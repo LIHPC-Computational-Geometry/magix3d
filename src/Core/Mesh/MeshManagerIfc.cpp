@@ -215,6 +215,11 @@ std::string MeshManagerIfc::getInfos(const std::string& name, int dim) const
     throw TkUtil::Exception ("MeshManagerIfc::getInfos should be overloaded.");
 }
 /*----------------------------------------------------------------------------*/
+Internal::M3DCommandResultIfc* MeshManagerIfc::exportBlocks(const std::string& n)
+{
+    throw TkUtil::Exception (TkUtil::UTF8String ("MeshManagerIfc::exportBlocks should be overloaded.", TkUtil::Charset::UTF_8));
+}
+/*----------------------------------------------------------------------------*/
 } // end namespace Mesh
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D

@@ -224,6 +224,15 @@ public:
 	SET_SWIG_COMPLETABLE_METHOD(getInfos)
 
 
+    /*------------------------------------------------------------------------*/
+    /** \brief Export dans un fichier au format VTK de la structure de blocs
+    *
+    *  \param n le nom du ficher dans lequel on exporte
+    */
+    virtual Mgx3D::Internal::M3DCommandResultIfc* exportBlocks(const std::string& n);
+    SET_SWIG_COMPLETABLE_METHOD(exportBlocks)
+
+
 private:
 	/**
 	 * \brief	Constructeur de copie. Interdit.
