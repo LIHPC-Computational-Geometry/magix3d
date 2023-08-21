@@ -1,0 +1,5 @@
+@PACKAGE_INIT@
+set (MAGIX3D_VERSION @MAGIX3D_VERSION@)
+set_and_check (Magix3D_RUNTIME_DIR   "@PACKAGE_RUNTIME_INSTALL_DIR@")
+check_required_components (QtVtkComponents)
+

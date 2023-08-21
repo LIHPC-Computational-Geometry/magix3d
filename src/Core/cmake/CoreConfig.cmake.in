@@ -1,0 +1,13 @@
+@PACKAGE_INIT@
+include(CMakeFindDependencyMacro)
+
+set (Core_VERSION @MAGIX3D_VERSION@)
+set_and_check (Core_INCLUDE_DIR   "@PACKAGE_INCLUDE_INSTALL_DIR@")
+set_and_check (Core_LIB_DIR   "@PACKAGE_LIB_INSTALL_DIR@")
+check_required_components (Core)
+find_dependency (PrefsCore)
+find_dependency (PythonUtil)
+find_dependency (GQGMDS)
+
+# Fournir l'accès aux services des cibles (fichier non inclus automatiquement) :
+include(${CMAKE_CURRENT_LIST_DIR}/CoreTargets.cmake)

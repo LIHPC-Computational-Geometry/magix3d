@@ -1,0 +1,18 @@
+find_path (TETGEN_INCLUDE_DIR NAMES tetgen.h)
+find_library (TETGEN_LIBRARY NAMES tet)
+
+if (TETGEN_INCLUDE_DIR AND TETGEN_LIBRARY)
+	message (STATUS "==>TETGEN FOUND : TETGEN_INCLUDE_DIR=${TETGEN_INCLUDE_DIR} TETGEN_LIBRARY=${TETGEN_LIBRARY}")
+	set (TETGEN_FOUND TRUE)
+else ( )
+	message (STATUS "==> TETGEN NOT FOUND.")
+	unset (TETGEN_FOUND)
+	return ( )
+endif (TETGEN_INCLUDE_DIR AND TETGEN_LIBRARY)
+
+
+set (TETGEN_TARGET "tetgen::tetgen")
+add_library (${TETGEN_TARGET} UNKNOWN IMPORTED)
+set_target_properties (tetgen::tetgen PROPERTIES
+                       INTERFACE_INCLUDE_DIRECTORIES ${TETGEN_INCLUDE_DIR}
+                       IMPORTED_LOCATION ${TETGEN_LIBRARY})

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<Magix3D XMLLoader_version="0.2.0">
+
+  <Section name="gui" type="container">
+  	<Section name="rays" type="container">
+	    <element name="spotTolerance" type="double">
+	      <annotation>
+	        <documentation>Tolérance dans les calculs d'intersection pointage laser/maille, 1e-2 par défaut</documentation>
+	      </annotation>
+	      <value>1.0e-2</value>
+	    </element>
+  	</Section>
+  </Section>
+
+</Magix3D>

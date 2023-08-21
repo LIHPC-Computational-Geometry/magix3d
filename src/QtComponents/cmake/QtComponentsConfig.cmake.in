@@ -1,0 +1,19 @@
+@PACKAGE_INIT@
+include(CMakeFindDependencyMacro)
+
+set (QtComponents_VERSION @LEM_VERSION@)
+set_and_check (QtComponents_INCLUDE_DIR   "@PACKAGE_INCLUDE_INSTALL_DIR@")
+set_and_check (QtComponents_LIB_DIR   "@PACKAGE_LIB_INSTALL_DIR@")
+check_required_components (QtComponents)
+find_dependency (pyMagix3D)
+find_dependency (PrefsQt REQUIRED)
+if (NOT USE_PYTHON_3)
+	find_dependency (QtPython REQUIRED)
+else (NOT USE_PYTHON_3)
+	find_dependency (QtPython3 REQUIRED)
+endif (NOT USE_PYTHON_3)
+find_dependency (QtQualif REQUIRED)
+find_dependency (GQGMDS REQUIRED)
+
+# Fournir l'accès aux services des cibles (fichier non inclus automatiquement) :
+include(${CMAKE_CURRENT_LIST_DIR}/QtComponentsTargets.cmake)
