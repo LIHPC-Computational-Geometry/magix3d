@@ -1280,7 +1280,25 @@ public:
     virtual Internal::M3DCommandResultIfc* setGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
 	SET_SWIG_COMPLETABLE_METHOD(setGroup)
 
+    /*------------------------------------------------------------------------*/
+    /** \brief retourne la liste des blocks gérés par le manager (non détruits)
+     */
+    virtual std::vector<std::string> getBlocks() const;
 
+    /*------------------------------------------------------------------------*/
+    /** \brief retourne la liste des faces gérées par le manager (non détruites)
+     */
+    virtual std::vector<std::string> getCoFaces() const;
+
+    /*------------------------------------------------------------------------*/
+    /** \brief retourne la liste des faces gérées par le manager (non détruites)
+     */
+    virtual std::vector<std::string> getCoEdges() const;
+
+    /*------------------------------------------------------------------------*/
+    /** \brief retourne la liste des faces gérées par le manager (non détruites)
+     */
+    virtual std::vector<std::string> getVertices() const;
 #ifndef SWIG
 
     /*------------------------------------------------------------------------*/

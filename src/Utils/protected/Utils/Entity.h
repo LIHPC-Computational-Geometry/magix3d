@@ -342,6 +342,11 @@ public:
         return (e1->getUniqueId()<e2->getUniqueId());
     }
 
+    /// Fonction de comparaison suivant l'unique id
+    bool operator<(const Entity* e) const {
+        return (this->getUniqueId() < e->getUniqueId());
+    }
+
 #endif
 
 

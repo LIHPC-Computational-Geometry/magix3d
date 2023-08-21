@@ -121,6 +121,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <algorithm>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -164,6 +165,66 @@ void TopoManager::clear()
     m_coedges.deleteAndClear();
     m_vertices.deleteAndClear();
     m_defaultNbMeshingEdges = 10;
+}
+/*----------------------------------------------------------------------------*/
+std::vector<std::string> TopoManager::getBlocks() const
+{
+    std::vector<std::string> entities_names;
+
+    const std::vector<Block* >& entities_all = m_blocks.get();
+    for(auto e: entities_all) {
+        if(!e->isDestroyed()) {
+            entities_names.push_back(e->getName());
+        }
+    }
+    std::sort(entities_names.begin(), entities_names.end());
+
+    return entities_names;
+}
+/*----------------------------------------------------------------------------*/
+std::vector<std::string> TopoManager::getCoFaces() const
+{
+    std::vector<std::string> entities_names;
+
+    const std::vector<CoFace* >& entities_all = m_cofaces.get();
+    for(auto e: entities_all) {
+        if(!e->isDestroyed()) {
+            entities_names.push_back(e->getName());
+        }
+    }
+    std::sort(entities_names.begin(), entities_names.end());
+
+    return entities_names;
+}
+/*----------------------------------------------------------------------------*/
+std::vector<std::string> TopoManager::getCoEdges() const
+{
+    std::vector<std::string> entities_names;
+
+    const std::vector<CoEdge* >& entities_all = m_coedges.get();
+    for(auto e: entities_all) {
+        if(!e->isDestroyed()) {
+            entities_names.push_back(e->getName());
+        }
+    }
+    std::sort(entities_names.begin(), entities_names.end());
+
+    return entities_names;
+}
+/*----------------------------------------------------------------------------*/
+std::vector<std::string>  TopoManager::getVertices() const
+{
+    std::vector<std::string> entities_names;
+
+    const std::vector<Vertex* >& entities_all = m_vertices.get();
+    for(auto e: entities_all) {
+        if(!e->isDestroyed()) {
+            entities_names.push_back(e->getName());
+        }
+    }
+    std::sort(entities_names.begin(), entities_names.end());
+
+    return entities_names;
 }
 /*----------------------------------------------------------------------------*/
 void TopoManager::getBlocks(std::vector<Block* > &blocks, bool sort) const

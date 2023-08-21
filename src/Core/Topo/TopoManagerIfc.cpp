@@ -797,10 +797,22 @@ Internal::M3DCommandResultIfc* TopoManagerIfc::setGroup(std::vector<std::string>
     throw TkUtil::Exception ("TopoManagerIfc::setGroup should be overloaded.");
 }
 /*----------------------------------------------------------------------------*/
+std::vector<std::string>
+TopoManagerIfc::getBlocks() const
+{
+    throw TkUtil::Exception ("TopoManagerIfc::getBlocks should be overloaded.");
+}
+/*----------------------------------------------------------------------------*/
 void
 TopoManagerIfc::getBlocks(std::vector<Topo::Block* >& blocks, bool sort) const
 {
     throw TkUtil::Exception ("TopoManagerIfc::getBlocks should be overloaded.");
+}
+/*----------------------------------------------------------------------------*/
+std::vector<std::string>
+TopoManagerIfc::getCoFaces() const
+{
+    throw TkUtil::Exception ("TopoManagerIfc::getCoFaces should be overloaded.");
 }
 /*----------------------------------------------------------------------------*/
 void
@@ -809,10 +821,22 @@ TopoManagerIfc::getCoFaces(std::vector<Topo::CoFace* >& faces) const
     throw TkUtil::Exception ("TopoManagerIfc::getCoFaces should be overloaded.");
 }
 /*----------------------------------------------------------------------------*/
+std::vector<std::string>
+TopoManagerIfc::getCoEdges() const
+{
+    throw TkUtil::Exception ("TopoManagerIfc::getCoEdges should be overloaded.");
+}
+/*----------------------------------------------------------------------------*/
 void
 TopoManagerIfc::getCoEdges(std::vector<Topo::CoEdge* >& edges) const
 {
     throw TkUtil::Exception ("TopoManagerIfc::getCoEdges should be overloaded.");
+}
+/*----------------------------------------------------------------------------*/
+std::vector<std::string>
+TopoManagerIfc::getVertices() const
+{
+    throw TkUtil::Exception ("TopoManagerIfc::getVertices should be overloaded.");
 }
 /*----------------------------------------------------------------------------*/
 void
