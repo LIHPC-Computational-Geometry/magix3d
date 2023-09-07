@@ -33,3 +33,5 @@ configure_file(
 include_directories(${PROJECT_BINARY_DIR})
 #======================================================================================================================
 add_subdirectory (src)
+message (STATUS "===============> MGX Documentation")
+add_subdirectory (Docs)

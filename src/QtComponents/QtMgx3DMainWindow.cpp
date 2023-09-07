@@ -138,7 +138,7 @@
 #include <QtUtil/QtAutoWaitingCursor.h>
 #include <QtUtil/QtCoordinatesDialog.h>
 #include <QtUtil/QtFileDialogUtilities.h>
-#include <QtUtil/QtHelpWindow.h>
+//#include <QtUtil/QtHelpWindow.h>
 #include <patchlevel.h>	// PY_VERSION
 #if PY_MAJOR_VERSION >= 3
 #	include <QtPython3/QtPython.h>
@@ -146,7 +146,7 @@
 #	include <QtPython/QtPython.h>
 #endif	// PY_MAJOR_VERSION >= 3
 #include <QtUtil/QtUnicodeHelper.h>
-#include <QtUtil/QtExternalLinkDialog.h>
+//#include <QtUtil/QtExternalLinkDialog.h>
 #include <QtUtil/QtStringHelper.h>
 #include <QtUtil/QtUtilInfos.h>
 #include <GQualif/QualifHelper.h>
@@ -924,7 +924,7 @@ Qt::AutoCompatConnection	3	The default type when Qt 3 support is enabled.
 #ifdef USE_EXPERIMENTAL_ROOM
                   _experimentalRoomPanel(0),
 #endif	// USE_EXPERIMENTAL_ROOM
-                  _pythonAPIWebBrowser(0), _repTypesDialog(0),
+                  _repTypesDialog(0),
                   _pythonMinScript(), _pytMinScriptCharset(Charset::ASCII),
                   _encodageScripts((ContextIfc::encodageScripts) - 1)
 		{
@@ -959,7 +959,7 @@ Qt::AutoCompatConnection	3	The default type when Qt 3 support is enabled.
 #ifdef USE_EXPERIMENTAL_ROOM
                   _experimentalRoomPanel(0),
 #endif	// USE_EXPERIMENTAL_ROOM
-                  _pythonAPIWebBrowser(0), _repTypesDialog(0),
+                  _repTypesDialog(0),
                   _pythonMinScript(), _pytMinScriptCharset(Charset::UNKNOWN),
                   _encodageScripts((ContextIfc::encodageScripts) - 1)
 		{
@@ -998,15 +998,6 @@ Qt::AutoCompatConnection	3	The default type when Qt 3 support is enabled.
 			if (0 != _commandMonitorPanel)
 				_commandMonitorPanel->release();
 //	delete _commandMonitorDialog;	_commandMonitorDialog	= 0;
-			if (0 != _pythonAPIWebBrowser)
-			{   // A ce stade cette boite de dialogue est normalement déjà détruite (cf. closeEvent, exitCallback).
-				// Si ça n'est pas le cas je crains le pire, il n'est pas sûr que le bogue QTBUG-59765 soit complément résolu.
-				_pythonAPIWebBrowser->setAttribute(Qt::WA_DeleteOnClose, true);     // CP : QTBUG-59765 workaround
-				_pythonAPIWebBrowser->close();                                    // CP : QTBUG-59765 workaround
-				_pythonAPIWebBrowser = 0;
-			}
-			delete _pythonAPIWebBrowser;
-			_pythonAPIWebBrowser = 0;
 
 			delete _repTypesDialog;
 			_repTypesDialog = 0;
@@ -2680,9 +2671,6 @@ void QtMgx3DMainWindow::showReady ( )
 			        SLOT(addExtremaMeshingEdgeLengthOnEdgeCallback()), defaultConnectionType);
 
 			// L'aide :
-			_actions._displayWikiAction = new QAction("Wiki Magix 3D (Présentation + TUTORIEL + FAQ)", this);
-			connect(_actions._displayWikiAction, SIGNAL(triggered()),
-			        this, SLOT(wikiCallback()), defaultConnectionType);
 			_actions._displayUsersGuideAction =
 					new QAction("Manuel utilisateur (pdf)", this);
 			connect(_actions._displayUsersGuideAction, SIGNAL(triggered()), this,
@@ -2698,14 +2686,7 @@ void QtMgx3DMainWindow::showReady ( )
 			_actions._displayWikiAction = new QAction("Prise en main (Wiki Magix 3D)", this);
 			connect(_actions._displayWikiAction, SIGNAL(triggered()),
 			        this, SLOT(wikiCallback()), defaultConnectionType);
-			_actions._displayTutorialAction = new QAction("Tutoriel (Wiki Magix 3D)", this);
-			QFont font = _actions._displayTutorialAction->font();
-#ifndef QT_4
-			font.setWeight(QFont::ExtraBold);
-#endif    // QT_4
-			font.setPointSize(1.4 * font.pointSize());
-			font.setBold(true);
-			_actions._displayTutorialAction->setFont(font);
+			_actions._displayTutorialAction = new QAction("Tutoriels", this);
 			connect(_actions._displayTutorialAction, SIGNAL(triggered()),
 			        this, SLOT(tutorialCallback()), defaultConnectionType);
 			_actions._displayPythonAPIUsersGuideAction =
@@ -4070,13 +4051,6 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 
 		void QtMgx3DMainWindow::closeEvent(QCloseEvent *event)
 		{
-			if (0 != _pythonAPIWebBrowser)
-			{
-				_pythonAPIWebBrowser->setAttribute(Qt::WA_DeleteOnClose, true); // CP : QTBUG-59765 workaround
-				_pythonAPIWebBrowser->close();                                // CP : QTBUG-59765 workaround
-				_pythonAPIWebBrowser = 0;
-			}   // if (0 != _pythonAPIWebBrowser)
-//::exit (0);
 			if (1 == QMessageBox::warning(this, getAppTitle().c_str(),
 			                              "Souhaitez-vous réellement quitter cette application ?",
 			                              "Oui", "Non", QString::null, 0, -1))
@@ -5302,12 +5276,6 @@ log (t5);
 		void QtMgx3DMainWindow::exitCallback()
 		{
 
-			if (0 != _pythonAPIWebBrowser)
-			{
-				_pythonAPIWebBrowser->setAttribute(Qt::WA_DeleteOnClose, true); // CP : QTBUG-59765 workaround
-				_pythonAPIWebBrowser->close();                                // CP : QTBUG-59765 workaround
-				_pythonAPIWebBrowser = 0;
-			}   // if (0 != _pythonAPIWebBrowser)
 #ifndef _DEBUG
 			if (0 != QtMessageBox::displayWarningMessage(this, getAppTitle(),
 			                                             "Souhaitez-vous réellement quitter cette application ?", 100,
@@ -7932,32 +7900,21 @@ void QtMgx3DMainWindow::showCommandMonitorDialogCallback ( )
 		_commandMonitorDialog->raise ( );
 	}
 */
-
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::showCommandMonitorDialogCallback
 
 
 void QtMgx3DMainWindow::usersGuideCallback ( )
 {
-    BEGIN_QT_TRY_CATCH_BLOCK
-
-	Process*	helpProcess	=
-			new Process (QtMgx3DApplication::HelpSystem::instance ( ).userManualViewer);
-	CHECK_NULL_PTR_ERROR (helpProcess)
-	Process::ProcessOptions&	options	= helpProcess->getOptions ( );
-	options.addOption (QtMgx3DApplication::HelpSystem::instance ( ).userManual);
-	helpProcess->execute ( );
-
+	BEGIN_QT_TRY_CATCH_BLOCK
+	QtMgx3DApplication::HelpSystem::instance ( ).show(QtMgx3DApplication::HelpSystem::instance ( ).userManual);
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::usersGuideCallback
-
 
 void QtMgx3DMainWindow::usersGuideContextCallback ( )
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
-
-	QtHelpWindow::displayURL (QtMgx3DApplication::HelpSystem::instance ( ).indexURL);
-
+	QtMgx3DApplication::HelpSystem::instance ( ).showUrl(QtMgx3DApplication::HelpSystem::instance ( ).indexURL);
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::usersGuideContextCallback
 
@@ -7965,10 +7922,7 @@ void QtMgx3DMainWindow::usersGuideContextCallback ( )
 void QtMgx3DMainWindow::wikiCallback ( )
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
-
-	QtExternalLinkDialog (
-		this, QtMgx3DApplication::HelpSystem::instance ( ).wikiURL, "Wiki Magix 3D", getAppTitle ( )).exec ( );
-
+	QtMgx3DApplication::HelpSystem::instance ( ).show(QtMgx3DApplication::HelpSystem::instance ( ).wikiURL);
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::wikiCallback
 
@@ -7976,10 +7930,8 @@ void QtMgx3DMainWindow::wikiCallback ( )
 void QtMgx3DMainWindow::tutorialCallback ( )
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
-
-	QtExternalLinkDialog (
-		this, QtMgx3DApplication::HelpSystem::instance ( ).tutorialURL, "Wiki Magix 3D", getAppTitle ( )).exec ( );
-
+	QtMgx3DApplication::HelpSystem::instance ( ).showUrl(QtMgx3DApplication::HelpSystem::instance ( ).tutorialURL,
+														QtMgx3DApplication::HelpSystem::instance ( ).tutorialTag);
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::tutorialCallback
 
@@ -7987,21 +7939,7 @@ void QtMgx3DMainWindow::tutorialCallback ( )
 void QtMgx3DMainWindow::pythonAPIUsersGuideCallback ( )
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
-
-	if (0 == _pythonAPIWebBrowser)
-	{
-		const string	title ("Magix 3D : Aide API Python");
-		_pythonAPIWebBrowser	= new QtWebBrowser (title);
-		_pythonAPIWebBrowser->setAttribute (Qt::WA_DeleteOnClose, false);
-		_pythonAPIWebBrowser->setURL (QtMgx3DApplication::HelpSystem::instance ( ).pythonAPIURL, "");
-		_pythonAPIWebBrowser->show ( );
-	}	// if (0 == _pythonAPIWebBrowser)
-	else
-	{
-		_pythonAPIWebBrowser->show ( );
-		_pythonAPIWebBrowser->raise ( );
-	}	// else if (0 == _pythonAPIWebBrowser)
-
+	QtMgx3DApplication::HelpSystem::instance ( ).showUrl(QtMgx3DApplication::HelpSystem::instance ( ).pythonAPIURL);
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::pythonAPIUsersGuideCallback
 
@@ -8009,10 +7947,8 @@ void QtMgx3DMainWindow::pythonAPIUsersGuideCallback ( )
 void QtMgx3DMainWindow::qualifCallback ( )
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
-
-	UTF8String  text ("Qualif (Qualité de maillages)");
-	QtExternalLinkDialog (this, QtMgx3DApplication::HelpSystem::instance ( ).qualifURL, text, getAppTitle ( )).exec ( );
-
+	//QtExternalLinkDialog (this, QtMgx3DApplication::HelpSystem::instance ( ).qualifURL, text, getAppTitle ( )).exec ( );
+	QtMgx3DApplication::HelpSystem::instance ( ).show(QtMgx3DApplication::HelpSystem::instance ( ).qualifURL);
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::qualifCallback
 
@@ -8020,10 +7956,9 @@ void QtMgx3DMainWindow::qualifCallback ( )
 void QtMgx3DMainWindow::shortKeyCallback ( )
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
-
-	QtHelpWindow::displayURL (QtMgx3DApplication::HelpSystem::instance ( ).shortKeyURL,
-			QtMgx3DApplication::HelpSystem::instance ( ).shortKeyTag);
-
+	//QtHelpWindow::displayURL (QtMgx3DApplication::HelpSystem::instance ( ).shortKeyURL,
+	//		QtMgx3DApplication::HelpSystem::instance ( ).shortKeyTag);
+	QtMgx3DApplication::HelpSystem::instance ( ).showUrl(QtMgx3DApplication::HelpSystem::instance ( ).shortKeyURL);
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::shortKeyCallback
 
@@ -8031,10 +7966,9 @@ void QtMgx3DMainWindow::shortKeyCallback ( )
 void QtMgx3DMainWindow::selectCallback ( )
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
-
-	QtHelpWindow::displayURL (QtMgx3DApplication::HelpSystem::instance ( ).selectURL,
-			QtMgx3DApplication::HelpSystem::instance ( ).selectTag);
-
+	//QtHelpWindow::displayURL (QtMgx3DApplication::HelpSystem::instance ( ).selectURL,
+	//		QtMgx3DApplication::HelpSystem::instance ( ).selectTag);
+	QtMgx3DApplication::HelpSystem::instance ( ).showUrl(QtMgx3DApplication::HelpSystem::instance ( ).selectURL);
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::selectCallback
 
@@ -8042,9 +7976,8 @@ void QtMgx3DMainWindow::selectCallback ( )
 void QtMgx3DMainWindow::historiqueCallback ( )
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
-
-	QtHelpWindow::displayURL (QtMgx3DApplication::HelpSystem::instance ( ).historiqueURL);
-
+	//QtHelpWindow::displayURL (QtMgx3DApplication::HelpSystem::instance ( ).historiqueURL);
+	QtMgx3DApplication::HelpSystem::instance ( ).showUrl(QtMgx3DApplication::HelpSystem::instance ( ).historiqueURL);
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::historiqueCallback
 
@@ -8160,7 +8093,8 @@ void QtMgx3DMainWindow::infoNewVersion(const TkUtil::Version& lastVersion,
 	{
 	case	0	:
 		//il faut ouvrir l'historique ...
-		QtHelpWindow::displayURL (QtMgx3DApplication::HelpSystem::instance ( ).historiqueURL);
+		//QtHelpWindow::displayURL (QtMgx3DApplication::HelpSystem::instance ( ).historiqueURL);
+		QtMgx3DApplication::HelpSystem::instance ( ).showUrl(QtMgx3DApplication::HelpSystem::instance ( ).historiqueURL);
 		break;
 	case	1	:
 		// on ne fait rien

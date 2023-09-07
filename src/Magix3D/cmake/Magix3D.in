@@ -27,11 +27,14 @@ export QT_PYTHON_SCRIPTS_DIR=@QtPython_RUNTIME_DIR@
 export PYTHONPATH=@CMAKE_INSTALL_PREFIX@/@MAGIX3D_BINDING_INSTALL_DIR@:@ADDPYTHONPACKAGES@$PYTHONPATH
 export PYTHONPATH=@QtPython_RUNTIME_DIR@:$PYTHONPATH
 export MGX3D_PATH=@CMAKE_INSTALL_PREFIX@/@MAGIX3D_BINDING_INSTALL_DIR@
-HELP_URL="-helpURL $ROOT_DIR/share/doc/Magix3D"
-WIKI_URL="-wikiURL "
-USER_MANUAL="-userManual $ROOT_DIR/share/doc/Magix3D/Pdf/manuel_utilisateur.pdf"
-PYTHON_API_MANUAL="-pythonAPIURL $ROOT_DIR/share/doc/Magix3D/pyMagix3D/html/index.html"
-MANUAL_VIEWER="-userManualViewer xdg-open"
+HELP_URL="-helpURL $ROOT_DIR/share/doc/MGX/sphinx"
+#WIKI_URL="-wikiURL @URL_WIKI@"
+#QUALIF_URL="-qualifURL @URL_QUALIF@"
+WIKI_URL="-wikiURL https://fr.wikipedia.org/"
+QUALIF_URL="-qualifURL https://www.lalanguefrancaise.com/dictionnaire/definition/qualif"
+
+USER_MANUAL="-userManual $ROOT_DIR/share/doc/MGX/sphinx/magix3d.pdf"
+DOC_VIEWER="-docViewer firefox"
 DEFAULT_CONFIG="-defaultConfig $ROOT_DIR/etc/magix3d.xml"
 CONFIG_PATCHS="-userConfigPatchs $ROOT_DIR/etc/magix3d_patchs.xml"
 OTHER_ARGS="-outCharsetRef àéèùô"
@@ -46,6 +49,6 @@ if [ $PLATFORM = Ubuntu ]; then
 	export LD_LIBRARY_PATH=@VTK_LIBRARY_PATH@:$LD_LIBRARY_PATH
 fi
 
-args="$HELP_URL $WIKI_URL $USER_MANUAL $PYTHON_API_MANUAL $MANUAL_VIEWER $DEFAULT_CONFIG $CONFIG_PATCHS $OTHER_ARGS $*"
+args="$HELP_URL $WIKI_URL $QUALIF_URL $USER_MANUAL $PYTHON_API_MANUAL $DOC_VIEWER $DEFAULT_CONFIG $CONFIG_PATCHS $OTHER_ARGS $*"
 
 $ROOT_DIR/bin/@MAGIX3D_EXE@ $args

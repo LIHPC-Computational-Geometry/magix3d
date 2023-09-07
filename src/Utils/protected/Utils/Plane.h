@@ -86,13 +86,13 @@ public:
      *   est indiqué par un décalage
      *
      *  @param type le type de plan (XY, XZ ou YZ)
-     *  @param offset le décalage par rapport au plan initial de type @type
+     *  @param offset le décalage par rapport au plan initial de type type
      */
     Plane(const XYZ& type, const double offset=0);
 
     /*------------------------------------------------------------------------*/
     /**  Constructeur par copie
-     *  @param p3 le plan à copier
+     *  @param p le plan à copier
      */
     Plane (const Plane& p):m_point(p.m_point), m_normal(p.m_normal)  {}
 

@@ -583,7 +583,7 @@ public:
      *  \param blocs_names la liste des noms de blocs à découper
      *  \param cofaces_names la liste des faces communes à considérer comme étant entre 2 blocs
      *  (ce qui permet de ne pas construire le bloc contre ces faces communes)
-     *  \param ratio_ogrid ratio pour positionner les nouveaux sommets,
+     *  \param ratio ratio pour positionner les nouveaux sommets,
      *  entre les sommets du bord de la sélection et le centre des blocs ou faces concernées
      *  \param nb_bras le nombre de couches de mailles autour du centre du o-grid à créer
      *  (c.a.d. le nombre de bras pour les arêtes entre les sommets du bord de la sélection et ceux créés)
@@ -615,7 +615,7 @@ public:
      *  \param faces_names la liste des noms de faces à découper
      *  \param coedges_names la liste des arêtes communes à considérer comme étant entre 2 faces
      *  (ce qui permet de ne pas construire la face contre ces arêtes communes)
-     *  \param ratio_ogrid ratio pour positionner les nouveaux sommets,
+     *  \param ratio ratio pour positionner les nouveaux sommets,
      *  entre les sommets du bord de la sélection et le centre des faces ou arêtes concernées
      *  \param nb_bras le nombre de couches de mailles autour du centre du o-grid à créer
      *  (c.a.d. le nombre de bras pour les arêtes entre les sommets du bord de la sélection et ceux créés)
@@ -1010,8 +1010,8 @@ public:
      * entraine celle des objets de niveau inférieurs (face, arêtes et sommets)
      * et réciproquement.
      *
-     * \param facteur supérieur à 0
-     * \param center   le centre
+     * \param facteur facteur supérieur à 0
+     * \param pcentre le centre
      * \param withGeom si l'homothétie se fait également sur la géométrie
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc*
@@ -1024,9 +1024,9 @@ public:
      * entraine celle des objets de niveau inférieurs (face, arêtes et sommets)
      * et réciproquement.
      *
-     * \param facteur suivant X supérieur à 0
-     * \param facteur suivant Y supérieur à 0
-     * \param facteur suivant Z supérieur à 0
+     * \param factorX facteur suivant X supérieur à 0
+     * \param factorY facteur suivant Y supérieur à 0
+     * \param factorZ facteur suivant Z supérieur à 0
      * \param withGeom si l'homothétie se fait également sur la géométrie
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc*
@@ -1133,7 +1133,7 @@ public:
     /** Opération de déplacement d'un sommet vers un autre sommet
      *
      * \param vertex_name le nom du sommet modifié
-     * \param targe_name le nom du sommet cible
+     * \param target_name le nom du sommet cible
      */
 	virtual Mgx3D::Internal::M3DCommandResultIfc*
 	setVertexSameLocation(std::string vertex_name,

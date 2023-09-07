@@ -95,8 +95,8 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur. S'enregistre auprès d'une liste de contextes
 	 *			existants et accessibles via la fonction <I>getContext</I>.
-	 * \param	Nom unique de ce contexte
-	 * \param   Utilise les flux standards (à éviter depuis l'IHM, car il y a
+	 * \param	name Nom unique de ce contexte
+	 * \param   withStdOutputs Utilise les flux standards (à éviter depuis l'IHM, car il y a
 	 * des conflits avec les sorties de commandes python)
 	 * \see		getContext
      */
@@ -110,7 +110,7 @@ public:
     virtual ~Context();
 
     /** \brief	Initialisation de l'API.
-     *  \param	argc et argv du main. Utilisation des éventuels arguments :<BR>
+     *  \param	argv argc et argv du main. Utilisation des éventuels arguments :<BR>
      *		-outCharsetRef àéèùô : détection automatique du jeu de caractères de
      *		la sortie standard (API TkUtil::Locale)<BR>
      *		-outCharset suivi de UTF-8, UTF-16, ISO-8859 ou ASCII pour imposer le jeu
@@ -236,7 +236,6 @@ public:
      * dans le commandManager (les undo n'apparaissent pas)
      * \param fileName nom du fichier pour la sauvegarde
      * \param enc le type d'information dans le script (nom, référence / commandes, coordonnées)
-     * \param enc le type d'information dans le script (nom, référence / commandes, coordonnées)
      */
     virtual void savePythonScript (std::string fileName, encodageScripts enc, TkUtil::Charset::CHARSET charset);
 
@@ -274,7 +273,7 @@ public:
 	static TkUtil::Log::TYPE getLogsMask ( );
 
 	/**
-	 * \param		Nouveau masque à appliquer par défaut aux flux sortants de
+	 * \param		mask Nouveau masque à appliquer par défaut aux flux sortants de
 	 *				logs.
 	 */
 	static void setLogsMask (TkUtil::Log::TYPE mask);
@@ -288,7 +287,7 @@ public:
 
 	/*------------------------------------------------------------------------*/
 	/**
-	 * \param	Nouveau gestionnaire d'écrivain de scripts (adoption).
+	 * \param	manager Nouveau gestionnaire d'écrivain de scripts (adoption).
 	 */
 	virtual void setScriptingManager (Internal::ScriptingManager* manager);
 
@@ -319,7 +318,7 @@ public:
     /*------------------------------------------------------------------------*/
     /**
     * Allocation d'une nouvelle propriété pour une entité (le nom)
-    * \param t le type d'objet
+    * \param ot le type d'objet
     */
 #ifndef SWIG
     Utils::Property* newProperty(const Utils::Entity::objectType& ot);
@@ -328,7 +327,7 @@ public:
     /*------------------------------------------------------------------------*/
     /**
     * Allocation d'une nouvelle propriété pour une entité avec un nom d'imposé
-    * \param t le type d'objet
+    * \param ot le type d'objet
     * \param name le nom de l'objet
     */
 #ifndef SWIG
@@ -338,7 +337,7 @@ public:
     /*------------------------------------------------------------------------*/
     /**
     * \return	Les propriétés d'affichage globale pour une entité (la couleur)
-    * \param	t le type d'objet
+    * \param	ot le type d'objet
     */
 #ifndef SWIG
     Utils::DisplayProperties& globalDisplayProperties (
@@ -350,7 +349,7 @@ public:
     /*------------------------------------------------------------------------*/
     /**
     * \return	Le masque d'affichage global pour une entité (filaire, surfacique, ...)
-    * \param	t le type d'objet
+    * \param	ot le type d'objet
     */
 #ifndef SWIG
     unsigned long& globalMask (Utils::Entity::objectType ot);
@@ -360,7 +359,7 @@ public:
     /*------------------------------------------------------------------------*/
     /**
     * Allocation d'une nouvelle propriété d'affichage pour une entité (la couleur)
-    * \param t le type d'objet
+    * \param ot le type d'objet
     */
 #ifndef SWIG
     Utils::DisplayProperties* newDisplayProperties(const Utils::Entity::objectType& ot);
@@ -439,7 +438,7 @@ public:
 	virtual TkUtil::Color getBackground ( ) const;
 
     /**
-	 * \param   La nouvelle couleur de fond du système graphique.
+	 * \param   bg La nouvelle couleur de fond du système graphique.
 	 */
 	virtual void setBackground (const TkUtil::Color& bg);
 
@@ -585,7 +584,7 @@ public :
 	 * Ex : si cette instance s'appelle <I>"Session_1"</I> et <I>base</I>
 	 * <I>"GeomManager"</I>, retourne un nom type
 	 * <I>"GeomManager_Session_1"</I>.
-	 * \param		Suffixe du nom créé
+	 * \param	base Suffixe du nom créé
 	 */
 	virtual std::string createName (const std::string& base) const;
 

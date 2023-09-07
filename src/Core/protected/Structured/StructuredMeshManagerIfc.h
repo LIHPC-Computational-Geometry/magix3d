@@ -36,8 +36,8 @@ class StructuredMeshManagerIfc: public Mgx3D::Internal::CommandCreator
 
 	/** Constructeur
 	 *
-	 *  \param	Nom unique de l'instance (utile en environnement distribué).
-	 *  \param	Contexte d'utilisation
+	 *  \param	name Nom unique de l'instance (utile en environnement distribué).
+	 *  \param	c Contexte d'utilisation
 	 */
 	StructuredMeshManagerIfc (const std::string& name, Mgx3D::Internal::ContextIfc* c);
 
@@ -79,8 +79,8 @@ class StructuredMeshManagerIfc: public Mgx3D::Internal::CommandCreator
 
 	/**
 	 * Affecter le maillage structuré au gestionnaire.
-	 * \param	Numéro du processeur (cas d'un partitionnement au chargement).
-	 * \param	Le (Partition du) maillage
+	 * \param	procNum Numéro du processeur (cas d'un partitionnement au chargement).
+	 * \param	mesh Le (La partition du) maillage
 	 * \see		releaseMeshEntities
 	 * \see		getMeshEntity
 	 * \see		getMesh
@@ -98,7 +98,7 @@ class StructuredMeshManagerIfc: public Mgx3D::Internal::CommandCreator
 	/**
 	 * Accéder au maillage structuré.
 	 * \return	Le(la partition demandée du) maillage structuré
-	 * \param	Numéro du processeur (cas d'un partitionnement au chargement).
+	 * \param	procNum Numéro du processeur (cas d'un partitionnement au chargement).
 	 */
 	virtual const StructuredMeshEntity& getMeshEntity (size_t procNum) const;
 	virtual StructuredMeshEntity& getMeshEntity (size_t procNum);

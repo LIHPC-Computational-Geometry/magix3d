@@ -80,13 +80,13 @@ public:
 
 	/**
 	 * Applique la configuration reçue en argument.
-	 * \param		Section racine de la configuration à appliquer.
+	 * \param	contextSection Section racine de la configuration à appliquer.
 	 */
 	void load (const Preferences::Section& contextSection);
 
 	/**
 	 * Ajoute à la section tranmise en argument la configuration actuelle.
-	 * \param		Section principale de la configuration de l'application.
+	 * \param		contextSection principale de la configuration de l'application.
 	 * \warning		N'effectue aucune action persistante.
 	 * \see			setPersistantConfiguration
 	 */
@@ -125,7 +125,7 @@ public:
 #ifndef SWIG
     /** \brief  Constructeur. S'enregistre auprès d'une liste de contextes
 	 *			existants et accessibles via la fonction <I>getContextIfc</I>.
-	 * \param	Nom unique de ce contexte
+	 * \param	name Nom unique de ce contexte
 	 * \see		getContextIfc
      */
     ContextIfc(const std::string& name);
@@ -144,7 +144,7 @@ public:
 	 * Ex : si cette instance s'appelle <I>"Session_1"</I> et <I>base</I>
 	 * <I>"GeomManager"</I>, retourne un nom type
 	 * <I>"GeomManager_Session_1"</I>.
-	 * \param		Suffixe du nom créé
+	 * \param	base Suffixe du nom créé
 	 */
 	virtual std::string createName (const std::string& base) const;
 	
@@ -231,7 +231,7 @@ public:
 	 * dans le commandManager (les undo n'apparaissent pas)
 	 * \param fileName nom du fichier pour la sauvegarde
 	 * \param enc le type d'information dans le script (nom, référence / commandes, coordonnées)
-	 * \param jeu de caractères utilisé pour encoder le fichier script
+	 * \param charset jeu de caractères utilisé pour encoder le fichier script
 	 */
 	virtual void savePythonScript (std::string fileName, encodageScripts enc, TkUtil::Charset::CHARSET charset);
 
@@ -253,7 +253,7 @@ public:
     virtual void setFinished(bool b);
 
     /*------------------------------------------------------------------------*/
-    /** \param  Le nouveau nom unique de l'instance.
+    /** \param  name Le nouveau nom unique de l'instance.
      */
     virtual void setName (const std::string& name);
 
@@ -374,7 +374,7 @@ public:
 	virtual TkUtil::Color getBackground ( ) const;
 
 	/**
-	 * \param	La nouvelle couleur de fond du système graphique.
+	 * \param	bg La nouvelle couleur de fond du système graphique.
 	 */
 	virtual void setBackground (const TkUtil::Color& bg);
 

@@ -52,8 +52,8 @@ QtBlockAssociationPanel::QtBlockAssociationPanel (
 			QWidget* parent, const string& panelName, 
 			QtMgx3DMainWindow& mainWindow, QtMgx3DOperationAction* action)
 	: QtMgx3DOperationPanel (parent, mainWindow, action,
-			QtMgx3DApplication::HelpSystem::instance ( ).vertexOperationURL,
-			QtMgx3DApplication::HelpSystem::instance ( ).vertexOperationTag),
+			QtMgx3DApplication::HelpSystem::instance ( ).associateBlockOperationURL,
+			QtMgx3DApplication::HelpSystem::instance ( ).associateBlockOperationTag),
 	  _blocksPanel (0), _volumePanel (0)
 {
 //	SET_WIDGET_BACKGROUND (this, Qt::yellow)

@@ -255,7 +255,7 @@ class QtMgx3DApplication : public QApplication
 		std::string					userManual;
 
 		/** L'outil de visualisation du manuel utilisateur. */
-		std::string					userManualViewer;
+		std::string					docViewer;
 
 		/** L'URL racine du système d'aide. Nulle par défaut.*/
 		std::string					rootURL;
@@ -270,7 +270,8 @@ class QtMgx3DApplication : public QApplication
 		std::string					wikiURL;
 		
 		/** L'URL du Tutorial Magix 3D. */
-		std::string					tutorialURL;
+		std::string					tutorialURL,
+									tutorialTag;
 
 		/** L'URL de l'API Python Magix 3D. Nulle par défaut.*/
 		std::string					pythonAPIURL;
@@ -279,8 +280,7 @@ class QtMgx3DApplication : public QApplication
 		std::string					qualifURL;
 
 		/** L'aide pour tout ce qui est raccourcis clavier */
-		std::string       			shortKeyURL,
-									shortKeyTag;
+		std::string       			shortKeyURL;
 
 		/** L'aide pour tout ce qui est sélection d'entités */
 		std::string       			selectURL,
@@ -617,6 +617,11 @@ class QtMgx3DApplication : public QApplication
 		std::string       			unrefineBlockOperationURL,
 									unrefineBlockOperationTag;
 
+		/** La page web du panneau d'édition d'association de blocs
+		 * topologiques , et sa balise dans la page. */
+		std::string       			associateBlockOperationURL,
+									associateBlockOperationTag;
+
 		/** La page web du panneau d'édition des paramètres de création de
 		 *  feuillets, et sa balise dans la page. */
 		std::string       			sheetOperationURL, sheetOperationTag;
@@ -643,7 +648,15 @@ class QtMgx3DApplication : public QApplication
 									syscoordRotationTag, syscoordTranslationTag;
 
 		static HelpSystem& instance ( );
+
+		/** Affiche la documentation se trouvant au chemin donné */
+		void show (std::string path);
+
+		/** Affiche la documentation composée d'une url */
+		void showUrl (std::string url);
 		
+		/** Affiche la documentation composée d'une url et d'un marqueur */
+		void showUrl (std::string url, std::string tag);
 		
 		private :
 

@@ -726,7 +726,6 @@ true,
 void QtMgx3DOperationPanel::helpCallback ( )
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
-
 	QtHelpWindow::displayURL (helpURL ( ), helpTag ( ));
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D : affichage de l'aide d'une opération.")
@@ -1859,9 +1858,9 @@ void QtMgx3DOperationsPanel::helpCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	if (0 != _operationPanel)
-		QtHelpWindow::displayURL (_operationPanel->helpURL ( ), _operationPanel->helpTag ( ));
+		QtMgx3DApplication::HelpSystem::instance ( ).showUrl(_operationPanel->helpURL ( ), _operationPanel->helpTag ( ));
 	else
-		QtHelpWindow::displayURL (QtMgx3DApplication::HelpSystem::instance ( ).operationsURL);
+		QtMgx3DApplication::HelpSystem::instance ( ).showUrl(QtMgx3DApplication::HelpSystem::instance ( ).operationsURL);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D : aide contextuelle des opérations.")
 }	// QtMgx3DOperationsPanel::helpCallback
