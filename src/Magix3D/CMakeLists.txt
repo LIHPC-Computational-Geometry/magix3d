@@ -45,9 +45,9 @@ install (
 
 # Le script de lancement de Magix3D :
 if (NOT USE_PYTHON_3)
-	find_package (QtPython 5 REQUIRED)
+	find_package (QtPython REQUIRED)
 else (NOT USE_PYTHON_3)
-	find_package (QtPython3 5 REQUIRED)
+	find_package (QtPython3 REQUIRED)
 	set (QtPython_RUNTIME_DIR "${QtPython3_RUNTIME_DIR}")
 endif (NOT USE_PYTHON_3)
 #find_package (LimaScripting)	# Faut il ajouter le PATH à Lima si installé ailleurs ?

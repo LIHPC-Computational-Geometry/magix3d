@@ -3,7 +3,7 @@ set (CURRENT_PACKAGE_MACRO_NAME "UTILS")
 include (${CMAKE_SOURCE_DIR}/cmake/version.cmake)
 include (${CMAKE_SOURCE_DIR}/cmake/common.cmake)
 
-find_package (TkUtil 5 REQUIRED)
+find_package (TkUtil REQUIRED)
 
 file (GLOB HEADERS protected/Utils/*.h)
 file (GLOB CPP_SOURCES *.cpp)

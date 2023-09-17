@@ -4,8 +4,8 @@ set (CURRENT_PACKAGE_MACRO_NAME "QT_VTK_COMPONENTS")
 include (${CMAKE_SOURCE_DIR}/cmake/version.cmake)
 include (${CMAKE_SOURCE_DIR}/cmake/common.cmake)
 
-find_package (QtVtk 7)
-find_package (ExperimentalRoom 7)
+find_package (QtVtk REQUIRED)
+find_package (ExperimentalRoom)
 
 if (VTK_9)
 	set (VTK_REQUIRED_PACKAGES RenderingLOD)

@@ -9,7 +9,9 @@
 
 #include "VtkComponents/vtkECMFactory.h"
 #include "VtkComponents/vtkECMXOpenGLRenderWindow.h"
+#ifdef USE_VTK_PARALLEL
 #include "VtkComponents/vtkDMAParallelRenderManager.h"
+#endif	// USE_VTK_PARALLEL
 
 #include <vtkVersion.h>
 #ifdef VTK_USE_X    // Eventuellement défini dans vtkRenderingOpenGLConfigure.h de la distribution VTK.
@@ -49,8 +51,9 @@ VTK_CREATE_CREATE_FUNCTION (vtkECMXOpenGLRenderWindow);
 #endif	// VTK_5
 #endif  // VTK_USE_X
 
+#ifdef USE_VTK_PARALLEL
 VTK_CREATE_CREATE_FUNCTION (vtkDMAParallelRenderManager);
-
+#endif	// USE_VTK_PARALLEL
 
 vtkECMFactory::vtkECMFactory ( )
 {
@@ -86,6 +89,7 @@ vtkECMFactory::vtkECMFactory ( )
 */
 
 
+#ifdef USE_VTK_PARALLEL
 	this->RegisterOverride("vtkCompositeRenderManager",
 	                       "vtkDMAParallelRenderManager",
 	                       "Corrects bug when bounds of a render windows are not initialized (e.g. when nothing is displayed).",
@@ -94,6 +98,7 @@ vtkECMFactory::vtkECMFactory ( )
 	cout << "- vtkDMAParallelRenderManager that overload vtkCompositeRenderManager in "
 	     << "order to corrects a bug when bounds of a render windows are not initialized (e.g. when nothing is displayed)." << endl
 	     << endl;
+#endif	// USE_VTK_PARALLEL
 }	// vtkECMFactory::vtkECMFactory
 
 

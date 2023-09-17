@@ -14,9 +14,11 @@ export -n LC_ALL
 export LC_NUMERIC=C
 
 #REM : lsb_release -d utilise 2 types de séparateurs, tab puis espaces => on remplace les tabs par des espaces puis on cherche l'info souhaitée ...
-PLATFORM=`ccc_os`
-if [ "$PLATFORM" = "" ]; then
-	PLATFORM=`lsb_release -d | tr -s '\t' ' ' | cut -d' ' -f2`
+if ! command -v ccc_os &> /dev/null
+then
+    PLATFORM=`lsb_release -d | tr -s '\t' ' ' | cut -d' ' -f2`
+else
+    PLATFORM=`ccc_os`
 fi
 ROOT_DIR=@CMAKE_INSTALL_PREFIX@
 
