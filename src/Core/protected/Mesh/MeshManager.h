@@ -235,6 +235,12 @@ public:
     /// modif de m_coface_allways_in_groups
     void setCoFaceAllwaysInGroups(bool vis) {m_coface_allways_in_groups = vis;}
 
+    /*------------------------------------------------------------------------*/
+    /** \brief Export dans un fichier au format VTK de la structure de blocs
+     *
+     *  \param n le nom du ficher dans lequel on exporte
+     */
+    virtual Mgx3D::Internal::M3DCommandResultIfc* exportBlocks(const std::string& n);
 
 private:
     /// Lien sur la structure de maillage et ses algos

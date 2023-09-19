@@ -20,6 +20,7 @@
 #include "Mesh/CommandWriteVTK.h"
 #include "Mesh/CommandWriteCGNS.h"
 #include "Mesh/CommandModifyMesh.h"
+#include "Mesh/CommandExportBlocks.h"
 #include "Mesh/SubVolume.h"
 #include "Topo/Block.h"
 #include "Internal/M3DCommandResult.h"
@@ -617,6 +618,31 @@ CommandMeshExplorer* MeshManager::endExplorer(CommandMeshExplorer* oldExplo, boo
 
     return command;
 }
+/*----------------------------------------------------------------------------*/
+    Internal::M3DCommandResultIfc* MeshManager::exportBlocks(const std::string& n)
+    {
+#ifdef _DEBUG2
+        std::cout<<"exportBlocks"<<std::endl;
+#endif
+
+        //creation de la commande d'exportation
+        CommandExportBlocks *command = new CommandExportBlocks(getLocalContext(), n);
+
+        // trace dans le script
+        TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
+        cmd << getContextAlias() << "." << "getTopoManager().exportBlocks(";
+        cmd <<"\""<<n<<"\")";
+        command->setScriptCommand(cmd);
+
+        // on passe au gestionnaire de commandes qui exécute la commande en // ou non
+        // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
+        getCommandManager().addCommand(command, Utils::Command::DO);
+
+        Internal::M3DCommandResultIfc*  cmdResult   =
+                new Internal::M3DCommandResult (*command);
+        return cmdResult;
+    }
+/*----------------------------------------------------------------------------*/
 /*----------------------------------------------------------------------------*/
 } // end namespace Mesh
 /*----------------------------------------------------------------------------*/
