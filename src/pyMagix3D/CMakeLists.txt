@@ -115,6 +115,7 @@ install (
    DESTINATION ${ConfigPackageLocation}
    )
 
+#[===[
 # La doc doxygen de l'API python :
 find_package (Doxygen)
 if (Doxygen_FOUND)
@@ -206,6 +207,7 @@ else (Doxygen_FOUND)
 	message (WARNING "Documentation de l'API python non générée : doxygen non trouvé.")
 #	message (FATAL_ERROR "Doxygen not found")
 endif (Doxygen_FOUND)
+]===]
 
 # Le lancement du test de non régression via ctest : depuis le répertoire de build, faire ctest -V nr
 add_test (NAME nr COMMAND make default PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR} PYTHON_EXE=${Python2_EXECUTABLE} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../NonRegression)

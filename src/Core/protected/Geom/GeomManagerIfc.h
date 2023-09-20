@@ -158,10 +158,10 @@ public:
             std::string groupName="");
 
     /*------------------------------------------------------------------------*/
-    /** \brief création d'un segment à partir des sommets v1, v2
+    /** \brief création d'un segment à partir des sommets n1, n2
      *
-     *  \param v1 le premier sommet
-     *  \param v2 le second somment
+     *  \param n1 le premier sommet
+     *  \param n2 le second somment
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc*
 		newSegment(std::string n1,std::string n2,
@@ -195,11 +195,10 @@ public:
 
     /*------------------------------------------------------------------------*/
     /** \brief création d'un cone suivant un axe, avec deux rayons
-     *         et une longueur
+     *         un vecteur et un angle
      *
      *  \param dr1 le premier rayon du cone (à l'origine)
      *  \param dr2 le deuxième rayon du cone
-     *  \param lg la longueur
      *  \param dv le vecteur pour l'axe et la longueur
      *  \param da l'angle de la portion de cone
      *  \param groupName optionnellement un nom de groupe
@@ -258,7 +257,7 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief création d'une surface à partir d'une autre à une distance donnée
      *
-     *  \param base le nom de la surface à copier
+     *  \param name le nom de la surface à copier
      *  \param offset la distance
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc*
@@ -340,7 +339,7 @@ public:
      *
      *  \param geo      les objets d'origine
      *  \param factor   le facteur d'homothétie
-     *  \param center   le centre (optionnel)
+     *  \param pcentre   le centre (optionnel)
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc*
         scale(std::vector<std::string>& geo, const double factor);
@@ -365,7 +364,7 @@ public:
      *
      *  \param geo      les objets d'origine
      *  \param factor   le facteur d'homothétie
-     *  \param center   le centre (optionnel)
+     *  \param pcentre   le centre (optionnel)
      *  \param withTopo a vrai si l'on doit copier la topologie avec la géométrie
      *  \param groupName groupe dans lequel sont mise les nouvelles entités
      */
@@ -855,7 +854,6 @@ public:
     /** \brief Import d'un fichier au format STL
      *
      *  \param n le nom du ficher dont le contenu doit etre importe
-     *  \param splitCompoundCurves décompose les courbes composites en de multiples courbes
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc* importSTL(std::string n);
 	SET_SWIG_COMPLETABLE_METHOD(importSTL)
@@ -996,7 +994,14 @@ public:
     virtual Mgx3D::Internal::M3DCommandResultIfc* section(std::vector<std::string>& entities, std::string tool);
 	SET_SWIG_COMPLETABLE_METHOD(section)
 
-
+    /*------------------------------------------------------------------------*/
+    /** \brief Section d'un groupe d'entités géométrique par un outil
+     *
+     *  \param entities les entités que l'on veut couper
+     *  \param tool     l'entité pour découper
+     *  \param planeGroupName le nom du groupe dans lequel on place toutes les
+     *                        entites sur le plan
+     */
     virtual Mgx3D::Internal::M3DCommandResultIfc* sectionByPlane(
             std::vector<std::string>& entities,  Utils::Math::Plane* tool,
             std::string planeGroupName);
@@ -1121,8 +1126,8 @@ protected :
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur
      *
-	 *  \param		Nom unique de l'instance (utile en environnement distribué).
-     *  \param c le contexte ce qui permet d'accéder entre autre au CommandManager
+	 *  \param	name unique de l'instance (utile en environnement distribué).
+     *  \param  c le contexte ce qui permet d'accéder entre autre au CommandManager
      */
     GeomManagerIfc (const std::string& name, Internal::ContextIfc * c);
 

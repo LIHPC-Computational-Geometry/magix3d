@@ -24,6 +24,7 @@ option (USE_MDLPARSER "Build the mdl parser to read the 2D mdl format (on-site, 
 option (USE_MESHGEMS "Build the MeshGems component to access tri/tet meshing functionalities (on-site, default : OFF)" OFF)
 option (USE_SEPA3D "Build the SEPA3D component (on-site, default : OFF)" OFF)
 option (USE_SMOOTH3D "Build the SMOOTH3D component (on-site, default : OFF)" OFF)
+option (WITH_DOC "Build the documentation (on-site, default : ON)" ON)
 #======================================================================================================================
 #tell cmake to generate the configure file that will be used to activate the previous option C++ balise in the code
 configure_file(
@@ -33,3 +34,7 @@ configure_file(
 include_directories(${PROJECT_BINARY_DIR})
 #======================================================================================================================
 add_subdirectory (src)
+if(WITH_DOC)
+  message (STATUS "===============> MGX Documentation")
+  add_subdirectory (Docs)
+endif()

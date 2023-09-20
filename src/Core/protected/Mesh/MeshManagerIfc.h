@@ -68,8 +68,8 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur
      *
-	 *  \param		Nom unique de l'instance (utile en environnement distribué).
-     *  \param c le contexte ce qui permet d'accéder entre autre au CommandManager
+	 *  \param	name Nom unique de l'instance (utile en environnement distribué).
+     *  \param  c Le contexte ce qui permet d'accéder entre autre au CommandManager
      */
     MeshManagerIfc(const std::string& name, Internal::ContextIfc* c);
 

@@ -1,0 +1,21 @@
+.wy-nav-content {
+    max-width: 80%;
+}
+
+span.caption-text {
+    text-align: center;
+}
+
+p {
+    margin-bottom: 8px; /* between paragraphs */
+}
+
+h2 {
+    margin-bottom: 5px; /* between paragraphs */
+}
+
+table.image-with-caption {
+    text-align:center;
+    background-color:silver;
+    border:none !important;
+}

@@ -49,10 +49,9 @@ vector<string> mgx3dAllowedArgs ( )
 	args.push_back ("--help");
 	args.push_back ("-helpURL");
 	args.push_back ("-wikiURL");
-	args.push_back ("-userManual");
-	args.push_back ("-userManualViewer");
-	args.push_back ("-pythonAPIURL");
 	args.push_back ("-qualifURL");
+	args.push_back ("-userManual");
+	args.push_back ("-docViewer");
 	args.push_back ("-script");
 	args.push_back ("--script");
 

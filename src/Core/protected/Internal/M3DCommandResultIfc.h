@@ -47,13 +47,13 @@ class M3DCommandResultIfc : public Mgx3D::Utils::CommandResult
 
 	/**
 	 * \return	Le i-ème volume créé par la commande.
-	 * \except	Lève une exception s'il n'existe pas de tel volume.
+	 * Lève une exception s'il n'existe pas de tel volume.
 	 */
 	virtual std::string getVolume (size_t index);
 
 	/**
 	 * \return	Le seul volume créé par la commande.
-	 * \except	Lève une exception s'il n'existe pas ou s'il y en a plus.
+	 * Lève une exception s'il n'existe pas ou s'il y en a plus.
 	 */
 	virtual std::string getVolume ( );
 
@@ -64,13 +64,13 @@ class M3DCommandResultIfc : public Mgx3D::Utils::CommandResult
 
 	/**
 	 * \return	La i-ème surface créée par la commande.
-	 * \except	Lève une exception si elle n'existe pas de telle surface.
+	 * Lève une exception si elle n'existe pas de telle surface.
 	 */
 	virtual std::string getSurface (size_t index);
 
 	/**
 	 * \return	La seule surface créée par la commande.
-	 * \except	Lève une exception si elle n'existe pas ou s'il y en a plus.
+	 * Lève une exception si elle n'existe pas ou s'il y en a plus.
 	 */
 	virtual std::string getSurface ( );
 
@@ -81,13 +81,13 @@ class M3DCommandResultIfc : public Mgx3D::Utils::CommandResult
 
 	/**
 	 * \return	La i-ème courbe créée par la commande.
-	 * \except	Lève une exception si elle n'existe pas de telle courbe.
+	 * Lève une exception si elle n'existe pas de telle courbe.
 	 */
 	virtual std::string getCurve (size_t index);
 
 	/**
 	 * \return	La seule courbe créée par la commande.
-	 * \except	Lève une exception si elle n'existe pas ou s'il y en a plus.
+	 * Lève une exception si elle n'existe pas ou s'il y en a plus.
 	 */
 	virtual std::string getCurve ( );
 
@@ -98,13 +98,13 @@ class M3DCommandResultIfc : public Mgx3D::Utils::CommandResult
 
 	/**
 	 * \return	Le i-ème point créé par la commande.
-	 * \except	Lève une exception s'il n'existe pas de tel point.
+	 * Lève une exception s'il n'existe pas de tel point.
 	 */
 	virtual std::string getVertex (size_t index);
 
 	/**
 	 * \return	Le seul point créé par la commande.
-	 * \except	Lève une exception s'il n'existe pas ou s'il y en a plus.
+	 * Lève une exception s'il n'existe pas ou s'il y en a plus.
 	 */
 	virtual std::string getVertex ( );
 
@@ -122,13 +122,13 @@ class M3DCommandResultIfc : public Mgx3D::Utils::CommandResult
 
 	/**
 	 * \return	Le i-ème bloc créé par la commande.
-	 * \except	Lève une exception s'il n'existe pas de tel bloc.
+	 * Lève une exception s'il n'existe pas de tel bloc.
 	 */
 	virtual std::string getBlock (size_t index);
 
 	/**
 	 * \return	Le seul bloc créé par la commande.
-	 * \except	Lève une exception s'il n'existe pas ou s'il y en a plus.
+	 * Lève une exception s'il n'existe pas ou s'il y en a plus.
 	 */
 	virtual std::string getBlock ( );
 
@@ -139,13 +139,13 @@ class M3DCommandResultIfc : public Mgx3D::Utils::CommandResult
 
 	/**
 	 * \return	La i-ème face créée par la commande.
-	 * \except	Lève une exception si elle n'existe pas de telle face.
+	 * Lève une exception si elle n'existe pas de telle face.
 	 */
 	virtual std::string getFace (size_t index);
 
 	/**
 	 * \return	La seule face créée par la commande.
-	 * \except	Lève une exception si elle n'existe pas ou s'il y en a plus.
+	 * Lève une exception si elle n'existe pas ou s'il y en a plus.
 	 */
 	virtual std::string getFace ( );
 
@@ -156,13 +156,13 @@ class M3DCommandResultIfc : public Mgx3D::Utils::CommandResult
 
 	/**
 	 * \return	La i-ème arête créée par la commande.
-	 * \except	Lève une exception si elle n'existe pas de telle arête.
+	 * Lève une exception si elle n'existe pas de telle arête.
 	 */
 	virtual std::string getEdge (size_t index);
 
 	/**
 	 * \return	La seule arête créée par la commande.
-	 * \except	Lève une exception si elle n'existe pas ou s'il y en a plus.
+	 * Lève une exception si elle n'existe pas ou s'il y en a plus.
 	 */
 	virtual std::string getEdge ( );
 
@@ -173,13 +173,13 @@ class M3DCommandResultIfc : public Mgx3D::Utils::CommandResult
 
 	/**
 	 * \return	Le i-ème sommet créé par la commande.
-	 * \except	Lève une exception s'il n'existe pas de tel sommet.
+	 * Lève une exception s'il n'existe pas de tel sommet.
 	 */
 	virtual std::string getTopoVertex (size_t index);
 
 	/**
 	 * \return	Le seul sommet créé par la commande.
-	 * \except	Lève une exception s'il n'existe pas ou s'il y en a plus.
+	 * Lève une exception s'il n'existe pas ou s'il y en a plus.
 	 */
 	virtual std::string getTopoVertex ( );
 
@@ -220,7 +220,7 @@ class M3DCommandResultIfc : public Mgx3D::Utils::CommandResult
 
 	/**
 	 * Constructeur.
-	 * \param	Commande représentée.
+	 * \param	Command  commande représentée.
 	 */
 	M3DCommandResultIfc (Mgx3D::Utils::Command&);
 

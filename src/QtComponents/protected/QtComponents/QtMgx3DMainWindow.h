@@ -1553,9 +1553,6 @@ class QtMgx3DMainWindow :
 	QWidget*							_experimentalRoomPanel;
 #endif	// USE_EXPERIMENTAL_ROOM
 
-	/** L'aide <I>API Python</I>. */
-	QtWebBrowser*						_pythonAPIWebBrowser;
-
 	/** L'éventuelle boite de dialogue de modification des propriétés graphiques
 	 * des entités affichées. */
 	Mgx3D::QtComponents::QtRepresentationTypesDialog*	_repTypesDialog;
