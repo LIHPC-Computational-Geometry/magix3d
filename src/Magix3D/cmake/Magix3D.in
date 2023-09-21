@@ -27,13 +27,11 @@ export QT_PYTHON_SCRIPTS_DIR=@QtPython_RUNTIME_DIR@
 export PYTHONPATH=@CMAKE_INSTALL_PREFIX@/@MAGIX3D_BINDING_INSTALL_DIR@:@ADDPYTHONPACKAGES@$PYTHONPATH
 export PYTHONPATH=@QtPython_RUNTIME_DIR@:$PYTHONPATH
 export MGX3D_PATH=@CMAKE_INSTALL_PREFIX@/@MAGIX3D_BINDING_INSTALL_DIR@
-HELP_URL="-helpURL $ROOT_DIR/share/doc/MGX/sphinx"
-#WIKI_URL="-wikiURL @URL_WIKI@"
-#QUALIF_URL="-qualifURL @URL_QUALIF@"
-WIKI_URL="-wikiURL https://fr.wikipedia.org/"
-QUALIF_URL="-qualifURL https://www.lalanguefrancaise.com/dictionnaire/definition/qualif"
+HELP_URL="-helpURL $ROOT_DIR/share/doc/@CMAKE_PROJECT_NAME@/sphinx"
+WIKI_URL="-wikiURL @URL_WIKI@"
+QUALIF_URL="-qualifURL @URL_QUALIF@"
 
-USER_MANUAL="-userManual $ROOT_DIR/share/doc/MGX/sphinx/magix3d.pdf"
+USER_MANUAL="-userManual $ROOT_DIR/share/doc/@CMAKE_PROJECT_NAME@/sphinx/magix3d.pdf"
 DOC_VIEWER="-docViewer firefox"
 DEFAULT_CONFIG="-defaultConfig $ROOT_DIR/etc/magix3d.xml"
 CONFIG_PATCHS="-userConfigPatchs $ROOT_DIR/etc/magix3d_patchs.xml"

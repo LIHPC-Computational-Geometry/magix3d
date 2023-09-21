@@ -25,3 +25,27 @@ option(SPHINX_OUTPUT_HTML "Output standalone HTML files" ON)
 option(SPHINX_OUTPUT_MAN "Output man pages" ON)
 
 option(SPHINX_WARNINGS_AS_ERRORS "When building documentation treat warnings as errors" OFF)
+
+find_package (Python COMPONENTS Interpreter)
+
+if (Python_Interpreter_FOUND)
+    # Check for Sphinx theme dependency for documentation
+    foreach (component IN LISTS Sphinx_FIND_COMPONENTS)
+        execute_process (
+            COMMAND ${Python_EXECUTABLE} -c "import ${component}"
+            ERROR_STRIP_TRAILING_WHITESPACE
+            ERROR_VARIABLE _Sphinx_BUILD_ERROR
+            OUTPUT_QUIET
+            RESULT_VARIABLE _Sphinx_BUILD_RESULT
+        )
+        if (_Sphinx_BUILD_RESULT EQUAL 0)
+            message (STATUS "Sphinx component '${component}' available")
+            set (Sphinx_${component}_FOUND TRUE)
+        elseif (_Sphinx_BUILD_RESULT EQUAL 1)
+            message (FATAL_ERROR "Sphinx component '${component}' is not available")
+            set (Sphinx_${component}_FOUND FALSE)
+        endif (_Sphinx_BUILD_RESULT EQUAL 0)
+        unset (_Sphinx_BUILD_ERROR)
+        unset (_Sphinx_BUILD_RESULT)
+    endforeach (component)
+endif (Python_Interpreter_FOUND)

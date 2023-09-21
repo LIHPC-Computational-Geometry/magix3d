@@ -1,9 +1,9 @@
 # Add the cmake folder so the FindSphinx module is found
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
-find_package(Python3 REQUIRED)
+find_package(Python REQUIRED)
 find_package(Doxygen REQUIRED)
-find_package(Sphinx REQUIRED)
+find_package(Sphinx REQUIRED COMPONENTS sphinx_rtd_theme breathe sphinx_copybutton)
 find_package(LATEX REQUIRED)
 
 # Find all the public headers
