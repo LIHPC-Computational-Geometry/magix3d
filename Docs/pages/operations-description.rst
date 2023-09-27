@@ -1,10 +1,10 @@
 .. _operations-description:
 
-Les différents panneaux s’ouvrent suivant la sélection des 3 icônes respectivement dans les 3 parties :
+Les différents panneaux s’ouvrent suivant la sélection des 3 icônes respectivement dans les 3 parties.
 
 Chacun de ces panneaux dispose d’un certain nombre de champs de texte
 où il est attendu soit des valeurs soit des noms d’entités. Dans le cas
-des champs pour des noms d’entités, il est possible
+des champs pour des noms d’entités, il est possible :
 
 -  Soit après une première activation du champ (il passe alors en
    violet) de sélectionner une entité depuis le panneau de

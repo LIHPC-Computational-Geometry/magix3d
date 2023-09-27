@@ -60,7 +60,9 @@ repère absolu lié à la chambre d’expérimentation ou dans un repère
 indépendant (dit maillage) et dont on donnera la formule de passage avec
 celui de la chambre. 
 
-Voir :ref:`utiliser-contexte`.
+.. only:: html
+
+   Voir :ref:`utiliser-contexte`.
 
 Maillage en 2D
 ^^^^^^^^^^^^^^
@@ -122,7 +124,9 @@ proposées :
    degré maximum à 1. Il n’est pas encore permis de sélectionner un
    degré différent suivant le contour.
 
-|image7|
+.. image:: ../images/image8.jpg
+   :width: 3.06716in
+   :height: 1.93184in
 
 .. _exporter:
 
@@ -152,7 +156,9 @@ Cette commande accessible avec le raccourci CTRL+S ouvre une
 fenêtre pour sélectionner l’emplacement et le nom du fichier pour
 sauvegarder les commandes python.
 
-|image11|
+.. image:: ../images/image12.jpeg
+   :width: 5.06299in
+   :height: 3.04717in
 
 Cette sauvegarde met dans un même fichier l’ensemble des commandes
 python utiles pour arriver à l’état actuel de la session. Les commandes
@@ -214,5 +220,3 @@ Scripts Magix3D récents
 
 Ce menu vous permet de retrouver facilement un des 10 derniers scripts
 exécutés avec succès.
-
-.. include:: substitution-images.rst

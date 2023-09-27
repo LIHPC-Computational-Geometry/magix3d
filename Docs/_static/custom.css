@@ -2,7 +2,7 @@
     max-width: 80%;
 }
 
-span.caption-text {
+.caption-text {
     text-align: center;
 }
 
@@ -18,4 +18,11 @@ table.image-with-caption {
     text-align:center;
     background-color:silver;
     border:none !important;
+}
+
+.mysidebar {
+    padding: 10px;
+    background: none;
+    border-radius: 0px;
+    float: right;
 }

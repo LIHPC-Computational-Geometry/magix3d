@@ -1,5 +1,5 @@
 Onglets
-****************
+-------
 
 .. toctree::
    :titlesonly:

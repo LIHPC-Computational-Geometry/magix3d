@@ -30,7 +30,7 @@ version = variables.magix_version
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx_rtd_theme', 'breathe', 'magix', 'sphinx_copybutton']
+extensions = ['sphinx_rtd_theme', 'breathe', 'magix', 'sphinx_copybutton', 'rst2pdf.pdfbuilder']
 
 # Breathe Configuration
 breathe_projects = {"Magix3D": variables.doxygen_build_path,}
@@ -51,15 +51,12 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
-#html_theme = 'classic'
-
 
 html_theme_options = {
 }
@@ -82,10 +79,7 @@ html_show_sourcelink = False
 
 language = "fr"
 
-latex_elements = {
-    'fontenc': r'\usepackage[LGR,T1]{fontenc}',
-    'textgreek': r'\usepackage{textalpha,alphabeta}',
-    'hyperref':r'\usepackage{hyperref}'
- }
- 
-latex_documents = [('pages/manuel-utilisateur', 'magix3d.tex', 'Manuel Utilisateur Magix3d', '', 'article')]
+pdf_documents = [('pages/manuel-utilisateur', 'magix3d', 'Manuel Utilisateur Magix3d', 'Equipe Maillage'),]
+pdf_stylesheets = ['styles', 'mystyle.yaml']
+pdf_use_coverpage = False
+pdf_use_toc = False

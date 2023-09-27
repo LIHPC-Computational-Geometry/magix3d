@@ -3,8 +3,7 @@ set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
 find_package(Python REQUIRED)
 find_package(Doxygen REQUIRED)
-find_package(Sphinx REQUIRED COMPONENTS sphinx_rtd_theme breathe sphinx_copybutton)
-find_package(LATEX REQUIRED)
+find_package(Sphinx REQUIRED COMPONENTS sphinx_rtd_theme breathe sphinx_copybutton rst2pdf)
 
 # Find all the public headers
 get_target_property(MGX_PUBLIC_HEADER_DIR Core INTERFACE_INCLUDE_DIRECTORIES)
@@ -100,18 +99,16 @@ set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/sphinx)
 set(SPHINX_INDEX_FILE ${SPHINX_BUILD}/index.html)
 
 # we call sphinx from camke command to set PYTHONPATH (to use built VARMMODULE_OUT file)
-set(HTML_SPHINX_COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=$ENV{PYTHONPATH}:${CMAKE_CURRENT_BINARY_DIR} 
+set(HTML_SPHINX_COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=$ENV{PYTHONPATH}:${CMAKE_CURRENT_BINARY_DIR}
       ${SPHINX_EXECUTABLE} -q -b html
       # Tell Breathe where to find the Doxygen output
     -Dbreathe_projects.MGX=${DOXYGEN_OUTPUT_DIR}/xml
       ${SPHINX_SOURCE} ${SPHINX_BUILD})
 
 # we call sphinx from camke command to set PYTHONPATH (to use built VARMMODULE_OUT file)
-set(LATEX_SPHINX_COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=$ENV{PYTHONPATH}:${CMAKE_CURRENT_BINARY_DIR} 
-    ${SPHINX_EXECUTABLE} -b latex
-# Tell Breathe where to find the Doxygen output
--Dbreathe_projects.MGX=${DOXYGEN_OUTPUT_DIR}/xml
-${SPHINX_SOURCE} ${SPHINX_BUILD}/latex)
+set(PDF_SPHINX_COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=$ENV{PYTHONPATH}:${CMAKE_CURRENT_BINARY_DIR}
+    ${SPHINX_EXECUTABLE} -b pdf
+${SPHINX_SOURCE} ${SPHINX_BUILD}/pdf)
 
 # Only regenerate Sphinx when:
 # - Doxygen has rerun
@@ -121,7 +118,7 @@ ${SPHINX_SOURCE} ${SPHINX_BUILD}/latex)
 add_custom_command(
     OUTPUT ${SPHINX_INDEX_FILE}
     COMMAND ${HTML_SPHINX_COMMAND}
-    COMMAND ${LATEX_SPHINX_COMMAND}
+    COMMAND ${PDF_SPHINX_COMMAND}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS
     # Other docs files you want to track should go here (or in some variable)
@@ -132,24 +129,10 @@ add_custom_command(
     ${CMAKE_CURRENT_SOURCE_DIR}/_static/*.css
     ${DOXYGEN_INDEX_FILE}
     MAIN_DEPENDENCY conf.py
-    COMMENT "Generating html and latex documentation with Sphinx")
+    COMMENT "Generating html and pdf documentation with Sphinx")
 
 # Doc target so we can run the job easily
 add_custom_target(documentation ALL DEPENDS ${SPHINX_INDEX_FILE})
-
-set(MAIN_TEX ${SPHINX_BUILD}/latex/magix3d.tex)
-set(OUTPUT_DIR_PDF ${SPHINX_BUILD})
-
-IF(LATEX_FOUND AND LATEX_PDFLATEX_FOUND)
-  add_custom_command(TARGET documentation
-      # Three times' the charm for PdfLaTeX to get all xrefs right
-      COMMAND ${PDFLATEX_COMPILER} -output-directory ${OUTPUT_DIR_PDF} ${MAIN_TEX}
-      COMMAND ${PDFLATEX_COMPILER} -output-directory ${OUTPUT_DIR_PDF} ${MAIN_TEX} 
-      COMMAND ${PDFLATEX_COMPILER} -output-directory ${OUTPUT_DIR_PDF} ${MAIN_TEX}
-      WORKING_DIRECTORY ${SPHINX_BUILD}/latex
-      DEPENDS  ${SPHINX_BUILD}/latex/*
-      COMMENT "Building LATEX documentation with pdflatex")
-ENDIF()
 
 # Recopie de la doc générée dans le répertoire d'installation
 include(GNUInstallDirs)
@@ -157,7 +140,6 @@ install (DIRECTORY ${SPHINX_BUILD}
 		DESTINATION ${CMAKE_INSTALL_DOCDIR}
     FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ GROUP_WRITE WORLD_READ
 		DIRECTORY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_EXECUTE SETGID
-    PATTERN "latex" EXCLUDE
    )
 
 install (DIRECTORY ${DOXYGEN_OUTPUT_DIR}

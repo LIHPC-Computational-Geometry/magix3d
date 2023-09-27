@@ -38,7 +38,9 @@ Afficher le repère
 Le repère est le même que celui de *Lem*. Il permet de situer
 les objets dans l’espace et d’avoir une idée de leurs dimensions.
 
-Voir :ref:`conventions-reperes`.
+.. only:: html
+
+   Voir :ref:`conventions-reperes`.
 
 Paramétrer le repère
 ^^^^^^^^^^^^^^^^^^^^
@@ -67,7 +69,7 @@ Recadrer la vue
 ^^^^^^^^^^^^^^^
 
 Permet de recadrer la vue de telle sorte que toutes les
-entités affichées soient visibles (raccourci « r » dans la fenêtre de
+entités affichées soient visibles (raccourci **r** dans la fenêtre de
 représentation).
 
 Vider la vue
@@ -92,15 +94,16 @@ familier avec son changement, il est composé de 3 segments
 respectivement de couleurs rouge, vert et bleu. Un bouton dans la barre
 permet un accès rapide.
 
-|image20|
+.. image:: ../images/image21.jpeg
+   :width: 2.15833in
+   :height: 1.78194in
 
-Il est possible de modifier sa place à l’aide des touches « f » ou
-« F ».
+Il est possible de modifier sa place à l’aide des touches **f** ou **F**.
 
-Avec la touche « f » (en minuscule), le point est recentré sur le groupe
+Avec la touche **f** (en minuscule), le point est recentré sur le groupe
 sous le curseur (au centre du cercle par exemple).
 
-Avec la touche « F » (en majuscule), le point est recentré sur l’entité
+Avec la touche **F** (en majuscule), le point est recentré sur l’entité
 de représentation (segment élémentaire ou polygone) sous le curseur (sur
 le contour du cercle par exemple).
 
@@ -118,5 +121,3 @@ Afficher l’éditeur de table de couleurs
 
 Ouvre un éditeur sur la table des couleurs précédente avec la
 même restriction, il faut disposer de valeurs aux nœuds ou aux mailles.
-
-.. include:: substitution-images.rst

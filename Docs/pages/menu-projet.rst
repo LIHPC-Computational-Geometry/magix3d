@@ -1,10 +1,10 @@
 .. _menu-projet:
-
+   
 Menu Projet
 ~~~~~~~~~~~
 
 Préférences
-^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^
 
 L’utilisateur a moyen, via un fichier de **ressources**, de paramétrer
 certains aspects de Magix3D : couleurs, interactions, et autres aspects
@@ -22,7 +22,9 @@ ressources (voir figure ci-après). Ces ressources sont regroupées de
 manière thématique dans une arborescence de **sections**, composées de
 sous-sections et/ou ressources.
 
-|preferencesDlg|
+.. image:: ../images/image3.png
+   :width: 5.73585in
+   :height: 4.79726in
 
 Chaque ressource est caractérisée par son nom (colonne Données), sa
 valeur, et un éventuel commentaire la décrivant.
@@ -47,20 +49,21 @@ Voir :ref:`preferences` pour de plus amples informations sur le contenu du
 fichier de préférences.
 
 Etat de l’IHM
-^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^
 
 Ce menu *Projet/Etat de l’IHM...* vous permet par défaut de retrouver
 l’IHM de Magix3D dans l’état qu’elle était lors de la fermeture. Il vous
 est également offert la possibilité de détruire cette sauvegarde pour
 revenir à l’état par défaut.
 
-|image3|
+.. image:: ../images/image4.jpeg
+   :width: 5.09434in
+   :height: 2.12938in
 
 Quitter
-^^^^^^^^^^^^^^
+^^^^^^^
 
 L’action *Projet/Quitter...* dispose du raccourci CTRL+Q ce qui permet
 d’accéder à cette action pour quitter l’application après une
 confirmation.
 
-.. include:: substitution-images.rst

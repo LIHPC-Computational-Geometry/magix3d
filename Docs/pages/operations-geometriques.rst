@@ -424,10 +424,12 @@ nombre de bras le nombre par défaut (voir :ref:`modifier-discretisation-aretes`
 
 Créer une sphère |image106| 
 '''''''''''''''''''''''''''''
+.. only:: html
 
-.. sidebar:: 
-
-   |image107|
+   .. raw:: html
+      
+      <div style="display:flex;align-items:center;">
+         <main style="width:60%">
 
 La création d’une sphère ou d’une portion de sphère, pleine
 ou creuse, se fait avec la méthode de saisie d’un *centre et d’un
@@ -455,16 +457,35 @@ rayon*, il faut donc renseigner les différentes parties du panneau :
 
 -  Nr, nombre de bras entre sommet interne de l’o-grid et couche externe
 
+.. only:: html
+
+   .. raw:: html
+
+         </main>
+         <aside class="mysidebar">
+   
+.. image:: ../images/image74.jpeg
+   :width: 2.8in
+
+.. only:: html
+
+   .. raw:: html
+
+         </aside>
+      </div>
 
 .. _creation-cylindre:
 
 Créer un cylindre |image108|
 '''''''''''''''''''''''''''''''
 
-.. sidebar:: 
+.. only:: html
 
-   |image109|
-   
+   .. raw:: html
+
+      <div style="display:flex;align-items:center;">
+         <main style="width:60%">
+
 La création d’un cylindre ou d’une portion de cylindre,
 plein ou creux, se fait avec la méthode de saisie d’un *centre, d’un
 rayon, d’un vecteur et d’un angle*, il faut donc renseigner les
@@ -497,14 +518,33 @@ différentes parties du panneau :
 
 -  Nr, nombre de bras entre sommet interne de l’o-grid et couche externe
 
+.. only:: html
+
+   .. raw:: html
+      
+         </main>
+         <aside class="mysidebar">
+
+.. image:: ../images/image77.jpeg
+      :width: 2in
+   
+.. only:: html
+
+   .. raw:: html
+
+         </aside>
+      </div>
+
 .. _creation-cone:
 
 Créer un cône |image110|
 '''''''''''''''''''''''''''
+.. only:: html
 
-.. sidebar:: 
+   .. raw:: html
 
-   |image111|
+      <div style="display:flex;align-items:center;">
+         <main style="width:60%">
 
 La création d’un cône se fait avec la méthode de saisie des
 rayons et axes, il faut donc renseigner les différentes parties du
@@ -530,6 +570,23 @@ panneau :
 -  Ni, nombre de bras entre plan de symétrie et point triple
 
 -  Nr, nombre de bras entre sommet interne de l’o-grid et couche externe
+
+.. only:: html
+
+   .. raw:: html
+
+         </main>
+         <aside class="mysidebar">
+
+.. image:: ../images/image79.jpeg
+      :width: 2.8in
+
+.. only:: html
+
+   .. raw:: html
+
+         </aside>
+      </div>
 
 .. _creation-aiguille:
 

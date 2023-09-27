@@ -1,11 +1,10 @@
 Menus
 -----
 
-|image1Cropped|
-
 Nous détaillons ci-dessous le contenu de chacun des menus de la barre.
+
 Certains de ces menus contiennent des actions pour lesquels il existe un
-raccourci dans la barre des boutons voir un raccourci clavier.
+raccourci dans la barre des boutons voire un raccourci clavier.
 
 :doc:`menu-projet`
    Pour accéder aux préférences de l'utilisateur
@@ -47,5 +46,3 @@ raccourci dans la barre des boutons voir un raccourci clavier.
    menu-chambre-experimentale
    menu-outils
    menu-aide
-
-.. include:: substitution-images.rst

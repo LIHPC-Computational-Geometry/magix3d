@@ -5,10 +5,11 @@ Opérations
 
 .. sidebar:: 
 
-   |operations|
+   .. image:: ../images/operations.jpeg
+    :width: 2.79028in
+    :height: 6.40208in
 
 .. include:: operations-description.rst
-
 
 :doc:`operations-geometriques`
    Opérations sur les entités géométriques de dimension 1, 2 ou 3
@@ -32,4 +33,3 @@ Opérations
    operations-maillage
    operations-reperes
 
-.. include:: substitution-images.rst

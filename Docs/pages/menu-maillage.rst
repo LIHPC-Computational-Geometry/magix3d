@@ -52,7 +52,9 @@ L’activation de l’exploration de feuillets ouvre un panneau
 dans un onglet du panneau Opérations (à côté de l’onglet Opération
 courante).
 
-|image28|
+.. image:: ../images/image29.jpeg
+   :width: 3.77292in
+   :height: 2.12014in
 
 Il vous faut alors sélectionner une arête le long de laquelle
 sera construit le feuillet.
@@ -63,7 +65,9 @@ explorer l’intérieur d’un maillage. Remarque : l’affichage du feuillet
 désactive automatiquement la représentation des volumes du maillage pour
 permettre d’observer le feuillet.
 
-|image29|
+.. image:: ../images/image30.jpeg
+   :width: 3.91509in
+   :height: 2.82425in
 
 .. _evaluation-qualite:
 
@@ -94,5 +98,3 @@ bloc non-structurés, ces blocs ne sont pas pris en compte dans la
 prévision.
 
 Ce panneau est réactualisé après chaque nouvelle commande.
-
-.. include:: substitution-images.rst
