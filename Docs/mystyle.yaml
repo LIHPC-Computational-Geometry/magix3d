@@ -1,0 +1,86 @@
+fontsAlias:
+  fontSerif: Times-Roman
+  fontSerifBold: Times-Bold
+  fontSerifBoldItalic: Times-BoldItalic
+  fontSerifItalic: Times-Italic
+  fontMono: Courier
+  fontMonoBold: Courier-Bold
+  fontMonoBoldItalic: Courier-BoldOblique
+  fontMonoItalic: Courier-Oblique
+  fontSans:  Times-Roman
+  fontSansBold:  Times-Bold
+  fontSansBoldItalic: Times-BoldItalic
+  fontSansItalic: Times-Italic
+pageTemplates:
+    decoratedPage:
+        defaultFooter: &defaulFooter |
+            .. class:: centeredfooter
+
+            Manuel Utilisateur Magix3D / ###Section###
+
+            .. class:: rightfooter
+
+            ###Page### 
+
+        defaultHeader: &defaultHeader |
+            .. class:: header
+
+            Manuel Utilisateur Magix3D
+
+    mainPage: &defaultHeaderAndFooter
+        defaultFooter: *defaulFooter
+        defaultHeader: *defaultHeader
+        showFooter: true
+        showHeader: false
+    coverPage: *defaultHeaderAndFooter
+    emptyPage: *defaultHeaderAndFooter
+styles:
+  heading:
+    parent: normal
+    spaceAfter: 6
+    spaceBefore: 12
+    fontName: fontSerifBold
+    textColor: "#20435c"
+    counter-reset: h2counter
+  heading1:
+    alignment: left
+    fontSize: 200%
+    parent: heading
+    counter-reset: h2counter
+  heading2:
+    fontSize: 175%
+    parent: heading
+    content: counter(h2counter) ".\0000a0\0000a0"
+    counter-increment: h2counter
+    counter-reset: h3counter
+  heading3:
+    fontSize: 150%
+    parent: heading
+    content: counter(h2counter) "." counter(h3counter) ".\0000a0\0000a0"
+    counter-increment: h3counter
+  heading4:
+    fontSize: 125%
+    parent: heading
+  heading5:
+    fontSize: 125%
+    parent: heading
+  xref:
+    parent: base
+  doc:
+    fontName: fontSerifBoldItalic
+    textColor: "#3b5f7c"
+  std:
+    fontName: fontSerifBoldItalic
+    textColor: "#3b5f7c"
+  header: 
+    alignment: center
+    parent: base
+    fontName: fontSerifItalic
+  rightfooter: 
+    alignment: right
+    parent: base
+    fontName: fontSerifBoldItalic
+  centeredfooter: 
+    alignment: center
+    parent: base
+    fontName: fontSerifItalic
