@@ -1,21 +1,6 @@
-.. |image0| image:: ../images/image1.jpeg
-   :width: 6.3in
-   :height: 6.21736in
-
 .. |image1| image:: ../images/image2.jpeg
    :width: 3.16089in
    :height: 0.46226in
-
-.. |image1Cropped| image:: ../images/image2_cropped.jpeg
-   :scale: 100%
-
-.. |preferencesDlg| image:: ../images/image3.png
-   :width: 5.73585in
-   :height: 4.79726in
-
-.. |image3| image:: ../images/image4.jpeg
-   :width: 5.09434in
-   :height: 2.12938in
 
 .. |image4| image:: ../images/image5.png
    :width: 0.25in
@@ -29,10 +14,6 @@
    :width: 0.31458in
    :height: 0.31458in
 
-.. |image7| image:: ../images/image8.jpg
-   :width: 3.06716in
-   :height: 1.93184in
-
 .. |image8| image:: ../images/image9.png
    :width: 0.31458in
    :height: 0.31458in
@@ -44,10 +25,6 @@
 .. |image10| image:: ../images/image11.png
    :width: 0.31458in
    :height: 0.31458in
-
-.. |image11| image:: ../images/image12.jpeg
-   :width: 5.06299in
-   :height: 3.04717in
 
 .. |image12| image:: ../images/image13.png
    :width: 0.33403in
@@ -81,10 +58,6 @@
    :width: 0.31458in
    :height: 0.31458in
 
-.. |image20| image:: ../images/image21.jpeg
-   :width: 2.15833in
-   :height: 1.78194in
-
 .. |image21| image:: ../images/image22.png
    :width: 0.33403in
    :height: 0.33403in
@@ -113,157 +86,17 @@
    :width: 0.44444in
    :height: 0.44444in
 
-.. |image28| image:: ../images/image29.jpeg
-   :width: 3.77292in
-   :height: 2.12014in
-
-.. |image29| image:: ../images/image30.jpeg
-   :width: 3.91509in
-   :height: 2.82425in
-
 .. |image30| image:: ../images/image31.png
    :width: 0.31458in
    :height: 0.31458in
-
-.. |image31| image:: ../images/image32.png
-   :width: 0.31458in
-   :height: 0.31458in
-
-.. |image32| image:: ../images/image33.png
-   :width: 0.31458in
-   :height: 0.31458in
-
-.. |image33| image:: ../images/image34.png
-   :width: 0.31458in
-   :height: 0.31458in
-
-.. |image34| image:: ../images/image35.png
-   :width: 0.31458in
-   :height: 0.31458in
-
-.. |image35| image:: ../images/image36.png
-   :width: 0.44444in
-   :height: 0.44444in
-
-.. |image36| image:: ../images/image37.jpg
-   :width: 4.48819in
-   :height: 5.70472in
-
-.. |image37| image:: ../images/image38.jpg
-   :width: 4.37008in
-   :height: 4.16929in
-
-.. |image38| image:: ../images/image39.jpg
-   :width: 7.26772in
-   :height: 5.62205in
-
-.. |image39| image:: ../images/image40.jpeg
-   :width: 4.79528in
-   :height: 2.61811in
-
-.. |image40| image:: ../images/image41.jpeg
-   :width: 5.43564in
-   :height: 3.58416in
 
 .. |image41| image:: ../images/image42.png
    :width: 0.31458in
    :height: 0.31458in
 
-.. |image42| image:: ../images/image2.jpeg
-   :width: 5.51887in
-   :height: 0.37736in
-
-.. |image43| image:: ../images/image5.png
-   :width: 0.25in
-   :height: 0.25in
-
-.. |image44| image:: ../images/image6.png
-   :width: 0.25in
-   :height: 0.25in
-
-.. |image45| image:: ../images/image7.png
-   :width: 0.31458in
-   :height: 0.31458in
-
-.. |image46| image:: ../images/image9.png
-   :width: 0.31458in
-   :height: 0.31458in
-
-.. |image47| image:: ../images/image10.png
-   :width: 0.31458in
-   :height: 0.31458in
-
-.. |image48| image:: ../images/image13.png
-   :width: 0.33403in
-   :height: 0.33403in
-
-.. |image49| image:: ../images/image15.png
-   :width: 0.33403in
-   :height: 0.33403in
-
-.. |image50| image:: ../images/image17.png
-   :width: 0.33056in
-   :height: 0.33403in
-
-.. |image51| image:: ../images/image18.png
-   :width: 0.33465in
-   :height: 0.33465in
-
-.. |image52| image:: ../images/image19.png
-   :width: 0.33465in
-   :height: 0.33465in
-
-.. |image53| image:: ../images/image20.png
-   :width: 0.31496in
-   :height: 0.31496in
-
-.. |image54| image:: ../images/image22.png
-   :width: 0.33403in
-   :height: 0.33403in
-
-.. |image55| image:: ../images/image43.png
-   :width: 0.31667in
-   :height: 0.31667in
-
-.. |image56| image:: ../images/image23.png
-   :width: 0.31458in
-   :height: 0.31458in
-
-.. |image57| image:: ../images/image24.png
-   :width: 0.31458in
-   :height: 0.31458in
-
-.. |image58| image:: ../images/image25.png
-   :width: 0.31496in
-   :height: 0.31496in
-
-.. |image59| image:: ../images/image26.png
-   :width: 0.31458in
-   :height: 0.31458in
-
-.. |image60| image:: ../images/image27.png
-   :width: 0.33465in
-   :height: 0.33465in
-
-.. |image61| image:: ../images/image44.png
-   :width: 2.15972in
-   :height: 0.89097in
-
-.. |image62| image:: ../images/image45.png
-   :width: 3.09375in
-   :height: 1.09861in
-
-.. |image63| image:: ../images/image46.jpeg
-   :width: 2.97986in
-   :height: 2.775in
-
 .. |image64| image:: ../images/image2.jpeg
    :width: 1.78403in
    :height: 3.35833in
-
-.. |operations| image:: ../images/operations.jpeg
-   :width: 2.79028in
-   :height: 6.40208in
 
 .. |image66| image:: ../images/image48.png
    :width: 0.31686in
@@ -425,25 +258,13 @@
    :width: 0.31458in
    :height: 0.31458in
 
-.. |image107| image:: ../images/image74.jpeg
-   :width: 2.93396in
-   :height: 2.82075in
-
 .. |image108| image:: ../images/image76.png
    :width: 0.33403in
    :height: 0.33403in
 
-.. |image109| image:: ../images/image77.jpeg
-   :width: 2.47569in
-   :height: 3.50347in
-
 .. |image110| image:: ../images/image78.png
    :width: 0.31458in
    :height: 0.31458in
-
-.. |image111| image:: ../images/image79.jpeg
-   :width: 3.14306in
-   :height: 3.46458in
 
 .. |image112| image:: ../images/image81.png
    :width: 0.33403in
@@ -896,34 +717,6 @@
 .. |image224| image:: ../images/image145.png
    :width: 0.31458in
    :height: 0.31458in
-
-.. |image225| image:: ../images/image146.jpeg
-   :width: 0.31683in
-   :height: 0.34653in
-
-.. |image226| image:: ../images/image147.jpeg
-   :width: 0.31683in
-   :height: 0.36634in
-
-.. |image227| image:: ../images/image148.jpeg
-   :width: 0.32673in
-   :height: 0.39604in
-
-.. |image228| image:: ../images/image149.jpeg
-   :width: 0.32673in
-   :height: 0.30693in
-
-.. |image229| image:: ../images/image150.jpeg
-   :width: 0.36634in
-   :height: 0.32673in
-
-.. |image230| image:: ../images/image151.jpeg
-   :width: 0.35644in
-   :height: 0.36634in
-
-.. |image231| image:: ../images/image152.jpeg
-   :width: 6in
-   :height: 3.5in
 
 .. |image232| image:: ../images/image154.jpeg
    :width: 6in

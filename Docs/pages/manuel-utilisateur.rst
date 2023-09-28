@@ -1,8 +1,11 @@
 .. toctree::
    :maxdepth: 1
 
-Manuel Utilisateur
-==================
+.. only:: html
+
+   Manuel Utilisateur
+   ==================
+
 (basé sur la version |version|)
 
 Ce document décrit comment utiliser l’**IHM (Interface Homme Machine)** de Magix3D dans le
@@ -10,7 +13,9 @@ détail pour chacune des parties.
 
 Au premier lancement, l’IHM se présente sous cette forme :
 
-|image0|
+.. figure:: ../images/image1.jpeg
+   :align: left
+   :width: 80%
 
 Les différentes vues de l'outil sont ajustables en taille et peuvent être :ref:`déplacées<modification-aspect>` les unes par 
 rapport aux autres. Il en est de même pour les groupes de boutons.
@@ -32,6 +37,7 @@ L'aide détaille chacun des menu et chacune des ces vues. Vous trouverez les sec
 .. toctree::
    :maxdepth: 2
    :hidden:
+   :numbered:
 
    menus
    onglets
@@ -40,6 +46,3 @@ L'aide détaille chacun des menu et chacune des ces vues. Vous trouverez les sec
    selection
    raccourcis
    preferences
-
-
-.. include:: substitution-images.rst   

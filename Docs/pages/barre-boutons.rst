@@ -1,12 +1,18 @@
 Barre d'outils
 ----------------
 
-|image42|
-
 Boutons annuler et rejouer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 |image43|\ |image44|\ 
+
+.. |image43| image:: ../images/image5.png
+   :width: 0.25in
+   :height: 0.25in
+
+.. |image44| image:: ../images/image6.png
+   :width: 0.25in
+   :height: 0.25in
 
 Voir les paragraphes :ref:`annuler` et :ref:`rejouer`.
 
@@ -14,6 +20,18 @@ Boutons d’importation et d’exportation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 |image45|\ |image46|\ |image47|\ 
+
+.. |image45| image:: ../images/image7.png
+   :width: 0.25in
+   :height: 0.25in
+
+.. |image46| image:: ../images/image9.png
+   :width: 0.25in
+   :height: 0.25in
+
+.. |image47| image:: ../images/image10.png
+   :width: 0.25in
+   :height: 0.25in
 
 Voir les paragraphes :ref:`importer`, :ref:`exporter`
 et :ref:`exporter-cao`.
@@ -23,6 +41,46 @@ Boutons associés à la vue
 
 |image48|\ |image49|\ |image50|\ |image51|\ |image52|\ |image53|\ |image54|\ |image55|\ |image56|\ |image57|\ 
 
+.. |image48| image:: ../images/image13.png
+   :width: 0.25in
+   :height: 0.25in
+
+.. |image49| image:: ../images/image15.png
+   :width: 0.25in
+   :height: 0.25in
+
+.. |image50| image:: ../images/image17.png
+   :width: 0.25in
+   :height: 0.25in
+
+.. |image51| image:: ../images/image18.png
+   :width: 0.25in
+   :height: 0.25in
+
+.. |image52| image:: ../images/image19.png
+   :width: 0.25in
+   :height: 0.25in
+
+.. |image53| image:: ../images/image20.png
+   :width: 0.25in
+   :height: 0.25in
+
+.. |image54| image:: ../images/image22.png
+   :width: 0.25in
+   :height: 0.25in
+
+.. |image55| image:: ../images/image43.png
+   :width: 0.25in
+   :height: 0.25in
+
+.. |image56| image:: ../images/image23.png
+   :width: 0.25in
+   :height: 0.25in
+
+.. |image57| image:: ../images/image24.png
+   :width: 0.25in
+   :height: 0.25in
+
 Voir :ref:`menu-vue`.
 
 .. _boutons-creation-maillage:
@@ -31,6 +89,18 @@ Boutons de création de maillage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 |image58|\ |image59|\ |image60|\ 
+
+.. |image58| image:: ../images/image25.png
+   :width: 0.25in
+   :height: 0.25in
+
+.. |image59| image:: ../images/image26.png
+   :width: 0.25in
+   :height: 0.25in
+
+.. |image60| image:: ../images/image27.png
+   :width: 0.25in
+   :height: 0.25in
 
 Ces boutons permettent un accès rapide aux commandes de création de maillage.
 
@@ -69,7 +139,8 @@ depuis la barre d’outils :
 Filtre sur la dimension des entités
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-|image61|\ 
+.. image:: ../images/image44.png
+   :height: 0.8in
 
 L’activation d’une des 4 icônes de filtrage des entités selon
 leur dimension inhibe la sélection de toutes les entités qui ne sont pas
@@ -79,7 +150,8 @@ entités de dimension 0 (points et sommets) sont sélectionnables.
 Filtre sur la fonction d’évaluation des entités
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-|image62|\ 
+.. image:: ../images/image45.png
+   :height: 0.9in
 
 Lorsqu’une entité est évaluée afin de voir si elle est
 sélectionnable, sa position peut être considérée de deux manières
@@ -101,4 +173,3 @@ particulier en mode filaire. Il devient ainsi possible de sélectionner
 au travers de surfaces matérialisées par des segments de droites. Ce
 mode présente l’inconvénient d’être moins performant.
 
-.. include:: substitution-images.rst

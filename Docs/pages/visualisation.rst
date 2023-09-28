@@ -3,7 +3,9 @@
 Fenêtre de visualisation
 -------------------------
 
-|image63|
+.. image:: ../images/image46.jpeg
+   :width: 2.97986in
+   :height: 2.775in
 
 C’est dans cette vue que sont représentés les entités de
 géométrie, topologie, maillage, ainsi que les rayons laser. On peut y
@@ -25,5 +27,3 @@ La sélection d’une entité la met en évidence en rouge (sauf pour les
 groupes de mailles) avec des traits plus épais lorsque c’est fait en
 dehors d’un champ de sélection d’un panneau de commande, sinon c’est
 fait en orange (voir :ref:`selection` pour plus d’informations).
-
-.. include:: substitution-images.rst

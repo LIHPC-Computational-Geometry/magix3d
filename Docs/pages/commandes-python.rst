@@ -17,35 +17,56 @@ clavier.
 
 Pour faire apparaitre la complétion possible pour une commande :
 **CTRL**-**Tab**, mais cette complétion n’est pas possible pour le
-résultat d’une fonction. Par exemple, il est possible de compléter
-*ctx.getGeom* mais pas *ctx.getGeomManager().newV*. Néanmoins si
-*gm=ctx.getGeomManager()*, il est possible d’obtenir la complétion sur
-*gm.newV*.
+résultat d’une fonction.
 
-Pour charger un script entier, utiliser l’icône |image225|.
+Par exemple, il est possible de compléter *ctx.getGeom* mais pas *ctx.getGeomManager().newV*. 
+Néanmoins si *gm=ctx.getGeomManager()*, il est possible d’obtenir la complétion sur *gm.newV*.
+
+Pour charger un script entier, utiliser l’icône |load|
 
 Les lignes non exécutées sont modifiables, mais une fois jouées, elles
 ne sont plus éditables.
 
-Il est possible de tout jouer jusqu’à la fin avec l’icône |image226|.
+Il est possible de tout jouer jusqu’à la fin avec l’icône |play|.
 
 Mais s’il a été mis un point d’arrêt devant une commande avec l’icône
-|image227|, l’exécution s’y arrête.
+|stop|, l’exécution s’y arrête.
 
-Pour se faire, se mettre en mode *debug* (icône |image228|) puis
-utiliser l’icône |image229| pour exécuter la commande suivante ou
-utiliser les icônes |image230| et |image226|.
+Pour se faire, se mettre en mode *debug* (icône |debug|) puis
+utiliser l’icône |step| pour exécuter la commande suivante ou
+utiliser les icônes |pause| et |play|.
 
-L’icône |image230| permet d’arrêter le cours d’une exécution.
+L’icône |pause| permet d’arrêter le cours d’une exécution.
 
-|image231|
+.. |load| image:: ../images/image146.jpeg
+   :scale: 80%
+
+.. |play| image:: ../images/image147.jpeg
+   :scale: 55%
+
+.. |pause| image:: ../images/image151.jpeg
+   :scale: 55%
+
+.. |stop| image:: ../images/image148.jpeg
+   :scale: 60%
+
+.. |debug| image:: ../images/image149.jpeg
+   :scale: 70%
+
+.. |step| image:: ../images/image150.jpeg
+   :scale: 70%
+
+.. image:: ../images/image152.jpeg
+   :width: 6in
+   :height: 3.5in
 
 
 Fonctions en Python
 -------------------
 
-Il est également possible de définir des fonctions. Par
-exemple :
+Il est également possible de définir des fonctions. 
+
+Par exemple :
 
 .. code-block:: python
 
@@ -94,5 +115,3 @@ Les sorties des commandes Python apparaisent dans une vue dédiée.
 Exemple de commande dont on attend une sortie ::
 
    help(ctx.getGeomManager().newVertex)
-
-.. include:: substitution-images.rst

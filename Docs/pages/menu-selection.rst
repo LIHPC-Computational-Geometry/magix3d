@@ -3,8 +3,11 @@
 Menu Sélection
 ~~~~~~~~~~~~~~
 
-Voir :ref:`selection` pour la méthodologie de sélection des entités. Ce menu
-permet essentiellement d’agir sur la sélection.
+Ce menu permet essentiellement d’agir sur la sélection.
+
+.. only:: html
+   
+   Voir :ref:`selection` pour la méthodologie de sélection des entités. 
 
 Afficher/Masquer les entités sélectionnées
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -114,7 +117,7 @@ Sélectionner des entités
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 Ce menu est disponible également avec le raccourci **CTRL+F**. Il permet
-de sélectionner une entité à partir de son nom (exemple : Surf0001).
+de sélectionner une entité à partir de son nom (exemple : *Surf0001*).
 
 Il est alors possible de rendre cette sélection visible (en laissant
 coché « Afficher la sélection »). C’est un moyen efficace pour
@@ -172,10 +175,25 @@ entités suivant l’un des critères suivant :
 Sélection d'entités selon la dimension
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-|image31| |image32| |image33| |image34|
+|dim0|\ |dim1|\ |dim2|\ |dim3|\
 
-Pour permettre la sélection
-d’entités, il est nécessaire de sélectionner la dimension des entités
+.. |dim0| image:: ../images/image32.png
+   :width: 0.25in
+   :height: 0.25in
+
+.. |dim1| image:: ../images/image33.png
+   :width: 0.25in
+   :height: 0.25in
+
+.. |dim2| image:: ../images/image34.png
+   :width: 0.25in
+   :height: 0.25in
+
+.. |dim3| image:: ../images/image35.png
+   :width: 0.25in
+   :height: 0.25in
+
+Pour permettre la sélection d’entités, il est nécessaire de sélectionner la dimension des entités
 que l’on souhaite sélectionner. Voir la description des :ref:`boutons-selection`.
 
 Les panneaux de commandes sélectionnent automatiquement les ou les
@@ -184,7 +202,13 @@ dimensions adaptées lorsqu’il s’agit de remplir un des champs.
 Mode de sélection des entités
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-|image35|\ Voir la description :ref:`boutons-selection`.
+|selection|
+
+.. |selection| image:: ../images/image36.png
+   :width: 0.25in
+   :height: 0.25in
+
+Voir la description :ref:`boutons-selection`.
 
 Il recommandé d’utiliser le mode de sélection filaire, proposé par
 défaut.
@@ -193,4 +217,3 @@ Le mode plein sera un peu mieux adapté (plus rapide) pour des entités
 représentées en mode volumique (volumes de mailles, volumes géométriques
 en représentation surfacique...).
 
-.. include:: substitution-images.rst

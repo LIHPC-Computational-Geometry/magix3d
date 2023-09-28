@@ -8,10 +8,6 @@ Gestionnaire d'entités
 Onglet Groupes
 --------------
 
-.. sidebar:: 
-
-   |image64|
-
 Cet onglet est le moyen le plus simple pour sélectionner les
 entités à afficher dans le panneau de représentation.
 
@@ -98,5 +94,3 @@ entité une bulle contenant sa description (coordonnés et angles dans les
 différents repères, ...) apparait. Dans le cas où l’entité est un anneau
 la description correspond aux valeurs moyennes des pointages laser qui
 le composent.
-
-.. include:: substitution-images.rst
