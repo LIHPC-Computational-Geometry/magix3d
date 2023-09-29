@@ -3,7 +3,8 @@
 Barre de notification
 ---------------------
 
-|image232|
+.. image:: ../images/image154.jpeg
+   :scale: 180%
 
 Cette barre de notification fait apparaître d’une part le dernier
 message de Magix3D (en général le dernier du panneau historique), ainsi
@@ -16,5 +17,4 @@ est la suivante :
 
 -  Rouge : la commande s’est terminée en erreur.
 
-.. include:: substitution-images.rst
 

@@ -17,7 +17,9 @@ sont définies par un triplet de composantes réelles RGB où chaque
 composante doit être comprise entre 0 et 1 ((0., 0., 0.) pour le noir,
 (1., 1., 1.) pour le blanc).
 
-|image233|
+.. image:: ../images/image155.jpg
+   :width: 6.3in
+   :height: 4.69375in
 
 La modification d’une ressource s’effectue en double-cliquant sur le
 champ contenant sa valeur, en modifiant la valeur et en validant la
@@ -473,7 +475,5 @@ Section **rays** : ressources liées à l’utilisation des rayons
 Section **server** : ressources spécifiques au mode client/serveur
 ===================================================================
 
-Le mode client/serveur n’étant pas encore disponible ces ressources ne
+Le mode client/serveur n’étant pas encore disponible, ces ressources ne
 sont pas décrites ici.
-
-.. include:: substitution-images.rst

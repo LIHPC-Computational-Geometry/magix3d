@@ -1,10 +1,8 @@
 .. toctree::
    :maxdepth: 1
 
-.. only:: html
-
-   Manuel Utilisateur
-   ==================
+Manuel Utilisateur
+==================
 
 (basé sur la version |version|)
 

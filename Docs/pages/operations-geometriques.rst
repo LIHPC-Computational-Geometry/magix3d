@@ -424,8 +424,9 @@ nombre de bras le nombre par défaut (voir :ref:`modifier-discretisation-aretes`
 
 Créer une sphère |image106| 
 '''''''''''''''''''''''''''''
-.. only:: html
 
+.. only:: html
+ 
    .. raw:: html
       
       <div style="display:flex;align-items:center;">
@@ -485,7 +486,7 @@ Créer un cylindre |image108|
 
       <div style="display:flex;align-items:center;">
          <main style="width:60%">
-
+   
 La création d’un cylindre ou d’une portion de cylindre,
 plein ou creux, se fait avec la méthode de saisie d’un *centre, d’un
 rayon, d’un vecteur et d’un angle*, il faut donc renseigner les
@@ -535,14 +536,16 @@ différentes parties du panneau :
          </aside>
       </div>
 
+
 .. _creation-cone:
 
 Créer un cône |image110|
 '''''''''''''''''''''''''''
+
 .. only:: html
-
+ 
    .. raw:: html
-
+ 
       <div style="display:flex;align-items:center;">
          <main style="width:60%">
 
@@ -642,31 +645,33 @@ le fait qu’il ne faut pas de trous entre 2 surfaces.
 Réaliser une opération booléenne |image118|
 '''''''''''''''''''''''''''''''''''''''''''
 
-Ce panneau permet de faire, sur des volumes, l’une des
-opérations booléennes suivante :
+Ce panneau permet de faire, sur des volumes, l’une des opérations booléennes suivante :
 
 -  Collage, permet d’avoir une seule entité commune aux interfaces. Si
    les volumes se chevauchent, il y a création d’un nouveau volume pour
-   cette intersection. Ci-dessous quelques cas pour expliciter le
-   fonctionnement :
+   cette intersection.
 
-+------------+--------------------------------------------------------+
-| |image125| | Cas de 2 boites avec 2 faces identiques :              |
-|            |                                                        |
-|            | Le collage donne 2 volumes et fait disparaitre une des |
-|            | 2 faces communes.                                      |
-+------------+--------------------------------------------------------+
-| |image126| | Cas de 2 boites avec 2 faces ayant un recouvrement     |
-|            | partiel :                                              |
-|            |                                                        |
-|            | Le collage donne 2 volumes et remplace les 2 faces par |
-|            | 3 faces sans recouvrement.                             |
-+------------+--------------------------------------------------------+
-| |image127| | Cas de 2 boites avec recouvrement des 2 volumes :      |
-|            |                                                        |
-|            | Le collage donne 3 volumes et découpe 3 faces en 2     |
-|            | dans chacun des volumes.                               |
-+------------+--------------------------------------------------------+
+.. raw:: pdf
+
+   FrameBreak 50
+
+Ci-dessous quelques cas pour expliciter le fonctionnement :
+
+.. figure:: ../images/image85.png
+   :scale: 100%
+
+   Cas de 2 boites avec 2 faces identiques : le collage donne 2 volumes et fait disparaitre une des 2 faces communes.
+
+.. figure:: ../images/image86.png
+   :scale: 100%
+
+   Cas de 2 boites avec 2 faces ayant un recouvrement partiel : le collage donne 2 volumes et remplace les 2 faces par 3 faces sans recouvrement.
+
+.. figure:: ../images/image87.png
+   :scale: 100%
+
+   Cas de 2 boites avec recouvrement des 2 volumes : le collage donne 3 volumes et découpe 3 faces en 2 dans chacun des volumes.
+
 
 -  Fusion (anciennement Union), permet d’avoir un unique volume, union
    des volumes sélectionnés.

@@ -258,14 +258,25 @@
    :width: 0.31458in
    :height: 0.31458in
 
+.. |image107| image:: ../images/image74.jpeg
+   :width: 2.93396in
+   :height: 2.82075in
+
 .. |image108| image:: ../images/image76.png
    :width: 0.33403in
    :height: 0.33403in
+
+.. |image109| image:: ../images/image77.jpeg
+   :width: 2.47569in
+   :height: 3.50347in
 
 .. |image110| image:: ../images/image78.png
    :width: 0.31458in
    :height: 0.31458in
 
+.. |image111| image:: ../images/image79.jpeg
+   :width: 3.14306in
+   :height: 3.46458in
 .. |image112| image:: ../images/image81.png
    :width: 0.33403in
    :height: 0.33403in
@@ -319,16 +330,13 @@
    :height: 0.7874in
 
 .. |image125| image:: ../images/image85.png
-   :width: 1.24016in
-   :height: 0.7874in
+   :width: 50%
 
 .. |image126| image:: ../images/image86.png
-   :width: 1.08268in
-   :height: 0.7874in
+   :width: 50%
 
 .. |image127| image:: ../images/image87.png
-   :width: 0.88583in
-   :height: 0.7874in
+   :width: 50%
 
 .. |image128| image:: ../images/image70.png
    :width: 0.31458in
@@ -555,8 +563,7 @@
    :height: 0.31667in
 
 .. |image184| image:: ../images/image119.jpeg
-   :width: 2.616in
-   :height: 1.13813in
+   :scale: 80%
 
 .. |image185| image:: ../images/image120.jpeg
    :width: 2.62006in
@@ -590,21 +597,8 @@
    :width: 2.624in
    :height: 1.65259in
 
-.. |image193| image:: ../images/image120.jpeg
-   :width: 2.62006in
-   :height: 1.616in
-
 .. |image194| image:: ../images/image121.jpeg
-   :width: 2.68109in
-   :height: 1.616in
-
-.. |image195| image:: ../images/image122.jpeg
-   :width: 2.81703in
-   :height: 1.656in
-
-.. |image196| image:: ../images/image123.jpeg
-   :width: 2.624in
-   :height: 1.65259in
+   :width: 70%
 
 .. |image197| image:: ../images/image124.png
    :width: 0.31458in
@@ -717,10 +711,6 @@
 .. |image224| image:: ../images/image145.png
    :width: 0.31458in
    :height: 0.31458in
-
-.. |image232| image:: ../images/image154.jpeg
-   :width: 6in
-   :height: 0.40729in
 
 .. |image233| image:: ../images/image155.jpg
    :width: 6.3in
