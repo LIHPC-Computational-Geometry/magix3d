@@ -1,0 +1,14 @@
+#! @Python_EXECUTABLE@
+# -*- coding: utf-8 -*-
+
+import sys
+
+dependencies = "@ADDPYTHONPACKAGES@"
+dependencies_tmp = dependencies.split(":")
+
+sys.path.insert(1,"@CMAKE_INSTALL_PREFIX@/@MAGIX3D_BINDING_INSTALL_DIR@")
+
+for dep in dependencies_tmp:
+    sys.path.insert(1,dep)
+
+exec(open(sys.argv[1]).read())
