@@ -114,7 +114,6 @@ ${SPHINX_SOURCE} ${SPHINX_BUILD}/pdf)
 # - Doxygen has rerun
 # - Our doc files have been updated
 # - The Sphinx config has been updated
-
 add_custom_command(
     OUTPUT ${SPHINX_INDEX_FILE}
     COMMAND ${HTML_SPHINX_COMMAND}
@@ -125,8 +124,10 @@ add_custom_command(
     ${CMAKE_CURRENT_SOURCE_DIR}/index.rst
     ${CMAKE_CURRENT_SOURCE_DIR}/pages/*.rst
     ${CMAKE_CURRENT_SOURCE_DIR}/resources/*
+    ${CMAKE_CURRENT_SOURCE_DIR}/images/*
     ${CMAKE_CURRENT_SOURCE_DIR}/_ext/*.py
     ${CMAKE_CURRENT_SOURCE_DIR}/_static/*.css
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.yaml
     ${DOXYGEN_INDEX_FILE}
     MAIN_DEPENDENCY conf.py
     COMMENT "Generating html and pdf documentation with Sphinx")

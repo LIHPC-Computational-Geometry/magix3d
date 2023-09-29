@@ -3,11 +3,12 @@
 Opérations
 ----------
 
-.. sidebar:: 
-
-   .. image:: ../images/operations.jpeg
-    :width: 2.79028in
-    :height: 6.40208in
+.. only:: html
+ 
+   .. raw:: html
+ 
+      <div style="display:flex;align-items:center;">
+         <main style="width:70%">
 
 .. include:: operations-description.rst
 
@@ -22,6 +23,23 @@ Opérations
 
 :doc:`operations-reperes`
    Opérations sur les repères
+
+.. only:: html
+
+   .. raw:: html
+
+         </main>
+         <aside class="mysidebar">
+
+.. image:: ../images/operations.jpeg
+      :width: 2.8in
+
+.. only:: html
+
+   .. raw:: html
+
+         </aside>
+      </div>
 
 .. toctree::
    :caption: Opérations

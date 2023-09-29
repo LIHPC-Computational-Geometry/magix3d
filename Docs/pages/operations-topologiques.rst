@@ -630,20 +630,23 @@ de manière à ce que les blocs soient parallélépipédiques, alors qu’avec
 0 les sommets seront à égale distance de l’axe de révolution que ceux du
 modèle 2D.
 
-Exemple avec une unique face en 2D :
+Exemple avec une unique face en 2D
 
-|image184|
+.. image:: ../images/image119.jpeg
+   :scale: 80%
+   :align: left
 
-+----------------------------------+----------------------------------+
-| |image193|                       | |image194|                       |
-+==================================+==================================+
-| Cas (par défaut) avec ratio à 1  | Cas possible avec ratio à 0      |
-+----------------------------------+----------------------------------+
-| |image195|                       | |image196|                       |
-+----------------------------------+----------------------------------+
-| Maillage des blocs, celui près   | Maillage des blocs, celui près   |
-| de l’axe est régulier            | de l’axe est déformé             |
-+----------------------------------+----------------------------------+
+.. list-table:: 
+   :class: mytable
+
+   * - .. image:: ../images/image120.jpeg
+     - .. image:: ../images/image121.jpeg 
+   * - Cas (par défaut) avec ratio à 1
+     - Cas possible avec ratio à 0
+   * - .. image:: ../images/image122.jpeg
+     - .. image:: ../images/image123.jpeg
+   * - Maillage des blocs, celui près de l’axe est régulier
+     - Maillage des blocs, celui près de l’axe est déformé
 
 .. _copie-blocs:
 

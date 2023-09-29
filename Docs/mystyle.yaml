@@ -84,3 +84,27 @@ styles:
     alignment: center
     parent: base
     fontName: fontSerifItalic
+  mytable:
+    parent: table
+    commands:
+    - - VALIGN
+      - [0, 0]
+      - [-1, -1]
+      - MIDDLE
+    - - ROWBACKGROUNDS
+      - [0, 0]
+      - [-1, -1]
+      - [white]
+    - - BOTTOMPADDING
+      - [0, 1]
+      - [-1, -1]
+      - 5
+    - - TOPPADDING
+      - [0, 1]
+      - [-1, -1]
+      - 5
+    - - ALIGN
+      - [0, 0]
+      - [-1, -1]
+      - CENTER
+  table-heading: {alignment: TA_LEFT, backColor: white, fontName: fontSansBold, parent: heading}

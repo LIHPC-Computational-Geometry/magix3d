@@ -14,7 +14,7 @@ h2 {
     margin-bottom: 5px; /* between paragraphs */
 }
 
-table.image-with-caption {
+table.mytable {
     text-align:center;
     background-color:silver;
     border:none !important;
