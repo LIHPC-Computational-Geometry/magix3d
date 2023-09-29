@@ -67,7 +67,8 @@ OUTPUT_DIRECTORY        = "@DOXYGEN_OUTPUT_DIR@"
 # performance problems for the file system.
 # The default value is: NO.
 
-CREATE_SUBDIRS         = YES
+# [2023/09/29] Set to no to prevent directory creation bug in Spack container during // build
+CREATE_SUBDIRS         = NO
 
 # If the ALLOW_UNICODE_NAMES tag is set to YES, doxygen will allow non-ASCII
 # characters to appear in the names of generated files. If set to NO, non-ASCII
