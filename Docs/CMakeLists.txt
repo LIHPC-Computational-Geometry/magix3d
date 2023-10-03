@@ -82,6 +82,8 @@ configure_file(${VARMMODULE_IN} ${VARMMODULE_OUT} @ONLY)
 
 # Doxygen won't create this for us
 file(MAKE_DIRECTORY ${DOXYGEN_OUTPUT_DIR})
+# fix bug https://github.com/doxygen/doxygen/issues/6293
+file(MAKE_DIRECTORY ${DOXYGEN_OUTPUT_DIR}/html)
 
 # Only regenerate Doxygen when the Doxyfile or public headers change
 add_custom_command(OUTPUT ${DOXYGEN_INDEX_FILE}
