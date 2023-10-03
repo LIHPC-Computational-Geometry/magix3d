@@ -71,7 +71,7 @@ html_css_files = [ 'custom.css']
 html_scaled_image_link = False
 
 html_title = "magix3D"
-html_logo = "images/magix3d.png"
+html_logo = "images/magix3D.jpg"
 html_favicon = "images/magix3DIcone.png"
 
 html_copy_source = False
