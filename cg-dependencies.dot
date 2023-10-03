@@ -1,0 +1,55 @@
+digraph LIHPCCGProjectDependencies {
+
+  VTK [shape=record color=red];
+  CGNS [shape=record color=red];
+  OpenCascade [shape=record color=red];
+  Mesquite [shape=record color=red];
+  QWT [shape=record color=red];
+
+  qtutil->tkutil
+  pythonutil->tkutil
+  preferences->tkutil
+  preferences->qtutil
+  qualif->lima
+  qwtcharts->tkutil
+  qwtcharts->qtutil
+  qwtcharts->QWT
+  gmdscea->gmds
+  gmdscea->lima
+  qtpython->tkutil
+  qtpython->qtutil
+  qtpython->pythonutil
+  triton2->gmds
+  triton2->gmdscea
+  triton2->lima
+  vtkcontrib->VTK
+  qtvtk->VTK
+  qtvtk->vtkcontrib
+  qtvtk->qtutil
+  qtvtk->tkutil
+  qtvtk->preferences
+  qqualif->tkutil
+  qqualif->lima
+  qqualif->qualif
+  qqualif->qwtcharts
+  qqualif->qtutil
+  qqualif->gmds
+  magix3d->vtkcontrib
+  magix3d->VTK
+  magix3d->tkutil
+  magix3d->preferences
+  magix3d->pythonutil
+  magix3d->OpenCascade
+  magix3d->qqualif
+  magix3d->gmds
+  magix3d->qualif
+  magix3d->lima
+  magix3d->gmdscea
+  magix3d->triton2
+  magix3d->qtutil
+  magix3d->qwtcharts
+  magix3d->qtpython
+  magix3d->CGNS
+  magix3d->Mesquite
+  magix3d->qtvtk
+}
