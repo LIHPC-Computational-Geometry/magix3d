@@ -29,8 +29,6 @@ Une face et un bloc topologique ont chacun leur méthode de discrétisation (tra
 
 Cette notion de topologie apparait déjà en 2D avec Magix mais elle est intégrée dans la définition des zones.
 
-.. _o-grid:
-
 Vocabulaire
 ***********
 
@@ -61,6 +59,8 @@ Avec comme convention de couleur:
 
 .. image:: ../images/DisqueAvecTopo.jpg
     :width: 300px
+
+.. _o-grid:
 
 O-grid
 ******
