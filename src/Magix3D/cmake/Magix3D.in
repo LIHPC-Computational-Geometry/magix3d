@@ -31,7 +31,7 @@ HELP_URL="-helpURL $ROOT_DIR/share/doc/@CMAKE_PROJECT_NAME@/sphinx"
 WIKI_URL="-wikiURL @URL_WIKI@"
 QUALIF_URL="-qualifURL @URL_QUALIF@"
 
-USER_MANUAL="-userManual $ROOT_DIR/share/doc/@CMAKE_PROJECT_NAME@/sphinx/magix3d.pdf"
+USER_MANUAL="-userManual $ROOT_DIR/share/doc/@CMAKE_PROJECT_NAME@/sphinx/pdf/magix3d.pdf"
 DOC_VIEWER="-docViewer firefox"
 DEFAULT_CONFIG="-defaultConfig $ROOT_DIR/etc/magix3d.xml"
 CONFIG_PATCHS="-userConfigPatchs $ROOT_DIR/etc/magix3d_patchs.xml"
