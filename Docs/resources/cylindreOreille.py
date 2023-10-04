@@ -5,8 +5,6 @@
 # fonctionne avec la version 1.14.2 le 11/06/2019
 
 import sys
-sys.path.append("/ccc/products/nec/share/packages")
-import maillage
 import pyMagix3D as Mgx3D
 ctx = Mgx3D.getStdContext()
 
@@ -142,4 +140,4 @@ ctx.getTopoManager().replaceTransfiniteByDirectionalMeshMethodAsPossible()
 # Création du maillage pour tous les blocs
 ctx.getMeshManager().newAllBlocksMesh()
 # Sauvegarde du maillage (mli)
-ctx.getMeshManager().writeMli("cylindreOreille.mli")
+ctx.getMeshManager().writeMli("cylindreOreille.mli2")

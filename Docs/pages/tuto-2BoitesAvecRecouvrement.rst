@@ -76,11 +76,8 @@ Il est alors possible de :ref:`sauvegarder<exporter-script>` l'ensemble des comm
 
 .. code-block:: python
 
-  #!/ccc/products/nec/bin/maillage_python
-  # -*- coding: iso-8859-15 -*-
+  # -*- coding: utf-8 -*-
   import sys
-  sys.path.append("/ccc/products/nec/share/packages")
-  import maillage
   import pyMagix3D as Mgx3D
   ctx = Mgx3D.getStdContext()
 
@@ -95,7 +92,7 @@ Il est alors possible de :ref:`sauvegarder<exporter-script>` l'ensemble des comm
   # Création du maillage pour tous les blocs
   ctx.getMeshManager().newAllBlocksMesh()
   # Sauvegarde du maillage (mli)
-  ctx.getMeshManager().writeMli("deuxBoitesRP.mli")
+  ctx.getMeshManager().writeMli("deuxBoitesRP.mli2")
 
 .. |deuxBoitesRPFaces1| image:: ../images/DeuxBoitesRP_faces1.jpeg
   :width: 450px

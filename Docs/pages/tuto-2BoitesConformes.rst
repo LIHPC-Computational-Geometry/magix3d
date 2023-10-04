@@ -144,7 +144,7 @@ Le panneau *Commandes python* fait alors apparaître les commandes suivantes :
 .. code-block:: python
 
   ctx.getMeshManager().newAllBlocksMesh()
-  ctx.getMeshManager().writeMli("deuxBoites.mli")
+  ctx.getMeshManager().writeMli("deuxBoites.mli2")
 
 .. _sauvegarde-cas-conforme:
 
@@ -156,11 +156,8 @@ Le fichier obtenu sera équivalent à ceci :
 
 .. code-block:: python
 
-  #!/ccc/products/nec/bin/maillage_python
-  # -*- coding: iso-8859-15 -*-
+  # -*- coding: utf-8 -*-
   import sys
-  sys.path.append("/ccc/products/nec/share/packages")
-  import maillage
   import pyMagix3D as Mgx3D
   ctx = Mgx3D.getStdContext()
 
@@ -175,6 +172,6 @@ Le fichier obtenu sera équivalent à ceci :
   # Création du maillage pour tous les blocs
   ctx.getMeshManager().newAllBlocksMesh()
   # Sauvegarde du maillage (mli)
-  ctx.getMeshManager().writeMli("deuxBoites.mli")
+  ctx.getMeshManager().writeMli("deuxBoites.mli2")
 
 .. include:: substitution-images.rst
