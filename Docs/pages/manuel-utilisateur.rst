@@ -11,12 +11,14 @@ détail pour chacune des parties.
 
 Au premier lancement, l’IHM se présente sous cette forme :
 
-.. figure:: ../images/image1.jpeg
+.. figure:: ../images/ihm.png
    :align: left
-   :width: 80%
+   :scale: 50%
 
 Les différentes vues de l'outil sont ajustables en taille et peuvent être :ref:`déplacées<modification-aspect>` les unes par 
-rapport aux autres. Il en est de même pour les groupes de boutons.
+rapport aux autres. 
+
+Il en est de même pour les groupes de boutons.
 
 L'aide détaille chacun des menu et chacune des ces vues. Vous trouverez les sections suivantes :
 
@@ -24,7 +26,7 @@ L'aide détaille chacun des menu et chacune des ces vues. Vous trouverez les sec
    Les menus Projet, Session, Vue, Topologie, Maillage, Sélection, Chambre expérimentale, Outils et Aide
 
 :doc:`onglets`
-   Les onglets Propriétés individuelles et communes de la sélection, Commande python et Historique
+   Les onglets Propriétés individuelles et communes de la sélection, Commandes python et Historique
 
 :doc:`vues`
    La barre de boutons, la fenêtre de visualisation, le panneau de gestion des entités et la barre de notification
