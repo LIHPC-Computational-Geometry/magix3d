@@ -744,7 +744,8 @@
 
 .. |topoSplitFace| image:: ../images/Topo_split_face.png
 
-.. |deuxBoitesMaillage| image:: ../images/DeuxBoites_maillage.jpeg
+.. |deuxBoitesMaillage| image:: ../images/DeuxBoites_maillage.png
+   :scale: 80%
 
 .. |cylindreOreille3Vol| image:: ../images/CylindreOreille_3vol.jpeg
 

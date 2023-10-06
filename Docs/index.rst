@@ -101,7 +101,7 @@ Pour aller plus loin avec votre cas 2D, il est nécessaire de voir les :ref:`rec
    pages/cea_tuto-*
 
 
-.. |deuxBoitesMaillage| image:: ./images/DeuxBoites_maillage.jpeg
+.. |deuxBoitesMaillage| image:: ./images/DeuxBoites_maillage.png
    :width: 100px
 .. |deuxBoitesRPMaillage| image:: ./images/DeuxBoitesRP_maillage.jpeg
    :width: 100px

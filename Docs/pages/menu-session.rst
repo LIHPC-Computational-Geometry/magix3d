@@ -11,10 +11,13 @@ Annuler
 L’action d’annulation d’une commande permet de revenir en
 arrière comme nous sommes en droit de nous y attendre, sauf pour les
 commandes qui créent un fichier (exportation de modèle ou de maillage).
-Le menu *Session/Annuler* du raccourci clavier CTRL+Z. Une icône est
-disponible dans la barre des boutons pour faciliter son accès. Le nom de
-la commande en question apparait dans le prolongement du menu ainsi que
-dans l’aide sous le curseur au niveau du bouton.
+Elle est accessible par
+
+* Le menu *Session/Annuler*
+* Le raccourci clavier *CTRL+Z*
+* Une icône dans la barre des boutons
+
+Dans tous les cas, le nom de la commande à annuler figure dans le label de la commande.
 
 Dans la pratique, les entités créées sont marquées comme étant détruites
 et n’apparaissent plus. Leur destruction ne sera effective que si une
@@ -137,7 +140,7 @@ Ce menu est analogue à celui de l’importation. Si la
 modélisation est 3D, alors l’exportation en MDL posera un problème
 puisque ce format n’accepte que des entités 2D. C’est un moyen de
 sauvegarder votre maillage. Le format recommandé pour les maillages est
-le *MLI*.
+le *MLI2*.
 
 .. _exporter-cao:
 
@@ -150,9 +153,9 @@ entités sélectionnées, et uniquement pour la géométrie.
 .. _exporter-script:
 
 Enregistrer le script Magix3D minimum
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Cette commande accessible avec le raccourci CTRL+S ouvre une
+Cette commande accessible avec le raccourci *CTRL+S* ouvre une
 fenêtre pour sélectionner l’emplacement et le nom du fichier pour
 sauvegarder les commandes python.
 

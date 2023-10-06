@@ -123,7 +123,7 @@ l’observateur. On peut passer de l’une à l’autre à condition de ne pas
 déplacer le curseur et d’appuyer sur la touche de tabulation (*tab*) ou
 sur la touche d’espace (*space*), selon la valeur de la ressource
 *Magix3D.gui.interactor. nextSelectionKey* (voir :ref:`preferences`). Le fait de presser simultanément la touche
-majuscule (*shift*) provoque une évaluation en sens inverse.
+*majuscule* (*shift*) provoque une évaluation en sens inverse.
 
 Afin de faciliter le travail de sélection, le nombre d’entités affichées
 étant potentiellement important, Magix3D propose 2 filtres accessibles
@@ -144,7 +144,7 @@ Filtre sur la dimension des entités
 
 L’activation d’une des 4 icônes de filtrage des entités selon
 leur dimension inhibe la sélection de toutes les entités qui ne sont pas
-de cette dimension. Dans le cas de la figure suivante, seules les
+de cette dimension. Dans le cas de la figure précédente, seules les
 entités de dimension 0 (points et sommets) sont sélectionnables.
 
 Filtre sur la fonction d’évaluation des entités
@@ -163,13 +163,9 @@ différentes :
 
 L’icône *mode de sélection* permet de passer d’un mode à l’autre.
 
-L’évaluation de la boite englobante donne des résultats rapides et ne
-requiert pas de précision particulière. Elle est en revanche peu adaptée
-lorsque plusieurs entités se superposent car celles en position centrale
-deviennent peu accessibles.
-
-L’évaluation de la représentation des entités revêt un intérêt
-particulier en mode filaire. Il devient ainsi possible de sélectionner
-au travers de surfaces matérialisées par des segments de droites. Ce
-mode présente l’inconvénient d’être moins performant.
+* | L’évaluation de la boite englobante donne des résultats rapides et ne requiert pas de précision particulière. 
+  | Elle est en revanche peu adaptée lorsque plusieurs entités se superposent car celles en position centrale deviennent peu accessibles.
+* | L’évaluation de la représentation des entités revêt un intérêt particulier en mode filaire. 
+  | Il devient ainsi possible de sélectionner au travers de surfaces matérialisées par des segments de droites. 
+  | Ce mode présente l’inconvénient d’être moins performant.
 
