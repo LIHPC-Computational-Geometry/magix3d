@@ -20,7 +20,15 @@ en sélectionnant les boutons suivants :
 
 |selectionCreationBoite|
 
-Pour notre exemple, nous vous proposons de modifier les champs suivants :
+Pour notre exemple, nous vous proposons de créer une boite en spécifiant les coordonnées de 2 coins diamétralement opposés.
+
+On choisira d'associer cette boite au groupe *Mat1*.
+
+La création de boite permet de créer une topologie associée. Par défaut, il s'agit d'un bloc structuré. Ce bloc porte les informations de discrétisation.
+On voit dans la partie topologie que par défaut la discrétisation est à 10 bras pour chaque arête du bloc dans chaque dimension. 
+
+On propose de modifier la discrétisation en y à 12 bras. 
+Pour cela, il faut modifier les champs suivants :
 
 .. taboperationparams::
       :valeurs: Groupe, Mat1
@@ -29,13 +37,22 @@ Pour notre exemple, nous vous proposons de modifier les champs suivants :
 
 Pour valider la commande et l'exécuter, cliquer ensuite sur le bouton *Appliquer*.
 
-Certaines des entités créées sont alors affichées suivant les filtres d'affichage (voir :ref:`filtre-dimension-entites`).
-
 Le panneau *Commandes python* fait alors apparaître la commande équivalente : 
 
 .. code-block:: python
 
+  # Création d'une boite avec une topologie
   ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1.2, 1), 10, 12, 10, "Mat1")
+
+Certaines des entités créées sont alors affichées suivant les filtres d'affichage (voir :ref:`filtre-dimension-entites`).
+
+En cochant *Topologie/Blocs* dans la fenêtre **Gestionnaire d'entités**, on visualise le bloc créé en plus de la boite.
+Après avoir coché *Topologie/Arêtes*, on peut configurer l'affichage pour les arêtes (clic droit / *Représentations ...*) et choisir d'afficher le nombre de bras de la discrétisation. 
+On obtient alors la vue suivante :
+
+.. image:: ../images/BoiteAvecBlocEtDiscretisation.png
+  :scale: 60%
+
 
 Construction de la 2ème boite
 *****************************

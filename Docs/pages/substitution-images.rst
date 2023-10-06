@@ -740,6 +740,7 @@
 .. |createBlockByEdgeRevolution| image:: ../images/Create_block_by_edge_revolution.png
 
 .. |selectionCreationBoite| image:: ../images/Selection_creation_boite.jpg
+   :scale: 80%
 
 .. |topoSplitFace| image:: ../images/Topo_split_face.png
 
