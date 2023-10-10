@@ -4,9 +4,9 @@ Maillage de 2 boites conformes avec recouvrement partiel
 Pré-requis
 **********
 
-Il faut avoir fait le :ref:`tutorial pour le cas de 2 boites conformes<tuto-2BoitesConformes>`.
+Il faut avoir fait le :ref:`tutoriel pour le cas de 2 boites conformes<tuto-2BoitesConformes>`.
 
-Dans ce tutorial nous allons prendre en compte une semi-conformité topologique, c'est à dire un recouvrement partiel 
+Dans ce tutoriae nous allons prendre en compte une semi-conformité topologique, c'est à dire un recouvrement partiel 
 entre les 2 boites.
 
 Si vous vous contentez de rejouer le collage comme cela a été fait pour le cas des 2 boites conformes, 
@@ -27,6 +27,8 @@ Les faces topologiques sont dans un même plan mais pas de la même taille, le c
 
 |deuxBoitesRPFaces1|
 
+Il faut donc découper la face sur le plan commun pour qu'elle soit de la même taille et puisse être collée.
+
 Découpage d'une face
 ********************
 
@@ -37,7 +39,8 @@ Il vous faut ouvrir le panneau *Discrétisation des arêtes* qui est accessible 
       :sousfamille: faces
       :operation: découpageface
 
-Vous allez ensuite sélectionner les entités pour remplir les champs comme suit :
+Vous allez ensuite sélectionner les entités pour remplir les champs comme suit 
+(on souhaite découper la face sur le plan commun selon l'arête verticale au niveau du sommet en haut de la seconde boite) :
 
 .. taboperationparams::
       :valeurs: Face, Fa0001
@@ -45,6 +48,13 @@ Vous allez ensuite sélectionner les entités pour remplir les champs comme suit
                 Entité, Som0010
 
 Exécuter la commande avec le bouton *Appliquer*.
+
+.. note::
+
+  Pour identifier les faces, arêtes, sommets, il est possible d'afficher leur nom dans la vue. Pour cela depuis le *Gestionnaire d'entités*, selectionner *Topologie/Faces*, 
+  *Topologie/Arêtes* ou *Topologie/Sommets* et dans la fenêtre *Représentations* accessible par clic droit, cocher *Nom/Afficher*.
+
+|deuxBoitesAvecNoms|
 
 Le panneau *Commandes python* fait alors apparaître la commande équivalente : 
 
@@ -101,4 +111,7 @@ Il est alors possible de :ref:`sauvegarder<exporter-script>` l'ensemble des comm
   :width: 450px
 
 .. |deuxBoitesRPMaillage| image:: ../images/DeuxBoitesRP_maillage.jpeg
+  :width: 450px
+
+.. |deuxBoitesAvecNoms| image:: ../images/DeuxBoitesAvecNoms.png
   :width: 450px
