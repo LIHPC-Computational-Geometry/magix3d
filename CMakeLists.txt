@@ -33,6 +33,7 @@ configure_file(
 )
 include_directories(${PROJECT_BINARY_DIR})
 #======================================================================================================================
+set(USE_GMSH ON)
 add_subdirectory (src)
 if(WITH_DOC)
   message (STATUS "===============> MGX Documentation")

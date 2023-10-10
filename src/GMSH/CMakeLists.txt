@@ -23,7 +23,8 @@ target_compile_definitions (Gmsh PUBLIC ${MAGIX3D_GMSH_PUBLIC_FLAGS})
 target_compile_definitions (Gmsh PRIVATE ${MAGIX3D_GMSH_PRIVATE_FLAGS})
 #target_link_libraries (Gmsh PUBLIC ${OpenCASCADE_LIBRARIES})	# OpenCASCADE_LIBRARIES requires tcl, tk, ... :(
 #target_link_libraries (Gmsh PUBLIC TKSTL TKV3d TKG2d TKHLR TKSTEP TKIGES TKXSBase TKShHealing TKService TKMath TKOffset TKBool TKPrim TKTopAlgo TKGeomAlgo TKBRep TKFeat TKGeomBase TKG3d TKG2d TKMath TKernel TKBO TKMesh TKMeshVS TKXDEIGES TKXDESTEP TKCDF TKCAF TKXCAF)
-target_link_libraries (Gmsh PUBLIC TKSTL TKV3d TKG2d TKHLR TKSTEP TKIGES TKXSBase TKShHealing TKService TKMath TKOffset TKBool TKPrim TKTopAlgo TKGeomAlgo TKBRep TKFeat TKGeomBase TKG3d TKG2d TKMath TKernel TKBO TKMesh TKXDEIGES TKXDESTEP TKCDF TKCAF TKXCAF)
+#target_link_libraries (Gmsh PUBLIC TKSTL TKV3d TKG2d TKHLR TKSTEP TKIGES TKXSBase TKShHealing TKService TKMath TKOffset TKBool TKPrim TKTopAlgo TKGeomAlgo TKBRep TKFeat TKGeomBase TKG3d TKG2d TKMath TKernel TKBO TKMesh TKXDEIGES TKXDESTEP TKCDF TKCAF TKXCAF)
+target_link_libraries (Gmsh PUBLIC ${OpenCASCADE_FoundationClasses_LIBRARIES} ${OpenCASCADE_ModelingAlgorithms_LIBRARIES} ${OpenCASCADE_DataExchange_LIBRARIES})
 
 # Quelques spécificité de compilation :
 SET_SOURCE_FILES_PROPERTIES (Numeric/robustPredicates.cpp PROPERTIES COMPILE_FLAGS -O0)
