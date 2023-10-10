@@ -35,6 +35,7 @@
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 /// GMSH
+#ifdef USE_GMSH
 #include "Context.h"
 #include "Options.h"
 #include "GModel.h"
@@ -49,7 +50,7 @@
 #include "GmshMessage.h"
 #include "MPoint.h"
 #include "robustPredicates.h"
-
+#endif
 
 //#define _DEBUG_MESH
 /*----------------------------------------------------------------------------*/
@@ -59,6 +60,11 @@ namespace Mesh {
 /*----------------------------------------------------------------------------*/
 void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo::CoFace* fa)
 {
+
+#ifndef USE_GMSH
+	std::cerr<<"meshDelaunayGMSH not available"<<std::endl;
+	return;
+#else
 #ifdef _DEBUG_MESH
     std::cout <<"Maillage de la face commune "<<fa->getName()<<" avec la méthode de Delaunay (version GMSH)"<<std::endl;
 #endif
@@ -528,6 +534,7 @@ uint MeshImplementation::_addGMDSVertex2GVertex(Topo::Edge* edge,
         }
     }
     return ind_vtx;
+#endif // USE_GMSH
 } // end _addGMDSVertex2GVertex
 /*----------------------------------------------------------------------------*/
 } // end namespace Mesh

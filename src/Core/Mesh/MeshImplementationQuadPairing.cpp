@@ -40,6 +40,7 @@
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 /// GMSH
+#ifdef USE_GMSH
 #include "Context.h"
 #include "Options.h"
 #include "GModel.h"
@@ -54,7 +55,7 @@
 #include "GmshMessage.h"
 #include "MPoint.h"
 #include "robustPredicates.h"
-
+#endif // USE_GMSH
 
 //#define _DEBUG_MESH
 /*----------------------------------------------------------------------------*/
@@ -65,7 +66,7 @@ namespace Mesh {
 void MeshImplementation::meshQuadPairing(Mesh::CommandCreateMesh* command, Topo::CoFace* fa)
 {
 	MGX_NOT_YET_IMPLEMENTED("Appariement")
-
+#ifdef USE_GMSH
 #ifdef _DEBUG_MESH
     std::cout <<"Maillage de la face commune "<<fa->getName()<<" avec la méthode de Quad Pairing"<<std::endl;
 #endif
@@ -701,7 +702,7 @@ void MeshImplementation::meshQuadPairing(Mesh::CommandCreateMesh* command, Topo:
 #ifdef _DEBUG_MESH
   //  writeMli("/tmp/brieree/toto.mli");
 #endif
-
+#endif // USE_GMSH
 } // end meshDelaunayGMSH
 /*----------------------------------------------------------------------------*/
 } // end namespace Mesh
