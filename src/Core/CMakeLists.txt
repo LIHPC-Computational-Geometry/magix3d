@@ -91,7 +91,7 @@ pkg_check_modules (libpcre REQUIRED libpcre)				# PCRE (Perl compatible regular 
 pkg_get_variable (PCRE_INC_DIR libpcre includedir)
 pkg_get_variable (PCRE_LIB_DIR libpcre libdir)
 
-find_package (OpenCASCADE 7.1.0 REQUIRED)
+find_package (OpenCASCADE 7.7.1 REQUIRED)
 
 set (ALL_TARGETS Core)
 set_property (TARGET Core PROPERTY VERSION ${CORE_VERSION})

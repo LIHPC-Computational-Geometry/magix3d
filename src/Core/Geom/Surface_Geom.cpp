@@ -610,13 +610,12 @@ bool Surface::contains(Surface* ASurf) const
     		selectTriangleID= nbTriInFace/2;
 
     	const Poly_Array1OfTriangle& Triangles = aPoly->Triangles();
-    	const TColgp_Array1OfPnt& Nodes = aPoly->Nodes();
 
     	// Get the triangle
     	//   std::cout<<"Triangle choisi : "<<selectTriangleID<<std::endl;
     	Standard_Integer N1,N2,N3;
     	Triangles(selectTriangleID).Get(N1,N2,N3);
-    	gp_Pnt V1 = Nodes(N1), V2 = Nodes(N2), V3 = Nodes(N3);
+    	gp_Pnt V1 = aPoly->Node(N1), V2 = aPoly->Node(N2), V3 = aPoly->Node(N3);
     	// on positionne correctement les sommets
     	if (!identity) {
     		V1.Transform(myTransf);

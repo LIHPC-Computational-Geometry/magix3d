@@ -70,7 +70,7 @@
 #include <BRepBuilderAPI_MakeSolid.hxx>
 #include <TopExp_Explorer.hxx>
 #include <BRepBuilderAPI_MakeShell.hxx>
-#include <BRepAdaptor_HCurve.hxx>
+#include <BRepAdaptor_Curve.hxx>
 #include <BRepFill_CurveConstraint.hxx>
 #include <GeomPlate_Surface.hxx>
 #include <GeomPlate_BuildPlateSurface.hxx>
@@ -389,7 +389,7 @@ TopoDS_Shape OCCGeomRepresentation::cleanShape(TopoDS_Shape& shape){
                     std::cout<<"suppression dans un \"wire\" "<< wmap.FindIndex(oldwire)<<std::endl;
 
                     TopoDS_Wire newwire = sfw->Wire();
-                    rebuild->Replace(oldwire, newwire, Standard_False);
+                    rebuild->Replace(oldwire, newwire);
                 }
 #ifdef _DEBUG
                 if((sfw->StatusSmall(ShapeExtend_FAIL1)) ||
@@ -415,7 +415,7 @@ TopoDS_Shape OCCGeomRepresentation::cleanShape(TopoDS_Shape& shape){
 #ifdef _DEBUG
                         std::cout <<"removing degenerated edge "<<emap.FindIndex(edge)<<std::endl;
 #endif
-                        rebuild->Remove(edge, false);
+                        rebuild->Remove(edge);
                     }
                 }
             }
@@ -894,13 +894,12 @@ bool OCCGeomRepresentation::contains(const TopoDS_Shape& sh,const TopoDS_Shape& 
                 selectTriangleID= nbTriInFace/2;
 
             const Poly_Array1OfTriangle& Triangles = aPoly->Triangles();
-            const TColgp_Array1OfPnt& Nodes = aPoly->Nodes();
 
             // Get the triangle
             //   std::cout<<"Triangle choisi : "<<selectTriangleID<<std::endl;
             Standard_Integer N1,N2,N3;
             Triangles(selectTriangleID).Get(N1,N2,N3);
-            gp_Pnt V1 = Nodes(N1), V2 = Nodes(N2), V3 = Nodes(N3);
+            gp_Pnt V1 = aPoly->Node(N1), V2 = aPoly->Node(N2), V3 = aPoly->Node(N3);
             // on positionne correctement les sommets
             if (!identity) {
                 V1.Transform(myTransf);
@@ -2119,7 +2118,7 @@ void OCCGeomRepresentation::getIntersection(gp_Pln& plan_cut, Utils::Math::Point
 		 else if (Intersector.NbPoints() > 1){
 			 for (uint i=1; i<=Intersector.NbPoints(); i++){
 				 gp_Pnt pt = Intersector.Point (i);
-				 Quantity_Parameter U, V, W;
+				 Standard_Real U, V, W;
 				 Intersector.Parameters(i, U, V, W);
 #ifdef _DEBUG_INTERSECTION
 				 std::cout<<" i = "<<i<<" W = "<<W<<" dans ["<<first<<" "<<last<<"] ?"<<std::endl;
