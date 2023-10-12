@@ -29,7 +29,7 @@ operations = {
                 "operationsbooléennes": ["Opérations booléennes", "Boolean.png"],
                 "discrétisation": ["Paramétrage de la discrétisation des arêtes ", "Edges_meshing_properties.png"],
                 "découpageface": ["Découpage d'une face selon une arête", "Topo_split_face.png"],
-                "découpagefaces": ["Découpage de faces [2D] selon une arête", "Topo_split_faces.png"],
+                "découpagefaces": ["Découpage de faces selon une arête (uniquement pour cas 2D)", "Topo_split_faces.png"],
                 "geomtogroupe": ["Ajout/suppression/affectation d'entités géométriques à un groupe", "Geom_add_to_group.png"],
                 "topotogroupe": ["Ajout/suppression/affectation d'entités topologiques à un groupe", "Topo_add_to_group.png"],
                 "blocparrévolution": ["Création de blocs par révolution de la topologie 2D", "Create_block_by_edge_revolution.png"],

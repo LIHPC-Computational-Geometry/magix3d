@@ -1,3 +1,5 @@
+.. _magix3d:
+
 Documentation magix3D
 =====================
 

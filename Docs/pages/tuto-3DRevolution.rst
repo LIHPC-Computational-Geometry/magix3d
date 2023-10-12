@@ -28,13 +28,13 @@ Le panneau *Commandes python* fait alors apparaître la commande suivante :
 
 .. code-block:: python
 
-  ctx.getTopoManager().importMDL("/xxx/cylindreOr.mdl",False)
+  ctx.getTopoManager().importMDL("cylindreOr.mdl", False, False,"", 1, 2)
 
 
 Découpage de la topologie pour placer l'o-grid
 **********************************************
 
-Pour éviter d'avoir des prismes le long de l'axe avec des maillages structurés par blocs, il est préférable de faire ce que l'on appel une décomposition en O (ou o-grid).
+Pour éviter d'avoir des prismes le long de l'axe avec des maillages structurés par blocs, il est préférable de faire ce que l'on appelle une :ref:`décomposition en O (ou o-grid)<o-grid>`.
 Pour définir la position de l'o-grid en 3D, nous positionnons des arêtes en 2D qui conserveront cette position lors de la création de la topologie 3D.
 
 Il vous faut ouvrir le panneau *Découpage d'une face selon une arête* qui est accessible depuis le panneau *Opérations* en sélectionnant les boutons suivants :
@@ -62,7 +62,7 @@ La topologie des arêtes a maintenant cet aspect :
 
 |cylindreOrAretesSplit|
 
-Cette opération s'apparente à celle faite dans Magix (2D) pour placer le tracé de l'o-grid avant utilisation de la commande revolMdlMesh (script utilisant Bibop3D).
+Cette opération s'apparente à celle faite dans Magix (2D) pour placer le tracé de l'o-grid avant utilisation de la commande :ref:`revolMdlMesh`.
 
 Création de la topologie 3D (et de la géométrie) par révolution
 ***************************************************************
@@ -75,7 +75,7 @@ Il vous faut ouvrir le panneau *Création de blocs par révolution* qui est acce
       :sousfamille: blocs
       :operation: blocparrévolution
 
-Vous allez ensuite sélectionner l'entité pour remplir les champs comme suit :
+Vous allez ensuite sélectionner l'arête qu'on vient de créer pour le tracé de l'ogrid :
 
 .. taboperationparams::
       :valeurs: Arête, Ar0018
@@ -92,7 +92,14 @@ La topologie des arêtes a maintenant cet aspect :
 
 |cylindreOrAretes3D|
 
-Cette opération s'apparente à la commande revolMdlMesh (script utilisant Bibop3D). 
+Cette opération s'apparente à la commande :ref:`revolMdlMesh`.
+
+.. note::
+
+  Lors de cette opération :
+  
+  - les arêtes topologiques vont créer des faces et les faces topologiques vont créer des blocs.
+  - les courbes géométriques vont créer des surfaces et les surfaces géométriques vont créer des volumes.toppologiques
 
 Opérations maillage et sauvegarde
 *********************************

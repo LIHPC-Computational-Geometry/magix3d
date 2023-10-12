@@ -17,6 +17,43 @@ Habituellement, elle délimite chacun des matériaux, ou pièces, du modèle. On
 
 .. _topologie:
 
+.. _o-grid:
+
+O-grid
+******
+
+On parle d’o-grid pour la décomposition de blocs topologiques en sous-blocs par insertion d’un bloc au centre. En 2D, cela s’effectue en décomposant 1 bloc en 5 blocs :
+
+.. image:: ../images/InsertionOgrid.jpeg
+
+Le maillage d'un disque peut être maillé avec une structuration par blocs de 3 façons représentées ici:
+
+.. image:: ../images/DisqueA.gif
+.. image:: ../images/DisqueB.gif
+.. image:: ../images/DisqueC.gif
+
+
+On constate que, dans le 1 :sup:`er` cas avec dégénérescence en un point, la connectivité autour du nœud central est très importante. Ce cas est préférable pour un écoulement radial et à éviter pour ceux qui sont orthogonaux au plan. Dans le 2 :sup:`ème` cas les mailles aux extrémités du bloc topologiques sont très aplaties. Le 3 :sup:`ème`` cas permet, avec l’o-grid, d’obtenir des mailles adaptées aux écoulements orthogonaux au plan.
+
+En 3D, un o-grid consiste à décomposer un bloc en 7 sous-blocs, un premier au centre et les 6 autres reliant chacune des faces d’un bloc à celle lui faisant face sur le bloc initial. Ce découpage topologique permet la construction de blocs adaptés à des hexaèdres pour un objet de révolution (avec des hexaèdres sur l’axe).
+
+Cette décomposition en o-grid en 3D permet ainsi d'éviter
+
+* soit les mailles à forte connectivité :
+
+    .. image:: ../images/ExempleCavite3D_O0_zoom.jpg
+          :width: 200px
+
+* soit les mailles plates :
+
+    .. image:: ../images/Exemple_maille_plates.jpg
+        :width: 200px
+
+Et l'on obtient un compromis avec des hexaèdres réguliers autour de l'axe de symétrie :
+
+.. image:: ../images/Cylindre_maille.jpg
+        :width: 300px
+
 Topologie
 *********
 
@@ -60,39 +97,4 @@ Avec comme convention de couleur:
 .. image:: ../images/DisqueAvecTopo.jpg
     :width: 300px
 
-.. _o-grid:
 
-O-grid
-******
-
-On parle d’o-grid pour la décomposition de blocs topologiques en sous-blocs par insertion d’un bloc au centre. En 2D, cela s’effectue en décomposant 1 bloc en 5 blocs :
-
-.. image:: ../images/InsertionOgrid.jpeg
-
-Le maillage d'un disque peut être maillé avec une structuration par blocs de 3 façons représentées ici:
-
-.. image:: ../images/DisqueA.gif
-.. image:: ../images/DisqueB.gif
-.. image:: ../images/DisqueC.gif
-
-
-On constate que, dans le 1er cas avec dégénérescence en un point, la connectivité autour du nœud central est très importante. Ce cas est préférable pour un écoulement radial et à éviter pour ceux qui sont orthogonaux au plan. Dans le 2ème cas, les mailles aux extrémités du bloc topologiques sont très aplaties. Le 3ème cas permet, avec l’o-grid, d’obtenir des mailles adaptées aux écoulements orthogonaux au plan.
-
-En 3D, un o-grid consiste à décomposer un bloc en 7 sous-blocs, un premier au centre et les 6 autres reliant chacune des faces d’un bloc à celle lui faisant face sur le bloc initial. Ce découpage topologique permet la construction de blocs adaptés à des hexaèdres pour un objet de révolution (avec des hexaèdres sur l’axe).
-
-Cette décomposition en o-grid en 3D permet ainsi d'éviter
-
-* soit les mailles à forte connectivité :
-
-    .. image:: ../images/ExempleCavite3D_O0_zoom.jpg
-          :width: 200px
-
-* soit les mailles plates :
-
-    .. image:: ../images/Exemple_maille_plates.jpg
-        :width: 200px
-
-Et l'on obtient un compromis avec des hexaèdres réguliers autour de l'axe de symétrie :
-
-.. image:: ../images/Cylindre_maille.jpg
-        :width: 300px
