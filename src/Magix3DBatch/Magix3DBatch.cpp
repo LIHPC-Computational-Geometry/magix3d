@@ -4,11 +4,10 @@
  * \date	31/01/2019
  * Point d'entrée dde l'application Magix 3D en mode batch (parallèle ou non).
  */
-#include "QtVtkComponents/VTKMgx3DSelectionManager.h"
+
+#include "Python/M3DPythonSession.h"
+#include "Internal/Context.h"
 #include "Internal/Mgx3DArguments.h"
-#include "Internal/ClientServerProperties.h"
-#include "VtkComponents/vtkDMAMultiProcessStream.h"
-#include <VtkComponents/vtkUnixServerSocket.h>
 #include "Utils/CommandManager.h"
 #include "Utils/Log.h"
 
@@ -27,10 +26,6 @@
 #include <memory>
 #include <vector>
 
-#include <vtkParallelRenderManager.h>	// RENDER_RMI_TAG
-#include <vtkGraphicsFactory.h>
-#include <vtkOpenGLRenderWindow.h>
-
 #include <stdlib.h>
 #include <unistd.h>	// getopt, getpid
 
@@ -38,16 +33,9 @@
 using namespace Mgx3D;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Internal;
-using namespace Mgx3D::QtVtkComponents;
 using namespace TkUtil;
 using namespace std;
 
-
-
-static bool					standalone			= false;
-static bool					isMaster			= true;	// standalone ou processus maître
-static unsigned long		nbProcs				= 1;
-static int					procNum				= 0;
 // Les scripts python Magix 3D à exécuter :
 static vector<string>		scripts;
 
@@ -106,7 +94,7 @@ int syntax (const string& pgm)
 	cerr << "Syntaxe :" << endl
 	     << pgm << "[-script s1.py][-script s2.py] script.py" << endl
 	     << "OU" << endl
-	     << pgm << "[--nbprocs nb] script.py" << endl
+	     << pgm << " script.py" << endl
 	     << "--script s.py .................. : script à exécuter (usage multiple possible). Peut ne pas être précédé de --script mais doit alors être le dernier argument de ligne de commande." << endl
 	     << endl;
 
@@ -120,7 +108,6 @@ int main (int argc, char *argv[], char* envp[])
 	try
 	{
 		
-	ClientServerProperties::setInstance (new ClientServerProperties ( ));	// Requis
 	Process::initialize (argc, argv, envp);
 	
     // logues version ~ Magix
@@ -136,13 +123,6 @@ int main (int argc, char *argv[], char* envp[])
 		ThreadPool::initialize (0);
 	}
 	
-	const char*	jobid	= getenv ("SLURM_JOB_ID");
-	if (0 != jobid)
-	{
-		cout << "Context d'exécution parallèle détecté (SLURM_JOB_ID = " << jobid << ")" << endl;
-		ClientServerProperties::getInstance ( ).setPolicy (ClientServerProperties::PARALLEL_CS);
-	}	// if (0 != jobid)
-	
 	vector<string>	allowedArgs	= mgx3dAllowedArgs ( );
 	Context::getArguments ( ).allowsArgs (allowedArgs);
 	Context::initialize (argc, argv);	// Récupère les arguments de ligne de commande
@@ -154,13 +134,9 @@ int main (int argc, char *argv[], char* envp[])
 	
 	const string	sessionName ("session_1");
 	Context*		context	= 0;
-	if (ClientServerProperties::BUILTIN == ClientServerProperties::getInstance ( ).getPolicy ( ))
-	{
-		VTKRenderingManager::initialize (false);	// !compositing
-		context	= new Internal::Context (sessionName, true);
-		context->setGraphical (false);
-		context->setExeName (argv[0]);
-	}	// if (ClientServerProperties::BUILTIN == ClientServerProperties::getInstance ( ).getPolicy ( ))
+	context	= new Internal::Context (sessionName, true);
+	context->setGraphical (false);
+	context->setExeName (argv[0]);
 	CHECK_NULL_PTR_ERROR (context)
 	
 	// fork, et ce service repose sur les classes
@@ -170,19 +146,19 @@ int main (int argc, char *argv[], char* envp[])
 	// du processus fils chargé de rediriger les sorties du script.
 	// Donc, au moins pour les serveurs, on affecte false à cette variable.
 	context->displayScriptOutputs.setValue (false);
+	// Instruction inutile d'un point de vue fonctionnel, la session par défaut du contexte est déjà de ce type.
+	// L'objet est ici de forcer à l'édition des liens de s'intéresser à createMgx3DPythonSession pour éviter
+	// qu'il ne soit déclaré undefined symbol ... Un autre moyen aussi inélégant serait de créer une fonction foo ( ){}
+	// appelée ici.
+context->setPythonSession (createMgx3DPythonSession ( ));
 	
-	vtkGraphicsFactory::SetOffScreenOnlyMode (1);	// Pas de main loop
-	
-	// Exécution des scripts transmis en arguments (pour processus maîtres uniquement) :
-	if (true == isMaster)
+	// Exécution des scripts transmis en arguments :
+	for (vector<string>::const_iterator its = scripts.begin ( ); scripts.end ( ) != its; its++)
 	{
-		for (vector<string>::const_iterator its = scripts.begin ( ); scripts.end ( ) != its; its++)
-		{
-cout << "PROCESSING SCRIPT " << *its << " on processor " << procNum << " ..." << endl;
-                context->getPythonSession ( ).execFile (*its, false);
-cout << "SCRIPT " << *its << " PROCESSED on processor " << procNum << "." << endl;
-		}	// for (vector<string>::const_iterator its = scripts.begin ( ); scripts.end ( ) != its; its++)
-	}	// if (true == isMaster)
+cout << "PROCESSING SCRIPT " << *its << " ..." << endl;
+		context->getPythonSession ( ).execFile (*its, false);
+cout << "SCRIPT " << *its << " PROCESSED." << endl;
+	}	// for (vector<string>::const_iterator its = scripts.begin ( ); scripts.end ( ) != its; its++)
 
 	}	// try
 	catch (const Exception& exc)
@@ -205,7 +181,7 @@ cout << "SCRIPT " << *its << " PROCESSED on processor " << procNum << "." << end
 		return -1;
 	}
 
-	cout << "Magix3DBatch completly completed on processor " << procNum << "." << endl;
+	cout << "Magix3DBatch completly completed." << endl;
 	return 0;
 }	// main
 

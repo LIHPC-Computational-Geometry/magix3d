@@ -5,7 +5,8 @@
 # => include version.cmake avant celui-ci.
 #
 
-include (${CMAKE_SOURCE_DIR}/cmake/organization.cmake)
+find_package (GUIToolkitsVariables)
+include (${GUIToolkitsVariables_CMAKE_DIR}/common.cmake)
 
 
 # Compilation :
@@ -55,6 +56,7 @@ else  (TRITON)
 	message (STATUS "------------> TRITON : OFF")
 endif (TRITON)
 
+message(MGX OPTIONS ${MAGIX3D_OPTIONS})
 set (MANDATORY_CXX_OPTIONS ${MANDATORY_VTK_OPTIONS} ${MANDATORY_MULTITHREADING_OPTIONS} ${MAGIX3D_OPTIONS})
 
 # Edition des liens :

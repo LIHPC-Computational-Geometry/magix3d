@@ -10,7 +10,6 @@
 #include <Utils/ErrorManagement.h>
 #include "Utils/CommandManager.h"
 #include "Internal/Mgx3DArguments.h"
-#include "Internal/ClientServerProperties.h"
 #include "Python/M3DPythonSession.h"
 #include <TkUtil/ErrorLog.h>
 #include <TkUtil/InformationLog.h>
@@ -51,10 +50,6 @@ int main (int argc, char* argv[], char* envp[])
 
 	BEGIN_TRY_CATCH_BLOCK
 	
-	// Paramètres client/serveur : inutilisés dans cette version de Magix 3D mais l'instance est a créer.
-	ClientServerProperties::setInstance (new ClientServerProperties ( ));
-
-
 	vector<string>	allowedArgs	= mgx3dAllowedArgs ( );
 	
 	Context::getArguments ( ).allowsArgs (allowedArgs);
@@ -86,6 +81,8 @@ int main (int argc, char* argv[], char* envp[])
 
 	CommandManager::sequentialDuration = 5;
 
+	// Indispensable en Python 3 avant l'appel à Py_Initialize : initialise le redirector qui
+	// redirige les sorties standards python vers la console python.
 	QtPython::preInitialize ( );
 	VTKRenderingManager::initialize (false);
 	const string			sessionName ("session_1");
@@ -101,8 +98,7 @@ int main (int argc, char* argv[], char* envp[])
     // on met de côté le nom de l'exécutable
     context->setExeName(argv[0]);
 
-	VTKSelectionManagerDimFilter*	selectionManager	=
-		new VTKSelectionManagerDimFilter ("VTKSelectionManagerDimFilter", context->getLogStream ( ));
+	VTKSelectionManagerDimFilter*	selectionManager	= new VTKSelectionManagerDimFilter ("VTKSelectionManagerDimFilter", context->getLogStream ( ));
 	context->setSelectionManager (selectionManager);
 	QtVtkMgx3DMainWindow*	mgxMainWindow	= new QtVtkMgx3DMainWindow (0, 0);
 	mgxMainWindow->init (sessionName, context, 0, 0);
@@ -126,11 +122,8 @@ int main (int argc, char* argv[], char* envp[])
 		mgxMainWindow->infoNewVersion(lastVersion, actualVersion);
 	}
 
-
 	// Y a-t-il des scripts à exécuter ?
-	for (vector<string>::const_iterator itpy =
-			Resources::instance ( ).instance ( )._scripts.begin ( );
-			Resources::instance ( ).instance ( )._scripts.end ( ) != itpy; itpy++)
+	for (vector<string>::const_iterator itpy = Resources::instance ( ).instance ( )._scripts.begin ( ); Resources::instance ( ).instance ( )._scripts.end ( ) != itpy; itpy++)
 		mgxMainWindow->executePythonScript (*itpy);
 
 	status	= mgxApplication.exec ( );

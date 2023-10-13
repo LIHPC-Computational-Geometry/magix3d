@@ -15,7 +15,6 @@
 #include "Utils/Common.h"
 #include "Utils/DisplayProperties.h"
 
-#include "Internal/ClientServerProperties.h"
 #include "Internal/Context.h"
 #include "Internal/InternalPreferences.h"
 #include "Internal/Resources.h"
@@ -59,15 +58,12 @@ using namespace Mgx3D::Internal;
 // Faut-il afficher la syntaxe d'utilisation du logiciel ?
 static bool	displayHelp		= false;
 
-// Ressources éventuellement récupérées à la ligne de commande et surchargeant
-// les ressources lues en configuration.
-string 			serverHostName;
+// Ressources éventuellement récupérées à la ligne de commande et surchargeant les ressources lues en configuration.
 unsigned long	graphicalWindowWidth	= (unsigned long)-1;
 unsigned long	graphicalWindowHeight	= (unsigned long)-1;
 bool			graphicalWindowFixedSize= false;
 double			stillFrameRate			= -1.;
 double			desiredFrameRate		= -1.;
-string			port, renderingPort;
 
 
 inline void initQtComponentsResources ( )
@@ -417,6 +413,11 @@ void QtMgx3DApplication::init (int argc, char* argv[], char* envp[])
 	QtValidatedTextField::errorForeground		= QColor (255, 255, 255);
 	QtStringHelper::initialize ( );
 	QwtChartsManager::initialize ( );
+#ifdef USE_PYTHON_CONSOLE
+	// Indispensable en Python 3 avant l'appel à Py_Initialize : initialise le redirector qui
+	// redirige les sorties standards python vers la console python.
+	QtPython::preInitialize ( );
+#endif  // USE_PYTHON_CONSOLE
 	QtPython::initialize (Context::getOutCharset ( ));
 	Process::initialize (argc, argv, envp);
 	ContextIfc::initialize ( );
@@ -487,15 +488,6 @@ void QtMgx3DApplication::init (int argc, char* argv[], char* envp[])
 		Resources::instance ( )._stillFrameRate.setValue (stillFrameRate);
 	if (desiredFrameRate > 0.)
 		Resources::instance ( )._desiredFrameRate.setValue (desiredFrameRate);
-
-	if ((0 != serverHostName.length ( )) || (false == port.empty ( )) || (false == renderingPort.empty ( )))
-	{
-		ClientServerProperties&	srvConfig	= ClientServerProperties::getInstance ( );
-		string	srvhn	= 0 == serverHostName.length ( ) ? srvConfig.getUsableInetAdress( ) : serverHostName;
-		string	p	= true == port.empty ( ) ? srvConfig.getPort ( ) : port;
-		string	rp	= true == renderingPort.empty ( ) ? srvConfig.getRenderingPort ( ) : renderingPort;
-		srvConfig.setServerParameters (srvhn, p, rp);
-	}	// if ((0 != serverHostName.length ( ))      || ...
 
 	// On applique la configuration :
 //	applyConfiguration (*(config.get ( )));
@@ -854,16 +846,6 @@ void QtMgx3DApplication::applyConfiguration (const Section& mainSection)
 	catch (...)
 	{
 	}
-
-	try
-	{
-		// Client/Serveur :
-		Section&	csSection	= mainSection.getSection ("server");
-		ClientServerProperties::getInstance ( ).load (csSection);
-	}
-	catch (...)
-	{
-	}
 }	// QtMgx3DApplication::applyConfiguration
 
 
@@ -992,7 +974,6 @@ void QtMgx3DApplication::saveConfiguration (Section& mainSection)
 	Section&	groupsSection	= PreferencesHelper::getSection (panelsSection, "groups");
 	Section&	logsSection		= PreferencesHelper::getSection (guiSection,"logs");
 	Section&	scriptingSection	= PreferencesHelper::getSection (guiSection,"scripting");
-	Section&	serverSection	= PreferencesHelper::getSection (mainSection,"server");
 
 	// GUI :
 	PreferencesHelper::updateBoolean (guiSection, Resources::instance ( )._saveGuiState);
@@ -1079,9 +1060,6 @@ void QtMgx3DApplication::saveConfiguration (Section& mainSection)
 
 	// Contexte :
 	getMainWindow ( ).getContext ( ).saveConfiguration (contextSection);
-
-	// Client/Serveur :
-	ClientServerProperties::getInstance ( ).save (serverSection);
 }	// QtMgx3DApplication::saveConfiguration
 
 

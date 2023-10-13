@@ -1,14 +1,16 @@
 set (CURRENT_PACKAGE_NAME "Magix3DBatch_exe")
 
+find_package (GUIToolkitsVariables)
 include (${CMAKE_SOURCE_DIR}/cmake/version.cmake)
 include (${CMAKE_SOURCE_DIR}/cmake/common.cmake)
-include (${CMAKE_SOURCE_DIR}/cmake/python_binding.cmake)
+include (${GUIToolkitsVariables_CMAKE_DIR}/python_binding.cmake)
 
 set (TARGET_NAME Magix3DBatch)
 set (MAGIX3D_BATCH_EXE ${TARGET_NAME}-${MAGIX3D_VERSION})
 add_executable (${MAGIX3D_BATCH_EXE} Magix3DBatch.cpp)
 
-target_link_libraries (${MAGIX3D_BATCH_EXE} PUBLIC QtVtkComponents)
+#target_link_libraries (${MAGIX3D_BATCH_EXE} PUBLIC QtVtkComponents)
+target_link_libraries (${MAGIX3D_BATCH_EXE} PUBLIC pyMagix3D)
 target_link_libraries (${MAGIX3D_BATCH_EXE} PUBLIC z)	# Pour Qt sous Ubuntu installé via l'installeur Qt)
 
 # INSTALL_RPATH modifie le rpath pour les libs internes au projet :

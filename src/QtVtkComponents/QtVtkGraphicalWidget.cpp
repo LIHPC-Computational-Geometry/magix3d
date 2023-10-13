@@ -42,16 +42,14 @@ namespace QtVtkComponents
 // ===========================================================================
 
 QtVtkGraphicalWidget::QtVtkGraphicalWidget (QWidget* parent, vtkRenderWindow* w, RenderingManager* rm)
-	: QtComponents::Qt3DGraphicalWidget (parent, rm),
-	  _vtkWidget (0), _lockableRenderWindow (0)
+	: QtComponents::Qt3DGraphicalWidget (parent, rm), _vtkWidget (0), _lockableRenderWindow (0)
 {
 	createGui (w);
 }	// QtVtkGraphicalWidget::QtVtkGraphicalWidget
 
 
 QtVtkGraphicalWidget::QtVtkGraphicalWidget (const QtVtkGraphicalWidget&)
-	: QtComponents::Qt3DGraphicalWidget (0, 0),
-	  _vtkWidget (0), _lockableRenderWindow (0)
+	: QtComponents::Qt3DGraphicalWidget (0, 0), _vtkWidget (0), _lockableRenderWindow (0)
 {
 	MGX_FORBIDDEN ("QtVtkGraphicalWidget copy constructor is not allowed.");
 }	// QtVtkGraphicalWidget::QtVtkGraphicalWidget (const QtVtkGraphicalWidget&)
@@ -99,7 +97,6 @@ vtkLockableRenderWindow& QtVtkGraphicalWidget::getLockableRenderWindow ( )
 }	// QtVtkGraphicalWidget::getLockableRenderWindow
 
 
-//QtVtkWidget& QtVtkGraphicalWidget::getVTKWidget ( )
 QtVtkGraphicWidget& QtVtkGraphicalWidget::getVTKWidget ( )
 {
 	CHECK_NULL_PTR_ERROR (_vtkWidget)
@@ -107,7 +104,6 @@ QtVtkGraphicWidget& QtVtkGraphicalWidget::getVTKWidget ( )
 }	// QtVtkGraphicalWidget::getVTKWidget
 
 
-//void QtVtkGraphicalWidget::setVTKWidget (QtVtkWidget* widget)
 void QtVtkGraphicalWidget::setVTKWidget (QtVtkGraphicWidget* widget)
 {
 	if (widget == _vtkWidget)
@@ -150,12 +146,9 @@ void QtVtkGraphicalWidget::updateConfiguration ( )
 			catch (...)
 			{
 			}
-/*			window->SetDesiredUpdateRate (
-							Resources::instance ( )._desiredFrameRate.getValue ( ));
-			interactor->SetStillUpdateRate (
-							Resources::instance ( )._stillFrameRate.getValue ( ));
-			interactor->SetDesiredUpdateRate (
-							Resources::instance ( )._desiredFrameRate.getValue ( ));
+/*			window->SetDesiredUpdateRate (Resources::instance ( )._desiredFrameRate.getValue ( ));
+			interactor->SetStillUpdateRate (Resources::instance ( )._stillFrameRate.getValue ( ));
+			interactor->SetDesiredUpdateRate (Resources::instance ( )._desiredFrameRate.getValue ( ));
 */
 			vtkRenderWindowInteractor*	interactor	= getVTKWidget ( ).getInteractor ( );
 			CHECK_NULL_PTR_ERROR (interactor)
@@ -187,7 +180,6 @@ void QtVtkGraphicalWidget::createGui (vtkRenderWindow* window)
 	_lockableRenderWindow	= dynamic_cast<vtkLockableRenderWindow*>(window);
 	QHBoxLayout*	layout	= new QHBoxLayout (this);
 	setLayout (layout);
-//	QtVtkWidget*	widget	= new QtVtkWidget (this, window);
 	QtVtkGraphicWidget*	widget	= new QtVtkGraphicWidget (this);
 	CHECK_NULL_PTR_ERROR (widget)
 	widget->setRenderWindow (window);

@@ -3,15 +3,11 @@
  * \author		Charles PIGNEROL
  * \date		21/06/2012
  *
- * \warning		Fournit la classe <I>vtkECMXOpenGLRenderWindow</I> pourles
- *				rendus off-screen.
+ * \warning		Fournit la classe <I>vtkECMXOpenGLRenderWindow</I> pour les rendus off-screen.
  */
 
 #include "VtkComponents/vtkECMFactory.h"
 #include "VtkComponents/vtkECMXOpenGLRenderWindow.h"
-#ifdef USE_VTK_PARALLEL
-#include "VtkComponents/vtkDMAParallelRenderManager.h"
-#endif	// USE_VTK_PARALLEL
 
 #include <vtkVersion.h>
 #ifdef VTK_USE_X    // Eventuellement défini dans vtkRenderingOpenGLConfigure.h de la distribution VTK.
@@ -28,8 +24,7 @@ using namespace std;
 void restoreMapState (vtkRenderWindow& window)
 {
 #ifdef VTK_USE_X
-	vtkXOpenGLRenderWindow*    xw    =
-					dynamic_cast<vtkXOpenGLRenderWindow*>(&window);
+	vtkXOpenGLRenderWindow*    xw    = dynamic_cast<vtkXOpenGLRenderWindow*>(&window);
 	if (0 != xw)
 	{
 		if (0 == window.GetMapped ( ))
@@ -50,10 +45,6 @@ void restoreMapState (vtkRenderWindow& window)
 VTK_CREATE_CREATE_FUNCTION (vtkECMXOpenGLRenderWindow);
 #endif	// VTK_5
 #endif  // VTK_USE_X
-
-#ifdef USE_VTK_PARALLEL
-VTK_CREATE_CREATE_FUNCTION (vtkDMAParallelRenderManager);
-#endif	// USE_VTK_PARALLEL
 
 vtkECMFactory::vtkECMFactory ( )
 {
@@ -87,18 +78,6 @@ vtkECMFactory::vtkECMFactory ( )
 #endif	// VTK_5
 #endif  // VTK_USE_X
 */
-
-
-#ifdef USE_VTK_PARALLEL
-	this->RegisterOverride("vtkCompositeRenderManager",
-	                       "vtkDMAParallelRenderManager",
-	                       "Corrects bug when bounds of a render windows are not initialized (e.g. when nothing is displayed).",
-	                       1,
-	                       vtkObjectFactoryCreatevtkDMAParallelRenderManager);
-	cout << "- vtkDMAParallelRenderManager that overload vtkCompositeRenderManager in "
-	     << "order to corrects a bug when bounds of a render windows are not initialized (e.g. when nothing is displayed)." << endl
-	     << endl;
-#endif	// USE_VTK_PARALLEL
 }	// vtkECMFactory::vtkECMFactory
 
 

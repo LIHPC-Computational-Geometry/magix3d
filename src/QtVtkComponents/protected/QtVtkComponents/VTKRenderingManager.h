@@ -11,7 +11,6 @@
 #include "QtVtkComponents/VTKMgx3DPicker.h"
 #include "QtVtkComponents/VTKMgx3DPickerCommand.h"
 #include "QtVtkComponents/VTKMgx3DSelectionManager.h"
-//#include "QtVtkComponents/QtVtkWidget.h"
 #include <QtComponents/Qt3DGraphicalWidget.h>
 #include <QtVtk/QtVtkGraphicWidget.h>
 #include <VtkContrib/vtkConstrainedPointWidget.h>
@@ -55,7 +54,6 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 	 * \param		<I>true</I> si le rendu doit être fait dans
 	 *				une fenêtre <I>offscreen</I>.
 	 */
-//	VTKRenderingManager (QtVtkWidget* w, bool offScreen);
 	VTKRenderingManager (QtVtkGraphicWidget* w, bool offScreen);
 
 	/**
@@ -885,7 +883,6 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 	/**
 	 * \return		Le widget VTK utilisé.
 	 */
-//	virtual QtVtkWidget& getVTKWidget ( );
 	virtual QtVtkGraphicWidget& getVTKWidget ( );
 
 	/**
@@ -944,8 +941,7 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 	VTKRenderingManager& operator = (const VTKRenderingManager&);
 
 	/** Eventuel widget <I>Qt/VTK</I> associé. */
-//	QtVtkWidget*									_vtkWidget;
-	QtVtkGraphicWidget*						_vtkWidget;
+	QtVtkGraphicWidget*								_vtkWidget;
 
 	/** L'afficheur utilisé. */
 	mutable vtkRenderer*							_renderer;

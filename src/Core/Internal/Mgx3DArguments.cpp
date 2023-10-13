@@ -62,22 +62,6 @@ vector<string> mgx3dAllowedArgs ( )
 	args.push_back ("-coordTranslate");
 	args.push_back ("--coordTranslate");
 
-	// Arguments parallélisme Magix3D :
-	args.push_back ("-nbprocs");
-	args.push_back ("--nbprocs");
-
-	// Arguments client/serveur Magix3D :
-	args.push_back ("-host");
-	args.push_back ("--host");
-	args.push_back ("-port");
-	args.push_back ("--port");
-	args.push_back ("-renderingPort");
-	args.push_back ("--renderingPort");
-	args.push_back ("-displays");
-	args.push_back ("--displays");
-	args.push_back ("-onScreenWindow");
-	args.push_back ("--onScreenWindow");
-
 	return args;
 }	// mgx3dAllowedArgs
 

@@ -1,8 +1,9 @@
 set (CURRENT_PACKAGE_NAME "Magix3D_exe")
 
+find_package (GUIToolkitsVariables)
 include (${CMAKE_SOURCE_DIR}/cmake/version.cmake)
 include (${CMAKE_SOURCE_DIR}/cmake/common.cmake)
-include (${CMAKE_SOURCE_DIR}/cmake/python_binding.cmake)
+include (${GUIToolkitsVariables_CMAKE_DIR}/python_binding.cmake)
 
 find_package (Qt5Core)	# Beurk
 set (TARGET_NAME Magix3D)

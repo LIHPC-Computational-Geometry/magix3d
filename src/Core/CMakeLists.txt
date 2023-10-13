@@ -75,19 +75,19 @@ if (TRITON)
 endif (TRITON)
 
 include (FindPkgConfig)
-include (${CMAKE_SOURCE_DIR}/cmake/python_binding.cmake)	# Access to Python.h
-include (${CMAKE_SOURCE_DIR}/cmake/FindCgns.cmake)			# Also requires HDF5, brought by Lima
+include (${GUIToolkitsVariables_CMAKE_DIR}/python_binding.cmake)	# Access to Python.h
+include (${CMAKE_SOURCE_DIR}/cmake/FindCgns.cmake)					# Also requires HDF5, brought by Lima
 include (${CMAKE_SOURCE_DIR}/cmake/FindMesquite.cmake)
 if (NOT TARGET Mesquite::Mesquite)
 	message (FATAL_ERROR "------------> MESQUITE NOT FOUND, FATAL ERROR")
 endif (NOT TARGET Mesquite::Mesquite)
-pkg_check_modules (gts REQUIRED gts)						# GTS (GNU Triangulated Surface Library)
+pkg_check_modules (gts REQUIRED gts)								# GTS (GNU Triangulated Surface Library)
 pkg_get_variable (GTS_INC_DIR gts includedir)
 pkg_get_variable (GTS_LIB_DIR gts libdir)
-pkg_check_modules (glib-2.0 REQUIRED glib-2.0)				# glib-2.0 (pour GTS)
+pkg_check_modules (glib-2.0 REQUIRED glib-2.0)						# glib-2.0 (pour GTS)
 pkg_get_variable (GLIB2_INC_DIR glib-2.0 includedir)
 pkg_get_variable (GLIB2_LIB_DIR glib-2.0 libdir)
-pkg_check_modules (libpcre REQUIRED libpcre)				# PCRE (Perl compatible regular expressions pour glib-2.0)
+pkg_check_modules (libpcre REQUIRED libpcre)						# PCRE (Perl compatible regular expressions pour glib-2.0)
 pkg_get_variable (PCRE_INC_DIR libpcre includedir)
 pkg_get_variable (PCRE_LIB_DIR libpcre libdir)
 
