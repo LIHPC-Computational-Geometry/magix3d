@@ -62,7 +62,7 @@ Tutoriels
 
 Pour aller plus loin avec votre cas 2D, il est nécessaire de voir les :ref:`recommandations générales<generation3D>` pour le passage de votre cas 2D au modèle bloc structuré en 3D.
 
-:doc:`pages/tuto-2CylindesCreux`
+:doc:`pages/tuto-2CylindresCreux`
    |CylindreOreilleMaillage| Tutoriel qui explique comment réaliser le maillage d'un cylindre creux avec un second cylindre creux qui l'intersecte
 
 .. include:: cea_index-tuto.rst
@@ -99,7 +99,7 @@ Pour aller plus loin avec votre cas 2D, il est nécessaire de voir les :ref:`rec
    pages/tuto-2BoitesAvecRecouvrement
    pages/tuto-Groupes
    pages/tuto-3DRevolution
-   pages/tuto-2CylindesCreux
+   pages/tuto-2CylindresCreux
    pages/cea_tuto-*
 
 

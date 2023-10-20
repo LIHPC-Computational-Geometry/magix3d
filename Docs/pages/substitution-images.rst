@@ -747,5 +747,3 @@
 .. |deuxBoitesMaillage| image:: ../images/DeuxBoites_maillage.png
    :scale: 80%
 
-.. |cylindreOreille3Vol| image:: ../images/CylindreOreille_3vol.jpeg
-

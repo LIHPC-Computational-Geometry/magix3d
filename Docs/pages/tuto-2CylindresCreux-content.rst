@@ -1,13 +1,6 @@
-.. _tuto-2CylindresCreux:
+.. _tuto-2CylindresCreux-content:
 
-Maillage de 2 cylindres creux
-#############################
-
-.. warning::
-  Le comportement de Magix3D ayant changé avec certaines versions, ce tutoriel est adapté aux 
-  versions **1.6.3** et **1.7.0**. Il ne fonctionne pas avec les versions 1.6.4 et 1.6.5. 
-  Les changements qui ont affecté ce tutoriel sont liés à l'ordre des entités issus d'une 
-  opération booléenne sur la géométrie.
+.. sectnum::
 
 Préambule
 *********
@@ -17,7 +10,7 @@ L'objectif est de faire un maillage structuré par bloc avec uniquement des hexa
 Nous maillerons le vide à l'intérieur de chacun des deux cylindres.
 
 .. image:: ../images/CylindreOreille_modelageOr.jpeg
-   :width: 350px
+   :width: 400px
 
 Du fait qu'il y a un grand nombre d'opérations pour réaliser le maillage, nous détaillerons les opérations dans leur version Python et minimiserons les détails pour l'utilisation de l'IHM. 
 
@@ -55,6 +48,7 @@ La commande Python :
 
 .. code-block:: python
 
+  # Création d'un cylindre avec une topologie
   ctx.getTopoManager().newCylinderWithTopo (Mgx3D.Point(0, 0, 0), 5.4, Mgx3D.Vector(10, 0, 0), 360, True, .5, 10, 10, 10, "OR")
 
 Construction du cylindre pour le vide associé au 1 :sup:`er` cylindre
@@ -71,6 +65,7 @@ La commande Python :
 
 .. code-block:: python
 
+  # Création du cylindre Vol0001
   ctx.getGeomManager().newCylinder (Mgx3D.Point(0, 0, 0), 5, Mgx3D.Vector(10, 0, 0), 360, "VIDE")
 
 Construction du 2 :sup:`ème` cylindre externe
@@ -90,12 +85,17 @@ La commande Python :
 
 .. code-block:: python
 
+  # Création du cylindre Vol0002
   ctx.getGeomManager().newCylinder (Mgx3D.Point(5, 4.5, 0), 1.2, Mgx3D.Vector(0, 3, 0), 360, "OR")
 
 La géométrie comporte alors 3 volumes:
 
-.. image:: ../images/CylindreOreille_3vol.jpeg
-    :width: 350px
+.. image:: ../images/CylindreOreille_3vol.png
+    :width: 400px
+
+.. note::
+
+  Pour afficher la peau des volumes, utiliser l'option *Gestionnaire d'entités / Volumes / Représentations / Surfaces / Afficher*
 
 Découpage du 2 :sup:`ème` cylindre externe
 ==========================================
@@ -110,19 +110,20 @@ depuis le panneau *Opérations* en sélectionnant les boutons suivants :
 
 .. line-block::
   Ensuite, sélectionner *Section* comme type d'opération.
-  Sélectionner comme volume à couper celui du 2 :sup:`ème` cylindre externe (*Vol0002*) à l'aide du :ref:`champ de sélection <selectionner-entites>`.
+  Sélectionner comme volume à couper celui du 2 :sup:`ème` cylindre externe (*Vol0002*).
   Sélectionner comme surface pour couper celle qui est circulaire et dans le volume de vide (interne au premier cylindre, *Surf0003*).
 
 La commande Python :
 
 .. code-block:: python
 
+  # Section suivant Surf0003 des entités Vol0002
   ctx.getGeomManager().section(["Vol0002"], "Surf0003")
 
 La géométrie comporte alors 4 volumes :
 
-.. image:: ../images/CylindreOreille_4vol.jpeg
-    :width: 350px
+.. image:: ../images/CylindreOreille_4vol.png
+    :width: 400px
 
 Destruction du volume interne au vide issu du 2 :sup:`ème` cylindre externe
 ===========================================================================
@@ -134,12 +135,13 @@ Il faut pour cela ouvrir le panneau *Destruction d'entités géométriques* qui 
       :sousfamille: volumes
       :operation: destruction
 
-Sélectionner comme volume à détruire celui à l'intérieur du vide et issu de la section du 2 :sup:`ème` cylindre externe (*Vol0004*) à l'aide du :ref:`champ de sélection <selectionner-entites>`.
+Sélectionner comme volume à détruire celui à l'intérieur du vide et issu de la section du 2 :sup:`ème` cylindre externe (*Vol0004*).
 
 La commande Python :
 
 .. code-block:: python
 
+  # Destruction de  Vol0004
   ctx.getGeomManager().destroy(["Vol0004"], True)
 
 Construction du cylindre pour le vide du 2 :sup:`ème` cylindre
@@ -158,6 +160,7 @@ La commande Python :
 
 .. code-block:: python
 
+  # Création du cylindre Vol0005
   ctx.getGeomManager().newCylinder (Mgx3D.Point(5, 4.5, 0), 1, Mgx3D.Vector(0, 3, 0), 360, "VIDE")
 
 Découpage du cylindre pour le vide du 2 :sup:`ème` cylindre
@@ -165,13 +168,13 @@ Découpage du cylindre pour le vide du 2 :sup:`ème` cylindre
 
 Il faut pour cela ré-ouvrir le panneau *Opérations booléennes sur des volumes* vu précédemment.
 
-Sélectionner comme volume à couper celui du 2 :sup:`ème` cylindre interne (*Vol0005*) à l'aide du champ de sélection
-Sélectionner comme surface pour couper celle qui est au bord du volume externe de ce 2 :sup:`ème` cylindre (*Surf0011*).
+Sélectionner comme volume à couper celui du 2 :sup:`ème` cylindre interne (*Vol0005*). Sélectionner comme surface pour couper celle qui est au bord du volume externe de ce 2 :sup:`ème` cylindre (*Surf0009*).
 
 La commande Python :
 
 .. code-block:: python
 
+  # Section suivant Surf0009 des entités Vol0005
   ctx.getGeomManager().section(["Vol0005"], "Surf0009")
 
 Destruction du volume interne au vide issu du 2 :sup:`ème` cylindre externe
@@ -179,18 +182,19 @@ Destruction du volume interne au vide issu du 2 :sup:`ème` cylindre externe
 
 Il faut pour cela ré-ouvrir le panneau *Destruction d'entités géométriques*.
 
-Sélectionner comme volume à détruire celui à l'intérieur du vide et issu de la section du dernier cylindre (interne, *Vol0007*) à l'aide du champ de sélection.
+Sélectionner comme volume à détruire celui à l'intérieur du vide et issu de la section du dernier cylindre (interne, *Vol0007*).
 
 La commande Python :
 
 .. code-block:: python
 
+  # Destruction de  Vol0007
   ctx.getGeomManager().destroy(["Vol0007"], True)
 
 La géométrie comporte alors 4 volumes dont 2 ont été coupés :
 
-.. image:: ../images/CylindreOreille_4vol2.jpeg
-    :width: 350px
+.. image:: ../images/CylindreOreille_4vol2.png
+    :width: 400px
 
 Fusion des volumes en OR
 ========================
@@ -203,6 +207,7 @@ La commande Python :
 
 .. code-block:: python
 
+  # Fusion booléenne entre géométries avec topologies
   ctx.getGeomManager().fuse(["Vol0000", "Vol0003"])
 
 Collage des différents volumes
@@ -225,6 +230,7 @@ La commande Python :
 
 .. code-block:: python
 
+  # Collage entre géométries avec topologies
   ctx.getGeomManager().glue(["Vol0001", "Vol0006", "Vol0008"])
 
 Rectification des groupes
@@ -257,13 +263,15 @@ Les commandes Python :
 
 .. code-block:: python
 
+  # Modifie le groupe OR
   ctx.getGeomManager().setGroup (["Vol0010"], 3, "OR")
+  # Modifie le groupe VIDE
   ctx.getGeomManager().setGroup (["Vol0009", "Vol0006"], 3, "VIDE")
 
 La géométrie comporte désormais 3 volumes:
 
-.. image:: ../images/CylindreOreille_3vol2.jpeg
-   :width: 350px
+.. image:: ../images/CylindreOreille_3vol2.png
+   :width: 400px
 
 Construction de la topologie
 ****************************
@@ -276,8 +284,7 @@ Nous vous recommandons d'activer dans le :ref:`filtre de représentation <gestio
 Construction d'un bloc pour le 2 :sup:`ème` cylindre
 ====================================================
 
-Nous allons associer un nouveau bloc au volume du 2 :sup:`ème` cylindre. Pour cela ouvrir le panneau *Création de bloc par association à un volume*
- qui est accessible depuis le panneau *Opérations* en sélectionnant les boutons suivants :
+Nous allons associer un nouveau bloc au volume du 2 :sup:`ème` cylindre. Pour cela ouvrir le panneau *Création de bloc par association à un volume* qui est accessible depuis le panneau *Opérations* en sélectionnant les boutons suivants :
 
 .. taboperation:: 
       :famille: topologie
@@ -288,12 +295,13 @@ Vous allez ensuite sélectionner l'entité pour remplir les champs comme suit, p
 
 .. taboperationparams::
       :valeurs: Volume, Vol0006
-                Type , Bloc structuré libre
+                Type , Bloc structuré libre (sans association)
 
 La commande Python :
 
 .. code-block:: python
 
+  # Création d'un bloc topologique structuré sans projection (Vol0006)
   ctx.getTopoManager().newFreeTopoOnGeometry ("Vol0006")
 
 Découpage des blocs dans le 1 :sup:`er` cylindre
@@ -304,13 +312,16 @@ La topologie de l'or correspondra aux blocs les plus à l'extérieur et celle du
 
 Pour cela ouvrir le panneau *Découpage de blocs selon une arête* qui est accessible depuis le panneau *Opérations* en sélectionnant les boutons suivants :
 
-
+.. taboperation:: 
+      :famille: topologie
+      :sousfamille: blocs
+      :operation: découpagebloc
 
 Vous allez ensuite sélectionner les 4 blocs en périphérie de l'o-grid dans le 1 :sup:`er` cylindre ainsi qu'une arête transversale (qui va de l'extérieur de l'o-grid vers le centre). 
 Les entités sélectionnées sont en orange :
 
 .. image:: ../images/CylindreOreille_splitBlocks1.jpeg
-  :width: 350px
+  :width: 400px
 
 Lorsque les champs du panneau seront remplis comme suit, exécuter la commande avec le bouton *Appliquer* :
 
@@ -327,6 +338,7 @@ La commande Python :
 
 .. code-block:: python
 
+  # Découpage suivant Ar0017 des blocs Bl0000 Bl0001 Bl0002 Bl0003
   ctx.getTopoManager().splitBlocks (["Bl0001", "Bl0002", "Bl0003", "Bl0000"], "Ar0017",.8)
 
 Associations avec la géométrie pour le 1 :sup:`er` cylindre
@@ -347,25 +359,27 @@ Ouvrir le panneau *Associations entités topologiques 0D, 1D, 2D -> entité(s) g
       :sousfamille: sommets
       :operation: modificationassociation
 
-Vous allez ensuite sélectionner la méthode de projection au plus près pour des sommets vers des entités 1D (courbes). 
-Sélectionner les sommets à proximités des courbes internes ainsi que les 2 courbes. Les courbes à sélectionner sont en orange :
+Vous allez ensuite sélectionner la méthode de projection au plus près pour des sommets vers des entités 1D (courbes).
+
+Sélectionner les sommets à proximité des courbes internes ainsi que les 2 courbes. Les courbes à sélectionner sont en orange :
 
 .. image:: ../images/CylindreOreille_projectVerticesOnNearestGeomEntities1.jpeg
-  :width: 350px
+  :width: 400px
 
 Lorsque les champs du panneau seront remplis comme suit, exécuter la commande avec le bouton *Appliquer* :
 
 .. taboperationparams::
-      :valeurs: Blocs, Sommets -> E. géométriques
-                Vertices , Som0048 Som0049 Som0050 Som0051 Som0052 Som0053 Som0054 Som0055
-                D1, Coché
+      :valeurs: Méthode, Sommets -> E. géométriques
+                Sommets , Som0048 Som0049 Som0050 Som0051 Som0052 Som0053 Som0054 Som0055
+                Dim1, Coché
                 Entités géométriques, Crb0003 Crb0005
 
 La commande Python :
 
 .. code-block:: python
 
-  ctx.getTopoManager().projectVerticesOnNearestGeomEntities (["Som0048", "Som0051", "Som0052", "Som0055", "Som0054", "Som0053", "Som0050", "Som0049"], ["Crb0003", "Crb0005"], True)
+  # Projection automatique pour les sommets topologiques Som0048 Som0049 Som0050 Som0051 Som0052 ... 
+  ctx.getTopoManager().projectVerticesOnNearestGeomEntities (["Som0048", "Som0049", "Som0050", "Som0051", "Som0052", "Som0053", "Som0054", "Som0055"], ["Crb0003", "Crb0005"], True)
 
 Association automatique entre arêtes et courbes internes du 1 :sup:`er` cylindre
 --------------------------------------------------------------------------------
@@ -382,12 +396,14 @@ La commande Python :
 
 .. code-block:: python
 
-  ctx.getTopoManager().projectEdgesOnCurves (["Ar0083", "Ar0099", "Ar0097", "Ar0090", "Ar0082", "Ar0098", "Ar0096", "Ar0089"])
+  # Projection automatique pour les arêtes topologiques Ar0082 Ar0083 Ar0089 Ar0090 Ar0096 ... 
+  ctx.getTopoManager().projectEdgesOnCurves (["Ar0082", "Ar0083", "Ar0089", "Ar0090", "Ar0096", "Ar0097", "Ar0098", "Ar0099"])
 
 Associations vers la surface en x :sub:`min` du 1 :sup:`er` cylindre
 --------------------------------------------------------------------
 
-Avec le même panneau, sélectionner la méthode de projection pour les entités topologiques vers une entité géométrique, puis sélectionner dans un premier temps les sommets en x :sub:`min` au centre de l'o-grid, dans un second les arêtes, ainsi que la surface en x :sub:`min`. Pour faciliter la sélection des sommets il est conseillé de n'activer que D0 dans un premier temps, puis D1 pour sélectionner les arêtes.
+Avec le même panneau, sélectionner la méthode de projection pour les entités topologiques vers une entité géométrique, puis sélectionner dans un premier temps les sommets en x :sub:`min` au centre de l'o-grid, dans un second les arêtes, ainsi que la surface en x :sub:`min`. 
+Pour faciliter la sélection des sommets il est conseillé de n'activer que Dim0 dans un premier temps, puis Dim1 pour sélectionner les arêtes.
 
 Lorsque les champs du panneau seront remplis comme suit, exécuter la commande avec le bouton *Appliquer* :
 
@@ -402,7 +418,9 @@ La commande Python :
 
 .. code-block:: python
 
+  # Affectation d'une projection vers Surf0005 pour les entités topologiques Som0018 Som0008 Som0026 Som0027 Ar0077 ... 
   ctx.getTopoManager().setGeomAssociation (["Som0018", "Som0008", "Som0026", "Som0027", "Ar0077", "Ar0075", "Ar0012", "Ar0005", "Ar0037", "Ar0028", "Ar0086", "Ar0092"], "Surf0005", True)
+
 
 Associations vers la surface en x :sub:`max` du 1 :sup:`er` cylindre
 --------------------------------------------------------------------
@@ -435,7 +453,8 @@ La commande Python :
 
 .. code-block:: python
 
-  ctx.getTopoManager().setGeomAssociation (["Bl0008", "Bl0006", "Bl0004", "Bl0013", "Bl0011"], "Vol0009", False)
+  # Affectation d'une projection vers Vol0009 pour les entités topologiques Bl0004 Bl0006 Bl0008 Bl0011 Bl0013
+  ctx.getTopoManager().setGeomAssociation (["Bl0004", "Bl0006", "Bl0008", "Bl0011", "Bl0013"], "Vol0009", False)
 
 Association automatique entre arêtes et surface interne du 1 :sup:`er` cylindre
 -------------------------------------------------------------------------------
@@ -731,12 +750,12 @@ Le maillage
 La peau du maillage a cet aspect :
 
 .. image:: ../images/CylindreOreille_maillage_ext.jpeg
-  :width: 350px
+  :width: 400px
 
 Vue de l'intérieur suivant 3 feuillets dans des plans orthogonaux :
 
 .. image:: ../images/CylindreOreille_maillage_int.jpeg
-  :width: 350px
+  :width: 400px
 
 Le script final
 ***************
