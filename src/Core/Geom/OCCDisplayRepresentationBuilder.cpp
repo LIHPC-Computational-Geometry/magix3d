@@ -818,32 +818,32 @@ computeIsoEdges(const TopoDS_Face& AFace)
         Standard_Real VPrm = myVPrm.Value (VIso) ;
         if (!aHatcher.IsDone (VInd))
         {
-          cout << "DBRep_IsoBuilder:: V iso of parameter: " << VPrm;
+          std::cout << "DBRep_IsoBuilder:: V iso of parameter: " << VPrm;
           switch (aHatcher.Status (VInd))
           {
             case HatchGen_NoProblem:
             {
-                cerr << " No Problem" << endl;
+	      std::cerr << " No Problem" << std::endl;
               break;
             }
             case HatchGen_TrimFailure:
             {
-                cerr << " Trim Failure" << endl;
+	      std::cerr << " Trim Failure" << std::endl;
               break;
             }
             case HatchGen_TransitionFailure:
             {
-                cerr << " Transition Failure" << endl;
+              std::cerr << " Transition Failure" << std::endl;
               break;
             }
             case HatchGen_IncoherentParity:
             {
-                cerr << " Incoherent Parity" << endl;
+              std::cerr << " Incoherent Parity" << std::endl;
               break;
             }
             case HatchGen_IncompatibleStates:
             {
-                cerr << " Incompatible States" << endl;
+              std::cerr << " Incompatible States" << std::endl;
               break;
             }
           }

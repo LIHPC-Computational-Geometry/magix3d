@@ -169,7 +169,7 @@ static TkUtil::Color nextColor (
 					<< " pour la tolérance, (" << farColor.getDRed ( ) << ", "
 					<< farColor.getDGreen ( ) << ", " << farColor.getDBlue ( )
 					<< ") pour la couleur de fond.";
-			cerr << message << endl;
+			std::cerr << message << std::endl;
 			context.getLogDispatcher ( ).log (TkUtil::ErrorLog (message));
 		}	// if (100 == recursionCount)
 
