@@ -3,7 +3,7 @@ set (CURRENT_PACKAGE_MACRO_NAME "MGX3D_GMSH")
 include (${CMAKE_SOURCE_DIR}/cmake/version.cmake)
 include (${CMAKE_SOURCE_DIR}/cmake/common.cmake)
 
-find_package (OpenCASCADE 7.1.0 REQUIRED)	# x.y.z requested for OCC ...
+find_package (OpenCASCADE 7.1.0 REQUIRED)
 
 file (GLOB HEADERS protected/*.h)
 file (GLOB CPP_SOURCES Common/*.cpp Geo/*.cpp Mesh/*.cpp Numeric/*.cpp)
@@ -21,9 +21,8 @@ target_include_directories (Gmsh PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE
 target_include_directories (Gmsh PUBLIC ${OpenCASCADE_INCLUDE_DIR})
 target_compile_definitions (Gmsh PUBLIC ${MAGIX3D_GMSH_PUBLIC_FLAGS})
 target_compile_definitions (Gmsh PRIVATE ${MAGIX3D_GMSH_PRIVATE_FLAGS})
-#target_link_libraries (Gmsh PUBLIC ${OpenCASCADE_LIBRARIES})	# OpenCASCADE_LIBRARIES requires tcl, tk, ... :(
-#target_link_libraries (Gmsh PUBLIC TKSTL TKV3d TKG2d TKHLR TKSTEP TKIGES TKXSBase TKShHealing TKService TKMath TKOffset TKBool TKPrim TKTopAlgo TKGeomAlgo TKBRep TKFeat TKGeomBase TKG3d TKG2d TKMath TKernel TKBO TKMesh TKMeshVS TKXDEIGES TKXDESTEP TKCDF TKCAF TKXCAF)
-target_link_libraries (Gmsh PUBLIC TKSTL TKV3d TKG2d TKHLR TKSTEP TKIGES TKXSBase TKShHealing TKService TKMath TKOffset TKBool TKPrim TKTopAlgo TKGeomAlgo TKBRep TKFeat TKGeomBase TKG3d TKG2d TKMath TKernel TKBO TKMesh TKXDEIGES TKXDESTEP TKCDF TKCAF TKXCAF)
+#target_link_libraries (Gmsh PUBLIC TKSTL TKV3d TKG2d TKHLR TKSTEP TKIGES TKXSBase TKShHealing TKService TKMath TKOffset TKBool TKPrim TKTopAlgo TKGeomAlgo TKBRep TKFeat TKGeomBase TKG3d TKG2d TKMath TKernel TKBO TKMesh TKXDEIGES TKXDESTEP TKCDF TKCAF TKXCAF)
+target_link_libraries (Gmsh PUBLIC ${OpenCASCADE_FoundationClasses_LIBRARIES} ${OpenCASCADE_ModelingAlgorithms_LIBRARIES} ${OpenCASCADE_DataExchange_LIBRARIES})
 
 # Quelques spécificité de compilation :
 SET_SOURCE_FILES_PROPERTIES (Numeric/robustPredicates.cpp PROPERTIES COMPILE_FLAGS -O0)
