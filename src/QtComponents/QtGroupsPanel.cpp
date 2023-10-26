@@ -183,8 +183,7 @@ QtGroupTreeWidgetItem::QtGroupTreeWidgetItem (QTreeWidgetItem* parent, GroupEnti
 QtGroupTreeWidgetItem::QtGroupTreeWidgetItem (QTreeWidgetItem* parent)
 	: QTreeWidgetItem (parent), _group (0)
 {	// Pour mode client/serveur
-	setFlags (Qt::ItemIsSelectable | Qt::ItemIsEnabled |
-	          Qt::ItemIsUserCheckable);
+	setFlags (Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsUserCheckable);
 	update (false);
 }	// QtGroupTreeWidgetItem::QtGroupTreeWidgetItem
 
@@ -1778,6 +1777,7 @@ void QtGroupsPanel::selectGeomVolumesCallback ( )
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
 }  // QtGroupsPanel::selectGeomVolumesCallback
+
 
 void QtGroupsPanel::selectGeomSurfacesCallback ( )
 {

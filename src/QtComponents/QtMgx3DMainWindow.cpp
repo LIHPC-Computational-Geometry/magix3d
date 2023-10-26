@@ -3790,8 +3790,7 @@ cout << ctime (&t);
 
 			BEGIN_QT_TRY_CATCH_BLOCK
 
-			// Le contexte peut changer, par exemple en mode client/serveur. C'est par
-			// ailleurs l'IHM qui gère les préférences utilisateurs. C'est donc ici un
+			// Le contexte peut changer. C'est par ailleurs l'IHM qui gère les préférences utilisateurs. C'est donc ici un
 			// bon endroit pour gérer le type de log à afficher/enregistrer :
 			if (0 != context)
 			{

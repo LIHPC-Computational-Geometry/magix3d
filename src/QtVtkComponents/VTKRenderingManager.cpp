@@ -652,7 +652,6 @@ void VTKRenderingManager::VTKPlaneInteractor::vtkInteractorModified ( )
 //                        LA CLASSE VTKRenderingManager
 // ===========================================================================
 
-//VTKRenderingManager::VTKRenderingManager (QtVtkWidget* vtkWidget, bool offScreen)
 VTKRenderingManager::VTKRenderingManager (QtVtkGraphicWidget* vtkWidget, bool offScreen)
 	: QtComponents::RenderingManager ( ),
 	  _vtkWidget (vtkWidget), _renderer (0), _renderWindow (0),
@@ -838,7 +837,6 @@ VTKRenderingManager::~VTKRenderingManager ( )
 }	// VTKRenderingManager::~VTKRenderingManager
 
 
-//QtVtkWidget& VTKRenderingManager::getVTKWidget ( )
 QtVtkGraphicWidget& VTKRenderingManager::getVTKWidget ( )
 {
 	CHECK_NULL_PTR_ERROR (_vtkWidget)

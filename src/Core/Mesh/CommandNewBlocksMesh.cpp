@@ -17,7 +17,6 @@
 #include "Topo/TopoHelper.h"
 
 #include "Internal/Context.h"
-#include "Internal/ClientServerProperties.h"
 
 #include "Utils/Magix3DEvents.h"
 /*----------------------------------------------------------------------------*/

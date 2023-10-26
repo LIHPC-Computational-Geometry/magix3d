@@ -3,8 +3,7 @@
  * \author			Charles PIGNEROL
  * \date			21/06/2012
  *
- * \warning			Fournit la classe <I>vtkECMXOpenGLRenderWindow</I> pourles
- *					rendus off-screen.
+ * \warning			Fournit la classe <I>vtkECMXOpenGLRenderWindow</I> pour les rendus off-screen.
  */
 #ifndef VTK_ECM_FACTORY_H
 #define VTK_ECM_FACTORY_H

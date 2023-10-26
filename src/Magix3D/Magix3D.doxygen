@@ -574,11 +574,6 @@ INPUT                  = \
                          ../../src/pyMagix3D \
                          ../../src/QtComponents \
                          ../../src/QtVtkComponents \
-                         ../../src/RCFMagix3DAPI \
-                         ../../src/RCFMagix3DClient \
-                         ../../src/RCFMagix3DClientAPI \
-                         ../../src/RCFMagix3DServer \
-                         ../../src/RCFMagix3DServerAPI \
                          ../../src/Utils \
                          ../../src/VTKComponents
                          

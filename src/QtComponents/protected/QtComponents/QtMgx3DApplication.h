@@ -103,11 +103,7 @@ class QtMgx3DApplication : public QApplication
 	 * @return		<I>true</I> si l'application doit afficher des boites de
 	 *				dialogue d'erreur lors des exceptions remontées lors de
 	 *				l'actualisation d'informations sur des entités, <I>false</I>
-	 *				dans le cas contraire. Concerne avant tout les modes
-	 *				<I>client/serveur</I> en fonctionnement <I>asynchrone</I> :
-	 *				un client peut recevoir un évènement de modification d'une
-	 *				entité alors que celle-ci est en cours de destruction côté
-	 *				serveur ...
+	 *				dans le cas contraire.
 	 */
 	static bool displayUpdatesErrors ( );
 

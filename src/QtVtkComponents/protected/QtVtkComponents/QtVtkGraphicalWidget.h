@@ -22,8 +22,6 @@ namespace Mgx3D
 namespace QtVtkComponents
 {
 
-//	class QtVtkWidget;
-
 /**
  * \brief		Classe de widget graphique 3D reposant sur l'API VTK.
  *
@@ -81,14 +79,13 @@ class QtVtkGraphicalWidget : public QtComponents::Qt3DGraphicalWidget
 	 * \return		Le widget <I>Qt/VTK</I>
 	 * \see			getRenderingWidget
 	 */
-//	virtual QtVtkWidget& getVTKWidget ( );
 	virtual QtVtkGraphicWidget& getVTKWidget ( );
 
 	/**
 	 * \param		Le nouveau widget <I>Qt/VTK</I>. Détruit l'éventuel ancien
 	 *				widget <I>Qt/VTK</I>.
 	 */
-	virtual void setVTKWidget (QtVtkGraphicWidget*);	//QtVtkWidget*);
+	virtual void setVTKWidget (QtVtkGraphicWidget*);
 
 	//@}	// Les opérations graphiques
 
@@ -123,7 +120,6 @@ class QtVtkGraphicalWidget : public QtComponents::Qt3DGraphicalWidget
 
 	/** Le widget <I>VTK</I> utilisée pour les affichages 3D. */
 	QtVtkGraphicWidget*				_vtkWidget;
-//	QtVtkWidget*					_vtkWidget;
 
 	/** La fenêtre de rendu. */
 	vtkLockableRenderWindow*		_lockableRenderWindow;

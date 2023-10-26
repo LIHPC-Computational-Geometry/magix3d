@@ -13,7 +13,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Internal/Context.h"
-#include "Internal/ClientServerProperties.h"
 #include "Internal/NameManager.h"
 #include "Internal/EntitiesHelper.h"
 #include "Internal/CommandChangeLengthUnit.h"
@@ -712,26 +711,6 @@ void Context::initialize (int argc, char* argv [])
 		255*Internal::InternalPreferences::instance ( )._topoColorWithoutProj.getRed ( ),
 		255*Internal::InternalPreferences::instance ( )._topoColorWithoutProj.getGreen ( ),
 		255*Internal::InternalPreferences::instance ( )._topoColorWithoutProj.getBlue ( )); // bleu, pas de proj
-	
-	// Aspects C/S :
-	std::string	host		= ClientServerProperties::getInstance ( ).getServerHost ( );
-	std::string	port		= ClientServerProperties::getInstance ( ).getPort ( );
-	std::string	rport		= ClientServerProperties::getInstance ( ).getRenderingPort ( );
-	bool		modified	= false;
-	if (true == m_argumentsMap.hasArg ("-host"))
-		{ host	= m_argumentsMap.getArgValue ("-host", std::string ( ), false);	modified	= true; }
-	else if (true == m_argumentsMap.hasArg ("--host"))
-		{ host	= m_argumentsMap.getArgValue ("--host", std::string ( ), false);	modified	= true; }
-	if (true == m_argumentsMap.hasArg ("-port"))
-		{ port	= m_argumentsMap.getArgValue ("-port", std::string ( ), false);	modified	= true; }
-	else if (true == m_argumentsMap.hasArg ("--port"))
-		{ port	= m_argumentsMap.getArgValue ("--port", std::string ( ), false);	modified	= true; }
-	if (true == m_argumentsMap.hasArg ("-renderingPort"))
-		{ rport	= m_argumentsMap.getArgValue ("-renderingPort", std::string ( ), false);	modified	= true; }
-	else if (true == m_argumentsMap.hasArg ("--renderingPort"))
-		{ rport	= m_argumentsMap.getArgValue ("--renderingPort", std::string ( ), false);	modified	= true; }
-	if (true == modified)
-		ClientServerProperties::getInstance ( ).setServerParameters (host, port, rport);
 }
 /*----------------------------------------------------------------------------*/
 void Context::finalize ( )
