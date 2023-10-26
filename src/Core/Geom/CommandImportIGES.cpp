@@ -276,7 +276,7 @@ void IGESHeader::read (const std::string& filepath, TkUtil::UTF8String& messages
 		char                         buffer[1024];
 		char                         globalSection[102400];
 		size_t                       gspos              = 0;
-		ifstream                     ifs(igesFile.getFullFileName());
+		std::ifstream                     ifs(igesFile.getFullFileName());
 		bool                         completed          = false;
 		bool                         msdos              = false;
 		memset(globalSection, '\0', 102400);
@@ -301,32 +301,32 @@ void IGESHeader::read (const std::string& filepath, TkUtil::UTF8String& messages
 			{
 				case 'S'    :
 					if (true == verbose)
-						cout << endofline << "Saut de la ligne \"" << buffer << "\" de la section \"Start\".";
+						std::cout << endofline << "Saut de la ligne \"" << buffer << "\" de la section \"Start\".";
 					break;    // Start section
 				case 'G'    :
 					if (true == verbose)
-						cout << endofline << "Processing line \"" << buffer << "\" de la section \"Global\".";
+						std::cout << endofline << "Processing line \"" << buffer << "\" de la section \"Global\".";
 					memcpy(globalSection + gspos, buffer, sectionPos);
 					gspos += sectionPos;
 					break;
 				case 'D'    :
 					if (true == verbose)
-						cout << endofline << "Saut de la ligne \"" << buffer << "\" de la section \"Directory entry\".";
+						std::cout << endofline << "Saut de la ligne \"" << buffer << "\" de la section \"Directory entry\".";
 					completed = true;   // just reading header == start + global
 					break;
 				case 'P'    :
 					if (true == verbose)
-						cout << endofline << "Saut de la ligne \"" << buffer << "\" de la section \"Parameter data\".";
+						std::cout << endofline << "Saut de la ligne \"" << buffer << "\" de la section \"Parameter data\".";
 					completed = true;   // just reading header == start + global
 					break;
 				case 'T'    :
 					if (true == verbose)
-						cout << endofline << "Saut de la ligne \"" << buffer << "\" de la section \"Terminate\".";
+						std::cout << endofline << "Saut de la ligne \"" << buffer << "\" de la section \"Terminate\".";
 					completed = true;   // just reading header == start + global
 					break;
 				default     :
 					if (true == verbose)
-						cout << endofline << "Saut de la ligne \"" << buffer << "\" de la section de type inconnu \"" << linetype
+						std::cout << endofline << "Saut de la ligne \"" << buffer << "\" de la section de type inconnu \"" << linetype
 						     << "\".";
 					completed = true;
 			}   // switch (linetype)

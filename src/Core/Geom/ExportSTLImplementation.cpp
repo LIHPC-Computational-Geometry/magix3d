@@ -45,7 +45,7 @@ void ExportSTLImplementation::write()
 			            dynamic_cast<OCCGeomRepresentation*>(rep);
 	CHECK_NULL_PTR_ERROR(geom_rep);
 
-	 StlAPI_ErrorStatus err = StlAPI::Write(geom_rep->getShape(), m_filename.c_str(), true);
+	 Standard_Boolean err = StlAPI::Write(geom_rep->getShape(), m_filename.c_str(), true);
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom
