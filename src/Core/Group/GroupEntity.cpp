@@ -31,7 +31,7 @@ GroupEntity::GroupEntity(Internal::Context& ctx,
 , m_level(level)
 {
 #ifdef _DEBUG2
-    std::cout<<"GroupEntity::GroupEntity("<<id<<") de nom "<<getName()<<std::endl;
+    std::cout<<"GroupEntity::GroupEntity de nom "<<getName()<<std::endl;
 #endif
 }
 /*----------------------------------------------------------------------------*/

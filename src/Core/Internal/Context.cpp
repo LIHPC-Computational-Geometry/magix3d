@@ -664,10 +664,10 @@ Context::~Context()
     delete m_sys_coord_manager;     m_sys_coord_manager = 0;
 
 #ifdef _DEBUG2
-    if (!Utils::Entity::isIdToEntityEmpty()){
+	if (!isIdToEntityEmpty()){
         std::cout<<"Certaines entités n'ont pas été détruites !"<<std::endl;
         //Utils::Entity::showAllEntities(std::cout);
-        Utils::Entity::showEntitiesStats(std::cout);
+		showEntitiesStats(std::cout);
     	throw TkUtil::Exception(TkUtil::UTF8String ("Certaines entités n'ont pas été détruites à la fin du contexte", TkUtil::Charset::UTF_8));
     }
 #endif
@@ -1656,7 +1656,7 @@ void Context::clearSession()
 	m_length_unit = Utils::Unit::undefined;
 
 #ifdef _DEBUG2
-	Utils::Entity::showEntitiesStats(std::cout);
+	showEntitiesStats(std::cout);
 #endif
 
 	clearIdToEntity ( );

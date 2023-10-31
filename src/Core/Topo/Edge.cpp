@@ -841,7 +841,7 @@ void Edge::
 getNodes(Vertex* v1, Vertex* v2, std::vector<gmds::Node>& vectNd)
 {
 #ifdef _DEBUG2
-	UTF8String	message (TkUtil::Charset::UTF_8);
+	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     message << "Edge::getNodes( \""
             << v1->getName() << "\", "
             << v2->getName() << "\") avec l'arête : "

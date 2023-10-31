@@ -22,8 +22,8 @@ CommandChangeLandmark(Internal::Context& context, Utils::Landmark::kind l)
 	getInfoCommand ( ).addContextInfo (InfoCommand::LANDMARKMODIFIED);
 #ifdef _DEBUG2
 	std::cout<<"CommandChangeLandmark de "
-			<<Utils::Landmark::toString(m_old_landmark)
-	        <<" vers "<<Utils::Landmark::toString(m_new_landmark)
+			<<Utils::Landmark::toString (m_old_landmark) 
+	        <<" vers "<<Utils::Landmark::toString (m_new_landmark)
 	        <<std::endl;
 #endif
 }
@@ -54,7 +54,7 @@ internalExecute()
 {
 #ifdef _DEBUG2
 	std::cout<<"CommandChangeLandmark::internalExecute => "
-	        <<Internal::ContextIfc::toString(m_new_landmark)
+	        <<Utils::Landmark::toString (m_new_landmark)
 	        <<std::endl;
 #endif
 std::cout << __FILE__ << ' ' << __LINE__ << " CONTEXT : " << Utils::Landmark::toString (getContext().m_landmark) << " -> " << Utils::Landmark::toString (m_new_landmark) << std::endl;
