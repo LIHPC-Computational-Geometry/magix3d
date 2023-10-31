@@ -168,3 +168,8 @@ install (EXPORT ${CMAKE_PACKAGE_TARGETS_NAME}
 install (FILES ${CMAKE_PACKAGE_CONFIG_FILE} ${CMAKE_PACKAGE_VERSION_FILE} DESTINATION ${ConfigPackageLocation})
 
 
+# Add debugging option
+option(USE_DEBUG "Enter debug mode" OFF)
+if (USE_DEBUG)
+	add_compile_definitions(_DEBUG2)
+endif()

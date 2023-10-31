@@ -1009,9 +1009,9 @@ getNodes(Vertex* sommet1, Vertex* sommet2, Vertex* sommet3, Vertex* sommet4,
 #ifdef _DEBUG2
                 std::cout<<"vectNd["<<idDep+i+j*nbNoeudsI
                 		 <<"] = nodes["<<i*incI+j*incJ*nbNoeudsCoFaceI<<"] : "
-                		 << vectNd[idDep+i+j*nbNoeudsI]->getX()<<","
-                		 << vectNd[idDep+i+j*nbNoeudsI]->getY()<<","
-                		 << vectNd[idDep+i+j*nbNoeudsI]->getZ()<<","
+                		 << vectNd[idDep+i+j*nbNoeudsI].X()<<","
+                		 << vectNd[idDep+i+j*nbNoeudsI].Y()<<","
+                		 << vectNd[idDep+i+j*nbNoeudsI].Z()<<","
                 		 << std::endl;
 #endif
             }

@@ -33,7 +33,7 @@ internalExecute()
 {
 #ifdef _DEBUG2
 	std::cout<<"CommandChangeMeshDim::internalExecute => "
-	        <<Utils::Unit::toString(m_new_mesh_dim)
+	        <<m_new_mesh_dim
 	        <<std::endl;
 #endif
 	getContext().m_mesh_dim = m_new_mesh_dim;

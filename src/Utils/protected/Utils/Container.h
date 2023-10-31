@@ -112,7 +112,7 @@ public:
     {
 #ifdef _DEBUG2
         if (ind>=m_entities.size())
-            throw TkUtil::Exception(UTF8String ("Erreur interne (indice trop élevé), avec Container::get", TkUtil::Charset::UTF_8));
+            throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne (indice trop élevé), avec Container::get", TkUtil::Charset::UTF_8));
 #endif
 
         return m_entities[ind];
@@ -124,7 +124,7 @@ public:
     {
 #ifdef _DEBUG2
         if (ind>=m_entities.size())
-            throw TkUtil::Exception(UTF8String ("Erreur interne (indice trop élevé), avec Container::set", TkUtil::Charset::UTF_8));
+            throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne (indice trop élevé), avec Container::set", TkUtil::Charset::UTF_8));
 #endif
 
         m_entities[ind] = entity;

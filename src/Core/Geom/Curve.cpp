@@ -716,8 +716,8 @@ void Curve::getParametricsPointsLoops(const double& alpha0,
     std::cout<<"Curve::getParametricsPointsLoops pour "<<nbPt<<" points avec la courbe "
             << getName()<<", qui possède "<<m_vertices.size()<<" sommets."<<std::endl;
     if (m_vertices.size() == 2){
-        std::cout<<" m_vertices[0] : "<<setprecision(14)<<m_vertices[0]->gedouble()<<std::endl;
-        std::cout<<" m_vertices[1] : "<<setprecision(14)<<m_vertices[1]->gedouble()<<std::endl;
+        std::cout<<" m_vertices[0] : "<<setprecision(14)<<m_vertices[0]->getCoord()<<std::endl;
+        std::cout<<" m_vertices[1] : "<<setprecision(14)<<m_vertices[1]->getCoord()<<std::endl;
     }
 #endif
 //
