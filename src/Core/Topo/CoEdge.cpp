@@ -2373,16 +2373,26 @@ check() const
     	const EdgeMeshingPropertyInterpolate* empi = dynamic_cast<const EdgeMeshingPropertyInterpolate*>(getMeshingProperty());
     	CHECK_NULL_PTR_ERROR(empi);
 
-    	if (empi->getType() == EdgeMeshingPropertyInterpolate::with_coedge_list){
-    		std::vector<std::string> coedges = empi->getCoEdges();
-    		for (uint i=0; i<coedges.size(); i++)
-    			getContext().getLocalTopoManager().getCoEdge(coedges[i], true);
-    	}
-    	else if (empi->getType() == EdgeMeshingPropertyInterpolate::with_coface){
-    		std::string coface = empi->getCoFace();
-    		getContext().getLocalTopoManager().getCoFace(coface, true);
-    	}
+		if (empi->getType() == EdgeMeshingPropertyInterpolate::with_coedge_list){
+			std::vector<std::string> coedges = empi->getCoEdges();
+			for (uint i=0; i<coedges.size(); i++)
+				getContext().getLocalTopoManager().getCoEdge(coedges[i], true);
+		}
+		else if (empi->getType() == EdgeMeshingPropertyInterpolate::with_coface){
+			try {
+				std::string coface = empi->getCoFace();
+				getContext().getLocalTopoManager().getCoFace(coface, true);
+			}
+			catch (Utils::IsDestroyedException e)
+			{
+			TkUtil::UTF8String messErr (TkUtil::Charset::UTF_8);
+				messErr << "Erreur avec l'arête commune "<<getName()
+					<<" dont la discrétisation est interpolée sur une face de référence détruite ("<<e.getMessage()<<")";
+				throw TkUtil::Exception(messErr);
+			}
+		}
     }
+
     if (getMeshLaw() == CoEdgeMeshingProperty::globalinterpolate){
 
     	const EdgeMeshingPropertyGlobalInterpolate* empi = dynamic_cast<const EdgeMeshingPropertyGlobalInterpolate*>(getMeshingProperty());
