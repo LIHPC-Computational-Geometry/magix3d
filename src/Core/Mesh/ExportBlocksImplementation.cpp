@@ -92,13 +92,27 @@ namespace Mgx3D {
                 }
             }
 
+            /* Ici ce sont les informations dont on aura besoin dans le fichier cgns final ça peut aussi bien
+             * etre les conditions au bord ou meme les noms des familles des interfaces entre les blocs etc
+             *
+             * Pour se faire on ecrit juste des variables de maillages sur les noeuds en donnant le nom qui sera
+             * utilisé dans le fichier cgns
+             */
             gmds::Variable<int>* farfield = mesh.newVariable<int>(gmds::GMDS_NODE,"Farfield");
             gmds::Variable<int>* paroi = mesh.newVariable<int>(gmds::GMDS_NODE,"Paroi");
+            gmds::Variable<int>* out = mesh.newVariable<int>(gmds::GMDS_NODE,"Sortie");
+            gmds::Variable<int>* sym = mesh.newVariable<int>(gmds::GMDS_NODE,"Symetrie");
 
+            /*
+             * Pour récupérer les variables à écrire on utilise les groupes des entités topologiques et on va mettre
+             * à 1 la valeur de la variable correspondante pour tous les noeuds générés par cette entité topo
+             */
 
-            gmds::Variable<int>* Axi = mesh.newVariable<int>(gmds::GMDS_NODE,"Axisymetrie");
-
-
+            /*
+             * Dans le cas des 4 variables ci-dessus on sait que ça va devenir des noms d'interface dans le fichier
+             * cgns donc ça correspond ici a un groupe sur les surfaces topo. Pour chaque surface topo on teste si
+             * elle appartient au groupe en question, si oui on prend tous ses noeuds et on met la variable à 1
+             */
             for(auto f : topo_faces){
                 std::vector<string> groupsName;
                 f->getGroupsName(groupsName);
@@ -111,14 +125,29 @@ namespace Mgx3D {
                     for(auto n : f_nodes){
                         paroi->set(n, 1);
                     }
-                }else if(std::find(groupsName.begin(),groupsName.end(), "Axisymetrie") != groupsName.end()){
+                }else if(std::find(groupsName.begin(),groupsName.end(), "Sortie") != groupsName.end()){
                     for(auto n : f_nodes){
-                        Axi->set(n, 1);
+                        out->set(n, 1);
+                    }
+                }else if(std::find(groupsName.begin(),groupsName.end(), "Symetrie") != groupsName.end()){
+                    for(auto n : f_nodes){
+                        sym->set(n, 1);
                     }
                 }
             }
 
-
+            //gmds::Variable<int>* fluide = mesh.newVariable<int>(gmds::GMDS_NODE,"Fluide"); //Valeur par défaut
+            gmds::Variable<int>* solide = mesh.newVariable<int>(gmds::GMDS_NODE,"Solide");
+            for(auto b : topo_blocs) {
+                std::vector<string> groupsName;
+                b->getGroupsName(groupsName);
+                std::vector<gmds::TCellID> b_nodes = b->nodes();
+                if (std::find(groupsName.begin(), groupsName.end(), "Solide") != groupsName.end()) {
+                    for (auto n: b_nodes) {
+                        solide->set(n, 1);
+                    }
+                }
+            }
 
 
             gmds::VTKWriter<gmds::IGMesh> writer(mesh);
