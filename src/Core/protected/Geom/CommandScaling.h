@@ -69,12 +69,14 @@ public:
      *  \param factorX le facteur de scaling suivant X
      *  \param factorY le facteur de scaling suivant Y
      *  \param factorZ le facteur de scaling suivant Z
+     *  \param pcentre centre de l'homotéthie
      */
     CommandScaling(Internal::Context& c,
             std::vector<GeomEntity*>& e,
             const double factorX,
             const double factorY,
-            const double factorZ);
+            const double factorZ,
+            const Point& pcentre);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur
@@ -84,12 +86,14 @@ public:
      *  \param factorX le facteur de scaling suivant X
      *  \param factorY le facteur de scaling suivant Y
      *  \param factorZ le facteur de scaling suivant Z
+     *  \param pcentre centre de l'homotéthie
      */
     CommandScaling(Internal::Context& c,
     		Geom::CommandGeomCopy* cmd,
             const double factorX,
             const double factorY,
-            const double factorZ);
+            const double factorZ,
+            const Point& pcentre);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur
@@ -98,11 +102,13 @@ public:
      *  \param factorX le facteur de scaling suivant X
      *  \param factorY le facteur de scaling suivant Y
      *  \param factorZ le facteur de scaling suivant Z
+     *  \param pcentre centre de l'homotéthie
      */
     CommandScaling(Internal::Context& c,
             const double factorX,
             const double factorY,
-            const double factorZ);
+            const double factorZ,
+            const Point& pcentre);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur

@@ -198,7 +198,8 @@ public:
     virtual void scale(const double F, const Utils::Math::Point& center) =0;
     virtual void scale(const double factorX,
             const double factorY,
-            const double factorZ) =0;
+            const double factorZ,
+            const Utils::Math::Point& center) =0;
 
     /*------------------------------------------------------------------------*/
     /** \brief Effectue la rotation de l'entité géométrique associée de

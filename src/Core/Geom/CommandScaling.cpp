@@ -85,7 +85,8 @@ CommandScaling::CommandScaling(Internal::Context& c,
 		std::vector<GeomEntity*>& entities,
         const double factorX,
         const double factorY,
-        const double factorZ)
+        const double factorZ,
+        const Point& pcentre)
 : CommandEditGeom(c, "Homothétie")
 , m_factor(0)
 , m_isHomogene(false)
@@ -94,7 +95,7 @@ CommandScaling::CommandScaling(Internal::Context& c,
 , m_factorZ(factorZ)
 {
 	validate();
-	m_impl = new GeomScaleImplementation(c, entities, m_factorX, m_factorY, m_factorZ);
+	m_impl = new GeomScaleImplementation(c, entities, m_factorX, m_factorY, m_factorZ, pcentre);
 
     TkUtil::UTF8String comments (TkUtil::Charset::UTF_8);
 	comments << "Homothétie de";
@@ -114,7 +115,8 @@ CommandScaling::CommandScaling(Internal::Context& c,
 		Geom::CommandGeomCopy* cmd,
         const double factorX,
         const double factorY,
-        const double factorZ)
+        const double factorZ,
+        const Point& pcentre)
 : CommandEditGeom(c, "Homothétie")
 , m_factor(0)
 , m_isHomogene(false)
@@ -123,13 +125,14 @@ CommandScaling::CommandScaling(Internal::Context& c,
 , m_factorZ(factorZ)
 {
 	validate();
-	m_impl = new GeomScaleImplementation(c, cmd, m_factorX, m_factorY, m_factorZ);
+	m_impl = new GeomScaleImplementation(c, cmd, m_factorX, m_factorY, m_factorZ, pcentre);
 }
 /*----------------------------------------------------------------------------*/
 CommandScaling::CommandScaling(Internal::Context& c,
         const double factorX,
         const double factorY,
-        const double factorZ)
+        const double factorZ,
+        const Point& pcentre)
 : CommandEditGeom(c, "Homothétie de tout")
 , m_factor(0)
 , m_isHomogene(false)
@@ -138,7 +141,7 @@ CommandScaling::CommandScaling(Internal::Context& c,
 , m_factorZ(factorZ)
 {
 	validate();
-	m_impl = new GeomScaleImplementation(c, m_factorX, m_factorY, m_factorZ);
+	m_impl = new GeomScaleImplementation(c, m_factorX, m_factorY, m_factorZ, pcentre);
 
     TkUtil::UTF8String comments (TkUtil::Charset::UTF_8);
 	comments << "Homothétie de tout de facteur "

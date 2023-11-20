@@ -297,7 +297,8 @@ public:
     void scale(const double F, const Point& center);
     void scale(const double factorX,
                 const double factorY,
-                const double factorZ);
+                const double factorZ,
+                const Utils::Math::Point& center);
     /*------------------------------------------------------------------------*/
     /** \brief Effectue la rotation de l'entité géométrique associée de
      *         manière isolée. C'est-à-dire que aucune des entités incidentes

@@ -44,11 +44,13 @@ public:
      *  \param factorX le facteur de scaling suivant X
      *  \param factorY le facteur de scaling suivant Y
      *  \param factorZ le facteur de scaling suivant Z
+     *  \param pcentre centre de l'homotéthie
      */
     CommandScaleMesh(Internal::Context& c,
-    		const double factorX,
-    		const double factorY,
-    		const double factorZ);
+		const double factorX,
+		const double factorY,
+		const double factorZ,
+		const Utils::Math::Point& pcentre);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur

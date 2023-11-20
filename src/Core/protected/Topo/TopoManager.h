@@ -1041,11 +1041,21 @@ public:
         	const double factorY,
         	const double factorZ,
             const bool withGeom);
+
+    virtual Mgx3D::Internal::M3DCommandResultIfc*
+        scale(std::vector<std::string>& ve,
+            const double factorX,
+            const double factorY,
+            const double factorZ,
+            const Point& pcentre,
+            const bool withGeom);
+
     virtual Mgx3D::Internal::M3DCommandResultIfc*
         scale(std::vector<TopoEntity*>& ve,
         	const double factorX,
 			const double factorY,
 			const double factorZ,
+            const Point& pcentre,
             const bool withGeom);
 
 
