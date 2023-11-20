@@ -188,12 +188,23 @@ class QtMgx3DHeterogeneousHomothetyPanel : public QtMgx3DOperationsSubPanel
 	virtual double getHomothetyZFactor ( ) const;
 
 	/**
+	 * \see			Le centre de l'homothétie
+	 * \see			getHomothetyFactor
+	 */
+	virtual Mgx3D::Utils::Math::Point getCenter ( ) const;
+
+	/**
 	 * \return		Les widgets de saisie des rapports d'homothétie selon les
 	 * 				différents axes.
 	 */
 	virtual QtDoubleTextField& getXFactorTextField ( );
 	virtual QtDoubleTextField& getYFactorTextField ( );
 	virtual QtDoubleTextField& getZFactorTextField ( );
+
+	/**
+	 * \return		Le widget de saisie du centre de l'homothétie.
+	 */
+	virtual QtMgx3DPointPanel& getCenterPanel ( );
 
 
 	protected :
@@ -227,6 +238,9 @@ class QtMgx3DHeterogeneousHomothetyPanel : public QtMgx3DOperationsSubPanel
 	QtDoubleTextField								*_homothetyXFactorTextField,
 													*_homothetyYFactorTextField,
 													*_homothetyZFactorTextField;
+
+	/** Le centre de l'homothétie. */
+	QtMgx3DPointPanel*								_centerPanel;
 };	// class QtMgx3DHeterogeneousHomothetyPanel
 
 }	// namespace QtComponents

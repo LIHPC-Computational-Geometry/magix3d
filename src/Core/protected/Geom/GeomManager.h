@@ -787,6 +787,7 @@ public:
      *  \param factorX   le facteur d'homothétie suivant l'axe des x
      *  \param factorY   le facteur d'homothétie suivant l'axe des y
      *  \param factorZ   le facteur d'homothétie suivant l'axe des z
+     *  \param center   le centre (optionnel)
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc*
         scale(std::vector<std::string>& geo,
@@ -795,24 +796,33 @@ public:
 				const double factorZ);
 
     virtual Mgx3D::Internal::M3DCommandResultIfc*
+        scale(std::vector<std::string>& geo,
+				const double factorX,
+				const double factorY,
+				const double factorZ,
+				const Point& pcentre);
+
+    virtual Mgx3D::Internal::M3DCommandResultIfc*
         scale(std::vector<Geom::GeomEntity*>& geo,
         		const double factorX,
 				const double factorY,
-				const double factorZ);
+				const double factorZ,
+                const Point& pcentre);
 
     virtual Mgx3D::Internal::M3DCommandResultIfc*
 		scaleAll(const double factorX,
 			const double factorY,
-			const double factorZ);
+			const double factorZ,
+			const Point& pcentre = Point(0,0,0));
 
     /*------------------------------------------------------------------------*/
     /** \brief homothétie d'une copie d'objets géométriques
      *
-     *  \param geo      les objets d'origine
-     *  \param factor   le facteur d'homothétie
-     *  \param center   le centre (optionnel)
-     *  \param withTopo a vrai si l'on doit copier la topologie avec la géométrie
-     *  \param groupName groupe dans lequel sont mise les nouvelles entités
+     *  \param geo       les objets d'origine
+     *  \param factor    le facteur d'homothétie
+     *  \param center    le centre (optionnel)
+     *  \param withTopo  a vrai si l'on doit copier la topologie avec la géométrie
+     *  \param groupName groupe dans lequel sont mises les nouvelles entités
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc*
 	copyAndScale(std::vector<std::string>& geo, const double factor, bool withTopo, std::string groupName);
@@ -832,8 +842,9 @@ public:
      *  \param factorX   le facteur d'homothétie suivant l'axe des x
      *  \param factorY   le facteur d'homothétie suivant l'axe des y
      *  \param factorZ   le facteur d'homothétie suivant l'axe des z
-     *  \param withTopo a vrai si l'on doit copier la topologie avec la géométrie
-     *  \param groupName groupe dans lequel sont mise les nouvelles entités
+     *  \param center    le centre (optionnel)
+     *  \param withTopo  a vrai si l'on doit copier la topologie avec la géométrie
+     *  \param groupName groupe dans lequel sont mises les nouvelles entités
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc*
 	copyAndScale(std::vector<std::string>& geo,
@@ -844,10 +855,20 @@ public:
 				std::string groupName);
 
     virtual Mgx3D::Internal::M3DCommandResultIfc*
-	copyAndScale(std::vector<Geom::GeomEntity*>& geo,
+	copyAndScale(std::vector<std::string>& geo,
         		const double factorX,
 				const double factorY,
 				const double factorZ,
+				const Point& pcentre,
+				bool withTopo,
+				std::string groupName);
+
+    virtual Mgx3D::Internal::M3DCommandResultIfc*
+	copyAndScale(std::vector<Geom::GeomEntity*>& geo,
+				const double factorX,
+				const double factorY,
+				const double factorZ,
+				const Point& pcentre,
 				bool withTopo,
 				std::string groupName);
 
@@ -855,6 +876,7 @@ public:
 	copyAndScaleAll(const double factorX,
 			const double factorY,
 			const double factorZ,
+			const Point& pcentre,
 			std::string groupName);
 
     /*------------------------------------------------------------------------*/

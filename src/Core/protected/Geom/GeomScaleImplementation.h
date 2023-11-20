@@ -74,10 +74,11 @@ public:
      *  \param factorZ le facteur de scaling suivant Z
     */
     GeomScaleImplementation(Internal::Context& c,
-    		std::vector<GeomEntity*>& e,
-    		const double factorX,
-    		const double factorY,
-    		const double factorZ);
+		std::vector<GeomEntity*>& e,
+		const double factorX,
+		const double factorY,
+		const double factorZ,
+		const Point& pcentre);
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur.
      *
@@ -87,10 +88,11 @@ public:
      *  \param factorZ le facteur de scaling suivant Z
     */
     GeomScaleImplementation(Internal::Context& c,
-    		Geom::CommandGeomCopy* cmd,
-    		const double factorX,
-    		const double factorY,
-    		const double factorZ);
+		Geom::CommandGeomCopy* cmd,
+		const double factorX,
+		const double factorY,
+		const double factorZ,
+		const Point& pcentre);
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur.
      *
@@ -99,9 +101,10 @@ public:
      *  \param factorZ le facteur de scaling suivant Z
      */
     GeomScaleImplementation(Internal::Context& c,
-    		const double factorX,
-    		const double factorY,
-    		const double factorZ);
+		const double factorX,
+		const double factorY,
+		const double factorZ,
+		const Point& pcentre);
 
     /*------------------------------------------------------------------------*/
     /** \brief   Destructeur

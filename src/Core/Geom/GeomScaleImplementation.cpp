@@ -80,14 +80,15 @@ GeomScaleImplementation(Internal::Context& c,
         std::vector<GeomEntity*>& es,
         const double factorX,
         const double factorY,
-        const double factorZ)
+        const double factorZ,
+        const Point& pcentre)
 : GeomModificationBaseClass(c)
 , m_factor(0)
 , m_isHomogene(false)
 , m_factorX(factorX)
 , m_factorY(factorY)
 , m_factorZ(factorZ)
-, m_center()
+, m_center(pcentre)
 {
     m_modifiedEntities.insert(m_modifiedEntities.end(),es.begin(),es.end());
 
@@ -100,14 +101,15 @@ GeomScaleImplementation(Internal::Context& c,
 		Geom::CommandGeomCopy* cmd,
         const double factorX,
         const double factorY,
-        const double factorZ)
+        const double factorZ,
+        const Point& pcentre)
 : GeomModificationBaseClass(c)
 , m_factor(0)
 , m_isHomogene(false)
 , m_factorX(factorX)
 , m_factorY(factorY)
 , m_factorZ(factorZ)
-, m_center()
+, m_center(pcentre)
 {
     init(cmd);
 }
@@ -116,14 +118,15 @@ GeomScaleImplementation::
 GeomScaleImplementation(Internal::Context& c,
         const double factorX,
         const double factorY,
-        const double factorZ)
+        const double factorZ,
+        const Point& pcentre)
 : GeomModificationBaseClass(c)
 , m_factor(0)
 , m_isHomogene(false)
 , m_factorX(factorX)
 , m_factorY(factorY)
 , m_factorZ(factorZ)
-, m_center()
+, m_center(pcentre)
 {
 	initWithAll();
     m_modifiedEntities.insert(m_modifiedEntities.end(),m_init_entities.begin(),m_init_entities.end());
@@ -196,7 +199,7 @@ void GeomScaleImplementation::scaleSingle(GeomEntity* e)
         if (m_isHomogene)
             new_rep->scale(m_factor, m_center);
         else
-            new_rep->scale(m_factorX, m_factorY, m_factorZ);
+            new_rep->scale(m_factorX, m_factorY, m_factorZ, m_center);
         new_reps.push_back(new_rep);
     }
 
@@ -212,7 +215,7 @@ performUndo()
         if (m_isHomogene)
             rep->scale(1.0/m_factor, m_center);
         else
-            rep->scale(1.0/m_factorX, 1.0/m_factorY, 1.0/m_factorZ);
+            rep->scale(1.0/m_factorX, 1.0/m_factorY, 1.0/m_factorZ, m_center);
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -224,7 +227,7 @@ performRedo()
         if (m_isHomogene)
             rep->scale(m_factor, m_center);
         else
-            rep->scale(m_factorX, m_factorY, m_factorZ);
+            rep->scale(m_factorX, m_factorY, m_factor, m_center);
     }
 }
 /*----------------------------------------------------------------------------*/

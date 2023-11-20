@@ -419,15 +419,20 @@ void FacetedCurve::scale(const double F, const Utils::Math::Point& center)
 /*----------------------------------------------------------------------------*/
 void FacetedCurve::scale(const double factorX,
             const double factorY,
-            const double factorZ)
+            const double factorZ,
+			const Utils::Math::Point& center)
 {
     // création de l'opérateur d'homothétie via OCC
     gp_GTrsf transf;
     transf.SetValue(1,1, factorX);
     transf.SetValue(2,2, factorY);
     transf.SetValue(3,3, factorZ);
+    transf.SetValue(1,4, (1-factorX) * center.getX());
+    transf.SetValue(2,4, (1-factorY) * center.getY());
+    transf.SetValue(3,4, (1-factorZ) * center.getZ());
 
 	FacetedHelper::transform(m_nodes, &transf);
+
     updateLength();
 }
 /*----------------------------------------------------------------------------*/

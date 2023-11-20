@@ -205,10 +205,20 @@ Internal::M3DCommandResultIfc* GeomManagerIfc::scale(std::vector<std::string>& g
     throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::scale should be overloaded.", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
+Internal::M3DCommandResultIfc* GeomManagerIfc::scale(std::vector<std::string>& geo,
+		const double factorX,
+		const double factorY,
+		const double factorZ,
+		const Point& pcentre)
+{
+    throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::scale should be overloaded.", TkUtil::Charset::UTF_8));
+}
+/*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc* GeomManagerIfc::scaleAll(
 		const double factorX,
 		const double factorY,
-		const double factorZ)
+		const double factorZ,
+		const Point& pcentre)
 {
     throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::scaleAll should be overloaded.", TkUtil::Charset::UTF_8));
 }
@@ -238,10 +248,21 @@ Internal::M3DCommandResultIfc* GeomManagerIfc::copyAndScale(std::vector<std::str
     throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::copyAndScale should be overloaded.", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
+Internal::M3DCommandResultIfc* GeomManagerIfc::copyAndScale(std::vector<std::string>& geo,
+		const double factorX,
+		const double factorY,
+		const double factorZ,
+		const Point& pcentre,
+		bool withTopo,
+		std::string groupName)
+{
+    throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::copyAndScale should be overloaded.", TkUtil::Charset::UTF_8));
+}/*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc* GeomManagerIfc::copyAndScaleAll(
 		const double factorX,
 		const double factorY,
 		const double factorZ,
+		const Point& pcentre,
 		std::string groupName)
 {
     throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::copyAndScaleAll should be overloaded.", TkUtil::Charset::UTF_8));

@@ -354,9 +354,16 @@ public:
 			const double factorY,
 			const double factorZ);
     virtual Mgx3D::Internal::M3DCommandResultIfc*
+        scale(std::vector<std::string>& geo,
+			const double factorX,
+			const double factorY,
+			const double factorZ,
+			const Point& pcentre);
+    virtual Mgx3D::Internal::M3DCommandResultIfc*
 		scaleAll(const double factorX,
 			const double factorY,
-			const double factorZ);
+			const double factorZ,
+			const Point& pcentre = Point(0,0,0));
 	SET_SWIG_COMPLETABLE_METHOD(scaleAll)
 
     /*------------------------------------------------------------------------*/
@@ -392,9 +399,18 @@ public:
 			bool withTopo,
 			std::string groupName);
     virtual Mgx3D::Internal::M3DCommandResultIfc*
+	copyAndScale(std::vector<std::string>& geo,
+			const double factorX,
+			const double factorY,
+			const double factorZ,
+			const Point& pcentre,
+			bool withTopo,
+			std::string groupName);
+    virtual Mgx3D::Internal::M3DCommandResultIfc*
 	copyAndScaleAll(const double factorX,
 			const double factorY,
 			const double factorZ,
+			const Point& pcentre,
 			std::string groupName);
 
     /*------------------------------------------------------------------------*/

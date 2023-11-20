@@ -4402,13 +4402,27 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<std::string
     std::vector<TopoEntity*> entities;
     TopoManager::getTopoEntities(ve, entities, "scale");
 
-    return scale(entities, factorX, factorY, factorZ, withGeom);
+    return scale(entities, factorX, factorY, factorZ, Utils::Math::Point(0,0,0), withGeom);
+}
+/*----------------------------------------------------------------------------*/
+Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<std::string>& ve,
+		const double factorX,
+		const double factorY,
+		const double factorZ,
+        const Point& pcentre,
+        const bool withGeom)
+{
+    std::vector<TopoEntity*> entities;
+    TopoManager::getTopoEntities(ve, entities, "scale");
+
+    return scale(entities, factorX, factorY, factorZ, pcentre, withGeom);
 }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<TopoEntity*>& ve,
 		const double factorX,
 		const double factorY,
 		const double factorZ,
+        const Point& pcentre,
         const bool withGeom)
 {
     if (ve.empty()){
@@ -4423,6 +4437,8 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<TopoEntity*
         message << ve[i]->getName();
     }
     message << "], "<< factorX<<", "<<factorY<<", "<<factorZ;
+    if (!(pcentre == Point(0,0,0)))
+        message <<", "<<pcentre.getScriptCommand();
     message <<(withGeom?", avec":", sans")<<" homothétie de la géométrie)";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
@@ -4436,8 +4452,8 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<TopoEntity*
         // constitution des entités géométriques à modifier
         std::vector<Geom::GeomEntity*> geomEntities = Topo::TopoHelper::getGeomEntities(ve);
 
-        Geom::CommandScaling* commandGeom = new Geom::CommandScaling(getLocalContext(), geomEntities, factorX, factorY, factorZ);
-        Topo::CommandScaleTopo* commandTopo = new Topo::CommandScaleTopo(getLocalContext(), ve, factorX, factorY, factorZ);
+        Geom::CommandScaling* commandGeom = new Geom::CommandScaling(getLocalContext(), geomEntities, factorX, factorY, factorZ, pcentre);
+        Topo::CommandScaleTopo* commandTopo = new Topo::CommandScaleTopo(getLocalContext(), ve, factorX, factorY, factorZ, pcentre);
 
         commandCompo->addCommand(commandGeom);
         commandCompo->addCommand(commandTopo);
@@ -4445,7 +4461,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<TopoEntity*
         command = commandCompo;
     }
     else {
-        command = new Topo::CommandScaleTopo(getLocalContext(), ve, factorX, factorY, factorZ);
+        command = new Topo::CommandScaleTopo(getLocalContext(), ve, factorX, factorY, factorZ, pcentre);
     }
 
     // trace dans le script
@@ -4459,6 +4475,8 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<TopoEntity*
     cmd << "\"], " << Utils::Math::MgxNumeric::userRepresentation (factorX)
         <<", "<<Utils::Math::MgxNumeric::userRepresentation (factorY)
         <<", "<<Utils::Math::MgxNumeric::userRepresentation (factorZ);
+    if (!(pcentre == Point(0,0,0)))
+        cmd <<", "<<pcentre.getScriptCommand();
     cmd<<", "<<(withGeom?"True":"False") <<")";
     command->setScriptCommand(cmd);
 

@@ -187,7 +187,8 @@ public:
     void scale(const double F, const Utils::Math::Point& center);
     void scale(const double factorX,
                 const double factorY,
-                const double factorZ);
+                const double factorZ,
+                const Utils::Math::Point& center);
 
     /*------------------------------------------------------------------------*/
     /** \brief Effectue la rotation de l'entité géométrique associée de

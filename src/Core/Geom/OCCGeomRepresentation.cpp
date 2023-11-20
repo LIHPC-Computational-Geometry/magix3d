@@ -2584,7 +2584,8 @@ void OCCGeomRepresentation::scale(const double F, const Point& center)
 /*----------------------------------------------------------------------------*/
 void OCCGeomRepresentation::scale(const double factorX,
         const double factorY,
-        const double factorZ)
+        const double factorZ,
+        const Point& center)
 {
     Bnd_Box box;
     box.SetGap(Utils::Math::MgxNumeric::mgxDoubleEpsilon);
@@ -2593,13 +2594,17 @@ void OCCGeomRepresentation::scale(const double factorX,
     double xmin,ymin,zmin,xmax,ymax,zmax;
     box.Get(xmin,ymin,zmin,xmax,ymax,zmax);
 
-    gp_GTrsf T;
-    T.SetValue(1,1, factorX);
-    T.SetValue(2,2, factorY);
-    T.SetValue(3,3, factorZ);
-    BRepBuilderAPI_GTransform scaling(T);
+    gp_GTrsf GT;
+    GT.SetValue(1,1, factorX);
+    GT.SetValue(2,2, factorY);
+    GT.SetValue(3,3, factorZ);
+	GT.SetValue(1,4, (1-factorX) * center.getX());
+	GT.SetValue(2,4, (1-factorY) * center.getY());
+    GT.SetValue(3,4, (1-factorZ) * center.getZ());
 
-    //on effectue l'homotéthie
+    BRepBuilderAPI_GTransform scaling(GT);
+
+    //on effectue l'homothétie
     scaling.Perform(m_shape);
 
     if(!scaling.IsDone())

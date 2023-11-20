@@ -201,7 +201,7 @@ QtMgx3DHeterogeneousHomothetyPanel::QtMgx3DHeterogeneousHomothetyPanel (
 	QWidget* parent, const string& appTitle, QtMgx3DMainWindow& mainWindow)
 	: QtMgx3DOperationsSubPanel (parent, mainWindow), _mainWindow (&mainWindow),
 	  _homothetyXFactorTextField (0), _homothetyYFactorTextField (0),
-	  _homothetyZFactorTextField (0)
+	  _homothetyZFactorTextField (0), _centerPanel (0)
 {
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 
@@ -228,6 +228,15 @@ QtMgx3DHeterogeneousHomothetyPanel::QtMgx3DHeterogeneousHomothetyPanel (
 	hlayout->addWidget (label);
 	_homothetyZFactorTextField	= new QtDoubleTextField (1., this);
 	hlayout->addWidget (_homothetyZFactorTextField);
+
+	// Le centre de l'homothétie :
+	_centerPanel	= new QtMgx3DPointPanel (
+			this, "Centre :", true, "x :", "y :", "z :",
+			0., -DBL_MAX, DBL_MAX, 0., -DBL_MAX, DBL_MAX, 0., -DBL_MAX, DBL_MAX,
+			&mainWindow, (FilterEntity::objectType)(
+					FilterEntity::GeomVertex |  FilterEntity::TopoVertex),
+			true);
+	layout->addWidget (_centerPanel);
 }	// QtMgx3DHeterogeneousHomothetyPanel::QtMgx3DHeterogeneousHomothetyPanel
 
 
@@ -235,7 +244,7 @@ QtMgx3DHeterogeneousHomothetyPanel::QtMgx3DHeterogeneousHomothetyPanel (
 									const QtMgx3DHeterogeneousHomothetyPanel& p)
 	: QtMgx3DOperationsSubPanel (p), _mainWindow (0),
 	  _homothetyXFactorTextField (0), _homothetyYFactorTextField (0),
-	  _homothetyZFactorTextField (0)
+	  _homothetyZFactorTextField (0), _centerPanel (0)
 {
 	MGX_FORBIDDEN ("QtMgx3DHeterogeneousHomothetyPanel copy constructor is not allowed.");
 }	// QtMgx3DHeterogeneousHomothetyPanel::QtMgx3DHeterogeneousHomothetyPanel
@@ -258,12 +267,14 @@ void QtMgx3DHeterogeneousHomothetyPanel::reset ( )
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
 
-	CHECK_NULL_PTR_ERROR (_homothetyXFactorTextField)	
-	CHECK_NULL_PTR_ERROR (_homothetyYFactorTextField)	
-	CHECK_NULL_PTR_ERROR (_homothetyZFactorTextField)	
+	CHECK_NULL_PTR_ERROR (_homothetyXFactorTextField)
+	CHECK_NULL_PTR_ERROR (_homothetyYFactorTextField)
+	CHECK_NULL_PTR_ERROR (_homothetyZFactorTextField)
+	CHECK_NULL_PTR_ERROR (_centerPanel)
 	_homothetyXFactorTextField->setValue (1.);
 	_homothetyYFactorTextField->setValue (1.);
 	_homothetyZFactorTextField->setValue (1.);
+	_centerPanel->reset ( );
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
 
@@ -272,19 +283,36 @@ void QtMgx3DHeterogeneousHomothetyPanel::reset ( )
 
 
 void QtMgx3DHeterogeneousHomothetyPanel::cancel ( )
-{	// A ACTUALISER SI CENTRE D'HOMOTHETIE
+{
+	CHECK_NULL_PTR_ERROR (_centerPanel)
+	_centerPanel->stopSelection ( );
+
+	if (true == cancelClearEntities ( ))
+	{
+		BEGIN_QT_TRY_CATCH_BLOCK
+
+		_centerPanel->setUniqueName ("");
+
+		COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
+	}	// if (true == cancelClearEntities ( ))
+
 	QtMgx3DOperationsSubPanel::cancel ( );
 }	// QtMgx3DHeterogeneousHomothetyPanel::cancel
 
 
 void QtMgx3DHeterogeneousHomothetyPanel::autoUpdate ( )
-{	// A ACTUALISER SI CENTRE D'HOMOTHETIE
+{
+	CHECK_NULL_PTR_ERROR (_centerPanel)
 	QtMgx3DOperationsSubPanel::autoUpdate ( );
+	_centerPanel->clearSelection ( );
+	_centerPanel->actualizeGui (true);
 }	// QtMgx3DHeterogeneousHomothetyPanel::autoUpdate
 
 
 void QtMgx3DHeterogeneousHomothetyPanel::stopSelection ( )
-{	// A ACTUALISER SI CENTRE D'HOMOTHETIE
+{
+	CHECK_NULL_PTR_ERROR (_centerPanel)
+	_centerPanel->stopSelection ( );
 }	// QtMgx3DHeterogeneousHomothetyPanel::stopSelection
 
 
@@ -308,6 +336,12 @@ double QtMgx3DHeterogeneousHomothetyPanel::getHomothetyZFactor ( ) const
 	return _homothetyZFactorTextField->getValue ( );
 }	// QtMgx3DHeterogeneousHomothetyPanel::getHomothetyZFactor
 
+Math::Point QtMgx3DHeterogeneousHomothetyPanel::getCenter ( ) const
+{
+	CHECK_NULL_PTR_ERROR (_centerPanel)
+	return _centerPanel->getPoint ( );
+}	// QtMgx3DHeterogeneousHomothetyPanel::getCenter
+
 
 QtDoubleTextField& QtMgx3DHeterogeneousHomothetyPanel::getXFactorTextField ( )
 {
@@ -330,9 +364,29 @@ QtDoubleTextField& QtMgx3DHeterogeneousHomothetyPanel::getZFactorTextField ( )
 }	// QtMgx3DHeterogeneousHomothetyPanel::getZFactorTextField
 
 
+QtMgx3DPointPanel& QtMgx3DHeterogeneousHomothetyPanel::getCenterPanel ( )
+{
+	CHECK_NULL_PTR_ERROR (_centerPanel)
+	return *_centerPanel;
+}	// QtMgx3DHeterogeneousHomothetyPanel::getCenterPanel
+
+
 vector<Entity*> QtMgx3DHeterogeneousHomothetyPanel::getInvolvedEntities ( )
-{	// A ACTUALISER SI CENTRE D'HOMOTHETIE
+{
 	vector<Entity*>	entities;
+
+	CHECK_NULL_PTR_ERROR (_centerPanel)
+	const string	centerName	= _centerPanel->getUniqueName ( );
+	if (0 != centerName.length ( ))
+	{
+		try
+		{
+			entities.push_back (&getContext().nameToEntity (centerName));
+		}
+		catch (...)
+		{
+		}
+	}	// if (0 != centerName.length ( ))
 
 	return entities;
 }	// QtMgx3DHeterogeneousHomothetyPanel::getInvolvedEntities

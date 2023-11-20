@@ -73,12 +73,14 @@ public:
      *  \param factorX le facteur de scaling suivant X
      *  \param factorY le facteur de scaling suivant Y
      *  \param factorZ le facteur de scaling suivant Z
+     *  \param pcentre centre de l'homotéthie
      */
     CommandScaleTopo(Internal::Context& c,
     		std::vector<TopoEntity*>& ve,
             const double factorX,
             const double factorY,
-            const double factorZ);
+            const double factorZ,
+            const Utils::Math::Point& pcentre);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur
@@ -88,6 +90,7 @@ public:
      *  \param factorX le facteur de scaling suivant X
      *  \param factorY le facteur de scaling suivant Y
      *  \param factorZ le facteur de scaling suivant Z
+     *  \param pcentre centre de l'homotéthie
      *  \param all_topo vrai si on est dans un cas de copie + transformation de toute la topologie
      */
     CommandScaleTopo(Internal::Context& c,
@@ -95,6 +98,7 @@ public:
             const double factorX,
             const double factorY,
             const double factorZ,
+            const Utils::Math::Point& pcentre,
 			bool all_topo);
 
     /*------------------------------------------------------------------------*/
@@ -104,11 +108,13 @@ public:
      *  \param factorX le facteur de scaling suivant X
      *  \param factorY le facteur de scaling suivant Y
      *  \param factorZ le facteur de scaling suivant Z
-     */
+     *  \param pcentre centre de l'homotéthie
+    */
     CommandScaleTopo(Internal::Context& c,
             const double factorX,
             const double factorY,
-            const double factorZ);
+            const double factorZ,
+            const Utils::Math::Point& pcentre);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur

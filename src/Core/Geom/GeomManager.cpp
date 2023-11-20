@@ -1113,14 +1113,29 @@ scale(std::vector<std::string>& geo,
     for (uint i=0; i<geo.size(); i++)
         vge.push_back(getEntity(geo[i]));
 
-    return scale(vge, factorX, factorY, factorZ);
+    return scale(vge, factorX, factorY, factorZ, Point(0,0,0));
+}
+/*----------------------------------------------------------------------------*/
+Internal::M3DCommandResultIfc* GeomManager::
+scale(std::vector<std::string>& geo,
+		const double factorX,
+		const double factorY,
+		const double factorZ,
+		const Point& pcentre)
+{
+    std::vector<GeomEntity*> vge;
+    for (uint i=0; i<geo.size(); i++)
+        vge.push_back(getEntity(geo[i]));
+
+    return scale(vge, factorX, factorY, factorZ, pcentre);
 }
 /*----------------------------------------------------------------------------*/
 Internal::M3DCommandResultIfc* GeomManager::
 scale(std::vector<Geom::GeomEntity*>& entities,
 		const double factorX,
 		const double factorY,
-		const double factorZ)
+		const double factorZ,
+		const Point& pcentre)
 {
     if (entities.empty()){
     	throw TkUtil::Exception(TkUtil::UTF8String ("Aucune entité sélectionnée pour l'homothétie", TkUtil::Charset::UTF_8));
@@ -1130,7 +1145,10 @@ scale(std::vector<Geom::GeomEntity*>& entities,
     message <<"GeomManager::scale(";
     for (uint i=0; i<entities.size(); i++)
         message <<entities[i]->getName()<<",";
-    message <<factorX<<", "<<factorY<<", "<<factorZ<<")";
+    message <<factorX<<", "<<factorY<<", "<<factorZ;
+    if (!(pcentre == Point(0,0,0)))
+        message <<", "<<pcentre.getScriptCommand();
+    message <<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     Internal::CommandInternal* command = 0;
@@ -1141,20 +1159,20 @@ scale(std::vector<Geom::GeomEntity*>& entities,
         Internal::CommandComposite* commandCompo =
              new Internal::CommandComposite(getLocalContext(), "Homothétie d'une géométrie avec sa topologie");
 
-        commandGeom = new CommandScaling(getLocalContext(), entities, factorX, factorY, factorZ);
+        commandGeom = new CommandScaling(getLocalContext(), entities, factorX, factorY, factorZ, pcentre);
         commandCompo->addCommand(commandGeom);
 
         std::vector<Topo::TopoEntity*> topoEntities = Topo::TopoHelper::getTopoEntities(entities);
 
         Topo::CommandScaleTopo* commandTopo =
-        		new Topo::CommandScaleTopo(getLocalContext(), topoEntities, factorX, factorY, factorZ);
+             new Topo::CommandScaleTopo(getLocalContext(), topoEntities, factorX, factorY, factorZ, pcentre);
         commandCompo->addCommand(commandTopo);
 
         command = commandCompo;
     }
     else {
-    	commandGeom = new CommandScaling(getLocalContext(), entities, factorX, factorY, factorZ);
-    	command = commandGeom;
+        commandGeom = new CommandScaling(getLocalContext(), entities, factorX, factorY, factorZ, pcentre);
+        command = commandGeom;
     }
 
     // trace dans le script
@@ -1166,7 +1184,9 @@ scale(std::vector<Geom::GeomEntity*>& entities,
            cmd<< entities[i]->getName();
        }
     cmd <<"\"], "<<factorX<<", "<<factorY<<", "<<factorZ;
-    cmd<<")";
+    if (!(pcentre == Point(0,0,0)))
+        cmd <<", "<<pcentre.getScriptCommand();
+    cmd <<")";
 
     command->setScriptCommand(cmd);
 
@@ -1180,28 +1200,34 @@ scale(std::vector<Geom::GeomEntity*>& entities,
 Internal::M3DCommandResultIfc* GeomManager::
 scaleAll(const double factorX,
 		const double factorY,
-		const double factorZ)
+		const double factorZ,
+		const Point& pcentre)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-    message <<"GeomManager::scaleAll("<<factorX<<", "<<factorY<<", "<<factorZ<<")";
+    message <<"GeomManager::scaleAll("<<factorX<<", "<<factorY<<", "<<factorZ;
+    if (!(pcentre == Point(0,0,0)))
+        message <<", "<<pcentre.getScriptCommand();
+    message <<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     Internal::CommandComposite* commandCompo =
     		new Internal::CommandComposite(getLocalContext(), "Homothétie de tout");
 
-    Internal::CommandInternal *commandGeom = new CommandScaling(getLocalContext(), factorX, factorY, factorZ);
+    Internal::CommandInternal *commandGeom = new CommandScaling(getLocalContext(), factorX, factorY, factorZ, pcentre);
     commandCompo->addCommand(commandGeom);
 
-    Internal::CommandInternal* commandTopo = new Topo::CommandScaleTopo(getLocalContext(), factorX, factorY, factorZ);
+    Internal::CommandInternal* commandTopo = new Topo::CommandScaleTopo(getLocalContext(), factorX, factorY, factorZ, pcentre);
     commandCompo->addCommand(commandTopo);
 
-    Internal::CommandInternal* commandMesh = new Mesh::CommandScaleMesh(getLocalContext(), factorX, factorY, factorZ);
+    Internal::CommandInternal* commandMesh = new Mesh::CommandScaleMesh(getLocalContext(), factorX, factorY, factorZ, pcentre);
     commandCompo->addCommand(commandMesh);
-
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().scaleAll("<<factorX<<", "<<factorY<<", "<<factorZ<<")";
+    cmd << getContextAlias() << "." << "getGeomManager().scaleAll("<<factorX<<", "<<factorY<<", "<<factorZ;
+    if (!(pcentre == Point(0,0,0)))
+        cmd <<", "<<pcentre.getScriptCommand();
+    cmd <<")";
     commandCompo->setScriptCommand(cmd);
 
     getCommandManager().addCommand(commandCompo, Utils::Command::DO);
@@ -1365,7 +1391,23 @@ copyAndScale(std::vector<std::string>& geo,
     for (uint i=0; i<geo.size(); i++)
         vge.push_back(getEntity(geo[i]));
 
-    return copyAndScale(vge, factorX, factorY, factorZ, withTopo, groupName);
+    return copyAndScale(vge, factorX, factorY, factorZ, Point(0,0,0), withTopo, groupName);
+}
+/*----------------------------------------------------------------------------*/
+Internal::M3DCommandResultIfc* GeomManager::
+copyAndScale(std::vector<std::string>& geo,
+		const double factorX,
+		const double factorY,
+		const double factorZ,
+        const Point& pcentre,
+		bool withTopo,
+		std::string groupName)
+{
+    std::vector<GeomEntity*> vge;
+    for (uint i=0; i<geo.size(); i++)
+        vge.push_back(getEntity(geo[i]));
+
+    return copyAndScale(vge, factorX, factorY, factorZ, pcentre, withTopo, groupName);
 }
 /*----------------------------------------------------------------------------*/
 Internal::M3DCommandResultIfc* GeomManager::
@@ -1373,6 +1415,7 @@ copyAndScale(std::vector<Geom::GeomEntity*>& entities,
 		const double factorX,
 		const double factorY,
 		const double factorZ,
+        const Point& pcentre,
 		bool withTopo,
 		std::string groupName)
 {
@@ -1384,7 +1427,10 @@ copyAndScale(std::vector<Geom::GeomEntity*>& entities,
     message <<"GeomManager::copyAndScale(";
     for (uint i=0; i<entities.size(); i++)
         message <<entities[i]->getName()<<",";
-    message <<factorX<<", "<<factorY<<", "<<factorZ<<")";
+    message <<factorX<<", "<<factorY<<", "<<factorZ;
+    if (!(pcentre == Point(0,0,0)))
+        message <<", "<<pcentre.getScriptCommand();
+    message <<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     Internal::CommandComposite* command = 0;
@@ -1403,11 +1449,11 @@ copyAndScale(std::vector<Geom::GeomEntity*>& entities,
         command->addCommand(commandTopoCopy);
 
         CommandScaling* commandGeomScale =
-    			new CommandScaling(getLocalContext(), commandGeomCopy, factorX, factorY, factorZ);
+                new CommandScaling(getLocalContext(), commandGeomCopy, factorX, factorY, factorZ, pcentre);
     	command->addCommand(commandGeomScale);
 
     	Topo::CommandScaleTopo* commandTopoScale =
-    			new Topo::CommandScaleTopo(getLocalContext(), commandTopoCopy, factorX, factorY, factorZ, false);
+                new Topo::CommandScaleTopo(getLocalContext(), commandTopoCopy, factorX, factorY, factorZ, pcentre, false);
     	command->addCommand(commandTopoScale);
     }
     else {
@@ -1418,7 +1464,7 @@ copyAndScale(std::vector<Geom::GeomEntity*>& entities,
     			new CommandGeomCopy(getLocalContext(), entities, groupName);
     	command->addCommand(commandCopy);
 
-    	CommandScaling* commandGeom = new CommandScaling(getLocalContext(), commandCopy, factorX, factorY, factorZ);
+        CommandScaling* commandGeom = new CommandScaling(getLocalContext(), commandCopy, factorX, factorY, factorZ, pcentre);
     	command->addCommand(commandGeom);
     }
 
@@ -1431,6 +1477,8 @@ copyAndScale(std::vector<Geom::GeomEntity*>& entities,
            cmd<< entities[i]->getName();
        }
     cmd <<"\"], "<<factorX<<", "<<factorY<<", "<<factorZ;
+    if (!(pcentre == Point(0,0,0)))
+        cmd <<", "<<pcentre.getScriptCommand();
     if(withTopo)
         cmd <<", True,\""<<groupName<<"\")";
     else
@@ -1449,10 +1497,14 @@ Internal::M3DCommandResultIfc* GeomManager::
 copyAndScaleAll(const double factorX,
 		const double factorY,
 		const double factorZ,
+        const Point& pcentre,
 		std::string groupName)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-    message <<"GeomManager::copyAndScaleAll("<<factorX<<", "<<factorY<<", "<<factorZ<<")";
+    message <<"GeomManager::copyAndScaleAll("<<factorX<<", "<<factorY<<", "<<factorZ;
+    if (!(pcentre == Point(0,0,0)))
+        message <<", "<<pcentre.getScriptCommand();
+    message <<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     Internal::CommandComposite* command =
@@ -1467,22 +1519,25 @@ copyAndScaleAll(const double factorX,
     command->addCommand(commandTopoCopy);
 
     CommandScaling* commandGeomScale =
-			new CommandScaling(getLocalContext(), commandGeomCopy, factorX, factorY, factorZ);
+			new CommandScaling(getLocalContext(), commandGeomCopy, factorX, factorY, factorZ, pcentre);
 	command->addCommand(commandGeomScale);
 
 	Topo::CommandScaleTopo* commandTopoScale =
-			new Topo::CommandScaleTopo(getLocalContext(), commandTopoCopy, factorX, factorY, factorZ, true);
+			new Topo::CommandScaleTopo(getLocalContext(), commandTopoCopy, factorX, factorY, factorZ, pcentre, true);
 	command->addCommand(commandTopoScale);
 
 	// on ne fait rien du maillage...
 //    Internal::CommandInternal* commandMesh = new Mesh::CommandScaleMesh(getLocalContext(), factorX, factorY, factorZ);
 //    commandCompo->addCommand(commandMesh);
 
-
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().copyAndScaleAll("
-    		<<factorX<<", "<<factorY<<", "<<factorZ<<", \""<<groupName<<"\")";
+        <<factorX<<", "<<factorY<<", "<<factorZ;
+    if (!(pcentre == Point(0,0,0)))
+        cmd <<", "<<pcentre.getScriptCommand();
+    cmd <<", \""<<groupName<<"\")";
+
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -1595,7 +1650,7 @@ copyAndMirror(std::vector<Geom::GeomEntity*>& entities, Utils::Math::Plane* plan
     if (withTopo && Internal::EntitiesHelper::hasTopoRef(entities)){
 
     	command =
-    			new Internal::CommandComposite(getLocalContext(), "Symétrie d'une copie d'une géométrie avec sa topologie");
+                new Internal::CommandComposite(getLocalContext(), "Symétrie d'une copie d'une géométrie avec sa topologie");
 
     	CommandGeomCopy *commandGeomCopy =
     			new CommandGeomCopy(getLocalContext(), entities, groupName);

@@ -50,14 +50,15 @@ CommandScaleMesh::
 CommandScaleMesh(Internal::Context& c,
 		const double factorX,
 		const double factorY,
-		const double factorZ)
+		const double factorZ,
+		const Utils::Math::Point& pcentre)
 :CommandTransformMesh(c, "Homothétie de tout le maillage")
 , m_factor(0)
 , m_isHomogene(false)
 , m_factorX(factorX)
 , m_factorY(factorY)
 , m_factorZ(factorZ)
-, m_center()
+, m_center(pcentre)
 {
 	if (Utils::Math::MgxNumeric::isNearlyZero(m_factorX))
 		throw TkUtil::Exception (TkUtil::UTF8String ("L'homothétie nécessite un facteur non nul suivant X", TkUtil::Charset::UTF_8));
@@ -99,6 +100,9 @@ internalExecute()
         transf.SetValue(1,1, m_factorX);
         transf.SetValue(2,2, m_factorY);
         transf.SetValue(3,3, m_factorZ);
+        transf.SetValue(1,4, (1-m_factorX) * m_center.getX());
+        transf.SetValue(2,4, (1-m_factorY) * m_center.getY());
+        transf.SetValue(3,4, (1-m_factorZ) * m_center.getZ());
 
         // applique la transformation
         transform(&transf);
@@ -127,6 +131,9 @@ internalUndo()
         transf.SetValue(1,1, 1.0/m_factorX);
         transf.SetValue(2,2, 1.0/m_factorY);
         transf.SetValue(3,3, 1.0/m_factorZ);
+        transf.SetValue(1,4, (1-m_factorX) * m_center.getX());
+        transf.SetValue(2,4, (1-m_factorY) * m_center.getY());
+        transf.SetValue(3,4, (1-m_factorZ) * m_center.getZ());
 
         // applique la transformation
         transform(&transf);

@@ -278,7 +278,8 @@ void FacetedSurface::scale(const double F, const Utils::Math::Point& center)
 /*----------------------------------------------------------------------------*/
 void FacetedSurface::scale(const double factorX,
             const double factorY,
-            const double factorZ)
+            const double factorZ,
+            const Utils::Math::Point& center)
 {
 	std::vector<gmds::Node>	nodes;
     FacetedHelper::getGMDSNodes(m_poly, nodes);
@@ -288,6 +289,9 @@ void FacetedSurface::scale(const double factorX,
     transf.SetValue(1,1, factorX);
     transf.SetValue(2,2, factorY);
     transf.SetValue(3,3, factorZ);
+    transf.SetValue(1,4, (1-factorX) * center.getX());
+    transf.SetValue(2,4, (1-factorY) * center.getY());
+    transf.SetValue(3,4, (1-factorZ) * center.getZ());
 
 	FacetedHelper::transform(nodes, &transf);
 
