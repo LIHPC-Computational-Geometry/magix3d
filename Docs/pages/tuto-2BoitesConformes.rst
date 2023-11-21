@@ -8,8 +8,9 @@ Pré-requis
 
 :ref:`Lancer l'IHM<lancement>` de Magix3D. Si nécessaire, :ref:`modifier son aspect<modification-aspect>`. 
 
-Construction de la 1ère boite
-*****************************
+Construction de la 1 :sup`ère` boite
+************************************
+
 Ouvrir le panneau *Création de boite* qui est accessible depuis le panneau :ref:`operations` 
 en sélectionnant les boutons suivants :
 
@@ -54,8 +55,8 @@ On obtient alors la vue suivante :
   :scale: 60%
 
 
-Construction de la 2ème boite
-*****************************
+Construction de la 2 :sup`ème` boite
+************************************
 
 Deux possibilités pour arriver au même résultat.
 Vous pouvez essayer la première puis annuler la commande avant d'essayer la deuxième. 
