@@ -34,14 +34,10 @@ public:
     double x = p.getX();
     double y = p.getY();
     double z = p.getZ();
-    double rayon = std::sqrt(x*x+y*y);
-    double inv = (rayon>0.0 ? 1.0 / rayon:0.0);
-    x *= inv;
-    y *= inv;
 
-    m_rho = rayon;
+    m_rho = std::sqrt(x*x+y*y);
     m_z = z;
-    m_phi = (x==0.0?0.0:std::atan2 (y , x))*180/M_PI;
+    m_phi = atan2(y,x) * 180/M_PI;
   }
 
   double getRho() const { return m_rho; }
