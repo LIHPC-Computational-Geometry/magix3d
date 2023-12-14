@@ -13,7 +13,7 @@
 #include "Mesh/MeshModificationItf.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/UTF8String.h>
-#include <GMDS/Utils/CommonTypes.h>
+#include <gmds/utils/CommonTypes.h>
 /*----------------------------------------------------------------------------*/
 namespace gmds{
 class Node;

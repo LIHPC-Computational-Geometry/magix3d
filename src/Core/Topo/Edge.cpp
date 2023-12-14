@@ -37,7 +37,7 @@
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/Timer.h>
 /*----------------------------------------------------------------------------*/
-#include <GMDS/IG/IGMesh.h>
+#include <gmds/ig/Mesh.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -851,7 +851,7 @@ getNodes(Vertex* v1, Vertex* v2, std::vector<gmds::Node>& vectNd)
 
     vectNd.clear();
 
-    gmds::IGMesh& gmds_mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
+    gmds::Mesh& gmds_mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
 
    // le premier noeud
     vectNd.push_back(gmds_mesh.get<gmds::Node>(v1->getNode()));

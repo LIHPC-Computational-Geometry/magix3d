@@ -177,7 +177,7 @@ void Volume::getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestr
 	    if (1 == mdr->getDecimationStep ( ))
 	    {
 	        // on passe par GMDS pour récupérer les noeuds et les mailles
-	        gmds::IGMesh& gmdsMesh = meshImpl->getGMDSMesh();
+	        gmds::Mesh& gmdsMesh = meshImpl->getGMDSMesh();
 	        if (false == skin)
 	        {	// Mailles pleines
 	            // Récupération du groupe GMDS
@@ -192,7 +192,7 @@ void Volume::getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestr
 	            // nombres de références sur les ids dans les polyèdres :
 	            uint	nbRefIds	= 0;
 
-	            gmds::Variable<short>* mark = gmdsMesh.newVariable<short>(gmds::GMDS_NODE,"markVol2");
+	            gmds::Variable<short>* mark = gmdsMesh.newVariable<short, gmds::GMDS_NODE>("markVol2");
 	            for (std::vector<gmds::Region>::const_iterator
 	                    iter_p = polyedres.begin(); iter_p != polyedres.end();
 	                    ++iter_p)
@@ -203,11 +203,11 @@ void Volume::getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestr
 	                        iter_n = nds.begin(); iter_n != nds.end(); ++iter_n)
 	                {
 	                    gmds::Node current = *iter_n;
-	                    if((*mark)[current.getID()]==0)
+	                    if((*mark)[current.id()]==0)
 	                    {
-	                        node2id[current.getID()] = nodes.size();
+	                        node2id[current.id()] = nodes.size();
 	                        nodes.push_back(current);
-	                        (*mark)[current.getID()]=1;
+	                        (*mark)[current.id()]=1;
 	                    }   // if (!gmdsMesh.isMarked(*iter_n,done))
 
 	                }   // for (std::vector<gmds::Node*>::const_iterator ...
@@ -238,7 +238,7 @@ void Volume::getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestr
 	        else
 	        {	// On prend la peau du maillage
 	            // on passe par GMDS pour récupérer les noeuds et les mailles :
-	            gmds::IGMesh&	gmdsMesh	= meshImpl->getGMDSMesh ( );
+	            gmds::Mesh&	gmdsMesh	= meshImpl->getGMDSMesh ( );
 	            // la liste des Topo::Block qui ont contribués :
 	            std::vector<Topo::Block* >	blocs;
 	            getBlocks (blocs);
@@ -272,7 +272,7 @@ void Volume::getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestr
 	            std::map<gmds::TCellID, int>	node2id;
 	            // nombres de références sur les ids dans les polygones :
 	            uint			nbRefIds	= 0;
-	            gmds::Variable<short>* mark = gmdsMesh.newVariable<short>(gmds::GMDS_NODE,"markVol1");
+	            gmds::Variable<short>* mark = gmdsMesh.newVariable<short, gmds::GMDS_NODE>("markVol1");
 	            for (std::map<Topo::CoFace*, int>::iterator
 	                    iter = marque_faces.begin();
 	                    iter != marque_faces.end(); ++iter)
@@ -296,11 +296,11 @@ void Volume::getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestr
 	                                iter_n != nds.end(); ++iter_n)
 	                        {
 	                            gmds::Node current = *iter_n;
-	                            if((*mark)[current.getID()]==0)
+	                            if((*mark)[current.id()]==0)
 	                            {
-	                                node2id[current.getID()] = nodes.size();
+	                                node2id[current.id()] = nodes.size();
 	                                nodes.push_back(current);
-	                                (*mark)[current.getID()]=1;
+	                                (*mark)[current.id()]=1;
 	                            }   // if (!gmdsMesh.isMarked(*iter_n,done))
 	                        }	// for (std::vector<gmds::Node*>:: ...
 
@@ -380,7 +380,7 @@ void Volume::getGMDSRegions(std::vector<gmds::Region >& ARegions) const
     Mesh::MeshImplementation*   meshImpl    =
                                 dynamic_cast<Mesh::MeshImplementation*> (meshItf);
     CHECK_NULL_PTR_ERROR(meshImpl);
-    gmds::IGMesh&  gmdsMesh    = meshImpl->getGMDSMesh ( );
+    gmds::Mesh&  gmdsMesh    = meshImpl->getGMDSMesh ( );
     for(unsigned int iBlock=0; iBlock<blocks.size(); iBlock++) {
         std::vector<gmds::TCellID> regions  = blocks[iBlock]->regions();
 
@@ -403,7 +403,7 @@ void Volume::getGMDSNodes(std::vector<gmds::Node>& ANodes) const
     Mesh::MeshItf*              meshItf  = getMeshManager ( ).getMesh ( );
     Mesh::MeshImplementation*   meshImpl = dynamic_cast<Mesh::MeshImplementation*> (meshItf);
     CHECK_NULL_PTR_ERROR(meshImpl);
-    gmds::IGMesh&  gmdsMesh = meshImpl->getGMDSMesh();
+    gmds::Mesh&  gmdsMesh = meshImpl->getGMDSMesh();
 
     for(unsigned int iBlock=0; iBlock<blocks.size(); iBlock++) {
     	std::vector<gmds::TCellID> nodes  = blocks[iBlock]->nodes();

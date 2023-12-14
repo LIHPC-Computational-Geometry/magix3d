@@ -174,7 +174,7 @@ void Surface::getRepresentation(Utils::DisplayRepresentation& dr, bool checkDest
 		if (1 == mdr->getDecimationStep ( ))
 		{
 			// on passe par GMDS pour récupérer les noeuds et les mailles
-			gmds::IGMesh&	gmdsMesh	=	meshImpl->getGMDSMesh ( );
+			gmds::Mesh&	gmdsMesh	=	meshImpl->getGMDSMesh ( );
 			// Récupération du groupe GMDS
 		    std::vector<gmds::Face>   polygones;
 		    getGMDSFaces(polygones);
@@ -187,8 +187,8 @@ void Surface::getRepresentation(Utils::DisplayRepresentation& dr, bool checkDest
 			getGMDSNodes(nodes);
 
 			for(int iNode=0; iNode<nodes.size(); iNode++) {
-				node2id[nodes[iNode].getID()] = iNode;
-				id2node[iNode] = nodes[iNode].getID();
+				node2id[nodes[iNode].id()] = iNode;
+				id2node[iNode] = nodes[iNode].id();
 			}
 
 			std::vector<Utils::Math::Point>& points	= mdr->getPoints ( );
@@ -264,7 +264,7 @@ void Surface::getGMDSFaces(std::vector<gmds::Face >& AFaces) const
     Mesh::MeshItf*              meshItf  = getMeshManager ( ).getMesh ( );
     Mesh::MeshImplementation*   meshImpl = dynamic_cast<Mesh::MeshImplementation*> (meshItf);
     CHECK_NULL_PTR_ERROR(meshImpl);
-    gmds::IGMesh&  gmdsMesh = meshImpl->getGMDSMesh();
+    gmds::Mesh&  gmdsMesh = meshImpl->getGMDSMesh();
 
     for(unsigned int iCoFace=0; iCoFace<coFaces.size(); iCoFace++) {
         std::vector<gmds::TCellID> faces  = coFaces[iCoFace]->faces();
@@ -288,7 +288,7 @@ void Surface::getGMDSNodes(std::vector<gmds::Node>& ANodes) const
     Mesh::MeshItf*              meshItf  = getMeshManager ( ).getMesh ( );
     Mesh::MeshImplementation*   meshImpl = dynamic_cast<Mesh::MeshImplementation*> (meshItf);
     CHECK_NULL_PTR_ERROR(meshImpl);
-    gmds::IGMesh&  gmdsMesh = meshImpl->getGMDSMesh();
+    gmds::Mesh&  gmdsMesh = meshImpl->getGMDSMesh();
 
     for(unsigned int iCoFace=0; iCoFace<coFaces.size(); iCoFace++) {
     	std::vector<gmds::TCellID> nodes  = coFaces[iCoFace]->nodes();

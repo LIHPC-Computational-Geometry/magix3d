@@ -10,8 +10,7 @@
 #ifndef MESHMODIFICATIONBYSEPA_H_
 #define MESHMODIFICATIONBYSEPA_H_
 /*----------------------------------------------------------------------------*/
-#include <GMDS/Utils/CommonTypes.h>
-#include <GMDS/IG/IG.h>
+#include <gmds/utils/CommonTypes.h>
 /*----------------------------------------------------------------------------*/
 #include "Internal/Context.h"
 #include "Mesh/MeshModificationItf.h"

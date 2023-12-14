@@ -23,7 +23,7 @@
 #include <TkUtil/MemoryError.h>
 #include <memory>           // unique_ptr
 
-#include "GMDS/IG/Node.h"
+#include "gmds/ig/Node.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -211,7 +211,7 @@ void Cloud::getGMDSNodes(std::vector<gmds::Node >& ANodes) const
     Mesh::MeshImplementation*   meshImpl    =
                                 dynamic_cast<Mesh::MeshImplementation*> (meshItf);
     CHECK_NULL_PTR_ERROR(meshImpl);
-    gmds::IGMesh& gmdsMesh = meshImpl->getGMDSMesh();
+    gmds::Mesh& gmdsMesh = meshImpl->getGMDSMesh();
 
     // ajout d'un filtre pour éviter de mettre 2 fois (ou plus) un même noeud
     std::map<gmds::TCellID, uint> filtre;

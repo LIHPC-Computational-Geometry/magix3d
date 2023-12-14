@@ -14,8 +14,8 @@
 #include "Mesh/MeshImplementation.h"
 #include "Utils/Vector.h"
 
-#include "GMDS/IG/IGMesh.h"
-#include "GMDS/IG/Face.h"
+#include "gmds/ig/Mesh.h"
+#include "gmds/ig/Face.h"
 /*----------------------------------------------------------------------------*/
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
@@ -95,10 +95,10 @@ void FacetedHelper::getGMDSNodes(const std::vector<gmds::Face>& poly,
 
         poly[i].get(nodes);
         for(unsigned int iNode=0; iNode<nodes.size(); iNode++) {
-            if (filtre_nodes[nodes[iNode].getID()] == 0){
+            if (filtre_nodes[nodes[iNode].id()] == 0){
                 ANodes.push_back(nodes[iNode]);
 
-                filtre_nodes[nodes[iNode].getID()] = 1;
+                filtre_nodes[nodes[iNode].id()] = 1;
             }
         }
     }
@@ -188,8 +188,8 @@ void FacetedHelper::buildIsoCurve(const std::vector<gmds::Face>& poly,
             } // end for i
             if (masqueNd == 0)
                 masqueNd = masqueInterval;
-            filtre_nodes[(*itn).getID()] = masqueNd;
-            //std::cout<<" nd "<<(*itn).getID()<<" masque à "<<masqueNd<<std::endl;
+            filtre_nodes[(*itn).id()] = masqueNd;
+            //std::cout<<" nd "<<(*itn).id()<<" masque à "<<masqueNd<<std::endl;
         } // end for itn
 
         // pour les triangles à cheval, déterminer les points d'intersection avec le plan pour un ou deux segments
@@ -225,8 +225,8 @@ void FacetedHelper::buildIsoCurve(const std::vector<gmds::Face>& poly,
             } // end for i
             if (masqueNd == 0)
                 masqueNd = masqueInterval;
-            filtre_nodes[(*itn).getID()] = masqueNd;
-            //std::cout<<" nd "<<(*itn).getID()<<" masque à "<<masqueNd<<std::endl;
+            filtre_nodes[(*itn).id()] = masqueNd;
+            //std::cout<<" nd "<<(*itn).id()<<" masque à "<<masqueNd<<std::endl;
         } // end for itn
 
         // pour les triangles à cheval, déterminer les points d'intersection avec le plan pour un ou deux segments
@@ -262,8 +262,8 @@ void FacetedHelper::buildIsoCurve(const std::vector<gmds::Face>& poly,
             } // end for i
             if (masqueNd == 0)
                 masqueNd = masqueInterval;
-            filtre_nodes[(*itn).getID()] = masqueNd;
-            //std::cout<<" nd "<<(*itn).getID()<<" masque à "<<masqueNd<<std::endl;
+            filtre_nodes[(*itn).id()] = masqueNd;
+            //std::cout<<" nd "<<(*itn).id()<<" masque à "<<masqueNd<<std::endl;
         } // end for itn
 
         // pour les triangles à cheval, déterminer les points d'intersection avec le plan pour un ou deux segments
@@ -285,10 +285,10 @@ void FacetedHelper::sortNodes(std::vector<gmds::Node>& nodes, std::map<gmds::TCe
 
     std::vector<gmds::Node> nodes_tmp;
     for (uint i=0; i<3; i++)
-        if (filtre_nodes[nodes[i].getID()] % 2 == 0)
+        if (filtre_nodes[nodes[i].id()] % 2 == 0)
             nodes_tmp.push_back(nodes[i]);
      for (uint i=0; i<3; i++)
-        if (filtre_nodes[nodes[i].getID()] % 2 != 0)
+        if (filtre_nodes[nodes[i].id()] % 2 != 0)
             nodes_tmp.push_back(nodes[i]);
     nodes = nodes_tmp;
 }
@@ -308,21 +308,21 @@ void FacetedHelper::addPointsIsoCurve(std::vector<gmds::Node>& nodes,
     // soit 3 sommets dans une même zone hors plan (pas d'intersection à faire)
 
     // cas avec noeud 0 sur le plan
-    if (filtre_nodes[nodes[0].getID()] % 2 == 0) {
-        if (filtre_nodes[nodes[1].getID()] % 2 == 0) {
+    if (filtre_nodes[nodes[0].id()] % 2 == 0) {
+        if (filtre_nodes[nodes[1].id()] % 2 == 0) {
             // ces 2 sommets sont sur le plan
             indices.push_back(points.size());
             points.push_back (Utils::Math::Point (nodes[0].X(), nodes[0].Y(), nodes[0].Z()));
             indices.push_back(points.size());
             points.push_back (Utils::Math::Point (nodes[1].X(), nodes[1].Y(), nodes[1].Z()));
         }
-        else if (filtre_nodes[nodes[1].getID()] != filtre_nodes[nodes[2].getID()]) {
+        else if (filtre_nodes[nodes[1].id()] != filtre_nodes[nodes[2].id()]) {
             // cas avec un sommet sur le plan et les 2 autres de part et d'autre
             indices.push_back(points.size());
             points.push_back (Utils::Math::Point (nodes[0].X(), nodes[0].Y(), nodes[0].Z()));
             indices.push_back(points.size());
             // recherche de l'intersection entre les 2 sommets et le plan
-            points.push_back (getIntersectionPlan(nodes[1], nodes[2], coordPl[filtre_nodes[nodes[0].getID()]/2-1], dirPlan));
+            points.push_back (getIntersectionPlan(nodes[1], nodes[2], coordPl[filtre_nodes[nodes[0].id()]/2-1], dirPlan));
         }
         else {
             // cas d'un sommet sur le plan et les deux autres d'un même côté
@@ -330,22 +330,22 @@ void FacetedHelper::addPointsIsoCurve(std::vector<gmds::Node>& nodes,
         }
     }
     else {
-        if (filtre_nodes[nodes[0].getID()] != filtre_nodes[nodes[1].getID()]){
+        if (filtre_nodes[nodes[0].id()] != filtre_nodes[nodes[1].id()]){
             indices.push_back(points.size());
             // recherche de l'intersection entre les 2 sommets et le plan
-            uint indPl = (filtre_nodes[nodes[0].getID()]+filtre_nodes[nodes[1].getID()])/4-1;
+            uint indPl = (filtre_nodes[nodes[0].id()]+filtre_nodes[nodes[1].id()])/4-1;
             points.push_back (getIntersectionPlan(nodes[0], nodes[1], coordPl[indPl], dirPlan));
         }
-        if (filtre_nodes[nodes[1].getID()] != filtre_nodes[nodes[2].getID()]){
+        if (filtre_nodes[nodes[1].id()] != filtre_nodes[nodes[2].id()]){
             indices.push_back(points.size());
             // recherche de l'intersection entre les 2 sommets et le plan
-            uint indPl = (filtre_nodes[nodes[2].getID()]+filtre_nodes[nodes[1].getID()])/4-1;
+            uint indPl = (filtre_nodes[nodes[2].id()]+filtre_nodes[nodes[1].id()])/4-1;
             points.push_back (getIntersectionPlan(nodes[1], nodes[2], coordPl[indPl], dirPlan));
         }
-        if (filtre_nodes[nodes[0].getID()] != filtre_nodes[nodes[2].getID()]){
+        if (filtre_nodes[nodes[0].id()] != filtre_nodes[nodes[2].id()]){
             indices.push_back(points.size());
             // recherche de l'intersection entre les 2 sommets et le plan
-            uint indPl = (filtre_nodes[nodes[0].getID()]+filtre_nodes[nodes[2].getID()])/4-1;
+            uint indPl = (filtre_nodes[nodes[0].id()]+filtre_nodes[nodes[2].id()])/4-1;
             points.push_back (getIntersectionPlan(nodes[0], nodes[2], coordPl[indPl], dirPlan));
         }
     }
@@ -408,12 +408,12 @@ void FacetedHelper::duplicateMesh(Mesh::MeshImplementation* mesh, std::vector<Fa
         if (fv[i]->getGMDSID() != old_mesh_id)
             throw TkUtil::Exception(TkUtil::UTF8String ("FacetedHelper::duplicateMesh ne peut fonctionner avec 2 sommets qui ne référencent pas le même maillage initial.", TkUtil::Charset::UTF_8));
 
-    gmds::IGMesh& old_mesh = mesh->getGMDSMesh(old_mesh_id);
-    gmds::IGMesh& new_mesh = mesh->getGMDSMesh(new_mesh_id);
+    gmds::Mesh& old_mesh = mesh->getGMDSMesh(old_mesh_id);
+    gmds::Mesh& new_mesh = mesh->getGMDSMesh(new_mesh_id);
 
     // utilisation de filtres sur les noeuds et les faces (polygones) à l'aide de GMDS
-    int node_mark = old_mesh.getNewMark<gmds::Node>();
-    int face_mark = old_mesh.getNewMark<gmds::Face>();
+    int node_mark = old_mesh.newMark<gmds::Node>();
+    int face_mark = old_mesh.newMark<gmds::Face>();
 
     // indirection (sur indices des noeuds et faces) pour le cas où tout le maillage ne serait pas dans la surface
     uint max_node_id = old_mesh.getNbNodes();
@@ -460,16 +460,16 @@ void FacetedHelper::duplicateMesh(Mesh::MeshImplementation* mesh, std::vector<Fa
      for (uint i=0; i<mesh_nodes.size(); i++) {
          gmds::Node old_nd = mesh_nodes[i];
          if (old_mesh.isMarked(old_nd, node_mark)) {
-             reduce_node_id[old_nd.getID()] = new_mesh.getNbNodes();
+             reduce_node_id[old_nd.id()] = new_mesh.getNbNodes();
              gmds::Node new_nd = new_mesh.newNode(old_nd.X(), old_nd.Y(), old_nd.Z());
-             //std::cout<<"new_nd depuis old-id "<<old_nd.getID()<<" new-id "<<reduce_node_id[old_nd.getID()]<<" en position "<<new_nd<<std::endl;
+             //std::cout<<"new_nd depuis old-id "<<old_nd.id()()<<" new-id "<<reduce_node_id[old_nd.id()()]<<" en position "<<new_nd<<std::endl;
          }
      }
     // parcours tous les polygones, duplique ceux qui sont marqués
      for (uint i=0; i<mesh_faces.size(); i++) {
          gmds::Face old_face = mesh_faces[i];
          if (old_mesh.isMarked(old_face, face_mark)) {
-             reduce_face_id[old_face.getID()] = new_mesh.getNbFaces();
+             reduce_face_id[old_face.id()] = new_mesh.getNbFaces();
              std::vector <gmds::TCellID> nds = old_face.getAllIDs<gmds::Node>();
              if (nds.size() != 3)
                  throw TkUtil::Exception(TkUtil::UTF8String ("FacetedHelper::duplicateMesh n'est prévu que pour des triangles.", TkUtil::Charset::UTF_8));
@@ -481,7 +481,7 @@ void FacetedHelper::duplicateMesh(Mesh::MeshImplementation* mesh, std::vector<Fa
                  throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, FacetedHelper::duplicateMesh a un problème d'indirection non définie sur un noeud.", TkUtil::Charset::UTF_8));
 
              gmds::Face new_face = new_mesh.newTriangle(nd1, nd2, nd3);
-             //std::cout<<"new_face depuis old-id "<<old_face.getID()<<" new-id "<<reduce_face_id[old_face.getID()]<<" avec sommets "<<nd1<<", "<<nd2<<", "<<nd3<<std::endl;
+             //std::cout<<"new_face depuis old-id "<<old_fac[iNode].id()()<<" new-id "<<reduce_face_id[old_fac[iNode].id()()]<<" avec sommets "<<nd1<<", "<<nd2<<", "<<nd3<<std::endl;
          }
      }
 
@@ -493,7 +493,7 @@ void FacetedHelper::duplicateMesh(Mesh::MeshImplementation* mesh, std::vector<Fa
 
         for (uint i = 0; i < old_faces.size(); i++) {
             gmds::Face poly = old_faces[i];
-            int fa = reduce_face_id[poly.getID()];
+            int fa = reduce_face_id[poly.id()];
             if (fa == -1)
                 throw TkUtil::Exception(TkUtil::UTF8String(
                         "Erreur interne, FacetedHelper::duplicateMesh a un problème d'indirection non définie sur un polygone.",
@@ -511,7 +511,7 @@ void FacetedHelper::duplicateMesh(Mesh::MeshImplementation* mesh, std::vector<Fa
         new_nodes.clear();
 
         for (uint j=0; j<old_nodes.size(); j++) {
-            int nd1 = reduce_node_id[old_nodes[j].getID()];
+            int nd1 = reduce_node_id[old_nodes[j].id()];
             if (nd1 == -1)
                 throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, FacetedHelper::duplicateMesh a un problème d'indirection non définie sur un noeud d'une courbe.", TkUtil::Charset::UTF_8));
             new_nodes.push_back(new_mesh.get<gmds::Node>(nd1));
@@ -525,7 +525,7 @@ void FacetedHelper::duplicateMesh(Mesh::MeshImplementation* mesh, std::vector<Fa
         gmds::Node old_node = old_vtx->getGMDSNode();
         gmds::Node& new_node = old_vtx->getGMDSNode();
 
-        int nd1 = reduce_node_id[old_node.getID()];
+        int nd1 = reduce_node_id[old_node.id()];
         if (nd1 == -1)
             throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, FacetedHelper::duplicateMesh a un problème d'indirection non définie sur un noeud d'un sommet.", TkUtil::Charset::UTF_8));
         new_node = new_mesh.get<gmds::Node>(nd1);
@@ -577,7 +577,7 @@ void FacetedHelper::transformOffset(Mesh::MeshImplementation* mesh, FacetedSurfa
 {
     // récupération du maillage GMDS et de quelques informations
     uint mesh_id = fs->getGMDSID();
-    gmds::IGMesh& gmds_mesh = mesh->getGMDSMesh(mesh_id);
+    gmds::Mesh& gmds_mesh = mesh->getGMDSMesh(mesh_id);
     uint max_face_id = gmds_mesh.getMaxLocalID(2);
     uint max_node_id = gmds_mesh.getMaxLocalID(0);
 
@@ -598,11 +598,11 @@ void FacetedHelper::transformOffset(Mesh::MeshImplementation* mesh, FacetedSurfa
         Utils::Math::Vector v2(nds[2].X()-nds[0].X(), nds[2].Y()-nds[0].Y(), nds[2].Z()-nds[0].Z());
 
         // le vecteur normal n'est pas normalisé pour tenir compte de la surface ce qui permettra de pondérer la normale en un noeud
-        normales[poly.getID()] = v1*v2;
-        //std::cout<<"normales pour "<<poly.getID()<<" : "<< normales[poly.getID()]<<std::endl;
+        normales[poly.id()] = v1*v2;
+        //std::cout<<"normales pour "<<poly.id()<<" : "<< normales[poly.id()]<<std::endl;
 
         for (uint j=0; j<3; j++)
-            node_to_face[nds[j].getID()].push_back(poly.getID());
+            node_to_face[nds[j].id()].push_back(poly.id());
     }
 
     // pour chacun des noeuds de la surface, déplacement en fonction de la normale des polygones adjacents
@@ -611,8 +611,8 @@ void FacetedHelper::transformOffset(Mesh::MeshImplementation* mesh, FacetedSurfa
 
     for (uint i=0; i<nodes.size(); i++){
         gmds::Node node = nodes[i];
-        std::vector<uint> l_faces_id = node_to_face[node.getID()];
-        //std::cout<<"noeud "<<node.getID()<<" avec "<<l_faces_id.size()<<" polygones"<<std::endl;
+        std::vector<uint> l_faces_id = node_to_face[node.id()];
+        //std::cout<<"noeud "<<nod[iNode].id()()<<" avec "<<l_faces_id.size()<<" polygones"<<std::endl;
         // la somme des normales des pomlygones adjacents
         Utils::Math::Vector vect;
         for (uint j=0; j<l_faces_id.size(); j++)

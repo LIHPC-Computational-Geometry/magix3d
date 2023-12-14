@@ -23,7 +23,7 @@
 #include <TkUtil/MemoryError.h>
 #include <memory>           // unique_ptr
 
-#include "GMDS/IG/Node.h"
+#include "gmds/ig/Node.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -174,7 +174,7 @@ void Line::getGMDSEdges(std::vector<gmds::Edge >& AEdges) const
     Mesh::MeshImplementation*   meshImpl    =
                                 dynamic_cast<Mesh::MeshImplementation*> (meshItf);
     CHECK_NULL_PTR_ERROR(meshImpl);
-    gmds::IGMesh& gmdsMesh = meshImpl->getGMDSMesh();
+    gmds::Mesh& gmdsMesh = meshImpl->getGMDSMesh();
 
      for(unsigned int iCoEdge=0; iCoEdge<coEdges.size(); iCoEdge++) {
         std::vector<gmds::TCellID> edges  = coEdges[iCoEdge]->edges();
@@ -194,7 +194,7 @@ void Line::getGMDSNodes(std::vector<gmds::Node >& ANodes) const
     Mesh::MeshImplementation*   meshImpl    =
                                 dynamic_cast<Mesh::MeshImplementation*> (meshItf);
     CHECK_NULL_PTR_ERROR(meshImpl);
-    gmds::IGMesh& gmdsMesh = meshImpl->getGMDSMesh();
+    gmds::Mesh& gmdsMesh = meshImpl->getGMDSMesh();
 
     for(std::vector<gmds::Edge>::const_iterator iter=AEdges.begin();
 			iter!=AEdges.end();++iter) {

@@ -18,7 +18,7 @@
 #include "Utils/Plane.h"
 /*----------------------------------------------------------------------------*/
 
-#include <GMDS/Math/Triangle.h>
+#include <gmds/math/Triangle.h>
 
 // OCC
 #include <gp_Pln.hxx>

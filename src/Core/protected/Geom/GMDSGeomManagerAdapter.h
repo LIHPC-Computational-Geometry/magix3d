@@ -16,11 +16,11 @@
 #include "Geom/GMDSGeomCurveAdapter.h"
 #include "Geom/GMDSGeomPointAdapter.h"
 /*----------------------------------------------------------------------------*/
-#include "GMDS/CAD/GeomManager.h"
-#include "GMDS/CAD/GeomVolume.h"
-#include "GMDS/CAD/GeomSurface.h"
-#include "GMDS/CAD/GeomCurve.h"
-#include "GMDS/CAD/GeomPoint.h"
+#include "gmds/cad/GeomManager.h"
+#include "gmds/cad/GeomVolume.h"
+#include "gmds/cad/GeomSurface.h"
+#include "gmds/cad/GeomCurve.h"
+#include "gmds/cad/GeomPoint.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -32,7 +32,7 @@ namespace Geom {
  *        les services requis par l'interface GeomVolume de GMDS
  *
  */
-class GMDSGeomManagerAdapter: public gmds::geom::GeomManager
+class GMDSGeomManagerAdapter: public gmds::cad::GeomManager
 {
 public:
     /*------------------------------------------------------------------------*/
@@ -48,22 +48,22 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  creation of a geometric volume
      */
-    virtual gmds::geom::GeomVolume* newVolume();
+    virtual gmds::cad::GeomVolume* newVolume();
 
     /*------------------------------------------------------------------------*/
     /** \brief  creation of a geometric surface
      */
-    virtual gmds::geom::GeomSurface* newSurface();
+    virtual gmds::cad::GeomSurface* newSurface();
 
     /*------------------------------------------------------------------------*/
     /** \brief  creation of a geometric curve
      */
-    virtual gmds::geom::GeomCurve* newCurve();
+    virtual gmds::cad::GeomCurve* newCurve();
 
     /*------------------------------------------------------------------------*/
     /** \brief  creation of a geometric point
      */
-    virtual gmds::geom::GeomPoint* newPoint();
+    virtual gmds::cad::GeomPoint* newPoint();
 
     /*------------------------------------------------------------------------*/
     /** \brief  Get the number of points of the model.
@@ -98,56 +98,56 @@ public:
      *
      *  \param points the points of the model.
      */
-    virtual void getPoints(std::vector<gmds::geom::GeomPoint*>& APoints) const;
+    virtual void getPoints(std::vector<gmds::cad::GeomPoint*>& APoints) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Access to the curves of the model.
      *
      *  \param curves the curves of the model.
      */
-    virtual void getCurves(std::vector<gmds::geom::GeomCurve*>& ACurves) const;
+    virtual void getCurves(std::vector<gmds::cad::GeomCurve*>& ACurves) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Access to the surface of the model.
      *
      *  \param surfaces the surfaces of the model.
      */
-    virtual void getSurfaces(std::vector<gmds::geom::GeomSurface*>& ASurfaces) const;
+    virtual void getSurfaces(std::vector<gmds::cad::GeomSurface*>& ASurfaces) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Access to the volumes of the model.
      *
      *  \param volumes the volumes of the model.
      */
-    virtual void getVolumes(std::vector<gmds::geom::GeomVolume*>& AVolumes) const;
+    virtual void getVolumes(std::vector<gmds::cad::GeomVolume*>& AVolumes) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Access to the mapped GMDS vertex of the model.
      *
      *  \param AVertex the Geom::Vertex of the model.
      */
-    virtual gmds::geom::GeomPoint* getGMDSVertex(Mgx3D::Geom::Vertex* AVertex);
+    virtual gmds::cad::GeomPoint* getGMDSVertex(Mgx3D::Geom::Vertex* AVertex);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Access to the mapped GMDS curve of the model.
      *
      *  \param ACurve the Geom::Curve of the model.
      */
-    virtual gmds::geom::GeomCurve* getGMDSCurve(Mgx3D::Geom::Curve* ACurve);
+    virtual gmds::cad::GeomCurve* getGMDSCurve(Mgx3D::Geom::Curve* ACurve);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Access to the mapped GMDS surface of the model.
      *
      *  \param ASurf the Geom::Surface of the model.
      */
-    virtual gmds::geom::GeomSurface* getGMDSSurface(Mgx3D::Geom::Surface* ASurf);
+    virtual gmds::cad::GeomSurface* getGMDSSurface(Mgx3D::Geom::Surface* ASurf);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Access to the mapped GMDS volume of the model.
      *
      *  \param AVol the Geom::Volume of the model.
      */
-    virtual gmds::geom::GeomVolume* getGMDSVolume(Mgx3D::Geom::Volume* AVol);
+    virtual gmds::cad::GeomVolume* getGMDSVolume(Mgx3D::Geom::Volume* AVol);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Export the model in a file.
@@ -177,15 +177,15 @@ private:
     /** sommets gérés par le manager */
     std::vector<Mgx3D::Geom::GMDSGeomPointAdapter*>  m_points;
 
-    std::map<Mgx3D::Geom::Volume *,gmds::geom::GeomVolume *> m_mgx2gmdsVolumes;
-    std::map<Mgx3D::Geom::Surface*,gmds::geom::GeomSurface*> m_mgx2gmdsSurfaces;
-    std::map<Mgx3D::Geom::Curve  *,gmds::geom::GeomCurve  *> m_mgx2gmdsCurves;
-    std::map<Mgx3D::Geom::Vertex *,gmds::geom::GeomPoint  *> m_mgx2gmdsPoints;
+    std::map<Mgx3D::Geom::Volume *,gmds::cad::GeomVolume *> m_mgx2gmdsVolumes;
+    std::map<Mgx3D::Geom::Surface*,gmds::cad::GeomSurface*> m_mgx2gmdsSurfaces;
+    std::map<Mgx3D::Geom::Curve  *,gmds::cad::GeomCurve  *> m_mgx2gmdsCurves;
+    std::map<Mgx3D::Geom::Vertex *,gmds::cad::GeomPoint  *> m_mgx2gmdsPoints;
 
-    std::map<gmds::geom::GeomVolume *,Mgx3D::Geom::Volume *> m_gmds2mgxVolumes;
-    std::map<gmds::geom::GeomSurface*,Mgx3D::Geom::Surface*> m_gmds2mgxSurfaces;
-    std::map<gmds::geom::GeomCurve  *,Mgx3D::Geom::Curve  *> m_gmds2mgxCurves;
-    std::map<gmds::geom::GeomPoint  *,Mgx3D::Geom::Vertex *> m_gmds2mgxPoints;
+    std::map<gmds::cad::GeomVolume *,Mgx3D::Geom::Volume *> m_gmds2mgxVolumes;
+    std::map<gmds::cad::GeomSurface*,Mgx3D::Geom::Surface*> m_gmds2mgxSurfaces;
+    std::map<gmds::cad::GeomCurve  *,Mgx3D::Geom::Curve  *> m_gmds2mgxCurves;
+    std::map<gmds::cad::GeomPoint  *,Mgx3D::Geom::Vertex *> m_gmds2mgxPoints;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

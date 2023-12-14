@@ -25,7 +25,7 @@
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
-#include "GMDS/IG/IGMesh.h"
+#include "gmds/ig/Mesh.h"
 /*----------------------------------------------------------------------------*/
 //#define _DEBUG_READ
 /*----------------------------------------------------------------------------*/
@@ -79,7 +79,7 @@ internalExecute()
 #endif
 		mesh->readMli(m_file_name, id);
 	}
-	gmds::IGMesh& gmdsMesh = mesh->getGMDSMesh(id);
+	gmds::Mesh& gmdsMesh = mesh->getGMDSMesh(id);
 
 
 #ifdef _DEBUG_READ
@@ -90,14 +90,11 @@ internalExecute()
 
 	// création des surfaces
 
-	for (gmds::IGMesh::surfaces_iterator iter = gmdsMesh.surfaces_begin();
-			iter != gmdsMesh.surfaces_end(); ++iter){
-
-		gmds::IGMesh::surface surf = *iter;
-
-		std::string nomGr = surf.name();
+	for(auto i=0; i< gmdsMesh.getNbGroups<gmds::Face>(); i++) {
+		auto surf = gmdsMesh.getGroup<gmds::Face>(i);
+		std::string nomGr = surf->name();
 #ifdef _DEBUG_READ
-		std::cout<<" importation de la surface : "<<surf.name()<<" avec "<<surf.size()<<" polygones"<<std::endl;
+		std::cout<<" importation de la surface : "<<iter.name()<<" avec "<<iter.size()<<" polygones"<<std::endl;
 #endif
 
 		Group::Group2D* gr = getContext().getLocalGroupManager().getNewGroup2D(nomGr, &getInfoCommand());
@@ -108,7 +105,14 @@ internalExecute()
 			throw TkUtil::Exception(messErr);
 		}
 
-		Geom::Surface* sf = EntityFactory(getContext()).newFacetedSurface(id, surf.cells());
+		std::vector<gmds::Face> faces;
+		for (auto face_id : surf->cells())
+		{
+			auto face = gmdsMesh.get<gmds::Face>(face_id);
+				faces.push_back(face);
+		}
+
+		Geom::Surface* sf = EntityFactory(getContext()).newFacetedSurface(id, faces);
 
 		gr->add(sf);
 		sf->add(gr);
@@ -126,15 +130,12 @@ internalExecute()
 	// création des courbes et sommets à partir des lignes
 	std::map<uint, Geom::Vertex*> nd2vtx;
 
-	for (gmds::IGMesh::lines_iterator iter = gmdsMesh.lines_begin();
-			iter != gmdsMesh.lines_end(); ++iter){
-
-		gmds::IGMesh::line ligne = *iter;
-
-		std::string nomGr = ligne.name();
+	for(auto i=0; i< gmdsMesh.getNbGroups<gmds::Edge>(); i++) {
+		auto ligne = gmdsMesh.getGroup<gmds::Edge>(i);
+		std::string nomGr = ligne->name();
 
 #ifdef _DEBUG_READ
-		std::cout<<" importation de la ligne : "<<ligne.name()<<" avec "<<ligne.size()<<" bras"<<std::endl;
+		std::cout<<" importation de la ligne : "<<ligne->name()<<" avec "<<ligne->size()<<" bras"<<std::endl;
 #endif
 
 		Group::Group1D* gr = getContext().getLocalGroupManager().getNewGroup1D(nomGr, &getInfoCommand());
@@ -147,7 +148,15 @@ internalExecute()
 
 		// recherche d'une liste de noeuds ordonnés
 
-		std::vector<uint> nodes_id = Mesh::MeshHelper::getOrderedNodesId(ligne.cells());
+		std::vector<gmds::Edge> edges;
+		for (auto edge_id : ligne->cells())
+		{
+			auto edge = gmdsMesh.get<gmds::Edge>(edge_id);
+				edges.push_back(edge);
+		}
+
+		std::vector<uint> nodes_id = Mesh::MeshHelper::getOrderedNodesId(edges);
+
 		std::vector<gmds::Node> nodes;
 		for (uint i=0; i<nodes_id.size(); i++)
 			nodes.push_back(gmdsMesh.get<gmds::Node>(nodes_id[i]));
@@ -166,22 +175,22 @@ internalExecute()
 
 		// création des vertex aux extrémités
 		gmds::Node nd = nodes[0];
-		Geom::Vertex* vtx = nd2vtx[nd.getID()];
+		Geom::Vertex* vtx = nd2vtx[nd.id()];
 		if (vtx == 0){
 			vtx = EntityFactory(getContext()).newFacetedVertex(id, nd);
 			m_createdEntities.push_back(vtx);
 			store(vtx);
-			nd2vtx[nd.getID()] = vtx;
+			nd2vtx[nd.id()] = vtx;
 			cv->add(vtx);
 			vtx->add(cv);
 		}
 		nd = nodes.back();
-		vtx = nd2vtx[nd.getID()];
+		vtx = nd2vtx[nd.id()];
 		if (vtx == 0){
 			vtx = EntityFactory(getContext()).newFacetedVertex(id, nd);
 			m_createdEntities.push_back(vtx);
 			store(vtx);
-			nd2vtx[nd.getID()] = vtx;
+			nd2vtx[nd.id()] = vtx;
 			cv->add(vtx);
 			vtx->add(cv);
 		}
@@ -190,23 +199,20 @@ internalExecute()
 
 	// mise à jour des dépendances crv <-> surf
 
-	gmds::TInt mark = gmdsMesh.getNewMark<gmds::Node>();
+	gmds::TInt mark = gmdsMesh.newMark<gmds::Node>();
 
-	for (gmds::IGMesh::surfaces_iterator iter1 = gmdsMesh.surfaces_begin();
-			iter1 != gmdsMesh.surfaces_end(); ++iter1){
+	for(auto i=0; i< gmdsMesh.getNbGroups<gmds::Face>(); i++) {
+		auto surf = gmdsMesh.getGroup<gmds::Face>(i);
 
-		gmds::IGMesh::surface surf = *iter1;
-
-		std::vector<gmds::Face> poly = surf.cells();
-
-		for(unsigned int i=0; i<poly.size(); i++) {
+		for (auto face_id : surf->cells()) {
 			std::vector<gmds::Node> nodes;
-			poly[i].get(nodes);
+			gmds::Face face = gmdsMesh.get<gmds::Face>(face_id);
+			face.get(nodes);
 			for(unsigned int iNode=0; iNode<nodes.size(); iNode++)
 				gmdsMesh.mark(nodes[iNode], mark);
 		}
 
-		std::string nomGrSurf = surf.name();
+		std::string nomGrSurf = surf->name();
 		Group::Group2D* grsurf = getContext().getLocalGroupManager().getGroup2D(nomGrSurf, true);
 		Geom::Surface* sf = 0;
 		std::vector<Geom::Surface*>& geomSurfs = grsurf->getSurfaces();
@@ -218,21 +224,25 @@ internalExecute()
 			throw TkUtil::Exception(messErr);
 		}
 
-		for (gmds::IGMesh::lines_iterator iter2 = gmdsMesh.lines_begin();
-				iter2 != gmdsMesh.lines_end(); ++iter2){
-
-			gmds::IGMesh::line ligne = *iter2;
+		for(auto i=0; i< gmdsMesh.getNbGroups<gmds::Edge>(); i++) {
+			auto ligne = gmdsMesh.getGroup<gmds::Edge>(i);
 			bool isInSurface = true;
 
-			std::vector<gmds::Node> nodes = Mesh::MeshHelper::getNodes(ligne.cells());
+			std::vector<gmds::Node> nodes;
+			for (auto edge_id : ligne->cells())
+			{
+				auto edge = gmdsMesh.get<gmds::Edge>(edge_id);
+				for (auto node : edge.get<gmds::Node>())
+					nodes.push_back(node);
+			}
 
 			for (uint i=0; i<nodes.size(); i++)
 				if (!gmdsMesh.isMarked(nodes[i], mark))
 					isInSurface = false;
 
 			if (isInSurface){
-				std::string nomGr = ligne.name();
-				if (ligne.size() > 1){
+				std::string nomGr = ligne->name();
+				if (ligne->size() > 1){
 					Group::Group1D* gr = getContext().getLocalGroupManager().getGroup1D(nomGr, true);
 
 					Geom::Curve* crv = 0;

@@ -29,7 +29,7 @@ GMDSGeomCurveAdapter::~GMDSGeomCurveAdapter()
 }
 /*----------------------------------------------------------------------------*/
 void GMDSGeomCurveAdapter::
-get(std::vector<gmds::geom::GeomPoint*>& APnt) const
+get(std::vector<gmds::cad::GeomPoint*>& APnt) const
 {
     APnt.clear();
     APnt.resize(m_points.size(),NULL);
@@ -40,7 +40,7 @@ get(std::vector<gmds::geom::GeomPoint*>& APnt) const
 }
 /*----------------------------------------------------------------------------*/
 void GMDSGeomCurveAdapter::
-get(std::vector<gmds::geom::GeomSurface*>& ASurf) const
+get(std::vector<gmds::cad::GeomSurface*>& ASurf) const
 {
     ASurf.clear();
     ASurf.resize(m_surfaces.size(),NULL);
@@ -51,15 +51,18 @@ get(std::vector<gmds::geom::GeomSurface*>& ASurf) const
 }
 /*----------------------------------------------------------------------------*/
 void GMDSGeomCurveAdapter::
-get(std::vector<gmds::geom::GeomVolume*>& AVol) const
+get(std::vector<gmds::cad::GeomVolume*>& AVol) const
 {
-    std::set<gmds::geom::GeomVolume* > vol_set;
-    for(unsigned int i=0;i<m_surfaces.size();i++)
+    std::set<gmds::cad::GeomVolume* > vol_set;
+/*  for(unsigned int i=0;i<m_surfaces.size();i++)
     {
-        std::vector<gmds::geom::GeomVolume* > vol_i;
+        std::vector<gmds::cad::GeomVolume* > vol_i;
         m_surfaces[i]->get(vol_i);
         vol_set.insert(vol_i.begin(),vol_i.end());
     }
+*/
+    for (auto surf : m_surfaces)
+        vol_set.insert(surf->volumes().begin(), surf->volumes().end());
     AVol.clear();
     AVol.insert(AVol.begin(),vol_set.begin(),vol_set.end());
 }
@@ -104,6 +107,12 @@ void GMDSGeomCurveAdapter::
 computeBoundingBox(gmds::TCoord minXYZ[3], gmds::TCoord maxXYZ[3]) const
 {
     throw TkUtil::Exception (TkUtil::UTF8String ("GMDSGeomCurveAdapter::computeBoundingBox pas disponible.", TkUtil::Charset::UTF_8));
+}
+/*----------------------------------------------------------------------------*/
+std::tuple<gmds::TCoord,gmds::TCoord,gmds::TCoord,gmds::TCoord,gmds::TCoord,gmds::TCoord> GMDSGeomVolumeAdapter::
+BBox() const
+{
+    throw TkUtil::Exception (TkUtil::UTF8String ("GMDSGeomSurfaceAdapter::BBox pas disponible.", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
 gmds::TCoord GMDSGeomCurveAdapter::
@@ -259,7 +268,7 @@ computeDistanceHaussdorfSubCurve(
                 point = points[iPoint-1];
             }
 
-            gmds::math::Vector vect(geom_representation[iSegment].getPoint(0),geom_representation[iSegment].getPoint(1));
+            gmds::math::Vector3d vect = geom_representation[iSegment].getPoint(1) - geom_representation[iSegment].getPoint(0);
             vect.normalize();
             point = point + vect*(step_length*iPoint - length);
 
@@ -306,13 +315,13 @@ computeDistanceHaussdorfSubCurve(
 /*----------------------------------------------------------------------------*/
 void GMDSGeomCurveAdapter::
 computeVector(
-        const gmds::geom::GeomPoint& AP,
+        const gmds::cad::GeomPoint& AP,
         gmds::math::Vector& AV) const
 {
-    gmds::math::Point point1 = AP.getPoint();
+    gmds::math::Point point1 = AP.point();
 //    gmds::math::Point pointlast = getSecondPoint()->getPoint();
 
-    gmds::geom::GeomPoint* firstPoint = getFirstPoint();
+    gmds::cad::GeomPoint* firstPoint = getFirstPoint();
 ////    if(fabs(AP.distance(firstPoint)) < 10.e-13) {
 ////
 ////    }
@@ -348,7 +357,8 @@ computeVector(
 
     gmds::math::Point point2(pt2.getX(),pt2.getY(),pt2.getZ());
 
-    AV = gmds::math::Vector (point1,point2);
+    //AV = gmds::math::Vector (point1,point2);
+    AV = gmds::math::Vector3d(point2-point1);
     AV.normalize();
 }
 /*----------------------------------------------------------------------------*/
@@ -371,20 +381,20 @@ getMultiplePoints(
     }
 }
 /*----------------------------------------------------------------------------*/
-gmds::geom::GeomPoint* GMDSGeomCurveAdapter::
+gmds::cad::GeomPoint* GMDSGeomCurveAdapter::
 getFirstPoint() const
 {
     if(getNbPoints() < 1) {
         throw TkUtil::Exception (TkUtil::UTF8String ("GMDSGeomCurveAdapter::getFirstPoint appelé sur une courbe sans sommet.", TkUtil::Charset::UTF_8));
     }
 
-    std::vector<gmds::geom::GeomPoint*> points;
+    std::vector<gmds::cad::GeomPoint*> points;
     get(points);
 
     return points[0];
 }
 /*----------------------------------------------------------------------------*/
-gmds::geom::GeomPoint* GMDSGeomCurveAdapter::
+gmds::cad::GeomPoint* GMDSGeomCurveAdapter::
 getSecondPoint() const
 {
     if(getNbPoints() < 2) {
@@ -392,7 +402,7 @@ getSecondPoint() const
                 "au moins deux sommets.", TkUtil::Charset::UTF_8));
     }
 
-    std::vector<gmds::geom::GeomPoint*> points;
+    std::vector<gmds::cad::GeomPoint*> points;
     get(points);
 
     return points[1];
@@ -401,7 +411,7 @@ getSecondPoint() const
 bool GMDSGeomCurveAdapter::
 isALoop() const
 {
-    std::vector<gmds::geom::GeomPoint*> points;
+    std::vector<gmds::cad::GeomPoint*> points;
     this->get(points);
 
     if(1 == points.size()) {
@@ -411,26 +421,27 @@ isALoop() const
     }
 }
 /*----------------------------------------------------------------------------*/
-gmds::geom::GeomSurface* GMDSGeomCurveAdapter::
+gmds::cad::GeomSurface* GMDSGeomCurveAdapter::
 getLeftSurface() const
 {
 	const double epsilonYEAH = 10e-10;
 //	throw TkUtil::Exception (TkUtil::UTF8String ("GMDSGeomCurveAdapter::getLeftSurface no more implemented.", TkUtil::Charset::UTF_8));
-    gmds::geom::GeomPoint* firstPoint = getFirstPoint();
+    gmds::cad::GeomPoint* firstPoint = getFirstPoint();
     gmds::math::Vector curveVector;
     computeVector(*firstPoint,curveVector);
     curveVector.normalize();
 
-    std::vector<gmds::geom::GeomSurface* > surfaces;
+    std::vector<gmds::cad::GeomSurface* > surfaces;
     get(surfaces);
 
-    gmds::geom::GeomSurface* surface1 = surfaces[0];
-    gmds::geom::GeomSurface* surface2 = surfaces[1];
+    gmds::cad::GeomSurface* surface1 = surfaces[0];
+    gmds::cad::GeomSurface* surface2 = surfaces[1];
 
     std::vector<gmds::math::Triangle> triangles;
     surface1->getTriangulation(triangles);
+    // NB : il faust passer par FacSurface
 
-    gmds::math::Point point = firstPoint->getPoint();
+    gmds::math::Point point = firstPoint->point();
     gmds::TCoord distMin = HUGE_VALF;
     unsigned int triangleIndex;
     bool triangleFound = false;
@@ -464,7 +475,7 @@ getLeftSurface() const
         // If yes, check the dot product to ensure that this second point is
         // indeed on the curve, and not on the other side
         if(dist0<epsilonYEAH && firstDist0>epsilonYEAH) {
-            gmds::math::Vector v(point,point0);
+            gmds::math::Vector3d v = point0-point;
 
             if(curveVector.dot(v)>=0.) {
                 triangleIndex = iTriangle;
@@ -473,7 +484,7 @@ getLeftSurface() const
             }
         }
         if(dist1<epsilonYEAH && firstDist1>epsilonYEAH) {
-            gmds::math::Vector v(point,point1);
+            gmds::math::Vector3d v = point1-point;
 
             if(curveVector.dot(v)>=0.) {
                 triangleIndex = iTriangle;
@@ -482,7 +493,7 @@ getLeftSurface() const
             }
         }
         if(dist2<epsilonYEAH && firstDist2>epsilonYEAH) {
-            gmds::math::Vector v(point,point2);
+            gmds::math::Vector3d v = point2-point;
 
             if(curveVector.dot(v)>=0.) {
                 triangleIndex = iTriangle;
@@ -509,7 +520,7 @@ getLeftSurface() const
 
     gmds::math::Vector uVector(triangleNormal - (triangleNormal.dot(curveVector))*curveVector);
 
-    gmds::math::Vector ppVector(point,trianglePoint);
+    gmds::math::Vector3d ppVector(trianglePoint - point);
 
 //    std::cout<<"getLeftSurface "<<std::endl;
 //    std::cout<<point<<std::endl;
@@ -527,20 +538,20 @@ getLeftSurface() const
     }
 }
 /*----------------------------------------------------------------------------*/
-gmds::geom::GeomSurface* GMDSGeomCurveAdapter::
+gmds::cad::GeomSurface* GMDSGeomCurveAdapter::
 getRightSurface() const
 {
     throw TkUtil::Exception (TkUtil::UTF8String ("GMDSGeomCurveAdapter::getRightSurface no more implemented.", TkUtil::Charset::UTF_8));
-//    gmds::geom::GeomPoint* firstPoint = getFirstPoint();
+//    gmds::cad::GeomPoint* firstPoint = getFirstPoint();
 //    gmds::math::Vector curveVector;
 //    computeVector(*firstPoint,curveVector);
 //    curveVector.normalize();
 //
-//    std::vector<gmds::geom::GeomSurface* > surfaces;
+//    std::vector<gmds::cad::GeomSurface* > surfaces;
 //    get(surfaces);
 //
-//    gmds::geom::GeomSurface* surface1 = surfaces[0];
-//    gmds::geom::GeomSurface* surface2 = surfaces[1];
+//    gmds::cad::GeomSurface* surface1 = surfaces[0];
+//    gmds::cad::GeomSurface* surface2 = surfaces[1];
 //
 //    std::vector<GEPETO::Triangle<3,gmds::TCoord > > triangles;
 //    surface1->getTriangulation(triangles);
@@ -593,19 +604,19 @@ getRightSurface() const
 gmds::TInt GMDSGeomCurveAdapter::
 getNbPoints() const
 {
-    std::vector<gmds::geom::GeomPoint*> points;
+    std::vector<gmds::cad::GeomPoint*> points;
     get(points);
     return points.size();
 }
 /*----------------------------------------------------------------------------*/
 void GMDSGeomCurveAdapter::
-add(gmds::geom::GeomPoint* APoint)
+add(gmds::cad::GeomPoint* APoint)
 {
     m_points.push_back(APoint);
 }
 /*----------------------------------------------------------------------------*/
 void GMDSGeomCurveAdapter::
-add(gmds::geom::GeomSurface* ASurf)
+add(gmds::cad::GeomSurface* ASurf)
 {
     m_surfaces.push_back(ASurf);
 }

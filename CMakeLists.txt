@@ -19,7 +19,7 @@ option (BUILD_SHARED_LIBS "create dynamic libraries (default : ON)" ON)
 option (BUILD_MAGIX3D "Build the whole MGX Application, including Gui and python binding (default : ON)" ON)
 option (USE_GMSH "Build with gmsh (default : ON)" ON)
 option (USE_SMOOTH3D "Build the SMOOTH3D component (default : OFF)" OFF)
-option (USE_TRITON "Build the TRITON component (default : ON)" ON)
+#option (USE_TRITON "Build the TRITON component (default : ON)" ON)
 option (WITH_DOC "Build the documentation (default : ON)" ON)
 #Next options are only available on-site. Default value is OFF.
 option (USE_DKOC "On-site. Build the DKOC component to read Catia files (on-site, default : OFF)" OFF)

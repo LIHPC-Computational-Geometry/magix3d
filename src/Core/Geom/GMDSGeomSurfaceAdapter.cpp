@@ -50,13 +50,12 @@ GMDSGeomSurfaceAdapter::~GMDSGeomSurfaceAdapter()
 }
 /*----------------------------------------------------------------------------*/
 void GMDSGeomSurfaceAdapter::
-get(std::vector<gmds::geom::GeomPoint*>& APnt) const
+get(std::vector<gmds::cad::GeomPoint*>& APnt) const
 {
-    std::set<gmds::geom::GeomPoint* > points_set;
+    std::set<gmds::cad::GeomPoint* > points_set;
     for(unsigned int i=0;i<m_curves.size();i++)
     {
-        std::vector<gmds::geom::GeomPoint* > p_i;
-        m_curves[i]->get(p_i);
+        std::vector<gmds::cad::GeomPoint* > p_i(m_curves[i]->points());
         points_set.insert(p_i.begin(),p_i.end());
     }
     APnt.clear();
@@ -64,7 +63,7 @@ get(std::vector<gmds::geom::GeomPoint*>& APnt) const
 }
 /*----------------------------------------------------------------------------*/
 void GMDSGeomSurfaceAdapter::
-get(std::vector<gmds::geom::GeomCurve*>& ACur) const
+get(std::vector<gmds::cad::GeomCurve*>& ACur) const
 {
     ACur.clear();
 
@@ -74,7 +73,7 @@ get(std::vector<gmds::geom::GeomCurve*>& ACur) const
 }
 /*----------------------------------------------------------------------------*/
 void GMDSGeomSurfaceAdapter::
-get(std::vector<gmds::geom::GeomVolume*>& AVol) const
+get(std::vector<gmds::cad::GeomVolume*>& AVol) const
 {
     AVol.clear();
 
@@ -164,13 +163,13 @@ reorientTriangulation()
 }
 /*----------------------------------------------------------------------------*/
 void GMDSGeomSurfaceAdapter::
-add(gmds::geom::GeomCurve* ACurve)
+add(gmds::cad::GeomCurve* ACurve)
 {
     m_curves.push_back(ACurve);
 }
 /*----------------------------------------------------------------------------*/
 void GMDSGeomSurfaceAdapter::
-add(gmds::geom::GeomVolume* AVol)
+add(gmds::cad::GeomVolume* AVol)
 {
     m_volumes.push_back(AVol);
 }

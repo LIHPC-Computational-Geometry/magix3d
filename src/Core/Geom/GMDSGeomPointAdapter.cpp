@@ -29,7 +29,7 @@ GMDSGeomPointAdapter::~GMDSGeomPointAdapter()
 }
 /*----------------------------------------------------------------------------*/
 void GMDSGeomPointAdapter::
-get(std::vector<gmds::geom::GeomCurve*>& ACur) const
+get(std::vector<gmds::cad::GeomCurve*>& ACur) const
 {
     ACur.clear();
     ACur.resize(m_curves.size());
@@ -40,13 +40,12 @@ get(std::vector<gmds::geom::GeomCurve*>& ACur) const
 }
 /*----------------------------------------------------------------------------*/
 void GMDSGeomPointAdapter::
-get(std::vector<gmds::geom::GeomSurface*>& ASurf) const
+get(std::vector<gmds::cad::GeomSurface*>& ASurf) const
 {
-    std::set<gmds::geom::GeomSurface* > surf_set;
+    std::set<gmds::cad::GeomSurface* > surf_set;
     for(unsigned int i=0;i<m_curves.size();i++)
     {
-        std::vector<gmds::geom::GeomSurface* > surf_i;
-        m_curves[i]->get(surf_i);
+        std::vector<gmds::cad::GeomSurface*> surf_i(m_curves[i]->surfaces());
         surf_set.insert(surf_i.begin(),surf_i.end());
     }
     ASurf.clear();
@@ -54,13 +53,12 @@ get(std::vector<gmds::geom::GeomSurface*>& ASurf) const
 }
 /*----------------------------------------------------------------------------*/
 void GMDSGeomPointAdapter::
-get(std::vector<gmds::geom::GeomVolume*>& AVol) const
+get(std::vector<gmds::cad::GeomVolume*>& AVol) const
 {
-    std::set<gmds::geom::GeomVolume* > vol_set;
+    std::set<gmds::cad::GeomVolume* > vol_set;
     for(unsigned int i=0;i<m_curves.size();i++)
     {
-        std::vector<gmds::geom::GeomVolume* > vol_i;
-        m_curves[i]->get(vol_i);
+        std::vector<gmds::cad::GeomVolume* > vol_i(m_curves[i]->volumes());
         vol_set.insert(vol_i.begin(),vol_i.end());
     }
     AVol.clear();
@@ -68,13 +66,13 @@ get(std::vector<gmds::geom::GeomVolume*>& AVol) const
 }
 /*------------------------------------------------------------------------*/
 //void GMDSGeomPointAdapter::
-//getOrdered(std::vector<gmds::geom::GeomCurve*>& ACur) const
+//getOrdered(std::vector<gmds::cad::GeomCurve*>& ACur) const
 //{
 //
 //}
 /*----------------------------------------------------------------------------*/
 //void GMDSGeomPointAdapter::
-//getOrderedDirect(std::vector<gmds::geom::GeomCurve*>& ACur) const
+//getOrderedDirect(std::vector<gmds::cad::GeomCurve*>& ACur) const
 //{
 //
 //
@@ -119,7 +117,7 @@ getPoint() const
 }
 /*----------------------------------------------------------------------------*/
 void GMDSGeomPointAdapter::
-add(gmds::geom::GeomCurve* ACurve)
+add(gmds::cad::GeomCurve* ACurve)
 {
     m_curves.push_back(ACurve);
 }

@@ -31,7 +31,7 @@ MesquiteMeshImplAdapter(
 	Mesquite::MsqError err;
 
 	MeshItf* mesh = m_meshManager.getMesh();
-	gmds::IGMesh& gmdsMesh = mesh->getGMDSMesh();
+	gmds::Mesh& gmdsMesh = mesh->getGMDSMesh();
 
 	// Tous les noeuds sont pris
 	unsigned int vertexCount = gmdsMesh.getNbNodes();
@@ -43,13 +43,14 @@ MesquiteMeshImplAdapter(
 	// table de correspondance entre noeuds Gmds et indices pour Mesquite
 	std::map<gmds::TCellID, uint> num_insurf;
 
-	gmds::IGMesh::node_iterator itn  = gmdsMesh.nodes_begin();
+	//gmds::Mesh::node_iterator itn  = gmdsMesh.nodes_begin();
 
 	unsigned int iVertexCount = 0;
-	for(;!itn.isDone();itn.next()) {
-		gmds::Node current_node = itn.value();
-
-		num_insurf[current_node.getID()] = iVertexCount;
+	for (auto i : gmdsMesh.nodes()){
+	//for(;!itn.isDone();itn.next()) {
+		//gmds::Node current_node = itn.value();
+		gmds::Node current_node = gmdsMesh.get<gmds::Node>(i);
+		num_insurf[current_node.id()] = iVertexCount;
 
 		myMesh->reset_vertex (
 				iVertexCount,
@@ -75,10 +76,9 @@ MesquiteMeshImplAdapter(
 		MSQ_CHKERR (err);
 
 		unsigned int iVertexCount = 0;
-		gmds::IGMesh::node_iterator itn  = gmdsMesh.nodes_begin();
 
-		for(;!itn.isDone();itn.next()) {
-			gmds::Node current_node = itn.value();
+		for(auto i : gmdsMesh.nodes()) {
+			gmds::Node current_node = gmdsMesh.get<gmds::Node>(i);
 
 			m_mesquite2GMDSNodes[vertices[iVertexCount]] = current_node;
 			iVertexCount++;
@@ -92,15 +92,13 @@ MesquiteMeshImplAdapter(
 	std::vector < size_t > vertices;
 	Mesquite::EntityTopology elem_type;
 
-	gmds::IGMesh::region_iterator itr  = gmdsMesh.regions_begin();
-
 	unsigned int iElementCount = 0;
-	for(;!itr.isDone();itr.next()) {
-		gmds::Region current_region = itr.value();
+	for(auto r : gmdsMesh.regions()) {
+		gmds::Region current_region = gmdsMesh.get<gmds::Region>(r);
 
 		std::vector<gmds::TCellID> nodes = current_region.getIDs<gmds::Node>();
 
-		switch (current_region.getType()) {
+		switch (current_region.type()) {
 		case gmds::GMDS_HEX:
 			elem_type = MESQUITE_NS::HEXAHEDRON;
 			vertices.resize (nodes.size());

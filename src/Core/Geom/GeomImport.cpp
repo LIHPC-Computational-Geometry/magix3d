@@ -25,7 +25,6 @@
 
 #include "Internal/InfoCommand.h"
 
-#include "GMDS/Utils/Timer.h"
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/MemoryError.h>

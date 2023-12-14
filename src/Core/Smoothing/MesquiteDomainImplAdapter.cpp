@@ -55,7 +55,7 @@ MesquiteDomainImplAdapter(
 //		Geom::Volume* vol_tmp2 = dynamic_cast<Geom::Volume*> (vol_tmp);
 //	}
 
-	gmds::IGMesh & gmds_mesh = m_meshManager.getMesh()->getGMDSMesh();
+	gmds::Mesh & gmds_mesh = m_meshManager.getMesh()->getGMDSMesh();
 	for(unsigned int iCoFace=0; iCoFace<coFaces.size(); iCoFace++) {
 
 		if(coFaces[iCoFace]->isMeshed()) {
@@ -102,8 +102,8 @@ MesquiteDomainImplAdapter(
 
 			if(NULL != vertex) {
 
-				m_nodes2GeomEntity[node.getID()] = vertex;
-				m_nodesIsOnVertex[node.getID()] = true;
+				m_nodes2GeomEntity[node.id()] = vertex;
+				m_nodesIsOnVertex[node.id()] = true;
 			}
 		}
 	}
@@ -122,7 +122,7 @@ void MesquiteDomainImplAdapter::snap_to (
 		Mesquite::Mesh::EntityHandle AEntityHandle,
 		Mesquite::Vector3D & coordinate) const
 {
-	gmds::TCellID node = m_mesquite2GMDSNodes[AEntityHandle].getID();
+	gmds::TCellID node = m_mesquite2GMDSNodes[AEntityHandle].id();
 
 	if((m_nodesIsOnVertex.find(node)  != m_nodesIsOnVertex.end())
 	|| (m_nodesIsOnCurve.find(node)   != m_nodesIsOnCurve.end())
@@ -145,7 +145,7 @@ void MesquiteDomainImplAdapter::vertex_normal_at(
 		Mesquite::Mesh::EntityHandle AEntityHandle,
 		Mesquite::Vector3D &coordinate) const
 {
-	gmds::TCellID node = m_mesquite2GMDSNodes[AEntityHandle].getID();
+	gmds::TCellID node = m_mesquite2GMDSNodes[AEntityHandle].id();
 
 	if(m_nodesIsOnSurface.find(node) == m_nodesIsOnSurface.end()) {
 		// in this case the node is not on a surface so the normal cannot be computed
@@ -202,7 +202,7 @@ void MesquiteDomainImplAdapter::domain_DoF( const MESQUITE_NS::Mesh::EntityHandl
 		Mesquite::MsqError& err ) const
 {
 	for (unsigned i = 0; i < num_vertices; ++i) {
-		gmds::TCellID node = m_mesquite2GMDSNodes[handle_array[i]].getID();
+		gmds::TCellID node = m_mesquite2GMDSNodes[handle_array[i]].id();
 
 		if(m_nodesIsOnVertex.find(node)  != m_nodesIsOnVertex.end()) {
 			dof_array[i] = 0;

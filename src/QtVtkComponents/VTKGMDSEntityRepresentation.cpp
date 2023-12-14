@@ -378,7 +378,7 @@ void VTKGMDSEntityRepresentation::createMeshEntityCloudRepresentation(
 
     }
 
-    gmds::IGMesh& gmdsMesh = meshImpl->getGMDSMesh();
+    gmds::Mesh& gmdsMesh = meshImpl->getGMDSMesh();
 
     try
     {
@@ -593,7 +593,7 @@ void VTKGMDSEntityRepresentation::createMeshEntityLineRepresentation(
 
     }
 
-    gmds::IGMesh& gmdsMesh = meshImpl->getGMDSMesh();
+    gmds::Mesh& gmdsMesh = meshImpl->getGMDSMesh();
     vector<Math::Point>    points;
     vector<size_t>         segments;
     if (1 == meshEntity->getDim())
@@ -613,7 +613,7 @@ void VTKGMDSEntityRepresentation::createMeshEntityLineRepresentation(
 
         // On gère les noeuds de manière unique :
         std::map<gmds::TCellID, unsigned long> node2id;
-        int done = gmdsMesh.getNewMark<gmds::Node> ( );
+        int done = gmdsMesh.newMark<gmds::Node> ( );
 
         for (std::vector<gmds::Edge>::const_iterator ite = edges.begin();
              edges.end() != ite; ite++)
@@ -622,23 +622,23 @@ void VTKGMDSEntityRepresentation::createMeshEntityLineRepresentation(
              if (2 != nodes.size ( ))
              {
                  TkUtil::UTF8String	msg;
-                 msg << "L'arête GMDS " << (unsigned long)(*ite).getID ( ) << " de la ligne "
+                 msg << "L'arête GMDS " << (unsigned long)(*ite).id() << " de la ligne "
                      << line->getName ( ) << " est composée de " << (unsigned long)nodes.size ( )
                      << " noeuds.";
                  throw TkUtil::Exception (msg);
              }	// if (2 != nodes.size ( ))
              gmds::Node& node1 = nodes [0], node2 = nodes [1];
-             if (false == gmdsMesh.isMarked<gmds::Node> (node1.getID ( ), done))
+             if (false == gmdsMesh.isMarked<gmds::Node> (node1.id( ), done))
              {
-                 node2id [node1.getID ( )] = points.size ( );
+                 node2id [node1.id()] = points.size ( );
                  points.push_back (Math::Point (node1.X ( ), node1.Y ( ), node1.Z ( )));
-                 gmdsMesh.mark<gmds::Node> (node1.getID ( ), done);
+                 gmdsMesh.mark<gmds::Node> (node1.id(), done);
              }	// if (false == gmdsMesh.isMarked<gmds::Node> (node1.getID ( ), done))
-             if (false == gmdsMesh.isMarked<gmds::Node> (node2.getID ( ), done))
+             if (false == gmdsMesh.isMarked<gmds::Node> (node2.id(), done))
              {
-                 node2id [node2.getID ( )] = points.size ( );
+                 node2id [node2.id()] = points.size ( );
                  points.push_back (Math::Point (node2.X ( ), node2.Y ( ), node2.Z ( )));
-                 gmdsMesh.mark<gmds::Node> (node1.getID ( ), done);
+                 gmdsMesh.mark<gmds::Node> (node1.id(), done);
              }	// if (false == gmdsMesh.isMarked<gmds::Node> (node2.getID ( ), done))
         }	// for (std::vector<gmds::Edge>::const_iterator ite = edges.begin();
         // Démarquer les noeuds :
@@ -652,8 +652,8 @@ void VTKGMDSEntityRepresentation::createMeshEntityLineRepresentation(
         {
             vector<gmds::Node>	nodes	= (*ite).get<gmds::Node> ( );
             gmds::Node& node1 = nodes [0], node2 = nodes [1];
-            segments.push_back (node2id [node1.getID ( )]);
-            segments.push_back (node2id [node2.getID ( )]);
+            segments.push_back (node2id [node1.id()]);
+            segments.push_back (node2id [node2.id()]);
         }	// for (std::vector<gmds::Edge>::const_iterator ite = edges.begin();
     } // if (1 == meshEntity->getDim()
 
@@ -700,7 +700,7 @@ void VTKGMDSEntityRepresentation::createMeshEntitySurfacicRepresentation(
     _surfacicGrid->Initialize();
 
     // on passe par GMDS pour récupérer les noeuds et les mailles
-    gmds::IGMesh& gmdsMesh =
+    gmds::Mesh& gmdsMesh =
     		meshImpl->getGMDSMesh();
 
     try
@@ -734,7 +734,7 @@ void VTKGMDSEntityRepresentation::createMeshEntitySurfacicRepresentation(
 } // VTKGMDSEntityRepresentation::createMeshEntitySurfacicRepresentation
 
 void VTKGMDSEntityRepresentation::
-createMeshEntitySurfacicRepresentation2D(Mesh::MeshEntity* meshEntity, gmds::IGMesh& gmdsMesh)
+createMeshEntitySurfacicRepresentation2D(Mesh::MeshEntity* meshEntity, gmds::Mesh& gmdsMesh)
 {
 #ifdef _DEBUG_VTKGMDSEntityRepresentation
 	std::cout<<"cas dimension 2"<<std::endl;
@@ -762,7 +762,7 @@ createMeshEntitySurfacicRepresentation2D(Mesh::MeshEntity* meshEntity, gmds::IGM
 
 
 void VTKGMDSEntityRepresentation::
-createMeshEntitySurfacicRepresentation3D(Mesh::MeshEntity* meshEntity, gmds::IGMesh& gmdsMesh)
+createMeshEntitySurfacicRepresentation3D(Mesh::MeshEntity* meshEntity, gmds::Mesh& gmdsMesh)
 {
 #ifdef _DEBUG_VTKGMDSEntityRepresentation
 	std::cout<<"cas dimension 3"<<std::endl;
@@ -821,7 +821,7 @@ createMeshEntitySurfacicRepresentation3D(Mesh::MeshEntity* meshEntity, gmds::IGM
 
 
 void VTKGMDSEntityRepresentation::
-createCoFacesSurfacicRepresentationRatio1(std::vector<Topo::CoFace*> cofaces, gmds::IGMesh& gmdsMesh)
+createCoFacesSurfacicRepresentationRatio1(std::vector<Topo::CoFace*> cofaces, gmds::Mesh& gmdsMesh)
 {
 #ifdef _DEBUG_VTKGMDSEntityRepresentation
 	std::cout<<"cas ratio 1"<<std::endl;
@@ -835,7 +835,7 @@ createCoFacesSurfacicRepresentationRatio1(std::vector<Topo::CoFace*> cofaces, gm
 	std::vector<gmds::Face> polygones;
 	std::map<gmds::TCellID, int> node2id;
 	uint nbRefIds = 0; /// nombres de références sur les ids dans les polygones
-	int done = gmdsMesh.getNewMark<gmds::Node>();
+	int done = gmdsMesh.newMark<gmds::Node>();
 
 	for (std::vector<Topo::CoFace*>::iterator iter=cofaces.begin(); iter!=cofaces.end(); ++iter){
 		Topo::CoFace* face = *iter;
@@ -853,7 +853,7 @@ createCoFacesSurfacicRepresentationRatio1(std::vector<Topo::CoFace*> cofaces, gm
 					iter_n != nds.end(); ++iter_n){
 
 				gmds::Node current_node =*iter_n;
-				gmds::TCellID current_node_id =current_node.getID();
+				gmds::TCellID current_node_id =current_node.id();
 				if (!gmdsMesh.isMarked<gmds::Node>(current_node_id, done)){
 
 					node2id[current_node_id] = nodes.size();
@@ -868,7 +868,7 @@ createCoFacesSurfacicRepresentationRatio1(std::vector<Topo::CoFace*> cofaces, gm
 	// on démarque les noeuds
 	for (std::vector<gmds::Node>::iterator iter = nodes.begin();
 			iter != nodes.end(); ++iter)
-		gmdsMesh.unmark<gmds::Node>(iter->getID(), done);
+		gmdsMesh.unmark<gmds::Node>(iter->id(), done);
 	gmdsMesh.freeMark<gmds::Node>(done);
 
 	const size_t pointsNum = nodes.size();
@@ -885,7 +885,7 @@ createCoFacesSurfacicRepresentationRatio1(std::vector<Topo::CoFace*> cofaces, gm
 	{
 		double coords[3] = { (*itp).X(), (*itp).Y(), (*itp).Z() };
 		points->SetPoint(id, coords);
-		_surfacicPointsVTK2GMDSID[id] = (*itp).getID();
+		_surfacicPointsVTK2GMDSID[id] = (*itp).id();
 	} // for (vector<Math::Point>::const_iterator itp = nodes.begin ( );
 
 	int* cellTypes = new int[polygonNum];
@@ -921,7 +921,7 @@ createCoFacesSurfacicRepresentationRatio1(std::vector<Topo::CoFace*> cofaces, gm
 } // createCoFacesSurfacicRepresentationRatio1
 
 void VTKGMDSEntityRepresentation::
-createCoFacesSurfacicRepresentationRatioN(std::vector<Topo::CoFace*> cofaces, gmds::IGMesh& gmdsMesh, int ratio_degrad)
+createCoFacesSurfacicRepresentationRatioN(std::vector<Topo::CoFace*> cofaces, gmds::Mesh& gmdsMesh, int ratio_degrad)
 {
 #ifdef _DEBUG_VTKGMDSEntityRepresentation
 	std::cout<<"cas ratio "<<ratio_degrad<<std::endl;
@@ -1041,7 +1041,7 @@ createCoFacesSurfacicRepresentationRatioN(std::vector<Topo::CoFace*> cofaces, gm
 
 				double coords[3] = { node.X(), node.Y(), node.Z() };
 				points->SetPoint(idNd, coords);
-				_surfacicPointsVTK2GMDSID[idNd] = node.getID();
+				_surfacicPointsVTK2GMDSID[idNd] = node.id();
 
 #ifdef _DEBUG_VTKGMDSEntityRepresentation
 				std::cout << "nodeVTK ("<<i<<","<<j<<") id "<<idNd<<" : "<<coords[0]<<", "<<coords[1]<<", "<<coords[2]<<std::endl;
@@ -1139,7 +1139,7 @@ void VTKGMDSEntityRepresentation::createMeshEntityVolumicRepresentation(
     try
     {
         // on passe par GMDS pour récupérer les noeuds et les mailles
-        gmds::IGMesh& gmdsMesh =
+        gmds::Mesh& gmdsMesh =
                 meshImpl->getGMDSMesh();
 
         // Récupération des mailles GMDS via le volume
@@ -1160,7 +1160,7 @@ void VTKGMDSEntityRepresentation::createMeshEntityVolumicRepresentation(
         std::map<gmds::TCellID, int> node2id;
         uint nbRefIds = 0; /// nombres de références sur les ids dans les polyêdres
 
-        const int done = gmdsMesh.getNewMark<gmds::Node>();
+        const int done = gmdsMesh.newMark<gmds::Node>();
         for (std::vector<gmds::Region>::const_iterator iter_p =
                 polyedres.begin(); iter_p != polyedres.end(); ++iter_p)
         {
@@ -1170,7 +1170,7 @@ void VTKGMDSEntityRepresentation::createMeshEntityVolumicRepresentation(
                     iter_n != nds.end(); ++iter_n)
             {
                 gmds::Node current_node =*iter_n;
-                gmds::TCellID current_node_id =current_node.getID();
+                gmds::TCellID current_node_id = current_node.id();
                 if (!gmdsMesh.isMarked<gmds::Node>(current_node_id, done))
                 {
 
@@ -1185,7 +1185,7 @@ void VTKGMDSEntityRepresentation::createMeshEntityVolumicRepresentation(
         // on démarque les noeuds
         for (std::vector<gmds::Node>::iterator iter = nodes.begin();
                 iter != nodes.end(); ++iter)
-            gmdsMesh.unmark<gmds::Node>(iter->getID(), done);
+            gmdsMesh.unmark<gmds::Node>(iter->id(), done);
 
         gmdsMesh.freeMark<gmds::Node>(done);
 
