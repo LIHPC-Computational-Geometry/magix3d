@@ -852,7 +852,7 @@ void MeshImplementation::meshStrutured(Mesh::CommandCreateMesh* command, Topo::C
             Utils::Math::Point &pt = coface->points()[i+nbNoeudsI*j];
             gmds::Node nd = getGMDSMesh().newNode(pt.getX(), pt.getY(), pt.getZ());
 #ifdef _DEBUG2
-            if (nd.id()()==gmds::NullID){
+            if (nd.id()==gmds::NullID){
 				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
             	message << "Création d'un noeud GMDS en erreur pour la face "<< coface->getName();
             	throw TkUtil::Exception (message);
