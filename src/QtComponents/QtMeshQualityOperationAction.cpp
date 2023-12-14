@@ -32,7 +32,7 @@
 #include "Mesh/MeshItf.h"
 #include "Mesh/Mgx3DQualifSerie.h"
 
-#include <GMDS/IG/IGMesh.h>
+#include <gmds/ig/Mesh.h>
 
 using namespace std;
 using namespace TkUtil;
@@ -275,7 +275,7 @@ void QtMeshQualityOperationPanel::autoUpdate ( )
 				dynamic_cast<Mesh::MeshManager*>(&getContext ( ).getMeshManager( ));
 		CHECK_NULL_PTR_ERROR (manager)
 		CHECK_NULL_PTR_ERROR (getContext ( ).getMeshManager ( ).getMesh ( ))
-		gmds::IGMesh&	mesh	=
+		gmds::Mesh&	mesh	=
 				getContext ( ).getMeshManager ( ).getMesh ( )->getGMDSMesh ( );
 
 		clearSeries ( );
@@ -328,13 +328,14 @@ void QtMeshQualityOperationPanel::autoUpdate ( )
 		{
 			vector<gmds::Face>	faces;
 			(*iter)->getGMDSFaces (faces);
-			gmds::IGMesh::surface&	s	= mesh.newSurface((*iter)->getName());
+			//gmds::Mesh::surface&	s	= mesh.newSurface((*iter)->getName());
+			auto s	= mesh.newGroup<gmds::Face>((*iter)->getName());
 			_gmdsSurfaces.push_back ((*iter)->getName());
 			for (vector<gmds::Face>::const_iterator itf = faces.begin ( );
 					faces.end ( ) != itf; itf++)
-				s.add (*itf);
+				s->add (*itf);
 			_analysedMeshEntities.push_back (*iter);
-			Mgx3DQualifSerie* serie	= new Mgx3DQualifSerie(s, (*iter)->getName(), "", *iter);
+			Mgx3DQualifSerie* serie	= new Mgx3DQualifSerie(*s, (*iter)->getName(), "", *iter);
 			getQualityWidget ( ).addSerie (serie);
 		}	// for (vector<string>::const_iterator iter = ...
 
@@ -343,13 +344,14 @@ void QtMeshQualityOperationPanel::autoUpdate ( )
 		{
 			vector<gmds::Region>	regions;
 			(*iter)->getGMDSRegions (regions);
-			gmds::IGMesh::volume&	v	= mesh.newVolume ((*iter)->getName());
+			//gmds::Mesh::volume&	v	= mesh.newVolume ((*iter)->getName());
+			auto v	= mesh.newGroup<gmds::Region>((*iter)->getName());
 			_gmdsVolumes.push_back ((*iter)->getName());
 			for (vector <gmds::Region>::const_iterator itr = regions.begin ( );
 					regions.end ( ) != itr; itr++)
-				v.add (*itr);
+				v->add (*itr);
 			_analysedMeshEntities.push_back (*iter);
-			Mgx3DQualifSerie*	serie	= new Mgx3DQualifSerie(v, (*iter)->getName(), "", *iter);
+			Mgx3DQualifSerie*	serie	= new Mgx3DQualifSerie(*v, (*iter)->getName(), "", *iter);
 			getQualityWidget ( ).addSerie (serie);
 		}	// for (vector<string>::const_iterator iter = ...
 
@@ -394,7 +396,7 @@ void QtMeshQualityOperationPanel::clear ( )
 			dynamic_cast<Mesh::MeshManager*>(&getContext ( ).getMeshManager( ));
 	CHECK_NULL_PTR_ERROR (manager)
 	CHECK_NULL_PTR_ERROR (getContext ( ).getMeshManager ( ).getMesh ( ))
-	gmds::IGMesh&	mesh	=
+	gmds::Mesh&	mesh	=
 				getContext ( ).getMeshManager ( ).getMesh ( )->getGMDSMesh ( );
 
 	// On masque les entités :
@@ -413,7 +415,8 @@ void QtMeshQualityOperationPanel::clear ( )
 		{
 			try
 			{
-				mesh.deleteSurface (mesh.getSurface ((*it)->getName ( )));
+				//mesh.deleteSurface (mesh.getSurface ((*it)->getName ( )));
+				mesh.deleteGroup<gmds::Face>(mesh.getGroup<gmds::Face>((*it)->getName ( )));
 			}
 			catch (const Exception& exc)
 			{
@@ -466,7 +469,7 @@ void QtMeshQualityOperationPanel::clear ( )
 		{
 			try
 			{
-				mesh.deleteVolume (mesh.getVolume ((*it)->getName ( )));
+				mesh.deleteGroup<gmds::Region>(mesh.getGroup<gmds::Region>((*it)->getName()));
 			}
 			catch (const Exception& exc)
 			{
@@ -541,7 +544,7 @@ void QtMeshQualityOperationPanel::clearSeries ( )
 			dynamic_cast<Mesh::MeshManager*>(&getContext ( ).getMeshManager( ));
 	CHECK_NULL_PTR_ERROR (manager)
 	CHECK_NULL_PTR_ERROR (getContext ( ).getMeshManager ( ).getMesh ( ))
-	gmds::IGMesh&	gmdsMesh	=
+	gmds::Mesh&	gmdsMesh	=
 				getContext ( ).getMeshManager ( ).getMesh ( )->getGMDSMesh ( );
 
 	for (vector<string>::iterator its = _gmdsSurfaces.begin ( );
@@ -549,7 +552,7 @@ void QtMeshQualityOperationPanel::clearSeries ( )
 	{
 		try
 		{
-			gmdsMesh.deleteSurface (gmdsMesh.getSurface (*its));
+			gmdsMesh.deleteGroup<gmds::Face>(gmdsMesh.getGroup<gmds::Face>(*its));
 		}
 		catch (const Exception& exc)
 		{
@@ -580,7 +583,7 @@ void QtMeshQualityOperationPanel::clearSeries ( )
 	{
 		try
 		{
-			gmdsMesh.deleteVolume (gmdsMesh.getVolume (*itv));
+			gmdsMesh.deleteGroup<gmds::Region>(gmdsMesh.getGroup<gmds::Region>(*itv));
 		}
 		catch (const Exception& exc)
 		{
@@ -621,15 +624,15 @@ void QtMeshQualityOperationPanel::displayCellsCallback ( )
 	Mesh::MeshManager*	manager	=
 			dynamic_cast<Mesh::MeshManager*>(&getContext ( ).getMeshManager( ));
 	CHECK_NULL_PTR_ERROR (manager)
+	gmds::Mesh&	gmdsMesh	=
+				getContext ( ).getMeshManager ( ).getMesh ( )->getGMDSMesh ( );
 
-	vector< gmds::IGMesh::surface* >	surfaces =
+	vector<gmds::CellGroup<gmds::Face>*>	surfaces =
 							getQualityWidget ( ).getSelectedClassesSurfaces ( );
-	vector< gmds::IGMesh::volume* >	volumes =
+	vector<gmds::CellGroup<gmds::Region>*>	volumes =
 							getQualityWidget ( ).getSelectedClassesVolumes ( );
 	vector<Mesh::MeshEntity*>	entities;
-	for (vector< gmds::IGMesh::surface*
-			>::const_iterator its = surfaces.begin ( ); surfaces.end ( ) != its;
-		its++)
+	for (auto its = surfaces.begin ( ); surfaces.end ( ) != its; its++)
 	{
 		// From CommandCreateMesh::addNewSurface :
 		Mesh::SubSurface*	surface	=
@@ -638,10 +641,10 @@ void QtMeshQualityOperationPanel::displayCellsCallback ( )
 								Entity::MeshSurface, (*its)->name ( )),
 							context->newDisplayProperties(Entity::MeshSurface),
 							0);
-		gmds::IGMesh::surface&	gmdsSurface	= **its;
+		auto gmdsSurface	= **its;
 		for (size_t i = 0; i < (*its)->size ( ); i++)
 		{
-			gmds::Face	face	= gmdsSurface [i];
+			gmds::Face face	= gmdsMesh.get<gmds::Face>(gmdsSurface [i]);
 			surface->addFace (face);
 		}	// for (size_t i = 0; i < (*its)->size ( ); i++)
 		context->newGraphicalRepresentation (*surface);
@@ -650,8 +653,7 @@ void QtMeshQualityOperationPanel::displayCellsCallback ( )
 		surface->getDisplayProperties ( ).setDisplayed (true);
 		entities.push_back (surface);
 	}
-	for (vector< gmds::IGMesh::volume*
-			>::const_iterator itv = volumes.begin ( ); volumes.end ( ) != itv;
+	for (auto itv = volumes.begin ( ); volumes.end ( ) != itv;
 			itv++)
 	{
 		Mesh::SubVolume*	volume	=
@@ -660,10 +662,10 @@ void QtMeshQualityOperationPanel::displayCellsCallback ( )
 								Entity::MeshVolume, (*itv)->name ( )),
 						context->newDisplayProperties(Entity::MeshVolume),
 						0);
-		gmds::IGMesh::volume&	gmdsVolume	= **itv;
+		auto gmdsVolume	= **itv;
 		for (size_t i = 0; i < (*itv)->size ( ); i++)
 		{
-			gmds::Region	region	= gmdsVolume [i];
+			gmds::Region	region	= gmdsMesh.get<gmds::Region>(gmdsVolume [i]);
 			volume->addRegion (region);
 		}
 		context->newGraphicalRepresentation (*volume);

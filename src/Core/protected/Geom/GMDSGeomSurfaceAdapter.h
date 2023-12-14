@@ -18,11 +18,11 @@
 #include "Geom/GMDSGeomCurveAdapter.h"
 #include "Geom/GMDSGeomVolumeAdapter.h"
 /*----------------------------------------------------------------------------*/
-#include <GMDS/Math/Triangle.h>
-#include <GMDS/CAD/GeomVolume.h>
-#include <GMDS/CAD/GeomSurface.h>
-#include <GMDS/CAD/GeomCurve.h>
-#include <GMDS/CAD/GeomPoint.h>
+#include <gmds/math/Triangle.h>
+#include <gmds/cad/GeomVolume.h>
+#include <gmds/cad/GeomSurface.h>
+#include <gmds/cad/GeomCurve.h>
+#include <gmds/cad/GeomPoint.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -34,7 +34,7 @@ namespace Geom {
  *        les services requis par l'interface GeomSurface de GMDS
  *
  */
-class GMDSGeomSurfaceAdapter: public gmds::geom::GeomSurface
+class GMDSGeomSurfaceAdapter: public gmds::cad::GeomSurface
 {
 public:
     /*------------------------------------------------------------------------*/
@@ -65,21 +65,21 @@ public:
      *
      *  \param APnt the adjacent points.
      */
-   virtual void get(std::vector<gmds::geom::GeomPoint*>& APnt) const;
+   virtual void get(std::vector<gmds::cad::GeomPoint*>& APnt) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Access to the adjacent curves.
      *
      *  \param ACur the adjacent curves.
      */
-    virtual void get(std::vector<gmds::geom::GeomCurve*>& ACur) const;
+    virtual void get(std::vector<gmds::cad::GeomCurve*>& ACur) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Access to the adjacent volumes
      *
      *  \param AVol the adjacent volumes.
      */
-    virtual void get(std::vector<gmds::geom::GeomVolume*>& AVol) const;
+    virtual void get(std::vector<gmds::cad::GeomVolume*>& AVol) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief Move a point AP near the surface to the closest point on the
@@ -125,14 +125,14 @@ public:
      *
      *  \param ACurve the new adjacent curve to add
      */
-    virtual void add(gmds::geom::GeomCurve* ACurve);
+    virtual void add(gmds::cad::GeomCurve* ACurve);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Add an adjacent volume
      *
      *  \param AVol the new adjacent volumee to add
      */
-    virtual void add(gmds::geom::GeomVolume* AVol);
+    virtual void add(gmds::cad::GeomVolume* AVol);
 
 
 private:
@@ -141,8 +141,8 @@ private:
     Geom::Surface& m_mgx3d_surface;
 
 
-    std::vector<gmds::geom::GeomCurve*> m_curves;
-    std::vector<gmds::geom::GeomVolume*> m_volumes;
+    std::vector<gmds::cad::GeomCurve*> m_curves;
+    std::vector<gmds::cad::GeomVolume*> m_volumes;
 
     /* stored faceted representation of the surface */
     std::vector<gmds::math::Triangle> m_triangulation;

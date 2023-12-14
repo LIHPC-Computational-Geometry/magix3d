@@ -19,7 +19,7 @@
 #include "Group/Group3D.h"
 #include "Internal/InfoCommand.h"
 #include "Topo/TopoHelper.h"
-#include <GMDS/IG/IGMesh.h>
+#include <gmds/ig/Mesh.h>
 #include "Mesh/MeshItf.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
@@ -409,7 +409,7 @@ createSubVolume(std::vector<BlockDirPos>& bloc_dirPos)
     if (!gr->find(sv))
     	gr->add(sv);
 
-    gmds::IGMesh& gmds_mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
+    gmds::Mesh& gmds_mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
 
     // parcours les blocs
     for (std::vector<BlockDirPos>::iterator iter1 = bloc_dirPos.begin();

@@ -15,7 +15,7 @@
 #include "Topo/Block.h"
 #include <vector>
 /*----------------------------------------------------------------------------*/
-#include <GMDS/IG/IGMesh.h>
+#include <gmds/ig/Mesh.h>
 //#include <ConstQualif.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
@@ -132,8 +132,8 @@ public:
     virtual TkUtil::UTF8String getInfo(gmds::Node nd) =0;
 
 	/// Accès au maillage (lecture/écriture car possibilité de création de surfaces/volumes).
-	virtual const gmds::IGMesh& getGMDSMesh ( ) const =0;
-	virtual gmds::IGMesh& getGMDSMesh ( ) = 0;
+	virtual const gmds::Mesh& getGMDSMesh ( ) const =0;
+	virtual gmds::Mesh& getGMDSMesh ( ) = 0;
 
 	/// Réinitialise la structure GMDS pour le maillage en sortie, avec nouvelle dimension
 	virtual void updateMeshDim() =0;

@@ -69,7 +69,7 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
     std::cout <<"Maillage de la face commune "<<fa->getName()<<" avec la méthode de Delaunay (version GMSH)"<<std::endl;
 #endif
 
-    gmds::IGMesh& gmds_mesh = getGMDSMesh();
+    gmds::Mesh& gmds_mesh = getGMDSMesh();
     Msg::ResetErrorCounter();
 
     Topo::FaceMeshingPropertyDelaunayGMSH* prop =
@@ -320,16 +320,16 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
 
                     MVertex* mvtx = new MEdgeVertex(pt.getX(), pt.getY(),pt.getZ(), gedge, param);
 
-                    cor_gmdsNode_gmshVertex[nd.getID()] = mvtx;
-                    cor_gmshVertex_gmdsNode[mvtx] = nd.getID();
+                    cor_gmdsNode_gmshVertex[nd.id()] = mvtx;
+                    cor_gmshVertex_gmdsNode[mvtx] = nd.id();
 
                     mesh_vertices.push_back(mvtx);
                 //}
             }
 
             for (uint j=0; j<edge_nodes.size()-1; j++){
-                MVertex* mvtx1 = cor_gmdsNode_gmshVertex[edge_nodes[j].getID()];
-                MVertex* mvtx2 = cor_gmdsNode_gmshVertex[edge_nodes[j+1].getID()];
+                MVertex* mvtx1 = cor_gmdsNode_gmshVertex[edge_nodes[j].id()];
+                MVertex* mvtx2 = cor_gmdsNode_gmshVertex[edge_nodes[j+1].id()];
                 lines.push_back(new MLine(mvtx1, mvtx2));
             }
 #ifdef _DEBUG_MESH
@@ -418,9 +418,9 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
                 if(cor_gmshVertex_gmdsNode.find(mvtx)==cor_gmshVertex_gmdsNode.end())
                 {
                     nd = getGMDSMesh().newNode(mvtx->x(), mvtx->y(), mvtx->z());
-                    fa_node_ids.push_back(nd.getID());
-                    command->addCreatedNode(nd.getID());
-                    cor_gmshVertex_gmdsNode[mvtx] = nd.getID();
+                    fa_node_ids.push_back(nd.id());
+                    command->addCreatedNode(nd.id());
+                    cor_gmshVertex_gmdsNode[mvtx] = nd.id();
                 }
                 else
                     nd = gmds_mesh.get<gmds::Node>(cor_gmshVertex_gmdsNode[mvtx]);
@@ -439,8 +439,8 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
 #endif
 
             gmds::Face t1 = getGMDSMesh().newTriangle(n1,n2,n3);
-            fa_face_ids.push_back(t1.getID());
-            command->addCreatedFace(t1.getID());
+            fa_face_ids.push_back(t1.id());
+            command->addCreatedFace(t1.id());
         }
     }
 

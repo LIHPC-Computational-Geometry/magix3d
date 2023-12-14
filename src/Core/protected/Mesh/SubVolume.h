@@ -12,7 +12,8 @@
 /*----------------------------------------------------------------------------*/
 #include "Mesh/Volume.h"
 #include <TkUtil/UTF8String.h>
-#include <GMDS/IG/Region.h>
+#include <gmds/ig/Region.h>
+
 /*----------------------------------------------------------------------------*/
 namespace gmds {
 class Region;
@@ -86,7 +87,7 @@ public:
     void addRegion(gmds::Region& reg);
 
     /// ajoute un vecteur de polyèdres à la liste
-    void addRegion(std::vector<gmds::Region> reg);
+    void addRegion(std::vector<gmds::Region> regs);
 
     ///  Fournit l'accès aux regions (polyèdres) GMDS
     virtual void getGMDSRegions(std::vector<gmds::Region>& ARegions) const;

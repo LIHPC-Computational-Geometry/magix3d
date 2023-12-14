@@ -22,7 +22,7 @@
 #include <TkUtil/Exception.h>
 #include <TkUtil/UTF8String.h>
 /*----------------------------------------------------------------------------*/
-#include <GMDS/IG/Node.h>
+#include <gmds/ig/Node.h>
 /*----------------------------------------------------------------------------*/
 //Mesquite
 #include "InstructionQueue.hpp"

@@ -14,8 +14,9 @@
 #include <Mesh/MeshItf.h>
 #include <Mesh/Surface.h>
 /*----------------------------------------------------------------------------*/
-#include <GMDS/IG/IGMesh.h>
-#include <GMDS/IO/VTKWriter.h>
+#include <gmds/ig/Mesh.h>
+#include <gmds/io/IGMeshIOService.h>
+#include <gmds/io/VTKWriter.h>
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
 #include <iostream>
@@ -99,24 +100,18 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 //	m_context.getLocalMeshManager().getSurfaces(surfaces);
 //	m_context.getLocalMeshManager().getClouds(clouds);
 
-	gmds::IGMesh& mesh = m_context.getLocalMeshManager().getMesh()->getGMDSMesh();
+	gmds::Mesh& mesh = m_context.getLocalMeshManager().getMesh()->getGMDSMesh();
 
 	std::cerr<<"m_context.getLocalMeshManager().getNbNodes() "<<m_context.getLocalMeshManager().getNbNodes()<<std::endl;
 	std::cerr<<"mesh.getNbNodes() "<<mesh.getNbNodes()<<std::endl;
 
 	{
-		gmds::IGMesh::node_iterator itn = mesh.nodes_begin();
-
-		for(; !itn.isDone(); itn.next()) {
-
-		}
-
 		// surfaces
 		for(unsigned int iCoFace=0; iCoFace<topo_cofaces.size(); iCoFace++) {
 
 			Geom::Surface* surf_tmp = dynamic_cast<Geom::Surface*> (topo_cofaces[iCoFace]->getGeomAssociation());
 			CHECK_NULL_PTR_ERROR(surf_tmp);
-			gmds::IGMesh::surface& surf = mesh.newSurface(surf_tmp->getName());
+			auto surf = mesh.newGroup<gmds::Face>(surf_tmp->getName());
 
 			std::vector<gmds::TCellID>& elems = topo_cofaces[iCoFace]->faces();
 			std::vector<gmds::Face> face_elems;
@@ -125,7 +120,7 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 			    face_elems[iGMDSFace] = mesh.get<gmds::Face>(elems[iGMDSFace]);
 			}
 			for(unsigned int iGMDSFace=0; iGMDSFace<elems.size(); iGMDSFace++) {
-				surf.add(face_elems[iGMDSFace]);
+				surf->add(face_elems[iGMDSFace]);
 			}
 		}
 
@@ -134,7 +129,7 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 
 		    Geom::Curve* curv_tmp = dynamic_cast<Geom::Curve*> (topo_coedges[iCoEdge]->getGeomAssociation());
 		    CHECK_NULL_PTR_ERROR(curv_tmp);
-		    gmds::IGMesh::cloud& cl = mesh.newCloud(curv_tmp->getName());
+		    auto cl = mesh.newGroup<gmds::Node>(curv_tmp->getName());
 
 		    std::vector<gmds::TCellID>& elems = topo_coedges[iCoEdge]->nodes();
 
@@ -144,7 +139,7 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 		        node_elems[iGMDSFace] = mesh.get<gmds::Node>(elems[iGMDSFace]);
 		    }
 		    for(unsigned int iGMDSNode=0; iGMDSNode<elems.size(); iGMDSNode++) {
-		        cl.add(node_elems[iGMDSNode]);
+		        cl->add(node_elems[iGMDSNode]);
 		    }
 		}
 
@@ -153,19 +148,18 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 
 			Geom::Vertex* vert_tmp = dynamic_cast<Geom::Vertex*> (topo_vertices[iVertex]->getGeomAssociation());
 			CHECK_NULL_PTR_ERROR(vert_tmp);
-			gmds::IGMesh::cloud& cl = mesh.newCloud(vert_tmp->getName());
-
+			auto cl = mesh.newGroup<gmds::Node>(vert_tmp->getName());
 			gmds::Node elem = mesh.get<gmds::Node>(topo_vertices[iVertex]->getNode());
 
-			cl.add(elem);
+			cl->add(elem);
 		}
 	}
 
 //	//post process
 //    {
-//        gmds::IGMesh::cloud& cl1 = mesh.getCloud("Crb0006");
-//        gmds::IGMesh::cloud& cl2 = mesh.getCloud("Crb0007");
-//        gmds::IGMesh::cloud& cl  = mesh.newCloud("composite6-7");
+//        gmds::Mesh::cloud& cl1 = mesh.getCloud("Crb0006");
+//        gmds::Mesh::cloud& cl2 = mesh.getCloud("Crb0007");
+//        gmds::Mesh::cloud& cl  = mesh.newCloud("composite6-7");
 //
 //        std::vector<gmds::TCellID> cl1_nodes = cl1.cellIDs();
 //        std::vector<gmds::TCellID> cl2_nodes = cl2.cellIDs();
@@ -187,9 +181,9 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 //
 //    }
 //    {
-//        gmds::IGMesh::cloud& cl1 = mesh.getCloud("Crb0009");
-//        gmds::IGMesh::cloud& cl2 = mesh.getCloud("Crb0010");
-//        gmds::IGMesh::cloud& cl  = mesh.newCloud("composite9-10");
+//        gmds::Mesh::cloud& cl1 = mesh.getCloud("Crb0009");
+//        gmds::Mesh::cloud& cl2 = mesh.getCloud("Crb0010");
+//        gmds::Mesh::cloud& cl  = mesh.newCloud("composite9-10");
 //
 //        std::vector<gmds::TCellID> cl1_nodes = cl1.cellIDs();
 //        std::vector<gmds::TCellID> cl2_nodes = cl2.cellIDs();
@@ -210,8 +204,11 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 //        }
 //
 //    }
-	gmds::VTKWriter<gmds::IGMesh> writer(mesh);
-	writer.write(m_filename,gmds::N|gmds::F);
+	gmds::IGMeshIOService ioService(&mesh);
+	gmds::VTKWriter writer(&ioService);
+	writer.setCellOptions(gmds::N|gmds::F);
+	writer.setDataOptions(gmds::N|gmds::F);
+	writer.write(m_filename);
 
     //std::cerr<<"ExportVTKImplementation::perform --->PAS IMPLEMENTE"<<std::endl;
 }

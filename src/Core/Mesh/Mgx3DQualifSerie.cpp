@@ -17,7 +17,7 @@ namespace Mesh
 {
 
 Mgx3DQualifSerie::Mgx3DQualifSerie (
-	gmds::IGMesh::surface& s, const std::string& name,
+	gmds::CellGroup<gmds::Face>& s, const std::string& name,
 	const std::string& fileName, Mgx3D::Mesh::MeshEntity* me)
 	: GQualif::GMDSQualifSerie (s, name, fileName), _meshEntity (me)
 {
@@ -25,7 +25,7 @@ Mgx3DQualifSerie::Mgx3DQualifSerie (
 
 
 Mgx3DQualifSerie::Mgx3DQualifSerie (
-	 gmds::IGMesh::volume& v, const std::string& name,
+	gmds::CellGroup<gmds::Region>& v, const std::string& name,
 	const std::string& fileName, Mgx3D::Mesh::MeshEntity* me)
 	: GQualif::GMDSQualifSerie (v, name, fileName), _meshEntity (me)
 {
@@ -34,7 +34,7 @@ Mgx3DQualifSerie::Mgx3DQualifSerie (
 
 Mgx3DQualifSerie::Mgx3DQualifSerie (const Mgx3DQualifSerie&)
 	: GQualif::GMDSQualifSerie (
-			*new gmds::IGMesh::surface (0, ""),
+			*new gmds::CellGroup<gmds::Face>(new gmds::Mesh(0),"Invalid mesh name"),
 			"Invalid serie name", "Invalid file name")
 {
 	MGX_FORBIDDEN ("Mgx3DQualifSerie copy constructor is not allowed.")

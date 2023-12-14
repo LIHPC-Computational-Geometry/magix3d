@@ -8,7 +8,7 @@
 /*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
 #include "Geom/GMDSGeomManagerAdapter.h"
-#include <GMDS/Math/Triangle.h>
+#include <gmds/math/Triangle.h>
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
@@ -58,8 +58,8 @@ GMDSGeomManagerAdapter::GMDSGeomManagerAdapter(Mgx3D::Geom::GeomManager& AMgx3DG
         verticesMgx[iPoint]->get(curves);
 
         for(unsigned int iCurve=0; iCurve<curves.size(); iCurve++) {
-            std::vector<gmds::geom::GeomCurve*> curves_tmp;
-            m_mgx2gmdsPoints[verticesMgx[iPoint]]->get(curves_tmp);
+            std::vector<gmds::cad::GeomCurve*> curves_tmp(m_mgx2gmdsPoints[verticesMgx[iPoint]]->curves());
+
             bool found = false;
             for(unsigned int iCurve_tmp=0; iCurve_tmp<curves_tmp.size(); iCurve_tmp++) {
                 if(curves_tmp[iCurve_tmp] == m_mgx2gmdsCurves[curves[iCurve]]) {
@@ -67,7 +67,7 @@ GMDSGeomManagerAdapter::GMDSGeomManagerAdapter(Mgx3D::Geom::GeomManager& AMgx3DG
                 }
             }
             if(!found) {
-                m_mgx2gmdsPoints[verticesMgx[iPoint]]->add(m_mgx2gmdsCurves[curves[iCurve]]);
+                m_mgx2gmdsPoints[verticesMgx[iPoint]]->curves().push_back(m_mgx2gmdsCurves[curves[iCurve]]);
             }
         }
     }
@@ -77,8 +77,7 @@ GMDSGeomManagerAdapter::GMDSGeomManagerAdapter(Mgx3D::Geom::GeomManager& AMgx3DG
         curvesMgx[iCurve]->get(points);
 
         for(unsigned int iPoint=0; iPoint<points.size(); iPoint++) {
-            std::vector<gmds::geom::GeomPoint*> points_tmp;
-            m_mgx2gmdsCurves[curvesMgx[iCurve]]->get(points_tmp);
+            std::vector<gmds::cad::GeomPoint*> points_tmp(m_mgx2gmdsCurves[curvesMgx[iCurve]]->points());
             bool found = false;
             for(unsigned int iPoint_tmp=0; iPoint_tmp<points_tmp.size(); iPoint_tmp++) {
                 if(points_tmp[iPoint_tmp] == m_mgx2gmdsPoints[points[iPoint]]) {
@@ -86,7 +85,7 @@ GMDSGeomManagerAdapter::GMDSGeomManagerAdapter(Mgx3D::Geom::GeomManager& AMgx3DG
                 }
             }
             if(!found) {
-                m_mgx2gmdsCurves[curvesMgx[iCurve]]->add(m_mgx2gmdsPoints[points[iPoint]]);
+                m_mgx2gmdsCurves[curvesMgx[iCurve]]->points().push_back(m_mgx2gmdsPoints[points[iPoint]]);
             }
         }
 
@@ -94,8 +93,7 @@ GMDSGeomManagerAdapter::GMDSGeomManagerAdapter(Mgx3D::Geom::GeomManager& AMgx3DG
         curvesMgx[iCurve]->get(surfaces);
 
         for(unsigned int iSurf=0; iSurf<surfaces.size(); iSurf++) {
-            std::vector<gmds::geom::GeomSurface*> surfaces_tmp;
-            m_mgx2gmdsCurves[curvesMgx[iCurve]]->get(surfaces_tmp);
+            std::vector<gmds::cad::GeomSurface*> surfaces_tmp(m_mgx2gmdsCurves[curvesMgx[iCurve]]->surfaces());
             bool found = false;
             for(unsigned int iSurf_tmp=0; iSurf_tmp<surfaces_tmp.size(); iSurf_tmp++) {
                 if(surfaces_tmp[iSurf_tmp] == m_mgx2gmdsSurfaces[surfaces[iSurf]]) {
@@ -103,7 +101,7 @@ GMDSGeomManagerAdapter::GMDSGeomManagerAdapter(Mgx3D::Geom::GeomManager& AMgx3DG
                 }
             }
             if(!found) {
-                m_mgx2gmdsCurves[curvesMgx[iCurve]]->add(m_mgx2gmdsSurfaces[surfaces[iSurf]]);
+                m_mgx2gmdsCurves[curvesMgx[iCurve]]->surfaces().push_back(m_mgx2gmdsSurfaces[surfaces[iSurf]]);
             }
         }
     }
@@ -113,8 +111,7 @@ GMDSGeomManagerAdapter::GMDSGeomManagerAdapter(Mgx3D::Geom::GeomManager& AMgx3DG
         surfacesMgx[iSurf]->get(curves);
 
         for(unsigned int iCurve=0; iCurve<curves.size(); iCurve++) {
-            std::vector<gmds::geom::GeomCurve*> curves_tmp;
-            m_mgx2gmdsSurfaces[surfacesMgx[iSurf]]->get(curves_tmp);
+            std::vector<gmds::cad::GeomCurve*> curves_tmp(m_mgx2gmdsSurfaces[surfacesMgx[iSurf]]->curves());
             bool found = false;
             for(unsigned int iCurve_tmp=0; iCurve_tmp<curves_tmp.size(); iCurve_tmp++) {
                 if(curves_tmp[iCurve_tmp] == m_mgx2gmdsCurves[curves[iCurve]]) {
@@ -122,7 +119,7 @@ GMDSGeomManagerAdapter::GMDSGeomManagerAdapter(Mgx3D::Geom::GeomManager& AMgx3DG
                 }
             }
             if(!found) {
-                m_mgx2gmdsSurfaces[surfacesMgx[iSurf]]->add(m_mgx2gmdsCurves[curves[iCurve]]);
+                m_mgx2gmdsSurfaces[surfacesMgx[iSurf]]->curves().push_back(m_mgx2gmdsCurves[curves[iCurve]]);
             }
         }
 
@@ -130,8 +127,7 @@ GMDSGeomManagerAdapter::GMDSGeomManagerAdapter(Mgx3D::Geom::GeomManager& AMgx3DG
         surfacesMgx[iSurf]->get(volumes);
 
         for(unsigned int iVol=0; iVol<volumes.size(); iVol++) {
-            std::vector<gmds::geom::GeomVolume*> volumes_tmp;
-            m_mgx2gmdsSurfaces[surfacesMgx[iSurf]]->get(volumes_tmp);
+            std::vector<gmds::cad::GeomVolume*> volumes_tmp(m_mgx2gmdsSurfaces[surfacesMgx[iSurf]]->volumes());
             bool found = false;
             for(unsigned int iVol_tmp=0; iVol_tmp<volumes_tmp.size(); iVol_tmp++) {
                 if(volumes_tmp[iVol_tmp] == m_mgx2gmdsVolumes[volumes[iVol]]) {
@@ -139,7 +135,7 @@ GMDSGeomManagerAdapter::GMDSGeomManagerAdapter(Mgx3D::Geom::GeomManager& AMgx3DG
                 }
             }
             if(!found) {
-                m_mgx2gmdsSurfaces[surfacesMgx[iSurf]]->add(m_mgx2gmdsVolumes[volumes[iVol]]);
+                m_mgx2gmdsSurfaces[surfacesMgx[iSurf]]->volumes().push_back(m_mgx2gmdsVolumes[volumes[iVol]]);
             }
         }
     }
@@ -149,8 +145,7 @@ GMDSGeomManagerAdapter::GMDSGeomManagerAdapter(Mgx3D::Geom::GeomManager& AMgx3DG
         volumesMgx[iVol]->get(surfaces);
 
         for(unsigned int iSurf=0; iSurf<surfaces.size(); iSurf++) {
-            std::vector<gmds::geom::GeomSurface*> surfaces_tmp;
-            m_mgx2gmdsVolumes[volumesMgx[iVol]]->get(surfaces_tmp);
+            std::vector<gmds::cad::GeomSurface*> surfaces_tmp(m_mgx2gmdsVolumes[volumesMgx[iVol]]->surfaces());
             bool found = false;
             for(unsigned int iSurf_tmp=0; iSurf_tmp<surfaces_tmp.size(); iSurf_tmp++) {
                 if(surfaces_tmp[iSurf_tmp] == m_mgx2gmdsSurfaces[surfaces[iSurf]]) {
@@ -158,7 +153,7 @@ GMDSGeomManagerAdapter::GMDSGeomManagerAdapter(Mgx3D::Geom::GeomManager& AMgx3DG
                 }
             }
             if(!found) {
-                m_mgx2gmdsVolumes[volumesMgx[iVol]]->add(m_mgx2gmdsSurfaces[surfaces[iSurf]]);
+                m_mgx2gmdsVolumes[volumesMgx[iVol]]->surfaces().push_back(m_mgx2gmdsSurfaces[surfaces[iSurf]]);
             }
         }
     }
@@ -170,25 +165,25 @@ GMDSGeomManagerAdapter::~GMDSGeomManagerAdapter()
 
 }
 /*----------------------------------------------------------------------------*/
-gmds::geom::GeomVolume* GMDSGeomManagerAdapter::
+gmds::cad::GeomVolume* GMDSGeomManagerAdapter::
 newVolume()
 {
     throw TkUtil::Exception (TkUtil::UTF8String ("GMDSGeomManagerAdapter::newVolume pas disponible.", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
-gmds::geom::GeomSurface* GMDSGeomManagerAdapter::
+gmds::cad::GeomSurface* GMDSGeomManagerAdapter::
 newSurface()
 {
     throw TkUtil::Exception (TkUtil::UTF8String ("GMDSGeomManagerAdapter::newSurface pas disponible.", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
-gmds::geom::GeomCurve* GMDSGeomManagerAdapter::
+gmds::cad::GeomCurve* GMDSGeomManagerAdapter::
 newCurve()
 {
     throw TkUtil::Exception (TkUtil::UTF8String ("GMDSGeomManagerAdapter::newCurve pas disponible.", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
-gmds::geom::GeomPoint* GMDSGeomManagerAdapter::
+gmds::cad::GeomPoint* GMDSGeomManagerAdapter::
 newPoint()
 {
     throw TkUtil::Exception (TkUtil::UTF8String ("GMDSGeomManagerAdapter::newPoint pas disponible.", TkUtil::Charset::UTF_8));
@@ -219,7 +214,7 @@ getNbVolumes() const
 }
 /*----------------------------------------------------------------------------*/
 void GMDSGeomManagerAdapter::
-getVolumes(std::vector<gmds::geom::GeomVolume*>& AVolumes) const
+getVolumes(std::vector<gmds::cad::GeomVolume*>& AVolumes) const
 {
     AVolumes.clear();
 
@@ -229,7 +224,7 @@ getVolumes(std::vector<gmds::geom::GeomVolume*>& AVolumes) const
 }
 /*----------------------------------------------------------------------------*/
 void GMDSGeomManagerAdapter::
-getSurfaces(std::vector<gmds::geom::GeomSurface*>& ASurfaces) const
+getSurfaces(std::vector<gmds::cad::GeomSurface*>& ASurfaces) const
 {
     ASurfaces.clear();
 
@@ -239,7 +234,7 @@ getSurfaces(std::vector<gmds::geom::GeomSurface*>& ASurfaces) const
 }
 /*----------------------------------------------------------------------------*/
 void GMDSGeomManagerAdapter::
-getCurves(std::vector<gmds::geom::GeomCurve*>& ACurves) const
+getCurves(std::vector<gmds::cad::GeomCurve*>& ACurves) const
 {
     ACurves.clear();
 
@@ -249,7 +244,7 @@ getCurves(std::vector<gmds::geom::GeomCurve*>& ACurves) const
 }
 /*----------------------------------------------------------------------------*/
 void GMDSGeomManagerAdapter::
-getPoints(std::vector<gmds::geom::GeomPoint*>& APoints) const
+getPoints(std::vector<gmds::cad::GeomPoint*>& APoints) const
 {
     APoints.clear();
 
@@ -263,11 +258,11 @@ exportTriangulation(const std::string& AFilename) const
 {
 //    Lima::Maillage m;
 //
-//    std::vector<gmds::geom::GeomVolume*> volumes;
+//    std::vector<gmds::cad::GeomVolume*> volumes;
 //    this->getVolumes(volumes);
 //
 //    for(unsigned int iVolume=0; iVolume<volumes.size(); iVolume++) {
-//        std::vector<gmds::geom::GeomSurface*> surfaces;
+//        std::vector<gmds::cad::GeomSurface*> surfaces;
 //        volumes[iVolume]->get(surfaces);
 //
 //        for(unsigned int iSurface=0; iSurface<surfaces.size(); iSurface++) {
@@ -287,25 +282,25 @@ exportTriangulation(const std::string& AFilename) const
     throw TkUtil::Exception (TkUtil::UTF8String ("GMDSGeomManagerAdapter::exportTriangulation pas disponible.", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
-gmds::geom::GeomPoint* GMDSGeomManagerAdapter::
+gmds::cad::GeomPoint* GMDSGeomManagerAdapter::
 getGMDSVertex(Mgx3D::Geom::Vertex* AVertex)
 {
     return m_mgx2gmdsPoints[AVertex];
 }
 /*----------------------------------------------------------------------------*/
-gmds::geom::GeomCurve* GMDSGeomManagerAdapter::
+gmds::cad::GeomCurve* GMDSGeomManagerAdapter::
 getGMDSCurve(Mgx3D::Geom::Curve* ACurve)
 {
     return m_mgx2gmdsCurves[ACurve];
 }
 /*----------------------------------------------------------------------------*/
-gmds::geom::GeomSurface* GMDSGeomManagerAdapter::
+gmds::cad::GeomSurface* GMDSGeomManagerAdapter::
 getGMDSSurface(Mgx3D::Geom::Surface* ASurf)
 {
     return m_mgx2gmdsSurfaces[ASurf];
 }
 /*----------------------------------------------------------------------------*/
-gmds::geom::GeomVolume* GMDSGeomManagerAdapter::
+gmds::cad::GeomVolume* GMDSGeomManagerAdapter::
 getGMDSVolume(Mgx3D::Geom::Volume* AVol)
 {
     return m_mgx2gmdsVolumes[AVol];
@@ -332,7 +327,7 @@ reorientSurfacesTriangulation(Mgx3D::Geom::Volume* AVol)
 
 	// we remove flat triangles in every surface of the model
 	{
-		std::vector<gmds::geom::GeomSurface*> surfaces;
+		std::vector<gmds::cad::GeomSurface*> surfaces;
 		this->getSurfaces(surfaces);
 
 		for(unsigned int iSurf=0; iSurf<surfaces.size(); iSurf++) {

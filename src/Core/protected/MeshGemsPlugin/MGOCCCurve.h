@@ -9,8 +9,8 @@
 /*----------------------------------------------------------------------------*/
 // GMDS File Headers
 /*----------------------------------------------------------------------------*/
-#include <GMDS/Utils/CommonTypes.h>
-#include <GMDS/Math/Point.h>
+#include <gmds/utils/CommonTypes.h>
+#include <gmds/math/Point.h>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
 

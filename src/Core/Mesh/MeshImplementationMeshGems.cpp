@@ -574,7 +574,7 @@ meshTriangularMeshGems(Mesh::CommandCreateMesh* command, Topo::CoFace* fa)
 //						if(p.isEpsilonEqual(pi,epsilon)){
 						if(std::fabs(p.getX()-pi.getX())<epsilonLocal && std::fabs(p.getY()-pi.getY())<epsilonLocal && std::fabs(p.getZ()-pi.getZ())<epsilonLocal) {
 							found_node = true;
-							node_ids[i] = ni.getID();
+							node_ids[i] = ni.id()();
 						}
 					}
 
@@ -591,8 +591,8 @@ meshTriangularMeshGems(Mesh::CommandCreateMesh* command, Topo::CoFace* fa)
 			// Nouveau noeud de maillage
 
 			nd = getGMDSMesh().newNode(x, y, z);
-			command->addCreatedNode(nd.getID());
-			node_ids[i] =nd.getID();
+			command->addCreatedNode(nd.id()());
+			node_ids[i] =nd.id()();
 		}
 
 	}
@@ -613,8 +613,8 @@ meshTriangularMeshGems(Mesh::CommandCreateMesh* command, Topo::CoFace* fa)
 		fd_nodes[1] = getGMDSMesh().get<gmds::Node>(node_ids[current_nodes[1]]) ;
 		fd_nodes[2] = getGMDSMesh().get<gmds::Node>(node_ids[current_nodes[2]]) ;
 		gmds::Face fd = getGMDSMesh().newTriangle(fd_nodes[0], fd_nodes[1], fd_nodes[2]);
-		elem.push_back(fd.getID());
-		command->addCreatedFace(fd.getID());
+		elem.push_back(f[iNode].id()());
+		command->addCreatedFace(f[iNode].id()());
 	}
 
 	std::vector<std::string> groupsName;
