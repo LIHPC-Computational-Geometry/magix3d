@@ -161,23 +161,23 @@ private :
 	/**
 	 * Créé la représentation surfacique VTK pour cas 2D
 	 */
-	virtual void createMeshEntitySurfacicRepresentation2D(Mesh::MeshEntity* meshEntity, gmds::IGMesh& gmdsMesh);
+	virtual void createMeshEntitySurfacicRepresentation2D(Mesh::MeshEntity* meshEntity, gmds::Mesh& gmdsMesh);
 
 	/**
 	 * Créé la représentation surfacique VTK pour cas 3D
 	 */
-	virtual void createMeshEntitySurfacicRepresentation3D(Mesh::MeshEntity* meshEntity, gmds::IGMesh& gmdsMesh);
+	virtual void createMeshEntitySurfacicRepresentation3D(Mesh::MeshEntity* meshEntity, gmds::Mesh& gmdsMesh);
 
 
 	/**
 	 * Créé la représentation surfacique VTK pour des cofaces sans ratio de dégradation
 	 */
-	virtual void createCoFacesSurfacicRepresentationRatio1(std::vector<Topo::CoFace*> cofaces, gmds::IGMesh& gmdsMesh);
+	virtual void createCoFacesSurfacicRepresentationRatio1(std::vector<Topo::CoFace*> cofaces, gmds::Mesh& gmdsMesh);
 
 	/**
 	 * Créé la représentation surfacique VTK pour des cofaces avec ratio de dégradation
 	 */
-	virtual void createCoFacesSurfacicRepresentationRatioN(std::vector<Topo::CoFace*> cofaces, gmds::IGMesh& gmdsMesh, int ratio);
+	virtual void createCoFacesSurfacicRepresentationRatioN(std::vector<Topo::CoFace*> cofaces, gmds::Mesh& gmdsMesh, int ratio);
 
 
 	/**

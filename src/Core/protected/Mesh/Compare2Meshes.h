@@ -10,7 +10,7 @@
 #ifndef COMPARE2MESHES_H_
 #define COMPARE2MESHES_H_
 /*----------------------------------------------------------------------------*/
-#include "GMDS/IG/IGMesh.h"
+#include "gmds/ig/Mesh.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -33,7 +33,7 @@ namespace Mesh {
 class Compare2Meshes {
 public:
     /// constructeur avec 2 maillages chargés
-    Compare2Meshes(Internal::Context* context, gmds::IGMesh& mesh1, gmds::IGMesh& mesh2);
+    Compare2Meshes(Internal::Context* context, gmds::Mesh& mesh1, gmds::Mesh& mesh2);
 
     ~Compare2Meshes() {}
 
@@ -54,8 +54,8 @@ private:
     /** le contexte */
     Internal::Context* m_context;
 
-    gmds::IGMesh& m_gmds_mesh1;
-    gmds::IGMesh& m_gmds_mesh2;
+    gmds::Mesh& m_gmds_mesh1;
+    gmds::Mesh& m_gmds_mesh2;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Mesh

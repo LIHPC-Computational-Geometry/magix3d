@@ -14,8 +14,8 @@
 #include <Mesh/MeshItf.h>
 #include <Mesh/Surface.h>
 /*----------------------------------------------------------------------------*/
-#include <GMDS/IG/IGMesh.h>
-#include "GMDSCEA/GMDSCEAWriter.h"
+#include <gmds/ig/Mesh.h>
+#include <gmds/io/LimaWriter.h>
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
 #include <iostream>
@@ -46,7 +46,7 @@ void ExportMLIImplementation::perform(Internal::InfoCommand* icmd)
 {
 
 	gmds::MeshModel mod = gmds::DIM3|gmds::N|gmds::E|gmds::F|gmds::E2N|gmds::F2N;
-	gmds::IGMesh mesh(mod);
+	gmds::Mesh mesh(mod);
 
 	try {
 		std::vector<std::string> surfacesNames = m_context.getLocalGeomManager().getSurfaces();
@@ -55,13 +55,13 @@ void ExportMLIImplementation::perform(Internal::InfoCommand* icmd)
 			std::vector<gmds::math::Triangle> triangles;
 			surf->getFacetedRepresentation(triangles);
 
-			gmds::IGMesh::surface& surf_group = mesh.newSurface(surfacesNames[iSurf]);
+			auto surf_group = mesh.getGroup<gmds::Face>(iSurf);
 			for(int iTri=0; iTri<triangles.size(); iTri++) {
 				gmds::Node n0 = mesh.newNode(triangles[iTri].getPoint(0));
 				gmds::Node n1 = mesh.newNode(triangles[iTri].getPoint(1));
 				gmds::Node n2 = mesh.newNode(triangles[iTri].getPoint(2));
 				gmds::Face f = mesh.newTriangle(n0,n1,n2);
-				surf_group.add(f);
+				surf_group->add(f);
 			}
 		}
 
@@ -71,12 +71,12 @@ void ExportMLIImplementation::perform(Internal::InfoCommand* icmd)
 			std::vector<gmds::math::Triangle> triangles;
 			curv->getFacetedRepresentation(triangles);
 
-			gmds::IGMesh::line& line_group = mesh.newLine(curvesNames[iCurv]);
+			auto line_group = mesh.getGroup<gmds::Edge>(curvesNames[iCurv]);
 			for(int iTri=0; iTri<triangles.size(); iTri++) {
 				gmds::Node n0 = mesh.newNode(triangles[iTri].getPoint(0));
 				gmds::Node n1 = mesh.newNode(triangles[iTri].getPoint(1));
 				gmds::Edge e = mesh.newEdge(n0,n1);
-				line_group.add(e);
+				line_group->add(e);
 			}
 		}
 
@@ -86,10 +86,10 @@ void ExportMLIImplementation::perform(Internal::InfoCommand* icmd)
 			std::vector<gmds::math::Triangle> triangles;
 			vert->getFacetedRepresentation(triangles);
 
-			gmds::IGMesh::cloud& cloud_group = mesh.newCloud(verticesNames[iVert]);
+			auto cloud_group = mesh.newGroup<gmds::Node>(verticesNames[iVert]);
 			for(int iTri=0; iTri<triangles.size(); iTri++) {
 				gmds::Node n = mesh.newNode(triangles[iTri].getPoint(0));
-				cloud_group.add(n);
+				cloud_group->add(n);
 			}
 		}
 	}
@@ -108,7 +108,7 @@ void ExportMLIImplementation::perform(Internal::InfoCommand* icmd)
 		}
 
 		bool	implemented	= false;
-		gmds::GMDSCEAWriter lw(mesh);
+		gmds::LimaWriter lw(mesh);
 		lw.setLengthUnit(convertFactorToMeter);
 		lw.write(m_filename, gmds::R|gmds::F|gmds::E|gmds::N);
 		implemented	= true;

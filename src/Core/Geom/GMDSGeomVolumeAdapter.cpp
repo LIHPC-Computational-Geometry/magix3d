@@ -33,13 +33,12 @@ GMDSGeomVolumeAdapter::~GMDSGeomVolumeAdapter()
 }
 /*----------------------------------------------------------------------------*/
 void GMDSGeomVolumeAdapter::
-get(std::vector<gmds::geom::GeomPoint*>& APnt) const
+get(std::vector<gmds::cad::GeomPoint*>& APnt) const
 {
-    std::set<gmds::geom::GeomPoint* > points_set;
+    std::set<gmds::cad::GeomPoint* > points_set;
     for(unsigned int i=0;i<m_surfaces.size();i++)
     {
-        std::vector<gmds::geom::GeomPoint* > p_i;
-        m_surfaces[i]->get(p_i);
+        std::vector<gmds::cad::GeomPoint* > p_i(m_surfaces[i]->points());
         points_set.insert(p_i.begin(),p_i.end());
     }
     APnt.clear();
@@ -47,13 +46,12 @@ get(std::vector<gmds::geom::GeomPoint*>& APnt) const
 }
 /*----------------------------------------------------------------------------*/
 void GMDSGeomVolumeAdapter::
-get(std::vector<gmds::geom::GeomCurve*>& ACur) const
+get(std::vector<gmds::cad::GeomCurve*>& ACur) const
 {
-    std::set<gmds::geom::GeomCurve* > curves_set;
+    std::set<gmds::cad::GeomCurve* > curves_set;
     for(unsigned int i=0;i<m_surfaces.size();i++)
     {
-        std::vector<gmds::geom::GeomCurve* > c_i;
-        m_surfaces[i]->get(c_i);
+        std::vector<gmds::cad::GeomCurve* > c_i(m_surfaces[i]->curves());
         curves_set.insert(c_i.begin(),c_i.end());
     }
     ACur.clear();
@@ -61,7 +59,7 @@ get(std::vector<gmds::geom::GeomCurve*>& ACur) const
 }
 /*----------------------------------------------------------------------------*/
 void GMDSGeomVolumeAdapter::
-get(std::vector<gmds::geom::GeomSurface*>& ASurf) const
+get(std::vector<gmds::cad::GeomSurface*>& ASurf) const
 {
     ASurf.clear();
 
@@ -77,6 +75,12 @@ computeBoundingBox(gmds::TCoord minXYZ[3], gmds::TCoord maxXYZ[3]) const
     throw TkUtil::Exception (TkUtil::UTF8String ("GMDSGeomSurfaceAdapter::computeBoundingBox pas disponible.", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
+std::tuple<gmds::TCoord,gmds::TCoord,gmds::TCoord,gmds::TCoord,gmds::TCoord,gmds::TCoord> GMDSGeomVolumeAdapter::
+BBox() const
+{
+    throw TkUtil::Exception (TkUtil::UTF8String ("GMDSGeomSurfaceAdapter::BBox pas disponible.", TkUtil::Charset::UTF_8));
+}
+/*----------------------------------------------------------------------------*/
 gmds::TCoord GMDSGeomVolumeAdapter::
 computeArea() const
 {
@@ -84,7 +88,7 @@ computeArea() const
 }
 /*----------------------------------------------------------------------------*/
 void GMDSGeomVolumeAdapter::
-add(gmds::geom::GeomSurface* ASurf)
+add(gmds::cad::GeomSurface* ASurf)
 {
     m_surfaces.push_back(ASurf);
 }

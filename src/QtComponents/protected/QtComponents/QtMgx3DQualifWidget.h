@@ -15,7 +15,7 @@
 #include "Mesh/MeshItf.h"
 #include "Internal/Context.h"
 
-#include <GMDS/Utils/CommonTypes.h>
+#include <gmds/utils/CommonTypes.h>
 
 
 namespace Mgx3D
@@ -66,14 +66,14 @@ class QtMgx3DQualifWidget : public GQualif::QtQualifWidget
 	 *				sélectionnées.
 	 * \warning		<B>Ces surfaces sont à détruire par l'appelant.</B>
 	 */
-	virtual std::vector<gmds::IGMesh::surface*> getSelectedClassesSurfaces ( );
+	virtual std::vector<gmds::CellGroup<gmds::Face>*> getSelectedClassesSurfaces ( );
 
 	/**
 	 * \return		La liste des volumes correspondant aux classes
 	 *				sélectionnées.
 	 * \warning		<B>Ces volumes sont à détruire par l'appelant.</B>
 	 */
-	virtual std::vector<gmds::IGMesh::volume*> getSelectedClassesVolumes ( );
+	virtual std::vector<gmds::CellGroup<gmds::Region>*> getSelectedClassesVolumes ( );
 
 
 	protected :

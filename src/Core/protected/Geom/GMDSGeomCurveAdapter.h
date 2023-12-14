@@ -17,10 +17,10 @@
 #include "Geom/GMDSGeomPointAdapter.h"
 #include "Geom/GMDSGeomSurfaceAdapter.h"
 /*----------------------------------------------------------------------------*/
-#include "GMDS/CAD/GeomVolume.h"
-#include "GMDS/CAD/GeomSurface.h"
-#include "GMDS/CAD/GeomCurve.h"
-#include "GMDS/CAD/GeomPoint.h"
+#include "gmds/cad/GeomVolume.h"
+#include "gmds/cad/GeomSurface.h"
+#include "gmds/cad/GeomCurve.h"
+#include "gmds/cad/GeomPoint.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -32,7 +32,7 @@ namespace Geom {
  *        les services requis par l'interface GeomCurve de GMDS
  *
  */
-class GMDSGeomCurveAdapter: public gmds::geom::GeomCurve
+class GMDSGeomCurveAdapter: public gmds::cad::GeomCurve
 {
 public:
     /*------------------------------------------------------------------------*/
@@ -50,21 +50,21 @@ public:
      *
      *  \param APnt the adjacent points.
      */
-    virtual void get(std::vector<gmds::geom::GeomPoint*>& APnt) const;
+    virtual void get(std::vector<gmds::cad::GeomPoint*>& APnt) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Access to the adjacent surfaces.
      *
      *  \param ASurf the adjacent surfaces
      */
-    virtual void get(std::vector<gmds::geom::GeomSurface*>& ASurf) const;
+    virtual void get(std::vector<gmds::cad::GeomSurface*>& ASurf) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Access to the adjacent volumes
      *
      *  \param AVol the adjacent volumes.
      */
-    virtual void get(std::vector<gmds::geom::GeomVolume*>& AVol) const;
+    virtual void get(std::vector<gmds::cad::GeomVolume*>& AVol) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Length of the curve
@@ -98,6 +98,8 @@ public:
      */
     virtual void computeBoundingBox(gmds::TCoord minXYZ[3], gmds::TCoord maxXYZ[3]) const;
 
+    virtual std::tuple<gmds::TCoord,gmds::TCoord,gmds::TCoord,gmds::TCoord,gmds::TCoord,gmds::TCoord>  BBox() const;
+
     virtual gmds::TCoord computeDistanceHaussdorf(
             const gmds::math::Segment& ASegment) const;
     virtual gmds::TCoord computeDistanceHaussdorfSubCurve(
@@ -111,7 +113,7 @@ public:
      *  \param AV the tangent vector
      */
     virtual void computeVector(
-            const gmds::geom::GeomPoint& AP,
+            const gmds::cad::GeomPoint& AP,
             gmds::math::Vector& AV) const;
 
     virtual void getMultiplePoints(const int& ANbPoints, gmds::math::Point* APoints) const;
@@ -120,13 +122,13 @@ public:
     /** \brief  Access to the first end point
      *
      */
-    virtual gmds::geom::GeomPoint* getFirstPoint() const;
+    virtual gmds::cad::GeomPoint* getFirstPoint() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Access to the second end point
      *
      */
-    virtual gmds::geom::GeomPoint* getSecondPoint() const;
+    virtual gmds::cad::GeomPoint* getSecondPoint() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Return whether the curve is a loop or not
@@ -141,7 +143,7 @@ public:
      *          in the same direction as the curve's segments
      *
      */
-    virtual gmds::geom::GeomSurface* getLeftSurface() const;
+    virtual gmds::cad::GeomSurface* getLeftSurface() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Access to the surface on the left;
@@ -149,21 +151,21 @@ public:
      *          in the same direction as the curve's segments
      *
      */
-    virtual gmds::geom::GeomSurface* getRightSurface() const;
+    virtual gmds::cad::GeomSurface* getRightSurface() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Add an adjacent point
      *
      *  \param APoint the new adjacent surface to add
      */
-    virtual void add(gmds::geom::GeomPoint* APoint);
+    virtual void add(gmds::cad::GeomPoint* APoint);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Add an adjacent surface
      *
      *  \param ASurf the new adjacent surface to add
      */
-    virtual void add(gmds::geom::GeomSurface* ASurf);
+    virtual void add(gmds::cad::GeomSurface* ASurf);
 
 private:
 
@@ -177,8 +179,8 @@ private:
      * GMDS */
     Geom::Curve& m_mgx3d_curve;
 
-    std::vector<gmds::geom::GeomPoint*> m_points;
-    std::vector<gmds::geom::GeomSurface*> m_surfaces;
+    std::vector<gmds::cad::GeomPoint*> m_points;
+    std::vector<gmds::cad::GeomSurface*> m_surfaces;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

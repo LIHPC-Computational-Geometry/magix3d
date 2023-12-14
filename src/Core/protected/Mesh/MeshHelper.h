@@ -36,9 +36,6 @@ public:
 	/// liste des ids triés, sans doublon sauf au extrémités si cela boucle
 	static std::vector<uint> getOrderedNodesId(std::vector<gmds::Edge> bras);
 
-	/// liste des noeuds (certainement en double)
-	static std::vector<gmds::Node> getNodes(std::vector<gmds::Edge> bras);
-
 private :
 
     /**

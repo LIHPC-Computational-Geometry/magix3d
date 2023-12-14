@@ -9,8 +9,8 @@
 /*----------------------------------------------------------------------------*/
 #include "Smoothing/MesquiteMeshAdapter.h"
 /*----------------------------------------------------------------------------*/
-#include "GMDS/IG/Node.h"
-#include "GMDS/IG/Face.h"
+#include "gmds/ig/Node.h"
+#include "gmds/ig/Face.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
@@ -53,12 +53,12 @@ MesquiteMeshAdapter(std::vector<gmds::Face>& gmdsPolygones,
 	for (uint i=0; i<vertexCount; i++){
 		gmds::Node nd = m_gmdsNodes[i];
 #ifdef _DEBUG2
-		std::cout << " i "<<i<<", "<<nd<<" fixé ? "<<(filtre_nodes[nd.getID()] == maskFixed?"vrai":"faux")<<std::endl;
+		std::cout << " i "<<i<<", "<<nd<<" fixé ? "<<(filtre_nodes[nd.id()] == maskFixed?"vrai":"faux")<<std::endl;
 #endif
-		num_insurf[nd.getID()] = i;
+		num_insurf[nd.id()] = i;
 		myMesh->reset_vertex (i,
 				Mesquite::Vector3D (nd.X(), nd.Y(), nd.Z()),
-				filtre_nodes[nd.getID()] == maskFixed,
+				filtre_nodes[nd.id()] == maskFixed,
 				err);
 	}
 
@@ -74,7 +74,7 @@ MesquiteMeshAdapter(std::vector<gmds::Face>& gmdsPolygones,
 		case 4:
 			elem_type = MESQUITE_NS::QUADRILATERAL;
 			vertices.resize (4);
-			if (isPolyInverted[cell.getID()])
+			if (isPolyInverted[cell.id()])
 				for (size_t j = 0; j < 4; j++)
 					vertices[j] = num_insurf[l_nds[3-j]];
 			else
@@ -84,7 +84,7 @@ MesquiteMeshAdapter(std::vector<gmds::Face>& gmdsPolygones,
 		case 3:
 			elem_type = MESQUITE_NS::TRIANGLE;
 			vertices.resize (3);
-			if (isPolyInverted[cell.getID()])
+			if (isPolyInverted[cell.id()])
 				for (size_t j = 0; j < 3; j++)
 					vertices[j] = num_insurf[l_nds[2-j]];
 			else

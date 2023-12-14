@@ -84,7 +84,7 @@ void SubVolume::getRepresentation(Utils::DisplayRepresentation& dr, bool checkDe
 	{
 	    if (1 == mdr->getDecimationStep ( ))
 	    {
-	        gmds::IGMesh&	gmdsMesh	= meshImpl->getGMDSMesh (m_gmds_id);
+	        gmds::Mesh&	gmdsMesh	= meshImpl->getGMDSMesh (m_gmds_id);
 	        if (false == skin)
 	        {	// Mailles internes comprises
 	            // Constitution d'un vecteur avec les noeuds de la surface
@@ -95,7 +95,7 @@ void SubVolume::getRepresentation(Utils::DisplayRepresentation& dr, bool checkDe
 	            // nombres de références sur les ids dans les polyèdres :
 	            uint	nbRefIds	= 0;
 
-	            gmds::Variable<short>* mark = gmdsMesh.newVariable<short>(gmds::GMDS_NODE,"markSubVol");
+	            gmds::Variable<short>* mark = gmdsMesh.newVariable<short, gmds::GMDS_NODE>("markSubVol");
 	            for (std::vector<gmds::Region>::const_iterator
 	                    iter_p = m_poly.begin(); iter_p != m_poly.end();
 	                    ++iter_p)
@@ -106,11 +106,11 @@ void SubVolume::getRepresentation(Utils::DisplayRepresentation& dr, bool checkDe
 	                        iter_n = nds.begin(); iter_n != nds.end(); ++iter_n)
 	                {
 	                    gmds::Node current = *iter_n;
-	                    if((*mark)[current.getID()]==0)
+	                    if((*mark)[current.id()]==0)
 	                    {
-	                        node2id[current.getID()] = nodes.size();
+	                        node2id[current.id()] = nodes.size();
 	                        nodes.push_back(current);
-	                        (*mark)[current.getID()]=1;
+	                        (*mark)[current.id()]=1;
 	                    } // if (!gmdsMesh.isMarked(*iter_n,done))
 	                }   // for (std::vector<gmds::Node*>::const_iterator ...
 	                nbRefIds += nds.size();
@@ -145,7 +145,7 @@ void SubVolume::getRepresentation(Utils::DisplayRepresentation& dr, bool checkDe
 	            // NB: on ne dispose pas des polygones pour les mailles d'un sous-volume
 
 
-	            gmds::IGMesh& gmdsMesh = meshImpl->getGMDSMesh (m_gmds_id);
+	            gmds::Mesh& gmdsMesh = meshImpl->getGMDSMesh (m_gmds_id);
 
 	            // on cumule les noeuds, en évitant les doublons
 	            std::vector<gmds::Node>	nodes;

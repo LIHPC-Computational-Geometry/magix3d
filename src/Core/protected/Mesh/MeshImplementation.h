@@ -156,8 +156,8 @@ public:
     virtual TkUtil::UTF8String getInfo(gmds::Node nd);
 
 	/// Accès au maillage.
-    virtual const gmds::IGMesh& getGMDSMesh ( ) const;
-    virtual gmds::IGMesh& getGMDSMesh ( );
+    virtual const gmds::Mesh& getGMDSMesh ( ) const;
+    virtual gmds::Mesh& getGMDSMesh ( );
 
     /// Retourne l'indice d'un nouveau maillage
     virtual uint createNewGMDSMesh ( );
@@ -166,7 +166,7 @@ public:
     virtual void deleteLastGMDSMesh ( );
 
     /// Retourne le ième maillage
-    virtual gmds::IGMesh& getGMDSMesh (uint id);
+    virtual gmds::Mesh& getGMDSMesh (uint id);
 
     /// Ajoute les groupes de mailles de gmds
     bool createGMDSGroups();
@@ -387,7 +387,7 @@ private:
 private:
 
     /** Lien sur les structures de maillage GMDS */
-    std::vector<gmds::IGMesh*> m_gmds_mesh;
+    std::vector<gmds::Mesh*> m_gmds_mesh;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Mesh

@@ -12,8 +12,8 @@
 /*----------------------------------------------------------------------------*/
 #include "Utils/Point.h"
 
-#include <GMDS/IG/Node.h>
-#include <GMDS/IG/Face.h>
+#include <gmds/ig/Node.h>
+#include <gmds/ig/Face.h>
 
 // OCC
 #include <gp_Trsf.hxx>

@@ -19,7 +19,7 @@
 #include <TkUtil/Exception.h>
 #include <TkUtil/MemoryError.h>
 // GMDS
-#include <GMDS/Utils/Exception.h>
+#include <gmds/utils/Exception.h>
 // OCC
 #include <gp_Trsf.hxx>
 #include <gp_GTrsf.hxx>
@@ -40,7 +40,7 @@ FacetedSurface::FacetedSurface(Internal::Context& c, uint gmds_id, std::vector<g
 	Mesh::MeshItf* meshItf = m_context.getMeshManager ( ).getMesh ( );
 	Mesh::MeshImplementation* meshImpl = dynamic_cast<Mesh::MeshImplementation*> (meshItf);
 	CHECK_NULL_PTR_ERROR(meshImpl)
-	gmds::IGMesh&	gmdsMesh	= meshImpl->getGMDSMesh (m_gmds_id);
+	gmds::Mesh&	gmdsMesh	= meshImpl->getGMDSMesh (m_gmds_id);
 
 	// transforme les quadrangles en 4 triangles, avec insertion d'un sommet au centre
 	for (std::vector<gmds::Face>::iterator iface=faces.begin(); iface!=faces.end(); ++iface){
@@ -51,14 +51,14 @@ FacetedSurface::FacetedSurface(Internal::Context& c, uint gmds_id, std::vector<g
 		if (nodes.size() == 3)
 			m_poly.push_back(face);
 		else if (nodes.size() == 4){
-			//std::cout<<"FacetedSurface découpe "<<" id "<<(long int)face.getID()<<" nb nodes "<<face.getNbNodes()<<std::endl;
+			//std::cout<<"FacetedSurface découpe "<<" id "<<(long int)fac[iNode].id()()<<" nb nodes "<<face.getNbNodes()<<std::endl;
 			gmds::math::Point pt = face.center();
 			gmds::Node nd = gmdsMesh.newNode(pt.X(), pt.Y(), pt.Z());
 
 			for (uint i=0; i<4; i++){
 				gmds::Face newFace = gmdsMesh.newTriangle(nodes[i], nodes[(i+1)%4], nd);
 				m_poly.push_back(newFace);
-				//std::cout<<"FacetedSurface ajoute "<<" id "<<(long int)newFace.getID()<<" nb nodes "<<newFace.getNbNodes()<<std::endl;
+				//std::cout<<"FacetedSurface ajoute "<<" id "<<(long int)newFac[iNode].id()()<<" nb nodes "<<newFace.getNbNodes()<<std::endl;
 			}
 		}
 		else
@@ -391,7 +391,7 @@ void FacetedSurface::buildDisplayRepresentation(Utils::DisplayRepresentation& dr
     	std::map<gmds::TCellID, int>	node2id;
         FacetedHelper::getGMDSNodes(m_poly, nodes);
     	for(int iNode=0; iNode<nodes.size(); iNode++) 
-    		node2id[nodes[iNode].getID()] = iNode;
+			node2id[nodes[iNode].id()] = iNode;
 
     	for (std::vector<gmds::Node>::iterator itn = nodes.begin ( );
     			itn != nodes.end ( ); itn++)

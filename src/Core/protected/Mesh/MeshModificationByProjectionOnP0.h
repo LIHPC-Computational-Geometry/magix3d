@@ -11,7 +11,7 @@
 #define MESHMODIFICATIONBYPROJECTIONONP0_H_
 /*----------------------------------------------------------------------------*/
 #include "Mesh/MeshModificationItf.h"
-#include <GMDS/Utils/CommonTypes.h>
+#include <gmds/utils/CommonTypes.h>
 /*----------------------------------------------------------------------------*/
 namespace gmds{
 class Node;

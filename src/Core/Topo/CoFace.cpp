@@ -3014,7 +3014,7 @@ getNodes(uint decalage,
         vectNd[i] = gmds::Node();
 #endif
 
-    gmds::IGMesh& gmds_mesh = getContext().getMeshManager().getMesh()->getGMDSMesh();
+    gmds::Mesh& gmds_mesh = getContext().getMeshManager().getMesh()->getGMDSMesh();
 
     std::vector<gmds::TCellID>& nodeIDs = nodes();
     std::vector<gmds::Node> myNodes;

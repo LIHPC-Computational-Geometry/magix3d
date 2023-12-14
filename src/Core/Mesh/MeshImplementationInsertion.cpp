@@ -31,8 +31,8 @@
 #include "Geom/GMDSGeomManagerAdapter.h"
 #include "Geom/GMDSGeomVolumeAdapter.h"
 
-#include "GMDS/CAD/FacetedGeomManager.h"
-//#include "GMDS/CAD/FacetedMeshIntersectionService.h"
+//#include "gmds/cad/FacetedGeomManager.h"
+//#include "gmds/cad/FacetedMeshIntersectionService.h"
 //#include "CaGe/MeshInsertDetailInOut.h"
 //#include "CaGe/MeshSplitter3Refinement.h"
 //#include "CaGe/LaplacianSmoothingGeomClassificationNew.h"
@@ -130,7 +130,7 @@ meshInsertion(Mesh::CommandCreateMesh* command, Topo::Block* ABlock)
 //
 //    typedef GEPETO::Numeric<double> GeomMeshTCoord;
 //
-////    std::vector<gmds::geom::GeomVolume<GeomMeshTCoord>* > vols;
+////    std::vector<gmds::cad::GeomVolume<GeomMeshTCoord>* > vols;
 //    gmds::geom::FacetedGeomManager<GeomMeshTCoord> model_tmp;
 //
 //    gmds::geom::FacetedGeomManager<GeomMeshTCoord> model;
@@ -146,7 +146,7 @@ meshInsertion(Mesh::CommandCreateMesh* command, Topo::Block* ABlock)
 //    model_bis.reorientSurfacesTriangulation(vol_tmp2);
 //
 ////    {
-////        gmds::Variable<gmds::geom::GeomEntity<gmds::TCoord>* >* volumeClassification = mesh_tmp.getGeometricClassification(3);
+////        gmds::Variable<gmds::cad::GeomEntity<gmds::TCoord>* >* volumeClassification = mesh_tmp.getGeometricClassification(3);
 ////
 ////        std::vector<Topo::Block* > blocks;
 ////        getContext().getLocalTopoManager().getBlocks(blocks);
@@ -175,10 +175,10 @@ meshInsertion(Mesh::CommandCreateMesh* command, Topo::Block* ABlock)
 //        ABlock->getCoEdges(block_edges);
 //        ABlock->getVertices(block_vertices);
 //
-//        gmds::Variable<gmds::geom::GeomEntity<gmds::TCoord>* >* cloudClassification  = mesh_tmp.getGeometricClassification(0);
-//        gmds::Variable<gmds::geom::GeomEntity<gmds::TCoord>* >* lineClassification   = mesh_tmp.getGeometricClassification(1);
-//        gmds::Variable<gmds::geom::GeomEntity<gmds::TCoord>* >* surfaceClassification= mesh_tmp.getGeometricClassification(2);
-//        gmds::Variable<gmds::geom::GeomEntity<gmds::TCoord>* >* volumeClassification = mesh_tmp.getGeometricClassification(3);
+//        gmds::Variable<gmds::cad::GeomEntity<gmds::TCoord>* >* cloudClassification  = mesh_tmp.getGeometricClassification(0);
+//        gmds::Variable<gmds::cad::GeomEntity<gmds::TCoord>* >* lineClassification   = mesh_tmp.getGeometricClassification(1);
+//        gmds::Variable<gmds::cad::GeomEntity<gmds::TCoord>* >* surfaceClassification= mesh_tmp.getGeometricClassification(2);
+//        gmds::Variable<gmds::cad::GeomEntity<gmds::TCoord>* >* volumeClassification = mesh_tmp.getGeometricClassification(3);
 //
 //        std::vector<Topo::Block* > blocks;
 //        getContext().getLocalTopoManager().getBlocks(blocks);
@@ -332,8 +332,8 @@ meshInsertion(Mesh::CommandCreateMesh* command, Topo::Block* ABlock)
 //    // - node creation in case of refinement
 //    {
 //        // update node position
-//        gmds::Variable<gmds::geom::GeomEntity<gmds::TCoord>* >* nodeClassificationTmp = mesh_tmp.getGeometricClassification(0);
-//        gmds::Variable<gmds::geom::GeomEntity<gmds::TCoord>* >* nodeClassification = this->getGMDSMesh().getGeometricClassification(0);
+//        gmds::Variable<gmds::cad::GeomEntity<gmds::TCoord>* >* nodeClassificationTmp = mesh_tmp.getGeometricClassification(0);
+//        gmds::Variable<gmds::cad::GeomEntity<gmds::TCoord>* >* nodeClassification = this->getGMDSMesh().getGeometricClassification(0);
 //
 //
 //        gmds::Mesh<TMask>::nodes_iterator it  =  mesh_tmp.nodes_begin();
@@ -386,8 +386,8 @@ meshInsertion(Mesh::CommandCreateMesh* command, Topo::Block* ABlock)
 //        //        }
 //    }
 //    {
-//        gmds::Variable<gmds::geom::GeomEntity<gmds::TCoord>* >* faceClassificationTmp = mesh_tmp.getGeometricClassification(2);
-//        gmds::Variable<gmds::geom::GeomEntity<gmds::TCoord>* >* faceClassification = this->getGMDSMesh().getGeometricClassification(2);
+//        gmds::Variable<gmds::cad::GeomEntity<gmds::TCoord>* >* faceClassificationTmp = mesh_tmp.getGeometricClassification(2);
+//        gmds::Variable<gmds::cad::GeomEntity<gmds::TCoord>* >* faceClassification = this->getGMDSMesh().getGeometricClassification(2);
 //        gmds::Mesh<TMask>::faces_iterator it  =  mesh_tmp.faces_begin();
 //        for(;!it->isDone();it->next()) {
 //            gmds::Face* current_face= it->currentItem();
@@ -442,8 +442,8 @@ meshInsertion(Mesh::CommandCreateMesh* command, Topo::Block* ABlock)
 //        }
 //    }
 //    {
-//        gmds::Variable<gmds::geom::GeomEntity<gmds::TCoord>* >* regionClassificationTmp = mesh_tmp.getGeometricClassification(3);
-//        gmds::Variable<gmds::geom::GeomEntity<gmds::TCoord>* >* regionClassification = this->getGMDSMesh().getGeometricClassification(3);
+//        gmds::Variable<gmds::cad::GeomEntity<gmds::TCoord>* >* regionClassificationTmp = mesh_tmp.getGeometricClassification(3);
+//        gmds::Variable<gmds::cad::GeomEntity<gmds::TCoord>* >* regionClassification = this->getGMDSMesh().getGeometricClassification(3);
 //        gmds::Mesh<TMask>::regions_iterator it  =  mesh_tmp.regions_begin();
 //        for(;!it->isDone();it->next())
 //        {
@@ -539,7 +539,7 @@ meshInsertion(Mesh::CommandCreateMesh* command, Topo::Block* ABlock)
 //    // association des régions au bloc
 //    std::map<Topo::Block*,std::set<gmds::Region*> > blocksRegionsSwitched;
 //    {
-//        gmds::Variable<gmds::geom::GeomEntity<gmds::TCoord>* >* volumeClassification = mesh_tmp.getGeometricClassification(3);
+//        gmds::Variable<gmds::cad::GeomEntity<gmds::TCoord>* >* volumeClassification = mesh_tmp.getGeometricClassification(3);
 //
 //        std::vector<Topo::Block* > blocks;
 //        getContext().getLocalTopoManager().getBlocks(blocks);
@@ -660,7 +660,7 @@ meshInsertion(Mesh::CommandCreateMesh* command, Topo::Block* ABlock)
 //
 //    // association des faces GMDS aux cofaces du bloc
 //    {
-//        gmds::Variable<gmds::geom::GeomEntity<gmds::TCoord>* >* surfaceClassification = mesh_tmp.getGeometricClassification(2);
+//        gmds::Variable<gmds::cad::GeomEntity<gmds::TCoord>* >* surfaceClassification = mesh_tmp.getGeometricClassification(2);
 //
 //        std::vector<Topo::Face* > faces;
 //        ABlock->getFaces(faces);
@@ -720,7 +720,7 @@ meshInsertion(Mesh::CommandCreateMesh* command, Topo::Block* ABlock)
 //
 //    // association des noeuds GMDS aux coEdges du bloc
 //    {
-//        gmds::Variable<gmds::geom::GeomEntity<gmds::TCoord>* >* curveClassification = mesh_tmp.getGeometricClassification(1);
+//        gmds::Variable<gmds::cad::GeomEntity<gmds::TCoord>* >* curveClassification = mesh_tmp.getGeometricClassification(1);
 //
 //        std::vector<Topo::Edge* > topoEdges;
 //        ABlock->getEdges(topoEdges);

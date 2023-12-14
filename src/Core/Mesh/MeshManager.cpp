@@ -466,10 +466,10 @@ bool MeshManager::compareWithMesh(std::string nom)
 {
     bool ok = true;
     MeshImplementation* mesh = (MeshImplementation*)m_mesh_itf;
-    gmds::IGMesh& gmdsMesh1 = mesh->getGMDSMesh();
+    gmds::Mesh& gmdsMesh1 = mesh->getGMDSMesh();
 
     uint id = mesh->createNewGMDSMesh();
-    gmds::IGMesh& gmdsMesh2 = mesh->getGMDSMesh(id);
+    gmds::Mesh& gmdsMesh2 = mesh->getGMDSMesh(id);
 
     mesh->readMli(nom, id);
 

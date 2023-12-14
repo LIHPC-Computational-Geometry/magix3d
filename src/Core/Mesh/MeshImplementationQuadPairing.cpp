@@ -31,7 +31,7 @@
 /*----------------------------------------------------------------------------*/
 /// GMDS
 //#include<SurfaceQTRAN.h>
-#include <GMDS/IG/IGMeshDoctor.h>
+#include <gmds/ig/MeshDoctor.h>
 /*----------------------------------------------------------------------------*/
 /// TkUtil
 #include <TkUtil/Exception.h>
@@ -71,7 +71,7 @@ void MeshImplementation::meshQuadPairing(Mesh::CommandCreateMesh* command, Topo:
     std::cout <<"Maillage de la face commune "<<fa->getName()<<" avec la méthode de Quad Pairing"<<std::endl;
 #endif
 
-    gmds::IGMesh& gmds_mesh = getGMDSMesh();
+    gmds::Mesh& gmds_mesh = getGMDSMesh();
 
     Topo::FaceMeshingPropertyQuadPairing* prop =
             dynamic_cast<Topo::FaceMeshingPropertyQuadPairing*>(fa->getCoFaceMeshingProperty());
@@ -117,7 +117,7 @@ void MeshImplementation::meshQuadPairing(Mesh::CommandCreateMesh* command, Topo:
     //      MAILLAGE QUAD
     //============================================================
     gmds::MeshModel mod_QTRAN =  gmds::DIM3|gmds::F|gmds::E|gmds::F2N|gmds::E2N|gmds::N2F|gmds::E2F|gmds::F2E;
-    gmds::IGMesh quad_mesh(mod_QTRAN);
+    gmds::Mesh quad_mesh(mod_QTRAN);
 
     //correspondance entre les différents maillages
     // Maillage M3D <---> Maillage local GMDS
@@ -292,10 +292,10 @@ void MeshImplementation::meshQuadPairing(Mesh::CommandCreateMesh* command, Topo:
                 gmds::Node created_quad_node = quad_mesh.newNode(created_gmsh_mesh_vertex->x(),
                         created_gmsh_mesh_vertex->y(),
                         created_gmsh_mesh_vertex->z());
-                cor_M3DNode_gmdsNode[m3D_node_id] = created_quad_node.getID();
-                cor_gmdsNode_M3DNode[created_quad_node.getID()] = m3D_node_id;
+                cor_M3DNode_gmdsNode[m3D_node_id] = created_quad_node.id();
+                cor_gmdsNode_M3DNode[created_quad_node.id()] = m3D_node_id;
 #ifdef _DEBUG_MESH
-            std::cout <<"   newNode au bord 1 ("<<created_quad_node.getID()<<"): "
+            std::cout <<"   newNode au bord 1 ("<<created_quad_node.id()<<"): "
             		<<created_quad_node.X()<<", "<<created_quad_node.Y()<<", "<<created_quad_node.Z()<<std::endl;
 #endif
             }
@@ -308,10 +308,10 @@ void MeshImplementation::meshQuadPairing(Mesh::CommandCreateMesh* command, Topo:
                     gmds::Node created_quad_node = quad_mesh.newNode(created_gmsh_mesh_vertex->x(),
                             created_gmsh_mesh_vertex->y(),
                             created_gmsh_mesh_vertex->z());
-                    cor_M3DNode_gmdsNode[m3D_node_id] = created_quad_node.getID();
-                    cor_gmdsNode_M3DNode[created_quad_node.getID()] = m3D_node_id;
+                    cor_M3DNode_gmdsNode[m3D_node_id] = created_quad_node.id();
+                    cor_gmdsNode_M3DNode[created_quad_node.id()] = m3D_node_id;
 #ifdef _DEBUG_MESH
-                    std::cout <<"   newNode au bord 2 ("<<created_quad_node.getID()<<"): "
+                    std::cout <<"   newNode au bord 2 ("<<created_quad_node.id()<<"): "
                     		<<created_quad_node.X()<<", "<<created_quad_node.Y()<<", "<<created_quad_node.Z()<<std::endl;
 #endif
 
@@ -381,26 +381,26 @@ void MeshImplementation::meshQuadPairing(Mesh::CommandCreateMesh* command, Topo:
                 //Creation du noeud gmsh
                 if(j%2==0){
                     MVertex* mvtx = new MEdgeVertex(pt.getX(), pt.getY(),pt.getZ(), gedge, param);
-                    cor_M3DNode_gmshVertex[nd.getID()] = mvtx;
-                    cor_gmshVertex_M3DNode[mvtx] = nd.getID();
+                    cor_M3DNode_gmshVertex[nd.id()] = mvtx;
+                    cor_gmshVertex_M3DNode[mvtx] = nd.id();
 
                     mesh_vertices.push_back(mvtx);
                     //Creation du noeud gmds pour le maillage quad
                     gmds::Node nd_quad = quad_mesh.newNode(nd.X(),nd.Y(),nd.Z());
 
-                    cor_gmdsNode_M3DNode[nd_quad.getID()] = nd.getID();
-                    cor_M3DNode_gmdsNode[nd.getID()     ] = nd_quad.getID();
+                    cor_gmdsNode_M3DNode[nd_quad.id()] = nd.id();
+                    cor_M3DNode_gmdsNode[nd.id()     ] = nd_quad.id();
 #ifdef _DEBUG_MESH
-                    std::cout <<"   newNode aux centres des bords ("<<nd_quad.getID()<<"): "
+                    std::cout <<"   newNode aux centres des bords ("<<nd_qua[iNode].id()<<"): "
                     		<<nd_quad.X()<<", "<<nd_quad.Y()<<", "<<nd_quad.Z()<<std::endl;
 #endif
 
                 }
                 else
                 {
-                    gmds::TCellID  nd1 = edge_nodes[j-1].getID();
-                    gmds::TCellID  nd2 = edge_nodes[j+1].getID();
-                    unused_M3DNode[std::pair<gmds::TCellID,gmds::TCellID>(nd1,nd2)] =nd.getID() ;
+                    gmds::TCellID  nd1 = edge_nodes[j-1].id();
+                    gmds::TCellID  nd2 = edge_nodes[j+1].id();
+                    unused_M3DNode[std::pair<gmds::TCellID,gmds::TCellID>(nd1,nd2)] =nd.id() ;
                 }
 
             }
@@ -411,8 +411,8 @@ void MeshImplementation::meshQuadPairing(Mesh::CommandCreateMesh* command, Topo:
 
                 if(j%2==0)
                 {
-                    MVertex* mvtx1 = cor_M3DNode_gmshVertex[edge_nodes[j].getID()];
-                    MVertex* mvtx2 = cor_M3DNode_gmshVertex[edge_nodes[j+2].getID()];
+                    MVertex* mvtx1 = cor_M3DNode_gmshVertex[edge_nodes[j].id()];
+                    MVertex* mvtx2 = cor_M3DNode_gmshVertex[edge_nodes[j+2].id()];
                     lines.push_back(new MLine(mvtx1, mvtx2));
                 }
             }
@@ -509,11 +509,11 @@ void MeshImplementation::meshQuadPairing(Mesh::CommandCreateMesh* command, Topo:
                 if(not_init && not_added)
                 {
                     gmds::Node nd = quad_mesh.newNode(mvtx->x(), mvtx->y(), mvtx->z());
-                    node_ids.push_back(nd.getID());
+                    node_ids.push_back(nd.id());
 
-                    created_nodes[mvtx]=nd.getID();
+                    created_nodes[mvtx]=nd.id();
 #ifdef _DEBUG_MESH
-                    std::cout <<"   newNode au centre ("<<nd.getID()<<"): "
+                    std::cout <<"   newNode au centre ("<<nd.id()<<"): "
                     		<<nd.X()<<", "<<nd.Y()<<", "<<nd.Z()<<std::endl;
 #endif
 
@@ -547,7 +547,7 @@ void MeshImplementation::meshQuadPairing(Mesh::CommandCreateMesh* command, Topo:
     std::cout<<"triangles -> quadrangles "<<std::endl;
 #endif
 
-    gmds::IGMeshDoctor doc(&quad_mesh);
+    gmds::MeshDoctor doc(&quad_mesh);
     doc.buildEdgesAndX2E();
     doc.updateUpwardConnectivity();
 
@@ -562,9 +562,8 @@ void MeshImplementation::meshQuadPairing(Mesh::CommandCreateMesh* command, Topo:
     std::vector<gmds::TCellID>& fa_node_ids = fa->nodes();
     std::vector<gmds::TCellID>& fa_face_ids = fa->faces();
 
-    gmds::IGMesh::face_iterator it_face = quad_mesh.faces_begin();
-    for(;!it_face.isDone();it_face.next()){
-        gmds::Face current_face = it_face.value();
+	for(auto t : quad_mesh.faces()){
+		auto current_face = quad_mesh.get<gmds::Face>(t);
         std::vector<gmds::Node> current_nodes = current_face.getAll<gmds::Node>();
         std::vector<gmds::TCellID> m3D_nodesID;
 
@@ -572,7 +571,7 @@ void MeshImplementation::meshQuadPairing(Mesh::CommandCreateMesh* command, Topo:
         {
             gmds::Node node_i = current_nodes[i_node];
 
-            if(cor_gmdsNode_M3DNode.find(node_i.getID())==cor_gmdsNode_M3DNode.end())
+            if(cor_gmdsNode_M3DNode.find(node_i.id())==cor_gmdsNode_M3DNode.end())
             {
 
                 //il est possible que le nouveau noeud correspondent a un noeud au bord non utilise
@@ -589,24 +588,24 @@ void MeshImplementation::meshQuadPairing(Mesh::CommandCreateMesh* command, Topo:
                     gmds::Node m3dNode_f0;
                     gmds::Node m3dNode_f1;
                     bool stop_look=false;
-                    if(cor_gmdsNode_M3DNode.find(n0_0.getID())!=cor_gmdsNode_M3DNode.end())
-                        m3dNode_f0 = getGMDSMesh().get<gmds::Node>(cor_gmdsNode_M3DNode[n0_0.getID()]);
-                    else if(cor_gmdsNode_M3DNode.find(n0_1.getID())!=cor_gmdsNode_M3DNode.end())
-                        m3dNode_f0 = getGMDSMesh().get<gmds::Node>(cor_gmdsNode_M3DNode[n0_1.getID()]);
+                    if(cor_gmdsNode_M3DNode.find(n0_0.id())!=cor_gmdsNode_M3DNode.end())
+                        m3dNode_f0 = getGMDSMesh().get<gmds::Node>(cor_gmdsNode_M3DNode[n0_0.id()]);
+                    else if(cor_gmdsNode_M3DNode.find(n0_1.id())!=cor_gmdsNode_M3DNode.end())
+                        m3dNode_f0 = getGMDSMesh().get<gmds::Node>(cor_gmdsNode_M3DNode[n0_1.id()]);
                     else
                         stop_look = true;
-                    if(cor_gmdsNode_M3DNode.find(n1_0.getID())!=cor_gmdsNode_M3DNode.end())
-                        m3dNode_f1 = getGMDSMesh().get<gmds::Node>(cor_gmdsNode_M3DNode[n1_0.getID()]);
-                    else if(cor_gmdsNode_M3DNode.find(n1_1.getID())!=cor_gmdsNode_M3DNode.end())
-                        m3dNode_f1 = getGMDSMesh().get<gmds::Node>(cor_gmdsNode_M3DNode[n1_1.getID()]);
+                    if(cor_gmdsNode_M3DNode.find(n1_0.id())!=cor_gmdsNode_M3DNode.end())
+                        m3dNode_f1 = getGMDSMesh().get<gmds::Node>(cor_gmdsNode_M3DNode[n1_0.id()]);
+                    else if(cor_gmdsNode_M3DNode.find(n1_1.id())!=cor_gmdsNode_M3DNode.end())
+                        m3dNode_f1 = getGMDSMesh().get<gmds::Node>(cor_gmdsNode_M3DNode[n1_1.id()]);
                     else
                         stop_look = true;
 
                     if(!stop_look)
                     {
                         std::pair<gmds::TCellID,gmds::TCellID> p1, p2;
-                        p1.first = m3dNode_f0.getID(); p1.second= m3dNode_f1.getID();
-                        p2.first = m3dNode_f1.getID(); p2.second= m3dNode_f0.getID();
+                        p1.first = m3dNode_f0.id(); p1.second= m3dNode_f1.id();
+                        p2.first = m3dNode_f1.id(); p2.second= m3dNode_f0.id();
                         if(unused_M3DNode.find(p1)==unused_M3DNode.end()){
                             gmds::TCellID m3d_node = unused_M3DNode[p2];
                             m3D_nodesID.push_back(m3d_node);
@@ -623,24 +622,24 @@ void MeshImplementation::meshQuadPairing(Mesh::CommandCreateMesh* command, Topo:
                     Utils::Math::Point pnt(node_i.X(), node_i.Y(), node_i.Z());
                     geo_entity->project(pnt);
                     gmds::Node nd = getGMDSMesh().newNode(pnt.getX(),pnt.getY(),pnt.getZ());
-                    fa_node_ids.push_back(nd.getID());
-                    command->addCreatedNode(nd.getID());
-                    m3D_nodesID.push_back(nd.getID());
+                    fa_node_ids.push_back(nd.id());
+                    command->addCreatedNode(nd.id());
+                    m3D_nodesID.push_back(nd.id());
 #ifdef _DEBUG_MESH
-                    std::cout <<"   newNode in M3D ("<<nd.getID()<<"): "
+                    std::cout <<"   newNode in M3D ("<<nd.id()<<"): "
                     		<<nd.X()<<", "<<nd.Y()<<", "<<nd.Z()<<std::endl;
 #endif
                 }
             }
             else //existing node in M3D
-                m3D_nodesID.push_back(cor_gmdsNode_M3DNode[node_i.getID()]);
+                m3D_nodesID.push_back(cor_gmdsNode_M3DNode[node_i.id()]);
         }
 
         if(m3D_nodesID.size()==3)
         {
             gmds::Face t1 = getGMDSMesh().newTriangle(m3D_nodesID[0],m3D_nodesID[1],m3D_nodesID[2]);
-            fa_face_ids.push_back(t1.getID());
-            command->addCreatedFace(t1.getID());
+            fa_face_ids.push_back(t1.id());
+            command->addCreatedFace(t1.id());
 #ifdef _DEBUG_MESH
             std::cout<<" triangle: "<<std::endl;
             gmds::Node node1 = gmds_mesh.get<gmds::Node>(m3D_nodesID[0]);
@@ -654,8 +653,8 @@ void MeshImplementation::meshQuadPairing(Mesh::CommandCreateMesh* command, Topo:
         else if(m3D_nodesID.size()==4)
         {
             gmds::Face q1 = getGMDSMesh().newQuad(m3D_nodesID[0],m3D_nodesID[1],m3D_nodesID[2],m3D_nodesID[3]);
-            fa_face_ids.push_back(q1.getID());
-            command->addCreatedFace(q1.getID());
+            fa_face_ids.push_back(q1.id());
+            command->addCreatedFace(q1.id());
 #ifdef _DEBUG_MESH
             std::cout<<" quadrangle: "<<std::endl;
             gmds::Node node1 = gmds_mesh.get<gmds::Node>(m3D_nodesID[0]);

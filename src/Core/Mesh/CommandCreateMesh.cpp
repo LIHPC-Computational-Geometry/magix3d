@@ -1045,17 +1045,14 @@ meshAndModify(std::list<Topo::CoFace*>& list_cofaces)
 	std::cout<<" => list_grp avec "<<list_grp.size()<<" groupes 2D"<<std::endl;
 #endif
 
-	gmds::IGMesh& gmds_mesh = getMeshManager().getMesh()->getGMDSMesh();
+	gmds::Mesh& gmds_mesh = getMeshManager().getMesh()->getGMDSMesh();
 	// les noeuds déjà dans gmds
-	std::vector<gmds::Node> nodes;
 
 	// on marque les noeuds déjà présents
 	//std::cout<<"Nb Nodes : "<<gmds_mesh.getNbNodes()<<std::endl;
-	gmds::IGMesh::node_iterator iter1 = gmds_mesh.nodes_begin();
-
-	for (;!iter1.isDone();iter1.next()){
+	for (auto n_id : gmds_mesh.nodes()) {
 		//std::cout<<"Node "<<iter1.value().getID()<<" fixé "<<std::endl;
-		filtre_nodes_pert[iter1.value().getID()] = 1;
+		filtre_nodes_pert[n_id] = 1;
 	}
 
 	// application de la modif pour chacun des groupes 2D
@@ -1146,7 +1143,7 @@ meshAndModify(std::list<Topo::CoFace*>& list_cofaces)
 				std::map<gmds::Node,double> deltas = sepa->getDeltas();
 
 				for(unsigned int iNode=0; iNode<gmdsNodes.size(); iNode++) {
-					value[gmdsNodes[iNode].getID()] = deltas[gmdsNodes[iNode]];
+					value[gmdsNodes[iNode].id()] = deltas[gmdsNodes[iNode]];
 				}
 
 				msurf->setNodesValue("SepaDelta",value);
@@ -1315,7 +1312,7 @@ modify(std::vector<Topo::Block*>& list_blocks)
 	std::cout<<" => list_grp avec "<<list_grp.size()<<" groupes 3D"<<std::endl;
 #endif
 
-	gmds::IGMesh& gmds_mesh = getMeshManager().getMesh()->getGMDSMesh();
+	gmds::Mesh& gmds_mesh = getMeshManager().getMesh()->getGMDSMesh();
 
 	// application de la modif pour chacun des groupes 3D
 	for (std::list<Group::Group3D*>::iterator iter1 = list_grp.begin();

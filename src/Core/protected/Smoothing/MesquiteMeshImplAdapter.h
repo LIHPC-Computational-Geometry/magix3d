@@ -22,7 +22,7 @@
 //class Node;
 ////class Face;
 //}
-#include "GMDS/IG/IGMesh.h"
+#include "gmds/ig/Mesh.h"
 /*----------------------------------------------------------------------------*/
 // Mesquite
 #include <MeshImpl.hpp>
