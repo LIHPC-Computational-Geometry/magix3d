@@ -30,7 +30,7 @@
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 #ifdef USE_TRITON
-#include "Triton2/TetgenFacade.h"
+#include "Triton2/TetgenInterface/TetgenFacade.h"
 #endif
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
@@ -65,7 +65,7 @@ meshDelaunayTetgen(Mesh::CommandCreateMesh* command, Topo::Block* bl)
     std::vector<std::vector<gmds::Face> > mesh_faces;
     std::vector<gmds::Face> mesh_faces_in1Surf;
     std::vector<gmds::Node> mesh_nodes;
-    int node_mark = getGMDSMesh().getNewMark<gmds::Node>();
+    int node_mark = getGMDSMesh().newMark<gmds::Node>();
 
     std::vector<gmds::Region> pyramids;
 
@@ -98,7 +98,7 @@ meshDelaunayTetgen(Mesh::CommandCreateMesh* command, Topo::Block* bl)
             	bool withPyramides = true;
             	for(unsigned int j=0;j<face_elem.size();j++){
             		gmds::Face q = getGMDSMesh().get<gmds::Face>(face_elem[j]);
-            		if (q.getType() == gmds::GMDS_QUAD){
+            		if (q.type() == gmds::GMDS_QUAD){
             			// q est un QUAD
             			std::vector<gmds::Node> nodes = q.getAll<gmds::Node>();
 
@@ -116,18 +116,18 @@ meshDelaunayTetgen(Mesh::CommandCreateMesh* command, Topo::Block* bl)
             				mesh_faces_in1Surf.push_back(t2);
             			}
             			else {
-            				gmds::math::Vector v1(n2.X()-n1.X(),
+            				gmds::math::Vector3d v1({n2.X()-n1.X(),
             						n2.Y()-n1.Y(),
-            						n2.Z()-n1.Z());
+            						n2.Z()-n1.Z()});
 
-            				gmds::math::Vector v3(n3.X()-n1.X(),
+            				gmds::math::Vector3d v3({n3.X()-n1.X(),
             						n3.Y()-n1.Y(),
-            						n3.Z()-n1.Z());
+            						n3.Z()-n1.Z()});
 
-            				gmds::math::Vector nq = ratio_hauteur_pyramides*(v1.cross(v3));
-            				gmds::math::Vector ref(block_center.X()-n1.X(),
+            				gmds::math::Vector3d nq = ratio_hauteur_pyramides*(v1.cross(v3));
+            				gmds::math::Vector3d ref({block_center.X()-n1.X(),
             						block_center.Y()-n1.Y(),
-            						block_center.Z()-n1.Z());
+            						block_center.Z()-n1.Z()});
 
             				gmds::Node p0, p1, p2,  p3, p4;
             				if(nq.dot(ref)>0.0){
@@ -136,7 +136,7 @@ meshDelaunayTetgen(Mesh::CommandCreateMesh* command, Topo::Block* bl)
             					p1=nodes[1];
             					p2=nodes[2];
             					p3=nodes[3];
-            					gmds::math::Vector center = q.center();
+            					gmds::math::Vector3d center = vec(q.center());
             					p4 = getGMDSMesh().newNode(
             							center.X()+nq[0],
             							center.Y()+nq[1],
@@ -148,7 +148,7 @@ meshDelaunayTetgen(Mesh::CommandCreateMesh* command, Topo::Block* bl)
             					p1=nodes[3];
             					p2=nodes[2];
             					p3=nodes[1];
-            					gmds::math::Vector center = q.center();
+            					gmds::math::Vector3d center = vec(q.center());
             					p4 = getGMDSMesh().newNode(center.X()-nq[0],
             							center.Y()-nq[1],
             							center.Z()-nq[2]);
@@ -496,19 +496,19 @@ meshDelaunayTetgen(Mesh::CommandCreateMesh* command, Topo::Block* bl)
 
     for(unsigned int i=0;i<newNodes.size();i++){
         gmds::Node  n = newNodes[i];
-        nodes.push_back(n.getID());
-        command->addCreatedNode(n.getID());
+        nodes.push_back(n.id());
+        command->addCreatedNode(n.id());
     }
     for(unsigned int i=0;i<newRegions.size();i++){
         gmds::Region r = newRegions[i];
-        elem.push_back(r.getID());
-        command->addCreatedRegion(r.getID());
+        elem.push_back(r.id());
+        command->addCreatedRegion(r.id());
     }
 
     for(unsigned int i=0;i<pyramids.size();i++){
         gmds::Region r = pyramids[i];
-        elem.push_back(r.getID());
-        command->addCreatedRegion(r.getID());
+        elem.push_back(r.id());
+        command->addCreatedRegion(r.id());
     }
 
 
