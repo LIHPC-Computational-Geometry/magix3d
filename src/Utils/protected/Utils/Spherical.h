@@ -35,20 +35,14 @@ public:
     double x = p.getX();
     double y = p.getY();
     double z = p.getZ();
-    double rayon = std::sqrt(x*x+y*y+z*z);
-    double inv = (rayon>0.0 ? 1.0 / rayon:0.0);
-    x *= inv;
-    y *= inv;
-    z *= inv;
 
-    m_rho = rayon;
-    m_theta = std::acos(z);
-    double sintheta = std::sin (m_theta);
-    if (MgxNumeric::isNearlyZero(sintheta) || x==0.0)
-    	m_phi = 0.0;
+    m_rho = std::sqrt(x*x+y*y+z*z);
+    m_phi = atan2(y,x) * 180/M_PI;
+
+    if (m_rho == 0.0)
+      m_theta = 0;
     else
-    	m_phi = std::atan2 (y / sintheta, x / sintheta)*180/M_PI;
-    m_theta *= 180/M_PI;
+      m_theta = acos(z/m_rho) * 180/M_PI;
   }
 
   double getRho() const { return m_rho; }
