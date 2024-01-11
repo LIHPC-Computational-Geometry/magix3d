@@ -1347,8 +1347,8 @@ void QtMgx3DMainWindow::showReady ( )
 			components.push_back(
 					QtAboutDialog::Component("GMDS", GMDS_VERSION, UTF8String("Structure de maillage", Charset::UTF_8), ""));
 #ifdef USE_TRITON
-																																	components.push_back (
-		QtAboutDialog::Component ("Triton", TRITON_VERSION, UTF8String ("Mailleur triangulaire", Charset::UTF_8), ""));
+			//components.push_back (
+			//		QtAboutDialog::Component ("Triton", TRITON_VERSION, UTF8String ("Mailleur triangulaire", Charset::UTF_8), ""));
 #else
 			components.push_back(
 					QtAboutDialog::Component("Triton", UTF8String("Déconnecté", Charset::UTF_8), UTF8String("Mailleur triangulaire", Charset::UTF_8), ""));
