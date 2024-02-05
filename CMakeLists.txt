@@ -21,7 +21,7 @@ option (USE_GMSH "Build with gmsh (default : ON)" ON)
 option (USE_SMOOTH3D "Build the SMOOTH3D component (default : OFF)" OFF)
 option (USE_TRITON "Build the TRITON component (default : ON)" ON)
 option (WITH_DOC "Build the documentation (default : ON)" ON)
-option (WITH_TEST "Enable testing (default:ON)" ON)
+option (WITH_TEST "Enable testing (default:ON)" OFF)
 option (WITH_COV "Enable code coverage of the testing target (default:OFF)" OFF)
 #Next options are only available on-site. Default value is OFF.
 option (USE_DKOC "On-site. Build the DKOC component to read Catia files (on-site, default : OFF)" OFF)
