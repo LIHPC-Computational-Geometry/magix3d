@@ -2,6 +2,8 @@
 project(mgx_python_testing)
 cmake_minimum_required(VERSION 3.15)
 #==============================================================================
+enable_testing()
+#==============================================================================
 find_program(PYTEST_LOCATION pytest)
 message("PYTEST_LOCATION= ${PYTEST_LOCATION}")
 message("ENVIRONMENT PYTHONPATH ${PYTHONPATH}")
