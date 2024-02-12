@@ -132,7 +132,7 @@ Il faut pour cela ouvrir le panneau *Destruction d'entités géométriques* qui 
 .. taboperation:: 
       :famille: géométrie
       :sousfamille: volumes
-      :operation: destruction
+      :operation: destructiongeom
 
 Sélectionner comme volume à détruire celui à l'intérieur du vide et issu de la section du 2 :sup:`ème` cylindre externe (*Vol0004*) à l'aide du :ref:`champ de sélection <selectionner-entites>`.
 

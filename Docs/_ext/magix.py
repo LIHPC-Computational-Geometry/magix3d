@@ -34,7 +34,9 @@ operations = {
                 "topotogroupe": ["Ajout/suppression/affectation d'entités topologiques à un groupe", "Topo_add_to_group.png"],
                 "blocparrévolution": ["Création de blocs par révolution de la topologie 2D", "Create_block_by_edge_revolution.png"],
                 "cylindre": ["Création de cylindre", "Cylinder.png"],
-                "destruction": ["Destruction d'entités géométriques", "Box_destruction.png"],
+                "cone": ["Création de cone", "image78.png"],
+                "sphère": ["Création de sphère", "image73.png"],
+                "destructiongeom": ["Destruction d'entités géométriques", "Box_destruction.png"],
                 "maillageblocs": ["Paramétrage du maillage des blocs", "Blocks_meshing_properties.png"],
                 "découpageblocogrid": ["Découpage de bloc avec o-grid ", "Topo_split_block_with_ogrid.png"],
                 "repère": ["Création d'un repère à partir de points", "Repere.png"],
@@ -46,11 +48,14 @@ operations = {
                 "sensdiscrétisation": ["Sens de discrétisation d'arêtes topologiques", "Topo_edge_direction.png"],
                 "prolongation":["Prolongation de découpage de face à partir d'un sommet situé sur une arête", "Topo_extend_split_face.png"],
                 "homothétie": ["Homothétie d'entités topologiques", "Topo_homothety.png"],
-                "fusion": ["Fusion de faces topologiques entre blocs pas forcément reliés", "Topo_glue_2_faces.png"],
+                "fusion": ["Fusion de faces topologiques", "Topo_glue_2_faces.png"],
                 "union":["Opérations booléennes", "Union.png"],
                 "bloc":["Création de bloc par association à un volume", "Create_block.png"],
                 "découpagebloc":["Découpage de blocs selon une arête", "Topo_split_block.png"],
-                "modificationassociation":["Modification des associations topologiques vers entités géométriques", "Topo_entities_association.png"]
+                "modificationassociation":["Modification des associations topologiques vers entités géométriques", "Topo_entities_association.png"],
+                "destructiontopo": ["Destruction d'entités topologiques", "image89.png"],
+                "rotationgeom": ["Rotation d'entités géométriques", "image54.png"],
+                "translation": ["Translation d'entités géométriques", "image53.png"]
              }
 
 def familleOperation(argument):

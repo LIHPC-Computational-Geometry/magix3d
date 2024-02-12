@@ -77,7 +77,8 @@ Le maillage d'un disque peut être maillé avec une structuration par blocs de 3
 
 
 On constate que, dans le 1er cas avec dégénérescence en un point, la connectivité autour du nœud central est très importante. Ce cas est préférable pour un écoulement radial et à éviter pour ceux qui sont orthogonaux au plan.
-Dans le 2 :sup:`ème cas, les mailles aux extrémités du bloc topologiques sont très aplaties. Le 3ème cas permet, avec l’o-grid, d’obtenir des mailles adaptées aux écoulements orthogonaux au plan.
+
+Dans le 2 :sup:`ème` cas, les mailles aux extrémités du bloc topologiques sont très aplaties. Le 3ème cas permet, avec l’o-grid, d’obtenir des mailles adaptées aux écoulements orthogonaux au plan.
 
 En 3D, un o-grid consiste à décomposer un bloc en 7 sous-blocs, un premier au centre et les 6 autres reliant chacune des faces d’un bloc à celle lui faisant face sur le bloc initial. Ce découpage topologique permet la construction de blocs adaptés à des hexaèdres pour un objet de révolution (avec des hexaèdres sur l’axe).
 
