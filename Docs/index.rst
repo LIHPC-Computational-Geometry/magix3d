@@ -9,13 +9,6 @@ Afin de permettre des études paramétrées et reproductibles, l'outil magix3D p
 Enfin, dans le cadre de la simulation numérique, l'outil magix3D fonctionnera dans un contexte distribué afin de permettre la génération et la manipulation de
 maillages sur un supercalculateur.
 
-
-Historique
-----------
-
-:doc:`pages/historique`
-   Les versions et les modifications
-
 Documentation utilisateur
 -------------------------
 
