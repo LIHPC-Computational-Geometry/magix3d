@@ -29,7 +29,7 @@ target_link_libraries (QtVtkComponents PUBLIC QtComponents VtkComponents QtVtk::
 if (ExperimentalRoom_FOUND)
 #	target_compile_options (QtVtkComponents PUBLIC -DUSE_EXPERIMENTAL_ROOM)	# Déjà fourni dans QtComponents
 	target_link_libraries (QtVtkComponents PUBLIC ExperimentalRoom::ExperimentalRoom)
-	find_package (ExperimentalRoomTExtension 7 REQUIRED)
+	find_package (ExperimentalRoomTExtension REQUIRED)
 	target_link_libraries (QtVtkComponents PUBLIC ExperimentalRoomTExtension::ExperimentalRoomTExtension)
 endif (ExperimentalRoom_FOUND)
 
