@@ -4,6 +4,7 @@ import pyMagix3D as Mgx3D
 
 def test_export_import_step():
     ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
     gm = ctx.getGeomManager ()
     tm = ctx.getTopoManager ()
     mm = ctx.getMeshManager ()
@@ -25,5 +26,3 @@ def test_export_import_step():
     # Import STEP
     ctx.getGeomManager().importSTEP("cube_sphere.step")
     assert gm.getNbVolumes()==1
-    #This last command is mandatory to clean the session for the next test
-    ctx.clearSession()

@@ -3,6 +3,7 @@ import pyMagix3D as Mgx3D
 
 def test_topo_box():
     ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
     gm = ctx.getGeomManager ()
     tm = ctx.getTopoManager ()
     mm = ctx.getMeshManager()
@@ -14,5 +15,3 @@ def test_topo_box():
     assert mm.getNbNodes()==1331
     assert mm.getNbFaces()==600
     assert mm.getNbRegions()==1000
-    #This last command is mandatory to clean the session for the next test
-    ctx.clearSession()
