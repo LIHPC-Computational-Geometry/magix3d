@@ -10,7 +10,7 @@ message("ENVIRONMENT PYTHONPATH ${PYTHONPATH}")
 #message("ENVIRONMENT PYTHONPATH ${CMAKE_PREFIX_PATH}/lib/python3.10/site-packages:$PYTHONPATH")
 
 add_test(NAME test_link
-        COMMAND pytest-3 -v -s ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMAND pytest -v -s ${CMAKE_CURRENT_SOURCE_DIR}
  )
 
 if(WITH_COV)
