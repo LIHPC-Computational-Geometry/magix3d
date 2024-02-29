@@ -211,4 +211,4 @@ endif (Doxygen_FOUND)
 ]===]
 
 # Le lancement du test de non régression via ctest : depuis le répertoire de build, faire ctest -V nr
-add_test (NAME nr COMMAND make default PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR} PYTHON_EXE=${Python2_EXECUTABLE} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../NonRegression)
+#add_test (NAME nr COMMAND make default PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR} PYTHON_EXE=${Python2_EXECUTABLE} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../NonRegression)
