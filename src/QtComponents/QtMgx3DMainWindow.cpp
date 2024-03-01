@@ -3722,8 +3722,6 @@ cout << ctime (&t);
 			if ((0 == _actions._undoAction) || (true == actionsDisabled()))
 				return;
 
-			QtAutoWaitingCursor cursor(true);
-
 			BEGIN_QT_TRY_CATCH_BLOCK
 
 			// Version du 10/01/11 :
@@ -3733,6 +3731,8 @@ cout << ctime (&t);
 			bool enable = !getCommandManager().hasRunningCommands();
 			if (true == _pythonPanel->isRunning())
 				enable = false;
+			QtAutoWaitingCursor cursor (!enable);
+
 			// Faut-il le laisser ou le commenter ? Provoque des menus grisés alors
 			// qu'aucune commande Mgx n'est en cours, mais des évènements Qt sont en attente
 			// de traitement et susceptible d'être à l'origine de commandes Mgx.
@@ -3745,7 +3745,6 @@ cout << ctime (&t);
 			if (0 != undoCmd.length())
 				undoText << ' ' << undoCmd;
 			_actions._undoAction->setText(UTF8TOQSTRING(undoText));
-//							QString::fromUtf8 (undoText.iso ( ).c_str ( )));
 			if (enable)
 				_actions._undoAction->setEnabled(0 == undoCmd.length() ? false : true);
 			else
@@ -3754,7 +3753,6 @@ cout << ctime (&t);
 			if (0 != redoCmd.length())
 				redoText << ' ' << redoCmd;
 			_actions._redoAction->setText(UTF8TOQSTRING(redoText));
-//							QString::fromUtf8 (redoText.iso ( ).c_str ( )));
 			if (enable)
 				_actions._redoAction->setEnabled(0 == redoCmd.length() ? false : true);
 			else
@@ -3767,8 +3765,7 @@ cout << ctime (&t);
 			// Actualisation du panneau "Opérations" :
 			getOperationsPanel().setEnabled(enable);
 			if (0 != _stateView)
-				_stateView->setState(getCommandManager().getCommandName(),
-				                     getCommandManager().getStatus());
+				_stateView->setState(getCommandManager().getCommandName(), getCommandManager().getStatus());
 
 			COMPLETE_QT_TRY_CATCH_BLOCK(QtMgx3DApplication::displayUpdatesErrors(), this, getAppTitle())
 
