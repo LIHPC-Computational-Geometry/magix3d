@@ -48,9 +48,6 @@ Tutoriels
 :doc:`pages/tuto-Groupes`
    |PlaqueEtCylindreMaille| Tutoriel qui montre comment utiliser les groupes
 
-:doc:`pages/tuto-3DRevolution`
-   |CylindreMaillage| Tutoriel qui explique comment réaliser une modélisation avec sa topologie, le tout en 3D, en partant d'un modèle 2D en provenance de magix (2D)
-
 Pour aller plus loin avec votre cas 2D, il est nécessaire de voir les :ref:`recommandations générales<generation3D>` pour le passage de votre cas 2D au modèle bloc structuré en 3D.
 
 :doc:`pages/tuto-2CylindesCreux`
@@ -89,7 +86,6 @@ Pour aller plus loin avec votre cas 2D, il est nécessaire de voir les :ref:`rec
    pages/tuto-2BoitesConformes
    pages/tuto-2BoitesAvecRecouvrement
    pages/tuto-Groupes
-   pages/tuto-3DRevolution
    pages/tuto-2CylindesCreux
    pages/cea_tuto-*
 
@@ -99,8 +95,6 @@ Pour aller plus loin avec votre cas 2D, il est nécessaire de voir les :ref:`rec
 .. |deuxBoitesRPMaillage| image:: ./images/DeuxBoitesRP_maillage.jpeg
    :width: 100px
 .. |PlaqueEtCylindreMaille| image:: ./images/PlaqueEtCylindre_maille.png
-   :width: 100px
-.. |CylindreMaillage| image:: ./images/Cylindre_maillage.jpeg
    :width: 100px
 .. |CylindreOreilleMaillage| image:: ./images/CylindreOreille_maillage_ext.jpeg
    :width: 100px
