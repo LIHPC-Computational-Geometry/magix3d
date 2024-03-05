@@ -85,6 +85,7 @@ QtDoubleTextField& QtNumericFieldsFactory::createPositionTextField (
 	textfield->setDecimals (decimals);
 //	textfield->setVisibleColumns (doubleMaxLength.size ( ));
 	// +1 : séparateur décimal
+	textfield->setNotation (QDoubleValidator::ScientificNotation, true);
 	textfield->setVisibleColumns (
 		decimals + doubleIntegerPartMaxLength + doubleExponentPartMaxLength + 1);
 
@@ -106,7 +107,7 @@ QtDoubleTextField& QtNumericFieldsFactory::createDistanceTextField (
 	CHECK_NULL_PTR_ERROR (textfield)
 //	textfield->setVisibleColumns (
 //							MgxNumeric::mgxDoubleScientificNotationCharMax);
-	textfield->setNotation (QDoubleValidator::ScientificNotation);
+	textfield->setNotation (QDoubleValidator::ScientificNotation, true);
 	textfield->setDecimals (decimals);
 //	textfield->setVisibleColumns (doubleMaxLength.size ( ));
 	// +1 : séparateur décimal
@@ -126,7 +127,7 @@ QtDoubleTextField& QtNumericFieldsFactory::createRatioTextField (
 	CHECK_NULL_PTR_ERROR (textfield)
 	textfield->setVisibleColumns (
 			MgxNumeric::mgxDoubleScientificNotationCharMax);
-	textfield->setNotation (QDoubleValidator::ScientificNotation);
+	textfield->setNotation (QDoubleValidator::ScientificNotation, true);
 
 	return *textfield;
 }	// QtNumericFieldsFactory::createRatioTextField
@@ -142,7 +143,7 @@ QtDoubleTextField& QtNumericFieldsFactory::createAngleTextField (
 	textfield->setVisibleColumns (
 							4 + MgxNumeric::mgxAngleDecimalNum);
 	textfield->setDecimals (MgxNumeric::mgxAngleDecimalNum);
-	textfield->setNotation (QDoubleValidator::StandardNotation);
+	textfield->setNotation (QDoubleValidator::StandardNotation, true);
 
 	return *textfield;
 }	// QtNumericFieldsFactory::createAngleTextField
