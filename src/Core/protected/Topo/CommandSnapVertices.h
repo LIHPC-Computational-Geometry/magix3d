@@ -58,10 +58,10 @@ public:
     virtual void getPreviewRepresentation(Utils::DisplayRepresentation& dr);
 
 private:
-    /** return true si le 2ème sommet est associé à une entité identique à celle du 1er
+    /** return false si le 2ème sommet est associé à une entité identique à celle du 1er
      * ou si elle est reliée à cette entité
      */
-    bool areAssociationOK(Vertex* som1, Vertex* som2);
+    bool needDeleteSom2Association(Vertex* som1, Vertex* som2);
 
     /// les premiers sommets (conservés)
     std::vector<Vertex* > m_vertices1;
