@@ -156,15 +156,13 @@ différentes dimensions.
 Il permet la dégénérescence de blocs par fusion de sommets.
 
 Il faut renseigner les noms des entités qui seront fusionnées 2 à 2
-suivant la dimension :
+suivant la dimension :
 
--  Un sommet topologique avec un autre,
+- Un sommet topologique avec un autre,
 
--  Une arête topologique avec une autre (les 2 paires de sommets sont
-   fusionnés),
+- Une arête topologique avec une autre (les 2 paires de sommets sont fusionnés),
 
--  Una face topologique avec une autre (les 2 quadruplets de sommets
-   sont fusionnés).
+- Une face topologique avec une autre (les 2 quadruplets de sommets sont fusionnés).
 
 Il est proposé par défaut de projeter le 2\ :sup:`ème` sommet sur le
 1\ :sup:`er`, mais il est possible que le sommet conservé soit
