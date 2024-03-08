@@ -421,13 +421,8 @@ void VTKRenderingManager::VTKPointInteractor::vtkInteractorModified ( )
 // ===========================================================================
 
 
-VTKRenderingManager::VTKConstrainedPointInteractor::VTKConstrainedPointInteractor (
-	Math::Point point, Entity* constraint, size_t factor,
-	VTKRenderingManager& renderingManager,
-	RenderingManager::InteractorObserver* observer)
-	: RenderingManager::ConstrainedPointInteractor (observer),
-	  _pointWidget (0), _constraintActor (0), _callback (0),
-	  _x (point.getX ( )), _y (point.getY ( )), _z (point.getZ ( ))
+VTKRenderingManager::VTKConstrainedPointInteractor::VTKConstrainedPointInteractor (Math::Point point, Entity* constraint, size_t factor, VTKRenderingManager& renderingManager, RenderingManager::InteractorObserver* observer)
+	: RenderingManager::ConstrainedPointInteractor (observer), _pointWidget (0), _constraintActor (0), _callback (0), _x (point.getX ( )), _y (point.getY ( )), _z (point.getZ ( ))
 {
 	_pointWidget		= vtkConstrainedPointWidget::New ( );
 	CHECK_NULL_PTR_ERROR (_pointWidget->GetRepresentation ( ))
@@ -438,24 +433,20 @@ VTKRenderingManager::VTKConstrainedPointInteractor::VTKConstrainedPointInteracto
 	_pointWidget->GetRepresentation ( )->SetHandleSize (30);
 	_pointWidget->On ( );
 	_callback	= new VTKInteractorCallback<VTKConstrainedPointInteractor> (this, _pointWidget);
-	// CP ATTENTION : setPoint doit être fait après setConstraint car setConstraint choisi le
-	// point sous le curseur de la souris à l'emplacement du dernier évènement.
+	// CP ATTENTION : setPoint doit être fait après setConstraint car setConstraint choisi le point sous le curseur de la souris à l'emplacement du dernier évènement.
 	setConstraint (constraint, factor);
 	setPoint (point);
 }	// VTKConstrainedPointInteractor::VTKConstrainedPointInteractor
 
 
-VTKRenderingManager::VTKConstrainedPointInteractor::VTKConstrainedPointInteractor (
-					const VTKRenderingManager::VTKConstrainedPointInteractor&)
+VTKRenderingManager::VTKConstrainedPointInteractor::VTKConstrainedPointInteractor (const VTKRenderingManager::VTKConstrainedPointInteractor&)
 	: RenderingManager::ConstrainedPointInteractor (0),
 	  _pointWidget (0), _constraintActor (0), _callback (0), _x (0.), _y (0.), _z (0.)
 {
 }	// VTKConstrainedPointInteractor::VTKConstrainedPointInteractor
 
 
-VTKRenderingManager::VTKConstrainedPointInteractor&
-			VTKRenderingManager::VTKConstrainedPointInteractor::operator = (
-					const VTKRenderingManager::VTKConstrainedPointInteractor&)
+VTKRenderingManager::VTKConstrainedPointInteractor& VTKRenderingManager::VTKConstrainedPointInteractor::operator = (const VTKRenderingManager::VTKConstrainedPointInteractor&)
 {
 	return *this;
 }	// VTKConstrainedPointInteractor::operator =
@@ -469,8 +460,7 @@ VTKRenderingManager::VTKConstrainedPointInteractor::~VTKConstrainedPointInteract
 
 	if (0 != _pointWidget)
 	{
-		if ((0 != _constraintActor) && (0 != _pointWidget->GetCurrentRenderer ( )) &&
-		    (false != _pointWidget->GetCurrentRenderer ( )->HasViewProp (_constraintActor)))
+		if ((0 != _constraintActor) && (0 != _pointWidget->GetCurrentRenderer ( )) && (false != _pointWidget->GetCurrentRenderer ( )->HasViewProp (_constraintActor)))
 			_pointWidget->GetCurrentRenderer ( )->RemoveViewProp (_constraintActor);
 		_pointWidget->Off ( );			// Mandatory (core dump ...)
 		_pointWidget->SetInteractor (0);	// Mandatory (core dump ...)
@@ -491,6 +481,12 @@ Math::Point VTKRenderingManager::VTKConstrainedPointInteractor::getPoint ( ) con
 }	// VTKConstrainedPointInteractor::getPoint
 
 
+Math::Point VTKRenderingManager::VTKConstrainedPointInteractor::getInitialPoint ( ) const
+{
+	return Math::Point (_x, _y, _z);
+}	// VTKConstrainedPointInteractor::getInitialPoint
+
+
 void VTKRenderingManager::VTKConstrainedPointInteractor::setPoint (Math::Point point)
 {
 	CHECK_NULL_PTR_ERROR (_pointWidget)
@@ -504,14 +500,22 @@ void VTKRenderingManager::VTKConstrainedPointInteractor::setPoint (Math::Point p
 
 	_pointWidget->GetConstrainedPointRepresentation ( )->SetWorldPosition (pos);
 	_pointWidget->On ( );
+	if (0 != _constraintActor)
+	{	// Positionner la "croix" du sélecteur sur l'entité de contrainte au plus près du point à déplacer :
+		double newCenterPoint[3], worldOrient[9];
+		_pointWidget->GetCurrentRenderer ( )->SetWorldPoint (pos);
+		_pointWidget->GetCurrentRenderer ( )->WorldToDisplay ( );
+		_pointWidget->GetCurrentRenderer ( )->GetDisplayPoint (pos);
+		if (_pointWidget->GetConstrainedPointRepresentation ( )->GetUGridPointPlacer ( )->ComputeWorldPosition (_pointWidget->GetCurrentRenderer ( ), pos, newCenterPoint, worldOrient))
+			_pointWidget->GetConstrainedPointRepresentation ( )->SetWorldPosition (newCenterPoint);
+	}	// if (0 != _constraintActor)
 }	// VTKConstrainedPointInteractor::setPoint
 
 
 void VTKRenderingManager::VTKConstrainedPointInteractor::setConstraint (Entity* constraint, size_t factor)
 {
 	CHECK_NULL_PTR_ERROR (_pointWidget)
-	if ((0 != _constraintActor) && (0 != _pointWidget->GetCurrentRenderer ( )) &&
-	    (false != _pointWidget->GetCurrentRenderer ( )->HasViewProp (_constraintActor)))
+	if ((0 != _constraintActor) && (0 != _pointWidget->GetCurrentRenderer ( )) && (false != _pointWidget->GetCurrentRenderer ( )->HasViewProp (_constraintActor)))
 		_pointWidget->GetCurrentRenderer ( )->RemoveViewProp (_constraintActor);
 	_constraintActor	= 0;
 	_pointWidget->GetConstrainedPointRepresentation ( )->GetUGridPointPlacer ( )->SetGrid (0);
@@ -521,8 +525,7 @@ void VTKRenderingManager::VTKConstrainedPointInteractor::setConstraint (Entity* 
 	vtkUnstructuredGrid*	grid	= 0;
 	if (0 != _pointWidget)
 	{
-		DisplayProperties::GraphicalRepresentation*	rep	= 0 == constraint ?
-				0 : constraint->getDisplayProperties ( ).getGraphicalRepresentation ( );
+		DisplayProperties::GraphicalRepresentation*	rep	= 0 == constraint ? 0 : constraint->getDisplayProperties ( ).getGraphicalRepresentation ( );
 		VTKEntityRepresentation*	vtkRep	= dynamic_cast<VTKEntityRepresentation*>(rep);
 		if (0 != rep)
 			rep->createRefinedRepresentation (factor);
@@ -533,10 +536,11 @@ void VTKRenderingManager::VTKConstrainedPointInteractor::setConstraint (Entity* 
 	if (0 != _constraintActor)
 	{
 		_pointWidget->GetConstrainedPointRepresentation ( )->GetUGridPointPlacer ( )->AddProp (_constraintActor);
+		_pointWidget->GetConstrainedPointRepresentation ( )->GetProperty ( )->SetColor (1., 0., 0.);	// Croix interactive rouge
 		_pointWidget->On ( );
-		if ((0 != _pointWidget->GetCurrentRenderer ( )) &&
-		    (false == _pointWidget->GetCurrentRenderer ( )->HasViewProp (_constraintActor)))
+		if ((0 != _pointWidget->GetCurrentRenderer ( )) && (false == _pointWidget->GetCurrentRenderer ( )->HasViewProp (_constraintActor)))
 			_pointWidget->GetCurrentRenderer ( )->AddViewProp (_constraintActor);
+		setPoint (getInitialPoint ( ));	// Positionner la "croix" du sélecteur sur l'entité de contrainte au plus près du point à déplacer 
 	}	// if (0 != _constraintActor)
 }	// VTKConstrainedPointInteractor::setConstraint
 
