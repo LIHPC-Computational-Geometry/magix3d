@@ -135,7 +135,7 @@ CommandSnapVertices(Internal::Context& c,
     	std::vector<Vertex* > vertices;
     	m_common_block->getHexaVertices(vertices);
 
-#ifdef _DEBUG_SNAP2
+#ifdef _DEBUG_SNAP
     	std::cout<<"getHexaVertices => ";
     	for (uint i=0; i<vertices.size(); i++)
     		std::cout<<" "<<vertices[i]->getName();
@@ -150,7 +150,7 @@ CommandSnapVertices(Internal::Context& c,
     			// les 2 marques pour 2 noeuds d'une arête du bloc
     			uint m1 = filtre_vertex[vertices[TopoHelper::tabIndVtxByEdgeAndDirOnBlock[i][j][0]]];
     			uint m2 = filtre_vertex[vertices[TopoHelper::tabIndVtxByEdgeAndDirOnBlock[i][j][1]]];
-#ifdef _DEBUG_SNAP2
+#ifdef _DEBUG_SNAP
     			std::cout<<"v1 = "<<vertices[TopoHelper::tabIndVtxByEdgeAndDirOnBlock[i][j][0]]->getName()<<", m1 = "<<m1<<std::endl;
     			std::cout<<"v2 = "<<vertices[TopoHelper::tabIndVtxByEdgeAndDirOnBlock[i][j][1]]->getName()<<", m2 = "<<m2<<std::endl;
 #endif
@@ -491,13 +491,10 @@ internalExecute()
                             <<" et libération de l'arête "<<coedge_between->getName()<<std::endl;
 #endif
 
-        // faut-il supprimer les associations pour som1 ?
-        bool needDeleteAssociation = !areAssociationOK(som1, som2);
-
         // Suppression des associations vers la géométrie pour les sommets m_vertices2
         // ainsi que pour tout ce qui touche ces sommets
-        if (needDeleteAssociation || !m_project_on_first)
-        TopoHelper::deleteAllAdjacentTopoEntitiesGeomAssociation(som2);
+        if (needDeleteSom2Association(som1, som2) || !m_project_on_first)
+            TopoHelper::deleteAllAdjacentTopoEntitiesGeomAssociation(som2);
 
         // si le som1 bouge, on supprime égallement les associations
         if (!m_project_on_first)
@@ -693,25 +690,25 @@ internalExecute()
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_1));
 }
 /*----------------------------------------------------------------------------*/
-bool CommandSnapVertices::areAssociationOK(Vertex* som1, Vertex* som2)
+bool CommandSnapVertices::needDeleteSom2Association(Vertex* som1, Vertex* som2)
 {
 	Geom::GeomEntity* assos1 = som1->getGeomAssociation();
 	Geom::GeomEntity* assos2 = som2->getGeomAssociation();
 
-	if (assos2 == 0) // on va conserver les associations du 1er
-		return true;
+    if (assos2 == 0) // on va conserver les associations du 1er
+		return false;
 	if (assos1 == assos2) // on conserve puisque identiques
-		return true;
-	if (assos1->getDim() == 0 && assos2->getDim() == 1){
+		return false;
+	if (assos1 != 0 && assos1->getDim() == 0 && assos2->getDim() == 1){
 		// on va chercher à vérifier que la courbe est reliée au sommet, si oui alors on conserve
 		Geom::Vertex* vt1 = dynamic_cast<Geom::Vertex*>(assos1);
 
 		Geom::Curve* crb2 = dynamic_cast<Geom::Curve*>(assos2);
 
 		if (crb2->firstPoint() == vt1 || crb2->secondPoint() == vt1)
-			return true;
+			return false;
 	}
-	return false;
+	return true;
 }
 /*----------------------------------------------------------------------------*/
 void CommandSnapVertices::getPreviewRepresentation(Utils::DisplayRepresentation& dr)
