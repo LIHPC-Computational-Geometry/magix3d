@@ -268,9 +268,9 @@ internalExecute()
 
 
     // liste des blocs modifiés par le déplacement des sommets
-    std::list<Topo::Block*> l_b;
+    std::vector<Topo::Block*> blocks;
     // liste des cofaces modifiées ...
-    std::list<Topo::CoFace*> l_f;
+    std::vector<Topo::CoFace*> cofaces;
 
     std::vector<Topo::Vertex* >::iterator iter1;
     std::vector<Topo::Vertex* >::iterator iter2;
@@ -280,31 +280,36 @@ internalExecute()
         Vertex* som1 = *iter1;
         Vertex* som2 = *iter2;
 
-        std::vector<Block* > blocks;
-        std::vector<CoFace* > cofaces;
+        std::vector<Block* > l_blocks;
+        std::vector<CoFace* > l_cofaces;
 
         // le som2 bouge, il est fusionné avec le som1
-        som2->getBlocks(blocks);
-        l_b.insert(l_b.end(), blocks.begin(), blocks.end());
+        som2->getBlocks(l_blocks);
+        blocks.insert(blocks.end(), l_blocks.begin(), l_blocks.end());
 
-        som2->getCoFaces(cofaces);
-        l_f.insert(l_f.end(), cofaces.begin(), cofaces.end());
+        som2->getCoFaces(l_cofaces);
+        cofaces.insert(cofaces.end(), l_cofaces.begin(), l_cofaces.end());
 
         // cas où le som1 bouge
         if (!m_project_on_first){
-            som1->getBlocks(blocks);
-            l_b.insert(l_b.end(), blocks.begin(), blocks.end());
+            som1->getBlocks(l_blocks);
+            blocks.insert(blocks.end(), l_blocks.begin(), l_blocks.end());
 
-            som1->getCoFaces(cofaces);
-            l_f.insert(l_f.end(), cofaces.begin(), cofaces.end());
+            som1->getCoFaces(l_cofaces);
+            cofaces.insert(cofaces.end(), l_cofaces.begin(), l_cofaces.end());
         }
     }
 
-    l_b.sort(Utils::Entity::compareEntity);
-    l_b.unique();
-    l_f.sort(Utils::Entity::compareEntity);
-    l_f.unique();
+    std::sort(blocks.begin(), blocks.end(), Utils::Entity::compareEntity);
+    auto lastblocks = std::unique(blocks.begin(), blocks.end());
+    blocks.erase(lastblocks, blocks.end());
 
+    std::sort(cofaces.begin(), cofaces.end(), Utils::Entity::compareEntity);
+    auto lastcofaces = std::unique(cofaces.begin(), cofaces.end());
+    cofaces.erase(lastcofaces, cofaces.end());
+
+    // force la sauvegarde des relations topologiques pour toutes les entités et celles de niveau inférieur
+    TopoHelper::saveTopoEntities(cofaces, &getInfoCommand());
 
     std::vector<CoEdge* > coedges;
     if (m_common_block)
@@ -679,7 +684,7 @@ internalExecute()
     } //end if (!m_project_on_first)
 
     // recherche la méthode la plus simple possible pour les cofaces et les blocs modifiés
-    updateMeshLaw(l_f, l_b);
+    updateMeshLaw(cofaces, blocks);
 
     // enregistrement des nouvelles entités dans le TopoManager
     registerToManagerCreatedEntities();

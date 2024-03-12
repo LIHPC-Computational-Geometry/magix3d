@@ -200,7 +200,7 @@ protected:
      *  potentiellement invalide
      *  recherche la méthode la plus simple
      */
-    void updateMeshLaw(std::list<Topo::CoFace*>& l_f, std::list<Topo::Block*>& l_b);
+    void updateMeshLaw(std::vector<Topo::CoFace*>& cofaces, std::vector<Topo::Block*>& blocks);
 
     /*------------------------------------------------------------------------*/
     /// change la discrétisation pour les arêtes d'une coface en mettant la discrétisation orthogonale

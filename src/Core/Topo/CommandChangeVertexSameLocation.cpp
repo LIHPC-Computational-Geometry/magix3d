@@ -49,30 +49,26 @@ internalExecute()
             << " de nom unique " << getUniqueName ( );
 
     // liste des blocs modifiés
-    std::list<Topo::Block*> l_b;
+    std::vector<Topo::Block*> blocks;
     // liste des cofaces modifiées
-    std::list<Topo::CoFace*> l_f;
-
+    std::vector<Topo::CoFace*> cofaces;
 
     m_vertex->saveVertexGeomProperty(&getInfoCommand(), true);
-
     m_vertex->setCoord(m_target->getCoord());
-
-    std::vector<Block* > blocks;
     m_vertex->getBlocks(blocks);
-    l_b.insert(l_b.end(), blocks.begin(), blocks.end());
 
-    std::vector<CoFace* > cofaces;
     m_vertex->getCoFaces(cofaces);
-    l_f.insert(l_f.end(), cofaces.begin(), cofaces.end());
 
-    l_b.sort(Utils::Entity::compareEntity);
-    l_b.unique();
-    l_f.sort(Utils::Entity::compareEntity);
-    l_f.unique();
+    std::sort(blocks.begin(), blocks.end(), Utils::Entity::compareEntity);
+    auto lastblocks = std::unique(blocks.begin(), blocks.end());
+    blocks.erase(lastblocks, blocks.end());
+
+    std::sort(cofaces.begin(), cofaces.end(), Utils::Entity::compareEntity);
+    auto lastcofaces = std::unique(cofaces.begin(), cofaces.end());
+    cofaces.erase(lastcofaces, cofaces.end());
 
     // recherche la méthode la plus simple possible
-    updateMeshLaw(l_f, l_b);
+    updateMeshLaw(cofaces,blocks);
 
     // on parcours les entités modifiées pour sauvegarder leur état d'avant la commande
     saveInternalsStats();

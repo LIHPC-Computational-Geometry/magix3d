@@ -438,14 +438,13 @@ registerToManagerCreatedEntities()
 }
 /*----------------------------------------------------------------------------*/
 void CommandEditTopo::
-updateMeshLaw(std::list<Topo::CoFace*>& l_f, std::list<Topo::Block*>& l_b)
+updateMeshLaw(std::vector<Topo::CoFace*>& cofaces, std::vector<Topo::Block*>& blocks)
 {
 #ifdef _DEBUG2
     uint nb_cofaces = 0;
     uint nb_blocs = 0;
 #endif
-   for(std::list<Topo::CoFace*>::iterator iter=l_f.begin(); iter != l_f.end(); ++iter){
-        Topo::CoFace* coface = *iter;
+   for(auto& coface : cofaces){
         if (coface->isDestroyed())
             continue;
 #ifdef _DEBUG2
@@ -462,17 +461,16 @@ updateMeshLaw(std::list<Topo::CoFace*>& l_f, std::list<Topo::Block*>& l_b)
 
     // il est préférable de le faire sur les blocs après les faces communes
     // c'est pour cela que tout est dans une unique méthode
-    for(std::list<Topo::Block*>::iterator iter=l_b.begin(); iter != l_b.end(); ++iter){
-        Topo::Block* bloc = *iter;
-        if (bloc->isDestroyed())
+    for(auto& block : blocks){
+        if (block->isDestroyed())
             continue;
 #ifdef _DEBUG2
        nb_blocs += 1;
 #endif
-        if (bloc->getMeshLaw() < BlockMeshingProperty::transfinite){
+        if (block->getMeshLaw() < BlockMeshingProperty::transfinite){
 
             // on cherche une méthode la plus basique possible
-            bloc->selectBasicMeshLaw(&getInfoCommand(), true);
+            block->selectBasicMeshLaw(&getInfoCommand(), true);
 
         } // end if (bloc->getMeshLaw() <= rotK)
     } // end for iter=l_b.begin()
