@@ -51,8 +51,7 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 
 	/**
 	 * \param		Eventuel widget associé.
-	 * \param		<I>true</I> si le rendu doit être fait dans
-	 *				une fenêtre <I>offscreen</I>.
+	 * \param		<I>true</I> si le rendu doit être fait dans une fenêtre <I>offscreen</I>.
 	 */
 	VTKRenderingManager (QtVtkGraphicWidget* w, bool offScreen);
 
@@ -67,8 +66,7 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 	//@{
 
 	/**
-	 * \return		<I>true</I> si des représentations sont affichées,
-	 *				<I>false</I> dans le cas contraire.
+	 * \return		<I>true</I> si des représentations sont affichées, <I>false</I> dans le cas contraire.
 	 * \see			displayRepresentation
 	 * \see			isDisplayed
 	 */
@@ -80,16 +78,12 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 	virtual std::vector<Mgx3D::Utils::Entity*> getDisplayedEntities ( );
 
 	/**
-	 * Recherche parmi les entités représentées celles dont les valeurs aux
-	 * noeuds ou aux mailles sont affichées. En retour, la liste des définitions
-	 * de table de couleurs rencontrées.
+	 * Recherche parmi les entités représentées celles dont les valeurs aux noeuds ou aux mailles sont affichées. En retour, la liste des définitions de table de couleurs rencontrées.
 	 */
 	virtual void getDisplayedValues (std::vector<RenderingManager::ColorTableDefinition>& definitions);
 
 	/**
-	 * Passe ou quitte le mode d'utilisation des propriétés d'affichage
-	 * global, partagées par les entités, et utilisées pour initialiser les
-	 * propriétés d'affichage individuelles.
+	 * Passe ou quitte le mode d'utilisation des propriétés d'affichage global, partagées par les entités, et utilisées pour initialiser les propriétés d'affichage individuelles.
 	 */
 	virtual void useGlobalDisplayProperties (bool global);
 
@@ -102,16 +96,14 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 	//@{
 
 	/**
-	 * Affiche/masque la représentation dont l'identifiant est tranmis en
-	 * argument.
+	 * Affiche/masque la représentation dont l'identifiant est tranmis en argument.
 	 */
 	virtual void displayRepresentation (RepresentationID id, bool show);
 
 	/**
 	 * Créé un vecteur orthogonal à celui transmis en argument.
 	 * \param		Coordonnées du vecteur dont on cherche un vecteur orthogonal
-	 * \param		Coordonnées du vecteur orthogonal (ou (0., 0., 0.) en cas de
-	 *				vecteur nul en entrée).
+	 * \param		Coordonnées du vecteur orthogonal (ou (0., 0., 0.) en cas de vecteur nul en entrée).
 	 */
 	static void getOrthogonalVector (const double coords [3], double orth [3]);
 
@@ -119,113 +111,84 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 	 * Affiche un segment.
 	 * \param		Extrémités du segment.
 	 * \param		Attributs de représentation.
-	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>,
-	 * 				<I>false</I> s'il ne faut pas.
+	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>, <I>false</I> s'il ne faut pas.
 	 * \return		Identifiant de la représentation du segment créée.
 	 * \see			destroyRepresentation
 	 */
-	virtual RepresentationID createSegment (
-			const Mgx3D::Utils::Math::Point& p1,
-			const Mgx3D::Utils::Math::Point& p2,
-			const Mgx3D::Utils::DisplayProperties& properties, bool display);
+	virtual RepresentationID createSegment (const Mgx3D::Utils::Math::Point& p1, const Mgx3D::Utils::Math::Point& p2, const Mgx3D::Utils::DisplayProperties& properties, bool display);
 
 	/**
 	 * Affiche un vecteur.
 	 * \param		Extrémités du vecteur.
 	 * \param		Attributs de représentation.
-	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>,
-	 * 				<I>false</I> s'il ne faut pas.
+	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>, <I>false</I> s'il ne faut pas.
 	 * \return		Identifiant de la représentation du vecteur créée.
 	 * \see			destroyRepresentation
 	 */
-	virtual RepresentationID createVector (
-			const Mgx3D::Utils::Math::Point& p1,
-			const Mgx3D::Utils::Math::Point& p2,
-			const Mgx3D::Utils::DisplayProperties& properties, bool display);
+	virtual RepresentationID createVector (const Mgx3D::Utils::Math::Point& p1, const Mgx3D::Utils::Math::Point& p2, const Mgx3D::Utils::DisplayProperties& properties, bool display);
 
 	/**
 	 * Affiche un axe de rotation.
 	 * \param		Extrémités de l'axe de rotation.
 	 * \param		Attributs de représentation.
-	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>,
-	 * 				<I>false</I> s'il ne faut pas.
+	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>, <I>false</I> s'il ne faut pas.
 	 * \return		Identifiant de la représentation de l'axe créé.
 	 * \see			destroyRepresentation
 	 */
-	virtual RepresentationID createRotationAxe (
-			const Mgx3D::Utils::Math::Point& p1,
-			const Mgx3D::Utils::Math::Point& p2,
-			const Mgx3D::Utils::DisplayProperties& properties, bool display);
+	virtual RepresentationID createRotationAxe (const Mgx3D::Utils::Math::Point& p1, const Mgx3D::Utils::Math::Point& p2, const Mgx3D::Utils::DisplayProperties& properties, bool display);
 
 	/**
 	 * Affiche une boite sous forme filaire.
 	 * \param		2 points opposés de la boite.
 	 * \param		Attributs de représentation.
-	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>,
-	 * 				<I>false</I> s'il ne faut pas.
+	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>, <I>false</I> s'il ne faut pas.
 	 * \return		Identifiant de la représentation de la boite créée.
 	 * \see			destroyRepresentation
 	 */
-	virtual RepresentationID createOutlineBox (
-			const Mgx3D::Utils::Math::Point& p1,
-			const Mgx3D::Utils::Math::Point& p2,
-			const Mgx3D::Utils::DisplayProperties& properties, bool display);
+	virtual RepresentationID createOutlineBox (const Mgx3D::Utils::Math::Point& p1, const Mgx3D::Utils::Math::Point& p2, const Mgx3D::Utils::DisplayProperties& properties, bool display);
 
 	/**
 	 * Affiche une représentation du nuage de points transmis en argument.
 	 * \param		Nuage de points à représenter.
 	 * \param		Attributs de représentation.
-	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>,
-	 * 				<I>false</I> s'il ne faut pas.
+	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>, <I>false</I> s'il ne faut pas.
 	 * \return		Identifiant de la représentation du nuage de point créée.
 	 * \see			createSegmentsWireRepresentation
 	 * \see			destroyRepresentation
 	 */
 	virtual RenderingManager::RepresentationID createCloudRepresentation (
-				const std::vector<Mgx3D::Utils::Math::Point>& points,
-				const Mgx3D::Utils::DisplayProperties& properties,
-				bool display);
+				const std::vector<Mgx3D::Utils::Math::Point>& points, const Mgx3D::Utils::DisplayProperties& properties, bool display);
 
 	/**
 	 * Affiche une représentation filaire des segments transmis en argument.
 	 * \param		Noeuds des segments.
 	 * \param		Segments à représenter.
 	 * \param		Attributs de représentation.
-	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>,
-	 * 				<I>false</I> s'il ne faut pas.
+	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>, <I>false</I> s'il ne faut pas.
 	 * \return		Identifiant de la représentation filaire créée.
-	 * \warning		Un identifiant nul est retourné en cas d'échec de la
-	 *				création de la représentation.
+	 * \warning		Un identifiant nul est retourné en cas d'échec de la création de la représentation.
 	 * \see			createCloudRepresentation
 	 * \see			destroyRepresentation
 	 */
 	virtual RenderingManager::RepresentationID createSegmentsWireRepresentation(
-				const std::vector<Mgx3D::Utils::Math::Point>& points,
-				const std::vector<size_t>& segments,
-				const Mgx3D::Utils::DisplayProperties& properties,
-				bool display);
+				const std::vector<Mgx3D::Utils::Math::Point>& points, const std::vector<size_t>& segments, const Mgx3D::Utils::DisplayProperties& properties, bool display);
 
 	/**
 	 * Affiche le texte transmis en argument.
 	 * \param		Emplacement du texte à afficher
 	 * \param		Nombre à afficher textuellement
 	 * \param		Attributs de représentation.
-	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>,
-	 * 				<I>false</I> s'il ne faut pas.
+	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>, <I>false</I> s'il ne faut pas.
 	 * \return		Identifiant de la représentation filaire créée.
-	 * \warning		Un identifiant nul est retourné en cas d'échec de la
-	 *				création de la représentation.
+	 * \warning		Un identifiant nul est retourné en cas d'échec de la création de la représentation.
 	 * \see			destroyRepresentation
 	 */
 	virtual RenderingManager::RepresentationID createTextRepresentation (
-				const Mgx3D::Utils::Math::Point& position, size_t number,
-				const Mgx3D::Utils::DisplayProperties& properties,
-				bool display);
+				const Mgx3D::Utils::Math::Point& position, size_t number, const Mgx3D::Utils::DisplayProperties& properties, bool display);
 
 	/**
 	 * Détruit la représentation dont l'ientifiant est transmis en argument.
-	 * \param		<I>true</I> si la représentation ne doit préalablement plus
-	 * 				être affichée.
+	 * \param		<I>true</I> si la représentation ne doit préalablement plus être affichée.
 	 */
 	virtual void destroyRepresentation (RenderingManager::RepresentationID, bool hide);
 
@@ -316,9 +279,7 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 	};	// class VTKColorTable
 
 	/**
-	 * \return	Une table de couleur associée à ce gestionnaire de
-	 * 			rendu et représentant la valeur dont le nom est transmis en
-	 * 			argument. Créé la table si nécessaire.
+	 * \return	Une table de couleur associée à ce gestionnaire de rendu et représentant la valeur dont le nom est transmis en argument. Créé la table si nécessaire.
 	 */
 	virtual RenderingManager::ColorTable* getColorTable (const RenderingManager::ColorTableDefinition&);
 
@@ -348,10 +309,8 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 	//@{
 
 	/**
-	 * Classe <I>callback VTK</I> sur une interaction et template sur une
-	 * classe ayant en fonction membre publique la méthode
-	 * <I>vtkInteractorModified</I>. Cette méthode est invoquée lorsque
-	 * l'utilisateur modifie interactivement l'interacteur.
+	 * Classe <I>callback VTK</I> sur une interaction et template sur une classe ayant en fonction membre publique la méthode
+	 * <I>vtkInteractorModified</I>. Cette méthode est invoquée lorsque l'utilisateur modifie interactivement l'interacteur.
 	 */
 	template <class Observer> class VTKInteractorCallback : public vtkCommand
 	{
@@ -404,7 +363,7 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 		virtual ~VTKPointInteractor ( );
 
 		/**
-		 * \return		Le point
+		 * \return		Le point défini interactivement
 		 * \see			setPoint
 		 */
 		virtual Mgx3D::Utils::Math::Point getPoint ( ) const;
@@ -426,8 +385,7 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 		virtual void setBoxDimensions(double dx, double dy, double dz);
 
 		/**
-		 * Méthode appelée lorsque l'interacteur <I>VTK</I> est modifié par
-		 * l'utilisateur. Invoque <I>notifyObserverForModifications</I>.
+		 * Méthode appelée lorsque l'interacteur <I>VTK</I> est modifié par l'utilisateur. Invoque <I>notifyObserverForModifications</I>.
 		 */
 		virtual void vtkInteractorModified ( );
 
@@ -459,11 +417,8 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 	/**
 	 * \param		Point proposé par défaut.
 	 * \param		Dimensions de la boite englobante de l'interacteur
-	 * \param		Eventuel observateur étant notifié de toute modification
-	 *				effectuée à l'aide de l'interacteur.
-	 * \return		Pointeur sur l'interacteur permettant de saisir les
-	 *				paramètres de définition du point, ou 0 en cas d'échec de
-	 *				la création de l'interacteur.
+	 * \param		Eventuel observateur étant notifié de toute modification effectuée à l'aide de l'interacteur.
+	 * \return		Pointeur sur l'interacteur permettant de saisir les paramètres de définition du point, ou 0 en cas d'échec de la création de l'interacteur.
 	 * \see			destroyInteractor
 	 */
 	virtual RenderingManager::PointInteractor* createPointInteractor (
@@ -471,9 +426,7 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 			RenderingManager::InteractorObserver* observer);
 
 	/**
-	 * <P>Interacteur <I>VTK</I> permettant la définition d'un point contraint
-	 * dans l'espace (le point sera l'un de ceux d'une grille VTK représentant une
-	 * entité).</P>
+	 * <P>Interacteur <I>VTK</I> permettant la définition d'un point contraint dans l'espace (le point sera l'un de ceux d'une grille VTK représentant une entité).</P>
 	 */
 	class VTKConstrainedPointInteractor : public ConstrainedPointInteractor
 	{
@@ -482,15 +435,11 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 		/**
 		 * \param		Un point
 		 * \param		La contrainte spatiale
-		 * \param		degré de raffinement attendu (ex : 10 pour x10 par
-		 * 			rapport à la représentation par défaut, ...).
+		 * \param		degré de raffinement attendu (ex : 10 pour x10 par rapport à la représentation par défaut, ...).
 		 * \param		Gestionnaire de rendu où l'interacteur sera représenté
 		 * \param		Eventuel observateur des interactions.
 		 */
-		VTKConstrainedPointInteractor (Mgx3D::Utils::Math::Point point,
-				Utils::Entity* constraint, size_t factor,
-				VTKRenderingManager& renderingManager,
-				RenderingManager::InteractorObserver* observer);
+		VTKConstrainedPointInteractor (Mgx3D::Utils::Math::Point point, Utils::Entity* constraint, size_t factor, VTKRenderingManager& renderingManager, RenderingManager::InteractorObserver* observer);
 
 		/**
 		 * Destructeur. RAS.
@@ -504,6 +453,12 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 		virtual Mgx3D::Utils::Math::Point getPoint ( ) const;
 
 		/**
+		 * \return		Le point initial
+		 * \see			setPoint
+		 */
+		virtual Mgx3D::Utils::Math::Point getInitialPoint ( ) const;
+		
+		/**
 		 * Actualise l'interacteur.
 		 * \param		Nouvelle définition du point.
 		 */
@@ -511,14 +466,12 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 
 		/**
 		 * \param		La nouvelle contrainte de positionnement.
-		 * \param		degré de raffinement attendu (ex : 10 pour x10 par
-		 * 			rapport à la représentation par défaut, ...).
+		 * \param		degré de raffinement attendu (ex : 10 pour x10 par rapport à la représentation par défaut, ...).
 		 */
 		virtual void setConstraint (Utils::Entity* constraint, size_t factor);
 
 		/**
-		 * Méthode appelée lorsque l'interacteur <I>VTK</I> est modifié par
-		 * l'utilisateur. Invoque <I>notifyObserverForModifications</I>.
+		 * Méthode appelée lorsque l'interacteur <I>VTK</I> est modifié par l'utilisateur. Invoque <I>notifyObserverForModifications</I>.
 		 */
 		virtual void vtkInteractorModified ( );
 
@@ -532,16 +485,16 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 		VTKConstrainedPointInteractor& operator = (const VTKConstrainedPointInteractor&);
 
 		/** Le widget VTK */
-		vtkConstrainedPointWidget*					_pointWidget;
+		vtkConstrainedPointWidget*									_pointWidget;
 
 		/** La contrainte. */
-		vtkActor*							_constraintActor;
+		vtkActor*													_constraintActor;
 
 		/** Le callback sur la modification de l'interacteur. */
 		VTKInteractorCallback<VTKConstrainedPointInteractor>*		_callback;
 
 		/** Le point initial. */
-		double								_x, _y, _z;
+		double														_x, _y, _z;
 	};	// class VTKConstrainedPointInteractor
 
 	/**
