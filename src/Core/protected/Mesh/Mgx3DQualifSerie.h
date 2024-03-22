@@ -35,7 +35,7 @@ class Mgx3DQualifSerie : public GQualif::GMDSQualifSerie
 	 * @param		Nom du fichier d'où est éventuellement issue la surface.
 	 * @param		Eventuelle entité Magix3D de rattachement.
 	 */
-	Mgx3DQualifSerie (gmds::CellGroup<gmds::Face>&, const std::string& name,
+	Mgx3DQualifSerie (const std::vector<gmds::Face>& surface, const std::string& name,
 				const std::string& fileName, Mgx3D::Mesh::MeshEntity* entity = 0);
 
 	/**
@@ -47,7 +47,7 @@ class Mgx3DQualifSerie : public GQualif::GMDSQualifSerie
 	 * @param		Nom du fichier d'où est éventuellement issue le volume.
 	 * @param		Eventuelle entité Magix3D de rattachement.
 	 */
-	Mgx3DQualifSerie (gmds::CellGroup<gmds::Region>&, const std::string& name,
+	Mgx3DQualifSerie (const std::vector<gmds::Region>& volume, const std::string& name,
 				const std::string& fileName, Mgx3D::Mesh::MeshEntity* entity = 0);
 
 	/**

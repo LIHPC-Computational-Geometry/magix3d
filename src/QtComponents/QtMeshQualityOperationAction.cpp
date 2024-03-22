@@ -328,14 +328,13 @@ void QtMeshQualityOperationPanel::autoUpdate ( )
 		{
 			vector<gmds::Face>	faces;
 			(*iter)->getGMDSFaces (faces);
-			//gmds::Mesh::surface&	s	= mesh.newSurface((*iter)->getName());
 			auto s	= mesh.newGroup<gmds::Face>((*iter)->getName());
 			_gmdsSurfaces.push_back ((*iter)->getName());
 			for (vector<gmds::Face>::const_iterator itf = faces.begin ( );
 					faces.end ( ) != itf; itf++)
 				s->add (*itf);
 			_analysedMeshEntities.push_back (*iter);
-			Mgx3DQualifSerie* serie	= new Mgx3DQualifSerie(*s, (*iter)->getName(), "", *iter);
+			Mgx3DQualifSerie* serie	= new Mgx3DQualifSerie(faces, (*iter)->getName(), "", *iter);
 			getQualityWidget ( ).addSerie (serie);
 		}	// for (vector<string>::const_iterator iter = ...
 
@@ -344,14 +343,13 @@ void QtMeshQualityOperationPanel::autoUpdate ( )
 		{
 			vector<gmds::Region>	regions;
 			(*iter)->getGMDSRegions (regions);
-			//gmds::Mesh::volume&	v	= mesh.newVolume ((*iter)->getName());
 			auto v	= mesh.newGroup<gmds::Region>((*iter)->getName());
 			_gmdsVolumes.push_back ((*iter)->getName());
 			for (vector <gmds::Region>::const_iterator itr = regions.begin ( );
 					regions.end ( ) != itr; itr++)
 				v->add (*itr);
 			_analysedMeshEntities.push_back (*iter);
-			Mgx3DQualifSerie*	serie	= new Mgx3DQualifSerie(*v, (*iter)->getName(), "", *iter);
+			Mgx3DQualifSerie*	serie	= new Mgx3DQualifSerie(regions, (*iter)->getName(), "", *iter);
 			getQualityWidget ( ).addSerie (serie);
 		}	// for (vector<string>::const_iterator iter = ...
 
