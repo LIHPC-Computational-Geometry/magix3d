@@ -17,24 +17,24 @@ namespace Mesh
 {
 
 Mgx3DQualifSerie::Mgx3DQualifSerie (
-	gmds::CellGroup<gmds::Face>& s, const std::string& name,
+	const std::vector<gmds::Face>& surface, const std::string& name,
 	const std::string& fileName, Mgx3D::Mesh::MeshEntity* me)
-	: GQualif::GMDSQualifSerie (s, name, fileName), _meshEntity (me)
+	: GQualif::GMDSQualifSerie (surface, name, fileName), _meshEntity (me)
 {
 }	// Mgx3DQualifSerie::Mgx3DQualifSerie
 
 
 Mgx3DQualifSerie::Mgx3DQualifSerie (
-	gmds::CellGroup<gmds::Region>& v, const std::string& name,
+	const std::vector<gmds::Region>& volume, const std::string& name,
 	const std::string& fileName, Mgx3D::Mesh::MeshEntity* me)
-	: GQualif::GMDSQualifSerie (v, name, fileName), _meshEntity (me)
+	: GQualif::GMDSQualifSerie (volume, name, fileName), _meshEntity (me)
 {
 }	// Mgx3DQualifSerie::Mgx3DQualifSerie
 
 
 Mgx3DQualifSerie::Mgx3DQualifSerie (const Mgx3DQualifSerie&)
 	: GQualif::GMDSQualifSerie (
-			*new gmds::CellGroup<gmds::Face>(new gmds::Mesh(0),"Invalid mesh name"),
+			*new std::vector<gmds::Face>(),
 			"Invalid serie name", "Invalid file name")
 {
 	MGX_FORBIDDEN ("Mgx3DQualifSerie copy constructor is not allowed.")
