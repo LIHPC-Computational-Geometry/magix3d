@@ -69,7 +69,7 @@ QtMeshQualityOperationPanel::QtMeshQualityOperationPanel (
 	: QtMgx3DOperationPanel (
 			0/*parent*/, mainWindow, action, helpURL, helpTag),
 	  _qualifWidget (0), _displayCellsButton (0), _initializeButton (0),
-	  _analysedMeshEntities ( ), _meshEntities ( ), _gmdsSurfaces ( ), _gmdsVolumes ( )
+	  _analysedMeshEntities ( ), _meshEntities ( )
 {
 	setWindowTitle (panelName.c_str ( ));
 	mainWindow.registerAdditionalOperationPanel (*this);
@@ -117,7 +117,7 @@ QtMeshQualityOperationPanel::QtMeshQualityOperationPanel (
 										const QtMeshQualityOperationPanel& cao)
 	: QtMgx3DOperationPanel (0, *new QtMgx3DMainWindow (0),	0, "", ""),
 	  _qualifWidget (0), _displayCellsButton (0), _initializeButton (0),
-	  _analysedMeshEntities ( ), _meshEntities ( ), _gmdsSurfaces ( ), _gmdsVolumes ( )
+	  _analysedMeshEntities ( ), _meshEntities ( )
 {
 	MGX_FORBIDDEN ("QtMeshQualityOperationPanel copy constructor is not allowed.");
 }	// QtMeshQualityOperationPanel::QtMeshQualityOperationPanel (const QtMeshQualityOperationPanel&)
@@ -328,11 +328,6 @@ void QtMeshQualityOperationPanel::autoUpdate ( )
 		{
 			vector<gmds::Face>	faces;
 			(*iter)->getGMDSFaces (faces);
-			auto s	= mesh.newGroup<gmds::Face>((*iter)->getName());
-			_gmdsSurfaces.push_back ((*iter)->getName());
-			for (vector<gmds::Face>::const_iterator itf = faces.begin ( );
-					faces.end ( ) != itf; itf++)
-				s->add (*itf);
 			_analysedMeshEntities.push_back (*iter);
 			Mgx3DQualifSerie* serie	= new Mgx3DQualifSerie(faces, (*iter)->getName(), "", *iter);
 			getQualityWidget ( ).addSerie (serie);
@@ -343,11 +338,6 @@ void QtMeshQualityOperationPanel::autoUpdate ( )
 		{
 			vector<gmds::Region>	regions;
 			(*iter)->getGMDSRegions (regions);
-			auto v	= mesh.newGroup<gmds::Region>((*iter)->getName());
-			_gmdsVolumes.push_back ((*iter)->getName());
-			for (vector <gmds::Region>::const_iterator itr = regions.begin ( );
-					regions.end ( ) != itr; itr++)
-				v->add (*itr);
 			_analysedMeshEntities.push_back (*iter);
 			Mgx3DQualifSerie*	serie	= new Mgx3DQualifSerie(regions, (*iter)->getName(), "", *iter);
 			getQualityWidget ( ).addSerie (serie);
@@ -545,68 +535,7 @@ void QtMeshQualityOperationPanel::clearSeries ( )
 	gmds::Mesh&	gmdsMesh	=
 				getContext ( ).getMeshManager ( ).getMesh ( )->getGMDSMesh ( );
 
-	for (vector<string>::iterator its = _gmdsSurfaces.begin ( );
-	     _gmdsSurfaces.end ( ) != its; its++)
-	{
-		try
-		{
-			gmdsMesh.deleteGroup<gmds::Face>(gmdsMesh.getGroup<gmds::Face>(*its));
-		}
-		catch (const Exception& exc)
-		{
-			UTF8String	error (Charset::UTF_8);
-			error << "Erreur survenue durant le nettoyage du panneau "
-			      << "Qualité de maillage : " << exc.getFullMessage ( );
-			log (ErrorLog (error));
-		}
-		catch (const exception& e)
-		{
-			UTF8String	error (Charset::UTF_8);
-			error << "Erreur survenue durant le nettoyage du panneau "
-			      << "Qualité de maillage : " << e.what ( );
-			log (ErrorLog (error));
-		}
-		catch (...)
-		{
-			UTF8String	error (Charset::UTF_8);
-			error << "Erreur non documentée survenue durant le nettoyage "
-			      << "du panneau Qualité de maillage.";
-			log (ErrorLog (error));
-		}
-	}	// for (vector<string>::iterator its = _gmdsSurfaces.begin ( ); ...
-	_gmdsSurfaces.clear ( );
-
-	for (vector<string>::iterator itv = _gmdsVolumes.begin ( );
-	     _gmdsVolumes.end ( ) != itv; itv++)
-	{
-		try
-		{
-			gmdsMesh.deleteGroup<gmds::Region>(gmdsMesh.getGroup<gmds::Region>(*itv));
-		}
-		catch (const Exception& exc)
-		{
-			UTF8String	error (Charset::UTF_8);
-			error << "Erreur survenue durant le nettoyage du panneau "
-			      << "Qualité de maillage : " << exc.getFullMessage ( );
-			log (ErrorLog (error));
-		}
-		catch (const exception& e)
-		{
-			UTF8String	error (Charset::UTF_8);
-			error << "Erreur survenue durant le nettoyage du panneau "
-			      << "Qualité de maillage : " << e.what ( );
-			log (ErrorLog (error));
-		}
-		catch (...)
-		{
-			UTF8String	error (Charset::UTF_8);
-			error << "Erreur non documentée survenue durant le nettoyage "
-			      << "du panneau Qualité de maillage.";
-			log (ErrorLog (error));
-		}
-	}	// for (vector<string>::iterator itv = _gmdsVolumes.begin ( ); ...
 	_analysedMeshEntities.clear ( );
-	_gmdsVolumes.clear ( );
 }	// QtMeshQualityOperationPanel::clearSeries
 
 
