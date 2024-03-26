@@ -43,14 +43,6 @@ using namespace Mgx3D::Mesh;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Internal;
 
-
-namespace GQualif
-{
-	class GMDSQualifSerie;
-}	// namespace GQualif
-
-
-
 namespace Mgx3D
 {
 
@@ -329,8 +321,7 @@ void QtMeshQualityOperationPanel::autoUpdate ( )
 			vector<gmds::Face>	faces;
 			(*iter)->getGMDSFaces (faces);
 			_analysedMeshEntities.push_back (*iter);
-			Mgx3DQualifSerie* serie	= new Mgx3DQualifSerie(faces, (*iter)->getName(), "", *iter);
-			getQualityWidget ( ).addSerie (serie);
+			getQualityWidget ( ).addSerie (new Mgx3DSurfaceQualifSerie(faces, (*iter)->getName(), "", *iter));
 		}	// for (vector<string>::const_iterator iter = ...
 
 		for (std::vector<Mesh::Volume*> ::const_iterator iter = volumes.begin ( );
@@ -339,8 +330,7 @@ void QtMeshQualityOperationPanel::autoUpdate ( )
 			vector<gmds::Region>	regions;
 			(*iter)->getGMDSRegions (regions);
 			_analysedMeshEntities.push_back (*iter);
-			Mgx3DQualifSerie*	serie	= new Mgx3DQualifSerie(regions, (*iter)->getName(), "", *iter);
-			getQualityWidget ( ).addSerie (serie);
+			getQualityWidget ( ).addSerie (new Mgx3DVolumeQualifSerie(regions, (*iter)->getName(), "", *iter));
 		}	// for (vector<string>::const_iterator iter = ...
 
 	}
