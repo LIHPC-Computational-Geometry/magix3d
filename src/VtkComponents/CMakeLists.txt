@@ -10,8 +10,7 @@ file (GLOB HEADERS protected/VtkComponents/vtkECMFactory.h protected/VtkComponen
                    protected/VtkComponents/vtkLockableRenderWindow.h protected/VtkComponents/vtkUnstructuredGridRefinementFilter.h)
 file (GLOB CPP_SOURCES vtkECMFactory.cpp vtkECMXOpenGLRenderWindow.cpp vtkECMXOpenGLRenderWindow.cpp vtkLockableRenderWindow.cpp vtkUnstructuredGridRefinementFilter.cpp)
 
-# On ajoute les en-têtes aux sources. C'est utile pour cmake dans certains cas,
-# par exemple lorsqu'ils doivent être pré-processés (moc, ...).
+# On ajoute les en-têtes aux sources. C'est utile pour cmake dans certains cas, par exemple lorsqu'ils doivent être pré-processés (moc, ...).
 add_library (VtkComponents ${CPP_SOURCES} ${HEADERS})
 set (ALL_TARGETS VtkComponents)
 set_property (TARGET VtkComponents PROPERTY VERSION ${MAGIX3D_VERSION})
@@ -39,8 +38,7 @@ configure_file (cmake/VtkComponentsDistribution.h.in  ${CMAKE_CURRENT_BINARY_DIR
 configure_file (${CMAKE_CURRENT_BINARY_DIR}/VtkComponentsDistribution.tmp  ${CMAKE_CURRENT_BINARY_DIR}/VtkComponentsDistribution.h)
 
 # ConfigPackageLocation : c'est plus ou moins standardisé, le défaut étant lib/cmake.
-# On nous recommande très vivement d'utiliser ce répertoire afin de limiter les soucis par la suite,
-# notamment au niveau des vues.
+# On nous recommande très vivement d'utiliser ce répertoire afin de limiter les soucis par la suite, notamment au niveau des vues.
 set (ConfigPackageLocation ${CMAKE_CMAKE_DIR})
 
 # La génération des règles d'installation :
@@ -65,7 +63,7 @@ write_basic_package_version_file(${CMAKE_PACKAGE_VERSION_FILE} VERSION ${MAGIX3D
 export (EXPORT ${CMAKE_PACKAGE_TARGETS_NAME} FILE ${CMAKE_PACKAGE_TARGETS_FILE} NAMESPACE ${CMAKE_MODULE_NAMESPACE})
 
 # Utilisation par d'autres modules de VtkComponents :
-set (INCLUDE_INSTALL_DIR include/)		# VtkComponents_INCLUDE_DIR avec VtkComponentsConfig.cmake.in
+set (INCLUDE_INSTALL_DIR include/)				# VtkComponents_INCLUDE_DIR avec VtkComponentsConfig.cmake.in
 set (LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR})	# VtkComponents_LIB_DIR avec VtkComponentsConfig.cmake.in
 # Création du fichier VtkComponentsConfig.cmake qui définira VtkComponents_INCLUDE_DIR, VtkComponents_LIB_DIR et VtkComponents_BIN_DIR :
 configure_package_config_file (cmake/${CMAKE_PACKAGE_CONFIG_NAME}.cmake.in ${CMAKE_PACKAGE_CONFIG_FILE}

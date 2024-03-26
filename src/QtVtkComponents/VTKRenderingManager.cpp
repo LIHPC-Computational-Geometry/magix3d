@@ -688,7 +688,9 @@ _renderWindow->PrintSelf (cout, *vtkIndent::New ( ));
 	_renderWindow->Render ( );	// Requis avant window->SetAlphaBitPlanes (1);
 #endif	// USE_OPENGL2_BACKEND
 	_renderWindow->SetAlphaBitPlanes (1);	// Bonne gestion de la transparence
-	_renderWindow->SetMultiSamples (0);	// Bonne gestion de la transparence
+#if VTK_MAJOR_VERSION < 9		// En VTK 9 dégrade fortement l'anti-aliasing (arêtes de très mauvaise qualité)
+	_renderWindow->SetMultiSamples (0);		// Bonne gestion de la transparence
+#endif	// VTK_9
 	_renderer	= vtkRenderer::New ( );
 	_renderer->SetUseDepthPeeling (true);	// Bonne gestion de la transparence
 	_renderer->SetLayer (_theaterLayer);
@@ -734,8 +736,7 @@ _renderWindow->PrintSelf (cout, *vtkIndent::New ( ));
 	}	// if (0 != _vtkWidget)
 
 //	_renderWindow->LineSmoothingOn ( );
-// PolygonSmoothingOn : ne pas mettre avec les QWidget, peut donner des rendus
-// pas très beau (triangularisation visible des faces ("arêtes" blanches)).
+// PolygonSmoothingOn : ne pas mettre avec les QWidget, peut donner des rendus pas très beau (triangularisation visible des faces ("arêtes" blanches)).
 //	_renderWindow->PolygonSmoothingOn ( );
 #ifndef USE_OPENGL2_BACKEND
 	_renderWindow->Render ( );

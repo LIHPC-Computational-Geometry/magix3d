@@ -13,8 +13,6 @@
 
 #include <vector>
 
-class vtkLockableRenderWindow;
-
 
 namespace Mgx3D 
 {
@@ -48,10 +46,8 @@ class QtVtkGraphicalWidget : public QtComponents::Qt3DGraphicalWidget
 	//@{
 
 		/**
-		 * \return	Une référence sur le gestionnaire d'entités/rendu pour
-		 *			<I>Qt/VTK</I>, s'il y en a une.
-		 * \exception	Une exception est levée en l'absence d'un tel
-		 *				gestionnaire.
+		 * \return	Une référence sur le gestionnaire d'entités/rendu pour <I>Qt/VTK</I>, s'il y en a une.
+		 * \exception	Une exception est levée en l'absence d'un tel gestionnaire.
 		 */
 		virtual VTKRenderingManager& getVTKRenderingManager ( );
 
@@ -70,20 +66,13 @@ class QtVtkGraphicalWidget : public QtComponents::Qt3DGraphicalWidget
 	virtual QWidget* getRenderingWidget ( );
 
 	/**
-	 * \return		La fenêtre <I>VTK verrouillable</I> utilisée pour les
-	 *			rendus graphiques.
-	 */
-	virtual vtkLockableRenderWindow& getLockableRenderWindow ( );
-
-	/**
 	 * \return		Le widget <I>Qt/VTK</I>
 	 * \see			getRenderingWidget
 	 */
 	virtual QtVtkGraphicWidget& getVTKWidget ( );
 
 	/**
-	 * \param		Le nouveau widget <I>Qt/VTK</I>. Détruit l'éventuel ancien
-	 *				widget <I>Qt/VTK</I>.
+	 * \param		Le nouveau widget <I>Qt/VTK</I>. Détruit l'éventuel ancien widget <I>Qt/VTK</I>.
 	 */
 	virtual void setVTKWidget (QtVtkGraphicWidget*);
 
@@ -120,9 +109,6 @@ class QtVtkGraphicalWidget : public QtComponents::Qt3DGraphicalWidget
 
 	/** Le widget <I>VTK</I> utilisée pour les affichages 3D. */
 	QtVtkGraphicWidget*				_vtkWidget;
-
-	/** La fenêtre de rendu. */
-	vtkLockableRenderWindow*		_lockableRenderWindow;
 };	// class QtVtkGraphicalWidget
 
 
