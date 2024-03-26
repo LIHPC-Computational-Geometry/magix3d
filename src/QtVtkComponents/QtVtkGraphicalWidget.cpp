@@ -10,7 +10,6 @@
 #include "QtVtkComponents/QtVtkGraphicalWidget.h"
 #include "QtVtkComponents/vtkCustomizableInteractorStyleTrackball.h"
 #include "QtComponents/QtMgx3DApplication.h"
-#include "VtkComponents/vtkLockableRenderWindow.h"
 #include "Utils/DisplayProperties.h"
 
 #include <QtUtil/QtErrorManagement.h>
@@ -42,14 +41,14 @@ namespace QtVtkComponents
 // ===========================================================================
 
 QtVtkGraphicalWidget::QtVtkGraphicalWidget (QWidget* parent, vtkRenderWindow* w, RenderingManager* rm)
-	: QtComponents::Qt3DGraphicalWidget (parent, rm), _vtkWidget (0), _lockableRenderWindow (0)
+	: QtComponents::Qt3DGraphicalWidget (parent, rm), _vtkWidget (0)
 {
 	createGui (w);
 }	// QtVtkGraphicalWidget::QtVtkGraphicalWidget
 
 
 QtVtkGraphicalWidget::QtVtkGraphicalWidget (const QtVtkGraphicalWidget&)
-	: QtComponents::Qt3DGraphicalWidget (0, 0), _vtkWidget (0), _lockableRenderWindow (0)
+	: QtComponents::Qt3DGraphicalWidget (0, 0), _vtkWidget (0)
 {
 	MGX_FORBIDDEN ("QtVtkGraphicalWidget copy constructor is not allowed.");
 }	// QtVtkGraphicalWidget::QtVtkGraphicalWidget (const QtVtkGraphicalWidget&)
@@ -90,13 +89,6 @@ QWidget* QtVtkGraphicalWidget::getRenderingWidget ( )
 }	// QtVtkGraphicalWidget::getRenderingWidget
 
 
-vtkLockableRenderWindow& QtVtkGraphicalWidget::getLockableRenderWindow ( )
-{
-	CHECK_NULL_PTR_ERROR (_lockableRenderWindow);
-	return *_lockableRenderWindow;
-}	// QtVtkGraphicalWidget::getLockableRenderWindow
-
-
 QtVtkGraphicWidget& QtVtkGraphicalWidget::getVTKWidget ( )
 {
 	CHECK_NULL_PTR_ERROR (_vtkWidget)
@@ -121,8 +113,6 @@ void QtVtkGraphicalWidget::setVTKWidget (QtVtkGraphicWidget* widget)
 	_vtkWidget	= widget;
 	if (0 != layout ( ))
 		layout ( )->addWidget (_vtkWidget);
-			
-	_lockableRenderWindow	= dynamic_cast<vtkLockableRenderWindow*>(getVTKWidget ( ).getRenderWindow ( ));
 }	// QtVtkGraphicalWidget::setVTKWidget
 
 
@@ -135,7 +125,6 @@ void QtVtkGraphicalWidget::updateConfiguration ( )
 		if (0 != getVTKWidget ( ).getRenderWindow ( ))
 		{
 			vtkRenderWindow*	window	= getVTKWidget ( ).getRenderWindow ( );
-			_lockableRenderWindow	= dynamic_cast<vtkLockableRenderWindow*>(window);
 			CHECK_NULL_PTR_ERROR (window)
 			try
 			{
@@ -152,8 +141,7 @@ void QtVtkGraphicalWidget::updateConfiguration ( )
 */
 			vtkRenderWindowInteractor*	interactor	= getVTKWidget ( ).getInteractor ( );
 			CHECK_NULL_PTR_ERROR (interactor)
-			vtkCustomizableInteractorStyleTrackball*	interactorStyle	=
-				dynamic_cast<vtkCustomizableInteractorStyleTrackball*>(interactor->GetInteractorStyle ( ));
+			vtkCustomizableInteractorStyleTrackball*	interactorStyle	= dynamic_cast<vtkCustomizableInteractorStyleTrackball*>(interactor->GetInteractorStyle ( ));
 			if (0 != interactorStyle)
 			{
 				vtkUnifiedInteractorStyle::upZoom	= Resources::instance ( )._mouseUpZoom;
@@ -177,7 +165,6 @@ void QtVtkGraphicalWidget::updateConfiguration ( )
 
 void QtVtkGraphicalWidget::createGui (vtkRenderWindow* window)
 {
-	_lockableRenderWindow	= dynamic_cast<vtkLockableRenderWindow*>(window);
 	QHBoxLayout*	layout	= new QHBoxLayout (this);
 	setLayout (layout);
 	QtVtkGraphicWidget*	widget	= new QtVtkGraphicWidget (this);
