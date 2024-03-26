@@ -22,32 +22,21 @@ namespace Mesh
  * <I>Magix 3D</I>. </P>
  *
  */
-class Mgx3DQualifSerie : public GQualif::GMDSQualifSerie
+template<typename TCellType, unsigned char Dim>
+class Mgx3DQualifSerie : public GQualif::GMDSQualifSerie<TCellType, Dim>
 {
 	public :
 
 	/**
 	 * Constructeur 1. Les données reçues en argument ne seront pas détruites
 	 * lors de la destruction de cette série.
-	 * @param		Surface <I>GMDS</I> représentée.
+	 * @param		Vecteur de mailles<I>GMDS</I> représentées.
 	 * @param		Eventuel nom de la surface (au sens de l'application). En 
 	 * 				son absence c'est le nom du fichier qui sera utilisé.
 	 * @param		Nom du fichier d'où est éventuellement issue la surface.
 	 * @param		Eventuelle entité Magix3D de rattachement.
 	 */
-	Mgx3DQualifSerie (const std::vector<gmds::Face>& surface, const std::string& name,
-				const std::string& fileName, Mgx3D::Mesh::MeshEntity* entity = 0);
-
-	/**
-	 * Constructeur 2. Les données reçues en argument ne seront pas détruites
-	 * lors de la destruction de cette série.
-	 * @param		Volume <I>GMDS</I> représenté.
-	 * @param		Eventuel nom du volume (au sens de l'application). En 
-	 * 				son absence c'est le nom du fichier qui sera utilisé.
-	 * @param		Nom du fichier d'où est éventuellement issue le volume.
-	 * @param		Eventuelle entité Magix3D de rattachement.
-	 */
-	Mgx3DQualifSerie (const std::vector<gmds::Region>& volume, const std::string& name,
+	Mgx3DQualifSerie (const std::vector<TCellType>& v, const std::string& name,
 				const std::string& fileName, Mgx3D::Mesh::MeshEntity* entity = 0);
 
 	/**
@@ -82,6 +71,9 @@ class Mgx3DQualifSerie : public GQualif::GMDSQualifSerie
 	
 	Mgx3D::Mesh::MeshEntity*		_meshEntity;
 };	// class Mgx3DQualifSerie
+
+typedef Mgx3DQualifSerie<gmds::Face, 2> Mgx3DSurfaceQualifSerie;
+typedef Mgx3DQualifSerie<gmds::Region, 3> Mgx3DVolumeQualifSerie;
 
 }	// namespace Mesh
 
