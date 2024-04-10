@@ -2212,7 +2212,7 @@ void GroupManager::addProjectionOnPZ0(const std::string& nom)
 /*----------------------------------------------------------------------------*/
 void GroupManager::addCartesianPerturbation(const std::string& nom, PyObject* py_obj)
 {
-	PyObject* pyName = PyObject_GetAttrString(py_obj, "func_name");
+    PyObject* pyName = PyObject_Str(py_obj);
 #ifdef _DEBUG2
 	std::cout<<"GroupManager::addCartesianPerturbation("<<nom<<", "<<PyString_AsString(pyName)<<")"<<std::endl;
 #endif
@@ -2246,7 +2246,7 @@ void GroupManager::addCartesianPerturbation(const std::string& nom, PyObject* py
 /*----------------------------------------------------------------------------*/
 void GroupManager::addPolarPerturbation(const std::string& nom, PyObject* py_obj)
 {
-	PyObject* pyName = PyObject_GetAttrString(py_obj, "func_name");
+    PyObject* pyName = PyObject_Str(py_obj);
 #ifdef _DEBUG2
 	std::cout<<"GroupManager::addPolarPerturbation("<<nom<<", "<<PyString_AsString(pyName)<<")"<<std::endl;
 #endif
