@@ -1,4 +1,5 @@
 import sys
+import os
 import pyMagix3D as Mgx3D
 
 vtkfilename = "box.vtk"
