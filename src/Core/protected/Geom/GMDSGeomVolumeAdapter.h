@@ -10,10 +10,10 @@
 #define MGX3D_GEOM_GMDSGEOMVOLUMEADAPTER_H_
 /*----------------------------------------------------------------------------*/
 #include "Geom/Volume.h"
-#include "GMDS/CAD/GeomVolume.h"
-#include "GMDS/CAD/GeomSurface.h"
-#include "GMDS/CAD/GeomCurve.h"
-#include "GMDS/CAD/GeomPoint.h"
+#include "gmds/cad/GeomVolume.h"
+#include "gmds/cad/GeomSurface.h"
+#include "gmds/cad/GeomCurve.h"
+#include "gmds/cad/GeomPoint.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -25,7 +25,7 @@ namespace Geom {
  *        les services requis par l'interface GeomVolume de GMDS
  *
  */
-class GMDSGeomVolumeAdapter: public gmds::geom::GeomVolume
+class GMDSGeomVolumeAdapter: public gmds::cad::GeomVolume
 {
 public:
     /*------------------------------------------------------------------------*/
@@ -56,21 +56,21 @@ public:
      *
      *  \param APnt the adjacent points.
      */
-    virtual void get(std::vector<gmds::geom::GeomPoint*>& APnt) const;
+    virtual void get(std::vector<gmds::cad::GeomPoint*>& APnt) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Access to the adjacent curves.
      *
      *  \param ACur the adjacent curves.
      */
-    virtual void get(std::vector<gmds::geom::GeomCurve*>& ACur) const;
+    virtual void get(std::vector<gmds::cad::GeomCurve*>& ACur) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Access to the adjacent surfaces.
      *
      *  \param ASurf the adjacent surfaces
      */
-    virtual void get(std::vector<gmds::geom::GeomSurface*>& ASurf) const;
+    virtual void get(std::vector<gmds::cad::GeomSurface*>& ASurf) const;
 
 //    /*------------------------------------------------------------------------*/
 //    /** \brief Move a point AP near the surface to the closest point on the
@@ -104,6 +104,7 @@ public:
             gmds::TCoord minXYZ[3],
             gmds::TCoord maxXYZ[3]) const;
 
+    virtual std::tuple<gmds::TCoord,gmds::TCoord,gmds::TCoord,gmds::TCoord,gmds::TCoord,gmds::TCoord>  BBox() const;
 
 //    /*------------------------------------------------------------------------*/
 //    /** \brief Get the closest point from AP on the surface
@@ -119,14 +120,14 @@ public:
      *
      *  \param ASurf the new adjacent surface to add
      */
-    virtual void add(gmds::geom::GeomSurface* ASurf);
+    virtual void add(gmds::cad::GeomSurface* ASurf);
 
 private:
     /* volume geometrique adapte pour une utilisation dans les algorithmes de
      * GMDS */
     Geom::Volume& m_mgx3d_volume;
 
-    std::vector<gmds::geom::GeomSurface*> m_surfaces;
+    std::vector<gmds::cad::GeomSurface*> m_surfaces;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

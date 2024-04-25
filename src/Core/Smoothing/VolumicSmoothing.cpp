@@ -15,8 +15,8 @@
 #include <TkUtil/Exception.h>
 #include <TkUtil/UTF8String.h>
 /*----------------------------------------------------------------------------*/
-#include <GMDS/IG/Node.h>
-#include <GMDS/IG/Region.h>
+#include <gmds/ig/Node.h>
+#include <gmds/ig/Region.h>
 /*----------------------------------------------------------------------------*/
 //#include <MachineTypes/machine_types.h>
 #include <cstdint>
@@ -121,7 +121,7 @@ applyModification(std::vector<gmds::Node>& gmdsNodes,
 		  weights[i] = 1.0;
 
 	  for (uint i=0; i<nb_vtx; i++)
-		  if (filtre_nodes[gmdsNodes[i].getID()] == maskFixed)
+		  if (filtre_nodes[gmdsNodes[i].id()] == maskFixed)
 			  relax[i] = 0.0;
 		  else
 			  relax[i] = 1.0;
@@ -129,14 +129,14 @@ applyModification(std::vector<gmds::Node>& gmdsNodes,
 	  // indirection des gmds::Node vers id dans structure Mesquite
 	  std::map<gmds::TCellID, uint> gmds2mesquite;
 	  for (uint i=0; i<nb_vtx; i++)
-		  gmds2mesquite[gmdsNodes[i].getID()] = i;
+		  gmds2mesquite[gmdsNodes[i].id()] = i;
 
 	  // nombre de noeuds par maille
 	  //int_type *nb_node_cell = new int_type[nb_cells];
           int64_t *nb_node_cell = new int64_t[nb_cells];
 	  uint nb_tt_node_cell = 0;
 	  for (uint i=0; i<nb_cells; i++){
-		  nb_node_cell[i] = gmdsPolyedres[i].getNbNodes();
+		  nb_node_cell[i] = gmdsPolyedres[i].nbNodes();
 		  nb_tt_node_cell += nb_node_cell[i];
 	  }
 

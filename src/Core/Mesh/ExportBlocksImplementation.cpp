@@ -14,8 +14,9 @@
 #include "Mesh/MeshItf.h"
 #include "Mesh/Surface.h"
 /*----------------------------------------------------------------------------*/
-#include <GMDS/IG/IGMesh.h>
-#include <GMDS/IO/VTKWriter.h>
+#include <gmds/ig/Mesh.h>
+#include "gmds/io/IGMeshIOService.h"
+#include <gmds/io/VTKWriter.h>
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
 #include <iostream>
@@ -42,9 +43,9 @@ namespace Mgx3D {
 
             std::map<gmds::TCellID,unsigned long> n2v;
 
-            gmds::IGMesh mesh(gmds::MeshModel(gmds::DIM3 | gmds::N | gmds::R | gmds::R2N | gmds::N2R));
+            gmds::Mesh mesh(gmds::MeshModel(gmds::DIM3 | gmds::N | gmds::R | gmds::R2N | gmds::N2R));
 
-            gmds::IGMesh localMesh = m_context.getLocalMeshManager().getMesh()->getGMDSMesh();
+            gmds::Mesh localMesh = m_context.getLocalMeshManager().getMesh()->getGMDSMesh();
 
 
             for(int iVertex = 0; iVertex < localMesh.getNbNodes(); iVertex++){
@@ -71,13 +72,13 @@ namespace Mgx3D {
 
             }
 
-            gmds::Variable<int>* discrI = mesh.newVariable<int>(gmds::GMDS_REGION,"discrI");
-            gmds::Variable<int>* discrJ = mesh.newVariable<int>(gmds::GMDS_REGION,"discrJ");
-            gmds::Variable<int>* discrK = mesh.newVariable<int>(gmds::GMDS_REGION,"discrK");
+            gmds::Variable<int>* discrI = mesh.newVariable<int, gmds::GMDS_REGION>("discrI");
+            gmds::Variable<int>* discrJ = mesh.newVariable<int, gmds::GMDS_REGION>("discrJ");
+            gmds::Variable<int>* discrK = mesh.newVariable<int, gmds::GMDS_REGION>("discrK");
 
             for(int iBlock = 0; iBlock < topo_blocs.size(); iBlock++){
 
-                gmds::Variable<int>* internalNodes = mesh.newVariable<int>(gmds::GMDS_NODE,"block"+std::to_string(iBlock));
+                gmds::Variable<int>* internalNodes = mesh.newVariable<int, gmds::GMDS_NODE>("block"+std::to_string(iBlock));
 
                 uint b_discrI,b_discrJ,b_discrK;
                 topo_blocs[iBlock]->getNbMeshingEdges(b_discrI,b_discrJ,b_discrK);
@@ -98,10 +99,10 @@ namespace Mgx3D {
              * Pour se faire on ecrit juste des variables de maillages sur les noeuds en donnant le nom qui sera
              * utilisé dans le fichier cgns
              */
-            gmds::Variable<int>* farfield = mesh.newVariable<int>(gmds::GMDS_NODE,"Farfield");
-            gmds::Variable<int>* paroi = mesh.newVariable<int>(gmds::GMDS_NODE,"Paroi");
-            gmds::Variable<int>* out = mesh.newVariable<int>(gmds::GMDS_NODE,"Sortie");
-            gmds::Variable<int>* sym = mesh.newVariable<int>(gmds::GMDS_NODE,"Symetrie");
+            gmds::Variable<int>* farfield   = mesh.newVariable<int, gmds::GMDS_NODE>("Farfield");
+            gmds::Variable<int>* paroi      = mesh.newVariable<int, gmds::GMDS_NODE>("Paroi");
+            gmds::Variable<int>* out        = mesh.newVariable<int, gmds::GMDS_NODE>("Sortie");
+            gmds::Variable<int>* sym        = mesh.newVariable<int, gmds::GMDS_NODE>("Symetrie");
 
             /*
              * Pour récupérer les variables à écrire on utilise les groupes des entités topologiques et on va mettre
@@ -114,7 +115,7 @@ namespace Mgx3D {
              * elle appartient au groupe en question, si oui on prend tous ses noeuds et on met la variable à 1
              */
             for(auto f : topo_faces){
-                std::vector<string> groupsName;
+                std::vector<std::string> groupsName;
                 f->getGroupsName(groupsName);
                 std::vector<gmds::TCellID> f_nodes = f->nodes();
                 if(std::find(groupsName.begin(),groupsName.end(), "Farfield") != groupsName.end()){
@@ -137,9 +138,9 @@ namespace Mgx3D {
             }
 
             //gmds::Variable<int>* fluide = mesh.newVariable<int>(gmds::GMDS_NODE,"Fluide"); //Valeur par défaut
-            gmds::Variable<int>* solide = mesh.newVariable<int>(gmds::GMDS_NODE,"Solide");
+            gmds::Variable<int>* solide = mesh.newVariable<int, gmds::GMDS_NODE>("Solide");
             for(auto b : topo_blocs) {
-                std::vector<string> groupsName;
+                std::vector<std::string> groupsName;
                 b->getGroupsName(groupsName);
                 std::vector<gmds::TCellID> b_nodes = b->nodes();
                 if (std::find(groupsName.begin(), groupsName.end(), "Solide") != groupsName.end()) {
@@ -149,10 +150,11 @@ namespace Mgx3D {
                 }
             }
 
-
-            gmds::VTKWriter<gmds::IGMesh> writer(mesh);
-            writer.write(m_filename,gmds::N|gmds::R);
-
+            gmds::IGMeshIOService ioService(&mesh);
+            gmds::VTKWriter writer(&ioService);
+            writer.setCellOptions(gmds::N|gmds::R);
+            writer.setDataOptions(gmds::N|gmds::R);
+            writer.write(m_filename);
         }
 /*----------------------------------------------------------------------------*/
     } // end namespace Topo

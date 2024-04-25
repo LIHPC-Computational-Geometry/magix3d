@@ -21,7 +21,7 @@
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
-#include "GMDS/IG/IGMesh.h"
+#include "gmds/ig/Mesh.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -83,19 +83,16 @@ void CommandReadMLI::internalExecute()
 
 	uint id = mesh->createNewGMDSMesh();
 	mesh->readMli(m_file_name, id);
-	gmds::IGMesh& gmdsMesh = mesh->getGMDSMesh(id);
+	gmds::Mesh& gmdsMesh = mesh->getGMDSMesh(id);
 
 #ifdef _DEBUG_READ
-	std::cout<<" nombre de volumes : "<<gmdsMesh.getNbVolumes()<<std::endl;
+	std::cout<<" nombre de volumes : "<<gmdsMesh.getNbGroups<gmds::Region>()<<std::endl;
 #endif
-	for (gmds::IGMesh::volumes_iterator iter = gmdsMesh.volumes_begin();
-			iter != gmdsMesh.volumes_end(); ++iter){
-
-		gmds::IGMesh::volume vol = *iter;
-
-		std::string nomGr = m_prefix+vol.name();
+	for(auto i=0; i< gmdsMesh.getNbGroups<gmds::Region>(); i++) {
+		auto vol = gmdsMesh.getGroup<gmds::Region>(i);
+		std::string nomGr = m_prefix+vol->name();
 #ifdef _DEBUG_READ
-	std::cout<<" importation du volume : "<<vol.name()<<" avec "<<vol.size()<<" polyèdres"<<std::endl;
+	std::cout<<" importation du volume : "<<vol->name()<<" avec "<<vol->size()<<" polyèdres"<<std::endl;
 #endif
 
 		Mesh::SubVolume* sv= new Mesh::SubVolume(
@@ -106,7 +103,12 @@ void CommandReadMLI::internalExecute()
 		sv->getDisplayProperties().setDisplayed(false);
         getInfoCommand().addMeshInfoEntity(sv, Internal::InfoCommand::CREATED);
 
-        sv->addRegion(vol.cells());
+		for (auto region_id : vol->cells())
+		{
+			auto region = gmdsMesh.get<gmds::Region>(region_id);
+				sv->addRegion(region);
+		}
+
         getContext().newGraphicalRepresentation (*sv);
 
         Group::Group3D* gr = getContext().getLocalGroupManager().getNewGroup3D(nomGr, &getInfoCommand());
@@ -123,16 +125,14 @@ void CommandReadMLI::internalExecute()
 	} // end for iter
 
 #ifdef _DEBUG_READ
-	std::cout<<" nombre de surfaces : "<<gmdsMesh.getNbSurfaces()<<std::endl;
+	std::cout<<" nombre de surfaces : "<<gmdsMesh.getNbGroups<gmds::Face>()<<std::endl;
 #endif
-	for (gmds::IGMesh::surfaces_iterator iter = gmdsMesh.surfaces_begin();
-			iter != gmdsMesh.surfaces_end(); ++iter){
 
-		gmds::IGMesh::surface surf = *iter;
-
-		std::string nomGr = m_prefix+surf.name();
+	for(auto i=0; i< gmdsMesh.getNbGroups<gmds::Face>(); i++) {
+		auto surf = gmdsMesh.getGroup<gmds::Face>(i);
+		std::string nomGr = m_prefix+surf->name();
 #ifdef _DEBUG_READ
-	std::cout<<" importation de la surface : "<<surf.name()<<" avec "<<surf.size()<<" polygones"<<std::endl;
+	std::cout<<" importation de la surface : "<<surf->name()<<" avec "<<surf->size()<<" polygones"<<std::endl;
 #endif
 
 		Mesh::SubSurface* ss= new Mesh::SubSurface(
@@ -143,7 +143,13 @@ void CommandReadMLI::internalExecute()
 		ss->getDisplayProperties().setDisplayed(false);
         getInfoCommand().addMeshInfoEntity(ss, Internal::InfoCommand::CREATED);
 
-        ss->addFace(surf.cells());
+
+		for (auto face_id : surf->cells())
+		{
+			auto face = gmdsMesh.get<gmds::Face>(face_id);
+			ss->addFace(face);
+		}
+
         getContext().newGraphicalRepresentation (*ss);
 
         Group::Group2D* gr = getContext().getLocalGroupManager().getNewGroup2D(nomGr, &getInfoCommand());

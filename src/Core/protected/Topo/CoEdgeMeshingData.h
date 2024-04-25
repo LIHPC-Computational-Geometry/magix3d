@@ -10,7 +10,7 @@
 #ifndef COEDGEMESHINGDATA_H_
 #define COEDGEMESHINGDATA_H_
 /*----------------------------------------------------------------------------*/
-#include <GMDS/Utils/CommonTypes.h>
+#include <gmds/utils/CommonTypes.h>
 
 #include "Utils/Time.h"
 /*----------------------------------------------------------------------------*/

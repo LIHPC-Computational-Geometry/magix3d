@@ -32,10 +32,11 @@
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
 #include "Geom/EntityFactory.h"
-#include "GMDSCEA/GMDSCEAWriter.h"
-#include "GMDSCEA/LimaReader.h"
-#include "GMDS/IO/VTKWriter.h"
-#include "GMDS/IO/VTKReader.h"
+#include <gmds/io/IGMeshIOService.h>
+#include <gmds/io/VTKWriter.h>
+#include <gmds/io/VTKReader.h>
+#include <gmds/io/LimaWriter.h>
+#include <gmds/io/LimaReader.h>
 
 /*----------------------------------------------------------------------------*/
 /// OCC
@@ -85,7 +86,7 @@ namespace Mesh {
 MeshImplementation::MeshImplementation(Internal::Context* c)
 : MeshItf(c)
 {
-	m_gmds_mesh.push_back(new gmds::IGMesh(MeshItf::TMask3D));
+	m_gmds_mesh.push_back(new gmds::Mesh(MeshItf::TMask3D));
 
     getGMDSMesh().initializeGeometryClassification();
 }
@@ -104,19 +105,19 @@ void MeshImplementation::updateMeshDim()
 	//delete m_gmds_mesh[0];
 	if (getContext().getMeshDim() == Internal::ContextIfc::MESH2D){
 #ifdef _DEBUG
-		std::cout<<"new gmds::IGMesh(MeshItf::TMask2D) ..."<<std::endl;
+		std::cout<<"new gmds::Mesh(MeshItf::TMask2D) ..."<<std::endl;
 #endif
 		m_gmds_mesh[0]->changeModel(MeshItf::TMask2D);
-		//m_gmds_mesh[0] = new gmds::IGMesh(MeshItf::TMask2D);
+		//m_gmds_mesh[0] = new gmds::Mesh(MeshItf::TMask2D);
 #ifdef _DEBUG
 		std::cout<<"après : getDim => "<<m_gmds_mesh[0]->getDim()<<std::endl;
 #endif
 	}
 	else if (getContext().getMeshDim() == Internal::ContextIfc::MESH3D){
 		m_gmds_mesh[0]->changeModel(MeshItf::TMask3D);
-		//m_gmds_mesh[0] = new gmds::IGMesh(MeshItf::TMask3D);
+		//m_gmds_mesh[0] = new gmds::Mesh(MeshItf::TMask3D);
 #ifdef _DEBUG
-		std::cout<<"new gmds::IGMesh(MeshItf::TMask3D) ..."<<std::endl;
+		std::cout<<"new gmds::Mesh(MeshItf::TMask3D) ..."<<std::endl;
 #endif
 	}
 	else
@@ -126,7 +127,7 @@ void MeshImplementation::updateMeshDim()
 TkUtil::UTF8String MeshImplementation::
 getInfo(gmds::Node nd)
 {
-    if (nd.getID()==gmds::NullID)
+    if (nd.id()==gmds::NullID)
         throw TkUtil::Exception (TkUtil::UTF8String ("MeshImplementation::getInfo ne peut se faire, le noeud n'existe pas (pointeur nul)", TkUtil::Charset::UTF_8));
 
 	TkUtil::UTF8String	mess (TkUtil::Charset::UTF_8);
@@ -134,11 +135,11 @@ getInfo(gmds::Node nd)
     mess << "["<<nd.X()
             <<", "<<nd.Y()
             <<", "<<nd.Z()<<"] (id "
-            << (long)nd.getID()<<")";
+            << (long)nd.id()<<")";
      return mess;
 }
 /*----------------------------------------------------------------------------*/
-const gmds::IGMesh& MeshImplementation::
+const gmds::Mesh& MeshImplementation::
 getGMDSMesh ( ) const
 {
 #ifdef _DEBUG
@@ -149,7 +150,7 @@ getGMDSMesh ( ) const
 	return *m_gmds_mesh[0];
 }
 /*----------------------------------------------------------------------------*/
-gmds::IGMesh& MeshImplementation::
+gmds::Mesh& MeshImplementation::
 getGMDSMesh ( )
 {
 #ifdef _DEBUG
@@ -163,7 +164,7 @@ getGMDSMesh ( )
 uint MeshImplementation::
 createNewGMDSMesh ( )
 {
-	m_gmds_mesh.push_back(new gmds::IGMesh(MeshItf::TMask3D));
+	m_gmds_mesh.push_back(new gmds::Mesh(MeshItf::TMask3D));
 
 	return m_gmds_mesh.size()-1;
 }
@@ -171,12 +172,12 @@ createNewGMDSMesh ( )
 void MeshImplementation::
 deleteLastGMDSMesh()
 {
-	gmds::IGMesh* last_mesh = m_gmds_mesh.back();
+	gmds::Mesh* last_mesh = m_gmds_mesh.back();
 	m_gmds_mesh.pop_back();
 	delete last_mesh;
 }
 /*----------------------------------------------------------------------------*/
-gmds::IGMesh& MeshImplementation::
+gmds::Mesh& MeshImplementation::
 getGMDSMesh (uint id)
 {
 	if (id>=m_gmds_mesh.size())
@@ -208,7 +209,7 @@ int MeshImplementation::getNbRegions()
 Utils::Math::Point MeshImplementation::getCoordNode(gmds::Node nd)
 {
 #ifdef _DEBUG
-    if (nd.getID() == gmds::NullID)
+    if (nd.id() == gmds::NullID)
         throw TkUtil::Exception (TkUtil::UTF8String ("MeshImplementation::getCoordNode ne peut se faire, le noeud n'existe pas (pointeur nul)", TkUtil::Charset::UTF_8));
 #endif
     return Utils::Math::Point(nd.X(), nd.Y(), nd.Z());
@@ -229,10 +230,10 @@ bool MeshImplementation::createGMDSGroups()
     std::vector<Mesh::Volume*> volumes;
     getContext().getLocalMeshManager().getVolumes(volumes);
 
-    std::vector<gmds::IGMesh::cloud*> createdGMDSClouds;
-    std::vector<gmds::IGMesh::line*> createdGMDSLines;
-    std::vector<gmds::IGMesh::surface*> createdGMDSSurfaces;
-    std::vector<gmds::IGMesh::volume*> createdGMDSVolumes;
+    std::vector<gmds::CellGroup<gmds::Node>*> createdGMDSClouds;
+    std::vector<gmds::CellGroup<gmds::Edge>*> createdGMDSLines;
+    std::vector<gmds::CellGroup<gmds::Face>*> createdGMDSSurfaces;
+    std::vector<gmds::CellGroup<gmds::Region>*> createdGMDSVolumes;
 
     try {
 
@@ -240,14 +241,14 @@ bool MeshImplementation::createGMDSGroups()
         Mesh::Cloud* current_cloud = clouds[iCloud];
         // modification du nom du nuage pour éviter les conflits avec les noms de ligne
         std::string cloudName = current_cloud->getName() + std::string("ND");
-        gmds::IGMesh::cloud& cl = getGMDSMesh().newCloud(cloudName);
-        createdGMDSClouds.push_back(&cl);
+        auto cl = getGMDSMesh().newGroup<gmds::Node>(cloudName);
+        createdGMDSClouds.push_back(cl);
 
         std::vector<gmds::Node> nodes;
         current_cloud->getGMDSNodes(nodes);
 
         for(unsigned int iNode=0; iNode<nodes.size(); iNode++) {
-            cl.add(nodes[iNode]);
+            cl->add(nodes[iNode]);
         }
     }
 
@@ -259,21 +260,21 @@ bool MeshImplementation::createGMDSGroups()
 //        if (lines.size() > 1 && current_line->getName() == lineDefaultName)
 //            continue;
 
-        gmds::IGMesh::line& ln = getGMDSMesh().newLine(current_line->getName());
-        createdGMDSLines.push_back(&ln);
+        auto ln = getGMDSMesh().newGroup<gmds::Edge>(current_line->getName());
+        createdGMDSLines.push_back(ln);
 
         std::vector<gmds::Edge> edges;
         current_line->getGMDSEdges(edges);
 
         for(unsigned int iEdge=0; iEdge<edges.size(); iEdge++) {
-            ln.add(edges[iEdge]);
+            ln->add(edges[iEdge]);
         }
     }
 
     for(unsigned int iSurf=0; iSurf<surfaces.size(); iSurf++) {
         Mesh::Surface* current_surf = surfaces[iSurf];
-        gmds::IGMesh::surface& su = getGMDSMesh().newSurface(current_surf->getName());
-        createdGMDSSurfaces.push_back(&su);
+        auto su = getGMDSMesh().newGroup<gmds::Face>(current_surf->getName());
+        createdGMDSSurfaces.push_back(su);
 
         std::vector<Topo::CoFace* > coFaces;
         current_surf->getCoFaces(coFaces);
@@ -282,14 +283,14 @@ bool MeshImplementation::createGMDSGroups()
         current_surf->getGMDSFaces(faces);
 
         for(unsigned int iFace=0; iFace<faces.size(); iFace++) {
-            su.add(faces[iFace]);
+            su->add(faces[iFace]);
         }
     }
 
     for(unsigned int iVol=0; iVol<volumes.size(); iVol++) {
         Mesh::Volume* current_vol = volumes[iVol];
-        gmds::IGMesh::volume& vo = getGMDSMesh().newVolume(current_vol->getName());
-        createdGMDSVolumes.push_back(&vo);
+        auto vo = getGMDSMesh().newGroup<gmds::Region>(current_vol->getName());
+        createdGMDSVolumes.push_back(vo);
 
         std::vector<Topo::Block* > blocks;
         current_vol->getBlocks(blocks);
@@ -298,7 +299,7 @@ bool MeshImplementation::createGMDSGroups()
         current_vol->getGMDSRegions(regions);
 
         for(unsigned int iRegion=0; iRegion<regions.size(); iRegion++) {
-            vo.add(regions[iRegion]);
+            vo->add(regions[iRegion]);
         }
     }
 
@@ -307,16 +308,16 @@ bool MeshImplementation::createGMDSGroups()
     	std::cerr<<"MeshImplementation::createGMDSGroups "<<e.what()<<std::endl;
 
     	for(int i=0; i<createdGMDSClouds.size(); i++) {
-    		getGMDSMesh().deleteCloud(*createdGMDSClouds[i]);
+            getGMDSMesh().deleteGroup<gmds::Node>(createdGMDSClouds[i]);
     	}
         for(int i=0; i<createdGMDSLines.size(); i++) {
-            getGMDSMesh().deleteLine(*createdGMDSLines[i]);
+            getGMDSMesh().deleteGroup<gmds::Edge>(createdGMDSLines[i]);
         }
     	for(int i=0; i<createdGMDSSurfaces.size(); i++) {
-    	    getGMDSMesh().deleteSurface(*createdGMDSSurfaces[i]);
+            getGMDSMesh().deleteGroup<gmds::Face>(createdGMDSSurfaces[i]);
     	}
     	for(int i=0; i<createdGMDSVolumes.size(); i++) {
-    	    getGMDSMesh().deleteVolume(*createdGMDSVolumes[i]);
+            getGMDSMesh().deleteGroup<gmds::Region>(createdGMDSVolumes[i]);
     	}
 
     	return false;
@@ -330,12 +331,14 @@ void MeshImplementation::writeMli(std::string nom)
     // on ajoute les groupes de mailles de gmds
     bool isCreateGMDSGroupsOK = createGMDSGroups();
     if(!isCreateGMDSGroupsOK) {
-    	throw TkUtil::Exception (TkUtil::UTF8String ("MeshImplementation::writeMli ne peut créer les groupes. Vérifiez que la fenêtre qualité est fermée.", TkUtil::Charset::UTF_8));
+    	throw TkUtil::Exception (TkUtil::UTF8String ("MeshImplementation::writeMli ne peut créer les groupes.", TkUtil::Charset::UTF_8));
     }
 
     try {
 		bool	implemented	= false;
-    	gmds::GMDSCEAWriter lw(getGMDSMesh());
+		//gmds::IGMeshIOService ioService(&getGMDSMesh());
+		//gmds::LimaWriter lw(&ioService);
+		gmds::LimaWriter lw(getGMDSMesh());
 
     	// Lima will work only in meters
     	Utils::Unit::lengthUnit lu = getContext().getLengthUnit();
@@ -345,7 +348,10 @@ void MeshImplementation::writeMli(std::string nom)
     	}
     	lw.setLengthUnit(convertFactorToMeter);
 
-    	lw.write(nom, gmds::R|gmds::F|gmds::E|gmds::N);
+		//lw.setCellOptions(gmds::R|gmds::F|gmds::E|gmds::N);
+		//lw.setDataOptions(gmds::R|gmds::F|gmds::E|gmds::N);
+		//lw.write(nom);
+		lw.write(nom, gmds::R|gmds::F|gmds::E|gmds::N);
     	implemented	= true;
 		if (false == implemented)
 			throw TkUtil::Exception (TkUtil::UTF8String ("Absence d'écrivain GMDS pour le format mli.", TkUtil::Charset::UTF_8));
@@ -366,10 +372,9 @@ void MeshImplementation::writeMli(std::string nom)
 void MeshImplementation::readVTK(std::string nom, uint id)
 {
 	try{
-		gmds::VTKReader<gmds::IGMesh> vtkReader(getGMDSMesh(id));
-
+		gmds::IGMeshIOService ioService(&getGMDSMesh(id));
+		gmds::VTKReader vtkReader(&ioService);
 		vtkReader.read(nom);
-
 	}
 	catch(gmds::GMDSException& e) {
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -385,12 +390,15 @@ void MeshImplementation::writeVTK(std::string nom)
     // on ajoute les groupes de mailles de gmds
 	bool isCreateGMDSGroupsOK = createGMDSGroups();
 	if(!isCreateGMDSGroupsOK) {
-	  	throw TkUtil::Exception (TkUtil::UTF8String ("MeshImplementation::writeVTK ne peut créer les groupes. Vérifiez que la fenêtre qualité est fermée.", TkUtil::Charset::UTF_8));
+	  	throw TkUtil::Exception (TkUtil::UTF8String ("MeshImplementation::writeVTK ne peut créer les groupes.", TkUtil::Charset::UTF_8));
 	}
 
 	try{
-		gmds::VTKWriter<gmds::IGMesh> vtkWriter(getGMDSMesh());
-		vtkWriter.write(nom, gmds::R|gmds::F|gmds::N);
+		gmds::IGMeshIOService ioService(&getGMDSMesh());
+		gmds::VTKWriter vtkWriter(&ioService);
+		vtkWriter.setCellOptions(gmds::R|gmds::F|gmds::N);
+		vtkWriter.setDataOptions(gmds::R|gmds::F|gmds::N);
+		vtkWriter.write(nom);
 	}
 	catch(gmds::GMDSException& e) {
 		deleteGMDSGroups();
@@ -416,7 +424,7 @@ void MeshImplementation::writeCGNS(std::string nom)
 
 	std::vector<Topo::Block*> blocks;
 	getContext().getLocalTopoManager().getBlocks(blocks, true);
-	gmds::IGMesh& gmdsMesh = getGMDSMesh();
+	gmds::Mesh& gmdsMesh = getGMDSMesh();
 
 	int index_file, icelldim, iphysdim, index_base;
 
@@ -948,32 +956,33 @@ void MeshImplementation::deleteGMDSGroups()
         // modification du nom du nuage pour éviter les conflits avec les noms de ligne
         std::string cloudName = current_cloud->getName() + std::string("ND");
 
-        getGMDSMesh().deleteCloud(getGMDSMesh().getCloud(cloudName));
+        getGMDSMesh().deleteGroup<gmds::Node>(getGMDSMesh().getGroup<gmds::Node>(cloudName));
     }
 
     for(unsigned int iLine=0; iLine<lines.size(); iLine++) {
         Mesh::Line* current_line = lines[iLine];
 
-        getGMDSMesh().deleteLine(getGMDSMesh().getLine(current_line->getName()));
+        getGMDSMesh().deleteGroup<gmds::Edge>(getGMDSMesh().getGroup<gmds::Edge>(current_line->getName()));
     }
 
     for(unsigned int iSurf=0; iSurf<surfaces.size(); iSurf++) {
         Mesh::Surface* current_surf = surfaces[iSurf];
 
-        getGMDSMesh().deleteSurface(getGMDSMesh().getSurface(current_surf->getName()));
+        getGMDSMesh().deleteGroup<gmds::Face>(getGMDSMesh().getGroup<gmds::Face>(current_surf->getName()));
     }
 
     for(unsigned int iVol=0; iVol<volumes.size(); iVol++) {
         Mesh::Volume* current_vol = volumes[iVol];
 
-        getGMDSMesh().deleteVolume(getGMDSMesh().getVolume(current_vol->getName()));
+        getGMDSMesh().deleteGroup<gmds::Region>(getGMDSMesh().getGroup<gmds::Region>(current_vol->getName()));
     }
 }
 /*----------------------------------------------------------------------------*/
 void MeshImplementation::readMli(std::string nom, uint id)
 {
-	bool	implemented	= false;
-    gmds::LimaReader<gmds::IGMesh> lr(getGMDSMesh(id));
+    bool implemented = false;
+    gmds::IGMeshIOService ioService(&getGMDSMesh(id));
+    gmds::LimaReader lr(getGMDSMesh(id));
     lr.read(nom, gmds::R|gmds::F|gmds::E|gmds::N);
     //std::cout<<"MeshImplementation::readMli avec comme unité "<<lr.getLengthUnit()<<std::endl;
 
@@ -994,9 +1003,8 @@ void MeshImplementation::readMli(std::string nom, uint id)
         double factor = Utils::Unit::computeFactor(luMli, luCtx);
         std::cout<<"factor = "<<factor<<std::endl;
 
-    	gmds::IGMesh::node_iterator itn  = getGMDSMesh(id).nodes_begin();
-        for (; !itn.isDone(); itn.next()) {
-            gmds::Node current_node = itn.value();
+        for (auto itn : getGMDSMesh(id).nodes()) {
+            auto current_node = getGMDSMesh(id).get<gmds::Node>(itn);
             current_node.setXYZ(factor*current_node.X(),factor*current_node.Y(),factor*current_node.Z());
         }
     }
@@ -1226,8 +1234,8 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::CoEdge* ed
         for (uint i=1; i<nbBrasI; i++){
             const Utils::Math::Point &ptI = ed->points()[i];
             gmds::Node nd = getGMDSMesh().newNode(ptI.getX(), ptI.getY(), ptI.getZ());
-            ed->nodes().push_back(nd.getID());
-            command->addCreatedNode(nd.getID());
+            ed->nodes().push_back(nd.id());
+            command->addCreatedNode(nd.id());
         }
 
         if (!ed->getVertex(1)->isMeshed())
@@ -1236,14 +1244,14 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::CoEdge* ed
 
         // compute nodes position based on the endpoints
         if(ed->getMeshingProperty()->getMeshLaw() == Topo::CoEdgeMeshingProperty::uniforme_smoothfix) {
-            gmds::math::Point pt0 = getGMDSMesh().get<gmds::Node>(ed->getVertex(0)->getNode()).getPoint();
-            gmds::math::Point pt1 = getGMDSMesh().get<gmds::Node>(ed->getVertex(1)->getNode()).getPoint();
+            gmds::math::Point pt0 = getGMDSMesh().get<gmds::Node>(ed->getVertex(0)->getNode()).point();
+            gmds::math::Point pt1 = getGMDSMesh().get<gmds::Node>(ed->getVertex(1)->getNode()).point();
             // It is not necessary to accomodate for meshing direction as 
             // it is not used for mesh nodes order but for thing like 
             // geometric progression
             //if(!ed->getMeshingProperty()->getDirect()) {
-            //    pt0 = getGMDSMesh().get<gmds::Node>(ed->getVertex(1)->getNode()).getPoint();
-            //    pt1 = getGMDSMesh().get<gmds::Node>(ed->getVertex(0)->getNode()).getPoint();
+            //    pt0 = getGMDSMesh().get<gmds::Node>(ed->getVertex(1)->getNode()).point();
+            //    pt1 = getGMDSMesh().get<gmds::Node>(ed->getVertex(0)->getNode()).point();
             //}
             for (uint i=1; i<nbBrasI; i++){
                 gmds::math::Point pt = (1. - ((double) i / (double) nbBrasI)) * pt0 + ((double) i / (double) nbBrasI) * pt1;
@@ -1260,8 +1268,8 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::CoEdge* ed
         	gmds::TCellID id1 = ed->nodes()[i];
         	gmds::TCellID id2 = ed->nodes()[i+1];
         	gmds::Edge edge = getGMDSMesh().newEdge(id1, id2);
-        	ed->edges().push_back(edge.getID());
-        	command->addCreatedEdge(edge.getID());
+			ed->edges().push_back(edge.id());
+			command->addCreatedEdge(edge.id());
         }
 
         // ajoute les bras aux groupes suivant ce qui a été demandé
@@ -1269,8 +1277,8 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::CoEdge* ed
 
 		// nettoyage du preMesh
 		ed->clearPoints();
-        ed->getMeshingData()->setPreMeshed(false);
-        ed->getMeshingData()->setMeshed(true);
+		ed->getMeshingData()->setPreMeshed(false);
+		ed->getMeshingData()->setMeshed(true);
     } // end if (!ed->isMeshed())
 }
 /*----------------------------------------------------------------------------*/
@@ -1313,10 +1321,10 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::Vertex* ve
 
 
         gmds::Node nd = getGMDSMesh().newNode(pt.getX(), pt.getY(), pt.getZ());
-        ve->setNode(nd.getID());
-        command->addCreatedNode(nd.getID());
+        ve->setNode(nd.id());
+        command->addCreatedNode(nd.id());
 #ifdef _DEBUG_MESH
-        std::cout <<"  setNode à "<<nd.getID()<<" pour "<<ve->getName()<<std::endl;
+        std::cout <<"  setNode à "<<nd.id()<<" pour "<<ve->getName()<<std::endl;
 #endif
 
         // ajoute le noeud aux groupes suivant ce qui a été demandé

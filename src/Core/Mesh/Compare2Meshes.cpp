@@ -17,13 +17,13 @@
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/TraceLog.h>
 /*----------------------------------------------------------------------------*/
-#include "GMDS/IG/IGMesh.h"
+#include "gmds/ig/Mesh.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Mesh {
 /*----------------------------------------------------------------------------*/
-Compare2Meshes::Compare2Meshes(Internal::Context* context, gmds::IGMesh& mesh1, gmds::IGMesh& mesh2)
+Compare2Meshes::Compare2Meshes(Internal::Context* context, gmds::Mesh& mesh1, gmds::Mesh& mesh2)
 : m_context(context)
 , m_gmds_mesh1(mesh1)
 , m_gmds_mesh2(mesh2)
@@ -71,37 +71,37 @@ bool Compare2Meshes::perform()
     }
 
     // nombre de nuages (de noeuds)
-    if (m_gmds_mesh1.getNbClouds() != m_gmds_mesh2.getNbClouds()){
+    if (m_gmds_mesh1.getNbGroups<gmds::Node>() != m_gmds_mesh2.getNbGroups<gmds::Node>()){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"Comparaison de 2 maillages: nombre de nuages différents "
-                <<(long)m_gmds_mesh1.getNbClouds()<<" != "<<(long)m_gmds_mesh2.getNbClouds();
+                <<(long)m_gmds_mesh1.getNbGroups<gmds::Node>()<<" != "<<(long)m_gmds_mesh2.getNbGroups<gmds::Node>();
         getContext().getLogStream()->log (TkUtil::TraceLog (message, TkUtil::Log::ERROR));
         ok = false;
     }
 
     // nombre de lignes (de bras)
-    if (m_gmds_mesh1.getNbLines() != m_gmds_mesh2.getNbLines()){
+    if (m_gmds_mesh1.getNbGroups<gmds::Edge>() != m_gmds_mesh2.getNbGroups<gmds::Edge>()){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"Comparaison de 2 maillages: nombre de lignes différents "
-                <<(long)m_gmds_mesh1.getNbLines()<<" != "<<(long)m_gmds_mesh2.getNbLines();
+                <<(long)m_gmds_mesh1.getNbGroups<gmds::Edge>()<<" != "<<(long)m_gmds_mesh2.getNbGroups<gmds::Edge>();
         getContext().getLogStream()->log (TkUtil::TraceLog (message, TkUtil::Log::ERROR));
         ok = false;
     }
 
     // nombre de surfaces (de polygones)
-    if (m_gmds_mesh1.getNbSurfaces() != m_gmds_mesh2.getNbSurfaces()){
+    if (m_gmds_mesh1.getNbGroups<gmds::Face>() != m_gmds_mesh2.getNbGroups<gmds::Face>()){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"Comparaison de 2 maillages: nombre de surfaces différents "
-                <<(long)m_gmds_mesh1.getNbSurfaces()<<" != "<<(long)m_gmds_mesh2.getNbSurfaces();
+                <<(long)m_gmds_mesh1.getNbGroups<gmds::Face>()<<" != "<<(long)m_gmds_mesh2.getNbGroups<gmds::Face>();
         getContext().getLogStream()->log (TkUtil::TraceLog (message, TkUtil::Log::ERROR));
         ok = false;
     }
 
     // nombre de volumes (de polyèdres)
-    if (m_gmds_mesh1.getNbVolumes() != m_gmds_mesh2.getNbVolumes()){
+    if (m_gmds_mesh1.getNbGroups<gmds::Region>() != m_gmds_mesh2.getNbGroups<gmds::Region>()){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"Comparaison de 2 maillages: nombre de volumes différents "
-                <<(long)m_gmds_mesh1.getNbVolumes()<<" != "<<(long)m_gmds_mesh2.getNbVolumes();
+                <<(long)m_gmds_mesh1.getNbGroups<gmds::Region>()<<" != "<<(long)m_gmds_mesh2.getNbGroups<gmds::Region>();
         getContext().getLogStream()->log (TkUtil::TraceLog (message, TkUtil::Log::ERROR));
         ok = false;
     }
@@ -112,15 +112,16 @@ bool Compare2Meshes::perform()
     // seulement s'il y en a autant de part et d'autre
     if (m_gmds_mesh1.getNbNodes() == m_gmds_mesh2.getNbNodes()) {
         uint nb_vtx_err = 0;
-        gmds::IGMesh::node_iterator itNd1 = m_gmds_mesh1.nodes_begin();
-        gmds::IGMesh::node_iterator itNd2 = m_gmds_mesh2.nodes_begin();
-
         double errMax = 0.0;
         uint idMax = 0;
         uint i = 0;
-        for (; !itNd1.isDone(); itNd1.next(), itNd2.next(), i++){
-            gmds::Node nd1 = itNd1.value();
-            gmds::Node nd2 = itNd2.value();
+
+        for (auto itNd1 = m_gmds_mesh1.nodes_begin(), itNd2 = m_gmds_mesh2.nodes_begin();
+                itNd1 != m_gmds_mesh1.nodes_end(), itNd2 != m_gmds_mesh2.nodes_end();
+                ++itNd1, ++itNd2){
+
+            gmds::Node nd1 = m_gmds_mesh1.get<gmds::Node>(*itNd1);
+            gmds::Node nd2 = m_gmds_mesh2.get<gmds::Node>(*itNd2);
 
             double x1 = nd1.X();
             double x2 = nd2.X();
@@ -160,14 +161,15 @@ bool Compare2Meshes::perform()
     // On fait l'impasse sur les bras
     if (m_gmds_mesh1.getNbFaces() == m_gmds_mesh2.getNbFaces()){
         uint nb_poly_err = 0;
-        gmds::IGMesh::face_iterator itPoly1 = m_gmds_mesh1.faces_begin();
-        gmds::IGMesh::face_iterator itPoly2 = m_gmds_mesh2.faces_begin();
 
-        for (; !itPoly1.isDone(); itPoly1.next(), itPoly2.next()){
-            gmds::Face p1 = itPoly1.value();
-            gmds::Face p2 = itPoly2.value();
+        for (auto itPoly1 = m_gmds_mesh1.faces_begin(), itPoly2 = m_gmds_mesh2.faces_begin();
+                itPoly1 != m_gmds_mesh1.faces_end(), itPoly2 != m_gmds_mesh2.faces_end();
+                ++itPoly1, ++itPoly2){
 
-            if (p1.getNbNodes() != p2.getNbNodes()){
+            gmds::Face p1 = m_gmds_mesh1.get<gmds::Face>(*itPoly1);
+            gmds::Face p2 = m_gmds_mesh2.get<gmds::Face>(*itPoly2);
+
+            if (p1.nbNodes() != p2.nbNodes()){
                 nb_poly_err += 1;
             }
             else {
@@ -195,14 +197,15 @@ bool Compare2Meshes::perform()
 
     if (m_gmds_mesh1.getNbRegions() == m_gmds_mesh2.getNbRegions()){
         uint nb_poly_err = 0;
-        gmds::IGMesh::region_iterator itPoly1 = m_gmds_mesh1.regions_begin();
-        gmds::IGMesh::region_iterator itPoly2 = m_gmds_mesh2.regions_begin();
 
-        for (; !itPoly1.isDone(); itPoly1.next(), itPoly2.next()){
-            gmds::Region p1 = itPoly1.value();
-            gmds::Region p2 = itPoly2.value();
+        for (auto itPoly1 = m_gmds_mesh1.regions_begin(), itPoly2 = m_gmds_mesh2.regions_begin();
+                itPoly1 != m_gmds_mesh1.regions_end(), itPoly2 != m_gmds_mesh2.regions_end();
+                ++itPoly1, ++itPoly2){
 
-            if (p1.getNbNodes() != p2.getNbNodes()){
+            gmds::Region p1 = m_gmds_mesh1.get<gmds::Region>(*itPoly1);
+            gmds::Region p2 = m_gmds_mesh2.get<gmds::Region>(*itPoly2);
+
+            if (p1.nbNodes() != p2.nbNodes()){
                 nb_poly_err += 1;
             }
             else {
@@ -235,14 +238,13 @@ bool Compare2Meshes::perform()
     // ----------------------
     {
         // comparaison des noms des groupes
-        gmds::IGMesh::clouds_iterator itGrp1 = m_gmds_mesh1.clouds_begin();
-        gmds::IGMesh::clouds_iterator itGrp2 = m_gmds_mesh2.clouds_begin();
         std::vector<std::string> liste1;
         std::vector<std::string> liste2;
-        for (; itGrp1 != m_gmds_mesh1.clouds_end(); ++itGrp1)
-            liste1.push_back(itGrp1->name());
-        for (; itGrp2 != m_gmds_mesh2.clouds_end(); ++itGrp2)
-            liste2.push_back(itGrp2->name());
+        for (auto itGrp1 = m_gmds_mesh1.groups_begin<gmds::Node>(); itGrp1 != m_gmds_mesh1.groups_end<gmds::Node>(); ++itGrp1)
+            liste1.push_back((*itGrp1)->name());
+
+        for (auto itGrp2 = m_gmds_mesh2.groups_begin<gmds::Node>(); itGrp2 != m_gmds_mesh2.groups_end<gmds::Node>(); ++itGrp2)
+            liste2.push_back((*itGrp2)->name());
 
         std::vector<std::string> common;
         std::vector<std::string> add1;
@@ -270,20 +272,21 @@ bool Compare2Meshes::perform()
 
         // comparaison du contenu des groupes en communs (id des éléments seulement, dans le même ordre)
         for (uint i=0; i<common.size(); i++){
-            gmds::IGMesh::cloud& grp1 = m_gmds_mesh1.getCloud(common[i]);
-            gmds::IGMesh::cloud& grp2 = m_gmds_mesh2.getCloud(common[i]);
-            std::vector<gmds::Node> cells1 = grp1.cells();
-            std::vector<gmds::Node> cells2 = grp2.cells();
+            auto grp1 = m_gmds_mesh1.getGroup<gmds::Node>(common[i]);
+            auto grp2 = m_gmds_mesh2.getGroup<gmds::Node>(common[i]);
+            auto cells1 = grp1->cells();
+            auto cells2 = grp2->cells();
 
             if (cells1.size() == cells2.size()){
-                std::vector<gmds::Node>::iterator ic1 = cells1.begin();
-                std::vector<gmds::Node>::iterator ic2 = cells2.begin();
                 uint nb_id_diff = 0;
-                for (; ic1 != cells1.end(); ++ic1, ++ic2)
-                    if ((*ic1).getID() != (*ic2).getID()){
+                for (auto ic1 = cells1.begin(), ic2 = cells2.begin(); ic1 != cells1.end(), ic2 != cells2.end(); ++ic1, ++ic2) {
+                    auto cell1 = m_gmds_mesh1.get<gmds::Node>(*ic1);
+                    auto cell2 = m_gmds_mesh2.get<gmds::Node>(*ic2);
+                    if (cell1.id() != cell2.id()){
 //                        std::cout<<common[i]<<": noeud id "<<(*ic1)->getID()<<" != "<<(*ic2)->getID()<<std::endl;
                         nb_id_diff += 1;
                     }
+                }
 
                 if (nb_id_diff){
 					TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -309,15 +312,16 @@ bool Compare2Meshes::perform()
     // ----------------------
     {
         // comparaison des noms des groupes
-        gmds::IGMesh::lines_iterator itGrp1 = m_gmds_mesh1.lines_begin();
-        gmds::IGMesh::lines_iterator itGrp2 = m_gmds_mesh2.lines_begin();
         std::vector<std::string> liste1;
         std::vector<std::string> liste2;
-        for (; itGrp1 != m_gmds_mesh1.lines_end(); ++itGrp1)
-            liste1.push_back(itGrp1->name());
-        for (; itGrp2 != m_gmds_mesh2.lines_end(); ++itGrp2)
-            liste2.push_back(itGrp2->name());
-
+        for (auto itGrp1 = m_gmds_mesh1.groups_begin<gmds::Edge>(); itGrp1 != m_gmds_mesh1.groups_end<gmds::Edge>(); ++itGrp1){
+            gmds::CellGroup<gmds::Edge> *current_group = *itGrp1;
+            liste1.push_back(current_group->name());
+        }
+        for (auto itGrp2 = m_gmds_mesh2.groups_begin<gmds::Edge>(); itGrp2 != m_gmds_mesh2.groups_end<gmds::Edge>(); ++itGrp2){
+            gmds::CellGroup<gmds::Edge> *current_group = *itGrp2;
+            liste2.push_back(current_group->name());
+        }
         std::vector<std::string> common;
         std::vector<std::string> add1;
         std::vector<std::string> add2;
@@ -344,19 +348,19 @@ bool Compare2Meshes::perform()
 
         // comparaison du contenu des groupes en communs (id des éléments seulement, dans le même ordre)
         for (uint i=0; i<common.size(); i++){
-            gmds::IGMesh::line& grp1 = m_gmds_mesh1.getLine(common[i]);
-            gmds::IGMesh::line& grp2 = m_gmds_mesh2.getLine(common[i]);
-            std::vector<gmds::Edge> cells1 = grp1.cells();
-            std::vector<gmds::Edge> cells2 = grp2.cells();
+            auto grp1 = m_gmds_mesh1.getGroup<gmds::Edge>(common[i]);
+            auto grp2 = m_gmds_mesh2.getGroup<gmds::Edge>(common[i]);
+            auto cells1 = grp1->cells();
+            auto cells2 = grp2->cells();
 
             if (cells1.size() == cells2.size()){
-                std::vector<gmds::Edge>::iterator ic1 = cells1.begin();
-                std::vector<gmds::Edge>::iterator ic2 = cells2.begin();
                 uint nb_id_diff = 0;
-                for (; ic1 != cells1.end(); ++ic1, ++ic2)
-                    if ((*ic1).getID() != (*ic2).getID())
+                for (auto ic1 = cells1.begin(), ic2 = cells2.begin(); ic1 != cells1.end(), ic2 != cells2.end(); ++ic1, ++ic2) {
+                    auto cell1 = m_gmds_mesh1.get<gmds::Node>(*ic1);
+                    auto cell2 = m_gmds_mesh2.get<gmds::Node>(*ic2);
+                    if (cell1.id() != cell2.id())
                         nb_id_diff += 1;
-
+                }
                 if (nb_id_diff){
 					TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
                     message <<"Comparaison de 2 maillages: bras de la surface "<<common[i]<< " différents: "
@@ -382,14 +386,13 @@ bool Compare2Meshes::perform()
     // ------------------------
     {
         // comparaison des noms des groupes
-        gmds::IGMesh::surfaces_iterator itGrp1 = m_gmds_mesh1.surfaces_begin();
-        gmds::IGMesh::surfaces_iterator itGrp2 = m_gmds_mesh2.surfaces_begin();
+
         std::vector<std::string> liste1;
         std::vector<std::string> liste2;
-        for (; itGrp1 != m_gmds_mesh1.surfaces_end(); ++itGrp1)
-            liste1.push_back(itGrp1->name());
-        for (; itGrp2 != m_gmds_mesh2.surfaces_end(); ++itGrp2)
-            liste2.push_back(itGrp2->name());
+        for (auto itGrp1 = m_gmds_mesh1.groups_begin<gmds::Face>(); itGrp1 != m_gmds_mesh1.groups_end<gmds::Face>(); ++itGrp1)
+            liste1.push_back((*itGrp1)->name());
+        for (auto itGrp2 = m_gmds_mesh2.groups_begin<gmds::Face>(); itGrp2 != m_gmds_mesh2.groups_end<gmds::Face>(); ++itGrp2)
+            liste2.push_back((*itGrp2)->name());
 
         std::vector<std::string> common;
         std::vector<std::string> add1;
@@ -417,18 +420,19 @@ bool Compare2Meshes::perform()
 
         // comparaison du contenu des groupes en communs (id des éléments seulement, dans le même ordre)
         for (uint i=0; i<common.size(); i++){
-            gmds::IGMesh::surface& grp1 = m_gmds_mesh1.getSurface(common[i]);
-            gmds::IGMesh::surface& grp2 = m_gmds_mesh2.getSurface(common[i]);
-            std::vector<gmds::Face> cells1 = grp1.cells();
-            std::vector<gmds::Face> cells2 = grp2.cells();
+            auto grp1 = m_gmds_mesh1.getGroup<gmds::Face>(common[i]);
+            auto grp2 = m_gmds_mesh2.getGroup<gmds::Face>(common[i]);
+            auto cells1 = grp1->cells();
+            auto cells2 = grp2->cells();
 
             if (cells1.size() == cells2.size()){
-                std::vector<gmds::Face>::iterator ic1 = cells1.begin();
-                std::vector<gmds::Face>::iterator ic2 = cells2.begin();
                 uint nb_id_diff = 0;
-                for (; ic1 != cells1.end(); ++ic1, ++ic2)
-                    if ((*ic1).getID() != (*ic2).getID())
+                for (auto ic1 = cells1.begin(), ic2 = cells2.begin(); ic1 != cells1.end(), ic2 != cells2.end(); ++ic1, ++ic2) {
+                    auto cell1 = m_gmds_mesh1.get<gmds::Node>(*ic1);
+                    auto cell2 = m_gmds_mesh2.get<gmds::Node>(*ic2);
+                    if (cell1.id() != cell2.id())
                         nb_id_diff += 1;
+                }
 
                 if (nb_id_diff){
 					TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -455,14 +459,13 @@ bool Compare2Meshes::perform()
     // -----------------------
     {
         // comparaison des noms des groupes
-        gmds::IGMesh::volumes_iterator itGrp1 = m_gmds_mesh1.volumes_begin();
-        gmds::IGMesh::volumes_iterator itGrp2 = m_gmds_mesh2.volumes_begin();
+
         std::vector<std::string> liste1;
         std::vector<std::string> liste2;
-        for (; itGrp1 != m_gmds_mesh1.volumes_end(); ++itGrp1)
-            liste1.push_back(itGrp1->name());
-        for (; itGrp2 != m_gmds_mesh2.volumes_end(); ++itGrp2)
-            liste2.push_back(itGrp2->name());
+        for (auto itGrp1 = m_gmds_mesh1.groups_begin<gmds::Region>(); itGrp1 != m_gmds_mesh1.groups_end<gmds::Region>(); ++itGrp1)
+            liste1.push_back((*itGrp1)->name());
+        for (auto itGrp2 = m_gmds_mesh2.groups_begin<gmds::Region>(); itGrp2 != m_gmds_mesh2.groups_end<gmds::Region>(); ++itGrp2)
+            liste2.push_back((*itGrp2)->name());
 
         std::vector<std::string> common;
         std::vector<std::string> add1;
@@ -490,18 +493,19 @@ bool Compare2Meshes::perform()
 
         // comparaison du contenu des groupes en communs (id des éléments seulement, dans le même ordre)
         for (uint i=0; i<common.size(); i++){
-            gmds::IGMesh::volume& grp1 = m_gmds_mesh1.getVolume(common[i]);
-            gmds::IGMesh::volume& grp2 = m_gmds_mesh2.getVolume(common[i]);
-            std::vector<gmds::Region> cells1 = grp1.cells();
-            std::vector<gmds::Region> cells2 = grp2.cells();
+            auto grp1 = m_gmds_mesh1.getGroup<gmds::Region>(common[i]);
+            auto grp2 = m_gmds_mesh2.getGroup<gmds::Region>(common[i]);
+            auto cells1 = grp1->cells();
+            auto cells2 = grp2->cells();
 
             if (cells1.size() == cells2.size()){
-                std::vector<gmds::Region>::iterator ic1 = cells1.begin();
-                std::vector<gmds::Region>::iterator ic2 = cells2.begin();
                 uint nb_id_diff = 0;
-                for (; ic1 != cells1.end(); ++ic1, ++ic2)
-                    if ((*ic1).getID() != (*ic2).getID())
+                for (auto ic1 = cells1.begin(), ic2 = cells2.begin(); ic1 != cells1.end(), ic2 != cells2.end(); ++ic1, ++ic2){
+                    auto cell1 = m_gmds_mesh1.get<gmds::Node>(*ic1);
+                    auto cell2 = m_gmds_mesh2.get<gmds::Node>(*ic2);
+                    if (cell1.id() != cell2.id())
                         nb_id_diff += 1;
+                }
 
                 if (nb_id_diff){
 					TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);

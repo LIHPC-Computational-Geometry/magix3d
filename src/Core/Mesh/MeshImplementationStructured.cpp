@@ -279,7 +279,7 @@ void MeshImplementation::preMeshStrutured(Topo::Block* bl)
                 		throw TkUtil::Exception (message);
                 	}
 #endif
-                	bl->nodes()[ibloc+jbloc] = nodes[iface+jface*ifacesize].getID();
+                    bl->nodes()[ibloc+jbloc] = nodes[iface+jface*ifacesize].id();
                     l_points[ibloc+jbloc] = getCoordNode(nodes[iface+jface*ifacesize]);
                     //                        std::cout<<"bl->nodes["<<ibloc+jbloc<<"] = "
                     //                                << getInfo(nodes[iface+jface*ifacesize])
@@ -296,7 +296,7 @@ void MeshImplementation::preMeshStrutured(Topo::Block* bl)
                 Utils::Math::Point pt = getCoordNode(node);
                 for(uint jface=0, jbloc=jblocdep; jface<jfacesize; jface++, jbloc+=jblocpas)
                     for(uint iface=0, ibloc=iblocdep; iface<ifacesize; iface++, ibloc+=iblocpas){
-                        bl->nodes()[ibloc+jbloc] = node.getID();
+                        bl->nodes()[ibloc+jbloc] = node.id();
                         l_points[ibloc+jbloc] = pt;
                     }
             }
@@ -503,8 +503,8 @@ void MeshImplementation::meshStrutured(Mesh::CommandCreateMesh* command, Topo::B
             for (uint k=1; k<nbBrasK; k++) {
                 Utils::Math::Point &pt = bl->points()[i+nbNoeudsI*j+k*nbNoeudsI*nbNoeudsJ];
                 gmds::Node nd = getGMDSMesh().newNode(pt.getX(), pt.getY(), pt.getZ());
-                bl->nodes()[i+nbNoeudsI*j+k*nbNoeudsI*nbNoeudsJ] = nd.getID();
-                command->addCreatedNode(nd.getID());
+                bl->nodes()[i+nbNoeudsI*j+k*nbNoeudsI*nbNoeudsJ] = nd.id();
+                command->addCreatedNode(nd.id());
             }
 
     delete [] bl->points();
@@ -625,7 +625,7 @@ void MeshImplementation::preMeshStrutured(Topo::CoFace* coface)
             uint nbPtI = arete->getNbNodes();
             // remplissage des coordonnées aux extrémités
             for(uint iarete=0, jface=idep[cote]; iarete<nbPtI; iarete++, jface+=ipas[cote]){
-            	coface->nodes()[jface] = nodes[iarete].getID();
+                coface->nodes()[jface] = nodes[iarete].id();
                 l_points[jface] = getCoordNode(nodes[iarete]);
             }
         }
@@ -635,7 +635,7 @@ void MeshImplementation::preMeshStrutured(Topo::CoFace* coface)
             uint nbPtI = coface->getEdge(cote-2)->getNbNodes();
             gmds::Node node = getGMDSMesh().get<gmds::Node>(coface->getVertex(0)->getNode());
             for(uint iarete=0, jface=idep[cote]; iarete<nbPtI; iarete++, jface+=ipas[cote]){
-            	coface->nodes()[jface] = node.getID();
+                coface->nodes()[jface] = node.id();
                 l_points[jface] = getCoordNode(node);
             }
         }
@@ -852,14 +852,14 @@ void MeshImplementation::meshStrutured(Mesh::CommandCreateMesh* command, Topo::C
             Utils::Math::Point &pt = coface->points()[i+nbNoeudsI*j];
             gmds::Node nd = getGMDSMesh().newNode(pt.getX(), pt.getY(), pt.getZ());
 #ifdef _DEBUG2
-            if (nd.getID()==gmds::NullID){
+            if (nd.id()==gmds::NullID){
 				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
             	message << "Création d'un noeud GMDS en erreur pour la face "<< coface->getName();
             	throw TkUtil::Exception (message);
             }
 #endif
-            coface->nodes()[i+nbNoeudsI*j] = nd.getID();
-            command->addCreatedNode(nd.getID());
+            coface->nodes()[i+nbNoeudsI*j] = nd.id();
+            command->addCreatedNode(nd.id());
         }
 
     delete [] coface->points();
@@ -1883,7 +1883,7 @@ void MeshImplementation::_addRegionsInVolumes(Mesh::CommandCreateMesh* command, 
     if (bl->getNbVertices() != 8) // K MAX
         kEnd-=1;
 
-    gmds::IGMesh& gmds_mesh = getGMDSMesh();
+    gmds::Mesh& gmds_mesh = getGMDSMesh();
     bool areRegionsTested = false;
     bool areRegionsInverted = false;
     unsigned int testOnDir = 9;
@@ -2014,8 +2014,8 @@ void MeshImplementation::_addRegionsInVolumes(Mesh::CommandCreateMesh* command, 
                 } else {
                 	r = getGMDSMesh().newHex(nd5,nd6,nd7,nd8,nd1,nd2,nd3,nd4);
                 }
-                elem.push_back(r.getID());
-                command->addCreatedRegion(r.getID());
+                elem.push_back(r.id());
+                command->addCreatedRegion(r.id());
 
             } // for (uint i=iBegin; i<iEnd; i++) {
         } // for (uint j=jBegin; j<jEnd; j++) {
@@ -2205,8 +2205,8 @@ void MeshImplementation::_addRegionsInVolumes(Mesh::CommandCreateMesh* command, 
         				}
         			}
 
-        			elem.push_back(r.getID());
-        			command->addCreatedRegion(r.getID());
+                    elem.push_back(r.id());
+                    command->addCreatedRegion(r.id());
 
         		} // for (uint i=iBegin; i<iEnd; i++){
         	} // for (uint j=jBegin; j<jEnd; j++) {
@@ -2274,7 +2274,7 @@ void MeshImplementation::_addFacesInSurfaces(Mesh::CommandCreateMesh* command, T
     std::vector<gmds::TCellID>& nodes = fa->nodes();
     std::vector<gmds::TCellID>& elem = fa->faces();
 
-    gmds::IGMesh& gmds_mesh = getGMDSMesh();
+    gmds::Mesh& gmds_mesh = getGMDSMesh();
 
 #define nodeIJ(ii,jj) nodes[ii+(jj)*nbNoeudsI]
 
@@ -2303,8 +2303,8 @@ void MeshImplementation::_addFacesInSurfaces(Mesh::CommandCreateMesh* command, T
                 gmds::Node nd3 = gmds_mesh.get<gmds::Node>(nodeIJ(i+1,j+1));
 
                 gmds::Face f = getGMDSMesh().newTriangle(nd1,nd2,nd3);
-                elem.push_back(f.getID());
-                command->addCreatedFace(f.getID());
+                elem.push_back(f.id());
+                command->addCreatedFace(f.id());
             }
     }
 
@@ -2323,8 +2323,8 @@ void MeshImplementation::_addFacesInSurfaces(Mesh::CommandCreateMesh* command, T
 
             gmds::Face f = getGMDSMesh().newQuad(nd1,nd2,nd3,nd4);
             //std::cout<<"Création du quad d'id "<<f<< " ("<<nd1<<", "<<nd2<<", "<<nd3<<", "<<nd4<<")\n";
-            elem.push_back(f.getID());
-            command->addCreatedFace(f.getID());
+            elem.push_back(f.id());
+            command->addCreatedFace(f.id());
 
             // vect2 = (nd2-nd1)*(nd4-nd1)
             Utils::Math::Vector vect2 = Utils::Math::Vector(nd2.X()-nd1.X(), nd2.Y()-nd1.Y(), nd2.Z()-nd1.Z())

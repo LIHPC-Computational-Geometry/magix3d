@@ -13,7 +13,7 @@
 #include <vector>
 #include <map>
 #include <sys/types.h> // pour uint
-#include <GMDS/Utils/CommonTypes.h>
+#include <gmds/utils/CommonTypes.h>
 /*----------------------------------------------------------------------------*/
 namespace gmds{
 class Node;

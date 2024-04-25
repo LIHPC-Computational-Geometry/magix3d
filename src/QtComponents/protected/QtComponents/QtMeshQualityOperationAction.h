@@ -158,9 +158,6 @@ class QtMeshQualityOperationPanel :
 	 * classes d'histogrammes fait par Qualif. */
 	std::vector<Mgx3D::Mesh::MeshEntity*>				_meshEntities;
 
-	/** Les éléments de maillage <I>GMDS</I> temporaires. */
-	std::vector<std::string>							_gmdsSurfaces;
-	std::vector<std::string>							_gmdsVolumes;
 };	// class QtMeshQualityOperationPanel
 
 

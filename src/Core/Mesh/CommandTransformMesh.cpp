@@ -43,13 +43,13 @@ CommandTransformMesh::
 void CommandTransformMesh::
 transform(gp_Trsf* transf)
 {
-	gmds::IGMesh& mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
+	gmds::Mesh& mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
 
 	std::vector<gmds::Node> nodes;
 	mesh.getAll(nodes);
 
 	for (uint i=0; i<nodes.size(); i++){
-		gmds::math::Point pt = nodes[i].getPoint();
+		gmds::math::Point pt = nodes[i].point();
 		double x = pt.X();
 		double y = pt.Y();
 		double z = pt.Z();
@@ -81,13 +81,13 @@ transform(gp_Trsf* transf)
 void CommandTransformMesh::
 transform(gp_GTrsf* transf)
 {
-	gmds::IGMesh& mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
+	gmds::Mesh& mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
 
 	std::vector<gmds::Node> nodes;
 	mesh.getAll(nodes);
 
 	for (uint i=0; i<nodes.size(); i++){
-		gmds::math::Point pt = nodes[i].getPoint();
+		gmds::math::Point pt = nodes[i].point();
 		double x = pt.X();
 		double y = pt.Y();
 		double z = pt.Z();

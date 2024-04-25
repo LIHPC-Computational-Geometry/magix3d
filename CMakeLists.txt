@@ -69,3 +69,7 @@ if(WITH_DOC)
   message (STATUS "===============> MGX Documentation")
   add_subdirectory (Docs)
 endif()
+
+if(USE_TRITON)
+  message (STATUS "===============> TRITON TRITON")
+endif()

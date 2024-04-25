@@ -32,7 +32,7 @@
 #include "Mesh/MeshItf.h"
 #include "Mesh/Mgx3DQualifSerie.h"
 
-#include <GMDS/IG/IGMesh.h>
+#include <gmds/ig/Mesh.h>
 
 using namespace std;
 using namespace TkUtil;
@@ -42,14 +42,6 @@ using namespace Mgx3D::Group;
 using namespace Mgx3D::Mesh;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Internal;
-
-
-namespace GQualif
-{
-	class GMDSQualifSerie;
-}	// namespace GQualif
-
-
 
 namespace Mgx3D
 {
@@ -69,7 +61,7 @@ QtMeshQualityOperationPanel::QtMeshQualityOperationPanel (
 	: QtMgx3DOperationPanel (
 			0/*parent*/, mainWindow, action, helpURL, helpTag),
 	  _qualifWidget (0), _displayCellsButton (0), _initializeButton (0),
-	  _analysedMeshEntities ( ), _meshEntities ( ), _gmdsSurfaces ( ), _gmdsVolumes ( )
+	  _analysedMeshEntities ( ), _meshEntities ( )
 {
 	setWindowTitle (panelName.c_str ( ));
 	mainWindow.registerAdditionalOperationPanel (*this);
@@ -117,7 +109,7 @@ QtMeshQualityOperationPanel::QtMeshQualityOperationPanel (
 										const QtMeshQualityOperationPanel& cao)
 	: QtMgx3DOperationPanel (0, *new QtMgx3DMainWindow (0),	0, "", ""),
 	  _qualifWidget (0), _displayCellsButton (0), _initializeButton (0),
-	  _analysedMeshEntities ( ), _meshEntities ( ), _gmdsSurfaces ( ), _gmdsVolumes ( )
+	  _analysedMeshEntities ( ), _meshEntities ( )
 {
 	MGX_FORBIDDEN ("QtMeshQualityOperationPanel copy constructor is not allowed.");
 }	// QtMeshQualityOperationPanel::QtMeshQualityOperationPanel (const QtMeshQualityOperationPanel&)
@@ -275,7 +267,7 @@ void QtMeshQualityOperationPanel::autoUpdate ( )
 				dynamic_cast<Mesh::MeshManager*>(&getContext ( ).getMeshManager( ));
 		CHECK_NULL_PTR_ERROR (manager)
 		CHECK_NULL_PTR_ERROR (getContext ( ).getMeshManager ( ).getMesh ( ))
-		gmds::IGMesh&	mesh	=
+		gmds::Mesh&	mesh	=
 				getContext ( ).getMeshManager ( ).getMesh ( )->getGMDSMesh ( );
 
 		clearSeries ( );
@@ -328,14 +320,8 @@ void QtMeshQualityOperationPanel::autoUpdate ( )
 		{
 			vector<gmds::Face>	faces;
 			(*iter)->getGMDSFaces (faces);
-			gmds::IGMesh::surface&	s	= mesh.newSurface((*iter)->getName());
-			_gmdsSurfaces.push_back ((*iter)->getName());
-			for (vector<gmds::Face>::const_iterator itf = faces.begin ( );
-					faces.end ( ) != itf; itf++)
-				s.add (*itf);
 			_analysedMeshEntities.push_back (*iter);
-			Mgx3DQualifSerie* serie	= new Mgx3DQualifSerie(s, (*iter)->getName(), "", *iter);
-			getQualityWidget ( ).addSerie (serie);
+			getQualityWidget ( ).addSerie (new Mgx3DSurfaceQualifSerie(faces, (*iter)->getName(), "", *iter));
 		}	// for (vector<string>::const_iterator iter = ...
 
 		for (std::vector<Mesh::Volume*> ::const_iterator iter = volumes.begin ( );
@@ -343,14 +329,8 @@ void QtMeshQualityOperationPanel::autoUpdate ( )
 		{
 			vector<gmds::Region>	regions;
 			(*iter)->getGMDSRegions (regions);
-			gmds::IGMesh::volume&	v	= mesh.newVolume ((*iter)->getName());
-			_gmdsVolumes.push_back ((*iter)->getName());
-			for (vector <gmds::Region>::const_iterator itr = regions.begin ( );
-					regions.end ( ) != itr; itr++)
-				v.add (*itr);
 			_analysedMeshEntities.push_back (*iter);
-			Mgx3DQualifSerie*	serie	= new Mgx3DQualifSerie(v, (*iter)->getName(), "", *iter);
-			getQualityWidget ( ).addSerie (serie);
+			getQualityWidget ( ).addSerie (new Mgx3DVolumeQualifSerie(regions, (*iter)->getName(), "", *iter));
 		}	// for (vector<string>::const_iterator iter = ...
 
 	}
@@ -394,7 +374,7 @@ void QtMeshQualityOperationPanel::clear ( )
 			dynamic_cast<Mesh::MeshManager*>(&getContext ( ).getMeshManager( ));
 	CHECK_NULL_PTR_ERROR (manager)
 	CHECK_NULL_PTR_ERROR (getContext ( ).getMeshManager ( ).getMesh ( ))
-	gmds::IGMesh&	mesh	=
+	gmds::Mesh&	mesh	=
 				getContext ( ).getMeshManager ( ).getMesh ( )->getGMDSMesh ( );
 
 	// On masque les entités :
@@ -413,7 +393,8 @@ void QtMeshQualityOperationPanel::clear ( )
 		{
 			try
 			{
-				mesh.deleteSurface (mesh.getSurface ((*it)->getName ( )));
+				//mesh.deleteSurface (mesh.getSurface ((*it)->getName ( )));
+				mesh.deleteGroup<gmds::Face>(mesh.getGroup<gmds::Face>((*it)->getName ( )));
 			}
 			catch (const Exception& exc)
 			{
@@ -466,7 +447,7 @@ void QtMeshQualityOperationPanel::clear ( )
 		{
 			try
 			{
-				mesh.deleteVolume (mesh.getVolume ((*it)->getName ( )));
+				mesh.deleteGroup<gmds::Region>(mesh.getGroup<gmds::Region>((*it)->getName()));
 			}
 			catch (const Exception& exc)
 			{
@@ -541,71 +522,10 @@ void QtMeshQualityOperationPanel::clearSeries ( )
 			dynamic_cast<Mesh::MeshManager*>(&getContext ( ).getMeshManager( ));
 	CHECK_NULL_PTR_ERROR (manager)
 	CHECK_NULL_PTR_ERROR (getContext ( ).getMeshManager ( ).getMesh ( ))
-	gmds::IGMesh&	gmdsMesh	=
+	gmds::Mesh&	gmdsMesh	=
 				getContext ( ).getMeshManager ( ).getMesh ( )->getGMDSMesh ( );
 
-	for (vector<string>::iterator its = _gmdsSurfaces.begin ( );
-	     _gmdsSurfaces.end ( ) != its; its++)
-	{
-		try
-		{
-			gmdsMesh.deleteSurface (gmdsMesh.getSurface (*its));
-		}
-		catch (const Exception& exc)
-		{
-			UTF8String	error (Charset::UTF_8);
-			error << "Erreur survenue durant le nettoyage du panneau "
-			      << "Qualité de maillage : " << exc.getFullMessage ( );
-			log (ErrorLog (error));
-		}
-		catch (const exception& e)
-		{
-			UTF8String	error (Charset::UTF_8);
-			error << "Erreur survenue durant le nettoyage du panneau "
-			      << "Qualité de maillage : " << e.what ( );
-			log (ErrorLog (error));
-		}
-		catch (...)
-		{
-			UTF8String	error (Charset::UTF_8);
-			error << "Erreur non documentée survenue durant le nettoyage "
-			      << "du panneau Qualité de maillage.";
-			log (ErrorLog (error));
-		}
-	}	// for (vector<string>::iterator its = _gmdsSurfaces.begin ( ); ...
-	_gmdsSurfaces.clear ( );
-
-	for (vector<string>::iterator itv = _gmdsVolumes.begin ( );
-	     _gmdsVolumes.end ( ) != itv; itv++)
-	{
-		try
-		{
-			gmdsMesh.deleteVolume (gmdsMesh.getVolume (*itv));
-		}
-		catch (const Exception& exc)
-		{
-			UTF8String	error (Charset::UTF_8);
-			error << "Erreur survenue durant le nettoyage du panneau "
-			      << "Qualité de maillage : " << exc.getFullMessage ( );
-			log (ErrorLog (error));
-		}
-		catch (const exception& e)
-		{
-			UTF8String	error (Charset::UTF_8);
-			error << "Erreur survenue durant le nettoyage du panneau "
-			      << "Qualité de maillage : " << e.what ( );
-			log (ErrorLog (error));
-		}
-		catch (...)
-		{
-			UTF8String	error (Charset::UTF_8);
-			error << "Erreur non documentée survenue durant le nettoyage "
-			      << "du panneau Qualité de maillage.";
-			log (ErrorLog (error));
-		}
-	}	// for (vector<string>::iterator itv = _gmdsVolumes.begin ( ); ...
 	_analysedMeshEntities.clear ( );
-	_gmdsVolumes.clear ( );
 }	// QtMeshQualityOperationPanel::clearSeries
 
 
@@ -621,15 +541,15 @@ void QtMeshQualityOperationPanel::displayCellsCallback ( )
 	Mesh::MeshManager*	manager	=
 			dynamic_cast<Mesh::MeshManager*>(&getContext ( ).getMeshManager( ));
 	CHECK_NULL_PTR_ERROR (manager)
+	gmds::Mesh&	gmdsMesh	=
+				getContext ( ).getMeshManager ( ).getMesh ( )->getGMDSMesh ( );
 
-	vector< gmds::IGMesh::surface* >	surfaces =
+	vector<gmds::CellGroup<gmds::Face>*>	surfaces =
 							getQualityWidget ( ).getSelectedClassesSurfaces ( );
-	vector< gmds::IGMesh::volume* >	volumes =
+	vector<gmds::CellGroup<gmds::Region>*>	volumes =
 							getQualityWidget ( ).getSelectedClassesVolumes ( );
 	vector<Mesh::MeshEntity*>	entities;
-	for (vector< gmds::IGMesh::surface*
-			>::const_iterator its = surfaces.begin ( ); surfaces.end ( ) != its;
-		its++)
+	for (auto its = surfaces.begin ( ); surfaces.end ( ) != its; its++)
 	{
 		// From CommandCreateMesh::addNewSurface :
 		Mesh::SubSurface*	surface	=
@@ -638,10 +558,10 @@ void QtMeshQualityOperationPanel::displayCellsCallback ( )
 								Entity::MeshSurface, (*its)->name ( )),
 							context->newDisplayProperties(Entity::MeshSurface),
 							0);
-		gmds::IGMesh::surface&	gmdsSurface	= **its;
+		auto gmdsSurface	= **its;
 		for (size_t i = 0; i < (*its)->size ( ); i++)
 		{
-			gmds::Face	face	= gmdsSurface [i];
+			gmds::Face face	= gmdsMesh.get<gmds::Face>(gmdsSurface [i]);
 			surface->addFace (face);
 		}	// for (size_t i = 0; i < (*its)->size ( ); i++)
 		context->newGraphicalRepresentation (*surface);
@@ -650,8 +570,7 @@ void QtMeshQualityOperationPanel::displayCellsCallback ( )
 		surface->getDisplayProperties ( ).setDisplayed (true);
 		entities.push_back (surface);
 	}
-	for (vector< gmds::IGMesh::volume*
-			>::const_iterator itv = volumes.begin ( ); volumes.end ( ) != itv;
+	for (auto itv = volumes.begin ( ); volumes.end ( ) != itv;
 			itv++)
 	{
 		Mesh::SubVolume*	volume	=
@@ -660,10 +579,10 @@ void QtMeshQualityOperationPanel::displayCellsCallback ( )
 								Entity::MeshVolume, (*itv)->name ( )),
 						context->newDisplayProperties(Entity::MeshVolume),
 						0);
-		gmds::IGMesh::volume&	gmdsVolume	= **itv;
+		auto gmdsVolume	= **itv;
 		for (size_t i = 0; i < (*itv)->size ( ); i++)
 		{
-			gmds::Region	region	= gmdsVolume [i];
+			gmds::Region	region	= gmdsMesh.get<gmds::Region>(gmdsVolume [i]);
 			volume->addRegion (region);
 		}
 		context->newGraphicalRepresentation (*volume);

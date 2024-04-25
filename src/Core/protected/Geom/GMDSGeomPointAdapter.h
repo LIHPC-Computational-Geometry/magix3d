@@ -12,10 +12,10 @@
 #include "Geom/Vertex.h"
 #include "Geom/GMDSGeomCurveAdapter.h"
 /*----------------------------------------------------------------------------*/
-#include "GMDS/CAD/GeomVolume.h"
-#include "GMDS/CAD/GeomSurface.h"
-#include "GMDS/CAD/GeomCurve.h"
-#include "GMDS/CAD/GeomPoint.h"
+#include "gmds/cad/GeomVolume.h"
+#include "gmds/cad/GeomSurface.h"
+#include "gmds/cad/GeomCurve.h"
+#include "gmds/cad/GeomPoint.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -27,7 +27,7 @@ namespace Geom {
  *        les services requis par l'interface GeomPoint de GMDS
  *
  */
-class GMDSGeomPointAdapter: public gmds::geom::GeomPoint
+class GMDSGeomPointAdapter: public gmds::cad::GeomPoint
 {
 public:
     /*------------------------------------------------------------------------*/
@@ -45,35 +45,35 @@ public:
      *
      *  \param APnt the adjacent points.
      */
-    virtual void get(std::vector<gmds::geom::GeomCurve*>& ACur) const;
+    virtual void get(std::vector<gmds::cad::GeomCurve*>& ACur) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Access to the adjacent surfaces.
      *
      *  \param ASurf the adjacent surfaces
      */
-    virtual void get(std::vector<gmds::geom::GeomSurface*>& ASurf) const;
+    virtual void get(std::vector<gmds::cad::GeomSurface*>& ASurf) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Access to the adjacent volumes
      *
      *  \param AVol the adjacent volumes.
      */
-    virtual void get(std::vector<gmds::geom::GeomVolume*>& AVol) const;
+    virtual void get(std::vector<gmds::cad::GeomVolume*>& AVol) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Access to the adjacent curves in an ordered fashion.
      *
      *  \param ACur the ordered adjacent curves.
      */
-//    virtual void getOrdered(std::vector<gmds::geom::GeomCurve*>& ACur) const;
+//    virtual void getOrdered(std::vector<gmds::cad::GeomCurve*>& ACur) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Access to the adjacent curves in a direct ordered fashion.
      *
      *  \param ACur the direct ordered adjacent curves.
      */
-//    virtual void getOrderedDirect(std::vector<gmds::geom::GeomCurve*>& ACur) const;
+//    virtual void getOrderedDirect(std::vector<gmds::cad::GeomCurve*>& ACur) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Return the number of curve incident to this point.
@@ -134,6 +134,11 @@ public:
         minXYZ[2]=Z();  maxXYZ[2]=Z();
     }
 
+    virtual std::tuple<gmds::TCoord,gmds::TCoord,gmds::TCoord,gmds::TCoord,gmds::TCoord,gmds::TCoord>  BBox() const
+    {
+	    return {X(), Y(), Z(), X(), Y(), Z()};
+    }
+
     virtual int getId() const {
 //        m_mgx3d_vertex.getID();
     	return 0;
@@ -144,14 +149,14 @@ public:
      *
      *  \param ACurve the new adjacent curve to add
      */
-    virtual void add(gmds::geom::GeomCurve* ACurve);
+    virtual void add(gmds::cad::GeomCurve* ACurve);
 
 private:
     /* courbe geometrique adaptee pour une utilisation dans les algorithmes de
      * GMDS */
     Geom::Vertex& m_mgx3d_vertex;
 
-    std::vector<gmds::geom::GeomCurve*> m_curves;
+    std::vector<gmds::cad::GeomCurve*> m_curves;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

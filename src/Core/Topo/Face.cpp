@@ -33,7 +33,7 @@
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/NumericConversions.h>
 #include <TkUtil/MemoryError.h>
-#include "GMDS/IG/Node.h"
+#include "gmds/ig/Node.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

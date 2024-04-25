@@ -82,10 +82,10 @@ void QtMgx3DQualifWidget::updateHistogram ( )
 }	// QtMgx3DQualifWidget::updateHistogram
 
 
-vector< gmds::IGMesh::surface*>
+vector<gmds::CellGroup<gmds::Face>*>
 							QtMgx3DQualifWidget::getSelectedClassesSurfaces ( )
 {
-	vector<gmds::IGMesh::surface*>	surfaces;
+	vector<gmds::CellGroup<gmds::Face>*> surfaces;
 
 	const QwtExtendedMultiBarChart&	histogram	=
 										getHistogramPanel ( ).getHistogram ( );
@@ -96,8 +96,8 @@ vector< gmds::IGMesh::surface*>
 	for (vector< pair<size_t, size_t> >::iterator its = selection.begin ( );
 	     selection.end ( ) != its; its++)
 	{
-		const Mesh::Mgx3DQualifSerie*	serie	=
-			dynamic_cast<const Mesh::Mgx3DQualifSerie*>(&getSerie ((*its).first));
+		const Mesh::Mgx3DSurfaceQualifSerie*	serie	=
+			dynamic_cast<const Mesh::Mgx3DSurfaceQualifSerie*>(&getSerie ((*its).first));
 		CHECK_NULL_PTR_ERROR (serie)
 		if (true == serie->isVolumic ( ))
 			continue;
@@ -108,14 +108,13 @@ vector< gmds::IGMesh::surface*>
 
 		UTF8String	name (Charset::UTF_8);
 		name << serie->getName ( ) << "_Class_" << (*its).second;
-		gmds::IGMesh::surface&	surface	=
-								mesh->getGMDSMesh ( ).newSurface (name.iso ( ));
-		surfaces.push_back (&surface);
+		auto surface = mesh->getGMDSMesh( ).newGroup<gmds::Face>(name.iso ( ));
+		surfaces.push_back (surface);
 
 		for (vector <gmds::TCellID>::const_iterator itc = cellsIds.begin ( );
 		     cellsIds.end ( ) != itc; itc++)
 		{
-			surface.add (serie->getGMDSFace (*itc));
+			surface->add (serie->getGMDSCell (*itc));
 		}	// for (vector <gmds::TCellID>::const_iterator itc = ...
 	}	// for (vector< pair<size_t, size_t> >::iterator its = ...
 
@@ -123,10 +122,10 @@ vector< gmds::IGMesh::surface*>
 }	// QtMgx3DQualifWidget::getSelectedClassesSurfaces
 
 
-vector< gmds::IGMesh::volume*>
+vector<gmds::CellGroup<gmds::Region>*> 
 							QtMgx3DQualifWidget::getSelectedClassesVolumes ( )
 {
-	vector<gmds::IGMesh::volume*>	volumes;
+	vector<gmds::CellGroup<gmds::Region>*>	volumes;
 
 	const QwtExtendedMultiBarChart&	histogram	=
 										getHistogramPanel ( ).getHistogram ( );
@@ -137,8 +136,8 @@ vector< gmds::IGMesh::volume*>
 	for (vector< pair<size_t, size_t> >::iterator its = selection.begin ( );
 	     selection.end ( ) != its; its++)
 	{
-		const Mesh::Mgx3DQualifSerie*	serie	=
-			dynamic_cast<const Mesh::Mgx3DQualifSerie*>(&getSerie ((*its).first));
+		const Mesh::Mgx3DVolumeQualifSerie*	serie	=
+			dynamic_cast<const Mesh::Mgx3DVolumeQualifSerie*>(&getSerie ((*its).first));
 		CHECK_NULL_PTR_ERROR (serie)
 
 		if (false == serie->isVolumic ( ))
@@ -151,14 +150,13 @@ vector< gmds::IGMesh::volume*>
 		UTF8String	name (Charset::UTF_8);
 		name << serie->getName ( )
 		     << "_Class_" << (*its).second;
-		gmds::IGMesh::volume&	volume	=
-								mesh->getGMDSMesh ( ).newVolume (name.iso ( ));
-		volumes.push_back (&volume);
+		auto volume	= mesh->getGMDSMesh( ).newGroup<gmds::Region>(name.iso ( ));
+		volumes.push_back (volume);
 
 		for (vector <gmds::TCellID>::const_iterator itc = cellsIds.begin ( );
 		     cellsIds.end ( ) != itc; itc++)
 		{
-			volume.add (serie->getGMDSRegion (*itc));
+			volume->add (serie->getGMDSCell (*itc));
 		}	// for (vector <gmds::TCellID>::const_iterator itc = ...
 	}	// for (vector< pair<size_t, size_t> >::iterator its = ...
 

@@ -18,7 +18,7 @@
 
 #include "TkUtil/Exception.h"
 
-#include <GMDS/IG/IGMesh.h>
+#include <gmds/ig/Mesh.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -56,7 +56,7 @@ void CommandDestroyMesh::internalExecute()
 	for (uint i=0; i<me.size(); i++)
 		getInfoCommand().addMeshInfoEntity(me[i], Internal::InfoCommand::DELETED);
 
-	gmds::IGMesh& gmds_mesh = getContext().getMeshManager().getMesh()->getGMDSMesh();
+	gmds::Mesh& gmds_mesh = getContext().getMeshManager().getMesh()->getGMDSMesh();
 	gmds_mesh.clear();
 
 	// commande de destruction de toutes les entités topologiques qui ont pu être construites

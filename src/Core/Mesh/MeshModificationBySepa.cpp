@@ -20,8 +20,8 @@
 #include <TkUtil/Exception.h>
 #include <TkUtil/UTF8String.h>
 /*----------------------------------------------------------------------------*/
-#include <GMDS/IO/VTKWriter.h>
-#include "GMDS/IG/Node.h"
+#include <gmds/io/VTKWriter.h>
+#include "gmds/ig/Node.h"
 #ifdef USE_SEPA3D
 #include "Sepa3DCore/Separatrice.h"
 #endif
@@ -97,7 +97,7 @@ MeshModificationBySepa::addControlFile(const std::string& AFilename)
 //
 //	// temporary mesh
 //	gmds::MeshModel* meshModel = new gmds::MeshModel(gmds::F|gmds::N|gmds::F2N);
-//	gmds::IGMesh* mesh = new gmds::IGMesh(*meshModel);
+//	gmds::Mesh* mesh = new gmds::Mesh(*meshModel);
 //
 //	gmds::Variable<double>* deltas = mesh->newVariable<double>(gmds::GMDS_NODE,"delta");
 //
@@ -106,7 +106,7 @@ MeshModificationBySepa::addControlFile(const std::string& AFilename)
 //
 //	for(; itn != m_deltas.end(); itn++) {
 //		gmds::Node newNode = mesh->newNode(itn->first.getPoint());
-//		(*deltas)[newNode.getID()] = itn->second;
+//		(*deltas)[newNod[iNode].id()()] = itn->second;
 //		old2newNodes[itn->first] = newNode;
 //	}
 //
@@ -120,7 +120,7 @@ MeshModificationBySepa::addControlFile(const std::string& AFilename)
 //		mesh->newFace(newNodes);
 //	}
 //
-//	gmds::VTKWriter<gmds::IGMesh> writer(*mesh);
+//	gmds::VTKWriter<gmds::Mesh> writer(*mesh);
 //	writer.write(AFilename,gmds::N|gmds::F);
 //	delete meshModel;
 //}

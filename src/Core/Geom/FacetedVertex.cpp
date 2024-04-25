@@ -16,7 +16,7 @@
 #include <TkUtil/Exception.h>
 #include <TkUtil/MemoryError.h>
 
-#include <GMDS/Utils/Exception.h>
+#include <gmds/utils/Exception.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

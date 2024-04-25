@@ -20,7 +20,7 @@
 #include <TkUtil/Exception.h>
 #include <TkUtil/UTF8String.h>
 /*----------------------------------------------------------------------------*/
-#include "GMDS/IG/Node.h"
+#include "gmds/ig/Node.h"
 /*----------------------------------------------------------------------------*/
 #if PY_MAJOR_VERSION >= 3
 #define PyString_AsString PyUnicode_AsUTF8
@@ -76,9 +76,9 @@ applyModification(std::vector<gmds::Node >& gmdsNodes,
 
 		// on passe les noeuds marqués
 #ifdef _DEBUG2
-		std::cout<<"Node "<<nd.getID()<<" filtre : "<<filtre_nodes[nd.getID()]<<std::endl;
+		std::cout<<"Node "<<nd.id()<<" filtre : "<<filtre_nodes[nd.id()]<<std::endl;
 #endif
-		if (filtre_nodes[nd.getID()] == maskFixed)
+		if (filtre_nodes[nd.id()] == maskFixed)
 			continue;
 #ifdef _DEBUG2
 	nodeCount += 1;
@@ -143,7 +143,7 @@ applyModification(std::vector<gmds::Node >& gmdsNodes,
 		}
 		else {
 			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-			message <<"Erreur interne lors de l'appel à PyObject_Call pour noeud d'id "<<(long)nd.getID()
+			message <<"Erreur interne lors de l'appel à PyObject_Call pour noeud d'id "<<(long)nd.id()
 					<<". Certainement un problème dans la fonction de perturbation en Python.";
 			throw TkUtil::Exception(message);
 		}

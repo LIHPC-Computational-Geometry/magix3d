@@ -1046,7 +1046,7 @@ void CoEdge::getPoints(std::vector<Utils::Math::Point> &points) const
 
 	if (isMeshed()){
 
-	    gmds::IGMesh& gmds_mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
+	    gmds::Mesh& gmds_mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
 
 		for (std::vector<gmds::TCellID>::iterator iter = m_mesh_data->nodes().begin();
 		    			iter != m_mesh_data->nodes().end(); ++iter){
@@ -2509,7 +2509,7 @@ getNodes(Topo::Vertex* v1, Topo::Vertex* v2,
         throw TkUtil::Exception (message);
     }
 
-    gmds::IGMesh& gmds_mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
+    gmds::Mesh& gmds_mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
 
     if (v1 == getVertex(0) && v2 == getVertex(1)){
     	for (std::vector<gmds::TCellID>::iterator iter = m_mesh_data->nodes().begin();

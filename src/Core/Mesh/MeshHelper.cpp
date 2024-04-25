@@ -12,8 +12,8 @@
 #include "Utils/MgxException.h"
 #include "Mesh/MeshHelper.h"
 
-#include "GMDS/IG/IGMesh.h"
-#include "GMDS/IG/Edge.h"
+#include "gmds/ig/Mesh.h"
+#include "gmds/ig/Edge.h"
 
 #include <map>
 
@@ -56,14 +56,14 @@ std::vector<uint> MeshHelper::getOrderedNodesId(std::vector<gmds::Edge> bras)
 	for(std::vector<gmds::Edge>::iterator iter1 = bras.begin();
 			iter1 != bras.end(); ++iter1) {
 		gmds::Edge& bras = *iter1;
-//std::cout<<" bras : "<<bras.getID()<<std::endl;
+//std::cout<<" bras : "<<bras.id()<<std::endl;
 		std::vector<gmds::Node> br_nodes = bras.get<gmds::Node>();
 
 		for (std::vector<gmds::Node>::iterator iter2 = br_nodes.begin();
 				iter2 != br_nodes.end(); ++iter2) {
 			gmds::Node& nd = (*iter2);
-//std::cout<<"   nd : "<<nd.getID()<<std::endl;
-			std::vector<gmds::Edge*>& v_bras = nd2br[nd.getID()];
+//std::cout<<"   nd : "<<nd.id()<<std::endl;
+			std::vector<gmds::Edge*>& v_bras = nd2br[nd.id()];
 
 			v_bras.push_back(&bras);
 
@@ -111,9 +111,9 @@ std::vector<uint> MeshHelper::getOrderedNodesId(std::vector<gmds::Edge> bras)
 			throw TkUtil::Exception("Erreur interne avec bras ayant autre chose que 2 noeuds");
 
 		if (br1_nodes[0] == br2_nodes[0] || br1_nodes[0] == br2_nodes[1])
-			id_dep = br1_nodes[0].getID();
+			id_dep = br1_nodes[0].id();
 		else if (br1_nodes[1] == br2_nodes[0] || br1_nodes[1] == br2_nodes[1])
-			id_dep = br1_nodes[1].getID();
+			id_dep = br1_nodes[1].id();
 		else {
 			TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
 			messErr <<"La recherche des sommets extrémité pour une courbe facétisée a échouée, les bras extrémités n'ont pas de noeud commun";
@@ -134,9 +134,9 @@ std::vector<uint> MeshHelper::getOrderedNodesId(std::vector<gmds::Edge> bras)
 
 		std::vector<gmds::Edge*>& v_bras = nd2br[id_dep];
 		for (uint i=0; i<v_bras.size() && !bras_found; i++)
-			if (filtre_bras[v_bras[i]->getID()] == 0){
+			if (filtre_bras[v_bras[i]->id()] == 0){
 				bras = *v_bras[i];
-				filtre_bras[bras.getID()] = 1;
+				filtre_bras[bras.id()] = 1;
 				bras_found = true;
 			}
 		if (!bras_found){
@@ -146,7 +146,7 @@ std::vector<uint> MeshHelper::getOrderedNodesId(std::vector<gmds::Edge> bras)
 		}
 
 		std::vector<gmds::Node> br_nodes = bras.get<gmds::Node>();
-		uint id_next = (br_nodes[0].getID() == id_dep?br_nodes[1].getID():br_nodes[0].getID());
+		uint id_next = (br_nodes[0].id() == id_dep?br_nodes[1].id():br_nodes[0].id());
 
 		id_dep = id_next;
 		nodes_id.push_back(id_dep);
@@ -155,22 +155,7 @@ std::vector<uint> MeshHelper::getOrderedNodesId(std::vector<gmds::Edge> bras)
 
 	return nodes_id;
 }
-/*----------------------------------------------------------------------------*/
-std::vector<gmds::Node> MeshHelper::getNodes(std::vector<gmds::Edge> bras)
-{
-	std::vector<gmds::Node> nodes;
 
-	for(std::vector<gmds::Edge>::iterator iter1 = bras.begin();
-			iter1 != bras.end(); ++iter1) {
-		gmds::Edge& bras = *iter1;
-		std::vector<gmds::Node> br_nodes = bras.get<gmds::Node>();
-
-		for (std::vector<gmds::Node>::iterator iter2 = br_nodes.begin();
-				iter2 != br_nodes.end(); ++iter2)
-			nodes.push_back(*iter2);
-	}
-	return nodes;
-}
 /*----------------------------------------------------------------------------*/
 } // end namespace Mesh
 /*----------------------------------------------------------------------------*/
