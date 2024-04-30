@@ -4,6 +4,8 @@ set (CURRENT_PACKAGE_MACRO_NAME "TRITON2")
 include (${CMAKE_SOURCE_DIR}/cmake/version.cmake)
 include (${CMAKE_SOURCE_DIR}/cmake/common.cmake)
 
+find_package (gmds REQUIRED)
+
 file (GLOB HEADERS protected/Triton2/TetgenInterface/TetgenFacade.h protected/Triton2/TetgenInterface/tetgen.h)
 file (GLOB CPP_SOURCES TetgenFacade.cpp tetgen/tetgen.cxx tetgen/predicates.cxx)
 
