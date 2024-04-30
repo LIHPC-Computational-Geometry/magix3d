@@ -13,7 +13,7 @@
           "PrefsCore_ROOT": "$env{INSTALL_DIR}/preferences",
           "PrefsQt_ROOT": "$env{INSTALL_DIR}/preferences",
           "PythonUtil_ROOT": "$env{INSTALL_DIR}/pythonutil",
-          "gmds_ROOT": "$env{INSTALL_DIR}/gmds072",
+          "gmds_ROOT": "$env{INSTALL_DIR}/gmds",
           "qualifinternal_ROOT": "$env{INSTALL_DIR}/qualif",
           "GQGMDS_ROOT": "$env{INSTALL_DIR}/qqualif",
           "QtQualif_ROOT": "$env{INSTALL_DIR}/qqualif",
