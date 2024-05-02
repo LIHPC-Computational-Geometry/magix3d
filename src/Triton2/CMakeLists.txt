@@ -20,6 +20,7 @@ set_property (TARGET Triton2 PROPERTY SOVERSION ${MAGIX3D_MAJOR_VERSION})
 
 target_include_directories (Triton2 PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/protected>$<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
 target_include_directories (Triton2 PUBLIC ${GMDS_INCLUDE_DIR})
+target_link_libraries (Triton2 PUBLIC GMDSIg)
 
 # INSTALLATION :
 include(CMakePackageConfigHelpers)
