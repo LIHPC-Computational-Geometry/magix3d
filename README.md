@@ -39,7 +39,7 @@ run on *ubuntu 22.02*.
 
 ### Installing the spack environment
 In order to install magix3d and its dependencies on ubuntu 22.02, you can open a terminal and run the next command 
-lines (see https://github.com/LIHPC-Computational-Geometry/spack_recipes/blob/main/build_spack.sh):
+lines (see https://github.com/LIHPC-Computational-Geometry/spack_recipes/blob/main/build_spack.sh , it contains more detailed comments):
 
 ```shell
 #==========================================
@@ -49,23 +49,25 @@ git clone --depth=1 -b v0.20.1  https://github.com/spack/spack.git
 #get CEA LIHPC meshing recipes
 git clone https://github.com/LIHPC-Computational-Geometry/spack_recipes.git
 #==========================================
-# configure spack engine with our recipes
-cp ./spack_recipes/config/packages.yaml ./spack/etc/spack/
+# configure spack with our recipes
+cp spack_recipes/config/packages.yaml spack/etc/spack/
+cp spack_recipes/config/repos.yaml spack/etc/spack/defaults/repos.yaml
 source ./spack/share/spack/setup-env.sh
-spack repo add ./spack_recipes/meshing
-spack repo add ./spack_recipes/meshing_supersede
+spack clean -a
 spack compiler find
 spack external find cmake
 #==========================================
-# to compile and develop within magix3d
-git clone git@github.com:LIHPC-Computational-Geometry/magix3d.git
-spack dev-build -d ./magix3d magix3d@2.2.7 ^vtk-maillage~opengl2+qt~mpi ^hdf5~mpi ^cgns~mpi ^mesquite~mpi
+# to install the latest release of magix3d
+spack install magix3d+smooth3d+triton2+doc ^vtk-maillage~opengl2+qt~mpi ^hdf5~mpi ^cgns~mpi ^mesquite~mpi
+# to build the current main branch
+# git clone https://github.com/LIHPC-Computational-Geometry/magix3d.git
+# spack install magix3d+smooth3d+triton2+doc dev_path=$PWD/magix3d build_type=Debug ^vtk-maillage~opengl2+qt~mpi ^hdf5~mpi ^cgns~mpi ^mesquite~mpi
 ```
 **Remark:** *Spack stores some data in your home (see `~/.spack`). If you use spack for installing 
 multiple libraries and software, it can be necessary to delete this directory to avoid conflicts
 during the installation procedure.*
 
-Just a few word to explain the previous command lines:
+Just a few words to explain the previous command lines:
 1. The first line downloads the version of spack we rely on. 
 2. The second line downloads the specific spack recipes we have for our meshing projects.
 3. The third block of lines configures spack for installing *magix3d* on your computer. When it is done, check that a c++ compiler was found.
