@@ -39,7 +39,7 @@ run on *ubuntu 22.02*.
 
 ### Installing the spack environment
 In order to install magix3d and its dependencies on ubuntu 22.02, you can open a terminal and run the next command 
-lines (see https://github.com/LIHPC-Computational-Geometry/spack_recipes/build_spack.sh):
+lines (see https://github.com/LIHPC-Computational-Geometry/spack_recipes/blob/main/build_spack.sh):
 
 ```shell
 #==========================================
