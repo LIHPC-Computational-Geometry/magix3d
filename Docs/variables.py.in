@@ -1,0 +1,2 @@
+magix_version = '@MAGIX3D_VERSION@'
+doxygen_build_path = '@DOXYGEN_OUTPUT_DIR@/xml'

@@ -1,0 +1,11 @@
+@PACKAGE_INIT@
+include(CMakeFindDependencyMacro)
+
+set (Utils_VERSION @MAGIX3D_VERSION@)
+set_and_check (Utils_INCLUDE_DIR   "@PACKAGE_INCLUDE_INSTALL_DIR@")
+set_and_check (Utils_LIB_DIR   "@PACKAGE_LIB_INSTALL_DIR@")
+check_required_components (Utils)
+find_dependency (TkUtil)
+
+# Fournir l'accès aux services des cibles (fichier non inclus automatiquement) :
+include(${CMAKE_CURRENT_LIST_DIR}/UtilsTargets.cmake)

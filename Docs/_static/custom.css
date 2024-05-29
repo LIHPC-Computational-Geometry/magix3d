@@ -1,0 +1,28 @@
+.wy-nav-content {
+    max-width: 80%;
+}
+
+.caption-text {
+    text-align: center;
+}
+
+p {
+    margin-bottom: 8px; /* between paragraphs */
+}
+
+h2 {
+    margin-bottom: 5px; /* between paragraphs */
+}
+
+table.mytable {
+    text-align:center;
+    background-color:silver;
+    border:none !important;
+}
+
+.mysidebar {
+    padding: 10px;
+    background: none;
+    border-radius: 0px;
+    float: right;
+}

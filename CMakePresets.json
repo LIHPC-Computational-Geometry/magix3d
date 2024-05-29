@@ -1,0 +1,35 @@
+{
+    "version": 3,
+    "configurePresets": [
+      {
+        "name": "ci",
+        "cacheVariables": {
+          "USE_PYTHON_3": "ON",
+          "GUIToolkitsVariables_ROOT": "$env{INSTALL_DIR}/guitoolkitsvariables",
+          "VtkContrib_ROOT": "$env{INSTALL_DIR}/vtkcontrib",
+          "VTK_ROOT": "$env{INSTALL_DIR}/VTK-7.1.1",
+          "TkUtil_ROOT": "$env{INSTALL_DIR}/tkutil",
+          "TkUtilScripting_ROOT": "$env{INSTALL_DIR}/tkutil",
+          "PrefsCore_ROOT": "$env{INSTALL_DIR}/preferences",
+          "PrefsQt_ROOT": "$env{INSTALL_DIR}/preferences",
+          "PythonUtil_ROOT": "$env{INSTALL_DIR}/pythonutil",
+          "gmds_ROOT": "$env{INSTALL_DIR}/gmds",
+          "qualifinternal_ROOT": "$env{INSTALL_DIR}/qualif",
+          "GQGMDS_ROOT": "$env{INSTALL_DIR}/qqualif",
+          "QtQualif_ROOT": "$env{INSTALL_DIR}/qqualif",
+          "Lima_ROOT": "$env{INSTALL_DIR}/lima",
+          "QtUtil_ROOT": "$env{INSTALL_DIR}/qtutil",
+          "QwtCharts_ROOT": "$env{INSTALL_DIR}/qwtcharts",
+          "QtPython3_ROOT": "$env{INSTALL_DIR}/qtpython",
+          "QtVtk_ROOT": "$env{INSTALL_DIR}/qtvtk",
+          "OpenCASCADE_ROOT": "$env{INSTALL_DIR}/occt-V7_1_0",
+          "CMAKE_PREFIX_PATH": "$env{INSTALL_DIR}/mesquite-2.3.0;$env{INSTALL_DIR}/CGNS-4.3.0",
+          "T_INTERNAL_EXTENSION": "not_defined",
+          "ERD_INTERNAL_EXTENSION": "not_defined",
+          "USER_TEAM": "undef_user_team",
+          "DOXYGEN_PATH": "not_defined",
+          "DKOC_LICENCE": "unavailable" 
+        }
+      }
+    ]
+}

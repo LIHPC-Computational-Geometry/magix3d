@@ -1,0 +1,783 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes" ?>
+<Magix3D XMLLoader_version="0.2.0">
+
+  <annotation>
+    <documentation>Préférences utilisateur du logiciel Magix 3D.</documentation>
+  </annotation>
+
+  <Section name="context" type="container">
+    <Section name="threading" type="container">
+      <element name="allowThreadedCommandTasks" type="boolean">
+        <annotation>
+          <documentation>true si une commande est autorisée à être décomposée en plusieurs tâches exécutées parallèlement dans plusieurs threads, false si l'exécution doit être séquentielle.</documentation>
+        </annotation>
+        <value>true</value>
+      </element>
+      <element name="allowThreadedEdgePreMeshTasks" type="boolean">
+        <annotation>
+          <documentation>true si le prémaillage des arêtes peut être décomposé en plusieurs tâches exécutées parallèlement dans plusieurs threads, false si l'exécution doit être séquentielle.</documentation>
+        </annotation>
+        <value>true</value>
+      </element>
+      <element name="allowThreadedFacePreMeshTasks" type="boolean">
+        <annotation>
+          <documentation>true si le prémaillage des faces peut être décomposé en plusieurs tâches exécutées parallèlement dans plusieurs threads, false si l'exécution doit être séquentielle.</documentation>
+        </annotation>
+        <value>true</value>
+      </element>
+      <element name="allowThreadedBlockPreMeshTasks" type="boolean">
+        <annotation>
+          <documentation>true si le prémaillage des blocs peut être décomposé en plusieurs tâches exécutées parallèlement dans plusieurs threads, false si l'exécution doit être séquentielle.</documentation>
+        </annotation>
+        <value>true</value>
+      </element>
+    </Section>
+    <Section name="scripting" type="container">
+      <element name="displayScriptOutputs" type="boolean">
+        <annotation>
+          <documentation>true si le programme doit afficher les sorties des commandes script, false dans le cas contraire.</documentation>
+        </annotation>
+        <value>true</value>
+      </element>
+    </Section>
+    <Section name="optimizing" type="container">
+      <element name="memorizeEdgePreMesh" type="boolean">
+        <annotation>
+          <documentation>true si le programme doit mémoriser le prémaillage des arêtes, false dans le cas contraire.</documentation>
+        </annotation>
+        <value>true</value>
+      </element>
+    </Section>
+  </Section>
+
+  <Section name="gui" type="container">
+    <annotation>
+      <documentation>Préférences liées à l'interface homme-machine.</documentation>
+    </annotation>
+    <Section name="theatre" type="container">
+      <annotation>
+        <documentation>Préférences liées à la fenêtre graphique.</documentation>
+      </annotation>
+      <Section name="vtk" type="container">
+        <annotation>
+          <documentation>Préférences liées à l'utilisation de VTK dans la fenêtre graphique.</documentation>
+        </annotation>
+        <Section name="picking" type="container">
+          <annotation>
+            <documentation>Section contenant les paramètres de sélection à la souris. La tolérance appliquée, lors des opérations de sélection, est définie comme étant la fraction de la diagonale de la fenêtre de rendu 3D.</documentation>
+          </annotation>
+          <element name="0DPickerTolerance" type="double">
+            <annotation>
+              <documentation>Tolérance appliquée lors de la sélection par pointage à la souris d'entités 0D par boite englobante.</documentation>
+            </annotation>
+            <value>1.000000e-02</value>
+          </element>
+          <element name="1DPickerTolerance" type="double">
+            <annotation>
+              <documentation>Tolérance appliquée lors de la sélection par pointage à la souris d'entités 1D par boite englobante.</documentation>
+            </annotation>
+            <value>1.000000e-03</value>
+          </element>
+          <element name="2DPickerTolerance" type="double">
+            <annotation>
+              <documentation>Tolérance appliquée lors de la sélection par pointage à la souris d'entités 2D par boite englobante.</documentation>
+            </annotation>
+            <value>1.000000e-04</value>
+          </element>
+          <element name="3DPickerTolerance" type="double">
+            <annotation>
+              <documentation>Tolérance appliquée lors de la sélection par pointage à la souris d'entités 3D par boite englobante.</documentation>
+            </annotation>
+            <value>1.000000e-04</value>
+          </element>
+          <element name="cellPickerTolerance" type="double">
+            <annotation>
+              <documentation>Tolérance appliquée lors de la sélection par pointage à la souris d'entités par proximité directe.</documentation>
+            </annotation>
+            <value>5.000000e-03</value>
+          </element>
+        </Section>
+      </Section>
+      <Section name="representations" type="container">
+        <Section name="geomEntities" type="container">
+          <element name="destroyOnHide" type="boolean">
+            <annotation>
+              <documentation>True si la représentation graphique des entités géométriques doit être détruite lorsque ces entités ne sont plus affichées, false dans le cas contraire.</documentation>
+            </annotation>
+            <value>false</value>
+          </element>
+        </Section>
+        <Section name="topoEntities" type="container">
+          <element name="destroyOnHide" type="boolean">
+            <annotation>
+              <documentation>True si la représentation graphique des entités topologiques doit être détruite lorsque ces entités ne sont plus affichées, false dans le cas contraire.</documentation>
+            </annotation>
+            <value>false</value>
+          </element>
+          <element name="displayFace" type="boolean">
+            <annotation>
+              <documentation>true si l'on souhaite voir les Faces en plus des CoFaces</documentation>
+            </annotation>
+            <value>false</value>
+          </element>
+          <element name="displayEdge" type="boolean">
+            <annotation>
+              <documentation>true si l'on souhaite voir les Edges en plus des CoEdges</documentation>
+            </annotation>
+            <value>false</value>
+          </element>
+          <element name="topoColorWithoutProj" type="color">
+            <annotation>
+              <documentation>Composantes R, G, B de la couleur des entités topologiques sans associations. Valeurs comprises entre 0 et 1.</documentation>
+            </annotation>
+            <red>0.000000e+00</red>
+            <green>1.000000e+00</green>
+            <blue>1.000000e+00</blue>
+          </element>
+          <element name="topoColorWith0DProj" type="color">
+            <annotation>
+              <documentation>Composantes R, G, B de la couleur des entités topologiques avec une association de dimension 0. Valeurs comprises entre 0 et 1.</documentation>
+            </annotation>
+            <red>8.000000e-01</red>
+            <green>4.000000e-01</green>
+            <blue>4.000000e-01</blue>
+          </element>
+          <element name="topoColorWith1DProj" type="color">
+            <annotation>
+              <documentation>Composantes R, G, B de la couleur des entités topologiques avec une association de dimension 1. Valeurs comprises entre 0 et 1.</documentation>
+            </annotation>
+            <red>0.000000e+00</red>
+            <green>1.000000e+00</green>
+            <blue>0.000000e+00</blue>
+          </element>
+          <element name="topoColorWith2DProj" type="color">
+            <annotation>
+              <documentation>Composantes R, G, B de la couleur des entités topologiques avec une association de dimension 2. Valeurs comprises entre 0 et 1.</documentation>
+            </annotation>
+            <red>1.000000e+00</red>
+            <green>1.000000e+00</green>
+            <blue>1.000000e+00</blue>
+          </element>
+          <element name="topoColorWith3DProj" type="color">
+            <annotation>
+              <documentation>Composantes R, G, B de la couleur des entités topologiques avec une association de dimension 3. Valeurs comprises entre 0 et 1.</documentation>
+            </annotation>
+            <red>1.000000e+00</red>
+            <green>1.000000e+00</green>
+            <blue>1.000000e+00</blue>
+          </element>
+        </Section>
+        <Section name="meshEntities" type="container">
+          <element name="destroyOnHide" type="boolean">
+            <annotation>
+              <documentation>True si la représentation graphique des entités de maillage doit être détruite lorsque ces entités ne sont plus affichées, false dans le cas contraire.</documentation>
+            </annotation>
+            <value>true</value>
+          </element>
+        </Section>
+        <element name="fontFamily" type="string">
+          <annotation>
+            <documentation>Police de caractères utilisée pour les affichages graphiques. Valeurs possibles : Arial, Times, Courier.</documentation>
+          </annotation>
+          <value>Arial</value>
+        </element>
+        <element name="fontSize" type="unsignedLong">
+          <annotation>
+            <documentation>Taille de la police de caractères utilisée pour les affichages graphiques.</documentation>
+          </annotation>
+          <value>12</value>
+        </element>
+        <element name="bold" type="boolean">
+          <annotation>
+            <documentation>Caractère gras de la police de caractères utilisée pour les affichages graphiques. Si true la police est grasse.</documentation>
+          </annotation>
+          <value>false</value>
+        </element>
+        <element name="italic" type="boolean">
+          <annotation>
+            <documentation>Caractère italiques de la police de caractères utilisée pour les affichages graphiques. Si true la police est italiques.</documentation>
+          </annotation>
+          <value>false</value>
+        </element>
+        <element name="useRgbColorComparison" type="boolean">
+          <annotation>
+            <documentation>Si true la comparaison de couleurs se fait dans l'espace RGB. Si false elle se fait dans l'espace HSV.</documentation>
+          </annotation>
+          <value>true</value>
+        </element>
+        <element name="backgroundRelDifference" type="double">
+          <annotation>
+            <documentation>Ecart relatif accepté entre la couleur de fond et une couleur d'entité (ex : 0.2 pour 20 pourcents).</documentation>
+          </annotation>
+          <value>5.000000e-02</value>
+        </element>
+        <element name="propagateDownEntityShow" type="boolean">
+          <annotation>
+            <documentation>Si true la demande d'affichage d'un groupe provoquera celui des entités du même groupe et de dimensions inférieures.</documentation>
+          </annotation>
+          <value>true</value>
+        </element>
+      </Section>
+      <element name="updateRefreshRate" type="unsignedLong">
+        <annotation>
+          <documentation>Fréquence de rafraîchissement de la fenêtre graphique lors d'opérations ajouts/suppressions/modifications d'entités (1 rafraîchissement sur n opérations).</documentation>
+        </annotation>
+        <value>100</value>
+      </element>
+      <element name="useDisplayList" type="boolean">
+        <annotation>
+          <documentation>True si les display lists Open GL sont utilisées, false dans le cas contraire.</documentation>
+        </annotation>
+        <value>true</value>
+      </element>
+      <element name="xyzCancelRoll" type="boolean">
+        <annotation>
+          <documentation>Une opération de positionnement de la vue dans un plan xOy, xOz, yOz (touches z, y ou x) doit elle être suivie d'une annulation du roulis (true) ou non (false) ?</documentation>
+        </annotation>
+        <value>true</value>
+      </element>
+      <element name="stillFrameRate" type="double">
+        <annotation>
+          <documentation>Nombre d'images/seconde souhaité hors interactions.</documentation>
+        </annotation>
+        <value>1.000000e-04</value>
+      </element>
+      <element name="desiredFrameRate" type="double">
+        <annotation>
+          <documentation>Nombre d'images/seconde durant les interactions.</documentation>
+        </annotation>
+        <value>1.500000e+01</value>
+      </element>
+      <element name="background" type="color">
+        <annotation>
+          <documentation>Composantes R, G, B de la couleur de fond de la fenêtre graphique. Valeurs comprises entre 0 et 1.</documentation>
+        </annotation>
+        <red>0.000000e+00</red>
+        <green>0.000000e+00</green>
+        <blue>0.000000e+00</blue>
+      </element>
+      <element name="displayTrihedron" type="boolean">
+        <annotation>
+          <documentation>Faut-il afficher (true) ou non (false) le trièdre dans la fenêtre graphique.</documentation>
+        </annotation>
+        <value>false</value>
+      </element>
+      <element name="displayFocalPoint" type="boolean">
+        <annotation>
+          <documentation>Faut-il afficher (true) ou non (false) la croix matérialisant le point focal dans la fenêtre graphique.</documentation>
+        </annotation>
+        <value>false</value>
+      </element>
+      <element name="graphicalWindowWidth" type="unsignedLong">
+        <annotation>
+          <documentation>Largeur souhaitée de la fenêtre graphique.</documentation>
+        </annotation>
+        <value>800</value>
+      </element>
+      <element name="graphicalWindowHeight" type="unsignedLong">
+        <annotation>
+          <documentation>Hauteur souhaitée de la fenêtre graphique.</documentation>
+        </annotation>
+        <value>600</value>
+      </element>
+      <element name="graphicalWindowFixedSize" type="boolean">
+        <annotation>
+          <documentation>True si la taille de la fenêtre graphique doit être fixe, false dans le cas contraire.</documentation>
+        </annotation>
+        <value>false</value>
+      </element>
+      <element name="multipleLighting" type="boolean">
+        <annotation>
+          <documentation>Faut-il utiliser (true) ou non (false) plusieurs sources de lumière ?</documentation>
+        </annotation>
+        <value>true</value>
+      </element>
+    </Section>
+    <Section name="interactor" type="container">
+      <annotation>
+        <documentation>Préférences liées aux interactions avec la fenêtre graphique.</documentation>
+      </annotation>
+      <element name="mouseUpZoom" type="boolean">
+        <annotation>
+          <documentation>Action du déplacement vertical de la souris avec le bouton droit pressé. Si false le fait d'aller vers le bas provoque un zoom, alors que d'aller vers le haut diminue la vue. Action inversée si true.</documentation>
+        </annotation>
+        <value>false</value>
+      </element>
+      <element name="zoomOnWheel" type="boolean">
+        <annotation>
+          <documentation>Action de la molette de la souris : zoom (true) ou déplacement vers le point focal (false).</documentation>
+        </annotation>
+        <value>false</value>
+      </element>
+      <element name="selectionColor" type="color">
+        <annotation>
+          <documentation>Couleur utilisée pour représenter les entités sélectionnées.</documentation>
+        </annotation>
+        <red>1.000000e+00</red>
+        <green>0.000000e+00</green>
+        <blue>0.000000e+00</blue>
+      </element>
+      <element name="selectionPointSize" type="double">
+        <annotation>
+          <documentation>Taille utilisée pour représenter les points/vertex sélectionnés.</documentation>
+        </annotation>
+        <value>8.000000e+00</value>
+      </element>
+      <element name="selectionLineWidth" type="double">
+        <annotation>
+          <documentation>Epaisseur de trait utilisée pour représenter les entités sélectionnées.</documentation>
+        </annotation>
+        <value>4.000000e+00</value>
+      </element>
+      <element name="nextSelectionKey" type="string">
+        <annotation>
+          <documentation>Touche permettant de sélectionner à la souris l'entité suivante lorsque plusieurs entités se superposent à l'écran (tab pour tabulation, space pour espace). Un parcours en sens inverse est effectué si la touche shift (majuscule) est également pressée.</documentation>
+        </annotation>
+        <value>tab</value>
+      </element>
+      <element name="selectionOnTop" type="boolean">
+        <annotation>
+          <documentation>True si le fait de sélectionner une entité provoque son affichage au premier plan, false si sa position dans la liste d'entités affichées est invariante.</documentation>
+        </annotation>
+        <value>false</value>
+      </element>
+      <element name="pickOnLeftButtonDown" type="boolean">
+        <annotation>
+          <documentation>True si, en mode sélection, le fait de presser le bouton gauche de la souris doit déclencher une opération de pointage (picking), false dans le cas contraire.</documentation>
+        </annotation>
+        <value>false</value>
+      </element>
+      <element name="pickOnRightButtonDown" type="boolean">
+        <annotation>
+          <documentation>True si, en mode sélection, le fait de presser le bouton droit de la souris doit déclencher une opération de pointage (picking), false dans le cas contraire.</documentation>
+        </annotation>
+        <value>false</value>
+      </element>
+      <element name="pickOnLeftButtonUp" type="boolean">
+        <annotation>
+          <documentation>True si, en mode sélection, le fait de relâcher le bouton gauche de la souris doit déclencher une opération de pointage (picking), false dans le cas contraire.</documentation>
+        </annotation>
+        <value>true</value>
+      </element>
+      <element name="pickOnRightButtonUp" type="boolean">
+        <annotation>
+          <documentation>True si, en mode sélection, le fait de relâcher le bouton droit de la souris doit déclencher une opération de pointage (picking), false dans le cas contraire.</documentation>
+        </annotation>
+        <value>false</value>
+      </element>
+      <element name="marginBoundingBoxPercentage" type="double">
+        <annotation>
+          <documentation>Pourcentage à appliquer aux échelles pour avoir les marges des boites englobantes, par exemple lors de la mise en évidence d'entités (highlighting). Une échelle est ici une puissance de 10 indiquant l'ordre de grandeur de taille d'une objet ou ensemble d'objets (ex : si xmin = 01. et xmax = 0.3, la taille est 0.2, l'échelle est 1, et la marge cette valeur * 1.</documentation>
+        </annotation>
+        <value>5.000000e-03</value>
+      </element>
+      <element name="highlightColor" type="color">
+        <annotation>
+          <documentation>Couleur des boites englobantes utilisées pour la mise en évidence d'entités (highlighting).</documentation>
+        </annotation>
+        <red>1.000000e+00</red>
+        <green>6.500000e-01</green>
+        <blue>0.000000e+00</blue>
+      </element>
+      <element name="highLightWidth" type="double">
+        <annotation>
+          <documentation>Epaisseur du trait des boites englobantes utilisées pour la mise en évidence d'entités (highlighting).</documentation>
+        </annotation>
+        <value>4.000000e+00</value>
+      </element>
+      <element name="highLightBoundinBox" type="boolean">
+        <annotation>
+          <documentation>true si une boite englobante doit être représentée autour d'une entité mise en évidence (highlighting), false dans le cas contraire.</documentation>
+        </annotation>
+        <value>false</value>
+      </element>
+      <element name="useHighLightColor" type="boolean">
+        <annotation>
+          <documentation>true si la couleur d'une entité doit être remplacée par la couleur de mise en évidence lors de la mise en évidence (highlighting), false dans le cas contraire.</documentation>
+        </annotation>
+        <value>true</value>
+      </element>
+      <element name="previewColor" type="color">
+        <annotation>
+          <documentation>Couleur utilisée pour afficher les éléments de prévisualisation (preview) : axes de rotation, boites englobantes, résultats d'opérations,  ...</documentation>
+        </annotation>
+        <red>1.700000e-01</red>
+        <green>6.500000e-01</green>
+        <blue>9.500000e-01</blue>
+      </element>
+      <element name="previewWidth" type="double">
+        <annotation>
+          <documentation>Epaisseur du trait utilisé pour afficher les éléments de prévisualisation (preview) : axes de rotation, boites englobantes, ...</documentation>
+        </annotation>
+        <value>4.000000e+00</value>
+      </element>
+      <element name="previewPointSize" type="double">
+        <annotation>
+          <documentation>Epaisseur des points utilisée pour afficher les éléments de prévisualisation (preview) : extrémités de segments, ...</documentation>
+        </annotation>
+        <value>1.000000e+01</value>
+      </element>
+    </Section>
+    <Section name="panels" type="container">
+      <annotation>
+        <documentation>Préférences liées aux panneaux de l'IHM.</documentation>
+      </annotation>
+      <Section name="selection" type="container">
+        <annotation>
+          <documentation>Préférences liées aux panneaux de représentation de la sélection.</documentation>
+        </annotation>
+        <element name="maxIndividualProperties" type="unsignedLong">
+          <annotation>
+            <documentation>Nombre maximum d'entités sélectionnées dont on détaille les propriétés individuelles.</documentation>
+          </annotation>
+          <value>50</value>
+        </element>
+        <element name="maxCommonProperties" type="unsignedLong">
+          <annotation>
+            <documentation>Nombre maximum d'entités sélectionnées dont on détaille les propriétés communes.</documentation>
+          </annotation>
+          <value>50</value>
+        </element>
+      </Section>
+      <Section name="operation" type="container">
+        <annotation>
+          <documentation>Préférences liées au panneaux opérations</documentation>
+        </annotation>
+        <element name="IDSeizureBackgroundColor" type="color">
+          <annotation>
+            <documentation>Composantes R, G, B de la couleur de fond des fenêtre de saisie des identifiants en mode de saisie interactive. Valeurs comprises entre 0 et 1.</documentation>
+          </annotation>
+          <red>8.627451e-01</red>
+          <green>7.843137e-01</green>
+          <blue>9.411765e-01</blue>
+        </element>
+        <element name="prevalidateSeizure" type="boolean">
+          <annotation>
+            <documentation>Faut-il procéder à une (pré-)validation des champs de texte de saisie des grandeurs numériques lorsque le panneau perd le focus ?</documentation>
+          </annotation>
+          <value>false</value>
+        </element>
+        <element name="autoUpdateUsesSelection" type="boolean">
+          <annotation>
+            <documentation>Les panneaux d'opérations doivent ils être initialisés (autant que possible) avec la sélection en cours lors de leur affichage ? Oui si true, non si false.")</documentation>
+          </annotation>
+          <value>true</value>
+        </element>
+        <element name="cancelClearEntities" type="boolean">
+          <annotation>
+            <documentation>Les noms des entités des panneaux d'opérations doivent ils être effacés lorsque les panneaux sont masqués ?</documentation>
+          </annotation>
+          <value>false</value>
+        </element>
+        <element name="showDialogOnCommandError" type="boolean">
+          <annotation>
+            <documentation>Faut-il afficher une boite de dialogue d'erreur lorsqu'une commande échoue ? Oui si true, non si false.</documentation>
+          </annotation>
+          <value>true</value>
+        </element>
+      </Section>
+      <Section name="groups" type="container">
+        <annotation>
+          <documentation>Préférences liées au panneau Groupes</documentation>
+        </annotation>
+        <element name="automaticSort" type="boolean">
+          <annotation>
+            <documentation>True si les noms de groupes sont automatiquement triés, false dans le cas contraire.</documentation>
+          </annotation>
+          <value>true</value>
+        </element>
+        <element name="sortType" type="string">
+          <annotation>
+            <documentation>typeDescendingName pour un ordre alphabétique descendant, typeAscendingName pour un ordre alphabétique ascendant.</documentation>
+          </annotation>
+          <value>typeAscendingName</value>
+        </element>
+        <element name="multiLevelGroupsView" type="boolean">
+          <annotation>
+            <documentation>True si les groupes sont classés par niveau, false dans le cas contraire.</documentation>
+          </annotation>
+          <value>false</value>
+        </element>
+      </Section>
+    </Section>
+    <Section name="logs" type="container">
+      <annotation>
+        <documentation>Préférences liées aux messages de l'IHM (historique).</documentation>
+      </annotation>
+      <element name="informations" type="boolean">
+        <annotation>
+          <documentation>Faut-il afficher les message d'information ?</documentation>
+        </annotation>
+        <value>true</value>
+      </element>
+      <element name="warnings" type="boolean">
+        <annotation>
+          <documentation>Faut-il afficher les avertissements ?</documentation>
+        </annotation>
+        <value>true</value>
+      </element>
+      <element name="errors" type="boolean">
+        <annotation>
+          <documentation>Faut-il afficher les erreurs ?</documentation>
+        </annotation>
+        <value>true</value>
+      </element>
+      <element name="taskOutputs" type="boolean">
+        <annotation>
+          <documentation>Faut-il afficher les sorties des processus lancés (ou des scripts) ?</documentation>
+        </annotation>
+        <value>true</value>
+      </element>
+      <element name="traces_1" type="boolean">
+        <annotation>
+          <documentation>Traces liées aux commandes.</documentation>
+        </annotation>
+        <value>false</value>
+      </element>
+      <element name="traces_2" type="boolean">
+        <annotation>
+          <documentation>Traces liées aux scripts et pythoneries.</documentation>
+        </annotation>
+        <value>false</value>
+      </element>
+      <element name="traces_3" type="boolean">
+        <annotation>
+          <documentation>Traces liées aux commandes de type géométrique.</documentation>
+        </annotation>
+        <value>false</value>
+      </element>
+      <element name="traces_4" type="boolean">
+        <annotation>
+          <documentation>Traces liées aux commandes de type topologique.</documentation>
+        </annotation>
+        <value>false</value>
+      </element>
+      <element name="traces_5" type="boolean">
+        <annotation>
+          <documentation>Traces liées aux commandes de type maillage.</documentation>
+        </annotation>
+        <value>false</value>
+      </element>
+      <element name="date" type="boolean">
+        <annotation>
+          <documentation>Faut-il faire figurer la date dans les traces (true/false) ?</documentation>
+        </annotation>
+        <value>false</value>
+      </element>
+      <element name="time" type="boolean">
+        <annotation>
+          <documentation>Faut-il faire figurer l'heure dans les traces (true/false) ?</documentation>
+        </annotation>
+        <value>false</value>
+      </element>
+      <element name="threadID" type="boolean">
+        <annotation>
+          <documentation>Faut-il faire figurer l'identifiant du thread dans les traces (true/false) ?</documentation>
+        </annotation>
+        <value>false</value>
+      </element>
+    </Section>
+    <Section name="rays" type="container">
+      <annotation>
+        <documentation>Paramétrage des pointages laser</documentation>
+      </annotation>
+      <element name="lineWidth" type="double">
+        <annotation>
+          <documentation>Epaisseur du trait des faces des pointages laser</documentation>
+        </annotation>
+        <value>0.000000e+00</value>
+      </element>
+      <element name="raysOpacity" type="double">
+        <annotation>
+          <documentation>Opacité ([0..1]) des faces des pointages laser, 1 par défaut</documentation>
+        </annotation>
+        <value>1.000000e+00</value>
+      </element>
+      <element name="raysSpotOpacity" type="double">
+        <annotation>
+          <documentation>Opacité ([0..1]) des taches des pointages laser, 1 par défaut</documentation>
+        </annotation>
+        <value>1.000000e+00</value>
+      </element>
+      <element name="spotTolerance" type="double">
+        <annotation>
+          <documentation>Tolérance dans les calculs d'intersection pointage laser/maille, 1e-2 par défaut</documentation>
+        </annotation>
+        <value>1.000000e-02</value>
+      </element>
+      <element name="spotRepresentationCheat" type="boolean">
+        <annotation>
+          <documentation>Faut il essayer de limiter les moirés lors des représentations des taches ?</documentation>
+        </annotation>
+        <value>true</value>
+      </element>
+      <element name="spotRepresentationCheatFactor" type="double">
+        <annotation>
+          <documentation>Pourcentage de proximité de la tache à la surface de projection, 0.991 par défaut</documentation>
+        </annotation>
+        <value>9.910000e-01</value>
+      </element>
+      <element name="hiddenCellsElimination" type="boolean">
+        <annotation>
+          <documentation>Faut il supprimer les taches cachées ?</documentation>
+        </annotation>
+        <value>true</value>
+      </element>
+      <element name="offScreenWindowWidth" type="unsignedLong">
+        <annotation>
+          <documentation>Largeur de la fenêtre offscreen utilisée pour supprimer les taches cachées</documentation>
+        </annotation>
+        <value>10240</value>
+      </element>
+      <element name="offScreenWindowHeight" type="unsignedLong">
+        <annotation>
+          <documentation>Hauteur de la fenêtre offscreen utilisée pour supprimer les taches cachées</documentation>
+        </annotation>
+        <value>6400</value>
+      </element>
+      <element name="releaseIntermediateMemory" type="boolean">
+        <annotation>
+          <documentation>Faut il restituer la mémoire inutilisée dans les calculs des pointages lasers et diagnostics (calculs intermédiaires) ?
+Occupe moins de mémoire mais perte en temps de calcul.</documentation>
+        </annotation>
+        <value>false</value>
+      </element>
+      <element name="raysFileCharset" type="string">
+        <annotation>
+          <documentation>Jeu de caractères utilisé par défaut lors de l'enregistrement des fichiers lasers/diagnostics (ISO8859, UTF8).</documentation>
+        </annotation>
+        <value>UTF8</value>
+      </element>
+    </Section>
+    <Section name="scripting" type="container">
+      <annotation>
+        <documentation>Préférences liées à l'utilisation du scripting.</documentation>
+      </annotation>
+      <element name="catchStdOutputs" type="boolean">
+        <annotation>
+          <documentation>True si les flux standards (stdout/stderr) des commandes et fichiers scripts doivent être récupérées pour être traitées comme des logs, false dans le cas contraire.</documentation>
+        </annotation>
+        <value>true</value>
+      </element>
+      <element name="recentScriptCapacity" type="unsignedLong">
+        <annotation>
+          <documentation>Nombre de scripts ouverts conservés en mémore et proposés dans le menu Session.Scripts Magix 3D récents ...</documentation>
+        </annotation>
+        <value>10</value>
+      </element>
+      <element name="scriptCharset" type="string">
+        <annotation>
+          <documentation>Jeu de caractères utilisé par la génération de scripts (ISO8859, UTF8).</documentation>
+        </annotation>
+        <value>UTF-8</value>
+      </element>
+    </Section>
+    <element name="saveGuiState" type="boolean">
+      <annotation>
+        <documentation>True si l'état de l'IHM (position, taille, organisation des panneaux, ...) doit être automatiquement enregistré en fin de session, false dans le cas contraire.</documentation>
+      </annotation>
+      <value>true</value>
+    </element>
+    <element name="loadGuiState" type="boolean">
+      <annotation>
+        <documentation>True si l'état de l'IHM (position, taille, organisation des panneaux, ...) enregistré en configuration doit être appliqué au lancement de Magix 3D.</documentation>
+      </annotation>
+      <value>true</value>
+    </element>
+    <element name="margin" type="long">
+      <annotation>
+        <documentation>Marges (haut/bas/gauche/droite) à l'intérieur des panneaux.\nElles valent 0 par défaut, l'objectif étant de gagner de la place.\nLes augmenter de 10 à 20 pixels si du texte est illisible.\nNécessite de redémarrer l'application pour prendre effet.</documentation>
+      </annotation>
+      <value>0</value>
+    </element>
+    <element name="spacing" type="long">
+      <annotation>
+        <documentation>Espace séparant 2 composants (bouton, zone de texte, ...) à l'intérieur des panneaux.\nIls valent 0 pixel par défaut, l'objectif étant de gagner de la place. Les augmenter de 10 à 20 pixels si du texte est illisible.\nNécessite de redémarrer l'application pour prendre effet.</documentation>
+      </annotation>
+      <value>0</value>
+    </element>
+  </Section>
+
+  <Section name="server" type="container">
+    <annotation>
+      <documentation>Préférences liées au mode client/serveur.</documentation>
+    </annotation>
+    <Section name="corba" type="container">
+      <Section name="giop" type="container">
+        <element name="giopMaxMsgSize" type="unsignedLong">
+          <value>5000000</value>
+        </element>
+        <element name="biDirectionalGIOP" type="boolean">
+          <value>false</value>
+        </element>
+      </Section>
+      <Section name="policy" type="container">
+        <element name="useTunneling" type="boolean">
+          <value>false</value>
+        </element>
+        <element name="policy" type="string">
+          <value>direct</value>
+        </element>
+      </Section>
+      <element name="transportRule" type="string">
+        <value>* tcp</value>
+      </element>
+    </Section>
+    <Section name="remoteProcess" type="container">
+      <element name="remoteShell" type="string">
+        <annotation>
+          <documentation>Shell utilisé pour lancer des processus distants.</documentation>
+        </annotation>
+        <value>ssh</value>
+      </element>
+      <element name="launcher" type="string">
+        <annotation>
+          <documentation>Lanceur d'applications.</documentation>
+        </annotation>
+        <value>/opt/Lem/6.15.0/bin/tkutil_launcher</value>
+      </element>
+    </Section>
+    <Section name="mpi" type="container">
+      <element name="launcher" type="string">
+        <value>/usr/bin/mpiexec.mpich</value>
+      </element>
+    </Section>
+    <element name="partitionName" type="string">
+      <annotation>
+        <documentation>Partition de la machine serveur à utiliser.</documentation>
+      </annotation>
+      <value>large</value>
+    </element>
+    <element name="userDataDirectory" type="string">
+      <annotation>
+        <documentation>Répertoire sur la machine serveur proposé par défaut pour charger les données utilisateurs.</documentation>
+      </annotation>
+      <value></value>
+    </element>
+    <element name="port" type="string">
+      <annotation>
+        <documentation>Port de communications utilisé par client et serveur pour les commandes Magix 3D.</documentation>
+      </annotation>
+      <value>2024</value>
+    </element>
+    <element name="renderingPort" type="string">
+      <annotation>
+        <documentation>Port de communications utilisé par client et serveur pour les opérations de rendu graphique.</documentation>
+      </annotation>
+      <value>2025</value>
+    </element>
+    <element name="host" type="string">
+      <annotation>
+        <documentation>Machine où est lancé le serveur parallèle.</documentation>
+      </annotation>
+      <value>localhost</value>
+    </element>
+    <element name="path" type="string">
+      <annotation>
+        <documentation>Path du serveur.</documentation>
+      </annotation>
+      <value>/tmp/Magix3D_BUILD/Magix3D/src/CorbaMpiMagix3DServer/CorbaMpiMagix3DServer-1.16.0_dev</value>
+    </element>
+  </Section>
+
+</Magix3D>

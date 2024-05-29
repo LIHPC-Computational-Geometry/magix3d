@@ -1,0 +1,33 @@
+#======================================================================================================================
+include (GNUInstallDirs)
+include (${PROJECT_SOURCE_DIR}/cmake/version.cmake)
+include (${PROJECT_SOURCE_DIR}/cmake/common.cmake)
+#======================================================================================================================
+#Source directories
+message (STATUS "===============> MGX utilities")
+add_subdirectory (VtkComponents)
+add_subdirectory (Utils)
+if (USE_GMSH)
+    add_subdirectory (GMSH)
+endif ()
+if (USE_TRITON)
+	add_subdirectory (Triton2)
+endif()
+message (STATUS "===============> MGX Kernel")
+add_subdirectory (Core)
+message (STATUS "===============> MGX Python binding")
+add_subdirectory (pyMagix3D)
+message (STATUS "===============> MGX GUI")
+add_subdirectory (QtComponents)
+add_subdirectory (QtVtkComponents)
+if (BUILD_MAGIX3D)
+	message (STATUS "===============> Full MGX interactive application")
+	add_subdirectory (Magix3D)
+endif ( )
+if (BUILD_MAGIX3DBATCH)
+	message (STATUS "===============> MGX batch application")
+	add_subdirectory (Magix3DBatch)
+endif ( )
+
+message (STATUS "===============>  End of compiling stage")
+
