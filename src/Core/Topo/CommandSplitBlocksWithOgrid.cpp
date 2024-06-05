@@ -747,7 +747,8 @@ createVertices(std::map<Vertex*, uint> & filtre_vertex,
                     }
 
                 }
-                else if (nb_face_int == 1){
+                else if ((nb_face_int == 1)
+                        || (nb_face_int == 2 && m_blocs.size() == 2)) {
                     // il est relié à 2 blocs sélectionnés
                     CoFace* coface = cofaces_int[0];
 
@@ -1048,10 +1049,6 @@ createCoEdgeAndFace(Vertex* vtx0,
         Vertex* som0 = vertices[i];
         Vertex* som1 = vertices[i+1];
 
-        // cas des arêtes internes avec les 2 sommets internes
-        if (filtre_vertex[som0] == 2 && filtre_vertex[som1] == 2)
-            continue;
-
         // on ordonne les sommets suivant leur id
         TopoHelper::sortVertices(som0, som1);
 
@@ -1064,9 +1061,13 @@ createCoEdgeAndFace(Vertex* vtx0,
         if (coedges_between.empty())
             throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne dans CommandSplitBlocksWithOgrid::createCoEdgeAndFace, aucune arête !!!", TkUtil::Charset::UTF_8));
 
-        // si l'une des arêtes est interne (sans toucher le bord), on passe
-        if (filtre_coedge[coedges_between[0]] == 3)
-            return;
+        // cas des arêtes internes avec les 2 sommets internes
+        if ((filtre_vertex[som0] == 2 && filtre_vertex[som1] == 2)
+            // ou si l'une des arêtes est interne (sans toucher le bord)
+            || (filtre_coedge[coedges_between[0]] == 3)) {
+            corr_2vtx_coedge[std::pair<Vertex*, Vertex*>(som0, som1)] = coedges_between[0];
+            continue;
+        }
 
 #ifdef _DEBUG_SPLIT_OGRID
         std::cout<<"=> createCoEdgeAndFace pour ("<<som0->getName()<<","<<som1->getName()<<")"<<std::endl;
