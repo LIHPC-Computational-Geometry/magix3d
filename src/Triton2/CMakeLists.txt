@@ -12,8 +12,11 @@ file (GLOB CPP_SOURCES TetgenFacade.cpp tetgen/tetgen.cxx tetgen/predicates.cxx)
 # On ajoute les en-têtes aux sources. C'est utile pour cmake dans certains cas,
 # par exemple lorsqu'ils doivent être pré-processés (moc, ...).
 add_library (Triton2 ${CPP_SOURCES} ${HEADERS})
-set_property (TARGET Triton2 PROPERTY AUTOMOC ON)
-set_property (TARGET Triton2 PROPERTY AUTORCC ON)
+
+# this option is for compiling J. Shewchuk's predicates, as prescribed in tetgen-1.6.0's Makefile
+# this option does not appear in its CMakeLists.txt
+set_source_files_properties(tetgen/predicates.cxx PROPERTIES COMPILE_OPTIONS "-O0")
+
 set (ALL_TARGETS Triton2)
 set_property (TARGET Triton2 PROPERTY VERSION ${MAGIX3D_VERSION})
 set_property (TARGET Triton2 PROPERTY SOVERSION ${MAGIX3D_MAJOR_VERSION})
