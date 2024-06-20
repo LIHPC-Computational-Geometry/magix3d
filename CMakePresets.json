@@ -23,7 +23,7 @@
           "QtPython3_ROOT": "$env{INSTALL_DIR}/qtpython",
           "QtVtk_ROOT": "$env{INSTALL_DIR}/qtvtk",
           "OpenCASCADE_ROOT": "$env{INSTALL_DIR}/occt-V7_1_0",
-          "CMAKE_PREFIX_PATH": "$env{INSTALL_DIR}/mesquite-2.3.0;$env{INSTALL_DIR}/CGNS-4.3.0",
+          "CMAKE_PREFIX_PATH": "$env{INSTALL_DIR}/mesquite-2.3.0;$env{INSTALL_DIR}/CGNS-4.3.0;$env{INSTALL_DIR}/tetgen1.6.0",
           "T_INTERNAL_EXTENSION": "not_defined",
           "ERD_INTERNAL_EXTENSION": "not_defined",
           "USER_TEAM": "undef_user_team",

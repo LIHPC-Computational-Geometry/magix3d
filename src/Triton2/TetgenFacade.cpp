@@ -23,13 +23,10 @@ void TetgenFacade::generateCDTMesh(gmds::Mesh& ABoundaryMesh,
 
 	buildTetgenInput(ABoundaryMesh);
 
-	/*TODO Understand how to fill a tetgenbehavior object in order to avoid using
-	 * "pq1.414a0.1"
-	 */
-	tetgenbehavior behav;
-	behav.plc=1;
-	behav.quality = AQuality;
-	tetrahedralize(/*&behav*/"pq1.2a0.1", &tetgenInput_, &tetgenOutput_);
+    char * param = const_cast<char*>("pq1.2a0.1");
+    tetgenbehavior behav;
+    behav.parse_commandline(param);
+    tetrahedralize(&behav, &tetgenInput_, &tetgenOutput_);
 	buildGMDSOutput(AVolMesh);
 }
 /*----------------------------------------------------------------------------*/
@@ -44,13 +41,10 @@ void TetgenFacade::generateTetMesh(gmds::Mesh& ABoundaryMesh,
 
 	buildTetgenInput(ABoundaryMesh);
 
-	/*TODO Understand how to fill a tetgenbehavior object in order to avoid using
-	 * "pq1.414a0.1"
-	 */
-	tetgenbehavior behav;
-	behav.plc=1;
-	behav.quality = AQuality;
-	tetrahedralize(/*&behav*/"pq1.414a0.1", &tetgenInput_, &tetgenOutput_);
+    char * param = const_cast<char*>("pq1.414a0.1");
+    tetgenbehavior behav;
+    behav.parse_commandline(param);
+    tetrahedralize(&behav, &tetgenInput_, &tetgenOutput_);
 	buildGMDSOutput(AVolMesh);
 }
 /*----------------------------------------------------------------------------*/
@@ -63,20 +57,13 @@ void TetgenFacade::generateTetMeshDistTet(gmds::Mesh& ABoundaryMesh,
 //		ABoundaryMesh.getNbPolygons()!=0 )
 //		throw gmds::GMDSException("The boundary mesh cannot contain quads or polygons");
 
-//	std::cout<<"begin buildTetgenInput"<<"\n";
 	buildTetgenInput(ABoundaryMesh);
 
-	/*TODO Understand how to fill a tetgenbehavior object in order to avoid using
-	 * "pq1.414a0.1"
-	 */
-	tetgenbehavior behav;
-	behav.plc=1;
-	behav.quality = AQuality;
-	//tetrahedralize(/*&behav*/"pq1.414a0.1", &tetgenInput_, &tetgenOutput_);
-//	std::cout<<"begin tetrahedralize"<<"\n";
-	//tetrahedralize(/*&behav*/"pYa.2", &tetgenInput_, &tetgenOutput_);
-	tetrahedralize(/*&behav*/"pq1.414a0.01", &tetgenInput_, &tetgenOutput_);
-//	std::cout<<"begin buildGMDSOutput"<<"\n";
+    char * param = const_cast<char*>("pq1.414a0.01");
+    tetgenbehavior behav;
+    behav.parse_commandline(param);
+    tetrahedralize(&behav, &tetgenInput_, &tetgenOutput_);
+
 	buildGMDSOutput(AVolMesh);
 }
 /*----------------------------------------------------------------------------*/
@@ -88,15 +75,13 @@ void TetgenFacade::generateTetMesh(std::vector<gmds::Node>& ANodes,
 
 	buildTetgenInput(ANodes,AFacets);
 
-	/*TODO Understand how to fill a tetgenbehavior object in order to avoid using
-	 * "pq1.414a0.1"
-	 */
-	char * param = const_cast<char*>(AParam.c_str());
-//	std::cout<<"begin tetrahedralize"<<"\n";
-	tetrahedralize("Yq1.2pa0.1"/*param*/, &tetgenInput_, &tetgenOutput_);
+//	char * param = const_cast<char*>(AParam.c_str());
+    char * param = const_cast<char*>("Yq1.2pa0.1");
+    tetgenbehavior behav;
+    behav.parse_commandline(param);
+    tetrahedralize(&behav, &tetgenInput_, &tetgenOutput_);
 
 	fillGMDSOutput(AMesh, ANodes);
-
 }
 /*----------------------------------------------------------------------------*/
 void TetgenFacade::generateTetMesh(
@@ -108,11 +93,11 @@ void TetgenFacade::generateTetMesh(
 		const std::string&  AParam )
 {
 	buildTetgenInput(ANodes,AFacets);
-
-
+    
 	char * param = const_cast<char*>(AParam.c_str());
-//	std::cout<<"begin tetrahedralize with "<<param<<std::endl;
-	tetrahedralize(param, &tetgenInput_, &tetgenOutput_);
+    tetgenbehavior behav;
+    behav.parse_commandline(param);
+    tetrahedralize(&behav, &tetgenInput_, &tetgenOutput_);
 
 	ACreatedNodes.clear();
 	ACreatedRegions.clear();
