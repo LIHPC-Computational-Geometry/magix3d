@@ -5,17 +5,14 @@ include (${CMAKE_SOURCE_DIR}/cmake/version.cmake)
 include (${CMAKE_SOURCE_DIR}/cmake/common.cmake)
 
 find_package (gmds REQUIRED)
+include (${CMAKE_SOURCE_DIR}/cmake/FindTetgen.cmake)
 
-file (GLOB HEADERS protected/Triton2/TetgenInterface/TetgenFacade.h protected/Triton2/TetgenInterface/tetgen.h)
-file (GLOB CPP_SOURCES TetgenFacade.cpp tetgen/tetgen.cxx tetgen/predicates.cxx)
+file (GLOB HEADERS protected/Triton2/TetgenInterface/TetgenFacade.h)
+file (GLOB CPP_SOURCES TetgenFacade.cpp)
 
 # On ajoute les en-têtes aux sources. C'est utile pour cmake dans certains cas,
 # par exemple lorsqu'ils doivent être pré-processés (moc, ...).
 add_library (Triton2 ${CPP_SOURCES} ${HEADERS})
-
-# this option is for compiling J. Shewchuk's predicates, as prescribed in tetgen-1.6.0's Makefile
-# this option does not appear in its CMakeLists.txt
-set_source_files_properties(tetgen/predicates.cxx PROPERTIES COMPILE_OPTIONS "-O0")
 
 set (ALL_TARGETS Triton2)
 set_property (TARGET Triton2 PROPERTY VERSION ${MAGIX3D_VERSION})
@@ -23,7 +20,7 @@ set_property (TARGET Triton2 PROPERTY SOVERSION ${MAGIX3D_MAJOR_VERSION})
 
 target_include_directories (Triton2 PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/protected>$<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
 target_include_directories (Triton2 PUBLIC ${GMDS_INCLUDE_DIR})
-target_link_libraries (Triton2 PUBLIC GMDSIg)
+target_link_libraries (Triton2 PUBLIC GMDSIg tetgen::tetgen)
 
 # INSTALLATION :
 include(CMakePackageConfigHelpers)

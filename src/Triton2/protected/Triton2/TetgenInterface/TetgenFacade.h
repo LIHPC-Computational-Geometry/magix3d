@@ -13,7 +13,7 @@
 #include <gmds/cad/GeomVolume.h>
 //#include <GMDSGeom/GeomManager.h>
 /*----------------------------------------------------------------------------*/
-#include "tetgen.h"
+#include <tetgen.h>
 /*----------------------------------------------------------------------------*/
 #include <sstream>
 #include <map>
