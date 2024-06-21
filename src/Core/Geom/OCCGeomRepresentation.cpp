@@ -1779,7 +1779,7 @@ void OCCGeomRepresentation::project(const Utils::Math::Point& P1, Utils::Math::P
 void OCCGeomRepresentation::projectPointOn( Utils::Math::Point& P)
 {
 
-	if(m_shape.ShapeType()==TopAbs_VERTEX)
+	if(!m_shape.IsNull() && m_shape.ShapeType()==TopAbs_VERTEX)
 	{
 		gp_Pnt pnt = BRep_Tool::Pnt(TopoDS::Vertex(m_shape));
 		P.setXYZ(pnt.X(), pnt.Y(), pnt.Z());
