@@ -989,6 +989,16 @@ public :
 			RenderingManager::InteractorObserver *observer);
 
 	/**
+	 * \param		Point proposé par défaut.
+	 * \param		Eventuel observateur étant notifié de toute modification effectuée à l'aide de l'interacteur.
+	 * \return		Pointeur sur l'interacteur permettant de saisir les paramètres de définition du point, ou 0 en cas d'échec de
+	 *				la création de l'interacteur.
+	 * \see			destroyInteractor
+	 */
+	virtual RenderingManager::ConstrainedPointInteractor *createAxisConstrainedPointInteractor(
+			Mgx3D::Utils::Math::Point point, RenderingManager::InteractorObserver *observer);
+			
+	/**
 	 * <P>Interacteur de base permettant la définition d'un plan.</P>
 	 * <P>Cette classe est à spécialiser. Lors des modifications du
 	 * paramétrage du plan les classes dérivées doivent informer l'éventuel

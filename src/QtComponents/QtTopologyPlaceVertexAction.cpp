@@ -349,12 +349,15 @@ void QtTopologyPlaceVertexPanel::preview (bool show, bool destroyInteractor)
 		double  dx = 0.1, dy = 0.1, dz = -0.1;
 		getInteractorBoxDims (dx, dy, dz);
 		Math::Point	p (getPoint ( ));
-		RenderingManager::PointInteractor*	interactor	= getInteractor ( );
+//		RenderingManager::PointInteractor*	interactor	= getInteractor ( );
+		RenderingManager::ConstrainedPointInteractor*	interactor	= getConstrainedInteractor ( );
 		if (0 == interactor)
 		{
 			if (0 != getVertex ( ))
 			{
-				interactor	= getRenderingManager ( ).createPointInteractor (p, dx, dy, dz, this);
+//				interactor	= getRenderingManager ( ).createPointInteractor (p, dx, dy, dz, this);
+interactor	= getRenderingManager ( ).createAxisConstrainedPointInteractor (p, this);
+/* CP : A REMETTRE pour interaction précise
 				if (0 != _sliderLabel)
 					_sliderLabel->show ( );
 				if (0 != _interactorSlider)
@@ -370,6 +373,7 @@ void QtTopologyPlaceVertexPanel::preview (bool show, bool destroyInteractor)
 					_interactorSlider->setValue (val);
 					_interactorSlider->show ( );
 				}
+*/
 				registerPreviewedInteractor (interactor);
 			}	// if (0 != getVertex ( ))
 		}	// if (0 == interactor)
@@ -387,8 +391,7 @@ void QtTopologyPlaceVertexPanel::preview (bool show, bool destroyInteractor)
 		if (0 == interactor)
 		{
 			const string	constraintName	= _entityConstraintPanel->getEntitiesPanel ( )->getUniqueName ( );
-			Entity*		constraint	= false == constraintName.empty ( ) ?
-							&getContext().nameToEntity (constraintName) : 0;
+			Entity*		constraint	= false == constraintName.empty ( ) ? &getContext().nameToEntity (constraintName) : 0;
 			// Cas tordu : constraint est une entité détruite (ex : undo) ;
 			constraint	= 0 == constraint ? 0 : (true == constraint->isDestroyed ( ) ? 0 : constraint);
 			interactor	= getRenderingManager ( ).createConstrainedPointInteractor (p, constraint, factor, this);

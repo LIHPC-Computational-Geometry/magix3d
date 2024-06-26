@@ -14,6 +14,7 @@
 #include <QtComponents/Qt3DGraphicalWidget.h>
 #include <QtVtk/QtVtkGraphicWidget.h>
 #include <VtkContrib/vtkConstrainedPointWidget.h>
+#include <VtkContrib/vtkConstrainedPointWidget2.h>
 #include <VtkContrib/vtkECMAxesActor.h>
 #include <VtkContrib/vtkLandmarkActor.h>
 #include <VtkContrib/vtkTrihedronCommand.h>
@@ -500,18 +501,86 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 	/**
 	 * \param		Point proposé par défaut.
 	 * \param		La contrainte spatiale (de type vtkUnstructuedGrid*)
-	 * \param		degré de raffinement attendu (ex : 10 pour x10 par
-	 * 			rapport à la représentation par défaut, ...).
-	 * \param		Eventuel observateur étant notifié de toute modification
-	 *			effectuée à l'aide de l'interacteur.
-	 * \return		Pointeur sur l'interacteur permettant de saisir les
-	 *			paramètres de définition du point, ou 0 en cas d'échec de
-	 *			la création de l'interacteur.
+	 * \param		degré de raffinement attendu (ex : 10 pour x10 par rapport à la représentation par défaut, ...).
+	 * \param		Eventuel observateur étant notifié de toute modification effectuée à l'aide de l'interacteur.
+	 * \return		Pointeur sur l'interacteur permettant de saisir les paramètres de définition du point, ou 0 en cas d'échec de la création de l'interacteur.
 	 * \see			destroyInteractor
 	 */
 	virtual RenderingManager::ConstrainedPointInteractor* createConstrainedPointInteractor (
-			Mgx3D::Utils::Math::Point point, Utils::Entity* constraint, size_t factor,
-			RenderingManager::InteractorObserver* observer);
+			Mgx3D::Utils::Math::Point point, Utils::Entity* constraint, size_t factor, RenderingManager::InteractorObserver* observer);
+			
+	/**
+	 * <P>Interacteur <I>VTK</I> permettant la définition d'un point contraint dans l'espace (le point sera l'un de ceux d'une grille VTK représentant une entité).</P>
+	 */
+	class VTKAxisConstrainedPointInteractor : public ConstrainedPointInteractor
+	{
+		public :
+
+		/**
+		 * \param		Un point
+		 * \param		Gestionnaire de rendu où l'interacteur sera représenté
+		 * \param		Eventuel observateur des interactions.
+		 */
+		VTKAxisConstrainedPointInteractor (Mgx3D::Utils::Math::Point point, VTKRenderingManager& renderingManager, RenderingManager::InteractorObserver* observer);
+
+		/**
+		 * Destructeur. RAS.
+		 */
+		virtual ~VTKAxisConstrainedPointInteractor ( );
+
+		/**
+		 * \return		Le point
+		 * \see			setPoint
+		 */
+		virtual Mgx3D::Utils::Math::Point getPoint ( ) const;
+
+		/**
+		 * \return		Le point initial
+		 * \see			setPoint
+		 */
+		virtual Mgx3D::Utils::Math::Point getInitialPoint ( ) const;
+		
+		/**
+		 * Actualise l'interacteur.
+		 * \param		Nouvelle définition du point.
+		 */
+		virtual void setPoint (Mgx3D::Utils::Math::Point point);
+
+		/**
+		 * Méthode appelée lorsque l'interacteur <I>VTK</I> est modifié par l'utilisateur. Invoque <I>notifyObserverForModifications</I>.
+		 */
+		virtual void vtkInteractorModified ( );
+
+
+		private :
+
+		/**
+		 * Constructeur de copie et opérateur = : interdits.
+		 */
+		VTKAxisConstrainedPointInteractor (const VTKAxisConstrainedPointInteractor&);
+		VTKAxisConstrainedPointInteractor& operator = (const VTKAxisConstrainedPointInteractor&);
+
+		/** Le widget VTK */
+		vtkConstrainedPointWidget2*									_pointWidget;
+		
+		/** Le gestionnaire de rendu, pour éviter des conflits dans la gestion des évènements clavier type "x". */
+		VTKRenderingManager*										_renderingManager;
+
+		/** Le callback sur la modification de l'interacteur. */
+		VTKInteractorCallback<VTKAxisConstrainedPointInteractor>*	_callback;
+
+		/** Le point initial. */
+		double														_x, _y, _z;
+	};	// class VTKAxisConstrainedPointInteractor
+	
+	/**
+	 * \param		Point proposé par défaut.
+	 * \param		Eventuel observateur étant notifié de toute modification effectuée à l'aide de l'interacteur.
+	 * \return		Pointeur sur l'interacteur permettant de saisir les paramètres de définition du point, ou 0 en cas d'échec de
+	 *				la création de l'interacteur.
+	 * \see			destroyInteractor
+	 */
+	virtual RenderingManager::ConstrainedPointInteractor* createAxisConstrainedPointInteractor (Mgx3D::Utils::Math::Point point, RenderingManager::InteractorObserver* observer);
 
 	/**
 	 * <P>Interacteur <I>VTK</I> permettant la définition d'un plan.</P>

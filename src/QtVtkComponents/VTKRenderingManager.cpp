@@ -552,6 +552,110 @@ void VTKRenderingManager::VTKConstrainedPointInteractor::vtkInteractorModified (
 
 
 // ===========================================================================
+//              LA CLASSE VTKRenderingManager::VTKAxisConstrainedPointInteractor
+// ===========================================================================
+
+
+VTKRenderingManager::VTKAxisConstrainedPointInteractor::VTKAxisConstrainedPointInteractor (Math::Point point, VTKRenderingManager& renderingManager, RenderingManager::InteractorObserver* observer)
+	: RenderingManager::ConstrainedPointInteractor (observer), _pointWidget (0), _renderingManager (&renderingManager), _callback (0), _x (point.getX ( )), _y (point.getY ( )), _z (point.getZ ( ))
+{
+	_pointWidget		= vtkConstrainedPointWidget2::New ( );
+	CHECK_NULL_PTR_ERROR (_pointWidget->GetRepresentation ( ))
+	_pointWidget->GetRepresentation ( );	// => CreateDefaultRepresentation ( )
+	try
+	{
+		CHECK_NULL_PTR_ERROR (_renderingManager)
+		renderingManager.getMgx3DInteractorStyle ( ).EnablePlaneKeysOff ( );
+	}
+	catch (...)
+	{
+	}
+	_pointWidget->SetInteractor (renderingManager.getRenderWindow ( ).GetInteractor ( ));
+	// On zoom le widget pour éviter sa juxtaposition avec la bounding box :
+//	_pointWidget->GetRepresentation ( )->SetPlaceFactor (2.5);
+	_pointWidget->GetRepresentation ( )->SetHandleSize (30);
+	_pointWidget->On ( );
+	_callback	= new VTKInteractorCallback<VTKAxisConstrainedPointInteractor> (this, _pointWidget);
+	setPoint (point);
+}	// VTKAxisConstrainedPointInteractor::VTKAxisConstrainedPointInteractor
+
+
+VTKRenderingManager::VTKAxisConstrainedPointInteractor::VTKAxisConstrainedPointInteractor (const VTKRenderingManager::VTKAxisConstrainedPointInteractor&)
+	: RenderingManager::ConstrainedPointInteractor (0), _pointWidget (0), _renderingManager (0), _callback (0), _x (0.), _y (0.), _z (0.)
+{
+}	// VTKAxisConstrainedPointInteractor::VTKAxisConstrainedPointInteractor
+
+
+VTKRenderingManager::VTKAxisConstrainedPointInteractor& VTKRenderingManager::VTKAxisConstrainedPointInteractor::operator = (const VTKRenderingManager::VTKAxisConstrainedPointInteractor&)
+{
+	return *this;
+}	// VTKAxisConstrainedPointInteractor::operator =
+
+
+VTKRenderingManager::VTKAxisConstrainedPointInteractor::~VTKAxisConstrainedPointInteractor ( )
+{
+	try
+	{
+		CHECK_NULL_PTR_ERROR (_renderingManager)
+		_renderingManager->getMgx3DInteractorStyle ( ).EnablePlaneKeysOn ( );
+	}
+	catch (...)
+	{
+	}
+	if (0 != _callback)
+		_callback->Delete ( );
+	_callback	= 0;
+
+	if (0 != _pointWidget)
+	{
+		_pointWidget->Off ( );			// Mandatory (core dump ...)
+		_pointWidget->SetInteractor (0);	// Mandatory (core dump ...)
+		_pointWidget->Delete ( );
+	}
+	_pointWidget	= 0;
+}	// VTKAxisConstrainedPointInteractor::~VTKAxisConstrainedPointInteractor
+
+
+Math::Point VTKRenderingManager::VTKAxisConstrainedPointInteractor::getPoint ( ) const
+{
+	CHECK_NULL_PTR_ERROR (_pointWidget)
+	CHECK_NULL_PTR_ERROR (_pointWidget->GetConstrainedPointRepresentation ( ))
+	double	point [3]	= { 0., 0., 0. };
+	_pointWidget->GetConstrainedPointRepresentation ( )->GetWorldPosition (point);
+
+	return Math::Point (point [0], point [1], point [2]);
+}	// VTKAxisConstrainedPointInteractor::getPoint
+
+
+Math::Point VTKRenderingManager::VTKAxisConstrainedPointInteractor::getInitialPoint ( ) const
+{
+	return Math::Point (_x, _y, _z);
+}	// VTKAxisConstrainedPointInteractor::getInitialPoint
+
+
+void VTKRenderingManager::VTKAxisConstrainedPointInteractor::setPoint (Math::Point point)
+{
+	CHECK_NULL_PTR_ERROR (_pointWidget)
+	CHECK_NULL_PTR_ERROR (_pointWidget->GetConstrainedPointRepresentation ( ))
+	_x	= point.getX ( );
+	_y	= point.getY ( );
+	_z	= point.getZ ( );
+/*	double	bounds [6]	= { _x - 10, _y - 10, _z - 10, _x + 10, _y + 10, _z + 10 };
+	_pointWidget->GetRepresentation ( )->PlaceWidget (bounds);	*/
+	double	pos [3]	= { _x, _y, _z };
+
+	_pointWidget->GetConstrainedPointRepresentation ( )->SetWorldPosition (pos);
+	_pointWidget->On ( );
+}	// VTKAxisConstrainedPointInteractor::setPoint
+
+
+void VTKRenderingManager::VTKAxisConstrainedPointInteractor::vtkInteractorModified ( )
+{
+	notifyObserverForModifications ( );
+}	// VTKAxisConstrainedPointInteractor::vtkInteractorModified
+
+
+// ===========================================================================
 //              LA CLASSE VTKRenderingManager::VTKPlaneInteractor
 // ===========================================================================
 
@@ -1420,9 +1524,7 @@ VTKRenderingManager::RepresentationID
 }	// VTKRenderingManager::createSegmentsWireRepresentation
 
 
-RenderingManager::RepresentationID VTKRenderingManager::createTextRepresentation (
-                const Math::Point& pos, size_t number,
-                const DisplayProperties& properties, bool display)
+RenderingManager::RepresentationID VTKRenderingManager::createTextRepresentation (const Math::Point& pos, size_t number, const DisplayProperties& properties, bool display)
 {
 	vtkActor2D*		actor	= vtkActor2D::New ( );
 	vtkTextMapper*	mapper	= vtkTextMapper::New ( );
@@ -1470,36 +1572,34 @@ void VTKRenderingManager::destroyRepresentation (RenderingManager::Representatio
 }	// VTKRenderingManager::destroyRepresentation
 
 
-RenderingManager::PointInteractor* VTKRenderingManager::createPointInteractor (
-	Math::Point point, double dx, double dy, double dz, RenderingManager::InteractorObserver* observer)
+RenderingManager::PointInteractor* VTKRenderingManager::createPointInteractor (Math::Point point, double dx, double dy, double dz, RenderingManager::InteractorObserver* observer)
 {
-	VTKPointInteractor*	interactor	=
-				new VTKPointInteractor (point, dx, dy, dz, *this, observer);
+	VTKPointInteractor*	interactor	= new VTKPointInteractor (point, dx, dy, dz, *this, observer);
 
 	return interactor;
 }	// VTKRenderingManager::createPointInteractor
 
 
-RenderingManager::ConstrainedPointInteractor*
-	VTKRenderingManager::createConstrainedPointInteractor (
-		Math::Point point, Entity* constraint, size_t factor, RenderingManager::InteractorObserver* observer)
+RenderingManager::ConstrainedPointInteractor* VTKRenderingManager::createConstrainedPointInteractor (Math::Point point, Entity* constraint, size_t factor, RenderingManager::InteractorObserver* observer)
 {
-	VTKConstrainedPointInteractor*	interactor	=
-			new VTKConstrainedPointInteractor (point, constraint, factor, *this, observer);
+	VTKConstrainedPointInteractor*	interactor	= new VTKConstrainedPointInteractor (point, constraint, factor, *this, observer);
 
 	return interactor;
 }	// VTKRenderingManager::createConstrainedPointInteractor
 
 
-RenderingManager::PlaneInteractor* VTKRenderingManager::createPlaneInteractor (
-							Math::Point point, Math::Vector normal,
-							double xMin, double xMax, double yMin, double yMax,
-							double zMin, double zMax,
-							RenderingManager::InteractorObserver* observer)
+RenderingManager::ConstrainedPointInteractor* VTKRenderingManager::createAxisConstrainedPointInteractor (Math::Point point,  RenderingManager::InteractorObserver* observer)
 {
-	VTKPlaneInteractor*	interactor	=
-		new VTKPlaneInteractor (
-			point, normal, xMin, xMax, yMin, yMax, zMin, zMax, *this, observer);
+	VTKAxisConstrainedPointInteractor*	interactor	= new VTKAxisConstrainedPointInteractor (point, *this, observer);
+
+	return interactor;
+}	// VTKRenderingManager::createAxisConstrainedPointInteractor
+
+
+RenderingManager::PlaneInteractor* VTKRenderingManager::createPlaneInteractor (
+	Math::Point point, Math::Vector normal, double xMin, double xMax, double yMin, double yMax, double zMin, double zMax, RenderingManager::InteractorObserver* observer)
+{
+	VTKPlaneInteractor*	interactor	= new VTKPlaneInteractor (point, normal, xMin, xMax, yMin, yMax, zMin, zMax, *this, observer);
 
 	return interactor;
 }	// VTKRenderingManager::createPlaneInteractor
@@ -1507,20 +1607,18 @@ RenderingManager::PlaneInteractor* VTKRenderingManager::createPlaneInteractor (
 
 void VTKRenderingManager::destroyInteractor (RenderingManager::Interactor* interactor)
 {
+cout << __FILE__ << ' ' << __LINE__ << " VTKRenderingManager::destroyInteractor" << endl;
 	delete interactor;
 }	// VTKRenderingManager::destroyInteractor
 
 
-RenderingManager::ColorTable* VTKRenderingManager::getColorTable (
-					const RenderingManager::ColorTableDefinition& definition)
+RenderingManager::ColorTable* VTKRenderingManager::getColorTable (const RenderingManager::ColorTableDefinition& definition)
 {
-	for (vector<VTKRenderingManager::VTKColorTable*>::iterator
-			it = _colorTables.begin ( ); _colorTables.end ( ) != it; it++)
+	for (vector<VTKRenderingManager::VTKColorTable*>::iterator it = _colorTables.begin ( ); _colorTables.end ( ) != it; it++)
 		if (true == (*it)->getDefinition ( ).comparable (definition))
 			return *it;
 
-	VTKRenderingManager::VTKColorTable*	table	=
-					new VTKRenderingManager::VTKColorTable (*this, definition);
+	VTKRenderingManager::VTKColorTable*	table	= new VTKRenderingManager::VTKColorTable (*this, definition);
 
 	table->getScalarBarWidget ( ).SetInteractor (getRenderWindow ( ).GetInteractor ( ));
 	_colorTables.push_back (table);

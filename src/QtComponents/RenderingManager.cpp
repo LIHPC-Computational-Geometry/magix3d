@@ -1115,6 +1115,13 @@ RenderingManager::ConstrainedPointInteractor* RenderingManager::createConstraine
 }	// RenderingManager::createConstrainedPointInteractor
 
 
+RenderingManager::ConstrainedPointInteractor* RenderingManager::createAxisConstrainedPointInteractor (
+				Math::Point point, RenderingManager::InteractorObserver* observer)
+{
+	throw Exception (UTF8String ("RenderingManager::createConstrainedPointInteractor should be overloaded.", Charset::UTF_8));
+}	// RenderingManager::createAxisConstrainedPointInteractor
+
+
 RenderingManager::PlaneInteractor* RenderingManager::createPlaneInteractor (
 							Math::Point point, Math::Vector normal,
 							double xMin, double xMax, double yMin, double yMax,
