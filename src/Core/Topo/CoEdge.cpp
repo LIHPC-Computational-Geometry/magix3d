@@ -2259,8 +2259,8 @@ saveCoEdgeTopoProperty(Internal::InfoCommand* icmd)
 #ifdef _DEBUG2
         std::cout<<"CoEdge::saveCoEdgeTopoProperty pour "<<getName()<<", change = "<<(change?"True":"False")<<std::endl;
 #endif
-        if (change && m_save_topo_property == 0){
-        	if (isMeshed()){
+        if (m_save_topo_property == 0){
+        	if (change && isMeshed()){
         		TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
         		message << "On ne peut pas modifier une arête alors qu'elle est déjà maillée.";
         		throw TkUtil::Exception (message);

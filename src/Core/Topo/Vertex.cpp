@@ -467,8 +467,8 @@ saveVertexTopoProperty(Internal::InfoCommand* icmd)
     			<<Internal::InfoCommand::type2String(icmd->getTopoInfoEntity()[this])<<std::endl;
 #endif
         bool change = icmd->addTopoInfoEntity(this,Internal::InfoCommand::OTHERMODIFIED);
-        if (change && m_save_topo_property == 0){
-        	if (isMeshed()){
+        if (m_save_topo_property == 0){
+        	if (change && isMeshed()){
 				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         		message << "On ne peut pas modifier un sommet alors qu'il est déjà maillé.";
         		throw TkUtil::Exception (message);
