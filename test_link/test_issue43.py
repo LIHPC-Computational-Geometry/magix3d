@@ -11,14 +11,14 @@ def test_issue43():
     tm.newBoxWithTopo(Mgx3D.Point(2,0,0), Mgx3D.Point(3,1,1), 10, 10, 10)
 
     # Fusion sommet
-    # assert('Som0008' in tm.getInfos('Fa0006', 2).vertices())
-    # assert('Som0004' not in tm.getInfos('Fa0006', 2).vertices())
-    # ctx.getTopoManager().fuse2Vertices ("Som0004","Som0008")
-    # assert('Som0008' not in tm.getInfos('Fa0006', 2).vertices())
-    # assert('Som0004' in tm.getInfos('Fa0006', 2).vertices())
-    # ctx.undo()
-    # assert('Som0008' in tm.getInfos('Fa0006', 2).vertices())
-    # assert('Som0004' not in tm.getInfos('Fa0006', 2).vertices())
+    assert('Som0008' in tm.getInfos('Fa0006', 2).vertices())
+    assert('Som0004' not in tm.getInfos('Fa0006', 2).vertices())
+    ctx.getTopoManager().fuse2Vertices ("Som0004","Som0008")
+    assert('Som0008' not in tm.getInfos('Fa0006', 2).vertices())
+    assert('Som0004' in tm.getInfos('Fa0006', 2).vertices())
+    ctx.undo()
+    assert('Som0008' in tm.getInfos('Fa0006', 2).vertices())
+    assert('Som0004' not in tm.getInfos('Fa0006', 2).vertices())
 
     # Fusion arete
     assert('Som0006' in tm.getInfos('Fa0005', 2).vertices())
