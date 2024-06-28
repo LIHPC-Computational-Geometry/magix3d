@@ -2023,8 +2023,8 @@ saveBlockTopoProperty(Internal::InfoCommand* icmd)
     if (icmd) {
         bool change = icmd->addTopoInfoEntity(this,Internal::InfoCommand::DISPMODIFIED);
         //std::cout<<"change = "<<(change?"vrai":"faux")<<std::endl;
-        if (change && m_save_topo_property == 0){
-        	if (isMeshed()){
+        if (m_save_topo_property == 0){
+        	if (change && isMeshed()){
 				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         		message << "On ne peut pas modifier un bloc alors qu'il est déjà maillé.";
         		throw TkUtil::Exception (message);

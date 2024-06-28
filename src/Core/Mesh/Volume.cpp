@@ -477,8 +477,8 @@ saveMeshVolumeTopoProperty(Internal::InfoCommand* icmd)
 {
 //    std::cout<<"saveMeshVolumeTopoProperty demandé ..."<<std::endl;
     if (icmd) {
-        bool change = icmd->addMeshInfoEntity(this,Internal::InfoCommand::DISPMODIFIED);
-        if (change && m_save_topo_property == 0){
+        icmd->addMeshInfoEntity(this,Internal::InfoCommand::DISPMODIFIED);
+        if (m_save_topo_property == 0){
 //            std::cout<<"  clone du MeshVolumeTopoProperty avec "
 //                    <<m_topo_property->getBlockContainer().size()<<" blocs"<<std::endl;
             m_save_topo_property = m_topo_property->clone();
