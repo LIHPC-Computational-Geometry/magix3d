@@ -13,7 +13,7 @@ def test_issue43():
     # Fusion sommet
     assert('Som0008' in tm.getInfos('Fa0006', 2).vertices())
     assert('Som0004' not in tm.getInfos('Fa0006', 2).vertices())
-    ctx.getTopoManager().fuse2Vertices ("Som0004","Som0008")
+    tm.fuse2Vertices ("Som0004","Som0008")
     assert('Som0008' not in tm.getInfos('Fa0006', 2).vertices())
     assert('Som0004' in tm.getInfos('Fa0006', 2).vertices())
     ctx.undo()
