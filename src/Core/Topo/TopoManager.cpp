@@ -2237,6 +2237,10 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitBlock(std::string nbloc,
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitBlock(Block* bloc, CoEdge* arete, const double& ratio)
 {
+    TkUtil::UTF8String   warning (TkUtil::Charset::UTF_8);
+    warning <<"La fonction splitBlock est obsolete, il est préférable d'utiliser splitBlocks";
+    log (TkUtil::TraceLog (warning, TkUtil::Log::WARNING));
+
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::splitBlock("<<bloc->getName()<<","<<arete->getName()<<","<<ratio<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
@@ -2257,6 +2261,10 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitBlock(Block* bloc, CoEdg
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitBlock(Block* bloc, CoEdge* arete, const Point& pt)
 {
+    TkUtil::UTF8String   warning (TkUtil::Charset::UTF_8);
+    warning <<"La fonction splitBlock est obsolete, il est préférable d'utiliser splitBlocks";
+    log (TkUtil::TraceLog (warning, TkUtil::Log::WARNING));
+
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::splitBlock("<<bloc->getName()<<","<<arete->getName()<<","<<pt<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
@@ -2283,10 +2291,8 @@ TopoManager::splitBlocks(std::vector<std::string> &blocs_names, std::string nare
             iter != blocs_names.end(); ++iter)
         blocs.push_back(getBlock(*iter));
 
-    if (blocs.size() > 1)
+    if (blocs.size() > 0)
     	return splitBlocks(blocs, getCoEdge(narete), ratio);
-    else if (blocs.size() == 1)
-    	return splitBlock(blocs[0], getCoEdge(narete), ratio);
     else
     	throw TkUtil::Exception (TkUtil::UTF8String ("Le découpage de blocs ne peut se faire sans aucun bloc", TkUtil::Charset::UTF_8));
 }
