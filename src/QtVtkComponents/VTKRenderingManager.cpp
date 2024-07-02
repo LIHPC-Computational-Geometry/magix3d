@@ -2017,6 +2017,7 @@ void VTKRenderingManager::setParallelProjection (bool parallel)
 			_camera->ParallelProjectionOn ( );
 		else
 			_camera->ParallelProjectionOff ( );
+		forceRender ( );
 	}	// if ((0 != _camera) && ...
 }	// VTKRenderingManager::setParallelProjection
 

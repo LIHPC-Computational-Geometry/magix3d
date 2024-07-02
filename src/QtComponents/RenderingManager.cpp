@@ -316,21 +316,24 @@ RenderingManager::DisplayLocker::~DisplayLocker ( )
 }	// DisplayLocker::~DisplayLocker
 
 // Optimisation visant à gérer les ordres d'affichage par lots.
-// Ex : on a 5000 entités à afficher : on ne provoque des ordres d'actualisation
-// de la vue 3D que toutes les 100 entités affichées.
+// Ex : on a 5000 entités à afficher : on ne provoque des ordres d'actualisation de la vue 3D que toutes les 100 entités affichées.
 #define DECLARE_DISPLAY_LOCKER                                                \
 	unique_ptr<DisplayLocker>	displayLocker (new DisplayLocker (*this));        \
 	size_t					displayLockerLoop	= 0;
 
-// On veut unlock avant lock => en 2 temps (reset (0) puis	
-// reset (new DisplayLocker (...)).
-// Si directement reset (new DisplayLocker (...))  on a
-// new DisplayLocker (...)
-// puis delete de l'ancien DisplayLocker => unlock en dernier ...
+// ==============================================================================================================================================================================
+// Note CP du 02/07/24
+// A propos de l'issue #59 : le bogue survient dans l'interruption de main loop ci-après (QtMgx3DApplication::processEvents (5000) dans la macro EVALUATE_DISPLAY_LOCKER),
+// lorsqu'on traite par exemple les évènements "Afficher les mailles" et qu'un contre-ordre intervient par exemple parce-que l'utilisateur s'impatiente. L'affichage des
+// mailles prend beaucoup de temps, dans l'interruption de main loop on enlève celles qui viennent de s'afficher, c'est rapide, mais le traitement d'affichage n'est pas fini
+// => affichage partiel au final.
+// ==============================================================================================================================================================================
+
+// On veut unlock avant lock => en 2 temps (reset (0) puis	 reset (new DisplayLocker (...)).
+// Si directement reset (new DisplayLocker (...))  on a new DisplayLocker (...) puis delete de l'ancien DisplayLocker => unlock en dernier ...
 #define EVALUATE_DISPLAY_LOCKER                                                            \
 	displayLockerLoop++;                                                                   \
-	if (0 == displayLockerLoop %                                                           \
-						Resources::instance ( )._updateRefreshRate.getValue ( ))  \
+	if (0 == displayLockerLoop % Resources::instance ( )._updateRefreshRate.getValue ( ))  \
 	{                                                                                      \
 		displayLocker.reset (0);                                                           \
 		displayLocker.reset (new DisplayLocker (*this));                                   \

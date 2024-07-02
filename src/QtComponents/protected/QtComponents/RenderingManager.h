@@ -39,19 +39,15 @@ namespace QtComponents
 {
 
 /**
- * \brief		<P>Classe gestionnaire d'affichages 3D générique.
- *				Cette classe est à dériver pour spécialiser avec une API 3D
- *				(VTK, Paraview).</P>
+ * \brief		<P>Classe gestionnaire d'affichages 3D générique. Cette classe est à dériver pour spécialiser avec une API 3D (VTK, Paraview).</P>
  *
- *				<P>Cette classe dérive de SelectionManagerObserver afin d'être
- *				en mesure d'actualiser les représentations graphiques en
+ *				<P>Cette classe dérive de SelectionManagerObserver afin d'être en mesure d'actualiser les représentations graphiques en
  *				fonction du caractère sélectionné ou non des entités.</P>
- * 				</P>
  * \author		Charles PIGNEROL, CEA/DAM/DSSI
  */
 class RenderingManager : public Utils::SelectionManagerObserver
 {
-public :
+	public :
 
 	struct ColorTableDefinition;
 
@@ -76,7 +72,6 @@ public :
 	 * \see			setContext
 	 */
 	virtual Mgx3D::Internal::Context &getContext();
-
 	virtual const Mgx3D::Internal::Context &getContext() const;
 
 	/*
@@ -93,40 +88,31 @@ public :
 	//@{
 
 	/**
-	 * Ajoute l'instance transmise en argument à la liste des entités
-	 * représentées.
+	 * Ajoute l'instance transmise en argument à la liste des entités représentées.
 	 * \param		Instance à ajouter.
 	 */
 	virtual void addEntity(Mgx3D::Utils::Entity &entity);
 
 	/**
-	 * Ajoute les instances transmises en argument à la liste des entités
-	 * représentées.
+	 * Ajoute les instances transmises en argument à la liste des entités représentées.
 	 * \param		Instances à ajouter.
-	 * \param		<I>true</I> si elles sont affichées, <I>false</I>
-	 *				dans le cas contraire.
+	 * \param		<I>true</I> si elles sont affichées, <I>false</I> dans le cas contraire.
 	 * \param		Type d'entités
 	 */
-	virtual void addEntities(
-			const std::vector<Mgx3D::Utils::Entity *> &entities, bool shown,
-			Mgx3D::Utils::DisplayRepresentation::display_type type);
+	virtual void addEntities(const std::vector<Mgx3D::Utils::Entity *> &entities, bool shown, Mgx3D::Utils::DisplayRepresentation::display_type type);
 
 	/**
-	 * Enlève l'instance transmise en argument de la liste des entités
-	 * représentées.
+	 * Enlève l'instance transmise en argument de la liste des entités représentées.
 	 * \param		Instance à enlever.
 	 */
 	virtual void removeEntity(Mgx3D::Utils::Entity &entity);
 
 	/**
-	 * Enlève les instances transmises en argument de la liste des entités
-	 * représentées.
+	 * Enlève les instances transmises en argument de la liste des entités représentées.
 	 * \param		Instances à enlever.
 	 * \param		Type d'entités
 	 */
-	virtual void removeEntities(
-			const std::vector<Mgx3D::Utils::Entity *> &entities,
-			Mgx3D::Utils::DisplayRepresentation::display_type type);
+	virtual void removeEntities(const std::vector<Mgx3D::Utils::Entity *> &entities, Mgx3D::Utils::DisplayRepresentation::display_type type);
 
 	/**
 	 * \return		La représentation associée à l'entité transmise en argument.
@@ -134,30 +120,23 @@ public :
 	 * \see			isDisplayed
 	 */
 	virtual Utils::GraphicalEntityRepresentation *getRepresentation(Mgx3D::Utils::Entity &e);
-
 	virtual const Utils::GraphicalEntityRepresentation *getRepresentation(const Mgx3D::Utils::Entity &e) const;
 
 	/**
-	 * Affiche ou masque, selon la valeur de <I>show</I>, la représentation de
-	 * l'entité transmise en argument.
+	 * Affiche ou masque, selon la valeur de <I>show</I>, la représentation de l'entité transmise en argument.
 	 * \param		Entité à représenter
-	 * \param		<I>true</I> s'il faut représenter l'entité, <I>false</I>
-	 *				dans le cas contraire.
-	 * \param		Masque d'affichage de l'entité (cf. 
-	 *				<I>GraphicalEntityRepresentation::CURVES</I> et autres.
+	 * \param		<I>true</I> s'il faut représenter l'entité, <I>false</I> dans le cas contraire.
+	 * \param		Masque d'affichage de l'entité (cf.  <I>GraphicalEntityRepresentation::CURVES</I> et autres).
 	 * \see			hasDisplayedRepresentation
 	 * \see			isDisplayed
 	 */
 	virtual void displayRepresentation(Mgx3D::Utils::Entity &entity, bool show, unsigned long mask);
 
 	/**
-	 * Affiche ou masque, selon la valeur de <I>show</I>, les représentations
-	 * des entités transmises en argument.
+	 * Affiche ou masque, selon la valeur de <I>show</I>, les représentations des entités transmises en argument.
 	 * \param		Entités à représenter
-	 * \param		<I>true</I> s'il faut représenter les entités, <I>false</I>
-	 *				dans le cas contraire.
-	 * \param		Masque d'affichage des entités (cf. 
-	 *				<I>GraphicalEntityRepresentation::CURVES</I> et autres.
+	 * \param		<I>true</I> s'il faut représenter les entités, <I>false</I> 	dans le cas contraire.
+	 * \param		Masque d'affichage des entités (cf. <I>GraphicalEntityRepresentation::CURVES</I> et autres).
 	 * \param		Type d'entités
 	 * \see			hasDisplayedRepresentation
 	 * \see			isDisplayed
@@ -168,22 +147,17 @@ public :
 			Mgx3D::Utils::DisplayRepresentation::display_type type);
 
 	/**
-	 * Affiche ou masque, selon la valeur de <I>show</I>, les représentations
-	 * des entités des groupes transmis en argument.
+	 * Affiche ou masque, selon la valeur de <I>show</I>, les représentations des entités des groupes transmis en argument.
 	 * \param		Groupes d'entités à représenter
-	 * \param		<I>true</I> s'il faut représenter les entités, <I>false</I>
-	 *				dans le cas contraire.
+	 * \param		<I>true</I> s'il faut représenter les entités, <I>false</I> dans le cas contraire.
 	 * \see			displayTypes
 	 * \see			updateDisplayedGroupsEntities
 	 */
-	virtual void displayRepresentations(
-			const std::vector<Mgx3D::Group::GroupEntity *> &groups, bool show);
+	virtual void displayRepresentations(const std::vector<Mgx3D::Group::GroupEntity *> &groups, bool show);
 
 	/**
-	 * Affiche ou masque, selon la valeur de <I>show</I>, les représentations
-	 * des entités sélectionnées
-	 * \param		<I>true</I> s'il faut représenter les entités, <I>false</I>
-	 *				dans le cas contraire.
+	 * Affiche ou masque, selon la valeur de <I>show</I>, les représentations des entités sélectionnées
+	 * \param		<I>true</I> s'il faut représenter les entités, <I>false</I> dans le cas contraire.
 	 * \see			hasDisplayedRepresentation
 	 * \see			isDisplayed
 	 */
@@ -196,10 +170,8 @@ public :
 	 virtual Mgx3D::Utils::FilterEntity::objectType displayedTypes ( ) const;
 
 	/**
-	 * Actualise la représentation des groupes de données transmis en arguments
-	 * avec le nouveau filtre transmis en argument.
-	 * <B>Fonctionne avec la méthode <I>displayRepresentations</I> prenant en
-	 * argument des instances de la classe <I>GroupEntity</I>.</B>
+	 * Actualise la représentation des groupes de données transmis en arguments avec le nouveau filtre transmis en argument.
+	 * <B>Fonctionne avec la méthode <I>displayRepresentations</I> prenant en argument des instances de la classe <I>GroupEntity</I>.</B>
 	 * \param		Nouveau filtre sur les types d'entités affichés à appliquer.
 	 * \see			displayRepresentations
 	 * \see			updateDisplayedGroupsEntities
@@ -211,11 +183,9 @@ public :
 	 * Actualise la représentation de l'entité tranmise en argument.
 	 * \param		Entité dont on modifie la représentation
 	 * \param		Nouveau masque de représentation
-	 * \param		true s'il faut recalculer sa représentation quoi qu'il en
-	 *				coûte (ex : modification du shrink factor)
+	 * \param		true s'il faut recalculer sa représentation quoi qu'il en coûte (ex : modification du shrink factor)
 	 */
-	virtual void updateRepresentation(
-			Mgx3D::Utils::Entity &entity, unsigned long mask, bool updateRep);
+	virtual void updateRepresentation(Mgx3D::Utils::Entity &entity, unsigned long mask, bool updateRep);
 
 	/**
 	 * Actualise la représentation de l'entité tranmise en argument.
@@ -224,21 +194,18 @@ public :
 	virtual void updateRepresentation(Mgx3D::Utils::Entity &entity);
 
 	/**
-	 * Force la réactualisation de toutes les représentations des entités
-	 * affichées.
+	 * Force la réactualisation de toutes les représentations des entités affichées.
 	 */
 	virtual void updateRepresentations();
 
 	/**
-	 * \return		<I>true</I> si l'entité transmise en argument est affichée,
-	 *				<I>false</I> dans le cas contraire.
+	 * \return		<I>true</I> si l'entité transmise en argument est affichée, <I>false</I> dans le cas contraire.
 	 * \see			displayRepresentation
 	 */
 	virtual bool isDisplayed(const Mgx3D::Utils::Entity &entity) const;
 
 	/**
-	 * \return		<I>true</I> si des représentations sont affichées,
-	 *				<I>false</I> dans le cas contraire.
+	 * \return		<I>true</I> si des représentations sont affichées, <I>false</I> dans le cas contraire.
 	 * \see			displayRepresentation
 	 * \see			isDisplayed
 	 */
@@ -251,28 +218,23 @@ public :
 	virtual std::vector<Mgx3D::Utils::Entity *> getDisplayedEntities();
 
 	/**
-	 * Recherche parmi les entités représentées celles dont les valeurs aux
-	 * noeuds ou aux mailles sont affichées. En retour, la liste des définitions
+	 * Recherche parmi les entités représentées celles dont les valeurs aux noeuds ou aux mailles sont affichées. En retour, la liste des définitions
 	 * de table de couleurs rencontrées.
 	 * \warning		Ne fait rien par défaut, méthode à surcharger.
 	 */
 	virtual void getDisplayedValues(std::vector <ColorTableDefinition> &definitions);
 
 	/**
-	 * Passe ou quitte le mode d'utilisation des propriétés d'affichage
-	 * global, partagées par les entités, et utilisées pour initialiser les
+	 * Passe ou quitte le mode d'utilisation des propriétés d'affichage global, partagées par les entités, et utilisées pour initialiser les
 	 * propriétés d'affichage individuelles.
 	 */
 	virtual void useGlobalDisplayProperties(bool global);
-
 	virtual bool useGlobalDisplayProperties() const;
 
 	/**
-	 * Passe ou quitte le mode d'utilisation de la couleur des entités
-	 * géométriques associées pour représenter les entités topologiques.
+	 * Passe ou quitte le mode d'utilisation de la couleur des entités géométriques associées pour représenter les entités topologiques.
 	 */
 	virtual void topoUseGeomColor(bool useGeomColor);
-
 	virtual bool topoUseGeomColor() const;
 
 	//@}	// Les entités représentées.
@@ -286,14 +248,12 @@ public :
 	typedef void *RepresentationID;
 
 	/**
-	 * Affiche/masque la représentation dont l'identifiant est tranmis en
-	 * argument.
+	 * Affiche/masque la représentation dont l'identifiant est tranmis en argument.
 	 */
 	virtual void displayRepresentation(RepresentationID id, bool show);
 
 	/**
-	 * Gère le <I>previewBegin</I>/<I>previewEnd</I> d'une commande. Lors de sa
-	 * destruction appelle <I>previewEnd</I> de la commande puis affiche les
+	 * Gère le <I>previewBegin</I>/<I>previewEnd</I> d'une commande. Lors de sa destruction appelle <I>previewEnd</I> de la commande puis affiche les
 	 * représentations annexes recensées.
 	 */
 	class CommandPreviewMgr
@@ -305,21 +265,16 @@ public :
 		 * \param	Gestionnaire de rendu associé
 		 * \param	Appelle <I>command.previewBegin ( )</I> si <I>true</I>.
 		 */
-		CommandPreviewMgr(
-				Mgx3D::Internal::CommandInternal &command,
-				Mgx3D::QtComponents::RenderingManager &renderingManager,
-				bool begin);
+		CommandPreviewMgr(Mgx3D::Internal::CommandInternal &command, Mgx3D::QtComponents::RenderingManager &renderingManager, bool begin);
 
 		/**
-		 * Appelle <I>getCommand ( ).previewEnd ( )</I> puis affiche les
-		 * représentations recensées.
+		 * Appelle <I>getCommand ( ).previewEnd ( )</I> puis affiche les représentations recensées.
 		 * \see		registerRepresentationID
 		 */
 		virtual ~CommandPreviewMgr();
 
 		/**
-		 * Enregistre l'identifiant transmis en argument pour affichage lors de
-		 * la destruction de ce gestionnaire d'apperçu.
+		 * Enregistre l'identifiant transmis en argument pour affichage lors de la destruction de ce gestionnaire d'apperçu.
 		 */
 		virtual void registerRepresentationID(
 				Mgx3D::QtComponents::RenderingManager::RepresentationID id);
@@ -351,7 +306,6 @@ public :
 	private :
 
 		CommandPreviewMgr(const CommandPreviewMgr &);
-
 		CommandPreviewMgr &operator=(const CommandPreviewMgr &);
 
 		Mgx3D::Internal::CommandInternal      *_command;
@@ -363,75 +317,58 @@ public :
 	 * Affiche un segment.
 	 * \param		Extrémités du segment.
 	 * \param		Attributs de représentation.
-	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>,
-	 * 				<I>false</I> s'il ne faut pas.
+	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>, <I>false</I> s'il ne faut pas.
 	 * \return		Identifiant de la représentation du segment créée.
-	 * \warning		Un identifiant nul est retourné en cas d'échec de la
-	 *				création de la représentation.
+	 * \warning		Un identifiant nul est retourné en cas d'échec de la création de la représentation.
 	 * \see			destroyRepresentation
 	 */
 	virtual RepresentationID createSegment(
-			const Mgx3D::Utils::Math::Point &p1,
-			const Mgx3D::Utils::Math::Point &p2,
-			const Mgx3D::Utils::DisplayProperties &properties, bool display);
+			const Mgx3D::Utils::Math::Point &p1, const Mgx3D::Utils::Math::Point &p2, const Mgx3D::Utils::DisplayProperties &properties, bool display);
 
 	/**
 	 * Affiche un vecteur.
 	 * \param		Extrémités du vecteur.
 	 * \param		Attributs de représentation.
-	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>,
-	 * 				<I>false</I> s'il ne faut pas.
+	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>, <I>false</I> s'il ne faut pas.
 	 * \return		Identifiant de la représentation du vecteur créée.
-	 * \warning		Un identifiant nul est retourné en cas d'échec de la
-	 *				création de la représentation.
+	 * \warning		Un identifiant nul est retourné en cas d'échec de la création de la représentation.
 	 * \see			destroyRepresentation
 	 */
 	virtual RepresentationID createVector(
-			const Mgx3D::Utils::Math::Point &p1,
-			const Mgx3D::Utils::Math::Point &p2,
-			const Mgx3D::Utils::DisplayProperties &properties, bool display);
+			const Mgx3D::Utils::Math::Point &p1, const Mgx3D::Utils::Math::Point &p2, const Mgx3D::Utils::DisplayProperties &properties, bool display);
 
 	/**
 	 * Affiche un axe de rotation.
 	 * \param		Extrémités de l'axe de rotation.
 	 * \param		Attributs de représentation.
-	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>,
-	 * 				<I>false</I> s'il ne faut pas.
+	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>, <I>false</I> s'il ne faut pas.
 	 * \return		Identifiant de la représentation de l'axe créé.
 	 * \warning		Un identifiant nul est retourné en cas d'échec de la
 	 *				création de la représentation.
 	 * \see			destroyRepresentation
 	 */
 	virtual RepresentationID createRotationAxe(
-			const Mgx3D::Utils::Math::Point &p1,
-			const Mgx3D::Utils::Math::Point &p2,
-			const Mgx3D::Utils::DisplayProperties &properties, bool display);
+			const Mgx3D::Utils::Math::Point &p1, const Mgx3D::Utils::Math::Point &p2, const Mgx3D::Utils::DisplayProperties &properties, bool display);
 
 	/**
 	 * Affiche une boite sous forme filaire.
 	 * \param		2 points opposés de la boite.
 	 * \param		Attributs de représentation.
-	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>,
-	 * 				<I>false</I> s'il ne faut pas.
+	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>, <I>false</I> s'il ne faut pas.
 	 * \return		Identifiant de la représentation de la boite créée.
-	 * \warning		Un identifiant nul est retourné en cas d'échec de la
-	 *				création de la représentation.
+	 * \warning		Un identifiant nul est retourné en cas d'échec de la création de la représentation.
 	 * \see			destroyRepresentation
 	 */
 	virtual RepresentationID createOutlineBox(
-			const Mgx3D::Utils::Math::Point &p1,
-			const Mgx3D::Utils::Math::Point &p2,
-			const Mgx3D::Utils::DisplayProperties &properties, bool display);
+			const Mgx3D::Utils::Math::Point &p1, const Mgx3D::Utils::Math::Point &p2, const Mgx3D::Utils::DisplayProperties &properties, bool display);
 
 	/**
 	 * Affiche une représentation du nuage de points transmis en argument.
 	 * \param		Nuage de points à représenter.
 	 * \param		Attributs de représentation.
-	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>,
-	 * 				<I>false</I> s'il ne faut pas.
+	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>, <I>false</I> s'il ne faut pas.
 	 * \return		Identifiant de la représentation du nuage de points créée.
-	 * \warning		Un identifiant nul est retourné en cas d'échec de la
-	 *				création de la représentation.
+	 * \warning		Un identifiant nul est retourné en cas d'échec de la création de la représentation.
 	 * \see			createSegmentsWireRepresentation
 	 * \see			destroyRepresentation
 	 */
@@ -445,11 +382,9 @@ public :
 	 * \param		Noeuds des segments.
 	 * \param		Triangles à représenter.
 	 * \param		Attributs de représentation.
-	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>,
-	 * 				<I>false</I> s'il ne faut pas.
+	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>, <I>false</I> s'il ne faut pas.
 	 * \return		Identifiant de la représentation filaire créée.
-	 * \warning		Un identifiant nul est retourné en cas d'échec de la
-	 *				création de la représentation.
+	 * \warning		Un identifiant nul est retourné en cas d'échec de la création de la représentation.
 	 * \see			createCloudRepresentation
 	 * \see			destroyRepresentation
 	 */
@@ -464,25 +399,19 @@ public :
 	 * \param		Emplacement du texte à afficher
 	 * \param		Nombre à afficher textuellement
 	 * \param		Attributs de représentation.
-	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>,
-	 * 				<I>false</I> s'il ne faut pas.
+	 * \param		<I>true</I> s'il faut l'ajouter au <I>renderer</I>, <I>false</I> s'il ne faut pas.
 	 * \return		Identifiant de la représentation filaire créée.
-	 * \warning		Un identifiant nul est retourné en cas d'échec de la
-	 *				création de la représentation.
+	 * \warning		Un identifiant nul est retourné en cas d'échec de la création de la représentation.
 	 * \see			destroyRepresentation
 	 */
 	virtual RenderingManager::RepresentationID createTextRepresentation(
-			const Mgx3D::Utils::Math::Point &position,
-			size_t number, const Mgx3D::Utils::DisplayProperties &properties,
-			bool display);
+			const Mgx3D::Utils::Math::Point &position, size_t number, const Mgx3D::Utils::DisplayProperties &properties, bool display);
 
 	/**
 	 * Détruit la représentation dont l'identifiant est transmis en argument.
-	 * \param		<I>true</I> si la représentation ne doit préalablement plus
-	 * 				être affichée.
+	 * \param		<I>true</I> si la représentation ne doit préalablement plus être affichée.
 	 */
-	virtual void destroyRepresentation(
-			RenderingManager::RepresentationID, bool hide);
+	virtual void destroyRepresentation(RenderingManager::RepresentationID, bool hide);
 
 	//@}	// Les représentations annexes.
 
@@ -514,7 +443,6 @@ public :
 		 * Constructeur de copie, opérateur = : RAS.
 		 */
 		ColorTableDefinition(const ColorTableDefinition &);
-
 		ColorTableDefinition &operator=(const ColorTableDefinition &);
 
 		/**
@@ -526,7 +454,6 @@ public :
 		 * Opérateurs de comparaison. RAS.
 		 */
 		bool operator==(const ColorTableDefinition &) const;
-
 		bool operator!=(const ColorTableDefinition &) const;
 
 		/**
@@ -535,14 +462,12 @@ public :
 		void extent(const ColorTableDefinition &def);
 
 		/**
-		 * Actualise le domaine de définition de la table en y ajoutant celui
-		 * transmis en argument.
+		 * Actualise le domaine de définition de la table en y ajoutant celui transmis en argument.
 		 */
 		void extentDomain(double min, double max);
 
 		/**
-		 * \return		<I>true</I> si la table transmise en argument est
-		 * 				comparable (traite de la même valeur).
+		 * \return		<I>true</I> si la table transmise en argument est comparable (traite de la même valeur).
 		 */
 		bool comparable(const ColorTableDefinition &);
 
@@ -557,8 +482,7 @@ public :
 	};    // struct ColorTableDefinition
 
 	/**
-	 * Représente une table de couleur affichée dans la vue graphique.
-	 * Classe a spécialiser avec une API 3D.
+	 * Représente une table de couleur affichée dans la vue graphique. Classe a spécialiser avec une API 3D.
 	 */
 	class ColorTable
 	{
@@ -671,7 +595,6 @@ public :
 		 * \return	Le gestionnaire d'affichage associé.
 		 */
 		virtual const RenderingManager &getRenderingManager() const;
-
 		virtual RenderingManager &getRenderingManager();
 
 
@@ -681,7 +604,6 @@ public :
 		 * Constructeur de copie, opérateur = : interdits.
 		 */
 		ColorTable(const ColorTable &);
-
 		ColorTable &operator=(const ColorTable &);
 
 		RenderingManager *_renderingManager;
@@ -690,9 +612,7 @@ public :
 
 
 	/**
-	 * \return	Une table de couleur associée à ce gestionnaire de
-	 * 			rendu et représentant la valeur dont le nom est transmis en
-	 * 			argument. Créé la table si nécessaire.
+	 * \return	Une table de couleur associée à ce gestionnaire de rendu et représentant la valeur dont le nom est transmis en argument. Créé la table si nécessaire.
 	 * \warning	Méthode à surcharger, lève une exception par défaut.
 	 */
 	virtual ColorTable *getColorTable(const ColorTableDefinition &);
@@ -724,8 +644,7 @@ public :
 	//@{
 
 	/**
- 	 * Classe de base d'observateur d'interacteur. Définit les callbacks
- 	 * appelables, façon <I>Adapter</I>, c.a.d. qu'ici ils ne font rien et
+ 	 * Classe de base d'observateur d'interacteur. Définit les callbacks appelables, façon <I>Adapter</I>, c.a.d. qu'ici ils ne font rien et
  	 * qu'ils sont à surcharger au cas par cas.
  	 *
  	 * \see		Interactor
@@ -742,13 +661,11 @@ public :
 
 		/**
 		 * Les callbacks possibles.
-		 * \warning		Ces méthodes ne font rien (type <I>adapter</I> et sont
-		 *				donc à surcharger si nécessaire.
+		 * \warning		Ces méthodes ne font rien (type <I>adapter</I> et sont donc à surcharger si nécessaire.
 		 */
 		virtual void pointModifiedCallback(Mgx3D::Utils::Math::Point point);
 
-		virtual void planeModifiedCallback(
-				Mgx3D::Utils::Math::Point point, Mgx3D::Utils::Math::Vector normal);
+		virtual void planeModifiedCallback(Mgx3D::Utils::Math::Point point, Mgx3D::Utils::Math::Vector normal);
 
 
 	protected :
@@ -765,19 +682,15 @@ public :
 		 * Constructeur de copie et opérateur = : interdit.
 		 */
 		InteractorObserver(const InteractorObserver &);
-
 		InteractorObserver &operator=(const InteractorObserver &);
 	};    // class InteractorObserver
 
 
 	/**
-	 * <P>Classe de base définissant un interacteur. Un interacteur permet à
-	 * l'utilisateur de définir interactivement dans la vue 3D un élément
+	 * <P>Classe de base définissant un interacteur. Un interacteur permet à l'utilisateur de définir interactivement dans la vue 3D un élément
 	 * géométrique (plan, boite, sphère, ...).</P>
-	 * <P>Des callbacks permettent en retour d'actualiser l'IHM (panneau de
-	 * définition du paramétrage de la forme géométrique par exemple). Ces
-	 * callbacks sont adressés à des instances de la classe
-	 * <I>InteractorObserver</I>.
+	 * <P>Des callbacks permettent en retour d'actualiser l'IHM (panneau de définition du paramétrage de la forme géométrique par exemple). Ces
+	 * callbacks sont adressés à des instances de la classe <I>InteractorObserver</I>.
 	 * </P>
 	 */
 	class Interactor
@@ -803,11 +716,8 @@ public :
 		virtual RenderingManager::InteractorObserver *getObserver();
 
 		/**
-		 * Notifie l'éventuel observateur des changements opérés par
-		 * l'utilisateur avec l'interacteur en invoquant la méthode
-		 * <I>callback</I> adaptée.
-		 * \warning		Cette méthode ne fait rien, elle est à surcharger dans
-		 * 				les classes dérivées.
+		 * Notifie l'éventuel observateur des changements opérés par l'utilisateur avec l'interacteur en invoquant la méthode <I>callback</I> adaptée.
+		 * \warning		Cette méthode ne fait rien, elle est à surcharger dans les classes dérivées.
 		 */
 		virtual void notifyObserverForModifications();
 
@@ -818,18 +728,14 @@ public :
 		 * Constructeur de copie et opérateur = : interdits.
 		 */
 		Interactor(const Interactor &);
-
 		Interactor &operator=(const Interactor &);
-
 		RenderingManager::InteractorObserver *_observer;
 	};    // class Interactor
 
 	/**
 	 * <P>Interacteur de base permettant la définition d'un point.</P>
-	 * <P>Cette classe est à spécialiser. Lors des modifications du
-	 * paramétrage du point les classes dérivées doivent informer l'éventuel
-	 * observateur des modfications, par exemple en appelant la méthode
-	 * <I>notifyObserverForModifications</I>.
+	 * <P>Cette classe est à spécialiser. Lors des modifications du paramétrage du point les classes dérivées doivent informer l'éventuel
+	 * observateur des modfications, par exemple en appelant la méthode <I>notifyObserverForModifications</I>.
 	 * </P>
 	 */
 	class PointInteractor : public Interactor
@@ -876,9 +782,7 @@ public :
 		PointInteractor(RenderingManager::InteractorObserver *observer);
 
 		/**
-		 * Notifie l'éventuel observateur des changements opérés par
-		 * l'utilisateur avec l'interacteur en invoquant sa méthode
-		 * <I>pointModifiedCallback</I>.
+		 * Notifie l'éventuel observateur des changements opérés par l'utilisateur avec l'interacteur en invoquant sa méthode <I>pointModifiedCallback</I>.
 		 */
 		virtual void notifyObserverForModifications();
 
@@ -889,31 +793,23 @@ public :
 		 * Constructeur de copie et opérateur = : interdits.
 		 */
 		PointInteractor(const PointInteractor &);
-
 		PointInteractor &operator=(const PointInteractor &);
 	};    // class PointInteractor
 
 	/**
 	 * \param		Point proposé par défaut.
 	 * \param		Dimensions de la boite englobante de l'interacteur
-	 * \param		Eventuel observateur étant notifié de toute modification
-	 *				effectuée à l'aide de l'interacteur.
-	 * \return		Pointeur sur l'interacteur permettant de saisir les
-	 *				paramètres de définition du point, ou 0 en cas d'échec de
-	 *				la création de l'interacteur.
+	 * \param		Eventuel observateur étant notifié de toute modification effectuée à l'aide de l'interacteur.
+	 * \return		Pointeur sur l'interacteur permettant de saisir les paramètres de définition du point, ou 0 en cas d'échec de la création de l'interacteur.
 	 * \see			destroyInteractor
 	 */
 	virtual RenderingManager::PointInteractor *createPointInteractor(
-			Mgx3D::Utils::Math::Point point, double dx, double dy, double dz,
-			RenderingManager::InteractorObserver *observer);
+				Mgx3D::Utils::Math::Point point, double dx, double dy, double dz, RenderingManager::InteractorObserver *observer);
 
 	/**
-	 * <P>Interacteur de base permettant la définition contrainte d'un point contraint
-	 * dans l'espace.</P>
-	 * <P>Cette classe est à spécialiser. Lors des modifications du
-	 * paramétrage du point les classes dérivées doivent informer l'éventuel
-	 * observateur des modfications, par exemple en appelant la méthode
-	 * <I>notifyObserverForModifications</I>.
+	 * <P>Interacteur de base permettant la définition contrainte d'un point contraint dans l'espace.</P>
+	 * <P>Cette classe est à spécialiser. Lors des modifications du paramétrage du point les classes dérivées doivent informer l'éventuel
+	 * observateur des modfications, par exemple en appelant la méthode <I>notifyObserverForModifications</I>.
 	 * </P>
 	 */
 	class ConstrainedPointInteractor : public Interactor
@@ -941,8 +837,7 @@ public :
 
 		/**
 		 * \param		La nouvelle contrainte de positionnement.
-		 * \param		degré de raffinement attendu (ex : 10 pour x10 par
-		 * 			rapport à la représentation par défaut, ...).
+		 * \param		degré de raffinement attendu (ex : 10 pour x10 par rapport à la représentation par défaut, ...).
 		 */
 		virtual void setConstraint(Utils::Entity *constraint, size_t factor);
 
@@ -955,9 +850,7 @@ public :
 		ConstrainedPointInteractor(RenderingManager::InteractorObserver *observer);
 
 		/**
-		 * Notifie l'éventuel observateur des changements opérés par
-		 * l'utilisateur avec l'interacteur en invoquant sa méthode
-		 * <I>pointModifiedCallback</I>.
+		 * Notifie l'éventuel observateur des changements opérés par l'utilisateur avec l'interacteur en invoquant sa méthode <I>pointModifiedCallback</I>.
 		 */
 		virtual void notifyObserverForModifications();
 
@@ -968,20 +861,15 @@ public :
 		 * Constructeur de copie et opérateur = : interdits.
 		 */
 		ConstrainedPointInteractor(const ConstrainedPointInteractor &);
-
 		ConstrainedPointInteractor &operator=(const ConstrainedPointInteractor &);
 	};    // class ConstrainedPointInteractor
 
 	/**
 	 * \param		Point proposé par défaut.
 	 * \param		Contrainte spatiale exercée pour définir la position du point.
-	 * \param		degré de raffinement attendu (ex : 10 pour x10 par
-	 * 			rapport à la représentation par défaut, ...).
-	 * \param		Eventuel observateur étant notifié de toute modification
-	 *			effectuée à l'aide de l'interacteur.
-	 * \return		Pointeur sur l'interacteur permettant de saisir les
-	 *			paramètres de définition du point, ou 0 en cas d'échec de
-	 *			la création de l'interacteur.
+	 * \param		degré de raffinement attendu (ex : 10 pour x10 par rapport à la représentation par défaut, ...).
+	 * \param		Eventuel observateur étant notifié de toute modification effectuée à l'aide de l'interacteur.
+	 * \return		Pointeur sur l'interacteur permettant de saisir les paramètres de définition du point, ou 0 en cas d'échec de la création de l'interacteur.
 	 * \see			destroyInteractor
 	 */
 	virtual RenderingManager::ConstrainedPointInteractor *createConstrainedPointInteractor(
@@ -990,10 +878,8 @@ public :
 
 	/**
 	 * <P>Interacteur de base permettant la définition d'un plan.</P>
-	 * <P>Cette classe est à spécialiser. Lors des modifications du
-	 * paramétrage du plan les classes dérivées doivent informer l'éventuel
-	 * observateur des modfications, par exemple en appelant la méthode
-	 * <I>notifyObserverForModifications</I>.
+	 * <P>Cette classe est à spécialiser. Lors des modifications du paramétrage du plan les classes dérivées doivent informer l'éventuel
+	 * observateur des modfications, par exemple en appelant la méthode <I>notifyObserverForModifications</I>.
 	 * </P>
 	 */
 	class PlaneInteractor : public Interactor
@@ -1038,9 +924,7 @@ public :
 		PlaneInteractor(RenderingManager::InteractorObserver *observer);
 
 		/**
-		 * Notifie l'éventuel observateur des changements opérés par
-		 * l'utilisateur avec l'interacteur en invoquant sa méthode
-		 * <I>planeModifiedCallback</I>.
+		 * Notifie l'éventuel observateur des changements opérés par l'utilisateur avec l'interacteur en invoquant sa méthode <I>planeModifiedCallback</I>.
 		 */
 		virtual void notifyObserverForModifications();
 
@@ -1051,18 +935,14 @@ public :
 		 * Constructeur de copie et opérateur = : interdits.
 		 */
 		PlaneInteractor(const PlaneInteractor &);
-
 		PlaneInteractor &operator=(const PlaneInteractor &);
 	};    // class PlaneInteractor
 
 	/**
 	 * \param		Point du plan et vecteur normal au plan proposés par défaut.
 	 * \param		Boite englobante de l'interacteur
-	 * \param		Eventuel observateur étant notifié de toute modification
-	 *				effectuée à l'aide de l'interacteur.
-	 * \return		Pointeur sur l'interacteur permettant de saisir les
-	 *				paramètres de définition d'un plan, ou 0 en cas d'échec de
-	 *				la création de l'interacteur.
+	 * \param		Eventuel observateur étant notifié de toute modification effectuée à l'aide de l'interacteur.
+	 * \return		Pointeur sur l'interacteur permettant de saisir les paramètres de définition d'un plan, ou 0 en cas d'échec de la création de l'interacteur.
 	 * \see			destroyInteractor
 	 */
 	virtual RenderingManager::PlaneInteractor *createPlaneInteractor(
@@ -1085,8 +965,7 @@ public :
 	//@{
 
 	/**
-	 * \param		Le gestionnaire de sélection à associer. Se référence
-	 *				auprès de lui pour être informé des modifications de la
+	 * \param		Le gestionnaire de sélection à associer. Se référenceauprès de lui pour être informé des modifications de la
 	 *				sélection.
 	 * \see			getSelectionManager
 	 * \see			entitiesAddedToSelection
@@ -1099,20 +978,17 @@ public :
 	 * \see			setSelectionManager
 	 */
 	virtual Utils::SelectionManagerIfc *getSelectionManager();
-
 	virtual const Utils::SelectionManagerIfc *getSelectionManager() const;
 
 	/**
 	 * Ajoute les entités tranmises en argument de la sélection.
 	 */
-	virtual void entitiesAddedToSelection(
-			const std::vector<Mgx3D::Utils::Entity *> &entities);
+	virtual void entitiesAddedToSelection(const std::vector<Mgx3D::Utils::Entity *> &entities);
 
 	/**
 	 * Enlève les entités tranmises en argument de la sélection.
 	 * \param	Entités enlevées de la sélection
-	 * \param	<I>true</I> s'il s'agit d'un <I>clearSelection</I>, à des fins
-	 * 			d'optimisation.
+	 * \param	<I>true</I> s'il s'agit d'un <I>clearSelection</I>, à des fins d'optimisation.
 	 */
 	virtual void entitiesRemovedFromSelection(
 			const std::vector<Mgx3D::Utils::Entity *> &entities, bool clear);
@@ -1132,10 +1008,8 @@ public :
 	friend class DisplayLocker;
 
 	/**
-	 * Classe dont la finalité est de bloquer les opérations d'affichage
-	 * d'une fenêtre graphique durant la durée de vie de l'instance, par
-	 * exemple durant une méthode callback de créations de nombreuses
-	 * entités. Grâce à cette instance toutes les opérations de tracés
+	 * Classe dont la finalité est de bloquer les opérations d'affichage d'une fenêtre graphique durant la durée de vie de l'instance, par
+	 * exemple durant une méthode callback de créations de nombreuses entités. Grâce à cette instance toutes les opérations de tracés
 	 * graphiques type <I>forceRender</I> sont inhibées.
 	 */
 	class DisplayLocker
@@ -1143,17 +1017,13 @@ public :
 	public :
 
 		/**
-		 * @param		Fenêtre dont les opérations graphiques sont inhibées
-		 *				durant la durée de vie de l'instance créée.
-		 * @param		Si <I>true</I> appelle <I>forceRender</I> sur
-		 *				la fenêtre graphique lors de la destruction de
-		 *				cette instance.
+		 * @param		Fenêtre dont les opérations graphiques sont inhibées durant la durée de vie de l'instance créée.
+		 * @param		Si <I>true</I> appelle <I>forceRender</I> sur la fenêtre graphique lors de la destruction de cette instance.
 		 */
 		DisplayLocker(RenderingManager &w, bool forceRenderAtEnd = true);
 
 		/**
-		 * Appelle éventuellement <I>forceRender</I> sur la fenêtre
-		 * graphique associée (cf. constructeur).
+		 * Appelle éventuellement <I>forceRender</I> sur la fenêtre graphique associée (cf. constructeur).
 		 */
 		~DisplayLocker();
 
@@ -1161,7 +1031,6 @@ public :
 	private :
 
 		DisplayLocker(const DisplayLocker &);
-
 		DisplayLocker &operator=(const DisplayLocker &);
 
 		RenderingManager *_3dwidget;
@@ -1172,37 +1041,28 @@ public :
 	 * En retour, la boite englobante de ce qui est affiché.
 	 * \warning		<B>Ne fait rien par défaut, méthode à surcharger.</B>
 	 */
-	virtual void getBoundingBox(
-			double &xmin, double &xmax, double &ymin, double &ymax,
-			double &zmin, double &zmax);
+	virtual void getBoundingBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax);
 
 	/**
-	 * <P>En retour, des marges à appliquer à une boite englobante d'entité
-	 * affiché (ex : <I>highlighting</I>, ...).</P>
-	 * <P>Les marges retournées sont un pourcentage des échelles correspondant
-	 * aux 3 dimensions de la boite englobante de ce qui est visible. Ex :
-	 * si la boite englobante est (0.1, 0.3, 10.2, 45.3, 10, 34), les échelles
-	 * sont 1, 100, 100, et c'est percent*échelle pour chaque axe qui est
-	 * retourné.
+	 * <P>En retour, des marges à appliquer à une boite englobante d'entité affiché (ex : <I>highlighting</I>, ...).</P>
+	 * <P>Les marges retournées sont un pourcentage des échelles correspondant aux 3 dimensions de la boite englobante de ce qui est visible. Ex :
+	 * si la boite englobante est (0.1, 0.3, 10.2, 45.3, 10, 34), les échelles sont 1, 100, 100, et c'est percent*échelle pour chaque axe qui est retourné.
 	 * </P>
 	 * \see			getBoundingBox
 	 * \see			QtMgx3DApplication::_marginBoundingBoxPercentage
 	 */
-	virtual void getBoundingBoxMargins(
-			double &xmargin, double &ymargin, double &zmargin);
+	virtual void getBoundingBoxMargins(double &xmargin, double &ymargin, double &zmargin);
 
 	/**
 	 * \return	La couleur de fond de la fenêtre graphique.
 	 */
 	virtual void getBackground(double &red, double &green, double &blue) const;
-
 	virtual TkUtil::Color getBackground() const;
 
 	/**
 	 * Nouvelle couleur de fond de la fenêtre graphique.
 	 */
 	virtual void setBackground(double red, double green, double blue);
-
 	virtual void setBackground(const TkUtil::Color &background);
 
 	/**
@@ -1226,8 +1086,7 @@ public :
 	virtual void setAxisProperties(const LandmarkAttributes &);
 
 	/**
-	 * Faut-il afficher ou non le point focal (matérialisé par une croix,
-	 * équivalent de l'option <I>show center</I>) de <I>ParaView</I>.
+	 * Faut-il afficher ou non le point focal (matérialisé par une croix, équivalent de l'option <I>show center</I>) de <I>ParaView</I>.
 	 */
 	virtual void setDisplayFocalPoint(bool display);
 
@@ -1249,9 +1108,7 @@ public :
 	 * \param		Position du point focal (x, y, z)
 	 * \param		Vecteur définissant la direction "haut" de la caméra
 	 */
-	virtual void getViewDefinition(
-			double &x, double &y, double &z, double &fx, double &fy, double &fz,
-			double &upx, double &upy, double &upz);
+	virtual void getViewDefinition(double &x, double &y, double &z, double &fx, double &fy, double &fz, double &upx, double &upy, double &upz);
 
 	/**
 	 * Définir la vue (position observateur/point focal).
@@ -1259,42 +1116,31 @@ public :
 	 * \param		Position du point focal (x, y, z)
 	 * \param		Vecteur définissant la direction "haut" de la caméra
 	 */
-	virtual void defineView(
-			double x, double y, double z, double fx, double fy, double fz,
-			double upx, double upy, double upz);
+	virtual void defineView(double x, double y, double z, double fx, double fy, double fz, double upx, double upy, double upz);
 
 	/**
-	 * Recadre la vue. Cette fonction est à surcharger, elle se contente
-	 *				d'appeler <I>forceRender</I> si <I>render</I> vaut
-	 *				<I>true</I>.
-	 * \param		<I>true</I> s'il faut provoquer un réaffichage,
-	 *				<I>false</I> dans le cas contraire.
+	 * Recadre la vue. Cette fonction est à surcharger, elle se contente d'appeler <I>forceRender</I> si <I>render</I> vaut <I>true</I>.
+	 * \param		<I>true</I> s'il faut provoquer un réaffichage, <I>false</I> dans le cas contraire.
 	 */
 	virtual void resetView(bool render = true);
 
 	/**
 	 * Passage mode de projection perspective <-> parallèle.
-	 * @param		<I>true</I> s'il faut passer en mode de projection
-	 * 				parallèle, <I>false</I> s'il faut passer en mode de
-	 * 				projection perspective.
+	 * @param		<I>true</I> s'il faut passer en mode de projection parallèle, <I>false</I> s'il faut passer en mode de projection perspective.
 	 */
 	virtual void setParallelProjection(bool parallel);
 
 	/**
-	 * Appelé pour ajuster automatiquement la vue à son contenu (ex : le repère
-	 * à ce qui est affiché).
+	 * Appelé pour ajuster automatiquement la vue à son contenu (ex : le repère à ce qui est affiché).
 	 */
 	virtual void updateView();
 
 	/**
-	 * Positionne la vue respectivement dans le plan <I>xOy</I>, <I>xOz</I>,
-	 * <I>yOz</I>.
+	 * Positionne la vue respectivement dans le plan <I>xOy</I>, <I>xOz</I>, <I>yOz</I>.
 	 * \warning		Ne fait rien par défaut, méthode à surcharger.
 	 */
 	virtual void displayxOyViewPlane();
-
 	virtual void displayxOzViewPlane();
-
 	virtual void displayyOzViewPlane();
 
 	/**
@@ -1304,8 +1150,7 @@ public :
 	virtual void resetRoll();
 
 	/**
-	 * Force une opération de rendu.
-	 * Ne fait rien par défaut.
+	 * Force une opération de rendu. Ne fait rien par défaut.
 	 */
 	virtual void forceRender();
 
@@ -1316,18 +1161,14 @@ public :
 	virtual void setFrameRates(double stillRF, double desiredFR);
 
 	/**
-	 * Mécanisme interne à la classe. Appelé lorsqu'une interaction utilisateur
-	 * commence. Propage l'information au serveur pour adapter le
-	 * <I>frame rate</I>.
+	 * Mécanisme interne à la classe. Appelé lorsqu'une interaction utilisateur commence. Propage l'information au serveur pour adapter le <I>frame rate</I>.
 	 * \warning		A surcharger, ne fait rien par défaut.
 	 * \see			endInteractionCallback
 	 */
 	virtual void startInteractionCallback();
 
 	/**
-	 * Mécanisme interne à la classe. Appelé lorsqu'une interaction utilisateur
-	 * s'achève. Propage l'information au serveur pour adapter le
-	 * <I>frame rate</I>.
+	 * Mécanisme interne à la classe. Appelé lorsqu'une interaction utilisateur s'achève. Propage l'information au serveur pour adapter le <I>frame rate</I>.
 	 * \warning		A surcharger, ne fait rien par défaut.
 	 * \see			startInteractionCallback
 	 */
@@ -1365,12 +1206,10 @@ public :
 
 	/**
 	 * \return		Une représentation 3D de l'entité transmise en argument.
-	 *				A spécialiser dans les classes dérivées selon l'API 3D
-	 *				utilisée.
+	 *				A spécialiser dans les classes dérivées selon l'API 3D utilisée.
 	 * \see			getRepresentation
 	 */
-	virtual Utils::GraphicalEntityRepresentation* createRepresentation (
-													Mgx3D::Utils::Entity& e);
+	virtual Utils::GraphicalEntityRepresentation* createRepresentation (Mgx3D::Utils::Entity& e);
 
 	/**
 	 * Affiche ou détruit la représentation 3D transmise en argument.
@@ -1383,9 +1222,7 @@ public :
 	 * \param		Masque d'affichage de l'entité (cf. 
 	 *				<I>GraphicalEntityRepresentation::CURVES</I> et autres.
 	 */
-	virtual void displayRepresentation (
-				Utils::GraphicalEntityRepresentation& representation, bool show,
-				bool forceUpdate, unsigned long mask);
+	virtual void displayRepresentation (Utils::GraphicalEntityRepresentation& representation, bool show, bool forceUpdate, unsigned long mask);
 
 	/**
 	 * Affiche/masque les groupes d'entités transmis en arguments.
@@ -1405,18 +1242,20 @@ public :
 				);
 
 	/**
-	 * \return		<I>true</I> si les opérations d'affichage sont inhibées
-	 *				(optimisation).
-	 * \see			lockDisplay
-	 */
-	virtual bool displayLocked ( ) const;
-
-	/**
-	 * \param		<I>true</I> si les opérations d'affichage sont à inhiber,
-	 *				<I>false</I> dans le cas contraire.
+	 * \param		<I>true</I> si les opérations d'affichage sont à inhiber, <I>false</I> dans le cas contraire.
 	 * \see			displayLocked
 	 */
 	virtual void lockDisplay (bool lock);
+
+
+
+	public	:			// Issue #59
+
+	/**
+	 * \return		<I>true</I> si les opérations d'affichage sont inhibées (optimisation).
+	 * \see			lockDisplay
+	 */
+	virtual bool displayLocked ( ) const;
 
 
 	private :
@@ -1432,8 +1271,7 @@ public :
 	 */
 	bool											_displayLocked;
 
-	/** Si <I>true</I> l'affichage des entités utilise des propriétés
-	 * d'affichage communes. Si <I>false</I> se sont des propriétés
+	/** Si <I>true</I> l'affichage des entités utilise des propriétés d'affichage communes. Si <I>false</I> se sont des propriétés
 	 * individuelles qui sont utilisées.
 	 */
 	bool											_useGlobalDisplayProperties;
@@ -1441,13 +1279,11 @@ public :
 	/** Les types d'entités affichés. */
 	Mgx3D::Utils::FilterEntity::objectType          _displayedTypes;
 
-	/** Si <I>true</I> l'affichage des entités topologiques utilise les
-	 * couleurs des entités géométriques associées.
+	/** Si <I>true</I> l'affichage des entités topologiques utilise les couleurs des entités géométriques associées.
 	 */
 	bool											_topoUseGeomColor;
 
-	/** La valeur de seuillage des données structurées affichées (ne concerne que l'affichage).
-	 * Par défaut -NumericServices::doubleMachInfinity ( ) */
+	/** La valeur de seuillage des données structurées affichées (ne concerne que l'affichage). Par défaut -NumericServices::doubleMachInfinity ( ) */
 	double                                          _structuredDataThreshold;
 };	// class RenderingManager
 
