@@ -577,6 +577,9 @@ vector<Group::GroupEntity*> QtGroupsPanel::getSelectedGroups ( ) const
 
 void QtGroupsPanel::displaySelectedTypes (bool display)
 {
+	if (true == getGraphicalWidget ( )->getRenderingManager ( ).displayLocked ( ))
+		return;	// Issue#59 : cf. QtGroupsPanel::entitiesTypesStateChangeCallback	
+
 	// MAJ IHM (pas de callback de déclenché) :
 	QtEntityTypeItem*	item	= 0;
 	for (vector<QtEntityTypeItem*>::iterator it = _typesItems.begin ( ); _typesItems.end ( ) != it; it++)
@@ -596,6 +599,9 @@ void QtGroupsPanel::displaySelectedTypes (bool display)
 
 void QtGroupsPanel::displaySelectedGroups (bool display)
 {
+	if (true == getGraphicalWidget ( )->getRenderingManager ( ).displayLocked ( ))
+		return;	// Issue#59 : cf. QtGroupsPanel::entitiesTypesStateChangeCallback	
+
 	// MAJ IHM (pas de callback de déclenché) + réalisation traitement :
 	vector<GroupEntity*>			groups;
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
@@ -615,6 +621,9 @@ void QtGroupsPanel::displaySelectedGroups (bool display)
 
 void QtGroupsPanel::displaySelectedGroupsNames (bool display)
 {
+	if (true == getGraphicalWidget ( )->getRenderingManager ( ).displayLocked ( ))
+		return;	// Issue#59 : cf. QtGroupsPanel::entitiesTypesStateChangeCallback
+		
 	// MAJ IHM (pas de callback de déclenché) + réalisation traitement :
 	vector<GroupEntity*>			groups;
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
@@ -685,8 +694,7 @@ void QtGroupsPanel::displaySelectedGroupsNames (bool display)
 void QtGroupsPanel::clearGroupCallback ()
 {
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -719,8 +727,7 @@ void QtGroupsPanel::selectionPolicyModified (void* smp)
 	// Dans cet appel on :
 	// - Annule l'effet de l'appel précédent
 	// - Actualise l'IHM à l'état courant du gestionnaire de sélection.
-	SelectionManagerDimFilter*	smdv	=
-			dynamic_cast<SelectionManagerDimFilter*>(getSelectionManager ( ));
+	SelectionManagerDimFilter*	smdv	= dynamic_cast<SelectionManagerDimFilter*>(getSelectionManager ( ));
 	FilterEntity::objectType		toRestore	= FilterEntity::NoneEntity;
 	if (0 != smdv)
 	{
@@ -1297,12 +1304,22 @@ void QtGroupsPanel::entitiesTypesStateChangeCallback (QTreeWidgetItem* item, int
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
 
-//	if ((0 == item) || (0 == item->parent ( )))
-//		return;
-
-	const FilterEntity::objectType	typesMask	= getCheckedEntitiesTypes ( );
 	if (0 != getGraphicalWidget ( ))
+	{
+		if (true == getGraphicalWidget ( )->getRenderingManager ( ).displayLocked ( ))
+		{	// Issue#59 : on est en train d'afficher/masquer des entités et on demande ici par ce callback le contraire
+			// Cette situation est probablement dûe à une opération longue (exécution d'un script, ...) et l'utilisateur
+			// s'impatiente => on aura au final un affichage partiel
+			// on annule l'exécution de ce callback et on re(dé)coche la checkbox correspondante
+			CHECK_NULL_PTR_ERROR (item)
+			const Qt::CheckState	checked	= item->checkState (col);
+			item->setCheckState (col, Qt::Checked == checked ? Qt::Unchecked : Qt::Checked);
+			return;
+		}	// if (true == getGraphicalWidget ( )->getRenderingManager ( ).displayLocked ( ))
+		
+		const FilterEntity::objectType	typesMask	= getCheckedEntitiesTypes ( );
 		getGraphicalWidget ( )->getRenderingManager ( ).displayTypes (typesMask);
+	}	// if (0 != getGraphicalWidget ( ))
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 }	// QtGroupsPanel::entitiesTypesStateChangeCallback
@@ -1326,6 +1343,13 @@ void QtGroupsPanel::groupStateChangeCallback (QTreeWidgetItem* item, int col)
 		if (0 != getGraphicalWidget ( ))
 		{
 			const bool	show	= groupItem->checkState (0) ? true : false;
+			
+			if (true == getGraphicalWidget ( )->getRenderingManager ( ).displayLocked ( ))
+			{	// Issue#59 : cf. QtGroupsPanel::entitiesTypesStateChangeCallback
+				groupItem->setCheckState (0, Qt::Checked == show ? Qt::Unchecked : Qt::Checked);
+				return;
+			}	// if (true == getGraphicalWidget ( )->getRenderingManager ( ).displayLocked ( ))
+			
 			vector<GroupEntity*>	groups;
 			groups.push_back (group);
 			getGraphicalWidget ( )->getRenderingManager ( ).displayRepresentations (groups, show);
