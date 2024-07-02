@@ -566,6 +566,8 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief Découpe un bloc structuré en deux
      *
+     *	OBSOLETE: Issue79 - Homogénéisation de l'API : utiliser splitBlocks
+     * 
      *  On utilise une arête et un ratio pour positionner un premier sommet
      *  qui va être inséré sur l'arête.
      *  Les 3 autres arêtes parallèles sont aussi découpées avec le même ratio.
