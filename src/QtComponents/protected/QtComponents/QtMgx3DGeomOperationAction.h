@@ -55,7 +55,7 @@ class QtMgx3DGeomOperationAction : public QtMgx3DOperationAction
 	 */
 	QtMgx3DGeomOperationAction (const QtMgx3DGeomOperationAction&);
 	QtMgx3DGeomOperationAction& operator = (const QtMgx3DGeomOperationAction&);
-};  // class QtMgx3DOperationAction
+};  // class QtMgx3DGeomOperationAction
 
 
 }	// namespace QtComponents
