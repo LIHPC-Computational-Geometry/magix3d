@@ -55,7 +55,7 @@ class QtMgx3DMeshOperationAction : public QtMgx3DOperationAction
 	 */
 	QtMgx3DMeshOperationAction (const QtMgx3DMeshOperationAction&);
 	QtMgx3DMeshOperationAction& operator = (const QtMgx3DMeshOperationAction&);
-};  // class QtMgx3DOperationAction
+};  // class QtMgx3DMeshOperationAction
 
 
 }	// namespace QtComponents

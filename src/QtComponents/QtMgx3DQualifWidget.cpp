@@ -96,25 +96,26 @@ vector<gmds::CellGroup<gmds::Face>*>
 	for (vector< pair<size_t, size_t> >::iterator its = selection.begin ( );
 	     selection.end ( ) != its; its++)
 	{
-		const Mesh::Mgx3DSurfaceQualifSerie*	serie	=
-			dynamic_cast<const Mesh::Mgx3DSurfaceQualifSerie*>(&getSerie ((*its).first));
+		const GQualif::AbstractQualifSerie* serie = &getSerie ((*its).first);
 		CHECK_NULL_PTR_ERROR (serie)
 		if (true == serie->isVolumic ( ))
 			continue;
+
+		auto surface_serie = dynamic_cast<const Mesh::Mgx3DSurfaceQualifSerie*>(serie);
 		vector <gmds::TCellID>	cellsIds;
-		serie->getGMDSCellsIndexes (cellsIds, (*its).second);
+		surface_serie->getGMDSCellsIndexes (cellsIds, (*its).second);
 		if (0 == cellsIds.size ( ))
 			continue;
 
 		UTF8String	name (Charset::UTF_8);
-		name << serie->getName ( ) << "_Class_" << (*its).second;
+		name << surface_serie->getName ( ) << "_Class_" << (*its).second;
 		auto surface = mesh->getGMDSMesh( ).newGroup<gmds::Face>(name.iso ( ));
 		surfaces.push_back (surface);
 
 		for (vector <gmds::TCellID>::const_iterator itc = cellsIds.begin ( );
 		     cellsIds.end ( ) != itc; itc++)
 		{
-			surface->add (serie->getGMDSCell (*itc));
+			surface->add (surface_serie->getGMDSCell (*itc));
 		}	// for (vector <gmds::TCellID>::const_iterator itc = ...
 	}	// for (vector< pair<size_t, size_t> >::iterator its = ...
 
