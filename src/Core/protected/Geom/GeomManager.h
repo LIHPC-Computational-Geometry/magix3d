@@ -198,16 +198,32 @@ public:
      *  \param p1 premier point
      *  \param p2 second point
      *  \param p3 dernier point
-
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc*
-		newCircle( std::string p1,  std::string p2,  std::string p3,
+		newCircle( std::string p1, std::string p2, std::string p3,
 				   std::string groupName="");
 
     virtual Mgx3D::Internal::M3DCommandResultIfc*
-		newCircle( Vertex* p1,  Vertex* p2,  Vertex* p3,
-                   std::string groupName="" );
+		newCircle( Vertex* p1, Vertex* p2, Vertex* p3,
+                   std::string groupName="");
 
+    /*------------------------------------------------------------------------*/
+    /** \brief création d'une ellipse centrée sur le point center, plan défini
+     *         par center/p1/p2, grand axe défini par center/p1,
+     *         grand rayon défini par la distance center-p1,
+     *         petit rayon défini par la distance p2-axe principal.
+     *
+     *  \param p1 premier point
+     *  \param p2 second point
+     *  \param center centre
+     */
+    virtual Mgx3D::Internal::M3DCommandResultIfc*
+		newEllipse( std::string p1, std::string p2, std::string center,
+				   std::string groupName="");
+
+    virtual Mgx3D::Internal::M3DCommandResultIfc*
+		newEllipse( Vertex* p1, Vertex* p2, Vertex* center,
+                   std::string groupName="");
 
     /*------------------------------------------------------------------------*/
     /** \brief création d'un arc de cercle à partir de 3 points et de la donnée

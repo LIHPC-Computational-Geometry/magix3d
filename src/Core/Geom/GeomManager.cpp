@@ -37,6 +37,7 @@
 #include "Geom/CommandNewPrism.h"
 #include "Geom/CommandGeomCopy.h"
 #include "Geom/CommandNewCircle.h"
+#include "Geom/CommandNewEllipse.h"
 #include "Geom/CommandNewCurveByCurveProjectionOnSurface.h"
 #include "Geom/CommandNewArcCircle.h"
 #include "Geom/CommandNewArcCircleWithAngles.h"
@@ -2287,6 +2288,43 @@ newCircle(Vertex* p1, Vertex* p2, Vertex* p3, std::string groupName )
             <<p1->getName()<<"\", \""
             <<p2->getName()<<"\", \""
             <<p3->getName()<<"\"";
+    if (!groupName.empty())
+        cmd<<", \""<<groupName<<"\"";
+    cmd<<")";
+    command->setScriptCommand(cmd);
+
+    getCommandManager().addCommand(command, Utils::Command::DO);
+
+    Internal::M3DCommandResultIfc*  cmdResult   =
+                                    new Internal::M3DCommandResult (*command);
+    return cmdResult;
+}
+/*----------------------------------------------------------------------------*/
+Internal::M3DCommandResultIfc* GeomManager::
+newEllipse(std::string p1,std::string p2, std::string center, std::string groupName)
+{
+    Vertex* v1 = getVertex(p1);
+    Vertex* v2 = getVertex(p2);
+    Vertex* vcenter = getVertex(center);
+    return newEllipse(v1,v2,vcenter, groupName);
+}
+
+/*----------------------------------------------------------------------------*/
+Internal::M3DCommandResultIfc* GeomManager::
+newEllipse(Vertex* p1, Vertex* p2, Vertex* center, std::string groupName )
+{
+    TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
+    message << "GeomManager::newEllipse("<<*p1<<", "<<*p2<<", "<<*center<<")";
+    log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
+
+    CommandNewEllipse *command =
+            new CommandNewEllipse(getLocalContext(),p1,p2,center,groupName);
+    // trace dans le script
+    TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
+    cmd << getContextAlias() << "." << "getGeomManager().newEllipse(\""
+            <<p1->getName()<<"\", \""
+            <<p2->getName()<<"\", \""
+            <<center->getName()<<"\"";
     if (!groupName.empty())
         cmd<<", \""<<groupName<<"\"";
     cmd<<")";

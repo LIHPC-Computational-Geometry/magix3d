@@ -29,6 +29,7 @@
 #include <BRepBuilderAPI_Transform.hxx>
 /*----------------------------------------------------------------------------*/
 #include <StdFail_NotDone.hxx>
+#include <gce_ErrorType.hxx>
 #include <gp_Pnt.hxx>
 #include <gp_Dir.hxx>
 #include <gp_Ax2.hxx>
@@ -58,6 +59,7 @@
 #include <gp_Dir.hxx>
 #include <gp_Ax2.hxx>
 #include <GC_MakeCircle.hxx>
+#include <GC_MakeEllipse.hxx>
 #include <GC_MakeArcOfCircle.hxx>
 #include <GC_MakeArcOfEllipse.hxx>
 #include <gp_Elips.hxx>
@@ -82,6 +84,7 @@
 #include <BRepAdaptor_Curve.hxx>
 
 #include <Geom_Circle.hxx>
+#include <Geom_Ellipse.hxx>
 /*----------------------------------------------------------------------------*/
 #include <set>
 /*----------------------------------------------------------------------------*/
@@ -89,6 +92,42 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 //#define _DEBUG2
+/*----------------------------------------------------------------------------*/
+// Définition de la fonction utilitaire GceErrorToString
+std::string GceErrorToString(const gce_ErrorType& error) {
+    switch (error) {
+        case gce_Done:
+            return "Done: Construction was successful.";
+        case gce_ConfusedPoints:
+            return "Confused Points: Two points are coincident.";
+        case gce_NegativeRadius:
+            return "Negative Radius: Radius value is negative.";
+        case gce_ColinearPoints:
+            return "Colinear Points: Three points are collinear.";
+        case gce_IntersectionError:
+            return "Intersection Error: Intersection cannot be computed.";
+        case gce_NullAxis:
+            return "Null Axis: Axis is undefined.";
+        case gce_NullAngle:
+            return "Null Angle: Angle value is invalid (usually null).";
+        case gce_NullRadius:
+            return "Null Radius: Radius is null.";
+        case gce_InvertAxis:
+            return "Invert Axis: Axis value is invalid.";
+        case gce_BadAngle:
+            return "Bad Angle: Angle value is invalid.";
+        case gce_InvertRadius:
+            return "Invert Radius: Radius value is incorrect (usually with respect to another radius).";
+        case gce_NullFocusLength:
+            return "Null Focus Length: Focus distance is null.";
+        case gce_NullVector:
+            return "Null Vector: Vector is null.";
+        case gce_BadEquation:
+            return "Bad Equation: Coefficients are incorrect (applies to the equation of a geometric object).";
+        default:
+            return "Unknown Error: An unknown error occurred.";
+    }
+}
 /*----------------------------------------------------------------------------*/
 //Handle(TDF_Data) EntityFactory::m_DF = 0;
 Handle(TDocStd_Document) EntityFactory::m_OCAFdoc = 0;
@@ -404,26 +443,73 @@ Curve* EntityFactory::newCircle(
     gp_Pnt P2(p2->getX(),p2->getY(),p2->getZ());
     gp_Pnt P3(p3->getX(),p3->getY(),p3->getZ());
 
-    if (P1.IsEqual(P2,0.0)|| P1.IsEqual(P3,0.0)|| P2.IsEqual(P3,0.0) )
+    if (P1.IsEqual(P2,0.0)|| P1.IsEqual(P3,0.0)|| P2.IsEqual(P3,0.0))
       throw Utils::BuildingException(TkUtil::UTF8String ("Param. illicites - 2 pts (au moins) sont égaux", TkUtil::Charset::UTF_8));
 
     try{
-    	Handle(Geom_Circle) arc = GC_MakeCircle (P1,P2,P3);
-        //GC_MakeCircle arc(P1,P2,P3);
-        TopoDS_Edge e = BRepBuilderAPI_MakeEdge(arc);
-        rep = new OCCGeomRepresentation(m_context, e);
+        GC_MakeCircle factory(P1,P2,P3);
+        if (factory.IsDone()){
+            Handle(Geom_Circle) arc = factory.Value();
+            TopoDS_Edge e = BRepBuilderAPI_MakeEdge(arc);
+            rep = new OCCGeomRepresentation(m_context, e);
+        }else{
+            // Récupérer et afficher le statut de l'erreur
+            std::string msg(GceErrorToString(factory.Status()));
+            throw Utils::BuildingException(TkUtil::UTF8String (msg, TkUtil::Charset::UTF_8));
+        }
     }
     catch(StdFail_NotDone& e){
         throw Utils::BuildingException(TkUtil::UTF8String ("Erreur durant la creation d'un cercle", TkUtil::Charset::UTF_8));
     }
 
-    Curve*	curve	= new Curve(m_context,
+    Curve*	curve = new Curve(m_context,
                 m_context.newProperty(Utils::Entity::GeomCurve),
                 m_context.newDisplayProperties(Utils::Entity::GeomCurve),
                 new GeomProperty(),rep);
 	CHECK_NULL_PTR_ERROR (curve)
 	m_context.newGraphicalRepresentation (*curve);
-	return curve;
+
+    return curve;
+}
+/*----------------------------------------------------------------------------*/
+Curve* EntityFactory::newEllipse(
+        const Geom::Vertex* p1,
+        const Geom::Vertex* p2,
+        const Geom::Vertex* center)
+{
+    OCCGeomRepresentation* rep =0;
+
+    gp_Pnt P1(p1->getX(),p1->getY(),p1->getZ());
+    gp_Pnt P2(p2->getX(),p2->getY(),p2->getZ());
+    gp_Pnt Center(center->getX(),center->getY(),center->getZ());
+
+    if (P1.IsEqual(P2,0.0)|| P1.IsEqual(Center,0.0)|| P2.IsEqual(Center,0.0))
+      throw Utils::BuildingException(TkUtil::UTF8String ("Param. illicites - 2 pts (au moins) sont égaux", TkUtil::Charset::UTF_8));
+
+    try{
+        GC_MakeEllipse factory(P1,P2,Center);
+        if (factory.IsDone()){
+            Handle(Geom_Ellipse) arc = factory.Value();
+            TopoDS_Edge e = BRepBuilderAPI_MakeEdge(arc);
+            rep = new OCCGeomRepresentation(m_context, e);
+        }else{
+            // Récupérer et afficher le statut de l'erreur
+            std::string msg(GceErrorToString(factory.Status()));
+            throw Utils::BuildingException(TkUtil::UTF8String (msg, TkUtil::Charset::UTF_8));
+        }
+    }
+    catch(StdFail_NotDone& e){
+        throw Utils::BuildingException(TkUtil::UTF8String ("Erreur durant la creation d'une ellipse", TkUtil::Charset::UTF_8));
+    }
+
+    Curve*	curve = new Curve(m_context,
+                m_context.newProperty(Utils::Entity::GeomCurve),
+                m_context.newDisplayProperties(Utils::Entity::GeomCurve),
+                new GeomProperty(),rep);
+	CHECK_NULL_PTR_ERROR (curve)
+	m_context.newGraphicalRepresentation (*curve);
+
+    return curve;
 }
 /*----------------------------------------------------------------------------*/
 Curve* EntityFactory::newArcCircle(

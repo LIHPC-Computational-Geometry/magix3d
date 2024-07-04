@@ -58,37 +58,6 @@ class MeshImplementation;
 }
 
 namespace Geom {
-class CommandCreateGeom;
-class CommandNewVertexByProjection;
-class CommandNewVertexByCurveParameterization;
-class CommandNewBox;
-class CommandNewCylinder;
-class CommandNewCone;
-class CommandNewPrism;
-class CommandNewSphere;
-class CommandNewSpherePart;
-class CommandNewHollowCylinder;
-class CommandNewHollowSphere;
-class CommandGeomCopy;
-class CommandNewSurface;
-class CommandNewCurveByCurveProjectionOnSurface;
-class GeomJoinCurvesImplementation;
-class OCCGeomRepresentation;
-class GeomModificationBaseClass;
-class GeomCutImplementation;
-class GeomCommonImplementation;
-class GeomNewPrismImplementation;
-class GeomFuseImplementation;
-class GeomGluingImplementation;
-class GeomSectionImplementation;
-class GeomImport;
-class GeomRevolImplementation;
-class GeomExtrudeImplementation;
-class Curve;
-class CommandNewFacetedSurfaces;
-class GeomSplitCurveImplementation;
-class CommandNewSurfaceByOffset;
-
 /*----------------------------------------------------------------------------*/
 /**
  * \class EntityFactory
@@ -101,13 +70,12 @@ class CommandNewSurfaceByOffset;
  */
 class EntityFactory
 {
-	friend class CommandCreateGeom;
+    friend class CommandCreateGeom;
     friend class CommandGeomCopy;
     friend class CommandNewVertex;
     friend class CommandNewVertexByProjection;
     friend class CommandNewVertexByCurveParameterization;
     friend class CommandNewSegment;
-    friend class CommandNewPrism;
     friend class CommandNewSphere;
     friend class CommandNewSpherePart;
     friend class CommandNewHollowSpherePart;
@@ -117,6 +85,7 @@ class EntityFactory
     friend class CommandNewCylinder;
     friend class CommandNewCone;
     friend class CommandNewCircle;
+    friend class CommandNewEllipse;
     friend class CommandNewArcCircle;
     friend class CommandNewArcCircleWithAngles;
     friend class CommandNewArcEllipse;
@@ -202,13 +171,23 @@ public:
      */
     Curve* newSegment(const Geom::Vertex* start, const Geom::Vertex* end);
     /*------------------------------------------------------------------------*/
-    /** \brief
+    /** \brief Cercle passant par les 3 sommets passés en arguments.
      */
     Curve* newCircle(
             const Geom::Vertex* p1,
             const Geom::Vertex* p2,
             const Geom::Vertex* p3);
+    /*------------------------------------------------------------------------*/
+    /** \brief Ellipse centrée sur le point center, plan défini par center/p1/p2, 
+     *         grand axe défini par center/p1, 
+     *         grand rayon défini par la distance center-p1, 
+     *         petit rayon défini par la distance p2-axe principal.
 
+     */
+    Curve* newEllipse(
+            const Geom::Vertex* p1,
+            const Geom::Vertex* p2,
+            const Geom::Vertex* center);
     /*------------------------------------------------------------------------*/
     /** \brief Arc de cercle dans le plan XY avec normale fixée
      */
@@ -256,11 +235,6 @@ public:
     /** \brief
      */
     Volume* newCone(PropertyCone* prop);
-
-    /*------------------------------------------------------------------------*/
-    /** \brief
-     */
-    Volume* newPrism(PropertyPrism* prop);
 
     /*------------------------------------------------------------------------*/
     /** \brief

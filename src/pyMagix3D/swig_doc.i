@@ -1079,6 +1079,17 @@ p2 : second point
 p3 : dernier point 
 
 ";
+%feature("docstring") Mgx3D::Geom::GeomManagerIfc::newEllipse "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newEllipse(std::string p1, std::string p2, std::string center, std::string groupName=\"\")
+
+création d'une ellipse centrée sur le point center, plan défini par center/p1/p2, grand axe défini par center/p1, grand rayon défini par la distance center-p1,
+petit rayon défini par la distance p2-axe principal
+
+p1 : premier point
+p2 : second point
+center : centre
+
+";
 %feature("docstring") Mgx3D::Geom::GeomManagerIfc::newCone "
 virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newCone(const double &dr1, const double &dr2, const Vector &dv, const double &da, std::string groupName=\"\")
 

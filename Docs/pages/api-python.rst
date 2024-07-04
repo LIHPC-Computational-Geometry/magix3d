@@ -33,6 +33,11 @@ Pour alléger l’écriture, nous utilisons les alias Python suivants:
     gm.newCircle
 
 .. code-block:: python
+    :caption: :ref:`creation-ellipse`
+
+    gm.newEllipse
+
+.. code-block:: python
     :caption: :ref:`creation-courbe-par-projection`
 
     gm.newCurveByCurveProjectionOnSurface
