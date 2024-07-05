@@ -923,7 +923,7 @@ public :
 		/**
 		 * Destructeur. RAS.
 		 */
-		virtual ~ConstrainedPointInteractor();
+		virtual ~ConstrainedPointInteractor ( );
 
 		/**
 		 * \return		Le point

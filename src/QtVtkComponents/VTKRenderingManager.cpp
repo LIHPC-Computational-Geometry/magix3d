@@ -573,7 +573,8 @@ VTKRenderingManager::VTKAxisConstrainedPointInteractor::VTKAxisConstrainedPointI
 	_pointWidget->SetInteractor (renderingManager.getRenderWindow ( ).GetInteractor ( ));
 	// On zoom le widget pour éviter sa juxtaposition avec la bounding box :
 //	_pointWidget->GetRepresentation ( )->SetPlaceFactor (2.5);
-	_pointWidget->GetRepresentation ( )->SetHandleSize (30);
+	_pointWidget->GetRepresentation ( )->SetHandleSize (15);
+	_pointWidget->GetConstrainedPointRepresentation ( )->DisplayConstraintAxis (true);
 	_pointWidget->On ( );
 	_callback	= new VTKInteractorCallback<VTKAxisConstrainedPointInteractor> (this, _pointWidget);
 	setPoint (point);
@@ -1607,7 +1608,6 @@ RenderingManager::PlaneInteractor* VTKRenderingManager::createPlaneInteractor (
 
 void VTKRenderingManager::destroyInteractor (RenderingManager::Interactor* interactor)
 {
-cout << __FILE__ << ' ' << __LINE__ << " VTKRenderingManager::destroyInteractor" << endl;
 	delete interactor;
 }	// VTKRenderingManager::destroyInteractor
 

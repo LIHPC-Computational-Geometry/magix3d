@@ -40,14 +40,11 @@ class QtTopologyPlaceVertexPanel :
 	 * Créé l'ihm.
 	 * \param	Widget parent.
 	 * \param	Nom du panneau
-	 * \param	Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée
-	 *			notamment pour récupérer le contexte.
+	 * \param	Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée notamment pour récupérer le contexte.
 	 * \param	Eventuelle action associée à ce panneau.
 	 */
 	QtTopologyPlaceVertexPanel (
-			QWidget* parent, const std::string& panelName,
-			Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
-			Mgx3D::QtComponents::QtMgx3DOperationAction* action);
+			QWidget* parent, const std::string& panelName, Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow, Mgx3D::QtComponents::QtMgx3DOperationAction* action);
 
 	/**
 	 * Destructeur. RAS.
@@ -60,8 +57,7 @@ class QtTopologyPlaceVertexPanel :
 	virtual void reset ( );
 
 	/**
-	 * Méthode appelée lorsque l'utilisateur suspend l'édition de l'opération.
-	 * Restitue l'environnement dans son état initial.
+	 * Méthode appelée lorsque l'utilisateur suspend l'édition de l'opération. Restitue l'environnement dans son état initial.
 	 * Invoque <I>preview (false)</I>.
 	 * \see	preview
 	 */
@@ -75,18 +71,14 @@ class QtTopologyPlaceVertexPanel :
 	virtual void autoUpdate ( );
 
 	/**
-	 * Méthode appelée lorsque la définition du point est modifiée par
-	 * l'utilisateur via un interacteur 3D dans la fenêtre graphique.
+	 * Méthode appelée lorsque la définition du point est modifiée par l'utilisateur via un interacteur 3D dans la fenêtre graphique.
 	 * Actualise le panneau.
 	 */
 	virtual void pointModifiedCallback (Mgx3D::Utils::Math::Point point);
 
 	/**
-	 * \param		<I>true</I> pour prévisualiser les entités concernées par
-	 * 				l'association, <I>false</I> pour arrêter la
-	 * 				prévisualisation.
-	 * \param		<I>true</I> s'il faut détruire l'éventuel interacteur dans
-	 * 				le cas d'un arrêt de la prévisualisation.
+	 * \param		<I>true</I> pour prévisualiser les entités concernées par l'association, <I>false</I> pour arrêter la prévisualisation.
+	 * \param		<I>true</I> s'il faut détruire l'éventuel interacteur dans le cas d'un arrêt de la prévisualisation.
 	 */
 	virtual void preview (bool show, bool destroyInteractor);
 
@@ -104,8 +96,7 @@ class QtTopologyPlaceVertexPanel :
 	virtual double getZ ( ) const;
 
 	/**
-	 * \return	<I>true</I> si le positionnement est contraint sur une
-	 *		entité, <I>false</I> dans le cas contraire.
+	 * \return	<I>true</I> si le positionnement est contraint sur une entité, <I>false</I> dans le cas contraire.
 	 */
 	virtual bool isContrained ( ) const;
 
@@ -123,17 +114,33 @@ class QtTopologyPlaceVertexPanel :
 	virtual Mgx3D::Topo::Vertex* getVertex ( ) const;
 
 	/**
-	 * \return		Un pointeur sur l'éventuel interacteur en cours
-	 * 			d'utilisation.
+	 * \return		true si un interacteur 3D doit être utilisé (boite + croix), false dans le cas contraire (=> interacteur 2D, déplacement dans le plan
+	 *				de l'écran ou le long d'un axe euclidien de contrainte)
+	 */
+	virtual bool useInteractor3D ( ) const;
+	
+	/**
+	 * \return		Un pointeur sur l'éventuel interacteur en cours d'utilisation.
+	 * \see			createPointInteractor
 	 */
 	virtual Mgx3D::QtComponents::RenderingManager::PointInteractor* getInteractor ( );
+	
+	/**
+	 * \return		Créé si le contexte s'y prête un interacteur 3D (boite + croix) et le retourne.
+	 */
+	virtual Mgx3D::QtComponents::RenderingManager::PointInteractor* createPointInteractor ( );
 
 	/**
-	 * \return		Un pointeur sur l'éventuel interacteur en cours
-	 * 			d'utilisation.
+	 * \return		Un pointeur sur l'éventuel interacteur en cours d'utilisation.
+	 * \see			createConstrainedPointInteractor
 	 */
 	virtual Mgx3D::QtComponents::RenderingManager::ConstrainedPointInteractor* getConstrainedInteractor ( );
 
+	/**
+	 * \return		Créé si le contexte s'y prête un interacteur 2D (déplacement dans le plan de l'écran ou le long d'un axe euclidien de contrainte) et le retourne.
+	 */
+	virtual Mgx3D::QtComponents::RenderingManager::ConstrainedPointInteractor* createConstrainedPointInteractor ( );
+	
 	/**
 	 * Invoqué lorsque l'opération a été exécutée. Actualise le panneau.
 	 * cf. spécifications dans la classe de base.
@@ -141,15 +148,13 @@ class QtTopologyPlaceVertexPanel :
 	virtual void operationCompleted ( );
 
 	/**
-	 * Invoqué lorsque des entités sont ajoutées à la sélection.
-	 * Actualise les champs de saisie X, Y et Z, puis invoque
+	 * Invoqué lorsque des entités sont ajoutées à la sélection. Actualise les champs de saisie X, Y et Z, puis invoque
 	 * QtMgx3DOperationsPanel::entitiesAddedToSelectionCallback.
 	 */
 	virtual void entitiesAddedToSelectionCallback (QString entitiesNames);
 
 	/**
-	 * Invoqué lorsque des entités sont enlevées de la sélection.
-	 * Affecte 0. aux champs de saisie X, Y et Z, puis invoque
+	 * Invoqué lorsque des entités sont enlevées de la sélection. Affecte 0. aux champs de saisie X, Y et Z, puis invoque
 	 * QtMgx3DOperationsPanel::entitiesRemovedFromSelectionCallback.
 	 */
 	virtual void entitiesRemovedFromSelectionCallback (QString entitiesNames);
@@ -163,20 +168,22 @@ class QtTopologyPlaceVertexPanel :
 	protected slots :
 
 	/**
-	 * Invoqué lorsque l'utilisateur modifie les coordonnées du point via les
-	 * champs de saisie. Actualise l'interacteur.
+	 * Invoqué lorsque l'utilisateur modifie les coordonnées du point via les champs de saisie. Actualise l'interacteur.
 	 */
 	virtual void coordinatesModifiedCallback ( );
+	
+	/**
+	 * Basculement interacteur 2D <=> interacteur 3D.
+	 */
+	virtual void interactorTypeCallback ( );
 
 	/**
-	 * Modifier la taille de l'interacteur et donc l'amplitude de déplacement
-	 * du sommet.
+	 * Modifier la taille de l'interacteur et donc l'amplitude de déplacement du sommet.
 	 */
 	virtual void interactorSizeCallback ( );
 
 	/**
-	 * Invoqué lorsque l'utilisateur souhaite passer du mode contraint au mode
-	 * non contraint ou réciproquement.
+	 * Invoqué lorsque l'utilisateur souhaite passer du mode contraint au mode non contraint ou réciproquement.
 	 */
 	virtual void constraintCallback ( );
 
@@ -193,54 +200,47 @@ class QtTopologyPlaceVertexPanel :
 	 * Constructeur de copie et opérateur = opérations interdites.
 	 */
 	QtTopologyPlaceVertexPanel (const QtTopologyPlaceVertexPanel&);
-	QtTopologyPlaceVertexPanel& operator = (
-										const QtTopologyPlaceVertexPanel&);
+	QtTopologyPlaceVertexPanel& operator = (const QtTopologyPlaceVertexPanel&);
 
 	/** Le sommet à positionner. */
-	QtMgx3DEntityPanel			*_vertexPanel;
+	QtMgx3DEntityPanel					*_vertexPanel;
 
 	/** Les nouvelles composantes des coordonnées du sommet. */
-	QtDoubleTextField			*_xTextField, *_yTextField, *_zTextField;
+	QtDoubleTextField					*_xTextField, *_yTextField, *_zTextField;
 
 	/** Modifier l'amplitude de déplacement. */
-	QLabel					*_sliderLabel;
-	QSlider					*_interactorSlider;
+	QLabel								*_sliderLabel;
+	QSlider								*_interactorSlider;
+
+	/** Utilise-t-on un interacteur 3D ? */
+	QCheckBox							*_3dInteractorCheckBox;
 
 	/** La saisie est elle contrainte sur une entité visible ? */
-	QCheckBox				*_constraintCheckBox;
+	QCheckBox							*_constraintCheckBox;
 
 	/** La contrainte. */
 	QtEntityByDimensionSelectorPanel	*_entityConstraintPanel;
 
-	/** Le facteur de raffinement de l'entité de contrainte (facteur multiplicatif
-	 * de discrétisation de l'affichage de cette entité pour saisie interactive
-	 * précise). */
-	QtIntTextField				*_refinementFactorTextField;
+	/** Le facteur de raffinement de l'entité de contrainte (facteur multiplicatif de discrétisation de l'affichage de cette entité pour saisie interactive précise). */
+	QtIntTextField						*_refinementFactorTextField;
 };	// class QtTopologyPlaceVertexPanel
 
 
 /**
- * Classe d'action type <I>check box</I> associée à un panneau type
- * <I>QtTopologyPlaceVertexPanel</I> de positionnement d'un sommet topologique.
+ * Classe d'action type <I>check box</I> associée à un panneau type <I>QtTopologyPlaceVertexPanel</I> de positionnement d'un sommet topologique.
  */
 class QtTopologyPlaceVertexAction : public QtMgx3DTopoOperationAction
 {
 	public :
 
 	/**
-	 * Créé et s'associe une instance de la classe
-	 * <I>QtTopologyPlaceVertexPanel</I>.
+	 * Créé et s'associe une instance de la classe <I>QtTopologyPlaceVertexPanel</I>.
 	 * \param		Icône représentant l'action.
 	 * \param		Texte représentant l'action.
-	 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée
-	 *				notamment pour récupérer le contexte et le panneau contenant
-	 *				les icônes.
+	 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée notamment pour récupérer le contexte et le panneau contenant les icônes.
 	 * \param		Tooltip décrivant l'action.
 	 */
-	QtTopologyPlaceVertexAction (
-		const QIcon& icon, const QString& text,
-		Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
-		const QString& tooltip);
+	QtTopologyPlaceVertexAction (const QIcon& icon, const QString& text, Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow, const QString& tooltip);
 
 	/**
 	 * Destructeur. RAS.
@@ -253,9 +253,7 @@ class QtTopologyPlaceVertexAction : public QtMgx3DTopoOperationAction
 	virtual QtTopologyPlaceVertexPanel* getTopologyProjectVerticesPanel ( );
 
 	/**
-	 * Positionne le sommet topologique conformément au paramétrage de
-	 * son panneau associé. Invoque préalablement
-	 * <I>QtMgx3DTopoOperationAction::executeOperation</I>.
+	 * Positionne le sommet topologique conformément au paramétrage de son panneau associé. Invoque préalablement <I>QtMgx3DTopoOperationAction::executeOperation</I>.
 	 */
 	virtual void executeOperation ( );
 
@@ -266,8 +264,7 @@ class QtTopologyPlaceVertexAction : public QtMgx3DTopoOperationAction
 	 * Constructeur de copie et opérateur = : interdits.
 	 */
 	QtTopologyPlaceVertexAction (const QtTopologyPlaceVertexAction&);
-	QtTopologyPlaceVertexAction& operator = (
-									const QtTopologyPlaceVertexAction&);
+	QtTopologyPlaceVertexAction& operator = (const QtTopologyPlaceVertexAction&);
 };  // class QtTopologyCreationAction
 
 

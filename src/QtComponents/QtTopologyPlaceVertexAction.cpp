@@ -42,15 +42,12 @@ const double	zoomComul	= 0.75;
 // ===========================================================================
 
 QtTopologyPlaceVertexPanel::QtTopologyPlaceVertexPanel (
-			QWidget* parent, const string& panelName,
-			QtMgx3DMainWindow& mainWindow, QtMgx3DOperationAction* action)
-	: QtMgx3DOperationPanel (
-				parent, mainWindow, action,
+			QWidget* parent, const string& panelName, QtMgx3DMainWindow& mainWindow, QtMgx3DOperationAction* action)
+	: QtMgx3DOperationPanel (parent, mainWindow, action,
 				QtMgx3DApplication::HelpSystem::instance ( ).instance ( ).placeVertexOperationURL,
 				QtMgx3DApplication::HelpSystem::instance ( ).instance ( ).placeVertexOperationTag),
 	  RenderingManager::InteractorObserver ( ),
-	  _vertexPanel (0), _xTextField (0), _yTextField (0), _zTextField (0),
-	  _sliderLabel(0), _interactorSlider (0),
+	  _vertexPanel (0), _xTextField (0), _yTextField (0), _zTextField (0), _sliderLabel(0), _interactorSlider (0), _3dInteractorCheckBox (0),
 	  _constraintCheckBox (0), _entityConstraintPanel (0), _refinementFactorTextField(0)
 {
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
@@ -66,14 +63,16 @@ QtTopologyPlaceVertexPanel::QtTopologyPlaceVertexPanel (
 	layout->addWidget (label);
 
 	// Le sommet à positionner :
-	_vertexPanel	= new QtMgx3DEntityPanel (
-			this, "", true, "Sommet :", "", &mainWindow,
-			SelectionManagerIfc::D0, FilterEntity::TopoVertex);
-	connect (_vertexPanel, SIGNAL (entitiesAddedToSelection(QString)),
-	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
-	connect (_vertexPanel, SIGNAL (entitiesRemovedFromSelection(QString)),
-	         this, SLOT (entitiesRemovedFromSelectionCallback (QString)));
+	_vertexPanel	= new QtMgx3DEntityPanel (this, "", true, "Sommet :", "", &mainWindow, SelectionManagerIfc::D0, FilterEntity::TopoVertex);
+	connect (_vertexPanel, SIGNAL (entitiesAddedToSelection(QString)), this, SLOT (entitiesAddedToSelectionCallback (QString)));
+	connect (_vertexPanel, SIGNAL (entitiesRemovedFromSelection(QString)), this, SLOT (entitiesRemovedFromSelectionCallback (QString)));
 	layout->addWidget (_vertexPanel);
+	
+	// L'interacteur utilisé :
+	_3dInteractorCheckBox	= new QCheckBox (": interacteur 3D.", this);
+	_3dInteractorCheckBox->setToolTip ("Cochée une boite avec 3 plans interactifs se coupant au sommet représentera l'espace euclidien.\nDécochée une sphère représentera le sommet, déplaçable dans le plan de l'écran ou le long d'un axe euclidien\n après frappe de 'x', 'y' ou 'z' (espace => retour au plan de l'écran).");
+	connect (_3dInteractorCheckBox, SIGNAL (stateChanged (int)), this, SLOT (interactorTypeCallback ( )));
+	layout->addWidget (_3dInteractorCheckBox);
 
 	// Les composantes :
 	QHBoxLayout*	hlayout	= new QHBoxLayout ( );
@@ -90,18 +89,15 @@ QtTopologyPlaceVertexPanel::QtTopologyPlaceVertexPanel (
 	hlayout->addLayout (vlayout);
 	_xTextField	= &QtNumericFieldsFactory::createPositionTextField (this);
 	_xTextField->setValue (0.);
-	connect (_xTextField, SIGNAL (textEdited (const QString&)), this,
-	         SLOT (coordinatesModifiedCallback ( )));
+	connect (_xTextField, SIGNAL (textEdited (const QString&)), this, SLOT (coordinatesModifiedCallback ( )));
 	vlayout->addWidget (_xTextField);
 	_yTextField	= &QtNumericFieldsFactory::createPositionTextField (this);
 	_yTextField->setValue (0.);
-	connect (_yTextField, SIGNAL (textEdited (const QString&)), this,
-	         SLOT (coordinatesModifiedCallback ( )));
+	connect (_yTextField, SIGNAL (textEdited (const QString&)), this, SLOT (coordinatesModifiedCallback ( )));
 	vlayout->addWidget (_yTextField);
 	_zTextField	= &QtNumericFieldsFactory::createPositionTextField (this);
 	_zTextField->setValue (0.);
-	connect (_zTextField, SIGNAL (textEdited (const QString&)), this,
-	         SLOT (coordinatesModifiedCallback ( )));
+	connect (_zTextField, SIGNAL (textEdited (const QString&)), this, SLOT (coordinatesModifiedCallback ( )));
 	vlayout->addWidget (_zTextField);
 
 	/** L'interacteur. */
@@ -114,22 +110,17 @@ QtTopologyPlaceVertexPanel::QtTopologyPlaceVertexPanel (
 	_interactorSlider->setRange (1, 100);
 	_interactorSlider->setToolTip (QString::fromUtf8("Modifie la taille de l'interacteur et donc l'amplitude possible de déplacement du sommet."));
 	hlayout->addWidget (_interactorSlider);
-	connect (_interactorSlider, SIGNAL(valueChanged (int)), this,
-	         SLOT (interactorSizeCallback ( )));
+	connect (_interactorSlider, SIGNAL(valueChanged (int)), this, SLOT (interactorSizeCallback ( )));
 	_sliderLabel->hide ( );
 	_interactorSlider->hide ( );
 
 	/** L'éventuelle contrainte. */
 	FilterEntity::objectType	filter	= (FilterEntity::objectType)(FilterEntity::AllEdges | FilterEntity::AllSurfaces);
 	_entityConstraintPanel	= new QtEntityByDimensionSelectorPanel (
-		this, mainWindow, "Entité de contrainte :",
-		(SelectionManagerIfc::DIM)(SelectionManagerIfc::D1 | SelectionManagerIfc::D2),
-		filter, SelectionManagerIfc::D1, false);
+		this, mainWindow, "Entité de contrainte :", (SelectionManagerIfc::DIM)(SelectionManagerIfc::D1 | SelectionManagerIfc::D2), filter, SelectionManagerIfc::D1, false);
 	_entityConstraintPanel->setToolTip ("Le sommet sera placé sur l'entité sélectionnée.\nPour déplacer le point presser le bouton gauche de la souris\net déplacer la souris.");
-	connect (_entityConstraintPanel, SIGNAL (entitiesAddedToSelection(QString)), this,
-	         SLOT (constraintSelectedCallback (QString)));
-	connect (_entityConstraintPanel, SIGNAL (entitiesRemovedFromSelection(QString)), this,
-	         SLOT (constraintUnselectedCallback (QString)));
+	connect (_entityConstraintPanel, SIGNAL (entitiesAddedToSelection(QString)), this,  SLOT (constraintSelectedCallback (QString)));
+	connect (_entityConstraintPanel, SIGNAL (entitiesRemovedFromSelection(QString)), this, SLOT (constraintUnselectedCallback (QString)));
 	_entityConstraintPanel->hide ( );
 	layout->addWidget (_entityConstraintPanel);
 	QWidget*	factorWidget	= new QWidget (this);
@@ -140,8 +131,7 @@ QtTopologyPlaceVertexPanel::QtTopologyPlaceVertexPanel (
 	_refinementFactorTextField	= new QtIntTextField (10, factorWidget);
 	hlayout->addWidget (_refinementFactorTextField);
 	_refinementFactorTextField->setRange (1, 10000);
-	connect (_refinementFactorTextField, SIGNAL (returnPressed( )), this,
-	         SLOT (constraintCallback ( )));
+	connect (_refinementFactorTextField, SIGNAL (returnPressed( )), this, SLOT (constraintCallback ( )));
 	label->setToolTip ("Facteur de raffinement de la représentation graphique pour positionnement interactif\n(ex 10 pour discrétisation 10x plus fine que la représentation graphique).");
 	_refinementFactorTextField->setToolTip ("Facteur de raffinement de la représentation graphique pour positionnement interactif\n(ex 10 pour discrétisation 10x plus fine que la représentation graphique).");
 	factorWidget->hide ( );
@@ -160,19 +150,16 @@ QtTopologyPlaceVertexPanel::QtTopologyPlaceVertexPanel (
 
 
 QtTopologyPlaceVertexPanel::QtTopologyPlaceVertexPanel (const QtTopologyPlaceVertexPanel& cao)
-	: QtMgx3DOperationPanel (
-			0, *new QtMgx3DMainWindow (0), 0, "", ""),
+	: QtMgx3DOperationPanel (0, *new QtMgx3DMainWindow (0), 0, "", ""),
 	  RenderingManager::InteractorObserver ( ),
-	  _vertexPanel (0), _xTextField (0), _yTextField (0), _zTextField (0),
-	  _sliderLabel(0), _interactorSlider (0),
+	  _vertexPanel (0), _xTextField (0), _yTextField (0), _zTextField (0), _sliderLabel(0), _interactorSlider (0), _3dInteractorCheckBox (0),
 	  _constraintCheckBox (0), _entityConstraintPanel (0), _refinementFactorTextField (0)
 {
 	MGX_FORBIDDEN ("QtTopologyPlaceVertexPanel copy constructor is not allowed.");
 }	// QtTopologyPlaceVertexPanel::QtTopologyPlaceVertexPanel (const QtTopologyPlaceVertexPanel&)
 
 
-QtTopologyPlaceVertexPanel& QtTopologyPlaceVertexPanel::operator = (
-										const QtTopologyPlaceVertexPanel&)
+QtTopologyPlaceVertexPanel& QtTopologyPlaceVertexPanel::operator = (const QtTopologyPlaceVertexPanel&)
 {
 	MGX_FORBIDDEN ("QtTopologyPlaceVertexPanel assignment operator is not allowed.");
 	return *this;
@@ -286,7 +273,7 @@ void QtTopologyPlaceVertexPanel::constraintSelectedCallback (QString name)
 
 	CHECK_NULL_PTR_ERROR (_refinementFactorTextField)
 	const size_t					factor		= _refinementFactorTextField->getValue ( );
-	Entity*						entity		= &getContext().nameToEntity (name.toStdString ( ));
+	Entity*							entity		= &getContext().nameToEntity (name.toStdString ( ));
 	RenderingManager::ConstrainedPointInteractor*	interactor	= getConstrainedInteractor ( );
 	if (0 != interactor)
 		interactor->setConstraint (entity, factor);
@@ -349,36 +336,27 @@ void QtTopologyPlaceVertexPanel::preview (bool show, bool destroyInteractor)
 		double  dx = 0.1, dy = 0.1, dz = -0.1;
 		getInteractorBoxDims (dx, dy, dz);
 		Math::Point	p (getPoint ( ));
-//		RenderingManager::PointInteractor*	interactor	= getInteractor ( );
-		RenderingManager::ConstrainedPointInteractor*	interactor	= getConstrainedInteractor ( );
-		if (0 == interactor)
+		
+		if (true == useInteractor3D ( ))
 		{
-			if (0 != getVertex ( ))
+			RenderingManager::PointInteractor*	interactor	= getInteractor ( );
+			if (0 == interactor)
 			{
-//				interactor	= getRenderingManager ( ).createPointInteractor (p, dx, dy, dz, this);
-interactor	= getRenderingManager ( ).createAxisConstrainedPointInteractor (p, this);
-/* CP : A REMETTRE pour interaction précise
-				if (0 != _sliderLabel)
-					_sliderLabel->show ( );
-				if (0 != _interactorSlider)
-				{
-					const int	min		= _interactorSlider->minimum ( );
-					const int	max		= _interactorSlider->maximum ( );
-					const int	val		= (max - min) / 2;
-					double		scale	=
-						min == max ?  1. : fabs(val - min) / fabs(max - min);
-					const double	zoomMin	= 0.2, zoomMax	= 5;
-					scale	= zoomComul * scale * (zoomMax - zoomMin);
-					interactor->setBoxDimensions (scale*dx, scale*dy, scale*dz);
-					_interactorSlider->setValue (val);
-					_interactorSlider->show ( );
-				}
-*/
-				registerPreviewedInteractor (interactor);
-			}	// if (0 != getVertex ( ))
-		}	// if (0 == interactor)
+				if (0 != getVertex ( ))
+					interactor	= createPointInteractor ( );
+			}
+			else
+				interactor->setPoint (p);
+		}	// if (true == useInteractor3D ( ))
 		else
-			interactor->setPoint (p);
+		{
+			RenderingManager::ConstrainedPointInteractor*	interactor	= getConstrainedInteractor ( );
+			if (0 == interactor)
+			{
+				if (0 != getVertex ( ))
+				interactor	= createConstrainedPointInteractor ( );
+			}
+		}	// else if (true == useInteractor3D ( ))
 	}	// if (false == constrained)
 	else	// => Curve/surface constrained interactor
 	{
@@ -468,6 +446,13 @@ Vertex* QtTopologyPlaceVertexPanel::getVertex ( ) const
 }	// QtTopologyPlaceVertexPanel::getVertex
 
 
+bool QtTopologyPlaceVertexPanel::useInteractor3D ( ) const
+{
+	CHECK_NULL_PTR_ERROR (_3dInteractorCheckBox)
+	return _3dInteractorCheckBox->isChecked ( );
+}	// QtTopologyPlaceVertexPanel::useInteractor3D
+
+
 RenderingManager::PointInteractor* QtTopologyPlaceVertexPanel::getInteractor ( )
 {
 	vector <RenderingManager::Interactor*>	interactors	= getPreviewedInteractors ( );
@@ -478,6 +463,41 @@ RenderingManager::PointInteractor* QtTopologyPlaceVertexPanel::getInteractor ( )
 }	// QtTopologyPlaceVertexPanel::getInteractor
 
 
+RenderingManager::PointInteractor* QtTopologyPlaceVertexPanel::createPointInteractor ( )
+{
+	if ((0 != getInteractor ( )) || (0 != getConstrainedInteractor ( )))
+			throw Exception (UTF8String ("QtTopologyPlaceVertexPanel::createPointInteractor : interacteur existant.", Charset::UTF_8));
+
+	RenderingManager::PointInteractor*	interactor	= 0;
+
+	if ((false == isContrained ( )) && (0 != getVertex ( )))
+	{
+		double  dx = 0.1, dy = 0.1, dz = -0.1;
+		getInteractorBoxDims (dx, dy, dz);
+		Math::Point	p (getPoint ( ));
+		interactor	= getRenderingManager ( ).createPointInteractor (p, dx, dy, dz, this);
+		if (0 != _sliderLabel)
+			_sliderLabel->show ( );
+		if (0 != _interactorSlider)
+		{
+			const int	min		= _interactorSlider->minimum ( );
+			const int	max		= _interactorSlider->maximum ( );
+			const int	val		= (max - min) / 2;
+			double		scale	= min == max ?  1. : fabs(val - min) / fabs(max - min);
+			const double	zoomMin	= 0.2, zoomMax	= 5;
+			scale	= zoomComul * scale * (zoomMax - zoomMin);
+			interactor->setBoxDimensions (scale*dx, scale*dy, scale*dz);
+			_interactorSlider->setValue (val);
+			_interactorSlider->show ( );
+		}	// if (0 != _interactorSlider)
+		
+		registerPreviewedInteractor (interactor);
+	}	// if ((false == isContrained ( )) && (0 != getVertex ( )))
+
+	return interactor;
+}	// QtTopologyPlaceVertexPanel::createConstrainedPointInteractor
+
+
 RenderingManager::ConstrainedPointInteractor* QtTopologyPlaceVertexPanel::getConstrainedInteractor ( )
 {
 	vector <RenderingManager::Interactor*>	interactors	= getPreviewedInteractors ( );
@@ -486,6 +506,29 @@ RenderingManager::ConstrainedPointInteractor* QtTopologyPlaceVertexPanel::getCon
 
 	return 0;
 }	// QtTopologyPlaceVertexPanel::getConstrainedInteractor
+
+
+RenderingManager::ConstrainedPointInteractor* QtTopologyPlaceVertexPanel::createConstrainedPointInteractor ( )
+{
+	if ((0 != getInteractor ( )) || (0 != getConstrainedInteractor ( )))
+			throw Exception (UTF8String ("QtTopologyPlaceVertexPanel::createConstrainedPointInteractor : interacteur existant.", Charset::UTF_8));
+
+	RenderingManager::ConstrainedPointInteractor*	interactor	= 0;
+
+	if ((false == isContrained ( )) && (0 != getVertex ( )))
+	{
+		Math::Point	p (getPoint ( ));
+		interactor	= getRenderingManager ( ).createAxisConstrainedPointInteractor (p, this);
+		if (0 != _sliderLabel)
+			_sliderLabel->hide ( );
+		if (0 != _interactorSlider)
+			_interactorSlider->hide ( );
+		
+		registerPreviewedInteractor (interactor);
+	}	// if ((false == isContrained ( )) && (0 != getVertex ( )))
+
+	return interactor;
+}	// QtTopologyPlaceVertexPanel::createConstrainedPointInteractor
 
 
 void QtTopologyPlaceVertexPanel::operationCompleted ( )
@@ -597,7 +640,7 @@ void QtTopologyPlaceVertexPanel::coordinatesModifiedCallback ( )
 	CHECK_NULL_PTR_ERROR (_xTextField)
 	CHECK_NULL_PTR_ERROR (_yTextField)
 	CHECK_NULL_PTR_ERROR (_zTextField)
-	RenderingManager::PointInteractor*		interactor	= getInteractor ( );
+	RenderingManager::PointInteractor*				interactor	= getInteractor ( );
 	RenderingManager::ConstrainedPointInteractor*	cinteractor	= getConstrainedInteractor ( );
 	if (0 != interactor)
 	{
@@ -612,6 +655,24 @@ void QtTopologyPlaceVertexPanel::coordinatesModifiedCallback ( )
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
 }	// QtTopologyPlaceVertexPanel::coordinatesModifiedCallback
+
+
+void QtTopologyPlaceVertexPanel::interactorTypeCallback ( )
+{
+	BEGIN_QT_TRY_CATCH_BLOCK
+
+	CHECK_NULL_PTR_ERROR (_3dInteractorCheckBox)
+
+	preview (false, true);	// => détruit l'interacteur en cours
+	if (true == _3dInteractorCheckBox->isChecked ( ))
+		createPointInteractor ( );	// Création si contexte OK
+	else
+		createConstrainedPointInteractor ( );	// Création si contexte OK
+
+	preview (true, true);
+		
+	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
+}	// QtTopologyPlaceVertexPanel::interactorTypeCallback
 
 
 void QtTopologyPlaceVertexPanel::interactorSizeCallback ( )
@@ -645,29 +706,22 @@ void QtTopologyPlaceVertexPanel::interactorSizeCallback ( )
 //                  LA CLASSE QtTopologyPlaceVertexAction
 // ===========================================================================
 
-QtTopologyPlaceVertexAction::QtTopologyPlaceVertexAction (
-	const QIcon& icon, const QString& text,
-	QtMgx3DMainWindow& mainWindow, const QString& tooltip)
+QtTopologyPlaceVertexAction::QtTopologyPlaceVertexAction (const QIcon& icon, const QString& text, QtMgx3DMainWindow& mainWindow, const QString& tooltip)
 	: QtMgx3DTopoOperationAction (icon, text, mainWindow, tooltip)
 {
-	QtTopologyPlaceVertexPanel*	operationPanel	= 
-			new QtTopologyPlaceVertexPanel (&getOperationPanelParent ( ),
-					text.toStdString ( ), mainWindow, this);
+	QtTopologyPlaceVertexPanel*	operationPanel	= new QtTopologyPlaceVertexPanel (&getOperationPanelParent ( ), text.toStdString ( ), mainWindow, this);
 	setOperationPanel (operationPanel);
 }	// QtTopologyPlaceVertexAction::QtTopologyPlaceVertexAction
 
 
-QtTopologyPlaceVertexAction::QtTopologyPlaceVertexAction (
-										const QtTopologyPlaceVertexAction&)
-	: QtMgx3DTopoOperationAction (
-						QIcon (""), "", *new QtMgx3DMainWindow (0), "")
+QtTopologyPlaceVertexAction::QtTopologyPlaceVertexAction (const QtTopologyPlaceVertexAction&)
+	: QtMgx3DTopoOperationAction (QIcon (""), "", *new QtMgx3DMainWindow (0), "")
 {
 	MGX_FORBIDDEN ("QtTopologyPlaceVertexAction copy constructor is not allowed.")
 }	// QtTopologyPlaceVertexAction::QtTopologyPlaceVertexAction
 
 
-QtTopologyPlaceVertexAction& QtTopologyPlaceVertexAction::operator = (
-										const QtTopologyPlaceVertexAction&)
+QtTopologyPlaceVertexAction& QtTopologyPlaceVertexAction::operator = (const QtTopologyPlaceVertexAction&)
 {
 	MGX_FORBIDDEN ("QtTopologyPlaceVertexAction assignment operator is not allowed.")
 	return *this;
@@ -679,8 +733,7 @@ QtTopologyPlaceVertexAction::~QtTopologyPlaceVertexAction ( )
 }	// QtTopologyPlaceVertexAction::~QtTopologyPlaceVertexAction
 
 
-QtTopologyPlaceVertexPanel*
-				QtTopologyPlaceVertexAction::getTopologyProjectVerticesPanel ( )
+QtTopologyPlaceVertexPanel* QtTopologyPlaceVertexAction::getTopologyProjectVerticesPanel ( )
 {
 	return dynamic_cast<QtTopologyPlaceVertexPanel*>(getOperationPanel ( ));
 }	// QtTopologyPlaceVertexAction::getTopologyProjectVerticesPanel
