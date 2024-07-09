@@ -25,8 +25,7 @@ namespace QtComponents
 
 
 /**
- * Panneau d'édition des paramètres d'une opération géométrique touchant
- * un cercle.
+ * Panneau d'édition des paramètres d'une opération géométrique touchant un cercle / une ellipse.
  */
 class QtCircleOperationPanel : public QtMgx3DOperationPanel
 {
@@ -34,26 +33,24 @@ class QtCircleOperationPanel : public QtMgx3DOperationPanel
 
 	public :
 
-	/** La méthode de création/modification du cercle.
+	/** La méthode de création/modification du cercle / de l'ellipse.
 	 * <OL>
 	 * <LI>Renseignement de 3 vertex (extrémités + centre du cercle)
+	 * <LI>Renseignement de 3 vertex (point 1 + point 2 + centre de l'ellipse)
 	 * </OL>
 	 */
-	enum OPERATION_METHOD { THREE_POINTS };
+	enum OPERATION_METHOD { THREE_POINTS, ELLIPSE_THREE_POINTS };
 
 	/**
 	 * Créé l'ihm.
 	 * \param	Widget parent.
 	 * \param	Nom du panneau.
 	 * \param	Politique de création/modification du groupe
-	 * \param	Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée
-	 *			notamment pour récupérer le contexte.
+	 * \param	Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée notamment pour récupérer le contexte.
 	 * \param	Eventuelle action associée à ce panneau.
 	 */
 	QtCircleOperationPanel (
-			QWidget* parent, const std::string& panelName,
-			QtMgx3DGroupNamePanel::POLICY creationPolicy,
-			Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
+			QWidget* parent, const std::string& panelName, QtMgx3DGroupNamePanel::POLICY creationPolicy, Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
 			Mgx3D::QtComponents::QtMgx3DOperationAction* action);
 
 	/**
@@ -86,9 +83,7 @@ class QtCircleOperationPanel : public QtMgx3DOperationPanel
 
     /**
      * Méthode appelée pour vérifier les paramètres saisis par l'utilisateur.
-     * En cas de paramètrage invalide cette méthode doit leve une exception de
-     * type <I>TkUtil::Exception</I> contenant un descriptif des erreurs
-     * rencontrées.
+     * En cas de paramètrage invalide cette méthode doit leve une exception de type <I>TkUtil::Exception</I> contenant un descriptif des erreurs rencontrées.
      */
     virtual void validate ( );
 
@@ -123,8 +118,7 @@ class QtCircleOperationPanel : public QtMgx3DOperationPanel
 	protected slots :
 
 	/**
-	 * Appelé lorsque la méthode change. Actualise le panneau de saisie des
-	 * paramètres.
+	 * Appelé lorsque la méthode change. Actualise le panneau de saisie des paramètres.
 	 */
 	virtual void operationMethodCallback ( );
 
@@ -160,8 +154,7 @@ class QtCircleOperationPanel : public QtMgx3DOperationPanel
 
 
 /**
- * Classe d'action type <I>check box</I> associée à un panneau type
- * <I>QtCircleOperationPanel</I> de création/modification d'un cercle.
+ * Classe d'action type <I>check box</I> associée à un panneau type <I>QtCircleOperationPanel</I> de création/modification d'un cercle/d'une ellipse.
  */
 class QtCircleOperationAction : public QtMgx3DGeomOperationAction
 {
@@ -172,16 +165,12 @@ class QtCircleOperationAction : public QtMgx3DGeomOperationAction
 	 * <I>QtCircleOperationPanel</I>.
 	 * \param		Icône représentant l'action.
 	 * \param		Texte représentant l'action.
-	 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée
-	 *				notamment pour récupérer le contexte et le panneau contenant
-	 *				les icônes.
+	 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée notamment pour récupérer le contexte et le panneau contenant les icônes.
 	 * \param		Tooltip décrivant l'action.
 	 * \param		Politique de création/modification du groupe
 	 */
 	QtCircleOperationAction (
-		const QIcon& icon, const QString& text,
-		Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
-		const QString& tooltip, QtMgx3DGroupNamePanel::POLICY creationPolicy);
+		const QIcon& icon, const QString& text, Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow, const QString& tooltip, QtMgx3DGroupNamePanel::POLICY creationPolicy);
 
 	/**
 	 * Destructeur. RAS.
@@ -195,8 +184,7 @@ class QtCircleOperationAction : public QtMgx3DGeomOperationAction
 
 	/**
 	 * Créé/modifie le cercle avec le paramétrage de son panneau associé.
-	 * Invoque préalablement
-	 * <I>QtMgx3DGeomOperationAction::executeOperation</I>.
+	 * Invoque préalablement <I>QtMgx3DGeomOperationAction::executeOperation</I>.
 	 */
 	virtual void executeOperation ( );
 

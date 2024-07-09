@@ -2754,8 +2754,8 @@ void QtMgx3DMainWindow::showReady ( )
 			QtMgx3DOperationAction *circleAction =
 					                       new QtCircleOperationAction(
 							                       QIcon(":/images/geom_create_circle.png"),
-							                       QString::fromUtf8("Création d'un cercle"), *this,
-							                       QString::fromUtf8("Création d'un cercle."),
+							                       QString::fromUtf8("Création d'un cercle/d'une ellipse"), *this,
+							                       QString::fromUtf8("Création d'un cercle/d'une ellipse."),
 							                       QtMgx3DGroupNamePanel::CREATION
 					                       );
 			registerOperationAction(
