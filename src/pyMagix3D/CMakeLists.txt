@@ -30,7 +30,7 @@ add_custom_command (TARGET pyMagix3D POST_BUILD COMMAND mv ${CMAKE_CURRENT_BINAR
 # Objectif avoir les flags de compilation SWIG suivants :
 # -globals pyMagix3D -shadow -DIN_STD="std::" -DSWIG_FORBIDS_FINALIZATION -DIN_UTIL="TkUtil::" -DIN_STD="std::"
 # Ne marche pas sans le -c++ malgré les CPLUSPLUS ON avant le swig_add_library.
-set (MAGIX3D_SWIG_COMPILE_OPTIONS "-c++;-module;pyMagix3D;-globals;pyMagix3D;-shadow;-DIN_STD=\"std::\";-DSWIG_FORBIDS_FINALIZATION;-DIN_UTIL=\"TkUtil::\";-DIN_STD=\"std::\"")
+set (MAGIX3D_SWIG_COMPILE_OPTIONS "-c++;-module;pyMagix3D;-globals;pyMagix3D;-shadow;-DIN_STD=\"std::\";-DSWIG_FORBIDS_FINALIZATION;-DIN_UTIL=\"TkUtil::\";-DIN_STD=\"std::\";"${MAGIX3D_OPTIONS}"")
 # Avec cmake_policy (SET CMP0086 NEW) -module ${SWIG_MODULE_NAME} devrait être automatiquement passé, SWIG_MODULE_NAME étant défini comme propriété du fichier swig. Mais ...
 #set (MT_SWIG_COMPILE_OPTIONS "-c++;-globals;pyMagix3D;-shadow;-DIN_STD=\"std::\";-DSWIG_FORBIDS_FINALIZATION;-DIN_UTIL=\"TkUtil::\";-DIN_STD=\"std::\"")
 swig_link_libraries (pyMagix3D PUBLIC Core TkUtilScripting::TkUtilScripting)
