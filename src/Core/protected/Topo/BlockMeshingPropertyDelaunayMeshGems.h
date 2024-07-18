@@ -142,6 +142,7 @@ public:
 					<< Utils::Math::MgxNumeric::userRepresentation(m_min_size) << ", "
 					<< Utils::Math::MgxNumeric::userRepresentation(m_max_size) << ", "
 					<< Utils::Math::MgxNumeric::userRepresentation(m_optimise_worst_elements) << ", "
+                    << (m_optimise_worst_elements?"True":"False") << ", "
         			<< Utils::Math::MgxNumeric::userRepresentation(m_ratio_pyramid_size) << ")";
         }
 
