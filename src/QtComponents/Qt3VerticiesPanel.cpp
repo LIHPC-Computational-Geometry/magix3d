@@ -10,6 +10,7 @@
 #include "Geom/Vertex.h"
 #include "Topo/Vertex.h"
 #include <QtUtil/QtErrorManagement.h>
+#include <QtUtil/QtUnicodeHelper.h>
 #include "QtComponents/Qt3VerticiesPanel.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 
@@ -42,11 +43,9 @@ namespace QtComponents
 // ===========================================================================
 
 
-Qt3VerticiesPanel::Qt3VerticiesPanel (
-			 QWidget* parent, const string& appTitle, QtMgx3DMainWindow& window,
-			Mgx3D::Utils::FilterEntity::objectType types, bool extremities)
+Qt3VerticiesPanel::Qt3VerticiesPanel (QWidget* parent, const string& appTitle, QtMgx3DMainWindow& window, Mgx3D::Utils::FilterEntity::objectType types, bool extremities)
 	: QtMgx3DOperationsSubPanel (parent, window),
-	  _mainWindow (&window), _vertex1Panel (0), _vertex2Panel (0), _vertex3Panel (0)
+	  _mainWindow (&window), _vertex1Panel (0), _vertex2Panel (0), _vertex3Panel (0), _vertex1Label (0), _vertex2Label (0), _vertex3Label (0)
 {
 //	setContentsMargins (0, 0, 0, 0);
 	QGridLayout*	layout	= new QGridLayout (this);
@@ -55,50 +54,38 @@ Qt3VerticiesPanel::Qt3VerticiesPanel (
 	layout->setSpacing (5);
 
 	// Les 3 vertex :
-	QLabel*	label;
+	_vertex1Label	= new QLabel (QString::fromUtf8(extremities?"Centre :":"Point 1:"), this);
+	layout->addWidget (_vertex1Label, 0, 0);
+	_vertex1Panel	= new QtMgx3DEntityPanel (this, "", true, "", "", &window, SelectionManagerIfc::D0, types);
+	layout->addWidget (_vertex1Panel, 0, 1);
+	connect (_vertex1Panel, SIGNAL (entitiesAddedToSelection (QString)), this,SLOT (pointsAddedToSelectionCallback (QString)));
+	connect (_vertex1Panel, SIGNAL (entitiesRemovedFromSelection (QString)), this, SLOT (pointsRemovedFromSelectionCallback (QString)));
 
-	label	= new QLabel (QString::fromUtf8(extremities?"Centre :":"Point 3:"), this);
-	layout->addWidget (label, 0, 0);
-	_vertex3Panel	= new QtMgx3DEntityPanel (
-			this, "", true, "", "", &window, SelectionManagerIfc::D0, types);
-	layout->addWidget (_vertex3Panel, 0, 1);
-	connect (_vertex3Panel, SIGNAL (entitiesAddedToSelection (QString)), this,
-	         SLOT (pointsAddedToSelectionCallback (QString)));
-	connect (_vertex3Panel, SIGNAL (entitiesRemovedFromSelection (QString)),
-			this, SLOT (pointsRemovedFromSelectionCallback (QString)));
+	_vertex2Label	= new QLabel (QString::fromUtf8(extremities?"Départ :":"Point 2:"), this);
+	layout->addWidget (_vertex2Label, 1, 0);
+	_vertex2Panel	= new QtMgx3DEntityPanel (this, "", true, "", "", &window, SelectionManagerIfc::D0, types);
+	layout->addWidget (_vertex2Panel, 1, 1);
+	connect (_vertex2Panel, SIGNAL (entitiesAddedToSelection (QString)), this, SLOT (pointsAddedToSelectionCallback (QString)));
+	connect (_vertex2Panel, SIGNAL (entitiesRemovedFromSelection (QString)), this, SLOT (pointsRemovedFromSelectionCallback (QString)));
 
-	label	= new QLabel (QString::fromUtf8(extremities?"Départ :":"Point 1:"), this);
-	layout->addWidget (label, 1, 0);
-	_vertex1Panel	= new QtMgx3DEntityPanel (
-			this, "", true, "", "", &window, SelectionManagerIfc::D0, types);
-	layout->addWidget (_vertex1Panel, 1, 1);
-	connect (_vertex1Panel, SIGNAL (entitiesAddedToSelection (QString)), this,
-	         SLOT (pointsAddedToSelectionCallback (QString)));
-	connect (_vertex1Panel, SIGNAL (entitiesRemovedFromSelection (QString)),
-			this, SLOT (pointsRemovedFromSelectionCallback (QString)));
-
-	label	= new QLabel (QString::fromUtf8(extremities?"Fin :":"Point 2:"), this);
-	layout->addWidget (label, 2, 0);
-	_vertex2Panel	= new QtMgx3DEntityPanel (
-			this, "", true, "", "", &window, SelectionManagerIfc::D0, types);
-	layout->addWidget (_vertex2Panel, 2, 1);
-	connect (_vertex2Panel, SIGNAL (entitiesAddedToSelection (QString)), this,
-	         SLOT (pointsAddedToSelectionCallback (QString)));
-	connect (_vertex2Panel, SIGNAL (entitiesRemovedFromSelection (QString)),
-			this, SLOT (pointsRemovedFromSelectionCallback (QString)));
+	_vertex3Label	= new QLabel (QString::fromUtf8(extremities?"Fin :":"Point 3:"), this);
+	layout->addWidget (_vertex3Label, 2, 0);
+	_vertex3Panel	= new QtMgx3DEntityPanel (this, "", true, "", "", &window, SelectionManagerIfc::D0, types);
+	layout->addWidget (_vertex3Panel, 2, 1);
+	connect (_vertex3Panel, SIGNAL (entitiesAddedToSelection (QString)), this, SLOT (pointsAddedToSelectionCallback (QString)));
+	connect (_vertex3Panel, SIGNAL (entitiesRemovedFromSelection (QString)), this, SLOT (pointsRemovedFromSelectionCallback (QString)));
 
 	CHECK_NULL_PTR_ERROR (_vertex1Panel->getNameTextField( ))
 	CHECK_NULL_PTR_ERROR (_vertex2Panel->getNameTextField( ))
 	CHECK_NULL_PTR_ERROR (_vertex3Panel->getNameTextField( ))
-	_vertex3Panel->getNameTextField( )->setLinkedSeizureManagers (0, _vertex1Panel->getNameTextField( ));
-	_vertex1Panel->getNameTextField( )->setLinkedSeizureManagers (_vertex3Panel->getNameTextField( ), _vertex2Panel->getNameTextField( ));
-	_vertex2Panel->getNameTextField( )->setLinkedSeizureManagers (_vertex3Panel->getNameTextField( ), 0);
+	_vertex1Panel->getNameTextField( )->setLinkedSeizureManagers (0, _vertex2Panel->getNameTextField( ));
+	_vertex2Panel->getNameTextField( )->setLinkedSeizureManagers (_vertex1Panel->getNameTextField( ), _vertex3Panel->getNameTextField( ));
+	_vertex3Panel->getNameTextField( )->setLinkedSeizureManagers (_vertex2Panel->getNameTextField( ), 0);
 }	// Qt3VerticiesPanel::Qt3VerticiesPanel
 
 
 Qt3VerticiesPanel::Qt3VerticiesPanel (const Qt3VerticiesPanel& p)
-	: QtMgx3DOperationsSubPanel (p),
-	  _mainWindow (0), _vertex1Panel (0), _vertex2Panel (0), _vertex3Panel (0)
+	: QtMgx3DOperationsSubPanel (p), _mainWindow (0), _vertex1Panel (0), _vertex2Panel (0), _vertex3Panel (0), _vertex1Label (0), _vertex2Label (0), _vertex3Label (0)
 {
 	MGX_FORBIDDEN ("Qt3VerticiesPanel copy constructor is not allowed.");
 }	// Qt3VerticiesPanel::Qt3VerticiesPanel
@@ -151,10 +138,8 @@ void Qt3VerticiesPanel::autoUpdate ( )
 	{
 		BEGIN_QT_TRY_CATCH_BLOCK
 
-		const FilterEntity::objectType	types	=
-											_vertex1Panel->getFilteredTypes ( );
-		vector<string>	selectedVertices =
-			getSelectionManager ( ).getEntitiesNames (types);
+		const FilterEntity::objectType	types	= _vertex1Panel->getFilteredTypes ( );
+		vector<string>	selectedVertices = getSelectionManager ( ).getEntitiesNames (types);
 		if (3 <= selectedVertices.size ( ))
 		{
 			_vertex1Panel->setUniqueName (selectedVertices [0]);
@@ -195,6 +180,39 @@ string Qt3VerticiesPanel::getCenterVertexUniqueName ( ) const
 	CHECK_NULL_PTR_ERROR (_vertex3Panel)
 	return _vertex3Panel->getUniqueName ( );
 }	// Qt3VerticiesPanel::getCenterVertexUniqueName
+
+
+QtMgx3DEntityPanel& Qt3VerticiesPanel::getStartVertexPanel ( )
+{
+	CHECK_NULL_PTR_ERROR (_vertex1Panel)
+	return *_vertex1Panel;
+}	// Qt3VerticiesPanel::getStartVertexPanel
+
+
+QtMgx3DEntityPanel& Qt3VerticiesPanel::getEndVertexPanel ( )
+{
+	CHECK_NULL_PTR_ERROR (_vertex2Panel)
+	return *_vertex2Panel;
+}	// Qt3VerticiesPanel::getEndVertexPanel
+
+
+QtMgx3DEntityPanel& Qt3VerticiesPanel::getCenterVertexPanel ( )
+{
+	CHECK_NULL_PTR_ERROR (_vertex3Panel)
+	return *_vertex3Panel;
+}	// Qt3VerticiesPanel::getCenterVertexPanel
+
+
+void Qt3VerticiesPanel::setLabels (const UTF8String& start, const UTF8String& end, const UTF8String& center)
+{
+	CHECK_NULL_PTR_ERROR (_vertex1Label)
+	CHECK_NULL_PTR_ERROR (_vertex2Label)
+	CHECK_NULL_PTR_ERROR (_vertex3Label)
+	_vertex1Label->setText (UTF8TOQSTRING (start));
+	_vertex2Label->setText (UTF8TOQSTRING (end));
+	_vertex3Label->setText (UTF8TOQSTRING (center));
+	
+}	// Qt3VerticiesPanel::setLabels
 
 
 void Qt3VerticiesPanel::getPoints (Math::Point& p1, Math::Point& p2, Math::Point& p3) const

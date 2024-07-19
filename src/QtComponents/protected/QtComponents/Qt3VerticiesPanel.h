@@ -24,8 +24,7 @@ namespace QtComponents
 {
 
 /**
- * Panneau permettant de saisir les extrémités d'un arc de cercle, matérialisées
- * par 2 points/sommets, et un 3ème (centre de l'arc de cercle).
+ * Panneau permettant de saisir les extrémités d'un arc de cercle, matérialisées par 2 points/sommets, et un 3ème (centre de l'arc de cercle).
  * Ou simplement par 3 points (pour un cercle)
  */
 class Qt3VerticiesPanel : public QtMgx3DOperationsSubPanel
@@ -36,16 +35,12 @@ class Qt3VerticiesPanel : public QtMgx3DOperationsSubPanel
 
 	/**
 	 * \param		Widget parent
-	 * \param		Le nom de l'application, pour les éventuels messages
-	 *				d'erreur.
+	 * \param		Le nom de l'application, pour les éventuels messages d'erreur.
 	 * \param		Fenêtre principale associée, pour la saisie des points/sommets.
 	 * \param		Types d'entités acceptées pour la saisie des points/sommets.
 	 * \param       vrai pour le cas avec 2 extrémités et un centre
 	 */
-	Qt3VerticiesPanel (QWidget* parent, const std::string& appTitle,
-					Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
-					Mgx3D::Utils::FilterEntity::objectType types,
-					bool extremities);
+	Qt3VerticiesPanel (QWidget* parent, const std::string& appTitle, Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow, Mgx3D::Utils::FilterEntity::objectType types, bool extremities);
 
 	/**
 	 * Destructeur. RAS.
@@ -71,7 +66,19 @@ class Qt3VerticiesPanel : public QtMgx3DOperationsSubPanel
 	virtual std::string getStartVertexUniqueName ( ) const;
 	virtual std::string getEndVertexUniqueName ( ) const;
 	virtual std::string getCenterVertexUniqueName ( ) const;
-
+	
+	/**
+	 * \return	Les panneaux de saisie des 3 vertex.
+	 */
+	 virtual QtMgx3DEntityPanel& getStartVertexPanel ( );
+	 virtual QtMgx3DEntityPanel& getEndVertexPanel ( );
+	 virtual QtMgx3DEntityPanel& getCenterVertexPanel ( );
+	 
+	 /**
+	  * \param	Nouveaux labels des 3 champs de saisie.
+	  */
+	virtual void setLabels (const TkUtil::UTF8String& start, const TkUtil::UTF8String& end, const TkUtil::UTF8String& center);
+	
 	/**
 	 * \param	En retour, les points définissant l'arête (départ/fin/centre).
 	 * \except	Une exception est levée en cas d'absence d'arête.
@@ -116,6 +123,7 @@ class Qt3VerticiesPanel : public QtMgx3DOperationsSubPanel
 	/** \return le point pour un sommet topo ou géom */
 	Utils::Math::Point getPoint (const std::string& name) const;
 
+
 	protected slots :
 
 	/**
@@ -146,6 +154,7 @@ class Qt3VerticiesPanel : public QtMgx3DOperationsSubPanel
 
 	/** Les 3 vertex. */
 	QtMgx3DEntityPanel				                *_vertex1Panel, *_vertex2Panel, *_vertex3Panel;
+	QLabel											*_vertex1Label, *_vertex2Label, *_vertex3Label;
 
 //	/** Contexte d'utilisation du panneau. */
 //	Mgx3D::Internal::ContextIfc*	_context;

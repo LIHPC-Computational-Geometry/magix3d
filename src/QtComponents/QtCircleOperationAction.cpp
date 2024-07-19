@@ -46,12 +46,8 @@ namespace QtComponents
 // ===========================================================================
 
 QtCircleOperationPanel::QtCircleOperationPanel (
-			QWidget* parent, const string& panelName, 
-			QtMgx3DGroupNamePanel::POLICY creationPolicy,
-			QtMgx3DMainWindow& mainWindow, QtMgx3DOperationAction* action)
-	: QtMgx3DOperationPanel (parent, mainWindow, action,
-			QtMgx3DApplication::HelpSystem::instance ( ).circleOperationURL,
-			QtMgx3DApplication::HelpSystem::instance ( ).circleOperationTag),
+			QWidget* parent, const string& panelName, QtMgx3DGroupNamePanel::POLICY creationPolicy, QtMgx3DMainWindow& mainWindow, QtMgx3DOperationAction* action)
+	: QtMgx3DOperationPanel (parent, mainWindow, action, QtMgx3DApplication::HelpSystem::instance ( ).circleOperationURL, QtMgx3DApplication::HelpSystem::instance ( ).circleOperationTag),
 	  _namePanel (0), _operationMethodComboBox (0),
 	  _currentParentWidget (0), _currentPanel (0),
 	  _verticesPanel (0)
@@ -74,8 +70,7 @@ QtCircleOperationPanel::QtCircleOperationPanel (
 	layout->addWidget (label);
 
 	// Nom groupe :
-	_namePanel	= new QtMgx3DGroupNamePanel (
-							this, "Groupe", mainWindow, 1, creationPolicy, "");
+	_namePanel	= new QtMgx3DGroupNamePanel (this, "Groupe", mainWindow, 1, creationPolicy, "");
 	layout->addWidget (_namePanel);
 	addValidatedField (*_namePanel);
 
@@ -85,15 +80,14 @@ QtCircleOperationPanel::QtCircleOperationPanel (
 	label	= new QLabel (QString::fromUtf8("Méthode"), this);
 	hlayout->addWidget (label);
 	_operationMethodComboBox	= new QComboBox (this);
-	_operationMethodComboBox->addItem ("Par saisie de 3 points");
-	connect (_operationMethodComboBox, SIGNAL (currentIndexChanged (int)),
-	         this, SLOT (operationMethodCallback ( )));
+	_operationMethodComboBox->addItem ("Cercle (saisie de 3 points)");
+	_operationMethodComboBox->addItem ("Ellipse (saisie de 3 points)");
+	connect (_operationMethodComboBox, SIGNAL (currentIndexChanged (int)), this, SLOT (operationMethodCallback ( )));
 	hlayout->addWidget (_operationMethodComboBox);
 	hlayout->addStretch (10);
 	
 	// Définition du cercle :
-	QtGroupBox*		groupBox	=
-						new QtGroupBox(QString::fromUtf8("Paramètres du cercle"), this);
+	QtGroupBox*		groupBox	= new QtGroupBox (QString::fromUtf8 ("Paramètres du cercle"), this);
 	QVBoxLayout*	vlayout	= new QVBoxLayout (groupBox);
 	vlayout->setContentsMargins  (
 						Resources::instance ( )._margin.getValue ( ),
@@ -109,14 +103,9 @@ QtCircleOperationPanel::QtCircleOperationPanel (
 	vlayout->addWidget (_currentParentWidget);
 	QHBoxLayout*	currentLayout = new QHBoxLayout (_currentParentWidget);
 	_currentParentWidget->setLayout (currentLayout);
-	_verticesPanel	= new Qt3VerticiesPanel (
-				0, "Définition d'un cercle par 3 points",
-				mainWindow, FilterEntity::GeomVertex,
-				false);
-	connect (_verticesPanel, SIGNAL (pointAddedToSelection (QString)), this,
-	         SLOT (entitiesAddedToSelectionCallback (QString)));
-	connect (_verticesPanel, SIGNAL (pointRemovedFromSelection (QString)), this,
-	         SLOT (entitiesRemovedFromSelectionCallback (QString)));
+	_verticesPanel	= new Qt3VerticiesPanel (0, "Définition d'un cercle par 3 points", mainWindow, FilterEntity::GeomVertex, false);
+	connect (_verticesPanel, SIGNAL (pointAddedToSelection (QString)), this, SLOT (entitiesAddedToSelectionCallback (QString)));
+	connect (_verticesPanel, SIGNAL (pointRemovedFromSelection (QString)), this, SLOT (entitiesRemovedFromSelectionCallback (QString)));
 	_verticesPanel->hide ( );
 	operationMethodCallback ( );
 
@@ -124,20 +113,15 @@ QtCircleOperationPanel::QtCircleOperationPanel (
 }	// QtCircleOperationPanel::QtCircleOperationPanel
 
 
-QtCircleOperationPanel::QtCircleOperationPanel (
-										const QtCircleOperationPanel& cao)
-	: QtMgx3DOperationPanel (
-			0, *new QtMgx3DMainWindow(0), 0, "", ""),
-	  _namePanel (0), _operationMethodComboBox (0),
-	  _currentParentWidget (0), _currentPanel (0),
-	  _verticesPanel (0)
+QtCircleOperationPanel::QtCircleOperationPanel (const QtCircleOperationPanel& cao)
+	: QtMgx3DOperationPanel (0, *new QtMgx3DMainWindow(0), 0, "", ""),
+	  _namePanel (0), _operationMethodComboBox (0), _currentParentWidget (0), _currentPanel (0), _verticesPanel (0)
 {
 	MGX_FORBIDDEN ("QtCircleOperationPanel copy constructor is not allowed.");
 }	// QtCircleOperationPanel::QtCircleOperationPanel (const QtCircleOperationPanel&)
 
 
-QtCircleOperationPanel& QtCircleOperationPanel::operator = (
-											const QtCircleOperationPanel&)
+QtCircleOperationPanel& QtCircleOperationPanel::operator = (const QtCircleOperationPanel&)
 {
 	MGX_FORBIDDEN ("QtCircleOperationPanel assignment operator is not allowed.");
 	return *this;
@@ -156,8 +140,7 @@ string QtCircleOperationPanel::getGroupName ( ) const
 }	// QtCircleOperationPanel::getGroupName
 
 
-QtCircleOperationPanel::OPERATION_METHOD
-						QtCircleOperationPanel::getOperationMethod ( ) const
+QtCircleOperationPanel::OPERATION_METHOD QtCircleOperationPanel::getOperationMethod ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_operationMethodComboBox);
 	return (QtCircleOperationPanel::OPERATION_METHOD)_operationMethodComboBox->currentIndex ( );
@@ -205,11 +188,6 @@ void QtCircleOperationPanel::reset ( )
 
 void QtCircleOperationPanel::validate ( )
 {
-// CP : suite discussion EBL/FL, il est convenu que la validation des
-// paramètres de l'opération est effectuée par le "noyau" et qu'un mauvais
-// paramétrage est remonté sous forme d'exception à la fonction appelante, donc
-// avant exécution de la commande.
-// Les validations des valeurs des paramètres sont donc ici commentées.
 	TkUtil::UTF8String	error (TkUtil::Charset::UTF_8);
 
 	try
@@ -229,20 +207,18 @@ void QtCircleOperationPanel::validate ( )
 	CHECK_NULL_PTR_ERROR (_operationMethodComboBox)
 	switch (_operationMethodComboBox->currentIndex ( ))
 	{
-		case QtCircleOperationPanel::THREE_POINTS	:
+		case QtCircleOperationPanel::THREE_POINTS			:
+		case QtCircleOperationPanel::ELLIPSE_THREE_POINTS	:
 			break;
 		case -1	:
 			if (0 != error.length ( ))
 				error << "\n";
-			error << "Absence de méthode d'opération de création/modification "
-			      << "d'un cercle sélectionnée.";
+			error << "Absence de méthode d'opération de création/modification d'un cercle sélectionnée.";
 			break;
 		default		:
 			if (0 != error.length ( ))
 				error << "\n";
-			error << "QtCircleOperationPanel::validate : index de méthode "
-			      << "d'opération de création/modification d'un cercle "
-			      << "invalide ("
+			error << "QtCircleOperationPanel::validate : index de méthode d'opération de création/modification d'un cercle invalide ("
 			      << (long)_operationMethodComboBox->currentIndex ( ) << ").";
 	}	// switch (_operationMethodComboBox->currentIndex ( ))
 
@@ -313,15 +289,25 @@ void QtCircleOperationPanel::operationMethodCallback ( )
 	}
 	_currentPanel	= 0;
 
+	QGroupBox*	parent	= dynamic_cast<QGroupBox*>(_currentParentWidget->parent ( ));
 	switch (getOperationMethod ( ))
 	{
 		case QtCircleOperationPanel::THREE_POINTS				:
-			_currentPanel	= _verticesPanel;					break;
+			_currentPanel	= _verticesPanel;
+			_verticesPanel->setLabels (UTF8String ("Point 1"), UTF8String ("Point 2"), UTF8String ("Point 3"));
+			if (0 != parent)
+				parent->setTitle (QString::fromUtf8 ("Paramètres du cercle"));
+			break;
+		case QtCircleOperationPanel::ELLIPSE_THREE_POINTS		:
+			_currentPanel	= _verticesPanel;
+			_verticesPanel->setLabels (UTF8String ("Point 1"), UTF8String ("Point 2"), UTF8String ("Centre"));
+			if (0 != parent)
+				parent->setTitle (QString::fromUtf8 ("Paramètres de l'ellipse"));
+			break;
 		default	:
 		{
 			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-			message << "Méthode d'opération non supportée ("
-			        << (unsigned long)getOperationMethod ( ) << ").";
+			message << "Méthode d'opération non supportée (" << (unsigned long)getOperationMethod ( ) << ").";
 			INTERNAL_ERROR (exc, message, "QtCircleOperationPanel::operationMethodCallback")
 			throw exc;
 		}
@@ -343,29 +329,22 @@ void QtCircleOperationPanel::operationMethodCallback ( )
 //                  LA CLASSE QtCircleOperationAction
 // ===========================================================================
 
-QtCircleOperationAction::QtCircleOperationAction (
-	const QIcon& icon, const QString& text, QtMgx3DMainWindow& mainWindow,
-	const QString& tooltip, QtMgx3DGroupNamePanel::POLICY creationPolicy)
+QtCircleOperationAction::QtCircleOperationAction (const QIcon& icon, const QString& text, QtMgx3DMainWindow& mainWindow, const QString& tooltip, QtMgx3DGroupNamePanel::POLICY creationPolicy)
 	: QtMgx3DGeomOperationAction (icon, text, mainWindow, tooltip)
 {
-	QtCircleOperationPanel*	operationPanel	=
-		new QtCircleOperationPanel (
-			&getOperationPanelParent ( ), text.toStdString ( ), creationPolicy,
-			mainWindow, this);
+	QtCircleOperationPanel*	operationPanel	= new QtCircleOperationPanel (&getOperationPanelParent ( ), text.toStdString ( ), creationPolicy, mainWindow, this);
 	setOperationPanel (operationPanel);
 }	// QtCircleOperationAction::QtCircleOperationAction
 
 
-QtCircleOperationAction::QtCircleOperationAction (
-										const QtCircleOperationAction&)
+QtCircleOperationAction::QtCircleOperationAction (const QtCircleOperationAction&)
 	: QtMgx3DGeomOperationAction (QIcon (""), "", *new QtMgx3DMainWindow (0), "")
 {
 	MGX_FORBIDDEN ("QtCircleOperationAction copy constructor is not allowed.")
 }	// QtCircleOperationAction::QtCircleOperationAction
 
 
-QtCircleOperationAction& QtCircleOperationAction::operator = (
-										const QtCircleOperationAction&)
+QtCircleOperationAction& QtCircleOperationAction::operator = (const QtCircleOperationAction&)
 {
 	MGX_FORBIDDEN ("QtCircleOperationAction assignment operator is not allowed.")
 	return *this;
@@ -395,6 +374,7 @@ void QtCircleOperationAction::executeOperation ( )
 	const string	name	= panel->getGroupName ( );
 	switch (getCirclePanel ( )->getOperationMethod ( ))
 	{
+	
 		case QtCircleOperationPanel::THREE_POINTS				:
 		{
 			const string	vertex1	= getCirclePanel ( )->getVertex1UniqueName ( );
@@ -403,12 +383,18 @@ void QtCircleOperationAction::executeOperation ( )
 			cmdResult	= getContext ( ).getGeomManager ( ).newCircle (vertex1, vertex2, vertex3, name);
 		}
 		break;
+		case QtCircleOperationPanel::ELLIPSE_THREE_POINTS		:
+		{
+			const string	vertex1	= getCirclePanel ( )->getVertex1UniqueName ( );
+			const string	vertex2	= getCirclePanel ( )->getVertex2UniqueName ( );
+			const string	vertex3	= getCirclePanel ( )->getVertex3UniqueName ( );
+			cmdResult	= getContext ( ).getGeomManager ( ).newEllipse (vertex1, vertex2, vertex3, name);
+		}
+		break;
 		default	:
 		{
 			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-			message << "Méthode d'opération non supportée ("
-			        << (unsigned long)getCirclePanel ( )->getOperationMethod ( )
-			        << ").";
+			message << "Méthode d'opération non supportée ("  << (unsigned long)getCirclePanel ( )->getOperationMethod ( ) << ").";
 			INTERNAL_ERROR (exc, message, "QtCircleOperationAction::executeOperation")
 			throw exc;
 		}
