@@ -200,16 +200,36 @@ Positionner un sommet topologique |image140|
 
 Ce panneau permet de renseigner à la main les coordonnées
 d’un sommet, mais surtout lorsque l’on active l’aperçu, il permet de
-déplacer graphiquement, à la souris, ce sommet. Par défaut le
-déplacement du point se fait dans toutes les directions, mais il est
-possible de le contraindre suivant un des 3 axes. Pour se faire il faut
-appuyer sur la touche *Shift*, ensuite le segment de la boite de
-contrôle du déplacement le plus proche du curseur sera celui suivant
-lequel se fera le déplacement.
+déplacer graphiquement, à la souris, ce sommet.
+Par défaut le déplacement du point se fait dans toutes les directions, 
+mais il est possible de le contraindre suivant un des 3 axes ou sur une
+entité.
+Par défaut on peut déplacer le sommet sélectionné dans le plan de 
+l'écran en cliquant dessus du bouton gauche et en déplaçant la souris. 
+Notons que la sphère devient verte. 
+On peut contraindre le déplacement le long de l'axe Ox, Oy ou Oz en 
+pressant respectivement la touche 'x', 'y' ou 'z'. Un axe vert
+matérialisant les positions possibles apparaît alors. Le retour au
+déplacement dans le plan de l'écran s'effectue par pression de la touche
+' ' (espace). Avec cet interacteur par défaut les déplacements ne sont
+donc possibles, à un moment donné, que dans un plan (écran, xOy, xOz,
+yOz).
+En cochant la case *interacteur 3D* on utilise un autre interacteur qui
+permet les déplacements dans l'espace. Le sommet est au centre d'une 
+boite filaire. On peut le déplacer en sélectionnant l'un des bras de 
+cette boite et en déplaçant la souris. En appuyant sur la touche 
+*Shift* le segment de la boite de contrôle du déplacement le plus proche
+du curseur sera celui suivant lequel se fera le déplacement.
 
 Il est également possible de contraindre le déplacement sur une entité
-1D (courbe) ou 2D (surface). Il faut sélectionner en premier lieu
-l’entité contraignante et en dernier le sommet à déplacer.
+1D (courbe) ou 2D (surface). Pour ce il convient de cocher la case 
+*contraindre sur une entité*. Il faut sélectionner en premier lieu
+l’entité contraignante et en dernier le sommet à déplacer qui sera
+matérialisé par une croix 3D. On peut alors déplacer interactivement le 
+sommet à la souris sur une discrétisation de la courbe ou la surface de 
+contrainte. On peut gagner en finesse dans le déplacement en augmentant
+le *facteur de raffinement* (validation par retour chariot dans le champ
+de saisie).
 
 .. _modif-coord-sommets:
 
