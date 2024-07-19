@@ -20,8 +20,7 @@
 
 /** <P>En plus de la classe <I>vtkUnifiedInteractorStyle</I> permet :<BR>
  * <OL>
- * <LI>L'annulation optionnelle du roulis lors  du repositionnement dans un plan
- * (touches X, Y, Z),
+ * <LI>L'annulation optionnelle du roulis lors  du repositionnement dans un plan (touches X, Y, Z),
  * <LI>Du <I>picking</I> au bouton gauche de la souris,
  * </OL>
  * </P>
@@ -33,8 +32,7 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	public :
 
 	/**
-	 * Evènements déclenchés par cette classe dans le prolongement des
-	 * <I>vtkCommand::EventIds</I>.
+	 * Evènements déclenchés par cette classe dans le prolongement des <I>vtkCommand::EventIds</I>.
 	 */
 	//@{
 
@@ -71,60 +69,47 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 
 	/**
 	 * <P>
-	 * Si la touche pressée est <I>QtMgx3DApplication::_nextSelectionKey</I>
-	 * appelle alors <I>NextSelection</I>.
+	 * Si la touche pressée est <I>QtMgx3DApplication::_nextSelectionKey</I> appelle alors <I>NextSelection</I>.
 	 * </P>
 	 * <P>
-	 * Dans les autres cas invoque
-	 * <I>vtkUnifiedInteractorStyle::OnKeyRelease ( )</I>.
+	 * Dans les autres cas invoque <I>vtkUnifiedInteractorStyle::OnKeyRelease ( )</I>.
 	 * </P>
 	 * \see		NextSelection
 	 */
 	virtual void OnKeyRelease ( );
 
-	/** Action effectuée lorsque la touche "Flèche vers la gauche"
-	 * est activée. Invoque Pan avec un déplacement de souris de
+	/** Action effectuée lorsque la touche "Flèche vers la gauche" est activée. Invoque Pan avec un déplacement de souris de
 	 * - GetMotionRatio ( ) * largeur de la fenêtre. 
-	 * <P>Ces évènements ponctuels provoquent l'invocation de
-	 * <I>InvokeEvent (ViewRedefinedEvent, NULL);</I>.
+	 * <P>Ces évènements ponctuels provoquent l'invocation de <I>InvokeEvent (ViewRedefinedEvent, NULL);</I>.
 	 */
 	virtual void OnLeftArrow ( );
 
-	/** Action effectuée lorsque la touche "Flèche vers le haut"
-	 * est activée. Invoque Pan avec un déplacement de souris de
+	/** Action effectuée lorsque la touche "Flèche vers le haut" est activée. Invoque Pan avec un déplacement de souris de
 	 * GetMotionRatio ( ) * hauteur de la fenêtre. 
-	 * <P>Ces évènements ponctuels provoquent l'invocation de
-	 * <I>InvokeEvent (ViewRedefinedEvent, NULL);</I>.
+	 * <P>Ces évènements ponctuels provoquent l'invocation de <I>InvokeEvent (ViewRedefinedEvent, NULL);</I>.
 	 */
 	virtual void OnUpArrow ( );
 
-	/** Action effectuée lorsque la touche "Flèche vers la droite"
-	 * est activée. Invoque Pan avec un déplacement de souris de
+	/** Action effectuée lorsque la touche "Flèche vers la droite" est activée. Invoque Pan avec un déplacement de souris de
 	 * GetMotionRatio ( ) * largeur de la fenêtre. 
-	 * <P>Ces évènements ponctuels provoquent l'invocation de
-	 * <I>InvokeEvent (ViewRedefinedEvent, NULL);</I>.
+	 * <P>Ces évènements ponctuels provoquent l'invocation de  <I>InvokeEvent (ViewRedefinedEvent, NULL);</I>.
 	 */
 	virtual void OnRightArrow ( );
 
-	/** Action effectuée lorsque la touche "Flèche vers le bas"
-	 * est activée. Invoque Pan avec un déplacement de souris de
+	/** Action effectuée lorsque la touche "Flèche vers le bas" est activée. Invoque Pan avec un déplacement de souris de
 	 * - GetMotionRatio ( ) * hauteur de la fenêtre. 
-	 * <P>Ces évènements ponctuels provoquent l'invocation de
-	 * <I>InvokeEvent (ViewRedefinedEvent, NULL);</I>.
+	 * <P>Ces évènements ponctuels provoquent l'invocation de <I>InvokeEvent (ViewRedefinedEvent, NULL);</I>.
 	 */
 	virtual void OnDownArrow ( );
 
 	/**
-	 * Si <I>centerOnActor</I> vaut <I>true</I> le centre de rotation devient
-	 * l'acteur, sinon il devient le point visé.
-	 * <P>Ces évènements ponctuels provoquent l'invocation de
-	 * <I>InvokeEvent (ViewRedefinedEvent, NULL);</I>.
+	 * Si <I>centerOnActor</I> vaut <I>true</I> le centre de rotation devient l'acteur, sinon il devient le point visé.
+	 * <P>Ces évènements ponctuels provoquent l'invocation de <I>InvokeEvent (ViewRedefinedEvent, NULL);</I>.
 	  */
 	virtual void FlyTo (bool centerOnActor);
 
 	/**
-	 * Positionne la vue respectivement dans le plan <I>xOy</I>, <I>xOz</I>,
-     * <I>yOz</I>. Supprime également le roulis si
+	 * Positionne la vue respectivement dans le plan <I>xOy</I>, <I>xOz</I>, <I>yOz</I>. Supprime également le roulis si
 	 * QtVtkMgx3DApplication::_xyzCancelRoll vaut <I>true</I>.
 	 * Invoque <I>InvokeEvent (ViewRedefinedEvent, NULL)</I>.
      */
@@ -134,15 +119,13 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 
 	/**
 	 * <P>Supprime le roulis.</P>
-	 * <P>Ces évènements ponctuels provoquent l'invocation de
-	 * <I>InvokeEvent (ViewRedefinedEvent, NULL);</I>.
+	 * <P>Ces évènements ponctuels provoquent l'invocation de <I>InvokeEvent (ViewRedefinedEvent, NULL);</I>.
 	 */
 	virtual void ResetRoll ( );
 
 	/**
 	 * <P>Annule un éventuel zoom préalable puis réinitialise la vue.</P>
-	 * <P>Ces évènements ponctuels provoquent l'invocation de
-	 * <I>InvokeEvent (ViewRedefinedEvent, NULL);</I>.
+	 * <P>Ces évènements ponctuels provoquent l'invocation de <I>InvokeEvent (ViewRedefinedEvent, NULL);</I>.
 	 */
 	virtual void ResetView ( );
 
@@ -152,11 +135,9 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	virtual void ResetViewOnSelection ( );
 
 	/**
-	 * \param	<I>Picker</I> à utiliser pour les opérations de sélection
-	 *			interactive à la souris.
+	 * \param	<I>Picker</I> à utiliser pour les opérations de sélection interactive à la souris.
 	 * \param	Commande associée.
-	 * L'ensemble gère les opérations de sélection interactive avec le
-	 * gestionnaire de sélection de <I>Magix 3D</I>.
+	 * L'ensemble gère les opérations de sélection interactive avec le gestionnaire de sélection de <I>Magix 3D</I>.
 	 * \see		SetEntitySeizureManager
 	 */
 	virtual void SetPickingTools (Mgx3D::QtVtkComponents::VTKMgx3DPicker*, Mgx3D::QtVtkComponents::VTKMgx3DPickerCommand*);
@@ -170,18 +151,15 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	virtual Mgx3D::QtComponents::EntitySeizureManager* GetEntitySeizureManager ( );
 
 	/**
-	 * \param	Gestionnaire de saisie interactive associé à l'opération de
-	 *			sélection à effectuer.
+	 * \param	Gestionnaire de saisie interactive associé à l'opération de sélection à effectuer.
 	 * \see		OnMiddleButtonDown
 	 * \see		GetEntitySeizureManager
 	 */
 	virtual void SetEntitySeizureManager (Mgx3D::QtComponents::EntitySeizureManager*);
 
 	/**
-	 * Effectue un picking si
-	 * <I>QtMgx3DApplication::_pickOnLeftButtonDown.getValue ( )</I> vaut
-	 * <I>true</I> et que la sélection interactive est activée, sinon invoque
-	 * <I>vtkUnifiedInteractorStyle::OnLeftButtonDown</I>.
+	 * Effectue un picking si <I>QtMgx3DApplication::_pickOnLeftButtonDown.getValue ( )</I> vaut
+	 * <I>true</I> et que la sélection interactive est activée, sinon invoque <I>vtkUnifiedInteractorStyle::OnLeftButtonDown</I>.
 	 * \see		OnRightButtonDown
 	 * \see		OnLeftButtonUp
 	 * \see		Pick
@@ -190,10 +168,8 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	virtual void OnLeftButtonDown ( );
 
 	/**
-	 * Effectue un picking si
-	 * <I>QtMgx3DApplication::_pickOnRightButtonDown.getValue ( )</I> vaut
-	 * <I>true</I> et que la sélection interactive est activée, sinon invoque
-	 * <I>vtkUnifiedInteractorStyle::OnRightButtonDown</I>.
+	 * Effectue un picking si <I>QtMgx3DApplication::_pickOnRightButtonDown.getValue ( )</I> vaut
+	 * <I>true</I> et que la sélection interactive est activée, sinon invoque <I>vtkUnifiedInteractorStyle::OnRightButtonDown</I>.
 	 * \see		OnLeftButtonDown
 	 * \see		OnRightButtonUp
 	 * \see		Pick
@@ -202,18 +178,15 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	virtual void OnRightButtonDown ( );
 
 	/**
-	 * En cas de fonctionnement avec une instance de la classe
-	 * <I>EntitySeizureManager</I>, provoque le passage au gestionnaire de
+	 * En cas de fonctionnement avec une instance de la classe <I>EntitySeizureManager</I>, provoque le passage au gestionnaire de
 	 * saisie suivant.
 	 */
 	virtual void OnMiddleButtonDown ( );
 
 	/**
 	 * Effectue un picking si
-	 * <I>QtMgx3DApplication::_pickOnLeftButtonUp.getValue ( )</I> vaut
-	 * <I>true</I>, que le curseur de la souris n'a pas bougé depuis que le
-	 * bouton a été enfoncé, et que la sélection interactive est activée, sinon
-	 * invoque <I>vtkUnifiedInteractorStyle::OnLeftButtonUp</I>.
+	 * <I>QtMgx3DApplication::_pickOnLeftButtonUp.getValue ( )</I> vaut <I>true</I>, que le curseur de la souris n'a pas bougé depuis que le
+	 * bouton a été enfoncé, et que la sélection interactive est activée, sinon invoque <I>vtkUnifiedInteractorStyle::OnLeftButtonUp</I>.
 	 * \see		OnLeftButtonDown
 	 * \see		OnRightButtonUp
 	 * \see		Pick
@@ -222,11 +195,8 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	virtual void OnLeftButtonUp ( );
 
 	/**
-	 * Effectue un picking si
-	 * <I>QtMgx3DApplication::_pickOnRightButtonUp.getValue ( )</I> vaut
-	 * <I>true</I>, que le curseur de la souris n'a pas bougé depuis que le
-	 * bouton a été enfoncé, et que la sélection interactive est activée, sinon
-	 * invoque <I>vtkUnifiedInteractorStyle::OnRightButtonUp</I>.
+	 * Effectue un picking si <I>QtMgx3DApplication::_pickOnRightButtonUp.getValue ( )</I> vaut <I>true</I>, que le curseur de la souris
+	 * n'a pas bougé depuis que le bouton a été enfoncé, et que la sélection interactive est activée, sinon invoque <I>vtkUnifiedInteractorStyle::OnRightButtonUp</I>.
 	 * \see		OnRightButtonDown
 	 * \see		OnLeftButtonUp
 	 * \see		Pick
@@ -261,10 +231,8 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	virtual void Pick ( );
 
 	/**
-	 * En mode sélection, désélectionne la dernière sélection
-	 * effectuée et passe à la suivante pointée au même endroit par la souris.
-	 * Effectue la même opération mais en sens inverse si la touche <I>shift</I>
-	 * est pressée.
+	 * En mode sélection, désélectionne la dernière sélection effectuée et passe à la suivante pointée au même endroit par la souris.
+	 * Effectue la même opération mais en sens inverse si la touche <I>shift</I> est pressée.
 	 */
 	virtual void NextSelection ( );
 

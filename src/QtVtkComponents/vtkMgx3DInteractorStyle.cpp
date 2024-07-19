@@ -31,28 +31,20 @@ const unsigned long		vtkMgx3DInteractorStyle::ViewRedefinedEvent	= 105000;
 
 
 vtkMgx3DInteractorStyle::vtkMgx3DInteractorStyle ( )
-	: vtkUnifiedInteractorStyle ( ),
-	  Mgx3DPicker (0), Mgx3DPickerCommand (0), SelectionManager (0),
-	  SeizureManager (0),
-	  InteractiveSelectionActivated (false)
+	: vtkUnifiedInteractorStyle ( ), Mgx3DPicker (0), Mgx3DPickerCommand (0), SelectionManager (0), SeizureManager (0), InteractiveSelectionActivated (false)
 {
 	ButtonPressPosition [0]	= ButtonPressPosition [1]	= 0;
 }	// vtkMgx3DInteractorStyle::vtkMgx3DInteractorStyle
 
 
-vtkMgx3DInteractorStyle::vtkMgx3DInteractorStyle (
-		const vtkMgx3DInteractorStyle&)
-	: vtkUnifiedInteractorStyle ( ),
-	  Mgx3DPicker (0), Mgx3DPickerCommand (0), SelectionManager (0),
-	  SeizureManager (0),
-	  InteractiveSelectionActivated (false)
+vtkMgx3DInteractorStyle::vtkMgx3DInteractorStyle (const vtkMgx3DInteractorStyle&)
+	: vtkUnifiedInteractorStyle ( ), Mgx3DPicker (0), Mgx3DPickerCommand (0), SelectionManager (0), SeizureManager (0), InteractiveSelectionActivated (false)
 {
 	assert (0 && "vtkMgx3DInteractorStyle copy constructor is not allowed.");
 }	// vtkMgx3DInteractorStyle copy constructor
 
 
-vtkMgx3DInteractorStyle& vtkMgx3DInteractorStyle::operator = (
-		const vtkMgx3DInteractorStyle&)
+vtkMgx3DInteractorStyle& vtkMgx3DInteractorStyle::operator = (const vtkMgx3DInteractorStyle&)
 {
 	assert (0 && "vtkMgx3DInteractorStyle::operator = is not allowed.");
 	return *this;
@@ -74,17 +66,10 @@ vtkMgx3DInteractorStyle::~vtkMgx3DInteractorStyle ( )
 void vtkMgx3DInteractorStyle::PrintSelf (ostream& os, vtkIndent indent)
 {
 	vtkUnifiedInteractorStyle::PrintSelf (os, indent);
-	os << "xyzCancelRoll : "
-	   << (true == Resources::instance ( )._xyzCancelRoll.getValue ( ) ?
-												"True" : "False") << endl
-	   << "InteractiveSelectionActivated : "
-	   << (true == InteractiveSelectionActivated ? "True" : "False") << endl
-	   << "PickOnLeftButtonDown : "
-			<< (true == Resources::instance ( )._pickOnLeftButtonDown.getValue( ) ?
-						"True" : "False") << endl
-	   << "PickOnRightButtonDown : "
-			<< (true == Resources::instance ( )._pickOnRightButtonDown.getValue( ) ?
-						"True" : "False") << endl;
+	os << "xyzCancelRoll : " << (true == Resources::instance ( )._xyzCancelRoll.getValue ( ) ? "True" : "False") << endl
+	   << "InteractiveSelectionActivated : " << (true == InteractiveSelectionActivated ? "True" : "False") << endl
+	   << "PickOnLeftButtonDown : " << (true == Resources::instance ( )._pickOnLeftButtonDown.getValue( ) ? "True" : "False") << endl
+	   << "PickOnRightButtonDown : " << (true == Resources::instance ( )._pickOnRightButtonDown.getValue( ) ? "True" : "False") << endl;
 }	// vtkMgx3DInteractorStyle::PrintSelf
 
 
@@ -98,11 +83,9 @@ void vtkMgx3DInteractorStyle::OnChar ( )
 		case 'f'	:
 		case 'F'	:
 		{
-			// Pb : Fly to repose sur le caractère pickable des acteurs,
-			// caractère sur lequel on joue dans Magix pour filtrer selon la
+			// Pb : Fly to repose sur le caractère pickable des acteurs, caractère sur lequel on joue dans Magix pour filtrer selon la
 			// dimension ce qui est sélectionnable ...
-			// On mémorise l'état pickable des acteurs, on les rends tous
-			// pickables, et on restaure l'état initial à la fin.
+			// On mémorise l'état pickable des acteurs, on les rends tous pickables, et on restaure l'état initial à la fin.
 			if (0 == CurrentRenderer)
 				return;
 			vtkPropCollection*	props	= CurrentRenderer->GetViewProps ( );
@@ -123,8 +106,7 @@ void vtkMgx3DInteractorStyle::OnChar ( )
 				}	// for ( prop->InitPathTraversal(); ...
 			}	// for ( props->InitTraversal(pit); ...
 			vtkUnifiedInteractorStyle::OnChar ( );
-			for (vector<vtkProp*>::iterator it = unpickables.begin( );
-			     unpickables.end ( ) != it; it++)
+			for (vector<vtkProp*>::iterator it = unpickables.begin( ); unpickables.end ( ) != it; it++)
 				(*it)->SetPickable (false);
 			break;
 		}
@@ -163,8 +145,7 @@ void vtkMgx3DInteractorStyle::OnKeyRelease ( )
 
 vtkMgx3DInteractorStyle* vtkMgx3DInteractorStyle::New ( )
 {
-	vtkObject*	object	= 
-		vtkObjectFactory::CreateInstance ("vtkMgx3DInteractorStyle");
+	vtkObject*	object	= vtkObjectFactory::CreateInstance ("vtkMgx3DInteractorStyle");
 	if (0 != object)
 		return (vtkMgx3DInteractorStyle*)object;
 
@@ -174,8 +155,7 @@ vtkMgx3DInteractorStyle* vtkMgx3DInteractorStyle::New ( )
 
 void vtkMgx3DInteractorStyle::DisplayxOyViewPlane ( )
 {
-	vtkCamera*	camera	= 0 == CurrentRenderer ? 
-						  0 : CurrentRenderer->GetActiveCamera ( );
+	vtkCamera*	camera	= 0 == CurrentRenderer ? 0 : CurrentRenderer->GetActiveCamera ( );
 	if (0 == camera)
 		return;
 
@@ -369,8 +349,7 @@ void vtkMgx3DInteractorStyle::OnLeftButtonDown ( )
 
 void vtkMgx3DInteractorStyle::OnMiddleButtonDown ( )
 {
-	if ((false == GetInteractiveSelectionActivated ( )) ||
-	    (false == isControlKeyPressed ( )))
+	if ((false == GetInteractiveSelectionActivated ( )) || (false == isControlKeyPressed ( )))
 	{
 		vtkUnifiedInteractorStyle::OnMiddleButtonDown ( );
 		return;
@@ -378,28 +357,23 @@ void vtkMgx3DInteractorStyle::OnMiddleButtonDown ( )
 
 	if (0 != GetEntitySeizureManager ( ))
 	{
-		EntitySeizureManager*	next	=
-			GetEntitySeizureManager ( )->getNextSeizureManager ( );
+		EntitySeizureManager*	next	= GetEntitySeizureManager ( )->getNextSeizureManager ( );
 		if (0 != next)
 			next->setInteractiveMode (true);
 		else
 		{	// C'est le dernier champ de saisie => validation de l'opération :
 			try
 			{
-				QtMgx3DMainWindow&	mainWindow	=
-								GetEntitySeizureManager ( )->getMainWindow ( );
-				QtMgx3DOperationPanel*	panel	=
-					mainWindow.getOperationsPanel ( ).getOperationsPanel ( );
-				QtMgx3DOperationAction*	action	=
-					0 == panel ? 0 : panel->getMgx3DOperationAction ( );
+				QtMgx3DMainWindow&	mainWindow	= GetEntitySeizureManager ( )->getMainWindow ( );
+				QtMgx3DOperationPanel*	panel	= mainWindow.getOperationsPanel ( ).getOperationsPanel ( );
+				QtMgx3DOperationAction*	action	= 0 == panel ? 0 : panel->getMgx3DOperationAction ( );
 				if (0 == action)
 					throw Exception (UTF8String ("Absence d'action associée.", Charset::UTF_8));
 				action->executeOperation ( );
 				panel->operationCompleted ( );
 
 				// Réinitialisation au premier champ :
-				EntitySeizureManager*	sm	=
-					GetEntitySeizureManager ( );
+				EntitySeizureManager*	sm	= GetEntitySeizureManager ( );
 				while ((0 != sm) && (0 != sm->getPreviousSeizureManager ( )))
 					sm	= sm->getPreviousSeizureManager ( );
 				if (0 != sm)
@@ -407,13 +381,11 @@ void vtkMgx3DInteractorStyle::OnMiddleButtonDown ( )
 			}
 			catch (const Exception& exc)
 			{
-				cout << "Erreur dans vtkMgx3DInteractorStyle::OnMiddleButtonDown : "
-				     << exc.getFullMessage ( ) << endl;
+				cout << "Erreur dans vtkMgx3DInteractorStyle::OnMiddleButtonDown : " << exc.getFullMessage ( ) << endl;
 			}
 			catch (...)
 			{
-				cout << "vtkMgx3DInteractorStyle::OnMiddleButtonDown : "
-				     << "erreur non documentée." << endl;
+				cout << "vtkMgx3DInteractorStyle::OnMiddleButtonDown : erreur non documentée." << endl;
 			}
 		}	// else if (0 != next)
 	}	// if (0 != GetEntitySeizureManager ( ))
@@ -426,8 +398,7 @@ void vtkMgx3DInteractorStyle::OnRightButtonDown ( )
 	if (0 != rwi)
 		rwi->GetEventPosition (ButtonPressPosition);
 
-	if ((true == GetInteractiveSelectionActivated ( )) &&
-	    (true == Resources::instance ( )._pickOnRightButtonDown.getValue ( )))
+	if ((true == GetInteractiveSelectionActivated ( )) && (true == Resources::instance ( )._pickOnRightButtonDown.getValue ( )))
 		Pick ( );
 	else
 		vtkUnifiedInteractorStyle::OnRightButtonDown ( );
@@ -441,16 +412,15 @@ void vtkMgx3DInteractorStyle::OnLeftButtonUp ( )
 
 	// Si le curseur n'a pas bougé depuis la pression sur le bouton, et que
 	// c'est paramétré tel que, on fait un picking :
-	if ((true == GetInteractiveSelectionActivated ( )) &&
-	    (true == Resources::instance ( )._pickOnLeftButtonUp.getValue ( )))
+	if ((true == GetInteractiveSelectionActivated ( )) && (true == Resources::instance ( )._pickOnLeftButtonUp.getValue ( )))
 	{
 		int							EventPosition [2]	= {0, 0};
 		vtkRenderWindowInteractor*	rwi	= this->Interactor;
-		if (0 != rwi){
+		if (0 != rwi)
+		{
 			rwi->GetEventPosition (EventPosition);
 
-			if ((EventPosition [0] == ButtonPressPosition [0]) &&
-					(EventPosition [1] == ButtonPressPosition [1]))
+			if ((EventPosition [0] == ButtonPressPosition [0]) && (EventPosition [1] == ButtonPressPosition [1]))
 				Pick ( );
 		}
 	}	// if ((true == GetInteractiveSelectionActivated ( )) && ...
@@ -464,16 +434,15 @@ void vtkMgx3DInteractorStyle::OnRightButtonUp ( )
 
 	// Si le curseur n'a pas bougé depuis la pression sur le bouton, et que
 	// c'est paramétré tel que, on fait un picking :
-	if ((true == GetInteractiveSelectionActivated ( )) &&
-	    (true == Resources::instance ( )._pickOnRightButtonUp.getValue ( )))
+	if ((true == GetInteractiveSelectionActivated ( )) && (true == Resources::instance ( )._pickOnRightButtonUp.getValue ( )))
 	{
 		int							EventPosition [2]	= {0, 0};
 		vtkRenderWindowInteractor*	rwi	= this->Interactor;
-		if (0 != rwi){
+		if (0 != rwi)
+		{
 			rwi->GetEventPosition (EventPosition);
 
-			if ((EventPosition [0] == ButtonPressPosition [0]) &&
-					(EventPosition [1] == ButtonPressPosition [1]))
+			if ((EventPosition [0] == ButtonPressPosition [0]) && (EventPosition [1] == ButtonPressPosition [1]))
 				Pick ( );
 		}
 	}	// if ((true == GetInteractiveSelectionActivated ( )) && ...
@@ -508,8 +477,7 @@ void vtkMgx3DInteractorStyle::Pick ( )
 		int *eventPos = rwi->GetEventPosition();
 		this->FindPokedRenderer(eventPos[0], eventPos[1]);
 		rwi->StartPickCallback();
-		vtkAbstractPropPicker *picker =
-					vtkAbstractPropPicker::SafeDownCast(rwi->GetPicker());
+		vtkAbstractPropPicker *picker = vtkAbstractPropPicker::SafeDownCast(rwi->GetPicker());
 		if ( picker != NULL )
 		{
 			picker->Pick(eventPos[0], eventPos[1], 0.0, this->CurrentRenderer);

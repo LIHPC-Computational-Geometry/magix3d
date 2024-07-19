@@ -26,21 +26,19 @@ double	vtkUnifiedInteractorStyle::eyeAngleModifier	= 0.25;		// en degres
 bool	vtkUnifiedInteractorStyle::upZoom		= false;
 
 vtkUnifiedInteractorStyle::vtkUnifiedInteractorStyle ( )
-	: vtkInteractorStyleTrackballCamera ( ), _motionRatio (0.1)
+	: vtkInteractorStyleTrackballCamera ( ), _motionRatio (0.1), _enablePlaneKeys (true)
 {
 }	// vtkUnifiedInteractorStyle::vtkUnifiedInteractorStyle
 
 
-vtkUnifiedInteractorStyle::vtkUnifiedInteractorStyle (
-		const vtkUnifiedInteractorStyle&)
-	: vtkInteractorStyleTrackballCamera ( ), _motionRatio (0.1)
+vtkUnifiedInteractorStyle::vtkUnifiedInteractorStyle (const vtkUnifiedInteractorStyle&)
+	: vtkInteractorStyleTrackballCamera ( ), _motionRatio (0.1), _enablePlaneKeys (true)
 {
 	assert (0 && "vtkUnifiedInteractorStyle copy constructor is not allowed.");
 }	// vtkUnifiedInteractorStyle copy constructor
 
 
-vtkUnifiedInteractorStyle& vtkUnifiedInteractorStyle::operator = (
-		const vtkUnifiedInteractorStyle&)
+vtkUnifiedInteractorStyle& vtkUnifiedInteractorStyle::operator = (const vtkUnifiedInteractorStyle&)
 {
 	assert (0 && "vtkUnifiedInteractorStyle::operator = is not allowed.");
 	return *this;
@@ -71,15 +69,18 @@ void vtkUnifiedInteractorStyle::OnChar ( )
 			break;
 		case 'x'	:
 		case 'X'	:
-			DisplayyOzViewPlane ( );
+			if (true == GetEnablePlaneKeys ( ))
+				DisplayyOzViewPlane ( );
 			break;
 		case 'y'	:
 		case 'Y'	:
-			DisplayxOzViewPlane ( );
+			if (true == GetEnablePlaneKeys ( ))
+				DisplayxOzViewPlane ( );
 			break;
 		case 'z'	:
 		case 'Z'	:
-			DisplayxOyViewPlane ( );
+			if (true == GetEnablePlaneKeys ( ))
+				DisplayxOyViewPlane ( );
 			break;
 		case 'a'	:	// Suppression du roulis
 		case 'A'	:
@@ -175,8 +176,7 @@ bool vtkUnifiedInteractorStyle::isShiftKeyPressed ( )
 void vtkUnifiedInteractorStyle::OnKeyRelease ( )
 {
 	vtkRenderWindowInteractor*	interactor		= this->Interactor;
-	vtkRenderWindow*			renderWindow	= (0 == CurrentRenderer ? 
-						0 : CurrentRenderer->GetRenderWindow ( ));
+	vtkRenderWindow*			renderWindow	= (0 == CurrentRenderer ? 0 : CurrentRenderer->GetRenderWindow ( ));
 	assert ((0 != interactor) && "vtkUnifiedInteractorStyle::OnKeyRelease : null interactor.");
 	char keycode = interactor->GetKeyCode ( );
 
@@ -326,21 +326,15 @@ void vtkUnifiedInteractorStyle::FlyTo (bool centerOnActor)
 	assert ((0 != interactor) && "vtkUnifiedInteractorStyle::FlyTo : null interactor.");
 	this->AnimState	= VTKIS_ANIM_ON;
 	// On utilise un autre picker afin de ne pas toucher à la selection.
-	// On prend un VTKECMPicker qui retiendra l'acteur le + proche du point
-	// pické.
+	// On prend un VTKECMPicker qui retiendra l'acteur le + proche du point pické.
 //	vtkPropPicker*	picker	= vtkPropPicker::New ( );
 	VTKECMPicker*	picker	= VTKECMPicker::New ( );
 	assert (0 != picker);
-	// SetMode (VTKECMPicker::DISTANCE) : plus précis, a priori OK en phase
-	// CAO. Mais fait appel à un vtkCellPicker qui risque d'être très couteux en
-	// mode maillage.
+	// SetMode (VTKECMPicker::DISTANCE) : plus précis, a priori OK en phase CAO. Mais fait appel à un vtkCellPicker qui risque d'être très couteux en mode maillage.
 	picker->SetMode (VTKECMPicker::DISTANCE);
 
-	FindPokedRenderer (interactor->GetEventPosition ( )[0],
-	                   interactor->GetEventPosition ( )[1]);
-	picker->Pick(interactor->GetEventPosition ( )[0],
-	             interactor->GetEventPosition ( )[1],
-	             0.0, CurrentRenderer);
+	FindPokedRenderer (interactor->GetEventPosition ( )[0], interactor->GetEventPosition ( )[1]);
+	picker->Pick(interactor->GetEventPosition ( )[0], interactor->GetEventPosition ( )[1], 0.0, CurrentRenderer);
 	vtkProp*	prop	= picker->GetViewProp ( );
 	if (0 == prop)
 	{
@@ -360,16 +354,10 @@ assert ((0 != bounds) && "vtkUnifiedInteractorStyle::FlyTo : null bounds");
 	else	// if (true == centerOnActor)
 	{
 //		vtkWorldPointPicker*	picker	= vtkWorldPointPicker::New ( );
-		// Que picker soit un VTKECMPicker ou un vtkPropPicker il connait les
-		// coordonnées du point pické sur l'acteur.
-		// - Si VTKECMPicker alors repose sur un vtkCellPicker => perfs non
-		// optimales, qui risquent d'accuser le coup avec des maillages.
-		// - Si vtkPropPicker le picking se fait à la boite englobante, puis
-		// avec un WorldPointPicker pour déterminer le z à l'aide du zbuffer.
-/*
-		picker->Pick (interactor->GetEventPosition ( )[0],
-		              interactor->GetEventPosition ( )[1],
-		              0, CurrentRenderer);*/
+		// Que picker soit un VTKECMPicker ou un vtkPropPicker il connait les coordonnées du point pické sur l'acteur.
+		// - Si VTKECMPicker alors repose sur un vtkCellPicker => perfs non optimales, qui risquent d'accuser le coup avec des maillages.
+		// - Si vtkPropPicker le picking se fait à la boite englobante, puis avec un WorldPointPicker pour déterminer le z à l'aide du zbuffer.
+//		picker->Pick (interactor->GetEventPosition ( )[0], interactor->GetEventPosition ( )[1], 0, CurrentRenderer);
 		picker->GetPickPosition (rotationCenter);
 //		picker->Delete ( );
 	}	// else if (true == centerOnActor)
@@ -382,8 +370,7 @@ assert ((0 != bounds) && "vtkUnifiedInteractorStyle::FlyTo : null bounds");
 
 void vtkUnifiedInteractorStyle::DisplayxOyViewPlane ( )
 {
-	vtkCamera*	camera	= 0 == CurrentRenderer ? 
-						  0 : CurrentRenderer->GetActiveCamera ( );
+	vtkCamera*	camera	= 0 == CurrentRenderer ? 0 : CurrentRenderer->GetActiveCamera ( );
 	if (0 == camera)
 		return;
 
@@ -458,8 +445,7 @@ void vtkUnifiedInteractorStyle::ResetRoll ( )
 						  0 : CurrentRenderer->GetActiveCamera ( );
 	if (0 != camera)
 		camera->SetRoll (0.);
-	if ((0 != CurrentRenderer) && 
-	    (0 != CurrentRenderer->GetRenderWindow ( )))
+	if ((0 != CurrentRenderer) && (0 != CurrentRenderer->GetRenderWindow ( )))
 		CurrentRenderer->GetRenderWindow ( )->Render ( );
 	InvokeEvent (vtkCommand::InteractionEvent, NULL);
 }	// vtkUnifiedInteractorStyle::ResetRoll
@@ -467,8 +453,7 @@ void vtkUnifiedInteractorStyle::ResetRoll ( )
 
 void vtkUnifiedInteractorStyle::ResetView ( )
 {
-	vtkCamera*	camera	= 0 == CurrentRenderer ?
-						  0 : CurrentRenderer->GetActiveCamera ( );
+	vtkCamera*	camera	= 0 == CurrentRenderer ? 0 : CurrentRenderer->GetActiveCamera ( );
 	if (0 != camera)
 	{
 		camera->SetViewAngle (30.);
