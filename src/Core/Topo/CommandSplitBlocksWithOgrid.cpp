@@ -44,25 +44,8 @@ CommandSplitBlocksWithOgrid(Internal::Context& c,
 , m_create_internal_vertices(create_internal_vertices)
 , m_propagate_neighbor_block(propagate_neighbor_block)
 {
-    if (ratio_ogrid<=0.0 || ratio_ogrid>=1.0)
-        throw TkUtil::Exception (TkUtil::UTF8String ("Le ratio doit être dans l'interval ]0 1[", TkUtil::Charset::UTF_8));
-
-    if (nb_bras<=0)
-        throw TkUtil::Exception (TkUtil::UTF8String ("Le nombre de bras doit être d'au moins 1", TkUtil::Charset::UTF_8));
-
-    // on ne conserve que les blocs structurés et non dégénérés
-    for (std::vector<Topo::Block* >::iterator iter = blocs.begin();
-            iter != blocs.end(); ++iter){
-        Topo::Block* hb = *iter;
-        if (hb->isStructured() && hb->getNbVertices() == 8)
-            m_blocs.push_back(hb);
-        else{
-			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-            message <<"Il n'est pas prévu de faire un découpage en o-grid dans un bloc non structuré ou dégénéré\n";
-            message << "("<<hb->getName()<<" n'est pas structuré)";
-            throw TkUtil::Exception(message);
-        }
-    }
+    // la validité de la sélection se fera dans le preExecute
+    m_blocs.insert(m_blocs.end(), blocs.begin(), blocs.end());
 
     // la validité de la sélection se fera lors de la création des filtres
     m_cofaces.insert(m_cofaces.end(), cofaces.begin(), cofaces.end());
@@ -83,6 +66,62 @@ CommandSplitBlocksWithOgrid::
 {
 }
 /*----------------------------------------------------------------------------*/
+/* Les traitements de la méthode preExecute étaient auparavant faits dans le  */
+/* constructeur. Or, lever une exception dans le constructeur ne permet pas   */
+/* de récupérer le message d'erreur si la commande a été déclenchée en Python */
+/* (fonctionne depuis l'IHM).                                                 */
+void CommandSplitBlocksWithOgrid::
+preExecute()
+{
+    if (m_ratio_ogrid<=0.0 || m_ratio_ogrid>=1.0)
+        throw TkUtil::Exception (TkUtil::UTF8String ("Le ratio doit être dans l'interval ]0 1[", TkUtil::Charset::UTF_8));
+
+    if (m_nb_meshing_edges<=0)
+        throw TkUtil::Exception (TkUtil::UTF8String ("Le nombre de bras doit être d'au moins 1", TkUtil::Charset::UTF_8));
+
+    // on vérifie que les blocs sont structurés et non dégénérés
+    for (std::vector<Topo::Block* >::iterator iter = m_blocs.begin();
+            iter != m_blocs.end(); ++iter){
+        Topo::Block* hb = *iter;
+        if (!(hb->isStructured() && hb->getNbVertices() == 8)){
+			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+            message <<"Il n'est pas prévu de faire un découpage en o-grid dans un bloc non structuré ou dégénéré\n";
+            message << "("<<hb->getName()<<" n'est pas structuré)";
+            throw TkUtil::Exception(message);
+        }
+    }
+
+    // on vérifie la formule d'Euler sur les blocs
+    std::set<std::string> v_names, e_names, f_names;
+    for (std::vector<Topo::Block* >::iterator iter = m_blocs.begin();
+            iter != m_blocs.end(); ++iter){
+        Topo::Block* hb = *iter;
+
+        const std::vector<Topo::Vertex* >& vertices = hb->getVertices();
+        for (auto i = vertices.begin(); i != vertices.end(); ++i)
+            v_names.insert((*i)->getName());
+
+        std::vector<Topo::CoEdge* > edges;
+        hb->getCoEdges(edges);
+        for (auto i = edges.begin(); i != edges.end(); ++i)
+            e_names.insert((*i)->getName());
+
+        std::vector<Topo::CoFace* > faces;
+        hb->getCoFaces(faces);
+        for (auto i = faces.begin(); i != faces.end(); ++i)
+            f_names.insert((*i)->getName());
+    }
+    int khi = (v_names.size() - e_names.size() + f_names.size()) / m_blocs.size();
+    if (khi != 2) {
+        TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+        message <<"La caractéristique d'Euler (S-A+F) n'est pas respectée pour le volume global représenté par [";
+        for (std::vector<Topo::Block* >::iterator iter = m_blocs.begin();
+            iter != m_blocs.end(); ++iter) message << " " << (*iter)->getName();
+        message << " ]. Réaliser un o-grid global n'est pas possible.";
+        throw TkUtil::Exception(message);
+    }
+}
+/*----------------------------------------------------------------------------*/
 void CommandSplitBlocksWithOgrid::
 internalExecute()
 {
@@ -93,6 +132,9 @@ internalExecute()
 #ifdef _DEBUG_SPLIT_OGRID
     std::cout<<"CommandSplitBlocksWithOgrid::internalExecute"<<std::endl;
 #endif
+
+    // vérifications avant exécution
+    preExecute();
 
     // Filtres:  à 1 pour ce qui est sur le bord et à 2 ce qui est à l'intérieur
     std::map<Vertex*, uint> filtre_vertex;
