@@ -285,7 +285,7 @@ donc sélectionner les noms de deux sommets aux extrémités.
 Créer un arc de cercle |image77|
 ''''''''''''''''''''''''''''''''''
 
-Se fait avec l’une des méthodes suivantes :
+Se fait avec l’une des méthodes suivantes :
 
 1. *Par saisie d’un centre et des 2 extrémités*. Il faut donc saisir les
    noms de 3 sommets. Se fait par défaut dans un plan orthogonal à l’axe
@@ -303,11 +303,18 @@ défaut (xOy), ainsi que l’arc en cours de construction.
 
 .. _creation-cercle:
 
-Créer un cercle |image78| 
+Créer un cercle / une ellipse |image78| 
 ''''''''''''''''''''''''''''''
 
-Se fait avec la méthode de *saisie de 3 points*. Il faut donc
-saisir les noms de 3 sommets par lesquels passera le cercle créé.
+Se fait avec la méthode de *saisie de 3 points*.
+
+Construit soit un cercle passant par les noms de 3 sommets fournis, 
+soit une ellipse centrée sur le sommet Centre, où :
+
+- le plan de l'ellipse est défini par Centre, Point 1 et Point 2,
+- son grand axe est défini par Centre et Point 1,
+- son grand rayon est la distance entre Centre et Point 1, et
+- son petit rayon est la distance entre Point 2 et l'axe principal.
 
 .. _creation-courbe-par-projection:
 
