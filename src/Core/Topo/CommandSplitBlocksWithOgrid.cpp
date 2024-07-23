@@ -91,34 +91,92 @@ preExecute()
         }
     }
 
-    // on vérifie la formule d'Euler sur les blocs
-    std::set<std::string> v_names, e_names, f_names;
-    for (std::vector<Topo::Block* >::iterator iter = m_blocs.begin();
-            iter != m_blocs.end(); ++iter){
-        Topo::Block* hb = *iter;
+    // Vérification de la contrainte d'Euler sur les blocs
+    // https://fr.wikipedia.org/wiki/Caract%C3%A9ristique_d%27Euler
+    // Pour tout sommet s d'un bloc, on considère tous les blocs adjacents à s
+    // comme un unique polyhèdre sur lequel on vérifie la contrainte d'Euler
+    // cad : S - A + F = 2
 
-        const std::vector<Topo::Vertex* >& vertices = hb->getVertices();
-        for (auto i = vertices.begin(); i != vertices.end(); ++i)
-            v_names.insert((*i)->getName());
-
-        std::vector<Topo::CoEdge* > edges;
-        hb->getCoEdges(edges);
-        for (auto i = edges.begin(); i != edges.end(); ++i)
-            e_names.insert((*i)->getName());
-
-        std::vector<Topo::CoFace* > faces;
-        hb->getCoFaces(faces);
-        for (auto i = faces.begin(); i != faces.end(); ++i)
-            f_names.insert((*i)->getName());
+    // Recherche de tous les sommets des blocs à découper (en enlevant les doublons)
+    std::set<Topo::Vertex*> all_vertices;
+    for (auto bi = m_blocs.begin(); bi != m_blocs.end(); ++bi){
+        Topo::Block* b = *bi;
+        std::vector<Topo::Vertex* > vertices;
+        b->getVertices(vertices);
+        for (auto vi = vertices.begin(); vi != vertices.end(); ++vi)
+            all_vertices.insert(*vi);
     }
-    int khi = (v_names.size() - e_names.size() + f_names.size()) / m_blocs.size();
-    if (khi != 2) {
-        TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-        message <<"La caractéristique d'Euler (S-A+F) n'est pas respectée pour le volume global représenté par [";
-        for (std::vector<Topo::Block* >::iterator iter = m_blocs.begin();
-            iter != m_blocs.end(); ++iter) message << " " << (*iter)->getName();
-        message << " ]. Réaliser un o-grid global n'est pas possible.";
-        throw TkUtil::Exception(message);
+
+    // Parcours des blocs adjacents à chacun des sommets.
+    // Ils sont considérés comme un unique polyhèdre
+    // pour le calcul de la contrainte d'Euler.
+    for (auto vi = all_vertices.begin(); vi != all_vertices.end(); ++vi){
+        Topo::Vertex* v = *vi;
+        std::vector<Topo::Block* > adjacent_blocks;
+        v->getBlocks(adjacent_blocks);
+
+        // Recherche des faces externes des blocs adjacents (= du polyhèdre)
+        // Pour cela, effacement des faces communes
+        std::set<Topo::CoFace*> external_faces;
+        for (auto bi = adjacent_blocks.begin(); bi != adjacent_blocks.end(); ++bi){
+            Topo::Block* hb = *bi;
+
+            std::vector<Topo::CoFace* > faces;
+            hb->getCoFaces(faces);
+            for (auto fi = faces.begin(); fi != faces.end(); ++fi){
+                Topo::CoFace* f = *fi;
+                if (external_faces.find(f) == external_faces.end())
+                    // not found
+                    external_faces.insert(f);
+                else
+                    // found => common internal face
+                    external_faces.erase(f);
+            }
+        }
+
+        // Recherche des aretes et sommets des faces externes.
+        // On utilise un set pour éviter les doublons.
+        std::set<Topo::CoEdge*> external_edges;
+        std::set<Topo::Vertex*> external_vertices;
+        for (auto fi = external_faces.begin(); fi != external_faces.end(); ++fi){
+            Topo::CoFace* f = *fi;
+
+            std::vector<Topo::CoEdge* > edges;
+            f->getCoEdges(edges);
+            for (auto ei = edges.begin(); ei != edges.end() ; ++ei)
+                external_edges.insert(*ei);
+
+            std::vector<Topo::Vertex* > vertices;
+            f->getVertices(vertices);
+            for (auto vi = vertices.begin(); vi != vertices.end(); ++vi)
+                external_vertices.insert(*vi);
+        }
+
+        // Calcul de khi = S - A + F
+        const int S = external_vertices.size();
+        const int A = external_edges.size();
+        const int F = external_faces.size();
+        const int khi = S - A + F;
+
+#ifdef _DEBUG_SPLIT_OGRID
+        std::cout << "Pour " << v->getName() << std::endl;
+        std::cout << "   Faces externes des blocs adjacents :";
+        for (auto fi = external_faces.begin(); fi != external_faces.end(); ++fi)
+            std::cout << " " << (*fi)->getName();
+        std::cout << std::endl;
+        std::cout << "   S=" << S << ", A=" << A << ", F=" << F << " =>  Khi=" << khi << std::endl;
+#endif
+
+        if (khi != 2) {
+            TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+            message << "La caractéristique d'Euler (S-A+F) n'est pas respectée pour les blocs adjacents à ";
+            message << v->getName();
+            message <<" c'est à dire le polyhèdre représenté par [";
+            for (auto bi = adjacent_blocks.begin(); bi != adjacent_blocks.end(); ++bi)
+                message << " " << (*bi)->getName();
+            message << " ]. Par conséquent, réaliser un O-grid global n'est pas possible.";
+            throw TkUtil::Exception(message);
+        }
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -129,9 +187,9 @@ internalExecute()
     message << "CommandSplitBlocksWithOgrid::execute pour la commande " << getName ( )
             << " de nom unique " << getUniqueName ( );
 
-#ifdef _DEBUG_SPLIT_OGRID
+//#ifdef _DEBUG_SPLIT_OGRID
     std::cout<<"CommandSplitBlocksWithOgrid::internalExecute"<<std::endl;
-#endif
+//#endif
 
     // vérifications avant exécution
     preExecute();
