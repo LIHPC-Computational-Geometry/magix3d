@@ -187,9 +187,9 @@ internalExecute()
     message << "CommandSplitBlocksWithOgrid::execute pour la commande " << getName ( )
             << " de nom unique " << getUniqueName ( );
 
-//#ifdef _DEBUG_SPLIT_OGRID
+#ifdef _DEBUG_SPLIT_OGRID
     std::cout<<"CommandSplitBlocksWithOgrid::internalExecute"<<std::endl;
-//#endif
+#endif
 
     // vérifications avant exécution
     preExecute();
