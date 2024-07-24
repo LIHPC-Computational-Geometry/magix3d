@@ -673,21 +673,24 @@ void QtMgx3DOperationPanel::discretisationModifiedCallback ( )
 void QtMgx3DOperationPanel::applyCallback ( )
 {
 	CommandResultIfc*	commandResult	= 0;
-	
+
+	bool	userNotified	= true;																		// CP NEW	
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	CHECK_NULL_PTR_ERROR (getMgx3DOperationAction ( ))
 	getMgx3DOperationAction ( )->executeOperation ( );
 	commandResult	= getMgx3DOperationAction ( )->getCommandResult ( );
 	getMgx3DOperationAction ( )->setCommandResult (0);
-	
+
 	if (0 != commandResult)
 	{
 		if (CommandIfc::DONE == commandResult->getStatus ( ))
 			hasError	= false;
 		else
 		{
-			errorString	= commandResult->getStrStatus ( );
+			userNotified	= commandResult->isUserNotified ( );										// CP NEW	
+			hasError		= true;																		// CP NEW	
+			errorString		= commandResult->getStrStatus ( );
 			commandResult->setUserNotified (true);
 		}	// else if (CommandIfc::DONE == commandResult->getStatus ( ))
 	}	// if (0 != commandResult)
@@ -697,17 +700,12 @@ void QtMgx3DOperationPanel::applyCallback ( )
 		hasError	= false;
 	}
 
-	// On n'affiche pas nécessairement le message d'erreur, 
-	// QtMgx3DMainWindow::commandModified l'a peut être déjà fait.
+	// On n'affiche pas nécessairement le message d'erreur, QtMgx3DMainWindow::commandModified l'a peut être déjà fait.
 	COMPLETE_QT_TRY_CATCH_BLOCK (
-// On force à true car lors de pré-traitements (ex : liste d'entités vide,
-// entité détruite) il n'y a pas création de commande donc
-// QtMgx3DMainWindow::commandModified n'est pas appelée donc pas de message
-// d'erreur.
-// Le risque, avec true à la place de !QtMgx3DApplication::_showDialogOnCommandError.getValue( ),
-// est que le message d'erreur soit affiché à 2 reprises.
-true,
-//			!Resources::instance ( )._showDialogOnCommandError.getValue( ),
+// On force à true car lors de pré-traitements (ex : liste d'entités vide, entité détruite) il n'y a pas création de commande donc
+// QtMgx3DMainWindow::commandModified n'est pas appelée donc pas de message d'erreur.
+// Le risque, avec true à la place de !QtMgx3DApplication::_showDialogOnCommandError.getValue( ), est que le message d'erreur soit affiché à 2 reprises.
+			(!userNotified && Resources::instance ( )._showDialogOnCommandError.getValue( )),			// CP 07/24
 			this, "Magix 3D : exécution d'une opération")
 
 	const bool succeeded	= !hasError;
