@@ -65,11 +65,9 @@ namespace QtComponents
 // ============================================================================
 
 
-QtMgx3DPythonConsole::QtMgx3DPythonConsole (
-			QWidget* parent, QtMgx3DMainWindow* mainWindow, const string& title)
+QtMgx3DPythonConsole::QtMgx3DPythonConsole (QWidget* parent, QtMgx3DMainWindow* mainWindow, const string& title)
 	: QtPythonConsole (parent, title),
-	  _mgxUserScriptingManager (0), _mainWindow (mainWindow),
-	  _graphicalWidget (0), _cmdMgrPolicy ((CommandManagerIfc::POLICY)-1)
+	  _mgxUserScriptingManager (0), _mainWindow (mainWindow), _graphicalWidget (0), _cmdMgrPolicy ((CommandManagerIfc::POLICY)-1)
 {
 	hideResult ("proxy of <Swig Object of type");
 }	// QtMgx3DPythonConsole::QtMgx3DPythonConsole
@@ -77,15 +75,13 @@ QtMgx3DPythonConsole::QtMgx3DPythonConsole (
 
 QtMgx3DPythonConsole::QtMgx3DPythonConsole (const QtMgx3DPythonConsole&)
 	: QtPythonConsole (0, ""),
-	  _mgxUserScriptingManager (0), _mainWindow (0), _graphicalWidget (0),
-	  _cmdMgrPolicy ((CommandManagerIfc::POLICY)-1)
+	  _mgxUserScriptingManager (0), _mainWindow (0), _graphicalWidget (0), _cmdMgrPolicy ((CommandManagerIfc::POLICY)-1)
 {
 	assert (0 && "QtMgx3DPythonConsole copy constructor is forbidden.");
 }	// QtMgx3DPythonConsole::QtMgx3DPythonConsole (const QtMgx3DPythonConsole&)
 
 
-QtMgx3DPythonConsole& QtMgx3DPythonConsole::operator = (
-													const QtMgx3DPythonConsole&)
+QtMgx3DPythonConsole& QtMgx3DPythonConsole::operator = (const QtMgx3DPythonConsole&)
 {
 	assert (0 && "QtMgx3DPythonConsole assignment operator is forbidden.");
 	return *this;
@@ -96,8 +92,7 @@ QtMgx3DPythonConsole::~QtMgx3DPythonConsole ( )
 {
 	_graphicalWidget	= 0;
 
-	// Contrairement au scripting manager, le user scripting manager relève de
-	// la responsabilité de ce panneau :
+	// Contrairement au scripting manager, le user scripting manager relève de la responsabilité de ce panneau :
 	delete _mgxUserScriptingManager;	_mgxUserScriptingManager	= 0;
 }	// QtMgx3DPythonConsole::~QtMgx3DPythonConsole
 
@@ -121,7 +116,7 @@ void QtMgx3DPythonConsole::setRunningMode (QtPythonConsole::RUNNING_MODE mode)
 	{
 		case QtPythonConsole::RM_DEBUG	: enableActions	= false;
 			break;
-		default						: enableActions	= true;
+		default							: enableActions	= true;
 	}	// switch (getRunningMode ( ))
 
 	if ((true == modified) && (QtPythonConsole::RM_DEBUG != mode))
@@ -229,14 +224,10 @@ void QtMgx3DPythonConsole::executeFile (const std::string& fileName)
 
 	storePolicy ( );
 
-	unique_ptr<RenderingManager::DisplayLocker>	displayLocker (
-		0 == _graphicalWidget ?
-		0 : new RenderingManager::DisplayLocker (
-							_graphicalWidget->getRenderingManager ( )));
+	unique_ptr<RenderingManager::DisplayLocker>	displayLocker (0 == _graphicalWidget ? 0 : new RenderingManager::DisplayLocker (_graphicalWidget->getRenderingManager ( )));
 
 	CommandManagerIfc::POLICY	cmdMgrPolicy	= CommandManagerIfc::THREADED;
-// Le PythonConsole reposant sur la QConsole ne supporte pas les instructions
-// écrites sur plusieurs lignes ... => on passe par PythonSession :
+// Le PythonConsole reposant sur la QConsole ne supporte pas les instructions écrites sur plusieurs lignes ... => on passe par PythonSession :
 	CHECK_NULL_PTR_ERROR (getMainWindow ( ))
 
 	try
@@ -267,16 +258,18 @@ void QtMgx3DPythonConsole::executeFile (const std::string& fileName)
 }	// QtMgx3DPythonConsole::executeFile
 
 
-void QtMgx3DPythonConsole::addToHistoric (
-	const UTF8String& command, const UTF8String& comments,
-	const UTF8String& commandOutput, bool statusErr, bool fromKernel)
+void QtMgx3DPythonConsole::addToHistoric (const UTF8String& command, const UTF8String& comments, const UTF8String& commandOutput, bool statusErr, bool fromKernel)
 {
 #ifdef MULTITHREADED_APPLICATION
 	AutoMutex	mutex (&getMutex ( ));
 #endif	// MULTITHREADED_APPLICATION
 
-	QtPythonConsole::addToHistoric (
-					command, comments, commandOutput, statusErr, fromKernel);
+	LogOutputStream*	logStream	= getLogStream ( );
+	if (true == fromKernel)
+		setLogStream (0);	// CP 07/24 : éviter une double écriture dans la fenêtre "Historique" :
+	QtPythonConsole::addToHistoric (command, comments, commandOutput, statusErr, fromKernel);
+	if (true == fromKernel)
+		setLogStream (logStream);
 }	// QtMgx3DPythonConsole::addToHistoric
 
 
@@ -317,10 +310,8 @@ void QtMgx3DPythonConsole::setGraphicalWidget (Qt3DGraphicalWidget* widget)
 
 void QtMgx3DPythonConsole::storePolicy ( )
 {
-	if ((0 != getMainWindow ( )) &&
-	    ((CommandManagerIfc::POLICY)-1 == _cmdMgrPolicy))
-		_cmdMgrPolicy	= getMainWindow ( )->getContext (
-				).getCommandManager( ).setPolicy(CommandManagerIfc::SEQUENTIAL);
+	if ((0 != getMainWindow ( )) && ((CommandManagerIfc::POLICY)-1 == _cmdMgrPolicy))
+		_cmdMgrPolicy	= getMainWindow ( )->getContext ( ).getCommandManager( ).setPolicy(CommandManagerIfc::SEQUENTIAL);
 }	// QtMgx3DPythonConsole::storePolicy
 
 
@@ -331,8 +322,7 @@ void QtMgx3DPythonConsole::restorePolicy ( )
 		try
 		{
 			if ((CommandManagerIfc::POLICY)-1 != _cmdMgrPolicy)
-				getMainWindow ( )->getContext (
-								).getCommandManager( ).setPolicy(_cmdMgrPolicy);
+				getMainWindow ( )->getContext ( ).getCommandManager( ).setPolicy(_cmdMgrPolicy);
 			_cmdMgrPolicy	= (CommandManagerIfc::POLICY)-1;
 		}
 		catch (...)
