@@ -1180,100 +1180,101 @@ Geom::Curve* CoEdge::createBSplineByProjWithOrthogonalIntersection(Utils::Math::
     std::cout<<" plane_pnt : "<<plane_pnt<<std::endl;
 #endif
     Utils::Math::Vector plane_vec(pt1 - pt0);
-    gp_Pln gp_plane(gp_Pnt(plane_pnt.getX(), plane_pnt.getY(), plane_pnt.getZ()),
-    		gp_Dir(plane_vec.getX(), plane_vec.getY(), plane_vec.getZ()));
-    BRepBuilderAPI_MakeFace mkF(gp_plane);
-    TopoDS_Face wf = mkF.Face();
-    TopoDS_Shape shape;
-    Geom::GeomModificationBaseClass::getOCCShape(surface, shape);
+	try {
+		gp_Pln gp_plane(gp_Pnt(plane_pnt.getX(), plane_pnt.getY(), plane_pnt.getZ()),
+				gp_Dir(plane_vec.getX(), plane_vec.getY(), plane_vec.getZ()));
+		BRepBuilderAPI_MakeFace mkF(gp_plane);
+		TopoDS_Face wf = mkF.Face();
+		TopoDS_Shape shape;
+		Geom::GeomModificationBaseClass::getOCCShape(surface, shape);
 
-    BRepAlgoAPI_Section intersector(shape, wf);
+		BRepAlgoAPI_Section intersector(shape, wf);
+		TopoDS_Shape section_tool;
 
-
-    TopoDS_Shape section_tool;
-
-    if (intersector.IsDone()){
-    	section_tool = intersector.Shape();
-    }
-    else {
-    	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-    	message<<"Echec lors de l'intersection entre plan et surface "<<surface->getName();
-    	throw TkUtil::Exception (message);
-    }
-
-
-#ifdef _DEBUG_GETPOINTS
-    GProp_GProps pb;
-    BRepGProp::LinearProperties(section_tool,pb);
-    std::cout<<"longueur de la courbe intersection :"<< pb.Mass()<<std::endl;
-#endif
-
-    // recherche point projeté au plus près sur courbe intersection
-    gp_Pnt pnt(plane_pnt.getX(),plane_pnt.getY(),plane_pnt.getZ());
-    TopoDS_Vertex V = BRepBuilderAPI_MakeVertex(pnt);
-    BRepExtrema_DistShapeShape extrema(V, section_tool);
-    bool isDone = extrema.IsDone();
-    if(!isDone) {
-    	isDone = extrema.Perform();
-    }
-    if(!isDone){
-    	std::cerr<<"Erreur interne sur la projection du centre de l'arete"<<std::endl;
-		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-		message<<"Echec d'une projection d'un point sur une courbe, pour arête sur "<<surface->getName();
-		throw TkUtil::Exception (message);
-    }
-    gp_Pnt pnt2 = extrema.PointOnShape2(1);
-    Utils::Math::Point ptI(pnt2.X(), pnt2.Y(), pnt2.Z());
-
-#ifdef _DEBUG_GETPOINTS
-    std::cout<<" ptI : "<<ptI<<std::endl;
-#endif
-
-
-    points_bspline.push_back(pt0);
-
-	const uint nbPts = 10;
-	vect = (ptI - pt0);
-	for (uint i=1; i<nbPts; i++){ // nbPts-2 points entre les 2 extrémités
-		Utils::Math::Point pt = pt0 + vect*((double)i)/((double)nbPts);
-		surface->project(pt);
-#ifdef _DEBUG_GETPOINTS
-		std::cout<<" points_bspline["<<i<<"]: "<<pt0 + vect*((double)i)/((double)nbPts)<<" => "<<pt<<std::endl;
-#endif
-		points_bspline.push_back(pt);
-	}
-
-    points_bspline.push_back(ptI);
-
-	vect = (pt1 - ptI);
-	for (uint i=1; i<nbPts; i++){ // nbPts-2 points entre les 2 extrémités
-		Utils::Math::Point pt = ptI + vect*((double)i)/((double)nbPts);
-		surface->project(pt);
-#ifdef _DEBUG_GETPOINTS
-		std::cout<<" points_bspline["<<i<<"]: "<<ptI + vect*((double)i)/((double)nbPts)<<" => "<<pt<<std::endl;
-#endif
-		points_bspline.push_back(pt);
-	}
-
-	points_bspline.push_back(pt1);
-
-	// vérification qu'il n'y a pas 2 points confondus
-	for (uint i=1; i<points_bspline.size(); i++)
-		if (points_bspline[i] == points_bspline[i-1]){
-			std::cerr<<TkUtil::UTF8String ("Des points de construction de la projection de l'arête coupée en 2 sont confondus", TkUtil::Charset::UTF_8)<<std::endl;
-			throw TkUtil::Exception (TkUtil::UTF8String ("Des points de construction de la projection de l'arête coupée en 2 sont confondus", TkUtil::Charset::UTF_8));
+		if (intersector.IsDone()){
+			section_tool = intersector.Shape();
 		}
-#ifdef _DEBUG_GETPOINTS
-	std::cout<<" newBSpline..."<<std::endl;
-#endif
-	curve = Geom::EntityFactory(getContext()).newBSpline(points_bspline, 1, 2);
+		else {
+			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+			message<<"Echec lors de l'intersection entre plan et surface "<<surface->getName();
+			throw TkUtil::Exception (message);
+		}
 
 #ifdef _DEBUG_GETPOINTS
-	//std::cout <<"  Utilisation d'une courbe ("<<curve->getName()<<") issue de la projection d'une arête sur la surface"<<std::endl;
-	std::cout <<"  Utilisation d'une courbe ("<<curve->getName()<<") issue de la projection de points sur la surface et création d'une B-Spline"<<std::endl;
-	for (uint i=0; i<points_bspline.size(); i++)
-		std::cout<<" points_bspline["<<i<<"] = "<<points_bspline[i]<<std::endl;
+		GProp_GProps pb;
+		BRepGProp::LinearProperties(section_tool,pb);
+		std::cout<<"longueur de la courbe intersection :"<< pb.Mass()<<std::endl;
 #endif
+
+		// recherche point projeté au plus près sur courbe intersection
+		gp_Pnt pnt(plane_pnt.getX(),plane_pnt.getY(),plane_pnt.getZ());
+		TopoDS_Vertex V = BRepBuilderAPI_MakeVertex(pnt);
+		BRepExtrema_DistShapeShape extrema(V, section_tool);
+		bool isDone = extrema.IsDone();
+		if(!isDone) {
+			isDone = extrema.Perform();
+		}
+		if(!isDone){
+			std::cerr<<"Erreur interne sur la projection du centre de l'arete"<<std::endl;
+			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+			message<<"Echec d'une projection d'un point sur une courbe, pour arête sur "<<surface->getName();
+			throw TkUtil::Exception (message);
+		}
+		gp_Pnt pnt2 = extrema.PointOnShape2(1);
+		Utils::Math::Point ptI(pnt2.X(), pnt2.Y(), pnt2.Z());
+
+#ifdef _DEBUG_GETPOINTS
+    	std::cout<<" ptI : "<<ptI<<std::endl;
+#endif
+
+
+		points_bspline.push_back(pt0);
+
+		const uint nbPts = 10;
+		vect = (ptI - pt0);
+		for (uint i=1; i<nbPts; i++){ // nbPts-2 points entre les 2 extrémités
+			Utils::Math::Point pt = pt0 + vect*((double)i)/((double)nbPts);
+			surface->project(pt);
+#ifdef _DEBUG_GETPOINTS
+			std::cout<<" points_bspline["<<i<<"]: "<<pt0 + vect*((double)i)/((double)nbPts)<<" => "<<pt<<std::endl;
+#endif
+			points_bspline.push_back(pt);
+		}
+
+    	points_bspline.push_back(ptI);
+
+		vect = (pt1 - ptI);
+		for (uint i=1; i<nbPts; i++){ // nbPts-2 points entre les 2 extrémités
+			Utils::Math::Point pt = ptI + vect*((double)i)/((double)nbPts);
+			surface->project(pt);
+#ifdef _DEBUG_GETPOINTS
+			std::cout<<" points_bspline["<<i<<"]: "<<ptI + vect*((double)i)/((double)nbPts)<<" => "<<pt<<std::endl;
+#endif
+			points_bspline.push_back(pt);
+		}
+
+		points_bspline.push_back(pt1);
+
+		// vérification qu'il n'y a pas 2 points confondus
+		for (uint i=1; i<points_bspline.size(); i++)
+			if (points_bspline[i] == points_bspline[i-1]){
+				std::cerr<<TkUtil::UTF8String ("Des points de construction de la projection de l'arête coupée en 2 sont confondus", TkUtil::Charset::UTF_8)<<std::endl;
+				throw TkUtil::Exception (TkUtil::UTF8String ("Des points de construction de la projection de l'arête coupée en 2 sont confondus", TkUtil::Charset::UTF_8));
+			}
+#ifdef _DEBUG_GETPOINTS
+		std::cout<<" newBSpline..."<<std::endl;
+#endif
+		curve = Geom::EntityFactory(getContext()).newBSpline(points_bspline, 1, 2);
+
+#ifdef _DEBUG_GETPOINTS
+		//std::cout <<"  Utilisation d'une courbe ("<<curve->getName()<<") issue de la projection d'une arête sur la surface"<<std::endl;
+		std::cout <<"  Utilisation d'une courbe ("<<curve->getName()<<") issue de la projection de points sur la surface et création d'une B-Spline"<<std::endl;
+		for (uint i=0; i<points_bspline.size(); i++)
+			std::cout<<" points_bspline["<<i<<"] = "<<points_bspline[i]<<std::endl;
+#endif
+	} catch (const Standard_Failure& e) {
+		throw TkUtil::Exception (e.GetMessageString());
+    }
 
 	return curve;
 }
@@ -1297,16 +1298,37 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 	Utils::Math::Point pt0 = getVertex(0)->getCoord();
 	Utils::Math::Point pt1 = getVertex(1)->getCoord();
 
+	bool pt0_projected = false;
+	bool pt1_projected = false;
 	if (project){
 		Geom::GeomEntity* ge0 = getVertex(0)->getGeomAssociation();
-		if (ge0 && !getVertex(0)->isMeshed())
+		if (ge0 && !getVertex(0)->isMeshed()){
 			ge0->project(pt0);
+			pt0_projected = true;
+		}
 		Geom::GeomEntity* ge1 = getVertex(1)->getGeomAssociation();
-		if (ge1 && !getVertex(1)->isMeshed())
+		if (ge1 && !getVertex(1)->isMeshed()){
 			ge1->project(pt1);
+			pt1_projected = true;
+		}
 	}
 
 	Utils::Math::Point vect = (pt1 - pt0);
+	if (Utils::Math::MgxNumeric::isNearlyZero(vect.norme())) {
+		std::string n0 = getVertex(0)->getName();
+		std::string n1 = getVertex(1)->getName();
+		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+		message << "Taille de l'arête "<< getName() << " nulle";
+		if (pt0_projected) {
+			message << " après projection de " << getVertex(0)->getName();
+			message << " sur " << getVertex(0)->getGeomAssociation()->getName();
+		}
+		if (pt1_projected) {
+			message << (pt0_projected?" et de ":" après projection de ") << getVertex(1)->getName();
+			message << " sur " << getVertex(1)->getGeomAssociation()->getName();
+		}
+		throw TkUtil::Exception (message);
+	}
 
 #ifdef _DEBUG_GETPOINTS
 	std::cout<<" pt0: "<<pt0<<std::endl;
@@ -1349,7 +1371,6 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 					curve = createBSplineByProj(pt0, pt1, surface);
 				}
 				catch (Utils::HalfCircleSurfaceException& exc){
-
 					try {
 						// 2ème essai avec autre méthode:
 						// on place le point central de l'arête directement sur la surface
@@ -1359,7 +1380,6 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 						curve = createBSplineByProjWithOrthogonalIntersection(pt0, pt1, surface);
 					}
 					catch (TkUtil::Exception& exc){
-
 						// remet les compteurs pour les ids
 						getContext().getNameManager().setInternalStats(name_manager_before);
 
