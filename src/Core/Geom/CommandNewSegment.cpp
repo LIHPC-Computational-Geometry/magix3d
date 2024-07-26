@@ -111,6 +111,12 @@ internalExecute()
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_1));
 }
 /*----------------------------------------------------------------------------*/
+void CommandNewSegment::
+getPreviewRepresentation(Utils::DisplayRepresentation& dr)
+{
+	return getPreviewRepresentationNewObjects(dr);
+}
+/*----------------------------------------------------------------------------*/
 } // end namespace Geom
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D

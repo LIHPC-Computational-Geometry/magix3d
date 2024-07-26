@@ -61,11 +61,7 @@ QtBoxOperationPanel::QtBoxOperationPanel (
 	  _point1Panel (0), _point2Panel (0), _topologyPanel (0)
 {
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
-	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
+	layout->setContentsMargins  (Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
 	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
@@ -77,18 +73,13 @@ QtBoxOperationPanel::QtBoxOperationPanel (
 	layout->addWidget (label);
 
 	// Nom groupe :
-	_namePanel	= new QtMgx3DGroupNamePanel (
-							this, "Groupe", mainWindow, 3, creationPolicy, "");
+	_namePanel	= new QtMgx3DGroupNamePanel (this, "Groupe", mainWindow, 3, creationPolicy, "");
 	layout->addWidget (_namePanel);
 	addValidatedField (*_namePanel);
 
 	// Méthode de création/modification de la boite :
 	QHBoxLayout*	hlayout	= new QHBoxLayout (0);
-	hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
+	hlayout->setContentsMargins  (Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
 	hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
 	layout->addLayout (hlayout);
 	label	= new QLabel (QString::fromUtf8("Méthode"), this);
@@ -102,78 +93,47 @@ QtBoxOperationPanel::QtBoxOperationPanel (
 	QtGroupBox*	groupBox	= new QtGroupBox (this, "Paramètres de la boite");
 	layout->addWidget (groupBox);
 	QVBoxLayout*	vlayout	= new QVBoxLayout (groupBox);
-	vlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
+	vlayout->setContentsMargins  (Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
 	vlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
 	groupBox->setLayout (vlayout);
-	_point1Panel	= new QtMgx3DPointPanel (
-		groupBox, "Point 1", true, "x :", "y :", "z :",
-		0., -DBL_MAX, DBL_MAX, 0., -DBL_MAX, DBL_MAX, 0., -DBL_MAX, DBL_MAX,
-		&mainWindow, FilterEntity::GeomVertex, true);
+	_point1Panel	= new QtMgx3DPointPanel (groupBox, "Point 1", true, "x :", "y :", "z :", 0., -DBL_MAX, DBL_MAX, 0., -DBL_MAX, DBL_MAX, 0., -DBL_MAX, DBL_MAX, &mainWindow, FilterEntity::GeomVertex, true);
 	vlayout->addWidget (_point1Panel);
-	connect (_point1Panel, SIGNAL (pointAddedToSelection(QString)),
-	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
-	connect (_point1Panel, SIGNAL (pointRemovedFromSelection(QString)),
-	         this, SLOT (entitiesRemovedFromSelectionCallback (QString)));
-	connect (_point1Panel, SIGNAL (pointModified()),
-			this, SLOT (parametersModifiedCallback ( )));
-	_point2Panel	= new QtMgx3DPointPanel (
-		groupBox, "Point 2", true, "x :", "y :", "z :",
-		1., -DBL_MAX, DBL_MAX, 1., -DBL_MAX, DBL_MAX, 1., -DBL_MAX, DBL_MAX,
-		&mainWindow, FilterEntity::GeomVertex, true);
+	connect (_point1Panel, SIGNAL (pointAddedToSelection(QString)), this, SLOT (entitiesAddedToSelectionCallback (QString)));
+	connect (_point1Panel, SIGNAL (pointRemovedFromSelection(QString)), this, SLOT (entitiesRemovedFromSelectionCallback (QString)));
+	connect (_point1Panel, SIGNAL (pointModified()), this, SLOT (parametersModifiedCallback ( )));
+	_point2Panel	= new QtMgx3DPointPanel (groupBox, "Point 2", true, "x :", "y :", "z :", 1., -DBL_MAX, DBL_MAX, 1., -DBL_MAX, DBL_MAX, 1., -DBL_MAX, DBL_MAX, &mainWindow, FilterEntity::GeomVertex, true);
 	vlayout->addWidget (_point2Panel);
-	connect (_point2Panel, SIGNAL (pointAddedToSelection(QString)),
-	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
-	connect (_point2Panel, SIGNAL (pointRemovedFromSelection(QString)),
-	         this, SLOT (entitiesRemovedFromSelectionCallback (QString)));
-	connect (_point2Panel, SIGNAL (pointModified()),
-			this, SLOT (parametersModifiedCallback ( )));
+	connect (_point2Panel, SIGNAL (pointAddedToSelection(QString)), this, SLOT (entitiesAddedToSelectionCallback (QString)));
+	connect (_point2Panel, SIGNAL (pointRemovedFromSelection(QString)), this, SLOT (entitiesRemovedFromSelectionCallback (QString)));
+	connect (_point2Panel, SIGNAL (pointModified()), this, SLOT (parametersModifiedCallback ( )));
 
 	// Topologie :
 	groupBox	= new QtGroupBox (this, "Topologie :");
 	layout->addWidget (groupBox);
 	vlayout	= new QVBoxLayout (groupBox);
-	vlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
+	vlayout->setContentsMargins  (Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
 	vlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
 	groupBox->setLayout (vlayout);
-	const int	defaultEdgesNum	=
-		mainWindow.getContext( ).getTopoManager( ).getDefaultNbMeshingEdges( );
+	const int	defaultEdgesNum	= mainWindow.getContext( ).getTopoManager( ).getDefaultNbMeshingEdges( );
 	_topologyPanel	= new QtTopologyPanel (
-			groupBox, mainWindow, true, false, 3, QtTopologyPanel::STRUCTURED_TOPOLOGY,
-			QtTopologyPanel::CARTESIAN,
-			defaultEdgesNum, defaultEdgesNum, defaultEdgesNum, true, true);
-	_topologyPanel->enableTopologyType (
-							QtTopologyPanel::OGRID_BLOCKS, false);
-	_topologyPanel->enableTopologyType (
-							QtTopologyPanel::STRUCTURED_FREE_TOPOLOGY, false);
-	_topologyPanel->enableTopologyType (
-							QtTopologyPanel::INSERTION_TOPOLOGY, false);
+		groupBox, mainWindow, true, false, 3, QtTopologyPanel::STRUCTURED_TOPOLOGY, QtTopologyPanel::CARTESIAN, defaultEdgesNum, defaultEdgesNum, defaultEdgesNum, true, true);
+	_topologyPanel->enableTopologyType (QtTopologyPanel::OGRID_BLOCKS, false);
+	_topologyPanel->enableTopologyType (QtTopologyPanel::STRUCTURED_FREE_TOPOLOGY, false);
+	_topologyPanel->enableTopologyType (QtTopologyPanel::INSERTION_TOPOLOGY, false);
 	vlayout->addWidget (_topologyPanel);
 
 	CHECK_NULL_PTR_ERROR (_point1Panel->getVertexTextField ( ))
 	CHECK_NULL_PTR_ERROR (_point2Panel->getVertexTextField ( ))
-	_point1Panel->getVertexTextField (
-		)->setLinkedSeizureManagers (0, _point2Panel->getVertexTextField ( ));
-	_point2Panel->getVertexTextField (
-		)->setLinkedSeizureManagers (_point1Panel->getVertexTextField ( ), 0);
+	_point1Panel->getVertexTextField ( )->setLinkedSeizureManagers (0, _point2Panel->getVertexTextField ( ));
+	_point2Panel->getVertexTextField ( )->setLinkedSeizureManagers (_point1Panel->getVertexTextField ( ), 0);
 
 	addPreviewCheckBox (true);
-
 }	// QtBoxOperationPanel::QtBoxOperationPanel
 
 
 QtBoxOperationPanel::QtBoxOperationPanel (const QtBoxOperationPanel& cao)
-	: QtMgx3DOperationPanel (
-			0, *new QtMgx3DMainWindow(0), 0, "", ""),
-	  _namePanel (0), _operationMethodComboBox (0),
-	  _point1Panel (0), _point2Panel (0), _topologyPanel (0)
+	: QtMgx3DOperationPanel (0, *new QtMgx3DMainWindow(0), 0, "", ""),
+	  _namePanel (0), _operationMethodComboBox (0), _point1Panel (0), _point2Panel (0), _topologyPanel (0)
 {
 	MGX_FORBIDDEN ("QtBoxOperationPanel copy constructor is not allowed.");
 }	// QtBoxOperationPanel::QtBoxOperationPanel (const QtBoxOperationPanel&)
@@ -200,16 +160,13 @@ vector<Entity*> QtBoxOperationPanel::getInvolvedEntities ( )
 	if (0 != _point1Panel->getUniqueName ( ).length ( ))
 	{
 		Geom::Vertex*	vertex	= 
-			getContext ( ).getGeomManager ( ).getVertex (
-									_point1Panel->getUniqueName ( ), false);
+			getContext ( ).getGeomManager ( ).getVertex (_point1Panel->getUniqueName ( ), false);
 		if (0 != vertex)
 			entities.push_back (vertex);
 	}	// if (0 != _point1Panel->getUniqueName ( ).length ( ))
 	if (0 != _point2Panel->getUniqueName ( ).length ( ))
 	{
-		Geom::Vertex*	vertex	= 
-			getContext ( ).getGeomManager ( ).getVertex (
-									_point2Panel->getUniqueName ( ), false);
+		Geom::Vertex*	vertex	= getContext ( ).getGeomManager ( ).getVertex (_point2Panel->getUniqueName ( ), false);
 		if (0 != vertex)
 			entities.push_back (vertex);
 	}	// if (0 != _point2Panel->getUniqueName ( ).length ( ))
@@ -225,8 +182,7 @@ string QtBoxOperationPanel::getGroupName ( ) const
 }	// QtBoxOperationPanel::getGroupName
 
 
-QtBoxOperationPanel::OPERATION_METHOD
-						QtBoxOperationPanel::getOperationMethod ( ) const
+QtBoxOperationPanel::OPERATION_METHOD QtBoxOperationPanel::getOperationMethod ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_operationMethodComboBox);
 	return (QtBoxOperationPanel::OPERATION_METHOD)_operationMethodComboBox->currentIndex ( );
@@ -246,7 +202,7 @@ Utils::Math::Point QtBoxOperationPanel::getPoint2() const
 
 bool QtBoxOperationPanel::createTopology ( ) const
 {
-	 CHECK_NULL_PTR_ERROR (_topologyPanel)
+	CHECK_NULL_PTR_ERROR (_topologyPanel)
 	return _topologyPanel->createTopology ( );
 }	// QtBoxOperationPanel::createTopology
 
@@ -291,8 +247,7 @@ void QtBoxOperationPanel::reset ( )
 	_namePanel->autoUpdate ( );
 	_point1Panel->reset ( );
 	_point2Panel->reset ( );
-	const int	defaultEdgesNum	=
-		getMainWindow ( )->getContext( ).getTopoManager( ).getDefaultNbMeshingEdges( );
+	const int	defaultEdgesNum	= getMainWindow ( )->getContext( ).getTopoManager( ).getDefaultNbMeshingEdges( );
 	_topologyPanel->setTopologyType (QtTopologyPanel::STRUCTURED_TOPOLOGY);
 	_topologyPanel->setAxe1EdgesNum (defaultEdgesNum);
 	_topologyPanel->setAxe2EdgesNum (defaultEdgesNum);
@@ -306,11 +261,8 @@ void QtBoxOperationPanel::reset ( )
 
 void QtBoxOperationPanel::validate ( )
 {
-// CP : suite discussion EBL/FL, il est convenu que la validation des
-// paramètres de l'opération est effectuée par le "noyau" et qu'un mauvais
-// paramétrage est remonté sous forme d'exception à la fonction appelante, donc
-// avant exécution de la commande.
-// Les validations des valeurs des paramètres sont donc ici commentées.
+// La validation des paramètres de l'opération est effectuée par le "noyau" et qu'un mauvais paramétrage est remonté sous forme d'exception à la fonction appelante, donc
+// avant exécution de la commande. Les validations des valeurs des paramètres sont donc ici commentées.
 	TkUtil::UTF8String	error (TkUtil::Charset::UTF_8);
 
 	try
@@ -335,15 +287,12 @@ void QtBoxOperationPanel::validate ( )
 		case -1	:
 			if (0 != error.length ( ))
 				error << "\n";
-			error << "Absence de méthode d'opération de création/modification "
-			      << "de boite sélectionnée.";
+			error << "Absence de méthode d'opération de création/modification de boite sélectionnée.";
 			break;
 		default		:
 			if (0 != error.length ( ))
 				error << "\n";
-			error << "QtBoxOperationPanel::validate : index de méthode "
-			      << "d'opération de création/modification de boite "
-			      << "invalide ("
+			error << "QtBoxOperationPanel::validate : index de méthode d'opération de création/modification de boite invalide ("
 			      << (long)_operationMethodComboBox->currentIndex ( ) << ").";
 	}	// switch (_operationMethodComboBox->currentIndex ( ))
 
@@ -396,8 +345,7 @@ void QtBoxOperationPanel::autoUpdate ( )
 		CHECK_NULL_PTR_ERROR (_point1Panel)
 		CHECK_NULL_PTR_ERROR (_point2Panel)
 
-		vector<string>	selectedVertices	=
-			getSelectionManager ( ).getEntitiesNames (FilterEntity::GeomVertex);
+		vector<string>	selectedVertices	= getSelectionManager ( ).getEntitiesNames (FilterEntity::GeomVertex);
 		if (2 >= selectedVertices.size ( ))
 		{
 			if (1 <= selectedVertices.size ( ))
@@ -463,8 +411,7 @@ void QtBoxOperationPanel::preview (bool show, bool destroyInteractor)
 				255 * Resources::instance ( )._previewColor.getRed ( ),
 				255 * Resources::instance ( )._previewColor.getGreen ( ),
 				255 * Resources::instance ( )._previewColor.getBlue ( )));
-		graphicalProps.setLineWidth (
-						Resources::instance ( )._previewWidth.getValue ( ));
+		graphicalProps.setLineWidth (Resources::instance ( )._previewWidth.getValue ( ));
 
 		Geom::CommandNewBox command(*context, getPoint1(), getPoint2(), "");
 
@@ -473,9 +420,7 @@ void QtBoxOperationPanel::preview (bool show, bool destroyInteractor)
 		const vector<Math::Point>&	points	= dr.getPoints ( );
 		const vector<size_t>&		indices	= dr.getCurveDiscretization ( );
 
-		RenderingManager::RepresentationID	repID	=
-				getRenderingManager ( ).createSegmentsWireRepresentation (
-										points, indices, graphicalProps, true);
+		RenderingManager::RepresentationID	repID	= getRenderingManager ( ).createSegmentsWireRepresentation (points, indices, graphicalProps, true);
 		registerPreviewedObject (repID);
 
 		getRenderingManager ( ).forceRender ( );
@@ -490,30 +435,22 @@ void QtBoxOperationPanel::preview (bool show, bool destroyInteractor)
 //                  LA CLASSE QtBoxOperationAction
 // ===========================================================================
 
-QtBoxOperationAction::QtBoxOperationAction (
-	const QIcon& icon, const QString& text, QtMgx3DMainWindow& mainWindow,
-	const QString& tooltip, QtMgx3DGroupNamePanel::POLICY creationPolicy)
+QtBoxOperationAction::QtBoxOperationAction (const QIcon& icon, const QString& text, QtMgx3DMainWindow& mainWindow, const QString& tooltip, QtMgx3DGroupNamePanel::POLICY creationPolicy)
 	: QtMgx3DGeomOperationAction (icon, text, mainWindow, tooltip)
 {
-	QtBoxOperationPanel*	operationPanel	=
-		new QtBoxOperationPanel (
-			&getOperationPanelParent ( ), text.toStdString ( ), creationPolicy,
-			mainWindow, this);
+	QtBoxOperationPanel*	operationPanel	= new QtBoxOperationPanel (&getOperationPanelParent ( ), text.toStdString ( ), creationPolicy, mainWindow, this);
 	setOperationPanel (operationPanel);
 }	// QtBoxOperationAction::QtBoxOperationAction
 
 
-QtBoxOperationAction::QtBoxOperationAction (
-										const QtBoxOperationAction&)
-	: QtMgx3DGeomOperationAction (
-						QIcon (""), "", *new QtMgx3DMainWindow (0), "")
+QtBoxOperationAction::QtBoxOperationAction (const QtBoxOperationAction&)
+	: QtMgx3DGeomOperationAction (QIcon (""), "", *new QtMgx3DMainWindow (0), "")
 {
 	MGX_FORBIDDEN ("QtBoxOperationAction copy constructor is not allowed.")
 }	// QtBoxOperationAction::QtBoxOperationAction
 
 
-QtBoxOperationAction& QtBoxOperationAction::operator = (
-										const QtBoxOperationAction&)
+QtBoxOperationAction& QtBoxOperationAction::operator = (const QtBoxOperationAction&)
 {
 	MGX_FORBIDDEN ("QtBoxOperationAction assignment operator is not allowed.")
 	return *this;

@@ -9,6 +9,8 @@
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include "Geom/GeomManagerIfc.h"
+#include "Geom/CommandNewSegment.h"
+#include "Geom/GeomDisplayRepresentation.h"
 #include "Geom/Vertex.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtSegmentOperationAction.h"
@@ -45,23 +47,13 @@ namespace QtComponents
 // ===========================================================================
 
 QtSegmentOperationPanel::QtSegmentOperationPanel (
-			QWidget* parent, const string& panelName, 
-			QtMgx3DGroupNamePanel::POLICY creationPolicy,
-			QtMgx3DMainWindow& mainWindow, QtMgx3DOperationAction* action)
-	: QtMgx3DOperationPanel (parent, mainWindow, action,
-			QtMgx3DApplication::HelpSystem::instance ( ).segmentOperationURL,
-			QtMgx3DApplication::HelpSystem::instance ( ).segmentOperationTag),
-	  _namePanel (0), _operationMethodComboBox (0),
-	  _currentParentWidget (0), _currentPanel (0),
-	  _verticesPanel (0)
+			QWidget* parent, const string& panelName, QtMgx3DGroupNamePanel::POLICY creationPolicy, QtMgx3DMainWindow& mainWindow, QtMgx3DOperationAction* action)
+	: QtMgx3DOperationPanel (parent, mainWindow, action, QtMgx3DApplication::HelpSystem::instance ( ).segmentOperationURL, QtMgx3DApplication::HelpSystem::instance ( ).segmentOperationTag),
+	  _namePanel (0), _operationMethodComboBox (0), _currentParentWidget (0), _currentPanel (0), _verticesPanel (0)
 {
 //	SET_WIDGET_BACKGROUND (this, Qt::yellow)
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
-	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
+	layout->setContentsMargins  (Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
 	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
@@ -73,8 +65,7 @@ QtSegmentOperationPanel::QtSegmentOperationPanel (
 	layout->addWidget (label);
 
 	// Nom groupe :
-	_namePanel	= new QtMgx3DGroupNamePanel (
-							this, "Groupe", mainWindow, 1, creationPolicy, "");
+	_namePanel	= new QtMgx3DGroupNamePanel (this, "Groupe", mainWindow, 1, creationPolicy, "");
 	layout->addWidget (_namePanel);
 	addValidatedField (*_namePanel);
 
@@ -85,19 +76,14 @@ QtSegmentOperationPanel::QtSegmentOperationPanel (
 	hlayout->addWidget (label);
 	_operationMethodComboBox	= new QComboBox (this);
 	_operationMethodComboBox->addItem (QString::fromUtf8("Par saisie des extrémités"));
-	connect (_operationMethodComboBox, SIGNAL (currentIndexChanged (int)),
-	         this, SLOT (operationMethodCallback ( )));
+	connect (_operationMethodComboBox, SIGNAL (currentIndexChanged (int)), this, SLOT (operationMethodCallback ( )));
 	hlayout->addWidget (_operationMethodComboBox);
 	hlayout->addStretch (10);
 	
 	// Définition du segment :
 	QtGroupBox*		groupBox	= new QtGroupBox(QString::fromUtf8("Paramètres du segment"), this);
 	QVBoxLayout*	vlayout	= new QVBoxLayout (groupBox);
-	vlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
+	vlayout->setContentsMargins  (Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
 	vlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
 	groupBox->setLayout (vlayout);
 	layout->addWidget (groupBox);
@@ -107,34 +93,27 @@ QtSegmentOperationPanel::QtSegmentOperationPanel (
 	vlayout->addWidget (_currentParentWidget);
 	QHBoxLayout*	currentLayout = new QHBoxLayout (_currentParentWidget);
 	_currentParentWidget->setLayout (currentLayout);
-	_verticesPanel	= new Qt2VerticiesPanel (
-				0, "Définition d'un segment par ses 2 extrémités", mainWindow,
-				 FilterEntity::GeomVertex);
-	connect (_verticesPanel, SIGNAL (pointAddedToSelection (QString)), this,
-	         SLOT (entitiesAddedToSelectionCallback (QString)));
-	connect (_verticesPanel, SIGNAL (pointRemovedFromSelection (QString)), this,
-	         SLOT (entitiesRemovedFromSelectionCallback (QString)));
+	_verticesPanel	= new Qt2VerticiesPanel (0, "Définition d'un segment par ses 2 extrémités", mainWindow, FilterEntity::GeomVertex);
+	connect (_verticesPanel, SIGNAL (pointAddedToSelection (QString)), this, SLOT (entitiesAddedToSelectionCallback (QString)));
+	connect (_verticesPanel, SIGNAL (pointRemovedFromSelection (QString)), this, SLOT (entitiesRemovedFromSelectionCallback (QString)));
 	_verticesPanel->hide ( );
 	operationMethodCallback ( );
 
 	vlayout->addStretch (2);
+	
+	addPreviewCheckBox (true);
 }	// QtSegmentOperationPanel::QtSegmentOperationPanel
 
 
-QtSegmentOperationPanel::QtSegmentOperationPanel (
-										const QtSegmentOperationPanel& cao)
-	: QtMgx3DOperationPanel (
-			0, *new QtMgx3DMainWindow(0), 0, "", ""),
-	  _namePanel (0), _operationMethodComboBox (0),
-	  _currentParentWidget (0), _currentPanel (0),
-	  _verticesPanel (0)
+QtSegmentOperationPanel::QtSegmentOperationPanel (const QtSegmentOperationPanel& cao)
+	: QtMgx3DOperationPanel (0, *new QtMgx3DMainWindow(0), 0, "", ""),
+	  _namePanel (0), _operationMethodComboBox (0), _currentParentWidget (0), _currentPanel (0), _verticesPanel (0)
 {
 	MGX_FORBIDDEN ("QtSegmentOperationPanel copy constructor is not allowed.");
 }	// QtSegmentOperationPanel::QtSegmentOperationPanel (const QtSegmentOperationPanel&)
 
 
-QtSegmentOperationPanel& QtSegmentOperationPanel::operator = (
-											const QtSegmentOperationPanel&)
+QtSegmentOperationPanel& QtSegmentOperationPanel::operator = (const QtSegmentOperationPanel&)
 {
 	MGX_FORBIDDEN ("QtSegmentOperationPanel assignment operator is not allowed.");
 	return *this;
@@ -153,8 +132,7 @@ string QtSegmentOperationPanel::getGroupName ( ) const
 }	// QtSegmentOperationPanel::getGroupName
 
 
-QtSegmentOperationPanel::OPERATION_METHOD
-						QtSegmentOperationPanel::getOperationMethod ( ) const
+QtSegmentOperationPanel::OPERATION_METHOD QtSegmentOperationPanel::getOperationMethod ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_operationMethodComboBox);
 	return (QtSegmentOperationPanel::OPERATION_METHOD)_operationMethodComboBox->currentIndex ( );
@@ -192,11 +170,6 @@ void QtSegmentOperationPanel::reset ( )
 
 void QtSegmentOperationPanel::validate ( )
 {
-// CP : suite discussion EBL/FL, il est convenu que la validation des
-// paramètres de l'opération est effectuée par le "noyau" et qu'un mauvais
-// paramétrage est remonté sous forme d'exception à la fonction appelante, donc
-// avant exécution de la commande.
-// Les validations des valeurs des paramètres sont donc ici commentées.
 	UTF8String	error (Charset::UTF_8);
 
 	try
@@ -221,15 +194,12 @@ void QtSegmentOperationPanel::validate ( )
 		case -1	:
 			if (0 != error.length ( ))
 				error << "\n";
-			error << "Absence de méthode d'opération de création/modification "
-			      << "de segment sélectionnée.";
+			error << "Absence de méthode d'opération de création/modification de segment sélectionnée.";
 			break;
 		default		:
 			if (0 != error.length ( ))
 				error << "\n";
-			error << "QtSegmentOperationPanel::validate : index de méthode "
-			      << "d'opération de création/modification de segment "
-			      << "invalide ("
+			error << "QtSegmentOperationPanel::validate : index de méthode d'opération de création/modification de segment invalide ("
 			      << (long)_operationMethodComboBox->currentIndex ( ) << ").";
 	}	// switch (_operationMethodComboBox->currentIndex ( ))
 
@@ -261,6 +231,65 @@ void QtSegmentOperationPanel::autoUpdate ( )
 
 	QtMgx3DOperationPanel::autoUpdate ( );
 }	// QtSegmentOperationPanel::autoUpdate
+
+
+void QtSegmentOperationPanel::preview (bool show, bool destroyInteractor)
+{
+	// Lors de la construction getGraphicalWidget peut être nul ...
+	try
+	{
+		getRenderingManager ( );
+	}
+	catch (...)
+	{
+		return;
+	}
+
+	QtMgx3DOperationPanel::preview (show, destroyInteractor);
+	if ((false == show) || (false == previewResult ( )))
+		return;
+
+	try
+	{
+		Context*		context		= dynamic_cast<Context*>(&getContext ( ));
+		CHECK_NULL_PTR_ERROR (context)
+
+		DisplayProperties	graphicalProps;
+		graphicalProps.setWireColor (Color (
+				255 * Resources::instance ( )._previewColor.getRed ( ),
+				255 * Resources::instance ( )._previewColor.getGreen ( ),
+				255 * Resources::instance ( )._previewColor.getBlue ( )));
+		graphicalProps.setLineWidth (Resources::instance ( )._previewWidth.getValue ( ));
+
+		Geom::Vertex	*v1	= 0, *v2 = 0;
+		switch (getOperationMethod ( ))
+		{
+			case QtSegmentOperationPanel::VERTEX_VERTEX				:
+			{
+				v1	= getContext ( ).getGeomManager ( ).getVertex (getVertex1Name ( ));
+				v2	= getContext ( ).getGeomManager ( ).getVertex (getVertex2Name ( ));
+			}
+			break;
+			default													: throw Exception ("Erreur interne dans QtSegmentOperationPanel::preview : cas non recensé.");
+		}	// switch (getOperationMethod ( ))
+		if ((0 == v1) || (0 == v2))
+			return;
+			
+		Geom::CommandNewSegment	command (*context, v1, v2, "");
+		Geom::GeomDisplayRepresentation	dr (DisplayRepresentation::WIRE);
+		command.getPreviewRepresentation (dr);
+		const vector<Math::Point>&	points	= dr.getPoints ( );
+		const vector<size_t>&		indices	= dr.getCurveDiscretization ( );
+
+		RenderingManager::RepresentationID	repID	= getRenderingManager ( ).createSegmentsWireRepresentation (points, indices, graphicalProps, true);
+		registerPreviewedObject (repID);
+
+		getRenderingManager ( ).forceRender ( );
+	}
+	catch (...)
+	{
+	}
+}	// QtSegmentOperationPanel::preview
 
 
 void QtSegmentOperationPanel::operationCompleted ( )
@@ -296,8 +325,7 @@ void QtSegmentOperationPanel::operationMethodCallback ( )
 		default	:
 		{
 			UTF8String	message (Charset::UTF_8);
-			message << "Méthode d'opération non supportée ("
-			        << (unsigned long)getOperationMethod ( ) << ").";
+			message << "Méthode d'opération non supportée (" << (unsigned long)getOperationMethod ( ) << ").";
 			INTERNAL_ERROR (exc, message, "QtSegmentOperationPanel::operationMethodCallback")
 			throw exc;
 		}
@@ -319,30 +347,22 @@ void QtSegmentOperationPanel::operationMethodCallback ( )
 //                  LA CLASSE QtSegmentOperationAction
 // ===========================================================================
 
-QtSegmentOperationAction::QtSegmentOperationAction (
-	const QIcon& icon, const QString& text, QtMgx3DMainWindow& mainWindow,
-	const QString& tooltip, QtMgx3DGroupNamePanel::POLICY creationPolicy)
+QtSegmentOperationAction::QtSegmentOperationAction (const QIcon& icon, const QString& text, QtMgx3DMainWindow& mainWindow, const QString& tooltip, QtMgx3DGroupNamePanel::POLICY creationPolicy)
 	: QtMgx3DGeomOperationAction (icon, text, mainWindow, tooltip)
 {
-	QtSegmentOperationPanel*	operationPanel	=
-		new QtSegmentOperationPanel (
-			&getOperationPanelParent ( ), text.toStdString ( ), creationPolicy,
-			mainWindow, this);
+	QtSegmentOperationPanel*	operationPanel	= new QtSegmentOperationPanel (&getOperationPanelParent ( ), text.toStdString ( ), creationPolicy, mainWindow, this);
 	setOperationPanel (operationPanel);
 }	// QtSegmentOperationAction::QtSegmentOperationAction
 
 
-QtSegmentOperationAction::QtSegmentOperationAction (
-										const QtSegmentOperationAction&)
-	: QtMgx3DGeomOperationAction (
-						QIcon (""), "", *new QtMgx3DMainWindow (0), "")
+QtSegmentOperationAction::QtSegmentOperationAction (const QtSegmentOperationAction&)
+	: QtMgx3DGeomOperationAction (QIcon (""), "", *new QtMgx3DMainWindow (0), "")
 {
 	MGX_FORBIDDEN ("QtSegmentOperationAction copy constructor is not allowed.")
 }	// QtSegmentOperationAction::QtSegmentOperationAction
 
 
-QtSegmentOperationAction& QtSegmentOperationAction::operator = (
-										const QtSegmentOperationAction&)
+QtSegmentOperationAction& QtSegmentOperationAction::operator = (const QtSegmentOperationAction&)
 {
 	MGX_FORBIDDEN ("QtSegmentOperationAction assignment operator is not allowed.")
 	return *this;
@@ -382,9 +402,7 @@ void QtSegmentOperationAction::executeOperation ( )
 		default	:
 		{
 			UTF8String	message (Charset::UTF_8);
-			message << "Méthode d'opération non supportée ("
-			        << (unsigned long)getSegmentPanel ( )->getOperationMethod ( )
-			        << ").";
+			message << "Méthode d'opération non supportée (" << (unsigned long)getSegmentPanel ( )->getOperationMethod ( ) << ").";
 			INTERNAL_ERROR (exc, message, "QtSegmentOperationAction::executeOperation")
 			throw exc;
 		}
