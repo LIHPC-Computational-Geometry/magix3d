@@ -27,8 +27,7 @@ namespace QtComponents
 
 
 /**
- * Panneau d'édition des paramètres d'une opération géométrique touchant
- * un segment.
+ * Panneau d'édition des paramètres d'une opération géométrique touchant un segment.
  */
 class QtSegmentOperationPanel : public QtMgx3DOperationPanel
 {
@@ -48,15 +47,12 @@ class QtSegmentOperationPanel : public QtMgx3DOperationPanel
 	 * \param	Widget parent.
 	 * \param	Nom du panneau.
 	 * \param	Politique de création/modification du groupe
-	 * \param	Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée
-	 *			notamment pour récupérer le contexte.
+	 * \param	Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée notamment pour récupérer le contexte.
 	 * \param	Eventuelle action associée à ce panneau.
 	 */
 	QtSegmentOperationPanel (
-			QWidget* parent, const std::string& panelName,
-			QtMgx3DGroupNamePanel::POLICY creationPolicy,
-			Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
-			Mgx3D::QtComponents::QtMgx3DOperationAction* action);
+			QWidget* parent, const std::string& panelName, QtMgx3DGroupNamePanel::POLICY creationPolicy,
+			Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow, Mgx3D::QtComponents::QtMgx3DOperationAction* action);
 
 	/**
 	 * RAS.
@@ -74,8 +70,7 @@ class QtSegmentOperationPanel : public QtMgx3DOperationPanel
 	virtual OPERATION_METHOD getOperationMethod ( ) const;
 
 	/**
-	 * Les coordonnées des vertices aux extrémités du segment
-	 * (si <I>getOperationMethod ( )</I> retourne <I>COORDINATES</I>).
+	 * Les coordonnées des vertices aux extrémités du segment (si <I>getOperationMethod ( )</I> retourne <I>COORDINATES</I>).
 	 */
 	virtual std::string getVertex1Name ( ) const;
 	virtual std::string getVertex2Name ( ) const;
@@ -87,9 +82,7 @@ class QtSegmentOperationPanel : public QtMgx3DOperationPanel
 
     /**
      * Méthode appelée pour vérifier les paramètres saisis par l'utilisateur.
-     * En cas de paramètrage invalide cette méthode doit leve une exception de
-     * type <I>TkUtil::Exception</I> contenant un descriptif des erreurs
-     * rencontrées.
+     * En cas de paramètrage invalide cette méthode doit leve une exception de type <I>TkUtil::Exception</I> contenant un descriptif des erreurs rencontrées.
      */
     virtual void validate ( );
 
@@ -105,6 +98,12 @@ class QtSegmentOperationPanel : public QtMgx3DOperationPanel
 	 * \see		cancel
 	 */
 	virtual void autoUpdate ( );
+	
+	/**
+	 * \param		<I>true</I> pour prévisualiser les entités créées, <I>false</I> pour arrêter la prévisualisation.
+	 * \param		<I>true</I> s'il faut détruire l'éventuel interacteur dans le cas d'un arrêt de la prévisualisation.
+	 */
+	virtual void preview (bool show, bool destroyInteractor);
 
 
 	protected :
@@ -119,8 +118,7 @@ class QtSegmentOperationPanel : public QtMgx3DOperationPanel
 	protected slots :
 
 	/**
-	 * Appelé lorsque la méthode change. Actualise le panneau de saisie des
-	 * paramètres.
+	 * Appelé lorsque la méthode change. Actualise le panneau de saisie des paramètres.
 	 */
 	virtual void operationMethodCallback ( );
 
@@ -156,8 +154,7 @@ class QtSegmentOperationPanel : public QtMgx3DOperationPanel
 
 
 /**
- * Classe d'action type <I>check box</I> associée à un panneau type
- * <I>QtSegmentOperationPanel</I> de création/modification d'un segment.
+ * Classe d'action type <I>check box</I> associée à un panneau type <I>QtSegmentOperationPanel</I> de création/modification d'un segment.
  */
 class QtSegmentOperationAction : public QtMgx3DGeomOperationAction
 {
@@ -168,16 +165,11 @@ class QtSegmentOperationAction : public QtMgx3DGeomOperationAction
 	 * <I>QtSegmentOperationPanel</I>.
 	 * \param		Icône représentant l'action.
 	 * \param		Texte représentant l'action.
-	 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée
-	 *				notamment pour récupérer le contexte et le panneau contenant
-	 *				les icônes.
+	 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée notamment pour récupérer le contexte et le panneau contenant les icônes.
 	 * \param		Tooltip décrivant l'action.
 	 * \param		Politique de création/modification du groupe
 	 */
-	QtSegmentOperationAction (
-		const QIcon& icon, const QString& text,
-		Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
-		const QString& tooltip, QtMgx3DGroupNamePanel::POLICY creationPolicy);
+	QtSegmentOperationAction (const QIcon& icon, const QString& text, Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow, const QString& tooltip, QtMgx3DGroupNamePanel::POLICY creationPolicy);
 
 	/**
 	 * Destructeur. RAS.
@@ -191,8 +183,7 @@ class QtSegmentOperationAction : public QtMgx3DGeomOperationAction
 
 	/**
 	 * Créé/modifie le segment avec le paramétrage de son panneau associé.
-	 * Invoque préalablement
-	 * <I>QtMgx3DGeomOperationAction::executeOperation</I>.
+	 * Invoque préalablement <I>QtMgx3DGeomOperationAction::executeOperation</I>.
 	 */
 	virtual void executeOperation ( );
 
@@ -203,8 +194,7 @@ class QtSegmentOperationAction : public QtMgx3DGeomOperationAction
 	 * Constructeur de copie et opérateur = : interdits.
 	 */
 	QtSegmentOperationAction (const QtSegmentOperationAction&);
-	QtSegmentOperationAction& operator = (
-									const QtSegmentOperationAction&);
+	QtSegmentOperationAction& operator = (const QtSegmentOperationAction&);
 };  // class QtSegmentOperationAction
 
 

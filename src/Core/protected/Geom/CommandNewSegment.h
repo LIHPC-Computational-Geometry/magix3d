@@ -58,6 +58,14 @@ public:
     /** \brief  exécute la commande
      */
     virtual void internalExecute();
+    
+    /*------------------------------------------------------------------------*/
+    /** \brief  exécute et annule la commande, retourne dans DisplayRepresentation
+     *  une représentation des entités créées
+     *
+     *  La commande doit ensuite être détruite
+     */
+    virtual void getPreviewRepresentation(Utils::DisplayRepresentation& dr);
 
 
 protected:

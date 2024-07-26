@@ -8,6 +8,9 @@
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
+#include "Geom/CommandNewCircle.h"
+#include "Geom/CommandNewEllipse.h"
+#include "Geom/GeomDisplayRepresentation.h"
 #include "Geom/GeomManagerIfc.h"
 #include "Geom/Vertex.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -48,17 +51,11 @@ namespace QtComponents
 QtCircleOperationPanel::QtCircleOperationPanel (
 			QWidget* parent, const string& panelName, QtMgx3DGroupNamePanel::POLICY creationPolicy, QtMgx3DMainWindow& mainWindow, QtMgx3DOperationAction* action)
 	: QtMgx3DOperationPanel (parent, mainWindow, action, QtMgx3DApplication::HelpSystem::instance ( ).circleOperationURL, QtMgx3DApplication::HelpSystem::instance ( ).circleOperationTag),
-	  _namePanel (0), _operationMethodComboBox (0),
-	  _currentParentWidget (0), _currentPanel (0),
-	  _verticesPanel (0)
+	  _namePanel (0), _operationMethodComboBox (0),  _currentParentWidget (0), _currentPanel (0), _verticesPanel (0)
 {
 //	SET_WIDGET_BACKGROUND (this, Qt::yellow)
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
-	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
+	layout->setContentsMargins  (Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
 	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
@@ -89,11 +86,7 @@ QtCircleOperationPanel::QtCircleOperationPanel (
 	// Définition du cercle :
 	QtGroupBox*		groupBox	= new QtGroupBox (QString::fromUtf8 ("Paramètres du cercle"), this);
 	QVBoxLayout*	vlayout	= new QVBoxLayout (groupBox);
-	vlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
+	vlayout->setContentsMargins  (Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
 	vlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
 	groupBox->setLayout (vlayout);
 	layout->addWidget (groupBox);
@@ -110,6 +103,8 @@ QtCircleOperationPanel::QtCircleOperationPanel (
 	operationMethodCallback ( );
 
 	vlayout->addStretch (2);
+	
+	addPreviewCheckBox (true);
 }	// QtCircleOperationPanel::QtCircleOperationPanel
 
 
@@ -250,6 +245,78 @@ void QtCircleOperationPanel::autoUpdate ( )
 
 	QtMgx3DOperationPanel::autoUpdate ( );
 }	// QtCircleOperationPanel::autoUpdate
+
+
+void QtCircleOperationPanel::preview (bool show, bool destroyInteractor)
+{
+	// Lors de la construction getGraphicalWidget peut être nul ...
+	try
+	{
+		getRenderingManager ( );
+	}
+	catch (...)
+	{
+		return;
+	}
+
+	QtMgx3DOperationPanel::preview (show, destroyInteractor);
+	if ((false == show) || (false == previewResult ( )))
+		return;
+
+	try
+	{
+		Context*		context		= dynamic_cast<Context*>(&getContext ( ));
+		CHECK_NULL_PTR_ERROR (context)
+
+		DisplayProperties	graphicalProps;
+		graphicalProps.setWireColor (Color (
+				255 * Resources::instance ( )._previewColor.getRed ( ),
+				255 * Resources::instance ( )._previewColor.getGreen ( ),
+				255 * Resources::instance ( )._previewColor.getBlue ( )));
+		graphicalProps.setLineWidth (Resources::instance ( )._previewWidth.getValue ( ));
+
+		CHECK_NULL_PTR_ERROR (_verticesPanel)
+		Geom::Vertex	*v1 = 0, *v2 = 0, *v3 = 0;
+		switch (getOperationMethod ( ))
+		{
+			case QtCircleOperationPanel::THREE_POINTS			:
+			case QtCircleOperationPanel::ELLIPSE_THREE_POINTS	:
+				v1	= getContext ( ).getGeomManager ( ).getVertex (_verticesPanel->getStartVertexUniqueName ( ), false);
+				v2	= getContext ( ).getGeomManager ( ).getVertex (_verticesPanel->getEndVertexUniqueName ( ), false);
+				v3	= getContext ( ).getGeomManager ( ).getVertex (_verticesPanel->getCenterVertexUniqueName ( ), false);
+				break;
+			default												: throw Exception ("Erreur interne dans QtCircleOperationPanel::preview : cas non recensé.");
+		}	// switch (getOperationMethod ( ))
+		if ((0 == v1) || (0 == v2) || (0 == v3))
+			return;
+
+		unique_ptr<CommandCreateGeom>	command;
+		switch (getOperationMethod ( ))
+		{
+			case QtCircleOperationPanel::THREE_POINTS			:
+				command.reset (new Geom::CommandNewCircle (*context, v1, v2, v3, ""));
+				break;
+			case QtCircleOperationPanel::ELLIPSE_THREE_POINTS	:
+				command.reset (new Geom::CommandNewEllipse (*context, v1, v2, v3, ""));
+				break;
+			default												: throw Exception ("Erreur interne dans QtCircleOperationPanel::preview : cas non recensé.");
+		}	// switch (getOperationMethod ( ))
+
+		CHECK_NULL_PTR_ERROR (command.get ( ))
+		Geom::GeomDisplayRepresentation	dr (DisplayRepresentation::WIRE);
+		command->getPreviewRepresentation (dr);
+		const vector<Math::Point>&	points	= dr.getPoints ( );
+		const vector<size_t>&		indices	= dr.getCurveDiscretization ( );
+
+		RenderingManager::RepresentationID	repID	= getRenderingManager ( ).createSegmentsWireRepresentation (points, indices, graphicalProps, true);
+		registerPreviewedObject (repID);
+
+		getRenderingManager ( ).forceRender ( );
+	}
+	catch (...)
+	{
+	}
+}	// QtCircleOperationPanel::preview
 
 
 vector<Entity*> QtCircleOperationPanel::getInvolvedEntities ( )
