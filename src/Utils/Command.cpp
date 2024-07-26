@@ -344,7 +344,10 @@ void Command::setStatus (Command::status status)
 
 	// On prévient les observateurs avant l'appel à log () qui peut lever une exception ...
     if (changeStatus || _status == Command::PROCESSING)
+	{
+		setUserNotified (false);			// CP 07/24 : une commande change plusieurs fois de status => autant de notifications à faire
         notifyObserversForModification (COMMAND_STATE);
+	}
 
 	message << statusToString (status) << ", chronomètre = " << MgxNumeric::userRepresentation (getTimer ( )) << ".";
     MGX_TRACE_LOG_1 (trace1, message)

@@ -4299,8 +4299,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 					// Traitement 1 : entités géométriques :
 					// Optimisation : on transmet des listes d'entités
 					uint i = 0;
-					vector < Geom::GeomEntity * > geomAddedShown, geomAddedHidden,
-							geomRemoved, geomModified;
+					vector < Geom::GeomEntity * > geomAddedShown, geomAddedHidden, geomRemoved, geomModified;
 					for (i = 0; i < icmd.getNbGeomInfoEntity(); i++)
 					{
 						GeomEntity *ge = 0;
@@ -4330,8 +4329,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 								{    // Mettre à jour toutes les représentations de l'entité,
 									// qu'elles soient graphiques, textuelles ou autres.
 									if (true == (*ge).getDisplayProperties().isDisplayed())
-										getGraphicalWidget().getRenderingManager(
-										).updateRepresentation(*ge);
+										getGraphicalWidget().getRenderingManager( ).updateRepresentation(*ge);
 									doRender = true;
 								}
 
@@ -4346,14 +4344,10 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 						getEntitiesPanel().removeCADEntities(geomRemoved);
 
 					// Traitement 2 : entités topologiques :
-					vector < Topo::TopoEntity * > topoAddedShown, topoAddedHidden,
-							topoRemoved, topoModified;
-					std::vector <InfoCommand::TopoEntityInfo> topo_entities_info =
-							                                          icmd.getSortedTopoInfoEntity();
+					vector < Topo::TopoEntity * > topoAddedShown, topoAddedHidden, topoRemoved, topoModified;
+					std::vector <InfoCommand::TopoEntityInfo> topo_entities_info = icmd.getSortedTopoInfoEntity();
 					i = 0;
-					for (std::vector<InfoCommand::TopoEntityInfo>::iterator
-							     iter_tei = topo_entities_info.begin();
-					     iter_tei != topo_entities_info.end(); ++iter_tei, i++)
+					for (std::vector<InfoCommand::TopoEntityInfo>::iterator iter_tei = topo_entities_info.begin(); iter_tei != topo_entities_info.end(); ++iter_tei, i++)
 					{
 						Topo::TopoEntity *te = (*iter_tei).m_topo_entity;
 						t                    = (*iter_tei).m_type;
@@ -4366,8 +4360,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 
 						if (InfoCommand::CREATED == t)
 						{
-							bool displayed =
-									     te->getDisplayProperties().isDisplayed();
+							bool displayed = te->getDisplayProperties().isDisplayed();
 							doRender = true == displayed ? true : doRender;
 							if (true == displayed)
 								topoAddedShown.push_back(te);
@@ -4379,8 +4372,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 							else
 								if (InfoCommand::DISPMODIFIED == t)
 								{
-									// Mettre à jour toutes les représentations de l'entité,
-									// qu'elles soient graphiques, textuelles ou autres.
+									// Mettre à jour toutes les représentations de l'entité, qu'elles soient graphiques, textuelles ou autres.
 									//std::cout<<" changement de représentation pour "<<te->getName()<<std::endl;
 									if (true == (*te).getDisplayProperties().isDisplayed())
 										getGraphicalWidget().getRenderingManager ( ).updateRepresentation(*te);
@@ -4391,21 +4383,15 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 										// les entités déjà avec une représentation mais qui ont un changement de visibilité
 
 										//std::cout<<" changement de visibilité pour "<<te->getName()<<std::endl;
-										RenderedEntityRepresentation *rer =
-												                             dynamic_cast<RenderedEntityRepresentation *>(
-														                             te->getDisplayProperties().getGraphicalRepresentation());
+										RenderedEntityRepresentation *rer = dynamic_cast<RenderedEntityRepresentation *>(te->getDisplayProperties().getGraphicalRepresentation());
 										if ((0 != rer) && (0 == rer->getRenderingManager()))
 											rer->setRenderingManager(&getGraphicalWidget().getRenderingManager());
 										const bool displayed = te->getDisplayProperties().isDisplayed();
-										// Bug workaround : displayed déjà tagué alors que
-										// displayRepresentation l'évalue ... => on inverse :
+										// Bug workaround : displayed déjà tagué alors que displayRepresentation l'évalue ... => on inverse :
 										te->getDisplayProperties().setDisplayed(!displayed);
-										// Puis on réaffecte => forcera l'actualisation de la
-										// représentation :
+										// Puis on réaffecte => forcera l'actualisation de la représentation :
 										if (0 != rer)
-											getGraphicalWidget().getRenderingManager(
-											).displayRepresentation(*te, displayed,
-											                        rer->getRepresentationMask());
+											getGraphicalWidget().getRenderingManager( ).displayRepresentation(*te, displayed, rer->getRepresentationMask());
 									}
 
 						if (0 == (i % Resources::instance()._updateRefreshRate.getValue()))
@@ -4417,12 +4403,9 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 						getEntitiesPanel().addTopologicEntities(topoAddedHidden, false);
 					if (0 != topoRemoved.size())
 						getEntitiesPanel().removeTopologicEntities(topoRemoved);
-//			if (0 != shownEntities.size ( ))
-//				getRenderingManager ( ).displayRepresentations (shownEntities
 
 					// Traitement 3 : entités de maillage :
-					vector < Mesh::MeshEntity * > meshAddedShown, meshAddedHidden,
-							meshRemoved, meshModified;
+					vector < Mesh::MeshEntity * > meshAddedShown, meshAddedHidden, meshRemoved, meshModified;
 					for (i = 0; i < icmd.getNbMeshInfoEntity(); i++)
 					{
 						MeshEntity *me = 0;
@@ -4436,8 +4419,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 
 						if (InfoCommand::CREATED == t)
 						{
-							bool displayed =
-									     me->getDisplayProperties().isDisplayed();
+							bool displayed = me->getDisplayProperties().isDisplayed();
 							doRender = true == displayed ? true : doRender;
 							if (true == displayed)
 								meshAddedShown.push_back(me);
@@ -4450,8 +4432,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 								if (InfoCommand::DISPMODIFIED == t)
 								{
 									if (true == (*me).getDisplayProperties().isDisplayed())
-										getGraphicalWidget().getRenderingManager(
-										).updateRepresentation(*me);
+										getGraphicalWidget().getRenderingManager( ).updateRepresentation(*me);
 									doRender = true;
 								}
 						if (0 == (i % Resources::instance()._updateRefreshRate.getValue()))
@@ -4466,10 +4447,8 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 
 					// Traitement 4 : entités de type groupes :
 					vector < Group::GroupEntity * > groupsAdded, groupsRemoved;
-					map < Group::GroupEntity * , InfoCommand::type > &groupsInfos =
-							                             icmd.getGroupInfoEntity();
-					for (map<Group::GroupEntity *, InfoCommand::type>::const_iterator
-							     itg = groupsInfos.begin(); groupsInfos.end() != itg; itg++)
+					map < Group::GroupEntity * , InfoCommand::type > &groupsInfos = icmd.getGroupInfoEntity();
+					for (map<Group::GroupEntity *, InfoCommand::type>::const_iterator itg = groupsInfos.begin(); groupsInfos.end() != itg; itg++)
 					{
 						switch ((*itg).second)
 						{
@@ -4500,7 +4479,6 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 						// on passe les entités non représentables
 						if (!rep->getDisplayProperties().isDisplayable())
 							continue;
-
 
 						if (InfoCommand::CREATED == t)
 						{
@@ -4548,8 +4526,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 							// s'ils doivent être affichés ou non à la création. Le panneau QtEntitiesPanel n'a pas vocation à exister ...
 							// On récupère l'info directement depuis le QtGroupsPanel :
 //					bool	displayed	= sme->getDisplayProperties ( ).isDisplayed ( );
-							bool displayed = 0 == (getGroupsPanel().getCheckedEntitiesTypes() &
-							                       FilterEntity::StructuredMesh) ? false : true;
+							bool displayed = 0 == (getGroupsPanel().getCheckedEntitiesTypes() & FilterEntity::StructuredMesh) ? false : true;
 							doRender = true == displayed ? true : doRender;
 							if (true == displayed)
 								smeshAddedShown.push_back(sme);
@@ -4578,9 +4555,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 						getEntitiesPanel().removeStructuredMeshEntities(smeshRemoved);
 
 					// Prévenir les panneaux additionnels de l'IHM (explorateur et qualité de maillage, ...) en vue d'une éventuelle actualisation :
-					for (vector<QtMgx3DOperationPanel *>::iterator itap =
-							                                               _additionalPanels.begin();
-					     _additionalPanels.end() != itap; itap++)
+					for (vector<QtMgx3DOperationPanel *>::iterator itap = _additionalPanels.begin(); _additionalPanels.end() != itap; itap++)
 						(*itap)->commandModifiedCallback(icmd);
 
 					// Une commande vient de s'achever avec succès => afficher l'équivalent en Python en l'ajoutant à l'historique :
@@ -4596,8 +4571,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 
 					if (Command::DONE == command.getStatus())
 					{
-						// A t'on un évènement important justifiant d'une notification via
-						// boite de dialogue ?
+						// A t'on un évènement important justifiant d'une notification via boite de dialogue ?
 						const string warn = commandInternal->getWarningToPopup();
 						if (false == warn.empty())
 							QtMessageBox::displayWarningMessage(this, getAppTitle().c_str(), warn);
@@ -4610,9 +4584,11 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 				else
 					if ((COMMAND_STATE == event) && (Command::FAIL == command.getStatus()))
 					{
-						if ((true == Resources::instance()._showDialogOnCommandError.getValue()) &&
-						    (false == command.isUserNotified()))
+						if ((true == Resources::instance()._showDialogOnCommandError.getValue()) && (false == command.isUserNotified()))
+						{
+							command.setUserNotified (true);
 							QtMessageBox::displayErrorMessage(this, getAppTitle(), command.getErrorMessage());
+						}
 
 						// pour permettre de rejouer cette commande qui a échouée, elle est transmise avec le status en erreur, cela peut permettre de la corriger
 						if (0 != _pythonPanel && commandInternal->isScriptable())
@@ -4625,7 +4601,6 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 
 							// [EB] on ajoute un "#" au début de chacune des lignes
 							UTF8String	cmd2 = addCharAtBeginLines('#', cmd);
-
 							getContext ( ).getScriptingManager ( ).addCommand (cmd2);
 							_pythonPanel->addToHistoric(commandInternal->getScriptCommand(), commandInternal->getScriptComments(), commandInternal->getErrorMessage(), true, true);
 						}    // if (0 != _pythonPanel && commandInternal->isScriptable())
@@ -4660,8 +4635,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 					case CommandIfc::CANCELED    :
 					case CommandIfc::FAIL        :
 //				getCommandManager ( ).processQueuedCommands ( );
-						if ((false == getCommandManager().hasRunningCommands()) &&
-						    (false == getCommandManager().hasQueuedCommands()))
+						if ((false == getCommandManager().hasRunningCommands()) && (false == getCommandManager().hasQueuedCommands()))
 							updateActions();
 						break;
 					case CommandIfc::INITED        :
@@ -4698,8 +4672,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 			if (0 == action)
 			{
 				UTF8String message(Charset::UTF_8);
-				message << "Unité non référencée : "
-				        << (unsigned long) getContext().getLengthUnit() << ".";
+				message << "Unité non référencée : " << (unsigned long) getContext().getLengthUnit() << ".";
 				INTERNAL_ERROR(exc, message, "QtMgx3DMainWindow::lengthUnitModifiedEvent")
 				throw exc;
 			}    // if (0 == action)
