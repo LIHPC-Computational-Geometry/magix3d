@@ -41,3 +41,17 @@ def test_issue35():
     tm.splitBlocksWithOgridV2(["Bl0000","Bl0001"],[],.5,10)
     # Split réalisé pour l'ensemble
     assert(tm.getNbBlocks() == 12)
+
+    # Test 3 : avec des splits
+    # ------------------------
+    ctx.clearSession() # Clean the session after the previous test
+    # Création d'une boite avec une topologie
+    tm.newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
+    # Découpage de tous les blocs suivant l'arête Ar0011
+    tm.splitAllBlocks ("Ar0011",.5)
+    # Découpage de tous les blocs suivant l'arête Ar0005
+    tm.splitAllBlocks ("Ar0005",.5)
+    # Découpage en O-grid des blocs structurés Bl0006 Bl0003
+    tm.splitBlocksWithOgridV2 (["Bl0006", "Bl0003"], [], .5, 10)
+    # Split non réalisé => toujours que 4 blocs
+    assert(tm.getNbBlocks() == 4)
