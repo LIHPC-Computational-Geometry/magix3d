@@ -107,13 +107,18 @@ preExecute()
             all_vertices.insert(*vi);
     }
 
-    // Parcours des blocs adjacents à chacun des sommets.
+    // Parcours des blocs adjacents à chacun des sommets (parmi les blocs sélectionnés).
     // Ils sont considérés comme un unique polyhèdre
     // pour le calcul de la contrainte d'Euler.
     for (auto vi = all_vertices.begin(); vi != all_vertices.end(); ++vi){
         Topo::Vertex* v = *vi;
+        // recherche de tous les blocs adjacents à v
         std::vector<Topo::Block* > adjacent_blocks;
         v->getBlocks(adjacent_blocks);
+        // filtrage pour ne laisser que les blocs de la liste des blocs sélectionnés (m_blocs)
+        adjacent_blocks.erase(std::remove_if(adjacent_blocks.begin(), adjacent_blocks.end(), [&](Topo::Block* b){
+            return std::find(m_blocs.begin(), m_blocs.end(), b) == m_blocs.end();
+        }), adjacent_blocks.end());
 
         // Recherche des faces externes des blocs adjacents (= du polyhèdre)
         // Pour cela, effacement des faces communes
