@@ -137,14 +137,16 @@ vector<gmds::CellGroup<gmds::Region>*>
 	for (vector< pair<size_t, size_t> >::iterator its = selection.begin ( );
 	     selection.end ( ) != its; its++)
 	{
-		const Mesh::Mgx3DVolumeQualifSerie*	serie	=
-			dynamic_cast<const Mesh::Mgx3DVolumeQualifSerie*>(&getSerie ((*its).first));
-		CHECK_NULL_PTR_ERROR (serie)
+        const GQualif::AbstractQualifSerie* serie = &getSerie ((*its).first);
+        CHECK_NULL_PTR_ERROR (serie)
+        if (false == serie->isVolumic ( ))
+            continue;
 
-		if (false == serie->isVolumic ( ))
-			continue;
+        const Mesh::Mgx3DVolumeQualifSerie*	volume_serie	=
+                dynamic_cast<const Mesh::Mgx3DVolumeQualifSerie*>(&getSerie ((*its).first));
+
 		vector <gmds::TCellID>	cellsIds;
-		serie->getGMDSCellsIndexes (cellsIds, (*its).second);
+        volume_serie->getGMDSCellsIndexes (cellsIds, (*its).second);
 		if (0 == cellsIds.size ( ))
 			continue;
 
@@ -157,7 +159,7 @@ vector<gmds::CellGroup<gmds::Region>*>
 		for (vector <gmds::TCellID>::const_iterator itc = cellsIds.begin ( );
 		     cellsIds.end ( ) != itc; itc++)
 		{
-			volume->add (serie->getGMDSCell (*itc));
+			volume->add (volume_serie->getGMDSCell (*itc));
 		}	// for (vector <gmds::TCellID>::const_iterator itc = ...
 	}	// for (vector< pair<size_t, size_t> >::iterator its = ...
 
