@@ -142,8 +142,7 @@ vector<gmds::CellGroup<gmds::Region>*>
         if (false == serie->isVolumic ( ))
             continue;
 
-        const Mesh::Mgx3DVolumeQualifSerie*	volume_serie	=
-                dynamic_cast<const Mesh::Mgx3DVolumeQualifSerie*>(&getSerie ((*its).first));
+        auto volume_serie = dynamic_cast<const Mesh::Mgx3DVolumeQualifSerie*>(serie);
 
 		vector <gmds::TCellID>	cellsIds;
         volume_serie->getGMDSCellsIndexes (cellsIds, (*its).second);
