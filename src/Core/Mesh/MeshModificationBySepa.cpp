@@ -179,10 +179,10 @@ applyModification(std::vector<gmds::Node >& AGmdsNodes, std::vector<gmds::Face>&
 			iter != AGmdsNodes.end(); ++iter) {
 		gmds::Node node = *iter;
 
-		double delta = sepa->getRadialPerturbation(node.getPoint()*convertFactorToMicron);
+		double delta = sepa->getRadialPerturbation(node.point()*convertFactorToMicron);
 		m_deltas[node] = delta;
 
-		gmds::math::Point point = node.getPoint()*convertFactorToMicron;
+		gmds::math::Point point = node.point()*convertFactorToMicron;
 		gmds::math::Point newPoint = (sepa->applyPerturbation(point)) * convertFactorFromMicron;
 		node.setPoint(newPoint);
 	}
