@@ -23,9 +23,9 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 extern "C"
 {
-  /*! Affichage d'un message indiquant que la fonction n'est pas encore implémenté. */
+  /*! Affichage d'un message indiquant que la fonction n'est pas encore implï¿½mentï¿½. */
   void MgxNotYetImplemented(const char*,const char*,unsigned int,const char*);
-  /*! Affichage d'un message indiquant que la fonction est obsolète. */
+  /*! Affichage d'un message indiquant que la fonction est obsolï¿½te. */
   void MgxObsolete(const char*,const char*,unsigned int,const char*);
   /*! Affichage d'un message indiquant que la fonction est interdite. */
   void MgxForbidden(const char*,const char*,unsigned int,const char*);
@@ -49,25 +49,25 @@ extern "C"
  * Macros d'instanciations de logs de type Trace.
  * @param		name est le nom de l'instance
  * @param		text est le message
- * @param		type est le niveau de trace souhaité
+ * @param		type est le niveau de trace souhaitï¿½
  */
 #define MGX_TRACE_LOG(name, text, type)                                          \
 TkUtil::TraceLog	name (TkUtil::UTF8String (text, type, TkUtil::UTF8String (__FILE__, __LINE__);
 
 #define MGX_TRACE_LOG_1(name, text)                                              \
-TkUtil::TraceLog	name (TkUtil::UTF8String (text, TkUtil::Charset::UTF_8), Log::TRACE_1, TkUtil::UTF8String (__FILE__, TkUtil::Charset::UTF_8), __LINE__);
+TkUtil::TraceLog	name (TkUtil::UTF8String (text, TkUtil::Charset::UTF_8), TkUtil::Log::TRACE_1, TkUtil::UTF8String (__FILE__, TkUtil::Charset::UTF_8), __LINE__);
 
 #define MGX_TRACE_LOG_2(name, text)                                              \
-TkUtil::TraceLog	name (TkUtil::UTF8String (text, TkUtil::Charset::UTF_8), Log::TRACE_2, TkUtil::UTF8String (__FILE__, TkUtil::Charset::UTF_8), __LINE__);
+TkUtil::TraceLog	name (TkUtil::UTF8String (text, TkUtil::Charset::UTF_8), TkUtil::Log::TRACE_2, TkUtil::UTF8String (__FILE__, TkUtil::Charset::UTF_8), __LINE__);
 
 #define MGX_TRACE_LOG_3(name, text)                                              \
-TkUtil::TraceLog	name (TkUtil::UTF8String (text, TkUtil::Charset::UTF_8), Log::TRACE_3, TkUtil::UTF8String (__FILE__, TkUtil::Charset::UTF_8), __LINE__);
+TkUtil::TraceLog	name (TkUtil::UTF8String (text, TkUtil::Charset::UTF_8), TkUtil::Log::TRACE_3, TkUtil::UTF8String (__FILE__, TkUtil::Charset::UTF_8), __LINE__);
 
 #define MGX_TRACE_LOG_4(name, text)                                              \
-TkUtil::TraceLog	name (TkUtil::UTF8String (text, TkUtil::Charset::UTF_8), Log::TRACE_4, TkUtil::UTF8String (__FILE__, TkUtil::Charset::UTF_8), __LINE__);
+TkUtil::TraceLog	name (TkUtil::UTF8String (text, TkUtil::Charset::UTF_8), TkUtil::Log::TRACE_4, TkUtil::UTF8String (__FILE__, TkUtil::Charset::UTF_8), __LINE__);
 
 #define MGX_TRACE_LOG_5(name, text)                                              \
-TkUtil::TraceLog	name (TkUtil::UTF8String (text, TkUtil::Charset::UTF_8), Log::TRACE_5, TkUtil::UTF8String (__FILE__, TkUtil::Charset::UTF_8), __LINE__);
+TkUtil::TraceLog	name (TkUtil::UTF8String (text, TkUtil::Charset::UTF_8), TkUtil::Log::TRACE_5, TkUtil::UTF8String (__FILE__, TkUtil::Charset::UTF_8), __LINE__);
 
 
 /*----------------------------------------------------------------------------*/
