@@ -13,7 +13,6 @@
 #include "Topo/TopoHelper.h"
 #include "Topo/FaceMeshingPropertyTransfinite.h"
 
-#include "Utils/Common.h"
 #include "Internal/Context.h"
 #include "Geom/CommandCreateGeom.h"
 #include "Geom/CommandEditGeom.h"
@@ -21,6 +20,7 @@
 
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
+#include <TkUtil/InformationLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/Exception.h>
 #include <TkUtil/MemoryError.h>
@@ -298,8 +298,13 @@ void CommandSetGeomAssociation::project(Vertex* vtx)
 		m_geom_entity->get(vertices);
 		for (uint i=0; i<vertices.size(); i++){
 			Utils::Math::Point posVtx = vertices[i]->getCenteredPosition();
-			if (posGeom.isEpsilonEqual(posVtx, Utils::Math::MgxNumeric::mgxTopoDoubleEpsilon))
+			if (posGeom.isEpsilonEqual(posVtx, Utils::Math::MgxNumeric::mgxTopoDoubleEpsilon)) {
+				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+				message << "La projection géométrique de " << vtx->getName() << " se trouve sur " << vertices[i]->getName() << " qui est un point de " << m_geom_entity->getName();
+				message << " : forçage de l'association géométrique avec " << vertices[i]->getName() << ".";
+				log (TkUtil::InformationLog(message));
 				vtx->setGeomAssociation(vertices[i]);
+			}
 		}
 	}
 	getInfoCommand().addTopoInfoEntity(vtx, Internal::InfoCommand::DISPMODIFIED);
