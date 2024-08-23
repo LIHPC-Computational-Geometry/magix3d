@@ -992,7 +992,22 @@ public:
      *  \param n le nom du ficher dans lequel on exporte
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc* exportMLI(std::vector<std::string>& ge,
-    		const std::string& n);
+            const std::string& n);
+
+    /*------------------------------------------------------------------------*/
+    /** \brief Export au format BREP de toute la géométrie
+     *
+     *  \param n le nom du ficher dans lequel on exporte
+     */
+    virtual Mgx3D::Internal::M3DCommandResultIfc* exportBREP(const std::string& n);
+
+    /** \brief Export d'une sélection au format BREP
+     *
+     *  \param ge la liste des noms des entités à exporter
+     *  \param n le nom du ficher dans lequel on exporte
+     */
+    virtual Mgx3D::Internal::M3DCommandResultIfc* exportBREP(std::vector<std::string>& ge,
+            const std::string& n);
 
     /*------------------------------------------------------------------------*/
     /** \brief Export au format STEP de toute la géométrie
@@ -1007,7 +1022,7 @@ public:
      *  \param n le nom du ficher dans lequel on exporte
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc* exportSTEP(std::vector<std::string>& ge,
-    		const std::string& n);
+            const std::string& n);
 
     /*------------------------------------------------------------------------*/
     /** \brief Export au format IGES de toute la géométrie

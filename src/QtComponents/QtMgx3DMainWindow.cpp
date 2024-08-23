@@ -5690,6 +5690,7 @@ void QtMgx3DMainWindow::exportAllCallback ( )
 	QStringList	filters;
 	filters << limaWExtensions ( ).c_str ( );
 	filters << "Magix MDL (*.mdl)";
+	filters << "BREP (*.brep)";
 	filters << "STEP (*.stp *.step)";
 	filters << "IGES (*.igs *.iges)";
 	filters << "CGNS (*.cgns)";
@@ -5783,6 +5784,11 @@ void QtMgx3DMainWindow::exportAllCallback ( )
 		log (InformationLog (msg));
 		getContext ( ).getGeomManager ( ).exportMDL (geomEntities, fileName);
 	}	// Magix 2D
+	else if (true == compareExtensions (file.getExtension ( ), "brep"))
+	{
+		log (InformationLog (msg));
+		getContext ( ).getGeomManager ( ).exportBREP (fileName);
+	}	// BREP
 	else if ((true == compareExtensions (file.getExtension ( ), "stp")) ||
 	         (true == compareExtensions (file.getExtension ( ), "step")))
 	{
@@ -5841,6 +5847,7 @@ void QtMgx3DMainWindow::exportSelectionCallback ( )
 	dialog.setConfirmOverwrite (false);	// Done in french later ...
 	QStringList	filters;
 	filters << "Magix MDL (*.mdl)";
+	filters << "BREP (*.brep)";
 	filters << "STEP (*.stp *.step)";
 	filters << "IGES (*.igs *.iges)";
 //	filters << "Lima++ (*.unf *.mli)";
@@ -5933,6 +5940,11 @@ void QtMgx3DMainWindow::exportSelectionCallback ( )
 		log (InformationLog (msg));
 		getContext ( ).getGeomManager ( ).exportMDL (selection, fileName);
 	}	// Magix 2D
+	else if (true == compareExtensions (file.getExtension ( ), "brep"))
+	{
+		log (InformationLog (msg));
+		getContext ( ).getGeomManager ( ).exportBREP (fileName);
+	}	// BREP
 	else if ((true == compareExtensions (file.getExtension ( ), "stp")) ||
 	         (true == compareExtensions (file.getExtension ( ), "step")))
 	{

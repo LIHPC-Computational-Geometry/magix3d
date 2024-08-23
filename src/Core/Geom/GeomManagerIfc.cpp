@@ -612,6 +612,17 @@ Internal::M3DCommandResultIfc* GeomManagerIfc::exportMLI(std::vector<std::string
     throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::exportMLI should be overloaded.", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
+Internal::M3DCommandResultIfc* GeomManagerIfc::exportBREP(const std::string& n)
+{
+    throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::exportBREP should be overloaded.", TkUtil::Charset::UTF_8));
+}
+/*----------------------------------------------------------------------------*/
+Internal::M3DCommandResultIfc* GeomManagerIfc::exportBREP(std::vector<std::string>& ge,
+		const std::string& n)
+{
+    throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::exportBREP should be overloaded.", TkUtil::Charset::UTF_8));
+}
+/*----------------------------------------------------------------------------*/
 Internal::M3DCommandResultIfc* GeomManagerIfc::exportSTEP(const std::string& n)
 {
     throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::exportSTEP should be overloaded.", TkUtil::Charset::UTF_8));
