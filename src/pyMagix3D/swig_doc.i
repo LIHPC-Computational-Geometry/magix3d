@@ -993,12 +993,20 @@ groupe : le nom du groupe dont on importe les zones et les entités associées
 zones : la liste des zones que l'on importe avec les entités associées 
 
 ";
+%feature("docstring") Mgx3D::Geom::GeomManagerIfc::importBREP "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::importBREP(std::string n)
+
+Import d'un fichier au format BREP.
+
+n : le nom du ficher dont le contenu doit etre importe
+
+";
 %feature("docstring") Mgx3D::Geom::GeomManagerIfc::importSTEP "
 virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::importSTEP(std::string n)
 
-Import d'un fichier au format STEP. 
+Import d'un fichier au format STEP.
 
-n : le nom du ficher dont le contenu doit etre importe 
+n : le nom du ficher dont le contenu doit etre importe
 
 ";
 %feature("docstring") Mgx3D::Geom::GeomManagerIfc::joinCurves "

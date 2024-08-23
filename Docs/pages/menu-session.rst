@@ -87,7 +87,10 @@ présente. Vous pouvez opter pour l’un des formats suivant :
 -  CATPart ou CATProduct pour les fichiers de modélisation en provenance
    de Catia ;
 
--  STP ou STEP pour les fichiers de modélisation dans ce format
+-  BREP pour les fichiers de modélisation dans ce format
+   d’échange ;
+
+-  STP ou STEP pour les fichiers de modélisation dans cet autre format
    d’échange ;
 
 -  IGS ou IGES pour les fichiers de modélisation dans cet autre format

@@ -533,6 +533,11 @@ Internal::M3DCommandResultIfc* GeomManagerIfc::splitCurve(std::string entity, co
     throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::splitCurve should be overloaded.", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
+Internal::M3DCommandResultIfc* GeomManagerIfc::importBREP(std::string n, const bool testVolumicProperties, const bool splitCompoundCurves)
+{
+    throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::importBREP should be overloaded.", TkUtil::Charset::UTF_8));
+}
+/*----------------------------------------------------------------------------*/
 Internal::M3DCommandResultIfc* GeomManagerIfc::importCATIA(std::string n, const bool testVolumicProperties, const bool splitCompoundCurves)
 {
     throw TkUtil::Exception(TkUtil::UTF8String ("GeomManagerIfc::importCATIA should be overloaded.", TkUtil::Charset::UTF_8));

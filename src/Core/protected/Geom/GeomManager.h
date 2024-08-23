@@ -920,6 +920,16 @@ public:
 	copyAndMirror(std::vector<Geom::GeomEntity*>& geo, Utils::Math::Plane* plane, bool withTopo, std::string groupName);
 
     /*------------------------------------------------------------------------*/
+    /** \brief Import d'un fichier au format BREP
+     *
+     *  \param n le nom du ficher dont le contenu doit etre importe
+     *  \param testVolumicProperties test que les volumes sont fermés
+     *  \param splitCompoundCurves décompose les courbes composites en de multiples courbes
+     */
+    virtual Mgx3D::Internal::M3DCommandResultIfc* importBREP(std::string n,
+        const bool testVolumicProperties=true, const bool splitCompoundCurves=false);
+
+    /*------------------------------------------------------------------------*/
     /** \brief Import d'un fichier au format CATIA
      *
      *  \param n le nom du ficher dont le contenu doit etre importe
@@ -927,7 +937,7 @@ public:
      *  \param splitCompoundCurves décompose les courbes composites en de multiples courbes
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc* importCATIA(std::string n,
-    		const bool testVolumicProperties=true, const bool splitCompoundCurves=false);
+        const bool testVolumicProperties=true, const bool splitCompoundCurves=false);
 
     /*------------------------------------------------------------------------*/
     /** \brief Import d'un fichier au format STEP
@@ -937,7 +947,7 @@ public:
      *  \param splitCompoundCurves décompose les courbes composites en de multiples courbes
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc* importSTEP(std::string n,
-    		const bool testVolumicProperties=true, const bool splitCompoundCurves=false);
+        const bool testVolumicProperties=true, const bool splitCompoundCurves=false);
 
     /*------------------------------------------------------------------------*/
     /** \brief Import d'un fichier au format STL
