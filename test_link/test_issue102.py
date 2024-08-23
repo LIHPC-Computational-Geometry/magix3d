@@ -1,4 +1,3 @@
-import sys
 import pyMagix3D as Mgx3D
 
 def test_issue102():

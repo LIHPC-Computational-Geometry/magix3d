@@ -860,12 +860,20 @@ ge : la liste des noms des entités à exporter
 n : le nom du ficher dans lequel on exporte 
 
 ";
+%feature("docstring") Mgx3D::Geom::GeomManagerIfc::exportBREP "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::exportBREP(const std::string &n)
+
+Export au format BREP.
+
+n : le nom du ficher dans lequel on exporte
+
+";
 %feature("docstring") Mgx3D::Geom::GeomManagerIfc::exportSTEP "
 virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::exportSTEP(const std::string &n)
 
-Export au format STEP. 
+Export au format STEP.
 
-n : le nom du ficher dans lequel on exporte 
+n : le nom du ficher dans lequel on exporte
 
 ";
 %feature("docstring") Mgx3D::Geom::GeomManagerIfc::exportVTK "

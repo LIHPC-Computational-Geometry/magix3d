@@ -5942,8 +5942,10 @@ void QtMgx3DMainWindow::exportSelectionCallback ( )
 	}	// Magix 2D
 	else if (true == compareExtensions (file.getExtension ( ), "brep"))
 	{
+		selection	= getContext ( ).getSelectionManager ( ).getEntitiesNames (
+													FilterEntity::AllGeom);
 		log (InformationLog (msg));
-		getContext ( ).getGeomManager ( ).exportBREP (fileName);
+		getContext ( ).getGeomManager ( ).exportBREP (selection, fileName);
 	}	// BREP
 	else if ((true == compareExtensions (file.getExtension ( ), "stp")) ||
 	         (true == compareExtensions (file.getExtension ( ), "step")))

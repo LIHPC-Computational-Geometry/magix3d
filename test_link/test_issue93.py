@@ -1,4 +1,3 @@
-import sys
 import pyMagix3D as Mgx3D
 
 # 2 edges not associated with geometry => after makeBlocksByRevol
