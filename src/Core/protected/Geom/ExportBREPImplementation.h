@@ -19,6 +19,16 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 /*----------------------------------------------------------------------------*/
+/**
+ * \class ExportBREPImplementation
+ * \brief Classe réalisant l'export du contenu d'un fichier de modélisation au
+ *        format BREP (format Open Cascade).
+ *
+ * Contrairement aux fichiers STEP, les fichiers BREP ne gèrent pas les unités
+ * de mesure explicitement. Les paramètres comme xstep.cascade.unit ou
+ * write.step.unit n'ont donc aucun effet lors de la lecture ou l'écriture
+ * de fichiers BREP
+ */
 class ExportBREPImplementation: public GeomExport
 {
 public:
