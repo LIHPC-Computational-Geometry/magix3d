@@ -19,7 +19,7 @@ def test_brep():
     assert gm.getNbCurves()==13
     assert gm.getNbVertices()==10
 
-    # 2. Import Selection
+    # 3. Import Selection
     ctx.clearSession() # Clean the session after the previous test
     gm.importBREP("test_brep_select.brep")
     assert gm.getNbVolumes()==1
