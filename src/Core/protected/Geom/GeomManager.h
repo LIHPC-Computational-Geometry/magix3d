@@ -176,7 +176,15 @@ public:
         newVertex(const double& x, const double& y, const double& z,
             std::string groupName="");
 
-
+    /*------------------------------------------------------------------------*/
+    /** \brief création d'un sommet géométrique à partir d'un sommet topologique
+     *
+	 *  \param vertexName	le sommet topologique
+     *  \param asso			faut-il associer le sommet topologique au sommet géométrique créé
+     */
+    virtual Mgx3D::Internal::M3DCommandResultIfc*
+		newVertexFromTopo(std::string vertexName, bool asso = true,
+            std::string groupName="");
 
     /*------------------------------------------------------------------------*/
     /** \brief création d'un segment à partir des sommets v1, v2

@@ -68,24 +68,16 @@ QtVertexOperationPanel::QtVertexCurveProjectionPanel::QtVertexCurveProjectionPan
 	setLayout (layout);
 
 	// Le point projeté :
-	_pointPanel	= new QtMgx3DEntityPanel (
-			this, "", true, "Point projeté :", "", &window, SelectionManagerIfc::D0,
-			FilterEntity::GeomVertex);
+	_pointPanel	= new QtMgx3DEntityPanel (this, "", true, "Point projeté :", "", &window, SelectionManagerIfc::D0, FilterEntity::GeomVertex);
 	layout->addWidget (_pointPanel);
-	connect (_pointPanel, SIGNAL (entitiesAddedToSelection(QString)),
-	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
-	connect (_pointPanel, SIGNAL (entitiesRemovedFromSelection(QString)),
-	         this, SLOT (entitiesRemovedFromSelectionCallback (QString)));
+	connect (_pointPanel, SIGNAL (entitiesAddedToSelection(QString)), this, SLOT (entitiesAddedToSelectionCallback (QString)));
+	connect (_pointPanel, SIGNAL (entitiesRemovedFromSelection(QString)), this, SLOT (entitiesRemovedFromSelectionCallback (QString)));
 
 	// La courbe sur laquelle est projeté le point :
-	_curvePanel	= new QtMgx3DEntityPanel (
-					this, "", true, "Courbe :", "", &window, SelectionManagerIfc::D1,
-					FilterEntity::GeomCurve);
+	_curvePanel	= new QtMgx3DEntityPanel (this, "", true, "Courbe :", "", &window, SelectionManagerIfc::D1, FilterEntity::GeomCurve);
 	layout->addWidget (_curvePanel);
-	connect (_curvePanel, SIGNAL (entitiesAddedToSelection(QString)),
-	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
-	connect (_curvePanel, SIGNAL (entitiesRemovedFromSelection(QString)),
-	         this, SLOT (entitiesRemovedFromSelectionCallback (QString)));
+	connect (_curvePanel, SIGNAL (entitiesAddedToSelection(QString)), this, SLOT (entitiesAddedToSelectionCallback (QString)));
+	connect (_curvePanel, SIGNAL (entitiesRemovedFromSelection(QString)), this, SLOT (entitiesRemovedFromSelectionCallback (QString)));
 
 	// enchainement pour sélection interactive
 	CHECK_NULL_PTR_ERROR(_pointPanel->getNameTextField())
@@ -96,8 +88,7 @@ QtVertexOperationPanel::QtVertexCurveProjectionPanel::QtVertexCurveProjectionPan
 }	// QtVertexCurveProjectionPanel::QtVertexCurveProjectionPanel
 
 
-QtVertexOperationPanel::QtVertexCurveProjectionPanel::QtVertexCurveProjectionPanel (
-	const QtVertexOperationPanel::QtVertexCurveProjectionPanel& p)
+QtVertexOperationPanel::QtVertexCurveProjectionPanel::QtVertexCurveProjectionPanel (const QtVertexOperationPanel::QtVertexCurveProjectionPanel& p)
 	: QtMgx3DOperationsSubPanel (p),
 	  _pointPanel (0), _curvePanel (0)
 {
@@ -105,9 +96,7 @@ QtVertexOperationPanel::QtVertexCurveProjectionPanel::QtVertexCurveProjectionPan
 }	// QtVertexCurveProjectionPanel::QtVertexCurveProjectionPanel
 
 
-QtVertexOperationPanel::QtVertexCurveProjectionPanel&
-	QtVertexOperationPanel::QtVertexCurveProjectionPanel::operator = (
-					const QtVertexOperationPanel::QtVertexCurveProjectionPanel&)
+QtVertexOperationPanel::QtVertexCurveProjectionPanel& QtVertexOperationPanel::QtVertexCurveProjectionPanel::operator = (const QtVertexOperationPanel::QtVertexCurveProjectionPanel&)
 {
 	 MGX_FORBIDDEN ("QtVertexCurveProjectionPanel assignment operator is not allowed.");
 	return *this;
@@ -165,12 +154,10 @@ void QtVertexOperationPanel::QtVertexCurveProjectionPanel::autoUpdate ( )
 	{
 		BEGIN_QT_TRY_CATCH_BLOCK
 
-		const vector<string>	selectedVertices	=
-			getSelectionManager ( ).getEntitiesNames (FilterEntity::GeomVertex);
+		const vector<string>	selectedVertices	= getSelectionManager ( ).getEntitiesNames (FilterEntity::GeomVertex);
 		if (1 == selectedVertices.size ( ))
 			_pointPanel->setUniqueName (selectedVertices [0]);
-		const vector<string>	selectedCurves	=
-			getSelectionManager ( ).getEntitiesNames (FilterEntity::GeomCurve);
+		const vector<string>	selectedCurves	= getSelectionManager ( ).getEntitiesNames (FilterEntity::GeomCurve);
 		if (1 == selectedCurves.size ( ))
 			_curvePanel->setUniqueName (selectedCurves [0]);
 
@@ -217,8 +204,7 @@ vector<Entity*>
 	vector<Entity*>	entities;
 
 	const string	vertexName	= getVertexUniqueName ( );
-	GeomEntity*		entity		=
-			 getContext ( ).getGeomManager ( ).getVertex (vertexName, false);
+	GeomEntity*		entity		= getContext ( ).getGeomManager ( ).getVertex (vertexName, false);
 	if (0 != entity)
 		entities.push_back (entity);
 	const string	curveName	= getCurveUniqueName ( );
@@ -407,8 +393,7 @@ void QtVertexOperationPanel::QtVertexSurfaceProjectionPanel::stopSelection ( )
 }	// QtVertexSurfaceProjectionPanel::stopSelection
 
 
-vector<Entity*>
-	QtVertexOperationPanel::QtVertexSurfaceProjectionPanel::getInvolvedEntities( )
+vector<Entity*> QtVertexOperationPanel::QtVertexSurfaceProjectionPanel::getInvolvedEntities( )
 {
 	vector<Entity*>	entities;
 
@@ -598,8 +583,7 @@ void QtVertexOperationPanel::QtVerticesRatioPanel::stopSelection ( )
 }	// QtVerticesRatioPanel::stopSelection
 
 
-vector<Entity*>
-QtVertexOperationPanel::QtVerticesRatioPanel::getInvolvedEntities( )
+vector<Entity*> QtVertexOperationPanel::QtVerticesRatioPanel::getInvolvedEntities( )
 {
     vector<Entity*>	entities;
 
@@ -638,6 +622,156 @@ QtDoubleTextField& QtVertexOperationPanel::QtVerticesRatioPanel::getRatePanel ( 
 
 
 // ===========================================================================
+//      LA CLASSE QtVertexOperationPanel::QtVertexFromTopologicVertexPanel
+// ===========================================================================
+
+QtVertexOperationPanel::QtVertexFromTopologicVertexPanel::QtVertexFromTopologicVertexPanel (
+			 QWidget* parent, const string& appTitle, QtMgx3DMainWindow& window)
+	: QtMgx3DOperationsSubPanel (parent, window),
+	  _topologicVertexPanel (0), _associationCheckBox (0)
+{
+	QVBoxLayout*	layout	= new QVBoxLayout (this);
+	layout->setContentsMargins  (Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ),
+								 Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+	setLayout (layout);
+
+	// Le point projeté :
+	_topologicVertexPanel	= new QtMgx3DEntityPanel (this, "", true, "Sommet topologique :", "", &window, SelectionManagerIfc::D0, FilterEntity::TopoVertex);
+	layout->addWidget (_topologicVertexPanel);
+	connect (_topologicVertexPanel, SIGNAL (entitiesAddedToSelection(QString)), this, SLOT (entitiesAddedToSelectionCallback (QString)));
+	connect (_topologicVertexPanel, SIGNAL (entitiesRemovedFromSelection(QString)), this, SLOT (entitiesRemovedFromSelectionCallback (QString)));
+
+	// Faut-il associer le vertex topologique au vertex créé ?
+	_associationCheckBox	= new QCheckBox (QString::fromUtf8("Associer le sommet topologique au point géométrique créé ?"), this);
+	_associationCheckBox->setChecked (true);
+	layout->addWidget (_associationCheckBox);
+}	// QtVertexFromTopologicVertexPanel::QtVertexFromTopologicVertexPanel
+
+
+QtVertexOperationPanel::QtVertexFromTopologicVertexPanel::QtVertexFromTopologicVertexPanel (const QtVertexOperationPanel::QtVertexFromTopologicVertexPanel& p)
+	: QtMgx3DOperationsSubPanel (p),
+	  _topologicVertexPanel (0), _associationCheckBox (0)
+{
+	MGX_FORBIDDEN ("QtVertexFromTopologicVertexPanel copy constructor is not allowed.");
+}	// QtVertexFromTopologicVertexPanel::QtVertexFromTopologicVertexPanel
+
+
+QtVertexOperationPanel::QtVertexFromTopologicVertexPanel& QtVertexOperationPanel::QtVertexFromTopologicVertexPanel::operator = (const QtVertexOperationPanel::QtVertexFromTopologicVertexPanel&)
+{
+	 MGX_FORBIDDEN ("QtVertexFromTopologicVertexPanel assignment operator is not allowed.");
+	return *this;
+}	// QtVertexFromTopologicVertexPanel::operator =
+
+
+QtVertexOperationPanel::QtVertexFromTopologicVertexPanel::~QtVertexFromTopologicVertexPanel ( )
+{
+}	// QtVertexFromTopologicVertexPanel::~QtVertexFromTopologicVertexPanel
+
+
+void QtVertexOperationPanel::QtVertexFromTopologicVertexPanel::reset ( )
+{
+	BEGIN_QT_TRY_CATCH_BLOCK
+
+	CHECK_NULL_PTR_ERROR (_topologicVertexPanel)
+	CHECK_NULL_PTR_ERROR (_associationCheckBox)
+	_topologicVertexPanel->reset ( );
+	_associationCheckBox->setChecked (true);
+
+	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
+
+	QtMgx3DOperationsSubPanel::reset ( );
+}	// QtVertexFromTopologicVertexPanel::reset
+
+
+void QtVertexOperationPanel::QtVertexFromTopologicVertexPanel::cancel ( )
+{
+	QtMgx3DOperationsSubPanel::cancel ( );
+
+	CHECK_NULL_PTR_ERROR (_topologicVertexPanel)
+	CHECK_NULL_PTR_ERROR (_associationCheckBox)
+	_topologicVertexPanel->stopSelection ( );
+
+	if (true == cancelClearEntities ( ))
+	{
+		BEGIN_QT_TRY_CATCH_BLOCK
+
+		_topologicVertexPanel->setUniqueName ("");
+
+		COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
+	}	// if (true == cancelClearEntities ( ))
+}	// QtVertexFromTopologicVertexPanel::cancel
+
+
+void QtVertexOperationPanel::QtVertexFromTopologicVertexPanel::autoUpdate ( )
+{
+	CHECK_NULL_PTR_ERROR (_topologicVertexPanel)
+	CHECK_NULL_PTR_ERROR (_associationCheckBox)
+
+#ifdef AUTO_UPDATE_OLD_SCHEME
+	if (true == autoUpdateUsesSelection ( ))
+	{
+		BEGIN_QT_TRY_CATCH_BLOCK
+
+		const vector<string>	selectedVertices	= getSelectionManager ( ).getEntitiesNames (FilterEntity::GeomVertex);
+		if (1 == selectedVertices.size ( ))
+			_topologicVertexPanel->setUniqueName (selectedVertices [0]);
+
+		COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
+	}	// if (true == autoUpdateUsesSelection ( ))
+#else	// AUTO_UPDATE_OLD_SCHEME
+	_topologicVertexPanel->clearSelection ( );
+#endif	// AUTO_UPDATE_OLD_SCHEME
+
+	_topologicVertexPanel->actualizeGui (true);
+
+	QtMgx3DOperationsSubPanel::autoUpdate ( );
+}	// QtVertexFromTopologicVertexPanel::autoUpdate
+
+
+string QtVertexOperationPanel::QtVertexFromTopologicVertexPanel::getVertexUniqueName ( ) const
+{
+	CHECK_NULL_PTR_ERROR (_topologicVertexPanel)
+	return _topologicVertexPanel->getUniqueName ( );
+}	// QtVertexFromTopologicVertexPanel::getVertexUniqueName
+
+
+bool QtVertexOperationPanel::QtVertexFromTopologicVertexPanel::associatesVerticies ( ) const
+{
+	CHECK_NULL_PTR_ERROR (_associationCheckBox)
+	return _associationCheckBox->isChecked ( );
+}	// QtVertexFromTopologicVertexPanel::associatesVerticies
+
+
+void QtVertexOperationPanel::QtVertexFromTopologicVertexPanel::stopSelection ( )
+{
+	CHECK_NULL_PTR_ERROR (_topologicVertexPanel)
+	CHECK_NULL_PTR_ERROR (_associationCheckBox)
+	_topologicVertexPanel->stopSelection ( );
+}	// QtVertexFromTopologicVertexPanel::stopSelection
+
+
+vector<Entity*> QtVertexOperationPanel::QtVertexFromTopologicVertexPanel::getInvolvedEntities ( )
+{
+	vector<Entity*>	entities;
+
+	const string		vertexName	= getVertexUniqueName ( );
+	Topo::TopoEntity*	entity		= getContext ( ).getTopoManager ( ).getVertex (vertexName, false);
+	if (0 != entity)
+		entities.push_back (entity);
+
+	return entities;
+}	// QtVertexFromTopologicVertexPanel::getInvolvedEntities
+
+
+QtMgx3DEntityPanel& QtVertexOperationPanel::QtVertexFromTopologicVertexPanel::getVertexPanel ( )
+{
+	CHECK_NULL_PTR_ERROR (_topologicVertexPanel)
+	return *_topologicVertexPanel;
+}	// QtVertexFromTopologicVertexPanel::getVertexPanel
+
+
+// ===========================================================================
 //                        LA CLASSE QtVertexOperationPanel
 // ===========================================================================
 
@@ -651,15 +785,13 @@ QtVertexOperationPanel::QtVertexOperationPanel (
 	  _namePanel (0), _operationMethodComboBox (0),
 	  _currentParentWidget (0), _currentPanel (0),
 	  _pointPanel (0), _vertexCurveProjectionPanel (0), _vertexSurfaceProjectionPanel (0),
-	  _curvilinearAbscissaPanel (0), _verticesRatioPanel (0)
+	  _curvilinearAbscissaPanel (0), _verticesRatioPanel (0), _fromTopologicVertexPanel (0)
 {
 //	SET_WIDGET_BACKGROUND (this, Qt::yellow)
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
+			Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), 
+			Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
 	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
@@ -671,8 +803,7 @@ QtVertexOperationPanel::QtVertexOperationPanel (
 	layout->addWidget (label);
 
 	// Nom groupe :
-	_namePanel	= new QtMgx3DGroupNamePanel (
-							this, "Groupe", mainWindow, 0, creationPolicy, "");
+	_namePanel	= new QtMgx3DGroupNamePanel (this, "Groupe", mainWindow, 0, creationPolicy, "");
 	layout->addWidget (_namePanel);
 	addValidatedField (*_namePanel);
 
@@ -687,8 +818,8 @@ QtVertexOperationPanel::QtVertexOperationPanel (
 	_operationMethodComboBox->addItem ("Par projection d'un point sur une surface");
 	_operationMethodComboBox->addItem ("Par saisie d'une abscisse curviligne");
 	_operationMethodComboBox->addItem ("Par ratio entre deux points");
-	connect (_operationMethodComboBox, SIGNAL (currentIndexChanged (int)),
-	         this, SLOT (operationMethodCallback ( )));
+	_operationMethodComboBox->addItem ("A partir d'un sommet topologique");
+	connect (_operationMethodComboBox, SIGNAL (currentIndexChanged (int)), this, SLOT (operationMethodCallback ( )));
 	hlayout->addWidget (_operationMethodComboBox);
 	hlayout->addStretch (10);
 	
@@ -696,10 +827,8 @@ QtVertexOperationPanel::QtVertexOperationPanel (
 	QtGroupBox*		groupBox	= new QtGroupBox (this, "Paramètres du point");
 	QVBoxLayout*	vlayout	= new QVBoxLayout (groupBox);
 	vlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
+						Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ),
+						Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
 	vlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
 	groupBox->setLayout (vlayout);
 	layout->addWidget (groupBox);
@@ -715,61 +844,36 @@ QtVertexOperationPanel::QtVertexOperationPanel (
 		&mainWindow,
 		(FilterEntity::objectType)(FilterEntity::GeomVertex|FilterEntity::TopoVertex),
 		true);
-	connect (_pointPanel, SIGNAL (pointModified ( )),
-	         this, SLOT (parametersModifiedCallback ( )));
-	_pointPanel->layout ( )->setSpacing (
-						Resources::instance ( )._spacing.getValue ( ));
+	connect (_pointPanel, SIGNAL (pointModified ( )), this, SLOT (parametersModifiedCallback ( )));
+	_pointPanel->layout ( )->setSpacing (Resources::instance ( )._spacing.getValue ( ));
 	_pointPanel->layout ( )->setContentsMargins (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
+						Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ),
+						Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
 	_pointPanel->hide ( );
-	_vertexCurveProjectionPanel	=
-			new QtVertexCurveProjectionPanel (
-					0, "Projection d'un vertex sur une courbe", mainWindow);
+	_vertexCurveProjectionPanel	= new QtVertexCurveProjectionPanel (0, "Projection d'un vertex sur une courbe", mainWindow);
 	_vertexCurveProjectionPanel->hide ( );
-	connect (_vertexCurveProjectionPanel->getPointPanel().getNameTextField(),
-			SIGNAL (selectionModified (QString)), this,
-			SLOT (parametersModifiedCallback ( )));
-	connect (_vertexCurveProjectionPanel->getCurvePanel().getNameTextField(),
-			SIGNAL (selectionModified (QString)), this,
-			SLOT (parametersModifiedCallback ( )));
+	connect (_vertexCurveProjectionPanel->getPointPanel().getNameTextField(), SIGNAL (selectionModified (QString)), this, SLOT (parametersModifiedCallback ( )));
+	connect (_vertexCurveProjectionPanel->getCurvePanel().getNameTextField(), SIGNAL (selectionModified (QString)), this, SLOT (parametersModifiedCallback ( )));
 
-	_vertexSurfaceProjectionPanel	=
-			new QtVertexSurfaceProjectionPanel (
-					0, "Projection d'un vertex sur une surface", mainWindow);
+	_vertexSurfaceProjectionPanel	= new QtVertexSurfaceProjectionPanel (0, "Projection d'un vertex sur une surface", mainWindow);
 	_vertexSurfaceProjectionPanel->hide ( );
-	connect (_vertexSurfaceProjectionPanel->getPointPanel().getNameTextField(),
-			SIGNAL (selectionModified (QString)), this,
-			SLOT (parametersModifiedCallback ( )));
-	connect (_vertexSurfaceProjectionPanel->getSurfacePanel().getNameTextField(),
-			SIGNAL (selectionModified (QString)), this,
-			SLOT (parametersModifiedCallback ( )));
+	connect (_vertexSurfaceProjectionPanel->getPointPanel().getNameTextField(), SIGNAL (selectionModified (QString)), this, SLOT (parametersModifiedCallback ( )));
+	connect (_vertexSurfaceProjectionPanel->getSurfacePanel().getNameTextField(), SIGNAL (selectionModified (QString)), this, SLOT (parametersModifiedCallback ( )));
 
-
-	_curvilinearAbscissaPanel	= new QtCurvilinearAbscissaPanel (
-					0, "Abscisse curviligne sur une courbe", &mainWindow);
+	_curvilinearAbscissaPanel	= new QtCurvilinearAbscissaPanel (0, "Abscisse curviligne sur une courbe", &mainWindow);
 	_curvilinearAbscissaPanel->hide ( );
-	connect (_curvilinearAbscissaPanel->getCurvePanel ( ).getNameTextField ( ),
-	         SIGNAL (selectionModified (QString)), this,
-	         SLOT (parametersModifiedCallback ( )));
-	connect (&_curvilinearAbscissaPanel->getCurvilinearAbscissaPanel ( ),
-		         SIGNAL (textEdited (const QString&)), this,
-		         SLOT (parametersModifiedCallback ( )));
+	connect (_curvilinearAbscissaPanel->getCurvePanel ( ).getNameTextField ( ), SIGNAL (selectionModified (QString)), this, SLOT (parametersModifiedCallback ( )));
+	connect (&_curvilinearAbscissaPanel->getCurvilinearAbscissaPanel ( ), SIGNAL (textEdited (const QString&)), this, SLOT (parametersModifiedCallback ( )));
 
-	_verticesRatioPanel   = new QtVerticesRatioPanel (
-	        0, "Ratio entre 2 points", mainWindow);
+	_verticesRatioPanel   = new QtVerticesRatioPanel (0, "Ratio entre 2 points", mainWindow);
 	_verticesRatioPanel->hide();
-	connect (_verticesRatioPanel->getFirstPointPanel ( ).getNameTextField ( ),
-	         SIGNAL (selectionModified (QString)), this,
-	         SLOT (parametersModifiedCallback ( )));
-	connect (_verticesRatioPanel->getSecondPointPanel ( ).getNameTextField ( ),
-	         SIGNAL (selectionModified (QString)), this,
-	         SLOT (parametersModifiedCallback ( )));
-    connect (&_verticesRatioPanel->getRatePanel ( ),
-         SIGNAL (textEdited (const QString&)), this,
-         SLOT (parametersModifiedCallback ( )));
+	connect (_verticesRatioPanel->getFirstPointPanel ( ).getNameTextField ( ), SIGNAL (selectionModified (QString)), this, SLOT (parametersModifiedCallback ( )));
+	connect (_verticesRatioPanel->getSecondPointPanel ( ).getNameTextField ( ), SIGNAL (selectionModified (QString)), this, SLOT (parametersModifiedCallback ( )));
+    connect (&_verticesRatioPanel->getRatePanel ( ), SIGNAL (textEdited (const QString&)), this, SLOT (parametersModifiedCallback ( )));
+
+	_fromTopologicVertexPanel   = new QtVertexFromTopologicVertexPanel (0, "A partir d'un sommet topologique", mainWindow);
+	_fromTopologicVertexPanel->hide(  );
+	connect (_fromTopologicVertexPanel->getVertexPanel ( ).getNameTextField ( ), SIGNAL (selectionModified (QString)), this, SLOT (parametersModifiedCallback ( )));
 
 	operationMethodCallback ( );
 
@@ -779,21 +883,18 @@ QtVertexOperationPanel::QtVertexOperationPanel (
 }	// QtVertexOperationPanel::QtVertexOperationPanel
 
 
-QtVertexOperationPanel::QtVertexOperationPanel (
-										const QtVertexOperationPanel& cao)
-	: QtMgx3DOperationPanel (
-			0, *new QtMgx3DMainWindow(0), 0, "", ""),
+QtVertexOperationPanel::QtVertexOperationPanel (const QtVertexOperationPanel& cao)
+	: QtMgx3DOperationPanel (0, *new QtMgx3DMainWindow(0), 0, "", ""),
 	  _namePanel (0), _operationMethodComboBox (0),
 	  _currentParentWidget (0), _currentPanel (0),
 	  _pointPanel (0), _vertexCurveProjectionPanel (0), _vertexSurfaceProjectionPanel (0),
-	  _curvilinearAbscissaPanel (0), _verticesRatioPanel (0)
+	  _curvilinearAbscissaPanel (0), _verticesRatioPanel (0), _fromTopologicVertexPanel (0)
 {
 	MGX_FORBIDDEN ("QtVertexOperationPanel copy constructor is not allowed.");
 }	// QtVertexOperationPanel::QtVertexOperationPanel (const QtVertexOperationPanel&)
 
 
-QtVertexOperationPanel& QtVertexOperationPanel::operator = (
-											const QtVertexOperationPanel&)
+QtVertexOperationPanel& QtVertexOperationPanel::operator = (const QtVertexOperationPanel&)
 {
 	MGX_FORBIDDEN ("QtVertexOperationPanel assignment operator is not allowed.");
 	return *this;
@@ -812,8 +913,7 @@ string QtVertexOperationPanel::getGroupName ( ) const
 }	// QtVertexOperationPanel::getGroupName
 
 
-QtVertexOperationPanel::OPERATION_METHOD
-						QtVertexOperationPanel::getOperationMethod ( ) const
+QtVertexOperationPanel::OPERATION_METHOD QtVertexOperationPanel::getOperationMethod ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_operationMethodComboBox);
 	return (QtVertexOperationPanel::OPERATION_METHOD)_operationMethodComboBox->currentIndex ( );
@@ -842,13 +942,12 @@ string QtVertexOperationPanel::getCurveName ( ) const
 		default	:
 		{
 			UTF8String	message (Charset::UTF_8);
-			message << "Méthode getCurveName ( ) invoquée pour une méthode "
-			        << "(" << (unsigned long)getOperationMethod ( )
-			        << ") ne reposant pas sur une courbe.";
+			message << "Méthode getCurveName ( ) invoquée pour une méthode " << "(" << (unsigned long)getOperationMethod ( ) << ") ne reposant pas sur une courbe.";
 			throw Exception (message);
 		}
 	}	// switch (getOperationMethod ( ))
 }	// QtVertexOperationPanel::getCurveName
+
 
 string QtVertexOperationPanel::getFirstPointName ( ) const
 {
@@ -861,13 +960,13 @@ string QtVertexOperationPanel::getFirstPointName ( ) const
         default	:
         {
             UTF8String	message (Charset::UTF_8);
-            message << "Méthode getFirstPointName ( ) invoquée pour une méthode "
-                    << "(" << (unsigned long)getOperationMethod ( )
+            message << "Méthode getFirstPointName ( ) invoquée pour une méthode (" << (unsigned long)getOperationMethod ( )
                     << ") ne reposant pas sur un premier point.";
             throw Exception (message);
         }
     }	// switch (getOperationMethod ( ))
 }	// QtVertexOperationPanel::getFirstPointName
+
 
 string QtVertexOperationPanel::getSecondPointName ( ) const
 {
@@ -880,8 +979,7 @@ string QtVertexOperationPanel::getSecondPointName ( ) const
         default	:
         {
             UTF8String	message (Charset::UTF_8);
-            message << "Méthode getSecondPointName ( ) invoquée pour une méthode "
-                    << "(" << (unsigned long)getOperationMethod ( )
+            message << "Méthode getSecondPointName ( ) invoquée pour une méthode (" << (unsigned long)getOperationMethod ( )
                     << ") ne reposant pas sur un second point.";
             throw Exception (message);
         }
@@ -900,8 +998,7 @@ string QtVertexOperationPanel::getSurfaceName ( ) const
 		default	:
 		{
 			UTF8String	message (Charset::UTF_8);
-			message << "Méthode getSurfaceName ( ) invoquée pour une méthode "
-			        << "(" << (unsigned long)getOperationMethod ( )
+			message << "Méthode getSurfaceName ( ) invoquée pour une méthode (" << (unsigned long)getOperationMethod ( )
 			        << ") ne reposant pas sur une surface.";
 			throw Exception (message);
 		}
@@ -924,8 +1021,7 @@ string QtVertexOperationPanel::getProjectedVertexName ( ) const
 	default	:
 	{
 		UTF8String	message (Charset::UTF_8);
-		message << "Méthode getProjectedVertexName ( ) invoquée pour une méthode "
-				<< "(" << (unsigned long)getOperationMethod ( )
+		message << "Méthode getProjectedVertexName ( ) invoquée pour une méthode (" << (unsigned long)getOperationMethod ( )
 				<< ") ne reposant pas sur une courbe ou une surface.";
 		throw Exception (message);
 	}
@@ -946,13 +1042,48 @@ double QtVertexOperationPanel::getCurvilinearAbscissa ( ) const
             break;
         default    : {
             UTF8String message(Charset::UTF_8);
-            message << "Méthode getCurvilinearAbscissa ( ) invoquée pour une méthode "
-                    << "(" << (unsigned long) getOperationMethod()
+            message << "Méthode getCurvilinearAbscissa ( ) invoquée pour une méthode (" << (unsigned long) getOperationMethod()
                     << ") ne reposant pas sur une abscisse curviligne ou un ratio.";
             throw Exception(message);
         }
     }
 }	// QtVertexOperationPanel::getCurvilinearAbscissa
+
+
+string QtVertexOperationPanel::getTopologicVertexName ( ) const
+{
+    switch (getOperationMethod ( )) 
+    {
+        case QtVertexOperationPanel::VERTEX_FROM_TOPOLOGIC_VERTEX        :
+            CHECK_NULL_PTR_ERROR (_fromTopologicVertexPanel)
+            return _fromTopologicVertexPanel->getVertexUniqueName ( );
+            break;
+        default    : {
+            UTF8String message(Charset::UTF_8);
+            message << "Méthode getTopologicVertexName ( ) invoquée pour une méthode (" << (unsigned long)getOperationMethod ( )
+                    << ") ne reposant pas sur un sommet topologique.";
+            throw Exception(message);
+        }
+    }
+}	// QtVertexOperationPanel::getTopologicVertexName
+
+
+bool QtVertexOperationPanel::associatesVerticies ( ) const
+{
+    switch (getOperationMethod ( )) 
+    {
+        case QtVertexOperationPanel::VERTEX_FROM_TOPOLOGIC_VERTEX        :
+            CHECK_NULL_PTR_ERROR (_fromTopologicVertexPanel)
+            return _fromTopologicVertexPanel->associatesVerticies();
+            break;
+        default    : {
+            UTF8String message(Charset::UTF_8);
+            message << "Méthode associatesVerticies ( ) invoquée pour une méthode (" << (unsigned long)getOperationMethod ( )
+                    << ") ne reposant pas sur un sommet topologique.";
+            throw Exception(message);
+        }
+    }
+}	// QtVertexOperationPanel::associatesVerticies
 
 
 void QtVertexOperationPanel::reset ( )
@@ -978,11 +1109,6 @@ void QtVertexOperationPanel::reset ( )
 
 void QtVertexOperationPanel::validate ( )
 {
-// CP : suite discussion EBL/FL, il est convenu que la validation des
-// paramètres de l'opération est effectuée par le "noyau" et qu'un mauvais
-// paramétrage est remonté sous forme d'exception à la fonction appelante, donc
-// avant exécution de la commande.
-// Les validations des valeurs des paramètres sont donc ici commentées.
 	UTF8String	error (Charset::UTF_8);
 
 	try
@@ -998,33 +1124,26 @@ void QtVertexOperationPanel::validate ( )
 		error << "QtVertexOperationPanel::validate : erreur non documentée.";
 	}
 
-//	VALIDATED_FIELD_EXPRESSION_EVALUATION (_namePanel->validate ( ), "Nom : ", error)
 	CHECK_NULL_PTR_ERROR (_operationMethodComboBox)
 	switch (_operationMethodComboBox->currentIndex ( ))
 	{
-		case QtVertexOperationPanel::COORDINATES	:
-		case QtVertexOperationPanel::VERTEX_PROJECTED_ON_CURVE	:
+		case QtVertexOperationPanel::COORDINATES					:
+		case QtVertexOperationPanel::VERTEX_PROJECTED_ON_CURVE		:
 		case QtVertexOperationPanel::VERTEX_PROJECTED_ON_SURFACE	:
-		case QtVertexOperationPanel::CURVILINEAR_ABSCISSA	:
+		case QtVertexOperationPanel::CURVILINEAR_ABSCISSA			:
+		case QtVertexOperationPanel::VERTEX_FROM_TOPOLOGIC_VERTEX	:
 			break;
 		case -1	:
 			if (0 != error.length ( ))
 				error << "\n";
-			error << "Absence de méthode d'opération de création/modification "
-			      << "de vertex sélectionnée.";
+			error << "Absence de méthode d'opération de création/modification de vertex sélectionnée.";
 			break;
 		default		:
 			if (0 != error.length ( ))
 				error << "\n";
-			error << "QtVertexOperationPanel::validate : index de méthode "
-			      << "d'opération de création/modification de vertex "
-			      << "invalide ("
+			error << "QtVertexOperationPanel::validate : index de méthode d'opération de création/modification de vertex invalide ("
 			      << (long)_operationMethodComboBox->currentIndex ( ) << ").";
 	}	// switch (_operationMethodComboBox->currentIndex ( ))
-
-//	VALIDATED_FIELD_EXPRESSION_EVALUATION (getX ( ), "Abscisse point : ", error)
-//	VALIDATED_FIELD_EXPRESSION_EVALUATION (getY ( ), "Ordonnée point : ", error)
-//	VALIDATED_FIELD_EXPRESSION_EVALUATION (getZ ( ), "Elévation point : ", error)
 
 	if (0 != error.length ( ))
 		throw Exception (error);
@@ -1037,8 +1156,7 @@ void QtVertexOperationPanel::cancel ( )
 
 	CHECK_NULL_PTR_ERROR (_pointPanel)
 	CHECK_NULL_PTR_ERROR (_curvilinearAbscissaPanel)
-	QtMgx3DOperationsSubPanel*	subPanel	=
-					dynamic_cast<QtMgx3DOperationsSubPanel*>(_currentPanel);
+	QtMgx3DOperationsSubPanel*	subPanel	= dynamic_cast<QtMgx3DOperationsSubPanel*>(_currentPanel);
 	_pointPanel->stopSelection ( );
 	_curvilinearAbscissaPanel->stopSelection ( );
 
@@ -1061,11 +1179,9 @@ void QtVertexOperationPanel::autoUpdate ( )
 {
 	CHECK_NULL_PTR_ERROR (_pointPanel)
 	CHECK_NULL_PTR_ERROR (_curvilinearAbscissaPanel)
-//	CHECK_NULL_PTR_ERROR (_namePanel)
-//	_namePanel->autoUpdate ( );
+	CHECK_NULL_PTR_ERROR (_fromTopologicVertexPanel)
 
-	QtMgx3DOperationsSubPanel*	subPanel	=
-					dynamic_cast<QtMgx3DOperationsSubPanel*>(_currentPanel);
+	QtMgx3DOperationsSubPanel*	subPanel	= dynamic_cast<QtMgx3DOperationsSubPanel*>(_currentPanel);
 	if (0 != subPanel)
 		subPanel->autoUpdate ( );
 
@@ -1074,15 +1190,16 @@ void QtVertexOperationPanel::autoUpdate ( )
 	{
 		BEGIN_QT_TRY_CATCH_BLOCK
 
-		const vector<string>	selectedVertices	=
-			getSelectionManager ( ).getEntitiesNames (FilterEntity::GeomVertex);
+		const vector<string>	selectedVertices		= getSelectionManager ( ).getEntitiesNames (FilterEntity::GeomVertex);
 		if (1 == selectedVertices.size ( ))
 			_pointPanel->setUniqueName (selectedVertices [0]);
-		const vector<string>	selectedCurves	=
-			getSelectionManager ( ).getEntitiesNames (FilterEntity::GeomCurve);
+		const vector<string>	selectedCurves			= getSelectionManager ( ).getEntitiesNames (FilterEntity::GeomCurve);
 		if (1 == selectedCurves.size ( ))
 			_curvilinearAbscissaPanel->setCurveUniqueName (selectedCurves [0]);
-
+		const vector<string>	selectedTopoVertices	= getSelectionManager ( ).getEntitiesNames (FilterEntity::TopoVertex);
+		if (1 == selectedTopoVertices.size ( ))
+			_fromTopologicVertexPanel->getVertexPanel ( ).setUniqueName (selectedTopoVertices [0]);
+		
 		COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
 	}	// if (true == autoUpdateUsesSelection ( ))
 #else	// AUTO_UPDATE_OLD_SCHEME
@@ -1099,9 +1216,10 @@ vector<Entity*> QtVertexOperationPanel::getInvolvedEntities ( )
 	CHECK_NULL_PTR_ERROR (_pointPanel)
 	CHECK_NULL_PTR_ERROR (_curvilinearAbscissaPanel)
 	CHECK_NULL_PTR_ERROR (_namePanel)
+	CHECK_NULL_PTR_ERROR (_fromTopologicVertexPanel)
 	vector<Entity*>	entities;
 
-	string	pointName, curveName, surfaceName;
+	string	pointName, curveName, surfaceName, topoVertexName;
 	switch (getOperationMethod ( ))
 	{
 		case QtVertexOperationPanel::COORDINATES	:
@@ -1118,6 +1236,9 @@ vector<Entity*> QtVertexOperationPanel::getInvolvedEntities ( )
 		case QtVertexOperationPanel::CURVILINEAR_ABSCISSA	:
 			curveName	= getCurveName ( );
 		break;
+		case QtVertexOperationPanel::VERTEX_FROM_TOPOLOGIC_VERTEX	:
+			topoVertexName	= getTopologicVertexName ( );
+		break;
 		default	:
 		{
 			INTERNAL_ERROR (exc, "Cas non implémenté.", "QtVertexOperationPanel::getInvolvedEntities")
@@ -1127,26 +1248,29 @@ vector<Entity*> QtVertexOperationPanel::getInvolvedEntities ( )
 
 	if (0 != pointName.length ( ))
 	{
-		Entity*	entity	= getContext ( ).getGeomManager ( ).getVertex (
-															pointName, false);
+		Entity*	entity	= getContext ( ).getGeomManager ( ).getVertex (pointName, false);
 		if (0 != entity)
 			entities.push_back (entity);
 	}	// if (0 != pointName.length ( ))
 	if (0 != curveName.length ( ))
 	{
-		Entity*	entity	= getContext ( ).getGeomManager ( ).getCurve (
-															curveName, false);
+		Entity*	entity	= getContext ( ).getGeomManager ( ).getCurve (curveName, false);
 		if (0 != entity)
 			entities.push_back (entity);
 	}	// if (0 != curveName.length ( ))
 
 	if (0 != surfaceName.length ( ))
 	{
-		Entity*	entity	= getContext ( ).getGeomManager ( ).getSurface (
-				surfaceName, false);
+		Entity*	entity	= getContext ( ).getGeomManager ( ).getSurface (surfaceName, false);
 		if (0 != entity)
 			entities.push_back (entity);
 	}	// if (0 != surfaceName.length ( ))
+	if (0 != topoVertexName.length ( ))
+	{
+		Entity*	entity	= getContext ( ).getTopoManager ( ).getVertex (topoVertexName, false);
+		if (0 != entity)
+			entities.push_back (entity);
+	}	// if (0 != topoVertexName.length ( ))
 
 	return entities;
 }	// QtVertexOperationPanel::getInvolvedEntities
@@ -1166,6 +1290,8 @@ void QtVertexOperationPanel::operationCompleted ( )
 		_curvilinearAbscissaPanel->stopSelection ( );
 	if (0 != _verticesRatioPanel)
         _verticesRatioPanel->stopSelection ( );
+    if (0 != _fromTopologicVertexPanel)
+		_fromTopologicVertexPanel->stopSelection ( );
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
 
@@ -1182,9 +1308,9 @@ void QtVertexOperationPanel::operationMethodCallback ( )
 	CHECK_NULL_PTR_ERROR (_vertexSurfaceProjectionPanel)
 	CHECK_NULL_PTR_ERROR (_curvilinearAbscissaPanel)
 	CHECK_NULL_PTR_ERROR (_verticesRatioPanel)
+	CHECK_NULL_PTR_ERROR (_fromTopologicVertexPanel)
 
-	// Changement de méthode => on annule la mise en évidence des paramètres en
-	// cours, puis on les mettra en évidence dans le panneau affiché :
+	// Changement de méthode => on annule la mise en évidence des paramètres en cours, puis on les mettra en évidence dans le panneau affiché :
 	cancel ( );
 
 	if (0 != _currentPanel)
@@ -1198,20 +1324,21 @@ void QtVertexOperationPanel::operationMethodCallback ( )
 	switch (getOperationMethod ( ))
 	{
 		case QtVertexOperationPanel::COORDINATES	:
-			_currentPanel	= _pointPanel;					break;
+			_currentPanel	= _pointPanel;						break;
 		case QtVertexOperationPanel::VERTEX_PROJECTED_ON_CURVE	:
-			_currentPanel	= _vertexCurveProjectionPanel;	break;
+			_currentPanel	= _vertexCurveProjectionPanel;		break;
 		case QtVertexOperationPanel::VERTEX_PROJECTED_ON_SURFACE	:
 			_currentPanel	= _vertexSurfaceProjectionPanel;	break;
 		case QtVertexOperationPanel::CURVILINEAR_ABSCISSA	:
-			_currentPanel	= _curvilinearAbscissaPanel;	break;
+			_currentPanel	= _curvilinearAbscissaPanel;		break;
 	    case QtVertexOperationPanel::RATE_WITH_2_POINTS  :
-	        _currentPanel   = _verticesRatioPanel;   break;
+	        _currentPanel   = _verticesRatioPanel;				break;
+	    case QtVertexOperationPanel::VERTEX_FROM_TOPOLOGIC_VERTEX  :
+	        _currentPanel   = _fromTopologicVertexPanel;		break;
 		default	:
 		{
 			UTF8String	message (Charset::UTF_8);
-			message << "Méthode d'opération non supportée ("
-			        << (unsigned long)getOperationMethod ( ) << ").";
+			message << "Méthode d'opération non supportée (" << (unsigned long)getOperationMethod ( ) << ").";
 			INTERNAL_ERROR (exc, message, "QtVertexOperationPanel::operationMethodCallback")
 			throw exc;
 		}
@@ -1254,11 +1381,8 @@ void QtVertexOperationPanel::preview (bool show, bool destroyInteractor)
 
 		DisplayProperties	graphicalProps;
 		graphicalProps.setCloudColor (Color (
-				255 * Resources::instance ( )._previewColor.getRed ( ),
-				255 * Resources::instance ( )._previewColor.getGreen ( ),
-				255 * Resources::instance ( )._previewColor.getBlue ( )));
-		graphicalProps.setPointSize (
-						Resources::instance ( )._previewPointSize.getValue ( ));
+				255 * Resources::instance ( )._previewColor.getRed ( ), 255 * Resources::instance ( )._previewColor.getGreen ( ), 255 * Resources::instance ( )._previewColor.getBlue ( )));
+		graphicalProps.setPointSize (Resources::instance ( )._previewPointSize.getValue ( ));
 
 		switch (getOperationMethod ( )) {
 		case QtVertexOperationPanel::COORDINATES	:
@@ -1269,9 +1393,7 @@ void QtVertexOperationPanel::preview (bool show, bool destroyInteractor)
 			command.getPreviewRepresentation (dr);
 			const vector<Math::Point>&	points	= dr.getPoints ( );
 
-			RenderingManager::RepresentationID	repID	=
-					getRenderingManager ( ).createCloudRepresentation (
-										points, graphicalProps, true);
+			RenderingManager::RepresentationID	repID	= getRenderingManager ( ).createCloudRepresentation (points, graphicalProps, true);
 			registerPreviewedObject (repID);
 
 			getRenderingManager ( ).forceRender ( );
@@ -1288,9 +1410,7 @@ void QtVertexOperationPanel::preview (bool show, bool destroyInteractor)
 			command.getPreviewRepresentation (dr);
 			const vector<Math::Point>&	points	= dr.getPoints ( );
 
-			RenderingManager::RepresentationID	repID	=
-					getRenderingManager ( ).createCloudRepresentation (
-										points, graphicalProps, true);
+			RenderingManager::RepresentationID	repID	= getRenderingManager ( ).createCloudRepresentation (points, graphicalProps, true);
 			registerPreviewedObject (repID);
 
 			getRenderingManager ( ).forceRender ( );
@@ -1307,9 +1427,7 @@ void QtVertexOperationPanel::preview (bool show, bool destroyInteractor)
 			command.getPreviewRepresentation (dr);
 			const vector<Math::Point>&	points	= dr.getPoints ( );
 
-			RenderingManager::RepresentationID	repID	=
-					getRenderingManager ( ).createCloudRepresentation (
-										points, graphicalProps, true);
+			RenderingManager::RepresentationID	repID	= getRenderingManager ( ).createCloudRepresentation (points, graphicalProps, true);
 			registerPreviewedObject (repID);
 
 			getRenderingManager ( ).forceRender ( );
@@ -1326,42 +1444,42 @@ void QtVertexOperationPanel::preview (bool show, bool destroyInteractor)
 			command.getPreviewRepresentation (dr);
 			const vector<Math::Point>&	points	= dr.getPoints ( );
 
-			RenderingManager::RepresentationID	repID	=
-					getRenderingManager ( ).createCloudRepresentation (
-										points, graphicalProps, true);
+			RenderingManager::RepresentationID	repID	= getRenderingManager ( ).createCloudRepresentation (points, graphicalProps, true);
 			registerPreviewedObject (repID);
 
 			getRenderingManager ( ).forceRender ( );
 
 		}
 		break;
-            case QtVertexOperationPanel::RATE_WITH_2_POINTS	:
-            {
-                Geom::Vertex *vtx1 = getContext().getGeomManager().getVertex(getFirstPointName());
-                Geom::Vertex *vtx2 = getContext().getGeomManager().getVertex(getSecondPointName());
-                Point p1 = vtx1->getPoint();
-                Point p2 = vtx2->getPoint();
-                if (p1 == p2){
-                    TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-                    message <<"newVertex impossible, entités "<<vtx1->getName()<<" et "<<vtx2->getName()<<" trop proches";
-                    throw TkUtil::Exception(message);
-                }
-                const double param = getCurvilinearAbscissa();
-                Point p = p1 + (p2-p1)*param;
-                Geom::CommandNewVertex command(*context, p, "");
+		case QtVertexOperationPanel::RATE_WITH_2_POINTS	:
+		{
+			Geom::Vertex *vtx1 = getContext().getGeomManager().getVertex(getFirstPointName());
+			Geom::Vertex *vtx2 = getContext().getGeomManager().getVertex(getSecondPointName());
+			Point p1 = vtx1->getPoint();
+			Point p2 = vtx2->getPoint();
+			if (p1 == p2){
+				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+				message <<"newVertex impossible, entités "<<vtx1->getName()<<" et "<<vtx2->getName()<<" trop proches";
+				throw TkUtil::Exception(message);
+			}
+			const double param = getCurvilinearAbscissa();
+			Point p = p1 + (p2-p1)*param;
+			Geom::CommandNewVertex command(*context, p, "");
 
-                Geom::GeomDisplayRepresentation	dr (DisplayRepresentation::WIRE);
-                command.getPreviewRepresentation (dr);
-                const vector<Math::Point>&	points	= dr.getPoints ( );
+			Geom::GeomDisplayRepresentation	dr (DisplayRepresentation::WIRE);
+			command.getPreviewRepresentation (dr);
+			const vector<Math::Point>&	points	= dr.getPoints ( );
 
-                RenderingManager::RepresentationID	repID	=
-                        getRenderingManager ( ).createCloudRepresentation (
-                                points, graphicalProps, true);
-                registerPreviewedObject (repID);
+			RenderingManager::RepresentationID	repID	= getRenderingManager ( ).createCloudRepresentation (points, graphicalProps, true);
+			registerPreviewedObject (repID);
 
-                getRenderingManager ( ).forceRender ( );
-            }
-                break;
+			getRenderingManager ( ).forceRender ( );
+		}
+		break;
+		case QtVertexOperationPanel::VERTEX_FROM_TOPOLOGIC_VERTEX  :
+		{	// TODO
+		}
+		break;
 		default	:
 		{
 			std::cerr<<"Cas non implémenté. QtVertexOperationPanel::preview"<<std::endl;
@@ -1384,16 +1502,12 @@ QtVertexOperationAction::QtVertexOperationAction (
 	const QString& tooltip, QtMgx3DGroupNamePanel::POLICY creationPolicy)
 	: QtMgx3DGeomOperationAction (icon, text, mainWindow, tooltip)
 {
-	QtVertexOperationPanel*	operationPanel	=
-		new QtVertexOperationPanel (
-			&getOperationPanelParent ( ), text.toStdString ( ), creationPolicy,
-			mainWindow, this);
+	QtVertexOperationPanel*	operationPanel	= new QtVertexOperationPanel (&getOperationPanelParent ( ), text.toStdString ( ), creationPolicy, mainWindow, this);
 	setOperationPanel (operationPanel);
 }	// QtVertexOperationAction::QtVertexOperationAction
 
 
-QtVertexOperationAction::QtVertexOperationAction (
-										const QtVertexOperationAction&)
+QtVertexOperationAction::QtVertexOperationAction (const QtVertexOperationAction&)
 	: QtMgx3DGeomOperationAction (
 						QIcon (""), "", *new QtMgx3DMainWindow (0, ""), "")
 {
@@ -1401,8 +1515,7 @@ QtVertexOperationAction::QtVertexOperationAction (
 }	// QtVertexOperationAction::QtVertexOperationAction
 
 
-QtVertexOperationAction& QtVertexOperationAction::operator = (
-										const QtVertexOperationAction&)
+QtVertexOperationAction& QtVertexOperationAction::operator = (const QtVertexOperationAction&)
 {
 	MGX_FORBIDDEN ("QtVertexOperationAction assignment operator is not allowed.")
 	return *this;
@@ -1467,12 +1580,17 @@ void QtVertexOperationAction::executeOperation ( )
 			cmdResult	= getContext ( ).getGeomManager ( ).newVertex (firstPoint, secondPoint, t, name);
 		}
 		break;
+	    case QtVertexOperationPanel::VERTEX_FROM_TOPOLOGIC_VERTEX  :
+	    {
+			const string	vertexName	= panel->getTopologicVertexName ( );
+			const bool		asso		= panel->associatesVerticies ( );
+			cmdResult	= getContext ( ).getGeomManager ( ).newVertexFromTopo (vertexName, asso, name);
+		}
+		break;
 		default	:
 		{
 			UTF8String	message (Charset::UTF_8);
-			message << "Méthode d'opération non supportée ("
-			        << (unsigned long)getVertexPanel ( )->getOperationMethod ( )
-			        << ").";
+			message << "Méthode d'opération non supportée (" << (unsigned long)getVertexPanel ( )->getOperationMethod ( ) << ").";
 			INTERNAL_ERROR (exc, message, "QtVertexOperationAction::executeOperation")
 			throw exc;
 		}
