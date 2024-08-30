@@ -3,6 +3,9 @@ set (CURRENT_PACKAGE_MACRO_NAME "CORE")
 include (${CMAKE_SOURCE_DIR}/cmake/version.cmake)
 include (${CMAKE_SOURCE_DIR}/cmake/common.cmake)
 
+find_package (GUIToolkitsVariables REQUIRED)
+include (${GUIToolkitsVariables_CMAKE_DIR}/python_binding.cmake)
+
 file (GLOB HEADERS protected/*/*.h)
 file (GLOB CPP_SOURCES Internal/*.cpp Geom/*.cpp Topo/*.cpp Mesh/*.cpp Structured/*.cpp Group/*.cpp SysCoord/*.cpp Smoothing/*.cpp )
 list(FILTER CPP_SOURCES EXCLUDE REGEX ".*GMDSGeom.*Adapter\\.cpp$")

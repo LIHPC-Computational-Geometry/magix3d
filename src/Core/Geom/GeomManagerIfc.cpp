@@ -96,6 +96,11 @@ Internal::M3DCommandResultIfc* GeomManagerIfc::newVertex(const double& x, const 
     throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::newVertex should be overloaded.", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
+Internal::M3DCommandResultIfc* GeomManagerIfc::newVertexFromTopo(std::string vertexName, bool asso, std::string groupName)
+{
+    throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::newVertexFromTopo should be overloaded.", TkUtil::Charset::UTF_8));
+}
+/*----------------------------------------------------------------------------*/
 Internal::M3DCommandResultIfc* GeomManagerIfc::newSegment(std::string n1,std::string n2, std::string groupName)
 {
 	throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::newSegment should be overloaded.", TkUtil::Charset::UTF_8));

@@ -525,6 +525,39 @@ newVertex(const Point& p, std::string groupName)
 }
 /*----------------------------------------------------------------------------*/
 Internal::M3DCommandResultIfc* GeomManager::
+newVertexFromTopo(std::string vertexName, bool asso, std::string groupName)
+{
+	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+	message << "GeomManager::newVertexFromTopo(" << vertexName << ", " << (true == asso ? "True" : "False") << ", " << groupName << ")";
+	log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
+	Topo::Vertex*	vertex	= getLocalContext ().getTopoManager ( ).getVertex (vertexName, true);
+	CHECK_NULL_PTR_ERROR (vertex)
+	Internal::CommandComposite* commandCompo = new Internal::CommandComposite(getLocalContext(), "Création d'un sommet géométrique à partir d'un sommet topologique.");
+	CHECK_NULL_PTR_ERROR (commandCompo)
+	CommandNewVertex*	commandVertex = new CommandNewVertex(getLocalContext(),vertex->getCoord ( ), groupName);
+	CHECK_NULL_PTR_ERROR (commandVertex)
+	commandCompo->addCommand (commandVertex);
+	std::vector<Topo::TopoEntity*>	verticies;
+	verticies.push_back (vertex);
+	if (true == asso)
+	{
+		Topo::CommandSetGeomAssociation* commandAsso = new Topo::CommandSetGeomAssociation(getLocalContext(), verticies, commandVertex);
+		CHECK_NULL_PTR_ERROR (commandAsso)
+		commandCompo->addCommand (commandAsso);
+	}	// if (true == asso)
+
+	// Trace dans le script :
+	TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
+    cmd << getContextAlias() << "." << "getGeomManager().newVertexFromTopo(\"" << vertexName << "\", " << (true == asso ? "True" : "False") << ",\"" << groupName << "\")";
+    commandCompo->setScriptCommand(cmd);
+
+    getCommandManager().addCommand(commandCompo, Utils::Command::DO);
+
+    Internal::M3DCommandResultIfc*  cmdResult   = new Internal::M3DCommandResult (*commandCompo);
+    return cmdResult;
+}
+/*----------------------------------------------------------------------------*/
+Internal::M3DCommandResultIfc* GeomManager::
 newSegment(std::string n1,std::string n2, std::string groupName)
 {
     Vertex* v1 = getVertex(n1);

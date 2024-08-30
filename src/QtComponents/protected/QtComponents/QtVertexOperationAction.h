@@ -27,8 +27,7 @@ namespace QtComponents
 
 
 /**
- * Panneau d'édition des paramètres d'une opération géométrique touchant
- * un vertex.
+ * Panneau d'édition des paramètres d'une opération géométrique touchant un vertex.
  */
 class QtVertexOperationPanel : public QtMgx3DOperationPanel
 {
@@ -42,22 +41,20 @@ class QtVertexOperationPanel : public QtMgx3DOperationPanel
 	 * <LI>Projection d'un point sur une courbe,
 	 * <LI>Projection d'un point sur une surface,
 	 * <LI>Point sur une courbe renseigné par son abscisse curvigne
+	 * <LI>Point créé à partir d'un sommet topologique avec option de liaison du sommet vers le point créé
 	 * </OL>
-	 * \warning		Dans le cas de la projection du point sur la courbe, la
-	 * 				nature de la projection n'est pas complétement établie
-	 * 				à ce jour (09/09/13) : a priori orthogonale à la courbe,
-	 * 				et point le plus près retenu.
+	 * \warning		Dans le cas de la projection du point sur la courbe, la nature de la projection n'est pas complétement établie
+	 * 				à ce jour (09/09/13) : a priori orthogonale à la courbe, et point le plus près retenu.
 	 */
 	enum OPERATION_METHOD {
-			COORDINATES, VERTEX_PROJECTED_ON_CURVE, VERTEX_PROJECTED_ON_SURFACE, CURVILINEAR_ABSCISSA, RATE_WITH_2_POINTS};
+			COORDINATES, VERTEX_PROJECTED_ON_CURVE, VERTEX_PROJECTED_ON_SURFACE, CURVILINEAR_ABSCISSA, RATE_WITH_2_POINTS, VERTEX_FROM_TOPOLOGIC_VERTEX };
 
 	/**
 	 * Créé l'ihm.
 	 * \param	Widget parent.
 	 * \param	Nom du panneau.
 	 * \param	Politique de création/modification du groupe
-	 * \param	Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée
-	 *			notamment pour récupérer le contexte.
+	 * \param	Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée notamment pour récupérer le contexte.
 	 * \param	Eventuelle action associée à ce panneau.
 	 */
 	QtVertexOperationPanel (
@@ -82,48 +79,52 @@ class QtVertexOperationPanel : public QtMgx3DOperationPanel
 	virtual OPERATION_METHOD getOperationMethod ( ) const;
 
 	/**
-	 * Les coordonnées du vertex (si <I>getOperationMethod ( )</I>
-	 * retourne <I>COORDINATES</I>).
+	 * \return	Les coordonnées du vertex (si <I>getOperationMethod ( )</I> retourne <I>COORDINATES</I>).
 	 */
 	virtual Mgx3D::Utils::Math::Point getPoint ( ) const;
 
 	/**
-	 * Le nom du premier point (si <I>getOperationMethod ( )</I>
-	 * retourne <I>RATE_WITH_2_POINTS</I>).
+	 * \return	Le nom du premier point (si <I>getOperationMethod ( )</I> retourne <I>RATE_WITH_2_POINTS</I>).
 	 */
 	virtual std::string getFirstPointName ( ) const;
 
 	/**
-	 * Le nom du second point (si <I>getOperationMethod ( )</I>
-	 * retourne <I>RATE_WITH_2_POINTS</I>).
+	 * \return	Le nom du second point (si <I>getOperationMethod ( )</I>  retourne <I>RATE_WITH_2_POINTS</I>).
 	 */
 	virtual std::string getSecondPointName ( ) const;
 
 	/**
-	 * Le nom de la courbe (si <I>getOperationMethod ( )</I>
-	 * retourne <I>VERTEX_PROJECTED_ON_CURVE</I> ou
+	 * \return	Le nom de la courbe (si <I>getOperationMethod ( )</I> retourne <I>VERTEX_PROJECTED_ON_CURVE</I> ou
 	 * <I>CURVILINEAR_ABSCISSA</I>).
 	 */
 	virtual std::string getCurveName ( ) const;
 
 	/**
-	 * Le nom de la surface (si <I>getOperationMethod ( )</I>
-	 * retourne <I>VERTEX_PROJECTED_ON_SURFACE</I> ).
+	 * \return	Le nom de la surface (si <I>getOperationMethod ( )</I> retourne <I>VERTEX_PROJECTED_ON_SURFACE</I> ).
 	 */
 	virtual std::string getSurfaceName ( ) const;
 
 	/**
-	 * Le nom du vertex à projeter (si <I>getOperationMethod ( )</I>
-	 * retourne <I>VERTEX_PROJECTED_ON_CURVE</I>.
+	 * \return	Le nom du vertex à projeter (si <I>getOperationMethod ( )</I> retourne <I>VERTEX_PROJECTED_ON_CURVE</I>.
 	 */
 	virtual std::string getProjectedVertexName ( ) const;
 
 	/**
-	 * \return		L'abscisse curviligne du vertex (
-	 * si <I>getOperationMethod ( )</I> retourne <I>CURVILINEAR_ABSCISSA</I>).
+	 * \return		L'abscisse curviligne du vertex (si <I>getOperationMethod ( )</I> retourne <I>CURVILINEAR_ABSCISSA</I>).
 	 */
 	virtual double getCurvilinearAbscissa ( ) const;
 
+	/**
+	 * \return	Le nom du sommet topologique (si <I>getOperationMethod ( )</I> retourne <I>VERTEX_FROM_TOPOLOGIC_VERTEX</I>).
+	 */
+	virtual std::string getTopologicVertexName ( ) const;
+
+	/**
+	 * \return	<I>true</I> si le point créé doit être associé au sommet, <I>false</I> dans le cas contraire
+	 * (si <I>getOperationMethod ( )</I> retourne <I>VERTEX_FROM_TOPOLOGIC_VERTEX</I>).
+	 */
+	virtual bool associatesVerticies ( ) const;
+		
 	/**
 	 * Réinitialise le panneau.
 	 */
@@ -131,9 +132,7 @@ class QtVertexOperationPanel : public QtMgx3DOperationPanel
 
     /**
      * Méthode appelée pour vérifier les paramètres saisis par l'utilisateur.
-     * En cas de paramètrage invalide cette méthode doit leve une exception de
-     * type <I>TkUtil::Exception</I> contenant un descriptif des erreurs
-     * rencontrées.
+     * En cas de paramètrage invalide cette méthode doit leve une exception de type <I>TkUtil::Exception</I> contenant un descriptif des erreurs rencontrées.
      */
     virtual void validate ( );
 
@@ -151,10 +150,8 @@ class QtVertexOperationPanel : public QtMgx3DOperationPanel
 	virtual void autoUpdate ( );
 
 	/**
-	 * \param		<I>true</I> pour prévisualiser les entités créées,
-	 *              <I>false</I> pour arrêter la prévisualisation.
-	 * \param		<I>true</I> s'il faut détruire l'éventuel interacteur dans
-	 * 				le cas d'un arrêt de la prévisualisation.
+	 * \param		<I>true</I> pour prévisualiser les entités créées, <I>false</I> pour arrêter la prévisualisation.
+	 * \param		<I>true</I> s'il faut détruire l'éventuel interacteur dans le cas d'un arrêt de la prévisualisation.
 	 */
 	virtual void preview (bool show, bool destroyInteractor);
 
@@ -167,15 +164,11 @@ class QtVertexOperationPanel : public QtMgx3DOperationPanel
 
 		/**
 		 * \param		Widget parent
-		 * \param		Le nom de l'application, pour les éventuels messages
-		 *				d'erreur.
+		 * \param		Le nom de l'application, pour les éventuels messages d'erreur.
 		 * \param		Contexte d'utilisation du panneau.
-		 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement,
-		 *				utilisée notamment pour récupérer le contexte.
+		 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée notamment pour récupérer le contexte.
 		 */
-		QtVertexCurveProjectionPanel (
-								QWidget* parent, const std::string& appTitle,
-								Mgx3D::QtComponents::QtMgx3DMainWindow& mw);
+		QtVertexCurveProjectionPanel (QWidget* parent, const std::string& appTitle, Mgx3D::QtComponents::QtMgx3DMainWindow& mw);
 
 		/**
 		 * Destructeur. RAS.
@@ -188,8 +181,7 @@ class QtVertexOperationPanel : public QtMgx3DOperationPanel
 		virtual void reset ( );
 
 		/**
-		 * Méthode appelée lorsque l'utilisateur suspend l'édition de
-		 * l'opération.
+		 * Méthode appelée lorsque l'utilisateur suspend l'édition de l'opération.
 		 * cf. spécifications de la classe de base.
 		 */
 		virtual void cancel ( );
@@ -239,8 +231,7 @@ class QtVertexOperationPanel : public QtMgx3DOperationPanel
 		 * Constructeur de copie, opérateur =. Interdits.
 		 */
 		QtVertexCurveProjectionPanel (const QtVertexCurveProjectionPanel&);
-		QtVertexCurveProjectionPanel& operator = (
-										const QtVertexCurveProjectionPanel&);
+		QtVertexCurveProjectionPanel& operator = (const QtVertexCurveProjectionPanel&);
 
 		/** Le point projeté. */
 		QtMgx3DEntityPanel*				_pointPanel;
@@ -255,15 +246,11 @@ class QtVertexOperationPanel : public QtMgx3DOperationPanel
 
 		/**
 		 * \param		Widget parent
-		 * \param		Le nom de l'application, pour les éventuels messages
-		 *				d'erreur.
+		 * \param		Le nom de l'application, pour les éventuels messages d'erreur.
 		 * \param		Contexte d'utilisation du panneau.
-		 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement,
-		 *				utilisée notamment pour récupérer le contexte.
+		 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée notamment pour récupérer le contexte.
 		 */
-		QtVertexSurfaceProjectionPanel (
-								QWidget* parent, const std::string& appTitle,
-								Mgx3D::QtComponents::QtMgx3DMainWindow& mw);
+		QtVertexSurfaceProjectionPanel (QWidget* parent, const std::string& appTitle, Mgx3D::QtComponents::QtMgx3DMainWindow& mw);
 
 		/**
 		 * Destructeur. RAS.
@@ -276,8 +263,7 @@ class QtVertexOperationPanel : public QtMgx3DOperationPanel
 		virtual void reset ( );
 
 		/**
-		 * Méthode appelée lorsque l'utilisateur suspend l'édition de
-		 * l'opération.
+		 * Méthode appelée lorsque l'utilisateur suspend l'édition de l'opération.
 		 * cf. spécifications de la classe de base.
 		 */
 		virtual void cancel ( );
@@ -327,8 +313,7 @@ class QtVertexOperationPanel : public QtMgx3DOperationPanel
 		 * Constructeur de copie, opérateur =. Interdits.
 		 */
 		QtVertexSurfaceProjectionPanel (const QtVertexSurfaceProjectionPanel&);
-		QtVertexSurfaceProjectionPanel& operator = (
-										const QtVertexSurfaceProjectionPanel&);
+		QtVertexSurfaceProjectionPanel& operator = (const QtVertexSurfaceProjectionPanel&);
 
 		/** Le point projeté. */
 		QtMgx3DEntityPanel*				_pointPanel;
@@ -343,15 +328,11 @@ class QtVertexOperationPanel : public QtMgx3DOperationPanel
 
         /**
          * \param		Widget parent
-         * \param		Le nom de l'application, pour les éventuels messages
-         *				d'erreur.
+         * \param		Le nom de l'application, pour les éventuels messages d'erreur.
          * \param		Contexte d'utilisation du panneau.
-         * \param		Fenêtre principale <I>Magix 3D</I> de rattachement,
-         *				utilisée notamment pour récupérer le contexte.
+         * \param		Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée notamment pour récupérer le contexte.
          */
-        QtVerticesRatioPanel (
-                QWidget* parent, const std::string& appTitle,
-                Mgx3D::QtComponents::QtMgx3DMainWindow& mw);
+        QtVerticesRatioPanel (QWidget* parent, const std::string& appTitle, Mgx3D::QtComponents::QtMgx3DMainWindow& mw);
 
         /**
          * Destructeur. RAS.
@@ -364,8 +345,7 @@ class QtVertexOperationPanel : public QtMgx3DOperationPanel
         virtual void reset ( );
 
         /**
-         * Méthode appelée lorsque l'utilisateur suspend l'édition de
-         * l'opération.
+         * Méthode appelée lorsque l'utilisateur suspend l'édition de l'opération.
          * cf. spécifications de la classe de base.
          */
         virtual void cancel ( );
@@ -426,8 +406,7 @@ class QtVertexOperationPanel : public QtMgx3DOperationPanel
          * Constructeur de copie, opérateur =. Interdits.
          */
         QtVerticesRatioPanel (const QtVerticesRatioPanel&);
-        QtVerticesRatioPanel& operator = (
-                const QtVerticesRatioPanel&);
+        QtVerticesRatioPanel& operator = (const QtVerticesRatioPanel&);
 
         /** Le premier point sélectionné. */
         QtMgx3DEntityPanel*				_firstPointPanel;
@@ -439,13 +418,90 @@ class QtVertexOperationPanel : public QtMgx3DOperationPanel
         QtDoubleTextField*              _ratePanel;
 
     };	// class QtVerticesRatioPanel
+    
+    class QtVertexFromTopologicVertexPanel : public QtMgx3DOperationsSubPanel
+	{
+		public :
+
+		/**
+		 * \param		Widget parent
+		 * \param		Le nom de l'application, pour les éventuels messages d'erreur.
+		 * \param		Contexte d'utilisation du panneau.
+		 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée notamment pour récupérer le contexte.
+		 */
+		QtVertexFromTopologicVertexPanel (QWidget* parent, const std::string& appTitle, Mgx3D::QtComponents::QtMgx3DMainWindow& mw);
+
+		/**
+		 * Destructeur. RAS.
+		 */
+		virtual ~QtVertexFromTopologicVertexPanel ( );
+
+		/**
+		 * Réinitialise le panneau.
+		 */
+		virtual void reset ( );
+
+		/**
+		 * Méthode appelée lorsque l'utilisateur suspend l'édition de l'opération.
+		 * cf. spécifications de la classe de base.
+		 */
+		virtual void cancel ( );
+
+		/**
+		 * Actualise le panneau en fonction du contexte.
+		 * cf. spécifications de la classe de base.
+		 */
+		virtual void autoUpdate ( );
+
+		/**
+		 * \return		Le sommet sélectionné à copier.
+		 */
+		virtual std::string getVertexUniqueName ( ) const;
+
+		/**
+		 * \return		S'il faut associer le sommet au point créé.
+		 */
+		virtual bool associatesVerticies ( ) const;
+
+		/**
+		 * Quitte le mode sélection interactive.
+		 */
+		 virtual void stopSelection ( );
+
+		 /**
+		  * \return		Le champ de saisie de du sommet.
+		  */
+		 virtual QtMgx3DEntityPanel& getVertexPanel ( );
+		 
+
+		protected :
+
+		/**
+		 * \return		La liste des entités impliquées dans l'opération.
+		 */
+		virtual std::vector<Mgx3D::Utils::Entity*> getInvolvedEntities ( );
 
 
-protected :
+		private :
+
+		/**
+		 * Constructeur de copie, opérateur =. Interdits.
+		 */
+		QtVertexFromTopologicVertexPanel (const QtVertexFromTopologicVertexPanel&);
+		QtVertexFromTopologicVertexPanel& operator = (const QtVertexFromTopologicVertexPanel&);
+
+		/** Le sommet topologique. */
+		QtMgx3DEntityPanel*				_topologicVertexPanel;
+
+		/** Faut-il associer le sommet topologique au point géométrique créé ? */
+		QCheckBox*						_associationCheckBox;
+	};	// class QtVertexFromTopologicVertexPanel
+
+
+	protected :
 
 	/**
-	 * \return		La liste des entités impliquées dans l'opération
-	 * 				(<B>hors panneaux autonomes dans le highlighting</B>).
+	 * \return		La liste des entités impliquées dans l'opération (<B>hors panneaux autonomes dans le highlighting</B>).
 	 */
 	virtual std::vector<Mgx3D::Utils::Entity*> getInvolvedEntities ( );
 
@@ -474,56 +530,54 @@ protected :
 	QtVertexOperationPanel& operator = (const QtVertexOperationPanel&);
 
 	/** Le nom de la boite. */
-	QtMgx3DGroupNamePanel*			_namePanel;
+	QtMgx3DGroupNamePanel*				_namePanel;
 
 	/** La méthode de création/modification du cylindre. */
-	QComboBox*						_operationMethodComboBox;
+	QComboBox*							_operationMethodComboBox;
 
 	/**
 	 * Les panneaux de saisie des paramètres de définition du vertex
 	 */
 	//{@
 	/** Parent du panneau courant. */
-	QWidget*						_currentParentWidget;
+	QWidget*							_currentParentWidget;
 
 	/** Panneau courant. */
-	QWidget*						_currentPanel;
+	QWidget*							_currentPanel;
 
 	/** Coordonnées du vertex. */
-	QtMgx3DPointPanel*				_pointPanel;
+	QtMgx3DPointPanel*					_pointPanel;
 
 	/** Projection d'un point sur une courbe. */
-	QtVertexCurveProjectionPanel*	_vertexCurveProjectionPanel;
+	QtVertexCurveProjectionPanel*		_vertexCurveProjectionPanel;
 
 	/** Projection d'un point sur une surface. */
-	QtVertexSurfaceProjectionPanel*	_vertexSurfaceProjectionPanel;
+	QtVertexSurfaceProjectionPanel*		_vertexSurfaceProjectionPanel;
 
 	/** Point défini par son abscisse curviligne sur une courbe. */
-	QtCurvilinearAbscissaPanel*		_curvilinearAbscissaPanel;
+	QtCurvilinearAbscissaPanel*			_curvilinearAbscissaPanel;
 
 	/** Point défini par son ratio de distance entre 2 autres points. */
-    QtVerticesRatioPanel*           _verticesRatioPanel;
+    QtVerticesRatioPanel*				_verticesRatioPanel;
 
+	/** */
+	QtVertexFromTopologicVertexPanel*	_fromTopologicVertexPanel;
 	//@}	// Panneaux de saisie des paramètres de définition du vertex
 };	// class QtVertexOperationPanel
 
 
 /**
- * Classe d'action type <I>check box</I> associée à un panneau type
- * <I>QtVertexOperationPanel</I> de création/modification d'un vertex.
+ * Classe d'action type <I>check box</I> associée à un panneau type <I>QtVertexOperationPanel</I> de création/modification d'un vertex.
  */
 class QtVertexOperationAction : public QtMgx3DGeomOperationAction
 {
 	public :
 
 	/**
-	 * Créé et s'associe une instance de la classe
-	 * <I>QtVertexOperationPanel</I>.
+	 * Créé et s'associe une instance de la classe <I>QtVertexOperationPanel</I>.
 	 * \param		Icône représentant l'action.
 	 * \param		Texte représentant l'action.
-	 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée
-	 *				notamment pour récupérer le contexte et le panneau contenant
-	 *				les icônes.
+	 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée notamment pour récupérer le contexte et le panneau contenant les icônes.
 	 * \param		Tooltip décrivant l'action.
 	 * \param		Politique de création/modification du groupe
 	 */
