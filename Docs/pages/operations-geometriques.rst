@@ -262,8 +262,12 @@ méthodes suivantes :
    d’une part le nom de la courbe concernée et d’autre part une abscisse
    curviligne (entre 0 et 1).
 
-5. *Suivant un ratio entre 2 points,* le point créé est placé sur la
+5. *Suivant un ratio entre 2 points*, le point créé est placé sur la
    droite passant par deux points à renseigner.
+
+6. *A partir d'un sommet topologique*, le point est créé à l'emplacement
+   du sommet topologique sélectionné, et ce dernier est associé au point
+   géométrique créé si la case correspondante est cochée.
 
 
 Opérations associées aux courbes géométriques
