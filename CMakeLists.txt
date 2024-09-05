@@ -26,7 +26,6 @@ option (WITH_COV "Enable code coverage of the testing target (default:OFF)" OFF)
 #Next options are only available on-site. Default value is OFF.
 option (USE_DKOC "On-site. Build the DKOC component to read Catia files (on-site, default : OFF)" OFF)
 option (USE_MDLPARSER "Build the mdl parser to read the 2D mdl format (on-site, default : OFF)" OFF)
-option (USE_MESHGEMS "Build the MeshGems component to access tri/tet meshing functionalities (on-site, default : OFF)" OFF)
 option (USE_SEPA3D "Build the SEPA3D component (on-site, default : OFF)" OFF)
 
 #======================================================================================================================

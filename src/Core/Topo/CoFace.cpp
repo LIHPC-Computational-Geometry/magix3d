@@ -31,7 +31,6 @@
 #include "Topo/FaceMeshingPropertyRotational.h"
 #include "Topo/FaceMeshingPropertyTransfinite.h"
 #include "Topo/FaceMeshingPropertyDelaunayGMSH.h"
-#include "Topo/FaceMeshingPropertyMeshGems.h"
 
 #include "Mesh/CommandCreateMesh.h"
 #include "Mesh/MeshManagerIfc.h"

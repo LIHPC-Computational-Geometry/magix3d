@@ -769,105 +769,6 @@ double QtFaceDelaunayGMSHPanel::getMax ( ) const
 }	// QtFaceDelaunayGMSHPanel::getMax
 
 
-#ifdef USE_MESHGEMS
-// ===========================================================================
-//                        LA CLASSE QtFaceMeshGemsPanel
-// ===========================================================================
-
-
-QtFaceMeshGemsPanel::QtFaceMeshGemsPanel (
-	QWidget* parent, QtMgx3DMainWindow& window, QtMgx3DOperationPanel* mainPanel)
-	: QtMgx3DOperationsSubPanel (parent, window, mainPanel),
-	  _sizeTextField (0)
-{
-//	setContentsMargins (0, 0, 0, 0);
-	QVBoxLayout*	layout	= new QVBoxLayout (this);
-	setLayout (layout);
-	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
-
-	FaceMeshingPropertyMeshGems	props;	// Pour récupérer les valeurs par défaut
-
-	QHBoxLayout*	hlayout	= new QHBoxLayout ( );
-	layout->addLayout (hlayout);
-	QLabel*	label	= new QLabel ("Taille :", this);
-	hlayout->addWidget (label);
-	_sizeTextField	= &QtNumericFieldsFactory::createDistanceTextField (this);
-	_sizeTextField->setValue (props.getSize ( ));
-	hlayout->addWidget (_sizeTextField);
-	hlayout	= new QHBoxLayout ( );
-	layout->addLayout (hlayout);
-	label	= new QLabel ("Gradation :", this);
-	hlayout->addWidget (label);
-	_gradTextField	= &QtNumericFieldsFactory::createDistanceTextField (this);
-	_gradTextField->setValue (props.getGradation ( ));
-	hlayout->addWidget (_gradTextField);
-}	// QtFaceMeshGemsPanel::QtFaceMeshGemsPanel
-
-
-QtFaceMeshGemsPanel::QtFaceMeshGemsPanel (
-		const QtFaceMeshGemsPanel& p)
-: QtMgx3DOperationsSubPanel (p), _sizeTextField (0), _gradTextField(0)
-{
-	MGX_FORBIDDEN ("QtFaceDelaunayGMSHPanel copy constructor is not allowed.");
-}	// QtFaceMeshGemsPanel::QtFaceMeshGemsPanel
-
-
-QtFaceMeshGemsPanel& QtFaceMeshGemsPanel::operator = (
-												const QtFaceMeshGemsPanel&)
-{
-	 MGX_FORBIDDEN ("QtFaceDelaunayGMSHPanel assignment operator is not allowed.");
-	return *this;
-}	// QtFaceMeshGemsPanel::operator =
-
-
-QtFaceMeshGemsPanel::~QtFaceMeshGemsPanel ( )
-{
-}	// QtFaceMeshGemsPanel::~QtFaceMeshGemsPanel
-
-
-void QtFaceMeshGemsPanel::reset ( )
-{
-	BEGIN_QT_TRY_CATCH_BLOCK
-
-	FaceMeshingPropertyMeshGems	props;	// Pour récupérer les valeurs par défaut
-
-	CHECK_NULL_PTR_ERROR (_sizeTextField)
-	CHECK_NULL_PTR_ERROR (_gradTextField)
-	_sizeTextField->setValue (props.getSize ( ));
-	_gradTextField->setValue (props.getGradation ( ));
-
-	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
-
-	QtMgx3DOperationsSubPanel::reset ( );
-}	// QtFaceMeshGemsPanel::reset
-
-
-FaceMeshingPropertyMeshGems*
-						QtFaceMeshGemsPanel::getMeshingProperty ( ) const
-{
-	return new FaceMeshingPropertyMeshGems (getSize ( ), getGradation());
-}	// QtFaceMeshGemsPanel::getMeshingProperty
-
-
-double QtFaceMeshGemsPanel::getSize( ) const
-{
-	CHECK_NULL_PTR_ERROR (_sizeTextField)
-	return _sizeTextField->getValue ( );
-}	// QtFaceMeshGemsPanel::getSize
-
-double QtFaceMeshGemsPanel::getGradation( ) const
-{
-	CHECK_NULL_PTR_ERROR (_gradTextField)
-	return _gradTextField->getValue ( );
-}	// QtFaceMeshGemsPanel::getSize
-#endif	// USE_MESHGEMS
-
-
 // ===========================================================================
 //                        LA CLASSE QtFaceQuadPairingPanel
 // ===========================================================================
@@ -979,9 +880,6 @@ QtFaceMeshingPropertyPanel::QtFaceMeshingPropertyPanel (
 	  _transfinitePanel (0), _directionalPanel (0), _orthogonalPanel (0),
 	  _rotationalPanel (0),
 	  _delaunayGMSHPanel (0),
-#ifdef USE_MESHGEMS
-	  _meshGemsPanel(0),
-#endif	// USE_MESHGEMS
 	  _quadPairingPanel(0),  _facesPanel (0)
 {
 //	SET_WIDGET_BACKGROUND (this, Qt::yellow)
@@ -1021,9 +919,6 @@ QtFaceMeshingPropertyPanel::QtFaceMeshingPropertyPanel (
 	_operationMethodComboBox->addItem ("Maillage directionnel orthogonal");
 	_operationMethodComboBox->addItem ("Maillage suivant une rotation");
 	_operationMethodComboBox->addItem ("Maillage Delaunay (GMSH)");
-#ifdef USE_MESHGEMS
-	_operationMethodComboBox->addItem ("Maillage Delaunay (MeshGems)");
-#endif	// USE_MESHGEMS
     //_operationMethodComboBox->addItem ("Maillage Quad non structuré (pairing) [inactif]");
 	connect (_operationMethodComboBox, SIGNAL (currentIndexChanged (int)),
 	         this, SLOT (operationMethodCallback ( )));
@@ -1061,10 +956,6 @@ QtFaceMeshingPropertyPanel::QtFaceMeshingPropertyPanel (
 	_rotationalPanel->hide ( );
 	_delaunayGMSHPanel	= new QtFaceDelaunayGMSHPanel (0, mainWindow, this);
 	_delaunayGMSHPanel->hide ( );
-#ifdef USE_MESHGEMS
-    _meshGemsPanel    = new QtFaceMeshGemsPanel (0, mainWindow, this);
-    _meshGemsPanel->hide ( );
-#endif	// USE_MESHGEMS
 //    _quadPairingPanel = new QtFaceQuadPairingPanel(0, mainWindow, this);
 //    _quadPairingPanel->hide ( );
 
@@ -1085,9 +976,6 @@ QtFaceMeshingPropertyPanel::QtFaceMeshingPropertyPanel (const QtFaceMeshingPrope
 	  _transfinitePanel (0), _directionalPanel (0), _orthogonalPanel (0),
 	  _rotationalPanel (0),
 	  _delaunayGMSHPanel (0),
-#ifdef USE_MESHGEMS
-	  _meshGemsPanel(0),
-#endif	// USE_MESHGEMS
 	  _quadPairingPanel(0), _facesPanel (0)
 {
 	MGX_FORBIDDEN ("QtFaceMeshingPropertyPanel copy constructor is not allowed.");
@@ -1134,11 +1022,6 @@ CoFaceMeshingProperty* QtFaceMeshingPropertyPanel::getMeshingProperty ( ) const
 			return _rotationalPanel->getMeshingProperty ( );
 		case QtFaceMeshingPropertyPanel::DELAUNAY_GMSH			:
 			return _delaunayGMSHPanel->getMeshingProperty ( );
-#ifdef USE_MESHGEMS
-        case QtFaceMeshingPropertyPanel::TRI_MESHGEMS			:
-        	CHECK_NULL_PTR_ERROR (_meshGemsPanel)
-            return _meshGemsPanel->getMeshingProperty ( );
-#endif	// USE_MESHGEMS
 //        case QtFaceMeshingPropertyPanel::QUAD_PAIRING                :
 //            return _quadPairingPanel->getMeshingProperty ( );
 	}	// switch (getOperationMethod ( ))
@@ -1172,10 +1055,6 @@ void QtFaceMeshingPropertyPanel::reset ( )
 	_orthogonalPanel->reset ( );
 	_rotationalPanel->reset ( );
 	_delaunayGMSHPanel->reset ( );
-#ifdef USE_MESHGEMS
-	CHECK_NULL_PTR_ERROR (_meshGemsPanel)
-	_meshGemsPanel->reset ( );
-#endif	// USE_MESHGEMS
 //	_quadPairingPanel->reset ( );
 	_facesPanel->reset ( );
 
@@ -1216,9 +1095,6 @@ void QtFaceMeshingPropertyPanel::validate ( )
 		case QtFaceMeshingPropertyPanel::ORTHOGONAL				:
 		case QtFaceMeshingPropertyPanel::ROTATIONAL				:
 		case QtFaceMeshingPropertyPanel::DELAUNAY_GMSH			:
-#ifdef USE_MESHGEMS
-		case QtFaceMeshingPropertyPanel::TRI_MESHGEMS			:
-#endif	// USE_MESHGEMS
 //        case QtFaceMeshingPropertyPanel::QUAD_PAIRING           :
 			break;
 		case -1	:
@@ -1395,11 +1271,6 @@ void QtFaceMeshingPropertyPanel::operationMethodCallback ( )
 			break;
 		case QtFaceMeshingPropertyPanel::DELAUNAY_GMSH			:
 			_currentPanel	= _delaunayGMSHPanel;			break;
-#ifdef USE_MESHGEMS
-		case QtFaceMeshingPropertyPanel::TRI_MESHGEMS		:
-			CHECK_NULL_PTR_ERROR (_meshGemsPanel)
-			_currentPanel	= _meshGemsPanel;				break;
-#endif	// USE_MESHGEMS
 //		case QtFaceMeshingPropertyPanel::QUAD_PAIRING      :
 //	        _currentPanel   = _quadPairingPanel;            break;
 		default	:

@@ -906,192 +906,6 @@ void QtBlockDelaunayTetgenPanel::reset ( )
 }	// QtBlockDelaunayTetgenPanel::reset
 
 
-#ifdef USE_MESHGEMS
-// ===========================================================================
-//                        LA CLASSE QtBlockDelaunayMeshGemsPanel
-// ===========================================================================
-
-
-QtBlockDelaunayMeshGemsPanel::QtBlockDelaunayMeshGemsPanel (
-	QWidget* parent, QtMgx3DMainWindow& window, QtMgx3DOperationPanel* mainPanel)
-	: QtMgx3DOperationsSubPanel (parent, window, mainPanel),
-	  _optimLvlComboBox(0), _verbosityTextField(0), _gradationFactorTextField(0), _minSizeFactorTextField(0),
-	  _maxSizeFactorTextField(0), _optimiseWorstElmtFactorCheckBox(0), _ratioPyramiSizeTextField(0)
-{
-	QVBoxLayout*	layout	= new QVBoxLayout (this);
-	setLayout (layout);
-	layout->setContentsMargins  (0, 0, 0, 0);
-	layout->setSpacing (5);
-
-	BlockMeshingPropertyDelaunayMeshGems	props;	// Pour récupérer les valeurs par défaut
-
-	QHBoxLayout*	hlayout	= new QHBoxLayout ( );
-	layout->addLayout (hlayout);
-	QLabel*	label	= new QLabel ("Niveau d'optimisation :", this);
-	hlayout->addWidget (label);
-	_optimLvlComboBox = new QComboBox(this);
-	_optimLvlComboBox->addItem("vertices");
-	_optimLvlComboBox->addItem("light");
-	_optimLvlComboBox->addItem("standard");
-	_optimLvlComboBox->addItem("strong");
-	_optimLvlComboBox->setCurrentIndex((int)props.getOptimLvl ( ));
-	hlayout->addWidget (_optimLvlComboBox);
-
-	hlayout	= new QHBoxLayout ( );
-	layout->addLayout (hlayout);
-	label	= new QLabel (QString::fromUtf8("Niveau de verbosité :"), this);
-	hlayout->addWidget (label);
-	_verbosityTextField	=
-					new QtIntTextField (3, this);
-	_verbosityTextField->setRange (0,  10);
-	_verbosityTextField->setValue (props.getVerbosity ( ));
-	hlayout->addWidget (_verbosityTextField);
-
-	hlayout	= new QHBoxLayout ( );
-	layout->addLayout (hlayout);
-	label	= new QLabel ("Ratio max entre 2 adjacents :", this);
-	hlayout->addWidget (label);
-	_gradationFactorTextField	= &QtNumericFieldsFactory::createDistanceTextField (this);
-	_gradationFactorTextField->setValue (props.getGradation ( ));
-	hlayout->addWidget (_gradationFactorTextField);
-
-	hlayout	= new QHBoxLayout ( );
-	layout->addLayout (hlayout);
-	label	= new QLabel ("Taille minimum :", this);
-	hlayout->addWidget (label);
-	_minSizeFactorTextField	= &QtNumericFieldsFactory::createDistanceTextField (this);
-	_minSizeFactorTextField->setValue (props.getMinSize ( ));
-	hlayout->addWidget (_minSizeFactorTextField);
-
-	hlayout	= new QHBoxLayout ( );
-	layout->addLayout (hlayout);
-	label	= new QLabel ("Taille maximale :", this);
-	hlayout->addWidget (label);
-	_maxSizeFactorTextField	= &QtNumericFieldsFactory::createDistanceTextField (this);
-	_maxSizeFactorTextField->setValue (props.getMaxSize ( ));
-	hlayout->addWidget (_maxSizeFactorTextField);
-
-	_optimiseWorstElmtFactorCheckBox	= new QCheckBox("Optimisation des éléments les plus mauvais", this);
-	_optimiseWorstElmtFactorCheckBox->setCheckState (props.getOptimWorstElem ( )?Qt::Checked:Qt::Unchecked);
-	layout->addWidget (_optimiseWorstElmtFactorCheckBox);
-
-	hlayout	= new QHBoxLayout ( );
-	layout->addLayout (hlayout);
-	label	= new QLabel ("Ration hauteur pyramides :", this);
-	hlayout->addWidget (label);
-	_ratioPyramiSizeTextField	= &QtNumericFieldsFactory::createDistanceTextField (this);
-	_ratioPyramiSizeTextField->setValue (props.getRatioPyramidSize ( ));
-	hlayout->addWidget (_ratioPyramiSizeTextField);
-
-
-}	// QtBlockDelaunayMeshGemsPanel::QtBlockDelaunayMeshGemsPanel
-
-
-QtBlockDelaunayMeshGemsPanel::QtBlockDelaunayMeshGemsPanel (
-											const QtBlockDelaunayMeshGemsPanel& p)
-	  : QtMgx3DOperationsSubPanel (p),
-		_optimLvlComboBox(0), _verbosityTextField(0), _gradationFactorTextField(0), _minSizeFactorTextField(0),
-			  _maxSizeFactorTextField(0), _optimiseWorstElmtFactorCheckBox(0), _ratioPyramiSizeTextField(0)
-{
-	MGX_FORBIDDEN ("QtBlockDelaunayMeshGemsPanel copy constructor is not allowed.");
-}	// QtBlockDelaunayMeshGemsPanel::QtBlockDelaunayMeshGemsPanel
-
-
-QtBlockDelaunayMeshGemsPanel& QtBlockDelaunayMeshGemsPanel::operator = (
-											const QtBlockDelaunayMeshGemsPanel&)
-{
-	 MGX_FORBIDDEN ("QtBlockDelaunayMeshGemsPanel assignment operator is not allowed.");
-	return *this;
-}	// QtBlockDelaunayMeshGemsPanel::operator =
-
-
-QtBlockDelaunayMeshGemsPanel::~QtBlockDelaunayMeshGemsPanel ( )
-{
-}	// QtBlockDelaunayMeshGemsPanel::~QtBlockDelaunayMeshGemsPanel
-
-
-BlockMeshingPropertyDelaunayMeshGems*
-						QtBlockDelaunayMeshGemsPanel::getMeshingProperty ( ) const
-{
-	return new BlockMeshingPropertyDelaunayMeshGems (
-			getOptimLvl ( ), getVerbosity ( ), getGradation(),
-			getMinSize(), getMaxSize(), getOptimWorstElem(), getRatioPyramidSize());
-}	// QtBlockDelaunayMeshGemsPanel::getMeshingProperty
-
-
-int QtBlockDelaunayMeshGemsPanel::getVerbosity ( ) const
-{
-	CHECK_NULL_PTR_ERROR (_verbosityTextField)
-	return _verbosityTextField->getValue ( );
-}	// QtBlockDelaunayMeshGemsPanel::getVerbosity
-
-
-Topo::BlockMeshingPropertyDelaunayMeshGems::MeshGemsOptimizationLevel QtBlockDelaunayMeshGemsPanel::getOptimLvl ( ) const
-{
-	CHECK_NULL_PTR_ERROR (_optimLvlComboBox)
-	return (Topo::BlockMeshingPropertyDelaunayMeshGems::MeshGemsOptimizationLevel)_optimLvlComboBox->currentIndex ( );
-}	// QtBlockDelaunayMeshGemsPanel::getOptimLvl
-
-
-double QtBlockDelaunayMeshGemsPanel::getGradation ( ) const
-{
-	CHECK_NULL_PTR_ERROR (_gradationFactorTextField)
-	return _gradationFactorTextField->getValue ( );
-}	// QtBlockDelaunayMeshGemsPanel::getGradation
-
-double QtBlockDelaunayMeshGemsPanel::getMinSize ( ) const
-{
-	CHECK_NULL_PTR_ERROR (_minSizeFactorTextField)
-	return _minSizeFactorTextField->getValue ( );
-}	// QtBlockDelaunayMeshGemsPanel::getMinSize
-
-double QtBlockDelaunayMeshGemsPanel::getMaxSize ( ) const
-{
-	CHECK_NULL_PTR_ERROR (_maxSizeFactorTextField)
-	return _maxSizeFactorTextField->getValue ( );
-}	// QtBlockDelaunayMeshGemsPanel::getMaxSize
-
-bool QtBlockDelaunayMeshGemsPanel::getOptimWorstElem ( ) const
-{
-	CHECK_NULL_PTR_ERROR (_optimiseWorstElmtFactorCheckBox)
-	return _optimiseWorstElmtFactorCheckBox->checkState()==Qt::Checked;
-}	// QtBlockDelaunayMeshGemsPanel::getOptimWorstElem
-
-double QtBlockDelaunayMeshGemsPanel::getRatioPyramidSize ( ) const
-{
-	CHECK_NULL_PTR_ERROR (_ratioPyramiSizeTextField)
-	return _ratioPyramiSizeTextField->getValue ( );
-}	// QtBlockDelaunayMeshGemsPanel::getRatioPyramidSize
-
-void QtBlockDelaunayMeshGemsPanel::reset ( )
-{
-	BEGIN_QT_TRY_CATCH_BLOCK
-
-	BlockMeshingPropertyDelaunayMeshGems	props;	// Pour récupérer les valeurs par défaut
-	CHECK_NULL_PTR_ERROR (_optimLvlComboBox)
-	CHECK_NULL_PTR_ERROR (_verbosityTextField)
-	CHECK_NULL_PTR_ERROR (_gradationFactorTextField)
-	CHECK_NULL_PTR_ERROR (_minSizeFactorTextField)
-	CHECK_NULL_PTR_ERROR (_maxSizeFactorTextField)
-	CHECK_NULL_PTR_ERROR (_optimiseWorstElmtFactorCheckBox)
-	CHECK_NULL_PTR_ERROR (_ratioPyramiSizeTextField)
-
-	_optimLvlComboBox->setCurrentIndex((int)props.getOptimLvl ( ));
-	_verbosityTextField->setValue (props.getVerbosity ( ));
-	_gradationFactorTextField->setValue (props.getGradation ( ));
-	_minSizeFactorTextField->setValue (props.getMinSize ( ));
-	_maxSizeFactorTextField->setValue (props.getMaxSize ( ));
-	_optimiseWorstElmtFactorCheckBox->setCheckState (props.getOptimWorstElem ( )?Qt::Checked:Qt::Unchecked);
-	_ratioPyramiSizeTextField->setValue (props.getRatioPyramidSize());
-
-	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
-
-	QtMgx3DOperationPanel::reset ( );
-}	// QtBlockDelaunayMeshGemsPanel::reset
-#endif	// USE_MESHGEMS
-
-
-
 // ===========================================================================
 //                        LA CLASSE QtBlockMeshInsertionPanel
 // ===========================================================================
@@ -1150,10 +964,7 @@ QtBlockMeshingPropertyPanel::QtBlockMeshingPropertyPanel (
 	  _operationMethodComboBox (0),
 	  _currentParentWidget (0), _currentPanel (0),
 	  _transfinitePanel (0), _directionalPanel (0), _orthogonalPanel (0),
-	  _rotationalPanel (0), 
-#ifdef USE_MESHGEMS
-	  _delaunayMeshGemsPanel(0),
-#endif	// USE_MESHGEMS
+	  _rotationalPanel (0),
 	  _delaunayTetgenPanel (0),
 	  _meshInsertionPanel (0), _blocksPanel (0)
 {
@@ -1190,9 +1001,6 @@ QtBlockMeshingPropertyPanel::QtBlockMeshingPropertyPanel (
 	_operationMethodComboBox->addItem ("Maillage directionnel");
 	_operationMethodComboBox->addItem ("Maillage directionnel orthogonal");
 	_operationMethodComboBox->addItem ("Maillage suivant une rotation");
-#ifdef USE_MESHGEMS
-	_operationMethodComboBox->addItem ("Maillage Delaunay (MeshGems)");
-#endif	// USE_MESHGEMS
 	_operationMethodComboBox->addItem ("Maillage Delaunay (Tetgen)");
 	_operationMethodComboBox->addItem (QString::fromUtf8("Maillage non structuré par insertion de maillage (Nico)"));
 	connect (_operationMethodComboBox, SIGNAL (currentIndexChanged (int)),
@@ -1229,10 +1037,6 @@ QtBlockMeshingPropertyPanel::QtBlockMeshingPropertyPanel (
 	_orthogonalPanel->hide ( );
 	_rotationalPanel	= new QtBlockRotationalPanel (0, mainWindow, this);
 	_rotationalPanel->hide ( );
-#ifdef USE_MESHGEMS
-	_delaunayMeshGemsPanel	= new QtBlockDelaunayMeshGemsPanel (0, mainWindow, this);
-	_delaunayMeshGemsPanel->hide ( );
-#endif	// USE_MESHGEMS
 	_delaunayTetgenPanel	=
 					new QtBlockDelaunayTetgenPanel (0, mainWindow, this);
 	_delaunayTetgenPanel->hide ( );
@@ -1258,9 +1062,6 @@ QtBlockMeshingPropertyPanel::QtBlockMeshingPropertyPanel (
 	  _currentParentWidget (0), _currentPanel (0),
 	  _transfinitePanel (0), _directionalPanel (0), _orthogonalPanel (0),
 	  _rotationalPanel (0),
-#ifdef USE_MESHGEMS
-	  _delaunayMeshGemsPanel(0),
-#endif	// USE_MESHGEMS
 	  _delaunayTetgenPanel (0),
 	  _meshInsertionPanel (0), _blocksPanel (0)
 {
@@ -1296,10 +1097,6 @@ void QtBlockMeshingPropertyPanel::reset ( )
 	_directionalPanel->reset ( );
 	_orthogonalPanel->reset ( );
 	_rotationalPanel->reset ( );
-#ifdef USE_MESHGEMS
-	CHECK_NULL_PTR_ERROR (_delaunayMeshGemsPanel)
-	_delaunayMeshGemsPanel->reset ( );
-#endif	// USE_MESHGEMS
 	_delaunayTetgenPanel->reset ( );
 	_meshInsertionPanel->reset ( );
 	_blocksPanel->reset ( );
@@ -1336,11 +1133,6 @@ BlockMeshingProperty* QtBlockMeshingPropertyPanel::getMeshingProperty ( ) const
 			return _orthogonalPanel->getMeshingProperty ( );
 		case QtBlockMeshingPropertyPanel::ROTATIONAL				:
 			return _rotationalPanel->getMeshingProperty ( );
-#ifdef USE_MESHGEMS
-		case QtBlockMeshingPropertyPanel::DELAUNAY_MESHGEMS			:
-			CHECK_NULL_PTR_ERROR (_delaunayMeshGemsPanel)
-			return _delaunayMeshGemsPanel->getMeshingProperty ( );
-#endif	// USE_MESHGEMS
 		case QtBlockMeshingPropertyPanel::DELAUNAY_TETGEN			:
 			return _delaunayTetgenPanel->getMeshingProperty ( );
 		case QtBlockMeshingPropertyPanel::MESH_INSERTION			:
@@ -1396,9 +1188,6 @@ void QtBlockMeshingPropertyPanel::validate ( )
 		case QtBlockMeshingPropertyPanel::DIRECTIONAL			:
 		case QtBlockMeshingPropertyPanel::ORTHOGONAL			:
 		case QtBlockMeshingPropertyPanel::ROTATIONAL			:
-#ifdef USE_MESHGEMS
-		case QtBlockMeshingPropertyPanel::DELAUNAY_MESHGEMS		:
-#endif	// USE_MESHGEMS
 		case QtBlockMeshingPropertyPanel::DELAUNAY_TETGEN		:
 		case QtBlockMeshingPropertyPanel::MESH_INSERTION		:
 			break;
@@ -1586,11 +1375,6 @@ void QtBlockMeshingPropertyPanel::operationMethodCallback ( )
 			_blocksPanel->getNameTextField ( )->setLinkedSeizureManagers (
 				_rotationalPanel->getAxePoint2TextField ( ), 0);
 			break;
-#ifdef USE_MESHGEMS
-		case QtBlockMeshingPropertyPanel::DELAUNAY_MESHGEMS			:
-			CHECK_NULL_PTR_ERROR (_delaunayMeshGemsPanel)
-			_currentPanel	= _delaunayMeshGemsPanel;			break;
-#endif	// USE_MESHGEMS
 		case QtBlockMeshingPropertyPanel::DELAUNAY_TETGEN			:
 			_currentPanel	= _delaunayTetgenPanel;			break;
 		case QtBlockMeshingPropertyPanel::MESH_INSERTION		:

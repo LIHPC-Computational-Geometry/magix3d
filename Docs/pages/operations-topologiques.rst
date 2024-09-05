@@ -577,9 +577,6 @@ suivantes :
 -  *Delaunay (NetGen)*, méthode non-structurée, construit des triangles
    mais pas toujours robuste.
 
--  *Delaunay (MeshGems)*, méthode non-structurée, construit des
-   triangles à l’aide de la bibliothèque commerciale GEMS.
-
 Ce panneau a son équivalent pour les blocs, voir :ref:`parametrage-discretisation-blocs`.
 
 Opérations associées aux blocs topologiques
@@ -776,9 +773,6 @@ suivantes :
 
 -  *Suivant une rotation*, méthode structurée bien adaptée aux blocs
    construits par révolution.
-
--  *Delaunay (MeshGems)*, méthode non-structurée, construit des
-   tétraèdres à l’aide de la bibliothèque commerciale GEMS.
 
 -  *Delaunay (TetGen)*, méthode non-structurée, construit des
    tétraèdres.

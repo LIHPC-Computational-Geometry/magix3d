@@ -54,16 +54,10 @@ using std::ptrdiff_t;
 #include "Topo/FaceMeshingPropertyTransfinite.h"
 #include "Topo/FaceMeshingPropertyDelaunayGMSH.h"
 #include "Topo/FaceMeshingPropertyQuadPairing.h"
-#ifdef USE_MESHGEMS
-#include "Topo/FaceMeshingPropertyMeshGems.h"
-#endif	// USE_MESHGEMS
 #include "Topo/BlockMeshingPropertyDirectional.h"
 #include "Topo/BlockMeshingPropertyOrthogonal.h"
 #include "Topo/BlockMeshingPropertyRotational.h"
 #include "Topo/BlockMeshingPropertyTransfinite.h"
-#ifdef USE_MESHGEMS
-#include "Topo/BlockMeshingPropertyDelaunayMeshGems.h"
-#endif	// USE_MESHGEMS
 #include "Topo/BlockMeshingPropertyDelaunayTetgen.h"
 #include "Topo/BlockMeshingPropertyInsertion.h"
 
@@ -335,13 +329,11 @@ using std::ptrdiff_t;
 %include Topo/FaceMeshingPropertyTransfinite.h
 %include Topo/FaceMeshingPropertyDelaunayGMSH.h
 %include Topo/FaceMeshingPropertyQuadPairing.h
-%include Topo/FaceMeshingPropertyMeshGems.h
 %include Topo/BlockMeshingProperty.h
 %include Topo/BlockMeshingPropertyDirectional.h
 %include Topo/BlockMeshingPropertyOrthogonal.h
 %include Topo/BlockMeshingPropertyRotational.h
 %include Topo/BlockMeshingPropertyTransfinite.h
-%include Topo/BlockMeshingPropertyDelaunayMeshGems.h
 %include Topo/BlockMeshingPropertyDelaunayTetgen.h
 %include Topo/BlockMeshingPropertyInsertion.h
 

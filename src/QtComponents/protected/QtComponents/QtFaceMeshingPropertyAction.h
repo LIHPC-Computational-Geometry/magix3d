@@ -18,9 +18,6 @@
 #include "Topo/FaceMeshingPropertyOrthogonal.h"
 #include "Topo/FaceMeshingPropertyRotational.h"
 #include "Topo/FaceMeshingPropertyDelaunayGMSH.h"
-#ifdef USE_MESHGEMS
-#include "Topo/FaceMeshingPropertyMeshGems.h"
-#endif	// USE_MESHGEMS
 #include "Topo/FaceMeshingPropertyQuadPairing.h"
 
 #include <QtUtil/QtIntTextField.h>
@@ -406,69 +403,6 @@ class QtFaceDelaunayGMSHPanel : public QtMgx3DOperationsSubPanel
 };	// class QtFaceDelaunayGMSHPanel
 
 
-#ifdef USE_MESHGEMS
-/**
- * Le paramétrage d'un maillage triangulaire surfacique via <I>MeshGems</I>.
- */
-class QtFaceMeshGemsPanel : public QtMgx3DOperationsSubPanel
-{
-	public :
-
-	/**
-	 * \param		Widget parent
-	 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement,
-	 *				utilisée notamment pour récupérer le contexte.
-	 * \param		Eventuel panneau de rattachement.
-	 */
-	QtFaceMeshGemsPanel (
-				QWidget* parent, Mgx3D::QtComponents::QtMgx3DMainWindow& mw,
-				QtMgx3DOperationPanel* mainPanel);
-
-	/**
-	 * Destructeur. RAS.
-	 */
-	virtual ~QtFaceMeshGemsPanel ( );
-
-	/**
-	 * Réinitialise le panneau.
-	 */
-	virtual void reset ( );
-
-	/**
-	 * \return		La propriété de maillage de la face conforme au panneau.
-	 */
-	virtual Mgx3D::Topo::FaceMeshingPropertyMeshGems*
-											getMeshingProperty ( ) const;
-
-	/**
-	 * \return		Le paramètre <I>size</I> pour <I>MeshGems</I>.
-	 * \see			getSize
-	 */
-	virtual double getSize ( ) const;
-
-	/**
-	 * \return		Le paramètre <I>gradation</I> pour <I>MeshGems</I>.
-	 * \see			getGradation
-	 */
-	virtual double getGradation ( ) const;
-
-
-	private :
-
-	/**
-	 * Constructeur de copie et opérateur = : interdits.
-	 */
-	QtFaceMeshGemsPanel (const QtFaceMeshGemsPanel&);
-	QtFaceMeshGemsPanel& operator = (const QtFaceMeshGemsPanel&);
-
-	/** La valeur size pour <I>MeshGems</I>. */
-	QtDoubleTextField			*_sizeTextField;
-	/** La valeur gradation pour <I>MeshGems</I>. */
-	QtDoubleTextField			*_gradTextField;
-};	// class QtFaceMeshGemsPanel
-#endif	// USE_MESHGEMS
-
-
 /**
  * Le paramétrage d'un maillage surfacique par appariement de triangles.
  */
@@ -545,18 +479,9 @@ class QtFaceMeshingPropertyPanel : public QtMgx3DOperationPanel
 	 * <LI>Maillage structuré directionnel orthogonal
 	 * <LI>Maillage structuré rotationnel
 	 * <LI>Maillage non structuré Delaunay généré par <I>GMSH</I>
-	 * <LI>Maillage non structuré triangulaire généré par <I>MeshGems</I>
-	 * 
-	 * <LI>Maillage non structuré quadrangulaire généré par appariement de triangles
 	 * </OL>
 	 */
-	enum OPERATION_METHOD { TRANSFINITE, DIRECTIONAL, ORTHOGONAL, ROTATIONAL, 
-	                        DELAUNAY_GMSH, 
-#ifdef USE_MESHGEMS
-	                        TRI_MESHGEMS
-#endif				// USE_MESHGEMS
-							//,QUAD_PAIRING
-	};
+	enum OPERATION_METHOD { TRANSFINITE, DIRECTIONAL, ORTHOGONAL, ROTATIONAL, DELAUNAY_GMSH };
 
 	/**
 	 * Créé l'ihm.
@@ -690,11 +615,6 @@ class QtFaceMeshingPropertyPanel : public QtMgx3DOperationPanel
 	/** Maillage non structuré Delaunay généré avec <I>GMSH</I>. */
 	QtFaceDelaunayGMSHPanel*					_delaunayGMSHPanel;
 
-
-#ifdef USE_MESHGEMS
-    /** Maillage non structuré triangulaire généré avec <I>MeshGems</I> (Distene). */
-    QtFaceMeshGemsPanel*                  		_meshGemsPanel;
-#endif				// USE_MESHGEMS
     /** Maillage non structuré par appariement de quads. */
     QtFaceQuadPairingPanel*                  	_quadPairingPanel;
 

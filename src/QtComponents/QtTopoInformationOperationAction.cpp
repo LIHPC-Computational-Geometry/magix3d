@@ -362,11 +362,7 @@ void QtTopoInformationOperationPanel::autoUpdate ( )
 	    		nb_dom_str_trans  += 1;
 	    		nb_regions_str_trans += nb;
 	    	}
-	    	else if (bloc->getMeshLaw() == Topo::BlockMeshingProperty::delaunayTetgen
-#ifdef USE_MESHGEMS
-					|| bloc->getMeshLaw() == Topo::BlockMeshingProperty::delaunayMeshGemsVol
-#endif
-					){
+	    	else if (bloc->getMeshLaw() == Topo::BlockMeshingProperty::delaunayTetgen){
 	    		nb_dom_unstr += 1;
 	    		nb_regions_unstr += nb;
 	    	}
@@ -391,9 +387,6 @@ void QtTopoInformationOperationPanel::autoUpdate ( )
 	            nb_faces_str_trans += nb;
 	        }
 	        else if (coface->getMeshLaw() == Topo::CoFaceMeshingProperty::delaunayGMSH
-#ifdef USE_MESHGEMS
-					|| coface->getMeshLaw() == Topo::CoFaceMeshingProperty::MeshGems
-#endif	// USE_MESHGEMS
 					){
 	            nb_fac_unstr += 1;
 	            nb_faces_unstr += nb;

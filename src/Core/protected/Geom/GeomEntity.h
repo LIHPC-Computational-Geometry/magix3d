@@ -45,8 +45,7 @@ class GeomProperty;
 class MementoGeomEntity;
 /*----------------------------------------------------------------------------*/
    /** \enum Orientation gives a list of orientation option for geometric
-    *        entities. 
-    * 							USEFUL FOR THE MESHGEMS Connection
+    *        entities.
     */
    typedef enum {
      GEOM_FORWARD,

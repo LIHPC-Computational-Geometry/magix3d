@@ -33,9 +33,6 @@
 #include "Topo/BlockMeshingPropertyRotational.h"
 #include "Topo/BlockMeshingPropertyTransfinite.h"
 #include "Topo/BlockMeshingPropertyDelaunayTetgen.h"
-#ifdef USE_MESHGEMS
-#include "Topo/BlockMeshingPropertyDelaunayMeshGems.h"
-#endif	// USE_MESHGEMS
 
 #include "Mesh/CommandCreateMesh.h"
 
@@ -122,16 +119,9 @@ Block(Internal::Context& ctx,
     if (isStructured){
         m_mesh_property = new BlockMeshingPropertyTransfinite();
     }
-#ifdef USE_MESHGEMS
-    else {
-        //Changement de Netgen a Tetgen pour la valeur par defaut F. Ledoux 30/10/13
-    	// Changement de Tetgen à MeshGems pour la valeur par défaut, EB le 3/5/2019
-        m_mesh_property = new BlockMeshingPropertyDelaunayMeshGems();
-    }
-#else
-    else
+    else{
 		m_mesh_property = new BlockMeshingPropertyDelaunayTetgen ( );   // Or Triton ???
-#endif	// USE_MESHGEMS
+    }
 
 #ifdef _DEBUG_MEMORY
     std::cout<<"Block::Block() avec les faces :";
@@ -1377,13 +1367,7 @@ unstructure(Internal::InfoCommand* icmd)
     if (!isStructured())
         return;
 
-#ifdef USE_MESHGEMS	
-    BlockMeshingProperty* prop = new BlockMeshingPropertyDelaunayMeshGems();
-    switchBlockMeshingProperty(icmd, prop);
-    delete prop;
-#else	// USE_MESHGEMS
 	throw TkUtil::Exception (TkUtil::UTF8String ("Non structuration d'un bloc non prévue", TkUtil::Charset::UTF_8));
-#endif	// USE_MESHGEMS
 
     // propage la non-structuration aux faces autant que possible
     for (uint i=0; i<6; i++)
@@ -1397,13 +1381,7 @@ void Block::setStructured(Internal::InfoCommand* icmd, bool str)
         throw TkUtil::Exception (TkUtil::UTF8String ("Structuration d'un bloc non prévue", TkUtil::Charset::UTF_8));
 
     if (isStructured()){
-#ifdef USE_MESHGEMS	
-        BlockMeshingProperty* prop = new BlockMeshingPropertyDelaunayMeshGems();
-        switchBlockMeshingProperty(icmd, prop);
-        delete prop;
-#else	// USE_MESHGEMS
 		throw TkUtil::Exception (TkUtil::UTF8String ("Structuration d'un bloc non prévue", TkUtil::Charset::UTF_8));
-#endif	// USE_MESHGEMS
     }
 }
 /*----------------------------------------------------------------------------*/

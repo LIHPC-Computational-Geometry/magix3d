@@ -37,9 +37,6 @@ public:
 		orthogonal,
         rotational,
         transfinite,
-#ifdef USE_MESHGEMS
-		MeshGems,        // recommandé, payant, mais le meilleur
-#endif	// USE_MESHGEMS
         delaunayGMSH,    // recommandé / delaunay GMSH
         quadPairing
     } meshLaw;

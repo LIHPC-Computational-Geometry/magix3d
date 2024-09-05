@@ -220,10 +220,6 @@ private:
     /// Création d'un maillage tétraédrique de Delaunay pour un bloc (version Tetgen)
     virtual void meshDelaunayTetgen(Mesh::CommandCreateMesh* command, Topo::Block* b);
 
-#ifdef USE_MESHGEMS
-    /// Création d'un maillage tétraédrique de Delaunay pour un bloc (version MeshGems)
-    virtual void meshDelaunayMeshGemsVol(Mesh::CommandCreateMesh* command, Topo::Block* b);
-#endif	// USE_MESHGEMS
     /// Création d'un maillage triangulaire de Delaunay pour un bloc par insertion
     virtual void meshInsertion(Mesh::CommandCreateMesh* command, Topo::Block* b);
 
@@ -233,16 +229,11 @@ private:
     /// Création d'un maillage transfini pour une face commune
     virtual void meshStrutured(Mesh::CommandCreateMesh* command, Topo::CoFace* fa);
 
-#ifdef USE_MESHGEMS
-    /// Création d'un maillage triangulaire  pour une face commune (version MeshGems)
-    virtual void meshTriangularMeshGems(Mesh::CommandCreateMesh* command, Topo::CoFace* fa);
-#endif	// USE_MESHGEMS
-
     /// Création d'un maillage triangulaire de Delaunay pour une face commune (version GMSH)
     virtual void meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo::CoFace* fa);
+
     /// Création d'un maillage quadrangulaire non structuré pour une face commune
     virtual void meshQuadPairing(Mesh::CommandCreateMesh* command, Topo::CoFace* fa);
-
 
 
     /** Création des coordonnées internes d'un quadrangle déformé, par méthode transfinie

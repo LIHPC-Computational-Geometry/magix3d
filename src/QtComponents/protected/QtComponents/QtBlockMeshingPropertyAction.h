@@ -18,9 +18,6 @@
 #include "Topo/BlockMeshingPropertyOrthogonal.h"
 #include "Topo/BlockMeshingPropertyRotational.h"
 #include "Topo/BlockMeshingPropertyDelaunayTetgen.h"
-#ifdef USE_MESHGEMS
-#include "Topo/BlockMeshingPropertyDelaunayMeshGems.h"
-#endif	// USE_MESHGEMS
 #include "Topo/BlockMeshingPropertyInsertion.h"
 
 #include <QtUtil/QtIntTextField.h>
@@ -428,7 +425,7 @@ class QtBlockDelaunayTetgenPanel : public QtMgx3DOperationsSubPanel
 	virtual double getQualityFactor ( ) const;
 
 	/**
-	 * \return		La ratio pour la taille des pyramides pour <I>MeshGems</I>.
+	 * \return		La ratio pour la taille des pyramides pour <I>Tetgen</I>.
 	 */
 	virtual double getRatioPyramidSize ( ) const;
 
@@ -444,95 +441,6 @@ class QtBlockDelaunayTetgenPanel : public QtMgx3DOperationsSubPanel
 	/** Les valeurs min et max pour <I>Tetgen</I>. */
 	QtDoubleTextField			*_volMaxTextField, *_qualityFactorTextField, *_ratioPyramiSizeTextField;
 };	// class QtBlockDelaunayTetgenPanel
-
-
-#ifdef USE_MESHGEMS
-/**
- * Le paramétrage d'un maillage Delaunay via <I>MeshGems</I>.
- */
-class QtBlockDelaunayMeshGemsPanel : public QtMgx3DOperationsSubPanel
-{
-	public :
-
-	/**
-	 * \param		Widget parent
-	 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement,
-	 *				utilisée notamment pour récupérer le contexte.
-	 * \param		Eventuel panneau de rattachement.
-	 */
-	QtBlockDelaunayMeshGemsPanel (
-				QWidget* parent, Mgx3D::QtComponents::QtMgx3DMainWindow& mw,
-				QtMgx3DOperationPanel* mainPanel = 0);
-
-	/**
-	 * Destructeur. RAS.
-	 */
-	virtual ~QtBlockDelaunayMeshGemsPanel ( );
-
-	/**
-	 * Réinitialise le panneau.
-	 */
-	virtual void reset ( );
-
-	/**
-	 * \return		La propriété de maillage de du bloc conforme au panneau.
-	 */
-	virtual Mgx3D::Topo::BlockMeshingPropertyDelaunayMeshGems*
-											getMeshingProperty ( ) const;
-
-	/**
-	 * \return		Accesseur sur la verbosité de l'appel à  <I>MeshGems</I>.
-	 */
-	virtual int getVerbosity ( ) const;
-
-	/**
-	 * \return		Le <I>niveau d'optimisation</I> pour <I>MeshGems</I>.
-	 */
-	virtual Topo::BlockMeshingPropertyDelaunayMeshGems::MeshGemsOptimizationLevel getOptimLvl ( ) const;
-
-	/**
-	 * \return		Le ration max des arêtes pour 2 tétraêdres adjacents pour <I>MeshGems</I>.
-	 */
-	virtual double getGradation ( ) const;
-
-	/**
-	 * \return		La taille minimum pour <I>MeshGems</I>.
-	 */
-	virtual double getMinSize ( ) const;
-
-	/**
-	 * \return		La taille maximale pour <I>MeshGems</I>.
-	 */
-	virtual double getMaxSize ( ) const;
-
-	/**
-	 * \return		Si doit être fait une optimisation des mauvais éléments <I>MeshGems</I>.
-	 */
-	virtual bool getOptimWorstElem ( ) const;
-
-	/**
-	 * \return		La ratio pour la taille des pyramides pour <I>MeshGems</I>.
-	 */
-	virtual double getRatioPyramidSize ( ) const;
-
-
-	private :
-
-	/**
-	 * Constructeur de copie et opérateur = : interdits.
-	 */
-	QtBlockDelaunayMeshGemsPanel (const QtBlockDelaunayMeshGemsPanel&);
-	QtBlockDelaunayMeshGemsPanel& operator = (const QtBlockDelaunayMeshGemsPanel&);
-
-	/** Quelques paramètres pour <I>MeshGems</I>. */
-	QComboBox                   *_optimLvlComboBox;
-	QtIntTextField              *_verbosityTextField;
-	QtDoubleTextField			*_gradationFactorTextField,
-								*_minSizeFactorTextField, *_maxSizeFactorTextField,
-								*_ratioPyramiSizeTextField;
-	QCheckBox                   *_optimiseWorstElmtFactorCheckBox;
-};	// class QtBlockDelaunayMeshGemsPanel
-#endif	// USE_MESHGEMS
 
 
 /**
@@ -589,15 +497,10 @@ class QtBlockMeshingPropertyPanel : public QtMgx3DOperationPanel
 	 * <LI>Maillage structuré directionnel
 	 * <LI>Maillage structuré directionnel orthogonal
 	 * <LI>Maillage structuré rotationnel
-	 * <LI>Maillage non structuré Delaunay généré par <I>MeshGems</I>
 	 * <LI>Maillage non structuré Delaunay généré par <I>Tetgen</I>
 	 * </OL>
 	 */
-	enum OPERATION_METHOD { TRANSFINITE, DIRECTIONAL, ORTHOGONAL, ROTATIONAL,
-#ifdef USE_MESHGEMS
-		DELAUNAY_MESHGEMS,
-#endif	// USE_MESHGEMS
-		DELAUNAY_TETGEN, MESH_INSERTION };
+	enum OPERATION_METHOD { TRANSFINITE, DIRECTIONAL, ORTHOGONAL, ROTATIONAL, DELAUNAY_TETGEN, MESH_INSERTION };
 
 	/**
 	 * Créé l'ihm.
@@ -735,14 +638,8 @@ class QtBlockMeshingPropertyPanel : public QtMgx3DOperationPanel
 	/** Maillage structuré rotationnel. */
 	QtBlockRotationalPanel*						_rotationalPanel;
 
-#ifdef USE_MESHGEMS
-	/** Maillage non structuré Delaunay généré avec <I>MeshGems</I>. */
-	QtBlockDelaunayMeshGemsPanel*				_delaunayMeshGemsPanel;
-#endif	// USE_MESHGEMS
-
 	/** Maillage non structuré Delaunay généré avec <I>Tetgen</I>. */
 	QtBlockDelaunayTetgenPanel*					_delaunayTetgenPanel;
-
 
 	/** Maillage non structuré obtenu par insertion de maillage. */
 	QtBlockMeshInsertionPanel*					_meshInsertionPanel;
