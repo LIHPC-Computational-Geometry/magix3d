@@ -109,12 +109,14 @@ Mgx3D::Utils::SerializedRepresentation* Vertex::getDescription (bool alsoCompute
 											"Propriété géométrique", coordsProp.getValue ( ));
 	propertyGeomDescription.addProperty (coordsProp);
 
+#ifdef _DEBUG		// Issue#111
     // précision OpenCascade ou autre
 	TkUtil::UTF8String	precStr (TkUtil::Charset::UTF_8);
     precStr<<getComputationalProperty()->getPrecision();
 
     propertyGeomDescription.addProperty (
     	        Utils::SerializedRepresentation::Property ("Précision", precStr.ascii()) );
+#endif	// _DEBUG
 
     bool isFaceted = false;
     FacetedVertex* fv = dynamic_cast<FacetedVertex*>(getComputationalProperty());
