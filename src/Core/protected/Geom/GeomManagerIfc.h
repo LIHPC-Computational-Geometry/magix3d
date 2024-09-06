@@ -856,7 +856,7 @@ public:
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc*
 	     common2DOnCopy(std::string entity1, std::string entity2, std::string groupName);
-	SET_SWIG_COMPLETABLE_METHOD(common2DOnCopy)
+    SET_SWIG_COMPLETABLE_METHOD(common2DOnCopy)
 
     /*------------------------------------------------------------------------*/
     /** \brief Différence Booléenne de n entités géométriques avec la première
@@ -872,6 +872,16 @@ public:
         cut(std::vector<std::string>& tokeep,std::vector<std::string>& tocut);
 
     /*------------------------------------------------------------------------*/
+    /** \brief Import d'un fichier au format BREP
+     *
+     *  \param n le nom du ficher dont le contenu doit etre importe
+     *  \param testVolumicProperties test que les volumes sont fermés
+     *  \param splitCompoundCurves décompose les courbes composites en de multiples courbes
+     */
+    virtual Mgx3D::Internal::M3DCommandResultIfc* importBREP(std::string n, const bool testVolumicProperties=true, const bool splitCompoundCurves=false);
+    SET_SWIG_COMPLETABLE_METHOD(importBREP)
+
+    /*------------------------------------------------------------------------*/
     /** \brief Import d'un fichier au format CATIA
      *
      *  \param n le nom du ficher dont le contenu doit etre importe
@@ -879,7 +889,7 @@ public:
      *  \param splitCompoundCurves décompose les courbes composites en de multiples courbes
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc* importCATIA(std::string n, const bool testVolumicProperties=true, const bool splitCompoundCurves=false);
-	SET_SWIG_COMPLETABLE_METHOD(importCATIA)
+    SET_SWIG_COMPLETABLE_METHOD(importCATIA)
 
     /*------------------------------------------------------------------------*/
     /** \brief Import d'un fichier au format STEP
@@ -889,7 +899,7 @@ public:
      *  \param splitCompoundCurves décompose les courbes composites en de multiples courbes
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc* importSTEP(std::string n, const bool testVolumicProperties=true, const bool splitCompoundCurves=false);
-	SET_SWIG_COMPLETABLE_METHOD(importSTEP)
+    SET_SWIG_COMPLETABLE_METHOD(importSTEP)
 
     /*------------------------------------------------------------------------*/
     /** \brief Import d'un fichier au format STL
@@ -897,7 +907,7 @@ public:
      *  \param n le nom du ficher dont le contenu doit etre importe
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc* importSTL(std::string n);
-	SET_SWIG_COMPLETABLE_METHOD(importSTL)
+    SET_SWIG_COMPLETABLE_METHOD(importSTL)
 
     /*------------------------------------------------------------------------*/
     /** \brief Import d'un fichier au format IGES
@@ -906,7 +916,7 @@ public:
      *  \param splitCompoundCurves décompose les courbes composites en de multiples courbes
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc* importIGES(std::string n, const bool splitCompoundCurves=false);
-	SET_SWIG_COMPLETABLE_METHOD(importIGES)
+    SET_SWIG_COMPLETABLE_METHOD(importIGES)
 
     /*------------------------------------------------------------------------*/
     /** \brief Import d'un fichier au format MDL
@@ -992,7 +1002,22 @@ public:
      *  \param n le nom du ficher dans lequel on exporte
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc* exportMLI(std::vector<std::string>& ge,
-    		const std::string& n);
+            const std::string& n);
+
+    /*------------------------------------------------------------------------*/
+    /** \brief Export au format BREP de toute la géométrie
+     *
+     *  \param n le nom du ficher dans lequel on exporte
+     */
+    virtual Mgx3D::Internal::M3DCommandResultIfc* exportBREP(const std::string& n);
+
+    /** \brief Export d'une sélection au format BREP
+     *
+     *  \param ge la liste des noms des entités à exporter
+     *  \param n le nom du ficher dans lequel on exporte
+     */
+    virtual Mgx3D::Internal::M3DCommandResultIfc* exportBREP(std::vector<std::string>& ge,
+            const std::string& n);
 
     /*------------------------------------------------------------------------*/
     /** \brief Export au format STEP de toute la géométrie
@@ -1007,7 +1032,7 @@ public:
      *  \param n le nom du ficher dans lequel on exporte
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc* exportSTEP(std::vector<std::string>& ge,
-    		const std::string& n);
+            const std::string& n);
 
     /*------------------------------------------------------------------------*/
     /** \brief Export au format IGES de toute la géométrie

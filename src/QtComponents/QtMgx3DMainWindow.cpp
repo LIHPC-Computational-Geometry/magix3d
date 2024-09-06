@@ -5402,6 +5402,7 @@ log (t5);
 			QStringList filters;
 			filters << "Magix MDL (*.mdl)";
 			filters << "Catia (*.CATPart *.CATProduct)";
+			filters << "BREP (*.brep)";
 			filters << "STEP (*.stp *.step)";
 			filters << "IGES (*.igs *.iges)";
 			UTF8String limaFilter(Charset::UTF_8);
@@ -5571,24 +5572,45 @@ log (t5);
 								getContext().getGeomManager().importIGES(fileName, splitCompoundCurves);
 							}    // IGES
 							else
-								if (Lima::SUFFIXE != Lima::_Reader::detectFormat(file.getFileName()))
+								if (true == compareExtensions(file.getExtension(), "brep"))
 								{
-									// [EB] sélection d'un préfixe ...
-									bool   ok  = false;
-									string pre = QInputDialog::getText(this, "Sélection d'un préfixe", "Préfixe :", QLineEdit::Normal, "", &ok).toStdString();
-									if (false == ok)
-										return;
-									msg << " Avec comme préfixe pour les noms de groupes : " << pre;
-									QtAutoWaitingCursor cursor(true);
+									if (false == splitAll)
+									{
+										QtImportOptionsDialog optionsDialog(this, getAppTitle(), fileName);
+										if (QDialog::Rejected == optionsDialog.exec())
+										{
+											msg << " Opération annulée par l'utilisateur.";
+											log(InformationLog(msg));
+											return;
+										}    // if (QDialog::Rejected == optionsDialog.exec ( ))
+
+										splitCompoundCurves = optionsDialog.splitCompoundCurves();
+										splitAll            = optionsDialog.forAll();
+									}   // if (false == splitAll)
 									log(InformationLog(msg));
-									getContext().getMeshManager().readMli(fileName, pre);
-								}    // Lima
+
+									QtAutoWaitingCursor cursor(true);
+									getContext().getGeomManager().importBREP(fileName, true, splitCompoundCurves);
+								}    // BREP
 								else
-								{
-									UTF8String error(Charset::UTF_8);
-									error << "Format du fichier " << fileName << " non supporté.";
-									throw Exception(error);
-								}
+									if (Lima::SUFFIXE != Lima::_Reader::detectFormat(file.getFileName()))
+									{
+										// [EB] sélection d'un préfixe ...
+										bool   ok  = false;
+										string pre = QInputDialog::getText(this, "Sélection d'un préfixe", "Préfixe :", QLineEdit::Normal, "", &ok).toStdString();
+										if (false == ok)
+											return;
+										msg << " Avec comme préfixe pour les noms de groupes : " << pre;
+										QtAutoWaitingCursor cursor(true);
+										log(InformationLog(msg));
+										getContext().getMeshManager().readMli(fileName, pre);
+									}    // Lima
+									else
+									{
+										UTF8String error(Charset::UTF_8);
+										error << "Format du fichier " << fileName << " non supporté.";
+										throw Exception(error);
+									}
 			}    // for (QStringList::Iterator it = fileList.begin ( ); ...
 
 			COMPLETE_QT_TRY_CATCH_BLOCK(true, this, getAppTitle())
@@ -5660,6 +5682,7 @@ void QtMgx3DMainWindow::exportAllCallback ( )
 	QStringList	filters;
 	filters << limaWExtensions ( ).c_str ( );
 	filters << "Magix MDL (*.mdl)";
+	filters << "BREP (*.brep)";
 	filters << "STEP (*.stp *.step)";
 	filters << "IGES (*.igs *.iges)";
 	filters << "CGNS (*.cgns)";
@@ -5753,6 +5776,11 @@ void QtMgx3DMainWindow::exportAllCallback ( )
 		log (InformationLog (msg));
 		getContext ( ).getGeomManager ( ).exportMDL (geomEntities, fileName);
 	}	// Magix 2D
+	else if (true == compareExtensions (file.getExtension ( ), "brep"))
+	{
+		log (InformationLog (msg));
+		getContext ( ).getGeomManager ( ).exportBREP (fileName);
+	}	// BREP
 	else if ((true == compareExtensions (file.getExtension ( ), "stp")) ||
 	         (true == compareExtensions (file.getExtension ( ), "step")))
 	{
@@ -5811,6 +5839,7 @@ void QtMgx3DMainWindow::exportSelectionCallback ( )
 	dialog.setConfirmOverwrite (false);	// Done in french later ...
 	QStringList	filters;
 	filters << "Magix MDL (*.mdl)";
+	filters << "BREP (*.brep)";
 	filters << "STEP (*.stp *.step)";
 	filters << "IGES (*.igs *.iges)";
 //	filters << "Lima++ (*.unf *.mli)";
@@ -5903,6 +5932,13 @@ void QtMgx3DMainWindow::exportSelectionCallback ( )
 		log (InformationLog (msg));
 		getContext ( ).getGeomManager ( ).exportMDL (selection, fileName);
 	}	// Magix 2D
+	else if (true == compareExtensions (file.getExtension ( ), "brep"))
+	{
+		selection	= getContext ( ).getSelectionManager ( ).getEntitiesNames (
+													FilterEntity::AllGeom);
+		log (InformationLog (msg));
+		getContext ( ).getGeomManager ( ).exportBREP (selection, fileName);
+	}	// BREP
 	else if ((true == compareExtensions (file.getExtension ( ), "stp")) ||
 	         (true == compareExtensions (file.getExtension ( ), "step")))
 	{

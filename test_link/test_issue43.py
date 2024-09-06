@@ -1,4 +1,3 @@
-import sys
 import pyMagix3D as Mgx3D
 
 # Issue43 : fusion d'une arete topo + undo => faces topos incorrectes

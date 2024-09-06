@@ -26,7 +26,7 @@ namespace QtComponents
 
 /**
  * Boite de dialogue pemettant de modifier les paramètres d'importation de CAO
- * au format <I>STEP</I>, <I>IGES</I> ou <I>Catia</I>.
+ * au format <I>BREP</I>, <I>STEP</I>, <I>IGES</I> ou <I>Catia</I>.
  */
 class QtImportOptionsDialog : public QDialog
 {

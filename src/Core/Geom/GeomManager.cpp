@@ -44,6 +44,7 @@
 #include "Geom/CommandNewArcEllipse.h"
 #include "Geom/CommandNewBSpline.h"
 #include "Geom/CommandTranslation.h"
+#include "Geom/CommandImportBREP.h"
 #include "Geom/CommandImportIGES.h"
 #include "Geom/CommandImportSTL.h"
 #include "Geom/CommandImportSTEP.h"
@@ -52,6 +53,7 @@
 #include "Geom/CommandExportMDL.h"
 #include "Geom/CommandExportVTK.h"
 #include "Geom/CommandExportMLI.h"
+#include "Geom/CommandExportBREP.h"
 #include "Geom/CommandExportSTEP.h"
 #include "Geom/CommandExportSTL.h"
 #include "Geom/CommandExportIGES.h"
@@ -3514,6 +3516,31 @@ common2DOnCopy(Geom::GeomEntity* entity1, Geom::GeomEntity* entity2, std::string
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
+Internal::M3DCommandResultIfc* GeomManager::importBREP(std::string n, const bool testVolumicProperties, const bool splitCompoundCurves)
+{
+    TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
+    message << "GeomManager::importBREP ("<<n<<")";
+    log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
+
+    //creation de la commande de création
+    CommandImportBREP *command = new CommandImportBREP(getLocalContext(), n, testVolumicProperties, splitCompoundCurves);
+    // trace dans le script
+    TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
+    cmd << getContextAlias() << "." << "getGeomManager().importBREP(\""<<n<<"\"";
+    if (!testVolumicProperties || splitCompoundCurves)
+        cmd << (testVolumicProperties?", True":", False") << (splitCompoundCurves?", True":", False");
+    cmd << ")";
+    command->setScriptCommand(cmd);
+
+    // on passe au gestionnaire de commandes qui exécute la commande en // ou non
+    // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
+    getCommandManager().addCommand(command, Utils::Command::DO);
+
+    Internal::M3DCommandResultIfc*  cmdResult   =
+                                    new Internal::M3DCommandResult (*command);
+    return cmdResult;
+}
+/*----------------------------------------------------------------------------*/
 Internal::M3DCommandResultIfc* GeomManager::importSTEP(std::string n, const bool testVolumicProperties, const bool splitCompoundCurves)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -3526,7 +3553,7 @@ Internal::M3DCommandResultIfc* GeomManager::importSTEP(std::string n, const bool
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().importSTEP(\""<<n<<"\"";
     if (!testVolumicProperties || splitCompoundCurves)
-    	cmd << (testVolumicProperties?", True":", False") << (splitCompoundCurves?", True":", False");
+        cmd << (testVolumicProperties?", True":", False") << (splitCompoundCurves?", True":", False");
     cmd << ")";
     command->setScriptCommand(cmd);
 
@@ -4060,6 +4087,70 @@ Internal::M3DCommandResultIfc* GeomManager::exportMLI(std::vector<Geom::GeomEnti
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().exportMLI([";
+    for(unsigned int i=0;i<geomEntities.size();i++){
+        if(i!=0)
+            cmd << ", ";
+        cmd << "\""<< geomEntities[i]->getName()<<"\"";
+    }
+    cmd <<"], \""<<n<<"\")";
+    command->setScriptCommand(cmd);
+
+    // on passe au gestionnaire de commandes qui exécute la commande en // ou non
+    // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
+    getCommandManager().addCommand(command, Utils::Command::DO);
+
+    Internal::M3DCommandResultIfc*  cmdResult   =
+            new Internal::M3DCommandResult (*command);
+    return cmdResult;
+}
+/*----------------------------------------------------------------------------*/
+Internal::M3DCommandResultIfc* GeomManager::exportBREP(const std::string& n)
+{
+#ifdef _DEBUG2
+    std::cout<<"exportBREP"<<std::endl;
+#endif
+
+    //creation de la commande d'exportation
+    CommandExportBREP *command = new CommandExportBREP(getLocalContext(), n);
+
+    // trace dans le script
+    TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
+    cmd << getContextAlias() << "." << "getGeomManager().exportBREP(";
+    cmd <<"\""<<n<<"\")";
+    command->setScriptCommand(cmd);
+
+    // on passe au gestionnaire de commandes qui exécute la commande en // ou non
+    // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
+    getCommandManager().addCommand(command, Utils::Command::DO);
+
+    Internal::M3DCommandResultIfc*  cmdResult   =
+            new Internal::M3DCommandResult (*command);
+    return cmdResult;
+}
+/*----------------------------------------------------------------------------*/
+Internal::M3DCommandResultIfc* GeomManager::exportBREP(std::vector<std::string>& ge,
+		const std::string& n)
+{
+    std::vector<Geom::GeomEntity*> geomEntities;
+    for (uint i=0; i<ge.size(); i++)
+        geomEntities.push_back(getEntity(ge[i]));
+
+    return exportBREP(geomEntities, n);
+}
+/*----------------------------------------------------------------------------*/
+Internal::M3DCommandResultIfc* GeomManager::exportBREP(std::vector<Geom::GeomEntity*>& geomEntities,
+        const std::string& n)
+{
+#ifdef _DEBUG2
+    std::cout<<"exportBREP avec "<<geomEntities.size()<<" entités"<<std::endl;
+#endif
+
+    //creation de la commande d'exportation
+    CommandExportBREP *command = new CommandExportBREP(getLocalContext(), geomEntities, n);
+
+    // trace dans le script
+    TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
+    cmd << getContextAlias() << "." << "getGeomManager().exportBREP([";
     for(unsigned int i=0;i<geomEntities.size();i++){
         if(i!=0)
             cmd << ", ";
