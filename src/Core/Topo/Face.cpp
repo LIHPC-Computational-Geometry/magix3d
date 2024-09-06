@@ -1021,7 +1021,8 @@ getNodes(Vertex* sommet1, Vertex* sommet2, Vertex* sommet3, Vertex* sommet4,
 #ifdef _DEBUG
         uint nbError = 0;
         for (int i=0; i<nbNoeudsI*nbNoeudsJ; i++)
-            if (vectNd[i].getID() == gmds::NullID) {
+//            if (vectNd[i].getID() == gmds::NullID) {
+            if (vectNd[i].id() == gmds::NullID) {	// CP
                 std::cout<<"vectNd["<<i<<"] non renseigné !\n";
                 nbError++;
             }

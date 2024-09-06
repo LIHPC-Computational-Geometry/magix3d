@@ -760,14 +760,17 @@ Utils::SerializedRepresentation* Surface::getDescription (bool alsoComputed) con
 	        Utils::SerializedRepresentation::Property ("Aire", volStr.ascii()) );
 	}
 
-    // précision OpenCascade ou autre
 	std::vector<GeomRepresentation*> reps = getComputationalProperties();
+	
+#ifdef _DEBUG		// Issue#111
+    // précision OpenCascade ou autre
 	for (uint i=0; i<reps.size(); i++){
 		TkUtil::UTF8String	precStr (TkUtil::Charset::UTF_8);
 		precStr << reps[i]->getPrecision();
 	    propertyGeomDescription.addProperty (
 	    	        Utils::SerializedRepresentation::Property ("Précision", precStr.ascii()) );
 	}
+#endif	// _DEBUG
 
 	// recherche des infos pour le cas facétisé
 	bool isFaceted = false;
@@ -779,7 +782,6 @@ Utils::SerializedRepresentation* Surface::getDescription (bool alsoComputed) con
 			nbFaces = fs->getNbFaces();
 		}
 	}
-
 
     // on ajoute des infos du style: c'est un plan
 	TkUtil::UTF8String	typeStr (TkUtil::Charset::UTF_8);

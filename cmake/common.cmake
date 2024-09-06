@@ -59,6 +59,10 @@ endif (TRITON)
 message(MGX OPTIONS ${MAGIX3D_OPTIONS})
 set (MANDATORY_CXX_OPTIONS ${MANDATORY_VTK_OPTIONS} ${MANDATORY_MULTITHREADING_OPTIONS} ${MAGIX3D_OPTIONS})
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	add_compile_definitions (_DEBUG)
+endif (CMAKE_BUILD_TYPE STREQUAL "Debug")
+
 # Edition des liens :
 # A l'installation les RPATHS utilisés seront ceux spécifiés ci-dessous (liste
 # de répertoires séparés par des ;) :

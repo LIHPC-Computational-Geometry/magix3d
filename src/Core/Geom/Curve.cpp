@@ -1511,14 +1511,17 @@ Utils::SerializedRepresentation* Curve::getDescription (bool alsoComputed) const
 	        Utils::SerializedRepresentation::Property ("Longueur", volStr.ascii()) );
 	}
 
-    // précision OpenCascade
 	std::vector<GeomRepresentation*> reps = getComputationalProperties();
+	
+#ifdef _DEBUG		// Issue#111
+    // précision OpenCascade
 	for (uint i=0; i<reps.size(); i++){
 	    TkUtil::UTF8String precStr (TkUtil::Charset::UTF_8);
 		precStr << reps[i]->getPrecision();
 	    propertyGeomDescription.addProperty (
 	    	        Utils::SerializedRepresentation::Property ("Précision", precStr.ascii()) );
 	}
+#endif	// _DEBUG
 
 	// recherche des infos pour le cas facétisé
 	bool isFaceted = false;
