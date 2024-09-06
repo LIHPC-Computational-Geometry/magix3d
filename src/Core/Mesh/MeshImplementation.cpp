@@ -1099,11 +1099,6 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::Block* bl)
         else if (bl->getMeshLaw() == Topo::BlockMeshingProperty::delaunayTetgen){
             meshDelaunayTetgen(command,bl);
         }
-#ifdef USE_MESHGEMS
-        else if (bl->getMeshLaw() == Topo::BlockMeshingProperty::delaunayMeshGemsVol){
-                    meshDelaunayMeshGemsVol(command,bl);
-                }
-#endif	// USE_MESHGEMS
         else if (bl->getMeshLaw() == Topo::BlockMeshingProperty::insertion){
             meshInsertion(command,bl);
         }
@@ -1162,11 +1157,6 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::CoFace* fa
         else if (fa->getMeshLaw() == Topo::CoFaceMeshingProperty::delaunayGMSH){
             meshDelaunayGMSH(command, fa);
         }
-#ifdef USE_MESHGEMS
-        else if (fa->getMeshLaw() == Topo::CoFaceMeshingProperty::MeshGems){
-            meshTriangularMeshGems(command, fa);
-        }
-#endif	// USE_MESHGEMS
         else if (fa->getMeshLaw() == Topo::CoFaceMeshingProperty::quadPairing){
             //meshQuadPairing(command, fa);
         	MGX_NOT_YET_IMPLEMENTED("Appariement");

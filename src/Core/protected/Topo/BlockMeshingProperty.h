@@ -38,9 +38,6 @@ public:
         rotational,
         transfinite,
         delaunayTetgen,      // recommandé / delaunayTetgen
-#ifdef USE_MESHGEMS
-		delaunayMeshGemsVol, // recommandé, payant, mais le meilleur
-#endif	// USE_MESHGEMS
         insertion
     } meshLaw;
 

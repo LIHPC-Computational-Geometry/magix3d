@@ -166,9 +166,7 @@ if (Doxygen_FOUND)
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyTransfinite.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyDelaunayNetgen.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyDelaunayGMSH.h 
-                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyMeshGems.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyQuadPairing.h 
-                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyMeshGems.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingProperty.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyDirectional.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyOrthogonal.h 

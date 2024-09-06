@@ -775,9 +775,7 @@ INPUT                  = ../../src/Doc/User \
                          ../../src/Core/protected/Topo/FaceMeshingPropertyRotational.h \
                          ../../src/Core/protected/Topo/FaceMeshingPropertyTransfinite.h \
                          ../../src/Core/protected/Topo/FaceMeshingPropertyDelaunayGMSH.h \
-                         ../../src/Core/protected/Topo/FaceMeshingPropertyMeshGems.h \
                          ../../src/Core/protected/Topo/FaceMeshingPropertyQuadPairing.h \
-                         ../../src/Core/protected/Topo/FaceMeshingPropertyMeshGems.h \
                          ../../src/Core/protected/Topo/BlockMeshingProperty.h \
                          ../../src/Core/protected/Topo/BlockMeshingPropertyDirectional.h \
                          ../../src/Core/protected/Topo/BlockMeshingPropertyOrthogonal.h \

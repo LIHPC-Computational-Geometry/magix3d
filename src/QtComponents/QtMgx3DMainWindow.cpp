@@ -178,10 +178,6 @@
 #include <stdlib.h>		// getenv
 #include <cmath>
 #include <strings.h>	// strcasecmp
-
-#ifdef USE_MESHGEMS
-#include <meshgems/meshgems.h>
-#endif
 #include <cgnslib.h>			// CGNS_DOTVERS
 #include <mesquite_version.h>	// MSQ_VERSION_STRING
 
@@ -1359,10 +1355,6 @@ void QtMgx3DMainWindow::showReady ( )
 #endif    // USE_CAGE
 			components.push_back(
 					QtAboutDialog::Component("NetGen", "???", UTF8String("Mailleur non structuré", Charset::UTF_8), ""));
-#ifdef USE_MESHGEMS
-																																	components.push_back (
-		QtAboutDialog::Component ("MeshGems", MESHGEMS_VERSION, UTF8String ("Mailleur non structuré (Distène)", Charset::UTF_8), ""));
-#endif
 			components.push_back(
 					QtAboutDialog::Component("Mesquite", MSQ_VERSION, UTF8String("Lisseur", Charset::UTF_8), ""));
 #ifdef USE_SMOOTH3D

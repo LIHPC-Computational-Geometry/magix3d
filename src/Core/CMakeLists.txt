@@ -13,11 +13,6 @@ list(FILTER CPP_SOURCES EXCLUDE REGEX ".*GMDSGeom.*Adapter\\.cpp$")
 # Répertoire d'en-têtes installés. Certains sont optionnels et ajoutés plus loin.
 set (HEADERS_DIRECTORIES protected/Geom protected/Group protected/Internal protected/Mesh protected/Smoothing protected/Structured protected/SysCoord protected/Topo)
 
-if (MESHGEMS)
-	file (GLOB MESHGEMS_PLUGIN_SOURCES MeshGemsPlugin/*.cpp)
-	list (APPEND CPP_SOURCES ${MESHGEMS_PLUGIN_SOURCES})
-endif (MESHGEMS)
-
 # On ajoute les en-têtes aux sources. C'est utile pour cmake dans certains cas,
 # par exemple lorsqu'ils doivent être pré-processés (moc, ...).
 add_library (Core ${CPP_SOURCES} ${HEADERS})
@@ -39,14 +34,6 @@ if (MDLPARSER)
 	target_compile_options (Core PUBLIC -DMDL_VERSION="${MdlParser_VERSION}")
 	list (APPEND CORE_OPTIONAL_LIBRARIES_LIST MdlParser::mdl)
 endif (MDLPARSER)
-if (MESHGEMS)
-	find_package (meshgems REQUIRED)
-	message (STATUS "------------> MESHGEMS VERSION ${MESHGEMS_VERSION}")
-	target_compile_definitions (Core PUBLIC -DMESHGEMS_VERSION="${MESHGEMS_VERSION}")
-	target_include_directories (Core PUBLIC ${MESHGEMS_INCLUDE_DIRS})
-	list (APPEND CORE_OPTIONAL_LIBRARIES_LIST ${MESHGEMS_LIBRARIES})
-	list (APPEND HEADERS_DIRECTORIES protected/MeshGemsPlugin)
-endif (MESHGEMS)
 if (SMOOTH3D)
 	find_package (smooth3D REQUIRED)
 	message (STATUS "------------> SMOOTH3D VERSION ${smooth3D_VERSION}")
