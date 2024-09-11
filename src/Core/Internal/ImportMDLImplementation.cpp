@@ -492,10 +492,7 @@ void ImportMDLImplementation::performTopo(Internal::InfoCommand* icmd)
                         <<")";
                 throw TkUtil::Exception(messErr);
             }
-            // sélection de la méthode transfinie ou directionnelle si possible
             m_icmd->addTopoInfoEntity (coface, Internal::InfoCommand::CREATED);
-            coface->selectBasicMeshLaw(m_icmd);
-
         } else {
             // cas non-structuré
             coface = new Topo::CoFace(m_context, edges);

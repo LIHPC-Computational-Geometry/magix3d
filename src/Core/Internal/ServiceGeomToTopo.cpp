@@ -17,6 +17,7 @@
 #include "Topo/Edge.h"
 #include "Topo/CoEdge.h"
 #include "Topo/Vertex.h"
+#include "Topo/FaceMeshingPropertyTransfinite.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Topo/CoEdgeMeshingProperty.h"
 #include "Topo/BlockMeshingPropertyInsertion.h"
@@ -121,8 +122,10 @@ bool ServiceGeomToTopo::convertCoFaceStructured()
 
     if (coface->structurable()){
         coface->structure(m_icmd);
-
-        coface->selectBasicMeshLaw(m_icmd);
+        coface->saveCoFaceMeshingProperty(m_icmd);
+        auto mp = new Topo::FaceMeshingPropertyTransfinite();
+        coface->switchCoFaceMeshingProperty(m_icmd, mp);
+        delete mp;
 
         return false; // ok
     }

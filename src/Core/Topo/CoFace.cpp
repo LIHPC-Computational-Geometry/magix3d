@@ -161,25 +161,17 @@ CoFace(Internal::Context& ctx,
 }
 /*----------------------------------------------------------------------------*/
 CoFace::
-CoFace(Internal::Context& ctx, int ni, int nj,
-    		CoFaceMeshingProperty::meshLaw ml,
-    		CoFaceMeshingProperty::meshDirLaw md)
+CoFace(Internal::Context& ctx, int ni, int nj)
 : TopoEntity(ctx,
         ctx.newProperty(Utils::Entity::TopoCoFace),
         ctx.newDisplayProperties(Utils::Entity::TopoCoFace))
 , m_topo_property(new CoFaceTopoProperty())
 , m_save_topo_property(0)
-, m_mesh_property(0)
+, m_mesh_property(new FaceMeshingPropertyTransfinite())
 , m_save_mesh_property(0)
 , m_mesh_data(new CoFaceMeshingData())
 , m_save_mesh_data(0)
 {
-    if (ml == CoFaceMeshingProperty::directional)
-        m_mesh_property =new FaceMeshingPropertyDirectional(md);
-    else
-        m_mesh_property =new FaceMeshingPropertyTransfinite();
-
-
     // face avec les sommets équivalents à ceux d'une surface de taille 1
     std::vector<Vertex* > vertices;
     vertices.push_back(new Topo::Vertex(ctx, Utils::Math::Point(1,0,0)));
@@ -957,8 +949,8 @@ split2(eDirOnCoFace dir, std::vector<Edge*>& edges1, std::vector<Edge*>& edges3,
 
     // recherche de la méthode de maillage qui semble la plus adaptée
     if (getMeshLaw() == CoFaceMeshingProperty::directional){
-    	coface1->selectBasicMeshLaw(icmd);
-    	coface2->selectBasicMeshLaw(icmd);
+    	coface1->tryToSetDirectionalMeshLaw(icmd);
+    	coface2->tryToSetDirectionalMeshLaw(icmd);
     }
 
     // on ajoute les 2 CoFaces aux faces
@@ -1219,9 +1211,9 @@ split3(eDirOnCoFace dir, std::vector<Edge*>& edges1, std::vector<Edge*>& edges3,
 
     // recherche de la méthode de maillage qui semble la plus adaptée
     if (getMeshLaw() == CoFaceMeshingProperty::directional){
-    	coface1->selectBasicMeshLaw(icmd);
-    	coface2->selectBasicMeshLaw(icmd);
-    	coface3->selectBasicMeshLaw(icmd);
+    	coface1->tryToSetDirectionalMeshLaw(icmd);
+    	coface2->tryToSetDirectionalMeshLaw(icmd);
+    	coface3->tryToSetDirectionalMeshLaw(icmd);
     }
 
     // on ajoute les 3 CoFaces aux faces
@@ -1499,12 +1491,6 @@ splitOgrid(eDirOnCoFace dir,
         	coface2->getGroupsContainer().add(gr);
         }
 
-        // recherche de la méthode de maillage qui semble la plus adaptée
-        coface0->selectBasicMeshLaw(icmd);
-        coface1->selectBasicMeshLaw(icmd);
-        coface2->selectBasicMeshLaw(icmd);
-
-
     } else if (edges1.size() == 3){
         // cas de la création de 4 faces en Ogrid
 
@@ -1721,13 +1707,6 @@ splitOgrid(eDirOnCoFace dir,
         	coface2->getGroupsContainer().add(gr);
         	coface3->getGroupsContainer().add(gr);
         }
-
-        // recherche de la méthode de maillage qui semble la plus adaptée
-        coface0->selectBasicMeshLaw(icmd);
-        coface1->selectBasicMeshLaw(icmd);
-        coface2->selectBasicMeshLaw(icmd);
-        coface3->selectBasicMeshLaw(icmd);
-
 
     } // end else if (edges1.size() == 3)
 
@@ -3847,15 +3826,15 @@ uint CoFace::getNbBlocks() const
 }
 /*----------------------------------------------------------------------------*/
 void CoFace::
-selectBasicMeshLaw(Internal::InfoCommand* icmd, bool forceCompute)
+tryToSetDirectionalMeshLaw(Internal::InfoCommand* icmd, bool forceCompute)
 {
-//#define _DEBUG_selectBasicMeshLaw
-#ifdef _DEBUG_selectBasicMeshLaw
-    std::cout<<"selectBasicMeshLaw pour "<<getName()<<" cas d'une coface avec MeshLaw à "<<getMeshLawName()<<std::endl;
+//#define _DEBUG_tryToSetDirectionalMeshLaw
+#ifdef _DEBUG_tryToSetDirectionalMeshLaw
+    std::cout<<"tryToSetDirectionalMeshLaw pour "<<getName()<<" cas d'une coface avec MeshLaw à "<<getMeshLawName()<<std::endl;
 #endif
 
     if (!forceCompute && getMeshLaw() == CoFaceMeshingProperty::directional){
-#ifdef _DEBUG_selectBasicMeshLaw
+#ifdef _DEBUG_tryToSetDirectionalMeshLaw
         std::cout<<"  on conserve "<<getMeshLawName()<< " pour "<<getName()<<std::endl;
 #endif
         return;
@@ -3923,7 +3902,7 @@ selectBasicMeshLaw(Internal::InfoCommand* icmd, bool forceCompute)
         switchCoFaceMeshingProperty(icmd, mp);
         delete mp;
 
-#ifdef _DEBUG_selectBasicMeshLaw
+#ifdef _DEBUG_tryToSetDirectionalMeshLaw
         std::cout<<"  on attribue "<<getMeshLawName()<< " à "<<getName()<<std::endl;
 #endif
     }

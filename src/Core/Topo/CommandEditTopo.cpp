@@ -452,11 +452,8 @@ updateMeshLaw(std::vector<Topo::CoFace*>& cofaces, std::vector<Topo::Block*>& bl
 #endif
        // cas d'une méthode structurée directionnelle ou rotationnelle
        if (coface->getMeshLaw() < CoFaceMeshingProperty::transfinite){
-
-           // on cherche une méthode la plus basique possible
-           coface->selectBasicMeshLaw(&getInfoCommand(), true);
-
-       } // end if (coface->getMeshLaw() <= rotJ)
+           coface->tryToSetDirectionalMeshLaw(&getInfoCommand(), true);
+       }
    } // end for iter=l_f.begin()
 
     // il est préférable de le faire sur les blocs après les faces communes
