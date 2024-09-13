@@ -1129,17 +1129,16 @@ Geom::Curve* CoEdge::createBSplineByProj(Utils::Math::Point& pt0,
 
 	if (is_near){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-		message << "Des points de construction de la projection de l'arête "
-				<< getName()
-				<< " sont confondus";
-		getContext().getLogStream()->log (TkUtil::TraceLog (message, TkUtil::Log::WARNING));
+		message << "Des points de construction de la projection de l'arête " << getName() << " sont confondus. ";
 		if (is_first_near && is_last_near){
-			std::cerr<<TkUtil::UTF8String ("Projection sur un demi cercle ?", TkUtil::Charset::UTF_8)<<std::endl;
-			throw Utils::HalfCircleSurfaceException(TkUtil::UTF8String ("Des points de construction de la projection de l'arête sont confondus, Projection sur un demi cercle ?", TkUtil::Charset::UTF_8));
+			message << "Projection sur un demi cercle ?";
+			getContext().getLogStream()->log (TkUtil::TraceLog (message, TkUtil::Log::WARNING));
+			throw Utils::HalfCircleSurfaceException(message);
 		}
 		else {
-			std::cerr<<TkUtil::UTF8String ("Projection en dehors de la surface ?", TkUtil::Charset::UTF_8)<<std::endl;
-			throw Utils::OuterSurfaceException(TkUtil::UTF8String ("Des points de construction de la projection de l'arête sont confondus, Projection en dehors de la surface ?", TkUtil::Charset::UTF_8));
+			message << "Projection en dehors de la surface ?";
+			getContext().getLogStream()->log (TkUtil::TraceLog (message, TkUtil::Log::WARNING));
+			throw Utils::OuterSurfaceException(message);
 		}
 	}
 #ifdef _DEBUG_GETPOINTS
@@ -1167,7 +1166,6 @@ Geom::Curve* CoEdge::createBSplineByProjWithOrthogonalIntersection(Utils::Math::
 	// on continue ensuite comme pour createBSplineByProj en 2 parties
 
 	Geom::Curve* curve = 0;
-	Utils::Math::Point vect = (pt1 - pt0);
 
 	// création d'une courbe BSpline s'appuyant sur les points projetés
 	std::vector<Utils::Math::Point> points_bspline;
@@ -1231,7 +1229,7 @@ Geom::Curve* CoEdge::createBSplineByProjWithOrthogonalIntersection(Utils::Math::
 		points_bspline.push_back(pt0);
 
 		const uint nbPts = 10;
-		vect = (ptI - pt0);
+		Utils::Math::Point vect = (ptI - pt0);
 		for (uint i=1; i<nbPts; i++){ // nbPts-2 points entre les 2 extrémités
 			Utils::Math::Point pt = pt0 + vect*((double)i)/((double)nbPts);
 			surface->project(pt);
@@ -1314,26 +1312,10 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 	}
 
 	Utils::Math::Point vect = (pt1 - pt0);
-	if (Utils::Math::MgxNumeric::isNearlyZero(vect.norme())) {
-		std::string n0 = getVertex(0)->getName();
-		std::string n1 = getVertex(1)->getName();
-		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-		message << "Taille de l'arête "<< getName() << " nulle";
-		if (pt0_projected) {
-			message << " après projection de " << getVertex(0)->getName();
-			message << " sur " << getVertex(0)->getGeomAssociation()->getName();
-		}
-		if (pt1_projected) {
-			message << (pt0_projected?" et de ":" après projection de ") << getVertex(1)->getName();
-			message << " sur " << getVertex(1)->getGeomAssociation()->getName();
-		}
-		throw TkUtil::Exception (message);
-	}
-
 #ifdef _DEBUG_GETPOINTS
-	std::cout<<" pt0: "<<pt0<<std::endl;
-	std::cout<<" pt1: "<<pt1<<std::endl;
-	std::cout<<" vect = " <<vect<<" longueur "<<vect.norme()<<std::endl;
+	std::cout<<" pt0 "<<getVertex(0)->getName()<<": "<<pt0<<std::endl;
+	std::cout<<" pt1 "<<getVertex(1)->getName()<<": "<<pt1<<std::endl;
+	std::cout<<" vect = "<<vect<<" longueur "<<vect.norme()<<std::endl;
 	std::cout<<" getGeomAssociation() -> "<<(getGeomAssociation()?getGeomAssociation()->getName():"0")<<std::endl;
 	std::cout<<" dni->getMeshLaw() "<<dni->getMeshLawName()<<std::endl;
 #endif
@@ -1359,10 +1341,10 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 			// courbe sur laquelle se fait la projection
 			Geom::Curve* curve = 0;
 			bool curveToBeDeleted = false;
-			if (ge->getType() == Utils::Entity::GeomCurve)
+			if (ge->getType() == Utils::Entity::GeomCurve) {
 				curve = dynamic_cast<Geom::Curve*> (ge);
+			}
 			else if (ge->getType() == Utils::Entity::GeomSurface){
-
 				getContext().getNameManager().getInternalStats(name_manager_before);
 				Geom::Surface* surface = dynamic_cast<Geom::Surface*> (ge);
 				CHECK_NULL_PTR_ERROR(surface);
@@ -1384,12 +1366,18 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 						getContext().getNameManager().setInternalStats(name_manager_before);
 
 						TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-						message << "Pb avec création d'une courbe par projection de l'arête "<<getName()<<" sur la surface "<<ge->getName();
-						message << "\nLe pb est peut-être lié à une projection sur un demi cercle => couper l'arête en deux";
+						message << "Pb avec création d'une courbe par projection de " << getName() << " sur la surface " << ge->getName() << ".\n";
+
+						if (Utils::Math::MgxNumeric::isNearlyZero(vect.norme())) {
+							std::string n0 = getVertex(0)->getName();
+							std::string n1 = getVertex(1)->getName();
+							message << getVertex(0)->getName() << " et " << getVertex(1)->getName() << " sont confondus après projection.\n";
+						}
+						message << "Le pb est peut-être lié à une projection sur un demi cercle => couper l'arête en deux. ";
 
 						// message plus important au niveau des logs
 						TkUtil::UTF8String	messageComplet (TkUtil::Charset::UTF_8);
-						messageComplet<<message<<", message remonté : "<<exc.getMessage();
+						messageComplet << message << ", message remonté : " << exc.getMessage();
 						getContext().getLogStream()->log(TkUtil::TraceLog (messageComplet, TkUtil::Log::TRACE_3));
 
 						throw TkUtil::Exception (message);

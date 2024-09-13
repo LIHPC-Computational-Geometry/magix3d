@@ -6850,20 +6850,20 @@ void QtMgx3DMainWindow::meshAllCallback ( )
 	// On maille tous les blocs s'il y en a :
 	if (0 != getContext ( ).getTopoManager ( ).getNbBlocks ( ))
 	{
-		message << "Création du maillage pour tous les blocs du maillage.";
+		message << "Création du maillage pour tous les blocs du maillage. ";
 		getContext ( ).getMeshManager ( ).newAllBlocksMesh ( );
 	}	// if (0 != getContext ( ).getTopoManager ( ).getNbBlocks ( ))
 	else if (0 != getContext ( ).getTopoManager ( ).getNbFaces ( ))
 	{	// => On maille les faces
-		message << "Création du maillage pour toutes les faces du maillage.";
+		message << "Création du maillage pour toutes les faces du maillage. ";
 		getContext ( ).getMeshManager ( ).newAllFacesMesh ( );
 	}	// else if (0 != getContext ( ).getTopoManager ( ).getNbFaces ( ))
 	else
 	{
-		throw Exception (UTF8String ("Il n'y a pas de topologie à mailler (ni face, ni bloc).", Charset::UTF_8));
+		throw Exception (UTF8String ("Il n'y a pas de topologie à mailler (ni face, ni bloc). ", Charset::UTF_8));
 	}
 
-    message << ". Commande créée avec succès.";
+    message << "Commande créée avec succès.";
 	log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_1));
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
