@@ -674,7 +674,7 @@ void QtMgx3DOperationPanel::applyCallback ( )
 {
 	CommandResultIfc*	commandResult	= 0;
 
-	bool	userNotified	= true;																		// CP NEW	
+	bool	userNotified	= false;	// CP 16/09/24 false par défaut (cas où la création de commande lève une exception => pas de commandResult)																	// CP NEW
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	CHECK_NULL_PTR_ERROR (getMgx3DOperationAction ( ))
@@ -688,8 +688,8 @@ void QtMgx3DOperationPanel::applyCallback ( )
 			hasError	= false;
 		else
 		{
-			userNotified	= commandResult->isUserNotified ( );										// CP NEW	
-			hasError		= true;																		// CP NEW	
+			userNotified	= commandResult->isUserNotified ( );
+			hasError		= true;
 			errorString		= commandResult->getStrStatus ( );
 			commandResult->setUserNotified (true);
 		}	// else if (CommandIfc::DONE == commandResult->getStatus ( ))

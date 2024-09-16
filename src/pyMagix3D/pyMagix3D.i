@@ -92,7 +92,7 @@ using std::ptrdiff_t;
   }
   catch(TkUtil::Exception& e){
     char buf [4096];
-    strncpy (buf, e.getMessage().iso().c_str(), 4095);
+    strncpy (buf, e.getMessage().utf8().c_str(), 4095);
     buf [4095]	= '\0';
     SWIG_exception (SWIG_RuntimeError, buf);
   } 
