@@ -1189,7 +1189,7 @@ newCylinderWithTopo(const Point& pcentre, const double& dr,
         const int naxe, const int ni, const int nr,
         std::string groupName)
 {
-    TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
+     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
      message << "TopoManager::newCylinderWithTopo("<<pcentre<<", "
 	         <<Utils::Math::MgxNumeric::userRepresentation (dr)<<", "<<dv<<", "
 	         <<Utils::Math::MgxNumeric::userRepresentation (da)<<", "

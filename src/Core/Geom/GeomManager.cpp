@@ -2157,7 +2157,7 @@ GeomManager::newCone(const double& dr1, const double& dr2,
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().newCylinder ("
+    cmd << getContextAlias() << "." << "getGeomManager().newCone ("
     		<< Utils::Math::MgxNumeric::userRepresentation (dr1) <<", "
             << Utils::Math::MgxNumeric::userRepresentation (dr2) <<", "
             <<dv.getScriptCommand()<<", "

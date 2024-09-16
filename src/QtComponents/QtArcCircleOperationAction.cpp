@@ -887,9 +887,9 @@ void QtArcCircleOperationAction::executeOperation ( )
 			const Utils::Math::Vector   normal	        = getArcCirclePanel ( )->getNormal ( );
 			const bool		            defineNormal	= getArcCirclePanel ( )->defineNormal ( );
 			if (true == defineNormal)
-				cmdResult	= getContext ( ).getGeomManager ( ).newArcCircle (vertex3, vertex1, vertex2, direct, normal, name);
+				cmdResult	= getContext ( ).getGeomManager ( ).newArcCircle (vertex1, vertex2, vertex3, direct, normal, name);
 			else
-				cmdResult	= getContext ( ).getGeomManager ( ).newArcCircle (vertex3, vertex1, vertex2, direct, name);
+				cmdResult	= getContext ( ).getGeomManager ( ).newArcCircle (vertex1, vertex2, vertex3, direct, name);
 		}
 		break;
 		case QtArcCircleOperationPanel::SYSCOORD_2_ANGLES	:
