@@ -228,10 +228,22 @@ class Resources
 	Preferences::BoolNamedValue					_autoUpdateUsesSelection;
 
 	/**
-	 * Faut-il afficher une boite de dialogue d'erreur lorsqu'une commande
-	 * échoue ?
+	 * Faut-il afficher une boite de dialogue d'erreur lorsqu'une commande échoue ?
 	 */
 	Preferences::BoolNamedValue					_showDialogOnCommandError;
+	
+	/**
+	 * Faut il que la boite de dialogue de commande échouée soit modale, et risque donc de
+	 * perturber l'organisation d'un autre bureau ? (Magix3D Issue 112)
+	 * Valeur par défaut à <I>false</I>.
+	 * @warning		Experimental
+	 */
+	 Preferences::BoolNamedValue				_showAmodalDialogOnCommandError;
+	 
+	 /**
+	  * Durée d'exécution de commande à partir de laquelle une notification système est envoyée.
+	  */
+	Preferences::UnsignedLongNamedValue			_commandNotificationDelay; 
 
 	/**
 	 * A partir de quel nombre d'entités sélectionnées ne faut il plus afficher

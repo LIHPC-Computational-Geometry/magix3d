@@ -3884,43 +3884,47 @@ cout << ctime (&t);
 		}    // QtMgx3DMainWindow::getContext
 
 
-		void QtMgx3DMainWindow::executePythonScript(const string &f)
-		{
-			File          file(f);
-			UTF8String    message(Charset::UTF_8);
-			TkUtil::Timer timer;
-			message << "Exécution du script Python " << file.getFullFileName()
-			        << " en cours ...";
+void QtMgx3DMainWindow::executePythonScript(const string &f)
+{
+	File          file(f);
+	UTF8String    message(Charset::UTF_8);
+	TkUtil::Timer timer;
+	message << "Exécution du script Python " << file.getFullFileName() << " en cours ...";
 
-			log(InformationLog(message));
+	log(InformationLog(message));
 
-			getContext().beginImportScript();
-			timer.start();
-			try
-			{
-				_pythonPanel->executeFile(f);
-				timer.stop();
-				getContext().endImportScript();
-			}
-			catch (...)
-			{
-				timer.stop();
-				getContext().endImportScript();
-				throw;
-			}
-			// titre de la fenêtre principale
-			UTF8String titre(Charset::UTF_8);
-			titre << Resources::instance()._softwareName << " (" << MAGIX3D_VERSION/*GSCC_PROJECT_VERSION*/<< ") "
-			      << file.getFileName();
-			setWindowTitle(UTF8TOQSTRING(titre));
+	getContext().beginImportScript();
+	timer.start();
+	try
+	{
+		_pythonPanel->executeFile(f);
+		timer.stop();
+		getContext().endImportScript();
+	}
+	catch (...)
+	{
+		timer.stop();
+		getContext().endImportScript();
+		if (timer.duration ( ) >= Resources::instance ( )._commandNotificationDelay.getValue ( ))
+			QtMessageBox::systemNotification ("Magix3D", "Script terminé en erreur.");
 
-			message.clear();
-			message << "Exécution du script Python " << file.getFullFileName()
-			        << " avec succès (en "
-			        << (unsigned long) timer.duration()
-			        << " secondes au total).";
-			log(InformationLog(message));
-		}    // QtMgx3DMainWindow::executePythonScript
+		throw;
+	}
+	// titre de la fenêtre principale
+	UTF8String titre(Charset::UTF_8);
+	titre << Resources::instance()._softwareName << " (" << MAGIX3D_VERSION/*GSCC_PROJECT_VERSION*/<< ") " << file.getFileName();
+	setWindowTitle(UTF8TOQSTRING(titre));
+
+	message.clear();
+	message << "Exécution du script Python " << file.getFullFileName() << " avec succès (en "
+			<< (unsigned long) timer.duration() << " secondes au total).";
+	log(InformationLog(message));
+		
+	if (timer.duration ( ) >= Resources::instance ( )._commandNotificationDelay.getValue ( ))
+	{
+		QtMessageBox::systemNotification ("Magix3D", "Script terminé avec succès.");
+	}	// if (timer.duration ( ) >= Resources::instance ( )._commandNotificationDelay.getValue ( ))
+}    // QtMgx3DMainWindow::executePythonScript
 
 
 		CommandManagerIfc &QtMgx3DMainWindow::getCommandManager()
@@ -4566,7 +4570,13 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 						// A t'on un évènement important justifiant d'une notification via boite de dialogue ?
 						const string warn = commandInternal->getWarningToPopup();
 						if (false == warn.empty())
-							QtMessageBox::displayWarningMessage(this, getAppTitle().c_str(), warn);
+						{
+							QtMessageBox::systemNotification ("Magix3D", "Commandes terminées avec avertissement.", QtMessageBox::URGENCY_CRITICAL);
+							if (false == Resources::instance ( )._showAmodalDialogOnCommandError.getValue ( ))
+								QtMessageBox::displayWarningMessage (this, getAppTitle().c_str ( ), warn);	// Défaut
+							else
+								QtMessageBox::displayWarningMessageInAppWorkspace (this, getAppTitle ( ), warn);	// Expérimental, Issue#112
+						}
 					}
 
 					if (0 != _stateView)
@@ -4579,7 +4589,11 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 						if ((true == Resources::instance()._showDialogOnCommandError.getValue()) && (false == command.isUserNotified()))
 						{
 							command.setUserNotified (true);
-							QtMessageBox::displayErrorMessage(this, getAppTitle(), command.getErrorMessage());
+							QtMessageBox::systemNotification ("Magix3D", "Commandes terminées en erreur.", QtMessageBox::URGENCY_CRITICAL);
+							if (false == Resources::instance ( )._showAmodalDialogOnCommandError.getValue ( ))
+								QtMessageBox::displayErrorMessage (this, getAppTitle ( ), command.getErrorMessage ( ));	// défaut
+							else
+								QtMessageBox::displayErrorMessageInAppWorkspace (this, getAppTitle ( ), command.getErrorMessage ( ));	// Expérimental, Issue#112
 						}
 
 						// pour permettre de rejouer cette commande qui a échouée, elle est transmise avec le status en erreur, cela peut permettre de la corriger
@@ -4600,7 +4614,6 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 						// On est en erreur => réactualiser les menus de l'IHM selon ce nouveau context.
 						updateActions();
 					}
-
 			}    // if (0 != commandInternal)
 
 			if (0 != _stateView)
