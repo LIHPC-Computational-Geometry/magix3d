@@ -402,10 +402,12 @@ void QtMgx3DApplication::init (int argc, char* argv[], char* envp[])
 	_envp	= envp;
 	initQtComponentsResources ( );
 
-	// QTextCodec : pour les flux Qt, notamment pour le QTextStream utilisé
-	// par la console python QConsole. En son absence, si locale vaut C alors
+	// QTextCodec : pour les flux Qt, notamment pour le QTextStream utilisé par la console python QConsole. En son absence, si locale vaut C alors
 	// les caractères accentués des fichiers scripts seront perdus.
-	QTextCodec::setCodecForLocale (QTextCodec::codecForName ("ISO 8859-1"));
+	// CP, remarque du 18/09/24 : ne semble plus d'actualité, et perturbe les QFileDialog lorsque les fichiers/répertoires ont des caractères
+	// accentués, ceux-ci sont convertis en std::string de manière erronée => on commente l'appel à QTextCodec::setCodecForLocale. Le contenu
+	// de la console python semble OK en environnement fr_FR.UTF-8
+	// QTextCodec::setCodecForLocale (QTextCodec::codecForName ("ISO 8859-1"));
 	// Eviter des messages d'erreur lorsque l'on quitte un champ de saisie numérique vide :
 	QtValidatedTextField::automaticValidation	=true;
 	QtValidatedTextField::dialogOnError			=false;
