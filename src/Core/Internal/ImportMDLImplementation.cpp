@@ -173,6 +173,45 @@ void ImportMDLImplementation::performGeom(Internal::InfoCommand* icmd)
 
         } // end for j<nb_cut_data
 
+        //Ajout des groupes 0D
+        for (uint ptId = 0; ptId<m_vCmdPt.size(); ptId++){
+            T_MdlCommand& current_command = *m_vCmdPt[ptId];
+
+            if(current_command.u.point.groups_name && !std::string(current_command.u.point.groups_name).empty()){
+                double x = current_command.u.point.cd.x1;
+                double y = current_command.u.point.cd.x2;
+
+                for(auto ge : m_newGeomEntities){
+                    if(ge->getDim() == 0){
+                        Geom::Vertex* v = dynamic_cast<Geom::Vertex*>(ge);
+
+                        if(v->getX() == x && v->getY() == y){
+                            uint id_grp=0;
+                            std::istringstream isgroups(TkUtil::UTF8String(current_command.u.area.groups_name).trim());
+                            std::string name;
+                            while (!isgroups.eof()){
+                                isgroups>>name;
+                                if (!name.empty()){
+                                    id_grp++;
+                                    if (!m_prefixName.empty())
+                                        name = m_prefixName + name;
+                                    Group::Group0D* group = m_context.getLocalGroupManager().getNewGroup0D(name, icmd);
+                                    if (id_grp == 1)
+                                        group->setLevel(2);
+                                    else
+                                        group->setLevel(3);
+                                    v->add(group);
+                                    group->add(v);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+
 #ifdef _DEBUG_MDL
         std::cout << "Création de la Surface "<<current_command.name<<std::endl;
 #endif
