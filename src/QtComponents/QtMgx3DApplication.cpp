@@ -656,7 +656,7 @@ void QtMgx3DApplication::syntax (const string& exe) const
 {
 	cout << "Syntaxe :" << endl
 	     << exe << "[-h][-defaultConfig fichier][-userConfig fichier]"
-	     << "[-outCharsetRef àéèùô][-outCharset charset]"
+	     << "[-outCharsetRef àéèùô][-outCharset charset][-icon fichier]"
 	     << "[-graphicalWindowWidth largeur][-graphicalWindowHeight hauteur]"
 	     << "[-graphicalWindowFixedSize]"
 		 << "[-useOCAF]"
@@ -671,7 +671,7 @@ void QtMgx3DApplication::syntax (const string& exe) const
 			<<"transmettre la chaîne \"àéèùô\" en argument pour détection automatique du jeu de caractères utilisé par la console"<<endl
 	     << " -outCharset jeu de caractères        : "
 			<<"utilise le jeu de caractères transmis pour les sorties standard (UTF-8/UTF-16/ISO-8859/ASCII)"<<endl
-
+	     << "-icon fichier                         : utilise pour icône de l'application celle contenue dans fichier" << endl
 	     << "-graphicalWindowWidth largeur         : "
 			<< "affecte largeur à la largeur de la fenêtre graphique" << endl
 	     << "-graphicalWindowHeight hauteur        : "
