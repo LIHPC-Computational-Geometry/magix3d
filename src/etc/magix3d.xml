@@ -475,6 +475,18 @@
           </annotation>
           <value>true</value>
         </element>
+        <element name="showAmodalDialogOnCommandError" type="boolean">
+          <annotation>
+            <documentation>Faut-il que la boite de dialogue d'erreur lorsqu'une commande échoue soit amodale ? Expérimental. Si oui évite que l'application ne bascule sur le bureau virtuel courant.</documentation>
+          </annotation>
+          <value>false</value>
+        </element>
+     <element name="commandNotificationDelay" type="unsignedLong">
+        <annotation>
+          <documentation>Durée d'exécution de commande en secondes à partir de laquelle une notification système est envoyée.</documentation>
+        </annotation>
+        <value>30</value>
+      </element>
       </Section>
       <Section name="groups" type="container">
         <annotation>
