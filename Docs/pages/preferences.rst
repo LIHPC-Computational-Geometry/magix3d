@@ -312,14 +312,23 @@ Section **panels** : ressources des panneaux de l’IHM
       sont masqués ? Oui si true, non si false. Vaut *false* par
       défaut.
 
-   -  **autoUpdateUsesSelection** : Les panneaux d'opérations doivent-ils être initialisés 
-      (autant que possible) avec la sélection en cours lors de leur affichage ? Oui si true, non
+   -  **autoUpdateUsesSelection** : Les panneaux d'opérations 
+      doivent-ils être initialisés (autant que possible) avec la 
+      sélection en cours lors de leur affichage ? Oui si true, non
       si false. Vaut *true* par défaut.
 
-   -  **showDialogOnCommandError** : Faut-il afficher une boite de
-      dialogue d'erreur lorsqu'une commande échoue ? Oui si true,
-      non si false.
-
+   -  **showDialogOnCommandError** : Faut-il afficher une boite de 
+      dialogue d'erreur lorsqu'une commande échoue ? Oui si true, non si
+      false.
+      
+   -  **showAmodalDialogOnCommandError** : Faut-il afficher une boite de 
+      dialogue d'erreur non modale lorsqu'une commande échoue ? Non si 
+      true (risque de désorganiser le bureau courant, valeur par 
+      défaut), oui si false (expérimental).
+      
+   - **commandNotificationDelay** : Durée d'exécution de commande en 
+      secondes à partir de laquelle une notification système est
+      envoyée.
 
 -  Section **selection** :
 
