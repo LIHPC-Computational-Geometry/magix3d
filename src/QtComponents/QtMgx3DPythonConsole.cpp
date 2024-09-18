@@ -3,6 +3,7 @@
 #include "QtComponents/QtMgx3DPythonConsole.h"
 #include "QtComponents/Qt3DGraphicalWidget.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
+#include "QtComponents/QtMgx3DApplication.h"
 #include <QtUtil/QtConfiguration.h>
 #include <QtUtil/QtMessageBox.h>
 #include <QtUtil/QtUnicodeHelper.h>
@@ -133,6 +134,8 @@ void QtMgx3DPythonConsole::run ( )
 	AutoMutex	mutex (&getMutex ( ));
 #endif	// MULTITHREADED_APPLICATION
 	storePolicy ( );
+	
+	ActionCompletionNotifier actionCompletionNotifier (getAppName ( ), QtMgx3DApplication::getAppIcon ( ), UTF8String ("Instructions python exécutées", Charset::UTF_8), QtMessageBox::URGENCY_NORMAL, 30, Resources::instance ( )._commandNotificationDelay);
 
 	try
 	{
@@ -170,6 +173,8 @@ void QtMgx3DPythonConsole::cont ( )
 #ifdef MULTITHREADED_APPLICATION
 	AutoMutex	mutex (&getMutex ( ));
 #endif	// MULTITHREADED_APPLICATION
+
+	ActionCompletionNotifier actionCompletionNotifier (getAppName ( ), QtMgx3DApplication::getAppIcon ( ), UTF8String ("Instructions python exécutées", Charset::UTF_8), QtMessageBox::URGENCY_NORMAL, 30, Resources::instance ( )._commandNotificationDelay);
 
 	QtPythonConsole::cont ( );
 }	// QtMgx3DPythonConsole::cont
@@ -224,6 +229,8 @@ void QtMgx3DPythonConsole::executeFile (const std::string& fileName)
 
 	storePolicy ( );
 
+	ActionCompletionNotifier actionCompletionNotifier (getAppName ( ), QtMgx3DApplication::getAppIcon ( ), UTF8String ("Script exécuté", Charset::UTF_8), QtMessageBox::URGENCY_NORMAL, 20, Resources::instance ( )._commandNotificationDelay);
+	
 	unique_ptr<RenderingManager::DisplayLocker>	displayLocker (0 == _graphicalWidget ? 0 : new RenderingManager::DisplayLocker (_graphicalWidget->getRenderingManager ( )));
 
 	CommandManagerIfc::POLICY	cmdMgrPolicy	= CommandManagerIfc::THREADED;
@@ -279,8 +286,7 @@ ScriptingManager* QtMgx3DPythonConsole::getMgxUserScriptingManager ( )
 }	// QtMgx3DPythonConsole::getMgxUserScriptingManager
 
 
-const ScriptingManager*
-				QtMgx3DPythonConsole::getMgxUserScriptingManager ( ) const
+const ScriptingManager* QtMgx3DPythonConsole::getMgxUserScriptingManager ( ) const
 {
 	return _mgxUserScriptingManager;
 }	// QtMgx3DPythonConsole::getMgxUserScriptingManager

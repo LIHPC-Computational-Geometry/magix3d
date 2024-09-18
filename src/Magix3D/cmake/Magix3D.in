@@ -34,6 +34,7 @@ QUALIF_URL="-qualifURL @URL_QUALIF@"
 USER_MANUAL="-userManual $ROOT_DIR/share/doc/@CMAKE_PROJECT_NAME@/sphinx/pdf/magix3d.pdf"
 DOC_VIEWER="-docViewer firefox"
 DEFAULT_CONFIG="-defaultConfig $ROOT_DIR/etc/magix3d.xml"
+ICON="-icon $ROOT_DIR/etc/logo_magix3D.png"
 CONFIG_PATCHS="-userConfigPatchs $ROOT_DIR/etc/magix3d_patchs.xml"
 OTHER_ARGS="-outCharsetRef àéèùô"
 
@@ -47,6 +48,6 @@ if [ $PLATFORM = Ubuntu ]; then
 	export LD_LIBRARY_PATH=@VTK_LIBRARY_PATH@:$LD_LIBRARY_PATH
 fi
 
-args="$HELP_URL $WIKI_URL $QUALIF_URL $USER_MANUAL $PYTHON_API_MANUAL $DOC_VIEWER $DEFAULT_CONFIG $CONFIG_PATCHS $OTHER_ARGS $*"
+args="$HELP_URL $WIKI_URL $QUALIF_URL $USER_MANUAL $PYTHON_API_MANUAL $DOC_VIEWER $DEFAULT_CONFIG $CONFIG_PATCHS $OTHER_ARGS $ICON $*"
 
 $ROOT_DIR/bin/@MAGIX3D_EXE@ $args

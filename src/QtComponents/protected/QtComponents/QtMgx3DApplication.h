@@ -95,10 +95,15 @@ class QtMgx3DApplication : public QApplication
 	 static QtMgx3DMainWindow& getMainWindow ( );
 
 	/**
-	 * @return		Le titre de l'application.
+	 * \return		Le titre de l'application.
 	 */
 	static std::string getAppTitle ( );
-
+	
+	/**
+	 * \return		Le fichier icon de l'application.
+	 */
+	static const std::string& getAppIcon ( );
+	
 	/**
 	 * @return		<I>true</I> si l'application doit afficher des boites de
 	 *				dialogue d'erreur lors des exceptions remontées lors de
@@ -679,6 +684,8 @@ class QtMgx3DApplication : public QApplication
 	/** argc, argv etenvp du main. */
 	static int								_argc;
 	static char								**_argv, **_envp;
+	/** Le fichier icone de l'application. */
+	static std::string						_appIcon;
 };	// class QtMgx3DApplication
 
 

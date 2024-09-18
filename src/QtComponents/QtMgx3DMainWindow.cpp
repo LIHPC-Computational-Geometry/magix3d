@@ -3905,9 +3905,6 @@ void QtMgx3DMainWindow::executePythonScript(const string &f)
 	{
 		timer.stop();
 		getContext().endImportScript();
-		if (timer.duration ( ) >= Resources::instance ( )._commandNotificationDelay.getValue ( ))
-			QtMessageBox::systemNotification ("Magix3D", "Script terminé en erreur.");
-
 		throw;
 	}
 	// titre de la fenêtre principale
@@ -3919,11 +3916,6 @@ void QtMgx3DMainWindow::executePythonScript(const string &f)
 	message << "Exécution du script Python " << file.getFullFileName() << " avec succès (en "
 			<< (unsigned long) timer.duration() << " secondes au total).";
 	log(InformationLog(message));
-		
-	if (timer.duration ( ) >= Resources::instance ( )._commandNotificationDelay.getValue ( ))
-	{
-		QtMessageBox::systemNotification ("Magix3D", "Script terminé avec succès.");
-	}	// if (timer.duration ( ) >= Resources::instance ( )._commandNotificationDelay.getValue ( ))
 }    // QtMgx3DMainWindow::executePythonScript
 
 
@@ -4571,7 +4563,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 						const string warn = commandInternal->getWarningToPopup();
 						if (false == warn.empty())
 						{
-							QtMessageBox::systemNotification ("Magix3D", "Commandes terminées avec avertissement.", QtMessageBox::URGENCY_CRITICAL);
+							QtMessageBox::systemNotification ("Magix3D", QtMgx3DApplication::getAppIcon ( ), "Commandes terminées avec avertissement.", QtMessageBox::URGENCY_CRITICAL);
 							if (false == Resources::instance ( )._showAmodalDialogOnCommandError.getValue ( ))
 								QtMessageBox::displayWarningMessage (this, getAppTitle().c_str ( ), warn);	// Défaut
 							else
@@ -4589,7 +4581,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 						if ((true == Resources::instance()._showDialogOnCommandError.getValue()) && (false == command.isUserNotified()))
 						{
 							command.setUserNotified (true);
-							QtMessageBox::systemNotification ("Magix3D", "Commandes terminées en erreur.", QtMessageBox::URGENCY_CRITICAL);
+							QtMessageBox::systemNotification ("Magix3D", QtMgx3DApplication::getAppIcon ( ), "Commandes terminées en erreur.", QtMessageBox::URGENCY_CRITICAL);
 							if (false == Resources::instance ( )._showAmodalDialogOnCommandError.getValue ( ))
 								QtMessageBox::displayErrorMessage (this, getAppTitle ( ), command.getErrorMessage ( ));	// défaut
 							else

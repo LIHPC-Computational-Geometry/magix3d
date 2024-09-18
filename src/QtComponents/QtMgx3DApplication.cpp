@@ -358,6 +358,7 @@ QtMgx3DApplication*	QtMgx3DApplication::_instance	= 0;
 int					QtMgx3DApplication::_argc		= 0;
 char**				QtMgx3DApplication::_argv		= 0;
 char**				QtMgx3DApplication::_envp		= 0;
+string				QtMgx3DApplication::_appIcon;
 
 
 QtMgx3DApplication::QtMgx3DApplication (int& argc, char* argv[], char* envp[])
@@ -405,8 +406,7 @@ void QtMgx3DApplication::init (int argc, char* argv[], char* envp[])
 	// par la console python QConsole. En son absence, si locale vaut C alors
 	// les caractères accentués des fichiers scripts seront perdus.
 	QTextCodec::setCodecForLocale (QTextCodec::codecForName ("ISO 8859-1"));
-	// Eviter des messages d'erreur lorsque l'on quitte un champ de saisie numérique
-	// vide :
+	// Eviter des messages d'erreur lorsque l'on quitte un champ de saisie numérique vide :
 	QtValidatedTextField::automaticValidation	=true;
 	QtValidatedTextField::dialogOnError			=false;
 	QtValidatedTextField::errorBackground		= QColor (250, 90, 40);
@@ -448,6 +448,9 @@ void QtMgx3DApplication::init (int argc, char* argv[], char* envp[])
 // Une exception est levée par Context::initialize en cas d'argument invalide.
 //		std::exit (EXIT_SUCCESS);
 	}
+	
+	if (false == _appIcon.empty ( ))
+		setWindowIcon (QIcon (_appIcon.c_str ( )));
 
 	// On essaie d'amméliorer la complétion du binding swig dans la console python :
 	QtPythonConsole::enableSwigCompletion	= true;
@@ -564,6 +567,12 @@ string QtMgx3DApplication::getAppTitle ( )
 }	// QtMgx3DApplication::getAppTitle
 
 
+const string& QtMgx3DApplication::getAppIcon ( )
+{
+	return _appIcon;
+}	// QtMgx3DApplication::getAppIcon
+
+
 bool QtMgx3DApplication::displayUpdatesErrors ( )
 {
 	return Resources::instance ( )._displayUpdatesErrors;
@@ -586,6 +595,8 @@ void QtMgx3DApplication::parseArgs (int& argc, char* argv [])
 {
 	displayHelp				= Context::getArguments ( ).hasArg ("-help") || Context::getArguments ( ).hasArg ("--help");
 	graphicalWindowFixedSize	= Context::getArguments ( ).hasArg ("-graphicalWindowFixedSize");
+	if (true == Context::getArguments ( ).hasArg ("-icon"))
+		_appIcon	= Context::getArguments ( ).getArgValue ("-icon");
 	if (true == Context::getArguments ( ).hasArg ("-defaultConfig"))
 		Resources::instance ( )._defaultConfigURL		= Context::getArguments ( ).getArgValue ("-defaultConfig");
 	if (true == Context::getArguments ( ).hasArg ("-userConfig"))
