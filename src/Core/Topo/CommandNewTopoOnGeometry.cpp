@@ -11,6 +11,8 @@
 #include "Topo/TopoManager.h"
 #include "Topo/Block.h"
 #include "Topo/CoFace.h"
+#include "Topo/BlockMeshingPropertyDirectional.h"
+#include "Topo/BlockMeshingPropertyTransfinite.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Utils/Common.h"
 #include "Internal/ServiceGeomToTopo.h"
@@ -262,7 +264,7 @@ internalExecute()
 		}
 		else {
 			// création d'un simple bloc
-			Block* bl = new Block(getContext(), 0,0,0,BlockMeshingProperty::transfinite);
+			Block* bl = new Block(getContext(), 0,0,0,new BlockMeshingPropertyTransfinite());
 			addCreatedBlock(bl);
 			if (!m_groupName.empty()){
 		    	Group::Group3D* grp = getContext().getLocalGroupManager().getNewGroup3D(m_groupName, &getInfoCommand());
@@ -436,7 +438,7 @@ void CommandNewTopoOnGeometry::createSpherePartBlock()
 {
 	// cas avec dégénérescence à l'origine
 	Topo::Block* bloc = new Topo::Block(getContext(), m_nj, m_nk, m_ni,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+			new BlockMeshingPropertyDirectional(BlockMeshingProperty::dir_k));
 
 	addCreatedBlock(bloc);
 	split();
@@ -481,7 +483,7 @@ void CommandNewTopoOnGeometry::createHollowSpherePartBlock()
 {
 	// cas d'un bloc régulier
 	Topo::Block* bloc = new Topo::Block(getContext(), m_nj, m_nk, m_ni,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+			new BlockMeshingPropertyDirectional(BlockMeshingProperty::dir_k));
 
 	addCreatedBlock(bloc);
 	split();

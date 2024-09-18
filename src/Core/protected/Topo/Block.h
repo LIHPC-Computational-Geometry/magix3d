@@ -70,9 +70,7 @@ public:
 
     /*------------------------------------------------------------------------*/
     /// Constructeur par défaut, maillage structuré
-    Block(Internal::Context& c, int ni=0, int nj=0, int nk=0,
-            BlockMeshingProperty::meshLaw ml = BlockMeshingProperty::directional,
-            BlockMeshingProperty::meshDirLaw md = BlockMeshingProperty::dir_i);
+    Block(Internal::Context& c, int ni, int nj, int nk, BlockMeshingProperty* mp);
 
     /*------------------------------------------------------------------------*/
     /// Constructeur par copie
@@ -371,10 +369,8 @@ public:
      */
     virtual void setMeshLaw(BlockMeshingProperty* new_ppty);
 
-    /** Recherche d'une méthode de maillage unidirectionnelle autant que possible,
-     *  sinon on utilise la méthode transfinie
-     */
-    virtual void selectBasicMeshLaw(Internal::InfoCommand* icmd, bool forceCompute = false);
+    /** Tente d'appliquer une méthode de maillage directionnelle */
+    virtual void tryToSetDirectionalMeshLaw(Internal::InfoCommand* icmd, bool forceCompute = false);
 
     /*------------------------------------------------------------------------*/
     /** Accesseur sur la liste des points */

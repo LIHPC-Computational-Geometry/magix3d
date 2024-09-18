@@ -20,6 +20,7 @@
 #include "Topo/FaceMeshingPropertyTransfinite.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Topo/CoEdgeMeshingProperty.h"
+#include "Topo/BlockMeshingPropertyTransfinite.h"
 #include "Topo/BlockMeshingPropertyInsertion.h"
 
 #include "Geom/Volume.h"
@@ -75,7 +76,12 @@ bool ServiceGeomToTopo::convertBlockStructured(const int ni, const int nj, const
     if (bloc->structurable()){
         bloc->structure(m_icmd);
 
-        bloc->selectBasicMeshLaw(m_icmd);
+        if (bloc->getMeshLaw() != Topo::BlockMeshingProperty::meshLaw::transfinite) {
+            bloc->saveBlockMeshingProperty(m_icmd);
+            auto mp = new Topo::BlockMeshingPropertyTransfinite();
+            bloc->switchBlockMeshingProperty(m_icmd, mp);
+            delete mp;
+        }
 
         // cas où le nombre de bras est donné par l'utilisateur
         if (ni>0 && nj>0 && nk>0){
@@ -122,10 +128,13 @@ bool ServiceGeomToTopo::convertCoFaceStructured()
 
     if (coface->structurable()){
         coface->structure(m_icmd);
-        coface->saveCoFaceMeshingProperty(m_icmd);
-        auto mp = new Topo::FaceMeshingPropertyTransfinite();
-        coface->switchCoFaceMeshingProperty(m_icmd, mp);
-        delete mp;
+
+        if (coface->getMeshLaw() != Topo::CoFaceMeshingProperty::meshLaw::transfinite) {
+            coface->saveCoFaceMeshingProperty(m_icmd);
+            auto mp = new Topo::FaceMeshingPropertyTransfinite();
+            coface->switchCoFaceMeshingProperty(m_icmd, mp);
+            delete mp;
+        }
 
         return false; // ok
     }

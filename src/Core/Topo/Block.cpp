@@ -158,15 +158,13 @@ Block(Internal::Context& ctx,
 }
 /*----------------------------------------------------------------------------*/
 Block::
-Block(Internal::Context& ctx, int ni, int nj, int nk,
-        BlockMeshingProperty::meshLaw ml,
-        BlockMeshingProperty::meshDirLaw md)
+Block(Internal::Context& ctx, int ni, int nj, int nk, BlockMeshingProperty* mp)
 : TopoEntity(ctx,
         ctx.newProperty(Utils::Entity::TopoBlock),
         ctx.newDisplayProperties(Utils::Entity::TopoBlock))
 , m_topo_property(new BlockTopoProperty())
 , m_save_topo_property(0)
-, m_mesh_property(0)
+, m_mesh_property(mp)
 , m_save_mesh_property(0)
 , m_mesh_data(new BlockMeshingData())
 , m_save_mesh_data(0)
@@ -174,12 +172,6 @@ Block(Internal::Context& ctx, int ni, int nj, int nk,
 	TkUtil::UTF8String	message1 (TkUtil::Charset::UTF_8);
     message1 << "Block::Block(), dans le cas structuré\n";
     log (TkUtil::TraceLog (message1, TkUtil::Log::TRACE_4));
-
-    // NB, il manque l'axe de rotation pour construire un BlockMeshingPropertyRotational
-    if (ml == BlockMeshingProperty::directional)
-        m_mesh_property =new BlockMeshingPropertyDirectional(md);
-    else
-        m_mesh_property =new BlockMeshingPropertyTransfinite();
 
     // bloc avec les sommets équivalents à ceux d'une boite de taille 1
 
@@ -2765,8 +2757,8 @@ split(CoEdge* arete, double ratio,
 #ifdef _DEBUG_SPLIT
         std::cout<<" cas d'un bloc ("<<getName()<<") avec MeshLaw à "<<getMeshLawName()<<std::endl;
 #endif
-        block_1->selectBasicMeshLaw(icmd);
-        block_2->selectBasicMeshLaw(icmd);
+        block_1->tryToSetDirectionalMeshLaw(icmd);
+        block_2->tryToSetDirectionalMeshLaw(icmd);
     }
     else {
         // on clone la méthode de discrétiasation
@@ -3717,10 +3709,10 @@ getRatios(std::map<CoEdge*,uint> &ratios)
 }
 /*----------------------------------------------------------------------------*/
 void Block::
-selectBasicMeshLaw(Internal::InfoCommand* icmd, bool forceCompute)
+tryToSetDirectionalMeshLaw(Internal::InfoCommand* icmd, bool forceCompute)
 {
 #ifdef _DEBUG2
-    std::cout<<"selectBasicMeshLaw pour "<<getName()<<" cas d'un bloc avec MeshLaw à "<<getMeshLawName()<<std::endl;
+    std::cout<<"tryToSetDirectionalMeshLaw pour "<<getName()<<" cas d'un bloc avec MeshLaw à "<<getMeshLawName()<<std::endl;
 #endif
 
     if (!forceCompute && getMeshLaw() == BlockMeshingProperty::directional){

@@ -467,7 +467,7 @@ updateMeshLaw(std::vector<Topo::CoFace*>& cofaces, std::vector<Topo::Block*>& bl
         if (block->getMeshLaw() < BlockMeshingProperty::transfinite){
 
             // on cherche une méthode la plus basique possible
-            block->selectBasicMeshLaw(&getInfoCommand(), true);
+            block->tryToSetDirectionalMeshLaw(&getInfoCommand(), true);
 
         } // end if (bloc->getMeshLaw() <= rotK)
     } // end for iter=l_b.begin()

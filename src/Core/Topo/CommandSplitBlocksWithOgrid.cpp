@@ -1602,7 +1602,7 @@ createBlock(std::map<Vertex*, uint> & filtre_vertex,
                         newBlock->setGeomAssociation(bloc->getGeomAssociation());
 
                         if (bloc->getMeshLaw() == BlockMeshingProperty::directional)
-                        	newBlock->selectBasicMeshLaw(&getInfoCommand());
+                        	newBlock->tryToSetDirectionalMeshLaw(&getInfoCommand());
 
                     } // end if filtre_coface[...] == 1
                 } // end iter3
@@ -1672,7 +1672,7 @@ createBlock(std::map<Vertex*, uint> & filtre_vertex,
                 newBlock->setGeomAssociation(bloc->getGeomAssociation());
 
                 if (bloc->getMeshLaw() == BlockMeshingProperty::directional)
-                	newBlock->selectBasicMeshLaw(&getInfoCommand());
+                	newBlock->tryToSetDirectionalMeshLaw(&getInfoCommand());
 
             } // end else if (filtre_face[face] == 1)
         else {
@@ -1712,7 +1712,7 @@ createBlock(std::map<Vertex*, uint> & filtre_vertex,
         newBlock->setGeomAssociation(bloc->getGeomAssociation());
 
         if (bloc->getMeshLaw() == BlockMeshingProperty::directional)
-        	newBlock->selectBasicMeshLaw(&getInfoCommand());
+        	newBlock->tryToSetDirectionalMeshLaw(&getInfoCommand());
 
     } // end iter1
 }
