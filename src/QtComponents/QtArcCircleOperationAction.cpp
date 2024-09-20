@@ -725,9 +725,9 @@ void QtArcCircleOperationPanel::preview (bool on, bool destroyInteractor)
 				// pour l'arc de courbe
 				const Vector        normal   = getNormal();
 				const bool          direct   = directOrientation();
-				Vertex              *pc      = context->getLocalGeomManager().getVertex(getCenterVertexUniqueName());
-				Vertex              *pd      = context->getLocalGeomManager().getVertex(getStartVertexUniqueName());
-				Vertex              *pe      = context->getLocalGeomManager().getVertex(getEndVertexUniqueName());
+				Vertex              *pc      = context->getLocalGeomManager().getVertex(getStartVertexUniqueName());
+				Vertex              *pd      = context->getLocalGeomManager().getVertex(getEndVertexUniqueName());
+				Vertex              *pe      = context->getLocalGeomManager().getVertex(getCenterVertexUniqueName());
 				command = new CommandNewArcCircle (*context, pc, pd, pe, direct, normal, groupName);
 				break;
 			}   // case QtArcCircleOperationPanel::EXTREMITIES_CENTER
