@@ -5,6 +5,7 @@
 #include "QtComponents/QtMgx3DApplication.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtVtkComponents/VTKMgx3DActor.h"
+#include "VtkComponents/vtkECMAreaPicker.h"
 
 #include <TkUtil/Exception.h>
 
@@ -494,7 +495,8 @@ void vtkMgx3DInteractorStyle::OnLeftButtonUp ( )
 			rwi->GetRenderWindow ( )->Frame ( );
 			RubberButtonDown		= false;
 // CP : A METTRE AU PROPRE
-vtkSmartPointer<vtkAreaPicker>		areaPicker		= vtkSmartPointer<vtkAreaPicker>::New ( );
+vtkSmartPointer<vtkECMAreaPicker>		areaPicker		= vtkSmartPointer<vtkECMAreaPicker>::New ( );
+areaPicker->SelectCompletelyInside (true);
 areaPicker->SetRenderer (CurrentRenderer);
 int	result	= areaPicker->AreaPick (StartPosition [0], StartPosition [1], EndPosition [0], EndPosition [1], CurrentRenderer);
 vtkProp3DCollection*		pickedProps	= areaPicker->GetProp3Ds ( );
