@@ -1091,15 +1091,29 @@ int vtkECMExtractSelectedFrustum::IsectDegenerateCell(vtkCell *cell)
 	vtkIdType npts = cell->GetNumberOfPoints();
 	vtkPoints *pts = cell->GetPoints();
 	double x[3];
-	for (vtkIdType i = 0; i < npts; i++)
+	
+	if (true == SelectionCompletelyInside)
 	{
-		pts->GetPoint(i, x);
-		if (this->Frustum->EvaluateFunction(x) >= 0.0)
+		for (vtkIdType i = 0; i < npts; i++)
 		{
-			return 0;
+			pts->GetPoint(i, x);
+			if (this->Frustum->EvaluateFunction(x) >= 0.0)
+				return 0;
 		}
-	}
-	return 1;
+
+		return 1;
+	}	// if (true == SelectionCompletelyInside)
+	else
+	{	// VTK original code : we allow to select cells that are partially inside the frustum
+		for (vtkIdType i = 0; i < npts; i++)
+		{
+			pts->GetPoint(i, x);
+			if (this->Frustum->EvaluateFunction(x) < 0.0)
+				return 1;
+		}
+
+		return 0;
+	}	// else if (true == SelectionCompletelyInside)
 	// !Magix3D code
 /* Original code (vtkECMExtractSelectedFrustum::IsectDegenerateCell)
   vtkIdType npts = cell->GetNumberOfPoints();
