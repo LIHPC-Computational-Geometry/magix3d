@@ -145,21 +145,21 @@ QtCircleOperationPanel::OPERATION_METHOD QtCircleOperationPanel::getOperationMet
 string QtCircleOperationPanel::getVertex1UniqueName ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_verticesPanel)
-	return _verticesPanel->getStartVertexUniqueName ( );
+	return _verticesPanel->getVertex1UniqueName ( );
 }	// QtCircleOperationPanel::getStartVertexUniqueName
 
 
 string QtCircleOperationPanel::getVertex2UniqueName ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_verticesPanel)
-	return _verticesPanel->getEndVertexUniqueName ( );
+	return _verticesPanel->getVertex2UniqueName ( );
 }	// QtCircleOperationPanel::getVertex2UniqueName
 
 
 string QtCircleOperationPanel::getVertex3UniqueName ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_verticesPanel)
-	return _verticesPanel->getCenterVertexUniqueName ( );
+	return _verticesPanel->getVertex3UniqueName ( );
 }	// QtCircleOperationPanel::getVertex3UniqueName
 
 
@@ -281,9 +281,9 @@ void QtCircleOperationPanel::preview (bool show, bool destroyInteractor)
 		{
 			case QtCircleOperationPanel::THREE_POINTS			:
 			case QtCircleOperationPanel::ELLIPSE_THREE_POINTS	:
-				v1	= getContext ( ).getGeomManager ( ).getVertex (_verticesPanel->getStartVertexUniqueName ( ), false);
-				v2	= getContext ( ).getGeomManager ( ).getVertex (_verticesPanel->getEndVertexUniqueName ( ), false);
-				v3	= getContext ( ).getGeomManager ( ).getVertex (_verticesPanel->getCenterVertexUniqueName ( ), false);
+				v1	= getContext ( ).getGeomManager ( ).getVertex (_verticesPanel->getVertex1UniqueName ( ), false);
+				v2	= getContext ( ).getGeomManager ( ).getVertex (_verticesPanel->getVertex2UniqueName ( ), false);
+				v3	= getContext ( ).getGeomManager ( ).getVertex (_verticesPanel->getVertex3UniqueName ( ), false);
 				break;
 			default												: throw Exception ("Erreur interne dans QtCircleOperationPanel::preview : cas non recensé.");
 		}	// switch (getOperationMethod ( ))

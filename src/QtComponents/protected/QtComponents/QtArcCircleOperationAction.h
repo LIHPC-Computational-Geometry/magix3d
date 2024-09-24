@@ -64,9 +64,9 @@ class QtCenterExtremitiesArcPanel : public QtMgx3DOperationsSubPanel
 	/**
 	 * Les coordonnées des vertices définissant l'arc de cercle.
 	 */
-	virtual std::string getStartVertexUniqueName ( ) const;
-	virtual std::string getEndVertexUniqueName ( ) const;
-	virtual std::string getCenterVertexUniqueName ( ) const;
+	virtual std::string getVertex1UniqueName ( ) const;
+	virtual std::string getVertex2UniqueName ( ) const;
+	virtual std::string getVertex3UniqueName ( ) const;
 
 	/**
 	 * \return	<I>true</I> si l'utilisateur défini la normale au plan, <I>false</I> dans le cas contraire.
@@ -257,9 +257,9 @@ class QtArcCircleOperationPanel : public QtMgx3DOperationPanel
 	 * Les coordonnées des vertices définissant l'arc de cercle.
 	 * (si <I>getOperationMethod ( )</I> retourne <I>EXTREMITIES_CENTER</I>).
 	 */
-	virtual std::string getStartVertexUniqueName ( ) const;
-	virtual std::string getEndVertexUniqueName ( ) const;
-	virtual std::string getCenterVertexUniqueName ( ) const;
+	virtual std::string getVertex1UniqueName ( ) const;
+	virtual std::string getVertex2UniqueName ( ) const;
+	virtual std::string getVertex3UniqueName ( ) const;
 
 	/**
 	 * \return	<I>true</I> si l'utilisateur défini la normale au plan, <I>false</I> dans le cas contraire.

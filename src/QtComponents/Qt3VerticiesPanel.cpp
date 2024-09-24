@@ -161,46 +161,46 @@ void Qt3VerticiesPanel::autoUpdate ( )
 }	// Qt3VerticiesPanel::autoUpdate
 
 
-string Qt3VerticiesPanel::getStartVertexUniqueName ( ) const
+string Qt3VerticiesPanel::getVertex1UniqueName ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_vertex1Panel)
 	return _vertex1Panel->getUniqueName ( );
-}	// Qt3VerticiesPanel::getStartVertexUniqueName
+}	// Qt3VerticiesPanel::getVertex1UniqueName
 
 
-string Qt3VerticiesPanel::getEndVertexUniqueName ( ) const
+string Qt3VerticiesPanel::getVertex2UniqueName ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_vertex2Panel)
 	return _vertex2Panel->getUniqueName ( );
-}	// Qt3VerticiesPanel::getEndVertexUniqueName
+}	// Qt3VerticiesPanel::getVertex2UniqueName
 
 
-string Qt3VerticiesPanel::getCenterVertexUniqueName ( ) const
+string Qt3VerticiesPanel::getVertex3UniqueName ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_vertex3Panel)
 	return _vertex3Panel->getUniqueName ( );
-}	// Qt3VerticiesPanel::getCenterVertexUniqueName
+}	// Qt3VerticiesPanel::getVertex3UniqueName
 
 
-QtMgx3DEntityPanel& Qt3VerticiesPanel::getStartVertexPanel ( )
+QtMgx3DEntityPanel& Qt3VerticiesPanel::getVertex1Panel ( )
 {
 	CHECK_NULL_PTR_ERROR (_vertex1Panel)
 	return *_vertex1Panel;
-}	// Qt3VerticiesPanel::getStartVertexPanel
+}	// Qt3VerticiesPanel::getVertex1Panel
 
 
-QtMgx3DEntityPanel& Qt3VerticiesPanel::getEndVertexPanel ( )
+QtMgx3DEntityPanel& Qt3VerticiesPanel::getVertex2Panel ( )
 {
 	CHECK_NULL_PTR_ERROR (_vertex2Panel)
 	return *_vertex2Panel;
-}	// Qt3VerticiesPanel::getEndVertexPanel
+}	// Qt3VerticiesPanel::getVertex2Panel
 
 
-QtMgx3DEntityPanel& Qt3VerticiesPanel::getCenterVertexPanel ( )
+QtMgx3DEntityPanel& Qt3VerticiesPanel::getVertex3Panel ( )
 {
 	CHECK_NULL_PTR_ERROR (_vertex3Panel)
 	return *_vertex3Panel;
-}	// Qt3VerticiesPanel::getCenterVertexPanel
+}	// Qt3VerticiesPanel::getVertex3Panel
 
 
 void Qt3VerticiesPanel::setLabels (const UTF8String& start, const UTF8String& end, const UTF8String& center)
@@ -217,9 +217,9 @@ void Qt3VerticiesPanel::setLabels (const UTF8String& start, const UTF8String& en
 
 void Qt3VerticiesPanel::getPoints (Math::Point& p1, Math::Point& p2, Math::Point& p3) const
 {
-	p1	= getPoint (getStartVertexUniqueName ( ));
-	p2	= getPoint (getEndVertexUniqueName ( ));
-	p3	= getPoint (getCenterVertexUniqueName ( ));
+	p1	= getPoint (getVertex1UniqueName ( ));
+	p2	= getPoint (getVertex2UniqueName ( ));
+	p3	= getPoint (getVertex3UniqueName ( ));
 }	// Qt3VerticiesPanel::getPoints
 
 
@@ -237,9 +237,9 @@ void Qt3VerticiesPanel::stopSelection ( )
 vector<Entity*> Qt3VerticiesPanel::getInvolvedEntities ( )
 {
 	vector<Entity*>	entities;
-	const string	name1	= getStartVertexUniqueName ( );
-	const string	name2	= getEndVertexUniqueName ( );
-	const string	name3	= getCenterVertexUniqueName ( );
+	const string	name1	= getVertex1UniqueName ( );
+	const string	name2	= getVertex2UniqueName ( );
+	const string	name3	= getVertex3UniqueName ( );
 	if (0 != name1.length ( ))
 	{
 		try

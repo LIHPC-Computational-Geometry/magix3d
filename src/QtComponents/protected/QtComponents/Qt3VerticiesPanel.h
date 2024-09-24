@@ -63,16 +63,16 @@ class Qt3VerticiesPanel : public QtMgx3DOperationsSubPanel
 	/**
 	 * Les coordonnées des 3 vertex (départ/fin/centre).
 	 */
-	virtual std::string getStartVertexUniqueName ( ) const;
-	virtual std::string getEndVertexUniqueName ( ) const;
-	virtual std::string getCenterVertexUniqueName ( ) const;
+	virtual std::string getVertex1UniqueName ( ) const;
+	virtual std::string getVertex2UniqueName ( ) const;
+	virtual std::string getVertex3UniqueName ( ) const;
 	
 	/**
 	 * \return	Les panneaux de saisie des 3 vertex.
 	 */
-	 virtual QtMgx3DEntityPanel& getStartVertexPanel ( );
-	 virtual QtMgx3DEntityPanel& getEndVertexPanel ( );
-	 virtual QtMgx3DEntityPanel& getCenterVertexPanel ( );
+	 virtual QtMgx3DEntityPanel& getVertex1Panel ( );
+	 virtual QtMgx3DEntityPanel& getVertex2Panel ( );
+	 virtual QtMgx3DEntityPanel& getVertex3Panel ( );
 	 
 	 /**
 	  * \param	Nouveaux labels des 3 champs de saisie.
