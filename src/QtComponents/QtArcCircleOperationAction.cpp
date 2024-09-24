@@ -108,24 +108,24 @@ QtCenterExtremitiesArcPanel::~QtCenterExtremitiesArcPanel ( )
 }    // QtCenterExtremitiesArcPanel::~QtCenterExtremitiesArcPanel
 
 
-string QtCenterExtremitiesArcPanel::getStartVertexUniqueName ( ) const
+string QtCenterExtremitiesArcPanel::getVertex1UniqueName ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_verticesPanel)
-	return _verticesPanel->getStartVertexUniqueName();
-}    // QtCenterExtremitiesArcPanel::getStartVertexUniqueName
+	return _verticesPanel->getVertex1UniqueName();
+}    // QtCenterExtremitiesArcPanel::getVertex1UniqueName
 
 
-string QtCenterExtremitiesArcPanel::getEndVertexUniqueName ( ) const
+string QtCenterExtremitiesArcPanel::getVertex2UniqueName ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_verticesPanel)
-	return _verticesPanel->getEndVertexUniqueName ( );
-}    // QtCenterExtremitiesArcPanel::getEndVertexUniqueName
+	return _verticesPanel->getVertex2UniqueName ( );
+}    // QtCenterExtremitiesArcPanel::getVertex2UniqueName
 
 
-string QtCenterExtremitiesArcPanel::getCenterVertexUniqueName ( ) const
+string QtCenterExtremitiesArcPanel::getVertex3UniqueName ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_verticesPanel)
-	return _verticesPanel->getCenterVertexUniqueName ( );
+	return _verticesPanel->getVertex3UniqueName ( );
 }    // QtCenterExtremitiesArcPanel::getCenterVertexUniqueName
 
 
@@ -458,43 +458,43 @@ QtArcCircleOperationPanel::OPERATION_METHOD QtArcCircleOperationPanel::getOperat
 }	// QtArcCircleOperationPanel::getOperationMethod
 
 
-string QtArcCircleOperationPanel::getStartVertexUniqueName ( ) const
+string QtArcCircleOperationPanel::getVertex1UniqueName ( ) const
 {
 	switch (getOperationMethod ( ))
 	{
 		case EXTREMITIES_CENTER :
 			CHECK_NULL_PTR_ERROR (_centerExtremitiesPanel)
-			return _centerExtremitiesPanel->getStartVertexUniqueName ( );
+			return _centerExtremitiesPanel->getVertex1UniqueName ( );
 	}   // switch (getOperationMethod ( ))
 
-	throw Exception ("QtArcCircleOperationPanel::getStartVertexUniqueName appellée hors contexte.");
-}	// QtArcCircleOperationPanel::getStartVertexUniqueName
+	throw Exception ("QtArcCircleOperationPanel::getVertex1UniqueName appellée hors contexte.");
+}	// QtArcCircleOperationPanel::getVertex1UniqueName
 
 
-string QtArcCircleOperationPanel::getEndVertexUniqueName ( ) const
+string QtArcCircleOperationPanel::getVertex2UniqueName ( ) const
 {
 	switch (getOperationMethod ( ))
 	{
 		case EXTREMITIES_CENTER :
 			CHECK_NULL_PTR_ERROR (_centerExtremitiesPanel)
-			return _centerExtremitiesPanel->getEndVertexUniqueName ( );
+			return _centerExtremitiesPanel->getVertex2UniqueName ( );
 	}   // switch (getOperationMethod ( ))
 
-	throw Exception ("QtArcCircleOperationPanel::getEndVertexUniqueName appellée hors contexte.");
-}	// QtArcCircleOperationPanel::getEndVertexUniqueName
+	throw Exception ("QtArcCircleOperationPanel::getVertex2UniqueName appellée hors contexte.");
+}	// QtArcCircleOperationPanel::getVertex2UniqueName
 
 
-string QtArcCircleOperationPanel::getCenterVertexUniqueName ( ) const
+string QtArcCircleOperationPanel::getVertex3UniqueName ( ) const
 {
 	switch (getOperationMethod ( ))
 	{
 		case EXTREMITIES_CENTER :
 			CHECK_NULL_PTR_ERROR (_centerExtremitiesPanel)
-			return _centerExtremitiesPanel->getCenterVertexUniqueName ( );
+			return _centerExtremitiesPanel->getVertex3UniqueName ( );
 	}   // switch (getOperationMethod ( ))
 
-	throw Exception ("QtArcCircleOperationPanel::getCenterVertexUniqueName appellée hors contexte.");
-}	// QtArcCircleOperationPanel::getCenterVertexUniqueName
+	throw Exception ("QtArcCircleOperationPanel::getVertex3UniqueName appellée hors contexte.");
+}	// QtArcCircleOperationPanel::getVertex3UniqueName
 
 
 double QtArcCircleOperationPanel::getStartAngle ( ) const
@@ -725,9 +725,9 @@ void QtArcCircleOperationPanel::preview (bool on, bool destroyInteractor)
 				// pour l'arc de courbe
 				const Vector        normal   = getNormal();
 				const bool          direct   = directOrientation();
-				Vertex              *pc      = context->getLocalGeomManager().getVertex(getStartVertexUniqueName());
-				Vertex              *pd      = context->getLocalGeomManager().getVertex(getEndVertexUniqueName());
-				Vertex              *pe      = context->getLocalGeomManager().getVertex(getCenterVertexUniqueName());
+				Vertex              *pc      = context->getLocalGeomManager().getVertex(getVertex1UniqueName());
+				Vertex              *pd      = context->getLocalGeomManager().getVertex(getVertex2UniqueName());
+				Vertex              *pe      = context->getLocalGeomManager().getVertex(getVertex3UniqueName());
 				command = new CommandNewArcCircle (*context, pc, pd, pe, direct, normal, groupName);
 				break;
 			}   // case QtArcCircleOperationPanel::EXTREMITIES_CENTER
@@ -880,9 +880,9 @@ void QtArcCircleOperationAction::executeOperation ( )
 	{
 		case QtArcCircleOperationPanel::EXTREMITIES_CENTER				:
 		{
-			const string	            vertex1	        = getArcCirclePanel ( )->getStartVertexUniqueName ( );
-			const string	            vertex2	        = getArcCirclePanel ( )->getEndVertexUniqueName ( );
-			const string	            vertex3	        = getArcCirclePanel ( )->getCenterVertexUniqueName ( );
+			const string	            vertex1	        = getArcCirclePanel ( )->getVertex1UniqueName ( );
+			const string	            vertex2	        = getArcCirclePanel ( )->getVertex2UniqueName ( );
+			const string	            vertex3	        = getArcCirclePanel ( )->getVertex3UniqueName ( );
 			const bool		            direct	        = getArcCirclePanel ( )->directOrientation ( );
 			const Utils::Math::Vector   normal	        = getArcCirclePanel ( )->getNormal ( );
 			const bool		            defineNormal	= getArcCirclePanel ( )->defineNormal ( );
