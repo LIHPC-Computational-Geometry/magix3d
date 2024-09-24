@@ -4,17 +4,20 @@
 #include "QtVtkComponents/vtkMgx3DInteractorStyle.h"
 #include "QtComponents/QtMgx3DApplication.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
+#include "QtVtkComponents/VTKMgx3DActor.h"
 
 #include <TkUtil/Exception.h>
 
 #include <vtkObjectFactory.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkAreaPicker.h>
 #include <vtkCamera.h>
 #include <vtkCommand.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkAbstractPropPicker.h>
 #include <vtkAssemblyPath.h>
+#include <vtkProp3DCollection.h>
 
 #include <assert.h>
 #include <strings.h>
@@ -31,14 +34,23 @@ const unsigned long		vtkMgx3DInteractorStyle::ViewRedefinedEvent	= 105000;
 
 
 vtkMgx3DInteractorStyle::vtkMgx3DInteractorStyle ( )
-	: vtkUnifiedInteractorStyle ( ), Mgx3DPicker (0), Mgx3DPickerCommand (0), SelectionManager (0), SeizureManager (0), InteractiveSelectionActivated (false)
+	: vtkUnifiedInteractorStyle ( ), Mgx3DPicker (0), Mgx3DPickerCommand (0), SelectionManager (0), SeizureManager (0), 
+	  InteractiveSelectionActivated (false), RubberButtonDown (false), RubberBand (false),
+	  PixelArray (vtkSmartPointer<vtkUnsignedCharArray>::New ( )), TmpPixelArray (vtkSmartPointer<vtkUnsignedCharArray>::New ( ))
 {
 	ButtonPressPosition [0]	= ButtonPressPosition [1]	= 0;
+	StartPosition [0]		= StartPosition [1]			= 0;
+	EndPosition [0]			= EndPosition [1]			= 0;
+	PixelArray->Initialize ( );
+	TmpPixelArray->Initialize ( );
+	PixelArray->SetNumberOfComponents (4);
+	TmpPixelArray->SetNumberOfComponents (4);
 }	// vtkMgx3DInteractorStyle::vtkMgx3DInteractorStyle
 
 
 vtkMgx3DInteractorStyle::vtkMgx3DInteractorStyle (const vtkMgx3DInteractorStyle&)
-	: vtkUnifiedInteractorStyle ( ), Mgx3DPicker (0), Mgx3DPickerCommand (0), SelectionManager (0), SeizureManager (0), InteractiveSelectionActivated (false)
+	: vtkUnifiedInteractorStyle ( ), Mgx3DPicker (0), Mgx3DPickerCommand (0), SelectionManager (0), SeizureManager (0),
+	  InteractiveSelectionActivated (false), RubberButtonDown (false), RubberBand (false), PixelArray ( ), TmpPixelArray ( )
 {
 	assert (0 && "vtkMgx3DInteractorStyle copy constructor is not allowed.");
 }	// vtkMgx3DInteractorStyle copy constructor
@@ -68,6 +80,7 @@ void vtkMgx3DInteractorStyle::PrintSelf (ostream& os, vtkIndent indent)
 	vtkUnifiedInteractorStyle::PrintSelf (os, indent);
 	os << "xyzCancelRoll : " << (true == Resources::instance ( )._xyzCancelRoll.getValue ( ) ? "True" : "False") << endl
 	   << "InteractiveSelectionActivated : " << (true == InteractiveSelectionActivated ? "True" : "False") << endl
+	   << "RubberBand : " << (true == RubberBand ? "True" : "False") << endl
 	   << "PickOnLeftButtonDown : " << (true == Resources::instance ( )._pickOnLeftButtonDown.getValue( ) ? "True" : "False") << endl
 	   << "PickOnRightButtonDown : " << (true == Resources::instance ( )._pickOnRightButtonDown.getValue( ) ? "True" : "False") << endl;
 }	// vtkMgx3DInteractorStyle::PrintSelf
@@ -180,8 +193,7 @@ void vtkMgx3DInteractorStyle::DisplayxOyViewPlane ( )
 
 void vtkMgx3DInteractorStyle::DisplayxOzViewPlane ( )
 {
-	vtkCamera*  camera  = 0 == CurrentRenderer ?
-						  0 : CurrentRenderer->GetActiveCamera ( );
+	vtkCamera*  camera  = 0 == CurrentRenderer ? 0 : CurrentRenderer->GetActiveCamera ( );
 	if (0 == camera)
 		return;
 
@@ -206,8 +218,7 @@ void vtkMgx3DInteractorStyle::DisplayxOzViewPlane ( )
 
 void vtkMgx3DInteractorStyle::DisplayyOzViewPlane ( )
 {
-	vtkCamera*	camera	= 0 == CurrentRenderer ? 
-						  0 : CurrentRenderer->GetActiveCamera ( );
+	vtkCamera*	camera	= 0 == CurrentRenderer ? 0 : CurrentRenderer->GetActiveCamera ( );
 	if (0 == camera)
 		return;
 
@@ -281,8 +292,7 @@ void vtkMgx3DInteractorStyle::ResetView ( )
 
 void vtkMgx3DInteractorStyle::ResetViewOnSelection ( )
 {
-	vtkCamera*	camera	= 0 == CurrentRenderer ? 
-						  0 : CurrentRenderer->GetActiveCamera ( );
+	vtkCamera*	camera	= 0 == CurrentRenderer ? 0 : CurrentRenderer->GetActiveCamera ( );
 	if ((0 != SelectionManager) && (0 != camera))
 	{
 		double	bounds [6]	= { 0., 0., 0., 0., 0., 0. };
@@ -299,8 +309,7 @@ void vtkMgx3DInteractorStyle::ResetViewOnSelection ( )
 }	// vtkMgx3DInteractorStyle::ResetViewOnSelection
 
 
-void vtkMgx3DInteractorStyle::SetPickingTools (
-				VTKMgx3DPicker* picker, VTKMgx3DPickerCommand* pickerCommand)
+void vtkMgx3DInteractorStyle::SetPickingTools (VTKMgx3DPicker* picker, VTKMgx3DPickerCommand* pickerCommand)
 {
 	if ((0 != Mgx3DPickerCommand) && (Mgx3DPickerCommand != pickerCommand))
 		Mgx3DPickerCommand->UnRegister (this);
@@ -333,15 +342,64 @@ VTKMgx3DPicker* vtkMgx3DInteractorStyle::GetMgx3DPicker ( )
 }	// vtkMgx3DInteractorStyle::GetMgx3DPicker
 
 
+void vtkMgx3DInteractorStyle::OnMouseMove ( )
+{
+	if (false == RubberBand)
+		vtkUnifiedInteractorStyle::OnMouseMove ( );
+	else
+	{
+		if ((GetInteractiveSelectionActivated ( ) == true)  && (true == RubberButtonDown))
+		{
+			vtkRenderWindowInteractor*	rwi	= this->Interactor;
+			if ((0 != rwi) && (0 != rwi->GetRenderWindow ( )))
+			{
+				EndPosition [0]	= rwi->GetEventPosition ( )[0];
+				EndPosition [1]	= rwi->GetEventPosition ( )[1];
+				int*	size	= rwi->GetRenderWindow ( )->GetSize ( );
+				if (EndPosition [0] > (size [0] - 1))
+					EndPosition [0]	= size [0] - 1;
+				if (EndPosition [0] < 0)
+					EndPosition [0] = 0;
+				if (EndPosition [1] > (size [1] - 1))
+					EndPosition [1] = size [1] - 1;
+				if (EndPosition [1] < 0)
+					EndPosition [1] = 0;
+				RedrawRubberBand ( );
+			}	// if ((0 != rwi) && (0 != rwi->GetRenderWindow ( )))
+		}	// if ((GetInteractiveSelectionActivated ( ) == true)  && (true == RubberButtonDown))
+	}	// if (false == RubberBand)
+}	// vtkMgx3DInteractorStyle::OnMouseMove
+
+
 void vtkMgx3DInteractorStyle::OnLeftButtonDown ( )
 {
 	vtkRenderWindowInteractor*	rwi	= this->Interactor;
 	if (0 != rwi)
 		rwi->GetEventPosition (ButtonPressPosition);
 
-	if ((true == GetInteractiveSelectionActivated ( )) &&
-	    (true == Resources::instance ( )._pickOnLeftButtonDown.getValue ( )))
-		Pick ( );
+	if (true == GetInteractiveSelectionActivated ( ))
+	{
+		if (false == RubberBand)
+		{
+			if (true == Resources::instance ( )._pickOnLeftButtonDown.getValue ( ))
+				Pick ( );
+			else
+				vtkUnifiedInteractorStyle::OnLeftButtonDown ( );
+		}	// if (false == RubberBand)
+		else
+		{
+			if ((0 == rwi) || (0 == rwi->GetRenderWindow ( )))
+				return;
+			RubberButtonDown	= true;
+			StartPosition [0]	= EndPosition [0]	= rwi->GetEventPosition ( )[0];
+			StartPosition [1]	= EndPosition [1]	= rwi->GetEventPosition ( )[1];
+			int*	size		= rwi->GetRenderWindow ( )->GetSize ( );
+			PixelArray->SetNumberOfTuples (size [0] * size [1]);
+			TmpPixelArray->SetNumberOfTuples (size [0] * size [1]);
+			rwi->GetRenderWindow ( )->GetRGBACharPixelData (0, 0, size [0] - 1, size [1] - 1, 1, PixelArray);
+			FindPokedRenderer (StartPosition [0], StartPosition [1]);
+		}	// else if (false == RubberBand)
+	}
 	else
 		vtkUnifiedInteractorStyle::OnLeftButtonDown ( );
 }	// vtkMgx3DInteractorStyle::OnLeftButtonDown
@@ -410,20 +468,59 @@ void vtkMgx3DInteractorStyle::OnLeftButtonUp ( )
 	// Arrêter un éventuel déclenchement d'interaction :
 	vtkUnifiedInteractorStyle::OnLeftButtonUp ( );
 
-	// Si le curseur n'a pas bougé depuis la pression sur le bouton, et que
-	// c'est paramétré tel que, on fait un picking :
-	if ((true == GetInteractiveSelectionActivated ( )) && (true == Resources::instance ( )._pickOnLeftButtonUp.getValue ( )))
+	if (true == GetInteractiveSelectionActivated ( ))
 	{
-		int							EventPosition [2]	= {0, 0};
 		vtkRenderWindowInteractor*	rwi	= this->Interactor;
-		if (0 != rwi)
+		
+		if (false == RubberBand)
 		{
-			rwi->GetEventPosition (EventPosition);
+			// Si le curseur n'a pas bougé depuis la pression sur le bouton, et que c'est paramétré tel que, on fait un picking :
+			if ((0 == rwi) || (true == Resources::instance ( )._pickOnLeftButtonUp.getValue ( )))
+			{
+				int		EventPosition [2]	= {0, 0};
+				if (0 != rwi)
+				{
+					rwi->GetEventPosition (EventPosition);
 
-			if ((EventPosition [0] == ButtonPressPosition [0]) && (EventPosition [1] == ButtonPressPosition [1]))
-				Pick ( );
-		}
-	}	// if ((true == GetInteractiveSelectionActivated ( )) && ...
+					if ((EventPosition [0] == ButtonPressPosition [0]) && (EventPosition [1] == ButtonPressPosition [1]))
+						Pick ( );
+				}	// if (0 != rwi)
+			}	// if ((0 == rwi) || (true == Resources::instance ( )._pickOnLeftButtonUp.getValue ( )))
+		}	// if (false == RubberBand)
+		else
+		{
+			const int* const	size	= rwi->GetRenderWindow ( )->GetSize ( );
+			rwi->GetRenderWindow ( )->SetRGBACharPixelData (0, 0, size [0] - 1, size [1] - 1, PixelArray->GetPointer (0), 0);
+			rwi->GetRenderWindow ( )->Frame ( );
+			RubberButtonDown		= false;
+// CP : A METTRE AU PROPRE
+vtkSmartPointer<vtkAreaPicker>		areaPicker		= vtkSmartPointer<vtkAreaPicker>::New ( );
+areaPicker->SetRenderer (CurrentRenderer);
+int	result	= areaPicker->AreaPick (StartPosition [0], StartPosition [1], EndPosition [0], EndPosition [1], CurrentRenderer);
+vtkProp3DCollection*		pickedProps	= areaPicker->GetProp3Ds ( );
+vtkProp3D*					p			= 0;
+vtkCollectionSimpleIterator	csi;
+pickedProps->InitTraversal (csi);
+vector<Entity*>	entities;
+while (0 != (p = pickedProps->GetNextProp3D (csi)))
+{
+	bool			add	= true;
+	VTKMgx3DActor*	a	= dynamic_cast<VTKMgx3DActor*>(p);
+	if (0 != a)
+	{
+cout << "Mgx3D Actor picked : " << a->GetEntity ( )->getName ( ) << endl;
+		entities.push_back (a->GetEntity ( ));
+	}
+}
+if (0 != SelectionManager)
+{
+	if (false == isControlKeyPressed ( ))
+		SelectionManager->clearSelection ( );
+	SelectionManager->addToSelection (entities);
+}
+// !CP : A METTRE AU PROPRE
+		}	// else if (false == RubberBand)
+	}	// if (true == GetInteractiveSelectionActivated ( ))
 }	// vtkMgx3DInteractorStyle::OnLeftButtonUp
 
 
@@ -465,6 +562,18 @@ bool vtkMgx3DInteractorStyle::GetInteractiveSelectionActivated ( ) const
 {
 	return InteractiveSelectionActivated;
 }	// vtkMgx3DInteractorStyle::GetInteractiveSelectionActivated
+
+
+void vtkMgx3DInteractorStyle::SetRubberBand (bool on)
+{
+	RubberBand	= on;
+}	// vtkMgx3DInteractorStyle::SetRubberBand
+
+
+bool vtkMgx3DInteractorStyle::GetRubberBand ( ) const
+{
+	return RubberBand;
+}	// vtkMgx3DInteractorStyle::GetRubberBand
 
 
 void vtkMgx3DInteractorStyle::Pick ( )
@@ -511,3 +620,62 @@ void vtkMgx3DInteractorStyle::HideSelection()
 //        Mgx3DPickerCommand->HideSelection ( );
 } // vtkMgx3DInteractorStyle::HideSelection
 
+
+void vtkMgx3DInteractorStyle::RedrawRubberBand ( )
+{
+	vtkRenderWindowInteractor*	rwi	= this->Interactor;
+	if ((0 == rwi) || (0 == rwi->GetRenderWindow ( )))
+		return;
+		
+	TmpPixelArray->DeepCopy (PixelArray);
+	unsigned char*		pixels	= TmpPixelArray->GetPointer (0);
+	const int* const	size	= rwi->GetRenderWindow ( )->GetSize ( );
+
+	int min [2], max [2];
+
+	min [0] = StartPosition [0] <= EndPosition [0] ? StartPosition [0] : EndPosition [0];
+	if (min [0] < 0)
+		min [0] = 0;
+	if (min [0] >= size [0])
+		min [0] = size [0] - 1;
+
+	min [1] = StartPosition [1] <= EndPosition [1] ? StartPosition [1] : EndPosition [1];
+	if (min [1] < 0)
+		min [1] = 0;
+	if (min [1] >= size [1])
+		min [1] = size [1] - 1;
+
+	max [0] = EndPosition [0] > StartPosition [0] ?	EndPosition [0] : StartPosition [0];
+	if (max [0] < 0)
+		max [0] = 0;
+	if (max [0] >= size [0])
+		max [0] = size [0] - 1;
+
+	max [1] = EndPosition [1] > StartPosition [1] ?	EndPosition [1] : StartPosition [1];
+	if (max [1] < 0)
+		max [1] = 0;
+	if (max [1] >= size [1])
+		max [1] = size [1] - 1;
+
+	for (int i = min [0]; i <= max [0]; i++)
+	{
+		pixels [4 * (min [1]*size [0] + i)] = 255 ^ pixels [4 * (min [1]*size [0] + i)];
+		pixels [4 * (min [1]*size [0] + i) + 1] = 255 ^ pixels [4 * (min [1]*size [0] + i) + 1];
+		pixels [4 * (min [1]*size [0] + i) + 2] = 255 ^ pixels [4 * (min [1]*size [0] + i) + 2];
+		pixels [4 * (max [1]*size [0] + i)] = 255 ^ pixels [4 * (max [1]*size [0] + i)];
+		pixels [4 * (max [1]*size [0] + i) + 1] = 255 ^ pixels [4 * (max [1]*size [0] + i) + 1];
+		pixels [4 * (max [1]*size [0] + i) + 2] = 255 ^ pixels [4 * (max [1]*size [0] + i) + 2];
+	}	// for (i = min [0]; i <= max [0]; i++)
+	for (int i = min [1] + 1; i < max [1]; i++)
+	{
+		pixels [4 * (i * size [0] + min [0])] = 255 ^ pixels [4 * (i * size [0] + min [0])];
+		pixels [4 * (i * size [0] + min [0]) + 1] = 255 ^ pixels [4 * (i * size [0] + min [0]) + 1];
+		pixels [4 * (i * size [0] + min [0]) + 2] = 255 ^ pixels [4 * (i * size [0] + min [0]) + 2];
+		pixels [4 * (i * size [0] + max [0])] = 255 ^ pixels [4 * (i * size [0] + max [0])];
+		pixels [4 * (i * size [0] + max [0]) + 1] = 255 ^ pixels [4 * (i * size [0] + max [0]) + 1];
+		pixels [4 * (i * size [0] + max [0]) + 2] = 255 ^ pixels [4 * (i * size [0] + max [0]) + 2];
+	}	// for (i = min [1] + 1; i < max [1]; i++)
+
+	rwi->GetRenderWindow ( )->SetRGBACharPixelData (0, 0, size [0] - 1, size [1] - 1, pixels, 0);
+	rwi->GetRenderWindow ( )->Frame ( );
+}	// vtkMgx3DInteractorStyle::RedrawRubberBand

@@ -17,6 +17,9 @@
 #include "Utils/Entity.h"
 #include "Utils/SelectionManagerIfc.h"
 
+#include <vtkSmartPointer.h>
+#include <vtkUnsignedCharArray.h>
+
 
 /** <P>En plus de la classe <I>vtkUnifiedInteractorStyle</I> permet :<BR>
  * <OL>
@@ -158,6 +161,11 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	virtual void SetEntitySeizureManager (Mgx3D::QtComponents::EntitySeizureManager*);
 
 	/**
+	 * En mode <I>capture au rectangle élastique</I> ajuste le rectangle au nouvel emplacement de la souris.
+	 */
+	 virtual void OnMouseMove ( );
+
+	/**
 	 * Effectue un picking si <I>QtMgx3DApplication::_pickOnLeftButtonDown.getValue ( )</I> vaut
 	 * <I>true</I> et que la sélection interactive est activée, sinon invoque <I>vtkUnifiedInteractorStyle::OnLeftButtonDown</I>.
 	 * \see		OnRightButtonDown
@@ -217,7 +225,12 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	virtual void SetInteractiveSelectionActivated (bool activate);
 	virtual bool GetInteractiveSelectionActivated ( ) const;
 
+	/** (Dés)Active le mode de sélection au <I>rectangle élastique</I>. 
+	 */
+	virtual void SetRubberBand (bool on);
+	virtual bool GetRubberBand ( ) const;
 
+	
 	protected :
 
 	/**
@@ -240,6 +253,11 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	 *  Masque les entités sélectionnées
 	 */
 	virtual void HideSelection();
+	
+	/**
+	 * Dessine un <I>rectangle élastique de sélection</I>.
+	 */
+	virtual void RedrawRubberBand ( );
 
 
 	private :
@@ -260,19 +278,30 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	/** L'éventuelle fenêtre principale associée. */
 	Mgx3D::QtComponents::EntitySeizureManager*		SeizureManager;
 
-	/** Vaut <I>true</I> si une opération de <I>picking</I> doit être
-	 * déclenchée respectivement sur bouton gauche ou bouton droit de la souris
+	/** Vaut <I>true</I> si une opération de <I>picking</I> doit être déclenchée respectivement sur bouton gauche ou bouton droit de la souris
 	 * pressé, et <I>false</I> dans le cas contraire.
 	 * \see			SetInteractiveSelectionActivated
 	 */
-	bool			 							InteractiveSelectionActivated;
+	bool			 								InteractiveSelectionActivated;
+
+	/** Vaut <I>true</I> si le bouton de <I>tracé élastique</I> est enfoncé. */
+	bool											RubberButtonDown;
+	
+	/** Vaut <I>true</I> en mode sélection au <I>rectangle élastique</I>. */
+	bool											RubberBand;
 
 	/** Position du curseur de la souris au moment où le bouton est pressé. */
-	int											ButtonPressPosition [2];
+	int												ButtonPressPosition [2];
 
+	/** Images pour le rendu avectracé élastique. */
+	vtkSmartPointer<vtkUnsignedCharArray>			PixelArray, TmpPixelArray;
+	
+	/** Position du curseur de la souris en mode <I>rectangle élastique</I>. */
+	int												StartPosition [2], EndPosition [2];
+	
 	/** Liste des objets poités par la souris et pouvant prétendre à être
 	 * sélectionnés. */
-	std::vector<Mgx3D::Utils::Entity*>			PointedObjects;
+	std::vector<Mgx3D::Utils::Entity*>				PointedObjects;
 };	// class vtkMgx3DInteractorStyle
 
 

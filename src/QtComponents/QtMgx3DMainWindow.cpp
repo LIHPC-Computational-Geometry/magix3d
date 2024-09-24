@@ -305,7 +305,7 @@ namespace QtComponents
                   _selectUnstructuredBlocks(0), _unselectUnstructuredBlocks(0),
                   _selectTransfiniteBlocks(0), _unselectTransfiniteBlocks(0),
                   _selectNodesAction(0), _selectEdgesAction(0), _selectSurfacesAction(0),
-                  _selectVolumesAction(0), _selectionModeAction(0),
+                  _selectVolumesAction(0), _selectionModeAction(0), _rubberBandSelectionAction (0),
                   _showCommandMonitorDialogAction(0),
                   _displayUsersGuideAction(0), _displayUsersGuideContextAction(0),
                   _displayWikiAction(0), _displayTutorialAction(0), _displayPythonAPIUsersGuideAction(0),
@@ -429,6 +429,7 @@ namespace QtComponents
                   _selectSurfacesAction(wa._selectSurfacesAction),
                   _selectVolumesAction(wa._selectVolumesAction),
                   _selectionModeAction(wa._selectionModeAction),
+                  _rubberBandSelectionAction(wa._rubberBandSelectionAction),
                   _showCommandMonitorDialogAction(wa._showCommandMonitorDialogAction),
                   _displayUsersGuideAction(wa._displayUsersGuideAction),
                   _displayUsersGuideContextAction(wa._displayUsersGuideContextAction),
@@ -557,6 +558,7 @@ namespace QtComponents
 				_selectSurfacesAction           = wa._selectSurfacesAction;
 				_selectVolumesAction            = wa._selectVolumesAction;
 				_selectionModeAction            = wa._selectionModeAction;
+				_rubberBandSelectionAction		= wa._rubberBandSelectionAction;
 				_showCommandMonitorDialogAction = wa._showCommandMonitorDialogAction;
 				_displayUsersGuideAction        = wa._displayUsersGuideAction;
 				_displayUsersGuideContextAction = wa._displayUsersGuideContextAction;
@@ -1920,6 +1922,7 @@ void QtMgx3DMainWindow::showReady ( )
 			_selectionMenu->addAction(getActions()._selectVolumesAction);
 			_selectionMenu->addSeparator();
 			_selectionMenu->addAction(getActions()._selectionModeAction);
+			_selectionMenu->addAction(getActions()._rubberBandSelectionAction);
 
 #ifdef USE_EXPERIMENTAL_ROOM
 			// Menu Chambre expérimentale :
@@ -2051,6 +2054,7 @@ void QtMgx3DMainWindow::showReady ( )
 			_selectionToolbar->addAction(getActions()._selectVolumesAction);
 			_selectionToolbar->addSeparator();
 			_selectionToolbar->addAction(getActions()._selectionModeAction);
+			_selectionToolbar->addAction(getActions()._rubberBandSelectionAction);
 			addToolBar(Qt::TopToolBarArea, _selectionToolbar);
 
 			COMPLETE_QT_TRY_CATCH_BLOCK(true, this, getAppTitle())
@@ -2537,50 +2541,34 @@ void QtMgx3DMainWindow::showReady ( )
 			connect(_actions._unselectTransfiniteBlocks, SIGNAL(triggered()),
 			        this, SLOT(unselectTransfiniteBlocksCallback()));
 
-			_actions._selectNodesAction =
-					new QAction(QIcon(":/images/nodes.png"),
-					            QString::fromUtf8("Sélection d'entités 0D"), this);
+			_actions._selectNodesAction = new QAction(QIcon(":/images/nodes.png"), QString::fromUtf8("Sélection d'entités 0D"), this);
 			_actions._selectNodesAction->setCheckable(true);
 			if (0 != getSelectionManager())
-				_actions._selectNodesAction->setChecked(
-						getSelectionManager()->is0DSelectionActivated());
-			connect(_actions._selectNodesAction, SIGNAL(toggled(bool)), this,
-			        SLOT(selectNodesCallback(bool)), defaultConnectionType);
-			_actions._selectEdgesAction =
-					new QAction(QIcon(":/images/edges.png"),
-					            QString::fromUtf8("Sélection d'entités 1D"), this);
+				_actions._selectNodesAction->setChecked(getSelectionManager()->is0DSelectionActivated());
+			connect(_actions._selectNodesAction, SIGNAL(toggled(bool)), this, SLOT(selectNodesCallback(bool)), defaultConnectionType);
+			_actions._selectEdgesAction = new QAction(QIcon(":/images/edges.png"), QString::fromUtf8("Sélection d'entités 1D"), this);
 			_actions._selectEdgesAction->setCheckable(true);
 			if (0 != getSelectionManager())
-				_actions._selectEdgesAction->setChecked(
-						getSelectionManager()->is1DSelectionActivated());
-			connect(_actions._selectEdgesAction, SIGNAL(toggled(bool)), this,
-			        SLOT(selectEdgesCallback(bool)), defaultConnectionType);
-			_actions._selectSurfacesAction =
-					new QAction(QIcon(":/images/surfaces.png"),
-					            QString::fromUtf8("Sélection d'entités 2D"), this);
+				_actions._selectEdgesAction->setChecked(getSelectionManager()->is1DSelectionActivated());
+			connect(_actions._selectEdgesAction, SIGNAL(toggled(bool)), this, SLOT(selectEdgesCallback(bool)), defaultConnectionType);
+			_actions._selectSurfacesAction = new QAction(QIcon(":/images/surfaces.png"), QString::fromUtf8("Sélection d'entités 2D"), this);
 			_actions._selectSurfacesAction->setCheckable(true);
 			if (0 != getSelectionManager())
-				_actions._selectSurfacesAction->setChecked(
-						getSelectionManager()->is2DSelectionActivated());
-			connect(_actions._selectSurfacesAction, SIGNAL(toggled(bool)), this,
-			        SLOT(selectSurfacesCallback(bool)), defaultConnectionType);
-			_actions._selectVolumesAction =
-					new QAction(QIcon(":/images/volumes.png"),
-					            QString::fromUtf8("Sélection d'entités 3D"), this);
+				_actions._selectSurfacesAction->setChecked(getSelectionManager()->is2DSelectionActivated());
+			connect(_actions._selectSurfacesAction, SIGNAL(toggled(bool)), this, SLOT(selectSurfacesCallback(bool)), defaultConnectionType);
+			_actions._selectVolumesAction = new QAction(QIcon(":/images/volumes.png"), QString::fromUtf8("Sélection d'entités 3D"), this);
 			_actions._selectVolumesAction->setCheckable(true);
 			if (0 != getSelectionManager())
-				_actions._selectVolumesAction->setChecked(
-						getSelectionManager()->is3DSelectionActivated());
-			connect(_actions._selectVolumesAction, SIGNAL(toggled(bool)), this,
-			        SLOT(selectVolumesCallback(bool)), defaultConnectionType);
-			_actions._selectionModeAction =
-					new QAction(QIcon(":/images/selection_mode.png"),
-					            QString::fromUtf8("Mode de sélection des entités (filaire ou plein)"), this);
+				_actions._selectVolumesAction->setChecked(getSelectionManager()->is3DSelectionActivated());
+			connect(_actions._selectVolumesAction, SIGNAL(toggled(bool)), this, SLOT(selectVolumesCallback(bool)), defaultConnectionType);
+			_actions._selectionModeAction = new QAction(QIcon(":/images/selection_mode.png"), QString::fromUtf8("Mode de sélection des entités (filaire ou plein)"), this);
 			_actions._selectionModeAction->setCheckable(true);
 			_actions._selectionModeAction->setChecked(true);
-			connect(_actions._selectionModeAction, SIGNAL(toggled(bool)), this,
-			        SLOT(selectionModeCallback(bool)), defaultConnectionType);
-
+			connect(_actions._selectionModeAction, SIGNAL(toggled(bool)), this, SLOT(selectionModeCallback(bool)), defaultConnectionType);
+			_actions._rubberBandSelectionAction = new QAction(QIcon(":/images/selection_mode.png"), QString::fromUtf8("Sélection par rectangle élastique"), this);
+			_actions._rubberBandSelectionAction->setCheckable(true);
+			_actions._rubberBandSelectionAction->setChecked(false);
+			connect(_actions._rubberBandSelectionAction, SIGNAL(toggled(bool)), this, SLOT(rubberBandSelectionCallback(bool)), defaultConnectionType);
 #ifdef USE_EXPERIMENTAL_ROOM
 			// La chambre expérimentale :
 			_actions._setRaysContextAction =
@@ -7789,6 +7777,11 @@ void QtMgx3DMainWindow::selectVolumesCallback (bool enabled)
 void QtMgx3DMainWindow::selectionModeCallback (bool boundingBox)
 {
 }	// QtMgx3DMainWindow::selectionModeCallback
+
+
+void QtMgx3DMainWindow::rubberBandSelectionCallback (bool on)
+{
+}	// QtMgx3DMainWindow::rubberBandSelectionCallback
 
 
 #ifdef USE_EXPERIMENTAL_ROOM
