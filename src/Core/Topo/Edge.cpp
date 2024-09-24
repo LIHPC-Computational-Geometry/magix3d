@@ -849,85 +849,70 @@ getNodes(Vertex* v1, Vertex* v2, std::vector<gmds::Node>& vectNd)
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 #endif
 
-    vectNd.clear();
 
     gmds::Mesh& gmds_mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
 
-   // le premier noeud
+    // le premier noeud
+    vectNd.clear();
     vectNd.push_back(gmds_mesh.get<gmds::Node>(v1->getNode()));
 
     // utilise les CoEdge pour obtenir les noeuds internes de l'arête
     // on évite le premier noeud de la CoEdge pour éviter les doublons
 
+    // issue#130 : suite à la lecture d'un fichier MDL, les coedges
+    // peuvent être dans n'importe quel ordre et n'importe quel sens.
+    // Par exemple
+    // Le bug de l'issue 130 se produit sur le maillage de la face Fa0866
+    // Une des arêtes de la face est Edge3273 qui va de [Som0414 --> Som0419]
+    // et qui est composée dans l'ordre de :
+    // - Ar2311 [Som0419 --> Som0844]
+    // - Ar2510 [Som0839 --> Som0844]
+    // - Ar2306 [Som0414 --> Som0839]
+    // Ce qui signifie que le "chemin" pour relier les 2 sommets de Edge2273 est :
+    // - Ar2306.getVertex(0) --> Ar2306.getVertex(1)
+    // - Ar2510.getVertex(0) --> Ar2510.getVertex(1)
+    // - Ar2311.getVertex(1) --> Ar2311.getVertex(0)
+    // Tous les cas de sens et d'ordre sont possibles. Il faut donc retrouver le chemin...
+
+
     std::vector<CoEdge* > coedges;
     getCoEdges(coedges);
-    Vertex* v_dep = v1;
-    Vertex* v_opp = 0;
+    Vertex* from_vertex = v1;
+    while (from_vertex != v2) {
+        // recherche de l'arete ayant une extrémité égale à from_vertex dans coedges
+        // (coedges étant réduite, normalement il n'y a qu'une coedge répondant à ce prédicat)
+        const auto it_current_coedge = std::find_if(coedges.begin(), coedges.end(), [&](const CoEdge* ce) {
+            return (ce->getVertex(0)==from_vertex || ce->getVertex(1)==from_vertex);
+        });
 
-
-    if (v1 == getVertex(0) && v2 == getVertex(1))
-        for (std::vector<CoEdge* >::iterator iter = coedges.begin();
-                iter != coedges.end(); ++iter){
-
-            int ratio = getRatio(*iter);
-
-            v_opp = (*iter)->getOppositeVertex(v_dep);
-
+        if (it_current_coedge == coedges.end()) {
+            TkUtil::UTF8String msg(TkUtil::Charset::UTF_8);
+            msg << "Les coedges de l'arête " << getName() << " ne permettent pas de relier les sommets ";
+            msg << v1->getName() << " et " << v2->getName();
+            throw TkUtil::Exception(msg);
+        } else {
+            // recopie des noeuds de la coedge en sautant le premier
+            CoEdge* current_coedge = *it_current_coedge;
+            Vertex* to_vertex = current_coedge->getOppositeVertex(from_vertex);
             std::vector<gmds::Node> nodes; // les noeuds de la CoEdge
-
-            (*iter)->getNodes(v_dep, v_opp, nodes);
-            std::vector<gmds::Node>::iterator iter2 = nodes.begin();
-
-            uint nb_bras = (*iter)->getNbMeshingEdges() / ratio;
-
+            current_coedge->getNodes(from_vertex, to_vertex, nodes);
+            // Rappel : on évite le premier noeud de la CoEdge pour éviter les doublons
+            std::vector<gmds::Node>::iterator it_node = nodes.begin();
+            int ratio = getRatio(current_coedge);
+            uint nb_bras = current_coedge->getNbMeshingEdges() / ratio;
             for (uint j=0; j<nb_bras; j++){
                 for (int i=0; i<ratio; i++)
-                    ++iter2;
-                vectNd.push_back(*iter2);
+                    ++it_node;
+                vectNd.push_back(*it_node);
             }
 
-            v_dep = v_opp;
+            // la coedge parcourue est effacée de la liste
+            coedges.erase(it_current_coedge);
+
+            // et avancement sur le vertex suivant
+            from_vertex = to_vertex;
         }
-    else if (v1 == getVertex(1) && v2 == getVertex(0))
-        for (std::vector<CoEdge* >::reverse_iterator iter = coedges.rbegin();
-                iter != coedges.rend(); ++iter){
-
-            int ratio = getRatio(*iter);
-
-            v_opp = (*iter)->getOppositeVertex(v_dep);
-
-            std::vector<gmds::Node> nodes; // les noeuds de la CoEdge
-
-            (*iter)->getNodes(v_dep, v_opp, nodes);
-            std::vector<gmds::Node>::iterator iter2 = nodes.begin();
-
-            uint nb_bras = (*iter)->getNbMeshingEdges() / ratio;
-
-            for (uint j=0; j<nb_bras; j++){
-                for (int i=0; i<ratio; i++)
-                    ++iter2;
-                vectNd.push_back(*iter2);
-            }
-
-            v_dep = v_opp;
-        }
-    else
-        throw TkUtil::Exception (TkUtil::UTF8String ("Erreur Interne: Edge::getNodes ne trouve pas le sens de parcours", TkUtil::Charset::UTF_8));
-
-    if (v2 != v_opp)
-        throw TkUtil::Exception (TkUtil::UTF8String ("Erreur Interne: Edge::getNodes a échouée, on ne trouve pas le dernier sommet", TkUtil::Charset::UTF_8));
-
-
-//        TkUtil::UTF8String   message (Charset::UTF_8);
-//        message << "Edge::getNodes( \""
-//                << v1->getName() << "\", "
-//                << v2->getName() << "\") avec l'arête "
-//                << getName() << " qui a comme sommets:";
-//        for (uint i=0; i<getNbVertices();i++)
-//            message <<"  "<<*getVertex(i);
-//        message << ", a échoué";
-//        throw TkUtil::Exception (message);
-//    }
+    }
 
 //		TkUtil::UTF8String	message (Charset::UTF_8);
 //    message << "Edge::getNodes( \""
