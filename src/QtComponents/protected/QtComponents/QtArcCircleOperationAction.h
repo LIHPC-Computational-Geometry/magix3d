@@ -448,7 +448,7 @@ class QtArcCircleOperationPanel : public QtMgx3DOperationPanel
 	QtAnglesSysCoordsArcPanel*      _anglesSysCoordsPanel;
 
     /** Renseignement de 3 vertices */
-    QtCircumcirclePtsArcPanel*      _circumcirclePts;
+    QtCircumcirclePtsArcPanel*      _circumcirclePtsPanel;
 	//@}	// Panneaux de saisie des paramètres de définition de l'arc de cercle
 };	// class QtArcCircleOperationPanel
 
