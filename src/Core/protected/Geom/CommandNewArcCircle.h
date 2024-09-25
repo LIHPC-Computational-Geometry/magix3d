@@ -41,7 +41,8 @@ public:
             Geom::Vertex* pe,
             const bool direct,
             const Vector& normal,
-            const std::string& groupName);
+            const std::string& groupName,
+            bool circumCircle);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur
@@ -69,6 +70,7 @@ protected:
     /// vecteur normal au plan pour lever l'ambiguïté dans le cas des 3 points alignés
     Utils::Math::Vector m_normal;
     bool m_direction;
+    bool m_circumCircle;
 
 };
 /*----------------------------------------------------------------------------*/
