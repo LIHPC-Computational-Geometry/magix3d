@@ -874,10 +874,10 @@ getNodes(Vertex* v1, Vertex* v2, std::vector<gmds::Node>& vectNd)
     // - Ar2311.getVertex(1) --> Ar2311.getVertex(0)
     // Tous les cas de sens et d'ordre sont possibles. Il faut donc retrouver le chemin...
 
-
     std::vector<CoEdge* > coedges;
     getCoEdges(coedges);
     Vertex* from_vertex = v1;
+
     while (from_vertex != v2) {
         // recherche de l'arete ayant une extrémité égale à from_vertex dans coedges
         // (coedges étant réduite, normalement il n'y a qu'une coedge répondant à ce prédicat)
@@ -914,13 +914,12 @@ getNodes(Vertex* v1, Vertex* v2, std::vector<gmds::Node>& vectNd)
         }
     }
 
-//		TkUtil::UTF8String	message (Charset::UTF_8);
-//    message << "Edge::getNodes( \""
-//            << v1->getName() << "\", "
-//            << v2->getName() << "\") avec l'arête "
-//            << getName()<<" donne un vecteur de "<<vectNd.size()<<" noeuds";
-//    std::cout<<message<<std::endl;
-//    std::cout<<"m_mesh_data->nodes().size() = "<<m_mesh_data->nodes().size()<<std::endl;
+    // TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+    // message << "Edge::getNodes( \""
+    //         << v1->getName() << "\", "
+    //         << v2->getName() << "\") avec l'arête "
+    //         << getName() << " donne un vecteur de " <<vectNd.size()<< " noeuds";
+    // std::cout<<message<<std::endl;
 }
 /*----------------------------------------------------------------------------*/
 void Edge::getPoints(std::vector<Utils::Math::Point> &points) const
