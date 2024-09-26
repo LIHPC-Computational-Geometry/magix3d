@@ -226,9 +226,16 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	virtual bool GetInteractiveSelectionActivated ( ) const;
 
 	/** (Dés)Active le mode de sélection au <I>rectangle élastique</I>. 
+	 * \see		SetCompletelyInsideSelection
 	 */
 	virtual void SetRubberBand (bool on);
 	virtual bool GetRubberBand ( ) const;
+	
+	/** (Dés)Active la nécessité d'englober complétement une entité dans le <I>rectangle élastique</I> pour être sélectionnée.
+	 * \see		SetRubberBand
+	 */
+	virtual void SetCompletelyInsideSelection (bool on);
+	virtual bool GetCompletelyInsideSelection ( ) const;
 
 	
 	protected :
@@ -289,6 +296,10 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	
 	/** Vaut <I>true</I> en mode sélection au <I>rectangle élastique</I>. */
 	bool											RubberBand;
+	
+	/** Vaut <I>true</I> en mode sélection au <I>rectangle élastique</I> lorsque une entité doit être complétement dans le rectangle pour être sélectionnée,
+	 * <I>false</I> (défaut) si une intersection suffit. */
+	 bool											CompletelyInsideSelection;
 
 	/** Position du curseur de la souris au moment où le bouton est pressé. */
 	int												ButtonPressPosition [2];

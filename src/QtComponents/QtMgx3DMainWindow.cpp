@@ -2565,7 +2565,8 @@ void QtMgx3DMainWindow::showReady ( )
 			_actions._selectionModeAction->setCheckable(true);
 			_actions._selectionModeAction->setChecked(true);
 			connect(_actions._selectionModeAction, SIGNAL(toggled(bool)), this, SLOT(selectionModeCallback(bool)), defaultConnectionType);
-			_actions._rubberBandSelectionAction = new QAction(QIcon(":/images/rubber_selection.png"), QString::fromUtf8("Sélection par rectangle élastique"), this);
+			// Rem CP : il existe également l'icône rubber_selection_inside.png pour la sélection d'entités englobées dans le rectangle élastique
+			_actions._rubberBandSelectionAction = new QAction(QIcon(":/images/rubber_selection_intersect.png"), QString::fromUtf8("Sélection par rectangle élastique"), this);
 			_actions._rubberBandSelectionAction->setCheckable(true);
 			_actions._rubberBandSelectionAction->setChecked(false);
 			connect(_actions._rubberBandSelectionAction, SIGNAL(toggled(bool)), this, SLOT(rubberBandSelectionCallback(bool)), defaultConnectionType);

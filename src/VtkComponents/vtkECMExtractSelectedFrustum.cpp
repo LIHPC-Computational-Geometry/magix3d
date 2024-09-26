@@ -813,8 +813,10 @@ int vtkECMExtractSelectedFrustum::OverallBoundsTest(double *bounds)
 //Also return a distance to the near plane.
 int vtkECMExtractSelectedFrustum::ABoxFrustumIsect(double *bounds, vtkCell *cell)
 {
-	return this->IsectDegenerateCell (cell);	// Magix3D code
-/* Original code (vtkExtractSelectedFrustum::ABoxFrustumIsect)
+	if (true == GetSelectCompletelyInside ( ))
+		return this->IsectDegenerateCell (cell);	// Magix3D code
+	else
+	{	// Original code (vtkExtractSelectedFrustum::ABoxFrustumIsect)
   if (bounds[0] > bounds[1] ||
       bounds[2] > bounds[3] ||
       bounds[4] > bounds[5])
@@ -1080,7 +1082,7 @@ int vtkECMExtractSelectedFrustum::ABoxFrustumIsect(double *bounds, vtkCell *cell
 
   delete[] vertbuffer;
   return 0;
-*/
+	}	// else if (true == GetSelectCompletelyInside ( )) == Original code (vtkExtractSelectedFrustum::ABoxFrustumIsect)
 }
 
 //--------------------------------------------------------------------------
@@ -1234,4 +1236,7 @@ void vtkECMExtractSelectedFrustum::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "InsideOut: "
      << (this->InsideOut ? "On\n" : "Off\n");
+
+  os << indent << "SelectionCompletelyInside: "
+     << (this->SelectionCompletelyInside ? "On\n" : "Off\n");
 }

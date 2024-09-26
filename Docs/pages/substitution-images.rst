@@ -743,3 +743,6 @@
 .. |deuxBoitesMaillage| image:: ../images/DeuxBoites_maillage.png
    :scale: 80%
 
+.. |RubberSelectionIntersect| image:: ../images/rubber_selection_intersect.png
+   :width: 0.31458in
+   :height: 0.31458in

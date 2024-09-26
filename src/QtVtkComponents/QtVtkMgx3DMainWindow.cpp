@@ -425,6 +425,8 @@ void QtVtkMgx3DMainWindow::rubberBandSelectionCallback (bool on)
 	QtVtkGraphicalWidget*	vgw	= dynamic_cast<QtVtkGraphicalWidget*>(&getGraphicalWidget ( ));
 	CHECK_NULL_PTR_ERROR (vgw)
 	vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).SetRubberBand (on);
+// Pour sélectionner les entités complètement englobées dans le rectangle élastique :
+//	vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).SetCompletelyInsideSelection (true);
 	
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtVtkMgx3DMainWindow::rubberBandSelectionCallback
