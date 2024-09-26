@@ -392,7 +392,13 @@ private:
     void split(Vertex* new_vtx1, Vertex* new_vtx2, std::vector<Edge*>& new_edges, Internal::InfoCommand* icmd);
 
     /*------------------------------------------------------------------------*/
+    /** Remplit l'argument path avec le chemin de coedges pour aller de v1 à v2.
+     *  Pour chaque coedge du chemin le booléen est vrai si la coedge est dans
+     *  le sens du parcours (v1->v2), faux sinon.
+     */
+    void computeCoEdgesPath(Vertex* v1, Vertex* v2, std::map<CoEdge*, bool>& path);
 
+    /*------------------------------------------------------------------------*/
 
     /// Propriétés topologiques de l'arête (liens sur la face et les 2 sommets)
     EdgeTopoProperty* m_topo_property;

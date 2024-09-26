@@ -874,43 +874,23 @@ getNodes(Vertex* v1, Vertex* v2, std::vector<gmds::Node>& vectNd)
     // - Ar2311.getVertex(1) --> Ar2311.getVertex(0)
     // Tous les cas de sens et d'ordre sont possibles. Il faut donc retrouver le chemin...
 
-    std::vector<CoEdge* > coedges;
-    getCoEdges(coedges);
-    Vertex* from_vertex = v1;
-
-    while (from_vertex != v2) {
-        // recherche de l'arete ayant une extrémité égale à from_vertex dans coedges
-        // (coedges étant réduite, normalement il n'y a qu'une coedge répondant à ce prédicat)
-        const auto it_current_coedge = std::find_if(coedges.begin(), coedges.end(), [&](const CoEdge* ce) {
-            return (ce->getVertex(0)==from_vertex || ce->getVertex(1)==from_vertex);
-        });
-
-        if (it_current_coedge == coedges.end()) {
-            TkUtil::UTF8String msg(TkUtil::Charset::UTF_8);
-            msg << "Les coedges de l'arête " << getName() << " ne permettent pas de relier les sommets ";
-            msg << v1->getName() << " et " << v2->getName();
-            throw TkUtil::Exception(msg);
-        } else {
-            // recopie des noeuds de la coedge en sautant le premier
-            CoEdge* current_coedge = *it_current_coedge;
-            Vertex* to_vertex = current_coedge->getOppositeVertex(from_vertex);
-            std::vector<gmds::Node> nodes; // les noeuds de la CoEdge
-            current_coedge->getNodes(from_vertex, to_vertex, nodes);
-            // Rappel : on évite le premier noeud de la CoEdge pour éviter les doublons
-            std::vector<gmds::Node>::iterator it_node = nodes.begin();
-            int ratio = getRatio(current_coedge);
-            uint nb_bras = current_coedge->getNbMeshingEdges() / ratio;
-            for (uint j=0; j<nb_bras; j++){
-                for (int i=0; i<ratio; i++)
-                    ++it_node;
-                vectNd.push_back(*it_node);
-            }
-
-            // la coedge parcourue est effacée de la liste
-            coedges.erase(it_current_coedge);
-
-            // et avancement sur le vertex suivant
-            from_vertex = to_vertex;
+    std::map<CoEdge*, bool> path;
+    computeCoEdgesPath(v1, v2, path);
+    for(auto it=path.begin() ; it!=path.end() ; ++it) {
+        CoEdge* current_coedge = it->first;
+        bool direction = it->second;
+        Vertex* from_vertex = current_coedge->getVertex(direction?0:1);
+        Vertex* to_vertex = current_coedge->getVertex(direction?1:0);
+        std::vector<gmds::Node> nodes; // les noeuds de la CoEdge
+        current_coedge->getNodes(from_vertex, to_vertex, nodes);
+        // Rappel : on évite le premier noeud de la CoEdge pour éviter les doublons
+        std::vector<gmds::Node>::iterator it_node = nodes.begin();
+        int ratio = getRatio(current_coedge);
+        uint nb_bras = current_coedge->getNbMeshingEdges() / ratio;
+        for (uint j=0; j<nb_bras; j++){
+            for (int i=0; i<ratio; i++)
+                ++it_node;
+            vectNd.push_back(*it_node);
         }
     }
 
@@ -1070,59 +1050,58 @@ computeCorrespondingNbMeshingEdges(Vertex* v_dep, const CoEdge* coedge, uint nbB
     std::cout<<" this : "<<*this<<std::endl;
 #endif
 
-   // sommes nous dans le même sens que l'arête ?
-    bool sens;
-    if (v_dep == getVertex(0))
-        sens = true;
-    else if (v_dep == getVertex(1))
-        sens = false;
-    else {
-        throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, Edge::computeCorrespondingNbMeshingEdges ne trouve pas le sommet", TkUtil::Charset::UTF_8));
-    }
-
-    // on suppose que les CoEdges sont ordonnées (d'un sommet à un autre)
-    int ind_coedge = m_topo_property->getCoEdgeContainer().getIndex(coedge);
-    int ind_dep = (sens?0:getNbCoEdges()-1);
-    int ind_inc = (sens?1:-1);
     Vertex* v_ar;
-    nbBras_edge = 0;
-
-    bool termine = false;
-    int i = ind_dep;
-    do {
-#ifdef _DEBUG_SPLIT
-        std::cout<<"i = "<<i<<", nbBras_edge "<<nbBras_edge<<", v_dep = "<<v_dep->getName()<<std::endl;
-#endif
-        if (v_dep == getCoEdge(i)->getVertex(0)){
-            sens_coedge = true;
-            v_ar = getCoEdge(i)->getVertex(1);
-        } else if (v_dep == getCoEdge(i)->getVertex(1)){
-            sens_coedge = false;
-            v_ar = getCoEdge(i)->getVertex(0);
-        } else {
-            throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, Edge::computeCorrespondingNbMeshingEdges ne trouve pas le sommet lors du parcours", TkUtil::Charset::UTF_8));
-        }
-
-        if (i!=ind_coedge)
-            nbBras_edge += getCoEdge(i)->getNbMeshingEdges()/getRatio(getCoEdge(i));
-        else if (sens_coedge)
-            nbBras_edge += nbBras_coedge/getRatio(getCoEdge(i));
-        else
-            nbBras_edge += (getCoEdge(i)->getNbMeshingEdges()-nbBras_coedge)/getRatio(getCoEdge(i));
-
-
-        if (i==ind_coedge)
-            termine = true;
-
-        i+=ind_inc;
-        v_dep = v_ar;
+    if (v_dep == getVertex(0)) v_ar = getVertex(1);
+    else if (v_dep == getVertex(1)) v_ar = getVertex(0);
+    else {
+        TkUtil::UTF8String msg(TkUtil::Charset::UTF_8);
+        msg << "Erreur interne Edge::computeCorrespondingNbMeshingEdges : " << getName();
+        msg << " [" << getVertex(0)->getName() << ", " << getVertex(1)->getName();
+        msg << "] ne possède pas le sommet " << v_dep->getName();
+        throw TkUtil::Exception(msg);
     }
-    while (!termine);
+
+    // issue#130 : suite à la lecture d'un fichier MDL, les coedges
+    // peuvent être dans n'importe quel ordre et n'importe quel sens.
+    // Le précédent algorithme supposait que les coedges étaient
+    // ordonnées d'un sommet à l'autre.
+    // On utilise maintenant la méthode computeCoEdgesPath qui
+    // donne la liste des arêtes sur le chemin.
+    std::map<CoEdge*, bool> path;
+    computeCoEdgesPath(v_dep, v_ar, path);
+    nbBras_edge = 0;
+    bool coedge_reached = false;
+    for(auto it=path.begin() ; it!=path.end() ; ++it) {
+        CoEdge* current_coedge = it->first;
+        bool direction = it->second;
+        int ratio = getRatio(current_coedge);
+        if (current_coedge == coedge) {
+            sens_coedge = direction;
+            if (direction) {
+                nbBras_edge += nbBras_coedge/ratio;
+            } else {
+                nbBras_edge += (current_coedge->getNbMeshingEdges()-nbBras_coedge)/ratio;
+            }
+            coedge_reached = true;
+            break;
+        } else {
+            nbBras_edge += current_coedge->getNbMeshingEdges()/ratio;
+        }
+    }
+
+    if (!coedge_reached) {
+        TkUtil::UTF8String msg(TkUtil::Charset::UTF_8);
+        msg << "Erreur interne Edge::computeCorrespondingNbMeshingEdges : " << getName();
+        msg << " [";
+        for (auto ce : getCoEdges())
+            msg << " " << ce->getName();
+        msg << "] ne possède pas la coedge " << coedge->getName();
+        throw TkUtil::Exception(msg);
+    }
 
 #ifdef _DEBUG_SPLIT
     std::cout<<" retourne nbBras_edge = "<<nbBras_edge
     		<<", sens_coedge = "<<sens_coedge
-    		<<", sens (/edge) = "<<sens
     		<<std::endl;
 #endif
 }
@@ -1280,6 +1259,53 @@ CoEdge* Edge::getCoEdge(Vertex* vtx1, Vertex* vtx2)
     std::cout<<"Edge::getCoEdge("<<vtx1->getName()<<","<<vtx2->getName()<<") dans l'arête "<<*this<<std::endl;
 
     throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, Edge::getCoEdge ne trouve pas l'arête commune à partir des 2 sommets", TkUtil::Charset::UTF_8));
+}
+/*----------------------------------------------------------------------------*/
+void Edge::computeCoEdgesPath(Vertex* v1, Vertex* v2, std::map<CoEdge*, bool>& path)
+{
+    std::vector<CoEdge* > coedges;
+    getCoEdges(coedges);
+    Vertex* from_vertex = v1;
+
+    while (from_vertex != v2) {
+        // recherche de l'arete ayant une extrémité égale à from_vertex dans coedges
+        // (coedges étant réduite, normalement il n'y a qu'une coedge répondant à ce prédicat)
+        Vertex* to_vertex = 0;
+        bool direction;
+        const auto it_current_coedge = std::find_if(coedges.begin(), coedges.end(), [&](const CoEdge* ce) {
+            if (ce->getVertex(0)==from_vertex) {
+                to_vertex = ce->getVertex(1);
+                direction = true;
+                return true;
+            }
+
+            if (ce->getVertex(1)==from_vertex) {
+                to_vertex = ce->getVertex(0);
+                direction = false;
+                return true;
+            }
+
+            return false;
+        });
+
+        if (it_current_coedge == coedges.end()) {
+            TkUtil::UTF8String msg(TkUtil::Charset::UTF_8);
+            msg << "Les coedges de l'arête " << getName();
+            msg << " ne permettent pas de relier les sommets ";
+            msg << v1->getName() << " et " << v2->getName();
+            throw TkUtil::Exception(msg);
+        } else {
+            // insertion de la edge dans le chemin
+            CoEdge* current_coedge = *it_current_coedge;
+            path.emplace(current_coedge, direction);
+
+            // la coedge parcourue est effacée de la liste
+            coedges.erase(it_current_coedge);
+
+            // et avancement sur le vertex suivant
+            from_vertex = to_vertex;
+        }
+    }
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo
