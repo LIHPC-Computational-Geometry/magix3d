@@ -1308,12 +1308,12 @@ void Edge::computeCoEdgesPath(Vertex* v1, Vertex* v2, std::list<std::pair<CoEdge
     }
 
 #ifdef _DEBUG_SPLIT
-    std::cout << getName() << ".computeCoEdgesPath(" << v1->getName()
+    std::cout << getName() << ".computeCoEdgesPath(" << v1->getName();
     std::cout << ", " << v2->getName() << ")" << std::endl;
-    std::cout << "  path: ";
+    std::cout << "  path: [ ";
     for (auto it=path.begin() ; it!=path.end() ; it++) {
         std::cout << it->first->getName() << " [" << it->first->getVertex(0)->getName();
-        std::cout << (it->second?"-->":"<--") << it->first->getVertex(1)->getName() << "], ";
+        std::cout << (it->second?"-->":"<--") << it->first->getVertex(1)->getName() << "] ";
     }
     std::cout << "]" << std::endl;
 #endif
