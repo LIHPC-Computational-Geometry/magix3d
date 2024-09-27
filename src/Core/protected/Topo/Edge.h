@@ -1,14 +1,10 @@
 /*----------------------------------------------------------------------------*/
 /** \file Edge.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 19/11/2010
- */
 /*----------------------------------------------------------------------------*/
 #ifndef TOPO_EDGE_H_
 #define TOPO_EDGE_H_
 /*----------------------------------------------------------------------------*/
+#include <list>
 /*----------------------------------------------------------------------------*/
 #include "Topo/Vertex.h"
 #include "Topo/Face.h"
@@ -396,7 +392,7 @@ private:
      *  Pour chaque coedge du chemin le booléen est vrai si la coedge est dans
      *  le sens du parcours (v1->v2), faux sinon.
      */
-    void computeCoEdgesPath(Vertex* v1, Vertex* v2, std::map<CoEdge*, bool>& path);
+    void computeCoEdgesPath(Vertex* v1, Vertex* v2, std::list<std::pair<CoEdge*, bool>>& path);
 
     /*------------------------------------------------------------------------*/
 

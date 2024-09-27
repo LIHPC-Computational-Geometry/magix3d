@@ -874,7 +874,7 @@ getNodes(Vertex* v1, Vertex* v2, std::vector<gmds::Node>& vectNd)
     // - Ar2311.getVertex(1) --> Ar2311.getVertex(0)
     // Tous les cas de sens et d'ordre sont possibles. Il faut donc retrouver le chemin...
 
-    std::map<CoEdge*, bool> path;
+    std::list<std::pair<CoEdge*, bool>> path;
     computeCoEdgesPath(v1, v2, path);
     for(auto it=path.begin() ; it!=path.end() ; ++it) {
         CoEdge* current_coedge = it->first;
@@ -1067,7 +1067,7 @@ computeCorrespondingNbMeshingEdges(Vertex* v_dep, const CoEdge* coedge, uint nbB
     // ordonnées d'un sommet à l'autre.
     // On utilise maintenant la méthode computeCoEdgesPath qui
     // donne la liste des arêtes sur le chemin.
-    std::map<CoEdge*, bool> path;
+    std::list<std::pair<CoEdge*, bool>> path;
     computeCoEdgesPath(v_dep, v_ar, path);
     nbBras_edge = 0;
     bool coedge_reached = false;
@@ -1261,7 +1261,7 @@ CoEdge* Edge::getCoEdge(Vertex* vtx1, Vertex* vtx2)
     throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, Edge::getCoEdge ne trouve pas l'arête commune à partir des 2 sommets", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
-void Edge::computeCoEdgesPath(Vertex* v1, Vertex* v2, std::map<CoEdge*, bool>& path)
+void Edge::computeCoEdgesPath(Vertex* v1, Vertex* v2, std::list<std::pair<CoEdge*, bool>>& path)
 {
     std::vector<CoEdge* > coedges;
     getCoEdges(coedges);
@@ -1297,7 +1297,7 @@ void Edge::computeCoEdgesPath(Vertex* v1, Vertex* v2, std::map<CoEdge*, bool>& p
         } else {
             // insertion de la edge dans le chemin
             CoEdge* current_coedge = *it_current_coedge;
-            path.emplace(current_coedge, direction);
+            path.push_back(std::make_pair(current_coedge, direction));
 
             // la coedge parcourue est effacée de la liste
             coedges.erase(it_current_coedge);
@@ -1306,6 +1306,17 @@ void Edge::computeCoEdgesPath(Vertex* v1, Vertex* v2, std::map<CoEdge*, bool>& p
             from_vertex = to_vertex;
         }
     }
+
+#ifdef _DEBUG_SPLIT
+    std::cout << getName() << ".computeCoEdgesPath(" << v1->getName()
+    std::cout << ", " << v2->getName() << ")" << std::endl;
+    std::cout << "  path: ";
+    for (auto it=path.begin() ; it!=path.end() ; it++) {
+        std::cout << it->first->getName() << " [" << it->first->getVertex(0)->getName();
+        std::cout << (it->second?"-->":"<--") << it->first->getVertex(1)->getName() << "], ";
+    }
+    std::cout << "]" << std::endl;
+#endif
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo
