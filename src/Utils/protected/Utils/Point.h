@@ -227,13 +227,15 @@ virtual bool isEpsilonEqual (const Point & v, const double & tol) const
 {
     double sq_dist = length2(v);
 
-    return Mgx3D::Utils::Math::MgxNumeric::isNearlyZero(sq_dist,tol*tol);
+    return MgxNumeric::isNearlyZero(sq_dist,tol*tol);
 }
 
 /*----------------------------------------------------------------------------*/
 virtual bool operator == (const Point & v) const
 {
-    return Mgx3D::Utils::Math::MgxNumeric::isNearlyZero(length(v));
+    return (MgxNumeric::isNearlyEqual(m_x, v.m_x)
+		&& MgxNumeric::isNearlyEqual(m_y, v.m_y)
+		&& MgxNumeric::isNearlyEqual(m_z, v.m_z));
 }
 
 /*----------------------------------------------------------------------------*/

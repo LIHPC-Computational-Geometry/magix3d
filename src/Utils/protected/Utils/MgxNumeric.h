@@ -68,6 +68,13 @@ namespace Math
 		static size_t				mgxDoubleFixedNotationCharMax;	
 #endif	// SWIG
 
+		static inline bool isNearlyEqual(const double a, const double b)
+		{
+			double s = std::fabs(a) + std::abs(b);
+			double d = a - b;
+			return (d==0.0) ? true : isNearlyZero(d/s);
+		}
+
 		static inline bool isNearlyZero (const double & u)
 		{
 			return std::fabs(u) < Mgx3D::Utils::Math::MgxNumeric::mgxDoubleEpsilon;
