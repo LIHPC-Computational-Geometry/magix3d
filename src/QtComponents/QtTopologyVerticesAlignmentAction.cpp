@@ -216,6 +216,8 @@ Math::Point QtTopologyVerticesAlignmentPanel::getPoint1 ( ) const
 	{
 		const vector<string>	names	= _point1TextField->getUniqueNames ( );
 		const string			name	= names [0];
+
+
 		switch (_point1TextField->getObjectType ( ))
 		{
 			case Entity::GeomVertex	:
@@ -227,6 +229,7 @@ Math::Point QtTopologyVerticesAlignmentPanel::getPoint1 ( ) const
 				CHECK_NULL_PTR_ERROR (vertex)
 				point	= vertex->getPoint ( );
 			}	// case Entity::GeomVertex
+            break;
 			case Entity::TopoVertex	:
 			{
 				const Topo::Vertex*	vertex	=
@@ -275,6 +278,7 @@ Math::Point QtTopologyVerticesAlignmentPanel::getPoint2 ( ) const
 				CHECK_NULL_PTR_ERROR (vertex)
 				point	= vertex->getPoint ( );
 			}	// case Entity::GeomVertex
+            break;
 			case Entity::TopoVertex	:
 			{
 				const Topo::Vertex*	vertex	=
