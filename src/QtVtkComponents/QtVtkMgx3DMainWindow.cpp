@@ -412,11 +412,24 @@ void QtVtkMgx3DMainWindow::selectionModeCallback (bool checked)
 	QtVtkGraphicalWidget*	vgw	= dynamic_cast<QtVtkGraphicalWidget*>(&getGraphicalWidget ( ));
 	CHECK_NULL_PTR_ERROR (vgw)
 	CHECK_NULL_PTR_ERROR (vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).GetMgx3DPicker ( ))
-	vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).GetMgx3DPicker ( )->SetMode (
-						true == boundingBox ? VTKMgx3DPicker::BOUNDING_BOX : VTKMgx3DPicker::DISTANCE);
+	vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).GetMgx3DPicker ( )->SetMode (true == boundingBox ? VTKMgx3DPicker::BOUNDING_BOX : VTKMgx3DPicker::DISTANCE);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtVtkMgx3DMainWindow::selectionModeCallback
+
+
+void QtVtkMgx3DMainWindow::rubberBandSelectionCallback (bool on)
+{
+	BEGIN_QT_TRY_CATCH_BLOCK
+	
+	QtVtkGraphicalWidget*	vgw	= dynamic_cast<QtVtkGraphicalWidget*>(&getGraphicalWidget ( ));
+	CHECK_NULL_PTR_ERROR (vgw)
+	vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).SetRubberBand (on);
+// Pour sélectionner les entités complètement englobées dans le rectangle élastique :
+//	vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).SetCompletelyInsideSelection (true);
+	
+	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
+}	// QtVtkMgx3DMainWindow::rubberBandSelectionCallback
 
 
 #ifdef USE_EXPERIMENTAL_ROOM

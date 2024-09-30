@@ -217,3 +217,13 @@ Le mode plein sera un peu mieux adapté (plus rapide) pour des entités
 représentées en mode volumique (volumes de mailles, volumes géométriques
 en représentation surfacique...).
 
+Sélection par rectangle élastique
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+|rubber_selection_intersect|
+
+.. |rubber_selection_intersect| image:: ../images/rubber_selection_intersect.png
+   :width: 0.25in
+   :height: 0.25in
+
+Voir la description :ref:`boutons-selection`.

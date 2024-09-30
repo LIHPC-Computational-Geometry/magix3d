@@ -431,7 +431,7 @@ class QtMgx3DMainWindow :
 						*_unselectTransfiniteBlocks;
 		QAction			*_selectNodesAction, *_selectEdgesAction,
 						*_selectSurfacesAction, *_selectVolumesAction;
-		QAction			*_selectionModeAction;
+		QAction			*_selectionModeAction, *_rubberBandSelectionAction;
 		QAction			*_showCommandMonitorDialogAction;
 		QAction			*_displayUsersGuideAction,
 						*_displayUsersGuideContextAction,
@@ -1288,11 +1288,16 @@ class QtMgx3DMainWindow :
 	virtual void selectVolumesCallback (bool enabled);
 
 	/**
-	 * Callback sur le mode de sélection : boite englobante ou distance à
-	 * l'entité.
+	 * Callback sur le mode de sélection : boite englobante ou distance à l'entité.
 	 * \warning		Ne fait rien par défaut, méthode à surcharger.
 	 */
 	virtual void selectionModeCallback (bool boundingBox);
+
+	/**
+	 * Callback sur le mode de sélection : rectangle élastique ou non.
+	 * \warning		Ne fait rien par défaut, méthode à surcharger.
+	 */	
+	virtual void rubberBandSelectionCallback (bool on);
 
 	//@}	// Callbacks du menu "Sélection".
 
