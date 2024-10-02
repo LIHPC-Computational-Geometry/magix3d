@@ -1,4 +1,3 @@
-import sys
 import pyMagix3D as Mgx3D
 
 # Test que le découpage en o-grid n'est PAS fait quand la contrainte d'Euler n'est pas vérifiée 
