@@ -2290,7 +2290,7 @@ newArcCircle(Vertex* pc, Vertex* pd, Vertex* pe, const bool direct, const Vector
         cmd << getContextAlias() << "." << "getGeomManager().newArcCircle(\""
             <<pc->getName()<<"\", \""
             <<pd->getName()<<"\", \""
-            <<pe->getName()<<"\", ";
+            <<pe->getName()<<"\"";
         if (!groupName.empty())
             cmd<<", \""<<groupName<<"\"";
         cmd<<")";
