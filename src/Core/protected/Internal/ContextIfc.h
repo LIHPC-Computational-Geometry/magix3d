@@ -25,7 +25,6 @@
 #include "Internal/M3DCommandResultIfc.h"
 #include <PythonUtil/PythonSession.h>
 #include <TkUtil/LogDispatcher.h>
-#include <PrefsCore/BoolNamedValue.h>
 #include <TkUtil/PaintAttributes.h>
 
 /*----------------------------------------------------------------------------*/
@@ -77,21 +76,6 @@ public:
 	/**
 	 * La gestion de la configuration.
 	 */
-
-	/**
-	 * Applique la configuration reçue en argument.
-	 * \param	contextSection Section racine de la configuration à appliquer.
-	 */
-	void load (const Preferences::Section& contextSection);
-
-	/**
-	 * Ajoute à la section tranmise en argument la configuration actuelle.
-	 * \param		contextSection principale de la configuration de l'application.
-	 * \warning		N'effectue aucune action persistante.
-	 * \see			setPersistantConfiguration
-	 */
-	void saveConfiguration (Preferences::Section& contextSection);
-	
 
     /*------------------------------------------------------------------------*/
 	/** Suivant ce que l'on souhaite voir apparaitre dans le script de sauvegarde
@@ -277,37 +261,8 @@ public:
     virtual Mgx3D::Utils::CommandManagerIfc& getCommandManager();
 
 	/*------------------------------------------------------------------------*/
-	/** \brief	Autorise-t-on l'usage de tâches parallèles lors de l'exécution
-	 *			de commandes (une tâche étant un élément de commande) ?
-	 */
-	Preferences::BoolNamedValue			allowThreadedCommandTasks;
-
-	/*------------------------------------------------------------------------*/
-	/** \brief	Autorise-t-on l'usage de tâches parallèles lors du prémaillage
-	 *			des arêtes ?
-	 */
-	Preferences::BoolNamedValue			allowThreadedEdgePreMeshTasks;
-
-	/*------------------------------------------------------------------------*/
-	/** \brief	Autorise-t-on l'usage de tâches parallèles lors du prémaillage
-	 *			des faces ?
-	 */
-	Preferences::BoolNamedValue			allowThreadedFacePreMeshTasks;
-
-	/*------------------------------------------------------------------------*/
-	/** \brief	Autorise-t-on l'usage de tâches parallèles lors du prémaillage
-	 *			des blocs ?
-	 */
-	Preferences::BoolNamedValue			allowThreadedBlockPreMeshTasks;
-
-	/*------------------------------------------------------------------------*/
 	/** Le thread principal de l'application. */
 	static pthread_t							threadId;
-
-	/*------------------------------------------------------------------------*/
-	/** \brief	Autorise-t-on la mémorisation du prémaillage des arêtes ?
-	 */
-	Preferences::BoolNamedValue			memorizeEdgePreMesh;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Accesseur sur le gestionnaire de sélection.
@@ -329,20 +284,6 @@ public:
     virtual TkUtil::LogDispatcher& getLogDispatcher ( );
     virtual const TkUtil::LogDispatcher& getLogDispatcher ( ) const;
     virtual TkUtil::LogOutputStream* getLogStream ( );
-
-	/** <I>true</I> s'il faut afficher les sorties des commandes scripts
-	 * exécutées, <I>false</I> dans le cas contraire.
-	 * \warning		Certaines versions de <I>MPI</I> seraient incompatible avec
-	 *				<I>fork</I>, et ce service repose sur les classes
-	 *				<I>PythonSession</I> et <I>DuplicatedStream</I> (au 26/07/12).
-	 *				La classe <I>DuplicatedStream</I> repose sur <I>fork</I>, et
-	 *				il arrive que le serveur, lancé sur station et avec mpich 1.2.6,
-	 *				reste en attente sur un <I>waitpid</I> du processus fils chargé
-	 *				de rediriger les sorties du script.
-	 *				Donc, au moins pour les serveurs, ne pas avoir peur d'affecter
-	 *				<I>false</I> à cette variable.
-	 */
-	Preferences::BoolNamedValue			displayScriptOutputs;
 
 	//@}	// gestion des logs
 

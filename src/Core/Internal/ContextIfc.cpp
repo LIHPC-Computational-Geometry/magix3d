@@ -53,87 +53,10 @@ void ContextIfc::finalize ( )
 	threadId	= (pthread_t)-1;
 }
 
-/*----------------------------------------------------------------------------*/
-void ContextIfc::load (const Preferences::Section& contextSection)
-{
-	try
-	{
-		Preferences::Section&	threadingSection	=
-									contextSection.getSection ("threading");
-		Preferences::Section&	scriptingSection	=
-									contextSection.getSection ("scripting");
-		Preferences::Section&	optimizingSection	=
-									contextSection.getSection ("optimizing");
-
-		Preferences::PreferencesHelper::getBoolean (
-								threadingSection, allowThreadedCommandTasks);
-
-		Preferences::PreferencesHelper::getBoolean (
-								threadingSection, allowThreadedEdgePreMeshTasks);
-
-		Preferences::PreferencesHelper::getBoolean (
-								threadingSection, allowThreadedFacePreMeshTasks);
-
-		Preferences::PreferencesHelper::getBoolean (
-								threadingSection, allowThreadedBlockPreMeshTasks);
-
-		Preferences::PreferencesHelper::getBoolean (
-								scriptingSection, displayScriptOutputs);
-
-		Preferences::PreferencesHelper::getBoolean (
-				                optimizingSection, memorizeEdgePreMesh);
-	}
-	catch (...)
-	{
-	}
-}
-
-/*----------------------------------------------------------------------------*/
-void ContextIfc::saveConfiguration (Preferences::Section& contextSection)
-{
-	Preferences::Section&	threadingSection	=
-				Preferences::PreferencesHelper::getSection (contextSection, "threading");
-	Preferences::Section&	scriptingSection	=
-				Preferences::PreferencesHelper::getSection (contextSection, "scripting");
-	Preferences::Section&	optimizingSection	=
-			    Preferences::PreferencesHelper::getSection (contextSection, "optimizing");
-
-	Preferences::PreferencesHelper::updateBoolean (
-									threadingSection, allowThreadedCommandTasks);
-	Preferences::PreferencesHelper::updateBoolean (
-									threadingSection, allowThreadedEdgePreMeshTasks);
-	Preferences::PreferencesHelper::updateBoolean (
-									threadingSection, allowThreadedFacePreMeshTasks);
-	Preferences::PreferencesHelper::updateBoolean (
-									threadingSection, allowThreadedBlockPreMeshTasks);
-	Preferences::PreferencesHelper::updateBoolean (
-									scriptingSection, displayScriptOutputs);
-	Preferences::PreferencesHelper::updateBoolean (
-			                        optimizingSection, memorizeEdgePreMesh);
-}
 
 /*----------------------------------------------------------------------------*/
 ContextIfc::ContextIfc(const std::string& name)
-: m_name (name),
-allowThreadedCommandTasks (
-		TkUtil::UTF8String ("allowThreadedCommandTasks", TkUtil::Charset::UTF_8), true,
-		TkUtil::UTF8String ("true si une commande est autorisée à être décomposée en plusieurs tâches exécutées parallèlement dans plusieurs threads, false si l'exécution doit être séquentielle.", TkUtil::Charset::UTF_8)),
-allowThreadedEdgePreMeshTasks (
-		TkUtil::UTF8String ("allowThreadedEdgePreMeshTasks", TkUtil::Charset::UTF_8), true,
-		TkUtil::UTF8String ("true si le prémaillage des arêtes peut être décomposé en plusieurs tâches exécutées parallèlement dans plusieurs threads, false si l'exécution doit être séquentielle.", TkUtil::Charset::UTF_8)),
-allowThreadedFacePreMeshTasks (
-		TkUtil::UTF8String ("allowThreadedFacePreMeshTasks", TkUtil::Charset::UTF_8), true,
-		TkUtil::UTF8String ("true si le prémaillage des faces peut être décomposé en plusieurs tâches exécutées parallèlement dans plusieurs threads, false si l'exécution doit être séquentielle.", TkUtil::Charset::UTF_8)),
-allowThreadedBlockPreMeshTasks (
-		TkUtil::UTF8String ("allowThreadedBlockPreMeshTasks", TkUtil::Charset::UTF_8), true,
-		TkUtil::UTF8String ("true si le prémaillage des blocs peut être décomposé en plusieurs tâches exécutées parallèlement dans plusieurs threads, false si l'exécution doit être séquentielle.", TkUtil::Charset::UTF_8)),
-displayScriptOutputs (
-		TkUtil::UTF8String ("displayScriptOutputs", TkUtil::Charset::UTF_8), true,
-		TkUtil::UTF8String ("true si le programme doit afficher les sorties des commandes script, false dans le cas contraire.", TkUtil::Charset::UTF_8)),
-memorizeEdgePreMesh (
-		TkUtil::UTF8String ("memorizeEdgePreMesh", TkUtil::Charset::UTF_8), true,
-		TkUtil::UTF8String ("true si le programme doit mémoriser le prémaillage des arêtes, false dans le cas contraire.", TkUtil::Charset::UTF_8))
-
+: m_name (name)
 {
 	// Enregistrement auprès de la liste des contextes. On en profite pour
 	// s'assurer de l'unicité du nom.
@@ -144,9 +67,7 @@ memorizeEdgePreMesh (
 		if ((*it)->getName ( ) == name)
 		{
 			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-			message << "Création d'un contexte de nom \"" << name
-			        << "\" : opération impossible, nom déjà utilisé par une "
-			        << "autre instance.";
+			message << "Création d'un contexte de nom \"" << name << "\" : opération impossible, nom déjà utilisé par une autre instance.";
 			throw TkUtil::Exception (message);
 		}	// if ((*it).getName ( ) == name)
 	}	// for (std::vector<ContextIfc*>::iterator it = contexts.begin ( );
@@ -154,25 +75,7 @@ memorizeEdgePreMesh (
 }
 /*----------------------------------------------------------------------------*/
 ContextIfc::ContextIfc (const ContextIfc&)
-: m_name ("Bidon"),
-allowThreadedCommandTasks (
-		TkUtil::UTF8String ("allowThreadedCommandTasks", TkUtil::Charset::UTF_8), true,
-		TkUtil::UTF8String ("true si une commande est autorisée à être décomposée en plusieurs tâches exécutées parallèlement dans plusieurs threads, false si l'exécution doit être séquentielle.", TkUtil::Charset::UTF_8)),
-allowThreadedEdgePreMeshTasks (
-		TkUtil::UTF8String ("allowThreadedEdgePreMeshTasks", TkUtil::Charset::UTF_8), true,
-		TkUtil::UTF8String ("true si le prémaillage des arêtes peut être décomposé en plusieurs tâches exécutées parallèlement dans plusieurs threads, false si l'exécution doit être séquentielle.", TkUtil::Charset::UTF_8)),
-allowThreadedFacePreMeshTasks (
-		TkUtil::UTF8String ("allowThreadedFacePreMeshTasks", TkUtil::Charset::UTF_8), true,
-		TkUtil::UTF8String ("true si le prémaillage des faces peut être décomposé en plusieurs tâches exécutées parallèlement dans plusieurs threads, false si l'exécution doit être séquentielle.", TkUtil::Charset::UTF_8)),
-allowThreadedBlockPreMeshTasks (
-		TkUtil::UTF8String ("allowThreadedBlockPreMeshTasks", TkUtil::Charset::UTF_8), true,
-		TkUtil::UTF8String ("true si le prémaillage des blocs peut être décomposé en plusieurs tâches exécutées parallèlement dans plusieurs threads, false si l'exécution doit être séquentielle.", TkUtil::Charset::UTF_8)),
-displayScriptOutputs (
-		TkUtil::UTF8String ("displayScriptOutputs", TkUtil::Charset::UTF_8), true,
-		TkUtil::UTF8String ("true si le programme doit afficher les sorties des commandes script, false dans le cas contraire.", TkUtil::Charset::UTF_8)),
-memorizeEdgePreMesh (
-		TkUtil::UTF8String ("memorizeEdgePreMesh", TkUtil::Charset::UTF_8), true,
-		TkUtil::UTF8String ("true si le programme doit mémoriser le prémaillage des arêtes, false dans le cas contraire.", TkUtil::Charset::UTF_8))
+: m_name ("Bidon")
 {
     MGX_FORBIDDEN ("ContextIfc copy constructor is not allowed.");
 }	// ContextIfc::ContextIfc
@@ -548,8 +451,7 @@ Internal::ContextIfc* getContextIfc (const char* name)
 
 //std::cout << __FILE__ << ' ' << __LINE__ << " ContextIfc::getContextIfc : absence de contexte de nom " << name << std::endl;
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-    message << "getContextIfc : absence de contexte de nom \"" << name
-            << "\" recensé.";
+    message << "getContextIfc : absence de contexte de nom \"" << name << "\" recensé.";
 	throw TkUtil::Exception (message);
 }	// getContextIfc
 

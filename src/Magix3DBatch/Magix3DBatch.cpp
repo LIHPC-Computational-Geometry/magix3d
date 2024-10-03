@@ -8,6 +8,7 @@
 #include "Python/M3DPythonSession.h"
 #include "Internal/Context.h"
 #include "Internal/Mgx3DArguments.h"
+#include "Internal/Resources.h"
 #include "Utils/CommandManager.h"
 #include "Utils/Log.h"
 
@@ -145,7 +146,8 @@ int main (int argc, char *argv[], char* envp[])
 	// lancé sur station et avec mpich 1.2.6, reste en attente sur un waitpid
 	// du processus fils chargé de rediriger les sorties du script.
 	// Donc, au moins pour les serveurs, on affecte false à cette variable.
-	context->displayScriptOutputs.setValue (false);
+//	context->displayScriptOutputs.setValue (false);
+	Resources::instance ( )._displayScriptOutputs.setValue (false);
 	// Instruction inutile d'un point de vue fonctionnel, la session par défaut du contexte est déjà de ce type.
 	// L'objet est ici de forcer à l'édition des liens de s'intéresser à createMgx3DPythonSession pour éviter
 	// qu'il ne soit déclaré undefined symbol ... Un autre moyen aussi inélégant serait de créer une fonction foo ( ){}

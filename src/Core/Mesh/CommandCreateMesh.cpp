@@ -8,6 +8,7 @@
  */
 /*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
+#include "Internal/Resources.h"
 #include "Mesh/CommandCreateMesh.h"
 #include "Mesh/MeshItf.h"
 #include "Mesh/MeshManager.h"
@@ -454,8 +455,7 @@ void CommandCreateMesh::mesh(Topo::Block* & bloc)
 /*----------------------------------------------------------------------------*/
 void CommandCreateMesh::preMesh(const std::vector<Topo::Block*>& blocks)
 {
-	if (true == threadingEnabled ( )
-			&& true==getContext ( ).allowThreadedBlockPreMeshTasks.getValue( ))
+	if (true == threadingEnabled ( ) && true == Internal::Resources::instance ( )._allowThreadedBlockPreMeshTasks.getValue( ))
 	{
 #ifdef _DEBUG_THREAD
 		std::cout << "CommandCreateMesh::preMesh. Lancement du pré-maillage des blocs dans des threads. NB_BLOCKS=" << blocks.size ( ) << std::endl;
@@ -521,8 +521,7 @@ void CommandCreateMesh::preMesh(const std::vector<Topo::CoFace*>& faces)
     double nbTot = (double)faces.size();
     double nbFaits = 0;
 
-    if (true == threadingEnabled ( )
-			&& true==getContext ( ).allowThreadedFacePreMeshTasks.getValue( ))
+    if (true == threadingEnabled ( ) && true == Internal::Resources::instance ( )._allowThreadedFacePreMeshTasks.getValue( ))
 	{
 #ifdef _DEBUG_THREAD
 		std::cout << "CommandCreateMesh::preMesh. Lancement du pré-maillage des faces dans des threads. NB_FACES=" << faces.size ( ) << std::endl;
@@ -594,8 +593,7 @@ void CommandCreateMesh::preMesh(const std::vector<Topo::CoEdge*>& aretes)
     double nbFaits = 0;
     uint nbMTThreads = 0; // nombre de taches indépendantes
 
-	if (true == threadingEnabled ( )
-			&& true==getContext ( ).allowThreadedEdgePreMeshTasks.getValue( ))
+	if (true == threadingEnabled ( ) && true == Internal::Resources::instance ( )._allowThreadedEdgePreMeshTasks.getValue( ))
 	{
 #ifdef _DEBUG_THREAD
 		std::cout << "CommandCreateMesh::preMesh. Lancement du pré-maillage des arêtes dans des threads. NB_EDGE=" << aretes.size ( ) << std::endl;
