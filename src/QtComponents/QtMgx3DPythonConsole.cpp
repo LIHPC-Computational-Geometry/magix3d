@@ -314,6 +314,11 @@ void QtMgx3DPythonConsole::setGraphicalWidget (Qt3DGraphicalWidget* widget)
 }	// QtMgx3DPythonConsole::setGraphicalWidget
 
 
+void QtMgx3DPythonConsole::saveConsoleScript (const string filePath, bool environment)
+{
+}	// QtMgx3DPythonConsole::saveConsoleScript
+
+
 void QtMgx3DPythonConsole::storePolicy ( )
 {
 	if ((0 != getMainWindow ( )) && ((CommandManagerIfc::POLICY)-1 == _cmdMgrPolicy))
