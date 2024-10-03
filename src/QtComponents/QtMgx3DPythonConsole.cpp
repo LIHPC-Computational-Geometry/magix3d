@@ -7,14 +7,22 @@
 #include <QtUtil/QtConfiguration.h>
 #include <QtUtil/QtMessageBox.h>
 #include <QtUtil/QtUnicodeHelper.h>
-
+#include <PythonUtil/PythonInfos.h>
+#include <TkUtil/Date.h>
 #include <TkUtil/Exception.h>
 #include <TkUtil/ErrorLog.h>
 #include <TkUtil/MemoryError.h>
+#include <TkUtil/MachineData.h>
+#include <TkUtil/Process.h>
 #include <TkUtil/ProcessLog.h>
 #include <TkUtil/TraceLog.h>
+#include <TkUtil/UserData.h>
+#include <TkUtil/UtilInfos.h>
+
+#include <IQualif.h>
 
 #include <assert.h>
+#include <fstream>
 #include <memory>
 
 #include <QLayout>
@@ -24,6 +32,7 @@
 #include <QThread>
 #include <QTextCodec>
 
+#include <Standard_Version.hxx>
 
 using namespace std;
 using namespace TkUtil;
@@ -314,8 +323,73 @@ void QtMgx3DPythonConsole::setGraphicalWidget (Qt3DGraphicalWidget* widget)
 }	// QtMgx3DPythonConsole::setGraphicalWidget
 
 
-void QtMgx3DPythonConsole::saveConsoleScript (const string filePath, bool environment)
+void QtMgx3DPythonConsole::saveConsoleScript (const string filePath, Charset charset, bool environment)
 {
+	UTF8String	text (charset);
+	if (false == environment)
+		text << "# -*- coding: " << Charset::charset2str (charset.charset ( )) << " -*-" << "\n" << "\n";
+	else
+	{
+		Date			date;
+		OperatingSystem	os;
+		text << "#!" << PYTHON_INTERPRETER << "\n";
+		text << "# -*- coding: " << Charset::charset2str (charset.charset ( )) << " -*-" << "\n" << "\n";
+		text << "# Logiciel               : " << Process::getCurrentSoftware ( ) << "\n";
+		text << "# Version                : " << Process::getCurrentSoftwareVersion ( ).getVersion ( ) << "\n";
+		text << "# Système d'exploitation : " << os.getName ( ) << " " << os.getVersion ( ).getVersion ( ) << "\n";
+		text << "# Auteur                 : " << UserData ( ).getName ( ) << "\n";
+		text << "# Date                   : " << date.getDate ( ) << " " << date.getTime ( ) << "\n";
+		text << "# Version API TkUtil     : " << UtilInfos::getVersion ( ).getVersion ( ) << "\n";
+		text << "# Version de Python      : " << PYTHON_VERSION << "\n";
+		text << "# Version de Swig        : " << SWIG_VERSION << "\n";
+		text << "# Version API PythonUtil : " << PythonInfos::getVersion ( ).getVersion ( ) << "\n";
+		text << "# Version API Qualif     : " << Qualif::QualifVersion ( ) << "\n";
+		text << "# Version API OCC        : " << OCC_VERSION_COMPLETE << "\n" << "\n";
+
+		// Un avertissement important :
+		text << "# ATTENTION : en cas d'utilisation en dehors de l'IHM Magix3D remplacez la ligne :\n"
+		     << "# ctx = Mgx3D.getContext(\"session_1\")\n"
+		     << "# par :\n"
+		     << "# ctx = Mgx3D.getStdContext()\n\n";	     
+	}
+	
+	// Contenu de la console :
+	const QString	qtext	= toPlainText ( );
+	text << qtext.toStdString ( ) << "\n";
+	
+	unique_ptr<ofstream>	stream (new ofstream (filePath.c_str( ), ios::trunc));
+	if (stream->rdstate ( ) != std::ios_base::goodbit)
+	{
+		UTF8String	error (Charset::UTF_8);
+		error << "Erreur lors de l'ouverture en écriture du script " << filePath << ".";
+		throw Exception (error);
+	}	// else if (stream->rdstate ( ) == std::ios_base::goodbit)
+	switch (charset.charset ( ))
+	{
+		case Charset::ASCII		: (*stream.get ( )) << text.ascii ( );	break;
+		case Charset::UTF_8		: (*stream.get ( )) << text.utf8 ( );	break;
+//		case Charset::UTF_16	: (*stream.get ( )).write ((WChar_t*)text.utf16 ( ).utf16 ( ), text.utf16 ( ).length ( ));	break;
+		case Charset::ISO_8859	: (*stream.get ( )) << text.iso ( );	break;
+		default	:
+			UTF8String	error (Charset::UTF_8);
+			error << "Erreur lors de l'écriture du script " << filePath << " : charset no supporté (" << Charset::charset2str (charset.charset ( )) << ")";
+			throw Exception (error);
+
+	}	// switch (charset.charset ( ))
+	if (stream->rdstate ( ) != std::ios_base::goodbit)
+	{
+		UTF8String	error (Charset::UTF_8);
+		error << "Erreur lors de l'écriture du script " << filePath << ".";
+		throw Exception (error);
+	}	// if (stream->rdstate ( ) != std::ios_base::goodbit)
+	stream->flush ( );
+	stream->close ( );
+	if (stream->rdstate ( ) != std::ios_base::goodbit)
+	{
+		UTF8String	error (Charset::UTF_8);
+		error << "Erreur lors de la fermeture du script " << filePath << ".";
+		throw Exception (error);
+	}	// if (stream->rdstate ( ) != std::ios_base::goodbit)
 }	// QtMgx3DPythonConsole::saveConsoleScript
 
 

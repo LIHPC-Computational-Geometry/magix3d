@@ -29,11 +29,9 @@ namespace QtComponents
 unsigned int	QtMgx3DScriptFileDialog::encodageScript	= 0;
 
 
-QtMgx3DScriptFileDialog::QtMgx3DScriptFileDialog (
-			QWidget* parent, const char* title, bool open, Charset::CHARSET charset, bool modal)
+QtMgx3DScriptFileDialog::QtMgx3DScriptFileDialog (QWidget* parent, const char* title, bool open, bool withScriptEncodage, bool withEnvironment, Charset::CHARSET charset, bool modal)
 	: QFileDialog (parent),
-	  _saveEntitiesNamesCheckBox (0), _saveEntitiesIdRefCheckBox(0),
-	  _saveEntitiesCoordCheckBox(0), _charsetComboBox (0)
+	  _saveEntitiesNamesCheckBox (0), _saveEntitiesIdRefCheckBox(0), _saveEntitiesCoordCheckBox(0), _saveEnvironmentCheckBox (0), _charsetComboBox (0)
 {
 	setWindowTitle (title);
 	setModal (modal);
@@ -41,13 +39,12 @@ QtMgx3DScriptFileDialog::QtMgx3DScriptFileDialog (
 	if (true == modal)
 		setWindowModality (Qt::WindowModal);
 
-	createGui (open, charset);
+	createGui (open, withScriptEncodage, withEnvironment, charset);
 }	// QtMgx3DScriptFileDialog::QtMgx3DScriptFileDialog
 
 
 QtMgx3DScriptFileDialog::QtMgx3DScriptFileDialog (const QtMgx3DScriptFileDialog&)
-	: QFileDialog (0), _saveEntitiesNamesCheckBox (0), _saveEntitiesIdRefCheckBox(0),
-	  _saveEntitiesCoordCheckBox(0), _charsetComboBox (0)
+	: QFileDialog (0), _saveEntitiesNamesCheckBox (0), _saveEntitiesIdRefCheckBox(0), _saveEntitiesCoordCheckBox(0), _saveEnvironmentCheckBox (0), _charsetComboBox (0)
 {
 	MGX_FORBIDDEN ("QtMgx3DScriptFileDialog copy constructor is not allowed.");
 }	// QtMgx3DScriptFileDialog::QtMgx3DScriptFileDialog (const QtMgx3DScriptFileDialog&)
@@ -97,6 +94,20 @@ unsigned int QtMgx3DScriptFileDialog::getEncodageScript ( ) const
 }
 
 
+bool QtMgx3DScriptFileDialog::getEnvironmentPython ( ) const
+{
+	CHECK_NULL_PTR_ERROR (_saveEnvironmentCheckBox)
+	return _saveEnvironmentCheckBox->isChecked ( );
+}	// QtMgx3DScriptFileDialog::getEnvironmentPython
+
+
+void QtMgx3DScriptFileDialog::setEnvironmentPython (bool set)
+{
+	CHECK_NULL_PTR_ERROR (_saveEnvironmentCheckBox)
+	_saveEnvironmentCheckBox->setChecked (set);
+}	// QtMgx3DScriptFileDialog::setEnvironmentPython
+
+
 Charset::CHARSET QtMgx3DScriptFileDialog::getCharset ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_charsetComboBox)
@@ -104,7 +115,7 @@ Charset::CHARSET QtMgx3DScriptFileDialog::getCharset ( ) const
 }	// QtMgx3DScriptFileDialog::getCharset
 
 
-void QtMgx3DScriptFileDialog::createGui (bool open, Charset::CHARSET charset)
+void QtMgx3DScriptFileDialog::createGui (bool open, bool withScriptEncodage, bool withEnvironment, Charset::CHARSET charset)
 {
 	setFileMode (true == open ? ExistingFiles : AnyFile);
 	setAcceptMode (true == open ? AcceptOpen : AcceptSave);
@@ -115,8 +126,7 @@ void QtMgx3DScriptFileDialog::createGui (bool open, Charset::CHARSET charset)
 	if (0 == layout ( ))
 	{
 		UTF8String	msg (Charset::UTF_8);
-		msg << "Impossibilité d'étendre les possibilités du sélecteur de fichier : "
-		    << "absence de layout dans le sélecteur de fichier Qt.";
+		msg << "Impossibilité d'étendre les possibilités du sélecteur de fichier : absence de layout dans le sélecteur de fichier Qt.";
 		ConsoleOutput::cerr ( ) << msg << co_endl;
 		return;
 	}	// if (0 == layout ( )) 
@@ -128,27 +138,32 @@ void QtMgx3DScriptFileDialog::createGui (bool open, Charset::CHARSET charset)
 	// [EB] utilisation de checkbox pour sélectionner un des modes de sauvegarde
 	QButtonGroup* buttonGroup	= new QButtonGroup (this);
 	buttonGroup->setExclusive (true);
-	_saveEntitiesNamesCheckBox	=
-			new QCheckBox (QString::fromUtf8("Enregistrer avec des noms pour les entités"));
+	_saveEntitiesNamesCheckBox	= new QCheckBox (QString::fromUtf8("Enregistrer avec des noms pour les entités"));
 	buttonGroup->addButton (_saveEntitiesNamesCheckBox);
 	if (encodageScript == Internal::ContextIfc::WITHNAMES)
 		_saveEntitiesNamesCheckBox->setCheckState (Qt::Checked);
 
-	_saveEntitiesIdRefCheckBox =
-			new QCheckBox (QString::fromUtf8("Enregistrer avec des références sur les commandes précédentes pour les entités"));
+	_saveEntitiesIdRefCheckBox = new QCheckBox (QString::fromUtf8("Enregistrer avec des références sur les commandes précédentes pour les entités"));
 	buttonGroup->addButton (_saveEntitiesIdRefCheckBox);
 	if (encodageScript == Internal::ContextIfc::WITHIDREF)
 		_saveEntitiesIdRefCheckBox->setCheckState (Qt::Checked);
 
-	_saveEntitiesCoordCheckBox =
-			new QCheckBox (QString::fromUtf8("Enregistrer avec des coordonnées pour retrouver les entités"));
+	_saveEntitiesCoordCheckBox = new QCheckBox (QString::fromUtf8("Enregistrer avec des coordonnées pour retrouver les entités"));
 	buttonGroup->addButton (_saveEntitiesCoordCheckBox);
 	if (encodageScript == Internal::ContextIfc::WITHCOORD)
 		_saveEntitiesCoordCheckBox->setCheckState (Qt::Checked);
 
-	mainLayout->addWidget (_saveEntitiesNamesCheckBox);
-	mainLayout->addWidget (_saveEntitiesIdRefCheckBox);
-	mainLayout->addWidget (_saveEntitiesCoordCheckBox);
+	_saveEnvironmentCheckBox = new QCheckBox (QString::fromUtf8("Enregistrer des informations complémentaires liées à l'environnement python"));
+
+	if (true == withScriptEncodage)
+	{
+		mainLayout->addWidget (_saveEntitiesNamesCheckBox);
+		mainLayout->addWidget (_saveEntitiesIdRefCheckBox);
+		mainLayout->addWidget (_saveEntitiesCoordCheckBox);
+	}	// if (true == withScriptEncodage)
+
+	if (true == withEnvironment)
+		mainLayout->addWidget (_saveEnvironmentCheckBox);
 
 	// Jeu de caractères pour l'encodage du script :
 	UTF8String		text ("Jeu de caractères :", Charset::UTF_8);

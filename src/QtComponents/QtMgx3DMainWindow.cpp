@@ -274,8 +274,7 @@ namespace QtComponents
                   _undefinedLandmarkAction(0),
                   _mesh2DDimAction(0),
                   _importAction(0), _exportAllAction(0), _exportSelectionAction(0),
-                  _saveMagix3DScriptAction(0), _saveAsMagix3DScriptAction(0),
-                  _savePythonConsoleAction (0), _savePythonConsoleWithEnvAction (0),
+                  _saveMagix3DScriptAction(0), _saveAsMagix3DScriptAction(0), _savePythonConsoleAction (0),
                   _longCommandAction(0), _openCascadeLongCommandAction(0),
                   _executePythonScriptAction(0),
                   _distanceMeasurementAction(0), _angleMeasurementAction(0), _extremaMeshingEdgeLengthOnEdgeAction(0),
@@ -374,7 +373,6 @@ namespace QtComponents
                   _saveMagix3DScriptAction(wa._saveMagix3DScriptAction),
                   _saveAsMagix3DScriptAction(wa._saveAsMagix3DScriptAction),
                   _savePythonConsoleAction (wa._savePythonConsoleAction),
-                  _savePythonConsoleWithEnvAction (wa._savePythonConsoleAction),
                   _longCommandAction(wa._longCommandAction),
                   _openCascadeLongCommandAction(wa._openCascadeLongCommandAction),
                   _executePythonScriptAction(wa._executePythonScriptAction),
@@ -504,7 +502,6 @@ namespace QtComponents
 				_saveMagix3DScriptAction              = wa._saveMagix3DScriptAction;
 				_saveAsMagix3DScriptAction            = wa._saveAsMagix3DScriptAction;
 				_savePythonConsoleAction              = wa._savePythonConsoleAction;
-				_savePythonConsoleWithEnvAction       = wa._savePythonConsoleWithEnvAction;
 				_longCommandAction                    = wa._longCommandAction;
 				_openCascadeLongCommandAction         = wa._openCascadeLongCommandAction;
 				_executePythonScriptAction            = wa._executePythonScriptAction;
@@ -629,8 +626,6 @@ namespace QtComponents
 				_saveAsMagix3DScriptAction->setEnabled(enable);
 			if (0 != _savePythonConsoleAction)
 				_savePythonConsoleAction->setEnabled (enable);
-			if (0 != _savePythonConsoleWithEnvAction)
-				_savePythonConsoleWithEnvAction->setEnable (enable);
 			if (0 != _executePythonScriptAction)
 				_executePythonScriptAction->setEnabled(enable);
 			if (0 != _mgx3DScriptsMenu)
@@ -1107,8 +1102,7 @@ void QtMgx3DMainWindow::showReady ( )
 				CHECK_NULL_PTR_ERROR(_pythonPanel)
 				CHECK_NULL_PTR_ERROR(getContext().getScriptingManager().getPythonWriter())
 				PythonWriter*	refWriter	= getContext ( ).getScriptingManager ( ).getPythonWriter ( );
-				PythonWriter*	writer	= new Internal::PythonWriter (
-				scriptToUserScript (refWriter->getFileName ( )), refWriter->getCharset ( ));
+				PythonWriter*	writer	= new Internal::PythonWriter (scriptToUserScript (refWriter->getFileName ( )), refWriter->getCharset ( ));
 				writer->writeHeader();
 				_pythonPanel->getLogDispatcher ( ).addStream (writer);
 			}
@@ -1692,7 +1686,6 @@ void QtMgx3DMainWindow::showReady ( )
 			_sessionMenu->addAction(getActions()._saveMagix3DScriptAction);
 			_sessionMenu->addAction(getActions()._saveAsMagix3DScriptAction);
 			_sessionMenu->addAction(getActions()._savePythonConsoleAction);
-			_sessionMenu->addAction(getActions()._savePythonConsoleWithEnvAction);
 			_sessionMenu->addSeparator();
 #ifdef _DEBUG
 																																	_sessionMenu->addAction (getActions ( )._longCommandAction);
@@ -2223,8 +2216,6 @@ void QtMgx3DMainWindow::showReady ( )
 			connect(_actions._saveAsMagix3DScriptAction, SIGNAL(triggered()), this, SLOT(saveAsMagix3DScriptCallback()), defaultConnectionType);
 			_actions._savePythonConsoleAction = new QtAutoDisablabledAction ("Enregistrer la console python ...", this);
 			connect(_actions._savePythonConsoleAction, SIGNAL(triggered()), this, SLOT(savePythonConsoleCallback ( )), defaultConnectionType);
-			_actions._savePythonConsoleWithEnvAction = new QtAutoDisablabledAction ("Enregistrer sous le script Magix 3D minimum ...", this);
-			connect(_actions._savePythonConsoleWithEnvAction, SIGNAL(triggered()), this, SLOT(savePythonConsoleWithEnvCallback()), defaultConnectionType);
 #ifdef _DEBUG
 	_actions._longCommandAction	= new QAction ("Longue commande", this);
 	connect (_actions._longCommandAction, SIGNAL (triggered ( )), this,
@@ -5137,8 +5128,122 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 		}    // QtMgx3DMainWindow::getDefaultScriptsCharset
 		
 		
-void QtMgx3DMainWindow::savePythonConsole (const string filePath, bool WithEnv)
+void QtMgx3DMainWindow::savePythonConsole (bool withEnv)
 {
+	static QString	consoleFilePath;
+	static bool		saveWithEnv	= true;
+	cout << __FILE__ << ' ' << __LINE__ << " QtMgx3DMainWindow::savePythonConsole (" << (true == withEnv ? "true" : "false") << ")" << endl;
+	static QString	lastDir (Process::getCurrentDirectory ( ).c_str ( ));
+	File			file (consoleFilePath.toStdString ( ));
+	static	Charset::CHARSET	charset	= Charset::str2charset (Resources::instance ( )._scriptsCharset.getValue ( ).ascii ( ).c_str ( ));
+	QtMgx3DScriptFileDialog	dialog (this, "Magix 3D - Enregistrement console Python", false, false, true, charset, true);
+	if ((false == _pythonMinScript.empty ( )) && (true == file.exists ( )))
+		lastDir	= file.getPath ( ).getFullFileName ( ).c_str ( );
+	dialog.setDirectory (lastDir);
+	if (false == _pythonMinScript.empty ( ))
+		dialog.selectFile (file.getFileName ( ).c_str ( ));
+	dialog.setFileMode (QFileDialog::AnyFile);
+	dialog.setAcceptMode (QFileDialog::AcceptSave);
+	dialog.setOption (QFileDialog::DontUseNativeDialog);
+	dialog.setConfirmOverwrite (false);	// Done in french later ...
+	QStringList	filters;
+	filters << "Magix 3D (*.py)";
+	dialog.setNameFilters (filters);
+	dialog.setEnvironmentPython (saveWithEnv);
+
+	string	fileName;
+	while (0 == fileName.length ( ))
+	{
+		if (QDialog::Accepted != dialog.exec ( ))
+			return;
+
+		QStringList	fileList	= dialog.selectedFiles ( );
+		if (0 == fileList.size ( ))
+			continue;
+
+		try
+		{
+			fileName	= checkMagix3DScriptFileName (fileList [0].toStdString ( ));
+		}
+		catch (TkUtil::Exception& e)
+		{
+			UTF8String	error (Charset::UTF_8);
+			error << e.getMessage ( ) << "\nSouhaitez-vous choisir un autre fichier ?";
+			switch (QMessageBox::warning (this, "Magix 3D", UTF8TOQSTRING (error), "Oui", "Annuler", QString::null, 0, -1))
+			{
+				case	0	: fileName.clear ( ); continue;
+				case	1	: return;
+			}	// switch (QMessageBox::warning (...
+		} // catch (TkUtil::Exception& e)
+		
+		file.setFullFileName (fileName);
+
+		try 
+		{	
+			bool fileExists = file.exists ( );
+
+			if (fileExists) 
+			{
+				UTF8String	warning (Charset::UTF_8);
+				warning << "Le fichier " << fileName << "\nexiste déjà. Souhaitez-vous l'écraser ?";
+				switch (QMessageBox::warning (this, "Magix 3D", UTF8TOQSTRING (warning), "Oui", "Non", "Annuler", 0, 2))
+				{
+					case	0	: break;
+					case	1	: fileName.clear(); continue;
+					case	2	: return;
+				}	// switch (QMessageBox::warning (...
+			} // if (fileExists)
+		}
+		catch (TkUtil::Exception& e) 
+		{
+			UTF8String	error (Charset::UTF_8);
+			error << "TkUtils::Exception file.exists ( ) " << e.getMessage()
+				  << "\nTest d'existence du fichier " << fileName
+				  << "\nimpossible. Le droit en exécution sur l'un des répertoires du chemin est probablement manquant. "
+				  << "\nSouhaitez-vous choisir un autre fichier ?";
+			switch (QMessageBox::warning (this, "Magix 3D", UTF8TOQSTRING (error), "Oui", "Annuler", QString::null, 0, -1))
+			{
+				case	0	: fileName.clear(); continue;
+				case	1	: return;
+			}	// switch (QMessageBox::warning (...
+		} // catch (TkUtil::Exception& e)
+
+		if (false == file.isWritable ( ))
+		{
+			UTF8String	error (Charset::UTF_8);
+			error << "Vous n'avez pas les droits en écriture sur le fichier\n" << fileName << ".\nSouhaitez-vous sélectionner un autre fichier ?";
+			switch (QMessageBox::warning (this, "Magix 3D", UTF8TOQSTRING (error), "Oui", "Annuler", QString::null, 0, -1))
+			{
+				case	0	: fileName.clear(); continue;
+				case	1	: return;
+			}	// switch (QMessageBox::warning (...
+		}	// if (false == file.isWritable ( ))
+	}	// while (0 == fileName.length ( ))
+
+	lastDir				= dialog.directory ( ).absolutePath ( );
+	saveWithEnv			= dialog.getEnvironmentPython ( );
+	charset				= dialog.getCharset ( );
+	
+	UTF8String	message (Charset::UTF_8);
+
+	BEGIN_QT_TRY_CATCH_BLOCK
+	
+	CHECK_NULL_PTR_ERROR (getPythonPanel ( ))
+
+	DISABLE_COMMAND_ACTIONS
+	DISABLE_GRAPHICAL_OPERATIONS
+
+	QtAutoWaitingCursor	cursor (true);
+
+	getPythonPanel ( )->saveConsoleScript (fileName, charset, saveWithEnv);
+
+	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
+
+	if (true == hasError)
+	{
+		message << "Echec lors de l'enregistrement de la console python dans le " << " fichier " << " :" << "\n" << errorString;
+		log (ErrorLog (message));
+	}	// if (true == hasError)
 }	// QtMgx3DMainWindow::savePythonConsole
 
 
@@ -5983,8 +6088,7 @@ void QtMgx3DMainWindow::exportSelectionCallback ( )
 
 	if (true == hasError)
 	{
-		message << "Echec lors de l'exportation de la sélection des données dans le "
-		        << " fichier " << " :" << "\n"
+		message << "Echec lors de l'exportation de la sélection des données dans le fichier " << " :" << "\n"
 		        << errorString;
 		log (ErrorLog (message));
 	}	// if (true == hasError)
@@ -6030,7 +6134,7 @@ void QtMgx3DMainWindow::saveAsMagix3DScriptCallback ( )
 	static QString	lastDir (Process::getCurrentDirectory ( ).c_str ( ));
 	File			file (_pythonMinScript);
 	Charset::CHARSET	charset	= Charset::str2charset (Resources::instance ( )._scriptsCharset.getValue ( ).ascii ( ).c_str ( ));
-	QtMgx3DScriptFileDialog	dialog (this, "Magix 3D - Enregistrement commandes Python", false, charset, true);
+	QtMgx3DScriptFileDialog	dialog (this, "Magix 3D - Enregistrement commandes Python", false, true, false, charset, true);
 	if ((false == _pythonMinScript.empty ( )) && (true == file.exists ( )))
 		lastDir	= file.getPath ( ).getFullFileName ( ).c_str ( );
 	dialog.setDirectory (lastDir);
@@ -6143,119 +6247,10 @@ void QtMgx3DMainWindow::saveAsMagix3DScriptCallback ( )
 }	// QtMgx3DMainWindow::saveAsMagix3DScriptCallback
 
 
-static QString	consoleFilePath ( );
 void QtMgx3DMainWindow::savePythonConsoleCallback ( )
 {
-	A IMPLEMENTER PUIS IMPLEMENTER QtMegxMainWindow::savePythonConsole () PUIS IMPLEMENTER savePythonConsoleWithEnvCallback QUASI IDENTIQUE A CETTE METHODE
-	static QString	lastDir (Process::getCurrentDirectory ( ).c_str ( ));
-	File			file (consoleFilePath.toStdString ( ));
-	Charset::CHARSET	charset	= Charset::str2charset (Resources::instance ( )._scriptsCharset.getValue ( ).ascii ( ).c_str ( ));
-	QtMgx3DScriptFileDialog	dialog (this, "Magix 3D - Enregistrement console Python", false, charset, true);
-	if ((false == _pythonMinScript.empty ( )) && (true == file.exists ( )))
-		lastDir	= file.getPath ( ).getFullFileName ( ).c_str ( );
-	dialog.setDirectory (lastDir);
-	if (false == _pythonMinScript.empty ( ))
-		dialog.selectFile (file.getFileName ( ).c_str ( ));
-	dialog.setFileMode (QFileDialog::AnyFile);
-	dialog.setAcceptMode (QFileDialog::AcceptSave);
-	dialog.setOption (QFileDialog::DontUseNativeDialog);
-	dialog.setConfirmOverwrite (false);	// Done in french later ...
-	QStringList	filters;
-	filters << "Magix 3D (*.py)";
-	dialog.setNameFilters (filters);
-
-	string	fileName;
-	while (0 == fileName.length ( ))
-	{
-		if (QDialog::Accepted != dialog.exec ( ))
-			return;
-
-		QStringList	fileList	= dialog.selectedFiles ( );
-		if (0 == fileList.size ( ))
-			continue;
-
-		try
-		{
-			fileName	= checkMagix3DScriptFileName (fileList [0].toStdString ( ));
-		}
-		catch (TkUtil::Exception& e)
-		{
-			UTF8String	error (Charset::UTF_8);
-			error << e.getMessage ( ) << "\nSouhaitez-vous choisir un autre fichier ?";
-			switch (QMessageBox::warning (this, "Magix 3D", UTF8TOQSTRING (error), "Oui", "Annuler", QString::null, 0, -1))
-			{
-				case	0	: fileName.clear ( ); continue;
-				case	1	: return;
-			}	// switch (QMessageBox::warning (...
-		} // catch (TkUtil::Exception& e)
-		
-		file.setFullFileName (fileName);
-
-		try {
-			bool fileExists = file.exists ( );
-
-			if (fileExists) {
-				UTF8String	warning (Charset::UTF_8);
-				warning << "Le fichier " << fileName << "\nexiste déjà. Souhaitez-vous l'écraser ?";
-				switch (QMessageBox::warning (this, "Magix 3D", UTF8TOQSTRING (warning), "Oui", "Non", "Annuler", 0, 2))
-				{
-					case	0	: break;
-					case	1	: fileName.clear(); continue;
-					case	2	: return;
-				}	// switch (QMessageBox::warning (...
-			} // if (fileExists)
-		}
-		catch (TkUtil::Exception& e) {
-			UTF8String	error (Charset::UTF_8);
-			error << "TkUtils::Exception file.exists ( ) " << e.getMessage()
-				  << "\nTest d'existence du fichier " << fileName
-				  << "\nimpossible. Le droit en exécution sur l'un des répertoires du chemin est probablement manquant. "
-				  << "\nSouhaitez-vous choisir un autre fichier ?";
-			switch (QMessageBox::warning (this, "Magix 3D", UTF8TOQSTRING (error), "Oui", "Annuler", QString::null, 0, -1))
-			{
-				case	0	: fileName.clear(); continue;
-				case	1	: return;
-			}	// switch (QMessageBox::warning (...
-		} // catch (TkUtil::Exception& e)
-
-		if (false == file.isWritable ( ))
-		{
-			UTF8String	error (Charset::UTF_8);
-			error << "Vous n'avez pas les droits en écriture sur le fichier\n" << fileName << ".\nSouhaitez-vous sélectionner un autre fichier ?";
-			switch (QMessageBox::warning (this, "Magix 3D", UTF8TOQSTRING (error), "Oui", "Annuler", QString::null, 0, -1))
-			{
-				case	0	: fileName.clear(); continue;
-				case	1	: return;
-			}	// switch (QMessageBox::warning (...
-		}	// if (false == file.isWritable ( ))
-	}	// while (0 == fileName.length ( ))
-
-	lastDir				= dialog.directory ( ).absolutePath ( );
-	
-	UTF8String	message (Charset::UTF_8);
-
-	BEGIN_QT_TRY_CATCH_BLOCK
-
-	DISABLE_COMMAND_ACTIONS
-	DISABLE_GRAPHICAL_OPERATIONS
-
-	QtAutoWaitingCursor	cursor (true);
-
-	savePythonConsole (fileName, false);
-
-	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
-
-	if (true == hasError)
-	{
-		message << "Echec lors de l'enregistrement de la console python dans le " << " fichier " << " :" << "\n" << errorString;
-		log (ErrorLog (message));
-	}	// if (true == hasError)
+	savePythonConsole (false);
 }	// QtMgx3DMainWindow::savePythonConsoleCallback
-
-
-void QtMgx3DMainWindow::savePythonConsoleWithEnvCallback ( )
-{
-}	// QtMgx3DMainWindow::savePythonConsoleWithEnvCallback
 
 
 void QtMgx3DMainWindow::longCommandCallback ( )
