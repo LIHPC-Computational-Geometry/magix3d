@@ -36,6 +36,7 @@
 
 #include "Internal/InfoCommand.h"
 #include "Internal/InternalPreferences.h"
+#include "Internal/Resources.h"
 
 #include "Geom/GeomEntity.h"
 #include "Geom/Curve.h"
@@ -1000,7 +1001,7 @@ bool CoEdge::isPreMeshed() const
 {
 	bool pointsUpToDate = (m_mesh_property->getModificationTime() < m_mesh_data->getPointsTime());
 	// force le recalcul du prémaillage
-	if (false==getContext ( ).memorizeEdgePreMesh.getValue( ))
+	if (false == Internal::Resources::instance ( )._memorizeEdgePreMesh.getValue( ))
 		pointsUpToDate = false;
 
 #ifdef _DEBUG2

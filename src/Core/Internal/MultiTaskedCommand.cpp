@@ -6,6 +6,7 @@
  * \date	23/03/201710
  */
 #include "Internal/ContextIfc.h"
+#include "Internal/Resources.h"
 #include "Utils/Common.h"
 #include "Utils/Magix3DEvents.h"
 #include "Internal/MultiTaskedCommand.h"
@@ -48,12 +49,9 @@ namespace Internal
 //                         LA CLASSE MultiTaskedCommand
 // ============================================================================
 
-MultiTaskedCommand::MultiTaskedCommand (
-							Context& c, const string& name, size_t tasksNum)
+MultiTaskedCommand::MultiTaskedCommand (Context& c, const string& name, size_t tasksNum)
 	: Internal::CommandInternal (c, name),
-	  _step (1), _stepNum (1), _stepName (name), _stepProgression (0.),
-	  _tasks ( ),
-	  _notificationTime ( ), _modificationTime ( ), _tasksMutex (new Mutex ( ))
+	  _step (1), _stepNum (1), _stepName (name), _stepProgression (0.), _tasks ( ), _notificationTime ( ), _modificationTime ( ), _tasksMutex (new Mutex ( ))
 {
 	gettimeofday (&_modificationTime, NULL);
 	gettimeofday (&_notificationTime, NULL);
@@ -62,8 +60,7 @@ MultiTaskedCommand::MultiTaskedCommand (
 
 MultiTaskedCommand::MultiTaskedCommand (const MultiTaskedCommand& cmd)
 	: CommandInternal (cmd),
-	  _step (1), _stepNum (1), _stepName (""), _stepProgression (0.), _tasks( ),
-	  _notificationTime ( ), _modificationTime ( ), _tasksMutex (0)
+	  _step (1), _stepNum (1), _stepName (""), _stepProgression (0.), _tasks( ), _notificationTime ( ), _modificationTime ( ), _tasksMutex (0)
 {
     MGX_FORBIDDEN("MultiTaskedCommand::MultiTaskedCommand is not allowed.");
 }	// MultiTaskedCommand::MultiTaskedCommand
@@ -94,13 +91,10 @@ MultiTaskedCommand::~MultiTaskedCommand ( )
 
 
 double MultiTaskedCommand::getProgression ( ) const
-{	// On part ici du principe que pour chaque étape de la commande on va de 0 à
-	// 100pc, et que chaque tache d'une étape prend le même temps.
-	// Une autre manière de faire, qui requiert une bonne prédictibilité
-	// de la progression, serait que la progression de la commande aille de 0 à
+{	// On part ici du principe que pour chaque étape de la commande on va de 0 à 100pc, et que chaque tache d'une étape prend le même temps.
+	// Une autre manière de faire, qui requiert une bonne prédictibilité de la progression, serait que la progression de la commande aille de 0 à
 	// 100pc, chaque étape couvrant un pourcentage connu de la commande.
-	// Méthode à surcharger pour avoir cette finesse. Elle peut utiliser
-	// les méthodes setStepProgression/getStepProgression prévue à cet effet.
+	// Méthode à surcharger pour avoir cette finesse. Elle peut utiliser les méthodes setStepProgression/getStepProgression prévue à cet effet.
 
 	return getStepProgression(); // [EB]
 }	// MultiTaskedCommand::getProgression
@@ -120,18 +114,12 @@ TkUtil::UTF8String MultiTaskedCommand::getStrProgression ( ) const
 		case Command::PROCESSING	:
 			if (1 < stepNum)
 			{
-				str << " (en cours, phase " << (unsigned long)getStep ( ) << "/"
-				    << (unsigned long)stepNum << " - " << getStepName ( ) << " "
-				    << ios_base::fixed << TkUtil::setprecision (2)
-				    << TkUtil::setw (5)
-				    << (100. * getStepProgression())
-				    << "%)";
+				str << " (en cours, phase " << (unsigned long)getStep ( ) << "/" << (unsigned long)stepNum << " - " << getStepName ( ) << " "
+				    << ios_base::fixed << TkUtil::setprecision (2) << TkUtil::setw (5) << (100. * getStepProgression()) << "%)";
 			}	// if (1 < stepNum)
 			else
 			{
-				str << " (en cours : " << ios_base::fixed
-				    << TkUtil::setprecision (2) << TkUtil::setw (5)
-				    << (100. * progress) << "%)";
+				str << " (en cours : " << ios_base::fixed << TkUtil::setprecision (2) << TkUtil::setw (5) << (100. * progress) << "%)";
 			}	// else if (1 < stepNum)
 			break;
 		case Command::DONE			: str << " (achevée, succès)";	break;
@@ -192,15 +180,11 @@ void MultiTaskedCommand::notifyObserversForModifications ( )
 	}
 	catch (const Exception& exc)
 	{
-		cerr << "ERREUR lors de la notification aux observateurs d'une "
-		     << "modification de la commande " << getName ( ) << " :\n"
-		     << exc.getFullMessage ( ) << endl;
+		cerr << "ERREUR lors de la notification aux observateurs d'une modification de la commande " << getName ( ) << " :\n" << exc.getFullMessage ( ) << endl;
 	}
 	catch (...)
 	{
-		cerr << "ERREUR non documentée lors de la notification aux "
-		     << "observateurs d'une modification de la commande "
-		     << getName ( ) << "." << endl;
+		cerr << "ERREUR non documentée lors de la notification aux observateurs d'une modification de la commande " << getName ( ) << "." << endl;
 	}
 }	// MultiTaskedCommand::notifyObserversForModifications
 
@@ -217,7 +201,7 @@ void MultiTaskedCommand::notifyObserversForModifications ( )
 
 bool MultiTaskedCommand::threadingEnabled ( ) const
 {	// EB: version qui accepte d'être dans le thread principal
-	return (true==getContext ( ).allowThreadedCommandTasks.getValue( ));
+	return (true == Resources::instance ( )._allowThreadedCommandTasks.getValue( ));
 }	// MultiTaskedCommand::threadingEnabled
 
 void MultiTaskedCommand::markModified ( )
@@ -228,8 +212,7 @@ void MultiTaskedCommand::markModified ( )
 }	// MultiTaskedCommand::markModified
 
 
-void MultiTaskedCommand::setStep (
-				size_t step, const string& stepName, double stepProgression)
+void MultiTaskedCommand::setStep (size_t step, const string& stepName, double stepProgression)
 {
 	AutoMutex	autoMutex (getTasksMutex ( ));
 
@@ -269,8 +252,7 @@ void MultiTaskedCommand::setStepProgression (double progression)
 }	// MultiTaskedCommand::setStepProgression
 
 
-void MultiTaskedCommand::stats (
-				size_t& completed, size_t& running, size_t& queued) const
+void MultiTaskedCommand::stats (size_t& completed, size_t& running, size_t& queued) const
 {
 	ThreadPool::instance ( ).stats (running, queued);
 	completed	= _tasks.size ( ) - running - queued;
@@ -288,8 +270,7 @@ void MultiTaskedCommand::addTask (MgxThreadedTask* task)
 }	// MultiTaskedCommand::addTask
 
 
-void MultiTaskedCommand::addTasks (
-					const vector<Mgx3D::Utils::MgxThreadedTask*>& tasks)
+void MultiTaskedCommand::addTasks (const vector<Mgx3D::Utils::MgxThreadedTask*>& tasks)
 {
 	AutoMutex	autoMutex (getCommandMutex ( ));
 

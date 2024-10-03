@@ -24,9 +24,7 @@ namespace Internal
 {
 		
 /**
- * Les ressources de l'application à l'exécution, pour l'essentiel des "préférences
- * utilisateur" lues en configuration et éventuellement surchargées à la ligne de
- * commande.
+ * Les ressources de l'application à l'exécution, pour l'essentiel des "préférences utilisateur" lues en configuration et éventuellement surchargées à la ligne de commande.
  * 
  * A finaliser : mettre de beaux accesseurs, de belles fonctions load, save, ...
  */
@@ -36,18 +34,17 @@ class Resources
 	
 	static Resources& instance ( );
 	
-	/** L'application doit elle afficher des boites de dialogue d'erreur
-	 * lors des exceptions remontées lors de l'actualisation d'informations
+	/** L'application doit elle afficher des boites de dialogue d'erreur lors des exceptions remontées lors de l'actualisation d'informations
 	 * sur des entités ?
 	 * \see			displayUpdatesErrors
 	 */
 	bool _displayUpdatesErrors;
 
 	/** URL du fichier de configuration par défaut. */
-	std::string								_defaultConfigURL;
+	std::string									_defaultConfigURL;
 
 	/** URL du fichier de configuration de l'utilisateur. */
-	std::string								_userConfigURL;
+	std::string									_userConfigURL;
 
 	/** URL du fichier des éventuels patchs à appliquer au fichier de
 	 * configuration de l'utilisateur. */
@@ -62,33 +59,47 @@ class Resources
 	 * \TODO [CP]		A placer en dehors de l'IHM, mais où ?
 	 */
 	std::string									_mgx3DRootSectionName;
+
+	/**
+	 * Une commande peut-elle être autorisée à être décomposée en plusieurs tâches exécutées parallèlement dans plusieurs threads ?
+	 */
+	Preferences::BoolNamedValue					_allowThreadedCommandTasks;
+
+	/**
+	 * Le programme doit afficher les sorties des commandes script ?
+	 */
+	Preferences::BoolNamedValue					_displayScriptOutputs;
 	
 	/**
-	 * La police de caractères à utiliser pour les affichages 2D dans la
-	 * fenêtre graphique. */
+	 * Le programme doit mémoriser le prémaillage des arêtes ?
+	 */
+	Preferences::BoolNamedValue					_memorizeEdgePreMesh;
+	 
+	/**
+	 * Le prémaillage des arêtes, faces et blocs peut il être décomposé en plusieurs tâches exécutées parallèlement dans plusieurs threads ?
+	 */
+	Preferences::BoolNamedValue					_allowThreadedEdgePreMeshTasks, _allowThreadedFacePreMeshTasks, _allowThreadedBlockPreMeshTasks;
+	
+	/**
+	 * La police de caractères à utiliser pour les affichages 2D dans la  fenêtre graphique. */
 	Preferences::StringNamedValue				_fontFamily;
 
 	/**
-	 * La taille de la police de caractères à utiliser pour les affichages 2D
-	 * dans la fenêtre graphique. */	
+	 * La taille de la police de caractères à utiliser pour les affichages 2D dans la fenêtre graphique. */	
 	Preferences::UnsignedLongNamedValue			_fontSize;
 	
 	/**
-	 * Les caractères gras/italiques de la police de caractères à utiliser pour
-	 * les affichages 2D dans la fenêtre graphique. */
+	 * Les caractères gras/italiques de la police de caractères à utiliser pour les affichages 2D dans la fenêtre graphique. */
 	Preferences::BoolNamedValue					_fontBold, _fontItalic;
 	
 	/**
-	 * Action du déplacement vertical de la souris avec le bouton droit
-	 * pressé. Par défaut, _mouseUpZoom vaut false, et le fait d'aller
-	 * vers le bas provoque un zoom, alors que d'aller vers le haut diminue
-	 * la vue. Actions inverses si _mouseUpZoom vaut true.
+	 * Action du déplacement vertical de la souris avec le bouton droit pressé. Par défaut, _mouseUpZoom vaut false, et le fait d'aller
+	 * vers le bas provoque un zoom, alors que d'aller vers le haut diminue la vue. Actions inverses si _mouseUpZoom vaut true.
 	 */
 	 Preferences::BoolNamedValue				_mouseUpZoom;
 
 	/**
-	 * <I>True</I> si la molette de la souris joue sur le zoom, <I>false</I> 
-	 * dans le cas contraire (déplacement caméra/point focal).
+	 * <I>True</I> si la molette de la souris joue sur le zoom, <I>false</I> dans le cas contraire (déplacement caméra/point focal).
 	 * Vaut <I>false</I> par défaut.
 	 */
 	Preferences::BoolNamedValue					_zoomOnWheel;
@@ -109,49 +120,42 @@ class Resources
 	Preferences::DoubleNamedValue				_selectionLineWidth;
 
 	/**
-	 * <I>True</I> si le fait de sélectionner une entité provoque son affichage
-	 * au premier plan, <I>false</I> si sa position dans la liste d'entités
+	 * <I>True</I> si le fait de sélectionner une entité provoque son affichage au premier plan, <I>false</I> si sa position dans la liste d'entités
 	 * affichées est invariante.
 	 */
 	Preferences::BoolNamedValue					_selectionOnTop;
 
 	/**
-	 * Touche permettant de passer à l'entité suivante dans une liste d'entités
-	 * pointées au même emplacement de la souris.
+	 * Touche permettant de passer à l'entité suivante dans une liste d'entités pointées au même emplacement de la souris.
 	 */
 	Preferences::StringNamedValue				_nextSelectionKey;
 
 	/**
-	 * <I>True</I> si, en mode sélection, le fait de presser le bouton gauche de
-	 * la souris doit déclencher une opération de pointage (<I>picking</I>),
+	 * <I>True</I> si, en mode sélection, le fait de presser le bouton gauche de la souris doit déclencher une opération de pointage (<I>picking</I>),
 	 * <I>false</I> dans le cas contraire.
 	 */
 	Preferences::BoolNamedValue					_pickOnLeftButtonDown;
 
 	/**
-	 * <I>True</I> si, en mode sélection, le fait de presser le bouton droit de
-	 * la souris doit déclencher une opération de pointage (<I>picking</I>),
+	 * <I>True</I> si, en mode sélection, le fait de presser le bouton droit de la souris doit déclencher une opération de pointage (<I>picking</I>),
 	 * <I>false</I> dans le cas contraire.
 	 */
 	Preferences::BoolNamedValue					_pickOnRightButtonDown;
 
 	/**
-	 * <I>True</I> si, en mode sélection, le fait de relâcher le bouton gauche
-	 * de la souris doit déclencher une opération de pointage (<I>picking</I>),
+	 * <I>True</I> si, en mode sélection, le fait de relâcher le bouton gauche de la souris doit déclencher une opération de pointage (<I>picking</I>),
 	 * <I>false</I> dans le cas contraire.
 	 */
 	Preferences::BoolNamedValue					_pickOnLeftButtonUp;
 
 	/**
-	 * <I>True</I> si, en mode sélection, le fait de relâcher le bouton droit de
-	 * la souris doit déclencher une opération de pointage (<I>picking</I>),
+	 * <I>True</I> si, en mode sélection, le fait de relâcher le bouton droit de la souris doit déclencher une opération de pointage (<I>picking</I>),
 	 * <I>false</I> dans le cas contraire.
 	 */
 	Preferences::BoolNamedValue					_pickOnRightButtonUp;
 
 	/**
-	 * Le pourcentage à appliquer aux échelles pour avoir les marges des boites
-	 * englobantes. Une échelle est ici une puissance de 10 indiquant l'ordre de
+	 * Le pourcentage à appliquer aux échelles pour avoir les marges des boites englobantes. Une échelle est ici une puissance de 10 indiquant l'ordre de
 	 * grandeur de taille d'une objet ou ensemble d'objets.
 	 */
 	Preferences::DoubleNamedValue				_marginBoundingBoxPercentage;
@@ -197,32 +201,27 @@ class Resources
 	Preferences::LongNamedValue					_margin;
 
 	/**
-	 * Les espaces entre 2 widgets à l'intérieur des conteneurs dans les
-	 * panneaux.
+	 * Les espaces entre 2 widgets à l'intérieur des conteneurs dans les panneaux.
 	 */
 	Preferences::LongNamedValue					_spacing;
 
 	/**
-	 * La couleur des champs de textes lors de la saisie interactive d'une
-	 * entité.
+	 * La couleur des champs de textes lors de la saisie interactive d'une entité.
 	 */
 	Preferences::ColorNamedValue				_IDSeizureBackgroundColor;
 
 	/**
-	 * Faut-il procéder à une (pré-)validation des champs de texte de saisie
-	 * des grandeurs numériques lorsque le panneau perd le focus ?
+	 * Faut-il procéder à une (pré-)validation des champs de texte de saisie des grandeurs numériques lorsque le panneau perd le focus ?
 	 */
 	Preferences::BoolNamedValue					_prevalidateSeizure;
 
 	/**
-	 * Les noms des entités des panneaux d'opérations doivent ils être 
-	 * effacés lorsque les panneaux sont masqués (méthode <I>cancel</I>) ?
+	 * Les noms des entités des panneaux d'opérations doivent ils être effacés lorsque les panneaux sont masqués (méthode <I>cancel</I>) ?
 	 */
 	Preferences::BoolNamedValue					_cancelClearEntities;
 
 	/**
-	 * Les panneaux d'opérations doivent ils être initialisés autant que
-	 * possible avec la sélection en cours lors de leur activation (méthode
+	 * Les panneaux d'opérations doivent ils être initialisés autant que possible avec la sélection en cours lors de leur activation (méthode
 	 * <I>autoUpdate</I>) ?
 	 */
 	Preferences::BoolNamedValue					_autoUpdateUsesSelection;
@@ -233,8 +232,7 @@ class Resources
 	Preferences::BoolNamedValue					_showDialogOnCommandError;
 	
 	/**
-	 * Faut il que la boite de dialogue de commande échouée soit modale, et risque donc de
-	 * perturber l'organisation d'un autre bureau ? (Magix3D Issue 112)
+	 * Faut il que la boite de dialogue de commande échouée soit modale, et risque donc de perturber l'organisation d'un autre bureau ? (Magix3D Issue 112)
 	 * Valeur par défaut à <I>false</I>.
 	 * @warning		Experimental
 	 */
@@ -246,13 +244,11 @@ class Resources
 	Preferences::UnsignedLongNamedValue			_commandNotificationDelay; 
 
 	/**
-	 * A partir de quel nombre d'entités sélectionnées ne faut il plus afficher
-	 * les propriétés individuelles de la sélection ? */
+	 * A partir de quel nombre d'entités sélectionnées ne faut il plus afficher les propriétés individuelles de la sélection ? */
 	Preferences::UnsignedLongNamedValue			_maxIndividualProperties;
 
 	/**
-	 * A partir de quel nombre d'entités sélectionnées ne faut il plus afficher
-	 * les propriétés communes de la sélection ? */
+	 * A partir de quel nombre d'entités sélectionnées ne faut il plus afficher les propriétés communes de la sélection ? */
 	Preferences::UnsignedLongNamedValue			_maxCommonProperties;
 
 	/**
@@ -330,14 +326,12 @@ class Resources
 	Preferences::BoolNamedValue					_useDisplayList;
 
 	/**
-	 * Si <I>true</I> les évènements claviers de repositionnement dans un plan
-	 * xOy, xOz, yOz provoquent également une annulation du roulis.
+	 * Si <I>true</I> les évènements claviers de repositionnement dans un plan xOy, xOz, yOz provoquent également une annulation du roulis.
 	 */
 	Preferences::BoolNamedValue					_xyzCancelRoll;
 
 	/**
-	 * Fréquence de rafraîchissement de la vue 3D lors
-	 * d'ajouts/suppressions/modifications d'entités.
+	 * Fréquence de rafraîchissement de la vue 3D lors d'ajouts/suppressions/modifications d'entités.
 	 */
 	Preferences::UnsignedLongNamedValue			_updateRefreshRate;
 
@@ -367,8 +361,7 @@ class Resources
 	Preferences::BoolNamedValue					_displayTrihedron;
 
 	/**
-	 * Faut-il afficher ou non le point focal (matérialisé par une croix,
-	 * équivalent de l'option <I>show center</I>) de <I>ParaView</I>.
+	 * Faut-il afficher ou non le point focal (matérialisé par une croix, équivalent de l'option <I>show center</I>) de <I>ParaView</I>.
 	 */
 	Preferences::BoolNamedValue					_displayFocalPoint;
 
@@ -378,8 +371,7 @@ class Resources
 	Preferences::UnsignedLongNamedValue			_graphicalWindowWidth, _graphicalWindowHeight;
 
 	/**
-	 * La taille de la fenêtre graphique est-elle fixe ? (<I>false</I> par
-	 * défaut).
+	 * La taille de la fenêtre graphique est-elle fixe ? (<I>false</I> par défaut).
 	 */
 	Preferences::BoolNamedValue					_graphicalWindowFixedSize;
 
@@ -388,8 +380,7 @@ class Resources
 	 */
 	 IN_STD vector<IN_PREFS Section*>			_pluginDefinitions;
 
-	/** Le masque à appliquer dans le flux "debug" de logs (Log::NONE par
-	 *  défaut. */
+	/** Le masque à appliquer dans le flux "debug" de logs (Log::NONE par défaut. */
 	IN_UTIL Log::TYPE							_debugLogsMask;
 
 	/** Boite de dialogue pour afficher la progression des tâches. */
@@ -411,11 +402,9 @@ class Resources
 	Preferences::BoolNamedValue					_multiLevelGroupsView;
 
 	/**
-	 * <P>Flux standards (<I>stdout</I> et <I>stderr</I>) récupérés
-	 * (<I>true</I>) ou non (<I>false</I>) par la session <I>python</I> lors de
+	 * <P>Flux standards (<I>stdout</I> et <I>stderr</I>) récupérés (<I>true</I>) ou non (<I>false</I>) par la session <I>python</I> lors de
 	 * l'exécution de commandes ou fichiers scripts.<P>
-	 * <P>L'intérêt de le faire est que les sorties figurent dans les
-	 * <I>logs</I>. L'intérêt de ne pas le faire est en cas de plantage où ces
+	 * <P>L'intérêt de le faire est que les sorties figurent dans les <I>logs</I>. L'intérêt de ne pas le faire est en cas de plantage où ces
 	 * traces, éventuellement utiles à la mise au point, sont perdues.
 	 * </P>
 	 */
@@ -437,8 +426,7 @@ class Resources
 	//@{
 
 	/**
-	 * Faut-il sauvegarder/réutiliser l'état de l'IHM (position, taille, ...)
-	 * d'une session à l'autre ?
+	 * Faut-il sauvegarder/réutiliser l'état de l'IHM (position, taille, ...) d'une session à l'autre ?
 	 * \see			_organisation
 	 * \see			_softwareName
 	 * \see			QtMgx3DMainWindow::writeSettings
@@ -463,23 +451,19 @@ class Resources
  	 */
 	//@{
 
-	/** Faut-il détruire la représentation graphique des entités géométriques
-	 * lorsqu'elles ne sont plus affichées ?
+	/** Faut-il détruire la représentation graphique des entités géométriques lorsqu'elles ne sont plus affichées ?
 	 */
 	Preferences::BoolNamedValue					_geomDestroyOnHide;
 
-	/** Faut-il détruire la représentation graphique des entités topologiques
-	 * lorsqu'elles ne sont plus affichées ?
+	/** Faut-il détruire la représentation graphique des entités topologiques lorsqu'elles ne sont plus affichées ?
 	 */
 	Preferences::BoolNamedValue					_topoDestroyOnHide;
 
-	/** Faut-il détruire la représentation graphique des entités de maillage
-	 * lorsqu'elles ne sont plus affichées ?
+	/** Faut-il détruire la représentation graphique des entités de maillage lorsqu'elles ne sont plus affichées ?
 	 */
 	Preferences::BoolNamedValue					_meshDestroyOnHide;
 
-	/** Les scripts à exécuter au lancement de l'application (arguments de
-	 * ligne de commande suivant -scripts. */
+	/** Les scripts à exécuter au lancement de l'application (arguments de ligne de commande suivant -scripts. */
 	std::vector<std::string>					_scripts;
 
 	//@}

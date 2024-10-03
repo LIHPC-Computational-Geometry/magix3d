@@ -842,11 +842,11 @@ void QtMgx3DApplication::applyConfiguration (const Section& mainSection)
 	try
 	{	// Scripting
 		Section&	guiSection			= mainSection.getSection ("gui");
-		Section&	scriptingSection	= guiSection.getSection ("scripting");
+		Section&	guiScriptingSection	= guiSection.getSection ("scripting");
 		PreferencesHelper::getBoolean (guiSection, Resources::instance ( )._saveGuiState);
 		PreferencesHelper::getBoolean (guiSection, Resources::instance ( )._loadGuiState);
-		PreferencesHelper::getUnsignedLong (scriptingSection, Resources::instance ( )._recentScriptCapacity);
-		PreferencesHelper::getString (scriptingSection, Resources::instance ( )._scriptsCharset);
+		PreferencesHelper::getUnsignedLong (guiScriptingSection, Resources::instance ( )._recentScriptCapacity);
+		PreferencesHelper::getString (guiScriptingSection, Resources::instance ( )._scriptsCharset);
 	}
 	catch (...)	
 	{
@@ -856,7 +856,15 @@ void QtMgx3DApplication::applyConfiguration (const Section& mainSection)
 	{
 		// Contexte :
 		Section&	contextSection	= mainSection.getSection ("context");
-		getMainWindow ( ).getContext ( ).load (contextSection);
+		Preferences::Section&	threadingSection	= Preferences::PreferencesHelper::getSection (contextSection, "threading");
+		Preferences::Section&	scriptingSection	= Preferences::PreferencesHelper::getSection (contextSection, "scripting");
+		Preferences::Section&	optimizingSection	= Preferences::PreferencesHelper::getSection (contextSection, "optimizing");
+		PreferencesHelper::getBoolean (threadingSection, Resources::instance ( )._allowThreadedCommandTasks);
+		PreferencesHelper::getBoolean (threadingSection, Resources::instance ( )._allowThreadedEdgePreMeshTasks);
+		PreferencesHelper::getBoolean (threadingSection, Resources::instance ( )._allowThreadedFacePreMeshTasks);
+		PreferencesHelper::getBoolean (threadingSection, Resources::instance ( )._allowThreadedBlockPreMeshTasks);
+		PreferencesHelper::getBoolean (scriptingSection, Resources::instance ( )._displayScriptOutputs);
+		PreferencesHelper::getBoolean (optimizingSection, Resources::instance ( )._memorizeEdgePreMesh);
 	}
 	catch (...)
 	{
@@ -988,7 +996,7 @@ void QtMgx3DApplication::saveConfiguration (Section& mainSection)
 	Section&	selectionSection= PreferencesHelper::getSection (panelsSection, "selection");
 	Section&	groupsSection	= PreferencesHelper::getSection (panelsSection, "groups");
 	Section&	logsSection		= PreferencesHelper::getSection (guiSection,"logs");
-	Section&	scriptingSection	= PreferencesHelper::getSection (guiSection,"scripting");
+	Section&	guiScriptingSection	= PreferencesHelper::getSection (guiSection,"scripting");
 
 	// GUI :
 	PreferencesHelper::updateBoolean (guiSection, Resources::instance ( )._saveGuiState);
@@ -1072,11 +1080,19 @@ void QtMgx3DApplication::saveConfiguration (Section& mainSection)
 	PreferencesHelper::updateBoolean (logsSection, Resources::instance ( )._logThreadID);
 
 	// Scripting :
-	PreferencesHelper::updateUnsignedLong (scriptingSection, Resources::instance ( )._recentScriptCapacity);
-	PreferencesHelper::updateString (scriptingSection, Resources::instance ( )._scriptsCharset);
+	PreferencesHelper::updateUnsignedLong (guiScriptingSection, Resources::instance ( )._recentScriptCapacity);
+	PreferencesHelper::updateString (guiScriptingSection, Resources::instance ( )._scriptsCharset);
 
 	// Contexte :
-	getMainWindow ( ).getContext ( ).saveConfiguration (contextSection);
+	Preferences::Section&	threadingSection	= PreferencesHelper::getSection (contextSection, "threading");
+	Preferences::Section&	scriptingSection	= PreferencesHelper::getSection (contextSection, "scripting");
+	Preferences::Section&	optimizingSection	= PreferencesHelper::getSection (contextSection, "optimizing");
+	PreferencesHelper::updateBoolean (threadingSection, Resources::instance ( )._allowThreadedCommandTasks);
+	PreferencesHelper::updateBoolean (threadingSection, Resources::instance ( )._allowThreadedEdgePreMeshTasks);
+	PreferencesHelper::updateBoolean (threadingSection, Resources::instance ( )._allowThreadedFacePreMeshTasks);
+	PreferencesHelper::updateBoolean (threadingSection, Resources::instance ( )._allowThreadedBlockPreMeshTasks);
+	PreferencesHelper::updateBoolean (scriptingSection, Resources::instance ( )._displayScriptOutputs);
+	PreferencesHelper::updateBoolean (optimizingSection, Resources::instance ( )._memorizeEdgePreMesh);
 }	// QtMgx3DApplication::saveConfiguration
 
 
