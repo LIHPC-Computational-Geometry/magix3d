@@ -200,6 +200,15 @@ pas écraser le fichier précédent.
 Enregistrer sous le script Magix3D minimum
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Cette commande permet de sélectionner un fichier où sera enregistré le
+contenu de la console python. Si la case "Enregistrer des informations
+complémentaires liées à l'environnement python est cochée", le shell
+python et des instructions d'utilisation en dehors de l'IHM Magix3D
+seront ajoutées en début de script.
+
+Enregistrer la console python
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Comme la commande précédente, mais en sélectionnant systématiquement le
 nom du fichier.
 

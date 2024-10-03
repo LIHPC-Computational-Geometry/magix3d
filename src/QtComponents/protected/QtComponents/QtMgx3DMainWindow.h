@@ -261,12 +261,6 @@ class QtMgx3DMainWindow :
 	virtual void savePythonConsoleCallback ( );
 
 	/**
-	 * Enregistre le contenu de la console python avec l'environnement d'exécution dans un fichier.
-	 * \see	savePythonConsole
-	 */
-	virtual void savePythonConsoleWithEnvCallback ( );
-	
-	/**
 	 * Exécute une commande longue, a priori dans un autre thread.
 	 * \warning	Pour tests uniquement.
 	 */
@@ -379,8 +373,7 @@ class QtMgx3DMainWindow :
 		QAction         *_mesh2DDimAction;
 		QAction			*_importAction,
 						*_exportAllAction, *_exportSelectionAction,
-						*_saveMagix3DScriptAction, *_saveAsMagix3DScriptAction,
-						*_savePythonConsoleAction, *_savePythonConsoleWithEnvAction;
+						*_saveMagix3DScriptAction, *_saveAsMagix3DScriptAction, *_savePythonConsoleAction;
 		QAction			*_longCommandAction, *_openCascadeLongCommandAction;
 		QAction			*_executePythonScriptAction;
 		QAction			*_preferencesAction, *_editSettingsAction, *_quitAction;
@@ -959,10 +952,9 @@ class QtMgx3DMainWindow :
 	
 	/**
 	 * Enregistre le contenu de la console python.
-	 * \param	nom et chemin du fichier d'enregistrement. 
 	 * \param	si <I>true</I> enregistre également l'environnement d'exécution (exécutable python, PYTHONPATH, ...).
 	 */
-	virtual void savePythonConsole (const std::string filePath, bool WithEnv);
+	virtual void savePythonConsole (bool WithEnv);
 
 	//@}	// Diverses opérations
 

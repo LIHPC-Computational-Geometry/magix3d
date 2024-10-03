@@ -103,12 +103,13 @@ class QtMgx3DPythonConsole : public QtPythonConsole
 	virtual void setGraphicalWidget (Qt3DGraphicalWidget* widget);
 	
 	/**
-	 * Enregistre le contenu de la console dansle fichier dont le nom est transmis en argument.
+	 * Enregistre le contenu de la console dans le fichier dont le nom est transmis en argument.
 	 * @param		path du fichier d'enregistrement
+	 * @param		format d'encodage du fichier
 	 * @param		<I>true</I> s'il faut mettre en en-tête l'environnement python (exécutable, PYTHONPATH, ...) ou <I>false</I> si seul le contenu
 	 * 				de la console doit être enregistré.
 	 */
-	virtual void saveConsoleScript (const std::string filePath, bool environment);
+	virtual void saveConsoleScript (const std::string filePath, TkUtil::Charset coding, bool environment);
 	
 
 	protected :

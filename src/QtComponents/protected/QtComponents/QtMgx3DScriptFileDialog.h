@@ -21,8 +21,7 @@ namespace QtComponents
 {
 
 /**
- * Widget type "File dialog" permettant de sélectionner un fichier script
- * Magix 3D.
+ * Widget type "File dialog" permettant de sélectionner un fichier script Magix 3D.
  * @author		Charles PIGNEROL, CEA/DAM/DSSI
  */
 class QtMgx3DScriptFileDialog : public QFileDialog 
@@ -33,15 +32,14 @@ class QtMgx3DScriptFileDialog : public QFileDialog
 	 * Constructeur
 	 * @param		parent
 	 * @param		titre de l'application
-	 * @param		<I>true</I> s'il s'agit d'une boite de dialogue 
-	 *			d'ouverture de fichiers, <I>false</I> s'il s'agit d'une
-	 *			boite de dialogue d'enregistrement.
-	 * @param		Jeu de caractères proposé par défaut pour l'encodage du fichier
-	 *			(cas boite de dialogue d'enregistrement).
+	 * @param		<I>true</I> s'il s'agit d'une boite de dialogue  d'ouverture de fichiers, <I>false</I> s'il s'agit d'une boite de dialogue d'enregistrement.
+	 * @param		<I>true</I> si l'utilisateur peut choisir des options d'encodage du script, <I>false</I> dans le cas contraire.
+	 * @param		<I>true</I> si l'utilisateur peut choisir d'enregistrer en plus des informations liées à l'environnement python, <I>false</I> dans le cas contraire.
+	 * @param		Jeu de caractères proposé par défaut pour l'encodage du fichier (cas boite de dialogue d'enregistrement).
 	 * @param		caractère modal de la boite de dialogue
 	 * Invoque createGui.
 	 */
-	QtMgx3DScriptFileDialog (QWidget* parent, const char* title, bool open, TkUtil::Charset::CHARSET charset, bool modal = true);
+	QtMgx3DScriptFileDialog (QWidget* parent, const char* title, bool open, bool withScriptEncodage, bool withEnvironment, TkUtil::Charset::CHARSET charset, bool modal);
 
 	/**
 	 * Destructeur.
@@ -59,6 +57,12 @@ class QtMgx3DScriptFileDialog : public QFileDialog
 	virtual unsigned int getEncodageScript ( ) const;
 
 	/**
+	 * @return		<I>true</I> s'il faut enregistrer des informations complémentaires liées à l'environnement python.
+	 */
+	virtual bool getEnvironmentPython ( ) const;
+	virtual void setEnvironmentPython (bool set);
+	
+	/**
 	 * Par défaut proposer l'enregistrement des noms d'entités, des id ou des coordonnées
 	 * Permet de retrouver la sélection d'une fois à l'autre
 	 */
@@ -74,13 +78,12 @@ class QtMgx3DScriptFileDialog : public QFileDialog
 
 	/**
 	 * Création des éléments complémentaires du sélecteur de fichier.
-	 * @param		<I>true</I> s'il s'agit d'une boite de dialogue 
-	 *			d'ouverture de fichiers, <I>false</I> s'il s'agit d'une
-	 *			boite de dialogue d'enregistrement.
-	 * @param		Jeu de caractères proposé par défaut pour l'encodage du fichier
-	 *			(cas boite de dialogue d'enregistrement).
+	 * @param		<I>true</I> s'il s'agit d'une boite de dialogue d'ouverture de fichiers, <I>false</I> s'il s'agit d'une boite de dialogue d'enregistrement.
+	 * @param		<I>true</I> si l'utilisateur peut choisir d'enregistrer en plus des informations liées à l'environnement python, <I>false</I> dans le cas contraire.
+	 * @param		<I>true</I> si l'utilisateur peut choisir des options d'encodage du script, <I>false</I> dans le cas contraire.
+	 * @param		Jeu de caractères proposé par défaut pour l'encodage du fichier (cas boite de dialogue d'enregistrement).
 	 */
-	virtual void createGui (bool open, TkUtil::Charset::CHARSET charset);
+	virtual void createGui (bool open, bool withScriptEncodage, bool withEnvironment, TkUtil::Charset::CHARSET charset);
 
 
 	private :
@@ -92,9 +95,10 @@ class QtMgx3DScriptFileDialog : public QFileDialog
 	QtMgx3DScriptFileDialog& operator = (const QtMgx3DScriptFileDialog&);
 
 	/** Le choix du type de références vers les entités dans le fichier sauvegardé. */
-	QCheckBox*				_saveEntitiesNamesCheckBox;
-	QCheckBox*				_saveEntitiesIdRefCheckBox;
-	QCheckBox*				_saveEntitiesCoordCheckBox;
+	QCheckBox*						_saveEntitiesNamesCheckBox;
+	QCheckBox*						_saveEntitiesIdRefCheckBox;
+	QCheckBox*						_saveEntitiesCoordCheckBox;
+	QCheckBox*						_saveEnvironmentCheckBox;
 	QtLabelisedCharsetComboBox*		_charsetComboBox;
 };	// class QtMgx3DScriptFileDialog
 
