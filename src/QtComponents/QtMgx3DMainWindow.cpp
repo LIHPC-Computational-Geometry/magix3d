@@ -5132,7 +5132,6 @@ void QtMgx3DMainWindow::savePythonConsole (bool withEnv)
 {
 	static QString	consoleFilePath;
 	static bool		saveWithEnv	= true;
-	cout << __FILE__ << ' ' << __LINE__ << " QtMgx3DMainWindow::savePythonConsole (" << (true == withEnv ? "true" : "false") << ")" << endl;
 	static QString	lastDir (Process::getCurrentDirectory ( ).c_str ( ));
 	File			file (consoleFilePath.toStdString ( ));
 	static	Charset::CHARSET	charset	= Charset::str2charset (Resources::instance ( )._scriptsCharset.getValue ( ).ascii ( ).c_str ( ));
