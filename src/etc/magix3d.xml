@@ -696,6 +696,12 @@ Occupe moins de mémoire mais perte en temps de calcul.</documentation>
       </annotation>
       <value>true</value>
     </element>
+    <element name="confirmQuitAction" type="boolean">
+      <annotation>
+        <documentation>True si une boite de dialogue de confirmation doit être affichée lorsque l'utilisateur met fin à Magix3D, false dans le cas contraire.</documentation>
+      </annotation>
+      <value>true</value>
+    </element>
     <element name="margin" type="long">
       <annotation>
         <documentation>Marges (haut/bas/gauche/droite) à l'intérieur des panneaux.\nElles valent 0 par défaut, l'objectif étant de gagner de la place.\nLes augmenter de 10 à 20 pixels si du texte est illisible.\nNécessite de redémarrer l'application pour prendre effet.</documentation>

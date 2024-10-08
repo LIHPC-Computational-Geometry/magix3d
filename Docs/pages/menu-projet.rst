@@ -66,4 +66,7 @@ Quitter
 L’action *Projet/Quitter...* dispose du raccourci CTRL+Q ce qui permet
 d’accéder à cette action pour quitter l’application après une
 confirmation.
+La demande de confirmation pour quitter l'application peut être
+désactivée en affectant *false* à la ressource 
+*Magix3D.gui.confirmQuitAction*.
 
