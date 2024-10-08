@@ -2193,6 +2193,15 @@ newArcCircle(std::string pc,std::string pd, std::string pe, const bool direct, s
 }
 /*----------------------------------------------------------------------------*/
 Internal::M3DCommandResultIfc* GeomManager::
+newArcCircle(std::string pc,std::string pd, std::string pe, std::string groupName)
+{
+    Vertex* vc = getVertex(pc);
+    Vertex* vd = getVertex(pd);
+    Vertex* ve = getVertex(pe);
+    return newArcCircle(vc,vd,ve, groupName);
+}
+/*----------------------------------------------------------------------------*/
+Internal::M3DCommandResultIfc* GeomManager::
 newArcCircle(const double& angleDep,
              const double& angleFin,
              const double& rayon,
@@ -2207,7 +2216,7 @@ newArcCircle(const double& angleDep,
 }
 /*----------------------------------------------------------------------------*/
 Internal::M3DCommandResultIfc* GeomManager::
-newArcCircle(Vertex* pc, Vertex* pd, Vertex* pe, const bool direct, std::string groupName )
+newArcCircle(Vertex* pc, Vertex* pd, Vertex* pe, const bool direct, std::string groupName)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message << "GeomManager::newArcCircle("<<*pc<<", "<<*pd<<", "<<*pe
@@ -2216,7 +2225,7 @@ newArcCircle(Vertex* pc, Vertex* pd, Vertex* pe, const bool direct, std::string 
     Vector normal(0,0,1);
 
     CommandNewArcCircle *command =
-            new CommandNewArcCircle(getLocalContext(), pc,pd,pe,direct, normal, groupName);
+            new CommandNewArcCircle(getLocalContext(), pc,pd,pe,direct, normal, groupName, false);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().newArcCircle(\""
@@ -2237,7 +2246,7 @@ newArcCircle(Vertex* pc, Vertex* pd, Vertex* pe, const bool direct, std::string 
 }
 /*----------------------------------------------------------------------------*/
 Internal::M3DCommandResultIfc* GeomManager::
-newArcCircle(Vertex* pc, Vertex* pd, Vertex* pe, const bool direct, const Vector& normal, std::string groupName )
+newArcCircle(Vertex* pc, Vertex* pd, Vertex* pe, const bool direct, const Vector& normal, std::string groupName)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message << "GeomManager::newArcCircle("<<*pc<<", "<<*pd<<", "<<*pe
@@ -2245,7 +2254,7 @@ newArcCircle(Vertex* pc, Vertex* pd, Vertex* pe, const bool direct, const Vector
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     CommandNewArcCircle *command =
-            new CommandNewArcCircle(getLocalContext(), pc,pd,pe,direct, normal, groupName);
+            new CommandNewArcCircle(getLocalContext(), pc,pd,pe,direct, normal, groupName, false);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().newArcCircle(\""
@@ -2265,6 +2274,34 @@ newArcCircle(Vertex* pc, Vertex* pd, Vertex* pe, const bool direct, const Vector
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
+/*----------------------------------------------------------------------------*/
+    Internal::M3DCommandResultIfc* GeomManager::
+    newArcCircle(Vertex* pc, Vertex* pd, Vertex* pe, std::string groupName)
+    {
+        TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
+        message << "GeomManager::newArcCircle("<<*pc<<", "<<*pd<<", "<<*pe
+                <<")";
+        log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
+        Vector normal(0,0,0);
+        CommandNewArcCircle *command =
+                new CommandNewArcCircle(getLocalContext(), pc,pd,pe,false, normal, groupName, true);
+        // trace dans le script
+        TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
+        cmd << getContextAlias() << "." << "getGeomManager().newArcCircle(\""
+            <<pc->getName()<<"\", \""
+            <<pd->getName()<<"\", \""
+            <<pe->getName()<<"\"";
+        if (!groupName.empty())
+            cmd<<", \""<<groupName<<"\"";
+        cmd<<")";
+        command->setScriptCommand(cmd);
+
+        getCommandManager().addCommand(command, Utils::Command::DO);
+
+        Internal::M3DCommandResultIfc*  cmdResult   =
+                new Internal::M3DCommandResult (*command);
+        return cmdResult;
+    }
 /*----------------------------------------------------------------------------*/
 Internal::M3DCommandResultIfc* GeomManager::
 newArcCircle(const double& angleDep,

@@ -465,6 +465,18 @@ public:
                               const bool direct,
                               std::string groupName="");
 
+    /** \brief création d'un arc de cercle à partir de 3 sommets inscrits.
+     *
+     *         Une exception est retournée
+     *
+     *  \param pc le point intermédiaire de l'arc de cercle
+     *  \param pd point de départ de l'arc de cercle
+     *  \param pe point de fin de l'arc de cercle
+     */
+    virtual Mgx3D::Internal::M3DCommandResultIfc*
+        newArcCircle( std::string pc,  std::string pd,  std::string pe,
+                          std::string groupName="");
+
     /** \brief création d'un arc de cercle à partir des angles et du rayon, dans un repère donné
      *
      *  \param angleDep angle de départ / axe OX, dans le plan XOY

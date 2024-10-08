@@ -315,6 +315,12 @@ newArcCircle(std::string pc, std::string pd, std::string pe, const bool direct, 
 }
 /*----------------------------------------------------------------------------*/
 Internal::M3DCommandResultIfc* GeomManagerIfc::
+newArcCircle(std::string pc, std::string pd, std::string pe, std::string groupName)
+{
+    throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::newArcCircle should be overloaded.", TkUtil::Charset::UTF_8));
+}
+/*----------------------------------------------------------------------------*/
+Internal::M3DCommandResultIfc* GeomManagerIfc::
 newArcCircle(const double& angleDep, const double& angleFin, const double& rayon, std::string sysCoordName , std::string groupName)
 {
     throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::newArcEllipse should be overloaded.", TkUtil::Charset::UTF_8));

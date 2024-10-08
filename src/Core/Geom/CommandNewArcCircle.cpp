@@ -28,9 +28,10 @@ CommandNewArcCircle(Internal::Context& c,
         Geom::Vertex* pd, Geom::Vertex* pe,
         const bool direct,
         const Vector& normal,
-        const std::string& groupName)
+        const std::string& groupName,
+        bool circumCircle)
 :CommandCreateWithOtherGeomEntities(c, "Création d'un arc de cercle", groupName), m_center(pc),
- m_start(pd), m_end(pe), m_normal(normal), m_direction(direct)
+ m_start(pd), m_end(pe), m_normal(normal), m_direction(direct), m_circumCircle(circumCircle)
 {}
 /*----------------------------------------------------------------------------*/
 CommandNewArcCircle::~CommandNewArcCircle()
@@ -54,7 +55,7 @@ internalExecute()
     saveMemento(m_start);
     saveMemento(m_end);
 
-    Curve* c = EntityFactory(getContext()).newArcCircle(m_center,m_start,m_end,m_direction, m_normal);
+    Curve* c = EntityFactory(getContext()).newArcCircle(m_center,m_start,m_end,m_direction, m_normal, m_circumCircle);
     m_createdEntities.push_back(c);
 
     // stockage dans le manager géom

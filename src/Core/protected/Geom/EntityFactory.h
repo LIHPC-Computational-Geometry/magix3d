@@ -201,7 +201,8 @@ public:
             const Geom::Vertex* start,
             const Geom::Vertex* end,
             const bool direction=true,
-            const Utils::Math::Vector& vec= Utils::Math::Vector(0,0,0));
+            const Utils::Math::Vector& vec= Utils::Math::Vector(0,0,0),
+            const bool circumCircle=false);
 
     /** \brief Arc de cercle pour le cas général en 3D avec rayon, angles et repère
      */

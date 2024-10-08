@@ -203,7 +203,75 @@ class QtAnglesSysCoordsArcPanel : public QtMgx3DOperationsSubPanel
 	/** Le repère. */
 	QtMgx3DEntityPanel          *_sysCoordPanel;
 };	// class QtAnglesSysCoordsArcPanel
-	
+
+/**
+ * Le paramétrage d'un arc de cercle à partir de 3 points circonscrits.
+ */
+    class QtCircumcirclePtsArcPanel : public QtMgx3DOperationsSubPanel
+    {
+    Q_OBJECT
+
+    public :
+
+        /**
+         * \param		Widget parent
+         * \param		Fenêtre principale <I>Magix 3D</I> de rattachement,
+         *				utilisée notamment pour récupérer le contexte.
+         * \param		Eventuel panneau de rattachement.
+         */
+        QtCircumcirclePtsArcPanel (QWidget* parent, Mgx3D::QtComponents::QtMgx3DMainWindow& mw, QtMgx3DOperationPanel* mainPanel = 0);
+
+        /**
+             * Destructeur. RAS.
+             */
+        virtual ~QtCircumcirclePtsArcPanel ( );
+
+        /**
+         * Réinitialise le panneau.
+         */
+        virtual void reset ( );
+
+        /**
+         * Restitue l'environnement dans son état initial.
+         */
+        virtual void cancel ( );
+
+        /**
+         * Le premier, deuxième et troisième point.
+         */
+        virtual std::string getVertex1UniqueName ( ) const;
+        virtual std::string getVertex2UniqueName ( ) const;
+        virtual std::string getVertex3UniqueName ( ) const;
+
+    signals :
+
+        /**
+         * Signal émis lorsque un paramètre du panneau est modifié.
+         */
+        void parametersModified ( );
+
+
+    protected slots :
+
+        /**
+         * Emet le signal parametersModified pour prise en charge par le panneau maître.
+         */
+        virtual void parametersModifiedCallback ( );
+
+
+    private :
+
+        /**
+         * Constructeur de copie et opérateur = : interdits.
+         */
+        QtCircumcirclePtsArcPanel (const QtCircumcirclePtsArcPanel&);
+        QtCircumcirclePtsArcPanel& operator = (const QtCircumcirclePtsArcPanel&);
+
+        /** Les 3 vertices. */
+        Qt3VerticiesPanel*              _verticesPanel;
+
+    };	// class QtCircumcirclePtsArcPanel
+
 	
 /**
  * Panneau d'édition des paramètres d'une opération géométrique touchant
@@ -219,9 +287,10 @@ class QtArcCircleOperationPanel : public QtMgx3DOperationPanel
 	 * <OL>
 	 * <LI>Renseignement de 3 vertex (extrémités + centre de l'arc).
 	 * <LI>Renseignement de 2 angles, d'un rayon et d'un repère.
+	 * <LI>Renseignement de 3 points circonscrits.
 	 * </OL>
 	 */
-	enum OPERATION_METHOD { EXTREMITIES_CENTER, SYSCOORD_2_ANGLES };
+	enum OPERATION_METHOD { EXTREMITIES_CENTER, SYSCOORD_2_ANGLES, CIRCUMCIRCLE_PTS};
 
 	/**
 	 * Créé l'ihm.
@@ -377,6 +446,9 @@ class QtArcCircleOperationPanel : public QtMgx3DOperationPanel
 
 	/** Renseignement de 2 angles / 1 rayon / 1 repère */
 	QtAnglesSysCoordsArcPanel*      _anglesSysCoordsPanel;
+
+    /** Renseignement de 3 vertices */
+    QtCircumcirclePtsArcPanel*      _circumcirclePtsPanel;
 	//@}	// Panneaux de saisie des paramètres de définition de l'arc de cercle
 };	// class QtArcCircleOperationPanel
 

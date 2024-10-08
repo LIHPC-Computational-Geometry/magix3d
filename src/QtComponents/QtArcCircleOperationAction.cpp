@@ -350,6 +350,105 @@ void QtAnglesSysCoordsArcPanel::cancel ( )
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
 }   // QtAnglesSysCoordsArcPanel::cancel
 
+
+// ===========================================================================
+//                        LA CLASSE QtCircumcirclePtsArcPanel
+// ===========================================================================
+
+        QtCircumcirclePtsArcPanel::QtCircumcirclePtsArcPanel(QWidget *parent, QtMgx3DMainWindow &window, QtMgx3DOperationPanel *mainPanel)
+                : QtMgx3DOperationsSubPanel(parent, window, mainPanel), _verticesPanel(0)
+        {
+            QVBoxLayout *layout = new QVBoxLayout(this);
+            setLayout(layout);
+            layout->setContentsMargins(0, 0, 0, 0);
+            layout->setSpacing(5);
+
+            _verticesPanel = new Qt3VerticiesPanel(this, "Définition d'un arc de cercle par trois points circonscrits", window, FilterEntity::GeomVertex, true);
+            connect(_verticesPanel, SIGNAL (pointAddedToSelection(QString)), this, SLOT (entitiesAddedToSelectionCallback(QString)));
+            connect(_verticesPanel, SIGNAL (pointRemovedFromSelection(QString)), this, SLOT (entitiesRemovedFromSelectionCallback(QString)));
+            connect(_verticesPanel, SIGNAL (pointAddedToSelection(QString)), this, SLOT (parametersModifiedCallback( )));
+            connect(_verticesPanel, SIGNAL (pointRemovedFromSelection(QString)), this, SLOT (parametersModifiedCallback( )));
+            layout->addWidget(_verticesPanel);
+
+        }    // QtCircumcirclePtsArcPanel::QtCircumcirclePtsArcPanel
+
+
+        QtCircumcirclePtsArcPanel::QtCircumcirclePtsArcPanel(const QtCircumcirclePtsArcPanel &p)
+                : QtMgx3DOperationsSubPanel(p), _verticesPanel(0)
+        {
+            MGX_FORBIDDEN ("QtCircumcirclePtsArcPanel copy constructor is not allowed.");
+        }    // QtCircumcirclePtsArcPanel::QtCircumcirclePtsArcPanel
+
+
+        QtCircumcirclePtsArcPanel &QtCircumcirclePtsArcPanel::operator=(const QtCircumcirclePtsArcPanel &)
+        {
+            MGX_FORBIDDEN ("QtCircumcirclePtsArcPanel assignment operator is not allowed.");
+            return *this;
+        }    // QtCircumcirclePtsArcPanel::operator =
+
+
+        QtCircumcirclePtsArcPanel::~QtCircumcirclePtsArcPanel ( )
+        {
+        }    // QtCircumcirclePtsArcPanel::~QtCircumcirclePtsArcPanel
+
+
+        string QtCircumcirclePtsArcPanel::getVertex1UniqueName ( ) const
+        {
+            CHECK_NULL_PTR_ERROR (_verticesPanel)
+            return _verticesPanel->getVertex1UniqueName();
+        }    // QtCircumcirclePtsArcPanel::getVertex1UniqueName
+
+
+        string QtCircumcirclePtsArcPanel::getVertex2UniqueName ( ) const
+        {
+            CHECK_NULL_PTR_ERROR (_verticesPanel)
+            return _verticesPanel->getVertex2UniqueName ( );
+        }    // QtCircumcirclePtsArcPanel::getVertex2UniqueName
+
+
+        string QtCircumcirclePtsArcPanel::getVertex3UniqueName ( ) const
+        {
+            CHECK_NULL_PTR_ERROR (_verticesPanel)
+            return _verticesPanel->getVertex3UniqueName ( );
+        }    // QtCircumcirclePtsArcPanel::getCenterVertexUniqueName
+
+
+        void QtCircumcirclePtsArcPanel::parametersModifiedCallback ( )
+        {
+            emit parametersModified ( );
+        }   // QtCircumcirclePtsArcPanel::parametersModifiedCallback()
+
+
+        void QtCircumcirclePtsArcPanel::reset ( )
+        {
+            BEGIN_QT_TRY_CATCH_BLOCK
+
+                CHECK_NULL_PTR_ERROR (_verticesPanel)
+                _verticesPanel->reset ( );
+
+            COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
+
+            QtMgx3DOperationPanel::reset ( );
+        }	// QtCircumcirclePtsArcPanel::reset
+
+
+        void QtCircumcirclePtsArcPanel::cancel ( )
+        {
+            QtMgx3DOperationsSubPanel::cancel ( );
+
+            BEGIN_QT_TRY_CATCH_BLOCK
+
+                CHECK_NULL_PTR_ERROR (_verticesPanel)
+                _verticesPanel->stopSelection ( );
+
+                if (true == cancelClearEntities ( ))
+                {
+                    _verticesPanel->cancel ( );
+                }	// if (true == cancelClearEntities ( ))
+
+            COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
+        }   // QtCircumcirclePtsArcPanel::cancel
+
 		
 // ===========================================================================
 //                        LA CLASSE QtArcCircleOperationPanel
@@ -389,6 +488,7 @@ QtArcCircleOperationPanel::QtArcCircleOperationPanel (
 	_operationMethodComboBox	= new QComboBox (this);
 	_operationMethodComboBox->addItem (QString::fromUtf8("Par saisie du centre et des extrémités"));
 	_operationMethodComboBox->addItem (QString::fromUtf8("Par saisie des angles et du repère"));
+    _operationMethodComboBox->addItem (QString::fromUtf8("Par saisie de trois points inscrits"));
 	connect (_operationMethodComboBox, SIGNAL (currentIndexChanged (int)), this, SLOT (operationMethodCallback ( )));
 	hlayout->addWidget (_operationMethodComboBox);
 	hlayout->addStretch (10);
@@ -416,6 +516,10 @@ QtArcCircleOperationPanel::QtArcCircleOperationPanel (
 	_anglesSysCoordsPanel   = new QtAnglesSysCoordsArcPanel (0, mainWindow);
 	connect (_anglesSysCoordsPanel, SIGNAL (parametersModified ( )), this, SLOT (parametersModifiedCallback ( )));
 	_anglesSysCoordsPanel->hide ( );
+    // Panneau points inscrits :
+    _circumcirclePtsPanel	= new QtCircumcirclePtsArcPanel (0, mainWindow);
+    connect (_circumcirclePtsPanel, SIGNAL (parametersModified ( )), this, SLOT (parametersModifiedCallback ( )));
+    _circumcirclePtsPanel->hide ( );
 	operationMethodCallback ( );
 
 	addPreviewCheckBox (true);
@@ -465,6 +569,9 @@ string QtArcCircleOperationPanel::getVertex1UniqueName ( ) const
 		case EXTREMITIES_CENTER :
 			CHECK_NULL_PTR_ERROR (_centerExtremitiesPanel)
 			return _centerExtremitiesPanel->getVertex1UniqueName ( );
+        case CIRCUMCIRCLE_PTS :
+            CHECK_NULL_PTR_ERROR (_circumcirclePtsPanel)
+            return _circumcirclePtsPanel->getVertex1UniqueName ( );
 	}   // switch (getOperationMethod ( ))
 
 	throw Exception ("QtArcCircleOperationPanel::getVertex1UniqueName appellée hors contexte.");
@@ -478,6 +585,9 @@ string QtArcCircleOperationPanel::getVertex2UniqueName ( ) const
 		case EXTREMITIES_CENTER :
 			CHECK_NULL_PTR_ERROR (_centerExtremitiesPanel)
 			return _centerExtremitiesPanel->getVertex2UniqueName ( );
+        case CIRCUMCIRCLE_PTS :
+            CHECK_NULL_PTR_ERROR (_circumcirclePtsPanel)
+            return _circumcirclePtsPanel->getVertex2UniqueName ( );
 	}   // switch (getOperationMethod ( ))
 
 	throw Exception ("QtArcCircleOperationPanel::getVertex2UniqueName appellée hors contexte.");
@@ -491,6 +601,9 @@ string QtArcCircleOperationPanel::getVertex3UniqueName ( ) const
 		case EXTREMITIES_CENTER :
 			CHECK_NULL_PTR_ERROR (_centerExtremitiesPanel)
 			return _centerExtremitiesPanel->getVertex3UniqueName ( );
+        case CIRCUMCIRCLE_PTS :
+            CHECK_NULL_PTR_ERROR (_circumcirclePtsPanel)
+            return _circumcirclePtsPanel->getVertex3UniqueName ( );
 	}   // switch (getOperationMethod ( ))
 
 	throw Exception ("QtArcCircleOperationPanel::getVertex3UniqueName appellée hors contexte.");
@@ -595,6 +708,7 @@ void QtArcCircleOperationPanel::reset ( )
 	CHECK_NULL_PTR_ERROR (_currentPanel)
 	CHECK_NULL_PTR_ERROR (_centerExtremitiesPanel)
 	CHECK_NULL_PTR_ERROR (_anglesSysCoordsPanel)
+    CHECK_NULL_PTR_ERROR (_circumcirclePtsPanel)
 	_namePanel->autoUpdate ( );
 	_currentPanel->reset ( );
 	_centerExtremitiesPanel->reset ( );
@@ -634,6 +748,7 @@ void QtArcCircleOperationPanel::validate ( )
 	{
 		case QtArcCircleOperationPanel::EXTREMITIES_CENTER	:
 		case QtArcCircleOperationPanel::SYSCOORD_2_ANGLES	:
+        case QtArcCircleOperationPanel::CIRCUMCIRCLE_PTS	:
 			break;
 		case -1	:
 			if (0 != error.length ( ))
@@ -728,7 +843,7 @@ void QtArcCircleOperationPanel::preview (bool on, bool destroyInteractor)
 				Vertex              *pc      = context->getLocalGeomManager().getVertex(getVertex1UniqueName());
 				Vertex              *pd      = context->getLocalGeomManager().getVertex(getVertex2UniqueName());
 				Vertex              *pe      = context->getLocalGeomManager().getVertex(getVertex3UniqueName());
-				command = new CommandNewArcCircle (*context, pc, pd, pe, direct, normal, groupName);
+				command = new CommandNewArcCircle (*context, pc, pd, pe, direct, normal, groupName, false);
 				break;
 			}   // case QtArcCircleOperationPanel::EXTREMITIES_CENTER
 			case QtArcCircleOperationPanel::SYSCOORD_2_ANGLES	:
@@ -740,6 +855,15 @@ void QtArcCircleOperationPanel::preview (bool on, bool destroyInteractor)
 				command                     = new CommandNewArcCircleWithAngles (*context, start, end, rayLength, sysCoord, groupName);
 				break;
 			}   // case QtArcCircleOperationPanel::SYSCOORD_2_ANGLES	:
+            case QtArcCircleOperationPanel::CIRCUMCIRCLE_PTS    :
+            {
+                // pour l'arc de courbe
+                Vertex              *pc      = context->getLocalGeomManager().getVertex(getVertex1UniqueName());
+                Vertex              *pd      = context->getLocalGeomManager().getVertex(getVertex2UniqueName());
+                Vertex              *pe      = context->getLocalGeomManager().getVertex(getVertex3UniqueName());
+                command = new CommandNewArcCircle (*context, pc, pd, pe, true, Vector(0,0,0), groupName, true);
+                break;
+        }   // case QtArcCircleOperationPanel::CIRCUMCIRCLE_PTS
 		}   // switch (_operationMethodComboBox->currentIndex ( ))
 
 		CHECK_NULL_PTR_ERROR (command)
@@ -806,6 +930,7 @@ void QtArcCircleOperationPanel::operationMethodCallback ( )
 	{
 		case QtArcCircleOperationPanel::EXTREMITIES_CENTER				: _currentPanel	= _centerExtremitiesPanel;  break;
 		case QtArcCircleOperationPanel::SYSCOORD_2_ANGLES				: _currentPanel	= _anglesSysCoordsPanel;    break;
+        case QtArcCircleOperationPanel::CIRCUMCIRCLE_PTS				: _currentPanel	= _circumcirclePtsPanel;         break;
 		default	:
 		{
 			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -901,6 +1026,14 @@ void QtArcCircleOperationAction::executeOperation ( )
 			cmdResult   = getContext ( ).getGeomManager ( ).newArcCircle (start, end, rayLength, sysCoordName, name);
 		}   // case QtArcCircleOperationPanel::SYSCOORD_2_ANGLES	:
 		break;
+        case QtArcCircleOperationPanel::CIRCUMCIRCLE_PTS				:
+        {
+            const string	            vertex1	        = getArcCirclePanel ( )->getVertex1UniqueName ( );
+            const string	            vertex2	        = getArcCirclePanel ( )->getVertex2UniqueName ( );
+            const string	            vertex3	        = getArcCirclePanel ( )->getVertex3UniqueName ( );
+            cmdResult	= getContext ( ).getGeomManager ( ).newArcCircle (vertex1, vertex2, vertex3, name);
+        }
+            break;
 		default	:
 		{
 			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
