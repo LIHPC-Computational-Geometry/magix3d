@@ -203,15 +203,18 @@ Enregistrer sous le script Magix3D minimum
 Comme la commande précédente, mais en sélectionnant systématiquement le
 nom du fichier.
 
-Exécuter un script Python
+Exécuter des scripts Python
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Il est possible de rejouer l’intégralité d’un script mis en place « à la
-main » ou sauvegardé lors d’une session Magix3D.
+Il est possible de rejouer l’intégralité d’un ou plusieurs scripts mis 
+en place « à la main » ou sauvegardé lors d’une session Magix3D.
 
 Les noms des entités dans un script importé sont automatiquement adaptés
 si la session comporte déjà des entités, ainsi il est possible
 d’enchainer plusieurs scripts.
+
+Dans le cas de la sélection de plusieurs scripts, ceux-ci sont exécutés
+dans l'ordre de sélection.
 
 
 Scripts Magix3D récents

@@ -915,31 +915,25 @@ class QtMgx3DMainWindow :
 	virtual void setMesh2D();
 
 	/**
-	 * Demander à l'utilisateur de sélectionner un (et un seul) fichier.
+	 * Demander à l'utilisateur de sélectionner un (QFileDialog::ExistingFile) ou plusieurs (QFileDialog::ExistingFiles) fichiers.
 	 * \param		Widget parent
 	 * \param		Répertoire par défaut
 	 * \param		Filtre appliqué
 	 * \param		Titre de la boite de dialogue
 	 * \param		Type de fichier sélectionnable
 	 * \param		Type d'ouverture
-	 * \return		Le fichier sélectionné, de path nul si l'opération est
-	 * 				annulée
+	 * \return		Le ou les fichier(s) sélectionné(s), ou vecteur vide si l'opération est annulée
 	 */
-	virtual TkUtil::File selectFileName (
-				QWidget* parent, const std::string& dir,
-				const std::string& filter, const std::string& title,
-				QFileDialog::FileMode fm = QFileDialog::ExistingFile,
-				QFileDialog::AcceptMode am = QFileDialog::AcceptOpen);
+	virtual std::vector<TkUtil::File> selectFileNames (QWidget* parent, const std::string& dir, const std::string& filter, const std::string& title,
+				QFileDialog::FileMode fm = QFileDialog::ExistingFile, QFileDialog::AcceptMode am = QFileDialog::AcceptOpen);
 
 	/**
-	 * @return	Le jeu de caractères à utiliser par défaut lors de l'enregistrement de
-	 *		scripts.
+	 * @return	Le jeu de caractères à utiliser par défaut lors de l'enregistrement de scripts.
 	 */
 	virtual TkUtil::Charset getDefaultScriptsCharset ( ) const;
 
 	/**
-	 * @return	Le jeu de caractères à utiliser par défaut lors de l'enregistrement de
-	 *		lasers ou diagnostics.
+	 * @return	Le jeu de caractères à utiliser par défaut lors de l'enregistrement de lasers ou diagnostics.
 	 * @warning	A surcharger, retourne Charset::UTF_8.
 	 */
 	virtual TkUtil::Charset getDefaultRaysCharset ( ) const;
