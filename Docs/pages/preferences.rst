@@ -471,6 +471,10 @@ Section **rays** : ressources liées à l’utilisation des rayons
    organisation des panneaux...) enregistré en configuration doit être
    appliqué au lancement de Magix3D.
 
+-  **confirmQuitAction** : *true* si une boite de dialogue de 
+   confirmation doit tre affiche lorsque l'utilisateur met fin Magix3D, 
+   *false* dans le cas contraire.
+
 -  **margin** : marges (haut/bas/gauche/droite) à l'intérieur des
    panneaux. Elles valent 0 par défaut, l'objectif étant de gagner de la
    place. Les augmenter de 10 à 20 pixels si du texte est illisible.
@@ -481,8 +485,3 @@ Section **rays** : ressources liées à l’utilisation des rayons
    pixels si du texte est illisible. Nécessite de redémarrer
    l'application pour prendre effet.
 
-Section **server** : ressources spécifiques au mode client/serveur
-===================================================================
-
-Le mode client/serveur n’étant pas encore disponible, ces ressources ne
-sont pas décrites ici.
