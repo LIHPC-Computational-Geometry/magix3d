@@ -426,42 +426,46 @@ TopoDS_Shape OCCGeomRepresentation::cleanShape(TopoDS_Shape& shape){
         sfwf->SetPrecision(tolerance);
         sfwf->Load(shape);
 
-#ifdef _DEBUG
-        if(sfwf->FixSmallEdges()){
-			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-            message <<"- fixing wire frames";
-            std::cout<<message<<std::endl;
-            if(sfwf->StatusSmallEdges(ShapeExtend_OK)){
-				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-                message <<"no small edges found";
-                std::cout<<message<<std::endl;
-            }
-            if(sfwf->StatusSmallEdges(ShapeExtend_DONE1)){
-				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-                message <<"some small edges fixed";
-                std::cout<<message<<std::endl;
-            }
-            if(sfwf->StatusSmallEdges(ShapeExtend_FAIL1)){
-				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-                message <<"failed to fix some small edges";
-                std::cout<<message<<std::endl;
-            }
-        }
+// Activer ce bloc de debug perturbe l'affichage des représentations
+// des surfaces sur une 1/2 sphere (pas sur une sphere entiere)
+// car les méthodes FixSmallEdges et FixWireGaps modifient sfwf
+// #ifdef _DEBUG
+//
+//         if(sfwf->FixSmallEdges()){
+// 			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+//             message <<"- fixing wire frames";
+//             std::cout<<message<<std::endl;
+//             if(sfwf->StatusSmallEdges(ShapeExtend_OK)){
+// 				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+//                 message <<"no small edges found";
+//                 std::cout<<message<<std::endl;
+//             }
+//             if(sfwf->StatusSmallEdges(ShapeExtend_DONE1)){
+// 				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+//                 message <<"some small edges fixed";
+//                 std::cout<<message<<std::endl;
+//             }
+//             if(sfwf->StatusSmallEdges(ShapeExtend_FAIL1)){
+// 				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+//                 message <<"failed to fix some small edges";
+//                 std::cout<<message<<std::endl;
+//             }
+//         }
 
-        if(sfwf->FixWireGaps()){
-            std::cout<<"- fixing wire gaps"<<std::endl;
-            if(sfwf->StatusWireGaps(ShapeExtend_OK))
-                std::cout<<"no gaps found"<<std::endl;
-            if(sfwf->StatusWireGaps(ShapeExtend_DONE1))
-                std::cout<<"some 2D gaps fixed"<<std::endl;
-            if(sfwf->StatusWireGaps(ShapeExtend_DONE2))
-                std::cout<<"some 3D gaps fixed"<<std::endl;
-            if(sfwf->StatusWireGaps(ShapeExtend_FAIL1))
-                std::cout<<"failed to fix some 2D gaps"<<std::endl;
-            if(sfwf->StatusWireGaps(ShapeExtend_FAIL2))
-                std::cout<<"failed to fix some 3D gaps"<<std::endl;
-        }
-#endif
+//         if(sfwf->FixWireGaps()){
+//             std::cout<<"- fixing wire gaps"<<std::endl;
+//             if(sfwf->StatusWireGaps(ShapeExtend_OK))
+//                 std::cout<<"no gaps found"<<std::endl;
+//             if(sfwf->StatusWireGaps(ShapeExtend_DONE1))
+//                 std::cout<<"some 2D gaps fixed"<<std::endl;
+//             if(sfwf->StatusWireGaps(ShapeExtend_DONE2))
+//                 std::cout<<"some 3D gaps fixed"<<std::endl;
+//             if(sfwf->StatusWireGaps(ShapeExtend_FAIL1))
+//                 std::cout<<"failed to fix some 2D gaps"<<std::endl;
+//             if(sfwf->StatusWireGaps(ShapeExtend_FAIL2))
+//                 std::cout<<"failed to fix some 3D gaps"<<std::endl;
+//         }
+// #endif
 
         shape = sfwf->Shape();
     }
