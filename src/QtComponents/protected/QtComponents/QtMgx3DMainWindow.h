@@ -437,7 +437,8 @@ class QtMgx3DMainWindow :
 						*_unselectTransfiniteBlocks;
 		QAction			*_selectNodesAction, *_selectEdgesAction,
 						*_selectSurfacesAction, *_selectVolumesAction;
-		QAction			*_selectionModeAction, *_rubberBandSelectionAction;
+		QAction			*_selectionModeAction;
+		QAction			*_pickingSelectionAction, *_rubberBandSelectionAction, *_rubberBandInsideSelectionAction;
 		QAction			*_showCommandMonitorDialogAction;
 		QAction			*_displayUsersGuideAction,
 						*_displayUsersGuideContextAction,
@@ -1306,10 +1307,12 @@ class QtMgx3DMainWindow :
 	virtual void selectionModeCallback (bool boundingBox);
 
 	/**
-	 * Callback sur le mode de sélection : rectangle élastique ou non.
-	 * \warning		Ne fait rien par défaut, méthode à surcharger.
+	 * Callback sur le mode de sélection : par défaut ne font qu'actualiser menus et boutons.
+	 * \warning		Méthodes à surcharger pour actualiser l'interacteur.
 	 */	
+	virtual void pickingSelectionCallback (bool on);
 	virtual void rubberBandSelectionCallback (bool on);
+	virtual void rubberBandInsideSelectionCallback (bool on);
 
 	//@}	// Callbacks du menu "Sélection".
 
@@ -1522,52 +1525,44 @@ class QtMgx3DMainWindow :
 	bool							_actionsDisabled;
 
 	/** Les commandes python. */
-	QtMgx3DPythonConsole*					_pythonPanel;
+	QtMgx3DPythonConsole*								_pythonPanel;
 
 	/** Les propriétés de la sélection. */
-	QtSelectionCommonPropertiesPanel*			_selectionCommonPropertiesPanel;
-	QtSelectionIndividualPropertiesPanel*			_selectionIndividualPropertiesPanel;
+	QtSelectionCommonPropertiesPanel*					_selectionCommonPropertiesPanel;
+	QtSelectionIndividualPropertiesPanel*				_selectionIndividualPropertiesPanel;
 
 	/** L'affichage des informations relatives au déroulement de la session. */
-	QtMgx3DLogsView*					_logView;
-	QtStatusLogOutputStream*				_statusView;
-	QtMgx3DStateView*					_stateView;
-	QtLogsView*						_pythonLogView;
+	QtMgx3DLogsView*									_logView;
+	QtStatusLogOutputStream*							_statusView;
+	QtMgx3DStateView*									_stateView;
+	QtLogsView*											_pythonLogView;
 
 	/** Les dock widgets. */
-	QDockWidget						*_entitiesDockWidget,
-								*_operationsDockWidget,
-								*_historyDockWidget,
-								*_selectionCPDockWidget,
-								*_selectionIPDockWidget,
-								*_pythonDockWidget,
-								*_pythonOutputDockWidget,
-								*_commandMonitorDockWidget;
+	QDockWidget											*_entitiesDockWidget, *_operationsDockWidget, *_historyDockWidget, *_selectionCPDockWidget, *_selectionIPDockWidget,
+														*_pythonDockWidget, *_pythonOutputDockWidget, *_commandMonitorDockWidget;
 
 	/** Les tab widgets. */
-	QTabWidget						*_entitiesTabWidget;
+	QTabWidget											*_entitiesTabWidget;
 
 	/** Les barres d'outils. */
-	QToolBar						*_commandToolbar,
-								*_3dViewToolbar,
-								*_meshingToolbar,
-								*_selectionToolbar;
+	QToolBar											*_commandToolbar, *_3dViewToolbar, *_meshingToolbar, *_selectionToolbar;
+	QToolButton											*_selectionModeToolButton;
 
 	/** Les actions possibles. */
-	WindowsActions						_actions;
+	WindowsActions										_actions;
 
 	/** Le titre de l'application, pour d'éventuels messages d'erreur. */
-	std::string						_appTitle;
+	std::string											_appTitle;
 
 	/** L'éventuel observateur de sélection d'entité. */
-	Mgx3D::QtComponents::EntitySeizureManager*		_seizureManager;
+	Mgx3D::QtComponents::EntitySeizureManager*			_seizureManager;
 
 	/** La boite de dialogue de surveillance des commandes. */
-	QtCommandMonitorPanel*					_commandMonitorPanel;
+	QtCommandMonitorPanel*								_commandMonitorPanel;
 
 #ifdef USE_EXPERIMENTAL_ROOM
 	/** Le panneau "Chambre expérimentale". */
-	QWidget*							_experimentalRoomPanel;
+	QWidget*											_experimentalRoomPanel;
 #endif	// USE_EXPERIMENTAL_ROOM
 
 	/** L'éventuelle boite de dialogue de modification des propriétés graphiques
@@ -1578,16 +1573,16 @@ class QtMgx3DMainWindow :
 	 * d'enregistrement.
 	 * @see		saveMagix3DScriptCallback
 	 */
-	std::string										_pythonMinScript;
-	TkUtil::Charset::CHARSET						_pytMinScriptCharset;
-	Internal::ContextIfc::encodageScripts			_encodageScripts;
+	std::string											_pythonMinScript;
+	TkUtil::Charset::CHARSET							_pytMinScriptCharset;
+	Internal::ContextIfc::encodageScripts				_encodageScripts;
 
 	/** La liste des scripts <I>Magix 3D</I> récemments exécutés. */
-	static TkUtil::UrlFifo					_recentScriptsURLFifo;
+	static TkUtil::UrlFifo								_recentScriptsURLFifo;
 
 	/** Le fichier contenant la liste des scripts <I>Magix 3D</I> récemments
 	 * exécutés. */
-	static const std::string				_recentScriptsFileName;
+	static const std::string							_recentScriptsFileName;
 };	// class QtMgx3DMainWindow
 
 

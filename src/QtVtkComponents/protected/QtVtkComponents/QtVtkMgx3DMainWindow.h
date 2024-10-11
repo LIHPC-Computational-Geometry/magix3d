@@ -167,11 +167,13 @@ class QtVtkMgx3DMainWindow : public QtComponents::QtMgx3DMainWindow
 	 * Callback sur le mode de sélection : boite englobante ou distance à l'entité.
 	*/
 	virtual void selectionModeCallback (bool boundingBox);
-	
+
 	/**
-	 * Callback sur le mode de sélection : rectangle élastique ou non.
+	 * Callback sur le mode de sélection : actualisent menus/boutons/interacteur.
 	 */	
+	virtual void pickingSelectionCallback (bool on);
 	virtual void rubberBandSelectionCallback (bool on);
+	virtual void rubberBandInsideSelectionCallback (bool on);
 
 #ifdef USE_EXPERIMENTAL_ROOM
 	/**

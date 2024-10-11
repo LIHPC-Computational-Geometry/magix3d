@@ -418,18 +418,57 @@ void QtVtkMgx3DMainWindow::selectionModeCallback (bool checked)
 }	// QtVtkMgx3DMainWindow::selectionModeCallback
 
 
+void QtVtkMgx3DMainWindow::pickingSelectionCallback (bool on)
+{
+	BEGIN_QT_TRY_CATCH_BLOCK
+	
+	QtMgx3DMainWindow::pickingSelectionCallback (on);	// actualisation menu/bouton
+
+	if (false == on)
+		return;
+		
+	QtVtkGraphicalWidget*	vgw	= dynamic_cast<QtVtkGraphicalWidget*>(&getGraphicalWidget ( ));
+	CHECK_NULL_PTR_ERROR (vgw)
+	vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).SetRubberBand (false);
+	
+	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
+}	// QtVtkMgx3DMainWindow::pickingSelectionCallback
+
+
 void QtVtkMgx3DMainWindow::rubberBandSelectionCallback (bool on)
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
 	
+	QtMgx3DMainWindow::rubberBandSelectionCallback (on);	// actualisation menu/bouton
+
+	if (false == on)
+		return;
+		
 	QtVtkGraphicalWidget*	vgw	= dynamic_cast<QtVtkGraphicalWidget*>(&getGraphicalWidget ( ));
 	CHECK_NULL_PTR_ERROR (vgw)
-	vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).SetRubberBand (on);
-// Pour sélectionner les entités complètement englobées dans le rectangle élastique :
-//	vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).SetCompletelyInsideSelection (true);
+	vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).SetRubberBand (true);
+	vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).SetCompletelyInsideSelection (false);
 	
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtVtkMgx3DMainWindow::rubberBandSelectionCallback
+
+
+void QtVtkMgx3DMainWindow::rubberBandInsideSelectionCallback (bool on)
+{
+	BEGIN_QT_TRY_CATCH_BLOCK
+	
+	QtMgx3DMainWindow::rubberBandInsideSelectionCallback (on);	// actualisation menu/bouton
+
+	if (false == on)
+		return;
+		
+	QtVtkGraphicalWidget*	vgw	= dynamic_cast<QtVtkGraphicalWidget*>(&getGraphicalWidget ( ));
+	CHECK_NULL_PTR_ERROR (vgw)
+	vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).SetRubberBand (true);
+	vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).SetCompletelyInsideSelection (true);
+	
+	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
+}	// QtVtkMgx3DMainWindow::rubberBandInsideSelectionCallback
 
 
 #ifdef USE_EXPERIMENTAL_ROOM
