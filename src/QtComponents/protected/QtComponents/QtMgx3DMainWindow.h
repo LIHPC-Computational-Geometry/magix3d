@@ -253,6 +253,12 @@ class QtMgx3DMainWindow :
 	 */
 	virtual void saveMagix3DScriptCallback ( );
 	virtual void saveAsMagix3DScriptCallback ( );
+	
+	/**
+	 * Enregistre le contenu de la console python dans un fichier.
+	 * \see	savePythonConsole
+	 */
+	virtual void savePythonConsoleCallback ( );
 
 	/**
 	 * Exécute une commande longue, a priori dans un autre thread.
@@ -367,7 +373,7 @@ class QtMgx3DMainWindow :
 		QAction         *_mesh2DDimAction;
 		QAction			*_importAction,
 						*_exportAllAction, *_exportSelectionAction,
-						*_saveMagix3DScriptAction, *_saveAsMagix3DScriptAction;
+						*_saveMagix3DScriptAction, *_saveAsMagix3DScriptAction, *_savePythonConsoleAction;
 		QAction			*_longCommandAction, *_openCascadeLongCommandAction;
 		QAction			*_executePythonScriptAction;
 		QAction			*_preferencesAction, *_editSettingsAction, *_quitAction;
@@ -915,34 +921,34 @@ class QtMgx3DMainWindow :
 	virtual void setMesh2D();
 
 	/**
-	 * Demander à l'utilisateur de sélectionner un (et un seul) fichier.
+	 * Demander à l'utilisateur de sélectionner un (QFileDialog::ExistingFile) ou plusieurs (QFileDialog::ExistingFiles) fichiers.
 	 * \param		Widget parent
 	 * \param		Répertoire par défaut
 	 * \param		Filtre appliqué
 	 * \param		Titre de la boite de dialogue
 	 * \param		Type de fichier sélectionnable
 	 * \param		Type d'ouverture
-	 * \return		Le fichier sélectionné, de path nul si l'opération est
-	 * 				annulée
+	 * \return		Le ou les fichier(s) sélectionné(s), ou vecteur vide si l'opération est annulée
 	 */
-	virtual TkUtil::File selectFileName (
-				QWidget* parent, const std::string& dir,
-				const std::string& filter, const std::string& title,
-				QFileDialog::FileMode fm = QFileDialog::ExistingFile,
-				QFileDialog::AcceptMode am = QFileDialog::AcceptOpen);
+	virtual std::vector<TkUtil::File> selectFileNames (QWidget* parent, const std::string& dir, const std::string& filter, const std::string& title,
+				QFileDialog::FileMode fm = QFileDialog::ExistingFile, QFileDialog::AcceptMode am = QFileDialog::AcceptOpen);
 
 	/**
-	 * @return	Le jeu de caractères à utiliser par défaut lors de l'enregistrement de
-	 *		scripts.
+	 * @return	Le jeu de caractères à utiliser par défaut lors de l'enregistrement de scripts.
 	 */
 	virtual TkUtil::Charset getDefaultScriptsCharset ( ) const;
 
 	/**
-	 * @return	Le jeu de caractères à utiliser par défaut lors de l'enregistrement de
-	 *		lasers ou diagnostics.
+	 * @return	Le jeu de caractères à utiliser par défaut lors de l'enregistrement de lasers ou diagnostics.
 	 * @warning	A surcharger, retourne Charset::UTF_8.
 	 */
 	virtual TkUtil::Charset getDefaultRaysCharset ( ) const;
+	
+	/**
+	 * Enregistre le contenu de la console python.
+	 * \param	si <I>true</I> enregistre également l'environnement d'exécution (exécutable python, PYTHONPATH, ...).
+	 */
+	virtual void savePythonConsole (bool WithEnv);
 
 	//@}	// Diverses opérations
 
