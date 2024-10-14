@@ -19,6 +19,7 @@ file (GLOB CPP_SOURCES pyMagix3D.i *.cpp)	# Pas swig_doc.i, inclus par pyMagix3D
 # par les sources du binding).
 set (ALL_TARGETS pyMagix3D)
 set_property (SOURCE pyMagix3D.i PROPERTY CPLUSPLUS ON)
+set_property (SOURCE pyMagix3D.i PROPERTY USE_SWIG_DEPENDENCIES TRUE)
 # La cible, le module swig (_pyMagix3D.so) :
 swig_add_library (pyMagix3D TYPE SHARED LANGUAGE PYTHON SOURCES ${CPP_SOURCES})
 cmake_policy (SET CMP0086 NEW)
