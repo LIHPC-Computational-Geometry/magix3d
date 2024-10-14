@@ -1,0 +1,96 @@
+Commande Création du sommet Pt0000 exécutée avec succès (en 1.62 millisecondes).
+Commande Création du sommet Pt0001 exécutée avec succès (en 1.15 millisecondes).
+Commande Création du sommet Pt0002 exécutée avec succès (en 1.24 millisecondes).
+Commande Création du sommet Pt0003 exécutée avec succès (en 1.35 millisecondes).
+Commande Création du segment Crb0000 exécutée avec succès (en 1.93 millisecondes).
+Commande Création du segment Crb0001 exécutée avec succès (en 1.49 millisecondes).
+Commande Création du segment Crb0002 exécutée avec succès (en 1.66 millisecondes).
+Commande Création du segment Crb0003 exécutée avec succès (en 1.47 millisecondes).
+Commande Création de la surface Surf0000 exécutée avec succès (en 2.33 millisecondes).
+Commande Création d'une face topologique structurée sur une géométrie (Surf0000) exécutée avec succès (en 234 microsecondes).
+Commande Découpage de l'arête Ar0000 exécutée avec succès (en 478 microsecondes).
+Commande Changement de discrétisation pour les arêtes Ar0002 exécutée avec succès (en 85 microsecondes).
+Appel de la commande CommandExtendSplitFace
+CommandExtendSplitFace::internalExecute()
+recherche de l'arête de la face qui contient ce sommet
+liste de coedges de taille 5
+splitFaces(...) avec 1 cofaces, arete = Ar0005, ratio_dec = 0, ratio_ogrid = 0, boucleDemandee = 0
+
+nbMeshingEdges_dep = 0
+coedge_dep = Ar0005
+coface_prec = 0
+coface trouvée : Fa0000
+edge_dep = Edge0000
+dirCoFaceSplit = j_dir
+nbMeshingEdges_dep =  0
+nbMeshingEdges_edge =  6
+sens_coedge_dep = faux
+vertex1 = Som0001
+vertex2 = Som0002
+coedge_after_cut = faux
+computeCorrespondingCoEdgeAndNbMeshingEdges(Som0002, 6, faux)
+ this :   Edge0002 (uniqueId 22) discrétisée en 9 avec comme arêtes communes:
+ Ar0002
+  arête avec comme sommets:
+    Som0002 (uniqueId 17), projeté sur Pt0002 (groupes: Hors_Groupe_0D) [ 1, 2, 0]  relié à 2 arêtes communes :  Ar0001 Ar0002
+    Som0003 (uniqueId 20), projeté sur Pt0003 (groupes: Hors_Groupe_0D) [ 0, 2, 0]  relié à 2 arêtes communes :  Ar0002 Ar0003
+    cette arête pointe sur les faces communes :  Fa0000
+
+i = 0, nbBras_edge 6, v_dep = Som0002
+nbBras_edge = 6 * ratio : 1
+on met à jour coedge (2)
+1
+1
+au moment du return 
+Ar0002
+1
+ retourne coedge = Ar0002, nbBras_coedge = 6, sens (/edge) = 1
+nbMeshingEdges_ar =  6
+coedge_ar =  Ar0002
+edge_ar =  Edge0002
+sens_coedge_ar = vrai
+# nouveau InfoSplit
+coedge_dep =  Ar0005
+coedge_ar =  Ar0002
+nbMeshingEdges_dep =  0
+nbMeshingEdges_ar =  6
+ on tente de relancer ...
+ on relance ...
+ cela se termine vraiment ...
+
+coface découpée : Fa0000, unique id : 25
+ Fa0000 (uniqueId 25) (structurée 10x10) DirectionJ (non maillée), projetée sur Surf0000 (groupes: Hors_Groupe_2D) avec 4 arêtes:
+ Edge0000 Edge0001 Edge0002 Edge0003
+ Fa0000 face commune avec 4 sommets:
+   Som0000 (uniqueId 13), projeté sur Pt0000 (groupes: Hors_Groupe_0D) [ 0, 0, 0]  relié à 2 arêtes communes :  Ar0003 Ar0004
+ ce sommet pointe sur les arêtes communes : Ar0003 Ar0004
+   Som0001 (uniqueId 14), projeté sur Pt0001 (groupes: Hors_Groupe_0D) [ 1, 0, 0]  relié à 2 arêtes communes :  Ar0001 Ar0005
+ ce sommet pointe sur les arêtes communes : Ar0001 Ar0005
+   Som0002 (uniqueId 17), projeté sur Pt0002 (groupes: Hors_Groupe_0D) [ 1, 2, 0]  relié à 2 arêtes communes :  Ar0001 Ar0002
+ ce sommet pointe sur les arêtes communes : Ar0001 Ar0002
+   Som0003 (uniqueId 20), projeté sur Pt0003 (groupes: Hors_Groupe_0D) [ 0, 2, 0]  relié à 2 arêtes communes :  Ar0002 Ar0003
+ ce sommet pointe sur les arêtes communes : Ar0002 Ar0003
+    cette face commune ne pointe sur aucune face.
+coedge_dep : Ar0005
+edge_dep :Edge0000
+coedge_ar : Ar0002
+edge_ar :Edge0002
+edge_dep à découper Edge0000
+newVertices1 :  Som0004
+Edge::split1(Som0004) avec comme arête :   Edge0000 (uniqueId 16) discrétisée en 10 avec comme arêtes communes:
+ Ar0004 Ar0005
+  arête avec comme sommets:
+    Som0000 (uniqueId 13), projeté sur Pt0000 (groupes: Hors_Groupe_0D) [ 0, 0, 0]  relié à 2 arêtes communes :  Ar0003 Ar0004
+    Som0001 (uniqueId 14), projeté sur Pt0001 (groupes: Hors_Groupe_0D) [ 1, 0, 0]  relié à 2 arêtes communes :  Ar0001 Ar0005
+    cette arête pointe sur les faces communes :  Fa0000
+
+edge_ar à découper Edge0002
+newVertices3 :  Som0005
+Edge::split1(Som0005) avec comme arête :   Edge0002 (uniqueId 22) (EN COURS D'EDITION) discrétisée en 9 avec comme arêtes communes:
+ Ar0006 Ar0007
+  arête avec comme sommets:
+    Som0002 (uniqueId 17) (EN COURS D'EDITION) , projeté sur Pt0002 (groupes: Hors_Groupe_0D) [ 1, 2, 0]  relié à 2 arêtes communes :  Ar0001 Ar0006
+    Som0003 (uniqueId 20) (EN COURS D'EDITION) , projeté sur Pt0003 (groupes: Hors_Groupe_0D) [ 0, 2, 0]  relié à 2 arêtes communes :  Ar0003 Ar0007
+    cette arête pointe sur les faces communes :  Fa0000
+
+Commande Découpage de la face Fa0000 par prolongation exécutée avec succès (en 1.18 millisecondes).

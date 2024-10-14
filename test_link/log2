@@ -1,0 +1,43 @@
+Commande Création du sommet Pt0000 exécutée avec succès (en 4.1 millisecondes).
+Commande Création du sommet Pt0001 exécutée avec succès (en 1.6 millisecondes).
+Commande Création du sommet Pt0002 exécutée avec succès (en 1.12 millisecondes).
+Commande Création du sommet Pt0003 exécutée avec succès (en 764 microsecondes).
+Commande Création du segment Crb0000 exécutée avec succès (en 836 microsecondes).
+Commande Création du segment Crb0001 exécutée avec succès (en 815 microsecondes).
+Commande Création du segment Crb0002 exécutée avec succès (en 1.38 millisecondes).
+Commande Création du segment Crb0003 exécutée avec succès (en 847 microsecondes).
+Commande Création de la surface Surf0000 exécutée avec succès (en 1.01 millisecondes).
+Commande Création d'une face topologique structurée sur une géométrie (Surf0000) exécutée avec succès (en 203 microsecondes).
+Commande Découpage de l'arête Ar0000 exécutée avec succès (en 246 microsecondes).
+Commande Changement de discrétisation pour les arêtes Ar0002 exécutée avec succès (en 76 microsecondes).
+Appel de la commande CommandExtendSplitFace
+CommandExtendSplitFace::internalExecute()
+recherche de l'arête de la face qui contient ce sommet
+liste de coedges de taille 5
+splitFaces(...) avec 1 cofaces, arete = Ar0005, ratio_dec = 0, ratio_ogrid = 0, boucleDemandee = 0
+
+nbMeshingEdges_dep = 0
+coedge_dep = Ar0005
+coface_prec = 0
+coface trouvée : Fa0000
+edge_dep = Edge0000
+dirCoFaceSplit = j_dir
+nbMeshingEdges_dep =  0
+nbMeshingEdges_edge =  6
+sens_coedge_dep = faux
+vertex1 = Som0001
+vertex2 = Som0002
+coedge_after_cut = faux
+computeCorrespondingCoEdgeAndNbMeshingEdges(Som0002, 6, faux)
+ this :   Edge0002 (uniqueId 22) discrétisée en 3 avec comme arêtes communes:
+ Ar0002
+  arête avec comme sommets:
+    Som0002 (uniqueId 17), projeté sur Pt0002 (groupes: Hors_Groupe_0D) [ 1, 2, 0]  relié à 2 arêtes communes :  Ar0001 Ar0002
+    Som0003 (uniqueId 20), projeté sur Pt0003 (groupes: Hors_Groupe_0D) [ 0, 2, 0]  relié à 2 arêtes communes :  Ar0002 Ar0003
+    cette arête pointe sur les faces communes :  Fa0000
+
+i = 0, nbBras_edge 6, v_dep = Som0002
+nbBras_edge : 6 -= getNbMeshingEdges: 3 / ratio : 1
+1
+1
+au moment du return 

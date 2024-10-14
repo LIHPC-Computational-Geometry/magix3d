@@ -465,9 +465,9 @@ split(std::vector<Vertex*> new_vtx, std::vector<Edge*>& new_edges, Internal::Inf
 void Edge::
 split(Vertex* new_vtx, std::vector<Edge*>& new_edges, Internal::InfoCommand* icmd)
 {
-#ifdef _DEBUG_SPLIT
-    std::cout<<"Edge::split("<<new_vtx->getName()<<") avec comme arête : "<<*this<<std::endl;
-#endif
+//#ifdef _DEBUG_SPLIT
+    std::cout<<"Edge::split1("<<new_vtx->getName()<<") avec comme arête : "<<*this<<std::endl;
+//#endif
 #ifdef _DEBUG_TIMER
    TkUtil::Timer timer(true);
 #endif
@@ -517,9 +517,9 @@ split(Vertex* new_vtx, std::vector<Edge*>& new_edges, Internal::InfoCommand* icm
 void Edge::
 split(Vertex* new_vtx1, Vertex* new_vtx2, std::vector<Edge*>& new_edges, Internal::InfoCommand* icmd)
 {
-#ifdef _DEBUG_SPLIT
-    std::cout<<"Edge::split("<<new_vtx1->getName()<<", "<<new_vtx2->getName()<<") avec comme arête : "<<*this<<std::endl;
-#endif
+//#ifdef _DEBUG_SPLIT
+    std::cout<<"Edge::split2("<<new_vtx1->getName()<<", "<<new_vtx2->getName()<<") avec comme arête : "<<*this<<std::endl;
+//#endif
 #ifdef _DEBUG_TIMER
    TkUtil::Timer timer(true);
 #endif
@@ -1143,6 +1143,7 @@ computeCorrespondingNbMeshingEdges(Vertex* v_dep, const CoEdge* coedge, uint nbB
 #endif
 }
 /*----------------------------------------------------------------------------*/
+#define _DEBUG_SPLIT
 void Edge::
 computeCorrespondingCoEdgeAndNbMeshingEdges(Vertex* v_dep, uint nbBras_edge, bool coedge_after_cut,
         CoEdge*& coedge, uint& nbBras_coedge, bool& sens_coedge)
@@ -1194,36 +1195,43 @@ computeCorrespondingCoEdgeAndNbMeshingEdges(Vertex* v_dep, uint nbBras_edge, boo
 
         if (getCoEdge(i)->getNbMeshingEdges()/getRatio(getCoEdge(i)) < nbBras_edge
         		|| (coedge_after_cut && getCoEdge(i)->getNbMeshingEdges()/getRatio(getCoEdge(i)) == nbBras_edge)){
-        	//std::cout<<"nbBras_edge : "<<nbBras_edge<<" -= getNbMeshingEdges: "<<getCoEdge(i)->getNbMeshingEdges()<<" / ratio : "<<getRatio(getCoEdge(i))<<std::endl;
+        	std::cout<<"nbBras_edge : "<<nbBras_edge<<" -= getNbMeshingEdges: "<<getCoEdge(i)->getNbMeshingEdges()<<" / ratio : "<<getRatio(getCoEdge(i))<<std::endl;
             nbBras_edge -= getCoEdge(i)->getNbMeshingEdges()/getRatio(getCoEdge(i));
             if (nbBras_edge == 0){
+                std::cout << "on met à jour coedge (1)" << std::endl;
             	coedge = getCoEdge(i);
             	nbBras_coedge = getCoEdge(i)->getNbMeshingEdges();
             }
         }
         else {
             if (sens_coedge){
-            	//std::cout<<"nbBras_edge = "<<nbBras_edge<<" * ratio : "<<getRatio(getCoEdge(i))<<std::endl;
+            	std::cout<<"nbBras_edge = "<<nbBras_edge<<" * ratio : "<<getRatio(getCoEdge(i))<<std::endl;
                 nbBras_coedge = nbBras_edge*getRatio(getCoEdge(i));
             }
             else {
-            	//std::cout<<"getNbMeshingEdges: "<<getCoEdge(i)->getNbMeshingEdges()<<" - nbBras_edge = "<<nbBras_edge<<" * ratio : "<<getRatio(getCoEdge(i))<<std::endl;
+            	std::cout<<"getNbMeshingEdges: "<<getCoEdge(i)->getNbMeshingEdges()<<" - nbBras_edge = "<<nbBras_edge<<" * ratio : "<<getRatio(getCoEdge(i))<<std::endl;
                 nbBras_coedge = getCoEdge(i)->getNbMeshingEdges()-nbBras_edge*getRatio(getCoEdge(i));
             }
+            std::cout << "on met à jour coedge (2)" << std::endl;
             coedge = getCoEdge(i);
             termine = true;
         }
 
         i+=ind_inc;
         v_dep = v_ar;
-
+        std::cout << getNbCoEdges() << std::endl;
+        
         if (i<0 || i>getNbCoEdges()-1){
         	termine = true;
         }
-
+        std::cout << termine << std::endl;
     }
     while (!termine);
 
+    std::cout << "au moment du return " << std::endl;
+    std::cout << coedge->getName() << std::endl;
+    std::cout << sens << std::endl;
+    
 #ifdef _DEBUG_TIMER
     timer.stop();
     std::cout<<"computeCorrespondingCoEdgeAndNbMeshingEdges en  "<<timer.strDuration()<<std::endl;

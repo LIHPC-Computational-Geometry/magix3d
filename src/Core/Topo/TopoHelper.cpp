@@ -625,7 +625,7 @@ void TopoHelper::getVerticesTip(const std::vector<CoEdge* > & coedges, Vertex* &
 #endif
 }
 /*----------------------------------------------------------------------------*/
-//#define _DEBUG_SPLIT
+#define _DEBUG_SPLIT
 void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
         CoEdge* arete, double ratio_dec, double ratio_ogrid,
         bool boucleDemandee, bool rebondAutorise,

@@ -28,6 +28,7 @@ CommandExtendSplitFace(Internal::Context& c, CoFace*  coface, Vertex* sommet)
 , m_coface(coface)
 , m_sommet(sommet)
 {
+        std::cout << "Appel de la commande CommandExtendSplitFace" << std::endl;
     if (!coface->isStructured())
         throw TkUtil::Exception (TkUtil::UTF8String ("Le découpage d'une face n'est possible que si elle est structurée", TkUtil::Charset::UTF_8));
 }
@@ -40,6 +41,7 @@ CommandExtendSplitFace::
 void CommandExtendSplitFace::
 internalExecute()
 {
+        std::cout << "CommandExtendSplitFace::internalExecute()" << std::endl;
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     message << "CommandExtendSplitFace::execute pour la commande " << getName ( )
             << " de nom unique " << getUniqueName ( );
@@ -53,8 +55,10 @@ internalExecute()
 
 
     // recherche de l'arête de la face qui contient ce sommet
+    std::cout << "recherche de l'arête de la face qui contient ce sommet" << std::endl;
     std::vector<CoEdge* > coedges;
     m_coface->getCoEdges(coedges);
+    std::cout << "liste de coedges de taille " << coedges.size() << std::endl;
 
     CoEdge* coedge = 0;
     for (std::vector<Topo::CoEdge* >::iterator iter = coedges.begin();
