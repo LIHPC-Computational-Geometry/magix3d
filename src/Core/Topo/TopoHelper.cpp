@@ -618,7 +618,7 @@ void TopoHelper::getVerticesTip(const std::vector<CoEdge* > & coedges, Vertex* &
 #endif
 }
 /*----------------------------------------------------------------------------*/
-//#define _DEBUG_SPLIT
+#define _DEBUG_SPLIT
 void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
         CoEdge* arete, double ratio_dec, double ratio_ogrid,
         bool boucleDemandee, bool rebondAutorise,
@@ -827,8 +827,18 @@ void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
 
         // réciproque: recherche la CoEdge touchée par le noeud
         if (0 != edge_ar){
+            if (edge_dep->getNbMeshingEdges() != edge_ar->getNbMeshingEdges())
+            {
+                    TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
+                    messErr << "Echec lors du découpage de la face "<<coface->getName()
+                            <<", le nombre d'arêtes de maillage est différent de part et d'autre de la face (" << (short)edge_dep->getNbMeshingEdges()
+                            << " vs " << (short)edge_ar->getNbMeshingEdges() << ")";
+                    throw TkUtil::Exception(messErr);
+            }
+
             edge_ar->computeCorrespondingCoEdgeAndNbMeshingEdges(vertex2, nbMeshingEdges_edge, coedge_after_cut,
                     coedge_ar, nbMeshingEdges_ar, sens_coedge_ar);
+
 
 #ifdef _DEBUG_SPLIT
             std::cout<<"nbMeshingEdges_ar =  "<<nbMeshingEdges_ar<<std::endl;
@@ -844,7 +854,6 @@ void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
             std::cout<<"edge_ar et coedge_ar  == 0\n";
 #endif
         }
-
         // on recherche si cette face est déjà coupée
         InfoSplit* is = cofaceInfoSplit[coface->getUniqueId()];
 
