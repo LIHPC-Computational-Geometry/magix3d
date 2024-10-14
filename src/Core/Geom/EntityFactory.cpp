@@ -517,7 +517,8 @@ Curve* EntityFactory::newArcCircle(
         const Geom::Vertex* start,
         const Geom::Vertex* end,
         const bool direction,
-        const Utils::Math::Vector& normal_in)
+        const Utils::Math::Vector& normal_in,
+        const bool circumCircle)
 {
 #ifdef _DEBUG2
     std::cout<<"newArcCircle center "<<center->getPoint()<<" , start "<<start->getPoint()
@@ -548,7 +549,12 @@ Curve* EntityFactory::newArcCircle(
 #ifdef _DEBUG2
     	std::cout<<"vecteurTangent "<<vecteurTangent.X()<<","<<vecteurTangent.Y()<<","<<vecteurTangent.Z()<<std::endl;
 #endif
-    	Handle(Geom_TrimmedCurve) arc = GC_MakeArcOfCircle (p_start, vecteurTangent, p_end);
+        Handle(Geom_TrimmedCurve) arc;
+        if(circumCircle){
+             arc = GC_MakeArcOfCircle (p_start, p_center, p_end);
+        }else{
+             arc = GC_MakeArcOfCircle (p_start, vecteurTangent, p_end);
+        }
         TopoDS_Edge e = BRepBuilderAPI_MakeEdge(arc);
         rep = new OCCGeomRepresentation(m_context, e);
     }
