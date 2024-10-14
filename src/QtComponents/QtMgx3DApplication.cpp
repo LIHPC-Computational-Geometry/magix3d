@@ -845,7 +845,8 @@ void QtMgx3DApplication::applyConfiguration (const Section& mainSection)
 		Section&	guiScriptingSection	= guiSection.getSection ("scripting");
 		PreferencesHelper::getBoolean (guiSection, Resources::instance ( )._saveGuiState);
 		PreferencesHelper::getBoolean (guiSection, Resources::instance ( )._loadGuiState);
-		PreferencesHelper::getUnsignedLong (guiScriptingSection, Resources::instance ( )._recentScriptCapacity);
+		PreferencesHelper::getBoolean (guiSection, Resources::instance ( )._confirmQuitAction);
+		PreferencesHelper::getUnsignedLong (guiSection, Resources::instance ( )._recentScriptCapacity);
 		PreferencesHelper::getString (guiScriptingSection, Resources::instance ( )._scriptsCharset);
 	}
 	catch (...)	
@@ -978,8 +979,7 @@ void QtMgx3DApplication::updateConfiguration (Section& section, NamedValue& valu
 	else
 	{
 		UTF8String	message (Charset::UTF_8);
-		message << "Actualisation de la préférence utilisateur "
-		        << value.getName ( ) << " non prévue.";
+		message << "Actualisation de la préférence utilisateur " << value.getName ( ) << " non prévue.";
 		throw Exception (message);
 	}
 }	// QtMgx3DApplication::updateConfiguration
@@ -1001,6 +1001,7 @@ void QtMgx3DApplication::saveConfiguration (Section& mainSection)
 	// GUI :
 	PreferencesHelper::updateBoolean (guiSection, Resources::instance ( )._saveGuiState);
 	PreferencesHelper::updateBoolean (guiSection, Resources::instance ( )._loadGuiState);
+	PreferencesHelper::updateBoolean (guiSection, Resources::instance ( )._confirmQuitAction);
 
 	// Théâtre :
 	PreferencesHelper::updateUnsignedLong (theatreSection, Resources::instance ( )._updateRefreshRate);

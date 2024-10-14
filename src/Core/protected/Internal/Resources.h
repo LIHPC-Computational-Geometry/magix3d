@@ -60,6 +60,9 @@ class Resources
 	 */
 	std::string									_mgx3DRootSectionName;
 
+	/** Faut-il demander confirmation pour quitter l'application ? */
+	Preferences::BoolNamedValue					_confirmQuitAction;
+	
 	/**
 	 * Une commande peut-elle être autorisée à être décomposée en plusieurs tâches exécutées parallèlement dans plusieurs threads ?
 	 */
@@ -272,56 +275,47 @@ class Resources
 	Preferences::BoolNamedValue					_logTaskOutputs;
 
 	/**
-	 * Faut-il afficher les logs de type TRACE_1 (<I>Commandes</I>) ?
-	 * Par défaut non.
+	 * Faut-il afficher les logs de type TRACE_1 (<I>Commandes</I>) ? Par défaut non.
 	 */
 	Preferences::BoolNamedValue					_logTraces_1;
 
 	/**
-	 * Faut-il afficher les logs de type TRACE_2 (<I>Scripting</I>) ?
-	 * Par défaut non.
+	 * Faut-il afficher les logs de type TRACE_2 (<I>Scripting</I>) ? Par défaut non.
 	 */
 	Preferences::BoolNamedValue					_logTraces_2;
 
 	/**
-	 * Faut-il afficher les logs de type TRACE_3 (<I>Géométrie</I>) ?
-	 * Par défaut non.
+	 * Faut-il afficher les logs de type TRACE_3 (<I>Géométrie</I>) ? Par défaut non.
 	 */
 	Preferences::BoolNamedValue					_logTraces_3;
 
 	/**
-	 * Faut-il afficher les logs de type TRACE_4 (<I>Topologie</I>) ?
-	 * Par défaut non.
+	 * Faut-il afficher les logs de type TRACE_4 (<I>Topologie</I>) ? Par défaut non.
 	 */
 	Preferences::BoolNamedValue					_logTraces_4;
 
 	/**
-	 * Faut-il afficher les logs de type TRACE_5 (<I>Maillage</I>) ?
-	 * Par défaut non.
+	 * Faut-il afficher les logs de type TRACE_5 (<I>Maillage</I>) ? Par défaut non.
 	 */
 	Preferences::BoolNamedValue					_logTraces_5;
 
 	/**
-	 * Faut-il afficher la date des logs ?
-	 * Par défaut non.
+	 * Faut-il afficher la date des logs ? Par défaut non.
 	 */
 	Preferences::BoolNamedValue					_logDate;
 
 	/**
-	 * Faut-il afficher l'heure des logs ?
-	 * Par défaut non.
+	 * Faut-il afficher l'heure des logs ? Par défaut non.
 	 */
 	Preferences::BoolNamedValue					_logTime;
 
 	/**
-	 * Faut-il afficher le thread des logs ?
-	 * Par défaut non.
+	 * Faut-il afficher le thread des logs ?  Par défaut non.
 	 */
 	Preferences::BoolNamedValue					_logThreadID;
 
 	/**
-	 * Utilisation (<I>true</I> ou non <I>false</I>) par défaut des
-	 * <I>display lists Open GL</I>.
+	 * Utilisation (<I>true</I> ou non <I>false</I>) par défaut des <I>display lists Open GL</I>.
 	 */
 	Preferences::BoolNamedValue					_useDisplayList;
 
@@ -378,12 +372,10 @@ class Resources
 	/**
 	 * La liste des plugins de l'application.
 	 */
-	 IN_STD vector<IN_PREFS Section*>			_pluginDefinitions;
+	IN_STD vector<IN_PREFS Section*>			_pluginDefinitions;
 
 	/** Le masque à appliquer dans le flux "debug" de logs (Log::NONE par défaut. */
 	IN_UTIL Log::TYPE							_debugLogsMask;
-
-	/** Boite de dialogue pour afficher la progression des tâches. */
 
 	/**
 	 * Le tri dans le panneau Groupes. Automatique ? Oui par défaut.
