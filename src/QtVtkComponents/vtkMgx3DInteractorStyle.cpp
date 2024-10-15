@@ -393,13 +393,16 @@ void vtkMgx3DInteractorStyle::OnLeftButtonDown ( )
 		{
 			if ((0 == rwi) || (0 == rwi->GetRenderWindow ( )))
 				return;
+
 			RubberButtonDown	= true;
 			StartPosition [0]	= EndPosition [0]	= rwi->GetEventPosition ( )[0];
 			StartPosition [1]	= EndPosition [1]	= rwi->GetEventPosition ( )[1];
 			int*	size		= rwi->GetRenderWindow ( )->GetSize ( );
 			PixelArray->SetNumberOfTuples (size [0] * size [1]);
 			TmpPixelArray->SetNumberOfTuples (size [0] * size [1]);
-			rwi->GetRenderWindow ( )->GetRGBACharPixelData (0, 0, size [0] - 1, size [1] - 1, 1, PixelArray);
+//			rwi->GetRenderWindow ( )->GetRGBACharPixelData (0, 0, size [0] - 1, size [1] - 1, 1, PixelArray);
+			// Si on est en double buffering on prend l'image dans le back buffer, sinon dans le front buffer.
+			rwi->GetRenderWindow ( )->GetRGBACharPixelData (0, 0, size [0] - 1, size [1] - 1, !rwi->GetRenderWindow ( )->GetDoubleBuffer ( ), PixelArray);
 			FindPokedRenderer (StartPosition [0], StartPosition [1]);
 		}	// else if (false == RubberBand)
 	}
@@ -493,7 +496,8 @@ void vtkMgx3DInteractorStyle::OnLeftButtonUp ( )
 		else
 		{
 			const int* const	size	= rwi->GetRenderWindow ( )->GetSize ( );
-			rwi->GetRenderWindow ( )->SetRGBACharPixelData (0, 0, size [0] - 1, size [1] - 1, PixelArray->GetPointer (0), 0);
+			// Si on est en double buffering on met l'image dans le back buffer, Frame ( )la rebasculera dans le front buffer, sinon on la met dans le front buffer.
+			rwi->GetRenderWindow ( )->SetRGBACharPixelData (0, 0, size [0] - 1, size [1] - 1, PixelArray->GetPointer (0), !rwi->GetRenderWindow ( )->GetDoubleBuffer ( ));
 			rwi->GetRenderWindow ( )->Frame ( );
 			RubberButtonDown		= false;
 
@@ -641,7 +645,7 @@ void vtkMgx3DInteractorStyle::RedrawRubberBand ( )
 	vtkRenderWindowInteractor*	rwi	= this->Interactor;
 	if ((0 == rwi) || (0 == rwi->GetRenderWindow ( )))
 		return;
-		
+
 	TmpPixelArray->DeepCopy (PixelArray);
 	unsigned char*		pixels	= TmpPixelArray->GetPointer (0);
 	const int* const	size	= rwi->GetRenderWindow ( )->GetSize ( );
@@ -691,6 +695,7 @@ void vtkMgx3DInteractorStyle::RedrawRubberBand ( )
 		pixels [4 * (i * size [0] + max [0]) + 2] = 255 ^ pixels [4 * (i * size [0] + max [0]) + 2];
 	}	// for (i = min [1] + 1; i < max [1]; i++)
 
-	rwi->GetRenderWindow ( )->SetRGBACharPixelData (0, 0, size [0] - 1, size [1] - 1, pixels, 0);
+	// Si on est en double buffering on met l'image dans le back buffer, Frame ( )la rebasculera dans le front buffer, sinon on la met dans le front buffer.
+	rwi->GetRenderWindow ( )->SetRGBACharPixelData (0, 0, size [0] - 1, size [1] - 1, pixels, !rwi->GetRenderWindow ( )->GetDoubleBuffer ( ));
 	rwi->GetRenderWindow ( )->Frame ( );
 }	// vtkMgx3DInteractorStyle::RedrawRubberBand
