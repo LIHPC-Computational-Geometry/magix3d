@@ -782,6 +782,7 @@ VTKRenderingManager::VTKRenderingManager (QtVtkGraphicWidget* vtkWidget, bool of
 #else	// VTK_MAJOR_VERSION < 9
 	vtkWidget->getRenderWindow ( ) : vtkGenericOpenGLRenderWindow::New ( );
 #endif	// #if VTK_MAJOR_VERSION < 9
+//vtkWidget->getRenderWindow ( )->DoubleBufferOff ( );	// Pour test rubber banding en condition sans double buffering => artefacts graphiques.
 cout << "RENDER WINDOW IS A " << _renderWindow->GetClassName ( ) << endl;
 _renderWindow->PrintSelf (cout, *vtkIndent::New ( ));
 	_axisProperties.axis1.color.setDRGB (vtkTrihedron::xColor [0], vtkTrihedron::xColor [1], vtkTrihedron::xColor [2]);
