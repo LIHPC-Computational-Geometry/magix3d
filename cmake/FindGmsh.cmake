@@ -1,0 +1,18 @@
+find_path (GMSH_INCLUDE_DIR NAMES gmsh.h)
+find_library (GMSH_LIBRARY NAMES gmsh)
+
+if (GMSH_INCLUDE_DIR AND GMSH_LIBRARY)
+	message (STATUS "==>GMSH FOUND : GMSH_INCLUDE_DIR=${GMSH_INCLUDE_DIR} GMSH_LIBRARY=${GMSH_LIBRARY}")
+	set (GMSH_FOUND TRUE)
+else ( )
+	message (STATUS "==> GMSH NOT FOUND.")
+	unset (GMSH_FOUND)
+	return ( )
+endif (GMSH_INCLUDE_DIR AND GMSH_LIBRARY)
+
+
+set (GMSH_TARGET "Gmsh")
+add_library (${GMSH_TARGET} UNKNOWN IMPORTED)
+set_target_properties (Gmsh PROPERTIES
+                       INTERFACE_INCLUDE_DIRECTORIES ${GMSH_INCLUDE_DIR}
+                       IMPORTED_LOCATION ${GMSH_LIBRARY})
