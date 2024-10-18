@@ -45,7 +45,6 @@ if(WITH_COV)
           '${CMAKE_SOURCE_DIR}/*/tst/*'
           '*/cmake-build-debug/*'
           '*/spack/*'
-          '*/GMSH/*'
   )
   SETUP_TARGET_FOR_COVERAGE_LCOV(
           NAME code_cover
