@@ -51,7 +51,7 @@ addGeomEntityToExport(GeomEntity* geomEntity)
 /*----------------------------------------------------------------------------*/
 void ExportBREPImplementation::write()
 {
-    std::ofstream file(m_filename, ios::out);
+    std::ofstream file(m_filename, std::ios::out);
     if (file.bad()) {
         throw TkUtil::Exception (TkUtil::UTF8String ("Impossible d'écrire ce fichier BREP", TkUtil::Charset::UTF_8));
     }

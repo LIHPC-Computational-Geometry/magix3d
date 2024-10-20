@@ -74,7 +74,7 @@ pkg_check_modules (GTS REQUIRED IMPORTED_TARGET gts)  # GTS (GNU Triangulated Su
 pkg_check_modules (GLIB2 REQUIRED IMPORTED_TARGET glib-2.0) # glib-2.0 (pour GTS)
 pkg_check_modules (PCRE REQUIRED IMPORTED_TARGET libpcre)  # PCRE (Perl compatible regular expressions pour glib-2.0)
 
-find_package (OpenCASCADE 7.1.0 REQUIRED)
+find_package (OpenCASCADE REQUIRED)
 
 set (ALL_TARGETS Core)
 set_property (TARGET Core PROPERTY VERSION ${CORE_VERSION})

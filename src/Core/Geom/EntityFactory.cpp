@@ -53,7 +53,6 @@
 #include<GProp_GProps.hxx>
 #include <BRepGProp.hxx>
 #include <BRepAlgoAPI_Cut.hxx>
-#include<BRepAlgo_Cut.hxx>
 #include <gp_Pln.hxx>
 #include <gp_Vec.hxx>
 #include <gp_Dir.hxx>
@@ -226,7 +225,8 @@ Surface* EntityFactory::newSurfaceByCopyWithOffset(Surface* E, const double& off
 			CHECK_NULL_PTR_ERROR(current_rep);
 			TopoDS_Shape sh = *(current_rep->getShapePtr());
 
-			BRepOffsetAPI_MakeOffsetShape MF(sh, offset,
+			BRepOffsetAPI_MakeOffsetShape MF;
+			MF.PerformByJoin(sh, offset,
 					Utils::Math::MgxNumeric::mgxDoubleEpsilon);
 
 			TopoDS_Shape aShape;

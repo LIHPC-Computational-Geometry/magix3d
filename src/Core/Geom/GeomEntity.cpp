@@ -458,7 +458,7 @@ getDescription (bool alsoComputed) const
     	OCCGeomRepresentation* rep1 = dynamic_cast<OCCGeomRepresentation*>(reps[i]);
     	if (rep1){
     		TopoDS_Shape sh1 = rep1->getShape();
-    		int hc = sh1.HashCode(INT_MAX);
+    		int hc = std::hash<TopoDS_Shape> {}(sh1);
     		occGeomDescription.addProperty (
     				Utils::SerializedRepresentation::Property ("HashCode", (long int)hc));
     		TDF_Label label = rep1->getLabel();
