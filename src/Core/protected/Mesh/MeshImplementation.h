@@ -232,10 +232,6 @@ private:
     /// Création d'un maillage triangulaire de Delaunay pour une face commune (version GMSH)
     virtual void meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo::CoFace* fa);
 
-    /// Création d'un maillage quadrangulaire non structuré pour une face commune
-    virtual void meshQuadPairing(Mesh::CommandCreateMesh* command, Topo::CoFace* fa);
-
-
     /** Création des coordonnées internes d'un quadrangle déformé, par méthode transfinie
         @param nbBrasI nombre de bras dans la première direction pour ce contour
         @param nbBrasJ nombrede bras  dans la deuxième direction pour ce contour
@@ -341,8 +337,6 @@ private:
             Utils::Math::Point axis2,
             uint dir);
 
-
-
     /// calcul la distance normalisée entre un des points et le premier
     void _calculDistances(Utils::Math::Point* l_points, uint indDep, uint increment, uint nbBras, double* ui);
 
@@ -352,12 +346,6 @@ private:
     void _calculDistancesJfixe(Utils::Math::Point* uij, uint indCoord, uint nbNoeudsI, uint nbNoeudsJ);
     /// met à val une des coordonnées
     void _setToVal(Utils::Math::Point* uij, uint indCoord, uint nbNoeudsI, uint nbNoeudsJ, double val);
-
-    /// ajoute un noeud gmds au sommet gmsh en parcourant les sommets d'une Edge, retourne l'indice du sommet dans l'arête
-    uint _addGMDSVertex2GVertex(Topo::Edge* edge,
-            GVertex* gv1,
-            std::map<gmds::TCellID, MVertex*>& cor_gmdsNode_gmshVertex,
-            std::map<MVertex*, gmds::TCellID>& cor_gmshVertex_gmdsNode);
 
     /** recherche des indices (idxI, idxJ, idxK) d'un noeud parmi ceux d'un bloc structuré
     */
