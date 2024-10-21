@@ -27,6 +27,9 @@
 /// OCC
 #include <TopTools_IndexedMapOfShape.hxx>
 #include <TopExp.hxx>
+#include <TopoDS_Face.hxx>
+#include <TopoDS.hxx>
+#include <BRepAdaptor_Curve.hxx>
 /*----------------------------------------------------------------------------*/
 /// TkUtil
 #include <TkUtil/Exception.h>
@@ -36,23 +39,9 @@
 /*----------------------------------------------------------------------------*/
 /// GMSH
 #ifdef USE_GMSH
-#include "Context.h"
-#include "Options.h"
-#include "GModel.h"
-#include "OCCVertex.h"
-#include "OCCEdge.h"
-#include "GModelIO_OCC.h"
-#include "MVertex.h"
-#include "MLine.h"
-#include "meshGFace.h"
-#include "meshGRegion.h"
-#include "MTriangle.h"
-#include "GmshMessage.h"
-#include "MPoint.h"
-#include "robustPredicates.h"
+#include "gmsh.h"
 #endif
 
-//#define _DEBUG_MESH
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -60,7 +49,6 @@ namespace Mesh {
 /*----------------------------------------------------------------------------*/
 void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo::CoFace* fa)
 {
-
 #ifndef USE_GMSH
 	std::cerr<<"meshDelaunayGMSH not available"<<std::endl;
 	return;
@@ -70,21 +58,24 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
 #endif
 
     gmds::Mesh& gmds_mesh = getGMDSMesh();
-    Msg::ResetErrorCounter();
 
     Topo::FaceMeshingPropertyDelaunayGMSH* prop =
             dynamic_cast<Topo::FaceMeshingPropertyDelaunayGMSH*>(fa->getCoFaceMeshingProperty());
     CHECK_NULL_PTR_ERROR(prop);
 
     // init des options GMSH
-    InitOptions(0);
+    gmsh::initialize();
+    gmsh::logger::start();
 
     // Initialize robust predicates
-    robustPredicates::exactinit();
+    //robustPredicates::exactinit();
 
     // récupération des paramètre utilisateur
-    CTX::instance()->mesh.lcMin = prop->getMin();
-    CTX::instance()->mesh.lcMax = prop->getMax();
+    gmsh::option::setNumber("Mesh.MeshSizeMin", prop->getMin());
+    gmsh::option::setNumber("Mesh.MeshSizeMax", prop->getMax());
+
+    // algo Delaunay
+    gmsh::option::setNumber("Mesh.Algorithm", 5);
 
     //Geometrie de la coface
     Geom::GeomEntity*  geo_entity = fa->getGeomAssociation();
@@ -109,14 +100,28 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
     TopExp::MapShapes(face_shape,TopAbs_EDGE, mapEdgeOfFace);
 
 #ifdef _DEBUG_MESH
-    std::cout <<"=== new GModel"<<std::endl;
+    std::cout <<"=== new gmsh model"<<std::endl;
 #endif
     // construction du modèle GMSH à partir de cette shape OCC
-    GModel* model = new GModel(std::string("GModel_")+fa->getName());
+    gmsh::model::add(std::string("GModel_")+fa->getName());
+    
 #ifdef _DEBUG_MESH
     std::cout <<"=== importOCCShape"<<std::endl;
 #endif
-    model->importOCCShape(&face_shape);
+    gmsh::vectorpair outDimTags;
+    gmsh::model::occ::importShapesNativePointer(&face_shape, outDimTags);
+    //gmsh::model::occ::synchronize();
+
+    // Recherche de la face = seule shape de dimension 2
+    auto it = std::find_if(outDimTags.begin(), outDimTags.end(), [](const std::pair<int, int>& p) {
+        return p.first == 2;
+    });
+    if (it == outDimTags.end()) {
+		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+        message << "L'import de la face OCC dans GMSH a échoué : "<< fa->getName();
+        throw TkUtil::Exception (message);
+    }
+    int gFaceId = it->second;
 
 #ifdef _DEBUG_MESH
     std::cout <<"=== traitement des arêtes de la face "<<fa->getName()<<std::endl;
@@ -125,328 +130,175 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
     std::vector<Topo::Edge* > edges;
     fa->getEdges(edges);
 
-    // correspondance entre noeuds GMDS et GMSH pour éviter les doublons
-    std::map<gmds::TCellID, MVertex*> cor_gmdsNode_gmshVertex;
-    std::map<MVertex*, gmds::TCellID> cor_gmshVertex_gmdsNode;
-    bool have_periodic_edge = false;
+    // Set qui contient tous les noeuds gmds
+    std::set<gmds::TCellID> gmds_node_ids;
 
-    std::map<Topo::Edge*, uint> filtre_edges;
+    gmsh::vectorpair gmsh_point_dim_tags;
 
     for(unsigned int i=0;i<edges.size();i++){
         Topo::Edge* edge =edges[i];
 #ifdef _DEBUG_MESH
         std::cout <<"--Traitement de l'arête "<<edge->getName()<<std::endl;
 #endif
-        std::vector<Topo::Vertex* > v_edge = edge->getVertices();
+        std::vector<Topo::Vertex* > vertices = edge->getVertices();
 
-        // cas d'une arête déjà vue
-        if (filtre_edges[edge] == 1){
-            have_periodic_edge = true;
-            // on passe le traitement de l'arête, elle a déja été vue
-            continue;
-        }
-
-        filtre_edges[edge] += 1;
-
-        if(v_edge.size()!=2){
+        if(vertices.size()!=2){
 			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
             message << "La face  "<< fa->getName()
                     << " ne peut pas être maillée en triangles :\n"
                     <<" une arete est incidente à "
-                    <<v_edge.size()<<" sommets";
+                    <<vertices.size()<<" sommets";
             throw TkUtil::Exception (message);
         }
+ 
+        std::vector<gmds::Node> edge_nodes;
+        edge->getNodes(vertices[0], vertices[1], edge_nodes);
 
-        // récupération de la courbe associée
-        Geom::GeomEntity* ge = edge->getCoEdge(0)->getGeomAssociation();
-        if (ge == 0){
-			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-            message << "L'arête "<< edge->getName()
-                    << " n'est pas projetée, ce cas n'est pas prévu pour le cas GMSH ";
-            throw TkUtil::Exception (message);
-        }
-#ifdef _DEBUG_MESH
-        std::cout <<"    associée à "<<ge->getName()<<" avec "
-        		<<ge->getRefTopo().size()<<" entités topologiques en relation"<<std::endl;
-#endif
-        Geom::Curve* curve = dynamic_cast<Geom::Curve*>(ge);
-        if (curve == 0){
-			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-            message << "L'arête "<< edge->getName()
-                    << " n'est pas projetée sur une courbe, ce qui n'est pas prévu pour le cas GMSH ";
-            throw TkUtil::Exception (message);
-        }
+        std::vector<std::size_t> gmsh_node_tags;
+        gmsh_node_tags.reserve(edge_nodes.size() + 2);
+        std::vector<double> gmsh_node_coords;
+        gmsh_node_coords.reserve(3*edge_nodes.size());
+        std::vector<double> gmsh_parametric_coords;
 
-        Geom::OCCGeomRepresentation* crv_occ_rep =
-                dynamic_cast<Geom::OCCGeomRepresentation*>(curve->getComputationalProperty());
+       // On stoke la liste des noeuds gmds rencontrés dans l'algorithme
+       if (edge_nodes.size() > 0)
+       {
+            gmds_node_ids.insert(edge_nodes[0].id());
+            gmds_node_ids.insert(edge_nodes[edge_nodes.size() - 1].id());
+       }
 
-        if(crv_occ_rep==0){
-			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-            message << "La face  "
-                    << fa->getName()
-                    << " ne peut pas être maillée en triangles : absence de shape OCC pour la courbe "
-                    <<curve->getName();
-            throw TkUtil::Exception (message);
-        }
-
-        TopoDS_Edge tedge = TopoDS::Edge(crv_occ_rep->getShape());
-        TopoDS_Edge edgeInFace;
-        int         edgeIndexInFace=0;
-        for(int j = 1; j <= mapEdgeOfFace.Extent(); j++){
-            TopoDS_Edge ej  = TopoDS::Edge(mapEdgeOfFace(j));
-            if(Geom::OCCGeomRepresentation::areEquals(tedge,ej))
-            {
-                edgeInFace=ej;
-                edgeIndexInFace=j;
-            }
-        }
-
-#ifdef _DEBUG_MESH
-        std::cout<<"*************************************************"<<std::endl;
-        std::cout<<"\t ==> Correspond à l'arête "<<edgeIndexInFace<<" dans la face"<<std::endl;
-#endif
-        BRepAdaptor_Curve curve_adaptor(edgeInFace);
-        double firstInFace = curve_adaptor.FirstParameter();
-        double lastInFace  = curve_adaptor.LastParameter();
-        BRepAdaptor_Curve curve_adaptor2(tedge);
-        double firstInM3D = curve_adaptor2.FirstParameter();
-        double lastInM3D  = curve_adaptor2.LastParameter();
-        bool mustReparamCurve= false;
-        if(firstInFace!=firstInM3D)
-            mustReparamCurve = true;
-
-#ifdef _DEBUG_MESH
-        std::cout<<"\t edge in OCC face -> ("<<firstInFace<<", "<<lastInFace<<")"<<std::endl;
-        std::cout<<"\t edge in M3D model-> ("<<firstInM3D<<", "<<lastInM3D<<")"<<std::endl;
-        std::cout<<"*************************************************"<<std::endl;
-#endif
-        // recherche de la gedge dans le model
-        GEdge* gedge = model->getOCCInternals()->getOCCEdgeByNativePtr(model, tedge);
-
-        if (gedge == 0){
-            // recherche avec notre propre identification de la bonne gedge
-
-            for (GModel::eiter iter = model->firstEdge(); iter != model->lastEdge(); ++iter){
-                GEdge* loc_gedge = *iter;
-
-                OCCEdge* loc_occedge = dynamic_cast<OCCEdge*>(loc_gedge);
-                if (loc_occedge == 0){
-					TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-                    message << "Erreur interne, conversion en  OCCEdge impossible !";
-                    throw TkUtil::Exception (message);
-                }
-
-                TopoDS_Edge loc_tedge = loc_occedge->getTopoDS_Edge();
-
-                if (Geom::OCCGeomRepresentation::areEquals(loc_tedge, tedge))
-                    gedge = loc_gedge;
-            }
-        }
-
-        if (gedge == 0){
-			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-            message << "Pb avec arête "
-                    << edge->getName()
-                    << ", on ne trouve pas de GEdge pour courbe "
-                    <<curve->getName();
-            throw TkUtil::Exception (message);
-        }
-        else {
-#ifdef _DEBUG_MESH
-            std::cout <<"    gedge trouvé... tag "<<gedge->tag()<<std::endl;
-#endif
-
-            // association entre GMSH::GVertex et GMDS::Node
-            GVertex *gv1 = gedge->getBeginVertex();
-            uint ind1 = _addGMDSVertex2GVertex(edge, gv1, cor_gmdsNode_gmshVertex, cor_gmshVertex_gmdsNode);
-            if (!gedge->periodic(0)){
-                GVertex *gv2 = gedge->getEndVertex();
-                _addGMDSVertex2GVertex(edge, gv2, cor_gmdsNode_gmshVertex, cor_gmshVertex_gmdsNode);
-            }
-            else {
-#ifdef _DEBUG_MESH
-                std::cout <<"  gedge périodique"<<std::endl;
-#endif
-            }
-            std::vector<MVertex*> &mesh_vertices = gedge->mesh_vertices ;
-            std::vector<MLine*> &lines = gedge->lines ;
-
-            std::vector<gmds::Node> edge_nodes;
-            if (ind1 == 0)
-                edge->getNodes(v_edge[0], v_edge[1], edge_nodes);
-            else{
-                edge->getNodes(v_edge[1], v_edge[0], edge_nodes);
-
-            }
-
-#ifdef _DEBUG_MESH
-            std::cout <<"    nombre de noeuds: "<<edge_nodes.size()<<std::endl;
-            std::cout <<"    gedge->getBeginVertex() en "
-                    <<gedge->getBeginVertex()->x()<<", "
-                    <<gedge->getBeginVertex()->y()<<", "
-                    <<gedge->getBeginVertex()->z()<<std::endl;
-            std::cout <<"    gedge->getEndVertex() en "
-                    <<gedge->getEndVertex()->x()<<", "
-                    <<gedge->getEndVertex()->y()<<", "
-                    <<gedge->getEndVertex()->z()<<std::endl;
-            std::cout <<"    v_edge[0] en "
-                    <<v_edge[0]->getX()<<", "
-                    <<v_edge[0]->getY()<<", "
-                    <<v_edge[0]->getZ()<<std::endl;
-            std::cout <<"    v_edge[1] en "
-                    <<v_edge[1]->getX()<<", "
-                    <<v_edge[1]->getY()<<", "
-                    <<v_edge[1]->getZ()<<std::endl;
-#endif
-
-
-            for (uint j=1; j<edge_nodes.size()-1; j++){
-                //MVertex* mvtx = cor_gmdsNode_gmshVertex[edge_nodes[j]];
-                //if (mvtx == 0){
-                gmds::Node nd = edge_nodes[j];
-
-                    Utils::Math::Point pt = getCoordNode(nd);
-
-                    double param = 0.0;
-//                    if(mustReparamCurve){
-                        // on doit utiliser une paramétrisation
-                        // propre à la courbe locale à la face et non au
-                        // modèle M3D
-                        Geom::OCCGeomRepresentation::getParameterOnTopoDSEdge(
-                                edgeInFace, pt,param);
-//                    }
-//                    else
-//                        crv_occ_rep->getParameter(pt, param, curve);
-
-                    MVertex* mvtx = new MEdgeVertex(pt.getX(), pt.getY(),pt.getZ(), gedge, param);
-
-                    cor_gmdsNode_gmshVertex[nd.id()] = mvtx;
-                    cor_gmshVertex_gmdsNode[mvtx] = nd.id();
-
-                    mesh_vertices.push_back(mvtx);
-                //}
-            }
-
-            for (uint j=0; j<edge_nodes.size()-1; j++){
-                MVertex* mvtx1 = cor_gmdsNode_gmshVertex[edge_nodes[j].id()];
-                MVertex* mvtx2 = cor_gmdsNode_gmshVertex[edge_nodes[j+1].id()];
-                lines.push_back(new MLine(mvtx1, mvtx2));
-            }
-#ifdef _DEBUG_MESH
-            gedge->meshStatistics.status = GEdge::DONE;
-            std::cout<<"========================================="<<std::endl;
-            std::cout<<"========================================="<<std::endl;
-            for(unsigned int k=0; k<lines.size();k++){
-                MLine* l = lines[k];
-                MVertex * v0 = l->getVertex(0);
-                MVertex * v1 = l->getVertex(1);
-                std::cout<<"Edge "<<k<<": "<<v0->getNum()<<", "<<v1->getNum()<<" de "
-                        <<"("<<v0->x()<<", "<<v0->y()<<", "<<v0->z()<<")"
-                        <<"("<<v1->x()<<", "<<v1->y()<<", "<<v1->z()<<") - ";
-
-                if(dynamic_cast<MEdgeVertex*>(v0)!=0){
-                    double p;
-                    dynamic_cast<MEdgeVertex*>(v0)->getParameter(0,p);
-                    std::cout<<"curve param 0 :"<<p<<" - ";
-                }
-
-                if(dynamic_cast<MEdgeVertex*>(v1)!=0){
-                    double p;
-                    dynamic_cast<MEdgeVertex*>(v1)->getParameter(0,p);
-                    std::cout<<"curve param 1 :"<<p;
-                }
-
-                std::cout<<std::endl;
-            }
-            std::cout<<"========================================="<<std::endl;
-            std::cout<<"========================================="<<std::endl;
-#endif
+        // Création des noeuds internes
+       for (uint j=1; j<edge_nodes.size()-1; j++)
+       {
+            gmds::Node nd = edge_nodes[j];
+            gmds_node_ids.insert(nd.id());
+            Utils::Math::Point pt = getCoordNode(nd);
+            int gmsh_point_tag = gmsh::model::occ::addPoint(pt.getX(), pt.getY(), pt.getZ());
+            std::cout << "Noeud " << j << " de coord " << pt  << std::endl;
+            gmsh_point_dim_tags.push_back({0, gmsh_point_tag});
         }
     } // end for(unsigned int i=0;i<edges.size();i++)
 
+    gmsh::vectorpair gmsh_entities_dim_tags;
+    gmsh::model::occ::getEntities(gmsh_entities_dim_tags);
+    gmsh::vectorpair out_dim_tags;
+    std::vector<gmsh::vectorpair> out_dim_tags_map;
+    gmsh::model::occ::fragment(gmsh_point_dim_tags, gmsh_entities_dim_tags, out_dim_tags, out_dim_tags_map);
 
-    // appel à GMSH pour mailler la surface
-    for(GModel::fiter it = model->firstFace(); it != model->lastFace(); ++it)
+    gmsh::model::occ::synchronize();
+
+    gmsh_entities_dim_tags.clear();
+    gmsh::model::occ::getEntities(gmsh_entities_dim_tags, 1);
+    for (auto dt : gmsh_entities_dim_tags)
     {
-        if (have_periodic_edge){
-#ifdef _DEBUG_MESH
-            std::cout<<"appel à meshGeneratorPeriodic"<<std::endl;
-#endif
-            meshGeneratorPeriodic(*it, // la GFace
-                    false); // debug
-        }
-        else {
-#ifdef _DEBUG_MESH
-            std::cout<<"appel à meshGenerator"<<std::endl;
-#endif
-            meshGenerator(*it, // la GFace
-                    0,     // RECUR_ITER
-                    false, // repairSelfIntersecting1dMesh
-                    false, // onlyInitialMesh
-                    false, // debug
-                    0);    // replacement_edges (list)
-        }
-
-        if (Msg::GetErrorCount()){
-			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-            message << "GMSH sort en erreur (ErrorCount : "
-                    << (short)Msg::GetErrorCount()
-                    << ") pour la face commune topologique "
-                    << fa->getName();
-            throw TkUtil::Exception (message);
-        }
-
-        // récupération du maillage pour le passer de gmsh à gmds
-        std::vector<MTriangle*>& triangles = (*it)->triangles;
-
-#ifdef _DEBUG_MESH
-        std::cout<<"###################################################"<<std::endl;
-        std::cout<<"###################################################"<<std::endl;
-        std::cout<<"triangles.size() = "<<triangles.size()<<std::endl;
-#endif
-        std::vector<gmds::TCellID>& fa_node_ids = fa->nodes();
-        std::vector<gmds::TCellID>& fa_face_ids = fa->faces();
-        for (uint i=0; i<triangles.size(); i++){
-            MTriangle* tri = triangles[i];
-            for (uint j=0; j<3; j++){
-                MVertex* mvtx = tri->getVertex(j);
-#ifdef _DEBUG_MESH
-              std::cout<<"Creation of ("<<mvtx->x()<<", "<<mvtx->y()<<", "<<mvtx->z()<<")"<<std::endl;
-#endif
-                gmds::Node nd;
-
-                if(cor_gmshVertex_gmdsNode.find(mvtx)==cor_gmshVertex_gmdsNode.end())
-                {
-                    nd = getGMDSMesh().newNode(mvtx->x(), mvtx->y(), mvtx->z());
-                    fa_node_ids.push_back(nd.id());
-                    command->addCreatedNode(nd.id());
-                    cor_gmshVertex_gmdsNode[mvtx] = nd.id();
-                }
-                else
-                    nd = gmds_mesh.get<gmds::Node>(cor_gmshVertex_gmdsNode[mvtx]);
-            }
-            gmds::TCellID n1 = cor_gmshVertex_gmdsNode[tri->getVertex(0)];
-            gmds::TCellID n2 = cor_gmshVertex_gmdsNode[tri->getVertex(1)];
-            gmds::TCellID n3 = cor_gmshVertex_gmdsNode[tri->getVertex(2)];
-#ifdef _DEBUG_MESH
-            std::cout<<" triangle: "<<std::endl;
-            gmds::Node node1 = gmds_mesh.get<gmds::Node>(n1);
-            gmds::Node node2 = gmds_mesh.get<gmds::Node>(n2);
-            gmds::Node node3 = gmds_mesh.get<gmds::Node>(n3);
-            std::cout<<"  node 1 : "<<node1.X()<<", "<<node1.Y()<<", "<<node1.Z()<<std::endl;
-            std::cout<<"  node 2 : "<<node2.X()<<", "<<node2.Y()<<", "<<node2.Z()<<std::endl;
-            std::cout<<"  node 3 : "<<node3.X()<<", "<<node3.Y()<<", "<<node3.Z()<<std::endl;
-#endif
-
-            gmds::Face t1 = getGMDSMesh().newTriangle(n1,n2,n3);
-            fa_face_ids.push_back(t1.id());
-            command->addCreatedFace(t1.id());
-        }
+        int lineId = dt.second;
+        std::string type;
+        gmsh::model::getType(1, dt.second, type);  // 1 pour dimension 1
+        if (type == "Line")
+            gmsh::model::mesh::setTransfiniteCurve(dt.second, 2);
     }
 
-    // nettoyage mémoire de ce qui a servi à GMSH
-    delete model;
+    gmsh::model::mesh::generate(2);
 
+    std::string error;
+    gmsh::logger::getLastError(error);
+    if (!error.empty()){
+        TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+        message << "GMSH sort en erreur (lastError : "
+                << error 
+                << ") pour la face commune topologique "
+                << fa->getName();
+        throw TkUtil::Exception (message);
+    }
+
+    // récupération du maillage pour le passer de gmsh à gmds
+
+    std::vector<int> gmsh_elt_types;                      // Types des éléments
+    std::vector<std::vector<std::size_t>> gmsh_elt_tags;  // Tags des éléments
+    std::vector<std::vector<std::size_t>> gmsh_elt_node_tags; // Connectivité des éléments (les indices des nœuds)
+
+    // Récupérer les éléments de la dimension 2 (triangles, quadrangles, etc.)
+    gmsh::model::mesh::getElements(gmsh_elt_types, gmsh_elt_tags, gmsh_elt_node_tags, 2);
+
+    // correspondance entre noeuds internes GMSH et GMDS pour éviter les doublons
+    std::map<std::size_t, gmds::TCellID> gmshNodeTag_to_gmdsCellId;
+
+    for (std::size_t i = 0; i < gmsh_elt_types.size(); ++i) {
+        if (gmsh_elt_types[i] == 2) {  // Le type 2 correspond aux triangles linéaires
+#ifdef _DEBUG_MESH
+            std::cout << "Triangles found, number of elements: " << gmsh_elt_tags[i].size() << std::endl;
+#endif
+
+            std::vector<gmds::TCellID>& fa_node_ids = fa->nodes();
+            std::vector<gmds::TCellID>& fa_face_ids = fa->faces();
+            for (std::size_t j = 0; j < gmsh_elt_node_tags[i].size(); j += 3) {
+                gmds::TCellID tcellids[3];
+                for (std::size_t k = 0; k < 3; ++k) {
+                    size_t gmsh_node_tag = gmsh_elt_node_tags[i][j+k];
+
+                    gmds::TCellID gmds_node_id = -1;
+
+                    auto iter =  gmshNodeTag_to_gmdsCellId.find(gmsh_node_tag);
+                    if (iter == gmshNodeTag_to_gmdsCellId.end())
+                    {
+                        // Coordonnées du noeud GMSH
+                        std::vector<double> coord;
+                        std::vector<double> parametricCoord;
+                        int dim, tag;
+                        gmsh::model::mesh::getNode(gmsh_node_tag, coord, parametricCoord, dim, tag);
+                        Utils::Math::Point gmsh_point(coord[0], coord[1], coord[2]);
+
+                        const double precision = Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon;
+                        
+                        // Recherche du noeud GMDS correspondant
+                        gmds::Mesh& gmds_mesh = getGMDSMesh();
+                        for (auto node_id : gmds_node_ids)
+                        {
+                            gmds::Node nd = gmds_mesh.get<gmds::Node>(node_id);
+                            Utils::Math::Point gmds_point(nd.X(), nd.Y(), nd.Z());
+                            double dist = gmds_point.length(gmsh_point);
+                            if (dist < precision)
+                            {
+                                gmds_node_id = node_id;
+                                gmshNodeTag_to_gmdsCellId[gmsh_node_tag] = node_id;
+                                break;
+                            }
+                        }
+
+                        // Le noeud GMDS n'existait pas, il faut le créer
+                        if (gmds_node_id == -1)
+                        {
+                            gmds_node_id = getGMDSMesh().newNode(coord[0], coord[1], coord[2]).id();
+                            gmshNodeTag_to_gmdsCellId[gmsh_node_tag] = gmds_node_id;
+                            fa_node_ids.push_back(gmds_node_id);
+                            command->addCreatedNode(gmds_node_id);
+                        }
+                    }
+                    else
+                        gmds_node_id = iter->second;
+                }
+                gmds::TCellID n1 = gmshNodeTag_to_gmdsCellId[gmsh_elt_node_tags[i][j]];
+                gmds::TCellID n2 = gmshNodeTag_to_gmdsCellId[gmsh_elt_node_tags[i][j+1]];
+                gmds::TCellID n3 = gmshNodeTag_to_gmdsCellId[gmsh_elt_node_tags[i][j+2]];
+
+#ifdef _DEBUG_MESH
+                std::cout<<" triangle: "<<std::endl;
+                gmds::Node node1 = gmds_mesh.get<gmds::Node>(n1);
+                gmds::Node node2 = gmds_mesh.get<gmds::Node>(n2);
+                gmds::Node node3 = gmds_mesh.get<gmds::Node>(n3);
+                std::cout<<"  node 1 : "<<node1.X()<<", "<<node1.Y()<<", "<<node1.Z()<<std::endl;
+                std::cout<<"  node 2 : "<<node2.X()<<", "<<node2.Y()<<", "<<node2.Z()<<std::endl;
+                std::cout<<"  node 3 : "<<node3.X()<<", "<<node3.Y()<<", "<<node3.Z()<<std::endl;
+#endif
+
+                gmds::Face t1 = getGMDSMesh().newTriangle(n1, n2, n3);
+                fa_face_ids.push_back(t1.id());
+                command->addCreatedFace(t1.id());
+            }
+        }
+    }
+    // nettoyage mémoire de ce qui a servi à GMSH
+    gmsh::model::remove();
 
     std::vector<std::string> groupsName;
     fa->getGroupsName(groupsName);
@@ -473,69 +325,18 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
         sf->addCoFace(fa);
     } // end for i<groupsName.size()
 
-
 #ifdef _DEBUG_MESH
-  //  writeMli("/tmp/brieree/toto.mli");
+    // Inspect the log:
+    std::vector<std::string> log;
+    gmsh::logger::get(log);
+    std::cout << "Logger has recorded " << log.size() << " lines" << std::endl;
 #endif
 
-} // end meshDelaunayGMSH
-/*----------------------------------------------------------------------------*/
-uint MeshImplementation::_addGMDSVertex2GVertex(Topo::Edge* edge,
-        GVertex* gv1,
-        std::map<gmds::TCellID, MVertex*>& cor_gmdsNode_gmshVertex,
-        std::map<MVertex*, gmds::TCellID>& cor_gmshVertex_gmdsNode)
-{
-	// on cherche le sommet magix correspondant
-    std::vector<Topo::Vertex*> vertices;
-    edge->getVertices(vertices);
-    Topo::Vertex* vertex = 0;
-    uint ind = 0;
-    uint ind_vtx = 0;
-    //coordonnées du point recherché
-    Utils::Math::Point p1(gv1->point().x(), gv1->point().y(), gv1->point().z());
-    //std::cout<<setprecision(14)<<"MeshImplementation::_addGMDSVertex2GVertex, p1 = "<<p1<<std::endl;
-
-    //std::cout<<"MeshImplementation::_addGMDSVertex2GVertex pour edge "<<edge->getName()<<"  avec "<<vertices.size()<<" sommets"<<std::endl;
-    for (std::vector<Topo::Vertex*>::const_iterator iter = vertices.begin();
-            iter != vertices.end(); ++iter, ++ind){
-        //pb de epsilon ??
-        Utils::Math::Point currentPnt = (*iter)->getCoord();
-        double dist = currentPnt.length(p1);
-        //std::cout<<setprecision(14)<<" currentPnt = "<<currentPnt<<", dist = "<<dist<<std::endl;
-        double precision = Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon;
-        if ((*iter)->getGeomAssociation())
-        	precision = (*iter)->getGeomAssociation()->getComputationalProperty()->getPrecision();
-        if ( dist <= precision ){
-            vertex = *iter;
-            ind_vtx = ind;
-        }
-    }
-    if (vertex == 0){
-		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-        message << "Pb avec arête "<< edge->getName()
-                << ", on ne trouve pas de sommet correspondant au point géométrique ("
-                <<gv1->point().x()<<", "<<gv1->point().y()<<", "<<gv1->point().z()<<")";
-        throw TkUtil::Exception (message);
-    }
-    else {
-        std::vector<gmds::Node> edge_nodes;
-        gmds::TCellID nd = vertex->getNode();
-        MVertex* mvtx = cor_gmdsNode_gmshVertex[nd];
-        if (mvtx == 0){
-            //Utils::Math::Point pt = getCoordNode(nd);
-            gmds::Node node = getGMDSMesh().get<gmds::Node>(nd);
-            mvtx = new MVertex( node.X(), node.Y(), node.Z(), gv1, 0);
-
-            cor_gmdsNode_gmshVertex[nd] = mvtx;
-            cor_gmshVertex_gmdsNode[mvtx] = nd;
-
-            gv1->addMeshVertex(mvtx);
-            gv1->points.push_back(new MPoint(mvtx));
-        }
-    }
-    return ind_vtx;
+    gmsh::logger::stop();
+    gmsh::finalize();
 #endif // USE_GMSH
-} // end _addGMDSVertex2GVertex
+} // end meshDelaunayGMSH
+
 /*----------------------------------------------------------------------------*/
 } // end namespace Mesh
 /*----------------------------------------------------------------------------*/
