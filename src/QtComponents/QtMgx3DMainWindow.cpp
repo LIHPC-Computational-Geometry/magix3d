@@ -4399,7 +4399,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 										te->getDisplayProperties().setDisplayed(!displayed);
 										// Puis on réaffecte => forcera l'actualisation de la représentation :
 										if (0 != rer)
-											getGraphicalWidget().getRenderingManager( ).displayRepresentation(*te, displayed, rer->getRepresentationMask());
+											getGraphicalWidget().getRenderingManager( ).displayRepresentation(*te, displayed, rer->getRepresentationMask(), true);
 									}
 
 						if (0 == (i % Resources::instance()._updateRefreshRate.getValue()))

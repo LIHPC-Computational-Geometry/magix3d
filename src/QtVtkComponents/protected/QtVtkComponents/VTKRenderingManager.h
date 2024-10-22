@@ -919,16 +919,12 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 	/**
 	 * Affiche ou détruit la représentation 3D transmise en argument.
 	 * \param		Représentation à afficher ou détruire.
-	 * \param		<I>true</I> s'il faut afficher la représentation,
-	 *				<I>false</I> s'il faut la détruire.
-	 * \param		<I>true</I> s'il faut forcer l'actualisation de la
-	 *				représentation graphique.
-	 * \param		Masque d'affichage de l'entité (cf. 
-	 *				<I>GraphicalEntityRepresentation::CURVES</I> et autres.
+	 * \param		<I>true</I> s'il faut afficher la représentation, <I>false</I> s'il faut la détruire.
+	 * \param		<I>true</I> s'il faut forcer l'actualisation de la représentation graphique.
+	 * \param		<I>true</I> s'il faut forcer l'opération de rendu dans la fenêtre graphique.
+	 * \param		Masque d'affichage de l'entité (cf. <I>GraphicalEntityRepresentation::CURVES</I> et autres.
 	 */
-	virtual void displayRepresentation (
-				Utils::GraphicalEntityRepresentation& representation,
-				bool show, bool forceUpdate, unsigned long mask);
+	virtual void displayRepresentation (Utils::GraphicalEntityRepresentation& representation, bool show, bool forceUpdate, bool forceRender, unsigned long mask);
 
 	/**
 	 * Classe actualisant la vue graphique lors de certains évènements

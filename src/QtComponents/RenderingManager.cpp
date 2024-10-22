@@ -282,24 +282,20 @@ RenderingManager& RenderingManager::ColorTable::getRenderingManager ( )
 // ===========================================================================
 
 
-RenderingManager::DisplayLocker::DisplayLocker (
-								RenderingManager& w, bool forceRenderAtEnd)
+RenderingManager::DisplayLocker::DisplayLocker (RenderingManager& w, bool forceRenderAtEnd)
 	: _3dwidget (&w), _forceRenderAtEnd (forceRenderAtEnd)
 {
 	w.lockDisplay (true);
 }	// RenderingManager::DisplayLocker
 
 
-RenderingManager::DisplayLocker::DisplayLocker (
-									const RenderingManager::DisplayLocker&)
+RenderingManager::DisplayLocker::DisplayLocker (const RenderingManager::DisplayLocker&)
 	: _3dwidget (0), _forceRenderAtEnd (false)
 {
 }	// DisplayLocker::DisplayLocker
 
 
-RenderingManager::DisplayLocker&
-			RenderingManager::DisplayLocker::operator = (
-									const RenderingManager::DisplayLocker&)
+RenderingManager::DisplayLocker& RenderingManager::DisplayLocker::operator = (const RenderingManager::DisplayLocker&)
 {
 	return *this;
 }	// DisplayLocker::operator =
@@ -318,7 +314,7 @@ RenderingManager::DisplayLocker::~DisplayLocker ( )
 // Optimisation visant à gérer les ordres d'affichage par lots.
 // Ex : on a 5000 entités à afficher : on ne provoque des ordres d'actualisation de la vue 3D que toutes les 100 entités affichées.
 #define DECLARE_DISPLAY_LOCKER                                                \
-	unique_ptr<DisplayLocker>	displayLocker (new DisplayLocker (*this));        \
+	unique_ptr<DisplayLocker>	displayLocker (new DisplayLocker (*this));    \
 	size_t					displayLockerLoop	= 0;
 
 // ==============================================================================================================================================================================
@@ -780,8 +776,7 @@ void RenderingManager::addEntities (const vector<Entity*>& entities, bool shown,
 {
 	DECLARE_DISPLAY_LOCKER
 
-	for (vector<Entity*>::const_iterator it = entities.begin ( );
-	     entities.end ( ) != it; it++)
+	for (vector<Entity*>::const_iterator it = entities.begin ( ); entities.end ( ) != it; it++)
 	{
 		addEntity (**it);
 
@@ -792,13 +787,11 @@ void RenderingManager::addEntities (const vector<Entity*>& entities, bool shown,
 
 void RenderingManager::removeEntity (Entity& entity)
 {
-	DisplayProperties::GraphicalRepresentation*	gr	=
-				entity.getDisplayProperties ( ).getGraphicalRepresentation ( );
+	DisplayProperties::GraphicalRepresentation*	gr	= entity.getDisplayProperties ( ).getGraphicalRepresentation ( );
 	if (0 != gr)
 	{
-		GraphicalEntityRepresentation*	ger	=
-							dynamic_cast<GraphicalEntityRepresentation*>(gr);
-		displayRepresentation (*ger, false, false, 0);
+		GraphicalEntityRepresentation*	ger	= dynamic_cast<GraphicalEntityRepresentation*>(gr);
+		displayRepresentation (*ger, false, false, 0, true);
 	}	// if (0 ! = gr)
 }	// RenderingManager::removeEntity
 
@@ -807,8 +800,7 @@ void RenderingManager::removeEntities (const vector<Entity*>& entities, DisplayR
 {
 	DECLARE_DISPLAY_LOCKER
 
-	for (vector<Entity*>::const_iterator it = entities.begin ( );
-	     entities.end ( ) != it; it++)
+	for (vector<Entity*>::const_iterator it = entities.begin ( ); entities.end ( ) != it; it++)
 	{
 		removeEntity (**it);
 
@@ -817,7 +809,7 @@ void RenderingManager::removeEntities (const vector<Entity*>& entities, DisplayR
 }	// RenderingManager::removeEntities
 
 
-void RenderingManager::displayRepresentation (Entity& entity, bool show, unsigned long mask)
+void RenderingManager::displayRepresentation (Entity& entity, bool show, unsigned long mask, bool forceRender)
 {
 	bool	first	= !hasDisplayedRepresentation ( );
 	GraphicalEntityRepresentation*	representation	= getRepresentation(entity);
@@ -827,12 +819,10 @@ void RenderingManager::displayRepresentation (Entity& entity, bool show, unsigne
 
 	if (0 != getSelectionManager ( ))
 		representation->setSelected(getSelectionManager( )->isSelected(entity));
-	bool	forceUpdate	=
-		(true==show) && (false==entity.getDisplayProperties( ).isDisplayed( )) ?
-		true : false;
+	bool	forceUpdate	= (true==show) && (false==entity.getDisplayProperties( ).isDisplayed( )) ? true : false;
 	entity.getDisplayProperties ( ).setDisplayed (show);
 	entity.getDisplayProperties ( ).setGraphicalRepresentation (representation);
-	displayRepresentation (*representation, show, forceUpdate, mask);
+	displayRepresentation (*representation, show, forceUpdate, forceRender, mask);
 
 // resetView inhibé car perd la vue lors du changement de filtre sur le type
 // d'entités affichées (MGXDDD-236).
@@ -841,23 +831,20 @@ void RenderingManager::displayRepresentation (Entity& entity, bool show, unsigne
 }	// RenderingManager::displayRepresentation
 
 
-void RenderingManager::displayRepresentations (
-		const vector<Entity*>& entities, bool show, unsigned long mask,
-		DisplayRepresentation::display_type type)
+void RenderingManager::displayRepresentations (const vector<Entity*>& entities, bool show, unsigned long mask, DisplayRepresentation::display_type type)
 {
 	DECLARE_DISPLAY_LOCKER
 
-	for (vector<Entity*>::const_iterator it = entities.begin ( );
-	     entities.end ( ) != it; it++)
+	size_t	count	= 0;
+	for (vector<Entity*>::const_iterator it = entities.begin ( ); entities.end ( ) != it; it++)
 	{
 		// CP : Nouveau code : on utilise le masque pré-existant s'il y en a un
-		unsigned long	currentMask	=
-			0 == (*it)->getDisplayProperties( ).getGraphicalRepresentation( ) ?
-			mask : (*it)->getDisplayProperties ( ).getGraphicalRepresentation ( )->getRepresentationMask ( );
-		displayRepresentation (**it, show, currentMask);
+		unsigned long	currentMask	= 0 == (*it)->getDisplayProperties( ).getGraphicalRepresentation( ) ? mask : (*it)->getDisplayProperties ( ).getGraphicalRepresentation ( )->getRepresentationMask ( );
+		const bool		forceRender	= ++count % Resources::instance ( )._updateRefreshRate.getValue ( );
+		displayRepresentation (**it, show, currentMask, forceRender);
 
 		EVALUATE_DISPLAY_LOCKER
-	}	// RenderingManager::displayRepresentations
+	}	// for (vector<Entity*>::const_iterator it = entities.begin ( ); entities.end ( ) != it; it++)
 }	// RenderingManager::displayRepresentations
 
 
@@ -867,14 +854,13 @@ void RenderingManager::displayRepresentationsSelectedEntities (bool show)
 
 	vector<Entity*> entities = getContext().getSelectionManager().getEntities();
 
-	for (vector<Entity*>::const_iterator it = entities.begin ( );
-	     entities.end ( ) != it; it++)
+	size_t	count	= 0;
+	for (vector<Entity*>::const_iterator it = entities.begin ( ); entities.end ( ) != it; it++)
 	{
 		// CP : Nouveau code : on utilise le masque pré-existant s'il y en a un
-		unsigned long	currentMask	=
-			0 == (*it)->getDisplayProperties( ).getGraphicalRepresentation( ) ?
-			0 : (*it)->getDisplayProperties ( ).getGraphicalRepresentation ( )->getRepresentationMask ( );
-		displayRepresentation (**it, show, currentMask);
+		unsigned long	currentMask	= 0 == (*it)->getDisplayProperties( ).getGraphicalRepresentation( ) ? 0 : (*it)->getDisplayProperties ( ).getGraphicalRepresentation ( )->getRepresentationMask ( );
+		const bool		forceRender	= ++count % Resources::instance ( )._updateRefreshRate.getValue ( );
+		displayRepresentation (**it, show, currentMask, forceRender);
 
 		EVALUATE_DISPLAY_LOCKER
 	}
@@ -889,8 +875,7 @@ void RenderingManager::displayRepresentations (const vector<GroupEntity*>& group
 	vector<Mesh::MeshEntity*>			meshAddedShown, meshAddedHidden;
 	vector<CoordinateSystem::SysCoord*>		sysCoordAddedShown, sysCoordAddedHidden;
 	vector<Structured::StructuredMeshEntity*>	sMeshAddedShown, sMeshAddedHidden;
-	for (vector<GroupEntity*>::const_iterator itg = groups.begin ( );
-	     groups.end ( ) != itg; itg++)
+	for (vector<GroupEntity*>::const_iterator itg = groups.begin ( ); groups.end ( ) != itg; itg++)
 		if (true == show)
 			groupAddedShown.push_back (*itg);
 		else
@@ -940,8 +925,7 @@ void RenderingManager::updateRepresentation (Mgx3D::Utils::Entity& entity, unsig
 				entity.getDisplayProperties ( ).getGraphicalRepresentation ( );
 	if (0 != gr)
 	{
-		GraphicalEntityRepresentation*	ger	=
-							dynamic_cast<GraphicalEntityRepresentation*>(gr);
+		GraphicalEntityRepresentation*	ger	= dynamic_cast<GraphicalEntityRepresentation*>(gr);
 		CHECK_NULL_PTR_ERROR (ger)
 		unsigned long	mask	= ger->getRepresentationMask ( );
 		// Rem CP : updateRep == true si shrink ou taille flèche modifié
@@ -1443,8 +1427,7 @@ GraphicalEntityRepresentation* RenderingManager::createRepresentation (Entity&)
 }	// RenderingManager::createRepresentation
 
 
-void RenderingManager::displayRepresentation (
-					GraphicalEntityRepresentation&, bool, bool, unsigned long)
+void RenderingManager::displayRepresentation (GraphicalEntityRepresentation&, bool, bool, bool, unsigned long)
 {
 	throw Exception (UTF8String ("RenderingManager::displayRepresentation should be overloaded.", Charset::UTF_8));
 }	// RenderingManager::displayRepresentation
