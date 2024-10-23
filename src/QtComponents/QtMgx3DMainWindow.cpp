@@ -2094,64 +2094,49 @@ void QtMgx3DMainWindow::showReady ( )
 			}    // if (0 != getActions ( )._quitAction)
 
 			_actions._preferencesAction = new QAction(QString::fromUtf8("Préférences ..."), this);
-			connect(_actions._preferencesAction, SIGNAL(triggered()), this,
-			        SLOT(preferencesCallback()), defaultConnectionType);
+			connect(_actions._preferencesAction, SIGNAL(triggered()), this, SLOT(preferencesCallback()), defaultConnectionType);
 			_actions._editSettingsAction = new QAction("Etat de l'IHM ...", this);
-			connect(_actions._editSettingsAction, SIGNAL(triggered()), this,
-			        SLOT(editSettingsCallback()), defaultConnectionType);
+			connect(_actions._editSettingsAction, SIGNAL(triggered()), this, SLOT(editSettingsCallback()), defaultConnectionType);
 			_actions._quitAction = new QAction("Quitter ...", this);
-			connect(_actions._quitAction, SIGNAL(triggered()), this,
-			        SLOT(exitCallback()));
+			connect(_actions._quitAction, SIGNAL(triggered()), this, SLOT(exitCallback()));
 			_actions._quitAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q));
 			_actions._quitAction->setShortcutContext(Qt::ApplicationShortcut);
 
 			// La session :
-			_actions._undoAction =
-					new QtAutoDisablabledAction(
-							QIcon(":/images/undo.png"), "Annuler", this);
-			connect(_actions._undoAction, SIGNAL(triggered()), this,
-			        SLOT(undoCallback()), defaultConnectionType);
+			_actions._undoAction = new QtAutoDisablabledAction(QIcon(":/images/undo.png"), "Annuler", this);
+			connect(_actions._undoAction, SIGNAL(triggered()), this, SLOT(undoCallback()), defaultConnectionType);
 			_actions._undoAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Z));
 			_actions._undoAction->setShortcutContext(Qt::ApplicationShortcut);
-			_actions._redoAction =
-					new QtAutoDisablabledAction(
-							QIcon(":/images/redo.png"), "Refaire", this);
-			connect(_actions._redoAction, SIGNAL(triggered()), this,
-			        SLOT(redoCallback()), defaultConnectionType);
+			_actions._redoAction = new QtAutoDisablabledAction(QIcon(":/images/redo.png"), "Refaire", this);
+			connect(_actions._redoAction, SIGNAL(triggered()), this, SLOT(redoCallback()), defaultConnectionType);
 			_actions._redoAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Y));
 			_actions._redoAction->setShortcutContext(Qt::ApplicationShortcut);
 			_actions._clearAction = new QAction(QString::fromUtf8("Réinitialiser"), this);
-			connect(_actions._clearAction, SIGNAL(triggered()), this,
-			        SLOT(reinitializeCallback()), defaultConnectionType);
+			connect(_actions._clearAction, SIGNAL(triggered()), this, SLOT(reinitializeCallback()), defaultConnectionType);
 			QActionGroup *unitGroup = new QActionGroup(this);
 			unitGroup->setExclusive(true);
 			_actions._meterAction = new QAction("m", this);
 			_actions._meterAction->setCheckable(true);
-			connect(_actions._meterAction, SIGNAL(triggered()), this,
-			        SLOT(unitMeterCallback()), defaultConnectionType);
+			connect(_actions._meterAction, SIGNAL(triggered()), this, SLOT(unitMeterCallback()), defaultConnectionType);
 			unitGroup->addAction(_actions._meterAction);
 			_actions._centimeterAction = new QAction("cm", this);
 			_actions._centimeterAction->setCheckable(true);
-			connect(_actions._centimeterAction, SIGNAL(triggered()), this,
-			        SLOT(unitCentimeterCallback()), defaultConnectionType);
+			connect(_actions._centimeterAction, SIGNAL(triggered()), this, SLOT(unitCentimeterCallback()), defaultConnectionType);
 			unitGroup->addAction(_actions._centimeterAction);
 			_actions._millimeterAction = new QAction("mm", this);
 			_actions._millimeterAction->setCheckable(true);
-			connect(_actions._millimeterAction, SIGNAL(triggered()), this,
-			        SLOT(unitMillimeterCallback()), defaultConnectionType);
+			connect(_actions._millimeterAction, SIGNAL(triggered()), this, SLOT(unitMillimeterCallback()), defaultConnectionType);
 			unitGroup->addAction(_actions._millimeterAction);
 			QString name;
 			name = QtStringHelper::muMin() + "m";
 			_actions._micrometerAction = new QAction(name, this);
 			_actions._micrometerAction->setCheckable(true);
-			connect(_actions._micrometerAction, SIGNAL(triggered()), this,
-			        SLOT(unitMicrometerCallback()), defaultConnectionType);
+			connect(_actions._micrometerAction, SIGNAL(triggered()), this, SLOT(unitMicrometerCallback()), defaultConnectionType);
 			unitGroup->addAction(_actions._micrometerAction);
 			_actions._undefinedUnitAction = new QAction(QString::fromUtf8("unité indéfinie"), this);
 			_actions._undefinedUnitAction->setCheckable(true);
 			_actions._undefinedUnitAction->setEnabled(false);    // sinon exception !
-			connect(_actions._undefinedUnitAction, SIGNAL(triggered()), this,
-			        SLOT(unitUndefinedCallback()), defaultConnectionType);
+			connect(_actions._undefinedUnitAction, SIGNAL(triggered()), this, SLOT(unitUndefinedCallback()), defaultConnectionType);
 			unitGroup->addAction(_actions._undefinedUnitAction);
 			try
 			{
@@ -2181,19 +2166,16 @@ void QtMgx3DMainWindow::showReady ( )
 			landmarkGroup->setExclusive(true);
 			_actions._meshLandmarkAction = new QAction("Maillage", this);
 			_actions._meshLandmarkAction->setCheckable(true);
-			connect(_actions._meshLandmarkAction, SIGNAL(triggered()), this,
-			        SLOT(meshLandmarkCallback()), defaultConnectionType);
+			connect(_actions._meshLandmarkAction, SIGNAL(triggered()), this, SLOT(meshLandmarkCallback()), defaultConnectionType);
 			landmarkGroup->addAction(_actions._meshLandmarkAction);
 			_actions._expRoomLandmarkAction = new QAction(QString::fromUtf8("Chambre expérimentale"), this);
 			_actions._expRoomLandmarkAction->setCheckable(true);
-			connect(_actions._expRoomLandmarkAction, SIGNAL(triggered()), this,
-			        SLOT(expRoomLandmarkCallback()), defaultConnectionType);
+			connect(_actions._expRoomLandmarkAction, SIGNAL(triggered()), this, SLOT(expRoomLandmarkCallback()), defaultConnectionType);
 			landmarkGroup->addAction(_actions._expRoomLandmarkAction);
 			_actions._undefinedLandmarkAction = new QAction(QString::fromUtf8("Indéfini"), this);
 			_actions._undefinedLandmarkAction->setCheckable(true);
 			_actions._undefinedLandmarkAction->setEnabled(false);
-			connect(_actions._undefinedLandmarkAction, SIGNAL(triggered()), this,
-			        SLOT(undefinedLandmarkCallback()), defaultConnectionType);
+			connect(_actions._undefinedLandmarkAction, SIGNAL(triggered()), this, SLOT(undefinedLandmarkCallback()), defaultConnectionType);
 			landmarkGroup->addAction(_actions._undefinedLandmarkAction);
 			try
 			{
@@ -2215,23 +2197,15 @@ void QtMgx3DMainWindow::showReady ( )
 			}
 
 			_actions._mesh2DDimAction = new QAction("Maillage en 2D", this);
-			connect(_actions._mesh2DDimAction, SIGNAL(triggered()), this,
-			        SLOT(mesh2DDimCallback()), defaultConnectionType);
+			connect(_actions._mesh2DDimAction, SIGNAL(triggered()), this, SLOT(mesh2DDimCallback()), defaultConnectionType);
 
-			_actions._importAction =
-					new QtAutoDisablabledAction(
-							QIcon(":/images/import.png"), "Importer ...", this);
+			_actions._importAction = new QtAutoDisablabledAction(QIcon(":/images/import.png"), "Importer ...", this);
 			connect(_actions._importAction, SIGNAL(triggered()), this,
 			        SLOT(importCallback()), defaultConnectionType);
-			_actions._exportAllAction =
-					new QtAutoDisablabledAction(
-							QIcon(":/images/export.png"), "Exporter tout ...", this);
+			_actions._exportAllAction = new QtAutoDisablabledAction(QIcon(":/images/export.png"), "Exporter tout ...", this);
 			connect(_actions._exportAllAction, SIGNAL(triggered()), this,
 			        SLOT(exportAllCallback()), defaultConnectionType);
-			_actions._exportSelectionAction =
-					new QtAutoDisablabledAction(
-							QIcon(":/images/export_selection.png"),
-							QString::fromUtf8("Exporter la CAO sélectionnée ..."), this);
+			_actions._exportSelectionAction = new QtAutoDisablabledAction(QIcon(":/images/export_selection.png"), QString::fromUtf8("Exporter la CAO sélectionnée ..."), this);
 			connect(_actions._exportSelectionAction, SIGNAL(triggered()), this, SLOT(exportSelectionCallback()), defaultConnectionType);
 			_actions._saveMagix3DScriptAction = new QtAutoDisablabledAction(QIcon(":/images/export_mgx3d_script.png"), "Enregistrer le script Magix 3D minimum ...", this);
 			_actions._saveMagix3DScriptAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
@@ -2252,74 +2226,38 @@ void QtMgx3DMainWindow::showReady ( )
 			connect(_actions._executePythonScriptAction, SIGNAL(triggered()), this, SLOT(executePythonScriptCallback()), defaultConnectionType);
 
 			// La vue 3D :
-			_actions._print3DViewAction =
-					new QAction(QIcon(":/images/print.png"), "Imprimer ...", this);
-			connect(_actions._print3DViewAction, SIGNAL(triggered()), this,
-			        SLOT(print3DViewCallback()), defaultConnectionType);
-			_actions._print3DViewAction->setShortcut(
-					QKeySequence(Qt::CTRL + Qt::Key_P));
+			_actions._print3DViewAction = new QAction(QIcon(":/images/print.png"), "Imprimer ...", this);
+			connect(_actions._print3DViewAction, SIGNAL(triggered()), this, SLOT(print3DViewCallback()), defaultConnectionType);
+			_actions._print3DViewAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
 			_actions._print3DViewAction->setShortcutContext(Qt::ApplicationShortcut);
-			_actions._print3DViewToFileAction =
-					new QAction("Imprimer dans un fichier ...", this);
-			connect(_actions._print3DViewToFileAction, SIGNAL(triggered()), this,
-			        SLOT(print3DViewToFileCallback()), defaultConnectionType);
-			_actions._useGlobalDisplayPropertiesAction =
-					new QAction(
-							QString::fromUtf8("Utilisation des propriétés d'affichage globales"), this);
+			_actions._print3DViewToFileAction = new QAction("Imprimer dans un fichier ...", this);
+			connect(_actions._print3DViewToFileAction, SIGNAL(triggered()), this, SLOT(print3DViewToFileCallback()), defaultConnectionType);
+			_actions._useGlobalDisplayPropertiesAction = new QAction(QString::fromUtf8("Utilisation des propriétés d'affichage globales"), this);
 			_actions._useGlobalDisplayPropertiesAction->setCheckable(true);
 			_actions._useGlobalDisplayPropertiesAction->setChecked(true);
-			connect(_actions._useGlobalDisplayPropertiesAction, SIGNAL(toggled(bool)),
-			        this, SLOT(useGlobalDisplayPropertiesCallback(bool)),
-			        defaultConnectionType);
-			_actions._displayTrihedronAction =
-					new QAction(
-							QIcon(":/images/trihedron.png"), QString::fromUtf8("Afficher le trièdre"), this);
+			connect(_actions._useGlobalDisplayPropertiesAction, SIGNAL(toggled(bool)), this, SLOT(useGlobalDisplayPropertiesCallback(bool)), defaultConnectionType);
+			_actions._displayTrihedronAction = new QAction(QIcon(":/images/trihedron.png"), QString::fromUtf8("Afficher le trièdre"), this);
 			_actions._displayTrihedronAction->setCheckable(true);
-			_actions._displayTrihedronAction->setChecked(
-					Resources::instance()._displayTrihedron.getValue());
-			connect(_actions._displayTrihedronAction, SIGNAL(toggled(bool)), this,
-			        SLOT(displayTrihedronCallback(bool)), defaultConnectionType);
-			_actions._displayLandmarkAction =
-					new QAction(
-							QIcon(":/images/landmark.png"), QString::fromUtf8("Afficher le repère"), this);
+			_actions._displayTrihedronAction->setChecked(Resources::instance()._displayTrihedron.getValue());
+			connect(_actions._displayTrihedronAction, SIGNAL(toggled(bool)), this, SLOT(displayTrihedronCallback(bool)), defaultConnectionType);
+			_actions._displayLandmarkAction = new QAction(QIcon(":/images/landmark.png"), QString::fromUtf8("Afficher le repère"), this);
 			_actions._displayLandmarkAction->setCheckable(true);
 			_actions._displayLandmarkAction->setChecked(false);
-			connect(_actions._displayLandmarkAction, SIGNAL(toggled(bool)), this,
-			        SLOT(displayLandmarkCallback(bool)), defaultConnectionType);
-			_actions._parametrizeLandmarkAction =
-					new QAction(QString::fromUtf8("Paramétrer le repère"), this);
-			connect(_actions._parametrizeLandmarkAction, SIGNAL(triggered()), this,
-			        SLOT(parametrizeLandmarkCallback()), defaultConnectionType);
-			_actions._displayFocalPointAction =
-					new QAction(
-							QIcon(":/images/focal_cross.png"), "Afficher le point focal",
-							this);
+			connect(_actions._displayLandmarkAction, SIGNAL(toggled(bool)), this, SLOT(displayLandmarkCallback(bool)), defaultConnectionType);
+			_actions._parametrizeLandmarkAction = new QAction(QString::fromUtf8("Paramétrer le repère"), this);
+			connect(_actions._parametrizeLandmarkAction, SIGNAL(triggered()), this, SLOT(parametrizeLandmarkCallback()), defaultConnectionType);
+			_actions._displayFocalPointAction = new QAction(QIcon(":/images/focal_cross.png"), "Afficher le point focal", this);
 			_actions._displayFocalPointAction->setCheckable(true);
-			_actions._displayFocalPointAction->setChecked(
-					Resources::instance()._displayFocalPoint.getValue());
-			connect(_actions._displayFocalPointAction, SIGNAL(toggled(bool)), this,
-			        SLOT(displayFocalPointCrossCallback(bool)),
-			        defaultConnectionType);
-			_actions._xOyViewAction =
-					new QAction(QIcon(":/images/trihedron_xOy.png"),
-					            "Afficher la vue du plan xOy", this);
-			connect(_actions._xOyViewAction, SIGNAL(triggered()), this,
-			        SLOT(xOyViewPlaneCallback()), defaultConnectionType);
-			_actions._xOzViewAction =
-					new QAction(QIcon(":/images/trihedron_xOz.png"),
-					            "Afficher la vue du plan xOz", this);
-			connect(_actions._xOzViewAction, SIGNAL(triggered()), this,
-			        SLOT(xOzViewPlaneCallback()), defaultConnectionType);
-			_actions._yOzViewAction =
-					new QAction(QIcon(":/images/trihedron_yOz.png"),
-					            "Afficher la vue du plan yOz", this);
-			connect(_actions._yOzViewAction, SIGNAL(triggered()), this,
-			        SLOT(yOzViewPlaneCallback()), defaultConnectionType);
-			_actions._resetViewAction =
-					new QAction(QIcon(":/images/reset_view.png"),
-					            "Recadrer la vue", this);
-			connect(_actions._resetViewAction, SIGNAL(triggered()), this,
-			        SLOT(resetViewCallback()), defaultConnectionType);
+			_actions._displayFocalPointAction->setChecked(Resources::instance()._displayFocalPoint.getValue());
+			connect(_actions._displayFocalPointAction, SIGNAL(toggled(bool)), this, SLOT(displayFocalPointCrossCallback(bool)), defaultConnectionType);
+			_actions._xOyViewAction = new QAction(QIcon(":/images/trihedron_xOy.png"), "Afficher la vue du plan xOy", this);
+			connect(_actions._xOyViewAction, SIGNAL(triggered()), this, SLOT(xOyViewPlaneCallback()), defaultConnectionType);
+			_actions._xOzViewAction = new QAction(QIcon(":/images/trihedron_xOz.png"), "Afficher la vue du plan xOz", this);
+			connect(_actions._xOzViewAction, SIGNAL(triggered()), this, SLOT(xOzViewPlaneCallback()), defaultConnectionType);
+			_actions._yOzViewAction = new QAction(QIcon(":/images/trihedron_yOz.png"), "Afficher la vue du plan yOz", this);
+			connect(_actions._yOzViewAction, SIGNAL(triggered()), this, SLOT(yOzViewPlaneCallback()), defaultConnectionType);
+			_actions._resetViewAction = new QAction(QIcon(":/images/reset_view.png"), "Recadrer la vue", this);
+			connect(_actions._resetViewAction, SIGNAL(triggered()), this, SLOT(resetViewCallback()), defaultConnectionType);
 
 			_actions._clearViewAction = new QAction("Vider la vue", this);
 			connect(_actions._clearViewAction, SIGNAL(triggered()), this, SLOT(clearViewCallback()), defaultConnectionType);
@@ -2330,208 +2268,117 @@ void QtMgx3DMainWindow::showReady ( )
 			_actions._parallelViewAction = new QAction(QString::fromUtf8("Projection parallèle"), this);
 			_actions._parallelViewAction->setCheckable(true);
 			_actions._parallelViewAction->setChecked(false);
-			connect(_actions._parallelViewAction, SIGNAL(toggled(bool)), this,
-			        SLOT(parallelProjectionCallback(bool)),
-			        defaultConnectionType);
+			connect(_actions._parallelViewAction, SIGNAL(toggled(bool)), this, SLOT(parallelProjectionCallback(bool)), defaultConnectionType);
 			_actions._displayLookupTableAction = new QAction(QIcon(":/images/lookup_table.png"), "Afficher la table de couleurs", this);
 			_actions._displayLookupTableAction->setCheckable(true);
-			connect(_actions._displayLookupTableAction, SIGNAL(toggled(bool)), this,
-			        SLOT(displayLookupTableCallback()), defaultConnectionType);
-			_actions._displayLookupTableEditorAction =
-					new QAction(QIcon(":/images/lookup_table_editor.png"),
-					            QString::fromUtf8("Afficher l'éditeur de tables de couleurs"), this);
-			connect(_actions._displayLookupTableEditorAction,
-			        SIGNAL(triggered()), this,
-			        SLOT(displayLookupTableEditorCallback()), defaultConnectionType);
+			connect(_actions._displayLookupTableAction, SIGNAL(toggled(bool)), this, SLOT(displayLookupTableCallback()), defaultConnectionType);
+			_actions._displayLookupTableEditorAction = new QAction(QIcon(":/images/lookup_table_editor.png"), QString::fromUtf8("Afficher l'éditeur de tables de couleurs"), this);
+			connect(_actions._displayLookupTableEditorAction, SIGNAL(triggered()), this, SLOT(displayLookupTableEditorCallback()), defaultConnectionType);
 
 			// La CAO :
 
 			// La Topologie
-			_actions._topoRefineAction =
-					new QAction(QString::fromUtf8("Raffiner la discrétisation des arêtes ..."), this);
-			connect(_actions._topoRefineAction, SIGNAL(triggered()), this,
-			        SLOT(refineTopologyCallback()), defaultConnectionType);
-			_actions._topoSetDefaultNbMeshingEdgesAction =
-					new QAction(QString::fromUtf8("Modifier la discrétisation des arêtes par défaut ..."), this);
-			connect(_actions._topoSetDefaultNbMeshingEdgesAction, SIGNAL(triggered()), this,
-			        SLOT(defaultNbMeshingEdgesCallback()), defaultConnectionType);
+			_actions._topoRefineAction = new QAction(QString::fromUtf8("Raffiner la discrétisation des arêtes ..."), this);
+			connect(_actions._topoRefineAction, SIGNAL(triggered()), this, SLOT(refineTopologyCallback()), defaultConnectionType);
+			_actions._topoSetDefaultNbMeshingEdgesAction = new QAction(QString::fromUtf8("Modifier la discrétisation des arêtes par défaut ..."), this);
+			connect(_actions._topoSetDefaultNbMeshingEdgesAction, SIGNAL(triggered()), this, SLOT(defaultNbMeshingEdgesCallback()), defaultConnectionType);
 #ifdef _DEBUG
-																																	_actions._topoNew3x3BoxesWithTopoAction   =
+			_actions._topoNew3x3BoxesWithTopoAction   =
             new QAction (QString::fromUtf8("Créer une grille de 3 X 3 boites avec les blocs ..."), this);
-    connect (_actions._topoNew3x3BoxesWithTopoAction, SIGNAL (triggered ( )), this,
-            SLOT (new3x3BoxesWithTopoCallback ( )), defaultConnectionType);
+			connect (_actions._topoNew3x3BoxesWithTopoAction, SIGNAL (triggered ( )), this, SLOT (new3x3BoxesWithTopoCallback ( )), defaultConnectionType);
 #endif
-			_actions._topoOptimMeshMethod =
-					new QAction(QString::fromUtf8("Optimise la méthode de maillage"), this);
-			connect(_actions._topoOptimMeshMethod, SIGNAL(triggered()), this,
-			        SLOT(optimMeshMethodCallback()), defaultConnectionType);
-			_actions._topoInformationAction =
-					new QAction("Informations sur la topologie", this);
-			connect(_actions._topoInformationAction, SIGNAL(triggered()), this,
-			        SLOT(addTopoInformationCallback()), defaultConnectionType);
-
+			_actions._topoOptimMeshMethod = new QAction(QString::fromUtf8("Optimise la méthode de maillage"), this);
+			connect(_actions._topoOptimMeshMethod, SIGNAL(triggered()), this, SLOT(optimMeshMethodCallback()), defaultConnectionType);
+			_actions._topoInformationAction = new QAction("Informations sur la topologie", this);
+			connect(_actions._topoInformationAction, SIGNAL(triggered()), this, SLOT(addTopoInformationCallback()), defaultConnectionType);
 
 			// Le Maillage
-			_actions._meshSelectionAction = new QAction(
-					QIcon(":/images/mesh_selection.png"), QString::fromUtf8("Mailler la sélection ..."),
-					this);
-			connect(_actions._meshSelectionAction, SIGNAL(triggered()), this,
-			        SLOT(meshSelectionCallback()), defaultConnectionType);
-			_actions._meshVisibleAction = new QAction(
-					QIcon(":/images/mesh_visible.png"),
-					"Mailler ce qui est visible ...", this);
-			connect(_actions._meshVisibleAction, SIGNAL(triggered()), this,
-			        SLOT(meshVisibleCallback()), defaultConnectionType);
-			_actions._meshAllAction = new QAction(
-					QIcon(":/images/meshing.png"), "Tout mailler ...", this);
-			connect(_actions._meshAllAction, SIGNAL(triggered()), this,
-			        SLOT(meshAllCallback()), defaultConnectionType);
+			_actions._meshSelectionAction = new QAction(QIcon(":/images/mesh_selection.png"), QString::fromUtf8("Mailler la sélection ..."), this);
+			connect(_actions._meshSelectionAction, SIGNAL(triggered()), this, SLOT(meshSelectionCallback()), defaultConnectionType);
+			_actions._meshVisibleAction = new QAction(QIcon(":/images/mesh_visible.png"), "Mailler ce qui est visible ...", this);
+			connect(_actions._meshVisibleAction, SIGNAL(triggered()), this, SLOT(meshVisibleCallback()), defaultConnectionType);
+			_actions._meshAllAction = new QAction(QIcon(":/images/meshing.png"), "Tout mailler ...", this);
+			connect(_actions._meshAllAction, SIGNAL(triggered()), this, SLOT(meshAllCallback()), defaultConnectionType);
 
-			_actions._unrefineMeshRepresentationAction = new QAction(
-					QString::fromUtf8("Déraffiner ..."), this);
-			connect(_actions._unrefineMeshRepresentationAction, SIGNAL(triggered()),
-			        this, SLOT(unrefineMeshRepresentationCallback()),
-			        defaultConnectionType);
+			_actions._unrefineMeshRepresentationAction = new QAction(QString::fromUtf8("Déraffiner ..."), this);
+			connect(_actions._unrefineMeshRepresentationAction, SIGNAL(triggered()), this, SLOT(unrefineMeshRepresentationCallback()), defaultConnectionType);
 
-			_actions._addMeshExplorerAction =
-					new QAction(QIcon(":/images/sheet_explorer.png"),
-					            "Exploration de feuillets", this);
-			connect(_actions._addMeshExplorerAction, SIGNAL(triggered()), this,
-			        SLOT(addMeshExplorerCallback()), defaultConnectionType);
-			_actions._addMeshQualityAction =
-					new QAction(QIcon(":/images/mesh_quality.png"),
-					            QString::fromUtf8("Evaluation de la qualité du maillage"), this);
-			connect(_actions._addMeshQualityAction, SIGNAL(triggered()), this,
-			        SLOT(addMeshQualityCallback()), defaultConnectionType);
+			_actions._addMeshExplorerAction = new QAction(QIcon(":/images/sheet_explorer.png"), "Exploration de feuillets", this);
+			connect(_actions._addMeshExplorerAction, SIGNAL(triggered()), this, SLOT(addMeshExplorerCallback()), defaultConnectionType);
+			_actions._addMeshQualityAction = new QAction(QIcon(":/images/mesh_quality.png"), QString::fromUtf8("Evaluation de la qualité du maillage"), this);
+			connect(_actions._addMeshQualityAction, SIGNAL(triggered()), this, SLOT(addMeshQualityCallback()), defaultConnectionType);
 
-			_actions._meshInformationAction =
-					new QAction("Informations sur le maillage", this);
-			connect(_actions._meshInformationAction, SIGNAL(triggered()), this,
-			        SLOT(addMeshInformationCallback()), defaultConnectionType);
+			_actions._meshInformationAction = new QAction("Informations sur le maillage", this);
+			connect(_actions._meshInformationAction, SIGNAL(triggered()), this, SLOT(addMeshInformationCallback()), defaultConnectionType);
 
 
 			// La sélection :
-			_actions._displaySelectedGroupsAction =
-					new QAction("Afficher les groupes", this);
-			connect(_actions._displaySelectedGroupsAction, SIGNAL(triggered()), this,
-			        SLOT(displaySelectedGroupsCallback()));
-			_actions._hideSelectedGroupsAction =
-					new QAction("Masquer les groupes", this);
-			connect(_actions._hideSelectedGroupsAction, SIGNAL(triggered()), this,
-			        SLOT(hideSelectedGroupsCallback()));
+			_actions._displaySelectedGroupsAction = new QAction("Afficher les groupes", this);
+			connect(_actions._displaySelectedGroupsAction, SIGNAL(triggered()), this, SLOT(displaySelectedGroupsCallback()));
+			_actions._hideSelectedGroupsAction = new QAction("Masquer les groupes", this);
+			connect(_actions._hideSelectedGroupsAction, SIGNAL(triggered()), this, SLOT(hideSelectedGroupsCallback()));
 
-			_actions._displaySelectedTypesAction =
-					new QAction(QString::fromUtf8("Afficher les entités de types sélectionnés"), this);
-			connect(_actions._displaySelectedTypesAction, SIGNAL(triggered()), this,
-			        SLOT(displaySelectedTypesCallback()));
-			_actions._hideSelectedTypesAction =
-					new QAction(QString::fromUtf8("Masquer les entités de types sélectionnés"), this);
-			connect(_actions._hideSelectedTypesAction, SIGNAL(triggered()), this,
-			        SLOT(hideSelectedTypesCallback()));
+			_actions._displaySelectedTypesAction = new QAction(QString::fromUtf8("Afficher les entités de types sélectionnés"), this);
+			connect(_actions._displaySelectedTypesAction, SIGNAL(triggered()), this, SLOT(displaySelectedTypesCallback()));
+			_actions._hideSelectedTypesAction = new QAction(QString::fromUtf8("Masquer les entités de types sélectionnés"), this);
+			connect(_actions._hideSelectedTypesAction, SIGNAL(triggered()), this, SLOT(hideSelectedTypesCallback()));
 
-			_actions._displaySelectedEntitiesAction =
-					new QAction(QString::fromUtf8("Afficher les entités sélectionnées"), this);
-			connect(_actions._displaySelectedEntitiesAction, SIGNAL(triggered()), this,
-			        SLOT(displaySelectedEntitiesCallback()));
-			_actions._hideSelectedEntitiesAction =
-					new QAction(QString::fromUtf8("Masquer les entités sélectionnées"), this);
-			connect(_actions._hideSelectedEntitiesAction, SIGNAL(triggered()), this,
-			        SLOT(hideSelectedEntitiesCallback()));
-			_actions._displaySelectionPropertiesAction =
-					new QAction(QString::fromUtf8("Afficher les propriétés des entités sélectionnées"), this);
+			_actions._displaySelectedEntitiesAction = new QAction(QString::fromUtf8("Afficher les entités sélectionnées"), this);
+			connect(_actions._displaySelectedEntitiesAction, SIGNAL(triggered()), this, SLOT(displaySelectedEntitiesCallback()));
+			_actions._hideSelectedEntitiesAction = new QAction(QString::fromUtf8("Masquer les entités sélectionnées"), this);
+			connect(_actions._hideSelectedEntitiesAction, SIGNAL(triggered()), this, SLOT(hideSelectedEntitiesCallback()));
+			_actions._displaySelectionPropertiesAction = new QAction(QString::fromUtf8("Afficher les propriétés des entités sélectionnées"), this);
 			_actions._displaySelectionPropertiesAction->setCheckable(true);
 			_actions._displaySelectionPropertiesAction->setChecked(true);
-			connect(_actions._displaySelectionPropertiesAction, SIGNAL(triggered()),
-			        this, SLOT(displaySelectedEntitiesPropertiesCallback()));
-			_actions._displayComputableSelectionPropertiesAction =
-					new QAction(QString::fromUtf8("Afficher les propriétés calculées des entités sélectionnées"), this);
+			connect(_actions._displaySelectionPropertiesAction, SIGNAL(triggered()), this, SLOT(displaySelectedEntitiesPropertiesCallback()));
+			_actions._displayComputableSelectionPropertiesAction = new QAction(QString::fromUtf8("Afficher les propriétés calculées des entités sélectionnées"), this);
 			_actions._displayComputableSelectionPropertiesAction->setCheckable(true);
 			_actions._displayComputableSelectionPropertiesAction->setChecked(false);
-			connect(_actions._displayComputableSelectionPropertiesAction,
-			        SIGNAL(triggered()), this,
-			        SLOT(displaySelectedEntitiesComputablePropertiesCallback()));
+			connect(_actions._displayComputableSelectionPropertiesAction, SIGNAL(triggered()), this, SLOT(displaySelectedEntitiesComputablePropertiesCallback()));
 
-			_actions._selectionRepresentationAction =
-					new QAction(QString::fromUtf8("Représentations ..."), this);
-			connect(_actions._selectionRepresentationAction, SIGNAL(triggered()), this,
-			        SLOT(showRepresentationTypesCallback()));
+			_actions._selectionRepresentationAction = new QAction(QString::fromUtf8("Représentations ..."), this);
+			connect(_actions._selectionRepresentationAction, SIGNAL(triggered()), this, SLOT(showRepresentationTypesCallback()));
 			_actions._selectEntitiesAction = new QAction(QString::fromUtf8("Sélectionner des entités ..."), this);
-			connect(_actions._selectEntitiesAction, SIGNAL(triggered()), this,
-			        SLOT(selectEntitiesCallback()));
-			_actions._selectEntitiesAction->setShortcut(
-					QKeySequence(Qt::CTRL + Qt::Key_F));
+			connect(_actions._selectEntitiesAction, SIGNAL(triggered()), this, SLOT(selectEntitiesCallback()));
+			_actions._selectEntitiesAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
 			_actions._selectEntitiesAction->setShortcutContext(Qt::ApplicationShortcut);
 			_actions._selectVisibleEntitiesAction = new QAction(QString::fromUtf8("Sélectionner les entités visibles"), this);
-			connect(_actions._selectVisibleEntitiesAction, SIGNAL(triggered()),
-			        this, SLOT(selectVisibleEntitiesCallback()));
+			connect(_actions._selectVisibleEntitiesAction, SIGNAL(triggered()), this, SLOT(selectVisibleEntitiesCallback()));
 			_actions._unselectVisibleEntitiesAction = new QAction(QString::fromUtf8("Désélectionner les entités visibles"), this);
-			connect(_actions._unselectVisibleEntitiesAction, SIGNAL(triggered()),
-			        this, SLOT(unselectVisibleEntitiesCallback()));
-			_actions._selectFusableEdgesAction =
-					new QAction(QString::fromUtf8("Sélectionner les arêtes fusionnables"), this);
-			connect(_actions._selectFusableEdgesAction, SIGNAL(triggered()), this,
-			        SLOT(selectFusableEdgesCallback()));
-			_actions._unselectFusableEdgesAction =
-					new QAction(QString::fromUtf8("Désélectionner les arêtes fusionnables"), this);
-			connect(_actions._unselectFusableEdgesAction, SIGNAL(triggered()), this,
-			        SLOT(unselectFusableEdgesCallback()));
-			_actions._selectInvalidEdges =
-					new QAction(QString::fromUtf8("Sélectionner les arêtes invalides"), this);
-			connect(_actions._selectInvalidEdges, SIGNAL(triggered()), this,
-			        SLOT(selectInvalidEdgesCallback()));
-			_actions._unselectInvalidEdges =
-					new QAction(QString::fromUtf8("Désélectionner les arêtes invalides"), this);
-			connect(_actions._unselectInvalidEdges, SIGNAL(triggered()), this,
-			        SLOT(unselectInvalidEdgesCallback()));
+			connect(_actions._unselectVisibleEntitiesAction, SIGNAL(triggered()), this, SLOT(unselectVisibleEntitiesCallback()));
+			_actions._selectFusableEdgesAction = new QAction(QString::fromUtf8("Sélectionner les arêtes fusionnables"), this);
+			connect(_actions._selectFusableEdgesAction, SIGNAL(triggered()), this, SLOT(selectFusableEdgesCallback()));
+			_actions._unselectFusableEdgesAction = new QAction(QString::fromUtf8("Désélectionner les arêtes fusionnables"), this);
+			connect(_actions._unselectFusableEdgesAction, SIGNAL(triggered()), this, SLOT(unselectFusableEdgesCallback()));
+			_actions._selectInvalidEdges = new QAction(QString::fromUtf8("Sélectionner les arêtes invalides"), this);
+			connect(_actions._selectInvalidEdges, SIGNAL(triggered()), this, SLOT(selectInvalidEdgesCallback()));
+			_actions._unselectInvalidEdges = new QAction(QString::fromUtf8("Désélectionner les arêtes invalides"), this);
+			connect(_actions._unselectInvalidEdges, SIGNAL(triggered()), this, SLOT(unselectInvalidEdgesCallback()));
 
-			_actions._selectBorderFacesAction =
-					new QAction(QString::fromUtf8("Sélectionner les faces aux bords"), this);
-			connect(_actions._selectBorderFacesAction, SIGNAL(triggered()), this,
-			        SLOT(selectBorderFacesCallback()));
-			_actions._unselectBorderFacesAction =
-					new QAction(QString::fromUtf8("Désélectionner les faces aux bords"), this);
-			connect(_actions._unselectBorderFacesAction, SIGNAL(triggered()), this,
-			        SLOT(unselectBorderFacesCallback()));
-			_actions._selectFacesWithoutBlockAction =
-					new QAction(QString::fromUtf8("Sélectionner les faces sans blocs"), this);
-			connect(_actions._selectFacesWithoutBlockAction, SIGNAL(triggered()), this,
-			        SLOT(selectFacesWithoutBlockCallback()));
-			_actions._unselectFacesWithoutBlockAction =
-					new QAction(QString::fromUtf8("Désélectionner les faces sans blocs"), this);
-			connect(_actions._unselectFacesWithoutBlockAction, SIGNAL(triggered()), this,
-			        SLOT(unselectFacesWithoutBlockCallback()));
-			_actions._selectSemiConformFacesAction =
-					new QAction(QString::fromUtf8("Sélectionner les faces semi-conformes"), this);
-			connect(_actions._selectSemiConformFacesAction, SIGNAL(triggered()),
-			        this, SLOT(selectSemiConformFacesCallback()));
-			_actions._unselectSemiConformFacesAction =
-					new QAction(QString::fromUtf8("Désélectionner les faces semi-conformes"), this);
-			connect(_actions._unselectSemiConformFacesAction, SIGNAL(triggered()),
-			        this, SLOT(unselectSemiConformFacesCallback()));
-			_actions._selectInvalidFaces =
-					new QAction(QString::fromUtf8("Sélectionner les faces invalides"), this);
-			connect(_actions._selectInvalidFaces, SIGNAL(triggered()),
-			        this, SLOT(selectInvalidFacesCallback()));
-			_actions._unselectInvalidFaces =
-					new QAction(QString::fromUtf8("Désélectionner les faces invalides"), this);
-			connect(_actions._unselectInvalidFaces, SIGNAL(triggered()),
-			        this, SLOT(unselectInvalidFacesCallback()));
-			_actions._selectUnstructuredFaces =
-					new QAction(QString::fromUtf8("Sélectionner les faces non-structuées"), this);
-			connect(_actions._selectUnstructuredFaces, SIGNAL(triggered()),
-			        this, SLOT(selectUnstructuredFacesCallback()));
-			_actions._unselectUnstructuredFaces =
-					new QAction(QString::fromUtf8("Désélectionner les faces non-structuées"), this);
-			connect(_actions._unselectUnstructuredFaces, SIGNAL(triggered()),
-			        this, SLOT(unselectUnstructuredFacesCallback()));
-			_actions._selectTransfiniteFaces =
-					new QAction(QString::fromUtf8("Sélectionner les faces avec méthode transfinie"), this);
-			connect(_actions._selectTransfiniteFaces, SIGNAL(triggered()),
-			        this, SLOT(selectTransfiniteFacesCallback()));
-			_actions._unselectTransfiniteFaces =
-					new QAction(QString::fromUtf8("Désélectionner les faces avec méthode transfinie"), this);
-			connect(_actions._unselectTransfiniteFaces, SIGNAL(triggered()),
-			        this, SLOT(unselectTransfiniteFacesCallback()));
+			_actions._selectBorderFacesAction = new QAction(QString::fromUtf8("Sélectionner les faces aux bords"), this);
+			connect(_actions._selectBorderFacesAction, SIGNAL(triggered()), this, SLOT(selectBorderFacesCallback()));
+			_actions._unselectBorderFacesAction = new QAction(QString::fromUtf8("Désélectionner les faces aux bords"), this);
+			connect(_actions._unselectBorderFacesAction, SIGNAL(triggered()), this, SLOT(unselectBorderFacesCallback()));
+			_actions._selectFacesWithoutBlockAction = new QAction(QString::fromUtf8("Sélectionner les faces sans blocs"), this);
+			connect(_actions._selectFacesWithoutBlockAction, SIGNAL(triggered()), this, SLOT(selectFacesWithoutBlockCallback()));
+			_actions._unselectFacesWithoutBlockAction = new QAction(QString::fromUtf8("Désélectionner les faces sans blocs"), this);
+			connect(_actions._unselectFacesWithoutBlockAction, SIGNAL(triggered()), this, SLOT(unselectFacesWithoutBlockCallback()));
+			_actions._selectSemiConformFacesAction = new QAction(QString::fromUtf8("Sélectionner les faces semi-conformes"), this);
+			connect(_actions._selectSemiConformFacesAction, SIGNAL(triggered()), this, SLOT(selectSemiConformFacesCallback()));
+			_actions._unselectSemiConformFacesAction = new QAction(QString::fromUtf8("Désélectionner les faces semi-conformes"), this);
+			connect(_actions._unselectSemiConformFacesAction, SIGNAL(triggered()), this, SLOT(unselectSemiConformFacesCallback()));
+			_actions._selectInvalidFaces = new QAction(QString::fromUtf8("Sélectionner les faces invalides"), this);
+			connect(_actions._selectInvalidFaces, SIGNAL(triggered()), this, SLOT(selectInvalidFacesCallback()));
+			_actions._unselectInvalidFaces = new QAction(QString::fromUtf8("Désélectionner les faces invalides"), this);
+			connect(_actions._unselectInvalidFaces, SIGNAL(triggered()), this, SLOT(unselectInvalidFacesCallback()));
+			_actions._selectUnstructuredFaces = new QAction(QString::fromUtf8("Sélectionner les faces non-structuées"), this);
+			connect(_actions._selectUnstructuredFaces, SIGNAL(triggered()), this, SLOT(selectUnstructuredFacesCallback()));
+			_actions._unselectUnstructuredFaces = new QAction(QString::fromUtf8("Désélectionner les faces non-structuées"), this);
+			connect(_actions._unselectUnstructuredFaces, SIGNAL(triggered()), this, SLOT(unselectUnstructuredFacesCallback()));
+			_actions._selectTransfiniteFaces = new QAction(QString::fromUtf8("Sélectionner les faces avec méthode transfinie"), this);
+			connect(_actions._selectTransfiniteFaces, SIGNAL(triggered()), this, SLOT(selectTransfiniteFacesCallback()));
+			_actions._unselectTransfiniteFaces = new QAction(QString::fromUtf8("Désélectionner les faces avec méthode transfinie"), this);
+			connect(_actions._unselectTransfiniteFaces, SIGNAL(triggered()), this, SLOT(unselectTransfiniteFacesCallback()));
 
 			_actions._selectInvalidBlocks =
 					new QAction(QString::fromUtf8("Sélectionner les blocs invalides"), this);
@@ -4055,14 +3902,15 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 
 		void QtMgx3DMainWindow::closeEvent(QCloseEvent *event)
 		{
-			if (1 == QMessageBox::warning(this, getAppTitle().c_str(),
-			                              "Souhaitez-vous réellement quitter cette application ?",
-			                              "Oui", "Non", QString::null, 0, -1))
+			if (true == Resources::instance ( )._confirmQuitAction.getValue ( ))
 			{
-				event->ignore();
-				return;
-			}
-
+				if (1 == QMessageBox::warning(this, getAppTitle().c_str ( ), "Souhaitez-vous réellement quitter cette application ?", "Oui", "Non", QString::null, 0, -1))
+				{
+					event->ignore();
+					return;
+				}
+			}	// if (true == Resources::instance ( )._confirmQuitAction.getValue ( ))
+			
 			// On a tendance à quitter Magix 3D via QApplication::exit. S'il y a du python en route ça ne pardonne pas ...
 			if (0 != _pythonPanel)
 				_pythonPanel->setRunningMode (QtPythonConsole::RM_CONTINUOUS);
@@ -4082,8 +3930,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 		{
 			if (0 == _groupsPanel)
 			{
-				INTERNAL_ERROR(exc, "QtMgx3DMainWindow::getGroupsPanel",
-				               "Panneau non instancié.")
+				INTERNAL_ERROR(exc, "QtMgx3DMainWindow::getGroupsPanel", "Panneau non instancié.")
 				throw exc;
 			}    // if (0 == _groupsPanel)
 
@@ -4095,8 +3942,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 		{
 			if (0 == _groupsPanel)
 			{
-				INTERNAL_ERROR(exc, "QtMgx3DMainWindow::getGroupsPanel",
-				               "Panneau non instancié.")
+				INTERNAL_ERROR(exc, "QtMgx3DMainWindow::getGroupsPanel", "Panneau non instancié.")
 				throw exc;
 			}    // if (0 == _groupsPanel)
 
@@ -4108,8 +3954,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 		{
 			if (0 == _entitiesPanel)
 			{
-				INTERNAL_ERROR(exc, "QtMgx3DMainWindow::getEntitiesPanel",
-				               "Panneau non instancié.")
+				INTERNAL_ERROR(exc, "QtMgx3DMainWindow::getEntitiesPanel", "Panneau non instancié.")
 				throw exc;
 			}    // if (0 == _entitiesPanel)
 
@@ -4121,8 +3966,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 		{
 			if (0 == _entitiesPanel)
 			{
-				INTERNAL_ERROR(exc, "QtMgx3DMainWindow::getEntitiesPanel",
-				               "Panneau non instancié.")
+				INTERNAL_ERROR(exc, "QtMgx3DMainWindow::getEntitiesPanel", "Panneau non instancié.")
 				throw exc;
 			}    // if (0 == _entitiesPanel)
 
@@ -4134,8 +3978,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 		{
 			if (0 == _operationsPanel)
 			{
-				INTERNAL_ERROR(exc, "QtMgx3DMainWindow::getOperationsPanel",
-				               "Panneau non instancié.")
+				INTERNAL_ERROR(exc, "QtMgx3DMainWindow::getOperationsPanel", "Panneau non instancié.")
 				throw exc;
 			}    // if (0 == _operationsPanel)
 
@@ -4143,8 +3986,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 		}    // QtMgx3DMainWindow::getOperationsPanel
 
 
-		void QtMgx3DMainWindow::registerAdditionalOperationPanel(
-				QtMgx3DOperationPanel &panel)
+		void QtMgx3DMainWindow::registerAdditionalOperationPanel(QtMgx3DOperationPanel &panel)
 		{
 			LOCK_INSTANCE
 
@@ -4154,8 +3996,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 		}    // QtMgx3DMainWindow::registerAdditionalOperationPanel
 
 
-		void QtMgx3DMainWindow::unregisterAdditionalOperationPanel(
-				QtMgx3DOperationPanel &panel)
+		void QtMgx3DMainWindow::unregisterAdditionalOperationPanel(QtMgx3DOperationPanel &panel)
 		{
 			LOCK_INSTANCE
 
@@ -5380,19 +5221,21 @@ log (t5);
 		}    // QtMgx3DMainWindow::editSettingsCallback
 
 
-		void QtMgx3DMainWindow::exitCallback()
-		{
+void QtMgx3DMainWindow::exitCallback()
+{
 
 #ifndef _DEBUG
-			if (0 != QtMessageBox::displayWarningMessage(this, getAppTitle(),
-			                                             "Souhaitez-vous réellement quitter cette application ?", 100,
-			                                             "Oui", "Non", 0, 0))
-				return;
+cout << __FILE__ << ' ' << __LINE__ << " QtMgx3DMainWindow::exitCallback" << endl;
+	if (true == Resources::instance ( )._confirmQuitAction.getValue ( ))
+	{
+		if (0 != QtMessageBox::displayWarningMessage(this, getAppTitle ( ), "Souhaitez-vous réellement quitter cette application ?", 100, "Oui", "Non", 0, 0))
+			return;
+	}	// if (true == Resources::instance ( )._confirmQuitAction.getValue ( ))
 			QApplication::exit();
 
 #else	// #ifndef _DEBUG
 
-																																	BEGIN_QT_TRY_CATCH_BLOCK
+	BEGIN_QT_TRY_CATCH_BLOCK
 
 	if (false == close ( ))
 		return;
@@ -5402,13 +5245,12 @@ log (t5);
 	if (true == hasError)
 	{
 		UTF8String	message (Charset::UTF_8);
-		message << "Echec lors de la fermeture de l'application "
-		        << " : " << errorString;
+		message << "Echec lors de la fermeture de l'application : " << errorString;
 		log (ErrorLog (message));
 	}	// if (true == hasError)
 
 #endif    // #ifndef _DEBUG
-		}    // QtMgx3DMainWindow::exitCallback
+}    // QtMgx3DMainWindow::exitCallback
 
 
 		void QtMgx3DMainWindow::undoCallback()
