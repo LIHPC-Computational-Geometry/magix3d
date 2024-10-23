@@ -2328,20 +2328,19 @@ Utils::GraphicalEntityRepresentation* VTKRenderingManager::createRepresentation 
 }	// VTKRenderingManager::createRepresentation
 
 
-void VTKRenderingManager::displayRepresentation (
-	Utils::GraphicalEntityRepresentation& representation, bool show,
-	bool forceUpdate, unsigned long mask)
+void VTKRenderingManager::displayRepresentation (Utils::GraphicalEntityRepresentation& representation, bool show, bool forceUpdate, bool doRender, unsigned long mask)
 {
 	VTKEntityRepresentation*	vtkRep	= dynamic_cast<VTKEntityRepresentation*>(&representation);
 	CHECK_NULL_PTR_ERROR (vtkRep);
 	if (true == show)
 	{
-		vtkRep->setRenderingManager (this);	// Nécessaire pour le code de projetections, affichage 3D/CELL_VALUES
+		vtkRep->setRenderingManager (this);	// Nécessaire pour le code de projections, affichage 3D/CELL_VALUES
 		vtkRep->updateRepresentation (mask, forceUpdate);
 	}	// if (true == show)
 	vtkRep->show (*this, show);
 
-	forceRender ( );
+	if (true == doRender)
+		forceRender ( );
 }	// VTKRenderingManager::displayRepresentation
 
 

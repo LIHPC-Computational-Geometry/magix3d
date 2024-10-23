@@ -127,10 +127,11 @@ class RenderingManager : public Utils::SelectionManagerObserver
 	 * \param		Entité à représenter
 	 * \param		<I>true</I> s'il faut représenter l'entité, <I>false</I> dans le cas contraire.
 	 * \param		Masque d'affichage de l'entité (cf.  <I>GraphicalEntityRepresentation::CURVES</I> et autres).
+	 * \param		<I>true</I> s'il faut forcer le rendu dans la fenêtre graphique.
 	 * \see			hasDisplayedRepresentation
 	 * \see			isDisplayed
 	 */
-	virtual void displayRepresentation(Mgx3D::Utils::Entity &entity, bool show, unsigned long mask);
+	virtual void displayRepresentation(Mgx3D::Utils::Entity &entity, bool show, unsigned long mask, bool forceRender);
 
 	/**
 	 * Affiche ou masque, selon la valeur de <I>show</I>, les représentations des entités transmises en argument.
@@ -141,10 +142,7 @@ class RenderingManager : public Utils::SelectionManagerObserver
 	 * \see			hasDisplayedRepresentation
 	 * \see			isDisplayed
 	 */
-	virtual void displayRepresentations(
-			const std::vector<Mgx3D::Utils::Entity *> &entities,
-			bool show, unsigned long mask,
-			Mgx3D::Utils::DisplayRepresentation::display_type type);
+	virtual void displayRepresentations(const std::vector<Mgx3D::Utils::Entity *> &entities, bool show, unsigned long mask, Mgx3D::Utils::DisplayRepresentation::display_type type);
 
 	/**
 	 * Affiche ou masque, selon la valeur de <I>show</I>, les représentations des entités des groupes transmis en argument.
@@ -1225,14 +1223,12 @@ class RenderingManager : public Utils::SelectionManagerObserver
 	 * Affiche ou détruit la représentation 3D transmise en argument.
 	 * A spécialiser dans les classes dérivées selon l'API 3D utilisée.
 	 * \param		Représentation à afficher ou détruire.
-	 * \param		<I>true</I> s'il faut afficher la représentation,
-	 *				<I>false</I> s'il faut la détruire.
-	 * \param		<I>true</I> s'il faut forcer l'actualisation de la
-	 *				représentation graphique.
-	 * \param		Masque d'affichage de l'entité (cf. 
-	 *				<I>GraphicalEntityRepresentation::CURVES</I> et autres.
+	 * \param		<I>true</I> s'il faut afficher la représentation, <I>false</I> s'il faut la détruire.
+	 * \param		<I>true</I> s'il faut forcer l'actualisation de la représentation graphique.
+	 * \param		<I>true</I> s'il faut forcer l'opération de rendu dans la fenêtre graphique.
+	 * \param		Masque d'affichage de l'entité (cf. <I>GraphicalEntityRepresentation::CURVES</I> et autres.
 	 */
-	virtual void displayRepresentation (Utils::GraphicalEntityRepresentation& representation, bool show, bool forceUpdate, unsigned long mask);
+	virtual void displayRepresentation (Utils::GraphicalEntityRepresentation& representation, bool show, bool forceUpdate, bool forceRender, unsigned long mask);
 
 	/**
 	 * Affiche/masque les groupes d'entités transmis en arguments.

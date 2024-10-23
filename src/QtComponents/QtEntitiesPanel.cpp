@@ -241,11 +241,9 @@ void QtEntitiesGroupTreeWidgetItem::stateChange (int col)
 
 			// Verrouiller les opérations d'affichage (optimisation) :
 			CHECK_NULL_PTR_ERROR (_panel)
-			Qt3DGraphicalWidget*	graphicalWidget	=
-												_panel->getGraphicalWidget ( );
+			Qt3DGraphicalWidget*	graphicalWidget	= _panel->getGraphicalWidget ( );
 			CHECK_NULL_PTR_ERROR (graphicalWidget)
-			RenderingManager::DisplayLocker	displayLocker(
-									graphicalWidget->getRenderingManager ( ));
+			RenderingManager::DisplayLocker	displayLocker (graphicalWidget->getRenderingManager ( ));
 			vector<Entity*>			entities;
 			unsigned long			mask	= 0;
 			const bool	checked	= Qt::Checked == currentState ? true : false;
@@ -255,25 +253,18 @@ void QtEntitiesGroupTreeWidgetItem::stateChange (int col)
 				CHECK_NULL_PTR_ERROR (item)
 				bool	changed	= !(item->checkState (0) == currentState);
 				item->setCheckState (0, currentState);
-				QtEntityTreeWidgetItem*	entityItem	=
-					dynamic_cast<QtEntityTreeWidgetItem*>(item);
+				QtEntityTreeWidgetItem*	entityItem	= dynamic_cast<QtEntityTreeWidgetItem*>(item);
 				CHECK_NULL_PTR_ERROR (entityItem)
 				if (false == _panel->groupEntitiesDisplayModifications ( ))
-					graphicalWidget->getRenderingManager (
-													).displayRepresentation (
-							*(entityItem->getEntity ( )), checked,
-							entityItem->getRepresentationMask ( ));
+					graphicalWidget->getRenderingManager ( ).displayRepresentation (*(entityItem->getEntity ( )), checked, entityItem->getRepresentationMask ( ), false);
 				else if (true == changed)
 				{
 					entities.push_back (entityItem->getEntity ( ));
 					mask	= entityItem->getRepresentationMask ( );
 				}	// else if (true == changed)
 			}	// for (int i = 0; i < childCount ( ); i++)
-			if ((true == _panel->groupEntitiesDisplayModifications ( )) &&
-			    (0 != entities.size ( )))
-				graphicalWidget->getRenderingManager (
-						).displayRepresentations (entities, currentState, mask,
-						                          getEntitiesType ( ));
+			if ((true == _panel->groupEntitiesDisplayModifications ( )) && (0 != entities.size ( )))
+				graphicalWidget->getRenderingManager ( ).displayRepresentations (entities, currentState, mask, getEntitiesType ( ));
 		}	// case 0
 		break;
 		case	1	:	// Mode d'affichage 3D
@@ -2197,9 +2188,7 @@ void QtEntitiesPanel::itemStateChange (QTreeWidgetItem*item , bool updateParent)
 		return;
 
 	const bool	checked	= Qt::Checked == item->checkState (0) ? true : false;
-	getGraphicalWidget ( )->getRenderingManager ( ).displayRepresentation (
-							*(entityItem->getEntity ( )), checked,
-							entityItem->getRepresentationMask ( ));
+	getGraphicalWidget ( )->getRenderingManager ( ).displayRepresentation (*(entityItem->getEntity ( )), checked, entityItem->getRepresentationMask ( ), true);
 
 	if (true == updateParent)
 	{
@@ -2232,12 +2221,9 @@ void QtEntitiesPanel::itemsStateChange (const vector<QTreeWidgetItem*>& list , b
 	CHECK_NULL_PTR_ERROR (getGraphicalWidget ( ))
 	QTreeWidgetItem*	parent	= list [0]->parent ( );
 
-	unique_ptr<RenderingManager::DisplayLocker>	displayLocker (
-		new RenderingManager::DisplayLocker (
-							getGraphicalWidget ( )->getRenderingManager ( )));
+	unique_ptr<RenderingManager::DisplayLocker>	displayLocker (new RenderingManager::DisplayLocker (getGraphicalWidget ( )->getRenderingManager ( )));
 	size_t	i	= 0;
-	for (vector<QTreeWidgetItem*>::const_iterator it = list.begin ( );
-	     list.end ( ) != it; it++, i++)
+	for (vector<QTreeWidgetItem*>::const_iterator it = list.begin ( ); list.end ( ) != it; it++, i++)
 	{
 
 		CHECK_NULL_PTR_ERROR (*it)
@@ -2246,20 +2232,15 @@ void QtEntitiesPanel::itemsStateChange (const vector<QTreeWidgetItem*>& list , b
 			continue;
 
 		const bool	checked	= Qt::Checked == (*it)->checkState (0) ? true:false;
-		getGraphicalWidget ( )->getRenderingManager ( ).displayRepresentation (
-							*(entityItem->getEntity ( )), checked,
-							entityItem->getRepresentationMask ( ));
+		getGraphicalWidget ( )->getRenderingManager ( ).displayRepresentation (*(entityItem->getEntity ( )), checked, entityItem->getRepresentationMask ( ), true);
 		if (0 == i % Resources::instance ( )._updateRefreshRate.getValue ( ))
 		{	// On fait un render tous les x entités.
 
-			// On veut unlock avant lock => en 2 temps (reset (0) puis
-			// reset (new DisplayLocker (...)).
-			// Si directement reset (new DisplayLocker (...))  on a
-			// new DisplayLocker (...)
+			// On veut unlock avant lock => en 2 temps (reset (0) puis reset (new DisplayLocker (...)).
+			// Si directement reset (new DisplayLocker (...))  on a new DisplayLocker (...)
 			// puis delete de l'ancien DisplayLocker => unlock en dernier ...
 			displayLocker.reset (0);
-			displayLocker.reset (new RenderingManager::DisplayLocker (
-							getGraphicalWidget ( )->getRenderingManager ( )));
+			displayLocker.reset (new RenderingManager::DisplayLocker (getGraphicalWidget ( )->getRenderingManager ( )));
 			// Eventuelle actualisation IHM :
 			if (true == QApplication::hasPendingEvents ( ))
 //				QApplication::processEvents (QEventLoop::AllEvents, 5000);
