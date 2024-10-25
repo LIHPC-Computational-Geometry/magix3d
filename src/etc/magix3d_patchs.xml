@@ -10,6 +10,14 @@
 	      <value>1.0e-2</value>
 	    </element>
   	</Section>
+  	<Section name="theatre" type="container">
+  	    <element name="updateRefreshRate" type="unsignedLong">
+        <annotation>
+          <documentation>Fréquence de rafraîchissement de la fenêtre graphique lors d'opérations ajouts/suppressions/modifications d'entités (1 rafraîchissement sur n opérations).</documentation>
+        </annotation>
+        <value>1000</value>
+		</element>
+	</Section>
   </Section>
 
 </Magix3D>

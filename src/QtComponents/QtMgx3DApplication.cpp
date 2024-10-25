@@ -919,8 +919,9 @@ Section* QtMgx3DApplication::getPersistantConfiguration ( )
 					bool	isExtendedMode	= false;
 					string	extension ("undefined extension");
 					UTF8String	context (Charset::UTF_8);
-					context << "Magix3D propose d'effectuer une mise à jour automatique de certaines préférences utilisateur jugées importantes";
-					context << ", l'une d'entre-elles (spotTolerance) influant sur la qualité des tâches laser affichées.";
+					context << "Magix3D propose d'effectuer une mise à jour automatique de certaines préférences utilisateur jugées importantes.\n";
+					context << "- spotTolerance, influant sur la qualité des tâches laser affichées,\n";
+					context << "- updateRefreshRate, influant sur la rapidité des affichages des entités\n";
 					UTF8String	modifications (Charset::UTF_8);
 					size_t			count	=
 						QtPrefsUpdater::update (
