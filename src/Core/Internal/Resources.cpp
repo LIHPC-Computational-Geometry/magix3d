@@ -82,7 +82,7 @@ _logTime ("time", false, UTF8String ("Faut-il faire figurer l'heure dans les tra
 _logThreadID ("threadID", false, UTF8String ("Faut-il faire figurer l'identifiant du thread dans les traces (true/false) ?", Charset::UTF_8)),
 _useDisplayList ("useDisplayList", true, UTF8String ("True si les display lists Open GL sont utilisées, false dans le cas contraire.", Charset::UTF_8)),
 _xyzCancelRoll ("xyzCancelRoll", false, UTF8String ("Une opération de positionnement de la vue dans un plan xOy, xOz, yOz (touches z, y ou x) doit elle être suivie d'une annulation du roulis (true) ou non (false) ?", Charset::UTF_8)),
-_updateRefreshRate ("updateRefreshRate", 100, UTF8String ("Fréquence de rafraîchissement de la fenêtre graphique lors d'opérations ajouts/suppressions/modifications d'entités (1 rafraîchissement sur n opérations).", Charset::UTF_8)),
+_updateRefreshRate ("updateRefreshRate", 1000, UTF8String ("Fréquence de rafraîchissement de la fenêtre graphique lors d'opérations ajouts/suppressions/modifications d'entités (1 rafraîchissement sur n opérations).", Charset::UTF_8)),
 _stillFrameRate ("stillFrameRate", 0.0001, UTF8String ("Nombre d'images/seconde souhaité hors interactions.", Charset::UTF_8)),	// Défaut VTK 5.10
 _desiredFrameRate ("desiredFrameRate", 15, UTF8String ("Nombre d'images/seconde durant les interactions.", Charset::UTF_8)),	// Défaut VTK 5.10		
 _background ("background", 0., 0., 0., UTF8String ("Composantes R, G, B de la couleur de fond de la fenêtre graphique. Valeurs comprises entre 0 et 1.", Charset::UTF_8)),

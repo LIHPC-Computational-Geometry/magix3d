@@ -222,7 +222,7 @@
         <annotation>
           <documentation>Fréquence de rafraîchissement de la fenêtre graphique lors d'opérations ajouts/suppressions/modifications d'entités (1 rafraîchissement sur n opérations).</documentation>
         </annotation>
-        <value>100</value>
+        <value>1000</value>
       </element>
       <element name="useDisplayList" type="boolean">
         <annotation>
