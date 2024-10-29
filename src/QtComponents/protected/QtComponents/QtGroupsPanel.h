@@ -13,6 +13,7 @@
 #include "QtComponents/QtEntitiesItemViewPanel.h"
 
 #include <QCheckBox>
+#include <QIcon>
 #include <QMenu>
 #include <QSettings>
 #include <QTreeWidget>
@@ -347,6 +348,11 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionMan
 
 	//@}	// La sélection.
 
+	/**
+	 * Actualise les icônes filaires/isofilaires/surfaciques en fonction du contexte.
+	 */
+	 virtual void updateIcons ( );
+	 
 
 	protected :
 
@@ -720,6 +726,15 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionMan
 
 	/** Cases à cocher à décocher au prochain appel de <I>selectionPolicyModified</I>. cf. selectionPolicyModified. */
 	Mgx3D::Utils::FilterEntity::objectType	_uncheckedCheckboxes;
+	
+	/** Les menus contextuels filaire et surfacique. */
+	QMenu									*_wireMenu, *_solidMenu;
+	
+	/** Les actions des menus contextuels filaire et surfacique. */
+	QAction									*_wireAction, *_isoWireAction, *_surfacicAction;
+	
+	/** Les icônes filaires et surfaciques. */
+	static QIcon							*_noWireIcon, *_wireIcon,*_isoWireIcon, *_fullWireIcon, *_noSolidIcon, *_surfacicIcon;
 };	// class QtGroupsPanel
 
 

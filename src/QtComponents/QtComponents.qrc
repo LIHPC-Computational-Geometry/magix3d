@@ -119,5 +119,11 @@
      <file>images/syscoord.png</file>
      <file>images/syscoord_translation.png</file>
      <file>images/syscoord_rotation.png</file>
+     <file>images/nowire.png</file>
+     <file>images/wire.png</file>
+     <file>images/isowire.png</file>
+     <file>images/fullwire.png</file>
+     <file>images/nosolid.png</file>
+     <file>images/surfacic.png</file>
  </qresource>
  </RCC>

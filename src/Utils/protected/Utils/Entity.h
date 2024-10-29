@@ -377,6 +377,9 @@ private :
 	TkUtil::LogOutputStream* m_log_stream;
 
 };
+
+Entity::objectType typesToType (FilterEntity::objectType types);
+
 /*----------------------------------------------------------------------------*/
 } // end namespace Utils
 /*----------------------------------------------------------------------------*/

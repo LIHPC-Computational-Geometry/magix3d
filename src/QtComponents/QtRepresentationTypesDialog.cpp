@@ -1074,6 +1074,9 @@ void QtRepresentationTypesDialog::applyCallback ( )
 	if ((OFF != topoUseGeomColor ( )) && (true == colorModified ( )))
 		getRenderingManager ( ).updateRepresentations ( );
 
+	if (0 != _mainWindow) 
+		_mainWindow->getGroupsPanel ( ).updateIcons ( );
+
 	getRenderingManager ( ).forceRender ( );
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getMainWindow ( ).getAppTitle ( ))

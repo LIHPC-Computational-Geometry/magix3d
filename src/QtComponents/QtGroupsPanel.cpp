@@ -65,6 +65,8 @@ namespace Mgx3D
 namespace QtComponents
 {
 
+const int	WIRE_COLUMN	= 1, SOLID_COLUMN	= (WIRE_COLUMN+1);
+
 
 static QAction* createAction (
 			QMenu& parent, const QString& label, const QString& whatsThis,
@@ -352,6 +354,14 @@ void QtGroupLevelTreeWidgetItem::updateState ( )
 // ===========================================================================
 
 
+QIcon*	QtGroupsPanel::_noWireIcon		= 0;
+QIcon*	QtGroupsPanel::_wireIcon		= 0;
+QIcon*	QtGroupsPanel::_isoWireIcon		= 0;
+QIcon*	QtGroupsPanel::_fullWireIcon	= 0;
+QIcon*	QtGroupsPanel::_noSolidIcon		= 0;
+QIcon*	QtGroupsPanel::_surfacicIcon	= 0;
+	
+	
 QtGroupsPanel::QtGroupsPanel (
 	QWidget* parent, QtMgx3DMainWindow* mainWindow, const string& name,
 	ContextIfc& context)
@@ -361,7 +371,8 @@ QtGroupsPanel::QtGroupsPanel (
 	  _typesItems ( ), _groupsEntriesItems ( ), _levelsEntriesItems ( ),
 	  //_groupsPropagationCheckBox (0),
 	  _typesPopupMenu (0), _groupsPopupMenu (0),
-	  _uncheckedCheckboxes (FilterEntity::NoneEntity)
+	  _uncheckedCheckboxes (FilterEntity::NoneEntity),
+	  _wireMenu (0), _solidMenu (0), _wireAction (0), _isoWireAction (0), _surfacicAction (0)
 {
 	createGui ( );
 	createPopupMenus ( );
@@ -691,6 +702,52 @@ void QtGroupsPanel::displaySelectedGroupsNames (bool display)
 }	// QtGroupsPanel::displaySelectedGroupsNames
 
 
+void QtGroupsPanel::updateIcons ( )
+{
+	Context*					context		= dynamic_cast<Context*>(&getContext ( ));		// ContextIfc* :(
+	CHECK_NULL_PTR_ERROR (context)
+		
+	for (vector<QtEntityTypeItem*>::iterator ite = _typesItems.begin ( ); _typesItems.end ( ) != ite; ite++)
+	{
+		const FilterEntity::objectType	types		= (*ite)->getEntityType ( );
+		const Entity::objectType		type		= typesToType (types);
+		
+		if ((Entity::GeomVolume != type) && (Entity::GeomSurface != type) && (Entity::TopoBlock != type) && (Entity::TopoCoFace))
+			continue;
+		
+		vector<Entity*>					entities;	
+		context->getGroupManager ( ).getShownEntities (types, entities);
+		QLabel*						wireLabel	= dynamic_cast<QLabel*>(_entitiesTypesWidget->itemWidget (*ite, WIRE_COLUMN));
+		QLabel*						solidLabel	= dynamic_cast<QLabel*>(_entitiesTypesWidget->itemWidget (*ite, SOLID_COLUMN));
+
+			// On actualise le menu popup en fonction du type d'entité et du masque courant appliqué à ce type d'entité :
+		unsigned long	gmask	= context->globalMask (type);
+		gmask	= context->globalMask (typesToType (types));
+
+		if (0 != wireLabel)
+		{
+			const QSize	size	= wireLabel->size ( );	// sizeHint ( ) retourne toujours (-1, -1)
+			if ((gmask & GraphicalEntityRepresentation::CURVES) && (gmask & GraphicalEntityRepresentation::ISOCURVES))
+				wireLabel->setPixmap (_fullWireIcon->pixmap (size.height ( )));
+			else if (gmask & GraphicalEntityRepresentation::ISOCURVES)
+				wireLabel->setPixmap (_isoWireIcon->pixmap (size.height ( )));
+			else if (gmask & GraphicalEntityRepresentation::CURVES)
+				wireLabel->setPixmap (_wireIcon->pixmap (size.height ( )));
+			else
+				wireLabel->setPixmap (_noWireIcon->pixmap (size.height ( )));
+		}	// if (0 != wireLabel)
+		if (0 != solidLabel)
+		{
+			const QSize	size	= solidLabel->size ( );
+			if (gmask & GraphicalEntityRepresentation::SURFACES)
+				solidLabel->setPixmap (_surfacicIcon->pixmap (size.height ( )));
+			else
+				solidLabel->setPixmap (_noSolidIcon->pixmap (size.height ( )));
+		}	// if (0 != solidLabel)
+	}	// for (vector<QtEntityTypeItem*>::iterator ite = _typesItems.begin ( ); _typesItems.end ( ) != ite; ite++)
+}	// QtGroupsPanel::updateIcons
+
+
 void QtGroupsPanel::clearGroupCallback ()
 {
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
@@ -716,13 +773,10 @@ void QtGroupsPanel::selectionPolicyModified (void* smp)
 		return;
 
 	// Réunion CP/EBL du 14/10/13.
-	// Appelé lorsque la politique de sélection change, par exemple lorsque
-	// l'utilisateur clique sur un champ de texte de type QtEntityIDTextField
+	// Appelé lorsque la politique de sélection change, par exemple lorsque l'utilisateur clique sur un champ de texte de type QtEntityIDTextField
 	// pour saisir de manière interactive l'id d'une entité.
-	// L'objectif est ici de provoquer l'affichage d'entités selectionnables en
-	// cochant dans l'arbre "Types d'entités" les cases à cocher
-	// correspondantes. Les entités correspondantes ne seront visibles dans la
-	// fenêtre graphique qu'à condition que leur groupe ne soit lui même coché
+	// L'objectif est ici de provoquer l'affichage d'entités selectionnables en cochant dans l'arbre "Types d'entités" les cases à cocher
+	// correspondantes. Les entités correspondantes ne seront visibles dans la fenêtre graphique qu'à condition que leur groupe ne soit lui même coché
 	// dans l'arbre "Groupes".
 	// Dans cet appel on :
 	// - Annule l'effet de l'appel précédent
@@ -733,10 +787,8 @@ void QtGroupsPanel::selectionPolicyModified (void* smp)
 	{
 		FilterEntity::objectType	types	= smdv->getFilteredTypes ( );
 
-		for (vector<QtEntityTypeItem*>::iterator it = _typesItems.begin ( );
-		     _typesItems.end ( ) != it; it++)
-			updateEntityItemState (
-				(*it)->getEntityType ( ), types,_uncheckedCheckboxes,toRestore);
+		for (vector<QtEntityTypeItem*>::iterator it = _typesItems.begin ( ); _typesItems.end ( ) != it; it++)
+			updateEntityItemState ((*it)->getEntityType ( ), types,_uncheckedCheckboxes,toRestore);
 
 		_uncheckedCheckboxes	= toRestore;
 	}	// if (0 != smdv)
@@ -752,8 +804,7 @@ void QtGroupsPanel::updateEntityItemState (
 	QtEntityTypeItem*	item	= getEntityTypeItem (type);
 	CHECK_NULL_PTR_ERROR (item)
 
-	// Rem : FilterEntity::All n'est pas issu d'un | sur des valeurs mais de
-	// (None) - 1 ... Pas très beau mais convient.
+	// Rem : FilterEntity::All n'est pas issu d'un | sur des valeurs mais de (None) - 1 ... Pas très beau mais convient.
 	if ((FilterEntity::All != newState) && (0 != (type & newState)))
 	{
 		if (Qt::Checked != item->checkState (0))
@@ -838,10 +889,37 @@ void QtGroupsPanel::createGui ( )
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
 
+	// Les menus contextuels :
+	if (0 == _noWireIcon)
+		_noWireIcon	= new QIcon (":/images/nowire.png");
+	if (0 == _wireIcon)
+		_wireIcon	= new QIcon (":/images/wire.png");
+	if (0 == _isoWireIcon)
+		_isoWireIcon	= new QIcon (":/images/isowire.png");
+	if (0 == _fullWireIcon)
+		_fullWireIcon	= new QIcon (":/images/fullwire.png");
+	if (0 == _noSolidIcon)
+		_noSolidIcon	= new QIcon (":/images/nosolid.png");
+	if (0 == _surfacicIcon)
+		_surfacicIcon	= new QIcon (":/images/surfacic.png");
+	_wireMenu	= new QMenu (this);
+	_wireAction	= _wireMenu->addAction  (*_wireIcon, "Affichage filaire");
+	_wireAction->setCheckable (true);
+	_wireAction->setChecked (true);
+	_wireAction->setData ((uint)GraphicalEntityRepresentation::CURVES);
+	_isoWireAction	= _wireMenu->addAction  (*_isoWireIcon, "Affichage isofilaire");
+	_isoWireAction->setCheckable (true);
+	_isoWireAction->setChecked (false);
+	_isoWireAction->setData ((uint)GraphicalEntityRepresentation::ISOCURVES);
+	_solidMenu	= new QMenu (this);
+	_surfacicAction	= _solidMenu->addAction  (*_surfacicIcon, "Affichage surfacique");
+	_surfacicAction->setCheckable (true);
+	_surfacicAction->setChecked (false);
+	_surfacicAction->setData ((uint)GraphicalEntityRepresentation::SURFACES);
+	QSize	iconSize (16, 16);		// Redimensionné dans QtGroupsPanel::updateIcons à la hauteur de ligne
 	if ((0 != _entitiesTypesWidget) || (0 != _entitiesGroupsWidget))
 	{
-		INTERNAL_ERROR (exc,
-				"QtGroupsPanel::createGui", "IHM déjà initialisée.")
+		INTERNAL_ERROR (exc, "QtGroupsPanel::createGui", "IHM déjà initialisée.")
 		throw exc;
 	}	// if ((0 != _entitiesTypesWidget) || ...
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
@@ -855,8 +933,7 @@ void QtGroupsPanel::createGui ( )
 
 	_entitiesTypesWidget	= new QTreeWidget (splitter);
 	splitter->addWidget (_entitiesTypesWidget);
-	connect (_entitiesTypesWidget, SIGNAL (itemClicked (QTreeWidgetItem*,int)),
-         this, SLOT (entitiesTypesStateChangeCallback (QTreeWidgetItem*, int)));
+	connect (_entitiesTypesWidget, SIGNAL (itemClicked (QTreeWidgetItem*,int)), this, SLOT (entitiesTypesStateChangeCallback (QTreeWidgetItem*, int)));
 	// On ne peut pas forcer la fermeture d'une branche :
 	_entitiesTypesWidget->setItemsExpandable (false);	// Voir expandAll + loin
 	_entitiesTypesWidget->setRootIsDecorated (false);	// Pas de croix
@@ -866,23 +943,44 @@ void QtGroupsPanel::createGui ( )
 	_entitiesTypesWidget->setSelectionMode (QTreeWidget::ExtendedSelection);
 	_entitiesTypesWidget->setSortingEnabled (false);
 	QAbstractItemModel*	treeModel	= _entitiesTypesWidget->model ( );
-	_entitiesTypesWidget->setColumnCount (1);
+	_entitiesTypesWidget->setColumnCount (3);
 	_entitiesTypesWidget->setColumnWidth (0, 200);
 	CHECK_NULL_PTR_ERROR (treeModel)
 	treeModel->setHeaderData (0, Qt::Horizontal, QVariant ("Types d'entités"));
+	treeModel->setHeaderData (WIRE_COLUMN, Qt::Horizontal, QVariant ("Fil."));
+	treeModel->setHeaderData (SOLID_COLUMN, Qt::Horizontal, QVariant ("Surf."));
 	// Géométrie :
 	QTreeWidgetItem*	item	= new  	QTreeWidgetItem (_entitiesTypesWidget);
 	item->setText (0, "Géométrie");
 	_entitiesTypesWidget->addTopLevelItem (item);
-	QtEntityTypeItem*	typeItem	=
-						new QtEntityTypeItem (item, FilterEntity::GeomVolume);
+	QtEntityTypeItem*	typeItem	= new QtEntityTypeItem (item, FilterEntity::GeomVolume);
 	typeItem->setCheckState (0, Qt::Unchecked);
+	typeItem->setToolTip (WIRE_COLUMN, "Affichage filaire/isofilaire");
+	typeItem->setToolTip (SOLID_COLUMN, "Affichage surfacique");
 	_typesItems.push_back (typeItem);
 	item->addChild (typeItem);
+	QLabel*	label	= new QLabel ("", _entitiesTypesWidget);
+	label->setAutoFillBackground (true);
+	label->setPixmap (_wireIcon->pixmap (iconSize.height ( )));
+	_entitiesTypesWidget->setItemWidget (typeItem, WIRE_COLUMN, label);
+	label	= new QLabel ("", _entitiesTypesWidget);
+	label->setAutoFillBackground (true);
+	label->setPixmap (_noSolidIcon->pixmap (iconSize.height ( )));
+	_entitiesTypesWidget->setItemWidget (typeItem, SOLID_COLUMN, label);
 	typeItem	= new QtEntityTypeItem (item, FilterEntity::GeomSurface);
 	typeItem->setCheckState (0, Qt::Unchecked);
+	typeItem->setToolTip (WIRE_COLUMN, "Affichage filaire/isofilaire");
+	typeItem->setToolTip (SOLID_COLUMN, "Affichage surfacique");
 	_typesItems.push_back (typeItem);
 	item->addChild (typeItem);
+	label	= new QLabel ("", _entitiesTypesWidget);
+	label->setAutoFillBackground (true);
+	label->setPixmap (_wireIcon->pixmap (iconSize.height ( )));
+	_entitiesTypesWidget->setItemWidget (typeItem, WIRE_COLUMN, label);
+	label	= new QLabel ("", _entitiesTypesWidget);
+	label->setAutoFillBackground (true);
+	label->setPixmap (_noSolidIcon->pixmap (iconSize.height ( )));
+	_entitiesTypesWidget->setItemWidget (typeItem, SOLID_COLUMN, label);
 	typeItem	= new QtEntityTypeItem (item, FilterEntity::GeomCurve);
 	typeItem->setCheckState (0, Qt::Unchecked);
 	_typesItems.push_back (typeItem);
@@ -897,12 +995,32 @@ void QtGroupsPanel::createGui ( )
 	_entitiesTypesWidget->addTopLevelItem (item);
 	typeItem	= new QtEntityTypeItem (item, FilterEntity::TopoBlock);
 	typeItem->setCheckState (0, Qt::Unchecked);
+	typeItem->setToolTip (WIRE_COLUMN, "Affichage filaire");
+	typeItem->setToolTip (SOLID_COLUMN, "Affichage surfacique");
 	_typesItems.push_back (typeItem);
 	item->addChild (typeItem);
+	label	= new QLabel ("", _entitiesTypesWidget);
+	label->setAutoFillBackground (true);
+	label->setPixmap (_wireIcon->pixmap (iconSize.height ( )));
+	_entitiesTypesWidget->setItemWidget (typeItem, WIRE_COLUMN, label);
+	label	= new QLabel ("", _entitiesTypesWidget);
+	label->setAutoFillBackground (true);
+	label->setPixmap (_noSolidIcon->pixmap (iconSize.height ( )));
+	_entitiesTypesWidget->setItemWidget (typeItem, SOLID_COLUMN, label);
 	typeItem	= new QtEntityTypeItem (item, FilterEntity::TopoCoFace);
 	typeItem->setCheckState (0, Qt::Unchecked);
+	typeItem->setToolTip (WIRE_COLUMN, "Affichage filaire");
+	typeItem->setToolTip (SOLID_COLUMN, "Affichage surfacique");
 	_typesItems.push_back (typeItem);
 	item->addChild (typeItem);
+	label	= new QLabel ("", _entitiesTypesWidget);
+	label->setAutoFillBackground (true);
+	label->setPixmap (_wireIcon->pixmap (iconSize.height ( )));
+	_entitiesTypesWidget->setItemWidget (typeItem, WIRE_COLUMN, label);
+	label	= new QLabel ("", _entitiesTypesWidget);
+	label->setAutoFillBackground (true);
+	label->setPixmap (_noSolidIcon->pixmap (iconSize.height ( )));
+	_entitiesTypesWidget->setItemWidget (typeItem, SOLID_COLUMN, label);
 	typeItem	= new QtEntityTypeItem (item, FilterEntity::TopoCoEdge);
 	typeItem->setCheckState (0, Qt::Unchecked);
 	_typesItems.push_back (typeItem);
@@ -949,13 +1067,13 @@ void QtGroupsPanel::createGui ( )
 	item->addChild (typeItem);
 	// On force la visibilité de l'ensemble des items :
 	_entitiesTypesWidget->expandAll ( );
+	for (int c = 1; c < 3; c++)
+		_entitiesTypesWidget->resizeColumnToContents (c);
 
 	_entitiesGroupsWidget	= new QTreeWidget (splitter);
 	splitter->addWidget (_entitiesGroupsWidget);
-	connect (_entitiesGroupsWidget, SIGNAL (itemClicked (QTreeWidgetItem*,int)),
-	         this, SLOT (groupStateChangeCallback (QTreeWidgetItem*, int)));
-	connect (_entitiesGroupsWidget, SIGNAL (itemClicked (QTreeWidgetItem*,int)),
-	         this, SLOT (showLevelGroupsCallback (QTreeWidgetItem*, int)));
+	connect (_entitiesGroupsWidget, SIGNAL (itemClicked (QTreeWidgetItem*,int)), this, SLOT (groupStateChangeCallback (QTreeWidgetItem*, int)));
+	connect (_entitiesGroupsWidget, SIGNAL (itemClicked (QTreeWidgetItem*,int)), this, SLOT (showLevelGroupsCallback (QTreeWidgetItem*, int)));
 	_entitiesGroupsWidget->setSelectionBehavior (QTreeWidget::SelectItems);
 /*/	// Sélection indépendante des items :
 	_entitiesGroupsWidget->setSelectionMode (QTreeWidget::MultiSelection);*/
@@ -973,8 +1091,7 @@ void QtGroupsPanel::createGui ( )
 	{
 		UTF8String	name (Charset::UTF_8);
 		name << "Dimension " << (unsigned long)i;
-		QTreeWidgetItem* groupEntryItem	=
-							new QTreeWidgetItem (_entitiesGroupsWidget);
+		QTreeWidgetItem* groupEntryItem	= new QTreeWidgetItem (_entitiesGroupsWidget);
 		groupEntryItem->setFlags (entryFlags);
 		groupEntryItem->setText (0, UTF8TOQSTRING (name));
 		groupEntryItem->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
@@ -986,6 +1103,7 @@ void QtGroupsPanel::createGui ( )
 	// On force la visibilité de l'ensemble des items :
 	_entitiesGroupsWidget->expandAll ( );
 
+	updateIcons ( );
 	// Propagation de l'affichage des groupes de dimension N - 1 :
 //	_groupsPropagationCheckBox	=
 //		new QCheckBox ("Propager l'affichage", this);
@@ -1008,8 +1126,7 @@ void QtGroupsPanel::createPopupMenus ( )
 	// Menu popup 1 : Types d'entités :
 	// Affichage :
 	_typesPopupMenu	= new QMenu (_entitiesTypesWidget);
-	QAction*	action	=
-			createAction(*_typesPopupMenu, "Afficher", QString::fromUtf8("Provoque l'affichage des entités dont les types sont sélectionnés et les groupes affichés."),
+	QAction*	action	= createAction(*_typesPopupMenu, "Afficher", QString::fromUtf8("Provoque l'affichage des entités dont les types sont sélectionnés et les groupes affichés."),
 			          SLOT (displaySelectedTypesCallback( )), this, false, OFF);
 	_typesPopupMenu->addAction (action);
 	action	= createAction (*_typesPopupMenu, "Masquer", QString::fromUtf8("Arrête l'affichage des entités dont les types sont sélectionnés et les groupes affichés."),
@@ -1055,25 +1172,14 @@ void QtGroupsPanel::createPopupMenus ( )
 	_groupsPopupMenu->addSeparator ( );
 	QMenu*	entry	= new QMenu ("Tri ...", _groupsPopupMenu);
 	_groupsPopupMenu->addMenu (entry);
-	action	= createCheckableAction (*entry, "Automatique",
-					"Tri automatiquement les groupes",
-					SLOT (automaticSortCallback (bool)), this,
-					Resources::instance ( )._automaticSort.getValue ( ), OFF);
-	const bool ascending	=
-		0 == Resources::instance ( )._sortType.getValue ( ).ascii ( ).compare (
-											"typeAscendingName") ? true : false;
-	action	= createCheckableAction (*entry, "Ordre ascendant",
-					"Tri les groupes par ordre alphabétique ascendant",
-					SLOT (ascendingSortCallback (bool)), this, ascending, OFF);
+	action	= createCheckableAction (*entry, "Automatique", "Tri automatiquement les groupes", SLOT (automaticSortCallback (bool)), this, Resources::instance ( )._automaticSort.getValue ( ), OFF);
+	const bool ascending	= 0 == Resources::instance ( )._sortType.getValue ( ).ascii ( ).compare ("typeAscendingName") ? true : false;
+	action	= createCheckableAction (*entry, "Ordre ascendant", "Tri les groupes par ordre alphabétique ascendant", SLOT (ascendingSortCallback (bool)), this, ascending, OFF);
 
 	_groupsPopupMenu->addSeparator ( );
-	action	= createCheckableAction (*_groupsPopupMenu, "Vue multi-niveaux",
-					"(Dé)classer les groupes par niveaux.",
-					SLOT (multiLevelViewCallback (bool)), this,
-					Resources::instance ( )._multiLevelGroupsView.getValue( ), OFF);
+	action	= createCheckableAction (*_groupsPopupMenu, "Vue multi-niveaux", "(Dé)classer les groupes par niveaux.", SLOT (multiLevelViewCallback (bool)), this, Resources::instance ( )._multiLevelGroupsView.getValue( ), OFF);
 	_groupsPopupMenu->addAction (action);
-	action	= createAction (*_groupsPopupMenu, "Changer de niveau ...", QString::fromUtf8("Change de niveau les groupes sélectionnés"),
-			         SLOT (changeGroupLevelCallback( )), this, false, OFF);
+	action	= createAction (*_groupsPopupMenu, "Changer de niveau ...", QString::fromUtf8("Change de niveau les groupes sélectionnés"), SLOT (changeGroupLevelCallback( )), this, false, OFF);
 	action	= createAction (*_groupsPopupMenu, QString::fromUtf8("Sélectionner les groupes d'un niveau"), QString::fromUtf8("Sélectionner des groupes selon leurs dimensions et niveaux"),
 					SLOT (levelSelectionCallback( )), this, false, OFF);
 	_groupsPopupMenu->addAction (action);
@@ -1300,27 +1406,111 @@ bool QtGroupsPanel::groupEntitiesDisplayModifications ( ) const
 }	// QtGroupsPanel::groupEntitiesDisplayModifications
 
 
+static unsigned long menuToRepresentations (QMenu& menu)
+{
+	unsigned long	reps	= 0;
+
+	QList<QAction*>	actions	= menu.actions ( );
+	for (QList<QAction*>::const_iterator ita = actions.begin ( ); actions.end ( ) != ita; ita++)
+	{
+		if (true == (*ita)->isChecked ( ))
+		{
+			unsigned long	type	= (*ita)->data ( ).toInt ( );
+			reps	|= type;
+		}	// if (true == (*ita)->isChecked ( ))
+	}	// for (QList<QAction*>::const_iterator ita = actions.begin ( ); actions.end ( ) != ita; ita++)
+
+	return reps;
+}	// menuToRepresentations
+
+
 void QtGroupsPanel::entitiesTypesStateChangeCallback (QTreeWidgetItem* item, int col)
 {
+	assert (0 != _wireMenu);
+	assert (0 != _solidMenu);
+	assert (0 != _wireAction);
+	assert (0 != _isoWireAction);
+	assert (0 != _surfacicAction);
+	assert (0 != _entitiesTypesWidget);
+
 	BEGIN_QT_TRY_CATCH_BLOCK
 
-	if (0 != getGraphicalWidget ( ))
+	if (0 == col)
 	{
-		if (true == getGraphicalWidget ( )->getRenderingManager ( ).displayLocked ( ))
-		{	// Issue#59 : on est en train d'afficher/masquer des entités et on demande ici par ce callback le contraire
-			// Cette situation est probablement dûe à une opération longue (exécution d'un script, ...) et l'utilisateur
-			// s'impatiente => on aura au final un affichage partiel
-			// on annule l'exécution de ce callback et on re(dé)coche la checkbox correspondante
-			CHECK_NULL_PTR_ERROR (item)
-			const Qt::CheckState	checked	= item->checkState (col);
-			item->setCheckState (col, Qt::Checked == checked ? Qt::Unchecked : Qt::Checked);
-			return;
-		}	// if (true == getGraphicalWidget ( )->getRenderingManager ( ).displayLocked ( ))
+		if (0 != getGraphicalWidget ( ))
+		{
+			if (true == getGraphicalWidget ( )->getRenderingManager ( ).displayLocked ( ))
+			{	// Issue#59 : on est en train d'afficher/masquer des entités et on demande ici par ce callback le contraire
+				// Cette situation est probablement dûe à une opération longue (exécution d'un script, ...) et l'utilisateur
+				// s'impatiente => on aura au final un affichage partiel
+				// on annule l'exécution de ce callback et on re(dé)coche la checkbox correspondante
+				CHECK_NULL_PTR_ERROR (item)
+				const Qt::CheckState	checked	= item->checkState (col);
+				item->setCheckState (col, Qt::Checked == checked ? Qt::Unchecked : Qt::Checked);
+				return;
+			}	// if (true == getGraphicalWidget ( )->getRenderingManager ( ).displayLocked ( ))
 		
-		const FilterEntity::objectType	typesMask	= getCheckedEntitiesTypes ( );
-		getGraphicalWidget ( )->getRenderingManager ( ).displayTypes (typesMask);
-	}	// if (0 != getGraphicalWidget ( ))
+			const FilterEntity::objectType	typesMask	= getCheckedEntitiesTypes ( );
+			getGraphicalWidget ( )->getRenderingManager ( ).displayTypes (typesMask);
+		}	// if (0 != getGraphicalWidget ( ))
+	}	// if (0 == col)
+	else
+	{	// Affichage menu contextuel choix filaire/solide
+		if (0 == item)
+			return;
 
+		QPoint				pos				= QCursor::pos ( );
+		QLabel*				label			= dynamic_cast<QLabel*>(_entitiesTypesWidget->itemWidget (item, col));
+		QtEntityTypeItem*	entityTypeItem	= dynamic_cast<QtEntityTypeItem*>(item);
+		Context*			context			= dynamic_cast<Context*>(&getContext ( ));		// ContextIfc* :(
+		if ((col >= 1) && (col <= 2) && (0 != entityTypeItem) && (0 != context))
+		{
+			QMenu*						menu	= WIRE_COLUMN == col ? _wireMenu : _solidMenu;
+			CHECK_NULL_PTR_ERROR (menu)
+			const FilterEntity::objectType	types	= entityTypeItem->getEntityType ( );
+			const Entity::objectType		type	= typesToType (types);
+			vector<Entity*>					entities;
+			context->getGroupManager ( ).getShownEntities (types, entities);
+
+			// On actualise le menu popup en fonction du type d'entité et du masque courant appliqué à ce type d'entité :
+			unsigned long	gmask	= context->globalMask (type);
+			switch (col)
+			{
+				case WIRE_COLUMN	:
+					_wireAction->setChecked (gmask & GraphicalEntityRepresentation::CURVES);
+					_isoWireAction->setChecked (gmask & GraphicalEntityRepresentation::ISOCURVES);
+					_isoWireAction->setEnabled (Entity::GeomVolume >= type ? true : false);
+					break;
+				default				: 
+					_surfacicAction->setChecked (gmask & GraphicalEntityRepresentation::SURFACES);
+			}	// switch (col)
+			QAction*		action	= menu->exec (pos);
+			const bool		checked	= 0 == action ? false : action->isChecked ( );
+			
+			context->globalMask (type)	= menuToRepresentations (*menu);	// cf. QtRepresentationTypesDialog::applyCallback / globalMode
+			updateIcons ( );
+
+			if (0 != getGraphicalWidget ( ))
+			{
+				bool	doRender	= false;
+				for (vector<Entity*>::iterator ite = entities.begin ( ); entities.end ( ) != ite; ite++)
+				{
+					DisplayProperties::GraphicalRepresentation*	rep	= (*ite)->getDisplayProperties ( ).getGraphicalRepresentation ( );
+				
+					if (0 != rep)
+					{
+						const unsigned long	mask	= true == checked ? rep->getRepresentationMask ( ) | type : rep->getRepresentationMask ( ) ^ type;
+						getGraphicalWidget ( )->getRenderingManager ( ).updateRepresentation (**ite, mask, true);
+						doRender	= true;
+					}	// if (0 != rep)
+				}	// for (vector<Entity*>::iterator ite = entities.begin ( ); entities.end ( ) != ite; ite++)
+				
+				if (true == doRender)
+					getGraphicalWidget ( )->getRenderingManager ( ).forceRender ( );
+			}	// if (0 != getGraphicalWidget ( ))
+		}	// if ((0 != role) && (col >= 1) && (col <= 2) && (0 != entityTypeItem) && (0 != context))
+	}	// else if (0 == col)
+	
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 }	// QtGroupsPanel::entitiesTypesStateChangeCallback
 
@@ -2599,6 +2789,7 @@ vector<QtGroupTreeWidgetItem*> QtGroupsPanel::getSelectedGroupsItems ( ) const
 
 	return selectedItems;
 }	// QtGroupsPanel::getSelectedGroupsItems
+
 
 
 // ============================================================================
