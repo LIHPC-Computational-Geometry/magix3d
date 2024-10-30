@@ -1267,7 +1267,9 @@ void Edge::computeCoEdgesPath(Vertex* v1, Vertex* v2, std::list<std::pair<CoEdge
     getCoEdges(coedges);
     Vertex* from_vertex = v1;
 
-    while (from_vertex != v2) {
+    if (from_vertex == v2 && coedges.size()==1) {
+        path.push_back(std::make_pair(coedges[0], true));
+    } else while (from_vertex != v2) {
         // recherche de l'arete ayant une extrémité égale à from_vertex dans coedges
         // (coedges étant réduite, normalement il n'y a qu'une coedge répondant à ce prédicat)
         Vertex* to_vertex = 0;
