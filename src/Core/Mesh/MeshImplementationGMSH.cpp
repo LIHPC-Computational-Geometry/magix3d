@@ -37,6 +37,8 @@
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
+//#define _DEBUG_MESH
+
 /// GMSH
 #ifdef USE_GMSH
 #include "gmsh.h"
@@ -57,28 +59,24 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
     std::cout <<"Maillage de la face commune "<<fa->getName()<<" avec la méthode de Delaunay (version GMSH)"<<std::endl;
 #endif
 
-    gmds::Mesh& gmds_mesh = getGMDSMesh();
+    // init des options GMSH
+    gmsh::initialize();
+    gmsh::logger::start();
 
     Topo::FaceMeshingPropertyDelaunayGMSH* prop =
             dynamic_cast<Topo::FaceMeshingPropertyDelaunayGMSH*>(fa->getCoFaceMeshingProperty());
     CHECK_NULL_PTR_ERROR(prop);
 
-    // init des options GMSH
-    gmsh::initialize();
-    gmsh::logger::start();
+    // récupération des paramètre utilisateur
+    gmsh::option::setNumber("Mesh.MeshSizeMin", prop->getMin());
+    gmsh::option::setNumber("Mesh.MeshSizeMax", prop->getMax());
+    gmsh::option::setNumber("Mesh.Algorithm", 5); // algo Delaunay
 
     // Initialize robust predicates
     //robustPredicates::exactinit();
 
-    // récupération des paramètre utilisateur
-    gmsh::option::setNumber("Mesh.MeshSizeMin", prop->getMin());
-    gmsh::option::setNumber("Mesh.MeshSizeMax", prop->getMax());
-
-    // algo Delaunay
-    gmsh::option::setNumber("Mesh.Algorithm", 5);
-
     //Geometrie de la coface
-    Geom::GeomEntity*  geo_entity = fa->getGeomAssociation();
+    Geom::GeomEntity* geo_entity = fa->getGeomAssociation();
     if(geo_entity==0){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message << "La face  "<< fa->getName()
@@ -96,9 +94,6 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
     }
     TopoDS_Face face_shape = TopoDS::Face(occ_rep->getShape());
 
-    TopTools_IndexedMapOfShape  mapEdgeOfFace;
-    TopExp::MapShapes(face_shape,TopAbs_EDGE, mapEdgeOfFace);
-
 #ifdef _DEBUG_MESH
     std::cout <<"=== new gmsh model"<<std::endl;
 #endif
@@ -108,20 +103,8 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
 #ifdef _DEBUG_MESH
     std::cout <<"=== importOCCShape"<<std::endl;
 #endif
-    gmsh::vectorpair outDimTags;
-    gmsh::model::occ::importShapesNativePointer(&face_shape, outDimTags);
-    //gmsh::model::occ::synchronize();
-
-    // Recherche de la face = seule shape de dimension 2
-    auto it = std::find_if(outDimTags.begin(), outDimTags.end(), [](const std::pair<int, int>& p) {
-        return p.first == 2;
-    });
-    if (it == outDimTags.end()) {
-		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-        message << "L'import de la face OCC dans GMSH a échoué : "<< fa->getName();
-        throw TkUtil::Exception (message);
-    }
-    int gFaceId = it->second;
+    gmsh::vectorpair gmsh_out_dim_tags;
+    gmsh::model::occ::importShapesNativePointer(&face_shape, gmsh_out_dim_tags);
 
 #ifdef _DEBUG_MESH
     std::cout <<"=== traitement des arêtes de la face "<<fa->getName()<<std::endl;
@@ -136,7 +119,7 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
     gmsh::vectorpair gmsh_point_dim_tags;
 
     for(unsigned int i=0;i<edges.size();i++){
-        Topo::Edge* edge =edges[i];
+        Topo::Edge* edge = edges[i];
 #ifdef _DEBUG_MESH
         std::cout <<"--Traitement de l'arête "<<edge->getName()<<std::endl;
 #endif
@@ -151,55 +134,53 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
             throw TkUtil::Exception (message);
         }
  
-        std::vector<gmds::Node> edge_nodes;
-        edge->getNodes(vertices[0], vertices[1], edge_nodes);
+        std::vector<gmds::Node> gmds_edge_nodes;
+        edge->getNodes(vertices[0], vertices[1], gmds_edge_nodes);
 
-        std::vector<std::size_t> gmsh_node_tags;
-        gmsh_node_tags.reserve(edge_nodes.size() + 2);
-        std::vector<double> gmsh_node_coords;
-        gmsh_node_coords.reserve(3*edge_nodes.size());
-        std::vector<double> gmsh_parametric_coords;
-
-       // On stoke la liste des noeuds gmds rencontrés dans l'algorithme
-       if (edge_nodes.size() > 0)
+       // On stocke la liste des noeuds gmds rencontrés dans l'algorithme
+       // afin de ne pas les recréer lors de la récupération des triangles
+       if (gmds_edge_nodes.size() > 0)
        {
-            gmds_node_ids.insert(edge_nodes[0].id());
-            gmds_node_ids.insert(edge_nodes[edge_nodes.size() - 1].id());
+            gmds_node_ids.insert(gmds_edge_nodes[0].id());
+            gmds_node_ids.insert(gmds_edge_nodes[gmds_edge_nodes.size() - 1].id());
        }
 
-        // Création des noeuds internes
-       for (uint j=1; j<edge_nodes.size()-1; j++)
-       {
-            gmds::Node nd = edge_nodes[j];
-            gmds_node_ids.insert(nd.id());
-            Utils::Math::Point pt = getCoordNode(nd);
+        // Création des noeuds internes de l'arête dans gmsh selon la discrétisation choisie
+        for (uint j=1; j<gmds_edge_nodes.size()-1; j++)
+        {
+            gmds::Node gmds_node = gmds_edge_nodes[j];
+            gmds_node_ids.insert(gmds_node.id());
+            Utils::Math::Point pt = getCoordNode(gmds_node);
             int gmsh_point_tag = gmsh::model::occ::addPoint(pt.getX(), pt.getY(), pt.getZ());
-            std::cout << "Noeud " << j << " de coord " << pt  << std::endl;
             gmsh_point_dim_tags.push_back({0, gmsh_point_tag});
         }
     } // end for(unsigned int i=0;i<edges.size();i++)
 
+    // La fragmentation permet d'ajouter les points de contraintes sur les arêtes tels que définis par la discrétisation 
+    // et récupérés via GMDS
     gmsh::vectorpair gmsh_entities_dim_tags;
     gmsh::model::occ::getEntities(gmsh_entities_dim_tags);
-    gmsh::vectorpair out_dim_tags;
-    std::vector<gmsh::vectorpair> out_dim_tags_map;
-    gmsh::model::occ::fragment(gmsh_point_dim_tags, gmsh_entities_dim_tags, out_dim_tags, out_dim_tags_map);
+    gmsh_out_dim_tags.clear();
+    std::vector<gmsh::vectorpair> gmsh_out_dim_tags_map;
+    gmsh::model::occ::fragment(gmsh_point_dim_tags, gmsh_entities_dim_tags, gmsh_out_dim_tags, gmsh_out_dim_tags_map);
 
     gmsh::model::occ::synchronize();
 
+    // On précise à GMSH qu'on veut seulement deux noeuds de maillage sur chaque Line de bord (pour éviter qu'il en ajoute)
+    // L'opération fragment a changé les tags des entités
     gmsh_entities_dim_tags.clear();
     gmsh::model::occ::getEntities(gmsh_entities_dim_tags, 1);
-    for (auto dt : gmsh_entities_dim_tags)
+    for (auto gmsh_dim_tag : gmsh_entities_dim_tags)
     {
-        int lineId = dt.second;
+        int gmsh_line_tag = gmsh_dim_tag.second;
         std::string type;
-        gmsh::model::getType(1, dt.second, type);  // 1 pour dimension 1
+        gmsh::model::getType(1, gmsh_line_tag, type);  // 1 pour dimension 1
         if (type == "Line")
-            gmsh::model::mesh::setTransfiniteCurve(dt.second, 2);
+            gmsh::model::mesh::setTransfiniteCurve(gmsh_line_tag, 2);
     }
 
+    // génération du maillage
     gmsh::model::mesh::generate(2);
-
     std::string error;
     gmsh::logger::getLastError(error);
     if (!error.empty()){
@@ -213,13 +194,13 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
 
     // récupération du maillage pour le passer de gmsh à gmds
 
+    // Récupérer les éléments de la dimension 2 (triangles, quadrangles, etc.)
     std::vector<int> gmsh_elt_types;                      // Types des éléments
     std::vector<std::vector<std::size_t>> gmsh_elt_tags;  // Tags des éléments
     std::vector<std::vector<std::size_t>> gmsh_elt_node_tags; // Connectivité des éléments (les indices des nœuds)
-
-    // Récupérer les éléments de la dimension 2 (triangles, quadrangles, etc.)
     gmsh::model::mesh::getElements(gmsh_elt_types, gmsh_elt_tags, gmsh_elt_node_tags, 2);
 
+    gmds::Mesh& gmds_mesh = getGMDSMesh();
     // correspondance entre noeuds internes GMSH et GMDS pour éviter les doublons
     std::map<std::size_t, gmds::TCellID> gmshNodeTag_to_gmdsCellId;
 
@@ -229,57 +210,57 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
             std::cout << "Triangles found, number of elements: " << gmsh_elt_tags[i].size() << std::endl;
 #endif
 
-            std::vector<gmds::TCellID>& fa_node_ids = fa->nodes();
-            std::vector<gmds::TCellID>& fa_face_ids = fa->faces();
+            std::vector<gmds::TCellID>& gmds_fa_node_ids = fa->nodes();
+            std::vector<gmds::TCellID>& gmds_fa_face_ids = fa->faces();
             for (std::size_t j = 0; j < gmsh_elt_node_tags[i].size(); j += 3) {
-                gmds::TCellID tcellids[3];
                 for (std::size_t k = 0; k < 3; ++k) {
-                    size_t gmsh_node_tag = gmsh_elt_node_tags[i][j+k];
-
                     gmds::TCellID gmds_node_id = -1;
 
-                    auto iter =  gmshNodeTag_to_gmdsCellId.find(gmsh_node_tag);
-                    if (iter == gmshNodeTag_to_gmdsCellId.end())
+                    std::size_t gmsh_node_tag = gmsh_elt_node_tags[i][j+k];
+                    if (gmshNodeTag_to_gmdsCellId.find(gmsh_node_tag) == gmshNodeTag_to_gmdsCellId.end())
                     {
                         // Coordonnées du noeud GMSH
-                        std::vector<double> coord;
-                        std::vector<double> parametricCoord;
+                        std::vector<double> gmsh_node_coord;
+                        std::vector<double> gmsh_node_parametric_coord;
                         int dim, tag;
-                        gmsh::model::mesh::getNode(gmsh_node_tag, coord, parametricCoord, dim, tag);
-                        Utils::Math::Point gmsh_point(coord[0], coord[1], coord[2]);
+                        gmsh::model::mesh::getNode(gmsh_node_tag, gmsh_node_coord, gmsh_node_parametric_coord, dim, tag);
+                        Utils::Math::Point gmsh_point(gmsh_node_coord[0], gmsh_node_coord[1], gmsh_node_coord[2]);
 
                         const double precision = Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon;
                         
                         // Recherche du noeud GMDS correspondant
-                        gmds::Mesh& gmds_mesh = getGMDSMesh();
-                        for (auto node_id : gmds_node_ids)
+                        bool gmds_node_found = false;
+                        for (auto gmds_node_id : gmds_node_ids)
                         {
-                            gmds::Node nd = gmds_mesh.get<gmds::Node>(node_id);
-                            Utils::Math::Point gmds_point(nd.X(), nd.Y(), nd.Z());
+                            gmds::Node gmds_node = gmds_mesh.get<gmds::Node>(gmds_node_id);
+                            Utils::Math::Point gmds_point(gmds_node.X(), gmds_node.Y(), gmds_node.Z());
                             double dist = gmds_point.length(gmsh_point);
                             if (dist < precision)
                             {
-                                gmds_node_id = node_id;
-                                gmshNodeTag_to_gmdsCellId[gmsh_node_tag] = node_id;
+                                gmds_node_found = true;
+                                gmshNodeTag_to_gmdsCellId[gmsh_node_tag] = gmds_node_id;
                                 break;
                             }
                         }
 
                         // Le noeud GMDS n'existait pas, il faut le créer
-                        if (gmds_node_id == -1)
+                        if (!gmds_node_found)
                         {
-                            gmds_node_id = getGMDSMesh().newNode(coord[0], coord[1], coord[2]).id();
+                            gmds_node_id = gmds_mesh.newNode(gmsh_node_coord[0], gmsh_node_coord[1], gmsh_node_coord[2]).id();
                             gmshNodeTag_to_gmdsCellId[gmsh_node_tag] = gmds_node_id;
-                            fa_node_ids.push_back(gmds_node_id);
+                            gmds_fa_node_ids.push_back(gmds_node_id);
                             command->addCreatedNode(gmds_node_id);
                         }
                     }
-                    else
-                        gmds_node_id = iter->second;
                 }
+
+                // Création des triangles GMDS
                 gmds::TCellID n1 = gmshNodeTag_to_gmdsCellId[gmsh_elt_node_tags[i][j]];
                 gmds::TCellID n2 = gmshNodeTag_to_gmdsCellId[gmsh_elt_node_tags[i][j+1]];
                 gmds::TCellID n3 = gmshNodeTag_to_gmdsCellId[gmsh_elt_node_tags[i][j+2]];
+                gmds::Face gmds_triangle = gmds_mesh.newTriangle(n1, n2, n3);
+                gmds_fa_face_ids.push_back(gmds_triangle.id());
+                command->addCreatedFace(gmds_triangle.id());
 
 #ifdef _DEBUG_MESH
                 std::cout<<" triangle: "<<std::endl;
@@ -291,27 +272,23 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
                 std::cout<<"  node 3 : "<<node3.X()<<", "<<node3.Y()<<", "<<node3.Z()<<std::endl;
 #endif
 
-                gmds::Face t1 = getGMDSMesh().newTriangle(n1, n2, n3);
-                fa_face_ids.push_back(t1.id());
-                command->addCreatedFace(t1.id());
             }
         }
     }
     // nettoyage mémoire de ce qui a servi à GMSH
     gmsh::model::remove();
 
-    std::vector<std::string> groupsName;
-    fa->getGroupsName(groupsName);
+    std::vector<std::string> group_names;
+    fa->getGroupsName(group_names);
 
 #ifdef _DEBUG_GROUP_BY_TOPO_ENTITY
     // on ajoute un groupe pour distinguer les faces en mode debug
-    groupsName.push_back(fa->getName());
+    group_names.push_back(fa->getName());
 #endif
 
-
     // ajout des polygones aux surfaces
-    for (size_t i=0; i<groupsName.size(); i++){
-        std::string& nom = groupsName[i];
+    for (size_t i=0; i<group_names.size(); i++){
+        std::string& nom = group_names[i];
 
         try {
             getContext().getLocalMeshManager().getSurface(nom);
@@ -319,11 +296,12 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
         } catch (...) {
             command->addNewSurface(nom);
         }
+
         // la surface de maillage que l'on vient de créer/modifier
         Mesh::Surface* sf = getContext().getLocalMeshManager().getSurface(nom);
         sf->saveMeshSurfaceTopoProperty(&command->getInfoCommand());
         sf->addCoFace(fa);
-    } // end for i<groupsName.size()
+    } // end for i<group_names.size()
 
 #ifdef _DEBUG_MESH
     // Inspect the log:
