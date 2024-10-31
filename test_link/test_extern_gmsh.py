@@ -29,3 +29,23 @@ def test_cylinder_delaunay_mesh():
     # Création du maillage pour des faces
     mm.newFacesMesh ( ["Fa0000", "Fa0001", "Fa0002"] )
     assert(mm.getNbFaces() == 248)
+
+def test_bridge_delaunay_mesh():
+    ctx = Mgx3D.getStdContext()
+    gm = ctx.getGeomManager()
+    tm = ctx.getTopoManager()
+    mm = ctx.getMeshManager()
+    ctx.clearSession() # Clean the session after the previous test
+    # Changement d'unité de longueur
+    ctx.setLengthUnit(Mgx3D.Unit.centimeter)
+    # Import STEP
+    gm.importSTEP("B0.step")
+    # Création d'un bloc topologique non structuré sur une géométrie (Vol0000)
+    tm.newUnstructuredTopoOnGeometry ("Vol0000")
+    # Changement de discrétisation pour les arêtes Ar0008
+    emp = Mgx3D.EdgeMeshingPropertyGeometric(30,1.1)
+    tm.setMeshingProperty (emp,["Ar0008"])
+    # Création du maillage pour tous les blocs
+    mm.newAllBlocksMesh()
+    assert(mm.getNbFaces() == 2830)
+
