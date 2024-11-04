@@ -28,7 +28,9 @@ def test_cylinder_delaunay_mesh():
     tm.setMeshingProperty (Mgx3D.FaceMeshingPropertyDelaunayGMSH(0, 1e22),["Fa0000", "Fa0001", "Fa0002"])
     # Création du maillage pour des faces
     mm.newFacesMesh ( ["Fa0000", "Fa0001", "Fa0002"] )
-    assert(mm.getNbFaces() == 248)
+    # Le nombre de faces en maillage Delaunay semble varier selon les options de compilation
+    assert(mm.getNbFaces() > 240)
+    assert(mm.getNbFaces() < 250)
 
 def test_bridge_delaunay_mesh():
     ctx = Mgx3D.getStdContext()
@@ -47,5 +49,7 @@ def test_bridge_delaunay_mesh():
     tm.setMeshingProperty (emp,["Ar0008"])
     # Création du maillage pour tous les blocs
     mm.newAllBlocksMesh()
-    assert(mm.getNbFaces() == 2830)
+    # Le nombre de faces en maillage Delaunay semble varier selon les options de compilation
+    assert(mm.getNbFaces() > 2820)
+    assert(mm.getNbFaces() < 2840)
 
