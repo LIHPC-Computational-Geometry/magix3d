@@ -1,4 +1,5 @@
 import pyMagix3D as Mgx3D
+import os
 
 def test_box_delaunay_mesh():
     ctx = Mgx3D.getStdContext()
@@ -41,7 +42,10 @@ def test_bridge_delaunay_mesh():
     # Changement d'unité de longueur
     ctx.setLengthUnit(Mgx3D.Unit.centimeter)
     # Import STEP
-    gm.importSTEP("B0.step")
+    # __file__ is the path of the current file, in this case the path of test_extern_gmsh.py
+    test_folder = os.path.dirname(__file__)
+    step_file_path = os.path.join(test_folder, 'B0.step')
+    gm.importSTEP(step_file_path)
     # Création d'un bloc topologique non structuré sur une géométrie (Vol0000)
     tm.newUnstructuredTopoOnGeometry ("Vol0000")
     # Changement de discrétisation pour les arêtes Ar0008
