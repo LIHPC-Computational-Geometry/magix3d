@@ -50,6 +50,15 @@ internalExecute()
             <<", normal "<<m_normal
             <<".";
 
+    // validity check
+    // figuring out whether we are trying to create a segment (infinite curvature)
+    if(!m_circumCircle) {
+        Utils::Math::Vector v0(m_center->getPoint(), m_start->getPoint());
+        Utils::Math::Vector v1(m_start->getPoint(), m_end->getPoint());
+        if(Utils::Math::MgxNumeric::isNearlyZero(v0.dot(v1))){
+            throw Utils::BuildingException(TkUtil::UTF8String ("Erreur durant la creation d'un arc de cercle; rayon de courbure infini", TkUtil::Charset::UTF_8));
+        }
+    }
 
     // sauvegarde des relations (connections topologiques) avant modification
     saveMemento(m_start);
