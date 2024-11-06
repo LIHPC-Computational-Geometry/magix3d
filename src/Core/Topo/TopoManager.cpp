@@ -104,6 +104,7 @@
 #include "Internal/NameManager.h"
 #include "Internal/M3DCommandResult.h"
 #include "Internal/CommandChangeLengthUnit.h"
+#include "Topo/CommandAlignOnSurface.h"
 
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
@@ -5672,6 +5673,45 @@ std::vector<std::string> TopoManager::getCommonEdges(const std::string& face1, c
 	for (uint i=0; i<coedges.size(); i++)
 		listeCoEdges.push_back(coedges[i]->getName());
 	return listeCoEdges;
+}
+
+/*----------------------------------------------------------------------------*/
+Mgx3D::Internal::M3DCommandResultIfc* TopoManager::alignVerticesOnSurface(
+        const std::string &surface,
+        const std::string &vertex,
+        const Point &pnt1,const Point &pnt2) {
+
+            Geom::GeomEntity* surf = getLocalContext().getGeomManager().getSurface(surface, true);
+            Vertex* vtx = TopoManager::getVertex (vertex, true);
+
+    return alignVerticesOnSurface(surf, vtx, pnt1, pnt2);
+}
+/*----------------------------------------------------------------------------*/
+Mgx3D::Internal::M3DCommandResultIfc* TopoManager::alignVerticesOnSurface(Geom::GeomEntity* surface, Vertex* vertex,
+                                         const Point &pnt1,const Point &pnt2) {
+
+
+        Topo::CommandAlignOnSurface* command =
+                new Topo::CommandAlignOnSurface(getLocalContext(), surface, vertex, pnt1, pnt2);
+
+        // trace dans le script
+        TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
+        cmd << getContextAlias() << "." << "getTopoManager().alignOnSurface ("
+            << surface->getName()<<", "
+            << vertex->getName() <<", "
+            << pnt1.getScriptCommand()<<", "
+            << pnt2.getScriptCommand()<< ")";
+        command->setScriptCommand(cmd);
+
+        // on passe au gestionnaire de commandes qui exécute la commande en // ou non
+        // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
+        getCommandManager().addCommand(command, Utils::Command::DO);
+
+        Internal::M3DCommandResultIfc*  cmdResult   =
+                new Internal::M3DCommandResult (*command);
+        return cmdResult;
+
+
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo

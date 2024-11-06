@@ -1615,6 +1615,12 @@ public:
      */
     virtual std::vector<std::string> getCommonEdges(const std::string& face1, const std::string& face2, int dim) const;
 
+    virtual Mgx3D::Internal::M3DCommandResultIfc*
+    alignVerticesOnSurface(const std::string &surface, const std::string &vertex, const Point &pnt1, const Point &pnt2);
+
+    virtual Mgx3D::Internal::M3DCommandResultIfc*
+    alignVerticesOnSurface(Geom::GeomEntity* surface, Vertex* vertex, const Point &pnt1, const Point &pnt2);
+
 private:
     /** Recherche un vecteur d'entités topologiques suivant leur nom,
      *  lève une exception en cas d'erreur.

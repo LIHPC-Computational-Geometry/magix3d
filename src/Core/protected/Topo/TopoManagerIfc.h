@@ -1336,6 +1336,10 @@ public:
     /** Retourne l'entité suivant le nom en argument */
     virtual TopoEntity* getEntity(const std::string& name, const bool exceptionIfNotFound=true) const;
 
+
+    virtual Mgx3D::Internal::M3DCommandResultIfc* alignVerticesOnSurface(const std::string &surface, const std::string &vertex,
+                                                                         const Point &pnt1,const Point &pnt2);
+
 #endif	// #ifndef SWIG
 
     /*------------------------------------------------------------------------*/
@@ -1359,6 +1363,7 @@ public:
     /** Retourne le nom du bloc en fonction des positions géométriques de ses sommets */
     virtual std::string getBlockAt(std::vector<Point>& pts) const;
 //	SET_SWIG_COMPLETABLE_METHOD_RET(std::string, getBlockAt)
+
 
 private:
 

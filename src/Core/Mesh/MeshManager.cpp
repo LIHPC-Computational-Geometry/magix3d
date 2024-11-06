@@ -24,6 +24,7 @@
 #include "Mesh/SubVolume.h"
 #include "Topo/Block.h"
 #include "Internal/M3DCommandResult.h"
+#include "Mesh/CommandDestroyMesh.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <Mesh/CommandCreateSubVolumeBetweenSheets.h>
