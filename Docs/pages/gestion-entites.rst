@@ -25,7 +25,9 @@ colonnes des surfaces, volumes, cofaces et blocs permettent par clic du
 bouton gauche de faire apparaître un menu contextuel controlant le
 mode d'affichage (filaire/isofilaire/surfacique) des entités 
 correspondantes.
-image:: ../images/groupes_raccourci_affichage.png
+
+.. image:: ../images/groupes_raccourci_affichage.png
+    :width: 400px
 
 La partie « **Groupes** » permet de sélectionner les groupes (nom de
 volume par exemple, nom de matériau) à afficher.
