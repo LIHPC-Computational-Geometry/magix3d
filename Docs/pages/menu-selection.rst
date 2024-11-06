@@ -9,6 +9,27 @@ Ce menu permet essentiellement d’agir sur la sélection.
    
    Voir :ref:`selection` pour la méthodologie de sélection des entités. 
 
+Annuler la dernière sélection
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Cette action annule la dernière opération de sélection effectuée. Son
+raccourci clavier est SHIFT-Z.
+
+
+Refaire la sélection annulée
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Cette action rejoue la dernière opération de sélection annulée. Son
+raccourci clavier est ALT-Z.
+
+A noter que lorsqu'une action de sélection consiste à détruire une
+sélection existante et en recommencer une, par exemple par clic sur une
+entité sans que la touche CTRL ne soit enfoncée, cette opération se 
+décompose en 2 opérations de sélection, "suppression de la sélection"
+puis "création d'une nouvelle sélection". L'annulation et le rejeu d'une
+telle action s'effectue dès lors en 2 temps.
+
+
 Afficher/Masquer les entités sélectionnées
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

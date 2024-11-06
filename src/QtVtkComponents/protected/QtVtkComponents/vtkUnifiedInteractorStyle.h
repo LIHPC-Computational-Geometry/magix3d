@@ -53,16 +53,15 @@ class vtkUnifiedInteractorStyle : public vtkInteractorStyleTrackballCamera
 	 * <OL> 
 	 * <LI> <I>f</I> : le centre de rotation est l'acteur,
 	 * <LI> <I>F</I> : le centre de rotation est le point visé,
-	 * <LI> <I>x</I> ou <I>X</I> : vue positionnée dans le plan yOz,
-	 * <LI> <I>y</I> ou <I>Y</I> : vue positionnée dans le plan xOz,
-	 * <LI> <I>z</I> ou <I>Z</I> : vue positionnée dans le plan xOy,
-	 * <LI> <I>a</I> ou <I>A</I> : suppression du roulis,
-	 * <LI> <I>r</I> ou <I>R</I> : annule un éventuel zoom préalable, puis invoque vtkInteractorStyleTrackballCamera::OnChar.
+	 * <LI> <I>x</I> : vue positionnée dans le plan yOz,
+	 * <LI> <I>y</I> : vue positionnée dans le plan xOz,
+	 * <LI> <I>z</I> : vue positionnée dans le plan xOy,
+	 * <LI> <I>a</I> : suppression du roulis,
+	 * <LI> <I>r</I> : annule un éventuel zoom préalable, puis invoque vtkInteractorStyleTrackballCamera::OnChar.
 	 * <LI> Suppression du passage au mode stéréo sur la touche 3.
 	 * </OL>
 	 * </P>
-	 * <P>Ces évènements ponctuels provoquent l'invocation de
-	 * <I>InvokeEvent (vtkCommand::InteractionEvent, NULL);</I>.
+	 * <P>Ces évènements ponctuels provoquent l'invocation de <I>InvokeEvent (vtkCommand::InteractionEvent, NULL);</I>.
 	 * \see		FlyTo
 	 * \see		DisplayxOyViewPlane
 	 * \see		DisplayxOzViewPlane
@@ -95,12 +94,25 @@ class vtkUnifiedInteractorStyle : public vtkInteractorStyleTrackballCamera
 	 */
 	virtual void OnMouseMove  ( );
 
-	/** @return		true si la touche <I>control</I> est pressée, sinon false. */
+	/** 
+	 * @return		true si la touche <I>control</I> est pressée, sinon false.
+	 */
 	virtual bool isControlKeyPressed ( );
 
-	/** @return		true si la touche <I>shift</I> est pressée, sinon false.
-	  */
+	/**
+	 * @return		true si la touche <I>alt</I> est pressée, sinon false.
+	 */
+	virtual bool isAltKeyPressed ( );
+	
+	/**
+	 * @return		true si la touche <I>shift</I> est pressée, sinon false.
+	 */
 	virtual bool isShiftKeyPressed ( );
+	
+	/**
+	 * @return		true au moins une touche parmi <I>control, shift, alt</I> est pressée, sinon false.
+	 */
+	virtual bool hasModifier ( );
 
 	/** 
 	 * <P>Teste si le caractère est Key_Up, Key_Left, Key_Right, ou Key_Down (de Qt). Appelle, si c'est le cas, la méthode associée. Dans le
