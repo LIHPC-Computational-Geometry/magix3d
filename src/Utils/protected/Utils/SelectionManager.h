@@ -7,6 +7,7 @@
 
 #include <TkUtil/Mutex.h>
 
+#include <ostream>
 #include <string>
 #include <vector>
 #include <sys/types.h>
@@ -259,6 +260,37 @@ class SelectionManager : public Mgx3D::Utils::SelectionManagerIfc
 	 * qu'il est oté de la sélection.
 	 */
 	virtual void clearSelection ( );
+	
+	/**
+	 * Annule la dernière opération de sélection.
+	 * \see		redo
+	 * \see		resetUndoStack
+	 */
+	virtual void undo ( );
+
+	/**
+	 * Rejoue la dernière opération de sélection annulée.
+	 * \see		undo
+	 * \see		resetUndoStack
+	 */
+	virtual void redo ( );
+
+	/**
+	 * Vide la pile de undo/redo.
+	 * \see		undo
+	 * \see		redo
+	 */
+	virtual void resetUndoStack ( );
+	
+	/**
+	 * \return	true si il y a au moins une sélection annulable, sinon false.
+	 */
+	 virtual bool isUndoable ( ) const;
+	 
+	/**
+	 * \return	true si il y a au moins une sélection rejouable, sinon false.
+	 */
+	 virtual bool isRedoable ( ) const;
 
 	//@}	// Les actions directes sur la sélection
 
@@ -310,6 +342,59 @@ class SelectionManager : public Mgx3D::Utils::SelectionManagerIfc
 	 */
 	virtual void notifyObserversForNewPolicy (void* smp = 0);
 
+	/**
+     * Les actions directes sur la sélection
+     */	
+	//@{
+	enum STACK_ACTION { ADD, REMOVE, CLEAR };
+	
+	/**
+	 * Informe ses observateurs que les entités sont ajoutées à la sélection.
+	 * Se référence auprès des entités.
+	 * Si undoable vaut true alors l'opération de sélection est ajoutée au gestionnaire de undo/redo.
+	 * @see			pushAction
+	 * @warning		Ne tient pas compte du mode d'extension de la sélection.
+	 */
+	virtual void addToSelection (const std::vector<Mgx3D::Utils::Entity*>& entities, bool undoable);
+
+	/**
+	 * Informe ses observateurs que les entités sont otées de la sélection.
+	 * Se déréférence auprès des entités.
+	 * Si undoable vaut true alors l'opération de sélection est ajoutée au gestionnaire de undo/redo.
+	 * @see			pushAction
+	 * @exception		Une exception est levée si une entité ne peut pas être enlevée de la sélection.
+	 */
+	virtual void removeFromSelection (const std::vector<Mgx3D::Utils::Entity*>& entities, bool undoable);
+
+	/**
+	 * Informe ses observateurs de la désélection des éléments qu'il est oté de la sélection.
+	 * Si undoable vaut true alors l'opération de sélection est ajoutée au gestionnaire de undo/redo.
+	 * @see			pushAction
+	 */
+	virtual void clearSelection (bool undoable);
+	
+	/**
+	 * Actualise la pile d'actions de sélection en ajoutant - si nécessaire - celle reçue en argument.
+	 */
+	virtual void pushAction (STACK_ACTION action, const std::vector<Mgx3D::Utils::Entity*>& entities);
+	
+	/**
+	 * \return	L'action de sélection courante, sous forme de chaine de caractères, pour aide à la mise au point.
+	 */
+	virtual std::string getCurrentAction ( ) const;
+
+	/**
+	 * \return	La i-ème action de sélection courante, sous forme de chaine de caractères, pour aide à la mise au point.
+	 */
+	virtual std::string getAction (size_t i) const;
+		
+	/**
+	 * Affiche la pile d'actions dans le flux transmis en argument à raison d'une ligne par action. L'action de sélection
+	 * courante, si il y en a, est précédée de "=>". Pour aide à la mise au point.
+	 */
+	 virtual void printActionsStack (std::ostream& stream) const;
+	//@}	// Les actions directes sur la sélection
+
 
 	private :
 
@@ -334,6 +419,12 @@ class SelectionManager : public Mgx3D::Utils::SelectionManagerIfc
 
 	/** Mutex pour protéger certaines opérations. */
 	mutable TkUtil::Mutex*									_mutex;
+	
+	/** La pile d'opération de sélection pour undo/redo. */
+	std::vector < std::pair <STACK_ACTION, std::vector<Mgx3D::Utils::Entity*> > >				_undoStack;
+	
+	/** L'opération courante de sélection. */
+	size_t																						_currentAction;
 
 	/** le flux pour les messages */
 	TkUtil::LogOutputStream* m_logOutputStream;

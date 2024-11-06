@@ -20,7 +20,12 @@ Cet onglet se décompose en 2 parties, en haut les types d’entités et en
 bas les groupes rassemblés par dimension.
 
 La partie « **Types d’entités** » permet d’activer ou non la
-représentation des entités suivant leur type.
+représentation des entités suivant leur type. Les secondes et troisièmes
+colonnes des surfaces, volumes, cofaces et blocs permettent par clic du
+bouton gauche de faire apparaître un menu contextuel controlant le
+mode d'affichage (filaire/isofilaire/surfacique) des entités 
+correspondantes.
+.. image:: ../images/groupes_raccourci_affichage.png
 
 La partie « **Groupes** » permet de sélectionner les groupes (nom de
 volume par exemple, nom de matériau) à afficher.

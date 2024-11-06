@@ -63,32 +63,34 @@ void vtkUnifiedInteractorStyle::OnChar ( )
 
 	switch (interactor->GetKeyCode ( ))
 	{
-		case 'f'	:	// Jamais appele, c'est toujours 'F'
+		case 'f'	:	// Jamais appelé, c'est toujours 'F'
 		case 'F'	:
 			FlyTo (false == isShiftKeyPressed ( ) ? true : false);
 			break;
 		case 'x'	:
-		case 'X'	:
-			if (true == GetEnablePlaneKeys ( ))
+//		case 'X'	:
+			if ((true == GetEnablePlaneKeys ( )) && (false == hasModifier ( )))
 				DisplayyOzViewPlane ( );
 			break;
 		case 'y'	:
-		case 'Y'	:
-			if (true == GetEnablePlaneKeys ( ))
+//		case 'Y'	:
+			if ((true == GetEnablePlaneKeys ( )) && (false == hasModifier ( )))
 				DisplayxOzViewPlane ( );
 			break;
 		case 'z'	:
-		case 'Z'	:
-			if (true == GetEnablePlaneKeys ( ))
+//		case 'Z'	:
+			if ((true == GetEnablePlaneKeys ( )) && (false == hasModifier ( )))
 				DisplayxOyViewPlane ( );
 			break;
 		case 'a'	:	// Suppression du roulis
-		case 'A'	:
-			ResetRoll ( );
+//		case 'A'	:
+			if (false == hasModifier ( ))
+				ResetRoll ( );
 			break;
-		case 'r'	:
-		case 'R'	:	// Reset. Annulation au prealable d'un eventuel zoom.
-			ResetView ( );
+		case 'r'	: // Reset. Annulation au prealable d'un eventuel zoom.
+//		case 'R'	:
+			if (false == hasModifier ( ))
+				ResetView ( );
 			break;
 		case '3'	:	// stereo <-> non stereo : on l'annule => traite plus loin
 			break;
@@ -171,6 +173,32 @@ bool vtkUnifiedInteractorStyle::isShiftKeyPressed ( )
 
 	return 0 != interactor->GetShiftKey ( ) ? true : false;
 }	// vtkUnifiedInteractorStyle::isShiftKeyPressed
+
+
+bool vtkUnifiedInteractorStyle::isAltKeyPressed ( )
+{
+	vtkRenderWindowInteractor*	interactor	= GetInteractor ( );
+	if (0 == interactor)
+	{
+		vtkWarningMacro("vtkUnifiedInteractorStyle::isAltKeyPressed : null interactor.");
+		return false;
+	}
+
+	return 0 != interactor->GetAltKey ( ) ? true : false;
+}	// vtkUnifiedInteractorStyle::isAltKeyPressed
+
+
+bool vtkUnifiedInteractorStyle::hasModifier ( )
+{
+	vtkRenderWindowInteractor*	interactor	= GetInteractor ( );
+	if (0 == interactor)
+	{
+		vtkWarningMacro("vtkUnifiedInteractorStyle::hasModifier : null interactor.");
+		return false;
+	}
+
+	return (0 != interactor->GetControlKey ( )) || (0 != interactor->GetShiftKey ( )) || (0 != interactor->GetAltKey ( )) ? true : false;
+}	// vtkUnifiedInteractorStyle::hasModifier
 
 
 void vtkUnifiedInteractorStyle::OnKeyRelease ( )

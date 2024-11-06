@@ -260,6 +260,37 @@ class SelectionManagerIfc
 	 * Informe ses observateurs de la désélection des éléments.
 	 */
 	virtual void clearSelection ( );
+	
+	/**
+	 * Annule la dernière opération de sélection.
+	 * \see		redo
+	 * \see		resetUndoStack
+	 */
+	virtual void undo ( );
+
+	/**
+	 * Rejoue la dernière opération de sélection annulée.
+	 * \see		undo
+	 * \see		resetUndoStack
+	 */
+	virtual void redo ( );
+
+	/**
+	 * Vide la pile de undo/redo.
+	 * \see		undo
+	 * \see		redo
+	 */
+	virtual void resetUndoStack ( );
+	
+	/**
+	 * \return	true si il y a au moins une sélection annulable, sinon false.
+	 */
+	 virtual bool isUndoable ( ) const;
+	 
+	/**
+	 * \return	true si il y a au moins une sélection rejouable, sinon false.
+	 */
+	 virtual bool isRedoable ( ) const;
 
 	//@}	// Les actions directes sur la sélection
 

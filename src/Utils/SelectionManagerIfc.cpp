@@ -250,6 +250,36 @@ void SelectionManagerIfc::clearSelection ( )
 }	// SelectionManagerIfc::clearSelection
 
 
+void SelectionManagerIfc::undo ( )
+{
+	throw Exception ("SelectionManagerIfc::undo should be overloaded.");
+}	// SelectionManagerIfc::undo
+
+
+void SelectionManagerIfc::redo ( )
+{
+	throw Exception ("SelectionManagerIfc::redo should be overloaded.");
+}	// SelectionManagerIfc::redo
+
+
+void SelectionManagerIfc::resetUndoStack ( )
+{
+	throw Exception ("SelectionManagerIfc::resetUndoStack should be overloaded.");
+}	// SelectionManagerIfc::resetUndoStack
+
+
+bool SelectionManagerIfc::isUndoable ( ) const
+{
+	throw Exception ("SelectionManagerIfc::isUndoable should be overloaded.");
+}	// SelectionManagerIfc::isUndoable
+
+
+bool SelectionManagerIfc::isRedoable ( ) const
+{
+	throw Exception ("SelectionManagerIfc::isRedoable should be overloaded.");
+}	// SelectionManagerIfc::isRedoable
+
+
 SelectionManagerIfc::DIM SelectionManagerIfc::dimensionToDimensions (int dimension)
 {
 	switch (dimension)

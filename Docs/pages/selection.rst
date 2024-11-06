@@ -57,3 +57,15 @@ sélection, sinon il y a remplacement) :
    opération.
 
 -  A partir d’une commande terminée, depuis l’:ref:`onglet-moniteur`.
+
+Les opérations de sélection sont annulable/rejouables, et ce entre 2
+commandes. En effet, les opérations de sélection n'étant pas des
+commandes Magix3D, la cohérence de la sélection ne pourrait être
+garantie si la pile d'opération de sélection n'était pas réinitialisée
+après chaque commande.
+
+Sans augmentation de la sélection, une opération de sélection se
+décompose en 2 étapes : annulation de la sélection courante puis
+création d'une nouvelle sélection. Ce sont ces 2 étapes qui sont
+stockées dans la pile d'opérations de sélection et le undo/redo de 
+telles opérations s'effectue en 2 temps.
