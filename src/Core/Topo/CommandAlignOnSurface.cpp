@@ -73,6 +73,7 @@ void CommandAlignOnSurface::internalExecute() {
 
         Point pnt = intersector.getIntersection();
         m_vertex->saveVertexGeomProperty(&getInfoCommand(), true);
+        m_vertex->saveTopoProperty();
         m_vertex->setCoord(pnt);
         m_vertex->setGeomAssociation(m_surface);
 
