@@ -729,24 +729,29 @@ void QtGroupsPanel::updateQuickButtons ( )
 	    (0 == _wireTopoBlockButton) || (0 == _solidTopoBlockButton) || (0 == _wireTopoCoFaceButton) || (0 == _solidTopoCoFaceButton))
 		return;
 
-	// Premier vrai passage on retaille les boutons pour qu'ils prennent moins de place et fassent la même taille :
+	// Premier vrai passage on retaille les boutons pour qu'ils prennent moins de place et fassent la même taille car par défaut ils sont un peu gros (et pas beau ;) ):
 	static bool first= true;
 	if (true == first)
 	{
-		int	height	= _entitiesTypesWidget->sizeHintForRow (2);
-		if (-1 != height)
+		// Récupérer la hauteur de Points (pas de QToolButton qui influence
+		int			height	= _entitiesTypesWidget->sizeHintForRow (3);	// Avant premier rendu retourne -1
+		// Si problème alors les 3 lignes qui suivent :
+		//_entitiesTypesWidget->setCurrentItem (_typesItems[3]);
+		//QModelIndex	index	= 	_entitiesTypesWidget->currentIndex ( );
+		//height				= _entitiesTypesWidget->sizeHintForRow (index.row ( ));
+		if (0 < height)
 		{	// CP - TODO : code à finaliser en récupérant la hauteur de la rangée et en l'affectant largeur x hauteur des widgets ci-dessous.
-			_wireGeomVolumeButton->setFixedSize (16, 16);
-			_solidGeomVolumeButton->setFixedSize (16, 16);
-			_wireGeomSurfaceButton->setFixedSize (16, 16);
-			_solidGeomSurfaceButton->setFixedSize (16, 16);
-			_wireTopoBlockButton->setFixedSize (16, 16);
-			_solidTopoBlockButton->setFixedSize (16, 16);
-			_wireTopoCoFaceButton->setFixedSize (16, 16);
-			_solidTopoCoFaceButton->setFixedSize (16, 16);
+			_wireGeomVolumeButton->setFixedSize (height, height);
+			_solidGeomVolumeButton->setFixedSize (height, height);
+			_wireGeomSurfaceButton->setFixedSize (height, height);
+			_solidGeomSurfaceButton->setFixedSize (height, height);
+			_wireTopoBlockButton->setFixedSize (height, height);
+			_solidTopoBlockButton->setFixedSize (height, height);
+			_wireTopoCoFaceButton->setFixedSize (height, height);
+			_solidTopoCoFaceButton->setFixedSize (height, height);
 			first	= false;
-		}
-	}	// if (true == first)
+		}	// if (0 < height)
+	}	// if (0 < height)
 	// GeomVolume / Wire :
 	unsigned long	rep	= context->globalMask (Entity::GeomVolume) & ((unsigned long)GraphicalEntityRepresentation::ISOCURVES | (unsigned long)GraphicalEntityRepresentation::CURVES);
 	_wireGeomVolumeButton->setChecked (0 == rep ? false : true);
@@ -918,7 +923,7 @@ void QtGroupsPanel::createGui ( )
 	if (0 == _surfacicIcon)
 		_surfacicIcon	= new QIcon (":/images/surfacic.png");
 
-	QSize	iconSize (16, 16);		// Redimensionné dans QtGroupsPanel::updateQuickButtons à la hauteur de ligne
+	QSize	iconSize (1, 1);		// Redimensionné dans QtGroupsPanel::updateQuickButtons à la hauteur de ligne
 	if ((0 != _entitiesTypesWidget) || (0 != _entitiesGroupsWidget))
 	{
 		INTERNAL_ERROR (exc, "QtGroupsPanel::createGui", "IHM déjà initialisée.")
