@@ -970,8 +970,7 @@ void QtRepresentationTypesDialog::applyCallback ( )
 	if (true == globalMode)
 	{
 		Context&	context	= getRenderingManager ( ).getContext ( );
-		for (Entity::objectType ot = Entity::GeomVertex; ot < Entity::undefined;
-		     ot = (Entity::objectType)(ot + 1))
+		for (Entity::objectType ot = Entity::GeomVertex; ot < Entity::undefined;  ot = (Entity::objectType)(ot + 1))
 		{
 			if (_globalMasks.end ( ) == _globalMasks.find (ot))
 				continue;
@@ -1005,15 +1004,14 @@ void QtRepresentationTypesDialog::applyCallback ( )
 			            GraphicalEntityRepresentation::NBMESHINGEDGE,
 			            useNbMeshRepresentation ( ));
 			updateMask (newMask, getDisplayedValueType ( ));
-			context.globalMask (ot)	= newMask;
+			context.globalMask (ot)			= newMask;
+			context.savedGlobalMask (ot)	= newMask;
 		}	// for (Entity::objectType ot = Entity::GeomVertex; ...
 
 		// Actualisation des représentations :
-		for (vector<Entity*>::const_iterator it = _entities.begin ( );
-		     _entities.end ( ) !=it; it++)
+		for (vector<Entity*>::const_iterator it = _entities.begin ( ); _entities.end ( ) !=it; it++)
 		{
-			DisplayProperties::GraphicalRepresentation*	rep	=
-				(*it)->getDisplayProperties ( ).getGraphicalRepresentation ( );
+			DisplayProperties::GraphicalRepresentation*	rep	= (*it)->getDisplayProperties ( ).getGraphicalRepresentation ( );
 			if (0 != rep)
 			{
 				unsigned long	mask	= rep->getRepresentationMask ( );
@@ -1026,11 +1024,8 @@ void QtRepresentationTypesDialog::applyCallback ( )
 
 	// On applique le nouveau masque de représentation aux entités
 	// sélectionnées :
-	const bool	forceUpdate	=
-		(true == newProperties.useShrinkFactor ( )) || (true == newProperties.useArrowComul ( )) ?
-		true : false;
-	for (vector<Entity*>::const_iterator it2 = _entities.begin ( );
-	     _entities.end ( ) != it2; it2++)
+	const bool	forceUpdate	= (true == newProperties.useShrinkFactor ( )) || (true == newProperties.useArrowComul ( )) ? true : false;
+	for (vector<Entity*>::const_iterator it2 = _entities.begin ( ); _entities.end ( ) != it2; it2++)
 	{
 		CHECK_NULL_PTR_ERROR ((*it2)->getDisplayProperties ( ).getGraphicalRepresentation ( ))
 		unsigned long	mask	=
@@ -1060,19 +1055,19 @@ void QtRepresentationTypesDialog::applyCallback ( )
 		updateMask (newMask, getDisplayedValueType ( ));
 
 		DisplayProperties&	properties	= (*it2)->getDisplayProperties ( );
-		QtRepresentationTypesPanel::ExtendedDisplayProperties
-			::updateDisplayProperties (getDisplayProperties ( ),
-								(*it2)->getType ( ), globalMode, properties);
+		QtRepresentationTypesPanel::ExtendedDisplayProperties::updateDisplayProperties (getDisplayProperties ( ), (*it2)->getType ( ), globalMode, properties);
 		getRenderingManager ( ).updateRepresentation (**it2, newMask, forceUpdate);
 	}	// for (vector<Entity*>::iterator it2 = ...
 
 	}	// else if (true == globalMode)
 
-	// En cas de changement de couleurs il faudra procéder à une actualisation
-	// des entités affichées : des entités topo peuvent avoir à synchroniser
+	// En cas de changement de couleurs il faudra procéder à une actualisation des entités affichées : des entités topo peuvent avoir à synchroniser
 	// leur couleur d'affichage avec celle de l'entité géométrique associée :
 	if ((OFF != topoUseGeomColor ( )) && (true == colorModified ( )))
 		getRenderingManager ( ).updateRepresentations ( );
+
+	if (0 != _mainWindow) 
+		_mainWindow->getGroupsPanel ( ).updateQuickButtons ( );
 
 	getRenderingManager ( ).forceRender ( );
 

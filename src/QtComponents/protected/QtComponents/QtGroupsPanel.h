@@ -13,8 +13,10 @@
 #include "QtComponents/QtEntitiesItemViewPanel.h"
 
 #include <QCheckBox>
+#include <QIcon>
 #include <QMenu>
 #include <QSettings>
+#include <QToolButton>
 #include <QTreeWidget>
 
 #include <map>
@@ -113,8 +115,7 @@ class QtGroupTreeWidgetItem : public QTreeWidgetItem
 	virtual void update (bool updateRepresentation);
 
 	/**
-	 * \return		Pointeur sur le groupe représenté, ou 0 s'il
-	 *				n'y en a pas.
+	 * \return		Pointeur sur le groupe représenté, ou 0 s'il n'y en a pas.
 	 */
 	virtual Group::GroupEntity* getGroup ( );
 	virtual const Group::GroupEntity* getGroup ( ) const;
@@ -198,6 +199,52 @@ class QtGroupLevelTreeWidgetItem : public QTreeWidgetItem
 
 
 /**
+ * \brief	Classe permettant par simple clic de basculer en mode affichage/masquage d'un mode de représentation ((iso)filaire/solide d'un type d'entité (GeomVolume, ...).
+ * Cette classe ne fait que véhiculer les informations utiles au traitement du changement du mode d'affichagee.
+ */
+class QtQuickRepToolButton : public QToolButton
+{
+	public :
+	
+	/**
+	 * @param	Parent
+	 * @param	icône affichée
+	 * @param	Type d'entité représenté
+	 * @param	Mode de représentation représenté (true : filaire, false : solide)
+	 */
+	QtQuickRepToolButton (QWidget* parent, QIcon& icon, Mgx3D::Utils::Entity::objectType type, bool wire);
+
+	/**
+	 * Destructeur. RAS.
+	 */
+	virtual ~QtQuickRepToolButton ( )
+	{ }
+
+	/**
+	 * @return	Le type d'entité représenté.
+	 */
+	Mgx3D::Utils::Entity::objectType entityType ( ) const;
+
+	/**
+	 * @return	true s'il l'instance représente le mode de représentation filaire, false s'il s'agit de la représentation solide.
+	 */
+	bool isWireRepresentation ( ) const;
+
+
+	private :
+
+	QtQuickRepToolButton (const QtQuickRepToolButton&);
+	QtQuickRepToolButton& operator = (const QtQuickRepToolButton&);
+	
+	/// Le type d'entité représenté. 
+	Mgx3D::Utils::Entity::objectType		_entityType;
+	
+	/// Le mode de représentation représenté (true : filaire, false : solide)
+	bool									_wireMode;
+};	// class QtQuickRepToolButton
+
+
+/**
  * \brief		Panneau de l'IHM <I>Magix 3D</I> affichant les différents groupes existants d'une session et les différents types de
  *				groupes <I>Magix 3D</I>.
  *				L'affichage est d'une part textuelle, d'autre part dans une fenêtre graphique 3D.
@@ -234,15 +281,13 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionMan
 	//@{
 
 	/**
-	 * Enregistre les paramètres d'affichage (taille, position, ...) de cette
-	 * fenêtre.
+	 * Enregistre les paramètres d'affichage (taille, position, ...) de cette fenêtre.
 	 * \see		readSettings
 	 */
 	virtual void writeSettings (QSettings& settings);
 
 	/**
-	 * Lit et s'applique les paramètres d'affichage (taille, position, ...) de
-	 * cette fenêtre.
+	 * Lit et s'applique les paramètres d'affichage (taille, position, ...) de cette fenêtre.
 	 * \see		writeSettings
 	 */
 	virtual void readSettings (QSettings& settings);
@@ -286,16 +331,14 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionMan
 	//@{
 
 	/**
-	 * Ajoute les instances transmises en argument à la liste des groupes
-	 * représentés.
+	 * Ajoute les instances transmises en argument à la liste des groupes représentés.
 	 * \param		Instances de groupes à ajouter
 	 * \see			removeGroups
 	 */
 	virtual void addGroups (const std::vector<Mgx3D::Group::GroupEntity*>& groups);
 
 	/**
-	 * Enlève les instances transmises en argument de la liste des groupes
-	 * représentés.
+	 * Enlève les instances transmises en argument de la liste des groupes représentés.
 	 * \param		Instances de groupes à enlever
 	 * \see			addGroups
 	 */
@@ -322,9 +365,7 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionMan
 	//@{
 
 	/**
- 	 * Actualise le panneau de manière à faciliter la sélection interactive
- 	 * d'entités conformément à la politique de sélection courrante du 
- 	 * gestionnaire de sélection.
+ 	 * Actualise le panneau de manière à faciliter la sélection interactive d'entités conformément à la politique de sélection courrante du gestionnaire de sélection.
  	 * \see		updateEntityItemState
  	 * \see		enableSelectionPolicyAdaptation
  	 */
@@ -347,6 +388,11 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionMan
 
 	//@}	// La sélection.
 
+	/**
+	 * Actualise l'état des différents boutons d'action rapide (affichage/masquage, filaire/solide) en fonction du contexte.
+	 */
+	 virtual void updateQuickButtons ( );
+	 
 
 	protected :
 
@@ -381,8 +427,7 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionMan
 	virtual QtGroupTreeWidgetItem* createGroupItem (Mgx3D::Group::GroupEntity&);
 
 	/**
-	 * \return		L'entrée principale dans l'arborescence des groupes dont la
-	 *				dimension et le niveaux sont transmis en arguments.
+	 * \return		L'entrée principale dans l'arborescence des groupes dont la dimension et le niveaux sont transmis en arguments.
 	 * \exception	Une exception est levée en cas de dimension invalide.
 	 * \see			createEntryItem
 	 */
@@ -395,18 +440,13 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionMan
 
 	/**
 	 * Appelé par <I>selectionPolicyModified</I>, factorisation de code.
-	 * Actualise l'état (coché) de l'item correspondant au type d'entité
-	 * transmis en premier argument selon l'état courant du gestionnaire de
+	 * Actualise l'état (coché) de l'item correspondant au type d'entité transmis en premier argument selon l'état courant du gestionnaire de
 	 * sélection et l'ancien état du gestion de sélection.
-	 * En cas d'activation d'un item, <I>toRestore</I> reçoit le type
-	 * correspondant par <I>opérateur |</I>.
+	 * En cas d'activation d'un item, <I>toRestore</I> reçoit le type correspondant par <I>opérateur </I>.
 	 * \see		selectionPolicyModified
 	 */
-	virtual void updateEntityItemState (
-					Mgx3D::Utils::FilterEntity::objectType type, 
-					Mgx3D::Utils::FilterEntity::objectType newState,
-					Mgx3D::Utils::FilterEntity::objectType oldState,
-					Mgx3D::Utils::FilterEntity::objectType& toRestore);
+	virtual void updateEntityItemState (Mgx3D::Utils::FilterEntity::objectType type, Mgx3D::Utils::FilterEntity::objectType newState,
+					Mgx3D::Utils::FilterEntity::objectType oldState, Mgx3D::Utils::FilterEntity::objectType& toRestore);
 
 	/**
 	 * Trier les items.
@@ -419,8 +459,7 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionMan
 	public :
 
 	/**
-	 * \return		<I>true</I> lorsque les modifications graphiques sur
-	 *				les entités doivent être groupées si possible.
+	 * \return		<I>true</I> lorsque les modifications graphiques sur les entités doivent être groupées si possible.
 	 *				Optimisation pour le mode client/serveur ...
 	 *				Retourne <I>false</I> par défaut.
 	 */
@@ -430,10 +469,8 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionMan
 	public slots :
 
 	/**
-	 * Appellé lorsque l'utilisateur clique sur un item de type
-	 * "type d'entités".
-	 * Actualise la représentation des groupes dans la fenêtre
-	 * graphique 3D.
+	 * Appellé lorsque l'utilisateur clique sur un item de type "type d'entités".
+	 * Actualise la représentation des groupes dans la fenêtre graphique 3D.
 	 * \see		groupStateChangeCallback
 	 */
 	virtual void entitiesTypesStateChangeCallback (QTreeWidgetItem*, int);
@@ -442,9 +479,15 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionMan
 	protected slots :
 
 	/**
+	 * Appellé lorsque l'utilisateur clique sur le bouton d'affichage/masquage rapide des représentations filaires ou surfaciques d'entités.
+	 * Affiche/masque les entités correspondantes tout en respectant leur mode d'affichage en cours (filaire/isofilaire/filaire + isofilaire/surfacique
+	 * selon le bouton et le mode en cours).
+	 */
+	virtual void quickDisplayRepresentationsCallback (bool display);
+	
+	/**
 	 * Appellé lorsque l'utilisateur clique sur un item de type groupe.
-	 * Affiche/Masque la représentation des entités du groupe dans la fenêtre
-	 * graphique 3D.
+	 * Affiche/Masque la représentation des entités du groupe dans la fenêtre graphique 3D.
 	 * \see		entitiesTypesStateChangeCallback
 	 */
 	virtual void groupStateChangeCallback (QTreeWidgetItem*, int);
@@ -505,26 +548,21 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionMan
 	virtual void changeGroupLevelCallback ( );
 
 	/**
-	 * Permet de sélectionner les groupes d'un niveau renseigné par
-	 * l'utilisateur.
+	 * Permet de sélectionner les groupes d'un niveau renseigné par l'utilisateur.
 	 */
 	virtual void levelSelectionCallback ( );
 
 	/**
-	 * Appelé pour modifier les paramètres d'affichage
-	 * (points/filaire/surfacique) des entités de types sélectionnés.
-	 * Affiche une boite de dialogue de choix des types de représentation à
-	 * utiliser, initialisé selon les entités sélectionnées dans l'arborescence
+	 * Appelé pour modifier les paramètres d'affichage (points/filaire/surfacique) des entités de types sélectionnés.
+	 * Affiche une boite de dialogue de choix des types de représentation à utiliser, initialisé selon les entités sélectionnées dans l'arborescence
 	 * de types d'entités, et effectue les modifications demandées.
 	 * \see		groupsRepresentationTypesCallback ( );
 	 */
 	virtual void typesRepresentationTypesCallback ( );
 
 	/**
-	 * Appelé pour modifier les paramètres d'affichage
-	 * (points/filaire/surfacique) des entités des groupes sélectionnés.
-	 * Affiche une boite de dialogue de choix des types de représentation à
-	 * utiliser, initialisé selon les entités sélectionnées dans l'arborescence
+	 * Appelé pour modifier les paramètres d'affichage (points/filaire/surfacique) des entités des groupes sélectionnés.
+	 * Affiche une boite de dialogue de choix des types de représentation à utiliser, initialisé selon les entités sélectionnées dans l'arborescence
 	 * de groupes d'entités, et effectue les modifications demandées.
 	 * \see		typesRepresentationTypesCallback ( );
 	 */
@@ -544,7 +582,6 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionMan
 	 * Sélectionne toutes les entités pour les types sélectionnés
 	 */
 	virtual void selectAllCallback ( );
-
 
 	/**
 	 * Sélectionne les volumes géométriques correspondants aux groupes sélectionnés
@@ -673,16 +710,12 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionMan
 
 
 	/**
-	 * Appelé lorsque le menu popup est demandé au niveau de l'arborescence des
-	 * types d'entités à afficher. Affiche ce menu popup à la position transmise
-	 * en argument.
+	 * Appelé lorsque le menu popup est demandé au niveau de l'arborescence des types d'entités à afficher. Affiche ce menu popup à la position transmise en argument.
 	 */
 	virtual void displayTypesPopupMenu (const QPoint&);
 
 	/**
-	 * Appelé lorsque le menu popup est demandé au niveau de l'arborescence des
-	 * groupes d'entités. Affiche ce menu popup à la position transmise
-	 * en argument.
+	 * Appelé lorsque le menu popup est demandé au niveau de l'arborescence des groupes d'entités. Affiche ce menu popup à la position transmise en argument.
 	 */
 	virtual void displayGroupsPopupMenu (const QPoint&);
 
@@ -720,6 +753,15 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionMan
 
 	/** Cases à cocher à décocher au prochain appel de <I>selectionPolicyModified</I>. cf. selectionPolicyModified. */
 	Mgx3D::Utils::FilterEntity::objectType	_uncheckedCheckboxes;
+	
+	/** Les menus contextuels filaire et surfacique. */
+	QtQuickRepToolButton					*_wireGeomVolumeButton, *_solidGeomVolumeButton;
+	QtQuickRepToolButton					*_wireGeomSurfaceButton, *_solidGeomSurfaceButton;
+	QtQuickRepToolButton					*_wireTopoBlockButton, *_solidTopoBlockButton;
+	QtQuickRepToolButton					*_wireTopoCoFaceButton, *_solidTopoCoFaceButton;
+	
+	/** Les icônes filaires et surfaciques. */
+	static QIcon							*_wireIcon, *_surfacicIcon;
 };	// class QtGroupsPanel
 
 

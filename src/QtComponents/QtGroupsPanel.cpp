@@ -65,11 +65,10 @@ namespace Mgx3D
 namespace QtComponents
 {
 
+const int	WIRE_COLUMN	= 1, SOLID_COLUMN	= (WIRE_COLUMN+1);
 
-static QAction* createAction (
-			QMenu& parent, const QString& label, const QString& whatsThis,
-			const char* method, QObject* receiver,
-			bool checkable, THREESTATES state)
+
+static QAction* createAction (QMenu& parent, const QString& label, const QString& whatsThis, const char* method, QObject* receiver, bool checkable, THREESTATES state)
 {
 	QAction*	action	= new QAction (label, &parent);
 	action->setWhatsThis (whatsThis);
@@ -79,8 +78,7 @@ static QAction* createAction (
 		switch (state)
 		{
 			case ON		: action->setChecked (true);	break;
-			// Pb : Qt 4.6.2 ne prévoit plus les checkbox dans les menus avec
-			// le setTristate (true) et le setCheckState (Qt::PartiallyChecked).
+			// Pb : Qt 4.6.2 ne prévoit plus les checkbox dans les menus avec le setTristate (true) et le setCheckState (Qt::PartiallyChecked).
 			case OFF	:
 			default		: action->setChecked (false);
 		}	// switch (state)
@@ -93,10 +91,7 @@ static QAction* createAction (
 }	// createAction
 
 
-static QAction* createCheckableAction (
-			QMenu& parent, const QString& label, const QString& whatsThis,
-			const char* method, QObject* receiver,
-			bool checked, THREESTATES state)
+static QAction* createCheckableAction (QMenu& parent, const QString& label, const QString& whatsThis, const char* method, QObject* receiver, bool checked, THREESTATES state)
 {
 	QAction*	action	= new QAction (label, &parent);
 	action->setWhatsThis (whatsThis);
@@ -144,8 +139,7 @@ QtEntityTypeItem::~QtEntityTypeItem ( )
 
 void QtEntityTypeItem::writeSettings (QSettings& settings)
 {
-	settings.beginGroup (
-		FilterEntity::filterToFullObjectTypeName (getEntityType ( )).c_str ( ));
+	settings.beginGroup (FilterEntity::filterToFullObjectTypeName (getEntityType ( )).c_str ( ));
 	settings.setValue ("checked", Qt::Checked == checkState (0) ? true : false);
 	settings.endGroup ( );
 }	// QtEntityTypeItem::writeSettings
@@ -153,10 +147,8 @@ void QtEntityTypeItem::writeSettings (QSettings& settings)
 
 void QtEntityTypeItem::readSettings (QSettings& settings)
 {
-	settings.beginGroup (
-		FilterEntity::filterToFullObjectTypeName (getEntityType ( )).c_str ( ));
-	setCheckState (0, true == settings.value ("checked").toBool ( ) ?
-	                  Qt::Checked : Qt::Unchecked);
+	settings.beginGroup (FilterEntity::filterToFullObjectTypeName (getEntityType ( )).c_str ( ));
+	setCheckState (0, true == settings.value ("checked").toBool ( ) ? Qt::Checked : Qt::Unchecked);
 	settings.endGroup ( );
 }	// QtEntityTypeItem::readSettings
 
@@ -227,19 +219,12 @@ void QtGroupTreeWidgetItem::update (bool updateRepresentation)
 
 	// La vue 3D :
 /*
-	if ((0 != getGroup ( )) &&
-	    (true == getGroup ( )->getDisplayProperties ( ).isDisplayed ( )))
+	if ((0 != getGroup ( )) && (true == getGroup ( )->getDisplayProperties ( ).isDisplayed ( )))
 	{
-		QtEntitiesTreeWidget*			parent	=
-				dynamic_cast<QtEntitiesTreeWidget*>(treeWidget ( ));
-		QtGroupsPanel*		panel	=
-							0 == parent ? 0 : parent->getEntitiesPanel ( );
-		Qt3DGraphicalWidget*	graphicalWidget	=
-							0 == panel ? 0 : panel->getGraphicalWidget ( );
-		GraphicalGroupRepresentation*	entity3DRep	=
-							0 == graphicalWidget ?
-				0 : graphicalWidget->getRenderingManager ( ).getRepresentation (
-																*getGroup ( ));
+		QtEntitiesTreeWidget*			parent	= dynamic_cast<QtEntitiesTreeWidget*>(treeWidget ( ));
+		QtGroupsPanel*					panel	= 0 == parent ? 0 : parent->getEntitiesPanel ( );
+		Qt3DGraphicalWidget*	graphicalWidget	= 0 == panel ? 0 : panel->getGraphicalWidget ( );
+		GraphicalGroupRepresentation*	entity3DRep	= 0 == graphicalWidget ? 0 : graphicalWidget->getRenderingManager ( ).getRepresentation (*getGroup ( ));
 		if (0 != entity3DRep)
 		{
 			entity3DRep->updateRepresentation (mask, true);
@@ -348,26 +333,69 @@ void QtGroupLevelTreeWidgetItem::updateState ( )
 
 
 // ===========================================================================
+//                     LA CLASSE QtQuickRepToolButton
+// ===========================================================================
+
+QtQuickRepToolButton::QtQuickRepToolButton (QWidget* parent, QIcon& icon, Entity::objectType type, bool wire)
+	: QToolButton (parent), _entityType (type), _wireMode (wire)
+{
+	setCheckable (true);
+	setToolButtonStyle (Qt::ToolButtonIconOnly);
+	setIcon (icon);
+	setToolTip (true == wire ? "Affichage filaire/isofilaire" : "Affichage surfacique");
+}	// QtQuickRepToolButton::QtQuickRepToolButton
+
+
+QtQuickRepToolButton::QtQuickRepToolButton (const QtQuickRepToolButton& tb)
+	: QToolButton ( ), _entityType (tb._entityType), _wireMode (tb._wireMode)
+{
+	MGX_FORBIDDEN ("QtQuickRepToolButton copy constructor is not allowed.");
+}	// QtQuickRepToolButton::QtQuickRepToolButton
+
+
+QtQuickRepToolButton& QtQuickRepToolButton::operator = (const QtQuickRepToolButton&)
+{
+	MGX_FORBIDDEN ("QtQuickRepToolButton assignment operator is not allowed.");
+	return *this;
+}	// QtQuickRepToolButton::QtQuickRepToolButton
+
+
+Entity::objectType QtQuickRepToolButton::entityType ( ) const
+{
+	return _entityType;
+}	// QtQuickRepToolButton::entityType
+
+
+bool QtQuickRepToolButton::isWireRepresentation ( ) const
+{
+	return _wireMode;
+}	// QtQuickRepToolButton::isWireRepresentation
+
+
+// ===========================================================================
 //                        LA CLASSE QtGroupsPanel
 // ===========================================================================
 
 
-QtGroupsPanel::QtGroupsPanel (
-	QWidget* parent, QtMgx3DMainWindow* mainWindow, const string& name,
-	ContextIfc& context)
+QIcon*	QtGroupsPanel::_wireIcon		= 0;
+QIcon*	QtGroupsPanel::_surfacicIcon	= 0;
+	
+	
+QtGroupsPanel::QtGroupsPanel (QWidget* parent, QtMgx3DMainWindow* mainWindow, const string& name, ContextIfc& context)
 	: QtEntitiesItemViewPanel (parent, mainWindow, name, context),
 	  SelectionManagerObserver (&context.getSelectionManager ( )),
 	  _entitiesTypesWidget (0), _entitiesGroupsWidget (0),
 	  _typesItems ( ), _groupsEntriesItems ( ), _levelsEntriesItems ( ),
 	  //_groupsPropagationCheckBox (0),
 	  _typesPopupMenu (0), _groupsPopupMenu (0),
-	  _uncheckedCheckboxes (FilterEntity::NoneEntity)
+	  _uncheckedCheckboxes (FilterEntity::NoneEntity),
+	  _wireGeomVolumeButton (0), _solidGeomVolumeButton (0), _wireGeomSurfaceButton (0), _solidGeomSurfaceButton (0),
+	  _wireTopoBlockButton (), _solidTopoBlockButton (0), _wireTopoCoFaceButton (0), _solidTopoCoFaceButton (0)
 {
 	createGui ( );
 	createPopupMenus ( );
 
-	// Par défaut le fait de démarrer une sélection interactive provoque
-	// l'affichage des entités des types sélectionnables des groupes affichés.
+	// Par défaut le fait de démarrer une sélection interactive provoque l'affichage des entités des types sélectionnables des groupes affichés.
 	enableSelectionPolicyAdaptation (true);
 
 	context.getSelectionManager ( ).addSelectionObserver (*this);
@@ -379,7 +407,8 @@ QtGroupsPanel::QtGroupsPanel (const QtGroupsPanel& gp)
 	  _entitiesTypesWidget (0), _entitiesGroupsWidget (0),
 	  _typesItems ( ), _groupsEntriesItems ( ), _levelsEntriesItems ( ),
 	  //_groupsPropagationCheckBox (0),
-	  _typesPopupMenu (0), _groupsPopupMenu (0),
+	  _wireGeomVolumeButton (0), _solidGeomVolumeButton (0), _wireGeomSurfaceButton (0), _solidGeomSurfaceButton (0),
+	  _wireTopoBlockButton (), _solidTopoBlockButton (0), _wireTopoCoFaceButton (0), _solidTopoCoFaceButton (0),
 	  _uncheckedCheckboxes (FilterEntity::NoneEntity)
 {
 	MGX_FORBIDDEN ("QtGroupsPanel copy constructor is not allowed.");
@@ -406,8 +435,7 @@ void QtGroupsPanel::writeSettings (QSettings& settings)
 
 	settings.setValue ("size", size ( ));
 
-	for (vector<QtEntityTypeItem*>::const_iterator iteti = _typesItems.begin( );
-	     _typesItems.end ( ) != iteti; iteti++)
+	for (vector<QtEntityTypeItem*>::const_iterator iteti = _typesItems.begin( ); _typesItems.end ( ) != iteti; iteti++)
 		(*iteti)->writeSettings (settings);
 	//settings.setValue ("groupsPropagation", Qt::Checked == _groupsPropagationCheckBox->checkState ( ) ? true : false);
 
@@ -432,42 +460,27 @@ void QtGroupsPanel::readSettings (QSettings& settings)
 
 	resize (settings.value ("size", size ( )).toSize ( ));
 
-	for (vector<QtEntityTypeItem*>::const_iterator iteti = _typesItems.begin( );
-	     _typesItems.end ( ) != iteti; iteti++)
+	for (vector<QtEntityTypeItem*>::const_iterator iteti = _typesItems.begin( ); _typesItems.end ( ) != iteti; iteti++)
 	{
 		const Qt::CheckState	oldState	= (*iteti)->checkState (0);
 		(*iteti)->readSettings (settings);
 		if (oldState != (*iteti)->checkState (0))
 			entitiesTypesStateChangeCallback (*iteti, 0);
 	}	// for (vector<QtEntityTypeItem*>::const_iterator iteti = ...
-//	const Qt::CheckState	state	=
-//			true == settings.value ("groupsPropagation", true).toBool ( ) ?
-//			Qt::Checked : Qt::Unchecked;
-	//_groupsPropagationCheckBox->setCheckState (state);
 
 	CHECK_NULL_PTR_ERROR (_entitiesTypesWidget)
 	CHECK_NULL_PTR_ERROR (_entitiesGroupsWidget)
 	settings.beginGroup ("EntitiesTypesPanel");
-	_entitiesTypesWidget->resize (
-			settings.value ("size", _entitiesTypesWidget->size ( )).toSize ( ));
+	_entitiesTypesWidget->resize (settings.value ("size", _entitiesTypesWidget->size ( )).toSize ( ));
 	settings.endGroup ( );
 	settings.beginGroup ("EntitiesGroupsPanel");
-	_entitiesGroupsWidget->resize (
-			settings.value ("size", _entitiesGroupsWidget->size ( )).toSize( ));
+	_entitiesGroupsWidget->resize (settings.value ("size", _entitiesGroupsWidget->size ( )).toSize( ));
 	settings.endGroup ( );
 
 	settings.endGroup ( );
 
 	//groupsRepresentationPropagationCallback ( );
 }	// QtGroupsPanel::readSettings
-
-
-//bool QtGroupsPanel::groupsRepresentationPropagation ( ) const
-//{
-//	CHECK_NULL_PTR_ERROR (_groupsPropagationCheckBox)
-//	return Qt::Checked == _groupsPropagationCheckBox->checkState ( ) ?
-//	       true : false;
-//}	// QtGroupsPanel::groupsRepresentationPropagation
 
 
 void QtGroupsPanel::setGraphicalWidget (Qt3DGraphicalWidget* widget3D)
@@ -481,8 +494,7 @@ FilterEntity::objectType QtGroupsPanel::getCheckedEntitiesTypes ( ) const
 {
 	FilterEntity::objectType	types	= FilterEntity::NoneEntity;
 
-	for (vector<QtEntityTypeItem*>::const_iterator it = _typesItems.begin ( );
-	     _typesItems.end ( ) != it; it++)
+	for (vector<QtEntityTypeItem*>::const_iterator it = _typesItems.begin ( );  _typesItems.end ( ) != it; it++)
 		if (Qt::Checked == (*it)->checkState (0))
 			types = (FilterEntity::objectType)(types | (*it)->getEntityType( ));
 
@@ -494,8 +506,7 @@ FilterEntity::objectType QtGroupsPanel::getSelectedEntitiesTypes ( ) const
 {
     FilterEntity::objectType    types   = FilterEntity::NoneEntity;
 
-    for (vector<QtEntityTypeItem*>::const_iterator it = _typesItems.begin ( );
-         _typesItems.end ( ) != it; it++)
+    for (vector<QtEntityTypeItem*>::const_iterator it = _typesItems.begin ( ); _typesItems.end ( ) != it; it++)
         if ((*it)->isSelected())
             types = (FilterEntity::objectType)(types | (*it)->getEntityType( ));
 
@@ -505,15 +516,12 @@ FilterEntity::objectType QtGroupsPanel::getSelectedEntitiesTypes ( ) const
 
 QtEntityTypeItem* QtGroupsPanel::getEntityTypeItem (FilterEntity::objectType type) const
 {
-	for (vector<QtEntityTypeItem*>::const_iterator it = _typesItems.begin ( );
-	     _typesItems.end ( ) != it; it++)
+	for (vector<QtEntityTypeItem*>::const_iterator it = _typesItems.begin ( ); _typesItems.end ( ) != it; it++)
 		if (type == (*it)->getEntityType ( ))
 			return *it;
 
 	UTF8String	error (Charset::UTF_8);
-	error << "Absence d'item correspondant au type "
-	      << FilterEntity::filterToObjectTypeName (type)
-	      << " dans l'arbre Types d'entités.";
+	error << "Absence d'item correspondant au type " << FilterEntity::filterToObjectTypeName (type) << " dans l'arbre Types d'entités.";
 
 	INTERNAL_ERROR (exc, error, "QtGroupsPanel::getEntityTypeItem")
 	throw exc;
@@ -522,8 +530,7 @@ QtEntityTypeItem* QtGroupsPanel::getEntityTypeItem (FilterEntity::objectType typ
 
 void QtGroupsPanel::addGroups (const vector<Group::GroupEntity*>& groups)
 {
-	for (vector<Group::GroupEntity*>::const_iterator it = groups.begin ( );
-	     groups.end ( ) != it; it++)
+	for (vector<Group::GroupEntity*>::const_iterator it = groups.begin ( ); groups.end ( ) != it; it++)
 	{
 		QTreeWidgetItem*	item	= createGroupItem (**it);
 		item->setCheckState (0, (**it).isVisible()?Qt::Checked:Qt::Unchecked);
@@ -537,8 +544,7 @@ void QtGroupsPanel::removeGroups (const vector<Group::GroupEntity*>& groups)
 {
 	vector<Utils::Entity*>	list;
 
-	for (vector<Group::GroupEntity*>::const_iterator it = groups.begin ( );
-	     groups.end ( ) != it; it++)
+	for (vector<Group::GroupEntity*>::const_iterator it = groups.begin ( ); groups.end ( ) != it; it++)
 	{
 		list.push_back (*it);
 		QTreeWidgetItem*	parent	= getGroupEntryItem ((*it)->getDim ( ), (*it)->getLevel ( ));
@@ -564,7 +570,7 @@ void QtGroupsPanel::removeGroups (const vector<Group::GroupEntity*>& groups)
 
 vector<Group::GroupEntity*> QtGroupsPanel::getSelectedGroups ( ) const
 {
-	vector<Group::GroupEntity*>	groups;
+	vector<Group::GroupEntity*>		groups;
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -605,8 +611,7 @@ void QtGroupsPanel::displaySelectedGroups (bool display)
 	// MAJ IHM (pas de callback de déclenché) + réalisation traitement :
 	vector<GroupEntity*>			groups;
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 //		if (true == (*it)->isSelected ( )) [EB car getSelectedGroupsItems a déjà fait une sélection]
 //		{
@@ -627,8 +632,7 @@ void QtGroupsPanel::displaySelectedGroupsNames (bool display)
 	// MAJ IHM (pas de callback de déclenché) + réalisation traitement :
 	vector<GroupEntity*>			groups;
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -686,12 +690,91 @@ void QtGroupsPanel::displaySelectedGroupsNames (bool display)
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 	if ((0 != groups.size ( )) && (0 != getGraphicalWidget ( )))
-		getGraphicalWidget ( )->getRenderingManager (
-							).displayRepresentations (groups, display);
+		getGraphicalWidget ( )->getRenderingManager ( ).displayRepresentations (groups, display);
 }	// QtGroupsPanel::displaySelectedGroupsNames
 
 
-void QtGroupsPanel::clearGroupCallback ()
+
+
+static unsigned long menuToRepresentations (QMenu& menu, unsigned long oldrep)
+{
+	unsigned long	reps	= oldrep;
+
+	QList<QAction*>	actions	= menu.actions ( );
+	for (QList<QAction*>::const_iterator ita = actions.begin ( ); actions.end ( ) != ita; ita++)
+	{
+		if (true == (*ita)->isEnabled ( ))
+		{
+			unsigned long	type	= (*ita)->data ( ).toInt ( );
+			if (true == (*ita)->isChecked ( ))
+				reps	|= type;
+			else
+			{	// On l'enlève si présent.
+				if (0 != (reps & type))
+					reps	^= type;
+			}
+		}	// if (true == (*ita)->isEnabled ( ))
+	}	// for (QList<QAction*>::const_iterator ita = actions.begin ( ); actions.end ( ) != ita; ita++)
+
+	return reps;
+}	// menuToRepresentations
+
+
+void QtGroupsPanel::updateQuickButtons ( )
+{
+	Context*	context		= dynamic_cast<Context*>(&getContext ( ));		// ContextIfc* :(
+	CHECK_NULL_PTR_ERROR (context)
+
+	if ((0 == _wireGeomVolumeButton) || (0 == _solidGeomVolumeButton) || (0 == _wireGeomSurfaceButton) || (0 == _solidGeomVolumeButton) ||
+	    (0 == _wireTopoBlockButton) || (0 == _solidTopoBlockButton) || (0 == _wireTopoCoFaceButton) || (0 == _solidTopoCoFaceButton))
+		return;
+
+	// Premier vrai passage on retaille les boutons pour qu'ils prennent moins de place et fassent la même taille :
+	static bool first= true;
+	if (true == first)
+	{
+		int	height	= _entitiesTypesWidget->sizeHintForRow (2);
+		if (-1 != height)
+		{	// CP - TODO : code à finaliser en récupérant la hauteur de la rangée et en l'affectant largeur x hauteur des widgets ci-dessous.
+			_wireGeomVolumeButton->setFixedSize (16, 16);
+			_solidGeomVolumeButton->setFixedSize (16, 16);
+			_wireGeomSurfaceButton->setFixedSize (16, 16);
+			_solidGeomSurfaceButton->setFixedSize (16, 16);
+			_wireTopoBlockButton->setFixedSize (16, 16);
+			_solidTopoBlockButton->setFixedSize (16, 16);
+			_wireTopoCoFaceButton->setFixedSize (16, 16);
+			_solidTopoCoFaceButton->setFixedSize (16, 16);
+			first	= false;
+		}
+	}	// if (true == first)
+	// GeomVolume / Wire :
+	unsigned long	rep	= context->globalMask (Entity::GeomVolume) & ((unsigned long)GraphicalEntityRepresentation::ISOCURVES | (unsigned long)GraphicalEntityRepresentation::CURVES);
+	_wireGeomVolumeButton->setChecked (0 == rep ? false : true);
+	// GeomVolume / Solid :
+	rep	= context->globalMask (Entity::GeomVolume) & (unsigned long)GraphicalEntityRepresentation::SURFACES;
+	_solidGeomVolumeButton->setChecked (0 == rep ? false : true);
+	// GeomSurface / Wire :
+	rep	= context->globalMask (Entity::GeomSurface) & ((unsigned long)GraphicalEntityRepresentation::ISOCURVES | (unsigned long)GraphicalEntityRepresentation::CURVES);
+	_wireGeomSurfaceButton->setChecked (0 == rep ? false : true);
+	// GeomSurface / Solid :
+	rep	= context->globalMask (Entity::GeomSurface) & (unsigned long)GraphicalEntityRepresentation::SURFACES;
+	_solidGeomSurfaceButton->setChecked (0 == rep ? false : true);
+	// TopoBlock / Wire :
+	rep	= context->globalMask (Entity::TopoBlock) & (unsigned long)GraphicalEntityRepresentation::CURVES;
+	_wireTopoBlockButton->setChecked (0 == rep ? false : true);
+	// TopoBlock / Solid :
+	rep	= context->globalMask (Entity::TopoBlock) & (unsigned long)GraphicalEntityRepresentation::SURFACES;
+	_solidTopoBlockButton->setChecked (0 == rep ? false : true);
+	// TopoCoFace / Wire :
+	rep	= context->globalMask (Entity::TopoCoFace) & (unsigned long)GraphicalEntityRepresentation::CURVES;
+	_wireTopoCoFaceButton->setChecked (0 == rep ? false : true);
+	// TopoCoFace / Solid :
+	rep	= context->globalMask (Entity::TopoCoFace) & (unsigned long)GraphicalEntityRepresentation::SURFACES;
+	_solidTopoCoFaceButton->setChecked (0 == rep ? false : true);
+}	// QtGroupsPanel::updateQuickButtons
+
+
+void QtGroupsPanel::clearGroupCallback ( )
 {
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -716,27 +799,22 @@ void QtGroupsPanel::selectionPolicyModified (void* smp)
 		return;
 
 	// Réunion CP/EBL du 14/10/13.
-	// Appelé lorsque la politique de sélection change, par exemple lorsque
-	// l'utilisateur clique sur un champ de texte de type QtEntityIDTextField
+	// Appelé lorsque la politique de sélection change, par exemple lorsque l'utilisateur clique sur un champ de texte de type QtEntityIDTextField
 	// pour saisir de manière interactive l'id d'une entité.
-	// L'objectif est ici de provoquer l'affichage d'entités selectionnables en
-	// cochant dans l'arbre "Types d'entités" les cases à cocher
-	// correspondantes. Les entités correspondantes ne seront visibles dans la
-	// fenêtre graphique qu'à condition que leur groupe ne soit lui même coché
+	// L'objectif est ici de provoquer l'affichage d'entités selectionnables en cochant dans l'arbre "Types d'entités" les cases à cocher
+	// correspondantes. Les entités correspondantes ne seront visibles dans la fenêtre graphique qu'à condition que leur groupe ne soit lui même coché
 	// dans l'arbre "Groupes".
 	// Dans cet appel on :
 	// - Annule l'effet de l'appel précédent
 	// - Actualise l'IHM à l'état courant du gestionnaire de sélection.
-	SelectionManagerDimFilter*	smdv	= dynamic_cast<SelectionManagerDimFilter*>(getSelectionManager ( ));
-	FilterEntity::objectType		toRestore	= FilterEntity::NoneEntity;
+	SelectionManagerDimFilter*	smdv		= dynamic_cast<SelectionManagerDimFilter*>(getSelectionManager ( ));
+	FilterEntity::objectType	toRestore	= FilterEntity::NoneEntity;
 	if (0 != smdv)
 	{
 		FilterEntity::objectType	types	= smdv->getFilteredTypes ( );
 
-		for (vector<QtEntityTypeItem*>::iterator it = _typesItems.begin ( );
-		     _typesItems.end ( ) != it; it++)
-			updateEntityItemState (
-				(*it)->getEntityType ( ), types,_uncheckedCheckboxes,toRestore);
+		for (vector<QtEntityTypeItem*>::iterator it = _typesItems.begin ( ); _typesItems.end ( ) != it; it++)
+			updateEntityItemState ((*it)->getEntityType ( ), types,_uncheckedCheckboxes,toRestore);
 
 		_uncheckedCheckboxes	= toRestore;
 	}	// if (0 != smdv)
@@ -745,15 +823,12 @@ void QtGroupsPanel::selectionPolicyModified (void* smp)
 }	// QtGroupsPanel::selectionPolicyModified
 
 
-void QtGroupsPanel::updateEntityItemState (
-		FilterEntity::objectType type, FilterEntity::objectType newState,
-		FilterEntity::objectType oldState, FilterEntity::objectType& toRestore)
+void QtGroupsPanel::updateEntityItemState (FilterEntity::objectType type, FilterEntity::objectType newState, FilterEntity::objectType oldState, FilterEntity::objectType& toRestore)
 {
 	QtEntityTypeItem*	item	= getEntityTypeItem (type);
 	CHECK_NULL_PTR_ERROR (item)
 
-	// Rem : FilterEntity::All n'est pas issu d'un | sur des valeurs mais de
-	// (None) - 1 ... Pas très beau mais convient.
+	// Rem : FilterEntity::All n'est pas issu d'un | sur des valeurs mais de (None) - 1 ... Pas très beau mais convient.
 	if ((FilterEntity::All != newState) && (0 != (type & newState)))
 	{
 		if (Qt::Checked != item->checkState (0))
@@ -789,8 +864,7 @@ void QtGroupsPanel::typeNameSort ( )
 
 	CHECK_NULL_PTR_ERROR (_entitiesGroupsWidget)
 
-	for (vector<QTreeWidgetItem*>::iterator itgi = _groupsEntriesItems.begin( );
-	     _groupsEntriesItems.end ( ) != itgi; itgi++)
+	for (vector<QTreeWidgetItem*>::iterator itgi = _groupsEntriesItems.begin( ); _groupsEntriesItems.end ( ) != itgi; itgi++)
 		typeNameSort (**itgi);
 
 	if (true == Resources::instance ( )._multiLevelGroupsView.getValue ( ))
@@ -820,14 +894,11 @@ void QtGroupsPanel::typeNameSort (QTreeWidgetItem& parent)
 		items.push_back (item);
 	}	// while (0 != parent.childCount ( ))
 	if (0 != Resources::instance ( )._sortType.getValue ( ).ascii ( ).compare ("typeAscendingName"))
-		std::sort (&items.front ( ), &(items [items.size ( )]),
-							TypeNameSortGreater<QTreeWidgetItem*> ( ));
+		std::sort (&items.front ( ), &(items [items.size ( )]), TypeNameSortGreater<QTreeWidgetItem*> ( ));
 	else
-		std::sort (&items.front ( ), &(items [items.size ( )]),
-							TypeNameSortLesser<QTreeWidgetItem*> ( ));
+		std::sort (&items.front ( ), &(items [items.size ( )]), TypeNameSortLesser<QTreeWidgetItem*> ( ));
 
-	for (vector<QTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 		parent.addChild (*it);
 
 	expansionTreeRestorer.restore ( );
@@ -838,10 +909,19 @@ void QtGroupsPanel::createGui ( )
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
 
+	Context*	context		= dynamic_cast<Context*>(&getContext ( ));
+	CHECK_NULL_PTR_ERROR (context)
+	
+	// Les menus contextuels :
+	if (0 == _wireIcon)
+		_wireIcon	= new QIcon (":/images/wire.png");
+	if (0 == _surfacicIcon)
+		_surfacicIcon	= new QIcon (":/images/surfacic.png");
+
+	QSize	iconSize (16, 16);		// Redimensionné dans QtGroupsPanel::updateQuickButtons à la hauteur de ligne
 	if ((0 != _entitiesTypesWidget) || (0 != _entitiesGroupsWidget))
 	{
-		INTERNAL_ERROR (exc,
-				"QtGroupsPanel::createGui", "IHM déjà initialisée.")
+		INTERNAL_ERROR (exc, "QtGroupsPanel::createGui", "IHM déjà initialisée.")
 		throw exc;
 	}	// if ((0 != _entitiesTypesWidget) || ...
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
@@ -855,8 +935,7 @@ void QtGroupsPanel::createGui ( )
 
 	_entitiesTypesWidget	= new QTreeWidget (splitter);
 	splitter->addWidget (_entitiesTypesWidget);
-	connect (_entitiesTypesWidget, SIGNAL (itemClicked (QTreeWidgetItem*,int)),
-         this, SLOT (entitiesTypesStateChangeCallback (QTreeWidgetItem*, int)));
+	connect (_entitiesTypesWidget, SIGNAL (itemClicked (QTreeWidgetItem*,int)), this, SLOT (entitiesTypesStateChangeCallback (QTreeWidgetItem*, int)));
 	// On ne peut pas forcer la fermeture d'une branche :
 	_entitiesTypesWidget->setItemsExpandable (false);	// Voir expandAll + loin
 	_entitiesTypesWidget->setRootIsDecorated (false);	// Pas de croix
@@ -866,27 +945,51 @@ void QtGroupsPanel::createGui ( )
 	_entitiesTypesWidget->setSelectionMode (QTreeWidget::ExtendedSelection);
 	_entitiesTypesWidget->setSortingEnabled (false);
 	QAbstractItemModel*	treeModel	= _entitiesTypesWidget->model ( );
-	_entitiesTypesWidget->setColumnCount (1);
+	_entitiesTypesWidget->setColumnCount (4);	// Col 4 : rien, mais occupe l'espace restant.
 	_entitiesTypesWidget->setColumnWidth (0, 200);
 	CHECK_NULL_PTR_ERROR (treeModel)
 	treeModel->setHeaderData (0, Qt::Horizontal, QVariant ("Types d'entités"));
+	treeModel->setHeaderData (WIRE_COLUMN, Qt::Horizontal, QVariant ("Fil."));
+	treeModel->setHeaderData (SOLID_COLUMN, Qt::Horizontal, QVariant ("Sol."));
+	treeModel->setHeaderData (SOLID_COLUMN + 1, Qt::Horizontal, QVariant (""));
 	// Géométrie :
 	QTreeWidgetItem*	item	= new  	QTreeWidgetItem (_entitiesTypesWidget);
 	item->setText (0, "Géométrie");
 	_entitiesTypesWidget->addTopLevelItem (item);
-	QtEntityTypeItem*	typeItem	=
-						new QtEntityTypeItem (item, FilterEntity::GeomVolume);
+	// Geom::Volume :
+	QtEntityTypeItem*	typeItem	= new QtEntityTypeItem (item, FilterEntity::GeomVolume);
 	typeItem->setCheckState (0, Qt::Unchecked);
 	_typesItems.push_back (typeItem);
 	item->addChild (typeItem);
+	unsigned long	gmask	= context->globalMask (Entity::GeomVolume);
+	_wireGeomVolumeButton	= new QtQuickRepToolButton (_entitiesTypesWidget, *_wireIcon, Entity::GeomVolume, true);
+	_wireGeomVolumeButton->setChecked ((gmask & GraphicalEntityRepresentation::CURVES) || (gmask & GraphicalEntityRepresentation::ISOCURVES));
+	connect (_wireGeomVolumeButton, SIGNAL (toggled (bool)), this, SLOT (quickDisplayRepresentationsCallback (bool)));
+	_entitiesTypesWidget->setItemWidget (typeItem, WIRE_COLUMN, _wireGeomVolumeButton);
+	_solidGeomVolumeButton	= new QtQuickRepToolButton (_entitiesTypesWidget, *_surfacicIcon, Entity::GeomVolume, false);
+	_solidGeomVolumeButton->setChecked (gmask & GraphicalEntityRepresentation::SURFACES);
+	connect (_solidGeomVolumeButton, SIGNAL (toggled (bool)), this, SLOT (quickDisplayRepresentationsCallback (bool)));
+	_entitiesTypesWidget->setItemWidget (typeItem, SOLID_COLUMN, _solidGeomVolumeButton);
+	// Geom::Surface :
 	typeItem	= new QtEntityTypeItem (item, FilterEntity::GeomSurface);
 	typeItem->setCheckState (0, Qt::Unchecked);
 	_typesItems.push_back (typeItem);
 	item->addChild (typeItem);
+	gmask	= context->globalMask (Entity::GeomSurface);
+	_wireGeomSurfaceButton	= new QtQuickRepToolButton (_entitiesTypesWidget, *_wireIcon, Entity::GeomSurface, true);
+	_wireGeomSurfaceButton->setChecked ((gmask & GraphicalEntityRepresentation::CURVES) || (gmask & GraphicalEntityRepresentation::ISOCURVES));
+	connect (_wireGeomSurfaceButton, SIGNAL (toggled (bool)), this, SLOT (quickDisplayRepresentationsCallback (bool)));
+	_entitiesTypesWidget->setItemWidget (typeItem, WIRE_COLUMN, _wireGeomSurfaceButton);
+	_solidGeomSurfaceButton	= new QtQuickRepToolButton (_entitiesTypesWidget, *_surfacicIcon, Entity::GeomSurface, false);
+	_solidGeomSurfaceButton->setChecked (gmask & GraphicalEntityRepresentation::SURFACES);
+	connect (_solidGeomSurfaceButton, SIGNAL (toggled (bool)), this, SLOT (quickDisplayRepresentationsCallback (bool)));
+	_entitiesTypesWidget->setItemWidget (typeItem, SOLID_COLUMN, _solidGeomSurfaceButton);
+	// Geom::Curve :
 	typeItem	= new QtEntityTypeItem (item, FilterEntity::GeomCurve);
 	typeItem->setCheckState (0, Qt::Unchecked);
 	_typesItems.push_back (typeItem);
 	item->addChild (typeItem);
+	// Geom::Vertex :
 	typeItem	= new QtEntityTypeItem (item, FilterEntity::GeomVertex);
 	typeItem->setCheckState (0, Qt::Unchecked);
 	_typesItems.push_back (typeItem);
@@ -895,18 +998,40 @@ void QtGroupsPanel::createGui ( )
 	item	= new  	QTreeWidgetItem (_entitiesTypesWidget);
 	item->setText (0, "Topologie");
 	_entitiesTypesWidget->addTopLevelItem (item);
+	// Topo::Block :
 	typeItem	= new QtEntityTypeItem (item, FilterEntity::TopoBlock);
 	typeItem->setCheckState (0, Qt::Unchecked);
 	_typesItems.push_back (typeItem);
 	item->addChild (typeItem);
+	gmask	= context->globalMask (Entity::TopoBlock);
+	_wireTopoBlockButton	= new QtQuickRepToolButton (_entitiesTypesWidget, *_wireIcon, Entity::TopoBlock, true);
+	_wireTopoBlockButton->setChecked (gmask & GraphicalEntityRepresentation::CURVES);
+	connect (_wireTopoBlockButton, SIGNAL (toggled (bool)), this, SLOT (quickDisplayRepresentationsCallback (bool)));
+	_entitiesTypesWidget->setItemWidget (typeItem, WIRE_COLUMN, _wireTopoBlockButton);
+	_solidTopoBlockButton	= new QtQuickRepToolButton (_entitiesTypesWidget, *_surfacicIcon, Entity::TopoBlock, false);
+	_solidTopoBlockButton->setChecked (gmask & GraphicalEntityRepresentation::SURFACES);
+	connect (_solidTopoBlockButton, SIGNAL (toggled (bool)), this, SLOT (quickDisplayRepresentationsCallback (bool)));
+	_entitiesTypesWidget->setItemWidget (typeItem, SOLID_COLUMN, _solidTopoBlockButton);
+	// Topo::CoFace :
 	typeItem	= new QtEntityTypeItem (item, FilterEntity::TopoCoFace);
 	typeItem->setCheckState (0, Qt::Unchecked);
 	_typesItems.push_back (typeItem);
 	item->addChild (typeItem);
+	gmask	= context->globalMask (Entity::TopoCoFace);
+	_wireTopoCoFaceButton	= new QtQuickRepToolButton (_entitiesTypesWidget, *_wireIcon, Entity::TopoCoFace, true);
+	_wireTopoCoFaceButton->setChecked (gmask & GraphicalEntityRepresentation::CURVES);
+	connect (_wireTopoCoFaceButton, SIGNAL (toggled (bool)), this, SLOT (quickDisplayRepresentationsCallback (bool)));
+	_entitiesTypesWidget->setItemWidget (typeItem, WIRE_COLUMN, _wireTopoCoFaceButton);
+	_solidTopoCoFaceButton	= new QtQuickRepToolButton (_entitiesTypesWidget, *_surfacicIcon, Entity::TopoCoFace, false);
+	_solidTopoCoFaceButton->setChecked (gmask & GraphicalEntityRepresentation::SURFACES);
+	connect (_solidTopoCoFaceButton, SIGNAL (toggled (bool)), this, SLOT (quickDisplayRepresentationsCallback (bool)));
+	_entitiesTypesWidget->setItemWidget (typeItem, SOLID_COLUMN, _solidTopoCoFaceButton);
+	// Topo::CoEdge :
 	typeItem	= new QtEntityTypeItem (item, FilterEntity::TopoCoEdge);
 	typeItem->setCheckState (0, Qt::Unchecked);
 	_typesItems.push_back (typeItem);
 	item->addChild (typeItem);
+	// Topo::Vertex :
 	typeItem	= new QtEntityTypeItem (item, FilterEntity::TopoVertex);
 	typeItem->setCheckState (0, Qt::Unchecked);
 	_typesItems.push_back (typeItem);
@@ -949,13 +1074,13 @@ void QtGroupsPanel::createGui ( )
 	item->addChild (typeItem);
 	// On force la visibilité de l'ensemble des items :
 	_entitiesTypesWidget->expandAll ( );
+	for (int c = 1; c < 3; c++)
+		_entitiesTypesWidget->resizeColumnToContents (c);
 
 	_entitiesGroupsWidget	= new QTreeWidget (splitter);
 	splitter->addWidget (_entitiesGroupsWidget);
-	connect (_entitiesGroupsWidget, SIGNAL (itemClicked (QTreeWidgetItem*,int)),
-	         this, SLOT (groupStateChangeCallback (QTreeWidgetItem*, int)));
-	connect (_entitiesGroupsWidget, SIGNAL (itemClicked (QTreeWidgetItem*,int)),
-	         this, SLOT (showLevelGroupsCallback (QTreeWidgetItem*, int)));
+	connect (_entitiesGroupsWidget, SIGNAL (itemClicked (QTreeWidgetItem*,int)), this, SLOT (groupStateChangeCallback (QTreeWidgetItem*, int)));
+	connect (_entitiesGroupsWidget, SIGNAL (itemClicked (QTreeWidgetItem*,int)), this, SLOT (showLevelGroupsCallback (QTreeWidgetItem*, int)));
 	_entitiesGroupsWidget->setSelectionBehavior (QTreeWidget::SelectItems);
 /*/	// Sélection indépendante des items :
 	_entitiesGroupsWidget->setSelectionMode (QTreeWidget::MultiSelection);*/
@@ -973,8 +1098,7 @@ void QtGroupsPanel::createGui ( )
 	{
 		UTF8String	name (Charset::UTF_8);
 		name << "Dimension " << (unsigned long)i;
-		QTreeWidgetItem* groupEntryItem	=
-							new QTreeWidgetItem (_entitiesGroupsWidget);
+		QTreeWidgetItem* groupEntryItem	= new QTreeWidgetItem (_entitiesGroupsWidget);
 		groupEntryItem->setFlags (entryFlags);
 		groupEntryItem->setText (0, UTF8TOQSTRING (name));
 		groupEntryItem->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
@@ -986,6 +1110,9 @@ void QtGroupsPanel::createGui ( )
 	// On force la visibilité de l'ensemble des items :
 	_entitiesGroupsWidget->expandAll ( );
 
+	_entitiesTypesWidget->resizeColumnToContents (1);
+	_entitiesTypesWidget->resizeColumnToContents (2);
+	updateQuickButtons ( );
 	// Propagation de l'affichage des groupes de dimension N - 1 :
 //	_groupsPropagationCheckBox	=
 //		new QCheckBox ("Propager l'affichage", this);
@@ -1008,8 +1135,7 @@ void QtGroupsPanel::createPopupMenus ( )
 	// Menu popup 1 : Types d'entités :
 	// Affichage :
 	_typesPopupMenu	= new QMenu (_entitiesTypesWidget);
-	QAction*	action	=
-			createAction(*_typesPopupMenu, "Afficher", QString::fromUtf8("Provoque l'affichage des entités dont les types sont sélectionnés et les groupes affichés."),
+	QAction*	action	= createAction(*_typesPopupMenu, "Afficher", QString::fromUtf8("Provoque l'affichage des entités dont les types sont sélectionnés et les groupes affichés."),
 			          SLOT (displaySelectedTypesCallback( )), this, false, OFF);
 	_typesPopupMenu->addAction (action);
 	action	= createAction (*_typesPopupMenu, "Masquer", QString::fromUtf8("Arrête l'affichage des entités dont les types sont sélectionnés et les groupes affichés."),
@@ -1055,25 +1181,14 @@ void QtGroupsPanel::createPopupMenus ( )
 	_groupsPopupMenu->addSeparator ( );
 	QMenu*	entry	= new QMenu ("Tri ...", _groupsPopupMenu);
 	_groupsPopupMenu->addMenu (entry);
-	action	= createCheckableAction (*entry, "Automatique",
-					"Tri automatiquement les groupes",
-					SLOT (automaticSortCallback (bool)), this,
-					Resources::instance ( )._automaticSort.getValue ( ), OFF);
-	const bool ascending	=
-		0 == Resources::instance ( )._sortType.getValue ( ).ascii ( ).compare (
-											"typeAscendingName") ? true : false;
-	action	= createCheckableAction (*entry, "Ordre ascendant",
-					"Tri les groupes par ordre alphabétique ascendant",
-					SLOT (ascendingSortCallback (bool)), this, ascending, OFF);
+	action	= createCheckableAction (*entry, "Automatique", "Tri automatiquement les groupes", SLOT (automaticSortCallback (bool)), this, Resources::instance ( )._automaticSort.getValue ( ), OFF);
+	const bool ascending	= 0 == Resources::instance ( )._sortType.getValue ( ).ascii ( ).compare ("typeAscendingName") ? true : false;
+	action	= createCheckableAction (*entry, "Ordre ascendant", "Tri les groupes par ordre alphabétique ascendant", SLOT (ascendingSortCallback (bool)), this, ascending, OFF);
 
 	_groupsPopupMenu->addSeparator ( );
-	action	= createCheckableAction (*_groupsPopupMenu, "Vue multi-niveaux",
-					"(Dé)classer les groupes par niveaux.",
-					SLOT (multiLevelViewCallback (bool)), this,
-					Resources::instance ( )._multiLevelGroupsView.getValue( ), OFF);
+	action	= createCheckableAction (*_groupsPopupMenu, "Vue multi-niveaux", "(Dé)classer les groupes par niveaux.", SLOT (multiLevelViewCallback (bool)), this, Resources::instance ( )._multiLevelGroupsView.getValue( ), OFF);
 	_groupsPopupMenu->addAction (action);
-	action	= createAction (*_groupsPopupMenu, "Changer de niveau ...", QString::fromUtf8("Change de niveau les groupes sélectionnés"),
-			         SLOT (changeGroupLevelCallback( )), this, false, OFF);
+	action	= createAction (*_groupsPopupMenu, "Changer de niveau ...", QString::fromUtf8("Change de niveau les groupes sélectionnés"), SLOT (changeGroupLevelCallback( )), this, false, OFF);
 	action	= createAction (*_groupsPopupMenu, QString::fromUtf8("Sélectionner les groupes d'un niveau"), QString::fromUtf8("Sélectionner des groupes selon leurs dimensions et niveaux"),
 					SLOT (levelSelectionCallback( )), this, false, OFF);
 	_groupsPopupMenu->addAction (action);
@@ -1195,9 +1310,7 @@ void QtGroupsPanel::createPopupMenus ( )
 			SLOT (clearGroupCallback ( )), this, false, OFF);
 
 	_entitiesGroupsWidget->setContextMenuPolicy (Qt::CustomContextMenu);
-	connect (_entitiesGroupsWidget,
-	         SIGNAL(customContextMenuRequested(const QPoint&)),
-	         this, SLOT (displayGroupsPopupMenu (const QPoint&)));
+	connect (_entitiesGroupsWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT (displayGroupsPopupMenu (const QPoint&)));
 }	// QtGroupsPanel::createPopupMenus
 
 
@@ -1206,9 +1319,7 @@ QtGroupTreeWidgetItem* QtGroupsPanel::getGroupItem (const Mgx3D::Group::GroupEnt
 	if ((0 > group.getDim ( )) || (4 <= group.getDim ( )))
 	{
 		UTF8String	message (Charset::UTF_8);
-		message << "QtGroupsPanel::getItem. Dimension invalide ("
-		        << (unsigned long)group.getDim ( ) << ") pour le groupe "
-		        << group.getName ( ) << ".";
+		message << "QtGroupsPanel::getItem. Dimension invalide (" << (unsigned long)group.getDim ( ) << ") pour le groupe " << group.getName ( ) << ".";
 		throw Exception (message);
 	}	// if ((0 > group.getDim ( )) || (4 <= group.getDim ( )))
 
@@ -1302,27 +1413,96 @@ bool QtGroupsPanel::groupEntitiesDisplayModifications ( ) const
 
 void QtGroupsPanel::entitiesTypesStateChangeCallback (QTreeWidgetItem* item, int col)
 {
+	assert (0 != _entitiesTypesWidget);
+
 	BEGIN_QT_TRY_CATCH_BLOCK
+
+	if (0 == col)
+	{
+		if (0 != getGraphicalWidget ( ))
+		{
+			if (true == getGraphicalWidget ( )->getRenderingManager ( ).displayLocked ( ))
+			{	// Issue#59 : on est en train d'afficher/masquer des entités et on demande ici par ce callback le contraire
+				// Cette situation est probablement dûe à une opération longue (exécution d'un script, ...) et l'utilisateur
+				// s'impatiente => on aura au final un affichage partiel
+				// on annule l'exécution de ce callback et on re(dé)coche la checkbox correspondante
+				CHECK_NULL_PTR_ERROR (item)
+				const Qt::CheckState	checked	= item->checkState (col);
+				item->setCheckState (col, Qt::Checked == checked ? Qt::Unchecked : Qt::Checked);
+				return;
+			}	// if (true == getGraphicalWidget ( )->getRenderingManager ( ).displayLocked ( ))
+		
+			const FilterEntity::objectType	typesMask	= getCheckedEntitiesTypes ( );
+			getGraphicalWidget ( )->getRenderingManager ( ).displayTypes (typesMask);
+		}	// if (0 != getGraphicalWidget ( ))
+	}	// if (0 == col)
+	
+	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
+}	// QtGroupsPanel::entitiesTypesStateChangeCallback
+
+
+void QtGroupsPanel::quickDisplayRepresentationsCallback (bool display)
+{
+	BEGIN_QT_TRY_CATCH_BLOCK
+
+	QtQuickRepToolButton*	button	= dynamic_cast<QtQuickRepToolButton*>(sender ( ));
+	CHECK_NULL_PTR_ERROR (button)
+	Context*		context	= dynamic_cast<Context*>(&getContext ( ));		// ContextIfc* :(
+	unsigned long	gmask	= 0;
+	CHECK_NULL_PTR_ERROR (context)
+	
+	if (true == display)
+	{
+		if (true == button->isWireRepresentation ( ))
+			context->restoreGlobalMaskWireProperties (button->entityType ( ));
+		else
+			context->restoreGlobalMaskSolidProperties (button->entityType ( ));
+		gmask	= context->globalMask (button->entityType ( ));
+	}
+	else
+	{
+		gmask	= context->globalMask (button->entityType ( ));
+		if (true == button->isWireRepresentation ( ))
+		{
+			if (0 != (gmask & GraphicalEntityRepresentation::CURVES))
+				gmask ^= GraphicalEntityRepresentation::CURVES;
+			if (0 != (gmask & GraphicalEntityRepresentation::ISOCURVES))
+				gmask ^= GraphicalEntityRepresentation::ISOCURVES;
+		}	// if (true == button->isWireRepresentation ( ))
+		else
+		{
+			if (0 != (gmask & GraphicalEntityRepresentation::SURFACES))
+				gmask ^= GraphicalEntityRepresentation::SURFACES;
+		}	// else // if (true == button->isWireRepresentation ( ))
+		context->globalMask (button->entityType ( ))	= gmask;
+	}	// else if (true == display)
 
 	if (0 != getGraphicalWidget ( ))
 	{
-		if (true == getGraphicalWidget ( )->getRenderingManager ( ).displayLocked ( ))
-		{	// Issue#59 : on est en train d'afficher/masquer des entités et on demande ici par ce callback le contraire
-			// Cette situation est probablement dûe à une opération longue (exécution d'un script, ...) et l'utilisateur
-			// s'impatiente => on aura au final un affichage partiel
-			// on annule l'exécution de ce callback et on re(dé)coche la checkbox correspondante
-			CHECK_NULL_PTR_ERROR (item)
-			const Qt::CheckState	checked	= item->checkState (col);
-			item->setCheckState (col, Qt::Checked == checked ? Qt::Unchecked : Qt::Checked);
-			return;
-		}	// if (true == getGraphicalWidget ( )->getRenderingManager ( ).displayLocked ( ))
-		
-		const FilterEntity::objectType	typesMask	= getCheckedEntitiesTypes ( );
-		getGraphicalWidget ( )->getRenderingManager ( ).displayTypes (typesMask);
-	}	// if (0 != getGraphicalWidget ( ))
+		bool	doRender	= false;
+		vector<Entity*>		entities;
+		context->getGroupManager ( ).getShownEntities (typeToTypes (button->entityType ( )), entities);
+		RenderingManager::DisplayLocker displayLocker (getGraphicalWidget ( )->getRenderingManager ( ));
+		for (vector<Entity*>::iterator ite = entities.begin ( ); entities.end ( ) != ite; ite++)
+		{
+			if (false == (*ite)->getDisplayProperties ( ).isDisplayed ( ))
+				continue;
 
+			DisplayProperties::GraphicalRepresentation*	rep	= (*ite)->getDisplayProperties ( ).getGraphicalRepresentation ( );
+			if (0 != rep)
+			{
+				getGraphicalWidget ( )->getRenderingManager ( ).updateRepresentation (**ite, gmask, true);
+				rep->updateRepresentation (gmask, true);
+				doRender	= true;
+			}	// if (0 != rep)
+		}	// for (vector<Entity*>::iterator ite = entities.begin ( ); entities.end ( ) != ite; ite++)
+				
+		if (true == doRender)
+			getGraphicalWidget ( )->getRenderingManager ( ).forceRender ( );
+	}	// if (0 != getGraphicalWidget ( ))
+	
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
-}	// QtGroupsPanel::entitiesTypesStateChangeCallback
+}	// QtGroupsPanel::quickDisplayRepresentationsCallback
 
 
 void QtGroupsPanel::groupStateChangeCallback (QTreeWidgetItem* item, int col)
@@ -1494,8 +1674,7 @@ void QtGroupsPanel::multiLevelViewCallback (bool enabled)
 				QtExpansionTreeRestorer	restorer (*(*it).second);
 				QTreeWidgetItem*		entry		= (*it).second;
 				QList<QTreeWidgetItem*>	children	= entry->takeChildren ( );
-				for (QList<QTreeWidgetItem*>::iterator itc = children.begin ( );
-				     itc != children.end ( ); itc++)
+				for (QList<QTreeWidgetItem*>::iterator itc = children.begin ( ); itc != children.end ( ); itc++)
 				{
 					QtGroupTreeWidgetItem*	groupItem	= dynamic_cast<QtGroupTreeWidgetItem*>(*itc);
 					CHECK_NULL_PTR_ERROR (groupItem)
@@ -1600,11 +1779,9 @@ void QtGroupsPanel::levelSelectionCallback ( )
 	vector<GroupEntity*>			groups;
 //	vector<Entity*>					selection;
 	getContext ( ).getGroupManager( ).getGroups (groups, dimensions, true);
-	for (vector<GroupEntity*>::iterator itg = groups.begin ( );
-	     groups.end ( ) != itg; itg++)
+	for (vector<GroupEntity*>::iterator itg = groups.begin ( ); groups.end ( ) != itg; itg++)
 	{
-		for (set<unsigned long>::const_iterator itl = levels.begin ( );
-		     levels.end ( ) != itl; itl++)
+		for (set<unsigned long>::const_iterator itl = levels.begin ( ); levels.end ( ) != itl; itl++)
 			if (*itl == (*itg)->getLevel ( ))
 			{
 				QtGroupTreeWidgetItem*	item	= getGroupItem (**itg);
@@ -1624,8 +1801,7 @@ void QtGroupsPanel::typesRepresentationTypesCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	// Verrouiller les opérations d'affichage (optimisation) :
-	RenderingManager::DisplayLocker displayLocker(
-	getGraphicalWidget ( )->getRenderingManager ( ));
+	RenderingManager::DisplayLocker displayLocker (getGraphicalWidget ( )->getRenderingManager ( ));
     
 	// On s'intéresse aux types sélectionnés :
 	FilterEntity::objectType    types   = getSelectedEntitiesTypes ( );
@@ -1642,22 +1818,20 @@ void QtGroupsPanel::groupsRepresentationTypesCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	// Verrouiller les opérations d'affichage (optimisation) :
-	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
+	RenderingManager::DisplayLocker	displayLocker (getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
 	vector<GroupEntity*>			groups;
 	vector<Entity*>					entities;
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
 			// Quelles entités du groupe sont affichées ?
 			vector<Entity*>	groupEntities	= (*it)->getGroup ( )->getEntities ( );
-			for (vector<Entity*>::iterator ite = groupEntities.begin ( );
-			     groupEntities.end ( ) != ite; ite++)
+			for (vector<Entity*>::iterator ite = groupEntities.begin ( ); groupEntities.end ( ) != ite; ite++)
 			{
 				CHECK_NULL_PTR_ERROR (*ite)
 				if (0 != (*ite)->getDisplayProperties ( ).getGraphicalRepresentation ( ))
@@ -1781,8 +1955,7 @@ void QtGroupsPanel::selectGeomVolumesCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -1814,8 +1987,7 @@ void QtGroupsPanel::selectGeomSurfacesCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -1847,8 +2019,7 @@ void QtGroupsPanel::selectGeomCurvesCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -1880,8 +2051,7 @@ void QtGroupsPanel::selectGeomVerticesCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -1913,8 +2083,7 @@ void QtGroupsPanel::selectTopoBlocksCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -1946,8 +2115,7 @@ void QtGroupsPanel::selectTopoCoFacesCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -1979,8 +2147,7 @@ void QtGroupsPanel::selectTopoCoEdgesCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -2012,8 +2179,7 @@ void QtGroupsPanel::selectTopoVerticesCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -2045,8 +2211,7 @@ void QtGroupsPanel::selectMeshVolumesCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -2078,8 +2243,7 @@ void QtGroupsPanel::selectMeshSurfacesCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -2111,8 +2275,7 @@ void QtGroupsPanel::selectMeshLinesCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -2144,8 +2307,7 @@ void QtGroupsPanel::selectMeshCloudsCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -2177,8 +2339,7 @@ void QtGroupsPanel::unselectGeomVolumesCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -2210,8 +2371,7 @@ void QtGroupsPanel::unselectGeomSurfacesCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -2243,8 +2403,7 @@ void QtGroupsPanel::unselectGeomCurvesCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -2276,8 +2435,7 @@ void QtGroupsPanel::unselectGeomVerticesCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -2309,8 +2467,7 @@ void QtGroupsPanel::unselectTopoBlocksCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -2342,8 +2499,7 @@ void QtGroupsPanel::unselectTopoCoFacesCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -2375,8 +2531,7 @@ void QtGroupsPanel::unselectTopoCoEdgesCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -2408,8 +2563,7 @@ void QtGroupsPanel::unselectTopoVerticesCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -2441,8 +2595,7 @@ void QtGroupsPanel::unselectMeshVolumesCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -2474,8 +2627,7 @@ void QtGroupsPanel::unselectMeshSurfacesCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -2507,8 +2659,7 @@ void QtGroupsPanel::unselectMeshLinesCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -2540,8 +2691,7 @@ void QtGroupsPanel::unselectMeshCloudsCallback ( )
 	vector<string>			groupsNames;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
-	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		if (true == (*it)->isSelected ( ))
 		{
@@ -2581,15 +2731,16 @@ vector<QtGroupTreeWidgetItem*> QtGroupsPanel::getSelectedGroupsItems ( ) const
 	CHECK_NULL_PTR_ERROR (_entitiesGroupsWidget)
 	vector<QtGroupTreeWidgetItem*>	selectedItems;
 	QList<QTreeWidgetItem*>			items	= _entitiesGroupsWidget->selectedItems ( );
-	for (QList<QTreeWidgetItem*>::iterator it = items.begin ( );
-	     items.end ( ) != it; it++)
+	for (QList<QTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
 	{
 		QtGroupTreeWidgetItem*	groupItem	= dynamic_cast<QtGroupTreeWidgetItem*>(*it);
 		if (0 != groupItem)
 			selectedItems.push_back (groupItem);
-		else {
+		else
+		{
 			// cas d'un item pour une dimension
-			for (uint i=0; i<(*it)->childCount(); i++){
+			for (uint i=0; i<(*it)->childCount(); i++)
+			{
 				QtGroupTreeWidgetItem*	groupItem2	= dynamic_cast<QtGroupTreeWidgetItem*>((*it)->child(i));
 				if (0 != groupItem2)
 					selectedItems.push_back (groupItem2);
@@ -2599,6 +2750,7 @@ vector<QtGroupTreeWidgetItem*> QtGroupsPanel::getSelectedGroupsItems ( ) const
 
 	return selectedItems;
 }	// QtGroupsPanel::getSelectedGroupsItems
+
 
 
 // ============================================================================
