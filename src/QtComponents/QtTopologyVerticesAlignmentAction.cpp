@@ -362,9 +362,9 @@ void QtBetween2PntsPanel::autoUpdate ( )
                     this, SLOT (entitiesAddedToSelectionCallback(QString)));
             connect(_geomEntityPanel, SIGNAL (entitiesRemovedFromSelection(QString)),
                     this, SLOT (entitiesRemovedFromSelectionCallback(QString)));
-            label->setToolTip(QString::fromUtf8("Premier point définissant la droite de projection des sommets."));
+            //label->setToolTip(QString::fromUtf8("Surface à intersecter sur laquelle sera projeté le sommet."));
             _geomEntityPanel->setToolTip(
-                    QString::fromUtf8("Premier point définissant la droite de projection des sommets."));
+                    QString::fromUtf8("Surface à intersecter sur laquelle sera projeté le sommet."));
             layout->addWidget(_geomEntityPanel);
             // Les sommets à projeter :
             _verticesPanel = new QtMgx3DEntityPanel(

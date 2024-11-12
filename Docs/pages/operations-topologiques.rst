@@ -244,12 +244,17 @@ coordonnées d’un ensemble de sommets topologiques.
 Aligner des sommets topologiques |image142|
 '''''''''''''''''''''''''''''''''''''''''''''
 
-Ce panneau permet d’aligner des sommets topologiques entre
-les deux aux extrémités.
+Ce panneau permet d’aligner des sommets topologiques selon l’une des méthodes
+suivantes :
 
-Pour se faire sélectionner, dans l’ordre les sommets en partant d’une
-extrémité. Les sommets aux extrémités ne bougent pas. Les sommets
-doivent être reliés par des arêtes.
+1. *Entre deux points*. Pour se faire sélectionner, dans l’ordre les sommets
+en partant d’une extrémité. Les sommets aux extrémités ne bougent pas. Les
+sommets doivent être reliés par des arêtes.
+
+2. *Contraint sur une surface géométrique.* Les deux points à sélectionner
+permettent de définir une droite qui va intersecter la surface, le sommet à
+aligner sera déplacé sur le point d'intersection de la droite et la surface.
+
 
 .. _projection-sommets-geometrie:
 
