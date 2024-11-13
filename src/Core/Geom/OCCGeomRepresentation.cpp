@@ -1791,11 +1791,12 @@ void OCCGeomRepresentation::projectPointOn( Utils::Math::Point& P)
 	{
 		gp_Pnt pnt(P.getX(),P.getY(),P.getZ());
 
-        // issue#86 : dans le cas des surfaces, si la surface est toute petite,
+        // issue#86 : dans le cas des surfaces
         // il faut projeter avec GeomAPI_ProjectPointOnSurf au lieu de
-        // BRepExtrema_DistShapeShape pour éviter les imprécisions numériques.
+        // BRepExtrema_DistShapeShape pour éviter que le point ne se
+        // retrouve au bord de la surface
         bool is_done = false;
-        if (m_shape.ShapeType()==TopAbs_FACE && computeSurfaceArea()<getPrecision()) {
+        if (m_shape.ShapeType()==TopAbs_FACE) {
             // Initialisation du projecteur
             TopoDS_Face face = TopoDS::Face(m_shape);
             Handle(Geom_Surface) surface = BRep_Tool::Surface(face);
