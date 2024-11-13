@@ -323,6 +323,10 @@ Context::Context(const std::string& name, bool withStdOutputs)
 , m_meshSubVolumeMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::MeshSubVolume))
 , m_structuredMeshMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::StructuredMesh))
 , m_sysCoordMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::SysCoord))
+, m_geomSavedSurfaceMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::GeomSurface))
+, m_geomSavedVolumeMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::GeomVolume))
+, m_topoSavedCoFaceMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::TopoCoFace))
+, m_topoSavedBlockMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::TopoBlock))
 {
 	// [EB] mis ici pour être pris en compte dans les scripts Python
 	// sinon on se retrouve en multi-thread systématiquement ...
@@ -624,6 +628,10 @@ Context::Context (const Context&)
 , m_meshSubVolumeMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::MeshSubVolume))
 , m_structuredMeshMask  (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::MeshVolume))
 , m_sysCoordMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::SysCoord))
+, m_geomSavedSurfaceMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::GeomSurface))
+, m_geomSavedVolumeMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::GeomVolume))
+, m_topoSavedCoFaceMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::TopoCoFace))
+, m_topoSavedBlockMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::TopoBlock))
 {
     MGX_FORBIDDEN ("Context copy constructor is not allowed.");
 }	// Context::Context
@@ -1237,8 +1245,94 @@ unsigned long Context::globalMask (Utils::Entity::objectType ot) const
 	INTERNAL_ERROR (exc, message, "Context::globalMask")
 	throw exc;
 }	// Context::globalMask
-
-
+/*----------------------------------------------------------------------------*/
+unsigned long& Context::savedGlobalMask (Utils::Entity::objectType ot)
+{
+	switch (ot)
+	{
+		case Utils::Entity::GeomSurface		: return m_geomSavedSurfaceMask;
+		case Utils::Entity::GeomVolume		: return m_geomSavedVolumeMask;
+		case Utils::Entity::TopoCoFace		: return m_topoSavedCoFaceMask;
+		case Utils::Entity::TopoBlock		: return m_topoSavedBlockMask;
+		default								:
+		{
+			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+			message << "Fonction non implémentée pour le type d'entité " << Utils::Entity::objectTypeToObjectTypeName (ot) << ".";
+			INTERNAL_ERROR (exc, message, "Context::savedGlobalMask")
+			throw exc;
+		}
+	}	// switch (ot)
+}	// Context::savedGlobalMask
+/*----------------------------------------------------------------------------*/
+unsigned long Context::savedGlobalMask (Utils::Entity::objectType ot) const
+{
+	switch (ot)
+	{
+		case Utils::Entity::GeomSurface		: return m_geomSavedSurfaceMask;
+		case Utils::Entity::GeomVolume		: return m_geomSavedVolumeMask;
+		case Utils::Entity::TopoCoFace		: return m_topoSavedCoFaceMask;
+		case Utils::Entity::TopoBlock		: return m_topoSavedBlockMask;
+		default								:
+		{
+			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+			message << "Fonction non implémentée pour le type d'entité " << Utils::Entity::objectTypeToObjectTypeName (ot) << ".";
+			INTERNAL_ERROR (exc, message, "Context::savedGlobalMask")
+			throw exc;
+		}
+	}	// switch (ot)
+}	// Context::savedGlobalMask
+/*----------------------------------------------------------------------------*/
+void Context::restoreGlobalMaskWireProperties (Utils::Entity::objectType ot)
+{
+	switch (ot)
+	{
+		case Utils::Entity::GeomSurface		:
+			m_geomSurfaceMask	|= (m_geomSavedSurfaceMask & (unsigned long)Utils::GraphicalEntityRepresentation::CURVES) | (m_geomSavedSurfaceMask & (unsigned long)Utils::GraphicalEntityRepresentation::ISOCURVES);
+			break;
+		case Utils::Entity::GeomVolume		:
+			m_geomVolumeMask	|= (m_geomSavedVolumeMask & (unsigned long)Utils::GraphicalEntityRepresentation::CURVES) | (m_geomSavedVolumeMask & (unsigned long)Utils::GraphicalEntityRepresentation::ISOCURVES);
+			break;
+		case Utils::Entity::TopoCoFace		:
+			m_topoCoFaceMask	|= m_topoSavedCoFaceMask & (unsigned long)Utils::GraphicalEntityRepresentation::CURVES;
+			break;
+		case Utils::Entity::TopoBlock		:
+			m_topoBlockMask		|= m_topoSavedBlockMask & (unsigned long)Utils::GraphicalEntityRepresentation::CURVES;
+			break;
+		default								:
+		{
+			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+			message << "Fonction non implémentée pour le type d'entité " << Utils::Entity::objectTypeToObjectTypeName (ot) << ".";
+			INTERNAL_ERROR (exc, message, "Context::restoreGlobalMaskWireProperties")
+			throw exc;
+		}
+	}	// switch (ot)
+}	// Context::restoreGlobalMaskWireProperties
+/*----------------------------------------------------------------------------*/
+void Context::restoreGlobalMaskSolidProperties (Utils::Entity::objectType ot)
+{
+	switch (ot)
+	{
+		case Utils::Entity::GeomSurface		:
+			m_geomSurfaceMask	|= m_geomSavedSurfaceMask & (unsigned long)Utils::GraphicalEntityRepresentation::SURFACES;
+			break;
+		case Utils::Entity::GeomVolume		:
+			m_geomVolumeMask	|= m_geomSavedVolumeMask & (unsigned long)Utils::GraphicalEntityRepresentation::SURFACES;
+			break;
+		case Utils::Entity::TopoCoFace		:
+			m_topoCoFaceMask	|= m_topoSavedCoFaceMask & (unsigned long)Utils::GraphicalEntityRepresentation::SURFACES;
+			break;
+		case Utils::Entity::TopoBlock		:
+			m_topoBlockMask		|= m_topoSavedBlockMask & (unsigned long)Utils::GraphicalEntityRepresentation::SURFACES;
+			break;
+		default								:
+		{
+			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+			message << "Fonction non implémentée pour le type d'entité " << Utils::Entity::objectTypeToObjectTypeName (ot) << ".";
+			INTERNAL_ERROR (exc, message, "Context::restoreGlobalMaskSolidProperties")
+			throw exc;
+		}
+	}	// switch (ot)
+}	// Context::restoreGlobalMaskSolidProperties
 /*----------------------------------------------------------------------------*/
 Utils::DisplayProperties* Context::newDisplayProperties(const Utils::Entity::objectType& ot)
 {

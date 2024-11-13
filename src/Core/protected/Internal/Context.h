@@ -358,6 +358,28 @@ public:
 
     /*------------------------------------------------------------------------*/
     /**
+    * \return	Le masque d'affichage global sauvegardé pour une entité (filaire, surfacique, ...)
+    * \param	ot le type d'objet
+    * \see		restoreGlobalMaskWireProperties
+    * \see		restoreGlobalMaskSolidProperties
+    */
+#ifndef SWIG
+    unsigned long& savedGlobalMask (Utils::Entity::objectType ot);
+    unsigned long savedGlobalMask (Utils::Entity::objectType ot) const;
+#endif
+
+    /*------------------------------------------------------------------------*/
+    /**
+    * Restaure les propriétés filaires/solides au masque pour le type d'entité transmis en argument.
+    * \param	ot le type d'objet
+    */
+#ifndef SWIG
+    void restoreGlobalMaskWireProperties (Utils::Entity::objectType ot);
+    void restoreGlobalMaskSolidProperties (Utils::Entity::objectType ot);
+#endif
+
+    /*------------------------------------------------------------------------*/
+    /**
     * Allocation d'une nouvelle propriété d'affichage pour une entité (la couleur)
     * \param ot le type d'objet
     */
@@ -746,6 +768,15 @@ protected:
 								m_meshSubVolumeMask,
 								m_structuredMeshMask,
 								m_sysCoordMask;
+
+	/** Les sauvegardes des masques globaux pour actions d'affichage/masquage mapides. 
+	 * \see		restoreGlobalMaskWireProperties
+	 * \see		restoreGlobalMaskSolidProperties
+	 */
+	unsigned long				m_geomSavedSurfaceMask,
+								m_geomSavedVolumeMask,
+								m_topoSavedCoFaceMask,
+								m_topoSavedBlockMask;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Internal

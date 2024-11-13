@@ -510,6 +510,68 @@ bool Entity::isVisible() const
     return getDisplayProperties().isDisplayed();
 }
 /*----------------------------------------------------------------------------*/
+Entity::objectType typesToType (FilterEntity::objectType types)
+{
+	switch (types)
+	{
+		case FilterEntity::NoneEntity		: return Entity::undefined;
+        case FilterEntity::GeomVertex		: return Entity::GeomVertex;
+        case FilterEntity::GeomCurve		: return Entity::GeomCurve;
+        case FilterEntity::GeomSurface		: return Entity::GeomSurface;
+        case FilterEntity::GeomVolume		: return Entity::GeomVolume;
+        case FilterEntity::TopoBlock		: return Entity::TopoBlock;
+        case FilterEntity::TopoFace			: return Entity::TopoFace;
+        case FilterEntity::TopoCoFace		: return Entity::TopoCoFace;
+        case FilterEntity::TopoEdge			: return Entity::TopoEdge;
+        case FilterEntity::TopoCoEdge		: return Entity::TopoCoEdge;
+        case FilterEntity::TopoVertex		: return Entity::TopoVertex;
+        case FilterEntity::MeshVolume		: return Entity::MeshVolume;
+        case FilterEntity::MeshSurface		: return Entity::MeshSurface;
+		case FilterEntity::MeshLine			: return Entity::MeshLine;
+        case FilterEntity::MeshCloud		: return Entity::MeshCloud;
+        case FilterEntity::MeshSubSurface	: return Entity::MeshSubSurface;
+        case FilterEntity::MeshSubVolume	: return Entity::MeshSubVolume;
+        case FilterEntity::Group0D			: return Entity::Group0D;
+        case FilterEntity::Group1D			: return Entity::Group1D;
+        case FilterEntity::Group2D			: return Entity::Group2D;
+        case FilterEntity::Group3D			: return Entity::Group3D;
+		case FilterEntity::StructuredMesh	: return Entity::StructuredMesh;
+	}	// switch (types)
+	
+	return Entity::undefined;
+}
+/*----------------------------------------------------------------------------*/
+FilterEntity::objectType typeToTypes (Entity::objectType type)
+{
+	switch (type)
+	{
+		case Entity::undefined		: return FilterEntity::NoneEntity;
+        case Entity::GeomVertex		: return FilterEntity::GeomVertex;
+        case Entity::GeomCurve		: return FilterEntity::GeomCurve;
+        case Entity::GeomSurface	: return FilterEntity::GeomSurface;
+        case Entity::GeomVolume		: return FilterEntity::GeomVolume;
+        case Entity::TopoBlock		: return FilterEntity::TopoBlock;
+        case Entity::TopoFace		: return FilterEntity::TopoFace;
+        case Entity::TopoCoFace		: return FilterEntity::TopoCoFace;
+        case Entity::TopoEdge		: return FilterEntity::TopoEdge;
+        case Entity::TopoCoEdge		: return FilterEntity::TopoCoEdge;
+        case Entity::TopoVertex		: return FilterEntity::TopoVertex;
+        case Entity::MeshVolume		: return FilterEntity::MeshVolume;
+        case Entity::MeshSurface	: return FilterEntity::MeshSurface;
+		case Entity::MeshLine		: return FilterEntity::MeshLine;
+        case Entity::MeshCloud		: return FilterEntity::MeshCloud;
+        case Entity::MeshSubSurface	: return FilterEntity::MeshSubSurface;
+        case Entity::MeshSubVolume	: return FilterEntity::MeshSubVolume;
+        case Entity::Group0D		: return FilterEntity::Group0D;
+        case Entity::Group1D		: return FilterEntity::Group1D;
+        case Entity::Group2D		: return FilterEntity::Group2D;
+        case Entity::Group3D		: return FilterEntity::Group3D;
+		case Entity::StructuredMesh	: return FilterEntity::StructuredMesh;
+	}	// switch (type)
+	
+	return FilterEntity::NoneEntity;
+}
+/*----------------------------------------------------------------------------*/
 } // end namespace Utils
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D

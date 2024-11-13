@@ -20,7 +20,22 @@ Cet onglet se décompose en 2 parties, en haut les types d’entités et en
 bas les groupes rassemblés par dimension.
 
 La partie « **Types d’entités** » permet d’activer ou non la
-représentation des entités suivant leur type.
+représentation des entités suivant leur type. Les secondes et troisièmes
+colonnes des surfaces, volumes, cofaces et blocs permettent par clic du
+bouton gauche controlant respectivement l'affichage en mode filaire et
+en mode solide des entités correspondantes.
+
+.. image:: ../images/groupes_raccourci_affichage.png
+    :width: 400px
+
+Ces boutons sont de type ON/OFF, les réglages fins des mode filaire
+(rien/filaire/isofilaire/filaire + isofilaire) et solide 
+(rien/surfacique) s'effectuant à l'aide de la boîte de dialogue
+prévue à cet effet.
+Cela signifie par exemple que dans la boite de dialogue de paramétrage 
+des propriétés d'affichage, si la case à cocher "Surfaces" n'est pas 
+cochée pour les volumes géométriques, activer le bouton "solide" des
+volumes géométriques sera sans effet.
 
 La partie « **Groupes** » permet de sélectionner les groupes (nom de
 volume par exemple, nom de matériau) à afficher.
