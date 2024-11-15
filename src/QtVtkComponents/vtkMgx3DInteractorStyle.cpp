@@ -523,8 +523,19 @@ void vtkMgx3DInteractorStyle::OnLeftButtonUp ( )
 			if (0 != SelectionManager)
 			{
 				if (false == isControlKeyPressed ( ))
+				{
 					SelectionManager->clearSelection ( );
-				SelectionManager->addToSelection (entities);
+					SelectionManager->addToSelection (entities);
+				}
+				else
+				{	// Ne pas ajouter une entité déjà présente car sinon au premier undo de la sélection on la retire de toute la pile de sélection
+					vector<Entity*>	filteredEntities;
+					for (vector<Entity*>::const_iterator ite = entities.begin ( ); entities.end ( ) != ite; ite++)
+						if (false == SelectionManager->isSelected(**ite))
+							filteredEntities.push_back (*ite);
+
+					SelectionManager->addToSelection (filteredEntities);
+				}	// else if (false == isControlKeyPressed ( ))
 			}	// if (0 != SelectionManager)
 		}	// else if (false == RubberBand)
 	}	// if (true == GetInteractiveSelectionActivated ( ))
