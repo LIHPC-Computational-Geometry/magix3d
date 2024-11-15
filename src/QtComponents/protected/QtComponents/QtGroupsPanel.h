@@ -245,6 +245,47 @@ class QtQuickRepToolButton : public QToolButton
 
 
 /**
+ * Classe dont l'unique objet est d'afficher dans un QTreeWidget des QToolButtons centrés dans leur colonne.
+ */
+class QtMgx3DTBTreeWidget : public QTreeWidget
+{
+	public :
+
+	/**
+	 * Constructeur. RAS.
+	 */
+	QtMgx3DTBTreeWidget (QWidget* parent);
+
+	/**
+	 * Destructeur. RAS.
+	 */
+	virtual ~QtMgx3DTBTreeWidget ( );
+
+	/**
+	 * Ajoute le QToolButton transmis en argument à la liste des boutons à recentrer dans leur colonne.
+	 */
+	void manage (QtQuickRepToolButton& button);
+
+
+	protected :
+	
+	/**
+	 * L'instance est redimensionnée => on recentre les tool buttons pris en charge.
+	 * @see		manage
+	 */
+	 virtual void updateGeometries ( );
+	 
+	 
+	 private :
+	 
+	 QtMgx3DTBTreeWidget (const QtMgx3DTBTreeWidget&);
+	 QtMgx3DTBTreeWidget& operator = (const QtMgx3DTBTreeWidget&);
+	 
+	 std::vector<QtQuickRepToolButton*>	_buttons;
+};	// class QtMgx3DTBTreeWidget
+
+
+/**
  * \brief		Panneau de l'IHM <I>Magix 3D</I> affichant les différents groupes existants d'une session et les différents types de
  *				groupes <I>Magix 3D</I>.
  *				L'affichage est d'une part textuelle, d'autre part dans une fenêtre graphique 3D.
@@ -731,10 +772,10 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionMan
 	QtGroupsPanel& operator = (const QtGroupsPanel&);
 
 	/** Le widget représentant les types d'entités. */
-	QTreeWidget*							_entitiesTypesWidget;
+	QtMgx3DTBTreeWidget*					_entitiesTypesWidget;
 
 	/** Le widget représentant les groupes d'entités. */
-	QTreeWidget*							_entitiesGroupsWidget;
+	QtMgx3DTBTreeWidget*					_entitiesGroupsWidget;
 
 	/** Les types d'entités filtrés. */
 	std::vector<QtEntityTypeItem*>			_typesItems;

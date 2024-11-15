@@ -341,6 +341,7 @@ QtQuickRepToolButton::QtQuickRepToolButton (QWidget* parent, QIcon& icon, Entity
 {
 	setCheckable (true);
 	setToolButtonStyle (Qt::ToolButtonIconOnly);
+	setIconSize (QSize (1, 1));
 	setIcon (icon);
 	setToolTip (true == wire ? "Affichage filaire/isofilaire" : "Affichage surfacique");
 }	// QtQuickRepToolButton::QtQuickRepToolButton
@@ -370,6 +371,56 @@ bool QtQuickRepToolButton::isWireRepresentation ( ) const
 {
 	return _wireMode;
 }	// QtQuickRepToolButton::isWireRepresentation
+
+
+// ===========================================================================
+//                     LA CLASSE QtMgx3DTBTreeWidget
+// ===========================================================================
+
+QtMgx3DTBTreeWidget::QtMgx3DTBTreeWidget (QWidget* parent)
+	: QTreeWidget (parent), _buttons ( )
+{
+}	// QtMgx3DTBTreeWidget::QtMgx3DTBTreeWidget
+
+
+QtMgx3DTBTreeWidget::QtMgx3DTBTreeWidget (const QtMgx3DTBTreeWidget&)
+	: QTreeWidget ( ), _buttons ( )
+{	// private (forbidden)
+}	// QtMgx3DTBTreeWidget::QtMgx3DTBTreeWidget
+
+
+QtMgx3DTBTreeWidget& QtMgx3DTBTreeWidget::operator = (const QtMgx3DTBTreeWidget&)
+{	// private (forbidden)
+	return *this;
+}	// QtMgx3DTBTreeWidget::operator =
+
+
+QtMgx3DTBTreeWidget::~QtMgx3DTBTreeWidget ( )
+{
+}	// QtMgx3DTBTreeWidget::~QtMgx3DTBTreeWidget
+
+	 
+void QtMgx3DTBTreeWidget::manage (QtQuickRepToolButton& button)
+{
+	_buttons.push_back (&button);
+}	// QtMgx3DTBTreeWidget::manage
+
+
+void QtMgx3DTBTreeWidget::updateGeometries ( )
+{
+	QTreeWidget::updateGeometries ( );
+	
+	for (vector<QtQuickRepToolButton*>::iterator itb = _buttons.begin ( ); _buttons.end ( ) != itb; itb++)
+	{
+		const int	col		= true == (*itb)->isWireRepresentation ( ) ? WIRE_COLUMN : SOLID_COLUMN;
+		QRect		geom	= (*itb)->geometry ( );
+		if (columnWidth (col) > geom.width ( ))
+		{
+			geom.setX (geom.x ( ) + (columnWidth (col) - geom.width ( )) / 2);
+			(*itb)->move (geom.x ( ), geom.y ( ));
+		}	// if (columnWidth (col) > geom.width ( ))
+	}	// for (vector<QtQuickRepToolButton*>::iterator itb = _buttons.begin ( ); _buttons.end ( ) != itb; itb++)
+}	// QtMgx3DTBTreeWidget::updateGeometries
 
 
 // ===========================================================================
@@ -733,22 +784,34 @@ void QtGroupsPanel::updateQuickButtons ( )
 	static bool first= true;
 	if (true == first)
 	{
-		// Récupérer la hauteur de Points (pas de QToolButton qui influence
-		int			height	= _entitiesTypesWidget->sizeHintForRow (3);	// Avant premier rendu retourne -1
-		// Si problème alors les 3 lignes qui suivent :
-		//_entitiesTypesWidget->setCurrentItem (_typesItems[3]);
-		//QModelIndex	index	= 	_entitiesTypesWidget->currentIndex ( );
-		//height				= _entitiesTypesWidget->sizeHintForRow (index.row ( ));
+		// Récupérer la hauteur de Points (pas de QToolButton qui influence)
+		int	height	= _entitiesTypesWidget->sizeHintForRow (3);	// Avant premier rendu retourne -1
 		if (0 < height)
-		{	// CP - TODO : code à finaliser en récupérant la hauteur de la rangée et en l'affectant largeur x hauteur des widgets ci-dessous.
-			_wireGeomVolumeButton->setFixedSize (height, height);
-			_solidGeomVolumeButton->setFixedSize (height, height);
-			_wireGeomSurfaceButton->setFixedSize (height, height);
-			_solidGeomSurfaceButton->setFixedSize (height, height);
-			_wireTopoBlockButton->setFixedSize (height, height);
-			_solidTopoBlockButton->setFixedSize (height, height);
-			_wireTopoCoFaceButton->setFixedSize (height, height);
-			_solidTopoCoFaceButton->setFixedSize (height, height);
+		{
+			_wireGeomVolumeButton->setIconSize (QSize (height, height));
+			_solidGeomVolumeButton->setIconSize (QSize (height, height));
+			_wireGeomSurfaceButton->setIconSize (QSize (height, height));
+			_solidGeomSurfaceButton->setIconSize (QSize (height, height));
+			_wireTopoBlockButton->setIconSize (QSize (height, height));
+			_solidTopoBlockButton->setIconSize (QSize (height, height));
+			_wireTopoCoFaceButton->setIconSize (QSize (height, height));
+			_solidTopoCoFaceButton->setIconSize (QSize (height, height));
+			QSize	buttonSize	= _wireGeomVolumeButton->size ( );
+			if ((buttonSize.width ( ) >= 10) || (buttonSize.height ( ) >= 10))	// Se mettre à l'abri d'un soucis technique
+			{
+				if (buttonSize.width ( ) < buttonSize.height ( ))
+					buttonSize.setHeight (buttonSize.width ( ));
+				else
+					buttonSize.setWidth (buttonSize.height ( ));
+				_wireGeomVolumeButton->setFixedSize (buttonSize);
+				_solidGeomVolumeButton->setFixedSize (buttonSize);
+				_wireGeomSurfaceButton->setFixedSize (buttonSize);
+				_solidGeomSurfaceButton->setFixedSize (buttonSize);
+				_wireTopoBlockButton->setFixedSize (buttonSize);
+				_solidTopoBlockButton->setFixedSize (buttonSize);
+				_wireTopoCoFaceButton->setFixedSize (buttonSize);
+				_solidTopoCoFaceButton->setFixedSize (buttonSize);
+			}	// if ((buttonSize.width ( ) >= 10) || (buttonSize.height ( ) >= 10))
 			first	= false;
 		}	// if (0 < height)
 	}	// if (0 < height)
@@ -938,7 +1001,7 @@ void QtGroupsPanel::createGui ( )
 	QSplitter*	splitter	= new QSplitter (Qt::Vertical, this);
 	layout->addWidget (splitter);
 
-	_entitiesTypesWidget	= new QTreeWidget (splitter);
+	_entitiesTypesWidget	= new QtMgx3DTBTreeWidget (splitter);
 	splitter->addWidget (_entitiesTypesWidget);
 	connect (_entitiesTypesWidget, SIGNAL (itemClicked (QTreeWidgetItem*,int)), this, SLOT (entitiesTypesStateChangeCallback (QTreeWidgetItem*, int)));
 	// On ne peut pas forcer la fermeture d'une branche :
@@ -971,10 +1034,12 @@ void QtGroupsPanel::createGui ( )
 	_wireGeomVolumeButton->setChecked ((gmask & GraphicalEntityRepresentation::CURVES) || (gmask & GraphicalEntityRepresentation::ISOCURVES));
 	connect (_wireGeomVolumeButton, SIGNAL (toggled (bool)), this, SLOT (quickDisplayRepresentationsCallback (bool)));
 	_entitiesTypesWidget->setItemWidget (typeItem, WIRE_COLUMN, _wireGeomVolumeButton);
+	_entitiesTypesWidget->manage (*_wireGeomVolumeButton);
 	_solidGeomVolumeButton	= new QtQuickRepToolButton (_entitiesTypesWidget, *_surfacicIcon, Entity::GeomVolume, false);
 	_solidGeomVolumeButton->setChecked (gmask & GraphicalEntityRepresentation::SURFACES);
 	connect (_solidGeomVolumeButton, SIGNAL (toggled (bool)), this, SLOT (quickDisplayRepresentationsCallback (bool)));
 	_entitiesTypesWidget->setItemWidget (typeItem, SOLID_COLUMN, _solidGeomVolumeButton);
+	_entitiesTypesWidget->manage (*_solidGeomVolumeButton);
 	// Geom::Surface :
 	typeItem	= new QtEntityTypeItem (item, FilterEntity::GeomSurface);
 	typeItem->setCheckState (0, Qt::Unchecked);
@@ -985,10 +1050,12 @@ void QtGroupsPanel::createGui ( )
 	_wireGeomSurfaceButton->setChecked ((gmask & GraphicalEntityRepresentation::CURVES) || (gmask & GraphicalEntityRepresentation::ISOCURVES));
 	connect (_wireGeomSurfaceButton, SIGNAL (toggled (bool)), this, SLOT (quickDisplayRepresentationsCallback (bool)));
 	_entitiesTypesWidget->setItemWidget (typeItem, WIRE_COLUMN, _wireGeomSurfaceButton);
+	_entitiesTypesWidget->manage (*_wireGeomSurfaceButton);
 	_solidGeomSurfaceButton	= new QtQuickRepToolButton (_entitiesTypesWidget, *_surfacicIcon, Entity::GeomSurface, false);
 	_solidGeomSurfaceButton->setChecked (gmask & GraphicalEntityRepresentation::SURFACES);
 	connect (_solidGeomSurfaceButton, SIGNAL (toggled (bool)), this, SLOT (quickDisplayRepresentationsCallback (bool)));
 	_entitiesTypesWidget->setItemWidget (typeItem, SOLID_COLUMN, _solidGeomSurfaceButton);
+	_entitiesTypesWidget->manage (*_solidGeomSurfaceButton);
 	// Geom::Curve :
 	typeItem	= new QtEntityTypeItem (item, FilterEntity::GeomCurve);
 	typeItem->setCheckState (0, Qt::Unchecked);
@@ -1013,10 +1080,12 @@ void QtGroupsPanel::createGui ( )
 	_wireTopoBlockButton->setChecked (gmask & GraphicalEntityRepresentation::CURVES);
 	connect (_wireTopoBlockButton, SIGNAL (toggled (bool)), this, SLOT (quickDisplayRepresentationsCallback (bool)));
 	_entitiesTypesWidget->setItemWidget (typeItem, WIRE_COLUMN, _wireTopoBlockButton);
+	_entitiesTypesWidget->manage (*_wireTopoBlockButton);
 	_solidTopoBlockButton	= new QtQuickRepToolButton (_entitiesTypesWidget, *_surfacicIcon, Entity::TopoBlock, false);
 	_solidTopoBlockButton->setChecked (gmask & GraphicalEntityRepresentation::SURFACES);
 	connect (_solidTopoBlockButton, SIGNAL (toggled (bool)), this, SLOT (quickDisplayRepresentationsCallback (bool)));
 	_entitiesTypesWidget->setItemWidget (typeItem, SOLID_COLUMN, _solidTopoBlockButton);
+	_entitiesTypesWidget->manage (*_solidTopoBlockButton);
 	// Topo::CoFace :
 	typeItem	= new QtEntityTypeItem (item, FilterEntity::TopoCoFace);
 	typeItem->setCheckState (0, Qt::Unchecked);
@@ -1027,10 +1096,12 @@ void QtGroupsPanel::createGui ( )
 	_wireTopoCoFaceButton->setChecked (gmask & GraphicalEntityRepresentation::CURVES);
 	connect (_wireTopoCoFaceButton, SIGNAL (toggled (bool)), this, SLOT (quickDisplayRepresentationsCallback (bool)));
 	_entitiesTypesWidget->setItemWidget (typeItem, WIRE_COLUMN, _wireTopoCoFaceButton);
+	_entitiesTypesWidget->manage (*_wireTopoCoFaceButton);
 	_solidTopoCoFaceButton	= new QtQuickRepToolButton (_entitiesTypesWidget, *_surfacicIcon, Entity::TopoCoFace, false);
 	_solidTopoCoFaceButton->setChecked (gmask & GraphicalEntityRepresentation::SURFACES);
 	connect (_solidTopoCoFaceButton, SIGNAL (toggled (bool)), this, SLOT (quickDisplayRepresentationsCallback (bool)));
 	_entitiesTypesWidget->setItemWidget (typeItem, SOLID_COLUMN, _solidTopoCoFaceButton);
+	_entitiesTypesWidget->manage (*_solidTopoCoFaceButton);
 	// Topo::CoEdge :
 	typeItem	= new QtEntityTypeItem (item, FilterEntity::TopoCoEdge);
 	typeItem->setCheckState (0, Qt::Unchecked);
@@ -1082,7 +1153,7 @@ void QtGroupsPanel::createGui ( )
 	for (int c = 1; c < 3; c++)
 		_entitiesTypesWidget->resizeColumnToContents (c);
 
-	_entitiesGroupsWidget	= new QTreeWidget (splitter);
+	_entitiesGroupsWidget	= new QtMgx3DTBTreeWidget (splitter);
 	splitter->addWidget (_entitiesGroupsWidget);
 	connect (_entitiesGroupsWidget, SIGNAL (itemClicked (QTreeWidgetItem*,int)), this, SLOT (groupStateChangeCallback (QTreeWidgetItem*, int)));
 	connect (_entitiesGroupsWidget, SIGNAL (itemClicked (QTreeWidgetItem*,int)), this, SLOT (showLevelGroupsCallback (QTreeWidgetItem*, int)));

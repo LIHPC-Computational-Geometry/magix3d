@@ -328,6 +328,24 @@ Context::Context(const std::string& name, bool withStdOutputs)
 , m_topoSavedCoFaceMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::TopoCoFace))
 , m_topoSavedBlockMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::TopoBlock))
 {
+	// Garantir qu'un clic accès rapide sur affichage filaire ou surfacique sera suivi d'effet ... Ensuite, c'est les goûts et les couleurs ;)
+	if (0 == (m_geomSavedSurfaceMask & (Utils::GraphicalEntityRepresentation::CURVES | Utils::GraphicalEntityRepresentation::ISOCURVES)))
+		m_geomSavedSurfaceMask |= Utils::GraphicalEntityRepresentation::CURVES | Utils::GraphicalEntityRepresentation::ISOCURVES;
+	if (0 == (m_geomSavedSurfaceMask & (Utils::GraphicalEntityRepresentation::SURFACES)))
+		m_geomSavedSurfaceMask |= Utils::GraphicalEntityRepresentation::SURFACES;
+	if (0 == (m_geomSavedVolumeMask & (Utils::GraphicalEntityRepresentation::CURVES | Utils::GraphicalEntityRepresentation::ISOCURVES)))
+		m_geomSavedVolumeMask |= Utils::GraphicalEntityRepresentation::CURVES | Utils::GraphicalEntityRepresentation::ISOCURVES;
+	if (0 == (m_geomSavedVolumeMask & (Utils::GraphicalEntityRepresentation::SURFACES)))
+		m_geomSavedVolumeMask |= Utils::GraphicalEntityRepresentation::SURFACES;
+	if (0 == (m_topoSavedCoFaceMask & Utils::GraphicalEntityRepresentation::CURVES))
+		m_topoSavedCoFaceMask |= Utils::GraphicalEntityRepresentation::CURVES;
+	if (0 == (m_topoSavedCoFaceMask & (Utils::GraphicalEntityRepresentation::SURFACES)))
+		m_topoSavedCoFaceMask |= Utils::GraphicalEntityRepresentation::SURFACES;
+	if (0 == (m_topoSavedBlockMask & Utils::GraphicalEntityRepresentation::CURVES))
+		m_topoSavedBlockMask |= Utils::GraphicalEntityRepresentation::CURVES;
+	if (0 == (m_topoSavedBlockMask & (Utils::GraphicalEntityRepresentation::SURFACES)))
+		m_topoSavedBlockMask |= Utils::GraphicalEntityRepresentation::SURFACES;
+		
 	// [EB] mis ici pour être pris en compte dans les scripts Python
 	// sinon on se retrouve en multi-thread systématiquement ...
 	ContextIfc::ContextIfc::initialize ( );
