@@ -979,32 +979,26 @@ void QtRepresentationTypesDialog::applyCallback ( )
 			QtRepresentationTypesPanel::ExtendedDisplayProperties::updateDisplayProperties (newProperties, ot, globalMode, globalProps);
 			unsigned long	newMask	= 0;
 			unsigned long	mask	= context.globalMask (ot);
-			updateMask (newMask, mask, GraphicalEntityRepresentation::CLOUDS,
-			            useCloudRepresentation ( ));
-			updateMask (newMask, mask, GraphicalEntityRepresentation::CURVES,
-			            useCurvesRepresentation ( ));
-			updateMask (newMask, mask, GraphicalEntityRepresentation::ISOCURVES,
-			            useIsoCurvesRepresentation ( ));
-			updateMask (newMask, mask, GraphicalEntityRepresentation::SURFACES,
-			            useSurfacesRepresentation ( ));
-			updateMask (newMask, mask, GraphicalEntityRepresentation::VOLUMES,
-			            useVolumesRepresentation ( ));
-			updateMask (newMask, mask, GraphicalEntityRepresentation::NAMES,
-			            useNamesRepresentation ( ));
-			updateMask (newMask, mask,
-			            GraphicalEntityRepresentation::ASSOCIATIONS,
-			            useAssociationsRepresentation ( ));
-			updateMask (newMask, mask,
-			            GraphicalEntityRepresentation::MESH_SHAPE,
-			            useMeshShapeRepresentation ( ));
-			updateMask (newMask, mask,
-			            GraphicalEntityRepresentation::DISCRETISATIONTYPE,
-			            useDiscretisationRepresentation ( ));
-			updateMask (newMask, mask,
-			            GraphicalEntityRepresentation::NBMESHINGEDGE,
-			            useNbMeshRepresentation ( ));
+			updateMask (newMask, mask, GraphicalEntityRepresentation::CLOUDS, useCloudRepresentation ( ));
+			updateMask (newMask, mask, GraphicalEntityRepresentation::CURVES, useCurvesRepresentation ( ));
+			updateMask (newMask, mask, GraphicalEntityRepresentation::ISOCURVES, useIsoCurvesRepresentation ( ));
+			updateMask (newMask, mask, GraphicalEntityRepresentation::SURFACES, useSurfacesRepresentation ( ));
+			updateMask (newMask, mask, GraphicalEntityRepresentation::VOLUMES, useVolumesRepresentation ( ));
+			updateMask (newMask, mask, GraphicalEntityRepresentation::NAMES, useNamesRepresentation ( ));
+			updateMask (newMask, mask, GraphicalEntityRepresentation::ASSOCIATIONS, useAssociationsRepresentation ( ));
+			updateMask (newMask, mask, GraphicalEntityRepresentation::MESH_SHAPE, useMeshShapeRepresentation ( ));
+			updateMask (newMask, mask, GraphicalEntityRepresentation::DISCRETISATIONTYPE, useDiscretisationRepresentation ( ));
+			updateMask (newMask, mask,  GraphicalEntityRepresentation::NBMESHINGEDGE, useNbMeshRepresentation ( ));
 			updateMask (newMask, getDisplayedValueType ( ));
 			context.globalMask (ot)			= newMask;
+			// Le masque sauvegardé : il doit lui rester au moins un attribut filaire et un attribut solide pour qu'en cas de clic sur un bouton d'accès rapide d'affichage
+			// on soit en mesure de concrétiser la demande :
+			const unsigned long		oldWireMask		= context.savedGlobalMask (ot) & (GraphicalEntityRepresentation::CURVES | GraphicalEntityRepresentation::ISOCURVES);
+			const unsigned long		oldSolidMask	= context.savedGlobalMask (ot) & (GraphicalEntityRepresentation::SURFACES);
+			if (0 == (newMask & (GraphicalEntityRepresentation::CURVES | GraphicalEntityRepresentation::ISOCURVES)))	// Plus de caractère filaire (:
+				newMask |= oldWireMask;
+			if (0 == (newMask & GraphicalEntityRepresentation::SURFACES))	// Plus de caractère solide (:
+				newMask |= oldSolidMask;
 			context.savedGlobalMask (ot)	= newMask;
 		}	// for (Entity::objectType ot = Entity::GeomVertex; ...
 
@@ -1022,42 +1016,29 @@ void QtRepresentationTypesDialog::applyCallback ( )
 	else
 	{
 
-	// On applique le nouveau masque de représentation aux entités
-	// sélectionnées :
-	const bool	forceUpdate	= (true == newProperties.useShrinkFactor ( )) || (true == newProperties.useArrowComul ( )) ? true : false;
-	for (vector<Entity*>::const_iterator it2 = _entities.begin ( ); _entities.end ( ) != it2; it2++)
-	{
-		CHECK_NULL_PTR_ERROR ((*it2)->getDisplayProperties ( ).getGraphicalRepresentation ( ))
-		unsigned long	mask	=
-			(*it2)->getDisplayProperties ( ).getGraphicalRepresentation ( )->getRepresentationMask ( );
-		unsigned long	newMask	= 0;
-		updateMask (newMask, mask, GraphicalEntityRepresentation::CLOUDS,
-		            useCloudRepresentation ( ));
-		updateMask (newMask, mask, GraphicalEntityRepresentation::CURVES,
-		            useCurvesRepresentation ( ));
-		updateMask (newMask, mask, GraphicalEntityRepresentation::ISOCURVES,
-		            useIsoCurvesRepresentation ( ));
-		updateMask (newMask, mask, GraphicalEntityRepresentation::SURFACES,
-		            useSurfacesRepresentation ( ));
-		updateMask (newMask, mask, GraphicalEntityRepresentation::VOLUMES,
-		            useVolumesRepresentation ( ));
-		updateMask (newMask, mask, GraphicalEntityRepresentation::NAMES,
-		            useNamesRepresentation ( ));
-		updateMask (newMask, mask, GraphicalEntityRepresentation::ASSOCIATIONS,
-		            useAssociationsRepresentation ( ));
-		updateMask (newMask, mask, GraphicalEntityRepresentation::MESH_SHAPE,
-		            useMeshShapeRepresentation ( ));
-		updateMask (newMask, mask,
-		            GraphicalEntityRepresentation::DISCRETISATIONTYPE,
-		            useDiscretisationRepresentation ( ));
-		updateMask (newMask, mask, GraphicalEntityRepresentation::NBMESHINGEDGE,
-		            useNbMeshRepresentation ( ));
-		updateMask (newMask, getDisplayedValueType ( ));
+		// On applique le nouveau masque de représentation aux entités sélectionnées :
+		const bool	forceUpdate	= (true == newProperties.useShrinkFactor ( )) || (true == newProperties.useArrowComul ( )) ? true : false;
+		for (vector<Entity*>::const_iterator it2 = _entities.begin ( ); _entities.end ( ) != it2; it2++)
+		{
+			CHECK_NULL_PTR_ERROR ((*it2)->getDisplayProperties ( ).getGraphicalRepresentation ( ))
+			unsigned long	mask	= (*it2)->getDisplayProperties ( ).getGraphicalRepresentation ( )->getRepresentationMask ( );
+			unsigned long	newMask	= 0;
+			updateMask (newMask, mask, GraphicalEntityRepresentation::CLOUDS,  useCloudRepresentation ( ));
+			updateMask (newMask, mask, GraphicalEntityRepresentation::CURVES, useCurvesRepresentation ( ));
+			updateMask (newMask, mask, GraphicalEntityRepresentation::ISOCURVES, useIsoCurvesRepresentation ( ));
+			updateMask (newMask, mask, GraphicalEntityRepresentation::SURFACES, useSurfacesRepresentation ( ));
+			updateMask (newMask, mask, GraphicalEntityRepresentation::VOLUMES, useVolumesRepresentation ( ));
+			updateMask (newMask, mask, GraphicalEntityRepresentation::NAMES, useNamesRepresentation ( ));
+			updateMask (newMask, mask, GraphicalEntityRepresentation::ASSOCIATIONS, useAssociationsRepresentation ( ));
+			updateMask (newMask, mask, GraphicalEntityRepresentation::MESH_SHAPE, useMeshShapeRepresentation ( ));
+			updateMask (newMask, mask, GraphicalEntityRepresentation::DISCRETISATIONTYPE, useDiscretisationRepresentation ( ));
+			updateMask (newMask, mask, GraphicalEntityRepresentation::NBMESHINGEDGE, useNbMeshRepresentation ( ));
+			updateMask (newMask, getDisplayedValueType ( ));
 
-		DisplayProperties&	properties	= (*it2)->getDisplayProperties ( );
-		QtRepresentationTypesPanel::ExtendedDisplayProperties::updateDisplayProperties (getDisplayProperties ( ), (*it2)->getType ( ), globalMode, properties);
-		getRenderingManager ( ).updateRepresentation (**it2, newMask, forceUpdate);
-	}	// for (vector<Entity*>::iterator it2 = ...
+			DisplayProperties&	properties	= (*it2)->getDisplayProperties ( );
+			QtRepresentationTypesPanel::ExtendedDisplayProperties::updateDisplayProperties (getDisplayProperties ( ), (*it2)->getType ( ), globalMode, properties);
+			getRenderingManager ( ).updateRepresentation (**it2, newMask, forceUpdate);
+		}	// for (vector<Entity*>::iterator it2 = ...
 
 	}	// else if (true == globalMode)
 
