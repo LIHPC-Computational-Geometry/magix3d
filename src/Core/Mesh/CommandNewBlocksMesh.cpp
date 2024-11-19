@@ -102,7 +102,23 @@ internalExecute()
    TkUtil::Timer timer(false);
 #endif
 
+    // delete the premesh of the edges to accommodate for possible smooth/pert modifications
+    // applied to adjacent surfaces
+    {
+        std::set<Topo::CoEdge *> set_coedges;
+        for (auto b: m_blocks) {
+            std::vector<Topo::CoEdge *> coedges;
+            b->getCoEdges(coedges);
 
+            for (auto ce: coedges) {
+                set_coedges.insert(ce);
+            }
+        }
+        for (auto ce: set_coedges) {
+            ce->clearPoints();
+            ce->getMeshingData()->setPreMeshed(false);
+        }
+    }
 
     // maille et modifie le maillage pour les modifications 2D, s'il y en a
     // cette étape est à effectuer avant le maillage de toutes les arêtes car le lissage
