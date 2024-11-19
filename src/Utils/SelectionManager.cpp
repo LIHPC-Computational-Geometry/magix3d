@@ -9,6 +9,7 @@
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/TraceLog.h>
 
+#include <assert.h>
 #include <float.h>
 
 using namespace TkUtil;
@@ -128,7 +129,7 @@ Mutex* SelectionManagerObserver::getMutex ( ) const
 SelectionManager::SelectionManager (const string& name, TkUtil::LogOutputStream* los)
 	: SelectionManagerIfc ( ),
 	  _name (name), _entities ( ), _observers ( ), _mutex (0),
-	  m_logOutputStream(los)
+	  _undoStack ( ), _currentAction ((size_t)-1), m_logOutputStream(los)
 {
 	_mutex	= new Mutex ( );
 }	// SelectionManager::SelectionManager
@@ -137,7 +138,7 @@ SelectionManager::SelectionManager (const string& name, TkUtil::LogOutputStream*
 SelectionManager::SelectionManager (const SelectionManager&)
 	: SelectionManagerIfc ( ),
 	  _name ("Invalid name"), _entities ( ), _observers ( ), _mutex (0),
-	  m_logOutputStream (0)
+	  _undoStack ( ), _currentAction ((size_t)-1), m_logOutputStream (0)
 {
     MGX_FORBIDDEN("SelectionManager::SelectionManager (const SelectionManager&) forbidden.");
 }	// SelectionManager::SelectionManager (const SelectionManager&)
@@ -147,11 +148,10 @@ SelectionManager::~SelectionManager ( )
 {
 	_mutex->lock ( );
 
-	for (vector<SelectionManagerObserverIfc*>::iterator it =
-						_observers.begin ( ); _observers.end ( ) != it; it++)
+	for (vector<SelectionManagerObserverIfc*>::iterator it = _observers.begin ( ); _observers.end ( ) != it; it++)
 		(*it)->selectionManagerDeleted ( );
 
-	clearSelection ( );
+	clearSelection (false);
 
 	delete _mutex;
 }	// SelectionManager::~SelectionManager
@@ -177,17 +177,14 @@ void SelectionManager::getBounds (double bounds [6])
 
 	AutoMutex	autoMutex (getMutex ( ));
 
-	for (vector<Entity*>::iterator	it = _entities.begin ( );
-	     _entities.end ( ) != it; it++)
+	for (vector<Entity*>::iterator	it = _entities.begin ( ); _entities.end ( ) != it; it++)
 	{
 		double	entityBounds [6];
 		(*it)->getBounds (entityBounds);
 		for (int i = 0; i < 6; i += 2)
 		{
-			bounds [i]		= bounds [i] <= entityBounds [i] ?
-							  bounds [i] :  entityBounds [i];
-			bounds [i + 1]	= bounds [i + 1] >= entityBounds [i + 1] ?
-							  bounds [i + 1] :  entityBounds [i + 1];
+			bounds [i]		= bounds [i] <= entityBounds [i] ? bounds [i] :  entityBounds [i];
+			bounds [i + 1]	= bounds [i + 1] >= entityBounds [i + 1] ? bounds [i + 1] :  entityBounds [i + 1];
 		}	// for (int i = 0; i < 6; i += 2)
 	}	// for (vector<Entity*>::iterator   it = ...
 }	// SelectionManager::getBounds
@@ -207,31 +204,29 @@ vector<Entity*> SelectionManager::getEntities ( ) const
 std::vector<std::string> SelectionManager::getEntitiesNames ( ) const
 {
     std::vector<std::string> entites;
-    for (vector<Mgx3D::Utils::Entity*>::const_iterator  it = _entities.begin ( );
-             _entities.end ( ) != it; it++)
+    for (vector<Mgx3D::Utils::Entity*>::const_iterator  it = _entities.begin ( ); _entities.end ( ) != it; it++)
         entites.push_back((*it)->getName());
 
         return entites;
 }
 
-std::vector<Mgx3D::Utils::Entity*> SelectionManager::getEntities ( Entity::objectType type) const
+std::vector<Mgx3D::Utils::Entity*> SelectionManager::getEntities (Entity::objectType type) const
 {
     std::vector<Mgx3D::Utils::Entity*> entites_filtrees;
 
-    for (vector<Mgx3D::Utils::Entity*>::const_iterator  it = _entities.begin( );
-         _entities.end ( ) != it; it++)
+    for (vector<Mgx3D::Utils::Entity*>::const_iterator  it = _entities.begin( ); _entities.end ( ) != it; it++)
         if ((*it)->getType() == type)
             entites_filtrees.push_back(*it);
 
     return entites_filtrees;
 }
 
-std::vector<std::string> SelectionManager::getEntitiesNames ( Entity::objectType type) const
+
+std::vector<std::string> SelectionManager::getEntitiesNames (Entity::objectType type) const
 {
     std::vector<std::string> entites_filtrees;
 
-    for (vector<Mgx3D::Utils::Entity*>::const_iterator  it = _entities.begin( );
-         _entities.end ( ) != it; it++)
+    for (vector<Mgx3D::Utils::Entity*>::const_iterator  it = _entities.begin( ); _entities.end ( ) != it; it++)
         if ((*it)->getType() == type)
             entites_filtrees.push_back((*it)->getName());
 
@@ -243,8 +238,7 @@ std::vector<std::string> SelectionManager::getEntitiesNames (FilterEntity::objec
 {
 	std::vector<std::string> entites_filtrees;
 
-	for (vector<Mgx3D::Utils::Entity*>::const_iterator  it = _entities.begin( );
-	     _entities.end ( ) != it; it++)
+	for (vector<Mgx3D::Utils::Entity*>::const_iterator  it = _entities.begin( ); _entities.end ( ) != it; it++)
 		if (0 != ((*it)->getFilteredType() & mask))
 			entites_filtrees.push_back((*it)->getName());
 
@@ -254,19 +248,124 @@ std::vector<std::string> SelectionManager::getEntitiesNames (FilterEntity::objec
 
 void SelectionManager::addToSelection (const vector<Entity*>& entities)
 {
+	addToSelection (entities, true);
+}	// SelectionManager::addToSelection
+
+
+void SelectionManager::removeFromSelection (const vector<Entity*>& entities)
+{
+	removeFromSelection (entities, true);
+}	// SelectionManager::removeFromSelection
+
+
+bool SelectionManager::isSelected (const Entity& entity) const
+{
+    // TODO [EB]: {Optimisation} partie pouvant être couteuse il me semble
+    // [CP] : OPTIMISATION
+    if (0 != entity.getDisplayProperties ( ).getGraphicalRepresentation ( ))
+		return entity.getDisplayProperties ( ).getGraphicalRepresentation ( )->isSelected ( );
+
+	// A priori on ne devrait pas passer ci-dessous :
+	AutoMutex	autoMutex (getMutex ( ));
+
+	for (vector<Entity*>::const_iterator it = _entities.begin ( ); _entities.end ( ) != it; it++)
+		if (*it == &entity)
+			return true;
+
+	return false;
+}	// SelectionManager::isSelected
+
+
+void SelectionManager::clearSelection ( )
+{
+	clearSelection (true);
+}	// SelectionManager::clearSelection
+
+
+void SelectionManager::undo ( )
+{
+	if (false == isUndoable ( ))
+	{
+		INTERNAL_ERROR (exc, "Annulation de la dernière opération de sélection demandée.", "Absence d'opération à annuler.")
+		throw (exc);
+	}	// if (false == isUndoable ( ))
+	
+	assert ((size_t)-1 != _currentAction);
+	pair<STACK_ACTION, vector<Mgx3D::Utils::Entity*>>	p	= _undoStack [_currentAction];
+	_currentAction--;
+	switch (p.first)
+	{
+		case SelectionManager::ADD		: removeFromSelection (p.second, false);	break;
+		case SelectionManager::REMOVE	: addToSelection (p.second, false);			break;
+		case SelectionManager::CLEAR	: addToSelection (p.second, false);			break;
+		default							: 
+		{
+			INTERNAL_ERROR (exc, "Annulation de la dernière opération de sélection demandée.", "Type d'opération inconnu.")
+			throw (exc);
+		}
+	}	// switch (p.first)	
+}	// SelectionManager::undo
+
+
+void SelectionManager::redo ( )
+{
+	if (false == isRedoable ( ))
+	{
+		INTERNAL_ERROR (exc, "Rejeu de la dernière opération de sélection demandée.", "Absence d'opération à rejouer.")
+		throw (exc);
+	}	// if (false == isRedoable ( ))
+	
+	assert (_currentAction + 1 < _undoStack.size ( ));
+	pair<STACK_ACTION, vector<Mgx3D::Utils::Entity*>>	p	= _undoStack [++_currentAction];
+	switch (p.first)
+	{
+		case SelectionManager::ADD		: addToSelection (p.second, false);			break;
+		case SelectionManager::REMOVE	: removeFromSelection (p.second, false);	break;
+		case SelectionManager::CLEAR	: removeFromSelection (p.second, false);	break;
+		default							: 
+		{
+			INTERNAL_ERROR (exc, "Rejeu de la dernière opération de sélection demandée.", "Type d'opération inconnu.")
+			throw (exc);
+		}
+	}	// switch (p.first)	
+}	// SelectionManager::redo
+
+
+void SelectionManager::resetUndoStack ( )
+{
+	_currentAction	= (size_t)-1;
+	_undoStack.clear ( );
+}	// SelectionManager::resetUndoStack
+
+
+bool SelectionManager::isUndoable ( ) const
+{
+	return (size_t)-1 != _currentAction ? true : false;
+}	// SelectionManager::isUndoable
+
+
+bool SelectionManager::isRedoable ( ) const
+{
+	if (false == _undoStack.empty ( ))
+		return (_currentAction < _undoStack.size ( ) - 1) || ((size_t)-1 == _currentAction) ? true : false;
+
+	return false;
+}	// SelectionManager::isRedoable
+
+
+void SelectionManager::addToSelection (const vector<Entity*>& entities, bool undoable)
+{
 	AutoMutex	autoMutex (getMutex ( ));
 
 	if (0 == entities.size ( ))
 		return;
 
-	bool			hasAlreadySelected	= false, first = true;
+	bool		hasAlreadySelected	= false, first = true;
 	UTF8String	alreadySelected (Charset::UTF_8);
 	UTF8String   message (Charset::UTF_8);
-	message << (1 == entities.size ( ) ?
-	           "Sélection de l'entité " : "Sélection des entités ");
+	message << (1 == entities.size ( ) ? "Sélection de l'entité " : "Sélection des entités ");
 
-	for (vector<Entity*>::const_iterator it = entities.begin ( );
-	     entities.end ( ) != it; it++)
+	for (vector<Entity*>::const_iterator it = entities.begin ( ); entities.end ( ) != it; it++)
 	{
 		CHECK_NULL_PTR_ERROR (*it)
 
@@ -287,6 +386,9 @@ void SelectionManager::addToSelection (const vector<Entity*>& entities)
 		first	= false;
 	}	// for (vector<Entity*>::const_iterator it = entities.begin ( ); ...
 
+	if (true == undoable)
+		pushAction (SelectionManager::ADD, entities);
+
 	if (0 != m_logOutputStream)
 		m_logOutputStream->log (TraceLog (message, Log::INFORMATION));
 
@@ -298,27 +400,24 @@ void SelectionManager::addToSelection (const vector<Entity*>& entities)
 }	// SelectionManager::addToSelection
 
 
-void SelectionManager::removeFromSelection (const vector<Entity*>& entities)
+void SelectionManager::removeFromSelection (const vector<Entity*>& entities, bool undoable)
 {
 	AutoMutex	autoMutex (getMutex ( ));
 
 	if (0 == entities.size ( ))
 		return;
 
-	bool			hasAlreadyRemoved	= false, first = true;
+	bool		hasAlreadyRemoved	= false, first = true;
 	UTF8String	alreadyRemoved (Charset::UTF_8);
 	UTF8String   message (Charset::UTF_8);
-	message << (1 == entities.size ( ) ?
-	           "Désélection de l'entité " : "Désélection des entités ");
+	message << (1 == entities.size ( ) ? "Désélection de l'entité " : "Désélection des entités ");
 
-	for (vector<Entity*>::const_iterator it1 = entities.begin ( );
-	     entities.end ( ) != it1; it1++)
+	for (vector<Entity*>::const_iterator it1 = entities.begin ( ); entities.end ( ) != it1; it1++)
 	{
 		CHECK_NULL_PTR_ERROR (*it1)
 
 		bool	removed	= false;
-		for (vector<Entity*>::iterator it2 = _entities.begin ( );
-		     _entities.end ( ) != it2; it2++)
+		for (vector<Entity*>::iterator it2 = _entities.begin ( ); _entities.end ( ) != it2; it2++)
 		{
 			if (*it1 == *it2)
 			{
@@ -343,13 +442,14 @@ void SelectionManager::removeFromSelection (const vector<Entity*>& entities)
 		message << (*it1)->getName ( );
 		first	= false;
 	}	// for (vector<Entity*>::const_iterator it1 = entities.begin ( ); ...
+	
+	if (true == undoable)
+		pushAction (SelectionManager::REMOVE, entities);
 
 	if (0 != m_logOutputStream)
 		m_logOutputStream->log (TraceLog (message, Log::INFORMATION));
 
-	for (vector<SelectionManagerObserverIfc*>::iterator it =
-						_observers.begin ( ); _observers.end ( ) != it;
-		it++)
+	for (vector<SelectionManagerObserverIfc*>::iterator it = _observers.begin ( ); _observers.end ( ) != it; it++)
 	{
 		(*it)->selectionModified ( );
 		(*it)->entitiesRemovedFromSelection (entities, false);
@@ -357,39 +457,17 @@ void SelectionManager::removeFromSelection (const vector<Entity*>& entities)
 }	// SelectionManager::removeFromSelection
 
 
-bool SelectionManager::isSelected (const Entity& entity) const
-{
-    // TODO [EB]: {Optimisation} partie pouvant être couteuse il me semble
-    // [CP] : OPTIMISATION
-    if (0 != entity.getDisplayProperties ( ).getGraphicalRepresentation ( ))
-		return entity.getDisplayProperties ( ).getGraphicalRepresentation ( )->isSelected ( );
-
-	// A priori on ne devrait pas passer ci-dessous :
-	AutoMutex	autoMutex (getMutex ( ));
-
-	for (vector<Entity*>::const_iterator it = _entities.begin ( );
-	     _entities.end ( ) != it; it++)
-			if (*it == &entity)
-				return true;
-
-	return false;
-}	// SelectionManager::isSelected
-
-
-void SelectionManager::clearSelection ( )
+void SelectionManager::clearSelection (bool undoable)
 {
 	AutoMutex	autoMutex (getMutex ( ));
 
-	// ATTENTION : on enlève ici, dès le début, chaque entité de la liste, et
-	// ce avant d'invoquer les observateurs pour les avertir de l'évènement. En 
-	// effet, ceux-ci peuvent etre tentés d'effectuer des requêtes auprès de
-	// ce gestionnaire de sélection, notamment un removeFromSelection. C'est
-	// par exemple le cas d'un observateur Qt où il est difficile de savoir si
-	// l'évènement de désenregistrement provient de ce gestionnaire ou d'un 
+	// ATTENTION : on enlève ici, dès le début, chaque entité de la liste, et ce avant d'invoquer les observateurs pour les avertir de l'évènement. En 
+	// effet, ceux-ci peuvent etre tentés d'effectuer des requêtes auprès de ce gestionnaire de sélection, notamment un removeFromSelection. C'est
+	// par exemple le cas d'un observateur Qt où il est difficile de savoir si l'évènement de désenregistrement provient de ce gestionnaire ou d'un 
 	// évenement au niveau de l'IHM.
+	const vector<Entity*>	unselected	= _entities;
 	if (0 != _entities.size ( ))
 	{
-		vector<Entity*>	unselected	= _entities;
 		_entities.clear ( );
 		for (vector<SelectionManagerObserverIfc*>::iterator	its	= _observers.begin ( ); _observers.end ( ) != its; its++)
 		{
@@ -397,10 +475,93 @@ void SelectionManager::clearSelection ( )
 			(*its)->entitiesRemovedFromSelection (unselected, true);
 		}	// for (vector<SelectionManagerObserverIfc*>::iterator its = ...
 	}	// if (0 != _entities.size ( ))
+	
+	if (true == undoable)
+		pushAction (SelectionManager::CLEAR, unselected);	// Le clear n'est jamais qu'un remove ;)
 
 	if (0 != m_logOutputStream)
 		m_logOutputStream->log (TraceLog (UTF8String("Annulation de la sélection.", Charset::UTF_8), Log::INFORMATION));
 }	// SelectionManager::clearSelection
+
+
+void SelectionManager::pushAction (STACK_ACTION action, const std::vector<Mgx3D::Utils::Entity*>& entities)
+{
+	switch (action)
+	{
+		case SelectionManager::CLEAR	:	// Ne pas engorger la pile de "clear" successifs.
+			if ((true == _undoStack.empty ( )) || ((size_t)-1 == _currentAction) || (_undoStack.at (_currentAction).first == action) || (false == entities.size ( )))
+			{
+				return;
+			}
+	}	// switch (action)
+	
+	if (_currentAction < _undoStack.size ( ) - 1)	// Se débarasser des sélections annulées préalablement
+	{
+//cout << "BEFORE ERASE :" << endl;	printActionsStack (cout);
+		_undoStack.erase (_undoStack.begin ( ) + _currentAction + 1, _undoStack.end ( ));
+//cout << "AFTER ERASE :" << endl;	printActionsStack (cout);
+	}	// if (_currentAction < _undoStack.size ( ) - 1)
+
+	_undoStack.push_back (pair<STACK_ACTION, vector<Mgx3D::Utils::Entity*>>(action, entities));
+	_currentAction++;
+//cout << "AFTER PUSH :" << endl;	printActionsStack (cout);	cout << __FILE__ << ' ' << __LINE__ << " 	SelectionManager::pushAction. CURRENT=" << getCurrentAction ( ) << endl;
+}	// SelectionManager::pushAction
+
+
+string SelectionManager::getCurrentAction ( ) const
+{
+	UTF8String	action (Charset::UTF_8);
+	
+	if ((size_t)-1 == _currentAction)
+		action << "Absence d'action de sélection";
+	else
+		action << getAction (_currentAction);
+
+	return action.utf8 ( );
+}	// SelectionManager::getCurrentAction
+
+
+string SelectionManager::getAction (size_t i) const
+{
+	UTF8String	action (Charset::UTF_8);
+	
+	if (_undoStack.size ( ) <= i)
+	{
+		UTF8String	error (Charset::UTF_8);
+		error << "Absence de " << i << "-ème action dans SelectionManager::getAction.";
+		throw (error);
+	}
+
+	pair<STACK_ACTION, vector<Mgx3D::Utils::Entity*>>	p	= _undoStack [i];
+	switch (p.first)
+	{
+		case SelectionManager::ADD		: action << "ADD entities ";	break;
+		case SelectionManager::REMOVE	: action << "REMOVE entities ";	break;
+		case SelectionManager::CLEAR	: action << "CLEAR entities ";	break;
+		default							: action << "non renseignée (erreur interne).";	return action.utf8 ( );
+	}	// switch (p.first)
+
+	const size_t printCount	= p.second.size ( ) <= 5 ? p.second.size ( ) : 5;
+	for (size_t i = 0; i < printCount; i++)
+		action << p.second [i]->getName ( ) << " ";
+
+	return action.utf8 ( );
+}	// SelectionManager::getAction
+
+
+void SelectionManager::printActionsStack (ostream& stream) const
+{
+	if ((size_t)-1 == _currentAction)
+		stream << "Absence d'action de sélection." << endl;
+	else
+	{
+		for (size_t i = 0; i < _currentAction; i++)
+			stream << "   " << getAction (i) << endl;
+		stream << "=> " << getCurrentAction ( ) << endl;
+		for (size_t i = _currentAction + 1; i < _undoStack.size ( ); i++)
+			stream << "=> " << getAction (i) << endl;
+	}	// if ((size_t)-1 == _currentAction)
+}	// SelectionManager::printActionsStack
 
 
 void SelectionManager::addSelectionObserver (SelectionManagerObserverIfc& observer)
@@ -451,9 +612,7 @@ void SelectionManager::notifyObserversForNewPolicy (void* smp)
 {
 	AutoMutex	autoMutex (getMutex ( ));
 
-	for (vector<SelectionManagerObserverIfc*>::iterator it =
-						_observers.begin ( ); _observers.end ( ) != it;
-		it++)
+	for (vector<SelectionManagerObserverIfc*>::iterator it = _observers.begin ( ); _observers.end ( ) != it; it++)
 		(*it)->selectionPolicyModified (smp);
 }	// SelectionManager::notifyObserversForNewPolicy
 

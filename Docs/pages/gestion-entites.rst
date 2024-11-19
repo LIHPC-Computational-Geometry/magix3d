@@ -21,7 +21,6 @@ bas les groupes rassemblés par dimension.
 
 La partie « **Types d’entités** » permet d’activer ou non la
 représentation des entités suivant leur type. Les secondes et troisièmes
-colonnes des surfaces, volumes, cofaces et blocs permettent par clic du
 bouton gauche controlant respectivement l'affichage en mode filaire et
 en mode solide des entités correspondantes.
 

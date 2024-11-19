@@ -403,7 +403,9 @@ class QtMgx3DMainWindow :
 		QAction			*_unrefineMeshRepresentationAction;
 		QAction			*_addMeshExplorerAction;
 		QAction			*_addMeshQualityAction;
-		QAction			*_displaySelectedGroupsAction,
+		QAction			*_undoSelectionAction,
+						*_redoSelectionAction,
+						*_displaySelectedGroupsAction,
 						*_hideSelectedGroupsAction,
 						*_displaySelectedTypesAction,
 						*_hideSelectedTypesAction,
@@ -960,6 +962,18 @@ class QtMgx3DMainWindow :
 	 */
 	//@{
 
+	/**
+	 * Annuler la dernière opération de sélection.
+	 * \see		redoSelectionCallback
+	 */
+	virtual void undoSelectionCallback ( );
+
+	/**
+	 * Rejouer la dernière opération de sélection annulée.
+	 * \see		undoSelectionCallback
+	 */
+	virtual void redoSelectionCallback ( );
+		
 	/**
 	 * Affiche une boite de dialogue non modale de modification des paramètres
 	 * d'affichage de la sélection en cours.

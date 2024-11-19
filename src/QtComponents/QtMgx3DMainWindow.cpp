@@ -285,6 +285,7 @@ namespace QtComponents
                   _meshSelectionAction(0), _meshVisibleAction(0), _meshAllAction(0),
                   _unrefineMeshRepresentationAction(0),
                   _addMeshExplorerAction(0), _addMeshQualityAction(0),
+                  _undoSelectionAction (0), _redoSelectionAction (0),
                   _displaySelectedGroupsAction(0), _hideSelectedGroupsAction(0),
                   _displaySelectedTypesAction(0), _hideSelectedTypesAction(0),
                   _displaySelectedEntitiesAction(0), _hideSelectedEntitiesAction(0),
@@ -392,6 +393,8 @@ namespace QtComponents
                   _unrefineMeshRepresentationAction(wa._unrefineMeshRepresentationAction),
                   _addMeshExplorerAction(wa._addMeshExplorerAction),
                   _addMeshQualityAction(wa._addMeshQualityAction),
+                  _undoSelectionAction (wa._undoSelectionAction),
+                  _redoSelectionAction (wa._redoSelectionAction),
                   _displaySelectedGroupsAction(wa._displaySelectedGroupsAction),
                   _hideSelectedGroupsAction(wa._hideSelectedGroupsAction),
                   _displaySelectedTypesAction(wa._displaySelectedTypesAction),
@@ -524,6 +527,8 @@ namespace QtComponents
 				_unrefineMeshRepresentationAction = wa._unrefineMeshRepresentationAction;
 				_addMeshExplorerAction         = wa._addMeshExplorerAction;
 				_addMeshQualityAction          = wa._addMeshQualityAction;
+				_undoSelectionAction           = wa._undoSelectionAction;
+				_redoSelectionAction           = wa._redoSelectionAction;
 				_displaySelectedGroupsAction   = wa._displaySelectedGroupsAction;
 				_hideSelectedGroupsAction      = wa._hideSelectedGroupsAction;
 				_displaySelectedTypesAction    = wa._displaySelectedTypesAction;
@@ -1820,6 +1825,9 @@ void QtMgx3DMainWindow::showReady ( )
 #ifndef QT_4
 			_selectionMenu->setToolTipsVisible(true);
 #endif    // 	QT_4
+			_selectionMenu->addAction (getActions ( )._undoSelectionAction);
+			_selectionMenu->addAction (getActions ( )._redoSelectionAction);
+			_selectionMenu->addSeparator ( );
 			_selectionMenu->addAction(getActions()._displaySelectedEntitiesAction);
 			_selectionMenu->addAction(getActions()._hideSelectedEntitiesAction);
 			_selectionMenu->addAction(getActions()._displaySelectedGroupsAction);
@@ -1828,8 +1836,7 @@ void QtMgx3DMainWindow::showReady ( )
 			_selectionMenu->addAction(getActions()._hideSelectedTypesAction);
 			_selectionMenu->addSeparator();
 			_selectionMenu->addAction(getActions()._displaySelectionPropertiesAction);
-			_selectionMenu->addAction(
-					getActions()._displayComputableSelectionPropertiesAction);
+			_selectionMenu->addAction(getActions()._displayComputableSelectionPropertiesAction);
 			_selectionMenu->addSeparator();
 			_selectionMenu->addAction(getActions()._selectionRepresentationAction);
 
@@ -2313,6 +2320,13 @@ void QtMgx3DMainWindow::showReady ( )
 
 
 			// La sélection :
+			_actions._undoSelectionAction	= new QAction("Annuler la dernière sélection", this);
+			connect(_actions._undoSelectionAction, SIGNAL(triggered ( )), this, SLOT(undoSelectionCallback ( )));
+			_actions._undoSelectionAction->setShortcut (QKeySequence (Qt::SHIFT + Qt::Key_Z));
+			_actions._undoSelectionAction->setShortcutContext (Qt::ApplicationShortcut);
+			_actions._redoSelectionAction	= new QAction("Refaire la sélection annulée", this);
+			connect(_actions._redoSelectionAction, SIGNAL(triggered ( )), this, SLOT(redoSelectionCallback ( )));
+			_actions._redoSelectionAction->setShortcut (QKeySequence (Qt::ALT + Qt::Key_Z));
 			_actions._displaySelectedGroupsAction = new QAction("Afficher les groupes", this);
 			connect(_actions._displaySelectedGroupsAction, SIGNAL(triggered()), this, SLOT(displaySelectedGroupsCallback()));
 			_actions._hideSelectedGroupsAction = new QAction("Masquer les groupes", this);
@@ -3621,6 +3635,12 @@ cout << ctime (&t);
 			_actions.setEnabled(enable);
 			if (0 != _pythonPanel)
 				_pythonPanel->setUsabled(enable);
+				
+			// Menu sélection :
+			if ((0 != _actions._undoSelectionAction) && (0 != getSelectionManager ( )))
+				_actions._undoSelectionAction->setEnabled (getSelectionManager ( )->isUndoable ( ));
+			if ((0 != _actions._redoSelectionAction) && (0 != getSelectionManager ( )))
+				_actions._redoSelectionAction->setEnabled (getSelectionManager ( )->isRedoable ( ));
 
 			// Actualisation du panneau "Opérations" :
 			getOperationsPanel().setEnabled(enable);
@@ -4114,9 +4134,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 			CommandInternal *commandInternal = dynamic_cast<CommandInternal *>(&command);
 			if (0 != commandInternal)
 			{
-				if ((COMMAND_STATE == event)
-				    && ((Command::DONE == command.getStatus())
-				        || (Command::INITED == command.getStatus())))
+				if ((COMMAND_STATE == event) && ((Command::DONE == command.getStatus()) || (Command::INITED == command.getStatus())))
 				{
 					LOCK_INSTANCE
 
@@ -4420,6 +4438,10 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 
 					if (Command::DONE == command.getStatus())
 					{
+						// Les opérations de sélection n'étant pas des commandes, on fait un RAZ de la pile de undo de sélection après chaque commande.
+						if (0 != getSelectionManager ( ))
+							getSelectionManager ( )->resetUndoStack ( );
+
 						// A t'on un évènement important justifiant d'une notification via boite de dialogue ?
 						const string warn = commandInternal->getWarningToPopup();
 						if (false == warn.empty())
@@ -7062,17 +7084,51 @@ void QtMgx3DMainWindow::displaySelectedEntitiesComputablePropertiesCallback ( )
 }	// QtMgx3DMainWindow::displaySelectedEntitiesComputablePropertiesCallback
 
 
+void QtMgx3DMainWindow::undoSelectionCallback ( )
+{
+	_actions.setEnabled (false);
+	if (0 != _pythonPanel)
+		_pythonPanel->setUsabled (false);
+		
+	BEGIN_QT_TRY_CATCH_BLOCK
+
+	getContext ( ).getSelectionManager ( ).undo ( );
+	
+	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
+	
+	_actions.setEnabled (true);
+	if (0 != _pythonPanel)
+		_pythonPanel->setUsabled (true);
+}	// QtMgx3DMainWindow::undoSelectionCallback
+
+
+void QtMgx3DMainWindow::redoSelectionCallback ( )
+{
+	_actions.setEnabled (false);
+	if (0 != _pythonPanel)
+		_pythonPanel->setUsabled (false);
+		
+	BEGIN_QT_TRY_CATCH_BLOCK
+
+	getContext ( ).getSelectionManager ( ).redo ( );
+	
+	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
+	
+	_actions.setEnabled (true);
+	if (0 != _pythonPanel)
+		_pythonPanel->setUsabled (true);
+}	// QtMgx3DMainWindow::redoSelectionCallback
+
+
 void QtMgx3DMainWindow::showRepresentationTypesCallback ( )
 {
     BEGIN_QT_TRY_CATCH_BLOCK
 
 	disableActions (true);
 
-	const vector<Entity*>	entities	=
-					getContext ( ).getSelectionManager ( ).getEntities ( );
+	const vector<Entity*>	entities	= getContext ( ).getSelectionManager ( ).getEntities ( );
 	vector<Entity*>			displayedEntities;
-	for (vector<Entity*>::const_iterator it = entities.begin ( );
-	     entities.end ( ) != it; it++)
+	for (vector<Entity*>::const_iterator it = entities.begin ( ); entities.end ( ) != it; it++)
 		if (true == (*it)->getDisplayProperties ( ).isDisplayed ( ))
 			displayedEntities.push_back (*it);
 	changeRepresentationTypes (displayedEntities);
@@ -7139,8 +7195,7 @@ void QtMgx3DMainWindow::selectVisibleEntitiesCallback ( )
 
 	CHECK_NULL_PTR_ERROR (_graphicalWidget)
 
-	vector<Entity*>	entities	=
-			_graphicalWidget->getRenderingManager ( ).getDisplayedEntities ( );
+	vector<Entity*>	entities	= _graphicalWidget->getRenderingManager ( ).getDisplayedEntities ( );
 	if (0 != entities.size ( ))
 		getContext ( ).getSelectionManager ( ).addToSelection (entities);
 
@@ -7154,8 +7209,7 @@ void QtMgx3DMainWindow::unselectVisibleEntitiesCallback ( )
 
 	CHECK_NULL_PTR_ERROR (_graphicalWidget)
 
-	vector<Entity*>	entities	=
-			_graphicalWidget->getRenderingManager ( ).getDisplayedEntities ( );
+	vector<Entity*>	entities	= _graphicalWidget->getRenderingManager ( ).getDisplayedEntities ( );
 	if (0 != entities.size ( ))
 		getContext ( ).getSelectionManager ( ).removeFromSelection (entities);
 
@@ -7167,8 +7221,7 @@ void QtMgx3DMainWindow::selectFusableEdgesCallback ( )
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
 
-	const vector < vector<string> >	names	=
-					getContext ( ).getTopoManager ( ).getFusableEdges ( );
+	const vector < vector<string> >	names	= getContext ( ).getTopoManager ( ).getFusableEdges ( );
 	vector<Entity*>			entities;
 	for (vector < vector<string> >::const_iterator itg = names.begin ( );
 	     names.end ( ) != itg; itg++)
