@@ -19,11 +19,7 @@
 #include <TkUtil/ScriptingLog.h>
 #include <TkUtil/TraceLog.h>
 #include <QTextCodec>
-#if PY_MAJOR_VERSION >= 3
-#   include <QtPython3/QtPython.h>
-#else   // PY_MAJOR_VERSION >= 3
-#   include <QtPython/QtPython.h>
-#endif  // PY_MAJOR_VERSION >= 3
+#include <QtPython3/QtPython.h>
 
 #ifdef QT_4
 #include <QX11Info>

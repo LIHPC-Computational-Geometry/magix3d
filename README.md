@@ -81,7 +81,7 @@ script has compiled the magix3d source code into `magix3d/`. In particular, it h
 When opening `magix3d` in clion, you will then have to add some compilation flags. For development purpose, we advise
 to use the following ones:
 ```shell
--DUSE_PYTHON_3=ON -DWITH_DOC=OFF -DWITH_COV=ON
+-DWITH_DOC=OFF -DWITH_COV=ON
 ```
 With this CMake options, you may get two CMake targets:
 - `test_link` that runs the python test suite, that is located in `test_link/` directory. This target requires to find the program `pytest`

@@ -66,9 +66,7 @@
 
 #include <TkUtil/Exception.h>
 #include <TkUtil/TraceLog.h>
-#if PY_MAJOR_VERSION >= 3
-#define PyString_AsString PyUnicode_AsUTF8
-#endif	// # PY_MAJOR_VERSION < 3
+
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -2214,7 +2212,7 @@ void GroupManager::addCartesianPerturbation(const std::string& nom, PyObject* py
 {
     PyObject* pyName = PyObject_Str(py_obj);
 #ifdef _DEBUG2
-	std::cout<<"GroupManager::addCartesianPerturbation("<<nom<<", "<<PyString_AsString(pyName)<<")"<<std::endl;
+	std::cout<<"GroupManager::addCartesianPerturbation("<<nom<<", "<<PyUnicode_AsUTF8(pyName)<<")"<<std::endl;
 #endif
 	// recherche du groupe 2D ou 3D
 	Group2D* gr2d = getGroup2D(nom, false);
@@ -2238,7 +2236,7 @@ void GroupManager::addCartesianPerturbation(const std::string& nom, PyObject* py
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGroupManager().addCartesianPerturbation (\""
-        << nom<<"\", "<<PyString_AsString(pyName)<<")";
+        << nom<<"\", "<<PyUnicode_AsUTF8(pyName)<<")";
     command->setScriptCommand(cmd);
 
     getContext().getCommandManager().addCommand(command, Utils::Command::DO);
@@ -2248,7 +2246,7 @@ void GroupManager::addPolarPerturbation(const std::string& nom, PyObject* py_obj
 {
     PyObject* pyName = PyObject_Str(py_obj);
 #ifdef _DEBUG2
-	std::cout<<"GroupManager::addPolarPerturbation("<<nom<<", "<<PyString_AsString(pyName)<<")"<<std::endl;
+	std::cout<<"GroupManager::addPolarPerturbation("<<nom<<", "<<PyUnicode_AsUTF8(pyName)<<")"<<std::endl;
 #endif
 	// recherche du groupe 2D ou 3D
 	Group2D* gr2d = getGroup2D(nom, false);
@@ -2272,7 +2270,7 @@ void GroupManager::addPolarPerturbation(const std::string& nom, PyObject* py_obj
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGroupManager().addPolarPerturbation (\""
-        << nom<<"\", "<<PyString_AsString(pyName)<<")";
+        << nom<<"\", "<<PyUnicode_AsUTF8(pyName)<<")";
     command->setScriptCommand(cmd);
 
     getContext().getCommandManager().addCommand(command, Utils::Command::DO);

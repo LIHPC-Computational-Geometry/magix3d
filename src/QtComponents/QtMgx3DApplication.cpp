@@ -32,13 +32,8 @@
 #include <QtUtil/QtAutoWaitingCursor.h>
 #include <QtUtil/QtHelpWindow.h>
 #include <PrefsQt/QtPrefsUpdater.h>
-#if PY_MAJOR_VERSION >= 3
-#	include <QtPython3/QtPython.h>
-#	include <QtPython3/QtPythonConsole.h>
-#else	// PY_MAJOR_VERSION >= 3
-#	include <QtPython/QtPython.h>
-#	include <QtPython/QtPythonConsole.h>
-#endif	// PY_MAJOR_VERSION >= 3
+#include <QtPython3/QtPython.h>
+#include <QtPython3/QtPythonConsole.h>
 #include <QtUtil/QtStringHelper.h>
 #include <QtUtil/QtValidatedTextField.h>
 #include <QwtCharts/QwtChartsManager.h>
@@ -415,11 +410,7 @@ void QtMgx3DApplication::init (int argc, char* argv[], char* envp[])
 	QtValidatedTextField::errorForeground		= QColor (255, 255, 255);
 	QtStringHelper::initialize ( );
 	QwtChartsManager::initialize ( );
-#ifdef USE_PYTHON_CONSOLE
-	// Indispensable en Python 3 avant l'appel à Py_Initialize : initialise le redirector qui
-	// redirige les sorties standards python vers la console python.
-	QtPython::preInitialize ( );
-#endif  // USE_PYTHON_CONSOLE
+	// REM : QtPython::preInitialize ( ) doit avoir été appelé auparavant, et avant Py_Initialize. C'est actuellement fait en début de main.
 	QtPython::initialize (Context::getOutCharset ( ));
 	Process::initialize (argc, argv, envp);
 	ContextIfc::initialize ( );

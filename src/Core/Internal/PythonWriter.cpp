@@ -17,7 +17,6 @@
 #include <Lima/malipp.h>
 
 #include <Standard_Version.hxx>
-#include <patchlevel.h>	// PY_MAJOR_VERSION
 
 
 /*----------------------------------------------------------------------------*/
@@ -32,11 +31,7 @@ PythonWriter (const TkUtil::UTF8String& fileName,
         bool enableDate, bool enableTime)
 : TkUtil::PythonLogOutputStream (fileName, charset, mask, enableDate, enableTime)
 {
-//    setEncoding (ISO_8859_15);	// obsolète, on utilise maintenant setCharset
-	setShell("python2");
-#if PY_MAJOR_VERSION >= 3
 	setShell(PYTHON_INTERPRETER);
-#endif	// PY_MAJOR_VERSION
 }
 /*----------------------------------------------------------------------------*/
 PythonWriter::

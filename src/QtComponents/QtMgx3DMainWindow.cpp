@@ -140,11 +140,7 @@
 #include <QtUtil/QtFileDialogUtilities.h>
 //#include <QtUtil/QtHelpWindow.h>
 #include <patchlevel.h>	// PY_VERSION
-#if PY_MAJOR_VERSION >= 3
-#	include <QtPython3/QtPython.h>
-#else	// PY_MAJOR_VERSION >= 3
-#	include <QtPython/QtPython.h>
-#endif	// PY_MAJOR_VERSION >= 3
+#include <QtPython3/QtPython.h>
 #include <QtUtil/QtUnicodeHelper.h>
 //#include <QtUtil/QtExternalLinkDialog.h>
 #include <QtUtil/QtStringHelper.h>

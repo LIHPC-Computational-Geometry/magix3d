@@ -4,11 +4,8 @@
 
 #include "Internal/ScriptingManager.h"
 #include "Utils/CommandManagerIfc.h"
-#if PY_MAJOR_VERSION >= 3
-#	include <QtPython3/QtPythonConsole.h>
-#else	// PY_MAJOR_VERSION >= 3
-#	include <QtPython/QtPythonConsole.h>
-#endif	// PY_MAJOR_VERSION >= 3
+#include <QtPython3/QtPythonConsole.h>
+
 
 namespace Mgx3D
 {
