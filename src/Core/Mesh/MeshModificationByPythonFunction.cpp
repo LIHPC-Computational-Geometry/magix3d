@@ -22,9 +22,7 @@
 /*----------------------------------------------------------------------------*/
 #include "gmds/ig/Node.h"
 /*----------------------------------------------------------------------------*/
-#if PY_MAJOR_VERSION >= 3
-#define PyString_AsString PyUnicode_AsUTF8
-#endif	// # PY_MAJOR_VERSION < 3
+
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Mesh {
@@ -48,7 +46,7 @@ void MeshModificationByPythonFunction::
 addToDescription (Mgx3D::Utils::SerializedRepresentation* description) const
 {
 	PyObject* pyName = PyObject_GetAttrString(m_py_obj, "func_name");
-	std::string strName(PyString_AsString(pyName));
+	std::string strName(PyUnicode_AsUTF8(pyName));
 
 	description->addProperty (
 			Utils::SerializedRepresentation::Property (

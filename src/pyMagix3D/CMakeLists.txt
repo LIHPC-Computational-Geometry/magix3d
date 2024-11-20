@@ -37,7 +37,6 @@ list (APPEND MAGIX3D_SWIG_COMPILE_OPTIONS ${MAGIX3D_OPTIONS})
 #set (MT_SWIG_COMPILE_OPTIONS "-c++;-globals;pyMagix3D;-shadow;-DIN_STD=\"std::\";-DSWIG_FORBIDS_FINALIZATION;-DIN_UTIL=\"TkUtil::\";-DIN_STD=\"std::\"")
 swig_link_libraries (pyMagix3D PUBLIC Core TkUtilScripting::TkUtilScripting)
 foreach (lib ${ALL_TARGETS})
-   target_include_directories (${lib} PRIVATE ${Python2_INCLUDE_DIRS})	# Ne devrait pas être nécesaire, non ? C'est pour le wrapper swig ...
    target_compile_options (${lib} PUBLIC ${MANDATORY_CXX_OPTIONS})
    target_compile_options (${lib} PRIVATE -DM3D_PYTHON_API_VERSION="${MAGIX3D_VERSION}")
    set_property (TARGET ${lib} PROPERTY VERSION ${MAGIX3D_VERSION})
@@ -211,4 +210,4 @@ endif (Doxygen_FOUND)
 ]===]
 
 # Le lancement du test de non régression via ctest : depuis le répertoire de build, faire ctest -V nr
-#add_test (NAME nr COMMAND make default PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR} PYTHON_EXE=${Python2_EXECUTABLE} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../NonRegression)
+#add_test (NAME nr COMMAND make default PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR} PYTHON_EXE=${Python3_EXECUTABLE} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../NonRegression)

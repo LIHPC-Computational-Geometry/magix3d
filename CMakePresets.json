@@ -4,7 +4,6 @@
       {
         "name": "ci",
         "cacheVariables": {
-          "USE_PYTHON_3": "ON",
           "TRITON": "ON",
           "GUIToolkitsVariables_ROOT": "$env{INSTALL_DIR}/guitoolkitsvariables",
           "VtkContrib_ROOT": "$env{INSTALL_DIR}/vtkcontrib",

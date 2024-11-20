@@ -74,11 +74,6 @@ using std::ptrdiff_t;
 #include "Structured/StructuredMeshManagerIfc.h"
 
 #include <patchlevel.h>	// PY_VERSION
-#if PY_MAJOR_VERSION >= 3
-#define PyString_Check PyUnicode_Check
-#define PyString_AsString PyUnicode_AsUTF8
-#define PyString_FromString PyUnicode_FromString
-#endif	// # PY_MAJOR_VERSION < 3
 %}
  
 // -------------------------------
@@ -109,7 +104,7 @@ using std::ptrdiff_t;
      $1 = 1;
      for (int i = 0; i<PyList_Size($input); i++) {
         PyObject* obj = PyList_GetItem( $input, i );
-        if (!PyString_Check(obj))
+        if (!PyUnicode_Check(obj))
           $1 = 0;
      }
    }
@@ -126,12 +121,12 @@ using std::ptrdiff_t;
   $1 = new std::vector<std::string>(PyList_Size($input));
   for (int i = 0; i<$1->size(); i++) {
     PyObject* obj = PyList_GetItem( $input, i );
-    if (!PyString_Check(obj)){
+    if (!PyUnicode_Check(obj)){
       printf("erreur objet %d n'est pas une string\n", i);
       return NULL;
     }
     else
-      (*$1)[i] = PyString_AsString(obj);
+      (*$1)[i] = PyUnicode_AsUTF8(obj);
   }
 }
 
@@ -144,7 +139,7 @@ using std::ptrdiff_t;
     std::vector<std::string>::const_iterator iter;
     int k;
     for(iter = $1.begin(), k=0; iter != $1.end(); ++iter, ++k) {
-        PyList_SetItem($result,k,PyString_FromString( (*iter).c_str() ));
+        PyList_SetItem($result,k,PyUnicode_FromString( (*iter).c_str() ));
     }
 }
 
@@ -206,7 +201,7 @@ using std::ptrdiff_t;
     	int k2;
     	std::vector<std::string>::const_iterator iter2;
     	for(iter2 = (*iter1).begin(), k2=0; iter2 != (*iter1).end(); ++iter2, ++k2) {
-        	PyList_SetItem(PyList_GetItem( $result, k1),k2,PyString_FromString( (*iter2).c_str() ));
+        	PyList_SetItem(PyList_GetItem( $result, k1),k2,PyUnicode_FromString( (*iter2).c_str() ));
         }
     }
 }
