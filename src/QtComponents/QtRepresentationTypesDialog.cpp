@@ -991,15 +991,21 @@ void QtRepresentationTypesDialog::applyCallback ( )
 			updateMask (newMask, mask,  GraphicalEntityRepresentation::NBMESHINGEDGE, useNbMeshRepresentation ( ));
 			updateMask (newMask, getDisplayedValueType ( ));
 			context.globalMask (ot)			= newMask;
-			// Le masque sauvegardé : il doit lui rester au moins un attribut filaire et un attribut solide pour qu'en cas de clic sur un bouton d'accès rapide d'affichage
-			// on soit en mesure de concrétiser la demande :
-			const unsigned long		oldWireMask		= context.savedGlobalMask (ot) & (GraphicalEntityRepresentation::CURVES | GraphicalEntityRepresentation::ISOCURVES);
-			const unsigned long		oldSolidMask	= context.savedGlobalMask (ot) & (GraphicalEntityRepresentation::SURFACES);
-			if (0 == (newMask & (GraphicalEntityRepresentation::CURVES | GraphicalEntityRepresentation::ISOCURVES)))	// Plus de caractère filaire (:
-				newMask |= oldWireMask;
-			if (0 == (newMask & GraphicalEntityRepresentation::SURFACES))	// Plus de caractère solide (:
-				newMask |= oldSolidMask;
-			context.savedGlobalMask (ot)	= newMask;
+			try
+			{
+				// Le masque sauvegardé : il doit lui rester au moins un attribut filaire et un attribut solide pour qu'en cas de clic sur un bouton d'accès rapide d'affichage
+				// on soit en mesure de concrétiser la demande :
+				const unsigned long		oldWireMask		= context.savedGlobalMask (ot) & (GraphicalEntityRepresentation::CURVES | GraphicalEntityRepresentation::ISOCURVES);
+				const unsigned long		oldSolidMask	= context.savedGlobalMask (ot) & (GraphicalEntityRepresentation::SURFACES);
+				if (0 == (newMask & (GraphicalEntityRepresentation::CURVES | GraphicalEntityRepresentation::ISOCURVES)))	// Plus de caractère filaire (:
+					newMask |= oldWireMask;
+				if (0 == (newMask & GraphicalEntityRepresentation::SURFACES))	// Plus de caractère solide (:
+					newMask |= oldSolidMask;
+				context.savedGlobalMask (ot)	= newMask;
+			}
+			catch (...)
+			{	// Pas de sauvegarde pour ot == Entity::CoEdge et autres
+			}
 		}	// for (Entity::objectType ot = Entity::GeomVertex; ...
 
 		// Actualisation des représentations :
