@@ -12,6 +12,8 @@
 
 #include <Utils/Common.h>
 
+#include <TkUtil/LocalNetwork.h>
+#include <QtUtil/QtMessageBox.h>
 #include <QtVtk/QtVtk.h>
 #ifdef USE_EXPERIMENTAL_ROOM
 #include <ExperimentalRoom/ExperimentalRoom.h>
@@ -27,6 +29,7 @@
 
 #include <mgx_config.h>
 using namespace std;
+using namespace TkUtil;
 using namespace Preferences;
 using namespace Mgx3D::Internal;
 
@@ -59,6 +62,18 @@ _offScreenWindowWidth ("offScreenWindowWidth", 1024, "Largeur de la fenêtre off
 _offScreenWindowHeight ("offScreenWindowHeight", 768, "Hauteur de la fenêtre offscreen utilisée pour supprimer les taches cachées"),
 _raysFileCharset ("raysFileCharset", "ISO8859", "Jeu de caractères utilisé par défaut lors de l'enregistrement des fichiers lasers/diagnostics (ISO8859, UTF8).")
 {
+	// Est-on sur une autre machine que celle de login ? Si oui risque de plantage si Gl/X non compatible ...
+	if (true == LocalNetwork::isRemoteHost ( ))
+	{
+		UTF8String	question (Charset::UTF_8);
+		question << "Magix3D n'est pas lancé depuis la station de login et risque de provoquer un plantage de la station en cas de rebonds ssh successifs sur au moins 2 machines.\n"
+		         << "Souhaitez-vous continuer d'utiliser Magix3D (oui) ? Ou quitter (annuler) ?";
+		int	answer	= QtMessageBox::displayWarningMessage (0, "Magix3D", question, 100, "Oui", "Annuler", 0, 1);
+
+		if (0 != answer)
+			::exit (-1);
+	}	// if (true == LocalNetwork::isRemoteHost ( ))
+
 #ifdef VTK_8
     // Gestion des paramètres Open GL via Qt.
 	// En son absence, par défaut, les polygones sont transparents.
