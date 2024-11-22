@@ -1615,6 +1615,11 @@ public:
      */
     virtual std::vector<std::string> getCommonEdges(const std::string& face1, const std::string& face2, int dim) const;
 
+
+    /*------------------------------------------------------------------------*/
+    /** \brief Aligne le sommet sélectionné sur l'intersection entre la droite définie
+     * par 2 points et une surface
+     */
     virtual Mgx3D::Internal::M3DCommandResultIfc*
     alignVerticesOnSurface(const std::string &surface, const std::string &vertex, const Point &pnt1, const Point &pnt2);
 
