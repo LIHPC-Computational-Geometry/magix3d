@@ -5697,8 +5697,8 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::alignVerticesOnSurface(Geom::
         // trace dans le script
         TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
         cmd << getContextAlias() << "." << "getTopoManager().alignOnSurface ("
-            << surface->getName()<<", "
-            << vertex->getName() <<", "
+            << "\""<<surface->getName()<<"\", "
+            << "\""<<vertex->getName() <<"\", "
             << pnt1.getScriptCommand()<<", "
             << pnt2.getScriptCommand()<< ")";
         command->setScriptCommand(cmd);
