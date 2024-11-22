@@ -1336,11 +1336,15 @@ public:
     /** Retourne l'entité suivant le nom en argument */
     virtual TopoEntity* getEntity(const std::string& name, const bool exceptionIfNotFound=true) const;
 
+#endif	// #ifndef SWIG
 
+    /*------------------------------------------------------------------------*/
+    /** \brief Aligne le sommet sélectionné sur l'intersection entre la droite définie
+     * par 2 points et une surface
+     */
     virtual Mgx3D::Internal::M3DCommandResultIfc* alignVerticesOnSurface(const std::string &surface, const std::string &vertex,
                                                                          const Point &pnt1,const Point &pnt2);
-
-#endif	// #ifndef SWIG
+    SET_SWIG_COMPLETABLE_METHOD(alignVerticesOnSurface)
 
     /*------------------------------------------------------------------------*/
     /** \brief retourne la liste des arêtes communes à 2 faces communes, ou à 2 blocs
