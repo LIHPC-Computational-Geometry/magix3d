@@ -169,7 +169,7 @@ preExecute()
 
             if (nb_discontinuities > 1) {
                 TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-                message << "Le ogrid ne peut pas être effectué du fait d'une discontinuité ";
+                message << "Le ogrid ne peut pas être effectué ";
                 message << "car les faces sélectionnées ne forment pas une surface unique";
                 throw TkUtil::Exception(message);
             }
