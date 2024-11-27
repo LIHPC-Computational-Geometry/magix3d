@@ -44,5 +44,12 @@
 		hasError    = true;                                                \
 	}
 
+#ifdef CHECK_COMMAND_ARGS
+#define CHECK_ENTITIES_LIST(entities)                                      \
+if (true == entities.empty ( ))                                            \
+	throw TkUtil::Exception (TkUtil::UTF8String ("Absence d'entité à traiter.", TkUtil::Charset::UTF_8));
+#else	// CHECK_COMMAND_ARGS
+#define CHECK_ENTITIES_LIST(entities)
+#endif	// CHECK_COMMAND_ARGS
 
 #endif	// ERROR_MANAGEMENT_H
