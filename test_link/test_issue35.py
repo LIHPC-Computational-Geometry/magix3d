@@ -3,7 +3,7 @@ import pyMagix3D as Mgx3D
 # Test que le découpage en o-grid n'est PAS fait quand la contrainte d'Euler n'est pas vérifiée 
 def test_issue35():
     ctx = Mgx3D.getStdContext()
-    gm = ctx.getGeomManager(
+    gm = ctx.getGeomManager()
     tm = ctx.getTopoManager()
 
     ######### 3D #########
