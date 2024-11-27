@@ -38,25 +38,8 @@ CommandSplitFacesWithOgrid(Internal::Context& c,
 , m_ratio_ogrid(ratio_ogrid)
 , m_nb_meshing_edges(nb_bras)
 {
-    if (ratio_ogrid<=0.0 || ratio_ogrid>=1.0)
-        throw TkUtil::Exception (TkUtil::UTF8String ("Le ratio doit être dans l'interval ]0 1[", TkUtil::Charset::UTF_8));
-
-    if (nb_bras<=0)
-        throw TkUtil::Exception (TkUtil::UTF8String ("Le nombre de bras doit être d'au moins 1", TkUtil::Charset::UTF_8));
-
-    // on ne concerve que les blocs structurés et non dégénérés
-    for (std::vector<Topo::CoFace* >::iterator iter = cofaces.begin();
-            iter != cofaces.end(); ++iter){
-        Topo::CoFace* hf = *iter;
-        if (hf->isStructured() && hf->getNbVertices() == 4)
-        	m_cofaces.push_back(hf);
-        else{
-			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-            message <<"Il n'est pas prévu de faire un découpage en o-grid dans une face non structurée ou dégénérée\n";
-            message << "("<<hf->getName()<<" n'est pas structurée)";
-            throw TkUtil::Exception(message);
-        }
-    }
+    // la validité de la sélection se fera lors de la création des filtres
+    m_cofaces.insert(m_cofaces.end(), cofaces.begin(), cofaces.end());
 
     // la validité de la sélection se fera lors de la création des filtres
     m_coedges.insert(m_coedges.end(), coedges.begin(), coedges.end());
@@ -77,6 +60,123 @@ CommandSplitFacesWithOgrid::
 {
 }
 /*----------------------------------------------------------------------------*/
+/* Les traitements de la méthode preExecute étaient auparavant faits dans le  */
+/* constructeur. Or, lever une exception dans le constructeur ne permet pas   */
+/* de récupérer le message d'erreur si la commande a été déclenchée en Python */
+/* (fonctionne depuis l'IHM).                                                 */
+void CommandSplitFacesWithOgrid::
+preExecute()
+{
+    if (m_ratio_ogrid<=0.0 || m_ratio_ogrid>=1.0)
+        throw TkUtil::Exception (TkUtil::UTF8String ("Le ratio doit être dans l'interval ]0 1[", TkUtil::Charset::UTF_8));
+
+    if (m_nb_meshing_edges<=0)
+        throw TkUtil::Exception (TkUtil::UTF8String ("Le nombre de bras doit être d'au moins 1", TkUtil::Charset::UTF_8));
+
+    // on ne conserve que les faces structurés et non dégénérés
+    for (std::vector<Topo::CoFace* >::iterator iter = m_cofaces.begin();
+            iter != m_cofaces.end(); ++iter){
+        Topo::CoFace* hf = *iter;
+        if (!(hf->isStructured() && hf->getNbVertices() == 4)) {
+			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+            message <<"Il n'est pas prévu de faire un découpage en o-grid dans une face non structurée ou dégénérée\n";
+            message << "("<<hf->getName()<<" n'est pas structurée)";
+            throw TkUtil::Exception(message);
+        }
+    }
+
+    // On va vérifier que le ogrid est possible sur l'ensemble des faces sélectionnées
+
+    // Etape 1 : On cherche tous les points
+    std::set<Topo::Vertex*> all_vertices;
+    for (Topo::CoFace* cf : m_cofaces) {
+        std::vector<Topo::Vertex* > vertices;
+        cf->getVertices(vertices);
+        all_vertices.insert(vertices.begin(), vertices.end());
+    }
+#ifdef _DEBUG_SPLIT_OGRID
+    std::cout << "Liste des points (" << all_vertices.size() << ") : ";
+    for (auto v : all_vertices)
+        std::cout << v->getName() << " ";
+    std::cout << std::endl;
+#endif
+
+    // Etape 2 : Pour chaque point, on extrait le sous-ensemble S de ses cofaces
+    // adjacentes appartenant à la liste dependant_cofaces. On doit pouvoir "tourner"
+    // autour du point et parcourir les cofaces de S. S'il y a une discontinuité,
+    // le ogrid n'est pas possible.
+    for (Topo::Vertex* v : all_vertices) {
+        // on cherche la 1ere coface concernée par le ogrid
+        std::vector<CoFace*> v_cofaces;
+        v->getCoFaces(v_cofaces);
+#ifdef _DEBUG_SPLIT_OGRID
+        std::cout << "Traitement du sommet " << v->getName() << " (" << v_cofaces.size() << " cofaces)" << std::endl;
+#endif
+        if (v_cofaces.size() > 1) {
+            Topo::CoFace* first_coface = v_cofaces[0];
+            bool connected = (std::find(m_cofaces.begin(), m_cofaces.end(), first_coface) != m_cofaces.end());
+            Topo::CoFace* current_coface = first_coface;
+            int nb_discontinuities = 0;
+            Topo::Edge* last_visited_coedge = 0; // pour ne pas sortir de la face par la edge d'entrée
+            while(nb_discontinuities<2) {
+                std::vector<Topo::Edge*> cf_edges;
+                current_coface->getEdges(cf_edges);
+#ifdef _DEBUG_SPLIT_OGRID
+                std::cout << "   coface " << current_coface->getName() << " (" << cf_edges.size() << " edges)" << std::endl;
+#endif
+                // recherche d'une arête partant de v sur la edge
+                auto selected_edge_iter = std::find_if(cf_edges.begin(), cf_edges.end(), [&v, &last_visited_coedge](Topo::Edge* x) {
+                    std::vector<Topo::Vertex* > x_vertices;
+                    x->getVertices(x_vertices);
+                    return x->getNbCoFaces() > 1      // si une seule coface, on est au bord
+                        && x != last_visited_coedge   // éviter la edge par lequel on est entré dans la coface
+                        && find(x_vertices.begin(), x_vertices.end(), v) != x_vertices.end();
+                });
+                if (selected_edge_iter == cf_edges.end()) {
+                    // pas de candidate, on a fait le tour pour ce sommet
+                    break;
+                } else {
+                    Topo::Edge* selected_edge = *selected_edge_iter;
+                    last_visited_coedge = selected_edge;
+                    // faut trouver la coface de l’autre coté de l’arête
+                    std::vector<CoFace*> fe_cofaces;
+                    selected_edge->getCoFaces(fe_cofaces);
+#ifdef _DEBUG_SPLIT_OGRID
+                    std::cout << "     passage par l'arete " << selected_edge->getName() << " (" << fe_cofaces.size() << " cofaces)" << std::endl;
+#endif
+                    auto new_coface_iter = std::find_if(fe_cofaces.begin(), fe_cofaces.end(), [&current_coface](Topo::CoFace* x) {
+                        return x != current_coface;
+                    });
+                    if (new_coface_iter == fe_cofaces.end()) {
+                        break;
+                    } else {
+                        current_coface = *new_coface_iter;
+#ifdef _DEBUG_SPLIT_OGRID
+                        std::cout << "       et arrivée sur la coface " << current_coface->getName() << std::endl;
+#endif
+                        if (current_coface == first_coface) break;
+                        bool tmp_connected = (std::find(m_cofaces.begin(), m_cofaces.end(), current_coface) != m_cofaces.end());
+                        if (connected != tmp_connected) {
+                            nb_discontinuities++;
+#ifdef _DEBUG_SPLIT_OGRID
+                            std::cout << "       Discontinuité : " << nb_discontinuities << std::endl;
+#endif
+                        }
+                        connected = tmp_connected;
+                    }
+                }
+            }
+
+            if (nb_discontinuities > 1) {
+                TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+                message << "Le ogrid ne peut pas être effectué du fait d'une discontinuité ";
+                message << "car les faces sélectionnées ne forment pas une surface unique";
+                throw TkUtil::Exception(message);
+            }
+        }
+    }
+}
+/*----------------------------------------------------------------------------*/
 void CommandSplitFacesWithOgrid::
 internalExecute()
 {
@@ -87,6 +187,9 @@ internalExecute()
 #ifdef _DEBUG_SPLIT_OGRID
     std::cout<<"CommandSplitFacesWithOgrid::internalExecute"<<std::endl;
 #endif
+
+    // vérifications avant exécution
+    preExecute();
 
     // Filtres:  à 1 pour ce qui est sur le bord et à 2 ce qui est à l'intérieur
     std::map<Vertex*, uint> filtre_vertex;
