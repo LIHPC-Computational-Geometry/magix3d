@@ -85,8 +85,10 @@
 #include "Internal/EntitiesHelper.h"
 #include "Internal/M3DCommandResult.h"
 #include "Internal/CommandChangeLengthUnit.h"
+#include "Internal/PythonWriter.h"
 
 #include "Utils/Entity.h"
+#include "Utils/ErrorManagement.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/Plane.h"
 #include "Utils/Vector.h"
@@ -226,6 +228,7 @@ copy(std::vector<std::string>& e, bool withTopo, std::string groupName)
 Internal::M3DCommandResultIfc* GeomManager::
 copy(std::vector<GeomEntity*>& e, bool withTopo, std::string groupName)
 {
+	CHECK_ENTITIES_LIST(e)
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     message << "GeomManager::copy (";
     for(unsigned int i=0;i<e.size();i++){
@@ -262,16 +265,11 @@ copy(std::vector<GeomEntity*>& e, bool withTopo, std::string groupName)
 
     // trace dans le script
 	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().copy([";
-    for(unsigned int i=0;i<e.size();i++){
-        if(i!=0)
-            cmd << ", ";
-        cmd << "\""<< e[i]->getName()<<"\"";
-    }
+    cmd << getContextAlias( ) << ".getGeomManager ( ).copy (" << Internal::entitiesToPythonList<GeomEntity> (e);
     if(withTopo)
-        cmd <<"], True,\""<<groupName<<"\")";
+        cmd <<", True,\""<<groupName<<"\")";
     else
-        cmd <<"], False,\""<<groupName<<"\")";
+        cmd <<", False,\""<<groupName<<"\")";
 
     command->setScriptCommand(cmd);
 
@@ -298,6 +296,7 @@ newVolume(std::vector<std::string>& e, std::string groupName)
 Internal::M3DCommandResultIfc* GeomManager::
 newVolume(std::vector<Surface*>& e, std::string groupName)
 {
+	CHECK_ENTITIES_LIST(e)
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     message << "GeomManager::newVolume (";
     for(unsigned int i=0;i<e.size();i++){
@@ -313,14 +312,7 @@ newVolume(std::vector<Surface*>& e, std::string groupName)
 
     // trace dans le script
 	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().newVolume([";
-    for(unsigned int i=0;i<e.size();i++){
-        if(i!=0)
-            cmd << ", ";
-        cmd << "\""<< e[i]->getName()<<"\"";
-    }
-
-    cmd <<"],\""<<groupName<<"\")";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).newVolume (" << Internal::entitiesToPythonList<Surface> (e) << ", \"" << groupName << "\")";
 
     command->setScriptCommand(cmd);
 
@@ -608,6 +600,7 @@ newPlanarSurface(std::vector<std::string>& curve_names, std::string groupName)
 Internal::M3DCommandResultIfc* GeomManager::
 newPlanarSurface(const std::vector<Geom::Curve* >& curves, std::string groupName )
 {
+	CHECK_ENTITIES_LIST(curves)
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     message << "GeomManager::newPlanarSurface from curves";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
@@ -617,14 +610,7 @@ newPlanarSurface(const std::vector<Geom::Curve* >& curves, std::string groupName
 
     // trace dans le script
 	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().newPlanarSurface( [\"";
-    for(unsigned int i=0;i<curves.size();i++)
-    {
-        if (i!=0)
-            cmd <<"\", \"";
-        cmd << curves[i]->getName();
-    }
-    cmd <<"\"] , \""<<groupName<<"\")";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).newPlanarSurface (" << Internal::entitiesToPythonList<Geom::Curve> (curves) << ", \"" << groupName << "\")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -821,14 +807,7 @@ newVerticesCurvesAndPlanarSurface(std::vector<Point>& points, std::string groupN
 
     // trace dans le script
 	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().newVerticesCurvesAndPlanarSurface( [";
-    for(unsigned int i=0;i<points.size();i++)
-    {
-        if (i!=0)
-            cmd <<", ";
-        cmd << points[i].getScriptCommand();
-    }
-    cmd <<"] , \""<<groupName<<"\")";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).newVerticesCurvesAndPlanarSurface (" << Internal::scriptablesToPythonList<Point> (points) << ", \"" << groupName << "\")";
     commandCompo->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -902,6 +881,7 @@ destroy(std::vector<std::string>& e_names, bool propagagetDown)
 Internal::M3DCommandResultIfc* GeomManager::
 destroy(std::vector<Geom::GeomEntity*>& entities, bool propagagetDown)
 {
+	CHECK_ENTITIES_LIST(entities)
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     message <<"GeomManager::destroy(";
     for (uint i=0; i<entities.size(); i++)
@@ -970,6 +950,7 @@ destroyWithTopo(std::vector<std::string>& e_names, bool propagagetDown)
 Internal::M3DCommandResultIfc* GeomManager::
 destroyWithTopo(std::vector<Geom::GeomEntity*>& entities, bool propagagetDown)
 {
+	CHECK_ENTITIES_LIST(entities)
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message <<"GeomManager::destroyWithTopo(";
     for (uint i=0; i<entities.size(); i++)
@@ -1083,13 +1064,7 @@ scale(std::vector<Geom::GeomEntity*>& entities, const double factor, const Point
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().scale([\"";
-    for(unsigned int i=0;i<entities.size();i++){
-           if(i!=0)
-               cmd << "\", \"";
-           cmd<< entities[i]->getName();
-       }
-    cmd <<"\"], "<<factor;
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).scale (" << Internal::entitiesToPythonList<GeomEntity>(entities) << ", " << factor;
     if (!(pcentre == Point(0,0,0)))
     	cmd <<", "<<pcentre.getScriptCommand();
     cmd<<")";
@@ -1347,13 +1322,7 @@ copyAndScale(std::vector<Geom::GeomEntity*>& entities, const double factor, cons
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().copyAndScale([\"";
-    for(unsigned int i=0;i<entities.size();i++){
-           if(i!=0)
-               cmd << "\", \"";
-           cmd<< entities[i]->getName();
-       }
-    cmd <<"\"], "<<factor;
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).copyAndScale (" << Internal::entitiesToPythonList<GeomEntity> (entities) << ", " << factor;
     cmd <<", "<<pcentre.getScriptCommand();
     if(withTopo)
         cmd <<", True,\""<<groupName<<"\")";
@@ -1634,15 +1603,7 @@ mirror(std::vector<Geom::GeomEntity*>& entities, Utils::Math::Plane* plane)
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().mirror([\"";
-    for(unsigned int i=0;i<entities.size();i++){
-           if(i!=0)
-               cmd << "\", \"";
-           cmd<< entities[i]->getName();
-       }
-    cmd <<"\"], "<<plane->getScriptCommand();
-
-    cmd<<")";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).mirror (" << Internal::entitiesToPythonList<GeomEntity> (entities) << ", " << plane->getScriptCommand ( ) << ")";
 
     command->setScriptCommand(cmd);
 
@@ -1719,13 +1680,7 @@ copyAndMirror(std::vector<Geom::GeomEntity*>& entities, Utils::Math::Plane* plan
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().copyAndMirror([\"";
-    for(unsigned int i=0;i<entities.size();i++){
-           if(i!=0)
-               cmd << "\", \"";
-           cmd<< entities[i]->getName();
-       }
-    cmd <<"\"], "<<plane->getScriptCommand();
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).copyAndMirror (" << Internal::entitiesToPythonList<GeomEntity> (entities) << ", " << plane->getScriptCommand ( ) << ")";
     if(withTopo)
         cmd <<", True,\""<<groupName<<"\")";
     else
@@ -2480,15 +2435,8 @@ newBSpline(Vertex* vtx1,
             new CommandNewBSpline(getLocalContext(), vtx1, vp, vtx2, deg_min, deg_max, groupName);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().newBSpline(\""
-    		<<vtx1->getName()<<"\", [";
-    for(unsigned int i=0;i<vp.size();i++)
-    {
-        if (i!=0)
-            cmd <<", ";
-        cmd << vp[i].getScriptCommand();
-    }
-    cmd <<"] , \""<<vtx2->getName()<<"\","<<(short)deg_min<<", "<<(short)deg_max
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).newBSpline (" << Internal::scriptablesToPythonList<Point> (vp) << ", ";
+    cmd <<vtx2->getName()<<"\","<<(short)deg_min<<", "<<(short)deg_max
     		<<", \""<<groupName<<"\")";
     command->setScriptCommand(cmd);
 
@@ -2618,13 +2566,7 @@ translate(std::vector<GeomEntity*>& entities, const Vector& dp)
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().translate([\"";
-    for(unsigned int i=0;i<entities.size();i++){
-           if(i!=0)
-               cmd << "\", \"";
-           cmd<< entities[i]->getName();
-       }
-    cmd <<"\"], "<<dp.getScriptCommand()<<")";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).translate (" << Internal::entitiesToPythonList<GeomEntity> (entities) << ", " << dp.getScriptCommand ( ) << ")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -2728,13 +2670,7 @@ copyAndTranslate(std::vector<GeomEntity*>& entities, const Vector& dp, bool with
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().copyAndTranslate([\"";
-    for(unsigned int i=0;i<entities.size();i++){
-           if(i!=0)
-               cmd << "\", \"";
-           cmd<< entities[i]->getName();
-       }
-    cmd <<"\"], "<<dp.getScriptCommand();
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).copyAndTranslate (" << Internal::entitiesToPythonList<GeomEntity> (entities) << ", " << dp.getScriptCommand ( );
     if(withTopo)
         cmd <<", True,\""<<groupName<<"\")";
     else
@@ -2805,6 +2741,7 @@ joinCurves(std::vector<std::string>& entities){
 Internal::M3DCommandResultIfc* GeomManager::
 joinCurves(std::vector<GeomEntity*>& entities)
 {
+	CHECK_ENTITIES_LIST(entities)
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message <<"GeomManager::joinCurves(";
     for (uint i=0; i<entities.size(); i++)
@@ -2844,13 +2781,7 @@ joinCurves(std::vector<GeomEntity*>& entities)
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().joinCurves([\"";
-    for(unsigned int i=0;i<entities.size();i++){
-           if(i!=0)
-               cmd << "\", \"";
-           cmd<< entities[i]->getName();
-       }
-    cmd <<"\"])";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).joinCurves (" << Internal::entitiesToPythonList<GeomEntity> (entities) << ")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -2874,6 +2805,7 @@ joinSurfaces(std::vector<std::string>& entities){
 Internal::M3DCommandResultIfc* GeomManager::
 joinSurfaces(std::vector<GeomEntity*>& entities)
 {
+	CHECK_ENTITIES_LIST(entities)
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message <<"GeomManager::joinSurfaces(";
     for (uint i=0; i<entities.size(); i++)
@@ -2916,13 +2848,7 @@ joinSurfaces(std::vector<GeomEntity*>& entities)
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().joinSurfaces([\"";
-    for(unsigned int i=0;i<entities.size();i++){
-           if(i!=0)
-               cmd << "\", \"";
-           cmd<< entities[i]->getName();
-       }
-    cmd <<"\"])";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).joinSurfaces (" << Internal::entitiesToPythonList<GeomEntity> (entities) << ")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -2985,13 +2911,7 @@ rotate( std::vector<GeomEntity*>& entities, const Utils::Math::Rotation& rot)
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().rotate([\"";
-    for(unsigned int i=0;i<entities.size();i++){
-           if(i!=0)
-               cmd << "\", \"";
-           cmd<< entities[i]->getName();
-       }
-    cmd <<"\"], "<<rot.getScriptCommand()<<")";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).rotate (" << Internal::entitiesToPythonList<GeomEntity> (entities) << ", " << rot.getScriptCommand ( ) << ")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -3103,13 +3023,7 @@ copyAndRotate( std::vector<GeomEntity*>& entities,
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().copyAndRotate([\"";
-    for(unsigned int i=0;i<entities.size();i++){
-           if(i!=0)
-               cmd << "\", \"";
-           cmd<< entities[i]->getName();
-       }
-    cmd <<"\"], "<<rot.getScriptCommand();
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).copyAndRotate (" << Internal::entitiesToPythonList<GeomEntity> (entities) << ", " << rot.getScriptCommand ( );
     if(withTopo)
         cmd <<", True,\""<<groupName<<"\")";
     else
@@ -3185,6 +3099,7 @@ makeRevol( std::vector<GeomEntity*>& entities,
         const Utils::Math::Rotation& rot,
         const bool keep)
 {
+	CHECK_ENTITIES_LIST(entities)
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message <<"GeomManager::makeRevol(";
     for (uint i=0; i<entities.size(); i++)
@@ -3196,13 +3111,7 @@ makeRevol( std::vector<GeomEntity*>& entities,
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().makeRevol([\"";
-    for(unsigned int i=0;i<entities.size();i++){
-           if(i!=0)
-               cmd << "\", \"";
-           cmd<< entities[i]->getName();
-       }
-    cmd <<"\"], "<<rot.getScriptCommand()<<", "<<(keep?"True":"False")<<")";
+    cmd << getContextAlias ( ) << ".getGeomManager().makeRevol (" << Internal::entitiesToPythonList<GeomEntity> (entities) << ", " << rot.getScriptCommand ( ) << ", " << (keep ? "True" : "False") << ")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -3226,6 +3135,7 @@ Internal::M3DCommandResultIfc* GeomManager::
 makeExtrude( std::vector<GeomEntity*>& entities,
 		const Vector& dp, const bool keep)
 {
+	CHECK_ENTITIES_LIST(entities)
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message <<"GeomManager::makeExtrude(";
     for (uint i=0; i<entities.size(); i++)
@@ -3237,13 +3147,7 @@ makeExtrude( std::vector<GeomEntity*>& entities,
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().makeExtrude([\"";
-    for(unsigned int i=0;i<entities.size();i++){
-           if(i!=0)
-               cmd << "\", \"";
-           cmd<< entities[i]->getName();
-       }
-    cmd <<"\"], "<<dp.getScriptCommand()<<", "<<(keep?"True":"False")<<")";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).makeExtrude (" << Internal::entitiesToPythonList<GeomEntity> (entities) << dp.getScriptCommand ( ) << ", " << (keep ? "True":"False") << ")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -3266,6 +3170,7 @@ makeBlocksByExtrude(std::vector<std::string>& entities,
 Internal::M3DCommandResultIfc* GeomManager::
 makeBlocksByExtrude(std::vector<GeomEntity*>& entities, const Utils::Math::Vector& dv, const bool keep)
 {
+	CHECK_ENTITIES_LIST(entities)
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message <<"GeomManager::makeBlocksByExtrude(";
     for (uint i=0; i<entities.size(); i++)
@@ -3308,13 +3213,8 @@ makeBlocksByExtrude(std::vector<GeomEntity*>& entities, const Utils::Math::Vecto
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().makeBlocksByExtrude ([\"";
-    for(unsigned int i=0;i<entities.size();i++){
-    	if(i!=0)
-    		cmd << "\", \"";
-    	cmd<< entities[i]->getName();
-    }
-    cmd <<"\"], "<<dv.getScriptCommand()<<", "<<(keep?"True":"False")<<")";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).makeBlocksByExtrude (" << Internal::entitiesToPythonList<GeomEntity> (entities) << ", " << dv.getScriptCommand ( ) 
+        << ", " << (keep ? "True":"False") << ")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -3336,6 +3236,7 @@ fuse(std::vector<std::string>& entities)
 Internal::M3DCommandResultIfc* GeomManager::
 fuse(std::vector<GeomEntity*>& entities)
 {
+	CHECK_ENTITIES_LIST (entities)
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message << "GeomManager::fuse (";
     for(unsigned int i=0;i<entities.size();i++){
@@ -3370,13 +3271,7 @@ fuse(std::vector<GeomEntity*>& entities)
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().fuse([";
-    for(unsigned int i=0;i<entities.size();i++){
-        if(i!=0)
-            cmd << ", ";
-        cmd << "\""<< entities[i]->getName()<<"\"";
-    }
-    cmd <<"])";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).fuse (" << Internal::entitiesToPythonList<GeomEntity> (entities) << ")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -3401,6 +3296,7 @@ common(std::vector<std::string>& entities)
 Internal::M3DCommandResultIfc* GeomManager::
 common(std::vector<Geom::GeomEntity*>& entities)
 {
+	CHECK_ENTITIES_LIST(entities)
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message << "GeomManager::common (";
     for(unsigned int i=0;i<entities.size();i++){
@@ -3435,13 +3331,7 @@ common(std::vector<Geom::GeomEntity*>& entities)
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().common([";
-    for(unsigned int i=0;i<entities.size();i++){
-        if(i!=0)
-            cmd << ", ";
-        cmd << "\""<< entities[i]->getName()<<"\"";
-    }
-    cmd <<"])";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).common (" << Internal::entitiesToPythonList<GeomEntity> (entities) << ")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -3956,13 +3846,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportMDL(std::vector<Geom::GeomEnti
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().exportMDL([";
-    for(unsigned int i=0;i<geomEntities.size();i++){
-        if(i!=0)
-            cmd << ", ";
-        cmd << "\""<< geomEntities[i]->getName()<<"\"";
-    }
-    cmd <<"], \""<<n<<"\")";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).exportMDL (" << Internal::entitiesToPythonList<GeomEntity> (geomEntities) << ", \"" << n << "\")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -4017,6 +3901,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportVTK(std::vector<std::string>& 
 Internal::M3DCommandResultIfc* GeomManager::exportVTK(std::vector<Geom::GeomEntity*>& geomEntities,
         const std::string& n)
 {
+	CHECK_ENTITIES_LIST(geomEntities)
 #ifdef _DEBUG2
     std::cout<<"exportVTK avec "<<geomEntities.size()<<" entités"<<std::endl;
 #endif
@@ -4026,13 +3911,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportVTK(std::vector<Geom::GeomEnti
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().exportVTK([";
-    for(unsigned int i=0;i<geomEntities.size();i++){
-        if(i!=0)
-            cmd << ", ";
-        cmd << "\""<< geomEntities[i]->getName()<<"\"";
-    }
-    cmd <<"], \""<<n<<"\")";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).exportVTK (" << Internal::entitiesToPythonList<GeomEntity> (geomEntities) << ", \"" << n << "\")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -4114,6 +3993,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportMLI(std::vector<std::string>& 
 Internal::M3DCommandResultIfc* GeomManager::exportMLI(std::vector<Geom::GeomEntity*>& geomEntities,
         const std::string& n)
 {
+	CHECK_ENTITIES_LIST(geomEntities)
 #ifdef _DEBUG2
     std::cout<<"exportMLI avec "<<geomEntities.size()<<" entités"<<std::endl;
 #endif
@@ -4123,13 +4003,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportMLI(std::vector<Geom::GeomEnti
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().exportMLI([";
-    for(unsigned int i=0;i<geomEntities.size();i++){
-        if(i!=0)
-            cmd << ", ";
-        cmd << "\""<< geomEntities[i]->getName()<<"\"";
-    }
-    cmd <<"], \""<<n<<"\")";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).exportMLI (" << Internal::entitiesToPythonList<GeomEntity> (geomEntities) << ", \"" << n << "\")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -4178,6 +4052,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportBREP(std::vector<std::string>&
 Internal::M3DCommandResultIfc* GeomManager::exportBREP(std::vector<Geom::GeomEntity*>& geomEntities,
         const std::string& n)
 {
+	CHECK_ENTITIES_LIST(geomEntities)
 #ifdef _DEBUG2
     std::cout<<"exportBREP avec "<<geomEntities.size()<<" entités"<<std::endl;
 #endif
@@ -4187,13 +4062,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportBREP(std::vector<Geom::GeomEnt
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().exportBREP([";
-    for(unsigned int i=0;i<geomEntities.size();i++){
-        if(i!=0)
-            cmd << ", ";
-        cmd << "\""<< geomEntities[i]->getName()<<"\"";
-    }
-    cmd <<"], \""<<n<<"\")";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).exportBREP (" << Internal::entitiesToPythonList<GeomEntity> (geomEntities) << ", \"" << n << "\")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -4242,6 +4111,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportSTEP(std::vector<std::string>&
 Internal::M3DCommandResultIfc* GeomManager::exportSTEP(std::vector<Geom::GeomEntity*>& geomEntities,
         const std::string& n)
 {
+	CHECK_ENTITIES_LIST(geomEntities)
 #ifdef _DEBUG2
     std::cout<<"exportSTEP avec "<<geomEntities.size()<<" entités"<<std::endl;
 #endif
@@ -4251,13 +4121,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportSTEP(std::vector<Geom::GeomEnt
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().exportSTEP([";
-    for(unsigned int i=0;i<geomEntities.size();i++){
-        if(i!=0)
-            cmd << ", ";
-        cmd << "\""<< geomEntities[i]->getName()<<"\"";
-    }
-    cmd <<"], \""<<n<<"\")";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).exportSTEP (" << Internal::entitiesToPythonList<GeomEntity> (geomEntities) << ", \"" << n << "\")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -4306,6 +4170,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportIGES(std::vector<std::string>&
 Internal::M3DCommandResultIfc* GeomManager::exportIGES(std::vector<Geom::GeomEntity*>& geomEntities,
         const std::string& n)
 {
+	CHECK_ENTITIES_LIST(geomEntities)
 #ifdef _DEBUG2
     std::cout<<"exportIGES avec "<<geomEntities.size()<<" entités"<<std::endl;
 #endif
@@ -4315,13 +4180,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportIGES(std::vector<Geom::GeomEnt
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().exportIGES([";
-    for(unsigned int i=0;i<geomEntities.size();i++){
-        if(i!=0)
-            cmd << ", ";
-        cmd << "\""<< geomEntities[i]->getName()<<"\"";
-    }
-    cmd <<"], \""<<n<<"\")";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).exportIGES (" << Internal::entitiesToPythonList<GeomEntity> (geomEntities) << ", \"" << n << "\")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -4345,6 +4204,7 @@ cut(std::string tokeep,std::vector<std::string>& tocut)
 Internal::M3DCommandResultIfc* GeomManager::
 cut(Geom::GeomEntity* tokeep, std::vector<Geom::GeomEntity*>& tocut)
 {
+	CHECK_ENTITIES_LIST(tocut)
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message << "GeomManager::cut (";
     for(unsigned int i=0;i<tocut.size();i++){
@@ -4382,13 +4242,7 @@ cut(Geom::GeomEntity* tokeep, std::vector<Geom::GeomEntity*>& tocut)
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().cut(\""<<tokeep->getName()<<"\",[";
-    for(unsigned int i=0;i<tocut.size();i++){
-        if(i!=0)
-            cmd << ", ";
-        cmd << "\""<< tocut[i]->getName()<<"\"";
-    }
-    cmd <<"])";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).cut (\"" << tokeep->getName ( ) << "\", " << Internal::entitiesToPythonList<GeomEntity> (tocut) << ")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -4419,6 +4273,8 @@ Internal::M3DCommandResultIfc* GeomManager::
 cut(std::vector<Geom::GeomEntity*>& tokeep,
         std::vector<Geom::GeomEntity*>& tocut)
 {
+	CHECK_ENTITIES_LIST(tokeep)
+	CHECK_ENTITIES_LIST(tocut)
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message << "GeomManager::cut ([";
     for(unsigned int i=0;i<tokeep.size();i++){
@@ -4467,19 +4323,7 @@ cut(std::vector<Geom::GeomEntity*>& tokeep,
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().cut([";
-    for(unsigned int i=0;i<tokeep.size();i++){
-        if(i!=0)
-            cmd << ", ";
-        cmd << "\""<< tokeep[i]->getName()<<"\"";
-    }
-    cmd <<"], [";
-    for(unsigned int i=0;i<tocut.size();i++){
-        if(i!=0)
-            cmd << ", ";
-        cmd << "\""<< tocut[i]->getName()<<"\"";
-    }
-    cmd <<"])";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).cut (" << Internal::entitiesToPythonList<GeomEntity> (tokeep) << ", " << Internal::entitiesToPythonList<GeomEntity> (tocut) << ")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -4505,7 +4349,7 @@ glue(std::vector<std::string>& entities)
 /*----------------------------------------------------------------------------*/
 Internal::M3DCommandResultIfc* GeomManager::glue( std::vector<Geom::GeomEntity*>& entities)
 {
-
+	CHECK_ENTITIES_LIST(entities)
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message << "GeomManager::glue (";
     for(unsigned int i=0;i<entities.size();i++){
@@ -4539,13 +4383,7 @@ Internal::M3DCommandResultIfc* GeomManager::glue( std::vector<Geom::GeomEntity*>
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().glue([";
-    for(unsigned int i=0;i<entities.size();i++){
-        if(i!=0)
-            cmd << ", ";
-        cmd << "\""<< entities[i]->getName()<<"\"";
-    }
-    cmd <<"])";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).glue (" << Internal::entitiesToPythonList<GeomEntity> (entities) << ")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -4571,7 +4409,7 @@ section(std::vector<std::string>& entities, std::string tool)
 Internal::M3DCommandResultIfc* GeomManager::section( std::vector<Geom::GeomEntity*>& entities,
     GeomEntity* tool)
 {
-
+	CHECK_ENTITIES_LIST(entities)
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message << "GeomManager::section ([";
     for(unsigned int i=0;i<entities.size();i++){
@@ -4663,13 +4501,7 @@ Internal::M3DCommandResultIfc* GeomManager::section( std::vector<Geom::GeomEntit
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().section([";
-    for(unsigned int i=0;i<entities.size();i++){
-        if(i!=0)
-            cmd << ", ";
-        cmd << "\""<< entities[i]->getName()<<"\"";
-    }
-    cmd<<"], \""<<tool->getName()<<"\")";
+    cmd << getContextAlias ( ) << ".getGeomManager().section (" << Internal::entitiesToPythonList<GeomEntity> (entities) << ", \"" << tool->getName ( ) << "\")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -4697,7 +4529,6 @@ Internal::M3DCommandResultIfc* GeomManager::
 sectionByPlane( std::vector<Geom::GeomEntity*>& entities,
                 Utils::Math::Plane* tool, std::string planeGroupName)
 {
-
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message << "GeomManager::sectionByPlane ([";
     for(unsigned int i=0;i<entities.size();i++){
@@ -4736,13 +4567,8 @@ sectionByPlane( std::vector<Geom::GeomEntity*>& entities,
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().sectionByPlane([";
-    for(unsigned int i=0;i<entities.size();i++){
-        if(i!=0)
-            cmd << ", ";
-        cmd << "\""<< entities[i]->getName()<<"\"";
-    }
-    cmd<<"], "<<tool->getScriptCommand();
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).sectionByPlane (" << Internal::entitiesToPythonList<GeomEntity> (entities) << ", ";
+    cmd <<tool->getScriptCommand();
     cmd<<", \""<<planeGroupName<<"\"";
     cmd<<")";
     command->setScriptCommand(cmd);
