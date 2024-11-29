@@ -4442,7 +4442,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 						const string warn = commandInternal->getWarningToPopup();
 						if (false == warn.empty())
 						{
-							QtMessageBox::systemNotification ("Magix3D", QtMgx3DApplication::getAppIcon ( ), "Commandes terminées avec avertissement.", QtMessageBox::URGENCY_CRITICAL);
+							QtMessageBox::systemNotification ("Magix3D", QtMgx3DApplication::getAppIcon ( ), "Commandes terminées avec avertissement.", QtMessageBox::URGENCY_NORMAL, Resources::instance ( )._commandNotificationDuration);
 							if (false == Resources::instance ( )._showAmodalDialogOnCommandError.getValue ( ))
 								QtMessageBox::displayWarningMessage (this, getAppTitle().c_str ( ), warn);	// Défaut
 							else
@@ -4460,7 +4460,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 						if ((true == Resources::instance()._showDialogOnCommandError.getValue()) && (false == command.isUserNotified()))
 						{
 							command.setUserNotified (true);
-							QtMessageBox::systemNotification ("Magix3D", QtMgx3DApplication::getAppIcon ( ), "Commandes terminées en erreur.", QtMessageBox::URGENCY_CRITICAL);
+							QtMessageBox::systemNotification ("Magix3D", QtMgx3DApplication::getAppIcon ( ), "Commandes terminées en erreur.", QtMessageBox::URGENCY_NORMAL, Resources::instance ( )._commandNotificationDuration);
 							if (false == Resources::instance ( )._showAmodalDialogOnCommandError.getValue ( ))
 								QtMessageBox::displayErrorMessage (this, getAppTitle ( ), command.getErrorMessage ( ));	// défaut
 							else
