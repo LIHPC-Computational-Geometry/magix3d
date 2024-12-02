@@ -53,12 +53,8 @@ using std::ptrdiff_t;
 #include "Topo/FaceMeshingPropertyTransfinite.h"
 #include "Topo/FaceMeshingPropertyDelaunayGMSH.h"
 #include "Topo/FaceMeshingPropertyQuadPairing.h"
-#include "Topo/BlockMeshingPropertyDirectional.h"
-#include "Topo/BlockMeshingPropertyOrthogonal.h"
-#include "Topo/BlockMeshingPropertyRotational.h"
 #include "Topo/BlockMeshingPropertyTransfinite.h"
 #include "Topo/BlockMeshingPropertyDelaunayTetgen.h"
-#include "Topo/BlockMeshingPropertyInsertion.h"
 
 #include "Mesh/MeshManagerIfc.h"
 #include "Smoothing/SurfacicSmoothing.h"
@@ -323,12 +319,8 @@ using std::ptrdiff_t;
 %include Topo/FaceMeshingPropertyDelaunayGMSH.h
 %include Topo/FaceMeshingPropertyQuadPairing.h
 %include Topo/BlockMeshingProperty.h
-%include Topo/BlockMeshingPropertyDirectional.h
-%include Topo/BlockMeshingPropertyOrthogonal.h
-%include Topo/BlockMeshingPropertyRotational.h
 %include Topo/BlockMeshingPropertyTransfinite.h
 %include Topo/BlockMeshingPropertyDelaunayTetgen.h
-%include Topo/BlockMeshingPropertyInsertion.h
 
 %include Mesh/MeshManagerIfc.h
 %include Smoothing/SurfacicSmoothing.h

@@ -14,7 +14,6 @@
 #include "Topo/Block.h"
 #include "Topo/Face.h"
 #include "Topo/Edge.h"
-#include "Topo/BlockMeshingPropertyInsertion.h"
 
 #include "Utils/Common.h"
 #include "Internal/Context.h"

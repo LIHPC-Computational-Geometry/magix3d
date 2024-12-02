@@ -193,8 +193,7 @@ createCylinderTopo1BlockPlein(Geom::PropertyCylinder* propertyCyl)
     double d2 = std::sqrt(2.0)/2.0;
     Utils::Math::Point p1, p2, p3, p4;
 
-    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_naxe);
     // stockage dans le manager topologiques des différentes entités
     addCreatedBlock(b1);
 
@@ -302,8 +301,7 @@ createCylinderTopo1BlockPlein(Geom::PropertyCylinder* propertyCyl)
 void CommandNewTopoOGridOnGeometry::
 createCylinderTopo1BlockDemi(Geom::PropertyCylinder* propertyCyl)
 {
-    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_nr, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_nr, m_naxe);
     // stockage dans le manager topologiques des différentes entités (bloc et niveau inférieur)
     addCreatedBlock(b1);
     b1->setGeomAssociation(getGeomEntity());
@@ -442,8 +440,7 @@ createCylinderTopo1BlockDemi(Geom::PropertyCylinder* propertyCyl)
 void CommandNewTopoOGridOnGeometry::
 createCylinderTopo1BlockQuart(Geom::PropertyCylinder* propertyCyl)
 {
-    Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_ni, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_ni, m_naxe);
     // stockage dans le manager topologiques des différentes entités (bloc et niveau inférieur)
     addCreatedBlock(b1);
     b1->setGeomAssociation(getGeomEntity());
@@ -605,16 +602,11 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridPleinNonDeg(Geom::Pro
     double d2 = std::sqrt(2.0)/2.0;
     Utils::Math::Point p1, p2, p3, p4;
 
-    Topo::Block* b1 = new Topo::Block(getContext(), m_nr, 2*m_ni, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_i);
-    Topo::Block* b2 = new Topo::Block(getContext(), 2*m_ni, m_nr, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_j);
-    Topo::Block* b3 = new Topo::Block(getContext(), m_nr, 2*m_ni, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_i);
-    Topo::Block* b4 = new Topo::Block(getContext(), 2*m_ni, m_nr, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_j);
-    Topo::Block* b5 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_i);
+    Topo::Block* b1 = new Topo::Block(getContext(), m_nr, 2*m_ni, m_naxe);
+    Topo::Block* b2 = new Topo::Block(getContext(), 2*m_ni, m_nr, m_naxe);
+    Topo::Block* b3 = new Topo::Block(getContext(), m_nr, 2*m_ni, m_naxe);
+    Topo::Block* b4 = new Topo::Block(getContext(), 2*m_ni, m_nr, m_naxe);
+    Topo::Block* b5 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_naxe);
 
     // stockage dans le manager topologiques des différentes entités (bloc et niveau inférieur)
     addCreatedBlock(b1);
@@ -821,14 +813,10 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridPleinDeg(Geom::Proper
     // mais ce dernier ne pouvait s'adapter au cas dégénéré,
     // en effet, la dégénérescence se place obligatoirement en z_max
 
-    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b2 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b3 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b4 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr);
+    Topo::Block* b2 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr);
+    Topo::Block* b3 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr);
+    Topo::Block* b4 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr);
 
     // stockage dans le manager topologiques des différentes entités (bloc et niveau inférieur)
     addCreatedBlock(b1);
@@ -1005,8 +993,7 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridQuartDeg(Geom::Proper
 #endif
     // cas m_ratio == 0
 
-    Topo::Block* b1 = new Topo::Block(getContext(), 4*m_ni, m_naxe, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b1 = new Topo::Block(getContext(), 4*m_ni, m_naxe, m_nr);
 
     // stockage dans le manager topologiques du bloc
     addCreatedBlock(b1);
@@ -1107,12 +1094,9 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridQuartNonDeg(Geom::Pro
     std::cout<<"createCylinderTopoOGridQuartNonDeg(...)"<<std::endl;
 #endif
 
-    Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_ni, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_i);
-    Topo::Block* b2 = new Topo::Block(getContext(), m_nr, m_ni, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_i);
-    Topo::Block* b3 = new Topo::Block(getContext(), m_ni, m_nr, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_j);
+    Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_ni, m_naxe);
+    Topo::Block* b2 = new Topo::Block(getContext(), m_nr, m_ni, m_naxe);
+    Topo::Block* b3 = new Topo::Block(getContext(), m_ni, m_nr, m_naxe);
 
     // stockage dans le manager topologiques des différentes entités (bloc et niveau inférieur)
     addCreatedBlock(b1);
@@ -1301,14 +1285,10 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridDemiNonDeg(Geom::Prop
 #endif
 
 
-    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_ni, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_j);
-    Topo::Block* b2 = new Topo::Block(getContext(), m_nr, m_ni, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_i);
-    Topo::Block* b3 = new Topo::Block(getContext(), 2*m_ni, m_nr, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_j);
-    Topo::Block* b4 = new Topo::Block(getContext(), m_nr, m_ni, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_i);
+    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_ni, m_naxe);
+    Topo::Block* b2 = new Topo::Block(getContext(), m_nr, m_ni, m_naxe);
+    Topo::Block* b3 = new Topo::Block(getContext(), 2*m_ni, m_nr, m_naxe);
+    Topo::Block* b4 = new Topo::Block(getContext(), m_nr, m_ni, m_naxe);
 
     // stockage dans le manager topologiques des différentes entités (bloc et niveau inférieur)
     addCreatedBlock(b1);
@@ -1615,8 +1595,7 @@ createSphereTopo1BlockPlein(Geom::PropertySphere* propertySph)
 
     double r2 = rayon*d3;
 
-    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, 2*m_ni,
-            BlockMeshingProperty::transfinite);
+    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, 2*m_ni);
     // stockage dans le manager topologiques des différentes entités
     addCreatedBlock(b1);
 
@@ -1665,8 +1644,7 @@ createSphereTopo1BlockDemi(Geom::PropertySphere* propertySph)
     double r2 = rayon*d2;
     double r3 = rayon*d3;
 
-    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_ni, 2*m_ni,
-            BlockMeshingProperty::transfinite);
+    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_ni, 2*m_ni);
     // stockage dans le manager topologiques des différentes entités
     addCreatedBlock(b1);
 
@@ -1801,8 +1779,7 @@ createSphereTopo1BlockQuart(Geom::PropertySphere* propertySph)
     double r2 = rayon*d2;
     double r3 = rayon*d3;
 
-    Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_ni, 2*m_ni,
-            BlockMeshingProperty::transfinite);
+    Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_ni, 2*m_ni);
     // stockage dans le manager topologiques des différentes entités
     addCreatedBlock(b1);
 
@@ -1900,8 +1877,7 @@ createSphereTopo1BlockHuitieme(Geom::PropertySphere* propertySph)
     double r2 = rayon*d2;
     double r3 = rayon*d3;
 
-    Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_ni, m_ni,
-            BlockMeshingProperty::transfinite);
+    Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_ni, m_ni);
     // stockage dans le manager topologiques des différentes entités
     addCreatedBlock(b1);
 
@@ -2002,18 +1978,12 @@ createSphereTopoOGridPleinDeg(Geom::PropertySphere* propertySph)
     pts_ext.push_back(centre+Utils::Math::Point(-r2,  r2,  r2));
     pts_ext.push_back(centre+Utils::Math::Point( r2,  r2,  r2));
 
-    Topo::Block* b2 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b3 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b4 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b5 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b6 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b7 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b2 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr);
+    Topo::Block* b3 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr);
+    Topo::Block* b4 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr);
+    Topo::Block* b5 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr);
+    Topo::Block* b6 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr);
+    Topo::Block* b7 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr);
 
     // les blocs externes pour utiliser des boucles
     std::vector<Block*> blocs;
@@ -2114,20 +2084,13 @@ createSphereTopoOGridPleinNonDeg(Geom::PropertySphere* propertySph)
     pts_int.push_back(centre+Utils::Math::Point( r2,  r2,  r2));
 
 
-    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, 2*m_ni,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b2 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b3 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b4 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b5 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b6 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b7 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, 2*m_ni);
+    Topo::Block* b2 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr);
+    Topo::Block* b3 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr);
+    Topo::Block* b4 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr);
+    Topo::Block* b5 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr);
+    Topo::Block* b6 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr);
+    Topo::Block* b7 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr);
 
     // les blocs externes pour utiliser des boucles
     std::vector<Block*> blocs;
@@ -2230,16 +2193,11 @@ createSphereTopoOGridDemiDeg(Geom::PropertySphere* propertySph)
     pts_ext.push_back(centre+Utils::Math::Point(-r2,   0,  r2));
     pts_ext.push_back(centre+Utils::Math::Point( r2,   0,  r2));
 
-    Topo::Block* b2 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b3 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b4 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b5 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b6 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b2 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr);
+    Topo::Block* b3 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr);
+    Topo::Block* b4 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr);
+    Topo::Block* b5 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr);
+    Topo::Block* b6 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr);
 
     // les blocs externes pour utiliser des boucles
     std::vector<Block*> blocs;
@@ -2453,18 +2411,12 @@ createSphereTopoOGridDemiNonDeg(Geom::PropertySphere* propertySph)
     pts_int.push_back(centre+Utils::Math::Point(-r2,   0,  r2));
     pts_int.push_back(centre+Utils::Math::Point( r2,   0,  r2));
 
-    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_ni,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b2 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b3 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b4 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b5 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b6 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_ni);
+    Topo::Block* b2 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr);
+    Topo::Block* b3 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr);
+    Topo::Block* b4 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr);
+    Topo::Block* b5 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr);
+    Topo::Block* b6 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr);
 
     // les blocs externes pour utiliser des boucles
     std::vector<Block*> blocs;
@@ -2686,14 +2638,10 @@ createSphereTopoOGridQuartDeg(Geom::PropertySphere* propertySph)
     pts_ext.push_back(centre+Utils::Math::Point(  0,   0,  r2));
     pts_ext.push_back(centre+Utils::Math::Point( r2,   0,  r2));
 
-    Topo::Block* b3 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b4 = new Topo::Block(getContext(), m_ni, m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b5 = new Topo::Block(getContext(), m_ni, m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b6 = new Topo::Block(getContext(), 2*m_ni, m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b3 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr);
+    Topo::Block* b4 = new Topo::Block(getContext(), m_ni, m_ni, m_nr);
+    Topo::Block* b5 = new Topo::Block(getContext(), m_ni, m_ni, m_nr);
+    Topo::Block* b6 = new Topo::Block(getContext(), 2*m_ni, m_ni, m_nr);
 
     // les blocs externes pour utiliser des boucles
     std::vector<Block*> blocs;
@@ -2850,16 +2798,11 @@ createSphereTopoOGridQuartNonDeg(Geom::PropertySphere* propertySph)
     pts_int.push_back(centre+Utils::Math::Point( r2,   0,  r2));
 
 
-    Topo::Block* b1 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_ni,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b3 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b4 = new Topo::Block(getContext(), m_ni, m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b5 = new Topo::Block(getContext(), m_ni, m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b6 = new Topo::Block(getContext(), 2*m_ni, m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b1 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_ni);
+    Topo::Block* b3 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr);
+    Topo::Block* b4 = new Topo::Block(getContext(), m_ni, m_ni, m_nr);
+    Topo::Block* b5 = new Topo::Block(getContext(), m_ni, m_ni, m_nr);
+    Topo::Block* b6 = new Topo::Block(getContext(), 2*m_ni, m_ni, m_nr);
 
     // les blocs externes pour utiliser des boucles
     std::vector<Block*> blocs;
@@ -3025,12 +2968,9 @@ createSphereTopoOGridHuitiemeDeg(Geom::PropertySphere* propertySph)
     pts_ext.push_back(centre+Utils::Math::Point(  0,   0,  r2));
     pts_ext.push_back(centre+Utils::Math::Point( r2,   0,  r2));
 
-    Topo::Block* b3 = new Topo::Block(getContext(), m_ni, m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b5 = new Topo::Block(getContext(), m_ni, m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b6 = new Topo::Block(getContext(), m_ni, m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b3 = new Topo::Block(getContext(), m_ni, m_ni, m_nr);
+    Topo::Block* b5 = new Topo::Block(getContext(), m_ni, m_ni, m_nr);
+    Topo::Block* b6 = new Topo::Block(getContext(), m_ni, m_ni, m_nr);
 
     // les blocs externes pour utiliser des boucles
     std::vector<Block*> blocs;
@@ -3193,14 +3133,10 @@ createSphereTopoOGridHuitiemeNonDeg(Geom::PropertySphere* propertySph)
     pts_int.push_back(centre+Utils::Math::Point(  0,   0,  r2));
     pts_int.push_back(centre+Utils::Math::Point( r2,   0,  r2));
 
-    Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_ni, m_ni,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b3 = new Topo::Block(getContext(), m_ni, m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b5 = new Topo::Block(getContext(), m_ni, m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b6 = new Topo::Block(getContext(), m_ni, m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_ni, m_ni);
+    Topo::Block* b3 = new Topo::Block(getContext(), m_ni, m_ni, m_nr);
+    Topo::Block* b5 = new Topo::Block(getContext(), m_ni, m_ni, m_nr);
+    Topo::Block* b6 = new Topo::Block(getContext(), m_ni, m_ni, m_nr);
 
 
     // les blocs externes pour utiliser des boucles
@@ -3418,8 +3354,7 @@ createHollowCylinderTopoQuart(Geom::PropertyHollowCylinder* propertyCyl)
 #endif
 
 	// création de 1 bloc
-    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr);
 
     // stockage dans le manager topologiques du bloc
     addCreatedBlock(b1);
@@ -3463,8 +3398,7 @@ createHollowCylinderTopoDemi(Geom::PropertyHollowCylinder* propertyCyl)
 #endif
 
 	// création de 1 bloc
-    Topo::Block* b1 = new Topo::Block(getContext(), 4*m_ni, m_naxe, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b1 = new Topo::Block(getContext(), 4*m_ni, m_naxe, m_nr);
 
     // stockage dans le manager topologiques du bloc
     addCreatedBlock(b1);
@@ -3509,22 +3443,10 @@ createHollowCylinderTopoEntier(Geom::PropertyHollowCylinder* propertyCyl)
     Utils::Math::Point centre = propertyCyl->getCenter();
     double d2 = std::sqrt(2.0)/2.0;
 
-	// CP NEW CODE v 2.2.2
-    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr, BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b2 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr, BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b3 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr, BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b4 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr, BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    // !CP NEW CODE
-/* CP OLD CODE
-    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_nr, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b2 = new Topo::Block(getContext(), 2*m_ni, m_nr, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b3 = new Topo::Block(getContext(), 2*m_ni, m_nr, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b4 = new Topo::Block(getContext(), 2*m_ni, m_nr, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-*/
+    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr);
+    Topo::Block* b2 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr);
+    Topo::Block* b3 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr);
+    Topo::Block* b4 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr);
 
     // stockage dans le manager topologiques des différentes entités (bloc et niveau inférieur)
     addCreatedBlock(b1);
@@ -3681,12 +3603,9 @@ createHollowSphereTopo()
 void CommandNewTopoOGridOnGeometry::
 createHollowSphereTopoHuitieme(Geom::PropertyHollowSphere* propertySph)
 {
-    Topo::Block* b3 = new Topo::Block(getContext(), m_ni, m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b5 = new Topo::Block(getContext(), m_ni, m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b6 = new Topo::Block(getContext(), m_ni, m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b3 = new Topo::Block(getContext(), m_ni, m_ni, m_nr);
+    Topo::Block* b5 = new Topo::Block(getContext(), m_ni, m_ni, m_nr);
+    Topo::Block* b6 = new Topo::Block(getContext(), m_ni, m_ni, m_nr);
 
     // les blocs externes pour utiliser des boucles
     std::vector<Block*> blocs;
@@ -3829,14 +3748,10 @@ createHollowSphereTopoHuitieme(Geom::PropertyHollowSphere* propertySph)
 void CommandNewTopoOGridOnGeometry::
 createHollowSphereTopoQuart(Geom::PropertyHollowSphere* propertySph)
 {
-    Topo::Block* b3 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b4 = new Topo::Block(getContext(), m_ni, m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b5 = new Topo::Block(getContext(), m_ni, m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b6 = new Topo::Block(getContext(), 2*m_ni, m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b3 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr);
+    Topo::Block* b4 = new Topo::Block(getContext(), m_ni, m_ni, m_nr);
+    Topo::Block* b5 = new Topo::Block(getContext(), m_ni, m_ni, m_nr);
+    Topo::Block* b6 = new Topo::Block(getContext(), 2*m_ni, m_ni, m_nr);
 
     std::vector<Block*> blocs;
     blocs.push_back(b3);
@@ -3968,16 +3883,11 @@ createHollowSphereTopoQuart(Geom::PropertyHollowSphere* propertySph)
 void CommandNewTopoOGridOnGeometry::
 createHollowSphereTopoDemi(Geom::PropertyHollowSphere* propertySph)
 {
-    Topo::Block* b2 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b3 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b4 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b5 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b6 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b2 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr);
+    Topo::Block* b3 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr);
+    Topo::Block* b4 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr);
+    Topo::Block* b5 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_nr);
+    Topo::Block* b6 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr);
 
     // les blocs externes pour utiliser des boucles
     std::vector<Block*> blocs;
@@ -4146,18 +4056,12 @@ createHollowSphereTopoDemi(Geom::PropertyHollowSphere* propertySph)
 void CommandNewTopoOGridOnGeometry::
 createHollowSphereTopoEntier(Geom::PropertyHollowSphere* propertySph)
 {
-    Topo::Block* b2 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b3 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b4 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b5 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b6 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b7 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b2 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr);
+    Topo::Block* b3 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr);
+    Topo::Block* b4 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr);
+    Topo::Block* b5 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr);
+    Topo::Block* b6 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr);
+    Topo::Block* b7 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_nr);
 
     // les blocs externes pour utiliser des boucles
     std::vector<Block*> blocs;
@@ -4481,8 +4385,7 @@ createConeTopoOGrid()
 /*----------------------------------------------------------------------------*/
 void CommandNewTopoOGridOnGeometry::createConeTopo1BlockQuartR0()
 {
-    Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_ni, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_ni, m_naxe);
 
     // stockage dans le manager topologiques des différentes entités
     addCreatedBlock(b1);
@@ -4544,8 +4447,7 @@ void CommandNewTopoOGridOnGeometry::createConeTopo1BlockQuartR0()
 /*----------------------------------------------------------------------------*/
 void CommandNewTopoOGridOnGeometry::createConeTopo1BlockQuart()
 {
-    Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_ni, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_ni, m_naxe);
 
     // stockage dans le manager topologiques des différentes entités
     addCreatedBlock(b1);
@@ -4618,8 +4520,7 @@ void CommandNewTopoOGridOnGeometry::createConeTopo1BlockQuart()
 /*----------------------------------------------------------------------------*/
 void CommandNewTopoOGridOnGeometry::createConeTopo1BlockDemiR0()
 {
-    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_ni, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_ni, m_naxe);
 
     // stockage dans le manager topologiques des différentes entités
     addCreatedBlock(b1);
@@ -4695,8 +4596,7 @@ void CommandNewTopoOGridOnGeometry::createConeTopo1BlockDemiR0()
 /*----------------------------------------------------------------------------*/
 void CommandNewTopoOGridOnGeometry::createConeTopo1BlockDemi()
 {
-    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_ni, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_ni, m_naxe);
 
     // stockage dans le manager topologiques des différentes entités
     addCreatedBlock(b1);
@@ -4787,8 +4687,7 @@ void CommandNewTopoOGridOnGeometry::createConeTopo1BlockDemi()
 /*----------------------------------------------------------------------------*/
 void CommandNewTopoOGridOnGeometry::createConeTopo1BlockPleinR0()
 {
-    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_naxe);
 
     // stockage dans le manager topologiques des différentes entités
     addCreatedBlock(b1);
@@ -4850,8 +4749,7 @@ void CommandNewTopoOGridOnGeometry::createConeTopo1BlockPleinR0()
 /*----------------------------------------------------------------------------*/
 void CommandNewTopoOGridOnGeometry::createConeTopo1BlockPlein()
 {
-    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_naxe,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_naxe);
 
     // stockage dans le manager topologiques des différentes entités
     addCreatedBlock(b1);
@@ -4923,12 +4821,9 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridQuartDegR0()
 /*----------------------------------------------------------------------------*/
 void CommandNewTopoOGridOnGeometry::createConeTopoOGridQuartNonDegR0()
 {
-	Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_nr, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-	Topo::Block* b2 = new Topo::Block(getContext(), m_nr, m_ni, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-	Topo::Block* b5 = new Topo::Block(getContext(), m_ni, m_ni, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+	Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_nr, m_naxe);
+	Topo::Block* b2 = new Topo::Block(getContext(), m_nr, m_ni, m_naxe);
+	Topo::Block* b5 = new Topo::Block(getContext(), m_ni, m_ni, m_naxe);
 
     // stockage dans le manager topologiques des différentes entités (bloc et niveau inférieur)
     addCreatedBlock(b1);
@@ -5044,10 +4939,8 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridQuartNonDegR0()
 /*----------------------------------------------------------------------------*/
 void CommandNewTopoOGridOnGeometry::createConeTopoOGridQuartDeg()
 {
-    Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_naxe, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b2 = new Topo::Block(getContext(), m_ni, m_naxe, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_naxe, m_nr);
+    Topo::Block* b2 = new Topo::Block(getContext(), m_ni, m_naxe, m_nr);
 
     // stockage dans le manager topologiques des différentes entités (bloc et niveau inférieur)
     addCreatedBlock(b1);
@@ -5140,12 +5033,9 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridQuartDeg()
 /*----------------------------------------------------------------------------*/
 void CommandNewTopoOGridOnGeometry::createConeTopoOGridQuartNonDeg()
 {
-	Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_nr, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-	Topo::Block* b2 = new Topo::Block(getContext(), m_nr, m_ni, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-	Topo::Block* b5 = new Topo::Block(getContext(), m_ni, m_ni, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+	Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_nr, m_naxe);
+	Topo::Block* b2 = new Topo::Block(getContext(), m_nr, m_ni, m_naxe);
+	Topo::Block* b5 = new Topo::Block(getContext(), m_ni, m_ni, m_naxe);
 
     // stockage dans le manager topologiques des différentes entités (bloc et niveau inférieur)
     addCreatedBlock(b1);
@@ -5297,14 +5187,10 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridDemiDegR0()
 /*----------------------------------------------------------------------------*/
 void CommandNewTopoOGridOnGeometry::createConeTopoOGridDemiNonDegR0()
 {
-	Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_nr, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-	Topo::Block* b2 = new Topo::Block(getContext(), m_nr, 2*m_ni, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-	Topo::Block* b3 = new Topo::Block(getContext(), m_ni, m_nr, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-	Topo::Block* b5 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+	Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_nr, m_naxe);
+	Topo::Block* b2 = new Topo::Block(getContext(), m_nr, 2*m_ni, m_naxe);
+	Topo::Block* b3 = new Topo::Block(getContext(), m_ni, m_nr, m_naxe);
+	Topo::Block* b5 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_naxe);
 
     // stockage dans le manager topologiques des différentes entités (bloc et niveau inférieur)
     addCreatedBlock(b1);
@@ -5451,12 +5337,9 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridDemiNonDegR0()
 /*----------------------------------------------------------------------------*/
 void CommandNewTopoOGridOnGeometry::createConeTopoOGridDemiDeg()
 {
-    Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_naxe, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b2 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b3 = new Topo::Block(getContext(), m_ni, m_naxe, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_naxe, m_nr);
+    Topo::Block* b2 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr);
+    Topo::Block* b3 = new Topo::Block(getContext(), m_ni, m_naxe, m_nr);
 
     // stockage dans le manager topologiques des différentes entités (bloc et niveau inférieur)
     addCreatedBlock(b1);
@@ -5565,14 +5448,10 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridDemiDeg()
 /*----------------------------------------------------------------------------*/
 void CommandNewTopoOGridOnGeometry::createConeTopoOGridDemiNonDeg()
 {
-	Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_nr, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-	Topo::Block* b2 = new Topo::Block(getContext(), m_nr, 2*m_ni, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-	Topo::Block* b3 = new Topo::Block(getContext(), m_ni, m_nr, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-	Topo::Block* b5 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+	Topo::Block* b1 = new Topo::Block(getContext(), m_ni, m_nr, m_naxe);
+	Topo::Block* b2 = new Topo::Block(getContext(), m_nr, 2*m_ni, m_naxe);
+	Topo::Block* b3 = new Topo::Block(getContext(), m_ni, m_nr, m_naxe);
+	Topo::Block* b5 = new Topo::Block(getContext(), m_ni, 2*m_ni, m_naxe);
 
     // stockage dans le manager topologiques des différentes entités (bloc et niveau inférieur)
     addCreatedBlock(b1);
@@ -5759,16 +5638,11 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridPleinDegR0()
 /*----------------------------------------------------------------------------*/
 void CommandNewTopoOGridOnGeometry::createConeTopoOGridPleinNonDegR0()
 {
-	Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_nr, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-	Topo::Block* b2 = new Topo::Block(getContext(), m_nr, 2*m_ni, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-	Topo::Block* b3 = new Topo::Block(getContext(), 2*m_ni, m_nr, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-	Topo::Block* b4 = new Topo::Block(getContext(), m_nr, 2*m_ni, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-	Topo::Block* b5 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+	Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_nr, m_naxe);
+	Topo::Block* b2 = new Topo::Block(getContext(), m_nr, 2*m_ni, m_naxe);
+	Topo::Block* b3 = new Topo::Block(getContext(), 2*m_ni, m_nr, m_naxe);
+	Topo::Block* b4 = new Topo::Block(getContext(), m_nr, 2*m_ni, m_naxe);
+	Topo::Block* b5 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_naxe);
 
     // stockage dans le manager topologiques des différentes entités (bloc et niveau inférieur)
     addCreatedBlock(b1);
@@ -5907,14 +5781,10 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridPleinNonDegR0()
 /*----------------------------------------------------------------------------*/
 void CommandNewTopoOGridOnGeometry::createConeTopoOGridPleinDeg()
 {
-    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b2 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b3 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-    Topo::Block* b4 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr,
-            BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+    Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr);
+    Topo::Block* b2 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr);
+    Topo::Block* b3 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr);
+    Topo::Block* b4 = new Topo::Block(getContext(), 2*m_ni, m_naxe, m_nr);
 
     // stockage dans le manager topologiques des différentes entités (bloc et niveau inférieur)
     addCreatedBlock(b1);
@@ -6036,16 +5906,11 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridPleinDeg()
 /*----------------------------------------------------------------------------*/
 void CommandNewTopoOGridOnGeometry::createConeTopoOGridPleinNonDeg()
 {
-	Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_nr, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-	Topo::Block* b2 = new Topo::Block(getContext(), m_nr, 2*m_ni, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-	Topo::Block* b3 = new Topo::Block(getContext(), 2*m_ni, m_nr, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-	Topo::Block* b4 = new Topo::Block(getContext(), m_nr, 2*m_ni, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
-	Topo::Block* b5 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_naxe,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+	Topo::Block* b1 = new Topo::Block(getContext(), 2*m_ni, m_nr, m_naxe);
+	Topo::Block* b2 = new Topo::Block(getContext(), m_nr, 2*m_ni, m_naxe);
+	Topo::Block* b3 = new Topo::Block(getContext(), 2*m_ni, m_nr, m_naxe);
+	Topo::Block* b4 = new Topo::Block(getContext(), m_nr, 2*m_ni, m_naxe);
+	Topo::Block* b5 = new Topo::Block(getContext(), 2*m_ni, 2*m_ni, m_naxe);
 
     // stockage dans le manager topologiques des différentes entités (bloc et niveau inférieur)
     addCreatedBlock(b1);

@@ -31,9 +31,9 @@ class CommandNewTopoOnGeometry: public Topo::CommandCreateTopo{
 public:
 
 	/** type de topologie demandée, non structuré, structuré avec projection,
-	 * un bloc sans projection, ou un bloc pour l'insertion
+	 * un bloc sans projection
 	 */
-	enum eTopoType { UNSTRUCTURED_BLOCK, STRUCTURED_BLOCK, FREE_BLOCK, INSERTION_BLOCK, ASSOCIATED_TOPO };
+	enum eTopoType { UNSTRUCTURED_BLOCK, STRUCTURED_BLOCK, FREE_BLOCK, ASSOCIATED_TOPO };
 
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur
@@ -122,9 +122,6 @@ private:
 
     /// dimension de l'entité topo libre
     short m_dim;
-
-    /// cas d'un bloc pour l'insertion
-    bool m_insertionBlock;
 
     /// nom du groupe pour cas d'un bloc seul (sans projection)
     std::string m_groupName;

@@ -47,12 +47,8 @@ set(DOXYGEN_DIRS
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyTransfinite.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyDelaunayGMSH.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyQuadPairing.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyDirectional.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyOrthogonal.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyRotational.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyTransfinite.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyDelaunayTetgen.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyInsertion.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Mesh/MeshManagerIfc.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Mesh/MeshModificationBySepa.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Smoothing/SurfacicSmoothing.h

@@ -1619,9 +1619,6 @@ createBlock(std::map<Vertex*, uint> & filtre_vertex,
                         // copie le lien sur la géométrie
                         newBlock->setGeomAssociation(bloc->getGeomAssociation());
 
-                        if (bloc->getMeshLaw() == BlockMeshingProperty::directional)
-                        	newBlock->selectBasicMeshLaw(&getInfoCommand());
-
                     } // end if filtre_coface[...] == 1
                 } // end iter3
             } // end if (filtre_face[face] == 2 || face->getNbCoFaces() == 1)
@@ -1689,9 +1686,6 @@ createBlock(std::map<Vertex*, uint> & filtre_vertex,
                 // copie le lien sur la géométrie
                 newBlock->setGeomAssociation(bloc->getGeomAssociation());
 
-                if (bloc->getMeshLaw() == BlockMeshingProperty::directional)
-                	newBlock->selectBasicMeshLaw(&getInfoCommand());
-
             } // end else if (filtre_face[face] == 1)
         else {
 #ifdef _DEBUG_SPLIT_OGRID
@@ -1728,9 +1722,6 @@ createBlock(std::map<Vertex*, uint> & filtre_vertex,
 
         // copie le lien sur la géométrie
         newBlock->setGeomAssociation(bloc->getGeomAssociation());
-
-        if (bloc->getMeshLaw() == BlockMeshingProperty::directional)
-        	newBlock->selectBasicMeshLaw(&getInfoCommand());
 
     } // end iter1
 }

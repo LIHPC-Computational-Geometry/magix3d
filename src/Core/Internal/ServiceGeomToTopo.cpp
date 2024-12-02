@@ -19,7 +19,6 @@
 #include "Topo/Vertex.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Topo/CoEdgeMeshingProperty.h"
-#include "Topo/BlockMeshingPropertyInsertion.h"
 
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
@@ -100,13 +99,6 @@ bool ServiceGeomToTopo::convertBlockStructured(const int ni, const int nj, const
     }
     else
         return true;
-}
-/*----------------------------------------------------------------------------*/
-void ServiceGeomToTopo::convertInsertionBlock()
-{
-	Topo::Block* bloc = getBlock();
-	Topo::BlockMeshingPropertyInsertion mp;
-	bloc->switchBlockMeshingProperty(m_icmd, &mp);
 }
 /*----------------------------------------------------------------------------*/
 Topo::Block* ServiceGeomToTopo::getBlock()

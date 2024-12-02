@@ -161,15 +161,6 @@ public:
 	SET_SWIG_COMPLETABLE_METHOD(newFreeTopoInGroup)
 
     /*------------------------------------------------------------------------*/
-    /** \brief Création d'une topologie pour l'insertion s'appuyant sur une géométrie
-     *
-     *  \param ne le nom de l'entité géométrique sur laquelle s'appuiera la topologie
-     */
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
-        newInsertionTopoOnGeometry(std::string ne);
-	SET_SWIG_COMPLETABLE_METHOD(newInsertionTopoOnGeometry)
-
-    /*------------------------------------------------------------------------*/
     /** \brief Création d'une boite parallèle aux axes Ox,Oy et Oz à partir des
      *         points pmin et pmax où pmin est le point de plus petites
      *         coordonnées (x,y,z) et pmax le point de plus grandes coordonnées
@@ -834,15 +825,6 @@ public:
     virtual Mgx3D::Internal::M3DCommandResultIfc*
         setBlockMeshingProperty(Topo::BlockMeshingProperty& emp, std::string bl);
 	SET_SWIG_COMPLETABLE_METHOD(setBlockMeshingProperty)
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Change la propriété de discrétisation pour les faces et les blocs.
-     *   Sélectionne la méthode directionnelle si possible à la place de la méthode
-     *   transfinie (car plus longue pour mailler)
-     */
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
-    	replaceTransfiniteByDirectionalMeshMethodAsPossible();
-	SET_SWIG_COMPLETABLE_METHOD(replaceTransfiniteByDirectionalMeshMethodAsPossible)
 
     /*------------------------------------------------------------------------*/
     /** \brief Change la discrétisation pour une arête commune (en nombre de bras seulement)

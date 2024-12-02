@@ -8,7 +8,6 @@
  */
 /*----------------------------------------------------------------------------*/
 #include "Topo/CommandSetBlockMeshingProperty.h"
-#include "Topo/BlockMeshingPropertyOrthogonal.h"
 #include "Topo/FaceMeshingPropertyOrthogonal.h"
 #include "Topo/Block.h"
 #include "Topo/TopoHelper.h"
@@ -229,42 +228,6 @@ internalExecute()
 
     	// initialise la direction si nécessaire
     	(*iter)->getBlockMeshingProperty()->initDir((*iter));
-
-
-    	// transmission de la demande d'orthogonalité aux faces
-    	if (m_prop->getMeshLaw() == BlockMeshingProperty::orthogonal){
-    		BlockMeshingPropertyOrthogonal* mp = dynamic_cast<BlockMeshingPropertyOrthogonal*>((*iter)->getBlockMeshingProperty());
-    		CHECK_NULL_PTR_ERROR(mp);
-
-    		// les 8 sommets, quitte à en répéter certains en cas de dégénérecence
-    		std::vector<Topo::Vertex* > vertices;
-    		(*iter)->getHexaVertices(vertices);
-
-    		if (mp->getDir() == 0){
-    			// cas orthogonalité suivant I
-    			setOrthogonalCoFaces((*iter)->getFace(2), vertices[0], vertices[1], mp->getNbLayers(), mp->getSide());
-    			setOrthogonalCoFaces((*iter)->getFace(3), vertices[2], vertices[3], mp->getNbLayers(), mp->getSide());
-    			setOrthogonalCoFaces((*iter)->getFace(4), vertices[0], vertices[1], mp->getNbLayers(), mp->getSide());
-    			if ((*iter)->getNbFaces() == 6)
-    				setOrthogonalCoFaces((*iter)->getFace(5), vertices[4], vertices[5], mp->getNbLayers(), mp->getSide());
-    		}
-    		else if (mp->getDir() == 1){
-    			// cas orthogonalité suivant J
-    			setOrthogonalCoFaces((*iter)->getFace(0), vertices[0], vertices[2], mp->getNbLayers(), mp->getSide());
-    			setOrthogonalCoFaces((*iter)->getFace(1), vertices[1], vertices[3], mp->getNbLayers(), mp->getSide());
-    			setOrthogonalCoFaces((*iter)->getFace(4), vertices[0], vertices[2], mp->getNbLayers(), mp->getSide());
-    			if ((*iter)->getNbFaces() == 6)
-    				setOrthogonalCoFaces((*iter)->getFace(5), vertices[5], vertices[7], mp->getNbLayers(), mp->getSide());
-    		}
-    		else if (mp->getDir() == 2){
-    			// cas orthogonalité suivant K
-    			setOrthogonalCoFaces((*iter)->getFace(0), vertices[0], vertices[4], mp->getNbLayers(), mp->getSide());
-    			setOrthogonalCoFaces((*iter)->getFace(1), vertices[3], vertices[7], mp->getNbLayers(), mp->getSide());
-    			setOrthogonalCoFaces((*iter)->getFace(2), vertices[0], vertices[4], mp->getNbLayers(), mp->getSide());
-    			setOrthogonalCoFaces((*iter)->getFace(3), vertices[3], vertices[7], mp->getNbLayers(), mp->getSide());
-    		}
-
-    	} // end if (m_prop->getMeshLaw() == BlockMeshingProperty::orthogonal)
 
     } // end for (std::vector<Block*>::iterator iter = m_blocks.begin() ...
 

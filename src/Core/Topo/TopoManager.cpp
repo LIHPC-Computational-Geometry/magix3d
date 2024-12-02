@@ -65,7 +65,6 @@
 #include "Topo/CommandDestroyTopo.h"
 #include "Topo/CommandReverseDirection.h"
 #include "Topo/CommandDuplicateTopo.h"
-#include "Topo/CommandReplaceTransfiniteMethod.h"
 #include "Topo/CommandInsertHole.h"
 #include <Topo/CommandFuseCoEdges.h>
 #include <Topo/CommandFuse2Blocks.h>
@@ -1055,34 +1054,6 @@ TopoManager::newFreeTopoInGroup(std::string ng, int dim)
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().newFreeTopoInGroup (\""
             <<ng<<"\", "<< (short)dim <<")";
-    command->setScriptCommand(cmd);
-
-    getCommandManager().addCommand(command, Utils::Command::DO);
-
-    Internal::M3DCommandResultIfc*  cmdResult   =
-    		new Internal::M3DCommandResult (*command);
-    return cmdResult;
-}
-/*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
-TopoManager::newInsertionTopoOnGeometry(std::string ne)
-{
-    return newInsertionTopoOnGeometry(getLocalContext().getGeomManager().getEntity(ne));
-}
-/*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
-TopoManager::newInsertionTopoOnGeometry(Geom::GeomEntity* ge)
-{
-    TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
-    message <<"TopoManager::newInsertionTopoOnGeometry("<<ge->getName()<<")";
-    log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
-
-    Topo::CommandNewTopoOnGeometry* command = new Topo::CommandNewTopoOnGeometry(getLocalContext(), ge,
-    		CommandNewTopoOnGeometry::INSERTION_BLOCK);
-
-    TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().newInsertionTopoOnGeometry (\""
-            <<ge->getName()<<"\")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -3428,22 +3399,6 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setBlockMeshingProperty(Block
 
     Internal::M3DCommandResultIfc*  cmdResult   =
             new Internal::M3DCommandResult (*command);
-    return cmdResult;
-}
-/*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
-TopoManager::replaceTransfiniteByDirectionalMeshMethodAsPossible()
-{
-    Topo::CommandReplaceTransfiniteMethod* command = new Topo::CommandReplaceTransfiniteMethod(getLocalContext());
-
-    TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().replaceTransfiniteByDirectionalMeshMethodAsPossible()";
-    command->setScriptCommand(cmd);
-
-    getCommandManager().addCommand(command, Utils::Command::DO);
-
-    Internal::M3DCommandResultIfc*  cmdResult   =
-    		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/

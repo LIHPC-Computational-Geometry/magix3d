@@ -197,17 +197,6 @@ public:
         newUnstructuredTopoOnGeometry(Geom::GeomEntity* ge);
 
     /*------------------------------------------------------------------------*/
-    /** \brief Création d'une topologie pour l'insertion s'appuyant sur une géométrie
-     *
-     *  \param ne le nom de l'entité géométrique sur laquelle s'appuiera la topologie
-     */
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
-        newInsertionTopoOnGeometry(std::string ne);
-
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
-        newInsertionTopoOnGeometry(Geom::GeomEntity* ge);
-
-    /*------------------------------------------------------------------------*/
     /** \brief création d'une boite parallèle aux axes Ox,Oy et Oz à partir des
      *         points pmin et pmax où pmin est le point de plus petites
      *         coordonnées (x,y,z) et pmax le point de plus grandes coordonnées
@@ -1359,14 +1348,6 @@ public:
 
     virtual Mgx3D::Internal::M3DCommandResultIfc*
         setBlockMeshingProperty(Topo::BlockMeshingProperty& emp, Topo::Block* bl);
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Change la propriété de discrétisation pour les faces et les blocs.
-     *   Sélectionne la méthode directionnelle si possible à la place de la méthode
-     *   transfinie (car plus longue pour mailler)
-     */
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
-    	replaceTransfiniteByDirectionalMeshMethodAsPossible();
 
     /*------------------------------------------------------------------------*/
     /** \brief Déraffine un bloc structuré suivant une direction

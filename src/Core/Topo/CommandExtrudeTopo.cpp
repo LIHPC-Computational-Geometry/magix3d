@@ -14,7 +14,6 @@
 #include "Topo/TopoHelper.h"
 #include "Topo/CoFace.h"
 #include "Topo/Edge.h"
-#include "Topo/BlockMeshingPropertyDirectional.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Topo/FaceMeshingPropertyDirectional.h"
 
@@ -488,9 +487,6 @@ void CommandExtrudeTopo::constructExtrudeBlocks(std::vector<CoFace*>& cofaces_0,
         std::cout<<"\nCréation du bloc : "<<*newBlock;
         //newBlock->check();
 #endif
-
-		BlockMeshingProperty* new_ppty = new BlockMeshingPropertyDirectional(BlockMeshingProperty::dir_i);
-		newBlock->setMeshLaw(new_ppty);
 
     } // for (; iter1_0 != cofaces_0.end(); ++iter1_0, ++iter1_1)
 
