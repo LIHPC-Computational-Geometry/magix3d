@@ -32,7 +32,6 @@ CommandNewTopoOnGeometry(Internal::Context& c, Geom::GeomEntity* entity, eTopoTy
 :CommandCreateTopo(c, "Nom de commande à définir")
 , m_freeTopo(false)
 , m_dim(0)
-, m_insertionBlock(false)
 , m_ni(0)
 , m_nj(0)
 , m_nk(0)
@@ -79,16 +78,6 @@ CommandNewTopoOnGeometry(Internal::Context& c, Geom::GeomEntity* entity, eTopoTy
     	}
     	m_freeTopo = true;
     	break;
-    case INSERTION_BLOCK:
-    	setStructured(false);
-    	if (entity==0 || entity->getDim() == 3)
-    		comments << "Création d'un bloc topologique pour l'insertion";
-    	else if (entity->getDim() == 2)
-    		comments << "Création d'une face topologique pour l'insertion";
-    	else
-    		comments << "Création d'une topologie pour l'insertion";
-    	m_insertionBlock = true;
-    	break;
     case ASSOCIATED_TOPO:
     	setStructured(false);
     	if (entity!=0 && entity->getDim() == 0){
@@ -119,7 +108,6 @@ CommandNewTopoOnGeometry(Internal::Context& c, Geom::CommandCreateGeom* command_
 :CommandCreateTopo(c, "Création d'une topologique sur une géométrie depuis une commande")
 , m_freeTopo(false)
 , m_dim(0)
-, m_insertionBlock(false)
 , m_ni(0)
 , m_nj(0)
 , m_nk(0)
@@ -137,10 +125,6 @@ CommandNewTopoOnGeometry(Internal::Context& c, Geom::CommandCreateGeom* command_
     	setStructured(true);
     	m_freeTopo = true;
     	break;
-    case INSERTION_BLOCK:
-    	setStructured(false);
-    	m_insertionBlock = true;
-    	break;
     default:
     	throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopoOnGeometry pour un type de topologie non prévu", TkUtil::Charset::UTF_8));
     }
@@ -152,7 +136,6 @@ CommandNewTopoOnGeometry(Internal::Context& c, const std::string& ng, const shor
 :CommandCreateTopo(c, "")
 , m_freeTopo(true)
 , m_dim(dim)
-, m_insertionBlock(false)
 , m_groupName(ng)
 , m_ni(0)
 , m_nj(0)
@@ -169,7 +152,6 @@ CommandNewTopoOnGeometry(Internal::Context& c, Geom::CommandCreateGeom* command_
 :CommandCreateTopo(c, "Création d'une topologique (ni nj nk) sur une géométrie depuis une commande")
 , m_freeTopo(false)
 , m_dim(0)
-, m_insertionBlock(false)
 , m_ni(ni)
 , m_nj(nj)
 , m_nk(nk)
@@ -184,7 +166,6 @@ CommandNewTopoOnGeometry(Internal::Context& c, Geom::Surface* entity, std::vecto
 :CommandCreateTopo(c, "Création d'une face topologique structurée sur une géométrie")
 , m_freeTopo(false)
 , m_dim(0)
-, m_insertionBlock(false)
 , m_ni(0)
 , m_nj(0)
 , m_nk(0)
@@ -262,7 +243,7 @@ internalExecute()
 		}
 		else {
 			// création d'un simple bloc
-			Block* bl = new Block(getContext(), 0,0,0,BlockMeshingProperty::transfinite);
+			Block* bl = new Block(getContext(), 0,0,0);
 			addCreatedBlock(bl);
 			if (!m_groupName.empty()){
 		    	Group::Group3D* grp = getContext().getLocalGroupManager().getNewGroup3D(m_groupName, &getInfoCommand());
@@ -321,9 +302,6 @@ internalExecute()
 					message <<"Convertion en un bloc structuré impossible pour le volume "<<getGeomEntity()->getName();
 					throw TkUtil::Exception(message);
 				}
-
-				if (m_insertionBlock)
-					g2t.convertInsertionBlock();
 
 				addCreatedBlock(g2t.getBlock());
 			}
@@ -435,8 +413,7 @@ void CommandNewTopoOnGeometry::getPreviewRepresentation(Utils::DisplayRepresenta
 void CommandNewTopoOnGeometry::createSpherePartBlock()
 {
 	// cas avec dégénérescence à l'origine
-	Topo::Block* bloc = new Topo::Block(getContext(), m_nj, m_nk, m_ni,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+	Topo::Block* bloc = new Topo::Block(getContext(), m_nj, m_nk, m_ni);
 
 	addCreatedBlock(bloc);
 	split();
@@ -480,8 +457,7 @@ void CommandNewTopoOnGeometry::createSpherePartBlock()
 void CommandNewTopoOnGeometry::createHollowSpherePartBlock()
 {
 	// cas d'un bloc régulier
-	Topo::Block* bloc = new Topo::Block(getContext(), m_nj, m_nk, m_ni,
-			BlockMeshingProperty::directional, BlockMeshingProperty::dir_k);
+	Topo::Block* bloc = new Topo::Block(getContext(), m_nj, m_nk, m_ni);
 
 	addCreatedBlock(bloc);
 	split();

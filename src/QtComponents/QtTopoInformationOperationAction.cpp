@@ -350,15 +350,7 @@ void QtTopoInformationOperationPanel::autoUpdate ( )
 	    	Topo::Block* bloc = *iter;
 	    	size_t nb = bloc->getMeshingData()->regions().size();
 	    	nb_regions_tot += nb;
-	    	if (bloc->getMeshLaw() == Topo::BlockMeshingProperty::directional){
-	    		nb_dom_str_dir += 1;
-	    		nb_regions_str_dir += nb;
-	    	}
-	    	else if (bloc->getMeshLaw() == Topo::BlockMeshingProperty::rotational){
-	    		nb_dom_str_rot += 1;
-	    		nb_regions_str_rot += nb;
-	    	}
-	    	else if (bloc->getMeshLaw() == Topo::BlockMeshingProperty::transfinite){
+	    	if (bloc->getMeshLaw() == Topo::BlockMeshingProperty::transfinite){
 	    		nb_dom_str_trans  += 1;
 	    		nb_regions_str_trans += nb;
 	    	}

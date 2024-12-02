@@ -13,7 +13,6 @@
 #include "Topo/Block.h"
 #include "Topo/TopoHelper.h"
 #include "Topo/FaceMeshingPropertyRotational.h"
-#include "Topo/BlockMeshingPropertyRotational.h"
 #include "Topo/CommandDuplicateTopo.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
@@ -152,28 +151,6 @@ transform(Block* bl, gp_Trsf* transf, std::map<TopoEntity*, bool>& filtre)
         }
     }
 
-    // cas d'une rotation ou d'une translation, il peut être nécessaire de modifier l'axe
-    if (bl->getMeshLaw() == Topo::BlockMeshingProperty::rotational){
-        BlockMeshingPropertyRotational* bmp = dynamic_cast<BlockMeshingPropertyRotational*>(bl->getBlockMeshingProperty());
-        CHECK_NULL_PTR_ERROR(bmp);
-        Utils::Math::Point axis[2];
-        bmp->getAxis(axis[0], axis[1]);
-
-        for (uint i=0; i<2; i++){
-            double x = axis[i].getX();
-            double y = axis[i].getY();
-            double z = axis[i].getZ();
-
-            transf->Transforms(x, y, z);
-
-            axis[i].setX(x);
-            axis[i].setY(y);
-            axis[i].setZ(z);
-        }
-        bl->saveBlockMeshingProperty(&getInfoCommand());
-        bmp->setAxis(axis[0], axis[1]);
-    }
-
     filtre[bl] = 1;
 }
 /*----------------------------------------------------------------------------*/
@@ -193,28 +170,6 @@ transform(Block* bl, gp_GTrsf* transf, std::map<TopoEntity*, bool>& filtre)
                 iter2 != cofaces.end(); ++iter2){
             transform(*iter2, transf, filtre);
         }
-    }
-
-    // cas d'une rotation ou d'une translation, il peut être nécessaire de modifier l'axe
-    if (bl->getMeshLaw() == Topo::BlockMeshingProperty::rotational){
-        BlockMeshingPropertyRotational* bmp = dynamic_cast<BlockMeshingPropertyRotational*>(bl->getBlockMeshingProperty());
-        CHECK_NULL_PTR_ERROR(bmp);
-        Utils::Math::Point axis[2];
-        bmp->getAxis(axis[0], axis[1]);
-
-        for (uint i=0; i<2; i++){
-            double x = axis[i].getX();
-            double y = axis[i].getY();
-            double z = axis[i].getZ();
-
-            transf->Transforms(x, y, z);
-
-            axis[i].setX(x);
-            axis[i].setY(y);
-            axis[i].setZ(z);
-        }
-        bl->saveBlockMeshingProperty(&getInfoCommand());
-        bmp->setAxis(axis[0], axis[1]);
     }
 
     filtre[bl] = 1;

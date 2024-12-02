@@ -14,11 +14,7 @@
 #include "QtComponents/QtMgx3DTopoOperationAction.h"
 #include "QtComponents/RenderingManager.h"
 #include "Topo/BlockMeshingPropertyTransfinite.h"
-#include "Topo/BlockMeshingPropertyDirectional.h"
-#include "Topo/BlockMeshingPropertyOrthogonal.h"
-#include "Topo/BlockMeshingPropertyRotational.h"
 #include "Topo/BlockMeshingPropertyDelaunayTetgen.h"
-#include "Topo/BlockMeshingPropertyInsertion.h"
 
 #include <QtUtil/QtIntTextField.h>
 
@@ -70,316 +66,6 @@ class QtBlockTransfinitePanel : public QtMgx3DOperationsSubPanel
 	QtBlockTransfinitePanel (const QtBlockTransfinitePanel&);
 	QtBlockTransfinitePanel& operator = (const QtBlockTransfinitePanel&);
 };	// class QtBlockTransfinitePanel
-
-
-/**
- * Le paramétrage d'un maillage directionnel.
- */
-class QtBlockDirectionalPanel : public QtMgx3DOperationsSubPanel
-{
-	Q_OBJECT
-
-	public :
-
-	/**
-	 * \param		Widget parent
-	 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement,
-	 *				utilisée notamment pour récupérer le contexte.
-	 * \param		Eventuel panneau de rattachement.
-	 */
-	QtBlockDirectionalPanel (
-				QWidget* parent, Mgx3D::QtComponents::QtMgx3DMainWindow& mw,
-				QtMgx3DOperationPanel* mainPanel = 0);
-
-	/**
-	 * Destructeur. RAS.
-	 */
-	virtual ~QtBlockDirectionalPanel ( );
-
-	/**
-	 * Réinitialise le panneau.
-	 */
-	virtual void reset ( );
-
-	/**
-	 * Méthode appelée lorsque l'utilisateur suspend l'édition de l'opération.
-	 * cf. spécifications de la classe de base.
-	 */
-	virtual void cancel ( );
-
-	/**
-	 * Actualise le panneau en fonction du contexte.
-	 * cf. spécifications de la classe de base.
-	 */
-	virtual void autoUpdate ( );
-
-	/**
-	 * \param		<I>true</I> pour prévisualiser l'opération, <I>false</I>
-	 * 				pour arrêter la prévisualisation.
-	 * \param		non utilisé
-	 */
-	virtual void preview (bool on, bool destroyInteractor);
-
-	/**
-	 * Affiche/masque la fenêtre, et les éventuelles informations de
-	 * prévisualisation.
-	 */
-	virtual void setVisible (bool visible);
-
-	/**
-	 * \return		Le point de départ définissant le vecteur directionnel.
-	 * \see			getPoint2
-	 */
-	virtual Mgx3D::Utils::Math::Point getPoint1 ( ) const;
-
-	/**
-	 * \return		Le point d'arrivée définissant le vecteur directionnel.
-	 * \see			getPoint1
-	 */
-	virtual Mgx3D::Utils::Math::Point getPoint2 ( ) const;
-
-	/**
-	 * \return		La propriété de maillage de du bloc conforme au panneau.
-	 */
-	virtual Mgx3D::Topo::BlockMeshingPropertyDirectional*
-											getMeshingProperty ( ) const; 
-
-	/**
-	 * Faut-il inverser le vecteur donné par l'arête ?
-	 */
-	virtual bool isEdgeInverted ( ) const;
-
-	/**
-	 * \return	<I>true</I> s'il faut utiliser le nom de l'arête, <I>false</I>
-	 * 			s'il faut utiliser le vecteur associé.
-	 * \see		getEdgeName
-	 */
-	 virtual bool useEdgeName ( ) const;
-
-	/**
-	 * \return	Le nom de l'arête directionnelle
-	 */
-	virtual std::string getEdgeName ( ) const;
-
-	/**
-	 * Quitte le mode sélection interactive.
-	 */
-	virtual void stopSelection ( );
-
-	/**
-	 * \return		Le champ de saisie de l'arête directionnelle.
-	 */
-	virtual QtEntityIDTextField* getEdgeTextField ( );
-
-
-	protected slots :
-
-	/**
-	 * Appelé lorsqu'un paramètre à changé : actualise les informations
-	 * affichées.
-	 */
-	virtual void directionModifiedCallback ( );
-
-
-	private :
-
-	/**
-	 * Constructeur de copie et opérateur = : interdits.
-	 */
-	QtBlockDirectionalPanel (const QtBlockDirectionalPanel&);
-	QtBlockDirectionalPanel& operator = (const QtBlockDirectionalPanel&);
-
-	/** La saisie du vecteur directeur. */
-	QtMgx3DEdgePanel*						_edgeTextField;
-
-	/** Le vecteur directionnel est-il à inverser ? */
-	QCheckBox*								_invertCheckBox;
-
-	/** Le vecteur donnant la direction. */
-	QLabel*									_directionLabel;
-
-	/** Utiliser le nom de l'arête ou le vecteur associé ? */
-	QCheckBox*								_useEdgeNameCheckBox;
-};	// class QtBlockDirectionalPanel
-
-
-/**
- * Le paramétrage d'un maillage <I>Orthogonal</I>.
- */
-class QtBlockOrthogonalPanel : public QtBlockDirectionalPanel
-{
-	public :
-
-	/**
-	 * \param		Widget parent
-	 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement,
-	 *				utilisée notamment pour récupérer le contexte.
-	 * \param		Eventuel panneau de rattachement.
-	 */
-	QtBlockOrthogonalPanel (
-				QWidget* parent, Mgx3D::QtComponents::QtMgx3DMainWindow& mw,
-				QtMgx3DOperationPanel* mainPanel = 0);
-
-	/**
-	 * Destructeur. RAS.
-	 */
-	virtual ~QtBlockOrthogonalPanel ( );
-
-	/**
-	 * Réinitialise le panneau.
-	 */
-	virtual void reset ( );
-
-	/**
-	 * \return		La propriété de maillage du bloc conforme au panneau.
-	 */
-	virtual Mgx3D::Topo::BlockMeshingPropertyOrthogonal*
-											getMeshingProperty ( ) const;
-
-	/**
-	 * \return		Le nombre de couches.
-	 */
-	virtual size_t getLayersNum ( ) const;
-
-
-	private :
-
-	/**
-	 * Constructeur de copie et opérateur = : interdits.
-	 */
-	QtBlockOrthogonalPanel (const QtBlockOrthogonalPanel&);
-	QtBlockOrthogonalPanel& operator = (const QtBlockOrthogonalPanel&);
-
-	/** Le nombre de couches. */
-	QtIntTextField*		_layersNumTextField;
-};	// class QtBlockOrthogonalPanel
-
-
-/**
- * Le paramétrage d'un maillage rotationel. La rotation est définie par
- * l'axe de rotation et la direction selon laquelle s'effectue le maillage.
- */
-class QtBlockRotationalPanel : public QtMgx3DOperationsSubPanel
-{
-	public :
-
-	/**
-	 * \param		Widget parent
-	 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement,
-	 *				utilisée notamment pour récupérer le contexte.
-	 * \param		Eventuel panneau de rattachement.
-	 */
-	QtBlockRotationalPanel (
-				QWidget* parent, Mgx3D::QtComponents::QtMgx3DMainWindow& mw,
-				QtMgx3DOperationPanel* mainPanel = 0);
-
-	/**
-	 * Destructeur. RAS.
-	 */
-	virtual ~QtBlockRotationalPanel ( );
-
-	/**
-	 * Réinitialise le panneau.
-	 */
-	virtual void reset ( );
-
-	/**
-	 * Méthode appelée lorsque l'utilisateur suspend l'édition de l'opération.
-	 * cf. spécifications de la classe de base.
-	 */
-	virtual void cancel ( );
-
-	/**
-	 * Actualise le panneau en fonction du contexte.
-	 * cf. spécifications de la classe de base.
-	 */
-	virtual void autoUpdate ( );
-
-	/**
-	 * \param		<I>true</I> pour prévisualiser l'opération, <I>false</I>
-	 * 				pour arrêter la prévisualisation.
-	 * \param		non utilisé
-	 */
-	virtual void preview (bool on, bool destroyInteractor);
-
-	/**
-	 * Affiche/masque la fenêtre, et les éventuelles informations de
-	 * prévisualisation.
-	 */
-	virtual void setVisible (bool visible);
-
-	/**
-	 * \return		Le point de départ définissant la direction de la rotation.
-	 * \see			getDirPoint2
-	 * \see			getAxePoint1
-	 */
-	virtual Mgx3D::Utils::Math::Point getDirPoint1 ( ) const;
-
-	/**
-	 * \return		Le point d'arrivée définissant la direction de la rotation.
-	 * \see			getDirPoint1
-	 */
-	virtual Mgx3D::Utils::Math::Point getDirPoint2 ( ) const;
-
-	/**
-	 * \return		Le point de départ définissant l'axe de rotation.
-	 * \see			getAxePoint2
-	 * \see			getDirPoint1
-	 */
-	virtual Mgx3D::Utils::Math::Point getAxePoint1 ( ) const;
-
-	/**
-	 * \return		Le point d'arrivée définissant l'axe de rotation.
-	 * \see			getAxePoint1
-	 */
-	virtual Mgx3D::Utils::Math::Point getAxePoint2 ( ) const;
-
-	/**
-	 * \return		La propriété de maillage de du bloc conforme au panneau.
-	 */
-	virtual Mgx3D::Topo::BlockMeshingPropertyRotational* getMeshingProperty ( ) const;
-
-	/**
-	 * Quitte le mode sélection interactive.
-	 */
-	virtual void stopSelection ( );
-
-	/**
-	 * \return		Le champ de saisie de l'arête directionnelle.
-	 */
-	virtual QtEntityIDTextField* getEdgeTextField ( );
-
-	/**
-	 * \return		Le champ de saisie du premier point de l'axe de rotation.
-	 */
-	virtual QtEntityIDTextField* getAxePoint1TextField ( );
-
-	/**
-	 * \return		Le champ de saisie du second point de l'axe de rotation.
-	 */
-	virtual QtEntityIDTextField* getAxePoint2TextField ( );
-
-
-	private :
-
-	/**
-	 * Constructeur de copie et opérateur = : interdits.
-	 */
-	QtBlockRotationalPanel (const QtBlockRotationalPanel&);
-	QtBlockRotationalPanel& operator = (const QtBlockRotationalPanel&);
-
-	/** La saisie de l'arête donnant la direction du maillage. */
-	QtMgx3DEdgePanel*						_directionTextField;
-
-	/** La saisie de 2 points permettant de définir l'axe de rotation. */
-	QtMgx3DPointPanel						*_axePoint1Panel, *_axePoint2Panel;
-
-	/** Le vecteur donnant la direction. */
-	QLabel*									_directionLabel;
-
-	/** Le vecteur donnant l'axe de rotation. */
-	QLabel*									_axeLabel;
-};	// class QtBlockRotationalPanel
 
 
 /**
@@ -444,45 +130,6 @@ class QtBlockDelaunayTetgenPanel : public QtMgx3DOperationsSubPanel
 
 
 /**
- * Le paramétrage d'un maillage par insertion de maillage.
- */
-class QtBlockMeshInsertionPanel : public QtMgx3DOperationsSubPanel
-{
-	public :
-
-	/**
-	 * \param		Widget parent
-	 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement,
-	 *				utilisée notamment pour récupérer le contexte.
-	 * \param		Eventuel panneau de rattachement.
-	 */
-	QtBlockMeshInsertionPanel (
-				QWidget* parent, Mgx3D::QtComponents::QtMgx3DMainWindow& mw,
-				QtMgx3DOperationPanel* mainPanel = 0);
-
-	/**
-	 * Destructeur. RAS.
-	 */
-	virtual ~QtBlockMeshInsertionPanel ( );
-
-	/**
-	 * \return		La propriété de maillage de du bloc conforme au panneau.
-	 */
-	virtual Mgx3D::Topo::BlockMeshingPropertyInsertion*
-											getMeshingProperty ( ) const;
-
-
-	private :
-
-	/**
-	 * Constructeur de copie et opérateur = : interdits.
-	 */
-	QtBlockMeshInsertionPanel (const QtBlockMeshInsertionPanel&);
-	QtBlockMeshInsertionPanel& operator = (const QtBlockMeshInsertionPanel&);
-};	// class QtBlockMeshInsertionPanel
-
-
-/**
  * Panneau d'édition des paramètres de maillage de blocs topologiques.
  */
 class QtBlockMeshingPropertyPanel : public QtMgx3DOperationPanel
@@ -494,13 +141,10 @@ class QtBlockMeshingPropertyPanel : public QtMgx3DOperationPanel
 	/** La méthode de maillage de du bloc.
 	 * <OL>
 	 * <LI>Maillage structuré transfini,
-	 * <LI>Maillage structuré directionnel
-	 * <LI>Maillage structuré directionnel orthogonal
-	 * <LI>Maillage structuré rotationnel
 	 * <LI>Maillage non structuré Delaunay généré par <I>Tetgen</I>
 	 * </OL>
 	 */
-	enum OPERATION_METHOD { TRANSFINITE, DIRECTIONAL, ORTHOGONAL, ROTATIONAL, DELAUNAY_TETGEN, MESH_INSERTION };
+	enum OPERATION_METHOD { TRANSFINITE, DELAUNAY_TETGEN };
 
 	/**
 	 * Créé l'ihm.
@@ -629,20 +273,8 @@ class QtBlockMeshingPropertyPanel : public QtMgx3DOperationPanel
 	/** Maillage transfini. */
 	QtBlockTransfinitePanel*					_transfinitePanel;
 
-	/** Maillage structuré directionnel. */
-	QtBlockDirectionalPanel*					_directionalPanel;
-
-	/** Maillage structuré directionnel orthogonal. */
-	QtBlockOrthogonalPanel*						_orthogonalPanel;
-
-	/** Maillage structuré rotationnel. */
-	QtBlockRotationalPanel*						_rotationalPanel;
-
 	/** Maillage non structuré Delaunay généré avec <I>Tetgen</I>. */
 	QtBlockDelaunayTetgenPanel*					_delaunayTetgenPanel;
-
-	/** Maillage non structuré obtenu par insertion de maillage. */
-	QtBlockMeshInsertionPanel*					_meshInsertionPanel;
 
 	//@}	// Panneaux de saisie des paramètres de définition du vertex
 

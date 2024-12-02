@@ -16,7 +16,6 @@
 #include "Topo/BlockTopoProperty.h"
 #include "Topo/BlockMeshingProperty.h"
 #include "Topo/BlockMeshingPropertyDelaunayTetgen.h"
-#include "Topo/BlockMeshingPropertyDirectional.h"
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
 /*----------------------------------------------------------------------------*/
@@ -610,21 +609,6 @@ internalExecute()
             if (bloc->getVertex(4) == bloc->getVertex(5))
                 bloc->getBlockTopoProperty()->getVertexContainer().set(5, bloc->getVertex(6));
             bloc->getBlockTopoProperty()->getVertexContainer().resize(6);
-        }
-        else if (!bloc->isStructured() && bloc->getNbVertices() == 7 && filtre_block[bloc] == 1){
-#ifdef _DEBUG_SNAP
-            std::cout<<"  bloc "<<bloc->getName()
-                     <<" avec dégénérescence en prisme [cas non structuré]"<<std::endl;
-            std::cout<<*bloc<<std::endl;
-#endif
-            if (bloc->getVertex(4) == bloc->getVertex(5))
-                bloc->getBlockTopoProperty()->getVertexContainer().set(5, bloc->getVertex(6));
-            bloc->getBlockTopoProperty()->getVertexContainer().resize(6);
-
-            // on le déclare structuré
-            BlockMeshingProperty* prop = new BlockMeshingPropertyDirectional(BlockMeshingProperty::dir_k);
-            bloc->switchBlockMeshingProperty(&getInfoCommand(), prop);
-            delete prop;
         }
         else {
 #ifdef _DEBUG_SNAP

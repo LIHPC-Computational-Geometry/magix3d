@@ -70,9 +70,7 @@ public:
 
     /*------------------------------------------------------------------------*/
     /// Constructeur par défaut, maillage structuré
-    Block(Internal::Context& c, int ni=0, int nj=0, int nk=0,
-            BlockMeshingProperty::meshLaw ml = BlockMeshingProperty::directional,
-            BlockMeshingProperty::meshDirLaw md = BlockMeshingProperty::dir_i);
+    Block(Internal::Context& c, int ni=0, int nj=0, int nk=0);
 
     /*------------------------------------------------------------------------*/
     /// Constructeur par copie
@@ -543,20 +541,6 @@ private:
     /*------------------------------------------------------------------------*/
     /// met à jour les associations
     void _init();
-
-    /*------------------------------------------------------------------------*/
-    /** Affecte à une face une méthode de maillage suivant une direction (ou rotation)
-     *  si cela est possible
-     *  c'est à dire, si cela suit une des arêtes de la face
-     *  Ne fait rien si c'est orthogonal à la face
-     *
-     * \param new_ppty une méthode de maillage suivant une direction ou une rotation
-     * \param dirCoedges les arêtes qui suivent la direction de la méthode de maillage
-     * \param coface la face pour laquelle on cherche à mettre la même direction de maillage
-     */
-    void _setDirectionMeshLawToFace(BlockMeshingProperty* new_ppty,
-            std::vector<Topo::CoEdge* >& dirCoedges,
-            Topo::CoFace* coface);
 
     /*------------------------------------------------------------------------*/
     /// propriétés topologiques de l'arête (liens sur les faces et les sommets)
