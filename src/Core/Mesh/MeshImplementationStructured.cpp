@@ -21,9 +21,6 @@
 #include "Topo/FaceMeshingPropertyOrthogonal.h"
 #include "Topo/FaceMeshingPropertyRotational.h"
 #include "Topo/BlockMeshingData.h"
-#include "Topo/BlockMeshingPropertyRotational.h"
-#include "Topo/BlockMeshingPropertyDirectional.h"
-#include "Topo/BlockMeshingPropertyOrthogonal.h"
 #include "Topo/TopoHelper.h"
 
 #include "Utils/Common.h"
@@ -102,10 +99,6 @@ void MeshImplementation::preMeshStrutured(Topo::Block* bl)
 	TkUtil::UTF8String	message1 (TkUtil::Charset::UTF_8);
     message1 <<"Maillage du bloc structuré "<<bl->getName()<<" avec la méthode "
             << bl->getMeshLawName();
-    if (bl->getMeshLaw() == Topo::BlockMeshingProperty::rotational
-            || bl->getMeshLaw() == Topo::BlockMeshingProperty::directional
-			|| bl->getMeshLaw() == Topo::BlockMeshingProperty::orthogonal)
-        message1 << " et direction "<<(short)bl->getBlockMeshingProperty()->getDir();
     std::vector<std::string> groupsName;
     bl->getGroupsName(groupsName);
     message1 << "\n GroupsName :";
@@ -339,130 +332,6 @@ void MeshImplementation::preMeshStrutured(Topo::Block* bl)
 
     if (bl->getMeshLaw() == Topo::BlockMeshingProperty::transfinite){
         discretiseTransfinie(nbBrasI, nbBrasJ, nbBrasK, l_points);
-    }
-    else if (bl->getMeshLaw() == Topo::BlockMeshingProperty::rotational){
-
-        Topo::BlockMeshingPropertyRotational* bmp = dynamic_cast<Topo::BlockMeshingPropertyRotational*>(bl->getBlockMeshingProperty());
-        CHECK_NULL_PTR_ERROR(bmp);
-        Utils::Math::Point axis1;
-        Utils::Math::Point axis2;
-        bmp->getAxis(axis1, axis2);
-        uint dir = bmp->getDir();
-
-        discretiseRotation(nbBrasI, nbBrasJ, nbBrasK, l_points, axis1, axis2, dir);
-
-    }
-    else if (bl->getMeshLaw() == Topo::BlockMeshingProperty::directional
-			|| bl->getMeshLaw() == Topo::BlockMeshingProperty::orthogonal){
-        Topo::BlockMeshingPropertyDirectional* bmp = dynamic_cast<Topo::BlockMeshingPropertyDirectional*>(bl->getBlockMeshingProperty());
-        CHECK_NULL_PTR_ERROR(bmp);
-        uint dir = bmp->getDir();
-        Topo::CoEdgeMeshingProperty *empDir[3];
-        uint nbBrasDir[3];
-        nbBrasDir[0] = nbBrasI;
-        nbBrasDir[1] = nbBrasJ;
-        nbBrasDir[2] = nbBrasK;
-
-        std::vector<Topo::CoEdge* > iCoedges[3];
-        bl->getOrientedCoEdges(iCoedges[0], iCoedges[1], iCoedges[2]);
-
-        // recherche des ratios par arête dans le bloc
-        std::map<Topo::CoEdge*,uint> ratios;
-        bl->getRatios(ratios);
-
-        // construction d'un tableau avec les 8 sommets en duplicant les sommets en cas de dégénérescence
-        std::vector<Topo::Vertex* > sommets;
-        bl->getHexaVertices(sommets);
-
-        uint dir_bl = bl->getBlockMeshingProperty()->getDir();
-        for (uint i=0; i<3; i++)
-            if (dir_bl != i)
-                empDir[i] = new Topo::EdgeMeshingPropertyUniform(nbBrasDir[i]);
-            else
-                empDir[i] = 0;
-
-        // recherche parmis les arêtes suivant la direction, si l'une d'elle ne serait composée que d'1 CoEdge
-        for (uint j=0; j<4; j++){
-            Topo::Vertex* vtx1 = sommets[Topo::TopoHelper::tabIndVtxByEdgeAndDirOnBlock[bl->getBlockMeshingProperty()->getDir()][j][0]];
-            Topo::Vertex* vtx2 = sommets[Topo::TopoHelper::tabIndVtxByEdgeAndDirOnBlock[bl->getBlockMeshingProperty()->getDir()][j][1]];
-
-            if (vtx1 != vtx2 && empDir[dir_bl] == 0){
-                std::vector<Topo::CoEdge* > coedges_between;
-                Topo::TopoHelper::getCoEdgesBetweenVertices(vtx1, vtx2, iCoedges[dir_bl], coedges_between);
-
-                if (coedges_between.size() == 1){
-
-                    // recherche s'il n'y aurait pas un déraffinement de cette arête
-                    // si c'est le cas, on ne réutilise pas MeshingProperty de cette arête.
-                    Topo::CoEdge* coedge = coedges_between[0];
-
-                    if (ratios[coedge] == 1){
-                        empDir[dir_bl] = coedge->getMeshingProperty()->clone();
-
-                        if (coedge->getVertex(0) != vtx1)
-                            empDir[dir_bl]->setDirect(!empDir[dir_bl]->getDirect());
-#ifdef _DEBUG_MESH
-                        std::cout<<" réutilisation de la discrétisation de l'arête "<<coedge->getName()<<std::endl;
-                        std::cout<<" vtx1 = "<<vtx1->getName()<<", vtx2 = "<<vtx2->getName()<<std::endl;
-                        std::cout<<" arête dont on prend la discrétisation: "<<*coedge;
-#endif
-                    }
-                }
-            }
-        }
-        if (empDir[dir_bl] == 0){
-        	// recherche des points qui correspondent à la discrétisation de l'"arête" du bloc
-        	std::vector<Utils::Math::Point> edge_points;
-            for (uint j=0; j<4; j++){
-                Topo::Vertex* vtx1 = sommets[Topo::TopoHelper::tabIndVtxByEdgeAndDirOnBlock[bl->getBlockMeshingProperty()->getDir()][j][0]];
-                Topo::Vertex* vtx2 = sommets[Topo::TopoHelper::tabIndVtxByEdgeAndDirOnBlock[bl->getBlockMeshingProperty()->getDir()][j][1]];
-
-                if (vtx1 != vtx2 && edge_points.empty()){
-                    std::vector<Topo::CoEdge* > coedges_between;
-                    Topo::TopoHelper::getCoEdgesBetweenVertices(vtx1, vtx2, iCoedges[dir_bl], coedges_between);
-                    Topo::TopoHelper::getPoints(vtx1, vtx2, coedges_between, ratios, edge_points);
-                }
-            }
-
-            if (edge_points.empty()){
-				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-            	message << "Le bloc "<<bl->getName() <<" ne respecte certainement pas le type de discrétisation\n";
-            	message << "du fait d'un découpage de toutes ses arêtes communes ou d'un déraffinement";
-            	getContext().getLogStream()->log(TkUtil::TraceLog (message, TkUtil::Log::INFORMATION));
-
-            	empDir[dir_bl] = new Topo::EdgeMeshingPropertyUniform(nbBrasDir[dir_bl]);
-            }
-            else {
-            	// calcul des longueurs des bras
-            	std::vector<double> tabulation;
-            	for (uint i=1; i<edge_points.size(); i++)
-            		tabulation.push_back(edge_points[i].length(edge_points[i-1]));
-
-                // création d'une discrétisation basée sur les points des discrétisations des arêtes
-            	empDir[dir_bl] = new Topo::EdgeMeshingPropertyTabulated(tabulation);
-            }
-        }
-
-        if (bl->getMeshLaw() == Topo::BlockMeshingProperty::orthogonal){
-        	Topo::BlockMeshingPropertyOrthogonal* bmp2 = dynamic_cast<Topo::BlockMeshingPropertyOrthogonal*>(bmp);
-        	CHECK_NULL_PTR_ERROR(bmp2);
-        	uint side = bmp2->getSide();
-        	uint nbLayers = bmp2->getNbLayers();
-        	// recherche de la surface / laquelle il faut être orthogonal
-        	Geom::Surface* surface = 0;
-        	Topo::Face* face = bl->getFace(dir*2+side);
-        	std::vector<Topo::CoFace*> cofaces;
-        	face->getCoFaces(cofaces);
-        	for (uint i=0; i<cofaces.size(); i++)
-        		if (cofaces[i]->getGeomAssociation() != 0)
-        			surface = dynamic_cast<Geom::Surface*>(cofaces[i]->getGeomAssociation());
-        	discretiseOrthogonalPuisCourbe(empDir[0], empDir[1], empDir[2], l_points, dir, side, nbLayers, surface);
-        }
-        else
-        	discretiseDirection(empDir[0], empDir[1], empDir[2], l_points, dir);
-
-        for (uint i=0; i<3; i++)
-            delete empDir[i];
     } else {
     	throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne dans MeshImplementation::meshStrutured pour block, type de maillage invalide", TkUtil::Charset::UTF_8));
     }

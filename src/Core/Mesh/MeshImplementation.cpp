@@ -1082,14 +1082,11 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::Block* bl)
         if (getContext().getMeshDim() == Internal::ContextIfc::MESH2D)
         	throw TkUtil::Exception (TkUtil::UTF8String ("Il n'est pas possible de mailler des blocs alors que le maillage n'est pas 3D en sortie", TkUtil::Charset::UTF_8));
 
-        if (Topo::BlockMeshingProperty::insertion != bl->getMeshLaw()){
-
-            std::vector<Topo::Face* > faces;
-            bl->getFaces(faces);
-            for (uint i=0; i<faces.size(); i++) {
-                mesh(command, faces[i]);
-            }
-        }
+		std::vector<Topo::Face* > faces;
+		bl->getFaces(faces);
+		for (uint i=0; i<faces.size(); i++) {
+			mesh(command, faces[i]);
+		}
 
         bl->saveBlockMeshingData(&command->getInfoCommand());
 
@@ -1099,20 +1096,11 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::Block* bl)
         else if (bl->getMeshLaw() == Topo::BlockMeshingProperty::delaunayTetgen){
             meshDelaunayTetgen(command,bl);
         }
-        else if (bl->getMeshLaw() == Topo::BlockMeshingProperty::insertion){
-            meshInsertion(command,bl);
-        }
         else {
             throw TkUtil::Exception (TkUtil::UTF8String ("MeshImplementation::mesh(Topo::Block* bl) pour une méthode inconnue", TkUtil::Charset::UTF_8));
         }
         bl->getMeshingData()->setMeshed(true);
     } // end if (!bl->isMeshed())
-    else {
-        if (bl->getMeshLaw() == Topo::BlockMeshingProperty::insertion) {
-            throw TkUtil::Exception (TkUtil::UTF8String ("MeshImplementation::mesh(Topo::Block* bl) pour la méthode "
-                    "insertion alors que le bloc est déjà maillé", TkUtil::Charset::UTF_8));
-        }
-    }
 
 }
 /*----------------------------------------------------------------------------*/

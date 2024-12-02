@@ -28,9 +28,6 @@
 #include "Topo/FaceMeshingPropertyRotational.h"
 #include "Topo/FaceMeshingPropertyTransfinite.h"
 #include "Topo/FaceMeshingPropertyDelaunayGMSH.h"
-#include "Topo/BlockMeshingPropertyDirectional.h"
-#include "Topo/BlockMeshingPropertyOrthogonal.h"
-#include "Topo/BlockMeshingPropertyRotational.h"
 #include "Topo/BlockMeshingPropertyTransfinite.h"
 #include "Topo/BlockMeshingPropertyDelaunayTetgen.h"
 
@@ -158,9 +155,7 @@ Block(Internal::Context& ctx,
 }
 /*----------------------------------------------------------------------------*/
 Block::
-Block(Internal::Context& ctx, int ni, int nj, int nk,
-        BlockMeshingProperty::meshLaw ml,
-        BlockMeshingProperty::meshDirLaw md)
+Block(Internal::Context& ctx, int ni, int nj, int nk)
 : TopoEntity(ctx,
         ctx.newProperty(Utils::Entity::TopoBlock),
         ctx.newDisplayProperties(Utils::Entity::TopoBlock))
@@ -175,11 +170,7 @@ Block(Internal::Context& ctx, int ni, int nj, int nk,
     message1 << "Block::Block(), dans le cas structuré\n";
     log (TkUtil::TraceLog (message1, TkUtil::Log::TRACE_4));
 
-    // NB, il manque l'axe de rotation pour construire un BlockMeshingPropertyRotational
-    if (ml == BlockMeshingProperty::directional)
-        m_mesh_property =new BlockMeshingPropertyDirectional(md);
-    else
-        m_mesh_property =new BlockMeshingPropertyTransfinite();
+    m_mesh_property = new BlockMeshingPropertyTransfinite();
 
     // bloc avec les sommets équivalents à ceux d'une boite de taille 1
 
@@ -701,55 +692,9 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
     		TopoHelper::getCoEdgesBetweenVertices(getVertex(0), getVertex(4), kCoedges, coedges_dirK);
 
     		// on va prendre la coedge1 et vect1 qui suivent le sens de la discrétisation (s'il y en a un)
-    		CoEdge* coedge1=0;
-    		CoEdge* coedge2=0;
-    		CoEdge* coedge3=0;
-
-    		if (m_mesh_property->getMeshLaw() == BlockMeshingProperty::directional
-    				|| m_mesh_property->getMeshLaw() == BlockMeshingProperty::orthogonal){
-    			BlockMeshingPropertyDirectional* mp = dynamic_cast<BlockMeshingPropertyDirectional*>(m_mesh_property);
-    			CHECK_NULL_PTR_ERROR(mp);
-    			if (mp->getDir() == 1){
-    				coedge1 = coedges_dirJ[0];
-    				coedge2 = coedges_dirI[0];
-    				coedge3 = coedges_dirK[0];
-    			}
-    			else if (mp->getDir() == 2){
-    				coedge1 = coedges_dirK[0];
-    				coedge2 = coedges_dirJ[0];
-    				coedge3 = coedges_dirI[0];
-    			}
-    			else {
-    				coedge1 = coedges_dirI[0];
-    				coedge2 = coedges_dirJ[0];
-    				coedge3 = coedges_dirK[0];
-    			}
-    		}
-    		else if (m_mesh_property->getMeshLaw() == BlockMeshingProperty::rotational){
-    			BlockMeshingPropertyRotational* mp = dynamic_cast<BlockMeshingPropertyRotational*>(m_mesh_property);
-    			CHECK_NULL_PTR_ERROR(mp);
-    			if (mp->getDir() == 1){
-    				coedge1 = coedges_dirJ[0];
-    				coedge2 = coedges_dirI[0];
-    				coedge3 = coedges_dirK[0];
-    			}
-    			else if (mp->getDir() == 2){
-    				coedge1 = coedges_dirK[0];
-    				coedge2 = coedges_dirJ[0];
-    				coedge3 = coedges_dirI[0];
-    			}
-    			else {
-    				coedge1 = coedges_dirI[0];
-    				coedge2 = coedges_dirJ[0];
-    				coedge3 = coedges_dirK[0];
-    			}
-    		}
-    		else {
-    			coedge1 = coedges_dirI[0];
-    			coedge2 = coedges_dirJ[0];
-    			coedge3 = coedges_dirK[0];
-    		}
-
+    		CoEdge* coedge1 = coedges_dirI[0];
+    		CoEdge* coedge2 = coedges_dirJ[0];
+    		CoEdge* coedge3 = coedges_dirK[0];
 
     		std::vector<Utils::Math::Point> points_coedge1;
     		std::vector<Utils::Math::Point> points_coedge2;
@@ -840,48 +785,6 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
     		std::cout<<" vect2 : "<<vect2<<std::endl;
     		std::cout<<" vect3 : "<<vect3<<std::endl;
 #endif
-    		// décalages pour faire apparaitre la courbure, si nécessaire
-    		double dec2 = 0.0;
-    		double dec3 = 0.0;
-    		if (m_mesh_property->getMeshLaw() == BlockMeshingProperty::rotational){
-    			BlockMeshingPropertyRotational* mp = dynamic_cast<BlockMeshingPropertyRotational*>(m_mesh_property);
-    			CHECK_NULL_PTR_ERROR(mp);
-    			Utils::Math::Point axis1, axis2;
-    			mp->getAxis(axis1, axis2);
-
-    			// on cherche à minimiser la distance entre l'axe et l'un des points
-    			// avec l'une des options pour la direction
-    			Utils::Math::Point option1 = (vect1*0.5+vect2*(0.5+0.1)+vect3*(0.5))*ratio+orig;
-    			Utils::Math::Point option2 = (vect1*0.5+vect2*(0.5-0.1)+vect3*(0.5))*ratio+orig;
-    			Utils::Math::Point option3 = (vect1*0.5+vect2*(0.5)+vect3*(0.5+0.1))*ratio+orig;
-    			Utils::Math::Point option4 = (vect1*0.5+vect2*(0.5)+vect3*(0.5-0.1))*ratio+orig;
-
-    			uint best_option = 1;
-    			double dist = (axis1-option1).norme2();
-
-    			if ((axis1-option2).norme2()<dist){
-    				dist = (axis1-option2).norme2();
-    				best_option = 2;
-    			}
-    			if ((axis1-option3).norme2()<dist){
-    				dist = (axis1-option3).norme2();
-    				best_option = 3;
-    			}
-    			if ((axis1-option4).norme2()<dist){
-    				dist = (axis1-option4).norme2();
-    				best_option = 4;
-    			}
-
-    			if (best_option == 1)
-    				dec2 = +0.1;
-    			else if (best_option == 2)
-    				dec2 = -0.1;
-    			else if (best_option == 3)
-    				dec3 = +0.1;
-    			else if (best_option == 4)
-    				dec3 = -0.1;
-    		}
-
     		// on dessine dans le repère vect1 vect2 vect3
     		points.push_back(vect1*0.4+vect2*0.4+vect3*0.2);
     		points.push_back(vect1*0.8+vect2*0.4+vect3*0.2);
@@ -904,25 +807,25 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
     		points.push_back(vect1*0.8+vect2*1.0+vect3*0.8);
 
 
-    		points.push_back(vect1*0.2+vect2*(0.4+dec2)+vect3*(0.4+dec3));
+    		points.push_back(vect1*0.2+vect2*(0.4)+vect3*(0.4));
     		points.push_back(vect1*0.4+vect2*0.4+vect3*0.4);
     		points.push_back(vect1*0.8+vect2*0.4+vect3*0.4);
-    		points.push_back(vect1*1.0+vect2*(0.4+dec2)+vect3*(0.4+dec3));
+    		points.push_back(vect1*1.0+vect2*(0.4)+vect3*(0.4));
 
-    		points.push_back(vect1*0.2+vect2*(0.4+dec2)+vect3*(0.8+dec3));
+    		points.push_back(vect1*0.2+vect2*(0.4)+vect3*(0.8));
     		points.push_back(vect1*0.4+vect2*0.4+vect3*0.8);
     		points.push_back(vect1*0.8+vect2*0.4+vect3*0.8);
-    		points.push_back(vect1*1.0+vect2*(0.4+dec2)+vect3*(0.8+dec3));
+    		points.push_back(vect1*1.0+vect2*(0.4)+vect3*(0.8));
 
-    		points.push_back(vect1*0.2+vect2*(0.8+dec2)+vect3*(0.4+dec3));
+    		points.push_back(vect1*0.2+vect2*(0.8)+vect3*(0.4));
     		points.push_back(vect1*0.4+vect2*0.8+vect3*0.4);
     		points.push_back(vect1*0.8+vect2*0.8+vect3*0.4);
-    		points.push_back(vect1*1.0+vect2*(0.8+dec2)+vect3*(0.4+dec3));
+    		points.push_back(vect1*1.0+vect2*(0.8)+vect3*(0.4));
 
-    		points.push_back(vect1*0.2+vect2*(0.8+dec2)+vect3*(0.8+dec3));
+    		points.push_back(vect1*0.2+vect2*(0.8)+vect3*(0.8));
     		points.push_back(vect1*0.4+vect2*0.8+vect3*0.8);
     		points.push_back(vect1*0.8+vect2*0.8+vect3*0.8);
-    		points.push_back(vect1*1.0+vect2*(0.8+dec2)+vect3*(0.8+dec3));
+    		points.push_back(vect1*1.0+vect2*(0.8)+vect3*(0.8));
 
 
     		indices.push_back(0); indices.push_back(17);
@@ -973,41 +876,6 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
 
 
     		// ajout des flêches
-    		if (m_mesh_property->getMeshLaw() == BlockMeshingProperty::directional
-    				|| m_mesh_property->getMeshLaw() == BlockMeshingProperty::orthogonal){
-    			points.push_back(vect1*1.1+vect2*0.2+vect3*0.4);
-    			points.push_back(vect1*1.1+vect2*0.6+vect3*0.4);
-    			points.push_back(vect1*1.1+vect2*0.4+vect3*0.2);
-    			points.push_back(vect1*1.1+vect2*0.4+vect3*0.6);
-    			points.push_back(vect1*1.3+vect2*0.4+vect3*0.4);
-    		}
-    		else if (m_mesh_property->getMeshLaw() == BlockMeshingProperty::rotational){
-    			if (dec2>0.0){
-    				points.push_back(vect1*1.2+vect2*0.5+vect3*0.4);
-    				points.push_back(vect1*1.0+vect2*0.7+vect3*0.4);
-    				points.push_back(vect1*1.1+vect2*0.6+vect3*0.2);
-    				points.push_back(vect1*1.1+vect2*0.6+vect3*0.6);
-    				points.push_back(vect1*1.2+vect2*0.7+vect3*0.4);
-    			} else if (dec2<0.0){
-    				points.push_back(vect1*1.2+vect2*0.3+vect3*0.4);
-    				points.push_back(vect1*1.0+vect2*0.1+vect3*0.4);
-    				points.push_back(vect1*1.1+vect2*0.2+vect3*0.2);
-    				points.push_back(vect1*1.1+vect2*0.2+vect3*0.6);
-    				points.push_back(vect1*1.2+vect2*0.1+vect3*0.4);
-    			} else if (dec3>0.0){
-    				points.push_back(vect1*1.2+vect3*0.5+vect2*0.4);
-    				points.push_back(vect1*1.0+vect3*0.7+vect2*0.4);
-    				points.push_back(vect1*1.1+vect3*0.6+vect2*0.2);
-    				points.push_back(vect1*1.1+vect3*0.6+vect2*0.6);
-    				points.push_back(vect1*1.2+vect3*0.7+vect2*0.4);
-    			} else if (dec3<0.0){
-    				points.push_back(vect1*1.2+vect3*0.3+vect2*0.4);
-    				points.push_back(vect1*1.0+vect3*0.1+vect2*0.4);
-    				points.push_back(vect1*1.1+vect3*0.2+vect2*0.2);
-    				points.push_back(vect1*1.1+vect3*0.2+vect2*0.6);
-    				points.push_back(vect1*1.2+vect3*0.1+vect2*0.4);
-    			}
-    		}
     		if (points.size() > 32){
     			indices.push_back(19); indices.push_back(36);
     			indices.push_back(32); indices.push_back(36);
@@ -1015,26 +883,6 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
     			indices.push_back(34); indices.push_back(36);
     			indices.push_back(35); indices.push_back(36);
     		}
-    		if (m_mesh_property->getMeshLaw() == BlockMeshingProperty::orthogonal){
-    			uint id = points.size();
-    			points.push_back(vect1*0.5+vect2*0.4+vect3*0.4);
-    			points.push_back(vect1*0.4+vect2*0.5+vect3*0.4);
-    			points.push_back(vect1*0.4+vect2*0.4+vect3*0.5);
-    			points.push_back(vect1*0.5+vect2*0.5+vect3*0.4);
-    			points.push_back(vect1*0.4+vect2*0.5+vect3*0.5);
-    			points.push_back(vect1*0.5+vect2*0.4+vect3*0.5);
-    			//points.push_back(vect1*0.5+vect2*0.5+vect3*0.5);
-    			indices.push_back(id+0); indices.push_back(id+3);
-    			indices.push_back(id+1); indices.push_back(id+3);
-    			indices.push_back(id+1); indices.push_back(id+4);
-    			indices.push_back(id+2); indices.push_back(id+4);
-    			indices.push_back(id+0); indices.push_back(id+5);
-    			indices.push_back(id+2); indices.push_back(id+5);
-//    			indices.push_back(id+3); indices.push_back(id+6);
-//    			indices.push_back(id+4); indices.push_back(id+6);
-//    			indices.push_back(id+5); indices.push_back(id+6);
-    		}
-
     	} // end if (isStructured())
     	else {
 
@@ -2759,20 +2607,9 @@ split(CoEdge* arete, double ratio,
     timer.reset();
     timer.start();
 #endif
-    if (getMeshLaw() == BlockMeshingProperty::directional){
-        // pour le cas d'un découpage unidirectionnel,
-        // on recherche une direction acceptable dans les 2 blocs
-#ifdef _DEBUG_SPLIT
-        std::cout<<" cas d'un bloc ("<<getName()<<") avec MeshLaw à "<<getMeshLawName()<<std::endl;
-#endif
-        block_1->selectBasicMeshLaw(icmd);
-        block_2->selectBasicMeshLaw(icmd);
-    }
-    else {
-        // on clone la méthode de discrétiasation
-        block_1->switchBlockMeshingProperty(icmd, getBlockMeshingProperty());
-        block_2->switchBlockMeshingProperty(icmd, getBlockMeshingProperty());
-    }
+    // on clone la méthode de discrétiasation
+    block_1->switchBlockMeshingProperty(icmd, getBlockMeshingProperty());
+    block_2->switchBlockMeshingProperty(icmd, getBlockMeshingProperty());
 #ifdef _DEBUG_TIMER
     timer.stop();
     std::cout<<" sélection du type de maillage en "<<timer.strDuration()<<std::endl;
@@ -3106,24 +2943,6 @@ permuteToKmaxFace(uint id, Internal::InfoCommand* icmd)
     // un filtre sur les sommets pour éviter de trouver les edges qui sont toutes en double depuis l'utilisation des CoEdge
     std::map<Topo::Vertex*, uint> filtre_sommets;
 
-    // mémorisation de la direction à l'aide d'un couple de sommets
-    Topo::Vertex* dirVertex1;
-    Topo::Vertex* dirVertex2;
-    if (getMeshLaw() == BlockMeshingProperty::directional
-    		|| getMeshLaw() == BlockMeshingProperty::orthogonal){
-    	BlockMeshingPropertyDirectional* prop =
-    			dynamic_cast<Topo::BlockMeshingPropertyDirectional*>(getBlockMeshingProperty());
-    	CHECK_NULL_PTR_ERROR(prop);
-    	dirVertex1 = getVertex(0);
-    	uint dir = prop->getDir();
-    	if (dir == 0)
-    		dirVertex2 = getVertex(1);
-    	else if (dir == 1)
-    		dirVertex2 = getVertex(2);
-    	else if (dir == 2)
-    		dirVertex2 = getVertex(4);
-    }
-
     // les arêtes du bloc
     std::vector<Edge* > edges;
     getEdges(edges);
@@ -3275,13 +3094,6 @@ permuteToKmaxFace(uint id, Internal::InfoCommand* icmd)
     m_topo_property->getFaceContainer().clear();
     m_topo_property->getFaceContainer().add(sorted_faces);
 
-    // on recherche la direction initiale
-    if (getMeshLaw() == BlockMeshingProperty::directional){
-        BlockMeshingPropertyDirectional* prop = new BlockMeshingPropertyDirectional(dirVertex1->getCoord(), dirVertex2->getCoord());
-        prop->initDir(this);
-        switchBlockMeshingProperty(icmd, prop);
-        delete prop;
-    }
 #ifdef _DEBUG_PERM
     std::cout<<" ==> Block : "<<*this<<std::endl;
 #endif
@@ -3482,16 +3294,6 @@ setMeshLaw(BlockMeshingProperty* new_ppty)
     BlockMeshingProperty* old_ppty = setProperty(new_ppty);
     delete old_ppty;
 
-    // recherche des arêtes qui suivent la direction du maillage
-    // si direction il y a
-    std::vector<Topo::CoEdge* > iCoedges[3];
-    eDirOnBlock dir = unknown;
-    if (new_ppty->getMeshLaw() == BlockMeshingProperty::directional
-            || new_ppty->getMeshLaw() == BlockMeshingProperty::rotational){
-        getOrientedCoEdges(iCoedges[0], iCoedges[1], iCoedges[2]);
-        dir = (eDirOnBlock)new_ppty->getDir();
-    }
-
     std::vector<Topo::Face* > faces;
     getFaces(faces);
     for (std::vector<Topo::Face* >::iterator iter1 = faces.begin();
@@ -3504,21 +3306,12 @@ setMeshLaw(BlockMeshingProperty* new_ppty)
             Topo::CoFace* coface = face->getCoFace(j);
 
             // cas où on affecte une méthode structurée
-            if (new_ppty->isStructured()){
-
-                if (new_ppty->getMeshLaw() == BlockMeshingProperty::transfinite) {
-                    FaceMeshingPropertyTransfinite* prop = new FaceMeshingPropertyTransfinite();
-                    CoFaceMeshingProperty* old_prop = coface->setProperty(prop);
-                    delete old_prop;
-                }
-                else {
-                    // il faut retrouver la direction par rapport à la face
-                    // et l'affecter si possible
-                    _setDirectionMeshLawToFace(new_ppty, iCoedges[dir], coface);
-                }
-            }
-            // si méthode non structuré, l'affecte à la face si le bloc voisin n'est pas structuré
-            else if (new_ppty->getMeshLaw() == BlockMeshingProperty::delaunayTetgen){
+            if (new_ppty->getMeshLaw() == BlockMeshingProperty::transfinite) {
+                FaceMeshingPropertyTransfinite* prop = new FaceMeshingPropertyTransfinite();
+                CoFaceMeshingProperty* old_prop = coface->setProperty(prop);
+                delete old_prop;
+            } else if (new_ppty->getMeshLaw() == BlockMeshingProperty::delaunayTetgen){
+                // si méthode non structuré, l'affecte à la face si le bloc voisin n'est pas structuré
                 // pas de bloc structuré comme voisin
                 if (0 == bloc_opp || !bloc_opp->isStructured()) {
                     FaceMeshingPropertyDelaunayGMSH* prop = new FaceMeshingPropertyDelaunayGMSH();
@@ -3532,69 +3325,6 @@ setMeshLaw(BlockMeshingProperty* new_ppty)
         } // end for j=0; j<face->getNbCoFace()
 
     } // end for iter1 = faces.begin();
-}
-/*----------------------------------------------------------------------------*/
-//#define _DEBUG_MESH_LAW
-void Block::
-_setDirectionMeshLawToFace(BlockMeshingProperty* new_ppty,
-        std::vector<Topo::CoEdge* >& dirCoedges,
-        Topo::CoFace* coface)
-{
-#ifdef _DEBUG_MESH_LAW
-    std::cout<<"_setDirectionMeshLawToFace("<<new_ppty->getMeshLawName()<<", "<<coface->getName()<<")"<<std::endl;
-#endif
-
-
-    // recherche de la direction (ce qui exclu les cas autres que directional ou rotational)
-    eDirOnBlock dir = (eDirOnBlock)new_ppty->getDir();;
-
-    // on marque les arêtes communes du bloc qui suivent la direction
-    std::map<CoEdge*, uint> filtre_aretes;
-#ifdef _DEBUG_MESH_LAW
-    std::cout<<" suivant les arêtes : ";
-#endif
-    for (std::vector<CoEdge* >::iterator iter = dirCoedges.begin();
-            iter != dirCoedges.end(); ++iter){
-        filtre_aretes[*iter] = 1;
-#ifdef _DEBUG_MESH_LAW
-        std::cout<<" "<<(*iter)->getName();
-#endif
-    }
-#ifdef _DEBUG_MESH_LAW
-    std::cout<<std::endl;
-#endif
-
-    std::vector<Topo::CoEdge* > iCoedges[2];
-    coface->getOrientedCoEdges(iCoedges[0], iCoedges[1]);
-
-    // on cherche les arêtes pour chacunes des directions
-    for (uint i=0; i<2; i++)
-        for (std::vector<CoEdge* >::iterator iter = iCoedges[i].begin();
-                iter != iCoedges[i].end(); ++iter)
-            if (filtre_aretes[*iter] == 1){
-
-                if (new_ppty->getMeshLaw() == BlockMeshingProperty::directional){
-                    FaceMeshingPropertyDirectional* prop =
-                            new FaceMeshingPropertyDirectional(i==0?CoFaceMeshingProperty::dir_i:CoFaceMeshingProperty::dir_j);
-                    CoFaceMeshingProperty* old_prop = coface->setProperty(prop);
-                    delete old_prop;
-                }
-                else if (new_ppty->getMeshLaw() == BlockMeshingProperty::rotational){
-                    BlockMeshingPropertyRotational* bmp = dynamic_cast<BlockMeshingPropertyRotational*>(new_ppty);
-                    CHECK_NULL_PTR_ERROR(bmp);
-                    Utils::Math::Point axis1;
-                    Utils::Math::Point axis2;
-                    bmp->getAxis(axis1, axis2);
-                    FaceMeshingPropertyRotational* prop =
-                            new FaceMeshingPropertyRotational(i==0?CoFaceMeshingProperty::dir_i:CoFaceMeshingProperty::dir_j,
-                            		axis1, axis2);
-                    CoFaceMeshingProperty* old_prop = coface->setProperty(prop);
-                    delete old_prop;
-                }
-            }
-
-    // il se peut que l'on ne trouve pas d'arête de marquée,
-    // c'est que l'on est orthogonal, on ne fait rien.
 }
 /*----------------------------------------------------------------------------*/
 int Block::
@@ -3722,22 +3452,11 @@ selectBasicMeshLaw(Internal::InfoCommand* icmd, bool forceCompute)
 #ifdef _DEBUG2
     std::cout<<"selectBasicMeshLaw pour "<<getName()<<" cas d'un bloc avec MeshLaw à "<<getMeshLawName()<<std::endl;
 #endif
-
-    if (!forceCompute && getMeshLaw() == BlockMeshingProperty::directional){
-#ifdef _DEBUG2
-        std::cout<<"  on conserve "<<getMeshLawName()<< " pour "<<getName()<<std::endl;
-#endif
-        return;
-    }
-
     std::vector<Topo::CoEdge* > iCoedges[3];
     getOrientedCoEdges(iCoedges[0], iCoedges[1], iCoedges[2]);
 
     std::vector<Topo::Vertex* > sommets;
     getHexaVertices(sommets);
-
-    // la direction sélectionnée, à définir
-    BlockMeshingProperty::meshDirLaw dirLaw = BlockMeshingProperty::dir_undef;
 
     // une des 3 directions convient-elle ?
     for (uint j=0; j<3; j++){
@@ -3752,20 +3471,7 @@ selectBasicMeshLaw(Internal::InfoCommand* icmd, bool forceCompute)
             coedges_dirs.push_back(coedges_dir1);
 
         } // end for k
-        if (TopoHelper::isUnidirectionalMeshable(coedges_dirs))
-            dirLaw = (BlockMeshingProperty::meshDirLaw)(j+1);
     } // end for j
-
-    if (dirLaw != BlockMeshingProperty::dir_undef){
-        saveBlockMeshingProperty(icmd);
-        BlockMeshingPropertyDirectional* mp = new BlockMeshingPropertyDirectional(dirLaw);
-        switchBlockMeshingProperty(icmd, mp);
-        delete mp;
-
-#ifdef _DEBUG2
-        std::cout<<"  on attribue "<<getMeshLawName()<< " à "<<getName()<<std::endl;
-#endif
-    }
 }
 /*----------------------------------------------------------------------------*/
 Utils::Math::Point Block::getBarycentre() const

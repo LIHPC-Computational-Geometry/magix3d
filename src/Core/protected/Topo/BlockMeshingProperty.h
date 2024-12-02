@@ -33,31 +33,9 @@ public:
     /** Les méthodes de maillage pour un bloc
      */
     typedef enum{
-        directional,
-		orthogonal,
-        rotational,
         transfinite,
-        delaunayTetgen,      // recommandé / delaunayTetgen
-        insertion
+        delaunayTetgen
     } meshLaw;
-
-    /** Direction suivant laquelle est effectuée la discrétisation (relative au bloc)
-     * pour les méthodes avec une direction
-     */
-    typedef enum{
-        dir_undef,
-        dir_i,
-        dir_j,
-        dir_k
-    } meshDirLaw;
-
-    /** Côté de départ pour les discrétisations orientés (tel que BlockMeshingPropertyOrthogonal)
-     */
-    typedef enum{
-    	side_undef,
-		side_min,
-		side_max
-    } meshSideLaw;
 
     /*------------------------------------------------------------------------*/
 #ifndef SWIG
@@ -115,18 +93,6 @@ protected:
     /*------------------------------------------------------------------------*/
     /// Constructeur par copie
     BlockMeshingProperty(const BlockMeshingProperty& pm) {}
-
-    /*------------------------------------------------------------------------*/
-#ifndef SWIG
-    /// Cherche la direction dans le bloc à partir de deux points
-    static meshDirLaw _computeDir(Block* block, Utils::Math::Point & v1, Utils::Math::Point & v2);
-    /*------------------------------------------------------------------------*/
-    /// Cherche la direction dans le bloc à partir d'une arête
-    static meshDirLaw _computeDir(Block* block, std::string& coedge_name);
-    /*------------------------------------------------------------------------*/
-    /// Cherche le côté dans le bloc à partir de deux points
-    static meshSideLaw _computeSide(Block* block, Utils::Math::Point & v1, Utils::Math::Point & v2, uint dir);
-#endif
 
 };
 /*----------------------------------------------------------------------------*/

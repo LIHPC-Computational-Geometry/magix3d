@@ -85,12 +85,6 @@ TopoManagerIfc::newFreeTopoInGroup(std::string ne, int dim)
 }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc*
-TopoManagerIfc::newInsertionTopoOnGeometry(std::string ne)
-{
-	throw TkUtil::Exception ("TopoManagerIfc::newInsertionTopoOnGeometry should be overloaded.");
-}
-/*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
 TopoManagerIfc::newBoxWithTopo(
 				const Utils::Math::Point& pmin, const Utils::Math::Point& pmax, bool meshStructured, std::string groupName)
 {
@@ -479,12 +473,6 @@ Mgx3D::Internal::M3DCommandResultIfc*
 TopoManagerIfc::setBlockMeshingProperty(BlockMeshingProperty& emp, std::string bl)
 {
     throw TkUtil::Exception ("TopoManagerIfc::setBlockMeshingProperty should be overloaded.");
-}
-/*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
-TopoManagerIfc::replaceTransfiniteByDirectionalMeshMethodAsPossible()
-{
-    throw TkUtil::Exception ("TopoManagerIfc::replaceTransfiniteByDirectionalMeshMethodAsPossible should be overloaded.");
 }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc*
