@@ -274,7 +274,6 @@ namespace QtComponents
                   _longCommandAction(0), _openCascadeLongCommandAction(0),
                   _executePythonScriptAction(0),
                   _distanceMeasurementAction(0), _angleMeasurementAction(0), _extremaMeshingEdgeLengthOnEdgeAction(0),
-                  _topoOptimMeshMethod(0),
                   _topoInformationAction(0), _meshInformationAction(0),
                   _topoRefineAction(0), _topoSetDefaultNbMeshingEdgesAction(0),
                   _topoNew3x3BoxesWithTopoAction(0),
@@ -377,7 +376,6 @@ namespace QtComponents
                   _distanceMeasurementAction(wa._distanceMeasurementAction),
                   _angleMeasurementAction(wa._angleMeasurementAction),
                   _extremaMeshingEdgeLengthOnEdgeAction(wa._extremaMeshingEdgeLengthOnEdgeAction),
-                  _topoOptimMeshMethod(wa._topoOptimMeshMethod),
                   _topoInformationAction(wa._topoInformationAction),
                   _meshInformationAction(wa._meshInformationAction),
                   _topoRefineAction(wa._topoRefineAction),
@@ -511,7 +509,6 @@ namespace QtComponents
 				_distanceMeasurementAction            = wa._distanceMeasurementAction;
 				_angleMeasurementAction               = wa._angleMeasurementAction;
 				_extremaMeshingEdgeLengthOnEdgeAction = wa._extremaMeshingEdgeLengthOnEdgeAction;
-				_topoOptimMeshMethod                  = wa._topoOptimMeshMethod;
 				_topoInformationAction                = wa._topoInformationAction;
 				_meshInformationAction                = wa._meshInformationAction;
 				_topoRefineAction                     = wa._topoRefineAction;
@@ -646,8 +643,6 @@ namespace QtComponents
 				_extremaMeshingEdgeLengthOnEdgeAction->setEnabled(enable);
 			if (0 != _meshInformationAction)
 				_meshInformationAction->setEnabled(enable);
-			if (0 != _topoOptimMeshMethod)
-				_topoOptimMeshMethod->setEnabled(enable);
 			if (0 != _topoInformationAction)
 				_topoInformationAction->setEnabled(enable);
 			if (0 != _topoRefineAction)
@@ -1789,7 +1784,6 @@ void QtMgx3DMainWindow::showReady ( )
 #ifdef _DEBUG
 			_topologyMenu->addAction (getActions ( )._topoNew3x3BoxesWithTopoAction);
 #endif
-			_topologyMenu->addAction(getActions()._topoOptimMeshMethod);
 			_topologyMenu->addAction(getActions()._topoInformationAction);
 
 			// Menu maillage :
@@ -2290,8 +2284,6 @@ void QtMgx3DMainWindow::showReady ( )
             new QAction (QString::fromUtf8("Créer une grille de 3 X 3 boites avec les blocs ..."), this);
 			connect (_actions._topoNew3x3BoxesWithTopoAction, SIGNAL (triggered ( )), this, SLOT (new3x3BoxesWithTopoCallback ( )), defaultConnectionType);
 #endif
-			_actions._topoOptimMeshMethod = new QAction(QString::fromUtf8("Optimise la méthode de maillage"), this);
-			connect(_actions._topoOptimMeshMethod, SIGNAL(triggered()), this, SLOT(optimMeshMethodCallback()), defaultConnectionType);
 			_actions._topoInformationAction = new QAction("Informations sur la topologie", this);
 			connect(_actions._topoInformationAction, SIGNAL(triggered()), this, SLOT(addTopoInformationCallback()), defaultConnectionType);
 
@@ -6691,22 +6683,6 @@ void QtMgx3DMainWindow::new3x3BoxesWithTopoCallback ()
 
     CHECK_COMMAND_CREATION_STATUS
 }   // QtMgx3DMainWindow::new3x3BoxesWithTopoCallback ()
-
-
-void QtMgx3DMainWindow::optimMeshMethodCallback ( )
-{
-	   UTF8String	message (Charset::UTF_8);
-	BEGIN_QT_TRY_CATCH_BLOCK
-
-    message << "Optimisation de la méthode de maillage pour tous les blocs";
-
-	getTopoManager().replaceTransfiniteByDirectionalMeshMethodAsPossible();
-
-	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
-
-	CHECK_COMMAND_CREATION_STATUS
-
-} // QtMgx3DMainWindow::optimMeshMethodCallback ( )
 
 void QtMgx3DMainWindow::addTopoInformationCallback ( )
 {
