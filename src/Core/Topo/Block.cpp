@@ -24,8 +24,6 @@
 #include "Topo/TopoDisplayRepresentation.h"
 #include "Topo/CommandEditTopo.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
-#include "Topo/FaceMeshingPropertyDirectional.h"
-#include "Topo/FaceMeshingPropertyRotational.h"
 #include "Topo/FaceMeshingPropertyTransfinite.h"
 #include "Topo/FaceMeshingPropertyDelaunayGMSH.h"
 #include "Topo/BlockMeshingPropertyTransfinite.h"
@@ -3444,34 +3442,6 @@ getRatios(std::map<CoEdge*,uint> &ratios)
             } // end for j<face->getNbCofaces()
         } // end else / if (haveRatio)
     } // end for i<getNbFaces()
-}
-/*----------------------------------------------------------------------------*/
-void Block::
-selectBasicMeshLaw(Internal::InfoCommand* icmd, bool forceCompute)
-{
-#ifdef _DEBUG2
-    std::cout<<"selectBasicMeshLaw pour "<<getName()<<" cas d'un bloc avec MeshLaw à "<<getMeshLawName()<<std::endl;
-#endif
-    std::vector<Topo::CoEdge* > iCoedges[3];
-    getOrientedCoEdges(iCoedges[0], iCoedges[1], iCoedges[2]);
-
-    std::vector<Topo::Vertex* > sommets;
-    getHexaVertices(sommets);
-
-    // une des 3 directions convient-elle ?
-    for (uint j=0; j<3; j++){
-        std::vector<std::vector<CoEdge* > > coedges_dirs;
-        for (uint k=0; k<4; k++){
-            std::vector<CoEdge* > coedges_dir1;
-
-            TopoHelper::getCoEdgesBetweenVertices(sommets[TopoHelper::tabIndVtxByEdgeAndDirOnBlock[j][k][0]],
-                    sommets[TopoHelper::tabIndVtxByEdgeAndDirOnBlock[j][k][1]],
-                    iCoedges[j],
-                    coedges_dir1);
-            coedges_dirs.push_back(coedges_dir1);
-
-        } // end for k
-    } // end for j
 }
 /*----------------------------------------------------------------------------*/
 Utils::Math::Point Block::getBarycentre() const

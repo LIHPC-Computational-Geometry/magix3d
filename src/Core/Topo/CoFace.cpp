@@ -26,9 +26,6 @@
 #include "Topo/CommandEditTopo.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Topo/EdgeMeshingPropertyInterpolate.h"
-#include "Topo/FaceMeshingPropertyDirectional.h"
-#include "Topo/FaceMeshingPropertyOrthogonal.h"
-#include "Topo/FaceMeshingPropertyRotational.h"
 #include "Topo/FaceMeshingPropertyTransfinite.h"
 #include "Topo/FaceMeshingPropertyDelaunayGMSH.h"
 
@@ -161,25 +158,17 @@ CoFace(Internal::Context& ctx,
 }
 /*----------------------------------------------------------------------------*/
 CoFace::
-CoFace(Internal::Context& ctx, int ni, int nj,
-    		CoFaceMeshingProperty::meshLaw ml,
-    		CoFaceMeshingProperty::meshDirLaw md)
+CoFace(Internal::Context& ctx, int ni, int nj)
 : TopoEntity(ctx,
         ctx.newProperty(Utils::Entity::TopoCoFace),
         ctx.newDisplayProperties(Utils::Entity::TopoCoFace))
 , m_topo_property(new CoFaceTopoProperty())
 , m_save_topo_property(0)
-, m_mesh_property(0)
+, m_mesh_property(new FaceMeshingPropertyTransfinite())
 , m_save_mesh_property(0)
 , m_mesh_data(new CoFaceMeshingData())
 , m_save_mesh_data(0)
 {
-    if (ml == CoFaceMeshingProperty::directional)
-        m_mesh_property =new FaceMeshingPropertyDirectional(md);
-    else
-        m_mesh_property =new FaceMeshingPropertyTransfinite();
-
-
     // face avec les sommets équivalents à ceux d'une surface de taille 1
     std::vector<Vertex* > vertices;
     vertices.push_back(new Topo::Vertex(ctx, Utils::Math::Point(1,0,0)));
@@ -955,12 +944,6 @@ split2(eDirOnCoFace dir, std::vector<Edge*>& edges1, std::vector<Edge*>& edges3,
     	coface2->getGroupsContainer().add(gr);
     }
 
-    // recherche de la méthode de maillage qui semble la plus adaptée
-    if (getMeshLaw() == CoFaceMeshingProperty::directional){
-    	coface1->selectBasicMeshLaw(icmd);
-    	coface2->selectBasicMeshLaw(icmd);
-    }
-
     // on ajoute les 2 CoFaces aux faces
     for (uint i=0; i<getNbFaces(); i++) {
         getFace(i)->saveFaceTopoProperty(icmd);
@@ -1215,13 +1198,6 @@ split3(eDirOnCoFace dir, std::vector<Edge*>& edges1, std::vector<Edge*>& edges3,
     	coface1->getGroupsContainer().add(gr);
     	coface2->getGroupsContainer().add(gr);
     	coface3->getGroupsContainer().add(gr);
-    }
-
-    // recherche de la méthode de maillage qui semble la plus adaptée
-    if (getMeshLaw() == CoFaceMeshingProperty::directional){
-    	coface1->selectBasicMeshLaw(icmd);
-    	coface2->selectBasicMeshLaw(icmd);
-    	coface3->selectBasicMeshLaw(icmd);
     }
 
     // on ajoute les 3 CoFaces aux faces
@@ -1499,11 +1475,6 @@ splitOgrid(eDirOnCoFace dir,
         	coface2->getGroupsContainer().add(gr);
         }
 
-        // recherche de la méthode de maillage qui semble la plus adaptée
-        coface0->selectBasicMeshLaw(icmd);
-        coface1->selectBasicMeshLaw(icmd);
-        coface2->selectBasicMeshLaw(icmd);
-
 
     } else if (edges1.size() == 3){
         // cas de la création de 4 faces en Ogrid
@@ -1721,12 +1692,6 @@ splitOgrid(eDirOnCoFace dir,
         	coface2->getGroupsContainer().add(gr);
         	coface3->getGroupsContainer().add(gr);
         }
-
-        // recherche de la méthode de maillage qui semble la plus adaptée
-        coface0->selectBasicMeshLaw(icmd);
-        coface1->selectBasicMeshLaw(icmd);
-        coface2->selectBasicMeshLaw(icmd);
-        coface3->selectBasicMeshLaw(icmd);
 
 
     } // end else if (edges1.size() == 3)
@@ -2077,62 +2042,11 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
     	if (isStructured()){
 
     		uint lastId = (getNbVertices() == 3?0:3);
-    		Edge* edge1=0;
-    		Edge* edge2=0;
-    		if (m_mesh_property->getMeshLaw() == CoFaceMeshingProperty::directional){
-    			FaceMeshingPropertyDirectional* mp = dynamic_cast<FaceMeshingPropertyDirectional*>(m_mesh_property);
-    			CHECK_NULL_PTR_ERROR(mp);
-    			if (mp->getDir() == 1){
-    				edge1 = getEdge(0);
-    				edge2 = getEdge(1);
-    			}
-    			else {
-    				edge1 = getEdge(1);
-    				edge2 = getEdge(0);
-    			}
-    		}
-    		else if (m_mesh_property->getMeshLaw() == CoFaceMeshingProperty::orthogonal){
-    			FaceMeshingPropertyOrthogonal* mp = dynamic_cast<FaceMeshingPropertyOrthogonal*>(m_mesh_property);
-    			CHECK_NULL_PTR_ERROR(mp);
-    			if (mp->getDir() == 1){
-    				edge1 = getEdge(0);
-    				if (mp->getSide() == 1){
-    					// cas où il faut prendre les arêtes de l'autre côté
-    					edge2 = getEdge(getVertex(0), getVertex(lastId));
-    				}
-    				else
-    					edge2 = getEdge(1);
-    			}
-    			else {
-    				edge1 = getEdge(1);
-    				if (mp->getSide() == 1){
-    					// cas où il faut prendre les arêtes de l'autre côté
-    					edge2 = getEdge(getVertex(2), getVertex(lastId));
-    				}
-    				else
-    					edge2 = getEdge(0);
-    			}
-    		}
-    		else if (m_mesh_property->getMeshLaw() == CoFaceMeshingProperty::rotational){
-    			FaceMeshingPropertyRotational* mp = dynamic_cast<FaceMeshingPropertyRotational*>(m_mesh_property);
-    			CHECK_NULL_PTR_ERROR(mp);
-    			if (mp->getDir() == 1){
-    				edge1 = getEdge(0);
-    				edge2 = getEdge(1);
-    			}
-    			else {
-    				edge1 = getEdge(1);
-    				edge2 = getEdge(0);
-    			}
-    		}
-    		else {
-    			edge1 = getEdge(1);
-    			edge2 = getEdge(0);
-    		}
+    		Edge* edge1 = getEdge(1);
+    		Edge* edge2 = getEdge(0);
 
 //    		std::cout<<"CoFace::getRepresentation pour "<<getName()<<" basé sur "
 //    				<<edge1->getName()<<" - "<<edge2->getName()<<std::endl;
-
 
     		std::vector<Utils::Math::Point> points_edge1;
     		std::vector<Utils::Math::Point> points_edge2;
@@ -2207,61 +2121,19 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
 //    		std::cout<<" vect1 : "<<vect1<<std::endl;
 //    		std::cout<<" vect2 : "<<vect2<<std::endl;
 
-    		// décalage pour faire apparaitre la courbure, si nécessaire
-    		double dec2 = 0.0;
-    		double dec3 = 0.0;
-    		if (m_mesh_property->getMeshLaw() == CoFaceMeshingProperty::rotational){
-    			FaceMeshingPropertyRotational* mp = dynamic_cast<FaceMeshingPropertyRotational*>(m_mesh_property);
-    			CHECK_NULL_PTR_ERROR(mp);
-    			Utils::Math::Point axis1, axis2;
-    			mp->getAxis(axis1, axis2);
-
-    			// on cherche à minimiser la distance entre l'axe et l'un des points
-    			// avec l'une des options pour la direction
-    			Utils::Math::Point option1 = (vect1*0.5+vect2*(0.5+0.1)+vect3*(0.5))*ratio+orig;
-    			Utils::Math::Point option2 = (vect1*0.5+vect2*(0.5-0.1)+vect3*(0.5))*ratio+orig;
-    			Utils::Math::Point option3 = (vect1*0.5+vect2*(0.5)+vect3*(0.5+0.1))*ratio+orig;
-    			Utils::Math::Point option4 = (vect1*0.5+vect2*(0.5)+vect3*(0.5-0.1))*ratio+orig;
-
-    			uint best_option = 1;
-    			double dist = (axis1-option1).norme2();
-
-    			if ((axis1-option2).norme2()<dist){
-    				dist = (axis1-option2).norme2();
-    				best_option = 2;
-    			}
-    			if ((axis1-option3).norme2()<dist){
-    				dist = (axis1-option3).norme2();
-    				best_option = 3;
-    			}
-    			if ((axis1-option4).norme2()<dist){
-    				dist = (axis1-option4).norme2();
-    				best_option = 4;
-    			}
-
-    			if (best_option == 1)
-    				dec2 = +0.1;
-    			else if (best_option == 2)
-    				dec2 = -0.1;
-    			else if (best_option == 3)
-    				dec3 = +0.1;
-    			else if (best_option == 4)
-    				dec3 = -0.1;
-    		}
-
     		// on dessine dans le repère vect1 vect2
-    		points.push_back(vect1*0.2+vect2*(0.4+dec2)+vect3*dec3);
+    		points.push_back(vect1*0.2+vect2*(0.4)+vect3);
     		points.push_back(vect1*0.4+vect2*0.4);
     		points.push_back(vect1*0.8+vect2*0.4);
-    		points.push_back(vect1*1.0+vect2*(0.4+dec2)+vect3*dec3);
+    		points.push_back(vect1*1.0+vect2*(0.4)+vect3);
     		points.push_back(vect1*0.4+vect2*0.2);
     		points.push_back(vect1*0.8+vect2*0.2);
     		points.push_back(vect1*0.4+vect2*1.0);
     		points.push_back(vect1*0.8+vect2*1.0);
-    		points.push_back(vect1*0.2+vect2*(0.8+dec2)+vect3*dec3);
+    		points.push_back(vect1*0.2+vect2*(0.8)+vect3);
     		points.push_back(vect1*0.4+vect2*0.8);
     		points.push_back(vect1*0.8+vect2*0.8);
-    		points.push_back(vect1*1.0+vect2*(0.8+dec2)+vect3*dec3);
+    		points.push_back(vect1*1.0+vect2*(0.8)+vect3);
     		indices.push_back(0); indices.push_back(1);
     		indices.push_back(1); indices.push_back(2);
     		indices.push_back(2); indices.push_back(3);
@@ -2275,38 +2147,10 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
     		indices.push_back(6); indices.push_back(9);
     		indices.push_back(7); indices.push_back(10);
 
-    		if (m_mesh_property->getMeshLaw() == CoFaceMeshingProperty::directional
-    				|| m_mesh_property->getMeshLaw() == CoFaceMeshingProperty::orthogonal){
-				points.push_back(vect1*1.1+vect2*0.6);
-   				points.push_back(vect1*1.1+vect2*0.2);
-   				points.push_back(vect1*1.3+vect2*0.4);
-    		} else if (m_mesh_property->getMeshLaw() == CoFaceMeshingProperty::rotational){
-    			if (dec2>0.0){
-    				points.push_back(vect1*1.2+vect2*0.5);
-       				points.push_back(vect1*1.0+vect2*0.7);
-       				points.push_back(vect1*1.2+vect2*0.7);
-    			} else if (dec2<0.0) {
-       				points.push_back(vect1*1.0+vect2*0.1);
-       				points.push_back(vect1*1.2+vect2*0.3);
-    				points.push_back(vect1*1.2+vect2*0.1);
-    			} else {
-    				points.push_back(vect1*1.1+vect2*0.6+vect3*dec3*2);
-       				points.push_back(vect1*1.1+vect2*0.2+vect3*dec3*2);
-       				points.push_back(vect1*1.3+vect2*0.4+vect3*dec3*4);
-    			}
-    		}
     		if (points.size() > 12){
     			indices.push_back(3); indices.push_back(14);
     			indices.push_back(13); indices.push_back(14);
     			indices.push_back(12); indices.push_back(14);
-    		}
-    		if (m_mesh_property->getMeshLaw() == CoFaceMeshingProperty::orthogonal){
-    			uint id = points.size();
-    			points.push_back(vect1*0.5+vect2*0.4);
-    			points.push_back(vect1*0.5+vect2*0.5);
-    			points.push_back(vect1*0.4+vect2*0.5);
-    			indices.push_back(id); indices.push_back(id+1);
-    			indices.push_back(id+2); indices.push_back(id+1);
     		}
     	} // end if (isStructured())
     	else {
@@ -3501,19 +3345,6 @@ permuteToJmaxEdge(Edge* edge, Internal::InfoCommand* icmd)
         m_topo_property->getEdgeContainer().add(sorted_edges);
         m_topo_property->getVertexContainer().clear();
         m_topo_property->getVertexContainer().add(sorted_vertices);
-
-        if (dec%2 && getMeshLaw() == CoFaceMeshingProperty::directional){
-            saveCoFaceMeshingProperty(icmd);
-            FaceMeshingPropertyDirectional* fmp = dynamic_cast<FaceMeshingPropertyDirectional*>(getCoFaceMeshingProperty());
-            CHECK_NULL_PTR_ERROR(fmp);
-            fmp->permDir();
-        }
-        else if (dec%2 && getMeshLaw() == CoFaceMeshingProperty::orthogonal){
-            saveCoFaceMeshingProperty(icmd);
-            FaceMeshingPropertyOrthogonal* fmp = dynamic_cast<FaceMeshingPropertyOrthogonal*>(getCoFaceMeshingProperty());
-            CHECK_NULL_PTR_ERROR(fmp);
-            fmp->permDir();
-        }
     } // end if (ind != 4)
 }
 /*----------------------------------------------------------------------------*/
@@ -3844,89 +3675,6 @@ uint CoFace::getNbBlocks() const
     std::vector<Block* > blocks;
     getBlocks(blocks);
     return blocks.size();
-}
-/*----------------------------------------------------------------------------*/
-void CoFace::
-selectBasicMeshLaw(Internal::InfoCommand* icmd, bool forceCompute)
-{
-//#define _DEBUG_selectBasicMeshLaw
-#ifdef _DEBUG_selectBasicMeshLaw
-    std::cout<<"selectBasicMeshLaw pour "<<getName()<<" cas d'une coface avec MeshLaw à "<<getMeshLawName()<<std::endl;
-#endif
-
-    if (!forceCompute && getMeshLaw() == CoFaceMeshingProperty::directional){
-#ifdef _DEBUG_selectBasicMeshLaw
-        std::cout<<"  on conserve "<<getMeshLawName()<< " pour "<<getName()<<std::endl;
-#endif
-        return;
-    }
-
-    std::vector<Topo::CoEdge* > iCoedges[2];
-    getOrientedCoEdges(iCoedges[0], iCoedges[1]);
-
-    // la direction sélectionnée, à définir
-    FaceMeshingPropertyDirectional::meshDirLaw dirLaw = FaceMeshingPropertyDirectional::dir_undef;
-
-    // dirI ok ?
-    {
-        std::vector<std::vector<CoEdge* > > coedges_dirs;
-        std::vector<CoEdge* > coedges_dir1;
-        std::vector<CoEdge* > coedges_dir2;
-
-        // il faut qu'un des côté soit en une seule arête sans ratio
-        bool unCoteOk = false;
-
-        TopoHelper::getCoEdgesBetweenVertices(getVertex(1), getVertex(2), iCoedges[0], coedges_dir1);
-        coedges_dirs.push_back(coedges_dir1);
-        if (coedges_dir1.size() == 1 && getEdge(getVertex(1), getVertex(2))->getRatio(coedges_dir1[0]) == 1)
-        	unCoteOk = true;
-
-        if (getNbVertices() == 4){
-            TopoHelper::getCoEdgesBetweenVertices(getVertex(0), getVertex(3), iCoedges[0], coedges_dir2);
-            coedges_dirs.push_back(coedges_dir2);
-            if (coedges_dir2.size() == 1 && getEdge(getVertex(0), getVertex(3))->getRatio(coedges_dir2[0]) == 1)
-            	unCoteOk = true;
-       }
-
-        if (TopoHelper::isUnidirectionalMeshable(coedges_dirs) && unCoteOk)
-            dirLaw = FaceMeshingPropertyDirectional::dir_i;
-    }
-
-    // dirJ ok ?
-    {
-        std::vector<std::vector<CoEdge* > > coedges_dirs;
-        std::vector<CoEdge* > coedges_dir1;
-        std::vector<CoEdge* > coedges_dir2;
-
-        // il faut qu'un des côté soit en une seule arête sans ratio
-        bool unCoteOk = false;
-
-        TopoHelper::getCoEdgesBetweenVertices(getVertex(1), getVertex(0), iCoedges[1], coedges_dir1);
-        coedges_dirs.push_back(coedges_dir1);
-        if (coedges_dir1.size() == 1 && getEdge(getVertex(1), getVertex(2))->getRatio(coedges_dir1[0]) == 1)
-        	unCoteOk = true;
-
-        Vertex* vtx3 = getVertex((getNbVertices()==4)?3:0);
-        TopoHelper::getCoEdgesBetweenVertices(getVertex(2), vtx3, iCoedges[1], coedges_dir2);
-        coedges_dirs.push_back(coedges_dir2);
-        if (coedges_dir2.size() == 1 && getEdge(getVertex(2), vtx3)->getRatio(coedges_dir2[0]) == 1)
-        	unCoteOk = true;
-
-        if (TopoHelper::isUnidirectionalMeshable(coedges_dirs) && unCoteOk)
-            dirLaw = FaceMeshingPropertyDirectional::dir_j;
-    }
-
-    // cas où l'on trouve que le maillage peut se faire suivant une direction
-    if (dirLaw != FaceMeshingPropertyDirectional::dir_undef){
-        saveCoFaceMeshingProperty(icmd);
-        FaceMeshingPropertyDirectional* mp = new FaceMeshingPropertyDirectional(dirLaw);
-        switchCoFaceMeshingProperty(icmd, mp);
-        delete mp;
-
-#ifdef _DEBUG_selectBasicMeshLaw
-        std::cout<<"  on attribue "<<getMeshLawName()<< " à "<<getName()<<std::endl;
-#endif
-    }
 }
 /*----------------------------------------------------------------------------*/
 Utils::Math::Point CoFace::getBarycentre() const

@@ -369,11 +369,6 @@ public:
      */
     virtual void setMeshLaw(BlockMeshingProperty* new_ppty);
 
-    /** Recherche d'une méthode de maillage unidirectionnelle autant que possible,
-     *  sinon on utilise la méthode transfinie
-     */
-    virtual void selectBasicMeshLaw(Internal::InfoCommand* icmd, bool forceCompute = false);
-
     /*------------------------------------------------------------------------*/
     /** Accesseur sur la liste des points */
     Utils::Math::Point*& points() {return m_mesh_data->points();}

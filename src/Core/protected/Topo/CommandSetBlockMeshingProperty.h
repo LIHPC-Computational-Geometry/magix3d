@@ -64,9 +64,6 @@ private:
     /// recherche le sommet suivant pour une face dans un bloc avec 2 sommets non marqués à 2
     Vertex* getNextVertex(Block* bloc, Vertex* vtx1, Vertex* vtx2, std::map<Topo::Vertex*, uint>& filtre_sommets);
 
-    /// Change la discrétisation pour une ou plusieurs faces en la mettant orthogonale
-    void setOrthogonalCoFaces(Face* face, Vertex* vtx1, Vertex* vtx2, int nbLayers, bool reverse);
-
 private:
     /// la nouvelle propriété de discrétisation
     BlockMeshingProperty* m_prop;

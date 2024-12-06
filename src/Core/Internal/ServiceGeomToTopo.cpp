@@ -73,8 +73,6 @@ bool ServiceGeomToTopo::convertBlockStructured(const int ni, const int nj, const
     if (bloc->structurable()){
         bloc->structure(m_icmd);
 
-        bloc->selectBasicMeshLaw(m_icmd);
-
         // cas où le nombre de bras est donné par l'utilisateur
         if (ni>0 && nj>0 && nk>0){
         	std::vector<Topo::CoEdge*> coedges;
@@ -113,8 +111,6 @@ bool ServiceGeomToTopo::convertCoFaceStructured()
 
     if (coface->structurable()){
         coface->structure(m_icmd);
-
-        coface->selectBasicMeshLaw(m_icmd);
 
         return false; // ok
     }

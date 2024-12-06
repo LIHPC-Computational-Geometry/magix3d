@@ -12,7 +12,6 @@
 #include "Utils/Common.h"
 #include "Topo/Block.h"
 #include "Topo/TopoHelper.h"
-#include "Topo/FaceMeshingPropertyRotational.h"
 #include "Topo/CommandDuplicateTopo.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
@@ -193,27 +192,6 @@ transform(CoFace* co, gp_Trsf* transf, std::map<TopoEntity*, bool>& filtre)
         }
     }
 
-    if (co->getMeshLaw() == Topo::CoFaceMeshingProperty::rotational){
-        FaceMeshingPropertyRotational* fmp = dynamic_cast<FaceMeshingPropertyRotational*>(co->getCoFaceMeshingProperty());
-        CHECK_NULL_PTR_ERROR(fmp);
-        Utils::Math::Point axis[2];
-        fmp->getAxis(axis[0], axis[1]);
-
-        for (uint i=0; i<2; i++){
-            double x = axis[i].getX();
-            double y = axis[i].getY();
-            double z = axis[i].getZ();
-
-            transf->Transforms(x, y, z);
-
-            axis[i].setX(x);
-            axis[i].setY(y);
-            axis[i].setZ(z);
-        }
-        co->saveCoFaceMeshingProperty(&getInfoCommand());
-        fmp->setAxis(axis[0], axis[1]);
-    }
-
     filtre[co] = 1;
 }
 /*----------------------------------------------------------------------------*/
@@ -233,27 +211,6 @@ transform(CoFace* co, gp_GTrsf* transf, std::map<TopoEntity*, bool>& filtre)
                 iter2 != coedges.end(); ++iter2){
             transform(*iter2, transf, filtre);
         }
-    }
-
-    if (co->getMeshLaw() == Topo::CoFaceMeshingProperty::rotational){
-        FaceMeshingPropertyRotational* fmp = dynamic_cast<FaceMeshingPropertyRotational*>(co->getCoFaceMeshingProperty());
-        CHECK_NULL_PTR_ERROR(fmp);
-        Utils::Math::Point axis[2];
-        fmp->getAxis(axis[0], axis[1]);
-
-        for (uint i=0; i<2; i++){
-            double x = axis[i].getX();
-            double y = axis[i].getY();
-            double z = axis[i].getZ();
-
-            transf->Transforms(x, y, z);
-
-            axis[i].setX(x);
-            axis[i].setY(y);
-            axis[i].setZ(z);
-        }
-        co->saveCoFaceMeshingProperty(&getInfoCommand());
-        fmp->setAxis(axis[0], axis[1]);
     }
 
     filtre[co] = 1;

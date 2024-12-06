@@ -63,9 +63,7 @@ public:
          bool hasHole);
 
     /// Constructeur par défaut, maillage structuré
-    CoFace(Internal::Context& c, int ni=0, int nj=0,
-    		CoFaceMeshingProperty::meshLaw ml = CoFaceMeshingProperty::directional,
-    		CoFaceMeshingProperty::meshDirLaw md = CoFaceMeshingProperty::dir_i);
+    CoFace(Internal::Context& c, int ni=0, int nj=0);
 
 
     /*------------------------------------------------------------------------*/
@@ -437,12 +435,6 @@ public:
 
     /// Accesseur sur le nom de la méthode de maillage
     virtual std::string getMeshLawName() const {return m_mesh_property->getMeshLawName();}
-
-    /** Recherche d'une méthode de maillage unidirectionnelle autant que possible,
-     *  sinon on utilise la méthode transfinie
-     */
-
-    virtual void selectBasicMeshLaw(Internal::InfoCommand* icmd, bool forceCompute = false);
 
 
     /*------------------------------------------------------------------------*/

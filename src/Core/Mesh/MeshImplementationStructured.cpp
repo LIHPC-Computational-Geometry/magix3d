@@ -17,9 +17,6 @@
 #include "Topo/TopoHelper.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Topo/EdgeMeshingPropertyTabulated.h"
-#include "Topo/FaceMeshingPropertyDirectional.h"
-#include "Topo/FaceMeshingPropertyOrthogonal.h"
-#include "Topo/FaceMeshingPropertyRotational.h"
 #include "Topo/BlockMeshingData.h"
 #include "Topo/TopoHelper.h"
 
@@ -71,10 +68,6 @@ void MeshImplementation::preMeshStrutured(Topo::Block* bl)
 	{
     std::cout <<"Maillage du bloc structuré "<<bl->getName()<<" avec la méthode "
             << bl->getMeshLawName();
-    if (bl->getMeshLaw() == Topo::BlockMeshingProperty::rotational
-            || bl->getMeshLaw() == Topo::BlockMeshingProperty::directional
-			|| bl->getMeshLaw() == Topo::BlockMeshingProperty::orthogonal)
-        std::cout << " et direction "<<(short)bl->getBlockMeshingProperty()->getDir();
     std::cout << std::endl;
 
     std::vector<std::string> groupsName;
@@ -511,137 +504,16 @@ void MeshImplementation::preMeshStrutured(Topo::CoFace* coface)
 
     }// end for cote<4
 
-    if (coface->getMeshLaw() == Topo::CoFaceMeshingProperty::transfinite)
+    if (coface->getMeshLaw() == Topo::CoFaceMeshingProperty::transfinite) {
         discretiseTransfinie(nbBrasI, nbBrasJ, l_points);
-    else if (coface->getMeshLaw() == Topo::CoFaceMeshingProperty::rotational){
-        Utils::Math::Point axis1;
-        Utils::Math::Point axis2;
-        Topo::FaceMeshingPropertyRotational* prop =
-                dynamic_cast<Topo::FaceMeshingPropertyRotational*>(coface->getCoFaceMeshingProperty());
-        CHECK_NULL_PTR_ERROR(prop);
-        prop->getAxis(axis1, axis2);
-        uint dir = prop->getDir();
-
-        discretiseRotation(nbBrasI, nbBrasJ, 0, l_points, axis1, axis2, dir);
-
-    }
-    else if (coface->getMeshLaw() == Topo::CoFaceMeshingProperty::directional
-    		|| coface->getMeshLaw() == Topo::CoFaceMeshingProperty::orthogonal){
-
-        Topo::CoEdgeMeshingProperty *empI, *empJ;
-        Topo::FaceMeshingPropertyDirectional* prop =
-                        dynamic_cast<Topo::FaceMeshingPropertyDirectional*>(coface->getCoFaceMeshingProperty());
-        CHECK_NULL_PTR_ERROR(prop);
-        uint dir = prop->getDir();
-        Topo::CoEdgeMeshingProperty *empDir[2];
-
-        // il faut retrouver si possible la discrétisation depuis une arête
-        // on peut se permettre de reconstruire une loi uniforme pour les directions
-        // qui ne sont pas celle de la discrétisation
-        if (dir == 0){
-        	bool is_inverted;
-        	empDir[1] = new Topo::EdgeMeshingPropertyUniform(nbBrasJ);
-        	Topo::CoEdgeMeshingProperty * empTmp = coface->getMeshingProperty(Topo::CoFace::i_dir, is_inverted);
-        	// si elle est interpolée, on s'en passe
-        	if (empTmp && empTmp->getMeshLaw() != Topo::CoEdgeMeshingProperty::interpolate){
-        		empDir[0] = empTmp->clone();
-        		if (is_inverted)
-        			empDir[0]->setDirect(!empDir[0]->getDirect());
-        	}
-        	else
-        		empDir[0] = 0;
-
-        } else {
-        	bool is_inverted;
-        	empDir[0] = new Topo::EdgeMeshingPropertyUniform(nbBrasI);
-        	Topo::CoEdgeMeshingProperty * empTmp = coface->getMeshingProperty(Topo::CoFace::j_dir, is_inverted);
-        	// si elle est interpolée, on s'en passe
-        	if (empTmp && empTmp->getMeshLaw() != Topo::CoEdgeMeshingProperty::interpolate){
-        		empDir[1] = empTmp->clone();
-        		if (is_inverted)
-        			empDir[1]->setDirect(!empDir[1]->getDirect());
-        	}
-        	else
-        		empDir[1] = 0;
-        }
-
-        // si la discrétisation est nulle (cas interpolée ou composée), on la remplace par une version tabulée
-        if (empDir[dir] == 0){
-        	std::vector<Topo::CoEdge* > coedges;
-        	Topo::Vertex* vtx1;
-        	Topo::Vertex* vtx2;
-        	std::map<Topo::CoEdge*,uint> ratios;
-        	if (dir == 0){
-        		Topo::Edge* edge = coface->getEdge(1);
-        		edge->getCoEdges(coedges);
-        		vtx1 = coface->getVertex(1);
-        		vtx2 = coface->getVertex(2);
-        		for (uint i=0; i<coedges.size(); i++)
-        			ratios[coedges[i]] = edge->getRatio(coedges[i]);
-
-        	}
-        	else {
-        		Topo::Edge* edge = coface->getEdge(0);
-        		edge->getCoEdges(coedges);
-        		vtx1 = coface->getVertex(1);
-        		vtx2 = coface->getVertex(0);
-           		for (uint i=0; i<coedges.size(); i++)
-           			ratios[coedges[i]] = edge->getRatio(coedges[i]);
-        	}
-
-        	// ordonne les coedges
-        	std::vector<Topo::CoEdge* > coedges_between;
-        	Topo::TopoHelper::getCoEdgesBetweenVertices(vtx1, vtx2, coedges, coedges_between);
-
-        	std::vector<Utils::Math::Point> edge_points;
-        	Topo::TopoHelper::getPoints(vtx1, vtx2, coedges_between, ratios, edge_points);
-
-        	// calcul des longueurs des bras
-        	std::vector<double> tabulation;
-        	for (uint i=1; i<edge_points.size(); i++)
-        		tabulation.push_back(edge_points[i].length(edge_points[i-1]));
-
-        	// création d'une discrétisation basée sur les points des discrétisations des arêtes
-        	empDir[dir] = new Topo::EdgeMeshingPropertyTabulated(tabulation);
-
-
-        } // end if ((dir == 0 && empDir[0] == 0) || (dir == 1 && empDir[1] == 0))
-
-        if (coface->getMeshLaw() == Topo::CoFaceMeshingProperty::orthogonal){
-        	Topo::FaceMeshingPropertyOrthogonal* fmp = dynamic_cast<Topo::FaceMeshingPropertyOrthogonal*>(prop);
-        	CHECK_NULL_PTR_ERROR(fmp);
-        	uint side = fmp->getSide();
-        	uint nbLayers = fmp->getNbLayers();
-        	// recherche de la surface / laquelle il faut être orthogonal
-        	// on ne connait pas la normale à une courbe ...
-        	Geom::Surface* surface = 0;
-        	Topo::Edge* edge = coface->getEdge(dir+side*2);
-        	std::vector<Topo::CoEdge*> coedges;
-        	edge->getCoEdges(coedges);
-        	//std::cout<<"orthogonal pour "<<coface->getName()<<" dir="<<dir<<", side="<<side<<" edge="<<edge->getName()<<std::endl;
-        	for (uint i=0; i<coedges.size(); i++)
-        		if (coedges[i]->getGeomAssociation() != 0){
-        			surface = dynamic_cast<Geom::Surface*>(coedges[i]->getGeomAssociation());
-        			//std::cout<<" surface trouvée à partir de "<<coedges[i]->getName()<<std::endl;
-        		}
-
-        	discretiseOrthogonalPuisCourbe(empDir[0], empDir[1], l_points, dir, side, nbLayers, surface);
-        }
-        else
-        	discretiseDirection(empDir[0], empDir[1], l_points, dir);
-
-        for (uint i=0; i<2; i++)
-        	delete empDir[i];
-
-    }
-    else {
+    } else {
         throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne dans MeshImplementation::meshStrutured pour face, type de maillage invalide", TkUtil::Charset::UTF_8));
     }
 
 
     // on ne fait pas de projection sur la surface pour les discrétisations
     // directionnelles et rotationnelles
-    if (coface->getGeomAssociation() && coface->getMeshLaw() > Topo::CoFaceMeshingProperty::rotational){
+    if (coface->getGeomAssociation()){
 #ifdef _DEBUG_MESH
         std::cout <<" Projection des noeuds de la coface "<<coface->getName()<<" sur la surface "<<coface->getGeomAssociation()->getName()<<std::endl;
 #endif

@@ -17,7 +17,6 @@
 #include "Topo/Face.h"
 #include "Topo/CoFace.h"
 #include "Topo/Block.h"
-#include "Topo/FaceMeshingPropertyOrthogonal.h"
 #include "Topo/EdgeMeshingPropertyInterpolate.h"
 
 #include "Geom/Vertex.h"
@@ -437,48 +436,6 @@ registerToManagerCreatedEntities()
 
 }
 /*----------------------------------------------------------------------------*/
-void CommandEditTopo::
-updateMeshLaw(std::vector<Topo::CoFace*>& cofaces, std::vector<Topo::Block*>& blocks)
-{
-#ifdef _DEBUG2
-    uint nb_cofaces = 0;
-    uint nb_blocs = 0;
-#endif
-   for(auto& coface : cofaces){
-        if (coface->isDestroyed())
-            continue;
-#ifdef _DEBUG2
-       nb_cofaces += 1;
-#endif
-       // cas d'une méthode structurée directionnelle ou rotationnelle
-       if (coface->getMeshLaw() < CoFaceMeshingProperty::transfinite){
-
-           // on cherche une méthode la plus basique possible
-           coface->selectBasicMeshLaw(&getInfoCommand(), true);
-
-       } // end if (coface->getMeshLaw() <= rotJ)
-   } // end for iter=l_f.begin()
-
-    // il est préférable de le faire sur les blocs après les faces communes
-    // c'est pour cela que tout est dans une unique méthode
-    for(auto& block : blocks){
-        if (block->isDestroyed())
-            continue;
-#ifdef _DEBUG2
-       nb_blocs += 1;
-#endif
-        if (block->getMeshLaw() < BlockMeshingProperty::transfinite){
-
-            // on cherche une méthode la plus basique possible
-            block->selectBasicMeshLaw(&getInfoCommand(), true);
-
-        } // end if (bloc->getMeshLaw() <= rotK)
-    } // end for iter=l_b.begin()
-#ifdef _DEBUG2
-    std::cout<<"CommandEditTopo::updateMeshLaw avec "<<nb_cofaces<<" cofaces et "<<nb_blocs<<" blocs"<<std::endl;
-#endif
-}
-/*----------------------------------------------------------------------------*/
 void CommandEditTopo::countNbCoEdgesByVertices(std::map<Topo::Vertex*, uint> &nb_coedges_by_vertex)
 {
 	throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, CommandEditTopo::countNbCoEdgesByVertices n'a pas été redéfinie", TkUtil::Charset::UTF_8));
@@ -721,57 +678,6 @@ getPreviewRepresentationDeletedTopo(Utils::DisplayRepresentation& dr)
     } // end for iter_tei
 
     previewEnd();
-}
-/*----------------------------------------------------------------------------*/
-void CommandEditTopo::setOrthogonalCoEdges(CoFace* coface, FaceMeshingPropertyOrthogonal* mp)
-{
-	if (mp->getDir() == 0){
-		// cas orthogonalité suivant I
-		if (mp->getSide() == 0){
-			setOrthogonalCoEdges(coface->getEdge(1), coface->getVertex(1), mp->getNbLayers());
-			// pour cas non dégénéré avec 3 sommets
-			if (coface->getNbVertices() == 4)
-				setOrthogonalCoEdges(coface->getEdge(3), coface->getVertex(0), mp->getNbLayers());
-		}
-		else {
-			setOrthogonalCoEdges(coface->getEdge(1), coface->getVertex(2), mp->getNbLayers());
-			// pour cas non dégénéré avec 3 sommets
-			if (coface->getNbVertices() == 4)
-				setOrthogonalCoEdges(coface->getEdge(3), coface->getVertex(3), mp->getNbLayers());
-		}
-
-	} else {
-		// cas orthogonalité suivant J
-		if (mp->getSide() == 0){
-			setOrthogonalCoEdges(coface->getEdge(0), coface->getVertex(1), mp->getNbLayers());
-			setOrthogonalCoEdges(coface->getEdge(2), coface->getVertex(2), mp->getNbLayers());
-		}
-		else {
-			setOrthogonalCoEdges(coface->getEdge(0), coface->getVertex(0), mp->getNbLayers());
-			setOrthogonalCoEdges(coface->getEdge(2), coface->getVertex(3), mp->getNbLayers());
-		}
-	}
-}
-/*----------------------------------------------------------------------------*/
-void CommandEditTopo::setOrthogonalCoEdges(Edge* edge, Vertex* vertex, int nbLayers)
-{
-	if (edge->getNbCoEdges() == 1){
-		CoEdge* coedge = edge->getCoEdge(0);
-
-		CoEdgeMeshingProperty *cemp = coedge->getMeshingProperty()->clone();
-		bool sens = (coedge->getVertex(0)==vertex);
-		cemp->setOrthogonal(nbLayers, sens);
-		if ((*cemp) != (*coedge->getMeshingProperty()))
-			coedge->switchCoEdgeMeshingProperty(&getInfoCommand(), cemp);
-		delete cemp;
-	}
-	else {
-		MGX_NOT_YET_IMPLEMENTED("Propagation orthogonalité pour plusieurs arêtes sur bord de face");
-		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-		message <<"Propagation orthogonalité pour arête "<<edge->getName()<<" sur bord d'une face n'est pas implémentée";
-		message <<"Cette arête est composée de plusieurs arêtes communes";
-		getContext().getLogStream()->log (TkUtil::TraceLog (message, TkUtil::Log::WARNING));
-	}
 }
 /*----------------------------------------------------------------------------*/
 void CommandEditTopo::

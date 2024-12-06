@@ -14,9 +14,6 @@
 #include "QtComponents/QtMgx3DTopoOperationAction.h"
 #include "QtComponents/RenderingManager.h"
 #include "Topo/FaceMeshingPropertyTransfinite.h"
-#include "Topo/FaceMeshingPropertyDirectional.h"
-#include "Topo/FaceMeshingPropertyOrthogonal.h"
-#include "Topo/FaceMeshingPropertyRotational.h"
 #include "Topo/FaceMeshingPropertyDelaunayGMSH.h"
 #include "Topo/FaceMeshingPropertyQuadPairing.h"
 
@@ -70,278 +67,6 @@ class QtFaceTransfinitePanel : public QtMgx3DOperationsSubPanel
 	QtFaceTransfinitePanel (const QtFaceTransfinitePanel&);
 	QtFaceTransfinitePanel& operator = (const QtFaceTransfinitePanel&);
 };	// class QtFaceTransfinitePanel
-
-
-/**
- * Le paramétrage d'un maillage directionnel.
- */
-class QtFaceDirectionalPanel : public QtMgx3DOperationsSubPanel
-{
-	Q_OBJECT
-
-	public :
-
-	/**
-	 * \param		Widget parent
-	 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement,
-	 *				utilisée notamment pour récupérer le contexte.
-	 * \param		Eventuel panneau de rattachement.
-	 */
-	QtFaceDirectionalPanel (
-				QWidget* parent, Mgx3D::QtComponents::QtMgx3DMainWindow& mw,
-				QtMgx3DOperationPanel* mainPanel);
-
-	/**
-	 * Destructeur. RAS.
-	 */
-	virtual ~QtFaceDirectionalPanel ( );
-
-	/**
-	 * Réinitialise le panneau.
-	 */
-	virtual void reset ( );
-
-	/**
-	 * \param		<I>true</I> pour prévisualiser l'opération, <I>false</I>
-	 * 				pour arrêter la prévisualisation.
-	 * \param		inutilisé
-	 */
-	virtual void preview (bool on, bool destroyInteractor);
-
-	/**
-	 * Affiche/masque la fenêtre, et les éventuelles informations de
-	 * prévisualisation.
-	 */
-	virtual void setVisible (bool visible);
-
-	/**
-	 * \return		Le point de départ définissant le vecteur directionnel.
-	 * \see			getPoint2
-	 */
-	virtual Mgx3D::Utils::Math::Point getPoint1 ( ) const;
-
-	/**
-	 * \return		Le point d'arrivée définissant le vecteur directionnel.
-	 * \see			getPoint1
-	 */
-	virtual Mgx3D::Utils::Math::Point getPoint2 ( ) const;
-
-	/**
-	 * \return		La propriété de maillage de la face conforme au panneau.
-	 */
-	virtual Mgx3D::Topo::FaceMeshingPropertyDirectional*
-											getMeshingProperty ( ) const; 
-
-	/**
-	 * Faut-il inverser le vecteur donné par l'arête ?
-	 */
-	virtual bool isEdgeInverted ( ) const;
-
-	/**
- 	 * Quitte le mode sélection interactive.
- 	 */
-	virtual void stopSelection ( );
-
-	/**
-	 * \return		Le champ de saisie de l'arête directionnelle.
-	 */
-	virtual QtEntityIDTextField* getEdgeTextField ( );
-
-
-	protected slots :
-
-	/**
-	 * Appelé lorsqu'un paramètre à changé : actualise les informations
-	 * affichées.
-	 */
-	virtual void directionModifiedCallback ( );
-
-
-	private :
-
-	/**
-	 * Constructeur de copie et opérateur = : interdits.
-	 */
-	QtFaceDirectionalPanel (const QtFaceDirectionalPanel&);
-	QtFaceDirectionalPanel& operator = (const QtFaceDirectionalPanel&);
-
-	/** La saisie du vecteur directeur. */
-	QtMgx3DEdgePanel*						_edgeTextField;
-
-	/** Le vecteur directionnel est-il à inverser ? */
-	QCheckBox*								_invertCheckBox;
-
-	/** Le vecteur donnant la direction. */
-	QLabel*									_directionLabel;
-};	// class QtFaceDirectionalPanel
-
-
-/**
- * Le paramétrage d'un maillage <I>Orthogonal</I>.
- */
-class QtFaceOrthogonalPanel : public QtFaceDirectionalPanel
-{
-	public :
-
-	/**
-	 * \param		Widget parent
-	 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement,
-	 *				utilisée notamment pour récupérer le contexte.
-	 * \param		Eventuel panneau de rattachement.
-	 */
-	QtFaceOrthogonalPanel (
-				QWidget* parent, Mgx3D::QtComponents::QtMgx3DMainWindow& mw,
-				QtMgx3DOperationPanel* mainPanel);
-
-	/**
-	 * Destructeur. RAS.
-	 */
-	virtual ~QtFaceOrthogonalPanel ( );
-
-	/**
-	 * Réinitialise le panneau.
-	 */
-	virtual void reset ( );
-
-	/**
-	 * \return		La propriété de maillage de la face conforme au panneau.
-	 */
-	virtual Mgx3D::Topo::FaceMeshingPropertyOrthogonal*
-											getMeshingProperty ( ) const;
-
-	/**
-	 * \return		Le nombre de couches.
-	 */
-	virtual size_t getLayersNum ( ) const;
-
-
-	private :
-
-	/**
-	 * Constructeur de copie et opérateur = : interdits.
-	 */
-	QtFaceOrthogonalPanel (const QtFaceOrthogonalPanel&);
-	QtFaceOrthogonalPanel& operator = (const QtFaceOrthogonalPanel&);
-
-	/** Le nombre de couches. */
-	QtIntTextField*				_layersNumTextField;
-};	// class QtFaceOrthogonalPanel
-
-
-/**
- * Le paramétrage d'un maillage rotationel. La rotation est définie par
- * l'axe de rotation et la direction selon laquelle s'effectue le maillage.
- */
-class QtFaceRotationalPanel : public QtMgx3DOperationsSubPanel
-{
-	public :
-
-	/**
-	 * \param		Widget parent
-	 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement,
-	 *				utilisée notamment pour récupérer le contexte.
-	 * \param		Eventuel panneau de rattachement.
-	 */
-	QtFaceRotationalPanel (
-				QWidget* parent, Mgx3D::QtComponents::QtMgx3DMainWindow& mw,
-				QtMgx3DOperationPanel* mainPanel);
-
-	/**
-	 * Destructeur. RAS.
-	 */
-	virtual ~QtFaceRotationalPanel ( );
-
-	/**
-	 * \param		<I>true</I> pour prévisualiser l'opération, <I>false</I>
-	 * 				pour arrêter la prévisualisation.
-	 * \param		inutilisé
-	 */
-	virtual void preview (bool on, bool destroyInteractor);
-
-	/**
-	 * Affiche/masque la fenêtre, et les éventuelles informations de
-	 * prévisualisation.
-	 */
-	virtual void setVisible (bool visible);
-
-	/**
-	 * \return		Le point de départ définissant la direction de la rotation.
-	 * \see			getDirPoint2
-	 * \see			getAxePoint1
-	 */
-	virtual Mgx3D::Utils::Math::Point getDirPoint1 ( ) const;
-
-	/**
-	 * \return		Le point d'arrivée définissant la direction de la rotation.
-	 * \see			getDirPoint1
-	 */
-	virtual Mgx3D::Utils::Math::Point getDirPoint2 ( ) const;
-
-	/**
-	 * \return		Le point de départ définissant l'axe de rotation.
-	 * \see			getAxePoint2
-	 * \see			getDirPoint1
-	 */
-	virtual Mgx3D::Utils::Math::Point getAxePoint1 ( ) const;
-
-	/**
-	 * \return		Le point d'arrivée définissant l'axe de rotation.
-	 * \see			getAxePoint1
-	 */
-	virtual Mgx3D::Utils::Math::Point getAxePoint2 ( ) const;
-
-	/**
-	 * \return		La propriété de maillage de la face conforme au panneau.
-	 */
-	virtual Mgx3D::Topo::FaceMeshingPropertyRotational*
-											getMeshingProperty ( ) const; 
-
-	/**
-	 * Réinitialise le panneau.
-	 */
-	virtual void reset ( );
-
-	/**
- 	 * Quitte le mode sélection interactive.
- 	 */
-	virtual void stopSelection ( );
-
-	/**
-	 * \return		Le champ de saisie de l'arête directionnelle.
-	 */
-	virtual QtEntityIDTextField* getEdgeTextField ( );
-
-	/**
-	 * \return		Le champ de saisie du premier point de l'axe de rotation.
-	 */
-	virtual QtEntityIDTextField* getAxePoint1TextField ( );
-
-	/**
-	 * \return		Le champ de saisie du second point de l'axe de rotation.
-	 */
-	virtual QtEntityIDTextField* getAxePoint2TextField ( );
-
-
-	private :
-
-	/**
-	 * Constructeur de copie et opérateur = : interdits.
-	 */
-	QtFaceRotationalPanel (const QtFaceRotationalPanel&);
-	QtFaceRotationalPanel& operator = (const QtFaceRotationalPanel&);
-
-	/** La saisie de l'arête donnant la direction du maillage. */
-	QtMgx3DEdgePanel*						_directionTextField;
-
-	/** La saisie de 2 points permettant de définir l'axe de rotation. */
-	QtMgx3DPointPanel						*_axePoint1Panel, *_axePoint2Panel;
-
-	/** Le vecteur donnant la direction. */
-	QLabel*									_directionLabel;
-
-	/** Le vecteur donnant l'axe de rotation. */
-	QLabel*									_axeLabel;
-};	// class QtFaceRotationalPanel
 
 
 /**
@@ -475,13 +200,10 @@ class QtFaceMeshingPropertyPanel : public QtMgx3DOperationPanel
 	/** La méthode de maillage de la face.
 	 * <OL>
 	 * <LI>Maillage structuré transfini,
-	 * <LI>Maillage structuré directionnel
-	 * <LI>Maillage structuré directionnel orthogonal
-	 * <LI>Maillage structuré rotationnel
 	 * <LI>Maillage non structuré Delaunay généré par <I>GMSH</I>
 	 * </OL>
 	 */
-	enum OPERATION_METHOD { TRANSFINITE, DIRECTIONAL, ORTHOGONAL, ROTATIONAL, DELAUNAY_GMSH };
+	enum OPERATION_METHOD { TRANSFINITE, DELAUNAY_GMSH };
 
 	/**
 	 * Créé l'ihm.
@@ -602,15 +324,6 @@ class QtFaceMeshingPropertyPanel : public QtMgx3DOperationPanel
 
 	/** Maillage transfini. */
 	QtFaceTransfinitePanel*						_transfinitePanel;
-
-	/** Maillage structuré directionnel. */
-	QtFaceDirectionalPanel*						_directionalPanel;
-
-	/** Maillage structuré directionnel orthogonal. */
-	QtFaceOrthogonalPanel*						_orthogonalPanel;
-
-	/** Maillage structuré rotationnel. */
-	QtFaceRotationalPanel*						_rotationalPanel;
 
 	/** Maillage non structuré Delaunay généré avec <I>GMSH</I>. */
 	QtFaceDelaunayGMSHPanel*					_delaunayGMSHPanel;

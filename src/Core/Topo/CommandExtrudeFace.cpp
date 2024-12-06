@@ -11,7 +11,6 @@
 #include "Topo/CoFace.h"
 #include "Topo/Edge.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
-#include "Topo/FaceMeshingPropertyDirectional.h"
 
 #include "Geom/CommandExtrusion.h"
 #include "Geom/Vertex.h"
@@ -364,11 +363,6 @@ namespace Mgx3D {
 
                             // mise à jour de la projection suivant la géom qui a été extrudée
                             //updateGeomAssociation(coedge_0->getGeomAssociation(), newCoFace);
-
-                            // maillage directionnel, suivant extrusion
-                            FaceMeshingPropertyDirectional* newProp = new FaceMeshingPropertyDirectional(FaceMeshingPropertyDirectional::dir_j);
-                            CoFaceMeshingProperty* oldProp = newCoFace->setProperty(newProp);
-                            delete oldProp;
 
                         } // end if filtre_vu
                     } // end for coedges
