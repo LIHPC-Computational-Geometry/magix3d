@@ -8,7 +8,6 @@
  */
 /*----------------------------------------------------------------------------*/
 #include "Topo/CommandSetFaceMeshingProperty.h"
-#include "Topo/FaceMeshingPropertyOrthogonal.h"
 
 #include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
@@ -69,15 +68,6 @@ internalExecute()
 
     	// initialise la direction si nécessaire
     	coface->getCoFaceMeshingProperty()->initDir(coface);
-
-    	// transmission de la demande d'orthogonalité aux arêtes
-    	if (m_prop->getMeshLaw() == CoFaceMeshingProperty::orthogonal){
-    		FaceMeshingPropertyOrthogonal* mp = dynamic_cast<FaceMeshingPropertyOrthogonal*>(coface->getCoFaceMeshingProperty());
-    		CHECK_NULL_PTR_ERROR(mp);
-
-    		setOrthogonalCoEdges(coface, mp);
-
-    	} // end if (m_prop->getMeshLaw() == CoFaceMeshingProperty::orthogonal)
     }
 
     // on parcours les entités modifiées pour sauvegarder leur état d'avant la commande

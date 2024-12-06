@@ -48,9 +48,6 @@ using std::ptrdiff_t;
 #include "Topo/EdgeMeshingPropertyGlobalInterpolate.h"
 #include "Topo/EdgeMeshingPropertyTabulated.h"
 #include "Topo/EdgeMeshingPropertyBeta.h"
-#include "Topo/FaceMeshingPropertyDirectional.h"
-#include "Topo/FaceMeshingPropertyOrthogonal.h"
-#include "Topo/FaceMeshingPropertyRotational.h"
 #include "Topo/FaceMeshingPropertyTransfinite.h"
 #include "Topo/FaceMeshingPropertyDelaunayGMSH.h"
 #include "Topo/FaceMeshingPropertyQuadPairing.h"
@@ -314,9 +311,6 @@ using std::ptrdiff_t;
 %include Topo/EdgeMeshingPropertyTabulated.h
 %include Topo/EdgeMeshingPropertyBeta.h
 %include Topo/CoFaceMeshingProperty.h
-%include Topo/FaceMeshingPropertyDirectional.h
-%include Topo/FaceMeshingPropertyOrthogonal.h
-%include Topo/FaceMeshingPropertyRotational.h
 %include Topo/FaceMeshingPropertyTransfinite.h
 %include Topo/FaceMeshingPropertyDelaunayGMSH.h
 %include Topo/FaceMeshingPropertyQuadPairing.h

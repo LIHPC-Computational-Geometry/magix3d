@@ -33,22 +33,10 @@ public:
     /** Les méthodes de maillage pour une face commune
      */
     typedef enum{
-        directional,
-		orthogonal,
-        rotational,
         transfinite,
         delaunayGMSH,    // recommandé / delaunay GMSH
         quadPairing
     } meshLaw;
-
-    /** Direction suivant laquelle est effectuée la discrétisation (relative à la face commune)
-     * pour les méthodes avec une direction
-     */
-    typedef enum{
-        dir_undef,
-        dir_i,
-        dir_j
-    }meshDirLaw;
 
     /** Côté de départ pour les discrétisations orientés (tel que FaceMeshingPropertyOrthogonal)
      */
@@ -103,14 +91,6 @@ protected:
 #ifndef SWIG
     /// Constructeur par copie
     CoFaceMeshingProperty(const CoFaceMeshingProperty& pm) {}
-#endif
-
-    /*------------------------------------------------------------------------*/
-#ifndef SWIG
-    /// Cherche la direction dans la coface à partir de deux points
-    static meshDirLaw _computeDir(CoFace* coface, Utils::Math::Point & v1, Utils::Math::Point & v2);
-    /// Cherche le côté dans la coface à partir de deux points
-    static meshSideLaw _computeSide(CoFace* coface, Utils::Math::Point & v1, Utils::Math::Point & v2, uint dir);
 #endif
 
 };

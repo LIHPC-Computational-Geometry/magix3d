@@ -366,15 +366,7 @@ void QtTopoInformationOperationPanel::autoUpdate ( )
 	        nb_cofaces +=1;
 	        size_t nb = coface->getMeshingData()->faces().size();
 	        nb_faces_tot += nb;
-	        if (coface->getMeshLaw() == Topo::CoFaceMeshingProperty::directional){
-	            nb_fac_str_dir += 1;
-	            nb_faces_str_dir += nb;
-	        }
-	        else if (coface->getMeshLaw() == Topo::CoFaceMeshingProperty::rotational){
-	            nb_fac_str_rot += 1;
-	            nb_faces_str_rot += nb;
-	        }
-	        else if (coface->getMeshLaw() == Topo::CoFaceMeshingProperty::transfinite){
+	        if (coface->getMeshLaw() == Topo::CoFaceMeshingProperty::transfinite){
 	            nb_fac_str_trans  += 1;
 	            nb_faces_str_trans += nb;
 	        }

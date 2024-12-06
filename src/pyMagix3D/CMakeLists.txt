@@ -161,21 +161,14 @@ if (Doxygen_FOUND)
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/EdgeMeshingPropertyTabulated.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/EdgeMeshingPropertyBeta.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/CoFaceMeshingProperty.h 
-                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyDirectional.h 
-                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyOrthogonal.h 
-                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyRotational.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyTransfinite.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyDelaunayNetgen.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyDelaunayGMSH.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyQuadPairing.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingProperty.h 
-                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyDirectional.h 
-                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyOrthogonal.h 
-                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyRotational.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyTransfinite.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyDelaunayNetgen.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyDelaunayTetgen.h 
-                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyInsertion.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Mesh/MeshManagerIfc.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Smoothing/SurfacicSmoothing.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Smoothing/VolumicSmoothing.h 

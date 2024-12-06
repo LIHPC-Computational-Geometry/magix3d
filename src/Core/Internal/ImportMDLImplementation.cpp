@@ -530,7 +530,6 @@ void ImportMDLImplementation::performTopo(Internal::InfoCommand* icmd)
             }
             // sélection de la méthode transfinie ou directionnelle si possible
             m_icmd->addTopoInfoEntity (coface, Internal::InfoCommand::CREATED);
-            coface->selectBasicMeshLaw(m_icmd);
 
         } else {
             // cas non-structuré

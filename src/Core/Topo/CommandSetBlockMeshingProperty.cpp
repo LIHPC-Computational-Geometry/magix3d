@@ -8,7 +8,6 @@
  */
 /*----------------------------------------------------------------------------*/
 #include "Topo/CommandSetBlockMeshingProperty.h"
-#include "Topo/FaceMeshingPropertyOrthogonal.h"
 #include "Topo/Block.h"
 #include "Topo/TopoHelper.h"
 
@@ -286,40 +285,6 @@ getNextVertex(Block* bloc, Vertex* vtx1, Vertex* vtx2, std::map<Topo::Vertex*, u
 void CommandSetBlockMeshingProperty::getPreviewRepresentation(Utils::DisplayRepresentation& dr)
 {
 	MGX_FORBIDDEN("getPreviewRepresentation non prévu");
-}
-/*----------------------------------------------------------------------------*/
-void CommandSetBlockMeshingProperty::setOrthogonalCoFaces(Face* face, Vertex* vtx1, Vertex* vtx2, int nbLayers, bool reverse)
-{
-	if (face->getNbCoFaces() == 1){
-		CoFace* coface = face->getCoFace(0);
-
-		Utils::Math::Point v2, v1;
-		if (reverse){
-			v2 = vtx1->getCoord();
-			v1 = vtx2->getCoord();
-		}
-		else {
-			v1 = vtx1->getCoord();
-			v2 = vtx2->getCoord();
-		}
-
-		FaceMeshingPropertyOrthogonal* mp = new FaceMeshingPropertyOrthogonal(v1, v2, nbLayers);
-		mp->initDir(coface); // initialisation avant ==
-
-		if ((*mp) != (*coface->getCoFaceMeshingProperty())) {
-			coface->switchCoFaceMeshingProperty(&getInfoCommand(), mp);
-
-			setOrthogonalCoEdges(coface, mp);
-		}
-		delete mp;
-	}
-	else {
-		MGX_NOT_YET_IMPLEMENTED("Propagation orthogonalité pour plusieurs faces sur bord de bloc");
-		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-		message <<"Propagation orthogonalité pour face "<<face->getName()<<" sur bord d'un bloc n'est pas implémentée";
-		message <<"Cette face est composée de plusieurs faces communes";
-		getContext().getLogStream()->log (TkUtil::TraceLog (message, TkUtil::Log::WARNING));
-	}
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo
