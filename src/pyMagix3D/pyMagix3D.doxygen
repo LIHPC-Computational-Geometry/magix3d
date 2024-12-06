@@ -770,9 +770,6 @@ INPUT                  = ../../src/Doc/User \
                          ../../src/Core/protected/Topo/EdgeMeshingPropertyTabulated.h \
                          ../../src/Core/protected/Topo/EdgeMeshingPropertyBeta.h \
                          ../../src/Core/protected/Topo/CoFaceMeshingProperty.h \
-                         ../../src/Core/protected/Topo/FaceMeshingPropertyDirectional.h \
-                         ../../src/Core/protected/Topo/FaceMeshingPropertyOrthogonal.h \
-                         ../../src/Core/protected/Topo/FaceMeshingPropertyRotational.h \
                          ../../src/Core/protected/Topo/FaceMeshingPropertyTransfinite.h \
                          ../../src/Core/protected/Topo/FaceMeshingPropertyDelaunayGMSH.h \
                          ../../src/Core/protected/Topo/FaceMeshingPropertyQuadPairing.h \

@@ -41,9 +41,6 @@ set(DOXYGEN_DIRS
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/EdgeMeshingPropertyGlobalInterpolate.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/EdgeMeshingPropertyTabulated.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/EdgeMeshingPropertyBeta.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyDirectional.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyOrthogonal.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyRotational.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyTransfinite.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyDelaunayGMSH.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyQuadPairing.h

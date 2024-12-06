@@ -16,8 +16,6 @@
 #include "Topo/CoFace.h"
 #include "Topo/Edge.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
-#include "Topo/FaceMeshingPropertyDirectional.h"
-#include "Topo/FaceMeshingPropertyRotational.h"
 #include "Topo/EdgeMeshingPropertyInterpolate.h"
 
 #include "Geom/CommandExtrudeRevolution.h"
@@ -2018,42 +2016,6 @@ constructRevolFaces(std::vector<CoFace*>& cofaces_0,
                                 else
                                     updateGeomAssociation(coedge_0->getGeomAssociation(), newCoFace);
 
-#ifdef _DEBUG_MESH_LAW
-                                std::cout<<"filtre_coedge["<<coedge_dep->getName()<<"] = "<<filtre_coedge[coedge_dep]<<std::endl;
-#endif
-                                // pour les faces communes en relation avec l'ogrid et celles issues d'une compositions de cofaces
-                                // (cas d'un bloc sous l'ogrid)
-                                if ((filtre_coedge[coedge_dep] == 1 || filtre_coedge[coedge_dep] == 0)
-                                		&& coedge_dep->getMeshLaw() != CoEdgeMeshingProperty::interpolate){
-                                    // on remplace la méthode créée par défaut, par celle directionnelle en I
-                                    FaceMeshingPropertyDirectional* newProp = new FaceMeshingPropertyDirectional(FaceMeshingPropertyDirectional::dir_i);
-                                    CoFaceMeshingProperty* oldProp = newCoFace->setProperty(newProp);
-                                    delete oldProp;
-#ifdef _DEBUG_MESH_LAW
-                                    std::cout<<"On utilise la méthode direction (dirI) pour mailler "<<newCoFace->getName()<<std::endl;
-#endif
-                                }
-                                else {
-                                    // recherche si l'arête a un sommet qui touche l'ogrid
-                                    bool touche = false;
-                                    for (uint i=0; i<coedge_dep->getNbVertices(); i++)
-                                        if (filtre_vertex[coedge_dep->getVertex(i)]%5 == 1)
-                                            touche = true;
-                                    if (!touche){
-                                        // on remplace la méthode créée par défaut, par celle rotationnelle suivant J
-                                        FaceMeshingPropertyRotational* newProp =
-                                                new FaceMeshingPropertyRotational
-                                                       (FaceMeshingPropertyRotational::dir_j,
-                                                        Utils::Math::Point(0,0,0),
-                                                        Utils::Math::Point(1,0,0));
-                                        CoFaceMeshingProperty* oldProp = newCoFace->setProperty(newProp);
-                                        delete oldProp;
-#ifdef _DEBUG_MESH_LAW
-                                        std::cout<<"On utilise la méthode rotation (rotJ) pour mailler "<<newCoFace->getName()<<std::endl;
-#endif
-                                    }
-                                }
-
                             } // end for coedges0
                         } // end else / if coedges0.size() != coedges1.size()
                     } // end cas de la construction d'une face
@@ -2840,27 +2802,6 @@ constructRevolBlocks(std::vector<CoFace*>& cofaces_0,
         std::cout<<"\nCréation du bloc à l'extérieur de l'ogrid : "<<*newBlock;
         //newBlock->check();
 #endif
-
-        // on cherche si l'une des directions peut servir pour définir un maillage unidirectionnel
-        // on se base sur la face de départ
-        // non valable pour le cas des blocs dégénérés
-        bool findDir = false;
-        if (vertices.size() == 8){
-        	Face* face = newBlock->getFace(0);
-        	if (face->getNbCoFaces() == 1){
-        		CoFaceMeshingProperty::meshLaw ml = face->getCoFace(0)->getMeshLaw();
-        		findDir = (ml == CoFaceMeshingProperty::directional);
-        	}
-        }
-
-        if (vertices.size() == 8 && findDir){
-        	std::vector<CoEdge* > iCoedges;
-        	std::vector<CoEdge* > jCoedges;
-
-        	Face* face = newBlock->getFace(0);
-
-        	face->getOrientedCoEdges(iCoedges, jCoedges);
-        } // end if (vertices.size() == 8 && findDir)
     } // end for cofaces
 }
 /*----------------------------------------------------------------------------*/
@@ -3137,7 +3078,6 @@ constructRevolBlocksInnerOgrid_4(std::vector<CoFace*>& cofaces_0,
 
                 Block* newBlock = new Topo::Block(getContext(), faces, vertices, true);
                 getInfoCommand().addTopoInfoEntity(newBlock, Internal::InfoCommand::CREATED);
-                newBlock->selectBasicMeshLaw(&getInfoCommand());
                 updateGeomAssociation(coface_0->getGeomAssociation(), newBlock);
 #ifdef _DEBUG_REVOL
                 std::cout<<"\nCréation du bloc à l'intérieur de l'ogrid (sur l'axe) : "<<*newBlock;
@@ -3253,7 +3193,6 @@ constructRevolBlocksInnerOgrid_4(std::vector<CoFace*>& cofaces_0,
 
                 Block* newBlock = new Topo::Block(getContext(), faces, vertices, true);
                 getInfoCommand().addTopoInfoEntity(newBlock, Internal::InfoCommand::CREATED);
-                newBlock->selectBasicMeshLaw(&getInfoCommand());
                 updateGeomAssociation(coface_0->getGeomAssociation(), newBlock);
 #ifdef _DEBUG_REVOL
                 std::cout<<"\nCréation du 1er bloc à l'intérieur de l'ogrid (autour du bloc central) : "<<*newBlock;
@@ -3349,7 +3288,6 @@ constructRevolBlocksInnerOgrid_4(std::vector<CoFace*>& cofaces_0,
 
                 Block* newBlock = new Topo::Block(getContext(), faces, vertices, true);
                 getInfoCommand().addTopoInfoEntity(newBlock, Internal::InfoCommand::CREATED);
-                newBlock->selectBasicMeshLaw(&getInfoCommand());
                 updateGeomAssociation(coface_0->getGeomAssociation(), newBlock);
 #ifdef _DEBUG_REVOL
                 std::cout<<"\nCréation du 2ème bloc à l'intérieur de l'ogrid (autour du bloc central) : "<<*newBlock;
@@ -3423,7 +3361,6 @@ constructRevolBlocksInnerOgrid_4(std::vector<CoFace*>& cofaces_0,
 
                 Block* newBlock = new Topo::Block(getContext(), faces, vertices, true);
                 getInfoCommand().addTopoInfoEntity(newBlock, Internal::InfoCommand::CREATED);
-                newBlock->selectBasicMeshLaw(&getInfoCommand());
                 updateGeomAssociation(coface_0->getGeomAssociation(), newBlock);
 #ifdef _DEBUG_REVOL
                 std::cout<<"\nCréation du 3ème bloc à l'intérieur de l'ogrid (autour du bloc central) : "<<*newBlock;
@@ -3603,7 +3540,6 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
             // Block (unique)
             Block* newBlock = new Topo::Block(getContext(), faces, vertices, true);
             getInfoCommand().addTopoInfoEntity(newBlock, Internal::InfoCommand::CREATED);
-            newBlock->selectBasicMeshLaw(&getInfoCommand());
             updateGeomAssociation(coface_0->getGeomAssociation(), newBlock);
 #ifdef _DEBUG_REVOL
             std::cout<<"\nCréation du bloc à l'intérieur de l'ogrid (sur l'axe) : "<<*newBlock;
@@ -3715,7 +3651,6 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
 
                 Block* newBlock = new Topo::Block(getContext(), faces, vertices, true);
                 getInfoCommand().addTopoInfoEntity(newBlock, Internal::InfoCommand::CREATED);
-                newBlock->selectBasicMeshLaw(&getInfoCommand());
                 updateGeomAssociation(coface_0->getGeomAssociation(), newBlock);
 #ifdef _DEBUG_REVOL
                 std::cout<<"\nCréation du 1er bloc à l'intérieur de l'ogrid (autour du bloc central) : "<<*newBlock;
@@ -3816,7 +3751,6 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
 
                 Block* newBlock = new Topo::Block(getContext(), faces, vertices, true);
                 getInfoCommand().addTopoInfoEntity(newBlock, Internal::InfoCommand::CREATED);
-                newBlock->selectBasicMeshLaw(&getInfoCommand());
                 updateGeomAssociation(coface_0->getGeomAssociation(), newBlock);
 #ifdef _DEBUG_REVOL
                 std::cout<<"\nCréation du 2ème bloc à l'intérieur de l'ogrid (autour du bloc central) : "<<*newBlock;
@@ -3912,7 +3846,6 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
 
                 Block* newBlock = new Topo::Block(getContext(), faces, vertices, true);
                 getInfoCommand().addTopoInfoEntity(newBlock, Internal::InfoCommand::CREATED);
-                newBlock->selectBasicMeshLaw(&getInfoCommand());
                 updateGeomAssociation(coface_0->getGeomAssociation(), newBlock);
 #ifdef _DEBUG_REVOL
                 std::cout<<"\nCréation du 3ème bloc à l'intérieur de l'ogrid (autour du bloc central) : "<<*newBlock;
@@ -4009,7 +3942,6 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
 
                 Block* newBlock = new Topo::Block(getContext(), faces, vertices, true);
                 getInfoCommand().addTopoInfoEntity(newBlock, Internal::InfoCommand::CREATED);
-                newBlock->selectBasicMeshLaw(&getInfoCommand());
                 updateGeomAssociation(coface_0->getGeomAssociation(), newBlock);
 #ifdef _DEBUG_REVOL
                 std::cout<<"\nCréation du 4ème bloc à l'intérieur de l'ogrid (autour du bloc central) : "<<*newBlock;
@@ -4086,7 +4018,6 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
 
                 Block* newBlock = new Topo::Block(getContext(), faces, vertices, true);
                 getInfoCommand().addTopoInfoEntity(newBlock, Internal::InfoCommand::CREATED);
-                newBlock->selectBasicMeshLaw(&getInfoCommand());
                 updateGeomAssociation(coface_0->getGeomAssociation(), newBlock);
 #ifdef _DEBUG_REVOL
                 std::cout<<"\nCréation du 5ème bloc à l'intérieur de l'ogrid (autour du bloc central) : "<<*newBlock;
@@ -4240,7 +4171,6 @@ constructRevolBlocksInnerOgrid_1(std::vector<CoFace*>& cofaces_45,
             // Block (unique)
             Block* newBlock = new Topo::Block(getContext(), faces, vertices, true);
             getInfoCommand().addTopoInfoEntity(newBlock, Internal::InfoCommand::CREATED);
-            newBlock->selectBasicMeshLaw(&getInfoCommand());
             updateGeomAssociation(coface_45->getGeomAssociation(), newBlock);
 #ifdef _DEBUG_REVOL
             std::cout<<"\nCréation du bloc à l'intérieur de l'ogrid (sur l'axe) : "<<*newBlock;
@@ -4431,7 +4361,6 @@ constructRevolBlocksInnerOgrid_1(std::vector<CoFace*>& cofaces_45,
 
                     Block* newBlock = new Topo::Block(getContext(), faces, vertices, true);
                     getInfoCommand().addTopoInfoEntity(newBlock, Internal::InfoCommand::CREATED);
-                    newBlock->selectBasicMeshLaw(&getInfoCommand());
                     updateGeomAssociation(coface_0->getGeomAssociation(), newBlock);
 #ifdef _DEBUG_REVOL
                     std::cout<<"\nCréation du "<<j*2<<"ème bloc à l'intérieur de l'ogrid (autour du bloc central) : "<<*newBlock;
@@ -4526,7 +4455,6 @@ constructRevolBlocksInnerOgrid_1(std::vector<CoFace*>& cofaces_45,
 
                     Block* newBlock = new Topo::Block(getContext(), faces, vertices, true);
                     getInfoCommand().addTopoInfoEntity(newBlock, Internal::InfoCommand::CREATED);
-                    newBlock->selectBasicMeshLaw(&getInfoCommand());
                     updateGeomAssociation(coface_0->getGeomAssociation(), newBlock);
 #ifdef _DEBUG_REVOL
                     std::cout<<"\nCréation du "<<j*2+1<<"ème bloc à l'intérieur de l'ogrid (autour du bloc central) : "<<*newBlock;

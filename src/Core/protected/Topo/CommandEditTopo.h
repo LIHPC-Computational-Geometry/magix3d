@@ -196,20 +196,6 @@ protected:
     virtual void countNbCoEdgesByVertices(std::map<Topo::Vertex*, uint> &nb_coedges_by_vertex);
 
     /*------------------------------------------------------------------------*/
-    /** Dans les cas d'une méthode de maillage initiale directionnelle ou rotationnelle
-     *  potentiellement invalide
-     *  recherche la méthode la plus simple
-     */
-    void updateMeshLaw(std::vector<Topo::CoFace*>& cofaces, std::vector<Topo::Block*>& blocks);
-
-    /*------------------------------------------------------------------------*/
-    /// change la discrétisation pour les arêtes d'une coface en mettant la discrétisation orthogonale
-    virtual void setOrthogonalCoEdges(CoFace* coface, FaceMeshingPropertyOrthogonal* mp);
-
-    /// Change la discrétisation pour une ou plusieurs arêtes en la mettant orthogonale
-    virtual void setOrthogonalCoEdges(Edge* edge, Vertex* vertex, int nbLayers);
-
-    /*------------------------------------------------------------------------*/
     /** Duplique les CoFaces
      */
     virtual void duplicate(std::vector<CoFace*>& cofaces_dep,

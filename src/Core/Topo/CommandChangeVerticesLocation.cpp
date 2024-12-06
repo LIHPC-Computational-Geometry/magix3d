@@ -140,9 +140,6 @@ internalExecute()
     auto lastcofaces = std::unique(cofaces.begin(), cofaces.end());
     cofaces.erase(lastcofaces, cofaces.end());
 
-    // recherche la méthode la plus simple possible
-    updateMeshLaw(cofaces, blocks);
-
     // on parcours les entités modifiées pour sauvegarder leur état d'avant la commande
     saveInternalsStats();
 

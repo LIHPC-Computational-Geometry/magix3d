@@ -667,9 +667,6 @@ internalExecute()
         } // end for iter1
     } //end if (!m_project_on_first)
 
-    // recherche la méthode la plus simple possible pour les cofaces et les blocs modifiés
-    updateMeshLaw(cofaces, blocks);
-
     // enregistrement des nouvelles entités dans le TopoManager
     registerToManagerCreatedEntities();
 
