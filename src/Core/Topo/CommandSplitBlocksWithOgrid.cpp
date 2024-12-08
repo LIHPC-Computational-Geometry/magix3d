@@ -44,8 +44,25 @@ CommandSplitBlocksWithOgrid(Internal::Context& c,
 , m_create_internal_vertices(create_internal_vertices)
 , m_propagate_neighbor_block(propagate_neighbor_block)
 {
-    // la validité de la sélection se fera dans le preExecute
-    m_blocs.insert(m_blocs.end(), blocs.begin(), blocs.end());
+    if (ratio_ogrid<=0.0 || ratio_ogrid>=1.0)
+        throw TkUtil::Exception (TkUtil::UTF8String ("Le ratio doit être dans l'interval ]0 1[", TkUtil::Charset::UTF_8));
+
+    if (nb_bras<=0)
+        throw TkUtil::Exception (TkUtil::UTF8String ("Le nombre de bras doit être d'au moins 1", TkUtil::Charset::UTF_8));
+
+    // on ne conserve que les blocs structurés et non dégénérés
+    for (std::vector<Topo::Block* >::iterator iter = blocs.begin();
+            iter != blocs.end(); ++iter){
+        Topo::Block* hb = *iter;
+        if (hb->isStructured() && hb->getNbVertices() == 8)
+            m_blocs.push_back(hb);
+        else{
+			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+            message <<"Il n'est pas prévu de faire un découpage en o-grid dans un bloc non structuré ou dégénéré\n";
+            message << "("<<hb->getName()<<" n'est pas structuré)";
+            throw TkUtil::Exception(message);
+        }
+    }
 
     // la validité de la sélection se fera lors de la création des filtres
     m_cofaces.insert(m_cofaces.end(), cofaces.begin(), cofaces.end());
@@ -66,125 +83,6 @@ CommandSplitBlocksWithOgrid::
 {
 }
 /*----------------------------------------------------------------------------*/
-/* Les traitements de la méthode preExecute étaient auparavant faits dans le  */
-/* constructeur. Or, lever une exception dans le constructeur ne permet pas   */
-/* de récupérer le message d'erreur si la commande a été déclenchée en Python */
-/* (fonctionne depuis l'IHM).                                                 */
-void CommandSplitBlocksWithOgrid::
-preExecute()
-{
-    if (m_ratio_ogrid<=0.0 || m_ratio_ogrid>=1.0)
-        throw TkUtil::Exception (TkUtil::UTF8String ("Le ratio doit être dans l'interval ]0 1[", TkUtil::Charset::UTF_8));
-
-    if (m_nb_meshing_edges<=0)
-        throw TkUtil::Exception (TkUtil::UTF8String ("Le nombre de bras doit être d'au moins 1", TkUtil::Charset::UTF_8));
-
-    // on vérifie que les blocs sont structurés et non dégénérés
-    for (std::vector<Topo::Block* >::iterator iter = m_blocs.begin();
-            iter != m_blocs.end(); ++iter){
-        Topo::Block* hb = *iter;
-        if (!(hb->isStructured() && hb->getNbVertices() == 8)){
-			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-            message <<"Il n'est pas prévu de faire un découpage en o-grid dans un bloc non structuré ou dégénéré\n";
-            message << "("<<hb->getName()<<" n'est pas structuré)";
-            throw TkUtil::Exception(message);
-        }
-    }
-
-    // Vérification de la contrainte d'Euler sur les blocs
-    // https://fr.wikipedia.org/wiki/Caract%C3%A9ristique_d%27Euler
-    // Pour tout sommet s d'un bloc, on considère tous les blocs adjacents à s
-    // comme un unique polyhèdre sur lequel on vérifie la contrainte d'Euler
-    // cad : S - A + F = 2
-
-    // Recherche de tous les sommets des blocs à découper (en enlevant les doublons)
-    std::set<Topo::Vertex*> all_vertices;
-    for (auto bi = m_blocs.begin(); bi != m_blocs.end(); ++bi){
-        Topo::Block* b = *bi;
-        std::vector<Topo::Vertex* > vertices;
-        b->getVertices(vertices);
-        for (auto vi = vertices.begin(); vi != vertices.end(); ++vi)
-            all_vertices.insert(*vi);
-    }
-
-    // Parcours des blocs adjacents à chacun des sommets (parmi les blocs sélectionnés).
-    // Ils sont considérés comme un unique polyhèdre
-    // pour le calcul de la contrainte d'Euler.
-    for (auto vi = all_vertices.begin(); vi != all_vertices.end(); ++vi){
-        Topo::Vertex* v = *vi;
-        // recherche de tous les blocs adjacents à v
-        std::vector<Topo::Block* > adjacent_blocks;
-        v->getBlocks(adjacent_blocks);
-        // filtrage pour ne laisser que les blocs de la liste des blocs sélectionnés (m_blocs)
-        adjacent_blocks.erase(std::remove_if(adjacent_blocks.begin(), adjacent_blocks.end(), [&](Topo::Block* b){
-            return std::find(m_blocs.begin(), m_blocs.end(), b) == m_blocs.end();
-        }), adjacent_blocks.end());
-
-        // Recherche des faces externes des blocs adjacents (= du polyhèdre)
-        // Pour cela, effacement des faces communes
-        std::set<Topo::CoFace*> external_faces;
-        for (auto bi = adjacent_blocks.begin(); bi != adjacent_blocks.end(); ++bi){
-            Topo::Block* hb = *bi;
-
-            std::vector<Topo::CoFace* > faces;
-            hb->getCoFaces(faces);
-            for (auto fi = faces.begin(); fi != faces.end(); ++fi){
-                Topo::CoFace* f = *fi;
-                if (external_faces.find(f) == external_faces.end())
-                    // not found
-                    external_faces.insert(f);
-                else
-                    // found => common internal face
-                    external_faces.erase(f);
-            }
-        }
-
-        // Recherche des aretes et sommets des faces externes.
-        // On utilise un set pour éviter les doublons.
-        std::set<Topo::CoEdge*> external_edges;
-        std::set<Topo::Vertex*> external_vertices;
-        for (auto fi = external_faces.begin(); fi != external_faces.end(); ++fi){
-            Topo::CoFace* f = *fi;
-
-            std::vector<Topo::CoEdge* > edges;
-            f->getCoEdges(edges);
-            for (auto ei = edges.begin(); ei != edges.end() ; ++ei)
-                external_edges.insert(*ei);
-
-            std::vector<Topo::Vertex* > vertices;
-            f->getVertices(vertices);
-            for (auto vi = vertices.begin(); vi != vertices.end(); ++vi)
-                external_vertices.insert(*vi);
-        }
-
-        // Calcul de khi = S - A + F
-        const int S = external_vertices.size();
-        const int A = external_edges.size();
-        const int F = external_faces.size();
-        const int khi = S - A + F;
-
-#ifdef _DEBUG_SPLIT_OGRID
-        std::cout << "Pour " << v->getName() << std::endl;
-        std::cout << "   Faces externes des blocs adjacents :";
-        for (auto fi = external_faces.begin(); fi != external_faces.end(); ++fi)
-            std::cout << " " << (*fi)->getName();
-        std::cout << std::endl;
-        std::cout << "   S=" << S << ", A=" << A << ", F=" << F << " =>  Khi=" << khi << std::endl;
-#endif
-
-        if (khi != 2) {
-            TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-            message << "La caractéristique d'Euler (S-A+F) n'est pas respectée pour les blocs adjacents à ";
-            message << v->getName();
-            message <<" c'est à dire le polyhèdre représenté par [";
-            for (auto bi = adjacent_blocks.begin(); bi != adjacent_blocks.end(); ++bi)
-                message << " " << (*bi)->getName();
-            message << " ]. Par conséquent, réaliser un O-grid global n'est pas possible.";
-            throw TkUtil::Exception(message);
-        }
-    }
-}
-/*----------------------------------------------------------------------------*/
 void CommandSplitBlocksWithOgrid::
 internalExecute()
 {
@@ -195,9 +93,6 @@ internalExecute()
 #ifdef _DEBUG_SPLIT_OGRID
     std::cout<<"CommandSplitBlocksWithOgrid::internalExecute"<<std::endl;
 #endif
-
-    // vérifications avant exécution
-    preExecute();
 
     // Filtres:  à 1 pour ce qui est sur le bord et à 2 ce qui est à l'intérieur
     std::map<Vertex*, uint> filtre_vertex;

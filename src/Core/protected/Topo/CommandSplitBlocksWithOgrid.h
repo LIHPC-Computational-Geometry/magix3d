@@ -70,13 +70,6 @@ public:
     virtual void getPreviewRepresentation(Utils::DisplayRepresentation& dr);
 
 private:
-    /** Les traitements de la méthode preExecute étaient auparavant faits dans le
-     * constructeur. Or, lever une exception dans le constructeur ne permet pas
-     * de récupérer le message d'erreur si la commande a été déclenchée en Python
-     * (fonctionne depuis l'IHM).
-     */
-    void preExecute();
-
     /** Remplissage des filtres pour les sommets, arêtes communes,
      * faces communes et les blocs
      * On met à 1 ce qui est sur le bord et
