@@ -393,7 +393,6 @@ class QtMgx3DMainWindow :
 		QAction			*_displayLookupTableAction,
 						*_displayLookupTableEditorAction;
 		QAction			*_distanceMeasurementAction, *_angleMeasurementAction, *_extremaMeshingEdgeLengthOnEdgeAction;
-		QAction			*_topoOptimMeshMethod;
 		QAction			*_topoInformationAction, *_meshInformationAction;
 		QAction			*_topoRefineAction,
 						*_topoSetDefaultNbMeshingEdgesAction;
@@ -1126,11 +1125,6 @@ class QtMgx3DMainWindow :
      * alternativement structurés/non-structurés.
      */
     virtual void new3x3BoxesWithTopoCallback ();
-
-    /**
-     * Remplace la méthode de maillage Transfini par une méthode plus rapide du type directionnelle.
-     */
-    virtual void optimMeshMethodCallback ();
 
     /**
      * Affiche une nouvelle fenêtre "Information sur la topologie".
