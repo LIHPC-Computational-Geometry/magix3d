@@ -11,6 +11,7 @@
 
 #include <assert.h>
 #include <float.h>
+#include <algorithm>
 
 using namespace TkUtil;
 using namespace std;
@@ -368,6 +369,12 @@ void SelectionManager::addToSelection (const vector<Entity*>& entities, bool und
 	for (vector<Entity*>::const_iterator it = entities.begin ( ); entities.end ( ) != it; it++)
 	{
 		CHECK_NULL_PTR_ERROR (*it)
+
+		// On filtre, certaines entités peuvent être présentes 2 fois (acteurs VTK filaire + isofilaire par ex) :
+		vector<Entity*>::const_iterator itnext	= it;	itnext++;
+		vector<Entity*>::const_iterator itfound	= find (itnext, entities.end ( ), *it);
+		if (entities.end ( ) != itfound)
+			continue;	// La dernière occurence sera ajoutée
 
 		if (true == isSelected (**it))
 		{

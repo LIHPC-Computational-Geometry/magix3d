@@ -25,6 +25,8 @@ class QtMgx3DMainWindow;
  */
 class QtMgx3DPythonConsole : public QtPythonConsole 
 {
+	Q_OBJECT
+
 	public :
 
 	/** Constructeur
@@ -107,10 +109,38 @@ class QtMgx3DPythonConsole : public QtPythonConsole
 	 * 				de la console doit être enregistré.
 	 */
 	virtual void saveConsoleScript (const std::string filePath, TkUtil::Charset coding, bool environment);
+
+
+	public slots :
 	
+	/**
+	 * Insère à l'emplacement du curseur la sélection courante correspondant au type transmis en argument.
+	 */
+	virtual void insertSelectionCallback (Utils::Entity::objectType type);
+
 
 	protected :
 
+	/**
+	 * @return	Un menu contextuel.
+	 * @see		updateActions
+	 */
+	virtual QMenu* createPopupMenu ( );
+	
+	/** Les actions d'insertion de la sélection courante. */
+	virtual QAction& insertSelectedVolumesAction ( );
+	virtual QAction& insertSelectedSurfacesAction ( );
+	virtual QAction& insertSelectedCurvesAction ( );
+	virtual QAction& insertSelectedGeomVerticesAction ( );
+	virtual QAction& insertSelectedBlocksAction ( );
+	virtual QAction& insertSelectedFacesAction ( );
+	virtual QAction& insertSelectedEdgesAction ( );
+	virtual QAction& insertSelectedTopoVerticesAction ( );
+	virtual QAction& insertSelectedMeshVolumesAction ( );
+	virtual QAction& insertSelectedMeshSurfacesAction ( );
+	virtual QAction& insertSelectedLinesAction ( );
+	virtual QAction& insertSelectedCloudsAction ( );
+	
 	/**
  	 * Récupère/réaffecte la politique de fonctionnement du gestionnaire de commandes.
  	 */
@@ -142,6 +172,11 @@ class QtMgx3DPythonConsole : public QtPythonConsole
 	 * aura fini de fonctionner.
 	 */
 	Mgx3D::Utils::CommandManagerIfc::POLICY			_cmdMgrPolicy;
+	
+	/** Les actions d'insertion de la sélection courante. */
+	QAction											*_insertSelectedVolumesAction, *_insertSelectedSurfacesAction, *_insertSelectedCurvesAction, *_insertSelectedGeomVerticesAction,
+													*_insertSelectedBlocksAction, *_insertSelectedFacesAction, *_insertSelectedEdgesAction, *_insertSelectedTopoVerticesAction,
+													*_insertSelectedMeshVolumesAction, *_insertSelectedMeshSurfacesAction, *_insertSelectedLinesAction, *_insertSelectedCloudsAction;
 };	// class QtMgx3DPythonConsole
 
 }	// namespace QtComponents

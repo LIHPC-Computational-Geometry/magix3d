@@ -12,6 +12,7 @@
 
 #include <PythonUtil/PythonLogOutputStream.h>
 #include <TkUtil/UTF8String.h>
+#include <iostream>
 
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
@@ -53,6 +54,7 @@ public :
      * Destructeur.
      */
     virtual ~PythonWriter ( );
+	
 
 protected:
 
@@ -78,6 +80,48 @@ private :
     PythonWriter (const PythonWriter&);
     PythonWriter& operator = (const PythonWriter&);
 };
+/*----------------------------------------------------------------------------*/
+/**
+ * \return	Une chaine de caractères utf-8 représentant en 
+ *          langage python la liste des entités transmise en arguments.
+ */
+template <class EntityType> std::string entitiesToPythonList (const std::vector<EntityType*>& entities)
+{
+	TkUtil::UTF8String	list (TkUtil::Charset::UTF_8);
+	list << '[';
+	typename std::vector<EntityType*>::const_iterator it = entities.begin ( );
+	if (entities.end ( ) != it)
+	{
+		list << "\"" << (*it)->getName ( ) << "\"";
+		it++;
+	}
+	for ( ; entities.end ( ) != it; it++)
+		list << ",\"" << (*it)->getName ( ) << "\"";
+	list << ']';
+
+	return list.utf8 ( );
+}
+/*----------------------------------------------------------------------------*/
+/**
+ * \return	Une chaine de caractères utf-8 représentant en 
+ *          langage python la liste des objets "scriptables" transmise en arguments.
+ */
+template <class Scriptable> std::string scriptablesToPythonList (const std::vector<Scriptable>& objects)
+{
+	TkUtil::UTF8String	list (TkUtil::Charset::UTF_8);
+	list << '[';
+	typename std::vector<Scriptable>::const_iterator it = objects.begin ( );
+	if (objects.end ( ) != it)
+	{
+		list << "\"" << (*it).getScriptCommand ( ) << "\"";
+		it++;
+	}
+	for ( ; objects.end ( ) != it; it++)
+		list << ",\"" << (*it).getScriptCommand ( ) << "\"";
+	list << ']';
+
+	return list.utf8 ( );
+}
 /*----------------------------------------------------------------------------*/
 } // end namespace Internal
 /*----------------------------------------------------------------------------*/
