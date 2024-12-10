@@ -1,4 +1,5 @@
 #include "Internal/ContextIfc.h"
+#include "Internal/PythonWriter.h"
 
 #include "QtComponents/QtMgx3DPythonConsole.h"
 #include "QtComponents/Qt3DGraphicalWidget.h"
@@ -77,15 +78,45 @@ namespace QtComponents
 
 QtMgx3DPythonConsole::QtMgx3DPythonConsole (QWidget* parent, QtMgx3DMainWindow* mainWindow, const string& title)
 	: QtPythonConsole (parent, title),
-	  _mgxUserScriptingManager (0), _mainWindow (mainWindow), _graphicalWidget (0), _cmdMgrPolicy ((CommandManagerIfc::POLICY)-1)
+	  _mgxUserScriptingManager (0), _mainWindow (mainWindow), _graphicalWidget (0), _cmdMgrPolicy ((CommandManagerIfc::POLICY)-1),
+	  _insertSelectedVolumesAction (0), _insertSelectedSurfacesAction (0), _insertSelectedCurvesAction (0), _insertSelectedGeomVerticesAction (0),
+	  _insertSelectedBlocksAction (0), _insertSelectedFacesAction (0), _insertSelectedEdgesAction (0), _insertSelectedTopoVerticesAction (0),
+	  _insertSelectedMeshVolumesAction (0), _insertSelectedMeshSurfacesAction (0), _insertSelectedLinesAction (0), _insertSelectedCloudsAction (0)
 {
 	hideResult ("proxy of <Swig Object of type");
+	_insertSelectedVolumesAction		= new QAction (UTF8TOQSTRING (UTF8String ("Volumes Géométriques", Charset::UTF_8)), this);
+	QObject::connect (_insertSelectedVolumesAction, &QAction::triggered, this, [this]( ){ insertSelectionCallback (Utils::Entity::GeomVolume); });
+	_insertSelectedSurfacesAction		= new QAction (UTF8TOQSTRING (UTF8String ("Surfaces Géométriques", Charset::UTF_8)), this);
+	QObject::connect (_insertSelectedSurfacesAction, &QAction::triggered, this, [this]( ){ insertSelectionCallback (Utils::Entity::GeomSurface); });
+	_insertSelectedCurvesAction			= new QAction (UTF8TOQSTRING (UTF8String ("Courbes Géométriques", Charset::UTF_8)), this);
+	QObject::connect (_insertSelectedCurvesAction, &QAction::triggered, this, [this]( ){ insertSelectionCallback (Utils::Entity::GeomCurve); });
+	_insertSelectedGeomVerticesAction	= new QAction (UTF8TOQSTRING (UTF8String ("Sommets Géométriques", Charset::UTF_8)), this);
+	QObject::connect (_insertSelectedGeomVerticesAction, &QAction::triggered, this, [this]( ){ insertSelectionCallback (Utils::Entity::GeomVertex); });
+	_insertSelectedBlocksAction		= new QAction (UTF8TOQSTRING (UTF8String ("Blocs Topologiques", Charset::UTF_8)), this);
+	QObject::connect (_insertSelectedBlocksAction, &QAction::triggered, this, [this]( ){ insertSelectionCallback (Utils::Entity::TopoBlock); });
+	_insertSelectedFacesAction		= new QAction (UTF8TOQSTRING (UTF8String ("Faces Topologiques", Charset::UTF_8)), this);
+	QObject::connect (_insertSelectedFacesAction, &QAction::triggered, this, [this]( ){ insertSelectionCallback (Utils::Entity::TopoCoFace); });
+	_insertSelectedEdgesAction			= new QAction (UTF8TOQSTRING (UTF8String ("Arêtes Topologiques", Charset::UTF_8)), this);
+	QObject::connect (_insertSelectedEdgesAction, &QAction::triggered, this, [this]( ){ insertSelectionCallback (Utils::Entity::TopoCoEdge); });
+	_insertSelectedTopoVerticesAction	= new QAction (UTF8TOQSTRING (UTF8String ("Sommets Topologiques", Charset::UTF_8)), this);
+	QObject::connect (_insertSelectedTopoVerticesAction, &QAction::triggered, this, [this]( ){ insertSelectionCallback (Utils::Entity::TopoVertex); });	
+	_insertSelectedMeshVolumesAction		= new QAction (UTF8TOQSTRING (UTF8String ("Volumes de Mailles", Charset::UTF_8)), this);
+	QObject::connect (_insertSelectedMeshVolumesAction, &QAction::triggered, this, [this]( ){ insertSelectionCallback (Utils::Entity::MeshVolume); });
+	_insertSelectedMeshSurfacesAction		= new QAction (UTF8TOQSTRING (UTF8String ("Surfaces de Mailles", Charset::UTF_8)), this);
+	QObject::connect (_insertSelectedMeshSurfacesAction, &QAction::triggered, this, [this]( ){ insertSelectionCallback (Utils::Entity::MeshSurface); });
+	_insertSelectedLinesAction			= new QAction (UTF8TOQSTRING (UTF8String ("Lignes de Mailles", Charset::UTF_8)), this);
+	QObject::connect (_insertSelectedLinesAction, &QAction::triggered, this, [this]( ){ insertSelectionCallback (Utils::Entity::MeshLine); });
+	_insertSelectedCloudsAction	= new QAction (UTF8TOQSTRING (UTF8String ("Nuages de Mailles", Charset::UTF_8)), this);
+	QObject::connect (_insertSelectedCloudsAction, &QAction::triggered, this, [this]( ){ insertSelectionCallback (Utils::Entity::MeshCloud); });
 }	// QtMgx3DPythonConsole::QtMgx3DPythonConsole
 
 
 QtMgx3DPythonConsole::QtMgx3DPythonConsole (const QtMgx3DPythonConsole&)
 	: QtPythonConsole (0, ""),
-	  _mgxUserScriptingManager (0), _mainWindow (0), _graphicalWidget (0), _cmdMgrPolicy ((CommandManagerIfc::POLICY)-1)
+	  _mgxUserScriptingManager (0), _mainWindow (0), _graphicalWidget (0), _cmdMgrPolicy ((CommandManagerIfc::POLICY)-1),
+	  _insertSelectedVolumesAction (0), _insertSelectedSurfacesAction (0), _insertSelectedCurvesAction (0), _insertSelectedGeomVerticesAction (0),
+	  _insertSelectedBlocksAction (0), _insertSelectedFacesAction (0), _insertSelectedEdgesAction (0), _insertSelectedTopoVerticesAction (0),
+	  _insertSelectedMeshVolumesAction (0), _insertSelectedMeshSurfacesAction (0), _insertSelectedLinesAction (0), _insertSelectedCloudsAction (0)
 {
 	assert (0 && "QtMgx3DPythonConsole copy constructor is forbidden.");
 }	// QtMgx3DPythonConsole::QtMgx3DPythonConsole (const QtMgx3DPythonConsole&)
@@ -391,6 +422,130 @@ void QtMgx3DPythonConsole::saveConsoleScript (const string filePath, Charset cha
 		throw Exception (error);
 	}	// if (stream->rdstate ( ) != std::ios_base::goodbit)
 }	// QtMgx3DPythonConsole::saveConsoleScript
+
+
+void QtMgx3DPythonConsole::insertSelectionCallback (Utils::Entity::objectType type)
+{
+	SelectionManagerIfc*	sm	= 0 == getMainWindow ( ) ? 0 : getMainWindow ( )->getSelectionManager ( );
+	if (0 != sm)
+	{
+		vector<Utils::Entity*>	entities		= sm->getEntities (type);
+		const string			entitiesNames	= Internal::entitiesToPythonList<Entity>(entities);
+		insertPlainText (entitiesNames.c_str ( ));
+	}	// if (0 != sm)
+}	// QtMgx3DPythonConsole::insertSelectionCallback
+
+
+QMenu* QtMgx3DPythonConsole::createPopupMenu ( )
+{
+	QMenu*	menu	= QtPythonConsole::createPopupMenu ( );
+	if (0 != menu)
+	{
+		menu->addSeparator ( );
+		QMenu*	entry	= new QMenu ("Insérer sélection", menu);
+		menu->addMenu (entry);
+		entry->addAction (&insertSelectedVolumesAction ( ));
+		entry->addAction (&insertSelectedSurfacesAction ( ));
+		entry->addAction (&insertSelectedCurvesAction ( ));
+		entry->addAction (&insertSelectedGeomVerticesAction ( ));
+		entry->addSeparator ( );
+		entry->addAction (&insertSelectedBlocksAction ( ));
+		entry->addAction (&insertSelectedFacesAction ( ));
+		entry->addAction (&insertSelectedEdgesAction ( ));
+		entry->addAction (&insertSelectedTopoVerticesAction ( ));
+		entry->addSeparator ( );
+		entry->addAction (&insertSelectedMeshVolumesAction ( ));
+		entry->addAction (&insertSelectedMeshSurfacesAction ( ));
+		entry->addAction (&insertSelectedLinesAction ( ));
+		entry->addAction (&insertSelectedCloudsAction ( ));
+	}	// if (0 != menu)
+	
+	return menu;
+}	// QtMgx3DPythonConsole::createPopupMenu
+
+
+QAction& QtMgx3DPythonConsole::insertSelectedVolumesAction ( )
+{
+	CHECK_NULL_PTR_ERROR (_insertSelectedVolumesAction)
+	return *_insertSelectedVolumesAction;
+}	// QtMgx3DPythonConsole::insertSelectedVolumesAction
+
+
+QAction& QtMgx3DPythonConsole::insertSelectedSurfacesAction ( )
+{
+	CHECK_NULL_PTR_ERROR (_insertSelectedSurfacesAction)
+	return *_insertSelectedSurfacesAction;
+}	// QtMgx3DPythonConsole::insertSelectedSurfacesAction
+
+
+QAction& QtMgx3DPythonConsole::insertSelectedCurvesAction ( )
+{
+	CHECK_NULL_PTR_ERROR (_insertSelectedCurvesAction)
+	return *_insertSelectedCurvesAction;
+}	// QtMgx3DPythonConsole::insertSelectedCurvesAction
+
+
+QAction& QtMgx3DPythonConsole::insertSelectedGeomVerticesAction ( )
+{
+	CHECK_NULL_PTR_ERROR (_insertSelectedGeomVerticesAction)
+	return *_insertSelectedGeomVerticesAction;
+}	// QtMgx3DPythonConsole::insertSelectedGeomVerticesAction
+
+
+QAction& QtMgx3DPythonConsole::insertSelectedBlocksAction ( )
+{
+	CHECK_NULL_PTR_ERROR (_insertSelectedBlocksAction)
+	return *_insertSelectedBlocksAction;
+}	// QtMgx3DPythonConsole::insertSelectedBlocksAction
+
+
+QAction& QtMgx3DPythonConsole::insertSelectedFacesAction ( )
+{
+	CHECK_NULL_PTR_ERROR (_insertSelectedFacesAction)
+	return *_insertSelectedFacesAction;
+}	// QtMgx3DPythonConsole::insertSelectedFacesAction
+
+
+QAction& QtMgx3DPythonConsole::insertSelectedEdgesAction ( )
+{
+	CHECK_NULL_PTR_ERROR (_insertSelectedEdgesAction)
+	return *_insertSelectedEdgesAction;
+}	// QtMgx3DPythonConsole::insertSelectedEdgesAction
+
+
+QAction& QtMgx3DPythonConsole::insertSelectedTopoVerticesAction ( )
+{
+	CHECK_NULL_PTR_ERROR (_insertSelectedTopoVerticesAction)
+	return *_insertSelectedTopoVerticesAction;
+}	// QtMgx3DPythonConsole::insertSelectedTopoVerticesAction
+
+
+QAction& QtMgx3DPythonConsole::insertSelectedMeshVolumesAction ( )
+{
+	CHECK_NULL_PTR_ERROR (_insertSelectedMeshVolumesAction)
+	return *_insertSelectedMeshVolumesAction;
+}	// QtMgx3DPythonConsole::insertSelectedMeshVolumesAction
+
+
+QAction& QtMgx3DPythonConsole::insertSelectedMeshSurfacesAction ( )
+{
+	CHECK_NULL_PTR_ERROR (_insertSelectedMeshSurfacesAction)
+	return *_insertSelectedMeshSurfacesAction;
+}	// QtMgx3DPythonConsole::insertSelectedMeshSurfacesAction
+
+
+QAction& QtMgx3DPythonConsole::insertSelectedLinesAction ( )
+{
+	CHECK_NULL_PTR_ERROR (_insertSelectedLinesAction)
+	return *_insertSelectedLinesAction;
+}	// QtMgx3DPythonConsole::insertSelectedLinesAction
+
+
+QAction& QtMgx3DPythonConsole::insertSelectedCloudsAction ( )
+{
+	CHECK_NULL_PTR_ERROR (_insertSelectedCloudsAction)
+	return *_insertSelectedCloudsAction;
+}	// QtMgx3DPythonConsole::insertSelectedCloudsAction
 
 
 void QtMgx3DPythonConsole::storePolicy ( )
