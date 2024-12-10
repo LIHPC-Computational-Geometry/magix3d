@@ -758,6 +758,7 @@ void QtMgx3DApplication::applyConfiguration (const Section& mainSection)
 		PreferencesHelper::getBoolean (operationSection, Resources::instance ( )._showDialogOnCommandError);
 		PreferencesHelper::getBoolean (operationSection, Resources::instance ( )._showAmodalDialogOnCommandError);
 		PreferencesHelper::getUnsignedLong (operationSection, Resources::instance ( )._commandNotificationDelay);
+		PreferencesHelper::getUnsignedLong (operationSection, Resources::instance ( )._commandNotificationDuration);
 		EntitySeizureManager::interactiveModeBackground.setRedF (Resources::instance ( )._IDSeizureBackgroundColor.getRed ( ));
 		EntitySeizureManager::interactiveModeBackground.setGreenF (Resources::instance ( )._IDSeizureBackgroundColor.getGreen ( ));
 		EntitySeizureManager::interactiveModeBackground.setBlueF (Resources::instance ( )._IDSeizureBackgroundColor.getBlue ( ));
@@ -1052,6 +1053,7 @@ void QtMgx3DApplication::saveConfiguration (Section& mainSection)
 	PreferencesHelper::updateBoolean (operationSection, Resources::instance ( )._showDialogOnCommandError);
 	PreferencesHelper::updateBoolean (operationSection, Resources::instance ( )._showAmodalDialogOnCommandError);
 	PreferencesHelper::updateUnsignedLong (operationSection, Resources::instance ( )._commandNotificationDelay);
+	PreferencesHelper::updateUnsignedLong (operationSection, Resources::instance ( )._commandNotificationDuration);
 	PreferencesHelper::updateUnsignedLong (selectionSection, Resources::instance ( )._maxIndividualProperties);
 	PreferencesHelper::updateUnsignedLong (selectionSection, Resources::instance ( )._maxCommonProperties);
 	PreferencesHelper::updateBoolean (groupsSection, Resources::instance ( )._automaticSort);

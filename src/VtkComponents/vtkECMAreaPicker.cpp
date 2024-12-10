@@ -105,7 +105,7 @@ void vtkECMAreaPicker::SelectCompletelyInside (bool on)	// Magix3D
 bool vtkECMAreaPicker::GetSelectCompletelyInside ( ) const	// Magix3D
 {
 	const vtkECMExtractSelectedFrustum*	extractor	= dynamic_cast<const vtkECMExtractSelectedFrustum*>(FrustumExtractor);
-	if (0 == extractor)
+	if (0 != extractor)
 		return extractor->GetSelectCompletelyInside ( );
 
 	return false;

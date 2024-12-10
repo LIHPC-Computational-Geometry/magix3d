@@ -1782,6 +1782,7 @@ void OCCGeomRepresentation::project(const Utils::Math::Point& P1, Utils::Math::P
 /*----------------------------------------------------------------------------*/
 void OCCGeomRepresentation::projectPointOn( Utils::Math::Point& P)
 {
+
 	if(!m_shape.IsNull() && m_shape.ShapeType()==TopAbs_VERTEX)
 	{
 		gp_Pnt pnt = BRep_Tool::Pnt(TopoDS::Vertex(m_shape));
@@ -1790,42 +1791,20 @@ void OCCGeomRepresentation::projectPointOn( Utils::Math::Point& P)
 	else
 	{
 		gp_Pnt pnt(P.getX(),P.getY(),P.getZ());
+		TopoDS_Vertex V = BRepBuilderAPI_MakeVertex(pnt);
+		BRepExtrema_DistShapeShape extrema(V, m_shape);
+		bool isDone = extrema.IsDone();
+		if(!isDone) {
+			isDone = extrema.Perform();
+		}
 
-        // issue#86 : dans le cas des surfaces, si la surface est toute petite,
-        // il faut projeter avec GeomAPI_ProjectPointOnSurf au lieu de
-        // BRepExtrema_DistShapeShape pour éviter les imprécisions numériques.
-        bool is_done = false;
-        if (m_shape.ShapeType()==TopAbs_FACE && computeSurfaceArea()<getPrecision()) {
-            // Initialisation du projecteur
-            TopoDS_Face face = TopoDS::Face(m_shape);
-            Handle(Geom_Surface) surface = BRep_Tool::Surface(face);
-            GeomAPI_ProjectPointOnSurf projector;
-            projector.Init(pnt, surface);
+		if(!isDone){
+			std::cerr<<"OCCGeomRepresentation::projectPointOn("<<P<<")\n";
+			throw TkUtil::Exception("Echec d'une projection d'un point sur une courbe ou surface!!");
 
-            // Si la projection est réussie
-            if (projector.NbPoints() > 0) {
-                gp_Pnt pnt2 = projector.NearestPoint();  // Point projeté le plus proche
-        		P.setXYZ(pnt2.X(), pnt2.Y(), pnt2.Z());
-                is_done = true;                
-            }
-        }
-
-        if (!is_done) {
-            TopoDS_Vertex V = BRepBuilderAPI_MakeVertex(pnt);
-            BRepExtrema_DistShapeShape extrema(V, m_shape);
-            bool isDone = extrema.IsDone();
-            if(!isDone) {
-                isDone = extrema.Perform();
-            }
-
-            if(!isDone){
-                std::cerr<<"OCCGeomRepresentation::projectPointOn("<<P<<")\n";
-                throw TkUtil::Exception("Echec d'une projection d'un point sur une courbe ou surface!!");
-
-            }
-            gp_Pnt pnt2 = extrema.PointOnShape2(1);
-            P.setXYZ(pnt2.X(), pnt2.Y(), pnt2.Z());
-        }
+		}
+		gp_Pnt pnt2 = extrema.PointOnShape2(1);
+		P.setXYZ(pnt2.X(), pnt2.Y(), pnt2.Z());
 //		std::cout<<"OCCGeomRepresentation::projectPointOn("<<pnt.X()<<", "<<pnt.Y()<<", "<<pnt.Z()
 //				<<") => "<<pnt2.X()<<", "<<pnt2.Y()<<", "<<pnt2.Z()<<" distance : "<<pnt.Distance(pnt2)<<std::endl;
 	}

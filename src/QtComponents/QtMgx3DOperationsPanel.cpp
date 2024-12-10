@@ -705,8 +705,8 @@ void QtMgx3DOperationPanel::applyCallback ( )
 // On force à true car lors de pré-traitements (ex : liste d'entités vide, entité détruite) il n'y a pas création de commande donc
 // QtMgx3DMainWindow::commandModified n'est pas appelée donc pas de message d'erreur.
 // Le risque, avec true à la place de !QtMgx3DApplication::_showDialogOnCommandError.getValue( ), est que le message d'erreur soit affiché à 2 reprises.
-			(!userNotified && Resources::instance ( )._showDialogOnCommandError.getValue( )),			// CP 07/24
-			this, "Magix 3D : exécution d'une opération")
+		(!userNotified && Resources::instance ( )._showDialogOnCommandError.getValue( )) && ((0 != getMgx3DOperationAction ( )) && (0 != getMgx3DOperationAction ( )->getCommandResult ( )) && (false == getMgx3DOperationAction ( )->getCommandResult ( )->isUserNotified ( ))),			// CP 21/11/24
+		this, "Magix 3D : exécution d'une opération")
 
 	const bool succeeded	= !hasError;
 	RE_BEGIN_QT_TRY_CATCH_BLOCK

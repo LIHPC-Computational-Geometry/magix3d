@@ -244,7 +244,12 @@ class Resources
 	 /**
 	  * Durée d'exécution de commande à partir de laquelle une notification système est envoyée.
 	  */
-	Preferences::UnsignedLongNamedValue			_commandNotificationDelay; 
+	Preferences::UnsignedLongNamedValue			_commandNotificationDelay;
+	
+	/**
+	 * Durée d'affichage des notifications système (en millisecondes) ou 0 pour les désactiver.
+	 */
+	Preferences::UnsignedLongNamedValue			_commandNotificationDuration;
 
 	/**
 	 * A partir de quel nombre d'entités sélectionnées ne faut il plus afficher les propriétés individuelles de la sélection ? */

@@ -329,6 +329,11 @@ Section **panels** : ressources des panneaux de l’IHM
    - **commandNotificationDelay** : Durée d'exécution de commande en 
       secondes à partir de laquelle une notification système est
       envoyée.
+      
+   - **commandNotificationDuration** : Durée d'affichage en 
+   millisecondes des notifications système (0 pour désactiver leur
+   affichage). Repose sur l'application notify-send.
+
 
 -  Section **selection** :
 

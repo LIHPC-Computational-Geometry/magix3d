@@ -101,6 +101,24 @@ internalExecute()
             iter != m_faces.end(); ++iter)
         (*iter)->check();
 
+    // delete the premesh of the edges to accommodate for possible smooth/pert modifications
+    // applied to adjacent surfaces
+    {
+        std::set<Topo::CoEdge *> set_coedges;
+        for (auto cf: list_cofaces) {
+            std::vector<Topo::CoEdge *> coedges;
+            cf->getCoEdges(coedges);
+
+            for (auto ce: coedges) {
+                set_coedges.insert(ce);
+            }
+        }
+        for (auto ce: set_coedges) {
+            ce->clearPoints();
+            ce->getMeshingData()->setPreMeshed(false);
+        }
+    }
+
     // maille et modifie le maillage pour les modifications 2D, s'il y en a
     setStepProgression (1.);
 	setStep (++step, "Lissage et perturbation des surfaces", 0.);

@@ -487,6 +487,12 @@
         </annotation>
         <value>30</value>
       </element>
+      <element name="commandNotificationDuration" type="unsignedLong">
+        <annotation>
+          <documentation>Durée d'affichage des notifications système (en millisecondes) ou 0 pour les désactiver.</documentation>
+        </annotation>
+        <value>30000</value>
+      </element>
       </Section>
       <Section name="groups" type="container">
         <annotation>

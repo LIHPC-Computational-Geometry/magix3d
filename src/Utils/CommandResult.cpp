@@ -95,7 +95,7 @@ UTF8String CommandResult::getStrStatus ( ) const
 
 UTF8String CommandResult::getErrorMessage ( ) const
 {
-	return getCommand ( ).getErrorMessage ( ).utf8 ( );
+	return getCommand ( ).getErrorMessage ( );
 }	// CommandResult::getErrorMessage
 
 
