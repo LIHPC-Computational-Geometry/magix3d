@@ -18,8 +18,6 @@
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Topo/FaceMeshingPropertyDirectional.h"
 #include "Topo/FaceMeshingPropertyRotational.h"
-#include "Topo/BlockMeshingPropertyDirectional.h"
-#include "Topo/BlockMeshingPropertyRotational.h"
 #include "Topo/EdgeMeshingPropertyInterpolate.h"
 
 #include "Geom/CommandExtrudeRevolution.h"
@@ -2862,93 +2860,7 @@ constructRevolBlocks(std::vector<CoFace*>& cofaces_0,
         	Face* face = newBlock->getFace(0);
 
         	face->getOrientedCoEdges(iCoedges, jCoedges);
-
-        	// les 2 groupes d'arêtes pour une même direction
-        	{
-        		std::vector<std::vector<CoEdge* > > coedges_dirs;
-
-        		std::vector<CoEdge* > coedges_dir1;
-        		TopoHelper::getCoEdgesBetweenVertices(face->getVertex(1),
-        				face->getVertex(2),
-        				iCoedges,
-        				coedges_dir1);
-        		coedges_dirs.push_back(coedges_dir1);
-
-        		if (face->getNbVertices() == 4){
-        			std::vector<CoEdge* > coedges_dir2;
-        			TopoHelper::getCoEdgesBetweenVertices(face->getVertex(0),
-        					face->getVertex(3),
-        					iCoedges,
-        					coedges_dir2);
-        			coedges_dirs.push_back(coedges_dir2);
-        		}
-
-        		if (TopoHelper::isUnidirectionalMeshable(coedges_dirs)){
-#ifdef _DEBUG_MESH_LAW
-        			std::cout<<"On utilise la méthode dirJ pour mailler "<<newBlock->getName()<<" ainsi que les faces ..."<< std::endl;
-#endif
-        			BlockMeshingProperty* new_ppty = new BlockMeshingPropertyDirectional(BlockMeshingProperty::dir_j);
-        			newBlock->setMeshLaw(new_ppty);
-        		}
-        	}
-
-        	if (newBlock->getMeshLaw() == BlockMeshingProperty::transfinite){
-
-        		std::vector<std::vector<CoEdge* > > coedges_dirs;
-
-        		std::vector<CoEdge* > coedges_dir1;
-        		TopoHelper::getCoEdgesBetweenVertices(face->getVertex(1),
-        				face->getVertex(0),
-        				jCoedges,
-        				coedges_dir1);
-        		coedges_dirs.push_back(coedges_dir1);
-
-        		std::vector<CoEdge* > coedges_dir2;
-        		TopoHelper::getCoEdgesBetweenVertices(face->getVertex(2),
-        				face->getVertex(face->getNbVertices()==4?3:0),
-        				jCoedges,
-        				coedges_dir2);
-        		coedges_dirs.push_back(coedges_dir2);
-
-        		if (TopoHelper::isUnidirectionalMeshable(coedges_dirs)){
-#ifdef _DEBUG_MESH_LAW
-        			std::cout<<"On utilise la méthode dirK pour mailler "<<newBlock->getName()<<" ainsi que les faces ..."<< std::endl;
-#endif
-        			BlockMeshingProperty* new_ppty = new BlockMeshingPropertyDirectional(BlockMeshingProperty::dir_k);
-        			newBlock->setMeshLaw(new_ppty);
-        		}
-        	}
-
-        	// cas des blocs au dessus de l'ogrid et qui ne le touche pas
-        	if (newBlock->getMeshLaw() == BlockMeshingProperty::transfinite){
-
-        		// recherche si la coface a un sommet qui touche l'ogrid
-        		bool touche = false;
-        		for (uint i=0; i<coface_0->getNbVertices(); i++)
-        			if (filtre_vertex[coface_0->getVertex(i)]%5 == 1)
-        				touche = true;
-        		if (!touche){
-#ifdef _DEBUG_MESH_LAW
-        			std::cout<<"On utilise la méthode rotation (rotI) pour mailler "<<newBlock->getName()<<std::endl;
-#endif
-        			BlockMeshingProperty* new_ppty = new BlockMeshingPropertyRotational
-        					(BlockMeshingProperty::dir_i, Utils::Math::Point(0,0,0), Utils::Math::Point(1,0,0));
-        			newBlock->setMeshLaw(new_ppty);
-        		}
-        	}
         } // end if (vertices.size() == 8 && findDir)
-        // on reste sur la méthode transfinie (car directionnelle pas compatible avec contours courbes dans le 2D)
-//        else if (vertices.size() != 8){
-//        	// On évite la méthode rotationnelle pour les blocs dégénérés
-//        	// car elle n'est pas adaptée aux cas avec un sommet point triple de l'ogrid sur une surface
-//        	// on utilise donc la direction vers la dégénérescence
-//#ifdef _DEBUG_MESH_LAW
-//        	std::cout<<"On utilise la méthode direction (dirK) pour mailler "<<newBlock->getName()<<std::endl;
-//#endif
-//        	BlockMeshingProperty* new_ppty = new BlockMeshingPropertyDirectional(BlockMeshingProperty::dir_k);
-//        	newBlock->setMeshLaw(new_ppty);
-//        }
-
     } // end for cofaces
 }
 /*----------------------------------------------------------------------------*/

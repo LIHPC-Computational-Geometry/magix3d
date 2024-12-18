@@ -171,9 +171,6 @@ void QtTopologyBlockCreationAction::executeOperation ( )
 		case QtTopologyPanel::OGRID_BLOCKS				:
 			cmdResult	= getContext ( ).getTopoManager ( ).newTopoOGridOnGeometry (name, panel->getOGridRatio ( ));
 			break;
-		case QtTopologyPanel::INSERTION_TOPOLOGY	:
-			cmdResult	= getContext ( ).getTopoManager ( ).newInsertionTopoOnGeometry (name);
-			break;
 		default											:
 		{
 			INTERNAL_ERROR (exc, "Type de topologie non supporté.", "QtTopologyBlockCreationAction::executeOperation")

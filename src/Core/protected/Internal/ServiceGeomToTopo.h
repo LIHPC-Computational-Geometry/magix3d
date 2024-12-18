@@ -59,11 +59,6 @@ public:
      */
     bool convertBlockStructured(const int ni, const int nj, const int nk);
 
-    /*------------------------------------------------------------------------*/
-    /** Convertion du bloc issue de la géométrie en un bloc pour l'insertion
-     * */
-    void convertInsertionBlock();
-
    /*------------------------------------------------------------------------*/
     /** Retourne le bloc construit */
     Topo::Block* getBlock();
