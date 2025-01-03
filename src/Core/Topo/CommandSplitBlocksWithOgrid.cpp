@@ -116,7 +116,6 @@ internalExecute()
     // Création des sommets au centre de l'o-grid
     createVertices(filtre_vertex, filtre_coedge, filtre_coface, corr_vertex);
 
-
     // relation entre sommet initial et arête vers le centre de l'o-grid
     std::map<Vertex*, CoEdge*> corr_vtx_coedge;
 
@@ -152,7 +151,6 @@ internalExecute()
     // mise à jour des arêtes et faces voisines si nécessaire pour cas m_propagate_neighbor_block==false
     freeUnused(filtre_vertex, filtre_coedge, filtre_coface, filtre_bloc,
             corr_vtx_coedge, corr_2vtx_coedge, corr_2vtx_coface, corr_coface);
-
 
     // suppression des entités temporaires
     cleanTemporaryEntities();
@@ -679,6 +677,15 @@ createVertices(std::map<Vertex*, uint> & filtre_vertex,
 #endif
 
                 if (nb_face_int == 0){
+                    std::vector<Block* > blocks;
+                    sommet->getBlocks(blocks);
+                    if (blocks.size() > 1) {
+                        // sommets relié à 2 blocs ayant une arête commune sans face commune
+                        // => pas de ogrid possible
+                        TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+                        message << "Le ogrid n'est pas réalisable car 2 des blocs sélectionnés ont un sommet en commun (" << sommet->getName() << ") mais pas de face commune.";
+                        throw TkUtil::Exception (message);
+                    }
                     // il n'est relié qu'à un seul bloc sélectionné
                     Utils::Math::Point pt = (barycentre_blk + (sommet->getCoord() - barycentre_blk)*m_ratio_ogrid);
                     newVtx = new Topo::Vertex(getContext(), pt);
