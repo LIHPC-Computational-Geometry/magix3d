@@ -544,6 +544,15 @@ createVertices(std::map<Vertex*, uint> & filtre_vertex,
 #ifdef _DEBUG_SPLIT_OGRID
                 	std::cout<<"il n'est relié à aucune arête sélectionnée"<<std::endl;
 #endif
+                    std::vector<CoFace* > cofaces;
+                    sommet->getCoFaces(cofaces);
+                    if (cofaces.size() > 1) {
+                        // sommets relié à 2 faces n'ayant aucune arête commune
+                        // => pas de ogrid possible
+                        TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+                        message << "Le ogrid n'est pas réalisable car 2 des faces sélectionnées ont un sommet en commun (" << sommet->getName() << ") mais pas d'arête commune.";
+                        throw TkUtil::Exception (message);
+                    }
                     Utils::Math::Point pt = (barycentre_cf + (sommet->getCoord() - barycentre_cf)*m_ratio_ogrid);
                     newVtx = new Topo::Vertex(getContext(), pt);
                     getInfoCommand().addTopoInfoEntity(newVtx, Internal::InfoCommand::CREATED);
