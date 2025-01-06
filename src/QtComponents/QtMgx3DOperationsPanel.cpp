@@ -2018,9 +2018,8 @@ void QtMgx3DOperationsPanel::registerSubFamilyToolBar (QtOperationsSubFamilyTool
 		// Déjà recensée ???
 		getToolbar (type);
 		UTF8String	message (Charset::UTF_8);
-		message << "Barre d'icônes déjà recensée pour le type "
-		        << (unsigned long)type << ".";
-		INTERNAL_ERROR (exc, message.iso ( ), "QtMgx3DOperationsPanel::registerSubFamilyToolBar")
+		message << "Barre d'icônes déjà recensée pour le type " << (unsigned long)type << ".";
+		INTERNAL_ERROR (exc, message.utf8 ( ), "QtMgx3DOperationsPanel::registerSubFamilyToolBar")
 		throw exc;
 	}
 	catch (...)
@@ -2037,8 +2036,7 @@ QtOperationsSubFamilyToolBar& QtMgx3DOperationsPanel::getToolbar (OPERATION_TYPE
 	{
 		UTF8String	message (Charset::UTF_8);
 		message << "Absence de barre d'icônes pour le type " << (unsigned long)type << ".";
-		INTERNAL_ERROR (
-					exc, message.iso ( ), "QtMgx3DOperationsPanel::getToolbar")
+		INTERNAL_ERROR (exc, message.utf8 ( ), "QtMgx3DOperationsPanel::getToolbar")
 		throw exc;
 	}
 	else
