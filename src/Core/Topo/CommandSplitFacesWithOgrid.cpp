@@ -544,15 +544,27 @@ createVertices(std::map<Vertex*, uint> & filtre_vertex,
 #ifdef _DEBUG_SPLIT_OGRID
                 	std::cout<<"il n'est relié à aucune arête sélectionnée"<<std::endl;
 #endif
+                    // ce cas n'est valide que si le sommet n'est relié qu'à une seule face sélectionnée
+                    // pas valide en cas de sommet commun à 2 faces sans arête commune
+                    // => récupération des faces du sommet pour compter le nombre de faces candidates à l'ogrid
                     std::vector<CoFace* > cofaces;
                     sommet->getCoFaces(cofaces);
-                    if (cofaces.size() > 1) {
+                    int nb_selected = 0;
+                    for (auto f1 : cofaces) {
+                        for (auto f2 : m_cofaces) {
+                            if (f1 == f2) nb_selected++;
+                        }
+                    }
+
+                    if (nb_selected > 1) {
                         // sommets relié à 2 faces n'ayant aucune arête commune
                         // => pas de ogrid possible
                         TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
                         message << "Le ogrid n'est pas réalisable car 2 des faces sélectionnées ont un sommet en commun (" << sommet->getName() << ") mais pas d'arête commune.";
                         throw TkUtil::Exception (message);
                     }
+
+                    // il n'est relié qu'à une seule face sélectionnée
                     Utils::Math::Point pt = (barycentre_cf + (sommet->getCoord() - barycentre_cf)*m_ratio_ogrid);
                     newVtx = new Topo::Vertex(getContext(), pt);
                     getInfoCommand().addTopoInfoEntity(newVtx, Internal::InfoCommand::CREATED);
