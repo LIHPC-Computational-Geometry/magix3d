@@ -677,15 +677,26 @@ createVertices(std::map<Vertex*, uint> & filtre_vertex,
 #endif
 
                 if (nb_face_int == 0){
+                    // ce cas n'est valide que si le sommet n'est relié qu'à un seul bloc sélectionné
+                    // pas valide en cas de sommet commun à 2 blocs sans arête commune
+                    // => récupération des blocs du sommet pour compter le nombre de blocs candidats à l'ogrid
                     std::vector<Block* > blocks;
                     sommet->getBlocks(blocks);
-                    if (blocks.size() > 1) {
+                    int nb_selected = 0;
+                    for (auto b1 : blocks) {
+                        for (auto b2 : m_blocs) {
+                            if (b1 == b2) nb_selected++;
+                        }
+                    }
+
+                    if (nb_selected > 1) {
                         // sommets relié à 2 blocs ayant une arête commune sans face commune
                         // => pas de ogrid possible
                         TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
                         message << "Le ogrid n'est pas réalisable car 2 des blocs sélectionnés ont un sommet en commun (" << sommet->getName() << ") mais pas de face commune.";
                         throw TkUtil::Exception (message);
                     }
+
                     // il n'est relié qu'à un seul bloc sélectionné
                     Utils::Math::Point pt = (barycentre_blk + (sommet->getCoord() - barycentre_blk)*m_ratio_ogrid);
                     newVtx = new Topo::Vertex(getContext(), pt);

@@ -58,6 +58,11 @@ def test_issue35():
     tm.splitBlocksWithOgridV2 (["Bl0006", "Bl0003"], [], .5, 10)
     # Split non réalisé => toujours que 4 blocs
     assert(tm.getNbBlocks() == 4)
+    # Il faut vérifier que ça fonctionne toujours avec 1 seul bloc
+    # Découpage en O-grid du bloc structuré Bl0006
+    tm.splitBlocksWithOgridV2 (["Bl0006"], [], .5, 10)
+    # Split réalisé => 10 blocs
+    assert(tm.getNbBlocks() == 10)
 
     # [3D] Test 4 : avec des splits d'arêtes
     # --------------------------------------
@@ -144,6 +149,11 @@ def test_issue35():
     tm.splitFace("Fa0000", "Ar0001", .2, True)
     tm.splitAllFaces("Ar0000", .5, .5)
     assert(tm.getNbFaces() == 4)
-    # Création du ogrid non réalisé => toujours que 4 blocs
+    # Création du ogrid non réalisé => toujours que 4 faces
     tm.splitFacesWithOgrid(["Fa0003", "Fa0006"], ["Ar0004", "Ar0010", "Ar0006", "Ar0015"], .5, 10)
     assert(tm.getNbFaces() == 4)
+    # Il faut vérifier que ça fonctionne toujours avec 1 seule face
+    # Création du ogrid sur une seule face
+    tm.splitFacesWithOgrid(["Fa0003"], [], .5, 10)
+    # Split réalisé => 8 faces
+    assert(tm.getNbFaces() == 8)
