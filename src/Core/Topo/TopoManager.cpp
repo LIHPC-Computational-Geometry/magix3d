@@ -18,6 +18,7 @@
 #include "Utils/Point.h"
 #include "Utils/Rotation.h"
 #include "Utils/TypeDedicatedNameManager.h"
+#include "Utils/ErrorManagement.h"
 #include "Utils/MgxException.h"
 
 #include "Topo/TopoManager.h"
@@ -104,7 +105,7 @@
 #include "Internal/M3DCommandResult.h"
 #include "Internal/CommandChangeLengthUnit.h"
 #include "Topo/CommandAlignOnSurface.h"
-
+#include "Internal/PythonWriter.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <Topo/CommandFuse2Edges.h>
@@ -122,6 +123,8 @@
 #include <string>
 #include <map>
 #include <algorithm>
+
+
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -1799,6 +1802,7 @@ void TopoManager::destroy(std::vector<std::string>& topo_entities_names, bool pr
 /*----------------------------------------------------------------------------*/
 void TopoManager::destroy(std::vector<Topo::TopoEntity*>& ve, bool propagate)
 {
+	CHECK_ENTITIES_LIST(ve)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::destroy([";
     for (uint i=0; i<ve.size(); i++){
@@ -1812,13 +1816,7 @@ void TopoManager::destroy(std::vector<Topo::TopoEntity*>& ve, bool propagate)
     Topo::CommandDestroyTopo* command = new Topo::CommandDestroyTopo(getLocalContext(), ve, propagate);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().destroy ([\"";
-    for (uint i=0; i<ve.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << ve[i]->getName();
-    }
-    cmd << "\"], "<<(propagate?"True":"False")<<")";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).destroy (" << Internal::entitiesToPythonList<TopoEntity> (ve) << ", " << (propagate ? "True" : "False") << ")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -1841,21 +1839,17 @@ TopoManager::copy(std::vector<std::string>& vb, std::string vo)
 Mgx3D::Internal::M3DCommandResultIfc*
 TopoManager::copy(std::vector<Topo::Block*>& vb, Geom::Volume* vo)
 {
+	CHECK_ENTITIES_LIST(vb)
     Topo::CommandDuplicateTopo* command = new Topo::CommandDuplicateTopo(getLocalContext(),
     		vb, vo);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().copy ([\"";
-    for (uint i=0; i<vb.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << vb[i]->getName();
-    }
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).copy (" << Internal::entitiesToPythonList<Block> (vb);
     if (vo)
-    	cmd<<"\"], \""<<vo->getName()<<"\")";
+    	cmd<<", \""<<vo->getName()<<"\")";
     else
-    	cmd<<"\"], \"\")";
+    	cmd<<", \"\")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -1880,6 +1874,7 @@ TopoManager::extract(std::vector<std::string>& vb, const std::string ng)
 Mgx3D::Internal::M3DCommandResultIfc*
 TopoManager::extract(std::vector<Topo::Block*>& vb, const std::string ng)
 {
+	CHECK_ENTITIES_LIST(vb)
     // creation de la commande composite
     Internal::CommandComposite *command =
             new Internal::CommandComposite(getLocalContext(), std::string("Extraction de blocs dans ")+ng);
@@ -1896,13 +1891,7 @@ TopoManager::extract(std::vector<Topo::Block*>& vb, const std::string ng)
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().extract ([\"";
-    for (uint i=0; i<vb.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << vb[i]->getName();
-    }
-    cmd<<"\"], \""<<ng<<"\")";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).extract (" << Internal::entitiesToPythonList<Block> (vb) << ", \"" << ng << "\")";
 
     command->setScriptCommand(cmd);
 
@@ -1927,6 +1916,7 @@ TopoManager::insertHole(std::vector<std::string>& face_names)
 Mgx3D::Internal::M3DCommandResultIfc*
 TopoManager::insertHole(std::vector<CoFace*>& cofaces)
 {
+	CHECK_ENTITIES_LIST(cofaces)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::insertHole("<<cofaces.size()<<" faces)";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
@@ -1934,13 +1924,7 @@ TopoManager::insertHole(std::vector<CoFace*>& cofaces)
     Topo::CommandInsertHole* command = new Topo::CommandInsertHole(getLocalContext(), cofaces);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().insertHole ([\"";
-    for (uint i=0; i<cofaces.size(); i++){
-       	if (i)
-       		cmd <<"\", \"";
-       	cmd << cofaces[i]->getName();
-       }
-       cmd <<"\"])";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).insertHole (" << Internal::entitiesToPythonList<CoFace> (cofaces) << ")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -1994,6 +1978,8 @@ TopoManager::fuse2EdgeList(std::vector<std::string>& coedge_names1, std::vector<
 Mgx3D::Internal::M3DCommandResultIfc*
 TopoManager::fuse2EdgeList(std::vector<Topo::CoEdge* > &coedges1, std::vector<Topo::CoEdge* > &coedges2)
 {
+	CHECK_ENTITIES_LIST(coedges1)
+	CHECK_ENTITIES_LIST(coedges2)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::fuse2EdgeList([";
     for (uint i=0; i<coedges1.size(); i++){
@@ -2015,19 +2001,7 @@ TopoManager::fuse2EdgeList(std::vector<Topo::CoEdge* > &coedges1, std::vector<To
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().fuse2EdgeList ([\"";
-    for (uint i=0; i<coedges1.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << coedges1[i]->getName();
-    }
-    cmd <<"\"], [\"";
-    for (uint i=0; i<coedges2.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << coedges2[i]->getName();
-    }
-    cmd << "\"])";
+    cmd << getContextAlias ( ) << ".getTopoManager().fuse2EdgeList (" << Internal::entitiesToPythonList<CoEdge> (coedges1) << ", " << Internal::entitiesToPythonList<CoEdge> (coedges2) << ")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -2081,6 +2055,8 @@ TopoManager::fuse2FaceList(std::vector<std::string>& coface_names1, std::vector<
 Mgx3D::Internal::M3DCommandResultIfc*
 TopoManager::fuse2FaceList(std::vector<Topo::CoFace* > &cofaces1, std::vector<Topo::CoFace* > &cofaces2)
 {
+	CHECK_ENTITIES_LIST(cofaces1)
+	CHECK_ENTITIES_LIST(cofaces2)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::fuse2FaceList([";
     for (uint i=0; i<cofaces1.size(); i++){
@@ -2102,19 +2078,7 @@ TopoManager::fuse2FaceList(std::vector<Topo::CoFace* > &cofaces1, std::vector<To
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().fuse2FaceList ([\"";
-    for (uint i=0; i<cofaces1.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << cofaces1[i]->getName();
-    }
-    cmd <<"\"], [\"";
-    for (uint i=0; i<cofaces2.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << cofaces2[i]->getName();
-    }
-    cmd << "\"])";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).fuse2FaceList (" << Internal::entitiesToPythonList<CoFace> (cofaces1) << ", " << Internal::entitiesToPythonList<CoFace> (cofaces2) << ")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -2272,16 +2236,10 @@ TopoManager::splitBlocks(std::vector<std::string> &blocs_names, std::string nare
 Mgx3D::Internal::M3DCommandResultIfc*
 TopoManager::splitBlocks(std::vector<Topo::Block* > &blocs, CoEdge* arete, const double& ratio)
 {
+	CHECK_ENTITIES_LIST(blocs)
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().splitBlocks ([\"";
-    for (uint i=0; i<blocs.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << blocs[i]->getName();
-    }
-    cmd <<"\"], \""<<arete->getName()
-    	<<"\","<<Utils::Math::MgxNumeric::userRepresentation (ratio)<<")";
+	cmd << getContextAlias ( ) << ".getTopoManager().splitBlocks (" << Internal::entitiesToPythonList<Block> (blocs) << ",\"" << arete->getName ( ) << "\", " << Utils::Math::MgxNumeric::userRepresentation (ratio) << ")";
 
     Topo::CommandSplitBlocks* command = new Topo::CommandSplitBlocks(getLocalContext(), blocs, arete, ratio);
 
@@ -2336,16 +2294,10 @@ TopoManager::splitBlocks(std::vector<std::string> &blocs_names, std::string nare
 Mgx3D::Internal::M3DCommandResultIfc*
 TopoManager::splitBlocks(std::vector<Topo::Block* > &blocs, CoEdge* arete, const Point& pt)
 {
+	CHECK_ENTITIES_LIST(blocs)
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().splitBlocks ([\"";
-    for (uint i=0; i<blocs.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << blocs[i]->getName();
-    }
-    cmd <<"\"], \""<<arete->getName()
-    	<<"\","<<pt.getScriptCommand()<<")";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).splitBlocks (" << Internal::entitiesToPythonList<Block> (blocs) << ", \"" << arete->getName ( ) << "\"," << pt.getScriptCommand ( ) << ")";
 
     Topo::CommandSplitBlocks* command = new Topo::CommandSplitBlocks(getLocalContext(), blocs, arete, pt);
 
@@ -2465,6 +2417,8 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitBlocksWithOgrid(std::vec
 		bool create_internal_vertices,
 		bool propagate_neighbor_block)
 {
+	CHECK_ENTITIES_LIST(blocs)
+	CHECK_ENTITIES_LIST(cofaces)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::splitBlocksWithOgrid([";
     for (uint i=0; i<blocs.size(); i++){
@@ -2487,28 +2441,13 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitBlocksWithOgrid(std::vec
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     if (propagate_neighbor_block)
-    	cmd << getContextAlias() << "." << "getTopoManager().splitBlocksWithOgrid ([\"";
+    	cmd << getContextAlias() << ".getTopoManager().splitBlocksWithOgrid (";
     else if (create_internal_vertices)
-    	cmd << getContextAlias() << "." << "getTopoManager().splitBlocksWithOgrid_old ([\"";
+    	cmd << getContextAlias() << ".getTopoManager().splitBlocksWithOgrid_old (";
     else
-    	cmd << getContextAlias() << "." << "getTopoManager().splitBlocksWithOgridV2 ([\"";
+    	cmd << getContextAlias() << ".getTopoManager().splitBlocksWithOgridV2 (";
 
-    for (uint i=0; i<blocs.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << blocs[i]->getName();
-    }
-    cmd <<"\"], [";
-    if (!cofaces.empty())
-        cmd <<"\"";
-    for (uint i=0; i<cofaces.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << cofaces[i]->getName();
-    }
-    if (!cofaces.empty())
-        cmd <<"\"";
-    cmd << "], ";
+    cmd << Internal::entitiesToPythonList<Block> (blocs) << ", " << Internal::entitiesToPythonList<CoFace> (cofaces) << ", ";
     cmd <<Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid)<<", "<<(short)nb_bras<<")";
     command->setScriptCommand(cmd);
 
@@ -2540,6 +2479,8 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFacesWithOgrid(std::vect
         std::vector<Topo::CoEdge*> &coedges,
         const double& ratio_ogrid, int nb_bras)
 {
+	CHECK_ENTITIES_LIST(cofaces)
+	CHECK_ENTITIES_LIST(coedges)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::splitFacesWithOgrid([";
     for (uint i=0; i<coedges.size(); i++){
@@ -2561,24 +2502,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFacesWithOgrid(std::vect
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-   	cmd << getContextAlias() << "." << "getTopoManager().splitFacesWithOgrid ([\"";
-
-    for (uint i=0; i<cofaces.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << cofaces[i]->getName();
-    }
-    cmd <<"\"], [";
-    if (!coedges.empty())
-        cmd <<"\"";
-    for (uint i=0; i<coedges.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << coedges[i]->getName();
-    }
-    if (!coedges.empty())
-        cmd <<"\"";
-    cmd << "], ";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).splitFacesWithOgrid (" << Internal::entitiesToPythonList<CoFace> (cofaces) << ", " << Internal::entitiesToPythonList<CoEdge> (coedges) << ", ";
     cmd <<Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid)<<", "<<(short)nb_bras<<")";
     command->setScriptCommand(cmd);
 
@@ -2601,6 +2525,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFaces(std::vector<std::s
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFaces(std::vector<Topo::CoFace*  > &cofaces, CoEdge* arete, const double& ratio_dec, const double& ratio_ogrid)
 {
+	CHECK_ENTITIES_LIST(cofaces)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::splitFaces([";
     for (uint i=0; i<cofaces.size(); i++){
@@ -2615,13 +2540,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFaces(std::vector<Topo::
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().splitFaces ([\"";
-    for (uint i=0; i<cofaces.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << cofaces[i]->getName();
-    }
-    cmd << "\"], \"";
+    cmd << getContextAlias ( ) << ".getTopoManager().splitFaces (" << Internal::entitiesToPythonList<CoFace> (cofaces) << ", ";
     cmd << arete->getName() <<"\", "<<Utils::Math::MgxNumeric::userRepresentation (ratio_dec)<<", "<<Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid)<<")";
     command->setScriptCommand(cmd);
 
@@ -2644,6 +2563,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFaces(std::vector<std::s
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFaces(std::vector<Topo::CoFace*  > &cofaces, CoEdge* arete, const Point& pt, const double& ratio_ogrid)
 {
+	CHECK_ENTITIES_LIST(cofaces)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::splitFaces([";
     for (uint i=0; i<cofaces.size(); i++){
@@ -2658,13 +2578,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFaces(std::vector<Topo::
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().splitFaces ([\"";
-    for (uint i=0; i<cofaces.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << cofaces[i]->getName();
-    }
-    cmd << "\"], \"";
+    cmd << getContextAlias ( ) << ".getTopoManager().splitFaces (" << Internal::entitiesToPythonList<CoFace> (cofaces) << ", ";
     cmd << arete->getName() <<"\", "<<pt.getScriptCommand()<<", "<<Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid)<<")";
     command->setScriptCommand(cmd);
 
@@ -3183,6 +3097,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(CoEdgeMesh
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(CoEdgeMeshingProperty& emp, std::vector<CoEdge*>& coedges)
 {
+	CHECK_ENTITIES_LIST (coedges)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::setMeshingProperty(EdgeMeshingProperty("<<(long)emp.getNbEdges()<<","<<emp.getMeshLawName()
                     <<"),"<<coedges.size()<<" arêtes)";
@@ -3191,15 +3106,8 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(CoEdgeMesh
     Topo::CommandSetEdgeMeshingProperty* command = new Topo::CommandSetEdgeMeshingProperty(getLocalContext(), emp, coedges);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << emp.getScriptCommandBegin()<<"\n";
-    cmd << getContextAlias() << "." << "getTopoManager().setMeshingProperty ("
-            <<emp.getScriptCommandRef()<<",[\"";
-    for (uint i=0; i<coedges.size(); i++){
-       	if (i)
-       		cmd <<"\", \"";
-       	cmd << coedges[i]->getName();
-       }
-       cmd <<"\"])";
+    cmd << emp.getScriptCommandBegin()<<"\n" << getContextAlias() << ".getTopoManager().setMeshingProperty (" << emp.getScriptCommandRef ( ) 
+        << ", " << Internal::entitiesToPythonList<CoEdge> (coedges) << ")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -3277,6 +3185,7 @@ TopoManager::reverseDirection(std::vector<std::string> &coedges_names)
 Mgx3D::Internal::M3DCommandResultIfc*
 TopoManager::reverseDirection(std::vector<CoEdge*>& coedges)
 {
+	CHECK_ENTITIES_LIST(coedges)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::reverseDirection pour "<<coedges.size()<<" arêtes";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
@@ -3284,13 +3193,7 @@ TopoManager::reverseDirection(std::vector<CoEdge*>& coedges)
     Topo::CommandReverseDirection* command = new Topo::CommandReverseDirection(getLocalContext(), coedges);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().reverseDirection ([\"";
-    for (uint i=0; i<coedges.size(); i++){
-       	if (i)
-       		cmd <<"\", \"";
-       	cmd << coedges[i]->getName();
-       }
-       cmd <<"\"])";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).reverseDirection (" << Internal::entitiesToPythonList<CoEdge> (coedges) << ")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -3312,6 +3215,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(CoFaceMesh
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(CoFaceMeshingProperty& emp, std::vector<CoFace*>& cofaces)
 {
+	CHECK_ENTITIES_LIST(cofaces)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::setMeshingProperty(EdgeMeshingProperty("<<emp.getMeshLawName()
                     <<"),"<<cofaces.size()<<" faces)";
@@ -3320,14 +3224,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(CoFaceMesh
     Topo::CommandSetFaceMeshingProperty* command = new Topo::CommandSetFaceMeshingProperty(getLocalContext(), emp, cofaces);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().setMeshingProperty ("
-            <<emp.getScriptCommand()<<",[\"";
-    for (uint i=0; i<cofaces.size(); i++){
-       	if (i)
-       		cmd <<"\", \"";
-       	cmd << cofaces[i]->getName();
-       }
-       cmd <<"\"])";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).setMeshingProperty (" << emp.getScriptCommand ( ) << ", " << Internal::entitiesToPythonList<CoFace> (cofaces) << ")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -3373,6 +3270,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(BlockMeshi
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(BlockMeshingProperty& emp, std::vector<Block*>& blocks)
 {
+	CHECK_ENTITIES_LIST(blocks)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::setMeshingProperty(EdgeMeshingProperty("<<emp.getMeshLawName()
                     <<"),"<<blocks.size()<<" blocs)";
@@ -3381,14 +3279,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(BlockMeshi
     Topo::CommandSetBlockMeshingProperty* command = new Topo::CommandSetBlockMeshingProperty(getLocalContext(), emp, blocks);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().setMeshingProperty ("
-            <<emp.getScriptCommand()<<",[\"";
-    for (uint i=0; i<blocks.size(); i++){
-       	if (i)
-       		cmd <<"\", \"";
-       	cmd << blocks[i]->getName();
-       }
-       cmd <<"\"])";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).setMeshingProperty (" << emp.getScriptCommand ( ) << ", " << Internal::entitiesToPythonList<Block> (blocks) << ")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -3784,6 +3675,7 @@ fuseEdges(std::vector<std::string> &coedges_names)
 Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
 fuseEdges(std::vector<CoEdge*> &coedges)
 {
+	CHECK_ENTITIES_LIST(coedges)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message << "TopoManager::fuseEdges (";
     for (uint i=0; i<coedges.size(); i++){
@@ -3839,13 +3731,7 @@ fuseEdges(std::vector<CoEdge*> &coedges)
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().fuseEdges ([\"";
-    for (uint i=0; i<coedges.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << coedges[i]->getName();
-    }
-    cmd << "\"])";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).fuseEdges (" << Internal::entitiesToPythonList<CoEdge> (coedges) << ")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -3902,6 +3788,7 @@ setGeomAssociation(std::vector<TopoEntity*> & topo_entities,
 		Geom::GeomEntity* geom_entity,
 		bool move_vertices)
 {
+	CHECK_ENTITIES_LIST(topo_entities)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message << "TopoManager::setGeomAssociation ([";
     for (uint i=0; i<topo_entities.size(); i++){
@@ -3918,13 +3805,8 @@ setGeomAssociation(std::vector<TopoEntity*> & topo_entities,
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().setGeomAssociation ([\"";
-    for (uint i=0; i<topo_entities.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << topo_entities[i]->getName();
-    }
-    cmd << "\"], \"" << (geom_entity?geom_entity->getName():"") << "\", "<<(move_vertices?"True":"False") <<")";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).setGeomAssociation (" << Internal::entitiesToPythonList<TopoEntity> (topo_entities) 
+        << ", \""  << (geom_entity ? geom_entity->getName () : "") << "\", " << (move_vertices ? "True": "False") << ")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -3964,7 +3846,8 @@ projectVerticesOnNearestGeomEntities(std::vector<Vertex*> & vertices,
 		std::vector<Geom::GeomEntity*> & geom_entities,
 		bool move_vertices)
 {
-
+	CHECK_ENTITIES_LIST(vertices)
+	CHECK_ENTITIES_LIST(geom_entities)
     // création de la commande
     Topo::CommandProjectVerticesOnNearestGeomEntities* command =
             new Topo::CommandProjectVerticesOnNearestGeomEntities(getLocalContext(), vertices, geom_entities, move_vertices);
@@ -3972,19 +3855,8 @@ projectVerticesOnNearestGeomEntities(std::vector<Vertex*> & vertices,
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().projectVerticesOnNearestGeomEntities ([\"";
-    for (uint i=0; i<vertices.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << vertices[i]->getName();
-    }
-    cmd << "\"], [\"";
-    for (uint i=0; i<geom_entities.size(); i++){
-    	if (i)
-    		cmd <<"\", \"";
-    	cmd << geom_entities[i]->getName();
-    }
-    cmd << "\"], "<<(move_vertices?"True":"False") <<")";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).projectVerticesOnNearestGeomEntities (" << Internal::entitiesToPythonList<Vertex> (vertices) << ", "
+        << Internal::entitiesToPythonList<Geom::GeomEntity> (geom_entities) << ", " << (move_vertices ? "True" : "False") << ")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -4021,13 +3893,7 @@ projectEdgesOnCurves(std::vector<CoEdge*> & coedges)
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().projectEdgesOnCurves ([\"";
-    for (uint i=0; i<coedges.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << coedges[i]->getName();
-    }
-    cmd << "\"])";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).projectEdgesOnCurves (" << Internal::entitiesToPythonList<CoEdge> (coedges) << ")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -4085,13 +3951,7 @@ projectFacesOnSurfaces(std::vector<CoFace*> & cofaces)
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().projectFacesOnSurfaces ([\"";
-    for (uint i=0; i<cofaces.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << cofaces[i]->getName();
-    }
-    cmd << "\"])";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).projectFacesOnSurfaces (" << Internal::entitiesToPythonList<CoFace> (cofaces) << ")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -4176,13 +4036,7 @@ translate(std::vector<TopoEntity*>& ve, const Vector& dp,
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().translate ([\"";
-    for (uint i=0; i<ve.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << ve[i]->getName();
-    }
-    cmd << "\"], " << dp.getScriptCommand() << ", "<<(withGeom?"True":"False") <<")";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).translate (" << Internal::entitiesToPythonList<TopoEntity> (ve) << ", " << dp.getScriptCommand ( ) << ", " << (withGeom ? "True" : "False") << ")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -4251,13 +4105,7 @@ rotate(std::vector<TopoEntity*>& ve,
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().rotate ([\"";
-    for (uint i=0; i<ve.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << ve[i]->getName();
-    }
-    cmd << "\"], " << rot.getScriptCommand() << ", "<<(withGeom?"True":"False") <<")";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).rotate (" << Internal::entitiesToPythonList<TopoEntity> (ve) << ", " << rot.getScriptCommand ( ) << ", " << (withGeom ? "True" : "False") << ")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -4334,13 +4182,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<TopoEntity*
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().scale ([\"";
-    for (uint i=0; i<ve.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << ve[i]->getName();
-    }
-    cmd << "\"], " << Utils::Math::MgxNumeric::userRepresentation (facteur);
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).scale (" << Internal::entitiesToPythonList<TopoEntity> (ve) << ", " << Utils::Math::MgxNumeric::userRepresentation (facteur);
     if (!(pcentre == Utils::Math::Point(0,0,0)))
     	cmd <<", "<<pcentre.getScriptCommand();
     cmd<<", "<<(withGeom?"True":"False") <<")";
@@ -4428,13 +4270,8 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<TopoEntity*
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().scale ([\"";
-    for (uint i=0; i<ve.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << ve[i]->getName();
-    }
-    cmd << "\"], " << Utils::Math::MgxNumeric::userRepresentation (factorX)
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).scale (" << Internal::entitiesToPythonList<TopoEntity> (ve) << ", ";
+    cmd << Utils::Math::MgxNumeric::userRepresentation (factorX)
         <<", "<<Utils::Math::MgxNumeric::userRepresentation (factorY)
         <<", "<<Utils::Math::MgxNumeric::userRepresentation (factorZ);
     if (!(pcentre == Point(0,0,0)))
@@ -4508,13 +4345,7 @@ TopoManager::mirror(std::vector<TopoEntity*>& ve,
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().mirror ([\"";
-    for (uint i=0; i<ve.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << ve[i]->getName();
-    }
-    cmd << "\"], " << plane->getScriptCommand() << ", "<<(withGeom?"True":"False") <<")";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).mirror (" << Internal::entitiesToPythonList<TopoEntity> (ve) << ", " << plane->getScriptCommand ( ) << ", "<< (withGeom ? "True" : "False") << ")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -4565,6 +4396,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexLocation(std::vector
         const double& zPos,
 		CoordinateSystem::SysCoord* rep)
 {
+	CHECK_ENTITIES_LIST(vertices)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message << "TopoManager::setVertexLocation ([";
     for (uint i=0; i<vertices.size(); i++){
@@ -4589,13 +4421,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexLocation(std::vector
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().setVertexLocation ([\"";
-    for (uint i=0; i<vertices.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << vertices[i]->getName();
-    }
-    cmd << "\"]";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).setVertexLocation (" << Internal::entitiesToPythonList<Vertex> (vertices);
     cmd << (changeX?", True, ":", False, ") << Utils::Math::MgxNumeric::userRepresentation (xPos);
     cmd << (changeY?", True, ":", False, ") << Utils::Math::MgxNumeric::userRepresentation (yPos);
     cmd << (changeZ?", True, ":", False, ") << Utils::Math::MgxNumeric::userRepresentation (zPos);
@@ -4652,6 +4478,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexSphericalLocation(st
 		const double& phiPos,
 		CoordinateSystem::SysCoord* rep)
 {
+	CHECK_ENTITIES_LIST(vertices)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message << "TopoManager::setVertexSphericalLocation ([";
     for (uint i=0; i<vertices.size(); i++){
@@ -4676,13 +4503,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexSphericalLocation(st
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().setVertexSphericalLocation ([\"";
-    for (uint i=0; i<vertices.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << vertices[i]->getName();
-    }
-    cmd << "\"]";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).setVertexSphericalLocation (" << Internal::entitiesToPythonList<Vertex> (vertices);
     cmd << (changeRho?", True, ":", False, ") << Utils::Math::MgxNumeric::userRepresentation (rhoPos);
     cmd << (changeTheta?", True, ":", False, ") << Utils::Math::MgxNumeric::userRepresentation (thetaPos);
     cmd << (changePhi?", True, ":", False, ") << Utils::Math::MgxNumeric::userRepresentation (phiPos);
@@ -4739,6 +4560,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexCylindricalLocation(
 				const double& zPos,
 				CoordinateSystem::SysCoord* rep)
 {
+	CHECK_ENTITIES_LIST(vertices)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message << "TopoManager::setVertexCylindricalLocation ([";
     for (uint i=0; i<vertices.size(); i++){
@@ -4763,13 +4585,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexCylindricalLocation(
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().setVertexCylindricalLocation ([\"";
-    for (uint i=0; i<vertices.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << vertices[i]->getName();
-    }
-    cmd << "\"]";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).setVertexCylindricalLocation (" << Internal::entitiesToPythonList<Vertex> (vertices);
     cmd << (changeRho?", True, ":", False, ") << Utils::Math::MgxNumeric::userRepresentation (rhoPos);
     cmd << (changePhi?", True, ":", False, ") << Utils::Math::MgxNumeric::userRepresentation (phiPos);
     cmd << (changeZ?", True, ":", False, ") << Utils::Math::MgxNumeric::userRepresentation (zPos);
@@ -4835,6 +4651,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::snapProjectedVertices(std::ve
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc* TopoManager::snapProjectedVertices(std::vector<Vertex*>& vertices)
 {
+	CHECK_ENTITIES_LIST(vertices)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message << "TopoManager::snapProjectedVertices ([";
     for (uint i=0; i<vertices.size(); i++){
@@ -4850,13 +4667,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::snapProjectedVertices(std::ve
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().snapProjectedVertices ([\"";
-    for (uint i=0; i<vertices.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << vertices[i]->getName();
-    }
-    cmd << "\"])";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).snapProjectedVertices (" << Internal::entitiesToPythonList<Vertex> (vertices) << ")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -4906,6 +4717,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::alignVertices(std::vector<std
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc* TopoManager::alignVertices(std::vector<Vertex*>& vertices)
 {
+	CHECK_ENTITIES_LIST(vertices)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message << "TopoManager::alignVertices ([";
     for (uint i=0; i<vertices.size(); i++){
@@ -4921,13 +4733,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::alignVertices(std::vector<Ver
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().alignVertices ([\"";
-    for (uint i=0; i<vertices.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << vertices[i]->getName();
-    }
-    cmd << "\"])";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).alignVertices (" << Internal::entitiesToPythonList<Vertex> (vertices) << ")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -4958,20 +4764,14 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::alignVertices(
 		const Point& p1, const Point& p2,
 		std::vector<Vertex*>& vertices)
 {
+	CHECK_ENTITIES_LIST(vertices)
     Topo::CommandAlignVertices* command =
             new Topo::CommandAlignVertices(getLocalContext(), p1, p2, vertices);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().alignVertices ("
-    		<< p1.getScriptCommand()<<", "
-    		<< p2.getScriptCommand()<<", [\"";
-    for (uint i=0; i<vertices.size(); i++){
-        if (i)
-            cmd <<"\", \"";
-        cmd << vertices[i]->getName();
-    }
-    cmd << "\"])";
+    cmd << getContextAlias ( ) << ".getTopoManager ( ).alignVertices (" << p1.getScriptCommand ( ) << ", " << p2.getScriptCommand ( )
+        << Internal::entitiesToPythonList<Vertex> (vertices) << ")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
