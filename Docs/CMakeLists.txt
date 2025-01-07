@@ -33,7 +33,6 @@ set(DOXYGEN_DIRS
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/TopoInfo.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/TopoManagerIfc.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/EdgeMeshingPropertyUniform.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/EdgeMeshingPropertyUniformSmoothFix.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/EdgeMeshingPropertyGeometric.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/EdgeMeshingPropertyBigeometric.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/EdgeMeshingPropertyHyperbolic.h
