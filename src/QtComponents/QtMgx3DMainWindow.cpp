@@ -109,6 +109,7 @@
 #include "QtComponents/QtMeshFacesOperationAction.h"
 #include "QtComponents/QtMeshExplorerOperationAction.h"
 #include "QtComponents/QtMeshQualityOperationAction.h"
+#include "QtComponents/QtMeshQualityDividerOperationAction.h"
 #include "QtComponents/QtMeshInformationOperationAction.h"
 #include "QtComponents/QtSmoothSurfaceOperationAction.h"
 #include "QtComponents/QtSmoothVolumeOperationAction.h"
@@ -279,7 +280,7 @@ namespace QtComponents
                   _topoNew3x3BoxesWithTopoAction(0),
                   _meshSelectionAction(0), _meshVisibleAction(0), _meshAllAction(0),
                   _unrefineMeshRepresentationAction(0),
-                  _addMeshExplorerAction(0), _addMeshQualityAction(0),
+                  _addMeshExplorerAction(0), _addMeshQualityAction(0), _addMeshQualityDividerAction (0),
                   _undoSelectionAction (0), _redoSelectionAction (0),
                   _displaySelectedGroupsAction(0), _hideSelectedGroupsAction(0),
                   _displaySelectedTypesAction(0), _hideSelectedTypesAction(0),
@@ -387,6 +388,7 @@ namespace QtComponents
                   _unrefineMeshRepresentationAction(wa._unrefineMeshRepresentationAction),
                   _addMeshExplorerAction(wa._addMeshExplorerAction),
                   _addMeshQualityAction(wa._addMeshQualityAction),
+                  _addMeshQualityDividerAction(wa._addMeshQualityDividerAction),
                   _undoSelectionAction (wa._undoSelectionAction),
                   _redoSelectionAction (wa._redoSelectionAction),
                   _displaySelectedGroupsAction(wa._displaySelectedGroupsAction),
@@ -520,6 +522,7 @@ namespace QtComponents
 				_unrefineMeshRepresentationAction = wa._unrefineMeshRepresentationAction;
 				_addMeshExplorerAction         = wa._addMeshExplorerAction;
 				_addMeshQualityAction          = wa._addMeshQualityAction;
+				_addMeshQualityDividerAction   = wa._addMeshQualityDividerAction;
 				_undoSelectionAction           = wa._undoSelectionAction;
 				_redoSelectionAction           = wa._redoSelectionAction;
 				_displaySelectedGroupsAction   = wa._displaySelectedGroupsAction;
@@ -663,6 +666,8 @@ namespace QtComponents
 				_addMeshExplorerAction->setEnabled(enable);
 			if (0 != _addMeshQualityAction)
 				_addMeshQualityAction->setEnabled(enable);
+			if (0 != _addMeshQualityDividerAction)
+				_addMeshQualityDividerAction->setEnabled(enable);
 #ifdef USE_EXPERIMENTAL_ROOM
 			if (0 != _loadRaysAction)
 				_loadRaysAction->setEnabled(enable);
@@ -1806,6 +1811,7 @@ void QtMgx3DMainWindow::showReady ( )
 			_meshingMenu->addSeparator();
 			_meshingMenu->addAction(getActions()._addMeshExplorerAction);
 			_meshingMenu->addAction(getActions()._addMeshQualityAction);
+			_meshingMenu->addAction(getActions()._addMeshQualityDividerAction);
 			_meshingMenu->addSeparator();
 			_meshingMenu->addAction(getActions()._meshInformationAction);
 
@@ -2302,6 +2308,8 @@ void QtMgx3DMainWindow::showReady ( )
 			connect(_actions._addMeshExplorerAction, SIGNAL(triggered()), this, SLOT(addMeshExplorerCallback()), defaultConnectionType);
 			_actions._addMeshQualityAction = new QAction(QIcon(":/images/mesh_quality.png"), QString::fromUtf8("Evaluation de la qualité du maillage"), this);
 			connect(_actions._addMeshQualityAction, SIGNAL(triggered()), this, SLOT(addMeshQualityCallback()), defaultConnectionType);
+			_actions._addMeshQualityDividerAction = new QAction(QIcon(":/images/mesh_quality.png"), QString::fromUtf8("Recherche selon critère"), this);
+			connect(_actions._addMeshQualityDividerAction, SIGNAL(triggered()), this, SLOT(addMeshQualityDividerCallback()), defaultConnectionType);
 
 			_actions._meshInformationAction = new QAction("Informations sur le maillage", this);
 			connect(_actions._meshInformationAction, SIGNAL(triggered()), this, SLOT(addMeshInformationCallback()), defaultConnectionType);
@@ -6928,6 +6936,18 @@ void QtMgx3DMainWindow::addMeshQualityCallback ( )
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::addMeshQualityCallback
+
+
+void QtMgx3DMainWindow::addMeshQualityDividerCallback ( )
+{
+    QtAutoWaitingCursor cursor (true);
+
+    BEGIN_QT_TRY_CATCH_BLOCK
+
+	QtMeshQualityDividerOperationAction*	qualityAction	= new QtMeshQualityDividerOperationAction (QIcon (":/images/mesh_quality.png"), "Recherche selon critère",	*this, "Rechercher des mailles comprises dans un domaine d'un critère de qualité");
+
+	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
+}	// QtMgx3DMainWindow::addMeshQualityDividerCallback
 
 
 void QtMgx3DMainWindow::addMeshInformationCallback ( )

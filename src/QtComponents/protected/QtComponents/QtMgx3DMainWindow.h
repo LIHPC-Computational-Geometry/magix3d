@@ -401,7 +401,8 @@ class QtMgx3DMainWindow :
 						*_meshAllAction;
 		QAction			*_unrefineMeshRepresentationAction;
 		QAction			*_addMeshExplorerAction;
-		QAction			*_addMeshQualityAction;
+		QAction			*_addMeshQualityAction,
+						*_addMeshQualityDividerAction;
 		QAction			*_undoSelectionAction,
 						*_redoSelectionAction,
 						*_displaySelectedGroupsAction,
@@ -1168,6 +1169,11 @@ class QtMgx3DMainWindow :
      * Affiche une nouvelle fenêtre "Qualité de maillage".
      */
     virtual void addMeshQualityCallback ( );
+    
+    /**
+     * Affiche une nouvelle fenêtre "Recherche selon critère".
+     */
+    virtual void addMeshQualityDividerCallback ( );
 
     /**
      * Affiche une nouvelle fenêtre "Information sur le maillage".
