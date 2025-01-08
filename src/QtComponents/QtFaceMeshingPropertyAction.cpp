@@ -330,9 +330,6 @@ QtFaceMeshingPropertyPanel::QtFaceMeshingPropertyPanel (
 	hlayout->addWidget (label);
 	_operationMethodComboBox	= new QComboBox (this);
 	_operationMethodComboBox->addItem ("Maillage transfini");
-	_operationMethodComboBox->addItem ("Maillage directionnel");
-	_operationMethodComboBox->addItem ("Maillage directionnel orthogonal");
-	_operationMethodComboBox->addItem ("Maillage suivant une rotation");
 	_operationMethodComboBox->addItem ("Maillage Delaunay (GMSH)");
     //_operationMethodComboBox->addItem ("Maillage Quad non structuré (pairing) [inactif]");
 	connect (_operationMethodComboBox, SIGNAL (currentIndexChanged (int)),
