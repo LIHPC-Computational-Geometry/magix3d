@@ -245,11 +245,7 @@ QtBlockMeshingPropertyPanel::QtBlockMeshingPropertyPanel (
 	hlayout->addWidget (label);
 	_operationMethodComboBox	= new QComboBox (this);
 	_operationMethodComboBox->addItem ("Maillage transfini");
-	_operationMethodComboBox->addItem ("Maillage directionnel");
-	_operationMethodComboBox->addItem ("Maillage directionnel orthogonal");
-	_operationMethodComboBox->addItem ("Maillage suivant une rotation");
 	_operationMethodComboBox->addItem ("Maillage Delaunay (Tetgen)");
-	_operationMethodComboBox->addItem (QString::fromUtf8("Maillage non structuré par insertion de maillage (Nico)"));
 	connect (_operationMethodComboBox, SIGNAL (currentIndexChanged (int)),
 	         this, SLOT (operationMethodCallback ( )));
 	hlayout->addWidget (_operationMethodComboBox);
