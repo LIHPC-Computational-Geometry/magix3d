@@ -55,6 +55,18 @@ TopoManagerIfc::newUnstructuredTopoOnGeometry(std::string ne)
 }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc*
+TopoManagerIfc::newTopoVertex(Utils::Math::Point pt, std::string groupName)
+{
+    throw TkUtil::Exception ("TopoManagerIfc::newTopoVertex should be overloaded.");
+}
+/*----------------------------------------------------------------------------*/
+    Mgx3D::Internal::M3DCommandResultIfc*
+    TopoManagerIfc::newTopoEntity(std::vector<std::string> ve, std::string groupName)
+    {
+        throw TkUtil::Exception ("TopoManagerIfc::newTopoEntity should be overloaded.");
+    }
+/*----------------------------------------------------------------------------*/
+Mgx3D::Internal::M3DCommandResultIfc*
 TopoManagerIfc::newTopoOnGeometry(std::string ne)
 {
 	throw TkUtil::Exception ("TopoManagerIfc::newTopoOnGeometry should be overloaded.");

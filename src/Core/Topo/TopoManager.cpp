@@ -110,6 +110,7 @@
 #include "Internal/M3DCommandResult.h"
 #include "Internal/CommandChangeLengthUnit.h"
 #include "Internal/PythonWriter.h"
+#include "Topo/CommandNewTopo.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/TraceLog.h>
@@ -885,6 +886,64 @@ std::string TopoManager::getBlockAt(std::vector<Point>& pts) const
 				<<pts.size()<<" positions";
 		throw TkUtil::Exception(message);
 	}
+}
+/*----------------------------------------------------------------------------*/
+    Mgx3D::Internal::M3DCommandResultIfc*
+    TopoManager::newTopoVertex(Utils::Math::Point pt, std::string groupName)
+    {
+        Topo::CommandNewTopo* command = new Topo::CommandNewTopo(getLocalContext(), pt, groupName);
+
+        TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
+        cmd << getContextAlias() << "." << "getTopoManager().newTopoVertex (";
+        cmd<<pt.getScriptCommand()<<",\""<<groupName<<"\")";
+        command->setScriptCommand(cmd);
+
+        getCommandManager().addCommand(command, Utils::Command::DO);
+
+        Internal::M3DCommandResultIfc*  cmdResult   =
+                new Internal::M3DCommandResult (*command);
+
+        return cmdResult;
+    }
+/*----------------------------------------------------------------------------*/
+Mgx3D::Internal::M3DCommandResultIfc*
+TopoManager::newTopoEntity(std::vector<std::string> ve, std::string groupName)
+{
+    std::vector<Vertex*> vertices;
+    for(auto v_name : ve){
+        vertices.push_back(getVertex(v_name));
+    }
+
+    return newTopoEntity(vertices, groupName);
+}
+/*----------------------------------------------------------------------------*/
+Mgx3D::Internal::M3DCommandResultIfc*
+TopoManager::newTopoEntity(std::vector<Topo::Vertex*> vertices, std::string groupName)
+{
+    TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+    message <<"TopoManager::newTopoEntity("<<")";
+    log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
+
+    Topo::CommandNewTopo* command = new Topo::CommandNewTopo(getLocalContext(), vertices,
+                                                             CommandNewTopo::STRUCTURED_BLOCK, groupName);
+
+    TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
+    cmd << getContextAlias() << "." << "getTopoManager().newTopoEntity (\""
+    <<"\", [";
+    for(unsigned int i=0;i<vertices.size();i++){
+        if(i!=0)
+            cmd << ", ";
+        cmd << "\""<< vertices[i]->getName()<<"\"";
+    }
+    cmd << "])";
+    command->setScriptCommand(cmd);
+
+    getCommandManager().addCommand(command, Utils::Command::DO);
+
+    Internal::M3DCommandResultIfc*  cmdResult   =
+            new Internal::M3DCommandResult (*command);
+
+    return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc*
