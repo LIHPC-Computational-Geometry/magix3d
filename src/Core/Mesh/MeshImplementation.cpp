@@ -1220,24 +1220,6 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::CoEdge* ed
         	mesh(command, ed->getVertex(1));
         ed->nodes().push_back(ed->getVertex(1)->getNode());
 
-        // compute nodes position based on the endpoints
-        if(ed->getMeshingProperty()->getMeshLaw() == Topo::CoEdgeMeshingProperty::uniforme_smoothfix) {
-            gmds::math::Point pt0 = getGMDSMesh().get<gmds::Node>(ed->getVertex(0)->getNode()).point();
-            gmds::math::Point pt1 = getGMDSMesh().get<gmds::Node>(ed->getVertex(1)->getNode()).point();
-            // It is not necessary to accomodate for meshing direction as 
-            // it is not used for mesh nodes order but for thing like 
-            // geometric progression
-            //if(!ed->getMeshingProperty()->getDirect()) {
-            //    pt0 = getGMDSMesh().get<gmds::Node>(ed->getVertex(1)->getNode()).point();
-            //    pt1 = getGMDSMesh().get<gmds::Node>(ed->getVertex(0)->getNode()).point();
-            //}
-            for (uint i=1; i<nbBrasI; i++){
-                gmds::math::Point pt = (1. - ((double) i / (double) nbBrasI)) * pt0 + ((double) i / (double) nbBrasI) * pt1;
-                gmds::Node node = getGMDSMesh().get<gmds::Node> (ed->nodes()[i]);
-                node.setXYZ(pt.X(), pt.Y(), pt.Z());
-            }
-        }
-
         // ajoute les noeuds aux groupes suivant ce qui a été demandé
         _addNodesInClouds(command, ed);
 
