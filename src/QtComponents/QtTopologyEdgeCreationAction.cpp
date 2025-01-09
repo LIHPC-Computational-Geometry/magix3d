@@ -37,12 +37,13 @@ namespace QtComponents
 // ===========================================================================
 
 QtTopologyEdgeCreationPanel::QtTopologyEdgeCreationPanel (
-			QWidget* parent, const string& panelName, 
+			QWidget* parent, const string& panelName,
+            QtMgx3DGroupNamePanel::POLICY creationPolicy,
 			QtMgx3DMainWindow& mainWindow, QtMgx3DOperationAction* action)
 : QtMgx3DOperationPanel (parent, mainWindow, action,
 		QtMgx3DApplication::HelpSystem::instance ( ).instance ( ).edgeCreationURL,
 		QtMgx3DApplication::HelpSystem::instance ( ).instance ( ).edgeCreationTag),
-		_curvePanel (0)
+		_curvePanel (0), _verticesPanel(0), _namePanel(0), _curveCheckBox(0)
 {
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	setLayout (layout);
@@ -55,6 +56,28 @@ QtTopologyEdgeCreationPanel::QtTopologyEdgeCreationPanel (
 	label->setFont (font);
 	layout->addWidget (label);
 
+    // Nom groupe :
+    _namePanel	= new QtMgx3DGroupNamePanel (this, "Groupe", mainWindow, 3, creationPolicy, "");
+    layout->addWidget (_namePanel);
+    addValidatedField (*_namePanel);
+
+    _verticesPanel = new QtMgx3DEntityPanel(this, "", true, "Sommets :", "",
+                                            &mainWindow, SelectionManagerIfc::D0,
+                                            FilterEntity::TopoVertex);
+    _verticesPanel->setMultiSelectMode(true);
+    layout->addWidget (_verticesPanel);
+    connect (_verticesPanel, SIGNAL (entitiesAddedToSelection(QString)),
+             this, SLOT (entitiesAddedToSelectionCallback (QString)));
+    connect (_verticesPanel, SIGNAL (entitiesRemovedFromSelection(QString)),
+             this, SLOT (entitiesRemovedFromSelectionCallback (QString)));
+
+    _curveCheckBox	=
+            new QCheckBox (QString::fromUtf8("Création par courbe géométrique"), this);
+    _curveCheckBox->setChecked (false);
+    layout->addWidget (_curveCheckBox);
+    connect (_curveCheckBox, SIGNAL (stateChanged (int)), this,
+             SLOT (methodCallBack ( )));
+
 	// Courbe à associer :
 	_curvePanel	= new QtMgx3DEntityPanel (
 						this, "", true, "Courbe associée :", "",
@@ -65,7 +88,7 @@ QtTopologyEdgeCreationPanel::QtTopologyEdgeCreationPanel (
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
 	connect (_curvePanel, SIGNAL (entitiesRemovedFromSelection(QString)),
 	         this, SLOT (entitiesRemovedFromSelectionCallback (QString)));
-
+    _curvePanel->setEnabled(false);
 
 	layout->addStretch (2);
 
@@ -99,6 +122,12 @@ string QtTopologyEdgeCreationPanel::getCurveName ( ) const
 	CHECK_NULL_PTR_ERROR (_curvePanel)
 	return _curvePanel->getUniqueName ( );
 }	// QtTopologyEdgeCreationPanel::getCurveName
+
+std::vector<string> QtTopologyEdgeCreationPanel::getVerticesNames() const
+{
+    CHECK_NULL_PTR_ERROR (_verticesPanel)
+    return _verticesPanel->getUniqueNames();
+}
 
 void QtTopologyEdgeCreationPanel::reset ( )
 {
@@ -162,7 +191,33 @@ void QtTopologyEdgeCreationPanel::autoUpdate ( )
 	QtMgx3DOperationPanel::autoUpdate ( );
 }	// QtTopologyEdgeCreationPanel::autoUpdate
 
+bool QtTopologyEdgeCreationPanel::curveMethod ( ) const
+{
+    CHECK_NULL_PTR_ERROR (_curveCheckBox)
+    return Qt::Checked == _curveCheckBox->checkState ( ) ? true : false;
+}	// QtTopologySplitFacesPanel::allFaces
 
+string QtTopologyEdgeCreationPanel::getGroupName() const
+{
+    CHECK_NULL_PTR_ERROR (_namePanel)
+    return _namePanel->getGroupName();
+}
+
+void QtTopologyEdgeCreationPanel::methodCallBack ( )
+{
+    BEGIN_QT_TRY_CATCH_BLOCK
+
+    CHECK_NULL_PTR_ERROR (_curveCheckBox)
+    CHECK_NULL_PTR_ERROR (_verticesPanel)
+    CHECK_NULL_PTR_ERROR (_curvePanel)
+
+    _verticesPanel->setEnabled (Qt::Checked == _curveCheckBox->checkState ( ) ? false : true);
+    _curvePanel->setEnabled (Qt::Checked == _curveCheckBox->checkState ( ) ? true : false);
+
+    parametersModifiedCallback();
+
+    COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
+}	// QtTopologySplitFacesPanel::facesModifiedCallback
 
 
 
@@ -172,12 +227,12 @@ void QtTopologyEdgeCreationPanel::autoUpdate ( )
 
 QtTopologyEdgeCreationAction::QtTopologyEdgeCreationAction (
 	const QIcon& icon, const QString& text,
-	QtMgx3DMainWindow& mainWindow, const QString& tooltip)
+	QtMgx3DMainWindow& mainWindow, const QString& tooltip, QtMgx3DGroupNamePanel::POLICY creationPolicy)
 	: QtTopologyCreationAction (icon, text, mainWindow, tooltip)
 {
 	QtTopologyEdgeCreationPanel*	operationPanel	=
 			new QtTopologyEdgeCreationPanel (
-					&getOperationPanelParent ( ), text.toStdString ( ), 
+					&getOperationPanelParent ( ), text.toStdString ( ), creationPolicy,
 					mainWindow, this);
 	setOperationPanel (operationPanel);
 }	// QtTopologyEdgeCreationAction::QtTopologyEdgeCreationAction
@@ -214,10 +269,17 @@ void QtTopologyEdgeCreationAction::executeOperation ( )
 	M3DCommandResultIfc*	cmdResult	= 0;
 	QtTopologyCreationAction::executeOperation ( );
 
-	// Récupération des paramètres d'association des entités topologiques :
-	const string	curve	= panel->getCurveName ( );
 
-	cmdResult	= getContext ( ).getTopoManager( ).newTopoOnGeometry (curve);
+    if (panel->curveMethod()){
+        // Récupération des paramètres d'association des entités topologiques :
+        const string	curve	= panel->getCurveName ( );
+        cmdResult	= getContext ( ).getTopoManager( ).newTopoOnGeometry (curve);
+    }
+    else{
+        std::vector<string> vnames = panel->getVerticesNames();
+        const string group = panel->getGroupName();
+        cmdResult	= getContext ( ).getTopoManager( ).newTopoEntity (vnames,group);
+    }
 
 	setCommandResult (cmdResult);
 }	// QtTopologyFaceCreationAction::executeOperation
