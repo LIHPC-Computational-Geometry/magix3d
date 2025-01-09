@@ -56,9 +56,6 @@ public:
         tabulated,
         /// decoupage d'une arete en N segments selon une loi beta de resserrement
         beta_resserrement,
-        /// should be used when endpoints have changed position (for example when smoothing)
-        /// valid only for a straight line, not for a curved edge
-        uniforme_smoothfix
     } meshLaw;
 
     /** Côté de départ pour les discrétisations orientés avec orthogonalité
