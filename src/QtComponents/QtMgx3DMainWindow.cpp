@@ -2962,7 +2962,7 @@ void QtMgx3DMainWindow::showReady ( )
 			QtMgx3DOperationAction *vertexByAssociation =
 					                       new QtTopologyVertexCreationAction(
 							                       QIcon(":/images/create_vertex.png"), QString::fromUtf8("Création de sommet par association à un point"), *this,
-							                       QString::fromUtf8("Création d'un sommet topologique par association à une point géométrique.")
+							                       QString::fromUtf8("Création d'un sommet topologique par association à une point géométrique."), QtMgx3DGroupNamePanel::CREATION
 					                       );
 			registerOperationAction(
 					*vertexByAssociation, QtMgx3DOperationsPanel::TOPO_VERTEX_OPERATION);
@@ -2970,7 +2970,7 @@ void QtMgx3DMainWindow::showReady ( )
 			QtMgx3DOperationAction *edgeByAssociation =
 					                       new QtTopologyEdgeCreationAction(
 							                       QIcon(":/images/create_edge.png"), QString::fromUtf8("Création d'arête par association à une courbe"), *this,
-							                       QString::fromUtf8("Création d'une arête topologique par association à une courbe géométrique.")
+							                       QString::fromUtf8("Création d'une arête topologique par association à une courbe géométrique."), QtMgx3DGroupNamePanel::CREATION
 					                       );
 			registerOperationAction(
 					*edgeByAssociation, QtMgx3DOperationsPanel::TOPO_EDGE_OPERATION);
