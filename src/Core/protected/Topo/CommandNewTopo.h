@@ -29,7 +29,7 @@ namespace Mgx3D {
             /** type de topologie demandée, non structuré, structuré avec projection,
              * un bloc sans projection, ou un bloc pour l'insertion
              */
-            enum eTopoType { UNSTRUCTURED_BLOCK, STRUCTURED_BLOCK };
+            enum eTopoType { UNSTRUCTURED_BLOCK, STRUCTURED_BLOCK, CONFORM };
 
             /*------------------------------------------------------------------------*/
             /** \brief  Constructeur
@@ -74,7 +74,12 @@ namespace Mgx3D {
             virtual void createVertex();
 
             /** Création d'une arête topologique */
-            virtual void createCoEdge();
+            virtual CoEdge* createCoEdge(Vertex* v0,Vertex* v1);
+
+            /** Création d'une face topologique structurée */
+            virtual void createFace();
+
+            virtual Topo::CoEdge* getCommonEdge(const Vertex* v0, const Vertex* v1);
 
         private:
 
