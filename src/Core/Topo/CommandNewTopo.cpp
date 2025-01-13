@@ -52,7 +52,7 @@ namespace Mgx3D {
                     m_dim = 3;
                     break;
                 default:
-                    throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopoOnGeometry pour un nombre de sommets non prévu", TkUtil::Charset::UTF_8));
+                    throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo pour un nombre de sommets non prévu", TkUtil::Charset::UTF_8));
             }
 
             switch (topoType){
@@ -73,7 +73,7 @@ namespace Mgx3D {
                         comments << "Création d'une arête topologie structurée";
                     break;
                 default:
-                    throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopoOnGeometry pour un type de topologie non prévu", TkUtil::Charset::UTF_8));
+                    throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo pour un type de topologie non prévu", TkUtil::Charset::UTF_8));
             }
 
             setScriptComments(comments);
@@ -115,7 +115,13 @@ CommandNewTopo::
                 createVertex();
             }
             else if (m_dim == 1){
-                createCoEdge();
+
+                if(getCommonEdge(m_vertices[0], m_vertices[1]) != nullptr){
+                    throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo une arete existe déjà entre " + m_vertices[0]->getName() + " et " + m_vertices[1]->getName(), TkUtil::Charset::UTF_8));
+                }
+                else{
+                    createCoEdge(m_vertices[0], m_vertices[1]);
+                }
             }
             else if (m_dim == 3){
                 // Utilise un service de création d'une topologie à partir d'un volume
@@ -172,43 +178,165 @@ CommandNewTopo::
             Group::Group0D *group = getContext().getLocalGroupManager().getNewGroup0D(m_groupName,
                                                                                       &getInfoCommand());
             group->add(vtx);
+            vtx->getGroupsContainer().add(group);
             getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
 
             getInfoCommand().addTopoInfoEntity(vtx, Internal::InfoCommand::CREATED);
         }
 /*----------------------------------------------------------------------------*/
-        void CommandNewTopo::createCoEdge()
+        CoEdge* CommandNewTopo::createCoEdge(Vertex* v0,Vertex* v1)
         {
-            Vertex* v0 = m_vertices[0];
-            Vertex* v1 = m_vertices[1];
-
-            bool commonEdgeExist = false;
-
-            for(auto v0_e : v0->getCoEdges()){
-                for(auto v1_e : v1->getCoEdges()){
-                    commonEdgeExist = v0_e->getName() == v1_e->getName() || commonEdgeExist;
-                }
-            }
-
-            if(commonEdgeExist){
-                throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo une arete existe déjà entre " + v0->getName() + " et " + v1->getName(), TkUtil::Charset::UTF_8));
-            }
-
             EdgeMeshingPropertyUniform emp(getContext().getLocalTopoManager().getDefaultNbMeshingEdges());
-            CoEdge* coedge = new CoEdge(getContext(), &emp, m_vertices[0], m_vertices[1]);
+            CoEdge* coedge = new CoEdge(getContext(), &emp, v0, v1);
 
             Group::Group1D *group = getContext().getLocalGroupManager().getNewGroup1D(m_groupName,
                                                                                       &getInfoCommand());
             group->add(coedge);
+            coedge->getGroupsContainer().add(group);
             getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
 
             getInfoCommand().addTopoInfoEntity(coedge, Internal::InfoCommand::CREATED);
         }
 /*----------------------------------------------------------------------------*/
-        void CommandNewTopo::getPreviewRepresentation(Utils::DisplayRepresentation& dr)
+        void CommandNewTopo::createFace()
         {
-            return getPreviewRepresentationNewCoedges(dr);
+            Vertex* v0 = m_vertices[0];
+            Vertex* v1 = m_vertices[1];
+            Vertex* v2 = m_vertices[2];
+            Vertex* v3 = m_vertices[3];
+
+            gmds::math::Triangle t012(gmds::math::Point(v0->getX(),v0->getY(),v0->getZ()),
+                                    gmds::math::Point(v1->getX(),v1->getY(),v1->getZ()),
+                                    gmds::math::Point(v2->getX(),v2->getY(),v2->getZ()));
+            gmds::math::Triangle t023(gmds::math::Point(v0->getX(),v0->getY(),v0->getZ()),
+                                    gmds::math::Point(v2->getX(),v2->getY(),v2->getZ()),
+                                    gmds::math::Point(v3->getX(),v3->getY(),v3->getZ()));
+
+            double dot = t012.getNormal().dot(t023.getNormal());
+
+            int orientation = 0;
+
+            if(dot < 0){
+                gmds::math::Triangle t013(gmds::math::Point(v0->getX(),v0->getY(),v0->getZ()),
+                                          gmds::math::Point(v1->getX(),v1->getY(),v1->getZ()),
+                                          gmds::math::Point(v3->getX(),v3->getY(),v3->getZ()));
+                gmds::math::Triangle t032(gmds::math::Point(v0->getX(),v0->getY(),v0->getZ()),
+                                          gmds::math::Point(v3->getX(),v3->getY(),v3->getZ()),
+                                          gmds::math::Point(v2->getX(),v2->getY(),v2->getZ()));
+
+                dot = t013.getNormal().dot(t032.getNormal());
+
+                if(dot < 0 ){
+                    gmds::math::Triangle t031(gmds::math::Point(v0->getX(),v0->getY(),v0->getZ()),
+                                              gmds::math::Point(v1->getX(),v1->getY(),v1->getZ()),
+                                              gmds::math::Point(v3->getX(),v3->getY(),v3->getZ()));
+
+                    dot = t031.getNormal().dot(t012.getNormal());
+                    if(dot < 0){
+                        throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo impossible d'ordonner les sommets pour créer une face", TkUtil::Charset::UTF_8));
+                    }
+                    else{
+                        orientation = 2; //cas les sommets 1 et 3 sont inversés
+                    }
+                } else{
+                    orientation = 1; //cas les sommets 1 et 2 sont inversés
+                }
+            }
+
+            CoEdge* e0;
+            CoEdge* e1;
+            CoEdge* e2;
+            CoEdge* e3;
+
+            switch (orientation) {
+                case 0:
+                    e0 = getCommonEdge(v0,v1);
+                    if(e0 == nullptr)
+                        e0 = createCoEdge(v0,v1);
+
+                    e1 = getCommonEdge(v1,v2);
+                    if(e1 == nullptr)
+                        e1 = createCoEdge(v1,v2);
+
+                    e2 = getCommonEdge(v2,v3);
+                    if(e2 == nullptr)
+                        e2 = createCoEdge(v2,v3);
+
+                    e3 = getCommonEdge(v3,v0);
+                    if(e3 == nullptr)
+                        e3 = createCoEdge(v3,v0);
+                    break;
+                case 1:
+                    e0 = getCommonEdge(v0,v1);
+                    if(e0 == nullptr)
+                        e0 = createCoEdge(v0,v1);
+
+                    e1 = getCommonEdge(v1,v3);
+                    if(e1 == nullptr)
+                        e1 = createCoEdge(v1,v3);
+
+                    e2 = getCommonEdge(v3,v2);
+                    if(e2 == nullptr)
+                        e2 = createCoEdge(v3,v2);
+
+                    e3 = getCommonEdge(v2,v0);
+                    if(e3 == nullptr)
+                        e3 = createCoEdge(v2,v0);
+                    break;
+                case 2:
+                    e0 = getCommonEdge(v0,v2);
+                    if(e0 == nullptr)
+                        e0 = createCoEdge(v0,v2);
+
+                    e1 = getCommonEdge(v2,v1);
+                    if(e1 == nullptr)
+                        e1 = createCoEdge(v2,v1);
+
+                    e2 = getCommonEdge(v1,v3);
+                    if(e2 == nullptr)
+                        e2 = createCoEdge(v1,v3);
+
+                    e3 = getCommonEdge(v3,v0);
+                    if(e3 == nullptr)
+                        e3 = createCoEdge(v3,v0);
+                    break;
+            }
+
+            Topo::Edge* edge0 = new Edge(getContext(), e0);
+            Topo::Edge* edge1 = new Edge(getContext(), e1);
+            Topo::Edge* edge2 = new Edge(getContext(), e2);
+            Topo::Edge* edge3 = new Edge(getContext(), e3);
+
+            std::vector<Edge*> edges = {edge0,edge1,edge2,edge3};
+
+            Topo::CoFace* face = new CoFace(getContext(), edges);
+
+            Group::Group2D *group = getContext().getLocalGroupManager().getNewGroup2D(m_groupName,
+                                                                                      &getInfoCommand());
+            group->add(face);
+            face->getGroupsContainer().add(group);
+            getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
+
+            getInfoCommand().addTopoInfoEntity(face, Internal::InfoCommand::CREATED);
         }
+/*----------------------------------------------------------------------------*/
+void CommandNewTopo::getPreviewRepresentation(Utils::DisplayRepresentation& dr)
+{
+    return getPreviewRepresentationNewCoedges(dr);
+}
+/*----------------------------------------------------------------------------*/
+Topo::CoEdge* CommandNewTopo::getCommonEdge(const Vertex* v1, const Vertex* v2) {
+
+    for(auto v1_e : v1->getCoEdges()){
+        for(auto v2_e : v2->getCoEdges()){
+            if(v1_e->getName() == v2_e->getName())
+                return v1_e;
+        }
+    }
+
+    return nullptr;
+}
+
 /*----------------------------------------------------------------------------*/
     } // end namespace Topo
 /*----------------------------------------------------------------------------*/

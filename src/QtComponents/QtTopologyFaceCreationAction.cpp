@@ -149,12 +149,13 @@ void QtTopologyFaceCreationAction::executeOperation ( )
 				if (0 == groupName.length ( ))
 				{
 					UTF8String	warning (Charset::UTF_8);
-					warning << "Vous n'avez pas choisi de nom d'entité géométrique ou ou de groupe. Souhaitez-vous continuer la création de cette face topologique ?";
+					warning << "Vous n'avez pas choisi de nom d'entité géométrique ou de groupe. Souhaitez-vous continuer la création de cette face topologique ?";
 					if (0 != QMessageBox::warning (0, "Magix 3D", UTF8TOQSTRING (warning), "Oui", "Non", "", 0, 2))
 						return;
 				}	// if (0 == groupName.length ( ))
 				cmdResult	= getContext ( ).getTopoManager( ).newFreeTopoInGroup (groupName, 2);
 			}
+
 			break;
 		default											:
 		{
