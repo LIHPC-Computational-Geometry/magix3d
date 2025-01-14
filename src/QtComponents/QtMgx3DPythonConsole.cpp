@@ -79,11 +79,14 @@ namespace QtComponents
 QtMgx3DPythonConsole::QtMgx3DPythonConsole (QWidget* parent, QtMgx3DMainWindow* mainWindow, const string& title)
 	: QtPythonConsole (parent, title),
 	  _mgxUserScriptingManager (0), _mainWindow (mainWindow), _graphicalWidget (0), _cmdMgrPolicy ((CommandManagerIfc::POLICY)-1),
+	  _insertSelectedEntitiesAction (0),
 	  _insertSelectedVolumesAction (0), _insertSelectedSurfacesAction (0), _insertSelectedCurvesAction (0), _insertSelectedGeomVerticesAction (0),
 	  _insertSelectedBlocksAction (0), _insertSelectedFacesAction (0), _insertSelectedEdgesAction (0), _insertSelectedTopoVerticesAction (0),
 	  _insertSelectedMeshVolumesAction (0), _insertSelectedMeshSurfacesAction (0), _insertSelectedLinesAction (0), _insertSelectedCloudsAction (0)
 {
 	hideResult ("proxy of <Swig Object of type");
+	_insertSelectedEntitiesAction		= new QAction (UTF8TOQSTRING (UTF8String ("Toutes entités", Charset::UTF_8)), this);
+	QObject::connect (_insertSelectedEntitiesAction, &QAction::triggered, this, [this]( ){ insertSelectionCallback (Utils::Entity::undefined); });
 	_insertSelectedVolumesAction		= new QAction (UTF8TOQSTRING (UTF8String ("Volumes Géométriques", Charset::UTF_8)), this);
 	QObject::connect (_insertSelectedVolumesAction, &QAction::triggered, this, [this]( ){ insertSelectionCallback (Utils::Entity::GeomVolume); });
 	_insertSelectedSurfacesAction		= new QAction (UTF8TOQSTRING (UTF8String ("Surfaces Géométriques", Charset::UTF_8)), this);
@@ -114,6 +117,7 @@ QtMgx3DPythonConsole::QtMgx3DPythonConsole (QWidget* parent, QtMgx3DMainWindow* 
 QtMgx3DPythonConsole::QtMgx3DPythonConsole (const QtMgx3DPythonConsole&)
 	: QtPythonConsole (0, ""),
 	  _mgxUserScriptingManager (0), _mainWindow (0), _graphicalWidget (0), _cmdMgrPolicy ((CommandManagerIfc::POLICY)-1),
+	  _insertSelectedEntitiesAction (0),
 	  _insertSelectedVolumesAction (0), _insertSelectedSurfacesAction (0), _insertSelectedCurvesAction (0), _insertSelectedGeomVerticesAction (0),
 	  _insertSelectedBlocksAction (0), _insertSelectedFacesAction (0), _insertSelectedEdgesAction (0), _insertSelectedTopoVerticesAction (0),
 	  _insertSelectedMeshVolumesAction (0), _insertSelectedMeshSurfacesAction (0), _insertSelectedLinesAction (0), _insertSelectedCloudsAction (0)
@@ -427,12 +431,13 @@ void QtMgx3DPythonConsole::saveConsoleScript (const string filePath, Charset cha
 void QtMgx3DPythonConsole::insertSelectionCallback (Utils::Entity::objectType type)
 {
 	SelectionManagerIfc*	sm	= 0 == getMainWindow ( ) ? 0 : getMainWindow ( )->getSelectionManager ( );
-	if (0 != sm)
-	{
-		vector<Utils::Entity*>	entities		= sm->getEntities (type);
-		const string			entitiesNames	= Internal::entitiesToPythonList<Entity>(entities);
-		insertPlainText (entitiesNames.c_str ( ));
-	}	// if (0 != sm)
+	if (0 == sm)
+		return;
+
+	const vector<Utils::Entity*>	entities		= Entity::undefined == type ? sm->getEntities ( ) : sm->getEntities (type);
+	const string					entitiesNames	= Internal::entitiesToPythonList<Entity>(entities);
+
+	insertPlainText (entitiesNames.c_str ( ));
 }	// QtMgx3DPythonConsole::insertSelectionCallback
 
 
@@ -444,6 +449,8 @@ QMenu* QtMgx3DPythonConsole::createPopupMenu ( )
 		menu->addSeparator ( );
 		QMenu*	entry	= new QMenu ("Insérer sélection", menu);
 		menu->addMenu (entry);
+		entry->addAction (&insertSelectedEntitiesAction ( ));
+		entry->addSeparator ( );
 		entry->addAction (&insertSelectedVolumesAction ( ));
 		entry->addAction (&insertSelectedSurfacesAction ( ));
 		entry->addAction (&insertSelectedCurvesAction ( ));
@@ -462,6 +469,13 @@ QMenu* QtMgx3DPythonConsole::createPopupMenu ( )
 	
 	return menu;
 }	// QtMgx3DPythonConsole::createPopupMenu
+
+
+QAction& QtMgx3DPythonConsole::insertSelectedEntitiesAction ( )
+{
+	CHECK_NULL_PTR_ERROR (_insertSelectedEntitiesAction)
+	return *_insertSelectedEntitiesAction;
+}	// QtMgx3DPythonConsole::insertSelectedEntitiesAction
 
 
 QAction& QtMgx3DPythonConsole::insertSelectedVolumesAction ( )

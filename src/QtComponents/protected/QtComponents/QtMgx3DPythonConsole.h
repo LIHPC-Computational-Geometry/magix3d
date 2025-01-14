@@ -115,6 +115,7 @@ class QtMgx3DPythonConsole : public QtPythonConsole
 	
 	/**
 	 * Insère à l'emplacement du curseur la sélection courante correspondant au type transmis en argument.
+	 * Si type vaut Entity::undefined insère alors toutes les entités sélectionnées, quelque soit leur type.
 	 */
 	virtual void insertSelectionCallback (Utils::Entity::objectType type);
 
@@ -128,6 +129,7 @@ class QtMgx3DPythonConsole : public QtPythonConsole
 	virtual QMenu* createPopupMenu ( );
 	
 	/** Les actions d'insertion de la sélection courante. */
+	virtual QAction& insertSelectedEntitiesAction ( );
 	virtual QAction& insertSelectedVolumesAction ( );
 	virtual QAction& insertSelectedSurfacesAction ( );
 	virtual QAction& insertSelectedCurvesAction ( );
@@ -174,7 +176,8 @@ class QtMgx3DPythonConsole : public QtPythonConsole
 	Mgx3D::Utils::CommandManagerIfc::POLICY			_cmdMgrPolicy;
 	
 	/** Les actions d'insertion de la sélection courante. */
-	QAction											*_insertSelectedVolumesAction, *_insertSelectedSurfacesAction, *_insertSelectedCurvesAction, *_insertSelectedGeomVerticesAction,
+	QAction											*_insertSelectedEntitiesAction,
+													*_insertSelectedVolumesAction, *_insertSelectedSurfacesAction, *_insertSelectedCurvesAction, *_insertSelectedGeomVerticesAction,
 													*_insertSelectedBlocksAction, *_insertSelectedFacesAction, *_insertSelectedEdgesAction, *_insertSelectedTopoVerticesAction,
 													*_insertSelectedMeshVolumesAction, *_insertSelectedMeshSurfacesAction, *_insertSelectedLinesAction, *_insertSelectedCloudsAction;
 };	// class QtMgx3DPythonConsole
