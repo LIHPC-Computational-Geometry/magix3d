@@ -119,6 +119,7 @@
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 #include <iostream>
+#include <utility>
 #include <vector>
 #include <string>
 #include <map>
@@ -925,7 +926,7 @@ TopoManager::newTopoEntity(std::vector<Topo::Vertex*> vertices, std::string grou
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
     Topo::CommandNewTopo* command = new Topo::CommandNewTopo(getLocalContext(), vertices,
-                                                             CommandNewTopo::STRUCTURED_BLOCK, groupName);
+                                                             CommandNewTopo::STRUCTURED_BLOCK, std::move(groupName));
 
     TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().newTopoEntity (\""

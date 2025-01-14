@@ -90,12 +90,12 @@ class QtTopologyCreationPanel : public QtMgx3DOperationPanel
 	 * \return		Le ratio de l'éventuel O-grid.
 	 */
 	virtual double getOGridRatio ( ) const;
-	
+
 	/**
 	 * \return		true si il faut positionner les vertex sur les coins de la boite englobant une sélection d'entités
 	 */
 	virtual bool placeVerticesOnSelectionBounds ( ) const;
-	
+
 	/**
 	 * \return		La liste des noms d'entités définissant la boite englobante de positionnement des sommets
 	 */
@@ -177,10 +177,10 @@ class QtTopologyCreationPanel : public QtMgx3DOperationPanel
 
 	/** La topologie créée. */
 	QtTopologyPanel*							_topologyPanel;
-	
+
 	/** Faut-il positionner les sommets topologiques sur les coins d'une boite englobant une sélection d'entités ? */
 	QCheckBox*									_selectionCheckBox;
-	
+
 	/** La sélection définissant une boite englobante. */
 	QtMgx3DEntityPanel*							_selectionEntitiesPanel;
 };	// class QtTopologyCreationPanel
