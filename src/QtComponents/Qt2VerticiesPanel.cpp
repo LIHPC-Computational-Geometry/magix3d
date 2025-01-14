@@ -5,10 +5,10 @@
  */
 
 #include "Internal/ContextIfc.h"
+#include "Internal/ODObject.h"
 
 #include "Utils/Common.h"
-#include "Geom/Vertex.h"
-#include "Topo/Vertex.h"
+
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/Qt2VerticiesPanel.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -267,16 +267,7 @@ void Qt2VerticiesPanel::pointsRemovedFromSelectionCallback (QString point)
 
 Utils::Math::Point Qt2VerticiesPanel::getPoint (const string& name) const
 {
-	Entity&			entity	= getContext().nameToEntity (name);
-	Geom::Vertex*	gvertex	= dynamic_cast<Geom::Vertex*>(&entity);
-	Topo::Vertex*	tvertex	= dynamic_cast<Topo::Vertex*>(&entity);
-
-    if (0 != gvertex)
-		return gvertex->getCoord ( );
-	else if (0 != tvertex)
-		return tvertex->getCoord ( );
-
-	throw Exception (UTF8String ("Absence de point de ce nom.", Charset::UTF_8));
+	return ODObject::nameToEntity(getContext(), name)->getPoint();
 }   // getPoint
 
 

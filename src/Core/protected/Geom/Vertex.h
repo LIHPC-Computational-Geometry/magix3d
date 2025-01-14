@@ -14,6 +14,7 @@
 #include "Geom/GeomEntity.h"
 /*----------------------------------------------------------------------------*/
 #include "Utils/Point.h"
+#include "Internal/ODObject.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -34,7 +35,7 @@ class GeomProperty;
  * \class Vertex
  * \brief Sommet de la géométrie
  */
-class Vertex: public GeomEntity {
+class Vertex: public GeomEntity, public Internal::ODObject {
 
     static const char* typeNameGeomVertex;
 
