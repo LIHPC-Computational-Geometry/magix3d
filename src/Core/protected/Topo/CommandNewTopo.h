@@ -74,12 +74,19 @@ namespace Mgx3D {
             virtual void createVertex();
 
             /** Création d'une arête topologique */
-            virtual CoEdge* createCoEdge(Vertex* v0,Vertex* v1);
+            virtual CoEdge* createCoEdge(Vertex* v0,Vertex* v1, std::string groupName);
 
             /** Création d'une face topologique structurée */
-            virtual void createFace();
+            virtual CoFace* createFace(Vertex* v0, Vertex* v1, Vertex* v2, Vertex* v3, std::string groupName);
+
+            /** Création d'un bloc topologique structuré */
+            virtual void createBlock(Vertex* v0, Vertex* v1, Vertex* v2, Vertex* v3, Vertex* v4, Vertex* v5,
+                                        Vertex* v6, Vertex* v7, std::string groupName);
 
             virtual Topo::CoEdge* getCommonEdge(const Vertex* v0, const Vertex* v1);
+            virtual Topo::CoFace* getCommonFace(const Vertex* v0, const Vertex* v1, const Vertex* v2, const Vertex* v3);
+            virtual Topo::Block*  getCommonBlock(const Vertex* v0, const Vertex* v1, const Vertex* v2, const Vertex* v3,
+                                                const Vertex* v4, const Vertex* v5, const Vertex* v6, const Vertex* v7);
 
         private:
 

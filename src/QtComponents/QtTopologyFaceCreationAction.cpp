@@ -132,6 +132,7 @@ void QtTopologyFaceCreationAction::executeOperation ( )
 	string							name	    = panel->getGeomEntityName ( );
 	string							groupName	= panel->getGroupName ( );
 	QtTopologyPanel::TOPOLOGY_TYPE	type	    = panel->getTopologyType ( );
+    std::vector<string>             vnames      = panel->getVerticesNames ( );
 
 	switch (type)
 	{
@@ -142,7 +143,10 @@ void QtTopologyFaceCreationAction::executeOperation ( )
 			cmdResult	= getContext ( ).getTopoManager ( ).newStructuredTopoOnGeometry (name);
 			break;
 		case QtTopologyPanel::STRUCTURED_FREE_TOPOLOGY	:
-			if (0 != name.length ( ))
+            if(!vnames.empty()){
+                cmdResult	= getContext ( ).getTopoManager ( ).newTopoEntity(vnames,groupName);
+            }
+			else if (0 != name.length ( ))
 				cmdResult	= getContext ( ).getTopoManager ( ).newFreeTopoOnGeometry (name);
 			else
 			{
@@ -155,7 +159,6 @@ void QtTopologyFaceCreationAction::executeOperation ( )
 				}	// if (0 == groupName.length ( ))
 				cmdResult	= getContext ( ).getTopoManager( ).newFreeTopoInGroup (groupName, 2);
 			}
-
 			break;
 		default											:
 		{
