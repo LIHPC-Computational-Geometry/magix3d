@@ -13,7 +13,6 @@
 #include <map>
 /*----------------------------------------------------------------------------*/
 #include "Utils/Point.h"
-#include "Internal/ODObject.h"
 /*----------------------------------------------------------------------------*/
 #include "Topo/TopoEntity.h"
 #include "Topo/VertexTopoProperty.h"
@@ -38,7 +37,7 @@ class Block;
 
    On change le nom de la classe pour les pythoneries, sinon il y a un conflit avec Geom::Vertex
  */
-class Vertex : public TopoEntity, public Internal::ODObject {
+class Vertex : public TopoEntity {
 
     static const char* typeNameTopoVertex;
 
@@ -391,7 +390,6 @@ public:
     /// met à jour la date (de la représentation) pour les arêtes incidentes
     void updateCoEdgeModificationTime();
 
-    Utils::Math::Point getPoint () const {return getCoord();}
 
 private:
 
