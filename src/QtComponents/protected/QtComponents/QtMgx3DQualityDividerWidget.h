@@ -114,6 +114,9 @@ class QtMgx3DQualityDividerWidget : public GQualif::QtQualityDividerWidget
 	
 	/** Les groupes affichés correspondant aux extractions obtenues. */
 	std::map<GQualif::AbstractQualifSerie*, Mgx3D::Mesh::MeshEntity*>		_extractions;
+	
+	/** Le nom du critère utilisé à la dernière extraction. */
+	std::string																_criterionName;
 };	// class QtMgx3DQualityDividerWidget
 
 

@@ -583,7 +583,6 @@ void QtMeshQualityOperationPanel::displayCellsCallback ( )
 		for (size_t i = 0; i < (*itv)->size ( ); i++)
 		{
 			gmds::Region	region	= gmdsMesh.get<gmds::Region>(gmdsVolume [i]);
-cout << __FILE__ << ' ' << __LINE__ << " ADDING REGION " << i << endl;
 			volume->addRegion (region);
 		}
 		context->newGraphicalRepresentation (*volume);

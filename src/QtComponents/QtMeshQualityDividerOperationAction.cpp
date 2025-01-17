@@ -77,7 +77,6 @@ QtMeshQualityDividerOperationPanel::QtMeshQualityDividerOperationPanel (
 	_qualifWidget	= new QtMgx3DQualityDividerWidget (this, context, &mainWindow);
 	scrollArea->setWidget (_qualifWidget);
 
-
 	// Les boutons : ATTENTION, dans le QtQualifWidget.
 	QPushButton*	closeButton	 = new QPushButton("Fermer", _qualifWidget);
 	_qualifWidget->getButtonsLayout ( ).addWidget (closeButton);

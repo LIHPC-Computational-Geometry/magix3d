@@ -12,9 +12,11 @@
 #include "Utils/Common.h"
 #include "Mesh/Mgx3DQualifSerie.h"
 #include "Mesh/Surface.h"
+#include "Mesh/SubSurface.h"
 #include "Mesh/Volume.h"
 #include "Mesh/SubVolume.h"
 
+#include <TkUtil/ErrorLog.h>
 #include <TkUtil/Exception.h>
 #include <TkUtil/InternalError.h>
 #include <TkUtil/MemoryError.h>
@@ -44,7 +46,7 @@ namespace QtComponents
 
 
 QtMgx3DQualityDividerWidget::QtMgx3DQualityDividerWidget (QWidget* parent, Context* context, QtMgx3DMainWindow* mainWindow)
-	: QtQualityDividerWidget (parent, "Magix 3D"), _mainWindow (mainWindow), _displayButton (0), _initializeButton (0), _context (context), _extractions ( )
+	: QtQualityDividerWidget (parent, "Magix 3D"), _mainWindow (mainWindow), _displayButton (0), _initializeButton (0), _context (context), _extractions ( ), _criterionName ( )
 {
 	_displayButton	= new QPushButton ("Afficher", this);
 	getButtonsLayout ( ).addWidget (_displayButton);
@@ -56,7 +58,7 @@ QtMgx3DQualityDividerWidget::QtMgx3DQualityDividerWidget (QWidget* parent, Conte
 
 
 QtMgx3DQualityDividerWidget::QtMgx3DQualityDividerWidget (const QtMgx3DQualityDividerWidget&)
-	: QtQualityDividerWidget (0, "Magix 3D"), _mainWindow (0), _displayButton (0), _initializeButton (0), _context (0), _extractions ( )
+	: QtQualityDividerWidget (0, "Magix 3D"), _mainWindow (0), _displayButton (0), _initializeButton (0), _context (0), _extractions ( ), _criterionName ( )
 {
 	MGX_FORBIDDEN ("QtMgx3DQualityDividerWidget copy constructor is not allowed.")
 }	// QtMgx3DQualityDividerWidget::QtMgx3DQualityDividerWidget
@@ -80,6 +82,7 @@ void QtMgx3DQualityDividerWidget::computeCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	removeDataGroupSubsets ( );
+	_criterionName	= Qualif::CRITERESTR [getCriterion ( )];
 
 	QtQualityDividerWidget::computeCallback ( );
 
@@ -97,7 +100,6 @@ void QtMgx3DQualityDividerWidget::displayExtraction (size_t i, bool display)
 	DisplayProperties::GraphicalRepresentation*	rep		= 0;	// et sa représentation graphique
 	AbstractQualifSerie*	serie	= dynamic_cast<AbstractQualifSerie*>(&getSerie (i));
 	CHECK_NULL_PTR_ERROR (serie)
-	cout << __FILE__ << ' ' << __LINE__ << " QtMgx3DQualityDividerWidget::displayExtraction. I=" << i << " NAME=" << serie->getName ( ) << " DISPLAY=" << (true == display ? "TRUE" : "FALSE") << endl;
 	map<AbstractQualifSerie*, MeshEntity*>::iterator	it	= _extractions.find (serie);
 	if (_extractions.end ( ) != it)
 		entity	= it->second;
@@ -107,15 +109,13 @@ void QtMgx3DQualityDividerWidget::displayExtraction (size_t i, bool display)
 		CHECK_NULL_PTR_ERROR (meshManager)
 		gmds::Mesh&			gmdsMesh	= meshManager->getMesh ( )->getGMDSMesh ( );
 		UTF8String	name (Charset::UTF_8);
-		name << serie->getName ( ) << "_Critere";
+		name << serie->getName ( ) << '_' << _criterionName;
 		if (true == serie->isVolumic ( ))
 		{
-cout << "IT IS A VOLUME SERIE" << endl;
 			const Mesh::Mgx3DVolumeQualifSerie* volumeSerie	= dynamic_cast<const Mesh::Mgx3DVolumeQualifSerie*>(serie);
 			CHECK_NULL_PTR_ERROR (volumeSerie)
 			vector <gmds::TCellID>	cellsIds;
 			volumeSerie->getGMDSCellsIndexes (cellsIds, 0);	// Une seule classe => 0
-cout << "NUMBER OF CELLS : " << cellsIds.size ( ) << endl;
 			gmds::CellGroup<gmds::Region>*	gmdsVolume	= mesh->getGMDSMesh ( ).newGroup<gmds::Region> (name);
 
 			SubVolume*	volume	= new SubVolume (getContext ( ), getContext ( ).newProperty (Entity::MeshVolume, name), getContext ( ).newDisplayProperties (Entity::MeshVolume), 0);
@@ -130,8 +130,21 @@ cout << "NUMBER OF CELLS : " << cellsIds.size ( ) << endl;
 		}	// if (true == serie->isVolumic ( ))
 		else
 		{
-cout << "IT IS A SURFACE SERIE" << endl;
-			auto surface_serie	= dynamic_cast<const Mesh::Mgx3DSurfaceQualifSerie*>(serie);
+			const Mesh::Mgx3DSurfaceQualifSerie* surfaceSerie	= dynamic_cast<const Mesh::Mgx3DSurfaceQualifSerie*>(serie);
+			CHECK_NULL_PTR_ERROR (surfaceSerie)
+			vector <gmds::TCellID>	cellsIds;
+			surfaceSerie->getGMDSCellsIndexes (cellsIds, 0);	// Une seule classe => 0
+			gmds::CellGroup<gmds::Face>*	gmdsSurface	= mesh->getGMDSMesh ( ).newGroup<gmds::Face> (name);
+
+			SubSurface*	surface	= new SubSurface (getContext ( ), getContext ( ).newProperty (Entity::MeshSurface, name), getContext ( ).newDisplayProperties (Entity::MeshSurface), 0);
+			CHECK_NULL_PTR_ERROR (surface)
+			for (vector <gmds::TCellID>::const_iterator itc = cellsIds.begin ( ); cellsIds.end ( ) != itc; itc++)
+			{
+				gmds::Face face	= gmdsMesh.get<gmds::Face>(*itc);
+				surface->addFace (face);
+			}
+			meshManager->add (surface);
+			entity	= surface;
 		}	// else if (true == serie->isVolumic ( ))
 
 		_extractions.insert (pair<AbstractQualifSerie*, MeshEntity*>(serie, entity));
@@ -191,20 +204,37 @@ void QtMgx3DQualityDividerWidget::removeDataGroupSubsets ( )
 		Volume*		volume	= dynamic_cast<Mesh::Volume*>(it->second);
 		if (0 != volume)
 		{
-cout << __FILE__ << ' ' << __LINE__ << " REMOVING VOLUME " << entity->getName ( ) << endl;
 			try
 			{
 				mesh.deleteGroup<gmds::Region>(mesh.getGroup<gmds::Region>(entity->getName ( )));
 			}
+			catch (const exception& e)
+			{
+				UTF8String	error (Charset::UTF_8);
+				error << "Erreur survenue durant le nettoyage du panneau Recherche selon critère : " << e.what ( );
+				getContext ( ).getLogDispatcher ( ).log (ErrorLog (error));
+			}
 			catch (...)
 			{
+				UTF8String	error (Charset::UTF_8);
+				error << "Erreur non renseignée survenue durant le nettoyage du panneau Recherche selon critère.";
+				getContext ( ).getLogDispatcher ( ).log (ErrorLog (error));
 			}
 			try
 			{
 				manager->remove (volume);
 			}
+			catch (const exception& e)
+			{
+				UTF8String	error (Charset::UTF_8);
+				error << "Erreur survenue durant le nettoyage du panneau Recherche selon critère : " << e.what ( );
+				getContext ( ).getLogDispatcher ( ).log (ErrorLog (error));
+			}
 			catch (...)
 			{
+				UTF8String	error (Charset::UTF_8);
+				error << "Erreur non renseignée survenue durant le nettoyage du panneau Recherche selon critère.";
+				getContext ( ).getLogDispatcher ( ).log (ErrorLog (error));
 			}
 		}	// if (0 != volume)
 		if (0 != surface)
@@ -213,15 +243,33 @@ cout << __FILE__ << ' ' << __LINE__ << " REMOVING VOLUME " << entity->getName ( 
 			{
 				mesh.deleteGroup<gmds::Face>(mesh.getGroup<gmds::Face>(entity->getName ( )));
 			}
+			catch (const exception& e)
+			{
+				UTF8String	error (Charset::UTF_8);
+				error << "Erreur survenue durant le nettoyage du panneau Recherche selon critère : " << e.what ( );
+				getContext ( ).getLogDispatcher ( ).log (ErrorLog (error));
+			}
 			catch (...)
 			{
+				UTF8String	error (Charset::UTF_8);
+				error << "Erreur non renseignée survenue durant le nettoyage du panneau Recherche selon critère.";
+				getContext ( ).getLogDispatcher ( ).log (ErrorLog (error));
 			}
 			try
 			{
 				manager->remove (surface);
 			}
+			catch (const exception& e)
+			{
+				UTF8String	error (Charset::UTF_8);
+				error << "Erreur survenue durant le nettoyage du panneau Recherche selon critère : " << e.what ( );
+				getContext ( ).getLogDispatcher ( ).log (ErrorLog (error));
+			}
 			catch (...)
 			{
+				UTF8String	error (Charset::UTF_8);
+				error << "Erreur non renseignée survenue durant le nettoyage du panneau Recherche selon critère.";
+				getContext ( ).getLogDispatcher ( ).log (ErrorLog (error));
 			}
 		}	// if (0 != surface)
 		
