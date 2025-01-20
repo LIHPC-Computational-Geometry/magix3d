@@ -70,7 +70,7 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
     // récupération des paramètre utilisateur
     gmsh::option::setNumber("Mesh.MeshSizeMin", prop->getMin());
     gmsh::option::setNumber("Mesh.MeshSizeMax", prop->getMax());
-    gmsh::option::setNumber("Mesh.Algorithm", 5); // algo Delaunay
+    gmsh::option::setNumber("Mesh.Algorithm", 6); // algo Frontal-Delaunay
 
     // Initialize robust predicates
     //robustPredicates::exactinit();
@@ -173,10 +173,7 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
     for (auto gmsh_dim_tag : gmsh_entities_dim_tags)
     {
         int gmsh_line_tag = gmsh_dim_tag.second;
-        std::string type;
-        gmsh::model::getType(1, gmsh_line_tag, type);  // 1 pour dimension 1
-        if (type == "Line")
-            gmsh::model::mesh::setTransfiniteCurve(gmsh_line_tag, 2);
+        gmsh::model::mesh::setTransfiniteCurve(gmsh_line_tag, 2);
     }
 
     // génération du maillage
