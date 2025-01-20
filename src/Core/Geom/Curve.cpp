@@ -26,7 +26,6 @@
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 #include "Geom/OCCGeomRepresentation.h"
-#include "Geom/FacetedCurve.h"
 
 #include <TopoDS_Shape.hxx>
 #include <TopoDS.hxx>
@@ -1523,17 +1522,6 @@ Utils::SerializedRepresentation* Curve::getDescription (bool alsoComputed) const
 	}
 #endif	// _DEBUG
 
-	// recherche des infos pour le cas facétisé
-	bool isFaceted = false;
-	uint nbNodes = 0;
-	if (reps.size() == 1){
-		FacetedCurve* fc = dynamic_cast<FacetedCurve*>(reps[0]);
-		if (fc){
-			isFaceted = true;
-			nbNodes = fc->getNbNodes();
-		}
-	}
-
     // on ajoute des infos du style: c'est une droite, un arc de cercle, une ellipse, une b-spline
     TkUtil::UTF8String typeStr (TkUtil::Charset::UTF_8);
 	bool isABSpline = false;
@@ -1554,21 +1542,11 @@ Utils::SerializedRepresentation* Curve::getDescription (bool alsoComputed) const
     }
     else if (getComputationalProperties().size()>1)
     	typeStr<<"composée";
-    else if (isFaceted)
-    	typeStr<<"facétisée";
     else
     	typeStr<<"quelconque";
 
     propertyGeomDescription.addProperty (
     		Utils::SerializedRepresentation::Property ("Type", typeStr));
-
-    if (isFaceted){
-		TkUtil::UTF8String	nbStr (TkUtil::Charset::UTF_8);
-    	nbStr<<(long int)nbNodes;
-
-    	propertyGeomDescription.addProperty (
-    			Utils::SerializedRepresentation::Property ("Nb noeuds", nbStr.ascii()) );
-    }
 
 #ifdef _DEBUG
     if (isABSpline){
@@ -1773,17 +1751,6 @@ void Curve::checkParams() const
 		throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, paramImgFirst non itialisé correctement", TkUtil::Charset::UTF_8));
 	if (reps.size() != paramImgLast.size())
 		throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, paramImgLast non itialisé correctement", TkUtil::Charset::UTF_8));
-}
-/*----------------------------------------------------------------------------*/
-bool Curve::needLowerDimensionalEntityModification()
-{
-	std::vector<GeomRepresentation*> reps = getComputationalProperties();
-	if (reps.size() == 1) {
-		FacetedCurve *fc = dynamic_cast<FacetedCurve *>(reps[0]);
-		if (fc)
-			return false;
-	}
-	return true;
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

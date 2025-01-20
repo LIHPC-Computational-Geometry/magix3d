@@ -370,13 +370,7 @@ public:
 													bool alsoComputed) const;
 #endif
 
-    /*------------------------------------------------------------------------*/
-    /** Dit s'il faut appliquer la transformation géométrique aux entités adjacentes de dimension inférieurs
-     */
-    virtual bool needLowerDimensionalEntityModification();
-
-
-        protected:
+protected:
 
     /*------------------------------------------------------------------------*/
     /** \brief  MAJ de l'état interne de l'objet géométrique spécifique au type

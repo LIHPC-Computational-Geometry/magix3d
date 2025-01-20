@@ -460,13 +460,8 @@ protected:
      */
     virtual void createSpecificMemento(MementoGeomEntity& mem);
 
-    /*------------------------------------------------------------------------*/
-    /** Dit s'il faut appliquer la transformation géométrique aux entités adjacentes de dimension inférieurs
-     */
-    virtual bool needLowerDimensionalEntityModification();
 
-
-        protected:
+protected:
     std::vector<Surface*> m_surfaces;
     std::vector<Vertex*> m_vertices;
     /// Listes des groupes 1D auxquels appartient cette courbe

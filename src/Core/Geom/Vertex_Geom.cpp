@@ -17,7 +17,6 @@
 #include "Geom/Volume.h"
 #include "Geom/GeomDisplayRepresentation.h"
 #include "Geom/OCCGeomRepresentation.h"
-#include "Geom/FacetedVertex.h"
 #include "Group/Group0D.h"
 #include "Geom/MementoGeomEntity.h"
 #include "Internal/Context.h"
@@ -117,13 +116,6 @@ Mgx3D::Utils::SerializedRepresentation* Vertex::getDescription (bool alsoCompute
     propertyGeomDescription.addProperty (
     	        Utils::SerializedRepresentation::Property ("Précision", precStr.ascii()) );
 #endif	// _DEBUG
-
-    bool isFaceted = false;
-    FacetedVertex* fv = dynamic_cast<FacetedVertex*>(getComputationalProperty());
-    if (fv){
-    	propertyGeomDescription.addProperty (
-    	    		Utils::SerializedRepresentation::Property ("Type", std::string("facétisé")) );
-    }
 
 	description->addPropertiesSet (propertyGeomDescription);
 	description->setSummary (coordsProp.getValue ( ));
@@ -244,19 +236,12 @@ Utils::Math::Point Vertex::getCenteredPosition() const
 {
     OCCGeomRepresentation* rep =
             dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
-    FacetedVertex* fv = dynamic_cast<FacetedVertex*>(getComputationalProperty());
     if (rep){
 
     	TopoDS_Vertex v = TopoDS::Vertex(rep->getShape());
     	gp_Pnt pnt = BRep_Tool::Pnt(v);
     	return Utils::Math::Point(pnt.X(),pnt.Y(), pnt.Z());
-    }
-    else if (fv){
-    	Utils::Math::Point pt;
-    	fv->getPoint(0, pt, true);
-    	return pt;
-    }
-    else
+    }    else
     	throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, type inconnu pour getCenteredPosition", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/

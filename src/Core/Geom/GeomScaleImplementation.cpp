@@ -164,10 +164,6 @@ void GeomScaleImplementation::perform(std::vector<GeomEntity*>& res)
     for(;it!=ite;it++)
         scaleSingle(*it);
 
-    for(it  = m_modifiedEntities.begin();it!=ite;it++)
-        if (!(*it)->needLowerDimensionalEntityModification())
-            m_undoableEntities.push_back(*it);
-
     // traitement spécifique pour les courbes composites
 	for(std::list<GeomEntity*>::iterator it = m_ref_entities[1].begin();
 			it!=m_ref_entities[1].end();it++){
