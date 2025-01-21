@@ -108,12 +108,20 @@ class QtMgx3DQualityDividerWidget : public GQualif::QtQualityDividerWidget
 	
 	/** Les boutons du panneau. */
 	QPushButton																*_displayButton, *_initializeButton;
+	QCheckBox																*_wireCheckBox;
 
 	/** Le context Magix 3D d'utilisation du panneau. */
 	Mgx3D::Internal::Context*												_context;
 	
 	/** Les groupes affichés correspondant aux extractions obtenues. */
 	std::map<GQualif::AbstractQualifSerie*, Mgx3D::Mesh::MeshEntity*>		_extractions;
+
+	/** Mode d'affichage originel des groupes parents pour restitution après arrêt de l'affichage des extractions obtenues. */
+	std::map<GQualif::AbstractQualifSerie*, unsigned long>					_parentsDisplayMask;
+	
+	/** Valeur initiale du RenderingManager.useGlobalDisplayProperties ( ), à restaurer à la fermeture du panneau si cette
+	 * valeur a été modifiée. */
+	bool																	_useGlobalDisplayProperties;
 	
 	/** Le nom du critère utilisé à la dernière extraction. */
 	std::string																_criterionName;
