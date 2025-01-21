@@ -103,6 +103,8 @@
      <file>images/mesh_all_surfaces.png</file>
      <file>images/mesh_all_volumes.png</file>
      <file>images/mesh_quality.png</file>
+     <file>images/mesh_quality2.png</file>
+     <file>images/quality_search.png</file>
      <file>images/mesh_surfacic_projection.png</file>
      <file>images/mesh_surfacic_smoothing.png</file>
      <file>images/mesh_volumic_smoothing.png</file>

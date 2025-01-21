@@ -2306,9 +2306,9 @@ void QtMgx3DMainWindow::showReady ( )
 
 			_actions._addMeshExplorerAction = new QAction(QIcon(":/images/sheet_explorer.png"), "Exploration de feuillets", this);
 			connect(_actions._addMeshExplorerAction, SIGNAL(triggered()), this, SLOT(addMeshExplorerCallback()), defaultConnectionType);
-			_actions._addMeshQualityAction = new QAction(QIcon(":/images/mesh_quality.png"), QString::fromUtf8("Evaluation de la qualité du maillage"), this);
+			_actions._addMeshQualityAction = new QAction(QIcon(":/images/mesh_quality2.png"), QString::fromUtf8("Evaluation de la qualité du maillage"), this);
 			connect(_actions._addMeshQualityAction, SIGNAL(triggered()), this, SLOT(addMeshQualityCallback()), defaultConnectionType);
-			_actions._addMeshQualityDividerAction = new QAction(QIcon(":/images/mesh_quality.png"), QString::fromUtf8("Recherche selon critère"), this);
+			_actions._addMeshQualityDividerAction = new QAction(QIcon(":/images/quality_search.png"), QString::fromUtf8("Recherche selon critère"), this);
 			connect(_actions._addMeshQualityDividerAction, SIGNAL(triggered()), this, SLOT(addMeshQualityDividerCallback()), defaultConnectionType);
 
 			_actions._meshInformationAction = new QAction("Informations sur le maillage", this);
@@ -6929,10 +6929,7 @@ void QtMgx3DMainWindow::addMeshQualityCallback ( )
     BEGIN_QT_TRY_CATCH_BLOCK
 
 	QtMeshQualityOperationAction*	qualityAction	=
-		new QtMeshQualityOperationAction (
-				QIcon (":/images/mesh_quality.png"), "Qualité de maillage",
-				*this, 
-				"Evaluation de la qualité du maillage.");
+		new QtMeshQualityOperationAction (QIcon (":/images/mesh_quality2.png"), "Qualité de maillage", *this, "Evaluation de la qualité du maillage.");
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::addMeshQualityCallback
@@ -6944,7 +6941,7 @@ void QtMgx3DMainWindow::addMeshQualityDividerCallback ( )
 
     BEGIN_QT_TRY_CATCH_BLOCK
 
-	QtMeshQualityDividerOperationAction*	qualityAction	= new QtMeshQualityDividerOperationAction (QIcon (":/images/mesh_quality.png"), "Recherche selon critère",	*this, "Rechercher des mailles comprises dans un domaine d'un critère de qualité");
+	QtMeshQualityDividerOperationAction*	qualityAction	= new QtMeshQualityDividerOperationAction (QIcon (":/images/quality_search.png"), "Recherche selon critère",	*this, "Rechercher des mailles comprises dans un domaine d'un critère de qualité");
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::addMeshQualityDividerCallback
