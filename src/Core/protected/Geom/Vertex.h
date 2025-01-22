@@ -46,12 +46,12 @@ public:
      *  \param ctx le contexte
      *  \param prop propriété (nom ...)
      *  \param disp propriétés d'affichage
-     *  \param gprop    les propriétés associées à la courbe
-     *  \param compProp les propriétés de calcul
+     *  \param gprop les propriétés associées à la courbe
+     *  \param shape l'objet occ
      */
 #ifndef SWIG
     Vertex(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, GeomRepresentation* compProp);
+            GeomProperty* gprop, const TopoDS_Shape& shape);
 #endif
 
     /*------------------------------------------------------------------------*/

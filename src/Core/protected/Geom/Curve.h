@@ -19,6 +19,8 @@
 /*----------------------------------------------------------------------------*/
 #include "Utils/Point.h"
 /*----------------------------------------------------------------------------*/
+#include <TopoDS_Edge.hxx>
+/*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Group {
@@ -50,26 +52,12 @@ public:
      *  \param ctx le contexte
      *  \param prop propriété (nom ...)
      *  \param disp propriétés d'affichage
-     *  \param gprop    les propriétés associées à la courbe
-     *  \param compProp les propriétés de calcul
+     *  \param gprop les propriétés associées à la courbe
+     *  \param shape l'objet occ
      */
 #ifndef SWIG
     Curve(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, GeomRepresentation* compProp);
-#endif
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Constructeur
-     *
-     *  \param ctx le contexte
-     *  \param prop propriété (nom ...)
-     *  \param disp propriétés d'affichage
-     *  \param gprop    les propriétés associées à la courbe
-     *  \param compProp les propriétés de calcul
-     */
-#ifndef SWIG
-    Curve(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, std::vector<GeomRepresentation*>& compProp);
+            GeomProperty* gprop, const TopoDS_Shape& shape);
 #endif
 
     /*------------------------------------------------------------------------*/
@@ -119,9 +107,6 @@ public:
      * \param ptStart position du sommet de départ pour ordonner la courbe
      */
     virtual void computeParams(Utils::Math::Point ptStart);
-
-    /// Vérification que computeParams a bien été utilisé pour initialisé le cas composite
-    void checkParams() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Calcule l'aire d'une entité:  Pour une courbe, c'est la
@@ -460,6 +445,10 @@ protected:
      */
     virtual void createSpecificMemento(MementoGeomEntity& mem);
 
+private:
+
+    static double getParameterOnTopoDSEdge(const TopoDS_Edge& edge,
+            const Utils::Math::Point& Pt, double& p);
 
 protected:
     std::vector<Surface*> m_surfaces;

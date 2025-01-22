@@ -1445,7 +1445,7 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 					){
 						dni->initCoeff(curve->getArea());
 #ifdef _DEBUG_GETPOINTS
-						std::cout<<"  initCoeff avec "<<curve->computeArea()<<std::endl;
+						std::cout<<"  initCoeff avec "<<curve->getArea()<<std::endl;
 #endif
 					}
 					else if (curve->isLinear()) {

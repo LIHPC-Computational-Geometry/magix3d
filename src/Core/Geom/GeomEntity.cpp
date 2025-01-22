@@ -6,23 +6,20 @@
  *  \date 18/10/2010
  */
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
+
 #include "Geom/GeomEntity.h"
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
-#include <TkUtil/Exception.h>
-#include <TkUtil/InternalError.h>
-#include <TkUtil/MemoryError.h>
-#include <TkUtil/UTF8String.h>
-#include "Geom/GeomRepresentation.h"
 #include "Geom/GeomProperty.h"
-#include "Topo/TopoEntity.h"
 #include "Geom/MementoGeomEntity.h"
-#include "Internal/Context.h"
-#include "Geom/OCCGeomRepresentation.h"
+#include "Geom/OCCDisplayRepresentationBuilder.h"
+#include "Geom/OCCFacetedRepresentationBuilder.h"
+#include "Geom/OCCHelper.h"
 
+#include "Topo/TopoEntity.h"
 #include "Topo/TopoEntity.h"
 #include "Topo/Vertex.h"
 #include "Topo/CoEdge.h"
@@ -34,39 +31,52 @@
 #include "Group/Group2D.h"
 #include "Group/Group3D.h"
 
-#include <memory>			// unique_ptr
+#include <TkUtil/Exception.h>
+#include <TkUtil/InternalError.h>
+#include <TkUtil/MemoryError.h>
+#include <TkUtil/UTF8String.h>
 #include <TkUtil/NumericConversions.h>
 
-#include <TopoDS_Shape.hxx>
+#include "Utils/Point.h"
 
+#include <memory>			// unique_ptr
+
+#include <Bnd_Box.hxx>
+#include <BRepBndLib.hxx>
+#include <BRepBuilderAPI_Transform.hxx>
+#include <BRepBuilderAPI_GTransform.hxx>
+#include <BRepBuilderAPI_MakeVertex.hxx>
+#include <BRepExtrema_DistShapeShape.hxx>
+#include <BRep_Tool.hxx>
+#include <TopExp_Explorer.hxx>
+#include <TNaming_Builder.hxx>
+#include <TopoDS.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 /*----------------------------------------------------------------------------*/
 GeomEntity::GeomEntity(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-        GeomProperty* gprop, GeomRepresentation* compProp)
+        GeomProperty* gprop, const TopoDS_Shape& shape)
 : Internal::InternalEntity (ctx, prop, disp),
-  m_geomProp(gprop), m_computedAreaIsUpToDate(false), m_computedArea(0)
+  m_geomProp(gprop), m_computedAreaIsUpToDate(false), m_computedArea(0), m_shape(shape)
 {
-	m_geomRep.push_back(compProp);
-}
-/*----------------------------------------------------------------------------*/
-GeomEntity::GeomEntity(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, std::vector<GeomRepresentation*>& compProp)
-: Internal::InternalEntity (ctx, prop, disp),
-  m_geomProp(gprop), m_computedAreaIsUpToDate(false), m_computedArea(0)
-{
-	m_geomRep = compProp;
+    if (useOCAF()){
+		m_label = m_rootLabel.FindChild(getContext().nextUniqueId());
+		TNaming_Builder tnb(m_label);
+		tnb.Generated(m_shape);
+	}
 }
 /*----------------------------------------------------------------------------*/
 GeomEntity::~GeomEntity()
 {
-	for (uint i=0; i<m_geomRep.size(); i++)
-		delete m_geomRep[i];
-
     if(m_geomProp!=0)
         delete m_geomProp;
+}
+/*----------------------------------------------------------------------------*/
+bool GeomEntity::useOCAF() const
+{
+	return (getContext().getGeomKernel() == Internal::ContextIfc::WITHOCAF);
 }
 /*----------------------------------------------------------------------------*/
 void GeomEntity::getBounds (double bounds[6]) const
@@ -87,7 +97,7 @@ void GeomEntity::setFromMemento(MementoGeomEntity& mem)
     //std::cout<<"GeomEntity::setFromMemento avec "<<getComputationalProperties().size()<<" GeomRepresentations remplacées par "<<mem.getGeomRepresentation().size()<<" pour "<<getName()<<std::endl;
     m_topo_entities = mem.getTopoEntities();
     m_geomProp = mem.getProperty();
-    m_geomRep = mem.getGeomRepresentation();
+    m_shape = mem.getShape();
     setFromSpecificMemento(mem);
 
     m_computedAreaIsUpToDate = false;
@@ -97,8 +107,7 @@ void GeomEntity::createMemento(MementoGeomEntity& mem)
 {
     mem.setTopoEntities(m_topo_entities);
     mem.setProperty(m_geomProp);
-    //std::cout<<"GeomEntity::createMemento avec "<<getComputationalProperties().size()<<" GeomRepresentations pour "<<getName()<<std::endl;
-    mem.setGeomRepresentation(getComputationalProperties());
+    mem.setShape(m_shape);
     createSpecificMemento(mem);
 }
 /*----------------------------------------------------------------------------*/
@@ -129,54 +138,17 @@ void GeomEntity::clearRefEntities(std::list<GeomEntity*>& vertices,
 	throw exc;
 }
 /*----------------------------------------------------------------------------*/
-void GeomEntity::computeBoundingBox(Utils::Math::Point& pmin,Utils::Math::Point& pmax) const
+void GeomEntity::computeBoundingBox(Utils::Math::Point& pmin,Utils::Math::Point& pmax,
+                                               double tol) const
 {
-	if (m_geomRep.empty())
-		return;
-	m_geomRep[0]->computeBoundingBox(pmin,pmax);
+    Bnd_Box box;
+    box.SetGap(tol);
+    BRepBndLib::Add(m_shape,box);
 
-	for (uint i=1; i<m_geomRep.size(); i++){
-		Utils::Math::Point p1,p2;
-		m_geomRep[i]->computeBoundingBox(p1,p2);
-		for (uint j=0; j<3; j++){
-			double c1 = pmin.getCoord(j);
-			double c2 = p1.getCoord(j);
-			if (c2<c1)
-				pmin.setCoord(j,c2);
-		}
-		for (uint j=0; j<3; j++){
-			double c1 = pmax.getCoord(j);
-			double c2 = p2.getCoord(j);
-			if (c2>c1)
-				pmin.setCoord(j,c2);
-		}
-	}
-}
-/*----------------------------------------------------------------------------*/
-void GeomEntity::
-setComputationalProperty(GeomRepresentation* cprop)
-{
-    GeomRepresentation* old_rep = 0;
-    if(cprop==0) {
-        throw   TkUtil::Exception(TkUtil::UTF8String ("Null computational property", TkUtil::Charset::UTF_8));
-    }
-    old_rep = getComputationalProperty();
-    m_geomRep.clear();
-    m_geomRep.push_back(cprop);
-
-    if (old_rep != getComputationalProperty())
-    	m_computedAreaIsUpToDate = false;
-
-}
-/*----------------------------------------------------------------------------*/
-void GeomEntity::
-setComputationalProperties(std::vector<GeomRepresentation*>& cprop)
-{
-    if(cprop.empty())
-        throw   TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, setComputationalProperties sans GeomRepresentation", TkUtil::Charset::UTF_8));
-
-	m_geomRep = cprop;
-	m_computedAreaIsUpToDate = false;
+    double xmin,ymin,zmin,xmax,ymax,zmax;
+    box.Get(xmin,ymin,zmin,xmax,ymax,zmax);
+    pmin.setXYZ(xmin, ymin, zmin);
+    pmax.setXYZ(xmax, ymax, zmax);
 }
 /*----------------------------------------------------------------------------*/
 GeomProperty* GeomEntity::setGeomProperty(GeomProperty* prop)
@@ -191,29 +163,6 @@ GeomProperty* GeomEntity::setGeomProperty(GeomProperty* prop)
     return old_rep;
 }
 /*----------------------------------------------------------------------------*/
-GeomRepresentation* GeomEntity::getComputationalProperty() const
-{
-	if (m_geomRep.size() == 1)
-		return m_geomRep[0];
-	else if (m_geomRep.size() == 0){
-		TkUtil::UTF8String	messErreur (TkUtil::Charset::UTF_8);
-		messErreur<<"Erreur interne, getComputationalProperty() avec m_geomRep vide pour ";
-		messErreur<<getName();
-		throw TkUtil::Exception (messErreur);
-	}
-	else {
-		TkUtil::UTF8String	messErreur (TkUtil::Charset::UTF_8);
-		messErreur<<"Erreur interne, getComputationalProperty() avec m_geomRep multiple pour ";
-		messErreur<<getName();
-		throw TkUtil::Exception (messErreur);
-	}
-}
-/*----------------------------------------------------------------------------*/
-std::vector<GeomRepresentation*> GeomEntity::getComputationalProperties() const
-{
-	return m_geomRep;
-}
-/*----------------------------------------------------------------------------*/
 void GeomEntity::
 getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
 {
@@ -221,10 +170,13 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
 	std::cout<<"getRepresentation appelé pour "<<getName()<<std::endl;
 #endif
 
-	for (uint i=0; i<m_geomRep.size(); i++){
-		m_geomRep[i]->buildDisplayRepresentation(dr, this);
-//		std::cout<<"GeomEntity::getRepresentation() pour "<<getName()<<", m_points.size() = "<<dr.getPoints().size()<<", m_surfaceDiscretization.size() = "<<dr.getSurfaceDiscretization().size()<<", m_curveDiscretization.size() = "<<dr.getCurveDiscretization().size() <<", m_isoCurveDiscretization.size() = "<<dr.getIsoCurveDiscretization().size()<<std::endl;
-	}
+    if (dr.getDisplayType()!= Utils::DisplayRepresentation::DISPLAY_GEOM)
+        throw TkUtil::Exception("Invalid display type entity");
+
+    TopoDS_Shape s = m_shape;
+    OCCDisplayRepresentationBuilder builder(this, s,
+                dynamic_cast<Geom::GeomDisplayRepresentation*>(&dr));
+    builder.execute();
 
 	// applique le shrink sur la représentation
 	Utils::Math::Point barycentre = getCenteredPosition();
@@ -453,39 +405,28 @@ getDescription (bool alsoComputed) const
     Utils::SerializedRepresentation  occGeomDescription (
     		"Propriétés OCC", "");
     // observation du HashCode retourné par OCC
-    std::vector<GeomRepresentation*> reps = getComputationalProperties();
-    for (uint i=0; i<reps.size(); i++){
-    	OCCGeomRepresentation* rep1 = dynamic_cast<OCCGeomRepresentation*>(reps[i]);
-    	if (rep1){
-    		TopoDS_Shape sh1 = rep1->getShape();
-    		int hc = sh1.HashCode(INT_MAX);
-    		occGeomDescription.addProperty (
-    				Utils::SerializedRepresentation::Property ("HashCode", (long int)hc));
-    		TDF_Label label = rep1->getLabel();
-    		if (label.IsNull())
-    			occGeomDescription.addProperty (
-    					Utils::SerializedRepresentation::Property ("Label OCAF", std::string("non defini")));
-    		else {
-    			occGeomDescription.addProperty (
-    					Utils::SerializedRepresentation::Property ("OCAF - Label",(long int)label.Tag()));
-    			occGeomDescription.addProperty (
-    					Utils::SerializedRepresentation::Property ("OCAF - Depth",(long int)label.Depth()));
-    			occGeomDescription.addProperty (
-    					Utils::SerializedRepresentation::Property ("OCAF - NbChildren",(long int)label.NbChildren()));
-    			occGeomDescription.addProperty (
-    					Utils::SerializedRepresentation::Property ("OCAF - NbAttributes",(long int)label.NbAttributes()));
-    			occGeomDescription.addProperty (
-    					Utils::SerializedRepresentation::Property ("OCAF - Tag",(long int)label.Tag()));
-   		}
-    	}
-    	else
-    		isOCC = false;
+    TopoDS_Shape sh1 = m_shape;
+    int hc = sh1.HashCode(INT_MAX);
+    occGeomDescription.addProperty (
+            Utils::SerializedRepresentation::Property ("HashCode", (long int)hc));
+    TDF_Label label = m_label;
+    if (label.IsNull())
+        occGeomDescription.addProperty (
+                Utils::SerializedRepresentation::Property ("Label OCAF", std::string("non defini")));
+    else {
+        occGeomDescription.addProperty (
+                Utils::SerializedRepresentation::Property ("OCAF - Label",(long int)label.Tag()));
+        occGeomDescription.addProperty (
+                Utils::SerializedRepresentation::Property ("OCAF - Depth",(long int)label.Depth()));
+        occGeomDescription.addProperty (
+                Utils::SerializedRepresentation::Property ("OCAF - NbChildren",(long int)label.NbChildren()));
+        occGeomDescription.addProperty (
+                Utils::SerializedRepresentation::Property ("OCAF - NbAttributes",(long int)label.NbAttributes()));
+        occGeomDescription.addProperty (
+                Utils::SerializedRepresentation::Property ("OCAF - Tag",(long int)label.Tag()));
     }
-    if (isOCC)
-    	description->addPropertiesSet (occGeomDescription);
+    description->addPropertiesSet (occGeomDescription);
 #endif
-
-
 	return description.release ( );
 }
 /*----------------------------------------------------------------------------*/
@@ -506,8 +447,9 @@ getFacetedRepresentation(
         std::vector<gmds::math::Triangle >& AVec) const
 {
     AVec.clear();
-    if (getComputationalProperty())
-    	getComputationalProperty()->getFacetedRepresentation(AVec, this);
+    TopoDS_Shape s = m_shape;
+    OCCFacetedRepresentationBuilder builder(this, s);
+    builder.execute(AVec);
 }
 /*----------------------------------------------------------------------------*/
 void GeomEntity::
@@ -515,12 +457,50 @@ facetedRepresentationForwardOrient(
         GeomEntity* AEntityOrientation,
         std::vector<gmds::math::Triangle >* ATri) const
 {
-    if (getComputationalProperty()) {
-    	getComputationalProperty()->facetedRepresentationForwardOrient(this, AEntityOrientation, ATri);
-    } else {
-    	throw TkUtil::Exception (TkUtil::UTF8String ("GeomEntity::facetedRepresentationForwardOrient "
-    			"there is no geometric representation.", TkUtil::Charset::UTF_8));
+    TopoDS_Shape callerShape = m_shape;
+    TopoDS_Shape entityOrientationShape = AEntityOrientation->getShape();
+
+    /* si la shape est vide, on ne fait rien */
+    if(m_shape.IsNull())
+        throw TkUtil::Exception ("GeomEntity::facetedRepresentationForwardOrient "
+                "shape est NULL.");
+
+    TopExp_Explorer ex;
+    for (ex.Init(callerShape, TopAbs_FACE); ex.More(); ex.Next()) {
+    	if(OCCHelper::areEquals(TopoDS::Face(ex.Current()),TopoDS::Face(entityOrientationShape))) {
+
+//    		TopoDS_Face face = TopoDS::Face(ex.Current());
+//    		TopoDS_Face face_bis = TopoDS::Face(entityOrientationShape);
+//
+//    		TopAbs_Orientation orient = face_bis.Orientation();
+//
+//    		if(orient==TopAbs_FORWARD) {
+//    			std::cout<<"TopAbs_FORWARD "<<std::endl;
+//    		}
+//    		if(orient==TopAbs_REVERSED) {
+//    			std::cout<<"TopAbs_REVERSED "<<std::endl;
+//    		}
+//    		if(orient==TopAbs_INTERNAL) {
+//    			std::cout<<"TopAbs_INTERNAL "<<std::endl;
+//    		}
+//    		if(orient==TopAbs_EXTERNAL) {
+//    			std::cout<<"TopAbs_EXTERNAL "<<std::endl;
+//    		}
+//
+//    		return (orient == TopAbs_FORWARD);
+
+//    		AEntityOrientation
+//    		 fillRepresentation(TopoDS::Face(ex.Current()),AVec);
+    		ATri->clear();
+
+    		OCCFacetedRepresentationBuilder builder(this, callerShape);
+    		builder.execute(*ATri,entityOrientationShape);
+
+    		return;
+    	}
     }
+    throw TkUtil::Exception ("GeomEntity::facetedRepresentationForwardOrient "
+            "la shape que l'on doit orienter n'a pas été trouvée.");
 }
 /*----------------------------------------------------------------------------*/
 GeomProperty::type GeomEntity::getGeomType ( ) const
@@ -669,6 +649,168 @@ double GeomEntity::getArea() const
 	}
 	//std::cout<<"return m_computedArea = "<< m_computedArea<<std::endl;
 	return m_computedArea;
+}
+/*----------------------------------------------------------------------------*/
+TopoDS_Shape& GeomEntity::getShape()  {
+    return m_shape;
+}
+/*----------------------------------------------------------------------------*/
+void GeomEntity::projectPointOn( Utils::Math::Point& P) const
+{
+
+	if(!m_shape.IsNull() && m_shape.ShapeType()==TopAbs_VERTEX)
+	{
+		gp_Pnt pnt = BRep_Tool::Pnt(TopoDS::Vertex(m_shape));
+		P.setXYZ(pnt.X(), pnt.Y(), pnt.Z());
+	}
+	else
+	{
+		gp_Pnt pnt(P.getX(),P.getY(),P.getZ());
+		TopoDS_Vertex V = BRepBuilderAPI_MakeVertex(pnt);
+		BRepExtrema_DistShapeShape extrema(V, m_shape);
+		bool isDone = extrema.IsDone();
+		if(!isDone) {
+			isDone = extrema.Perform();
+		}
+
+		if(!isDone){
+			std::cerr<<"OCCGeomRepresentation::projectPointOn("<<P<<")\n";
+			throw TkUtil::Exception("Echec d'une projection d'un point sur une courbe ou surface!!");
+
+		}
+		gp_Pnt pnt2 = extrema.PointOnShape2(1);
+		P.setXYZ(pnt2.X(), pnt2.Y(), pnt2.Z());
+	}
+}
+/*----------------------------------------------------------------------------*/
+void GeomEntity::translate(const Utils::Math::Vector& V)
+{
+    gp_Trsf T;
+    gp_Vec v(V.getX(),V.getY(),V.getZ());
+    T.SetTranslation(v);
+    BRepBuilderAPI_Transform translat(T);
+    //on effectue la translation
+    translat.Perform(m_shape);
+
+    if(!translat.IsDone())
+        throw TkUtil::Exception("Echec d'une translation!!");
+
+    //on stocke le résultat de la translation (maj de la shape interne)
+    m_shape = translat.Shape();
+}
+/*----------------------------------------------------------------------------*/
+void GeomEntity::scale(const double F, const Point& center)
+{
+    Bnd_Box box;
+    box.SetGap(Utils::Math::MgxNumeric::mgxDoubleEpsilon);
+    BRepBndLib::Add(m_shape, box);
+
+    double xmin,ymin,zmin,xmax,ymax,zmax;
+    box.Get(xmin,ymin,zmin,xmax,ymax,zmax);
+
+    gp_Trsf T;
+    T.SetScale(gp_Pnt(center.getX(), center.getY(), center.getZ()),F);
+    BRepBuilderAPI_Transform scaling(T);
+
+    //on effectue l'homotéthie
+    scaling.Perform(m_shape);
+
+    if(!scaling.IsDone())
+    	throw TkUtil::Exception(TkUtil::UTF8String ("Echec d'une homothétie!!", TkUtil::Charset::UTF_8));
+
+    //on stocke le résultat de la translation (maj de la shape interne)
+    m_shape = scaling.Shape();
+}
+/*----------------------------------------------------------------------------*/
+void GeomEntity::scale(const double factorX,
+        const double factorY,
+        const double factorZ,
+        const Point& center)
+{
+    Bnd_Box box;
+    box.SetGap(Utils::Math::MgxNumeric::mgxDoubleEpsilon);
+    BRepBndLib::Add(m_shape, box);
+
+    double xmin,ymin,zmin,xmax,ymax,zmax;
+    box.Get(xmin,ymin,zmin,xmax,ymax,zmax);
+
+    gp_GTrsf GT;
+    GT.SetValue(1,1, factorX);
+    GT.SetValue(2,2, factorY);
+    GT.SetValue(3,3, factorZ);
+	GT.SetValue(1,4, (1-factorX) * center.getX());
+	GT.SetValue(2,4, (1-factorY) * center.getY());
+    GT.SetValue(3,4, (1-factorZ) * center.getZ());
+
+    BRepBuilderAPI_GTransform scaling(GT);
+
+    //on effectue l'homothétie
+    scaling.Perform(m_shape);
+
+    if(!scaling.IsDone())
+    	throw TkUtil::Exception(TkUtil::UTF8String ("Echec d'une homothétie!!", TkUtil::Charset::UTF_8));
+
+    //on stocke le résultat de la translation (maj de la shape interne)
+    m_shape = scaling.Shape();
+}
+/*----------------------------------------------------------------------------*/
+void GeomEntity::rotate(const Utils::Math::Point& P1,
+        const Utils::Math::Point& P2, double Angle)
+{
+    gp_Trsf T;
+    gp_Pnt p1(P1.getX(),P1.getY(),P1.getZ());
+
+    gp_Dir dir( P2.getX()-P1.getX(),
+                P2.getY()-P1.getY(),
+                P2.getZ()-P1.getZ());
+
+    gp_Ax1 axis(p1,dir);
+    T.SetRotation(axis,Angle);
+    BRepBuilderAPI_Transform rotat(T);
+    //on effectue la rotation
+    rotat.Perform(m_shape);
+
+    if(!rotat.IsDone())
+        throw TkUtil::Exception("Echec d'une rotation!!");
+
+    //on stocke le résultat de la translation (maj de la shape interne)
+    m_shape = rotat.Shape();
+}
+/*----------------------------------------------------------------------------*/
+void GeomEntity::mirror(const Utils::Math::Plane& plane)
+{
+	gp_Trsf T;
+    Utils::Math::Point plane_pnt = plane.getPoint();
+    Utils::Math::Vector plane_vec = plane.getNormal();
+
+    gp_Ax2 A2(gp_Pnt(plane_pnt.getX(), plane_pnt.getY(), plane_pnt.getZ()),
+    		gp_Dir(plane_vec.getX(), plane_vec.getY(), plane_vec.getZ()));
+    T.SetMirror (A2);
+    BRepBuilderAPI_Transform trans(T);
+
+    trans.Perform(m_shape);
+
+    if(!trans.IsDone())
+    	throw TkUtil::Exception(TkUtil::UTF8String ("Echec d'une symétrie!!", TkUtil::Charset::UTF_8));
+
+    //on stocke le résultat de la transformation (maj de la shape interne)
+    m_shape = trans.Shape();
+}
+/*----------------------------------------------------------------------------*/
+double GeomEntity::getPrecision()
+{
+	if(m_shape.ShapeType()==TopAbs_VERTEX){
+		return BRep_Tool::Tolerance(TopoDS::Vertex(m_shape));
+	}
+	else if(m_shape.ShapeType()==TopAbs_EDGE){
+		return BRep_Tool::Tolerance(TopoDS::Edge(m_shape));
+	}
+	else if(m_shape.ShapeType()==TopAbs_FACE){
+		return BRep_Tool::Tolerance(TopoDS::Face(m_shape));
+	}
+	// [EB] pas trouvé de précision pour un volume
+
+	return 0.0;
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

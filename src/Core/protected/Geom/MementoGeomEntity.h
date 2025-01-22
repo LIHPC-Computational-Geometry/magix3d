@@ -125,11 +125,11 @@ public:
         m_groups3D = grps;
     }
 
-    inline std::vector<GeomRepresentation*>& getGeomRepresentation() {
-        return m_geomRepresentation;
+    inline TopoDS_Shape& getShape() {
+        return m_shape;
     }
-    inline void setGeomRepresentation(std::vector<GeomRepresentation*> g) {
-        m_geomRepresentation = g;
+    inline void setShape(TopoDS_Shape& s) {
+        m_shape = s;
     }
 
     inline GeomProperty* getProperty() {
@@ -156,11 +156,11 @@ private :
 
     /* ancienne représentation géométrique des entités que l'on a modifiées. Il
      * est de la responsabilité de l'objet de les détruire */
-    std::vector<GeomRepresentation*> m_geomRepresentation;
+    TopoDS_Shape m_shape;
 
     /* ancienne propriétés des entités que l'on a modifiées. Il
      * est de la responsabilité de l'objet de les détruire */
-    GeomProperty*           m_property;
+    GeomProperty* m_property;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

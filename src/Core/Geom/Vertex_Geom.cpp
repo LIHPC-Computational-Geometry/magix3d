@@ -40,8 +40,8 @@ namespace Geom {
 const char* Vertex::typeNameGeomVertex = "GeomVertex";
 /*----------------------------------------------------------------------------*/
 Vertex::Vertex(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-        GeomProperty* gprop, GeomRepresentation* compProp)
-: GeomEntity(ctx, prop, disp, gprop,compProp)
+        GeomProperty* gprop, const TopoDS_Shape& shape)
+: GeomEntity(ctx, prop, disp, gprop, shape)
 {
 }
 /*----------------------------------------------------------------------------*/
@@ -51,7 +51,7 @@ GeomEntity* Vertex::clone(Internal::Context& c)
             c.newProperty(this->getType()),
             c.newDisplayProperties(this->getType()),
             new GeomProperty(),
-            this->getComputationalProperty()->clone());
+            m_shape);
 }
 /*----------------------------------------------------------------------------*/
 Vertex::~Vertex()
@@ -111,7 +111,7 @@ Mgx3D::Utils::SerializedRepresentation* Vertex::getDescription (bool alsoCompute
 #ifdef _DEBUG		// Issue#111
     // précision OpenCascade ou autre
 	TkUtil::UTF8String	precStr (TkUtil::Charset::UTF_8);
-    precStr<<getComputationalProperty()->getPrecision();
+    precStr<<getPrecision();
 
     propertyGeomDescription.addProperty (
     	        Utils::SerializedRepresentation::Property ("Précision", precStr.ascii()) );
@@ -234,15 +234,9 @@ void Vertex::remove(Curve* c)
 /*----------------------------------------------------------------------------*/
 Utils::Math::Point Vertex::getCenteredPosition() const
 {
-    OCCGeomRepresentation* rep =
-            dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
-    if (rep){
-
-    	TopoDS_Vertex v = TopoDS::Vertex(rep->getShape());
-    	gp_Pnt pnt = BRep_Tool::Pnt(v);
-    	return Utils::Math::Point(pnt.X(),pnt.Y(), pnt.Z());
-    }    else
-    	throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, type inconnu pour getCenteredPosition", TkUtil::Charset::UTF_8));
+    TopoDS_Vertex v = TopoDS::Vertex(m_shape);
+    gp_Pnt pnt = BRep_Tool::Pnt(v);
+    return Utils::Math::Point(pnt.X(),pnt.Y(), pnt.Z());
 }
 /*----------------------------------------------------------------------------*/
 Utils::Math::Point Vertex::getCoord() const

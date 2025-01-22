@@ -15,11 +15,16 @@
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 #include "Internal/InternalEntity.h"
+#include "Utils/Plane.h"
 #include "Utils/Point.h"
+#include "Utils/Vector.h"
 #include "Geom/GeomProperty.h"
 #include "Topo/TopoEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <gmds/math/Triangle.h>
+/*----------------------------------------------------------------------------*/
+#include <TDF_Label.hxx>
+#include <TopoDS_Shape.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -40,7 +45,6 @@ class Volume;
 class Surface;
 class Curve;
 class Vertex;
-class GeomRepresentation;
 class GeomProperty;
 class MementoGeomEntity;
 /*----------------------------------------------------------------------------*/
@@ -65,23 +69,17 @@ class GeomEntity : public Internal::InternalEntity{
 
 protected:
     /*------------------------------------------------------------------------*/
-    /** \brief  Constructeur. Une entité délègue un certain nombre de calculs
-     *          géométrique à un objet de type ComputationalProperty.
-     *
-     *          Une fois une propriété associée à une entité, la mort de
-     *          l'entité entrainera celle des propriétés attachées.
+    /** \brief  Constructeur.
      */
     GeomEntity(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, GeomRepresentation* compProp=0);
+            GeomProperty* gprop, const TopoDS_Shape& shape);
 
-    /** \brief  Constructeur. Une entité délègue un certain nombre de calculs
-     *          géométrique à des objets de type ComputationalProperty.
-     *
-     *          Une fois une propriété associée à une entité, la mort de
-     *          l'entité entrainera celle des propriétés attachées.
+    /*------------------------------------------------------------------------*/
+    /** Cas d'utilisation de OCAF
      */
-    GeomEntity(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, std::vector<GeomRepresentation*>& compProp);
+    bool useOCAF() const;
+
+    void projectPointOn( Utils::Math::Point& P) const;
 
 public:
 
@@ -89,9 +87,7 @@ public:
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
      *          courant.
      */
-    virtual GeomEntity* clone(Internal::Context&){
-        throw TkUtil::Exception (TkUtil::UTF8String ("GeomEntity::clone pas implementee.", TkUtil::Charset::UTF_8));
-    };
+    virtual GeomEntity* clone(Internal::Context&)=0;
 
     /*------------------------------------------------------------------------*/
     /** \brief   Destructeur
@@ -150,42 +146,20 @@ protected:
     virtual void createSpecificMemento(MementoGeomEntity& mem);
 #endif
 
-public:
-    /*------------------------------------------------------------------------*/
-    /** \brief  MAJ de la propriété de calcul.
-     */
-#ifndef SWIG
-    void setComputationalProperty(GeomRepresentation* cprop);
-    void setComputationalProperties(std::vector<GeomRepresentation*>& cprop);
-#endif
-
-
-    /*------------------------------------------------------------------------*/
-    /** \brief   récupération de la propriété de calcul
-     */
-#ifndef SWIG
-    GeomRepresentation* getComputationalProperty() const;
-    std::vector<GeomRepresentation*> getComputationalProperties() const;
-
-#endif
-
     /*------------------------------------------------------------------------*/
     /** \brief  Calcule l'aire d'une entité:  Pour une courbe, c'est la
      *          longueur, pour une surface, l'aire, pour un volume le volume.
+     *          Calcul qui peut être long. On ne le fait que quand cest nécessaire
+     *          Sinon, on renvoit l'aire stockée
      */
     virtual double computeArea() const =0;
 
+public:
     /*------------------------------------------------------------------------*/
     /** \brief  Retourne l'aire d'une entité:  Pour une courbe, c'est la
      *          longueur, pour une surface, l'aire, pour un volume le volume.
      */
     virtual double getArea() const;
-
-    /** \brief  Stocke l'aire d'une entité:  Pour une courbe, c'est la
-     *          longueur, pour une surface, l'aire, pour un volume le volume.
-     */
-    virtual void setArea(double area)
-    {m_computedArea = area;}
 
     /*------------------------------------------------------------------------*/
     /** \brief  Calcul de la boite englobante orientée selon les axes Ox,Oy,Oz
@@ -194,7 +168,8 @@ public:
      *  \param pmax Les coordonnées max de la boite englobante
      */
     virtual void computeBoundingBox (
-							Utils::Math::Point& pmin,Utils::Math::Point& pmax) const;
+							Utils::Math::Point& pmin,Utils::Math::Point& pmax,
+                                    double tol = 0.00) const;
 
 
     /*------------------------------------------------------------------------*/
@@ -446,10 +421,61 @@ public:
     /// Retourne le nombre de groupes
     virtual int getNbGroups() const;
 
-private:
+    /// Accès à la shape OCC sous-jacente.
+    TopoDS_Shape& getShape();
 
-    /// Interfaces pour les objets géométriques
-    std::vector<GeomRepresentation*> m_geomRep;
+    /*------------------------------------------------------------------------*/
+    /** \brief Effectue la translation de l'entité géométrique associée de
+     *         manière isolée. C'est-à-dire que aucune des entités incidentes
+     *         n'est impactée par ce traitement
+     *
+     *  \param V le vecteur de translation à appliquer
+     */
+    void translate(const Utils::Math::Vector& V);
+
+    /*------------------------------------------------------------------------*/
+    /** \brief Effectue l'homothétié de l'entité géométrique associée de
+     *         manière isolée. C'est-à-dire que aucune des entités incidentes
+     *         n'est impactée par ce traitement
+     *
+     *  \param F le facteur d'homothétie
+     *  \param center le centre d'homothétie
+     */
+    void scale(const double F, const Utils::Math::Point& center);
+    void scale(const double factorX,
+            const double factorY,
+            const double factorZ,
+            const Utils::Math::Point& center);
+
+    /*------------------------------------------------------------------------*/
+    /** \brief Effectue la rotation de l'entité géométrique associée de
+     *         manière isolée. C'est-à-dire que aucune des entités incidentes
+     *         n'est impactée par ce traitement
+     *
+     *  \param P1    premier point definissant l'axe de rotation
+     *  \param P2    second point definissant l'axe de rotation
+     *  \param Angle    angle de rotation en degré (compris entre ]0,360])
+     */
+    void rotate(const Utils::Math::Point& P1,
+            const Utils::Math::Point& P2, double Angle);
+
+    /*------------------------------------------------------------------------*/
+    /** \brief Effectue la symétrie de l'entité géométrique associée de
+     *         manière isolée. C'est-à-dire que aucune des entités incidentes
+     *         n'est impactée par ce traitement
+     *
+     *  \param plane le plan de symétrie
+     */
+    void mirror(const Utils::Math::Plane& plane);
+
+    /*------------------------------------------------------------------------*/
+    /** \brief  Fournit la précision
+     *
+     *  \return un double (en général de l'ordre de e-5)
+     */
+   double getPrecision();
+
+private:
 
     /// Propriétés géométriques (qui peut être spécifique, PropertyBox par exemple)
     GeomProperty* m_geomProp;
@@ -463,6 +489,15 @@ private:
     /// résultat de la commande computeArea, qui peut être longue
     mutable double m_computedArea;
 
+protected:
+
+    TopoDS_Shape m_shape;
+
+    /// label pour OCAF
+    TDF_Label m_label;
+
+    /// le label pour ajouter les construction suivantes
+    static TDF_Label m_rootLabel;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

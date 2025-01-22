@@ -109,6 +109,8 @@ class EntityFactory
     friend class Mesh::MeshImplementation;
     friend class Topo::CommandAlignVertices;
     friend class Topo::CoEdge;
+    friend class Volume;
+    friend class Surface;
     friend class Curve;
     friend class CommandNewSurfaceByOffset;
 
