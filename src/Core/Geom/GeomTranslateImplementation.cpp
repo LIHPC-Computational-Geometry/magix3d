@@ -95,16 +95,11 @@ void GeomTranslateImplementation::
 translateSingle(GeomEntity* e)
 {
     //std::cout<<"GeomTranslateImplementation::translateSingle pour "<<e->getName()<<std::endl;
-    std::vector<GeomRepresentation*> reps = e->getComputationalProperties();
-    std::vector<GeomRepresentation*> new_reps;
-    for (uint i=0; i<reps.size(); i++){
-        GeomRepresentation* new_rep = reps[i]->clone();
-        new_rep->translate(m_dv);
+    GeomRepresentation* rep = e->getComputationalProperty();
+    GeomRepresentation* new_rep = rep->clone();
+    new_rep->translate(m_dv);
 
-        new_reps.push_back(new_rep);
-    }
-
-    e->setComputationalProperties(new_reps);
+    e->setComputationalProperty(new_rep);
     e->setGeomProperty(new GeomProperty());
 }
 /*----------------------------------------------------------------------------*/

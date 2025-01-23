@@ -72,6 +72,7 @@ class EntityFactory
 {
     friend class CommandCreateGeom;
     friend class CommandGeomCopy;
+    friend class CommandJoinCurves;
     friend class CommandNewVertex;
     friend class CommandNewVertexByProjection;
     friend class CommandNewVertexByCurveParameterization;
@@ -104,13 +105,11 @@ class EntityFactory
     friend class GeomRevolImplementation;
     friend class GeomExtrudeImplementation;
     friend class GeomImport;
-    friend class GeomJoinCurvesImplementation;
     friend class Internal::ImportMDLImplementation;
     friend class Mesh::MeshImplementation;
     friend class Topo::CommandAlignVertices;
     friend class Topo::CoEdge;
     friend class Curve;
-    friend class CommandNewFacetedSurfaces;
     friend class GeomSplitCurveImplementation;
     friend class CommandNewSurfaceByOffset;
 
@@ -281,20 +280,15 @@ public:
     /** \brief
      */
     Surface* newOCCSurface(TopoDS_Face& f);
-    Surface* newOCCCompositeSurface(std::vector<TopoDS_Face>& v_ds_face);
-
-    Surface* newFacetedSurface(uint gmds_id, std::vector<gmds::Face> faces);
 
     /*------------------------------------------------------------------------*/
     /** \brief
      */
     Curve* newOCCCurve(TopoDS_Edge& e);
     Curve* newOCCCurve(TopoDS_Wire& w);
-
-    Curve* newOCCCompositeCurve(std::vector<TopoDS_Edge>& v_ds_edge,
+    static TopoDS_Wire buildWire(std::vector<TopoDS_Shape>& edges_and_wires);
+    Curve* newOCCCurve(std::vector<TopoDS_Edge>& v_ds_edge,
     		Utils::Math::Point& extremaFirst, Utils::Math::Point& extremaLast);
-
-    Curve* newFacetedCurve(uint gmds_id, std::vector<gmds::Node> nodes);
 
     //    /*------------------------------------------------------------------------*/
 //    /** \brief
@@ -305,8 +299,6 @@ public:
     /** \brief
      */
     Vertex* newOCCVertex(TopoDS_Vertex& v);
-
-    Vertex* newFacetedVertex(uint gmds_id, gmds::Node node);
 
     /*------------------------------------------------------------------------*/
     /** Création d'une courbe

@@ -11,12 +11,19 @@
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
-#include "Utils/Common.h"
 #include "Geom/CommandJoinSurfaces.h"
 #include "Group/Group2D.h"
+#include "Geom/OCCGeomRepresentation.h"
+#include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/UTF8String.h>
+/*----------------------------------------------------------------------------*/
+#include <BRepAlgoAPI_Fuse.hxx>
+#include <BRep_Builder.hxx>
+#include <TopoDS_Compound.hxx>
+#include <TopoDS.hxx>
+#include <BRepBuilderAPI_Sewing.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -97,12 +104,36 @@ void CommandJoinSurfaces::init(std::vector<GeomEntity*>& es)
 /*----------------------------------------------------------------------------*/
 void CommandJoinSurfaces::internalSpecificExecute()
 {
-	// utilisation d'un vecteur de GeomRepresentation pour la surface composite
-	std::vector<GeomRepresentation*> reps;
+	TopoDS_Face result;
+
+	// Tentative par occ::fuse puis éventuellement occ::sewing
+	TopoDS_Compound compound;
+	BRep_Builder builder;
+	builder.MakeCompound(compound);
+	BRepBuilderAPI_Sewing sewing;
+
 	for(uint i=0; i<m_entities.size(); i++){
-		std::vector<GeomRepresentation*> loc_reps = m_entities[i]->getComputationalProperties();
-		for (uint j=0; j<loc_reps.size(); j++)
-			reps.push_back(loc_reps[j]->clone());
+		OCCGeomRepresentation* surf_rep = dynamic_cast<OCCGeomRepresentation*>(m_entities[i]->getComputationalProperty());
+		TopoDS_Face face = TopoDS::Face(surf_rep->getShape());
+		builder.Add(compound, face);
+		sewing.Add(face);
+	}
+
+	// 1. Fuse
+	BRepAlgoAPI_Fuse fuse(compound, compound);
+	fuse.Build();
+	if (!fuse.IsDone() || fuse.Shape().ShapeType() != TopAbs_FACE) {
+		// 2. Sewing
+		sewing.Perform();
+		TopoDS_Shape sewedShape = sewing.SewedShape();
+		if (sewedShape.ShapeType() == TopAbs_FACE) {
+    		result = TopoDS::Face(sewing.SewedShape());
+		}
+		else 
+			throw TkUtil::Exception(TkUtil::UTF8String ("Le résultat du sewing OCC est un compound ou une forme inattendue.", TkUtil::Charset::UTF_8));
+		throw TkUtil::Exception(TkUtil::UTF8String ("La fusion OCC a échoué !", TkUtil::Charset::UTF_8));
+	} else {
+		result = TopoDS::Face(fuse.Shape());
 	}
 
 	// création de la surface union
@@ -110,7 +141,7 @@ void CommandJoinSurfaces::internalSpecificExecute()
 			getContext().newProperty(Utils::Entity::GeomSurface),
             getContext().newDisplayProperties(Utils::Entity::GeomSurface),
 			new GeomProperty(),
-			reps);
+			new OCCGeomRepresentation(getContext(), result));
 	getContext().newGraphicalRepresentation (*newSurface);
 	m_newEntities.push_back(newSurface);
 

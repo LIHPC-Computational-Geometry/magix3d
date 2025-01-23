@@ -63,19 +63,6 @@ public:
             GeomProperty* gprop, GeomRepresentation* compProp=0);
 #endif
 
-    /** \brief  Constructeur
-     *
-     *  \param ctx le contexte
-     *  \param prop propriété (nom ...)
-     *  \param disp propriétés d'affichage
-     *  \param gprop    les propriétés associées à la surface composite
-     *  \param compProp les propriétés de calcul des surfaces
-     */
-#ifndef SWIG
-    Surface(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, std::vector<GeomRepresentation*>& compProp);
-#endif
-
     /*------------------------------------------------------------------------*/
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
      *          courant.

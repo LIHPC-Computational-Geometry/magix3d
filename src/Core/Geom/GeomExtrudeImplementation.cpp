@@ -224,15 +224,13 @@ void GeomExtrudeImplementation::makeExtrudeComposite(Curve* curve,std::vector<Ge
 	std::cout<<"GeomExtrudeImplementation::makeExtrude ("<<curve->getName()<<")"<<std::endl;
 #endif
     // cas d'une courbe composée de plusieurs shapes
-	std::vector<GeomRepresentation*> ppties = curve->getComputationalProperties();
+	GeomRepresentation* ppty = curve->getComputationalProperty();
 
 	// les différentes occ_shape de la courbe composite
     std::vector<TopoDS_Edge> v_shape;
-    for (uint i=0; i<ppties.size(); i++){
-    	OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(ppties[i]);
-    	CHECK_NULL_PTR_ERROR(occ_rep);
-    	v_shape.push_back(TopoDS::Edge(occ_rep->getShape()));
-    }
+   	OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(ppty);
+   	CHECK_NULL_PTR_ERROR(occ_rep);
+   	v_shape.push_back(TopoDS::Edge(occ_rep->getShape()));
 
     // ON AURA BESOIN DES SOMMETS DE LA COURBE DE DEPART PAR LA SUITE
     std::vector<Vertex*> c_vertices;
@@ -342,7 +340,8 @@ void GeomExtrudeImplementation::makeExtrudeComposite(Curve* curve,std::vector<Ge
     else if (v_faces.size() == 1)
     	surf = EntityFactory(m_context).newOCCSurface(v_faces[0]);
     else
-    	surf = EntityFactory(m_context).newOCCCompositeSurface(v_faces);
+    	throw TkUtil::Exception(TkUtil::UTF8String ("On ne sait pas créer une Surface composite", TkUtil::Charset::UTF_8));
+
 
     if (surf){
     	m_newEntities.push_back(surf);
@@ -380,7 +379,7 @@ void GeomExtrudeImplementation::makeExtrudeComposite(Curve* curve,std::vector<Ge
     if (v_shape.size() == 1)
     	c_copy = EntityFactory(m_context).newOCCCurve(v_shape[0]);
     else
-    	c_copy = EntityFactory(m_context).newOCCCompositeCurve(v_shape, pt1, pt2);
+    	c_copy = EntityFactory(m_context).newOCCCurve(v_shape, pt1, pt2);
 #ifdef _DEBUG2
     std::cout<<" création de la copie "<<c_copy->getName()<<std::endl;
 #endif
@@ -393,7 +392,7 @@ void GeomExtrudeImplementation::makeExtrudeComposite(Curve* curve,std::vector<Ge
     else if (v_shape_opp.size() == 1)
     	c_opp = EntityFactory(m_context).newOCCCurve(v_shape_opp[0]);
     else
-    	c_opp = EntityFactory(m_context).newOCCCompositeCurve(v_shape_opp, pt1, pt2);
+    	c_opp = EntityFactory(m_context).newOCCCurve(v_shape_opp, pt1, pt2);
     if (c_copy){
     	m_newEntities.push_back(c_copy);
     	m_newCurves.push_back(c_copy);
@@ -595,10 +594,9 @@ void GeomExtrudeImplementation::makeExtrude(Surface* surf,
                 continue;
 //           std::cout<<"\t surf "<<surf_i->getName()<<std::endl;
             lateral_surfs.push_back(surf_i);
-            std::vector<TopoDS_Shape> surf_i_occ;
-            getOCCShapes(surf_i,surf_i_occ);
-            // cas multi shape...
-            lateral_surfs_occ.insert(lateral_surfs_occ.end(), surf_i_occ.begin(), surf_i_occ.end());
+            TopoDS_Shape surf_i_occ;
+            getOCCShape(surf_i,surf_i_occ);
+            lateral_surfs_occ.push_back(surf_i_occ);
         }
 
         // on cherche maintenant les deux surfaces manquantes (dep et arrivée)

@@ -6,15 +6,21 @@
  */
 /*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
+#include "Geom/EntityFactory.h"
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Utils/Common.h"
 #include "Geom/CommandJoinCurves.h"
+#include "Geom/OCCGeomRepresentation.h"
 #include "Group/Group1D.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/UTF8String.h>
+/*----------------------------------------------------------------------------*/
+#include <BRepBuilderAPI_MakeWire.hxx>
+#include <TopExp_Explorer.hxx>
+#include <TopoDS.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -130,20 +136,14 @@ internalSpecificExecute()
 
     } while (courbesOrdonnees.size() != m_entities.size());
 
-	// utilisation d'un vecteur de GeomRepresentation pour la courbe composite
-	std::vector<GeomRepresentation*> reps;
+	std::vector<TopoDS_Shape> edges_and_wires;
 	for(uint i=0; i<courbesOrdonnees.size(); i++){
-		std::vector<GeomRepresentation*> loc_reps = courbesOrdonnees[i]->getComputationalProperties();
-		for (uint j=0; j<loc_reps.size(); j++)
-			reps.push_back(loc_reps[j]->clone());
+		OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(courbesOrdonnees[i]->getComputationalProperty());
+		edges_and_wires.push_back(rep->getShape());
 	}
-
-	// création de la courbe union
-	Curve* newCurve = new Curve(getContext(),
-			getContext().newProperty(Utils::Entity::GeomCurve),
-            getContext().newDisplayProperties(Utils::Entity::GeomCurve),
-			new GeomProperty(),
-			reps);
+	
+	TopoDS_Wire wire = EntityFactory::buildWire(edges_and_wires);
+	Curve* newCurve = EntityFactory(getContext()).newOCCCurve(wire);
 	getContext().newGraphicalRepresentation (*newCurve);
 	m_newEntities.push_back(newCurve);
 

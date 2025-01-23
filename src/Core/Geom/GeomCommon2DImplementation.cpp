@@ -107,7 +107,7 @@ void GeomCommon2DImplementation::perform(std::vector<GeomEntity*>& res)
 void GeomCommon2DImplementation::commonSurfaces()
 {
     TopoDS_Shape s1, s2;
-	if (m_entity1->getComputationalProperties().size()>1){
+	/*if (m_entity1->getComputationalProperties().size()>1){
 		// création d'un Shell
 		std::vector<TopoDS_Shape> topoS;
 		getOCCShapes(m_entity1, topoS);
@@ -120,10 +120,10 @@ void GeomCommon2DImplementation::commonSurfaces()
 		}
 		s1 = aShell;
 	}
-	else
-		getOCCShape(m_entity1, s1);
+	else*/
+	getOCCShape(m_entity1, s1);
 
-	if (m_entity2->getComputationalProperties().size()>1){
+	/*if (m_entity2->getComputationalProperties().size()>1){
 		// création d'un Shell
 		std::vector<TopoDS_Shape> topoS;
 		getOCCShapes(m_entity2, topoS);
@@ -136,8 +136,8 @@ void GeomCommon2DImplementation::commonSurfaces()
 		}
 		s2 = aShell;
 	}
-	else
-		getOCCShape(m_entity2, s2);
+	else*/
+	getOCCShape(m_entity2, s2);
 
 
     BRepAlgoAPI_Section intersector(s1, s2);

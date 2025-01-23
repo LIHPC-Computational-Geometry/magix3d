@@ -125,10 +125,10 @@ public:
         m_groups3D = grps;
     }
 
-    inline std::vector<GeomRepresentation*>& getGeomRepresentation() {
+    inline GeomRepresentation* getGeomRepresentation() {
         return m_geomRepresentation;
     }
-    inline void setGeomRepresentation(std::vector<GeomRepresentation*> g) {
+    inline void setGeomRepresentation(GeomRepresentation* g) {
         m_geomRepresentation = g;
     }
 
@@ -156,7 +156,7 @@ private :
 
     /* ancienne représentation géométrique des entités que l'on a modifiées. Il
      * est de la responsabilité de l'objet de les détruire */
-    std::vector<GeomRepresentation*> m_geomRepresentation;
+    GeomRepresentation* m_geomRepresentation;
 
     /* ancienne propriétés des entités que l'on a modifiées. Il
      * est de la responsabilité de l'objet de les détruire */

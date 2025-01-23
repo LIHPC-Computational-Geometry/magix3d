@@ -370,14 +370,6 @@ public:
     	newVerticesCurvesAndPlanarSurface(std::vector<Point>& points, std::string groupName);
 
     /*------------------------------------------------------------------------*/
-    /** \brief création d'une (ou plusieurs) surface facétisée à partir d'un fichier, pour tests
-     *
-     *  \param nom du fichier mli
-     */
-	virtual Mgx3D::Internal::M3DCommandResultIfc*
-			newFacetedSurface(std::string nom);
-
-    /*------------------------------------------------------------------------*/
    /** \brief création d'une courbe par projection orthogonale d'une courbe sur une surface
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc*

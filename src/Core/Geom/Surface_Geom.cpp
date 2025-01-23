@@ -26,7 +26,6 @@
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 #include "Geom/OCCGeomRepresentation.h"
-#include "Geom/FacetedSurface.h"
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS.hxx>
@@ -65,20 +64,10 @@ Surface::Surface(Internal::Context& ctx, Utils::Property* prop,
 {
 }
 /*----------------------------------------------------------------------------*/
-Surface::Surface(Internal::Context& ctx, Utils::Property* prop,
-        Utils::DisplayProperties* disp,
-        GeomProperty* gprop, std::vector<GeomRepresentation*>& compProp)
-:GeomEntity(ctx, prop, disp, gprop, compProp)
-{
-}
-/*----------------------------------------------------------------------------*/
 GeomEntity* Surface::clone(Internal::Context& c)
 {
-	std::vector<GeomRepresentation*> newGeomRep;
-	std::vector<GeomRepresentation*> oldGeomRep = this->getComputationalProperties();
-
-	for (uint i=0; i<oldGeomRep.size(); i++)
-		newGeomRep.push_back(oldGeomRep[i]->clone());
+	GeomRepresentation* newGeomRep;
+	GeomRepresentation* oldGeomRep = this->getComputationalProperty()->clone();
 
     return new Surface(c,
             c.newProperty(this->getType()),
@@ -217,9 +206,9 @@ void Surface::get(std::vector<Volume*>& volumes) const
 /*----------------------------------------------------------------------------*/
 void Surface::project(Utils::Math::Point& P) const
 {
-	if (getComputationalProperties().size() == 1)
+//	if (getComputationalProperties().size() == 1)
 		getComputationalProperty()->project(P,this);
-	else {
+/*	else {
 		// on va prendre la projection la plus courte pour le cas composé
 		Utils::Math::Point pInit = P;
 
@@ -237,14 +226,14 @@ void Surface::project(Utils::Math::Point& P) const
 			}
 		}
 		P = pBest;
-	}
+	}*/
 }
 /*----------------------------------------------------------------------------*/
 void Surface::project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const
 {
-	if (getComputationalProperties().size() == 1)
+//	if (getComputationalProperties().size() == 1)
 		getComputationalProperty()->project(P1,P2,this);
-	else {
+/*	else {
 		// on va prendre la projection la plus courte pour le cas composé
 
 		std::vector<GeomRepresentation*> reps = getComputationalProperties();
@@ -260,14 +249,14 @@ void Surface::project(const Utils::Math::Point& P1, Utils::Math::Point& P2) cons
 			}
 		}
 		P2 = pBest;
-	}
+	}*/
 }
 /*----------------------------------------------------------------------------*/
 void Surface::normal(const Utils::Math::Point& P1, Utils::Math::Vector& V2) const
 {
-	if (getComputationalProperties().size() == 1)
+//	if (getComputationalProperties().size() == 1)
 		getComputationalProperty()->normal(P1,V2,this);
-	else {
+/*	else {
 		// comme pour la projection, on recherche la plus courte distance et on utilise cette sous-surface
 //		std::cout<<"normale en "<<P1<<"pour "<<getName()<<std::endl;
 		uint ind = 0;
@@ -289,7 +278,7 @@ void Surface::normal(const Utils::Math::Point& P1, Utils::Math::Vector& V2) cons
 		}
 //		std::cout<<"  normale pour ind "<<ind<<" en "<<pBest<<std::endl;
 		reps[ind]->normal(pBest, V2, this);
-	}
+	}*/
 }
 /*----------------------------------------------------------------------------*/
 void Surface::add(Volume* v)
@@ -324,23 +313,19 @@ void Surface::remove(Curve* c)
 /*----------------------------------------------------------------------------*/
 void Surface::split(std::vector<Curve* >& curv,std::vector<Vertex* >&  vert)
 {
-	if (getComputationalProperties().size() == 1)
+//	if (getComputationalProperties().size() == 1)
 		getComputationalProperty()->split(curv,vert,this);
-	else {
+/*	else {
 		std::vector<GeomRepresentation*> reps = getComputationalProperties();
 		for (uint i=0; i<reps.size(); i++)
 			reps[i]->split(curv,vert,this);
-	}
+	}*/
 }
 /*----------------------------------------------------------------------------*/
 double Surface::computeArea() const
 {
-	double area = 0.0;
-	std::vector<GeomRepresentation*> reps = getComputationalProperties();
-	for (uint i=0; i<reps.size(); i++)
-		area += reps[i]->computeSurfaceArea();
-
-	return area;
+	GeomRepresentation* rep = getComputationalProperty();
+	return rep->computeSurfaceArea();;
 }
 /*----------------------------------------------------------------------------*/
 void Surface::addAllDownLevelEntity(std::list<GeomEntity*>& l_entity) const
@@ -446,10 +431,6 @@ void Surface::setDestroyed(bool b)
 /*----------------------------------------------------------------------------*/
 bool Surface::isPlanar() const
 {
-	// on dit que ce n'est pas planaire dès que c'est composé
-	if (getComputationalProperties().size()>1)
-		return false;
-
     OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
 
     // pas plan si autre que OCC
@@ -507,11 +488,9 @@ bool Surface::contains(Surface* ASurf) const
     // TESTEE PEUT NE PAS ENCORE ETRE CONNECTEE TOPOLOGIQUEMENT
     // AVEC DES ENTITES M3D
     //===============================================================
-    std::vector<GeomRepresentation*> loc_reps = ASurf->getComputationalProperties();
-
-    for (uint j=0; j<loc_reps.size(); j++){
+    GeomRepresentation* loc_rep = ASurf->getComputationalProperty();
     	OCCGeomRepresentation* occ_rep =
-    			dynamic_cast<OCCGeomRepresentation*>(loc_reps[j]);
+    			dynamic_cast<OCCGeomRepresentation*>(loc_rep);
     	CHECK_NULL_PTR_ERROR(occ_rep);
 
     	TopoDS_Shape shOther = occ_rep->getShape();
@@ -645,7 +624,6 @@ bool Surface::contains(Surface* ASurf) const
     	project(middle_point,proj_i);
     	if(!Utils::Math::MgxNumeric::isNearlyZero(middle_point.length(proj_i),tol))
     		return false;
-    } // end for (uint j=0; j<loc_reps.size(); j++)
 
     return true;
 }
@@ -760,50 +738,25 @@ Utils::SerializedRepresentation* Surface::getDescription (bool alsoComputed) con
 	        Utils::SerializedRepresentation::Property ("Aire", volStr.ascii()) );
 	}
 
-	std::vector<GeomRepresentation*> reps = getComputationalProperties();
+	GeomRepresentation* rep = getComputationalProperty();
 	
 #ifdef _DEBUG		// Issue#111
     // précision OpenCascade ou autre
-	for (uint i=0; i<reps.size(); i++){
 		TkUtil::UTF8String	precStr (TkUtil::Charset::UTF_8);
-		precStr << reps[i]->getPrecision();
+		precStr << rep->getPrecision();
 	    propertyGeomDescription.addProperty (
 	    	        Utils::SerializedRepresentation::Property ("Précision", precStr.ascii()) );
-	}
 #endif	// _DEBUG
-
-	// recherche des infos pour le cas facétisé
-	bool isFaceted = false;
-	uint nbFaces = 0;
-	if (reps.size() == 1){
-		FacetedSurface* fs = dynamic_cast<FacetedSurface*>(reps[0]);
-		if (fs){
-			isFaceted = true;
-			nbFaces = fs->getNbFaces();
-		}
-	}
 
     // on ajoute des infos du style: c'est un plan
 	TkUtil::UTF8String	typeStr (TkUtil::Charset::UTF_8);
     if (isPlanar())
     	typeStr<<"plan";
-    else if (getComputationalProperties().size()>1)
-    	typeStr<<"composée";
-    else if (isFaceted)
-    	typeStr<<"facétisée";
     else
     	typeStr<<"quelconque";
 
     propertyGeomDescription.addProperty (
     		Utils::SerializedRepresentation::Property ("Type", typeStr.ascii()) );
-
-    if (isFaceted){
-		TkUtil::UTF8String	nbStr (TkUtil::Charset::UTF_8);
-    	nbStr<<(long int)nbFaces;
-
-    	propertyGeomDescription.addProperty (
-    			Utils::SerializedRepresentation::Property ("Nb polygones", nbStr.ascii()) );
-    }
 
     description->addPropertiesSet (propertyGeomDescription);
 
@@ -897,12 +850,6 @@ void Surface::d2(const double& AU, const double& AV,
 /*----------------------------------------------------------------------------*/
 bool Surface::needLowerDimensionalEntityModification()
 {
-    std::vector<GeomRepresentation*> reps = getComputationalProperties();
-    if (reps.size() == 1) {
-        FacetedSurface *fs = dynamic_cast<FacetedSurface *>(reps[0]);
-        if (fs)
-            return false;
-    }
     return true;
 }
 /*----------------------------------------------------------------------------*/

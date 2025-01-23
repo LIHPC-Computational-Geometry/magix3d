@@ -9,9 +9,6 @@
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomProperty.h"
 #include "Geom/OCCGeomRepresentation.h"
-#include "Geom/FacetedSurface.h"
-#include "Geom/FacetedCurve.h"
-#include "Geom/FacetedVertex.h"
 #include "Utils/Entity.h"
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
@@ -216,38 +213,26 @@ Surface* EntityFactory::newSurfaceByCopyWithOffset(Surface* E, const double& off
 {
 	// version avec multiples GeomRepresentation, ce qui pose pb au "split"
 	// qui est fait après pour retrouver les courbes adjacentes
-	std::vector<GeomRepresentation*> new_reps;
-
+    std::vector<TopoDS_Face> faces; 
 	try{
 
-		std::vector<GeomRepresentation*> init_reps = E->getComputationalProperties();
-		for (uint i=0; i<init_reps.size(); i++){
-			OCCGeomRepresentation* current_rep =dynamic_cast<OCCGeomRepresentation*>(init_reps[i]);
-			CHECK_NULL_PTR_ERROR(current_rep);
-			TopoDS_Shape sh = *(current_rep->getShapePtr());
+        OCCGeomRepresentation* current_rep =dynamic_cast<OCCGeomRepresentation*>(E->getComputationalProperty());
+        CHECK_NULL_PTR_ERROR(current_rep);
+        TopoDS_Shape sh = current_rep->getShape();
 
-			BRepOffsetAPI_MakeOffsetShape MF(sh, offset,
-					Utils::Math::MgxNumeric::mgxDoubleEpsilon);
+        BRepOffsetAPI_MakeOffsetShape MF(sh, offset,
+                Utils::Math::MgxNumeric::mgxDoubleEpsilon);
 
-			TopoDS_Shape aShape;
-
-			if(MF.IsDone()){
-				aShape   = MF.Shape();
-				if (!aShape.IsNull()){
-					TopExp_Explorer exp2;
-					for(exp2.Init(TopoDS::Shell(aShape), TopAbs_FACE); exp2.More(); exp2.Next()){
-					    TopoDS_Face aFace = TopoDS::Face(exp2.Current());
-					    new_reps.push_back(new OCCGeomRepresentation(m_context, aFace));
-					  }
-				}
-#ifdef _DEBUG
-				else
-					std::cerr<<"aFace.IsNull() !"<<std::endl;
-#endif
-			}
-			else
-				throw Utils::BuildingException("Error during surface creation (error...)");
-		} // end for i
+        if(MF.IsDone() && !MF.Shape().IsNull()){
+            TopoDS_Shape aShape = MF.Shape();
+            TopExp_Explorer exp2;
+            for(exp2.Init(TopoDS::Shell(aShape), TopAbs_FACE); exp2.More(); exp2.Next()){
+                TopoDS_Face aFace = TopoDS::Face(exp2.Current());
+                faces.push_back(aFace);
+            }
+        }
+        else
+            throw Utils::BuildingException("Error during surface creation (error...)");
 	}
 	catch(StdFail_NotDone& e){
 		throw Utils::BuildingException("Erreur OCC lors de la création de la surface avec offset");
@@ -258,21 +243,13 @@ Surface* EntityFactory::newSurfaceByCopyWithOffset(Surface* E, const double& off
 		throw Utils::BuildingException(message);
 	}
 
-	Surface*    surface;
-	if (new_reps.size() == 1)
-		surface = new Surface(m_context,
-				m_context.newProperty(Utils::Entity::GeomSurface),
-				m_context.newDisplayProperties(Utils::Entity::GeomSurface),
-				new GeomProperty(),new_reps[0]);
+	Surface* surface;
+	if (faces.size() == 1)
+		surface = newOCCSurface(faces[0]);
 	else
-		// surface composite
-		surface = new Surface(m_context,
-				m_context.newProperty(Utils::Entity::GeomSurface),
-				m_context.newDisplayProperties(Utils::Entity::GeomSurface),
-				new GeomProperty(),new_reps);
+		throw Utils::BuildingException("On ne sait pas traiter une création de surface avec offset qui produit plusieurs surfaces");
 
 	CHECK_NULL_PTR_ERROR (surface)
-	m_context.newGraphicalRepresentation (*surface);
 	return surface;
 }
 /*----------------------------------------------------------------------------*/
@@ -881,33 +858,19 @@ Surface* EntityFactory::newSurface(const std::vector<Geom::Curve*>& curves)
         /* on récupère les courbes OCC sous-jacentes à chaque courbes et on
          * crée un wire
          */
-        BRepBuilderAPI_MakeWire mk_wire;
-
-
+        //BRepBuilderAPI_MakeWire mk_wire;
+        std::vector<TopoDS_Shape> edges_and_wires;
         for(unsigned int i=0;i<curves.size();i++){
             Geom::Curve* current_curve = curves[i];
 
-            std::vector<GeomRepresentation*> reps = current_curve->getComputationalProperties();
-            for (uint j=0; j<reps.size(); j++){
-            	OCCGeomRepresentation* current_rep =dynamic_cast<OCCGeomRepresentation*>
-            	                                (reps[j]);
-                TopoDS_Shape sh = *(current_rep->getShapePtr());
-                if (sh.ShapeType() != TopAbs_WIRE && sh.ShapeType() != TopAbs_EDGE)
-                    throw Utils::BuildingException("");
-                else if (sh.ShapeType() == TopAbs_WIRE) // [EB] ce qui n'arrive plus normallement depuis la mise en place des courbes composées
-                {
-                    TopTools_IndexedMapOfShape mapE;
-                    TopExp::MapShapes(sh,TopAbs_EDGE, mapE);
-                    for(int i=1; i<=mapE.Extent(); i++)
-                        mk_wire.Add(TopoDS::Edge(mapE.FindKey(i)));
-                }
-                else if (sh.ShapeType() == TopAbs_EDGE){
-                    mk_wire.Add(TopoDS::Edge(sh));
-                }
-            }
+            //std::vector<GeomRepresentation*> reps = current_curve->getComputationalProperties();
+            //for (uint j=0; j<reps.size(); j++){
+            //	OCCGeomRepresentation* current_rep =dynamic_cast<OCCGeomRepresentation*>
+            //	                                (reps[j]);
+            //    TopoDS_Shape sh = *(current_rep->getShapePtr());
+            OCCGeomRepresentation* current_rep = dynamic_cast<OCCGeomRepresentation*>(current_curve->getComputationalProperty());
+            edges_and_wires.push_back(current_rep->getShape());
         }
-        mk_wire.Build();
-        TopoDS_Wire w = mk_wire.Wire();
 
         /* A partir des points des courbes, on cree un plan support de la face.
          * Si on a plus de 3 points, on vérifie la coplanarité. Si elle n'est
@@ -990,17 +953,14 @@ Surface* EntityFactory::newSurface(const std::vector<Geom::Curve*>& curves)
             }
         }
 
-        TopoDS_Face aFace;
-        BRepBuilderAPI_MakeFace MF(surface_plane,w,true);
-
-
+        TopoDS_Wire wire = buildWire(edges_and_wires);
+        BRepBuilderAPI_MakeFace MF(surface_plane, wire, true);
         if(MF.Error()==BRepBuilderAPI_FaceDone){
-            aFace   = MF.Face();
+            TopoDS_Face aFace   = MF.Face();
             rep = new OCCGeomRepresentation(m_context, aFace);
         }
         else
-            throw Utils::BuildingException("Error during surface creation (error...)");
-
+            throw Utils::BuildingException("Error during surface creation (error...)");        
     }
     catch(StdFail_NotDone& e){
         throw Utils::BuildingException("Error during surface creation (not done)");
@@ -1576,54 +1536,6 @@ Surface* EntityFactory::newOCCSurface(TopoDS_Face& f)
 	return surface;
 }
 /*----------------------------------------------------------------------------*/
-Surface* EntityFactory::newOCCCompositeSurface(std::vector<TopoDS_Face>& v_ds_face)
-{
-	std::vector<GeomRepresentation*> reps;
-	for (uint i=0; i<v_ds_face.size(); i++)
-		reps.push_back(new OCCGeomRepresentation(m_context, v_ds_face[i]));
-
-	Surface*	surface	= new Surface(m_context,
-			m_context.newProperty(Utils::Entity::GeomSurface),
-			m_context.newDisplayProperties(Utils::Entity::GeomSurface),
-			new GeomProperty(),
-			reps);
-	CHECK_NULL_PTR_ERROR (surface)
-	m_context.newGraphicalRepresentation (*surface);
-	return surface;
-}
-/*----------------------------------------------------------------------------*/
-Surface* EntityFactory::newFacetedSurface(uint gmds_id, std::vector<gmds::Face> faces)
-{
-	Surface*	surface	= new Surface(m_context,
-			m_context.newProperty(Utils::Entity::GeomSurface),
-			m_context.newDisplayProperties(Utils::Entity::GeomSurface),
-			new GeomProperty(), new FacetedSurface(m_context, gmds_id, faces));
-	CHECK_NULL_PTR_ERROR (surface)
-	m_context.newGraphicalRepresentation (*surface);
-	return surface;
-}
-/*----------------------------------------------------------------------------*/
-Curve*  EntityFactory::newFacetedCurve(uint gmds_id, std::vector<gmds::Node> nodes)
-{
-	Curve*	curve	= new Curve(m_context,
-			m_context.newProperty(Utils::Entity::GeomCurve),
-			m_context.newDisplayProperties(Utils::Entity::GeomCurve),
-			new GeomProperty(), new FacetedCurve(m_context, gmds_id, nodes));
-	CHECK_NULL_PTR_ERROR (curve)
-	m_context.newGraphicalRepresentation (*curve);
-	return curve;
-}
-/*----------------------------------------------------------------------------*/
-Vertex* EntityFactory::newFacetedVertex(uint gmds_id, gmds::Node node)
-{
-	Vertex*	vtx	= new Vertex(m_context,
-			m_context.newProperty(Utils::Entity::GeomVertex),
-			m_context.newDisplayProperties(Utils::Entity::GeomVertex),
-			new GeomProperty(), new FacetedVertex(m_context, gmds_id, node));
-	CHECK_NULL_PTR_ERROR (vtx)
-	m_context.newGraphicalRepresentation (*vtx);
-	return vtx;
-}
 /*----------------------------------------------------------------------------*/
 Curve* EntityFactory::newOCCCurve(TopoDS_Edge& e)
 {
@@ -1647,7 +1559,26 @@ Curve* EntityFactory::newOCCCurve(TopoDS_Wire& w)
     return curve;
 }
 /*----------------------------------------------------------------------------*/
-Curve* EntityFactory::newOCCCompositeCurve(std::vector<TopoDS_Edge>& v_ds_edge,
+TopoDS_Wire EntityFactory::buildWire(std::vector<TopoDS_Shape>& edges_and_wires)
+{
+    // Fusion des TopoDS_Shape de chaque courbe en un TopoDS_Wire combiné 
+	BRepBuilderAPI_MakeWire wireBuilder;
+	for(uint i=0; i<edges_and_wires.size(); i++){
+		TopoDS_Shape shape = edges_and_wires[i];
+		if (shape.ShapeType() == TopAbs_EDGE) {
+            wireBuilder.Add(TopoDS::Edge(shape));
+        } else if (shape.ShapeType() == TopAbs_WIRE) {
+            for (TopExp_Explorer explorer(shape, TopAbs_EDGE); explorer.More(); explorer.Next()) {
+                wireBuilder.Add(TopoDS::Edge(explorer.Current()));
+            }
+        }
+	}
+
+    TopoDS_Wire wire = wireBuilder.Wire();
+    return wire;
+}
+/*----------------------------------------------------------------------------*/
+Curve* EntityFactory::newOCCCurve(std::vector<TopoDS_Edge>& v_ds_edge,
 		Utils::Math::Point& extremaFirst, Utils::Math::Point& extremaLast)
 {
 //#define _DEBUG_COMPOSITE
@@ -1666,8 +1597,6 @@ Curve* EntityFactory::newOCCCompositeCurve(std::vector<TopoDS_Edge>& v_ds_edge,
 	}
 #endif
 
-	std::vector<GeomRepresentation*> reps;
-
 	// certains TopoDS_Edge issus de la projection peuvent être des parasites (projection sur surface lointaine)
 	// Nous allons donc partir extremaFirst et de proche en proche aller jusqu'à extremaLast
 	// sans forcément prendre tous les éléments de v_ds_edge
@@ -1676,6 +1605,7 @@ Curve* EntityFactory::newOCCCompositeCurve(std::vector<TopoDS_Edge>& v_ds_edge,
 	std::cout<<"epsilon "<<epsilon<<std::endl;
 #endif
 	Utils::Math::Point ptPrec = extremaFirst;
+    std::vector<TopoDS_Shape> filteredEdges;
 	do {
 		// recherche d'un TopoDS_Edge relié à ptPrec
 		std::vector<TopoDS_Edge>::iterator iter_to_erase;
@@ -1715,7 +1645,7 @@ Curve* EntityFactory::newOCCCompositeCurve(std::vector<TopoDS_Edge>& v_ds_edge,
 #ifdef _DEBUG_COMPOSITE
 			std::cout<<"found, ptPrec : "<<ptPrec<<std::endl;
 #endif
-			reps.push_back(new OCCGeomRepresentation(m_context, ds_edge_found));
+            filteredEdges.push_back(ds_edge_found);
 			v_ds_edge.erase(iter_to_erase);
 		}
 		else {
@@ -1730,18 +1660,20 @@ Curve* EntityFactory::newOCCCompositeCurve(std::vector<TopoDS_Edge>& v_ds_edge,
 	std::cout<<"terminé, il reste "<<v_ds_edge.size()<<" TopoDS_Edge non utilisées, pour "<<reps.size()<<" utilisées"<<std::endl;
 #endif
 
-	// création de la courbe composée
-	Curve*  curve   = new Curve(m_context,
-			m_context.newProperty(Utils::Entity::GeomCurve),
-			m_context.newDisplayProperties(Utils::Entity::GeomCurve),
-			new GeomProperty(),
-			reps);
+    Curve*  curve;
+    if (filteredEdges.size() == 1)
+        curve = newOCCCurve(TopoDS::Edge(filteredEdges[0]));
+    else if (filteredEdges.size() > 1)
+    {
+        TopoDS_Wire wire = buildWire(filteredEdges);
+        curve = newOCCCurve(wire);
+    }
 	CHECK_NULL_PTR_ERROR (curve)
-	m_context.newGraphicalRepresentation (*curve);
-	if (reps.size() > 1)
+	if (filteredEdges.size() > 1)
 		curve->computeParams(extremaFirst);
 	return curve;
 }
+
 /*----------------------------------------------------------------------------*/
 //Curve* EntityFactory::newOCCCurve(TopoDS_Wire& w)
 //{
@@ -1792,47 +1724,37 @@ Curve* EntityFactory::newCurveByTopoDS_ShapeProjectionOnSurface(TopoDS_Shape sha
 #ifdef _DEBUG_EDGEPROJECTION
     std::cout<<"EntityFactory::newCurveByTopoDS_ShapeProjectionOnSurface, proj sur "<<surface->getName()<<std::endl;
 #endif
+	GeomRepresentation* rep = surface->getComputationalProperty();
+    OCCGeomRepresentation* surf_rep =dynamic_cast<OCCGeomRepresentation*>(rep);
+    CHECK_NULL_PTR_ERROR(surf_rep);
+    TopoDS_Shape surf_shape = surf_rep->getShape();
+
+    BRepAlgo_NormalProjection proj;
+    proj.Init(surf_shape);
+    proj.Add(shape);
+    proj.Build();
+
+    if (!proj.IsDone()){
+        TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+        message << "OCC a échoué, création de la projection sur la surface  "<<surface->getName();
+        throw TkUtil::Exception (message);
+    }
+
+    // récupération de la projection (un compound)
 	std::vector<TopoDS_Edge> v_ds_edge;
-
-	std::vector<GeomRepresentation*> reps = surface->getComputationalProperties();
-	for (uint i=0; i<reps.size(); i++){
+    const TopoDS_Shape proj_shape = proj.Projection();
+    TopExp_Explorer ex;
+    for (ex.Init(proj_shape, TopAbs_EDGE); ex.More(); ex.Next()) {
+        TopoDS_Edge aEdge = TopoDS::Edge(ex.Current());
+        v_ds_edge.push_back(aEdge);
 #ifdef _DEBUG_EDGEPROJECTION
-		std::cout<<" proj i="<<i<<std::endl;
+        std::cout<<" aEdge Degenerated ? "<<(BRep_Tool::Degenerated(aEdge)?"vrai":"faux")<<std::endl;
+        GProp_GProps pb;
+        BRepGProp::LinearProperties(aEdge,pb);
+        double res = pb.Mass();
+        std::cout<<" aEdge longueur = "<<res<<std::endl;
 #endif
-		OCCGeomRepresentation* surf_rep =dynamic_cast<OCCGeomRepresentation*>(reps[i]);
-		CHECK_NULL_PTR_ERROR(surf_rep);
-		TopoDS_Shape surf_shape = surf_rep->getShape();
-
-	    BRepAlgo_NormalProjection proj;
-	    proj.Init(surf_shape);
-
-	    proj.Add(shape);
-
-	    proj.Build();
-
-	    if (!proj.IsDone()){
-			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-	        message << "OCC a échoué, création de la projection sur la surface  "<<surface->getName();
-	        throw TkUtil::Exception (message);
-	    }
-
-	    // récupération de la projection (un compound)
-	    const TopoDS_Shape proj_shape = proj.Projection();
-	    TopExp_Explorer ex;
-	    for (ex.Init(proj_shape, TopAbs_EDGE); ex.More(); ex.Next()) {
-	    	TopoDS_Edge aEdge = TopoDS::Edge(ex.Current());
-	    	v_ds_edge.push_back(aEdge);
-#ifdef _DEBUG_EDGEPROJECTION
-	    	std::cout<<" aEdge Degenerated ? "<<(BRep_Tool::Degenerated(aEdge)?"vrai":"faux")<<std::endl;
-	        GProp_GProps pb;
-	        BRepGProp::LinearProperties(aEdge,pb);
-	        double res = pb.Mass();
-	        std::cout<<" aEdge longueur = "<<res<<std::endl;
-#endif
-
-	    }
-
-	} // end for i<reps.size()\
+    }
 
 #ifdef _DEBUG_EDGEPROJECTION
 		std::cout<<" v_ds_edge.size() = "<<v_ds_edge.size()<<std::endl;
@@ -1858,7 +1780,7 @@ Curve* EntityFactory::newCurveByTopoDS_ShapeProjectionOnSurface(TopoDS_Shape sha
 		else
 			throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, newCurveByTopoDS_ShapeProjectionOnSurface n'est pas prévu pour chose qu'une TopAbs_EDGE", TkUtil::Charset::UTF_8));
 
-		return newOCCCompositeCurve(v_ds_edge, extremaFirst, extremaLast);
+		return newOCCCurve(v_ds_edge, extremaFirst, extremaLast);
 	}
 
 }

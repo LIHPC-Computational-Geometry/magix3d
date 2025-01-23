@@ -160,11 +160,6 @@ Internal::M3DCommandResultIfc* GeomManagerIfc::newPlanarSurface(std::vector<std:
     throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::newPlanarSurface should be overloaded.", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManagerIfc::newFacetedSurface(std::string nom)
-{
-    throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::newFacetedSurface should be overloaded.", TkUtil::Charset::UTF_8));
-}
-/*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc*
 GeomManagerIfc::newVerticesCurvesAndPlanarSurface(std::vector<Utils::Math::Point>& points, std::string groupName)
 {

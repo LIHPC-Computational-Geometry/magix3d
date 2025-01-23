@@ -83,15 +83,7 @@ protected:
             std::map<Geom::Vertex*,Geom::Vertex*>& v2vOpp,
             std::map<Geom::Vertex*,Geom::Curve*>& v2c);
 
-//    void makeRevol(Curve *c, std::vector<GeomEntity*>& res,
-//            std::map<Geom::Vertex*,Geom::Vertex*>  & v2v,
-//            std::map<Geom::Vertex*,Geom::Vertex*>  & v2vOpp,
-//            std::map<Geom::Vertex*,Geom::Curve*>   & v2c,
-//            std::map<Geom::Curve*  ,Geom::Curve*>  & c2c,
-//            std::map<Geom::Curve*  ,Geom::Curve*>  & c2cOpp,
-//            std::map<Geom::Curve*  ,Geom::Surface*>& c2s);
-
-    void makeRevolComposite(Curve *c, std::vector<GeomEntity*>& res,
+    void makeRevol(Curve *c, std::vector<GeomEntity*>& res,
             std::map<Geom::Vertex*,Geom::Vertex*>  & v2v,
             std::map<Geom::Vertex*,Geom::Vertex*>  & v2vOpp,
             std::map<Geom::Vertex*,Geom::Curve*>   & v2c,
@@ -99,15 +91,7 @@ protected:
             std::map<Geom::Curve*  ,Geom::Curve*>  & c2cOpp,
             std::map<Geom::Curve*  ,Geom::Surface*>& c2s);
 
-//    void makeRevol2PI(Curve *c, std::vector<GeomEntity*>& res,
-//            std::map<Geom::Vertex*,Geom::Vertex*>  & v2v,
-//            std::map<Geom::Vertex*,Geom::Vertex*>  & v2vOpp,
-//            std::map<Geom::Vertex*,Geom::Curve*>   & v2c,
-//            std::map<Geom::Curve*  ,Geom::Curve*>  & c2c,
-//            std::map<Geom::Curve*  ,Geom::Curve*>  & c2cOpp,
-//            std::map<Geom::Curve*  ,Geom::Surface*>& c2s);
-
-    void makeRevol2PIComposite(Curve *c, std::vector<GeomEntity*>& res,
+    void makeRevol2PI(Curve *c, std::vector<GeomEntity*>& res,
             std::map<Geom::Vertex*,Geom::Vertex*>  & v2v,
             std::map<Geom::Vertex*,Geom::Vertex*>  & v2vOpp,
             std::map<Geom::Vertex*,Geom::Curve*>   & v2c,

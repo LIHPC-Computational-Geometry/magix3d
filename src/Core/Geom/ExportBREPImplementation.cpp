@@ -40,13 +40,11 @@ ExportBREPImplementation::~ExportBREPImplementation()
 void ExportBREPImplementation::
 addGeomEntityToExport(GeomEntity* geomEntity)
 {
-	std::vector<GeomRepresentation*> reps = geomEntity->getComputationalProperties();
-	for (uint i=0; i<reps.size(); i++){
-		OCCGeomRepresentation* geom_rep =
-		            dynamic_cast<OCCGeomRepresentation*>(reps[i]);
-		CHECK_NULL_PTR_ERROR(geom_rep);
-        m_builder.Add(m_compound, geom_rep->getShape());
-	}
+	GeomRepresentation* rep = geomEntity->getComputationalProperty();
+    OCCGeomRepresentation* geom_rep =
+                dynamic_cast<OCCGeomRepresentation*>(rep);
+    CHECK_NULL_PTR_ERROR(geom_rep);
+    m_builder.Add(m_compound, geom_rep->getShape());
 }
 /*----------------------------------------------------------------------------*/
 void ExportBREPImplementation::write()

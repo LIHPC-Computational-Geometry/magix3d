@@ -118,10 +118,10 @@ void GeomRevolImplementation::perform(std::vector<GeomEntity*>& res,
         Curve* current_curve= dynamic_cast<Curve*>(*it);
         CHECK_NULL_PTR_ERROR(current_curve);
         if(m_angle==2*M_PI) {
-            makeRevol2PIComposite(current_curve,res,v2v,v2vOpp,v2c,c2c,c2cOpp,c2s);
+            makeRevol2PI(current_curve,res,v2v,v2vOpp,v2c,c2c,c2cOpp,c2s);
         }
         else {
-        	makeRevolComposite(current_curve,res,v2v,v2vOpp,v2c,c2c,c2cOpp,c2s);
+        	makeRevol(current_curve,res,v2v,v2vOpp,v2c,c2c,c2cOpp,c2s);
         }
     }
 
@@ -287,7 +287,7 @@ void GeomRevolImplementation::makeRevol(Vertex* v,std::vector<GeomEntity*>& res,
     }
 }
 /*----------------------------------------------------------------------------*/
-void GeomRevolImplementation::makeRevol2PIComposite(Curve* curve,std::vector<GeomEntity*>& res,
+void GeomRevolImplementation::makeRevol2PI(Curve* curve,std::vector<GeomEntity*>& res,
         std::map<Geom::Vertex*,Geom::Vertex*>  & v2v,
         std::map<Geom::Vertex*,Geom::Vertex*>  & v2vOpp,
         std::map<Geom::Vertex*,Geom::Curve*>   & v2c,
@@ -314,16 +314,13 @@ void GeomRevolImplementation::makeRevol2PIComposite(Curve* curve,std::vector<Geo
     // REALISATION DE LA REVOLUTION
     //======================================================================
 
-    // cas d'une courbe composée de plusieurs shapes
-    std::vector<GeomRepresentation*> ppties = curve->getComputationalProperties();
+    GeomRepresentation* ppty = curve->getComputationalProperty();
 
     // les différentes occ_shape de la courbe composite
-    std::vector<TopoDS_Edge> v_shape;
-    for (uint i=0; i<ppties.size(); i++){
-    	OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(ppties[i]);
-    	CHECK_NULL_PTR_ERROR(occ_rep);
-    	v_shape.push_back(TopoDS::Edge(occ_rep->getShape()));
-    }
+   
+    OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(ppty);
+    CHECK_NULL_PTR_ERROR(occ_rep);
+    TopoDS_Edge shape = TopoDS::Edge(occ_rep->getShape());
 
     // ON AURA BESOIN DES SOMMETS DE LA COURBE DE DEPART PAR LA SUITE
 	std::vector<Vertex*> c_vertices;
@@ -358,9 +355,6 @@ void GeomRevolImplementation::makeRevol2PIComposite(Curve* curve,std::vector<Geo
 	bool cree_face = false;
 	bool cree_courbe = false;
 
-    // révolution pour les différentes shapes
-    for (uint i=0; i<v_shape.size(); i++){
-    	TopoDS_Shape shape = v_shape[i];
     	BRepPrimAPI_MakeRevol mkR(shape, axis, m_angle);
 
     	//======================================================================
@@ -496,23 +490,20 @@ void GeomRevolImplementation::makeRevol2PIComposite(Curve* curve,std::vector<Geo
 					cree_courbe = true;
 
     	} // end else / if (!mkR.IsDone () || mkR.Shape().IsNull())
-    } // end for (uint i=0; i<v_shape.size(); i++)
+
 
     Curve* c_copy=0;
     Surface* surf=0;
-    if (cree_courbe){
-        if (v_shape.size() == 1)
-        	c_copy = EntityFactory(m_context).newOCCCurve(v_shape[0]);
-        else
-        	c_copy = EntityFactory(m_context).newOCCCompositeCurve(v_shape, pt1, pt2);
-    }
+    if (cree_courbe)
+        	c_copy = EntityFactory(m_context).newOCCCurve(shape);
 	if (cree_face){
 		if (v_faces.size() == 0)
 			surf = 0;
 		else if (v_faces.size() == 1)
 			surf = EntityFactory(m_context).newOCCSurface(v_faces[0]);
 		else
-			surf = EntityFactory(m_context).newOCCCompositeSurface(v_faces);
+			throw TkUtil::Exception(TkUtil::UTF8String ("On ne sait pas créer une Surface composite", TkUtil::Charset::UTF_8));
+
 	}
 
 	//======================================================================
@@ -569,7 +560,7 @@ void GeomRevolImplementation::makeRevol2PIComposite(Curve* curve,std::vector<Geo
 }
 /*----------------------------------------------------------------------------*/
 /*----------------------------------------------------------------------------*/
-void GeomRevolImplementation::makeRevolComposite(Curve* curve,std::vector<GeomEntity*>& res,
+void GeomRevolImplementation::makeRevol(Curve* curve,std::vector<GeomEntity*>& res,
         std::map<Geom::Vertex*,Geom::Vertex*>  & v2v,
         std::map<Geom::Vertex*,Geom::Vertex*>  & v2vOpp,
         std::map<Geom::Vertex*,Geom::Curve*>   & v2c,
@@ -581,15 +572,10 @@ void GeomRevolImplementation::makeRevolComposite(Curve* curve,std::vector<GeomEn
 	std::cout<<"GeomRevolImplementation::makeRevol ("<<curve->getName()<<")"<<std::endl;
 #endif
     // cas d'une courbe composée de plusieurs shapes
-	std::vector<GeomRepresentation*> ppties = curve->getComputationalProperties();
-
-	// les différentes occ_shape de la courbe composite
-    std::vector<TopoDS_Edge> v_shape;
-    for (uint i=0; i<ppties.size(); i++){
-    	OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(ppties[i]);
-    	CHECK_NULL_PTR_ERROR(occ_rep);
-    	v_shape.push_back(TopoDS::Edge(occ_rep->getShape()));
-    }
+	GeomRepresentation* ppty = curve->getComputationalProperty();
+   	OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(ppty);
+   	CHECK_NULL_PTR_ERROR(occ_rep);
+    TopoDS_Edge shape = TopoDS::Edge(occ_rep->getShape());
 
     // ON AURA BESOIN DES SOMMETS DE LA COURBE DE DEPART PAR LA SUITE
     std::vector<Vertex*> c_vertices;
@@ -615,9 +601,6 @@ void GeomRevolImplementation::makeRevolComposite(Curve* curve,std::vector<GeomEn
     // les courbes opposées
     std::vector<TopoDS_Edge> v_shape_opp;
 
-    // révolution pour les différentes shapes
-    for (uint i=0; i<v_shape.size(); i++){
-    	TopoDS_Shape shape = v_shape[i];
     	BRepPrimAPI_MakeRevol mkR(shape, axis, m_angle);
 
     	//======================================================================
@@ -771,7 +754,6 @@ void GeomRevolImplementation::makeRevolComposite(Curve* curve,std::vector<GeomEn
     		}
 
     	} // end else / if (!mkR.IsDone () || mkR.Shape().IsNull())
-    } // end for (uint i=0; i<v_shape.size(); i++)
 
     Surface* surf = 0;
     if (v_faces.size() == 0)
@@ -779,7 +761,8 @@ void GeomRevolImplementation::makeRevolComposite(Curve* curve,std::vector<GeomEn
     else if (v_faces.size() == 1)
     	surf = EntityFactory(m_context).newOCCSurface(v_faces[0]);
     else
-    	surf = EntityFactory(m_context).newOCCCompositeSurface(v_faces);
+    	throw TkUtil::Exception(TkUtil::UTF8String ("On ne sait pas créer une Surface composite", TkUtil::Charset::UTF_8));
+
 
     if (surf){
     	m_newEntities.push_back(surf);
@@ -814,10 +797,7 @@ void GeomRevolImplementation::makeRevolComposite(Curve* curve,std::vector<GeomEn
     Utils::Math::Point pt1 = v1->getCoord();
     Utils::Math::Point pt2 = v2->getCoord();
     Curve* c_copy=0;
-    if (v_shape.size() == 1)
-    	c_copy = EntityFactory(m_context).newOCCCurve(v_shape[0]);
-    else
-    	c_copy = EntityFactory(m_context).newOCCCompositeCurve(v_shape, pt1, pt2);
+   	c_copy = EntityFactory(m_context).newOCCCurve(shape);
 #ifdef _DEBUG2
     std::cout<<" création de la copie "<<c_copy->getName()<<std::endl;
 #endif
@@ -830,7 +810,7 @@ void GeomRevolImplementation::makeRevolComposite(Curve* curve,std::vector<GeomEn
     else if (v_shape_opp.size() == 1)
     	c_opp = EntityFactory(m_context).newOCCCurve(v_shape_opp[0]);
     else
-    	c_opp = EntityFactory(m_context).newOCCCompositeCurve(v_shape_opp, pt1, pt2);
+    	c_opp = EntityFactory(m_context).newOCCCurve(v_shape_opp, pt1, pt2);
     if (c_copy){
     	m_newEntities.push_back(c_copy);
     	m_newCurves.push_back(c_copy);
@@ -1036,10 +1016,9 @@ void GeomRevolImplementation::makeRevol(Surface* surf,
                 continue;
 //           std::cout<<"\t surf "<<surf_i->getName()<<std::endl;
             lateral_surfs.push_back(surf_i);
-            std::vector<TopoDS_Shape> surf_i_occ;
-            getOCCShapes(surf_i,surf_i_occ);
-            // cas multi shape...
-            lateral_surfs_occ.insert(lateral_surfs_occ.end(), surf_i_occ.begin(), surf_i_occ.end());
+            TopoDS_Shape surf_i_occ;
+            getOCCShape(surf_i,surf_i_occ);
+            lateral_surfs_occ.push_back(surf_i_occ);
         }
 
         // on cherche maintenant les deux surfaces manquantes (dep et arrivée)
@@ -1205,10 +1184,10 @@ void GeomRevolImplementation::makeRevol2PI(Surface* surf,
             continue;
 //           std::cout<<"\t surf "<<surf_i->getName()<<std::endl;
         lateral_surfs.push_back(surf_i);
-        std::vector<TopoDS_Shape> surf_i_occ;
-        getOCCShapes(surf_i,surf_i_occ);
+        TopoDS_Shape surf_i_occ;
+        getOCCShape(surf_i,surf_i_occ);
         // cas multi shape...
-        lateral_surfs_occ.insert(lateral_surfs_occ.end(), surf_i_occ.begin(), surf_i_occ.end());
+        lateral_surfs_occ.push_back(surf_i_occ);
 
     }
 

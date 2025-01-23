@@ -49,21 +49,13 @@ GeomEntity::GeomEntity(Internal::Context& ctx, Utils::Property* prop, Utils::Dis
 : Internal::InternalEntity (ctx, prop, disp),
   m_geomProp(gprop), m_computedAreaIsUpToDate(false), m_computedArea(0)
 {
-	m_geomRep.push_back(compProp);
-}
-/*----------------------------------------------------------------------------*/
-GeomEntity::GeomEntity(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, std::vector<GeomRepresentation*>& compProp)
-: Internal::InternalEntity (ctx, prop, disp),
-  m_geomProp(gprop), m_computedAreaIsUpToDate(false), m_computedArea(0)
-{
 	m_geomRep = compProp;
 }
+
 /*----------------------------------------------------------------------------*/
 GeomEntity::~GeomEntity()
 {
-	for (uint i=0; i<m_geomRep.size(); i++)
-		delete m_geomRep[i];
+	delete m_geomRep;
 
     if(m_geomProp!=0)
         delete m_geomProp;
@@ -98,7 +90,7 @@ void GeomEntity::createMemento(MementoGeomEntity& mem)
     mem.setTopoEntities(m_topo_entities);
     mem.setProperty(m_geomProp);
     //std::cout<<"GeomEntity::createMemento avec "<<getComputationalProperties().size()<<" GeomRepresentations pour "<<getName()<<std::endl;
-    mem.setGeomRepresentation(getComputationalProperties());
+    mem.setGeomRepresentation(getComputationalProperty());
     createSpecificMemento(mem);
 }
 /*----------------------------------------------------------------------------*/
@@ -131,26 +123,7 @@ void GeomEntity::clearRefEntities(std::list<GeomEntity*>& vertices,
 /*----------------------------------------------------------------------------*/
 void GeomEntity::computeBoundingBox(Utils::Math::Point& pmin,Utils::Math::Point& pmax) const
 {
-	if (m_geomRep.empty())
-		return;
-	m_geomRep[0]->computeBoundingBox(pmin,pmax);
-
-	for (uint i=1; i<m_geomRep.size(); i++){
-		Utils::Math::Point p1,p2;
-		m_geomRep[i]->computeBoundingBox(p1,p2);
-		for (uint j=0; j<3; j++){
-			double c1 = pmin.getCoord(j);
-			double c2 = p1.getCoord(j);
-			if (c2<c1)
-				pmin.setCoord(j,c2);
-		}
-		for (uint j=0; j<3; j++){
-			double c1 = pmax.getCoord(j);
-			double c2 = p2.getCoord(j);
-			if (c2>c1)
-				pmin.setCoord(j,c2);
-		}
-	}
+	m_geomRep->computeBoundingBox(pmin,pmax);
 }
 /*----------------------------------------------------------------------------*/
 void GeomEntity::
@@ -161,22 +134,9 @@ setComputationalProperty(GeomRepresentation* cprop)
         throw   TkUtil::Exception(TkUtil::UTF8String ("Null computational property", TkUtil::Charset::UTF_8));
     }
     old_rep = getComputationalProperty();
-    m_geomRep.clear();
-    m_geomRep.push_back(cprop);
-
+    m_geomRep = cprop;
     if (old_rep != getComputationalProperty())
     	m_computedAreaIsUpToDate = false;
-
-}
-/*----------------------------------------------------------------------------*/
-void GeomEntity::
-setComputationalProperties(std::vector<GeomRepresentation*>& cprop)
-{
-    if(cprop.empty())
-        throw   TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, setComputationalProperties sans GeomRepresentation", TkUtil::Charset::UTF_8));
-
-	m_geomRep = cprop;
-	m_computedAreaIsUpToDate = false;
 }
 /*----------------------------------------------------------------------------*/
 GeomProperty* GeomEntity::setGeomProperty(GeomProperty* prop)
@@ -193,25 +153,14 @@ GeomProperty* GeomEntity::setGeomProperty(GeomProperty* prop)
 /*----------------------------------------------------------------------------*/
 GeomRepresentation* GeomEntity::getComputationalProperty() const
 {
-	if (m_geomRep.size() == 1)
-		return m_geomRep[0];
-	else if (m_geomRep.size() == 0){
+	if (m_geomRep == 0){
 		TkUtil::UTF8String	messErreur (TkUtil::Charset::UTF_8);
 		messErreur<<"Erreur interne, getComputationalProperty() avec m_geomRep vide pour ";
 		messErreur<<getName();
 		throw TkUtil::Exception (messErreur);
 	}
-	else {
-		TkUtil::UTF8String	messErreur (TkUtil::Charset::UTF_8);
-		messErreur<<"Erreur interne, getComputationalProperty() avec m_geomRep multiple pour ";
-		messErreur<<getName();
-		throw TkUtil::Exception (messErreur);
-	}
-}
-/*----------------------------------------------------------------------------*/
-std::vector<GeomRepresentation*> GeomEntity::getComputationalProperties() const
-{
-	return m_geomRep;
+	else
+    	return m_geomRep;
 }
 /*----------------------------------------------------------------------------*/
 void GeomEntity::
@@ -221,10 +170,8 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
 	std::cout<<"getRepresentation appelé pour "<<getName()<<std::endl;
 #endif
 
-	for (uint i=0; i<m_geomRep.size(); i++){
-		m_geomRep[i]->buildDisplayRepresentation(dr, this);
+	m_geomRep->buildDisplayRepresentation(dr, this);
 //		std::cout<<"GeomEntity::getRepresentation() pour "<<getName()<<", m_points.size() = "<<dr.getPoints().size()<<", m_surfaceDiscretization.size() = "<<dr.getSurfaceDiscretization().size()<<", m_curveDiscretization.size() = "<<dr.getCurveDiscretization().size() <<", m_isoCurveDiscretization.size() = "<<dr.getIsoCurveDiscretization().size()<<std::endl;
-	}
 
 	// applique le shrink sur la représentation
 	Utils::Math::Point barycentre = getCenteredPosition();
@@ -453,34 +400,32 @@ getDescription (bool alsoComputed) const
     Utils::SerializedRepresentation  occGeomDescription (
     		"Propriétés OCC", "");
     // observation du HashCode retourné par OCC
-    std::vector<GeomRepresentation*> reps = getComputationalProperties();
-    for (uint i=0; i<reps.size(); i++){
-    	OCCGeomRepresentation* rep1 = dynamic_cast<OCCGeomRepresentation*>(reps[i]);
-    	if (rep1){
-    		TopoDS_Shape sh1 = rep1->getShape();
-    		int hc = sh1.HashCode(INT_MAX);
-    		occGeomDescription.addProperty (
-    				Utils::SerializedRepresentation::Property ("HashCode", (long int)hc));
-    		TDF_Label label = rep1->getLabel();
-    		if (label.IsNull())
-    			occGeomDescription.addProperty (
-    					Utils::SerializedRepresentation::Property ("Label OCAF", std::string("non defini")));
-    		else {
-    			occGeomDescription.addProperty (
-    					Utils::SerializedRepresentation::Property ("OCAF - Label",(long int)label.Tag()));
-    			occGeomDescription.addProperty (
-    					Utils::SerializedRepresentation::Property ("OCAF - Depth",(long int)label.Depth()));
-    			occGeomDescription.addProperty (
-    					Utils::SerializedRepresentation::Property ("OCAF - NbChildren",(long int)label.NbChildren()));
-    			occGeomDescription.addProperty (
-    					Utils::SerializedRepresentation::Property ("OCAF - NbAttributes",(long int)label.NbAttributes()));
-    			occGeomDescription.addProperty (
-    					Utils::SerializedRepresentation::Property ("OCAF - Tag",(long int)label.Tag()));
-   		}
-    	}
-    	else
-    		isOCC = false;
+    GeomRepresentation* rep = getComputationalProperty();
+    OCCGeomRepresentation* rep1 = dynamic_cast<OCCGeomRepresentation*>(rep);
+    if (rep1){
+        TopoDS_Shape sh1 = rep1->getShape();
+        int hc = sh1.HashCode(INT_MAX);
+        occGeomDescription.addProperty (
+                Utils::SerializedRepresentation::Property ("HashCode", (long int)hc));
+        TDF_Label label = rep1->getLabel();
+        if (label.IsNull())
+            occGeomDescription.addProperty (
+                    Utils::SerializedRepresentation::Property ("Label OCAF", std::string("non defini")));
+        else {
+            occGeomDescription.addProperty (
+                    Utils::SerializedRepresentation::Property ("OCAF - Label",(long int)label.Tag()));
+            occGeomDescription.addProperty (
+                    Utils::SerializedRepresentation::Property ("OCAF - Depth",(long int)label.Depth()));
+            occGeomDescription.addProperty (
+                    Utils::SerializedRepresentation::Property ("OCAF - NbChildren",(long int)label.NbChildren()));
+            occGeomDescription.addProperty (
+                    Utils::SerializedRepresentation::Property ("OCAF - NbAttributes",(long int)label.NbAttributes()));
+            occGeomDescription.addProperty (
+                    Utils::SerializedRepresentation::Property ("OCAF - Tag",(long int)label.Tag()));
     }
+    }
+    else
+        isOCC = false;
     if (isOCC)
     	description->addPropertiesSet (occGeomDescription);
 #endif

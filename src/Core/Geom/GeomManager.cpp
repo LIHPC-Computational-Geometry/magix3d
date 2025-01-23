@@ -27,7 +27,6 @@
 #include "Geom/CommandNewSegment.h"
 #include "Geom/CommandNewSurface.h"
 #include "Geom/CommandNewSurfaceByOffset.h"
-#include "Geom/CommandNewFacetedSurfaces.h"
 #include "Geom/CommandNewSphere.h"
 #include "Geom/CommandNewSpherePart.h"
 #include "Geom/CommandNewHollowSpherePart.h"
@@ -817,21 +816,6 @@ newVerticesCurvesAndPlanarSurface(std::vector<Point>& points, std::string groupN
     Internal::M3DCommandResultIfc*  cmdResult   =
     		new Internal::M3DCommandResult (*commandCompo);
     return cmdResult;
-}
-/*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc*
-GeomManager::newFacetedSurface(std::string nom)
-{
-	CommandNewFacetedSurfaces* command = new CommandNewFacetedSurfaces(getLocalContext(), nom);
-
-    // trace dans le script
-	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().newFacetedSurface(\""<<nom<<"\")";
-    command->setScriptCommand(cmd);
-	getCommandManager().addCommand(command, Utils::Command::DO);
-
-	Internal::M3DCommandResultIfc*  cmdResult = new Internal::M3DCommandResult (*command);
-	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
 Internal::M3DCommandResultIfc*

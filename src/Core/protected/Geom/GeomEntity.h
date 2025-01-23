@@ -74,15 +74,6 @@ protected:
     GeomEntity(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
             GeomProperty* gprop, GeomRepresentation* compProp=0);
 
-    /** \brief  Constructeur. Une entité délègue un certain nombre de calculs
-     *          géométrique à des objets de type ComputationalProperty.
-     *
-     *          Une fois une propriété associée à une entité, la mort de
-     *          l'entité entrainera celle des propriétés attachées.
-     */
-    GeomEntity(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, std::vector<GeomRepresentation*>& compProp);
-
 public:
 
     /*------------------------------------------------------------------------*/
@@ -156,7 +147,6 @@ public:
      */
 #ifndef SWIG
     void setComputationalProperty(GeomRepresentation* cprop);
-    void setComputationalProperties(std::vector<GeomRepresentation*>& cprop);
 #endif
 
 
@@ -165,8 +155,6 @@ public:
      */
 #ifndef SWIG
     GeomRepresentation* getComputationalProperty() const;
-    std::vector<GeomRepresentation*> getComputationalProperties() const;
-
 #endif
 
     /*------------------------------------------------------------------------*/
@@ -461,7 +449,7 @@ public:
 private:
 
     /// Interfaces pour les objets géométriques
-    std::vector<GeomRepresentation*> m_geomRep;
+    GeomRepresentation* m_geomRep;
 
     /// Propriétés géométriques (qui peut être spécifique, PropertyBox par exemple)
     GeomProperty* m_geomProp;

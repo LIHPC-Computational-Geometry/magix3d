@@ -120,7 +120,6 @@ public:
      *          que l'on fusionne.
      */
     static void getOCCShape(GeomEntity* ge, TopoDS_Shape& topoS);
-    static void getOCCShapes(GeomEntity* ge, std::vector<TopoDS_Shape>& topoS);
 
 protected:
 

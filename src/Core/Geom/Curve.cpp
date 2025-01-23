@@ -26,7 +26,6 @@
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 #include "Geom/OCCGeomRepresentation.h"
-#include "Geom/FacetedCurve.h"
 
 #include <TopoDS_Shape.hxx>
 #include <TopoDS.hxx>
@@ -63,19 +62,12 @@ Curve::Curve(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProper
 {
 }
 /*----------------------------------------------------------------------------*/
-Curve::Curve(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, std::vector<GeomRepresentation*>& compProp)
-:GeomEntity(ctx, prop, disp, gprop,compProp)
-{
-}
-/*----------------------------------------------------------------------------*/
 GeomEntity* Curve::clone(Internal::Context& c)
 {
-	std::vector<GeomRepresentation*> newGeomRep;
-	std::vector<GeomRepresentation*> oldGeomRep = this->getComputationalProperties();
+	GeomRepresentation* newGeomRep;
+	GeomRepresentation* oldGeomRep = this->getComputationalProperty();
 
-	for (uint i=0; i<oldGeomRep.size(); i++)
-		newGeomRep.push_back(oldGeomRep[i]->clone());
+	newGeomRep = oldGeomRep->clone();
 	Curve* newCrv = new Curve(c,
             c.newProperty(this->getType()),
             c.newDisplayProperties(this->getType()),
@@ -351,176 +343,40 @@ bool Curve::contains(Curve* ACurve) const
 /*----------------------------------------------------------------------------*/
 void Curve::project(Utils::Math::Point& P) const
 {
-	if (getComputationalProperties().size() == 1)
-		getComputationalProperty()->project(P,this);
-	else {
-		// on va prendre la projection la plus courte pour le cas composé
-		Utils::Math::Point pInit = P;
-
-		std::vector<GeomRepresentation*> reps = getComputationalProperties();
-		reps[0]->project(P,this);
-		Utils::Math::Point pBest = P;
-		double norme2 = (P-pInit).norme2();
-		//std::cout<<"pBest : "<<pBest<<", norme2 : "<<norme2<<std::endl;
-		for (uint i=1; i<reps.size(); i++){
-			P = pInit;
-			reps[i]->project(P,this);
-			double dist = (P-pInit).norme2();
-			//std::cout<<"P : "<<P<<", dist : "<<dist<<std::endl;
-			if (dist<norme2){
-				//std::cout<<"pBest = P"<<std::endl;
-				norme2 = dist;
-				pBest = P;
-			}
-		}
-		P = pBest;
-	}
+	getComputationalProperty()->project(P,this);
 }
 /*----------------------------------------------------------------------------*/
 void Curve::project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const
 {
-	if (getComputationalProperties().size() == 1)
-		getComputationalProperty()->project(P1,P2,this);
-	else {
-		// on va prendre la projection la plus courte pour le cas composé
-
-		std::vector<GeomRepresentation*> reps = getComputationalProperties();
-		reps[0]->project(P1,P2,this);
-		Utils::Math::Point pBest = P2;
-		double norme2 = (P2-P1).norme2();
-		for (uint i=1; i<reps.size(); i++){
-			reps[i]->project(P1,P2,this);
-			double dist = (P2-P1).norme2();
-			if (dist<norme2){
-				norme2 = dist;
-				pBest = P2;
-			}
-		}
-		P2 = pBest;
-	}
+	getComputationalProperty()->project(P1,P2,this);
 }
 /*----------------------------------------------------------------------------*/
 void Curve::
 getPoint(const double& p, Utils::Math::Point& Pt, const bool in01) const
 {
-	if (getComputationalProperties().size() == 1)
-		getComputationalProperty()->getPoint(p, Pt, in01);
-	else {
-		// vérification que computeParams a bien été utilisé
-		checkParams();
-
-		// on cherche la section paramètrée correspondante
-		if (p<0.0 || p>1.0)
-	    	throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, le paramètre doit être dans l'interval [0,1] pour les courbes composées", TkUtil::Charset::UTF_8));
-
-		uint ind = 0;
-		for (; ind<paramImgLast.size() && p>paramImgLast[ind]; ind++)
-			;
-		if (ind>=paramImgLast.size())
-			throw TkUtil::Exception("Erreur interne, l'indice est en dehors des bornes");
-
-		double ratio = (p-paramImgFirst[ind])/(paramImgLast[ind]-paramImgFirst[ind]);
-
-		double paramLoc = paramLocFirst[ind]+ratio*(paramLocLast[ind]-paramLocFirst[ind]);
-
-		std::vector<GeomRepresentation*> reps = getComputationalProperties();
-		reps[ind]->getPoint(paramLoc, Pt, false);
-	}
+	getComputationalProperty()->getPoint(p, Pt, in01);
 }
 /*----------------------------------------------------------------------------*/
 void Curve::tangent(const Utils::Math::Point& P1, Utils::Math::Vector& V2) const
 {
-	if (getComputationalProperties().size() == 1)
-		getComputationalProperty()->tangent(P1, V2);
-	else {
-		// on va prendre la projection la plus courte pour le cas composé et utiliser la tangente associée
-		Utils::Math::Point P2;
-		std::vector<GeomRepresentation*> reps = getComputationalProperties();
-		reps[0]->project(P1,P2,this);
-		Utils::Math::Point pBest = P2;
-		uint idBest=0;
-		double norme2 = (P2-P1).norme2();
-		for (uint i=1; i<reps.size(); i++){
-			reps[i]->project(P1,P2,this);
-			double dist = (P2-P1).norme2();
-			if (dist<norme2){
-				norme2 = dist;
-				pBest = P2;
-				idBest = i;
-			}
-		}
-		P2 = pBest;
-		reps[idBest]->tangent(P1, V2);
-	}
+	getComputationalProperty()->tangent(P1, V2);
 }
 /*----------------------------------------------------------------------------*/
 void Curve::getIntersection(gp_Pln& plan_cut, Utils::Math::Point& Pt) const
 {
-	if (getComputationalProperties().size() == 1)
-		getComputationalProperty()->getIntersection(plan_cut, Pt);
-	else {
-		MGX_NOT_YET_IMPLEMENTED("intersection avec un plan non implémentée pour le cas composée (utilisé pour discrétisation polaire)");
-	}
-
+	getComputationalProperty()->getIntersection(plan_cut, Pt);
 }
 /*----------------------------------------------------------------------------*/
 void Curve::getParameter(const Utils::Math::Point& Pt, double& p) const
 {
     //std::cout<<setprecision(14)<<"Curve::getParameter pour pt "<<Pt<<std::endl;
-	if (getComputationalProperties().size() == 1)
-		getComputationalProperty()->getParameter(Pt, p, this);
-	else {
-		// vérification que computeParams a bien été utilisé
-		checkParams();
-
-		// en général on cherche les points aux extrémités... mais ils ne sont pas toujours renseignés
-		// c'est le cas d'une arête projetée sur une surface composite
-		std::vector<Vertex*> vertices;
-		get(vertices);
-//		if (vertices.size() != 2 && vertices.size() != 1)
-//			throw TkUtil::Exception("Erreur interne, Courbe composite avec autre chose que 1 ou 2 sommets");
-		if (vertices.size() >= 1 && vertices[0]->getPoint() == Pt){
-			p=0.0;
-			return;
-		}
-		else if (vertices.size() == 2 && vertices[1]->getPoint() == Pt){
-			p=1.0;
-			return;
-		}
-
-		std::vector<GeomRepresentation*> reps = getComputationalProperties();
-		for (uint ind=0; ind<reps.size(); ind++){
-
-			try{
-				double paramLoc = 0.0;
-				reps[ind]->getParameter(Pt, paramLoc, this);
-				//std::cout<<" paramLoc "<<paramLoc<<std::endl;
-
-				double ratio = (paramLoc-paramLocFirst[ind])/(paramLocLast[ind]-paramLocFirst[ind]);
-				p = paramImgFirst[ind]+ratio*(paramImgLast[ind]-paramImgFirst[ind]);
-				//std::cout<<" p "<<p<<std::endl;
-				return;
-			}
-			catch(TkUtil::Exception &e){
-
-			}
-		}
-
-    	throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, le point n'a pas permis de trouver un paramètre sur l'une des courbes", TkUtil::Charset::UTF_8));
-	}
+	getComputationalProperty()->getParameter(Pt, p, this);
     //std::cout<<"  => p = "<<p<<std::endl;
 }
 /*----------------------------------------------------------------------------*/
 void Curve::getParameters(double& first, double& last) const
 {
-	if (getComputationalProperties().size() == 1)
-		getComputationalProperty()->getParameters(first, last);
-	else {
-		// vérification que computeParams a bien été utilisé
-		checkParams();
-		first = 0.0;
-		last = 1.0;
-	}
+	getComputationalProperty()->getParameters(first, last);
 }
 /*----------------------------------------------------------------------------*/
 //#define _DEBUG_GETPARAMETRICSPOINTS
@@ -1102,80 +958,15 @@ void Curve::split(std::vector<Vertex* >&  vert)
 {
 	// identification des sommets aux extrémités (ceux vus qu'une unique fois)
 
-	std::vector<GeomRepresentation*> reps = getComputationalProperties();
-	if (reps.size() == 1)
-		reps[0]->split(vert,this);
-	else {
-		//std::cout<<"Curve::split avec reps.size() = "<<reps.size()<<std::endl;
-
-		std::vector<TopoDS_Vertex> vtx;
-		for (uint i=0; i<reps.size(); i++){
-			OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(reps[i]);
-			CHECK_NULL_PTR_ERROR(occ_rep);
-
-			TopExp_Explorer e;
-			for(e.Init(occ_rep->getShape(), TopAbs_VERTEX); e.More(); e.Next()){
-				TopoDS_Vertex V = TopoDS::Vertex(e.Current());
-				vtx.push_back(V);
-			}
-		}
-		//std::cout<<"vtx.size() = "<<vtx.size()<<std::endl;
-
-		TopoDS_Vertex Vdep;
-		TopoDS_Vertex Vfin;
-
-		for (uint i=0; i<vtx.size()-1; i++){
-			TopoDS_Vertex V1 = vtx[i];
-			for (uint j=i+1; j<vtx.size(); j++){
-				TopoDS_Vertex V2 = vtx[j];
-				if ((!V1.IsNull()) && (!V2.IsNull()) && OCCGeomRepresentation::areEquals(V1,V2)){
-					 vtx[i].Nullify();
-					 vtx[j].Nullify();
-				}
-			}
-		} // end for i<vtx.size()
-
-		for (uint i=0; i<vtx.size(); i++){
-			TopoDS_Vertex V1 = vtx[i];
-			if (!V1.IsNull()){
-				if (Vdep.IsNull())
-					Vdep = V1;
-				else if (Vfin.IsNull())
-					Vfin = V1;
-				else {
-					TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-					messErr << "La courbe "<<getName()<<" est composée de plusieurs parties et on trouve plus de 2 sommets comme extrémité";
-					throw TkUtil::Exception(messErr);
-				}
-
-			}
-		}
-
-		if (!Vdep.IsNull()){
-			// création du nouveau sommet
-			Vertex* v = EntityFactory(getContext()).newOCCVertex(Vdep);
-			// on crée le lien C->V
-			add(v);
-			// on crée le lien V->C
-			v->add(this);
-		}
-
-		if (!Vfin.IsNull()){
-			Vertex* v = EntityFactory(getContext()).newOCCVertex(Vfin);
-			add(v);
-			v->add(this);
-		}
-
-	} // end else / if (reps.size() == 1)
+	GeomRepresentation* rep = getComputationalProperty();
+	rep->split(vert,this);
 }
 /*----------------------------------------------------------------------------*/
 double Curve::computeArea() const
 {
 	double area = 0.0;
-	std::vector<GeomRepresentation*> reps = getComputationalProperties();
-	for (uint i=0; i<reps.size(); i++)
-		area += reps[i]->computeCurveArea();
-
+	GeomRepresentation* rep = getComputationalProperty();
+	area += rep->computeCurveArea();
 	return area;
 }
 /*----------------------------------------------------------------------------*/
@@ -1285,10 +1076,6 @@ void Curve::setDestroyed(bool b)
 /*----------------------------------------------------------------------------*/
 bool Curve::isLinear() const
 {
-	// on dit que ce n'est pas linéaire dès que c'est composé
-	if (getComputationalProperties().size()>1)
-		return false;
-
      OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
 
     if(rep){
@@ -1327,10 +1114,6 @@ bool Curve::isLinear() const
 /*----------------------------------------------------------------------------*/
 bool Curve::isCircle() const
 {
-	// on dit que ce n'est pas circulaire dès que c'est composé
-	if (getComputationalProperties().size()>1)
-		return false;
-
     OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
 
     if(rep){
@@ -1362,10 +1145,6 @@ bool Curve::isCircle() const
 /*----------------------------------------------------------------------------*/
 bool Curve::isEllipse() const
 {
-	// on dit que ce n'est pas circulaire dès que c'est composé
-	if (getComputationalProperties().size()>1)
-		return false;
-
     OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
 
     if(rep){
@@ -1396,10 +1175,6 @@ bool Curve::isEllipse() const
 /*----------------------------------------------------------------------------*/
 bool Curve::isBSpline() const
 {
-	// on dit que ce n'est pas, dès que c'est composé
-	if (getComputationalProperties().size()>1)
-		return false;
-
 	OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
 
 	if(rep){
@@ -1429,10 +1204,6 @@ bool Curve::isBSpline() const
 /*----------------------------------------------------------------------------*/
 bool Curve::isWire() const
 {
-	// on dit que ce n'est pas, dès que c'est composé
-	if (getComputationalProperties().size()>1)
-		return false;
-
 	OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
 
 	if(rep){
@@ -1511,28 +1282,19 @@ Utils::SerializedRepresentation* Curve::getDescription (bool alsoComputed) const
 	        Utils::SerializedRepresentation::Property ("Longueur", volStr.ascii()) );
 	}
 
-	std::vector<GeomRepresentation*> reps = getComputationalProperties();
+	GeomRepresentation* rep = getComputationalProperty();
 	
 #ifdef _DEBUG		// Issue#111
     // précision OpenCascade
-	for (uint i=0; i<reps.size(); i++){
-	    TkUtil::UTF8String precStr (TkUtil::Charset::UTF_8);
-		precStr << reps[i]->getPrecision();
-	    propertyGeomDescription.addProperty (
-	    	        Utils::SerializedRepresentation::Property ("Précision", precStr.ascii()) );
-	}
+	TkUtil::UTF8String precStr (TkUtil::Charset::UTF_8);
+	precStr << rep->getPrecision();
+	propertyGeomDescription.addProperty (
+				Utils::SerializedRepresentation::Property ("Précision", precStr.ascii()) );
 #endif	// _DEBUG
 
 	// recherche des infos pour le cas facétisé
 	bool isFaceted = false;
 	uint nbNodes = 0;
-	if (reps.size() == 1){
-		FacetedCurve* fc = dynamic_cast<FacetedCurve*>(reps[0]);
-		if (fc){
-			isFaceted = true;
-			nbNodes = fc->getNbNodes();
-		}
-	}
 
     // on ajoute des infos du style: c'est une droite, un arc de cercle, une ellipse, une b-spline
     TkUtil::UTF8String typeStr (TkUtil::Charset::UTF_8);
@@ -1552,8 +1314,6 @@ Utils::SerializedRepresentation* Curve::getDescription (bool alsoComputed) const
     	typeStr<<"wire";
     	isAWire = true;
     }
-    else if (getComputationalProperties().size()>1)
-    	typeStr<<"composée";
     else if (isFaceted)
     	typeStr<<"facétisée";
     else
@@ -1648,141 +1408,15 @@ void Curve::computeParams(Utils::Math::Point ptStart)
 	paramLocLast.clear();
 
 	// NB, on ne fait rien si la courbe n'est pas composite
-
-	// on renseigne les paramLocFirst et autres
-
-	// pour cela on commence par calculer les longueurs des différentes parties
-	std::vector<double> areasLoc;
-	double areaTot = 0.0;
-	std::vector<GeomRepresentation*> reps = getComputationalProperties();
-	if (reps.size() == 1)
-		return;
-
-	for (uint i=0; i<reps.size(); i++){
-		double area = reps[i]->computeCurveArea();
-		areasLoc.push_back(area);
-		areaTot+=area;
-	}
-
-	// calcul des paramImgFirst et paramImgLast
-	double areaI = 0.0;
-	double paramI = 0.0;
-	for (uint i=0; i<areasLoc.size(); i++){
-		paramImgFirst.push_back(paramI);
-		areaI += areasLoc[i];
-		paramI = areaI/areaTot;
-		paramImgLast.push_back(paramI);
-	}
-
-	// epsilon relatif à la longueur totale
-	double epsilon = areaTot*Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon*10;
-
-#ifdef _DEBUG_PARAMS
-	std::cout<<"Curve::computeParams ptStart :"<<ptStart<<std::endl;
-	std::cout<<"epsilon loc = "<<epsilon<<std::endl;
-	std::cout<<"areasLoc:";
-	for (uint i=0; i<areasLoc.size(); i++)
-		std::cout<<" "<<areasLoc[i];
-	std::cout<<std::endl;
-	std::cout<<"paramImgFirst:";
-	for (uint i=0; i<paramImgFirst.size(); i++)
-		std::cout<<" "<<paramImgFirst[i];
-	std::cout<<std::endl;
-	std::cout<<"paramImgLast:";
-	for (uint i=0; i<paramImgLast.size(); i++)
-		std::cout<<" "<<paramImgLast[i];
-	std::cout<<std::endl;
-	std::cout<<"couples de points: "<<std::endl;
-	Utils::Math::Point ptBegin, ptEnd;
-	for (uint i=0; i<reps.size(); i++){
-		reps[i]->getPoint(0.0, ptBegin, true);
-		reps[i]->getPoint(1.0, ptEnd, true);
-		std::cout<<ptBegin<<" "<<ptEnd<<std::endl;
-	}
-#endif
-
-	// remplissage des paramLocFirst et paramLocLast et tenant compte du sens
-	Utils::Math::Point ptPrec;
-	reps[0]->getPoint(0.0, ptPrec, true);
-#ifdef _DEBUG_PARAMS
-	std::cout<<"longueur ptStart-ptPrec "<<ptPrec.length(ptStart)<<std::endl;
-#endif
-	if (not (ptPrec.isEpsilonEqual(ptStart, epsilon))){
-		reps[0]->getPoint(1.0, ptPrec, true);
-#ifdef _DEBUG_PARAMS
-		std::cout<<"longueur ptStart-ptPrec "<<ptPrec.length(ptStart)<<std::endl;
-#endif
-		if (not (ptPrec.isEpsilonEqual(ptStart, epsilon))){
-			throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, Courbe composite où on ne retrouve pas le premier sommet", TkUtil::Charset::UTF_8));
-		}
-	}
-	for (uint i=0; i<reps.size(); i++){
-		double inverse = false;
-		Utils::Math::Point pt1, pt2;
-		reps[i]->getPoint(0.0, pt1, true);
-		reps[i]->getPoint(1.0, pt2, true);
-#ifdef _DEBUG_PARAMS
-		std::cout<<"i="<<i<<" ptPrec: "<<ptPrec<<std::endl;
-		std::cout<<"longueur pt1-ptPrec "<<ptPrec.length(pt1)<<" pt2-ptPrec "<<ptPrec.length(pt2)<<std::endl;
-#endif
-		if (not (pt1.isEpsilonEqual(ptPrec, epsilon))){
-			inverse = true;
-			if (not (pt2.isEpsilonEqual(ptPrec, epsilon))){
-				throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, Courbe composite où on ne retrouve pas le sommet précédent", TkUtil::Charset::UTF_8));
-			}
-		}
-
-		double first, last;
-		if (inverse){
-			reps[i]->getParameters(last, first);
-			ptPrec = pt1;
-		}
-		else {
-			ptPrec = pt2;
-			reps[i]->getParameters(first, last);
-		}
-		paramLocFirst.push_back(first);
-		paramLocLast.push_back(last);
-	}
-#ifdef _DEBUG_PARAMS
-	std::cout<<"paramLocFirst:";
-	for (uint i=0; i<paramLocFirst.size(); i++)
-		std::cout<<" "<<paramLocFirst[i];
-	std::cout<<std::endl;
-	std::cout<<"paramLocLast:";
-	for (uint i=0; i<paramLocLast.size(); i++)
-		std::cout<<" "<<paramLocLast[i];
-	std::cout<<std::endl;
-#endif
 }
 /*----------------------------------------------------------------------------*/
 void Curve::checkParams() const
 {
-	std::vector<GeomRepresentation*> reps = getComputationalProperties();
-	if (reps.size() == 1)
-		return;
-
-	if (reps.size() != paramLocFirst.size()){
-		TkUtil::UTF8String messErr (TkUtil::Charset::UTF_8);
-		messErr << "Erreur interne, paramLocFirst non itialisé correctement pour "<<getName();
-		throw TkUtil::Exception(messErr);
-	}
-	if (reps.size() != paramLocLast.size())
-		throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, paramLocLast non itialisé correctement", TkUtil::Charset::UTF_8));
-	if (reps.size() != paramImgFirst.size())
-		throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, paramImgFirst non itialisé correctement", TkUtil::Charset::UTF_8));
-	if (reps.size() != paramImgLast.size())
-		throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, paramImgLast non itialisé correctement", TkUtil::Charset::UTF_8));
+	return;
 }
 /*----------------------------------------------------------------------------*/
 bool Curve::needLowerDimensionalEntityModification()
 {
-	std::vector<GeomRepresentation*> reps = getComputationalProperties();
-	if (reps.size() == 1) {
-		FacetedCurve *fc = dynamic_cast<FacetedCurve *>(reps[0]);
-		if (fc)
-			return false;
-	}
 	return true;
 }
 /*----------------------------------------------------------------------------*/

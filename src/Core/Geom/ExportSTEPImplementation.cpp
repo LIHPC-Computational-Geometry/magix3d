@@ -69,13 +69,11 @@ ExportSTEPImplementation::~ExportSTEPImplementation()
 void ExportSTEPImplementation::
 addGeomEntityToExport(GeomEntity* geomEntity)
 {
-	std::vector<GeomRepresentation*> reps = geomEntity->getComputationalProperties();
-	for (uint i=0; i<reps.size(); i++){
-		OCCGeomRepresentation* geom_rep =
-		            dynamic_cast<OCCGeomRepresentation*>(reps[i]);
-		CHECK_NULL_PTR_ERROR(geom_rep);
-		m_writer.Transfer(geom_rep->getShape(), STEPControl_AsIs);
-	}
+	GeomRepresentation* rep = geomEntity->getComputationalProperty();
+    OCCGeomRepresentation* geom_rep =
+                dynamic_cast<OCCGeomRepresentation*>(rep);
+    CHECK_NULL_PTR_ERROR(geom_rep);
+    m_writer.Transfer(geom_rep->getShape(), STEPControl_AsIs);
 }
 /*----------------------------------------------------------------------------*/
 void ExportSTEPImplementation::write()

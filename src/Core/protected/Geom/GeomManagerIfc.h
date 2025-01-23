@@ -291,24 +291,12 @@ public:
         newVerticesCurvesAndPlanarSurface(std::vector<Utils::Math::Point>& points, std::string groupName);
 	//SET_SWIG_COMPLETABLE_METHOD(newVerticesCurvesAndPlanarSurface)
 
-
-    /*------------------------------------------------------------------------*/
-    /** \brief création d'une surface facétisée à partir d'un fichier, pour tests
-     *
-     *  \param nom du fichier mli
-     */
-	virtual Mgx3D::Internal::M3DCommandResultIfc*
-			newFacetedSurface(std::string nom);
-	SET_SWIG_COMPLETABLE_METHOD(newFacetedSurface)
-
-
     /*------------------------------------------------------------------------*/
    /** \brief création d'une courbe par projection orthogonale d'une courbe sur une surface
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc*
     newCurveByCurveProjectionOnSurface(const std::string& curveName, const std::string& surfaceName, std::string groupName="");
 	SET_SWIG_COMPLETABLE_METHOD(newCurveByCurveProjectionOnSurface)
-
 
     /*------------------------------------------------------------------------*/
     /** \brief suppression d'entités géométriques. Si on supprime une entité
