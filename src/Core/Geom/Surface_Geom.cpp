@@ -66,8 +66,7 @@ Surface::Surface(Internal::Context& ctx, Utils::Property* prop,
 /*----------------------------------------------------------------------------*/
 GeomEntity* Surface::clone(Internal::Context& c)
 {
-	GeomRepresentation* newGeomRep;
-	GeomRepresentation* oldGeomRep = this->getComputationalProperty()->clone();
+	GeomRepresentation* newGeomRep = this->getComputationalProperty()->clone();
 
     return new Surface(c,
             c.newProperty(this->getType()),
