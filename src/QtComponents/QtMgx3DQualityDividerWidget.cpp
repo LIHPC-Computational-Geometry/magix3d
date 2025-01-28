@@ -121,7 +121,7 @@ void QtMgx3DQualityDividerWidget::displayExtraction (size_t i, bool display)
 		UTF8String	name (Charset::UTF_8);
 		name << serie->getName ( ) << '_' << _criterionName;
 		if (true == serie->isVolumic ( ))
-		{
+		{	// Création du volume GMDS :
 			const Mesh::Mgx3DVolumeQualifSerie* volumeSerie	= dynamic_cast<const Mesh::Mgx3DVolumeQualifSerie*>(serie);
 			CHECK_NULL_PTR_ERROR (volumeSerie)
 			parent	= volumeSerie->getMeshEntity ( );
@@ -129,33 +129,39 @@ void QtMgx3DQualityDividerWidget::displayExtraction (size_t i, bool display)
 			vector <gmds::TCellID>	cellsIds;
 			volumeSerie->getGMDSCellsIndexes (cellsIds, 0);	// Une seule classe => 0
 			gmds::CellGroup<gmds::Region>*	gmdsVolume	= mesh->getGMDSMesh ( ).newGroup<gmds::Region> (name);
+			for (vector <gmds::TCellID>::const_iterator itc = cellsIds.begin ( ); cellsIds.end ( ) != itc; itc++)
+				gmdsVolume->add (volumeSerie->getGMDSCell (*itc));
 
+			// Création du volume Magix3D :
 			SubVolume*	volume	= new SubVolume (getContext ( ), getContext ( ).newProperty (Entity::MeshVolume, name), getContext ( ).newDisplayProperties (Entity::MeshVolume), 0);
 			CHECK_NULL_PTR_ERROR (volume)
-			for (vector <gmds::TCellID>::const_iterator itc = cellsIds.begin ( ); cellsIds.end ( ) != itc; itc++)
+			for (size_t i = 0; i < gmdsVolume->size ( ); i++)
 			{
-				gmds::Region	region	= gmdsMesh.get<gmds::Region>(*itc);
+				gmds::Region	region	= gmdsMesh.get<gmds::Region>((*gmdsVolume)[i]);
 				volume->addRegion (region);
-			}
+			}	// for (size_t i = 0; i < gmdsVolume->size ( ); i++)
 			meshManager->add (volume);
 			entity	= volume;
 		}	// if (true == serie->isVolumic ( ))
 		else
-		{
+		{	// // Création de la surface GMDS :
 			const Mesh::Mgx3DSurfaceQualifSerie* surfaceSerie	= dynamic_cast<const Mesh::Mgx3DSurfaceQualifSerie*>(serie);
 			CHECK_NULL_PTR_ERROR (surfaceSerie)
 			parent	= surfaceSerie->getMeshEntity ( );
 			vector <gmds::TCellID>	cellsIds;
 			surfaceSerie->getGMDSCellsIndexes (cellsIds, 0);	// Une seule classe => 0
 			gmds::CellGroup<gmds::Face>*	gmdsSurface	= mesh->getGMDSMesh ( ).newGroup<gmds::Face> (name);
+			for (vector <gmds::TCellID>::const_iterator itc = cellsIds.begin ( ); cellsIds.end ( ) != itc; itc++)
+				gmdsSurface->add (surfaceSerie->getGMDSCell (*itc));
 
+			// Création de la surface Magix3D :
 			SubSurface*	surface	= new SubSurface (getContext ( ), getContext ( ).newProperty (Entity::MeshSurface, name), getContext ( ).newDisplayProperties (Entity::MeshSurface), 0);
 			CHECK_NULL_PTR_ERROR (surface)
-			for (vector <gmds::TCellID>::const_iterator itc = cellsIds.begin ( ); cellsIds.end ( ) != itc; itc++)
+			for (size_t i = 0; i < gmdsSurface->size ( ); i++)
 			{
-				gmds::Face face	= gmdsMesh.get<gmds::Face>(*itc);
+				gmds::Face	face	= gmdsMesh.get<gmds::Face>((*gmdsSurface)[i]);
 				surface->addFace (face);
-			}
+			}	// for (size_t i = 0; i < gmdsSurface->size ( ); i++)
 			meshManager->add (surface);
 			entity	= surface;
 		}	// else if (true == serie->isVolumic ( ))
