@@ -79,7 +79,37 @@ un panneau dans un onglet du panneau Opérations (à côté de l’onglet
 Opération courante).
 
 Cette évaluation se fait sur les groupes de mailles sélectionnés (voir
-:ref:`selection`). Il est similaire à celui disponible dans Lem.
+:ref:`selection`). Les mailles correspondantes sont distribuées 
+dans les classes d'un histogramme selon leur valeur pour le critère de 
+qualité utilisé.
+
+Il est possible d'afficher les mailles d'une classe en sélectionnant la
+barre associée par clic puis en activant le bouton "Afficher".
+
+Ce panneau est similaire à celui disponible dans Lem.
+
+.. image:: ../images/quality_histogram.png
+   :width: 6.in
+
+.. _recherche-selon-critere:
+
+Recherche selon critère
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Cette action, ouvre également un panneau dans un onglet du panneau 
+Opérations permettant de rechercher les mailles correspondant à un 
+domaine d'un critère de qualité.
+
+Contrairement à l'évaluation de la qualité de maillage (cf. 
+:ref:`evaluation-qualite`), la recherche est ici binaire, une maille 
+fait partie ou non du domaine de recherche. Pour chaque groupe de 
+mailles soumis à la recherche un sous-groupe recevant 
+les mailles recherchées est créé. Le nombre de mailles trouvées est 
+affiché en vis à vis et ces mailles peuvent être affichées en cochant la
+case associée prévue à cet effet.
+
+.. image:: ../images/criteria_search.png
+   :width: 6.in
 
 .. _info-maillage:
 
