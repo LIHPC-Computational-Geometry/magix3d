@@ -110,6 +110,7 @@ void GeomRevolImplementation::perform(std::vector<GeomEntity*>& res,
     for(it=m_ref_entities[0].begin();it!=m_ref_entities[0].end();it++){
         Vertex* current_vertex = dynamic_cast<Vertex*>(*it);
         CHECK_NULL_PTR_ERROR(current_vertex);
+        std::cout << "On fait la revol de " << current_vertex->getName() << std::endl;
         makeRevol(current_vertex,res,v2v,v2vOpp,v2c);
     }
 
@@ -117,6 +118,7 @@ void GeomRevolImplementation::perform(std::vector<GeomEntity*>& res,
     for(it=m_ref_entities[1].begin();it!=m_ref_entities[1].end();it++){
         Curve* current_curve= dynamic_cast<Curve*>(*it);
         CHECK_NULL_PTR_ERROR(current_curve);
+        std::cout << "On fait la revol de " << current_curve->getName() << std::endl;
         if(m_angle==2*M_PI) {
             makeRevol2PI(current_curve,res,v2v,v2vOpp,v2c,c2c,c2cOpp,c2s);
         }
@@ -129,6 +131,7 @@ void GeomRevolImplementation::perform(std::vector<GeomEntity*>& res,
     for(it=m_ref_entities[2].begin();it!=m_ref_entities[2].end();it++){
         Surface* current_surf= dynamic_cast<Surface*>(*it);
         CHECK_NULL_PTR_ERROR(current_surf);
+        std::cout << "On fait la revol de " << current_surf->getName() << std::endl;
         if(m_angle==2*M_PI)
             makeRevol2PI(current_surf,res,v2v,v2vOpp,v2c,c2c,c2cOpp,c2s,s2s,s2sOpp,s2v);
         else
@@ -575,7 +578,7 @@ void GeomRevolImplementation::makeRevol(Curve* curve,std::vector<GeomEntity*>& r
 	GeomRepresentation* ppty = curve->getComputationalProperty();
    	OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(ppty);
    	CHECK_NULL_PTR_ERROR(occ_rep);
-    TopoDS_Edge shape = TopoDS::Edge(occ_rep->getShape());
+    TopoDS_Shape shape = occ_rep->getShape();
 
     // ON AURA BESOIN DES SOMMETS DE LA COURBE DE DEPART PAR LA SUITE
     std::vector<Vertex*> c_vertices;
@@ -615,10 +618,11 @@ void GeomRevolImplementation::makeRevol(Curve* curve,std::vector<GeomEntity*>& r
     	//======================================================================
     	else{
     		TopoDS_Shape sh = mkR.Shape();
-
-    		if (sh.ShapeType()!=TopAbs_FACE)
-    			throw TkUtil::Exception(TkUtil::UTF8String ("configuration imprévue lors de la révolution d'une courbe: pas de surface générée", TkUtil::Charset::UTF_8));
-
+     		if (sh.ShapeType()!=TopAbs_FACE) {
+                TkUtil::UTF8String msg(TkUtil::Charset::UTF_8);
+                msg << "configuration imprévue lors de la révolution d'une courbe : pas de surface générée";
+    			throw TkUtil::Exception(msg);
+            }
     		TopoDS_Face f = TopoDS::Face(sh);
     		v_faces.push_back(f);
 
@@ -797,7 +801,10 @@ void GeomRevolImplementation::makeRevol(Curve* curve,std::vector<GeomEntity*>& r
     Utils::Math::Point pt1 = v1->getCoord();
     Utils::Math::Point pt2 = v2->getCoord();
     Curve* c_copy=0;
-   	c_copy = EntityFactory(m_context).newOCCCurve(shape);
+    if (shape.ShapeType() == TopAbs_WIRE)
+   	    c_copy = EntityFactory(m_context).newOCCCurve(TopoDS::Wire(shape));
+    else
+        c_copy = EntityFactory(m_context).newOCCCurve(TopoDS::Edge(shape));
 #ifdef _DEBUG2
     std::cout<<" création de la copie "<<c_copy->getName()<<std::endl;
 #endif

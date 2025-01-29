@@ -144,7 +144,6 @@ internalSpecificExecute()
 	
 	TopoDS_Wire wire = EntityFactory::buildWire(edges_and_wires);
 	Curve* newCurve = EntityFactory(getContext()).newOCCCurve(wire);
-	getContext().newGraphicalRepresentation (*newCurve);
 	m_newEntities.push_back(newCurve);
 
 	// mise en place des paramètres pour cette courbe composée

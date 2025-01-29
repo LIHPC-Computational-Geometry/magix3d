@@ -107,17 +107,19 @@
 #include <TopTools_ListOfShape.hxx>
 #include <TopTools_IndexedMapOfShape.hxx>
 #include <TopTools_IndexedDataMapOfShapeListOfShape.hxx>
-#include<ShapeAnalysis_ShapeContents.hxx>
-#include<BRepBuilderAPI_MakeVertex.hxx>
+#include <ShapeAnalysis_ShapeContents.hxx>
+#include <BRepBuilderAPI_MakeVertex.hxx>
 
 #include <BRepClass_FaceClassifier.hxx>
 #include <BRepExtrema_DistShapeShape.hxx>
 #include <BRepMesh_IncrementalMesh.hxx>
 #include <BRepClass3d_SolidClassifier.hxx>
+#include <GCPnts_AbscissaPoint.hxx>
 
 #include <GeomAPI_IntCS.hxx>
 #include <TDF_Label.hxx>
 #include <TNaming_Builder.hxx>
+#include <BRepAdaptor_CompCurve.hxx>
 
 /*----------------------------------------------------------------------------*/
 // utilisation du TopoDS_Shape::IsSame
@@ -1912,24 +1914,28 @@ void OCCGeomRepresentation::getPoint(const double& p, Utils::Math::Point& Pt,
         const bool in01)
 {
     gp_Pnt res;
-    if(m_shape.ShapeType()==TopAbs_EDGE){
-        BRepAdaptor_Curve brepCurve(TopoDS::Edge(m_shape));
-        if(in01)
-        {
-            double f= brepCurve.FirstParameter();
-            double l= brepCurve.LastParameter();
+    Adaptor3d_Curve* brepCurve;
+    if (m_shape.ShapeType()==TopAbs_EDGE)
+        brepCurve = new BRepAdaptor_Curve(TopoDS::Edge(m_shape));
+    else if (m_shape.ShapeType()==TopAbs_WIRE)
+        brepCurve = new BRepAdaptor_CompCurve(TopoDS::Wire(m_shape));
 
-            //p dans [0,1] a positionner dans [f,l]
-            if(f<l)
-                res = brepCurve.Value(f+p*(l-f));
-            else
-                res = brepCurve.Value(l+p*(f-l));
-        }
+    if(in01)
+    {
+        double f= brepCurve->FirstParameter();
+        double l= brepCurve->LastParameter();
+        //p dans [0,1] a positionner dans [f,l]
+        if(f<l)
+            res = brepCurve->Value(f+p*(l-f));
         else
-            res = brepCurve.Value(p);
+            res = brepCurve->Value(l+p*(f-l));
     }
-    else{
-    	MGX_FORBIDDEN("cas d'un wire");
+    else
+        res = brepCurve->Value(p);
+
+    delete brepCurve;
+
+//    	MGX_FORBIDDEN("cas d'un wire");
 //        //cas du wire, on est entre 0 et 1 et on gère nous même
 //        TopoDS_Wire w = TopoDS::Wire(m_shape);
 //        //====================================================================
@@ -2087,7 +2093,6 @@ void OCCGeomRepresentation::getPoint(const double& p, Utils::Math::Point& Pt,
 ////                <<" entre ("<<first_vertex->getX()<<", "<<first_vertex->getY()<<", "<<first_vertex->getZ()<<") et "
 ////                <<" ("<<second_vertex->getX()<<", "<<second_vertex->getY()<<", "<<second_vertex->getZ()<<")"
 ////                <<std::endl;
-    }
 
     Pt.setXYZ(res.X(), res.Y(), res.Z());
 }
