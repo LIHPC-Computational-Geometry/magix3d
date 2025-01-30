@@ -30,6 +30,8 @@
 #include <TkUtil/Exception.h>
 #include <TkUtil/ReferencedMutex.h>
 #include <TkUtil/MemoryError.h>
+
+/*----------------------------------------------------------------------------*/
 using namespace TkUtil;
 using namespace Mgx3D::Utils;
 
@@ -73,12 +75,6 @@ CommandCreateGeom::~CommandCreateGeom()
 
 }
 /*----------------------------------------------------------------------------*/
-void CommandCreateGeom::preExecute()
-{
-	if (!m_isPreview)
-		EntityFactory(getContext()).beginOCAFCommand();
-}
-/*----------------------------------------------------------------------------*/
 void CommandCreateGeom::postExecute(bool hasError)
 {
 	if (hasError){
@@ -102,13 +98,6 @@ void CommandCreateGeom::postExecute(bool hasError)
 		} // end for i<icmd.getNbGeomInfoEntity()
 
 		icmd.clear();
-
-		if (!m_isPreview)
-			EntityFactory(getContext()).abortOCAFCommand();
-	}
-	else {
-		if (!m_isPreview)
-			EntityFactory(getContext()).endOCAFCommand();
 	}
 }
 /*----------------------------------------------------------------------------*/
@@ -125,9 +114,6 @@ void CommandCreateGeom::internalUndo()
 
     AutoReferencedMutex autoMutex (getMutex ( ));
 
-    // gestion du undo via OCAF
-    EntityFactory(getContext()).undoOCAFCommand();
-
     // les entités détruites sont dites créées et inversement
     getInfoCommand().permCreatedDeleted();
 
@@ -143,9 +129,6 @@ void CommandCreateGeom::internalRedo()
     AutoReferencedMutex	autoMutex (getMutex ( ));
 
     startingOrcompletionLog (true);
-
-    // gestion du undo via OCAF
-    EntityFactory(getContext()).redoOCAFCommand();
 
     // les entités détruites sont dites créées et inversement
     getInfoCommand().permCreatedDeleted();

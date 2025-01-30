@@ -650,7 +650,6 @@ void QtMgx3DApplication::syntax (const string& exe) const
 	     << "[-outCharsetRef àéèùô][-outCharset charset][-icon fichier]"
 	     << "[-graphicalWindowWidth largeur][-graphicalWindowHeight hauteur]"
 	     << "[-graphicalWindowFixedSize]"
-		 << "[-useOCAF]"
 	     << "[-script file1.py][-script file2.py] ... [-script filen.py]"
 	     << endl << endl
 	     << " -h                                   : affiche ce message" <<endl
@@ -669,7 +668,6 @@ void QtMgx3DApplication::syntax (const string& exe) const
 			<< "affecte hauteur à la hauteur de la fenêtre graphique" << endl
 	     << "-graphicalWindowFixedSize             : "
 			<< "la fenêtre graphique ne peut pas être redimensionnée" << endl
-		<< " -useOCAF : utilisation d'OCAF pour la gestion du noyau gémétrique."<<endl
 		<< " -scripts fichier python               : exécute le fichier "
 			<< "python transmis en arguments au lancement de l'application." <<endl
 	     << endl << endl;

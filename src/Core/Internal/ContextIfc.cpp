@@ -355,11 +355,6 @@ Internal::M3DCommandResultIfc* ContextIfc::setLengthUnit(const Utils::Unit::leng
 	throw TkUtil::Exception ("ContextIfc::setLengthUnit should be overloaded.");
 }
 /*----------------------------------------------------------------------------*/
-ContextIfc::geomKernel ContextIfc::getGeomKernel() const
-{
-	throw TkUtil::Exception ("ContextIfc::getGeomKernel should be overloaded.");
-}
-/*----------------------------------------------------------------------------*/
 Internal::M3DCommandResultIfc* ContextIfc::setMesh2D()
 {
 	throw TkUtil::Exception ("ContextIfc::setMesh2D should be overloaded.");

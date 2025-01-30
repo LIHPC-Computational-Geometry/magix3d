@@ -37,10 +37,6 @@
 #include <gp_Pnt.hxx>
 #include <gp_Vec.hxx>
 
-#include <TDF_Data.hxx>
-#include <TDocStd_Application.hxx>
-#include <TDocStd_Document.hxx>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -115,43 +111,6 @@ class EntityFactory
     friend class CommandNewSurfaceByOffset;
 
 public:
-
-    /*------------------------------------------------------------------------*/
-    /** Conteneur modélisation géométrique en OCAF
-     *  Data Framework
-     */
-    //static Handle(TDF_Data) m_DF;
-    static Handle(TDocStd_Document) m_OCAFdoc;
-    static Handle(TDocStd_Application) m_OCAFapp;
-
-    /*------------------------------------------------------------------------*/
-    /** Initialise si nécessaire OCAF
-     */
-    static void initialize(Internal::ContextIfc::geomKernel gk);
-
-    /*------------------------------------------------------------------------*/
-    /** Retourne le label ra::cine OCAF */
-    static TDF_Label getOCAFRootLabel();
-
-    /*------------------------------------------------------------------------*/
-    /// Cas de l'utilisation d'OCAF
-    bool useOCAF() const;
-
-    /// début d'une commande pour OACF
-    void beginOCAFCommand();
-
-    /// fin d'une commande pour OCAF
-    void endOCAFCommand();
-
-    /// abandon d'une commande pour OCAF
-    void abortOCAFCommand();
-
-    /// annule la dernière commande OCAF
-    void undoOCAFCommand();
-
-    /// rejoue la dernière commande OCAF
-    void redoOCAFCommand();
-
     /*------------------------------------------------------------------------*/
     /** \brief
      */

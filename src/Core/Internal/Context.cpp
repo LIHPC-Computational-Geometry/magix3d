@@ -243,9 +243,6 @@ static TkUtil::Color nextColor (
 TkUtil::Log::TYPE	Context::m_logMask	= TkUtil::Log::PRODUCTION;
 TkUtil::ArgumentsMap	Context::m_argumentsMap;
 TkUtil::Charset		Context::m_outCharset (TkUtil::Charset::UTF_8);
-/** Utilisation d'OCC (sans OCAF) par défaut */
-ContextIfc::geomKernel Context::m_geom_kernel = ContextIfc::WITHOCC;
-
 
 TkUtil::Color	Context::m_initial_geom_displayColor (255, 0, 127);
 TkUtil::Color	Context::m_initial_topo_displayColor (0, 1, 1);	// Initialisé dans initialize
@@ -573,9 +570,6 @@ Context::Context(const std::string& name, bool withStdOutputs)
 	m_group3DisplayProperties.setPointSize(5.0);
 	m_group3DisplayProperties.setDisplayed(false);
 	m_group3DisplayProperties.setDisplayable(false);
-
-    // initialisation méthode OCC ou OCAF
-    Geom::EntityFactory::initialize(getGeomKernel());
 }
 /*----------------------------------------------------------------------------*/
 Context::Context (const Context&)
@@ -709,7 +703,6 @@ void Context::initialize (int argc, char* argv [])
 	std::string	outCharsetRefString;
 
 	outCharsetRefString	= m_argumentsMap.getArgValue ("-outCharsetRef", std::string ( ), false);
-	m_geom_kernel	= true == m_argumentsMap.hasArg ("-useOCAF") ? ContextIfc::WITHOCAF : ContextIfc::WITHOCC;
 	std::string	charset;
 	if (true == m_argumentsMap.hasArg ("-outCharset"))
 		charset	= m_argumentsMap.getArgValue ("-outCharset", std::string ( ), false);
@@ -1421,6 +1414,7 @@ Utils::DisplayProperties* Context::newDisplayProperties(const Utils::Entity::obj
 /*----------------------------------------------------------------------------*/
 void Context::newGraphicalRepresentation (Utils::Entity& entity)
 {
+	std::cout << "Context::newGraphicalRepresentation " << entity.getName() << std::endl; 
     if (!isGraphical())
         return;
 

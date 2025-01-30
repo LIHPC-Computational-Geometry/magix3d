@@ -19,7 +19,6 @@
 #include <TopoDS_Vertex.hxx>
 #include <TopoDS_Solid.hxx>
 #include <TopTools_IndexedMapOfShape.hxx>
-#include <TDF_Label.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -49,11 +48,6 @@ public:
     /** \brief  Destructeur
      */
     virtual ~OCCGeomRepresentation();
-
-    /*------------------------------------------------------------------------*/
-    /** Cas d'utilisation de OCAF
-     */
-    bool useOCAF() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Compare topologiquement 2 shapes OCC de manière générale. A
@@ -374,13 +368,6 @@ public:
   //  TopoDS_Shape const& getShape() const;
     TopoDS_Shape getShape();
 
-    /** \brief Accès au label OCAF
-     */
-    TDF_Label getLabel() const;
-
-    /// changement de label racine
-    static void setRootLabel(TDF_Label label) {OCCGeomRepresentation::m_rootLabel = label;}
-
     /*------------------------------------------------------------------------*/
     /** \brief  Accès à la shape OCC sous-jacente via un pointeur.
      */
@@ -462,12 +449,6 @@ protected:
     Internal::Context & m_context;
 
     TopoDS_Shape m_shape;
-
-    /// label pour OCAF
-    TDF_Label m_label;
-
-    /// le label pour ajouter les construction suivantes
-    static TDF_Label m_rootLabel;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

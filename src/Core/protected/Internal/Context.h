@@ -115,7 +115,6 @@ public:
      *		la sortie standard (API TkUtil::Locale)<BR>
      *		-outCharset suivi de UTF-8, UTF-16, ISO-8859 ou ASCII pour imposer le jeu
      *          de caractères de la sortie standard.
-     *      -useOCAF
      * Détection de l'encodage de la sortie standard.
      */
     static void initialize (int argc, char* argv []);
@@ -511,10 +510,6 @@ public:
 	/// change la dimension pour le maillage en sortie, 3D par défaut
 	virtual Internal::M3DCommandResultIfc* setMesh2D();
 
-   /*------------------------------------------------------------------------*/
-    /// type de gestionnaire géométrique
-    virtual geomKernel getGeomKernel() const {return m_geom_kernel;}
-
     /*------------------------------------------------------------------------*/
     /** Réinitialisation de la session
      */
@@ -677,9 +672,6 @@ protected:
 
     /** Le jeu de caractères utilisé par la sortie standard. */
     static TkUtil::Charset		m_outCharset;
-
-	/** gestionnaire noyau géométrique */
-    static geomKernel m_geom_kernel;
 
 	/** booléen positionné à vrai seulement lorsque la sessione est terminée
 	 * (destruction du context)
