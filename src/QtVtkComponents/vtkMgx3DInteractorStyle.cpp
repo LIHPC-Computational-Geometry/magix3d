@@ -34,6 +34,19 @@ using namespace Mgx3D::QtVtkComponents;
 const unsigned long		vtkMgx3DInteractorStyle::ViewRedefinedEvent	= 105000;
 
 
+
+/**
+ * Pour que les entités sélectionnées soient classées par ordre alphabétique et non par l'algo de la classe set :
+ */
+bool entityComparator (const Entity* lhs, const Entity* rhs)
+{
+	if ((0 == lhs) || (0 == rhs))
+		return true;
+		
+	return lhs->getName ( ) < rhs->getName ( );
+}	// entityComparator
+
+
 vtkMgx3DInteractorStyle::vtkMgx3DInteractorStyle ( )
 	: vtkUnifiedInteractorStyle ( ), Mgx3DPicker (0), Mgx3DPickerCommand (0), SelectionManager (0), SeizureManager (0), 
 	  InteractiveSelectionActivated (false), RubberButtonDown (false), RubberBand (false), CompletelyInsideSelection (false),
@@ -468,7 +481,7 @@ void vtkMgx3DInteractorStyle::OnRightButtonDown ( )
 		vtkUnifiedInteractorStyle::OnRightButtonDown ( );
 }	// vtkMgx3DInteractorStyle::OnRightButtonDown
 
-
+    
 void vtkMgx3DInteractorStyle::OnLeftButtonUp ( )
 {
 	// Arrêter un éventuel déclenchement d'interaction :
@@ -512,25 +525,28 @@ void vtkMgx3DInteractorStyle::OnLeftButtonUp ( )
 			vtkProp3D*					p			= 0;
 			vtkCollectionSimpleIterator	csi;
 			pickedProps->InitTraversal (csi);
-			vector<Entity*>	entities;
+			set<Entity*, decltype(&entityComparator)>	entities (&entityComparator);
 			while (0 != (p = pickedProps->GetNextProp3D (csi)))
 			{
 				bool			add	= true;
 				VTKMgx3DActor*	a	= dynamic_cast<VTKMgx3DActor*>(p);
 				if (0 != a)
-					entities.push_back (a->GetEntity ( ));
+					entities.insert (a->GetEntity ( ));
 			}	// while (0 != (p = pickedProps->GetNextProp3D (csi)))
 			if (0 != SelectionManager)
 			{
 				if (false == isControlKeyPressed ( ))
 				{
 					SelectionManager->clearSelection ( );
-					SelectionManager->addToSelection (entities);
+					vector<Entity*>	selection;
+					for (set<Entity*>::const_iterator ite = entities.begin ( ); entities.end ( ) != ite; ite++)
+						selection.push_back (*ite);
+					SelectionManager->addToSelection (selection);
 				}
 				else
 				{	// Ne pas ajouter une entité déjà présente car sinon au premier undo de la sélection on la retire de toute la pile de sélection
 					vector<Entity*>	filteredEntities;
-					for (vector<Entity*>::const_iterator ite = entities.begin ( ); entities.end ( ) != ite; ite++)
+					for (set<Entity*>::const_iterator ite = entities.begin ( ); entities.end ( ) != ite; ite++)
 						if (false == SelectionManager->isSelected(**ite))
 							filteredEntities.push_back (*ite);
 
