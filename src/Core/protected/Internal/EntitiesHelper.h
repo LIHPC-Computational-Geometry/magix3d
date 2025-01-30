@@ -130,6 +130,10 @@ public:
 
 	/// recherche le type d'un objet en fonction de son nom
 	static Utils::Entity::objectType getObjectType(TkUtil::UTF8String& nomObj);
+	
+	/// retourne la boite englobante d'un ensemble d'entités. Le bouléen retourné vaut false en cas d'échec.
+	static bool getBounds (const std::vector<Utils::Entity*>& entities, double bounds [6]);
+	
 
 private :
 

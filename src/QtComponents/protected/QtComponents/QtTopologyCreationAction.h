@@ -90,6 +90,11 @@ class QtTopologyCreationPanel : public QtMgx3DOperationPanel
 	 * \return		Le ratio de l'éventuel O-grid.
 	 */
 	virtual double getOGridRatio ( ) const;
+	
+	/**
+	 * \return		true si il faut positionner les vertex sur les coins de la boite englobant la sélection courante
+	 */
+	virtual bool placeVerticesOnSelectionBounds ( ) const;
 
 	/**
 	 * Réinitialise le panneau.
@@ -167,6 +172,9 @@ class QtTopologyCreationPanel : public QtMgx3DOperationPanel
 
 	/** La topologie créée. */
 	QtTopologyPanel*							_topologyPanel;
+	
+	/** Faut-il positionner les sommets topologiques sur les coins de la boite englobant une sélection ? */
+	QCheckBox*									_selectionCheckBox;
 };	// class QtTopologyCreationPanel
 
 

@@ -535,6 +535,11 @@ public:
 	 */
 	virtual std::vector<Utils::Entity*> get(const std::vector<unsigned long>& ids, bool raisesIfNotFound) const;
 
+	/** \brief Retourne les entités dont les noms sont transmis en argument.
+	 *         Une exception est levée si une entité n'est pas dans le contexte
+	 *         et si le second argument vaut true.
+	 */
+	virtual std::vector<Utils::Entity*> get(const std::vector<std::string>& names, bool raisesIfNotFound) const;
 
     /**  Vide la table de correspondance entre un unique id et l'objet
      *

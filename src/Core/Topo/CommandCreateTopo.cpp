@@ -35,6 +35,9 @@ namespace Topo {
 /*----------------------------------------------------------------------------*/
 CommandCreateTopo::CommandCreateTopo(Internal::Context& c, std::string name)
 : CommandEditTopo (c, name)
+, m_blocks ( )
+, m_cofaces ( )
+, m_bounding_entities ( )
 , m_geom_entity(0)
 , m_command_create_geom(0)
 , m_structured(true)

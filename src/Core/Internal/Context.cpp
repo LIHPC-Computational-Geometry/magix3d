@@ -1838,6 +1838,21 @@ std::vector<Utils::Entity*> Context::get (
 	return entities;
 }	// ContextIfc::get
 /*----------------------------------------------------------------------------*/
+std::vector<Utils::Entity*> Context::get (
+					const std::vector<std::string>& names, bool raises) const
+{
+	std::vector<Utils::Entity*> entities;
+	for (std::vector<std::string>::const_iterator it = names.begin ( );
+	     names.end ( ) != it; it++)
+	{
+		for (std::map<unsigned long, Utils::Entity*>::const_iterator ite = _entities.begin();
+			ite != _entities.end(); ++ite)
+			if (*it == (*ite).second->getName())
+				entities.push_back((*ite).second);
+	}
+	return entities;
+}
+/*----------------------------------------------------------------------------*/
 void Context::clearIdToEntity()
 {
 	TkUtil::AutoMutex	autoMutex (&_entitiesMutex);

@@ -91,6 +91,15 @@ public:
     /** \brief  retourne l'entité géométrique pour la construction de la topologie
      */
     Geom::GeomEntity* getGeomEntity() const {return m_geom_entity;}
+    
+    /*------------------------------------------------------------------------*/
+    /** \brief  permet de spécifier une boite englobante de positionnement des sommets via une liste d'entités
+     */
+    void setBoundingEntities (const std::vector<Utils::Entity*>& ve) { m_bounding_entities = ve; }
+    
+    /** \brief permet de connaître les entités définissant la boite englobante de positionnement des sommets
+     */
+    const std::vector<Utils::Entity*> getBoundingEntities ( ) const { return m_bounding_entities; }
 
     /*------------------------------------------------------------------------*/
     /** \brief  permet de spécifier une commande de construction géométrique
@@ -118,6 +127,9 @@ private:
 
     /** resultat de l'opération (on ne stocke que les nouvelles CoFaces) */
     std::vector<CoFace* > m_cofaces;
+    
+    /** Les entités définissant la boite englobante de positionnement des sommets */
+    std::vector<Utils::Entity*> m_bounding_entities;
 
     /** parametre optionnel de l'opération */
     Geom::GeomEntity* m_geom_entity;

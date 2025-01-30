@@ -15,6 +15,7 @@
 #include "Utils/Common.h"
 #include "Internal/ServiceGeomToTopo.h"
 #include "Internal/Context.h"
+#include "Internal/EntitiesHelper.h"
 #include "Group/Group3D.h"
 #include "Group/Group2D.h"
 /*----------------------------------------------------------------------------*/
@@ -267,6 +268,22 @@ internalExecute()
 				bl->getVertex(true,  false, true )->setCoord(Utils::Math::Point(pmax.getX(), pmin.getY(), pmax.getZ()));
 				bl->getVertex(false, true,  true )->setCoord(Utils::Math::Point(pmin.getX(), pmax.getY(), pmax.getZ()));
 				bl->getVertex(true,  true,  true )->setCoord(Utils::Math::Point(pmax.getX(), pmax.getY(), pmax.getZ()));
+			}
+			else 	// Pas de geom entity associée : une sélection pour positionner les sommets ?
+			{
+				const std::vector<Utils::Entity*>&	boundingEntities	= getBoundingEntities ( );
+				double	bounds [6]	= { 0., 0., 0., 0., 0., 0. };
+				if (false == Internal::EntitiesHelper::getBounds (boundingEntities, bounds))
+					throw TkUtil::Exception (TkUtil::UTF8String ("Erreur Interne, CommandNewTopoOnGeometry sans entité pour définir la position des sommets", TkUtil::Charset::UTF_8));
+					
+				bl->getVertex (false, false, false)->setCoord (Utils::Math::Point (bounds [0], bounds [2], bounds [4]));
+				bl->getVertex (false, false, true)->setCoord (Utils::Math::Point (bounds [0], bounds [2], bounds [5]));
+				bl->getVertex (false, true, false)->setCoord (Utils::Math::Point (bounds [0], bounds [3], bounds [4]));
+				bl->getVertex (false, true, true)->setCoord (Utils::Math::Point (bounds [0], bounds [3], bounds [5]));
+				bl->getVertex (true, false, false)->setCoord (Utils::Math::Point (bounds [1], bounds [2], bounds [4]));
+				bl->getVertex (true, false, true)->setCoord (Utils::Math::Point (bounds [1], bounds [2], bounds [5]));
+				bl->getVertex (true, true, false)->setCoord (Utils::Math::Point (bounds [1], bounds [3], bounds [4]));
+				bl->getVertex (true, true, true)->setCoord (Utils::Math::Point (bounds [1], bounds [3], bounds [5]));
 			}
 		}
 		// stockage dans le InfoCommand des différentes entités (bloc et niveau inférieur)

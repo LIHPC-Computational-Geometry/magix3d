@@ -53,7 +53,7 @@ QtTopologyCreationPanel::QtTopologyCreationPanel (
 			const string& helpURL,
 			const string& helpTag)
 	: QtMgx3DOperationPanel (parent, mainWindow, action, helpURL, helpTag),
-	  _geomEntityPanel (0), _topologyPanel (0)
+	  _geomEntityPanel (0), _topologyPanel (0), _selectionCheckBox (0)
 {
 //	SET_WIDGET_BACKGROUND (this, Qt::yellow)
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
@@ -81,32 +81,32 @@ QtTopologyCreationPanel::QtTopologyCreationPanel (
 					entityNameType = "Volume :";
 					break;
 	}	// switch (dimension)
-	_geomEntityPanel	= new QtMgx3DEntityPanel (
-							this, "", true, entityNameType, "",
-							&mainWindow, dimension, filter);
+	_geomEntityPanel	= new QtMgx3DEntityPanel (this, "", true, entityNameType, "", &mainWindow, dimension, filter);
 	layout->addWidget (_geomEntityPanel);
-	connect (_geomEntityPanel, SIGNAL (entitiesAddedToSelection(QString)),
-	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
-	connect (_geomEntityPanel, SIGNAL (entitiesRemovedFromSelection(QString)),
-	         this, SLOT (entitiesRemovedFromSelectionCallback (QString)));
+	connect (_geomEntityPanel, SIGNAL (entitiesAddedToSelection(QString)), this, SLOT (entitiesAddedToSelectionCallback (QString)));
+	connect (_geomEntityPanel, SIGNAL (entitiesRemovedFromSelection(QString)), this, SLOT (entitiesRemovedFromSelectionCallback (QString)));
 
 	QLabel* ouLabel = new QLabel("Ou", this);
 	layout->addWidget (ouLabel);
 
 	// Le panneau "Topologie créée" :
-	bool	use3DLabels	=
-		SelectionManagerIfc::D3 <= dimension ? true : false;
-	int	groupDimension	= SelectionManagerIfc::dimensionsToDimension(dimension);
-	_topologyPanel	= new QtTopologyPanel (
-		this, mainWindow, true, true, groupDimension,
-		defaultTopo, defaultCoords, 10, 10, 10, use3DLabels, true);
+	bool	use3DLabels	= SelectionManagerIfc::D3 <= dimension ? true : false;
+	int	groupDimension	= SelectionManagerIfc::dimensionsToDimension (dimension);
+	_topologyPanel	= new QtTopologyPanel (this, mainWindow, true, true, groupDimension, defaultTopo, defaultCoords, 10, 10, 10, use3DLabels, true);
 	_topologyPanel->createTopology (true);
 	_topologyPanel->displayTopologyCreation (false);
-	connect (_topologyPanel, SIGNAL (topologyCreationModified ( )), this,
-	         SLOT (topologyModifiedCallback ( )));
-	connect (_topologyPanel, SIGNAL (topologyTypeModified ( )), this,
-	         SLOT (topologyModifiedCallback ( )));
+	connect (_topologyPanel, SIGNAL (topologyCreationModified ( )), this, SLOT (topologyModifiedCallback ( )));
+	connect (_topologyPanel, SIGNAL (topologyTypeModified ( )), this, SLOT (topologyModifiedCallback ( )));
 	layout->addWidget (_topologyPanel);
+	
+	// Utiliser la sélection pour positionner les vertex ?
+	switch (dimension)
+	{
+		case SelectionManagerIfc::D3	:
+			_selectionCheckBox	= new QCheckBox ("Sommets aux coins de la sélection", this);
+			layout->addWidget (_selectionCheckBox);
+			break;
+	}	// switch (dimension)
 
 	CHECK_NULL_PTR_ERROR (_geomEntityPanel->getNameTextField ( ))
 	_geomEntityPanel->getNameTextField ( )->setLinkedSeizureManagers (0, 0);
@@ -118,18 +118,15 @@ QtTopologyCreationPanel::QtTopologyCreationPanel (
 }	// QtTopologyCreationPanel::QtTopologyCreationPanel
 
 
-QtTopologyCreationPanel::QtTopologyCreationPanel (
-										const QtTopologyCreationPanel& cao)
-	: QtMgx3DOperationPanel (
-			0, *new QtMgx3DMainWindow(0), 0, "", ""),
-	  _geomEntityPanel (0), _topologyPanel (0)
+QtTopologyCreationPanel::QtTopologyCreationPanel (const QtTopologyCreationPanel& cao)
+	: QtMgx3DOperationPanel (0, *new QtMgx3DMainWindow(0), 0, "", ""),
+	  _geomEntityPanel (0), _topologyPanel (0), _selectionCheckBox (0)
 {
 	MGX_FORBIDDEN ("QtTopologyCreationPanel copy constructor is not allowed.");
 }	// QtTopologyCreationPanel::QtTopologyCreationPanel (const QtTopologyCreationPanel&)
 
 
-QtTopologyCreationPanel& QtTopologyCreationPanel::operator = (
-											const QtTopologyCreationPanel&)
+QtTopologyCreationPanel& QtTopologyCreationPanel::operator = (const QtTopologyCreationPanel&)
 {
 	MGX_FORBIDDEN ("QtTopologyCreationPanel assignment operator is not allowed.");
 	return *this;
@@ -167,6 +164,12 @@ double QtTopologyCreationPanel::getOGridRatio ( ) const
 	CHECK_NULL_PTR_ERROR (_topologyPanel)
 	 return _topologyPanel->getOGridRatio ( );
 }	// QtTopologyCreationPanel::getOGridRatio
+
+
+bool QtTopologyCreationPanel::placeVerticesOnSelectionBounds ( ) const
+{
+	return 0 == _selectionCheckBox ? false : _selectionCheckBox->isChecked ( );
+}	// QtTopologyCreationPanel::placeVerticesOnSelectionBounds
 
 
 void QtTopologyCreationPanel::reset ( )
@@ -244,10 +247,8 @@ void QtTopologyCreationPanel::autoUpdate ( )
 	{
 		BEGIN_QT_TRY_CATCH_BLOCK
 
-		FilterEntity::objectType	types	=
-				_geomEntityPanel->getNameTextField ( )->getFilteredTypes ( );
-		vector<string>	selectedVolumes	=
-							getSelectionManager ( ).getEntitiesNames (types);
+		FilterEntity::objectType	types			= _geomEntityPanel->getNameTextField ( )->getFilteredTypes ( );
+		vector<string>				selectedVolumes	= getSelectionManager ( ).getEntitiesNames (types);
 		if (1 == selectedVolumes.size ( ))
 			setGeomEntityName (selectedVolumes [0]);
 
@@ -269,8 +270,7 @@ vector<Entity*> QtTopologyCreationPanel::getInvolvedEntities ( )
 	const string	geomName	= getGeomEntityName ( );
 
 	if (0 != geomName.length ( ))
-		entities.push_back (
-				getContext ( ).getGeomManager ( ).getEntity (geomName, true));
+		entities.push_back (getContext ( ).getGeomManager ( ).getEntity (geomName, true));
 
 	return entities;
 }	// QtTopologyCreationPanel::getInvolvedEntities
@@ -315,14 +315,18 @@ void QtTopologyCreationPanel::topologyModifiedCallback ( )
 	if (0 != getMainWindow ( ))
 		getMainWindow ( )->getOperationsPanel ( ).updateLayoutWorkaround( );
 
-	bool	allowGroup	= false;
+	bool	allowGroup		= false;
+	bool	allowSelection	= false;
 	switch (getTopologyType ( ))
 	{
 		case QtTopologyPanel::STRUCTURED_FREE_TOPOLOGY	:
-			allowGroup	= true;
+			allowGroup		= true;
+			allowSelection	= true;
 			break;
 	}	// switch (getTopologyType ( ))
 	getTopologyPanel ( ).allowGroupName (allowGroup);
+	if (0 != _selectionCheckBox)
+		_selectionCheckBox->setEnabled (allowSelection);
 }	// QtTopologyCreationPanel::topologyModifiedCallback
 
 
@@ -330,17 +334,14 @@ void QtTopologyCreationPanel::topologyModifiedCallback ( )
 //                  LA CLASSE QtTopologyCreationAction
 // ===========================================================================
 
-QtTopologyCreationAction::QtTopologyCreationAction (
-	const QIcon& icon, const QString& text,
-	QtMgx3DMainWindow& mainWindow, const QString& tooltip)
+QtTopologyCreationAction::QtTopologyCreationAction (const QIcon& icon, const QString& text, QtMgx3DMainWindow& mainWindow, const QString& tooltip)
 	: QtMgx3DTopoOperationAction (icon, text, mainWindow, tooltip)
 {
 }	// QtTopologyCreationAction::QtTopologyCreationAction
 
 
 QtTopologyCreationAction::QtTopologyCreationAction (const QtTopologyCreationAction&)
-	: QtMgx3DTopoOperationAction (
-						QIcon (""), "", *new QtMgx3DMainWindow (0), "")
+	: QtMgx3DTopoOperationAction (QIcon (""), "", *new QtMgx3DMainWindow (0), "")
 {
 	MGX_FORBIDDEN ("QtTopologyCreationAction copy constructor is not allowed.")
 }	// QtTopologyCreationAction::QtTopologyCreationAction
