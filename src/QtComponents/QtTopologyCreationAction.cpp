@@ -53,7 +53,7 @@ QtTopologyCreationPanel::QtTopologyCreationPanel (
 			const string& helpURL,
 			const string& helpTag)
 	: QtMgx3DOperationPanel (parent, mainWindow, action, helpURL, helpTag),
-	  _geomEntityPanel (0), _topologyPanel (0), _selectionCheckBox (0)
+	  _geomEntityPanel (0), _topologyPanel (0), _selectionCheckBox (0), _selectionEntitiesPanel (0)
 {
 //	SET_WIDGET_BACKGROUND (this, Qt::yellow)
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
@@ -105,11 +105,16 @@ QtTopologyCreationPanel::QtTopologyCreationPanel (
 		case SelectionManagerIfc::D3	:
 			_selectionCheckBox	= new QCheckBox ("Sommets aux coins de la sélection", this);
 			layout->addWidget (_selectionCheckBox);
+			_selectionEntitiesPanel	= new QtMgx3DEntityPanel (this, "", true, "Entités : ", "", &mainWindow, SelectionManagerIfc::ALL_DIMENSIONS, FilterEntity::All);
+			_selectionEntitiesPanel->setMultiSelectMode (true);
+			layout->addWidget (_selectionEntitiesPanel);
 			break;
 	}	// switch (dimension)
 
 	CHECK_NULL_PTR_ERROR (_geomEntityPanel->getNameTextField ( ))
-	_geomEntityPanel->getNameTextField ( )->setLinkedSeizureManagers (0, 0);
+	_geomEntityPanel->getNameTextField ( )->setLinkedSeizureManagers (0, 0 == _selectionEntitiesPanel ? 0 : _selectionEntitiesPanel->getNameTextField ( ));
+	if ((0 != _selectionEntitiesPanel) && (0 != _selectionEntitiesPanel->getNameTextField ( )))
+		_selectionEntitiesPanel->getNameTextField ( )->setLinkedSeizureManagers (0 == _geomEntityPanel ? 0 : _geomEntityPanel->getNameTextField ( ), 0);
 
 	topologyModifiedCallback ( );
 
@@ -120,7 +125,7 @@ QtTopologyCreationPanel::QtTopologyCreationPanel (
 
 QtTopologyCreationPanel::QtTopologyCreationPanel (const QtTopologyCreationPanel& cao)
 	: QtMgx3DOperationPanel (0, *new QtMgx3DMainWindow(0), 0, "", ""),
-	  _geomEntityPanel (0), _topologyPanel (0), _selectionCheckBox (0)
+	  _geomEntityPanel (0), _topologyPanel (0), _selectionCheckBox (0), _selectionEntitiesPanel (0)
 {
 	MGX_FORBIDDEN ("QtTopologyCreationPanel copy constructor is not allowed.");
 }	// QtTopologyCreationPanel::QtTopologyCreationPanel (const QtTopologyCreationPanel&)
@@ -170,6 +175,13 @@ bool QtTopologyCreationPanel::placeVerticesOnSelectionBounds ( ) const
 {
 	return 0 == _selectionCheckBox ? false : _selectionCheckBox->isChecked ( );
 }	// QtTopologyCreationPanel::placeVerticesOnSelectionBounds
+
+
+vector<string> QtTopologyCreationPanel::getBoundingEntities ( ) const
+{
+	CHECK_NULL_PTR_ERROR(_selectionEntitiesPanel)
+	return _selectionEntitiesPanel->getUniqueNames ( );
+}	// QtTopologyCreationPanel::getBoundingEntities
 
 
 void QtTopologyCreationPanel::reset ( )
@@ -231,6 +243,7 @@ void QtTopologyCreationPanel::cancel ( )
 		BEGIN_QT_TRY_CATCH_BLOCK
 
 		setGeomEntityName ("");
+	
 
 		COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
 	}	// if (true == cancelClearEntities ( ))
@@ -252,10 +265,19 @@ void QtTopologyCreationPanel::autoUpdate ( )
 		if (1 == selectedVolumes.size ( ))
 			setGeomEntityName (selectedVolumes [0]);
 
+		// A affiner :
+		if (0 != _selectionEntitiesPanel)
+		{	// Les sommets sont susceptibles d'être positionnés sur la boite englobante de la sélection
+			const vector<string>	selection	= getSelectionManager ( ).getEntitiesNames ( );
+			_selectionEntitiesPanel->setUniqueNames (selection);
+		}	// if (0 != _selectionEntitiesPanel)
+
 		COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
 	}	// if (true == autoUpdateUsesSelection ( ))
 #else	// AUTO_UPDATE_OLD_SCHEME
 	_geomEntityPanel->clearSelection ( );
+	if (0 != _selectionEntitiesPanel)
+		_selectionEntitiesPanel->clearSelection ( );
 #endif	// AUTO_UPDATE_OLD_SCHEME
 
 	_geomEntityPanel->actualizeGui (true);
@@ -327,6 +349,8 @@ void QtTopologyCreationPanel::topologyModifiedCallback ( )
 	getTopologyPanel ( ).allowGroupName (allowGroup);
 	if (0 != _selectionCheckBox)
 		_selectionCheckBox->setEnabled (allowSelection);
+	if (0 != _selectionEntitiesPanel)
+		_selectionEntitiesPanel->setEnabled (allowSelection);
 }	// QtTopologyCreationPanel::topologyModifiedCallback
 
 

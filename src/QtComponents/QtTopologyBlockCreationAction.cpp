@@ -158,7 +158,7 @@ void QtTopologyBlockCreationAction::executeOperation ( )
 					cmdResult	= getContext ( ).getTopoManager( ).newFreeTopoInGroup (groupName, 3);
 				else
 				{
-					vector<string>	names	= getContext ( ).getSelectionManager ( ).getEntitiesNames ( );
+					vector<string>	names	= panel->getBoundingEntities ( );
 					cmdResult	= getContext ( ).getTopoManager( ).newFreeBoundedTopoInGroup (groupName, 3, names);
 				}	// else if (false == verticesOnSelection)
 			}
