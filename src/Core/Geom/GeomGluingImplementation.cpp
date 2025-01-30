@@ -94,12 +94,8 @@ void GeomGluingImplementation::perform(std::vector<GeomEntity*>& res)
     if(dim_ref==3){
     	sewVolumes(res);
     }
-    else if (dim_ref==1)
-        sewCurves(res);
 
     res.insert(res.end(),entities_new.begin(),entities_new.end());
-
-
 }
 /*----------------------------------------------------------------------------*/
 void GeomGluingImplementation::sewVolumes(std::vector<GeomEntity*>& res)
@@ -131,37 +127,6 @@ void GeomGluingImplementation::sewVolumes(std::vector<GeomEntity*>& res)
 	TopoDS_Shape s1 = splitter.Shape();
 
 	createGeomEntities(s1,true);
-	//createGeomEntities(splitter);
-
-//    //=========================================================================
-//    std::map<GeomEntity*, std::vector<GeomEntity*> >::iterator it = m_replacedEntities.begin();
-//    while(it!=m_replacedEntities.end()){
-//        GeomEntity* oldE = it->first;
-//        std::vector<GeomEntity*> newE = it->second;
-//        std::cout<<oldE->getName()<<" replaced by"<<std::endl;
-//        for(unsigned int i=0;i<newE.size();i++)
-//            std::cout<<"\t "<<newE[i]->getName()<<std::endl;
-//        it++;
-//    }
-}
-/*----------------------------------------------------------------------------*/
-void GeomGluingImplementation::sewCurves(std::vector<GeomEntity*>& res)
-{
-	throw TkUtil::Exception (TkUtil::UTF8String ("sewCurve non fonctionnel", TkUtil::Charset::UTF_8));
-    //on conserve dans un vecteur les shapes OCC des objets M3D initiaux
-    BRep_Builder B;
-    TopoDS_Compound compound;
-    TopoDS_Wire w;
-    B.MakeCompound(compound);
-
-    for(unsigned int i=0;i<m_init_entities.size();i++)
-    {
-        GeomEntity* ei = m_init_entities[i];
-        TopoDS_Shape si;
-        getOCCShape(ei, si);
-        B.Add(compound,si);
-    }
-
 }
 /*----------------------------------------------------------------------------*/
 /*----------------------------------------------------------------------------*/

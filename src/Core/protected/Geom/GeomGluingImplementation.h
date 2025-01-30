@@ -68,11 +68,6 @@ protected:
      */
     void sewVolumes(std::vector<GeomEntity*>& res);
 
-    /*------------------------------------------------------------------------*/
-    /** \brief  réalisation de l'union de courbes
-     */
-    void sewCurves(std::vector<GeomEntity*>& res);
-
 private:
 
     /** Entités qui vont être modifiées par l'algorithme. Purement technique pour
