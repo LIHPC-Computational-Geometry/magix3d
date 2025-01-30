@@ -86,15 +86,6 @@ public:
 		WITHCOORD=2
 	};
 
-
-	/*------------------------------------------------------------------------*/
-	/** Suivant ce que l'on souhaite comme gestionnaire pour noyau géométrique
-	 */
-	enum geomKernel {
-		WITHOCC=0,
-		WITHOCAF=1
-	};
-
 	/*------------------------------------------------------------------------*/
 	/** Possibilité de spécifier que le maillage est 2D
 	 */
@@ -354,10 +345,6 @@ public:
     /// change l'unité de longueur
     virtual Internal::M3DCommandResultIfc* setLengthUnit(const Utils::Unit::lengthUnit& lu);
 	SET_SWIG_COMPLETABLE_METHOD(setLengthUnit)
-
-    /// type de gestionnaire géométrique
-    virtual geomKernel getGeomKernel() const;
-	SET_SWIG_COMPLETABLE_METHOD(getGeomKernel)
 
 	/// retourne la dimension du maillage en sortie
 	virtual meshDim getMeshDim() const;

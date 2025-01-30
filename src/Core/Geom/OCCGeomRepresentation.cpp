@@ -116,8 +116,6 @@
 #include <BRepClass3d_SolidClassifier.hxx>
 
 #include <GeomAPI_IntCS.hxx>
-#include <TDF_Label.hxx>
-#include <TNaming_Builder.hxx>
 
 /*----------------------------------------------------------------------------*/
 // utilisation du TopoDS_Shape::IsSame
@@ -131,20 +129,12 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 /*----------------------------------------------------------------------------*/
-TDF_Label OCCGeomRepresentation::m_rootLabel=TDF_Label();
-/*----------------------------------------------------------------------------*/
 OCCGeomRepresentation::OCCGeomRepresentation(Internal::Context& c,
 			const TopoDS_Shape& shape)
-:m_context(c), m_shape(shape), m_label()
+:m_context(c), m_shape(shape)
 {
     // on ne fait pas appel à BRepBuilderAPI_Copy ici car dans ce cas les shapes
     // "identiques" ne sont pas reconnues comme telles (différentes avec IsSame)
-
-	if (useOCAF()){
-		m_label = m_rootLabel.FindChild(m_context.nextUniqueId());
-		TNaming_Builder tnb(m_label);
-		tnb.Generated(m_shape);
-	}
 }
 /*----------------------------------------------------------------------------*/
 OCCGeomRepresentation::OCCGeomRepresentation(const OCCGeomRepresentation& rep)
@@ -152,29 +142,13 @@ OCCGeomRepresentation::OCCGeomRepresentation(const OCCGeomRepresentation& rep)
 {
     // on ne fait pas appel à BRepBuilderAPI_Copy ici car dans ce cas les shapes
     // "identiques" ne sont pas reconnues comme telles (différentes avec IsSame)
-
-	if (useOCAF()){
-		m_label = m_rootLabel.FindChild(m_context.nextUniqueId());
-		TNaming_Builder tnb(m_label);
-		tnb.Generated(m_shape);
-	}
 }
 /*----------------------------------------------------------------------------*/
 OCCGeomRepresentation::~OCCGeomRepresentation()
 {}
 /*----------------------------------------------------------------------------*/
-bool OCCGeomRepresentation::useOCAF() const
-{
-	return (m_context.getGeomKernel() == Internal::ContextIfc::WITHOCAF);
-}
-/*----------------------------------------------------------------------------*/
 TopoDS_Shape OCCGeomRepresentation::getShape()  {
     return m_shape;
-}
-/*----------------------------------------------------------------------------*/
-TDF_Label OCCGeomRepresentation::getLabel() const
-{
-	return m_label;
 }
 /*----------------------------------------------------------------------------*/
 void OCCGeomRepresentation::addShapeToLists(TopoDS_Shape& shape,
@@ -1396,11 +1370,6 @@ bool OCCGeomRepresentation::areEquals(const TopoDS_Vertex& v1,
 void OCCGeomRepresentation::split(std::vector<Surface*>& surf,
         std::vector<Curve*  >& curv, std::vector<Vertex* >&  vert,Volume* owner)
 {
-	if (useOCAF()){
-    	OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(owner->getComputationalProperty());
-    	CHECK_NULL_PTR_ERROR(occ_rep);
-		setRootLabel(occ_rep->getLabel());
-	}
     /* on va explorer le solide OCC stocké en attribut et créer les entités de
      * dimension directement inférieure, c'est-à-dire les faces
      */
@@ -1541,20 +1510,11 @@ void OCCGeomRepresentation::split(std::vector<Surface*>& surf,
     owner->get(surf);
     owner->get(curv);
     owner->get(vert);
-
-    if (useOCAF())
-    	setRootLabel(EntityFactory::getOCAFRootLabel());
 }
 /*----------------------------------------------------------------------------*/
 void OCCGeomRepresentation::split(std::vector<Curve*  >& curv,
         std::vector<Vertex* >&  vert,Surface* owner)
 {
-	if (useOCAF()){
-    	OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(owner->getComputationalProperty());
-    	CHECK_NULL_PTR_ERROR(occ_rep);
-		setRootLabel(occ_rep->getLabel());
-	}
-
     /* on va explorer la face OCC stocké en attribut et créer les entités de
      * dimension directement inférieure, c'est-à-dire les courbes
      */
@@ -1638,9 +1598,6 @@ void OCCGeomRepresentation::split(std::vector<Curve*  >& curv,
     // on renseigne la fonction appelante
     owner->get(curv);
     owner->get(vert);
-
-    if (useOCAF())
-    	setRootLabel(EntityFactory::getOCAFRootLabel());
 }
 /*----------------------------------------------------------------------------*/
 void OCCGeomRepresentation::split(std::vector<Vertex* >&  vert,Curve* owner)
@@ -1648,12 +1605,6 @@ void OCCGeomRepresentation::split(std::vector<Vertex* >&  vert,Curve* owner)
 #ifdef _DEBUG2
 	std::cout<<"OCCGeomRepresentation::split avec vert.size () = "<<vert.size ()<<std::endl;
 #endif
-
-	if (useOCAF()){
-    	OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(owner->getComputationalProperty());
-    	CHECK_NULL_PTR_ERROR(occ_rep);
-		setRootLabel(occ_rep->getLabel());
-	}
 
     /* on va explorer la courbe OCC stockée en attribut et créer les entités de
      * dimension directement inférieure, c'est-à-dire les sommets
@@ -1687,9 +1638,6 @@ void OCCGeomRepresentation::split(std::vector<Vertex* >&  vert,Curve* owner)
 
     // on renseigne la fonction appelante
     owner->get(vert);
-
-    if (useOCAF())
-     	setRootLabel(EntityFactory::getOCAFRootLabel());
 }
 /*----------------------------------------------------------------------------*/
 void OCCGeomRepresentation::project(Utils::Math::Point& P, const Curve* C)
@@ -2663,15 +2611,7 @@ void OCCGeomRepresentation::mirror(const Utils::Math::Plane& plane)
 /*----------------------------------------------------------------------------*/
 GeomRepresentation* OCCGeomRepresentation::clone() const
 {
-	if (useOCAF())
-		setRootLabel(getLabel());
-
-    GeomRepresentation* e= new OCCGeomRepresentation(*this);
-
-    if (useOCAF())
-    	setRootLabel(EntityFactory::getOCAFRootLabel());
-
-    return e;
+    return new OCCGeomRepresentation(*this);
 }
 /*----------------------------------------------------------------------------*/
 void OCCGeomRepresentation::connectTopology( // [EB] OBSOLETE, cf GeomGluingImplementation::sewSurfaces

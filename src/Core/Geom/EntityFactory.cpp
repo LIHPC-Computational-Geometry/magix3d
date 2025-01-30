@@ -49,11 +49,11 @@
 
 #include <BRepAlgoAPI_Cut.hxx>
 
-#include<ShapeAnalysis_ShapeContents.hxx>
-#include<GProp_GProps.hxx>
+#include <ShapeAnalysis_ShapeContents.hxx>
+#include <GProp_GProps.hxx>
 #include <BRepGProp.hxx>
 #include <BRepAlgoAPI_Cut.hxx>
-#include<BRepAlgo_Cut.hxx>
+#include <BRepAlgo_Cut.hxx>
 #include <gp_Pln.hxx>
 #include <gp_Vec.hxx>
 #include <gp_Dir.hxx>
@@ -129,80 +129,9 @@ std::string GceErrorToString(const gce_ErrorType& error) {
     }
 }
 /*----------------------------------------------------------------------------*/
-//Handle(TDF_Data) EntityFactory::m_DF = 0;
-Handle(TDocStd_Document) EntityFactory::m_OCAFdoc = 0;
-Handle(TDocStd_Application) EntityFactory::m_OCAFapp = 0;
-/*----------------------------------------------------------------------------*/
 EntityFactory::EntityFactory(Internal::Context& c)
 : m_context(c)
 {}
-/*----------------------------------------------------------------------------*/
-void EntityFactory::initialize(Internal::ContextIfc::geomKernel gk)
-{
-	if (gk == Internal::ContextIfc::WITHOCAF){
-		m_OCAFapp = new TDocStd_Application();
-		m_OCAFapp->NewDocument("Standard", m_OCAFdoc);
-		m_OCAFdoc->SetUndoLimit(-1); // pas de limite pour undo
-		//m_DF = m_OCAFdoc->GetData();
-		OCCGeomRepresentation::setRootLabel(m_OCAFdoc->Main());
-	}
-}
-/*----------------------------------------------------------------------------*/
-bool EntityFactory::useOCAF() const
-{
-	return (m_context.getGeomKernel() == Internal::ContextIfc::WITHOCAF);
-}
-/*----------------------------------------------------------------------------*/
-TDF_Label EntityFactory::getOCAFRootLabel()
-{
-	CHECK_NULL_PTR_ERROR(EntityFactory::m_OCAFdoc.get());
-	return EntityFactory::m_OCAFdoc->Main();
-}
-/*----------------------------------------------------------------------------*/
-void EntityFactory::beginOCAFCommand()
-{
-#ifdef _DEBUG_OCAF
-	std::cout<<"EntityFactory::beginOCAFCommand()"<<std::endl;
-#endif
-	if (useOCAF())
-		m_OCAFdoc->OpenCommand();
-}
-/*----------------------------------------------------------------------------*/
-void EntityFactory::endOCAFCommand()
-{
-#ifdef _DEBUG_OCAF
-	std::cout<<"EntityFactory::endOCAFCommand()"<<std::endl;
-#endif
-	if (useOCAF())
-		m_OCAFdoc->CommitCommand();
-}
-/*----------------------------------------------------------------------------*/
-void EntityFactory::abortOCAFCommand()
-{
-#ifdef _DEBUG_OCAF
-	std::cout<<"EntityFactory::abortOCAFCommand()"<<std::endl;
-#endif
-	if (useOCAF())
-		m_OCAFdoc->AbortCommand();
-}
-/*----------------------------------------------------------------------------*/
-void EntityFactory::undoOCAFCommand()
-{
-#ifdef _DEBUG_OCAF
-	std::cout<<"EntityFactory::undoOCAFCommand()"<<std::endl;
-#endif
-	if (useOCAF())
-		m_OCAFdoc->Undo();
-}
-/*----------------------------------------------------------------------------*/
-void EntityFactory::redoOCAFCommand()
-{
-#ifdef _DEBUG_OCAF
-	std::cout<<"EntityFactory::redoOCAFCommand()"<<std::endl;
-#endif
-	if (useOCAF())
-		m_OCAFdoc->Redo();
-}
 /*----------------------------------------------------------------------------*/
 GeomEntity* EntityFactory::copy(GeomEntity* E)
 {
@@ -938,8 +867,10 @@ Surface* EntityFactory::newSurface(const std::vector<Geom::Curve*>& curves)
             if(!curve->isLinear()){
                 Utils::Math::Point pnew;
                 curve->getPoint(0.3,pnew,true);
+                std::cout << "Point à 0.3 " << pnew << std::endl;
                 vec_vertices.push_back(pnew);
                 curve->getPoint(0.7,pnew,true);
+                std::cout << "Point à 0.7 " << pnew << std::endl;
                 vec_vertices.push_back(pnew);
             }
         }

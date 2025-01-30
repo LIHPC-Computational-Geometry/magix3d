@@ -461,22 +461,6 @@ getDescription (bool alsoComputed) const
     		int hc = sh1.HashCode(INT_MAX);
     		occGeomDescription.addProperty (
     				Utils::SerializedRepresentation::Property ("HashCode", (long int)hc));
-    		TDF_Label label = rep1->getLabel();
-    		if (label.IsNull())
-    			occGeomDescription.addProperty (
-    					Utils::SerializedRepresentation::Property ("Label OCAF", std::string("non defini")));
-    		else {
-    			occGeomDescription.addProperty (
-    					Utils::SerializedRepresentation::Property ("OCAF - Label",(long int)label.Tag()));
-    			occGeomDescription.addProperty (
-    					Utils::SerializedRepresentation::Property ("OCAF - Depth",(long int)label.Depth()));
-    			occGeomDescription.addProperty (
-    					Utils::SerializedRepresentation::Property ("OCAF - NbChildren",(long int)label.NbChildren()));
-    			occGeomDescription.addProperty (
-    					Utils::SerializedRepresentation::Property ("OCAF - NbAttributes",(long int)label.NbAttributes()));
-    			occGeomDescription.addProperty (
-    					Utils::SerializedRepresentation::Property ("OCAF - Tag",(long int)label.Tag()));
-   		}
     	}
     	else
     		isOCC = false;

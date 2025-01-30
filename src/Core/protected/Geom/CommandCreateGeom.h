@@ -163,10 +163,6 @@ protected:
      */
     virtual void getPreviewRepresentationNewObjects(Utils::DisplayRepresentation& dr);
 
-    /** Ce qui est fait avant la commande
-     */
-    virtual void preExecute();
-
    /** Ce qui est fait après la commande suivant le cas en erreur ou non
      */
     virtual void postExecute(bool hasError);

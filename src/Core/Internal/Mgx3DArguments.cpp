@@ -55,9 +55,6 @@ vector<string> mgx3dAllowedArgs ( )
 	args.push_back ("-script");
 	args.push_back ("--script");
 
-	// Arguments noyau Magix3D :
-	args.push_back ("-useOCAF");
-
 	// Arguments Magix3D batch :
 	args.push_back ("-coordTranslate");
 	args.push_back ("--coordTranslate");

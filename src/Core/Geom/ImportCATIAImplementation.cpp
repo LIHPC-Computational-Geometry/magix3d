@@ -20,7 +20,6 @@
 #include "Geom/Volume.h"
 #include "Geom/OCCGeomRepresentation.h"
 #include "Geom/EntityFactory.h"
-#include "Geom/OCCApplication.h"
 
 #include "Group/GroupManager.h"
 #include "Group/Group3D.h"

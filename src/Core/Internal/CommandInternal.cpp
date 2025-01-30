@@ -109,7 +109,7 @@ Utils::CommandIfc::status CommandInternal::execute()
     	// on fait le ménage pour le cas d'une commande qui serait rejouée (maillage par ex)
     	m_warning_to_pop_up.clear();
 
-    	// opérations particulières type OCAF...
+    	// opérations particulières
     	preExecute();
 
         // ce qui est propre à la commande
