@@ -212,22 +212,19 @@ private:
 //    void _removeRegionsFromVolume(std::set<gmds::Region*>& elem, gmds::Mesh<TMask>::volume& vo);
 
     /// Création des points d'un maillage structuré pour un bloc (thread-safe)
-    virtual void preMeshStrutured(Topo::Block* bl);
+    virtual void preMeshStructured(Topo::Block* bl);
 
     /// Création d'un maillage structuré pour un bloc
-    virtual void meshStrutured(Mesh::CommandCreateMesh* command, Topo::Block* b);
+    virtual void meshStructured(Mesh::CommandCreateMesh* command, Topo::Block* b);
 
     /// Création d'un maillage tétraédrique de Delaunay pour un bloc (version Tetgen)
     virtual void meshDelaunayTetgen(Mesh::CommandCreateMesh* command, Topo::Block* b);
 
-    /// Création d'un maillage triangulaire de Delaunay pour un bloc par insertion
-    virtual void meshInsertion(Mesh::CommandCreateMesh* command, Topo::Block* b);
-
     /// Création des points d'un maillage transfini pour une face commune
-    virtual void preMeshStrutured(Topo::CoFace* fa);
+    virtual void preMeshStructured(Topo::CoFace* fa);
 
     /// Création d'un maillage transfini pour une face commune
-    virtual void meshStrutured(Mesh::CommandCreateMesh* command, Topo::CoFace* fa);
+    virtual void meshStructured(Mesh::CommandCreateMesh* command, Topo::CoFace* fa);
 
     /// Création d'un maillage triangulaire de Delaunay pour une face commune (version GMSH)
     virtual void meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo::CoFace* fa);

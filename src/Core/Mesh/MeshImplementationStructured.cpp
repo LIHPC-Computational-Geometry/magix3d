@@ -62,7 +62,7 @@ namespace Mesh {
 //#define _DEBUG_GROUP_BY_TOPO_ENTITY
 //#define _DEBUG_TIMER
 /*----------------------------------------------------------------------------*/
-void MeshImplementation::preMeshStrutured(Topo::Block* bl)
+void MeshImplementation::preMeshStructured(Topo::Block* bl)
 {
 #ifdef _DEBUG_MESH_FUNCTION
 	{
@@ -204,7 +204,7 @@ void MeshImplementation::preMeshStrutured(Topo::Block* bl)
                 // l'ordre est bon ...
             }
             else
-                throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, MeshImplementation::meshStrutured pour nbPtI et nbPtJ", TkUtil::Charset::UTF_8));
+                throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, MeshImplementation::meshStructured pour nbPtI et nbPtJ", TkUtil::Charset::UTF_8));
 
 
             std::vector<gmds::Node> nodes;
@@ -221,7 +221,7 @@ void MeshImplementation::preMeshStrutured(Topo::Block* bl)
                             nodes);
                 else {
                 	if (cote >= 5)
-                		throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, MeshImplementation::meshStrutured, cote trop grand", TkUtil::Charset::UTF_8));
+                		throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, MeshImplementation::meshStructured, cote trop grand", TkUtil::Charset::UTF_8));
                 	face->getNodes(bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][0]),
                             bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][1]),
                             bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][2]),
@@ -241,7 +241,7 @@ void MeshImplementation::preMeshStrutured(Topo::Block* bl)
                     face->getNodes(3, false, nodes);
                 else {
 					TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-                    message << "Erreur interne dans MeshImplementation::meshStrutured pour le bloc"
+                    message << "Erreur interne dans MeshImplementation::meshStructured pour le bloc"
                             << bl->getName() << ", avec la face "
                             << face->getName() << ", pb avec recherche du sens";
                     throw TkUtil::Exception (message);
@@ -256,7 +256,7 @@ void MeshImplementation::preMeshStrutured(Topo::Block* bl)
                 	if (iface+jface*ifacesize >= nodes.size())
                 	{
 						TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-                		message << "Erreur interne dans MeshImplementation::meshStrutured pour le bloc"
+                		message << "Erreur interne dans MeshImplementation::meshStructured pour le bloc"
                 				<< bl->getName() <<" de taille "<< (short)nbNoeudsI<<" X "<< (short)nbNoeudsJ<<" X "<< (short)nbNoeudsK
                 				<<", avec la face "
                 				<< face->getName() <<" de taille "<<(short)nbPtI<<" X "<<(short)nbPtJ
@@ -315,7 +315,7 @@ void MeshImplementation::preMeshStrutured(Topo::Block* bl)
             }
             else {
 				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-                message << "Erreur interne dans MeshImplementation::meshStrutured pour le bloc"
+                message << "Erreur interne dans MeshImplementation::meshStructured pour le bloc"
                         << bl->getName() << ", les faces dégénérées ne rentre pas dans l'une des 3 possibilitées";
                 throw TkUtil::Exception (message);
             } // else ... (bl->getNbVertices() == 5)
@@ -326,7 +326,7 @@ void MeshImplementation::preMeshStrutured(Topo::Block* bl)
     if (bl->getMeshLaw() == Topo::BlockMeshingProperty::transfinite){
         discretiseTransfinie(nbBrasI, nbBrasJ, nbBrasK, l_points);
     } else {
-    	throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne dans MeshImplementation::meshStrutured pour block, type de maillage invalide", TkUtil::Charset::UTF_8));
+    	throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne dans MeshImplementation::meshStructured pour block, type de maillage invalide", TkUtil::Charset::UTF_8));
     }
 #ifdef _DEBUG_TIMER
     timer.stop();
@@ -335,9 +335,9 @@ void MeshImplementation::preMeshStrutured(Topo::Block* bl)
     timer.start();
 #endif
 
-} // preMeshStrutured(Block*)
+} // preMeshStructured(Block*)
 /*----------------------------------------------------------------------------*/
-void MeshImplementation::meshStrutured(Mesh::CommandCreateMesh* command, Topo::Block* bl)
+void MeshImplementation::meshStructured(Mesh::CommandCreateMesh* command, Topo::Block* bl)
 {
 #ifdef _DEBUG_TIMER
     TkUtil::Timer timer(true);
@@ -381,7 +381,7 @@ void MeshImplementation::meshStrutured(Mesh::CommandCreateMesh* command, Topo::B
 #endif
 
 //#ifdef _DEBUG_MESH
-//    std::cout<<"MeshImplementation::meshStrutured () avec comme nbNoeuds en I, J et K: "
+//    std::cout<<"MeshImplementation::meshStructured () avec comme nbNoeuds en I, J et K: "
 //            <<nbNoeudsI<<", "<<nbNoeudsJ<<", "<<nbNoeudsK<<std::endl;
 //    for (uint kk=0; kk<nbNoeudsK; kk++)
 //        for (uint jj=0; jj<nbNoeudsJ; jj++)
@@ -404,9 +404,9 @@ void MeshImplementation::meshStrutured(Mesh::CommandCreateMesh* command, Topo::B
     std::cout<<"création des polyèdres et volumes d'un bloc "<<timer.cpuDuration()/TkUtil::Timer::cpuPerSecond()<<" secondes"<<std::endl;
 #endif
 
-} // meshStrutured (Block*)
+} // meshStructured (Block*)
 /*----------------------------------------------------------------------------*/
-void MeshImplementation::preMeshStrutured(Topo::CoFace* coface)
+void MeshImplementation::preMeshStructured(Topo::CoFace* coface)
 {
     if (!coface->isStructured()){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -507,7 +507,7 @@ void MeshImplementation::preMeshStrutured(Topo::CoFace* coface)
     if (coface->getMeshLaw() == Topo::CoFaceMeshingProperty::transfinite) {
         discretiseTransfinie(nbBrasI, nbBrasJ, l_points);
     } else {
-        throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne dans MeshImplementation::meshStrutured pour face, type de maillage invalide", TkUtil::Charset::UTF_8));
+        throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne dans MeshImplementation::meshStructured pour face, type de maillage invalide", TkUtil::Charset::UTF_8));
     }
 
 
@@ -567,9 +567,9 @@ void MeshImplementation::preMeshStrutured(Topo::CoFace* coface)
     timer.start();
 #endif
 
-} // end preMeshStrutured(CoFace*)
+} // end preMeshStructured(CoFace*)
 /*----------------------------------------------------------------------------*/
-void MeshImplementation::meshStrutured(Mesh::CommandCreateMesh* command, Topo::CoFace* coface)
+void MeshImplementation::meshStructured(Mesh::CommandCreateMesh* command, Topo::CoFace* coface)
 {
 #ifdef _DEBUG_TIMER
     TkUtil::Timer timer(true);

@@ -370,14 +370,6 @@ public:
     	newVerticesCurvesAndPlanarSurface(std::vector<Point>& points, std::string groupName);
 
     /*------------------------------------------------------------------------*/
-    /** \brief création d'une (ou plusieurs) surface facétisée à partir d'un fichier, pour tests
-     *
-     *  \param nom du fichier mli
-     */
-	virtual Mgx3D::Internal::M3DCommandResultIfc*
-			newFacetedSurface(std::string nom);
-
-    /*------------------------------------------------------------------------*/
    /** \brief création d'une courbe par projection orthogonale d'une courbe sur une surface
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc*
@@ -1233,15 +1225,6 @@ public:
     virtual Mgx3D::Internal::M3DCommandResultIfc* sectionByPlane(
             std::vector<Geom::GeomEntity*>& entities, Utils::Math::Plane* tool,
             std::string planeGroupName);
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Découpage d'une courbe en un point
-     *
-     *  \param entity le nom de la courbe
-     *  \param pt     la position de la coupe
-     */
-    virtual Mgx3D::Internal::M3DCommandResultIfc* splitCurve(std::string entity, const Point& pt);
-    virtual Mgx3D::Internal::M3DCommandResultIfc* splitCurve(Geom::Curve* crv, const Point& pt);
 
     /*------------------------------------------------------------------------*/
     /** \brief retourne la liste des volumes (non détruits) gérées par le manager

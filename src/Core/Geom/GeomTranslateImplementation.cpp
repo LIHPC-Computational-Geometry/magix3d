@@ -77,10 +77,6 @@ void GeomTranslateImplementation::perform(std::vector<GeomEntity*>& res)
     for(;it!=ite;it++)
         translateSingle(*it);
 
-    for(it  = m_modifiedEntities.begin();it!=ite;it++)
-        if (!(*it)->needLowerDimensionalEntityModification())
-            m_undoableEntities.push_back(*it);
-
     // on force l'ajout des dépendances de dimension inférieur, même pour le cas facétisé
     // c'est nécessaire pour identifier qu'il y a eu modifications des courbes facétisées
     buildInitialSet(init_entities, true);

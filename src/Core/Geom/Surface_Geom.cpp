@@ -26,7 +26,6 @@
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 #include "Geom/OCCGeomRepresentation.h"
-#include "Geom/FacetedSurface.h"
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS.hxx>
@@ -772,38 +771,17 @@ Utils::SerializedRepresentation* Surface::getDescription (bool alsoComputed) con
 	}
 #endif	// _DEBUG
 
-	// recherche des infos pour le cas facétisé
-	bool isFaceted = false;
-	uint nbFaces = 0;
-	if (reps.size() == 1){
-		FacetedSurface* fs = dynamic_cast<FacetedSurface*>(reps[0]);
-		if (fs){
-			isFaceted = true;
-			nbFaces = fs->getNbFaces();
-		}
-	}
-
     // on ajoute des infos du style: c'est un plan
 	TkUtil::UTF8String	typeStr (TkUtil::Charset::UTF_8);
     if (isPlanar())
     	typeStr<<"plan";
     else if (getComputationalProperties().size()>1)
     	typeStr<<"composée";
-    else if (isFaceted)
-    	typeStr<<"facétisée";
     else
     	typeStr<<"quelconque";
 
     propertyGeomDescription.addProperty (
     		Utils::SerializedRepresentation::Property ("Type", typeStr.ascii()) );
-
-    if (isFaceted){
-		TkUtil::UTF8String	nbStr (TkUtil::Charset::UTF_8);
-    	nbStr<<(long int)nbFaces;
-
-    	propertyGeomDescription.addProperty (
-    			Utils::SerializedRepresentation::Property ("Nb polygones", nbStr.ascii()) );
-    }
 
     description->addPropertiesSet (propertyGeomDescription);
 
@@ -893,17 +871,6 @@ void Surface::d2(const double& AU, const double& AV,
 	ADUV.setX(duv.X());
 	ADUV.setY(duv.Y());
 	ADUV.setZ(duv.Z());
-}
-/*----------------------------------------------------------------------------*/
-bool Surface::needLowerDimensionalEntityModification()
-{
-    std::vector<GeomRepresentation*> reps = getComputationalProperties();
-    if (reps.size() == 1) {
-        FacetedSurface *fs = dynamic_cast<FacetedSurface *>(reps[0]);
-        if (fs)
-            return false;
-    }
-    return true;
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

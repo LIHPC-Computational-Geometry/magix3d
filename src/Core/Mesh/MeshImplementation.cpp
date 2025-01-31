@@ -1065,7 +1065,7 @@ void MeshImplementation::preMesh(Internal::CommandInternal* command, Topo::Block
 
         bl->saveBlockMeshingData(&command->getInfoCommand());
 
-        preMeshStrutured(bl);
+        preMeshStructured(bl);
 
 		bl->getMeshingData()->setPreMeshed(true);
 	}
@@ -1091,7 +1091,7 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::Block* bl)
         bl->saveBlockMeshingData(&command->getInfoCommand());
 
         if (bl->getMeshLaw() <= Topo::BlockMeshingProperty::transfinite){
-            meshStrutured(command,bl);
+            meshStructured(command,bl);
         }
         else if (bl->getMeshLaw() == Topo::BlockMeshingProperty::delaunayTetgen){
             meshDelaunayTetgen(command,bl);
@@ -1120,7 +1120,7 @@ void MeshImplementation::preMesh(Internal::CommandInternal* command, Topo::CoFac
 
 		fa->saveCoFaceMeshingData(&command->getInfoCommand());
 
-        preMeshStrutured(fa);
+        preMeshStructured(fa);
 
         fa->getMeshingData()->setPreMeshed(true);
 	}
@@ -1140,7 +1140,7 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::CoFace* fa
         fa->saveCoFaceMeshingData(&command->getInfoCommand());
 
         if (fa->getMeshLaw() <= Topo::CoFaceMeshingProperty::transfinite){
-            meshStrutured(command, fa);
+            meshStructured(command, fa);
         }
         else if (fa->getMeshLaw() == Topo::CoFaceMeshingProperty::delaunayGMSH){
             meshDelaunayGMSH(command, fa);

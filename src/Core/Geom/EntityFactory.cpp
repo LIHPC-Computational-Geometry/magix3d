@@ -9,9 +9,6 @@
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomProperty.h"
 #include "Geom/OCCGeomRepresentation.h"
-#include "Geom/FacetedSurface.h"
-#include "Geom/FacetedCurve.h"
-#include "Geom/FacetedVertex.h"
 #include "Utils/Entity.h"
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
@@ -1521,39 +1518,6 @@ Surface* EntityFactory::newOCCCompositeSurface(std::vector<TopoDS_Face>& v_ds_fa
 	CHECK_NULL_PTR_ERROR (surface)
 	m_context.newGraphicalRepresentation (*surface);
 	return surface;
-}
-/*----------------------------------------------------------------------------*/
-Surface* EntityFactory::newFacetedSurface(uint gmds_id, std::vector<gmds::Face> faces)
-{
-	Surface*	surface	= new Surface(m_context,
-			m_context.newProperty(Utils::Entity::GeomSurface),
-			m_context.newDisplayProperties(Utils::Entity::GeomSurface),
-			new GeomProperty(), new FacetedSurface(m_context, gmds_id, faces));
-	CHECK_NULL_PTR_ERROR (surface)
-	m_context.newGraphicalRepresentation (*surface);
-	return surface;
-}
-/*----------------------------------------------------------------------------*/
-Curve*  EntityFactory::newFacetedCurve(uint gmds_id, std::vector<gmds::Node> nodes)
-{
-	Curve*	curve	= new Curve(m_context,
-			m_context.newProperty(Utils::Entity::GeomCurve),
-			m_context.newDisplayProperties(Utils::Entity::GeomCurve),
-			new GeomProperty(), new FacetedCurve(m_context, gmds_id, nodes));
-	CHECK_NULL_PTR_ERROR (curve)
-	m_context.newGraphicalRepresentation (*curve);
-	return curve;
-}
-/*----------------------------------------------------------------------------*/
-Vertex* EntityFactory::newFacetedVertex(uint gmds_id, gmds::Node node)
-{
-	Vertex*	vtx	= new Vertex(m_context,
-			m_context.newProperty(Utils::Entity::GeomVertex),
-			m_context.newDisplayProperties(Utils::Entity::GeomVertex),
-			new GeomProperty(), new FacetedVertex(m_context, gmds_id, node));
-	CHECK_NULL_PTR_ERROR (vtx)
-	m_context.newGraphicalRepresentation (*vtx);
-	return vtx;
 }
 /*----------------------------------------------------------------------------*/
 Curve* EntityFactory::newOCCCurve(TopoDS_Edge& e)
