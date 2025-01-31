@@ -3180,10 +3180,10 @@ switchCoFaceMeshingProperty(Internal::InfoCommand* icmd, CoFaceMeshingProperty* 
 
     // propagation aux entités topologiques de niveau supérieur
     if (icmd){
-        bool old_strutured = isStructured();
+        bool old_structured = isStructured();
         bool new_structured = prop->isStructured();
         // on propage seulement la destructuration
-        if ((old_strutured != new_structured) && old_strutured){
+        if ((old_structured != new_structured) && old_structured){
             std::vector<Face*> faces;
             getFaces(faces);
             for (std::vector<Face*>::iterator iter = faces.begin(); iter != faces.end(); ++iter)

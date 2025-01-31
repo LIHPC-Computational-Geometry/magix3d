@@ -27,7 +27,6 @@
 #include "Geom/CommandNewSegment.h"
 #include "Geom/CommandNewSurface.h"
 #include "Geom/CommandNewSurfaceByOffset.h"
-#include "Geom/CommandNewFacetedSurfaces.h"
 #include "Geom/CommandNewSphere.h"
 #include "Geom/CommandNewSpherePart.h"
 #include "Geom/CommandNewHollowSpherePart.h"
@@ -75,7 +74,6 @@
 #include "Geom/CommandJoinCurves.h"
 #include "Geom/CommandJoinSurfaces.h"
 #include "Geom/CommandNewGeomVolume.h"
-#include "Geom/CommandSplitCurve.h"
 #include "Internal/ImportMDLImplementation.h"
 #include "Internal/ImportMDL2Commandes.h"
 #include "Internal/ExportMDLImplementation.h"
@@ -817,21 +815,6 @@ newVerticesCurvesAndPlanarSurface(std::vector<Point>& points, std::string groupN
     Internal::M3DCommandResultIfc*  cmdResult   =
     		new Internal::M3DCommandResult (*commandCompo);
     return cmdResult;
-}
-/*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc*
-GeomManager::newFacetedSurface(std::string nom)
-{
-	CommandNewFacetedSurfaces* command = new CommandNewFacetedSurfaces(getLocalContext(), nom);
-
-    // trace dans le script
-	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().newFacetedSurface(\""<<nom<<"\")";
-    command->setScriptCommand(cmd);
-	getCommandManager().addCommand(command, Utils::Command::DO);
-
-	Internal::M3DCommandResultIfc*  cmdResult = new Internal::M3DCommandResult (*command);
-	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
 Internal::M3DCommandResultIfc*
@@ -4579,56 +4562,6 @@ sectionByPlane( std::vector<Geom::GeomEntity*>& entities,
 
     Internal::M3DCommandResultIfc*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
-    return cmdResult;
-}
-
-/*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::splitCurve(std::string entity, const Point& pt)
-{
-	Geom::Curve* crv = getCurve(entity, true);
-	return splitCurve(crv, pt);
-}
-/*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::splitCurve(Geom::Curve* crv, const Point& pt)
-{
-
-    TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-    message << "GeomManager::splitCurve ("<<crv->getName()<<", "<<pt<<")";
-    log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
-
-    Internal::CommandInternal* command = 0;
-
-    if (!crv->getRefTopo().empty()){
-
-    	Internal::CommandComposite* commandCompo =
-    			new Internal::CommandComposite(getLocalContext(), "Découpage d'une courbe avec topologie");
-
-    	Geom::CommandEditGeom *commandGeom =
-    			new CommandSplitCurve(getLocalContext(),crv,pt);
-
-    	commandCompo->addCommand(commandGeom);
-
-    	Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getLocalContext(),
-    			commandGeom);
-    	commandCompo->addCommand(commandTopo);
-
-    	command = commandCompo;
-    }
-    else {
-    	command = new CommandSplitCurve(getLocalContext(),crv,pt);
-    }
-
-    // trace dans le script
-    TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().splitCurve("<<crv->getName()<<", "<<pt<<")";
-    command->setScriptCommand(cmd);
-
-    // on passe au gestionnaire de commandes qui exécute la commande en // ou non
-    // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
-    getCommandManager().addCommand(command, Utils::Command::DO);
-
-    Internal::M3DCommandResultIfc*  cmdResult   =
-    		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/

@@ -446,18 +446,6 @@ public:
     /// Retourne le nombre de groupes
     virtual int getNbGroups() const;
 
-    /*------------------------------------------------------------------------*/
-    /** Dit s'il faut appliquer la transformation géométrique aux entités adjacentes de dimension inférieurs
-     *
-     * @return par défaut vrai
-     *
-     * Avec OCC, la modification (rotation, translation...) effectuée pour une entité doit également l'être
-     * pour ses entités adjacentes (Surface -> courbes et sommets)
-     * Ce n'est pas le cas avec les surfaces facétisées car une surface référence les noeuds des courbes et sommets
-     * donc la transformation de la surface implique celle des entités adjacentes
-     */
-    virtual bool needLowerDimensionalEntityModification() { return true;}
-
 private:
 
     /// Interfaces pour les objets géométriques
