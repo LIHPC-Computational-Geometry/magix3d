@@ -85,6 +85,12 @@ TopoManagerIfc::newFreeTopoInGroup(std::string ne, int dim)
 }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc*
+TopoManagerIfc::newFreeBoundedTopoInGroup(std::string ng, int dim, const std::vector<std::string>& ve)
+{
+	throw TkUtil::Exception ("TopoManagerIfc::newFreeBoundedTopoInGroup should be overloaded.");
+}
+/*----------------------------------------------------------------------------*/
+Mgx3D::Internal::M3DCommandResultIfc*
 TopoManagerIfc::newBoxWithTopo(
 				const Utils::Math::Point& pmin, const Utils::Math::Point& pmax, bool meshStructured, std::string groupName)
 {

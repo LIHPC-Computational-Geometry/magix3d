@@ -391,6 +391,12 @@ std::vector<Utils::Entity*> ContextIfc::get (
 	throw TkUtil::Exception ("ContextIfc::get.");
 }	// ContextIfc::get
 /*----------------------------------------------------------------------------*/
+std::vector<Utils::Entity*> ContextIfc::get (
+								const std::vector<std::string>&, bool) const
+{
+	throw TkUtil::Exception ("ContextIfc::get.");
+}	// ContextIfc::get
+/*----------------------------------------------------------------------------*/
 Utils::Entity& ContextIfc::uniqueIdToEntity (unsigned long uid) const
 {
 	throw TkUtil::Exception ("ContextIfc::uniqueIdToEntity.");

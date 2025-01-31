@@ -160,6 +160,20 @@ public:
          newFreeTopoInGroup(std::string ng, int dim);
 	SET_SWIG_COMPLETABLE_METHOD(newFreeTopoInGroup)
 
+    /** \brief Création d'un block topologique structuré sans association
+       *
+       *  L'entité topologique est mise dans un groupe et ses sommets aux coins de la boite
+       *  englobante définie par les entités transmises en arguments
+       *
+       *  \param ng le nom du groupe dans lequel sera mis le bloc ou la face
+       *  \param dim la dimension (2 ou 3) de ce que l'on veut créer
+       *  \param ve est la liste des noms d'entités définissant la boite englobante de positionnement
+       *         des sommets
+      */
+     virtual Mgx3D::Internal::M3DCommandResultIfc*
+         newFreeBoundedTopoInGroup(std::string ng, int dim, const std::vector<std::string>& ve);
+	SET_SWIG_COMPLETABLE_METHOD(newFreeBoundedTopoInGroup)
+	
     /*------------------------------------------------------------------------*/
     /** \brief Création d'une boite parallèle aux axes Ox,Oy et Oz à partir des
      *         points pmin et pmax où pmin est le point de plus petites

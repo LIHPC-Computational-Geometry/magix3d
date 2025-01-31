@@ -31,6 +31,8 @@
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/NumericServices.h>
 
+#include <limits>
+
 
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
@@ -661,6 +663,27 @@ double EntitiesHelper::angle(const Utils::Entity* cec, const Utils::Entity* ce1,
 	angle =  acos(ps)*180/M_PI;
 
 	return angle;
+}
+/*----------------------------------------------------------------------------*/
+bool EntitiesHelper::getBounds (const std::vector<Utils::Entity*>& entities, double bounds [6])
+{
+	bounds [0]	= bounds [2]	= bounds [4]	= std::numeric_limits<double>::max();
+	bounds [1]	= bounds [3]	= bounds [5]	= std::numeric_limits<double>::min();
+	if (true == entities.empty ( ))
+		return false;
+
+	for (std::vector<Utils::Entity*>::const_iterator ite = entities.begin ( ); ite != entities.end ( ); ite++)
+	{
+		double	entityBounds [6];
+		(*ite)->getBounds (entityBounds);
+		for (int i = 0; i < 6; i += 2)
+		{
+			bounds [i]		= bounds [i] <= entityBounds [i] ? bounds [i] :  entityBounds [i];
+			bounds [i + 1]	= bounds [i + 1] >= entityBounds [i + 1] ? bounds [i + 1] :  entityBounds [i + 1];
+		}	// for (int i = 0; i < 6; i += 2)
+	}	// for (std::vector<Utils::Entity*>::const_iterator ite = entities.begin ( ); ite != entities.end ( ); ite++)
+
+	return true;
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Internal

@@ -169,6 +169,19 @@ public:
       virtual Mgx3D::Internal::M3DCommandResultIfc*
           newFreeTopoInGroup(std::string ng,  int dim);
 
+    /** \brief Création d'un block topologique structuré sans association
+       *
+       *  L'entité topologique est mise dans un groupe et ses sommets aux coins de la boite
+       *  englobante définie par les entités transmises en arguments
+       *
+       *  \param ng le nom du groupe dans lequel sera mis le bloc ou la face
+       *  \param dim la dimension (2 ou 3) de ce que l'on veut créer
+       *  \param ve est la liste des noms d'entités définissant la boite englobante de positionnement
+       *         des sommets
+      */
+     virtual Mgx3D::Internal::M3DCommandResultIfc*
+         newFreeBoundedTopoInGroup(std::string ng, int dim, const std::vector<std::string>& ve);
+
     /*------------------------------------------------------------------------*/
     /** \brief Création d'une topologie structurée en o-grid
      *

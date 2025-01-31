@@ -29,8 +29,7 @@ class QtTopologyBlockCreationPanel : public QtTopologyCreationPanel
 	 * Créé l'ihm.
 	 * \param	Widget parent.
 	 * \param	Nom du panneau.
-	 * \param	Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée
-	 *			notamment pour récupérer le contexte.
+	 * \param	Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée notamment pour récupérer le contexte.
 	 * \param	Eventuelle action associée à ce panneau.
 	 */
 	QtTopologyBlockCreationPanel (
@@ -63,14 +62,12 @@ class QtTopologyBlockCreationPanel : public QtTopologyCreationPanel
 	 * Constructeur de copie et opérateur = opérations interdites.
 	 */
 	QtTopologyBlockCreationPanel (const QtTopologyBlockCreationPanel&);
-	QtTopologyBlockCreationPanel& operator = (
-							const QtTopologyBlockCreationPanel&);
+	QtTopologyBlockCreationPanel& operator = (const QtTopologyBlockCreationPanel&);
 };	// class QtTopologyBlockCreationPanel
 
 
 /**
- * Classe d'action type <I>check box</I> associée à un panneau type
- * <I>QtTopologyBlockCreationPanel</I> de création de bloc topologique associé
+ * Classe d'action type <I>check box</I> associée à un panneau type <I>QtTopologyBlockCreationPanel</I> de création de bloc topologique associé
  * à un volume géométrique.
  */
 class QtTopologyBlockCreationAction : public QtTopologyCreationAction
@@ -82,9 +79,7 @@ class QtTopologyBlockCreationAction : public QtTopologyCreationAction
 	 * <I>QtTopologyBlockCreationPanel</I>.
 	 * \param		Icône représentant l'action.
 	 * \param		Texte représentant l'action.
-	 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée
-	 *				notamment pour récupérer le contexte et le panneau contenant
-	 *				les icônes.
+	 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée notamment pour récupérer le contexte et le panneau contenant les icônes.
 	 * \param		Tooltip décrivant l'action.
 	 */
 	QtTopologyBlockCreationAction (
@@ -98,8 +93,7 @@ class QtTopologyBlockCreationAction : public QtTopologyCreationAction
 	virtual ~QtTopologyBlockCreationAction ( );
 
 	/**
-	 * Créé le bloc topologique conformément au paramétrage de
-	 * son panneau associé. Invoque préalablement
+	 * Créé le bloc topologique conformément au paramétrage de son panneau associé. Invoque préalablement
 	 * <I>QtMgx3DTopoOperationAction::executeOperation</I>.
 	 */
 	virtual void executeOperation ( );
@@ -111,8 +105,7 @@ class QtTopologyBlockCreationAction : public QtTopologyCreationAction
 	 * Constructeur de copie et opérateur = : interdits.
 	 */
 	QtTopologyBlockCreationAction (const QtTopologyBlockCreationAction&);
-	QtTopologyBlockCreationAction& operator = (
-									const QtTopologyBlockCreationAction&);
+	QtTopologyBlockCreationAction& operator = (const QtTopologyBlockCreationAction&);
 };  // class QtTopologyCreationAction
 
 

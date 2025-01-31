@@ -1063,6 +1063,29 @@ TopoManager::newFreeTopoInGroup(std::string ng, int dim)
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
+Mgx3D::Internal::M3DCommandResultIfc*
+TopoManager::newFreeBoundedTopoInGroup(std::string ng, int dim, const std::vector<std::string>& ve)
+{
+    TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
+    message <<"TopoManager::newFreeBoundedTopoInGroup("<<ng<<")";
+    log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
+
+    Topo::CommandNewTopoOnGeometry* command = new Topo::CommandNewTopoOnGeometry(getLocalContext(), ng, dim);
+    std::vector<Utils::Entity*>	entities	= getLocalContext ( ).get (ve, true);
+    command->setBoundingEntities (entities);
+
+    TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
+    cmd << getContextAlias() << "." << "getTopoManager().newFreeBoundedTopoInGroup (\""
+            <<ng<<"\", "<< (short)dim << ", " << Internal::entitiesToPythonList<Mgx3D::Utils::Entity> (entities) << ")";
+    command->setScriptCommand(cmd);
+
+    getCommandManager().addCommand(command, Utils::Command::DO);
+
+    Internal::M3DCommandResultIfc*  cmdResult   =
+    		new Internal::M3DCommandResult (*command);
+    return cmdResult;
+}
+/*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
 newBoxWithTopo(const Utils::Math::Point& pmin, const Utils::Math::Point& pmax,
 		bool meshStructured, std::string groupName)
