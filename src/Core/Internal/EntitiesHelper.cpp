@@ -31,7 +31,7 @@
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/NumericServices.h>
 
-#include <values.h>
+#include <limits>
 
 
 /*----------------------------------------------------------------------------*/
