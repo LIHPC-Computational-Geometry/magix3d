@@ -3084,7 +3084,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::makeBlocksByExtrude(std::vect
             message <<", ";
         message << cofaces[i]->getName();
     }
-    message <<"],"<<dv<<")";
+    message <<"],"<<dv.getScriptCommand()<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
     Topo::CommandExtrudeFace* command = new CommandExtrudeFace(getLocalContext(), cofaces, dv);
@@ -3097,7 +3097,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::makeBlocksByExtrude(std::vect
         cmd << "\""<<cofaces[i]->getName()<< "\"";
     }
     cmd <<"],";
-    cmd << dv << ")";
+    cmd << dv.getScriptCommand() << ")";
 
     command->setScriptCommand(cmd);
 
