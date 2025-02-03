@@ -3426,19 +3426,19 @@ common2DOnCopy(Geom::GeomEntity* entity1, Geom::GeomEntity* entity2, std::string
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::importBREP(std::string n, const bool testVolumicProperties, const bool splitCompoundCurves)
+Internal::M3DCommandResultIfc* GeomManager::importBREP(std::string n, const bool testVolumicProperties)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message << "GeomManager::importBREP ("<<n<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     //creation de la commande de création
-    CommandImportBREP *command = new CommandImportBREP(getLocalContext(), n, testVolumicProperties, splitCompoundCurves);
+    CommandImportBREP *command = new CommandImportBREP(getLocalContext(), n, testVolumicProperties);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().importBREP(\""<<n<<"\"";
-    if (!testVolumicProperties || splitCompoundCurves)
-        cmd << (testVolumicProperties?", True":", False") << (splitCompoundCurves?", True":", False");
+    if (!testVolumicProperties)
+        cmd << (testVolumicProperties?", True":", False");
     cmd << ")";
     command->setScriptCommand(cmd);
 
@@ -3451,19 +3451,19 @@ Internal::M3DCommandResultIfc* GeomManager::importBREP(std::string n, const bool
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::importSTEP(std::string n, const bool testVolumicProperties, const bool splitCompoundCurves)
+Internal::M3DCommandResultIfc* GeomManager::importSTEP(std::string n, const bool testVolumicProperties)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message << "GeomManager::importSTEP ("<<n<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     //creation de la commande de création
-    CommandImportSTEP *command = new CommandImportSTEP(getLocalContext(), n, testVolumicProperties, splitCompoundCurves);
+    CommandImportSTEP *command = new CommandImportSTEP(getLocalContext(), n, testVolumicProperties);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().importSTEP(\""<<n<<"\"";
-    if (!testVolumicProperties || splitCompoundCurves)
-        cmd << (testVolumicProperties?", True":", False") << (splitCompoundCurves?", True":", False");
+    if (!testVolumicProperties)
+        cmd << (testVolumicProperties?", True":", False");
     cmd << ")";
     command->setScriptCommand(cmd);
 
@@ -3499,20 +3499,17 @@ Internal::M3DCommandResultIfc* GeomManager::importSTL(std::string n)
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::importIGES(std::string n, const bool splitCompoundCurves)
+Internal::M3DCommandResultIfc* GeomManager::importIGES(std::string n)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message << "GeomManager::importIGES ("<<n<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     //creation de la commande de création
-    CommandImportIGES *command = new CommandImportIGES(getLocalContext(),n, splitCompoundCurves);
+    CommandImportIGES *command = new CommandImportIGES(getLocalContext(), n);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().importIGES(\""<<n<<"\"";
-    if (splitCompoundCurves)
-    	cmd << (splitCompoundCurves?", True":", False");
-    cmd << ")";
+    cmd << getContextAlias() << "." << "getGeomManager().importIGES(\"" << n << "\")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -3524,19 +3521,19 @@ Internal::M3DCommandResultIfc* GeomManager::importIGES(std::string n, const bool
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::importCATIA(std::string n, const bool testVolumicProperties, const bool splitCompoundCurves)
+Internal::M3DCommandResultIfc* GeomManager::importCATIA(std::string n, const bool testVolumicProperties)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message << "GeomManager::importCATIA ("<<n<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     //creation de la commande de création
-    CommandImportCATIA *command = new CommandImportCATIA(getLocalContext(), n, testVolumicProperties, splitCompoundCurves);
+    CommandImportCATIA *command = new CommandImportCATIA(getLocalContext(), n, testVolumicProperties);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().importCATIA(\""<<n<<"\"";
-    if (!testVolumicProperties || splitCompoundCurves)
-    	cmd << (testVolumicProperties?", True":", False") << (splitCompoundCurves?", True":", False");
+    if (!testVolumicProperties)
+    	cmd << (testVolumicProperties?", True":", False");
     cmd << ")";
     command->setScriptCommand(cmd);
 

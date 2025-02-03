@@ -941,30 +941,27 @@ public:
      *
      *  \param n le nom du ficher dont le contenu doit etre importe
      *  \param testVolumicProperties test que les volumes sont fermés
-     *  \param splitCompoundCurves décompose les courbes composites en de multiples courbes
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc* importBREP(std::string n,
-        const bool testVolumicProperties=true, const bool splitCompoundCurves=false);
+        const bool testVolumicProperties=true);
 
     /*------------------------------------------------------------------------*/
     /** \brief Import d'un fichier au format CATIA
      *
      *  \param n le nom du ficher dont le contenu doit etre importe
      *  \param testVolumicProperties test que les volumes sont fermés
-     *  \param splitCompoundCurves décompose les courbes composites en de multiples courbes
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc* importCATIA(std::string n,
-        const bool testVolumicProperties=true, const bool splitCompoundCurves=false);
+        const bool testVolumicProperties=true);
 
     /*------------------------------------------------------------------------*/
     /** \brief Import d'un fichier au format STEP
      *
      *  \param n le nom du ficher dont le contenu doit etre importe
      *  \param testVolumicProperties test que les volumes sont fermés
-     *  \param splitCompoundCurves décompose les courbes composites en de multiples courbes
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc* importSTEP(std::string n,
-        const bool testVolumicProperties=true, const bool splitCompoundCurves=false);
+        const bool testVolumicProperties=true);
 
     /*------------------------------------------------------------------------*/
     /** \brief Import d'un fichier au format STL
@@ -977,9 +974,8 @@ public:
     /** \brief Import d'un fichier au format IGES
      *
      *  \param n le nom du ficher dont le contenu doit etre importe
-     *  \param splitCompoundCurves décompose les courbes composites en de multiples courbes
      */
-    virtual Mgx3D::Internal::M3DCommandResultIfc* importIGES(std::string n, const bool splitCompoundCurves=false);
+    virtual Mgx3D::Internal::M3DCommandResultIfc* importIGES(std::string n);
 
     /*------------------------------------------------------------------------*/
     /** \brief Import d'un fichier au format MDL

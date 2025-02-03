@@ -67,10 +67,6 @@ public:
      */
     void prePerform(){};
 
-    /** active ou non la décompostion des courbes */
-    void setSplitCompoundCurves(bool flag)
-    	{ m_splitCompondCurves = flag; }
-
     /** active ou non le test comme quoi les volumes sont fermés */
     void setTestVolumicProperties(bool flag)
     	{ m_testVolumicProperties = flag; }
@@ -147,9 +143,6 @@ protected:
 
     /// flag suivant qu'il est nécessaire ou non de tester que les volumes sont fermés
     bool m_testVolumicProperties;
-
-    /// flag suivant que l'on souhaite décomposer les courbes composées en de multiples courbes
-    bool m_splitCompondCurves;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

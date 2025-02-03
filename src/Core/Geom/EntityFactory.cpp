@@ -1531,17 +1531,6 @@ Curve* EntityFactory::newOCCCurve(TopoDS_Edge& e)
     return curve;
 }
 /*----------------------------------------------------------------------------*/
-Curve* EntityFactory::newOCCCurve(TopoDS_Wire& w)
-{
-    Curve*  curve   = new Curve(m_context,
-            m_context.newProperty(Utils::Entity::GeomCurve),
-            m_context.newDisplayProperties(Utils::Entity::GeomCurve),
-            new GeomProperty(), new OCCGeomRepresentation(m_context, w));
-    CHECK_NULL_PTR_ERROR (curve)
-    m_context.newGraphicalRepresentation (*curve);
-    return curve;
-}
-/*----------------------------------------------------------------------------*/
 Curve* EntityFactory::newOCCCompositeCurve(std::vector<TopoDS_Edge>& v_ds_edge,
 		Utils::Math::Point& extremaFirst, Utils::Math::Point& extremaLast)
 {
@@ -1637,17 +1626,6 @@ Curve* EntityFactory::newOCCCompositeCurve(std::vector<TopoDS_Edge>& v_ds_edge,
 		curve->computeParams(extremaFirst);
 	return curve;
 }
-/*----------------------------------------------------------------------------*/
-//Curve* EntityFactory::newOCCCurve(TopoDS_Wire& w)
-//{
-//    Curve*  curve   = new Curve(m_context,
-//            m_context.newProperty(Utils::Entity::GeomCurve),
-//            m_context.newDisplayProperties(Utils::Entity::GeomCurve),
-//            new GeomProperty(), new OCCGeomRepresentation(m_context, w));
-//    CHECK_NULL_PTR_ERROR (curve)
-//    m_context.newGraphicalRepresentation (*curve);
-//    return curve;
-//}
 /*----------------------------------------------------------------------------*/
 //#define _DEBUG_EDGEPROJECTION
 Curve* EntityFactory::newCurveByEdgeProjectionOnSurface(const Utils::Math::Point& P1,

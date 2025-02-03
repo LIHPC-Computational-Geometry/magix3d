@@ -33,11 +33,10 @@ class Surface;
 class Volume;
 /*----------------------------------------------------------------------------*/
 CommandImportIGES::
-CommandImportIGES(Internal::Context& c, const std::string& n, const bool splitCompoundCurves)
+CommandImportIGES(Internal::Context& c, const std::string& n)
 : CommandCreateGeom(c, "Import IGES"), m_filename(n)
 {
     m_impl = new ImportIGESImplementation(c, &getInfoCommand(), m_filename);
-    m_impl->setSplitCompoundCurves(splitCompoundCurves);
 }
 /*----------------------------------------------------------------------------*/
 CommandImportIGES::~CommandImportIGES()

@@ -534,17 +534,17 @@ Internal::M3DCommandResultIfc* GeomManagerIfc::sectionByPlane(std::vector<std::s
     throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::section should be overloaded.", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManagerIfc::importBREP(std::string n, const bool testVolumicProperties, const bool splitCompoundCurves)
+Internal::M3DCommandResultIfc* GeomManagerIfc::importBREP(std::string n, const bool testVolumicProperties)
 {
     throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::importBREP should be overloaded.", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManagerIfc::importCATIA(std::string n, const bool testVolumicProperties, const bool splitCompoundCurves)
+Internal::M3DCommandResultIfc* GeomManagerIfc::importCATIA(std::string n, const bool testVolumicProperties)
 {
     throw TkUtil::Exception(TkUtil::UTF8String ("GeomManagerIfc::importCATIA should be overloaded.", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManagerIfc::importSTEP(std::string n, const bool testVolumicProperties, const bool splitCompoundCurves)
+Internal::M3DCommandResultIfc* GeomManagerIfc::importSTEP(std::string n, const bool testVolumicProperties)
 {
     throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::importSTEP should be overloaded.", TkUtil::Charset::UTF_8));
 }
@@ -554,7 +554,7 @@ Internal::M3DCommandResultIfc* GeomManagerIfc::importSTL(std::string n)
     throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::importSTL should be overloaded.", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManagerIfc::importIGES(std::string n, const bool splitCompoundCurves)
+Internal::M3DCommandResultIfc* GeomManagerIfc::importIGES(std::string n)
 {
     throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::importIGES should be overloaded.", TkUtil::Charset::UTF_8));
 }

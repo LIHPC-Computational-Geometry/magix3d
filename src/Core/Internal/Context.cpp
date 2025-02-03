@@ -1414,7 +1414,6 @@ Utils::DisplayProperties* Context::newDisplayProperties(const Utils::Entity::obj
 /*----------------------------------------------------------------------------*/
 void Context::newGraphicalRepresentation (Utils::Entity& entity)
 {
-	std::cout << "Context::newGraphicalRepresentation " << entity.getName() << std::endl; 
     if (!isGraphical())
         return;
 

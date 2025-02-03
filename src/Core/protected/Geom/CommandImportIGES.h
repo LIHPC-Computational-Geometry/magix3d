@@ -40,9 +40,8 @@ public:
      *
      *  \param c le contexte
      *  \param n le nom du fichier à importer
-     *  \param splitCompoundCurves décompose les courbes composites en de multiples courbes
      */
-    CommandImportIGES(Internal::Context& c, const std::string& n, const bool splitCompoundCurves);
+    CommandImportIGES(Internal::Context& c, const std::string& n);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur

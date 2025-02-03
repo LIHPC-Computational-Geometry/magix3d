@@ -50,8 +50,7 @@ GeomImport(Internal::Context& c, Internal::InfoCommand* icmd,
         const std::string& n, const bool onlySolidsAndFaces)
 : GeomModificationBaseClass(c /*on ne garde pas les entités initiales*/),
   m_icmd(icmd), m_filename(n), m_onlySolidsAndFaces(onlySolidsAndFaces),
-  m_testVolumicProperties(true),
-  m_splitCompondCurves(false)
+  m_testVolumicProperties(true)
 {
 	// récupération du nom du fichier sans chemin ni extension
 	std::string suffix = m_filename;
@@ -267,62 +266,24 @@ void GeomImport::add(TopoDS_Shape& AShape, const std::string& AName)
     break;
     case TopAbs_WIRE:
     {
-    	if (m_splitCompondCurves){
-            // version avec courbes multiples
-            TopoDS_Wire aWire= TopoDS::Wire(AShape);
-            TopExp_Explorer ex;
-            for (ex.Init(aWire,TopAbs_EDGE); ex.More(); ex.Next())
-            {
-                TopoDS_Edge aEdge = TopoDS::Edge(ex.Current());
-                Curve* curve=EntityFactory(m_context).newOCCCurve(TopoDS::Edge(aEdge));
-                curvs.push_back(curve);
-                TkUtil::UTF8String	name (TkUtil::Charset::UTF_8);
-                name << AName<< "-edge";
-                addToGroup(curve, AName);
-                store(curve);
-            }
-            splitManyCurves(curvs, verts);
-            for(unsigned int i=0;i<verts.size();i++){
-            	store(verts[i]);
-            	addToGroup(verts[i],"");
-            }
-    	}
-    	else {
-    		Curve* curve=EntityFactory(m_context).newOCCCurve(TopoDS::Wire(AShape));
-    		addToGroup(curve, AName);
-    		curve->split(verts);
-    		store(curve);
-    		for(unsigned int i=0;i<verts.size();i++)
-    			store(verts[i]);
-    	}
-
-//        TopoDS_Wire aWire= TopoDS::Wire(AShape);
-//        TopExp_Explorer ex;
-//        std::vector<TopoDS_Edge> v_ds_edge;
-//        for (ex.Init(aWire,TopAbs_EDGE); ex.More(); ex.Next()){
-//        	v_ds_edge.push_back(TopoDS::Edge(ex.Current()));
-//        }
-//        Utils::Math::Point pt1, pt2;
-//        {
-//        	BRepAdaptor_Curve brepCurve(v_ds_edge.front());
-//        	gp_Pnt res;
-//        	res = brepCurve.Value(brepCurve.FirstParameter());
-//        	pt1.setXYZ(res.X(), res.Y(), res.Z());
-//        }
-//        {
-//        	BRepAdaptor_Curve brepCurve(v_ds_edge.back());
-//        	gp_Pnt res;
-//        	res = brepCurve.Value(brepCurve.LastParameter());
-//        	pt2.setXYZ(res.X(), res.Y(), res.Z());
-//        }
-//
-//        Curve* curve=EntityFactory(m_context).newOCCCompositeCurve(v_ds_edge, pt1, pt2);
-//        addToGroup(curve, AName);
-//        curve->split(verts);
-//        store(curve);
-//        for(unsigned int i=0;i<verts.size();i++)
-//        	store(verts[i]);
-
+        // version avec courbes multiples
+        TopoDS_Wire aWire= TopoDS::Wire(AShape);
+        TopExp_Explorer ex;
+        for (ex.Init(aWire,TopAbs_EDGE); ex.More(); ex.Next())
+        {
+            TopoDS_Edge aEdge = TopoDS::Edge(ex.Current());
+            Curve* curve=EntityFactory(m_context).newOCCCurve(TopoDS::Edge(aEdge));
+            curvs.push_back(curve);
+            TkUtil::UTF8String	name (TkUtil::Charset::UTF_8);
+            name << AName<< "-edge";
+            addToGroup(curve, AName);
+            store(curve);
+        }
+        splitManyCurves(curvs, verts);
+        for(unsigned int i=0;i<verts.size();i++){
+            store(verts[i]);
+            addToGroup(verts[i],"");
+        }
     }
     break;
     case TopAbs_EDGE:

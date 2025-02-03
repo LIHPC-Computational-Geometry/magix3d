@@ -28,11 +28,10 @@ class Surface;
 class Volume;
 /*----------------------------------------------------------------------------*/
 CommandImportCATIA::
-CommandImportCATIA(Internal::Context& c, const std::string& n,  const bool testVolumicProperties, const bool splitCompoundCurves)
+CommandImportCATIA(Internal::Context& c, const std::string& n,  const bool testVolumicProperties)
 : CommandCreateGeom(c, "Import CATIA"), m_filename(n)
 {
     m_impl = new ImportCATIAImplementation(c, &getInfoCommand(), m_filename);
-    m_impl->setSplitCompoundCurves(splitCompoundCurves);
     m_impl->setTestVolumicProperties(testVolumicProperties);
 }
 /*----------------------------------------------------------------------------*/
