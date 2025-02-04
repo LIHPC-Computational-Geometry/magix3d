@@ -25,7 +25,6 @@
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtLandmarkDialog.h"
 #include "QtComponents/QtMdlOptionsDialog.h"
-#include "QtComponents/QtImportOptionsDialog.h"
 #include "QtComponents/QtMgx3DScriptFileDialog.h"
 #include "QtComponents/QtGuiStateDialog.h"
 #include "QtComponents/RenderedEntityRepresentation.h"
@@ -5448,8 +5447,6 @@ cout << __FILE__ << ' ' << __LINE__ << " QtMgx3DMainWindow::exitCallback" << end
 
 			QStringList                fileList            = dialog.selectedFiles();
 			string                     fileName;
-			bool                       splitAll            = false;
-			bool                       splitCompoundCurves = false;
 			for (QStringList::Iterator it                  = fileList.begin(); fileList.end() != it;
 			     it++)
 			{
@@ -5502,64 +5499,22 @@ cout << __FILE__ << ' ' << __LINE__ << " QtMgx3DMainWindow::exitCallback" << end
 					if ((true == compareExtensions(file.getExtension(), "CATPart")) ||
 					    (true == compareExtensions(file.getExtension(), "CATProduct")))
 					{
-						if (false == splitAll)
-						{
-							QtImportOptionsDialog optionsDialog(this, getAppTitle(), fileName);
-							if (QDialog::Rejected == optionsDialog.exec())
-							{
-								msg << " Opération annulée par l'utilisateur.";
-								log(InformationLog(msg));
-								return;
-							}    // if (QDialog::Rejected == optionsDialog.exec ( ))
-
-							splitCompoundCurves = optionsDialog.splitCompoundCurves();
-							splitAll            = optionsDialog.forAll();
-						}   // if (false == splitAll)
-
 						log(InformationLog(msg));
 						QtAutoWaitingCursor cursor(true);
-						getContext().getGeomManager().importCATIA(fileName, true, splitCompoundCurves);
+						getContext().getGeomManager().importCATIA(fileName, true);
 					}    // Catia
 					else
 						if ((true == compareExtensions(file.getExtension(), "stp")) ||
 						    (true == compareExtensions(file.getExtension(), "step")))
 						{
-							if (false == splitAll)
-							{
-								QtImportOptionsDialog optionsDialog(this, getAppTitle(), fileName);
-								if (QDialog::Rejected == optionsDialog.exec())
-								{
-									msg << " Opération annulée par l'utilisateur.";
-									log(InformationLog(msg));
-									return;
-								}    // if (QDialog::Rejected == optionsDialog.exec ( ))
-
-								splitCompoundCurves = optionsDialog.splitCompoundCurves();
-								splitAll            = optionsDialog.forAll();
-							}   // if (false == splitAll)
 							log(InformationLog(msg));
 							QtAutoWaitingCursor cursor(true);
-							getContext().getGeomManager().importSTEP(fileName, true, splitCompoundCurves);
+							getContext().getGeomManager().importSTEP(fileName, true);
 						}    // STEP
 						else
 							if ((true == compareExtensions(file.getExtension(), "igs")) ||
 							    (true == compareExtensions(file.getExtension(), "iges")))
 							{
-								if (false == splitAll)
-								{
-									QtImportOptionsDialog optionsDialog(this, getAppTitle(), fileName);
-									if (QDialog::Rejected == optionsDialog.exec())
-									{
-										msg << " Opération annulée par l'utilisateur.";
-										log(InformationLog(msg));
-										return;
-									}    // if (QDialog::Rejected == optionsDialog.exec ( ))
-
-									splitCompoundCurves = optionsDialog.splitCompoundCurves();
-									splitAll            = optionsDialog.forAll();
-								}   // if (false == splitAll)
-								log(InformationLog(msg));
-
 								if (Utils::Unit::undefined == getContext().getLengthUnit())
 								{   // Suggérer l'unité de longueur du fichier IGES si elle est compatible
 									IGESHeader header;
@@ -5575,28 +5530,13 @@ cout << __FILE__ << ' ' << __LINE__ << " QtMgx3DMainWindow::exitCallback" << end
 								}   // if (Utils::Unit::undefined == getContext ( ).getLengthUnit ( ))
 
 								QtAutoWaitingCursor cursor(true);
-								getContext().getGeomManager().importIGES(fileName, splitCompoundCurves);
+								getContext().getGeomManager().importIGES(fileName);
 							}    // IGES
 							else
 								if (true == compareExtensions(file.getExtension(), "brep"))
 								{
-									if (false == splitAll)
-									{
-										QtImportOptionsDialog optionsDialog(this, getAppTitle(), fileName);
-										if (QDialog::Rejected == optionsDialog.exec())
-										{
-											msg << " Opération annulée par l'utilisateur.";
-											log(InformationLog(msg));
-											return;
-										}    // if (QDialog::Rejected == optionsDialog.exec ( ))
-
-										splitCompoundCurves = optionsDialog.splitCompoundCurves();
-										splitAll            = optionsDialog.forAll();
-									}   // if (false == splitAll)
-									log(InformationLog(msg));
-
 									QtAutoWaitingCursor cursor(true);
-									getContext().getGeomManager().importBREP(fileName, true, splitCompoundCurves);
+									getContext().getGeomManager().importBREP(fileName, true);
 								}    // BREP
 								else
 									if (Lima::SUFFIXE != Lima::_Reader::detectFormat(file.getFileName()))

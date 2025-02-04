@@ -244,7 +244,6 @@ public:
     /** \brief
      */
     Curve* newOCCCurve(TopoDS_Edge& e);
-    Curve* newOCCCurve(TopoDS_Wire& w);
 
     Curve* newOCCCompositeCurve(std::vector<TopoDS_Edge>& v_ds_edge,
     		Utils::Math::Point& extremaFirst, Utils::Math::Point& extremaLast);

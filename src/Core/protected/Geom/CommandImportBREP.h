@@ -36,9 +36,8 @@ public:
      *  \param c le contexte
      *  \param n le nom du fichier à importer
      *  \param testVolumicProperties s'il est nécessaire que les volumes sont fermés
-     *  \param splitCompoundCurves décompose les courbes composites en de multiples courbes
      */
-    CommandImportBREP(Internal::Context& c, const std::string& n, const bool testVolumicProperties, const bool splitCompoundCurves);
+    CommandImportBREP(Internal::Context& c, const std::string& n, const bool testVolumicProperties);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur

@@ -28,11 +28,10 @@ class Surface;
 class Volume;
 /*----------------------------------------------------------------------------*/
 CommandImportSTEP::
-CommandImportSTEP(Internal::Context& c, const std::string& n, const bool testVolumicProperties, const bool splitCompoundCurves)
+CommandImportSTEP(Internal::Context& c, const std::string& n, const bool testVolumicProperties)
 : CommandCreateGeom(c, "Import STEP"), m_filename(n)
 {
     m_impl = new ImportSTEPImplementation(c, &getInfoCommand(), m_filename);
-    m_impl->setSplitCompoundCurves(splitCompoundCurves);
     m_impl->setTestVolumicProperties(testVolumicProperties);
 }
 /*----------------------------------------------------------------------------*/
