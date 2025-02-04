@@ -311,34 +311,32 @@ void QtMgx3DOperationPanel::highlight (bool show)
 	// N'afficher une boite de dialogue d'erreur que si demandé ...
 	QT_PREVIEW_BEGIN_TRY_CATCH_BLOCK
 
+	size_t i = 0;
 	if (false == show)
 	{
 		const vector<Entity*>	entities	= _highlightedEntities;
 		_highlightedEntities.clear ( );
-		for (vector<Entity*>::const_iterator it = entities.begin ( );
-		     entities.end ( ) != it; it++)
+		for (vector<Entity*>::const_iterator it = entities.begin ( ); entities.end ( ) != it; it++, i++)
 		{
-			DisplayProperties::GraphicalRepresentation*	gr	=
-				(*it)->getDisplayProperties ( ).getGraphicalRepresentation ( );
-			CHECK_NULL_PTR_ERROR (gr)
-			gr->setHighlighted (false);
+			DisplayProperties::GraphicalRepresentation*	gr	= (*it)->getDisplayProperties ( ).getGraphicalRepresentation ( );
+			CHECK_NULL_PTR_ERROR (gr)			
+			const bool	refreshGui	= 0 == (i % Resources::instance ( )._updateRefreshRate.getValue ( )) ? true : false;
+			gr->setHighlighted (false, refreshGui);
 		}	// for (vector<Entity*>::iterator it = ...
 	}	// if (false == show)
 	else
 	{
 		const vector<Entity*>	entities	= getInvolvedEntities ( );
-		for (vector<Entity*>::const_iterator it = entities.begin ( );
-		     entities.end ( ) != it; it++)
+		for (vector<Entity*>::const_iterator it = entities.begin ( ); entities.end ( ) != it; it++, i++)
 		{
-			DisplayProperties::GraphicalRepresentation*	gr	=
-				(*it)->getDisplayProperties ( ).getGraphicalRepresentation ( );
+			DisplayProperties::GraphicalRepresentation*	gr	= (*it)->getDisplayProperties ( ).getGraphicalRepresentation ( );
 			CHECK_NULL_PTR_ERROR (gr)
-			RenderedEntityRepresentation*	rep	=
-								dynamic_cast<RenderedEntityRepresentation*>(gr);
+			RenderedEntityRepresentation*	rep	= dynamic_cast<RenderedEntityRepresentation*>(gr);
 			if (0 != rep)
 				rep->setRenderingManager (&renderingManager);
 			registerHighlightedEntity (**it);
-			gr->setHighlighted (true);
+			const bool	refreshGui	= 0 == (i % Resources::instance ( )._updateRefreshRate.getValue ( )) ? true : false;
+			gr->setHighlighted (true, refreshGui);
 		}	// for (vector<Entity*>::const_iterator it = entities.begin ( );
 	}	// else if (false == show)
 

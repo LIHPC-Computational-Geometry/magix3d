@@ -462,11 +462,13 @@ vector<Entity*> QtTopologySplitFacesPanel::getInvolvedEntities ( )
 	vector<Entity*>	entities;
 	if (true == allFaces ( ))
 	{
+/* Issue #179 : on ne met pas en surbrillances "toutes les faces". Celles concernées seront visibles via le preview.
 		vector<CoFace*>	faces;
 		getContext ( ).getTopoManager ( ).getCoFaces (faces);
 		for (vector<CoFace*>::iterator it = faces.begin ( );
 		     faces.end ( ) != it; it++)
 			entities.push_back (*it);
+*/
 	}
 	else
 	{
