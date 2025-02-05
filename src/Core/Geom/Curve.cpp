@@ -146,28 +146,30 @@ void Curve::clearRefEntities(std::list<GeomEntity*>& vertices,
 /*----------------------------------------------------------------------------*/
 bool Curve::isEqual(Geom::Curve* curve)
 {
-    OCCGeomRepresentation* rep1 = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
-    OCCGeomRepresentation* rep2 = dynamic_cast<OCCGeomRepresentation*>(curve->getComputationalProperty());
-    CHECK_NULL_PTR_ERROR(rep1);
-    CHECK_NULL_PTR_ERROR(rep2);
-    TopoDS_Shape sh1 = rep1->getShape();
-    TopoDS_Shape sh2 = rep2->getShape();
+	int nb_reps = getComputationalProperties().size();
+	if (nb_reps != curve->getComputationalProperties().size())
+		return false;
 
-    if(sh1.ShapeType()==TopAbs_EDGE && sh2.ShapeType()==TopAbs_EDGE)
-    {
-        TopoDS_Edge e1 = TopoDS::Edge(rep1->getShape());
-        TopoDS_Edge e2 = TopoDS::Edge(rep2->getShape());
-        return OCCGeomRepresentation::areEquals(e1,e2);
-    }
-    else if(sh1.ShapeType()==TopAbs_WIRE && sh2.ShapeType()==TopAbs_WIRE)
-    {
-        TopoDS_Wire w1 = TopoDS::Wire(rep1->getShape());
-        TopoDS_Wire w2 = TopoDS::Wire(rep2->getShape());
-        return OCCGeomRepresentation::areEquals(w1,w2);
-    }
+	// geometrical representations must be in the same order
+	for (int i=0 ; i<nb_reps ; ++i)
+	{
+		OCCGeomRepresentation* rep1 = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperties()[i]);
+		OCCGeomRepresentation* rep2 = dynamic_cast<OCCGeomRepresentation*>(curve->getComputationalProperties()[i]);
+		CHECK_NULL_PTR_ERROR(rep1);
+		CHECK_NULL_PTR_ERROR(rep2);
+		TopoDS_Shape sh1 = rep1->getShape();
+		TopoDS_Shape sh2 = rep2->getShape();
 
-    return false;
+		if(sh1.ShapeType()!=TopAbs_EDGE || sh2.ShapeType()!=TopAbs_EDGE)
+			return false;
 
+		TopoDS_Edge e1 = TopoDS::Edge(rep1->getShape());
+		TopoDS_Edge e2 = TopoDS::Edge(rep2->getShape());
+		if (!OCCGeomRepresentation::areEquals(e1,e2))
+			return false;
+	}
+
+    return true;
 }
 /*----------------------------------------------------------------------------*/
 void Curve::get(std::vector<Vertex*>& vertices) const
@@ -282,129 +284,125 @@ bool Curve::contains(Curve* ACurve) const
     // TESTEE PEUT NE PAS ENCORE ETRE CONNECTEE TOPOLOGIQUEMENT
     // AVEC DES ENTITES M3D
     //===============================================================
-    OCCGeomRepresentation* rep =
-            dynamic_cast<OCCGeomRepresentation*>(ACurve->getComputationalProperty());
-	CHECK_NULL_PTR_ERROR(rep);
-    TopoDS_Shape shOther = rep->getShape();
+	for (GeomRepresentation* cp : ACurve->getComputationalProperties())
+	{
+		OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(cp);
+		CHECK_NULL_PTR_ERROR(rep);
+		TopoDS_Shape shOther = rep->getShape();
 
-    //===============================================================
-    // on teste les sommets
-    //===============================================================
-    TopTools_IndexedMapOfShape map_vertices;
-    TopExp::MapShapes(shOther,TopAbs_VERTEX, map_vertices);
-    for(unsigned int i=1; i<=map_vertices.Extent();i++){
-        TopoDS_Shape s_i = map_vertices.FindKey(i);
-        TopoDS_Vertex v_i = TopoDS::Vertex(s_i);
-        gp_Pnt p_i = BRep_Tool::Pnt(v_i);
+		//===============================================================
+		// on teste les sommets
+		//===============================================================
+		TopTools_IndexedMapOfShape map_vertices;
+		TopExp::MapShapes(shOther, TopAbs_VERTEX, map_vertices);
+		for(unsigned int i=1; i<=map_vertices.Extent();i++)
+		{
+			TopoDS_Shape s_i = map_vertices.FindKey(i);
+			TopoDS_Vertex v_i = TopoDS::Vertex(s_i);
+			gp_Pnt p_i = BRep_Tool::Pnt(v_i);
 
-        Utils::Math::Point pi(p_i.X(),p_i.Y(),p_i.Z());
-        Utils::Math::Point proj_i;
+			Utils::Math::Point pi(p_i.X(),p_i.Y(),p_i.Z());
+			Utils::Math::Point proj_i;
 
-        project(pi,proj_i);
-        if(!Utils::Math::MgxNumeric::isNearlyZero(pi.length(proj_i),tol))
-            return false;
+			project(pi, proj_i);
+			if(!Utils::Math::MgxNumeric::isNearlyZero(pi.length(proj_i),tol))
+				return false;
+		}
 
-    }
+		//===============================================================
+		// On teste les courbes (1er point au 1/3, 2eme au 2/3)
+		//===============================================================
+		TopTools_IndexedMapOfShape map_edges;
+		TopExp::MapShapes(shOther, TopAbs_EDGE, map_edges);
+		for(unsigned int i=1; i<=map_edges.Extent();i++)
+		{
+			TopoDS_Shape s_i = map_edges.FindKey(i);
+			TopoDS_Edge e_i = TopoDS::Edge(s_i);
+			BRepAdaptor_Curve curve_adaptor(e_i);
+			double umin = curve_adaptor.FirstParameter();
+			double umax = curve_adaptor.LastParameter();
 
-    //===============================================================
-    // On teste les courbes (1er point au 1/3, 2eme au 2/3)
-    //===============================================================
-    TopTools_IndexedMapOfShape map_edges;
-    TopExp::MapShapes(shOther,TopAbs_EDGE, map_edges);
-    for(unsigned int i=1; i<=map_edges.Extent();i++){
-        TopoDS_Shape s_i = map_edges.FindKey(i);
-        TopoDS_Edge e_i = TopoDS::Edge(s_i);
-        BRepAdaptor_Curve curve_adaptor(e_i);
-        double umin = curve_adaptor.FirstParameter();
-        double umax = curve_adaptor.LastParameter();
+			double u1 = umin+(umax-umin)/3.0;
 
-        double u1 = umin+(umax-umin)/3.0;
+			gp_Pnt pnt1 = curve_adaptor.Value(u1);
+			Utils::Math::Point pi1(pnt1.X(),pnt1.Y(),pnt1.Z());
 
-        gp_Pnt pnt1 = curve_adaptor.Value(u1);
-        Utils::Math::Point pi1(pnt1.X(),pnt1.Y(),pnt1.Z());
+			Utils::Math::Point proj_i1;
+			project(pi1,proj_i1);
+			if(!Utils::Math::MgxNumeric::isNearlyZero(pi1.length(proj_i1),tol))
+			{
+				//            std::cout<<"Point  :"<<pi1<<std::endl;
+				return false;
+			}
 
-        Utils::Math::Point proj_i1;
-        project(pi1,proj_i1);
-        if(!Utils::Math::MgxNumeric::isNearlyZero(pi1.length(proj_i1),tol))
-        {
-            //            std::cout<<"Point  :"<<pi1<<std::endl;
-            return false;
-        }
+			double u2 = umin+(umax-umin)*2.0/3.0;
 
-        double u2 = umin+(umax-umin)*2.0/3.0;
+			gp_Pnt pnt2 = curve_adaptor.Value(u2);
+			Utils::Math::Point pi2(pnt2.X(),pnt2.Y(),pnt2.Z());
 
-        gp_Pnt pnt2 = curve_adaptor.Value(u2);
-        Utils::Math::Point pi2(pnt2.X(),pnt2.Y(),pnt2.Z());
-
-        Utils::Math::Point proj_i2;
-        project(pi2,proj_i2);
-        if(!Utils::Math::MgxNumeric::isNearlyZero(pi2.length(proj_i2),tol))
-        {
-            //            std::cout<<"Point  :"<<pi2<<std::endl;
-            return false;
-        }
-
-    }
+			Utils::Math::Point proj_i2;
+			project(pi2,proj_i2);
+			if(!Utils::Math::MgxNumeric::isNearlyZero(pi2.length(proj_i2),tol))
+			{
+				//            std::cout<<"Point  :"<<pi2<<std::endl;
+				return false;
+			}
+		}
+	}
     return true;
 }
 /*----------------------------------------------------------------------------*/
 void Curve::project(Utils::Math::Point& P) const
 {
-	if (getComputationalProperties().size() == 1)
-		getComputationalProperty()->project(P,this);
-	else {
-		// on va prendre la projection la plus courte pour le cas composé
-		Utils::Math::Point pInit = P;
+	// on va prendre la projection la plus courte pour le cas composé
+	std::vector<GeomRepresentation*> reps = getComputationalProperties();
+	Utils::Math::Point pInit = P;
 
-		std::vector<GeomRepresentation*> reps = getComputationalProperties();
-		reps[0]->project(P,this);
-		Utils::Math::Point pBest = P;
-		double norme2 = (P-pInit).norme2();
-		//std::cout<<"pBest : "<<pBest<<", norme2 : "<<norme2<<std::endl;
-		for (uint i=1; i<reps.size(); i++){
-			P = pInit;
-			reps[i]->project(P,this);
-			double dist = (P-pInit).norme2();
-			//std::cout<<"P : "<<P<<", dist : "<<dist<<std::endl;
-			if (dist<norme2){
-				//std::cout<<"pBest = P"<<std::endl;
-				norme2 = dist;
-				pBest = P;
-			}
+	reps[0]->project(P,this);
+	Utils::Math::Point pBest = P;
+	double norme2 = (P-pInit).norme2();
+	//std::cout<<"pBest : "<<pBest<<", norme2 : "<<norme2<<std::endl;
+	for (uint i=1; i<reps.size(); i++){
+		P = pInit;
+		reps[i]->project(P,this);
+		double dist = (P-pInit).norme2();
+		//std::cout<<"P : "<<P<<", dist : "<<dist<<std::endl;
+		if (dist<norme2){
+			//std::cout<<"pBest = P"<<std::endl;
+			norme2 = dist;
+			pBest = P;
 		}
-		P = pBest;
 	}
+	P = pBest;
 }
 /*----------------------------------------------------------------------------*/
 void Curve::project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const
 {
-	if (getComputationalProperties().size() == 1)
-		getComputationalProperty()->project(P1,P2,this);
-	else {
-		// on va prendre la projection la plus courte pour le cas composé
-
-		std::vector<GeomRepresentation*> reps = getComputationalProperties();
-		reps[0]->project(P1,P2,this);
-		Utils::Math::Point pBest = P2;
-		double norme2 = (P2-P1).norme2();
-		for (uint i=1; i<reps.size(); i++){
-			reps[i]->project(P1,P2,this);
-			double dist = (P2-P1).norme2();
-			if (dist<norme2){
-				norme2 = dist;
-				pBest = P2;
-			}
+	std::vector<GeomRepresentation*> reps = getComputationalProperties();
+	reps[0]->project(P1,P2,this);
+	Utils::Math::Point pBest = P2;
+	double norme2 = (P2-P1).norme2();
+	for (uint i=1; i<reps.size(); i++){
+		reps[i]->project(P1,P2,this);
+		double dist = (P2-P1).norme2();
+		if (dist<norme2){
+			norme2 = dist;
+			pBest = P2;
 		}
-		P2 = pBest;
 	}
+	P2 = pBest;
 }
 /*----------------------------------------------------------------------------*/
 void Curve::
 getPoint(const double& p, Utils::Math::Point& Pt, const bool in01) const
 {
-	if (getComputationalProperties().size() == 1)
-		getComputationalProperty()->getPoint(p, Pt, in01);
-	else {
+	std::vector<GeomRepresentation*> reps = getComputationalProperties();
+	if (reps.size() == 1)
+	{
+		reps[0]->getPoint(p, Pt, in01);
+	}
+	else
+	{
 		// vérification que computeParams a bien été utilisé
 		checkParams();
 
@@ -422,53 +420,51 @@ getPoint(const double& p, Utils::Math::Point& Pt, const bool in01) const
 
 		double paramLoc = paramLocFirst[ind]+ratio*(paramLocLast[ind]-paramLocFirst[ind]);
 
-		std::vector<GeomRepresentation*> reps = getComputationalProperties();
 		reps[ind]->getPoint(paramLoc, Pt, false);
 	}
 }
 /*----------------------------------------------------------------------------*/
 void Curve::tangent(const Utils::Math::Point& P1, Utils::Math::Vector& V2) const
 {
-	if (getComputationalProperties().size() == 1)
-		getComputationalProperty()->tangent(P1, V2);
-	else {
-		// on va prendre la projection la plus courte pour le cas composé et utiliser la tangente associée
-		Utils::Math::Point P2;
-		std::vector<GeomRepresentation*> reps = getComputationalProperties();
-		reps[0]->project(P1,P2,this);
-		Utils::Math::Point pBest = P2;
-		uint idBest=0;
-		double norme2 = (P2-P1).norme2();
-		for (uint i=1; i<reps.size(); i++){
-			reps[i]->project(P1,P2,this);
-			double dist = (P2-P1).norme2();
-			if (dist<norme2){
-				norme2 = dist;
-				pBest = P2;
-				idBest = i;
-			}
+	// on va prendre la projection la plus courte pour le cas composé et utiliser la tangente associée
+	Utils::Math::Point P2;
+	std::vector<GeomRepresentation*> reps = getComputationalProperties();
+	reps[0]->project(P1,P2,this);
+	Utils::Math::Point pBest = P2;
+	uint idBest=0;
+	double norme2 = (P2-P1).norme2();
+	for (uint i=1; i<reps.size(); i++){
+		reps[i]->project(P1,P2,this);
+		double dist = (P2-P1).norme2();
+		if (dist<norme2){
+			norme2 = dist;
+			pBest = P2;
+			idBest = i;
 		}
-		P2 = pBest;
-		reps[idBest]->tangent(P1, V2);
 	}
+	P2 = pBest;
+	reps[idBest]->tangent(P1, V2);
 }
 /*----------------------------------------------------------------------------*/
 void Curve::getIntersection(gp_Pln& plan_cut, Utils::Math::Point& Pt) const
 {
-	if (getComputationalProperties().size() == 1)
-		getComputationalProperty()->getIntersection(plan_cut, Pt);
-	else {
-		MGX_NOT_YET_IMPLEMENTED("intersection avec un plan non implémentée pour le cas composée (utilisé pour discrétisation polaire)");
-	}
-
+	std::vector<GeomRepresentation*> reps = getComputationalProperties();
+	if (reps.size() == 1)
+		reps[0]->getIntersection(plan_cut, Pt);
+	else
+		MGX_NOT_YET_IMPLEMENTED("Intersection avec un plan non implémentée pour le cas composé (utilisé pour discrétisation polaire)");
 }
 /*----------------------------------------------------------------------------*/
 void Curve::getParameter(const Utils::Math::Point& Pt, double& p) const
 {
     //std::cout<<setprecision(14)<<"Curve::getParameter pour pt "<<Pt<<std::endl;
-	if (getComputationalProperties().size() == 1)
-		getComputationalProperty()->getParameter(Pt, p, this);
-	else {
+	std::vector<GeomRepresentation*> reps = getComputationalProperties();
+	if (reps.size() == 1)
+	{
+		reps[0]->getParameter(Pt, p, this);
+	}
+	else
+	{
 		// vérification que computeParams a bien été utilisé
 		checkParams();
 
@@ -487,7 +483,6 @@ void Curve::getParameter(const Utils::Math::Point& Pt, double& p) const
 			return;
 		}
 
-		std::vector<GeomRepresentation*> reps = getComputationalProperties();
 		for (uint ind=0; ind<reps.size(); ind++){
 
 			try{
@@ -512,9 +507,13 @@ void Curve::getParameter(const Utils::Math::Point& Pt, double& p) const
 /*----------------------------------------------------------------------------*/
 void Curve::getParameters(double& first, double& last) const
 {
-	if (getComputationalProperties().size() == 1)
-		getComputationalProperty()->getParameters(first, last);
-	else {
+	std::vector<GeomRepresentation*> reps = getComputationalProperties();
+	if (reps.size() == 1)
+	{
+		reps[0]->getParameters(first, last);
+	}
+	else
+	{
 		// vérification que computeParams a bien été utilisé
 		checkParams();
 		first = 0.0;
@@ -559,7 +558,14 @@ void Curve::getParametricsPoints(const Utils::Math::Point& Pt0,
 #endif
 
     if (m_vertices.size() == 1){
-        getComputationalProperty()->getParameters(first, last);
+		std::vector<GeomRepresentation*> reps = getComputationalProperties();
+		if (reps.size() != 1) {
+			TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
+			messErr << "[Erreur interne] La courbe "<<getName()<<" est une courbe composée ce qui ne permet pas de trouver les points en fonction d'une paramétrisation";
+			throw TkUtil::Exception(messErr);
+		}
+
+        reps[0]->getParameters(first, last);
 
 
 #ifdef _DEBUG_GETPARAMETRICSPOINTS
@@ -899,23 +905,29 @@ void Curve::getPolarParametricsPoints(const Utils::Math::Point& Pt0,
 /*------------------------------------------------------------------------*/
 Vertex* Curve::firstPoint() const
 {
-	OCCGeomRepresentation* this_rep = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
-	CHECK_NULL_PTR_ERROR(this_rep);
-	TopoDS_Shape this_shape = this_rep->getShape();
+	std::vector<GeomRepresentation*> reps = getComputationalProperties();
+	if (reps.size() > 0) {
+		OCCGeomRepresentation* this_rep = dynamic_cast<OCCGeomRepresentation*>(reps[0]);
+		CHECK_NULL_PTR_ERROR(this_rep);
+		TopoDS_Shape this_shape = this_rep->getShape();
 
-	TopoDS_Edge e = TopoDS::Edge(this_shape);
-	TopoDS_Vertex v = TopExp::FirstVertex(e);
+		TopoDS_Edge e = TopoDS::Edge(this_shape);
+		TopoDS_Vertex v = TopExp::FirstVertex(e);
 
-	int index = -1;
-	for(unsigned int i=0;i<m_vertices.size();i++){
-		Vertex* vi = m_vertices[i];
-		OCCGeomRepresentation* vi_rep = dynamic_cast<OCCGeomRepresentation*>(vi->getComputationalProperty());
-		CHECK_NULL_PTR_ERROR(vi_rep);
-		TopoDS_Shape vi_shape = vi_rep->getShape();
+		int index = -1;
+		for(unsigned int i=0;i<m_vertices.size();i++){
+			Vertex* vi = m_vertices[i];
+			std::vector<GeomRepresentation*> vi_reps = vi->getComputationalProperties();
+			if (vi_reps.size() == 1) {
+				OCCGeomRepresentation* vi_rep = dynamic_cast<OCCGeomRepresentation*>(vi_reps[0]);
+				CHECK_NULL_PTR_ERROR(vi_rep);
+				TopoDS_Shape vi_shape = vi_rep->getShape();
 
-		TopoDS_Vertex occ_vi = TopoDS::Vertex(vi_shape);
-		if (OCCGeomRepresentation::areEquals(v, occ_vi)){
-			return vi;
+				TopoDS_Vertex occ_vi = TopoDS::Vertex(vi_shape);
+				if (OCCGeomRepresentation::areEquals(v, occ_vi)){
+					return vi;
+				}
+			}
 		}
 	}
 	throw TkUtil::Exception(TkUtil::UTF8String ("Impossible de trouver le premier sommet d'une courbe (au sens OCC)", TkUtil::Charset::UTF_8));
@@ -923,148 +935,32 @@ Vertex* Curve::firstPoint() const
 /*------------------------------------------------------------------------*/
 Vertex* Curve::secondPoint() const
 {
-	OCCGeomRepresentation* this_rep = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
-	CHECK_NULL_PTR_ERROR(this_rep);
-	TopoDS_Shape this_shape = this_rep->getShape();
+	std::vector<GeomRepresentation*> reps = getComputationalProperties();
+	if (reps.size() > 0) {
+		OCCGeomRepresentation* this_rep = dynamic_cast<OCCGeomRepresentation*>(reps[reps.size()-1]);
+		CHECK_NULL_PTR_ERROR(this_rep);
+		TopoDS_Shape this_shape = this_rep->getShape();
 
-	TopoDS_Edge e = TopoDS::Edge(this_shape);
-	TopoDS_Vertex v = TopExp::LastVertex(e);
+		TopoDS_Edge e = TopoDS::Edge(this_shape);
+		TopoDS_Vertex v = TopExp::LastVertex(e);
 
-	int index = -1;
-	for(unsigned int i=0;i<m_vertices.size();i++){
-		Vertex* vi = m_vertices[i];
-		OCCGeomRepresentation* vi_rep = dynamic_cast<OCCGeomRepresentation*>(vi->getComputationalProperty());
-		CHECK_NULL_PTR_ERROR(vi_rep);
-		TopoDS_Shape vi_shape = vi_rep->getShape();
+		int index = -1;
+		for(unsigned int i=0;i<m_vertices.size();i++){
+			Vertex* vi = m_vertices[i];
+			std::vector<GeomRepresentation*> vi_reps = vi->getComputationalProperties();
+			if (vi_reps.size() == 1) {
+				OCCGeomRepresentation* vi_rep = dynamic_cast<OCCGeomRepresentation*>(vi_reps[0]);
+				CHECK_NULL_PTR_ERROR(vi_rep);
+				TopoDS_Shape vi_shape = vi_rep->getShape();
 
-		TopoDS_Vertex occ_vi = TopoDS::Vertex(vi_shape);
-		if (OCCGeomRepresentation::areEquals(v, occ_vi)){
-			return vi;
+				TopoDS_Vertex occ_vi = TopoDS::Vertex(vi_shape);
+				if (OCCGeomRepresentation::areEquals(v, occ_vi)){
+					return vi;
+				}
+			}
 		}
 	}
 	throw TkUtil::Exception(TkUtil::UTF8String ("Impossible de trouver le second sommet d'une courbe (au sens OCC)", TkUtil::Charset::UTF_8));
-}
-/*----------------------------------------------------------------------------*/
-void Curve::bounds(Surface* ASurf, double& ATMin, double& ATMax) const
-{
-	OCCGeomRepresentation* this_rep = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
-	OCCGeomRepresentation* surf_rep = dynamic_cast<OCCGeomRepresentation*>(ASurf->getComputationalProperty());
-	CHECK_NULL_PTR_ERROR(this_rep);
-	CHECK_NULL_PTR_ERROR(surf_rep);
-	TopoDS_Shape this_shape = this_rep->getShape();
-	TopoDS_Shape surf_shape = surf_rep->getShape();
-
-	TopoDS_Edge e = TopoDS::Edge(this_shape);
-	TopoDS_Face f = TopoDS::Face(surf_shape);
-
-	BRep_Tool::CurveOnSurface(e, f, ATMin, ATMax);
-
-}
-/*----------------------------------------------------------------------------*/
-void Curve::
-getParameter2D(Surface* ASurf, const Utils::Math::Point& Pt, double& p) const
-{
-	OCCGeomRepresentation* this_rep =
-			dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
-	OCCGeomRepresentation* surf_rep =
-			dynamic_cast<OCCGeomRepresentation*>(ASurf->getComputationalProperty());
-	CHECK_NULL_PTR_ERROR(this_rep);
-	CHECK_NULL_PTR_ERROR(surf_rep);
-	TopoDS_Shape this_shape = this_rep->getShape();
-	TopoDS_Shape surf_shape = surf_rep->getShape();
-
-	TopoDS_Edge e = TopoDS::Edge(this_shape);
-	TopoDS_Face f = TopoDS::Face(surf_shape);
-
-	//WE GET THE 2D CURVE
-	double t_min, t_max;
-	Handle_Geom2d_Curve parametric_curve = BRep_Tool::CurveOnSurface(e, f, t_min, t_max);
-
-	//WE PROJECT THE POINT ON THE SURFACE
-	Handle_Geom_Surface surf_3d = BRep_Tool::Surface(f);
-	gp_Pnt to_project(Pt.getX(),Pt.getY(),Pt.getZ());
-	GeomAPI_ProjectPointOnSurf surf_proj(to_project,surf_3d);
-	//WE GET THE U, V parameters of the point in the surface
-	double u,v;
-	surf_proj.Parameters(1,u,v);
-
- gp_Pnt2d point_2D(u,v);
-
-	Geom2dAPI_ProjectPointOnCurve proj2d(point_2D, parametric_curve);
-
-	p = proj2d.Parameter(1);
-
-}
-/*----------------------------------------------------------------------------*/
-void Curve::parametricData(Surface* ASurf, double& AT,  double AUV[2],
-		double ADT[2],
-		double ADTT[2]) const
-{
-	OCCGeomRepresentation* this_rep =
-			dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
-	OCCGeomRepresentation* surf_rep =
-			dynamic_cast<OCCGeomRepresentation*>(ASurf->getComputationalProperty());
-	CHECK_NULL_PTR_ERROR(this_rep);
-	CHECK_NULL_PTR_ERROR(surf_rep);
-	TopoDS_Shape this_shape = this_rep->getShape();
-	TopoDS_Shape surf_shape = surf_rep->getShape();
-
-	TopoDS_Edge e = TopoDS::Edge(this_shape);
-	TopoDS_Face f = TopoDS::Face(surf_shape);
-
-	double t_min, t_max;
-	Handle_Geom2d_Curve parametric_curve = BRep_Tool::CurveOnSurface(e, f, t_min, t_max);
-
-	// We get the 2D coordinate of the point with parameter AT
-	gp_Pnt2d pnt = parametric_curve->Value(AT);
-	AUV[0] = pnt.X();
-	AUV[1] = pnt.Y();
-	// We get the first derivative in the point with parameter AT
-	gp_Vec2d dt = parametric_curve->DN(AT,1);
-	ADT[0] = dt.X();
-	ADT[1] = dt.Y();
-	// We get the second derivative in the point with parameter AT
-	gp_Vec2d dtt = parametric_curve->DN(AT,2);
-	ADTT[0] = dtt.X();
-	ADTT[1] = dtt.Y();
-}
-/*------------------------------------------------------------------------*/
-GeomOrientation Curve::orientation() const
-{
-	OCCGeomRepresentation* this_rep =
-			dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
-	CHECK_NULL_PTR_ERROR(this_rep);
-	TopoDS_Shape this_shape = this_rep->getShape();
-	TopoDS_Edge e = TopoDS::Edge(this_shape);
-
-	GeomOrientation value;
-	switch(e.Orientation())
-	{
-	case(TopAbs_FORWARD):
-			 value = GEOM_FORWARD;
-	break;
-	case(TopAbs_REVERSED):
-			  value = GEOM_REVERSED;
-	break;
-	case(TopAbs_INTERNAL):
-			  value = GEOM_INTERNAL;
-	break;
-	case(TopAbs_EXTERNAL):
-			  value = GEOM_EXTERNAL;
-	break;
-	};
-	return value;
-}
-/*------------------------------------------------------------------------*/
-bool Curve::isInternal() const
-{
-	OCCGeomRepresentation* this_rep =
-			dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
-	CHECK_NULL_PTR_ERROR(this_rep);
-	TopoDS_Shape this_shape = this_rep->getShape();
-	TopoDS_Edge e = TopoDS::Edge(this_shape);
-
-	return (e.Orientation()==TopAbs_INTERNAL);
 }
 /*----------------------------------------------------------------------------*/
 void Curve::add(Surface* s)
@@ -1284,11 +1180,13 @@ void Curve::setDestroyed(bool b)
 /*----------------------------------------------------------------------------*/
 bool Curve::isLinear() const
 {
+	std::vector<GeomRepresentation*> reps = getComputationalProperties();
+
 	// on dit que ce n'est pas linéaire dès que c'est composé
-	if (getComputationalProperties().size()>1)
+	if (reps.size() != 1)
 		return false;
 
-     OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
+    OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(reps[0]);
 
     if(rep){
     	TopoDS_Shape sh = rep->getShape();
@@ -1326,11 +1224,13 @@ bool Curve::isLinear() const
 /*----------------------------------------------------------------------------*/
 bool Curve::isCircle() const
 {
+	std::vector<GeomRepresentation*> reps = getComputationalProperties();
+
 	// on dit que ce n'est pas circulaire dès que c'est composé
-	if (getComputationalProperties().size()>1)
+	if (reps.size() != 1)
 		return false;
 
-    OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
+    OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(reps[0]);
 
     if(rep){
     	TopoDS_Shape sh = rep->getShape();
@@ -1361,11 +1261,13 @@ bool Curve::isCircle() const
 /*----------------------------------------------------------------------------*/
 bool Curve::isEllipse() const
 {
+	std::vector<GeomRepresentation*> reps = getComputationalProperties();
+
 	// on dit que ce n'est pas circulaire dès que c'est composé
-	if (getComputationalProperties().size()>1)
+	if (reps.size() != 1)
 		return false;
 
-    OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
+    OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(reps[0]);
 
     if(rep){
     	TopoDS_Shape sh = rep->getShape();
@@ -1395,11 +1297,13 @@ bool Curve::isEllipse() const
 /*----------------------------------------------------------------------------*/
 bool Curve::isBSpline() const
 {
+	std::vector<GeomRepresentation*> reps = getComputationalProperties();
+
 	// on dit que ce n'est pas, dès que c'est composé
-	if (getComputationalProperties().size()>1)
+	if (reps.size() != 1)
 		return false;
 
-	OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
+    OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(reps[0]);
 
 	if(rep){
 
@@ -1424,71 +1328,6 @@ bool Curve::isBSpline() const
 	}
 
     return false;
-}
-/*----------------------------------------------------------------------------*/
-bool Curve::isWire() const
-{
-	// on dit que ce n'est pas, dès que c'est composé
-	if (getComputationalProperties().size()>1)
-		return false;
-
-	OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
-
-	if(rep){
-
-		TopoDS_Shape sh = rep->getShape();
-
-		if(sh.ShapeType()== TopAbs_WIRE)
-			return true;
-	}
-
-    return false;
-}
-/*----------------------------------------------------------------------------*/
-Utils::Math::Point Curve::getCenter() const
-{
-    //std::cout<<"Curve::getCenter()  pour "<<getName()<<std::endl;
-
-    OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
-
-    if(rep==0)
-        throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne (pas de shape OCC), avec Curve::getCenter", TkUtil::Charset::UTF_8));
-
-    TopoDS_Shape sh = rep->getShape();
-
-
-    if(sh.ShapeType()!= TopAbs_EDGE)
-    {
-        throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne (pas de shape OCC), avec Curve::getCenter", TkUtil::Charset::UTF_8));
-
-        //on peut avoir un wire !!!
-    }
-
-
-    TopoDS_Edge edge = TopoDS::Edge(sh);
-
-    Standard_Real first_param, last_param;
-    Handle_Geom_Curve curve = BRep_Tool::Curve(edge, first_param, last_param);
-    if (curve.IsNull())
-    	throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, curve non reconnue, avec Curve::getCenter", TkUtil::Charset::UTF_8));
-
-    if (curve->DynamicType()==STANDARD_TYPE(Geom_Ellipse)){
-        Handle(Geom_Ellipse) ellipse = Handle(Geom_Ellipse)::DownCast(curve);
-        gp_Elips elips = ellipse->Elips();
-        const gp_Pnt& loc = elips.Location();
-
-        return Utils::Math::Point(loc.X(), loc.Y(), loc.Z());
-
-    } else if (curve->DynamicType()==STANDARD_TYPE(Geom_Circle)){
-        Handle(Geom_Circle) circle = Handle(Geom_Circle)::DownCast(curve);
-        gp_Circ circ = circle->Circ();
-        const gp_Ax2& ax = circ.Position();
-        const gp_Pnt& loc = ax.Location();
-
-        return Utils::Math::Point(loc.X(), loc.Y(), loc.Z());
-    }
-    else
-        throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, type non prévu, avec Curve::getCenter", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
 Utils::SerializedRepresentation* Curve::getDescription (bool alsoComputed) const
@@ -1525,7 +1364,6 @@ Utils::SerializedRepresentation* Curve::getDescription (bool alsoComputed) const
     // on ajoute des infos du style: c'est une droite, un arc de cercle, une ellipse, une b-spline
     TkUtil::UTF8String typeStr (TkUtil::Charset::UTF_8);
 	bool isABSpline = false;
-	bool isAWire = false;
     if (isLinear())
     	typeStr<<"segment";
     else if (isCircle())
@@ -1535,10 +1373,6 @@ Utils::SerializedRepresentation* Curve::getDescription (bool alsoComputed) const
     else if (isBSpline()){
     	isABSpline = true;
     	typeStr<<"b-spline";
-    }
-    else if (isWire()){
-    	typeStr<<"wire";
-    	isAWire = true;
     }
     else if (getComputationalProperties().size()>1)
     	typeStr<<"composée";
@@ -1553,49 +1387,23 @@ Utils::SerializedRepresentation* Curve::getDescription (bool alsoComputed) const
 		TkUtil::UTF8String	nbStr1 (TkUtil::Charset::UTF_8);
 		TkUtil::UTF8String	nbStr2 (TkUtil::Charset::UTF_8);
 
-		OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
+		// c'est une spline => une seule représentation
+		OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperties()[0]);
 		CHECK_NULL_PTR_ERROR(rep);
-		TopoDS_Shape sh = rep->getShape();
+		TopoDS_Edge edge = TopoDS::Edge(rep->getShape());
 
-		if (sh.ShapeType()==TopAbs_EDGE){
-			Standard_Real first_param, last_param;
-			TopoDS_Edge edge = TopoDS::Edge(sh);
-			Handle_Geom_Curve curve = BRep_Tool::Curve(edge, first_param, last_param);
+		Standard_Real first_param, last_param;
+		Handle_Geom_Curve curve = BRep_Tool::Curve(edge, first_param, last_param);
 
-			Handle(Geom_BSplineCurve) bspline = Handle(Geom_BSplineCurve)::DownCast(curve);
+		Handle(Geom_BSplineCurve) bspline = Handle(Geom_BSplineCurve)::DownCast(curve);
 
-			nbStr1<<(long int)bspline->NbKnots();
-			nbStr2<<(long int)bspline->NbPoles();
+		nbStr1<<(long int)bspline->NbKnots();
+		nbStr2<<(long int)bspline->NbPoles();
 
-	    	propertyGeomDescription.addProperty (
-	    			Utils::SerializedRepresentation::Property ("Nb noeuds", nbStr1.ascii()) );
-	    	propertyGeomDescription.addProperty (
-	    			Utils::SerializedRepresentation::Property ("Nb poles", nbStr2.ascii()) );
-		}
-    }
-
-    if (isAWire){
-		TkUtil::UTF8String	nbStr1 (TkUtil::Charset::UTF_8);
-		TkUtil::UTF8String	nbStr2 (TkUtil::Charset::UTF_8);
-
-		OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
-		CHECK_NULL_PTR_ERROR(rep);
-		TopoDS_Shape sh = rep->getShape();
-
-		if (sh.ShapeType()==TopAbs_WIRE){
-			TopoDS_Wire aWire= TopoDS::Wire(sh);
-			TopExp_Explorer ex;
-			uint nb_edges = 0;
-			for (ex.Init(aWire,TopAbs_EDGE); ex.More(); ex.Next()){ // pas trouvé de "size"
-				nb_edges++;
-			}
-			nbStr1<<(long int)nb_edges;
-			nbStr2<<(long int)m_vertices.size();
-	    	propertyGeomDescription.addProperty (
-	    			Utils::SerializedRepresentation::Property ("Nb edges", nbStr1.ascii()) );
-	    	propertyGeomDescription.addProperty (
-	    			Utils::SerializedRepresentation::Property ("Nb vertices", nbStr2.ascii()) );
-		}
+		propertyGeomDescription.addProperty (
+				Utils::SerializedRepresentation::Property ("Nb noeuds", nbStr1.ascii()) );
+		propertyGeomDescription.addProperty (
+				Utils::SerializedRepresentation::Property ("Nb poles", nbStr2.ascii()) );
     }
 
     // affichage des paramètres extrémas

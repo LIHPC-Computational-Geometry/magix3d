@@ -259,6 +259,14 @@ public:
     virtual void setDestroyed(bool b);
 #endif
 
+    /*------------------------------------------------------------------------*/
+    /** \brief  Fournit une représentation facétisée (point, segments, polygones) de l'entité
+     *
+     */
+    virtual void facetedRepresentationForwardOrient(
+            Surface* AEntityOrientation,
+            std::vector<gmds::math::Triangle >*) const;
+
 	/*------------------------------------------------------------------------*/
 	/** \brief	Fournit une représentation textuelle de l'entité.
 	 * \param	true si l'entité fourni la totalité de sa description, false si

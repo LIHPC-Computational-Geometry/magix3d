@@ -350,8 +350,8 @@ public:
      *
      */
     virtual void facetedRepresentationForwardOrient(
-    		const GeomEntity* ACaller,
-    		const GeomEntity* AEntityOrientation,
+    		const Volume* ACaller,
+    		const Surface* AEntityOrientation,
     		std::vector<gmds::math::Triangle >*) const;
 
     /*------------------------------------------------------------------------*/

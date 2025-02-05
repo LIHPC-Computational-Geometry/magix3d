@@ -254,16 +254,6 @@ public:
             const GeomEntity* caller) const=0;
 
     /*------------------------------------------------------------------------*/
-    /** \brief  Renvoie si la surface AEntityOrientation est bien orientée
-     * 			par rapport au volume ACaller.
-     *
-     */
-    virtual void facetedRepresentationForwardOrient(
-    		const GeomEntity* ACaller,
-    		const GeomEntity* AEntityOrientation,
-    		std::vector<gmds::math::Triangle >*) const=0;
-
-    /*------------------------------------------------------------------------*/
     /** \brief  Fournit un clone de l'instance de représentation géométrique.
      *          Pour cela, un appel à "new" est effectué dans cette commande.
      *

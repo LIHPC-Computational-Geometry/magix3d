@@ -206,11 +206,12 @@ void GeomScaleImplementation::
 performUndo()
 {
     for (uint i=0; i<m_undoableEntities.size(); i++){
-        GeomRepresentation* rep = m_undoableEntities[i]->getComputationalProperty();
-        if (m_isHomogene)
-            rep->scale(1.0/m_factor, m_center);
-        else
-            rep->scale(1.0/m_factorX, 1.0/m_factorY, 1.0/m_factorZ, m_center);
+        for (GeomRepresentation* rep : m_undoableEntities[i]->getComputationalProperties()){
+            if (m_isHomogene)
+                rep->scale(1.0/m_factor, m_center);
+            else
+                rep->scale(1.0/m_factorX, 1.0/m_factorY, 1.0/m_factorZ, m_center);
+        }
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -218,11 +219,12 @@ void GeomScaleImplementation::
 performRedo()
 {
     for (uint i=0; i<m_undoableEntities.size(); i++){
-        GeomRepresentation* rep = m_undoableEntities[i]->getComputationalProperty();
-        if (m_isHomogene)
-            rep->scale(m_factor, m_center);
-        else
-            rep->scale(m_factorX, m_factorY, m_factor, m_center);
+        for (GeomRepresentation* rep : m_undoableEntities[i]->getComputationalProperties()){
+            if (m_isHomogene)
+                rep->scale(m_factor, m_center);
+            else
+                rep->scale(m_factorX, m_factorY, m_factor, m_center);
+        }
     }
 }
 /*----------------------------------------------------------------------------*/

@@ -164,33 +164,6 @@ void Surface::get(std::vector<Curve*>& curves) const
     curves.insert(curves.end(),m_curves.begin(),m_curves.end());
 }
 /*----------------------------------------------------------------------------*/
-void Surface::getTemporary(std::vector<Curve*>& curves) const
-{
-	OCCGeomRepresentation* occ_rep =
-			dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
-
-	if(occ_rep==0)
-		throw TkUtil::Exception (TkUtil::UTF8String ("getParametricBounds nécessite une représentation OCC", TkUtil::Charset::UTF_8));
-
-	TopoDS_Shape sh = occ_rep->getShape();
-
-	if(sh.ShapeType()!=TopAbs_FACE)
-		throw TkUtil::Exception (TkUtil::UTF8String ("getTemporary nécessite une face OCC", TkUtil::Charset::UTF_8));
-
-	curves.clear();
-	TopExp_Explorer exp0;
-	for(exp0.Init(sh, TopAbs_EDGE); exp0.More(); exp0.Next()){
-		TopoDS_Edge edge = TopoDS::Edge(exp0.Current());
-
-		Curve*  c   = new Curve(getContext(),
-				getContext().newProperty(Utils::Entity::GeomCurve),
-				getContext().newDisplayProperties(Utils::Entity::GeomCurve),
-				new GeomProperty(), new OCCGeomRepresentation(getContext(), edge));
-
-		curves.push_back(c);
-	}
-}
-/*----------------------------------------------------------------------------*/
 void Surface::get(std::vector<Surface*>& surfaces) const
 {
     std::list<Surface*> l;
@@ -216,13 +189,12 @@ void Surface::get(std::vector<Volume*>& volumes) const
 /*----------------------------------------------------------------------------*/
 void Surface::project(Utils::Math::Point& P) const
 {
-	if (getComputationalProperties().size() == 1)
-		getComputationalProperty()->project(P,this);
+	std::vector<GeomRepresentation*> reps = getComputationalProperties();
+	if (reps.size() == 1)
+		reps[0]->project(P,this);
 	else {
 		// on va prendre la projection la plus courte pour le cas composé
 		Utils::Math::Point pInit = P;
-
-		std::vector<GeomRepresentation*> reps = getComputationalProperties();
 		reps[0]->project(P,this);
 		Utils::Math::Point pBest = P;
 		double norme2 = (P-pInit).norme2();
@@ -241,12 +213,11 @@ void Surface::project(Utils::Math::Point& P) const
 /*----------------------------------------------------------------------------*/
 void Surface::project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const
 {
+	std::vector<GeomRepresentation*> reps = getComputationalProperties();
 	if (getComputationalProperties().size() == 1)
-		getComputationalProperty()->project(P1,P2,this);
+		reps[0]->project(P1,P2,this);
 	else {
 		// on va prendre la projection la plus courte pour le cas composé
-
-		std::vector<GeomRepresentation*> reps = getComputationalProperties();
 		reps[0]->project(P1,P2,this);
 		Utils::Math::Point pBest = P2;
 		double norme2 = (P2-P1).norme2();
@@ -264,14 +235,14 @@ void Surface::project(const Utils::Math::Point& P1, Utils::Math::Point& P2) cons
 /*----------------------------------------------------------------------------*/
 void Surface::normal(const Utils::Math::Point& P1, Utils::Math::Vector& V2) const
 {
-	if (getComputationalProperties().size() == 1)
-		getComputationalProperty()->normal(P1,V2,this);
+	std::vector<GeomRepresentation*> reps = getComputationalProperties();
+	if (reps.size() == 1)
+		reps[0]->normal(P1,V2,this);
 	else {
 		// comme pour la projection, on recherche la plus courte distance et on utilise cette sous-surface
 //		std::cout<<"normale en "<<P1<<"pour "<<getName()<<std::endl;
 		uint ind = 0;
 		Utils::Math::Point P2;
-		std::vector<GeomRepresentation*> reps = getComputationalProperties();
 		reps[0]->project(P1,P2,this);
 		Utils::Math::Point pBest = P2;
 		double norme2 = (P2-P1).norme2();
@@ -323,10 +294,10 @@ void Surface::remove(Curve* c)
 /*----------------------------------------------------------------------------*/
 void Surface::split(std::vector<Curve* >& curv,std::vector<Vertex* >&  vert)
 {
-	if (getComputationalProperties().size() == 1)
-		getComputationalProperty()->split(curv,vert,this);
+	std::vector<GeomRepresentation*> reps = getComputationalProperties();
+	if (reps.size() == 1)
+		reps[0]->split(curv,vert,this);
 	else {
-		std::vector<GeomRepresentation*> reps = getComputationalProperties();
 		for (uint i=0; i<reps.size(); i++)
 			reps[i]->split(curv,vert,this);
 	}
@@ -445,17 +416,19 @@ void Surface::setDestroyed(bool b)
 /*----------------------------------------------------------------------------*/
 bool Surface::isPlanar() const
 {
+	std::vector<GeomRepresentation*> reps = getComputationalProperties();
+
 	// on dit que ce n'est pas planaire dès que c'est composé
-	if (getComputationalProperties().size()>1)
+	if (reps.size() > 1)
 		return false;
 
-    OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
+    OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(reps[0]);
 
     // pas plan si autre que OCC
     if(rep!=0){
     	TopoDS_Shape sh = rep->getShape();
 
-    	if(sh.ShapeType() == TopAbs_FACE){
+    	if(sh.ShapeType() == TopAbs_FACE){ // forcément une Face
     		TopoDS_Face face = TopoDS::Face(sh);
     		Handle_Geom_Surface surface = BRep_Tool::Surface(face);
     		if(surface->DynamicType()==STANDARD_TYPE(Geom_Plane))
@@ -649,56 +622,25 @@ bool Surface::contains(Surface* ASurf) const
     return true;
 }
 /*----------------------------------------------------------------------------*/
-/*----------------------------------------------------------------------------*/
-void Surface::
-getParametricBounds(double& U1,double& U2,double& V1,double& V2) const
-{
-    OCCGeomRepresentation* occ_rep =
-            dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
-
-    if(occ_rep==0)
-        throw TkUtil::Exception (TkUtil::UTF8String ("getParametricBounds nécessite une représentation OCC", TkUtil::Charset::UTF_8));
-
-    TopoDS_Shape sh = occ_rep->getShape();
-
-    if(sh.ShapeType()!=TopAbs_FACE)
-        throw TkUtil::Exception (TkUtil::UTF8String ("getParametricBounds nécessite une face OCC", TkUtil::Charset::UTF_8));
-
-    Handle_Geom_Surface surf = BRep_Tool::Surface(TopoDS::Face(sh));
-
-    //calcul des parametres par OCC
-    surf->Bounds(U1,U2,V1,V2);
-}
-/*----------------------------------------------------------------------------*/
-/*----------------------------------------------------------------------------*/
 Utils::Math::Point Surface::getPoint(const double u, const double v) const
 {
+	for (GeomRepresentation* gr : getComputationalProperties()) {
+		OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(gr);
+		if(occ_rep==0 || occ_rep->getShape().ShapeType()!=TopAbs_FACE)
+			throw TkUtil::Exception (TkUtil::UTF8String ("getParametricBounds nécessite une face OCC", TkUtil::Charset::UTF_8));
 
-    double umin, umax, vmin, vmax;
-    getParametricBounds(umin, umax, vmin, vmax);
+		// check parametric bounds
+		TopoDS_Shape sh = occ_rep->getShape();
+		Handle_Geom_Surface surf = BRep_Tool::Surface(TopoDS::Face(sh));
+		double umin, umax, vmin, vmax;
+		surf->Bounds(umin, umax, vmin, vmax);
+		if(u>=umin && u<=umax && v>=vmin && v<=vmax) {
+			gp_Pnt occ_pnt = surf->Value(u,v);
+			return Utils::Math::Point(occ_pnt.X(), occ_pnt.Y(), occ_pnt.Z());
+		}
+	}
 
-    if(u<umin || u>umax)
-        throw TkUtil::Exception (TkUtil::UTF8String ("Parametre u hors de la plage [UMIN, UMAX]", TkUtil::Charset::UTF_8));
-    if(v<vmin || v>vmax)
-        throw TkUtil::Exception (TkUtil::UTF8String ("Parametre v hors de la plage [VMIN, VMAX]", TkUtil::Charset::UTF_8));
-
-    OCCGeomRepresentation* occ_rep =
-            dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
-
-    if(occ_rep==0)
-        throw TkUtil::Exception (TkUtil::UTF8String ("getParametricBounds nécessite une représentation OCC", TkUtil::Charset::UTF_8));
-
-    TopoDS_Shape sh = occ_rep->getShape();
-
-    if(sh.ShapeType()!=TopAbs_FACE)
-        throw TkUtil::Exception (TkUtil::UTF8String ("getParametricBounds nécessite une face OCC", TkUtil::Charset::UTF_8));
-
-    Handle_Geom_Surface surf = BRep_Tool::Surface(TopoDS::Face(sh));
-
-    gp_Pnt occ_pnt = surf->Value(u,v);
-
-     return Utils::Math::Point(occ_pnt.X(), occ_pnt.Y(), occ_pnt.Z());
-
+    throw TkUtil::Exception (TkUtil::UTF8String ("Parametre u hors de la plage [UMIN, UMAX]", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
 void Surface::get(std::vector<Topo::CoFace*>& cofaces)
@@ -786,91 +728,6 @@ Utils::SerializedRepresentation* Surface::getDescription (bool alsoComputed) con
     description->addPropertiesSet (propertyGeomDescription);
 
 	return description.release ( );
-}
-/*------------------------------------------------------------------------*/
-GeomOrientation Surface::orientation() const
-{
-	OCCGeomRepresentation* this_rep = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
-	CHECK_NULL_PTR_ERROR(this_rep);
-	TopoDS_Shape this_shape = this_rep->getShape();
-
-	TopoDS_Face f = TopoDS::Face(this_shape);
-	GeomOrientation value;
-	switch(f.Orientation())
-	{
-	case(TopAbs_FORWARD):
-		  value = GEOM_FORWARD;
-	break;
-	case(TopAbs_REVERSED):
-		  value = GEOM_REVERSED;
-	break;
-	case(TopAbs_INTERNAL):
-		  value = GEOM_INTERNAL;
-	break;
-	case(TopAbs_EXTERNAL):
-		  value = GEOM_EXTERNAL;
-	break;
-	};
-	return value;
-}
-
-/*------------------------------------------------------------------------*/
-void Surface::bounds(double& AUMin, double& AUMax,
-		double& AVMin, double& AVMax) const
-{
-	OCCGeomRepresentation* this_rep =
-			dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
-	CHECK_NULL_PTR_ERROR(this_rep);
-	TopoDS_Shape this_shape = this_rep->getShape();
-
-	TopoDS_Face f = TopoDS::Face(this_shape);
-	Handle_Geom_Surface surf = BRep_Tool::Surface(f);
-	surf->Bounds(AUMin,AUMax,AVMin,AVMax);
-}
-/*------------------------------------------------------------------------*/
-void Surface::d2(const double& AU, const double& AV,
-		Utils::Math::Point& AP,
-		Utils::Math::Vector& ADU,
-		Utils::Math::Vector& ADV,
-		Utils::Math::Vector& ADUU,
-		Utils::Math::Vector& ADUV,
-		Utils::Math::Vector& ADVV) const
-{
-	OCCGeomRepresentation* this_rep =
-			dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
-	CHECK_NULL_PTR_ERROR(this_rep);
-	TopoDS_Shape this_shape = this_rep->getShape();
-
-	TopoDS_Face f = TopoDS::Face(this_shape);
-	Handle_Geom_Surface surf = BRep_Tool::Surface(f);
-	gp_Pnt pnt;
-	gp_Vec du, dv, duu, dvv, duv;
-	surf->D2(AU,AV,pnt,du,dv,duu,dvv,duv);
-
-	//We get the location
-	AP.setXYZ(pnt.X(),pnt.Y(),pnt.Z());
-
-	//We get the first derivatives
-	ADU.setX(du.X());
-	ADU.setY(du.Y());
-	ADU.setZ(du.Z());
-
-	ADV.setX(dv.X());
-	ADV.setY(dv.Y());
-	ADV.setZ(dv.Z());
-
-	//We get the second derivatives
-	ADUU.setX(duu.X());
-	ADUU.setY(duu.Y());
-	ADUU.setZ(duu.Z());
-
-	ADVV.setX(dvv.X());
-	ADVV.setY(dvv.Y());
-	ADVV.setZ(dvv.Z());
-
-	ADUV.setX(duv.X());
-	ADUV.setY(duv.Y());
-	ADUV.setZ(duv.Z());
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

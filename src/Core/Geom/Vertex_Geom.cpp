@@ -47,11 +47,12 @@ Vertex::Vertex(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProp
 /*----------------------------------------------------------------------------*/
 GeomEntity* Vertex::clone(Internal::Context& c)
 {
+    // 1 seule représentation pour le vertex
     return new Vertex(c,
             c.newProperty(this->getType()),
             c.newDisplayProperties(this->getType()),
             new GeomProperty(),
-            this->getComputationalProperty()->clone());
+            this->getComputationalProperties()[0]->clone());
 }
 /*----------------------------------------------------------------------------*/
 Vertex::~Vertex()
@@ -110,8 +111,9 @@ Mgx3D::Utils::SerializedRepresentation* Vertex::getDescription (bool alsoCompute
 
 #ifdef _DEBUG		// Issue#111
     // précision OpenCascade ou autre
+    // 1 seule représentation pour le vertex
 	TkUtil::UTF8String	precStr (TkUtil::Charset::UTF_8);
-    precStr<<getComputationalProperty()->getPrecision();
+    precStr<<getComputationalProperties()[0]->getPrecision();
 
     propertyGeomDescription.addProperty (
     	        Utils::SerializedRepresentation::Property ("Précision", precStr.ascii()) );
@@ -234,8 +236,9 @@ void Vertex::remove(Curve* c)
 /*----------------------------------------------------------------------------*/
 Utils::Math::Point Vertex::getCenteredPosition() const
 {
+    // 1 seule représentation pour le vertex
     OCCGeomRepresentation* rep =
-            dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
+            dynamic_cast<OCCGeomRepresentation*>(getComputationalProperties()[0]);
     if (rep){
 
     	TopoDS_Vertex v = TopoDS::Vertex(rep->getShape());

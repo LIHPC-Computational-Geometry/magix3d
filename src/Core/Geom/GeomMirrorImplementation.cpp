@@ -105,19 +105,17 @@ void GeomMirrorImplementation::
 void GeomMirrorImplementation::
 performUndo()
 {
-    for (uint i=0; i<m_undoableEntities.size(); i++){
-        GeomRepresentation* rep = m_undoableEntities[i]->getComputationalProperty();
-        rep->mirror(m_plane);
-    }
+    for (uint i=0; i<m_undoableEntities.size(); i++)
+        for (GeomRepresentation* rep : m_undoableEntities[i]->getComputationalProperties())
+            rep->mirror(m_plane);
 }
 /*----------------------------------------------------------------------------*/
 void GeomMirrorImplementation::
 performRedo()
 {
-    for (uint i=0; i<m_undoableEntities.size(); i++){
-        GeomRepresentation* rep = m_undoableEntities[i]->getComputationalProperty();
-        rep->mirror(m_plane);
-    }
+    for (uint i=0; i<m_undoableEntities.size(); i++)
+        for (GeomRepresentation* rep : m_undoableEntities[i]->getComputationalProperties())
+            rep->mirror(m_plane);
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom
