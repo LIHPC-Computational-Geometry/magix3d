@@ -36,9 +36,6 @@
 #include <BRepBuilderAPI_MakeWire.hxx>
 #include <TopoDS_Wire.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
-#include <ShapeAnalysis_Wire.hxx>
-#include <ShapeExtend_WireData.hxx>
-#include <ShapeFix_Wire.hxx>
 #include <TopoDS.hxx>
 #include <TopExp_Explorer.hxx>
 #include <BRepAlgo_NormalProjection.hxx>
@@ -815,20 +812,13 @@ Surface* EntityFactory::newSurface(const std::vector<Geom::Curve*>& curves)
 
             std::vector<GeomRepresentation*> reps = current_curve->getComputationalProperties();
             for (uint j=0; j<reps.size(); j++){
-            	OCCGeomRepresentation* current_rep =dynamic_cast<OCCGeomRepresentation*>
+            	OCCGeomRepresentation* current_rep = dynamic_cast<OCCGeomRepresentation*>
             	                                (reps[j]);
                 TopoDS_Shape sh = *(current_rep->getShapePtr());
-                if (sh.ShapeType() != TopAbs_WIRE && sh.ShapeType() != TopAbs_EDGE)
-                    throw Utils::BuildingException("");
-                else if (sh.ShapeType() == TopAbs_WIRE) // [EB] ce qui n'arrive plus normallement depuis la mise en place des courbes composées
-                {
-                    TopTools_IndexedMapOfShape mapE;
-                    TopExp::MapShapes(sh,TopAbs_EDGE, mapE);
-                    for(int i=1; i<=mapE.Extent(); i++)
-                        mk_wire.Add(TopoDS::Edge(mapE.FindKey(i)));
-                }
-                else if (sh.ShapeType() == TopAbs_EDGE){
+                if (sh.ShapeType() == TopAbs_EDGE){
                     mk_wire.Add(TopoDS::Edge(sh));
+                } else {
+                    throw Utils::BuildingException("");
                 }
             }
         }
@@ -1652,8 +1642,11 @@ Curve* EntityFactory::newCurveByCurveProjectionOnSurface(Curve* curve, Surface* 
             <<curve->getName() << ", "<<surface->getName()<<")"<<std::endl;
 #endif
 
-    OCCGeomRepresentation* crv_rep =dynamic_cast<OCCGeomRepresentation*>
-             (curve->getComputationalProperty());
+    std::vector<GeomRepresentation*> reps = curve->getComputationalProperties();
+    if (reps.size() != 1) 
+        throw TkUtil::Exception(TkUtil::UTF8String ("Pas possible de projeter une courbe composée", TkUtil::Charset::UTF_8));
+
+    OCCGeomRepresentation* crv_rep =dynamic_cast<OCCGeomRepresentation*>(reps[0]);
     CHECK_NULL_PTR_ERROR(crv_rep);
     TopoDS_Shape crv_shape = crv_rep->getShape();
 
@@ -1735,58 +1728,6 @@ Curve* EntityFactory::newCurveByTopoDS_ShapeProjectionOnSurface(TopoDS_Shape sha
 	}
 
 }
-///*----------------------------------------------------------------------------*/
-//Surface* EntityFactory::newSurface(std::vector<Curve*>& curves)
-//{
-//    BRep_Builder B;
-//    TopoDS_Compound compound;
-//    B.MakeCompound(compound);
-//    std::cerr<<"NB Curves: "<<curves.size()<<std::endl;
-//
-//    for(unsigned int i=0; i<curves.size();i++)
-//    {
-//        Curve* ei = curves[i];
-//
-//        GeomRepresentation* rep = ei->getComputationalProperty();
-//
-//        OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(rep);
-//
-//        if(occ_rep==0)
-//            throw TkUtil::Exception("impossible d'unir des entités non représentées à l'aide d'OCC");
-//
-//        TopoDS_Shape si = occ_rep->getShape();
-//        B.Add(compound,si);
-//    }
-//
-//    BRepBuilderAPI_MakeFace mkFace;
-//    std::cerr<<"A"<<std::endl;
-//    mkFace.Add(TopoDS::Wire(compound));
-//    std::cerr<<"B"<<std::endl;
-//    TopoDS_Shape result = mkFace.Shape();
-//    std::cerr<<"C"<<std::endl;
-//    if(result.ShapeType()==TopAbs_FACE)
-//        return newOCCSurface(TopoDS::Face(result));
-//    else
-//        throw TkUtil::Exception("Impossible de crer une surface a partir de ces courbes");
-//
-//    std::cerr<<"D"<<std::endl;
-////    ShHealOper_Sewing wireMaker;
-////    wireMaker.Init(compound);
-////    wireMaker.Perform();
-////
-////    TopoDS_Shape s1 = wireMaker.GetResultShape();
-////    if (s1.ShapeType()==TopAbs_WIRE){
-////        BRepBuilderAPI_MakeFace mkFace;
-////        mkFace.Add(TopoDS::Wire(s1));
-////        TopoDS_Shape result = mkFace.Shape();
-////        if(result.ShapeType()==TopAbs_FACE)
-////            return newOCCSurface(TopoDS::Face(result));
-////        else
-////            throw TkUtil::Exception("Impossible de crer une surface a partir de ces courbes");
-////    }
-////    else
-////        throw TkUtil::Exception("Impossible de crer une surface a partir de ces courbes");
-//}
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom
 /*----------------------------------------------------------------------------*/

@@ -155,7 +155,6 @@ public:
     /** \brief  MAJ de la propriété de calcul.
      */
 #ifndef SWIG
-    void setComputationalProperty(GeomRepresentation* cprop);
     void setComputationalProperties(std::vector<GeomRepresentation*>& cprop);
 #endif
 
@@ -164,7 +163,6 @@ public:
     /** \brief   récupération de la propriété de calcul
      */
 #ifndef SWIG
-    GeomRepresentation* getComputationalProperty() const;
     std::vector<GeomRepresentation*> getComputationalProperties() const;
 
 #endif
@@ -403,14 +401,6 @@ public:
      */
     virtual void getFacetedRepresentation(
             std::vector<gmds::math::Triangle  >& AVec) const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Fournit une représentation facétisée (point, segments, polygones) de l'entité
-     *
-     */
-    virtual void facetedRepresentationForwardOrient(
-            GeomEntity* AEntityOrientation,
-            std::vector<gmds::math::Triangle >*) const;
 
     /*------------------------------------------------------------------------*/
     /** Ajoute une relation vers la topologie

@@ -154,22 +154,6 @@ void GeomEntity::computeBoundingBox(Utils::Math::Point& pmin,Utils::Math::Point&
 }
 /*----------------------------------------------------------------------------*/
 void GeomEntity::
-setComputationalProperty(GeomRepresentation* cprop)
-{
-    GeomRepresentation* old_rep = 0;
-    if(cprop==0) {
-        throw   TkUtil::Exception(TkUtil::UTF8String ("Null computational property", TkUtil::Charset::UTF_8));
-    }
-    old_rep = getComputationalProperty();
-    m_geomRep.clear();
-    m_geomRep.push_back(cprop);
-
-    if (old_rep != getComputationalProperty())
-    	m_computedAreaIsUpToDate = false;
-
-}
-/*----------------------------------------------------------------------------*/
-void GeomEntity::
 setComputationalProperties(std::vector<GeomRepresentation*>& cprop)
 {
     if(cprop.empty())
@@ -189,24 +173,6 @@ GeomProperty* GeomEntity::setGeomProperty(GeomProperty* prop)
     old_rep = m_geomProp;
     m_geomProp= prop;
     return old_rep;
-}
-/*----------------------------------------------------------------------------*/
-GeomRepresentation* GeomEntity::getComputationalProperty() const
-{
-	if (m_geomRep.size() == 1)
-		return m_geomRep[0];
-	else if (m_geomRep.size() == 0){
-		TkUtil::UTF8String	messErreur (TkUtil::Charset::UTF_8);
-		messErreur<<"Erreur interne, getComputationalProperty() avec m_geomRep vide pour ";
-		messErreur<<getName();
-		throw TkUtil::Exception (messErreur);
-	}
-	else {
-		TkUtil::UTF8String	messErreur (TkUtil::Charset::UTF_8);
-		messErreur<<"Erreur interne, getComputationalProperty() avec m_geomRep multiple pour ";
-		messErreur<<getName();
-		throw TkUtil::Exception (messErreur);
-	}
 }
 /*----------------------------------------------------------------------------*/
 std::vector<GeomRepresentation*> GeomEntity::getComputationalProperties() const
@@ -490,21 +456,8 @@ getFacetedRepresentation(
         std::vector<gmds::math::Triangle >& AVec) const
 {
     AVec.clear();
-    if (getComputationalProperty())
-    	getComputationalProperty()->getFacetedRepresentation(AVec, this);
-}
-/*----------------------------------------------------------------------------*/
-void GeomEntity::
-facetedRepresentationForwardOrient(
-        GeomEntity* AEntityOrientation,
-        std::vector<gmds::math::Triangle >* ATri) const
-{
-    if (getComputationalProperty()) {
-    	getComputationalProperty()->facetedRepresentationForwardOrient(this, AEntityOrientation, ATri);
-    } else {
-    	throw TkUtil::Exception (TkUtil::UTF8String ("GeomEntity::facetedRepresentationForwardOrient "
-    			"there is no geometric representation.", TkUtil::Charset::UTF_8));
-    }
+    for (GeomRepresentation* rep : getComputationalProperties())
+    	rep->getFacetedRepresentation(AVec, this);
 }
 /*----------------------------------------------------------------------------*/
 GeomProperty::type GeomEntity::getGeomType ( ) const

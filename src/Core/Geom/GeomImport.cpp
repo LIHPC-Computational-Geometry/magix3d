@@ -272,7 +272,7 @@ void GeomImport::add(TopoDS_Shape& AShape, const std::string& AName)
         for (ex.Init(aWire,TopAbs_EDGE); ex.More(); ex.Next())
         {
             TopoDS_Edge aEdge = TopoDS::Edge(ex.Current());
-            Curve* curve=EntityFactory(m_context).newOCCCurve(TopoDS::Edge(aEdge));
+            Curve* curve=EntityFactory(m_context).newOCCCurve(aEdge);
             curvs.push_back(curve);
             TkUtil::UTF8String	name (TkUtil::Charset::UTF_8);
             name << AName<< "-edge";
@@ -410,10 +410,10 @@ splitManyCurves(std::vector<Curve*>& curvs, std::vector<Vertex*>& verts)
 	std::vector<TopoDS_Vertex> all_vtx;
 
 	for (uint i=0; i<curvs.size(); i++){
-		GeomRepresentation* rep = curvs[i]->getComputationalProperty();
-		std::vector<TopoDS_Vertex> vtx;
+        // les courbes viennent d'être créées avec une seule arête
+		GeomRepresentation* rep = curvs[i]->getComputationalProperties()[0];
 		OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(rep);
-		CHECK_NULL_PTR_ERROR(occ_rep);
+		std::vector<TopoDS_Vertex> vtx;
 		TopExp_Explorer e;
 		for(e.Init(occ_rep->getShape(), TopAbs_VERTEX); e.More(); e.Next()){
 			TopoDS_Vertex V = TopoDS::Vertex(e.Current());

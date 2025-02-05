@@ -40,12 +40,31 @@ void ExportSTLImplementation::write()
 		throw TkUtil::Exception (TkUtil::UTF8String ("ExportSTLImplementation ne peut fonctionner qu'avec une unique entité", TkUtil::Charset::UTF_8));
 
 
-	GeomRepresentation* rep = m_geomEntities[0]->getComputationalProperty();
-	OCCGeomRepresentation* geom_rep =
-			            dynamic_cast<OCCGeomRepresentation*>(rep);
-	CHECK_NULL_PTR_ERROR(geom_rep);
+	std::vector<GeomRepresentation*> reps = m_geomEntities[0]->getComputationalProperties();
+	if (reps.size() == 1) {
+		OCCGeomRepresentation* gr = dynamic_cast<OCCGeomRepresentation*>(reps[0]);
+		CHECK_NULL_PTR_ERROR(gr);
+		StlAPI::Write(gr->getShape(), m_filename.c_str(), true);
+	} else if (reps.size() > 1) {
+		TopoDS_Compound compound = combineShapes(reps);
+		StlAPI::Write(compound, m_filename.c_str(), true);
+	}
+}
 
-	 Standard_Boolean err = StlAPI::Write(geom_rep->getShape(), m_filename.c_str(), true);
+/*----------------------------------------------------------------------------*/
+TopoDS_Compound ExportSTLImplementation::combineShapes(const std::vector<GeomRepresentation*>& reps)
+{
+    BRep_Builder builder;
+    TopoDS_Compound compound;
+    builder.MakeCompound(compound);
+
+    for (GeomRepresentation* rep : reps) {
+		OCCGeomRepresentation* gr = dynamic_cast<OCCGeomRepresentation*>(rep);
+		CHECK_NULL_PTR_ERROR(gr);
+        builder.Add(compound, gr->getShape());
+    }
+
+    return compound;
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

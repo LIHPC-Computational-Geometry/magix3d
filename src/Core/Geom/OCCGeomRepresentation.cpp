@@ -1619,7 +1619,8 @@ void OCCGeomRepresentation::split(std::vector<Vertex* >&  vert,Curve* owner)
         // on évite de mettre 2 fois le même sommet [EB]
         bool are_same = false;
         if (v){
-        	OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(v->getComputationalProperty());
+            // 1 seule représentation pour le vertex
+        	OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(v->getComputationalProperties()[0]);
         	CHECK_NULL_PTR_ERROR(occ_rep);
         	TopoDS_Vertex Vprec = TopoDS::Vertex(occ_rep->getShape());
         	if (Vprec.IsSame(V))
@@ -2127,16 +2128,18 @@ void OCCGeomRepresentation::getParameter(const Utils::Math::Point& Pt, double& p
 
         //récuperation du sommet initial
         Vertex* first_vertex  = m3d_vertices.front();
+        // 1 seule représentation pour le vertex
         OCCGeomRepresentation* occ_rep =
                 dynamic_cast<OCCGeomRepresentation*>
-                (first_vertex->getComputationalProperty());
+                (first_vertex->getComputationalProperties()[0]);
         CHECK_NULL_PTR_ERROR(occ_rep);
         TopoDS_Vertex v1 = TopoDS::Vertex(occ_rep->getShape());
 
         //récuperation du sommet final
         Vertex* second_vertex = m3d_vertices.back();
+        // 1 seule représentation pour le vertex
         occ_rep = dynamic_cast<OCCGeomRepresentation*>
-                (second_vertex->getComputationalProperty());
+                (second_vertex->getComputationalProperties()[0]);
         CHECK_NULL_PTR_ERROR(occ_rep);
         TopoDS_Vertex v2 = TopoDS::Vertex(occ_rep->getShape());
 
@@ -2935,57 +2938,28 @@ getFacetedRepresentation(
 /*----------------------------------------------------------------------------*/
 void OCCGeomRepresentation::
 facetedRepresentationForwardOrient(
-        const GeomEntity* ACaller,
-        const GeomEntity* AEntityOrientation,
+        const Volume* ACaller,
+        const Surface* AEntityOrientation,
         std::vector<gmds::math::Triangle>* ATri) const
 {
     TopoDS_Shape callerShape = m_shape;
 
-    OCCGeomRepresentation* occ_rep =
-                      dynamic_cast<OCCGeomRepresentation*> (AEntityOrientation->getComputationalProperty());
-    CHECK_NULL_PTR_ERROR(occ_rep);
-    TopoDS_Shape entityOrientationShape = occ_rep->getShape();
+    for (GeomRepresentation* gr : AEntityOrientation->getComputationalProperties()) {
+        OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(gr);
+        CHECK_NULL_PTR_ERROR(occ_rep);
+        TopoDS_Shape entityOrientationShape = occ_rep->getShape();
+        TopExp_Explorer ex;
 
+        for (ex.Init(callerShape, TopAbs_FACE); ex.More(); ex.Next()) {
+            if(areEquals(TopoDS::Face(ex.Current()), TopoDS::Face(entityOrientationShape))) {
+                ATri->clear();
 
-    /* si la shape est vide, on ne fait rien */
-    if(m_shape.IsNull())
-        throw TkUtil::Exception ("OCCGeomRepresentation::facetedRepresentationForwardOrient "
-                "shape est NULL.");
+                OCCFacetedRepresentationBuilder builder(ACaller,callerShape);
+                builder.execute(*ATri,entityOrientationShape);
 
-    TopExp_Explorer ex;
-
-    for (ex.Init(callerShape, TopAbs_FACE); ex.More(); ex.Next()) {
-    	if(areEquals(TopoDS::Face(ex.Current()),TopoDS::Face(entityOrientationShape))) {
-
-//    		TopoDS_Face face = TopoDS::Face(ex.Current());
-//    		TopoDS_Face face_bis = TopoDS::Face(entityOrientationShape);
-//
-//    		TopAbs_Orientation orient = face_bis.Orientation();
-//
-//    		if(orient==TopAbs_FORWARD) {
-//    			std::cout<<"TopAbs_FORWARD "<<std::endl;
-//    		}
-//    		if(orient==TopAbs_REVERSED) {
-//    			std::cout<<"TopAbs_REVERSED "<<std::endl;
-//    		}
-//    		if(orient==TopAbs_INTERNAL) {
-//    			std::cout<<"TopAbs_INTERNAL "<<std::endl;
-//    		}
-//    		if(orient==TopAbs_EXTERNAL) {
-//    			std::cout<<"TopAbs_EXTERNAL "<<std::endl;
-//    		}
-//
-//    		return (orient == TopAbs_FORWARD);
-
-//    		AEntityOrientation
-//    		 fillRepresentation(TopoDS::Face(ex.Current()),AVec);
-    		ATri->clear();
-
-    		OCCFacetedRepresentationBuilder builder(ACaller,callerShape);
-    		builder.execute(*ATri,entityOrientationShape);
-
-    		return;
-    	}
+                return;
+            }
+        }
     }
 
     throw TkUtil::Exception ("OCCGeomRepresentation::facetedRepresentationForwardOrient "

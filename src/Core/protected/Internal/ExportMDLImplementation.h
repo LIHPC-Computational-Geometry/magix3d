@@ -15,6 +15,8 @@
 #include "Geom/GeomEntity.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
+#include <TopoDS_Edge.hxx>
+/*----------------------------------------------------------------------------*/
 #include <string>
 #include <vector>
 /*----------------------------------------------------------------------------*/
@@ -98,6 +100,8 @@ private:
     /// sauvegarde d'une surface dans la structure MDL
     uint save(Geom::Surface* sf);
 
+    /// retourne la position du centre pour une ellipse ou un cercle 
+    Utils::Math::Point getCenter(const TopoDS_Edge& edge);
 
 private:
 

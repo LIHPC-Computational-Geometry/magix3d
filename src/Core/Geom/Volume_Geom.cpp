@@ -85,11 +85,12 @@ Volume::Volume(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProp
 /*----------------------------------------------------------------------------*/
 GeomEntity* Volume::clone(Internal::Context& c)
 {
+    // 1 seule représentation pour le volume
     return new Volume(c,
             c.newProperty(this->getType()),
             c.newDisplayProperties(this->getType()),
             new GeomProperty(),
-            this->getComputationalProperty()->clone());
+            this->getComputationalProperties()[0]->clone());
 }
 
 /*----------------------------------------------------------------------------*/
@@ -242,13 +243,15 @@ void Volume::split(std::vector<Surface*>& surf,
         std::vector<Curve*  >& curv,
         std::vector<Vertex* >&  vert)
 {
-    getComputationalProperty()->split(surf,curv,vert,this);
+    // 1 seule représentation pour le vertex
+    getComputationalProperties()[0]->split(surf,curv,vert,this);
 
 }
 /*----------------------------------------------------------------------------*/
 double Volume::computeArea() const
 {
-    return getComputationalProperty()->computeVolumeArea();
+    // 1 seule représentation pour le vertex
+    return getComputationalProperties()[0]->computeVolumeArea();
 }
 /*----------------------------------------------------------------------------*/
 bool Volume::contains(Volume* vol) const
@@ -283,13 +286,14 @@ bool Volume::contains(Volume* vol) const
     // TESTEE PEUT NE PAS ENCORE ETRE CONNECTEE TOPOLOGIQUEMENT
     // AVEC DES ENTITES M3D
     //===============================================================
+    // 1 seule représentation pour le vertex
     OCCGeomRepresentation* rep =
-            dynamic_cast<OCCGeomRepresentation*>(vol->getComputationalProperty());
+            dynamic_cast<OCCGeomRepresentation*>(vol->getComputationalProperties()[0]);
     CHECK_NULL_PTR_ERROR(rep);
     TopoDS_Shape shOther = rep->getShape();
 
     OCCGeomRepresentation* my_rep =
-                dynamic_cast<OCCGeomRepresentation*>(this->getComputationalProperty());
+                dynamic_cast<OCCGeomRepresentation*>(this->getComputationalProperties()[0]);
     CHECK_NULL_PTR_ERROR(my_rep);
     TopoDS_Shape sh = my_rep->getShape();
 
@@ -517,6 +521,16 @@ get(std::vector<Topo::Block*>& blocs) const
 			iter != topo_entities.end(); ++iter)
 		if ((*iter)->getDim() == 3)
 			blocs.push_back(dynamic_cast<Topo::Block*>(*iter));
+}
+/*----------------------------------------------------------------------------*/
+void Volume::
+facetedRepresentationForwardOrient(
+        Surface* AEntityOrientation,
+        std::vector<gmds::math::Triangle >* ATri) const
+{
+    // 1 seule représentation sur un volume
+    OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(getComputationalProperties()[0]);
+    rep->facetedRepresentationForwardOrient(this, AEntityOrientation, ATri);
 }
 /*----------------------------------------------------------------------------*/
 Utils::SerializedRepresentation* Volume::getDescription (bool alsoComputed) const

@@ -107,19 +107,17 @@ void GeomTranslateImplementation::
 performUndo()
 {
     Utils::Math::Vector dv_inv(-m_dv.getX(), -m_dv.getY(), -m_dv.getZ());
-    for (uint i=0; i<m_undoableEntities.size(); i++){
-        GeomRepresentation* rep = m_undoableEntities[i]->getComputationalProperty();
-        rep->translate(dv_inv);
-    }
+    for (uint i=0; i<m_undoableEntities.size(); i++)
+        for (GeomRepresentation* rep : m_undoableEntities[i]->getComputationalProperties())
+            rep->translate(dv_inv);
 }
 /*----------------------------------------------------------------------------*/
 void GeomTranslateImplementation::
 performRedo()
 {
-    for (uint i=0; i<m_undoableEntities.size(); i++){
-        GeomRepresentation* rep = m_undoableEntities[i]->getComputationalProperty();
-        rep->translate(m_dv);
-    }
+    for (uint i=0; i<m_undoableEntities.size(); i++)
+        for (GeomRepresentation* rep : m_undoableEntities[i]->getComputationalProperties())
+            rep->translate(m_dv);
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

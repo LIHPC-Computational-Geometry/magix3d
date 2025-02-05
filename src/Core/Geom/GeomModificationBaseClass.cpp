@@ -230,16 +230,15 @@ addAdjacencyReference(GeomEntity* e)
     }
 }
 /*----------------------------------------------------------------------------*/
-void GeomModificationBaseClass::getOCCShape(GeomEntity* e, TopoDS_Shape& sh){
-
-    GeomRepresentation* rep = e->getComputationalProperty();
-
-    OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(rep);
-
-    if(occ_rep==0)
-        throw TkUtil::Exception (TkUtil::UTF8String ("impossible de modifier des entités non représentées à l'aide d'OCC", TkUtil::Charset::UTF_8));
-
-    sh = occ_rep->getShape();
+void GeomModificationBaseClass::getOCCShape(GeomEntity* ge, TopoDS_Shape& sh)
+{
+	std::vector<GeomRepresentation*> ppties = ge->getComputationalProperties();
+    if (ppties.size() == 1) {
+        OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(ppties[0]);
+        sh = occ_rep->getShape();
+    } else {
+        throw TkUtil::Exception (TkUtil::UTF8String ("la modification n'est possible que sur des entités OCC non composées", TkUtil::Charset::UTF_8));
+    }
 }
 /*----------------------------------------------------------------------------*/
 void GeomModificationBaseClass::getOCCShapes(GeomEntity* ge, std::vector<TopoDS_Shape>& topoS)
@@ -987,8 +986,9 @@ void GeomModificationBaseClass::rebuildAdjacencyLinks()
 void GeomModificationBaseClass::computeReplacedVertex(Vertex* e)
 {
     //e est une entité supprimée, on cherche celles l'ayant remplacées
+    // une seule représentation pour un vertex
     OCCGeomRepresentation* occ_rep =
-            dynamic_cast<OCCGeomRepresentation*>(e->getComputationalProperty());
+            dynamic_cast<OCCGeomRepresentation*>(e->getComputationalProperties()[0]);
     CHECK_NULL_PTR_ERROR(occ_rep);
     TopoDS_Vertex occ_e = TopoDS::Vertex(occ_rep->getShape());
     //========================================================================
@@ -997,8 +997,9 @@ void GeomModificationBaseClass::computeReplacedVertex(Vertex* e)
     bool is_replaced  = false;
     for(unsigned int i=0;i<m_toKeepVertices.size() && !is_replaced;i++){
         Vertex* v = m_toKeepVertices[i];
+        // une seule représentation pour un vertex
         OCCGeomRepresentation* occ_rep_v =
-                dynamic_cast<OCCGeomRepresentation*>(v->getComputationalProperty());
+                dynamic_cast<OCCGeomRepresentation*>(v->getComputationalProperties()[0]);
         CHECK_NULL_PTR_ERROR(occ_rep_v);
         TopoDS_Vertex occ_v = TopoDS::Vertex(occ_rep_v->getShape());
         // si on sait que la shape est partiellement remplacee, autant ne
@@ -1196,9 +1197,10 @@ void GeomModificationBaseClass::computeReplacedSurface(Surface* e)
 /*----------------------------------------------------------------------------*/
 void GeomModificationBaseClass::computeReplacedVolume(Volume* e)
 {
-	//e est une entité supprimée, on cherche celles l'ayant remplacées
+	// e est une entité supprimée, on cherche celles l'ayant remplacées
+    // une seule représentation pour un volume
 	OCCGeomRepresentation* occ_rep =
-			dynamic_cast<OCCGeomRepresentation*>(e->getComputationalProperty());
+			dynamic_cast<OCCGeomRepresentation*>(e->getComputationalProperties()[0]);
 	CHECK_NULL_PTR_ERROR(occ_rep);
 	TopoDS_Solid occ_e = TopoDS::Solid(occ_rep->getShape());
 
@@ -1215,8 +1217,9 @@ void GeomModificationBaseClass::computeReplacedVolume(Volume* e)
 #ifdef _DEBUG2
 		std::cout<<"  m_toKeepVolumes["<<i<<"] : "<<s->getName()<<std::endl;
 #endif
+        // 1 seule représentation pour un volume
 		OCCGeomRepresentation* occ_rep_s =
-				dynamic_cast<OCCGeomRepresentation*>(s->getComputationalProperty());
+				dynamic_cast<OCCGeomRepresentation*>(s->getComputationalProperties()[0]);
 		CHECK_NULL_PTR_ERROR(occ_rep_s);
 		TopoDS_Solid occ_s = TopoDS::Solid(occ_rep_s->getShape());
 		// si on sait que la shape est partiellement remplacee, autant ne
@@ -1238,8 +1241,9 @@ void GeomModificationBaseClass::computeReplacedVolume(Volume* e)
 	//========================================================================
 	for(unsigned int i=0;i<m_newVolumes.size() && !is_fully_replaced;i++){
 		Volume* s = m_newVolumes[i];
+        // 1 seule représentation pour un volume
 		OCCGeomRepresentation* occ_rep_s =
-				dynamic_cast<OCCGeomRepresentation*>(s->getComputationalProperty());
+				dynamic_cast<OCCGeomRepresentation*>(s->getComputationalProperties()[0]);
 		CHECK_NULL_PTR_ERROR(occ_rep_s);
 		TopoDS_Solid occ_s = TopoDS::Solid(occ_rep_s->getShape());
 		// si on sait que la shape est partiellement remplacee, autant ne
@@ -1827,8 +1831,9 @@ void GeomModificationBaseClass::createNewVertices(const TopoDS_Shape& shape,
             Vertex* current = dynamic_cast<Vertex*>(*it);
             CHECK_NULL_PTR_ERROR(current);
             //REPRESENTION OCC ASSOCIEE
+            // 1 seule représentation pour un vertex
             OCCGeomRepresentation* occ_rep =
-                    dynamic_cast<OCCGeomRepresentation*>(current->getComputationalProperty());
+                    dynamic_cast<OCCGeomRepresentation*>(current->getComputationalProperties()[0]);
             CHECK_NULL_PTR_ERROR(occ_rep);
             //SOMMET OCC CORRESPONDANT
             TopoDS_Vertex vrep = TopoDS::Vertex(occ_rep->getShape());
@@ -1856,8 +1861,9 @@ void GeomModificationBaseClass::createNewVertices(const TopoDS_Shape& shape,
             for(unsigned int k=0; k<m_newVertices.size() && !found_in_news;k++)
             {
                 Geom::Vertex* current = m_newVertices[k];
+                // 1 seule représentation pour un vertex
                 OCCGeomRepresentation* occ_rep =
-                        dynamic_cast<OCCGeomRepresentation*>(current->getComputationalProperty());
+                        dynamic_cast<OCCGeomRepresentation*>(current->getComputationalProperties()[0]);
                 CHECK_NULL_PTR_ERROR(occ_rep);
                 TopoDS_Vertex vrep = TopoDS::Vertex(occ_rep->getShape());
 
@@ -2178,8 +2184,9 @@ void GeomModificationBaseClass::createNewVolumes(
         {
             Volume* current = dynamic_cast<Volume*>(*it);
             CHECK_NULL_PTR_ERROR(current);
+            // 1 seule représentation pour un volume
             OCCGeomRepresentation* occ_rep =
-                    dynamic_cast<OCCGeomRepresentation*>(current->getComputationalProperty());
+                    dynamic_cast<OCCGeomRepresentation*>(current->getComputationalProperties()[0]);
             CHECK_NULL_PTR_ERROR(occ_rep);
 //            TopoDS_Shape sh = occ_rep->getShape();
 //            std::cout<<index++<<") "<<current->getName()<<" : "<<sh.ShapeType()<<std::endl;
@@ -2213,9 +2220,9 @@ void GeomModificationBaseClass::createNewVolumes(
             for(unsigned int k=0; k<m_newVolumes.size() &&!found_in_news;k++)
             {
                 Volume* current = m_newVolumes[k];
-
+                // 1 seule représentation pour un volume
                 OCCGeomRepresentation* occ_rep =
-                        dynamic_cast<OCCGeomRepresentation*>(current->getComputationalProperty());
+                        dynamic_cast<OCCGeomRepresentation*>(current->getComputationalProperties()[0]);
                 CHECK_NULL_PTR_ERROR(occ_rep);
                 TopoDS_Solid rep_volume = TopoDS::Solid(occ_rep->getShape());
 
@@ -2288,8 +2295,9 @@ void GeomModificationBaseClass::createNewAdjVolumes(
         {
             Volume* current = dynamic_cast<Volume*>(*it);
             CHECK_NULL_PTR_ERROR(current);
+            // 1 seule représentation pour un volume
             OCCGeomRepresentation* occ_rep =
-                    dynamic_cast<OCCGeomRepresentation*>(current->getComputationalProperty());
+                    dynamic_cast<OCCGeomRepresentation*>(current->getComputationalProperties()[0]);
             CHECK_NULL_PTR_ERROR(occ_rep);
             TopoDS_Solid rep_volume = TopoDS::Solid(occ_rep->getShape());
 
@@ -2316,8 +2324,9 @@ void GeomModificationBaseClass::createNewAdjVolumes(
 #ifdef _DEBUG2
             std::cout<<"=> adj compare: "<<current->getName()<<std::endl;
 #endif
+            // 1 seule représentation pour un volume
             OCCGeomRepresentation* occ_rep =
-                    dynamic_cast<OCCGeomRepresentation*>(current->getComputationalProperty());
+                    dynamic_cast<OCCGeomRepresentation*>(current->getComputationalProperties()[0]);
             CHECK_NULL_PTR_ERROR(occ_rep);
             TopoDS_Solid rep_volume = TopoDS::Solid(occ_rep->getShape());
 
@@ -2341,8 +2350,9 @@ void GeomModificationBaseClass::createNewAdjVolumes(
             {
                 Volume* current = m_newVolumes[k];
 
+                // 1 seule représentation pour un volume
                 OCCGeomRepresentation* occ_rep =
-                        dynamic_cast<OCCGeomRepresentation*>(current->getComputationalProperty());
+                        dynamic_cast<OCCGeomRepresentation*>(current->getComputationalProperties()[0]);
                 CHECK_NULL_PTR_ERROR(occ_rep);
                 TopoDS_Solid rep_volume = TopoDS::Solid(occ_rep->getShape());
 
