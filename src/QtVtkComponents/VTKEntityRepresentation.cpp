@@ -236,14 +236,12 @@ void VTKEntityRepresentation::setSelected (bool selected)
 }	// VTKEntityRepresentation::setSelected
 
 
-void VTKEntityRepresentation::setHighlighted (bool highlighted)
+void VTKEntityRepresentation::setHighlighted (bool highlighted, bool refreshGui)
 {
 	const unsigned long	mask	= getRepresentationMask ( );
 	if (true == highlighted)
 	{
-// 		if (0 == (mask & DISCRETISATIONTYPE))
- 		if ((0 == (mask & DISCRETISATIONTYPE)) && (0 != getEntity ( )) &&
-		    (Entity::TopoCoEdge == getEntity ( )->getType ( )))
+ 		if ((0 == (mask & DISCRETISATIONTYPE)) && (0 != getEntity ( )) && (Entity::TopoCoEdge == getEntity ( )->getType ( )))
 		{
 			_highlightForceDiscretisationType	= true;
 			// Forcer la création de la représentation du type de
@@ -264,9 +262,8 @@ void VTKEntityRepresentation::setHighlighted (bool highlighted)
 	RenderedEntityRepresentation::setHighlighted (highlighted);
 	if ((true == update) && (0 != getEntity ( )))
 	{
-		updateHighlightRepresentation (highlighted);
-		if ((true == highlighted) &&
-		    (true == Resources::instance ( )._selectionOnTop.getValue ( )))
+		updateHighlightRepresentation (highlighted, refreshGui);
+		if ((true == highlighted) && (true == Resources::instance ( )._selectionOnTop.getValue ( )))
 			bringToTop ( );
 	}	// if ((true == update) && (0 != getEntity ( )))
 }	// VTKEntityRepresentation::setHighlighted
@@ -728,10 +725,9 @@ property->SetInterpolationToFlat ( );
 }	// VTKEntityRepresentation::updateRepresentationProperties
 
 
-void VTKEntityRepresentation::updateHighlightRepresentation (bool highlight)
+void VTKEntityRepresentation::updateHighlightRepresentation (bool highlight, bool refreshGui)
 {
-	VTKRenderingManager*	renderingManager
-						= dynamic_cast<VTKRenderingManager*>(_renderingManager);
+	VTKRenderingManager*	renderingManager = dynamic_cast<VTKRenderingManager*>(_renderingManager);
 	if ((0 == renderingManager) || (0 == _renderer))
 		return;
 
@@ -755,28 +751,24 @@ void VTKEntityRepresentation::updateHighlightRepresentation (bool highlight)
 		    (false == getEntity ( )->getDisplayProperties ( ).isDisplayed ( )))
 			destroyRepresentations (destroyDataOnHide ( ));
 
-		// Si l'entité est représentée alors on actualise si nécessaire sa
-		// représentation.
+		// Si l'entité est représentée alors on actualise si nécessaire sa représentation.
 		updateRepresentationProperties ( );
 
-		// L'évènement vient d'ailleurs que la fenêtre graphique => forcer son
-		// actualisation :
-		if (0 != _renderer->GetRenderWindow ( ))
+		// L'évènement vient d'ailleurs que la fenêtre graphique => forcer son actualisation SSI demandé :
+		if ((true == refreshGui) && (0 != _renderer->GetRenderWindow ( )))
 			_renderer->GetRenderWindow ( )->Render ( );
 
 		return;
 	}	// if (false == highlight)
 
 	// On force l'affichage de l'entité si nécessaire pour le highlighting :
-	if ((0 != getEntity ( )) &&
-	    (false == getEntity ( )->getDisplayProperties ( ).isDisplayed ( )))
+	if ((0 != getEntity ( )) && (false == getEntity ( )->getDisplayProperties ( ).isDisplayed ( )))
 			updateRepresentation (getRepresentationMask ( ), true);
 
 	if (true == Resources::instance ( )._useHighLightColor.getValue ( ))
 		updateRepresentationProperties ( );
 
-	if ((true == highlight) &&
-	    (true == Resources::instance ( )._highLightBoundinBox.getValue ( )))
+	if ((true == highlight) && (true == Resources::instance ( )._highLightBoundinBox.getValue ( )))
 	{
 		if (0 == _highlightActor)
 		{
@@ -820,9 +812,8 @@ void VTKEntityRepresentation::updateHighlightRepresentation (bool highlight)
 		}	// if (0 != getEntity ( ))
 	}	// if (true == highlight) && ...
 
-	// L'évènement vient d'ailleurs que la fenêtre graphique => forcer son
-	// actualisation :
-	if (0 != _renderer->GetRenderWindow ( ))
+	// L'évènement vient d'ailleurs que la fenêtre graphique => forcer son actualisation SSI demandé :
+	if ((true == refreshGui) && (0 != _renderer->GetRenderWindow ( )))
 		_renderer->GetRenderWindow ( )->Render ( );
 }	// VTKEntityRepresentation::updateHighlightRepresentation
 

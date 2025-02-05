@@ -44,8 +44,7 @@ namespace QtVtkComponents
  *				un affichage 3D reposant sur <I>VTK</I>.
  *
  */
-class VTKEntityRepresentation :
-						public QtComponents::RenderedEntityRepresentation
+class VTKEntityRepresentation : public QtComponents::RenderedEntityRepresentation
 {
 	public :
 
@@ -76,14 +75,13 @@ class VTKEntityRepresentation :
 	virtual void setSelected (bool selected);
 
 	/**
-	 * Modifie si nécessaire les attributs de représentation selon
-	 * <I>highlighted</I>.
+	 * Modifie si nécessaire les attributs de représentation selon <I>highlighted</I>.
 	 *
 	 * \warning		Force l'affichage du type de discrétisation afin de donner
 	 *				éventuellement un complément d'information visuel à
 	 *				l'utilisateur.
 	 */
-	virtual void setHighlighted (bool highlighted);
+	virtual void setHighlighted (bool highlighted, bool refreshGui);
 
 	/**
 	 * Met à jour la représentation graphique VTK de l'entité
@@ -253,9 +251,10 @@ class VTKEntityRepresentation :
 	virtual void updateRepresentationProperties ( );
 
 	/**
-	 * Actualise la représentation <I>highlight</I>.
+	 * Actualise la représentation <I>highlight</I>. Si refreshGui vaut true force alors
+	 * un raffraîchissement de la vue graphique.
 	 */
-	virtual void updateHighlightRepresentation (bool highlight);
+	virtual void updateHighlightRepresentation (bool highlight, bool refreshGui);
 
 	/**
 	 * <P>Créé un <I>pattern</I> de ligne pointillée sous VTK à transmettre à la

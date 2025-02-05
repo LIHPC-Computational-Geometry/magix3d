@@ -383,7 +383,11 @@ class DisplayProperties
 		virtual bool isSelected ( ) const;
 		virtual void setSelectable (bool selected);
 		virtual bool isSelectable ( ) const;
-		virtual void setHighlighted (bool selected);
+		/** 
+		 * Mise en subrillance de l'entité si selected vaut true.
+		 * Si refreshGui vaut true force alors un raffraîchissement de la vue graphique.
+		 */
+		virtual void setHighlighted (bool selected, bool refreshGui = true);
 		virtual bool isHighlighted ( ) const;
 
 		/**

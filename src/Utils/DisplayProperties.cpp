@@ -85,7 +85,7 @@ bool DisplayProperties::GraphicalRepresentation::isSelectable ( ) const
 }	// GraphicalRepresentation::isSelectable
 
 
-void DisplayProperties::GraphicalRepresentation::setHighlighted (bool highlighted)
+void DisplayProperties::GraphicalRepresentation::setHighlighted (bool highlighted, bool refreshGui)
 {
 	_highlighted	= highlighted;
 }	// GraphicalRepresentation::setHighlighted
