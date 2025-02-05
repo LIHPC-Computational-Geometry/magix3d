@@ -134,8 +134,7 @@ public:
      *  \param curves les courbes incidents
      */
     virtual void get(std::vector<Curve*>& curves) const;
-    virtual void getTemporary(std::vector<Curve*>& curves) const;
-
+    
     /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès aux surfaces géométriques incidentes
      *
@@ -171,48 +170,6 @@ public:
      *  \param V2 la normale recherchée suivant le projeté du point
      */
     virtual void normal(const Utils::Math::Point& P1, Utils::Math::Vector& V2) const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Fournit les parametres [U1,U2]x[V1,V2] de la parametrisation de
-     *         la surface
-     */
-    virtual void getParametricBounds(double& U1,double& U2,double& V1,double& V2) const;
-    /*------------------------------------------------------------------------*/
-    /** \brief Get the parametrics bounds of this surface
-     *
-     *  \return AUMin u min value of the paramtric space
-     *  \return AUMax u max value of the paramtric space
-     *  \return AVMin v min value of the paramtric space
-     *  \return AVMax v max value of the paramtric space
-     */
-    virtual void bounds(double& AUMin, double& AUMax,
-    			double& AVMin, double& AVMax) const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Computes the 3D point AP, the first and second derivative in the
-     *			directions u and v at the point of parametric coordinates
-     *			(AU, AV)
-     *
-     *	\param  AU u parameter
-     *  \param  AV v parameter
-     *  \return AP 3D point in (u,v) on this surface
-     *  \return ADU  first derivative in u at point (u,v) on this surface
-     *  \return ADV  first derivative in v at point (u,v) on this surface
-     *  \return ADUU second derivative in u   at point (u,v) on this surface
-     *  \return ADUV second derivative in u,v at point (u,v) on this surface
-     *  \return ADVV second derivative in v   at point (u,v) on this surface
-     */
-    virtual void d2(const double& AU, const double& AV,
-    			Utils::Math::Point& AP,
-				Utils::Math::Vector& ADU,
-				Utils::Math::Vector& ADV,
-				Utils::Math::Vector& ADUU,
-				Utils::Math::Vector& ADUV,
-				Utils::Math::Vector& ADVV) const;
-    /*------------------------------------------------------------------------*/
-    /** \brief  Provides the orientation of this surface.
-	  */
-    virtual GeomOrientation orientation() const;
 
      /*------------------------------------------------------------------------*/
      /** \brief Retourne le point de parametre (u,v) dans l'espace de parametre

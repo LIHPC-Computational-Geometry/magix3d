@@ -126,19 +126,17 @@ makeRevol(GeomEntity* e)
 void GeomRotationImplementation::
 performUndo()
 {
-    for (uint i=0; i<m_undoableEntities.size(); i++){
-        GeomRepresentation* rep = m_undoableEntities[i]->getComputationalProperty();
-        rep->rotate(m_axis1,m_axis2,-m_angle);
-    }
+    for (uint i=0; i<m_undoableEntities.size(); i++)
+        for (GeomRepresentation* rep : m_undoableEntities[i]->getComputationalProperties())
+            rep->rotate(m_axis1,m_axis2,-m_angle);
 }
 /*----------------------------------------------------------------------------*/
 void GeomRotationImplementation::
 performRedo()
 {
-    for (uint i=0; i<m_undoableEntities.size(); i++){
-        GeomRepresentation* rep = m_undoableEntities[i]->getComputationalProperty();
-        rep->rotate(m_axis1,m_axis2,m_angle);
-    }
+    for (uint i=0; i<m_undoableEntities.size(); i++)
+        for (GeomRepresentation* rep : m_undoableEntities[i]->getComputationalProperties())
+            rep->rotate(m_axis1,m_axis2,m_angle);
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

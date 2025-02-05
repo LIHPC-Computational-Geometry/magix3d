@@ -255,46 +255,10 @@ public:
     Vertex* secondPoint() const;
 
     /*------------------------------------------------------------------------*/
-    /** \brief  Access to the parameterization interval of curve *this in the
-     *			surface ASurf.
-     *
-     *	\param ASurf the surface we want to compute the curve parameterization
-     *	\return ATMin min value of the parameterization
-     *	\return ATMax max value of the parameterization
-     */
-    void bounds(Surface* ASurf, double& ATMin, double& ATMax) const;
-    /*------------------------------------------------------------------------*/
     /** \brief  Ajoute s comme surface incidente
      *
      *  \param s un pointeur sur une surface
      */
-
-    /*------------------------------------------------------------------------*/
-       /** \brief  Provides 2D data about the curve in the parametric space of the
- 	  surface ASurf
- 	  *
- 	  *	\param  ASurf the surface we want to compute the curve parameterization
- 	  *	\param  AT   the curve parameter we want extract data from
- 	  *	\return AUV  the 2D (u,v) parameter
- 	  *	\return ADT  the 2D 1st derivative to *this in the param. space of ASurf
- 	  *	\return ADTT the 2D 2nd derivative to *this in the param. space of ASurf
- 	  */
-       void parametricData(Surface* ASurf, double& AT,
- 					      double AUV[2], double ADT[2], double ADTT[2]) const;
-
-       /*------------------------------------------------------------------------*/
-       /** \brief  Provides the orientation of *this.
- 	  */
-       GeomOrientation orientation() const;
-
-       /*------------------------------------------------------------------------*/
-       /** \brief Indicates if *this is a curve internal to a surface. By internal,
-        *		we mean that the curve does not belong to a wire enclosing ASurf but
-        *		is an imprint inside ASurf
-        *	\return a boolean value that means internal(true)/boundary(false)
-        */
-       bool isInternal() const;
-       void getParameter2D(Surface* ASurf, const Utils::Math::Point& Pt, double& p) const;
 
 #ifndef SWIG
     void add(Surface* s);
@@ -420,16 +384,6 @@ public:
     /** \brief   indique si la courbe est une BSpline ou pas
      */
     bool isBSpline() const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief   indique si la courbe est un wire (courbe composée) ou pas
-     */
-    bool isWire() const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief   retourne la position du centre dans d'une ellipse ou d'un cercle
-     */
-    Utils::Math::Point getCenter() const;
 
 	/*------------------------------------------------------------------------*/
 	/** \brief	Fournit une représentation textuelle de l'entité.
