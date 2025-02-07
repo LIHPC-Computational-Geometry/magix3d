@@ -772,6 +772,7 @@ protected:
 	 */
 	unsigned long				m_geomSavedSurfaceMask,
 								m_geomSavedVolumeMask,
+								m_topoSavedCoEdgeMask,
 								m_topoSavedCoFaceMask,
 								m_topoSavedBlockMask;
 };

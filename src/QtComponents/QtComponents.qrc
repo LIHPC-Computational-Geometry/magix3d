@@ -125,6 +125,7 @@
      <file>images/wire.png</file>
      <file>images/isowire.png</file>
      <file>images/fullwire.png</file>
+     <file>images/curved_edge.png</file>
      <file>images/nosolid.png</file>
      <file>images/surfacic.png</file>
  </qresource>
