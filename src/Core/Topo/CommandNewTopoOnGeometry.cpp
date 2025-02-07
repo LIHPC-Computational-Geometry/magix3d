@@ -273,17 +273,17 @@ internalExecute()
 			{
 				const std::vector<Utils::Entity*>&	boundingEntities	= getBoundingEntities ( );
 				double	bounds [6]	= { 0., 0., 0., 0., 0., 0. };
-				if (false == Internal::EntitiesHelper::getBounds (boundingEntities, bounds))
-					throw TkUtil::Exception (TkUtil::UTF8String ("Erreur Interne, CommandNewTopoOnGeometry sans entité pour définir la position des sommets", TkUtil::Charset::UTF_8));
-					
-				bl->getVertex (false, false, false)->setCoord (Utils::Math::Point (bounds [0], bounds [2], bounds [4]));
-				bl->getVertex (false, false, true)->setCoord (Utils::Math::Point (bounds [0], bounds [2], bounds [5]));
-				bl->getVertex (false, true, false)->setCoord (Utils::Math::Point (bounds [0], bounds [3], bounds [4]));
-				bl->getVertex (false, true, true)->setCoord (Utils::Math::Point (bounds [0], bounds [3], bounds [5]));
-				bl->getVertex (true, false, false)->setCoord (Utils::Math::Point (bounds [1], bounds [2], bounds [4]));
-				bl->getVertex (true, false, true)->setCoord (Utils::Math::Point (bounds [1], bounds [2], bounds [5]));
-				bl->getVertex (true, true, false)->setCoord (Utils::Math::Point (bounds [1], bounds [3], bounds [4]));
-				bl->getVertex (true, true, true)->setCoord (Utils::Math::Point (bounds [1], bounds [3], bounds [5]));
+				if (true == Internal::EntitiesHelper::getBounds (boundingEntities, bounds))
+				{			
+					bl->getVertex (false, false, false)->setCoord (Utils::Math::Point (bounds [0], bounds [2], bounds [4]));
+					bl->getVertex (false, false, true)->setCoord (Utils::Math::Point (bounds [0], bounds [2], bounds [5]));
+					bl->getVertex (false, true, false)->setCoord (Utils::Math::Point (bounds [0], bounds [3], bounds [4]));
+					bl->getVertex (false, true, true)->setCoord (Utils::Math::Point (bounds [0], bounds [3], bounds [5]));
+					bl->getVertex (true, false, false)->setCoord (Utils::Math::Point (bounds [1], bounds [2], bounds [4]));
+					bl->getVertex (true, false, true)->setCoord (Utils::Math::Point (bounds [1], bounds [2], bounds [5]));
+					bl->getVertex (true, true, false)->setCoord (Utils::Math::Point (bounds [1], bounds [3], bounds [4]));
+					bl->getVertex (true, true, true)->setCoord (Utils::Math::Point (bounds [1], bounds [3], bounds [5]));
+				}
 			}
 		}
 		// stockage dans le InfoCommand des différentes entités (bloc et niveau inférieur)
