@@ -262,7 +262,7 @@ protected:
      */
     void checkValidity(std::set<GeomEntity*>& entities);
 
-    void buildInitialSet(std::set<GeomEntity*>& init_entities, bool force);
+    void buildInitialSet(std::set<GeomEntity*>& init_entities);
 
 protected:
 

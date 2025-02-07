@@ -87,7 +87,7 @@ void GeomRotationImplementation::perform(std::vector<GeomEntity*>& res)
     // on sépare les entités à révolutionner ;-) ainsi que les entités incidentes
     // de dimension inférieure en trois ensembles selon leur dimension.
     std::set<GeomEntity*> init_entities;
-    buildInitialSet(init_entities, false);
+    buildInitialSet(init_entities);
     //maintenant on met a jour les entites de references
     m_modifiedEntities.insert(m_modifiedEntities.end(),init_entities.begin(),init_entities.end());
 
@@ -98,9 +98,8 @@ void GeomRotationImplementation::perform(std::vector<GeomEntity*>& res)
     for(;it!=ite;it++)
         makeRevol(*it);
 
-    // on force l'ajout des dépendances de dimension inférieur, même pour le cas facétisé
-    // c'est nécessaire pour identifier qu'il y a eu modifications des courbes facétisées
-    buildInitialSet(init_entities, true);
+    // on force l'ajout des dépendances de dimension inférieur
+    buildInitialSet(init_entities);
     //maintenant on met a jour les entites de references
     m_modifiedEntities.clear();
     m_modifiedEntities.insert(m_modifiedEntities.end(),init_entities.begin(),init_entities.end());

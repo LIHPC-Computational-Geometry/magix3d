@@ -2477,7 +2477,7 @@ void GeomModificationBaseClass::checkValidity(std::set<GeomEntity*>& entities)
 }
 /*----------------------------------------------------------------------------*/
 void GeomModificationBaseClass::
-buildInitialSet(std::set<GeomEntity*>& init_entities, bool force)
+buildInitialSet(std::set<GeomEntity*>& init_entities)
 {
     // on utilise un set pour ne pas ajouter plusieurs fois la meme cellule
     // dans les entites de references (pb sinon à la destruction de la commande)
@@ -2489,14 +2489,14 @@ buildInitialSet(std::set<GeomEntity*>& init_entities, bool force)
         int dimi = ei->getDim();
         // ei is always added
         init_entities.insert(ei);
-        if(dimi>=1 && force){ //vertices must be added to
+        if(dimi>=1){ //vertices must be added to
             std::vector<Vertex*> vertices;
             ei->get(vertices);
             for(unsigned int iv=0;iv<vertices.size();iv++)
                 init_entities.insert(vertices[iv]);
 
         }
-        if(dimi>=2 && force){//curves to be added
+        if(dimi>=2){//curves to be added
             std::vector<Curve*> curves;
             ei->get(curves);
             //std::cerr<<"Curves: "<<curves.size()<<std::endl;
@@ -2506,7 +2506,7 @@ buildInitialSet(std::set<GeomEntity*>& init_entities, bool force)
 
 
         }
-        if(dimi>=3 && force){
+        if(dimi>=3){
             std::vector<Surface*> surfs;
             ei->get(surfs);
             for(unsigned int ic=0;ic<surfs.size();ic++)
