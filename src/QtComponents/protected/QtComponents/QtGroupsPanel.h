@@ -800,9 +800,10 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionMan
 	QtQuickRepToolButton					*_wireGeomSurfaceButton, *_solidGeomSurfaceButton;
 	QtQuickRepToolButton					*_wireTopoBlockButton, *_solidTopoBlockButton;
 	QtQuickRepToolButton					*_wireTopoCoFaceButton, *_solidTopoCoFaceButton;
+	QtQuickRepToolButton					*_wireTopoCoEdgeButton;
 	
 	/** Les icônes filaires et surfaciques. */
-	static QIcon							*_wireIcon, *_surfacicIcon;
+	static QIcon							*_wireIcon, *_surfacicIcon, *_curvedEdgeIcon;
 };	// class QtGroupsPanel
 
 

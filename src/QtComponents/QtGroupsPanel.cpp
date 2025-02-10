@@ -344,6 +344,8 @@ QtQuickRepToolButton::QtQuickRepToolButton (QWidget* parent, QIcon& icon, Entity
 	setIconSize (QSize (1, 1));
 	setIcon (icon);
 	setToolTip (true == wire ? "Affichage filaire/isofilaire" : "Affichage surfacique");
+	if ((Entity::TopoCoEdge == type) && (true == wire))
+		setToolTip ("Affichage des arêtes projetées");
 }	// QtQuickRepToolButton::QtQuickRepToolButton
 
 
@@ -429,6 +431,7 @@ void QtMgx3DTBTreeWidget::updateGeometries ( )
 
 
 QIcon*	QtGroupsPanel::_wireIcon		= 0;
+QIcon*	QtGroupsPanel::_curvedEdgeIcon	= 0;
 QIcon*	QtGroupsPanel::_surfacicIcon	= 0;
 	
 	
@@ -441,7 +444,7 @@ QtGroupsPanel::QtGroupsPanel (QWidget* parent, QtMgx3DMainWindow* mainWindow, co
 	  _typesPopupMenu (0), _groupsPopupMenu (0),
 	  _uncheckedCheckboxes (FilterEntity::NoneEntity),
 	  _wireGeomVolumeButton (0), _solidGeomVolumeButton (0), _wireGeomSurfaceButton (0), _solidGeomSurfaceButton (0),
-	  _wireTopoBlockButton (), _solidTopoBlockButton (0), _wireTopoCoFaceButton (0), _solidTopoCoFaceButton (0)
+	  _wireTopoBlockButton (), _solidTopoBlockButton (0), _wireTopoCoFaceButton (0), _solidTopoCoFaceButton (0), _wireTopoCoEdgeButton (0)
 {
 	createGui ( );
 	createPopupMenus ( );
@@ -459,7 +462,7 @@ QtGroupsPanel::QtGroupsPanel (const QtGroupsPanel& gp)
 	  _typesItems ( ), _groupsEntriesItems ( ), _levelsEntriesItems ( ),
 	  //_groupsPropagationCheckBox (0),
 	  _wireGeomVolumeButton (0), _solidGeomVolumeButton (0), _wireGeomSurfaceButton (0), _solidGeomSurfaceButton (0),
-	  _wireTopoBlockButton (), _solidTopoBlockButton (0), _wireTopoCoFaceButton (0), _solidTopoCoFaceButton (0),
+	  _wireTopoBlockButton (), _solidTopoBlockButton (0), _wireTopoCoFaceButton (0), _solidTopoCoFaceButton (0), _wireTopoCoEdgeButton (0),
 	  _uncheckedCheckboxes (FilterEntity::NoneEntity)
 {
 	MGX_FORBIDDEN ("QtGroupsPanel copy constructor is not allowed.");
@@ -777,7 +780,7 @@ void QtGroupsPanel::updateQuickButtons ( )
 	CHECK_NULL_PTR_ERROR (context)
 
 	if ((0 == _wireGeomVolumeButton) || (0 == _solidGeomVolumeButton) || (0 == _wireGeomSurfaceButton) || (0 == _solidGeomVolumeButton) ||
-	    (0 == _wireTopoBlockButton) || (0 == _solidTopoBlockButton) || (0 == _wireTopoCoFaceButton) || (0 == _solidTopoCoFaceButton))
+	    (0 == _wireTopoBlockButton) || (0 == _solidTopoBlockButton) || (0 == _wireTopoCoFaceButton) || (0 == _solidTopoCoFaceButton) || (0 == _wireTopoCoEdgeButton))
 		return;
 
 	// Premier vrai passage on retaille les boutons pour qu'ils prennent moins de place et fassent la même taille car par défaut ils sont un peu gros (et pas beau ;) ):
@@ -796,6 +799,7 @@ void QtGroupsPanel::updateQuickButtons ( )
 			_solidTopoBlockButton->setIconSize (QSize (height, height));
 			_wireTopoCoFaceButton->setIconSize (QSize (height, height));
 			_solidTopoCoFaceButton->setIconSize (QSize (height, height));
+			_wireTopoCoEdgeButton->setIconSize (QSize (height, height));
 			QSize	buttonSize	= _wireGeomVolumeButton->size ( );
 			if ((buttonSize.width ( ) >= 10) || (buttonSize.height ( ) >= 10))	// Se mettre à l'abri d'un soucis technique
 			{
@@ -811,6 +815,7 @@ void QtGroupsPanel::updateQuickButtons ( )
 				_solidTopoBlockButton->setFixedSize (buttonSize);
 				_wireTopoCoFaceButton->setFixedSize (buttonSize);
 				_solidTopoCoFaceButton->setFixedSize (buttonSize);
+				_wireTopoCoEdgeButton->setFixedSize (buttonSize);
 			}	// if ((buttonSize.width ( ) >= 10) || (buttonSize.height ( ) >= 10))
 			first	= false;
 		}	// if (0 < height)
@@ -839,6 +844,9 @@ void QtGroupsPanel::updateQuickButtons ( )
 	// TopoCoFace / Solid :
 	rep	= context->globalMask (Entity::TopoCoFace) & (unsigned long)GraphicalEntityRepresentation::SURFACES;
 	_solidTopoCoFaceButton->setChecked (0 == rep ? false : true);
+	// TopoCoEdge / Wire :
+	rep	= context->globalMask (Entity::TopoCoEdge) & (unsigned long)GraphicalEntityRepresentation::MESH_SHAPE;
+	_wireTopoCoEdgeButton->setChecked (0 == rep ? false : true);
 }	// QtGroupsPanel::updateQuickButtons
 
 
@@ -983,6 +991,8 @@ void QtGroupsPanel::createGui ( )
 	// Les menus contextuels :
 	if (0 == _wireIcon)
 		_wireIcon	= new QIcon (":/images/wire.png");
+	if (0 == _curvedEdgeIcon)
+		_curvedEdgeIcon	= new QIcon (":/images/curved_edge.png");
 	if (0 == _surfacicIcon)
 		_surfacicIcon	= new QIcon (":/images/surfacic.png");
 
@@ -1107,6 +1117,12 @@ void QtGroupsPanel::createGui ( )
 	typeItem->setCheckState (0, Qt::Unchecked);
 	_typesItems.push_back (typeItem);
 	item->addChild (typeItem);
+	gmask	= context->globalMask (Entity::TopoCoEdge);
+	_wireTopoCoEdgeButton	= new QtQuickRepToolButton (_entitiesTypesWidget, *_curvedEdgeIcon, Entity::TopoCoEdge, true);
+	_wireTopoCoEdgeButton->setChecked (gmask & GraphicalEntityRepresentation::MESH_SHAPE);
+	connect (_wireTopoCoEdgeButton, SIGNAL (toggled (bool)), this, SLOT (quickDisplayRepresentationsCallback (bool)));
+	_entitiesTypesWidget->setItemWidget (typeItem, WIRE_COLUMN, _wireTopoCoEdgeButton);
+	_entitiesTypesWidget->manage (*_wireTopoCoEdgeButton);
 	// Topo::Vertex :
 	typeItem	= new QtEntityTypeItem (item, FilterEntity::TopoVertex);
 	typeItem->setCheckState (0, Qt::Unchecked);
@@ -1540,10 +1556,18 @@ void QtGroupsPanel::quickDisplayRepresentationsCallback (bool display)
 		gmask	= context->globalMask (button->entityType ( ));
 		if (true == button->isWireRepresentation ( ))
 		{
-			if (0 != (gmask & GraphicalEntityRepresentation::CURVES))
-				gmask ^= GraphicalEntityRepresentation::CURVES;
-			if (0 != (gmask & GraphicalEntityRepresentation::ISOCURVES))
-				gmask ^= GraphicalEntityRepresentation::ISOCURVES;
+			if (Entity::TopoCoEdge != button->entityType ( ))
+			{
+				if (0 != (gmask & GraphicalEntityRepresentation::CURVES))
+					gmask ^= GraphicalEntityRepresentation::CURVES;
+				if (0 != (gmask & GraphicalEntityRepresentation::ISOCURVES))
+					gmask ^= GraphicalEntityRepresentation::ISOCURVES;
+			}	// if (Entity::TopoCoEdge != button->entityType ( ))
+			else
+			{	// ATTENTION : pour les CoEdge on ne s'intéresse pas ici à la représentation filaire mais uniquement au caractère "projeté" :
+				if (0 != (gmask & GraphicalEntityRepresentation::MESH_SHAPE))
+					gmask ^= GraphicalEntityRepresentation::MESH_SHAPE;
+			}	// else if (Entity::TopoCoEdge != button->entityType ( ))
 		}	// if (true == button->isWireRepresentation ( ))
 		else
 		{

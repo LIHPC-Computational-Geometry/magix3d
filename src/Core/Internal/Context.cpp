@@ -322,6 +322,7 @@ Context::Context(const std::string& name, bool withStdOutputs)
 , m_sysCoordMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::SysCoord))
 , m_geomSavedSurfaceMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::GeomSurface))
 , m_geomSavedVolumeMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::GeomVolume))
+, m_topoSavedCoEdgeMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::TopoCoEdge))
 , m_topoSavedCoFaceMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::TopoCoFace))
 , m_topoSavedBlockMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::TopoBlock))
 {
@@ -334,6 +335,8 @@ Context::Context(const std::string& name, bool withStdOutputs)
 		m_geomSavedVolumeMask |= Utils::GraphicalEntityRepresentation::CURVES | Utils::GraphicalEntityRepresentation::ISOCURVES;
 	if (0 == (m_geomSavedVolumeMask & (Utils::GraphicalEntityRepresentation::SURFACES)))
 		m_geomSavedVolumeMask |= Utils::GraphicalEntityRepresentation::SURFACES;
+	if (0 == (m_topoSavedCoEdgeMask & Utils::GraphicalEntityRepresentation::MESH_SHAPE))
+		m_topoSavedCoEdgeMask |= Utils::GraphicalEntityRepresentation::MESH_SHAPE;
 	if (0 == (m_topoSavedCoFaceMask & Utils::GraphicalEntityRepresentation::CURVES))
 		m_topoSavedCoFaceMask |= Utils::GraphicalEntityRepresentation::CURVES;
 	if (0 == (m_topoSavedCoFaceMask & (Utils::GraphicalEntityRepresentation::SURFACES)))
@@ -1263,6 +1266,7 @@ unsigned long& Context::savedGlobalMask (Utils::Entity::objectType ot)
 	{
 		case Utils::Entity::GeomSurface		: return m_geomSavedSurfaceMask;
 		case Utils::Entity::GeomVolume		: return m_geomSavedVolumeMask;
+		case Utils::Entity::TopoCoEdge		: return m_topoSavedCoEdgeMask;
 		case Utils::Entity::TopoCoFace		: return m_topoSavedCoFaceMask;
 		case Utils::Entity::TopoBlock		: return m_topoSavedBlockMask;
 		default								:
@@ -1281,6 +1285,7 @@ unsigned long Context::savedGlobalMask (Utils::Entity::objectType ot) const
 	{
 		case Utils::Entity::GeomSurface		: return m_geomSavedSurfaceMask;
 		case Utils::Entity::GeomVolume		: return m_geomSavedVolumeMask;
+		case Utils::Entity::TopoCoEdge		: return m_topoSavedCoEdgeMask;
 		case Utils::Entity::TopoCoFace		: return m_topoSavedCoFaceMask;
 		case Utils::Entity::TopoBlock		: return m_topoSavedBlockMask;
 		default								:
@@ -1302,6 +1307,9 @@ void Context::restoreGlobalMaskWireProperties (Utils::Entity::objectType ot)
 			break;
 		case Utils::Entity::GeomVolume		:
 			m_geomVolumeMask	|= (m_geomSavedVolumeMask & (unsigned long)Utils::GraphicalEntityRepresentation::CURVES) | (m_geomSavedVolumeMask & (unsigned long)Utils::GraphicalEntityRepresentation::ISOCURVES);
+			break;
+		case Utils::Entity::TopoCoEdge		:
+			m_topoCoEdgeMask	|= m_topoSavedCoEdgeMask & (unsigned long)Utils::GraphicalEntityRepresentation::MESH_SHAPE;
 			break;
 		case Utils::Entity::TopoCoFace		:
 			m_topoCoFaceMask	|= m_topoSavedCoFaceMask & (unsigned long)Utils::GraphicalEntityRepresentation::CURVES;
