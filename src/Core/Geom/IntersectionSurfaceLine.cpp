@@ -27,8 +27,7 @@ namespace Mgx3D {
 
 /*----------------------------------------------------------------------------*/
         void IntersectionSurfaceLine::perform() {
-            TopoDS_Shape tool_shape;
-            GeomModificationBaseClass::getOCCShape(m_surf,tool_shape);
+            TopoDS_Shape tool_shape = m_surf->getOCCShapes()[0];
             TopoDS_Face tool_face = TopoDS::Face(tool_shape);
 
             m_intersector = new IntCurvesFace_Intersector(tool_face, 1);

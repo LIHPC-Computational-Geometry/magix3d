@@ -18,7 +18,6 @@
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
-#include "Geom/OCCGeomRepresentation.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/CommandGeomCopy.h"
 #include "Utils/MgxNumeric.h"
@@ -107,47 +106,41 @@ void GeomCommon2DImplementation::perform(std::vector<GeomEntity*>& res)
 void GeomCommon2DImplementation::commonSurfaces()
 {
     TopoDS_Shape s1, s2;
-	if (m_entity1->getComputationalProperties().size()>1){
+	std::vector<TopoDS_Shape> topoS1 = m_entity1->getOCCShapes();
+	if (topoS1.size()==1){
+		s1 = topoS1[0];
+	} else {
 		// création d'un Shell
-		std::vector<TopoDS_Shape> topoS;
-		getOCCShapes(m_entity1, topoS);
-
 		BRep_Builder B;
 		TopoDS_Shell aShell;
 		B.MakeShell(aShell);
-		for (uint i=0; i<topoS.size(); i++){
-			B.Add(aShell,topoS[i]);
+		for (uint i=0; i<topoS1.size(); i++){
+			B.Add(aShell,topoS1[i]);
 		}
 		s1 = aShell;
 	}
-	else
-		getOCCShape(m_entity1, s1);
 
-	if (m_entity2->getComputationalProperties().size()>1){
-		// création d'un Shell
-		std::vector<TopoDS_Shape> topoS;
-		getOCCShapes(m_entity2, topoS);
-
+	std::vector<TopoDS_Shape> topoS2 = m_entity2->getOCCShapes();
+	if (topoS2.size()==1){
+		s2 = topoS2[0];
+	} else {
 		BRep_Builder B;
 		TopoDS_Shell aShell;
 		B.MakeShell(aShell);
-		for (uint i=0; i<topoS.size(); i++){
-			B.Add(aShell,topoS[i]);
+		for (uint i=0; i<topoS2.size(); i++){
+			B.Add(aShell,topoS2[i]);
 		}
 		s2 = aShell;
 	}
-	else
-		getOCCShape(m_entity2, s2);
 
 
     BRepAlgoAPI_Section intersector(s1, s2);
 
     if (intersector.IsDone()){
     	TopoDS_Shape sh = intersector.Shape();
-
-    	TopTools_IndexedMapOfShape  vertices, curves;
-    	TopExp::MapShapes(sh,TopAbs_VERTEX, vertices);
-    	TopExp::MapShapes(sh,TopAbs_EDGE, curves);
+    	TopTools_IndexedMapOfShape vertices, curves;
+    	TopExp::MapShapes(sh, TopAbs_VERTEX, vertices);
+    	TopExp::MapShapes(sh, TopAbs_EDGE, curves);
 
 #ifdef _DEBUG
     	std::cout<<"création d'une courbe avec "<<vertices.Extent()<<" sommets et "<<curves.Extent()<<" courbes "<<std::endl;
@@ -178,7 +171,6 @@ void GeomCommon2DImplementation::commonSurfaces()
     	std::cout<<"commonSurfaces: on supprime "<<adj[j]->getName()<<std::endl;
 #endif
     m_removedEntities.insert(m_removedEntities.end(), adj.begin(), adj.end());
-
 }
 /*----------------------------------------------------------------------------*/
 void GeomCommon2DImplementation::commonCurves()

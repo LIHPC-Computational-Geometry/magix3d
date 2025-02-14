@@ -27,7 +27,6 @@
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
 #include "Geom/Surface.h"
-#include "Geom/OCCGeomRepresentation.h"
 /*----------------------------------------------------------------------------*/
 /// TkUtil
 #include <TkUtil/Exception.h>

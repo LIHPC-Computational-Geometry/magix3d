@@ -18,6 +18,10 @@
 #include "Geom/Volume.h"
 #include "Geom/CommandGeomCopy.h"
 /*----------------------------------------------------------------------------*/
+#include <Bnd_Box.hxx>
+#include <BRepBndLib.hxx>
+#include <BRepBuilderAPI_Transform.hxx>
+#include <BRepBuilderAPI_GTransform.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -187,30 +191,82 @@ void GeomScaleImplementation::perform(std::vector<GeomEntity*>& res)
 void GeomScaleImplementation::scaleSingle(GeomEntity* e)
 {
     //std::cout<<"GeomScaleImplementation::scaleSingle pour "<<e->getName()<<std::endl;
-    std::vector<GeomRepresentation*> reps = e->getComputationalProperties();
-    std::vector<GeomRepresentation*> new_reps;
+    std::vector<TopoDS_Shape> reps = e->getOCCShapes();
+    std::vector<TopoDS_Shape> new_reps;
     for (uint i=0; i<reps.size(); i++){
-        GeomRepresentation* new_rep = reps[i]->clone();
         if (m_isHomogene)
-            new_rep->scale(m_factor, m_center);
+            new_reps.push_back(scale(reps[i], m_factor, m_center));
         else
-            new_rep->scale(m_factorX, m_factorY, m_factorZ, m_center);
-        new_reps.push_back(new_rep);
+            new_reps.push_back(scale(reps[i], m_factorX, m_factorY, m_factorZ, m_center));
     }
 
-    e->setComputationalProperties(new_reps);
+    e->setOCCShapes(new_reps);
     e->setGeomProperty(new GeomProperty());
+}
+/*----------------------------------------------------------------------------*/
+TopoDS_Shape GeomScaleImplementation::
+scale(const TopoDS_Shape& shape, const double F, const Point& center) const
+{
+    Bnd_Box box;
+    box.SetGap(Utils::Math::MgxNumeric::mgxDoubleEpsilon);
+    BRepBndLib::Add(shape, box);
+
+    double xmin,ymin,zmin,xmax,ymax,zmax;
+    box.Get(xmin,ymin,zmin,xmax,ymax,zmax);
+
+    gp_Trsf T;
+    T.SetScale(gp_Pnt(center.getX(), center.getY(), center.getZ()),F);
+    BRepBuilderAPI_Transform scaling(T);
+
+    //on effectue l'homotéthie
+    scaling.Perform(shape);
+
+    if(!scaling.IsDone())
+    	throw TkUtil::Exception(TkUtil::UTF8String ("Echec d'une homothétie!!", TkUtil::Charset::UTF_8));
+
+    //on stocke le résultat de la translation (maj de la shape interne)
+    return scaling.Shape();
+}
+/*----------------------------------------------------------------------------*/
+TopoDS_Shape GeomScaleImplementation::
+scale(const TopoDS_Shape& shape, const double factorX, const double factorY, const double factorZ, const Point& center) const
+{
+    Bnd_Box box;
+    box.SetGap(Utils::Math::MgxNumeric::mgxDoubleEpsilon);
+    BRepBndLib::Add(shape, box);
+
+    double xmin,ymin,zmin,xmax,ymax,zmax;
+    box.Get(xmin,ymin,zmin,xmax,ymax,zmax);
+
+    gp_GTrsf GT;
+    GT.SetValue(1, 1, factorX);
+    GT.SetValue(2, 2, factorY);
+    GT.SetValue(3, 3, factorZ);
+	GT.SetValue(1, 4, (1-factorX) * center.getX());
+	GT.SetValue(2, 4, (1-factorY) * center.getY());
+    GT.SetValue(3, 4, (1-factorZ) * center.getZ());
+
+    BRepBuilderAPI_GTransform scaling(GT);
+
+    //on effectue l'homothétie
+    scaling.Perform(shape);
+
+    if(!scaling.IsDone())
+    	throw TkUtil::Exception(TkUtil::UTF8String ("Echec d'une homothétie!!", TkUtil::Charset::UTF_8));
+
+    //on stocke le résultat de la translation (maj de la shape interne)
+    return scaling.Shape();
 }
 /*----------------------------------------------------------------------------*/
 void GeomScaleImplementation::
 performUndo()
 {
     for (uint i=0; i<m_undoableEntities.size(); i++){
-        for (GeomRepresentation* rep : m_undoableEntities[i]->getComputationalProperties()){
+        for (auto rep : m_undoableEntities[i]->getOCCShapes()){
             if (m_isHomogene)
-                rep->scale(1.0/m_factor, m_center);
+                scale(rep, 1.0/m_factor, m_center);
             else
-                rep->scale(1.0/m_factorX, 1.0/m_factorY, 1.0/m_factorZ, m_center);
+                scale(rep, 1.0/m_factorX, 1.0/m_factorY, 1.0/m_factorZ, m_center);
         }
     }
 }
@@ -219,11 +275,11 @@ void GeomScaleImplementation::
 performRedo()
 {
     for (uint i=0; i<m_undoableEntities.size(); i++){
-        for (GeomRepresentation* rep : m_undoableEntities[i]->getComputationalProperties()){
+        for (auto rep : m_undoableEntities[i]->getOCCShapes()){
             if (m_isHomogene)
-                rep->scale(m_factor, m_center);
+                scale(rep, m_factor, m_center);
             else
-                rep->scale(m_factorX, m_factorY, m_factor, m_center);
+                scale(rep, m_factorX, m_factorY, m_factor, m_center);
         }
     }
 }
@@ -232,3 +288,4 @@ performRedo()
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D
 /*----------------------------------------------------------------------------*/
+

@@ -10,7 +10,6 @@
 /*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
 #include "Geom/GeomManager.h"
-#include "Geom/OCCGeomRepresentation.h"
 #include "Geom/GeomDisplayRepresentation.h"
 #include "Internal/ExportMDLImplementation.h"
 #include "Topo/Vertex.h"
@@ -241,8 +240,8 @@ save(Geom::Curve* cv)
             std::string centerName = cv->getName()+"Center";
 
             // 1 seule représentation pour une courbe ou une ellipse
-            Geom::OCCGeomRepresentation* rep = dynamic_cast<Geom::OCCGeomRepresentation*>(cv->getComputationalProperties()[0]);
-            TopoDS_Edge edge = TopoDS::Edge(rep->getShape());
+            TopoDS_Shape rep = cv->getOCCShapes()[0];
+            TopoDS_Edge edge = TopoDS::Edge(rep);
             Utils::Math::Point center = getCenter(edge);
 
             uint idP3 = save(center, centerName);

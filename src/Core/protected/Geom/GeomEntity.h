@@ -12,6 +12,8 @@
 #include <vector>
 #include <list>
 /*----------------------------------------------------------------------------*/
+#include <TopoDS_Shape.hxx>
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 #include "Internal/InternalEntity.h"
@@ -40,7 +42,6 @@ class Volume;
 class Surface;
 class Curve;
 class Vertex;
-class GeomRepresentation;
 class GeomProperty;
 class MementoGeomEntity;
 /*----------------------------------------------------------------------------*/
@@ -72,7 +73,7 @@ protected:
      *          l'entité entrainera celle des propriétés attachées.
      */
     GeomEntity(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, GeomRepresentation* compProp=0);
+            GeomProperty* gprop, TopoDS_Shape& shape);
 
     /** \brief  Constructeur. Une entité délègue un certain nombre de calculs
      *          géométrique à des objets de type ComputationalProperty.
@@ -81,7 +82,7 @@ protected:
      *          l'entité entrainera celle des propriétés attachées.
      */
     GeomEntity(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, std::vector<GeomRepresentation*>& compProp);
+            GeomProperty* gprop, std::vector<TopoDS_Shape>& shapes);
 
 public:
 
@@ -155,7 +156,7 @@ public:
     /** \brief  MAJ de la propriété de calcul.
      */
 #ifndef SWIG
-    void setComputationalProperties(std::vector<GeomRepresentation*>& cprop);
+    void setOCCShapes(std::vector<TopoDS_Shape>& shapes);
 #endif
 
 
@@ -163,7 +164,7 @@ public:
     /** \brief   récupération de la propriété de calcul
      */
 #ifndef SWIG
-    std::vector<GeomRepresentation*> getComputationalProperties() const;
+    std::vector<TopoDS_Shape> getOCCShapes() const;
 
 #endif
 
@@ -439,7 +440,7 @@ public:
 private:
 
     /// Interfaces pour les objets géométriques
-    std::vector<GeomRepresentation*> m_geomRep;
+    std::vector<TopoDS_Shape> m_shapes;
 
     /// Propriétés géométriques (qui peut être spécifique, PropertyBox par exemple)
     GeomProperty* m_geomProp;

@@ -156,7 +156,7 @@ void QtEntitiesItemViewPanel::setLogStream (LogOutputStream* stream)
 }	// QtEntitiesItemViewPanel::setLogStream
 
 
-void QtEntitiesItemViewPanel::log (const Log& l)
+void QtEntitiesItemViewPanel::log (const TkUtil::Log& l)
 {
 	if (0 != _logStream)
 		_logStream->log (l);

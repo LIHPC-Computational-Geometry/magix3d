@@ -68,7 +68,7 @@ void QtMgx3DLogsView::readSettings (QSettings& settings)
 }	// QtMgx3DLogsView::readSettings
 
 
-void QtMgx3DLogsView::log (const Log& log)
+void QtMgx3DLogsView::log (const IN_UTIL Log& log)
 {
 	AutoMutex	autoMutex (getMutex ( ));
 	QtLogsView::log (log);

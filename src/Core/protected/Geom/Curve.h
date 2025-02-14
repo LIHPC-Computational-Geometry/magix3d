@@ -15,7 +15,6 @@
 /*----------------------------------------------------------------------------*/
 #include "Geom/GeomEntity.h"
 #include "Geom/GeomProperty.h"
-#include "Geom/GeomRepresentation.h"
 /*----------------------------------------------------------------------------*/
 #include "Utils/Point.h"
 /*----------------------------------------------------------------------------*/
@@ -50,12 +49,12 @@ public:
      *  \param ctx le contexte
      *  \param prop propriété (nom ...)
      *  \param disp propriétés d'affichage
-     *  \param gprop    les propriétés associées à la courbe
-     *  \param compProp les propriétés de calcul
+     *  \param gprop les propriétés associées à la courbe
+     *  \param shape la shape OCC
      */
 #ifndef SWIG
     Curve(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, GeomRepresentation* compProp);
+            GeomProperty* gprop, TopoDS_Shape& shape);
 #endif
 
     /*------------------------------------------------------------------------*/
@@ -64,12 +63,12 @@ public:
      *  \param ctx le contexte
      *  \param prop propriété (nom ...)
      *  \param disp propriétés d'affichage
-     *  \param gprop    les propriétés associées à la courbe
-     *  \param compProp les propriétés de calcul
+     *  \param gprop les propriétés associées à la courbe
+     *  \param shapes les shapes OCC
      */
 #ifndef SWIG
     Curve(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, std::vector<GeomRepresentation*>& compProp);
+            GeomProperty* gprop, std::vector<TopoDS_Shape>& shapes);
 #endif
 
     /*------------------------------------------------------------------------*/

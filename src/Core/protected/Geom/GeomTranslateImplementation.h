@@ -87,14 +87,23 @@ public:
     void performUndo();
     void performRedo();
 
-protected:
-
+private:
     /*------------------------------------------------------------------------*/
     /** \brief  translation des entités descendantes
      *
      *  \param e l'entité à translater
      */
     void translateSingle(GeomEntity* e);
+
+    /*------------------------------------------------------------------------*/
+    /** \brief Effectue la translation de l'entité géométrique associée de
+     *         manière isolée. C'est-à-dire que aucune des entités incidentes
+     *         n'est impactée par ce traitement
+     *
+     *  \param shape l'entité géométrique
+     *  \param V le vecteur de translation à appliquer
+     */
+    TopoDS_Shape translate(const TopoDS_Shape& shape, const Utils::Math::Vector& V);
 
 protected:
 

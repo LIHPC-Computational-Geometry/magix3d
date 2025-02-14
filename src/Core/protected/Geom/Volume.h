@@ -51,7 +51,7 @@ public:
      */
 #ifndef SWIG
     Volume(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, GeomRepresentation* compProp=0);
+            GeomProperty* gprop, TopoDS_Shape& shape);
 #endif
 
     /*------------------------------------------------------------------------*/
@@ -258,14 +258,6 @@ public:
 #ifndef SWIG
     virtual void setDestroyed(bool b);
 #endif
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Fournit une représentation facétisée (point, segments, polygones) de l'entité
-     *
-     */
-    virtual void facetedRepresentationForwardOrient(
-            Surface* AEntityOrientation,
-            std::vector<gmds::math::Triangle >*) const;
 
 	/*------------------------------------------------------------------------*/
 	/** \brief	Fournit une représentation textuelle de l'entité.

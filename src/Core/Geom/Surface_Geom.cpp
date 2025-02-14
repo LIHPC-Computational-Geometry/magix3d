@@ -6,7 +6,7 @@
  *  \date 25/10/2010
  */
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 #include <list>
 #include <string.h>
@@ -18,14 +18,15 @@
 #include "Geom/Volume.h"
 #include "Geom/Loop.h"
 #include "Geom/MementoGeomEntity.h"
+#include "Geom/OCCHelper.h"
 #include "Group/Group2D.h"
+#include "Geom/EntityFactory.h"
 #include "Topo/CoFace.h"
 #include "Topo/CoEdge.h"
 #include "Topo/Vertex.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
-#include "Geom/OCCGeomRepresentation.h"
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS.hxx>
@@ -42,6 +43,7 @@
 #include <GeomAPI_ProjectPointOnSurf.hxx>
 #include <Poly_Triangulation.hxx>
 #include <TopExp_Explorer.hxx>
+#include <Standard_Type.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -59,31 +61,26 @@ const char* Surface::typeNameGeomSurface = "GeomSurface";
 /*----------------------------------------------------------------------------*/
 Surface::Surface(Internal::Context& ctx, Utils::Property* prop,
         Utils::DisplayProperties* disp,
-        GeomProperty* gprop, GeomRepresentation* compProp)
-:GeomEntity(ctx, prop, disp, gprop,compProp)
+        GeomProperty* gprop, TopoDS_Shape& shape)
+:GeomEntity(ctx, prop, disp, gprop, shape)
 {
 }
 /*----------------------------------------------------------------------------*/
 Surface::Surface(Internal::Context& ctx, Utils::Property* prop,
         Utils::DisplayProperties* disp,
-        GeomProperty* gprop, std::vector<GeomRepresentation*>& compProp)
-:GeomEntity(ctx, prop, disp, gprop, compProp)
+        GeomProperty* gprop, std::vector<TopoDS_Shape>& shapes)
+:GeomEntity(ctx, prop, disp, gprop, shapes)
 {
 }
 /*----------------------------------------------------------------------------*/
 GeomEntity* Surface::clone(Internal::Context& c)
 {
-	std::vector<GeomRepresentation*> newGeomRep;
-	std::vector<GeomRepresentation*> oldGeomRep = this->getComputationalProperties();
-
-	for (uint i=0; i<oldGeomRep.size(); i++)
-		newGeomRep.push_back(oldGeomRep[i]->clone());
-
+	std::vector<TopoDS_Shape> reps = this->getOCCShapes();
     return new Surface(c,
             c.newProperty(this->getType()),
             c.newDisplayProperties(this->getType()),
             new GeomProperty(),
-			newGeomRep);
+			reps);
 }
 /*----------------------------------------------------------------------------*/
 Surface::~Surface()
@@ -189,76 +186,66 @@ void Surface::get(std::vector<Volume*>& volumes) const
 /*----------------------------------------------------------------------------*/
 void Surface::project(Utils::Math::Point& P) const
 {
-	std::vector<GeomRepresentation*> reps = getComputationalProperties();
-	if (reps.size() == 1)
-		reps[0]->project(P,this);
-	else {
-		// on va prendre la projection la plus courte pour le cas composé
-		Utils::Math::Point pInit = P;
-		reps[0]->project(P,this);
-		Utils::Math::Point pBest = P;
-		double norme2 = (P-pInit).norme2();
-		for (uint i=1; i<reps.size(); i++){
-			P = pInit;
-			reps[i]->project(P,this);
-			double dist = (P-pInit).norme2();
-			if (dist<norme2){
-				norme2 = dist;
-				pBest = P;
-			}
-		}
-		P = pBest;
-	}
+	OCCHelper::project(getOCCShapes(), P);
 }
 /*----------------------------------------------------------------------------*/
 void Surface::project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const
 {
-	std::vector<GeomRepresentation*> reps = getComputationalProperties();
-	if (getComputationalProperties().size() == 1)
-		reps[0]->project(P1,P2,this);
-	else {
-		// on va prendre la projection la plus courte pour le cas composé
-		reps[0]->project(P1,P2,this);
-		Utils::Math::Point pBest = P2;
-		double norme2 = (P2-P1).norme2();
-		for (uint i=1; i<reps.size(); i++){
-			reps[i]->project(P1,P2,this);
-			double dist = (P2-P1).norme2();
-			if (dist<norme2){
-				norme2 = dist;
-				pBest = P2;
-			}
-		}
-		P2 = pBest;
-	}
+	OCCHelper::project(getOCCShapes(), P1, P2);
 }
 /*----------------------------------------------------------------------------*/
 void Surface::normal(const Utils::Math::Point& P1, Utils::Math::Vector& V2) const
 {
-	std::vector<GeomRepresentation*> reps = getComputationalProperties();
-	if (reps.size() == 1)
-		reps[0]->normal(P1,V2,this);
-	else {
-		// comme pour la projection, on recherche la plus courte distance et on utilise cette sous-surface
-//		std::cout<<"normale en "<<P1<<"pour "<<getName()<<std::endl;
-		uint ind = 0;
-		Utils::Math::Point P2;
-		reps[0]->project(P1,P2,this);
-		Utils::Math::Point pBest = P2;
-		double norme2 = (P2-P1).norme2();
-//		std::cout<<"i "<<0<<" norme2 "<<norme2<<std::endl;
-		for (uint i=1; i<reps.size(); i++){
-			reps[i]->project(P1,P2,this);
-			double dist = (P2-P1).norme2();
-//			std::cout<<"i "<<i<<" dist "<<dist<<std::endl;
-			if (dist<norme2){
-				norme2 = dist;
-				pBest = P2;
-				ind = i;
-			}
-		}
-//		std::cout<<"  normale pour ind "<<ind<<" en "<<pBest<<std::endl;
-		reps[ind]->normal(pBest, V2, this);
+	auto reps = getOCCShapes();
+	TopoDS_Face face;
+	if (reps.size() == 1) {
+		face = TopoDS::Face(reps[0]);
+	} else {
+		uint idBest = OCCHelper::project(reps, P1, V2);
+		face = TopoDS::Face(reps[idBest]);
+	}
+
+	// projection pour en déduire les paramètres
+	gp_Pnt pnt(P1.getX(),P1.getY(),P1.getZ());
+	TopoDS_Vertex Vtx = BRepBuilderAPI_MakeVertex(pnt);
+	BRepExtrema_DistShapeShape extrema(Vtx, face);
+	bool isDone = extrema.IsDone();
+	if(!isDone) {
+		isDone = extrema.Perform();
+	}
+	//std::cout<<"  NbSolution "<<extrema.NbSolution()<<std::endl;
+	if(!isDone){
+		std::cerr<<"Surface::normal("<<P1<<")\n";
+		throw TkUtil::Exception("Echec d'une projection d'un point sur une surface (pour la normale)!!");
+	}
+
+	if (extrema.SupportTypeShape2(1) == BRepExtrema_IsInFace){
+		//std::cout<<"  Solution sur la surface"<<std::endl;
+		Standard_Real U, V;
+		extrema.ParOnFaceS2(1, U, V);
+
+		Handle(Geom_Surface) brepSurface = BRep_Tool::Surface(face);
+
+		gp_Pnt out_pnt;
+		gp_Vec du, dv;
+		brepSurface->D1(U,V,out_pnt,du,dv);
+
+		gp_Vec n=du.Crossed(dv);
+		V2.setX(n.X());
+		V2.setY(n.Y());
+		V2.setZ(n.Z());
+	}
+	else if (extrema.SupportTypeShape2(1) == BRepExtrema_IsOnEdge){
+		//std::cout<<"  Solution sur le bord de la surface"<<std::endl;
+
+		V2.setX(0);
+		V2.setY(0);
+		V2.setZ(0);
+	}
+	else if (extrema.SupportTypeShape2(1) == BRepExtrema_IsVertex){
+		V2.setX(0);
+		V2.setY(0);
+		V2.setZ(0);
 	}
 }
 /*----------------------------------------------------------------------------*/
@@ -292,24 +279,99 @@ void Surface::remove(Curve* c)
         m_curves.erase(it);
 }
 /*----------------------------------------------------------------------------*/
-void Surface::split(std::vector<Curve* >& curv,std::vector<Vertex* >&  vert)
+void Surface::split(std::vector<Curve* >& curv, std::vector<Vertex* >&  vert)
 {
-	std::vector<GeomRepresentation*> reps = getComputationalProperties();
-	if (reps.size() == 1)
-		reps[0]->split(curv,vert,this);
-	else {
-		for (uint i=0; i<reps.size(); i++)
-			reps[i]->split(curv,vert,this);
+	for (auto rep : getOCCShapes()) {
+		/* on va explorer la face OCC stocké en attribut et créer les entités de
+		* dimension directement inférieure, c'est-à-dire les courbes
+		*/
+		TopExp_Explorer e;
+
+		/* on crée les faces */
+		std::vector<TopoDS_Shape> OCCCurves;
+		std::vector<Curve *>      Mgx3DCurves;
+
+
+		for(e.Init(rep, TopAbs_EDGE); e.More(); e.Next())
+		{
+
+			TopoDS_Edge E = TopoDS::Edge(e.Current());
+
+			Curve* c = EntityFactory(getContext()).newOCCCurve(E);
+
+			// correspondance entre shapes OCC et géométries Mgx3D
+			OCCCurves.push_back(E);
+			Mgx3DCurves.push_back(c);
+			// on crée le lien V->F
+			this->add(c);
+			// on crée le lien F->V
+			c->add(this);
+		}
+
+
+		// maintenant que les aretes sont créées, on crée les
+		// sommets
+		TopTools_IndexedDataMapOfShapeListOfShape map;
+		TopExp::MapShapesAndAncestors(rep, TopAbs_VERTEX, TopAbs_EDGE, map);
+		// on a ainsi tous les sommets dans map et pour chaque sommet, on
+		// connait les aretes auxquelles il appartient.
+
+		/* on crée les labels contenants les sommets et pour chaque sommet,
+		* on fait pointer une ref à partir des labels ayant les aretes
+		* correspondantes */
+		TopTools_IndexedMapOfShape map_vertices;
+		TopExp::MapShapes(rep,TopAbs_VERTEX, map_vertices);
+		TopTools_ListOfShape listEdges;
+
+		for(int i = 1; i <= map_vertices.Extent(); i++)
+		{
+			TopoDS_Vertex V = TopoDS::Vertex(map_vertices(i));
+			// creation du sommet
+			Vertex* v = EntityFactory(getContext()).newOCCVertex(V);
+
+			/* on récupère les arêtes contenant ce sommet. Mais attention, ce nb
+			* d'arêtes est trop important car des doublons existent.
+			*/
+			listEdges = map.FindFromKey(V);
+
+			TopTools_ListIteratorOfListOfShape it_edges;
+
+			// ce vecteur nous sert à ne pas récupérer 2 fois le même sommet
+			std::vector<bool> still_done;
+			still_done.resize(Mgx3DCurves.size(),0);
+
+			for(it_edges.Initialize(listEdges);it_edges.More();it_edges.Next()){
+				TopoDS_Shape shape =  it_edges.Value();
+				Curve *c= 0;
+				bool not_find_shape = true;
+				for(int i =0; i<OCCCurves.size() && not_find_shape; i++){
+					if(shape.IsSame(OCCCurves[i]) && !still_done[i]){
+						not_find_shape = false;
+						c = Mgx3DCurves[i];
+						still_done[i] = true;
+					}
+				}
+				// si on a trouvé la shape et qu'elle n'avait pas déjà été traitée
+				if(!not_find_shape){
+					// on crée le lien C->V
+					c->add(v);
+					// on crée le lien V->C
+					v->add(c);
+				}
+			}
+		}
+
+		// on renseigne la fonction appelante
+		this->get(curv);
+		this->get(vert);
 	}
 }
 /*----------------------------------------------------------------------------*/
 double Surface::computeArea() const
 {
 	double area = 0.0;
-	std::vector<GeomRepresentation*> reps = getComputationalProperties();
-	for (uint i=0; i<reps.size(); i++)
-		area += reps[i]->computeSurfaceArea();
-
+	for (auto rep : getOCCShapes())
+		area += OCCHelper::computeArea(TopoDS::Face(rep));
 	return area;
 }
 /*----------------------------------------------------------------------------*/
@@ -416,27 +478,12 @@ void Surface::setDestroyed(bool b)
 /*----------------------------------------------------------------------------*/
 bool Surface::isPlanar() const
 {
-	std::vector<GeomRepresentation*> reps = getComputationalProperties();
-
-	// on dit que ce n'est pas planaire dès que c'est composé
-	if (reps.size() > 1)
+	auto reps = getOCCShapes();
+	if (reps.size() == 1)
+		return OCCHelper::isTypeOf(TopoDS::Face(reps[0]), STANDARD_TYPE(Geom_Plane));
+	else
+		// courbe composée : on dit que ce n'est pas une ellipse
 		return false;
-
-    OCCGeomRepresentation* rep = dynamic_cast<OCCGeomRepresentation*>(reps[0]);
-
-    // pas plan si autre que OCC
-    if(rep!=0){
-    	TopoDS_Shape sh = rep->getShape();
-
-    	if(sh.ShapeType() == TopAbs_FACE){ // forcément une Face
-    		TopoDS_Face face = TopoDS::Face(sh);
-    		Handle_Geom_Surface surface = BRep_Tool::Surface(face);
-    		if(surface->DynamicType()==STANDARD_TYPE(Geom_Plane))
-    			return true;
-    	}
-    }
-
-    return false;
 }
 /*----------------------------------------------------------------------------*/
 bool Surface::contains(Surface* ASurf) const
@@ -479,15 +526,7 @@ bool Surface::contains(Surface* ASurf) const
     // TESTEE PEUT NE PAS ENCORE ETRE CONNECTEE TOPOLOGIQUEMENT
     // AVEC DES ENTITES M3D
     //===============================================================
-    std::vector<GeomRepresentation*> loc_reps = ASurf->getComputationalProperties();
-
-    for (uint j=0; j<loc_reps.size(); j++){
-    	OCCGeomRepresentation* occ_rep =
-    			dynamic_cast<OCCGeomRepresentation*>(loc_reps[j]);
-    	CHECK_NULL_PTR_ERROR(occ_rep);
-
-    	TopoDS_Shape shOther = occ_rep->getShape();
-
+	for (auto shOther : ASurf->getOCCShapes()) {
     	//===============================================================
     	// on teste les sommets
     	//===============================================================
@@ -557,7 +596,7 @@ bool Surface::contains(Surface* ASurf) const
     	Handle_Geom_Surface surf = BRep_Tool::Surface(otherFace);
     	// On récupère la transformation de la shape/face
     	if (aPoly.IsNull()){
-    		OCCGeomRepresentation::buildIncrementalBRepMesh(otherFace, 0.1);
+    		OCCHelper::buildIncrementalBRepMesh(otherFace, 0.1);
     		// mesher.Perform();
     		aPoly = BRep_Tool::Triangulation(otherFace,aLoc);
     	}
@@ -624,13 +663,8 @@ bool Surface::contains(Surface* ASurf) const
 /*----------------------------------------------------------------------------*/
 Utils::Math::Point Surface::getPoint(const double u, const double v) const
 {
-	for (GeomRepresentation* gr : getComputationalProperties()) {
-		OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(gr);
-		if(occ_rep==0 || occ_rep->getShape().ShapeType()!=TopAbs_FACE)
-			throw TkUtil::Exception (TkUtil::UTF8String ("getParametricBounds nécessite une face OCC", TkUtil::Charset::UTF_8));
-
+	for (auto sh : getOCCShapes()) {
 		// check parametric bounds
-		TopoDS_Shape sh = occ_rep->getShape();
 		Handle_Geom_Surface surf = BRep_Tool::Surface(TopoDS::Face(sh));
 		double umin, umax, vmin, vmax;
 		surf->Bounds(umin, umax, vmin, vmax);
@@ -701,13 +735,13 @@ Utils::SerializedRepresentation* Surface::getDescription (bool alsoComputed) con
 	        Utils::SerializedRepresentation::Property ("Aire", volStr.ascii()) );
 	}
 
-	std::vector<GeomRepresentation*> reps = getComputationalProperties();
-	
+	auto reps = getOCCShapes();
+
 #ifdef _DEBUG		// Issue#111
     // précision OpenCascade ou autre
 	for (uint i=0; i<reps.size(); i++){
 		TkUtil::UTF8String	precStr (TkUtil::Charset::UTF_8);
-		precStr << reps[i]->getPrecision();
+		precStr << BRep_Tool::Tolerance(TopoDS::Face(reps[i]));
 	    propertyGeomDescription.addProperty (
 	    	        Utils::SerializedRepresentation::Property ("Précision", precStr.ascii()) );
 	}
@@ -717,7 +751,7 @@ Utils::SerializedRepresentation* Surface::getDescription (bool alsoComputed) con
 	TkUtil::UTF8String	typeStr (TkUtil::Charset::UTF_8);
     if (isPlanar())
     	typeStr<<"plan";
-    else if (getComputationalProperties().size()>1)
+    else if (reps.size()>1)
     	typeStr<<"composée";
     else
     	typeStr<<"quelconque";

@@ -68,7 +68,6 @@
 #include "Geom/CommandRotation.h"
 #include "Geom/CommandScaling.h"
 #include "Geom/CommandMirroring.h"
-#include "Geom/GeomRepresentation.h"
 #include "Geom/CommandNewVertexByProjection.h"
 #include "Geom/CommandNewVertexByCurveParameterization.h"
 #include "Geom/CommandJoinCurves.h"

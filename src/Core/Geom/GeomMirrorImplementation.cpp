@@ -17,6 +17,9 @@
 #include "Geom/Volume.h"
 #include "Geom/CommandGeomCopy.h"
 /*----------------------------------------------------------------------------*/
+#include <BRepBuilderAPI_Transform.hxx>
+#include <gp_Ax2.hxx>
+/*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
@@ -89,33 +92,49 @@ void GeomMirrorImplementation::
     mirrorSingle(GeomEntity* e)
 {
     //std::cout<<"GeomMirrorImplementation::mirrorSingle pour "<<e->getName()<<std::endl;
-    std::vector<GeomRepresentation*> reps = e->getComputationalProperties();
-    std::vector<GeomRepresentation*> new_reps;
+    std::vector<TopoDS_Shape> reps = e->getOCCShapes();
+    std::vector<TopoDS_Shape> new_reps;
     for (uint i=0; i<reps.size(); i++){
-        GeomRepresentation* new_rep = reps[i]->clone();
-        new_rep->mirror(m_plane);
-
-        new_reps.push_back(new_rep);
+        new_reps.push_back(mirror(reps[i], m_plane));
     }
 
-    e->setComputationalProperties(new_reps);
+    e->setOCCShapes(new_reps);
     e->setGeomProperty(new GeomProperty());
+}
+/*----------------------------------------------------------------------------*/
+TopoDS_Shape GeomMirrorImplementation::
+mirror(const TopoDS_Shape& shape, const Utils::Math::Plane& plane) const
+{
+	gp_Trsf T;
+    Utils::Math::Point plane_pnt = plane.getPoint();
+    Utils::Math::Vector plane_vec = plane.getNormal();
+
+    gp_Ax2 A2(gp_Pnt(plane_pnt.getX(), plane_pnt.getY(), plane_pnt.getZ()),
+    		gp_Dir(plane_vec.getX(), plane_vec.getY(), plane_vec.getZ()));
+    T.SetMirror (A2);
+    BRepBuilderAPI_Transform trans(T);
+
+    trans.Perform(shape);
+
+    if(!trans.IsDone())
+    	throw TkUtil::Exception(TkUtil::UTF8String ("Echec d'une symétrie!!", TkUtil::Charset::UTF_8));
+
+    //on stocke le résultat de la transformation (maj de la shape interne)
+    return trans.Shape();
 }
 /*----------------------------------------------------------------------------*/
 void GeomMirrorImplementation::
 performUndo()
 {
     for (uint i=0; i<m_undoableEntities.size(); i++)
-        for (GeomRepresentation* rep : m_undoableEntities[i]->getComputationalProperties())
-            rep->mirror(m_plane);
+        for (auto rep : m_undoableEntities[i]->getOCCShapes())
+            rep = mirror(rep, m_plane);
 }
 /*----------------------------------------------------------------------------*/
 void GeomMirrorImplementation::
 performRedo()
 {
-    for (uint i=0; i<m_undoableEntities.size(); i++)
-        for (GeomRepresentation* rep : m_undoableEntities[i]->getComputationalProperties())
-            rep->mirror(m_plane);
+    performUndo();
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

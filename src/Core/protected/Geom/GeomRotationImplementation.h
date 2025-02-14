@@ -98,9 +98,20 @@ public:
     void performUndo();
     void performRedo();
 
-protected:
+private:
     void makeRevol(GeomEntity* e);
 
+    /*------------------------------------------------------------------------*/
+    /** \brief Effectue la rotation de l'entité géométrique de
+     *         manière isolée. C'est-à-dire que aucune des entités incidentes
+     *         n'est impactée par ce traitement
+     *
+     *  \param shape l'entité géométrique
+     *  \param P1    premier point definissant l'axe de rotation
+     *  \param P2    second point definissant l'axe de rotation
+     *  \param Angle angle de rotation en degré (compris entre ]0,360])
+     */
+    TopoDS_Shape rotate(const TopoDS_Shape& shape, const Utils::Math::Point& P1, const Utils::Math::Point& P2, double Angle) const;
 
 protected:
 

@@ -13,8 +13,6 @@
 #include "Geom/GeomManager.h"
 #include "Utils/MgxException.h"
 
-#include "Geom/OCCGeomRepresentation.h"
-
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
 /*----------------------------------------------------------------------------*/

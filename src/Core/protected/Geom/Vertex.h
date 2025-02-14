@@ -51,7 +51,7 @@ public:
      */
 #ifndef SWIG
     Vertex(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, GeomRepresentation* compProp);
+            GeomProperty* gprop, TopoDS_Shape& shape);
 #endif
 
     /*------------------------------------------------------------------------*/

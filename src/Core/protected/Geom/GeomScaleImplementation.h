@@ -124,16 +124,26 @@ public:
     void performUndo();
     void performRedo();
 
-protected:
+private:
 
     /*------------------------------------------------------------------------*/
     /** \brief  homothétie des entités descendantes
      *
      *  \param entities les entités à translater
      */
-    //void scaleDownEntities(std::list<GeomEntity*>& entities);
     void scaleSingle(GeomEntity* e);
 
+    /*------------------------------------------------------------------------*/
+    /** \brief Effectue l'homothétie de l'entité géométrique de
+     *         manière isolée. C'est-à-dire que aucune des entités incidentes
+     *         n'est impactée par ce traitement
+     *
+     *  \param shape l'entité géométrique
+     *  \param F le facteur d'homothétie
+     *  \param center le centre d'homothétie
+     */
+    TopoDS_Shape scale(const TopoDS_Shape& shape, const double F, const Point& center) const;
+    TopoDS_Shape scale(const TopoDS_Shape& shape, const double factorX, const double factorY, const double factorZ, const Point& center) const;
 
 protected:
 

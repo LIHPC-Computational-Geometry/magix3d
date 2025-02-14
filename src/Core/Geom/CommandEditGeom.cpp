@@ -91,8 +91,6 @@ void CommandEditGeom::internalExecute()
            std::cerr<<"Memento cree pour "<<e->getName()<<std::endl;
 #endif
             ref.insert(std::pair<GeomEntity*,MementoGeomEntity>(e,mem));
-//            std::cerr<<"On vient de sauver l'etat de "<<e->getName()<<std::endl;
-//            std::cerr<<"\t "<<mem.getGeomRepresentation()<<std::endl;
         }
     }
 //    gmds::Timer t2;
@@ -254,7 +252,6 @@ void CommandEditGeom::permMementos()
         e->setFromMemento(mem_saved);
 #ifdef _DEBUG_CANCEL
         std::cout<<"On a permute l'etat pour "<<e->getName()<<std::endl;
-//        std::cerr<<"\t "<<mem_saved.getGeomRepresentation()<<std::endl;
 #endif
     }
 

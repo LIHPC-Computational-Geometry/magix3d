@@ -10,7 +10,6 @@
 /*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
 #include "Geom/GeomManager.h"
-#include "Geom/OCCGeomRepresentation.h"
 #include "Internal/ImportMDL2Commandes.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomHelper.h"

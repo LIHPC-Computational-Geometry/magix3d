@@ -2,6 +2,7 @@
 #define QT_MGX3D_LOGS_VIEW_H
 
 #include <TkUtil/util_config.h>
+#include <TkUtil/Log.h>
 #include <QtUtil/QtLogsView.h>
 
 #include <QSettings>

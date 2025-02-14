@@ -11,7 +11,6 @@
 /*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
 #include "Geom/GeomManager.h"
-#include "Geom/OCCGeomRepresentation.h"
 #include "Internal/ImportMDLItf.h"
 #include "Geom/EntityFactory.h"
 #include "Topo/EdgeMeshingPropertyGeometric.h"

@@ -80,14 +80,23 @@ public:
     void performUndo();
     void performRedo();
 
-protected:
-
+private:
     /*------------------------------------------------------------------------*/
     /** \brief  symétrie des entités
      *
      *  \param e l'entité à symétriser
      */
     void mirrorSingle(GeomEntity* e);
+
+    /*------------------------------------------------------------------------*/
+    /** \brief Effectue la symétrie de l'entité géométrique de
+     *         manière isolée. C'est-à-dire que aucune des entités incidentes
+     *         n'est impactée par ce traitement
+     *
+     *  \param shape l'entité géométrique
+     *  \param plane le plan de symétrie
+     */
+    TopoDS_Shape mirror(const TopoDS_Shape& shape, const Utils::Math::Plane& plane) const;
 
 protected:
 

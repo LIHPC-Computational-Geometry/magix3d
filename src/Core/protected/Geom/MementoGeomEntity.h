@@ -20,7 +20,6 @@ class TopoEntity;
 namespace Geom {
 /*----------------------------------------------------------------------------*/
 class GeomProperty;
-class GeomRepresentation;
 /*----------------------------------------------------------------------------*/
 /**
  * \class MementoGeomEntity
@@ -125,11 +124,11 @@ public:
         m_groups3D = grps;
     }
 
-    inline std::vector<GeomRepresentation*>& getGeomRepresentation() {
-        return m_geomRepresentation;
+    inline std::vector<TopoDS_Shape>& getOCCShapes() {
+        return m_shapes;
     }
-    inline void setGeomRepresentation(std::vector<GeomRepresentation*> g) {
-        m_geomRepresentation = g;
+    inline void setOCCShapes(const std::vector<TopoDS_Shape>& g) {
+        m_shapes = g;
     }
 
     inline GeomProperty* getProperty() {
@@ -156,7 +155,7 @@ private :
 
     /* ancienne représentation géométrique des entités que l'on a modifiées. Il
      * est de la responsabilité de l'objet de les détruire */
-    std::vector<GeomRepresentation*> m_geomRepresentation;
+    std::vector<TopoDS_Shape> m_shapes;
 
     /* ancienne propriétés des entités que l'on a modifiées. Il
      * est de la responsabilité de l'objet de les détruire */

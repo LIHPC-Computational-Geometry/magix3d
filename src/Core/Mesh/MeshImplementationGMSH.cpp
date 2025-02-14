@@ -22,7 +22,6 @@
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
-#include "Geom/OCCGeomRepresentation.h"
 /*----------------------------------------------------------------------------*/
 /// OCC
 #include <TopTools_IndexedMapOfShape.hxx>
@@ -84,17 +83,8 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
         throw TkUtil::Exception (message);
     }
 
-    for (Geom::GeomRepresentation* gr : geo_entity->getComputationalProperties()) {
-        Geom::OCCGeomRepresentation* occ_rep =
-        dynamic_cast<Geom::OCCGeomRepresentation*>(gr);
-
-        if(occ_rep==0){
-            TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-            message << "La face  "<< fa->getName()
-                    << " ne peut pas être maillée en triangles : absence de shape OCC";
-            throw TkUtil::Exception (message);
-        }
-        TopoDS_Face face_shape = TopoDS::Face(occ_rep->getShape());
+    for (auto sh : geo_entity->getOCCShapes()) {
+        TopoDS_Face face_shape = TopoDS::Face(sh);
 
 #ifdef _DEBUG_MESH
         std::cout <<"=== new gmsh model"<<std::endl;

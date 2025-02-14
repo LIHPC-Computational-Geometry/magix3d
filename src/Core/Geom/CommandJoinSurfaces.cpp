@@ -97,12 +97,11 @@ void CommandJoinSurfaces::init(std::vector<GeomEntity*>& es)
 /*----------------------------------------------------------------------------*/
 void CommandJoinSurfaces::internalSpecificExecute()
 {
-	// utilisation d'un vecteur de GeomRepresentation pour la surface composite
-	std::vector<GeomRepresentation*> reps;
-	for(uint i=0; i<m_entities.size(); i++){
-		std::vector<GeomRepresentation*> loc_reps = m_entities[i]->getComputationalProperties();
-		for (uint j=0; j<loc_reps.size(); j++)
-			reps.push_back(loc_reps[j]->clone());
+	// utilisation d'un vecteur de shape pour la surface composite
+	std::vector<TopoDS_Shape> reps;
+	for (auto entity : m_entities) {
+		auto loc_reps = entity->getOCCShapes();
+		std::copy(loc_reps.begin(), loc_reps.end(), std::back_inserter(reps));
 	}
 
 	// création de la surface union
