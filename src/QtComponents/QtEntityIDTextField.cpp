@@ -5,6 +5,7 @@
  */
 
 #include "Internal/ContextIfc.h"
+#include "Internal/EntitiesHelper.h"
 
 #include "QtComponents/QtEntityIDTextField.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -19,7 +20,6 @@
 #include <QtUtil/QtUnicodeHelper.h>
 
 #include <QKeyEvent>
-
 
 using namespace std;
 using namespace TkUtil;
@@ -688,52 +688,42 @@ void QtEntityIDTextField::textModifiedCallback ( )
 
 	try
 	{
-		// On enlève la sélection dûe à cette instance du gestionnaire de
-		// sélection et on y ajoute, si possible, celle saisie par
-		// l'utilisateur :
-		const vector<Entity*>	selectedEntities	= getSelectedEntities ( );
-		clearSeizuredEntities ( );
-		if ((0 != getSelectionManager ( )) && (0 != selectedEntities.size ( )))
-			getSelectionManager ( )->removeFromSelection (selectedEntities);
-
-		UTF8String		selection (Charset::UTF_8);
-		vector<string>	names	= getUniqueNames ( );
-		for (vector<string>::iterator it = names.begin ( );
-		     names.end ( ) != it; it++)
+		const vector<Entity*>	oldSelection	= getSelectedEntities ( );
+		vector<Entity*>			newSelection, added, removed;
+		vector<string>			names (getUniqueNames ( ));
+		for (vector<string>::const_iterator it = names.begin ( ); names.end ( ) != it; it++)
 		{
 			try
 			{
 				Entity&	entity = getContext().nameToEntity (*it);
-				if (0 != getSelectionManager ( ))
-				{
-					// EntitySeizureManager va appeler addToSelection et autres
-					// => ne pas rajouter le nom des entités pré-sélectionnées
-					// à la liste en cours.
-					_updating	= true;
-					vector<Entity*>	entities;
-					entities.push_back (&entity);
-					getSelectionManager ( )->addToSelection (entities);
-					_updating	= false;
-				}
-				if (false == selection.empty ( ))
-					selection << ' ';
-				selection << *it;
+				newSelection.push_back (&entity);
 			}
 			catch (...)
 			{
-				_updating	= false;
-				UTF8String	message (Charset::UTF_8);
-				message << "Erreur : il n'y a pas d'entité du nom de \"" << *it
-				        << "\". Entité enlevée de la sélection.";
-				getContext ( ).getLogDispatcher ( ).log (WarningLog (message));
 			}
+		}	// for (vector<string>::const_iterator it = names.begin ( ); names.end ( ) != it; it++)
 
-			setText (UTF8TOQSTRING (selection.trim ( )));
-		}	// for (vector<string>::iterator it = names.begin ( );
+		difference (oldSelection, newSelection, added, removed);
+/*		for (vector<Entity*>::const_iterator ite = newSelection.begin ( ); newSelection.end ( ) != ite; ite++)
+			if (previousSelection.end ( ) == std::find (previousSelection.begin ( ), previousSelection.end ( ), *ite))
+				added.push_back (*ite);
+		for (vector<Entity*>::const_iterator ite = previousSelection.begin ( ); previousSelection.end ( ) != ite; ite++)
+			if (newSelection.end ( ) == std::find (newSelection.begin ( ), newSelection.end ( ), *ite))
+				removed.push_back (*ite);*/
+		if (0 != getSelectionManager ( ))
+		{
+			if (false == removed.empty ( ))
+				getSelectionManager ( )->removeFromSelection (removed);
+			_updating	= true;
+			if (false == added.empty ( ))
+				getSelectionManager ( )->addToSelection (added);
+			_updating	= false;
+		}	// if (0 != getSelectionManager ( ))
 
 // MGXDDD-262 : Faut-il ajouter ici un
 // emit entitiesAddedToSelection (getQText ( )) pour des cas tordus si on a
 // false == inInteractiveMode ( ) en entrée de fonction ???
+
 		emit selectionModified (getQText ( ));
 	}
 	catch (...)

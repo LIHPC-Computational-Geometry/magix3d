@@ -10,6 +10,7 @@
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtMgx3DApplication.h"
 #include <QtUtil/QtErrorManagement.h>
+#include <QtUtil/QtWidgetAutoLock.h>
 #include "QtComponents/RenderedEntityRepresentation.h"
 #include "QtComponents/QtMgx3DScrollArea.h"
 #include "Topo/CoEdge.h"
@@ -1840,8 +1841,8 @@ void QtMgx3DOperationsPanel::applyCallback ( )
 
 	if (0 != _operationPanel)
 	{
-//		CHECK_NULL_PTR_ERROR (_operationPanel->getMgx3DOperationAction ( ))
-//		_operationPanel->getMgx3DOperationAction ( )->executeOperation ( );
+		QtWidgetAutoLock	lock (_operationPanel);
+		
 		_operationPanel->applyCallback ( );
 	}	// if (0 != _operationPanel)
 
