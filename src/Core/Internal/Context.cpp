@@ -31,7 +31,6 @@
 #include "Utils/DisplayProperties.h"
 #include "Utils/CommandManager.h"
 #include "Utils/Entity.h"
-#include <Utils/Log.h>
 
 #include "Topo/Vertex.h"
 #include "Topo/CoEdge.h"
@@ -1985,14 +1984,6 @@ Internal::Context* getStdContext ()
 	catch (const TkUtil::Exception& exc) {
 		// si le contexte n'existe pas, on en créé un avec comme nom "python"
 		//std::cout << __FILE__ << ' ' << __LINE__ << " Context::getContext. Contexte " << name << " non trouvé. Création d'une instance de la classe Internal::Context." << std::endl;
-		char* env = getenv ("CODE");
-		if (env == 0 || strlen(env) == 0){
-//			LM_set_codename("python");
-			//std::cout<<"LM_set_codename(python)"<<std::endl;
-
-		    // logues version ~ Magix
-			Utils::maillage_log(0, 0, "Magix3D");
-		}
 		TkUtil::ThreadManager::initialize (0);
 		TkUtil::ThreadPool::initialize (0);
 

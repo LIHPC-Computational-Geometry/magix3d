@@ -10,7 +10,6 @@
 #include "Internal/Mgx3DArguments.h"
 #include "Internal/Resources.h"
 #include "Utils/CommandManager.h"
-#include "Utils/Log.h"
 
 #include <TkUtil/ArgumentsMap.h>
 #include <TkUtil/Exception.h>
@@ -110,9 +109,6 @@ int main (int argc, char *argv[], char* envp[])
 	{
 		
 	Process::initialize (argc, argv, envp);
-	
-    // logues version ~ Magix
-    Utils::maillage_log(argc, argv, "Magix3DBatch");
 
 	try
 	{
