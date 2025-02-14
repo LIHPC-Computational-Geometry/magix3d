@@ -2609,17 +2609,17 @@ void QtMgx3DMainWindow::showReady ( )
 					                       );
 			registerOperationAction(
 					*segmentAction, QtMgx3DOperationsPanel::GEOM_CURVE_OPERATION);
-			// Arc de cercle :
+			// Arc de cercle/d'ellipse :
 			QtMgx3DOperationAction *arcCircleAction =
 					                       new QtArcCircleOperationAction(
 							                       QIcon(":/images/geom_create_arc_circle.png"),
-							                       QString::fromUtf8("Création d'arc de cercle"), *this,
-							                       QString::fromUtf8("Création d'arc de cercle."),
+							                       QString::fromUtf8("Création d'arc de cercle/d'ellipse"), *this,
+							                       QString::fromUtf8("Création d'arc de cercle/d'ellipse."),
 							                       QtMgx3DGroupNamePanel::CREATION
 					                       );
 			registerOperationAction(
 					*arcCircleAction, QtMgx3DOperationsPanel::GEOM_CURVE_OPERATION);
-			// Cercle :
+			// Cercle/Ellipse :
 			QtMgx3DOperationAction *circleAction =
 					                       new QtCircleOperationAction(
 							                       QIcon(":/images/geom_create_circle.png"),
