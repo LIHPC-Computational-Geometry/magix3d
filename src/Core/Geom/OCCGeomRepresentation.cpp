@@ -116,6 +116,7 @@
 #include <BRepClass3d_SolidClassifier.hxx>
 
 #include <GeomAPI_IntCS.hxx>
+#include <ShapeAnalysis.hxx>
 
 /*----------------------------------------------------------------------------*/
 // utilisation du TopoDS_Shape::IsSame
@@ -1647,70 +1648,44 @@ void OCCGeomRepresentation::project(Utils::Math::Point& P, const Curve* C)
 /*----------------------------------------------------------------------------*/
 void OCCGeomRepresentation::project(Utils::Math::Point& P, const Surface* S)
 {
-    projectPointOn(P);
+    // in gmsh ShapeFix_Wire::FixReorder is called in the surface setup step.
+    // Is it mandatory when meshing in the UV parametric space
+    // and not in our case ?
 
-//	double tol = 1.0e-7;
-//	gp_Pnt aPnt(P.getX(),P.getY(),P.getZ());
-//
-//	// version Salomé d'une projection d'un point sur une surface
-//	// 3 fois plus rapide que projectPointOn, mais pb avec tests unitaires
-//
-//	TopoDS_Face aFace = TopoDS::Face(m_shape);
-//	Handle(Geom_Surface) surface = BRep_Tool::Surface(aFace);
-//	double U1, U2, V1, V2;
-//	//surface->Bounds(U1, U2, V1, V2);
-//	BRepTools::UVBounds(aFace, U1, U2, V1, V2);
-//
-//	// projector
-//	GeomAPI_ProjectPointOnSurf proj;
-//	proj.Init(surface, U1, U2, V1, V2, tol);
-//
-//	//gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(anOriginal));
-//	proj.Perform(aPnt);
-//	if (!proj.IsDone()) {
-//		Standard_ConstructionError::Raise
-//		("Projection aborted : the algorithm failed");
-//	}
-//	int nbPoints = proj.NbPoints();
-//	if (nbPoints < 1) {
-//		Standard_ConstructionError::Raise("No solution found");
-//	}
-//
-//	Quantity_Parameter U, V;
-//	proj.LowerDistanceParameters(U, V);
-//	gp_Pnt2d aProjPnt (U, V);
-//
-//	// classifier
-//	BRepClass_FaceClassifier aClsf (aFace, aProjPnt, tol);
-//	if (aClsf.State() != TopAbs_IN && aClsf.State() != TopAbs_ON) {
-//		bool isSol = false;
-//		double minDist = RealLast();
-//		for (int i = 1; i <= nbPoints; i++) {
-//			Quantity_Parameter Ui, Vi;
-//			proj.Parameters(i, Ui, Vi);
-//			aProjPnt = gp_Pnt2d(Ui, Vi);
-//			aClsf.Perform(aFace, aProjPnt, tol);
-//			if (aClsf.State() == TopAbs_IN || aClsf.State() == TopAbs_ON) {
-//				isSol = true;
-//				double dist = proj.Distance(i);
-//				if (dist < minDist) {
-//					minDist = dist;
-//					U = Ui;
-//					V = Vi;
-//				}
-//			}
-//		}
-//		if (!isSol) {
-//			Standard_ConstructionError::Raise("No solution found");
-//		}
-//	}
-//
-//	gp_Pnt surfPnt = surface->Value(U, V);
-//
-//	//aShape = BRepBuilderAPI_MakeVertex(surfPnt).Shape();
-//
-//
-//	P.setXYZ(surfPnt.X(), surfPnt.Y(), surfPnt.Z());
+    double umin, umax, vmin, vmax = 0.;
+    TopoDS_Face face = TopoDS::Face(m_shape);
+    ShapeAnalysis::GetFaceUVBounds(face, umin, umax, vmin, vmax);
+    Handle(Geom_Surface) surface = BRep_Tool::Surface(face);
+
+    GeomAPI_ProjectPointOnSurf projector;
+    gp_Pnt pnt(P.getX(),P.getY(),P.getZ());
+    projector.Init(pnt, surface, umin, umax, vmin, vmax);
+    bool isDone = false;
+    if (projector.NbPoints() > 0) {
+        gp_Pnt pnt2 = projector.NearestPoint();
+        P.setXYZ(pnt2.X(), pnt2.Y(), pnt2.Z());
+        isDone = true;
+    }
+//    else {
+//        std::cerr<<"OCCGeomRepresentation::project ERROR "<<P<<" on surface " <<S<<std::endl;
+//        throw TkUtil::Exception("Echec d'une projection d'un point sur une courbe ou surface!!");
+//    }
+
+// this second projection in case the first one fails might not be necessary
+    if(!isDone) {
+        TopoDS_Vertex V = BRepBuilderAPI_MakeVertex(pnt);
+        BRepExtrema_DistShapeShape extrema(V, m_shape);
+        bool isDone = extrema.IsDone();
+        if(!isDone) {
+            isDone = extrema.Perform();
+        }
+        if(!isDone) {
+            std::cerr<<"OCCGeomRepresentation::project error "<<P<<" on surface " <<S<<std::endl;
+            throw TkUtil::Exception("Echec d'une projection d'un point sur une courbe ou surface!!");
+        }
+        gp_Pnt pnt2 = extrema.PointOnShape2(1);
+        P.setXYZ(pnt2.X(), pnt2.Y(), pnt2.Z());
+    }
 }
 /*----------------------------------------------------------------------------*/
 void OCCGeomRepresentation::project(const Utils::Math::Point& P1, Utils::Math::Point& P2,
@@ -1736,7 +1711,7 @@ void OCCGeomRepresentation::projectPointOn( Utils::Math::Point& P)
 		gp_Pnt pnt = BRep_Tool::Pnt(TopoDS::Vertex(m_shape));
 		P.setXYZ(pnt.X(), pnt.Y(), pnt.Z());
 	}
-	else
+    else
 	{
 		gp_Pnt pnt(P.getX(),P.getY(),P.getZ());
 		TopoDS_Vertex V = BRepBuilderAPI_MakeVertex(pnt);
