@@ -286,20 +286,27 @@ donc sélectionner les noms de deux sommets aux extrémités.
 
 .. _creation-arc-cercle:
 
-Créer un arc de cercle |image77|
-''''''''''''''''''''''''''''''''''
+Créer un arc de cercle ou d'ellipse |image77|
+'''''''''''''''''''''''''''''''''''''''''''''
 
 Se fait avec l’une des méthodes suivantes :
 
-1. *Par saisie d’un centre et des 2 extrémités*. Il faut donc saisir les
-   noms de 3 sommets. Se fait par défaut dans un plan orthogonal à l’axe
-   des Z. Il est possible de se placer dans un autre plan, pour cela il
-   suffit de définir une normale au plan. Il est possible d’inverser le
-   sens pour l’arc.
+1. *Arc de cercle par saisie d’un centre et des 2 extrémités*. Il faut 
+   donc saisir les noms de 3 sommets. Se fait par défaut dans un plan 
+   orthogonal à l’axe des Z. Il est possible de se placer dans un autre
+   plan, pour cela il suffit de définir une normale au plan. Il est 
+   possible d’inverser le sens pour l’arc.
 
-2. *Par sélection d’un repère local, de deux angles et d’un rayon.*
+2. *Arc de cercle par saisie des angles et du repère.*
    L’arc est créé dans le plan (xOy) du repère local. Les angles sont
    pris par rapport à l’axe (Ox) et sont exprimés en degrés.
+
+3. *Arc de cercle par saisie de 3 points inscrits.* Construit un arc de
+   cercle passant par les 3 points donnés.
+
+4. *Arc d'ellipse par saisie du centre et des extrémités.* Construit un
+   arc d'ellipse dont le centre est donné, les 2 rayons étant définis 
+   par le centre et chacune des extrémités.
 
 La fonction *Aperçu* permet de visualiser la normale au plan de
 construction lorsqu’il est sélectionné un autre plan que le plan par

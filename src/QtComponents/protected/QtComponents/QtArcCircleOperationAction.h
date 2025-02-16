@@ -69,6 +69,11 @@ class QtCenterExtremitiesArcPanel : public QtMgx3DOperationsSubPanel
 	virtual std::string getVertex3UniqueName ( ) const;
 
 	/**
+	 * \param	<I>true</I> si l'utilisateur peut choisir ou non de définir la normale (interdit dans le cas d'une ellipse).
+	 */
+	virtual void enableNormal (bool enable);
+	
+	/**
 	 * \return	<I>true</I> si l'utilisateur défini la normale au plan, <I>false</I> dans le cas contraire.
 	 * \see		getNormal
 	 */
@@ -275,7 +280,7 @@ class QtAnglesSysCoordsArcPanel : public QtMgx3DOperationsSubPanel
 	
 /**
  * Panneau d'édition des paramètres d'une opération géométrique touchant
- * un arc de cercle.
+ * un arc de cercle/d'ellipse.
  */
 class QtArcCircleOperationPanel : public QtMgx3DOperationPanel
 {
@@ -283,14 +288,15 @@ class QtArcCircleOperationPanel : public QtMgx3DOperationPanel
 
 	public :
 
-	/** La méthode de création/modification de l'arc de cercle.
+	/** La méthode de création/modification de l'arc de cercle/d'ellipse.
 	 * <OL>
-	 * <LI>Renseignement de 3 vertex (extrémités + centre de l'arc).
-	 * <LI>Renseignement de 2 angles, d'un rayon et d'un repère.
-	 * <LI>Renseignement de 3 points circonscrits.
+	 * <LI>Arc de cercle par 3 vertex (extrémités + centre de l'arc).
+	 * <LI>Arc de cercle par 2 angles, d'un rayon et d'un repère.
+	 * <LI>Arc de cercle par 3 points circonscrits.
+	 * <LI>Arc d'ellipse par 3 vertex (extrémités des 2 rayons + centre de l'arc).
 	 * </OL>
 	 */
-	enum OPERATION_METHOD { EXTREMITIES_CENTER, SYSCOORD_2_ANGLES, CIRCUMCIRCLE_PTS};
+	enum OPERATION_METHOD { EXTREMITIES_CENTER, SYSCOORD_2_ANGLES, CIRCUMCIRCLE_PTS, ELLIPSE_EXTREMITIES_CENTER };
 
 	/**
 	 * Créé l'ihm.
@@ -455,7 +461,7 @@ class QtArcCircleOperationPanel : public QtMgx3DOperationPanel
 
 /**
  * Classe d'action type <I>check box</I> associée à un panneau type
- * <I>QtArcCircleOperationPanel</I> de création/modification d'un arc de cercle.
+ * <I>QtArcCircleOperationPanel</I> de création/modification d'un arc de cercle/d'ellipse.
  */
 class QtArcCircleOperationAction : public QtMgx3DGeomOperationAction
 {
@@ -483,12 +489,12 @@ class QtArcCircleOperationAction : public QtMgx3DGeomOperationAction
 	virtual ~QtArcCircleOperationAction ( );
 
 	/**
-	 * \return		Le panneau d'édition de l'arc de cercle.
+	 * \return		Le panneau d'édition de l'arc de cercle/d'ellipse.
 	 */
 	virtual QtArcCircleOperationPanel* getArcCirclePanel ( );
 
 	/**
-	 * Créé/modifie l'arc de cercle avec le paramétrage de son panneau associé.
+	 * Créé/modifie l'arc de cercle/d'ellipse avec le paramétrage de son panneau associé.
 	 * Invoque préalablement
 	 * <I>QtMgx3DGeomOperationAction::executeOperation</I>.
 	 */

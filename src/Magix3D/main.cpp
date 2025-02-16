@@ -1,5 +1,4 @@
 #include "Internal/ContextIfc.h"
-#include <Utils/Log.h>
 
 #include <QtVtkComponents/QtVtkMgx3DMainWindow.h>
 #include <QtVtkComponents/QtVtkMgx3DApplication.h>
@@ -63,9 +62,6 @@ int main (int argc, char* argv[], char* envp[])
 #ifdef _DEBUG
 	feenableexcept(FE_DIVBYZERO); // |FE_INVALID
 #endif
-
-    // logues version ~ Magix
-    maillage_log(argc, argv, "Magix3D");
 
 	// Jouer sur la nature des logs générés par l'application : c'est ici le
 	// meilleur endroit, comme ci-dessous :
