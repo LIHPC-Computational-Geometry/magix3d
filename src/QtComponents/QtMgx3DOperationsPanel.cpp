@@ -10,6 +10,7 @@
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtMgx3DApplication.h"
 #include <QtUtil/QtErrorManagement.h>
+#include <QtUtil/QtWidgetAutoLock.h>
 #include "QtComponents/RenderedEntityRepresentation.h"
 #include "QtComponents/QtMgx3DScrollArea.h"
 #include "Topo/CoEdge.h"
@@ -675,6 +676,8 @@ void QtMgx3DOperationPanel::applyCallback ( )
 	bool	userNotified	= false;	// CP 16/09/24 false par défaut (cas où la création de commande lève une exception => pas de commandResult)																	// CP NEW
 	BEGIN_QT_TRY_CATCH_BLOCK
 
+	highlight (false);	// CP 18/02/25 : ne pas être tenté de modifier la surbrillance d'entités détruites.
+
 	CHECK_NULL_PTR_ERROR (getMgx3DOperationAction ( ))
 	getMgx3DOperationAction ( )->executeOperation ( );
 	commandResult	= getMgx3DOperationAction ( )->getCommandResult ( );
@@ -683,7 +686,10 @@ void QtMgx3DOperationPanel::applyCallback ( )
 	if (0 != commandResult)
 	{
 		if (CommandIfc::DONE == commandResult->getStatus ( ))
+		{
+			reset ( );	// CP 18/02/25 : ne pas être tenté de modifier la surbrillance d'entités détruites.
 			hasError	= false;
+		}
 		else
 		{
 			userNotified	= commandResult->isUserNotified ( );
@@ -1840,8 +1846,8 @@ void QtMgx3DOperationsPanel::applyCallback ( )
 
 	if (0 != _operationPanel)
 	{
-//		CHECK_NULL_PTR_ERROR (_operationPanel->getMgx3DOperationAction ( ))
-//		_operationPanel->getMgx3DOperationAction ( )->executeOperation ( );
+		QtWidgetAutoLock	lock (_operationPanel);
+		
 		_operationPanel->applyCallback ( );
 	}	// if (0 != _operationPanel)
 

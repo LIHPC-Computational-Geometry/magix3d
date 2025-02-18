@@ -8,6 +8,7 @@
 
 #include "QtComponents/EntitySeizureManager.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
+#include "Internal/EntitiesHelper.h"
 
 #include <Utils/Common.h>
 
@@ -239,9 +240,11 @@ void EntitySeizureManager::setInteractiveMode (bool enable)
 			// On ajoute au gestionnaire de sélection la ou les entités déjà
 			// sélectionnées :
 			vector<Entity*>	entities	= getSelectedEntities ( );
-			_seizuredEntities.clear ( );
-			if (0 != entities.size ( ))
-				getSelectionManager ( )->addToSelection (entities);
+			vector<Entity*>	added, removed;
+			vector<Entity*>	currentSelection	= getSelectionManager( )->getEntities ( );
+			difference (currentSelection, entities, added, removed);
+			if (0 != added.size ( ))
+				getSelectionManager ( )->addToSelection (added);
 		}	// if (0 != getSelectionManager ( ))
 
 	}	// if (true == _interactiveMode)
