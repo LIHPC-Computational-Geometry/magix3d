@@ -676,6 +676,8 @@ void QtMgx3DOperationPanel::applyCallback ( )
 	bool	userNotified	= false;	// CP 16/09/24 false par défaut (cas où la création de commande lève une exception => pas de commandResult)																	// CP NEW
 	BEGIN_QT_TRY_CATCH_BLOCK
 
+	highlight (false);	// CP 18/02/25 : ne pas être tenté de modifier la surbrillance d'entités détruites.
+
 	CHECK_NULL_PTR_ERROR (getMgx3DOperationAction ( ))
 	getMgx3DOperationAction ( )->executeOperation ( );
 	commandResult	= getMgx3DOperationAction ( )->getCommandResult ( );
@@ -684,7 +686,10 @@ void QtMgx3DOperationPanel::applyCallback ( )
 	if (0 != commandResult)
 	{
 		if (CommandIfc::DONE == commandResult->getStatus ( ))
+		{
+			reset ( );	// CP 18/02/25 : ne pas être tenté de modifier la surbrillance d'entités détruites.
 			hasError	= false;
+		}
 		else
 		{
 			userNotified	= commandResult->isUserNotified ( );

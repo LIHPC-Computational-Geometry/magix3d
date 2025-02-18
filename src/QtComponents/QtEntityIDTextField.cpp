@@ -48,12 +48,9 @@ QtEntityIDTextField::QtEntityIDTextField (
 	// 1er callback à exécuter : filterText, le texte est peut-être issu de
 	// copier/coller avec la console python, il faut alors enlever des ,, ', ",
 	// ...
-	connect (this, SIGNAL (editingFinished ( )), this,
-	         SLOT (filterText ( )));
-	connect (this, SIGNAL (returnPressed ( )), this,
-	         SLOT (returnPressedCallback ( )));
-	connect (this, SIGNAL (editingFinished ( )), this,
-	         SLOT (textModifiedCallback ( )));
+	connect (this, SIGNAL (editingFinished ( )), this, SLOT (filterText ( )));
+	connect (this, SIGNAL (returnPressed ( )), this, SLOT (returnPressedCallback ( )));
+	connect (this, SIGNAL (editingFinished ( )), this, SLOT (textModifiedCallback ( )));
 
 	// Le menu contextuel :
 	_addGraphicalSelectionAction	= new QAction (QString::fromUtf8 ("Ajouter la sélection"), this);
@@ -349,11 +346,9 @@ void QtEntityIDTextField::addGraphicalSelectionCallback ( )
 
 void QtEntityIDTextField::addSelectedGroupsEntitiesCallback ( )
 {
-cout << "QtEntityIDTextField::addSelectedGroupsEntitiesCallback called" << endl;
 	try
 	{
 		vector<Group::GroupEntity*>	groups	= getMainWindow ( ).getGroupsPanel ( ).getSelectedGroups ( );
-cout << "CURRENT SELECTION HAS " << groups.size ( ) << " GROUPS" << endl;
 		vector<Entity*>	keptEntities;
 		for (vector<Group::GroupEntity*>::const_iterator itg = groups.begin ( );
 		     groups.end ( ) != itg; itg++)
@@ -367,7 +362,6 @@ cout << "CURRENT SELECTION HAS " << groups.size ( ) << " GROUPS" << endl;
 
 		if (0 != keptEntities.size ( ))
 			addToSelection (keptEntities);
-cout << "KEPT ENTIES COUNT IS " << keptEntities.size ( ) << endl;
 	}
 	catch (...)
 	{
@@ -704,12 +698,6 @@ void QtEntityIDTextField::textModifiedCallback ( )
 		}	// for (vector<string>::const_iterator it = names.begin ( ); names.end ( ) != it; it++)
 
 		difference (oldSelection, newSelection, added, removed);
-/*		for (vector<Entity*>::const_iterator ite = newSelection.begin ( ); newSelection.end ( ) != ite; ite++)
-			if (previousSelection.end ( ) == std::find (previousSelection.begin ( ), previousSelection.end ( ), *ite))
-				added.push_back (*ite);
-		for (vector<Entity*>::const_iterator ite = previousSelection.begin ( ); previousSelection.end ( ) != ite; ite++)
-			if (newSelection.end ( ) == std::find (newSelection.begin ( ), newSelection.end ( ), *ite))
-				removed.push_back (*ite);*/
 		if (0 != getSelectionManager ( ))
 		{
 			if (false == removed.empty ( ))
