@@ -55,25 +55,39 @@ namespace Geom {
 const char* Curve::typeNameGeomCurve = "GeomCurve";
 /*----------------------------------------------------------------------------*/
 Curve::Curve(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-        GeomProperty* gprop, TopoDS_Shape& shape)
-:GeomEntity(ctx, prop, disp, gprop, shape)
+        GeomProperty* gprop, TopoDS_Edge& shape)
+:GeomEntity(ctx, prop, disp, gprop)
 {
+	m_occ_edges.push_back(shape);
 }
 /*----------------------------------------------------------------------------*/
 Curve::Curve(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, std::vector<TopoDS_Shape>& shapes)
-:GeomEntity(ctx, prop, disp, gprop, shapes)
+            GeomProperty* gprop, std::vector<TopoDS_Edge>& shapes)
+:GeomEntity(ctx, prop, disp, gprop)
+, m_occ_edges(shapes)
 {
+}
+/*----------------------------------------------------------------------------*/
+void Curve::apply(std::function<void(const TopoDS_Shape&)> const& lambda) const
+{
+	for (auto sh : m_occ_edges)
+		lambda(sh);
+}
+/*----------------------------------------------------------------------------*/
+void Curve::applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda)
+{
+	for (int i=0 ; i<m_occ_edges.size() ; ++i) {
+		m_occ_edges[i] = TopoDS::Edge(lambda(m_occ_edges[i]));
+	}
 }
 /*----------------------------------------------------------------------------*/
 GeomEntity* Curve::clone(Internal::Context& c)
 {
-	std::vector<TopoDS_Shape> reps = this->getOCCShapes();
 	Curve* newCrv = new Curve(c,
             c.newProperty(this->getType()),
             c.newDisplayProperties(this->getType()),
             new GeomProperty(),
-			reps);
+			m_occ_edges);
 
 	newCrv->paramLocFirst = paramLocFirst;
 	newCrv->paramLocLast = paramLocLast;
@@ -91,10 +105,37 @@ void Curve::setFromSpecificMemento(MementoGeomEntity& mem)
     m_surfaces = mem.getSurfaces();
     m_vertices = mem.getVertices();
     m_groups  = mem.getGroups1D();
+	m_occ_edges.clear();
+	for (auto sh : mem.getOCCShapes())
+		m_occ_edges.push_back(TopoDS::Edge(sh));
 
     // pour le cas des courbes composites, on force la mise à jour des paramètres
     if (!m_vertices.empty())
     	computeParams(m_vertices[0]->getPoint());
+}
+/*----------------------------------------------------------------------------*/
+void Curve::computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const
+{
+	if (m_occ_edges.empty())
+		return;
+
+    OCCHelper::computeBoundingBox(m_occ_edges[0], pmin, pmax);
+	for (uint i=1; i<m_occ_edges.size(); i++){
+		Utils::Math::Point p1,p2;
+        OCCHelper::computeBoundingBox(m_occ_edges[i], pmin, pmax);
+		for (uint j=0; j<3; j++){
+			double c1 = pmin.getCoord(j);
+			double c2 = p1.getCoord(j);
+			if (c2<c1)
+				pmin.setCoord(j,c2);
+		}
+		for (uint j=0; j<3; j++){
+			double c1 = pmax.getCoord(j);
+			double c2 = p2.getCoord(j);
+			if (c2>c1)
+				pmin.setCoord(j,c2);
+		}
+	}
 }
 /*----------------------------------------------------------------------------*/
 void Curve::createSpecificMemento(MementoGeomEntity& mem)
@@ -102,6 +143,10 @@ void Curve::createSpecificMemento(MementoGeomEntity& mem)
     mem.setSurfaces(m_surfaces);
     mem.setVertices(m_vertices);
     mem.setGroups1D(m_groups);
+	std::vector<TopoDS_Shape> shapes;
+	for (auto e : m_occ_edges)
+		shapes.push_back(e);
+	mem.setOCCShapes(shapes);
 }
 /*----------------------------------------------------------------------------*/
 void Curve::getRefEntities(std::vector<GeomEntity*>& entities)
@@ -140,21 +185,14 @@ void Curve::clearRefEntities(std::list<GeomEntity*>& vertices,
 /*----------------------------------------------------------------------------*/
 bool Curve::isEqual(Geom::Curve* curve)
 {
-	int nb_reps = getOCCShapes().size();
-	if (nb_reps != curve->getOCCShapes().size())
+	if (m_occ_edges.size() != curve->m_occ_edges.size())
 		return false;
 
 	// geometrical representations must be in the same order
-	for (int i=0 ; i<nb_reps ; ++i)
+	for (int i=0 ; i<m_occ_edges.size() ; ++i)
 	{
-		TopoDS_Shape sh1 = getOCCShapes()[i];
-		TopoDS_Shape sh2 = curve->getOCCShapes()[i];
-
-		if(sh1.ShapeType()!=TopAbs_EDGE || sh2.ShapeType()!=TopAbs_EDGE)
-			return false;
-
-		TopoDS_Edge e1 = TopoDS::Edge(sh1);
-		TopoDS_Edge e2 = TopoDS::Edge(sh2);
+		TopoDS_Edge e1 = m_occ_edges[i];
+		TopoDS_Edge e2 = curve->m_occ_edges[i];
 		if (!OCCHelper::areEquals(e1,e2))
 			return false;
 	}
@@ -274,7 +312,7 @@ bool Curve::contains(Curve* ACurve) const
     // TESTEE PEUT NE PAS ENCORE ETRE CONNECTEE TOPOLOGIQUEMENT
     // AVEC DES ENTITES M3D
     //===============================================================
-	for (TopoDS_Shape shOther : ACurve->getOCCShapes())
+	for (TopoDS_Shape shOther : ACurve->m_occ_edges)
 	{
 		//===============================================================
 		// on teste les sommets
@@ -338,23 +376,41 @@ bool Curve::contains(Curve* ACurve) const
     return true;
 }
 /*----------------------------------------------------------------------------*/
-void Curve::project(Utils::Math::Point& P) const
+uint Curve::project(Utils::Math::Point& P) const
 {
-	OCCHelper::project(getOCCShapes(), P);
+	Utils::Math::Point P2;
+	int idBest = project(P, P2);
+	P = P2;
+    return idBest;
 }
 /*----------------------------------------------------------------------------*/
-void Curve::project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const
+uint Curve::project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const
 {
-	OCCHelper::project(getOCCShapes(), P1, P2);
+	P2 = P1;
+	OCCHelper::projectPointOn(m_occ_edges[0], P2);
+	Utils::Math::Point pBest = P2;
+	uint idBest = 0;
+	double norme2 = (P2-P1).norme2();
+	for (uint i=1; i<m_occ_edges.size(); i++){
+		P2 = P1;
+		OCCHelper::projectPointOn(m_occ_edges[i], P2);
+		double dist = (P2-P1).norme2();
+		if (dist<norme2){
+			norme2 = dist;
+			pBest = P2;
+        	idBest = i;
+		}
+	}
+	P2 = pBest;
+    return idBest;
 }
 /*----------------------------------------------------------------------------*/
 void Curve::
 getPoint(const double& p, Utils::Math::Point& Pt, const bool in01) const
 {
-	auto reps = getOCCShapes();
-	if (reps.size() == 1)
+	if (m_occ_edges.size() == 1)
 	{
-		OCCHelper::getPoint(TopoDS::Edge(reps[0]), p, Pt, in01);
+		OCCHelper::getPoint(m_occ_edges[0], p, Pt, in01);
 	}
 	else
 	{
@@ -373,7 +429,7 @@ getPoint(const double& p, Utils::Math::Point& Pt, const bool in01) const
 
 		double ratio = (p-paramImgFirst[ind])/(paramImgLast[ind]-paramImgFirst[ind]);
 		double paramLoc = paramLocFirst[ind]+ratio*(paramLocLast[ind]-paramLocFirst[ind]);
-		OCCHelper::getPoint(TopoDS::Edge(reps[ind]), paramLoc, Pt, false);
+		OCCHelper::getPoint(m_occ_edges[ind], paramLoc, Pt, false);
 	}
 }
 /*----------------------------------------------------------------------------*/
@@ -381,16 +437,14 @@ void Curve::tangent(const Utils::Math::Point& P1, Utils::Math::Vector& V2) const
 {
 	// on va prendre la projection la plus courte pour le cas composé et utiliser la tangente associée
 	Utils::Math::Point P2;
-	auto reps = getOCCShapes();
-	uint idBest = OCCHelper::project(reps, P1, P2);
-	OCCHelper::tangent(TopoDS::Edge(reps[idBest]), P1, V2);
+	uint idBest = project(P1, P2);
+	OCCHelper::tangent(m_occ_edges[idBest], P1, V2);
 }
 /*----------------------------------------------------------------------------*/
 void Curve::getIntersection(gp_Pln& plan_cut, Utils::Math::Point& Pt) const
 {
-	auto reps = getOCCShapes();
-	if (reps.size() == 1)
-		OCCHelper::getIntersection(TopoDS::Edge(reps[0]), plan_cut, Pt);
+	if (m_occ_edges.size() == 1)
+		OCCHelper::getIntersection(m_occ_edges[0], plan_cut, Pt);
 	else
 		MGX_NOT_YET_IMPLEMENTED("Intersection avec un plan non implémentée pour le cas composé (utilisé pour discrétisation polaire)");
 }
@@ -398,10 +452,9 @@ void Curve::getIntersection(gp_Pln& plan_cut, Utils::Math::Point& Pt) const
 void Curve::getParameter(const Utils::Math::Point& Pt, double& p) const
 {
     //std::cout<<setprecision(14)<<"Curve::getParameter pour pt "<<Pt<<std::endl;
-	auto reps = getOCCShapes();
-	if (reps.size() == 1)
+	if (m_occ_edges.size() == 1)
 	{
-		OCCHelper::getParameter(TopoDS::Edge(reps[0]), Pt, p);
+		OCCHelper::getParameter(m_occ_edges[0], Pt, p);
 	}
 	else
 	{
@@ -423,11 +476,11 @@ void Curve::getParameter(const Utils::Math::Point& Pt, double& p) const
 			return;
 		}
 
-		for (uint ind=0; ind<reps.size(); ind++){
+		for (uint ind=0; ind<m_occ_edges.size(); ind++){
 
 			try{
 				double paramLoc = 0.0;
-				OCCHelper::getParameter(TopoDS::Edge(reps[ind]), Pt, paramLoc);
+				OCCHelper::getParameter(m_occ_edges[ind], Pt, paramLoc);
 				//std::cout<<" paramLoc "<<paramLoc<<std::endl;
 
 				double ratio = (paramLoc-paramLocFirst[ind])/(paramLocLast[ind]-paramLocFirst[ind]);
@@ -447,9 +500,8 @@ void Curve::getParameter(const Utils::Math::Point& Pt, double& p) const
 /*----------------------------------------------------------------------------*/
 void Curve::getParameters(double& first, double& last) const
 {
-	auto reps = getOCCShapes();
-	if (reps.size() == 1) {
-		OCCHelper::getParameters(TopoDS::Edge(reps[0]), first, last);
+	if (m_occ_edges.size() == 1) {
+		OCCHelper::getParameters(m_occ_edges[0], first, last);
 	} else {
 		// vérification que computeParams a bien été utilisé
 		checkParams();
@@ -495,8 +547,7 @@ void Curve::getParametricsPoints(const Utils::Math::Point& Pt0,
 #endif
 
     if (m_vertices.size() == 1){
-		auto reps = getOCCShapes();
-		if (reps.size() != 1) {
+		if (m_occ_edges.size() != 1) {
 			TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
 			messErr << "[Erreur interne] La courbe "<<getName()<<" est une courbe composée ce qui ne permet pas de trouver les points en fonction d'une paramétrisation";
 			throw TkUtil::Exception(messErr);
@@ -841,20 +892,16 @@ void Curve::getPolarParametricsPoints(const Utils::Math::Point& Pt0,
 /*------------------------------------------------------------------------*/
 Vertex* Curve::firstPoint() const
 {
-	auto reps = getOCCShapes();
-	if (reps.size() > 0) {
-		TopoDS_Edge e = TopoDS::Edge(reps[0]);
+	if (m_occ_edges.size() > 0) {
+		TopoDS_Edge e = m_occ_edges[0];
 		TopoDS_Vertex v = TopExp::FirstVertex(e);
 
 		int index = -1;
 		for(unsigned int i=0;i<m_vertices.size();i++){
 			Vertex* vi = m_vertices[i];
-			auto vi_reps = vi->getOCCShapes();
-			if (vi_reps.size() == 1) {
-				TopoDS_Vertex occ_vi = TopoDS::Vertex(vi_reps[0]);
-				if (OCCHelper::areEquals(v, occ_vi)){
+			auto occ_vi = vi->getOCCVertex();
+			if (OCCHelper::areEquals(v, occ_vi)){
 					return vi;
-				}
 			}
 		}
 	}
@@ -863,21 +910,16 @@ Vertex* Curve::firstPoint() const
 /*------------------------------------------------------------------------*/
 Vertex* Curve::secondPoint() const
 {
-	auto reps = getOCCShapes();
-	if (reps.size() > 0) {
-		auto this_shape = reps[reps.size()-1];
-		TopoDS_Edge e = TopoDS::Edge(this_shape);
+	if (m_occ_edges.size() > 0) {
+		TopoDS_Edge e =  m_occ_edges[m_occ_edges.size()-1];
 		TopoDS_Vertex v = TopExp::LastVertex(e);
 
 		int index = -1;
 		for(unsigned int i=0;i<m_vertices.size();i++){
 			Vertex* vi = m_vertices[i];
-			auto vi_reps = vi->getOCCShapes();
-			if (vi_reps.size() == 1) {
-				TopoDS_Vertex occ_vi = TopoDS::Vertex(vi_reps[0]);
-				if (OCCHelper::areEquals(v, occ_vi)){
-					return vi;
-				}
+			auto occ_vi = vi->getOCCVertex();
+			if (OCCHelper::areEquals(v, occ_vi)){
+				return vi;
 			}
 		}
 	}
@@ -917,14 +959,13 @@ void Curve::remove(Vertex* v)
 void Curve::split(std::vector<Vertex* >&  vert)
 {
 	// identification des sommets aux extrémités (ceux vus qu'une unique fois)
-	auto reps = getOCCShapes();
-	if (reps.size() == 1) {
+	if (m_occ_edges.size() == 1) {
 		/* on va explorer la courbe OCC stockée en attribut et créer les entités de
 		* dimension directement inférieure, c'est-à-dire les sommets
 		*/
 		Vertex* v = 0;
 		TopExp_Explorer e;
-		for(e.Init(reps[0], TopAbs_VERTEX); e.More(); e.Next())
+		for(e.Init(m_occ_edges[0], TopAbs_VERTEX); e.More(); e.Next())
 		{
 
 			TopoDS_Vertex V = TopoDS::Vertex(e.Current());
@@ -932,7 +973,7 @@ void Curve::split(std::vector<Vertex* >&  vert)
 			bool are_same = false;
 			if (v){
 				// 1 seule représentation pour le vertex
-				TopoDS_Vertex Vprec = TopoDS::Vertex(v->getOCCShapes()[0]);
+				TopoDS_Vertex Vprec = TopoDS::Vertex(v->getOCCVertex());
 				if (Vprec.IsSame(V))
 					are_same = true;
 			}
@@ -951,12 +992,12 @@ void Curve::split(std::vector<Vertex* >&  vert)
 		// on renseigne la fonction appelante
 		this->get(vert);
 	} else {
-		//std::cout<<"Curve::split avec reps.size() = "<<reps.size()<<std::endl;
+		//std::cout<<"Curve::split avec m_occ_edges.size() = "<<m_occ_edges.size()<<std::endl;
 
 		std::vector<TopoDS_Vertex> vtx;
-		for (uint i=0; i<reps.size(); i++){
+		for (uint i=0; i<m_occ_edges.size(); i++){
 			TopExp_Explorer e;
-			for(e.Init(reps[i], TopAbs_VERTEX); e.More(); e.Next()){
+			for(e.Init(m_occ_edges[i], TopAbs_VERTEX); e.More(); e.Next()){
 				TopoDS_Vertex V = TopoDS::Vertex(e.Current());
 				vtx.push_back(V);
 			}
@@ -1008,14 +1049,14 @@ void Curve::split(std::vector<Vertex* >&  vert)
 			v->add(this);
 		}
 
-	} // end else / if (reps.size() == 1)
+	} // end else / if (m_occ_edges.size() == 1)
 }
 /*----------------------------------------------------------------------------*/
 double Curve::computeArea() const
 {
 	double area = 0.0;
-	for (auto s : getOCCShapes())
-		area += OCCHelper::getLength(TopoDS::Edge(s));
+	for (auto s : m_occ_edges)
+		area += OCCHelper::getLength(s);
 	return area;
 }
 /*----------------------------------------------------------------------------*/
@@ -1125,9 +1166,8 @@ void Curve::setDestroyed(bool b)
 /*----------------------------------------------------------------------------*/
 bool Curve::isLinear() const
 {
-	auto reps = getOCCShapes();
-	if (reps.size() == 1)
-		return OCCHelper::isTypeOf(TopoDS::Edge(reps[0]), STANDARD_TYPE(Geom_Line));
+	if (m_occ_edges.size() == 1)
+		return OCCHelper::isTypeOf(m_occ_edges[0], STANDARD_TYPE(Geom_Line));
 	else
 		// courbe composée : on dit que ce n'est pas une cercle
 		return false;
@@ -1135,9 +1175,8 @@ bool Curve::isLinear() const
 /*----------------------------------------------------------------------------*/
 bool Curve::isCircle() const
 {
-	auto reps = getOCCShapes();
-	if (reps.size() == 1)
-		return OCCHelper::isTypeOf(TopoDS::Edge(reps[0]), STANDARD_TYPE(Geom_Circle));
+	if (m_occ_edges.size() == 1)
+		return OCCHelper::isTypeOf(m_occ_edges[0], STANDARD_TYPE(Geom_Circle));
 	else
 		// courbe composée : on dit que ce n'est pas une cercle
 		return false;
@@ -1145,9 +1184,8 @@ bool Curve::isCircle() const
 /*----------------------------------------------------------------------------*/
 bool Curve::isEllipse() const
 {
-	auto reps = getOCCShapes();
-	if (reps.size() == 1)
-		return OCCHelper::isTypeOf(TopoDS::Edge(reps[0]), STANDARD_TYPE(Geom_Ellipse));
+	if (m_occ_edges.size() == 1)
+		return OCCHelper::isTypeOf(m_occ_edges[0], STANDARD_TYPE(Geom_Ellipse));
 	else
 		// courbe composée : on dit que ce n'est pas une ellipse
 		return false;
@@ -1155,9 +1193,8 @@ bool Curve::isEllipse() const
 /*----------------------------------------------------------------------------*/
 bool Curve::isBSpline() const
 {
-	auto reps = getOCCShapes();
-	if (reps.size() == 1)
-		return OCCHelper::isTypeOf(TopoDS::Edge(reps[0]), STANDARD_TYPE(Geom_BSplineCurve));
+	if (m_occ_edges.size() == 1)
+		return OCCHelper::isTypeOf(m_occ_edges[0], STANDARD_TYPE(Geom_BSplineCurve));
 	else
 		// courbe composée : on dit que ce n'est pas une spline
 		return false;
@@ -1182,13 +1219,11 @@ Utils::SerializedRepresentation* Curve::getDescription (bool alsoComputed) const
 	        Utils::SerializedRepresentation::Property ("Longueur", volStr.ascii()) );
 	}
 
-	auto reps = getOCCShapes();
-	
 #ifdef _DEBUG		// Issue#111
     // précision OpenCascade
-	for (uint i=0; i<reps.size(); i++){
+	for (uint i=0; i<m_occ_edges.size(); i++){
 	    TkUtil::UTF8String precStr (TkUtil::Charset::UTF_8);
-		precStr << BRep_Tool::Tolerance(TopoDS::Edge(reps[i]));
+		precStr << BRep_Tool::Tolerance(m_occ_edges[i]);
 	    propertyGeomDescription.addProperty (
 	    	        Utils::SerializedRepresentation::Property ("Précision", precStr.ascii()) );
 	}
@@ -1207,7 +1242,7 @@ Utils::SerializedRepresentation* Curve::getDescription (bool alsoComputed) const
     	isABSpline = true;
     	typeStr<<"b-spline";
     }
-    else if (reps.size()>1)
+    else if (m_occ_edges.size()>1)
     	typeStr<<"composée";
     else
     	typeStr<<"quelconque";
@@ -1221,7 +1256,7 @@ Utils::SerializedRepresentation* Curve::getDescription (bool alsoComputed) const
 		TkUtil::UTF8String	nbStr2 (TkUtil::Charset::UTF_8);
 
 		// c'est une spline => une seule représentation de type Edge
-		TopoDS_Edge edge = TopoDS::Edge(getOCCShapes()[0]);
+		TopoDS_Edge edge = m_occ_edges[0];
 		Standard_Real first_param, last_param;
 		Handle_Geom_Curve curve = BRep_Tool::Curve(edge, first_param, last_param);
 
@@ -1270,12 +1305,11 @@ void Curve::computeParams(Utils::Math::Point ptStart)
 	// pour cela on commence par calculer les longueurs des différentes parties
 	std::vector<double> areasLoc;
 	double areaTot = 0.0;
-	auto reps = getOCCShapes();
-	if (reps.size() == 1)
+	if (m_occ_edges.size() == 1)
 		return;
 
-	for (uint i=0; i<reps.size(); i++){
-		double area = OCCHelper::getLength(TopoDS::Edge(reps[i]));
+	for (uint i=0; i<m_occ_edges.size(); i++){
+		double area = OCCHelper::getLength(m_occ_edges[i]);
 		areasLoc.push_back(area);
 		areaTot+=area;
 	}
@@ -1310,16 +1344,16 @@ void Curve::computeParams(Utils::Math::Point ptStart)
 	std::cout<<std::endl;
 	std::cout<<"couples de points: "<<std::endl;
 	Utils::Math::Point ptBegin, ptEnd;
-	for (uint i=0; i<reps.size(); i++){
-		reps[i]->getPoint(0.0, ptBegin, true);
-		reps[i]->getPoint(1.0, ptEnd, true);
+	for (uint i=0; i<m_occ_edges.size(); i++){
+		m_occ_edges[i]->getPoint(0.0, ptBegin, true);
+		m_occ_edges[i]->getPoint(1.0, ptEnd, true);
 		std::cout<<ptBegin<<" "<<ptEnd<<std::endl;
 	}
 #endif
 
 	// remplissage des paramLocFirst et paramLocLast et tenant compte du sens
 	Utils::Math::Point ptPrec;
-	TopoDS_Edge edge_0 = TopoDS::Edge(reps[0]);
+	TopoDS_Edge edge_0 = m_occ_edges[0];
 	OCCHelper::getPoint(edge_0, 0.0, ptPrec, true);
 #ifdef _DEBUG_PARAMS
 	std::cout<<"longueur ptStart-ptPrec "<<ptPrec.length(ptStart)<<std::endl;
@@ -1333,10 +1367,10 @@ void Curve::computeParams(Utils::Math::Point ptStart)
 			throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, Courbe composite où on ne retrouve pas le premier sommet", TkUtil::Charset::UTF_8));
 		}
 	}
-	for (uint i=0; i<reps.size(); i++){
+	for (uint i=0; i<m_occ_edges.size(); i++){
 		double inverse = false;
 		Utils::Math::Point pt1, pt2;
-		TopoDS_Edge edge_i = TopoDS::Edge(reps[i]);
+		TopoDS_Edge edge_i = m_occ_edges[i];
 		OCCHelper::getPoint(edge_i, 0.0, pt1, true);
 		OCCHelper::getPoint(edge_i, 1.0, pt2, true);
 #ifdef _DEBUG_PARAMS
@@ -1376,20 +1410,19 @@ void Curve::computeParams(Utils::Math::Point ptStart)
 /*----------------------------------------------------------------------------*/
 void Curve::checkParams() const
 {
-	auto reps = getOCCShapes();
-	if (reps.size() == 1)
+	if (m_occ_edges.size() == 1)
 		return;
 
-	if (reps.size() != paramLocFirst.size()){
+	if (m_occ_edges.size() != paramLocFirst.size()){
 		TkUtil::UTF8String messErr (TkUtil::Charset::UTF_8);
 		messErr << "Erreur interne, paramLocFirst non itialisé correctement pour "<<getName();
 		throw TkUtil::Exception(messErr);
 	}
-	if (reps.size() != paramLocLast.size())
+	if (m_occ_edges.size() != paramLocLast.size())
 		throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, paramLocLast non itialisé correctement", TkUtil::Charset::UTF_8));
-	if (reps.size() != paramImgFirst.size())
+	if (m_occ_edges.size() != paramImgFirst.size())
 		throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, paramImgFirst non itialisé correctement", TkUtil::Charset::UTF_8));
-	if (reps.size() != paramImgLast.size())
+	if (m_occ_edges.size() != paramImgLast.size())
 		throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, paramImgLast non itialisé correctement", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/

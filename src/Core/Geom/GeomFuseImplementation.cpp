@@ -93,14 +93,11 @@ void GeomFuseImplementation::fuseVolumes(std::vector<GeomEntity*>& res)
 	std::cout<<"GeomFuseImplementation::fuseVolumes()"<<std::endl;
 #endif
 
-    GeomEntity* e1 = m_init_entities[0];
-    TopoDS_Shape s1;
-    getOCCShape(e1, s1);
+    Volume* e1 = dynamic_cast<Volume*>(m_init_entities[0]);
+    TopoDS_Shape s1 = e1->getOCCShape();
     for(unsigned int i=1;i<m_init_entities.size();i++){
-        GeomEntity* e2 = m_init_entities[i];
-        TopoDS_Shape s2;
-        getOCCShape(e2, s2);
-
+        Volume* e2 = dynamic_cast<Volume*>(m_init_entities[i]);
+        TopoDS_Shape s2 = e2->getOCCShape();
         BRepAlgoAPI_Fuse fuse_operator(s1, s2);
         TopoDS_Shape s;
         if(fuse_operator.IsDone())
@@ -156,20 +153,22 @@ void GeomFuseImplementation::fuseSurfaces(std::vector<GeomEntity*>& res)
 	std::cout<<"GeomFuseImplementation::fuseSurfaces()"<<std::endl;
 #endif
 
-    GeomEntity* e1 = m_init_entities[0];
-    TopoDS_Shape s1;
-    getOCCShape(e1, s1);
+    Surface* e1 = dynamic_cast<Surface*>(m_init_entities[0]);
+    if (e1->getOCCFaces().size() != 1) {
+        throw TkUtil::Exception (TkUtil::UTF8String ("Fusion impossible pour une surface composée " + e1->getName(), TkUtil::Charset::UTF_8));
+    }
+    TopoDS_Shape s1 = e1->getOCCFaces()[0];
     for(unsigned int i=1;i<m_init_entities.size();i++){
-        GeomEntity* e2 = m_init_entities[i];
-        TopoDS_Shape s2;
-        getOCCShape(e2, s2);
-
-
+        Surface* e2 = dynamic_cast<Surface*>(m_init_entities[i]);
+        if (e2->getOCCFaces().size() != 1) {
+            throw TkUtil::Exception (TkUtil::UTF8String ("Fusion impossible pour une surface composée " + e2->getName(), TkUtil::Charset::UTF_8));
+        }
+        TopoDS_Shape s2 = e2->getOCCFaces()[0];
         BRepAlgoAPI_Fuse fuse_operator(s1, s2);
         TopoDS_Shape s;
         if(fuse_operator.IsDone())
         {
-            s= fuse_operator.Shape();
+            s = fuse_operator.Shape();
             ShapeAnalysis_ShapeContents cont;
             cont.Clear();
             cont.Perform(s);
@@ -218,14 +217,17 @@ void GeomFuseImplementation::fuseCurves(std::vector<GeomEntity*>& res)
 	// [EB] non utilisé
 	std::cout<<"GeomFuseImplementation::fuseCurves()"<<std::endl;
 #endif
-    GeomEntity* e1 = m_init_entities[0];
-    TopoDS_Shape s1;
-    getOCCShape(e1, s1);
+    Curve* e1 = dynamic_cast<Curve*>(m_init_entities[0]);
+    if (e1->getOCCEdges().size() != 1) {
+        throw TkUtil::Exception (TkUtil::UTF8String ("Fusion impossible pour une courbe composée " + e1->getName(), TkUtil::Charset::UTF_8));
+    }
+    TopoDS_Shape s1 = e1->getOCCEdges()[0];
     for(unsigned int i=1;i<m_init_entities.size();i++){
-        GeomEntity* e2 = m_init_entities[i];
-        TopoDS_Shape s2;
-        getOCCShape(e2, s2);
-
+        Curve* e2 = dynamic_cast<Curve*>(m_init_entities[i]);
+        if (e2->getOCCEdges().size() != 1) {
+            throw TkUtil::Exception (TkUtil::UTF8String ("Fusion impossible pour une courbe composée " + e2->getName(), TkUtil::Charset::UTF_8));
+        }
+        TopoDS_Shape s2 = e2->getOCCEdges()[0];
         BRepAlgoAPI_Fuse fuse_operator(s1, s2);
         TopoDS_Shape s;
         if(fuse_operator.IsDone())

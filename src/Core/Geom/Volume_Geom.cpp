@@ -81,19 +81,28 @@ bool compareVertex(Vertex* v1, Vertex* v2)
 /*----------------------------------------------------------------------------*/
 Volume::Volume(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
         GeomProperty* gprop, TopoDS_Shape& shape)
-: GeomEntity(ctx, prop, disp, gprop, shape)
+: GeomEntity(ctx, prop, disp, gprop)
+, m_occ_shape(shape)
 {
+}
+/*----------------------------------------------------------------------------*/
+void Volume::apply(std::function<void(const TopoDS_Shape&)> const& lambda) const
+{
+    lambda(m_occ_shape);
+}
+/*----------------------------------------------------------------------------*/
+void Volume::applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda)
+{
+    m_occ_shape = lambda(m_occ_shape);
 }
 /*----------------------------------------------------------------------------*/
 GeomEntity* Volume::clone(Internal::Context& c)
 {
-    // 1 seule représentation pour le volume
-	std::vector<TopoDS_Shape> reps = this->getOCCShapes();
     return new Volume(c,
             c.newProperty(this->getType()),
             c.newDisplayProperties(this->getType()),
             new GeomProperty(),
-            reps[0]);
+            m_occ_shape);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -104,12 +113,15 @@ void Volume::setFromSpecificMemento(MementoGeomEntity& mem)
 {
     m_surfaces = mem.getSurfaces();
     m_groups  = mem.getGroups3D();
+    m_occ_shape = mem.getOCCShapes()[0];
 }
 /*----------------------------------------------------------------------------*/
 void Volume::createSpecificMemento(MementoGeomEntity& mem)
 {
     mem.setSurfaces(m_surfaces);
     mem.setGroups3D(m_groups);
+    std::vector<TopoDS_Shape> shapes = { m_occ_shape };
+    mem.setOCCShapes(shapes);
 }
 /*----------------------------------------------------------------------------*/
 void Volume::getRefEntities(std::vector<GeomEntity*>& entities)
@@ -210,14 +222,16 @@ void Volume::get(std::vector<Volume*>& volumes) const
     volumes.insert(volumes.end(),l.begin(),l.end());
 }
 /*----------------------------------------------------------------------------*/
-void Volume::project(Utils::Math::Point& P) const
+uint Volume::project(Utils::Math::Point& P) const
 {
     throw TkUtil::Exception (TkUtil::UTF8String ("Volume::project n'est pas disponible", TkUtil::Charset::UTF_8));
+    return 0;
 }
 /*----------------------------------------------------------------------------*/
-void Volume::project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const
+uint Volume::project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const
 {
     throw TkUtil::Exception (TkUtil::UTF8String ("Volume::project n'est pas disponible", TkUtil::Charset::UTF_8));
+    return 0;
 }
 /*----------------------------------------------------------------------------*/
 void Volume::add(Surface* s)
@@ -246,9 +260,6 @@ void Volume::split(std::vector<Surface*>& surf,
         std::vector<Curve*  >& curv,
         std::vector<Vertex* >& vert)
 {
-    // 1 seule représentation pour le volume
-    TopoDS_Shape shape = getOCCShapes()[0];
-
     /* on va explorer le solide OCC stocké en attribut et créer les entités de
      * dimension directement inférieure, c'est-à-dire les faces
      */
@@ -263,7 +274,7 @@ void Volume::split(std::vector<Surface*>& surf,
     std::vector<Curve *>      Mgx3DCurves;
 
 
-    for(e.Init(shape, TopAbs_FACE); e.More(); e.Next())
+    for(e.Init(m_occ_shape, TopAbs_FACE); e.More(); e.Next())
     {
 
         TopoDS_Face F = TopoDS::Face(e.Current());
@@ -281,12 +292,12 @@ void Volume::split(std::vector<Surface*>& surf,
 
     // maintenant que les faces sont créées, on crée les arêtes
     TopTools_IndexedDataMapOfShapeListOfShape map;
-    TopExp::MapShapesAndAncestors(shape, TopAbs_EDGE, TopAbs_FACE, map);
+    TopExp::MapShapesAndAncestors(m_occ_shape, TopAbs_EDGE, TopAbs_FACE, map);
     // on a ainsi toutes les arêtes dans map et pour chaque arête, on
     // connait les faces auxquelles elle appartient.
 
     TopTools_IndexedMapOfShape map_edges;
-    TopExp::MapShapes(shape,TopAbs_EDGE, map_edges);
+    TopExp::MapShapes(m_occ_shape,TopAbs_EDGE, map_edges);
     TopTools_ListOfShape listFaces;
 
 
@@ -335,7 +346,7 @@ void Volume::split(std::vector<Surface*>& surf,
 
     // maintenant que les faces et les aretes sont créées, on crée les
     // sommets
-    TopExp::MapShapesAndAncestors(shape, TopAbs_VERTEX, TopAbs_EDGE, map);
+    TopExp::MapShapesAndAncestors(m_occ_shape, TopAbs_VERTEX, TopAbs_EDGE, map);
     // on a ainsi tous les sommets dans map et pour chaque sommet, on
     // connait les aretes auxquelles il appartient.
 
@@ -343,7 +354,7 @@ void Volume::split(std::vector<Surface*>& surf,
      * on fait pointer une ref à partir des labels ayant les aretes
      * correspondantes */
     TopTools_IndexedMapOfShape map_vertices;
-    TopExp::MapShapes(shape,TopAbs_VERTEX, map_vertices);
+    TopExp::MapShapes(m_occ_shape,TopAbs_VERTEX, map_vertices);
     TopTools_ListOfShape listEdges;
 
     for(int i = 1; i <= map_vertices.Extent(); i++)
@@ -394,8 +405,12 @@ void Volume::split(std::vector<Surface*>& surf,
 double Volume::computeArea() const
 {
     // 1 seule représentation pour le volume
-    TopoDS_Shape sh = getOCCShapes()[0];
-    return OCCHelper::computeArea(sh);
+    return OCCHelper::computeArea(m_occ_shape);
+}
+/*----------------------------------------------------------------------------*/
+void Volume::computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const
+{
+    OCCHelper::computeBoundingBox(m_occ_shape, pmin, pmax);
 }
 /*----------------------------------------------------------------------------*/
 bool Volume::contains(Volume* vol) const
@@ -431,8 +446,8 @@ bool Volume::contains(Volume* vol) const
     // AVEC DES ENTITES M3D
     //===============================================================
     // 1 seule représentation pour le volume
-    TopoDS_Shape shOther = vol->getOCCShapes()[0];
-    TopoDS_Shape sh = this->getOCCShapes()[0];
+    TopoDS_Shape shOther = vol->m_occ_shape;
+    TopoDS_Shape sh = this->m_occ_shape;
     BRepClass3d_SolidClassifier classifier(sh);
 
     //===============================================================

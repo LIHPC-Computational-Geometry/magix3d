@@ -110,13 +110,8 @@ void GeomRotationImplementation::perform(std::vector<GeomEntity*>& res)
 void GeomRotationImplementation::
 makeRevol(GeomEntity* e)
 {
-    std::vector<TopoDS_Shape> reps = e->getOCCShapes();
-    std::vector<TopoDS_Shape> new_reps;
-    for (uint i=0; i<reps.size(); i++){
-        new_reps.push_back(rotate(reps[i], m_axis1, m_axis2, m_angle));
-    }
-
-    e->setOCCShapes(new_reps);
+    auto revol = [&](const TopoDS_Shape& sh) { return rotate(sh, m_axis1, m_axis2, m_angle); };
+    e->applyAndReturn(revol);
     e->setGeomProperty(new GeomProperty());
 }
 /*----------------------------------------------------------------------------*/
@@ -146,17 +141,17 @@ rotate(const TopoDS_Shape& shape, const Utils::Math::Point& P1, const Utils::Mat
 void GeomRotationImplementation::
 performUndo()
 {
+    auto undo = [&](const TopoDS_Shape& sh) { return rotate(sh, m_axis1, m_axis2, -m_angle); };
     for (uint i=0; i<m_undoableEntities.size(); i++)
-        for (auto rep : m_undoableEntities[i]->getOCCShapes())
-            rep = rotate(rep, m_axis1, m_axis2, -m_angle);
+        m_undoableEntities[i]->applyAndReturn(undo);
 }
 /*----------------------------------------------------------------------------*/
 void GeomRotationImplementation::
 performRedo()
 {
+    auto redo = [&](const TopoDS_Shape& sh) { return rotate(sh, m_axis1, m_axis2, m_angle); };
     for (uint i=0; i<m_undoableEntities.size(); i++)
-        for (auto rep : m_undoableEntities[i]->getOCCShapes())
-            rep = rotate(rep, m_axis1, m_axis2, m_angle);
+        m_undoableEntities[i]->applyAndReturn(redo);
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

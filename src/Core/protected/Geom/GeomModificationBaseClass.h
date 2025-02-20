@@ -117,12 +117,6 @@ public:
 
 protected:
     /*------------------------------------------------------------------------*/
-    /** \brief  Récupération des shapes OCC correspondants aux entités M3D
-     *          que l'on fusionne.
-     */
-    static void getOCCShape(GeomEntity* ge, TopoDS_Shape& topoS);
-
-    /*------------------------------------------------------------------------*/
     /** \brief  Constructeur.
      *
      *  \param c le contexte de travail qui sera toujours utile

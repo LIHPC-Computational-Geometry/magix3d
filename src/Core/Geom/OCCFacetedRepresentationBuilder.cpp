@@ -55,9 +55,8 @@ namespace Mgx3D {
 namespace Geom {
 /*----------------------------------------------------------------------------*/
 OCCFacetedRepresentationBuilder::
-OCCFacetedRepresentationBuilder(const GeomEntity* caller,
-                                TopoDS_Shape& shape)
-:m_entity(caller),m_shape(shape)
+OCCFacetedRepresentationBuilder(const TopoDS_Shape& shape)
+: m_shape(shape)
 {}
 /*----------------------------------------------------------------------------*/
 OCCFacetedRepresentationBuilder::~OCCFacetedRepresentationBuilder()

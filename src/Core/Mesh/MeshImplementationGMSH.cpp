@@ -76,15 +76,15 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
 
     //Geometrie de la coface
     Geom::GeomEntity* geo_entity = fa->getGeomAssociation();
-    if(geo_entity==0){
+    if(geo_entity==0 || geo_entity->getDim() != 2){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message << "La face  "<< fa->getName()
                 << " ne peut pas être maillée en triangles : absence de géométrie associée";
         throw TkUtil::Exception (message);
     }
 
-    for (auto sh : geo_entity->getOCCShapes()) {
-        TopoDS_Face face_shape = TopoDS::Face(sh);
+    Geom::Surface* f = dynamic_cast<Geom::Surface*>(geo_entity);
+    for (auto face_shape : f->getOCCFaces()) {
 
 #ifdef _DEBUG_MESH
         std::cout <<"=== new gmsh model"<<std::endl;

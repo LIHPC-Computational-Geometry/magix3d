@@ -142,9 +142,7 @@ void GeomExtrudeImplementation::makeExtrude(Vertex* v,std::vector<GeomEntity*>& 
 #ifdef _DEBUG2
 	std::cout<<"GeomExtrudeImplementation::makeExtrude ("<<v->getName()<<")"<<std::endl;
 #endif
-    TopoDS_Shape s;
-    getOCCShape(v, s);
-
+    TopoDS_Vertex s = v->getOCCVertex();
     gp_Vec Vx(m_vector.getX(), m_vector.getY(), m_vector.getZ());
     BRepPrimAPI_MakePrism mkR(s, Vx);
 
@@ -223,11 +221,8 @@ void GeomExtrudeImplementation::makeExtrudeComposite(Curve* curve,std::vector<Ge
 #ifdef _DEBUG2
 	std::cout<<"GeomExtrudeImplementation::makeExtrude ("<<curve->getName()<<")"<<std::endl;
 #endif
-	// les différentes occ_shape de la courbe composite
-    std::vector<TopoDS_Edge> v_shape;
-    for (auto s : curve->getOCCShapes()){
-    	v_shape.push_back(TopoDS::Edge(s));
-    }
+	// les différentes occ_edge de la courbe composite
+    std::vector<TopoDS_Edge> v_shape = curve->getOCCEdges();
 
     // ON AURA BESOIN DES SOMMETS DE LA COURBE DE DEPART PAR LA SUITE
     std::vector<Vertex*> c_vertices;
@@ -288,7 +283,7 @@ void GeomExtrudeImplementation::makeExtrudeComposite(Curve* curve,std::vector<Ge
         		if (v_fixe == 0){
         			throw TkUtil::Exception(TkUtil::UTF8String ("Une configuration imprévue a été rencontrée lors de l'extrusion d'une courbe composée avec 3 sommets pour une surface: on ne trouve pas de sommet sur l'axe", TkUtil::Charset::UTF_8));
         		}
-        		getOCCShape(v_fixe, v_fixe_occ);
+        		v_fixe_occ = v_fixe->getOCCVertex();
         	}
 
         	// les sommets oppposés (ceux qui ne sont pas dans la courbe)
@@ -553,8 +548,10 @@ void GeomExtrudeImplementation::makeExtrude(Surface* surf,
         std::map<Geom::Surface*,Geom::Surface*>& s2sOpp,
         std::map<Geom::Surface*,Geom::Volume*> & s2v)
 {
-    TopoDS_Shape s;
-    getOCCShape(surf, s);
+    if (surf->getOCCFaces().size() != 1) {
+        throw TkUtil::Exception(TkUtil::UTF8String ("Pas d'extrusion possible sur les surfaces composées : " + surf->getName(), TkUtil::Charset::UTF_8));
+    }
+    TopoDS_Face s = surf->getOCCFaces()[0];
     gp_Vec Vx(m_vector.getX(), m_vector.getY(), m_vector.getZ());
     BRepPrimAPI_MakePrism mkR(s, Vx);
 
@@ -590,7 +587,7 @@ void GeomExtrudeImplementation::makeExtrude(Surface* surf,
                 continue;
 //           std::cout<<"\t surf "<<surf_i->getName()<<std::endl;
             lateral_surfs.push_back(surf_i);
-            auto surf_i_occ = surf_i->getOCCShapes();
+            auto surf_i_occ = surf_i->getOCCFaces();
             // cas multi shape...
             lateral_surfs_occ.insert(lateral_surfs_occ.end(), surf_i_occ.begin(), surf_i_occ.end());
         }
@@ -617,7 +614,7 @@ void GeomExtrudeImplementation::makeExtrude(Surface* surf,
         }
         if(extrem_surf.size()!=2){
             std::cerr<<"GeomExtrudeImplementation::makeExtrude [extrem_surf.size()="<<extrem_surf.size()<<" différent de 2] pour "<<surf->getName()<<std::endl;
-            throw TkUtil::Exception(TkUtil::UTF8String ("OCC n'a pas pu effectuer une extrusion d'une surface", TkUtil::Charset::UTF_8));
+            throw TkUtil::Exception(TkUtil::UTF8String("OCC n'a pas pu effectuer une extrusion d'une surface", TkUtil::Charset::UTF_8));
         }
 
         TopoDS_Shape s0 = extrem_surf[0];

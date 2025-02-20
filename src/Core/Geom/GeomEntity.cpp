@@ -43,18 +43,9 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 /*----------------------------------------------------------------------------*/
-GeomEntity::GeomEntity(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-        GeomProperty* gprop, TopoDS_Shape& shape)
+GeomEntity::GeomEntity(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp, GeomProperty* gprop)
 : Internal::InternalEntity (ctx, prop, disp),
   m_geomProp(gprop), m_computedAreaIsUpToDate(false), m_computedArea(0)
-{
-	m_shapes.push_back(shape);
-}
-/*----------------------------------------------------------------------------*/
-GeomEntity::GeomEntity(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, std::vector<TopoDS_Shape>& shapes)
-: Internal::InternalEntity (ctx, prop, disp),
-  m_geomProp(gprop), m_shapes(shapes), m_computedAreaIsUpToDate(false), m_computedArea(0)
 {
 }
 /*----------------------------------------------------------------------------*/
@@ -81,7 +72,6 @@ void GeomEntity::setFromMemento(MementoGeomEntity& mem)
 {
     m_topo_entities = mem.getTopoEntities();
     m_geomProp = mem.getProperty();
-    m_shapes = mem.getOCCShapes();
     setFromSpecificMemento(mem);
 
     m_computedAreaIsUpToDate = false;
@@ -91,7 +81,6 @@ void GeomEntity::createMemento(MementoGeomEntity& mem)
 {
     mem.setTopoEntities(m_topo_entities);
     mem.setProperty(m_geomProp);
-    mem.setOCCShapes(getOCCShapes());
     createSpecificMemento(mem);
 }
 /*----------------------------------------------------------------------------*/
@@ -122,40 +111,6 @@ void GeomEntity::clearRefEntities(std::list<GeomEntity*>& vertices,
 	throw exc;
 }
 /*----------------------------------------------------------------------------*/
-void GeomEntity::computeBoundingBox(Utils::Math::Point& pmin,Utils::Math::Point& pmax) const
-{
-	if (m_shapes.empty())
-		return;
-
-    OCCHelper::computeBoundingBox(m_shapes[0], pmin, pmax);
-	for (uint i=1; i<m_shapes.size(); i++){
-		Utils::Math::Point p1,p2;
-        OCCHelper::computeBoundingBox(m_shapes[i], pmin, pmax);
-		for (uint j=0; j<3; j++){
-			double c1 = pmin.getCoord(j);
-			double c2 = p1.getCoord(j);
-			if (c2<c1)
-				pmin.setCoord(j,c2);
-		}
-		for (uint j=0; j<3; j++){
-			double c1 = pmax.getCoord(j);
-			double c2 = p2.getCoord(j);
-			if (c2>c1)
-				pmin.setCoord(j,c2);
-		}
-	}
-}
-/*----------------------------------------------------------------------------*/
-void GeomEntity::
-setOCCShapes(std::vector<TopoDS_Shape>& shapes)
-{
-    if(shapes.empty())
-        throw   TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, setComputationalProperties sans shapes OCC", TkUtil::Charset::UTF_8));
-
-	m_shapes = shapes;
-	m_computedAreaIsUpToDate = false;
-}
-/*----------------------------------------------------------------------------*/
 GeomProperty* GeomEntity::setGeomProperty(GeomProperty* prop)
 {
     GeomProperty* old_rep=0;
@@ -168,11 +123,6 @@ GeomProperty* GeomEntity::setGeomProperty(GeomProperty* prop)
     return old_rep;
 }
 /*----------------------------------------------------------------------------*/
-std::vector<TopoDS_Shape> GeomEntity::getOCCShapes() const
-{
-	return m_shapes;
-}
-/*----------------------------------------------------------------------------*/
 void GeomEntity::
 getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
 {
@@ -180,14 +130,16 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
 	std::cout<<"getRepresentation appelé pour "<<getName()<<std::endl;
 #endif
 
-	for (uint i=0; i<m_shapes.size(); i++){
-        if (dr.getDisplayType()!= Utils::DisplayRepresentation::DISPLAY_GEOM)
-            throw TkUtil::Exception("Invalid display type entity");
+    if (dr.getDisplayType()!= Utils::DisplayRepresentation::DISPLAY_GEOM)
+        throw TkUtil::Exception("Invalid display type entity");
 
-        GeomDisplayRepresentation* gdr = dynamic_cast<GeomDisplayRepresentation*>(&dr);
-        OCCDisplayRepresentationBuilder builder(this, m_shapes[i], gdr);
+    GeomDisplayRepresentation* gdr = dynamic_cast<GeomDisplayRepresentation*>(&dr);
+
+    auto add_representation = [&](const TopoDS_Shape& sh) { 
+        OCCDisplayRepresentationBuilder builder(this, sh, gdr);
         builder.execute();
-	}
+    };
+    this->apply(add_representation);
 
 	// applique le shrink sur la représentation
 	Utils::Math::Point barycentre = getCenteredPosition();
@@ -413,12 +365,12 @@ getDescription (bool alsoComputed) const
 #ifdef _DEBUG
     Utils::SerializedRepresentation  occGeomDescription ("Propriétés OCC", "");
     // observation du HashCode retourné par OCC
-    auto reps = getOCCShapes();
-    for (uint i=0; i<reps.size(); i++){
-   	    int hc = reps[i].HashCode(INT_MAX);
-   	    occGeomDescription.addProperty (
-   				Utils::SerializedRepresentation::Property ("HashCode", (long int)hc));
-   	}
+
+    auto add_description = [&](const TopoDS_Shape& sh) {
+        int hc = sh.HashCode(INT_MAX);
+        occGeomDescription.addProperty (Utils::SerializedRepresentation::Property ("HashCode", (long int)hc));
+    };
+    this->apply(add_description);
    	description->addPropertiesSet (occGeomDescription);
 #endif
 
@@ -435,17 +387,6 @@ std::string GeomEntity::getSummary ( ) const
 	    }
 
 	return summary.ascii ( );
-}
-/*----------------------------------------------------------------------------*/
-void GeomEntity::
-getFacetedRepresentation(
-        std::vector<gmds::math::Triangle >& AVec) const
-{
-    AVec.clear();
-    for (auto s : getOCCShapes()) {
-        OCCFacetedRepresentationBuilder builder(this, s);
-        builder.execute(AVec);
-    }
 }
 /*----------------------------------------------------------------------------*/
 GeomProperty::type GeomEntity::getGeomType ( ) const

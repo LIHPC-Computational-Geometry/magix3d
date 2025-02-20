@@ -18,6 +18,8 @@
 /*----------------------------------------------------------------------------*/
 #include "Utils/Point.h"
 /*----------------------------------------------------------------------------*/
+#include <TopoDS_Edge.hxx>
+/*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Group {
@@ -54,7 +56,7 @@ public:
      */
 #ifndef SWIG
     Curve(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, TopoDS_Shape& shape);
+            GeomProperty* gprop, TopoDS_Edge& shape);
 #endif
 
     /*------------------------------------------------------------------------*/
@@ -68,8 +70,12 @@ public:
      */
 #ifndef SWIG
     Curve(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, std::vector<TopoDS_Shape>& shapes);
+            GeomProperty* gprop, std::vector<TopoDS_Edge>& shapes);
 #endif
+    const std::vector<TopoDS_Edge>& getOCCEdges() const { return m_occ_edges; }
+
+    virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const;
+    virtual void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
@@ -129,6 +135,14 @@ public:
     virtual double computeArea() const;
 
     /*------------------------------------------------------------------------*/
+    /** \brief  Calcul de la boite englobante orientée selon les axes Ox,Oy,Oz
+     *
+     *  \param pmin Les coordonnées min de la boite englobante
+     *  \param pmax Les coordonnées max de la boite englobante
+     */
+    virtual void computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const;
+
+    /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès aux sommets géométriques incidents
      *
      *  \param vertices les sommets incidents
@@ -175,12 +189,12 @@ public:
     /** \brief Projete le point P sur la courbe. P est modifié
      *  \param P le point à projeter
      */
-    virtual void project(Utils::Math::Point& P) const;
+    virtual uint project(Utils::Math::Point& P) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief Projete le point P1 sur la courbe, le résultat est le point P2.
      */
-    virtual void project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const ;
+    virtual uint project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const ;
 
     /*------------------------------------------------------------------------*/
     /** \brief Donne le point en fonction du paramètre sur la courbe
@@ -413,13 +427,13 @@ protected:
      */
     virtual void createSpecificMemento(MementoGeomEntity& mem);
 
-        protected:
+private:
     std::vector<Surface*> m_surfaces;
     std::vector<Vertex*> m_vertices;
     /// Listes des groupes 1D auxquels appartient cette courbe
     std::vector<Group::Group1D*> m_groups;
-
-private:
+    /// représentation open cascade
+    std::vector<TopoDS_Edge> m_occ_edges;
     /// premier paramètre local à une des composantes
     std::vector<double> paramLocFirst;
     /// dernier paramètre local à une des composantes
@@ -428,7 +442,6 @@ private:
     std::vector<double> paramImgFirst;
     /// dernier paramètre image pour une des composantes, dans [0,1]
     std::vector<double> paramImgLast;
-
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

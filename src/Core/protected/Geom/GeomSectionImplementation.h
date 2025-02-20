@@ -82,6 +82,10 @@ protected:
     void sectionSurfaces(std::vector<GeomEntity*>& res);
 
 private:
+    TopoDS_Face checkSurface(GeomEntity* ge) const;
+    TopoDS_Shape checkVolume(GeomEntity* ge) const;
+
+private:
 
     /** Entités qui vont être modifiées par l'algorithme. Purement technique pour
      * faire le lien entre initialize() et finalize()
@@ -94,7 +98,6 @@ private:
     std::vector<GeomEntity*> m_entities_param;
     /* outil de découpe */
     GeomEntity* m_tool;
-
 
     TopoDS_Shape m_restricted_section_tool;
 };

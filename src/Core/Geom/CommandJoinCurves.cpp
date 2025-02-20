@@ -111,10 +111,10 @@ internalSpecificExecute()
     }
 
     // construction d'un vecteur ordonné de courbes (en partant du premier sommet extrémité)
-    std::vector<GeomEntity*> courbesOrdonnees;
+    std::vector<Curve*> courbesOrdonnees;
     // recherche d'une première courbe qui contienne le premier sommet
     Vertex* vtxDep = extremites[0];
-    GeomEntity* crvDep = getCurveContains(m_entities, vtxDep);
+    Curve* crvDep = getCurveContains(m_entities, vtxDep);
     if (crvDep==0)
     	throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, recherche crvDep==0", TkUtil::Charset::UTF_8));
     courbesOrdonnees.push_back(crvDep);
@@ -131,9 +131,9 @@ internalSpecificExecute()
     } while (courbesOrdonnees.size() != m_entities.size());
 
 	// utilisation d'un vecteur de shapes pour la courbe composite
-	std::vector<TopoDS_Shape> reps;
+	std::vector<TopoDS_Edge> reps;
 	for (auto courbesOrdonnee : courbesOrdonnees) {
-		auto loc_reps = courbesOrdonnee->getOCCShapes();
+		auto loc_reps = courbesOrdonnee->getOCCEdges();
 		std::copy(loc_reps.begin(), loc_reps.end(), std::back_inserter(reps));
 	}
 
@@ -180,17 +180,17 @@ internalSpecificExecute()
 	 m_createdEntities = m_newEntities;
 }
 /*----------------------------------------------------------------------------*/
-GeomEntity* CommandJoinCurves::getCurveContains(std::vector<GeomEntity*>& entities,
+Curve* CommandJoinCurves::getCurveContains(std::vector<GeomEntity*>& entities,
 		Vertex* vtx)
 {
-	GeomEntity* ge = 0;
+	Curve* ge = 0;
 
 	for (uint i=0;i<entities.size();i++){
 		std::vector<Vertex*> vertices;
 		entities[i]->get(vertices);
 		for (uint j=0; j<vertices.size(); j++)
 			if (vertices[j] == vtx)
-				ge = entities[i];
+				ge = dynamic_cast<Curve*>(entities[i]);
 	}
 	return ge;
 }
@@ -210,12 +210,9 @@ Vertex* CommandJoinCurves::getOppositeVtx(GeomEntity* crv, Vertex* vtx)
 		throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, on ne trouve pas un sommet dans une courbe", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
-GeomEntity* CommandJoinCurves::getCurve(Vertex* vtx, GeomEntity* crvExclude)
+Curve* CommandJoinCurves::getCurve(Vertex* vtx, Curve* crvExclude)
 {
 	std::vector<Curve*> curves;
-	Curve* crv = dynamic_cast<Curve*>(crvExclude);
-	if (crv == 0)
-		throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne avec dynamic_cast", TkUtil::Charset::UTF_8));
 	vtx->get(curves);
 	if (curves.size() == 1)
 		throw TkUtil::Exception(TkUtil::UTF8String ("Les sommets doivent être reliés à 2 courbes distinctes", TkUtil::Charset::UTF_8));

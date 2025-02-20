@@ -99,26 +99,12 @@ void GeomGluingImplementation::perform(std::vector<GeomEntity*>& res)
 /*----------------------------------------------------------------------------*/
 void GeomGluingImplementation::sewVolumes(std::vector<GeomEntity*>& res)
 {
-
-//	GeomEntity* e0 = m_init_entities[0];
-//	TopoDS_Shape s0;
-//	getOCCShape(e0, s0);
-//	GeomEntity* e1 = m_init_entities[1];
-//	TopoDS_Shape s1;
-//	getOCCShape(e1, s1);
-//	QANewModTopOpe_Glue splitter(s0, s1, false, true);
-//	TopoDS_Shape result = splitter.Shape();
-//	createGeomEntities(result,true);
-	//createGeomEntities(splitter);
-
-
 	//on conserve dans un vecteur les shapes OCC des objets M3D initiaux
 	BRepAlgoAPI_BuilderAlgo splitter;
 	TopTools_ListOfShape list_of_arguments;
 	for(unsigned int i=0;i<m_init_entities.size();i++){
-		GeomEntity* ei = m_init_entities[i];
-		TopoDS_Shape si;
-		getOCCShape(ei, si);
+		Volume* ei = dynamic_cast<Volume*>(m_init_entities[i]);
+		TopoDS_Shape si = ei->getOCCShape();
 		list_of_arguments.Append(si);
 	}
 	splitter.SetArguments(list_of_arguments);

@@ -92,13 +92,8 @@ void GeomMirrorImplementation::
     mirrorSingle(GeomEntity* e)
 {
     //std::cout<<"GeomMirrorImplementation::mirrorSingle pour "<<e->getName()<<std::endl;
-    std::vector<TopoDS_Shape> reps = e->getOCCShapes();
-    std::vector<TopoDS_Shape> new_reps;
-    for (uint i=0; i<reps.size(); i++){
-        new_reps.push_back(mirror(reps[i], m_plane));
-    }
-
-    e->setOCCShapes(new_reps);
+    auto _mirror = [&](const TopoDS_Shape& sh) { return mirror(sh, m_plane); };
+    e->applyAndReturn(_mirror);
     e->setGeomProperty(new GeomProperty());
 }
 /*----------------------------------------------------------------------------*/
@@ -126,9 +121,9 @@ mirror(const TopoDS_Shape& shape, const Utils::Math::Plane& plane) const
 void GeomMirrorImplementation::
 performUndo()
 {
+    auto undo = [&](const TopoDS_Shape& sh) { return mirror(sh, m_plane); };
     for (uint i=0; i<m_undoableEntities.size(); i++)
-        for (auto rep : m_undoableEntities[i]->getOCCShapes())
-            rep = mirror(rep, m_plane);
+        m_undoableEntities[i]->applyAndReturn(undo);
 }
 /*----------------------------------------------------------------------------*/
 void GeomMirrorImplementation::

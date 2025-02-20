@@ -39,8 +39,8 @@ ExportBREPImplementation::~ExportBREPImplementation()
 void ExportBREPImplementation::
 addGeomEntityToExport(GeomEntity* geomEntity)
 {
-    for (auto sh : geomEntity->getOCCShapes())
-        m_builder.Add(m_compound, sh);
+    auto add = [&](const TopoDS_Shape& sh) { m_builder.Add(m_compound, sh); };
+    geomEntity->apply(add);
 }
 /*----------------------------------------------------------------------------*/
 void ExportBREPImplementation::write()

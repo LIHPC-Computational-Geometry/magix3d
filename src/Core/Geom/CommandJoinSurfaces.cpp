@@ -98,9 +98,10 @@ void CommandJoinSurfaces::init(std::vector<GeomEntity*>& es)
 void CommandJoinSurfaces::internalSpecificExecute()
 {
 	// utilisation d'un vecteur de shape pour la surface composite
-	std::vector<TopoDS_Shape> reps;
+	std::vector<TopoDS_Face> reps;
 	for (auto entity : m_entities) {
-		auto loc_reps = entity->getOCCShapes();
+		Surface* s = dynamic_cast<Surface*>(entity);
+		auto loc_reps = s->getOCCFaces();
 		std::copy(loc_reps.begin(), loc_reps.end(), std::back_inserter(reps));
 	}
 

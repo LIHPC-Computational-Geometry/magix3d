@@ -138,11 +138,11 @@ Surface* EntityFactory::newSurfaceByCopyWithOffset(Surface* E, const double& off
 {
 	// version avec multiples faces, ce qui pose pb au "split"
 	// qui est fait après pour retrouver les courbes adjacentes
-	std::vector<TopoDS_Shape> new_reps;
+	std::vector<TopoDS_Face> new_reps;
 
 	try{
 
-		auto init_reps = E->getOCCShapes();
+		auto init_reps = E->getOCCFaces();
         for (auto sh : init_reps) {
 			BRepOffsetAPI_MakeOffsetShape MF(sh, offset,
 					Utils::Math::MgxNumeric::mgxDoubleEpsilon);
@@ -662,12 +662,8 @@ Surface* EntityFactory::newSurface(const std::vector<Geom::Curve*>& curves)
          */
         BRepBuilderAPI_MakeWire mk_wire;
         for (Geom::Curve* current_curve : curves) {
-            for (auto sh : current_curve->getOCCShapes()) {
-                if (sh.ShapeType() == TopAbs_EDGE){
-                    mk_wire.Add(TopoDS::Edge(sh));
-                } else {
-                    throw Utils::BuildingException("");
-                }
+            for (auto sh : current_curve->getOCCEdges()) {
+                mk_wire.Add(sh);
             }
         }
         mk_wire.Build();
@@ -1269,7 +1265,7 @@ Surface* EntityFactory::newOCCSurface(TopoDS_Face& f)
 /*----------------------------------------------------------------------------*/
 Surface* EntityFactory::newOCCCompositeSurface(std::vector<TopoDS_Face>& v_ds_face)
 {
-    std::vector<TopoDS_Shape> shapes;
+    std::vector<TopoDS_Face> shapes;
     for (auto f : v_ds_face) shapes.push_back(f);
 	Surface* surface = new Surface(m_context,
 			m_context.newProperty(Utils::Entity::GeomSurface),
@@ -1311,7 +1307,7 @@ Curve* EntityFactory::newOCCCompositeCurve(std::vector<TopoDS_Edge>& v_ds_edge,
 	}
 #endif
 
-	std::vector<TopoDS_Shape> reps;
+	std::vector<TopoDS_Edge> reps;
 
 	// certains TopoDS_Edge issus de la projection peuvent être des parasites (projection sur surface lointaine)
 	// Nous allons donc partir extremaFirst et de proche en proche aller jusqu'à extremaLast
@@ -1401,7 +1397,7 @@ Curve* EntityFactory::newCurveByEdgeProjectionOnSurface(const Utils::Math::Point
     // création de l'arête à projeter
     gp_Pnt Pt1(P1.getX(),P1.getY(),P1.getZ());
     gp_Pnt Pt2(P2.getX(),P2.getY(),P2.getZ());
-    TopoDS_Shape edge_shape = BRepBuilderAPI_MakeEdge(Pt1,Pt2);
+    TopoDS_Edge edge_shape = BRepBuilderAPI_MakeEdge(Pt1,Pt2);
 
     return newCurveByTopoDS_ShapeProjectionOnSurface(edge_shape, surface);
 }
@@ -1413,20 +1409,20 @@ Curve* EntityFactory::newCurveByCurveProjectionOnSurface(Curve* curve, Surface* 
             <<curve->getName() << ", "<<surface->getName()<<")"<<std::endl;
 #endif
 
-    auto reps = curve->getOCCShapes();
+    auto reps = curve->getOCCEdges();
     if (reps.size() != 1) 
         throw TkUtil::Exception(TkUtil::UTF8String ("Pas possible de projeter une courbe composée", TkUtil::Charset::UTF_8));
     return newCurveByTopoDS_ShapeProjectionOnSurface(reps[0], surface);
 }
 /*----------------------------------------------------------------------------*/
-Curve* EntityFactory::newCurveByTopoDS_ShapeProjectionOnSurface(TopoDS_Shape shape, Surface* surface)
+Curve* EntityFactory::newCurveByTopoDS_ShapeProjectionOnSurface(TopoDS_Edge shape, Surface* surface)
 {
 #ifdef _DEBUG_EDGEPROJECTION
     std::cout<<"EntityFactory::newCurveByTopoDS_ShapeProjectionOnSurface, proj sur "<<surface->getName()<<std::endl;
 #endif
 	std::vector<TopoDS_Edge> v_ds_edge;
 
-	auto reps = surface->getOCCShapes();
+	auto reps = surface->getOCCFaces();
 	for (auto surf_shape : reps) {
 	    BRepAlgo_NormalProjection proj;
 	    proj.Init(surf_shape);

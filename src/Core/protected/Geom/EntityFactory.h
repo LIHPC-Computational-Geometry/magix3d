@@ -281,7 +281,7 @@ public:
 protected:
 
     /// factorisation de la crétion d'une courbe par projection
-    Curve* newCurveByTopoDS_ShapeProjectionOnSurface(TopoDS_Shape shape,
+    Curve* newCurveByTopoDS_ShapeProjectionOnSurface(TopoDS_Edge shape,
     		Surface* surface);
 
 

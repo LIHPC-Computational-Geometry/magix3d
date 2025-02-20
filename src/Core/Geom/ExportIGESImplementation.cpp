@@ -76,9 +76,8 @@ ExportIGESImplementation::~ExportIGESImplementation()
 void ExportIGESImplementation::
 addGeomEntityToExport(GeomEntity* geomEntity)
 {
-	for (auto s : geomEntity->getOCCShapes()){
-		m_writer->AddShape(s);
-	}
+    auto add = [&](const TopoDS_Shape& sh) { m_writer->AddShape(sh); };
+    geomEntity->apply(add);
 }
 /*----------------------------------------------------------------------------*/
 void ExportIGESImplementation::write()

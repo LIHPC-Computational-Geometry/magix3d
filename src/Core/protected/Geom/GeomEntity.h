@@ -11,6 +11,7 @@
 /*----------------------------------------------------------------------------*/
 #include <vector>
 #include <list>
+#include <functional>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
 /*----------------------------------------------------------------------------*/
@@ -73,18 +74,11 @@ protected:
      *          l'entité entrainera celle des propriétés attachées.
      */
     GeomEntity(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, TopoDS_Shape& shape);
-
-    /** \brief  Constructeur. Une entité délègue un certain nombre de calculs
-     *          géométrique à des objets de type ComputationalProperty.
-     *
-     *          Une fois une propriété associée à une entité, la mort de
-     *          l'entité entrainera celle des propriétés attachées.
-     */
-    GeomEntity(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, std::vector<TopoDS_Shape>& shapes);
+            GeomProperty* gprop);
 
 public:
+    virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const = 0;
+    virtual void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda) = 0;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
@@ -153,22 +147,6 @@ protected:
 
 public:
     /*------------------------------------------------------------------------*/
-    /** \brief  MAJ de la propriété de calcul.
-     */
-#ifndef SWIG
-    void setOCCShapes(std::vector<TopoDS_Shape>& shapes);
-#endif
-
-
-    /*------------------------------------------------------------------------*/
-    /** \brief   récupération de la propriété de calcul
-     */
-#ifndef SWIG
-    std::vector<TopoDS_Shape> getOCCShapes() const;
-
-#endif
-
-    /*------------------------------------------------------------------------*/
     /** \brief  Calcule l'aire d'une entité:  Pour une courbe, c'est la
      *          longueur, pour une surface, l'aire, pour un volume le volume.
      */
@@ -187,14 +165,23 @@ public:
     {m_computedArea = area;}
 
     /*------------------------------------------------------------------------*/
+    /** \brief Projete le point P sur le sommet. P est modifié
+     *  \param P le point à projeter
+     */
+    virtual uint project(Utils::Math::Point& P) const = 0;
+
+    /*------------------------------------------------------------------------*/
+    /** \brief Projete le point P1 sur le sommet, le résultat est le point P2.
+     */
+    virtual uint project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const = 0;
+
+    /*------------------------------------------------------------------------*/
     /** \brief  Calcul de la boite englobante orientée selon les axes Ox,Oy,Oz
      *
      *  \param pmin Les coordonnées min de la boite englobante
      *  \param pmax Les coordonnées max de la boite englobante
      */
-    virtual void computeBoundingBox (
-							Utils::Math::Point& pmin,Utils::Math::Point& pmax) const;
-
+    virtual void computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const = 0;
 
     /*------------------------------------------------------------------------*/
     /** \brief  récupère la liste des geom_entity référencés par (*this)
@@ -241,17 +228,6 @@ public:
      *  \param volumes les volumes incidents
      */
     virtual void get(std::vector<Volume*>& volumes) const =0;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Projete le point P sur la géométrie. P est modifié
-     *  \param P le point à projeter
-     */
-    virtual void project(Utils::Math::Point& P) const =0;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Projete le point P1 sur la géométrie, le résultat est le point P2.
-     */
-    virtual void project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const =0;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Ajoute e comme entité géométrique incidente. Selon la dimension
@@ -397,13 +373,6 @@ public:
 #endif
 
     /*------------------------------------------------------------------------*/
-    /** \brief  Fournit une représentation facétisée (point, segments, polygones) de l'entité
-     *
-     */
-    virtual void getFacetedRepresentation(
-            std::vector<gmds::math::Triangle  >& AVec) const;
-
-    /*------------------------------------------------------------------------*/
     /** Ajoute une relation vers la topologie
      *  Il est vérifié que la relation n'y ait pas déjà
      * */
@@ -438,10 +407,6 @@ public:
     virtual int getNbGroups() const;
 
 private:
-
-    /// Interfaces pour les objets géométriques
-    std::vector<TopoDS_Shape> m_shapes;
-
     /// Propriétés géométriques (qui peut être spécifique, PropertyBox par exemple)
     GeomProperty* m_geomProp;
 

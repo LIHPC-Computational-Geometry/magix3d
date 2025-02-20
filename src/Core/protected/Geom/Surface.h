@@ -15,8 +15,8 @@
 #include "Utils/Vector.h"
 /*----------------------------------------------------------------------------*/
 #include <list>
-
-class TopoDS_Edge;
+/*----------------------------------------------------------------------------*/
+#include <TopoDS_Face.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -60,7 +60,7 @@ public:
      */
 #ifndef SWIG
     Surface(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, TopoDS_Shape& shape);
+            GeomProperty* gprop, TopoDS_Face& shape);
 #endif
 
     /** \brief  Constructeur
@@ -73,8 +73,12 @@ public:
      */
 #ifndef SWIG
     Surface(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, std::vector<TopoDS_Shape>& shapes);
+            GeomProperty* gprop, std::vector<TopoDS_Face>& shapes);
 #endif
+    const std::vector<TopoDS_Face>& getOCCFaces() const { return m_occ_faces; }
+
+    virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const;
+    virtual void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
@@ -109,6 +113,14 @@ public:
      */
     virtual void split(std::vector<Curve* >& curv,
                        std::vector<Vertex* >&  vert);
+
+    /*------------------------------------------------------------------------*/
+    /** \brief  Calcul de la boite englobante orientée selon les axes Ox,Oy,Oz
+     *
+     *  \param pmin Les coordonnées min de la boite englobante
+     *  \param pmax Les coordonnées max de la boite englobante
+     */
+    virtual void computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Calcule l'aire d'une entité:  Pour une courbe, c'est la
@@ -156,13 +168,6 @@ public:
      */
     virtual bool contains(Surface* ASurf) const;
 
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Projete le point P sur la surface. P est modifié
-     *  \param P le point à projeter
-     */
-    virtual void project(Utils::Math::Point& P) const;
-
     /*------------------------------------------------------------------------*/
     /** \brief Calcul la normale à une surface en un point
      *
@@ -178,10 +183,17 @@ public:
       *         levée. La robustesse de cette méthode repose sur OCC
       */
     virtual Utils::Math::Point getPoint(const double u, const double v) const;
+
+    /*------------------------------------------------------------------------*/
+    /** \brief Projete le point P sur la surface. P est modifié
+     *  \param P le point à projeter
+     */
+    virtual uint project(Utils::Math::Point& P) const;
+
     /*------------------------------------------------------------------------*/
     /** \brief Projete le point P1 sur la surface, le résultat est le point P2.
      */
-    virtual void project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const;
+    virtual uint project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Ajoute v comme volume incident
@@ -190,13 +202,6 @@ public:
      */
 #ifndef SWIG
       virtual void add(Volume* v);
-//    /*------------------------------------------------------------------------*/
-//    /** \brief  Ajoute c comme courbe incidente
-//     *
-//     *  \param c un pointeur sur une courbe
-//     */
-//    virtual void add(TopoDS_Edge e);
-//    std::vector<TopoDS_Edge> getEdges();
 
 #endif
 
@@ -344,12 +349,10 @@ public:
     virtual void createSpecificMemento(MementoGeomEntity& mem);
 
 protected:
-
     std::vector<Curve*> m_curves;
-//    std::vector<TopoDS_Edge> m_occ_edges;
-    //std::vector<TopoDS_Edge> m_occ_edges;
     std::vector<Volume*> m_volumes;
-
+    /// représentation open cascade
+    std::vector<TopoDS_Face> m_occ_faces;
     /// Listes des groupes 2D auxquels appartient cette surface
     std::vector<Group::Group2D*> m_groups;
 };

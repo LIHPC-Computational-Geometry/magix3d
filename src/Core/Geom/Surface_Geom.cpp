@@ -61,26 +61,40 @@ const char* Surface::typeNameGeomSurface = "GeomSurface";
 /*----------------------------------------------------------------------------*/
 Surface::Surface(Internal::Context& ctx, Utils::Property* prop,
         Utils::DisplayProperties* disp,
-        GeomProperty* gprop, TopoDS_Shape& shape)
-:GeomEntity(ctx, prop, disp, gprop, shape)
+        GeomProperty* gprop, TopoDS_Face& shape)
+:GeomEntity(ctx, prop, disp, gprop)
 {
+	m_occ_faces.push_back(shape);
 }
 /*----------------------------------------------------------------------------*/
 Surface::Surface(Internal::Context& ctx, Utils::Property* prop,
         Utils::DisplayProperties* disp,
-        GeomProperty* gprop, std::vector<TopoDS_Shape>& shapes)
-:GeomEntity(ctx, prop, disp, gprop, shapes)
+        GeomProperty* gprop, std::vector<TopoDS_Face>& shapes)
+:GeomEntity(ctx, prop, disp, gprop)
+, m_occ_faces(shapes)
 {
+}
+/*----------------------------------------------------------------------------*/
+void Surface::apply(std::function<void(const TopoDS_Shape&)> const& lambda) const
+{
+	for (auto sh : m_occ_faces)
+		lambda(sh);
+}
+/*----------------------------------------------------------------------------*/
+void Surface::applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda)
+{
+	for (int i=0 ; i<m_occ_faces.size() ; ++i) {
+		m_occ_faces[i] = TopoDS::Face(lambda(m_occ_faces[i]));
+	}
 }
 /*----------------------------------------------------------------------------*/
 GeomEntity* Surface::clone(Internal::Context& c)
 {
-	std::vector<TopoDS_Shape> reps = this->getOCCShapes();
     return new Surface(c,
             c.newProperty(this->getType()),
             c.newDisplayProperties(this->getType()),
             new GeomProperty(),
-			reps);
+			m_occ_faces);
 }
 /*----------------------------------------------------------------------------*/
 Surface::~Surface()
@@ -93,6 +107,9 @@ void Surface::setFromSpecificMemento(MementoGeomEntity& mem)
     m_curves = mem.getCurves();
     m_volumes = mem.getVolumes();
     m_groups  = mem.getGroups2D();
+	m_occ_faces.clear();
+	for (auto sh : mem.getOCCShapes())
+		m_occ_faces.push_back(TopoDS::Face(sh));
 }
 /*----------------------------------------------------------------------------*/
 void Surface::createSpecificMemento(MementoGeomEntity& mem)
@@ -100,6 +117,10 @@ void Surface::createSpecificMemento(MementoGeomEntity& mem)
     mem.setCurves(m_curves);
     mem.setVolumes(m_volumes);
     mem.setGroups2D(m_groups);
+	std::vector<TopoDS_Shape> shapes;
+	for (auto f : m_occ_faces)
+		shapes.push_back(f);
+	mem.setOCCShapes(shapes);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -184,25 +205,43 @@ void Surface::get(std::vector<Volume*>& volumes) const
     volumes.insert(volumes.end(),m_volumes.begin(),m_volumes.end());
 }
 /*----------------------------------------------------------------------------*/
-void Surface::project(Utils::Math::Point& P) const
+uint Surface::project(Utils::Math::Point& P) const
 {
-	OCCHelper::project(getOCCShapes(), P);
+	Utils::Math::Point P2;
+	int idBest = project(P, P2);
+	P = P2;
+    return idBest;
 }
 /*----------------------------------------------------------------------------*/
-void Surface::project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const
+uint Surface::project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const
 {
-	OCCHelper::project(getOCCShapes(), P1, P2);
+	P2 = P1;
+	OCCHelper::projectPointOn(m_occ_faces[0], P2);
+	Utils::Math::Point pBest = P2;
+	uint idBest = 0;
+	double norme2 = (P2-P1).norme2();
+	for (uint i=1; i<m_occ_faces.size(); i++){
+		P2 = P1;
+		OCCHelper::projectPointOn(m_occ_faces[i], P2);
+		double dist = (P2-P1).norme2();
+		if (dist<norme2){
+			norme2 = dist;
+			pBest = P2;
+        	idBest = i;
+		}
+	}
+	P2 = pBest;
+    return idBest;
 }
 /*----------------------------------------------------------------------------*/
 void Surface::normal(const Utils::Math::Point& P1, Utils::Math::Vector& V2) const
 {
-	auto reps = getOCCShapes();
 	TopoDS_Face face;
-	if (reps.size() == 1) {
-		face = TopoDS::Face(reps[0]);
+	if (m_occ_faces.size() == 1) {
+		face = TopoDS::Face(m_occ_faces[0]);
 	} else {
-		uint idBest = OCCHelper::project(reps, P1, V2);
-		face = TopoDS::Face(reps[idBest]);
+		uint idBest = project(P1, V2);
+		face = TopoDS::Face(m_occ_faces[idBest]);
 	}
 
 	// projection pour en déduire les paramètres
@@ -281,7 +320,7 @@ void Surface::remove(Curve* c)
 /*----------------------------------------------------------------------------*/
 void Surface::split(std::vector<Curve* >& curv, std::vector<Vertex* >&  vert)
 {
-	for (auto rep : getOCCShapes()) {
+	for (auto rep : m_occ_faces) {
 		/* on va explorer la face OCC stocké en attribut et créer les entités de
 		* dimension directement inférieure, c'est-à-dire les courbes
 		*/
@@ -370,9 +409,33 @@ void Surface::split(std::vector<Curve* >& curv, std::vector<Vertex* >&  vert)
 double Surface::computeArea() const
 {
 	double area = 0.0;
-	for (auto rep : getOCCShapes())
+	for (auto rep : m_occ_faces)
 		area += OCCHelper::computeArea(TopoDS::Face(rep));
 	return area;
+}
+/*----------------------------------------------------------------------------*/
+void Surface::computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const
+{
+	if (m_occ_faces.empty())
+		return;
+
+    OCCHelper::computeBoundingBox(m_occ_faces[0], pmin, pmax);
+	for (uint i=1; i<m_occ_faces.size(); i++){
+		Utils::Math::Point p1,p2;
+        OCCHelper::computeBoundingBox(m_occ_faces[i], pmin, pmax);
+		for (uint j=0; j<3; j++){
+			double c1 = pmin.getCoord(j);
+			double c2 = p1.getCoord(j);
+			if (c2<c1)
+				pmin.setCoord(j,c2);
+		}
+		for (uint j=0; j<3; j++){
+			double c1 = pmax.getCoord(j);
+			double c2 = p2.getCoord(j);
+			if (c2>c1)
+				pmin.setCoord(j,c2);
+		}
+	}
 }
 /*----------------------------------------------------------------------------*/
 void Surface::addAllDownLevelEntity(std::list<GeomEntity*>& l_entity) const
@@ -478,9 +541,8 @@ void Surface::setDestroyed(bool b)
 /*----------------------------------------------------------------------------*/
 bool Surface::isPlanar() const
 {
-	auto reps = getOCCShapes();
-	if (reps.size() == 1)
-		return OCCHelper::isTypeOf(TopoDS::Face(reps[0]), STANDARD_TYPE(Geom_Plane));
+	if (m_occ_faces.size() == 1)
+		return OCCHelper::isTypeOf(TopoDS::Face(m_occ_faces[0]), STANDARD_TYPE(Geom_Plane));
 	else
 		// courbe composée : on dit que ce n'est pas une ellipse
 		return false;
@@ -526,7 +588,7 @@ bool Surface::contains(Surface* ASurf) const
     // TESTEE PEUT NE PAS ENCORE ETRE CONNECTEE TOPOLOGIQUEMENT
     // AVEC DES ENTITES M3D
     //===============================================================
-	for (auto shOther : ASurf->getOCCShapes()) {
+	for (auto shOther : ASurf->getOCCFaces()) {
     	//===============================================================
     	// on teste les sommets
     	//===============================================================
@@ -663,7 +725,7 @@ bool Surface::contains(Surface* ASurf) const
 /*----------------------------------------------------------------------------*/
 Utils::Math::Point Surface::getPoint(const double u, const double v) const
 {
-	for (auto sh : getOCCShapes()) {
+	for (auto sh : m_occ_faces) {
 		// check parametric bounds
 		Handle_Geom_Surface surf = BRep_Tool::Surface(TopoDS::Face(sh));
 		double umin, umax, vmin, vmax;
@@ -735,13 +797,12 @@ Utils::SerializedRepresentation* Surface::getDescription (bool alsoComputed) con
 	        Utils::SerializedRepresentation::Property ("Aire", volStr.ascii()) );
 	}
 
-	auto reps = getOCCShapes();
 
 #ifdef _DEBUG		// Issue#111
     // précision OpenCascade ou autre
-	for (uint i=0; i<reps.size(); i++){
+	for (uint i=0; i<m_occ_faces.size(); i++){
 		TkUtil::UTF8String	precStr (TkUtil::Charset::UTF_8);
-		precStr << BRep_Tool::Tolerance(TopoDS::Face(reps[i]));
+		precStr << BRep_Tool::Tolerance(m_occ_faces[i]);
 	    propertyGeomDescription.addProperty (
 	    	        Utils::SerializedRepresentation::Property ("Précision", precStr.ascii()) );
 	}
@@ -751,7 +812,7 @@ Utils::SerializedRepresentation* Surface::getDescription (bool alsoComputed) con
 	TkUtil::UTF8String	typeStr (TkUtil::Charset::UTF_8);
     if (isPlanar())
     	typeStr<<"plan";
-    else if (reps.size()>1)
+    else if (m_occ_faces.size()>1)
     	typeStr<<"composée";
     else
     	typeStr<<"quelconque";
