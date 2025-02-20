@@ -68,9 +68,8 @@ ExportSTEPImplementation::~ExportSTEPImplementation()
 void ExportSTEPImplementation::
 addGeomEntityToExport(GeomEntity* geomEntity)
 {
-	for (auto s : geomEntity->getOCCShapes()){
-		m_writer.Transfer(s, STEPControl_AsIs);
-	}
+    auto add = [&](const TopoDS_Shape& sh) { m_writer.Transfer(sh, STEPControl_AsIs); };
+    geomEntity->apply(add);
 }
 /*----------------------------------------------------------------------------*/
 void ExportSTEPImplementation::write()

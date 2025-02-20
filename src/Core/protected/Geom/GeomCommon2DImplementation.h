@@ -77,9 +77,9 @@ protected:
 
     /*------------------------------------------------------------------------*/
     /** \brief  réalisation de l'intersection de 2 surfaces */
-    void commonSurfaces();
+    void commonSurfaces(const Surface* surf1, const Surface* surf2);
     /** \brief  réalisation de l'intersection de 2 courbes */
-    void commonCurves();
+    void commonCurves(const Curve* curv1, const Curve* curv2);
 
     /// la commande de copie qui permet d'accéder aux copies géométriques
     Geom::CommandGeomCopy* m_geomCmd;

@@ -95,18 +95,24 @@ void GeomCommon2DImplementation::prePerform()
 /*----------------------------------------------------------------------------*/
 void GeomCommon2DImplementation::perform(std::vector<GeomEntity*>& res)
 {
-	if (m_entity1->getDim() == 2 && m_entity2->getDim() == 2)
-		commonSurfaces();
-	else if (m_entity1->getDim() == 1 && m_entity2->getDim() == 1)
-		commonCurves();
-	else
+	if (m_entity1->getDim() == 2 && m_entity2->getDim() == 2) {
+		Surface* surf1 = dynamic_cast<Surface*>(m_entity1);
+		Surface* surf2 = dynamic_cast<Surface*>(m_entity2);
+		commonSurfaces(surf1, surf2);
+	} else if (m_entity1->getDim() == 1 && m_entity2->getDim() == 1) {
+		Curve* curv1 = dynamic_cast<Curve*>(m_entity1);
+		Curve* curv2 = dynamic_cast<Curve*>(m_entity2);
+		commonCurves(curv1, curv2);
+	} else {
 		throw TkUtil::Exception("Erreur interne, cas non prévu dans GeomCommon2DImplementation::perform");
+	}
 }
 /*----------------------------------------------------------------------------*/
-void GeomCommon2DImplementation::commonSurfaces()
+void GeomCommon2DImplementation::
+commonSurfaces(const Surface* surf1, const Surface* surf2)
 {
     TopoDS_Shape s1, s2;
-	std::vector<TopoDS_Shape> topoS1 = m_entity1->getOCCShapes();
+	std::vector<TopoDS_Face> topoS1 = surf1->getOCCFaces();
 	if (topoS1.size()==1){
 		s1 = topoS1[0];
 	} else {
@@ -120,7 +126,7 @@ void GeomCommon2DImplementation::commonSurfaces()
 		s1 = aShell;
 	}
 
-	std::vector<TopoDS_Shape> topoS2 = m_entity2->getOCCShapes();
+	std::vector<TopoDS_Face> topoS2 = surf2->getOCCFaces();
 	if (topoS2.size()==1){
 		s2 = topoS2[0];
 	} else {
@@ -173,26 +179,18 @@ void GeomCommon2DImplementation::commonSurfaces()
     m_removedEntities.insert(m_removedEntities.end(), adj.begin(), adj.end());
 }
 /*----------------------------------------------------------------------------*/
-void GeomCommon2DImplementation::commonCurves()
+void GeomCommon2DImplementation::
+commonCurves(const Curve* curv1, const Curve* curv2)
 {
-	/* exemple d'utilisation
-
-ctx.getGeomManager().newBox (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), "B")
-ctx.getGeomManager().newCylinder (Mgx3D.Point(-.5, .5, .5), 1, Mgx3D.Vector(10, 10, 1), 9.000000e+01, "C")
-crb=ctx.getGeomManager().copy(["Crb0002", "Crb0020"], True,"TMP")
-ctx.getGeomManager().common2D("Crb0021", "Crb0022", "INTER")
-
-	 */
-    TopoDS_Shape s1, s2;
-    getOCCShape(m_entity1, s1);
-    getOCCShape(m_entity2, s2);
-
-
+	if (curv1->getOCCEdges().size() != 1 || curv2->getOCCEdges().size() != 1) {
+		throw TkUtil::Exception (TkUtil::UTF8String ("la modification n'est possible que sur des entités OCC non composées", TkUtil::Charset::UTF_8));
+	}
+    TopoDS_Edge s1 = curv1->getOCCEdges()[0];
+    TopoDS_Edge s2 = curv2->getOCCEdges()[0];
     BRepAlgoAPI_Section intersector(s1, s2);
 
     if (intersector.IsDone()){
     	TopoDS_Shape sh = intersector.Shape();
-
     	TopTools_IndexedMapOfShape  vertices;
     	TopExp::MapShapes(sh,TopAbs_VERTEX, vertices);
 

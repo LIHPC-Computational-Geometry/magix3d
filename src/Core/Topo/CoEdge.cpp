@@ -1165,7 +1165,7 @@ Geom::Curve* CoEdge::createBSplineByProjWithOrthogonalIntersection(Utils::Math::
 	// on va commencer par essayer de placer un point sur la surface à l'intersection entre le plan orthogonal à l'arête
 	// et cette surface.
 	// on continue ensuite comme pour createBSplineByProj en 2 parties
-	auto reps = surface->getOCCShapes();
+	auto reps = surface->getOCCFaces();
 	if (reps.size() != 1) {
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
 		message<<"createBSplineByProjWithOrthogonalIntersection impossible sur la surface composée : "<<surface->getName();

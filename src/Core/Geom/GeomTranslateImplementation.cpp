@@ -91,14 +91,8 @@ void GeomTranslateImplementation::perform(std::vector<GeomEntity*>& res)
 void GeomTranslateImplementation::
 translateSingle(GeomEntity* e)
 {
-    //std::cout<<"GeomTranslateImplementation::translateSingle pour "<<e->getName()<<std::endl;
-    std::vector<TopoDS_Shape> reps = e->getOCCShapes();
-    std::vector<TopoDS_Shape> new_reps;
-    for (uint i=0; i<reps.size(); i++){
-        new_reps.push_back(translate(reps[i], m_dv));
-    }
-
-    e->setOCCShapes(new_reps);
+    auto trans = [&](const TopoDS_Shape& sh) { return translate(sh, m_dv); };
+    e->applyAndReturn(trans);
     e->setGeomProperty(new GeomProperty());
 }
 /*----------------------------------------------------------------------------*/
@@ -123,17 +117,17 @@ void GeomTranslateImplementation::
 performUndo()
 {
     Utils::Math::Vector dv_inv(-m_dv.getX(), -m_dv.getY(), -m_dv.getZ());
+    auto undo = [&](const TopoDS_Shape& sh) { return translate(sh, dv_inv); };
     for (uint i=0; i<m_undoableEntities.size(); i++)
-        for (auto rep : m_undoableEntities[i]->getOCCShapes())
-            translate(rep, dv_inv);
+        m_undoableEntities[i]->applyAndReturn(undo);
 }
 /*----------------------------------------------------------------------------*/
 void GeomTranslateImplementation::
 performRedo()
 {
+    auto redo = [&](const TopoDS_Shape& sh) { return translate(sh, m_dv); };
     for (uint i=0; i<m_undoableEntities.size(); i++)
-        for (auto rep : m_undoableEntities[i]->getOCCShapes())
-            translate(rep, m_dv);
+        m_undoableEntities[i]->applyAndReturn(redo);
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

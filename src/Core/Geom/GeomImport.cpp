@@ -408,7 +408,7 @@ splitManyCurves(std::vector<Curve*>& curvs, std::vector<Vertex*>& verts)
 
 	for (uint i=0; i<curvs.size(); i++){
         // les courbes viennent d'être créées avec une seule arête
-		TopoDS_Shape s = curvs[i]->getOCCShapes()[0];
+		TopoDS_Shape s = curvs[i]->getOCCEdges()[0];
 		std::vector<TopoDS_Vertex> vtx;
 		TopExp_Explorer e;
 		for(e.Init(s, TopAbs_VERTEX); e.More(); e.Next()){

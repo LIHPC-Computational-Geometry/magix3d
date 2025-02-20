@@ -53,9 +53,6 @@ protected:
     /** \brief   Ecriture effective du fichier de sortie
      */
     void write();
-
-private:
-    TopoDS_Compound combineShapes(const std::vector<TopoDS_Shape>& shapes);
 };
 
 /*----------------------------------------------------------------------------*/

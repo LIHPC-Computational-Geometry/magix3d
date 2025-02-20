@@ -9,6 +9,8 @@
 #ifndef MGX3D_GEOM_VERTEX_H_
 #define MGX3D_GEOM_VERTEX_H_
 /*----------------------------------------------------------------------------*/
+#include <TopoDS_Vertex.hxx>
+/*----------------------------------------------------------------------------*/
 #include <vector>
 /*----------------------------------------------------------------------------*/
 #include "Geom/GeomEntity.h"
@@ -51,8 +53,12 @@ public:
      */
 #ifndef SWIG
     Vertex(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, TopoDS_Shape& shape);
+            GeomProperty* gprop, TopoDS_Vertex& shape);
 #endif
+    const TopoDS_Vertex& getOCCVertex() const { return m_occ_vertex; }
+
+    virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const;
+    virtual void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
@@ -112,6 +118,14 @@ public:
     double computeArea() const;
 
     /*------------------------------------------------------------------------*/
+    /** \brief  Calcul de la boite englobante orientée selon les axes Ox,Oy,Oz
+     *
+     *  \param pmin Les coordonnées min de la boite englobante
+     *  \param pmax Les coordonnées max de la boite englobante
+     */
+    virtual void computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const;
+
+    /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès aux sommets géométriques incidents via une
      *          courbe
      *
@@ -148,12 +162,12 @@ public:
     /** \brief Projete le point P sur le sommet. P est modifié
      *  \param P le point à projeter
      */
-    virtual void project(Utils::Math::Point& P) const;
+    virtual uint project(Utils::Math::Point& P) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief Projete le point P1 sur le sommet, le résultat est le point P2.
      */
-    virtual void project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const ;
+    virtual uint project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const ;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Return the number of curve incident to this point.
@@ -291,13 +305,14 @@ protected:
      *          donc).
      */
     virtual void createSpecificMemento(MementoGeomEntity& mem);
-private:
 
+private:
     /// accès aux courbes incidentes
     std::vector<Curve*> m_curves;
-
     /// Listes des groupes 0D auxquels appartient ce sommet
     std::vector<Group::Group0D*> m_groups;
+    /// représentation open cascade
+    TopoDS_Vertex m_occ_vertex;
 };
 /*----------------------------------------------------------------------------*/
 

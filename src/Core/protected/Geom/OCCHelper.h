@@ -70,7 +70,7 @@ public:
      *          associé à une entité OCC. Cette méthode factorise ce
      *          traitement.
      */
-    static double buildIncrementalBRepMesh(TopoDS_Shape& shape, const double& deflection);
+    static double buildIncrementalBRepMesh(const TopoDS_Shape& shape, const double& deflection);
 
     /*------------------------------------------------------------------------*/
     /** \brief Donne le point en fonction du paramètre sur la courbe
@@ -78,19 +78,7 @@ public:
      * \param p le paramètre curviligne
      * \param Pt le résultat
      */
-    static void getPoint(TopoDS_Edge& edge, const double& p, Utils::Math::Point& Pt, const bool in01 = false);
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Projete le point P1 sur la shape, le résultat est le point P2.
-     *  \return l'indice de la shape qui a donné la meilleure projection
-     */
-    static uint project(const std::vector<TopoDS_Shape>& shapes, const Utils::Math::Point& P1, Utils::Math::Point& P2);
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Projete le point P sur la shape. P est modifié
-     *  \param P le point à projeter
-     */
-    static uint project(const std::vector<TopoDS_Shape>& shapes, Utils::Math::Point& P);
+    static void getPoint(const TopoDS_Edge& edge, const double& p, Utils::Math::Point& Pt, const bool in01 = false);
 
     /*------------------------------------------------------------------------*/
     /** \brief Calcul la tangente à une courbe en un point
@@ -146,12 +134,14 @@ public:
      */
     static TopoDS_Shape cleanShape(TopoDS_Shape& sh);
 
-private:
     /*------------------------------------------------------------------------*/
     /** \brief  Projette le point P sur la shape OCC
      */
-    static void projectPointOn(const TopoDS_Shape& shape, Utils::Math::Point& P);
+    static void projectPointOn(const TopoDS_Face& shape, Utils::Math::Point& P);
+    static void projectPointOn(const TopoDS_Vertex& shape, Utils::Math::Point& P);
+    static void projectPointOn(const TopoDS_Edge& shape, Utils::Math::Point& P);
 
+private:
     /*------------------------------------------------------------------------*/
     /** \brief  construction de map pour le nettoyage
      */

@@ -153,8 +153,7 @@ private :
     std::vector<Group::Group2D*> m_groups2D;
     std::vector<Group::Group3D*> m_groups3D;
 
-    /* ancienne représentation géométrique des entités que l'on a modifiées. Il
-     * est de la responsabilité de l'objet de les détruire */
+    /* ancienne représentation géométrique des entités que l'on a modifiées */
     std::vector<TopoDS_Shape> m_shapes;
 
     /* ancienne propriétés des entités que l'on a modifiées. Il

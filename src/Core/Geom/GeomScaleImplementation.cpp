@@ -191,16 +191,13 @@ void GeomScaleImplementation::perform(std::vector<GeomEntity*>& res)
 void GeomScaleImplementation::scaleSingle(GeomEntity* e)
 {
     //std::cout<<"GeomScaleImplementation::scaleSingle pour "<<e->getName()<<std::endl;
-    std::vector<TopoDS_Shape> reps = e->getOCCShapes();
-    std::vector<TopoDS_Shape> new_reps;
-    for (uint i=0; i<reps.size(); i++){
-        if (m_isHomogene)
-            new_reps.push_back(scale(reps[i], m_factor, m_center));
-        else
-            new_reps.push_back(scale(reps[i], m_factorX, m_factorY, m_factorZ, m_center));
+    if (m_isHomogene) {
+        auto _scale = [&](const TopoDS_Shape& sh) { return scale(sh, m_factor, m_center); };
+        e->applyAndReturn(_scale);
+    } else {
+        auto _scale = [&](const TopoDS_Shape& sh) { return scale(sh, m_factorX, m_factorY, m_factorZ, m_center); };
+        e->applyAndReturn(_scale);
     }
-
-    e->setOCCShapes(new_reps);
     e->setGeomProperty(new GeomProperty());
 }
 /*----------------------------------------------------------------------------*/
@@ -261,12 +258,13 @@ scale(const TopoDS_Shape& shape, const double factorX, const double factorY, con
 void GeomScaleImplementation::
 performUndo()
 {
-    for (uint i=0; i<m_undoableEntities.size(); i++){
-        for (auto rep : m_undoableEntities[i]->getOCCShapes()){
-            if (m_isHomogene)
-                scale(rep, 1.0/m_factor, m_center);
-            else
-                scale(rep, 1.0/m_factorX, 1.0/m_factorY, 1.0/m_factorZ, m_center);
+    for (uint i=0; i<m_undoableEntities.size(); i++) {
+        if (m_isHomogene) {
+            auto undo = [&](const TopoDS_Shape& sh) { return scale(sh, 1.0/m_factor, m_center); };
+            m_undoableEntities[i]->applyAndReturn(undo);
+        } else {
+            auto undo = [&](const TopoDS_Shape& sh) { return scale(sh, 1.0/m_factorX, 1.0/m_factorY, 1.0/m_factorZ, m_center); };
+            m_undoableEntities[i]->applyAndReturn(undo);
         }
     }
 }
@@ -274,12 +272,13 @@ performUndo()
 void GeomScaleImplementation::
 performRedo()
 {
-    for (uint i=0; i<m_undoableEntities.size(); i++){
-        for (auto rep : m_undoableEntities[i]->getOCCShapes()){
-            if (m_isHomogene)
-                scale(rep, m_factor, m_center);
-            else
-                scale(rep, m_factorX, m_factorY, m_factor, m_center);
+    for (uint i=0; i<m_undoableEntities.size(); i++) {
+        if (m_isHomogene) {
+            auto redo = [&](const TopoDS_Shape& sh) { return scale(sh, m_factor, m_center); };
+            m_undoableEntities[i]->applyAndReturn(redo);
+        } else {
+            auto redo = [&](const TopoDS_Shape& sh) { return scale(sh,  m_factorX, m_factorY, m_factor, m_center); };
+            m_undoableEntities[i]->applyAndReturn(redo);
         }
     }
 }

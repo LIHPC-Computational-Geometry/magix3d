@@ -36,9 +36,7 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur
      */
-    OCCFacetedRepresentationBuilder(
-            const GeomEntity* entity,
-            TopoDS_Shape& shape);
+    OCCFacetedRepresentationBuilder(const TopoDS_Shape& shape);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur
@@ -84,12 +82,8 @@ protected:
             std::vector<gmds::math::Triangle >& AVec);
 protected:
 
-    /* Entité géométrique dont on doit construire une représentation sachant que
-     * sa représentation est de type OCC */
-    const GeomEntity* m_entity;
-
     /* shape dont on doit construire une représentation */
-    TopoDS_Shape& m_shape;
+    const TopoDS_Shape& m_shape;
 
     /* représentation stockant les paramètre d'entrée et de sortie*/
 //    GeomDisplayRepresentation* m_rep;

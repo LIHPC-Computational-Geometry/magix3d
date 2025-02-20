@@ -117,22 +117,16 @@ void GeomSectionImplementation::sectionVolumes(std::vector<GeomEntity*>& res)
     //========================================================================
     //1 - Recuperation de la surface de coupe
     //========================================================================
-    TopoDS_Shape tool_shape;
-    getOCCShape(m_tool,tool_shape);
-    TopoDS_Face tool_face = TopoDS::Face(tool_shape);
+    TopoDS_Face tool_face = checkSurface(m_tool);
 
     //========================================================================
     // 2 - Conservation du plan de coupe réduit aux objets coupés
     //========================================================================
     // On commence par fusionner toutes les entites a couper
     GeomEntity* e1 = m_init_entities[0];
-    TopoDS_Shape s_fuse;
-    getOCCShape(e1, s_fuse);
+    TopoDS_Shape s_fuse = checkVolume(e1);
     for(unsigned int i=1;i<m_init_entities.size();i++){
-        GeomEntity* e2 = m_init_entities[i];
-        TopoDS_Shape s2;
-        getOCCShape(e2, s2);
-
+        TopoDS_Shape s2 = checkVolume(m_init_entities[i]);
         BRepAlgoAPI_Fuse fuse_operator(s_fuse,s2);
         if(fuse_operator.IsDone())
             s_fuse = fuse_operator.Shape();
@@ -152,12 +146,9 @@ void GeomSectionImplementation::sectionVolumes(std::vector<GeomEntity*>& res)
     //========================================================================
     TopoDS_Shape s;
     BRepAlgoAPI_BuilderAlgo splitter;
-
     TopTools_ListOfShape list_of_arguments;
     for (unsigned int i = 0; i < m_init_entities.size(); i++) {
-        GeomEntity* ei = m_init_entities[i];
-        TopoDS_Shape si;
-        getOCCShape(ei, si);
+        TopoDS_Shape si = checkVolume(m_init_entities[i]);
         list_of_arguments.Append(si);
     }
     list_of_arguments.Append(m_restricted_section_tool);
@@ -176,9 +167,7 @@ void GeomSectionImplementation::sectionSurfaces(std::vector<GeomEntity*>& res)
     //========================================================================
     //1 - Recuperation de la surface de coupe
     //========================================================================
-    TopoDS_Shape tool_shape;
-    getOCCShape(m_tool,tool_shape);
-    TopoDS_Face tool_face = TopoDS::Face(tool_shape);
+    TopoDS_Face tool_face = checkSurface(m_tool);
 
     //========================================================================
     // 2 - Conservation du plan de coupe réduit aux objets coupés
@@ -214,9 +203,7 @@ void GeomSectionImplementation::sectionSurfaces(std::vector<GeomEntity*>& res)
     BRepAlgoAPI_BuilderAlgo splitter;
     TopTools_ListOfShape list_of_arguments;
     for (unsigned int i = 0; i < m_init_entities.size(); i++) {
-        GeomEntity* ei = m_init_entities[i];
-        TopoDS_Shape si;
-        getOCCShape(ei, si);
+        TopoDS_Shape si = checkSurface(m_init_entities[i]);
         list_of_arguments.Append(si);
     }
     list_of_arguments.Append(tool_face);
@@ -229,7 +216,29 @@ void GeomSectionImplementation::sectionSurfaces(std::vector<GeomEntity*>& res)
 
     res.insert(res.end(), entities_new.begin(), entities_new.end());
 }
-
+/*----------------------------------------------------------------------------*/
+TopoDS_Face GeomSectionImplementation::
+checkSurface(GeomEntity* ge) const
+{
+    if (ge->getDim() == 2) {
+        Surface* s = dynamic_cast<Surface*>(ge);
+        if (s->getOCCFaces().size() != 1) {
+            throw TkUtil::Exception("Pas de support des surfaces composées dans cette opération : " + s->getName());
+        }
+        return s->getOCCFaces()[0];
+    }
+    throw TkUtil::Exception("L'entité doit être dimension 2 : " + ge->getName());
+}
+/*----------------------------------------------------------------------------*/
+TopoDS_Shape GeomSectionImplementation::
+checkVolume(GeomEntity* ge) const
+{
+    if (ge->getDim() == 3) {
+        Volume* v = dynamic_cast<Volume*>(ge);
+        return v->getOCCShape();
+    }
+    throw TkUtil::Exception("L'entité doit être de dimension 3 : " + ge->getName());
+}
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom
 /*----------------------------------------------------------------------------*/

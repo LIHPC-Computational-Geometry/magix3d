@@ -94,6 +94,9 @@ protected:
     bool isOnPlane(Curve *c);
     bool isOnPlane(Utils::Math::Point& p);
     Utils::Math::Plane* m_plane;
+
+    void getUniqueOCCShape(GeomEntity* ge, TopoDS_Shape& sh) const;
+
 private:
 
     /** Entités qui vont être modifiées par l'algorithme. Purement technique pour

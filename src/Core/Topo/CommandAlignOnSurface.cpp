@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 #include "Topo/CommandAlignOnSurface.h"
 #include "Geom/IntersectionSurfaceLine.h"
+#include "Geom/Surface.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/MemoryError.h>
@@ -51,7 +52,8 @@ void CommandAlignOnSurface::internalExecute() {
 
         m_dir = *new Vector(m_pnt1,m_pnt2);
 
-        Geom::IntersectionSurfaceLine intersector(m_surface,m_pnt1, m_dir);
+        Geom::Surface* s = dynamic_cast<Geom::Surface*>(m_surface);
+        Geom::IntersectionSurfaceLine intersector(s, m_pnt1, m_dir);
         intersector.perform();
         int nbPnt = intersector.getNbPnt();
         if(nbPnt != 1){
