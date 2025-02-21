@@ -45,7 +45,7 @@
 
 #include "Group/Group2D.h"
 /*----------------------------------------------------------------------------*/
-#include "TkUtil/Exception.h"
+#include <TkUtil/Exception.h>
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/NumericConversions.h>

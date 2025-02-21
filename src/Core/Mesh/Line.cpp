@@ -17,8 +17,8 @@
 #include "Utils/SerializedRepresentation.h"
 #include "Internal/InfoCommand.h"
 
-#include "TkUtil/Exception.h"
-#include "TkUtil/InternalError.h"
+#include <TkUtil/Exception.h>
+#include <TkUtil/InternalError.h>
 #include <TkUtil/NumericConversions.h>
 #include <TkUtil/MemoryError.h>
 #include <memory>           // unique_ptr

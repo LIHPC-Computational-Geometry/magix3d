@@ -8,7 +8,7 @@
 /*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
 #include "Utils/Common.h"
-#include <Geom/CommandExportSTEP.h>
+#include "Geom/CommandExportSTEP.h"
 #include "Geom/GeomManager.h"
 #include "Geom/ExportSTEPImplementation.h"
 /*----------------------------------------------------------------------------*/

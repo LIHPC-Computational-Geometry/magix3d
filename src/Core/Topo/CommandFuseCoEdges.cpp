@@ -7,11 +7,11 @@
  *  \date 31 mai 2012
  */
 /*----------------------------------------------------------------------------*/
-#include <Topo/CommandFuseCoEdges.h>
 #include "Internal/Context.h"
 #include "Topo/CoEdge.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Topo/TopoHelper.h"
+#include "Topo/CommandFuseCoEdges.h"
 #include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>

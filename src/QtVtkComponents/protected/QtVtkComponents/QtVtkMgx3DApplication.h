@@ -6,12 +6,12 @@
 #ifndef QT_VTK_MGX3D_APPLICATION_H
 #define QT_VTK_MGX3D_APPLICATION_H
 
+#include "QtComponents/QtMgx3DApplication.h"
+
 #include <PrefsCore/BoolNamedValue.h>
 #include <PrefsCore/DoubleNamedValue.h>
 #include <PrefsCore/UnsignedLongNamedValue.h>
 #include <TkUtil/Log.h>
-
-#include <QtComponents/QtMgx3DApplication.h>
 
 
 namespace Mgx3D 

@@ -26,7 +26,7 @@
 
 #include "Mesh/CommandCreateMesh.h"
 #include "Mesh/MeshImplementation.h"
-#include <Mesh/MeshItf.h>
+#include "Mesh/MeshItf.h"
 
 #include "Utils/Common.h"
 #include "Utils/Point.h"
@@ -46,7 +46,7 @@
 
 #include "Group/Group1D.h"
 /*----------------------------------------------------------------------------*/
-#include "TkUtil/Exception.h"
+#include <TkUtil/Exception.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/NumericConversions.h>

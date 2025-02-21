@@ -10,13 +10,13 @@
 #include "QtVtkComponents/QtVtkMgx3DApplication.h"
 #include "QtVtkComponents/VTKConfiguration.h"
 
-#include <Utils/Common.h>
+#include "Utils/Common.h"
 
 #include <QtVtk/QtVtk.h>
 #ifdef USE_EXPERIMENTAL_ROOM
-#include <ExperimentalRoom/ExperimentalRoom.h>
-#include <ExperimentalRoom/ExperimentalRoomDistribution.h>
-#include <ExperimentalRoom/QtVtkExperimentalRoomPanel.h>
+#include "ExperimentalRoom/ExperimentalRoom.h"
+#include "ExperimentalRoom/ExperimentalRoomDistribution.h"
+#include "ExperimentalRoom/QtVtkExperimentalRoomPanel.h"
 #endif	// USE_EXPERIMENTAL_ROOM
 #include <QSurfaceFormat>
 #include <PrefsCore/PreferencesHelper.h>

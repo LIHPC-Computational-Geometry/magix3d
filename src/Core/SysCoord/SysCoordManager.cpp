@@ -13,13 +13,14 @@
 #include "Utils/MgxException.h"
 #include "Utils/Vector.h"
 #include "Utils/Rotation.h"
-#include <SysCoord/SysCoordManager.h>
-#include <SysCoord/CommandNewSysCoord.h>
-#include <SysCoord/CommandDuplicateSysCoord.h>
-#include <SysCoord/CommandTranslateSysCoord.h>
-#include <SysCoord/CommandRotateSysCoord.h>
+#include "SysCoord/SysCoordManager.h"
+#include "SysCoord/CommandNewSysCoord.h"
+#include "SysCoord/CommandDuplicateSysCoord.h"
+#include "SysCoord/CommandTranslateSysCoord.h"
+#include "SysCoord/CommandRotateSysCoord.h"
 #include "Internal/M3DCommandResult.h"
 #include "Internal/CommandComposite.h"
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

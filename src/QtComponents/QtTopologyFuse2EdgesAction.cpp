@@ -6,12 +6,13 @@
 
 #include "Internal/ContextIfc.h"
 
-#include <QtComponents/QtTopologyFuse2EdgesAction.h>
-#include "Utils/Common.h"
-#include <QtUtil/QtErrorManagement.h>
+#include "QtComponents/QtTopologyFuse2EdgesAction.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
+#include "Utils/Common.h"
+
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>
+#include <QtUtil/QtErrorManagement.h>
 #include <QtUtil/QtConfiguration.h>
 
 

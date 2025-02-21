@@ -22,7 +22,7 @@
 #include "Geom/EntityFactory.h"
 #include "Utils/MgxNumeric.h"
 /*----------------------------------------------------------------------------*/
-#include "TkUtil/Exception.h"
+#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
 #include <TopoDS.hxx>

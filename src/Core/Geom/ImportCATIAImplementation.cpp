@@ -31,8 +31,8 @@
 
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
+#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
-#include "TkUtil/Exception.h"
 #include <mgx_config.h>
 /*----------------------------------------------------------------------------*/
 #ifdef USE_DKOC

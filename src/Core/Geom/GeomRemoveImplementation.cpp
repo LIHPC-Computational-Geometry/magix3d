@@ -7,10 +7,10 @@
  */
 /*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
-#include <Geom/GeomRemoveImplementation.h>
+#include "Geom/GeomRemoveImplementation.h"
 #include "Geom/EntityFactory.h"
 /*----------------------------------------------------------------------------*/
-#include "TkUtil/Exception.h"
+#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 #include <set>
 /*----------------------------------------------------------------------------*/

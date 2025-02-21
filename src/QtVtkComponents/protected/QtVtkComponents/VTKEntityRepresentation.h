@@ -8,8 +8,8 @@
 
 #include "QtVtkComponents/VTKMgx3DActor.h"
 #include "QtVtkComponents/VTKRenderingManager.h"
-
-#include <QtComponents/RenderedEntityRepresentation.h>
+#include "QtComponents/RenderedEntityRepresentation.h"
+#include "VtkComponents/vtkUnstructuredGridRefinementFilter.h"
 
 #include <vtkActor2D.h>
 #include <vtkArrowSource.h>
@@ -21,7 +21,6 @@
 #include <vtkTextActor.h>
 #include <vtkSelectVisiblePoints.h>
 #include <vtkUnstructuredGrid.h>
-#include <VtkComponents/vtkUnstructuredGridRefinementFilter.h>
 
 #include <vector>
 

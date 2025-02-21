@@ -20,7 +20,7 @@
 #include "Geom/OCCGeomRepresentation.h"
 #include "Geom/EntityFactory.h"
 /*----------------------------------------------------------------------------*/
-#include "TkUtil/Exception.h"
+#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Face.hxx>

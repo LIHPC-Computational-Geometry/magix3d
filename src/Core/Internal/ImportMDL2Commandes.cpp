@@ -9,9 +9,10 @@
  */
 /*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
+#include "Internal/M3DCommandResult.h"
+#include "Internal/ImportMDL2Commandes.h"
 #include "Geom/GeomManager.h"
 #include "Geom/OCCGeomRepresentation.h"
-#include "Internal/ImportMDL2Commandes.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomHelper.h"
 #include "Topo/EdgeMeshingPropertyGeometric.h"
@@ -27,14 +28,14 @@
 #include "Group/Group2D.h"
 #include "Group/Group1D.h"
 #include "Group/Group0D.h"
-#include "Internal/M3DCommandResult.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
+#include <TkUtil/MemoryError.h>
+/*----------------------------------------------------------------------------*/
 #include <sstream>
 #include <iostream>
-#include "TkUtil/MemoryError.h"
 /*----------------------------------------------------------------------------*/
 //#define _DEBUG_MDL
 /*----------------------------------------------------------------------------*/

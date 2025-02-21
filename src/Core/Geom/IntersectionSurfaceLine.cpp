@@ -7,7 +7,7 @@
 #include "Geom/IntersectionSurfaceLine.h"
 #include "Geom/Surface.h"
 #include "Geom/Vertex.h"
-#include <Geom/GeomModificationBaseClass.h>
+#include "Geom/GeomModificationBaseClass.h"
 /*----------------------------------------------------------------------------*/
 #include <gp_Lin.hxx>
 #include <TopoDS.hxx>

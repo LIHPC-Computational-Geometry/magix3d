@@ -2,7 +2,7 @@
 #define VTK_MGX3D_ACTOR_H
 
 
-#include <Utils/DisplayRepresentation.h>
+#include "Utils/DisplayRepresentation.h"
 
 #include <vtkLODActor.h>
 

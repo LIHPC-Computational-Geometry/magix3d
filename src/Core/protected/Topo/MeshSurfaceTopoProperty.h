@@ -10,7 +10,7 @@
 #define MESH_SURFACE_TOPO_PROPERTY_H_
 /*----------------------------------------------------------------------------*/
 #include "Utils/Container.h"
-#include "TkUtil/Exception.h"
+#include <TkUtil/Exception.h>
 #include <sys/types.h>
 #include <vector>
 #include <list>

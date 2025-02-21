@@ -9,8 +9,8 @@
 
 #include <TkUtil/util_config.h>
 
-#include <QtComponents/QtMgx3DEntityPanel.h>
-#include <Internal/ContextIfc.h>
+#include "QtComponents/QtMgx3DEntityPanel.h"
+#include "Internal/ContextIfc.h"
 
 #include <QtUtil/QtDoubleTextField.h>
 

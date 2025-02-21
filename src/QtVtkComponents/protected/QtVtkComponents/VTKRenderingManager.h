@@ -7,11 +7,12 @@
 #define VTK_RENDERING_MANAGER_H
 
 
-#include <QtVtkComponents/vtkMgx3DInteractorStyle.h>
+#include "QtVtkComponents/vtkMgx3DInteractorStyle.h"
 #include "QtVtkComponents/VTKMgx3DPicker.h"
 #include "QtVtkComponents/VTKMgx3DPickerCommand.h"
 #include "QtVtkComponents/VTKMgx3DSelectionManager.h"
-#include <QtComponents/Qt3DGraphicalWidget.h>
+#include "QtComponents/Qt3DGraphicalWidget.h"
+
 #include <QtVtk/QtVtkGraphicWidget.h>
 #include <VtkContrib/vtkConstrainedPointWidget.h>
 #include <VtkContrib/vtkConstrainedPointWidget2.h>

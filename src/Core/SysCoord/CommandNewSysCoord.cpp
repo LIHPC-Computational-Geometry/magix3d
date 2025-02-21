@@ -12,9 +12,9 @@
 #include "Internal/InfoCommand.h"
 #include "Internal/Context.h"
 #include "Group/Group3D.h"
-#include <SysCoord/CommandNewSysCoord.h>
-#include <SysCoord/SysCoordManager.h>
-#include <SysCoord/SysCoordDisplayRepresentation.h>
+#include "SysCoord/CommandNewSysCoord.h"
+#include "SysCoord/SysCoordManager.h"
+#include "SysCoord/SysCoordDisplayRepresentation.h"
 
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>

@@ -101,6 +101,11 @@
 #include "QtComponents/QtTopologyMirrorAction.h"
 #include "QtComponents/QtTopologyUnrefineBlockAction.h"
 #include "QtComponents/QtTopoInformationOperationAction.h"
+#include "QtComponents/QtTopologyFuse2EdgesAction.h"
+#include "QtComponents/QtTopologyFuse2FacesAction.h"
+#include "QtComponents/QtTopologyFuse2VerticesAction.h"
+#include "QtComponents/QtTopologyDegenerateBlockAction.h"
+#include "QtComponents/QtTopologyFuseEdgesAction.h"
 // Les opérations maillages :
 #include "QtComponents/QtGroupProjectionOnPlaneAction.h"
 #include "QtComponents/QtMeshSubVolumeBetweenSheetsAction.h"
@@ -178,13 +183,6 @@
 #include <mesquite_version.h>	// MSQ_VERSION_STRING
 
 #include <xercesc/util/XercesVersion.hpp>
-#include <QtComponents/QtTopologyFuse2EdgesAction.h>
-#include <QtComponents/QtTopologyFuse2FacesAction.h>
-#include <QtComponents/QtTopologyFuse2VerticesAction.h>
-#include <QtComponents/QtTopologyDegenerateBlockAction.h>
-#include <QtComponents/QtTopologyFuseEdgesAction.h>
-
-
 
 #include <Standard_Version.hxx> // OCC
 

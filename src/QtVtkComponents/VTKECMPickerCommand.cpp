@@ -3,7 +3,7 @@
 #include "QtVtkComponents/VTKECMPickerCommand.h"
 #include "QtVtkComponents/vtkCustomizableInteractorStyleTrackball.h"
 
-#include <Utils/Common.h>
+#include "Utils/Common.h"
 
 #include <TkUtil/Exception.h>
 #include <TkUtil/ErrorLog.h>

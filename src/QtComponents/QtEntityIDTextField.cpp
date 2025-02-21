@@ -9,7 +9,7 @@
 #include "QtComponents/QtEntityIDTextField.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 
-#include <Utils/Common.h>
+#include "Utils/Common.h"
 
 #include <TkUtil/Exception.h>
 #include <TkUtil/MemoryError.h>

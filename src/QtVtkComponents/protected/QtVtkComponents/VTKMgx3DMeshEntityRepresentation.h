@@ -8,7 +8,7 @@
 
 #include "QtVtkComponents/VTKMgx3DEntityRepresentation.h"
 
-#include <Mesh/MeshEntity.h>
+#include "Mesh/MeshEntity.h"
 
 
 namespace Mgx3D 

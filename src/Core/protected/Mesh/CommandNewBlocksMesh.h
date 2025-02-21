@@ -11,7 +11,8 @@
 #define COMMANDNEWBLOCKSMESH_H_
 /*----------------------------------------------------------------------------*/
 #include "Mesh/CommandCreateMesh.h"
-#include <Utils/MgxThreadedTaskManager.h>
+#include "Utils/MgxThreadedTaskManager.h"
+/*----------------------------------------------------------------------------*/
 #include <vector>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
