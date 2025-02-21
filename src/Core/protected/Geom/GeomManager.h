@@ -620,44 +620,6 @@ public:
                 std::string groupName="");
 
     /*------------------------------------------------------------------------*/
-    /** \brief création d'un prisme à partir d'une surface et d'un vecteur de
-     *          direction
-     *
-     *	  OBSOLETE: du fait d'un plantage non résolu lors du undo-redo
-     *	            et du fait que cela n'agisse que sur une unique surface
-     *     =>   utiliser  makeExtrude*
-     *
-     *  \param base la surface à extruder
-     *  \param dp   le vecteur d'extrusion
-     *  \param groupName optionnellement un nom de groupe
-     */
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
-    newPrism(std::string base,
-    		const Vector& dp,
-    		std::string groupName="");
-
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
-    newPrism(GeomEntity* base,
-    		const Vector& dp,
-    		std::string groupName="");
-
-    /** \brief création d'un prisme à partir d'une surface et d'un vecteur de
-     *          direction, extrusion de la topologie avec
-     *
-     *  \param base la surface à extruder
-     *  \param dp   le vecteur d'extrusion
-     *  \param groupName optionnellement un nom de groupe
-     */
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
-		newPrismWithTopo(std::string base, const Vector& dp,
-                          std::string groupName="");
-
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
-    newPrismWithTopo(GeomEntity* base,
-    		const Vector& dp,
-    		std::string groupName="");
-
-    /*------------------------------------------------------------------------*/
     /** \brief création d'un cone suivant un axe, avec deux rayons
      *         et une longueur
      *

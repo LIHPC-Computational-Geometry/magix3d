@@ -469,9 +469,6 @@ def Surface(modele, groupe=None, zones=None, zone=None):
 
 def Shape():
     print ("Shape A FAIRE ???")
-    
-def Extrude(s, vec, coeff = 1):
-    return getStdContext().getGeomManager().newPrism(s.getSurface(), vec, "")
 
 def Rev(s):
     return getStdContext().getGeomManager().makeRevol(s.getSurface(), RotX(360), False)
@@ -591,11 +588,6 @@ public:
     Mgx3D::Internal::M3DCommandResultIfc* __mul__(double factor) {
         std::vector<std::string> vols = $self->getVolumes();
         return Mgx3D::getStdContext()->getGeomManager().scale(vols, factor);
-    }
-    
-    // Extrude
-    Mgx3D::Internal::M3DCommandResultIfc* Extrude (Mgx3D::Utils::Math::Vector* vec, int coeff=1) {
-        return Mgx3D::getStdContext()->getGeomManager().newPrism($self->getSurface(), *vec, "");
     }
     
     // Rev

@@ -179,31 +179,6 @@ public:
 	SET_SWIG_COMPLETABLE_METHOD(newSegment)
 
     /*------------------------------------------------------------------------*/
-    /** \brief création d'un prisme à partir d'une surface et d'un vecteur de
-     *          direction
-     *
-     *  \param base la surface à extruder
-     *  \param dp   le vecteur d'extrusion
-     *  \param groupName optionnellement un nom de groupe
-     */
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
-		newPrism(std::string base, const Vector& dp,
-                          std::string groupName="");
-	SET_SWIG_COMPLETABLE_METHOD(newPrism)
-
-    /** \brief création d'un prisme à partir d'une surface et d'un vecteur de
-     *          direction, extrusion de la topologie avec
-     *
-     *  \param base la surface à extruder
-     *  \param dp   le vecteur d'extrusion
-     *  \param groupName optionnellement un nom de groupe
-     */
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
-		newPrismWithTopo(std::string base, const Vector& dp,
-                          std::string groupName="");
-	SET_SWIG_COMPLETABLE_METHOD(newPrismWithTopo)
-
-    /*------------------------------------------------------------------------*/
     /** \brief création d'un cone suivant un axe, avec deux rayons
      *         un vecteur et un angle
      *

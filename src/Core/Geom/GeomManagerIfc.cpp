@@ -106,18 +106,6 @@ Internal::M3DCommandResultIfc* GeomManagerIfc::newSegment(std::string n1,std::st
 	throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::newSegment should be overloaded.", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManagerIfc::newPrism(std::string base, const Vector& v,
-                              std::string groupName)
-{
-    throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::newPrism should be overloaded.", TkUtil::Charset::UTF_8));
-}
-/*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManagerIfc::newPrismWithTopo(std::string base, const Vector& v,
-                              std::string groupName)
-{
-    throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::newPrismWithTopo should be overloaded.", TkUtil::Charset::UTF_8));
-}
-/*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc*
 GeomManagerIfc::newCone(const double& dr1, const double& dr2,
 		const Vector& dv, const double& da, std::string groupName)

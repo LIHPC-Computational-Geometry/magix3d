@@ -909,16 +909,6 @@ création d'une surface planaire à partir d'un ensemble de courbes
 curves : le nom des courbes définissant le contour 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::newPrism "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newPrism(std::string base, const Vector &dp, std::string groupName=\"\")
-
-création d'un prisme à partir d'une surface et d'un vecteur de direction 
-
-base : la surface à extruder 
-dp : le vecteur d'extrusion 
-groupName : optionnellement un nom de groupe 
-
-";
 %feature("docstring") Mgx3D::Geom::GeomManagerIfc::newSegment "
 virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newSegment(std::string n1, std::string n2, std::string groupName=\"\")
 

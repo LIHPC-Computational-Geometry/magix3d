@@ -33,7 +33,6 @@
 #include "Geom/CommandNewBox.h"
 #include "Geom/CommandNewCylinder.h"
 #include "Geom/CommandNewCone.h"
-#include "Geom/CommandNewPrism.h"
 #include "Geom/CommandGeomCopy.h"
 #include "Geom/CommandNewCircle.h"
 #include "Geom/CommandNewEllipse.h"
@@ -2427,76 +2426,6 @@ newBSpline(Vertex* vtx1,
 
 	Internal::M3DCommandResultIfc*	cmdResult	=
 			new Internal::M3DCommandResult (*command);
-	return cmdResult;
-}
-/*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
-newPrism(std::string name, const Utils::Math::Vector& dv, std::string groupName)
-{
-    return newPrism(getEntity(name),dv, groupName);
-}
-/*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
-newPrismWithTopo(std::string name, const Utils::Math::Vector& dv, std::string groupName)
-{
-    return newPrismWithTopo(getEntity(name),dv, groupName);
-}
-/*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
-newPrism(GeomEntity* base, const Utils::Math::Vector& dv, std::string groupName)
-{
-    TkUtil::UTF8String   warning (TkUtil::Charset::UTF_8);
-    warning <<"La fonction newPrism est obsolete, il est préférable d'utiliser makeExtrude";
-    log (TkUtil::TraceLog (warning, TkUtil::Log::WARNING));
-
-    TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-    message << "GeomManager::newPrism("<<base->getName()<<", "<<dv;
-    if (!groupName.empty())
-        message<<", "<<groupName;
-    message<<")";
-    log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
-
-    Internal::CommandInternal* command = new CommandNewPrism(getLocalContext(), base, dv,groupName);
-
-    // trace dans le script
-    TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().newPrism (\""<<base->getName()<<"\", "
-                             <<dv.getScriptCommand();
-    if (!groupName.empty())
-        cmd<<", \""<<groupName<<"\"";
-    cmd<<")";
-    command->setScriptCommand(cmd);
-
-    getCommandManager().addCommand(command, Utils::Command::DO);
-
-	Internal::M3DCommandResultIfc*	cmdResult	=
-									new Internal::M3DCommandResult (*command);
-	return cmdResult;
-}
-/*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
-newPrismWithTopo(GeomEntity* base, const Utils::Math::Vector& dv, std::string groupName)
-{
-    TkUtil::UTF8String   warning (TkUtil::Charset::UTF_8);
-    warning <<"La fonction newPrismWithTopo est obsolete, il est faut utiliser makeBlocksByExtrude";
-    log (TkUtil::TraceLog (warning, TkUtil::Log::ERROR));
-
-    Internal::CommandComposite* command =
-                 new Internal::CommandComposite(getLocalContext(), "[OBSOLETE] Création d'un prisme avec topologie [OBSOLETE]");
-
-    // trace dans le script
-    TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().newPrismWithTopo (\""<<base->getName()<<"\", "
-                             <<dv.getScriptCommand();
-    if (!groupName.empty())
-        cmd<<", \""<<groupName<<"\"";
-    cmd<<")";
-    command->setScriptCommand(cmd);
-
-    getCommandManager().addCommand(command, Utils::Command::DO);
-
-	Internal::M3DCommandResultIfc*	cmdResult	=
-									new Internal::M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
