@@ -110,6 +110,12 @@ Pour alléger l’écriture, nous utilisons les alias Python suivants:
     gm.newSpherePartWithTopo
 
 .. code-block:: python
+    :caption: :ref:`creation-prisme` 
+
+    gm.makeExtrude
+    gm.makeBlocksByExtrude
+
+.. code-block:: python
     :caption: :ref:`creation-volume`
 
     gm.newVolume
