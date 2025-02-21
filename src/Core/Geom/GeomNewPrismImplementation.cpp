@@ -17,7 +17,6 @@
 #include "Geom/PropertyPrism.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
-#include "Geom/OCCGeomRepresentation.h"
 #include "Geom/EntityFactory.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
@@ -68,8 +67,6 @@ void GeomNewPrismImplementation::prePerform()
 /*----------------------------------------------------------------------------*/
 void GeomNewPrismImplementation::perform(std::vector<GeomEntity*>& res)
 {
-    OCCGeomRepresentation* rep =0;
-
     GeomEntity* base = m_prop->getBase();
 
     TopoDS_Shape sh;

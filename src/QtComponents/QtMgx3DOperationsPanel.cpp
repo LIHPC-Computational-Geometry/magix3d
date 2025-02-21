@@ -624,7 +624,7 @@ void QtMgx3DOperationPanel::operationCompleted ( )
 }	// QtMgx3DOperationPanel::operationCompleted
 
 
-void QtMgx3DOperationPanel::log (const Log& log)
+void QtMgx3DOperationPanel::log (const TkUtil::Log& log)
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
 	getContext ( ).getLogDispatcher ( ).log (log);
@@ -2007,7 +2007,7 @@ void QtMgx3DOperationsPanel::setLogStream (LogOutputStream* stream)
 }	// QtMgx3DOperationsPanel::setLogStream
 
 
-void QtMgx3DOperationsPanel::log (const Log& log)
+void QtMgx3DOperationsPanel::log (const TkUtil::Log& log)
 {
 	if (0 != _logStream)
 		_logStream->log (log);

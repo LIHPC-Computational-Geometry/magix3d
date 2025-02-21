@@ -18,7 +18,6 @@
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
-#include "Geom/OCCGeomRepresentation.h"
 
 #include "Group/GroupManager.h"
 #include "Group/Group3D.h"

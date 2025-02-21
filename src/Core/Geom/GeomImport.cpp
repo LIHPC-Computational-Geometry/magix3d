@@ -13,8 +13,8 @@
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
-#include "Geom/OCCGeomRepresentation.h"
 #include "Geom/EntityFactory.h"
+#include "Geom/OCCHelper.h"
 
 #include "Group/GroupManager.h"
 #include "Group/Group3D.h"
@@ -180,7 +180,6 @@ void GeomImport::perform(std::vector<GeomEntity*>& res)
             for (; ex.More(); ex.Next())
             {
                 TopoDS_Shape sh =ex.Current();
-                //            sh = OCCGeomRepresentation::cleanShape(sh);
                 TopoDS_Wire aWire= TopoDS::Wire(sh);
 				TkUtil::UTF8String	name (TkUtil::Charset::UTF_8);
                 name << m_shortfilename << "-wire-" << TkUtil::setw (2) << id_wire++;
@@ -190,7 +189,6 @@ void GeomImport::perform(std::vector<GeomEntity*>& res)
             for (; ex.More(); ex.Next()) {
 
                 TopoDS_Shape sh =ex.Current();
-                //            sh = OCCGeomRepresentation::cleanShape(sh);
                 TopoDS_Edge e= TopoDS::Edge(sh);
 				TkUtil::UTF8String	name (TkUtil::Charset::UTF_8);
                 name << m_shortfilename << "-edge-" << TkUtil::setw (2) << id_edge++;
@@ -199,7 +197,6 @@ void GeomImport::perform(std::vector<GeomEntity*>& res)
             ex.Init(current_shape, TopAbs_VERTEX, TopAbs_EDGE);
             for (; ex.More(); ex.Next()) {
                 TopoDS_Shape sh =ex.Current();
-                //            sh = OCCGeomRepresentation::cleanShape(sh);
                 TopoDS_Vertex v = TopoDS::Vertex(sh);
 				TkUtil::UTF8String	name (TkUtil::Charset::UTF_8);
                 name << m_shortfilename << "-vertex-" << TkUtil::setw (2) << id_vertex++;
@@ -411,11 +408,10 @@ splitManyCurves(std::vector<Curve*>& curvs, std::vector<Vertex*>& verts)
 
 	for (uint i=0; i<curvs.size(); i++){
         // les courbes viennent d'être créées avec une seule arête
-		GeomRepresentation* rep = curvs[i]->getComputationalProperties()[0];
-		OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(rep);
+		TopoDS_Shape s = curvs[i]->getOCCShapes()[0];
 		std::vector<TopoDS_Vertex> vtx;
 		TopExp_Explorer e;
-		for(e.Init(occ_rep->getShape(), TopAbs_VERTEX); e.More(); e.Next()){
+		for(e.Init(s, TopAbs_VERTEX); e.More(); e.Next()){
 			TopoDS_Vertex V = TopoDS::Vertex(e.Current());
 			vtx.push_back(V);
 		}
@@ -440,7 +436,7 @@ splitManyCurves(std::vector<Curve*>& curvs, std::vector<Vertex*>& verts)
 			// il faut trouver le sommet commun avec le premier et permuter l'ordre
 			// des 2 premiers si nécessaire
 			 bool perm=false;
-			 if (OCCGeomRepresentation::areEquals(all_vtx[0],vtx[0]) || OCCGeomRepresentation::areEquals(all_vtx[0],vtx[1])){
+			 if (OCCHelper::areEquals(all_vtx[0],vtx[0]) || OCCHelper::areEquals(all_vtx[0],vtx[1])){
 				 TopoDS_Vertex V = all_vtx[0];
 				 all_vtx[0] = all_vtx[1];
 				 all_vtx[1] = V;
@@ -456,9 +452,9 @@ splitManyCurves(std::vector<Curve*>& curvs, std::vector<Vertex*>& verts)
 			verts.back()->add(curvs[i]);
 
 			uint j=2;
-			if (OCCGeomRepresentation::areEquals(all_vtx.back(),vtx[0]))
+			if (OCCHelper::areEquals(all_vtx.back(),vtx[0]))
 				j=1;
-			if (OCCGeomRepresentation::areEquals(all_vtx.back(),vtx[1]))
+			if (OCCHelper::areEquals(all_vtx.back(),vtx[1]))
 				j=0;
 			if (j==2)
 				throw TkUtil::Exception("La courbe (composée initialement) n'a pas de sommets communs entre 2 composantes");
@@ -466,7 +462,7 @@ splitManyCurves(std::vector<Curve*>& curvs, std::vector<Vertex*>& verts)
 			bool add_vtx = true;
 			if (i==curvs.size()-1){
 				// cas où cela boucle
-				if (OCCGeomRepresentation::areEquals(all_vtx.front(),vtx[j]))
+				if (OCCHelper::areEquals(all_vtx.front(),vtx[j]))
 					add_vtx = false;
 			}
 

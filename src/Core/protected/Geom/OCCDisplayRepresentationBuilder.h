@@ -37,7 +37,7 @@ public:
     /** \brief  Constructeur
      */
     OCCDisplayRepresentationBuilder(const GeomEntity* entity,
-                                    TopoDS_Shape& shape,
+                                    const TopoDS_Shape& shape,
                                     GeomDisplayRepresentation* rep);
 
     /*------------------------------------------------------------------------*/
@@ -83,7 +83,7 @@ protected:
     const GeomEntity* m_entity;
 
     /* shape dont on doit construire une représentation */
-    TopoDS_Shape& m_shape;
+    const TopoDS_Shape& m_shape;
 
     /* représentation stockant les paramètre d'entrée et de sortie*/
     GeomDisplayRepresentation* m_rep;

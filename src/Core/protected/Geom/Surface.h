@@ -55,12 +55,12 @@ public:
      *  \param ctx le contexte
      *  \param prop propriété (nom ...)
      *  \param disp propriétés d'affichage
-     *  \param gprop    les propriétés associées à la surface
-     *  \param compProp les propriétés de calcul
+     *  \param gprop les propriétés associées à la surface
+     *  \param shape la shape OCC
      */
 #ifndef SWIG
     Surface(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, GeomRepresentation* compProp=0);
+            GeomProperty* gprop, TopoDS_Shape& shape);
 #endif
 
     /** \brief  Constructeur
@@ -68,12 +68,12 @@ public:
      *  \param ctx le contexte
      *  \param prop propriété (nom ...)
      *  \param disp propriétés d'affichage
-     *  \param gprop    les propriétés associées à la surface composite
-     *  \param compProp les propriétés de calcul des surfaces
+     *  \param gprop les propriétés associées à la surface composite
+     *  \param shapes les shapes OCC
      */
 #ifndef SWIG
     Surface(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, std::vector<GeomRepresentation*>& compProp);
+            GeomProperty* gprop, std::vector<TopoDS_Shape>& shapes);
 #endif
 
     /*------------------------------------------------------------------------*/

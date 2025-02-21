@@ -1165,7 +1165,12 @@ Geom::Curve* CoEdge::createBSplineByProjWithOrthogonalIntersection(Utils::Math::
 	// on va commencer par essayer de placer un point sur la surface à l'intersection entre le plan orthogonal à l'arête
 	// et cette surface.
 	// on continue ensuite comme pour createBSplineByProj en 2 parties
-
+	auto reps = surface->getOCCShapes();
+	if (reps.size() != 1) {
+		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+		message<<"createBSplineByProjWithOrthogonalIntersection impossible sur la surface composée : "<<surface->getName();
+		throw TkUtil::Exception (message);
+	}
 	Geom::Curve* curve = 0;
 
 	// création d'une courbe BSpline s'appuyant sur les points projetés
@@ -1184,9 +1189,7 @@ Geom::Curve* CoEdge::createBSplineByProjWithOrthogonalIntersection(Utils::Math::
 				gp_Dir(plane_vec.getX(), plane_vec.getY(), plane_vec.getZ()));
 		BRepBuilderAPI_MakeFace mkF(gp_plane);
 		TopoDS_Face wf = mkF.Face();
-		TopoDS_Shape shape;
-		Geom::GeomModificationBaseClass::getOCCShape(surface, shape);
-
+		TopoDS_Shape shape = reps[0];
 		BRepAlgoAPI_Section intersector(shape, wf);
 		TopoDS_Shape section_tool;
 
