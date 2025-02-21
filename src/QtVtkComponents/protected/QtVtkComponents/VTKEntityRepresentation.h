@@ -16,6 +16,7 @@
 #include <vtkDataSetMapper.h>
 #include <vtkLabeledDataMapper.h>
 #include <vtkOutlineSource.h>
+#include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkRenderer.h>
 #include <vtkTextActor.h>
@@ -119,9 +120,9 @@ class VTKEntityRepresentation : public QtComponents::RenderedEntityRepresentatio
 	/**
 	 * \return	La représentation pleine (surfacique).
 	 */
-	virtual vtkUnstructuredGrid* getSurfacicGrid ( );
+	virtual vtkPolyData* getSurfacicGrid ( );
 	virtual vtkActor* getSurfacicActor ( );
-	virtual vtkDataSetMapper* getSurfacicMapper ( );
+	virtual vtkPolyDataMapper* getSurfacicMapper ( );
 
 	/**
  * \return	La représentation pleine (volumique).
@@ -134,9 +135,9 @@ class VTKEntityRepresentation : public QtComponents::RenderedEntityRepresentatio
 	/**
 	 * \return	La représentation raffinée (ex : positionnement d'un point).
 	 */
-	virtual vtkUnstructuredGrid* getRefinedGrid ( );
+	virtual vtkPolyData* getRefinedGrid ( );
 	virtual vtkActor* getRefinedActor ( );
-	virtual vtkDataSetMapper* getRefinedMapper ( );
+	virtual vtkPolyDataMapper* getRefinedMapper ( );
 
 	//@}	// Les ressources <I>VTK</I>.
 
@@ -288,7 +289,7 @@ class VTKEntityRepresentation : public QtComponents::RenderedEntityRepresentatio
 	 */
 	//@{
 	/** Le maillage représentant l'entité en mode plein. */
-	vtkUnstructuredGrid*		_surfacicGrid;
+	vtkPolyData*				_surfacicGrid;
 
 	/** Correspondance entre points vtk et noeuds gmds. */
 	std::map<int,int>			_surfacicPointsVTK2GMDSID;
@@ -297,7 +298,7 @@ class VTKEntityRepresentation : public QtComponents::RenderedEntityRepresentatio
 	VTKMgx3DActor*				_surfacicActor;
 
 	/** Le mapper associé en mode plein. */
-	vtkDataSetMapper*		   _surfacicMapper;
+	vtkPolyDataMapper*		   _surfacicMapper;
 	//@}
 
     /**
@@ -419,7 +420,7 @@ class VTKEntityRepresentation : public QtComponents::RenderedEntityRepresentatio
 	 */
 	//@{
 	/** Le maillage représentant l'entité en mode "raffiné". */
-	vtkUnstructuredGrid*        _refinedGrid;
+	vtkPolyData*		        _refinedGrid;
 
 	/** La discretisation du maillage raffiné. */
 	vtkUnstructuredGridRefinementFilter*          _refineFilter;
@@ -428,7 +429,7 @@ class VTKEntityRepresentation : public QtComponents::RenderedEntityRepresentatio
 	VTKMgx3DActor*              _refinedActor;
 
 	/** Le mapper associé en mode plein. */
-	vtkDataSetMapper*          _refinedMapper;
+	vtkPolyDataMapper*          _refinedMapper;
 	//@}	// La représentation "raffinée".
 
 	/**
@@ -436,7 +437,7 @@ class VTKEntityRepresentation : public QtComponents::RenderedEntityRepresentatio
 	 */
 	//@{
 	vtkOutlineSource*			_outlineSource;
-	vtkActor*				_highlightActor;
+	vtkActor*					_highlightActor;
 	vtkPolyDataMapper*			_highlightMapper;
 	//@}	// La mise en évidence
 

@@ -514,6 +514,9 @@ void VTKRenderingManager::VTKConstrainedPointInteractor::setPoint (Math::Point p
 
 void VTKRenderingManager::VTKConstrainedPointInteractor::setConstraint (Entity* constraint, size_t factor)
 {
+// CP TODO
+cout << __FILE__ << ' ' << __LINE__ << " VTKRenderingManager::VTKConstrainedPointInteractor::setConstraint TO REIMPLEMENT WITH POLYDATA" << endl;
+/*
 	CHECK_NULL_PTR_ERROR (_pointWidget)
 	if ((0 != _constraintActor) && (0 != _pointWidget->GetCurrentRenderer ( )) && (false != _pointWidget->GetCurrentRenderer ( )->HasViewProp (_constraintActor)))
 		_pointWidget->GetCurrentRenderer ( )->RemoveViewProp (_constraintActor);
@@ -542,6 +545,7 @@ void VTKRenderingManager::VTKConstrainedPointInteractor::setConstraint (Entity* 
 			_pointWidget->GetCurrentRenderer ( )->AddViewProp (_constraintActor);
 		setPoint (getInitialPoint ( ));	// Positionner la "croix" du sélecteur sur l'entité de contrainte au plus près du point à déplacer 
 	}	// if (0 != _constraintActor)
+*/
 }	// VTKConstrainedPointInteractor::setConstraint
 
 

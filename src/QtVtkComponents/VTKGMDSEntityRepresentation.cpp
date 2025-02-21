@@ -132,12 +132,8 @@ void VTKGMDSEntityRepresentation::createSurfacicRepresentation()
                 meshEntity);
     } // if (0 == _surfacicGrid)
 
-    _surfacicMapper = vtkDataSetMapper::New();
-#ifndef VTK_5
+    _surfacicMapper = vtkPolyDataMapper::New();
     _surfacicMapper->SetInputData(_surfacicGrid);
-#else	// VTK_5
-    _surfacicMapper->SetInput(_surfacicGrid);
-#endif	// VTK_5
     _surfacicMapper->ScalarVisibilityOff();
 #if	VTK_MAJOR_VERSION < 8
     _surfacicMapper->SetImmediateModeRendering(!Internal::Resources::instance ( )._useDisplayList.getValue ( ));
@@ -190,11 +186,7 @@ void VTKGMDSEntityRepresentation::createVolumicRepresentation()
     if (0 == (getRepresentationMask() & CURVES)) {
         _volumicMapper = vtkDataSetMapper::New();
 
-#ifndef VTK_5
         _volumicMapper->SetInputData(_volumicGrid);
-#else	// VTK_5
-        _volumicMapper->SetInput(_volumicGrid);
-#endif	// VTK_5
         _volumicMapper->ScalarVisibilityOff();
 #if	VTK_MAJOR_VERSION < 8        
         _volumicMapper->SetImmediateModeRendering(!Internal::Resources::instance ( )._useDisplayList);
@@ -271,19 +263,11 @@ void VTKGMDSEntityRepresentation::createWireRepresentation()
     // on créé la représentation sur le volume s'il existe
     if (_volumicGrid)
     {
-#ifndef VTK_5
         edgesExtractor->SetInputData(_volumicGrid);
-#else	// VTK_5
-        edgesExtractor->SetInput(_volumicGrid);
-#endif	// VTK_5
     }
     else if (_surfacicGrid)
     {
-#ifndef VTK_5
         edgesExtractor->SetInputData(_surfacicGrid);
-#else	// VTK_5
-        edgesExtractor->SetInput(_surfacicGrid);
-#endif	// VTK_5
     }
     else
     {
@@ -294,11 +278,7 @@ void VTKGMDSEntityRepresentation::createWireRepresentation()
     }
 
     _wireMapper = vtkDataSetMapper::New();
-#ifndef VTK_5
     _wireMapper->SetInputConnection (edgesExtractor->GetOutputPort ( ));
-#else	// VTK_5
-    _wireMapper->SetInput(edgesExtractor->GetOutput());
-#endif	// VTK_5
     _wireMapper->ScalarVisibilityOff();
 #if	VTK_MAJOR_VERSION < 8
     _wireMapper->SetImmediateModeRendering(!Internal::Resources::instance ( )._useDisplayList);
@@ -384,11 +364,7 @@ void VTKGMDSEntityRepresentation::createMeshEntityCloudRepresentation(
     {
         _cloudGrid = vtkUnstructuredGrid::New();
         _cloudMapper = vtkDataSetMapper::New();
-#ifndef VTK_5
         _cloudMapper->SetInputData(_cloudGrid);
-#else	// VTK_5
-        _cloudMapper->SetInput(_cloudGrid);
-#endif	// VTK_5
         _cloudMapper->ScalarVisibilityOff();
 #if	VTK_MAJOR_VERSION < 8
         _cloudMapper->SetImmediateModeRendering(!Internal::Resources::instance ( )._useDisplayList);
@@ -695,7 +671,7 @@ void VTKGMDSEntityRepresentation::createMeshEntitySurfacicRepresentation(
             << meshEntity->getName();
     getEntity()->log(TkUtil::TraceLog(message1, TkUtil::Log::TRACE_5));
 
-    _surfacicGrid = vtkUnstructuredGrid::New();
+    _surfacicGrid = vtkPolyData::New();
     CHECK_NULL_PTR_ERROR(_surfacicGrid)
     _surfacicGrid->Initialize();
 
@@ -823,6 +799,8 @@ createMeshEntitySurfacicRepresentation3D(Mesh::MeshEntity* meshEntity, gmds::Mes
 void VTKGMDSEntityRepresentation::
 createCoFacesSurfacicRepresentationRatio1(std::vector<Topo::CoFace*> cofaces, gmds::Mesh& gmdsMesh)
 {
+cout << __FILE__ << ' ' << __LINE__ << " VTKGMDSEntityRepresentation::createCoFacesSurfacicRepresentationRatio1 TO REIMPLEMENT AS POLYDATA" << endl;
+/*
 #ifdef _DEBUG_VTKGMDSEntityRepresentation
 	std::cout<<"cas ratio 1"<<std::endl;
 #endif
@@ -917,12 +895,15 @@ createCoFacesSurfacicRepresentationRatio1(std::vector<Topo::CoFace*> cofaces, gm
 	cellArray = 0;
 	points->Delete ( );
 	points	= 0;
-
+*/
 } // createCoFacesSurfacicRepresentationRatio1
 
 void VTKGMDSEntityRepresentation::
 createCoFacesSurfacicRepresentationRatioN(std::vector<Topo::CoFace*> cofaces, gmds::Mesh& gmdsMesh, int ratio_degrad)
 {
+// CP TODO
+cout << __FILE__ << ' ' << __LINE__ << " VTKGMDSEntityRepresentation::createCoFacesSurfacicRepresentationRatioN TO REIMPLEMENT AS POLYDATA" << endl;
+/*
 #ifdef _DEBUG_VTKGMDSEntityRepresentation
 	std::cout<<"cas ratio "<<ratio_degrad<<std::endl;
 #endif
@@ -1080,7 +1061,7 @@ createCoFacesSurfacicRepresentationRatioN(std::vector<Topo::CoFace*> cofaces, gm
 	idsArray = 0;
 	cellArray->Delete();
 	cellArray = 0;
-
+*/
 } // createCoFacesSurfacicRepresentationRatioN
 
 

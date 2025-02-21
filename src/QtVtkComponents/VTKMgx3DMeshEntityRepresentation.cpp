@@ -162,11 +162,7 @@ void VTKMgx3DMeshEntityRepresentation::createVolumicRepresentation (
 
 	_volumicGrid	= vtkUnstructuredGrid::New ( );
 	_volumicMapper	= vtkDataSetMapper::New ( );
-#ifndef VTK_5
 	_volumicMapper->SetInputData (_volumicGrid);
-#else	// VTK_5
-	_volumicMapper->SetInput (_volumicGrid);
-#endif	// VTK_5
 	_volumicMapper->ScalarVisibilityOff ( );
 #if	VTK_MAJOR_VERSION < 8
 	_volumicMapper->SetImmediateModeRendering (!Internal::Resources::instance ( )._useDisplayList);
@@ -250,6 +246,9 @@ void VTKMgx3DMeshEntityRepresentation::createVolumicRepresentation (
 
 void VTKMgx3DMeshEntityRepresentation::createWireRepresentation ( )
 {
+// CP TODO
+cout << __FILE__ << ' ' << __LINE__ << " VTKMgx3DMeshEntityRepresentation::createWireRepresentation TO REIMPLEMENT AS POLYDATA" << endl;
+/*
 	if ((0 != _wireGrid) || (0 != _wireMapper) || (0 != _wireActor))
 	{
 		INTERNAL_ERROR (exc, "Représentation déjà créée.",
@@ -313,6 +312,7 @@ void VTKMgx3DMeshEntityRepresentation::createWireRepresentation ( )
 	_wireActor->SetMapper (_wireMapper);
 	actor->SetVisibility (!hideGrid);
 	edgesExtractor->Delete ( );		edgesExtractor	= 0;
+*/
 }	// VTKMgx3DMeshEntityRepresentation::createWireRepresentation
 
 

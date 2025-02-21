@@ -196,28 +196,6 @@ void VTKEntityRepresentation::show (VTKRenderingManager& renderingManager, bool 
 		// Pour les processus fils MPI du mode standalone/parallèle :
 		if (0 != e)
 			e->getDisplayProperties ( ).setDisplayed (false);
-/*
-		// Si _highlightActor est non nul on garde le renderer pour pouvoir
-		// mettre fin au highlighting ultérieurement.
-		if (0 == _highlightActor)
-			_renderer			= 0;
-		if (0 != _volumicActor)
-			renderer.RemoveViewProp (_volumicActor);
-        if (0 != _surfacicActor)
-            renderer.RemoveViewProp (_surfacicActor);
-		if (0 != _wireActor)
-			renderer.RemoveViewProp (_wireActor);
-		if (0 != _isoWireActor)
-			renderer.RemoveViewProp (_isoWireActor);
-		if (0 != _cloudActor)
-			renderer.RemoveViewProp (_cloudActor);
-		if (0 != _textualInfosActor)
-			renderer.RemoveViewProp (_textualInfosActor);
-		if (0 != _vectAssActor)
-			renderer.RemoveViewProp (_vectAssActor);
-		if (0 != _discActor)
-			renderer.RemoveViewProp (_discActor);
-*/
 	}	// else if (true == display)
 }	// VTKEntityRepresentation::show
 
@@ -485,10 +463,7 @@ void VTKEntityRepresentation::updateRepresentationProperties ( )
 	//std::cout<<"VTKEntityRepresentation::updateRepresentationProperties pour "<< getEntity()->getName()<<std::endl;
 
 	vtkProperty*				property	= 0;
-//	const DisplayProperties&	properties	=
-//									getEntity ( )->getDisplayProperties ( );
 	const DisplayProperties	properties	= getDisplayPropertiesAttributes ( );
-//	const unsigned long			mask	= getRepresentationMask ( );
 	const unsigned long			mask	= getUsedRepresentationMask ( );
 
 	// Mode nuage :
@@ -554,18 +529,18 @@ property->SetInterpolationToFlat ( );
 	}	// if (0 != property)
 
 	// Mode volumique :
-    	property    = 0 == _volumicActor ? 0 : _volumicActor->GetProperty ( );
-    	if (0 != property)
+    property    = 0 == _volumicActor ? 0 : _volumicActor->GetProperty ( );
+    if (0 != property)
    	{
 		const Color	color	= getColor (VOLUMES);
-        	property->SetColor (
+        property->SetColor (
                     color.getRed ( ) / 255., color.getGreen ( ) / 255.,
 					color.getBlue ( ) / 255.);
 		const float	lineWidth	= getLineWidth (*getEntity ( ), VOLUMES);
 		property->SetLineWidth (lineWidth);
 		property->SetOpacity (properties.getVolumicOpacity ( ));
 		property->SetRepresentationToSurface ( );
-    	}   // if (0 != property)
+    }   // if (0 != property)
 
 	// Informations textuelles :
 	vtkTextProperty*	textProperty	= 0 == _textualInfosMapper ?
@@ -602,12 +577,15 @@ property->SetInterpolationToFlat ( );
 	if (0 != _textualInfosActor)
 		_textualInfosActor->PickableOff ( );
 
+// CP TODO
+cout << __FILE__ << ' ' << __LINE__ << " VTKEntityRepresentation::updateRepresentationProperties : NODES anD CELLS VALUES TO DO" << endl;
+/*
 	// Actualisation des éventuelles valeurs (noeuds/mailles) affichées :
 	vtkUnstructuredGrid*	grid		= 0 == _surfacicGrid ? _volumicGrid : _surfacicGrid;
-	vtkDataSetMapper*	mapper		= 0 == _surfacicGrid ? _volumicMapper : _surfacicMapper;
-	vtkPoints*		points		= 0 == grid ? 0 : grid->GetPoints ( );
-	vtkPointData*		pointData	= 0 == grid ? 0 : grid->GetPointData ( );
-	vtkCellData*		cellData	= 0 == grid ? 0 : grid->GetCellData ( );
+	vtkMapper*				mapper		= 0 == _surfacicGrid ? (vtkMapper*)_volumicMapper : (vtkMapper*)_surfacicMapper;
+	vtkPoints*				points		= 0 == grid ? 0 : grid->GetPoints ( );
+	vtkPointData*			pointData	= 0 == grid ? 0 : grid->GetPointData ( );
+	vtkCellData*			cellData	= 0 == grid ? 0 : grid->GetCellData ( );
 	double			domain [2]	= { 0., 0. };
 	// CP ATTENTION : si on affiche un volume, le fait d'utiliser _surfacicGrid
 	// laisse supposer qu'on affiche la peau, donc beaucoup de noeuds et mailles
@@ -722,6 +700,7 @@ property->SetInterpolationToFlat ( );
 			}	// if (0 != mapper)
 		}	// if ((0 != cellData) && (0 != (mask & CELLS_VALUES)))
 	}	// if (0 != mapper)
+*/
 }	// VTKEntityRepresentation::updateRepresentationProperties
 
 
@@ -886,7 +865,7 @@ CHECK_NULL_PTR_ERROR (_renderer)
 }	// VTKEntityRepresentation::setRenderingManager
 
 
-vtkUnstructuredGrid* VTKEntityRepresentation::getSurfacicGrid ( )
+vtkPolyData* VTKEntityRepresentation::getSurfacicGrid ( )
 {
 	return _surfacicGrid;
 }	// VTKEntityRepresentation::getSurfacicGrid
@@ -898,7 +877,7 @@ vtkActor* VTKEntityRepresentation::getSurfacicActor ( )
 }	// VTKEntityRepresentation::getSurfacicActor
 
 
-vtkDataSetMapper* VTKEntityRepresentation::getSurfacicMapper ( )
+vtkPolyDataMapper* VTKEntityRepresentation::getSurfacicMapper ( )
 {
 	return _surfacicMapper;
 }	// VTKEntityRepresentation::getSurfacicMapper
@@ -922,11 +901,14 @@ vtkDataSetMapper* VTKEntityRepresentation::getVolumicMapper ( )
 }	// VTKEntityRepresentation::getVolumicMapper
 
 
-vtkUnstructuredGrid* VTKEntityRepresentation::getRefinedGrid ( )
+vtkPolyData* VTKEntityRepresentation::getRefinedGrid ( )
 {
+// CP TODO
+cout << __FILE__ << ' ' << __LINE__ << " VTKEntityRepresentation::getRefinedGrid TO REIMPLEMENT AS POLYDATA" << endl;
+/*
 	if (0 != _refineFilter)
 		return _refineFilter->GetOutput ( );
-
+*/
 	return _refinedGrid;
 }	// VTKEntityRepresentation::getRefinedGrid
 
@@ -937,7 +919,7 @@ vtkActor* VTKEntityRepresentation::getRefinedActor ( )
 }	// VTKEntityRepresentation::getRefinedActor
 
 
-vtkDataSetMapper* VTKEntityRepresentation::getRefinedMapper ( )
+vtkPolyDataMapper* VTKEntityRepresentation::getRefinedMapper ( )
 {
 	return _refinedMapper;
 }	// VTKEntityRepresentation::getRefinedMapper
