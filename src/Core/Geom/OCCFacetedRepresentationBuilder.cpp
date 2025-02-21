@@ -9,7 +9,7 @@
 #include "Geom/OCCFacetedRepresentationBuilder.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
-#include "Geom/OCCGeomRepresentation.h"
+#include "Geom/OCCHelper.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
@@ -72,7 +72,7 @@ void OCCFacetedRepresentationBuilder::execute(
                 "shape est NULL.",
 				TkUtil::Charset::UTF_8));
 
-    OCCGeomRepresentation::buildIncrementalBRepMesh(m_shape, 0.01);
+    OCCHelper::buildIncrementalBRepMesh(m_shape, 0.01);
 
     if (m_shape.ShapeType()==TopAbs_COMPSOLID ||
             m_shape.ShapeType()==TopAbs_SOLID  ||
@@ -96,7 +96,7 @@ void OCCFacetedRepresentationBuilder::execute(
                 "shape est NULL.",
 				TkUtil::Charset::UTF_8));
 
-    OCCGeomRepresentation::buildIncrementalBRepMesh(m_shape, 0.01);
+    OCCHelper::buildIncrementalBRepMesh(m_shape, 0.01);
 
     if (m_shape.ShapeType()==TopAbs_COMPSOLID ||
             m_shape.ShapeType()==TopAbs_SOLID  ||
@@ -312,7 +312,7 @@ void OCCFacetedRepresentationBuilder::computeFaces(
 
     for (ex.Init(m_shape, TopAbs_FACE); ex.More(); ex.Next()) {
         // on récupère la face et on la maille
-    	if (OCCGeomRepresentation::areEquals(TopoDS::Face(AShape),TopoDS::Face(ex.Current()))) {
+    	if (OCCHelper::areEquals(TopoDS::Face(AShape),TopoDS::Face(ex.Current()))) {
     		fillRepresentation(TopoDS::Face(ex.Current()),AVec);
     	}
     } // for (ex.Init(m_shape, TopAbs_FACE); ex.More(); ex.Next(),i++)

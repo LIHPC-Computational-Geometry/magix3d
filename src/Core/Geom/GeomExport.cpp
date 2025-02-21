@@ -7,7 +7,6 @@
  */
 /*----------------------------------------------------------------------------*/
 #include "Geom/GeomExport.h"
-#include "Geom/OCCGeomRepresentation.h"
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"

@@ -9,8 +9,9 @@
 #ifndef MGX3D_GEOM_OCCFACETEDREPRESENTATIONBUILDER_H_
 #define MGX3D_GEOM_OCCFACETEDREPRESENTATIONBUILDER_H_
 /*----------------------------------------------------------------------------*/
-#include "Geom/GeomRepresentation.h"
-//#include "Geom/GeomDisplayRepresentation.h"
+#include <gmds/math/Triangle.h>
+/*----------------------------------------------------------------------------*/
+#include <vector>
 /*----------------------------------------------------------------------------*/
 //#include <TopoDS_Shape.hxx>
 class TopoDS_Face;

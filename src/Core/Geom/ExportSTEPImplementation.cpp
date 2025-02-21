@@ -7,7 +7,6 @@
  */
 /*----------------------------------------------------------------------------*/
 #include "Geom/ExportSTEPImplementation.h"
-#include "Geom/OCCGeomRepresentation.h"
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
@@ -69,12 +68,8 @@ ExportSTEPImplementation::~ExportSTEPImplementation()
 void ExportSTEPImplementation::
 addGeomEntityToExport(GeomEntity* geomEntity)
 {
-	std::vector<GeomRepresentation*> reps = geomEntity->getComputationalProperties();
-	for (uint i=0; i<reps.size(); i++){
-		OCCGeomRepresentation* geom_rep =
-		            dynamic_cast<OCCGeomRepresentation*>(reps[i]);
-		CHECK_NULL_PTR_ERROR(geom_rep);
-		m_writer.Transfer(geom_rep->getShape(), STEPControl_AsIs);
+	for (auto s : geomEntity->getOCCShapes()){
+		m_writer.Transfer(s, STEPControl_AsIs);
 	}
 }
 /*----------------------------------------------------------------------------*/

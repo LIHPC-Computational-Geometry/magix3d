@@ -16,7 +16,6 @@
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
 #include "Geom/GeomDisplayRepresentation.h"
-#include "Geom/OCCGeomRepresentation.h"
 #include "Group/Group0D.h"
 #include "Geom/MementoGeomEntity.h"
 #include "Internal/Context.h"
@@ -40,19 +39,20 @@ namespace Geom {
 const char* Vertex::typeNameGeomVertex = "GeomVertex";
 /*----------------------------------------------------------------------------*/
 Vertex::Vertex(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-        GeomProperty* gprop, GeomRepresentation* compProp)
-: GeomEntity(ctx, prop, disp, gprop,compProp)
+        GeomProperty* gprop, TopoDS_Shape& shape)
+: GeomEntity(ctx, prop, disp, gprop, shape)
 {
 }
 /*----------------------------------------------------------------------------*/
 GeomEntity* Vertex::clone(Internal::Context& c)
 {
     // 1 seule représentation pour le vertex
+	std::vector<TopoDS_Shape> reps = this->getOCCShapes();
     return new Vertex(c,
             c.newProperty(this->getType()),
             c.newDisplayProperties(this->getType()),
             new GeomProperty(),
-            this->getComputationalProperties()[0]->clone());
+            reps[0]);
 }
 /*----------------------------------------------------------------------------*/
 Vertex::~Vertex()
@@ -109,11 +109,13 @@ Mgx3D::Utils::SerializedRepresentation* Vertex::getDescription (bool alsoCompute
 											"Propriété géométrique", coordsProp.getValue ( ));
 	propertyGeomDescription.addProperty (coordsProp);
 
+    // 1 seule représentation pour le vertex
+	auto rep = getOCCShapes()[0];
+
 #ifdef _DEBUG		// Issue#111
     // précision OpenCascade ou autre
-    // 1 seule représentation pour le vertex
 	TkUtil::UTF8String	precStr (TkUtil::Charset::UTF_8);
-    precStr<<getComputationalProperties()[0]->getPrecision();
+    precStr << BRep_Tool::Tolerance(TopoDS::Vertex(rep));;
 
     propertyGeomDescription.addProperty (
     	        Utils::SerializedRepresentation::Property ("Précision", precStr.ascii()) );
@@ -237,16 +239,9 @@ void Vertex::remove(Curve* c)
 Utils::Math::Point Vertex::getCenteredPosition() const
 {
     // 1 seule représentation pour le vertex
-    OCCGeomRepresentation* rep =
-            dynamic_cast<OCCGeomRepresentation*>(getComputationalProperties()[0]);
-    if (rep){
-
-    	TopoDS_Vertex v = TopoDS::Vertex(rep->getShape());
-    	gp_Pnt pnt = BRep_Tool::Pnt(v);
-    	return Utils::Math::Point(pnt.X(),pnt.Y(), pnt.Z());
-    }
-    else
-    	throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, type inconnu pour getCenteredPosition", TkUtil::Charset::UTF_8));
+    TopoDS_Vertex v = TopoDS::Vertex(getOCCShapes()[0]);
+    gp_Pnt pnt = BRep_Tool::Pnt(v);
+    return Utils::Math::Point(pnt.X(),pnt.Y(), pnt.Z());
 }
 /*----------------------------------------------------------------------------*/
 Utils::Math::Point Vertex::getCoord() const

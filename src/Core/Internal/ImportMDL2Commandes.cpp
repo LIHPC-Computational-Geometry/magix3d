@@ -12,7 +12,6 @@
 #include "Internal/M3DCommandResult.h"
 #include "Internal/ImportMDL2Commandes.h"
 #include "Geom/GeomManager.h"
-#include "Geom/OCCGeomRepresentation.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomHelper.h"
 #include "Topo/EdgeMeshingPropertyGeometric.h"

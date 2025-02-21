@@ -10,7 +10,7 @@
 #include "Geom/OCCDisplayRepresentationBuilder.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
-#include "Geom/OCCGeomRepresentation.h"
+#include "Geom/OCCHelper.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/WarningLog.h>
@@ -82,7 +82,7 @@ static Standard_Integer MaxPlotCount = 5;
 /*----------------------------------------------------------------------------*/
 OCCDisplayRepresentationBuilder::
 OCCDisplayRepresentationBuilder(const GeomEntity* caller,
-                                TopoDS_Shape& shape,
+                                const TopoDS_Shape& shape,
                                 Geom::GeomDisplayRepresentation* rep)
 :m_entity(caller),m_shape(shape), m_rep(rep)
 {}
@@ -95,11 +95,6 @@ void OCCDisplayRepresentationBuilder::execute()
     /* si la shape est vide, on ne fait rien */
     if(m_shape.IsNull())
         return;
-
-// [EB] retiré car perturbe les opérations booléennes
-    // on crée la représentation de la shape
-//    double deflection = OCCGeomRepresentation::buildIncrementalBRepMesh(m_shape);
-//    m_rep->setDeflection(deflection);
 
     if (m_shape.ShapeType()==TopAbs_COMPSOLID ||
             m_shape.ShapeType()==TopAbs_SOLID  ||
@@ -1153,9 +1148,9 @@ void OCCDisplayRepresentationBuilder::fillRepresentation(
     	std::cout<<"cas avec aPoly.IsNull()..."<<std::endl;
 #endif
         TopoDS_Face sh = aFace;
-        OCCGeomRepresentation::cleanShape(sh);
+        OCCHelper::cleanShape(sh);
         BRepTools::Clean(sh);
-        OCCGeomRepresentation::buildIncrementalBRepMesh(sh, m_rep->getDeflection());
+        OCCHelper::buildIncrementalBRepMesh(sh, m_rep->getDeflection());
         aPoly = BRep_Tool::Triangulation(sh,aLoc);
         if (aPoly.IsNull()){
 			TkUtil::UTF8String	warningText (TkUtil::Charset::UTF_8);

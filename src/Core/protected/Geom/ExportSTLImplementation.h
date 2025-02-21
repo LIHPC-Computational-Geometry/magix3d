@@ -55,7 +55,7 @@ protected:
     void write();
 
 private:
-    TopoDS_Compound combineShapes(const std::vector<GeomRepresentation*>& shapes);
+    TopoDS_Compound combineShapes(const std::vector<TopoDS_Shape>& shapes);
 };
 
 /*----------------------------------------------------------------------------*/

@@ -7,7 +7,6 @@
  */
 /*----------------------------------------------------------------------------*/
 #include "Geom/ExportIGESImplementation.h"
-#include "Geom/OCCGeomRepresentation.h"
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
@@ -77,12 +76,8 @@ ExportIGESImplementation::~ExportIGESImplementation()
 void ExportIGESImplementation::
 addGeomEntityToExport(GeomEntity* geomEntity)
 {
-	std::vector<GeomRepresentation*> reps = geomEntity->getComputationalProperties();
-	for (uint i=0; i<reps.size(); i++){
-		OCCGeomRepresentation* geom_rep =
-		            dynamic_cast<OCCGeomRepresentation*>(reps[i]);
-		CHECK_NULL_PTR_ERROR(geom_rep);
-		m_writer->AddShape(geom_rep->getShape());
+	for (auto s : geomEntity->getOCCShapes()){
+		m_writer->AddShape(s);
 	}
 }
 /*----------------------------------------------------------------------------*/

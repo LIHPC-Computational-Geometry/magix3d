@@ -7,7 +7,6 @@
  */
 /*----------------------------------------------------------------------------*/
 #include "Geom/ExportBREPImplementation.h"
-#include "Geom/OCCGeomRepresentation.h"
 /*----------------------------------------------------------------------------*/
 #include <iostream>
 #include <TkUtil/MemoryError.h>
@@ -40,13 +39,8 @@ ExportBREPImplementation::~ExportBREPImplementation()
 void ExportBREPImplementation::
 addGeomEntityToExport(GeomEntity* geomEntity)
 {
-	std::vector<GeomRepresentation*> reps = geomEntity->getComputationalProperties();
-	for (uint i=0; i<reps.size(); i++){
-		OCCGeomRepresentation* geom_rep =
-		            dynamic_cast<OCCGeomRepresentation*>(reps[i]);
-		CHECK_NULL_PTR_ERROR(geom_rep);
-        m_builder.Add(m_compound, geom_rep->getShape());
-	}
+    for (auto sh : geomEntity->getOCCShapes())
+        m_builder.Add(m_compound, sh);
 }
 /*----------------------------------------------------------------------------*/
 void ExportBREPImplementation::write()

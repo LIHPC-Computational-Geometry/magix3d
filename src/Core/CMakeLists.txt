@@ -8,7 +8,6 @@ include (${GUIToolkitsVariables_CMAKE_DIR}/python_binding.cmake)
 
 file (GLOB HEADERS protected/*/*.h)
 file (GLOB CPP_SOURCES Internal/*.cpp Geom/*.cpp Topo/*.cpp Mesh/*.cpp Structured/*.cpp Group/*.cpp SysCoord/*.cpp Smoothing/*.cpp )
-list(FILTER CPP_SOURCES EXCLUDE REGEX ".*GMDSGeom.*Adapter\\.cpp$")
 
 # Répertoire d'en-têtes installés. Certains sont optionnels et ajoutés plus loin.
 set (HEADERS_DIRECTORIES protected/Geom protected/Group protected/Internal protected/Mesh protected/Smoothing protected/Structured protected/SysCoord protected/Topo)

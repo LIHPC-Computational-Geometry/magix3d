@@ -130,12 +130,11 @@ internalSpecificExecute()
 
     } while (courbesOrdonnees.size() != m_entities.size());
 
-	// utilisation d'un vecteur de GeomRepresentation pour la courbe composite
-	std::vector<GeomRepresentation*> reps;
-	for(uint i=0; i<courbesOrdonnees.size(); i++){
-		std::vector<GeomRepresentation*> loc_reps = courbesOrdonnees[i]->getComputationalProperties();
-		for (uint j=0; j<loc_reps.size(); j++)
-			reps.push_back(loc_reps[j]->clone());
+	// utilisation d'un vecteur de shapes pour la courbe composite
+	std::vector<TopoDS_Shape> reps;
+	for (auto courbesOrdonnee : courbesOrdonnees) {
+		auto loc_reps = courbesOrdonnee->getOCCShapes();
+		std::copy(loc_reps.begin(), loc_reps.end(), std::back_inserter(reps));
 	}
 
 	// création de la courbe union

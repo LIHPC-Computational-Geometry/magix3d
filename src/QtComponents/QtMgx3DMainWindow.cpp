@@ -4585,7 +4585,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 		}    // QtMgx3DMainWindow::getGraphicalWidget
 
 
-		void QtMgx3DMainWindow::log(const Log &log)
+		void QtMgx3DMainWindow::log(const TkUtil::Log &log)
 		{
 			getLogDispatcher().log(log);
 		}    // QtMgx3DMainWindow::log
