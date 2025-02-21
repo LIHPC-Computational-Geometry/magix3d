@@ -6,7 +6,7 @@
  *      Author: ledouxf
  */
 /*----------------------------------------------------------------------------*/
-#include <Topo/EdgeMeshingPropertySpecificSize.h>
+#include "Topo/EdgeMeshingPropertySpecificSize.h"
 #include "Geom/GeomEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/UTF8String.h>

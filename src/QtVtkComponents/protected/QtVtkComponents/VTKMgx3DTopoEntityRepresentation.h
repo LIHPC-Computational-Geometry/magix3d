@@ -8,7 +8,7 @@
 
 #include "QtVtkComponents/VTKMgx3DEntityRepresentation.h"
 
-#include <Topo/TopoEntity.h>
+#include "Topo/TopoEntity.h"
 
 #ifdef OLD_TOPO_ENTITY_EDGESNUM_REPRESENTATION
 #include <vtkLabeledDataMapper.h>

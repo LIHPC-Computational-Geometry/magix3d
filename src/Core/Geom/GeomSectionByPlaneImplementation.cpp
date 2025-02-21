@@ -25,7 +25,7 @@
 #include "Utils/Plane.h"
 #include "Utils/Vector.h"
 /*----------------------------------------------------------------------------*/
-#include "TkUtil/Exception.h"
+#include <TkUtil/Exception.h>
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>

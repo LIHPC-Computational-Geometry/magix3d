@@ -7,16 +7,17 @@
  *  \date 18 mai 2018
  */
 /*----------------------------------------------------------------------------*/
-#include <SysCoord/SysCoord.h>
-#include <SysCoord/SysCoordDisplayRepresentation.h>
-#include <SysCoord/CommandEditSysCoord.h>
+#include "SysCoord/SysCoord.h"
+#include "SysCoord/SysCoordDisplayRepresentation.h"
+#include "SysCoord/CommandEditSysCoord.h"
 #include "Internal/Context.h"
 #include "Utils/Common.h"
 #include "Internal/InfoCommand.h"
 /*----------------------------------------------------------------------------*/
 #include <iostream>
 #include <string>
-#include "TkUtil/MemoryError.h"
+#include <TkUtil/Exception.h>
+#include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

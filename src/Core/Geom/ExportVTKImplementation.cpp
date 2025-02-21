@@ -6,13 +6,13 @@
  *      Author: legoff
  */
 /*----------------------------------------------------------------------------*/
-#include <Geom/ExportVTKImplementation.h>
-#include <Geom/Volume.h>
-#include <Geom/Surface.h>
-#include <Geom/Curve.h>
-#include <Geom/Vertex.h>
-#include <Mesh/MeshItf.h>
-#include <Mesh/Surface.h>
+#include "Geom/ExportVTKImplementation.h"
+#include "Geom/Volume.h"
+#include "Geom/Surface.h"
+#include "Geom/Curve.h"
+#include "Geom/Vertex.h"
+#include "Mesh/MeshItf.h"
+#include "Mesh/Surface.h"
 /*----------------------------------------------------------------------------*/
 #include <gmds/ig/Mesh.h>
 #include <gmds/io/IGMeshIOService.h>

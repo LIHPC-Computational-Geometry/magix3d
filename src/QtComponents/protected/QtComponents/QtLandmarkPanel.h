@@ -1,8 +1,9 @@
 #ifndef QT_LANDMARK_PANEL_H
 #define QT_LANDMARK_PANEL_H
 
+#include "QtComponents/QtAxisPanel.h"
+
 #include <QtUtil/QtGroupBox.h>
-#include <QtComponents/QtAxisPanel.h>
 
 #include <QCheckBox>
 

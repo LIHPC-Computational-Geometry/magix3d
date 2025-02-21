@@ -8,18 +8,18 @@
  */
 /*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
-#include "TkUtil/Exception.h"
-#include "TkUtil/MemoryError.h"
-#include "Utils/Common.h"
 #include "Internal/InfoCommand.h"
+#include "Utils/Common.h"
 #include "Geom/GeomEntity.h"
 #include "Topo/TopoEntity.h"
 #include "Topo/CoEdge.h"
 #include "Mesh/MeshEntity.h"
 #include "Group/GroupEntity.h"
-#include <SysCoord/SysCoord.h>
+#include "SysCoord/SysCoord.h"
 #include "Structured/StructuredMeshEntity.h"
-
+/*----------------------------------------------------------------------------*/
+#include <TkUtil/Exception.h>
+#include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

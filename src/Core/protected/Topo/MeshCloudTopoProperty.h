@@ -10,7 +10,7 @@
 #define MESH_CLOUD_TOPO_PROPERTY_H_
 /*----------------------------------------------------------------------------*/
 #include "Utils/Container.h"
-#include "TkUtil/Exception.h"
+#include <TkUtil/Exception.h>
 #include <vector>
 #include <sys/types.h>
 #include <algorithm>

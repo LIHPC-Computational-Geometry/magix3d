@@ -12,8 +12,8 @@
 #include "Internal/InfoCommand.h"
 #include "Internal/Context.h"
 #include "Group/Group3D.h"
-#include <SysCoord/CommandDuplicateSysCoord.h>
-#include <SysCoord/SysCoordManager.h>
+#include "SysCoord/CommandDuplicateSysCoord.h"
+#include "SysCoord/SysCoordManager.h"
 
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>

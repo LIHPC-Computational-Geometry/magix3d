@@ -14,14 +14,14 @@
 #include "Geom/Volume.h"
 #include "Geom/OCCGeomRepresentation.h"
 #include "Geom/EntityFactory.h"
-/*----------------------------------------------------------------------------*/
 #include "Utils/MgxNumeric.h"
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/WarningLog.h>
-/*----------------------------------------------------------------------------*/
-#include "TkUtil/Exception.h"
+#include <TkUtil/Exception.h>
 #include <TkUtil/MemoryError.h>
+/*----------------------------------------------------------------------------*/
 #include <set>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>

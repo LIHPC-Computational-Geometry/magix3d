@@ -22,7 +22,7 @@
 #include "Topo/CommandEditTopo.h"
 
 #include "Mesh/CommandCreateMesh.h"
-#include <Mesh/MeshItf.h>
+#include "Mesh/MeshItf.h"
 
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
@@ -31,7 +31,7 @@
 #include "Internal/InfoCommand.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
-#include "TkUtil/Exception.h"
+#include <TkUtil/Exception.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/NumericConversions.h>
 #include <TkUtil/TraceLog.h>

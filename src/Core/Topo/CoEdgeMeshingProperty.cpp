@@ -11,9 +11,9 @@
 /*----------------------------------------------------------------------------*/
 #include "Topo/CoEdgeMeshingProperty.h"
 #include "Topo/CoEdge.h"
-#include "TkUtil/Exception.h"
 #include "Topo/TopoHelper.h"
 #include "Utils/Vector.h"
+#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

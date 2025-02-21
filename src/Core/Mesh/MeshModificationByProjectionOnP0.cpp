@@ -9,10 +9,9 @@
 /*----------------------------------------------------------------------------*/
 #include "Mesh/MeshImplementation.h"
 #include "Mesh/MeshManager.h"
+#include "Mesh/MeshModificationByProjectionOnP0.h"
 #include "Utils/SerializedRepresentation.h"
 #include "Utils/MgxNumeric.h"
-/*----------------------------------------------------------------------------*/
-#include <Mesh/MeshModificationByProjectionOnP0.h>
 /*----------------------------------------------------------------------------*/
 #include "gmds/ig/Node.h"
 /*----------------------------------------------------------------------------*/

@@ -66,11 +66,15 @@
 #include "Topo/CommandReverseDirection.h"
 #include "Topo/CommandDuplicateTopo.h"
 #include "Topo/CommandInsertHole.h"
-#include <Topo/CommandFuseCoEdges.h>
-#include <Topo/CommandFuse2Blocks.h>
+#include "Topo/CommandFuseCoEdges.h"
+#include "Topo/CommandFuse2Blocks.h"
 #include "Topo/CommandExtrudeTopo.h"
 #include "Topo/CommandExtrudeFace.h"
-
+#include "Topo/CommandAlignOnSurface.h"
+#include "Topo/CommandFuse2Edges.h"
+#include "Topo/CommandFuse2EdgeList.h"
+#include "Topo/CommandFuse2Faces.h"
+#include "Topo/CommandFuse2FaceList.h"
 #include "Topo/Block.h"
 #include "Topo/CoFace.h"
 #include "Topo/Face.h"
@@ -104,15 +108,9 @@
 #include "Internal/NameManager.h"
 #include "Internal/M3DCommandResult.h"
 #include "Internal/CommandChangeLengthUnit.h"
-#include "Topo/CommandAlignOnSurface.h"
 #include "Internal/PythonWriter.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
-#include <Topo/CommandFuse2Edges.h>
-#include <Topo/CommandFuse2EdgeList.h>
-#include <Topo/CommandFuse2Faces.h>
-#include <Topo/CommandFuse2FaceList.h>
-
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/ErrorLog.h>
 #include <TkUtil/UTF8String.h>

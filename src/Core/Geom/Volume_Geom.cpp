@@ -20,7 +20,6 @@
 #include "Geom/Shell.h"
 #include "Geom/OCCGeomRepresentation.h"
 #include "Geom/MementoGeomEntity.h"
-#include "TkUtil/Exception.h"
 #include "Group/Group3D.h"
 #include "Internal/Context.h"
 #include "Topo/Block.h"
@@ -28,6 +27,7 @@
 #include "Topo/CoEdge.h"
 #include "Topo/Vertex.h"
 /*----------------------------------------------------------------------------*/
+#include <TkUtil/Exception.h>
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 #include <BRepClass3d_SolidClassifier.hxx>

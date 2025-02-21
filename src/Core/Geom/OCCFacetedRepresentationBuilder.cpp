@@ -11,7 +11,7 @@
 #include "Geom/Volume.h"
 #include "Geom/OCCGeomRepresentation.h"
 /*----------------------------------------------------------------------------*/
-#include "TkUtil/Exception.h"
+#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 //// inclusion de fichiers en-tête OCC
 #include<Poly_Polygon3D.hxx>

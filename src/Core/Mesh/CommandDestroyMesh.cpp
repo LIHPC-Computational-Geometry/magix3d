@@ -16,7 +16,7 @@
 #include "Mesh/MeshItf.h"
 #include "Mesh/MeshModificationItf.h"
 
-#include "TkUtil/Exception.h"
+#include <TkUtil/Exception.h>
 
 #include <gmds/ig/Mesh.h>
 /*----------------------------------------------------------------------------*/

@@ -8,7 +8,8 @@
 
 
 #include "QtVtkComponents/VTKRenderingManager.h"
-#include <QtComponents/Qt3DGraphicalWidget.h>
+#include "QtComponents/Qt3DGraphicalWidget.h"
+
 #include <QtVtk/QtVtkGraphicWidget.h>
 
 #include <vector>

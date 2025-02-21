@@ -8,7 +8,9 @@
  */
 /*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
+#include "Internal/InfoCommand.h"
 #include "Group/GroupManager.h"
+#include "Group/Group3D.h"
 #include "Geom/Volume.h"
 #include "Topo/TopoEntity.h"
 #include "Topo/Block.h"
@@ -16,18 +18,15 @@
 #include "Topo/Edge.h"
 #include "Topo/CoEdge.h"
 #include "Topo/Vertex.h"
-#include "Group/Group3D.h"
-#include "Internal/InfoCommand.h"
 #include "Topo/TopoHelper.h"
-#include <gmds/ig/Mesh.h>
 #include "Mesh/MeshItf.h"
+#include "Mesh/CommandCreateSubVolumeBetweenSheets.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
-#include <Mesh/CommandCreateSubVolumeBetweenSheets.h>
-
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/ReferencedMutex.h>
+#include <gmds/ig/Mesh.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

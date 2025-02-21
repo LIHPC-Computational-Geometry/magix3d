@@ -8,7 +8,7 @@
 
 #include "QtVtkComponents/VTKMgx3DEntityRepresentation.h"
 
-#include <SysCoord/SysCoord.h>
+#include "SysCoord/SysCoord.h"
 
 
 namespace Mgx3D 

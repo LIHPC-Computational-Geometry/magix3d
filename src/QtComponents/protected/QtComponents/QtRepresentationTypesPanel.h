@@ -7,21 +7,19 @@
 #define QT_REPRESENTATION_TYPES_PANEL_H
 
 
-#include <QtComponents/QtMgx3DGroupBox.h>
+#include "QtComponents/QtMgx3DGroupBox.h"
 #include "Utils/Entity.h"
 #include "Utils/DisplayProperties.h"
 
 #include <TkUtil/ThreeStates.h>
+#include <TkUtil/PaintAttributes.h>
 #include <QtUtil/QtGroupBox.h>
+#include <QtUtil/QtDoubleTextField.h>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QLabel>
 #include <QPushButton>
 #include <QGridLayout>
-
-#include <TkUtil/PaintAttributes.h>
-#include <QtUtil/QtDoubleTextField.h>
-
 #include <set>
 
 

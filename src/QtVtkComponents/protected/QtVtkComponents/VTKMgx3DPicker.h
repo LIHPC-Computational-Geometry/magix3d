@@ -2,8 +2,8 @@
 #define VTK_MGX3D_PICKER_H
 
 
-#include <Utils/Entity.h>
-#include <QtVtkComponents/VTKECMPicker.h>
+#include "Utils/Entity.h"
+#include "QtVtkComponents/VTKECMPicker.h"
 
 #include <vtkAssemblyPath.h>
 #include <vtkRenderer.h>

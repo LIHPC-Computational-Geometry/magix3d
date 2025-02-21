@@ -9,7 +9,7 @@
 #include "Internal/ContextIfc.h"
 /*----------------------------------------------------------------------------*/
 #include "Utils/Common.h"
-#include <Geom/CommandExportSTL.h>
+#include "Geom/CommandExportSTL.h"
 #include "Geom/GeomManager.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>

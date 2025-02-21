@@ -5,14 +5,14 @@
  */
 
 #include "Internal/ContextIfc.h"
-
-#include <QtComponents/QtTopologyFuse2FacesAction.h>
-#include "Utils/Common.h"
-#include <QtUtil/QtErrorManagement.h>
+#include "QtComponents/QtTopologyFuse2FacesAction.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
+#include "Utils/Common.h"
+
+#include <QtUtil/QtErrorManagement.h>
+#include <QtUtil/QtConfiguration.h>
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>
-#include <QtUtil/QtConfiguration.h>
 
 
 using namespace std;

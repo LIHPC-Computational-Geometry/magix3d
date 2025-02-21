@@ -20,7 +20,7 @@
 #include "Geom/Volume.h"
 #include "Geom/EntityFactory.h"
 /*----------------------------------------------------------------------------*/
-#include "TkUtil/Exception.h"
+#include <TkUtil/Exception.h>
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>

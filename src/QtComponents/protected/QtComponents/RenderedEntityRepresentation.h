@@ -6,7 +6,7 @@
 #ifndef RENDERED_ENTITY_REPRESENTATION_H
 #define RENDERED_ENTITY_REPRESENTATION_H
 
-#include <Utils/GraphicalEntityRepresentation.h>
+#include "Utils/GraphicalEntityRepresentation.h"
 
 namespace Mgx3D 
 {

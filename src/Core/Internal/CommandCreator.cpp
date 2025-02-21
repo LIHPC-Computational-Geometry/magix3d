@@ -9,10 +9,11 @@
 /*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
 #include "Internal/CommandCreator.h"
-#include "TkUtil/LogOutputStream.h"
-#include <TkUtil/Exception.h>
 #include "Internal/ContextIfc.h"
 #include "Internal/Context.h"
+/*----------------------------------------------------------------------------*/
+#include <TkUtil/LogOutputStream.h>
+#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

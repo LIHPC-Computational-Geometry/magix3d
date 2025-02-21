@@ -5,7 +5,7 @@
 #ifndef INTERSECTIONSURFACELINE_H
 #define INTERSECTIONSURFACELINE_H
 /*----------------------------------------------------------------------------*/
-#include <Geom/GeomEntity.h>
+#include "Geom/GeomEntity.h"
 #include "Geom/GeomModificationBaseClass.h"
 #include "Utils/Vector.h"
 /*----------------------------------------------------------------------------*/

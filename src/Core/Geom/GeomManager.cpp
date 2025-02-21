@@ -63,7 +63,7 @@
 #include "Geom/CommandGluing.h"
 #include "Geom/CommandSection.h"
 #include "Geom/CommandSectionByPlane.h"
-#include <Geom/CommandExtrudeRevolution.h>
+#include "Geom/CommandExtrudeRevolution.h"
 #include "Geom/CommandExtrudeDirection.h"
 #include "Geom/CommandRotation.h"
 #include "Geom/CommandScaling.h"
@@ -114,7 +114,7 @@
 #include "Topo/CommandExtrudeTopo.h"
 #include "Topo/TopoHelper.h"
 
-#include <SysCoord/SysCoord.h>
+#include "SysCoord/SysCoord.h"
 
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>

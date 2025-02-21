@@ -7,10 +7,8 @@
 #ifndef QT_ENTITY_ID_TEXTFIELD_H
 #define QT_ENTITY_ID_TEXTFIELD_H
 
-#include "Internal/ContextIfc.h"
-
-#include <QtComponents/EntitySeizureManager.h>
 #include "Internal/Context.h"
+#include "QtComponents/EntitySeizureManager.h"
 
 #include <QtUtil/QtTextField.h>
 

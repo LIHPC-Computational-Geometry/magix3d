@@ -26,7 +26,7 @@
 #include "GL/glext.h"
 
 #ifndef VTK_IMPLEMENT_MESA_CXX
-#include <VtkComponents/vtkECMXOpenGLRenderWindow.h>
+#include "VtkComponents/vtkECMXOpenGLRenderWindow.h"
 #include <vtkOpenGLRenderer.h>
 #include <vtkOpenGLProperty.h>
 #include <vtkOpenGLTexture.h>

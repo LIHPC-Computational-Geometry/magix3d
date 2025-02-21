@@ -12,8 +12,8 @@
 #include "Internal/PythonWriter.h"
 #include "Utils/Common.h"
 
-#include "TkUtil/Exception.h"
-#include "TkUtil/File.h"
+#include <TkUtil/Exception.h>
+#include <TkUtil/File.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/ErrorLog.h>
 #include <TkUtil/TraceLog.h>

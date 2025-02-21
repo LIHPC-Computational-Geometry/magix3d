@@ -6,8 +6,8 @@
  *      Author: Eric B
  */
 /*----------------------------------------------------------------------------*/
-#include <Geom/ExportSTLImplementation.h>
-#include <Geom/OCCGeomRepresentation.h>
+#include "Geom/ExportSTLImplementation.h"
+#include "Geom/OCCGeomRepresentation.h"
 #include "Geom/GeomEntity.h"
 #include "Utils/Entity.h"
 /*----------------------------------------------------------------------------*/

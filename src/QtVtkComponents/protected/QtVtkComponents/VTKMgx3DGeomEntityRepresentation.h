@@ -8,7 +8,7 @@
 
 #include "QtVtkComponents/VTKMgx3DEntityRepresentation.h"
 
-#include <Geom/GeomEntity.h>
+#include "Geom/GeomEntity.h"
 
 
 namespace Mgx3D 
