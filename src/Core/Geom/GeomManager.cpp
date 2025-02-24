@@ -72,7 +72,6 @@
 #include "Geom/CommandNewVertexByCurveParameterization.h"
 #include "Geom/CommandJoinCurves.h"
 #include "Geom/CommandJoinSurfaces.h"
-#include "Geom/CommandNewGeomVolume.h"
 #include "Internal/ImportMDLImplementation.h"
 #include "Internal/ImportMDL2Commandes.h"
 #include "Internal/ExportMDLImplementation.h"
@@ -267,49 +266,6 @@ copy(std::vector<GeomEntity*>& e, bool withTopo, std::string groupName)
         cmd <<", True,\""<<groupName<<"\")";
     else
         cmd <<", False,\""<<groupName<<"\")";
-
-    command->setScriptCommand(cmd);
-
-    // on passe au gestionnaire de commandes qui exécute la commande en // ou non
-    // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
-    getCommandManager().addCommand(command, Utils::Command::DO);
-
-    Internal::M3DCommandResultIfc*  cmdResult   =
-                                    new Internal::M3DCommandResult (*command);
-    return cmdResult;
-
-}
-/*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
-newVolume(std::vector<std::string>& e, std::string groupName)
-{
-    std::vector<Surface*> vge;
-    for (uint i=0; i<e.size(); i++)
-        vge.push_back(getSurface(e[i],true));
-
-    return newVolume(vge, groupName);
-}
-/*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
-newVolume(std::vector<Surface*>& e, std::string groupName)
-{
-	CHECK_ENTITIES_LIST(e)
-	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-    message << "GeomManager::newVolume (";
-    for(unsigned int i=0;i<e.size();i++){
-        if(i!=0)
-            message<<", ";
-        message << e[i]->getName();
-    }
-    message<<")";
-    log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
-
-    CommandNewGeomVolume* command =
-            new CommandNewGeomVolume(getLocalContext(),e, groupName);
-
-    // trace dans le script
-	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias ( ) << ".getGeomManager ( ).newVolume (" << Internal::entitiesToPythonList<Surface> (e) << ", \"" << groupName << "\")";
 
     command->setScriptCommand(cmd);
 

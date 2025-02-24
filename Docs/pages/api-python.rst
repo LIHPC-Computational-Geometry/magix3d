@@ -116,11 +116,6 @@ Pour alléger l’écriture, nous utilisons les alias Python suivants:
     gm.makeBlocksByExtrude
 
 .. code-block:: python
-    :caption: :ref:`creation-volume`
-
-    gm.newVolume
-
-.. code-block:: python
     :caption: :ref:`operations-booleennes`
 
     gm.glue

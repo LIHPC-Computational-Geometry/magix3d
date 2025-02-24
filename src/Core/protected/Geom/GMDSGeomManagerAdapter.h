@@ -46,11 +46,6 @@ public:
     virtual ~GMDSGeomManagerAdapter();
 
     /*------------------------------------------------------------------------*/
-    /** \brief  creation of a geometric volume
-     */
-    virtual gmds::cad::GeomVolume* newVolume();
-
-    /*------------------------------------------------------------------------*/
     /** \brief  creation of a geometric surface
      */
     virtual gmds::cad::GeomSurface* newSurface();

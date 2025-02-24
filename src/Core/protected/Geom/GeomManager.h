@@ -107,18 +107,6 @@ public:
         copy(std::vector<GeomEntity*>& e, bool withTopo, std::string groupName);
 
     /*------------------------------------------------------------------------*/
-    /** \brief création d'un volume à partir d'une liste de surfaces formant un
-     *         le bord d'un volume fermé
-     *
-     *  \param e les surfaces géométriques bordant le volume à créer
-     */
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
-        newVolume(std::vector<std::string>& e, std::string groupName);
-
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
-        newVolume(std::vector<Surface*>& e, std::string groupName);
-
-    /*------------------------------------------------------------------------*/
     /** \brief création d'un sommet géométrique  à partir d'un point p(x,y,z)
      *         et d'une courbe ou surface. Le sommet créé est le projet de p sur la
      *         courbe ou la surface.

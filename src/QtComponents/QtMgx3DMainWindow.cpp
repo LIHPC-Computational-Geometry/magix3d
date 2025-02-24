@@ -53,7 +53,6 @@
 #include "QtComponents/QtGeomEntityDestructionAction.h"
 #include "QtComponents/QtGeomPlaneCutAction.h"
 #include "QtComponents/QtGeomSurfaceCreationAction.h"
-#include "QtComponents/QtGeomVolumeCreationAction.h"
 #include "QtComponents/QtGeometryGlueCurvesAction.h"
 #include "QtComponents/QtGeometryGlueSurfacesAction.h"
 #include "QtComponents/QtGeometryHomothetyAction.h"
@@ -2703,16 +2702,6 @@ void QtMgx3DMainWindow::showReady ( )
 					                       );
 			registerOperationAction(
 					*prismAction, QtMgx3DOperationsPanel::GEOM_VOLUME_OPERATION);
-			// Volume :
-			QtGeomVolumeCreationAction *volumeAction =
-					                           new QtGeomVolumeCreationAction(
-							                           QIcon(
-									                           ":/images/create_volume_with_surfaces.png"),
-							                           QString::fromUtf8("Création de volume"), *this, QString::fromUtf8("Création de volume.")
-					                           );
-			CHECK_NULL_PTR_ERROR(volumeAction->getVolumeCreationPanel())
-			registerOperationAction(
-					*volumeAction, QtMgx3DOperationsPanel::GEOM_VOLUME_OPERATION);
 			// Création d'entité par révolution :
 			dim = 0;
 			for (int ot = (int) QtMgx3DOperationsPanel::GEOM_CURVE_OPERATION;
