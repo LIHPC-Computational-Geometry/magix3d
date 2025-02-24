@@ -240,7 +240,7 @@ save(Geom::Curve* cv)
             std::string centerName = cv->getName()+"Center";
 
             // 1 seule représentation pour une courbe ou une ellipse
-            TopoDS_Edge edge rep = cv->getOCCEdges()[0];
+            TopoDS_Edge edge = cv->getOCCEdges()[0];
             Utils::Math::Point center = getCenter(edge);
 
             uint idP3 = save(center, centerName);
