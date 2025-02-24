@@ -165,12 +165,6 @@ GMDSGeomManagerAdapter::~GMDSGeomManagerAdapter()
 
 }
 /*----------------------------------------------------------------------------*/
-gmds::cad::GeomVolume* GMDSGeomManagerAdapter::
-newVolume()
-{
-    throw TkUtil::Exception (TkUtil::UTF8String ("GMDSGeomManagerAdapter::newVolume pas disponible.", TkUtil::Charset::UTF_8));
-}
-/*----------------------------------------------------------------------------*/
 gmds::cad::GeomSurface* GMDSGeomManagerAdapter::
 newSurface()
 {

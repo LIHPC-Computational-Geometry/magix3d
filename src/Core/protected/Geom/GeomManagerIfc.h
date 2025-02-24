@@ -102,15 +102,6 @@ public:
 	SET_SWIG_COMPLETABLE_METHOD(copy)
 
     /*------------------------------------------------------------------------*/
-    /** \brief création d'entités géométrique par copie
-     *
-     *  \param e les surfaces géométriques qui entoure le volume à créer
-     *  \param groupName un nom de groupe
-     */
-    virtual Mgx3D::Internal::M3DCommandResultIfc* newVolume(std::vector<std::string>& e, std::string groupName);
-	SET_SWIG_COMPLETABLE_METHOD(newVolume)
-
-    /*------------------------------------------------------------------------*/
     /** \brief création d'un sommet géométrique  à partir d'un point p(x,y,z)
      *         et d'une courbe ou surface. Le sommet crée est le projet de p sur la
      *         courbe ou surface.
