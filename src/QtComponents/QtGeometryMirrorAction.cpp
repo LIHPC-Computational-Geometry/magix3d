@@ -387,6 +387,7 @@ RenderingManager::PlaneInteractor* QtGeometryMirrorPanel::getInteractor ( )
 	return 0;
 }	// QtGeometryMirrorPanel::getInteractor
 
+
 void QtGeometryMirrorPanel::preview (bool show, bool destroyInteractor)
 {
 
@@ -412,11 +413,12 @@ void QtGeometryMirrorPanel::preview (bool show, bool destroyInteractor)
 
 	std::vector<Mgx3D::Utils::Entity*> entities = getInvolvedEntities ( );
 
-	for (std::vector<Mgx3D::Utils::Entity*>::iterator it = entities.begin ( );
-	     entities.end ( ) != it; it++)
+	// Actualisation aperçu résultat opération :
+	unique_ptr<RenderingManager::DisplayLocker>	displayLocker (new RenderingManager::DisplayLocker (getRenderingManager ( )));
+	for (std::vector<Mgx3D::Utils::Entity*>::iterator it = entities.begin ( ); entities.end ( ) != it; it++)
 	{
-//		GeomEntity*	entity	= dynamic_cast<GeomEntity*>(*it);
 		Entity*	entity	= (*it);
+	
 		CHECK_NULL_PTR_ERROR (entity)
 		double		bounds [6] = { 0., 0., 0., 0., 0., 0. };
 		entity->getBounds (bounds);
@@ -426,23 +428,20 @@ void QtGeometryMirrorPanel::preview (bool show, bool destroyInteractor)
 		yMax	= bounds [3] > yMax ? bounds [3] : yMax;
 		zMin	= bounds [4] < zMin ? bounds [4] : zMin;
 		zMax	= bounds [5] > zMax ? bounds [5] : zMax;
-		DisplayProperties::GraphicalRepresentation*	gr	=
-				entity->getDisplayProperties ( ).getGraphicalRepresentation ( );
+		DisplayProperties::GraphicalRepresentation*	gr	= entity->getDisplayProperties ( ).getGraphicalRepresentation ( );
 		CHECK_NULL_PTR_ERROR (gr)
-		RenderedEntityRepresentation*	rep	=
-								dynamic_cast<RenderedEntityRepresentation*>(gr);
+		RenderedEntityRepresentation*	rep	= dynamic_cast<RenderedEntityRepresentation*>(gr);
 		if (0 != rep)
 				rep->setRenderingManager (&getRenderingManager ( ));
 		registerHighlightedEntity (*entity);
-		gr->setHighlighted (true);
+		gr->setHighlighted (true, true);
 	}	// for (vector<string>::const_iterator it = entities.begin ( ); ...
+	displayLocker.reset ( );
 
 	// La représentation de la coupe :
 	Math::Point		p1 (getPoint ( ));
 	Math::Vector	normal (getNormal ( ));
-	Math::Point		p2 (p1.getX ( ) + normal.getX ( ),
-					    p1.getY ( ) + normal.getY ( ),
-					    p1.getZ ( ) + normal.getZ ( ));
+	Math::Point		p2 (p1.getX ( ) + normal.getX ( ), p1.getY ( ) + normal.getY ( ), p1.getZ ( ) + normal.getZ ( ));
 	// Si pb de boite englobante, par ex car 0==entities.size ( ), on
 	// prend la bounding box de la vue 3D.
 	if ((false == NumericServices::isValidAndNotMax (xMin)) ||
@@ -451,8 +450,7 @@ void QtGeometryMirrorPanel::preview (bool show, bool destroyInteractor)
 	    (false == NumericServices::isValidAndNotMax (yMax)) ||
 	    (false == NumericServices::isValidAndNotMax (zMin)) ||
 	    (false == NumericServices::isValidAndNotMax (zMax)))
-		getRenderingManager ( ).getBoundingBox (
-											xMin, xMax, yMin, yMax, zMin, zMax);
+		getRenderingManager ( ).getBoundingBox (xMin, xMax, yMin, yMax, zMin, zMax);
 	if ((false == NumericServices::isValidAndNotMax (xMin)) ||
 	    (false == NumericServices::isValidAndNotMax (xMax)) ||
 	    (false == NumericServices::isValidAndNotMax (yMin)) ||
@@ -463,8 +461,7 @@ void QtGeometryMirrorPanel::preview (bool show, bool destroyInteractor)
 	RenderingManager::PlaneInteractor*	interactor	= getInteractor ( );
 	if (0 == interactor)
 	{
-		interactor	= getRenderingManager ( ).createPlaneInteractor (
-				p1, normal, xMin, xMax, yMin, yMax, zMin, zMax, this);
+		interactor	= getRenderingManager ( ).createPlaneInteractor (p1, normal, xMin, xMax, yMin, yMax, zMin, zMax, this);
 		registerPreviewedInteractor (interactor);
 	}
 	else
