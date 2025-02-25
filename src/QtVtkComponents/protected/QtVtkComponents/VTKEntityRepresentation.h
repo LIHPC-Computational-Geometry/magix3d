@@ -22,7 +22,8 @@
 #include <vtkTextActor.h>
 #include <vtkSelectVisiblePoints.h>
 #include <vtkUnstructuredGrid.h>
-#include <VtkComponents/vtkUnstructuredGridRefinementFilter.h>
+//#include <VtkComponents/vtkUnstructuredGridRefinementFilter.h>
+#include <vtkLoopSubdivisionFilter.h>
 
 #include <vector>
 
@@ -66,8 +67,7 @@ class VTKEntityRepresentation : public QtComponents::RenderedEntityRepresentatio
 	 * \param	<I>true</I> s'il faut afficher l'entité, <I>false</I> s'il
 	 *			faut l'enlever.
 	 */
-	virtual void show (
-			Mgx3D::QtVtkComponents::VTKRenderingManager& renderer, bool show);
+	virtual void show (Mgx3D::QtVtkComponents::VTKRenderingManager& renderer, bool show);
 
 	/**
 	 * Modifie si nécessaire les attributs de représentation selon
@@ -323,31 +323,31 @@ class VTKEntityRepresentation : public QtComponents::RenderedEntityRepresentatio
 	 */
 	//@{
 	/** Le maillage représentant l'entité en mode filaire. */
-	vtkUnstructuredGrid*		_wireGrid;
+	vtkPolyData*				_wireGrid;
 
 	/** L'acteur associé en mode filaire. */
 	VTKMgx3DActor*				_wireActor;
 
 	/** Le mapper associé en mode filaire. */
-	vtkDataSetMapper*		   	_wireMapper;
+	vtkPolyDataMapper*		   	_wireMapper;
 
 	/** Le maillage complémentaire ISO représentant l'entité en mode filaire. */
-	vtkUnstructuredGrid*		_isoWireGrid;
+	vtkPolyData*				_isoWireGrid;
 
 	/** L'acteur complémentaire ISO associé en mode filaire. */
 	VTKMgx3DActor*				_isoWireActor;
 
 	/** Le mapper complémentaire ISO associé en mode filaire. */
-	vtkDataSetMapper*		   _isoWireMapper;
+	vtkPolyDataMapper*		   _isoWireMapper;
 
 	/** Le maillage représentant une représentation de la discrétisation de l'entité. */
-	vtkUnstructuredGrid*		_discGrid;
+	vtkPolyData*				_discGrid;
 
 	/** L'acteur associé en mode filaire. */
 	VTKMgx3DActor*				_discActor;
 
 	/** Le mapper associé en mode filaire. */
-	vtkDataSetMapper*		   	_discMapper;
+	vtkPolyDataMapper*		   	_discMapper;
 
 	//@}
 
@@ -423,7 +423,8 @@ class VTKEntityRepresentation : public QtComponents::RenderedEntityRepresentatio
 	vtkPolyData*		        _refinedGrid;
 
 	/** La discretisation du maillage raffiné. */
-	vtkUnstructuredGridRefinementFilter*          _refineFilter;
+//	vtkUnstructuredGridRefinementFilter*          _refineFilter;
+	vtkLoopSubdivisionFilter*	_refineFilter;
 
 	/** L'acteur associé en mode plein. */
 	VTKMgx3DActor*              _refinedActor;

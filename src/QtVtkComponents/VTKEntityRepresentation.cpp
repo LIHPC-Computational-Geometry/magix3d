@@ -903,12 +903,10 @@ vtkDataSetMapper* VTKEntityRepresentation::getVolumicMapper ( )
 
 vtkPolyData* VTKEntityRepresentation::getRefinedGrid ( )
 {
-// CP TODO
 cout << __FILE__ << ' ' << __LINE__ << " VTKEntityRepresentation::getRefinedGrid TO REIMPLEMENT AS POLYDATA" << endl;
-/*
 	if (0 != _refineFilter)
 		return _refineFilter->GetOutput ( );
-*/
+
 	return _refinedGrid;
 }	// VTKEntityRepresentation::getRefinedGrid
 

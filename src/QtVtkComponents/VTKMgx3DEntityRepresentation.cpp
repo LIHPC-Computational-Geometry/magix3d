@@ -78,16 +78,14 @@ VTKMgx3DEntityRepresentation::VTKMgx3DEntityRepresentation (Entity& entity)
 }	// VTKMgx3DEntityRepresentation::VTKMgx3DEntityRepresentation
 
 
-VTKMgx3DEntityRepresentation::VTKMgx3DEntityRepresentation (
-											VTKMgx3DEntityRepresentation& ver)
+VTKMgx3DEntityRepresentation::VTKMgx3DEntityRepresentation (VTKMgx3DEntityRepresentation& ver)
 	: VTKEntityRepresentation (*(ver.getEntity ( )))
 {
 	MGX_FORBIDDEN ("VTKMgx3DEntityRepresentation copy constructor is not allowed.");
 }	// VTKMgx3DEntityRepresentation::VTKMgx3DEntityRepresentation
 
 
-VTKMgx3DEntityRepresentation& VTKMgx3DEntityRepresentation::operator = (
-										const VTKMgx3DEntityRepresentation& er)
+VTKMgx3DEntityRepresentation& VTKMgx3DEntityRepresentation::operator = (const VTKMgx3DEntityRepresentation& er)
 {
 	MGX_FORBIDDEN ("VTKMgx3DEntityRepresentation assignment operator is not allowed.");
 	if (&er != this)
@@ -372,8 +370,8 @@ cout << __FILE__ << ' ' << __LINE__ << " VTKMgx3DEntityRepresentation::createPol
 
 void VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (
 		Entity* entity,
-		VTKMgx3DActor*& actor, vtkDataSetMapper*& mapper,
-		vtkUnstructuredGrid*& grid,
+		VTKMgx3DActor*& actor, vtkPolyDataMapper*& mapper,
+		vtkPolyData*& grid,
 		const vector<Math::Point>& meshPts, const vector<size_t>& mesh)
 {
 	if ((0 != grid) || (0 != mapper) || (0 != actor))
@@ -382,8 +380,8 @@ void VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (
 	           "VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation")
 		throw exc;
 	}	// if ((0 != grid) || ...
-	grid		= vtkUnstructuredGrid::New ( );
-	mapper		= vtkDataSetMapper::New ( );
+	grid		= vtkPolyData::New ( );
+	mapper		= vtkPolyDataMapper::New ( );
 	mapper->SetInputData (grid);
 	mapper->ScalarVisibilityOff ( );
 #if	VTK_MAJOR_VERSION < 8
@@ -396,9 +394,7 @@ void VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (
 	if (0 != entity)
 		properties	= entity->getDisplayProperties ( );
 	const Color&	wireColor	= properties.getWireColor ( );
-	actor->GetProperty ( )->SetColor (
-		wireColor.getRed ( ) / 255., wireColor.getGreen ( ) / 255.,
-		wireColor.getBlue ( ) / 255.);
+	actor->GetProperty ( )->SetColor (wireColor.getRed ( ) / 255., wireColor.getGreen ( ) / 255., wireColor.getBlue ( ) / 255.);
 	actor->SetMapper (mapper);
 	CHECK_NULL_PTR_ERROR (grid)
 	vtkPoints*	points	= vtkPoints::New ( );
@@ -413,8 +409,7 @@ void VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (
 	grid->Allocate (edgesNum, 1000);
 	grid->SetPoints (points);
 	vtkIdType	id	= 0;
-	for (vector<Math::Point>::const_iterator itp = meshPts.begin ( );
-	     meshPts.end ( ) != itp; itp++, id++)
+	for (vector<Math::Point>::const_iterator itp = meshPts.begin ( ); meshPts.end ( ) != itp; itp++, id++)
 	{
 		// InsertPoint : range checking, réallocation si nécessaire.
 		// SetPoints   : pas de range checking ou  réallocation.
@@ -423,39 +418,26 @@ void VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (
 		points->SetPoint (id, coords);
 	}	// for (vector<Math::Point>::const_iterator itp = meshPts.begin ( );
 
-	// Les segments : on part ici du principe qu'on a que des segments.
-	// => Spécialisation : triangles
+	// Les segments :
 	vtkCellArray*	cellArray	= vtkCellArray::New ( );
-	vtkIdTypeArray*	idsArray	= vtkIdTypeArray::New ( );
-	// idsArray est forcément du type : nbPts p1 p2 .. pn pour chaque point,
-	// à savoir qu'on ne peut s'affranchir de mettre nbPts si toutes les mailles
-	// sont de même type (segment) et que c'est renseigné par ailleurs via
-	// grid->SetCells (VTK_LINE, cellArray);
-	// Par rapport au cas général (polygones de types différents) on fait tout
-	// de même l'économie du tableau cellTypes de taille
-	// edgesNum * sizeof (int).
-	idsArray->SetNumberOfValues (3 * edgesNum);
-	vtkIdType*		cellsPtr	= idsArray->GetPointer (0);
+	CHECK_NULL_PTR_ERROR (cellArray)
+	cellArray->Allocate (2 * edgesNum, 2 * edgesNum);
 	for (id = 0; id < edgesNum; id++)
 	{
-		size_t	pos	= 3 * id;
-		cellsPtr [pos]	= 2;
-		for (size_t j = 0; j < 2; j++)
-			cellsPtr [pos + j + 1]	= mesh [2 * id + j];
-	}	// for (id = 0; id < edgesNum; id++)
-	idsArray->Squeeze ( );
-	cellArray->SetCells (edgesNum, idsArray);
+		vtkIdType	pts [VTK_CELL_SIZE]	= { 0, 0 };
+		for (size_t i = 0; i < 2; i++)
+			pts [i]	= mesh [2 * id + i];
+		cellArray->InsertNextCell (2, pts);
+	}	// for (id = 0; id < edgesNum; id++
 	cellArray->Squeeze ( );
-	grid->SetCells (VTK_LINE, cellArray);
-	idsArray->Delete ( );	idsArray	= 0;
+	grid->SetLines (cellArray);
 	cellArray->Delete ( );	cellArray	= 0;
 	if (0 != points)
 		points->Delete ( );
 }	// VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation
 
 
-void VTKMgx3DEntityRepresentation::createAssociationVectorRepresentation (
-								const vector<Point>& vector, const Color& color)
+void VTKMgx3DEntityRepresentation::createAssociationVectorRepresentation (const vector<Point>& vector, const Color& color)
 {
 	if (true == vector.empty ( ))
 		return;
@@ -578,8 +560,8 @@ void VTKMgx3DEntityRepresentation::createAssociationVectorRepresentation (
 	_vectAssActor->SetMapper (_vectAssMapper);
 }	// VTKMgx3DEntityRepresentation::createAssociationVectorRepresentation
 
-void VTKMgx3DEntityRepresentation::createTrihedronRepresentation (
-		vtkTransform* transf)
+
+void VTKMgx3DEntityRepresentation::createTrihedronRepresentation (vtkTransform* transf)
 {
 	CHECK_NULL_PTR_ERROR (getEntity ( ));
 
@@ -663,33 +645,29 @@ void VTKMgx3DEntityRepresentation::createRefinedRepresentation (size_t factor)
 	vector<Math::Point>	points;
 	vector<size_t>		triangles;
 	const bool		shouldRefine	= !getRefinedRepresentation (points, triangles, factor);
-switch (getEntity ( )->getDim ( ))
-{
-	case 2	:
-	case 3	:
-	VTKMgx3DEntityRepresentation::createTrianglesSurfacicRepresentation (
-		getEntity ( ), _refinedActor, _refinedMapper, _refinedGrid, points, triangles);
-		break;
-	default	:
+	switch (getEntity ( )->getDim ( ))
+	{
+		case 2	:
+		case 3	:
+			VTKMgx3DEntityRepresentation::createTrianglesSurfacicRepresentation (getEntity ( ), _refinedActor, _refinedMapper, _refinedGrid, points, triangles);
+			break;
+		default	:
 cout << __FILE__ << ' ' << __LINE__ << " VTKMgx3DEntityRepresentation::createRefinedRepresentation TO REIMPLEMENT AS POLYDATA" << endl;
-/*	CP TODO
-	VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (
-		getEntity ( ), _refinedActor, _refinedMapper, _refinedGrid, points, triangles);
-*/
-}	// switch (getEntity ( )->getDim ( ))
+			VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (getEntity ( ), _refinedActor, _refinedMapper, _refinedGrid, points, triangles);
+	}	// switch (getEntity ( )->getDim ( ))
 
 	if (true == shouldRefine)
 	{
 cout << __FILE__ << ' ' << __LINE__ << " VTKMgx3DEntityRepresentation::createRefinedRepresentation TO REIMPLEMENT AS POLYDATA" << endl;
-/*	CP TODO
-		_refineFilter	= vtkUnstructuredGridRefinementFilter::New ( );
+		_refineFilter	= vtkLoopSubdivisionFilter::New ( );
+		_refineFilter->SetNumberOfSubdivisions (factor);
+//		_refineFilter	= vtkUnstructuredGridRefinementFilter::New ( );
 		_refinedMapper->SetInputData (_refineFilter->GetOutput ( ));
 		_refineFilter->SetInputData (_refinedGrid);
-		_refineFilter->SetRefinementFactor (factor);
+//		_refineFilter->SetRefinementFactor (factor);
 		_refineFilter->Update ( );
 		_refinedMapper->SetInputData (_refineFilter->GetOutput ( ));
 		_refinedActor->GetProperty ( )->SetColor (0., 1., 0.);
-*/
 	}	// if (true == shouldRefine)
 }	// VTKMgx3DEntityRepresentation::createRefinedRepresentation
 

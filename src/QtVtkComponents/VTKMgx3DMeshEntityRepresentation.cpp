@@ -41,23 +41,20 @@ namespace QtVtkComponents
 // ===========================================================================
 
 
-VTKMgx3DMeshEntityRepresentation::VTKMgx3DMeshEntityRepresentation (
-															MeshEntity& entity)
+VTKMgx3DMeshEntityRepresentation::VTKMgx3DMeshEntityRepresentation (MeshEntity& entity)
 	: QtVtkComponents::VTKMgx3DEntityRepresentation (entity)
 {
 }	// VTKMgx3DMeshEntityRepresentation::VTKMgx3DMeshEntityRepresentation
 
 
-VTKMgx3DMeshEntityRepresentation::VTKMgx3DMeshEntityRepresentation (
-										VTKMgx3DMeshEntityRepresentation& ver)
+VTKMgx3DMeshEntityRepresentation::VTKMgx3DMeshEntityRepresentation (VTKMgx3DMeshEntityRepresentation& ver)
 	: QtVtkComponents::VTKMgx3DEntityRepresentation (*(ver.getEntity ( )))
 {
 	MGX_FORBIDDEN ("VTKMgx3DMeshEntityRepresentation copy constructor is not allowed.");
 }	// VTKMgx3DMeshEntityRepresentation::VTKMgx3DMeshEntityRepresentation
 
 
-VTKMgx3DMeshEntityRepresentation& VTKMgx3DMeshEntityRepresentation::operator = (
-									const VTKMgx3DMeshEntityRepresentation& er)
+VTKMgx3DMeshEntityRepresentation& VTKMgx3DMeshEntityRepresentation::operator = (const VTKMgx3DMeshEntityRepresentation& er)
 {
 	MGX_FORBIDDEN ("VTKMgx3DMeshEntityRepresentation assignment operator is not allowed.");
 	if (&er != this)
@@ -121,8 +118,7 @@ void VTKMgx3DMeshEntityRepresentation::createSurfacicRepresentation ( )
 	vector<Math::Point>&	points		= mdr.getPoints ( );
 	const vector<size_t>&	polygons	= mdr.getCells ( );
 	std::map<int,int>       points2gmdsID = mdr.getPoints2nodesID ( );
-	VTKMgx3DEntityRepresentation::createPolygonsSurfacicRepresentation (
-														points, polygons);
+	VTKMgx3DEntityRepresentation::createPolygonsSurfacicRepresentation (points, polygons);
 	_surfacicActor->SetVisibility (true);
 	_surfacicPointsVTK2GMDSID = points2gmdsID;
 //_surfacicActor->GetProperty ( )->SetOpacity (.75);
@@ -150,8 +146,7 @@ void VTKMgx3DMeshEntityRepresentation::createVolumicRepresentation ( )
 }	// VTKMgx3DMeshEntityRepresentation::createVolumicRepresentation
 
 
-void VTKMgx3DMeshEntityRepresentation::createVolumicRepresentation (
-			const vector<Math::Point>& meshPts, const vector<size_t>& mesh)
+void VTKMgx3DMeshEntityRepresentation::createVolumicRepresentation (const vector<Math::Point>& meshPts, const vector<size_t>& mesh)
 {
 	if ((0 != _volumicGrid) || (0 != _volumicMapper) || (0 != _volumicActor))
 	{
@@ -246,13 +241,9 @@ void VTKMgx3DMeshEntityRepresentation::createVolumicRepresentation (
 
 void VTKMgx3DMeshEntityRepresentation::createWireRepresentation ( )
 {
-// CP TODO
-cout << __FILE__ << ' ' << __LINE__ << " VTKMgx3DMeshEntityRepresentation::createWireRepresentation TO REIMPLEMENT AS POLYDATA" << endl;
-/*
 	if ((0 != _wireGrid) || (0 != _wireMapper) || (0 != _wireActor))
 	{
-		INTERNAL_ERROR (exc, "Représentation déjà créée.",
-                "VTKMgx3DMeshEntityRepresentation::createWireRepresentation")
+		INTERNAL_ERROR (exc, "Représentation déjà créée.", "VTKMgx3DMeshEntityRepresentation::createWireRepresentation")
 		throw exc;
 	}	// if ((0 != _wireGrid) || ...
 	CHECK_NULL_PTR_ERROR (getEntity ( ))
@@ -262,41 +253,32 @@ cout << __FILE__ << ' ' << __LINE__ << " VTKMgx3DMeshEntityRepresentation::creat
 	// [EB] : le problème c'est que l'on prend systématiquement toutes les mailles
 	// et pas seulement la peau
 
-	MeshDisplayRepresentation	mdr (DisplayRepresentation::WIRE);
-	getEntity ( )->getRepresentation (mdr, true);
-	vector<Math::Point>&	points		= mdr.getPoints ( );
-	const vector<size_t>&	polygons	= mdr.getCells ( );
-	vtkUnstructuredGrid*	grid	=
-				2 == getEntity ( )->getDim ( ) ? _surfacicGrid : _volumicGrid;
-	vtkActor*				actor	=
-				2 == getEntity ( )->getDim ( ) ? _surfacicActor : _volumicActor;
-	bool					hideGrid	= false;
-	if (0 == grid)
+	bool					hideGrid		= false;
+	vtkExtractEdges*		edgesExtractor	= vtkExtractEdges::New ( );
+	if (2 == getEntity ( )->getDim ( ))
 	{
-		if (2 == getEntity ( )->getDim ( ))
+		if (0 == _surfacicGrid)
+		{
 			createSurfacicRepresentation ( );
-		else
+			hideGrid	= true;
+		}	// if (0 == _surfacicGrid)
+		CHECK_NULL_PTR_ERROR (_surfacicGrid)
+		edgesExtractor->SetInputData (_surfacicGrid);
+	}	// if (2 == getEntity ( )->getDim ( ))
+	else
+	{
+		if (0 == _volumicGrid)
+		{
 			createVolumicRepresentation ( );
-		grid	= 2 == getEntity( )->getDim( ) ? _surfacicGrid : _volumicGrid;
-		actor	= 2 == getEntity( )->getDim( ) ? _surfacicActor : _volumicActor;
-		hideGrid	= true;
-	}	// if (0 == grid)
-	CHECK_NULL_PTR_ERROR (grid)
+			hideGrid	= true;
+		}	// if (0 == _volumicGrid)
+		CHECK_NULL_PTR_ERROR (_volumicGrid)
+		edgesExtractor->SetInputData (_volumicGrid);
+	}	// else if (2 == getEntity ( )->getDim ( ))
+	vtkActor*	actor	= 2 == getEntity ( )->getDim ( ) ? _surfacicActor : _volumicActor;
 	CHECK_NULL_PTR_ERROR (actor)
-
-	vtkExtractEdges*	edgesExtractor	= vtkExtractEdges::New ( );
-#ifndef VTK_5
-	edgesExtractor->SetInputData (grid);
-#else	// VTK_5
-	edgesExtractor->SetInput (grid);
-#endif	// VTK_5
-
-	_wireMapper	= vtkDataSetMapper::New ( );
-#ifndef VTK_5
+	_wireMapper	= vtkPolyDataMapper::New ( );
 	_wireMapper->SetInputConnection (edgesExtractor->GetOutputPort ( ));
-#else	// VTK_5
-	_wireMapper->SetInput (edgesExtractor->GetOutput ( ));
-#endif	// VTK_5
 	_wireMapper->ScalarVisibilityOff ( );
 #if	VTK_MAJOR_VERSION < 8
 	_wireMapper->SetImmediateModeRendering (!Internal::Resources::instance ( )._useDisplayList);
@@ -304,15 +286,12 @@ cout << __FILE__ << ' ' << __LINE__ << " VTKMgx3DMeshEntityRepresentation::creat
 	_wireActor	= VTKMgx3DActor::New ( );
 	_wireActor->SetEntity (getEntity ( ));
 	_wireActor->SetRepresentationType (DisplayRepresentation::WIRE);
-	const DisplayProperties&	properties	=
-									getEntity ( )->getDisplayProperties ( );
+	const DisplayProperties&	properties	= getEntity ( )->getDisplayProperties ( );
 	const Color&				wireColor	= properties.getWireColor ( );
-	_wireActor->GetProperty ( )->SetColor (
-			wireColor.getRed ( ), wireColor.getGreen ( ), wireColor.getBlue( ));	
+	_wireActor->GetProperty ( )->SetColor (wireColor.getRed ( ), wireColor.getGreen ( ), wireColor.getBlue( ));	
 	_wireActor->SetMapper (_wireMapper);
 	actor->SetVisibility (!hideGrid);
 	edgesExtractor->Delete ( );		edgesExtractor	= 0;
-*/
 }	// VTKMgx3DMeshEntityRepresentation::createWireRepresentation
 
 
@@ -320,8 +299,7 @@ void VTKMgx3DMeshEntityRepresentation::createIsoWireRepresentation ( )
 {
 	if ((0 != _isoWireGrid) || (0 != _isoWireMapper) || (0 != _isoWireActor))
 	{
-		INTERNAL_ERROR (exc, "Représentation déjà créée.",
-                "VTKMgx3DMeshEntityRepresentation::createIsoWireRepresentation")
+		INTERNAL_ERROR (exc, "Représentation déjà créée.", "VTKMgx3DMeshEntityRepresentation::createIsoWireRepresentation")
 		throw exc;
 	}	// if ((0 != _isoWireGrid) || ...
 
@@ -329,8 +307,7 @@ void VTKMgx3DMeshEntityRepresentation::createIsoWireRepresentation ( )
 	getEntity ( )->getRepresentation (gr, true);
 	vector<Math::Point>&	points		= gr.getPoints ( );
 	vector<size_t>&			lines	= gr.getCurveDiscretization ( );
-	VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (
-			getEntity ( ), _isoWireActor, _isoWireMapper,_isoWireGrid, points, lines);
+	VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (getEntity ( ), _isoWireActor, _isoWireMapper,_isoWireGrid, points, lines);
 }	// VTKMgx3DMeshEntityRepresentation::createIsoWireRepresentation
 
 
@@ -339,8 +316,7 @@ void VTKMgx3DMeshEntityRepresentation::createAssociationVectorRepresentation ( )
 }	// VTKMgx3DMeshEntityRepresentation::createAssociationVectorRepresentation
 
 
-bool VTKMgx3DMeshEntityRepresentation::getRefinedRepresentation (
-	vector<Math::Point>& points, vector<size_t>& triangles, size_t factor)
+bool VTKMgx3DMeshEntityRepresentation::getRefinedRepresentation (vector<Math::Point>& points, vector<size_t>& triangles, size_t factor)
 {
 	return false;	// Raffinement non fait comme demandé
 }	// VTKMgx3DMeshEntityRepresentation::getRefinedRepresentation

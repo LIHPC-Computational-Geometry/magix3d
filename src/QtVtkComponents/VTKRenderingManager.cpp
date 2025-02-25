@@ -69,6 +69,7 @@
 #include <vtkTextMapper.h>
 #include <vtkTextProperty.h>
 #include <vtkTransform.h>
+#include <vtkTriangleFilter.h>
 #include <vtkDebugLeaks.h>
 
 #include <set>
@@ -516,7 +517,6 @@ void VTKRenderingManager::VTKConstrainedPointInteractor::setConstraint (Entity* 
 {
 // CP TODO
 cout << __FILE__ << ' ' << __LINE__ << " VTKRenderingManager::VTKConstrainedPointInteractor::setConstraint TO REIMPLEMENT WITH POLYDATA" << endl;
-/*
 	CHECK_NULL_PTR_ERROR (_pointWidget)
 	if ((0 != _constraintActor) && (0 != _pointWidget->GetCurrentRenderer ( )) && (false != _pointWidget->GetCurrentRenderer ( )->HasViewProp (_constraintActor)))
 		_pointWidget->GetCurrentRenderer ( )->RemoveViewProp (_constraintActor);
@@ -525,14 +525,22 @@ cout << __FILE__ << ' ' << __LINE__ << " VTKRenderingManager::VTKConstrainedPoin
 	_pointWidget->GetConstrainedPointRepresentation ( )->GetUGridPointPlacer ( )->RemoveAllProps ( );
 	_pointWidget->Off ( );
 
-	vtkUnstructuredGrid*	grid	= 0;
+	vtkUnstructuredGrid*	grid	= vtkUnstructuredGrid::New ( );
 	if (0 != _pointWidget)
 	{
 		DisplayProperties::GraphicalRepresentation*	rep	= 0 == constraint ? 0 : constraint->getDisplayProperties ( ).getGraphicalRepresentation ( );
 		VTKEntityRepresentation*	vtkRep	= dynamic_cast<VTKEntityRepresentation*>(rep);
 		if (0 != rep)
 			rep->createRefinedRepresentation (factor);
-		grid			= 0 == vtkRep ? 0 : vtkRep->getRefinedGrid ( );
+		if (0 != vtkRep->getRefinedGrid ( ))
+		{
+			vtkTriangleFilter*	triangleFilter	= vtkTriangleFilter::New ( );
+			triangleFilter->SetInputData (vtkRep->getRefinedGrid ( ));
+			triangleFilter->Update ( );
+			grid->SetPoints (triangleFilter->GetOutput ( )->GetPoints ( ));
+			grid->SetCells (VTK_TRIANGLE, triangleFilter->GetOutput ( )->GetPolys () );
+			triangleFilter->Delete ( );		triangleFilter	= 0;
+		}	// if (0 != vtkRep->getRefinedGrid ( ))
 		_constraintActor	= 0 == vtkRep ? 0 : vtkRep->getRefinedActor ( );
 	}	// if (0 != _pointWidget)
 	_pointWidget->GetConstrainedPointRepresentation ( )->GetUGridPointPlacer ( )->SetGrid (grid);
@@ -545,7 +553,7 @@ cout << __FILE__ << ' ' << __LINE__ << " VTKRenderingManager::VTKConstrainedPoin
 			_pointWidget->GetCurrentRenderer ( )->AddViewProp (_constraintActor);
 		setPoint (getInitialPoint ( ));	// Positionner la "croix" du sélecteur sur l'entité de contrainte au plus près du point à déplacer 
 	}	// if (0 != _constraintActor)
-*/
+	grid->Delete ( );	grid	= 0;
 }	// VTKConstrainedPointInteractor::setConstraint
 
 
@@ -1502,8 +1510,8 @@ VTKRenderingManager::RepresentationID
 			const DisplayProperties& properties, bool display)
 {
 	VTKMgx3DActor*			actor	= 0;
-	vtkDataSetMapper*		mapper	= 0;
-	vtkUnstructuredGrid*	grid	= 0;
+	vtkPolyDataMapper*		mapper	= 0;
+	vtkPolyData*			grid	= 0;
 	VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (0, actor, mapper, grid, points, segments);
 	CHECK_NULL_PTR_ERROR (actor)
 	CHECK_NULL_PTR_ERROR (mapper)

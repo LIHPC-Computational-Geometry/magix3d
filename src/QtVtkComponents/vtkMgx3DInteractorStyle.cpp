@@ -18,7 +18,10 @@
 #include <vtkRenderWindow.h>
 #include <vtkAbstractPropPicker.h>
 #include <vtkAssemblyPath.h>
+#include <vtkInformation.h>
 #include <vtkProp3DCollection.h>
+#include <vtkSelection.h>
+#include <vtkSelectionNode.h>
 
 #include <assert.h>
 #include <strings.h>
@@ -49,8 +52,9 @@ bool entityComparator (const Entity* lhs, const Entity* rhs)
 
 vtkMgx3DInteractorStyle::vtkMgx3DInteractorStyle ( )
 	: vtkUnifiedInteractorStyle ( ), Mgx3DPicker (0), Mgx3DPickerCommand (0), SelectionManager (0), SeizureManager (0), 
-	  InteractiveSelectionActivated (false), RubberButtonDown (false), RubberBand (false), CompletelyInsideSelection (false),
-	  PixelArray (vtkSmartPointer<vtkUnsignedCharArray>::New ( )), TmpPixelArray (vtkSmartPointer<vtkUnsignedCharArray>::New ( ))
+	  InteractiveSelectionActivated (false), ForegroundSelection (false), RubberButtonDown (false), RubberBand (false), CompletelyInsideSelection (false),
+	  PixelArray (vtkSmartPointer<vtkUnsignedCharArray>::New ( )), TmpPixelArray (vtkSmartPointer<vtkUnsignedCharArray>::New ( )),
+	  HardwareSelector(vtkSmartPointer<vtkHardwareSelector>::New ( ))
 {
 	ButtonPressPosition [0]	= ButtonPressPosition [1]	= 0;
 	StartPosition [0]		= StartPosition [1]			= 0;
@@ -64,8 +68,8 @@ vtkMgx3DInteractorStyle::vtkMgx3DInteractorStyle ( )
 
 vtkMgx3DInteractorStyle::vtkMgx3DInteractorStyle (const vtkMgx3DInteractorStyle&)
 	: vtkUnifiedInteractorStyle ( ), Mgx3DPicker (0), Mgx3DPickerCommand (0), SelectionManager (0), SeizureManager (0),
-	  InteractiveSelectionActivated (false), RubberButtonDown (false), RubberBand (false), CompletelyInsideSelection (false),
-	  PixelArray ( ), TmpPixelArray ( )
+	  InteractiveSelectionActivated (false), ForegroundSelection (false), RubberButtonDown (false), RubberBand (false), CompletelyInsideSelection (false),
+	  PixelArray ( ), TmpPixelArray ( ), HardwareSelector ( )
 {
 	assert (0 && "vtkMgx3DInteractorStyle copy constructor is not allowed.");
 }	// vtkMgx3DInteractorStyle copy constructor
@@ -97,6 +101,7 @@ void vtkMgx3DInteractorStyle::PrintSelf (ostream& os, vtkIndent indent)
 	   << "InteractiveSelectionActivated : " << (true == InteractiveSelectionActivated ? "True" : "False") << endl
 	   << "RubberBand : " << (true == RubberBand ? "True" : "False") << endl
 	   << "CompletelyInsideSelection : " << (true == CompletelyInsideSelection ? "True" : "False") << endl
+	   << "ForegroundSelection : " << (true == ForegroundSelection ? "True" : "False") << endl
 	   << "PickOnLeftButtonDown : " << (true == Resources::instance ( )._pickOnLeftButtonDown.getValue( ) ? "True" : "False") << endl
 	   << "PickOnRightButtonDown : " << (true == Resources::instance ( )._pickOnRightButtonDown.getValue( ) ? "True" : "False") << endl;
 }	// vtkMgx3DInteractorStyle::PrintSelf
@@ -514,27 +519,31 @@ void vtkMgx3DInteractorStyle::OnLeftButtonUp ( )
 			rwi->GetRenderWindow ( )->Frame ( );
 			RubberButtonDown		= false;
 
-			vtkSmartPointer<vtkECMAreaPicker>		areaPicker		= vtkSmartPointer<vtkECMAreaPicker>::New ( );
-//			areaPicker->SelectCompletelyInside (CompletelyInsideSelection);
-// Rem : CTRL + i mappé en Tab !!! d'où le choix de 'd' (dedans) plutôt que 'i' (inside, intérieur) (:
-			if ((true == CompletelyInsideSelection) || ((0 != rwi) && (0 != rwi->GetKeySym ( )) && ('d' == *rwi->GetKeySym ( ))))
-				areaPicker->SelectCompletelyInside (true);
-			areaPicker->SetRenderer (CurrentRenderer);
-			int	result	= areaPicker->AreaPick (StartPosition [0], StartPosition [1], EndPosition [0], EndPosition [1], CurrentRenderer);
-			vtkProp3DCollection*		pickedProps	= areaPicker->GetProp3Ds ( );
-			vtkProp3D*					p			= 0;
-			vtkCollectionSimpleIterator	csi;
-			pickedProps->InitTraversal (csi);
-			set<Entity*, decltype(&entityComparator)>	entities (&entityComparator);
-			while (0 != (p = pickedProps->GetNextProp3D (csi)))
+			if (0 == SelectionManager)
+				return;
+
+ForegroundSelection	= true;
+			if (false == GetForegroundSelection ( ))
 			{
-				bool			add	= true;
-				VTKMgx3DActor*	a	= dynamic_cast<VTKMgx3DActor*>(p);
-				if (0 != a)
-					entities.insert (a->GetEntity ( ));
-			}	// while (0 != (p = pickedProps->GetNextProp3D (csi)))
-			if (0 != SelectionManager)
-			{
+				vtkSmartPointer<vtkECMAreaPicker>		areaPicker		= vtkSmartPointer<vtkECMAreaPicker>::New ( );
+				// Rem : CTRL + i mappé en Tab !!! d'où le choix de 'd' (dedans) plutôt que 'i' (inside, intérieur) (:
+				if ((true == CompletelyInsideSelection) || ((0 != rwi) && (0 != rwi->GetKeySym ( )) && ('d' == *rwi->GetKeySym ( ))))
+					areaPicker->SelectCompletelyInside (true);
+				areaPicker->SetRenderer (CurrentRenderer);
+				int	result	= areaPicker->AreaPick (StartPosition [0], StartPosition [1], EndPosition [0], EndPosition [1], CurrentRenderer);
+				vtkProp3DCollection*		pickedProps	= areaPicker->GetProp3Ds ( );
+				vtkProp3D*					p			= 0;
+				vtkCollectionSimpleIterator	csi;
+				pickedProps->InitTraversal (csi);
+				set<Entity*, decltype(&entityComparator)>	entities (&entityComparator);
+				while (0 != (p = pickedProps->GetNextProp3D (csi)))
+				{
+					bool			add	= true;
+					VTKMgx3DActor*	a	= dynamic_cast<VTKMgx3DActor*>(p);
+					if (0 != a)
+						entities.insert (a->GetEntity ( ));
+				}	// while (0 != (p = pickedProps->GetNextProp3D (csi)))
+
 				if (false == isControlKeyPressed ( ))
 				{
 					SelectionManager->clearSelection ( );
@@ -552,7 +561,54 @@ void vtkMgx3DInteractorStyle::OnLeftButtonUp ( )
 
 					SelectionManager->addToSelection (filteredEntities);
 				}	// else if (false == isControlKeyPressed ( ))
-			}	// if (0 != SelectionManager)
+			}	// if (false == GetForegroundSelection ( ))
+			else
+			{	// Sélection hardware au premier plan
+				const double	xmin	= StartPosition [0] < EndPosition [0] ? StartPosition [0] : EndPosition [0];
+				const double	xmax	= StartPosition [0] >= EndPosition [0] ? StartPosition [0] : EndPosition [0];
+				const double	ymin	= StartPosition [1] < EndPosition [1] ? StartPosition [1] : EndPosition [1];
+				const double	ymax	= StartPosition [1] >= EndPosition [1] ? StartPosition [1] : EndPosition [1];
+				vtkHardwareSelector&	selector	= GetHardwareSelector ( );
+				selector.SetArea (xmin, ymin, xmax, ymax);
+				selector.SetRenderer (CurrentRenderer);
+				vtkSmartPointer<vtkSelection>	selection;
+				selection.TakeReference (selector.Select ( ));
+				vector<Entity*>					capturedEntities;
+				for (unsigned int n = 0; n < selection->GetNumberOfNodes ( ); n++)
+				{
+					vtkSelectionNode*	node	= selection->GetNode (n);
+					if ((0 == node) || (0 == node->GetProperties ( )))
+						continue;
+						
+					const int			propId		= node->GetProperties ( )->Get (vtkSelectionNode::PROP_ID ( ));
+					VTKMgx3DActor*		mgxActor	= dynamic_cast<VTKMgx3DActor*>(selector.GetPropFromID (propId));
+					if (0 != mgxActor)
+					{
+						Entity*	entity	= mgxActor->GetEntity ( );
+						for (vector<Entity*>::const_iterator ite = capturedEntities.begin ( ); capturedEntities.end ( ) != ite; ite++)
+							if (*ite == entity)
+								continue;	// Ne recenser qu'un seul exemplaire. On peut avoir des représentations pleines + filaires ...
+						capturedEntities.push_back (entity);
+					}	// if (0 != mgxActor)
+				}	// for (unsigned int n = 0; n < selection->GetNumberOfNodes ( ); n++)
+
+				if (false == isControlKeyPressed ( ))
+				{
+					SelectionManager->clearSelection ( );
+					SelectionManager->addToSelection (capturedEntities);
+				}
+				else
+				{
+					// Ne pas ajouter une entité déjà présente car sinon au premier undo de la sélection on la retire de toute la pile de sélection
+					vector<Entity*>	filteredEntities;
+					for (vector<Entity*>::const_iterator ite = capturedEntities.begin ( ); capturedEntities.end ( ) != ite; ite++)
+						if (false == SelectionManager->isSelected(**ite))
+							filteredEntities.push_back (*ite);
+
+					SelectionManager->addToSelection (filteredEntities);
+				}	// else if (false == isControlKeyPressed ( ))
+				
+			}	// else if (false == GetForegroundSelection ( ))
 		}	// else if (false == RubberBand)
 	}	// if (true == GetInteractiveSelectionActivated ( ))
 }	// vtkMgx3DInteractorStyle::OnLeftButtonUp
@@ -596,6 +652,18 @@ bool vtkMgx3DInteractorStyle::GetInteractiveSelectionActivated ( ) const
 {
 	return InteractiveSelectionActivated;
 }	// vtkMgx3DInteractorStyle::GetInteractiveSelectionActivated
+
+
+void vtkMgx3DInteractorStyle::SetForegroundSelection (bool on)
+{
+	ForegroundSelection	= on;
+}	// vtkMgx3DInteractorStyle::SetForegroundSelection
+
+
+bool vtkMgx3DInteractorStyle::GetForegroundSelection ( ) const
+{
+	return ForegroundSelection;
+}	// vtkMgx3DInteractorStyle::GetForegroundSelection
 
 
 void vtkMgx3DInteractorStyle::SetRubberBand (bool on)
@@ -665,6 +733,13 @@ void vtkMgx3DInteractorStyle::HideSelection()
 //    if (0 != Mgx3DPickerCommand)
 //        Mgx3DPickerCommand->HideSelection ( );
 } // vtkMgx3DInteractorStyle::HideSelection
+
+
+vtkHardwareSelector& vtkMgx3DInteractorStyle::GetHardwareSelector ( )
+{
+	assert ((0 != HardwareSelector.Get ( )) && "vtkMgx3DInteractorStyle::GetHardwareSelector : null selector.");
+	return *(HardwareSelector.Get ( ));
+}	// vtkMgx3DInteractorStyle::GetHardwareSelector 
 
 
 void vtkMgx3DInteractorStyle::RedrawRubberBand ( )
