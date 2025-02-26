@@ -14,6 +14,7 @@
 
 #include <TkUtil/InternalError.h>
 
+#include <algorithm>
 #include <vector>
 #include <string>
 
@@ -174,6 +175,23 @@ template < typename E > inline std::vector< Mgx3D::Utils::Entity* > entitiesFrom
 
 	return entities;
 }	// entitiesFromTypedEntities
+
+/**
+ * \return		La différence entre les 2 listes d'entités reçues en premiers arguments.
+ * \param		before et after représentent la même liste d'entités avant et après un évènement, par exemple l'exécution d'une commande
+ * \param		En sortie added recevra les entités présentes dans after mais pas dans before
+ * \param		En sortie removed recevra les entités présentes dans before mais pas dans after
+ */
+template < typename E > inline void difference (
+			const std::vector< E* >& before, const std::vector< E* >& after, std::vector< E* >& added, std::vector< E* >& removed)
+{
+	for (typename std::vector< E* >::const_iterator ite = after.begin ( ); after.end ( ) != ite; ite++)
+		if (before.end ( ) == std::find (before.begin ( ), before.end ( ), *ite))
+			added.push_back (*ite);
+	for (typename std::vector< E* >::const_iterator ite = before.begin ( ); before.end ( ) != ite; ite++)
+		if (after.end ( ) == std::find (after.begin ( ), after.end ( ), *ite))
+			removed.push_back (*ite);
+}	// difference
 
 
 /*----------------------------------------------------------------------------*/
