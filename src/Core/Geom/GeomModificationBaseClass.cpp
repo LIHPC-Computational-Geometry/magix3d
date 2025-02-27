@@ -459,14 +459,87 @@ void GeomModificationBaseClass::cleanRefEntities(){
     //En fait, on supprime les connectivites de entites de references
     //entre elles. Si un solide adjacent est connecte a une entite de ref
     // mais n'en est pas une, cette adjacence est conservée.
-    for(unsigned int i=0; i<4;i++){
-        std::list<GeomEntity*>::iterator it = m_ref_entities[i].begin();
-        for(;it!=m_ref_entities[i].end();it++){
-        	// Attention si l'entite de reference est adjacente, on ne fait rien
-        	GeomEntity* e = *it;
-        	e->clearRefEntities(m_ref_entities[0],m_ref_entities[1],
-        			m_ref_entities[2],m_ref_entities[3]);
+    for (auto ge : m_ref_entities[0])
+    {
+        Vertex* v = dynamic_cast<Vertex*>(ge);
+        std::vector<Curve*> toRemoveC;
+        std::vector<Curve*> incidentCurves;
+        v->get(incidentCurves);
+        auto refCurves = m_ref_entities[1];
+        for(auto c : incidentCurves){
+            auto res = std::find(refCurves.begin(),refCurves.end(),c);
+            if(res != refCurves.end())
+                toRemoveC.push_back(c);
         }
+        for(auto c : toRemoveC)
+            v->remove(c);
+    }
+    for (auto ge : m_ref_entities[1])
+    {
+        Curve* c = dynamic_cast<Curve*>(ge);
+        std::vector<Surface*> toRemoveS;
+        std::vector<Vertex*> toRemoveV;
+        std::vector<Surface*> incidentSurfaces;
+        std::vector<Vertex*> incidentVertices;
+        c->get(incidentSurfaces);
+        c->get(incidentVertices);
+        auto refSurfaces = m_ref_entities[2];
+        for(auto s : incidentSurfaces){
+            auto res = std::find(refSurfaces.begin(),refSurfaces.end(),s);
+            if(res != refSurfaces.end())
+                toRemoveS.push_back(s);
+        }
+        auto refVertices = m_ref_entities[0];
+        for(auto v : incidentVertices){
+            auto res = std::find(refVertices.begin(),refVertices.end(),v);
+            if(res != refVertices.end())
+                toRemoveV.push_back(v);
+        }
+        for(auto s : toRemoveS)
+            c->remove(s);
+        for(auto v : toRemoveV)
+            c->remove(v);
+    }
+    for (auto ge : m_ref_entities[2])
+    {
+        Surface* s = dynamic_cast<Surface*>(ge);
+        std::vector<Volume*> toRemoveV;
+        std::vector<Curve*> toRemoveC;
+        std::vector<Volume*> incidentVolumes;
+        std::vector<Curve*> incidentCurves;
+        s->get(incidentVolumes);
+        s->get(incidentCurves);
+        auto refVolumes = m_ref_entities[3];
+        for(auto v : incidentVolumes){
+            auto res = std::find(refVolumes.begin(),refVolumes.end(),s);
+            if(res != refVolumes.end())
+                toRemoveV.push_back(v);
+        }
+        auto refCurves = m_ref_entities[1];
+        for(auto c : incidentCurves){
+            auto res = std::find(refCurves.begin(),refCurves.end(),c);
+            if(res != refCurves.end())
+                toRemoveC.push_back(c);
+        }
+        for(auto v : toRemoveV)
+            s->remove(v);
+        for(auto c : toRemoveC)
+            s->remove(c);
+    }
+    for (auto ge : m_ref_entities[3])
+    {
+        Volume* v = dynamic_cast<Volume*>(ge);
+        std::vector<Surface*> toRemoveS;
+        std::vector<Surface*> incidentSurfaces;
+        v->get(incidentSurfaces);
+        auto refSurfaces = m_ref_entities[2];
+        for(auto s : incidentSurfaces){
+            auto res = std::find(refSurfaces.begin(),refSurfaces.end(),s);
+            if(res != refSurfaces.end())
+                toRemoveS.push_back(s);
+        }
+        for(auto s : toRemoveS)
+            v->remove(s);
     }
 }
 /*----------------------------------------------------------------------------*/

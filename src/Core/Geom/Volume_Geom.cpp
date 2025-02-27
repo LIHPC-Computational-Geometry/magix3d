@@ -124,22 +124,6 @@ void Volume::createSpecificMemento(MementoGeomEntity& mem)
     mem.setOCCShapes(shapes);
 }
 /*----------------------------------------------------------------------------*/
-void Volume::clearRefEntities(std::list<GeomEntity*>& vertices,
-        std::list<GeomEntity*>& curves,
-        std::list<GeomEntity*>& surfaces,
-        std::list<GeomEntity*>& volumes)
-{
-    std::vector<Surface*> toRemoveS;
-    for(unsigned int i=0;i<m_surfaces.size();i++){
-        GeomEntity *e = m_surfaces[i];
-        std::list<GeomEntity*>::iterator res = std::find(surfaces.begin(),surfaces.end(),e);
-        if(res!=surfaces.end())
-            toRemoveS.push_back(dynamic_cast<Surface*>(e));
-    }
-    for(unsigned int i=0;i<toRemoveS.size();i++)
-        remove(toRemoveS[i]);
-}
-/*----------------------------------------------------------------------------*/
 void Volume::get(std::vector<Vertex*>& vertices) const
 {
     std::list<Vertex*> l;

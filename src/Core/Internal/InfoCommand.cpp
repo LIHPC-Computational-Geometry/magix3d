@@ -431,28 +431,40 @@ void InfoCommand::setDestroyAndUpdateConnectivity
 
     struct : Geom::GeomEntityVisitor {
         void visit(Geom::Vertex* v) override {
-            for (Geom::Curve* c : v->getCurves())
+            std::vector<Geom::Curve*> curves;
+            v->get(curves);
+            for (Geom::Curve* c : curves)
                 if (!c->isDestroyed())
                     c->remove(v);
         }
         void visit(Geom::Curve* c) override {
-            for (Geom::Surface* s : c->getSurfaces())
+            std::vector<Geom::Surface*> surfaces;
+            c->get(surfaces);
+            std::vector<Geom::Vertex*> vertices;
+            c->get(vertices);
+            for (Geom::Surface* s : surfaces)
                 if (!s->isDestroyed())
                     s->remove(c);
-            for (Geom::Vertex* v : c->getVertices())
+            for (Geom::Vertex* v : vertices)
                 if (!v->isDestroyed())
                     v->remove(c);
         }
         void visit(Geom::Surface* s) override {
-            for (Geom::Curve* c : s->getCurves())
+            std::vector<Geom::Curve*> curves;
+            s->get(curves);
+            std::vector<Geom::Volume*> volumes;
+            s->get(volumes);
+            for (Geom::Curve* c : curves)
                 if (!c->isDestroyed())
                     c->remove(s);
-            for (Geom::Volume* v : s->getVolumes())
+            for (Geom::Volume* v : volumes)
                 if (!v->isDestroyed())
                     v->remove(s);
         }
         void visit(Geom::Volume* v) override {
-            for (Geom::Surface* s : v->getSurfaces())
+            std::vector<Geom::Surface*> surfaces;
+            v->get(surfaces);
+            for (Geom::Surface* s : surfaces)
                 if (!s->isDestroyed())
                     s->remove(v);
         }

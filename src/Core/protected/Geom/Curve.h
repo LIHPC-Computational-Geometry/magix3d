@@ -89,17 +89,6 @@ public:
      */
     virtual ~Curve();
 
-    /*------------------------------------------------------------------------*/
-    /** \brief  récupère la liste des geom_entity référencés par (*this) et la
-     *          supprime ceux appartenant à entities.
-     */
-#ifndef SWIG
-    virtual void clearRefEntities(std::list<GeomEntity*>& vertices,
-            std::list<GeomEntity*>& curves,
-            std::list<GeomEntity*>& surfaces,
-            std::list<GeomEntity*>& volumes);
-#endif
-
     virtual bool isEqual(Geom::Curve* curve);
 
     /*------------------------------------------------------------------------*/
@@ -364,16 +353,6 @@ public:
 
     /// Retourne le nombre de groupes
     virtual int getNbGroups() const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Return the surfaces incident to this curve
-     */
-    const std::vector<Surface*>& getSurfaces() const { return m_surfaces; }
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Return the vertices incident to this curve
-     */
-    const std::vector<Vertex*>& getVertices() const { return m_vertices; }
     
     /*------------------------------------------------------------------------*/
     /** \brief   détruit l'objet

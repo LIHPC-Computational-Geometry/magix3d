@@ -96,15 +96,6 @@ void GeomEntity::createSpecificMemento(MementoGeomEntity& mem)
 	throw exc;
 }
 /*----------------------------------------------------------------------------*/
-void GeomEntity::clearRefEntities(std::list<GeomEntity*>& vertices,
-            std::list<GeomEntity*>& curves,
-            std::list<GeomEntity*>& surfaces,
-            std::list<GeomEntity*>& volumes)
-{
-	INTERNAL_ERROR(exc, TkUtil::UTF8String ("Méthode non surchargée.", TkUtil::Charset::UTF_8), "GeomEntity::clearRefEntities")
-	throw exc;
-}
-/*----------------------------------------------------------------------------*/
 GeomProperty* GeomEntity::setGeomProperty(GeomProperty* prop)
 {
     GeomProperty* old_rep=0;

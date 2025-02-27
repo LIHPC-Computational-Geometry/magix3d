@@ -109,17 +109,6 @@ public:
     int getDim() const {return 3;}
 
     /*------------------------------------------------------------------------*/
-    /** \brief  récupère la liste des geom_entity référencés par (*this) et la
-     *          supprime ceux appartenant à entities.
-     */
-#ifndef SWIG
-    virtual void clearRefEntities(std::list<GeomEntity*>& vertices,
-            std::list<GeomEntity*>& curves,
-            std::list<GeomEntity*>& surfaces,
-            std::list<GeomEntity*>& volumes);
-#endif
-
-    /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès aux sommets géométriques incidents
      *
      *  \param vertices les sommets incidents
@@ -259,11 +248,6 @@ public:
 
     /// Retourne le nombre de groupes
     virtual int getNbGroups() const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Return the surfaces incident to this volume.
-     */
-    const std::vector<Surface*>& getSurfaces() const { return m_surfaces; }
 
     /*------------------------------------------------------------------------*/
     /** \brief   détruit l'objet
