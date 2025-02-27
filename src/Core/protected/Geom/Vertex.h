@@ -59,6 +59,7 @@ public:
 
     virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const;
     virtual void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda);
+    virtual void accept(GeomEntityVisitor& v) { v.visit(this); }
 
     /*------------------------------------------------------------------------*/
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
@@ -68,13 +69,6 @@ public:
 
       /// Destructeur
     virtual ~Vertex();
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  récupère la liste des geom_entity référencés par (*this)
-     *
-     *  \param entities la liste des entités géométriques que l'on récupère
-     */
-    virtual void getRefEntities(std::vector<GeomEntity*>& entities);
 
     /*------------------------------------------------------------------------*/
     /** \brief  récupère la liste des geom_entity référencés par (*this) et la
@@ -170,12 +164,9 @@ public:
     virtual uint project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const ;
 
     /*------------------------------------------------------------------------*/
-    /** \brief  Return the number of curve incident to this point.
-     *
+    /** \brief  Return the curves incident to this point.
      */
-    virtual size_t getNbCurves() const{
-        return m_curves.size();
-    };
+    const std::vector<Curve*>& getCurves() const { return m_curves; }
 
     /*------------------------------------------------------------------------*/
     /** \brief  Ajoute c comme courbe incidente

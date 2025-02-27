@@ -96,12 +96,6 @@ void GeomEntity::createSpecificMemento(MementoGeomEntity& mem)
 	throw exc;
 }
 /*----------------------------------------------------------------------------*/
-void GeomEntity::getRefEntities(std::vector<GeomEntity*>& entities)
-{
-	INTERNAL_ERROR(exc, TkUtil::UTF8String ("Méthode non surchargée.", TkUtil::Charset::UTF_8), "GeomEntity::getRefEntities")
-	throw exc;
-}
-/*----------------------------------------------------------------------------*/
 void GeomEntity::clearRefEntities(std::list<GeomEntity*>& vertices,
             std::list<GeomEntity*>& curves,
             std::list<GeomEntity*>& surfaces,
@@ -394,70 +388,6 @@ GeomProperty::type GeomEntity::getGeomType ( ) const
 	CHECK_NULL_PTR_ERROR (getGeomProperty ( ))
 	return getGeomProperty ( )->getType ( );
 }	// GeomEntity::getGeomType
-/*----------------------------------------------------------------------------*/
-void GeomEntity::add(Vertex* v)
-{}
-/*----------------------------------------------------------------------------*/
-void GeomEntity::add(Curve* c)
-{}
-/*----------------------------------------------------------------------------*/
-void GeomEntity::add(Surface* s)
-{}
-/*----------------------------------------------------------------------------*/
-void GeomEntity::add(Volume* v)
-{}
-/*----------------------------------------------------------------------------*/
-void GeomEntity::add(GeomEntity* e)
-{
-    switch(e->getDim()){
-    case 0:
-        add(dynamic_cast<Vertex*>(e));
-        break;
-    case 1:
-        add(dynamic_cast<Curve*>(e));
-        break;
-    case 2:
-        add(dynamic_cast<Surface*>(e));
-        break;
-    case 3:
-        add(dynamic_cast<Volume*>(e));
-        break;
-    default:
-        throw   TkUtil::Exception(TkUtil::UTF8String ("Invalid geometric cell dimension", TkUtil::Charset::UTF_8));
-    }
-}
-/*----------------------------------------------------------------------------*/
-void GeomEntity::remove(Vertex* v)
-{}
-/*----------------------------------------------------------------------------*/
-void GeomEntity::remove(Curve* c)
-{}
-/*----------------------------------------------------------------------------*/
-void GeomEntity::remove(Surface* s)
-{}
-/*----------------------------------------------------------------------------*/
-void GeomEntity::remove(Volume* v)
-{}
-/*----------------------------------------------------------------------------*/
-void GeomEntity::remove(GeomEntity* e)
-{
-    switch(e->getDim()){
-    case 0:
-        remove(dynamic_cast<Vertex*>(e));
-        break;
-    case 1:
-        remove(dynamic_cast<Curve*>(e));
-        break;
-    case 2:
-        remove(dynamic_cast<Surface*>(e));
-        break;
-    case 3:
-        remove(dynamic_cast<Volume*>(e));
-        break;
-    default:
-        throw   TkUtil::Exception(TkUtil::UTF8String ("Invalid geometric cell dimension", TkUtil::Charset::UTF_8));
-    }
-}
 /*----------------------------------------------------------------------------*/
 void GeomEntity::addRefTopo(Topo::TopoEntity* te)
 {

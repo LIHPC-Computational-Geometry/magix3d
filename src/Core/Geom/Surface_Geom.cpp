@@ -122,14 +122,6 @@ void Surface::createSpecificMemento(MementoGeomEntity& mem)
 		shapes.push_back(f);
 	mem.setOCCShapes(shapes);
 }
-
-/*----------------------------------------------------------------------------*/
-void Surface::getRefEntities(std::vector<GeomEntity*>& entities)
-{
-    entities.clear();
-    entities.insert(entities.end(),m_volumes.begin(),m_volumes.end());
-    entities.insert(entities.end(),m_curves.begin(),m_curves.end());
-}
 /*----------------------------------------------------------------------------*/
 void Surface::clearRefEntities(std::list<GeomEntity*>& vertices,
         std::list<GeomEntity*>& curves,

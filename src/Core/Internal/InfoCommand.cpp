@@ -11,6 +11,10 @@
 #include "Internal/InfoCommand.h"
 #include "Utils/Common.h"
 #include "Geom/GeomEntity.h"
+#include "Geom/Vertex.h"
+#include "Geom/Curve.h"
+#include "Geom/Surface.h"
+#include "Geom/Volume.h"
 #include "Topo/TopoEntity.h"
 #include "Topo/CoEdge.h"
 #include "Mesh/MeshEntity.h"
@@ -425,19 +429,37 @@ void InfoCommand::setDestroyAndUpdateConnectivity
          iter != entitiesToRemove.end(); ++iter)
         (*iter)->setDestroyed(true);
 
-    for (std::vector <Geom::GeomEntity*>::iterator iter = entitiesToRemove.begin();
-         iter != entitiesToRemove.end(); ++iter)
-    {
-        Geom::GeomEntity* entity = *iter;
-        std::vector<Geom::GeomEntity*> ref_entities;
-        entity->getRefEntities(ref_entities);
-        for(unsigned int i=0;i<ref_entities.size();i++){
-            Geom::GeomEntity* ref_entity = ref_entities[i];
-            if(!ref_entity->isDestroyed())
-                ref_entity->remove(entity);
+    struct : Geom::GeomEntityVisitor {
+        void visit(Geom::Vertex* v) override {
+            for (Geom::Curve* c : v->getCurves())
+                if (!c->isDestroyed())
+                    c->remove(v);
         }
-    } // end for ( ... iter ...)
+        void visit(Geom::Curve* c) override {
+            for (Geom::Surface* s : c->getSurfaces())
+                if (!s->isDestroyed())
+                    s->remove(c);
+            for (Geom::Vertex* v : c->getVertices())
+                if (!v->isDestroyed())
+                    v->remove(c);
+        }
+        void visit(Geom::Surface* s) override {
+            for (Geom::Curve* c : s->getCurves())
+                if (!c->isDestroyed())
+                    c->remove(s);
+            for (Geom::Volume* v : s->getVolumes())
+                if (!v->isDestroyed())
+                    v->remove(s);
+        }
+        void visit(Geom::Volume* v) override {
+            for (Geom::Surface* s : v->getSurfaces())
+                if (!s->isDestroyed())
+                    s->remove(v);
+        }
+    } destroy_visitor;
 
+    for (Geom::GeomEntity* ge : entitiesToRemove)
+        ge->accept(destroy_visitor);
 }
 /*----------------------------------------------------------------------------*/
 void InfoCommand::clear()
