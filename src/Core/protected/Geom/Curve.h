@@ -76,6 +76,7 @@ public:
 
     virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const;
     virtual void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda);
+    virtual void accept(GeomEntityVisitor& v) { v.visit(this); }
 
     /*------------------------------------------------------------------------*/
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
@@ -87,13 +88,6 @@ public:
     /** \brief  Destructeur
      */
     virtual ~Curve();
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  récupère la liste des geom_entity référencés par (*this)
-     *
-     *  \param entities la liste des entités géométriques que l'on récupère
-     */
-    virtual void getRefEntities(std::vector<GeomEntity*>& entities);
 
     /*------------------------------------------------------------------------*/
     /** \brief  récupère la liste des geom_entity référencés par (*this) et la
@@ -371,7 +365,17 @@ public:
     /// Retourne le nombre de groupes
     virtual int getNbGroups() const;
 
-/*------------------------------------------------------------------------*/
+    /*------------------------------------------------------------------------*/
+    /** \brief  Return the surfaces incident to this curve
+     */
+    const std::vector<Surface*>& getSurfaces() const { return m_surfaces; }
+
+    /*------------------------------------------------------------------------*/
+    /** \brief  Return the vertices incident to this curve
+     */
+    const std::vector<Vertex*>& getVertices() const { return m_vertices; }
+    
+    /*------------------------------------------------------------------------*/
     /** \brief   détruit l'objet
      */
 #ifndef SWIG
