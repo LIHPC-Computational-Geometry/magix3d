@@ -84,23 +84,6 @@ void Vertex::createSpecificMemento(MementoGeomEntity& mem)
     mem.setOCCShapes(shapes);
 }
 /*----------------------------------------------------------------------------*/
-void Vertex::clearRefEntities(std::list<GeomEntity*>& vertices,
-        std::list<GeomEntity*>& curves,
-        std::list<GeomEntity*>& surfaces,
-        std::list<GeomEntity*>& volumes)
-{
-    std::vector<Curve*> toRemoveC;
-    for(unsigned int i=0;i<m_curves.size();i++){
-        GeomEntity *e = m_curves[i];
-        std::list<GeomEntity*>::iterator res = std::find(curves.begin(),curves.end(),e);
-        if(res!=curves.end())
-            toRemoveC.push_back(dynamic_cast<Curve*>(e));
-    }
-
-    for(unsigned int i=0;i<toRemoveC.size();i++)
-        remove(toRemoveC[i]);
-}
-/*----------------------------------------------------------------------------*/
 Mgx3D::Utils::SerializedRepresentation* Vertex::getDescription (bool alsoComputed) const
 {
 	std::unique_ptr<Mgx3D::Utils::SerializedRepresentation>	description (

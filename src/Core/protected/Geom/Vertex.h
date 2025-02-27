@@ -71,17 +71,6 @@ public:
     virtual ~Vertex();
 
     /*------------------------------------------------------------------------*/
-    /** \brief  récupère la liste des geom_entity référencés par (*this) et la
-     *          supprime ceux appartenant à entities.
-     */
-#ifndef SWIG
-    virtual void clearRefEntities(std::list<GeomEntity*>& vertices,
-            std::list<GeomEntity*>& curves,
-            std::list<GeomEntity*>& surfaces,
-            std::list<GeomEntity*>& volumes);
-#endif
-
-    /*------------------------------------------------------------------------*/
     /** \brief  retourne la dimension de l'entité géométrique
      */
     int getDim() const {return 0;}
@@ -162,11 +151,6 @@ public:
     /** \brief Projete le point P1 sur le sommet, le résultat est le point P2.
      */
     virtual uint project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const ;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Return the curves incident to this point.
-     */
-    const std::vector<Curve*>& getCurves() const { return m_curves; }
 
     /*------------------------------------------------------------------------*/
     /** \brief  Ajoute c comme courbe incidente
