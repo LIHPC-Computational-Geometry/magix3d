@@ -4792,7 +4792,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::alignVertices(
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias ( ) << ".getTopoManager ( ).alignVertices (" << p1.getScriptCommand ( ) << ", " << p2.getScriptCommand ( )
-        << Internal::entitiesToPythonList<Vertex> (vertices) << ")";
+        << ", " << Internal::entitiesToPythonList<Vertex> (vertices) << ")";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
