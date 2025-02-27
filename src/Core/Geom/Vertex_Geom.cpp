@@ -84,12 +84,6 @@ void Vertex::createSpecificMemento(MementoGeomEntity& mem)
     mem.setOCCShapes(shapes);
 }
 /*----------------------------------------------------------------------------*/
-void Vertex::getRefEntities(std::vector<GeomEntity*>& entities)
-{
-    entities.clear();
-    entities.insert(entities.end(),m_curves.begin(),m_curves.end());
-}
-/*----------------------------------------------------------------------------*/
 void Vertex::clearRefEntities(std::list<GeomEntity*>& vertices,
         std::list<GeomEntity*>& curves,
         std::list<GeomEntity*>& surfaces,

@@ -20,6 +20,7 @@
 #include "Internal/InternalEntity.h"
 #include "Utils/Point.h"
 #include "Geom/GeomProperty.h"
+#include "Geom/GeomEntityVisitor.h"
 #include "Topo/TopoEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <gmds/math/Triangle.h>
@@ -79,6 +80,7 @@ protected:
 public:
     virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const = 0;
     virtual void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda) = 0;
+    virtual void accept(GeomEntityVisitor& visitor) = 0;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
@@ -184,13 +186,6 @@ public:
     virtual void computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const = 0;
 
     /*------------------------------------------------------------------------*/
-    /** \brief  récupère la liste des geom_entity référencés par (*this)
-     *
-     *  \param entities la liste des entités géométriques que l'on récupère
-     */
-    virtual void getRefEntities(std::vector<GeomEntity*>& entities);
-
-    /*------------------------------------------------------------------------*/
     /** \brief  récupère la liste des geom_entity référencés par (*this) et la
      *          supprime ceux appartenant à entities.
      */
@@ -228,99 +223,6 @@ public:
      *  \param volumes les volumes incidents
      */
     virtual void get(std::vector<Volume*>& volumes) const =0;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Ajoute e comme entité géométrique incidente. Selon la dimension
-     *          de e, cet ajout peut être impossible et donc ne rien faire
-     *
-     *  \param e un pointeur sur une entité géométrique
-     */
-#ifndef SWIG
-    virtual void add(GeomEntity* e);
-#endif
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Ajoute v comme volume incident
-     *
-     *  \param v un pointeur sur un volume
-     */
-#ifndef SWIG
-    virtual void add(Volume* v);
-#endif
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Ajoute s comme surface incidente
-     *
-     *  \param s un pointeur sur une surface
-     */
-#ifndef SWIG
-    virtual void add(Surface* s);
-#endif
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Ajoute c comme courbe incidente
-     *
-     *  \param c un pointeur sur une courbe
-     */
-#ifndef SWIG
-    virtual void add(Curve* c);
-#endif
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Ajoute v comme sommet incident
-     *
-     *  \param v un pointeur sur un sommet
-     */
-#ifndef SWIG
-    virtual void add(Vertex* v);
-#endif
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Supprime e comme entité géométrique incidente. Selon la
-     *          dimension de e, cet suppression peut être impossible et donc
-     *          ne rien faire
-     *
-     *  \param e un pointeur sur une entité géométrique
-     */
-#ifndef SWIG
-    virtual void remove(GeomEntity* e);
-#endif
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Supprime v comme volume incident
-     *
-     *  \param v un pointeur sur un volume
-     */
-#ifndef SWIG
-    virtual void remove(Volume* v);
-#endif
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Supprime s comme surface incidente
-     *
-     *  \param s un pointeur sur une surface
-     */
-#ifndef SWIG
-    virtual void remove(Surface* s);
-#endif
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Supprime c comme courbe incidente
-     *
-     *  \param c un pointeur sur une courbe
-     */
-#ifndef SWIG
-    virtual void remove(Curve* c);
-#endif
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Supprime v comme sommet incident
-     *
-     *  \param v un pointeur sur un sommet
-     */
-#ifndef SWIG
-    virtual void remove(Vertex* v);
-#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief   retourne un point sur l'objet au centre si possible

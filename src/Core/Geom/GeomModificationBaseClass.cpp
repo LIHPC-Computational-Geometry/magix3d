@@ -911,38 +911,36 @@ void GeomModificationBaseClass::rebuildAdjacencyLinks()
     //===================================================================
     // 1 - GESTION DES VOLUMES ADJACENTS
     //===================================================================
-    std::vector<GeomEntity*> volumesToTest;
+    std::vector<Volume*> volumesToTest;
     std::list<GeomEntity*>::iterator it = m_adj_entities[3].begin();
     for(;it!=m_adj_entities[3].end();it++){
-        GeomEntity* ei = *it;
+        Volume* vi = dynamic_cast<Volume*>(*it);
 #ifdef _DEBUG2
         std::cout<<" ADJ VOLUME "<<ei->getName()<<std::endl;
 #endif
         //on regarde si des surfaces du volumes ont été remplacées
         std::vector<Surface*> surfs;
-        ei->get(surfs);
+        vi->get(surfs);
         bool surf_modified = false;
 //        std::cout<<"NB REPLACED ENTITIES = "<<m_replacedEntities.size()<<std::endl;
 //        std::cout<<"NB SURFS = "<<surfs.size()<<std::endl;
         for(unsigned int is=0;is<surfs.size();is++){
-            std::map<GeomEntity*,std::vector<GeomEntity*> >::const_iterator it
-            =m_replacedEntities.find(surfs[is]);
-
+            auto it = m_replacedEntities.find(surfs[is]);
             if(it!=m_replacedEntities.end()){
                 //la surface a été remplacée!!!!
 //                std::cout<<"\t surface remplacee"<<std::endl;
                 surf_modified=true;
-                ei->remove(surfs[is]);
+                vi->remove(surfs[is]);
                 std::vector<GeomEntity*> newSurfs = it->second;
                 for(unsigned int inewsurf=0;inewsurf<newSurfs.size();inewsurf++){
-                    GeomEntity* si = newSurfs[inewsurf];
-                    ei->add(si);
-                    si->add(ei);
+                    Surface* si = dynamic_cast<Surface*>(newSurfs[inewsurf]);
+                    vi->add(si);
+                    si->add(vi);
                 }
             }
         }
         if(surf_modified)
-            volumesToTest.push_back(ei);
+            volumesToTest.push_back(vi);
 
     }
     //===================================================================
