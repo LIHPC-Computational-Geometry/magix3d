@@ -149,33 +149,6 @@ void Curve::createSpecificMemento(MementoGeomEntity& mem)
 	mem.setOCCShapes(shapes);
 }
 /*----------------------------------------------------------------------------*/
-void Curve::clearRefEntities(std::list<GeomEntity*>& vertices,
-        std::list<GeomEntity*>& curves,
-        std::list<GeomEntity*>& surfaces,
-        std::list<GeomEntity*>& volumes)
-{
-    std::vector<Surface*> toRemoveS;
-    std::vector<Vertex*> toRemoveV;
-    for(unsigned int i=0;i<m_surfaces.size();i++){
-        GeomEntity *e = m_surfaces[i];
-        std::list<GeomEntity*>::iterator res = std::find(surfaces.begin(),surfaces.end(),e);
-        if(res!=surfaces.end())
-            toRemoveS.push_back(dynamic_cast<Surface*>(e));
-    }
-
-    for(unsigned int i=0;i<m_vertices.size();i++){
-        GeomEntity *e = m_vertices[i];
-        std::list<GeomEntity*>::iterator res = std::find(vertices.begin(),vertices.end(),e);
-        if(res!=vertices.end())
-            toRemoveV.push_back(dynamic_cast<Vertex*>(e));
-    }
-
-    for(unsigned int i=0;i<toRemoveS.size();i++)
-        remove(toRemoveS[i]);
-    for(unsigned int i=0;i<toRemoveV.size();i++)
-        remove(toRemoveV[i]);
-}
-/*----------------------------------------------------------------------------*/
 bool Curve::isEqual(Geom::Curve* curve)
 {
 	if (m_occ_edges.size() != curve->m_occ_edges.size())

@@ -93,17 +93,6 @@ public:
     virtual ~Surface();
 
     /*------------------------------------------------------------------------*/
-    /** \brief  récupère la liste des geom_entity référencés par (*this) et la
-     *          supprime ceux appartenant à entities.
-     */
-#ifndef SWIG
-    virtual void clearRefEntities(std::list<GeomEntity*>& vertices,
-            std::list<GeomEntity*>& curves,
-            std::list<GeomEntity*>& surfaces,
-            std::list<GeomEntity*>& volumes);
-#endif
-
-    /*------------------------------------------------------------------------*/
     /** \brief  Décompose l'entité en ses sous-entités.
      */
     virtual void split(std::vector<Curve* >& curv,
@@ -292,16 +281,6 @@ public:
 
     /// Retourne le nombre de groupes
     virtual int getNbGroups() const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Return the curves incident to this surface
-     */
-    const std::vector<Curve*>& getCurves() const { return m_curves; }
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Return the volumes incident to this surface
-     */
-    const std::vector<Volume*>& getVolumes() const { return m_volumes; }    
 
     /*------------------------------------------------------------------------*/
     /// retourne la liste des faces topologiques communes qui pointent sur cette surface
