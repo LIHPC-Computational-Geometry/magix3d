@@ -525,35 +525,41 @@ cout << __FILE__ << ' ' << __LINE__ << " VTKRenderingManager::VTKConstrainedPoin
 	_pointWidget->GetConstrainedPointRepresentation ( )->GetUGridPointPlacer ( )->RemoveAllProps ( );
 	_pointWidget->Off ( );
 
-	vtkUnstructuredGrid*	grid	= vtkUnstructuredGrid::New ( );
+	vtkUnstructuredGrid*	grid	= 0;
 	if (0 != _pointWidget)
 	{
 		DisplayProperties::GraphicalRepresentation*	rep	= 0 == constraint ? 0 : constraint->getDisplayProperties ( ).getGraphicalRepresentation ( );
 		VTKEntityRepresentation*	vtkRep	= dynamic_cast<VTKEntityRepresentation*>(rep);
 		if (0 != rep)
 			rep->createRefinedRepresentation (factor);
-		if (0 != vtkRep->getRefinedGrid ( ))
+		if ((0 != vtkRep) && (0 != vtkRep->getRefinedGrid ( )))
 		{
 			vtkTriangleFilter*	triangleFilter	= vtkTriangleFilter::New ( );
 			triangleFilter->SetInputData (vtkRep->getRefinedGrid ( ));
 			triangleFilter->Update ( );
+			grid	= vtkUnstructuredGrid::New ( );
+			grid->Initialize ( );
 			grid->SetPoints (triangleFilter->GetOutput ( )->GetPoints ( ));
-			grid->SetCells (VTK_TRIANGLE, triangleFilter->GetOutput ( )->GetPolys () );
+			grid->SetCells (VTK_TRIANGLE, triangleFilter->GetOutput ( )->GetPolys ( ));
 			triangleFilter->Delete ( );		triangleFilter	= 0;
-		}	// if (0 != vtkRep->getRefinedGrid ( ))
-		_constraintActor	= 0 == vtkRep ? 0 : vtkRep->getRefinedActor ( );
+			_constraintActor	= vtkRep->getRefinedActor ( );
+		}	// if ((0 != vtkRep) && (0 != vtkRep->getRefinedGrid ( )))
+
+		if (0 != _constraintActor)
+		{
+			_pointWidget->GetConstrainedPointRepresentation ( )->GetUGridPointPlacer ( )->AddProp (_constraintActor);
+			_pointWidget->GetConstrainedPointRepresentation ( )->GetProperty ( )->SetColor (1., 0., 0.);	// Croix interactive rouge
+			_pointWidget->On ( );
+			if ((0 != _pointWidget->GetCurrentRenderer ( )) && (false == _pointWidget->GetCurrentRenderer ( )->HasViewProp (_constraintActor)))
+				_pointWidget->GetCurrentRenderer ( )->AddViewProp (_constraintActor);
+			setPoint (getInitialPoint ( ));	// Positionner la "croix" du sélecteur sur l'entité de contrainte au plus près du point à déplacer 
+		}	// if (0 != _constraintActor)
+		
+		_pointWidget->GetConstrainedPointRepresentation ( )->GetUGridPointPlacer ( )->SetGrid (grid);
+		if (0 != grid)
+			grid->Delete ( );
+		grid	= 0;
 	}	// if (0 != _pointWidget)
-	_pointWidget->GetConstrainedPointRepresentation ( )->GetUGridPointPlacer ( )->SetGrid (grid);
-	if (0 != _constraintActor)
-	{
-		_pointWidget->GetConstrainedPointRepresentation ( )->GetUGridPointPlacer ( )->AddProp (_constraintActor);
-		_pointWidget->GetConstrainedPointRepresentation ( )->GetProperty ( )->SetColor (1., 0., 0.);	// Croix interactive rouge
-		_pointWidget->On ( );
-		if ((0 != _pointWidget->GetCurrentRenderer ( )) && (false == _pointWidget->GetCurrentRenderer ( )->HasViewProp (_constraintActor)))
-			_pointWidget->GetCurrentRenderer ( )->AddViewProp (_constraintActor);
-		setPoint (getInitialPoint ( ));	// Positionner la "croix" du sélecteur sur l'entité de contrainte au plus près du point à déplacer 
-	}	// if (0 != _constraintActor)
-	grid->Delete ( );	grid	= 0;
 }	// VTKConstrainedPointInteractor::setConstraint
 
 

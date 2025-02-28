@@ -22,8 +22,8 @@
 #include <vtkTextActor.h>
 #include <vtkSelectVisiblePoints.h>
 #include <vtkUnstructuredGrid.h>
-//#include <VtkComponents/vtkUnstructuredGridRefinementFilter.h>
-#include <vtkLoopSubdivisionFilter.h>
+#include <VtkComponents/vtkPolyDataRefinementFilter.h>
+
 
 #include <vector>
 
@@ -423,8 +423,7 @@ class VTKEntityRepresentation : public QtComponents::RenderedEntityRepresentatio
 	vtkPolyData*		        _refinedGrid;
 
 	/** La discretisation du maillage raffiné. */
-//	vtkUnstructuredGridRefinementFilter*          _refineFilter;
-	vtkLoopSubdivisionFilter*	_refineFilter;
+	vtkPolyDataRefinementFilter* _refineFilter;
 
 	/** L'acteur associé en mode plein. */
 	VTKMgx3DActor*              _refinedActor;

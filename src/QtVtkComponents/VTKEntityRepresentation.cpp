@@ -577,20 +577,27 @@ property->SetInterpolationToFlat ( );
 	if (0 != _textualInfosActor)
 		_textualInfosActor->PickableOff ( );
 
-// CP TODO
-cout << __FILE__ << ' ' << __LINE__ << " VTKEntityRepresentation::updateRepresentationProperties : NODES anD CELLS VALUES TO DO" << endl;
-/*
 	// Actualisation des éventuelles valeurs (noeuds/mailles) affichées :
-	vtkUnstructuredGrid*	grid		= 0 == _surfacicGrid ? _volumicGrid : _surfacicGrid;
-	vtkMapper*				mapper		= 0 == _surfacicGrid ? (vtkMapper*)_volumicMapper : (vtkMapper*)_surfacicMapper;
-	vtkPoints*				points		= 0 == grid ? 0 : grid->GetPoints ( );
-	vtkPointData*			pointData	= 0 == grid ? 0 : grid->GetPointData ( );
-	vtkCellData*			cellData	= 0 == grid ? 0 : grid->GetCellData ( );
+	// ATTENTION : CE CODE N'EST PLUS EPROUVE
+	vtkMapper*				mapper		= 0 == _surfacicMapper ? (vtkMapper*)_volumicMapper : (vtkMapper*)_surfacicMapper;
+	vtkPoints*				points		= 0;
+	vtkPointData*			pointData	= 0;
+	vtkCellData*			cellData	= 0;
+	if (0 != _surfacicGrid)
+		points	= _surfacicGrid->GetPoints ( );
+	else if (0 != _volumicGrid)
+		points	= _volumicGrid->GetPoints ( );
+	if (0 != _surfacicGrid)
+		pointData	= _surfacicGrid->GetPointData ( );
+	else if (0 != _volumicGrid)
+		pointData	= _volumicGrid->GetPointData ( );
+	if (0 != _surfacicGrid)
+		cellData	= _surfacicGrid->GetCellData ( );
+	else if (0 != _volumicGrid)
+		cellData	= _volumicGrid->GetCellData ( );
 	double			domain [2]	= { 0., 0. };
-	// CP ATTENTION : si on affiche un volume, le fait d'utiliser _surfacicGrid
-	// laisse supposer qu'on affiche la peau, donc beaucoup de noeuds et mailles
-	// sont écartés. Les valeurs aux noeuds/mailles affichés doivent
-	// correspondre à ceux affichés.
+	// CP ATTENTION : si on affiche un volume, le fait d'utiliser _surfacicGrid laisse supposer qu'on affiche la peau, donc beaucoup de noeuds et mailles
+	// sont écartés. Les valeurs aux noeuds/mailles affichés doivent correspondre à ceux affichés.
 	if (0 != mapper)
 	{
     		if ((0 != (mask & NODES_VALUES)) && (0 != pointData))
@@ -670,12 +677,27 @@ cout << __FILE__ << ' ' << __LINE__ << " VTKEntityRepresentation::updateRepresen
 				values->Delete ( );	// => Ref : 2 -> 1, le tableau existe toujours
 			}	// if (0 != values)
 
-			double*			ptr		=
-					values->WritePointer (0, grid->GetNumberOfCells ( ));
+			double*			ptr		= 0;
+			if (0 != _surfacicGrid)
+			{
+				ptr	= values->WritePointer (0, _surfacicGrid->GetNumberOfCells ( ));
+				values->SetNumberOfTuples (_surfacicGrid->GetNumberOfCells ( ));	
+			}	// if (0 != _surfacicGrid)
+			else	//	if (0 != _surfacicGrid)
+			{
+				CHECK_NULL_PTR_ERROR (_volumicGrid)
+				ptr	= values->WritePointer (0, _volumicGrid->GetNumberOfCells ( ));
+				values->SetNumberOfTuples (_volumicGrid->GetNumberOfCells ( ));	
+			}	// if (0 != _surfacicGrid)
 			CHECK_NULL_PTR_ERROR (ptr)
-			values->SetNumberOfTuples (grid->GetNumberOfCells ( ));
-// CP : récupérer ici les vraies valeurs aux mailles :
-			for (size_t n = 0; n < grid->GetNumberOfCells ( ); n++)
+			
+			// CP : récupérer ici les vraies valeurs aux mailles :
+			size_t	cellNum	= 0;
+			if (0 != _surfacicGrid)
+				cellNum	= _surfacicGrid->GetNumberOfCells ( );
+			else if (0 != _volumicGrid)
+				cellNum	= _volumicGrid->GetNumberOfCells ( );
+			for (size_t n = 0; n < cellNum; n++)
 				*ptr++	= n;
 			values->SetName (properties.getValueName ( ).c_str ( ));
 			cellData->SetScalars (values);
@@ -684,14 +706,11 @@ cout << __FILE__ << ' ' << __LINE__ << " VTKEntityRepresentation::updateRepresen
 			if (0 != mapper)
 			{
 				mapper->ScalarVisibilityOn ( );
-				mapper->SetScalarRange (0., grid->GetNumberOfCells ( ));
+				mapper->SetScalarRange (0., cellNum);
 			}	// if (0 != mapper)
-			RenderingManager::ColorTableDefinition	colorTableDefinition (
-				properties.getValueName ( ), USHRT_MAX, domain [0], domain [1]);
-			VTKRenderingManager::VTKColorTable*	colorTable	=
-				0 == _renderingManager ?
-				0 : dynamic_cast<VTKRenderingManager::VTKColorTable*>(
-					_renderingManager->getColorTable (colorTableDefinition));
+			RenderingManager::ColorTableDefinition	colorTableDefinition (properties.getValueName ( ), USHRT_MAX, domain [0], domain [1]);
+			VTKRenderingManager::VTKColorTable*	colorTable	= 0 == _renderingManager ?
+					0 : dynamic_cast<VTKRenderingManager::VTKColorTable*>(_renderingManager->getColorTable (colorTableDefinition));
 			CHECK_NULL_PTR_ERROR (colorTable)
 			if (0 != mapper)
 			{
@@ -700,7 +719,6 @@ cout << __FILE__ << ' ' << __LINE__ << " VTKEntityRepresentation::updateRepresen
 			}	// if (0 != mapper)
 		}	// if ((0 != cellData) && (0 != (mask & CELLS_VALUES)))
 	}	// if (0 != mapper)
-*/
 }	// VTKEntityRepresentation::updateRepresentationProperties
 
 

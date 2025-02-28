@@ -271,6 +271,28 @@ void VTKMgx3DEntityRepresentation::createTrianglesSurfacicRepresentation (
 		points->SetPoint (id, coords);
 	}	// for (vector<Math::Point>::const_iterator itp = meshPts.begin ( );
 
+// CP NEW CODE
+	// Les triangles : on part ici du principe qu'on a que des triangles.
+	vtkCellArray*	cellArray	= vtkCellArray::New ( );
+	vtkIdTypeArray*	idsArray	= vtkIdTypeArray::New ( );
+	CHECK_NULL_PTR_ERROR (cellArray)
+	CHECK_NULL_PTR_ERROR (idsArray)
+	idsArray->SetNumberOfValues (4 * trianglesNum);
+	vtkIdType*		cellsPtr	= idsArray->GetPointer (0);
+	size_t			pos			= 0;
+	for (id = 0; id < trianglesNum; id++)
+	{
+		cellsPtr [pos++]	= 3;
+		for (size_t i = 0; i < 3; i++)
+			cellsPtr [pos++]	= triangles [3 * id + i];
+	}	// for (id = 0; id < trianglesNum; id++)
+	cellArray->SetCells (trianglesNum, idsArray);
+	polydata->SetPolys (cellArray);
+	polydata->BuildCells ( );	// Indispensable à vtkCellPicker, sinon plantage (:
+	idsArray->Delete ( );	idsArray	= 0;
+	cellArray->Delete ( );	cellArray	= 0;
+	points->Delete ( );		points		= 0;
+/* ============================================
 	// Les triangles : on part ici du principe qu'on a que des triangles.
 	vtkCellArray*	cellArray	= vtkCellArray::New ( );
 	CHECK_NULL_PTR_ERROR (cellArray)
@@ -286,25 +308,22 @@ void VTKMgx3DEntityRepresentation::createTrianglesSurfacicRepresentation (
 	polydata->SetPolys (cellArray);
 	cellArray->Delete ( );	cellArray	= 0;
 	points->Delete ( );	points	= 0;
+*/
 }	// VTKMgx3DEntityRepresentation::createTrianglesSurfacicRepresentation
 
 
-void VTKMgx3DEntityRepresentation::createTrianglesSurfacicRepresentation (
-			const vector<Math::Point>& meshPts, const vector<size_t>& mesh)
+void VTKMgx3DEntityRepresentation::createTrianglesSurfacicRepresentation (const vector<Math::Point>& meshPts, const vector<size_t>& mesh)
 {
-	createTrianglesSurfacicRepresentation (
-		getEntity ( ), _surfacicActor, _surfacicMapper, _surfacicGrid, meshPts, mesh);
+	createTrianglesSurfacicRepresentation (getEntity ( ), _surfacicActor, _surfacicMapper, _surfacicGrid, meshPts, mesh);
 }	// VTKMgx3DEntityRepresentation::createTrianglesSurfacicRepresentation
 
 
-void VTKMgx3DEntityRepresentation::createPolygonsSurfacicRepresentation (
-			const vector<Math::Point>& meshPts, const vector<size_t>& mesh)
+void VTKMgx3DEntityRepresentation::createPolygonsSurfacicRepresentation (const vector<Math::Point>& meshPts, const vector<size_t>& mesh)
 {
 cout << __FILE__ << ' ' << __LINE__ << " VTKMgx3DEntityRepresentation::createPolygonsSurfacicRepresentation AT BEGINNING" << endl;
 	if ((0 != _surfacicGrid) || (0 != _surfacicMapper) || (0 != _surfacicActor))
 	{
-		INTERNAL_ERROR (exc, "Représentation déjà créée.",
-                  "VTKMgx3DEntityRepresentation::createPolygonsSurfacicRepresentation")
+		INTERNAL_ERROR (exc, "Représentation déjà créée.", "VTKMgx3DEntityRepresentation::createPolygonsSurfacicRepresentation")
 		throw exc;
 	}	// if ((0 != _surfacicGrid) || ...
 	_surfacicGrid		= vtkPolyData::New ( );
@@ -361,6 +380,7 @@ cout << __FILE__ << ' ' << __LINE__ << " VTKMgx3DEntityRepresentation::createPol
 	cellArray->SetCells (id, idsArray);
 	cellArray->Squeeze ( );
 	_surfacicGrid->SetPolys (cellArray);
+	_surfacicGrid->BuildCells ( );
 	idsArray->Delete ( );	idsArray	= 0;
 	cellArray->Delete ( );	cellArray	= 0;
 	points->Delete ( );		points		= 0;
@@ -369,15 +389,11 @@ cout << __FILE__ << ' ' << __LINE__ << " VTKMgx3DEntityRepresentation::createPol
 
 
 void VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (
-		Entity* entity,
-		VTKMgx3DActor*& actor, vtkPolyDataMapper*& mapper,
-		vtkPolyData*& grid,
-		const vector<Math::Point>& meshPts, const vector<size_t>& mesh)
+		Entity* entity, VTKMgx3DActor*& actor, vtkPolyDataMapper*& mapper, vtkPolyData*& grid, const vector<Math::Point>& meshPts, const vector<size_t>& mesh)
 {
 	if ((0 != grid) || (0 != mapper) || (0 != actor))
 	{
-		INTERNAL_ERROR (exc, "Représentation déjà créée.",
-	           "VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation")
+		INTERNAL_ERROR (exc, "Représentation déjà créée.", "VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation")
 		throw exc;
 	}	// if ((0 != grid) || ...
 	grid		= vtkPolyData::New ( );
@@ -431,6 +447,7 @@ void VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (
 	}	// for (id = 0; id < edgesNum; id++
 	cellArray->Squeeze ( );
 	grid->SetLines (cellArray);
+	grid->BuildCells ( );
 	cellArray->Delete ( );	cellArray	= 0;
 	if (0 != points)
 		points->Delete ( );
@@ -445,17 +462,14 @@ void VTKMgx3DEntityRepresentation::createAssociationVectorRepresentation (const 
 	if (2 != vector.size ( ))
 	{
 		UTF8String	message (Charset::UTF_8);
-		message << "Arguments invalides (" << vector.size ( )
-		        << " points pour le vecteur.";
-		INTERNAL_ERROR (exc, message,
-		"VTKMgx3DEntityRepresentation::createAssociationVectorRepresentation")
+		message << "Arguments invalides (" << vector.size ( ) << " points pour le vecteur.";
+		INTERNAL_ERROR (exc, message, "VTKMgx3DEntityRepresentation::createAssociationVectorRepresentation")
 		throw exc;
 	}	// if (2 != vector.size ( ))
 
 	if ((0 != _vectAssArrow) || (0 != _vectAssActor) || (0 != _vectAssMapper))
 	{
-		INTERNAL_ERROR (exc, "Représentation déjà créée.",
-		"VTKMgx3DEntityRepresentation::createAssociationVectorRepresentation")
+		INTERNAL_ERROR (exc, "Représentation déjà créée.", "VTKMgx3DEntityRepresentation::createAssociationVectorRepresentation")
 		throw exc;
 	}	// if ((0 != _vectAssArrow) || ...
 
@@ -465,11 +479,8 @@ void VTKMgx3DEntityRepresentation::createAssociationVectorRepresentation (const 
 		return;
 
 	// Soit les vecteurs u, flèche VTK initiale, et v, flèche demandée.
-	// Soit w un vecteur ortogonal à u et v, autour duquel est effectuée la
-	// rotation (=> rotation autour d'un angle quelconque).
-	// Aspects redimensionnement : On passe d'un vecteur de norme 1 sur X à
-	// un vecteur de norme v.abs ( ) => multiplication de mat (0, 0) par
-	// v.abs ( ).
+	// Soit w un vecteur ortogonal à u et v, autour duquel est effectuée la rotation (=> rotation autour d'un angle quelconque).
+	// Aspects redimensionnement : On passe d'un vecteur de norme 1 sur X à un vecteur de norme v.abs ( ) => multiplication de mat (0, 0) par v.abs ( ).
 	const Vector	u (1., 0., 0.), v (vector [0], vector [1]);
 	const Vector	w	= u * v;	// produit vectoriel
 	// Rem : u et v sont non nuls, u car connu, v car testé ci-dessus.
@@ -483,21 +494,17 @@ void VTKMgx3DEntityRepresentation::createAssociationVectorRepresentation (const 
 	const double	angle	= acos (cosinus) * 180. / M_PI;
 	transform->RotateWXYZ (angle, w.getX ( ), w.getY ( ), w.getZ ( ));
 	transform->PostMultiply ( );
-	// Le vecteur recherché et celui de référence sont ils orientés dans le
-	// même sens ? On évalue avec une vtkTransform temporaire, et on finalise
+	// Le vecteur recherché et celui de référence sont ils orientés dans le même sens ? On évalue avec une vtkTransform temporaire, et on finalise
 	// la transformation selon le résultat de l'évaluation :
 	vtkTransform*	transformTest	= vtkTransform::New ( );
 	transformTest->DeepCopy (transform);
-	transformTest->Translate (
-			vector [0].getX ( ), vector [0].getY ( ), vector [0].getZ ( ));
+	transformTest->Translate (vector [0].getX ( ), vector [0].getY ( ), vector [0].getZ ( ));
 	const bool	sameDir	= sameDirection (*transformTest, vector);
 	transformTest->Delete ( );
 	if (true == sameDir)
-		transform->Translate (
-			vector [0].getX ( ), vector [0].getY ( ), vector [0].getZ ( ));
+		transform->Translate (vector [0].getX ( ), vector [0].getY ( ), vector [0].getZ ( ));
 	else
-		transform->Translate (
-			vector [1].getX ( ), vector [1].getY ( ), vector [1].getZ ( ));
+		transform->Translate (vector [1].getX ( ), vector [1].getY ( ), vector [1].getZ ( ));
 
 	// On récupère le facteur d'agrandissement, à des fins esthétiques (cf.
 	// suite).
@@ -520,26 +527,19 @@ void VTKMgx3DEntityRepresentation::createAssociationVectorRepresentation (const 
 	// Tip   : tête de la flèche (partie conique)
 	// Shaft : base de la flèche
 	// Rem : la flèche va être redimensionnée (cf. transformation ci-dessus).
-	// Sa longueur avant transformation est 1 ((0, 0, 0) -> (1, 0, 0)).
-	// => à prendre en compte dans les longueurs des rayons.
+	// Sa longueur avant transformation est 1 ((0, 0, 0) -> (1, 0, 0)). => à prendre en compte dans les longueurs des rayons.
 	_vectAssArrow->SetShaftResolution (24);
 	_vectAssArrow->SetTipResolution (24);
 	// On veut que les diamètres du cône et de la tige ne soient pas excessif.
-	// => On bride celui de la tige, et on dit que celui du cône est 3 x plus
-	// grand.
-	// Rem : c'est un peu de la cuisine, si ça ne donne pas satisfaction il
-	// serait bon de coder une classe vtkArrowSource sur laquelle on soit en
-	// mesure d'imposer la taille du cône et de la tige (Points 1 et 2,
-	// SetRadius). Cela devrait être possible à partir de vtkLineSource et
-	// vtkConeSource, en héritant de vtkPolyDataAlgorithm, en surchargeant 
-	// GetOutputDataObject et/ou GetOutputPort et utilisant
+	// => On bride celui de la tige, et on dit que celui du cône est 3 x plus grand.
+	// Rem : c'est un peu de la cuisine, si ça ne donne pas satisfaction il serait bon de coder une classe vtkArrowSource sur laquelle on soit en
+	// mesure d'imposer la taille du cône et de la tige (Points 1 et 2,  SetRadius). Cela devrait être possible à partir de vtkLineSource et
+	// vtkConeSource, en héritant de vtkPolyDataAlgorithm, en surchargeant  GetOutputDataObject et/ou GetOutputPort et utilisant
 	// SetNumberOfOutputPorts. Peut être passer par un vtkMergeFilter.
 //	double	shaftRadiusPercent	= 0.03;		// OK en général
 //	const double	length	= vector [0].length (vector [1]);
-	const double	arrowComul	=
-		((0 != getRenderingManager ( )) && (true == getRenderingManager ( )->useGlobalDisplayProperties ( ))) ?
-			getRenderingManager ( )->getContext ( ).globalDisplayProperties (getEntity ( )->getType ( )).getArrowComul ( ) :
-			 getEntity ( )->getDisplayProperties ( ).getArrowComul ( );
+	const double	arrowComul	= ((0 != getRenderingManager ( )) && (true == getRenderingManager ( )->useGlobalDisplayProperties ( ))) ?
+			getRenderingManager ( )->getContext ( ).globalDisplayProperties (getEntity ( )->getType ( )).getArrowComul ( ) : getEntity ( )->getDisplayProperties ( ).getArrowComul ( );
 	const double	targetShaftRadius	= 5.;
 	double		shaftRadiusPercent	= targetShaftRadius / scale;
 	//std::cout<<"shaftRadiusPercent = "<<shaftRadiusPercent<<std::endl;
@@ -554,9 +554,7 @@ void VTKMgx3DEntityRepresentation::createAssociationVectorRepresentation (const 
 	_vectAssArrow->SetInvert (!sameDir);	// Inverser la flèche ?
 	_vectAssMapper->SetInputConnection (_vectAssArrow->GetOutputPort ( ));
 	_vectAssMapper->ScalarVisibilityOff ( );
-	_vectAssActor->GetProperty ( )->SetColor (
-			color.getRed ( ) / 255., color.getGreen ( ) / 255.,
-			color.getBlue ( ) / 255.);
+	_vectAssActor->GetProperty ( )->SetColor (color.getRed ( ) / 255., color.getGreen ( ) / 255., color.getBlue ( ) / 255.);
 	_vectAssActor->SetMapper (_vectAssMapper);
 }	// VTKMgx3DEntityRepresentation::createAssociationVectorRepresentation
 
@@ -644,7 +642,7 @@ void VTKMgx3DEntityRepresentation::createRefinedRepresentation (size_t factor)
 
 	vector<Math::Point>	points;
 	vector<size_t>		triangles;
-	const bool		shouldRefine	= !getRefinedRepresentation (points, triangles, factor);
+	const bool			shouldRefine	= !getRefinedRepresentation (points, triangles, factor);
 	switch (getEntity ( )->getDim ( ))
 	{
 		case 2	:
@@ -652,19 +650,15 @@ void VTKMgx3DEntityRepresentation::createRefinedRepresentation (size_t factor)
 			VTKMgx3DEntityRepresentation::createTrianglesSurfacicRepresentation (getEntity ( ), _refinedActor, _refinedMapper, _refinedGrid, points, triangles);
 			break;
 		default	:
-cout << __FILE__ << ' ' << __LINE__ << " VTKMgx3DEntityRepresentation::createRefinedRepresentation TO REIMPLEMENT AS POLYDATA" << endl;
 			VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (getEntity ( ), _refinedActor, _refinedMapper, _refinedGrid, points, triangles);
 	}	// switch (getEntity ( )->getDim ( ))
 
 	if (true == shouldRefine)
 	{
-cout << __FILE__ << ' ' << __LINE__ << " VTKMgx3DEntityRepresentation::createRefinedRepresentation TO REIMPLEMENT AS POLYDATA" << endl;
-		_refineFilter	= vtkLoopSubdivisionFilter::New ( );
-		_refineFilter->SetNumberOfSubdivisions (factor);
-//		_refineFilter	= vtkUnstructuredGridRefinementFilter::New ( );
+		_refineFilter	= vtkPolyDataRefinementFilter::New ( );
 		_refinedMapper->SetInputData (_refineFilter->GetOutput ( ));
 		_refineFilter->SetInputData (_refinedGrid);
-//		_refineFilter->SetRefinementFactor (factor);
+		_refineFilter->SetRefinementFactor (factor);
 		_refineFilter->Update ( );
 		_refinedMapper->SetInputData (_refineFilter->GetOutput ( ));
 		_refinedActor->GetProperty ( )->SetColor (0., 1., 0.);
