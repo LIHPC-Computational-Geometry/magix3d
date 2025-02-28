@@ -7,12 +7,12 @@
 #ifdef USE_EXPERIMENTAL_ROOM
 
 #include "Internal/ContextIfc.h"
-
+#include "QtComponents/QtRepresentationTypesPanel.h"
 #include "QtVtkComponents/QtVtkMgx3DExperimentalRoomPanel.h"
+#include "QtVtkComponents/VTKEntityRepresentation.h"
 #include "Utils/Common.h"
 #include "Utils/Entity.h"
 #include "Utils/Unit.h"
-#include "QtVtkComponents/VTKEntityRepresentation.h"
 
 #include <TkUtil/InternalError.h>
 #include <TkUtil/MemoryError.h>
@@ -23,7 +23,6 @@
 #include <cmath>
 
 #include <assert.h>
-#include <QtComponents/QtRepresentationTypesPanel.h>
 
 using namespace std;
 using namespace TkUtil;

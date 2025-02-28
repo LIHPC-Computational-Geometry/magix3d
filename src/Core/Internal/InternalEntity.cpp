@@ -11,7 +11,8 @@
 #include "Internal/InternalEntity.h"
 #include "Internal/Context.h"
 #include "Utils/SerializedRepresentation.h"
-#include "TkUtil/MemoryError.h"
+/*----------------------------------------------------------------------------*/
+#include <TkUtil/MemoryError.h>
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

@@ -8,6 +8,7 @@
  */
 /*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
+#include "Internal/M3DCommandResult.h"
 #include "Utils/CommandManager.h"
 #include "Mesh/MeshManager.h"
 #include "Mesh/MeshImplementation.h"
@@ -22,14 +23,12 @@
 #include "Mesh/CommandModifyMesh.h"
 #include "Mesh/CommandExportBlocks.h"
 #include "Mesh/SubVolume.h"
-#include "Topo/Block.h"
-#include "Internal/M3DCommandResult.h"
+#include "Mesh/CommandCreateSubVolumeBetweenSheets.h"
 #include "Mesh/CommandDestroyMesh.h"
+#include "Topo/Block.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
-#include <Mesh/CommandCreateSubVolumeBetweenSheets.h>
 #include <TkUtil/MemoryError.h>
-
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 /*----------------------------------------------------------------------------*/

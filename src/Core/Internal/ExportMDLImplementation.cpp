@@ -10,7 +10,6 @@
 /*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
 #include "Geom/GeomManager.h"
-#include "Geom/OCCGeomRepresentation.h"
 #include "Geom/GeomDisplayRepresentation.h"
 #include "Internal/ExportMDLImplementation.h"
 #include "Topo/Vertex.h"
@@ -23,7 +22,15 @@
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
-
+/*----------------------------------------------------------------------------*/
+#include <TopoDS.hxx>
+#include <BRep_Tool.hxx>
+#include <Geom_Circle.hxx>
+#include <Geom_Ellipse.hxx>
+#include <Geom_Curve.hxx>
+#include <gp_Circ.hxx>
+#include <gp_Elips.hxx>
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
@@ -190,7 +197,7 @@ save(Geom::Curve* cv)
         throw TkUtil::Exception(TkUtil::UTF8String ("Erreur lors de l'écriture du fichier au format Mdl, une entité n'a pas été convertie en Curve", TkUtil::Charset::UTF_8));
 
     if (m_cor_uniqueId_mdlId[cv->getUniqueId()] == 0){
-        if (cv->isLinear() && !cv->isWire()){
+        if (cv->isLinear()){
             std::vector<Geom::Vertex*> vertices;
             cv->get(vertices);
             if (vertices.size() != 2){
@@ -231,7 +238,11 @@ save(Geom::Curve* cv)
             uint idP1 = save(vertices[0]);
             uint idP2 = save(vertices[1]);
             std::string centerName = cv->getName()+"Center";
-            Utils::Math::Point center = cv->getCenter();
+
+            // 1 seule représentation pour une courbe ou une ellipse
+            TopoDS_Edge edge = cv->getOCCEdges()[0];
+            Utils::Math::Point center = getCenter(edge);
+
             uint idP3 = save(center, centerName);
 
             T_MdlCommand& cmd = nextCommand(cv->getName(), MdlEllipse, m_obs_id[IdObCurve]++);
@@ -271,85 +282,6 @@ save(Geom::Curve* cv)
 
             std::vector<Geom::Vertex*> vertices;
             cv->get(vertices);
-
-            std::string nomSupport = std::string("Su")+cv->getName();
-            T_MdlCommand& cmd = nextCommand(nomSupport, MdlLineSup, m_obs_id[IdObLineSup]++);
-
-//            // on stocke l'id+1 pour distinguer les cas où ce n'est pas défini (donc à 0)
-//            m_cor_uniqueId_mdlId[cv->getUniqueId()] = m_obs_id[IdObLineSup];
-
-            cmd.u.linesup.is_region = false;
-            cmd.u.linesup.nb = points.size();
-            cmd.u.linesup.x  = new double[points.size()];
-            cmd.u.linesup.y  = new double[points.size()];
-            for(size_t j=0; j<points.size(); j++ ){
-                cmd.u.linesup.x[j] = points[j].getX();
-                cmd.u.linesup.y[j] = points[j].getY();
-            }
-#ifdef _DEBUG_EXPORT
-            std::cout<<"save support pour cv = "<<nomSupport
-                    <<" avec "<<points.size()<<" points"
-                    <<" et "<<vertices.size()<<" sommets"
-                    <<std::endl;
-
-            std::cout<<" vertices[0]->getPoint(): "<<vertices[0]->getPoint()<<std::endl;
-            std::cout<<" vertices.back()->getPoint(): "<<vertices.back()->getPoint()<<std::endl;
-
-            std::cout<<" points[0]: "<<points[0]<<std::endl;
-            std::cout<<" points.back(): "<<points.back()<<std::endl;
-
-#endif
-
-            // vérification que les points sont dans l'ordre de parcours de la courbe
-            double same_dir = true;
-            if (vertices[0]->getPoint().isEpsilonEqual(points[0], Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon)
-            		&& vertices.back()->getPoint().isEpsilonEqual(points.back(), Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon))
-            	same_dir = true;
-            else if (vertices[0]->getPoint().isEpsilonEqual(points.back(), Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon)
-            		&& vertices.back()->getPoint().isEpsilonEqual(points[0], Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon))
-            	same_dir = false;
-            else {
-				TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-            	messErr << "Erreur lors de l'écriture du fichier au format Mdl, entité "<<cv->getName()
-            			<<", on ne retrouve pas les sommets aux extrémités parmis les points de la représentation";
-            	throw TkUtil::Exception(messErr);
-            }
-
-
-            // création d'une ligne qui s'appuie sur ce support
-            uint idP1 = save(same_dir?vertices[0]:vertices.back());
-            uint idP2 = save(same_dir?vertices.back():vertices[0]);
-            T_MdlCommand& cmd2   = nextCommand(cv->getName(),MdlLine,m_obs_id[IdObLine]++);
-            m_cor_uniqueId_commandId[cv->getUniqueId()] = mdl_info.nb_commands-1;
-
-            cmd2.model1d.pt1 = idP1;
-            cmd2.model1d.pt2 = idP2;
-            cmd2.u.line.line  = m_obs_id[IdObLineSup]-1;
-            cmd2.u.line.nbegin = 2;
-            cmd2.u.line.nend   = points.size()-1;
-
-            // on stocke l'id+1 pour distinguer les cas où ce n'est pas défini (donc à 0)
-            m_cor_uniqueId_mdlId[cv->getUniqueId()] = m_obs_id[IdObLine];
-
-#ifdef _DEBUG_EXPORT
-            std::cout<<"save cv = "<<cv->getName()
-                    <<" entre "<<vertices[0]->getName()<<" ("<<idP1
-                    <<") et "<<vertices.back()->getName()<<" ("<<idP2<<")"
-                    <<" qui pointe sur "<<nomSupport<<" id "<<cmd2.u.line.line
-                    <<" de "<<cmd2.u.line.nbegin<<" à "<<cmd2.u.line.nend
-                    <<" ( => "<<m_cor_uniqueId_mdlId[cv->getUniqueId()]-1<<")"
-                    <<std::endl;
-#endif
-
-        }
-        else if (cv->isWire()){
-
-           std::vector<Utils::Math::Point> points;
-
-            std::vector<Geom::Vertex*> vertices;
-            cv->get(vertices);
-            for (uint i=0; i<vertices.size(); i++)
-            	points.push_back(vertices[i]->getCoord());
 
             std::string nomSupport = std::string("Su")+cv->getName();
             T_MdlCommand& cmd = nextCommand(nomSupport, MdlLineSup, m_obs_id[IdObLineSup]++);
@@ -550,8 +482,34 @@ nextCommand(std::string nm, int t, size_t id)
 
     return mdl_info.commands[mdl_info.nb_commands-1];
 }
+/*----------------------------------------------------------------------------*/
+Utils::Math::Point ExportMDLImplementation::
+getCenter(const TopoDS_Edge& edge)
+{
+    Standard_Real first_param, last_param;
+    Handle_Geom_Curve curve = BRep_Tool::Curve(edge, first_param, last_param);
+    TkUtil::UTF8String error_msg("Erreur interne, type non prévu : seules courbe et ellipse cont autorisées", TkUtil::Charset::UTF_8);
+    if (curve.IsNull())
+    	throw TkUtil::Exception(error_msg);
 
+    if (curve->DynamicType()==STANDARD_TYPE(Geom_Ellipse)){
+        Handle(Geom_Ellipse) ellipse = Handle(Geom_Ellipse)::DownCast(curve);
+        gp_Elips elips = ellipse->Elips();
+        const gp_Pnt& loc = elips.Location();
 
+        return Utils::Math::Point(loc.X(), loc.Y(), loc.Z());
+
+    } else if (curve->DynamicType()==STANDARD_TYPE(Geom_Circle)){
+        Handle(Geom_Circle) circle = Handle(Geom_Circle)::DownCast(curve);
+        gp_Circ circ = circle->Circ();
+        const gp_Ax2& ax = circ.Position();
+        const gp_Pnt& loc = ax.Location();
+
+        return Utils::Math::Point(loc.X(), loc.Y(), loc.Z());
+    }
+    else
+        throw TkUtil::Exception(error_msg);
+}
 /*----------------------------------------------------------------------------*/
 } // end namespace Internal
 /*----------------------------------------------------------------------------*/

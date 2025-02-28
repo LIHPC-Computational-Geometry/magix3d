@@ -71,11 +71,6 @@ Internal::M3DCommandResultIfc* GeomManagerIfc::copy(std::vector<std::string>& e,
     throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::copy should be overloaded.", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManagerIfc::newVolume(std::vector<std::string>& e, std::string groupName)
-{
-    throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::newVolume should be overloaded.", TkUtil::Charset::UTF_8));
-}
-/*----------------------------------------------------------------------------*/
 Internal::M3DCommandResultIfc* GeomManagerIfc::newVertex(std::string curveName, const double& param, std::string groupName)
 {
     throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::newVertex should be overloaded.", TkUtil::Charset::UTF_8));
@@ -104,18 +99,6 @@ Internal::M3DCommandResultIfc* GeomManagerIfc::newVertexFromTopo(std::string ver
 Internal::M3DCommandResultIfc* GeomManagerIfc::newSegment(std::string n1,std::string n2, std::string groupName)
 {
 	throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::newSegment should be overloaded.", TkUtil::Charset::UTF_8));
-}
-/*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManagerIfc::newPrism(std::string base, const Vector& v,
-                              std::string groupName)
-{
-    throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::newPrism should be overloaded.", TkUtil::Charset::UTF_8));
-}
-/*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManagerIfc::newPrismWithTopo(std::string base, const Vector& v,
-                              std::string groupName)
-{
-    throw TkUtil::Exception (TkUtil::UTF8String ("GeomManagerIfc::newPrismWithTopo should be overloaded.", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc*

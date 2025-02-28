@@ -10,6 +10,7 @@
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtMgx3DApplication.h"
 #include <QtUtil/QtErrorManagement.h>
+#include <QtUtil/QtWidgetAutoLock.h>
 #include "QtComponents/RenderedEntityRepresentation.h"
 #include "QtComponents/QtMgx3DScrollArea.h"
 #include "Topo/CoEdge.h"
@@ -623,7 +624,7 @@ void QtMgx3DOperationPanel::operationCompleted ( )
 }	// QtMgx3DOperationPanel::operationCompleted
 
 
-void QtMgx3DOperationPanel::log (const Log& log)
+void QtMgx3DOperationPanel::log (const TkUtil::Log& log)
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
 	getContext ( ).getLogDispatcher ( ).log (log);
@@ -675,6 +676,8 @@ void QtMgx3DOperationPanel::applyCallback ( )
 	bool	userNotified	= false;	// CP 16/09/24 false par défaut (cas où la création de commande lève une exception => pas de commandResult)																	// CP NEW
 	BEGIN_QT_TRY_CATCH_BLOCK
 
+	highlight (false);	// CP 18/02/25 : ne pas être tenté de modifier la surbrillance d'entités détruites.
+
 	CHECK_NULL_PTR_ERROR (getMgx3DOperationAction ( ))
 	getMgx3DOperationAction ( )->executeOperation ( );
 	commandResult	= getMgx3DOperationAction ( )->getCommandResult ( );
@@ -683,7 +686,10 @@ void QtMgx3DOperationPanel::applyCallback ( )
 	if (0 != commandResult)
 	{
 		if (CommandIfc::DONE == commandResult->getStatus ( ))
+		{
+			reset ( );	// CP 18/02/25 : ne pas être tenté de modifier la surbrillance d'entités détruites.
 			hasError	= false;
+		}
 		else
 		{
 			userNotified	= commandResult->isUserNotified ( );
@@ -762,7 +768,7 @@ void QtMgx3DOperationPanel::entitiesAddedToSelectionCallback (QString entitiesNa
 				registerHighlightedEntity (*entity);
 				DisplayProperties::GraphicalRepresentation*	gr	= entity->getDisplayProperties ( ).getGraphicalRepresentation ( );
 				CHECK_NULL_PTR_ERROR (gr)
-				gr->setHighlighted (true);
+				gr->setHighlighted (true, false);
 			}
 			catch (...)
 			{
@@ -819,7 +825,7 @@ void QtMgx3DOperationPanel::entitiesRemovedFromSelectionCallback (QString entiti
 				unregisterHighlightedEntity (*entity);
 				DisplayProperties::GraphicalRepresentation*	gr	= entity->getDisplayProperties ( ).getGraphicalRepresentation ( );
 				CHECK_NULL_PTR_ERROR (gr)
-				gr->setHighlighted (false);
+				gr->setHighlighted (false, false);
 			}
 			catch (...)
 			{
@@ -833,8 +839,7 @@ void QtMgx3DOperationPanel::entitiesRemovedFromSelectionCallback (QString entiti
 
 
 	// Actualisation aperçu résultat opération :
-	unique_ptr<RenderingManager::DisplayLocker>	displayLocker (
-				new RenderingManager::DisplayLocker (getRenderingManager ( )));
+	unique_ptr<RenderingManager::DisplayLocker>	displayLocker (new RenderingManager::DisplayLocker (getRenderingManager ( )));
 	preview (false, true);
 	displayLocker.reset ( );
 	preview (true, true);
@@ -1840,8 +1845,8 @@ void QtMgx3DOperationsPanel::applyCallback ( )
 
 	if (0 != _operationPanel)
 	{
-//		CHECK_NULL_PTR_ERROR (_operationPanel->getMgx3DOperationAction ( ))
-//		_operationPanel->getMgx3DOperationAction ( )->executeOperation ( );
+		QtWidgetAutoLock	lock (_operationPanel);
+		
 		_operationPanel->applyCallback ( );
 	}	// if (0 != _operationPanel)
 
@@ -2002,7 +2007,7 @@ void QtMgx3DOperationsPanel::setLogStream (LogOutputStream* stream)
 }	// QtMgx3DOperationsPanel::setLogStream
 
 
-void QtMgx3DOperationsPanel::log (const Log& log)
+void QtMgx3DOperationsPanel::log (const TkUtil::Log& log)
 {
 	if (0 != _logStream)
 		_logStream->log (log);

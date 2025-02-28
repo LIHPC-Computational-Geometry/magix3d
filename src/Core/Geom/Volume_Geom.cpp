@@ -18,9 +18,9 @@
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
 #include "Geom/Shell.h"
-#include "Geom/OCCGeomRepresentation.h"
 #include "Geom/MementoGeomEntity.h"
-#include "TkUtil/Exception.h"
+#include "Geom/EntityFactory.h"
+#include "Geom/OCCHelper.h"
 #include "Group/Group3D.h"
 #include "Internal/Context.h"
 #include "Topo/Block.h"
@@ -28,7 +28,10 @@
 #include "Topo/CoEdge.h"
 #include "Topo/Vertex.h"
 /*----------------------------------------------------------------------------*/
+#include <TkUtil/Exception.h>
 #include <TkUtil/MemoryError.h>
+#include <TkUtil/Exception.h>
+#include <TkUtil/TraceLog.h>
 /*----------------------------------------------------------------------------*/
 #include <BRepClass3d_SolidClassifier.hxx>
 #include <TopTools_IndexedMapOfShape.hxx>
@@ -44,7 +47,6 @@
 #include <BRepCheck_Analyzer.hxx>
 #include <GProp_GProps.hxx>
 #include <BRepGProp.hxx>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -78,9 +80,20 @@ bool compareVertex(Vertex* v1, Vertex* v2)
 }
 /*----------------------------------------------------------------------------*/
 Volume::Volume(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-        GeomProperty* gprop, GeomRepresentation* compProp)
-: GeomEntity(ctx, prop, disp, gprop,compProp)
+        GeomProperty* gprop, TopoDS_Shape& shape)
+: GeomEntity(ctx, prop, disp, gprop)
+, m_occ_shape(shape)
 {
+}
+/*----------------------------------------------------------------------------*/
+void Volume::apply(std::function<void(const TopoDS_Shape&)> const& lambda) const
+{
+    lambda(m_occ_shape);
+}
+/*----------------------------------------------------------------------------*/
+void Volume::applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda)
+{
+    m_occ_shape = lambda(m_occ_shape);
 }
 /*----------------------------------------------------------------------------*/
 GeomEntity* Volume::clone(Internal::Context& c)
@@ -89,7 +102,7 @@ GeomEntity* Volume::clone(Internal::Context& c)
             c.newProperty(this->getType()),
             c.newDisplayProperties(this->getType()),
             new GeomProperty(),
-            this->getComputationalProperty()->clone());
+            m_occ_shape);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -100,12 +113,15 @@ void Volume::setFromSpecificMemento(MementoGeomEntity& mem)
 {
     m_surfaces = mem.getSurfaces();
     m_groups  = mem.getGroups3D();
+    m_occ_shape = mem.getOCCShapes()[0];
 }
 /*----------------------------------------------------------------------------*/
 void Volume::createSpecificMemento(MementoGeomEntity& mem)
 {
     mem.setSurfaces(m_surfaces);
     mem.setGroups3D(m_groups);
+    std::vector<TopoDS_Shape> shapes = { m_occ_shape };
+    mem.setOCCShapes(shapes);
 }
 /*----------------------------------------------------------------------------*/
 void Volume::getRefEntities(std::vector<GeomEntity*>& entities)
@@ -206,14 +222,16 @@ void Volume::get(std::vector<Volume*>& volumes) const
     volumes.insert(volumes.end(),l.begin(),l.end());
 }
 /*----------------------------------------------------------------------------*/
-void Volume::project(Utils::Math::Point& P) const
+uint Volume::project(Utils::Math::Point& P) const
 {
     throw TkUtil::Exception (TkUtil::UTF8String ("Volume::project n'est pas disponible", TkUtil::Charset::UTF_8));
+    return 0;
 }
 /*----------------------------------------------------------------------------*/
-void Volume::project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const
+uint Volume::project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const
 {
     throw TkUtil::Exception (TkUtil::UTF8String ("Volume::project n'est pas disponible", TkUtil::Charset::UTF_8));
+    return 0;
 }
 /*----------------------------------------------------------------------------*/
 void Volume::add(Surface* s)
@@ -240,20 +258,163 @@ void Volume::remove(Surface* s)
 /*----------------------------------------------------------------------------*/
 void Volume::split(std::vector<Surface*>& surf,
         std::vector<Curve*  >& curv,
-        std::vector<Vertex* >&  vert)
+        std::vector<Vertex* >& vert)
 {
-    getComputationalProperty()->split(surf,curv,vert,this);
+    /* on va explorer le solide OCC stocké en attribut et créer les entités de
+     * dimension directement inférieure, c'est-à-dire les faces
+     */
+    TopExp_Explorer e;
+//    if (m_shape.ShapeType()!=TopAbs_SOLID  && m_shape.ShapeType()!=TopAbs_SHELL)
+//        throw TkUtil::Exception("Wrong OCC shape type!!!");
 
+    /* on crée les faces */
+    std::vector<TopoDS_Shape> OCCFaces;
+    std::vector<Surface*>     Mgx3DSurfaces;
+    std::vector<TopoDS_Shape> OCCCurves;
+    std::vector<Curve *>      Mgx3DCurves;
+
+
+    for(e.Init(m_occ_shape, TopAbs_FACE); e.More(); e.Next())
+    {
+
+        TopoDS_Face F = TopoDS::Face(e.Current());
+
+        Surface* s = EntityFactory(getContext()).newOCCSurface(F);
+
+        // correspondance entre shapes OCC et géométries Mgx3D
+        OCCFaces.push_back(F);
+        Mgx3DSurfaces.push_back(s);
+        // on crée le lien V->F
+        this->add(s);
+        // on crée le lien F->V
+        s->add(this);
+    }
+
+    // maintenant que les faces sont créées, on crée les arêtes
+    TopTools_IndexedDataMapOfShapeListOfShape map;
+    TopExp::MapShapesAndAncestors(m_occ_shape, TopAbs_EDGE, TopAbs_FACE, map);
+    // on a ainsi toutes les arêtes dans map et pour chaque arête, on
+    // connait les faces auxquelles elle appartient.
+
+    TopTools_IndexedMapOfShape map_edges;
+    TopExp::MapShapes(m_occ_shape,TopAbs_EDGE, map_edges);
+    TopTools_ListOfShape listFaces;
+
+
+    for(int i = 1; i <= map_edges.Extent(); i++)
+    {
+        TopoDS_Edge E = TopoDS::Edge(map_edges(i));
+        BRepCheck_Analyzer anaAna(E, Standard_False);
+        GProp_GProps pb;
+        BRepGProp::LinearProperties(E,pb);
+        double res = pb.Mass();
+        if(res<Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon){
+			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+            message <<"Une courbe de taille nulle n'a pas ete creee pour l'entité géométrique "<<this->getName();
+            getContext().getLogDispatcher().log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
+            continue;
+        }
+
+        Curve* c = EntityFactory(getContext()).newOCCCurve(E);
+
+        // correspondance entre shapes OCC et géométries Mgx3D
+        OCCCurves.push_back(E);
+        Mgx3DCurves.push_back(c);
+
+        /* on récupère les faces contenant cette arête et déjà crées donc
+         */
+        listFaces = map.FindFromKey(E);
+        TopTools_ListIteratorOfListOfShape it_faces;
+        for(it_faces.Initialize(listFaces);it_faces.More();it_faces.Next()){
+            TopoDS_Shape shape =  it_faces.Value();
+
+           Surface *s= 0;
+           bool not_find_shape = true;
+           for(int i =0; i<OCCFaces.size() && not_find_shape; i++)
+               if(shape.IsSame(OCCFaces[i])){
+                   not_find_shape = false;
+                   s = Mgx3DSurfaces[i];
+               }
+
+           // on crée le lien S->C
+           s->add(c);
+           // on crée le lien C->S
+           c->add(s);
+
+        }
+    }
+
+    // maintenant que les faces et les aretes sont créées, on crée les
+    // sommets
+    TopExp::MapShapesAndAncestors(m_occ_shape, TopAbs_VERTEX, TopAbs_EDGE, map);
+    // on a ainsi tous les sommets dans map et pour chaque sommet, on
+    // connait les aretes auxquelles il appartient.
+
+    /* on crée les labels contenants les sommets et pour chaque sommet,
+     * on fait pointer une ref à partir des labels ayant les aretes
+     * correspondantes */
+    TopTools_IndexedMapOfShape map_vertices;
+    TopExp::MapShapes(m_occ_shape,TopAbs_VERTEX, map_vertices);
+    TopTools_ListOfShape listEdges;
+
+    for(int i = 1; i <= map_vertices.Extent(); i++)
+    {
+        TopoDS_Vertex V = TopoDS::Vertex(map_vertices(i));
+        // creation du sommet
+        Vertex* v = EntityFactory(getContext()).newOCCVertex(V);
+
+        /* on récupère les arêtes contenant ce sommet. Mais attention, ce nb
+         * d'arêtes est trop important car des doublons existent.
+         */
+        listEdges = map.FindFromKey(V);
+
+        TopTools_ListIteratorOfListOfShape it_edges;
+
+        // ce vecteur nous sert à ne pas récupérer 2 fois le même sommet
+        std::vector<bool> still_done;
+        still_done.resize(Mgx3DCurves.size(),0);
+
+        for(it_edges.Initialize(listEdges);it_edges.More();it_edges.Next()){
+           TopoDS_Shape shape =  it_edges.Value();
+           Curve *c= 0;
+           bool not_find_shape = true;
+           for(int i =0; i<OCCCurves.size() && not_find_shape; i++){
+               if(shape.IsSame(OCCCurves[i]) && !still_done[i]){
+                   not_find_shape = false;
+                   c = Mgx3DCurves[i];
+                   still_done[i] = true;
+               }
+           }
+           // si on a trouvé la shape et qu'elle n'avait pas déjà été traitée
+           if(!not_find_shape){
+               // on crée le lien C->V
+               c->add(v);
+               // on crée le lien V->C
+               v->add(c);
+           }
+
+        }
+    }
+
+    // on renseigne la fonction appelante
+    this->get(surf);
+    this->get(curv);
+    this->get(vert);
 }
 /*----------------------------------------------------------------------------*/
 double Volume::computeArea() const
 {
-    return getComputationalProperty()->computeVolumeArea();
+    // 1 seule représentation pour le volume
+    return OCCHelper::computeArea(m_occ_shape);
+}
+/*----------------------------------------------------------------------------*/
+void Volume::computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const
+{
+    OCCHelper::computeBoundingBox(m_occ_shape, pmin, pmax);
 }
 /*----------------------------------------------------------------------------*/
 bool Volume::contains(Volume* vol) const
 {
-
     //double tol = Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon;
     double my_bounds[6];
     double bounds[6];
@@ -278,23 +439,16 @@ bool Volume::contains(Volume* vol) const
 
     if(myArea<otherArea)
         return false;
+
     //===============================================================
     // EN FAIT IL FAUT TRAVAILLER AVEC LA SHAPES OCC, CAR LA SHAPE
     // TESTEE PEUT NE PAS ENCORE ETRE CONNECTEE TOPOLOGIQUEMENT
     // AVEC DES ENTITES M3D
     //===============================================================
-    OCCGeomRepresentation* rep =
-            dynamic_cast<OCCGeomRepresentation*>(vol->getComputationalProperty());
-    CHECK_NULL_PTR_ERROR(rep);
-    TopoDS_Shape shOther = rep->getShape();
-
-    OCCGeomRepresentation* my_rep =
-                dynamic_cast<OCCGeomRepresentation*>(this->getComputationalProperty());
-    CHECK_NULL_PTR_ERROR(my_rep);
-    TopoDS_Shape sh = my_rep->getShape();
-
+    // 1 seule représentation pour le volume
+    TopoDS_Shape shOther = vol->m_occ_shape;
+    TopoDS_Shape sh = this->m_occ_shape;
     BRepClass3d_SolidClassifier classifier(sh);
-
 
     //===============================================================
     // on teste les sommets
@@ -347,7 +501,7 @@ bool Volume::contains(Volume* vol) const
             Handle_Geom_Surface surf = BRep_Tool::Surface(f_i);
             // On récupère la transformation de la shape/face
             if (aPoly.IsNull()){
-               OCCGeomRepresentation::buildIncrementalBRepMesh(f_i, 0.1);
+               OCCHelper::buildIncrementalBRepMesh(f_i, 0.1);
                 aPoly = BRep_Tool::Triangulation(f_i,aLoc);
             }
             if (aPoly.IsNull()){

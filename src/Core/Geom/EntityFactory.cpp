@@ -8,7 +8,6 @@
 /*----------------------------------------------------------------------------*/
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomProperty.h"
-#include "Geom/OCCGeomRepresentation.h"
 #include "Utils/Entity.h"
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
@@ -36,9 +35,6 @@
 #include <BRepBuilderAPI_MakeWire.hxx>
 #include <TopoDS_Wire.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
-#include <ShapeAnalysis_Wire.hxx>
-#include <ShapeExtend_WireData.hxx>
-#include <ShapeFix_Wire.hxx>
 #include <TopoDS.hxx>
 #include <TopExp_Explorer.hxx>
 #include <BRepAlgo_NormalProjection.hxx>
@@ -140,30 +136,24 @@ GeomEntity* EntityFactory::copy(GeomEntity* E)
 /*----------------------------------------------------------------------------*/
 Surface* EntityFactory::newSurfaceByCopyWithOffset(Surface* E, const double& offset)
 {
-	// version avec multiples GeomRepresentation, ce qui pose pb au "split"
+	// version avec multiples faces, ce qui pose pb au "split"
 	// qui est fait après pour retrouver les courbes adjacentes
-	std::vector<GeomRepresentation*> new_reps;
+	std::vector<TopoDS_Face> new_reps;
 
 	try{
 
-		std::vector<GeomRepresentation*> init_reps = E->getComputationalProperties();
-		for (uint i=0; i<init_reps.size(); i++){
-			OCCGeomRepresentation* current_rep =dynamic_cast<OCCGeomRepresentation*>(init_reps[i]);
-			CHECK_NULL_PTR_ERROR(current_rep);
-			TopoDS_Shape sh = *(current_rep->getShapePtr());
-
+		auto init_reps = E->getOCCFaces();
+        for (auto sh : init_reps) {
 			BRepOffsetAPI_MakeOffsetShape MF(sh, offset,
 					Utils::Math::MgxNumeric::mgxDoubleEpsilon);
 
-			TopoDS_Shape aShape;
-
 			if(MF.IsDone()){
-				aShape   = MF.Shape();
+				TopoDS_Shape aShape = MF.Shape();
 				if (!aShape.IsNull()){
 					TopExp_Explorer exp2;
 					for(exp2.Init(TopoDS::Shell(aShape), TopAbs_FACE); exp2.More(); exp2.Next()){
 					    TopoDS_Face aFace = TopoDS::Face(exp2.Current());
-					    new_reps.push_back(new OCCGeomRepresentation(m_context, aFace));
+					    new_reps.push_back(aFace);
 					  }
 				}
 #ifdef _DEBUG
@@ -184,87 +174,14 @@ Surface* EntityFactory::newSurfaceByCopyWithOffset(Surface* E, const double& off
 		throw Utils::BuildingException(message);
 	}
 
-	Surface*    surface;
-	if (new_reps.size() == 1)
-		surface = new Surface(m_context,
+	Surface* surface = new Surface(m_context,
 				m_context.newProperty(Utils::Entity::GeomSurface),
 				m_context.newDisplayProperties(Utils::Entity::GeomSurface),
-				new GeomProperty(),new_reps[0]);
-	else
-		// surface composite
-		surface = new Surface(m_context,
-				m_context.newProperty(Utils::Entity::GeomSurface),
-				m_context.newDisplayProperties(Utils::Entity::GeomSurface),
-				new GeomProperty(),new_reps);
+				new GeomProperty(), new_reps);
 
-	CHECK_NULL_PTR_ERROR (surface)
 	m_context.newGraphicalRepresentation (*surface);
 	return surface;
 }
-/*----------------------------------------------------------------------------*/
-//Surface* EntityFactory::newSurfaceByCopyWithOffset(Surface* E, const double& offset)
-//{
-//	// version avec création d'un compound ou d'un shell (une seule surface)
-//	GeomRepresentation* new_rep;
-//
-//    try{
-//    	BRep_Builder B;
-////    	TopoDS_Compound compound;
-////    	B.MakeCompound(compound);
-//    	TopoDS_Shell aShell;
-//    	B.MakeShell(aShell);
-//
-//    	std::vector<GeomRepresentation*> init_reps = E->getComputationalProperties();
-//    	for (uint i=0; i<init_reps.size(); i++){
-//    		OCCGeomRepresentation* current_rep =dynamic_cast<OCCGeomRepresentation*>(init_reps[i]);
-//    		CHECK_NULL_PTR_ERROR(current_rep);
-//    		TopoDS_Shape sh = *(current_rep->getShapePtr());
-////    		B.Add(compound,sh);
-//    		B.Add(aShell,sh);
-//    	} // end for i
-//
-//		BRepOffsetAPI_MakeOffsetShape MF(aShell, offset,
-//				Utils::Math::MgxNumeric::mgxDoubleEpsilon);
-//
-//		TopoDS_Shape aFace;
-//		//MF.Build();
-//
-//		// hélas, ne fonctionne pas (not IsDone) avec TopoDS_Compound
-//		if(MF.IsDone()){
-//			aFace   = MF.Shape();
-//			if (!aFace.IsNull()){
-//				new_rep = new OCCGeomRepresentation(m_context, aFace);
-//			}
-//#ifdef _DEBUG
-//			else
-//				std::cerr<<"aFace.IsNull() !"<<std::endl;
-//#endif
-//		}
-//		else {
-//			MF.Check();
-//			throw Utils::BuildingException("Error during surface creation (error...)");
-//		}
-//
-//    }
-//    catch(StdFail_NotDone& e){
-//        throw Utils::BuildingException("Erreur OCC lors de la création de la surface avec offset");
-//    }
-//    catch(Utils::BuildingException& e){
-//		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-//    	message << "Error during surface creation, "<<e.getMessage();
-//        throw Utils::BuildingException(message);
-//    }
-//
-//    Surface*    surface;
-//    surface = new Surface(m_context,
-//    		m_context.newProperty(Utils::Entity::GeomSurface),
-//			m_context.newDisplayProperties(Utils::Entity::GeomSurface),
-//			new GeomProperty(),new_rep);
-//
-//    CHECK_NULL_PTR_ERROR (surface)
-//    m_context.newGraphicalRepresentation (*surface);
-//    return surface;
-//}
 /*----------------------------------------------------------------------------*/
 Vertex* EntityFactory::newVertex(const Utils::Math::Point& P)
 {
@@ -278,8 +195,7 @@ Vertex* EntityFactory::newOCCVertex(TopoDS_Vertex& v)
     Vertex*	vertex	= new Vertex(m_context,
             m_context.newProperty(Utils::Entity::GeomVertex),
             m_context.newDisplayProperties(Utils::Entity::GeomVertex),
-            new GeomProperty(),
-            new OCCGeomRepresentation(m_context,v));
+            new GeomProperty(), v);
 	CHECK_NULL_PTR_ERROR (vertex)
 	m_context.newGraphicalRepresentation (*vertex);
 	return vertex;
@@ -288,28 +204,20 @@ Vertex* EntityFactory::newOCCVertex(TopoDS_Vertex& v)
 Curve* EntityFactory::newSegment(const Geom::Vertex* start,
                                   const Geom::Vertex* end)
 {
-    OCCGeomRepresentation* rep =0;
+    gp_Pnt P1(start->getX(), start->getY(), start->getZ());
+    gp_Pnt P2(end->getX(), end->getY(), end->getZ());
 
-
-    gp_Pnt P1(start->getX(),start->getY(),start->getZ());
-    gp_Pnt P2(end->getX(),end->getY(),end->getZ());
-
-
-    try{
-        TopoDS_Edge e= BRepBuilderAPI_MakeEdge(P1,P2);
-        rep = new OCCGeomRepresentation(m_context, e);
-    }
-    catch(StdFail_NotDone& e){
+    try {
+        TopoDS_Edge e = BRepBuilderAPI_MakeEdge(P1,P2);
+        Curve* curve = new Curve(m_context,
+                    m_context.newProperty(Utils::Entity::GeomCurve),
+                    m_context.newDisplayProperties(Utils::Entity::GeomCurve),
+                    new GeomProperty(), e);
+        m_context.newGraphicalRepresentation (*curve);
+        return curve;
+    } catch(StdFail_NotDone& e) {
         throw Utils::BuildingException("Error during Segment creation");
     }
-
-    Curve*	curve	= new Curve(m_context,
-                m_context.newProperty(Utils::Entity::GeomCurve),
-                m_context.newDisplayProperties(Utils::Entity::GeomCurve),
-                new GeomProperty(),rep);
-	CHECK_NULL_PTR_ERROR (curve)
-	m_context.newGraphicalRepresentation (*curve);
-	return curve;
 }
 /*----------------------------------------------------------------------------*/
 gp_Vec EntityFactory::buildValidNormalForArcs(
@@ -363,8 +271,6 @@ Curve* EntityFactory::newCircle(
         const Geom::Vertex* p2,
         const Geom::Vertex* p3)
 {
-    OCCGeomRepresentation* rep =0;
-
     gp_Pnt P1(p1->getX(),p1->getY(),p1->getZ());
     gp_Pnt P2(p2->getX(),p2->getY(),p2->getZ());
     gp_Pnt P3(p3->getX(),p3->getY(),p3->getZ());
@@ -372,30 +278,25 @@ Curve* EntityFactory::newCircle(
     if (P1.IsEqual(P2,0.0)|| P1.IsEqual(P3,0.0)|| P2.IsEqual(P3,0.0))
       throw Utils::BuildingException(TkUtil::UTF8String ("Param. illicites - 2 pts (au moins) sont égaux", TkUtil::Charset::UTF_8));
 
-    try{
+    try {
         GC_MakeCircle factory(P1,P2,P3);
-        if (factory.IsDone()){
+        if (factory.IsDone()) {
             Handle(Geom_Circle) arc = factory.Value();
             TopoDS_Edge e = BRepBuilderAPI_MakeEdge(arc);
-            rep = new OCCGeomRepresentation(m_context, e);
-        }else{
+            Curve*	curve = new Curve(m_context,
+                        m_context.newProperty(Utils::Entity::GeomCurve),
+                        m_context.newDisplayProperties(Utils::Entity::GeomCurve),
+                        new GeomProperty(), e);
+            m_context.newGraphicalRepresentation (*curve);
+            return curve;
+        } else {
             // Récupérer et afficher le statut de l'erreur
             std::string msg(GceErrorToString(factory.Status()));
             throw Utils::BuildingException(TkUtil::UTF8String (msg, TkUtil::Charset::UTF_8));
         }
-    }
-    catch(StdFail_NotDone& e){
+    } catch(StdFail_NotDone& e) {
         throw Utils::BuildingException(TkUtil::UTF8String ("Erreur durant la creation d'un cercle", TkUtil::Charset::UTF_8));
     }
-
-    Curve*	curve = new Curve(m_context,
-                m_context.newProperty(Utils::Entity::GeomCurve),
-                m_context.newDisplayProperties(Utils::Entity::GeomCurve),
-                new GeomProperty(),rep);
-	CHECK_NULL_PTR_ERROR (curve)
-	m_context.newGraphicalRepresentation (*curve);
-
-    return curve;
 }
 /*----------------------------------------------------------------------------*/
 Curve* EntityFactory::newEllipse(
@@ -403,8 +304,6 @@ Curve* EntityFactory::newEllipse(
         const Geom::Vertex* p2,
         const Geom::Vertex* center)
 {
-    OCCGeomRepresentation* rep =0;
-
     gp_Pnt P1(p1->getX(),p1->getY(),p1->getZ());
     gp_Pnt P2(p2->getX(),p2->getY(),p2->getZ());
     gp_Pnt Center(center->getX(),center->getY(),center->getZ());
@@ -412,30 +311,25 @@ Curve* EntityFactory::newEllipse(
     if (P1.IsEqual(P2,0.0)|| P1.IsEqual(Center,0.0)|| P2.IsEqual(Center,0.0))
       throw Utils::BuildingException(TkUtil::UTF8String ("Param. illicites - 2 pts (au moins) sont égaux", TkUtil::Charset::UTF_8));
 
-    try{
+    try {
         GC_MakeEllipse factory(P1,P2,Center);
-        if (factory.IsDone()){
+        if (factory.IsDone()) {
             Handle(Geom_Ellipse) arc = factory.Value();
             TopoDS_Edge e = BRepBuilderAPI_MakeEdge(arc);
-            rep = new OCCGeomRepresentation(m_context, e);
-        }else{
+            Curve*	curve = new Curve(m_context,
+                        m_context.newProperty(Utils::Entity::GeomCurve),
+                        m_context.newDisplayProperties(Utils::Entity::GeomCurve),
+                        new GeomProperty(), e);
+            m_context.newGraphicalRepresentation (*curve);
+            return curve;
+        } else {
             // Récupérer et afficher le statut de l'erreur
             std::string msg(GceErrorToString(factory.Status()));
             throw Utils::BuildingException(TkUtil::UTF8String (msg, TkUtil::Charset::UTF_8));
         }
-    }
-    catch(StdFail_NotDone& e){
+    } catch(StdFail_NotDone& e) {
         throw Utils::BuildingException(TkUtil::UTF8String ("Erreur durant la creation d'une ellipse", TkUtil::Charset::UTF_8));
     }
-
-    Curve*	curve = new Curve(m_context,
-                m_context.newProperty(Utils::Entity::GeomCurve),
-                m_context.newDisplayProperties(Utils::Entity::GeomCurve),
-                new GeomProperty(),rep);
-	CHECK_NULL_PTR_ERROR (curve)
-	m_context.newGraphicalRepresentation (*curve);
-
-    return curve;
 }
 /*----------------------------------------------------------------------------*/
 Curve* EntityFactory::newArcCircle(
@@ -452,8 +346,6 @@ Curve* EntityFactory::newArcCircle(
 			<<", normal_in "<<normal_in
 			<<std::endl;
 #endif
-    OCCGeomRepresentation* rep =0;
-
     gp_Pnt p_center(center->getX(),center->getY(),center->getZ());
     gp_Pnt p_start(start->getX(),start->getY(),start->getZ());
     gp_Pnt p_end(end->getX(),end->getY(),end->getZ());
@@ -467,34 +359,30 @@ Curve* EntityFactory::newArcCircle(
     //vecteur tangent à l'arc de cercle en PStart selon la direction choisie
     gp_Vec vecteurTangent;
     if(direction)
-    	vecteurTangent= v_normal.Crossed(from_center_to_start);
+    	vecteurTangent = v_normal.Crossed(from_center_to_start);
     else
-        vecteurTangent= from_center_to_start.Crossed(v_normal);
+        vecteurTangent = from_center_to_start.Crossed(v_normal);
 
-    try{
+    try {
 #ifdef _DEBUG2
     	std::cout<<"vecteurTangent "<<vecteurTangent.X()<<","<<vecteurTangent.Y()<<","<<vecteurTangent.Z()<<std::endl;
 #endif
         Handle(Geom_TrimmedCurve) arc;
-        if(circumCircle){
-             arc = GC_MakeArcOfCircle (p_start, p_center, p_end);
-        }else{
-             arc = GC_MakeArcOfCircle (p_start, vecteurTangent, p_end);
+        if (circumCircle) {
+             arc = GC_MakeArcOfCircle(p_start, p_center, p_end);
+        } else {
+             arc = GC_MakeArcOfCircle(p_start, vecteurTangent, p_end);
         }
         TopoDS_Edge e = BRepBuilderAPI_MakeEdge(arc);
-        rep = new OCCGeomRepresentation(m_context, e);
-    }
-    catch(StdFail_NotDone& e){
+        Curve* curve = new Curve(m_context,
+                    m_context.newProperty(Utils::Entity::GeomCurve),
+                    m_context.newDisplayProperties(Utils::Entity::GeomCurve),
+                    new GeomProperty(), e);
+        m_context.newGraphicalRepresentation (*curve);
+        return curve;
+    } catch(StdFail_NotDone& e) {
         throw Utils::BuildingException(TkUtil::UTF8String ("Erreur durant la creation d'un arc de cercle", TkUtil::Charset::UTF_8));
     }
-
-    Curve*  curve   = new Curve(m_context,
-                m_context.newProperty(Utils::Entity::GeomCurve),
-                m_context.newDisplayProperties(Utils::Entity::GeomCurve),
-                new GeomProperty(),rep);
-    CHECK_NULL_PTR_ERROR (curve)
-    m_context.newGraphicalRepresentation (*curve);
-    return curve;
 }
 /*----------------------------------------------------------------------------*/
 Curve* EntityFactory::newArcCircle(
@@ -503,8 +391,6 @@ Curve* EntityFactory::newArcCircle(
                 const double& rayon,
                 CoordinateSystem::SysCoord* syscoord)
 {
-    OCCGeomRepresentation* rep =0;
-
     Utils::Math::Point center;
     Utils::Math::Point start(rayon*std::cos(angleDep*M_PI/180), rayon*std::sin(angleDep*M_PI/180), 0);
     Utils::Math::Point end(rayon*std::cos(angleFin*M_PI/180), rayon*std::sin(angleFin*M_PI/180), 0);
@@ -535,22 +421,18 @@ Curve* EntityFactory::newArcCircle(
     	std::cout<<"vecteurTangent "<<vecteurTangent.X()<<","<<vecteurTangent.Y()<<","<<vecteurTangent.Z()<<std::endl;
 #endif
 
-    try{
-        Handle(Geom_TrimmedCurve) arc = GC_MakeArcOfCircle (p_start, vecteurTangent, p_end);
+    try {
+        Handle(Geom_TrimmedCurve) arc = GC_MakeArcOfCircle(p_start, vecteurTangent, p_end);
         TopoDS_Edge e = BRepBuilderAPI_MakeEdge(arc);
-        rep = new OCCGeomRepresentation(m_context, e);
-    }
-    catch(StdFail_NotDone& e){
+        Curve* curve = new Curve(m_context,
+                                    m_context.newProperty(Utils::Entity::GeomCurve),
+                                    m_context.newDisplayProperties(Utils::Entity::GeomCurve),
+                                    new GeomProperty(), e);
+        m_context.newGraphicalRepresentation (*curve);
+        return curve;
+    } catch(StdFail_NotDone& e) {
         throw Utils::BuildingException(TkUtil::UTF8String ("Erreur durant la creation d'un arc de cercle", TkUtil::Charset::UTF_8));
     }
-
-    Curve*  curve   = new Curve(m_context,
-                                m_context.newProperty(Utils::Entity::GeomCurve),
-                                m_context.newDisplayProperties(Utils::Entity::GeomCurve),
-                                new GeomProperty(),rep);
-    CHECK_NULL_PTR_ERROR (curve)
-    m_context.newGraphicalRepresentation (*curve);
-    return curve;
 }
 /*----------------------------------------------------------------------------*/
 Curve* EntityFactory::newArcCircle2D(
@@ -564,8 +446,6 @@ Curve* EntityFactory::newArcCircle2D(
 			<<" , end "<<end->getPoint()<<" , direction "<<(direction?"true":"false")
 			<<std::endl;
 #endif
-    OCCGeomRepresentation* rep =0;
-
     gp_Pnt p_center(center->getX(),center->getY(),center->getZ());
     gp_Pnt p_start(start->getX(),start->getY(),start->getZ());
     gp_Pnt p_end(end->getX(),end->getY(),end->getZ());
@@ -582,29 +462,24 @@ Curve* EntityFactory::newArcCircle2D(
     std::cout<<"vecteurTangent "<<vecteurTangent.X()<<","<<vecteurTangent.Y()<<","<<vecteurTangent.Z()<<std::endl;
 #endif
 
-    try{
+    try {
     	Handle(Geom_TrimmedCurve) arc = GC_MakeArcOfCircle(p_start, vecteurTangent, p_end);
         TopoDS_Edge e = BRepBuilderAPI_MakeEdge(arc);
-        rep = new OCCGeomRepresentation(m_context, e);
-    }
-    catch(StdFail_NotDone& e){
+        Curve* curve = new Curve(m_context,
+                    m_context.newProperty(Utils::Entity::GeomCurve),
+                    m_context.newDisplayProperties(Utils::Entity::GeomCurve),
+                    new GeomProperty(), e);
+        m_context.newGraphicalRepresentation (*curve);
+        return curve;
+    } catch(StdFail_NotDone& e) {
         throw Utils::BuildingException(TkUtil::UTF8String ("Erreur durant la creation d'un arc de cercle", TkUtil::Charset::UTF_8));
     }
-
-    Curve*  curve   = new Curve(m_context,
-                m_context.newProperty(Utils::Entity::GeomCurve),
-                m_context.newDisplayProperties(Utils::Entity::GeomCurve),
-                new GeomProperty(),rep);
-    CHECK_NULL_PTR_ERROR (curve)
-    m_context.newGraphicalRepresentation (*curve);
-    return curve;
 }
 /*----------------------------------------------------------------------------*/
 Curve* EntityFactory::newArcEllipse(const Geom::Vertex* center,
     const Geom::Vertex* start, const Geom::Vertex* end,
     const bool direction)
 {
-    OCCGeomRepresentation* rep =0;
 #ifdef _DEBUG2
     std::cout<<"newArcEllipse center "<<center->getPoint()<<" , start "<<start->getPoint()
 			<<" , end "<<end->getPoint()<<" , direction "<<(direction?"true":"false")<<std::endl;
@@ -614,32 +489,22 @@ Curve* EntityFactory::newArcEllipse(const Geom::Vertex* center,
     gp_Pnt p_start(start->getX(),start->getY(),start->getZ());
     gp_Pnt p_end(end->getX(),end->getY(),end->getZ());
     gp_Vec from_center_to_start(p_center, p_start);
-//
-//    gp_Vec v_normal = buildValidNormalForArcs(p_center,p_start,p_end,normal);
-//
-//    //vecteur tangent à l'arc de cercle en p_start selon la direction choisie
-//    gp_Vec vecteurTangent;
-//    if(direction)
-//      vecteurTangent= normal.Crossed(from_center_to_start);
-//    else
-//        vecteurTangent= from_center_to_start.Crossed(normal);
-//
 
     /* calcul du grand axe et du petit axe a partir des coordonnées centrées
      *
      * (x1,y1) et (x2,y2) */
-    double x1=p_start.X()-p_center.X();
-    double y1=p_start.Y()-p_center.Y();
-    double x2=p_end.X()-p_center.X();
-    double y2=p_end.Y()-p_center.Y();
-    double det= x1*x1*y2*y2-x2*x2*y1*y1;
+    double x1 = p_start.X()-p_center.X();
+    double y1 = p_start.Y()-p_center.Y();
+    double x2 = p_end.X()-p_center.X();
+    double y2 = p_end.Y()-p_center.Y();
+    double det = x1*x1*y2*y2-x2*x2*y1*y1;
 
-    if (det==0)
+    if (det == 0)
       throw Utils::BuildingException(TkUtil::UTF8String ("Les 3 points n'appartiennent pas a une ellipse non dégénérée dont les axes sont X et Y", TkUtil::Charset::UTF_8));
 
 
-    double b2= det / (x1*x1-x2*x2);
-    double a2= det / (y2*y2-y1*y1);
+    double b2 = det / (x1*x1-x2*x2);
+    double a2 = det / (y2*y2-y1*y1);
     double b = sqrt(b2); // demi-axe selon y
     double a = sqrt(a2); // demi-axe selon x
 
@@ -647,8 +512,8 @@ Curve* EntityFactory::newArcEllipse(const Geom::Vertex* center,
      * abcisses doit porter le grand axe de l'ellipse et le sens de l'ellipse
      * est celui qui va de Xe vers Ye. Donc si a>b, Xe=X sinon Xe=Y et
      * si dir=true, Ze=Z sinon Ze=-Z */
-    gp_Dir Ze=(direction)?gp_Dir(0,0,1):gp_Dir(0,0,-1);
-    gp_Dir Xe=(a>b)?gp_Dir(1,0,0):gp_Dir(0,1,0);
+    gp_Dir Ze = (direction)?gp_Dir(0,0,1):gp_Dir(0,0,-1);
+    gp_Dir Xe = (a>b)?gp_Dir(1,0,0):gp_Dir(0,1,0);
 #ifdef _DEBUG2
     std::cout<<"locSysCoord center , Ze (0,0,"<<Ze.Z()
 			<<") , Xe ("<<Xe.X()<<","<<Xe.Y()<<",0)"<<std::endl;
@@ -660,22 +525,18 @@ Curve* EntityFactory::newArcEllipse(const Geom::Vertex* center,
 #endif
     gp_Elips ellipse=gp_Elips(locSysCoord,std::max(a,b),std::min(a,b));
 
-    try{
+    try {
     	Handle(Geom_TrimmedCurve) arc = GC_MakeArcOfEllipse(ellipse, p_start, p_end, true);
         TopoDS_Edge e = BRepBuilderAPI_MakeEdge(arc);
-        rep = new OCCGeomRepresentation(m_context, e);
-    }
-    catch(StdFail_NotDone& e){
+        Curve* curve = new Curve(m_context,
+                    m_context.newProperty(Utils::Entity::GeomCurve),
+                    m_context.newDisplayProperties(Utils::Entity::GeomCurve),
+                    new GeomProperty(), e);
+        m_context.newGraphicalRepresentation (*curve);
+        return curve;
+    } catch(StdFail_NotDone& e) {
         throw Utils::BuildingException(TkUtil::UTF8String ("Erreur durant la creation d'un arc d'ellipse", TkUtil::Charset::UTF_8));
     }
-
-    Curve*	curve	= new Curve(m_context,
-                m_context.newProperty(Utils::Entity::GeomCurve),
-                m_context.newDisplayProperties(Utils::Entity::GeomCurve),
-                new GeomProperty(),rep);
-	CHECK_NULL_PTR_ERROR (curve)
-	m_context.newGraphicalRepresentation (*curve);
-	return curve;
 }
 /*----------------------------------------------------------------------------*/
 //#define _DEBUG_BSPLINE
@@ -685,7 +546,6 @@ Curve* EntityFactory::newBSpline(const std::vector<Utils::Math::Point>& points, 
 	std::cout<<"EntityFactory::newBSpline avec "<<points.size()<<" points"<<std::endl;
 #endif
     //gmds::Timer t1;
-    OCCGeomRepresentation* rep =0;
     // construction d'un tableau avec les points
     // ATTENTION : si deux points consécutifs ont les memes coords, on n'en
     // considère qu'un seul.
@@ -731,9 +591,8 @@ Curve* EntityFactory::newBSpline(const std::vector<Utils::Math::Point>& points, 
         }
    }
 
-    try{
+    try {
         //gmds::Timer t2;
-
 
         // construit une courbe BSpline à partir du tableau
     	// [EB] pb avec Tol3D à 1e-4 pour cas Rémy d'un contour de gaineIni... passe bien avec 1e-3 (qui est la valeur par défaut dans OCC)
@@ -752,26 +611,21 @@ Curve* EntityFactory::newBSpline(const std::vector<Utils::Math::Point>& points, 
         TopoDS_Edge e = BRepBuilderAPI_MakeEdge(bspline);
         //gmds::Timer t4;
 
-        rep = new OCCGeomRepresentation(m_context, e);
+        Curve* curve = new Curve(m_context,
+                    m_context.newProperty(Utils::Entity::GeomCurve),
+                    m_context.newDisplayProperties(Utils::Entity::GeomCurve),
+                    new GeomProperty(), e);
+        m_context.newGraphicalRepresentation (*curve);
+
+        //gmds::Timer t6;
+        //std::cerr<<"GLOBAL time = "<<t6-t1<<std::endl;
+        return curve;
         //gmds::Timer t5;
         //std::cerr<<"\t BRepBuilderAPI_MakeEdge     = "<<t4-t3<<std::endl;
-        //std::cerr<<"\t OCCGeomRepresentation build = "<<t5-t4<<std::endl;
 
-    }
-    catch(StdFail_NotDone& e){
+    } catch(StdFail_NotDone& e) {
         throw Utils::BuildingException(TkUtil::UTF8String ("Erreur durant la creation d'une bspline", TkUtil::Charset::UTF_8));
     }
-
-    Curve*	curve	= new Curve(m_context,
-                m_context.newProperty(Utils::Entity::GeomCurve),
-                m_context.newDisplayProperties(Utils::Entity::GeomCurve),
-                new GeomProperty(),rep);
-	CHECK_NULL_PTR_ERROR (curve)
-	m_context.newGraphicalRepresentation (*curve);
-
-    //gmds::Timer t6;
-    //std::cerr<<"GLOBAL time = "<<t6-t1<<std::endl;
-	return curve;
 }
 /*----------------------------------------------------------------------------*/
 bool EntityFactory::checkClosedWire(const std::vector<Geom::Curve*>& curves) const
@@ -799,7 +653,6 @@ bool EntityFactory::checkClosedWire(const std::vector<Geom::Curve*>& curves) con
 /*----------------------------------------------------------------------------*/
 Surface* EntityFactory::newSurface(const std::vector<Geom::Curve*>& curves)
 {
-    OCCGeomRepresentation* rep =0;
     if(!checkClosedWire(curves)){
         throw Utils::BuildingException("Error during surface creation: no closed loop");
     }
@@ -808,28 +661,9 @@ Surface* EntityFactory::newSurface(const std::vector<Geom::Curve*>& curves)
          * crée un wire
          */
         BRepBuilderAPI_MakeWire mk_wire;
-
-
-        for(unsigned int i=0;i<curves.size();i++){
-            Geom::Curve* current_curve = curves[i];
-
-            std::vector<GeomRepresentation*> reps = current_curve->getComputationalProperties();
-            for (uint j=0; j<reps.size(); j++){
-            	OCCGeomRepresentation* current_rep =dynamic_cast<OCCGeomRepresentation*>
-            	                                (reps[j]);
-                TopoDS_Shape sh = *(current_rep->getShapePtr());
-                if (sh.ShapeType() != TopAbs_WIRE && sh.ShapeType() != TopAbs_EDGE)
-                    throw Utils::BuildingException("");
-                else if (sh.ShapeType() == TopAbs_WIRE) // [EB] ce qui n'arrive plus normallement depuis la mise en place des courbes composées
-                {
-                    TopTools_IndexedMapOfShape mapE;
-                    TopExp::MapShapes(sh,TopAbs_EDGE, mapE);
-                    for(int i=1; i<=mapE.Extent(); i++)
-                        mk_wire.Add(TopoDS::Edge(mapE.FindKey(i)));
-                }
-                else if (sh.ShapeType() == TopAbs_EDGE){
-                    mk_wire.Add(TopoDS::Edge(sh));
-                }
+        for (Geom::Curve* current_curve : curves) {
+            for (auto sh : current_curve->getOCCEdges()) {
+                mk_wire.Add(sh);
             }
         }
         mk_wire.Build();
@@ -923,58 +757,46 @@ Surface* EntityFactory::newSurface(const std::vector<Geom::Curve*>& curves)
 
 
         if(MF.Error()==BRepBuilderAPI_FaceDone){
-            aFace   = MF.Face();
-            rep = new OCCGeomRepresentation(m_context, aFace);
+            aFace = MF.Face();
+            Surface* surface = new Surface(m_context,
+                        m_context.newProperty(Utils::Entity::GeomSurface),
+                        m_context.newDisplayProperties(Utils::Entity::GeomSurface),
+                        new GeomProperty(), aFace);
+            m_context.newGraphicalRepresentation (*surface);
+            return surface;
         }
-        else
+        else {
             throw Utils::BuildingException("Error during surface creation (error...)");
-
-    }
-    catch(StdFail_NotDone& e){
+        }
+    } catch(StdFail_NotDone& e) {
         throw Utils::BuildingException("Error during surface creation (not done)");
-    }
-    catch(Utils::BuildingException& e){
+    } catch(Utils::BuildingException& e) {
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     	message << "Error during surface creation, "<<e.getMessage();
         throw Utils::BuildingException(message);
     }
-
-    Surface*    surface = new Surface(m_context,
-                m_context.newProperty(Utils::Entity::GeomSurface),
-                m_context.newDisplayProperties(Utils::Entity::GeomSurface),
-                new GeomProperty(),rep);
-    CHECK_NULL_PTR_ERROR (surface)
-    m_context.newGraphicalRepresentation (*surface);
-    return surface;
 }
 /*----------------------------------------------------------------------------*/
 Volume* EntityFactory::newBox(PropertyBox* prop)
 {
-    OCCGeomRepresentation* rep =0;
     Utils::Math::Point pmin = prop->getPnt();
     gp_Pnt A(pmin.getX(),pmin.getY(),pmin.getZ());
-//    gp_Dir N(0,0,prop->getZ());
-//    gp_Dir Vx(prop->getX(),0,0);
-//    gp_Ax2 axis(A,N,Vx);
 
     //BRepPrimAPI_MakeBox mkBox(axis,prop->getX(),prop->getY(),prop->getZ());
     BRepPrimAPI_MakeBox mkBox(A, prop->getX(),prop->getY(),prop->getZ());
 
     try{
         TopoDS_Shape s = mkBox.Solid();
-        rep = new OCCGeomRepresentation(m_context, s);
-    }
-    catch(StdFail_NotDone& e){
+        Volume*	volume	= new Volume(m_context,
+                m_context.newProperty(Utils::Entity::GeomVolume),
+                m_context.newDisplayProperties(Utils::Entity::GeomVolume),
+                prop, s);
+        CHECK_NULL_PTR_ERROR (volume)
+        m_context.newGraphicalRepresentation (*volume);
+        return volume;
+    }catch(StdFail_NotDone& e){
         throw Utils::BuildingException("Error during Box creation");
     }
-
-    Volume*	volume	= new Volume(m_context,
-            m_context.newProperty(Utils::Entity::GeomVolume),
-            m_context.newDisplayProperties(Utils::Entity::GeomVolume),
-            prop,rep);
-	CHECK_NULL_PTR_ERROR (volume)
-	m_context.newGraphicalRepresentation (*volume);
-	return volume;
 }
 /*----------------------------------------------------------------------------*/
 void analyse(TopoDS_Shape& s)
@@ -995,8 +817,6 @@ Volume* EntityFactory::newCylinder(PropertyCylinder* prop)
 {
     Volume* result_entity=0;
 
-    OCCGeomRepresentation* rep =0;
-
     Utils::Math::Point pcenter = prop->getCenter();
     gp_Pnt A(pcenter.getX(),pcenter.getY(),pcenter.getZ());
 
@@ -1009,27 +829,20 @@ Volume* EntityFactory::newCylinder(PropertyCylinder* prop)
                                    prop->getHeight(),angle*M_PI/180.0);
     try{
         TopoDS_Shape s = mkCyl.Solid();
-        rep = new OCCGeomRepresentation(m_context, s);
-    }
-    catch(StdFail_NotDone& e){
+        Volume* volume  =  new Volume(m_context,
+                m_context.newProperty(Utils::Entity::GeomVolume),
+                m_context.newDisplayProperties(Utils::Entity::GeomVolume),
+                prop, s);
+        CHECK_NULL_PTR_ERROR (volume)
+        m_context.newGraphicalRepresentation (*volume);
+        return volume;
+    }catch(StdFail_NotDone& e){
         throw Utils::BuildingException(TkUtil::UTF8String ("Erreur à la création d'un cylindre", TkUtil::Charset::UTF_8));
     }
-
-    Volume* volume  =  new Volume(m_context,
-            m_context.newProperty(Utils::Entity::GeomVolume),
-            m_context.newDisplayProperties(Utils::Entity::GeomVolume),
-            prop,rep);
-    CHECK_NULL_PTR_ERROR (volume)
-    m_context.newGraphicalRepresentation (*volume);
-    return volume;
 }
 /*----------------------------------------------------------------------------*/
 Volume* EntityFactory::newHollowCylinder(PropertyHollowCylinder* prop)
 {
-    Volume* result_entity=0;
-
-    OCCGeomRepresentation* rep =0;
-
     Utils::Math::Point pcenter = prop->getCenter();
     gp_Pnt A(pcenter.getX(),pcenter.getY(),pcenter.getZ());
 
@@ -1048,11 +861,10 @@ Volume* EntityFactory::newHollowCylinder(PropertyHollowCylinder* prop)
         TopoDS_Shape s_ext = mkCylExt.Solid();
 
         BRepAlgoAPI_Cut Cut_operator(s_ext, s_int);
-        TopoDS_Shape s, solid;
 
         if(Cut_operator.IsDone())
         {
-            s = Cut_operator.Shape();
+            TopoDS_Shape s = Cut_operator.Shape();
             ShapeAnalysis_ShapeContents cont;
             cont.Clear();
             cont.Perform(s);
@@ -1066,34 +878,27 @@ Volume* EntityFactory::newHollowCylinder(PropertyHollowCylinder* prop)
                 if(mapS.Extent()>1)
                     throw TkUtil::Exception(TkUtil::UTF8String ("HollowSphere: Problème OCC lors de la différence (plus de 1 solide)", TkUtil::Charset::UTF_8));
 
-                solid = TopoDS::Solid(mapS.FindKey(1));
+                TopoDS_Shape solid = TopoDS::Solid(mapS.FindKey(1));
+                Volume* volume  =  new Volume(m_context,
+                        m_context.newProperty(Utils::Entity::GeomVolume),
+                        m_context.newDisplayProperties(Utils::Entity::GeomVolume),
+                        prop, solid);
+                CHECK_NULL_PTR_ERROR (volume)
+                m_context.newGraphicalRepresentation (*volume);
+                return volume;
             }
 
         }
         else
             throw TkUtil::Exception(TkUtil::UTF8String ("HollowCylinder: Problème OCC lors de la différence", TkUtil::Charset::UTF_8));
-
-        rep = new OCCGeomRepresentation(m_context, solid);
     }
     catch(StdFail_NotDone& e){
         throw Utils::BuildingException(TkUtil::UTF8String ("Erreur à la création d'un cylindre creux", TkUtil::Charset::UTF_8));
     }
-
-    Volume* volume  =  new Volume(m_context,
-            m_context.newProperty(Utils::Entity::GeomVolume),
-            m_context.newDisplayProperties(Utils::Entity::GeomVolume),
-            prop,rep);
-    CHECK_NULL_PTR_ERROR (volume)
-    m_context.newGraphicalRepresentation (*volume);
-    return volume;
 }
 /*----------------------------------------------------------------------------*/
 Volume* EntityFactory::newCone(PropertyCone* prop)
 {
-    Volume* result_entity=0;
-
-    OCCGeomRepresentation* rep =0;
-
     gp_Pnt A(0,0,0);
 
     Utils::Math::Vector paxis = prop->getAxis();
@@ -1105,25 +910,20 @@ Volume* EntityFactory::newCone(PropertyCone* prop)
                                    prop->getHeight(), angle*M_PI/180.0);
     try{
         TopoDS_Shape s = mkCone.Solid();
-        rep = new OCCGeomRepresentation(m_context, s);
-    }
-    catch(StdFail_NotDone& e){
+        Volume*	volume	=  new Volume(m_context,
+                m_context.newProperty(Utils::Entity::GeomVolume),
+                m_context.newDisplayProperties(Utils::Entity::GeomVolume),
+                prop, s);
+        CHECK_NULL_PTR_ERROR (volume)
+        m_context.newGraphicalRepresentation (*volume);
+        return volume;
+    }catch(StdFail_NotDone& e){
         throw Utils::BuildingException(TkUtil::UTF8String ("Erreur à la création d'un cône", TkUtil::Charset::UTF_8));
     }
-
-    Volume*	volume	=  new Volume(m_context,
-            m_context.newProperty(Utils::Entity::GeomVolume),
-            m_context.newDisplayProperties(Utils::Entity::GeomVolume),
-            prop,rep);
-	CHECK_NULL_PTR_ERROR (volume)
-	m_context.newGraphicalRepresentation (*volume);
-	return volume;
 }
 /*----------------------------------------------------------------------------*/
 Volume* EntityFactory::newSphere(PropertySphere* prop)
 {
-    OCCGeomRepresentation* rep =0;
-
     Utils::Math::Point pcenter = prop->getCenter();
     gp_Pnt center(pcenter.getX(),pcenter.getY(),pcenter.getZ());
     double radius= prop->getRadius();
@@ -1134,53 +934,49 @@ Volume* EntityFactory::newSphere(PropertySphere* prop)
     switch(type){
     case (Utils::Portion::ENTIER):{
         BRepPrimAPI_MakeSphere mkSphere(center,radius);
-        s= mkSphere.Solid();
+        s = mkSphere.Solid();
     }
     break;
     case (Utils::Portion::TROIS_QUARTS):{
         BRepPrimAPI_MakeSphere mkSphere(center,radius,3*M_PI/4);
-        s= mkSphere.Solid();
+        s = mkSphere.Solid();
     }
     break;
     case (Utils::Portion::DEMI):{
         BRepPrimAPI_MakeSphere mkSphere(center,radius,M_PI);
-        s= mkSphere.Solid();
+        s = mkSphere.Solid();
     }
     break;
     case (Utils::Portion::QUART):{
         BRepPrimAPI_MakeSphere mkSphere(center,radius,M_PI/2);
-        s= mkSphere.Solid();
+        s = mkSphere.Solid();
     }
     break;
     case (Utils::Portion::HUITIEME):{
         BRepPrimAPI_MakeSphere mkSphere(center,radius,0,M_PI/2,M_PI/2);
-        s= mkSphere.Solid();
+        s = mkSphere.Solid();
     }
     break;
     case (Utils::Portion::ANGLE_DEF):{
         // l'angle est supposé en degré et non pas en radians
         BRepPrimAPI_MakeSphere mkSphere(center,radius,(angle*M_PI)/180.0);
-        s= mkSphere.Solid();
+        s = mkSphere.Solid();
     }
     break;
     }
 
 
     try{
-
-        rep = new OCCGeomRepresentation(m_context, s);
-    }
-    catch(StdFail_NotDone& e){
+        Volume* volume  = new Volume(m_context,
+                m_context.newProperty(Utils::Entity::GeomVolume),
+                m_context.newDisplayProperties(Utils::Entity::GeomVolume),
+                prop, s);
+        CHECK_NULL_PTR_ERROR (volume)
+        m_context.newGraphicalRepresentation (*volume);
+        return volume;
+    }catch(StdFail_NotDone& e){
         throw Utils::BuildingException(TkUtil::UTF8String ("Erreur à la création d'une sphère", TkUtil::Charset::UTF_8));
     }
-
-    Volume* volume  = new Volume(m_context,
-            m_context.newProperty(Utils::Entity::GeomVolume),
-            m_context.newDisplayProperties(Utils::Entity::GeomVolume),
-            prop,rep);
-    CHECK_NULL_PTR_ERROR (volume)
-    m_context.newGraphicalRepresentation (*volume);
-    return volume;
 }
 /*----------------------------------------------------------------------------*/
 Volume* EntityFactory::newSpherePart(PropertySpherePart* prop)
@@ -1217,22 +1013,17 @@ Volume* EntityFactory::newSpherePart(PropertySpherePart* prop)
 		shape = getShapeAfterPlaneCut(shape, gp_plane, pnt_to_eliminate);
 	}
 
-	OCCGeomRepresentation* rep =0;
 	try{
-		rep = new OCCGeomRepresentation(m_context, shape);
-	}
-	catch(StdFail_NotDone& e){
+        Volume* volume  = new Volume(m_context,
+                m_context.newProperty(Utils::Entity::GeomVolume),
+                m_context.newDisplayProperties(Utils::Entity::GeomVolume),
+                prop, shape);
+        CHECK_NULL_PTR_ERROR (volume)
+        m_context.newGraphicalRepresentation (*volume);
+        return volume;
+	}catch(StdFail_NotDone& e){
 		throw Utils::BuildingException(TkUtil::UTF8String ("Erreur à la création d'une aiguille", TkUtil::Charset::UTF_8));
 	}
-
-
-	Volume* volume  = new Volume(m_context,
-			m_context.newProperty(Utils::Entity::GeomVolume),
-			m_context.newDisplayProperties(Utils::Entity::GeomVolume),
-			prop,rep);
-	CHECK_NULL_PTR_ERROR (volume)
-	m_context.newGraphicalRepresentation (*volume);
-	return volume;
 }
 /*----------------------------------------------------------------------------*/
 Volume* EntityFactory::newHollowSpherePart(PropertyHollowSpherePart* prop)
@@ -1297,22 +1088,17 @@ Volume* EntityFactory::newHollowSpherePart(PropertyHollowSpherePart* prop)
         }
     }
 
-	OCCGeomRepresentation* rep =0;
 	try{
-		rep = new OCCGeomRepresentation(m_context, shape);
-	}
-	catch(StdFail_NotDone& e){
+        Volume* volume  = new Volume(m_context,
+                m_context.newProperty(Utils::Entity::GeomVolume),
+                m_context.newDisplayProperties(Utils::Entity::GeomVolume),
+                prop, shape);
+        CHECK_NULL_PTR_ERROR (volume)
+        m_context.newGraphicalRepresentation (*volume);
+        return volume;
+	}catch(StdFail_NotDone& e){
 		throw Utils::BuildingException(TkUtil::UTF8String ("Erreur à la création d'une aiguille", TkUtil::Charset::UTF_8));
 	}
-
-
-	Volume* volume  = new Volume(m_context,
-			m_context.newProperty(Utils::Entity::GeomVolume),
-			m_context.newDisplayProperties(Utils::Entity::GeomVolume),
-			prop,rep);
-	CHECK_NULL_PTR_ERROR (volume)
-	m_context.newGraphicalRepresentation (*volume);
-	return volume;
 }
 /*----------------------------------------------------------------------------*/
 TopoDS_Shape EntityFactory::getShapeAfterPlaneCut(TopoDS_Shape shape, gp_Pln gp_plane, gp_Pnt pnt_to_eliminate)
@@ -1360,8 +1146,6 @@ TopoDS_Shape EntityFactory::getShapeAfterPlaneCut(TopoDS_Shape shape, gp_Pln gp_
 /*----------------------------------------------------------------------------*/
 Volume* EntityFactory::newHollowSphere(PropertyHollowSphere* prop)
 {
-    OCCGeomRepresentation* rep =0;
-
     Utils::Math::Point pcenter = prop->getCenter();
     gp_Pnt center(pcenter.getX(),pcenter.getY(),pcenter.getZ());
     double radius_int= prop->getRadiusInt();
@@ -1419,67 +1203,42 @@ Volume* EntityFactory::newHollowSphere(PropertyHollowSphere* prop)
     }
 
     BRepAlgoAPI_Cut Cut_operator(s_ext, s_int);
-    TopoDS_Shape sh, solid;
-
     if(Cut_operator.IsDone())
     {
-        sh = Cut_operator.Shape();
+        TopoDS_Shape sh = Cut_operator.Shape();
         ShapeAnalysis_ShapeContents cont;
         cont.Clear();
         cont.Perform(sh);
         if (cont.NbSolids()<1){
             throw TkUtil::Exception(TkUtil::UTF8String ("HollowSphere: Problème OCC lors de la différence", TkUtil::Charset::UTF_8));
-        }
-        else {
+        } else {
             TopTools_IndexedMapOfShape mapS;
             TopExp::MapShapes(sh,TopAbs_SOLID, mapS);
             if(mapS.Extent()>1)
                 throw TkUtil::Exception(TkUtil::UTF8String ("HollowSphere: Problème OCC lors de la différence (plus de 1 solide)", TkUtil::Charset::UTF_8));
 
-            solid = TopoDS::Solid(mapS.FindKey(1));
+            TopoDS_Shape solid = TopoDS::Solid(mapS.FindKey(1));
+            Volume* volume  = new Volume(m_context,
+                    m_context.newProperty(Utils::Entity::GeomVolume),
+                    m_context.newDisplayProperties(Utils::Entity::GeomVolume),
+                    prop, solid);
+            CHECK_NULL_PTR_ERROR (volume)
+            m_context.newGraphicalRepresentation (*volume);
+            return volume;
         }
     }
     else
         throw TkUtil::Exception(TkUtil::UTF8String ("HollowSphere: Problème OCC lors de la différence", TkUtil::Charset::UTF_8));
-
-    try{
-        rep = new OCCGeomRepresentation(m_context, solid);
-    }
-    catch(StdFail_NotDone& e)
-    {
-        throw Utils::BuildingException(TkUtil::UTF8String ("Erreur à la création d'une sphère creuse", TkUtil::Charset::UTF_8));
-    }
-
-    Volume* volume  = new Volume(m_context,
-            m_context.newProperty(Utils::Entity::GeomVolume),
-            m_context.newDisplayProperties(Utils::Entity::GeomVolume),
-            prop,rep);
-    CHECK_NULL_PTR_ERROR (volume)
-    m_context.newGraphicalRepresentation (*volume);
-    return volume;
 }
 /*----------------------------------------------------------------------------*/
 Volume* EntityFactory::newOCCVolume(TopoDS_Solid& s)
 {
-    //TopoDS_Shape cs = OCCGeomRepresentation::cleanShape(s);
-    Volume*	volume	= new Volume(m_context,
-            m_context.newProperty(Utils::Entity::GeomVolume),
-            m_context.newDisplayProperties(Utils::Entity::GeomVolume),
-            new GeomProperty(), new OCCGeomRepresentation(m_context, s));
-	CHECK_NULL_PTR_ERROR (volume)
-	m_context.newGraphicalRepresentation (*volume);
-	return volume;
+	return newOCCShape(s);
 }
 /*----------------------------------------------------------------------------*/
 Volume* EntityFactory::newOCCVolume(TopoDS_Shell& s)
 {
-    Volume*	volume	= new Volume(m_context,
-            m_context.newProperty(Utils::Entity::GeomVolume),
-            m_context.newDisplayProperties(Utils::Entity::GeomVolume),
-            new GeomProperty(), new OCCGeomRepresentation(m_context, s));
-	CHECK_NULL_PTR_ERROR (volume)
-	m_context.newGraphicalRepresentation (*volume);
-	return volume;
+	return newOCCShape(s);
 }
 /*----------------------------------------------------------------------------*/
 Volume* EntityFactory::newOCCShape(TopoDS_Shape& s)
@@ -1487,7 +1246,7 @@ Volume* EntityFactory::newOCCShape(TopoDS_Shape& s)
     Volume*	volume	= new Volume(m_context,
             m_context.newProperty(Utils::Entity::GeomVolume),
             m_context.newDisplayProperties(Utils::Entity::GeomVolume),
-            new GeomProperty(), new OCCGeomRepresentation(m_context, s));
+            new GeomProperty(), s);
 	CHECK_NULL_PTR_ERROR (volume)
 	m_context.newGraphicalRepresentation (*volume);
 	return volume;
@@ -1498,7 +1257,7 @@ Surface* EntityFactory::newOCCSurface(TopoDS_Face& f)
    Surface*	surface	= new Surface(m_context,
             m_context.newProperty(Utils::Entity::GeomSurface),
             m_context.newDisplayProperties(Utils::Entity::GeomSurface),
-            new GeomProperty(), new OCCGeomRepresentation(m_context, f));
+            new GeomProperty(), f);
 	CHECK_NULL_PTR_ERROR (surface)
 	m_context.newGraphicalRepresentation (*surface);
 	return surface;
@@ -1506,15 +1265,13 @@ Surface* EntityFactory::newOCCSurface(TopoDS_Face& f)
 /*----------------------------------------------------------------------------*/
 Surface* EntityFactory::newOCCCompositeSurface(std::vector<TopoDS_Face>& v_ds_face)
 {
-	std::vector<GeomRepresentation*> reps;
-	for (uint i=0; i<v_ds_face.size(); i++)
-		reps.push_back(new OCCGeomRepresentation(m_context, v_ds_face[i]));
-
-	Surface*	surface	= new Surface(m_context,
+    std::vector<TopoDS_Face> shapes;
+    for (auto f : v_ds_face) shapes.push_back(f);
+	Surface* surface = new Surface(m_context,
 			m_context.newProperty(Utils::Entity::GeomSurface),
 			m_context.newDisplayProperties(Utils::Entity::GeomSurface),
 			new GeomProperty(),
-			reps);
+			shapes);
 	CHECK_NULL_PTR_ERROR (surface)
 	m_context.newGraphicalRepresentation (*surface);
 	return surface;
@@ -1522,10 +1279,10 @@ Surface* EntityFactory::newOCCCompositeSurface(std::vector<TopoDS_Face>& v_ds_fa
 /*----------------------------------------------------------------------------*/
 Curve* EntityFactory::newOCCCurve(TopoDS_Edge& e)
 {
-    Curve*  curve   = new Curve(m_context,
+    Curve* curve = new Curve(m_context,
             m_context.newProperty(Utils::Entity::GeomCurve),
             m_context.newDisplayProperties(Utils::Entity::GeomCurve),
-            new GeomProperty(), new OCCGeomRepresentation(m_context, e));
+            new GeomProperty(), e);
     CHECK_NULL_PTR_ERROR (curve)
     m_context.newGraphicalRepresentation (*curve);
     return curve;
@@ -1550,7 +1307,7 @@ Curve* EntityFactory::newOCCCompositeCurve(std::vector<TopoDS_Edge>& v_ds_edge,
 	}
 #endif
 
-	std::vector<GeomRepresentation*> reps;
+	std::vector<TopoDS_Edge> reps;
 
 	// certains TopoDS_Edge issus de la projection peuvent être des parasites (projection sur surface lointaine)
 	// Nous allons donc partir extremaFirst et de proche en proche aller jusqu'à extremaLast
@@ -1599,7 +1356,7 @@ Curve* EntityFactory::newOCCCompositeCurve(std::vector<TopoDS_Edge>& v_ds_edge,
 #ifdef _DEBUG_COMPOSITE
 			std::cout<<"found, ptPrec : "<<ptPrec<<std::endl;
 #endif
-			reps.push_back(new OCCGeomRepresentation(m_context, ds_edge_found));
+			reps.push_back(ds_edge_found);
 			v_ds_edge.erase(iter_to_erase);
 		}
 		else {
@@ -1640,7 +1397,7 @@ Curve* EntityFactory::newCurveByEdgeProjectionOnSurface(const Utils::Math::Point
     // création de l'arête à projeter
     gp_Pnt Pt1(P1.getX(),P1.getY(),P1.getZ());
     gp_Pnt Pt2(P2.getX(),P2.getY(),P2.getZ());
-    TopoDS_Shape edge_shape = BRepBuilderAPI_MakeEdge(Pt1,Pt2);
+    TopoDS_Edge edge_shape = BRepBuilderAPI_MakeEdge(Pt1,Pt2);
 
     return newCurveByTopoDS_ShapeProjectionOnSurface(edge_shape, surface);
 }
@@ -1652,35 +1409,24 @@ Curve* EntityFactory::newCurveByCurveProjectionOnSurface(Curve* curve, Surface* 
             <<curve->getName() << ", "<<surface->getName()<<")"<<std::endl;
 #endif
 
-    OCCGeomRepresentation* crv_rep =dynamic_cast<OCCGeomRepresentation*>
-             (curve->getComputationalProperty());
-    CHECK_NULL_PTR_ERROR(crv_rep);
-    TopoDS_Shape crv_shape = crv_rep->getShape();
-
-    return newCurveByTopoDS_ShapeProjectionOnSurface(crv_shape, surface);
+    auto reps = curve->getOCCEdges();
+    if (reps.size() != 1) 
+        throw TkUtil::Exception(TkUtil::UTF8String ("Pas possible de projeter une courbe composée", TkUtil::Charset::UTF_8));
+    return newCurveByTopoDS_ShapeProjectionOnSurface(reps[0], surface);
 }
 /*----------------------------------------------------------------------------*/
-Curve* EntityFactory::newCurveByTopoDS_ShapeProjectionOnSurface(TopoDS_Shape shape, Surface* surface)
+Curve* EntityFactory::newCurveByTopoDS_ShapeProjectionOnSurface(TopoDS_Edge shape, Surface* surface)
 {
 #ifdef _DEBUG_EDGEPROJECTION
     std::cout<<"EntityFactory::newCurveByTopoDS_ShapeProjectionOnSurface, proj sur "<<surface->getName()<<std::endl;
 #endif
 	std::vector<TopoDS_Edge> v_ds_edge;
 
-	std::vector<GeomRepresentation*> reps = surface->getComputationalProperties();
-	for (uint i=0; i<reps.size(); i++){
-#ifdef _DEBUG_EDGEPROJECTION
-		std::cout<<" proj i="<<i<<std::endl;
-#endif
-		OCCGeomRepresentation* surf_rep =dynamic_cast<OCCGeomRepresentation*>(reps[i]);
-		CHECK_NULL_PTR_ERROR(surf_rep);
-		TopoDS_Shape surf_shape = surf_rep->getShape();
-
+	auto reps = surface->getOCCFaces();
+	for (auto surf_shape : reps) {
 	    BRepAlgo_NormalProjection proj;
 	    proj.Init(surf_shape);
-
 	    proj.Add(shape);
-
 	    proj.Build();
 
 	    if (!proj.IsDone()){
@@ -1735,58 +1481,6 @@ Curve* EntityFactory::newCurveByTopoDS_ShapeProjectionOnSurface(TopoDS_Shape sha
 	}
 
 }
-///*----------------------------------------------------------------------------*/
-//Surface* EntityFactory::newSurface(std::vector<Curve*>& curves)
-//{
-//    BRep_Builder B;
-//    TopoDS_Compound compound;
-//    B.MakeCompound(compound);
-//    std::cerr<<"NB Curves: "<<curves.size()<<std::endl;
-//
-//    for(unsigned int i=0; i<curves.size();i++)
-//    {
-//        Curve* ei = curves[i];
-//
-//        GeomRepresentation* rep = ei->getComputationalProperty();
-//
-//        OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(rep);
-//
-//        if(occ_rep==0)
-//            throw TkUtil::Exception("impossible d'unir des entités non représentées à l'aide d'OCC");
-//
-//        TopoDS_Shape si = occ_rep->getShape();
-//        B.Add(compound,si);
-//    }
-//
-//    BRepBuilderAPI_MakeFace mkFace;
-//    std::cerr<<"A"<<std::endl;
-//    mkFace.Add(TopoDS::Wire(compound));
-//    std::cerr<<"B"<<std::endl;
-//    TopoDS_Shape result = mkFace.Shape();
-//    std::cerr<<"C"<<std::endl;
-//    if(result.ShapeType()==TopAbs_FACE)
-//        return newOCCSurface(TopoDS::Face(result));
-//    else
-//        throw TkUtil::Exception("Impossible de crer une surface a partir de ces courbes");
-//
-//    std::cerr<<"D"<<std::endl;
-////    ShHealOper_Sewing wireMaker;
-////    wireMaker.Init(compound);
-////    wireMaker.Perform();
-////
-////    TopoDS_Shape s1 = wireMaker.GetResultShape();
-////    if (s1.ShapeType()==TopAbs_WIRE){
-////        BRepBuilderAPI_MakeFace mkFace;
-////        mkFace.Add(TopoDS::Wire(s1));
-////        TopoDS_Shape result = mkFace.Shape();
-////        if(result.ShapeType()==TopAbs_FACE)
-////            return newOCCSurface(TopoDS::Face(result));
-////        else
-////            throw TkUtil::Exception("Impossible de crer une surface a partir de ces courbes");
-////    }
-////    else
-////        throw TkUtil::Exception("Impossible de crer une surface a partir de ces courbes");
-//}
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom
 /*----------------------------------------------------------------------------*/

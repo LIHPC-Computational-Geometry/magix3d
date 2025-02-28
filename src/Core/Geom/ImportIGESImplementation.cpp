@@ -18,7 +18,6 @@
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
-#include "Geom/OCCGeomRepresentation.h"
 
 #include "Group/GroupManager.h"
 #include "Group/Group3D.h"
@@ -32,13 +31,11 @@
 
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-/*----------------------------------------------------------------------------*/
-#include "TkUtil/Exception.h"
+#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
 #include <IGESControl_Reader.hxx>
 #include <Interface_Static.hxx>
-#include <Utils/MgxException.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

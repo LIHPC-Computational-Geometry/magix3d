@@ -8,7 +8,7 @@
 
 #include "QtVtkComponents/VTKConfiguration.h"
 
-#include <Utils/Common.h>
+#include "Utils/Common.h"
 
 #include <TkUtil/Exception.h>
 #include <PrefsCore/PreferencesHelper.h>

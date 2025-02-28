@@ -12,16 +12,16 @@
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
-#include "Geom/OCCGeomRepresentation.h"
 #include "Geom/EntityFactory.h"
-/*----------------------------------------------------------------------------*/
+#include "Geom/OCCHelper.h"
 #include "Utils/MgxNumeric.h"
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/WarningLog.h>
-/*----------------------------------------------------------------------------*/
-#include "TkUtil/Exception.h"
+#include <TkUtil/Exception.h>
 #include <TkUtil/MemoryError.h>
+/*----------------------------------------------------------------------------*/
 #include <set>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
@@ -227,31 +227,6 @@ addAdjacencyReference(GeomEntity* e)
                 m_adj_entities[v->getDim()].push_back(v);
             }
         }
-    }
-}
-/*----------------------------------------------------------------------------*/
-void GeomModificationBaseClass::getOCCShape(GeomEntity* e, TopoDS_Shape& sh){
-
-    GeomRepresentation* rep = e->getComputationalProperty();
-
-    OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(rep);
-
-    if(occ_rep==0)
-        throw TkUtil::Exception (TkUtil::UTF8String ("impossible de modifier des entités non représentées à l'aide d'OCC", TkUtil::Charset::UTF_8));
-
-    sh = occ_rep->getShape();
-}
-/*----------------------------------------------------------------------------*/
-void GeomModificationBaseClass::getOCCShapes(GeomEntity* ge, std::vector<TopoDS_Shape>& topoS)
-{
-    // cas d'une entité géométrique composée de plusieurs shapes
-	std::vector<GeomRepresentation*> ppties = ge->getComputationalProperties();
-
-	// les différentes occ_shape de la composition
-    for (uint i=0; i<ppties.size(); i++){
-    	OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(ppties[i]);
-    	CHECK_NULL_PTR_ERROR(occ_rep);
-    	topoS.push_back(occ_rep->getShape());
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -784,11 +759,11 @@ void GeomModificationBaseClass::rebuildAdjacencyEntities(const TopoDS_Shape& sha
     //===================================================================
     // 1 - GESTION DES VOLUMES ADJACENTS
     //===================================================================
-    std::vector<GeomEntity*> volumesToTest;
+    std::vector<Volume*> volumesToTest;
     std::list<GeomEntity*>::iterator it = m_adj_entities[3].begin();
     // ATTENTION SEUL DES VOLUMES NON REF SONT TRAITES
     for(;it!=m_adj_entities[3].end();it++){
-        GeomEntity* ei = *it;
+        Volume* ei = dynamic_cast<Volume*>(*it);
 
         std::list<GeomEntity*>::iterator it_ref = m_ref_entities[3].begin();
 #ifdef _DEBUG2
@@ -833,9 +808,7 @@ void GeomModificationBaseClass::rebuildAdjacencyEntities(const TopoDS_Shape& sha
 #ifdef _DEBUG2
            std::cout<<"GESTION DE L'ENTITE ADJ "<<ei->getName()<<std::endl;
 #endif
-            TopoDS_Shape si;
-            getOCCShape(ei, si);
-
+            TopoDS_Shape si = ei->getOCCShape();
             std::vector<GeomEntity*> newRef;
             newRef.push_back(ei);
             init(newRef);
@@ -987,23 +960,19 @@ void GeomModificationBaseClass::rebuildAdjacencyLinks()
 void GeomModificationBaseClass::computeReplacedVertex(Vertex* e)
 {
     //e est une entité supprimée, on cherche celles l'ayant remplacées
-    OCCGeomRepresentation* occ_rep =
-            dynamic_cast<OCCGeomRepresentation*>(e->getComputationalProperty());
-    CHECK_NULL_PTR_ERROR(occ_rep);
-    TopoDS_Vertex occ_e = TopoDS::Vertex(occ_rep->getShape());
+    // une seule représentation pour un vertex
+    TopoDS_Vertex occ_e = e->getOCCVertex();
     //========================================================================
     // Pour un sommet, c'est forcement une entite conservee qui peut remplacer
     // notre sommet
     bool is_replaced  = false;
     for(unsigned int i=0;i<m_toKeepVertices.size() && !is_replaced;i++){
         Vertex* v = m_toKeepVertices[i];
-        OCCGeomRepresentation* occ_rep_v =
-                dynamic_cast<OCCGeomRepresentation*>(v->getComputationalProperty());
-        CHECK_NULL_PTR_ERROR(occ_rep_v);
-        TopoDS_Vertex occ_v = TopoDS::Vertex(occ_rep_v->getShape());
+        // une seule représentation pour un vertex
+        TopoDS_Vertex occ_v = v->getOCCVertex();
         // si on sait que la shape est partiellement remplacee, autant ne
         // plus tester les shapes en egalite
-        if(OCCGeomRepresentation::areEquals(occ_v,occ_e)){
+        if(OCCHelper::areEquals(occ_v,occ_e)){
             m_replacedEntities[e].push_back(v); //e remplacee par c
             is_replaced = true;
         }
@@ -1012,16 +981,12 @@ void GeomModificationBaseClass::computeReplacedVertex(Vertex* e)
 /*----------------------------------------------------------------------------*/
 void GeomModificationBaseClass::computeReplacedCurve(Curve* e)
 {
-	std::vector<GeomRepresentation*> loc_reps = e->getComputationalProperties();
 #ifdef _DEBUG2
-	std::cout<<" computeReplacedCurve "<<e->getName()<<" avec "<<loc_reps.size()<<" GeomRepresentation"<<std::endl;
+	std::cout<<" computeReplacedCurve "<<e->getName()<<std::endl;
 #endif
 
-	for (uint j=0; j<loc_reps.size(); j++){
-		OCCGeomRepresentation* occ_rep =
-				dynamic_cast<OCCGeomRepresentation*>(loc_reps[j]);
-		CHECK_NULL_PTR_ERROR(occ_rep);
-		TopoDS_Edge occ_e = TopoDS::Edge(occ_rep->getShape());
+    for (auto occ_rep : e->getOCCEdges()) {
+		TopoDS_Edge occ_e = TopoDS::Edge(occ_rep);
 
 		//========================================================================
 		// Cela peut être une entité conservée (cas d'un glue par exemple) ou
@@ -1036,15 +1001,12 @@ void GeomModificationBaseClass::computeReplacedCurve(Curve* e)
 	#ifdef _DEBUG2
 			std::cout<<"  "<<c->getName()<<std::endl;
 	#endif
-			std::vector<GeomRepresentation*> loc_reps_c = c->getComputationalProperties();
+			auto loc_reps_c = c->getOCCEdges();
 			if (loc_reps_c.size() == 1){
-				OCCGeomRepresentation* occ_rep_c =
-						dynamic_cast<OCCGeomRepresentation*>(loc_reps_c[0]);
-				CHECK_NULL_PTR_ERROR(occ_rep_c);
-				TopoDS_Edge occ_c = TopoDS::Edge(occ_rep_c->getShape());
+				TopoDS_Edge occ_c = loc_reps_c[0];
 				// si on sait que la shape est partiellement remplacee, autant ne
 				// plus tester les shapes en egalite
-				if(!is_partly_replaced && OCCGeomRepresentation::areEquals(occ_c,occ_e)){
+				if(!is_partly_replaced && OCCHelper::areEquals(occ_c,occ_e)){
 					m_replacedEntities[e].push_back(c); //e remplacee par c
 					is_fully_replaced = true;
 				}
@@ -1068,16 +1030,13 @@ void GeomModificationBaseClass::computeReplacedCurve(Curve* e)
 	#ifdef _DEBUG2
 			std::cout<<"  "<<c->getName()<<std::endl;
 	#endif
-			std::vector<GeomRepresentation*> loc_reps_c = c->getComputationalProperties();
+			auto loc_reps_c = c->getOCCEdges();
 			if (loc_reps_c.size() == 1){
-				OCCGeomRepresentation* occ_rep_c =
-						dynamic_cast<OCCGeomRepresentation*>(loc_reps_c[0]);
-				CHECK_NULL_PTR_ERROR(occ_rep_c);
-				TopoDS_Edge occ_c = TopoDS::Edge(occ_rep_c->getShape());
+				TopoDS_Edge occ_c = loc_reps_c[0];
 
 				// si on sait que la shape est partiellement remplacee, autant ne
 				// plus tester les shapes en egalite
-				if(!is_partly_replaced && OCCGeomRepresentation::areEquals(occ_c,occ_e)){
+				if(!is_partly_replaced && OCCHelper::areEquals(occ_c,occ_e)){
 					m_replacedEntities[e].push_back(c); //e remplacee par c
 					is_fully_replaced = true;
 				}
@@ -1112,13 +1071,7 @@ void GeomModificationBaseClass::computeReplacedSurface(Surface* e)
 	std::cout<<" computeReplacedSurface("<<e->getName()<<")"<<std::endl;
 #endif
 
-	std::vector<GeomRepresentation*> loc_reps = e->getComputationalProperties();
-
-	for (uint j=0; j<loc_reps.size(); j++){
-		OCCGeomRepresentation* occ_rep =
-				dynamic_cast<OCCGeomRepresentation*>(loc_reps[j]);
-		CHECK_NULL_PTR_ERROR(occ_rep);
-		TopoDS_Face occ_e = TopoDS::Face(occ_rep->getShape());
+    for (auto occ_e : e->getOCCFaces()) {
 		//========================================================================
 		// Cela peut être une entité conservée (cas d'un glue par exemple) ou
 		// nouvelle
@@ -1129,16 +1082,12 @@ void GeomModificationBaseClass::computeReplacedSurface(Surface* e)
 #ifdef _DEBUG2
 			std::cout<<"  m_toKeepSurfaces["<<i<<"] : "<<s->getName()<<std::endl;
 #endif
-			std::vector<GeomRepresentation*> loc_reps_s = s->getComputationalProperties();
+			auto loc_reps_s = s->getOCCFaces();
 			if (loc_reps_s.size() == 1){
-				OCCGeomRepresentation* occ_rep_s =
-						dynamic_cast<OCCGeomRepresentation*>(loc_reps_s[0]);
-
-				CHECK_NULL_PTR_ERROR(occ_rep_s);
-				TopoDS_Face occ_s = TopoDS::Face(occ_rep_s->getShape());
+				TopoDS_Face occ_s = loc_reps_s[0];
 				// si on sait que la shape est partiellement remplacee, autant ne
 				// plus tester les shapes en egalite
-				if(!is_partly_replaced && OCCGeomRepresentation::areEquals(occ_s,occ_e)){
+				if(!is_partly_replaced && OCCHelper::areEquals(occ_s,occ_e)){
 					m_replacedEntities[e].push_back(s); //e remplacee par s
 					is_fully_replaced = true;
 				}
@@ -1160,15 +1109,12 @@ void GeomModificationBaseClass::computeReplacedSurface(Surface* e)
 #ifdef _DEBUG2
 			std::cout<<"  m_newSurfaces["<<i<<"] : "<<s->getName()<<std::endl;
 #endif
-			std::vector<GeomRepresentation*> loc_reps_s = s->getComputationalProperties();
+			auto loc_reps_s = s->getOCCFaces();
 			if (loc_reps_s.size() == 1){
-				OCCGeomRepresentation* occ_rep_s =
-						dynamic_cast<OCCGeomRepresentation*>(loc_reps_s[0]);
-				CHECK_NULL_PTR_ERROR(occ_rep_s);
-				TopoDS_Face occ_s = TopoDS::Face(occ_rep_s->getShape());
+				TopoDS_Face occ_s = loc_reps_s[0];
 				// si on sait que la shape est partiellement remplacee, autant ne
 				// plus tester les shapes en egalite
-				if(!is_partly_replaced && OCCGeomRepresentation::areEquals(occ_s,occ_e)){
+				if(!is_partly_replaced && OCCHelper::areEquals(occ_s,occ_e)){
 					m_replacedEntities[e].push_back(s); //e remplacee par s
 					is_fully_replaced = true;
 				}
@@ -1196,11 +1142,10 @@ void GeomModificationBaseClass::computeReplacedSurface(Surface* e)
 /*----------------------------------------------------------------------------*/
 void GeomModificationBaseClass::computeReplacedVolume(Volume* e)
 {
-	//e est une entité supprimée, on cherche celles l'ayant remplacées
-	OCCGeomRepresentation* occ_rep =
-			dynamic_cast<OCCGeomRepresentation*>(e->getComputationalProperty());
-	CHECK_NULL_PTR_ERROR(occ_rep);
-	TopoDS_Solid occ_e = TopoDS::Solid(occ_rep->getShape());
+	// e est une entité supprimée, on cherche celles l'ayant remplacées
+    if (e->getOCCShape().ShapeType() != TopAbs_SOLID)
+        throw TkUtil::Exception(TkUtil::UTF8String("Le volume doit être de type SOLID : " + e->getName(), TkUtil::Charset::UTF_8));
+	TopoDS_Solid occ_e = TopoDS::Solid(e->getOCCShape());
 
 #ifdef _DEBUG2
 	std::cout<<"Volume a remplacer : "<<e->getName()<<std::endl;
@@ -1215,13 +1160,12 @@ void GeomModificationBaseClass::computeReplacedVolume(Volume* e)
 #ifdef _DEBUG2
 		std::cout<<"  m_toKeepVolumes["<<i<<"] : "<<s->getName()<<std::endl;
 #endif
-		OCCGeomRepresentation* occ_rep_s =
-				dynamic_cast<OCCGeomRepresentation*>(s->getComputationalProperty());
-		CHECK_NULL_PTR_ERROR(occ_rep_s);
-		TopoDS_Solid occ_s = TopoDS::Solid(occ_rep_s->getShape());
+        if (s->getOCCShape().ShapeType() != TopAbs_SOLID)
+            throw TkUtil::Exception(TkUtil::UTF8String("Le volume doit être de type SOLID : " + s->getName(), TkUtil::Charset::UTF_8));
+		TopoDS_Solid occ_s = TopoDS::Solid(s->getOCCShape());
 		// si on sait que la shape est partiellement remplacee, autant ne
 		// plus tester les shapes en egalite
-		if(!is_partly_replaced && OCCGeomRepresentation::areEquals(occ_s,occ_e)){
+		if(!is_partly_replaced && OCCHelper::areEquals(occ_s,occ_e)){
 			m_replacedEntities[e].push_back(s); //e remplacee par s
 			is_fully_replaced = true;
 		}
@@ -1238,10 +1182,9 @@ void GeomModificationBaseClass::computeReplacedVolume(Volume* e)
 	//========================================================================
 	for(unsigned int i=0;i<m_newVolumes.size() && !is_fully_replaced;i++){
 		Volume* s = m_newVolumes[i];
-		OCCGeomRepresentation* occ_rep_s =
-				dynamic_cast<OCCGeomRepresentation*>(s->getComputationalProperty());
-		CHECK_NULL_PTR_ERROR(occ_rep_s);
-		TopoDS_Solid occ_s = TopoDS::Solid(occ_rep_s->getShape());
+        if (s->getOCCShape().ShapeType() != TopAbs_SOLID)
+            throw TkUtil::Exception(TkUtil::UTF8String("Le volume doit être de type SOLID : " + s->getName(), TkUtil::Charset::UTF_8));
+		TopoDS_Solid occ_s = TopoDS::Solid(s->getOCCShape());
 		// si on sait que la shape est partiellement remplacee, autant ne
 		// plus tester les shapes en egalite
 #ifdef _DEBUG2
@@ -1249,7 +1192,7 @@ void GeomModificationBaseClass::computeReplacedVolume(Volume* e)
 		std::cout<<"\t  partly replaced = "<< is_partly_replaced<<std::endl;
 		std::cout<<"\t  fully  replaced = "<< is_fully_replaced<<std::endl;
 #endif
-		if(!is_partly_replaced && OCCGeomRepresentation::areEquals(occ_s,occ_e)){
+		if(!is_partly_replaced && OCCHelper::areEquals(occ_s,occ_e)){
 
 			m_replacedEntities[e].push_back(s); //e remplacee par s
 			is_fully_replaced = true;
@@ -1319,7 +1262,7 @@ void GeomModificationBaseClass::connect(
             for(unsigned int i_f=0;i_f<occ_surfaces.size()&& !found;i_f++)
             {
                 TopoDS_Face F2 = TopoDS::Face(occ_surfaces[i_f]);
-                if(OCCGeomRepresentation::areEquals(F,F2))
+                if(OCCHelper::areEquals(F,F2))
                 {
                     found=true;
                     std::vector<Surface*> this_surf;
@@ -1354,7 +1297,7 @@ void GeomModificationBaseClass::connect(
             for(unsigned int i_e=0;i_e<occ_curves.size()&& !found;i_e++)
             {
                 TopoDS_Edge E2 = TopoDS::Edge(occ_curves[i_e]);
-                if(OCCGeomRepresentation::areEquals(E,E2))
+                if(OCCHelper::areEquals(E,E2))
                 {
 
                     found=true;
@@ -1390,7 +1333,7 @@ void GeomModificationBaseClass::connect(
             for(unsigned int i_v=0;i_v<occ_vertices.size()&& !found;i_v++)
             {
                 TopoDS_Vertex V2 = TopoDS::Vertex(occ_vertices[i_v]);
-                if(OCCGeomRepresentation::areEquals(V,V2))
+                if(OCCHelper::areEquals(V,V2))
                 {
                     found=true;
                     std::vector<Vertex*> this_vert;
@@ -1827,12 +1770,10 @@ void GeomModificationBaseClass::createNewVertices(const TopoDS_Shape& shape,
             Vertex* current = dynamic_cast<Vertex*>(*it);
             CHECK_NULL_PTR_ERROR(current);
             //REPRESENTION OCC ASSOCIEE
-            OCCGeomRepresentation* occ_rep =
-                    dynamic_cast<OCCGeomRepresentation*>(current->getComputationalProperty());
-            CHECK_NULL_PTR_ERROR(occ_rep);
+            // 1 seule représentation pour un vertex
             //SOMMET OCC CORRESPONDANT
-            TopoDS_Vertex vrep = TopoDS::Vertex(occ_rep->getShape());
-            if(OCCGeomRepresentation::areEquals(V,vrep)){
+            TopoDS_Vertex vrep = current->getOCCVertex();
+            if(OCCHelper::areEquals(V,vrep)){
                 // on a trouve que le sommet existe déjà,
                 to_keep = true;
                 newVertex = current;
@@ -1856,12 +1797,10 @@ void GeomModificationBaseClass::createNewVertices(const TopoDS_Shape& shape,
             for(unsigned int k=0; k<m_newVertices.size() && !found_in_news;k++)
             {
                 Geom::Vertex* current = m_newVertices[k];
-                OCCGeomRepresentation* occ_rep =
-                        dynamic_cast<OCCGeomRepresentation*>(current->getComputationalProperty());
-                CHECK_NULL_PTR_ERROR(occ_rep);
-                TopoDS_Vertex vrep = TopoDS::Vertex(occ_rep->getShape());
+                // 1 seule représentation pour un vertex
+                TopoDS_Vertex vrep = current->getOCCVertex();
 
-                if(OCCGeomRepresentation::areEquals(V,vrep)){
+                if(OCCHelper::areEquals(V,vrep)){
                     found_in_news=true;
                     newVertex=current;
                     newOCCVertex=V;
@@ -1936,15 +1875,8 @@ void GeomModificationBaseClass::createNewCurves(const TopoDS_Shape& shape,
                 Curve* current = dynamic_cast<Curve*>(*it);
                 CHECK_NULL_PTR_ERROR(current);
 
-                std::vector<GeomRepresentation*> loc_reps = current->getComputationalProperties();
-
-                for (uint j=0; j<loc_reps.size(); j++){
-                	OCCGeomRepresentation* occ_rep =
-                			dynamic_cast<OCCGeomRepresentation*>(loc_reps[j]);
-                	CHECK_NULL_PTR_ERROR(occ_rep);
-                	TopoDS_Edge ref_edge = TopoDS::Edge(occ_rep->getShape());
-
-                	if(OCCGeomRepresentation::areEquals(E,ref_edge)){
+                for (auto ref_edge : current->getOCCEdges()) {
+                	if(OCCHelper::areEquals(E,ref_edge)){
                 		// on a trouve que le sommet existe déjà, on conserve
                 		// la référence
                 		to_keep = true;
@@ -1965,14 +1897,10 @@ void GeomModificationBaseClass::createNewCurves(const TopoDS_Shape& shape,
                 for(unsigned int k=0; k<m_newCurves.size() && !found_in_news;k++)
                 {
                     Curve* current = m_newCurves[k];
-                    std::vector<GeomRepresentation*> loc_reps = current->getComputationalProperties();
+                    auto loc_reps = current->getOCCEdges();
                     if (loc_reps.size() == 1){
-                    	OCCGeomRepresentation* occ_rep =
-                    			dynamic_cast<OCCGeomRepresentation*>(loc_reps[0]);
-                    	CHECK_NULL_PTR_ERROR(occ_rep);
-                    	TopoDS_Edge ref_edge = TopoDS::Edge(occ_rep->getShape());
-
-                    	if(OCCGeomRepresentation::areEquals(E,ref_edge)){
+                    	TopoDS_Edge ref_edge = loc_reps[0];
+                    	if(OCCHelper::areEquals(E,ref_edge)){
                     		found_in_news=true;
                     		newEdge = current;
                     		newOCCEdge = E;
@@ -2029,7 +1957,7 @@ void GeomModificationBaseClass::createNewSurfaces(
     for(int i = 1; i <= entities.Extent(); i++){
     	TopoDS_Face F = TopoDS::Face(entities(i));
     	sorted_entities.push_back(F);
-    	OCCGeomRepresentation::buildIncrementalBRepMesh(F, 0.01); // calcul de la triangulation interne
+    	OCCHelper::buildIncrementalBRepMesh(F, 0.01); // calcul de la triangulation interne
     }
     sorted_entities.sort(compareOCCFace);
 #ifdef _DEBUG2
@@ -2062,17 +1990,11 @@ void GeomModificationBaseClass::createNewSurfaces(
     			Surface* current = dynamic_cast<Surface*>(*it);
     			CHECK_NULL_PTR_ERROR(current);
 
-    			std::vector<GeomRepresentation*> loc_reps = current->getComputationalProperties();
-
-    			for (uint j=0; j<loc_reps.size(); j++){
-    				OCCGeomRepresentation* occ_rep =
-    						dynamic_cast<OCCGeomRepresentation*>(loc_reps[j]);
-    				CHECK_NULL_PTR_ERROR(occ_rep);
-    				TopoDS_Face rep_face = TopoDS::Face(occ_rep->getShape());
+                for (auto rep_face : current->getOCCFaces()) {
 #ifdef _DEBUG2
     				std::cout<<"  areEquals avec "<<current->getName()<<std::endl;
 #endif
-    				if(OCCGeomRepresentation::areEquals(F,rep_face)){
+    				if(OCCHelper::areEquals(F, rep_face)){
     					//std::cout<<"\t on garde"<<std::endl;
     					// on a trouve que la face existe déjà, on en conserve la référence
     					to_keep = true;
@@ -2092,14 +2014,10 @@ void GeomModificationBaseClass::createNewSurfaces(
     			for(unsigned int k=0; k<m_newSurfaces.size() &&!found_in_news;k++)
     			{
     				Surface* current = m_newSurfaces[k];
-    				std::vector<GeomRepresentation*> loc_reps = current->getComputationalProperties();
+    				auto loc_reps = current->getOCCFaces();
     				if (loc_reps.size() == 1){
-    					OCCGeomRepresentation* occ_rep =
-    							dynamic_cast<OCCGeomRepresentation*>(loc_reps[0]);
-    					CHECK_NULL_PTR_ERROR(occ_rep);
-        				TopoDS_Face rep_face = TopoDS::Face(occ_rep->getShape());
-
-        				if(OCCGeomRepresentation::areEquals(F,rep_face)){
+        				TopoDS_Face rep_face = loc_reps[0];
+        				if(OCCHelper::areEquals(F, rep_face)){
         					found_in_news = true;
         					newFace = current;
         					newOCCFace = F;
@@ -2178,23 +2096,10 @@ void GeomModificationBaseClass::createNewVolumes(
         {
             Volume* current = dynamic_cast<Volume*>(*it);
             CHECK_NULL_PTR_ERROR(current);
-            OCCGeomRepresentation* occ_rep =
-                    dynamic_cast<OCCGeomRepresentation*>(current->getComputationalProperty());
-            CHECK_NULL_PTR_ERROR(occ_rep);
-//            TopoDS_Shape sh = occ_rep->getShape();
-//            std::cout<<index++<<") "<<current->getName()<<" : "<<sh.ShapeType()<<std::endl;
-//            if(sh.ShapeType()==TopAbs_COMPOUND)
-//                std::cout<<"   --> COMPOUND"<<std::endl;
-//            else if(sh.ShapeType()==TopAbs_COMPSOLID)
-//                std::cout<<"   --> COMP SOLID"<<std::endl;
-//            else if(sh.ShapeType()==TopAbs_SHELL)
-//                std::cout<<"   --> SHELL"<<std::endl;
-//            else if(sh.ShapeType()==TopAbs_SOLID)
-//                std::cout<<"   --> SOLID"<<std::endl;
-
-            TopoDS_Solid rep_volume = TopoDS::Solid(occ_rep->getShape());
-
-            if(OCCGeomRepresentation::areEquals(V,rep_volume))
+            if (current->getOCCShape().ShapeType() != TopAbs_SOLID)
+                throw TkUtil::Exception(TkUtil::UTF8String("Le volume doit être de type SOLID : " + current->getName(), TkUtil::Charset::UTF_8));
+            TopoDS_Solid rep_volume = TopoDS::Solid(current->getOCCShape());
+            if(OCCHelper::areEquals(V, rep_volume))
             {
                 // on a trouve que le volume existe déjà, on en conserve la référence
                 to_keep = true;
@@ -2213,13 +2118,10 @@ void GeomModificationBaseClass::createNewVolumes(
             for(unsigned int k=0; k<m_newVolumes.size() &&!found_in_news;k++)
             {
                 Volume* current = m_newVolumes[k];
-
-                OCCGeomRepresentation* occ_rep =
-                        dynamic_cast<OCCGeomRepresentation*>(current->getComputationalProperty());
-                CHECK_NULL_PTR_ERROR(occ_rep);
-                TopoDS_Solid rep_volume = TopoDS::Solid(occ_rep->getShape());
-
-                if(OCCGeomRepresentation::areEquals(V,rep_volume))
+                if (current->getOCCShape().ShapeType() != TopAbs_SOLID)
+                    throw TkUtil::Exception(TkUtil::UTF8String("Le volume doit être de type SOLID : " + current->getName(), TkUtil::Charset::UTF_8));
+                TopoDS_Solid rep_volume = TopoDS::Solid(current->getOCCShape());
+                if(OCCHelper::areEquals(V, rep_volume))
                 {
                     found_in_news = true;
                     newVolume = current;
@@ -2288,12 +2190,10 @@ void GeomModificationBaseClass::createNewAdjVolumes(
         {
             Volume* current = dynamic_cast<Volume*>(*it);
             CHECK_NULL_PTR_ERROR(current);
-            OCCGeomRepresentation* occ_rep =
-                    dynamic_cast<OCCGeomRepresentation*>(current->getComputationalProperty());
-            CHECK_NULL_PTR_ERROR(occ_rep);
-            TopoDS_Solid rep_volume = TopoDS::Solid(occ_rep->getShape());
-
-            if(OCCGeomRepresentation::areEquals(V,rep_volume))
+            if (current->getOCCShape().ShapeType() != TopAbs_SOLID)
+                throw TkUtil::Exception(TkUtil::UTF8String("Le volume doit être de type SOLID : " + current->getName(), TkUtil::Charset::UTF_8));
+            TopoDS_Solid rep_volume = TopoDS::Solid(current->getOCCShape());
+            if(OCCHelper::areEquals(V, rep_volume))
             {
                 // on a trouve que le volume existe déjà, on en conserve la référence
                 to_keep = true;
@@ -2316,12 +2216,10 @@ void GeomModificationBaseClass::createNewAdjVolumes(
 #ifdef _DEBUG2
             std::cout<<"=> adj compare: "<<current->getName()<<std::endl;
 #endif
-            OCCGeomRepresentation* occ_rep =
-                    dynamic_cast<OCCGeomRepresentation*>(current->getComputationalProperty());
-            CHECK_NULL_PTR_ERROR(occ_rep);
-            TopoDS_Solid rep_volume = TopoDS::Solid(occ_rep->getShape());
-
-            if(OCCGeomRepresentation::contains(V,rep_volume))
+            if (current->getOCCShape().ShapeType() != TopAbs_SOLID)
+                throw TkUtil::Exception(TkUtil::UTF8String("Le volume doit être de type SOLID : " + current->getName(), TkUtil::Charset::UTF_8));
+            TopoDS_Solid rep_volume = TopoDS::Solid(current->getOCCShape());
+            if(OCCHelper::contains(V, rep_volume))
             {
                 // on a trouve que le volume existe déjà, on en conserve la référence
                 to_keep = true;
@@ -2340,13 +2238,10 @@ void GeomModificationBaseClass::createNewAdjVolumes(
             for(unsigned int k=0; k<m_newVolumes.size() &&!found_in_news;k++)
             {
                 Volume* current = m_newVolumes[k];
-
-                OCCGeomRepresentation* occ_rep =
-                        dynamic_cast<OCCGeomRepresentation*>(current->getComputationalProperty());
-                CHECK_NULL_PTR_ERROR(occ_rep);
-                TopoDS_Solid rep_volume = TopoDS::Solid(occ_rep->getShape());
-
-                if(OCCGeomRepresentation::areEquals(V,rep_volume))
+                if (current->getOCCShape().ShapeType() != TopAbs_SOLID)
+                    throw TkUtil::Exception(TkUtil::UTF8String("Le volume doit être de type SOLID : " + current->getName(), TkUtil::Charset::UTF_8));
+                TopoDS_Solid rep_volume = TopoDS::Solid(current->getOCCShape());
+                if(OCCHelper::areEquals(V, rep_volume))
                 {
                     found_in_news = true;
                     newVolume = current;

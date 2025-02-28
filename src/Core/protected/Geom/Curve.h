@@ -15,9 +15,10 @@
 /*----------------------------------------------------------------------------*/
 #include "Geom/GeomEntity.h"
 #include "Geom/GeomProperty.h"
-#include "Geom/GeomRepresentation.h"
 /*----------------------------------------------------------------------------*/
 #include "Utils/Point.h"
+/*----------------------------------------------------------------------------*/
+#include <TopoDS_Edge.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -50,12 +51,12 @@ public:
      *  \param ctx le contexte
      *  \param prop propriété (nom ...)
      *  \param disp propriétés d'affichage
-     *  \param gprop    les propriétés associées à la courbe
-     *  \param compProp les propriétés de calcul
+     *  \param gprop les propriétés associées à la courbe
+     *  \param shape la shape OCC
      */
 #ifndef SWIG
     Curve(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, GeomRepresentation* compProp);
+            GeomProperty* gprop, TopoDS_Edge& shape);
 #endif
 
     /*------------------------------------------------------------------------*/
@@ -64,13 +65,17 @@ public:
      *  \param ctx le contexte
      *  \param prop propriété (nom ...)
      *  \param disp propriétés d'affichage
-     *  \param gprop    les propriétés associées à la courbe
-     *  \param compProp les propriétés de calcul
+     *  \param gprop les propriétés associées à la courbe
+     *  \param shapes les shapes OCC
      */
 #ifndef SWIG
     Curve(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, std::vector<GeomRepresentation*>& compProp);
+            GeomProperty* gprop, std::vector<TopoDS_Edge>& shapes);
 #endif
+    const std::vector<TopoDS_Edge>& getOCCEdges() const { return m_occ_edges; }
+
+    virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const;
+    virtual void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
@@ -130,6 +135,14 @@ public:
     virtual double computeArea() const;
 
     /*------------------------------------------------------------------------*/
+    /** \brief  Calcul de la boite englobante orientée selon les axes Ox,Oy,Oz
+     *
+     *  \param pmin Les coordonnées min de la boite englobante
+     *  \param pmax Les coordonnées max de la boite englobante
+     */
+    virtual void computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const;
+
+    /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès aux sommets géométriques incidents
      *
      *  \param vertices les sommets incidents
@@ -176,12 +189,12 @@ public:
     /** \brief Projete le point P sur la courbe. P est modifié
      *  \param P le point à projeter
      */
-    virtual void project(Utils::Math::Point& P) const;
+    virtual uint project(Utils::Math::Point& P) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief Projete le point P1 sur la courbe, le résultat est le point P2.
      */
-    virtual void project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const ;
+    virtual uint project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const ;
 
     /*------------------------------------------------------------------------*/
     /** \brief Donne le point en fonction du paramètre sur la courbe
@@ -255,46 +268,10 @@ public:
     Vertex* secondPoint() const;
 
     /*------------------------------------------------------------------------*/
-    /** \brief  Access to the parameterization interval of curve *this in the
-     *			surface ASurf.
-     *
-     *	\param ASurf the surface we want to compute the curve parameterization
-     *	\return ATMin min value of the parameterization
-     *	\return ATMax max value of the parameterization
-     */
-    void bounds(Surface* ASurf, double& ATMin, double& ATMax) const;
-    /*------------------------------------------------------------------------*/
     /** \brief  Ajoute s comme surface incidente
      *
      *  \param s un pointeur sur une surface
      */
-
-    /*------------------------------------------------------------------------*/
-       /** \brief  Provides 2D data about the curve in the parametric space of the
- 	  surface ASurf
- 	  *
- 	  *	\param  ASurf the surface we want to compute the curve parameterization
- 	  *	\param  AT   the curve parameter we want extract data from
- 	  *	\return AUV  the 2D (u,v) parameter
- 	  *	\return ADT  the 2D 1st derivative to *this in the param. space of ASurf
- 	  *	\return ADTT the 2D 2nd derivative to *this in the param. space of ASurf
- 	  */
-       void parametricData(Surface* ASurf, double& AT,
- 					      double AUV[2], double ADT[2], double ADTT[2]) const;
-
-       /*------------------------------------------------------------------------*/
-       /** \brief  Provides the orientation of *this.
- 	  */
-       GeomOrientation orientation() const;
-
-       /*------------------------------------------------------------------------*/
-       /** \brief Indicates if *this is a curve internal to a surface. By internal,
-        *		we mean that the curve does not belong to a wire enclosing ASurf but
-        *		is an imprint inside ASurf
-        *	\return a boolean value that means internal(true)/boundary(false)
-        */
-       bool isInternal() const;
-       void getParameter2D(Surface* ASurf, const Utils::Math::Point& Pt, double& p) const;
 
 #ifndef SWIG
     void add(Surface* s);
@@ -421,16 +398,6 @@ public:
      */
     bool isBSpline() const;
 
-    /*------------------------------------------------------------------------*/
-    /** \brief   indique si la courbe est un wire (courbe composée) ou pas
-     */
-    bool isWire() const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief   retourne la position du centre dans d'une ellipse ou d'un cercle
-     */
-    Utils::Math::Point getCenter() const;
-
 	/*------------------------------------------------------------------------*/
 	/** \brief	Fournit une représentation textuelle de l'entité.
 	 * \param	true si l'entité fourni la totalité de sa description, false si
@@ -460,13 +427,13 @@ protected:
      */
     virtual void createSpecificMemento(MementoGeomEntity& mem);
 
-        protected:
+private:
     std::vector<Surface*> m_surfaces;
     std::vector<Vertex*> m_vertices;
     /// Listes des groupes 1D auxquels appartient cette courbe
     std::vector<Group::Group1D*> m_groups;
-
-private:
+    /// représentation open cascade
+    std::vector<TopoDS_Edge> m_occ_edges;
     /// premier paramètre local à une des composantes
     std::vector<double> paramLocFirst;
     /// dernier paramètre local à une des composantes
@@ -475,7 +442,6 @@ private:
     std::vector<double> paramImgFirst;
     /// dernier paramètre image pour une des composantes, dans [0,1]
     std::vector<double> paramImgLast;
-
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

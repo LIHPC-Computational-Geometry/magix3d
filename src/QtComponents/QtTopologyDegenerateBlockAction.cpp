@@ -6,14 +6,14 @@
 
 #include "Internal/ContextIfc.h"
 
-#include <QtComponents/QtTopologyDegenerateBlockAction.h>
-#include "Utils/Common.h"
-#include <QtUtil/QtErrorManagement.h>
+#include "QtComponents/QtTopologyDegenerateBlockAction.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
+#include "Utils/Common.h"
+
+#include <QtUtil/QtErrorManagement.h>
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>
 #include <QtUtil/QtConfiguration.h>
-
 
 using namespace std;
 using namespace TkUtil;

@@ -8,8 +8,8 @@
 #define ENTITY_SEIZURE_MANAGER_H
 
 
-#include <Utils/SelectionManager.h>
-#include <Internal/ContextIfc.h>
+#include "Utils/SelectionManager.h"
+#include "Internal/ContextIfc.h"
 
 #include <QColor>
 

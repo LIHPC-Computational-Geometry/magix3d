@@ -4,7 +4,8 @@
  *  \date    16/05/2011
  */
 /*----------------------------------------------------------------------------*/
-#include <Triton2/TetgenInterface/TetgenFacade.h>
+#include "Triton2/TetgenInterface/TetgenFacade.h"
+/*----------------------------------------------------------------------------*/
 using namespace triton;
 using namespace gmds;
 /*----------------------------------------------------------------------------*/

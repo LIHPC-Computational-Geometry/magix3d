@@ -7,11 +7,11 @@
  */
 /*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
-#include <Geom/GeomInfo.h>
-#include <Geom/Vertex.h>
-#include <Geom/Curve.h>
-#include <Geom/Surface.h>
-#include <Geom/Volume.h>
+#include "Geom/GeomInfo.h"
+#include "Geom/Vertex.h"
+#include "Geom/Curve.h"
+#include "Geom/Surface.h"
+#include "Geom/Volume.h"
 #include "Topo/TopoEntity.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

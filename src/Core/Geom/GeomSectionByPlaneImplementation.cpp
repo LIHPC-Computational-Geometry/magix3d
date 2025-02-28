@@ -18,14 +18,13 @@
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
-#include "Geom/OCCGeomRepresentation.h"
 #include "Geom/EntityFactory.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/Point.h"
 #include "Utils/Plane.h"
 #include "Utils/Vector.h"
 /*----------------------------------------------------------------------------*/
-#include "TkUtil/Exception.h"
+#include <TkUtil/Exception.h>
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
@@ -115,11 +114,11 @@ void GeomSectionByPlaneImplementation::splitEntities(std::vector<GeomEntity*>& r
 #endif
     GeomEntity* e1 = m_init_entities[0];
     TopoDS_Shape s_fuse;
-    getOCCShape(e1, s_fuse);
+    getUniqueOCCShape(e1, s_fuse);
     for(unsigned int i=1;i<m_init_entities.size();i++){
         GeomEntity* e2 = m_init_entities[i];
         TopoDS_Shape s2;
-        getOCCShape(e2, s2);
+        getUniqueOCCShape(e2, s2);
 
         BRepAlgoAPI_Fuse fuse_operator(s_fuse,s2);
         if(fuse_operator.IsDone())
@@ -144,7 +143,7 @@ void GeomSectionByPlaneImplementation::splitEntities(std::vector<GeomEntity*>& r
     for (unsigned int i = 0; i < m_init_entities.size(); i++) {
     	GeomEntity* ei = m_init_entities[i];
     	TopoDS_Shape si;
-        getOCCShape(ei, si);
+        getUniqueOCCShape(ei, si);
         list_of_arguments.Append(si);
     }
     list_of_arguments.Append(wf);
@@ -265,52 +264,43 @@ bool GeomSectionByPlaneImplementation::isOnPlane(Utils::Math::Point& p)
             < Mgx3D::Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon);
 }
 /*----------------------------------------------------------------------------*/
-//void GeomSectionByPlaneImplementation::
-//manageAdjacentEntities(std::vector<GeomEntity*>& entities)
-//{
-//    for(unsigned int i=0;i<entities.size();i++){
-//
-//        TopoDS_Shape s;
-//        BRepAlgoAPI_BuilderAlgo  splitter;
-//        GeomEntity* ei = entities[i];
-//        TopoDS_Shape si;
-//        getOCCShape(ei, si);
-//
-//        //============================================================
-//        // 1 - Intersection de si avec l'objet de coupe
-//        //============================================================
-//
-//        TopTools_ListOfShape list_of_arguments;
-//        list_of_arguments.Append(si);
-//        list_of_arguments.Append(m_restricted_section_tool);
-//
-//        splitter.SetArguments(list_of_arguments);
-//        splitter.Build();
-//        s = splitter.Shape();
-//
-//
-//        //============================================================
-//        // 2 -  Récupération de l'intersection de si et
-//        //      m_restricted_section_tool
-//        //============================================================
-//
-//        TopTools_ListOfShape genSh;
-//        genSh = splitter.Generated(si) ;
-//        TopTools_ListOfShape modSh;
-//        modSh = splitter.Modified(si);
-////        std::cerr<<"NB Shapes generated from "<<ei->getName()<<" : "<<genSh.Extent()<<std::endl;
-////        std::cerr<<"NB Shapes modified from  "<<ei->getName()<<" : "<<modSh.Extent()<<std::endl;
-//
-//        //============================================================
-//        // 2 - remplacement de la shape si par s dans ei
-//        //============================================================
-//        GeomRepresentation* rep = ei->getComputationalProperty();
-//        OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(rep);
-//        CHECK_NULL_PTR_ERROR(occ_rep);
-//        occ_rep->setShape(modSh.First());
-//    }
-//
-//}
+void GeomSectionByPlaneImplementation::
+getUniqueOCCShape(GeomEntity* ge, TopoDS_Shape& sh) const
+{
+    switch (ge->getDim())
+    {
+        case 0:
+        {
+            Vertex* v = dynamic_cast<Vertex*>(ge);
+            sh = v->getOCCVertex();
+            break;
+        }
+        case 1:
+        {
+            Curve* c = dynamic_cast<Curve*>(ge);
+            if (c->getOCCEdges().size() != 1)
+                throw TkUtil::Exception("Opération non réalisable sur une courbe composée : " + c->getName());
+            sh = c->getOCCEdges()[0];
+            break;
+        }
+        case 2:
+        {
+            Surface* s = dynamic_cast<Surface*>(ge);
+            if (s->getOCCFaces().size() != 1)
+                throw TkUtil::Exception("Opération non réalisable sur une surface composée : " + s->getName());
+            sh = s->getOCCFaces()[0];
+            break;
+        }
+        case 3:
+        {
+            Volume* v = dynamic_cast<Volume*>(ge);
+            sh = v->getOCCShape();
+            break;
+        }
+        default:
+            throw TkUtil::Exception("Opération non réalisable sur cette entité : " + ge->getName());
+    }
+}
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom
 /*----------------------------------------------------------------------------*/

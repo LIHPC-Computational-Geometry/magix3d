@@ -496,13 +496,11 @@ void QtSelectionIndividualPropertiesPanel::entitiesAddedToSelection (
 						const vector<Entity*>& entities)
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
-
-		if ((0 == getSelectionManager ( )) || (false == displayProperties ( )))
+	if ((0 == getSelectionManager ( )) || (false == displayProperties ( )))
 		return;
 
 	CHECK_NULL_PTR_ERROR (_entitiesWidget)
-	if (Resources::instance ( )._maxIndividualProperties.getValue ( ) <
-															entities.size ( ))
+	if (Resources::instance ( )._maxIndividualProperties.getValue ( ) < entities.size ( ))
 	{
 		UTF8String	message (Charset::UTF_8);
 		message << "Sélection courante : " << entities.size ( ) << " entités.";

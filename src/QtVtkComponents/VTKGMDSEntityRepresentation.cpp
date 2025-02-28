@@ -10,7 +10,8 @@
 #include "QtVtkComponents/VTKGMDSEntityRepresentation.h"
 #include "QtVtkComponents/VTKMgx3DEntityRepresentation.h"
 #include "QtComponents/QtMgx3DApplication.h"
-#include <Utils/DisplayProperties.h>
+
+#include "Utils/DisplayProperties.h"
 
 #include "Mesh/MeshImplementation.h"
 #include "Mesh/Cloud.h"

@@ -53,7 +53,6 @@
 #include "QtComponents/QtGeomEntityDestructionAction.h"
 #include "QtComponents/QtGeomPlaneCutAction.h"
 #include "QtComponents/QtGeomSurfaceCreationAction.h"
-#include "QtComponents/QtGeomVolumeCreationAction.h"
 #include "QtComponents/QtGeometryGlueCurvesAction.h"
 #include "QtComponents/QtGeometryGlueSurfacesAction.h"
 #include "QtComponents/QtGeometryHomothetyAction.h"
@@ -101,6 +100,11 @@
 #include "QtComponents/QtTopologyMirrorAction.h"
 #include "QtComponents/QtTopologyUnrefineBlockAction.h"
 #include "QtComponents/QtTopoInformationOperationAction.h"
+#include "QtComponents/QtTopologyFuse2EdgesAction.h"
+#include "QtComponents/QtTopologyFuse2FacesAction.h"
+#include "QtComponents/QtTopologyFuse2VerticesAction.h"
+#include "QtComponents/QtTopologyDegenerateBlockAction.h"
+#include "QtComponents/QtTopologyFuseEdgesAction.h"
 // Les opérations maillages :
 #include "QtComponents/QtGroupProjectionOnPlaneAction.h"
 #include "QtComponents/QtMeshSubVolumeBetweenSheetsAction.h"
@@ -178,13 +182,6 @@
 #include <mesquite_version.h>	// MSQ_VERSION_STRING
 
 #include <xercesc/util/XercesVersion.hpp>
-#include <QtComponents/QtTopologyFuse2EdgesAction.h>
-#include <QtComponents/QtTopologyFuse2FacesAction.h>
-#include <QtComponents/QtTopologyFuse2VerticesAction.h>
-#include <QtComponents/QtTopologyDegenerateBlockAction.h>
-#include <QtComponents/QtTopologyFuseEdgesAction.h>
-
-
 
 #include <Standard_Version.hxx> // OCC
 
@@ -2715,16 +2712,6 @@ void QtMgx3DMainWindow::showReady ( )
 					                       );
 			registerOperationAction(
 					*prismAction, QtMgx3DOperationsPanel::GEOM_VOLUME_OPERATION);
-			// Volume :
-			QtGeomVolumeCreationAction *volumeAction =
-					                           new QtGeomVolumeCreationAction(
-							                           QIcon(
-									                           ":/images/create_volume_with_surfaces.png"),
-							                           QString::fromUtf8("Création de volume"), *this, QString::fromUtf8("Création de volume.")
-					                           );
-			CHECK_NULL_PTR_ERROR(volumeAction->getVolumeCreationPanel())
-			registerOperationAction(
-					*volumeAction, QtMgx3DOperationsPanel::GEOM_VOLUME_OPERATION);
 			// Création d'entité par révolution :
 			dim = 0;
 			for (int ot = (int) QtMgx3DOperationsPanel::GEOM_CURVE_OPERATION;
@@ -4608,7 +4595,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 		}    // QtMgx3DMainWindow::getGraphicalWidget
 
 
-		void QtMgx3DMainWindow::log(const Log &log)
+		void QtMgx3DMainWindow::log(const TkUtil::Log &log)
 		{
 			getLogDispatcher().log(log);
 		}    // QtMgx3DMainWindow::log

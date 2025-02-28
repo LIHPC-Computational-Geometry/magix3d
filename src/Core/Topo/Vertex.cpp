@@ -21,7 +21,7 @@
 #include "Topo/FaceMeshingPropertyTransfinite.h"
 #include "Topo/BlockMeshingPropertyTransfinite.h"
 #include "Mesh/CommandCreateMesh.h"
-#include <Mesh/MeshItf.h>
+#include "Mesh/MeshItf.h"
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/SerializedRepresentation.h"
@@ -29,7 +29,7 @@
 #include "Geom/GeomEntity.h"
 #include "Group/Group0D.h"
 /*----------------------------------------------------------------------------*/
-#include "TkUtil/Exception.h"
+#include <TkUtil/Exception.h>
 #include <TkUtil/NumericConversions.h>
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/

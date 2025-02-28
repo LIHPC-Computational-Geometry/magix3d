@@ -9,7 +9,8 @@
 #include "Internal/ContextIfc.h"
 /*----------------------------------------------------------------------------*/
 #include "Geom/ImportBREPImplementation.h"
-#include "TkUtil/Exception.h"
+/*----------------------------------------------------------------------------*/
+#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
 #include <BRep_Builder.hxx>

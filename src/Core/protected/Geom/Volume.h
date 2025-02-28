@@ -13,6 +13,8 @@
 /*----------------------------------------------------------------------------*/
 #include <list>
 /*----------------------------------------------------------------------------*/
+#include <TopoDS_Shape.hxx>
+/*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Group {
@@ -51,8 +53,12 @@ public:
      */
 #ifndef SWIG
     Volume(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, GeomRepresentation* compProp=0);
+            GeomProperty* gprop, TopoDS_Shape& shape);
 #endif
+    const TopoDS_Shape& getOCCShape() const { return m_occ_shape; }
+
+    virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const;
+    virtual void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
@@ -70,6 +76,14 @@ public:
      *          longueur, pour une surface, l'aire, pour un volume le volume.
      */
     double computeArea() const;
+
+    /*------------------------------------------------------------------------*/
+    /** \brief  Calcul de la boite englobante orientée selon les axes Ox,Oy,Oz
+     *
+     *  \param pmin Les coordonnées min de la boite englobante
+     *  \param pmax Les coordonnées max de la boite englobante
+     */
+    virtual void computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief Vérifie que la surface ASurf est contenue dans *this
@@ -157,13 +171,13 @@ public:
      *  \param P le point à projeter
      *  [fonction non disponible]
      */
-    virtual void project(Utils::Math::Point& P) const;
+    virtual uint project(Utils::Math::Point& P) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief Projete le point P1 sur le volume, le résultat est le point P2.
      * [fonction non disponible]
      */
-    virtual void project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const ;
+    virtual uint project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const ;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Ajoute s comme surface incidente
@@ -286,13 +300,14 @@ protected:
      *          donc).
      */
     virtual void createSpecificMemento(MementoGeomEntity& mem);
-protected:
 
-    /** surfaces incidentes au volume */
+private:
+    /// surfaces incidentes au volume
     std::vector<Surface*> m_surfaces;
-
     /// Listes des groupes 3D auxquels appartient ce volume
     std::vector<Group::Group3D*> m_groups;
+    /// représentation open cascade
+    TopoDS_Shape m_occ_shape;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

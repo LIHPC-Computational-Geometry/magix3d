@@ -9,8 +9,8 @@
 #ifndef SYSCOORD_MANAGER_H_
 #define SYSCOORD_MANAGER_H_
 /*----------------------------------------------------------------------------*/
-#include <SysCoord/SysCoord.h>
-#include <SysCoord/SysCoordManagerIfc.h>
+#include "SysCoord/SysCoord.h"
+#include "SysCoord/SysCoordManagerIfc.h"
 #include "Utils/Container.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

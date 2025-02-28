@@ -107,18 +107,6 @@ public:
         copy(std::vector<GeomEntity*>& e, bool withTopo, std::string groupName);
 
     /*------------------------------------------------------------------------*/
-    /** \brief création d'un volume à partir d'une liste de surfaces formant un
-     *         le bord d'un volume fermé
-     *
-     *  \param e les surfaces géométriques bordant le volume à créer
-     */
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
-        newVolume(std::vector<std::string>& e, std::string groupName);
-
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
-        newVolume(std::vector<Surface*>& e, std::string groupName);
-
-    /*------------------------------------------------------------------------*/
     /** \brief création d'un sommet géométrique  à partir d'un point p(x,y,z)
      *         et d'une courbe ou surface. Le sommet créé est le projet de p sur la
      *         courbe ou la surface.
@@ -618,44 +606,6 @@ public:
                 const double& radius_ext,
                 const  Utils::Portion::Type& dt,
                 std::string groupName="");
-
-    /*------------------------------------------------------------------------*/
-    /** \brief création d'un prisme à partir d'une surface et d'un vecteur de
-     *          direction
-     *
-     *	  OBSOLETE: du fait d'un plantage non résolu lors du undo-redo
-     *	            et du fait que cela n'agisse que sur une unique surface
-     *     =>   utiliser  makeExtrude*
-     *
-     *  \param base la surface à extruder
-     *  \param dp   le vecteur d'extrusion
-     *  \param groupName optionnellement un nom de groupe
-     */
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
-    newPrism(std::string base,
-    		const Vector& dp,
-    		std::string groupName="");
-
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
-    newPrism(GeomEntity* base,
-    		const Vector& dp,
-    		std::string groupName="");
-
-    /** \brief création d'un prisme à partir d'une surface et d'un vecteur de
-     *          direction, extrusion de la topologie avec
-     *
-     *  \param base la surface à extruder
-     *  \param dp   le vecteur d'extrusion
-     *  \param groupName optionnellement un nom de groupe
-     */
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
-		newPrismWithTopo(std::string base, const Vector& dp,
-                          std::string groupName="");
-
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
-    newPrismWithTopo(GeomEntity* base,
-    		const Vector& dp,
-    		std::string groupName="");
 
     /*------------------------------------------------------------------------*/
     /** \brief création d'un cone suivant un axe, avec deux rayons

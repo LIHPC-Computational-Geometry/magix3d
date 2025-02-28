@@ -9,12 +9,12 @@
 /*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
 #include "Topo/TopoHelper.h"
+#include "Topo/CommandFuse2FaceList.h"
 #include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/Exception.h>
-#include <Topo/CommandFuse2FaceList.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

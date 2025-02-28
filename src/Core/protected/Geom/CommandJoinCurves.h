@@ -59,13 +59,13 @@ public:
 
 private:
 	/// recherche d'une courbe qui contienne un sommet
-	GeomEntity* getCurveContains(std::vector<GeomEntity*>& entities, Vertex* vtx);
+	Curve* getCurveContains(std::vector<GeomEntity*>& entities, Vertex* vtx);
 
 	/// recherche du sommet opposé sur une courbe
 	Vertex* getOppositeVtx(GeomEntity* crv, Vertex* vtx);
 
 	/// recherche d'une courbe à partir d'un sommet en excluant une première courbe
-	GeomEntity* getCurve(Vertex* vtx, GeomEntity* crvExclude);
+	Curve* getCurve(Vertex* vtx, Curve* crvExclude);
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

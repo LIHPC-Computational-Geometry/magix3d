@@ -17,10 +17,9 @@
 #include "Geom/PropertyPrism.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
-#include "Geom/OCCGeomRepresentation.h"
 #include "Geom/EntityFactory.h"
 /*----------------------------------------------------------------------------*/
-#include "TkUtil/Exception.h"
+#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Face.hxx>
@@ -68,45 +67,37 @@ void GeomNewPrismImplementation::prePerform()
 /*----------------------------------------------------------------------------*/
 void GeomNewPrismImplementation::perform(std::vector<GeomEntity*>& res)
 {
-    OCCGeomRepresentation* rep =0;
-
     GeomEntity* base = m_prop->getBase();
-
-    TopoDS_Shape sh;
-    getOCCShape(base,sh);
-
     Utils::Math::Vector paxis = m_prop->getAxis();
-    gp_Vec Vx(paxis.getX(),paxis.getY(),paxis.getZ());
+    gp_Vec Vx(paxis.getX(), paxis.getY(), paxis.getZ());
 
-    if (sh.ShapeType() == TopAbs_FACE){
-        BRepPrimAPI_MakePrism builder(TopoDS::Face(sh),Vx);
+    if (base->getDim() == 1) {
+        Curve* curve = dynamic_cast<Curve*>(base);
+        if (curve->getOCCEdges().size() != 1) 
+            throw TkUtil::Exception (TkUtil::UTF8String ("L'extrusion n'est pas possible sur une courbe composée : " + curve->getName(), TkUtil::Charset::UTF_8));
+
+        TopoDS_Edge sh = curve->getOCCEdges()[0];
+        BRepPrimAPI_MakePrism builder(sh, Vx);
         if (!builder.IsDone ())
-        {
             throw TkUtil::Exception (TkUtil::UTF8String ("OCC n'arrive pas à effectuer la création du prisme par extrusion", TkUtil::Charset::UTF_8));
-        }
+
+        // on a obtenu la face souhaitee en OCC
+        TopoDS_Face res_face = TopoDS::Face(builder.Shape());
+        createGeomEntities(res_face);
+    } else if (base->getDim() == 2){
+        Surface* surf = dynamic_cast<Surface*>(base);
+        if (surf->getOCCFaces().size() != 1) 
+            throw TkUtil::Exception (TkUtil::UTF8String ("L'extrusion n'est pas possible sur une face composée : " + surf->getName(), TkUtil::Charset::UTF_8));
+
+        TopoDS_Face sh = surf->getOCCFaces()[0];
+        BRepPrimAPI_MakePrism builder(sh, Vx);
+        if (!builder.IsDone ())
+            throw TkUtil::Exception (TkUtil::UTF8String ("OCC n'arrive pas à effectuer la création du prisme par extrusion", TkUtil::Charset::UTF_8));
+
         // on a obtenu le volume souhaite en OCC
         TopoDS_Solid res_vol = TopoDS::Solid(builder.Shape());
         createGeomEntities(res_vol);
-        /* res est la nouvelle shape, on doit la connecter aux sous-shapes déjà
-         * existantes ou créer de nouvelles sous-shapes.
-         */
-        //    res.push_back(result_entity);
-    }
-    else if (sh.ShapeType() == TopAbs_EDGE){
-        BRepPrimAPI_MakePrism builder(TopoDS::Edge(sh),Vx);
-        if (!builder.IsDone ())
-        {
-            throw TkUtil::Exception (TkUtil::UTF8String ("OCC n'arrive pas à effectuer la création du prisme par extrusion", TkUtil::Charset::UTF_8));
-        }
-        // on a obtenu le volume souhaite en OCC
-        TopoDS_Face res_face = TopoDS::Face(builder.Shape());
-        createGeomEntities(res_face);
-        /* res est la nouvelle shape, on doit la connecter aux sous-shapes déjà
-         * existantes ou créer de nouvelles sous-shapes.
-         */
-        //    res.push_back(result_entity);
-    }
-    else
+    } else
         throw TkUtil::Exception (TkUtil::UTF8String ("Impossible de créer un prisme à partir de cette base", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/

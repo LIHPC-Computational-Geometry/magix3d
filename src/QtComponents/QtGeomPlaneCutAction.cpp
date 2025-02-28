@@ -439,21 +439,18 @@ void QtGeomPlaneCutPanel::preview (bool show, bool destroyInteractor)
 						255 * Resources::instance ( )._previewColor.getRed ( ),
 						255 * Resources::instance ( )._previewColor.getGreen ( ),
 						255 * Resources::instance ( )._previewColor.getBlue ( )));
-	graphicalProps.setPointSize (
-							Resources::instance ( )._previewPointSize.getValue ( ));
+	graphicalProps.setPointSize (Resources::instance ( )._previewPointSize.getValue ( ));
 	graphicalProps.setWireColor (Color (
 						255 * Resources::instance ( )._previewColor.getRed ( ),
 						255 * Resources::instance ( )._previewColor.getGreen ( ),
 						255 * Resources::instance ( )._previewColor.getBlue ( )));
-	graphicalProps.setLineWidth (
-								Resources::instance ( )._previewWidth.getValue ( ));
+	graphicalProps.setLineWidth (Resources::instance ( )._previewWidth.getValue ( ));
 
 	// Les entités soumises à la coupe :
 	const vector<string>	entities	= getCutEntities ( );
-	double	xMin = DBL_MAX, xMax = -DBL_MAX, yMin = DBL_MAX,
-	        yMax = -DBL_MAX, zMin = DBL_MAX, zMax = -DBL_MAX;
-	for (vector<string>::const_iterator it = entities.begin ( );
-	     entities.end ( ) != it; it++)
+	double	xMin = DBL_MAX, xMax = -DBL_MAX, yMin = DBL_MAX, yMax = -DBL_MAX, zMin = DBL_MAX, zMax = -DBL_MAX;
+	unique_ptr<RenderingManager::DisplayLocker>	displayLocker (new RenderingManager::DisplayLocker (getRenderingManager ( )));
+	for (vector<string>::const_iterator it = entities.begin ( ); entities.end ( ) != it; it++)
 	{
 		GeomEntity*	entity	= getContext ( ).getGeomManager ( ).getEntity (*it);
 		CHECK_NULL_PTR_ERROR (entity)
@@ -465,23 +462,20 @@ void QtGeomPlaneCutPanel::preview (bool show, bool destroyInteractor)
 		yMax	= bounds [3] > yMax ? bounds [3] : yMax;
 		zMin	= bounds [4] < zMin ? bounds [4] : zMin;
 		zMax	= bounds [5] > zMax ? bounds [5] : zMax;
-		DisplayProperties::GraphicalRepresentation*	gr	=
-				entity->getDisplayProperties ( ).getGraphicalRepresentation ( );
+		DisplayProperties::GraphicalRepresentation*	gr	= entity->getDisplayProperties ( ).getGraphicalRepresentation ( );
 		CHECK_NULL_PTR_ERROR (gr)
-		RenderedEntityRepresentation*	rep	=
-								dynamic_cast<RenderedEntityRepresentation*>(gr);
+		RenderedEntityRepresentation*	rep	= dynamic_cast<RenderedEntityRepresentation*>(gr);
 		if (0 != rep)
 				rep->setRenderingManager (&getRenderingManager ( ));
 		registerHighlightedEntity (*entity);
-		gr->setHighlighted (true);
+		gr->setHighlighted (true, false);
 	}	// for (vector<string>::const_iterator it = entities.begin ( ); ...
-
+	displayLocker.reset ( );
+	
 	// La représentation de la coupe :
 	Math::Point		p1 (getPoint ( ));
 	Math::Vector	normal (getNormal ( ));
-	Math::Point		p2 (p1.getX ( ) + normal.getX ( ),
-					    p1.getY ( ) + normal.getY ( ),
-					    p1.getZ ( ) + normal.getZ ( ));
+	Math::Point		p2 (p1.getX ( ) + normal.getX ( ), p1.getY ( ) + normal.getY ( ), p1.getZ ( ) + normal.getZ ( ));
 	// Si pb de boite englobante, par ex car 0==entities.size ( ), on
 	// prend la bounding box de la vue 3D.
 	if ((false == NumericServices::isValidAndNotMax (xMin)) ||
@@ -490,8 +484,7 @@ void QtGeomPlaneCutPanel::preview (bool show, bool destroyInteractor)
 	    (false == NumericServices::isValidAndNotMax (yMax)) ||
 	    (false == NumericServices::isValidAndNotMax (zMin)) ||
 	    (false == NumericServices::isValidAndNotMax (zMax)))
-		getRenderingManager ( ).getBoundingBox (
-											xMin, xMax, yMin, yMax, zMin, zMax);
+		getRenderingManager ( ).getBoundingBox (xMin, xMax, yMin, yMax, zMin, zMax);
 	if ((false == NumericServices::isValidAndNotMax (xMin)) ||
 	    (false == NumericServices::isValidAndNotMax (xMax)) ||
 	    (false == NumericServices::isValidAndNotMax (yMin)) ||
@@ -502,26 +495,13 @@ void QtGeomPlaneCutPanel::preview (bool show, bool destroyInteractor)
 	RenderingManager::PlaneInteractor*	interactor	= getInteractor ( );
 	if (0 == interactor)
 	{
-		interactor	= getRenderingManager ( ).createPlaneInteractor (
-						p1, normal, xMin, xMax, yMin, yMax, zMin, zMax, this);
+		interactor	= getRenderingManager ( ).createPlaneInteractor (p1, normal, xMin, xMax, yMin, yMax, zMin, zMax, this);
 		registerPreviewedInteractor (interactor);
 	}
 	else
 	{
 		interactor->setPlane (p1, normal);
 	}
-/*
-		if (0 == _interactor)
-		{
-			vector<Math::Point>	points;
-			points.push_back (p1);
-			_previewIDs.push_back (
-				renderingManager.createCloudRepresentation (
-												points, graphicalProps, true));
-			_previewIDs.push_back (
-				renderingManager.createVector (p1, p2, graphicalProps, true));
-		}	// if (0 == _interactor)
-*/
 
 	QT_PREVIEW_COMPLETE_TRY_CATCH_BLOCK
 

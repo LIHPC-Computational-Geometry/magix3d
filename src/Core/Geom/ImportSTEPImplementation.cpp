@@ -16,7 +16,7 @@
 #include "Geom/ImportSTEPImplementation.h"
 #include "Utils/MgxException.h"
 /*----------------------------------------------------------------------------*/
-#include "TkUtil/Exception.h"
+#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
 #include <STEPControl_Reader.hxx>

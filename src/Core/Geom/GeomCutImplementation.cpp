@@ -18,10 +18,9 @@
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
-#include "Geom/OCCGeomRepresentation.h"
 #include "Geom/EntityFactory.h"
 /*----------------------------------------------------------------------------*/
-#include "TkUtil/Exception.h"
+#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Face.hxx>
@@ -82,27 +81,20 @@ void GeomCutImplementation::perform(std::vector<GeomEntity*>& res)
 void GeomCutImplementation::cutVolumes(std::vector<GeomEntity*>& res)
 {
     //entite a conserver
-    GeomEntity* e1 = m_init_entities[0];
-    TopoDS_Shape s1;
-    getOCCShape(e1, s1);
+    Volume* e1 = dynamic_cast<Volume*>(m_init_entities[0]);
+    TopoDS_Shape s1 = e1->getOCCShape();
 
-
-
-    GeomEntity* e2 = m_init_entities[1];
-
-    TopoDS_Shape cutting_assembly;
-
-    getOCCShape(e2, cutting_assembly);
+    Volume* e2 = dynamic_cast<Volume*>(m_init_entities[1]);
+    TopoDS_Shape cutting_assembly = e2->getOCCShape();
     for(unsigned int i=2;i<m_init_entities.size();i++){
-        GeomEntity* e3 = m_init_entities[i];
-        TopoDS_Shape s3;
-        getOCCShape(e3, s3);
+        Volume* e3 = dynamic_cast<Volume*>(m_init_entities[i]);
+        TopoDS_Shape s3 = e3->getOCCShape();
 
         BRepAlgoAPI_Fuse fuse_operator(cutting_assembly, s3);
         TopoDS_Shape s;
         if(fuse_operator.IsDone())
         {
-            s= fuse_operator.Shape();
+            s = fuse_operator.Shape();
             ShapeAnalysis_ShapeContents cont;
             cont.Clear();
             cont.Perform(s);

@@ -9,7 +9,7 @@
 #include "Internal/ContextIfc.h"
 /*----------------------------------------------------------------------------*/
 #include "Utils/Common.h"
-#include <Geom/CommandExportVTK.h>
+#include "Geom/CommandExportVTK.h"
 #include "Geom/GeomManager.h"
 #include "Geom/ExportVTKImplementation.h"
 /*----------------------------------------------------------------------------*/

@@ -1,15 +1,16 @@
 #include "Internal/ContextIfc.h"
 
-#include <QtVtkComponents/QtVtkMgx3DMainWindow.h>
-#include <QtVtkComponents/QtVtkMgx3DApplication.h>
-#include <QtVtkComponents/QtVtkGraphicalWidget.h>
+#include "QtVtkComponents/QtVtkMgx3DMainWindow.h"
+#include "QtVtkComponents/QtVtkMgx3DApplication.h"
+#include "QtVtkComponents/QtVtkGraphicalWidget.h"
 #include "QtVtkComponents/VTKSelectionManagerDimFilter.h"
 #include "QtVtkComponents/VTKRenderingManager.h"
 #include "Internal/Context.h"
-#include <Utils/ErrorManagement.h>
+#include "Utils/ErrorManagement.h"
 #include "Utils/CommandManager.h"
 #include "Internal/Mgx3DArguments.h"
 #include "Python/M3DPythonSession.h"
+
 #include <TkUtil/ErrorLog.h>
 #include <TkUtil/InformationLog.h>
 #include <TkUtil/MemoryError.h>

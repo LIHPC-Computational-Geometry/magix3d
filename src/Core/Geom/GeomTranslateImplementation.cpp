@@ -18,6 +18,8 @@
 #include "Geom/Volume.h"
 #include "Geom/CommandGeomCopy.h"
 /*----------------------------------------------------------------------------*/
+#include <BRepBuilderAPI_Transform.hxx>
+/*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
@@ -89,37 +91,43 @@ void GeomTranslateImplementation::perform(std::vector<GeomEntity*>& res)
 void GeomTranslateImplementation::
 translateSingle(GeomEntity* e)
 {
-    //std::cout<<"GeomTranslateImplementation::translateSingle pour "<<e->getName()<<std::endl;
-    std::vector<GeomRepresentation*> reps = e->getComputationalProperties();
-    std::vector<GeomRepresentation*> new_reps;
-    for (uint i=0; i<reps.size(); i++){
-        GeomRepresentation* new_rep = reps[i]->clone();
-        new_rep->translate(m_dv);
-
-        new_reps.push_back(new_rep);
-    }
-
-    e->setComputationalProperties(new_reps);
+    auto trans = [&](const TopoDS_Shape& sh) { return translate(sh, m_dv); };
+    e->applyAndReturn(trans);
     e->setGeomProperty(new GeomProperty());
+}
+/*----------------------------------------------------------------------------*/
+TopoDS_Shape GeomTranslateImplementation::
+translate(const TopoDS_Shape& shape, const Utils::Math::Vector& V)
+{
+    gp_Trsf T;
+    gp_Vec v(V.getX(),V.getY(),V.getZ());
+    T.SetTranslation(v);
+    BRepBuilderAPI_Transform translat(T);
+    //on effectue la translation
+    translat.Perform(shape);
+
+    if(!translat.IsDone())
+        throw TkUtil::Exception("Echec d'une translation!!");
+
+    //on stocke le résultat de la translation (maj de la shape interne)
+    return translat.Shape();
 }
 /*----------------------------------------------------------------------------*/
 void GeomTranslateImplementation::
 performUndo()
 {
     Utils::Math::Vector dv_inv(-m_dv.getX(), -m_dv.getY(), -m_dv.getZ());
-    for (uint i=0; i<m_undoableEntities.size(); i++){
-        GeomRepresentation* rep = m_undoableEntities[i]->getComputationalProperty();
-        rep->translate(dv_inv);
-    }
+    auto undo = [&](const TopoDS_Shape& sh) { return translate(sh, dv_inv); };
+    for (uint i=0; i<m_undoableEntities.size(); i++)
+        m_undoableEntities[i]->applyAndReturn(undo);
 }
 /*----------------------------------------------------------------------------*/
 void GeomTranslateImplementation::
 performRedo()
 {
-    for (uint i=0; i<m_undoableEntities.size(); i++){
-        GeomRepresentation* rep = m_undoableEntities[i]->getComputationalProperty();
-        rep->translate(m_dv);
-    }
+    auto redo = [&](const TopoDS_Shape& sh) { return translate(sh, m_dv); };
+    for (uint i=0; i<m_undoableEntities.size(); i++)
+        m_undoableEntities[i]->applyAndReturn(redo);
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

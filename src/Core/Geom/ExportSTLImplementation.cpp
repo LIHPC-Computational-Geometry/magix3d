@@ -6,8 +6,7 @@
  *      Author: Eric B
  */
 /*----------------------------------------------------------------------------*/
-#include <Geom/ExportSTLImplementation.h>
-#include <Geom/OCCGeomRepresentation.h>
+#include "Geom/ExportSTLImplementation.h"
 #include "Geom/GeomEntity.h"
 #include "Utils/Entity.h"
 /*----------------------------------------------------------------------------*/
@@ -36,16 +35,13 @@ ExportSTLImplementation::~ExportSTLImplementation()
 /*----------------------------------------------------------------------------*/
 void ExportSTLImplementation::write()
 {
-	if (m_geomEntities.size() != 1)
-		throw TkUtil::Exception (TkUtil::UTF8String ("ExportSTLImplementation ne peut fonctionner qu'avec une unique entité", TkUtil::Charset::UTF_8));
-
-
-	GeomRepresentation* rep = m_geomEntities[0]->getComputationalProperty();
-	OCCGeomRepresentation* geom_rep =
-			            dynamic_cast<OCCGeomRepresentation*>(rep);
-	CHECK_NULL_PTR_ERROR(geom_rep);
-
-	 Standard_Boolean err = StlAPI::Write(geom_rep->getShape(), m_filename.c_str(), true);
+    BRep_Builder builder;
+    TopoDS_Compound compound;
+    builder.MakeCompound(compound);	
+    auto add = [&](const TopoDS_Shape& sh) { builder.Add(compound, sh); };
+	for (auto ge : m_geomEntities)
+	    ge->apply(add);
+	StlAPI::Write(compound, m_filename.c_str(), true);
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

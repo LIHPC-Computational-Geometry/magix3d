@@ -15,8 +15,8 @@
 #include "Utils/Vector.h"
 /*----------------------------------------------------------------------------*/
 #include <list>
-
-class TopoDS_Edge;
+/*----------------------------------------------------------------------------*/
+#include <TopoDS_Face.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -55,12 +55,12 @@ public:
      *  \param ctx le contexte
      *  \param prop propriété (nom ...)
      *  \param disp propriétés d'affichage
-     *  \param gprop    les propriétés associées à la surface
-     *  \param compProp les propriétés de calcul
+     *  \param gprop les propriétés associées à la surface
+     *  \param shape la shape OCC
      */
 #ifndef SWIG
     Surface(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, GeomRepresentation* compProp=0);
+            GeomProperty* gprop, TopoDS_Face& shape);
 #endif
 
     /** \brief  Constructeur
@@ -68,13 +68,17 @@ public:
      *  \param ctx le contexte
      *  \param prop propriété (nom ...)
      *  \param disp propriétés d'affichage
-     *  \param gprop    les propriétés associées à la surface composite
-     *  \param compProp les propriétés de calcul des surfaces
+     *  \param gprop les propriétés associées à la surface composite
+     *  \param shapes les shapes OCC
      */
 #ifndef SWIG
     Surface(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-            GeomProperty* gprop, std::vector<GeomRepresentation*>& compProp);
+            GeomProperty* gprop, std::vector<TopoDS_Face>& shapes);
 #endif
+    const std::vector<TopoDS_Face>& getOCCFaces() const { return m_occ_faces; }
+
+    virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const;
+    virtual void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
@@ -111,6 +115,14 @@ public:
                        std::vector<Vertex* >&  vert);
 
     /*------------------------------------------------------------------------*/
+    /** \brief  Calcul de la boite englobante orientée selon les axes Ox,Oy,Oz
+     *
+     *  \param pmin Les coordonnées min de la boite englobante
+     *  \param pmax Les coordonnées max de la boite englobante
+     */
+    virtual void computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const;
+
+    /*------------------------------------------------------------------------*/
     /** \brief  Calcule l'aire d'une entité:  Pour une courbe, c'est la
      *          longueur, pour une surface, l'aire, pour un volume le volume.
      */
@@ -134,8 +146,7 @@ public:
      *  \param curves les courbes incidents
      */
     virtual void get(std::vector<Curve*>& curves) const;
-    virtual void getTemporary(std::vector<Curve*>& curves) const;
-
+    
     /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès aux surfaces géométriques incidentes
      *
@@ -157,13 +168,6 @@ public:
      */
     virtual bool contains(Surface* ASurf) const;
 
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Projete le point P sur la surface. P est modifié
-     *  \param P le point à projeter
-     */
-    virtual void project(Utils::Math::Point& P) const;
-
     /*------------------------------------------------------------------------*/
     /** \brief Calcul la normale à une surface en un point
      *
@@ -172,48 +176,6 @@ public:
      */
     virtual void normal(const Utils::Math::Point& P1, Utils::Math::Vector& V2) const;
 
-    /*------------------------------------------------------------------------*/
-    /** \brief Fournit les parametres [U1,U2]x[V1,V2] de la parametrisation de
-     *         la surface
-     */
-    virtual void getParametricBounds(double& U1,double& U2,double& V1,double& V2) const;
-    /*------------------------------------------------------------------------*/
-    /** \brief Get the parametrics bounds of this surface
-     *
-     *  \return AUMin u min value of the paramtric space
-     *  \return AUMax u max value of the paramtric space
-     *  \return AVMin v min value of the paramtric space
-     *  \return AVMax v max value of the paramtric space
-     */
-    virtual void bounds(double& AUMin, double& AUMax,
-    			double& AVMin, double& AVMax) const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Computes the 3D point AP, the first and second derivative in the
-     *			directions u and v at the point of parametric coordinates
-     *			(AU, AV)
-     *
-     *	\param  AU u parameter
-     *  \param  AV v parameter
-     *  \return AP 3D point in (u,v) on this surface
-     *  \return ADU  first derivative in u at point (u,v) on this surface
-     *  \return ADV  first derivative in v at point (u,v) on this surface
-     *  \return ADUU second derivative in u   at point (u,v) on this surface
-     *  \return ADUV second derivative in u,v at point (u,v) on this surface
-     *  \return ADVV second derivative in v   at point (u,v) on this surface
-     */
-    virtual void d2(const double& AU, const double& AV,
-    			Utils::Math::Point& AP,
-				Utils::Math::Vector& ADU,
-				Utils::Math::Vector& ADV,
-				Utils::Math::Vector& ADUU,
-				Utils::Math::Vector& ADUV,
-				Utils::Math::Vector& ADVV) const;
-    /*------------------------------------------------------------------------*/
-    /** \brief  Provides the orientation of this surface.
-	  */
-    virtual GeomOrientation orientation() const;
-
      /*------------------------------------------------------------------------*/
      /** \brief Retourne le point de parametre (u,v) dans l'espace de parametre
       *         de la surface. Si (u,v) est choisi hors des bornes [U1,U2] x
@@ -221,10 +183,17 @@ public:
       *         levée. La robustesse de cette méthode repose sur OCC
       */
     virtual Utils::Math::Point getPoint(const double u, const double v) const;
+
+    /*------------------------------------------------------------------------*/
+    /** \brief Projete le point P sur la surface. P est modifié
+     *  \param P le point à projeter
+     */
+    virtual uint project(Utils::Math::Point& P) const;
+
     /*------------------------------------------------------------------------*/
     /** \brief Projete le point P1 sur la surface, le résultat est le point P2.
      */
-    virtual void project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const;
+    virtual uint project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Ajoute v comme volume incident
@@ -233,13 +202,6 @@ public:
      */
 #ifndef SWIG
       virtual void add(Volume* v);
-//    /*------------------------------------------------------------------------*/
-//    /** \brief  Ajoute c comme courbe incidente
-//     *
-//     *  \param c un pointeur sur une courbe
-//     */
-//    virtual void add(TopoDS_Edge e);
-//    std::vector<TopoDS_Edge> getEdges();
 
 #endif
 
@@ -387,12 +349,10 @@ public:
     virtual void createSpecificMemento(MementoGeomEntity& mem);
 
 protected:
-
     std::vector<Curve*> m_curves;
-//    std::vector<TopoDS_Edge> m_occ_edges;
-    //std::vector<TopoDS_Edge> m_occ_edges;
     std::vector<Volume*> m_volumes;
-
+    /// représentation open cascade
+    std::vector<TopoDS_Face> m_occ_faces;
     /// Listes des groupes 2D auxquels appartient cette surface
     std::vector<Group::Group2D*> m_groups;
 };

@@ -8,17 +8,14 @@
  */
 /*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
-#include <Topo/TopoInfo.h>
-
-#include <Topo/Vertex.h>
-#include <Topo/CoEdge.h>
-#include <Topo/Edge.h>
-#include <Topo/CoFace.h>
-#include <Topo/Face.h>
-#include <Topo/Block.h>
-
+#include "Topo/TopoInfo.h"
+#include "Topo/Vertex.h"
+#include "Topo/CoEdge.h"
+#include "Topo/Edge.h"
+#include "Topo/CoFace.h"
+#include "Topo/Face.h"
+#include "Topo/Block.h"
 #include "Geom/GeomEntity.h"
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

@@ -9,9 +9,10 @@
 
 #include "QtVtkComponents/VTKMgx3DEntityRepresentation.h"
 #include "QtComponents/QtMgx3DApplication.h"
-#include <Utils/DisplayProperties.h>
-#include <Utils/MgxNumeric.h>
-#include <Utils/Vector.h>
+
+#include "Utils/DisplayProperties.h"
+#include "Utils/MgxNumeric.h"
+#include "Utils/Vector.h"
 
 #include <TkUtil/InternalError.h>
 #include <TkUtil/MemoryError.h>

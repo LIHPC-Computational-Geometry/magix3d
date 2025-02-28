@@ -102,15 +102,6 @@ public:
 	SET_SWIG_COMPLETABLE_METHOD(copy)
 
     /*------------------------------------------------------------------------*/
-    /** \brief création d'entités géométrique par copie
-     *
-     *  \param e les surfaces géométriques qui entoure le volume à créer
-     *  \param groupName un nom de groupe
-     */
-    virtual Mgx3D::Internal::M3DCommandResultIfc* newVolume(std::vector<std::string>& e, std::string groupName);
-	SET_SWIG_COMPLETABLE_METHOD(newVolume)
-
-    /*------------------------------------------------------------------------*/
     /** \brief création d'un sommet géométrique  à partir d'un point p(x,y,z)
      *         et d'une courbe ou surface. Le sommet crée est le projet de p sur la
      *         courbe ou surface.
@@ -177,31 +168,6 @@ public:
 		newSegment(std::string n1,std::string n2,
             std::string groupName="");
 	SET_SWIG_COMPLETABLE_METHOD(newSegment)
-
-    /*------------------------------------------------------------------------*/
-    /** \brief création d'un prisme à partir d'une surface et d'un vecteur de
-     *          direction
-     *
-     *  \param base la surface à extruder
-     *  \param dp   le vecteur d'extrusion
-     *  \param groupName optionnellement un nom de groupe
-     */
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
-		newPrism(std::string base, const Vector& dp,
-                          std::string groupName="");
-	SET_SWIG_COMPLETABLE_METHOD(newPrism)
-
-    /** \brief création d'un prisme à partir d'une surface et d'un vecteur de
-     *          direction, extrusion de la topologie avec
-     *
-     *  \param base la surface à extruder
-     *  \param dp   le vecteur d'extrusion
-     *  \param groupName optionnellement un nom de groupe
-     */
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
-		newPrismWithTopo(std::string base, const Vector& dp,
-                          std::string groupName="");
-	SET_SWIG_COMPLETABLE_METHOD(newPrismWithTopo)
 
     /*------------------------------------------------------------------------*/
     /** \brief création d'un cone suivant un axe, avec deux rayons

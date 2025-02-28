@@ -6,12 +6,11 @@
  *      Author: ledouxf
  */
 /*----------------------------------------------------------------------------*/
-#include <Geom/ExportSTEPImplementation.h>
-#include <Geom/OCCGeomRepresentation.h>
-#include <Geom/Volume.h>
-#include <Geom/Surface.h>
-#include <Geom/Curve.h>
-#include <Geom/Vertex.h>
+#include "Geom/ExportSTEPImplementation.h"
+#include "Geom/Volume.h"
+#include "Geom/Surface.h"
+#include "Geom/Curve.h"
+#include "Geom/Vertex.h"
 /*----------------------------------------------------------------------------*/
 #include <iostream>
 #include <TkUtil/MemoryError.h>
@@ -69,13 +68,8 @@ ExportSTEPImplementation::~ExportSTEPImplementation()
 void ExportSTEPImplementation::
 addGeomEntityToExport(GeomEntity* geomEntity)
 {
-	std::vector<GeomRepresentation*> reps = geomEntity->getComputationalProperties();
-	for (uint i=0; i<reps.size(); i++){
-		OCCGeomRepresentation* geom_rep =
-		            dynamic_cast<OCCGeomRepresentation*>(reps[i]);
-		CHECK_NULL_PTR_ERROR(geom_rep);
-		m_writer.Transfer(geom_rep->getShape(), STEPControl_AsIs);
-	}
+    auto add = [&](const TopoDS_Shape& sh) { m_writer.Transfer(sh, STEPControl_AsIs); };
+    geomEntity->apply(add);
 }
 /*----------------------------------------------------------------------------*/
 void ExportSTEPImplementation::write()

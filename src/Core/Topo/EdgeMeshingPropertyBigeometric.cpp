@@ -8,10 +8,10 @@
  */
 /*----------------------------------------------------------------------------*/
 #include "Topo/EdgeMeshingPropertyBigeometric.h"
-#include <TkUtil/UTF8String.h>
-#include "TkUtil/Exception.h"
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
+#include <TkUtil/UTF8String.h>
+#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

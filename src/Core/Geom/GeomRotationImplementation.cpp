@@ -15,13 +15,13 @@
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
 #include "Geom/EntityFactory.h"
-#include "Geom/OCCGeomRepresentation.h"
 #include "Geom/GeomRotationImplementation.h"
 #include "Geom/CommandGeomCopy.h"
 /*----------------------------------------------------------------------------*/
 //inclusion de fichiers en-tête d'Open Cascade
 #include <TopoDS_Shape.hxx>
 #include <BRepPrimAPI_MakeRevol.hxx>
+#include <BRepBuilderAPI_Transform.hxx>
 #include <gp_Ax1.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
@@ -110,35 +110,48 @@ void GeomRotationImplementation::perform(std::vector<GeomEntity*>& res)
 void GeomRotationImplementation::
 makeRevol(GeomEntity* e)
 {
-    std::vector<GeomRepresentation*> reps = e->getComputationalProperties();
-    std::vector<GeomRepresentation*> new_reps;
-    for (uint i=0; i<reps.size(); i++){
-        GeomRepresentation* new_rep = reps[i]->clone();
-        new_rep->rotate(m_axis1,m_axis2,m_angle);
-
-        new_reps.push_back(new_rep);
-    }
-
-    e->setComputationalProperties(new_reps);
+    auto revol = [&](const TopoDS_Shape& sh) { return rotate(sh, m_axis1, m_axis2, m_angle); };
+    e->applyAndReturn(revol);
     e->setGeomProperty(new GeomProperty());
+}
+/*----------------------------------------------------------------------------*/
+TopoDS_Shape GeomRotationImplementation::
+rotate(const TopoDS_Shape& shape, const Utils::Math::Point& P1, const Utils::Math::Point& P2, double Angle) const
+{
+    gp_Trsf T;
+    gp_Pnt p1(P1.getX(),P1.getY(),P1.getZ());
+
+    gp_Dir dir( P2.getX()-P1.getX(),
+                P2.getY()-P1.getY(),
+                P2.getZ()-P1.getZ());
+
+    gp_Ax1 axis(p1,dir);
+    T.SetRotation(axis,Angle);
+    BRepBuilderAPI_Transform rotat(T);
+    //on effectue la rotation
+    rotat.Perform(shape);
+
+    if(!rotat.IsDone())
+        throw TkUtil::Exception("Echec d'une rotation!!");
+
+    //on stocke le résultat de la translation (maj de la shape interne)
+    return rotat.Shape();
 }
 /*----------------------------------------------------------------------------*/
 void GeomRotationImplementation::
 performUndo()
 {
-    for (uint i=0; i<m_undoableEntities.size(); i++){
-        GeomRepresentation* rep = m_undoableEntities[i]->getComputationalProperty();
-        rep->rotate(m_axis1,m_axis2,-m_angle);
-    }
+    auto undo = [&](const TopoDS_Shape& sh) { return rotate(sh, m_axis1, m_axis2, -m_angle); };
+    for (uint i=0; i<m_undoableEntities.size(); i++)
+        m_undoableEntities[i]->applyAndReturn(undo);
 }
 /*----------------------------------------------------------------------------*/
 void GeomRotationImplementation::
 performRedo()
 {
-    for (uint i=0; i<m_undoableEntities.size(); i++){
-        GeomRepresentation* rep = m_undoableEntities[i]->getComputationalProperty();
-        rep->rotate(m_axis1,m_axis2,m_angle);
-    }
+    auto redo = [&](const TopoDS_Shape& sh) { return rotate(sh, m_axis1, m_axis2, m_angle); };
+    for (uint i=0; i<m_undoableEntities.size(); i++)
+        m_undoableEntities[i]->applyAndReturn(redo);
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

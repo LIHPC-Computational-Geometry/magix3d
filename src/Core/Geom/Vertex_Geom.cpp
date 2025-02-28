@@ -16,9 +16,9 @@
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
 #include "Geom/GeomDisplayRepresentation.h"
-#include "Geom/OCCGeomRepresentation.h"
-#include "Group/Group0D.h"
+#include "Geom/OCCHelper.h"
 #include "Geom/MementoGeomEntity.h"
+#include "Group/Group0D.h"
 #include "Internal/Context.h"
 #include "Topo/Vertex.h"
 /*----------------------------------------------------------------------------*/
@@ -40,9 +40,20 @@ namespace Geom {
 const char* Vertex::typeNameGeomVertex = "GeomVertex";
 /*----------------------------------------------------------------------------*/
 Vertex::Vertex(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
-        GeomProperty* gprop, GeomRepresentation* compProp)
-: GeomEntity(ctx, prop, disp, gprop,compProp)
+        GeomProperty* gprop, TopoDS_Vertex& shape)
+: GeomEntity(ctx, prop, disp, gprop)
+, m_occ_vertex(shape)
 {
+}
+/*----------------------------------------------------------------------------*/
+void Vertex::apply(std::function<void(const TopoDS_Shape&)> const& lambda) const
+{
+    lambda(m_occ_vertex);
+}
+/*----------------------------------------------------------------------------*/
+void Vertex::applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda)
+{
+    m_occ_vertex = TopoDS::Vertex(lambda(m_occ_vertex));
 }
 /*----------------------------------------------------------------------------*/
 GeomEntity* Vertex::clone(Internal::Context& c)
@@ -51,7 +62,7 @@ GeomEntity* Vertex::clone(Internal::Context& c)
             c.newProperty(this->getType()),
             c.newDisplayProperties(this->getType()),
             new GeomProperty(),
-            this->getComputationalProperty()->clone());
+            m_occ_vertex);
 }
 /*----------------------------------------------------------------------------*/
 Vertex::~Vertex()
@@ -62,12 +73,15 @@ void Vertex::setFromSpecificMemento(MementoGeomEntity& mem)
 {
     m_curves = mem.getCurves();
     m_groups = mem.getGroups0D();
+    m_occ_vertex = TopoDS::Vertex(mem.getOCCShapes()[0]);
 }
 /*----------------------------------------------------------------------------*/
 void Vertex::createSpecificMemento(MementoGeomEntity& mem)
 {
     mem.setCurves(m_curves);
     mem.setGroups0D(m_groups);
+    std::vector<TopoDS_Shape> shapes = { m_occ_vertex };
+    mem.setOCCShapes(shapes);
 }
 /*----------------------------------------------------------------------------*/
 void Vertex::getRefEntities(std::vector<GeomEntity*>& entities)
@@ -111,7 +125,7 @@ Mgx3D::Utils::SerializedRepresentation* Vertex::getDescription (bool alsoCompute
 #ifdef _DEBUG		// Issue#111
     // précision OpenCascade ou autre
 	TkUtil::UTF8String	precStr (TkUtil::Charset::UTF_8);
-    precStr<<getComputationalProperty()->getPrecision();
+    precStr << BRep_Tool::Tolerance(m_occ_vertex);;
 
     propertyGeomDescription.addProperty (
     	        Utils::SerializedRepresentation::Property ("Précision", precStr.ascii()) );
@@ -137,6 +151,11 @@ std::string Vertex::getSummary ( ) const
 double Vertex::computeArea() const
 {
     return 0;
+}
+/*----------------------------------------------------------------------------*/
+void Vertex::computeBoundingBox(Utils::Math::Point& pmin,Utils::Math::Point& pmax) const
+{
+    OCCHelper::computeBoundingBox(m_occ_vertex, pmin, pmax);
 }
 /*----------------------------------------------------------------------------*/
 void Vertex::get(std::vector<Vertex*>& vertices) const
@@ -206,14 +225,16 @@ void Vertex::get(std::vector<Topo::Vertex*>& vertices)
 		}
 }
 /*----------------------------------------------------------------------------*/
-void Vertex::project(Utils::Math::Point& P) const
+uint Vertex::project(Utils::Math::Point& P) const
 {
     P = getCenteredPosition();
+    return 0;
 }
 /*----------------------------------------------------------------------------*/
-void Vertex::project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const
+uint Vertex::project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const
 {
     P2 = getCenteredPosition();
+    return 0;
 }
 /*----------------------------------------------------------------------------*/
 void Vertex::add(Curve* c)
@@ -234,16 +255,8 @@ void Vertex::remove(Curve* c)
 /*----------------------------------------------------------------------------*/
 Utils::Math::Point Vertex::getCenteredPosition() const
 {
-    OCCGeomRepresentation* rep =
-            dynamic_cast<OCCGeomRepresentation*>(getComputationalProperty());
-    if (rep){
-
-    	TopoDS_Vertex v = TopoDS::Vertex(rep->getShape());
-    	gp_Pnt pnt = BRep_Tool::Pnt(v);
-    	return Utils::Math::Point(pnt.X(),pnt.Y(), pnt.Z());
-    }
-    else
-    	throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, type inconnu pour getCenteredPosition", TkUtil::Charset::UTF_8));
+    gp_Pnt pnt = BRep_Tool::Pnt(m_occ_vertex);
+    return Utils::Math::Point(pnt.X(),pnt.Y(), pnt.Z());
 }
 /*----------------------------------------------------------------------------*/
 Utils::Math::Point Vertex::getCoord() const

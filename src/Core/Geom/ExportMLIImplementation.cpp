@@ -6,13 +6,14 @@
  *      Author: legoff
  */
 /*----------------------------------------------------------------------------*/
-#include <Geom/ExportMLIImplementation.h>
-#include <Geom/Volume.h>
-#include <Geom/Surface.h>
-#include <Geom/Curve.h>
-#include <Geom/Vertex.h>
-#include <Mesh/MeshItf.h>
-#include <Mesh/Surface.h>
+#include "Geom/ExportMLIImplementation.h"
+#include "Geom/Volume.h"
+#include "Geom/Surface.h"
+#include "Geom/Curve.h"
+#include "Geom/Vertex.h"
+#include "Geom/OCCFacetedRepresentationBuilder.h"
+#include "Mesh/MeshItf.h"
+#include "Mesh/Surface.h"
 /*----------------------------------------------------------------------------*/
 #include <gmds/ig/Mesh.h>
 #include <gmds/io/LimaWriter.h>
@@ -48,12 +49,17 @@ void ExportMLIImplementation::perform(Internal::InfoCommand* icmd)
 	gmds::MeshModel mod = gmds::DIM3|gmds::N|gmds::E|gmds::F|gmds::E2N|gmds::F2N;
 	gmds::Mesh mesh(mod);
 
+	
 	try {
 		std::vector<std::string> surfacesNames = m_context.getLocalGeomManager().getSurfaces();
 		for(int iSurf=0; iSurf<surfacesNames.size(); iSurf++) {
 			Geom::Surface* surf = m_context.getLocalGeomManager().getSurface(surfacesNames[iSurf]);
 			std::vector<gmds::math::Triangle> triangles;
-			surf->getFacetedRepresentation(triangles);
+			auto add = [&](const TopoDS_Shape& sh) {
+				OCCFacetedRepresentationBuilder builder(sh);
+				builder.execute(triangles);
+			};
+			surf->apply(add);
 
 			auto surf_group = mesh.getGroup<gmds::Face>(iSurf);
 			for(int iTri=0; iTri<triangles.size(); iTri++) {
@@ -69,7 +75,11 @@ void ExportMLIImplementation::perform(Internal::InfoCommand* icmd)
 		for(int iCurv=0; iCurv<curvesNames.size(); iCurv++) {
 			Geom::Curve* curv = m_context.getLocalGeomManager().getCurve(curvesNames[iCurv]);
 			std::vector<gmds::math::Triangle> triangles;
-			curv->getFacetedRepresentation(triangles);
+			auto add = [&](const TopoDS_Shape& sh) {
+				OCCFacetedRepresentationBuilder builder(sh);
+				builder.execute(triangles);
+			};
+			curv->apply(add);
 
 			auto line_group = mesh.getGroup<gmds::Edge>(curvesNames[iCurv]);
 			for(int iTri=0; iTri<triangles.size(); iTri++) {
@@ -84,7 +94,11 @@ void ExportMLIImplementation::perform(Internal::InfoCommand* icmd)
 		for(int iVert=0; iVert<verticesNames.size(); iVert++) {
 			Geom::Vertex* vert = m_context.getLocalGeomManager().getVertex(verticesNames[iVert]);
 			std::vector<gmds::math::Triangle> triangles;
-			vert->getFacetedRepresentation(triangles);
+			auto add = [&](const TopoDS_Shape& sh) {
+				OCCFacetedRepresentationBuilder builder(sh);
+				builder.execute(triangles);
+			};
+			vert->apply(add);
 
 			auto cloud_group = mesh.newGroup<gmds::Node>(verticesNames[iVert]);
 			for(int iTri=0; iTri<triangles.size(); iTri++) {

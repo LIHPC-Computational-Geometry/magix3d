@@ -649,15 +649,6 @@ plusieurs surfaces et un vecteur pour construire le[s] volume[s] par
 extrusion des surfaces. Il est également possible d’obtenir la
 construction des blocs par extrusion.
 
-.. _creation-volume:
-
-Créer un volume |image114|
-'''''''''''''''''''''''''''''
-
-La création d’un volume à partir de surfaces se fait en
-sélectionnant un ensemble fermé de surfaces. La difficulté réside dans
-le fait qu’il ne faut pas de trous entre 2 surfaces.
-
 .. _operations-booleennes:
 
 Réaliser une opération booléenne |image118|

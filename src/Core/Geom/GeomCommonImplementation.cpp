@@ -18,11 +18,10 @@
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
-#include "Geom/OCCGeomRepresentation.h"
 #include "Geom/EntityFactory.h"
 #include "Utils/MgxNumeric.h"
 /*----------------------------------------------------------------------------*/
-#include "TkUtil/Exception.h"
+#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
 #include <TopoDS.hxx>
@@ -60,13 +59,11 @@ void GeomCommonImplementation::perform(std::vector<GeomEntity*>& res)
 /*----------------------------------------------------------------------------*/
 void GeomCommonImplementation::commonVolumes(std::vector<GeomEntity*>& res)
 {
-    GeomEntity* e1 = m_init_entities[0];
-    TopoDS_Shape s1;
-    getOCCShape(e1, s1);
+    Volume* e1 = dynamic_cast<Volume*>(m_init_entities[0]);
+    TopoDS_Shape s1 = e1->getOCCShape();
     for(unsigned int i=1;i<m_init_entities.size();i++){
-        GeomEntity* e2 = m_init_entities[i];
-        TopoDS_Shape s2;
-        getOCCShape(e2, s2);
+        Volume* e2 = dynamic_cast<Volume*>(m_init_entities[i]);
+        TopoDS_Shape s2 = e2->getOCCShape();
 
         BRepAlgoAPI_Common Common_operator(s1, s2);
         TopoDS_Shape s;

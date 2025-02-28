@@ -6,13 +6,12 @@
  *      Author: ledouxf
  */
 /*----------------------------------------------------------------------------*/
-#include <Geom/ExportIGESImplementation.h>
-#include <Geom/OCCGeomRepresentation.h>
-#include <Geom/Volume.h>
-#include <Geom/Surface.h>
-#include <Geom/Curve.h>
-#include <Geom/Vertex.h>
-#include <Utils/Unit.h>
+#include "Geom/ExportIGESImplementation.h"
+#include "Geom/Volume.h"
+#include "Geom/Surface.h"
+#include "Geom/Curve.h"
+#include "Geom/Vertex.h"
+#include "Utils/Unit.h"
 /*----------------------------------------------------------------------------*/
 #include <iostream>
 #include <TkUtil/MemoryError.h>
@@ -77,13 +76,8 @@ ExportIGESImplementation::~ExportIGESImplementation()
 void ExportIGESImplementation::
 addGeomEntityToExport(GeomEntity* geomEntity)
 {
-	std::vector<GeomRepresentation*> reps = geomEntity->getComputationalProperties();
-	for (uint i=0; i<reps.size(); i++){
-		OCCGeomRepresentation* geom_rep =
-		            dynamic_cast<OCCGeomRepresentation*>(reps[i]);
-		CHECK_NULL_PTR_ERROR(geom_rep);
-		m_writer->AddShape(geom_rep->getShape());
-	}
+    auto add = [&](const TopoDS_Shape& sh) { m_writer->AddShape(sh); };
+    geomEntity->apply(add);
 }
 /*----------------------------------------------------------------------------*/
 void ExportIGESImplementation::write()

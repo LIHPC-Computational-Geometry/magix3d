@@ -10,8 +10,7 @@
 #include "QtComponents/QtMgx3DApplication.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/EntitySeizureManager.h"
-#include <QtUtil/QtErrorManagement.h>
-#include <QtComponents/QtMgx3DPreferencesDialog.h>
+#include "QtComponents/QtMgx3DPreferencesDialog.h"
 #include "Utils/Common.h"
 #include "Utils/DisplayProperties.h"
 
@@ -23,24 +22,26 @@
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/NumericConversions.h>
 #include <TkUtil/NetworkData.h>
-#include <PrefsCore/PreferencesHelper.h>
 #include <TkUtil/RemoteProcess.h>
 #include <TkUtil/ThreadManager.h>
 #include <TkUtil/ThreadPool.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/UserData.h>
+
 #include <QtUtil/QtAutoWaitingCursor.h>
+#include <QtUtil/QtErrorManagement.h>
 #include <QtUtil/QtHelpWindow.h>
+#include <QtUtil/QtStringHelper.h>
+#include <QtUtil/QtValidatedTextField.h>
+
+#include <PrefsCore/PreferencesHelper.h>
 #include <PrefsQt/QtPrefsUpdater.h>
 #include <QtPython3/QtPython.h>
 #include <QtPython3/QtPythonConsole.h>
-#include <QtUtil/QtStringHelper.h>
-#include <QtUtil/QtValidatedTextField.h>
 #include <QwtCharts/QwtChartsManager.h>
 #include <PrefsXerces/XMLLoader.h>
 
 #include <QTextCodec>
-
 
 using namespace std;
 using namespace TkUtil;

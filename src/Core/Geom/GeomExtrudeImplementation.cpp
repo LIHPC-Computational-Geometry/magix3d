@@ -18,12 +18,12 @@
 #include <set>
 /*----------------------------------------------------------------------------*/
 #include "Geom/GeomExtrudeImplementation.h"
-#include "Geom/OCCGeomRepresentation.h"
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
 #include "Geom/EntityFactory.h"
+#include "Geom/OCCHelper.h"
 /*----------------------------------------------------------------------------*/
 //inclusion de fichiers en-tête d'Open Cascade
 #include <TopoDS_Shape.hxx>
@@ -142,9 +142,7 @@ void GeomExtrudeImplementation::makeExtrude(Vertex* v,std::vector<GeomEntity*>& 
 #ifdef _DEBUG2
 	std::cout<<"GeomExtrudeImplementation::makeExtrude ("<<v->getName()<<")"<<std::endl;
 #endif
-    TopoDS_Shape s;
-    getOCCShape(v, s);
-
+    TopoDS_Vertex s = v->getOCCVertex();
     gp_Vec Vx(m_vector.getX(), m_vector.getY(), m_vector.getZ());
     BRepPrimAPI_MakePrism mkR(s, Vx);
 
@@ -182,7 +180,7 @@ void GeomExtrudeImplementation::makeExtrude(Vertex* v,std::vector<GeomEntity*>& 
     		TopoDS_Vertex v_occ =  TopoDS::Vertex(map_result(i));
 
     		Vertex* v_m3d=EntityFactory(m_context).newOCCVertex(v_occ);
-    		if(OCCGeomRepresentation::areEquals(v_occ,TopoDS::Vertex(s)))
+    		if(OCCHelper::areEquals(v_occ,TopoDS::Vertex(s)))
     		{
     			v2v[v]= v_m3d;
     			m_v2v_inv[v_m3d]=v;
@@ -223,16 +221,8 @@ void GeomExtrudeImplementation::makeExtrudeComposite(Curve* curve,std::vector<Ge
 #ifdef _DEBUG2
 	std::cout<<"GeomExtrudeImplementation::makeExtrude ("<<curve->getName()<<")"<<std::endl;
 #endif
-    // cas d'une courbe composée de plusieurs shapes
-	std::vector<GeomRepresentation*> ppties = curve->getComputationalProperties();
-
-	// les différentes occ_shape de la courbe composite
-    std::vector<TopoDS_Edge> v_shape;
-    for (uint i=0; i<ppties.size(); i++){
-    	OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(ppties[i]);
-    	CHECK_NULL_PTR_ERROR(occ_rep);
-    	v_shape.push_back(TopoDS::Edge(occ_rep->getShape()));
-    }
+	// les différentes occ_edge de la courbe composite
+    std::vector<TopoDS_Edge> v_shape = curve->getOCCEdges();
 
     // ON AURA BESOIN DES SOMMETS DE LA COURBE DE DEPART PAR LA SUITE
     std::vector<Vertex*> c_vertices;
@@ -293,7 +283,7 @@ void GeomExtrudeImplementation::makeExtrudeComposite(Curve* curve,std::vector<Ge
         		if (v_fixe == 0){
         			throw TkUtil::Exception(TkUtil::UTF8String ("Une configuration imprévue a été rencontrée lors de l'extrusion d'une courbe composée avec 3 sommets pour une surface: on ne trouve pas de sommet sur l'axe", TkUtil::Charset::UTF_8));
         		}
-        		getOCCShape(v_fixe, v_fixe_occ);
+        		v_fixe_occ = v_fixe->getOCCVertex();
         	}
 
         	// les sommets oppposés (ceux qui ne sont pas dans la courbe)
@@ -475,25 +465,25 @@ void GeomExtrudeImplementation::findOCCEdgeAssociation(TopoDS_Edge& ref,
     TopoDS_Vertex v1_e1occ =  TopoDS::Vertex(map_result_vertex(1));
     TopoDS_Vertex v2_e1occ =  TopoDS::Vertex(map_result_vertex(2));
 
-    if(((OCCGeomRepresentation::areEquals(v1_e1occ, TopoDS::Vertex(v1))==true) &&
-            (OCCGeomRepresentation::areEquals(v2_e1occ, TopoDS::Vertex(v2))==true)  )||
-            ((OCCGeomRepresentation::areEquals(v1_e1occ, TopoDS::Vertex(v2))==true) &&
-                    (OCCGeomRepresentation::areEquals(v2_e1occ, TopoDS::Vertex(v1))==true)  ))
+    if(((OCCHelper::areEquals(v1_e1occ, TopoDS::Vertex(v1))==true) &&
+            (OCCHelper::areEquals(v2_e1occ, TopoDS::Vertex(v2))==true)  )||
+            ((OCCHelper::areEquals(v1_e1occ, TopoDS::Vertex(v2))==true) &&
+                    (OCCHelper::areEquals(v2_e1occ, TopoDS::Vertex(v1))==true)  ))
         e12 = ref;
-    else if(((OCCGeomRepresentation::areEquals(v1_e1occ, TopoDS::Vertex(v2))==true) &&
-            (OCCGeomRepresentation::areEquals(v2_e1occ, TopoDS::Vertex(v3))==true)  )||
-            ((OCCGeomRepresentation::areEquals(v1_e1occ, TopoDS::Vertex(v3))==true) &&
-                    (OCCGeomRepresentation::areEquals(v2_e1occ, TopoDS::Vertex(v2))==true)  ))
+    else if(((OCCHelper::areEquals(v1_e1occ, TopoDS::Vertex(v2))==true) &&
+            (OCCHelper::areEquals(v2_e1occ, TopoDS::Vertex(v3))==true)  )||
+            ((OCCHelper::areEquals(v1_e1occ, TopoDS::Vertex(v3))==true) &&
+                    (OCCHelper::areEquals(v2_e1occ, TopoDS::Vertex(v2))==true)  ))
         e23= ref;
-    else if(((OCCGeomRepresentation::areEquals(v1_e1occ, TopoDS::Vertex(v3))==true) &&
-            (OCCGeomRepresentation::areEquals(v2_e1occ, TopoDS::Vertex(v4))==true)  )||
-            ((OCCGeomRepresentation::areEquals(v1_e1occ, TopoDS::Vertex(v4))==true) &&
-                    (OCCGeomRepresentation::areEquals(v2_e1occ, TopoDS::Vertex(v3))==true)  ))
+    else if(((OCCHelper::areEquals(v1_e1occ, TopoDS::Vertex(v3))==true) &&
+            (OCCHelper::areEquals(v2_e1occ, TopoDS::Vertex(v4))==true)  )||
+            ((OCCHelper::areEquals(v1_e1occ, TopoDS::Vertex(v4))==true) &&
+                    (OCCHelper::areEquals(v2_e1occ, TopoDS::Vertex(v3))==true)  ))
         e34= ref;
-    else if(((OCCGeomRepresentation::areEquals(v1_e1occ, TopoDS::Vertex(v1))==true) &&
-            (OCCGeomRepresentation::areEquals(v2_e1occ, TopoDS::Vertex(v4))==true)  )||
-            ((OCCGeomRepresentation::areEquals(v1_e1occ, TopoDS::Vertex(v4))==true) &&
-                    (OCCGeomRepresentation::areEquals(v2_e1occ, TopoDS::Vertex(v1))==true)  ))
+    else if(((OCCHelper::areEquals(v1_e1occ, TopoDS::Vertex(v1))==true) &&
+            (OCCHelper::areEquals(v2_e1occ, TopoDS::Vertex(v4))==true)  )||
+            ((OCCHelper::areEquals(v1_e1occ, TopoDS::Vertex(v4))==true) &&
+                    (OCCHelper::areEquals(v2_e1occ, TopoDS::Vertex(v1))==true)  ))
         e41= ref;
     else
         throw TkUtil::Exception(TkUtil::UTF8String ("Une configuration imprévue a été rencontrée lors de l'extrusion d'une courbe : impossible de trouver une association arête-courbe", TkUtil::Charset::UTF_8));
@@ -558,8 +548,10 @@ void GeomExtrudeImplementation::makeExtrude(Surface* surf,
         std::map<Geom::Surface*,Geom::Surface*>& s2sOpp,
         std::map<Geom::Surface*,Geom::Volume*> & s2v)
 {
-    TopoDS_Shape s;
-    getOCCShape(surf, s);
+    if (surf->getOCCFaces().size() != 1) {
+        throw TkUtil::Exception(TkUtil::UTF8String ("Pas d'extrusion possible sur les surfaces composées : " + surf->getName(), TkUtil::Charset::UTF_8));
+    }
+    TopoDS_Face s = surf->getOCCFaces()[0];
     gp_Vec Vx(m_vector.getX(), m_vector.getY(), m_vector.getZ());
     BRepPrimAPI_MakePrism mkR(s, Vx);
 
@@ -595,8 +587,7 @@ void GeomExtrudeImplementation::makeExtrude(Surface* surf,
                 continue;
 //           std::cout<<"\t surf "<<surf_i->getName()<<std::endl;
             lateral_surfs.push_back(surf_i);
-            std::vector<TopoDS_Shape> surf_i_occ;
-            getOCCShapes(surf_i,surf_i_occ);
+            auto surf_i_occ = surf_i->getOCCFaces();
             // cas multi shape...
             lateral_surfs_occ.insert(lateral_surfs_occ.end(), surf_i_occ.begin(), surf_i_occ.end());
         }
@@ -614,7 +605,7 @@ void GeomExtrudeImplementation::makeExtrude(Surface* surf,
             bool islateral=false;
             for(unsigned int i_lat=0;i_lat<lateral_surfs_occ.size() &&!islateral;i_lat++){
 //                std::cout<<"\t compare "<<i_face<<" with "<<i_lat<<std::endl;
-                if(OCCGeomRepresentation::areEquals(TopoDS::Face(face_i),
+                if(OCCHelper::areEquals(TopoDS::Face(face_i),
                         TopoDS::Face(lateral_surfs_occ[i_lat])))
                     islateral=true;
             }
@@ -623,7 +614,7 @@ void GeomExtrudeImplementation::makeExtrude(Surface* surf,
         }
         if(extrem_surf.size()!=2){
             std::cerr<<"GeomExtrudeImplementation::makeExtrude [extrem_surf.size()="<<extrem_surf.size()<<" différent de 2] pour "<<surf->getName()<<std::endl;
-            throw TkUtil::Exception(TkUtil::UTF8String ("OCC n'a pas pu effectuer une extrusion d'une surface", TkUtil::Charset::UTF_8));
+            throw TkUtil::Exception(TkUtil::UTF8String("OCC n'a pas pu effectuer une extrusion d'une surface", TkUtil::Charset::UTF_8));
         }
 
         TopoDS_Shape s0 = extrem_surf[0];

@@ -9,11 +9,11 @@
 /*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
 #include "Utils/Common.h"
+#include "Topo/CommandFuse2Edges.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/Exception.h>
-#include <Topo/CommandFuse2Edges.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

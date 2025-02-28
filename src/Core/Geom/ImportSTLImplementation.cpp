@@ -18,7 +18,6 @@
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
-#include "Geom/OCCGeomRepresentation.h"
 
 #include "Group/GroupManager.h"
 #include "Group/Group3D.h"
@@ -27,16 +26,12 @@
 #include "Group/Group0D.h"
 
 #include "Internal/InfoCommand.h"
-
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-/*----------------------------------------------------------------------------*/
-#include "TkUtil/Exception.h"
+#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
-//#include <RWStl.hxx>
-//#include <StlMesh_Mesh.hxx>
-//#include <OSD_Path.hxx>
 #include <StlAPI.hxx>
 #include <Interface_Static.hxx>
 /*----------------------------------------------------------------------------*/

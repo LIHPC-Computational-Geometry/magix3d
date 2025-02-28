@@ -12,12 +12,10 @@
 #include "Geom/GeomManager.h"
 #include "Utils/MgxException.h"
 #include "Utils/MgxNumeric.h"
-
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/MemoryError.h>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

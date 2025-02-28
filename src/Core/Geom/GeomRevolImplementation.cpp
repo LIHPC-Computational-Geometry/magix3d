@@ -12,12 +12,12 @@
 #include <set>
 /*----------------------------------------------------------------------------*/
 #include "Geom/GeomRevolImplementation.h"
-#include "Geom/OCCGeomRepresentation.h"
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
 #include "Geom/EntityFactory.h"
+#include "Geom/OCCHelper.h"
 /*----------------------------------------------------------------------------*/
 //inclusion de fichiers en-tête d'Open Cascade
 #include <TopoDS_Shape.hxx>
@@ -165,19 +165,17 @@ void GeomRevolImplementation::makeRevol(Vertex* v,std::vector<GeomEntity*>& res,
         v1.SetCoord(pnt_v.X()-p1.X(),pnt_v.Y()-p1.Y(),pnt_v.Z()-p1.Z());
     gp_Vec v2(p1,p2);
 
-    TopoDS_Shape s;
-    getOCCShape(v, s);
+    TopoDS_Vertex s = v->getOCCVertex();
     //======================================================================
     // LE SOMMET EST SUR L'AXE DE RÉVOLUTION
     //======================================================================
 
     if(v1.IsParallel(v2,Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon)) {
         //Cas du sommet sur l'axe
-        TopoDS_Vertex v_occ =  TopoDS::Vertex(s);
 
         //on crée une copie que l'on lie avec le sommet initial
         //et inversement
-        Vertex* v_m3d=EntityFactory(m_context).newOCCVertex(v_occ);
+        Vertex* v_m3d=EntityFactory(m_context).newOCCVertex(s);
 #ifdef _DEBUG2
         std::cout<<" sommet sur l'axe créé "<<v_m3d->getName()<<std::endl;
 #endif
@@ -207,7 +205,6 @@ void GeomRevolImplementation::makeRevol(Vertex* v,std::vector<GeomEntity*>& res,
         }
         TopoDS_Shape sh = mkR.Shape();
 
-
         if (sh.ShapeType()==TopAbs_EDGE){
             TopoDS_Edge e = TopoDS::Edge(sh);
             if (BRep_Tool::Degenerated(e)){
@@ -216,7 +213,7 @@ void GeomRevolImplementation::makeRevol(Vertex* v,std::vector<GeomEntity*>& res,
             	throw TkUtil::Exception(message);
             }
             TopTools_IndexedMapOfShape map_result;
-            TopExp::MapShapes(e,TopAbs_VERTEX, map_result);
+            TopExp::MapShapes(e, TopAbs_VERTEX, map_result);
             if (map_result.Extent()>2)
             {
                 throw TkUtil::Exception(TkUtil::UTF8String ("OCC n'a pas pu effectuer une révolution d'un sommet", TkUtil::Charset::UTF_8));
@@ -257,7 +254,7 @@ void GeomRevolImplementation::makeRevol(Vertex* v,std::vector<GeomEntity*>& res,
                     TopoDS_Vertex v_occ =  TopoDS::Vertex(map_result(i));
 
                     Vertex* v_m3d=EntityFactory(m_context).newOCCVertex(v_occ);
-                    if(OCCGeomRepresentation::areEquals(v_occ,TopoDS::Vertex(s)))
+                    if(OCCHelper::areEquals(v_occ, s))
                     {
                         v2v[v]= v_m3d;
                         m_v2v_inv[v_m3d]=v;
@@ -314,16 +311,8 @@ void GeomRevolImplementation::makeRevol2PIComposite(Curve* curve,std::vector<Geo
     // REALISATION DE LA REVOLUTION
     //======================================================================
 
-    // cas d'une courbe composée de plusieurs shapes
-    std::vector<GeomRepresentation*> ppties = curve->getComputationalProperties();
-
     // les différentes occ_shape de la courbe composite
-    std::vector<TopoDS_Edge> v_shape;
-    for (uint i=0; i<ppties.size(); i++){
-    	OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(ppties[i]);
-    	CHECK_NULL_PTR_ERROR(occ_rep);
-    	v_shape.push_back(TopoDS::Edge(occ_rep->getShape()));
-    }
+    std::vector<TopoDS_Edge> v_shape = curve->getOCCEdges();
 
     // ON AURA BESOIN DES SOMMETS DE LA COURBE DE DEPART PAR LA SUITE
 	std::vector<Vertex*> c_vertices;
@@ -580,16 +569,8 @@ void GeomRevolImplementation::makeRevolComposite(Curve* curve,std::vector<GeomEn
 #ifdef _DEBUG2
 	std::cout<<"GeomRevolImplementation::makeRevol ("<<curve->getName()<<")"<<std::endl;
 #endif
-    // cas d'une courbe composée de plusieurs shapes
-	std::vector<GeomRepresentation*> ppties = curve->getComputationalProperties();
-
 	// les différentes occ_shape de la courbe composite
-    std::vector<TopoDS_Edge> v_shape;
-    for (uint i=0; i<ppties.size(); i++){
-    	OCCGeomRepresentation* occ_rep = dynamic_cast<OCCGeomRepresentation*>(ppties[i]);
-    	CHECK_NULL_PTR_ERROR(occ_rep);
-    	v_shape.push_back(TopoDS::Edge(occ_rep->getShape()));
-    }
+    std::vector<TopoDS_Edge> v_shape = curve->getOCCEdges();
 
     // ON AURA BESOIN DES SOMMETS DE LA COURBE DE DEPART PAR LA SUITE
     std::vector<Vertex*> c_vertices;
@@ -729,7 +710,7 @@ void GeomRevolImplementation::makeRevolComposite(Curve* curve,std::vector<GeomEn
 	    			if (v_fixe == 0){
 	    				throw TkUtil::Exception(TkUtil::UTF8String ("Une configuration imprévue a été rencontrée lors de la révolution d'une courbe composée avec 3 sommets pour une surface: on ne trouve pas de sommet sur l'axe", TkUtil::Charset::UTF_8));
 	    			}
-	    			getOCCShape(v_fixe, v_fixe_occ);
+                    v_fixe_occ = v_fixe->getOCCVertex();
 				}
 
 				// les sommets oppposés (ceux qui ne sont pas dans la courbe)
@@ -911,25 +892,25 @@ void GeomRevolImplementation::findOCCEdgeAssociation(TopoDS_Edge& ref,
     TopoDS_Vertex v1_e1occ =  TopoDS::Vertex(map_result_vertex(1));
     TopoDS_Vertex v2_e1occ =  TopoDS::Vertex(map_result_vertex(2));
 
-    if(((OCCGeomRepresentation::areEquals(v1_e1occ, TopoDS::Vertex(v1))==true) &&
-            (OCCGeomRepresentation::areEquals(v2_e1occ, TopoDS::Vertex(v2))==true)  )||
-            ((OCCGeomRepresentation::areEquals(v1_e1occ, TopoDS::Vertex(v2))==true) &&
-                    (OCCGeomRepresentation::areEquals(v2_e1occ, TopoDS::Vertex(v1))==true)  ))
+    if(((OCCHelper::areEquals(v1_e1occ, v1)==true) &&
+            (OCCHelper::areEquals(v2_e1occ, v2)==true)  )||
+            ((OCCHelper::areEquals(v1_e1occ, v2)==true) &&
+                    (OCCHelper::areEquals(v2_e1occ, v1)==true)  ))
         e12 = ref;
-    else if(((OCCGeomRepresentation::areEquals(v1_e1occ, TopoDS::Vertex(v2))==true) &&
-            (OCCGeomRepresentation::areEquals(v2_e1occ, TopoDS::Vertex(v3))==true)  )||
-            ((OCCGeomRepresentation::areEquals(v1_e1occ, TopoDS::Vertex(v3))==true) &&
-                    (OCCGeomRepresentation::areEquals(v2_e1occ, TopoDS::Vertex(v2))==true)  ))
+    else if(((OCCHelper::areEquals(v1_e1occ, v2)==true) &&
+            (OCCHelper::areEquals(v2_e1occ, v3)==true)  )||
+            ((OCCHelper::areEquals(v1_e1occ, v3)==true) &&
+                    (OCCHelper::areEquals(v2_e1occ, v2)==true)  ))
         e23= ref;
-    else if(((OCCGeomRepresentation::areEquals(v1_e1occ, TopoDS::Vertex(v3))==true) &&
-            (OCCGeomRepresentation::areEquals(v2_e1occ, TopoDS::Vertex(v4))==true)  )||
-            ((OCCGeomRepresentation::areEquals(v1_e1occ, TopoDS::Vertex(v4))==true) &&
-                    (OCCGeomRepresentation::areEquals(v2_e1occ, TopoDS::Vertex(v3))==true)  ))
+    else if(((OCCHelper::areEquals(v1_e1occ, v3)==true) &&
+            (OCCHelper::areEquals(v2_e1occ, v4)==true)  )||
+            ((OCCHelper::areEquals(v1_e1occ, v4)==true) &&
+                    (OCCHelper::areEquals(v2_e1occ, v3)==true)  ))
         e34= ref;
-    else if(((OCCGeomRepresentation::areEquals(v1_e1occ, TopoDS::Vertex(v1))==true) &&
-            (OCCGeomRepresentation::areEquals(v2_e1occ, TopoDS::Vertex(v4))==true)  )||
-            ((OCCGeomRepresentation::areEquals(v1_e1occ, TopoDS::Vertex(v4))==true) &&
-                    (OCCGeomRepresentation::areEquals(v2_e1occ, TopoDS::Vertex(v1))==true)  ))
+    else if(((OCCHelper::areEquals(v1_e1occ, v1)==true) &&
+            (OCCHelper::areEquals(v2_e1occ, v4)==true)  )||
+            ((OCCHelper::areEquals(v1_e1occ, v4)==true) &&
+                    (OCCHelper::areEquals(v2_e1occ, v1)==true)  ))
         e41= ref;
     else
         throw TkUtil::Exception(TkUtil::UTF8String ("Une configuration imprévue a été rencontrée lors de la révolution d'une courbe : impossible de trouver une association arête-courbe", TkUtil::Charset::UTF_8));
@@ -949,20 +930,20 @@ void GeomRevolImplementation::findOCCEdgeAssociation(TopoDS_Edge& ref,
     TopoDS_Vertex v1_e1occ =  TopoDS::Vertex(map_result_vertex(1));
     TopoDS_Vertex v2_e1occ =  TopoDS::Vertex(map_result_vertex(2));
 
-    if(((BRepTools::Compare(v1_e1occ, TopoDS::Vertex(v1))==true) &&
-            (BRepTools::Compare(v2_e1occ, TopoDS::Vertex(v2))==true)  )||
-            ((BRepTools::Compare(v1_e1occ, TopoDS::Vertex(v2))==true) &&
-                    (BRepTools::Compare(v2_e1occ, TopoDS::Vertex(v1))==true)  ))
+    if(((BRepTools::Compare(v1_e1occ, v1)==true) &&
+            (BRepTools::Compare(v2_e1occ, v2)==true)  )||
+            ((BRepTools::Compare(v1_e1occ, v2)==true) &&
+                    (BRepTools::Compare(v2_e1occ, v1)==true)  ))
         e12 = ref;
-    else if(((BRepTools::Compare(v1_e1occ, TopoDS::Vertex(v2))==true) &&
-            (BRepTools::Compare(v2_e1occ, TopoDS::Vertex(v3))==true)  )||
-            ((BRepTools::Compare(v1_e1occ, TopoDS::Vertex(v3))==true) &&
-                    (BRepTools::Compare(v2_e1occ, TopoDS::Vertex(v2))==true)  ))
+    else if(((BRepTools::Compare(v1_e1occ, v2)==true) &&
+            (BRepTools::Compare(v2_e1occ, v3)==true)  )||
+            ((BRepTools::Compare(v1_e1occ, v3)==true) &&
+                    (BRepTools::Compare(v2_e1occ, v2)==true)  ))
         e23= ref;
-    else if(((BRepTools::Compare(v1_e1occ, TopoDS::Vertex(v3))==true) &&
-            (BRepTools::Compare(v2_e1occ, TopoDS::Vertex(v1))==true)  )||
-            ((BRepTools::Compare(v1_e1occ, TopoDS::Vertex(v1))==true) &&
-                    (BRepTools::Compare(v2_e1occ, TopoDS::Vertex(v3))==true)  ))
+    else if(((BRepTools::Compare(v1_e1occ, v3)==true) &&
+            (BRepTools::Compare(v2_e1occ, v1)==true)  )||
+            ((BRepTools::Compare(v1_e1occ, v1)==true) &&
+                    (BRepTools::Compare(v2_e1occ, v3)==true)  ))
         e31= ref;
     else
         throw TkUtil::Exception(TkUtil::UTF8String ("Une configuration imprévue a été rencontrée lors de la révolution d'une courbe : impossible de trouver une association arête-courbe (2)", TkUtil::Charset::UTF_8));
@@ -994,8 +975,10 @@ void GeomRevolImplementation::makeRevol(Surface* surf,
         std::map<Geom::Surface*,Geom::Surface*>& s2sOpp,
         std::map<Geom::Surface*,Geom::Volume*> & s2v)
 {
-    TopoDS_Shape s;
-    getOCCShape(surf, s);
+    if (surf->getOCCFaces().size() != 1) {
+        throw TkUtil::Exception(TkUtil::UTF8String ("Pas de révolution possible sur les surfaces composées : " + surf->getName(), TkUtil::Charset::UTF_8));
+    }
+    TopoDS_Face s = surf->getOCCFaces()[0];
     gp_Pnt p1(m_axis1.getX(),m_axis1.getY(),m_axis1.getZ());
     gp_Dir dir( m_axis2.getX()-m_axis1.getX(),
             m_axis2.getY()-m_axis1.getY(),
@@ -1013,7 +996,6 @@ void GeomRevolImplementation::makeRevol(Surface* surf,
     }
     TopoDS_Shape sh = mkR.Shape();
 
-
     if (sh.ShapeType()==TopAbs_SOLID){
         TopoDS_Solid solid = TopoDS::Solid(sh);
         Volume* vol=EntityFactory(m_context).newOCCVolume(solid);
@@ -1028,7 +1010,7 @@ void GeomRevolImplementation::makeRevol(Surface* surf,
         // toutes les surfaces incidentes au volume créé sauf surf et la surface opposée
         // ont été créés à partir des courbes de curves_of_surf
         std::vector<Surface*> lateral_surfs;
-        std::vector<TopoDS_Shape> lateral_surfs_occ;
+        std::vector<TopoDS_Face> lateral_surfs_occ;
         for(unsigned int i=0;i<curves_of_surf.size();i++){
             Surface* surf_i =c2s[curves_of_surf[i]];
             //la surface peut être =0 si la courbe était sur l'axe de révolution
@@ -1036,8 +1018,7 @@ void GeomRevolImplementation::makeRevol(Surface* surf,
                 continue;
 //           std::cout<<"\t surf "<<surf_i->getName()<<std::endl;
             lateral_surfs.push_back(surf_i);
-            std::vector<TopoDS_Shape> surf_i_occ;
-            getOCCShapes(surf_i,surf_i_occ);
+            std::vector<TopoDS_Face> surf_i_occ = surf_i->getOCCFaces();
             // cas multi shape...
             lateral_surfs_occ.insert(lateral_surfs_occ.end(), surf_i_occ.begin(), surf_i_occ.end());
         }
@@ -1051,12 +1032,11 @@ void GeomRevolImplementation::makeRevol(Surface* surf,
 //        std::cerr<<"Nb faces laterales ="<<lateral_surfs.size()<<std::endl;
         for(int i_face=1;i_face<=map_result_surf.Extent();i_face++){
 //            std::cout<<"----"<<std::endl;
-            TopoDS_Shape face_i =  map_result_surf(i_face);
+            TopoDS_Face face_i =  TopoDS::Face(map_result_surf(i_face));
             bool islateral=false;
             for(unsigned int i_lat=0;i_lat<lateral_surfs_occ.size() &&!islateral;i_lat++){
 //                std::cout<<"\t compare "<<i_face<<" with "<<i_lat<<std::endl;
-                if(OCCGeomRepresentation::areEquals(TopoDS::Face(face_i),
-                        TopoDS::Face(lateral_surfs_occ[i_lat])))
+                if(OCCHelper::areEquals(face_i, lateral_surfs_occ[i_lat]))
                     islateral=true;
             }
             if(islateral==false)// on a la copie ou l'opposée de surf
@@ -1154,8 +1134,10 @@ void GeomRevolImplementation::makeRevol2PI(Surface* surf,
     //======================================================================
     // REALISATION DE LA REVOLUTION
     //======================================================================
-    TopoDS_Shape s;
-    getOCCShape(surf, s);
+    if (surf->getOCCFaces().size() != 1) {
+        throw TkUtil::Exception(TkUtil::UTF8String ("Pas de révolution possible sur les surfaces composées : " + surf->getName(), TkUtil::Charset::UTF_8));
+    }
+    TopoDS_Face s = surf->getOCCFaces()[0];
 
     gp_Pnt p1(m_axis1.getX(),m_axis1.getY(),m_axis1.getZ());
     gp_Pnt p2(m_axis2.getX(),m_axis2.getY(),m_axis2.getZ());
@@ -1166,7 +1148,6 @@ void GeomRevolImplementation::makeRevol2PI(Surface* surf,
 
     // sh contient la shape obtenue après révolution
     TopoDS_Shape sh = mkR.Shape();
-
 
     if (!mkR.IsDone () || mkR.Shape().IsNull())
     {
@@ -1197,21 +1178,19 @@ void GeomRevolImplementation::makeRevol2PI(Surface* surf,
     // toutes les surfaces incidentes au volume créé sauf surf et la surface opposée
     // ont été créés à partir des courbes de curves_of_surf
     std::vector<Surface*> lateral_surfs;
-    std::vector<TopoDS_Shape> lateral_surfs_occ;
+    std::vector<TopoDS_Face> lateral_surfs_occ;
     for(unsigned int i=0;i<curves_of_surf.size();i++){
-        Surface* surf_i =c2s[curves_of_surf[i]];
+        Surface* surf_i = c2s[curves_of_surf[i]];
         //la surface peut être =0 si la courbe était sur l'axe de révolution
         if(surf_i==0)
             continue;
 //           std::cout<<"\t surf "<<surf_i->getName()<<std::endl;
         lateral_surfs.push_back(surf_i);
-        std::vector<TopoDS_Shape> surf_i_occ;
-        getOCCShapes(surf_i,surf_i_occ);
+        std::vector<TopoDS_Face> surf_i_occ = surf_i->getOCCFaces();
         // cas multi shape...
         lateral_surfs_occ.insert(lateral_surfs_occ.end(), surf_i_occ.begin(), surf_i_occ.end());
 
     }
-
 
     //MISE A JOUR DES CONNECTIVITES
 
@@ -1221,8 +1200,6 @@ void GeomRevolImplementation::makeRevol2PI(Surface* surf,
         si->add(vol);
         vol->add(si);
     }
-
-
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

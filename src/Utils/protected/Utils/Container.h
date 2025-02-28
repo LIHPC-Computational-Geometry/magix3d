@@ -15,8 +15,8 @@
 #include <vector>
 #include <list>
 #include <algorithm>
-#include "TkUtil/Exception.h"
-#include "TkUtil/UTF8String.h"
+#include <TkUtil/Exception.h>
+#include <TkUtil/UTF8String.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

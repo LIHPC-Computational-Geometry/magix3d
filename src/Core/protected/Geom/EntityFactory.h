@@ -88,7 +88,6 @@ class EntityFactory
     friend class CommandNewBSpline;
     friend class CommandNewSurface;
     friend class CommandNewCurveByCurveProjectionOnSurface;
-    friend class OCCGeomRepresentation;
     friend class GeomModificationBaseClass;
     friend class GeomNewPrismImplementation;
     friend class GeomCutImplementation;
@@ -106,6 +105,8 @@ class EntityFactory
     friend class Topo::CommandAlignVertices;
     friend class Topo::CoEdge;
     friend class Curve;
+    friend class Surface;
+    friend class Volume;
     friend class CommandNewSurfaceByOffset;
 
 public:
@@ -280,7 +281,7 @@ public:
 protected:
 
     /// factorisation de la crétion d'une courbe par projection
-    Curve* newCurveByTopoDS_ShapeProjectionOnSurface(TopoDS_Shape shape,
+    Curve* newCurveByTopoDS_ShapeProjectionOnSurface(TopoDS_Edge shape,
     		Surface* surface);
 
 

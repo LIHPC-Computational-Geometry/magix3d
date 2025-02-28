@@ -12,9 +12,9 @@
 #include "Utils/Vector.h"
 #include "Internal/InfoCommand.h"
 #include "Internal/Context.h"
-#include <SysCoord/CommandTranslateSysCoord.h>
-#include <SysCoord/CommandDuplicateSysCoord.h>
-#include <SysCoord/SysCoordManager.h>
+#include "SysCoord/CommandTranslateSysCoord.h"
+#include "SysCoord/CommandDuplicateSysCoord.h"
+#include "SysCoord/SysCoordManager.h"
 
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
