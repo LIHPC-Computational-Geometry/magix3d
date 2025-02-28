@@ -120,7 +120,7 @@ class VTKEntityRepresentation : public QtComponents::RenderedEntityRepresentatio
 	/**
 	 * \return	La représentation pleine (surfacique).
 	 */
-	virtual vtkPolyData* getSurfacicGrid ( );
+	virtual vtkPolyData* getSurfacicPolyData ( );
 	virtual vtkActor* getSurfacicActor ( );
 	virtual vtkPolyDataMapper* getSurfacicMapper ( );
 
@@ -135,7 +135,7 @@ class VTKEntityRepresentation : public QtComponents::RenderedEntityRepresentatio
 	/**
 	 * \return	La représentation raffinée (ex : positionnement d'un point).
 	 */
-	virtual vtkPolyData* getRefinedGrid ( );
+	virtual vtkPolyData* getRefinedPolyData ( );
 	virtual vtkActor* getRefinedActor ( );
 	virtual vtkPolyDataMapper* getRefinedMapper ( );
 
@@ -289,7 +289,7 @@ class VTKEntityRepresentation : public QtComponents::RenderedEntityRepresentatio
 	 */
 	//@{
 	/** Le maillage représentant l'entité en mode plein. */
-	vtkPolyData*				_surfacicGrid;
+	vtkPolyData*				_surfacicPolyData;
 
 	/** Correspondance entre points vtk et noeuds gmds. */
 	std::map<int,int>			_surfacicPointsVTK2GMDSID;
@@ -323,7 +323,7 @@ class VTKEntityRepresentation : public QtComponents::RenderedEntityRepresentatio
 	 */
 	//@{
 	/** Le maillage représentant l'entité en mode filaire. */
-	vtkPolyData*				_wireGrid;
+	vtkPolyData*				_wirePolyData;
 
 	/** L'acteur associé en mode filaire. */
 	VTKMgx3DActor*				_wireActor;
@@ -332,7 +332,7 @@ class VTKEntityRepresentation : public QtComponents::RenderedEntityRepresentatio
 	vtkPolyDataMapper*		   	_wireMapper;
 
 	/** Le maillage complémentaire ISO représentant l'entité en mode filaire. */
-	vtkPolyData*				_isoWireGrid;
+	vtkPolyData*				_isoWirePolyData;
 
 	/** L'acteur complémentaire ISO associé en mode filaire. */
 	VTKMgx3DActor*				_isoWireActor;
@@ -341,7 +341,7 @@ class VTKEntityRepresentation : public QtComponents::RenderedEntityRepresentatio
 	vtkPolyDataMapper*		   _isoWireMapper;
 
 	/** Le maillage représentant une représentation de la discrétisation de l'entité. */
-	vtkPolyData*				_discGrid;
+	vtkPolyData*				_discPolyData;
 
 	/** L'acteur associé en mode filaire. */
 	VTKMgx3DActor*				_discActor;
@@ -420,7 +420,7 @@ class VTKEntityRepresentation : public QtComponents::RenderedEntityRepresentatio
 	 */
 	//@{
 	/** Le maillage représentant l'entité en mode "raffiné". */
-	vtkPolyData*		        _refinedGrid;
+	vtkPolyData*		        _refinedPolyData;
 
 	/** La discretisation du maillage raffiné. */
 	vtkPolyDataRefinementFilter* _refineFilter;

@@ -108,14 +108,14 @@ void VTKGMDSEntityRepresentation::createCloudRepresentation()
 
 void VTKGMDSEntityRepresentation::createSurfacicRepresentation()
 {
-    if ((0 != _surfacicGrid) || (0 != _surfacicMapper) || (0 != _surfacicActor))
+    if ((0 != _surfacicPolyData) || (0 != _surfacicMapper) || (0 != _surfacicActor))
     {
         INTERNAL_ERROR(exc, "Représentation déjà créée.", "VTKGMDSEntityRepresentation::createSurfacicRepresentation")
         throw exc;
     } // if ((0 != _surfacicMapper) || ...
 
     // Appel à la méthode spécialisée GMDS de création de surface VTK
-    if (0 == _surfacicGrid)
+    if (0 == _surfacicPolyData)
     {
         Mesh::MeshEntity* meshEntity = dynamic_cast<Mesh::MeshEntity*>(getEntity());
     	//std::cout<<"VTKGMDSEntityRepresentation::createSurfacicRepresentation pour "<<getEntity()->getName()<<" avec shrink à "<<getEntity ( )->getDisplayProperties().getShrinkFactor()<<std::endl;
@@ -126,10 +126,10 @@ void VTKGMDSEntityRepresentation::createSurfacicRepresentation()
         }
 
         VTKGMDSEntityRepresentation::createMeshEntitySurfacicRepresentation(meshEntity);
-    } // if (0 == _surfacicGrid)
+    } // if (0 == _surfacicPolyData)
 
     _surfacicMapper = vtkPolyDataMapper::New();
-    _surfacicMapper->SetInputData(_surfacicGrid);
+    _surfacicMapper->SetInputData(_surfacicPolyData);
     _surfacicMapper->ScalarVisibilityOff();
 #if	VTK_MAJOR_VERSION < 8
     _surfacicMapper->SetImmediateModeRendering(!Internal::Resources::instance ( )._useDisplayList.getValue ( ));
@@ -143,7 +143,7 @@ void VTKGMDSEntityRepresentation::createSurfacicRepresentation()
     _surfacicActor->GetProperty()->SetColor(surfacicColor.getRed()/255., surfacicColor.getGreen()/255., surfacicColor.getBlue()/255.);
     _surfacicActor->SetMapper(_surfacicMapper);
 
-    vtkPoints* points = _surfacicGrid->GetPoints ( );
+    vtkPoints* points = _surfacicPolyData->GetPoints ( );
     doShrink(points);
 
 //_surfacicMapper->PrintSelf (cout,*vtkIndent::New( ));
@@ -205,12 +205,12 @@ void VTKGMDSEntityRepresentation::createVolumicRepresentation()
 
 void VTKGMDSEntityRepresentation::createWireRepresentation()
 {
-    if ( //(0 != _wireGrid) || le _wireGrid n'est pas renseigné
+    if ( //(0 != _wirePolyData) || le _wirePolyData n'est pas renseigné
     (0 != _wireMapper) || (0 != _wireActor))
     {
         INTERNAL_ERROR(exc, "Représentation déjà créée.",  "VTKGMDSEntityRepresentation::createWireRepresentation")
         throw exc;
-    } // if ((0 != _wireGrid) || ...
+    } // if ((0 != _wirePolyData) || ...
 
     CHECK_NULL_PTR_ERROR(getEntity ( ))
     switch (getEntity ( )->getDim ( ))
@@ -228,8 +228,8 @@ void VTKGMDSEntityRepresentation::createWireRepresentation()
         }
     }	// switch (getEntity ( )->getDim ( ))
 
-    // nous allons avoir besoin de _surfacicGrid ou _volumicGrid
-    if (0 == _surfacicGrid && 0 == _volumicGrid)
+    // nous allons avoir besoin de _surfacicPolyData ou _volumicGrid
+    if (0 == _surfacicPolyData && 0 == _volumicGrid)
     {
         // Appel à la méthode spécialisée GMDS de création de surface VTK
         Mesh::MeshEntity* meshEntity = dynamic_cast<Mesh::MeshEntity*>(getEntity());
@@ -240,8 +240,8 @@ void VTKGMDSEntityRepresentation::createWireRepresentation()
         } // if (0 == meshEntity)
 
         VTKGMDSEntityRepresentation::createMeshEntitySurfacicRepresentation (meshEntity);
-        CHECK_NULL_PTR_ERROR(_surfacicGrid)
-    } // if (0 == _surfacicGrid)
+        CHECK_NULL_PTR_ERROR(_surfacicPolyData)
+    } // if (0 == _surfacicPolyData)
 
     UTF8String	message1 (Charset::UTF_8);
     message1 << "VTKGMDSEntityRepresentation::createWireRepresentation pour " << getEntity()->getName();
@@ -254,9 +254,9 @@ void VTKGMDSEntityRepresentation::createWireRepresentation()
     {
         edgesExtractor->SetInputData(_volumicGrid);
     }
-    else if (_surfacicGrid)
+    else if (_surfacicPolyData)
     {
-        edgesExtractor->SetInputData(_surfacicGrid);
+        edgesExtractor->SetInputData(_surfacicPolyData);
     }
     else
     {
@@ -302,11 +302,11 @@ void VTKGMDSEntityRepresentation::createWireRepresentation()
 
 void VTKGMDSEntityRepresentation::createIsoWireRepresentation()
 {
-    if ((0 != _isoWireGrid) || (0 != _isoWireMapper) || (0 != _isoWireActor))
+    if ((0 != _isoWirePolyData) || (0 != _isoWireMapper) || (0 != _isoWireActor))
     {
         INTERNAL_ERROR(exc, "Représentation déjà créée.", "VTKGMDSEntityRepresentation::createIsoWireRepresentation")
         throw exc;
-    } // if ((0 != _isoWireGrid) || ...
+    } // if ((0 != _isoWirePolyData) || ...
 
     throw TkUtil::Exception("VTKGMDSEntityRepresentation::createIsoWireRepresentation() indisponible");
 } // VTKGMDSEntityRepresentation::createIsoWireRepresentation
@@ -519,11 +519,11 @@ void VTKGMDSEntityRepresentation::createMeshEntityCloudRepresentation( Mesh::Mes
 void VTKGMDSEntityRepresentation::createMeshEntityLineRepresentation(Mesh::MeshEntity* meshEntity)
 {
     CHECK_NULL_PTR_ERROR (meshEntity)
-    if ((0 != _wireGrid) || (0 != _wireMapper) || (0 != _wireActor))
+    if ((0 != _wirePolyData) || (0 != _wireMapper) || (0 != _wireActor))
     {
         INTERNAL_ERROR(exc, "Représentation déjà créée.", "VTKGMDSEntityRepresentation::createMeshEntityLineRepresentation");
         throw exc;
-    } // if ((0 != _wireGrid) || ...
+    } // if ((0 != _wirePolyData) || ...
 
     if (meshEntity->isDestroyed())
     {
@@ -605,7 +605,7 @@ void VTKGMDSEntityRepresentation::createMeshEntityLineRepresentation(Mesh::MeshE
     } // if (1 == meshEntity->getDim()
 
     VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation(
-            getEntity ( ), _wireActor, _wireMapper, _wireGrid, points, segments);
+            getEntity ( ), _wireActor, _wireMapper, _wirePolyData, points, segments);
 
 } // VTKGMDSEntityRepresentation::createMeshEntityLineRepresentation
 
@@ -617,11 +617,11 @@ void VTKGMDSEntityRepresentation::createMeshEntitySurfacicRepresentation(
 	std::cout<<"VTKGMDSEntityRepresentation::createMeshEntitySurfacicRepresentation("<<meshEntity->getName()<<")"<<std::endl;
 #endif
 
-    if (0 != _surfacicGrid)
+    if (0 != _surfacicPolyData)
     {
         INTERNAL_ERROR(exc, "Représentation déjà créée.", "VTKGMDSEntityRepresentation::createMeshEntitySurfacicRepresentation")
         throw exc;
-    } // if (0 != _surfacicGrid)
+    } // if (0 != _surfacicPolyData)
 
     // Récupération du maillage GMDS
     Mesh::MeshItf* meshItf = meshEntity->getMeshManager().getMesh();
@@ -637,9 +637,9 @@ void VTKGMDSEntityRepresentation::createMeshEntitySurfacicRepresentation(
     message1 << "VTKGMDSEntityRepresentation::createMeshEntitySurfacicRepresentation pour " << meshEntity->getName();
     getEntity()->log(TkUtil::TraceLog(message1, TkUtil::Log::TRACE_5));
 
-    _surfacicGrid = vtkPolyData::New();
-    CHECK_NULL_PTR_ERROR(_surfacicGrid)
-    _surfacicGrid->Initialize();
+    _surfacicPolyData = vtkPolyData::New();
+    CHECK_NULL_PTR_ERROR(_surfacicPolyData)
+    _surfacicPolyData->Initialize();
 
     // on passe par GMDS pour récupérer les noeuds et les mailles
     gmds::Mesh& gmdsMesh =
@@ -762,7 +762,7 @@ createMeshEntitySurfacicRepresentation3D(Mesh::MeshEntity* meshEntity, gmds::Mes
 void VTKGMDSEntityRepresentation::
 createCoFacesSurfacicRepresentationRatio1(std::vector<Topo::CoFace*> cofaces, gmds::Mesh& gmdsMesh)
 {
-	CHECK_NULL_PTR_ERROR (_surfacicGrid)
+	CHECK_NULL_PTR_ERROR (_surfacicPolyData)
 #ifdef _DEBUG_VTKGMDSEntityRepresentation
 	std::cout<<"cas ratio 1"<<std::endl;
 #endif
@@ -817,7 +817,7 @@ cout << __FILE__ << ' ' << __LINE__ << endl;
 
 	// Les sommets :
 	points->SetNumberOfPoints(pointsNum);
-	_surfacicGrid->SetPoints(points);
+	_surfacicPolyData->SetPoints(points);
 	_surfacicPointsVTK2GMDSID.clear();
 	vtkIdType id = 0;
 	for (std::vector<gmds::Node>::const_iterator itp = nodes.begin(); nodes.end() != itp; itp++, id++)
@@ -844,7 +844,7 @@ cout << __FILE__ << ' ' << __LINE__ << endl;
 	} // for (id = 0; id < polygonNum; id++)
 
 	cellArray->SetCells (polygonNum, idsArray);
-	_surfacicGrid->SetPolys (cellArray);
+	_surfacicPolyData->SetPolys (cellArray);
 	idsArray->Delete ( );
 	idsArray = 0;
 	cellArray->Delete ( );
@@ -857,7 +857,7 @@ cout << __FILE__ << ' ' << __LINE__ << endl;
 void VTKGMDSEntityRepresentation::
 createCoFacesSurfacicRepresentationRatioN(std::vector<Topo::CoFace*> cofaces, gmds::Mesh& gmdsMesh, int ratio_degrad)
 {
-	CHECK_NULL_PTR_ERROR (_surfacicGrid)
+	CHECK_NULL_PTR_ERROR (_surfacicPolyData)
 #ifdef _DEBUG_VTKGMDSEntityRepresentation
 	std::cout<<"cas ratio "<<ratio_degrad<<std::endl;
 #endif
@@ -912,8 +912,8 @@ createCoFacesSurfacicRepresentationRatioN(std::vector<Topo::CoFace*> cofaces, gm
 #endif
 
 	points->SetNumberOfPoints(pointsNum);
-	_surfacicGrid->Allocate(polygonNum, 1000);
-	_surfacicGrid->SetPoints(points);
+	_surfacicPolyData->Allocate(polygonNum, 1000);
+	_surfacicPolyData->SetPoints(points);
 	_surfacicPointsVTK2GMDSID.clear();
 
 	vtkCellArray* cellArray = vtkCellArray::New();
@@ -1001,7 +1001,7 @@ createCoFacesSurfacicRepresentationRatioN(std::vector<Topo::CoFace*> cofaces, gm
 	} // for (iter...
 
 	cellArray->SetCells(polygonNum, idsArray);
-	_surfacicGrid->SetPolys(cellArray);
+	_surfacicPolyData->SetPolys(cellArray);
 	idsArray->Delete();
 	idsArray = 0;
 	cellArray->Delete();

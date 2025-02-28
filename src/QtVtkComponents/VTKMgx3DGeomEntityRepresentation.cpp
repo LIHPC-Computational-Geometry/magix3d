@@ -88,12 +88,12 @@ void VTKMgx3DGeomEntityRepresentation::createCloudRepresentation ( )
 
 void VTKMgx3DGeomEntityRepresentation::createSurfacicRepresentation ( )
 {
-	if ((0 != _surfacicGrid) || (0 != _surfacicMapper) || (0 != _surfacicActor))
+	if ((0 != _surfacicPolyData) || (0 != _surfacicMapper) || (0 != _surfacicActor))
 	{
 		INTERNAL_ERROR (exc, "Représentation déjà créée.",
                "VTKMgx3DGeomEntityRepresentation::createSurfacicRepresentation")
 		throw exc;
-	}	// if ((0 != _surfacicGrid) || ...
+	}	// if ((0 != _surfacicPolyData) || ...
 	CHECK_NULL_PTR_ERROR (getEntity ( ))
 
 	GeomDisplayRepresentation	gr (DisplayRepresentation::SOLID, 0.001);
@@ -109,12 +109,12 @@ void VTKMgx3DGeomEntityRepresentation::createSurfacicRepresentation ( )
 
 void VTKMgx3DGeomEntityRepresentation::createWireRepresentation ( )
 {
-	if ((0 != _wireGrid) || (0 != _wireMapper) || (0 != _wireActor))
+	if ((0 != _wirePolyData) || (0 != _wireMapper) || (0 != _wireActor))
 	{
 		INTERNAL_ERROR (exc, "Représentation déjà créée.",
                 "VTKMgx3DGeomEntityRepresentation::createWireRepresentation")
 		throw exc;
-	}	// if ((0 != _wireGrid) || ...
+	}	// if ((0 != _wirePolyData) || ...
 	CHECK_NULL_PTR_ERROR (getEntity ( ))
 
 	GeomDisplayRepresentation	gr (DisplayRepresentation::WIRE, 0.01);
@@ -125,18 +125,18 @@ void VTKMgx3DGeomEntityRepresentation::createWireRepresentation ( )
 	vector<Math::Point>&	points		= gr.getPoints ( );
 	vector<size_t>&			segments	= gr.getCurveDiscretization ( );
 	VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation(
-			getEntity ( ), _wireActor, _wireMapper, _wireGrid, points, segments);
+			getEntity ( ), _wireActor, _wireMapper, _wirePolyData, points, segments);
 }	// VTKMgx3DGeomEntityRepresentation::createWireRepresentation
 
 
 void VTKMgx3DGeomEntityRepresentation::createIsoWireRepresentation ( )
 {
-	if ((0 != _isoWireGrid) || (0 != _isoWireMapper) || (0 != _isoWireActor))
+	if ((0 != _isoWirePolyData) || (0 != _isoWireMapper) || (0 != _isoWireActor))
 	{
 		INTERNAL_ERROR (exc, "Représentation déjà créée.",
                 "VTKMgx3DGeomEntityRepresentation::createIsoWireRepresentation")
 		throw exc;
-	}	// if ((0 != _isoWireGrid) || ...
+	}	// if ((0 != _isoWirePolyData) || ...
 	CHECK_NULL_PTR_ERROR (getEntity ( ))
 
 	GeomDisplayRepresentation	gr (DisplayRepresentation::ISOCURVE, 0.01);
@@ -146,7 +146,7 @@ void VTKMgx3DGeomEntityRepresentation::createIsoWireRepresentation ( )
 	vector<Math::Point>&	points		= gr.getPoints ( );
 	vector<size_t>&			lines	= gr.getCurveDiscretization ( );
 	VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (
-			getEntity ( ), _isoWireActor, _isoWireMapper,_isoWireGrid, points, lines);
+			getEntity ( ), _isoWireActor, _isoWireMapper,_isoWirePolyData, points, lines);
 }	// VTKMgx3DGeomEntityRepresentation::createIsoWireRepresentation
 
 

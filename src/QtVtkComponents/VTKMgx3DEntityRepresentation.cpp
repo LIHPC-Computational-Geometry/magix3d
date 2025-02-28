@@ -314,21 +314,21 @@ void VTKMgx3DEntityRepresentation::createTrianglesSurfacicRepresentation (
 
 void VTKMgx3DEntityRepresentation::createTrianglesSurfacicRepresentation (const vector<Math::Point>& meshPts, const vector<size_t>& mesh)
 {
-	createTrianglesSurfacicRepresentation (getEntity ( ), _surfacicActor, _surfacicMapper, _surfacicGrid, meshPts, mesh);
+	createTrianglesSurfacicRepresentation (getEntity ( ), _surfacicActor, _surfacicMapper, _surfacicPolyData, meshPts, mesh);
 }	// VTKMgx3DEntityRepresentation::createTrianglesSurfacicRepresentation
 
 
 void VTKMgx3DEntityRepresentation::createPolygonsSurfacicRepresentation (const vector<Math::Point>& meshPts, const vector<size_t>& mesh)
 {
 cout << __FILE__ << ' ' << __LINE__ << " VTKMgx3DEntityRepresentation::createPolygonsSurfacicRepresentation AT BEGINNING" << endl;
-	if ((0 != _surfacicGrid) || (0 != _surfacicMapper) || (0 != _surfacicActor))
+	if ((0 != _surfacicPolyData) || (0 != _surfacicMapper) || (0 != _surfacicActor))
 	{
 		INTERNAL_ERROR (exc, "Représentation déjà créée.", "VTKMgx3DEntityRepresentation::createPolygonsSurfacicRepresentation")
 		throw exc;
-	}	// if ((0 != _surfacicGrid) || ...
-	_surfacicGrid		= vtkPolyData::New ( );
+	}	// if ((0 != _surfacicPolyData) || ...
+	_surfacicPolyData		= vtkPolyData::New ( );
 	_surfacicMapper		= vtkPolyDataMapper::New ( );
-	_surfacicMapper->SetInputData (_surfacicGrid);
+	_surfacicMapper->SetInputData (_surfacicPolyData);
 	_surfacicMapper->ScalarVisibilityOff ( );
 #if	VTK_MAJOR_VERSION < 8
 	_surfacicMapper->SetImmediateModeRendering (!Internal::Resources::instance ( )._useDisplayList);
@@ -344,17 +344,17 @@ cout << __FILE__ << ' ' << __LINE__ << " VTKMgx3DEntityRepresentation::createPol
 		surfacicColor.getRed ( ) / 255., surfacicColor.getGreen ( ) / 255.,
 		surfacicColor.getBlue ( ) / 255.);
 	_surfacicActor->SetMapper (_surfacicMapper);
-	CHECK_NULL_PTR_ERROR (_surfacicGrid)
+	CHECK_NULL_PTR_ERROR (_surfacicPolyData)
 	vtkPoints*	points	= vtkPoints::New ( );
 	CHECK_NULL_PTR_ERROR (points)
-	_surfacicGrid->Initialize ( );
+	_surfacicPolyData->Initialize ( );
 	const size_t	pointsNum		= meshPts.size ( );
 	const size_t	polygonsNum	= mesh.size ( ) / 3;	// Approximation ...
 	// Les sommets :
 	points->SetDataTypeToDouble ( );
 	points->SetNumberOfPoints (pointsNum);
-	_surfacicGrid->Allocate (polygonsNum, 1000);
-	_surfacicGrid->SetPoints (points);
+	_surfacicPolyData->Allocate (polygonsNum, 1000);
+	_surfacicPolyData->SetPoints (points);
 	vtkIdType	id	= 0;
 	for (vector<Math::Point>::const_iterator itp = meshPts.begin ( );
 	     meshPts.end ( ) != itp; itp++, id++)
@@ -379,8 +379,8 @@ cout << __FILE__ << ' ' << __LINE__ << " VTKMgx3DEntityRepresentation::createPol
 	idsArray->Squeeze ( );
 	cellArray->SetCells (id, idsArray);
 	cellArray->Squeeze ( );
-	_surfacicGrid->SetPolys (cellArray);
-	_surfacicGrid->BuildCells ( );
+	_surfacicPolyData->SetPolys (cellArray);
+	_surfacicPolyData->BuildCells ( );
 	idsArray->Delete ( );	idsArray	= 0;
 	cellArray->Delete ( );	cellArray	= 0;
 	points->Delete ( );		points		= 0;
@@ -647,17 +647,17 @@ void VTKMgx3DEntityRepresentation::createRefinedRepresentation (size_t factor)
 	{
 		case 2	:
 		case 3	:
-			VTKMgx3DEntityRepresentation::createTrianglesSurfacicRepresentation (getEntity ( ), _refinedActor, _refinedMapper, _refinedGrid, points, triangles);
+			VTKMgx3DEntityRepresentation::createTrianglesSurfacicRepresentation (getEntity ( ), _refinedActor, _refinedMapper, _refinedPolyData, points, triangles);
 			break;
 		default	:
-			VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (getEntity ( ), _refinedActor, _refinedMapper, _refinedGrid, points, triangles);
+			VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (getEntity ( ), _refinedActor, _refinedMapper, _refinedPolyData, points, triangles);
 	}	// switch (getEntity ( )->getDim ( ))
 
 	if (true == shouldRefine)
 	{
 		_refineFilter	= vtkPolyDataRefinementFilter::New ( );
 		_refinedMapper->SetInputData (_refineFilter->GetOutput ( ));
-		_refineFilter->SetInputData (_refinedGrid);
+		_refineFilter->SetInputData (_refinedPolyData);
 		_refineFilter->SetRefinementFactor (factor);
 		_refineFilter->Update ( );
 		_refinedMapper->SetInputData (_refineFilter->GetOutput ( ));

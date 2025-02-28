@@ -119,7 +119,7 @@ protected :
 	        Mesh::MeshEntity* meshEntity);
 
 	/**
-	 * Créé la représentation surfacique VTK (<I>_surfacicGrid</I>) de l'entité
+	 * Créé la représentation surfacique VTK (<I>_surfacicPolyData</I>) de l'entité
 	 * représentée à partir des points et polygones du maillage.
 	 * \param l'entité de maillage
 	 * \warning		<B>Ne créé pas l'acteur (<I>_surfacicActor</I> et le mapper

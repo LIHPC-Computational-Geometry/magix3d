@@ -522,7 +522,6 @@ void vtkMgx3DInteractorStyle::OnLeftButtonUp ( )
 			if (0 == SelectionManager)
 				return;
 
-ForegroundSelection	= true;
 			if (false == GetForegroundSelection ( ))
 			{
 				vtkSmartPointer<vtkECMAreaPicker>		areaPicker		= vtkSmartPointer<vtkECMAreaPicker>::New ( );
@@ -585,10 +584,8 @@ ForegroundSelection	= true;
 					if (0 != mgxActor)
 					{
 						Entity*	entity	= mgxActor->GetEntity ( );
-						for (vector<Entity*>::const_iterator ite = capturedEntities.begin ( ); capturedEntities.end ( ) != ite; ite++)
-							if (*ite == entity)
-								continue;	// Ne recenser qu'un seul exemplaire. On peut avoir des représentations pleines + filaires ...
-						capturedEntities.push_back (entity);
+						if (capturedEntities.end ( ) == find (capturedEntities.begin ( ), capturedEntities.end ( ), entity))
+							capturedEntities.push_back (entity);	// Ne recenser qu'un seul exemplaire. On peut avoir des représentations pleines + filaires ...
 					}	// if (0 != mgxActor)
 				}	// for (unsigned int n = 0; n < selection->GetNumberOfNodes ( ); n++)
 

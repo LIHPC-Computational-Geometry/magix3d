@@ -134,12 +134,12 @@ void VTKMgx3DStructuredMeshEntityRepresentation::createCloudRepresentation ( )
 
 void VTKMgx3DStructuredMeshEntityRepresentation::createSurfacicRepresentation ( )
 {
-	if ((0 != _surfacicGrid) || (0 != _surfacicMapper) || (0 != _surfacicActor))
+	if ((0 != _surfacicPolyData) || (0 != _surfacicMapper) || (0 != _surfacicActor))
 	{
 		INTERNAL_ERROR (exc, "Représentation déjà créée.",
                "VTKMgx3DStructuredMeshEntityRepresentation::createSurfacicRepresentation")
 		throw exc;
-	}	// if ((0 != _surfacicGrid) || ...
+	}	// if ((0 != _surfacicPolyData) || ...
 
 	throw Exception (UTF8String ("VTKMgx3DStructuredMeshEntityRepresentation::createSurfacicRepresentation is not supported.", Charset::UTF_8));
 }	// VTKMgx3DStructuredMeshEntityRepresentation::createSurfacicRepresentation
@@ -310,12 +310,12 @@ void VTKMgx3DStructuredMeshEntityRepresentation::createVolumicRepresentation (co
 
 void VTKMgx3DStructuredMeshEntityRepresentation::createWireRepresentation ( )
 {
-	if ((0 != _wireGrid) || (0 != _wireMapper) || (0 != _wireActor))
+	if ((0 != _wirePolyData) || (0 != _wireMapper) || (0 != _wireActor))
 	{
 		INTERNAL_ERROR (exc, "Représentation déjà créée.",
                 "VTKMgx3DStructuredMeshEntityRepresentation::createWireRepresentation")
 		throw exc;
-	}	// if ((0 != _wireGrid) || ...
+	}	// if ((0 != _wirePolyData) || ...
 	CHECK_NULL_PTR_ERROR (getEntity ( ))
 
 	throw Exception (UTF8String ("VTKMgx3DStructuredMeshEntityRepresentation::createWireRepresentation is not supported.", Charset::UTF_8));
@@ -324,12 +324,12 @@ void VTKMgx3DStructuredMeshEntityRepresentation::createWireRepresentation ( )
 
 void VTKMgx3DStructuredMeshEntityRepresentation::createIsoWireRepresentation ( )
 {
-	if ((0 != _isoWireGrid) || (0 != _isoWireMapper) || (0 != _isoWireActor))
+	if ((0 != _isoWirePolyData) || (0 != _isoWireMapper) || (0 != _isoWireActor))
 	{
 		INTERNAL_ERROR (exc, "Représentation déjà créée.",
                 "VTKMgx3DStructuredMeshEntityRepresentation::createIsoWireRepresentation")
 		throw exc;
-	}	// if ((0 != _isoWireGrid) || ...
+	}	// if ((0 != _isoWirePolyData) || ...
 
 	throw Exception (UTF8String ("VTKMgx3DStructuredMeshEntityRepresentation::createIsoWireRepresentation is not supported.", Charset::UTF_8));
 }	// VTKMgx3DStructuredMeshEntityRepresentation::createIsoWireRepresentation

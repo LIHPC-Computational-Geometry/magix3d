@@ -266,12 +266,12 @@ void VTKMgx3DTopoEntityRepresentation::createCloudRepresentation ( )
 
 void VTKMgx3DTopoEntityRepresentation::createSurfacicRepresentation ( )
 {
-	if ((0 != _surfacicGrid) || (0 != _surfacicMapper) || (0 != _surfacicActor))
+	if ((0 != _surfacicPolyData) || (0 != _surfacicMapper) || (0 != _surfacicActor))
 	{
 		INTERNAL_ERROR (exc, "Représentation déjà créée.",
                "VTKMgx3DTopoEntityRepresentation::createSurfacicRepresentation")
 		throw exc;
-	}	// if ((0 != _surfacicGrid) || ...
+	}	// if ((0 != _surfacicPolyData) || ...
 
 	TopoDisplayRepresentation	tr (DisplayRepresentation::SOLID);
 	const DisplayProperties		props	= getDisplayPropertiesAttributes ( );
@@ -286,12 +286,12 @@ void VTKMgx3DTopoEntityRepresentation::createSurfacicRepresentation ( )
 
 void VTKMgx3DTopoEntityRepresentation::createWireRepresentation ( )
 {
-	if ((0 != _wireGrid) || (0 != _wireMapper) || (0 != _wireActor))
+	if ((0 != _wirePolyData) || (0 != _wireMapper) || (0 != _wireActor))
 	{
 		INTERNAL_ERROR (exc, "Représentation déjà créée.",
                 "VTKMgx3DTopoEntityRepresentation::createWireRepresentation")
 		throw exc;
-	}	// if ((0 != _wireGrid) || ...
+	}	// if ((0 != _wirePolyData) || ...
 	DisplayRepresentation::type	t	= (DisplayRepresentation::type)(DisplayRepresentation::WIRE|DisplayRepresentation::MINIMUMWIRE);
 	TopoDisplayRepresentation	tr (t);
 	//std::cout<<"VTKMgx3DTopoEntityRepresentation::createWireRepresentation avec shrink à "<<getEntity ( )->getDisplayProperties().getShrinkFactor()<<std::endl;
@@ -301,7 +301,7 @@ void VTKMgx3DTopoEntityRepresentation::createWireRepresentation ( )
 	vector<Math::Point>&	points		= tr.getPoints ( );
 	vector<size_t>&			segments	= tr.getCurveDiscretization ( );
 	VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (
-			getEntity ( ), _wireActor, _wireMapper, _wireGrid, points, segments);
+			getEntity ( ), _wireActor, _wireMapper, _wirePolyData, points, segments);
 }	// VTKMgx3DTopoEntityRepresentation::createWireRepresentation
 
 
@@ -328,12 +328,12 @@ void VTKMgx3DTopoEntityRepresentation::createMeshShapeCloudRepresentation ( )
 
 void VTKMgx3DTopoEntityRepresentation::createMeshShapeWireRepresentation ( )
 {
-    if ((0 != _wireGrid) || (0 != _wireMapper) || (0 != _wireActor))
+    if ((0 != _wirePolyData) || (0 != _wireMapper) || (0 != _wireActor))
     {
         INTERNAL_ERROR (exc, "Représentation déjà créée.",
                 "VTKMgx3DTopoEntityRepresentation::createMeshShapeWireRepresentation")
         throw exc;
-    }   // if ((0 != _wireGrid) || ...
+    }   // if ((0 != _wirePolyData) || ...
     DisplayRepresentation::type t   = (DisplayRepresentation::type)(DisplayRepresentation::WIRE
             | DisplayRepresentation::SHOWMESHSHAPE);
     TopoDisplayRepresentation   tr (t);
@@ -343,19 +343,19 @@ void VTKMgx3DTopoEntityRepresentation::createMeshShapeWireRepresentation ( )
     vector<Math::Point>&    points      = tr.getPoints ( );
     vector<size_t>&         segments   = tr.getCurveDiscretization ( );
     VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (
-    		getEntity ( ), _wireActor, _wireMapper, _wireGrid, points, segments);
+    		getEntity ( ), _wireActor, _wireMapper, _wirePolyData, points, segments);
 
 }   // VTKMgx3DTopoEntityRepresentation::createMeshShapeWireRepresentation
 
 
 void VTKMgx3DTopoEntityRepresentation::createDiscretisationRepresentation ( )
 {
-    if ((0 != _discGrid) || (0 != _discMapper) || (0 != _discActor))
+    if ((0 != _discPolyData) || (0 != _discMapper) || (0 != _discActor))
     {
         INTERNAL_ERROR (exc, "Représentation déjà créée.",
                 "VTKMgx3DTopoEntityRepresentation::createDiscretisationRepresentation")
         throw exc;
-    }   // if ((0 != _discGrid) || ...
+    }   // if ((0 != _discPolyData) || ...
     DisplayRepresentation::type t   = (DisplayRepresentation::type)(DisplayRepresentation::SHOWDISCRETISATIONTYPE);
     TopoDisplayRepresentation   tr (t);
 	const DisplayProperties		props	= getDisplayPropertiesAttributes ( );
@@ -364,18 +364,18 @@ void VTKMgx3DTopoEntityRepresentation::createDiscretisationRepresentation ( )
     vector<Math::Point>&    points      = tr.getPoints ( );
     vector<size_t>&         segments   = tr.getCurveDiscretization ( );
     VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (
-		    		getEntity ( ), _discActor, _discMapper, _discGrid, points, segments);
+		    		getEntity ( ), _discActor, _discMapper, _discPolyData, points, segments);
 }   // VTKMgx3DTopoEntityRepresentation::createDiscretisationRepresentation
 
 
 void VTKMgx3DTopoEntityRepresentation::createIsoWireRepresentation ( )
 {
-	if ((0 != _isoWireGrid) || (0 != _isoWireMapper) || (0 != _isoWireActor))
+	if ((0 != _isoWirePolyData) || (0 != _isoWireMapper) || (0 != _isoWireActor))
 	{
 		INTERNAL_ERROR (exc, "Représentation déjà créée.",
                 "VTKMgx3DTopoEntityRepresentation::createIsoWireRepresentation")
 		throw exc;
-	}	// if ((0 != _isoWireGrid) || ...
+	}	// if ((0 != _isoWirePolyData) || ...
 
 	TopoDisplayRepresentation	tr (DisplayRepresentation::ISOCURVE);
 	const DisplayProperties		props	= getDisplayPropertiesAttributes ( );
@@ -384,7 +384,7 @@ void VTKMgx3DTopoEntityRepresentation::createIsoWireRepresentation ( )
 	vector<Math::Point>&	points	= tr.getPoints ( );
 	vector<size_t>&			lines	= tr.getCurveDiscretization ( );
 	VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (
-				getEntity ( ), _isoWireActor, _isoWireMapper,_isoWireGrid, points, lines);
+				getEntity ( ), _isoWireActor, _isoWireMapper,_isoWirePolyData, points, lines);
 }	// VTKMgx3DTopoEntityRepresentation::createIsoWireRepresentation
 
 

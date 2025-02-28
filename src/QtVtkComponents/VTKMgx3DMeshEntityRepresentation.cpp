@@ -90,12 +90,12 @@ void VTKMgx3DMeshEntityRepresentation::createCloudRepresentation ( )
 
 void VTKMgx3DMeshEntityRepresentation::createSurfacicRepresentation ( )
 {
-	if ((0 != _surfacicGrid) || (0 != _surfacicMapper) || (0 != _surfacicActor))
+	if ((0 != _surfacicPolyData) || (0 != _surfacicMapper) || (0 != _surfacicActor))
 	{
 		INTERNAL_ERROR (exc, "Représentation déjà créée.",
                "VTKMgx3DMeshEntityRepresentation::createSurfacicRepresentation")
 		throw exc;
-	}	// if ((0 != _surfacicGrid) || ...
+	}	// if ((0 != _surfacicPolyData) || ...
 
 	MeshDisplayRepresentation	mdr (DisplayRepresentation::SOLID);
 	//std::cout<<"VTKMgx3DMeshEntityRepresentation::createSurfacicRepresentation avec shrink à "<<getEntity ( )->getDisplayProperties().getShrinkFactor()<<std::endl;
@@ -241,11 +241,11 @@ void VTKMgx3DMeshEntityRepresentation::createVolumicRepresentation (const vector
 
 void VTKMgx3DMeshEntityRepresentation::createWireRepresentation ( )
 {
-	if ((0 != _wireGrid) || (0 != _wireMapper) || (0 != _wireActor))
+	if ((0 != _wirePolyData) || (0 != _wireMapper) || (0 != _wireActor))
 	{
 		INTERNAL_ERROR (exc, "Représentation déjà créée.", "VTKMgx3DMeshEntityRepresentation::createWireRepresentation")
 		throw exc;
-	}	// if ((0 != _wireGrid) || ...
+	}	// if ((0 != _wirePolyData) || ...
 	CHECK_NULL_PTR_ERROR (getEntity ( ))
 
 	// Note CP : Au 29/05/12, la représentation générale de la vue filaire
@@ -257,13 +257,13 @@ void VTKMgx3DMeshEntityRepresentation::createWireRepresentation ( )
 	vtkExtractEdges*		edgesExtractor	= vtkExtractEdges::New ( );
 	if (2 == getEntity ( )->getDim ( ))
 	{
-		if (0 == _surfacicGrid)
+		if (0 == _surfacicPolyData)
 		{
 			createSurfacicRepresentation ( );
 			hideGrid	= true;
-		}	// if (0 == _surfacicGrid)
-		CHECK_NULL_PTR_ERROR (_surfacicGrid)
-		edgesExtractor->SetInputData (_surfacicGrid);
+		}	// if (0 == _surfacicPolyData)
+		CHECK_NULL_PTR_ERROR (_surfacicPolyData)
+		edgesExtractor->SetInputData (_surfacicPolyData);
 	}	// if (2 == getEntity ( )->getDim ( ))
 	else
 	{
@@ -297,17 +297,17 @@ void VTKMgx3DMeshEntityRepresentation::createWireRepresentation ( )
 
 void VTKMgx3DMeshEntityRepresentation::createIsoWireRepresentation ( )
 {
-	if ((0 != _isoWireGrid) || (0 != _isoWireMapper) || (0 != _isoWireActor))
+	if ((0 != _isoWirePolyData) || (0 != _isoWireMapper) || (0 != _isoWireActor))
 	{
 		INTERNAL_ERROR (exc, "Représentation déjà créée.", "VTKMgx3DMeshEntityRepresentation::createIsoWireRepresentation")
 		throw exc;
-	}	// if ((0 != _isoWireGrid) || ...
+	}	// if ((0 != _isoWirePolyData) || ...
 
 	MeshDisplayRepresentation	gr (DisplayRepresentation::ISOCURVE);
 	getEntity ( )->getRepresentation (gr, true);
 	vector<Math::Point>&	points		= gr.getPoints ( );
 	vector<size_t>&			lines	= gr.getCurveDiscretization ( );
-	VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (getEntity ( ), _isoWireActor, _isoWireMapper,_isoWireGrid, points, lines);
+	VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (getEntity ( ), _isoWireActor, _isoWireMapper,_isoWirePolyData, points, lines);
 }	// VTKMgx3DMeshEntityRepresentation::createIsoWireRepresentation
 
 

@@ -532,10 +532,10 @@ cout << __FILE__ << ' ' << __LINE__ << " VTKRenderingManager::VTKConstrainedPoin
 		VTKEntityRepresentation*	vtkRep	= dynamic_cast<VTKEntityRepresentation*>(rep);
 		if (0 != rep)
 			rep->createRefinedRepresentation (factor);
-		if ((0 != vtkRep) && (0 != vtkRep->getRefinedGrid ( )))
+		if ((0 != vtkRep) && (0 != vtkRep->getRefinedPolyData ( )))
 		{
 			vtkTriangleFilter*	triangleFilter	= vtkTriangleFilter::New ( );
-			triangleFilter->SetInputData (vtkRep->getRefinedGrid ( ));
+			triangleFilter->SetInputData (vtkRep->getRefinedPolyData ( ));
 			triangleFilter->Update ( );
 			grid	= vtkUnstructuredGrid::New ( );
 			grid->Initialize ( );
@@ -543,7 +543,7 @@ cout << __FILE__ << ' ' << __LINE__ << " VTKRenderingManager::VTKConstrainedPoin
 			grid->SetCells (VTK_TRIANGLE, triangleFilter->GetOutput ( )->GetPolys ( ));
 			triangleFilter->Delete ( );		triangleFilter	= 0;
 			_constraintActor	= vtkRep->getRefinedActor ( );
-		}	// if ((0 != vtkRep) && (0 != vtkRep->getRefinedGrid ( )))
+		}	// if ((0 != vtkRep) && (0 != vtkRep->getRefinedPolyData ( )))
 
 		if (0 != _constraintActor)
 		{

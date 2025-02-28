@@ -56,13 +56,13 @@ namespace QtVtkComponents
 VTKEntityRepresentation::VTKEntityRepresentation (Entity& entity)
 	: RenderedEntityRepresentation (entity),
 	  _renderer (0),
-	  _surfacicGrid (0), _surfacicActor (0), _surfacicMapper (0),
+	  _surfacicPolyData (0), _surfacicActor (0), _surfacicMapper (0),
       _volumicGrid (0), _volumicActor (0), _volumicMapper (0),
-	  _wireGrid (0), _wireActor (0), _wireMapper (0),
-	  _isoWireGrid (0), _isoWireActor (0), _isoWireMapper (0),
-	  _discGrid (0), _discActor(0), _discMapper(0),
+	  _wirePolyData (0), _wireActor (0), _wireMapper (0),
+	  _isoWirePolyData (0), _isoWireActor (0), _isoWireMapper (0),
+	  _discPolyData (0), _discActor(0), _discMapper(0),
 	  _cloudGrid (0), _cloudActor (0), _cloudMapper (0),
-	  _refinedGrid (0), _refineFilter (0),
+	  _refinedPolyData (0), _refineFilter (0),
 	  _refinedActor (0), _refinedMapper (0),
 	  _textualInfosActor (0), _textualInfosMapper (0),
 	  _vectAssArrow (0), _vectAssActor (0), _vectAssMapper (0),
@@ -78,13 +78,13 @@ VTKEntityRepresentation::VTKEntityRepresentation (Entity& entity)
 VTKEntityRepresentation::VTKEntityRepresentation (VTKEntityRepresentation& ver)
 	: RenderedEntityRepresentation (*(ver.getEntity ( ))),
 	  _renderer (0),
-	  _surfacicGrid (0), _surfacicActor (0), _surfacicMapper (0),
+	  _surfacicPolyData (0), _surfacicActor (0), _surfacicMapper (0),
       _volumicGrid (0), _volumicActor (0), _volumicMapper (0),
-	  _wireGrid (0), _wireActor (0), _wireMapper (0),
-	  _isoWireGrid (0), _isoWireActor (0), _isoWireMapper (0),
-	  _discGrid (0), _discActor(0), _discMapper(0),
+	  _wirePolyData (0), _wireActor (0), _wireMapper (0),
+	  _isoWirePolyData (0), _isoWireActor (0), _isoWireMapper (0),
+	  _discPolyData (0), _discActor(0), _discMapper(0),
 	  _cloudGrid (0), _cloudActor (0), _cloudMapper (0),
-	  _refinedGrid (0), _refineFilter (0),
+	  _refinedPolyData (0), _refineFilter (0),
 	  _refinedActor (0), _refinedMapper (0),
 	  _textualInfosActor (0), _textualInfosMapper (0),
 	  _vectAssArrow (0), _vectAssActor (0), _vectAssMapper (0),
@@ -337,7 +337,7 @@ void VTKEntityRepresentation::updateRepresentation (unsigned long mask, bool for
 	// bogue supplémentaire (non cohérence du mask et des Add/RemoveViewProp
 	if (0 != (usedMask & SURFACES))
 	{
-	    if (0 == _surfacicGrid)
+	    if (0 == _surfacicPolyData)
 	        createSurfacicRepresentation ( );
 	    if (0 != _renderer)
 	        if (0 != _surfacicActor){
@@ -358,7 +358,7 @@ void VTKEntityRepresentation::updateRepresentation (unsigned long mask, bool for
 	}   // if (0 != (usedMask & SURFACES))
 	if (0 != (usedMask & ISOCURVES))
 	{
-		if (0 == _isoWireGrid)
+		if (0 == _isoWirePolyData)
 			createIsoWireRepresentation ( );
 		if (0 != _renderer)
 			if (0 != _isoWireActor)
@@ -369,10 +369,10 @@ void VTKEntityRepresentation::updateRepresentation (unsigned long mask, bool for
 	}	// if (0 != (usedMask & ISOCURVES))
 	if ((0 != (usedMask & CURVES)))
 	{
-//		if (0 == _wireGrid)
-// CP : ATTENTION à ce test, selon les cas on instancie ou non _wireGrid,
+//		if (0 == _wirePolyData)
+// CP : ATTENTION à ce test, selon les cas on instancie ou non _wirePolyData,
 // dans certains cas on utilise un vtkExtractEdges sur une peau et donc
-// _wireGrid est nulle.
+// _wirePolyData est nulle.
 		if ((0 == _wireActor) || (0 == _wireMapper)){
 		    if (0 == (usedMask & MESH_SHAPE))
 		        createWireRepresentation ( );
@@ -441,7 +441,7 @@ void VTKEntityRepresentation::updateRepresentation (unsigned long mask, bool for
 
     if (0 != (usedMask & DISCRETISATIONTYPE))
 	{
-    	if (0 == _discGrid)
+    	if (0 == _discPolyData)
     		createDiscretisationRepresentation();
     	if (0 != _renderer)
     		if (0 != _discActor)
@@ -583,20 +583,20 @@ property->SetInterpolationToFlat ( );
 	vtkPoints*				points		= 0;
 	vtkPointData*			pointData	= 0;
 	vtkCellData*			cellData	= 0;
-	if (0 != _surfacicGrid)
-		points	= _surfacicGrid->GetPoints ( );
+	if (0 != _surfacicPolyData)
+		points	= _surfacicPolyData->GetPoints ( );
 	else if (0 != _volumicGrid)
 		points	= _volumicGrid->GetPoints ( );
-	if (0 != _surfacicGrid)
-		pointData	= _surfacicGrid->GetPointData ( );
+	if (0 != _surfacicPolyData)
+		pointData	= _surfacicPolyData->GetPointData ( );
 	else if (0 != _volumicGrid)
 		pointData	= _volumicGrid->GetPointData ( );
-	if (0 != _surfacicGrid)
-		cellData	= _surfacicGrid->GetCellData ( );
+	if (0 != _surfacicPolyData)
+		cellData	= _surfacicPolyData->GetCellData ( );
 	else if (0 != _volumicGrid)
 		cellData	= _volumicGrid->GetCellData ( );
 	double			domain [2]	= { 0., 0. };
-	// CP ATTENTION : si on affiche un volume, le fait d'utiliser _surfacicGrid laisse supposer qu'on affiche la peau, donc beaucoup de noeuds et mailles
+	// CP ATTENTION : si on affiche un volume, le fait d'utiliser _surfacicPolyData laisse supposer qu'on affiche la peau, donc beaucoup de noeuds et mailles
 	// sont écartés. Les valeurs aux noeuds/mailles affichés doivent correspondre à ceux affichés.
 	if (0 != mapper)
 	{
@@ -619,7 +619,7 @@ property->SetInterpolationToFlat ( );
 			values->SetNumberOfTuples (points->GetNumberOfPoints ( ));
 			std::map<int,double>	nodesValue = getEntity ( )->getNodesValue (properties.getValueName ( ));
 			std::map<int,int> vtk2gmdsIDPoints =
-				0 == _surfacicGrid ? _volumicPointsVTK2GMDSID : _surfacicPointsVTK2GMDSID;
+				0 == _surfacicPolyData ? _volumicPointsVTK2GMDSID : _surfacicPointsVTK2GMDSID;
 			double minValue =  HUGE_VALF;
 			double maxValue = -HUGE_VALF;
 			if (nodesValue.size ( ) < points->GetNumberOfPoints ( ))
@@ -678,23 +678,23 @@ property->SetInterpolationToFlat ( );
 			}	// if (0 != values)
 
 			double*			ptr		= 0;
-			if (0 != _surfacicGrid)
+			if (0 != _surfacicPolyData)
 			{
-				ptr	= values->WritePointer (0, _surfacicGrid->GetNumberOfCells ( ));
-				values->SetNumberOfTuples (_surfacicGrid->GetNumberOfCells ( ));	
-			}	// if (0 != _surfacicGrid)
-			else	//	if (0 != _surfacicGrid)
+				ptr	= values->WritePointer (0, _surfacicPolyData->GetNumberOfCells ( ));
+				values->SetNumberOfTuples (_surfacicPolyData->GetNumberOfCells ( ));	
+			}	// if (0 != _surfacicPolyData)
+			else	//	if (0 != _surfacicPolyData)
 			{
 				CHECK_NULL_PTR_ERROR (_volumicGrid)
 				ptr	= values->WritePointer (0, _volumicGrid->GetNumberOfCells ( ));
 				values->SetNumberOfTuples (_volumicGrid->GetNumberOfCells ( ));	
-			}	// if (0 != _surfacicGrid)
+			}	// if (0 != _surfacicPolyData)
 			CHECK_NULL_PTR_ERROR (ptr)
 			
 			// CP : récupérer ici les vraies valeurs aux mailles :
 			size_t	cellNum	= 0;
-			if (0 != _surfacicGrid)
-				cellNum	= _surfacicGrid->GetNumberOfCells ( );
+			if (0 != _surfacicPolyData)
+				cellNum	= _surfacicPolyData->GetNumberOfCells ( );
 			else if (0 != _volumicGrid)
 				cellNum	= _volumicGrid->GetNumberOfCells ( );
 			for (size_t n = 0; n < cellNum; n++)
@@ -883,10 +883,10 @@ CHECK_NULL_PTR_ERROR (_renderer)
 }	// VTKEntityRepresentation::setRenderingManager
 
 
-vtkPolyData* VTKEntityRepresentation::getSurfacicGrid ( )
+vtkPolyData* VTKEntityRepresentation::getSurfacicPolyData ( )
 {
-	return _surfacicGrid;
-}	// VTKEntityRepresentation::getSurfacicGrid
+	return _surfacicPolyData;
+}	// VTKEntityRepresentation::getSurfacicPolyData
 
 
 vtkActor* VTKEntityRepresentation::getSurfacicActor ( )
@@ -919,14 +919,14 @@ vtkDataSetMapper* VTKEntityRepresentation::getVolumicMapper ( )
 }	// VTKEntityRepresentation::getVolumicMapper
 
 
-vtkPolyData* VTKEntityRepresentation::getRefinedGrid ( )
+vtkPolyData* VTKEntityRepresentation::getRefinedPolyData ( )
 {
-cout << __FILE__ << ' ' << __LINE__ << " VTKEntityRepresentation::getRefinedGrid TO REIMPLEMENT AS POLYDATA" << endl;
+cout << __FILE__ << ' ' << __LINE__ << " VTKEntityRepresentation::getRefinedPolyData TO REIMPLEMENT AS POLYDATA" << endl;
 	if (0 != _refineFilter)
 		return _refineFilter->GetOutput ( );
 
-	return _refinedGrid;
-}	// VTKEntityRepresentation::getRefinedGrid
+	return _refinedPolyData;
+}	// VTKEntityRepresentation::getRefinedPolyData
 
 
 vtkActor* VTKEntityRepresentation::getRefinedActor ( )
@@ -956,9 +956,9 @@ void VTKEntityRepresentation::destroyRefinedRepresentation ( )
 	if (0 != _refinedMapper)
 		_refinedMapper->Delete ( );
 	_refinedMapper	= 0;
-	if (0 != _refinedGrid)
-		_refinedGrid->Delete ( );
-	_refinedGrid	= 0;	
+	if (0 != _refinedPolyData)
+		_refinedPolyData->Delete ( );
+	_refinedPolyData	= 0;	
 }	// VTKEntityRepresentation::destroyRefinedRepresentation
 
 
@@ -1019,9 +1019,9 @@ void VTKEntityRepresentation::destroyRepresentations (bool realyDestroy)
 		if (0 != _surfacicMapper)
 			_surfacicMapper->Delete ( );
 		_surfacicMapper	= 0;
-		if (0 != _surfacicGrid)
-			_surfacicGrid->Delete ( );
-		_surfacicGrid	= 0;
+		if (0 != _surfacicPolyData)
+			_surfacicPolyData->Delete ( );
+		_surfacicPolyData	= 0;
 	}	// if (true == realyDestroy)
 
     if (0 != _volumicActor)
@@ -1059,9 +1059,9 @@ void VTKEntityRepresentation::destroyRepresentations (bool realyDestroy)
 		if (0 != _isoWireMapper)
 			_isoWireMapper->Delete ( );
 		_isoWireMapper	= 0;
-		if (0 != _isoWireGrid)
-			_isoWireGrid->Delete ( );
-		_isoWireGrid	= 0;
+		if (0 != _isoWirePolyData)
+			_isoWirePolyData->Delete ( );
+		_isoWirePolyData	= 0;
 	}	// if (true == realyDestroy)
 
 	if (0 != _wireActor)
@@ -1079,9 +1079,9 @@ void VTKEntityRepresentation::destroyRepresentations (bool realyDestroy)
 		if (0 != _wireMapper)
 			_wireMapper->Delete ( );
 		_wireMapper	= 0;
-		if (0 != _wireGrid)
-			_wireGrid->Delete ( );
-		_wireGrid	= 0;
+		if (0 != _wirePolyData)
+			_wirePolyData->Delete ( );
+		_wirePolyData	= 0;
 	}	// if (true == realyDestroy)
 
 	if (0 != _discActor)
@@ -1099,9 +1099,9 @@ void VTKEntityRepresentation::destroyRepresentations (bool realyDestroy)
 		if (0 != _discMapper)
 			_discMapper->Delete ( );
 		_discMapper	= 0;
-		if (0 != _discGrid)
-			_discGrid->Delete ( );
-		_discGrid	= 0;
+		if (0 != _discPolyData)
+			_discPolyData->Delete ( );
+		_discPolyData	= 0;
 	}	// if (true == realyDestroy)
 
 	if (0 != _cloudActor)
