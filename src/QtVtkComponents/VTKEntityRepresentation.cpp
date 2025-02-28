@@ -460,8 +460,6 @@ void VTKEntityRepresentation::updateRepresentationProperties ( )
 	if (0 == getEntity ( ))
 		return;
 
-	//std::cout<<"VTKEntityRepresentation::updateRepresentationProperties pour "<< getEntity()->getName()<<std::endl;
-
 	vtkProperty*				property	= 0;
 	const DisplayProperties	properties	= getDisplayPropertiesAttributes ( );
 	const unsigned long			mask	= getUsedRepresentationMask ( );
@@ -921,7 +919,6 @@ vtkDataSetMapper* VTKEntityRepresentation::getVolumicMapper ( )
 
 vtkPolyData* VTKEntityRepresentation::getRefinedPolyData ( )
 {
-cout << __FILE__ << ' ' << __LINE__ << " VTKEntityRepresentation::getRefinedPolyData TO REIMPLEMENT AS POLYDATA" << endl;
 	if (0 != _refineFilter)
 		return _refineFilter->GetOutput ( );
 

@@ -441,6 +441,7 @@ class QtMgx3DMainWindow :
 						*_selectSurfacesAction, *_selectVolumesAction;
 		QAction			*_selectionModeAction;
 		QAction			*_pickingSelectionAction, *_rubberBandSelectionAction, *_rubberBandInsideSelectionAction;
+		QAction			*_selectVisibleAction;
 		QAction			*_showCommandMonitorDialogAction;
 		QAction			*_displayUsersGuideAction,
 						*_displayUsersGuideContextAction,
@@ -1321,6 +1322,7 @@ class QtMgx3DMainWindow :
 	virtual void pickingSelectionCallback (bool on);
 	virtual void rubberBandSelectionCallback (bool on);
 	virtual void rubberBandInsideSelectionCallback (bool on);
+	virtual void visibleSelectionCallback (bool on);
 
 	//@}	// Callbacks du menu "Sélection".
 

@@ -303,6 +303,7 @@ namespace QtComponents
                   _selectNodesAction(0), _selectEdgesAction(0), _selectSurfacesAction(0),
                   _selectVolumesAction(0), _selectionModeAction(0), 
                   _pickingSelectionAction (0), _rubberBandSelectionAction (0), _rubberBandInsideSelectionAction (0),
+                  _selectVisibleAction (0),
                   _showCommandMonitorDialogAction(0),
                   _displayUsersGuideAction(0), _displayUsersGuideContextAction(0),
                   _displayWikiAction(0), _displayTutorialAction(0), _displayPythonAPIUsersGuideAction(0),
@@ -432,6 +433,7 @@ namespace QtComponents
                   _pickingSelectionAction(wa._pickingSelectionAction),
                   _rubberBandSelectionAction(wa._rubberBandSelectionAction),
                   _rubberBandInsideSelectionAction(wa._rubberBandInsideSelectionAction),
+                  _selectVisibleAction (wa._selectVisibleAction),
                   _showCommandMonitorDialogAction(wa._showCommandMonitorDialogAction),
                   _displayUsersGuideAction(wa._displayUsersGuideAction),
                   _displayUsersGuideContextAction(wa._displayUsersGuideContextAction),
@@ -566,6 +568,7 @@ namespace QtComponents
 				_pickingSelectionAction			= wa._pickingSelectionAction;
 				_rubberBandSelectionAction		= wa._rubberBandSelectionAction;
 				_rubberBandInsideSelectionAction= wa._rubberBandInsideSelectionAction;
+				_selectVisibleAction			= wa._selectVisibleAction;
 				_showCommandMonitorDialogAction = wa._showCommandMonitorDialogAction;
 				_displayUsersGuideAction        = wa._displayUsersGuideAction;
 				_displayUsersGuideContextAction = wa._displayUsersGuideContextAction;
@@ -1931,11 +1934,13 @@ void QtMgx3DMainWindow::showReady ( )
 			_selectionMenu->addAction(getActions()._selectEdgesAction);
 			_selectionMenu->addAction(getActions()._selectSurfacesAction);
 			_selectionMenu->addAction(getActions()._selectVolumesAction);
-			_selectionMenu->addSeparator();
+			_selectionMenu->addSeparator ( );
 			_selectionMenu->addAction(getActions()._selectionModeAction);
 			_selectionMenu->addAction(getActions()._pickingSelectionAction);
 			_selectionMenu->addAction(getActions()._rubberBandSelectionAction);
 			_selectionMenu->addAction(getActions()._rubberBandInsideSelectionAction);
+			_selectionMenu->addSeparator ( );
+			_selectionMenu->addAction (getActions()._selectVisibleAction);
 
 #ifdef USE_EXPERIMENTAL_ROOM
 			// Menu Chambre expérimentale :
@@ -2080,7 +2085,8 @@ void QtMgx3DMainWindow::showReady ( )
 			_selectionToolbar->addWidget (_selectionModeToolButton);
 			_selectionModeToolButton->setIcon (getActions ( )._pickingSelectionAction->icon ( ));
 			_selectionModeToolButton->setToolTip (getActions ( )._pickingSelectionAction->toolTip ( ));
-			
+			_selectionToolbar->addSeparator();
+			_selectionToolbar->addAction (getActions ( )._selectVisibleAction);			
 			addToolBar(Qt::TopToolBarArea, _selectionToolbar);
 
 			COMPLETE_QT_TRY_CATCH_BLOCK(true, this, getAppTitle())
@@ -2091,8 +2097,7 @@ void QtMgx3DMainWindow::showReady ( )
 		{
 			if (0 != getActions()._quitAction)
 			{
-				INTERNAL_ERROR(exc,
-				               "QtMgx3DMainWindow::createActions", "Actions déjà créées.")
+				INTERNAL_ERROR(exc,"QtMgx3DMainWindow::createActions", "Actions déjà créées.")
 			}    // if (0 != getActions ( )._quitAction)
 
 			_actions._preferencesAction = new QAction(QString::fromUtf8("Préférences ..."), this);
@@ -2458,6 +2463,11 @@ void QtMgx3DMainWindow::showReady ( )
 			ag1->addAction (_actions._pickingSelectionAction);
 			ag1->addAction (_actions._rubberBandSelectionAction);
 			ag1->addAction (_actions._rubberBandInsideSelectionAction);
+			_actions._selectVisibleAction	= new QAction (QIcon (":/images/visible.png"), QString::fromUtf8 ("Sélection des entités visibles uniquement."), this);
+			_actions._selectVisibleAction->setToolTip (QString::fromUtf8 ("Activé ne permet de sélectionner que les entités visibles, pas celles masquées par d'autres."));
+			_actions._selectVisibleAction->setCheckable (true);
+			_actions._selectVisibleAction->setChecked (false);
+			connect (_actions._selectVisibleAction, SIGNAL(toggled(bool)), this, SLOT(visibleSelectionCallback(bool)), defaultConnectionType);
 #ifdef USE_EXPERIMENTAL_ROOM
 			// La chambre expérimentale :
 			_actions._setRaysContextAction =
@@ -7756,6 +7766,7 @@ void QtMgx3DMainWindow::pickingSelectionCallback (bool on)
 		_selectionModeToolButton->setIcon (getActions ( )._pickingSelectionAction->icon ( ));
 		_selectionModeToolButton->setToolTip (getActions ( )._pickingSelectionAction->toolTip ( ));
 	}	// if (true == on)
+	getActions ( )._selectVisibleAction->setEnabled (!on);
 	
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::pickingSelectionCallback
@@ -7770,6 +7781,7 @@ void QtMgx3DMainWindow::rubberBandSelectionCallback (bool on)
 		_selectionModeToolButton->setIcon (getActions ( )._rubberBandSelectionAction->icon ( ));
 		_selectionModeToolButton->setToolTip (getActions ( )._rubberBandSelectionAction->toolTip ( ));
 	}	// if (true == on)
+	getActions ( )._selectVisibleAction->setEnabled (on);
 	
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::rubberBandSelectionCallback
@@ -7784,9 +7796,20 @@ void QtMgx3DMainWindow::rubberBandInsideSelectionCallback (bool on)
 		_selectionModeToolButton->setIcon (getActions ( )._rubberBandInsideSelectionAction->icon ( ));
 		_selectionModeToolButton->setToolTip (getActions ( )._rubberBandInsideSelectionAction->toolTip ( ));
 	}	// if (true == on)
+	getActions ( )._selectVisibleAction->setEnabled (on);
 	
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::rubberBandInsideSelectionCallback
+
+
+void QtMgx3DMainWindow::visibleSelectionCallback (bool on)
+{
+	BEGIN_QT_TRY_CATCH_BLOCK
+
+	// To overload
+	
+	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
+}	// QtMgx3DMainWindow::visibleSelectionCallback
 
 
 #ifdef USE_EXPERIMENTAL_ROOM

@@ -770,7 +770,6 @@ createCoFacesSurfacicRepresentationRatio1(std::vector<Topo::CoFace*> cofaces, gm
 	CHECK_NULL_PTR_ERROR(points)
     points->SetDataTypeToDouble();
 
-cout << __FILE__ << ' ' << __LINE__ << endl;
 	// on cumule les noeuds, en évitant les doublons
 	std::vector<gmds::Node> nodes;
 	std::vector<gmds::Face> polygones;
@@ -842,7 +841,6 @@ cout << __FILE__ << ' ' << __LINE__ << endl;
 		for (size_t j = 0; j < ndsIDs.size(); j++)
 			cellsPtr [pos++] = node2id [ndsIDs [j]];
 	} // for (id = 0; id < polygonNum; id++)
-
 	cellArray->SetCells (polygonNum, idsArray);
 	_surfacicPolyData->SetPolys (cellArray);
 	idsArray->Delete ( );
@@ -1114,7 +1112,7 @@ void VTKGMDSEntityRepresentation::createMeshEntityVolumicRepresentation(Mesh::Me
 
         const size_t pointsNum = nodes.size();
         const size_t polyedreNum = polyedres.size();
-        //cout << "PTS : " << pointsNum << " POLYGONES : " << polyedreNum << endl;
+
         // Les sommets :
         points->SetNumberOfPoints(pointsNum);
         _volumicGrid->Allocate(polyedreNum, 1000);

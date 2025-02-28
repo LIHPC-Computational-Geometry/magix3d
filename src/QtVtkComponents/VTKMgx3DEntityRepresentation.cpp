@@ -156,7 +156,6 @@ void VTKMgx3DEntityRepresentation::createPointsCloudRepresentation (
 	// Les points : on part ici du principe qu'on a que des points.
 #ifndef VTK_SLOW_CODE
 #	ifndef VTK_VERTEX_GENERALIZATION
-//cout << "VERTEX SPECIALIZATION" << endl;
 	// => Spécialisation : triangles
 	vtkCellArray*	cellArray	= vtkCellArray::New ( );
 	vtkIdTypeArray*	idsArray	= vtkIdTypeArray::New ( );
@@ -182,7 +181,6 @@ void VTKMgx3DEntityRepresentation::createPointsCloudRepresentation (
 	idsArray->Delete ( );	idsArray	= 0;
 	cellArray->Delete ( );	cellArray	= 0;
 #	else	// VTK_VERTEX_GENERALIZATION
-//cout << "VERTEX GENERALIZATION" << endl;
 	int*			cellTypes	= new int [pointsNum];
 	vtkCellArray*	cellArray	= vtkCellArray::New ( );
 	vtkIdTypeArray*	idsArray	= vtkIdTypeArray::New ( );
@@ -204,7 +202,6 @@ void VTKMgx3DEntityRepresentation::createPointsCloudRepresentation (
 	cellArray->Delete ( );	cellArray	= 0;
 #	endif	//  VTK_VERTEX_GENERALIZATION
 #else	// VTK_SLOW_CODE
-//cout << "VTK SLOW CODE" << endl;
 	// Ca marche mais l'algo est loin d'être optimal :
 	vtkVertex* vertex	= vtkVertex::New ( );
 	for (id = 0; id < pointsNum; id++)
@@ -255,7 +252,6 @@ void VTKMgx3DEntityRepresentation::createTrianglesSurfacicRepresentation (
 	polydata->Initialize ( );
 	const size_t	pointsNum	= meshPts.size ( );
 	const size_t	trianglesNum	= triangles.size ( ) / 3;
-//cout << "PTS : " << pointsNum << " TRIANGLES : " << trianglesNum << endl;
 	// Les sommets :
 	points->SetDataTypeToDouble ( );
 	points->SetNumberOfPoints (pointsNum);
@@ -320,7 +316,6 @@ void VTKMgx3DEntityRepresentation::createTrianglesSurfacicRepresentation (const 
 
 void VTKMgx3DEntityRepresentation::createPolygonsSurfacicRepresentation (const vector<Math::Point>& meshPts, const vector<size_t>& mesh)
 {
-cout << __FILE__ << ' ' << __LINE__ << " VTKMgx3DEntityRepresentation::createPolygonsSurfacicRepresentation AT BEGINNING" << endl;
 	if ((0 != _surfacicPolyData) || (0 != _surfacicMapper) || (0 != _surfacicActor))
 	{
 		INTERNAL_ERROR (exc, "Représentation déjà créée.", "VTKMgx3DEntityRepresentation::createPolygonsSurfacicRepresentation")
@@ -350,6 +345,7 @@ cout << __FILE__ << ' ' << __LINE__ << " VTKMgx3DEntityRepresentation::createPol
 	_surfacicPolyData->Initialize ( );
 	const size_t	pointsNum		= meshPts.size ( );
 	const size_t	polygonsNum	= mesh.size ( ) / 3;	// Approximation ...
+	
 	// Les sommets :
 	points->SetDataTypeToDouble ( );
 	points->SetNumberOfPoints (pointsNum);
@@ -384,7 +380,6 @@ cout << __FILE__ << ' ' << __LINE__ << " VTKMgx3DEntityRepresentation::createPol
 	idsArray->Delete ( );	idsArray	= 0;
 	cellArray->Delete ( );	cellArray	= 0;
 	points->Delete ( );		points		= 0;
-cout << __FILE__ << ' ' << __LINE__ << " VTKMgx3DEntityRepresentation::createPolygonsSurfacicRepresentation AT END" << endl;
 }	// VTKMgx3DEntityRepresentation::createPolygonsSurfacicRepresentation
 
 
@@ -418,7 +413,7 @@ void VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (
 	grid->Initialize ( );
 	const size_t	pointsNum	= meshPts.size ( );
 	const size_t	edgesNum	= mesh.size ( ) / 2;
-//cout << "PTS : " << pointsNum << " EDGES : " << edgesNum << endl;
+
 	// Les sommets :
 	points->SetDataTypeToDouble ( );
 	points->SetNumberOfPoints (pointsNum);
