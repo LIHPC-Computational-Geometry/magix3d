@@ -7,8 +7,10 @@ include (${CMAKE_SOURCE_DIR}/cmake/common.cmake)
 find_package (VtkContrib REQUIRED)
 
 file (GLOB HEADERS protected/VtkComponents/vtkECMFactory.h protected/VtkComponents/vtkECMXOpenGLRenderWindow.h protected/VtkComponents/vtkECMAreaPicker.h
-                   protected/VtkComponents/vtkECMExtractSelectedFrustum.h protected/VtkComponents/vtkUnstructuredGridRefinementFilter.h)
-file (GLOB CPP_SOURCES vtkECMFactory.cpp vtkECMXOpenGLRenderWindow.cpp vtkECMAreaPicker.cpp vtkECMExtractSelectedFrustum.cpp vtkUnstructuredGridRefinementFilter.cpp)
+                   protected/VtkComponents/vtkECMExtractSelectedFrustum.h protected/VtkComponents/vtkPolyDataRefinementFilter.h
+                   protected/VtkComponents/vtkUnstructuredGridRefinementFilter.h)
+file (GLOB CPP_SOURCES vtkECMFactory.cpp vtkECMXOpenGLRenderWindow.cpp vtkECMAreaPicker.cpp vtkECMExtractSelectedFrustum.cpp vtkPolyDataRefinementFilter.cpp
+                   vtkUnstructuredGridRefinementFilter.cpp)
 
 # On ajoute les en-têtes aux sources. C'est utile pour cmake dans certains cas, par exemple lorsqu'ils doivent être pré-processés (moc, ...).
 add_library (VtkComponents ${CPP_SOURCES} ${HEADERS})

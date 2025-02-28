@@ -44,19 +44,16 @@ namespace QtVtkComponents
 
 const string VTKMgx3DTopoEntityRepresentation::edgesNumFieldName ("edgesNum");
 
-VTKMgx3DTopoEntityRepresentation::VTKMgx3DTopoEntityRepresentation (
-															TopoEntity& entity)
+VTKMgx3DTopoEntityRepresentation::VTKMgx3DTopoEntityRepresentation (TopoEntity& entity)
 	: QtVtkComponents::VTKMgx3DEntityRepresentation (entity)
 #ifdef OLD_TOPO_ENTITY_EDGESNUM_REPRESENTATION
-	  , _meshingEdgesNumActor (0), _meshingEdgesNumMapper (0),
-	  _visibleMeshingEdgesFilter (0)
+	  , _meshingEdgesNumActor (0), _meshingEdgesNumMapper (0), _visibleMeshingEdgesFilter (0)
 #endif	// OLD_TOPO_ENTITY_EDGESNUM_REPRESENTATION
 {
 }	// VTKMgx3DTopoEntityRepresentation::VTKMgx3DTopoEntityRepresentation
 
 
-VTKMgx3DTopoEntityRepresentation::VTKMgx3DTopoEntityRepresentation (
-										VTKMgx3DTopoEntityRepresentation& ver)
+VTKMgx3DTopoEntityRepresentation::VTKMgx3DTopoEntityRepresentation (VTKMgx3DTopoEntityRepresentation& ver)
 	: QtVtkComponents::VTKMgx3DEntityRepresentation (*(ver.getEntity ( )))
 #ifdef OLD_TOPO_ENTITY_EDGESNUM_REPRESENTATION
 	  , _meshingEdgesNumActor (0), _meshingEdgesNumMapper (0),
@@ -67,8 +64,7 @@ VTKMgx3DTopoEntityRepresentation::VTKMgx3DTopoEntityRepresentation (
 }	// VTKMgx3DTopoEntityRepresentation::VTKMgx3DTopoEntityRepresentation
 
 
-VTKMgx3DTopoEntityRepresentation& VTKMgx3DTopoEntityRepresentation::operator = (
-									const VTKMgx3DTopoEntityRepresentation& er)
+VTKMgx3DTopoEntityRepresentation& VTKMgx3DTopoEntityRepresentation::operator = (const VTKMgx3DTopoEntityRepresentation& er)
 {
 	MGX_FORBIDDEN ("VTKMgx3DTopoEntityRepresentation assignment operator is not allowed.");
 	if (&er != this)
@@ -85,8 +81,7 @@ VTKMgx3DTopoEntityRepresentation::~VTKMgx3DTopoEntityRepresentation ( )
 }	// VTKMgx3DTopoEntityRepresentation::~VTKMgx3DTopoEntityRepresentation
 
 
-void VTKMgx3DTopoEntityRepresentation::setRenderingManager (
-														RenderingManager* rm)
+void VTKMgx3DTopoEntityRepresentation::setRenderingManager (RenderingManager* rm)
 {
 	VTKMgx3DEntityRepresentation::setRenderingManager (rm);
 
@@ -95,8 +90,7 @@ void VTKMgx3DTopoEntityRepresentation::setRenderingManager (
 }	// VTKMgx3DTopoEntityRepresentation::setRenderingManager
 
 
-void VTKMgx3DTopoEntityRepresentation::show (
-							VTKRenderingManager& renderingManager, bool display)
+void VTKMgx3DTopoEntityRepresentation::show (VTKRenderingManager& renderingManager, bool display)
 {
 	VTKMgx3DEntityRepresentation::show (renderingManager, display);
 #ifdef OLD_TOPO_ENTITY_EDGESNUM_REPRESENTATION
@@ -121,12 +115,9 @@ void VTKMgx3DTopoEntityRepresentation::show (
 }	// VTKMgx3DTopoEntityRepresentation::show
 
 
-string VTKMgx3DTopoEntityRepresentation::getRepresentationText (
-													unsigned long mask) const
+string VTKMgx3DTopoEntityRepresentation::getRepresentationText (unsigned long mask) const
 {
-	UTF8String	text (
-				VTKMgx3DEntityRepresentation::getRepresentationText (mask),
-				Charset::UTF_8);
+	UTF8String	text (VTKMgx3DEntityRepresentation::getRepresentationText (mask), Charset::UTF_8);
 
 	if (0 != (GraphicalEntityRepresentation::NBMESHINGEDGE & mask))
 	{
@@ -150,8 +141,7 @@ Math::Point
 	{
 		DisplayRepresentation::type	type	= DisplayRepresentation::WIRE;
 		if (0 != (mask & MESH_SHAPE))
-			type	= (DisplayRepresentation::type)(
-			DisplayRepresentation::WIRE | DisplayRepresentation::SHOWMESHSHAPE);
+			type	= (DisplayRepresentation::type)(DisplayRepresentation::WIRE | DisplayRepresentation::SHOWMESHSHAPE);
 		TopoDisplayRepresentation	tr (type);
 		const DisplayProperties		props	= getDisplayPropertiesAttributes( );
 		tr.setShrink (props.getShrinkFactor ( ));
@@ -181,8 +171,7 @@ Math::Point
 }	// VTKMgx3DTopoEntityRepresentation::getRepresentationTextPosition
 
 
-void VTKMgx3DTopoEntityRepresentation::updateRepresentation (
-												unsigned long mask, bool force)
+void VTKMgx3DTopoEntityRepresentation::updateRepresentation (unsigned long mask, bool force)
 {
 #ifdef OLD_TOPO_ENTITY_EDGESNUM_REPRESENTATION
 	const unsigned long		oldMask = getRepresentationMask ( );
@@ -223,8 +212,7 @@ void VTKMgx3DTopoEntityRepresentation::updateRepresentation (
 
 Color VTKMgx3DTopoEntityRepresentation::getColor (unsigned long rep) const
 {
-	if ((0 != getRenderingManager ( )) && (false == isSelected ( )) &&
-	    (false == isHighlighted ( )) &&
+	if ((0 != getRenderingManager ( )) && (false == isSelected ( )) && (false == isHighlighted ( )) &&
 	    (true == getRenderingManager ( )->topoUseGeomColor ( )))
 	{
 		const TopoEntity*	te	= dynamic_cast<const TopoEntity*>(getEntity( ));
@@ -234,8 +222,7 @@ Color VTKMgx3DTopoEntityRepresentation::getColor (unsigned long rep) const
 		{
 			DisplayProperties&			dp	= ge->getDisplayProperties ( );
 			GraphicalRepresentation*	gr	= dp.getGraphicalRepresentation ( );
-			RenderedEntityRepresentation*	rer	=
-							dynamic_cast<RenderedEntityRepresentation*>(gr);
+			RenderedEntityRepresentation*	rer	= dynamic_cast<RenderedEntityRepresentation*>(gr);
 			if (0 != rer)
 				return rer->getBaseColor (rep);
 		}	// if (0 != ge)
@@ -249,8 +236,7 @@ void VTKMgx3DTopoEntityRepresentation::createCloudRepresentation ( )
 {
 	if ((0 != _cloudGrid) || (0 != _cloudMapper) || (0 != _cloudActor))
 	{
-		INTERNAL_ERROR (exc, "Représentation déjà créée.",
-               "VTKMgx3DTopoEntityRepresentation::createCloudRepresentation")
+		INTERNAL_ERROR (exc, "Représentation déjà créée.", "VTKMgx3DTopoEntityRepresentation::createCloudRepresentation")
 		throw exc;
 	}	// if ((0 != _cloudGrid) || ...
 
@@ -259,19 +245,17 @@ void VTKMgx3DTopoEntityRepresentation::createCloudRepresentation ( )
 	tr.setShrink (props.getShrinkFactor ( ));
 	getEntity ( )->getRepresentation (tr, true);
 	vector<Math::Point>&	points		= tr.getPoints ( );
-	VTKMgx3DEntityRepresentation::createPointsCloudRepresentation (
-			getEntity ( ), _cloudActor, _cloudMapper, _cloudGrid, points);
+	VTKMgx3DEntityRepresentation::createPointsCloudRepresentation (getEntity ( ), _cloudActor, _cloudMapper, _cloudGrid, points);
 }	// VTKMgx3DTopoEntityRepresentation::createCloudRepresentation
 
 
 void VTKMgx3DTopoEntityRepresentation::createSurfacicRepresentation ( )
 {
-	if ((0 != _surfacicGrid) || (0 != _surfacicMapper) || (0 != _surfacicActor))
+	if ((0 != _surfacicPolyData) || (0 != _surfacicMapper) || (0 != _surfacicActor))
 	{
-		INTERNAL_ERROR (exc, "Représentation déjà créée.",
-               "VTKMgx3DTopoEntityRepresentation::createSurfacicRepresentation")
+		INTERNAL_ERROR (exc, "Représentation déjà créée.", "VTKMgx3DTopoEntityRepresentation::createSurfacicRepresentation")
 		throw exc;
-	}	// if ((0 != _surfacicGrid) || ...
+	}	// if ((0 != _surfacicPolyData) || ...
 
 	TopoDisplayRepresentation	tr (DisplayRepresentation::SOLID);
 	const DisplayProperties		props	= getDisplayPropertiesAttributes ( );
@@ -279,19 +263,17 @@ void VTKMgx3DTopoEntityRepresentation::createSurfacicRepresentation ( )
 	getEntity ( )->getRepresentation (tr, true);
 	vector<Math::Point>&	points		= tr.getPoints ( );
 	vector<size_t>&			triangles	= tr.getSurfaceDiscretization ( );
-	VTKMgx3DEntityRepresentation::createTrianglesSurfacicRepresentation (
-														points, triangles);
+	VTKMgx3DEntityRepresentation::createTrianglesSurfacicRepresentation (points, triangles);
 }	// VTKMgx3DTopoEntityRepresentation::createSurfacicRepresentation
 
 
 void VTKMgx3DTopoEntityRepresentation::createWireRepresentation ( )
 {
-	if ((0 != _wireGrid) || (0 != _wireMapper) || (0 != _wireActor))
+	if ((0 != _wirePolyData) || (0 != _wireMapper) || (0 != _wireActor))
 	{
-		INTERNAL_ERROR (exc, "Représentation déjà créée.",
-                "VTKMgx3DTopoEntityRepresentation::createWireRepresentation")
+		INTERNAL_ERROR (exc, "Représentation déjà créée.", "VTKMgx3DTopoEntityRepresentation::createWireRepresentation")
 		throw exc;
-	}	// if ((0 != _wireGrid) || ...
+	}	// if ((0 != _wirePolyData) || ...
 	DisplayRepresentation::type	t	= (DisplayRepresentation::type)(DisplayRepresentation::WIRE|DisplayRepresentation::MINIMUMWIRE);
 	TopoDisplayRepresentation	tr (t);
 	//std::cout<<"VTKMgx3DTopoEntityRepresentation::createWireRepresentation avec shrink à "<<getEntity ( )->getDisplayProperties().getShrinkFactor()<<std::endl;
@@ -300,8 +282,7 @@ void VTKMgx3DTopoEntityRepresentation::createWireRepresentation ( )
 	getEntity ( )->getRepresentation (tr, true);
 	vector<Math::Point>&	points		= tr.getPoints ( );
 	vector<size_t>&			segments	= tr.getCurveDiscretization ( );
-	VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (
-			getEntity ( ), _wireActor, _wireMapper, _wireGrid, points, segments);
+	VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (getEntity ( ), _wireActor, _wireMapper, _wirePolyData, points, segments);
 }	// VTKMgx3DTopoEntityRepresentation::createWireRepresentation
 
 
@@ -309,53 +290,46 @@ void VTKMgx3DTopoEntityRepresentation::createMeshShapeCloudRepresentation ( )
 {
 	if ((0 != _cloudGrid) || (0 != _cloudMapper) || (0 != _cloudActor))
     {
-        INTERNAL_ERROR (exc, "Représentation déjà créée.",
-                "VTKMgx3DTopoEntityRepresentation::createMeshShapeCloudRepresentation")
+        INTERNAL_ERROR (exc, "Représentation déjà créée.", "VTKMgx3DTopoEntityRepresentation::createMeshShapeCloudRepresentation")
         throw exc;
     }   // if ((0 != _cloudGrid) || ...
-    DisplayRepresentation::type t   = (DisplayRepresentation::type)(DisplayRepresentation::WIRE
-            | DisplayRepresentation::SHOWMESHSHAPE);
+    DisplayRepresentation::type t   = (DisplayRepresentation::type)(DisplayRepresentation::WIRE | DisplayRepresentation::SHOWMESHSHAPE);
     TopoDisplayRepresentation   tr (t);
 	const DisplayProperties		props	= getDisplayPropertiesAttributes ( );
 	tr.setShrink (props.getShrinkFactor ( ));
     getEntity ( )->getRepresentation (tr, true);
     vector<Math::Point>&    points      = tr.getPoints ( );
-    VTKMgx3DEntityRepresentation::createPointsCloudRepresentation (
-			getEntity ( ), _cloudActor, _cloudMapper, _cloudGrid, points);
+    VTKMgx3DEntityRepresentation::createPointsCloudRepresentation (getEntity ( ), _cloudActor, _cloudMapper, _cloudGrid, points);
 
 }   // VTKMgx3DTopoEntityRepresentation::createMeshShapeCloudRepresentation
 
 
 void VTKMgx3DTopoEntityRepresentation::createMeshShapeWireRepresentation ( )
 {
-    if ((0 != _wireGrid) || (0 != _wireMapper) || (0 != _wireActor))
+    if ((0 != _wirePolyData) || (0 != _wireMapper) || (0 != _wireActor))
     {
-        INTERNAL_ERROR (exc, "Représentation déjà créée.",
-                "VTKMgx3DTopoEntityRepresentation::createMeshShapeWireRepresentation")
+        INTERNAL_ERROR (exc, "Représentation déjà créée.", "VTKMgx3DTopoEntityRepresentation::createMeshShapeWireRepresentation")
         throw exc;
-    }   // if ((0 != _wireGrid) || ...
-    DisplayRepresentation::type t   = (DisplayRepresentation::type)(DisplayRepresentation::WIRE
-            | DisplayRepresentation::SHOWMESHSHAPE);
+    }   // if ((0 != _wirePolyData) || ...
+    DisplayRepresentation::type t   = (DisplayRepresentation::type)(DisplayRepresentation::WIRE | DisplayRepresentation::SHOWMESHSHAPE);
     TopoDisplayRepresentation   tr (t);
 	const DisplayProperties		props	= getDisplayPropertiesAttributes ( );
 	tr.setShrink (props.getShrinkFactor ( ));
     getEntity ( )->getRepresentation (tr, true);
     vector<Math::Point>&    points      = tr.getPoints ( );
     vector<size_t>&         segments   = tr.getCurveDiscretization ( );
-    VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (
-    		getEntity ( ), _wireActor, _wireMapper, _wireGrid, points, segments);
+    VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (getEntity ( ), _wireActor, _wireMapper, _wirePolyData, points, segments);
 
 }   // VTKMgx3DTopoEntityRepresentation::createMeshShapeWireRepresentation
 
 
 void VTKMgx3DTopoEntityRepresentation::createDiscretisationRepresentation ( )
 {
-    if ((0 != _discGrid) || (0 != _discMapper) || (0 != _discActor))
+    if ((0 != _discPolyData) || (0 != _discMapper) || (0 != _discActor))
     {
-        INTERNAL_ERROR (exc, "Représentation déjà créée.",
-                "VTKMgx3DTopoEntityRepresentation::createDiscretisationRepresentation")
+        INTERNAL_ERROR (exc, "Représentation déjà créée.", "VTKMgx3DTopoEntityRepresentation::createDiscretisationRepresentation")
         throw exc;
-    }   // if ((0 != _discGrid) || ...
+    }   // if ((0 != _discPolyData) || ...
     DisplayRepresentation::type t   = (DisplayRepresentation::type)(DisplayRepresentation::SHOWDISCRETISATIONTYPE);
     TopoDisplayRepresentation   tr (t);
 	const DisplayProperties		props	= getDisplayPropertiesAttributes ( );
@@ -363,19 +337,17 @@ void VTKMgx3DTopoEntityRepresentation::createDiscretisationRepresentation ( )
     getEntity ( )->getRepresentation (tr, true);
     vector<Math::Point>&    points      = tr.getPoints ( );
     vector<size_t>&         segments   = tr.getCurveDiscretization ( );
-    VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (
-		    		getEntity ( ), _discActor, _discMapper, _discGrid, points, segments);
+    VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (getEntity ( ), _discActor, _discMapper, _discPolyData, points, segments);
 }   // VTKMgx3DTopoEntityRepresentation::createDiscretisationRepresentation
 
 
 void VTKMgx3DTopoEntityRepresentation::createIsoWireRepresentation ( )
 {
-	if ((0 != _isoWireGrid) || (0 != _isoWireMapper) || (0 != _isoWireActor))
+	if ((0 != _isoWirePolyData) || (0 != _isoWireMapper) || (0 != _isoWireActor))
 	{
-		INTERNAL_ERROR (exc, "Représentation déjà créée.",
-                "VTKMgx3DTopoEntityRepresentation::createIsoWireRepresentation")
+		INTERNAL_ERROR (exc, "Représentation déjà créée.", "VTKMgx3DTopoEntityRepresentation::createIsoWireRepresentation")
 		throw exc;
-	}	// if ((0 != _isoWireGrid) || ...
+	}	// if ((0 != _isoWirePolyData) || ...
 
 	TopoDisplayRepresentation	tr (DisplayRepresentation::ISOCURVE);
 	const DisplayProperties		props	= getDisplayPropertiesAttributes ( );
@@ -383,8 +355,7 @@ void VTKMgx3DTopoEntityRepresentation::createIsoWireRepresentation ( )
 	getEntity ( )->getRepresentation (tr, true);
 	vector<Math::Point>&	points	= tr.getPoints ( );
 	vector<size_t>&			lines	= tr.getCurveDiscretization ( );
-	VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (
-				getEntity ( ), _isoWireActor, _isoWireMapper,_isoWireGrid, points, lines);
+	VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (getEntity ( ), _isoWireActor, _isoWireMapper,_isoWirePolyData, points, lines);
 }	// VTKMgx3DTopoEntityRepresentation::createIsoWireRepresentation
 
 
@@ -392,27 +363,24 @@ void VTKMgx3DTopoEntityRepresentation::createAssociationVectorRepresentation ( )
 {
 	if ((0 != _vectAssArrow) || (0 != _vectAssMapper) || (0 != _vectAssActor))
 	{
-		INTERNAL_ERROR (exc, "Représentation déjà créée.",
-                "VTKMgx3DTopoEntityRepresentation::createAssociationVectorRepresentation")
+		INTERNAL_ERROR (exc, "Représentation déjà créée.",  "VTKMgx3DTopoEntityRepresentation::createAssociationVectorRepresentation")
 		throw exc;
 	}	// if ((0 != _vectAssArrow) || ...
-	DisplayRepresentation::type	t	=
-		(DisplayRepresentation::type)(DisplayRepresentation::SHOWASSOCIATION);
+	DisplayRepresentation::type	t	= (DisplayRepresentation::type)(DisplayRepresentation::SHOWASSOCIATION);
 	TopoDisplayRepresentation	tr (t);
 	const DisplayProperties		props	= getDisplayPropertiesAttributes ( );
 	tr.setShrink (props.getShrinkFactor ( ));
 	getEntity ( )->getRepresentation (tr, true);
 //	const DisplayProperties&	properties	= getEntity ( )->getDisplayProperties ( );
 	const DisplayProperties		properties	= getDisplayPropertiesAttributes ( );
-	const Color&						color	= properties.getWireColor ( );
-	const vector<Math::Point>&      	vector	= tr.getVector ( );
+	const Color&				color	= properties.getWireColor ( );
+	const vector<Math::Point>&  vector	= tr.getVector ( );
 	VTKMgx3DEntityRepresentation::createAssociationVectorRepresentation (
 																vector, color);
 }	// VTKMgx3DTopoEntityRepresentation::createAssociationVectorRepresentation
 
 
-bool VTKMgx3DTopoEntityRepresentation::getRefinedRepresentation (
-	vector<Math::Point>& points, vector<size_t>& discretization, size_t factor)
+bool VTKMgx3DTopoEntityRepresentation::getRefinedRepresentation (vector<Math::Point>& points, vector<size_t>& discretization, size_t factor)
 {
 	CHECK_NULL_PTR_ERROR (getEntity ( ))
 	const DisplayRepresentation::type	repType	= getEntity ( )->getDim ( ) < 2 ? 
@@ -432,8 +400,7 @@ bool VTKMgx3DTopoEntityRepresentation::getRefinedRepresentation (
 
 
 #ifdef OLD_TOPO_ENTITY_EDGESNUM_REPRESENTATION
-void VTKMgx3DTopoEntityRepresentation::createMeshingEdgesNumRepresentation (
-															unsigned long mask)
+void VTKMgx3DTopoEntityRepresentation::createMeshingEdgesNumRepresentation (unsigned long mask)
 {
 	CHECK_NULL_PTR_ERROR (getEntity ( ))
 	CoEdge*	edge	= dynamic_cast<CoEdge*>(getEntity ( ));
@@ -441,8 +408,7 @@ void VTKMgx3DTopoEntityRepresentation::createMeshingEdgesNumRepresentation (
 	{
 		DisplayRepresentation::type	type	= DisplayRepresentation::WIRE;
 		if (0 != (mask & MESH_SHAPE))
-			type	= (DisplayRepresentation::type)(
-			DisplayRepresentation::WIRE | DisplayRepresentation::SHOWMESHSHAPE);
+			type	= (DisplayRepresentation::type)(DisplayRepresentation::WIRE | DisplayRepresentation::SHOWMESHSHAPE);
 		TopoDisplayRepresentation	tr (type);
 		const DisplayProperties		props	= getDisplayPropertiesAttributes( );
 		tr.setShrink (props.getShrinkFactor ( ));
@@ -491,15 +457,12 @@ void VTKMgx3DTopoEntityRepresentation::createMeshingEdgesNumRepresentation (
 		data->SetScalars (array);
 		data->SetActiveScalars (edgesNumFieldName.c_str ( ));
 		data->CopyScalarsOn ( );
-		data->SetActiveAttribute (
-					edgesNumFieldName.c_str ( ), vtkDataSetAttributes::SCALARS);
+		data->SetActiveAttribute (edgesNumFieldName.c_str ( ), vtkDataSetAttributes::SCALARS);
 		_visibleMeshingEdgesFilter->SetInput (grid);
 		CHECK_NULL_PTR_ERROR (_visibleMeshingEdgesFilter->GetOutput ( ))
-		vtkDataSetAttributes*	attr	=
-					_visibleMeshingEdgesFilter->GetOutput ( )->GetPointData ( );
+		vtkDataSetAttributes*	attr	= _visibleMeshingEdgesFilter->GetOutput ( )->GetPointData ( );
 		CHECK_NULL_PTR_ERROR (attr)
-		int	index	= attr->SetActiveAttribute (
-					edgesNumFieldName.c_str ( ), vtkDataSetAttributes::SCALARS);
+		int	index	= attr->SetActiveAttribute (edgesNumFieldName.c_str ( ), vtkDataSetAttributes::SCALARS);
 //		const DisplayProperties&	properties	= edge->getDisplayProperties( );
 		const DisplayProperties	properties	= getDisplayPropertiesAttributes( );
 		Color						color		= properties.getWireColor ( );
@@ -540,8 +503,7 @@ void VTKMgx3DTopoEntityRepresentation::destroyRepresentations (bool realyDestroy
 #ifdef OLD_TOPO_ENTITY_EDGESNUM_REPRESENTATION
 	if (0 != _meshingEdgesNumActor)
 	{
-		VTKRenderingManager*	renderingManager	=
-					dynamic_cast<VTKRenderingManager*>(getRenderingManager ( ));
+		VTKRenderingManager*	renderingManager	= dynamic_cast<VTKRenderingManager*>(getRenderingManager ( ));
 		if (0 != renderingManager)
 		{
 			vtkRenderer&	renderer	= renderingManager->getRenderer ( );
@@ -574,24 +536,18 @@ void VTKMgx3DTopoEntityRepresentation::updateRepresentationProperties ( )
 	VTKMgx3DEntityRepresentation::updateRepresentationProperties ( );
 
 #ifdef OLD_TOPO_ENTITY_EDGESNUM_REPRESENTATION
-//	const DisplayProperties&	properties	=
-//									getEntity ( )->getDisplayProperties ( );
 	const DisplayProperties	properties	= getDisplayPropertiesAttributes ( );
 	if (0 != _meshingEdgesNumMapper)
 	{
 		Color		color		= properties.getWireColor ( );
 		int			fontFamily	= 0, fontSize	= 12;
 		bool		bold	= false,	italic	= false;
-		// Rem CP : on ne fait pas getFontProperties (..., color) car les
-		// arêtes topo ont un code couleur pour la discrétisation.
+		// Rem CP : on ne fait pas getFontProperties (..., color) car les arêtes topo ont un code couleur pour la discrétisation.
 		// => on utilise une instance de Color qui ne sera pas utilisé.
 		Color	c (0, 0, 0);
 		properties.getFontProperties(fontFamily, fontSize, bold, italic, c);
-		_meshingEdgesNumMapper->GetLabelTextProperty ( )->SetColor (
-					color.getRed ( ) / 255., color.getGreen ( ) / 255.,
-					color.getBlue ( ) / 255.);
-		_meshingEdgesNumMapper->GetLabelTextProperty ( )->SetFontFamily (
-																	fontFamily);
+		_meshingEdgesNumMapper->GetLabelTextProperty ( )->SetColor (color.getRed ( ) / 255., color.getGreen ( ) / 255., color.getBlue ( ) / 255.);
+		_meshingEdgesNumMapper->GetLabelTextProperty ( )->SetFontFamily (fontFamily);
 		_meshingEdgesNumMapper->GetLabelTextProperty ( )->SetFontSize(fontSize);
 		_meshingEdgesNumMapper->GetLabelTextProperty ( )->SetBold (bold);
 		_meshingEdgesNumMapper->GetLabelTextProperty ( )->SetItalic (italic);

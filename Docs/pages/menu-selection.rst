@@ -214,8 +214,9 @@ Sélection d'entités selon la dimension
    :width: 0.25in
    :height: 0.25in
 
-Pour permettre la sélection d’entités, il est nécessaire de sélectionner la dimension des entités
-que l’on souhaite sélectionner. Voir la description des :ref:`boutons-selection`.
+Pour permettre la sélection d’entités, il est nécessaire de sélectionner
+la dimension des entités que l’on souhaite sélectionner. Voir la 
+description des :ref:`boutons-selection`.
 
 Les panneaux de commandes sélectionnent automatiquement les ou les
 dimensions adaptées lorsqu’il s’agit de remplir un des champs.
@@ -248,3 +249,12 @@ Sélection par rectangle élastique
    :height: 0.25in
 
 Voir la description :ref:`boutons-selection`.
+
+En mode de sélection par rectangle élastique il est possible de ne 
+sélectionner que les entités visibles à l'écran, c'est à dire non 
+masquées par d'autres qui seraient situées devant. Pour ce il convient
+de cocher au préalable le bouton "Sélection des entités visibles 
+uniquement".
+
+.. image:: ../images/visible.png
+   :width: 0.25in

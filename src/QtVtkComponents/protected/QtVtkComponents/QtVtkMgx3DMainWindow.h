@@ -174,6 +174,7 @@ class QtVtkMgx3DMainWindow : public QtComponents::QtMgx3DMainWindow
 	virtual void pickingSelectionCallback (bool on);
 	virtual void rubberBandSelectionCallback (bool on);
 	virtual void rubberBandInsideSelectionCallback (bool on);
+	virtual void visibleSelectionCallback (bool on);
 
 #ifdef USE_EXPERIMENTAL_ROOM
 	/**

@@ -112,11 +112,12 @@ void QtVtkMgx3DMainWindow::setGraphicalWidget (Qt3DGraphicalWidget& widget)
 	CHECK_NULL_PTR_ERROR (vgw)
 	CHECK_NULL_PTR_ERROR (vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).GetMgx3DPicker ( ))
 	CHECK_NULL_PTR_ERROR (getActions ( )._selectionModeAction)
-	const bool	boundingBox	=
-			false == getActions ( )._selectionModeAction->isChecked ( ) ?
-			true : false;
+	const bool	boundingBox	= false == getActions ( )._selectionModeAction->isChecked ( ) ? true : false;
 	vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).GetMgx3DPicker ( )->SetMode (
 					true == boundingBox ? VTKMgx3DPicker::BOUNDING_BOX : VTKMgx3DPicker::DISTANCE);
+	bool	enabled	= 0 == getActions ( )._selectVisibleAction ? false : getActions ( )._selectVisibleAction->isChecked ( );
+	vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).SetForegroundSelection (enabled);
+	getActions ( )._selectVisibleAction->setEnabled (vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).GetRubberBand ( ));
 }	// QtVtkMgx3DMainWindow::setGraphicalWidget
 
 
@@ -469,6 +470,20 @@ void QtVtkMgx3DMainWindow::rubberBandInsideSelectionCallback (bool on)
 	
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtVtkMgx3DMainWindow::rubberBandInsideSelectionCallback
+
+
+void QtVtkMgx3DMainWindow::visibleSelectionCallback (bool on)
+{
+	BEGIN_QT_TRY_CATCH_BLOCK
+	
+	QtMgx3DMainWindow::visibleSelectionCallback (on);
+
+	QtVtkGraphicalWidget*	vgw	= dynamic_cast<QtVtkGraphicalWidget*>(&getGraphicalWidget ( ));
+	CHECK_NULL_PTR_ERROR (vgw)
+	vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).SetForegroundSelection (on);
+	
+	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
+}	// QtVtkMgx3DMainWindow::visibleSelectionCallback
 
 
 #ifdef USE_EXPERIMENTAL_ROOM

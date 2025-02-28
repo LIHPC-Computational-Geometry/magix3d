@@ -33,23 +33,20 @@ namespace QtVtkComponents
 // ===========================================================================
 
 
-VTKMgx3DGeomEntityRepresentation::VTKMgx3DGeomEntityRepresentation (
-															GeomEntity& entity)
+VTKMgx3DGeomEntityRepresentation::VTKMgx3DGeomEntityRepresentation (GeomEntity& entity)
 	: QtVtkComponents::VTKMgx3DEntityRepresentation (entity)
 {
 }	// VTKMgx3DGeomEntityRepresentation::VTKMgx3DGeomEntityRepresentation
 
 
-VTKMgx3DGeomEntityRepresentation::VTKMgx3DGeomEntityRepresentation (
-										VTKMgx3DGeomEntityRepresentation& ver)
+VTKMgx3DGeomEntityRepresentation::VTKMgx3DGeomEntityRepresentation (VTKMgx3DGeomEntityRepresentation& ver)
 	: QtVtkComponents::VTKMgx3DEntityRepresentation (*(ver.getEntity ( )))
 {
 	MGX_FORBIDDEN ("VTKMgx3DGeomEntityRepresentation copy constructor is not allowed.");
 }	// VTKMgx3DGeomEntityRepresentation::VTKMgx3DGeomEntityRepresentation
 
 
-VTKMgx3DGeomEntityRepresentation& VTKMgx3DGeomEntityRepresentation::operator = (
-									const VTKMgx3DGeomEntityRepresentation& er)
+VTKMgx3DGeomEntityRepresentation& VTKMgx3DGeomEntityRepresentation::operator = (const VTKMgx3DGeomEntityRepresentation& er)
 {
 	MGX_FORBIDDEN ("VTKMgx3DGeomEntityRepresentation assignment operator is not allowed.");
 	if (&er != this)
@@ -70,8 +67,7 @@ void VTKMgx3DGeomEntityRepresentation::createCloudRepresentation ( )
 {
 	if ((0 != _cloudGrid) || (0 != _cloudMapper) || (0 != _cloudActor))
 	{
-		INTERNAL_ERROR (exc, "Représentation déjà créée.",
-               "VTKMgx3DGeomEntityRepresentation::createCloudRepresentation")
+		INTERNAL_ERROR (exc, "Représentation déjà créée.", "VTKMgx3DGeomEntityRepresentation::createCloudRepresentation")
 		throw exc;
 	}	// if ((0 != _cloudGrid) || ...
 	CHECK_NULL_PTR_ERROR (getEntity ( ))
@@ -81,19 +77,17 @@ void VTKMgx3DGeomEntityRepresentation::createCloudRepresentation ( )
 	gr.setShrink (props.getShrinkFactor ( ));
 	getEntity ( )->getRepresentation (gr, true);
 	vector<Math::Point>&	points		= gr.getPoints ( );
-	VTKMgx3DEntityRepresentation::createPointsCloudRepresentation (
-					getEntity ( ), _cloudActor, _cloudMapper, _cloudGrid, points);
+	VTKMgx3DEntityRepresentation::createPointsCloudRepresentation (getEntity ( ), _cloudActor, _cloudMapper, _cloudGrid, points);
 }	// VTKMgx3DGeomEntityRepresentation::createCloudRepresentation
 
 
 void VTKMgx3DGeomEntityRepresentation::createSurfacicRepresentation ( )
 {
-	if ((0 != _surfacicGrid) || (0 != _surfacicMapper) || (0 != _surfacicActor))
+	if ((0 != _surfacicPolyData) || (0 != _surfacicMapper) || (0 != _surfacicActor))
 	{
-		INTERNAL_ERROR (exc, "Représentation déjà créée.",
-               "VTKMgx3DGeomEntityRepresentation::createSurfacicRepresentation")
+		INTERNAL_ERROR (exc, "Représentation déjà créée.", "VTKMgx3DGeomEntityRepresentation::createSurfacicRepresentation")
 		throw exc;
-	}	// if ((0 != _surfacicGrid) || ...
+	}	// if ((0 != _surfacicPolyData) || ...
 	CHECK_NULL_PTR_ERROR (getEntity ( ))
 
 	GeomDisplayRepresentation	gr (DisplayRepresentation::SOLID, 0.001);
@@ -102,19 +96,17 @@ void VTKMgx3DGeomEntityRepresentation::createSurfacicRepresentation ( )
 	getEntity ( )->getRepresentation (gr, true);
 	vector<Math::Point>&	points		= gr.getPoints ( );
 	vector<size_t>&			triangles	= gr.getSurfaceDiscretization ( );
-	VTKMgx3DEntityRepresentation::createTrianglesSurfacicRepresentation (
-														points, triangles);
+	VTKMgx3DEntityRepresentation::createTrianglesSurfacicRepresentation (points, triangles);
 }	// VTKMgx3DGeomEntityRepresentation::createSurfacicRepresentation
 
 
 void VTKMgx3DGeomEntityRepresentation::createWireRepresentation ( )
 {
-	if ((0 != _wireGrid) || (0 != _wireMapper) || (0 != _wireActor))
+	if ((0 != _wirePolyData) || (0 != _wireMapper) || (0 != _wireActor))
 	{
-		INTERNAL_ERROR (exc, "Représentation déjà créée.",
-                "VTKMgx3DGeomEntityRepresentation::createWireRepresentation")
+		INTERNAL_ERROR (exc, "Représentation déjà créée.", "VTKMgx3DGeomEntityRepresentation::createWireRepresentation")
 		throw exc;
-	}	// if ((0 != _wireGrid) || ...
+	}	// if ((0 != _wirePolyData) || ...
 	CHECK_NULL_PTR_ERROR (getEntity ( ))
 
 	GeomDisplayRepresentation	gr (DisplayRepresentation::WIRE, 0.01);
@@ -124,19 +116,17 @@ void VTKMgx3DGeomEntityRepresentation::createWireRepresentation ( )
 	getEntity ( )->getRepresentation (gr, true);
 	vector<Math::Point>&	points		= gr.getPoints ( );
 	vector<size_t>&			segments	= gr.getCurveDiscretization ( );
-	VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation(
-			getEntity ( ), _wireActor, _wireMapper, _wireGrid, points, segments);
+	VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation(getEntity ( ), _wireActor, _wireMapper, _wirePolyData, points, segments);
 }	// VTKMgx3DGeomEntityRepresentation::createWireRepresentation
 
 
 void VTKMgx3DGeomEntityRepresentation::createIsoWireRepresentation ( )
 {
-	if ((0 != _isoWireGrid) || (0 != _isoWireMapper) || (0 != _isoWireActor))
+	if ((0 != _isoWirePolyData) || (0 != _isoWireMapper) || (0 != _isoWireActor))
 	{
-		INTERNAL_ERROR (exc, "Représentation déjà créée.",
-                "VTKMgx3DGeomEntityRepresentation::createIsoWireRepresentation")
+		INTERNAL_ERROR (exc, "Représentation déjà créée.", "VTKMgx3DGeomEntityRepresentation::createIsoWireRepresentation")
 		throw exc;
-	}	// if ((0 != _isoWireGrid) || ...
+	}	// if ((0 != _isoWirePolyData) || ...
 	CHECK_NULL_PTR_ERROR (getEntity ( ))
 
 	GeomDisplayRepresentation	gr (DisplayRepresentation::ISOCURVE, 0.01);
@@ -145,8 +135,7 @@ void VTKMgx3DGeomEntityRepresentation::createIsoWireRepresentation ( )
 	getEntity ( )->getRepresentation (gr, true);
 	vector<Math::Point>&	points		= gr.getPoints ( );
 	vector<size_t>&			lines	= gr.getCurveDiscretization ( );
-	VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (
-			getEntity ( ), _isoWireActor, _isoWireMapper,_isoWireGrid, points, lines);
+	VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (getEntity ( ), _isoWireActor, _isoWireMapper,_isoWirePolyData, points, lines);
 }	// VTKMgx3DGeomEntityRepresentation::createIsoWireRepresentation
 
 
@@ -155,8 +144,7 @@ void VTKMgx3DGeomEntityRepresentation::createAssociationVectorRepresentation ( )
 }	// VTKMgx3DGeomEntityRepresentation::createAssociationVectorRepresentation
 
 
-bool VTKMgx3DGeomEntityRepresentation::getRefinedRepresentation (
-	vector<Math::Point>& points, vector<size_t>& discretization, size_t factor)
+bool VTKMgx3DGeomEntityRepresentation::getRefinedRepresentation (vector<Math::Point>& points, vector<size_t>& discretization, size_t factor)
 {
 	CHECK_NULL_PTR_ERROR (getEntity ( ))
 	const DisplayRepresentation::type	repType	= getEntity ( )->getDim ( ) < 2 ? 

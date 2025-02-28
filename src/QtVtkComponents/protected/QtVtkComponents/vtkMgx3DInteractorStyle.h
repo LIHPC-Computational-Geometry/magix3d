@@ -17,6 +17,7 @@
 #include "Utils/Entity.h"
 #include "Utils/SelectionManagerIfc.h"
 
+#include <vtkHardwareSelector.h>
 #include <vtkSmartPointer.h>
 #include <vtkUnsignedCharArray.h>
 
@@ -225,6 +226,11 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	virtual void SetInteractiveSelectionActivated (bool activate);
 	virtual bool GetInteractiveSelectionActivated ( ) const;
 
+
+	/** (Le picking effectué est-il au premier plan ou en profondeur (et approximatif) ? */
+	virtual void SetForegroundSelection (bool on);
+	virtual bool GetForegroundSelection ( ) const;
+
 	/** (Dés)Active le mode de sélection au <I>rectangle élastique</I>. 
 	 * \see		SetCompletelyInsideSelection
 	 */
@@ -236,7 +242,7 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	 */
 	virtual void SetCompletelyInsideSelection (bool on);
 	virtual bool GetCompletelyInsideSelection ( ) const;
-
+	
 	
 	protected :
 
@@ -260,12 +266,17 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	 *  Masque les entités sélectionnées
 	 */
 	virtual void HideSelection();
+
+	/**
+	 * \return	Une référence sur le sélecteur hardware.
+	 */
+	virtual vtkHardwareSelector& GetHardwareSelector ( );
 	
 	/**
 	 * Dessine un <I>rectangle élastique de sélection</I>.
 	 */
 	virtual void RedrawRubberBand ( );
-
+	
 
 	private :
 
@@ -290,6 +301,10 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	 * \see			SetInteractiveSelectionActivated
 	 */
 	bool			 								InteractiveSelectionActivated;
+	
+	/** Le picking effectué est-il au premier plan (true) ou en profondeur (et approximatif) ? Vaut false par défaut.
+	 */
+	bool											ForegroundSelection;
 
 	/** Vaut <I>true</I> si le bouton de <I>tracé élastique</I> est enfoncé. */
 	bool											RubberButtonDown;
@@ -310,9 +325,11 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	/** Position du curseur de la souris en mode <I>rectangle élastique</I>. */
 	int												StartPosition [2], EndPosition [2];
 	
-	/** Liste des objets poités par la souris et pouvant prétendre à être
-	 * sélectionnés. */
+	/** Liste des objets poités par la souris et pouvant prétendre à être sélectionnés. */
 	std::vector<Mgx3D::Utils::Entity*>				PointedObjects;
+	
+	/** Un sélecteur pour le picking précis de premier plan. */
+	vtkSmartPointer<vtkHardwareSelector>			HardwareSelector;
 };	// class vtkMgx3DInteractorStyle
 
 
