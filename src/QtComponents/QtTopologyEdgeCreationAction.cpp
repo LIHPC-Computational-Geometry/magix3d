@@ -203,6 +203,41 @@ string QtTopologyEdgeCreationPanel::getGroupName() const
     return _namePanel->getGroupName();
 }
 
+void QtTopologyEdgeCreationPanel::preview (bool show, bool destroyInteractor){
+    try
+    {
+        getRenderingManager ( );
+    }
+    catch (...)
+    {
+        return;
+    }
+
+    QtMgx3DOperationPanel::preview (show, destroyInteractor);
+    if ((false == show) || (false == previewResult ( )))
+        return;
+
+    try {
+        Context *context = dynamic_cast<Context *>(&getContext());
+        CHECK_NULL_PTR_ERROR (context)
+
+        DisplayProperties graphicalProps;
+        graphicalProps.setWireColor(Color(
+                255 * Resources::instance()._previewColor.getRed(),
+                255 * Resources::instance()._previewColor.getGreen(),
+                255 * Resources::instance()._previewColor.getBlue()));
+        graphicalProps.setLineWidth(Resources::instance()._previewWidth.getValue());
+
+        RenderingManager::RepresentationID	repID	= getRenderingManager ( ).createSegmentsWireRepresentation(points, graphicalProps, true);
+        registerPreviewedObject (repID);
+
+        getRenderingManager ( ).forceRender ( );
+    }catch (...)
+    {
+        return;
+    }
+}
+
 void QtTopologyEdgeCreationPanel::methodCallBack ( )
 {
     BEGIN_QT_TRY_CATCH_BLOCK

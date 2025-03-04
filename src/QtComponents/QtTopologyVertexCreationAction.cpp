@@ -119,6 +119,10 @@ QtTopologyVertexCreationPanel::QtTopologyVertexCreationPanel (
     connect (_zTextField,  SIGNAL (textEdited (const QString&)), this,
              SLOT (coordinatesEditedCallback ( )));
 
+
+    addPreviewCheckBox (true);
+
+    layout->addStretch (2);
 }	// QtTopologyVertexCreationPanel::QtTopologyVertexCreationPanel
 
 
@@ -310,6 +314,47 @@ void QtTopologyVertexCreationPanel::updateCoordinates (const string& name)
         }	// QtTopologyVertexCreationPanel::isModified
 
 
+void QtTopologyVertexCreationPanel::preview(bool show, bool destroyInteractor)
+{
+        QtMgx3DOperationPanel::preview (show, destroyInteractor);
+
+        if ((false == show) || (false == previewResult ( )))
+            return;
+
+        // Lors de la construction getGraphicalWidget peut être nul ...
+        try
+        {
+            CHECK_NULL_PTR_ERROR (getMainWindow ( ))
+            getMainWindow ( )->getGraphicalWidget ( ).getRenderingManager ( );
+        }
+        catch (...)
+        {
+            return;
+        }
+
+        try
+        {
+            Context*		context		= dynamic_cast<Context*>(&getContext ( ));
+            CHECK_NULL_PTR_ERROR (context)
+
+            DisplayProperties	graphicalProps;
+            graphicalProps.setCloudColor (Color (
+                    255 * Resources::instance ( )._previewColor.getRed ( ), 255 * Resources::instance ( )._previewColor.getGreen ( ), 255 * Resources::instance ( )._previewColor.getBlue ( )));
+            graphicalProps.setPointSize (Resources::instance ( )._previewPointSize.getValue ( ));
+
+
+            const vector<Math::Point>&	points = {getPoint()};
+
+            RenderingManager::RepresentationID	repID	= getRenderingManager ( ).createCloudRepresentation (points, graphicalProps, true);
+            registerPreviewedObject (repID);
+
+            getRenderingManager ( ).forceRender ( );
+        }
+        catch (...)
+        {
+        }
+}
+
 
 //-------------------------------------------------
 //                      Callbacks
@@ -335,6 +380,21 @@ void QtTopologyVertexCreationPanel::coordinatesEditedCallback ( )
     _vertexPanel->reset();
     _vertexPanel->blockSignals (false);
     emit pointModified ( );
+
+        try
+        {
+            getRenderingManager ( );
+        }
+        catch (...)
+        {	// Probablement période d'initialisation ...
+            return;
+        }
+
+
+            unique_ptr<RenderingManager::DisplayLocker>	displayLocker (new RenderingManager::DisplayLocker (getRenderingManager ( )));
+            preview (false, true);
+            displayLocker.reset ( );
+            preview (true, true);
 
     COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Création sommet topologique")
 }	// QtMgx3DPointPanel::coordinatesEditedCallback

@@ -83,9 +83,19 @@ class QtTopologyEdgeCreationPanel : public QtMgx3DOperationPanel
 	 */
 	virtual void autoUpdate ( );
 
+    /**
+	 * La méthode de création de l'arete.
+	 */
     bool curveMethod ( ) const;
 
+
     std::string getGroupName() const;
+
+    /**
+	 * \param		<I>true</I> pour prévisualiser les entités créées, <I>false</I> pour arrêter la prévisualisation.
+	 * \param		<I>true</I> s'il faut détruire l'éventuel interacteur dans le cas d'un arrêt de la prévisualisation.
+	 */
+    virtual void preview (bool show, bool destroyInteractor);
 
     protected slots :
 
