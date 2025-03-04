@@ -16,10 +16,9 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
     namespace Topo {
 /*----------------------------------------------------------------------------*/
-/** \class CommandNewTopoOnGeometry
- *  \brief Commande permettant de créer une topologie pour une géométrie quelconque
+/** \class CommandNewTopo
+ *  \brief Commande permettant de créer une topologie libre quelconque
  *  avec réutilisation de la topologie existante
- *  Fonctionne également sans géométrie, mais avec nom de groupe
  */
 /*----------------------------------------------------------------------------*/
         class CommandNewTopo: public CommandEditTopo {
@@ -32,20 +31,21 @@ namespace Mgx3D {
             enum eTopoType { UNSTRUCTURED_BLOCK, STRUCTURED_BLOCK, CONFORM };
 
             /*------------------------------------------------------------------------*/
-            /** \brief  Constructeur
+            /** \brief  Constructeur d'entité topologique libre
              *
              *  \param c le contexte
-             *  \param entity un Volume ou une Surface
+             *  \param sommets la liste des sommets topologiques
              *  \param topoType un énuméré sur le type de topologie souhaitée
+             *  \param groupName le nom du groupe à associer l'entité, peut etre vide
              */
             CommandNewTopo(Internal::Context& c, std::vector<Topo::Vertex*> sommets, eTopoType topoType,
                            std::string groupName);
             /*------------------------------------------------------------------------*/
-            /** \brief  Constructeur
+            /** \brief  Constructeur pour un sommet topologique uniquement par coordonées géométriques
              *
              *  \param c le contexte
-             *  \param entity un Volume ou une Surface
-             *  \param topoType un énuméré sur le type de topologie souhaitée
+             *  \param point les coordonnées pour créer le sommet topologique
+             *  \param groupName le nom du groupe à associer l'entité, peut etre vide
              */
             CommandNewTopo(Internal::Context& c, const Utils::Math::Point point,
                            std::string groupName);
@@ -83,8 +83,19 @@ namespace Mgx3D {
             virtual void createBlock(Vertex* v0, Vertex* v1, Vertex* v2, Vertex* v3, Vertex* v4, Vertex* v5,
                                         Vertex* v6, Vertex* v7, std::string groupName);
 
+            /** Récupère l'arete topologique commune aux deux sommets si elle existe
+             * @return l'arete topologique si elle existe ou nullptr sinon
+             * */
             virtual Topo::CoEdge* getCommonEdge(const Vertex* v0, const Vertex* v1);
+
+            /** Récupère la face topologique commune aux quatres sommets si elle existe
+             * @return la face topologique si elle existe ou nullptr sinon
+             * */
             virtual Topo::CoFace* getCommonFace(const Vertex* v0, const Vertex* v1, const Vertex* v2, const Vertex* v3);
+
+            /** Récupère le bloc topologique commun aux huit sommets si il existe
+             * @return le bloc topologique si il existe ou nullptr sinon
+             * */
             virtual Topo::Block*  getCommonBlock(const Vertex* v0, const Vertex* v1, const Vertex* v2, const Vertex* v3,
                                                 const Vertex* v4, const Vertex* v5, const Vertex* v6, const Vertex* v7);
 
@@ -93,11 +104,13 @@ namespace Mgx3D {
             /// dimension de l'entité topo libre
             short m_dim;
 
-            /// nom du groupe pour cas d'un bloc seul (sans projection)
+            /// nom du groupe
             std::string m_groupName;
 
+            /// les coordonnées pour créer un sommet libre
             Utils::Math::Point m_point;
 
+            /// les sommets topologiques qui servants à créer l'entité
             std::vector<Topo::Vertex*> m_vertices;
 
             /// nombre de bras pour la première direction dans le cas structuré
