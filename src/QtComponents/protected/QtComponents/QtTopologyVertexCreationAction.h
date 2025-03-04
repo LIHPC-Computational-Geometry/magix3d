@@ -91,6 +91,8 @@ class QtTopologyVertexCreationPanel : public QtMgx3DOperationPanel
  */
     virtual bool isModified ( ) const;
 
+    virtual void preview (bool show, bool destroyInteractor);
+
     signals :
 
     /**
