@@ -66,8 +66,7 @@ void GeomExport::perform(Internal::InfoCommand* icmd)
     	for(unsigned int i=0;i<surfs.size();i++)
     	{
     		Surface* ge = surfs[i];
-    		std::vector<Volume*> adj_vol;
-    		ge->get(adj_vol);
+    		auto adj_vol = ge->getVolumes();
     		if(adj_vol.empty()){
     			addGeomEntityToExport(ge);
     		}
@@ -80,8 +79,7 @@ void GeomExport::perform(Internal::InfoCommand* icmd)
     	for(unsigned int i=0;i<curvs.size();i++)
     	{
     		Curve* ge = curvs[i];
-    		std::vector<Surface*> adj_surf;
-    		ge->get(adj_surf);
+    		auto adj_surf = ge->getSurfaces();
     		if(adj_surf.empty()){
     			addGeomEntityToExport(ge);
     		}
@@ -94,8 +92,7 @@ void GeomExport::perform(Internal::InfoCommand* icmd)
     	for(unsigned int i=0;i<verts.size();i++)
     	{
     		Vertex* ge = verts[i];
-    		std::vector<Curve*> adj_curves;
-    		ge->get(adj_curves);
+    		auto adj_curves = ge->getCurves();
     		if(adj_curves.empty()){
     			addGeomEntityToExport(ge);
     		}

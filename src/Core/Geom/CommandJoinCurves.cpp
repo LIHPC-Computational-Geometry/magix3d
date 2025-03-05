@@ -54,14 +54,15 @@ void CommandJoinCurves::validate()
         throw TkUtil::Exception(warningText);
 
     // il faut que les courbes fusionnées appartiennent aux mêmes surfaces
-    m_entities[0]->get(m_toKeepSurfaces);
+	Curve* c0 = dynamic_cast<Curve*>(m_entities[0]);
+	m_toKeepSurfaces = c0->getSurfaces();
     std::map<Surface*,uint> filtre;
     for (uint i=0; i<m_toKeepSurfaces.size(); i++)
     	filtre[m_toKeepSurfaces[i]] = 1;
 
     for (uint i=1; i<m_entities.size();i++){
-    	std::vector<Surface*> surfs;
-    	m_entities[i]->get(surfs);
+		Curve* ci = dynamic_cast<Curve*>(m_entities[i]);
+    	auto surfs = ci->getSurfaces();
     	if (surfs.size() != m_toKeepSurfaces.size())
     		throw TkUtil::Exception(TkUtil::UTF8String ("Les courbes doivent être dans les mêmes surfaces", TkUtil::Charset::UTF_8));
     	for (uint j=0; j<surfs.size(); j++)
@@ -78,8 +79,8 @@ internalSpecificExecute()
 
     std::map<Vertex*,uint> filtre;
     for (uint i=0;i<m_entities.size();i++){
-    	std::vector<Vertex*> vertices;
-    	m_entities[i]->get(vertices);
+		Curve* ci = dynamic_cast<Curve*>(m_entities[i]);
+    	auto vertices = ci->getVertices();
     	for (uint j=0; j<vertices.size(); j++)
     		filtre[vertices[j]] += 1;
     }
@@ -184,21 +185,18 @@ Curve* CommandJoinCurves::getCurveContains(std::vector<GeomEntity*>& entities,
 		Vertex* vtx)
 {
 	Curve* ge = 0;
-
 	for (uint i=0;i<entities.size();i++){
-		std::vector<Vertex*> vertices;
-		entities[i]->get(vertices);
-		for (uint j=0; j<vertices.size(); j++)
-			if (vertices[j] == vtx)
-				ge = dynamic_cast<Curve*>(entities[i]);
+		Curve* c = dynamic_cast<Curve*>(entities[i]);
+		for (auto v : c->getVertices())
+			if (v == vtx)
+				ge = c;
 	}
 	return ge;
 }
 /*----------------------------------------------------------------------------*/
-Vertex* CommandJoinCurves::getOppositeVtx(GeomEntity* crv, Vertex* vtx)
+Vertex* CommandJoinCurves::getOppositeVtx(Curve* crv, Vertex* vtx)
 {
-	std::vector<Vertex*> vertices;
-	crv->get(vertices);
+	auto vertices = crv->getVertices();
 	if (vertices.size() != 2)
 		throw TkUtil::Exception(TkUtil::UTF8String ("Les courbes doivent avoir 2 sommets", TkUtil::Charset::UTF_8));
 
@@ -212,8 +210,7 @@ Vertex* CommandJoinCurves::getOppositeVtx(GeomEntity* crv, Vertex* vtx)
 /*----------------------------------------------------------------------------*/
 Curve* CommandJoinCurves::getCurve(Vertex* vtx, Curve* crvExclude)
 {
-	std::vector<Curve*> curves;
-	vtx->get(curves);
+	auto curves = vtx->getCurves();
 	if (curves.size() == 1)
 		throw TkUtil::Exception(TkUtil::UTF8String ("Les sommets doivent être reliés à 2 courbes distinctes", TkUtil::Charset::UTF_8));
 	if (curves.size() != 2)

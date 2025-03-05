@@ -130,8 +130,7 @@ addGroupOnAxis()
             iter != m_c2c.end(); ++iter){
         Geom::Curve* crv1 = iter->first;
         Geom::Curve* crv2 = iter->second;
-        std::vector<Vertex*> vertices;
-        crv1->get(vertices);
+        auto vertices = crv1->getVertices();
         //std::cout<<"observe "<<crv1->getName()<<" entre "<<vertices[0]->getName()<<" et "<<vertices[1]->getName()<<std::endl;
         if (vertices.size()==2
                 && filtre_vertices[vertices[0]]==2

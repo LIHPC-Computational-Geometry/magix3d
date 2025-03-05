@@ -79,7 +79,7 @@ public:
 
     virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const;
     virtual void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda);
-    virtual void accept(GeomEntityVisitor& v) { v.visit(this); }
+    virtual void accept(GeomEntityVisitor& v) const { v.visit(this); }
 
     /*------------------------------------------------------------------------*/
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
@@ -116,34 +116,6 @@ public:
     /** \brief  retourne la dimension de l'entité géométrique
      */
     virtual int getDim() const {return 2;}
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux sommets géométriques incidents
-     *
-     *  \param vertices les sommets incidents
-     */
-    virtual void get(std::vector<Vertex*>& vertices) const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux courbes géométriques incidentes
-     *
-     *  \param curves les courbes incidents
-     */
-    virtual void get(std::vector<Curve*>& curves) const;
-    
-    /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux surfaces géométriques incidentes
-     *
-     *  \param surfaces les surfaces incidentes
-     */
-    virtual void get(std::vector<Surface*>& surfaces) const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux volumes géométriques incidents
-     *
-     *  \param volumes les volumes incidents
-     */
-    virtual void get(std::vector<Volume*>& volumes) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief Vérifie que la surface ASurf est contenue dans *this
@@ -281,6 +253,16 @@ public:
 
     /// Retourne le nombre de groupes
     virtual int getNbGroups() const;
+
+    /*------------------------------------------------------------------------*/
+    /** \brief  Return the curves incident to this surface
+     */
+    const std::vector<Curve*>& getCurves() const { return m_curves; }
+
+    /*------------------------------------------------------------------------*/
+    /** \brief  Return the volumes incident to this surface
+     */
+    const std::vector<Volume*>& getVolumes() const { return m_volumes; }    
 
     /*------------------------------------------------------------------------*/
     /// retourne la liste des faces topologiques communes qui pointent sur cette surface

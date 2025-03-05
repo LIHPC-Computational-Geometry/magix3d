@@ -315,8 +315,7 @@ void GeomRevolImplementation::makeRevol2PIComposite(Curve* curve,std::vector<Geo
     std::vector<TopoDS_Edge> v_shape = curve->getOCCEdges();
 
     // ON AURA BESOIN DES SOMMETS DE LA COURBE DE DEPART PAR LA SUITE
-	std::vector<Vertex*> c_vertices;
-	curve->get(c_vertices);
+	auto c_vertices = curve->getVertices();
 
 	if(c_vertices.size()!=2){ //cas d'un cercle
 		TkUtil::UTF8String	warningText (TkUtil::Charset::UTF_8);
@@ -573,8 +572,7 @@ void GeomRevolImplementation::makeRevolComposite(Curve* curve,std::vector<GeomEn
     std::vector<TopoDS_Edge> v_shape = curve->getOCCEdges();
 
     // ON AURA BESOIN DES SOMMETS DE LA COURBE DE DEPART PAR LA SUITE
-    std::vector<Vertex*> c_vertices;
-    curve->get(c_vertices);
+    auto c_vertices = curve->getVertices();
 
     if(c_vertices.size()!=2){
         std::cerr<<"Courbe (posant problème): "<<curve->getName()<<", avec comme sommet:";
@@ -1005,8 +1003,7 @@ void GeomRevolImplementation::makeRevol(Surface* surf,
         s2v[surf] = vol;
 
         // on recupere toutes les courbes incidentes à la face de départ
-        std::vector<Curve*> curves_of_surf;
-        surf->get(curves_of_surf);
+        auto curves_of_surf = surf->getCurves();
         // toutes les surfaces incidentes au volume créé sauf surf et la surface opposée
         // ont été créés à partir des courbes de curves_of_surf
         std::vector<Surface*> lateral_surfs;
@@ -1172,8 +1169,7 @@ void GeomRevolImplementation::makeRevol2PI(Surface* surf,
     s2v[surf] = vol;
 
     // on recupere toutes les courbes incidentes à la face de départ
-    std::vector<Curve*> curves_of_surf;
-    surf->get(curves_of_surf);
+    auto curves_of_surf = surf->getCurves();
 
     // toutes les surfaces incidentes au volume créé sauf surf et la surface opposée
     // ont été créés à partir des courbes de curves_of_surf

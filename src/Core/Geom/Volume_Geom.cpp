@@ -54,31 +54,6 @@ namespace Geom {
 /*----------------------------------------------------------------------------*/
 const char* Volume::typeNameGeomVolume = "GeomVolume";
 /*----------------------------------------------------------------------------*/
-/// fonction de tri géométrique utile pour ordonner les sommets (boite comme dans Bibop3D)
-bool compareVertex(Vertex* v1, Vertex* v2)
-{
-    double z1 = v1->getZ();
-    double z2 = v2->getZ();
-
-    if (z1==z2){
-        double y1 = v1->getY();
-        double y2 = v2->getY();
-
-        if (y1==y2){
-            double x1 = v1->getX();
-            double x2 = v2->getX();
-
-            return (x1<x2);
-        }
-        else {
-            return (y1<y2);
-        }
-    }
-    else {
-        return (z1<z2);
-    }
-}
-/*----------------------------------------------------------------------------*/
 Volume::Volume(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
         GeomProperty* gprop, TopoDS_Shape& shape)
 : GeomEntity(ctx, prop, disp, gprop)
@@ -122,82 +97,6 @@ void Volume::createSpecificMemento(MementoGeomEntity& mem)
     mem.setGroups3D(m_groups);
     std::vector<TopoDS_Shape> shapes = { m_occ_shape };
     mem.setOCCShapes(shapes);
-}
-/*----------------------------------------------------------------------------*/
-void Volume::get(std::vector<Vertex*>& vertices) const
-{
-    std::list<Vertex*> l;
-    vertices.clear();
-    for(unsigned int i=0; i <m_surfaces.size();i++){
-        Surface* s = m_surfaces[i];
-        std::vector<Vertex*> local_vertices;
-        s->get(local_vertices);
-        l.insert(l.end(),local_vertices.begin(),local_vertices.end());
-    }
-
-    l.sort(Utils::Entity::compareEntity);
-    l.unique();
-
-    vertices.insert(vertices.end(),l.begin(),l.end());
-}
-/*----------------------------------------------------------------------------*/
-void Volume::getGeomSorted(std::vector<Vertex*>& vertices) const
-{
-    std::list<Vertex*> l;
-    vertices.clear();
-    for(unsigned int i=0; i <m_surfaces.size();i++){
-        Surface* s = m_surfaces[i];
-        std::vector<Vertex*> local_vertices;
-        s->get(local_vertices);
-        l.insert(l.end(),local_vertices.begin(),local_vertices.end());
-    }
-
-    // on fait un tri suivant les positions géométriques
-    //std::cout<<"Volume::get lance un sort pour "<<l.size()<<" Geom::Vertex"<<std::endl;
-    l.sort(compareVertex);
-    l.unique();
-
-    vertices.insert(vertices.end(),l.begin(),l.end());
-}
-/*----------------------------------------------------------------------------*/
-void Volume::get(std::vector<Curve*>& curves) const
-{
-    std::list<Curve*> l;
-    curves.clear();
-    for(unsigned int i=0; i <m_surfaces.size();i++){
-        Surface* s = m_surfaces[i];
-        std::vector<Curve*> local_curves;
-        s->get(local_curves);
-        l.insert(l.end(),local_curves.begin(),local_curves.end());
-    }
-
-    l.sort(Utils::Entity::compareEntity);
-    l.unique();
-
-    curves.insert(curves.end(),l.begin(),l.end());
-}
-/*----------------------------------------------------------------------------*/
-void Volume::get(std::vector<Surface*>& surfaces) const
-{
-    surfaces.clear();
-    surfaces.insert(surfaces.end(),m_surfaces.begin(),m_surfaces.end());
-}
-/*----------------------------------------------------------------------------*/
-void Volume::get(std::vector<Volume*>& volumes) const
-{
-    std::list<Volume*> l;
-    volumes.clear();
-    for(unsigned int i=0; i <m_surfaces.size();i++){
-        Surface* s = m_surfaces[i];
-        std::vector<Volume*> local_vol;
-        s->get(local_vol);
-        l.insert(l.end(),local_vol.begin(),local_vol.end());
-    }
-
-    l.sort(Utils::Entity::compareEntity);
-    l.unique();
-    l.remove(const_cast<Volume*>(this));
-    volumes.insert(volumes.end(),l.begin(),l.end());
 }
 /*----------------------------------------------------------------------------*/
 uint Volume::project(Utils::Math::Point& P) const
@@ -258,6 +157,7 @@ void Volume::split(std::vector<Surface*>& surf,
         TopoDS_Face F = TopoDS::Face(e.Current());
 
         Surface* s = EntityFactory(getContext()).newOCCSurface(F);
+        surf.push_back(s);
 
         // correspondance entre shapes OCC et géométries Mgx3D
         OCCFaces.push_back(F);
@@ -294,6 +194,7 @@ void Volume::split(std::vector<Surface*>& surf,
         }
 
         Curve* c = EntityFactory(getContext()).newOCCCurve(E);
+        curv.push_back(c);
 
         // correspondance entre shapes OCC et géométries Mgx3D
         OCCCurves.push_back(E);
@@ -318,7 +219,6 @@ void Volume::split(std::vector<Surface*>& surf,
            s->add(c);
            // on crée le lien C->S
            c->add(s);
-
         }
     }
 
@@ -340,6 +240,7 @@ void Volume::split(std::vector<Surface*>& surf,
         TopoDS_Vertex V = TopoDS::Vertex(map_vertices(i));
         // creation du sommet
         Vertex* v = EntityFactory(getContext()).newOCCVertex(V);
+        vert.push_back(v);
 
         /* on récupère les arêtes contenant ce sommet. Mais attention, ce nb
          * d'arêtes est trop important car des doublons existent.
@@ -373,11 +274,6 @@ void Volume::split(std::vector<Surface*>& surf,
 
         }
     }
-
-    // on renseigne la fonction appelante
-    this->get(surf);
-    this->get(curv);
-    this->get(vert);
 }
 /*----------------------------------------------------------------------------*/
 double Volume::computeArea() const

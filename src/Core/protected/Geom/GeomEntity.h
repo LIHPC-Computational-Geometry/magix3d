@@ -10,6 +10,7 @@
 #define MGX3D_GEOM_GEOMENTITY_H_
 /*----------------------------------------------------------------------------*/
 #include <vector>
+#include <set>
 #include <list>
 #include <functional>
 /*----------------------------------------------------------------------------*/
@@ -80,7 +81,7 @@ protected:
 public:
     virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const = 0;
     virtual void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda) = 0;
-    virtual void accept(GeomEntityVisitor& visitor) = 0;
+    virtual void accept(GeomEntityVisitor& visitor) const = 0 ;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
@@ -186,34 +187,6 @@ public:
     virtual void computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const = 0;
 
     /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux sommets géométriques incidents
-     *
-     *  \param vertices les sommets incidents
-     */
-    virtual void get(std::vector<Vertex*>& vertices) const =0;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux courbes géométriques incidentes
-     *
-     *  \param curves les courbes incidents
-     */
-    virtual void get(std::vector<Curve*>& curves) const = 0;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux surfaces géométriques incidentes
-     *
-     *  \param surfaces les surfaces incidentes
-     */
-    virtual void get(std::vector<Surface*>& surfaces) const =0;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux volumes géométriques incidents
-     *
-     *  \param volumes les volumes incidents
-     */
-    virtual void get(std::vector<Volume*>& volumes) const =0;
-
-    /*------------------------------------------------------------------------*/
     /** \brief   retourne un point sur l'objet au centre si possible
      * \author Eric Brière de l'Isle
      */
@@ -244,6 +217,14 @@ public:
 			Mgx3D::Utils::DisplayRepresentation& dr, bool checkDestroyed) const;
 #endif
 
+private:
+#ifndef SWIG
+    template<typename T>
+    void buildSerializedRepresentation(Utils::SerializedRepresentation& description, const std::string& title, 
+                                                const std::set<T*, decltype(&Utils::Entity::compareEntity)> elements) const;
+#endif
+
+public:
 	/*------------------------------------------------------------------------*/
 	/** \brief	Fournit une représentation textuelle de l'entité.
 	 * \param	true si l'entité fourni la totalité de sa description, false si
@@ -254,13 +235,6 @@ public:
 #ifndef SWIG
     virtual Mgx3D::Utils::SerializedRepresentation* getDescription (
 													bool alsoComputed) const;
-#endif
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Fournit un résumé textuel de l'entité.
-     */
-#ifndef SWIG
-    virtual std::string getSummary ( ) const;
 #endif
 
     /*------------------------------------------------------------------------*/

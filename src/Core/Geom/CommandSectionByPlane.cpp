@@ -77,18 +77,16 @@ void CommandSectionByPlane::validate()
         throw TkUtil::Exception(TkUtil::UTF8String ("La coupe par un plan ne s'applique qu'à un ensemble de volumes ou un ensemble de surfaces", TkUtil::Charset::UTF_8));
 
     if(nbDim2==m_entities.size()){
+        // On n'a que des surfaces
         short nbSurfConnected2Vol=0;
         std::vector<GeomEntity*> validEntities;
         for(unsigned int i=0;i<m_entities.size();i++)
         {
-            std::vector<Volume*> vols;
-            m_entities[i]->get(vols);
+            Surface* si = dynamic_cast<Surface*>(m_entities[i]);
+            auto vols = si->getVolumes();
             if(!vols.empty())
-            {
                 nbSurfConnected2Vol++;
-            }
-            else validEntities.push_back(m_entities[i]);
-
+            else validEntities.push_back(si);
         }
         m_entities = validEntities;
         if(nbSurfConnected2Vol!=0)

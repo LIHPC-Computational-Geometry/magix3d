@@ -8,6 +8,7 @@
 /*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
 #include "Geom/GeomRemoveImplementation.h"
+#include "Geom/IncidentGeomEntitiesVisitor.h"
 #include "Geom/EntityFactory.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
@@ -43,30 +44,18 @@ void GeomRemoveImplementation::perform(std::vector<GeomEntity*>& res)
     // Pour chaque élément à supprimer, on doit supprimer les éléments
     // incidents de dimension supérieure
     //========================================================================
+    GetUpIncidentGeomEntitiesVisitor v;
     for(unsigned int i=0;i<m_entities_param.size();i++){
         GeomEntity* ei = m_entities_param[i];
 
         //suppression de l'entité elle-même
         toRemove[ei->getDim()].insert(ei);
 
-        if(ei->getDim()<3){
-            std::vector<Volume*> adj;
-            ei->get(adj);
-            toRemove[3].insert(adj.begin(),adj.end());
-        }
-
-        if(ei->getDim()<2){
-            std::vector<Surface*> adj;
-            ei->get(adj);
-            toRemove[2].insert(adj.begin(),adj.end());
-        }
-
-        if(ei->getDim()<1){
-            std::vector<Curve*> adj;
-            ei->get(adj);
-            toRemove[1].insert(adj.begin(),adj.end());
-        }
+        ei->accept(v);
     }
+    for (auto eii : v.get())
+        toRemove[eii->getDim()].insert(eii);
+
     //========================================================================
     // Si m_propagate = true, on doit aussi supprimer les éléments incidents
     // de dimension inférieure sauf s'ils sont partagés avec des entités qui
@@ -76,25 +65,15 @@ void GeomRemoveImplementation::perform(std::vector<GeomEntity*>& res)
 
     if(m_propagate){
         std::set<GeomEntity*> candidatesToBeRemove[4];
+        GetDownIncidentGeomEntitiesVisitor v;
         for(unsigned int i=0;i<m_entities_param.size();i++){
             GeomEntity* ei = m_entities_param[i];
 
-            if(ei->getDim()>0){
-                std::vector<Vertex*> adj;
-                ei->get(adj);
-                candidatesToBeRemove[0].insert(adj.begin(),adj.end());
-            }
-            if(ei->getDim()>1){
-                std::vector<Curve*> adj;
-                ei->get(adj);
-                candidatesToBeRemove[1].insert(adj.begin(),adj.end());
-            }
-            if(ei->getDim()>2){
-                std::vector<Surface*> adj;
-                ei->get(adj);
-                candidatesToBeRemove[2].insert(adj.begin(),adj.end());
-            }
+            ei->accept(v);
         }
+        for (auto eii : v.get())
+            candidatesToBeRemove[eii->getDim()].insert(eii);
+
         // on regarde maintenant si effectivement ces entités peuvent être
         // supprimées
 
@@ -103,9 +82,8 @@ void GeomRemoveImplementation::perform(std::vector<GeomEntity*>& res)
         for(;it!=candidatesToBeRemove[2].end();it++){
             //une face ne peut pas être retiré si elle est utilisée par
             //un volume qui est conservé.
-            GeomEntity* e = *it;
-            std::vector<Volume*> vols;
-            e->get(vols);
+            Surface* e = dynamic_cast<Surface*>(*it);
+            auto vols = e->getVolumes();
             bool keep_e = false;
             for(unsigned int i=0;i<vols.size() && !keep_e;i++){
                 GeomEntity* ei = vols[i];
@@ -120,21 +98,21 @@ void GeomRemoveImplementation::perform(std::vector<GeomEntity*>& res)
         for(;it!=candidatesToBeRemove[1].end();it++){
             //une courbe ne peut pas être retirée si elle est utilisée par
             //un volume ou une face qui est conservée.
-            GeomEntity* e = *it;
-            std::vector<Surface*> surfs;
-            e->get(surfs);
+            Curve* e = dynamic_cast<Curve*>(*it);
+            auto surfs = e->getSurfaces();
             bool keep_e = false;
             for(unsigned int i=0;i<surfs.size() && !keep_e;i++){
-                GeomEntity* ei = surfs[i];
-                if(toRemove[2].find(ei)==toRemove[2].end())//ei est conservé
+                Surface* si = surfs[i];
+                if(toRemove[2].find(si)==toRemove[2].end())//si est conservé
                     keep_e = true; //donc e aussi
-            }
-            std::vector<Volume*> vols;
-            e->get(vols);
-            for(unsigned int i=0;i<vols.size() && !keep_e;i++){
-                GeomEntity* ei = vols[i];
-                if(toRemove[3].find(ei)==toRemove[3].end())//ei est conservé
-                    keep_e = true; //donc e aussi
+                else {    
+                    auto vols = si->getVolumes();    
+                    for(unsigned int i=0;i<vols.size() && !keep_e;i++){
+                        Volume* vi = vols[i];
+                        if(toRemove[3].find(vi)==toRemove[3].end())//vi est conservé
+                            keep_e = true; //donc e aussi
+                    }
+                }
             }
             if(!keep_e)
                 toRemove[1].insert(e);
@@ -145,34 +123,33 @@ void GeomRemoveImplementation::perform(std::vector<GeomEntity*>& res)
         for(;it!=candidatesToBeRemove[0].end();it++){
             //un sommet ne peut pas être retiré si il est utilisé par
             //un volume, une face ou une courbe qui est conservé.
-            GeomEntity* e = *it;
-            std::vector<Curve*> curvs;
-            e->get(curvs);
+            Vertex* e = dynamic_cast<Vertex*>(*it);
+            auto curvs = e->getCurves();
             bool keep_e = false;
             for(unsigned int i=0;i<curvs.size() && !keep_e;i++){
-                GeomEntity* ei = curvs[i];
-                if(toRemove[1].find(ei)==toRemove[1].end())//ei est conservé
+                Curve* ci = curvs[i];
+                if(toRemove[1].find(ci)==toRemove[1].end())//ci est conservé
                     keep_e = true; //donc e aussi
-            }
-
-            std::vector<Surface*> surfs;
-            e->get(surfs);
-            for(unsigned int i=0;i<surfs.size() && !keep_e;i++){
-                GeomEntity* ei = surfs[i];
-                if(toRemove[2].find(ei)==toRemove[2].end())//ei est conservé
-                    keep_e = true; //donc e aussi
-            }
-            std::vector<Volume*> vols;
-            e->get(vols);
-            for(unsigned int i=0;i<vols.size() && !keep_e;i++){
-                GeomEntity* ei = vols[i];
-                if(toRemove[3].find(ei)==toRemove[3].end())//ei est conservé
-                    keep_e = true; //donc e aussi
+                else {    
+                    auto surfs = ci->getSurfaces();
+                    for(unsigned int i=0;i<surfs.size() && !keep_e;i++){
+                        Surface* si = surfs[i];
+                        if(toRemove[2].find(si)==toRemove[2].end())//si est conservé
+                            keep_e = true; //donc e aussi
+                        else {
+                            auto vols = si->getVolumes();
+                            for(unsigned int i=0;i<vols.size() && !keep_e;i++){
+                                Volume* vi = vols[i];
+                                if(toRemove[3].find(vi)==toRemove[3].end())//vi est conservé
+                                    keep_e = true; //donc e aussi
+                            }
+                        }    
+                    }
+                }
             }
             if(!keep_e)
                 toRemove[0].insert(e);
         }
-
     }
     //========================================================================
     // L'ensemble toRemove contient toutes les entités à supprimer. Pour
@@ -185,8 +162,7 @@ void GeomRemoveImplementation::perform(std::vector<GeomEntity*>& res)
     std::set<GeomEntity*>::iterator it = toRemove[3].begin();
     for(;it!=toRemove[3].end();it++){
         Volume* v = dynamic_cast<Volume*>(*it);
-        std::vector<Surface*> surfs;
-        v->get(surfs);
+        auto surfs = v->getSurfaces();
         for(unsigned int i=0;i<surfs.size();i++){
             Surface* si = dynamic_cast<Surface*>(surfs[i]);
             if(toRemove[2].find(si)==toRemove[2].end())//si est conservé
@@ -197,15 +173,13 @@ void GeomRemoveImplementation::perform(std::vector<GeomEntity*>& res)
     it = toRemove[2].begin();
     for(;it!=toRemove[2].end();it++){
         Surface* s = dynamic_cast<Surface*>(*it);
-        std::vector<Curve*> curvs;
-        s->get(curvs);
+        auto curvs = s->getCurves();
         for(unsigned int i=0;i<curvs.size();i++){
             Curve* ci = dynamic_cast<Curve*>(curvs[i]);
             if(toRemove[1].find(ci)==toRemove[1].end())//ci est conservé
                 ci->remove(s);
         }
-        std::vector<Volume*> vols;
-        s->get(vols);
+        auto vols = s->getVolumes();
         for(unsigned int i=0;i<vols.size();i++){
             Volume* vi = dynamic_cast<Volume*>(vols[i]);
             if(toRemove[3].find(vi)==toRemove[3].end())//vi est conservé
@@ -216,15 +190,13 @@ void GeomRemoveImplementation::perform(std::vector<GeomEntity*>& res)
     it = toRemove[1].begin();
     for(;it!=toRemove[1].end();it++){
         Curve* c = dynamic_cast<Curve*>(*it);
-        std::vector<Surface*> surfs;
-        c->get(surfs);
+        auto surfs = c->getSurfaces();
         for(unsigned int i=0;i<surfs.size();i++){
             Surface* si = dynamic_cast<Surface*>(surfs[i]);
             if(toRemove[2].find(si)==toRemove[2].end())//ei est conservé
                 si->remove(c);
         }
-        std::vector<Vertex*> verts;
-        c->get(verts);
+        auto verts = c->getVertices();
         for(unsigned int i=0;i<verts.size();i++){
             Vertex* vi = dynamic_cast<Vertex*>(verts[i]);
             if(toRemove[0].find(vi)==toRemove[0].end())//ei est conservé
@@ -235,8 +207,7 @@ void GeomRemoveImplementation::perform(std::vector<GeomEntity*>& res)
     it = toRemove[0].begin();
     for(;it!=toRemove[0].end();it++){
         Vertex* v = dynamic_cast<Vertex*>(*it);
-        std::vector<Curve*> curvs;
-        v->get(curvs);
+        auto curvs = v->getCurves();
         for(unsigned int i=0;i<curvs.size();i++){
             Curve* ci = dynamic_cast<Curve*>(curvs[i]);
             if(toRemove[1].find(ci)==toRemove[1].end())//ei est conservé

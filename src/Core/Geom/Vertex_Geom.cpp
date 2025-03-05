@@ -135,60 +135,6 @@ void Vertex::computeBoundingBox(Utils::Math::Point& pmin,Utils::Math::Point& pma
     OCCHelper::computeBoundingBox(m_occ_vertex, pmin, pmax);
 }
 /*----------------------------------------------------------------------------*/
-void Vertex::get(std::vector<Vertex*>& vertices) const
-{
-    std::list<Vertex*> l;
-    vertices.clear();
-    for(unsigned int i=0; i <m_curves.size();i++){
-        Curve* c = m_curves[i];
-        std::vector<Vertex*> local_vertices;
-        c->get(local_vertices);
-        l.insert(l.end(),local_vertices.begin(),local_vertices.end());
-    }
-    l.sort(Utils::Entity::compareEntity);
-    l.unique();
-    l.remove(const_cast<Vertex*>(this));
-    vertices.insert(vertices.end(),l.begin(),l.end());
-}
-/*----------------------------------------------------------------------------*/
-void Vertex::get(std::vector<Curve*>& curves) const
-{
-    curves.clear();
-    curves.insert(curves.end(),m_curves.begin(),m_curves.end());
-}
-/*----------------------------------------------------------------------------*/
-void Vertex::get(std::vector<Surface*>& surfaces) const
-{
-    std::list<Surface*> l;
-    surfaces.clear();
-    for(unsigned int i=0; i <m_curves.size();i++){
-        Curve* c = m_curves[i];
-        std::vector<Surface*> local_surfaces;
-        c->get(local_surfaces);
-        l.insert(l.end(),local_surfaces.begin(),local_surfaces.end());
-    }
-    l.sort(Utils::Entity::compareEntity);
-    l.unique();
-
-    surfaces.insert(surfaces.end(),l.begin(),l.end());
-}
-/*----------------------------------------------------------------------------*/
-void Vertex::get(std::vector<Volume*>& volumes) const
-{
-    std::list<Volume*> l;
-    volumes.clear();
-    for(unsigned int i=0; i <m_curves.size();i++){
-        Curve* c = m_curves[i];
-        std::vector<Volume*> local_vol;
-        c->get(local_vol);
-        l.insert(l.end(),local_vol.begin(),local_vol.end());
-    }
-    l.sort(Utils::Entity::compareEntity);
-    l.unique();
-
-    volumes.insert(volumes.end(),l.begin(),l.end());
-}
-/*----------------------------------------------------------------------------*/
 void Vertex::get(std::vector<Topo::Vertex*>& vertices)
 {
 	const std::vector<Topo::TopoEntity* >& topos = getRefTopo();

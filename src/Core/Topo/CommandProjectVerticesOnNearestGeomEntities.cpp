@@ -6,15 +6,19 @@
  *  \date 6/11/2014
  */
 /*----------------------------------------------------------------------------*/
-#include "Topo/CommandProjectVerticesOnNearestGeomEntities.h"
+
+#include "Geom/GeomEntity.h"
 #include "Geom/EntityFactory.h"
+#include "Geom/IncidentGeomEntitiesVisitor.h"
+
 #include "Topo/TopoManager.h"
 #include "Topo/Vertex.h"
+#include "Topo/CommandProjectVerticesOnNearestGeomEntities.h"
 
 #include "Utils/Common.h"
 #include "Utils/Point.h"
+
 #include "Internal/Context.h"
-#include "Geom/GeomEntity.h"
 
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
@@ -116,12 +120,12 @@ void CommandProjectVerticesOnNearestGeomEntities::project(Vertex* vtx, Geom::Geo
 
 		// si on se retrouve à proximité d'un sommet géométrique
 		// on peut alors associer ce sommet topo à ce dernier
-		std::vector<Geom::Vertex*> vertices;
-		ge->get(vertices);
-		for (uint i=0; i<vertices.size(); i++){
-			Utils::Math::Point posVtx = vertices[i]->getCenteredPosition();
+	   	Geom::GetDownIncidentGeomEntitiesVisitor v;
+    	ge->accept(v);
+		for (auto vert : v.getVertices()){
+			Utils::Math::Point posVtx = vert->getCenteredPosition();
 			if (posGeom.isEpsilonEqual(posVtx, Utils::Math::MgxNumeric::mgxTopoDoubleEpsilon))
-				vtx->setGeomAssociation(vertices[i]);
+				vtx->setGeomAssociation(vert);
 		}
 	}
 	getInfoCommand().addTopoInfoEntity(vtx, Internal::InfoCommand::DISPMODIFIED);
