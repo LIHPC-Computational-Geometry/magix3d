@@ -398,15 +398,6 @@ getDescription (bool alsoComputed) const
     return description.release ( );
 }
 /*----------------------------------------------------------------------------*/
-std::string Vertex::
-getSummary ( ) const
-{
-    std::vector<double> coords = m_geom_property->getCoord().getCoords();
-    Mgx3D::Utils::SerializedRepresentation::Property    coordsProp (
-                                                        "Coordonnées", coords);
-    return coordsProp.getValue ( );
-}
-/*----------------------------------------------------------------------------*/
 void Vertex::
 saveVertexGeomProperty(Internal::InfoCommand* icmd, bool propagate)
 {

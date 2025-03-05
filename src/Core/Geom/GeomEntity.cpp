@@ -18,6 +18,7 @@
 #include "Geom/OCCDisplayRepresentationBuilder.h"
 #include "Geom/OCCFacetedRepresentationBuilder.h"
 #include "Geom/MementoGeomEntity.h"
+#include "Geom/IncidentGeomEntitiesVisitor.h"
 
 #include <TkUtil/Exception.h>
 #include <TkUtil/InternalError.h>
@@ -135,6 +136,20 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
 			pts[i] = (barycentre + (pts[i] - barycentre) * shrink);
 }
 /*----------------------------------------------------------------------------*/
+template<typename T>
+void GeomEntity::
+buildSerializedRepresentation(Utils::SerializedRepresentation& description, const std::string& title, 
+    const std::set<T*, decltype(&Utils::Entity::compareEntity)> elements) const
+{
+    if (!elements.empty()){
+        Utils::SerializedRepresentation	sr (title,TkUtil::NumericConversions::toStr(elements.size()));
+        for (auto elt : elements)
+            sr.addProperty (Utils::SerializedRepresentation::Property(elt->getName(),*elt));
+        description.addPropertiesSet (sr);
+    }
+}
+
+/*----------------------------------------------------------------------------*/
 Utils::SerializedRepresentation* GeomEntity::
 getDescription (bool alsoComputed) const
 {
@@ -142,72 +157,42 @@ getDescription (bool alsoComputed) const
 			InternalEntity::getDescription (alsoComputed));
 	CHECK_NULL_PTR_ERROR (description.get ( ))
 
+	Utils::SerializedRepresentation  relationsGeomDescription ("Relations géométriques", "");
+    GetUpIncidentGeomEntitiesVisitor vup;
+    GetDownIncidentGeomEntitiesVisitor vdown;
+    GetAdjacentGeomEntitiesVisitor vadj;
+    this->accept(vup);
+    this->accept(vdown);
+    this->accept(vadj);
 
-	Utils::SerializedRepresentation  relationsGeomDescription (
-                                                "Relations géométriques", "");
+	// On y ajoute les éléments géométriques en relation avec celui-ci :
+	auto v = vdown.getVertices();
+    v.insert(vadj.getVertices().begin(), vadj.getVertices().end());
+    buildSerializedRepresentation(relationsGeomDescription, "Sommets", v);
+    TkUtil::UTF8String	summary (TkUtil::Charset::UTF_8);
+    for (auto vert : v)
+        summary << vert->getName ( ) <<" ";
+    description->setSummary(summary.ascii());
 
+	auto c = vup.getCurves();
+    c.insert(vdown.getCurves().begin(), vdown.getCurves().end());
+    c.insert(vadj.getCurves().begin(), vadj.getCurves().end());
+    buildSerializedRepresentation(relationsGeomDescription, "Courbes", c);
 
-	// On y ajoute les éléments géométriques en relation avec celuis-ci :
-	std::vector<Vertex*>		v;
-	get (v);
-	if (!v.empty()){
-		TkUtil::UTF8String	summary (TkUtil::Charset::UTF_8);
-	    Utils::SerializedRepresentation	vertices ("Sommets",
-	            TkUtil::NumericConversions::toStr(v.size()));
-	    for (std::vector<Vertex*>::iterator itv = v.begin( ); v.end( )!=itv; itv++){
-	        vertices.addProperty (
-	                Utils::SerializedRepresentation::Property (
-	                        (*itv)->getName ( ),  *(*itv)));
-	        summary << (*itv)->getName ( ) <<" ";
-	    }
-	    relationsGeomDescription.addPropertiesSet (vertices);
-	    description->setSummary(summary.ascii());
-	}
+	auto s = vup.getSurfaces();
+    s.insert(vdown.getSurfaces().begin(), vdown.getSurfaces().end());
+    s.insert(vadj.getSurfaces().begin(), vadj.getSurfaces().end());
+    buildSerializedRepresentation(relationsGeomDescription, "Surfaces", s);
 
-	std::vector<Curve*>			c;
-	get (c);
-	if (!c.empty()){
-	    Utils::SerializedRepresentation	curves ("Courbes",
-                TkUtil::NumericConversions::toStr(c.size()));
-	    for (std::vector<Curve*>::iterator itc = c.begin( ); c.end( )!=itc; itc++)
-	        curves.addProperty (
-	                Utils::SerializedRepresentation::Property (
-	                        (*itc)->getName ( ), *(*itc)));
-	    relationsGeomDescription.addPropertiesSet (curves);
-	}
-
-	std::vector<Surface*>		s;
-	get (s);
-	if (!s.empty()){
-	    Utils::SerializedRepresentation	surfaces ("Surfaces",
-                TkUtil::NumericConversions::toStr(s.size()));
-	    for (std::vector<Surface*>::iterator its = s.begin( ); s.end( )!=its; its++)
-	        surfaces.addProperty (
-	                Utils::SerializedRepresentation::Property (
-	                        (*its)->getName ( ), *(*its)));
-	    relationsGeomDescription.addPropertiesSet (surfaces);
-	}
-
-	std::vector<Volume*>		vol;
-	get (vol);
-	if (!vol.empty()){
-	    Utils::SerializedRepresentation	volumes ("Volumes",
-                TkUtil::NumericConversions::toStr(vol.size()));
-	    for (std::vector<Volume*>::iterator itv = vol.begin( ); vol.end( )!=itv;
-	            itv++)
-	        volumes.addProperty (
-	                Utils::SerializedRepresentation::Property (
-	                        (*itv)->getName ( ), *(*itv)));
-	    relationsGeomDescription.addPropertiesSet (volumes);
-	}
+    auto vol = vup.getVolumes();
+    vol.insert(vadj.getVolumes().begin(), vadj.getVolumes().end());
+    buildSerializedRepresentation(relationsGeomDescription, "Volumes", vol);
 
 	description->addPropertiesSet (relationsGeomDescription);
 
-
 	// la Topologie s'il y en a une
 	if (!m_topo_entities.empty()){
-	    Utils::SerializedRepresentation  topoDescription (
-	            "Relations topologiques", "");
+	    Utils::SerializedRepresentation  topoDescription ("Relations topologiques", "");
 
 	    std::vector<Topo::Vertex*> v;
         std::vector<Topo::CoEdge*> e;
@@ -273,13 +258,11 @@ getDescription (bool alsoComputed) const
                         "Relations topologiques", std::string("Aucune")));
 	}
 
-
     // Les groupes s'il y en a
 	std::vector<Group::GroupEntity*> grp;
 	getGroups(grp);
     if (!grp.empty()){
-        Utils::SerializedRepresentation  groupeDescription (
-                "Relations vers des groupes", "");
+        Utils::SerializedRepresentation  groupeDescription ("Relations vers des groupes", "");
 
         std::vector<Group::Group0D*> g0;
         std::vector<Group::Group1D*> g1;
@@ -360,18 +343,6 @@ getDescription (bool alsoComputed) const
 #endif
 
 	return description.release ( );
-}
-/*----------------------------------------------------------------------------*/
-std::string GeomEntity::getSummary ( ) const
-{
-	std::vector<Vertex*>		v;
-	get (v);
-	TkUtil::UTF8String	summary (TkUtil::Charset::UTF_8);
-	for (std::vector<Vertex*>::iterator itv = v.begin( ); v.end( )!=itv; itv++){
-	        summary << (*itv)->getName ( ) <<" ";
-	    }
-
-	return summary.ascii ( );
 }
 /*----------------------------------------------------------------------------*/
 GeomProperty::type GeomEntity::getGeomType ( ) const

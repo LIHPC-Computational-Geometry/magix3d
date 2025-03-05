@@ -11,6 +11,7 @@
 #include "Geom/GeomFuseImplementation.h"
 #include "Geom/Curve.h"
 #include "Geom/EntityFactory.h"
+#include "Geom/IncidentGeomEntitiesVisitor.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/ReferencedMutex.h>
@@ -147,44 +148,21 @@ void CommandGeomCopy::internalSpecificPreExecute()
     /* On doit faire attention de copier aussi les entités de dimension
      * inférieure. Et cela une seule fois!!
      */
+    GetDownIncidentGeomEntitiesVisitor v;
     m_ref_entities.resize(4);
     for(unsigned int i=0;i<m_entities.size();i++){
           GeomEntity* e = m_entities[i];
           m_ref_entities[e->getDim()].push_back(e);
-          if(e->getDim()>0){
-                 std::vector<Vertex*> vertices;
-                 e->get(vertices);
-                 for(unsigned int i=0;i<vertices.size();i++)
-                 {
-                     GeomEntity *v = vertices[i];
-                     m_ref_entities[0].push_back(v);
-                 }
-             }
-             if(e->getDim()>1){
-                 std::vector<Curve*> curves;
-                 e->get(curves);
-                 for(unsigned int i=0;i<curves.size();i++)
-                 {
-                     GeomEntity *c = curves[i];
-                     m_ref_entities[1].push_back(c);
-                 }
-             }
-             if(e->getDim()>2){
-                 std::vector<Surface*> surfs;
-                 e->get(surfs);
-                 for(unsigned int i=0;i<surfs.size();i++)
-                 {
-                     GeomEntity *f = surfs[i];
-                     m_ref_entities[2].push_back(f);
-                 }
-             }
-      }
+          e->accept(v);
+    }
 
-      // conservation des entités de références de manière unique
-      for(int i=0;i<4;i++){
-          m_ref_entities[i].sort(Utils::Entity::compareEntity);
-          m_ref_entities[i].unique();
-      }
+    for (auto ei : v.get())
+        m_ref_entities[ei->getDim()].push_back(ei);
+        
+    for(int i=0;i<4;i++){
+        // TODO A vérifier, peut-être inutile ?
+        m_ref_entities[i].sort(Utils::Entity::compareEntity);
+    }
 }
 /*----------------------------------------------------------------------------*/
 void CommandGeomCopy::internalSpecificExecute()
@@ -217,8 +195,7 @@ void CommandGeomCopy::internalSpecificExecute()
     for(;it!=m_ref_entities[3].end();it++)
     {
         Volume* v = dynamic_cast<Volume*>(*it);
-        std::vector<Surface*> surfaces;
-        v->get(surfaces);
+        auto surfaces = v->getSurfaces();
 
         Volume* new_v = dynamic_cast<Volume*>(m_correspondance[3][v]);
         for(unsigned int i=0;i<surfaces.size();i++){
@@ -233,8 +210,7 @@ void CommandGeomCopy::internalSpecificExecute()
     for(;it!=m_ref_entities[2].end();it++)
     {
         Surface* s = dynamic_cast<Surface*>(*it);
-        std::vector<Curve*> curves;
-        s->get(curves);
+        auto curves = s->getCurves();
 
         Surface* new_s = dynamic_cast<Surface*>(m_correspondance[2][s]);
         for(unsigned int i=0;i<curves.size();i++){
@@ -249,8 +225,7 @@ void CommandGeomCopy::internalSpecificExecute()
     for(;it!=m_ref_entities[1].end();it++)
     {
         Curve* c = dynamic_cast<Curve*>(*it);
-        std::vector<Vertex*> vertices;
-        c->get(vertices);
+        auto vertices = c->getVertices();
 
         Curve* new_c = dynamic_cast<Curve*>(m_correspondance[1][c]);
         for(unsigned int i=0;i<vertices.size();i++){

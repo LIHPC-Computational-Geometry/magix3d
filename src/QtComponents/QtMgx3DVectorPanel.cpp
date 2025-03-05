@@ -498,8 +498,7 @@ void QtMgx3DVectorPanel::selectedSegmentCallback (const QString name)
 						).getGeomManager ( ).getCurve (
 													name.toStdString ( ), true);
 				CHECK_NULL_PTR_ERROR (segment);
-				vector<Geom::Vertex*>	vertices;
-				segment->get (vertices);
+				auto vertices = segment->getVertices();
 				size_t	count	= vertices.size ( );
 				if (1 > count)
 					throw Exception (UTF8String ("Courbe géométrique dotée au plus d'un sommet.", Charset::UTF_8));

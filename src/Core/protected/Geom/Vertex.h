@@ -59,7 +59,7 @@ public:
 
     virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const;
     virtual void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda);
-    virtual void accept(GeomEntityVisitor& v) { v.visit(this); }
+    virtual void accept(GeomEntityVisitor& v) const { v.visit(this); }
 
     /*------------------------------------------------------------------------*/
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
@@ -109,33 +109,11 @@ public:
     virtual void computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const;
 
     /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux sommets géométriques incidents via une
-     *          courbe
-     *
-     *  \param vertices les sommets incidents
-     */
-    virtual void get(std::vector<Vertex*>& vertices) const;
-
-    /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès aux courbes géométriques incidentes
      *
      *  \param curves les courbes incidents
      */
-    virtual void get(std::vector<Curve*>& curves) const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux surfaces géométriques incidentes
-     *
-     *  \param surfaces les surfaces incidentes
-     */
-    virtual void get(std::vector<Surface*>& surfaces) const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux volumes géométriques incidents
-     *
-     *  \param volumes les volumes incidents
-     */
-    virtual void get(std::vector<Volume*>& volumes) const;
+    const std::vector<Curve*>& getCurves() const {return m_curves;}
 
     /*------------------------------------------------------------------------*/
     /// retourne la liste des sommets topologiques qui pointent sur cette courbe

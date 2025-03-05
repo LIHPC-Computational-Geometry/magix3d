@@ -198,8 +198,7 @@ save(Geom::Curve* cv)
 
     if (m_cor_uniqueId_mdlId[cv->getUniqueId()] == 0){
         if (cv->isLinear()){
-            std::vector<Geom::Vertex*> vertices;
-            cv->get(vertices);
+            auto vertices = cv->getVertices();
             if (vertices.size() != 2){
 				TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
                 messErr << "Erreur lors de l'écriture du fichier au format Mdl, entité "<<cv->getName()<<" a autre chose que 2 sommets ("<<vertices.size()<<" dans notre cas)";
@@ -226,8 +225,7 @@ save(Geom::Curve* cv)
 #endif
         }
         else if (cv->isCircle() || cv->isEllipse()){
-            std::vector<Geom::Vertex*> vertices;
-            cv->get(vertices);
+            auto vertices = cv->getVertices();
             if (vertices.size() != 2){
 				TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
                 messErr << "Erreur lors de l'écriture du fichier au format Mdl, entité "<<cv->getName()<<" a autre chose que 2 sommets ("<<vertices.size()<<" dans notre cas)";
@@ -280,8 +278,7 @@ save(Geom::Curve* cv)
             cv->getRepresentation(rep, true);
             std::vector<Utils::Math::Point>&   points      = rep.getPoints ( );
 
-            std::vector<Geom::Vertex*> vertices;
-            cv->get(vertices);
+            auto vertices = cv->getVertices();
 
             std::string nomSupport = std::string("Su")+cv->getName();
             T_MdlCommand& cmd = nextCommand(nomSupport, MdlLineSup, m_obs_id[IdObLineSup]++);
@@ -372,8 +369,7 @@ save(Geom::Surface* sf)
         throw TkUtil::Exception(TkUtil::UTF8String ("Erreur lors de l'écriture du fichier au format Mdl, une entité n'a pas été convertie en Surface", TkUtil::Charset::UTF_8));
 
     if (m_cor_uniqueId_mdlId[sf->getUniqueId()] == 0){
-        std::vector<Geom::Curve*> curves;
-        sf->get(curves);
+        auto curves = sf->getCurves();
         uint nb_cd = curves.size();
 
         // pour être certain de la la sauvegarde des courbes

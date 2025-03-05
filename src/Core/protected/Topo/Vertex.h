@@ -216,14 +216,6 @@ public:
     virtual Mgx3D::Utils::SerializedRepresentation* getDescription (
 													bool alsoComputed) const;
 
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Fournit un résumé textuel de l'entité.
-     */
-
-    virtual std::string getSummary ( ) const;
-
-
     /*------------------------------------------------------------------------*/
     /** Vérification du sommet
      * Il est juste vérifié qu'il n'est pas détruit

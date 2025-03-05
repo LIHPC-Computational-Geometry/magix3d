@@ -632,13 +632,11 @@ bool EntityFactory::checkClosedWire(const std::vector<Geom::Curve*>& curves) con
 {
     std::set<Utils::Entity::uniqueID> vertex_ids;
     if (curves.size() == 1){
-    	std::vector<Geom::Vertex*> v;
-    	curves[0]->get(v);
+    	auto v = curves[0]->getVertices();
     	return ((v.size() == 2 && (v[0]->getCoord() == v[1]->getCoord())) || v.size() == 1);
     }
     for(unsigned int i=0; i<curves.size();i++){
-        std::vector<Geom::Vertex*> v;
-        curves[i]->get(v);
+        auto v = curves[i]->getVertices();
         if(v.size()>=1){
             vertex_ids.insert(v[0]->getUniqueId());
             if(v.size()==2)
@@ -676,8 +674,7 @@ Surface* EntityFactory::newSurface(const std::vector<Geom::Curve*>& curves)
         std::set<Geom::Vertex*> vertices;
         for(unsigned int i=0;i<curves.size();i++){
             Geom::Curve* current_curve = curves[i];
-            std::vector<Geom::Vertex*> current_vertices;
-            current_curve->get(current_vertices);
+            auto current_vertices = current_curve->getVertices();
             vertices.insert(current_vertices.begin(),current_vertices.end());
         }
 

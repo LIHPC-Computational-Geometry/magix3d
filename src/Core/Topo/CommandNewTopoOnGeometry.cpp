@@ -7,6 +7,7 @@
  */
 /*----------------------------------------------------------------------------*/
 #include "Geom/EntityFactory.h"
+#include "Geom/IncidentGeomEntitiesVisitor.h"
 #include "Topo/CommandNewTopoOnGeometry.h"
 #include "Topo/TopoManager.h"
 #include "Topo/Block.h"
@@ -394,8 +395,7 @@ void CommandNewTopoOnGeometry::createCoEdge()
 		throw TkUtil::Exception (TkUtil::UTF8String ("createCoEdge imposible pour autre chose qu'une courbe géométrique", TkUtil::Charset::UTF_8));
 
 	// récupéaration des sommets
-	std::vector<Geom::Vertex*> gvertices;
-	crv->get(gvertices);
+	auto gvertices = crv->getVertices();
 	std::vector<Topo::Vertex*> tvertices;
 	for (uint i=0; i<gvertices.size(); i++){
 		const std::vector<Topo::TopoEntity* > ref_topo = gvertices[i]->getRefTopo();
@@ -429,14 +429,18 @@ void CommandNewTopoOnGeometry::getPreviewRepresentation(Utils::DisplayRepresenta
 /*----------------------------------------------------------------------------*/
 void CommandNewTopoOnGeometry::createSpherePartBlock()
 {
+	Geom::Volume* volume = dynamic_cast<Geom::Volume*>(getGeomEntity());
 	// cas avec dégénérescence à l'origine
 	Topo::Block* bloc = new Topo::Block(getContext(), m_nj, m_nk, m_ni);
 
 	addCreatedBlock(bloc);
 	split();
 
-	std::vector<Geom::Vertex*> vertices;
-	getGeomEntity()->get(vertices);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
 
 	for (uint i=0; i<5; i++)
 		bloc->getVertex(i)->setCoord(vertices[i]->getCoord());
@@ -448,8 +452,6 @@ void CommandNewTopoOnGeometry::createSpherePartBlock()
 	// les associations
 	bloc->setGeomAssociation(getGeomEntity());
 
-	std::vector<Geom::Curve*> curves;
-	getGeomEntity()->get(curves);
 	bloc->getFace(Block::k_min)->getEdge(bloc->getVertex(0), bloc->getVertex(1))->setGeomAssociation(curves[0]);
 	bloc->getFace(Block::k_min)->getEdge(bloc->getVertex(0), bloc->getVertex(2))->setGeomAssociation(curves[1]);
 	bloc->getFace(Block::k_min)->getEdge(bloc->getVertex(3), bloc->getVertex(2))->setGeomAssociation(curves[2]);
@@ -459,8 +461,6 @@ void CommandNewTopoOnGeometry::createSpherePartBlock()
 	bloc->getFace(Block::i_max)->getEdge(bloc->getVertex(1), bloc->getVertex(4))->setGeomAssociation(curves[5]);
 	bloc->getFace(Block::i_max)->getEdge(bloc->getVertex(3), bloc->getVertex(4))->setGeomAssociation(curves[7]);
 
-	std::vector<Geom::Surface*> surfaces;
-	getGeomEntity()->get(surfaces);
 	bloc->getFace(Block::k_min)->setGeomAssociation(surfaces[0]);
 	bloc->getFace(Block::i_min)->setGeomAssociation(surfaces[2]);
 	bloc->getFace(Block::i_max)->setGeomAssociation(surfaces[4]);
@@ -479,8 +479,11 @@ void CommandNewTopoOnGeometry::createHollowSpherePartBlock()
 	addCreatedBlock(bloc);
 	split();
 
-	std::vector<Geom::Vertex*> vertices;
-	getGeomEntity()->get(vertices);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
 
 	for (uint i=0; i<8; i++)
 		bloc->getVertex(i)->setCoord(vertices[i]->getCoord());
@@ -488,8 +491,6 @@ void CommandNewTopoOnGeometry::createHollowSpherePartBlock()
 	// les associations
 	bloc->setGeomAssociation(getGeomEntity());
 
-	std::vector<Geom::Curve*> curves;
-	getGeomEntity()->get(curves);
 	bloc->getFace(Block::k_min)->getEdge(bloc->getVertex(0), bloc->getVertex(1))->setGeomAssociation(curves[0]);
 	bloc->getFace(Block::k_min)->getEdge(bloc->getVertex(0), bloc->getVertex(2))->setGeomAssociation(curves[1]);
 	bloc->getFace(Block::k_min)->getEdge(bloc->getVertex(3), bloc->getVertex(2))->setGeomAssociation(curves[2]);
@@ -503,8 +504,6 @@ void CommandNewTopoOnGeometry::createHollowSpherePartBlock()
 	bloc->getFace(Block::k_max)->getEdge(bloc->getVertex(4), bloc->getVertex(6))->setGeomAssociation(curves[7]);
 	bloc->getFace(Block::k_max)->getEdge(bloc->getVertex(5), bloc->getVertex(7))->setGeomAssociation(curves[11]);
 
-	std::vector<Geom::Surface*> surfaces;
-	getGeomEntity()->get(surfaces);
 	bloc->getFace(Block::k_min)->setGeomAssociation(surfaces[0]);
 	bloc->getFace(Block::i_min)->setGeomAssociation(surfaces[2]);
 	bloc->getFace(Block::i_max)->setGeomAssociation(surfaces[4]);

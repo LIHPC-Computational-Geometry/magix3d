@@ -123,51 +123,6 @@ void Surface::createSpecificMemento(MementoGeomEntity& mem)
 	mem.setOCCShapes(shapes);
 }
 /*----------------------------------------------------------------------------*/
-void Surface::get(std::vector<Vertex*>& vertices) const
-{
-    std::list<Vertex*> l;
-    vertices.clear();
-    for(unsigned int i=0; i <m_curves.size();i++){
-        Curve* c = m_curves[i];
-        std::vector<Vertex*> local_vertices;
-        c->get(local_vertices);
-        l.insert(l.end(),local_vertices.begin(),local_vertices.end());
-    }
-    l.sort(Utils::Entity::compareEntity);
-    l.unique();
-
-    vertices.insert(vertices.end(),l.begin(),l.end());
-}
-/*----------------------------------------------------------------------------*/
-void Surface::get(std::vector<Curve*>& curves) const
-{
-    curves.clear();
-    curves.insert(curves.end(),m_curves.begin(),m_curves.end());
-}
-/*----------------------------------------------------------------------------*/
-void Surface::get(std::vector<Surface*>& surfaces) const
-{
-    std::list<Surface*> l;
-    surfaces.clear();
-    for(unsigned int i=0; i <m_curves.size();i++){
-        Curve *c = m_curves[i];
-        std::vector<Surface*> local_surfaces;
-        c->get(local_surfaces);
-        l.insert(l.end(),local_surfaces.begin(),local_surfaces.end());
-    }
-
-    l.sort(Utils::Entity::compareEntity);
-    l.unique();
-    l.remove(const_cast<Surface*>(this));
-    surfaces.insert(surfaces.end(),l.begin(),l.end());
-}
-/*----------------------------------------------------------------------------*/
-void Surface::get(std::vector<Volume*>& volumes) const
-{
-    volumes.clear();
-    volumes.insert(volumes.end(),m_volumes.begin(),m_volumes.end());
-}
-/*----------------------------------------------------------------------------*/
 uint Surface::project(Utils::Math::Point& P) const
 {
 	Utils::Math::Point P2;
@@ -308,6 +263,7 @@ void Surface::split(std::vector<Curve* >& curv, std::vector<Vertex* >&  vert)
 			this->add(c);
 			// on crée le lien F->V
 			c->add(this);
+			curv.push_back(c);
 		}
 
 
@@ -359,13 +315,10 @@ void Surface::split(std::vector<Curve* >& curv, std::vector<Vertex* >&  vert)
 					c->add(v);
 					// on crée le lien V->C
 					v->add(c);
+					vert.push_back(v);
 				}
 			}
 		}
-
-		// on renseigne la fonction appelante
-		this->get(curv);
-		this->get(vert);
 	}
 }
 /*----------------------------------------------------------------------------*/

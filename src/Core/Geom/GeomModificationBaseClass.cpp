@@ -13,6 +13,7 @@
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
 #include "Geom/EntityFactory.h"
+#include "Geom/IncidentGeomEntitiesVisitor.h"
 #include "Geom/OCCHelper.h"
 #include "Utils/MgxNumeric.h"
 /*----------------------------------------------------------------------------*/
@@ -165,68 +166,31 @@ addReference(GeomEntity* e)
 void GeomModificationBaseClass::
 addDownIncidentReference(GeomEntity* e)
 {
-    if(e->getDim()>0)
-    {
-        std::vector<Vertex*> vertices;
-        e->get(vertices);
-        for(unsigned int i=0;i<vertices.size();i++)
-            addReference(vertices[i]);
-    }
-    if(e->getDim()>1)
-    {
-        std::vector<Curve*> curves;
-        e->get(curves);
-        for(unsigned int i=0;i<curves.size();i++)
-            addReference(curves[i]);
-    }
-    if(e->getDim()>2)
-    {
-        std::vector<Surface*> surfs;
-        e->get(surfs);
-        for(unsigned int i=0;i<surfs.size();i++)
-            addReference(surfs[i]);
-    }
+    GetDownIncidentGeomEntitiesVisitor v;
+    e->accept(v);
+    for (auto ei : v.get())
+        addReference(ei);
 }
 /*----------------------------------------------------------------------------*/
 void GeomModificationBaseClass::
 addAdjacencyReference(GeomEntity* e)
 {
-    if(e->getDim()<=1)
+    GetUpIncidentGeomEntitiesVisitor vi;
+    e->accept(vi);
+    for (auto ei : vi.get())
     {
-        std::vector<Curve*> curves;
-        e->get(curves);
-        for(unsigned int i=0;i<curves.size();i++){
-            GeomEntity* c= curves[i];
-            if(std::find(m_ref_entities[1].begin(),m_ref_entities[1].end(),c)==m_ref_entities[1].end())
-                m_adj_entities[c->getDim()].push_back(c);
-        }
+        int dim = ei->getDim();
+        if(std::find(m_ref_entities[dim].begin(),m_ref_entities[dim].end(),ei)==m_ref_entities[dim].end())
+            m_adj_entities[dim].push_back(ei);
     }
-    if(e->getDim()<=2)
-    {
-        std::vector<Surface*> surfs;
-        e->get(surfs);
-        for(unsigned int i=0;i<surfs.size();i++)
-        {
-            GeomEntity* s= surfs[i];
-            if(std::find(m_ref_entities[2].begin(),m_ref_entities[2].end(),s)==m_ref_entities[2].end())
-                m_adj_entities[s->getDim()].push_back(s);
-        }
 
-    }
-    if(e->getDim()<=3)
+    GetAdjacentGeomEntitiesVisitor va;
+    e->accept(va);
+    for (auto ei : va.get())
     {
-        std::vector<Volume*> vols;
-        e->get(vols);
-        for(unsigned int i=0;i<vols.size();i++)
-        {
-            GeomEntity* v= vols[i];
-            if(std::find(m_ref_entities[3].begin(),m_ref_entities[3].end(),v)==m_ref_entities[3].end()){
-#ifdef _DEBUG2
-                std::cout<<"AJOUTER EN ADJ 3: "<<v->getName()<<std::endl;
-#endif
-                m_adj_entities[v->getDim()].push_back(v);
-            }
-        }
+        int dim = ei->getDim();
+        if (dim > 0 && std::find(m_ref_entities[dim].begin(),m_ref_entities[dim].end(),ei)==m_ref_entities[dim].end())
+            m_adj_entities[dim].push_back(ei);
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -370,8 +334,7 @@ void GeomModificationBaseClass::clean(const bool deleteAloneVertices)
     	for(unsigned int i=0;i<m_newVertices.size();){
     		Vertex* e = m_newVertices[i];
     		//Si l'entité n'est connectée à rien, c'est quelle doit disparaitre
-    		std::vector<Curve*> ec;
-    		e->get(ec);
+    		auto ec = e->getCurves();
     		if(ec.empty()){
     			delete m_newVertices[i]; // [EB] si on ne détruit pas ici, je ne sais pas où ce sera fait
     			Vertex* laste = m_newVertices[m_newVertices.size()-1];
@@ -385,10 +348,8 @@ void GeomModificationBaseClass::clean(const bool deleteAloneVertices)
     for(unsigned int i=0;i<m_newCurves.size();){
         Curve* e = m_newCurves[i];
         //Si l'entité n'est connectée à rien, c'est quelle doit disparaitre
-        std::vector<Vertex*> ev;
-        e->get(ev);
-        std::vector<Surface*> es;
-        e->get(es);
+        auto ev = e->getVertices();
+        auto es = e->getSurfaces();
         if(ev.empty() && es.empty()){
         	delete m_newCurves[i]; // [EB] si on ne détruit pas ici, je ne sais pas où ce sera fait
             Curve* laste = m_newCurves[m_newCurves.size()-1];
@@ -402,10 +363,8 @@ void GeomModificationBaseClass::clean(const bool deleteAloneVertices)
     for(unsigned int i=0;i<m_newSurfaces.size();){
         Surface* e = m_newSurfaces[i];
         //Si l'entité n'est connectée à rien, c'est quelle doit disparaitre
-        std::vector<Volume*> ev;
-        e->get(ev);
-        std::vector<Curve*> ec;
-        e->get(ec);
+        auto ev = e->getVolumes();
+        auto ec = e->getCurves();
         if(ev.empty() && ec.empty()){
         	delete m_newSurfaces[i]; // [EB] si on ne détruit pas ici, je ne sais pas où ce sera fait
             Surface* laste = m_newSurfaces[m_newSurfaces.size()-1];
@@ -419,8 +378,7 @@ void GeomModificationBaseClass::clean(const bool deleteAloneVertices)
     for(unsigned int i=0;i<m_newVolumes.size();){
         Volume* e = m_newVolumes[i];
         //Si l'entité n'est connectée à rien, c'est quelle doit disparaitre
-        std::vector<Surface*> es;
-        e->get(es);
+        auto es = e->getSurfaces();
         if(es.empty()){
         	delete m_newVolumes[i]; // [EB] si on ne détruit pas ici, je ne sais pas où ce sera fait
             Volume* laste = m_newVolumes[m_newVolumes.size()-1];
@@ -463,8 +421,7 @@ void GeomModificationBaseClass::cleanRefEntities(){
     {
         Vertex* v = dynamic_cast<Vertex*>(ge);
         std::vector<Curve*> toRemoveC;
-        std::vector<Curve*> incidentCurves;
-        v->get(incidentCurves);
+        std::vector<Curve*> incidentCurves = v->getCurves();
         auto refCurves = m_ref_entities[1];
         for(auto c : incidentCurves){
             auto res = std::find(refCurves.begin(),refCurves.end(),c);
@@ -479,10 +436,8 @@ void GeomModificationBaseClass::cleanRefEntities(){
         Curve* c = dynamic_cast<Curve*>(ge);
         std::vector<Surface*> toRemoveS;
         std::vector<Vertex*> toRemoveV;
-        std::vector<Surface*> incidentSurfaces;
-        std::vector<Vertex*> incidentVertices;
-        c->get(incidentSurfaces);
-        c->get(incidentVertices);
+        std::vector<Surface*> incidentSurfaces = c->getSurfaces();
+        std::vector<Vertex*> incidentVertices = c->getVertices();
         auto refSurfaces = m_ref_entities[2];
         for(auto s : incidentSurfaces){
             auto res = std::find(refSurfaces.begin(),refSurfaces.end(),s);
@@ -505,10 +460,8 @@ void GeomModificationBaseClass::cleanRefEntities(){
         Surface* s = dynamic_cast<Surface*>(ge);
         std::vector<Volume*> toRemoveV;
         std::vector<Curve*> toRemoveC;
-        std::vector<Volume*> incidentVolumes;
-        std::vector<Curve*> incidentCurves;
-        s->get(incidentVolumes);
-        s->get(incidentCurves);
+        std::vector<Volume*> incidentVolumes = s->getVolumes();
+        std::vector<Curve*> incidentCurves = s->getCurves();
         auto refVolumes = m_ref_entities[3];
         for(auto v : incidentVolumes){
             auto res = std::find(refVolumes.begin(),refVolumes.end(),s);
@@ -530,8 +483,7 @@ void GeomModificationBaseClass::cleanRefEntities(){
     {
         Volume* v = dynamic_cast<Volume*>(ge);
         std::vector<Surface*> toRemoveS;
-        std::vector<Surface*> incidentSurfaces;
-        v->get(incidentSurfaces);
+        std::vector<Surface*> incidentSurfaces = v->getSurfaces();
         auto refSurfaces = m_ref_entities[2];
         for(auto s : incidentSurfaces){
             auto res = std::find(refSurfaces.begin(),refSurfaces.end(),s);
@@ -543,31 +495,25 @@ void GeomModificationBaseClass::cleanRefEntities(){
     }
 }
 /*----------------------------------------------------------------------------*/
-void GeomModificationBaseClass::cleanEntityAndChildren(GeomEntity* e)
+void GeomModificationBaseClass::cleanEntityAndChildren(Volume* ve)
 {
     //Ici, on supprime les connectivités entre e et ses cellules de dimension
     // inférieure
-    std::vector<Surface*> e_surfaces;
-    e->get(e_surfaces);
-
-    Volume* ve = dynamic_cast<Volume*>(e);
-    CHECK_NULL_PTR_ERROR(ve);
+    auto e_surfaces = ve->getSurfaces();
     for(unsigned int i=0;i<e_surfaces.size();i++)
     {
         Surface *si = e_surfaces[i];
         si->remove(ve);
         ve->remove(si);
 
-        std::vector<Curve*> si_curves;
-        si->get(si_curves);
+        auto si_curves = si->getCurves();
         for(unsigned int j=0;j<si_curves.size();j++)
          {
              Curve *cj = si_curves[j];
              cj->remove(si);
              si->remove(cj);
 
-             std::vector<Vertex*> cj_vertices;
-             cj->get(cj_vertices);
+             auto cj_vertices = cj->getVertices();
              for(unsigned int k=0;k<cj_vertices.size();k++)
               {
                   Vertex* vk = cj_vertices[k];
@@ -856,8 +802,7 @@ void GeomModificationBaseClass::rebuildAdjacencyEntities(const TopoDS_Shape& sha
         std::cout<<"REBUILD ADJ VOLUME "<<ei->getName()<<std::endl;
 #endif
        //on regarde si des surfaces du volumes ont été remplacées
-        std::vector<Surface*> surfs;
-        ei->get(surfs);
+        auto surfs = ei->getSurfaces();
         bool surf_modified = false;
 
         for(unsigned int is=0;is<surfs.size();is++)
@@ -992,8 +937,7 @@ void GeomModificationBaseClass::rebuildAdjacencyLinks()
         std::cout<<" ADJ VOLUME "<<ei->getName()<<std::endl;
 #endif
         //on regarde si des surfaces du volumes ont été remplacées
-        std::vector<Surface*> surfs;
-        vi->get(surfs);
+        auto surfs = vi->getSurfaces();
         bool surf_modified = false;
 //        std::cout<<"NB REPLACED ENTITIES = "<<m_replacedEntities.size()<<std::endl;
 //        std::cout<<"NB SURFS = "<<surfs.size()<<std::endl;
@@ -1336,8 +1280,7 @@ void GeomModificationBaseClass::connect(
                 if(OCCHelper::areEquals(F,F2))
                 {
                     found=true;
-                    std::vector<Surface*> this_surf;
-                    m3d_volume->get(this_surf);
+                    auto this_surf = m3d_volume->getSurfaces();
                     if(std::find(this_surf.begin(),this_surf.end(),m3d_surfaces[i_f])==this_surf.end())
                     {
                         m3d_volume->add(m3d_surfaces[i_f]);
@@ -1372,8 +1315,7 @@ void GeomModificationBaseClass::connect(
                 {
 
                     found=true;
-                    std::vector<Curve*> this_curv;
-                    m3d_surface->get(this_curv);
+                    auto this_curv = m3d_surface->getCurves();
                     // une courbe ne référence qu'une fois une surface
                     if(std::find(this_curv.begin(),this_curv.end(),m3d_curves[i_e])==this_curv.end())
                     {
@@ -1407,8 +1349,7 @@ void GeomModificationBaseClass::connect(
                 if(OCCHelper::areEquals(V,V2))
                 {
                     found=true;
-                    std::vector<Vertex*> this_vert;
-                    m3d_curve->get(this_vert);
+                    auto this_vert = m3d_curve->getVertices();
                     if(std::find(this_vert.begin(),this_vert.end(),m3d_vertices[i_v])==this_vert.end())
                     {
                         m3d_curve->add(m3d_vertices[i_v]);
@@ -2399,44 +2340,14 @@ getGeomEntity(TopoDS_Shape &loc_shape,
 /*----------------------------------------------------------------------------*/
 void GeomModificationBaseClass::checkValidity(std::set<GeomEntity*>& entities)
 {
-    std::set<GeomEntity*>::iterator it  = entities.begin();
-    std::set<GeomEntity*>::iterator ite = entities.end();
-
-    for(;it!=ite;it++){
-        GeomEntity* ei = *it;
-        int dimi = ei->getDim();
-
-        if(dimi<1){
-            std::vector<Curve*> curves;
-            ei->get(curves);
-            for(unsigned int i=0;i<curves.size();i++){
-                if(entities.find(curves[i])==ite){
-                    TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-                    message << "Une entité est connectée à des courbes ("<<curves[i]->getName()<<" entre autre) qui ne sont pas modifiées";
-                    throw TkUtil::Exception (message);
-                }
-            }
-        }
-        if(dimi<2){
-            std::vector<Surface*> surfs;
-            ei->get(surfs);
-            for(unsigned int i=0;i<surfs.size();i++){
-                if(entities.find(surfs[i])==ite){
-                    TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-                    message << "Une entité est connectée à des surfaces ("<<surfs[i]->getName()<<" entre autre) qui ne sont pas modifiées";
-                    throw TkUtil::Exception (message);
-                }
-            }
-        }
-        if(dimi<3){
-            std::vector<Volume*> vols;
-            ei->get(vols);
-            for(unsigned int i=0;i<vols.size();i++){
-                if(entities.find(vols[i])==ite){
-                    TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-                    message << "Une entité est connectée à des volumes ("<<vols[i]->getName()<<" entre autre) qui ne sont pas modifiées";
-                    throw TkUtil::Exception (message);
-                }
+    for(auto ei : entities){
+        GetUpIncidentGeomEntitiesVisitor v;
+        ei->accept(v);
+        for (auto vei : v.get()) {
+            if(entities.find(vei)==entities.end()){
+                TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+                message << "L'entité " << ei->getName() << " est reliée à " << vei->getName() << " non modifiée";
+                throw TkUtil::Exception (message);
             }
         }
     }
@@ -2455,31 +2366,12 @@ buildInitialSet(std::set<GeomEntity*>& init_entities)
         int dimi = ei->getDim();
         // ei is always added
         init_entities.insert(ei);
-        if(dimi>=1){ //vertices must be added to
-            std::vector<Vertex*> vertices;
-            ei->get(vertices);
-            for(unsigned int iv=0;iv<vertices.size();iv++)
-                init_entities.insert(vertices[iv]);
 
-        }
-        if(dimi>=2){//curves to be added
-            std::vector<Curve*> curves;
-            ei->get(curves);
-            //std::cerr<<"Curves: "<<curves.size()<<std::endl;
-
-            for(unsigned int ic=0;ic<curves.size();ic++)
-                init_entities.insert(curves[ic]);
-
-
-        }
-        if(dimi>=3){
-            std::vector<Surface*> surfs;
-            ei->get(surfs);
-            for(unsigned int ic=0;ic<surfs.size();ic++)
-                init_entities.insert(surfs[ic]);
-        }
+        GetDownIncidentGeomEntitiesVisitor v;
+        ei->accept(v);
+        for(auto e : v.get())
+            init_entities.insert(e);
     }
-
 }
 /*----------------------------------------------------------------------------*/
 }

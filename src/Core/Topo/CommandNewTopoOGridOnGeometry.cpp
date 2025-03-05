@@ -26,6 +26,7 @@
 #include "Geom/PropertyHollowSphere.h"
 #include "Geom/GeomEntity.h"
 #include "Geom/GeomHelper.h"
+#include "Geom/IncidentGeomEntitiesVisitor.h"
 #include "Internal/NameManager.h"
 #include "Internal/Context.h"
 #include "Internal/EntitiesHelper.h"
@@ -240,8 +241,9 @@ createCylinderTopo1BlockPlein(Geom::PropertyCylinder* propertyCyl)
     } // end for (uint niv=0; niv<2; niv++)
 
     // les projections sur la géométrie
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
     if (surfaces.size() != 3){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 3 surfaces géométriques mais "
@@ -266,8 +268,7 @@ createCylinderTopo1BlockPlein(Geom::PropertyCylinder* propertyCyl)
     // la dernière surface est à la base du cylindre
     b1->getFace(Block::k_min)->setGeomAssociation(surfaces[2]);
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
     if (curves.size() != 3){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 3 courbes géométriques mais "
@@ -309,8 +310,12 @@ createCylinderTopo1BlockDemi(Geom::PropertyCylinder* propertyCyl)
     split(); // split à faire avant les modifications
 
     // les projections sur la géométrie
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
+
     if (surfaces.size() != 5){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 5 surfaces géométriques mais "
@@ -318,8 +323,6 @@ createCylinderTopo1BlockDemi(Geom::PropertyCylinder* propertyCyl)
         throw TkUtil::Exception(message);
     }
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
     if (curves.size() != 9){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 9 courbes géométriques mais "
@@ -328,8 +331,6 @@ createCylinderTopo1BlockDemi(Geom::PropertyCylinder* propertyCyl)
     }
 
     // on utilise directement les sommets géométriques
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
     if (vertices.size() != 6){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 6 sommets géométriques mais "
@@ -448,8 +449,12 @@ createCylinderTopo1BlockQuart(Geom::PropertyCylinder* propertyCyl)
     split(); // split à faire avant les modifications
 
     // les projections sur la géométrie
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
+
     if (surfaces.size() != 5){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 5 surfaces géométriques mais "
@@ -457,8 +462,6 @@ createCylinderTopo1BlockQuart(Geom::PropertyCylinder* propertyCyl)
         throw TkUtil::Exception(message);
     }
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
     if (curves.size() != 9){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 9 courbes géométriques mais "
@@ -467,8 +470,6 @@ createCylinderTopo1BlockQuart(Geom::PropertyCylinder* propertyCyl)
     }
 
     // on utilise directement les sommets géométriques
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
     if (vertices.size() != 6){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 6 sommets géométriques mais "
@@ -716,8 +717,11 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridPleinNonDeg(Geom::Pro
     b4->getFace(Block::i_min)->fuse(b1->getFace(Block::j_min), &getInfoCommand());
 
     // les projections sur la géométrie
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+
     if (surfaces.size() != 3){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 3 surfaces géométriques mais "
@@ -764,8 +768,6 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridPleinNonDeg(Geom::Pro
         b5->getFace(Block::k_min)->getVertex(i)->setGeomAssociation(surfaces[2]);
     }
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
     if (curves.size() != 3){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 3 courbes géométriques mais "
@@ -909,8 +911,11 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridPleinDeg(Geom::Proper
 
 
     // les projections sur la géométrie
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    
     if (surfaces.size() != 3){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 3 surfaces géométriques mais "
@@ -953,8 +958,6 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridPleinDeg(Geom::Proper
     }
     b1->getVertex(4)->setGeomAssociation(surfaces[2]);
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
     if (curves.size() != 3){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 3 courbes géométriques mais "
@@ -1003,8 +1006,12 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridQuartDeg(Geom::Proper
     split(); // split à faire avant les modifications
 
     // on utilise directement les sommets géométriques
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
+
     if (vertices.size() != 6){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 6 sommets géométriques mais "
@@ -1028,8 +1035,6 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridQuartDeg(Geom::Proper
     b1->degenerateFaceInEdge(Block::k_max, b1->getVertex(4), b1->getVertex(5), &getInfoCommand());
 
     // les projections sur la géométrie
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
     if (surfaces.size() != 5){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 5 surfaces géométriques mais "
@@ -1049,9 +1054,6 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridQuartDeg(Geom::Proper
     b1->getFace(Block::i_min)->setGeomAssociation(surfaces[3]);
     b1->getFace(Block::i_max)->setGeomAssociation(surfaces[4]);
 
-
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
     if (curves.size() != 9){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 9 courbes géométriques mais "
@@ -1110,8 +1112,12 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridQuartNonDeg(Geom::Pro
     split(); // split à faire avant les modifications
 
     // les projections sur la géométrie
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
+
     if (surfaces.size() != 5){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 5 surfaces géométriques mais "
@@ -1119,8 +1125,6 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridQuartNonDeg(Geom::Pro
         throw TkUtil::Exception(message);
     }
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
     if (curves.size() != 9){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 9 courbes géométriques mais "
@@ -1129,8 +1133,6 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridQuartNonDeg(Geom::Pro
     }
 
     // on utilise directement les sommets géométriques
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
     if (vertices.size() != 6){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 6 sommets géométriques mais "
@@ -1304,8 +1306,12 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridDemiNonDeg(Geom::Prop
     split(); // split à faire avant les modifications
 
     // les projections sur la géométrie
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
+
     if (surfaces.size() != 5){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 5 surfaces géométriques mais "
@@ -1313,8 +1319,6 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridDemiNonDeg(Geom::Prop
         throw TkUtil::Exception(message);
     }
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
     if (curves.size() != 9){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 9 courbes géométriques mais "
@@ -1323,8 +1327,6 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridDemiNonDeg(Geom::Prop
     }
 
     // on utilise directement les sommets géométriques
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
     if (vertices.size() != 6){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 6 sommets géométriques mais "
@@ -1613,8 +1615,7 @@ createSphereTopo1BlockPlein(Geom::PropertySphere* propertySph)
     b1->getVertex(true, true, true )->setCoord(centre+Utils::Math::Point( r2,  r2,  r2));
 
     // les projections sur la géométrie
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    auto surfaces = dynamic_cast<Geom::Volume*>(getGeomEntity())->getSurfaces();
     if (surfaces.size() != 1){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 1 surface géométrique mais "
@@ -1673,8 +1674,12 @@ createSphereTopo1BlockDemi(Geom::PropertySphere* propertySph)
             &getInfoCommand());
 
     // les projections sur la géométrie
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
+
     if (surfaces.size() != 3){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 3 surfaces géométriques mais "
@@ -1705,8 +1710,6 @@ createSphereTopo1BlockDemi(Geom::PropertySphere* propertySph)
         throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b1", TkUtil::Charset::UTF_8));
 
     // les sommets géométriques
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
     if (vertices.size() != 2){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 2 sommets géométriques mais "
@@ -1732,8 +1735,6 @@ createSphereTopo1BlockDemi(Geom::PropertySphere* propertySph)
     v0->setCoord(vertices[0]->getCoord());
     v1->setCoord(vertices[1]->getCoord());
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
     if (curves.size() != 3){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 3 courbes géométriques mais "
@@ -1798,8 +1799,12 @@ createSphereTopo1BlockQuart(Geom::PropertySphere* propertySph)
 
 
     // les projections sur la géométrie
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
+
     if (surfaces.size() != 3){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 3 surfaces géométriques mais "
@@ -1823,8 +1828,6 @@ createSphereTopo1BlockQuart(Geom::PropertySphere* propertySph)
     b1->getFace(Block::j_min)->setGeomAssociation(surfaces[1]);
 
     // les sommets géométriques
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
     if (vertices.size() != 2){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 2 sommets géométriques mais "
@@ -1839,8 +1842,6 @@ createSphereTopo1BlockQuart(Geom::PropertySphere* propertySph)
     v0->setCoord(vertices[0]->getCoord());
     v1->setCoord(vertices[1]->getCoord());
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
     if (curves.size() != 3){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 3 courbes géométriques mais "
@@ -1886,8 +1887,12 @@ createSphereTopo1BlockHuitieme(Geom::PropertySphere* propertySph)
     split(); // split à faire avant les modifications
 
     // les sommets géométriques
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
+
     if (vertices.size() != 4){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 4 sommets géométriques mais "
@@ -1910,8 +1915,6 @@ createSphereTopo1BlockHuitieme(Geom::PropertySphere* propertySph)
     b1->getVertex(false,false,true )->setGeomAssociation(vertices[0]);
 
     // les projections sur la géométrie
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
     if (surfaces.size() != 4){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 4 surfaces géométriques mais "
@@ -1934,8 +1937,6 @@ createSphereTopo1BlockHuitieme(Geom::PropertySphere* propertySph)
     b1->getFace(Block::j_min)->setGeomAssociation(surfaces[2]);
     b1->getFace(Block::k_min)->setGeomAssociation(surfaces[1]);
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
     if (curves.size() != 6){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 6 courbes géométriques mais "
@@ -2030,8 +2031,7 @@ createSphereTopoOGridPleinDeg(Geom::PropertySphere* propertySph)
     b2->getFace(Block::j_max)->fuse(b5->getFace(Block::j_min), &getInfoCommand());
 
     // les projections sur la géométrie
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    auto surfaces = dynamic_cast<Geom::Volume*>(getGeomEntity())->getSurfaces();
     if (surfaces.size() != 1){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 1 surface géométrique mais "
@@ -2146,8 +2146,7 @@ createSphereTopoOGridPleinNonDeg(Geom::PropertySphere* propertySph)
 //             <<" fuse avec "<<getTopoManager().getCoFace("Fa0026")->getInfoBlock()<<std::endl;
 
     // les projections sur la géométrie
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    auto surfaces = dynamic_cast<Geom::Volume*>(getGeomEntity())->getSurfaces();
     if (surfaces.size() != 1){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 1 surface géométrique mais "
@@ -2260,8 +2259,13 @@ createSphereTopoOGridDemiDeg(Geom::PropertySphere* propertySph)
     coedges.push_back(splitingEdges[0]->getCoEdge(0));
 
     // les projections sur la géométrie
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
+
     if (surfaces.size() != 3){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 3 surfaces géométriques mais "
@@ -2311,8 +2315,6 @@ createSphereTopoOGridDemiDeg(Geom::PropertySphere* propertySph)
 
 
     // les sommets géométriques
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
     if (vertices.size() != 2){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 2 sommets géométriques mais "
@@ -2331,9 +2333,6 @@ createSphereTopoOGridDemiDeg(Geom::PropertySphere* propertySph)
     v0->setCoord(vertices[0]->getCoord());
     v1->setCoord(vertices[1]->getCoord());
 
-
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
     if (curves.size() != 3){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 3 courbes géométriques mais "
@@ -2478,8 +2477,12 @@ createSphereTopoOGridDemiNonDeg(Geom::PropertySphere* propertySph)
 
 
     // les projections sur la géométrie
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
+
     if (surfaces.size() != 3){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 3 surfaces géométriques mais "
@@ -2538,8 +2541,6 @@ createSphereTopoOGridDemiNonDeg(Geom::PropertySphere* propertySph)
         throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b5", TkUtil::Charset::UTF_8));
 
     // les sommets géométriques
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
     if (vertices.size() != 2){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 2 sommets géométriques mais "
@@ -2563,8 +2564,6 @@ createSphereTopoOGridDemiNonDeg(Geom::PropertySphere* propertySph)
     v0->setCoord(vertices[0]->getCoord());
     v1->setCoord(vertices[1]->getCoord());
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
     if (curves.size() != 3){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 3 courbes géométriques mais "
@@ -2678,8 +2677,12 @@ createSphereTopoOGridQuartDeg(Geom::PropertySphere* propertySph)
     b5->getFace(Block::i_max)->fuse(b6->getFace(Block::i_min), &getInfoCommand());
 
     // les projections sur la géométrie
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
+
     if (surfaces.size() != 3){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 3 surfaces géométriques mais "
@@ -2708,8 +2711,6 @@ createSphereTopoOGridQuartDeg(Geom::PropertySphere* propertySph)
 
 
     // les sommets géométriques
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
     if (vertices.size() != 2){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 2 sommets géométriques mais "
@@ -2724,8 +2725,6 @@ createSphereTopoOGridQuartDeg(Geom::PropertySphere* propertySph)
     v0->setCoord(vertices[0]->getCoord());
     v1->setCoord(vertices[1]->getCoord());
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
     if (curves.size() != 3){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 3 courbes géométriques mais "
@@ -2844,8 +2843,12 @@ createSphereTopoOGridQuartNonDeg(Geom::PropertySphere* propertySph)
     b5->getFace(Block::i_max)->fuse(b6->getFace(Block::i_min), &getInfoCommand());
 
     // les projections sur la géométrie
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
+
     if (surfaces.size() != 3){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 3 surfaces géométriques mais "
@@ -2876,8 +2879,6 @@ createSphereTopoOGridQuartNonDeg(Geom::PropertySphere* propertySph)
 
 
     // les sommets géométriques
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
     if (vertices.size() != 2){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 2 sommets géométriques mais "
@@ -2892,8 +2893,6 @@ createSphereTopoOGridQuartNonDeg(Geom::PropertySphere* propertySph)
     v0->setCoord(vertices[0]->getCoord());
     v1->setCoord(vertices[1]->getCoord());
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
     if (curves.size() != 3){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 3 courbes géométriques mais "
@@ -3011,8 +3010,12 @@ createSphereTopoOGridHuitiemeDeg(Geom::PropertySphere* propertySph)
     b5->getFace(Block::i_max)->fuse(b6->getFace(Block::i_min), &getInfoCommand());
 
     // les projections sur la géométrie
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
+
     if (surfaces.size() != 4){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 4 surfaces géométriques mais "
@@ -3042,8 +3045,6 @@ createSphereTopoOGridHuitiemeDeg(Geom::PropertySphere* propertySph)
 
 
     // les sommets géométriques
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
     if (vertices.size() != 4){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 4 sommets géométriques mais "
@@ -3065,8 +3066,6 @@ createSphereTopoOGridHuitiemeDeg(Geom::PropertySphere* propertySph)
     v2->setCoord(vertices[2]->getCoord());
     v3->setCoord(vertices[3]->getCoord());
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
     if (curves.size() != 6){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 6 courbes géométriques mais "
@@ -3193,8 +3192,12 @@ createSphereTopoOGridHuitiemeNonDeg(Geom::PropertySphere* propertySph)
 
 
     // les projections sur la géométrie
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
+
     if (surfaces.size() != 4){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 4 surfaces géométriques mais "
@@ -3227,8 +3230,6 @@ createSphereTopoOGridHuitiemeNonDeg(Geom::PropertySphere* propertySph)
 
 
     // les sommets géométriques
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
     if (vertices.size() != 4){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 4 sommets géométriques mais "
@@ -3253,8 +3254,6 @@ createSphereTopoOGridHuitiemeNonDeg(Geom::PropertySphere* propertySph)
 
     //std::cout<<getTopoManager().getCoFace("Fa0000")->getInfoBlock()<<std::endl;
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
     if (curves.size() != 6){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 6 courbes géométriques mais "
@@ -3364,8 +3363,9 @@ createHollowCylinderTopoQuart(Geom::PropertyHollowCylinder* propertyCyl)
     split(); // split à faire avant les modifications
 
     // on utilise directement les sommets géométriques
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
     if (vertices.size() != 8){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 8 sommets géométriques mais "
@@ -3408,8 +3408,9 @@ createHollowCylinderTopoDemi(Geom::PropertyHollowCylinder* propertyCyl)
     split(); // split à faire avant les modifications
 
     // on utilise directement les sommets géométriques
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
     if (vertices.size() != 8){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 8 sommets géométriques mais "
@@ -3461,9 +3462,10 @@ createHollowCylinderTopoEntier(Geom::PropertyHollowCylinder* propertyCyl)
 
     split(); // split à faire avant les modifications
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
-
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+ 
     if (curves.size() != 6){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 6 courbes géométriques mais "
@@ -3693,9 +3695,13 @@ createHollowSphereTopoHuitieme(Geom::PropertyHollowSphere* propertySph)
     b3->getFace(Block::j_min)->fuse(b5->getFace(Block::j_max), &getInfoCommand());
     b5->getFace(Block::i_max)->fuse(b6->getFace(Block::i_min), &getInfoCommand());
 
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
+
     // les sommets géométriques
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
     if (vertices.size() != 6){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 6 sommets géométriques mais "
@@ -3710,9 +3716,6 @@ createHollowSphereTopoHuitieme(Geom::PropertyHollowSphere* propertySph)
     b6->getVertex(5)->setGeomAssociation(vertices[4]);
     b3->getVertex(6)->setGeomAssociation(vertices[5]);
 
-
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
     if (curves.size() != 9){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 9 courbes géométriques mais "
@@ -3727,8 +3730,6 @@ createHollowSphereTopoHuitieme(Geom::PropertyHollowSphere* propertySph)
     b3->getVertex(7)->setGeomAssociation(curves[7]);
     b5->getVertex(6)->setGeomAssociation(curves[8]);
 
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
     if (surfaces.size() != 5){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 5 surfaces géométriques mais "
@@ -3826,9 +3827,12 @@ createHollowSphereTopoQuart(Geom::PropertyHollowSphere* propertySph)
     b3->getFace(Block::j_min)->fuse(b5->getFace(Block::j_max), &getInfoCommand());
     b5->getFace(Block::i_max)->fuse(b6->getFace(Block::i_min), &getInfoCommand());
 
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
 
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
     if (vertices.size() != 4){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 4 sommets géométriques mais "
@@ -3841,8 +3845,6 @@ createHollowSphereTopoQuart(Geom::PropertyHollowSphere* propertySph)
     b5->getVertex(4)->setGeomAssociation(vertices[3]);
     b4->getVertex(6)->setGeomAssociation(vertices[2]);
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
     if (curves.size() != 6){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 6 courbes géométriques mais "
@@ -3860,8 +3862,6 @@ createHollowSphereTopoQuart(Geom::PropertyHollowSphere* propertySph)
     b6->getVertex(4)->setGeomAssociation(curves[3]);
     b6->getVertex(5)->setGeomAssociation(curves[3]);
 
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
     if (surfaces.size() != 4){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 4 surfaces géométriques mais "
@@ -3989,8 +3989,12 @@ createHollowSphereTopoDemi(Geom::PropertyHollowSphere* propertySph)
 
 
     // les sommets géométriques
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
+
     if (vertices.size() != 4){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 4 sommets géométriques mais "
@@ -4008,9 +4012,6 @@ createHollowSphereTopoDemi(Geom::PropertyHollowSphere* propertySph)
     coedges[1]->getVertex(0)->setCoord(vertices[0]->getCoord());
     coedges[1]->getVertex(1)->setCoord(vertices[3]->getCoord());
 
-
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
     if (curves.size() != 6){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 6 courbes géométriques mais "
@@ -4028,8 +4029,6 @@ createHollowSphereTopoDemi(Geom::PropertyHollowSphere* propertySph)
     b3->getVertex(4)->setGeomAssociation(curves[5]);
     b3->getVertex(6)->setGeomAssociation(curves[5]);
 
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
     if (surfaces.size() != 4){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 4 surfaces géométriques mais "
@@ -4148,8 +4147,8 @@ createHollowSphereTopoEntier(Geom::PropertyHollowSphere* propertySph)
 
 
     // les projections sur la géométrie
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    auto s = dynamic_cast<Geom::Volume*>(getGeomEntity())->getSurfaces();
+    std::vector<Geom::Surface*> surfaces (s.begin(), s.end());
     if (surfaces.size() != 2){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 2 surface géométrique mais "
@@ -4396,10 +4395,10 @@ void CommandNewTopoOGridOnGeometry::createConeTopo1BlockQuartR0()
 
     split(); // split à faire avant les modifications
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
 
     if (curves.size() != 6){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -4456,10 +4455,10 @@ void CommandNewTopoOGridOnGeometry::createConeTopo1BlockQuart()
 
     split(); // split à faire avant les modifications
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
 
     if (curves.size() != 9){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -4531,10 +4530,10 @@ void CommandNewTopoOGridOnGeometry::createConeTopo1BlockDemiR0()
 
     split(); // split à faire avant les modifications
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
 
     if (curves.size() != 6){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -4605,10 +4604,10 @@ void CommandNewTopoOGridOnGeometry::createConeTopo1BlockDemi()
 
     split(); // split à faire avant les modifications
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
 
     if (curves.size() != 9){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -4698,10 +4697,10 @@ void CommandNewTopoOGridOnGeometry::createConeTopo1BlockPleinR0()
 
     split(); // split à faire avant les modifications
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
 
     if (curves.size() != 2){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -4758,8 +4757,9 @@ void CommandNewTopoOGridOnGeometry::createConeTopo1BlockPlein()
 
     split(); // split à faire avant les modifications
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
 
     if (curves.size() != 3){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -4840,12 +4840,11 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridQuartNonDegR0()
     b2->degenerateFaceInVertex(5, &getInfoCommand());
     b5->degenerateFaceInVertex(5, &getInfoCommand());
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
 
     if (curves.size() != 6){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -4951,10 +4950,10 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridQuartDeg()
 
     split(); // split à faire avant les modifications
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
 
     if (curves.size() != 9){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -5048,12 +5047,11 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridQuartNonDeg()
 
     split(); // split à faire avant les modifications
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
 
     if (curves.size() != 9){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -5210,12 +5208,11 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridDemiNonDegR0()
     b3->degenerateFaceInVertex(5, &getInfoCommand());
     b5->degenerateFaceInVertex(5, &getInfoCommand());
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
 
     if (curves.size() != 6){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -5352,10 +5349,10 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridDemiDeg()
 
     split(); // split à faire avant les modifications
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
 
     if (curves.size() != 9){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -5466,12 +5463,11 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridDemiNonDeg()
 
     split(); // split à faire avant les modifications
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
 
     if (curves.size() != 9){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -5665,12 +5661,11 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridPleinNonDegR0()
     b4->degenerateFaceInVertex(5, &getInfoCommand());
     b5->degenerateFaceInVertex(5, &getInfoCommand());
 
-    std::vector<Geom::Vertex*> vertices;
-    getGeomEntity()->get(vertices);
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+    std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
 
     if (vertices.size() != 2){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -5799,10 +5794,10 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridPleinDeg()
 
     split(); // split à faire avant les modifications
 
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
 
     if (curves.size() != 3){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -5927,12 +5922,11 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridPleinNonDeg()
 
     split(); // split à faire avant les modifications
 
-
-    std::vector<Geom::Curve*> curves;
-    getGeomEntity()->get(curves);
-    std::vector<Geom::Surface*> surfaces;
-    getGeomEntity()->get(surfaces);
-
+    Geom::GetDownIncidentGeomEntitiesVisitor v;
+    getGeomEntity()->accept(v);
+    std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+    std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+  
     if (curves.size() != 3){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"CommandNewTopoOGridOnGeometry ne trouve pas 3 courbes géométriques mais "
@@ -5945,7 +5939,6 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridPleinNonDeg()
                 <<surfaces.size()<<" pour le cône "<<getGeomEntity()->getName();
         throw TkUtil::Exception(message);
     }
-
 
     Utils::Math::Point pt;
     Geom::Curve* crv;

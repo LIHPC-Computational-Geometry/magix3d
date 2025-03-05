@@ -71,6 +71,8 @@
 #include "Geom/CommandNewVertexByCurveParameterization.h"
 #include "Geom/CommandJoinCurves.h"
 #include "Geom/CommandJoinSurfaces.h"
+#include "Geom/IncidentGeomEntitiesVisitor.h"
+
 #include "Internal/ImportMDLImplementation.h"
 #include "Internal/ImportMDL2Commandes.h"
 #include "Internal/ExportMDLImplementation.h"
@@ -158,50 +160,6 @@ void GeomManager::clear()
             iter != m_vertices.end(); ++iter)
         delete *iter;
     m_vertices.clear();
-}
-/*----------------------------------------------------------------------------*/
-Geom::GeomInfo GeomManager::getInfos(std::string name, int dim)
-{
-    GeomEntity* e = 0;
-    switch(dim){
-    case(0):{
-        e =getVertex(name);
-    }
-    break;
-    case(1):{
-        e =getCurve(name);
-    }
-    break;
-    case(2):{
-        e =getSurface(name);
-    }
-    break;
-    case(3):{
-        e =getVolume(name);
-    }
-    break;
-    default:{
-        throw TkUtil::Exception (TkUtil::UTF8String ("Dimension erronée", TkUtil::Charset::UTF_8));
-    }
-    break;
-    }
-    return getInfos(e);
-}
-/*----------------------------------------------------------------------------*/
-Geom::GeomInfo GeomManager::getInfos(const GeomEntity* e)
-{
-    Geom::GeomInfo infos;
-    infos.name = e->getName();
-    infos.dimension = e->getDim();
-    infos.area = e->computeArea();
-
-    e->get(infos.incident_vertices);
-    e->get(infos.incident_curves);
-    e->get(infos.incident_surfaces);
-    e->get(infos.incident_volumes);
-    e->getRefTopo(infos.topo_entities);
-    e->getGroupsName(infos.groups_name);
-    return infos;
 }
 /*----------------------------------------------------------------------------*/
 Utils::Math::Point GeomManager::getCoord(const std::string& name) const
@@ -4749,8 +4707,9 @@ std::string GeomManager::getSurfaceAt(std::vector<Utils::Math::Point>& pts) cons
 
 	for (std::vector<Surface*>::const_iterator iter = m_surfaces.begin();
 	            iter != m_surfaces.end(); ++iter){
-		std::vector<Geom::Vertex*> vertices;
-		(*iter)->get(vertices);
+        Geom::GetDownIncidentGeomEntitiesVisitor v;
+        (*iter)->accept(v);
+        std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
 		uint i;
 		if (vertices.size() != pts.size())
 			continue;
@@ -4768,7 +4727,7 @@ std::string GeomManager::getSurfaceAt(std::vector<Utils::Math::Point>& pts) cons
 		return surfaces[0]->getName();
 	else {
 		TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-		message <<"getCurveAt impossible, on trouve "<<surfaces.size()
+		message <<"getSurfaceAt impossible, on trouve "<<surfaces.size()
 				<<" surfaces avec ces "
 				<<pts.size()<<" positions";
 		throw TkUtil::Exception(message);
@@ -4789,8 +4748,9 @@ std::string GeomManager::getVolumeAt(std::vector<Utils::Math::Point>& pts) const
 
 	for (std::vector<Volume*>::const_iterator iter = m_volumes.begin();
 	            iter != m_volumes.end(); ++iter){
-		std::vector<Geom::Vertex*> vertices;
-		(*iter)->get(vertices);
+        Geom::GetDownIncidentGeomEntitiesVisitor v;
+        (*iter)->accept(v);
+        std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
 		uint i;
 		if (vertices.size() != pts.size())
 			continue;
@@ -4808,7 +4768,7 @@ std::string GeomManager::getVolumeAt(std::vector<Utils::Math::Point>& pts) const
 		return volumes[0]->getName();
 	else {
 		TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-		message <<"getCurveAt impossible, on trouve "<<volumes.size()
+		message <<"getVolumeAt impossible, on trouve "<<volumes.size()
 				<<" volumes avec ces "
 				<<pts.size()<<" positions";
 		throw TkUtil::Exception(message);
