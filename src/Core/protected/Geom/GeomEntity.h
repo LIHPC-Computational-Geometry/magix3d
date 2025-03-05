@@ -224,6 +224,12 @@ private:
                                                 const std::set<T*, decltype(&Utils::Entity::compareEntity)> elements) const;
 #endif
 
+private:
+#ifndef SWIG
+    template<typename T>
+    void buildSerializedRepresentation(Utils::SerializedRepresentation& description, const std::string& title, 
+                                                const std::vector<T*> elements) const;
+#endif
 public:
 	/*------------------------------------------------------------------------*/
 	/** \brief	Fournit une représentation textuelle de l'entité.

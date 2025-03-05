@@ -148,7 +148,19 @@ buildSerializedRepresentation(Utils::SerializedRepresentation& description, cons
         description.addPropertiesSet (sr);
     }
 }
-
+/*----------------------------------------------------------------------------*/
+template<typename T>
+void GeomEntity::
+buildSerializedRepresentation(Utils::SerializedRepresentation& description, const std::string& title, 
+    const std::vector<T*> elements) const
+{
+    if (!elements.empty()){
+        Utils::SerializedRepresentation	sr (title,TkUtil::NumericConversions::toStr(elements.size()));
+        for (auto elt : elements)
+            sr.addProperty (Utils::SerializedRepresentation::Property(elt->getName(),*elt));
+        description.addPropertiesSet (sr);
+    }
+}
 /*----------------------------------------------------------------------------*/
 Utils::SerializedRepresentation* GeomEntity::
 getDescription (bool alsoComputed) const
@@ -211,45 +223,10 @@ getDescription (bool alsoComputed) const
                 b.push_back(dynamic_cast<Topo::Block*>(*iter));
         }
 
-        if (!v.empty()){
-            Utils::SerializedRepresentation  vertices ("Sommets topologiques",
-                    TkUtil::NumericConversions::toStr(v.size()));
-            for (std::vector<Topo::Vertex*>::iterator iter = v.begin( ); v.end( )!=iter; iter++)
-                vertices.addProperty (
-                        Utils::SerializedRepresentation::Property (
-                                (*iter)->getName ( ),  *(*iter)));
-            topoDescription.addPropertiesSet (vertices);
-        }
-
-        if (!e.empty()){
-            Utils::SerializedRepresentation  coedges ("Arêtes topologiques",
-                    TkUtil::NumericConversions::toStr(e.size()));
-            for (std::vector<Topo::CoEdge*>::iterator iter = e.begin( ); e.end( )!=iter; iter++)
-                coedges.addProperty (
-                        Utils::SerializedRepresentation::Property (
-                                (*iter)->getName ( ),  *(*iter)));
-            topoDescription.addPropertiesSet (coedges);
-        }
-
-        if (!f.empty()){
-            Utils::SerializedRepresentation  cofaces ("Faces topologiques",
-                    TkUtil::NumericConversions::toStr(f.size()));
-            for (std::vector<Topo::CoFace*>::iterator iter = f.begin( ); f.end( )!=iter; iter++)
-                cofaces.addProperty (
-                        Utils::SerializedRepresentation::Property (
-                                (*iter)->getName ( ),  *(*iter)));
-            topoDescription.addPropertiesSet (cofaces);
-        }
-
-        if (!b.empty()){
-            Utils::SerializedRepresentation  blocks ("Blocs topologiques",
-                    TkUtil::NumericConversions::toStr(b.size()));
-            for (std::vector<Topo::Block*>::iterator iter = b.begin( ); b.end( )!=iter; iter++)
-                blocks.addProperty (
-                        Utils::SerializedRepresentation::Property (
-                                (*iter)->getName ( ),  *(*iter)));
-            topoDescription.addPropertiesSet (blocks);
-        }
+        buildSerializedRepresentation(topoDescription, "Sommets topologiques", v);
+        buildSerializedRepresentation(topoDescription, "Arêtes topologiques", e);
+        buildSerializedRepresentation(topoDescription, "Faces topologiques", f);
+        buildSerializedRepresentation(topoDescription, "Blocs topologiques", b);
 
 	    description->addPropertiesSet (topoDescription);
 	} else {
@@ -281,48 +258,12 @@ getDescription (bool alsoComputed) const
                 g3.push_back(dynamic_cast<Group::Group3D*>(*iter));
         }
 
-        if (!g0.empty()){
-            Utils::SerializedRepresentation  groupe ("Groupes 0D",
-                    TkUtil::NumericConversions::toStr(g0.size()));
-            for (std::vector<Group::Group0D*>::iterator iter = g0.begin( ); g0.end( )!=iter; iter++)
-                groupe.addProperty (
-                        Utils::SerializedRepresentation::Property (
-                                (*iter)->getName ( ),  *(*iter)));
-            groupeDescription.addPropertiesSet (groupe);
-        }
-
-        if (!g1.empty()){
-            Utils::SerializedRepresentation  groupe ("Groupes 1D",
-                    TkUtil::NumericConversions::toStr(g1.size()));
-            for (std::vector<Group::Group1D*>::iterator iter = g1.begin( ); g1.end( )!=iter; iter++)
-                groupe.addProperty (
-                        Utils::SerializedRepresentation::Property (
-                                (*iter)->getName ( ),  *(*iter)));
-            groupeDescription.addPropertiesSet (groupe);
-        }
-
-        if (!g2.empty()){
-            Utils::SerializedRepresentation  groupe ("Groupes 2D",
-                    TkUtil::NumericConversions::toStr(g2.size()));
-            for (std::vector<Group::Group2D*>::iterator iter = g2.begin( ); g2.end( )!=iter; iter++)
-                groupe.addProperty (
-                        Utils::SerializedRepresentation::Property (
-                                (*iter)->getName ( ),  *(*iter)));
-            groupeDescription.addPropertiesSet (groupe);
-        }
-
-        if (!g3.empty()){
-            Utils::SerializedRepresentation  groupe ("Groupes 3D",
-                    TkUtil::NumericConversions::toStr(g3.size()));
-            for (std::vector<Group::Group3D*>::iterator iter = g3.begin( ); g3.end( )!=iter; iter++)
-                groupe.addProperty (
-                        Utils::SerializedRepresentation::Property (
-                                (*iter)->getName ( ),  *(*iter)));
-            groupeDescription.addPropertiesSet (groupe);
-        }
+        buildSerializedRepresentation(groupeDescription, "Groupes 0D", g0);
+        buildSerializedRepresentation(groupeDescription, "Groupes 1D", g1);
+        buildSerializedRepresentation(groupeDescription, "Groupes 2D", g2);
+        buildSerializedRepresentation(groupeDescription, "Groupes 3D", g3);
 
         description->addPropertiesSet (groupeDescription);
-
         groupeDescription.setSummary(TkUtil::NumericConversions::toStr(grp.size()));
     } else {
         description->addProperty (
