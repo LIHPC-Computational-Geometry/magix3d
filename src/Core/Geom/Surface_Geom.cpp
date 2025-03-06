@@ -255,6 +255,7 @@ void Surface::split(std::vector<Curve* >& curv, std::vector<Vertex* >&  vert)
 			TopoDS_Edge E = TopoDS::Edge(e.Current());
 
 			Curve* c = EntityFactory(getContext()).newOCCCurve(E);
+			curv.push_back(c);
 
 			// correspondance entre shapes OCC et géométries Mgx3D
 			OCCCurves.push_back(E);
@@ -263,7 +264,6 @@ void Surface::split(std::vector<Curve* >& curv, std::vector<Vertex* >&  vert)
 			this->add(c);
 			// on crée le lien F->V
 			c->add(this);
-			curv.push_back(c);
 		}
 
 
@@ -286,6 +286,7 @@ void Surface::split(std::vector<Curve* >& curv, std::vector<Vertex* >&  vert)
 			TopoDS_Vertex V = TopoDS::Vertex(map_vertices(i));
 			// creation du sommet
 			Vertex* v = EntityFactory(getContext()).newOCCVertex(V);
+			vert.push_back(v);
 
 			/* on récupère les arêtes contenant ce sommet. Mais attention, ce nb
 			* d'arêtes est trop important car des doublons existent.
@@ -315,7 +316,6 @@ void Surface::split(std::vector<Curve* >& curv, std::vector<Vertex* >&  vert)
 					c->add(v);
 					// on crée le lien V->C
 					v->add(c);
-					vert.push_back(v);
 				}
 			}
 		}
