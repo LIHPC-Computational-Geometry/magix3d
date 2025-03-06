@@ -81,7 +81,16 @@ public:
 	/** Réinitialisation     */
 	virtual void clear();
 
-	/** retourne les coordonnés d'un sommet */
+	/*------------------------------------------------------------------------*/
+    /** \brief récupère des informations sur les entités géométriques.
+     *
+     *  \param e l'entité géométrique dont on veut des informations.
+     */
+    virtual GeomInfo getInfos(std::string e, int dim);
+
+    virtual GeomInfo getInfos(const GeomEntity* e);
+
+    /** retourne les coordonnés d'un sommet */
 	virtual Point getCoord(const std::string& name) const;
 
     /*------------------------------------------------------------------------*/
