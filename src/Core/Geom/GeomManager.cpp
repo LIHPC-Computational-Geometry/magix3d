@@ -162,6 +162,68 @@ void GeomManager::clear()
     m_vertices.clear();
 }
 /*----------------------------------------------------------------------------*/
+Geom::GeomInfo GeomManager::getInfos(std::string name, int dim)
+{
+    GeomEntity* e = 0;
+    switch(dim){
+    case(0):{
+        e =getVertex(name);
+    }
+    break;
+    case(1):{
+        e =getCurve(name);
+    }
+    break;
+    case(2):{
+        e =getSurface(name);
+    }
+    break;
+    case(3):{
+        e =getVolume(name);
+    }
+    break;
+    default:{
+        throw TkUtil::Exception (TkUtil::UTF8String ("Dimension erronée", TkUtil::Charset::UTF_8));
+    }
+    break;
+    }
+    return getInfos(e);
+}
+/*----------------------------------------------------------------------------*/
+Geom::GeomInfo GeomManager::getInfos(const GeomEntity* e)
+{
+    Geom::GeomInfo infos;
+    infos.name = e->getName();
+    infos.dimension = e->getDim();
+    infos.area = e->computeArea();
+
+    GetUpIncidentGeomEntitiesVisitor vup;
+    GetDownIncidentGeomEntitiesVisitor vdown;
+    GetAdjacentGeomEntitiesVisitor vadj;
+    e->accept(vup);
+    e->accept(vdown);
+    e->accept(vadj);
+
+	// On y ajoute les éléments géométriques en relation avec celui-ci :
+    infos.incident_vertices.insert(infos.incident_vertices.end(), vdown.getVertices().begin(), vdown.getVertices().end());
+    infos.incident_vertices.insert(infos.incident_vertices.end(), vadj.getVertices().begin(), vadj.getVertices().end());
+
+    infos.incident_curves.insert(infos.incident_curves.end(), vup.getCurves().begin(), vup.getCurves().end());
+    infos.incident_curves.insert(infos.incident_curves.end(), vdown.getCurves().begin(), vdown.getCurves().end());
+    infos.incident_curves.insert(infos.incident_curves.end(), vadj.getCurves().begin(), vadj.getCurves().end());
+
+    infos.incident_surfaces.insert(infos.incident_surfaces.end(), vup.getSurfaces().begin(), vup.getSurfaces().end());
+    infos.incident_surfaces.insert(infos.incident_surfaces.end(), vdown.getSurfaces().begin(), vdown.getSurfaces().end());
+    infos.incident_surfaces.insert(infos.incident_surfaces.end(), vadj.getSurfaces().begin(), vadj.getSurfaces().end());
+
+    infos.incident_volumes.insert(infos.incident_volumes.end(), vup.getVolumes().begin(), vup.getVolumes().end());
+    infos.incident_volumes.insert(infos.incident_volumes.end(), vadj.getVolumes().begin(), vadj.getVolumes().end());
+
+    e->getRefTopo(infos.topo_entities);
+    e->getGroupsName(infos.groups_name);
+    return infos;
+}
+/*----------------------------------------------------------------------------*/
 Utils::Math::Point GeomManager::getCoord(const std::string& name) const
 {
 	Vertex* vtx = GeomManager::getVertex (name);
