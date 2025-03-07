@@ -54,14 +54,15 @@ void CommandJoinSurfaces::validate()
         throw TkUtil::Exception(warningText);
 
     // il faut que les surfaces fusionnées appartiennent aux mêmes volumes
-    m_entities[0]->get(m_toKeepVolumes);
+	Surface* s0 = dynamic_cast<Surface*>(m_entities[0]);
+    m_toKeepVolumes = s0->getVolumes();
     std::map<Volume*,uint> filtre;
     for (uint i=0; i<m_toKeepVolumes.size(); i++)
     	filtre[m_toKeepVolumes[i]] = 1;
 
     for (uint i=1; i<m_entities.size();i++){
-    	std::vector<Volume*> vols;
-    	m_entities[i]->get(vols);
+   		Surface* si = dynamic_cast<Surface*>(m_entities[i]);
+		auto vols = si->getVolumes();
     	if (vols.size() != m_toKeepVolumes.size())
     		throw TkUtil::Exception(TkUtil::UTF8String ("Les surfaces doivent être dans les mêmes volumes", TkUtil::Charset::UTF_8));
     	for (uint j=0; j<vols.size(); j++)
@@ -78,8 +79,8 @@ void CommandJoinSurfaces::init(std::vector<GeomEntity*>& es)
     // si une courbe est vue 2 fois, elle sera détruite
     std::map<Curve*,uint> filtre;
     for (uint i=0;i<es.size();i++){
-    	std::vector<Curve*> curves;
-    	es[i]->get(curves);
+		Surface* si = dynamic_cast<Surface*>(es[i]);
+    	auto curves = si->getCurves();
     	for (uint j=0; j<curves.size(); j++)
     		filtre[curves[j]] += 1;
     }
@@ -141,8 +142,8 @@ void CommandJoinSurfaces::internalSpecificExecute()
 	 // recherche des courbes au bord de la nouvelle surface
     std::map<Curve*,uint> filtre;
     for (uint i=0;i<m_entities.size();i++){
-    	std::vector<Curve*> curves;
-    	m_entities[i]->get(curves);
+		Surface* si = dynamic_cast<Surface*>(m_entities[i]);
+    	auto curves = si->getCurves();
     	for (uint j=0; j<curves.size(); j++)
     		filtre[curves[j]] += 1;
     }

@@ -71,6 +71,8 @@
 #include "Geom/CommandNewVertexByCurveParameterization.h"
 #include "Geom/CommandJoinCurves.h"
 #include "Geom/CommandJoinSurfaces.h"
+#include "Geom/IncidentGeomEntitiesVisitor.h"
+
 #include "Internal/ImportMDLImplementation.h"
 #include "Internal/ImportMDL2Commandes.h"
 #include "Internal/ExportMDLImplementation.h"
@@ -195,10 +197,28 @@ Geom::GeomInfo GeomManager::getInfos(const GeomEntity* e)
     infos.dimension = e->getDim();
     infos.area = e->computeArea();
 
-    e->get(infos.incident_vertices);
-    e->get(infos.incident_curves);
-    e->get(infos.incident_surfaces);
-    e->get(infos.incident_volumes);
+    GetUpIncidentGeomEntitiesVisitor vup;
+    GetDownIncidentGeomEntitiesVisitor vdown;
+    GetAdjacentGeomEntitiesVisitor vadj;
+    e->accept(vup);
+    e->accept(vdown);
+    e->accept(vadj);
+
+	// On y ajoute les éléments géométriques en relation avec celui-ci :
+    infos.incident_vertices.insert(infos.incident_vertices.end(), vdown.getVertices().begin(), vdown.getVertices().end());
+    infos.incident_vertices.insert(infos.incident_vertices.end(), vadj.getVertices().begin(), vadj.getVertices().end());
+
+    infos.incident_curves.insert(infos.incident_curves.end(), vup.getCurves().begin(), vup.getCurves().end());
+    infos.incident_curves.insert(infos.incident_curves.end(), vdown.getCurves().begin(), vdown.getCurves().end());
+    infos.incident_curves.insert(infos.incident_curves.end(), vadj.getCurves().begin(), vadj.getCurves().end());
+
+    infos.incident_surfaces.insert(infos.incident_surfaces.end(), vup.getSurfaces().begin(), vup.getSurfaces().end());
+    infos.incident_surfaces.insert(infos.incident_surfaces.end(), vdown.getSurfaces().begin(), vdown.getSurfaces().end());
+    infos.incident_surfaces.insert(infos.incident_surfaces.end(), vadj.getSurfaces().begin(), vadj.getSurfaces().end());
+
+    infos.incident_volumes.insert(infos.incident_volumes.end(), vup.getVolumes().begin(), vup.getVolumes().end());
+    infos.incident_volumes.insert(infos.incident_volumes.end(), vadj.getVolumes().begin(), vadj.getVolumes().end());
+
     e->getRefTopo(infos.topo_entities);
     e->getGroupsName(infos.groups_name);
     return infos;
@@ -4749,8 +4769,9 @@ std::string GeomManager::getSurfaceAt(std::vector<Utils::Math::Point>& pts) cons
 
 	for (std::vector<Surface*>::const_iterator iter = m_surfaces.begin();
 	            iter != m_surfaces.end(); ++iter){
-		std::vector<Geom::Vertex*> vertices;
-		(*iter)->get(vertices);
+        Geom::GetDownIncidentGeomEntitiesVisitor v;
+        (*iter)->accept(v);
+        std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
 		uint i;
 		if (vertices.size() != pts.size())
 			continue;
@@ -4768,7 +4789,7 @@ std::string GeomManager::getSurfaceAt(std::vector<Utils::Math::Point>& pts) cons
 		return surfaces[0]->getName();
 	else {
 		TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-		message <<"getCurveAt impossible, on trouve "<<surfaces.size()
+		message <<"getSurfaceAt impossible, on trouve "<<surfaces.size()
 				<<" surfaces avec ces "
 				<<pts.size()<<" positions";
 		throw TkUtil::Exception(message);
@@ -4789,8 +4810,9 @@ std::string GeomManager::getVolumeAt(std::vector<Utils::Math::Point>& pts) const
 
 	for (std::vector<Volume*>::const_iterator iter = m_volumes.begin();
 	            iter != m_volumes.end(); ++iter){
-		std::vector<Geom::Vertex*> vertices;
-		(*iter)->get(vertices);
+        Geom::GetDownIncidentGeomEntitiesVisitor v;
+        (*iter)->accept(v);
+        std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
 		uint i;
 		if (vertices.size() != pts.size())
 			continue;
@@ -4808,7 +4830,7 @@ std::string GeomManager::getVolumeAt(std::vector<Utils::Math::Point>& pts) const
 		return volumes[0]->getName();
 	else {
 		TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-		message <<"getCurveAt impossible, on trouve "<<volumes.size()
+		message <<"getVolumeAt impossible, on trouve "<<volumes.size()
 				<<" volumes avec ces "
 				<<pts.size()<<" positions";
 		throw TkUtil::Exception(message);

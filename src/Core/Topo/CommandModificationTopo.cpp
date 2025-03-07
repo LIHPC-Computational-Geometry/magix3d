@@ -221,8 +221,8 @@ void CommandModificationTopo::MAJCoEdges()
                 // on traite à part le cas des courbes à un seul sommet (cercle complet)
                 // cas où la courbe est remplacée par une autre
                 if (newEntities.size() == 1){
-                	std::vector<Geom::Vertex*> geom_vertices;
-                	newEntities[0]->get(geom_vertices);
+                    Geom::Curve* curve0 = dynamic_cast<Geom::Curve*>(newEntities[0]);
+                	auto geom_vertices = curve0->getVertices();
                 	if (geom_vertices.size() == 1){
 
                 		std::vector<Topo::Vertex*> all_vertices = getAllVertices(*iter);
@@ -321,8 +321,8 @@ void CommandModificationTopo::MAJCoEdges()
 
 
                 for (uint i=0; i<newEntities.size(); i++){
-                    std::vector<Geom::Vertex*> geom_vertices;
-                    newEntities[i]->get(geom_vertices);
+                    Geom::Curve* curve = dynamic_cast<Geom::Curve*>(newEntities[i]);
+                	auto geom_vertices = curve->getVertices();
                     if (geom_vertices.size() != 2){
                     	continue;
                     }
@@ -1043,8 +1043,7 @@ getAllVertices(Geom::GeomEntity* ge)
     		}
     	}
     	// on ajoute les sommets aux extrémités
-    	std::vector<Geom::Vertex*> vertices;
-    	ge->get(vertices);
+    	auto vertices = dynamic_cast<Geom::Curve*>(ge)->getVertices();
     	for (uint j=0; j<vertices.size();j++){
     		const std::vector<Topo::TopoEntity* >& topos_som = vertices[j]->getRefTopo();
     		for (uint i=0; i<topos_som.size(); i++){
@@ -1101,8 +1100,7 @@ getCoEdges(Geom::GeomEntity* ge, Geom::GeomEntity* ge_init)
     }
     else if (ge->getDim() == 2){
     	bool contour_troue = false;
-        std::vector<Geom::Curve*> curves;
-        ge->get(curves);
+        auto curves = dynamic_cast<Geom::Surface*>(ge)->getCurves();
         for (std::vector<Geom::Curve*>::iterator iter = curves.begin();
                 iter != curves.end(); ++iter){
             const std::vector<Topo::TopoEntity* >& topos = (*iter)->getRefTopo();
@@ -1221,18 +1219,14 @@ getCoFaces(Geom::GeomEntity* ge, bool exceptionIfNotFound)
         }
     }
     else if (ge->getDim()==3){
-        std::vector<Geom::Surface*> surfaces;
-         ge->get(surfaces);
-         for (std::vector<Geom::Surface*>::iterator iter = surfaces.begin();
-                 iter != surfaces.end(); ++iter){
-             const std::vector<Topo::TopoEntity* >& topos = (*iter)->getRefTopo();
-             for (uint i=0; i<topos.size(); i++){
-                 // on ne s'intéresse qu'aux CoFaces, on néglige les sommets et les arêtes
-                 if (topos[i]->getDim()==2 && !topos[i]->isDestroyed()){
-                	 cofaces.push_back(dynamic_cast<Topo::CoFace*>(topos[i]));
-                 }
-             }
-         }
+        auto surfaces = dynamic_cast<Geom::Volume*>(ge)->getSurfaces();
+        for (std::vector<Geom::Surface*>::iterator iter = surfaces.begin(); iter != surfaces.end(); ++iter){
+            const std::vector<Topo::TopoEntity* >& topos = (*iter)->getRefTopo();
+            for (uint i=0; i<topos.size(); i++)
+                // on ne s'intéresse qu'aux CoFaces, on néglige les sommets et les arêtes
+                if (topos[i]->getDim()==2 && !topos[i]->isDestroyed())
+                    cofaces.push_back(dynamic_cast<Topo::CoFace*>(topos[i]));
+        }
     }
     else {
 		TkUtil::UTF8String	err (TkUtil::Charset::UTF_8);
@@ -1481,9 +1475,7 @@ fuseInternalCoEdgesAndVertices(Geom::GeomEntity* ge, std::vector<Geom::GeomEntit
         		// recherche des courbes communes aux différentes surfaces
         		std::map<Geom::Curve*, uint> filtre_curves;
         		for (uint k=0; k<newEntities.size(); k++){
-            		std::vector<Geom::Curve*> curves;
-        			newEntities[k]->get(curves);
-
+            		auto curves = dynamic_cast<Geom::Surface*>(newEntities[k])->getCurves();
         			for (uint j=0; j<curves.size(); ++j){
         				filtre_curves[curves[j]] += 1;
         			}
@@ -1499,8 +1491,7 @@ fuseInternalCoEdgesAndVertices(Geom::GeomEntity* ge, std::vector<Geom::GeomEntit
 #endif
 
         				// recherche si les sommets extrémités sont compatibles avec ceux de l'arête
-        				std::vector<Geom::Vertex*> vertices;
-        				curve->get(vertices);
+        				auto vertices = curve->getVertices();
         				// les sommets géométriques aux extrémités de la topologie
         				Geom::Vertex* vtx1 = 0;
         				Geom::Vertex* vtx2 = 0;
@@ -2295,8 +2286,7 @@ void CommandModificationTopo::associateInnerCoFaces(std::vector<Geom::GeomEntity
     std::map<Topo::CoFace*, uint> filtre_cofaces;
 
     for (uint k=0; k<geoms.size(); k++){
-    	std::vector<Geom::Surface*> surfaces;
-    	geoms[k]->get(surfaces);
+    	auto surfaces = dynamic_cast<Geom::Volume*>(geoms[k])->getSurfaces();
 
     	for (uint j=0; j<surfaces.size(); ++j)
     		filtre_surface[surfaces[j]] += 1;

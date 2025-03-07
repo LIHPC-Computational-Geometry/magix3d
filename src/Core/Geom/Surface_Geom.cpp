@@ -122,88 +122,6 @@ void Surface::createSpecificMemento(MementoGeomEntity& mem)
 		shapes.push_back(f);
 	mem.setOCCShapes(shapes);
 }
-
-/*----------------------------------------------------------------------------*/
-void Surface::getRefEntities(std::vector<GeomEntity*>& entities)
-{
-    entities.clear();
-    entities.insert(entities.end(),m_volumes.begin(),m_volumes.end());
-    entities.insert(entities.end(),m_curves.begin(),m_curves.end());
-}
-/*----------------------------------------------------------------------------*/
-void Surface::clearRefEntities(std::list<GeomEntity*>& vertices,
-        std::list<GeomEntity*>& curves,
-        std::list<GeomEntity*>& surfaces,
-        std::list<GeomEntity*>& volumes)
-{
-    std::vector<Curve*> toRemoveC;
-    std::vector<Volume*> toRemoveV;
-    for(unsigned int i=0;i<m_curves.size();i++){
-        GeomEntity *e = m_curves[i];
-        std::list<GeomEntity*>::iterator res = std::find(curves.begin(),curves.end(),e);
-        if(res!=curves.end())
-            toRemoveC.push_back(dynamic_cast<Curve*>(e));
-    }
-
-    for(unsigned int i=0;i<m_volumes.size();i++){
-        GeomEntity *e = m_volumes[i];
-        std::list<GeomEntity*>::iterator res = std::find(volumes.begin(),volumes.end(),e);
-        if(res!=volumes.end()){
-            toRemoveV.push_back(dynamic_cast<Volume*>(e));
-        }
-    }
-
-    for(unsigned int i=0;i<toRemoveC.size();i++)
-        remove(toRemoveC[i]);
-    for(unsigned int i=0;i<toRemoveV.size();i++)
-        remove(toRemoveV[i]);
-}
-
-/*----------------------------------------------------------------------------*/
-void Surface::get(std::vector<Vertex*>& vertices) const
-{
-    std::list<Vertex*> l;
-    vertices.clear();
-    for(unsigned int i=0; i <m_curves.size();i++){
-        Curve* c = m_curves[i];
-        std::vector<Vertex*> local_vertices;
-        c->get(local_vertices);
-        l.insert(l.end(),local_vertices.begin(),local_vertices.end());
-    }
-    l.sort(Utils::Entity::compareEntity);
-    l.unique();
-
-    vertices.insert(vertices.end(),l.begin(),l.end());
-}
-/*----------------------------------------------------------------------------*/
-void Surface::get(std::vector<Curve*>& curves) const
-{
-    curves.clear();
-    curves.insert(curves.end(),m_curves.begin(),m_curves.end());
-}
-/*----------------------------------------------------------------------------*/
-void Surface::get(std::vector<Surface*>& surfaces) const
-{
-    std::list<Surface*> l;
-    surfaces.clear();
-    for(unsigned int i=0; i <m_curves.size();i++){
-        Curve *c = m_curves[i];
-        std::vector<Surface*> local_surfaces;
-        c->get(local_surfaces);
-        l.insert(l.end(),local_surfaces.begin(),local_surfaces.end());
-    }
-
-    l.sort(Utils::Entity::compareEntity);
-    l.unique();
-    l.remove(const_cast<Surface*>(this));
-    surfaces.insert(surfaces.end(),l.begin(),l.end());
-}
-/*----------------------------------------------------------------------------*/
-void Surface::get(std::vector<Volume*>& volumes) const
-{
-    volumes.clear();
-    volumes.insert(volumes.end(),m_volumes.begin(),m_volumes.end());
-}
 /*----------------------------------------------------------------------------*/
 uint Surface::project(Utils::Math::Point& P) const
 {
@@ -337,6 +255,7 @@ void Surface::split(std::vector<Curve* >& curv, std::vector<Vertex* >&  vert)
 			TopoDS_Edge E = TopoDS::Edge(e.Current());
 
 			Curve* c = EntityFactory(getContext()).newOCCCurve(E);
+			curv.push_back(c);
 
 			// correspondance entre shapes OCC et géométries Mgx3D
 			OCCCurves.push_back(E);
@@ -367,6 +286,7 @@ void Surface::split(std::vector<Curve* >& curv, std::vector<Vertex* >&  vert)
 			TopoDS_Vertex V = TopoDS::Vertex(map_vertices(i));
 			// creation du sommet
 			Vertex* v = EntityFactory(getContext()).newOCCVertex(V);
+			vert.push_back(v);
 
 			/* on récupère les arêtes contenant ce sommet. Mais attention, ce nb
 			* d'arêtes est trop important car des doublons existent.
@@ -399,10 +319,6 @@ void Surface::split(std::vector<Curve* >& curv, std::vector<Vertex* >&  vert)
 				}
 			}
 		}
-
-		// on renseigne la fonction appelante
-		this->get(curv);
-		this->get(vert);
 	}
 }
 /*----------------------------------------------------------------------------*/

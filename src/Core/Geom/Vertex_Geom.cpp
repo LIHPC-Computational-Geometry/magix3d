@@ -84,29 +84,6 @@ void Vertex::createSpecificMemento(MementoGeomEntity& mem)
     mem.setOCCShapes(shapes);
 }
 /*----------------------------------------------------------------------------*/
-void Vertex::getRefEntities(std::vector<GeomEntity*>& entities)
-{
-    entities.clear();
-    entities.insert(entities.end(),m_curves.begin(),m_curves.end());
-}
-/*----------------------------------------------------------------------------*/
-void Vertex::clearRefEntities(std::list<GeomEntity*>& vertices,
-        std::list<GeomEntity*>& curves,
-        std::list<GeomEntity*>& surfaces,
-        std::list<GeomEntity*>& volumes)
-{
-    std::vector<Curve*> toRemoveC;
-    for(unsigned int i=0;i<m_curves.size();i++){
-        GeomEntity *e = m_curves[i];
-        std::list<GeomEntity*>::iterator res = std::find(curves.begin(),curves.end(),e);
-        if(res!=curves.end())
-            toRemoveC.push_back(dynamic_cast<Curve*>(e));
-    }
-
-    for(unsigned int i=0;i<toRemoveC.size();i++)
-        remove(toRemoveC[i]);
-}
-/*----------------------------------------------------------------------------*/
 Mgx3D::Utils::SerializedRepresentation* Vertex::getDescription (bool alsoComputed) const
 {
 	std::unique_ptr<Mgx3D::Utils::SerializedRepresentation>	description (
@@ -156,60 +133,6 @@ double Vertex::computeArea() const
 void Vertex::computeBoundingBox(Utils::Math::Point& pmin,Utils::Math::Point& pmax) const
 {
     OCCHelper::computeBoundingBox(m_occ_vertex, pmin, pmax);
-}
-/*----------------------------------------------------------------------------*/
-void Vertex::get(std::vector<Vertex*>& vertices) const
-{
-    std::list<Vertex*> l;
-    vertices.clear();
-    for(unsigned int i=0; i <m_curves.size();i++){
-        Curve* c = m_curves[i];
-        std::vector<Vertex*> local_vertices;
-        c->get(local_vertices);
-        l.insert(l.end(),local_vertices.begin(),local_vertices.end());
-    }
-    l.sort(Utils::Entity::compareEntity);
-    l.unique();
-    l.remove(const_cast<Vertex*>(this));
-    vertices.insert(vertices.end(),l.begin(),l.end());
-}
-/*----------------------------------------------------------------------------*/
-void Vertex::get(std::vector<Curve*>& curves) const
-{
-    curves.clear();
-    curves.insert(curves.end(),m_curves.begin(),m_curves.end());
-}
-/*----------------------------------------------------------------------------*/
-void Vertex::get(std::vector<Surface*>& surfaces) const
-{
-    std::list<Surface*> l;
-    surfaces.clear();
-    for(unsigned int i=0; i <m_curves.size();i++){
-        Curve* c = m_curves[i];
-        std::vector<Surface*> local_surfaces;
-        c->get(local_surfaces);
-        l.insert(l.end(),local_surfaces.begin(),local_surfaces.end());
-    }
-    l.sort(Utils::Entity::compareEntity);
-    l.unique();
-
-    surfaces.insert(surfaces.end(),l.begin(),l.end());
-}
-/*----------------------------------------------------------------------------*/
-void Vertex::get(std::vector<Volume*>& volumes) const
-{
-    std::list<Volume*> l;
-    volumes.clear();
-    for(unsigned int i=0; i <m_curves.size();i++){
-        Curve* c = m_curves[i];
-        std::vector<Volume*> local_vol;
-        c->get(local_vol);
-        l.insert(l.end(),local_vol.begin(),local_vol.end());
-    }
-    l.sort(Utils::Entity::compareEntity);
-    l.unique();
-
-    volumes.insert(volumes.end(),l.begin(),l.end());
 }
 /*----------------------------------------------------------------------------*/
 void Vertex::get(std::vector<Topo::Vertex*>& vertices)

@@ -11,6 +11,10 @@
 #include "Internal/InfoCommand.h"
 #include "Utils/Common.h"
 #include "Geom/GeomEntity.h"
+#include "Geom/Vertex.h"
+#include "Geom/Curve.h"
+#include "Geom/Surface.h"
+#include "Geom/Volume.h"
 #include "Topo/TopoEntity.h"
 #include "Topo/CoEdge.h"
 #include "Mesh/MeshEntity.h"
@@ -425,19 +429,43 @@ void InfoCommand::setDestroyAndUpdateConnectivity
          iter != entitiesToRemove.end(); ++iter)
         (*iter)->setDestroyed(true);
 
-    for (std::vector <Geom::GeomEntity*>::iterator iter = entitiesToRemove.begin();
-         iter != entitiesToRemove.end(); ++iter)
-    {
-        Geom::GeomEntity* entity = *iter;
-        std::vector<Geom::GeomEntity*> ref_entities;
-        entity->getRefEntities(ref_entities);
-        for(unsigned int i=0;i<ref_entities.size();i++){
-            Geom::GeomEntity* ref_entity = ref_entities[i];
-            if(!ref_entity->isDestroyed())
-                ref_entity->remove(entity);
+    struct : Geom::GeomEntityVisitor {
+        void visit(const Geom::Vertex* v) override {
+            auto curves = v->getCurves();
+            for (Geom::Curve* c : curves)
+                if (!c->isDestroyed())
+                    c->remove(const_cast<Geom::Vertex*>(v));
         }
-    } // end for ( ... iter ...)
+        void visit(const Geom::Curve* c) override {
+            auto surfaces = c->getSurfaces();
+            auto vertices = c->getVertices();
+            for (Geom::Surface* s : surfaces)
+                if (!s->isDestroyed())
+                    s->remove(const_cast<Geom::Curve*>(c));
+            for (Geom::Vertex* v : vertices)
+                if (!v->isDestroyed())
+                    v->remove(const_cast<Geom::Curve*>(c));
+        }
+        void visit(const Geom::Surface* s) override {
+            auto curves = s->getCurves();
+            auto volumes = s->getVolumes();
+            for (Geom::Curve* c : curves)
+                if (!c->isDestroyed())
+                    c->remove(const_cast<Geom::Surface*>(s));
+            for (Geom::Volume* v : volumes)
+                if (!v->isDestroyed())
+                    v->remove(const_cast<Geom::Surface*>(s));
+        }
+        void visit(const Geom::Volume* v) override {
+            auto surfaces = v->getSurfaces();
+            for (Geom::Surface* s : surfaces)
+                if (!s->isDestroyed())
+                    s->remove(const_cast<Geom::Volume*>(v));
+        }
+    } destroy_visitor;
 
+    for (Geom::GeomEntity* ge : entitiesToRemove)
+        ge->accept(destroy_visitor);
 }
 /*----------------------------------------------------------------------------*/
 void InfoCommand::clear()

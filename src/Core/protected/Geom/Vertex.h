@@ -59,6 +59,7 @@ public:
 
     virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const;
     virtual void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda);
+    virtual void accept(GeomEntityVisitor& v) const { v.visit(this); }
 
     /*------------------------------------------------------------------------*/
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
@@ -68,24 +69,6 @@ public:
 
       /// Destructeur
     virtual ~Vertex();
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  récupère la liste des geom_entity référencés par (*this)
-     *
-     *  \param entities la liste des entités géométriques que l'on récupère
-     */
-    virtual void getRefEntities(std::vector<GeomEntity*>& entities);
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  récupère la liste des geom_entity référencés par (*this) et la
-     *          supprime ceux appartenant à entities.
-     */
-#ifndef SWIG
-    virtual void clearRefEntities(std::list<GeomEntity*>& vertices,
-            std::list<GeomEntity*>& curves,
-            std::list<GeomEntity*>& surfaces,
-            std::list<GeomEntity*>& volumes);
-#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief  retourne la dimension de l'entité géométrique
@@ -126,33 +109,11 @@ public:
     virtual void computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const;
 
     /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux sommets géométriques incidents via une
-     *          courbe
-     *
-     *  \param vertices les sommets incidents
-     */
-    virtual void get(std::vector<Vertex*>& vertices) const;
-
-    /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès aux courbes géométriques incidentes
      *
      *  \param curves les courbes incidents
      */
-    virtual void get(std::vector<Curve*>& curves) const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux surfaces géométriques incidentes
-     *
-     *  \param surfaces les surfaces incidentes
-     */
-    virtual void get(std::vector<Surface*>& surfaces) const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux volumes géométriques incidents
-     *
-     *  \param volumes les volumes incidents
-     */
-    virtual void get(std::vector<Volume*>& volumes) const;
+    const std::vector<Curve*>& getCurves() const {return m_curves;}
 
     /*------------------------------------------------------------------------*/
     /// retourne la liste des sommets topologiques qui pointent sur cette courbe
@@ -168,14 +129,6 @@ public:
     /** \brief Projete le point P1 sur le sommet, le résultat est le point P2.
      */
     virtual uint project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const ;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Return the number of curve incident to this point.
-     *
-     */
-    virtual size_t getNbCurves() const{
-        return m_curves.size();
-    };
 
     /*------------------------------------------------------------------------*/
     /** \brief  Ajoute c comme courbe incidente

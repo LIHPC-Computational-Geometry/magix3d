@@ -76,10 +76,8 @@ Surface* GeomHelper::getCommonSurface(std::vector<Surface*>& surf1,
 /*----------------------------------------------------------------------------*/
 Vertex* GeomHelper::getCommonVertex(Curve* crv1, Curve* crv2)
 {
-	std::vector<Vertex*> vertices1;
-	std::vector<Vertex*> vertices2;
-	crv1->get(vertices1);
-	crv2->get(vertices2);
+	auto vertices1 = crv1->getVertices();
+	auto vertices2 = crv2->getVertices();
 
 	for (uint i=0; i<vertices1.size(); i++)
 		for (uint j=0; j<vertices2.size(); j++)

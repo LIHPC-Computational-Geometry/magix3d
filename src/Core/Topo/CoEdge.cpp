@@ -1440,8 +1440,7 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 
 
 					// regarde si l'on est dans le cas de l'arête projetée sur l'intégralité de la courbe
-					std::vector<Geom::Vertex*> crv_vertices;
-					curve->get(crv_vertices);
+					auto crv_vertices = curve->getVertices();
 					if (getNbVertices() == 2 && crv_vertices.size() == 2
 							&& ( (getVertex(0)->getCoord() == crv_vertices[0]->getCoord() && getVertex(1)->getCoord() == crv_vertices[1]->getCoord())
 									|| (getVertex(0)->getCoord() == crv_vertices[1]->getCoord() && getVertex(1)->getCoord() == crv_vertices[0]->getCoord()) )
@@ -1524,8 +1523,7 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 						<< getName() << ", sur "<<ge->getName();
 				message<<", pt0 : "<<pt0;
 				message<<", pt1 : "<<pt1;
-				std::vector<Geom::Vertex*> vertices;
-				curve->get(vertices);
+				auto vertices = curve->getVertices();
 				if (vertices.size()>0)
 					message<<", vertices[0] : "<<vertices[0]->getCoord();
 				if (vertices.size()>1)
@@ -1870,9 +1868,22 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
         	else if (ge->getType() == Utils::Entity::GeomCurve
         			|| ge->getType() == Utils::Entity::GeomVertex) {
 
+				// recherche des courbes qui en dépendent, en évitant la courbe sur laquelle ed pourrait être projetée
         		// recherche des surfaces qui en dépendent, en évitant la surface sur laquelle ed pourrait être projetée
+				std::vector<Geom::Curve*> curves1;
         		std::vector<Geom::Surface*> surfaces1;
-        		ge->get(surfaces1);
+				if (ge->getType() == Utils::Entity::GeomCurve){
+					Geom::Curve* c = dynamic_cast<Geom::Curve*>(ge);
+					curves1.push_back(c);
+            		surfaces1 = c->getSurfaces();
+				}
+				else{
+					Geom::Vertex* v = dynamic_cast<Geom::Vertex*>(ge);
+					curves1 = v->getCurves();
+					for (auto c : curves1)
+						for (auto s : c->getSurfaces())
+		            		surfaces1.push_back(s);
+				}
 
         		std::vector<Geom::Surface*> surfaces2;
         		for (uint i=0; i<surfaces1.size(); i++)
@@ -1881,14 +1892,6 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 
         		if (surfaces2.empty()){
         			// c'est le cas en 2D
-
-            		// recherche des courbes qui en dépendent, en évitant la courbe sur laquelle ed pourrait être projetée
-            		std::vector<Geom::Curve*> curves1;
-            		if (ge->getType() == Utils::Entity::GeomCurve)
-            			curves1.push_back(dynamic_cast<Geom::Curve*>(ge));
-            		else
-            			ge->get(curves1);
-
             		std::vector<Geom::Curve*> curves2;
             		for (uint i=0; i<curves1.size(); i++)
             			if (curves1[i] != getGeomAssociation())

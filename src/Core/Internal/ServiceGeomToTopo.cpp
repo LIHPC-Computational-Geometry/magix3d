@@ -24,6 +24,7 @@
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
+#include "Geom/IncidentGeomEntitiesVisitor.h"
 
 #include "Internal/Context.h"
 #include "Internal/InfoCommand.h"
@@ -131,26 +132,44 @@ Topo::Block* ServiceGeomToTopo::getBlock(Geom::Volume* vol)
         if (vol == 0)
             return 0;
 
-        std::vector<Geom::Surface*> surfaces;
-        vol->get(surfaces);
-
         std::vector<Topo::Face* > faces;
-        for (std::vector<Geom::Surface*>::iterator iter1 = surfaces.begin();
-                    iter1 != surfaces.end(); ++iter1){
-
-            faces.push_back(getFace(*iter1));
-        }
+        for (auto s : vol->getSurfaces())
+            faces.push_back(getFace(s));
 
         // on récupère les sommets triés dans l'ordre suivant leur position géométrique
-        std::vector<Geom::Vertex*> vertices;
-        vol->getGeomSorted(vertices);
+        auto compareVertex = [](Geom::Vertex* v1, Geom::Vertex* v2) 
+        {
+            double z1 = v1->getZ();
+            double z2 = v2->getZ();
+
+            if (z1==z2){
+                double y1 = v1->getY();
+                double y2 = v2->getY();
+
+                if (y1==y2){
+                    double x1 = v1->getX();
+                    double x2 = v2->getX();
+
+                    return (x1<x2);
+                }
+                else {
+                    return (y1<y2);
+                }
+            }
+            else {
+                return (z1<z2);
+            }
+        };
+
+        std::set<Geom::Vertex*, decltype(compareVertex)> vertices(compareVertex);
+        for (auto s : vol->getSurfaces())
+            for (auto c : s->getCurves())
+                for (auto vertex : c->getVertices())
+                   vertices.insert(vertex);
 
         std::vector<Topo::Vertex* > sommets;
-        for (std::vector<Geom::Vertex*>::iterator iter = vertices.begin();
-                iter != vertices.end(); ++iter){
-
-            sommets.push_back(getVertex(*iter));
-        }
+        for (auto vert : vertices)
+            sommets.push_back(getVertex(vert));
 
         bloc = new Topo::Block(m_context, faces, sommets);
         m_icmd->addTopoInfoEntity(bloc, Internal::InfoCommand::CREATED);
@@ -194,16 +213,13 @@ Topo::Face* ServiceGeomToTopo::getFace(Geom::Surface* surf)
             } // end for i
 
             // récupération des sommets aux extrémités de la surface
+            Geom::GetDownIncidentGeomEntitiesVisitor v;
+            surf->accept(v);
             std::vector<Topo::Vertex* > sommets;
-            std::vector<Geom::Vertex*> vertices;
-            surf->get(vertices);
-
-            for (uint i=0; i<vertices.size(); i++){
-                sommets.push_back(getVertex(vertices[i]));
-            }
+            for (auto v : v.getVertices())
+                sommets.push_back(getVertex(v));
 
             face = new Topo::Face(m_context, cofaces, sommets, false);
-
         }
         else if (topos.size() == 1){
             Topo::TopoEntity* te = topos[0];
@@ -221,8 +237,7 @@ Topo::Face* ServiceGeomToTopo::getFace(Geom::Surface* surf)
         }
         else {
 
-            std::vector<Geom::Curve*> curves;
-            surf->get(curves);
+            auto curves = surf->getCurves();
 
             // constitution du vecteur d'arêtes en fonction des courbes de la surface
 
@@ -282,8 +297,7 @@ Topo::CoFace* ServiceGeomToTopo::getCoFace(Geom::Surface* surf)
         }
         else {
     		std::vector<Topo::Edge* > edges;
-    		std::vector<Geom::Curve*> curves;
-    		surf->get(curves);
+    		auto curves = surf->getCurves();
     		bool isStructured = false;
         	if (m_extrem_vertices.empty()){
         		// constitution du vecteur d'arêtes en fonction des courbes de la surface
@@ -424,8 +438,7 @@ Topo::Edge* ServiceGeomToTopo::getEdge(Geom::Curve* curve)
                 }
             } // end for i
 
-            std::vector<Geom::Vertex*> vertices;
-            curve->get(vertices);
+            auto vertices = curve->getVertices();
 
             if (vertices.size() == 0 || vertices.size() > 2)
                 throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, une courbe avec autre chose que 1 ou 2 Vertex", TkUtil::Charset::UTF_8));
@@ -452,9 +465,7 @@ Topo::Edge* ServiceGeomToTopo::getEdge(Geom::Curve* curve)
 
         }
         else {
-            std::vector<Geom::Vertex*> vertices;
-            curve->get(vertices);
-
+            auto vertices = curve->getVertices();
             if (vertices.size() == 0 || vertices.size() > 2){
                 std::cerr<<"vertices.size() = "<<vertices.size()<<std::endl;
                 std::cerr<<"Curve : "<<curve->getName()<<std::endl;

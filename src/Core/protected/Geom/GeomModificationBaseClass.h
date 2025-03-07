@@ -184,7 +184,7 @@ protected:
 
     void cleanRefEntities();
 
-    void cleanEntityAndChildren(GeomEntity* e);
+    void cleanEntityAndChildren(Volume* e);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Une fois les entités de référence traitées, cette

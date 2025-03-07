@@ -37,6 +37,7 @@
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
+#include "Geom/IncidentGeomEntitiesVisitor.h"
 
 #include "Topo/TopoEntity.h"
 #include "Topo/Block.h"
@@ -1269,52 +1270,39 @@ void GroupManager::addMark(Group3D* grp,
 {
 	bool propagate = getPropagate();
 
-    std::vector<Geom::Volume*>& volumes = grp->getVolumes();
-
-    for (std::vector<Geom::Volume*>::iterator iter3 = volumes.begin();
-            iter3 != volumes.end(); ++iter3)
-
+    for (auto vol : grp->getVolumes()) {
         // on n'observe les entités qu'une fois
-        if (filtre_vu[*iter3] == false){
-            filtre_vu[*iter3] = true;
+        if (filtre_vu[vol] == false){
+            filtre_vu[vol] = true;
+
+            Geom::GetDownIncidentGeomEntitiesVisitor v;
+            vol->accept(v);
 
             // on tient compte du masque pour savoir si on s'interesse à la visibilité de ce type d'entité
             if (visibilityMask & Utils::FilterEntity::GeomVolume)
-                filtre_geom[*iter3] = filtre_geom[*iter3] | mark;
+                filtre_geom[vol] = filtre_geom[vol] | mark;
 
             // faut-il continuer avec les surfaces ?
             if ((visibilityMask & Utils::FilterEntity::GeomSurface) && propagate){
-                std::vector<Geom::Surface*> surfaces;
-                (*iter3)->get(surfaces);
-
-                for (std::vector<Geom::Surface*>::iterator iter2 = surfaces.begin();
-                        iter2 != surfaces.end(); ++iter2)
-                    filtre_geom[*iter2] = filtre_geom[*iter2] | mark;
+                for (auto s : v.getSurfaces())
+                    filtre_geom[s] = filtre_geom[s] | mark;
             } // end if (visibilityMask & Utils::FilterEntity::GeomSurface)
 
             // faut-il continuer avec les courbes ?
             if ((visibilityMask & Utils::FilterEntity::GeomCurve) && propagate){
-                std::vector<Geom::Curve*> curves;
-                (*iter3)->get(curves);
-
-                for (std::vector<Geom::Curve*>::iterator iter2 = curves.begin();
-                        iter2 != curves.end(); ++iter2)
-                    filtre_geom[*iter2] = filtre_geom[*iter2] | mark;
+                for (auto c : v.getCurves())
+                    filtre_geom[c] = filtre_geom[c] | mark;
             } // end if (visibilityMask & Utils::FilterEntity::GeomCurve)
 
             // faut-il continuer avec les sommets ?
             if ((visibilityMask & Utils::FilterEntity::GeomVertex) && propagate){
-                std::vector<Geom::Vertex*> vertices;
-                (*iter3)->get(vertices);
-
-                for (std::vector<Geom::Vertex*>::iterator iter2 = vertices.begin();
-                        iter2 != vertices.end(); ++iter2)
-                    filtre_geom[*iter2] = filtre_geom[*iter2] | mark;
+                for (auto vert : v.getVertices())
+                    filtre_geom[vert] = filtre_geom[vert] | mark;
             } // end if (visibilityMask & Utils::FilterEntity::GeomVertex)
 
             // faut-il propager à la topologie ?
             if (visibilityMask >= Utils::FilterEntity::TopoBlock){
-                const std::vector<Topo::TopoEntity* >& topo = (*iter3)->getRefTopo();
+                const std::vector<Topo::TopoEntity* >& topo = (vol)->getRefTopo();
 
                 for (std::vector<Topo::TopoEntity* >::const_iterator iter2 = topo.begin();
                         iter2 != topo.end(); ++iter2){
@@ -1325,9 +1313,9 @@ void GroupManager::addMark(Group3D* grp,
                     }
                 }
             } // end if (visibilityMask >= Utils::FilterEntity::TopoBlock)
-
-        } // end if (filtre_vu[*iter3] == false)
-
+        } // end if (filtre_vu[vol] == false)
+    }
+    
     if (visibilityMask >= Utils::FilterEntity::TopoBlock){
     	std::vector<Topo::Block*>& blocs = grp->getBlocks();
 
@@ -1354,42 +1342,33 @@ void GroupManager::addMark(Group2D* grp,
 {
 	bool propagate = getPropagate();
 
-    std::vector<Geom::Surface*>& surfaces = grp->getSurfaces();
-
-    for (std::vector<Geom::Surface*>::iterator iter3 = surfaces.begin();
-            iter3 != surfaces.end(); ++iter3)
-
+    for (auto surf : grp->getSurfaces()) {
         // on n'observe les entités qu'une fois
-        if (filtre_vu[*iter3] == false){
-            filtre_vu[*iter3] = true;
+        if (filtre_vu[surf] == false){
+            filtre_vu[surf] = true;
+
+            Geom::GetDownIncidentGeomEntitiesVisitor v;
+            surf->accept(v);
 
             // on tient compte du masque pour savoir si on s'interesse à la visibilité de ce type d'entité
             if (visibilityMask & Utils::FilterEntity::GeomSurface)
-                filtre_geom[*iter3] = filtre_geom[*iter3] | mark;
+                filtre_geom[surf] = filtre_geom[surf] | mark;
 
             // faut-il continuer avec les courbes ?
             if ((visibilityMask & Utils::FilterEntity::GeomCurve) && propagate){
-                std::vector<Geom::Curve*> curves;
-                (*iter3)->get(curves);
-
-                for (std::vector<Geom::Curve*>::iterator iter2 = curves.begin();
-                        iter2 != curves.end(); ++iter2)
-                    filtre_geom[*iter2] = filtre_geom[*iter2] | mark;
+                 for (auto c : v.getCurves())
+                    filtre_geom[c] = filtre_geom[c] | mark;
             } // end if (visibilityMask & Utils::FilterEntity::GeomCurve)
 
             // faut-il continuer avec les sommets ?
             if ((visibilityMask & Utils::FilterEntity::GeomVertex) && propagate){
-                std::vector<Geom::Vertex*> vertices;
-                (*iter3)->get(vertices);
-
-                for (std::vector<Geom::Vertex*>::iterator iter2 = vertices.begin();
-                        iter2 != vertices.end(); ++iter2)
-                    filtre_geom[*iter2] = filtre_geom[*iter2] | mark;
+                for (auto vert : v.getVertices())
+                    filtre_geom[vert] = filtre_geom[vert] | mark;
             } // end if (visibilityMask & Utils::FilterEntity::GeomVertex)
 
             // faut-il propager à la topologie ?
             if (visibilityMask >= Utils::FilterEntity::TopoCoFace){
-                const std::vector<Topo::TopoEntity* >& topo = (*iter3)->getRefTopo();
+                const std::vector<Topo::TopoEntity* >& topo = surf->getRefTopo();
 
                 for (std::vector<Topo::TopoEntity* >::const_iterator iter2 = topo.begin();
                         iter2 != topo.end(); ++iter2){
@@ -1401,8 +1380,8 @@ void GroupManager::addMark(Group2D* grp,
                 }
             } // end if (visibilityMask >= Utils::FilterEntity::TopoCoFace)
 
-        } // end if (filtre_vu[*iter3] == false)
-
+        } // end if (filtre_vu[surf] == false)
+    }
 
     if (visibilityMask >= Utils::FilterEntity::TopoCoFace){
     	std::vector<Topo::CoFace*>& cofaces = grp->getCoFaces();
@@ -1422,32 +1401,24 @@ void GroupManager::addMark(Group1D* grp,
 {
 	bool propagate = getPropagate();
 
-    std::vector<Geom::Curve*>& curves = grp->getCurves();
-
-    for (std::vector<Geom::Curve*>::iterator iter3 = curves.begin();
-            iter3 != curves.end(); ++iter3)
-
+    for (auto c : grp->getCurves()){
         // on n'observe les entités qu'une fois
-        if (filtre_vu[*iter3] == false){
-            filtre_vu[*iter3] = true;
+        if (filtre_vu[c] == false){
+            filtre_vu[c] = true;
 
             // on tient compte du masque pour savoir si on s'interesse à la visibilité de ce type d'entité
             if (visibilityMask & Utils::FilterEntity::GeomCurve)
-                filtre_geom[*iter3] = filtre_geom[*iter3] | mark;
+                filtre_geom[c] = filtre_geom[c] | mark;
 
             // faut-il continuer avec les sommets ?
             if ((visibilityMask & Utils::FilterEntity::GeomVertex) && propagate){
-                std::vector<Geom::Vertex*> vertices;
-                (*iter3)->get(vertices);
-
-                for (std::vector<Geom::Vertex*>::iterator iter2 = vertices.begin();
-                        iter2 != vertices.end(); ++iter2)
-                    filtre_geom[*iter2] = filtre_geom[*iter2] | mark;
+                for (auto vert : c->getVertices())
+                    filtre_geom[vert] = filtre_geom[vert] | mark;
             } // end if (visibilityMask & Utils::FilterEntity::GeomVertex)
 
             // faut-il propager à la topologie ?
             if (visibilityMask >= Utils::FilterEntity::TopoCoEdge){
-                const std::vector<Topo::TopoEntity* >& topo = (*iter3)->getRefTopo();
+                const std::vector<Topo::TopoEntity* >& topo = c->getRefTopo();
 
                 for (std::vector<Topo::TopoEntity* >::const_iterator iter2 = topo.begin();
                         iter2 != topo.end(); ++iter2){
@@ -1459,7 +1430,8 @@ void GroupManager::addMark(Group1D* grp,
                 }
             } // end if (visibilityMask >= Utils::FilterEntity::TopoCoEdge)
 
-        } // end if (filtre_vu[*iter3] == false)
+        } // end if (filtre_vu[c] == false)
+    }
 
     if (visibilityMask >= Utils::FilterEntity::TopoCoEdge){
     	std::vector<Topo::CoEdge*>& coedges = grp->getCoEdges();
@@ -1477,23 +1449,18 @@ void GroupManager::addMark(Group0D* grp,
         std::map<Topo::TopoEntity*, uint>& filtre_topo,
         uint mark)
 {
-
-    std::vector<Geom::Vertex*>& vertices = grp->getVertices();
-
     // on tient compte du masque pour savoir si on s'interesse à la visibilité de ce type d'entité
-    if (visibilityMask & Utils::FilterEntity::GeomVertex)
-        for (std::vector<Geom::Vertex*>::iterator iter3 = vertices.begin();
-                iter3 != vertices.end(); ++iter3)
-
+    if (visibilityMask & Utils::FilterEntity::GeomVertex){
+        for (auto vert : grp->getVertices()){
             // on n'observe les entités qu'une fois
-            if (filtre_vu[*iter3] == false){
-                filtre_vu[*iter3] = true;
+            if (filtre_vu[vert] == false){
+                filtre_vu[vert] = true;
 
-                filtre_geom[*iter3] = filtre_geom[*iter3] | mark;
+                filtre_geom[vert] = filtre_geom[vert] | mark;
 
                 // faut-il propager à la topologie ?
                 if (visibilityMask >= Utils::FilterEntity::TopoVertex){
-                    const std::vector<Topo::TopoEntity* >& topo = (*iter3)->getRefTopo();
+                    const std::vector<Topo::TopoEntity* >& topo = vert->getRefTopo();
 
                     for (std::vector<Topo::TopoEntity* >::const_iterator iter2 = topo.begin();
                             iter2 != topo.end(); ++iter2){
@@ -1505,8 +1472,9 @@ void GroupManager::addMark(Group0D* grp,
                     }
                 } // end if (visibilityMask >= Utils::FilterEntity::TopoVertex)
 
-            } // end if (filtre_vu[*iter3] == false)
-
+            } // end if (filtre_vu[vert] == false)
+        }
+    }
     if (visibilityMask >= Utils::FilterEntity::TopoVertex){
     	std::vector<Topo::Vertex*>& vertices = grp->getTopoVertices();
 
@@ -1681,26 +1649,25 @@ void GroupManager::addMark(CoordinateSystem::SysCoord* rep,
 std::vector<std::string> GroupManager::getGeomEntities(const std::vector<std::string>& vg)
 {
     std::set<Geom::GeomEntity*> initGeomEntities;
-
-    for (uint i=0; i<vg.size(); i++){
-        Group3D* gr3d = getGroup3D(vg[i], false);
+    for (auto vn : vg){
+        Group3D* gr3d = getGroup3D(vn, false);
         if (gr3d){
-            std::vector<Geom::Volume*> volumes = gr3d->getVolumes();
+            auto volumes = gr3d->getVolumes();
             initGeomEntities.insert(volumes.begin(), volumes.end());
         } else {
-            Group2D* gr2d = getGroup2D(vg[i], false);
+            Group2D* gr2d = getGroup2D(vn, false);
             if (gr2d){
-                std::vector<Geom::Surface*> surfaces = gr2d->getSurfaces();
+                auto surfaces = gr2d->getSurfaces();
                 initGeomEntities.insert(surfaces.begin(), surfaces.end());
             } else {
-                Group1D* gr1d = getGroup1D(vg[i], false);
+                Group1D* gr1d = getGroup1D(vn, false);
                 if (gr1d){
-                    std::vector<Geom::Curve*> curves = gr1d->getCurves();
+                    auto curves = gr1d->getCurves();
                     initGeomEntities.insert(curves.begin(), curves.end());
                 } else {
-                    Group0D* gr0d = getGroup0D(vg[i], false);
+                    Group0D* gr0d = getGroup0D(vn, false);
                     if (gr0d){
-                        std::vector<Geom::Vertex*> vertices = gr0d->getVertices();
+                        auto vertices = gr0d->getVertices();
                         initGeomEntities.insert(vertices.begin(), vertices.end());
                     }
                 }
@@ -1719,11 +1686,10 @@ std::vector<std::string> GroupManager::getGeomEntities(const std::vector<std::st
 void GroupManager::get(const std::vector<std::string>& vg, std::vector<Geom::Volume*>& volumes)
 {
     std::set<Geom::Volume*> initGeomEntities;
-
-    for (uint i=0; i<vg.size(); i++){
-        Group3D* gr3d = getGroup3D(vg[i], false);
+    for (auto vn : vg){
+        Group3D* gr3d = getGroup3D(vn, false);
         if (gr3d){
-        	std::vector<Geom::Volume*> loc_volumes = gr3d->getVolumes();
+        	auto loc_volumes = gr3d->getVolumes();
         	initGeomEntities.insert(loc_volumes.begin(), loc_volumes.end());
         }
     } // end for i
@@ -1736,19 +1702,17 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Geom::Vol
 void GroupManager::get(const std::vector<std::string>& vg, std::vector<Geom::Surface*>& surfaces)
 {
     std::set<Geom::Surface*> initGeomEntities;
-    for (uint i=0; i<vg.size(); i++){
-    	Group3D* gr3d = getGroup3D(vg[i], false);
+    for (auto vn : vg){
+    	Group3D* gr3d = getGroup3D(vn, false);
     	if (gr3d){
-    		std::vector<Geom::Volume*> volumes = gr3d->getVolumes();
-    		for (uint j=0; j<volumes.size(); j++){
-    			std::vector<Geom::Surface*> loc_surfaces;
-    			volumes[j]->get(loc_surfaces);
+    		for (auto volume : gr3d->getVolumes()){
+    			auto loc_surfaces = volume->getSurfaces();
     			initGeomEntities.insert(loc_surfaces.begin(), loc_surfaces.end());
     		}
     	} else {
-    		Group2D* gr2d = getGroup2D(vg[i], false);
+    		Group2D* gr2d = getGroup2D(vn, false);
     		if (gr2d){
-    			std::vector<Geom::Surface*> loc_surfaces = gr2d->getSurfaces();
+    			auto loc_surfaces = gr2d->getSurfaces();
     			initGeomEntities.insert(loc_surfaces.begin(), loc_surfaces.end());
     		}
     	}
@@ -1762,28 +1726,26 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Geom::Sur
 void GroupManager::get(const std::vector<std::string>& vg, std::vector<Geom::Curve*>& curves)
 {
     std::set<Geom::Curve*> initGeomEntities;
-    for (uint i=0; i<vg.size(); i++){
-    	Group3D* gr3d = getGroup3D(vg[i], false);
+    for (auto vn : vg){
+    	Group3D* gr3d = getGroup3D(vn, false);
     	if (gr3d){
-    		std::vector<Geom::Volume*> volumes = gr3d->getVolumes();
-    		for (uint j=0; j<volumes.size(); j++){
-    			std::vector<Geom::Curve*> loc_curves;
-    			volumes[j]->get(loc_curves);
-    			initGeomEntities.insert(loc_curves.begin(), loc_curves.end());
+    		for (auto volume : gr3d->getVolumes()){
+                for (auto surface : volume->getSurfaces()){
+                    auto loc_curves = surface->getCurves();
+                    initGeomEntities.insert(loc_curves.begin(), loc_curves.end());
+                }
     		}
     	} else {
-            Group2D* gr2d = getGroup2D(vg[i], false);
+            Group2D* gr2d = getGroup2D(vn, false);
             if (gr2d){
-                std::vector<Geom::Surface*> surfaces = gr2d->getSurfaces();
-                for (uint j=0; j<surfaces.size(); j++){
-                	std::vector<Geom::Curve*> loc_curves;
-                	surfaces[j]->get(loc_curves);
+                for (auto surface : gr2d->getSurfaces()){
+                	auto loc_curves = surface->getCurves();
                 	initGeomEntities.insert(loc_curves.begin(), loc_curves.end());
                 }
             } else {
-                Group1D* gr1d = getGroup1D(vg[i], false);
+                Group1D* gr1d = getGroup1D(vn, false);
                 if (gr1d){
-                	std::vector<Geom::Curve*> loc_curves = gr1d->getCurves();
+                	auto loc_curves = gr1d->getCurves();
                 	initGeomEntities.insert(loc_curves.begin(), loc_curves.end());
                 }
             }
@@ -1798,37 +1760,39 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Geom::Cur
 void GroupManager::get(const std::vector<std::string>& vg, std::vector<Geom::Vertex*>& vertices)
 {
     std::set<Geom::Vertex*> initGeomEntities;
-    for (uint i=0; i<vg.size(); i++){
-    	Group3D* gr3d = getGroup3D(vg[i], false);
+    for (auto vn : vg){
+    	Group3D* gr3d = getGroup3D(vn, false);
     	if (gr3d){
     		std::vector<Geom::Volume*> volumes = gr3d->getVolumes();
-    		for (uint j=0; j<volumes.size(); j++){
-    			std::vector<Geom::Vertex*> loc_vertices;
-    			volumes[j]->get(loc_vertices);
-    			initGeomEntities.insert(loc_vertices.begin(), loc_vertices.end());
+    		for (auto volume : volumes){
+                for (auto surface : volume->getSurfaces())
+                    for (auto curve : surface->getCurves()) {
+    			        auto loc_vertices = curve->getVertices();
+    			        initGeomEntities.insert(loc_vertices.begin(), loc_vertices.end());
+                    }
     		}
     	} else {
-            Group2D* gr2d = getGroup2D(vg[i], false);
+            Group2D* gr2d = getGroup2D(vn, false);
             if (gr2d){
                 std::vector<Geom::Surface*> surfaces = gr2d->getSurfaces();
-                for (uint j=0; j<surfaces.size(); j++){
-                	std::vector<Geom::Vertex*> loc_vertices;
-                	surfaces[j]->get(loc_vertices);
-                	initGeomEntities.insert(loc_vertices.begin(), loc_vertices.end());
+                for (auto surface : surfaces){
+                    for (auto curve : surface->getCurves()){
+                	    auto loc_vertices = curve->getVertices();
+                	    initGeomEntities.insert(loc_vertices.begin(), loc_vertices.end());
+                    }
                 }
             } else {
-            	Group1D* gr1d = getGroup1D(vg[i], false);
+            	Group1D* gr1d = getGroup1D(vn, false);
             	if (gr1d){
             		std::vector<Geom::Curve*> curves = gr1d->getCurves();
-            		for (uint j=0; j<curves.size(); j++){
-            			std::vector<Geom::Vertex*> loc_vertices;
-            			curves[j]->get(loc_vertices);
+            		for (auto curve : curves){
+            			auto loc_vertices = curve->getVertices();
             			initGeomEntities.insert(loc_vertices.begin(), loc_vertices.end());
             		}
             	} else {
-            		Group0D* gr0d = getGroup0D(vg[i], false);
+            		Group0D* gr0d = getGroup0D(vn, false);
             		if (gr0d){
-            			std::vector<Geom::Vertex*> loc_vertices = gr0d->getVertices();
+            			auto loc_vertices = gr0d->getVertices();
             			initGeomEntities.insert(loc_vertices.begin(), loc_vertices.end());
             		}
             	}

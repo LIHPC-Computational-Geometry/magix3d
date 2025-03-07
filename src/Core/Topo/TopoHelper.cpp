@@ -12,26 +12,29 @@
 #include <map>
 #include <set>
 #include <vector>
+
 #include "Topo/Edge.h"
 #include "Topo/Face.h"
 #include "Topo/CoEdge.h"
 #include "Topo/CoFace.h"
 #include "Topo/Vertex.h"
 #include "Topo/TopoHelper.h"
-
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Topo/EdgeMeshingPropertyTabulated.h"
+
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
 #include "Geom/GeomEntity.h"
+#include "Geom/IncidentGeomEntitiesVisitor.h"
 
 #include <TkUtil/Exception.h>
+#include <TkUtil/MemoryError.h>
+
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
 #include "Utils/MgxNumeric.h"
-#include <TkUtil/MemoryError.h>
 
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
@@ -359,9 +362,8 @@ void TopoHelper::get(std::vector<Geom::Volume*>& volumes, std::set<Topo::CoFace*
 		Topo::TopoHelper::get(blocs, cofaces);
 
 		if (propagate){
-			// on parcours les surfaces pour les cas sans blocs ...
-			std::vector<Geom::Surface*> surfaces;
-			volumes[j]->get(surfaces);
+			// on parcourt les surfaces pour les cas sans blocs ...
+			auto surfaces = volumes[j]->getSurfaces();
 			Topo::TopoHelper::get(surfaces, cofaces);
 		}
 	}
@@ -376,14 +378,16 @@ void TopoHelper::get(std::vector<Geom::Volume*>& volumes, std::set<Topo::CoEdge*
 		Topo::TopoHelper::get(blocs, coedges);
 
 		if (propagate){
-			// on parcours les surfaces pour les cas sans blocs ...
-			std::vector<Geom::Surface*> surfaces;
-			volumes[j]->get(surfaces);
+
+            Geom::GetDownIncidentGeomEntitiesVisitor v;
+            volumes[j]->accept(v);
+            std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+            std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+
+			// on parcourt les surfaces pour les cas sans blocs ...
 			Topo::TopoHelper::get(surfaces, coedges, propagate);
 
-			// on parcours les courbes pour les cas sans faces ...
-			std::vector<Geom::Curve*> curves;
-			volumes[j]->get(curves);
+			// on parcourt les courbes pour les cas sans faces ...
 			Topo::TopoHelper::get(curves, coedges);
 		}
 	}
@@ -398,19 +402,20 @@ void TopoHelper::get(std::vector<Geom::Volume*>& volumes, std::set<Topo::Vertex*
 		Topo::TopoHelper::get(blocs, vertices);
 
 		if (propagate){
-			// on parcours les surfaces pour les cas sans blocs ...
-			std::vector<Geom::Surface*> surfaces;
-			volumes[j]->get(surfaces);
+
+            Geom::GetDownIncidentGeomEntitiesVisitor v;
+            volumes[j]->accept(v);
+            std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
+            std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+            std::vector<Geom::Vertex*> vtx (v.getVertices().begin(), v.getVertices().end());
+
+			// on parcourt les surfaces pour les cas sans blocs ...
 			Topo::TopoHelper::get(surfaces, vertices, propagate);
 
-			// on parcours les courbes pour les cas sans faces ...
-			std::vector<Geom::Curve*> curves;
-			volumes[j]->get(curves);
+			// on parcourt les courbes pour les cas sans faces ...
 			Topo::TopoHelper::get(curves, vertices, propagate);
 
-			// on parcours les sommets pour les cas sans arêtes ...
-			std::vector<Geom::Vertex*> vtx;
-			volumes[j]->get(vtx);
+			// on parcourt les sommets pour les cas sans arêtes ...
 			Topo::TopoHelper::get(vtx, vertices);
 		}
 	}
@@ -434,9 +439,8 @@ void TopoHelper::get(std::vector<Geom::Surface*>& surfaces, std::set<Topo::CoEdg
 		Topo::TopoHelper::get(cofaces, coedges);
 
 		if (propagate){
-			// on parcours les courbes pour les cas sans faces ...
-			std::vector<Geom::Curve*> curves;
-			surfaces[j]->get(curves);
+			// on parcourt les courbes pour les cas sans faces ...
+			auto curves = surfaces[j]->getCurves();
 			Topo::TopoHelper::get(curves, coedges);
 		}
 	}
@@ -452,14 +456,16 @@ void TopoHelper::get(std::vector<Geom::Surface*>& surfaces, std::set<Topo::Verte
 		Topo::TopoHelper::get(cofaces, vertices);
 
 		if (propagate){
-			// on parcours les courbes pour les cas sans faces ...
-			std::vector<Geom::Curve*> curves;
-			surfaces[j]->get(curves);
+
+            Geom::GetDownIncidentGeomEntitiesVisitor v;
+            surfaces[j]->accept(v);
+            std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
+            std::vector<Geom::Vertex*> vtx (v.getVertices().begin(), v.getVertices().end());
+
+			// on parcourt les courbes pour les cas sans faces ...
 			Topo::TopoHelper::get(curves, vertices, propagate);
 
-			// on parcours les sommets pour les cas sans arêtes ...
-			std::vector<Geom::Vertex*> vtx;
-			surfaces[j]->get(vtx);
+			// on parcourt les sommets pour les cas sans arêtes ...
 			Topo::TopoHelper::get(vtx, vertices);
 		}
 	}
@@ -482,9 +488,8 @@ void TopoHelper::get(std::vector<Geom::Curve*>& curves, std::set<Topo::Vertex*>&
 		Topo::TopoHelper::get(loc_coedges, vertices);
 
 		if (propagate){
-			// on parcours les sommets pour les cas sans arêtes ...
-			std::vector<Geom::Vertex*> vtx;
-			curves[k]->get(vtx);
+			// on parcourt les sommets pour les cas sans arêtes ...
+			auto vtx = curves[k]->getVertices();
 			Topo::TopoHelper::get(vtx, vertices);
 		}
 	}
@@ -1166,7 +1171,7 @@ void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
     // map de stockage des CoEdges initiales et des nouveaux sommets créés
     std::map<CoEdge*, std::vector<Vertex*> > oldCoEdge2newVertices;
 
-    // on parcours à nouveau les faces et arêtes à couper pour y faire le split
+    // on parcourt à nouveau les faces et arêtes à couper pour y faire le split
     for (std::map<uint, InfoSplit*>::iterator iter = cofaceInfoSplit.begin();
             iter != cofaceInfoSplit.end(); ++iter) {
         uint id = (*iter).first;
