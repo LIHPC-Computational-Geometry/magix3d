@@ -464,7 +464,7 @@ void GeomModificationBaseClass::cleanRefEntities(){
         std::vector<Curve*> incidentCurves = s->getCurves();
         auto refVolumes = m_ref_entities[3];
         for(auto v : incidentVolumes){
-            auto res = std::find(refVolumes.begin(),refVolumes.end(),s);
+            auto res = std::find(refVolumes.begin(),refVolumes.end(),v);
             if(res != refVolumes.end())
                 toRemoveV.push_back(v);
         }
