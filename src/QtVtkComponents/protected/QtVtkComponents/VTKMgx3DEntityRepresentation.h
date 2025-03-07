@@ -70,8 +70,8 @@ class VTKMgx3DEntityRepresentation :
 	 */
 	static void createSegmentsWireRepresentation (
 			Mgx3D::Utils::Entity* entity,
-			VTKMgx3DActor*& actor, vtkDataSetMapper*& mapper,
-			vtkUnstructuredGrid*& grid,
+			VTKMgx3DActor*& actor, vtkPolyDataMapper*& mapper,
+			vtkPolyData*& grid,
 			const std::vector<Mgx3D::Utils::Math::Point>& points,
 			const std::vector<size_t>& segments);
 
@@ -85,8 +85,8 @@ class VTKMgx3DEntityRepresentation :
 	 */
 	static void createTrianglesSurfacicRepresentation (
 			Mgx3D::Utils::Entity* entity,
-			VTKMgx3DActor*& actor, vtkDataSetMapper*& mapper,
-			vtkUnstructuredGrid*& grid,
+			VTKMgx3DActor*& actor, vtkPolyDataMapper*& mapper,
+			vtkPolyData*& grid,
 			const std::vector<Mgx3D::Utils::Math::Point>& points,
 			const std::vector<size_t>& triangles);
 
