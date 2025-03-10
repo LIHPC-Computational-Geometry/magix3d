@@ -7,7 +7,6 @@
  */
 /*----------------------------------------------------------------------------*/
 #include "Topo/CommandSetGeomAssociation.h"
-#include "Geom/EntityFactory.h"
 #include "Topo/TopoManager.h"
 #include "Topo/Block.h"
 #include "Topo/TopoHelper.h"
@@ -17,6 +16,8 @@
 #include "Geom/CommandCreateGeom.h"
 #include "Geom/CommandEditGeom.h"
 #include "Geom/GeomModificationBaseClass.h"
+#include "Geom/IncidentGeomEntitiesVisitor.h"
+#include "Geom/EntityFactory.h"
 
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
@@ -234,11 +235,9 @@ void CommandSetGeomAssociation::project(CoFace* coface)
 					CHECK_NULL_PTR_ERROR(vtx2);
 
 					Geom::Curve* common_curve = 0;
-					std::vector<Geom::Curve*> curves;
-					vtx1->get(curves);
+					auto curves = vtx1->getCurves();
 					for (uint i=0; i<curves.size(); i++){
-						std::vector<Geom::Vertex*> vertices;
-						curves[i]->get(vertices);
+						auto vertices = curves[i]->getVertices();
 						for (uint j=0; j<vertices.size(); j++)
 							if (vertices[j] == vtx2)
 								common_curve = curves[i];
@@ -294,16 +293,16 @@ void CommandSetGeomAssociation::project(Vertex* vtx)
 
 		// si on se retrouve à proximité d'un sommet géométrique
 		// on peut alors associer ce sommet topo à ce dernier
-		std::vector<Geom::Vertex*> vertices;
-		m_geom_entity->get(vertices);
-		for (uint i=0; i<vertices.size(); i++){
-			Utils::Math::Point posVtx = vertices[i]->getCenteredPosition();
+	   	Geom::GetDownIncidentGeomEntitiesVisitor v;
+    	m_geom_entity->accept(v);
+		for (auto vert : v.getVertices()){
+			Utils::Math::Point posVtx = vert->getCenteredPosition();
 			if (posGeom.isEpsilonEqual(posVtx, Utils::Math::MgxNumeric::mgxTopoDoubleEpsilon)) {
 				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-				message << "La projection géométrique de " << vtx->getName() << " se trouve sur " << vertices[i]->getName() << " qui est un point de " << m_geom_entity->getName();
-				message << " : forçage de l'association géométrique avec " << vertices[i]->getName() << ".";
+				message << "La projection géométrique de " << vtx->getName() << " se trouve sur " << vert->getName() << " qui est un point de " << m_geom_entity->getName();
+				message << " : forçage de l'association géométrique avec " << vert->getName() << ".";
 				log (TkUtil::InformationLog(message));
-				vtx->setGeomAssociation(vertices[i]);
+				vtx->setGeomAssociation(vert);
 			}
 		}
 	}

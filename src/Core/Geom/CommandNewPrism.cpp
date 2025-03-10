@@ -10,6 +10,7 @@
 #include "Geom/PropertyPrism.h"
 #include "Geom/GeomNewPrismImplementation.h"
 #include "Geom/GeomManager.h"
+#include "Geom/IncidentGeomEntitiesVisitor.h"
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
@@ -128,8 +129,7 @@ internalExecute()
     		filtre_uid[curv->getUniqueId()] = 2;
 
     		// recherche du sommet opposé
-    		std::vector<Vertex*> vertices;
-    		curv->get(vertices);
+    		auto vertices = curv->getVertices();
     		Vertex* opp_vtx = 0;
     		for (uint i=0; i<vertices.size(); i++)
     			if (filtre_uid[vertices[i]->getUniqueId()] == 0)
@@ -146,8 +146,7 @@ internalExecute()
     	Surface* surf = new_surfaces[i];
 
     	if (filtre_uid[surf->getUniqueId()] == 2){
-    		std::vector<Curve*> curves;
-    		surf->get(curves);
+    		auto curves = surf->getCurves();
     		Curve* curv = 0;
     		Curve* opp_crv = 0;
     		for (uint i=0; i<curves.size(); i++)
@@ -203,22 +202,16 @@ internalExecute()
 void CommandNewPrism::marque(Surface* surf, std::map<unsigned long, uint>& filtre_uid)
 {
 	filtre_uid[surf->getUniqueId()] = 1;
-	std::vector<Curve*> curves;
-	std::vector<Vertex*> vertices;
 
-	surf->get(curves);
-	for (uint i=0; i<curves.size(); i++)
-		filtre_uid[curves[i]->getUniqueId()] = 1;
-
-	surf->get(vertices);
-	for (uint i=0; i<vertices.size(); i++)
-		filtre_uid[vertices[i]->getUniqueId()] = 1;
+    GetDownIncidentGeomEntitiesVisitor v;
+    surf->accept(v);
+    for (auto ei : v.get())
+        filtre_uid[ei->getUniqueId()] = 1;
 }
 /*----------------------------------------------------------------------------*/
 Vertex* CommandNewPrism::getMarquedVertex(Curve* curv, std::map<unsigned long, uint>& filtre_uid)
 {
-	std::vector<Vertex*> vertices;
-	curv->get(vertices);
+	auto vertices = curv->getVertices();
 	for (uint i=0; i<vertices.size(); i++)
 		if (filtre_uid[vertices[i]->getUniqueId()] == 1)
 			return vertices[i];
@@ -227,8 +220,7 @@ Vertex* CommandNewPrism::getMarquedVertex(Curve* curv, std::map<unsigned long, u
 /*----------------------------------------------------------------------------*/
 Curve* CommandNewPrism::getMarquedCurve(Surface* surf, std::map<unsigned long, uint>& filtre_uid)
 {
-	std::vector<Curve*> curves;
-	surf->get(curves);
+	auto curves = surf->getCurves();
 	for (uint i=0; i<curves.size(); i++)
 		if (filtre_uid[curves[i]->getUniqueId()] == 1)
 			return curves[i];

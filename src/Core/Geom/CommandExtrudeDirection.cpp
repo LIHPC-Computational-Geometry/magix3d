@@ -89,8 +89,7 @@ internalExecute()
         for (auto v2v : m_v2v) {
             Vertex *v_ref = v2v.first;
             Vertex *v_created = v2v.second;
-            std::vector<Curve *> curves;
-            v_ref->get(curves);
+            auto curves = v_ref->getCurves();
             for (int i = 0; i < curves.size(); i++) {
                 Curve *c = curves[i];
                 v_created->add(c);
@@ -102,8 +101,7 @@ internalExecute()
         for (auto c2c : m_c2c) {
             Curve *c_ref = c2c.first;
             Curve *c_created = c2c.second;
-            std::vector<Surface *> surfaces;
-            c_ref->get(surfaces);
+            auto surfaces = c_ref->getSurfaces();
             for (int i = 0; i < surfaces.size(); i++) {
                 Surface *s = surfaces[i];
                 c_created->add(s);
@@ -115,8 +113,7 @@ internalExecute()
         for (auto s2s : m_s2s) {
             Surface *s_ref = s2s.first;
             Surface *s_created = s2s.second;
-            std::vector<Volume *> volumes;
-            s_ref->get(volumes);
+            auto volumes = s_ref->getVolumes();
             for (int i = 0; i < volumes.size(); i++) {
                 Volume *vol = volumes[i];
                 s_created->add(vol);

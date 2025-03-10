@@ -62,7 +62,7 @@ private:
 	Curve* getCurveContains(std::vector<GeomEntity*>& entities, Vertex* vtx);
 
 	/// recherche du sommet opposé sur une courbe
-	Vertex* getOppositeVtx(GeomEntity* crv, Vertex* vtx);
+	Vertex* getOppositeVtx(Curve* crv, Vertex* vtx);
 
 	/// recherche d'une courbe à partir d'un sommet en excluant une première courbe
 	Curve* getCurve(Vertex* vtx, Curve* crvExclude);

@@ -19,6 +19,7 @@
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
+#include "Geom/IncidentGeomEntitiesVisitor.h"
 #include "Topo/Block.h"
 #include "Topo/CoFace.h"
 #include "Topo/Face.h"
@@ -238,32 +239,15 @@ std::string EntitiesHelper::entitiesNames (
 /*----------------------------------------------------------------------------*/
 bool EntitiesHelper::hasTopoRef(std::vector<Geom::GeomEntity*>& entities)
 {
-    for (uint i=0; i<entities.size(); i++){
+    for (uint i=0; i<entities.size(); i++){	
         if (!entities[i]->getRefTopo().empty())
             return true;
 
-        // recherche sur les entités de niveau inférieurs
-        if (entities[i]->getDim()>0){
-        	std::vector<Geom::Vertex*> sub_entities;
-        	entities[i]->get(sub_entities);
-        	for (uint j=0; j<sub_entities.size(); j++)
-        		if (!sub_entities[j]->getRefTopo().empty())
-        			return true;
-        }
-        if (entities[i]->getDim()>1){
-        	std::vector<Geom::Curve*> sub_entities;
-        	entities[i]->get(sub_entities);
-        	for (uint j=0; j<sub_entities.size(); j++)
-        		if (!sub_entities[j]->getRefTopo().empty())
-        			return true;
-        }
-        if (entities[i]->getDim()>2){
-        	std::vector<Geom::Surface*> sub_entities;
-        	entities[i]->get(sub_entities);
-        	for (uint j=0; j<sub_entities.size(); j++)
-        		if (!sub_entities[j]->getRefTopo().empty())
-        			return true;
-        }
+		Geom::GetDownIncidentGeomEntitiesVisitor v;
+		entities[i]->accept(v);
+		for (auto sub_entity : v.get())
+			if (!sub_entity->getRefTopo().empty())
+				return true;
 
     } // end for i<entities.size()
 
@@ -416,7 +400,8 @@ void EntitiesHelper::getAssociatedCurves(Topo::Vertex* vtx, std::vector<Geom::Cu
 	Geom::GeomEntity* ge = vtx->getGeomAssociation();
 	if (ge){
 		if (ge->getDim()==0){
-			ge->get(curves);
+			Geom::Vertex* vertex = dynamic_cast<Geom::Vertex*>(ge);
+			curves = vertex->getCurves();
 		}
 		else if (ge->getDim()==1){
 			Geom::Curve* curve = dynamic_cast<Geom::Curve*>(ge);
@@ -429,8 +414,15 @@ void EntitiesHelper::getAssociatedSurfaces(Topo::Vertex* vtx, std::vector<Geom::
 {
 	Geom::GeomEntity* ge = vtx->getGeomAssociation();
 	if (ge){
-		if (ge->getDim()==0 || ge->getDim()==1){
-			ge->get(surfaces);
+		if (ge->getDim()==0){
+			Geom::Vertex* vertex = dynamic_cast<Geom::Vertex*>(ge);
+			for(auto curve: vertex->getCurves())
+				for (auto surf : curve->getSurfaces())
+					surfaces.push_back(surf);
+		}
+		else if (ge->getDim()==1){
+			Geom::Curve* curve = dynamic_cast<Geom::Curve*>(ge);
+			surfaces = curve->getSurfaces();
 		}
 		else if (ge->getDim()==2){
 			Geom::Surface* surf = dynamic_cast<Geom::Surface*>(ge);
@@ -444,7 +436,9 @@ void EntitiesHelper::getAssociatedSurfaces(Topo::CoEdge* coedge, std::vector<Geo
 	Geom::GeomEntity* ge = coedge->getGeomAssociation();
 	if (ge){
 		if (ge->getDim()==1){
-			ge->get(surfaces);
+			Geom::Curve* curve = dynamic_cast<Geom::Curve*>(ge);
+			for (auto surface : curve->getSurfaces())
+				surfaces.push_back(surface);
 		}
 		else if (ge->getDim()==2){
 			Geom::Surface* surface = dynamic_cast<Geom::Surface*>(ge);
@@ -519,8 +513,7 @@ Geom::Surface* EntitiesHelper::getCommonSurface(Topo::CoFace* coface)
 			nb_ok=0;
 			for (std::map<Geom::Surface*, uint>::iterator iter2 = filtre_surfaces.begin();
 					iter2!=filtre_surfaces.end(); ++iter2){
-				std::vector<Geom::Curve*> curves;
-				(*iter2).first->get(curves);
+				auto curves = (*iter2).first->getCurves();
 				if ((*iter2).second == coedges.size() && curves.size() == nb_crv){
 					nb_ok+=1;
 					surface = (*iter2).first;

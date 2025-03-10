@@ -15,6 +15,7 @@
 #include "Geom/Volume.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/OCCHelper.h"
+#include "Geom/GeomSplitImplementation.h"
 
 #include "Group/GroupManager.h"
 #include "Group/Group3D.h"
@@ -223,13 +224,14 @@ void GeomImport::add(TopoDS_Shape& AShape, const std::string& AName)
     std::vector<Surface*> surfs;
     std::vector<Curve*  > curvs;
     std::vector<Vertex* > verts;
+    GeomSplitImplementation gsi(m_context);
 
     switch(AShape.ShapeType()){
     case TopAbs_SOLID:
     {
         Volume* vol=EntityFactory(m_context).newOCCVolume(TopoDS::Solid(AShape));
     	addToGroup(vol, AName);
-        vol->split(surfs,curvs,verts);
+        gsi.split(vol, surfs, curvs, verts);
         store(vol);
         for(unsigned int i=0;i<surfs.size();i++){
         	store(surfs[i]);
@@ -249,7 +251,7 @@ void GeomImport::add(TopoDS_Shape& AShape, const std::string& AName)
     {
         Surface* surf=EntityFactory(m_context).newOCCSurface(TopoDS::Face(AShape));
         addToGroup(surf, AName);
-        surf->split(curvs,verts);
+        gsi.split(surf, curvs, verts);
         store(surf);
         for(unsigned int i=0;i<curvs.size();i++){
         	store(curvs[i]);
@@ -287,7 +289,7 @@ void GeomImport::add(TopoDS_Shape& AShape, const std::string& AName)
     {
         Curve* curve=EntityFactory(m_context).newOCCCurve(TopoDS::Edge(AShape));
         addToGroup(curve, AName);
-        curve->split(verts);
+        gsi.split(curve, verts);
         store(curve);
         for(unsigned int i=0;i<verts.size();i++)
         	store(verts[i]);
@@ -310,7 +312,7 @@ void GeomImport::add(TopoDS_Shape& AShape, const std::string& AName)
     {
         Volume* vol=EntityFactory(m_context).newOCCVolume(TopoDS::Shell(AShape));
     	addToGroup(vol, AName);
-        vol->split(surfs,curvs,verts);
+        gsi.split(vol, surfs, curvs, verts);
         store(vol);
         for(unsigned int i=0;i<surfs.size();i++){
         	store(surfs[i]);

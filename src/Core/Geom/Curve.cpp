@@ -42,7 +42,6 @@
 #include <BRepAdaptor_Curve.hxx>
 #include <Geom2d_Curve.hxx>
 #include <BRep_Builder.hxx>
-#include <TopExp_Explorer.hxx>
 #include <BRepBuilderAPI_Transform.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <Geom2dAPI_ProjectPointOnCurve.hxx>
@@ -149,40 +148,6 @@ void Curve::createSpecificMemento(MementoGeomEntity& mem)
 	mem.setOCCShapes(shapes);
 }
 /*----------------------------------------------------------------------------*/
-void Curve::getRefEntities(std::vector<GeomEntity*>& entities)
-{
-    entities.clear();
-    entities.insert(entities.end(),m_surfaces.begin(),m_surfaces.end());
-    entities.insert(entities.end(),m_vertices.begin(),m_vertices.end());
-}
-/*----------------------------------------------------------------------------*/
-void Curve::clearRefEntities(std::list<GeomEntity*>& vertices,
-        std::list<GeomEntity*>& curves,
-        std::list<GeomEntity*>& surfaces,
-        std::list<GeomEntity*>& volumes)
-{
-    std::vector<Surface*> toRemoveS;
-    std::vector<Vertex*> toRemoveV;
-    for(unsigned int i=0;i<m_surfaces.size();i++){
-        GeomEntity *e = m_surfaces[i];
-        std::list<GeomEntity*>::iterator res = std::find(surfaces.begin(),surfaces.end(),e);
-        if(res!=surfaces.end())
-            toRemoveS.push_back(dynamic_cast<Surface*>(e));
-    }
-
-    for(unsigned int i=0;i<m_vertices.size();i++){
-        GeomEntity *e = m_vertices[i];
-        std::list<GeomEntity*>::iterator res = std::find(vertices.begin(),vertices.end(),e);
-        if(res!=vertices.end())
-            toRemoveV.push_back(dynamic_cast<Vertex*>(e));
-    }
-
-    for(unsigned int i=0;i<toRemoveS.size();i++)
-        remove(toRemoveS[i]);
-    for(unsigned int i=0;i<toRemoveV.size();i++)
-        remove(toRemoveV[i]);
-}
-/*----------------------------------------------------------------------------*/
 bool Curve::isEqual(Geom::Curve* curve)
 {
 	if (m_occ_edges.size() != curve->m_occ_edges.size())
@@ -198,53 +163,6 @@ bool Curve::isEqual(Geom::Curve* curve)
 	}
 
     return true;
-}
-/*----------------------------------------------------------------------------*/
-void Curve::get(std::vector<Vertex*>& vertices) const
-{
-    vertices.clear();
-    vertices.insert(vertices.end(),m_vertices.begin(),m_vertices.end());
-}
-/*----------------------------------------------------------------------------*/
-void Curve::get(std::vector<Curve*>& curves) const
-{
-    std::list<Curve*> l;
-    curves.clear();
-    std::vector<Vertex*>::const_iterator it;
-    for(it = m_vertices.begin();it!=m_vertices.end();it++){
-        Vertex* v = *it;
-        std::vector<Curve*> local_curves;
-        v->get(local_curves);
-        l.insert(l.end(),local_curves.begin(),local_curves.end());
-    }
-
-    l.sort(Utils::Entity::compareEntity);
-    l.unique();
-    l.remove(const_cast<Curve*>(this));
-    curves.insert(curves.end(),l.begin(),l.end());
-}
-/*----------------------------------------------------------------------------*/
-void Curve::get(std::vector<Surface*>& surfaces) const
-{
-    surfaces.clear();
-    surfaces.insert(surfaces.end(),m_surfaces.begin(),m_surfaces.end());
-}
-/*----------------------------------------------------------------------------*/
-void Curve::get(std::vector<Volume*>& volumes) const
-{
-    std::list<Volume*> l;
-    volumes.clear();
-    std::vector<Surface*>::const_iterator it;
-    for(it = m_surfaces.begin();it!=m_surfaces.end();it++){
-        Surface* s = *it;
-        std::vector<Volume*> local_volumes;
-        s->get(local_volumes);
-        l.insert(l.end(),local_volumes.begin(),local_volumes.end());
-    }
-    l.sort(Utils::Entity::compareEntity);
-    l.unique();
-
-    volumes.insert(volumes.end(),l.begin(),l.end());
 }
 /*----------------------------------------------------------------------------*/
 void Curve::get(std::vector<Topo::CoEdge*>& coedges)
@@ -463,15 +381,13 @@ void Curve::getParameter(const Utils::Math::Point& Pt, double& p) const
 
 		// en général on cherche les points aux extrémités... mais ils ne sont pas toujours renseignés
 		// c'est le cas d'une arête projetée sur une surface composite
-		std::vector<Vertex*> vertices;
-		get(vertices);
 //		if (vertices.size() != 2 && vertices.size() != 1)
 //			throw TkUtil::Exception("Erreur interne, Courbe composite avec autre chose que 1 ou 2 sommets");
-		if (vertices.size() >= 1 && vertices[0]->getPoint() == Pt){
+		if (m_vertices.size() >= 1 && m_vertices[0]->getPoint() == Pt){
 			p=0.0;
 			return;
 		}
-		else if (vertices.size() == 2 && vertices[1]->getPoint() == Pt){
+		else if (m_vertices.size() == 2 && m_vertices[1]->getPoint() == Pt){
 			p=1.0;
 			return;
 		}
@@ -954,102 +870,6 @@ void Curve::remove(Vertex* v)
 
     if(it!=m_vertices.end())
         m_vertices.erase(it);
-}
-/*----------------------------------------------------------------------------*/
-void Curve::split(std::vector<Vertex* >&  vert)
-{
-	// identification des sommets aux extrémités (ceux vus qu'une unique fois)
-	if (m_occ_edges.size() == 1) {
-		/* on va explorer la courbe OCC stockée en attribut et créer les entités de
-		* dimension directement inférieure, c'est-à-dire les sommets
-		*/
-		Vertex* v = 0;
-		TopExp_Explorer e;
-		for(e.Init(m_occ_edges[0], TopAbs_VERTEX); e.More(); e.Next())
-		{
-
-			TopoDS_Vertex V = TopoDS::Vertex(e.Current());
-			// on évite de mettre 2 fois le même sommet [EB]
-			bool are_same = false;
-			if (v){
-				// 1 seule représentation pour le vertex
-				TopoDS_Vertex Vprec = TopoDS::Vertex(v->getOCCVertex());
-				if (Vprec.IsSame(V))
-					are_same = true;
-			}
-
-			if (!are_same){
-				// création du nouveau sommet
-				v = EntityFactory(getContext()).newOCCVertex(V);
-
-				// on crée le lien C->V
-				this->add(v);
-				// on crée le lien V->C
-				v->add(this);
-			}
-		}
-
-		// on renseigne la fonction appelante
-		this->get(vert);
-	} else {
-		//std::cout<<"Curve::split avec m_occ_edges.size() = "<<m_occ_edges.size()<<std::endl;
-
-		std::vector<TopoDS_Vertex> vtx;
-		for (uint i=0; i<m_occ_edges.size(); i++){
-			TopExp_Explorer e;
-			for(e.Init(m_occ_edges[i], TopAbs_VERTEX); e.More(); e.Next()){
-				TopoDS_Vertex V = TopoDS::Vertex(e.Current());
-				vtx.push_back(V);
-			}
-		}
-		//std::cout<<"vtx.size() = "<<vtx.size()<<std::endl;
-
-		TopoDS_Vertex Vdep;
-		TopoDS_Vertex Vfin;
-
-		for (uint i=0; i<vtx.size()-1; i++){
-			TopoDS_Vertex V1 = vtx[i];
-			for (uint j=i+1; j<vtx.size(); j++){
-				TopoDS_Vertex V2 = vtx[j];
-				if ((!V1.IsNull()) && (!V2.IsNull()) && OCCHelper::areEquals(V1,V2)){
-					 vtx[i].Nullify();
-					 vtx[j].Nullify();
-				}
-			}
-		} // end for i<vtx.size()
-
-		for (uint i=0; i<vtx.size(); i++){
-			TopoDS_Vertex V1 = vtx[i];
-			if (!V1.IsNull()){
-				if (Vdep.IsNull())
-					Vdep = V1;
-				else if (Vfin.IsNull())
-					Vfin = V1;
-				else {
-					TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-					messErr << "La courbe "<<getName()<<" est composée de plusieurs parties et on trouve plus de 2 sommets comme extrémité";
-					throw TkUtil::Exception(messErr);
-				}
-
-			}
-		}
-
-		if (!Vdep.IsNull()){
-			// création du nouveau sommet
-			Vertex* v = EntityFactory(getContext()).newOCCVertex(Vdep);
-			// on crée le lien C->V
-			add(v);
-			// on crée le lien V->C
-			v->add(this);
-		}
-
-		if (!Vfin.IsNull()){
-			Vertex* v = EntityFactory(getContext()).newOCCVertex(Vfin);
-			add(v);
-			v->add(this);
-		}
-
-	} // end else / if (m_occ_edges.size() == 1)
 }
 /*----------------------------------------------------------------------------*/
 double Curve::computeArea() const

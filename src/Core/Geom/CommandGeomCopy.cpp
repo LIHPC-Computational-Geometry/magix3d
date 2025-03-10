@@ -11,6 +11,7 @@
 #include "Geom/GeomFuseImplementation.h"
 #include "Geom/Curve.h"
 #include "Geom/EntityFactory.h"
+#include "Geom/IncidentGeomEntitiesVisitor.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/ReferencedMutex.h>
@@ -147,44 +148,21 @@ void CommandGeomCopy::internalSpecificPreExecute()
     /* On doit faire attention de copier aussi les entités de dimension
      * inférieure. Et cela une seule fois!!
      */
+    GetDownIncidentGeomEntitiesVisitor v;
     m_ref_entities.resize(4);
     for(unsigned int i=0;i<m_entities.size();i++){
           GeomEntity* e = m_entities[i];
           m_ref_entities[e->getDim()].push_back(e);
-          if(e->getDim()>0){
-                 std::vector<Vertex*> vertices;
-                 e->get(vertices);
-                 for(unsigned int i=0;i<vertices.size();i++)
-                 {
-                     GeomEntity *v = vertices[i];
-                     m_ref_entities[0].push_back(v);
-                 }
-             }
-             if(e->getDim()>1){
-                 std::vector<Curve*> curves;
-                 e->get(curves);
-                 for(unsigned int i=0;i<curves.size();i++)
-                 {
-                     GeomEntity *c = curves[i];
-                     m_ref_entities[1].push_back(c);
-                 }
-             }
-             if(e->getDim()>2){
-                 std::vector<Surface*> surfs;
-                 e->get(surfs);
-                 for(unsigned int i=0;i<surfs.size();i++)
-                 {
-                     GeomEntity *f = surfs[i];
-                     m_ref_entities[2].push_back(f);
-                 }
-             }
-      }
+          e->accept(v);
+    }
 
-      // conservation des entités de références de manière unique
-      for(int i=0;i<4;i++){
-          m_ref_entities[i].sort(Utils::Entity::compareEntity);
-          m_ref_entities[i].unique();
-      }
+    for (auto ei : v.get())
+        m_ref_entities[ei->getDim()].push_back(ei);
+        
+    for(int i=0;i<4;i++){
+        // TODO A vérifier, peut-être inutile ?
+        m_ref_entities[i].sort(Utils::Entity::compareEntity);
+    }
 }
 /*----------------------------------------------------------------------------*/
 void CommandGeomCopy::internalSpecificExecute()
@@ -216,68 +194,44 @@ void CommandGeomCopy::internalSpecificExecute()
     std::list<GeomEntity*>::iterator it = m_ref_entities[3].begin();
     for(;it!=m_ref_entities[3].end();it++)
     {
-        GeomEntity* ge = *it;
-        std::vector<Surface*> surfaces;
-        std::vector<Curve*> curves;
-        std::vector<Vertex*> vertices;
-        ge->get(surfaces);
-        ge->get(curves);
-        ge->get(vertices);
+        Volume* v = dynamic_cast<Volume*>(*it);
+        auto surfaces = v->getSurfaces();
 
-        GeomEntity* new_ge = m_correspondance[3][ge];
+        Volume* new_v = dynamic_cast<Volume*>(m_correspondance[3][v]);
         for(unsigned int i=0;i<surfaces.size();i++){
-            GeomEntity* new_surf = m_correspondance[2][surfaces[i]];
-            new_ge->add(new_surf);
-            new_surf->add(new_ge);
-        }
-        for(unsigned int i=0;i<curves.size();i++){
-            GeomEntity* new_curv = m_correspondance[1][curves[i]];
-            new_ge->add(new_curv);
-            new_curv->add(new_ge);
-        }
-        for(unsigned int i=0;i<vertices.size();i++){
-            GeomEntity* new_vert= m_correspondance[0][vertices[i]];
-            new_ge->add(new_vert);
-            new_vert->add(new_ge);
+            Surface* new_surf = dynamic_cast<Surface*>(m_correspondance[2][surfaces[i]]);
+            new_v->add(new_surf);
+            new_surf->add(new_v);
         }
     }
+
     //pour les surfaces
     it = m_ref_entities[2].begin();
     for(;it!=m_ref_entities[2].end();it++)
     {
-        GeomEntity* ge = *it;
-        std::vector<Curve*> curves;
-        std::vector<Vertex*> vertices;
-        ge->get(curves);
-        ge->get(vertices);
+        Surface* s = dynamic_cast<Surface*>(*it);
+        auto curves = s->getCurves();
 
-        GeomEntity* new_ge = m_correspondance[2][ge];
-
+        Surface* new_s = dynamic_cast<Surface*>(m_correspondance[2][s]);
         for(unsigned int i=0;i<curves.size();i++){
-            GeomEntity* new_curv = m_correspondance[1][curves[i]];
-            new_ge->add(new_curv);
-            new_curv->add(new_ge);
-        }
-        for(unsigned int i=0;i<vertices.size();i++){
-            GeomEntity* new_vert= m_correspondance[0][vertices[i]];
-            new_ge->add(new_vert);
-            new_vert->add(new_ge);
+            Curve* new_curv = dynamic_cast<Curve*>(m_correspondance[1][curves[i]]);
+            new_s->add(new_curv);
+            new_curv->add(new_s);
         }
     }
+
     //pour les courbes
     it = m_ref_entities[1].begin();
     for(;it!=m_ref_entities[1].end();it++)
     {
-        GeomEntity* ge = *it;
-        std::vector<Vertex*> vertices;
-        ge->get(vertices);
+        Curve* c = dynamic_cast<Curve*>(*it);
+        auto vertices = c->getVertices();
 
-        GeomEntity* new_ge = m_correspondance[1][ge];
-
+        Curve* new_c = dynamic_cast<Curve*>(m_correspondance[1][c]);
         for(unsigned int i=0;i<vertices.size();i++){
-            GeomEntity* new_vert= m_correspondance[0][vertices[i]];
-            new_ge->add(new_vert);
-            new_vert->add(new_ge);
+            Vertex* new_vert = dynamic_cast<Vertex*>(m_correspondance[0][vertices[i]]);
+            new_c->add(new_vert);
+            new_vert->add(new_c);
         }
     }
 

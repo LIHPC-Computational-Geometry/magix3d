@@ -12,6 +12,7 @@
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandJoinEntities.h"
 #include "Geom/GeomManager.h"
+#include "Geom/IncidentGeomEntitiesVisitor.h"
 #include "Geom/EntityFactory.h"
 #include "Group/Group2D.h"
 /*----------------------------------------------------------------------------*/
@@ -119,53 +120,19 @@ addReference(GeomEntity* e)
 void CommandJoinEntities::
 addDownIncidentReference(GeomEntity* e)
 {
-    if(e->getDim()>0)
-    {
-        std::vector<Vertex*> vertices;
-        e->get(vertices);
-        for(unsigned int i=0;i<vertices.size();i++)
-            addReference(vertices[i]);
-    }
-    if(e->getDim()>1)
-    {
-        std::vector<Curve*> curves;
-        e->get(curves);
-        for(unsigned int i=0;i<curves.size();i++)
-            addReference(curves[i]);
-    }
-    if(e->getDim()>2)
-    {
-        std::vector<Surface*> surfs;
-        e->get(surfs);
-        for(unsigned int i=0;i<surfs.size();i++)
-            addReference(surfs[i]);
-    }
+    GetDownIncidentGeomEntitiesVisitor v;
+    e->accept(v);
+    for (auto ei : v.get())
+        addReference(ei);
 }
 /*----------------------------------------------------------------------------*/
 void CommandJoinEntities::
 addUpIncidentReference(GeomEntity* e)
 {
-    if(e->getDim()<1)
-    {
-        std::vector<Curve*> curves;
-        e->get(curves);
-        for(unsigned int i=0;i<curves.size();i++)
-            addReference(curves[i]);
-    }
-    if(e->getDim()<2)
-    {
-        std::vector<Surface*> surfs;
-        e->get(surfs);
-        for(unsigned int i=0;i<surfs.size();i++)
-            addReference(surfs[i]);
-    }
-    if(e->getDim()<3)
-    {
-        std::vector<Volume*> vols;
-        e->get(vols);
-        for(unsigned int i=0;i<vols.size();i++)
-            addReference(vols[i]);
-    }
+    GetUpIncidentGeomEntitiesVisitor v;
+    e->accept(v);
+    for (auto ei : v.get())
+        addReference(ei);
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

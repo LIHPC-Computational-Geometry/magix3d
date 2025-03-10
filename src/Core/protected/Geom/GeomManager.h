@@ -90,7 +90,7 @@ public:
 
     virtual GeomInfo getInfos(const GeomEntity* e);
 
-	/** retourne les coordonnés d'un sommet */
+    /** retourne les coordonnés d'un sommet */
 	virtual Point getCoord(const std::string& name) const;
 
     /*------------------------------------------------------------------------*/

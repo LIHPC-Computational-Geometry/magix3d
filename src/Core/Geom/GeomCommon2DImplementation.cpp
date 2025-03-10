@@ -161,22 +161,21 @@ commonSurfaces(const Surface* surf1, const Surface* surf2)
 	 }
 
     // suppression des volumes incidents
-    std::vector<Volume*> adj;
-    m_entity1->get(adj);
+    auto adj1 = surf1->getVolumes();
 
 #ifdef _DEBUG
-    for (uint j=0; j<adj.size(); j++)
-    	std::cout<<"commonSurfaces: on supprime "<<adj[j]->getName()<<std::endl;
+    for (uint j=0; j<adj1.size(); j++)
+    	std::cout<<"commonSurfaces: on supprime "<<adj1[j]->getName()<<std::endl;
 #endif
-    m_removedEntities.insert(m_removedEntities.end(), adj.begin(), adj.end());
+    m_removedEntities.insert(m_removedEntities.end(), adj1.begin(), adj1.end());
 
-    m_entity2->get(adj);
+    auto adj2 = surf2->getVolumes();
 
 #ifdef _DEBUG
-    for (uint j=0; j<adj.size(); j++)
-    	std::cout<<"commonSurfaces: on supprime "<<adj[j]->getName()<<std::endl;
+    for (uint j=0; j<adj2.size(); j++)
+    	std::cout<<"commonSurfaces: on supprime "<<adj2[j]->getName()<<std::endl;
 #endif
-    m_removedEntities.insert(m_removedEntities.end(), adj.begin(), adj.end());
+    m_removedEntities.insert(m_removedEntities.end(), adj2.begin(), adj2.end());
 }
 /*----------------------------------------------------------------------------*/
 void GeomCommon2DImplementation::
@@ -207,22 +206,21 @@ commonCurves(const Curve* curv1, const Curve* curv2)
 	 }
 
     // suppression des surfaces incidentes
-    std::vector<Surface*> adj;
-    m_entity1->get(adj);
+    auto adj1 = curv1->getSurfaces();
 
 #ifdef _DEBUG
-    for (uint j=0; j<adj.size(); j++)
-    	std::cout<<"commonCurves: on supprime "<<adj[j]->getName()<<std::endl;
+    for (uint j=0; j<adj1.size(); j++)
+    	std::cout<<"commonCurves: on supprime "<<adj1[j]->getName()<<std::endl;
 #endif
-    m_removedEntities.insert(m_removedEntities.end(), adj.begin(), adj.end());
+    m_removedEntities.insert(m_removedEntities.end(), adj1.begin(), adj1.end());
 
-    m_entity2->get(adj);
+    auto adj2 = curv2->getSurfaces();
 
 #ifdef _DEBUG
-    for (uint j=0; j<adj.size(); j++)
-    	std::cout<<"commonCurves: on supprime "<<adj[j]->getName()<<std::endl;
+    for (uint j=0; j<adj2.size(); j++)
+    	std::cout<<"commonCurves: on supprime "<<adj2[j]->getName()<<std::endl;
 #endif
-    m_removedEntities.insert(m_removedEntities.end(), adj.begin(), adj.end());
+    m_removedEntities.insert(m_removedEntities.end(), adj2.begin(), adj2.end());
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

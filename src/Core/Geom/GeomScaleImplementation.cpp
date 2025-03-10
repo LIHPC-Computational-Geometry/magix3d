@@ -171,10 +171,8 @@ void GeomScaleImplementation::perform(std::vector<GeomEntity*>& res)
     // traitement spécifique pour les courbes composites
 	for(std::list<GeomEntity*>::iterator it = m_ref_entities[1].begin();
 			it!=m_ref_entities[1].end();it++){
-		GeomEntity* entity = *it;
-		std::vector<Vertex*> vertices;
-		entity->get(vertices);
-		Curve* crv = dynamic_cast<Curve*>(entity);
+		Curve* crv = dynamic_cast<Curve*>(*it);
+		auto vertices = crv->getVertices();
 		if (crv && vertices.size())
 			crv->computeParams(vertices[0]->getPoint());
 	}

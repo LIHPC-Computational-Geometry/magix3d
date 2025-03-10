@@ -193,8 +193,7 @@ bool GeomSectionByPlaneImplementation::isOnPlane(GeomEntity* e)
         onPlane = false;
     else if (e->getDim() == 2)
     { //SURFACE
-        std::vector<Curve*> curves;
-        e->get(curves);
+        std::vector<Curve*> curves = dynamic_cast<Surface*>(e)->getCurves();
         for (unsigned int i = 0; i < curves.size() && onPlane; i++)
         {
             if (!isOnPlane(curves[i]))
@@ -224,8 +223,7 @@ bool GeomSectionByPlaneImplementation::isOnPlane(Curve* c)
 {
 
     bool onPlane = true;
-    std::vector<Vertex*> vertices;
-    c->get(vertices);
+    auto vertices = c->getVertices();
     for (unsigned int i = 0; i < vertices.size(); i++)
     {
         Vertex* vi = vertices[i];

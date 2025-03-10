@@ -530,8 +530,7 @@ Geom::Curve* ImportMDL2Commandes::getCurve(const std::string name)
 #ifdef _DEBUG
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     message << "getCurve("<<name<< ") retourne la Curve "<<crv->getName();
-    std::vector<Geom::Vertex*> vertices;
-    crv->get(vertices);
+    auto vertices = crv->getVertices();
     message<<", composée des sommets:";
     for (uint i=0; i<vertices.size(); i++)
         message<<" "<<vertices[i]->getName();
