@@ -93,12 +93,6 @@ public:
     virtual ~Surface();
 
     /*------------------------------------------------------------------------*/
-    /** \brief  Décompose l'entité en ses sous-entités.
-     */
-    virtual void split(std::vector<Curve* >& curv,
-                       std::vector<Vertex* >&  vert);
-
-    /*------------------------------------------------------------------------*/
     /** \brief  Calcul de la boite englobante orientée selon les axes Ox,Oy,Oz
      *
      *  \param pmin Les coordonnées min de la boite englobante

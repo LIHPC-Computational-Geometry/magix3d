@@ -108,6 +108,7 @@ class EntityFactory
     friend class Surface;
     friend class Volume;
     friend class CommandNewSurfaceByOffset;
+    friend class GeomSplitImplementation;
 
 public:
     /*------------------------------------------------------------------------*/
