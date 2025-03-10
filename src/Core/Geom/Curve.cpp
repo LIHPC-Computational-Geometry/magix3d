@@ -42,7 +42,6 @@
 #include <BRepAdaptor_Curve.hxx>
 #include <Geom2d_Curve.hxx>
 #include <BRep_Builder.hxx>
-#include <TopExp_Explorer.hxx>
 #include <BRepBuilderAPI_Transform.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <Geom2dAPI_ProjectPointOnCurve.hxx>
@@ -871,102 +870,6 @@ void Curve::remove(Vertex* v)
 
     if(it!=m_vertices.end())
         m_vertices.erase(it);
-}
-/*----------------------------------------------------------------------------*/
-void Curve::split(std::vector<Vertex* >&  vert)
-{
-	// identification des sommets aux extrémités (ceux vus qu'une unique fois)
-	if (m_occ_edges.size() == 1) {
-		/* on va explorer la courbe OCC stockée en attribut et créer les entités de
-		* dimension directement inférieure, c'est-à-dire les sommets
-		*/
-		Vertex* v = 0;
-		TopExp_Explorer e;
-		for(e.Init(m_occ_edges[0], TopAbs_VERTEX); e.More(); e.Next())
-		{
-
-			TopoDS_Vertex V = TopoDS::Vertex(e.Current());
-			// on évite de mettre 2 fois le même sommet [EB]
-			bool are_same = false;
-			if (v){
-				// 1 seule représentation pour le vertex
-				TopoDS_Vertex Vprec = TopoDS::Vertex(v->getOCCVertex());
-				if (Vprec.IsSame(V))
-					are_same = true;
-			}
-
-			if (!are_same){
-				// création du nouveau sommet
-				v = EntityFactory(getContext()).newOCCVertex(V);
-
-				// on crée le lien C->V
-				this->add(v);
-				// on crée le lien V->C
-				v->add(this);
-			}
-		}
-
-		// on renseigne la fonction appelante
-		vert = m_vertices;
-	} else {
-		//std::cout<<"Curve::split avec m_occ_edges.size() = "<<m_occ_edges.size()<<std::endl;
-
-		std::vector<TopoDS_Vertex> vtx;
-		for (uint i=0; i<m_occ_edges.size(); i++){
-			TopExp_Explorer e;
-			for(e.Init(m_occ_edges[i], TopAbs_VERTEX); e.More(); e.Next()){
-				TopoDS_Vertex V = TopoDS::Vertex(e.Current());
-				vtx.push_back(V);
-			}
-		}
-		//std::cout<<"vtx.size() = "<<vtx.size()<<std::endl;
-
-		TopoDS_Vertex Vdep;
-		TopoDS_Vertex Vfin;
-
-		for (uint i=0; i<vtx.size()-1; i++){
-			TopoDS_Vertex V1 = vtx[i];
-			for (uint j=i+1; j<vtx.size(); j++){
-				TopoDS_Vertex V2 = vtx[j];
-				if ((!V1.IsNull()) && (!V2.IsNull()) && OCCHelper::areEquals(V1,V2)){
-					 vtx[i].Nullify();
-					 vtx[j].Nullify();
-				}
-			}
-		} // end for i<vtx.size()
-
-		for (uint i=0; i<vtx.size(); i++){
-			TopoDS_Vertex V1 = vtx[i];
-			if (!V1.IsNull()){
-				if (Vdep.IsNull())
-					Vdep = V1;
-				else if (Vfin.IsNull())
-					Vfin = V1;
-				else {
-					TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-					messErr << "La courbe "<<getName()<<" est composée de plusieurs parties et on trouve plus de 2 sommets comme extrémité";
-					throw TkUtil::Exception(messErr);
-				}
-
-			}
-		}
-
-		if (!Vdep.IsNull()){
-			// création du nouveau sommet
-			Vertex* v = EntityFactory(getContext()).newOCCVertex(Vdep);
-			// on crée le lien C->V
-			add(v);
-			// on crée le lien V->C
-			v->add(this);
-		}
-
-		if (!Vfin.IsNull()){
-			Vertex* v = EntityFactory(getContext()).newOCCVertex(Vfin);
-			add(v);
-			v->add(this);
-		}
-
-	} // end else / if (m_occ_edges.size() == 1)
 }
 /*----------------------------------------------------------------------------*/
 double Curve::computeArea() const

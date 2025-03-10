@@ -17,6 +17,7 @@
 #include "Geom/GeomProperty.h"
 /*----------------------------------------------------------------------------*/
 #include "Utils/Point.h"
+#include "Utils/Vector.h"
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Edge.hxx>
 /*----------------------------------------------------------------------------*/
@@ -90,11 +91,6 @@ public:
     virtual ~Curve();
 
     virtual bool isEqual(Geom::Curve* curve);
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Décompose l'entité en ses sous-entités.
-     */
-    virtual void split(std::vector<Vertex* >&  vert);
 
     /*------------------------------------------------------------------------*/
     /** \brief  retourne la dimension de l'entité géométrique

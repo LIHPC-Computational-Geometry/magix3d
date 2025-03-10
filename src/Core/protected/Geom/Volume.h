@@ -93,16 +93,6 @@ public:
      */
     virtual bool contains(Volume* vol) const;
 
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Décompose l'entité en ses sous-entités.
-     */
-#ifndef SWIG
-    virtual void split(std::vector<Surface*>& surf,
-                       std::vector<Curve*  >& curv,
-                       std::vector<Vertex* >&  vert);
-#endif
-
     /*------------------------------------------------------------------------*/
     /** \brief  retourne la dimension de l'entité géométrique
      */
