@@ -93,17 +93,15 @@ QtDimensionsSelectorPanel::QtDimensionsSelectorPanel (
 }	// QtDimensionsSelectorPanel::QtDimensionsSelectorPanel
 
 
-QtDimensionsSelectorPanel::QtDimensionsSelectorPanel (
-											const QtDimensionsSelectorPanel&)
+QtDimensionsSelectorPanel::QtDimensionsSelectorPanel (const QtDimensionsSelectorPanel&)
 	: QWidget (0), _buttonGroup (0),
-	  _d0CheckBox (0), _d1CheckBox (0), _d2CheckBox (0), _d3CheckBox (0)
+	  _d0CheckBox (0), _d1CheckBox (0), _d2CheckBox (0), _d3CheckBox (0), _allowedDimensions (SelectionManagerIfc::NO_DIM)
 {
 	MGX_FORBIDDEN ("QtDimensionsSelectorPanel copy constructor is not allowed.");
 }	// QtDimensionsSelectorPanel::QtDimensionsSelectorPanel (const QtDimensionsSelectorPanel&)
 
 
-QtDimensionsSelectorPanel& QtDimensionsSelectorPanel::operator = (
-											const QtDimensionsSelectorPanel&)
+QtDimensionsSelectorPanel& QtDimensionsSelectorPanel::operator = (const QtDimensionsSelectorPanel&)
 {
 	MGX_FORBIDDEN ("QtDimensionsSelectorPanel assignment operator is not allowed.");
 	return *this;
