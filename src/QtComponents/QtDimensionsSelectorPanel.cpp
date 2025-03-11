@@ -39,7 +39,7 @@ QtDimensionsSelectorPanel::QtDimensionsSelectorPanel (
 	QWidget* parent, SelectionManagerIfc::DIM allowedDimensions,
 	SelectionManagerIfc::DIM defaultDimensions, bool allowMultipleDimensions)
 	: QWidget (parent), _buttonGroup (0),
-	  _d0CheckBox (0), _d1CheckBox (0), _d2CheckBox (0), _d3CheckBox (0)
+	  _d0CheckBox (0), _d1CheckBox (0), _d2CheckBox (0), _d3CheckBox (0), _allowedDimensions (allowedDimensions)
 {
 	_buttonGroup	= new QButtonGroup (this);
 	_buttonGroup->setExclusive (!allowMultipleDimensions);
@@ -126,22 +126,18 @@ SelectionManagerIfc::DIM QtDimensionsSelectorPanel::getDimensions ( ) const
 {
 	SelectionManagerIfc::DIM	dimensions	= SelectionManagerIfc::NO_DIM;
 
-	if ((0 != _d0CheckBox) && (Qt::Checked == _d0CheckBox->checkState ( )) &&
-	    (true == _d0CheckBox->isEnabled ( )))
-		dimensions	=
-			(SelectionManagerIfc::DIM)(dimensions | SelectionManagerIfc::D0);
-	if ((0 != _d1CheckBox) && (Qt::Checked == _d1CheckBox->checkState ( )) &&
-	    (true == _d1CheckBox->isEnabled ( )))
-		dimensions	=
-			(SelectionManagerIfc::DIM)(dimensions | SelectionManagerIfc::D1);
-	if ((0 != _d2CheckBox) && (Qt::Checked == _d2CheckBox->checkState ( )) &&
-	    (true == _d2CheckBox->isEnabled ( )))
-		dimensions	=
-			(SelectionManagerIfc::DIM)(dimensions | SelectionManagerIfc::D2);
-	if ((0 != _d3CheckBox) && (Qt::Checked == _d3CheckBox->checkState ( )) &&
-	    (true == _d3CheckBox->isEnabled ( )))
-		dimensions	=
-			(SelectionManagerIfc::DIM)(dimensions | SelectionManagerIfc::D3);
+	// v > 2.4.1 : on ne délègue plus à _d*CheckBox->isEnabled ( ) la réponse à "dimension * sélectionnable" car
+	// si un des parents de la checkbox est désactivé alors la checkbox répondra false.
+	// Or QtMgx3DOperationsPanel::applyCallback désactive le panneau "Opérations" avant de d'exécuter la commande
+	// afin de garantir que la commande exécutée est conforme au contenu du panneau.
+	if ((0 != _d0CheckBox) && (Qt::Checked == _d0CheckBox->checkState ( )) && (true == isDimensionAllowed (SelectionManagerIfc::D0)))
+		dimensions	= (SelectionManagerIfc::DIM)(dimensions | SelectionManagerIfc::D0);
+	if ((0 != _d1CheckBox) && (Qt::Checked == _d1CheckBox->checkState ( )) && (true == isDimensionAllowed (SelectionManagerIfc::D1)))
+		dimensions	= (SelectionManagerIfc::DIM)(dimensions | SelectionManagerIfc::D1);
+	if ((0 != _d2CheckBox) && (Qt::Checked == _d2CheckBox->checkState ( )) && (true == isDimensionAllowed (SelectionManagerIfc::D2)))
+		dimensions	= (SelectionManagerIfc::DIM)(dimensions | SelectionManagerIfc::D2);
+	if ((0 != _d3CheckBox) && (Qt::Checked == _d3CheckBox->checkState ( )) && (true == isDimensionAllowed (SelectionManagerIfc::D3)))
+		dimensions	= (SelectionManagerIfc::DIM)(dimensions | SelectionManagerIfc::D3);
 
 	return dimensions;
 }	// QtDimensionsSelectorPanel::getDimensions
@@ -149,61 +145,54 @@ SelectionManagerIfc::DIM QtDimensionsSelectorPanel::getDimensions ( ) const
 
 void QtDimensionsSelectorPanel::setDimensions (SelectionManagerIfc::DIM dims)
 {
-	QtObjectSignalBlocker	blocker0 (_d0CheckBox), blocker1 (_d1CheckBox),
-							blocker2 (_d2CheckBox), blocker3 (_d3CheckBox);
+	QtObjectSignalBlocker	blocker0 (_d0CheckBox), blocker1 (_d1CheckBox), blocker2 (_d2CheckBox), blocker3 (_d3CheckBox);
 
 	if (0 != _d0CheckBox)
-		_d0CheckBox->setCheckState (
-			0 != (SelectionManagerIfc::D0 & dims) ? Qt::Checked:Qt::Unchecked);
+		_d0CheckBox->setCheckState (0 != (SelectionManagerIfc::D0 & dims) ? Qt::Checked:Qt::Unchecked);
 	if (0 != _d1CheckBox)
-		_d1CheckBox->setCheckState (
-			0 != (SelectionManagerIfc::D1 & dims) ? Qt::Checked:Qt::Unchecked);
+		_d1CheckBox->setCheckState (0 != (SelectionManagerIfc::D1 & dims) ? Qt::Checked:Qt::Unchecked);
 	if (0 != _d2CheckBox)
-		_d2CheckBox->setCheckState (
-			0 != (SelectionManagerIfc::D2 & dims) ? Qt::Checked:Qt::Unchecked);
+		_d2CheckBox->setCheckState (0 != (SelectionManagerIfc::D2 & dims) ? Qt::Checked:Qt::Unchecked);
 	if (0 != _d3CheckBox)
-		_d3CheckBox->setCheckState (
-			0 != (SelectionManagerIfc::D3 & dims) ? Qt::Checked:Qt::Unchecked);
+		_d3CheckBox->setCheckState (0 != (SelectionManagerIfc::D3 & dims) ? Qt::Checked:Qt::Unchecked);
 }	// QtDimensionsSelectorPanel::setDimensions
 
 
-SelectionManagerIfc::DIM
-					QtDimensionsSelectorPanel::getAllowedDimensions ( ) const
+SelectionManagerIfc::DIM QtDimensionsSelectorPanel::getAllowedDimensions ( ) const
 {
 	SelectionManagerIfc::DIM	dimensions	= SelectionManagerIfc::NO_DIM;
 
-	if ((0 != _d0CheckBox) && (true == _d0CheckBox->isEnabled ( )))
-		dimensions	=
-			(SelectionManagerIfc::DIM)(dimensions | SelectionManagerIfc::D0);
-	if ((0 != _d1CheckBox) && (true == _d1CheckBox->isEnabled ( )))
-		dimensions	=
-			(SelectionManagerIfc::DIM)(dimensions | SelectionManagerIfc::D1);
-	if ((0 != _d2CheckBox) && (true == _d2CheckBox->isEnabled ( )))
-		dimensions	=
-			(SelectionManagerIfc::DIM)(dimensions | SelectionManagerIfc::D2);
-	if ((0 != _d3CheckBox) && (true == _d3CheckBox->isEnabled ( )))
-		dimensions	=
-			(SelectionManagerIfc::DIM)(dimensions | SelectionManagerIfc::D3);
+	if ((0 != _d0CheckBox) && (0 != (_allowedDimensions & SelectionManagerIfc::D0)))
+		dimensions	= (SelectionManagerIfc::DIM)(dimensions | SelectionManagerIfc::D0);
+	if ((0 != _d1CheckBox) && (0 != (_allowedDimensions & SelectionManagerIfc::D1)))
+		dimensions	= (SelectionManagerIfc::DIM)(dimensions | SelectionManagerIfc::D1);
+	if ((0 != _d2CheckBox) && (0 != (_allowedDimensions & SelectionManagerIfc::D2)))
+		dimensions	= (SelectionManagerIfc::DIM)(dimensions | SelectionManagerIfc::D2);
+	if ((0 != _d3CheckBox) && (0 != (_allowedDimensions & SelectionManagerIfc::D3)))
+		dimensions	= (SelectionManagerIfc::DIM)(dimensions | SelectionManagerIfc::D3);
 
 	return dimensions;
 }	// QtDimensionsSelectorPanel::getAllowedDimensions
 
 
-void QtDimensionsSelectorPanel::setAllowedDimensions (
-											SelectionManagerIfc::DIM dimensions)
+bool QtDimensionsSelectorPanel::isDimensionAllowed (Mgx3D::Utils::SelectionManagerIfc::DIM dimension) const
 {
+	return 0 == (dimension & _allowedDimensions) ? false : true;
+}	// QtDimensionsSelectorPanel::isDimensionAllowed
+
+
+void QtDimensionsSelectorPanel::setAllowedDimensions (SelectionManagerIfc::DIM dimensions)
+{
+	_allowedDimensions	= dimensions;
+
 	if (0 != _d0CheckBox)
-		_d0CheckBox->setEnabled (
-				0 != (dimensions & SelectionManagerIfc::D0) ? true : false);
+		_d0CheckBox->setEnabled (isDimensionAllowed (SelectionManagerIfc::D0));
 	if (0 != _d1CheckBox)
-		_d1CheckBox->setEnabled (
-				0 != (dimensions & SelectionManagerIfc::D1) ? true : false);
+		_d1CheckBox->setEnabled (isDimensionAllowed (SelectionManagerIfc::D1));
 	if (0 != _d2CheckBox)
-		_d2CheckBox->setEnabled (
-				0 != (dimensions & SelectionManagerIfc::D2) ? true : false);
+		_d2CheckBox->setEnabled (isDimensionAllowed (SelectionManagerIfc::D2));
 	if (0 != _d3CheckBox)
-		_d3CheckBox->setEnabled (
-				0 != (dimensions & SelectionManagerIfc::D3) ? true : false);
+		_d3CheckBox->setEnabled (isDimensionAllowed (SelectionManagerIfc::D3));
 }	// QtDimensionsSelectorPanel::setAllowedDimensions
 
 

@@ -71,16 +71,23 @@ class QtDimensionsSelectorPanel : public QWidget
 	/**
 	 * \return		Les dimensions sélectionnables.
 	 * \see			setAllowedDimensions
+	 * \see			isDimensionAllowed
 	 */
 	virtual Mgx3D::Utils::SelectionManagerIfc::DIM getAllowedDimensions ( ) const;
-
+	
+	/**
+	 * \return		true si la dimension transmise en argument est séleectionnable, false dans le cas contraire.
+	 * \see			setAllowedDimensions
+	 * \see			getAllowedDimensions
+	 */
+	virtual bool isDimensionAllowed (Mgx3D::Utils::SelectionManagerIfc::DIM dimension) const;
+	
 	/**
 	 * Actualise le panneau conformément aux dimensions reçues en argument.
 	 * \param		Nouvelles dimensions sélectionnables.
 	 * \see			getAllowedDimensions
 	 */
-	virtual void setAllowedDimensions (
-							Mgx3D::Utils::SelectionManagerIfc::DIM dimensions);
+	virtual void setAllowedDimensions (Mgx3D::Utils::SelectionManagerIfc::DIM dimensions);
 
 
 	signals :
@@ -109,11 +116,13 @@ class QtDimensionsSelectorPanel : public QWidget
 	QtDimensionsSelectorPanel& operator = (const QtDimensionsSelectorPanel&);
 
 	/** La gestion exclusive ou non de la dimension. */
-	QButtonGroup*					_buttonGroup;
+	QButtonGroup*							_buttonGroup;
 
 	/** Les dimensions possibles. */
-	QCheckBox						*_d0CheckBox, *_d1CheckBox, *_d2CheckBox,
-									*_d3CheckBox;
+	QCheckBox								*_d0CheckBox, *_d1CheckBox, *_d2CheckBox, *_d3CheckBox;
+	
+	/** Les dimensions autorisées. */
+	Mgx3D::Utils::SelectionManagerIfc::DIM	_allowedDimensions;
 };	// class QtDimensionsSelectorPanel
 
 
