@@ -427,26 +427,22 @@ void QtTopologySplitFacesPanel::preview (bool show, bool destroyInteractor)
 					throw Exception (UTF8String ("QtTopologySplitFacesPanel::preview : cas non implémenté.", Charset::UTF_8));
 			}	// switch (getCutDefinitionMethod ( ))
 		}	// else if (true == allFaces ( ))
-		CHECK_NULL_PTR_ERROR (command.get ( ))
-		RenderingManager::CommandPreviewMgr	previewManager (
-							*command.get ( ), getRenderingManager ( ), true);
+		
+		{	// Bloc pour forcer la destruction de previewManager (qui ajoute les acteurs VTK à la scène) avant de faire le forceRender ( ).
+			CHECK_NULL_PTR_ERROR (command.get ( ))
+			RenderingManager::CommandPreviewMgr	previewManager (*command.get ( ), getRenderingManager ( ), true);
 
-		// Ajouter les infos de pré-maillage ?
-		if (0 != edge->getDisplayProperties ( ).getGraphicalRepresentation( ))
-		{
-			const DisplayProperties&	props	=
-				true == getRenderingManager ( ).useGlobalDisplayProperties ( ) ?
-				getRenderingManager ( ).getContext ( ).globalDisplayProperties (
-					edge->getType ( )) : edge->getDisplayProperties ( );
-			const unsigned long		mask	=
-				true == getRenderingManager ( ).useGlobalDisplayProperties ( ) ?
-				getRenderingManager().getContext().globalMask(edge->getType()) :
-				edge->getDisplayProperties ( ).getGraphicalRepresentation (
-													)->getRepresentationMask( );
+			// Ajouter les infos de pré-maillage ?
+			if (0 != edge->getDisplayProperties ( ).getGraphicalRepresentation( ))
+			{
+				const DisplayProperties&	props	= true == getRenderingManager ( ).useGlobalDisplayProperties ( ) ? 
+						getRenderingManager ( ).getContext ( ).globalDisplayProperties (edge->getType ( )) : edge->getDisplayProperties ( );
+				const unsigned long		mask	= true == getRenderingManager ( ).useGlobalDisplayProperties ( ) ?
+					getRenderingManager().getContext().globalMask(edge->getType()) : edge->getDisplayProperties ( ).getGraphicalRepresentation ( )->getRepresentationMask( );
 
-			previewEdges (*command, previewManager, InfoCommand::CREATED,
-			              props, mask);
-		}	// if (0 != edge->getDisplayProperties ( )...
+				previewEdges (*command, previewManager, InfoCommand::CREATED, props, mask);
+			}	// if (0 != edge->getDisplayProperties ( )...
+		}
 
 		getRenderingManager ( ).forceRender ( );
 
