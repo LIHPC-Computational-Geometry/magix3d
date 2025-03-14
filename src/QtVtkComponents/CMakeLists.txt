@@ -27,10 +27,12 @@ target_include_directories (QtVtkComponents PUBLIC $<BUILD_INTERFACE:${CMAKE_CUR
 target_compile_options (QtVtkComponents PRIVATE -DMAGIX3D_VERSION="${MAGIX3D_VERSION}")
 target_link_libraries (QtVtkComponents PUBLIC QtComponents VtkComponents QtVtk::QtVtk)
 if (ExperimentalRoom_FOUND)
-#	target_compile_options (QtVtkComponents PUBLIC -DUSE_EXPERIMENTAL_ROOM)	# Déjà fourni dans QtComponents
 	target_link_libraries (QtVtkComponents PUBLIC ExperimentalRoom::ExperimentalRoom)
-	find_package (ExperimentalRoomTExtension REQUIRED)
-	target_link_libraries (QtVtkComponents PUBLIC ExperimentalRoomTExtension::ExperimentalRoomTExtension)
+	find_package (ExperimentalRoomTExtension)
+	if (ExperimentalRoomTExtension_FOUND)
+		target_compile_definitions (QtVtkComponents PRIVATE USE_EXPERIMENTAL_ROOM_TRAYS)
+		target_link_libraries (QtVtkComponents PUBLIC ExperimentalRoomTExtension::ExperimentalRoomTExtension)
+	endif (ExperimentalRoomTExtension_FOUND)
 endif (ExperimentalRoom_FOUND)
 
 target_compile_options (QtVtkComponents PRIVATE ${SHARED_CFLAGS})	# Requested by Qt ...

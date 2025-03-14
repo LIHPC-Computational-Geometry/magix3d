@@ -164,8 +164,6 @@ void QtVtkMgx3DExperimentalRoomPanel::useSelection (Context& context, bool globa
 				mask  = true == global ? context.globalMask ((*it)->getType ( )) : gr->getRepresentationMask ( );   // Correctif CP 31/07/20 : inefficace en mode global
 				bool useSurfaceMask = (0 != (GraphicalEntityRepresentation::SURFACES & mask) ? true : false);
 				bool useVolumeMask  = (0 != (GraphicalEntityRepresentation::VOLUMES & mask) ? true : false);
-//				std::cout<<"QtVtkMgx3DExperimentalRoomPanel::useSelection pour "<<(*it)->getName()
-//						<<" SURFACES ? "<<useSurfaceMask<<std::endl;
 				// pas de représentation triangulaire
 				if (!useSurfaceMask && !useVolumeMask)
 					nbEntitiesWithoutTriangulation += 1;
@@ -178,12 +176,11 @@ void QtVtkMgx3DExperimentalRoomPanel::useSelection (Context& context, bool globa
 			continue;
 
 		VTKEntityRepresentation*	vtkRepresentation	= dynamic_cast<VTKEntityRepresentation*>(gr);
-		vtkUnstructuredGrid*		grid				=
-			0 == vtkRepresentation ? 0 : vtkRepresentation->getSurfacicGrid ( );
-		if (0 == grid)
+		vtkPolyData*				polydata			= 0 == vtkRepresentation ? 0 : vtkRepresentation->getSurfacicPolyData ( );
+		if (0 == polydata)
 			continue;
 
-		grids.push_back (grid);
+		polydatas.push_back (polydata);
 		names.push_back ((*it)->getName ( ));
 	}	// for(vector<Entity*>::iterator it = entities.begin ( ); ...
 
