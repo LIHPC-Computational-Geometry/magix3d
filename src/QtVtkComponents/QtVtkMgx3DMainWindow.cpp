@@ -51,7 +51,7 @@ using namespace Mgx3D::QtComponents;
 
 #undef LOCK_INSTANCE
 #define LOCK_INSTANCE AutoReferencedMutex autoReferencedMutex (TkUtil::ObjectBase::getMutex ( ));
-const string ERD_INTERNAL_EXTENSION_EXT ("erd");
+
 
 namespace Mgx3D
 {
@@ -581,7 +581,7 @@ void QtVtkMgx3DMainWindow::saveAsRaysCallback ( )
 	}
 	else
 #endif	// USE_EXPERIMENTAL_ROOM_TRAYS
-	if ((file.getExtension ( ) == ERD_INTERNAL_EXTENSION_EXT) || ((true == dialog.selectedNameFilter ( ).startsWith ("Experimental Room Description")) && ((false == file.exists ( )) || (ExperimentalRoomERDIOManager::isERDFile (file.getFullFileName ( ))))))
+	if ((file.getExtension ( ) == ERD_INTERNAL_EXTENSION) || ((true == dialog.selectedNameFilter ( ).startsWith ("Experimental Room Description")) && ((false == file.exists ( )) || (ExperimentalRoomERDIOManager::isERDFile (file.getFullFileName ( ))))))
 	{
 		ioManager	= dynamic_cast<ExperimentalRoomERDIOManager*>(_experimentalRoomPanel->getRaysIOManager ( ));
 		if (0 == ioManager)
@@ -680,12 +680,9 @@ défini (Menu Chambre expérimentale).", Charset::UTF_8));
 	const bool			        eraseAppData= !file.isWritable ( );
 	ExperimentalRoomIOManager*	ioManager	= 0;
 	ExperimentalRoom*			room	    = 0;
-cout << __FILE__ << ' ' << __LINE__ << " QtVtkMgx3DMainWindow::loadRays File=" << file.getFullFileName ( ) << " Ext=" << file.getExtension ( ) << "ERD_EXT=" << ERD_INTERNAL_EXTENSION_EXT << endl;
-if (file.getExtension ( ) == ERD_INTERNAL_EXTENSION_EXT) cout << "IT IS ERD" << endl;
-else cout << "IT IS NOT ERD" << endl;
-	if ((file.getExtension ( ) == ERD_INTERNAL_EXTENSION_EXT) || ((file.getExtension ( ) == "xml") && (ExperimentalRoomERDIOManager::isERDFile (file.getFullFileName ( )))))
+
+	if ((file.getExtension ( ) == ERD_INTERNAL_EXTENSION) || ((file.getExtension ( ) == "xml") && (ExperimentalRoomERDIOManager::isERDFile (file.getFullFileName ( )))))
 	{
-cout << __FILE__ << ' ' << __LINE__ << " QtVtkMgx3DMainWindow::loadRays File=" << file.getFullFileName ( ) << " Ext=" << file.getExtension ( ) << endl;
 		ioManager	= new ExperimentalRoomERDIOManager ( );
 		room	    = new ExperimentalRoom (file.getFileName ( ), ExperimentalRoom::TARGET);
 		ioManager->getReader ( ).loadRoom (file.getFullFileName ( ), *room, ExperimentRay::LASER, ExperimentRay::CARTESIAN_EXP_ROOM);
@@ -814,7 +811,7 @@ void QtVtkMgx3DMainWindow::saveAsDiagsCallback ( )
 	}
 	else
 #endif	// USE_EXPERIMENTAL_ROOM_TRAYS
-		if ((file.getExtension ( ) == ERD_INTERNAL_EXTENSION_EXT) || ((true == dialog.selectedNameFilter ( ).startsWith ("Experimental Room Description")) && ((false == file.exists ( )) || (ExperimentalRoomERDIOManager::isERDFile (file.getFullFileName ( ))))))
+		if ((file.getExtension ( ) == ERD_INTERNAL_EXTENSION) || ((true == dialog.selectedNameFilter ( ).startsWith ("Experimental Room Description")) && ((false == file.exists ( )) || (ExperimentalRoomERDIOManager::isERDFile (file.getFullFileName ( ))))))
 	{
 		ioManager	= dynamic_cast<ExperimentalRoomERDIOManager*>(_experimentalRoomPanel->getDiagsIOManager ( ));
 		if (0 == ioManager)
@@ -884,7 +881,7 @@ défini (Menu Chambre expérimentale).", Charset::UTF_8));
 	// Faudra t'il détruire les données applicatives de la chambre ?
 	const bool	eraseAppData	= !file.isWritable ( );
 
-	if ((file.getExtension ( ) == ERD_INTERNAL_EXTENSION_EXT) || ((file.getExtension ( ) == "xml") && (ExperimentalRoomERDIOManager::isERDFile (file.getFullFileName ( )))))
+	if ((file.getExtension ( ) == ERD_INTERNAL_EXTENSION) || ((file.getExtension ( ) == "xml") && (ExperimentalRoomERDIOManager::isERDFile (file.getFullFileName ( )))))
 	{
 		ExperimentalRoomERDIOManager*	ioManager	= new ExperimentalRoomERDIOManager ( );
 		ExperimentalRoom*	            room	    = new ExperimentalRoom (file.getFileName ( ), ExperimentalRoom::TARGET);
