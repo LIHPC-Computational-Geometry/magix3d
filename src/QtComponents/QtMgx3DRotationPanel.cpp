@@ -226,9 +226,9 @@ Math::Rotation QtMgx3DRotationPanel::getRotation ( ) const
 	}
 	else if (0 != vertices3Panel)
 	{
-		// ordre des points pour vertices3Panel : P1, P2, Centre
+		// ordre des points pour vertices3Panel : center, start, end
 		vertices3Panel->getPoints (p1, p2, p3);
-		rotation	= Rotation (p3, p1, p2);
+		rotation	= Rotation (p1, p2, p3);
 	}
 	else
 	{
