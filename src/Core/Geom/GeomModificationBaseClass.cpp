@@ -89,7 +89,6 @@ void GeomModificationBaseClass::init(Geom::CommandGeomCopy* cmd)
 /*----------------------------------------------------------------------------*/
 void GeomModificationBaseClass::init(std::vector<GeomEntity*>& es)
 {
-
     // pour chacune des entités passées en argument, on ajoute les entités de
     // dimension inférieure et supérieure ou égale en référence.
     for(unsigned int i=0;i<es.size();i++){
@@ -97,6 +96,7 @@ void GeomModificationBaseClass::init(std::vector<GeomEntity*>& es)
         m_init_entities.push_back(esi);
         addReference(esi);
         addDownIncidentReference(esi);
+        addUpIncidentReference(esi);
     }
 
     for(unsigned int i=0;i<es.size();i++){
@@ -113,7 +113,6 @@ void GeomModificationBaseClass::init(std::vector<GeomEntity*>& es)
         m_adj_entities[i].unique();
     }
 
-
 #ifdef _DEBUG2
     std::list<GeomEntity*>::iterator adj3_it =m_adj_entities[3].begin();
     for(;adj3_it!=m_adj_entities[3].end();adj3_it++) {
@@ -125,7 +124,6 @@ void GeomModificationBaseClass::init(std::vector<GeomEntity*>& es)
         std::cout<<"+++ VOL REF = "<<(*adj3_it)->getName()<<std::endl;
     }
 #endif
-
 }
 /*----------------------------------------------------------------------------*/
 void GeomModificationBaseClass::initWithAll()
@@ -173,17 +171,17 @@ addDownIncidentReference(GeomEntity* e)
 }
 /*----------------------------------------------------------------------------*/
 void GeomModificationBaseClass::
+addUpIncidentReference(GeomEntity* e)
+{
+    GetUpIncidentGeomEntitiesVisitor v;
+    e->accept(v);
+    for (auto ei : v.get())
+        addReference(ei);
+}
+/*----------------------------------------------------------------------------*/
+void GeomModificationBaseClass::
 addAdjacencyReference(GeomEntity* e)
 {
-    GetUpIncidentGeomEntitiesVisitor vi;
-    e->accept(vi);
-    for (auto ei : vi.get())
-    {
-        int dim = ei->getDim();
-        if(std::find(m_ref_entities[dim].begin(),m_ref_entities[dim].end(),ei)==m_ref_entities[dim].end())
-            m_adj_entities[dim].push_back(ei);
-    }
-
     GetAdjacentGeomEntitiesVisitor va;
     e->accept(va);
     for (auto ei : va.get())
