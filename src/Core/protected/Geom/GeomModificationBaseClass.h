@@ -157,8 +157,16 @@ protected:
     virtual void addDownIncidentReference(GeomEntity* entity);
 
     /*------------------------------------------------------------------------*/
-    /** \brief  Ajoute les entités filles de entity dans les entités de
+    /** \brief  Ajoute les entités parentes de entity dans les entités de
      *          référence
+     *
+     *  \param entity une entité
+     */
+    virtual void addUpIncidentReference(GeomEntity* entity);
+
+    /*------------------------------------------------------------------------*/
+    /** \brief  Ajoute les entités adjcentes de entity dans les entités 
+     *          adjacentes
      *
      *  \param entity une entité
      */
