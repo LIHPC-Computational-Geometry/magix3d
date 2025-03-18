@@ -63,6 +63,18 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 	virtual ~VTKRenderingManager ( );
 
 	/**
+	 * Le contexte d'utilisation du gestionnaire de rendu.
+	 */
+	//@{
+
+	/*
+	 * \param		Nouveau contexte d'utilisation du gestionnaire de rendu.
+	 */
+	virtual void setContext (Mgx3D::Internal::Context* context);
+
+	//@}	// Le contexte d'utilisation du gestionnaire de rendu.
+
+	/**
 	 * Les entités représentées.
 	 */
 	//@{
