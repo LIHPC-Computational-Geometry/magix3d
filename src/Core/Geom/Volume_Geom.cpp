@@ -84,21 +84,6 @@ GeomEntity* Volume::clone(Internal::Context& c)
 Volume::~Volume()
 {}
 /*----------------------------------------------------------------------------*/
-void Volume::setFromSpecificMemento(MementoGeomEntity& mem)
-{
-    m_surfaces = mem.getSurfaces();
-    m_groups  = mem.getGroups3D();
-    m_occ_shape = mem.getOCCShapes()[0];
-}
-/*----------------------------------------------------------------------------*/
-void Volume::createSpecificMemento(MementoGeomEntity& mem)
-{
-    mem.setSurfaces(m_surfaces);
-    mem.setGroups3D(m_groups);
-    std::vector<TopoDS_Shape> shapes = { m_occ_shape };
-    mem.setOCCShapes(shapes);
-}
-/*----------------------------------------------------------------------------*/
 uint Volume::project(Utils::Math::Point& P) const
 {
     throw TkUtil::Exception (TkUtil::UTF8String ("Volume::project n'est pas disponible", TkUtil::Charset::UTF_8));

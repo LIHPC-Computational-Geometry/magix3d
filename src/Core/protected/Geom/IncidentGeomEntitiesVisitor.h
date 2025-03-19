@@ -13,7 +13,7 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 /*----------------------------------------------------------------------------*/
-class GetDownIncidentGeomEntitiesVisitor : public GeomEntityVisitor
+class GetDownIncidentGeomEntitiesVisitor : public ConstGeomEntityVisitor
 {
 public:   
     virtual void visit(const Vertex*) {}
@@ -74,7 +74,7 @@ private:
     std::set<Vertex*, decltype(&Utils::Entity::compareEntity)> m_down_incident_vertices;
 };
 
-class GetUpIncidentGeomEntitiesVisitor : public GeomEntityVisitor
+class GetUpIncidentGeomEntitiesVisitor : public ConstGeomEntityVisitor
 {
 public:
     virtual void visit(const Vertex* vertex)
@@ -135,7 +135,7 @@ private:
     std::set<Curve*, decltype(&Utils::Entity::compareEntity)> m_up_incident_curves;
 };
 
-class GetAdjacentGeomEntitiesVisitor : public GeomEntityVisitor
+class GetAdjacentGeomEntitiesVisitor : public ConstGeomEntityVisitor
 {
 public:
     virtual void visit(const Vertex* vertex)

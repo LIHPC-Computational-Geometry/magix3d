@@ -10,16 +10,30 @@
 #define MGX3D_MEMENTOGEOMENTITY_H_
 /*----------------------------------------------------------------------------*/
 #include <vector>
+#include <TopoDS_Shape.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
-namespace Topo {
-class TopoEntity;
+namespace Topo
+{
+    class TopoEntity;
+}
+
+namespace Group
+{
+    class Group0D;
+    class Group1D;
+    class Group2D;
+    class Group3D;
 }
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 /*----------------------------------------------------------------------------*/
 class GeomProperty;
+class Volume;
+class Surface;
+class Curve;
+class Vertex;
 /*----------------------------------------------------------------------------*/
 /**
  * \class MementoGeomEntity

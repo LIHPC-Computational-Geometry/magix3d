@@ -429,7 +429,7 @@ void InfoCommand::setDestroyAndUpdateConnectivity
          iter != entitiesToRemove.end(); ++iter)
         (*iter)->setDestroyed(true);
 
-    struct : Geom::GeomEntityVisitor {
+    struct : Geom::ConstGeomEntityVisitor {
         void visit(const Geom::Vertex* v) override {
             auto curves = v->getCurves();
             for (Geom::Curve* c : curves)

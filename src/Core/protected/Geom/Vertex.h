@@ -38,6 +38,7 @@ class GeomProperty;
  */
 class Vertex: public GeomEntity {
 
+    friend class MementoManager;
     static const char* typeNameGeomVertex;
 
 public:
@@ -59,7 +60,8 @@ public:
 
     virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const;
     virtual void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda);
-    virtual void accept(GeomEntityVisitor& v) const { v.visit(this); }
+    virtual void accept(ConstGeomEntityVisitor& v) const { v.visit(this); }
+    virtual void accept(GeomEntityVisitor& v) { v.visit(this); }
 
     /*------------------------------------------------------------------------*/
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
@@ -230,6 +232,9 @@ public:
     /// Retourne la liste des groupes auxquels appartient cette entité
     virtual void getGroups(std::vector<Group::GroupEntity*>& grp) const;
 
+    /// Retourne la liste des groupes auxquels appartient cette entité
+    virtual const std::vector<Group::Group0D*>& getGroups() const {return m_groups;}
+
     /// Affecte une nouvelle liste des groupes auxquels appartient cette entité
     virtual void setGroups(std::vector<Group::GroupEntity*>& grp);
 
@@ -242,22 +247,6 @@ public:
 #ifndef SWIG
     virtual void setDestroyed(bool b);
 #endif
-
-protected:
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  MAJ de l'état interne de l'objet géométrique spécifique au type
-     *          d'entités géométriques (classes filles donc). Cette méthode est
-     *          appelée par setMemento(...)
-     */
-    virtual void setFromSpecificMemento(MementoGeomEntity& mem);
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  récupération de l'état interne de l'objet géométrique
-     *          spécifique au type d'entités géométriques (classes filles
-     *          donc).
-     */
-    virtual void createSpecificMemento(MementoGeomEntity& mem);
 
 private:
     /// accès aux courbes incidentes

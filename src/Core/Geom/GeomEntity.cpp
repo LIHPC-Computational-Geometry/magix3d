@@ -69,34 +69,6 @@ void GeomEntity::getBounds (double bounds[6]) const
 	bounds [5]	= max.getZ ( );
 }
 /*----------------------------------------------------------------------------*/
-void GeomEntity::setFromMemento(MementoGeomEntity& mem)
-{
-    m_topo_entities = mem.getTopoEntities();
-    m_geomProp = mem.getProperty();
-    setFromSpecificMemento(mem);
-
-    m_computedAreaIsUpToDate = false;
-}
-/*----------------------------------------------------------------------------*/
-void GeomEntity::createMemento(MementoGeomEntity& mem)
-{
-    mem.setTopoEntities(m_topo_entities);
-    mem.setProperty(m_geomProp);
-    createSpecificMemento(mem);
-}
-/*----------------------------------------------------------------------------*/
-void GeomEntity::setFromSpecificMemento(MementoGeomEntity& mem)
-{
-	INTERNAL_ERROR(exc, TkUtil::UTF8String ("Méthode non surchargée.", TkUtil::Charset::UTF_8), "GeomEntity::setFromSpecificMemento")
-	throw exc;
-}
-/*----------------------------------------------------------------------------*/
-void GeomEntity::createSpecificMemento(MementoGeomEntity& mem)
-{
-	INTERNAL_ERROR(exc, TkUtil::UTF8String ("Méthode non surchargée.", TkUtil::Charset::UTF_8), "GeomEntity::createSpecificMemento")
-	throw exc;
-}
-/*----------------------------------------------------------------------------*/
 GeomProperty* GeomEntity::setGeomProperty(GeomProperty* prop)
 {
     GeomProperty* old_rep=0;

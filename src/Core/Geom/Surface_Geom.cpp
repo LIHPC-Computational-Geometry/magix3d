@@ -102,27 +102,6 @@ Surface::~Surface()
 	//std::cout<<"Surface::~Surface() pour "<<getName()<<std::endl;
 }
 /*----------------------------------------------------------------------------*/
-void Surface::setFromSpecificMemento(MementoGeomEntity& mem)
-{
-    m_curves = mem.getCurves();
-    m_volumes = mem.getVolumes();
-    m_groups  = mem.getGroups2D();
-	m_occ_faces.clear();
-	for (auto sh : mem.getOCCShapes())
-		m_occ_faces.push_back(TopoDS::Face(sh));
-}
-/*----------------------------------------------------------------------------*/
-void Surface::createSpecificMemento(MementoGeomEntity& mem)
-{
-    mem.setCurves(m_curves);
-    mem.setVolumes(m_volumes);
-    mem.setGroups2D(m_groups);
-	std::vector<TopoDS_Shape> shapes;
-	for (auto f : m_occ_faces)
-		shapes.push_back(f);
-	mem.setOCCShapes(shapes);
-}
-/*----------------------------------------------------------------------------*/
 uint Surface::project(Utils::Math::Point& P) const
 {
 	Utils::Math::Point P2;

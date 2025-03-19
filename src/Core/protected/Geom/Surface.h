@@ -45,6 +45,7 @@ class GeomProperty;
  */
 class Surface: public GeomEntity {
 
+    friend class MementoManager;
     static const char* typeNameGeomSurface;
 
 public:
@@ -79,7 +80,8 @@ public:
 
     virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const;
     virtual void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda);
-    virtual void accept(GeomEntityVisitor& v) const { v.visit(this); }
+    virtual void accept(ConstGeomEntityVisitor& v) const { v.visit(this); }
+    virtual void accept(GeomEntityVisitor& v) { v.visit(this); }
 
     /*------------------------------------------------------------------------*/
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
@@ -292,23 +294,7 @@ public:
 													bool alsoComputed) const;
 #endif
 
-        protected:
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  MAJ de l'état interne de l'objet géométrique spécifique au type
-     *          d'entités géométriques (classes filles donc). Cette méthode est
-     *          appelée par setMemento(...)
-     */
-    virtual void setFromSpecificMemento(MementoGeomEntity& mem);
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  récupération de l'état interne de l'objet géométrique
-     *          spécifique au type d'entités géométriques (classes filles
-     *          donc).
-     */
-    virtual void createSpecificMemento(MementoGeomEntity& mem);
-
-protected:
+private:
     std::vector<Curve*> m_curves;
     std::vector<Volume*> m_volumes;
     /// représentation open cascade
