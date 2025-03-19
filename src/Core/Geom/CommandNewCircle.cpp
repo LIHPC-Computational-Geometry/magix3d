@@ -44,9 +44,9 @@ internalExecute()
             << *m_p2<< ", p3 "<<*m_p3<<".";
 
     // sauvegarde des relations (connections topologiques) avant modification
-    saveMemento(m_p1);
-    saveMemento(m_p2);
-    saveMemento(m_p3);
+    m_memento_manager.saveMemento(m_p1);
+    m_memento_manager.saveMemento(m_p2);
+    m_memento_manager.saveMemento(m_p3);
 
     Curve* c = EntityFactory(getContext()).newCircle(m_p1,m_p2,m_p3);
     m_createdEntities.push_back(c);

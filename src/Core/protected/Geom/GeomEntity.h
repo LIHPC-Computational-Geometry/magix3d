@@ -67,6 +67,8 @@ class MementoGeomEntity;
  */
 class GeomEntity : public Internal::InternalEntity{
 
+    friend class MementoManager;
+
 protected:
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur. Une entité délègue un certain nombre de calculs
@@ -81,7 +83,8 @@ protected:
 public:
     virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const = 0;
     virtual void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda) = 0;
-    virtual void accept(GeomEntityVisitor& visitor) const = 0 ;
+    virtual void accept(ConstGeomEntityVisitor& visitor) const = 0 ;
+    virtual void accept(GeomEntityVisitor& visitor) = 0 ;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
@@ -111,41 +114,6 @@ public:
      */
 #ifndef SWIG
     GeomProperty* setGeomProperty(GeomProperty* prop);
-#endif
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  MAJ de l'état interne de l'objet géométrique en fonction des
-     *          informations stockées dans le mémento mem.
-     */
-#ifndef SWIG
-    void setFromMemento(MementoGeomEntity& mem);
-#endif
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  récupération de l'état interne de l'objet géométrique sous la
-     *          forme du mémento mem passé en argument
-     */
-#ifndef SWIG
-    void createMemento(MementoGeomEntity& mem);
-#endif
-
-protected:
-    /*------------------------------------------------------------------------*/
-    /** \brief  MAJ de l'état interne de l'objet géométrique spécifique au type
-     *          d'entités géométriques (classes filles donc). Cette méthode est
-     *          appelée par setMemento(...)
-     */
-#ifndef SWIG
-    virtual void setFromSpecificMemento(MementoGeomEntity& mem);
-#endif
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  récupération de l'état interne de l'objet géométrique
-     *          spécifique au type d'entités géométriques (classes filles
-     *          donc).
-     */
-#ifndef SWIG
-    virtual void createSpecificMemento(MementoGeomEntity& mem);
 #endif
 
 public:
@@ -196,7 +164,7 @@ public:
     /** \brief  Fournit l'accès à la propriété de l'entité géométrique
      */
 #ifndef SWIG
-    virtual GeomProperty* getGeomProperty() const {return m_geomProp;}
+    virtual GeomProperty* getGeomProperty() const { return m_geomProp; }
 #endif
 
 	/*------------------------------------------------------------------------*/
@@ -261,7 +229,10 @@ public:
     /** Retourne la liste des entités topologiques référencées */
 #ifndef SWIG
     virtual void getRefTopo(std::vector<Topo::TopoEntity* >& vte) const;
-    virtual const std::vector<Topo::TopoEntity* >& getRefTopo() const {return m_topo_entities;}
+    virtual const std::vector<Topo::TopoEntity* >& getRefTopo() const
+    { return m_topo_entities; }
+    virtual void setRefTopo(const std::vector<Topo::TopoEntity* >& vte)
+    { m_topo_entities = vte; }
 #endif
 
     /*------------------------------------------------------------------------*/

@@ -11,7 +11,7 @@
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandCreateGeom.h"
 #include "Geom/GeomModificationBaseClass.h"
-#include "Geom/MementoGeomEntity.h"
+#include "Geom/MementoManager.h"
 /*----------------------------------------------------------------------------*/
 #include "Geom/Volume.h"
 /*----------------------------------------------------------------------------*/
@@ -45,7 +45,7 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur, destruction du volume
      */
-    virtual ~CommandEditGeom();
+    virtual ~CommandEditGeom() = default;
 
     /*------------------------------------------------------------------------*/
     /** \brief  exécute la commande en déléguant un traitement spécifique
@@ -139,21 +139,6 @@ protected:
     void saveMementos(std::map<GeomEntity*,MementoGeomEntity> & entities);
 
     /*------------------------------------------------------------------------*/
-    /** permute les propriétés internes avec leur sauvegarde
-     */
-    void permMementos();
-
-    /*------------------------------------------------------------------------*/
-    /** fait le ménage pour le cas d'une commande en erreur
-     */
-    void cancelMementos();
-
-    /*------------------------------------------------------------------------*/
-    /** destruction des propriétés internes des entités modifiés
-     */
-    void deleteMementos();
-
-    /*------------------------------------------------------------------------*/
     /** Copie les groupes d'une entité vers une autre (de même dimension) */
     void copyGroups(GeomEntity* ge1, GeomEntity* ge2);
 
@@ -163,10 +148,7 @@ protected:
 
 protected:
 
-    /** pour les entitiés géométriques modifiées lors de l'opération, on
-     * stocke leur "état interne" sous forme de mémento. Ce stockage est de la
-     * responsabilité de chaque entité */
-    std::map<GeomEntity*,MementoGeomEntity> m_mementos;
+    MementoManager m_memento_manager;
 
     /* objet gérant l'opération OCC*/
     GeomModificationBaseClass* m_impl;

@@ -60,7 +60,7 @@ internalExecute()
 {
 
 	for (uint i=0; i<m_createdEntities.size(); i++)
-		saveMemento(m_createdEntities[i]);
+        m_memento_manager.saveMemento(m_createdEntities[i]);
 
     m_impl->perform(m_createdEntities);
     std::vector<GeomEntity*>& new_entities = m_impl->getNewEntities();

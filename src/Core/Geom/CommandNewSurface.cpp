@@ -66,7 +66,7 @@ internalExecute()
 */
     // sauvegarde des relations (connections topologiques) avant modification
     for (uint i=0; i<m_curves.size(); i++)
-    	saveMemento(m_curves[i]);
+        m_memento_manager.saveMemento(m_curves[i]);
 
     Surface* s = EntityFactory(getContext()).newSurface(m_curves);
     m_createdEntities.push_back(s);

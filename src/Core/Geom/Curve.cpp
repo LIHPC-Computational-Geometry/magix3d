@@ -96,23 +96,6 @@ GeomEntity* Curve::clone(Internal::Context& c)
 	return newCrv;
 }
 /*----------------------------------------------------------------------------*/
-Curve::~Curve()
-{}
-/*----------------------------------------------------------------------------*/
-void Curve::setFromSpecificMemento(MementoGeomEntity& mem)
-{
-    m_surfaces = mem.getSurfaces();
-    m_vertices = mem.getVertices();
-    m_groups  = mem.getGroups1D();
-	m_occ_edges.clear();
-	for (auto sh : mem.getOCCShapes())
-		m_occ_edges.push_back(TopoDS::Edge(sh));
-
-    // pour le cas des courbes composites, on force la mise à jour des paramètres
-    if (!m_vertices.empty())
-    	computeParams(m_vertices[0]->getPoint());
-}
-/*----------------------------------------------------------------------------*/
 void Curve::computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const
 {
 	if (m_occ_edges.empty())
@@ -135,17 +118,6 @@ void Curve::computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pma
 				pmin.setCoord(j,c2);
 		}
 	}
-}
-/*----------------------------------------------------------------------------*/
-void Curve::createSpecificMemento(MementoGeomEntity& mem)
-{
-    mem.setSurfaces(m_surfaces);
-    mem.setVertices(m_vertices);
-    mem.setGroups1D(m_groups);
-	std::vector<TopoDS_Shape> shapes;
-	for (auto e : m_occ_edges)
-		shapes.push_back(e);
-	mem.setOCCShapes(shapes);
 }
 /*----------------------------------------------------------------------------*/
 bool Curve::isEqual(Geom::Curve* curve)

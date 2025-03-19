@@ -44,11 +44,6 @@ CommandEditGeom::CommandEditGeom(Internal::Context& c, std::string name,
     m_impl=0;
 }
 /*----------------------------------------------------------------------------*/
-CommandEditGeom::~CommandEditGeom()
-{
-    deleteMementos();
-}
-/*----------------------------------------------------------------------------*/
 //#define _DEBUG2
 void CommandEditGeom::internalExecute()
 {
@@ -84,13 +79,12 @@ void CommandEditGeom::internalExecute()
         std::list<GeomEntity*>* refList = refEntities[i];
         std::list<GeomEntity*>::iterator it;
         for(it=refList->begin();it!=refList->end();it++){
-            GeomEntity* e= *it;
-            MementoGeomEntity mem;
-            e->createMemento(mem);
+            GeomEntity* e = *it;
+            MementoGeomEntity mem = m_memento_manager.createMemento(e);
 #ifdef _DEBUG2
            std::cerr<<"Memento cree pour "<<e->getName()<<std::endl;
 #endif
-            ref.insert(std::pair<GeomEntity*,MementoGeomEntity>(e,mem));
+            ref.insert({e, mem});
         }
     }
 //    gmds::Timer t2;
@@ -187,7 +181,7 @@ void CommandEditGeom::internalUndo()
     AutoReferencedMutex autoMutex (getMutex ( ));
 
     // permute toutes les propriétés internes avec leur sauvegarde
-    permMementos();
+    m_memento_manager.permMementos();
 
     // les entités détruites sont dites créées et inversement
     getInfoCommand().permCreatedDeleted();
@@ -209,7 +203,7 @@ void CommandEditGeom::internalRedo()
     startingOrcompletionLog (true);
 
     // permute toutes les propriétés internes avec leur sauvegarde
-    permMementos();
+    m_memento_manager.permMementos();
 
     // les entités détruites sont dites créées et inversement
     getInfoCommand().permCreatedDeleted();
@@ -227,52 +221,12 @@ void CommandEditGeom::internalRedo()
 void CommandEditGeom::
 saveMementos(std::map<GeomEntity*,MementoGeomEntity> & candidates)
 {
-    std::map<GeomEntity*,MementoGeomEntity>::iterator it;
-    for (it=candidates.begin();it!=candidates.end();it++){
-
-        GeomEntity *e = it->first;
-
-        MementoGeomEntity mem = it->second;
-        m_mementos.insert(std::pair<GeomEntity*,MementoGeomEntity>(e,mem));
+    for (const auto& pair : candidates) {
+        m_memento_manager.saveMemento(pair.first, pair.second);
 #ifdef _DEBUG_CANCEL
         std::cout<<"save Memento pour "<<e->getName()<<std::endl;
 #endif
     }
-}
-/*----------------------------------------------------------------------------*/
-void CommandEditGeom::permMementos()
-{
-    std::map<GeomEntity*,MementoGeomEntity>::iterator it =  m_mementos.begin();
-    for(;it!=m_mementos.end();it++){
-        GeomEntity *e = it->first;
-        MementoGeomEntity mem_saved = it->second;
-        MementoGeomEntity mem_current;
-        e->createMemento(mem_current);
-        it->second = mem_current;
-        e->setFromMemento(mem_saved);
-#ifdef _DEBUG_CANCEL
-        std::cout<<"On a permute l'etat pour "<<e->getName()<<std::endl;
-#endif
-    }
-
-}
-/*----------------------------------------------------------------------------*/
-void CommandEditGeom::cancelMementos()
-{
-#ifdef _DEBUG_CANCEL
-    std::cout<<"CommandEditGeom::cancelInternalsStats() ..."<<std::endl;
-#endif
-//    saveMementos();
-//    permMementos();
-//    deleteMementos();
-//
-//    getInfoCommand().permCreatedDeleted();
-//    getInfoCommand().clear();
-}
-/*----------------------------------------------------------------------------*/
-void CommandEditGeom::deleteMementos()
-{
-    m_mementos.clear();
 }
 /*----------------------------------------------------------------------------*/
 void CommandEditGeom::copyGroups(GeomEntity* ge1, GeomEntity* ge2)

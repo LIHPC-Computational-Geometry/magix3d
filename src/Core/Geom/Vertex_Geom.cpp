@@ -67,22 +67,6 @@ GeomEntity* Vertex::clone(Internal::Context& c)
 /*----------------------------------------------------------------------------*/
 Vertex::~Vertex()
 {}
-
-/*----------------------------------------------------------------------------*/
-void Vertex::setFromSpecificMemento(MementoGeomEntity& mem)
-{
-    m_curves = mem.getCurves();
-    m_groups = mem.getGroups0D();
-    m_occ_vertex = TopoDS::Vertex(mem.getOCCShapes()[0]);
-}
-/*----------------------------------------------------------------------------*/
-void Vertex::createSpecificMemento(MementoGeomEntity& mem)
-{
-    mem.setCurves(m_curves);
-    mem.setGroups0D(m_groups);
-    std::vector<TopoDS_Shape> shapes = { m_occ_vertex };
-    mem.setOCCShapes(shapes);
-}
 /*----------------------------------------------------------------------------*/
 Mgx3D::Utils::SerializedRepresentation* Vertex::getDescription (bool alsoComputed) const
 {

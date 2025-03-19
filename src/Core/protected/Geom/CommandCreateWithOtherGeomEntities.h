@@ -13,7 +13,7 @@
 #define COMMANDCREATEWITHOTHERGEOMENTITIES_H_
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandCreateGeom.h"
-#include "Geom/MementoGeomEntity.h"
+#include "Geom/MementoManager.h"
 /*----------------------------------------------------------------------------*/
 #include <vector>
 /*----------------------------------------------------------------------------*/
@@ -44,7 +44,7 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur, destruction de l'entité
      */
-    virtual ~CommandCreateWithOtherGeomEntities();
+    virtual ~CommandCreateWithOtherGeomEntities() = default;
 
     /*------------------------------------------------------------------------*/
     /** \brief  annule la commande
@@ -56,30 +56,8 @@ public:
      */
     void internalRedo();
 
-
 protected:
-
-    /*------------------------------------------------------------------------*/
-    /** sauvegarde pour une entité géométrique des connections topologiques */
-    void saveMemento(GeomEntity* entity);
-
-    /*------------------------------------------------------------------------*/
-    /** permute les propriétés internes avec leur sauvegarde
-     */
-    void permMementos();
-
-    /*------------------------------------------------------------------------*/
-    /** destruction des propriétés internes des entités modifiés
-     */
-    void deleteMementos();
-
-
-protected:
-
-    /** pour les entitiés géométriques modifiées lors de l'opération, on
-     * stocke leur "état interne" sous forme de mémento. Ce stockage est de la
-     * responsabilité de chaque entité */
-    std::map<GeomEntity*,MementoGeomEntity> m_mementos;
+    MementoManager m_memento_manager;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom
