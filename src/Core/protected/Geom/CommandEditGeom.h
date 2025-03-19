@@ -136,7 +136,7 @@ protected:
     /** parcours les entités modifiées par l'opération géométrique et pour
      *  celles modifiées dans entities, conserve le memento associé
      */
-    void saveMementos(std::map<GeomEntity*,MementoGeomEntity> & entities);
+    void saveMementos(std::map<GeomEntity*,MementoEntity> & entities);
 
     /*------------------------------------------------------------------------*/
     /** Copie les groupes d'une entité vers une autre (de même dimension) */

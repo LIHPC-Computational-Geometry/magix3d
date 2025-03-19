@@ -1,7 +1,7 @@
 #ifndef MEMENTO_MANAGER_H_
 #define MEMENTO_MANAGER_H_
 /*----------------------------------------------------------------------------*/
-#include "Geom/MementoGeomEntity.h"
+#include "Geom/MementoEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <map>
 /*----------------------------------------------------------------------------*/
@@ -17,18 +17,18 @@ public:
 	MementoManager() = default;
     ~MementoManager() = default;
 
-    const MementoGeomEntity createMemento(const GeomEntity* e) const;
-    void permMementos();
-    void saveMemento(GeomEntity* e, const MementoGeomEntity& mem);
+    const MementoEntity createMemento(const GeomEntity* e) const;
+    void saveMemento(GeomEntity* e, const MementoEntity& mem);
     void saveMemento(GeomEntity* e) { saveMemento(e, createMemento(e)); }
+    void permMementos();
 
 private :
-    void setFromMemento(GeomEntity* e, const MementoGeomEntity& mem);
+    void setFromMemento(GeomEntity* e, const MementoEntity& mem);
 
     /** pour les entitiés géométriques modifiées lors de l'opération, on
      * stocke leur "état interne" sous forme de mémento. Ce stockage est de la
      * responsabilité de chaque entité */
-    std::map<GeomEntity*, MementoGeomEntity> m_mementos;
+    std::map<GeomEntity*, MementoEntity> m_mementos;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

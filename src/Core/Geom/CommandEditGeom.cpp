@@ -55,7 +55,7 @@ void CommandEditGeom::internalExecute()
     internalSpecificPreExecute();
 
     // on recupere toutes les entites concernes par l'opération géométrique
-    std::map<GeomEntity*,MementoGeomEntity> ref;
+    std::map<GeomEntity*,MementoEntity> ref;
     std::vector<std::list<GeomEntity*>*> refEntities;
 
     refEntities.push_back(&(getRefEntities(0))); //sommets
@@ -80,7 +80,7 @@ void CommandEditGeom::internalExecute()
         std::list<GeomEntity*>::iterator it;
         for(it=refList->begin();it!=refList->end();it++){
             GeomEntity* e = *it;
-            MementoGeomEntity mem = m_memento_manager.createMemento(e);
+            MementoEntity mem = m_memento_manager.createMemento(e);
 #ifdef _DEBUG2
            std::cerr<<"Memento cree pour "<<e->getName()<<std::endl;
 #endif
@@ -145,7 +145,7 @@ void CommandEditGeom::internalExecute()
 #endif
 
     //sauvegarde des mementos pour le undo/redo
-    std::map<GeomEntity*,MementoGeomEntity> keeped_ref;
+    std::map<GeomEntity*,MementoEntity> keeped_ref;
     for(unsigned int i=0;i<mod_entities.size();i++){
         GeomEntity* e = mod_entities[i];
         keeped_ref[e] = ref[e];
@@ -219,7 +219,7 @@ void CommandEditGeom::internalRedo()
 /*----------------------------------------------------------------------------*/
 //#define _DEBUG_CANCEL
 void CommandEditGeom::
-saveMementos(std::map<GeomEntity*,MementoGeomEntity> & candidates)
+saveMementos(std::map<GeomEntity*,MementoEntity> & candidates)
 {
     for (const auto& pair : candidates) {
         m_memento_manager.saveMemento(pair.first, pair.second);

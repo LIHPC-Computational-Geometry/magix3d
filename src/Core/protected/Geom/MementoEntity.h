@@ -1,13 +1,13 @@
 /*----------------------------------------------------------------------------*/
 /*
- * MementoGeomEntity.h
+ * MementoEntity.h
  *
  *  Created on: 21 janv. 2013
  *      Author: ledouxf
  */
 /*----------------------------------------------------------------------------*/
-#ifndef MGX3D_MEMENTOGEOMENTITY_H_
-#define MGX3D_MEMENTOGEOMENTITY_H_
+#ifndef MGX3D_MEMENTOENTITY_H_
+#define MGX3D_MEMENTOENTITY_H_
 /*----------------------------------------------------------------------------*/
 #include <vector>
 #include <TopoDS_Shape.hxx>
@@ -36,17 +36,17 @@ class Curve;
 class Vertex;
 /*----------------------------------------------------------------------------*/
 /**
- * \class MementoGeomEntity
+ * \class MementoEntity
  * \brief Classe permettant le stockage des informations caractérisant une
  *        entité géométrique dans le cadre du undo/redo.
  *
  *        Par défaut, le système de commandes de Mgx3D permet de stocker les
  *        entités de Magix3D qui ont été supprimées, modifiées et/ou ajoutées.
  *        Dans le cas d'entités que l'on modifie, c'est de leur responsabilité
- *        de stocker leurs "modifications". La classe MementoGeomEntity joue
+ *        de stocker leurs "modifications". La classe MementoEntity joue
  *        ce rôle pour les entités géométriques.
  *
- *        Dans le cadre du pattern Mémento, la classe MementoGeomEntity joue
+ *        Dans le cadre du pattern Mémento, la classe MementoEntity joue
  *        le rôle de Mémento, les classes filles de GeomEntity jouent le rôle
  *        de créateurs et les classes de Commandes géométriques ayant besoin
  *        de ce type d'informations de sauvegarde jouent le rôle de Demandeur
@@ -58,21 +58,21 @@ class Vertex;
  *        (sommets, courbes, surfaces, volumes)
  *
  */
-class MementoGeomEntity
+class MementoEntity
 {
 public:
 
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur.
      */
-	MementoGeomEntity()
+	MementoEntity()
 : m_property(0)
 {;}
 
     /*------------------------------------------------------------------------*/
     /** \brief   Destructeur
      */
-    virtual ~MementoGeomEntity(){;}
+    virtual ~MementoEntity(){;}
 
     inline std::vector<Topo::TopoEntity* >&
     getTopoEntities()  {
@@ -179,5 +179,5 @@ private :
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D
 /*----------------------------------------------------------------------------*/
-#endif /* MGX3D_MEMENTOGEOMENTITY_H_ */
+#endif /* MGX3D_MEMENTOENTITY_H_ */
 /*----------------------------------------------------------------------------*/

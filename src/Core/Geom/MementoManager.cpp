@@ -12,7 +12,7 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 /*----------------------------------------------------------------------------*/
-const MementoGeomEntity MementoManager::
+const MementoEntity MementoManager::
 createMemento(const GeomEntity* e) const
 {
     struct : ConstGeomEntityVisitor {
@@ -58,7 +58,7 @@ createMemento(const GeomEntity* e) const
             mem.setProperty(e->getGeomProperty());
         }
 
-        MementoGeomEntity mem;
+        MementoEntity mem;
     } create_memento_visitor;
 
     e->accept(create_memento_visitor);
@@ -66,24 +66,24 @@ createMemento(const GeomEntity* e) const
 }
 /*----------------------------------------------------------------------------*/
 void MementoManager::
+saveMemento(GeomEntity* e, const MementoEntity& mem)
+{
+	m_mementos.insert({e, mem});
+}
+/*----------------------------------------------------------------------------*/
+void MementoManager::
 permMementos()
 {
-    for(auto v : m_mementos){
+    for(auto v : m_mementos) {
         GeomEntity *e = v.first;
-        MementoGeomEntity mem_saved = v.second;
+        MementoEntity mem_saved = v.second;
         v.second = createMemento(e);
         setFromMemento(e, mem_saved);
     }
 }
 /*----------------------------------------------------------------------------*/
 void MementoManager::
-saveMemento(GeomEntity* e, const MementoGeomEntity& mem)
-{
-	m_mementos.insert({e, mem});
-}
-/*----------------------------------------------------------------------------*/
-void MementoManager::
-setFromMemento(GeomEntity* e, const MementoGeomEntity& mem)
+setFromMemento(GeomEntity* e, const MementoEntity& mem)
 {
     struct : GeomEntityVisitor {
         void visit(Vertex* v) override {
@@ -130,7 +130,7 @@ setFromMemento(GeomEntity* e, const MementoGeomEntity& mem)
             e->m_computedAreaIsUpToDate = false;
         }
 
-        MementoGeomEntity m_mem;
+        MementoEntity m_mem;
     } set_memento_visitor;
 
     set_memento_visitor.m_mem = mem;

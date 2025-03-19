@@ -17,7 +17,6 @@
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
 #include "Geom/Loop.h"
-#include "Geom/MementoGeomEntity.h"
 #include "Geom/OCCHelper.h"
 #include "Group/Group2D.h"
 #include "Geom/EntityFactory.h"

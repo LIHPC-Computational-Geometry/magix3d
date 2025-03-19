@@ -46,7 +46,7 @@ class Surface;
 class Curve;
 class Vertex;
 class GeomProperty;
-class MementoGeomEntity;
+class MementoEntity;
 /*----------------------------------------------------------------------------*/
    /** \enum Orientation gives a list of orientation option for geometric
     *        entities.
