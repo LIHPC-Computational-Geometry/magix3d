@@ -18,7 +18,6 @@
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
 #include "Geom/Shell.h"
-#include "Geom/MementoGeomEntity.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/OCCHelper.h"
 #include "Group/Group3D.h"

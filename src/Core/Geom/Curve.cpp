@@ -18,7 +18,6 @@
 #include "Geom/Volume.h"
 #include "Group/Group1D.h"
 #include "Geom/EntityFactory.h"
-#include "Geom/MementoGeomEntity.h"
 #include "Geom/OCCHelper.h"
 #include "Internal/Context.h"
 #include "Topo/CoEdge.h"

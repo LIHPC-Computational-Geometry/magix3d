@@ -17,7 +17,6 @@
 #include "Geom/Volume.h"
 #include "Geom/GeomDisplayRepresentation.h"
 #include "Geom/OCCHelper.h"
-#include "Geom/MementoGeomEntity.h"
 #include "Group/Group0D.h"
 #include "Internal/Context.h"
 #include "Topo/Vertex.h"

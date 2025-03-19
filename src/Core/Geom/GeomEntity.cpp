@@ -17,7 +17,6 @@
 #include "Geom/GeomDisplayRepresentation.h"
 #include "Geom/OCCDisplayRepresentationBuilder.h"
 #include "Geom/OCCFacetedRepresentationBuilder.h"
-#include "Geom/MementoGeomEntity.h"
 #include "Geom/IncidentGeomEntitiesVisitor.h"
 
 #include <TkUtil/Exception.h>
