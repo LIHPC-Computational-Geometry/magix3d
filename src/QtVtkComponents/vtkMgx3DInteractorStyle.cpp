@@ -1,5 +1,6 @@
 #include "Internal/ContextIfc.h"
 #include "Internal/Resources.h"
+#include "Utils/MgxNumeric.h"
 
 #include "QtVtkComponents/vtkMgx3DInteractorStyle.h"
 #include "QtComponents/QtMgx3DApplication.h"
@@ -7,7 +8,9 @@
 #include "QtVtkComponents/VTKMgx3DActor.h"
 #include "VtkComponents/vtkECMAreaPicker.h"
 
-#include <TkUtil/Exception.h>
+#include <TkUtil/InformationLog.h>
+#include <TkUtil/NumericServices.h>
+
 
 #include <vtkObjectFactory.h>
 #include <vtkRenderWindowInteractor.h>
@@ -24,6 +27,7 @@
 #include <vtkSelectionNode.h>
 
 #include <assert.h>
+#include <math.h>
 #include <strings.h>
 
 using namespace TkUtil;
@@ -54,7 +58,7 @@ vtkMgx3DInteractorStyle::vtkMgx3DInteractorStyle ( )
 	: vtkUnifiedInteractorStyle ( ), Mgx3DPicker (0), Mgx3DPickerCommand (0), SelectionManager (0), SeizureManager (0), 
 	  InteractiveSelectionActivated (false), ForegroundSelection (false), RubberButtonDown (false), RubberBand (false), CompletelyInsideSelection (false),
 	  PixelArray (vtkSmartPointer<vtkUnsignedCharArray>::New ( )), TmpPixelArray (vtkSmartPointer<vtkUnsignedCharArray>::New ( )),
-	  HardwareSelector(vtkSmartPointer<vtkHardwareSelector>::New ( ))
+	  HardwareSelector(vtkSmartPointer<vtkHardwareSelector>::New ( )), GUILogOutputStream (0)
 {
 	ButtonPressPosition [0]	= ButtonPressPosition [1]	= 0;
 	StartPosition [0]		= StartPosition [1]			= 0;
@@ -69,7 +73,7 @@ vtkMgx3DInteractorStyle::vtkMgx3DInteractorStyle ( )
 vtkMgx3DInteractorStyle::vtkMgx3DInteractorStyle (const vtkMgx3DInteractorStyle&)
 	: vtkUnifiedInteractorStyle ( ), Mgx3DPicker (0), Mgx3DPickerCommand (0), SelectionManager (0), SeizureManager (0),
 	  InteractiveSelectionActivated (false), ForegroundSelection (false), RubberButtonDown (false), RubberBand (false), CompletelyInsideSelection (false),
-	  PixelArray ( ), TmpPixelArray ( ), HardwareSelector ( )
+	  PixelArray ( ), TmpPixelArray ( ), HardwareSelector ( ), GUILogOutputStream (0)
 {
 	assert (0 && "vtkMgx3DInteractorStyle copy constructor is not allowed.");
 }	// vtkMgx3DInteractorStyle copy constructor
@@ -91,6 +95,7 @@ vtkMgx3DInteractorStyle::~vtkMgx3DInteractorStyle ( )
 	if (0 != Mgx3DPicker)
 		Mgx3DPicker->UnRegister (this);
 	Mgx3DPicker			= 0;
+	GUILogOutputStream	= 0;
 }	// vtkMgx3DInteractorStyle::~vtkMgx3DInteractorStyle
 
 
@@ -292,7 +297,26 @@ void vtkMgx3DInteractorStyle::OnDownArrow ( )
 
 void vtkMgx3DInteractorStyle::FlyTo (bool centerOnActor)
 {
+	vtkCamera*	camera	= 0 == CurrentRenderer ? 0 : CurrentRenderer->GetActiveCamera ( );
+	if (0 == camera)
+		return;
+
+	vtkFloatingPointType	oldFocal [3]	= { -NumericServices::doubleMachMax ( ), -NumericServices::doubleMachMax ( ), -NumericServices::doubleMachMax ( ) };
+	camera->GetFocalPoint (oldFocal);
+
     vtkUnifiedInteractorStyle::FlyTo (centerOnActor);
+    if (0 != GetGUILogOutputStream ( ))
+    {
+		vtkFloatingPointType	newFocal [3]	= { -NumericServices::doubleMachMax ( ), -NumericServices::doubleMachMax ( ), -NumericServices::doubleMachMax ( ) };
+		camera->GetFocalPoint (newFocal);
+		const double	distance	= sqrt ((newFocal [0] - oldFocal [0])*(newFocal [0] - oldFocal [0]) + (newFocal [1] - oldFocal [1])*(newFocal [1] - oldFocal [1]) + (newFocal [2] - oldFocal [2])*(newFocal [2] - oldFocal [2]));
+		if (distance > Math::MgxNumeric::mgxDoubleEpsilon)
+		{
+			UTF8String	info (Charset::UTF_8);
+			info << "Point focal en (" << newFocal [0] << ", " << newFocal [1] << ", " << newFocal [2] << ")";
+			GetGUILogOutputStream ( )->log (InformationLog (info));
+		}	// if (distance > Math::MgxNumeric::mgxDoubleEpsilon)
+	}	// if (0 != GetGUILogOutputStream ( ))
     InvokeEvent (ViewRedefinedEvent, NULL);
 }   // vtkMgx3DInteractorStyle::FlyTo
 
@@ -687,6 +711,18 @@ bool vtkMgx3DInteractorStyle::GetCompletelyInsideSelection ( ) const
 }	// vtkMgx3DInteractorStyle::GetCompletelyInsideSelection
 
 
+void vtkMgx3DInteractorStyle::SetGUILogOutputStream (TkUtil::LogOutputStream* stream)
+{
+	GUILogOutputStream	= stream;
+}	// vtkMgx3DInteractorStyle::SetGUILogOutputStream
+
+
+TkUtil::LogOutputStream* vtkMgx3DInteractorStyle::GetGUILogOutputStream ( )
+{
+	return GUILogOutputStream;
+}	// vtkMgx3DInteractorStyle::GetGUILogOutputStream
+	
+	
 void vtkMgx3DInteractorStyle::Pick ( )
 {
 	// Code issu de vtkInteractorStyle::OnChar de VTK 5.10.0, char == P

@@ -964,6 +964,21 @@ VTKRenderingManager::~VTKRenderingManager ( )
 }	// VTKRenderingManager::~VTKRenderingManager
 
 
+void VTKRenderingManager::setContext (Mgx3D::Internal::Context* context)
+{
+	RenderingManager::setContext (context);
+	
+	try
+	{
+		getMgx3DInteractorStyle ().SetGUILogOutputStream (0);
+		getMgx3DInteractorStyle ().SetGUILogOutputStream (&getContext ( ).getLogDispatcher ( ));
+	}
+	catch (...)
+	{
+	}
+}
+
+
 QtVtkGraphicWidget& VTKRenderingManager::getVTKWidget ( )
 {
 	CHECK_NULL_PTR_ERROR (_vtkWidget)

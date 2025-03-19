@@ -16,6 +16,7 @@
 #include "QtComponents/EntitySeizureManager.h"
 #include "Utils/Entity.h"
 #include "Utils/SelectionManagerIfc.h"
+#include <TkUtil/LogOutputStream.h>
 
 #include <vtkHardwareSelector.h>
 #include <vtkSmartPointer.h>
@@ -243,6 +244,11 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	virtual void SetCompletelyInsideSelection (bool on);
 	virtual bool GetCompletelyInsideSelection ( ) const;
 	
+	/** (Dés)Associer un flux de messages dans l'IHM à cet interacteur.
+	 */
+	virtual void SetGUILogOutputStream (TkUtil::LogOutputStream*);
+	virtual TkUtil::LogOutputStream* GetGUILogOutputStream ( );
+	
 	
 	protected :
 
@@ -330,6 +336,9 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	
 	/** Un sélecteur pour le picking précis de premier plan. */
 	vtkSmartPointer<vtkHardwareSelector>			HardwareSelector;
+	
+	/** Un flux d'affichage d'infos sur les interactions dans l'IHM. */
+	TkUtil::LogOutputStream*						GUILogOutputStream;
 };	// class vtkMgx3DInteractorStyle
 
 
