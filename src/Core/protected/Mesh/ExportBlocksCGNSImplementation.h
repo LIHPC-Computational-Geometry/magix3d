@@ -1,6 +1,6 @@
 /*----------------------------------------------------------------------------*/
 /*
- * ExportBlocksImplementation.h
+ * ExportBlocksCGNSImplementation.h
  *
  *  Created on: 27/06/23
  *      Author: calderan
@@ -17,7 +17,7 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
     namespace Mesh {
 /*----------------------------------------------------------------------------*/
-        class ExportBlocksImplementation
+        class ExportBlocksCGNSImplementation
         {
         public:
 
@@ -27,12 +27,12 @@ namespace Mgx3D {
              *  \param c le contexte
              *  \param n le nom du fichier dans lequel se fait l'exportation
              */
-            ExportBlocksImplementation(Internal::Context& c, const std::string& n);
+            ExportBlocksCGNSImplementation(Internal::Context& c, const std::string& n);
 
             /*------------------------------------------------------------------------*/
             /** \brief   Destructeur
              */
-            virtual ~ExportBlocksImplementation();
+            virtual ~ExportBlocksCGNSImplementation();
 
 
             /*------------------------------------------------------------------------*/
