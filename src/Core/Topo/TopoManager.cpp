@@ -75,6 +75,7 @@
 #include "Topo/CommandFuse2EdgeList.h"
 #include "Topo/CommandFuse2Faces.h"
 #include "Topo/CommandFuse2FaceList.h"
+#include "Topo/CommandExportBlocks.h"
 #include "Topo/Block.h"
 #include "Topo/CoFace.h"
 #include "Topo/Face.h"
@@ -5488,6 +5489,26 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::alignVerticesOnSurface(Geom::
         return cmdResult;
 
 
+}
+/*----------------------------------------------------------------------------*/
+Internal::M3DCommandResultIfc* TopoManager::exportBlocks(const std::string& n)
+{
+    //creation de la commande d'exportation
+    CommandExportBlocks *command = new CommandExportBlocks(getLocalContext(), n);
+
+    // trace dans le script
+    TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
+    cmd << getContextAlias() << "." << "getGeomManager().exportVTK(";
+    cmd <<"\""<<n<<"\")";
+    command->setScriptCommand(cmd);
+
+    // on passe au gestionnaire de commandes qui exécute la commande en // ou non
+    // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
+    getCommandManager().addCommand(command, Utils::Command::DO);
+
+    Internal::M3DCommandResultIfc*  cmdResult   =
+            new Internal::M3DCommandResult (*command);
+    return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo

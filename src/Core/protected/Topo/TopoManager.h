@@ -1579,6 +1579,8 @@ public:
     /** Retourne le nom du bloc en fonction des positions géométriques de ses sommets */
     virtual std::string getBlockAt(std::vector<Point>& pts) const;
 
+    virtual Mgx3D::Internal::M3DCommandResultIfc* exportBlocks(const std::string& n);
+
     /*------------------------------------------------------------------------*/
     /// retourne le nombre de blocs non détruits référencés par le TopoManager
     virtual int getNbBlocks() const;
@@ -1619,6 +1621,7 @@ public:
 
     virtual Mgx3D::Internal::M3DCommandResultIfc*
     alignVerticesOnSurface(Geom::GeomEntity* surface, Vertex* vertex, const Point &pnt1, const Point &pnt2);
+
 
 private:
     /** Recherche un vecteur d'entités topologiques suivant leur nom,

@@ -896,7 +896,12 @@ std::vector<std::string> TopoManagerIfc::getCommonEdges(const std::string& face1
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc* TopoManagerIfc::alignVerticesOnSurface(const std::string& surface, const std::string& vertex, const Point &pnt1,const Point &pnt2)
 {
-    throw TkUtil::Exception ("TopoManagerIfc::getCommonEdges should be overloaded.");
+    throw TkUtil::Exception ("TopoManagerIfc::alignVerticesOnSurface should be overloaded.");
+}
+/*----------------------------------------------------------------------------*/
+Mgx3D::Internal::M3DCommandResultIfc* TopoManagerIfc::exportBlocks(const std::string &n)
+{
+    throw TkUtil::Exception ("TopoManagerIfc::exportBlocks should be overloaded.");
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo
