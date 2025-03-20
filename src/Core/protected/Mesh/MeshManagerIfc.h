@@ -229,8 +229,8 @@ public:
     *
     *  \param n le nom du ficher dans lequel on exporte
     */
-    virtual Mgx3D::Internal::M3DCommandResultIfc* exportBlocks(const std::string& n);
-    SET_SWIG_COMPLETABLE_METHOD(exportBlocks)
+    virtual Mgx3D::Internal::M3DCommandResultIfc* exportBlocksForCGNS(const std::string& n);
+    SET_SWIG_COMPLETABLE_METHOD(exportBlocksForCGNS)
 
 
 private:
