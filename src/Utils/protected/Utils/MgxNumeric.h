@@ -70,9 +70,17 @@ namespace Math
 
 		static inline bool isNearlyEqual(const double a, const double b)
 		{
-			double s = std::fabs(a) + std::abs(b);
-			double d = a - b;
-			return (d==0.0) ? true : isNearlyZero(d/s);
+            if(a == b) {
+                return true;
+            } else {
+                double d = std::abs(a - b);
+                if (a == 0.0 || b == 0.0) {
+                    return isNearlyZero(d);
+                } else {
+                    double s = std::fabs(a) + std::abs(b);
+                    return isNearlyZero(d / s);
+                }
+            }
 		}
 
 		static inline bool isNearlyZero (const double & u)
