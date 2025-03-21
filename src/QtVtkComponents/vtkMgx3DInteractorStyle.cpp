@@ -313,7 +313,7 @@ void vtkMgx3DInteractorStyle::FlyTo (bool centerOnActor)
 		if (distance > Math::MgxNumeric::mgxDoubleEpsilon)
 		{
 			UTF8String	info (Charset::UTF_8);
-			info << "Point focal en (" << newFocal [0] << ", " << newFocal [1] << ", " << newFocal [2] << ")";
+			info << "Point focal en Mgx3D.Point(" << newFocal [0] << ", " << newFocal [1] << ", " << newFocal [2] << ")";
 			GetGUILogOutputStream ( )->log (InformationLog (info));
 		}	// if (distance > Math::MgxNumeric::mgxDoubleEpsilon)
 	}	// if (0 != GetGUILogOutputStream ( ))
