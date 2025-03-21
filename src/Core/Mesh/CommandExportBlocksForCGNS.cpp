@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandExportBlocks.cpp
+/** \file CommandExportBlocksForCGNS.cpp
  *
  *  \author legoff
  *
@@ -9,7 +9,7 @@
 #include "Internal/ContextIfc.h"
 /*----------------------------------------------------------------------------*/
 #include "Utils/Common.h"
-#include "Mesh/CommandExportBlocks.h"
+#include "Mesh/CommandExportBlocksForCGNS.h"
 #include "Geom/GeomManager.h"
 #include "Geom/ExportVTKImplementation.h"
 /*----------------------------------------------------------------------------*/
@@ -19,19 +19,19 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
     namespace Mesh {
 /*----------------------------------------------------------------------------*/
-        CommandExportBlocks::
-        CommandExportBlocks(Internal::Context& context, const std::string& fileName)
+        CommandExportBlocksForCGNS::
+        CommandExportBlocksForCGNS(Internal::Context& context, const std::string& fileName)
                 : Internal::CommandInternal(context, "Export VTK total (géométrie)")
                 , m_impl(context,fileName)
         {
         }
 
 /*----------------------------------------------------------------------------*/
-        CommandExportBlocks::~CommandExportBlocks()
+        CommandExportBlocksForCGNS::~CommandExportBlocksForCGNS()
         {
         }
 /*----------------------------------------------------------------------------*/
-        void CommandExportBlocks::
+        void CommandExportBlocksForCGNS::
         internalExecute()
         {
             // écriture du VTK

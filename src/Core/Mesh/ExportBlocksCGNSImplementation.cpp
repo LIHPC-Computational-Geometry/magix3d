@@ -1,12 +1,12 @@
 /*----------------------------------------------------------------------------*/
 /*
- * ExportBlocksImplementation.cpp
+ * ExportBlocksCGNSImplementation.cpp
  *
  *  Created on: 27/06/23
  *      Author: calderan
  */
 /*----------------------------------------------------------------------------*/
-#include "Mesh/ExportBlocksImplementation.h"
+#include "Mesh/ExportBlocksCGNSImplementation.h"
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
@@ -25,16 +25,16 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
     namespace Mesh {
 /*----------------------------------------------------------------------------*/
-        ExportBlocksImplementation::
-        ExportBlocksImplementation(Internal::Context& c, const std::string& n)
+        ExportBlocksCGNSImplementation::
+        ExportBlocksCGNSImplementation(Internal::Context& c, const std::string& n)
                 : m_context(c), m_filename(n)
         {}
 
 /*----------------------------------------------------------------------------*/
-        ExportBlocksImplementation::~ExportBlocksImplementation()
+        ExportBlocksCGNSImplementation::~ExportBlocksCGNSImplementation()
         {}
 /*----------------------------------------------------------------------------*/
-        void ExportBlocksImplementation::perform(Internal::InfoCommand* icmd)
+        void ExportBlocksCGNSImplementation::perform(Internal::InfoCommand* icmd)
         {
 
             std::vector<Topo::Vertex*> topo_vertices;

@@ -1364,6 +1364,8 @@ public:
     virtual std::string getBlockAt(std::vector<Point>& pts) const;
 //	SET_SWIG_COMPLETABLE_METHOD_RET(std::string, getBlockAt)
 
+    virtual Mgx3D::Internal::M3DCommandResultIfc* exportBlocks(const std::string& n);
+    SET_SWIG_COMPLETABLE_METHOD(exportBlocksForCGNS)
 
 private:
 

@@ -1,13 +1,13 @@
 /*----------------------------------------------------------------------------*/
 /*
- * ExportBlocksImplementation.h
+ * ExportBlocksCGNSImplementation.h
  *
  *  Created on: 27/06/23
  *      Author: calderan
  */
 /*----------------------------------------------------------------------------*/
-#ifndef MGX3D_GEOM_EXPORTBLOCKSIMPLEMENTATION_H_
-#define MGX3D_GEOM_EXPORTBLOCKSIMPLEMENTATION_H_
+#ifndef EXPORTBLOCKSCGNSIMPLEMENTATION_H_
+#define EXPORTBLOCKSCGNSIMPLEMENTATION_H_
 /*----------------------------------------------------------------------------*/
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
@@ -17,7 +17,7 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
     namespace Mesh {
 /*----------------------------------------------------------------------------*/
-        class ExportBlocksImplementation
+        class ExportBlocksCGNSImplementation
         {
         public:
 
@@ -27,12 +27,12 @@ namespace Mgx3D {
              *  \param c le contexte
              *  \param n le nom du fichier dans lequel se fait l'exportation
              */
-            ExportBlocksImplementation(Internal::Context& c, const std::string& n);
+            ExportBlocksCGNSImplementation(Internal::Context& c, const std::string& n);
 
             /*------------------------------------------------------------------------*/
             /** \brief   Destructeur
              */
-            virtual ~ExportBlocksImplementation();
+            virtual ~ExportBlocksCGNSImplementation();
 
 
             /*------------------------------------------------------------------------*/
@@ -50,11 +50,11 @@ namespace Mgx3D {
         };
 
 /*----------------------------------------------------------------------------*/
-    } // end namespace Topo
+    } // end namespace Mesh
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D
 /*----------------------------------------------------------------------------*/
-#endif /* MGX3D_GEOM_EXPORTBLOCKSIMPLEMENTATION_H_ */
+#endif /* EXPORTBLOCKCGNSSIMPLEMENTATION_H_ */
 /*----------------------------------------------------------------------------*/
 
 
