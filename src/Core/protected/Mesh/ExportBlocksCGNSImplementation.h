@@ -6,8 +6,8 @@
  *      Author: calderan
  */
 /*----------------------------------------------------------------------------*/
-#ifndef MGX3D_GEOM_EXPORTBLOCKSIMPLEMENTATION_H_
-#define MGX3D_GEOM_EXPORTBLOCKSIMPLEMENTATION_H_
+#ifndef EXPORTBLOCKSCGNSIMPLEMENTATION_H_
+#define EXPORTBLOCKSCGNSIMPLEMENTATION_H_
 /*----------------------------------------------------------------------------*/
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
@@ -50,11 +50,11 @@ namespace Mgx3D {
         };
 
 /*----------------------------------------------------------------------------*/
-    } // end namespace Topo
+    } // end namespace Mesh
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D
 /*----------------------------------------------------------------------------*/
-#endif /* MGX3D_GEOM_EXPORTBLOCKSIMPLEMENTATION_H_ */
+#endif /* EXPORTBLOCKCGNSSIMPLEMENTATION_H_ */
 /*----------------------------------------------------------------------------*/
 
 

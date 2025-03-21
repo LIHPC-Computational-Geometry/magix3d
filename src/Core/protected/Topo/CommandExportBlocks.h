@@ -46,7 +46,7 @@ public:
 protected:
 
     /* objet gérant l'opération d'exportation */
-    ExportBlocksCGNSImplementation m_impl;
+    ExportBlocksImplementation m_impl;
 };
 }
 }
