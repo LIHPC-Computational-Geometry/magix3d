@@ -320,7 +320,8 @@ void CommandNewBlocksMesh::signalMeshCrossed(std::vector<std::string>& blockCros
 			m_warning_to_pop_up<<" "<<blockCrossed[i];
 	}
 
-	std::cout<<"WARNING: "<<m_warning_to_pop_up.iso()<<std::endl;
+    log (TkUtil::TraceLog(m_warning_to_pop_up));
+	std::cout<<"WARNING: "<<m_warning_to_pop_up.utf8()<<std::endl;
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Mesh

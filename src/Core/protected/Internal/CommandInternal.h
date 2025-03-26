@@ -32,7 +32,7 @@ public:
     /*------------------------------------------------------------------------*/
     /// Accesseur sur les warnings importants
     virtual std::string getWarningToPopup ( ) const
-	{ return m_warning_to_pop_up.iso ( ); }
+	{ return m_warning_to_pop_up.utf8(); }
 
     /*------------------------------------------------------------------------*/
     /// Destructeur
