@@ -101,10 +101,6 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 //	m_context.getLocalMeshManager().getClouds(clouds);
 
 	gmds::Mesh& mesh = m_context.getLocalMeshManager().getMesh()->getGMDSMesh();
-
-	std::cerr<<"m_context.getLocalMeshManager().getNbNodes() "<<m_context.getLocalMeshManager().getNbNodes()<<std::endl;
-	std::cerr<<"mesh.getNbNodes() "<<mesh.getNbNodes()<<std::endl;
-
 	{
 		// surfaces
 		for(unsigned int iCoFace=0; iCoFace<topo_cofaces.size(); iCoFace++) {

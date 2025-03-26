@@ -273,7 +273,8 @@ bool Volume::contains(Volume* vol) const
             classifier.Perform(p_i,1e-6);
             TopAbs_State result = classifier.State();
             if(result==TopAbs_OUT || result==TopAbs_UNKNOWN){
-                std::cerr<<"\t ** une face OUT"<<std::endl;
+                const TkUtil::UTF8String message("\t ** une face OUT", TkUtil::Charset::UTF_8);
+                log(TkUtil::TraceLog (message, TkUtil::Log::TRACE_1));
                 return false;
             }
         }

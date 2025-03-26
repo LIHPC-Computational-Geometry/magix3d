@@ -4435,7 +4435,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 							getSelectionManager ( )->resetUndoStack ( );
 
 						// A t'on un évènement important justifiant d'une notification via boite de dialogue ?
-						const string warn = commandInternal->getWarningToPopup();
+						const UTF8String warn(commandInternal->getWarningToPopup(), Charset::UTF_8);
 						if (false == warn.empty())
 						{
 							QtMessageBox::systemNotification ("Magix3D", QtMgx3DApplication::getAppIcon ( ), "Commandes terminées avec avertissement.", QtMessageBox::URGENCY_NORMAL, Resources::instance ( )._commandNotificationDuration);
