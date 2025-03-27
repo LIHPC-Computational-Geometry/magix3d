@@ -21,7 +21,7 @@
 #include "Mesh/CommandWriteVTK.h"
 #include "Mesh/CommandWriteCGNS.h"
 #include "Mesh/CommandModifyMesh.h"
-#include "Mesh/CommandExportBlocks.h"
+#include "Mesh/CommandExportBlocksForCGNS.h"
 #include "Mesh/SubVolume.h"
 #include "Mesh/CommandCreateSubVolumeBetweenSheets.h"
 #include "Mesh/CommandDestroyMesh.h"
@@ -619,14 +619,14 @@ CommandMeshExplorer* MeshManager::endExplorer(CommandMeshExplorer* oldExplo, boo
     return command;
 }
 /*----------------------------------------------------------------------------*/
-    Internal::M3DCommandResultIfc* MeshManager::exportBlocks(const std::string& n)
+    Internal::M3DCommandResultIfc* MeshManager::exportBlocksForCGNS(const std::string& n)
     {
 #ifdef _DEBUG2
         std::cout<<"exportBlocks"<<std::endl;
 #endif
 
         //creation de la commande d'exportation
-        CommandExportBlocks *command = new CommandExportBlocks(getLocalContext(), n);
+        CommandExportBlocksForCGNS *command = new CommandExportBlocksForCGNS(getLocalContext(), n);
 
         // trace dans le script
         TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);

@@ -240,7 +240,7 @@ public:
      *
      *  \param n le nom du ficher dans lequel on exporte
      */
-    virtual Mgx3D::Internal::M3DCommandResultIfc* exportBlocks(const std::string& n);
+    virtual Mgx3D::Internal::M3DCommandResultIfc* exportBlocksForCGNS(const std::string& n);
 
 private:
     /// Lien sur la structure de maillage et ses algos

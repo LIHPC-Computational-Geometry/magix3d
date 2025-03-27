@@ -396,8 +396,8 @@ void MeshImplementation::writeVTK(std::string nom)
 	try{
 		gmds::IGMeshIOService ioService(&getGMDSMesh());
 		gmds::VTKWriter vtkWriter(&ioService);
-		vtkWriter.setCellOptions(gmds::R|gmds::F|gmds::N);
-		vtkWriter.setDataOptions(gmds::R|gmds::F|gmds::N);
+		vtkWriter.setCellOptions(gmds::R|gmds::N);
+		vtkWriter.setDataOptions(gmds::R|gmds::N);
 		vtkWriter.write(nom);
 	}
 	catch(gmds::GMDSException& e) {
