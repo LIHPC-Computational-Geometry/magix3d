@@ -43,11 +43,13 @@ TopoEntity::~TopoEntity()
     std::cout<<"TopoEntity::~TopoEntity() de "<<getName()<<std::endl;
     //std::cout<<"  m_topo_property en "<<m_topo_property<<std::endl;
 #endif
-    if (m_topo_property)
-        delete m_topo_property;
+    delete m_topo_property;
+    m_topo_property = 0;
 
-    if (m_save_topo_property)
-        std::cerr<<"La sauvegarde du TopoProperty a été oublié pour "<<getName()<<std::endl;
+    if (m_save_topo_property) {
+        delete m_save_topo_property;
+        m_save_topo_property = 0;
+    }
 }
 /*----------------------------------------------------------------------------*/
 void TopoEntity::getBounds (double bounds[6]) const

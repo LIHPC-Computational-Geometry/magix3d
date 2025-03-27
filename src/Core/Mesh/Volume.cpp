@@ -43,11 +43,12 @@ Volume::Volume(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProp
 Volume::~Volume()
 {
 	delete m_topo_property;
+	m_topo_property = 0;
 
-#ifdef _DEBUG
-    if (m_save_topo_property)
-        std::cerr <<"La sauvegarde du MeshVolumeTopoProperty a été oubliée pour "<<getName()<<std::endl;
-#endif
+    if (m_save_topo_property) {
+		delete m_save_topo_property;
+		m_save_topo_property = 0;
+	}
 }
 /*----------------------------------------------------------------------------*/
 Volume::
