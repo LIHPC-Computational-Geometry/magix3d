@@ -131,17 +131,20 @@ Edge::
 #endif
 
     delete m_topo_property;
-    delete m_mesh_property;
-
-#ifdef _DEBUG
     m_topo_property = 0;
+
+    delete m_mesh_property;
     m_mesh_property = 0;
 
-    if (m_save_topo_property)
-    	std::cerr<<"La sauvegarde du EdgeTopoProperty a été oubliée pour "<<getName()<<std::endl;
-    if (m_save_mesh_property)
-    	std::cerr<<"La sauvegarde du EdgeMeshingProperty a été oubliée pour "<<getName()<<std::endl;
-#endif
+    if (m_save_topo_property) {
+        delete m_save_topo_property;
+        m_save_topo_property = 0;
+    }
+
+    if (m_save_mesh_property) {
+        delete m_save_mesh_property;
+        m_save_mesh_property = 0;
+    }
 }
 /*----------------------------------------------------------------------------*/
 void Edge::sortCoEdges()
