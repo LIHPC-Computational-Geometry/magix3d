@@ -8,6 +8,7 @@
 #ifndef MGX_NUMERIC_H
 #define MGX_NUMERIC_H
 
+#include <algorithm>
 #include <numeric>
 #include <cmath>
 #include <string>
@@ -68,29 +69,37 @@ namespace Math
 		static size_t				mgxDoubleFixedNotationCharMax;	
 #endif	// SWIG
 
-		static inline bool isNearlyEqual(const double a, const double b)
+		static inline bool isNearlyEqual(double a, double b)
 		{
-			double s = std::fabs(a) + std::abs(b);
-			double d = a - b;
-			return (d==0.0) ? true : isNearlyZero(d/s);
+            if(a == b) {
+                return true;
+            } else {
+                auto d = std::abs(a - b);
+                if (a == 0.0 || b == 0.0) {
+                    return isNearlyZero(d);
+                } else {
+                    auto s = std::max(std::abs(a), std::abs(b));
+                    return d <= s * Mgx3D::Utils::Math::MgxNumeric::mgxDoubleEpsilon;
+                }
+            }
 		}
 
-		static inline bool isNearlyZero (const double & u)
+		static inline bool isNearlyZero (double u)
 		{
-			return std::fabs(u) < Mgx3D::Utils::Math::MgxNumeric::mgxDoubleEpsilon;
+			return std::fabs(u) <= Mgx3D::Utils::Math::MgxNumeric::mgxDoubleEpsilon;
 		}	// isNearlyZero
 
-        static inline bool isNearlyZero (const double & u, const double & epsilon)
+        static inline bool isNearlyZero (double u, double epsilon)
         {
 #ifdef _DEBUG
             double epsilon10 = epsilon*10;
-            bool infEps    = std::fabs(u) < epsilon;
-            bool infEps10 = std::fabs(u) < epsilon10;
+            bool infEps    = std::fabs(u) <= epsilon;
+            bool infEps10 = std::fabs(u) <= epsilon10;
             if(infEps10 && !infEps){
                 std::cerr<<"Warning: "<<u<<" inferieur a "<<epsilon10<<" et superieur a "<<epsilon<<std::endl;
             }
 #endif
-            return std::fabs(u) < epsilon;
+            return std::fabs(u) <= epsilon;
         }   // isNearlyZero
 
 
