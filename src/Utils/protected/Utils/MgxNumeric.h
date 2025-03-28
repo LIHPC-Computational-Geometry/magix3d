@@ -86,20 +86,20 @@ namespace Math
 
 		static inline bool isNearlyZero (double u)
 		{
-			return std::fabs(u) < Mgx3D::Utils::Math::MgxNumeric::mgxDoubleEpsilon;
+			return std::fabs(u) <= Mgx3D::Utils::Math::MgxNumeric::mgxDoubleEpsilon;
 		}	// isNearlyZero
 
-        static inline bool isNearlyZero (const double & u, const double & epsilon)
+        static inline bool isNearlyZero (double u, double epsilon)
         {
 #ifdef _DEBUG
             double epsilon10 = epsilon*10;
-            bool infEps    = std::fabs(u) < epsilon;
-            bool infEps10 = std::fabs(u) < epsilon10;
+            bool infEps    = std::fabs(u) <= epsilon;
+            bool infEps10 = std::fabs(u) <= epsilon10;
             if(infEps10 && !infEps){
                 std::cerr<<"Warning: "<<u<<" inferieur a "<<epsilon10<<" et superieur a "<<epsilon<<std::endl;
             }
 #endif
-            return std::fabs(u) < epsilon;
+            return std::fabs(u) <= epsilon;
         }   // isNearlyZero
 
 
