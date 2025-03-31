@@ -349,9 +349,6 @@ CommandNewTopo::
 
             Topo::CoFace* face = new CoFace(getContext(), edges, true);
 
-            //face->structure(&getInfoCommand());
-            face->selectBasicMeshLaw(&getInfoCommand());
-
             Group::Group2D *group = getContext().getLocalGroupManager().getNewGroup2D(groupName,
                                                                                       &getInfoCommand());
             group->add(face);
