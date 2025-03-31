@@ -88,6 +88,22 @@ using std::ptrdiff_t;
   }
 }
 
+%typemap(out) Mgx3D::Internal::M3DCommandResultIfc*
+{	// Objectif : lever une exception lorsqu'une commande se termine en erreur
+	// => interrompt l'exécution du script par l'interprêteur python, que ce soit 
+	// à la ligne de commande ou depuis la console python.
+	Mgx3D::Internal::M3DCommandResultIfc*	cmdResult	= $1;
+	
+	if (Mgx3D::Utils::CommandIfc::FAIL == cmdResult->getStatus ( ))
+	{
+		$result	= nullptr;
+		SWIG_exception (SWIG_RuntimeError, cmdResult->getErrorMessage ( ).utf8 ( ).c_str ( ));
+	}
+	else
+	{
+		$result	= SWIG_NewPointerObj (SWIG_as_voidptr (result), SWIGTYPE_p_Mgx3D__Internal__M3DCommandResultIfc, 0);
+	}
+}	// %typemap(out) Mgx3D::Internal::M3DCommandResultIfc*
 
 // -------------------------------
 
