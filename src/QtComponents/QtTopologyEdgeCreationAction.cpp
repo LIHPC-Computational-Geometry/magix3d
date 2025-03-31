@@ -228,10 +228,14 @@ void QtTopologyEdgeCreationPanel::preview (bool show, bool destroyInteractor){
                 255 * Resources::instance()._previewColor.getBlue()));
         graphicalProps.setLineWidth(Resources::instance()._previewWidth.getValue());
 
-        RenderingManager::RepresentationID	repID	= getRenderingManager ( ).createSegmentsWireRepresentation(points, graphicalProps, true);
-        registerPreviewedObject (repID);
+        if(_verticesPanel->getUniqueNames().size() == 2){
 
-        getRenderingManager ( ).forceRender ( );
+
+            //RenderingManager::RepresentationID	repID	= getRenderingManager ( ).createSegmentsWireRepresentation(points, graphicalProps, true);
+            //registerPreviewedObject (repID);
+
+            //getRenderingManager ( ).forceRender ( );
+        }
     }catch (...)
     {
         return;
