@@ -123,8 +123,24 @@ bool VTKMgx3DActor::IsWire ( ) const
 void VTKMgx3DActor::CreateOwnLODs ( )
 {
 	// On ne veut pas de LODs pour les entités topologiques :
-	if ((0 != GetEntity ( )) && (false == GetEntity ( )->isTopoEntity ( )))
-		vtkLODActor::CreateOwnLODs ( );
+//	if ((0 != GetEntity ( )) && (false == GetEntity ( )->isTopoEntity ( )))
+//		vtkLODActor::CreateOwnLODs ( );
+	if (0 != GetEntity ( ))
+	{
+		switch (GetEntity ( )->getType ( ))
+		{	// On précise ici pour quels types d'entités on ne veut pas de LODActors (level of detail).
+			// Les LODActors sont des acteurs dont on affiche qu'un sous-ensemble lors des interactions
+			// pour maintenir une certaine fluidité.
+			case Entity::TopoEdge	:
+			case Entity::TopoCoEdge	:
+			case Entity::TopoFace	:
+			case Entity::TopoCoFace	:
+			case Entity::TopoBlock	:
+				break;
+			default	:
+				vtkLODActor::CreateOwnLODs ( );
+		}	// switch (GetEntity ( )->getType ( ))
+	}	// if (0 != GetEntity ( ))
 }	// VTKMgx3DActor::CreateOwnLODs
 
 
