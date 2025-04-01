@@ -245,7 +245,7 @@ namespace QtComponents
 
 		QtMgx3DMainWindow::WindowsActions::WindowsActions()
 				: _preferencesAction(0), _editSettingsAction(0), _quitAction(0),
-				  _print3DViewAction(0), _print3DViewToFileAction(0),
+				  _2dModeAction (0), _print3DViewAction(0), _print3DViewToFileAction(0),
 				  _useGlobalDisplayPropertiesAction(0),
 				  _displayTrihedronAction(0), _displayLandmarkAction(0),
 				  _parametrizeLandmarkAction(0), _displayFocalPointAction(0),
@@ -322,6 +322,7 @@ namespace QtComponents
 				: _preferencesAction(wa._preferencesAction),
 				  _editSettingsAction(wa._editSettingsAction),
 				  _quitAction(wa._quitAction),
+				  _2dModeAction (wa._2dModeAction),
 				  _print3DViewAction(wa._print3DViewAction),
 				  _print3DViewToFileAction(wa._print3DViewToFileAction),
 				  _useGlobalDisplayPropertiesAction(wa._useGlobalDisplayPropertiesAction),
@@ -454,12 +455,13 @@ namespace QtComponents
 		{
 			if (&wa != this)
 			{
-				_preferencesAction       = wa._preferencesAction;
-				_editSettingsAction      = wa._editSettingsAction;
-				_quitAction              = wa._quitAction;
-				_print3DViewAction       = wa._print3DViewAction;
-				_print3DViewToFileAction = wa._print3DViewToFileAction;
-				_useGlobalDisplayPropertiesAction = wa._useGlobalDisplayPropertiesAction;
+				_preferencesAction                    = wa._preferencesAction;
+				_editSettingsAction                   = wa._editSettingsAction;
+				_quitAction                           = wa._quitAction;
+				_2dModeAction                         = wa._2dModeAction;
+				_print3DViewAction                    = wa._print3DViewAction;
+				_print3DViewToFileAction              = wa._print3DViewToFileAction;
+				_useGlobalDisplayPropertiesAction     = wa._useGlobalDisplayPropertiesAction;
 				_displayTrihedronAction               = wa._displayTrihedronAction;
 				_displayLandmarkAction                = wa._displayLandmarkAction;
 				_parametrizeLandmarkAction            = wa._parametrizeLandmarkAction;
@@ -1748,9 +1750,8 @@ void QtMgx3DMainWindow::showReady ( )
 			// Menu Vue :
 			_viewMenu = new QMenu("&Vue", menubar);
 			menubar->addMenu(_viewMenu);
-#ifndef QT_4
 			_viewMenu->setToolTipsVisible(true);
-#endif    // 	QT_4
+			_viewMenu->addAction(getActions()._2dModeAction);
 			_viewMenu->addAction(getActions()._print3DViewAction);
 			_viewMenu->addAction(getActions()._print3DViewToFileAction);
 			_viewMenu->addAction(getActions()._useGlobalDisplayPropertiesAction);
@@ -1780,9 +1781,7 @@ void QtMgx3DMainWindow::showReady ( )
 			// Menu Topologie :
 			_topologyMenu = new QMenu("&Topologie", menubar);
 			menubar->addMenu(_topologyMenu);
-#ifndef QT_4
 			_topologyMenu->setToolTipsVisible(true);
-#endif    // 	QT_4
 			_topologyMenu->addAction(getActions()._topoSetDefaultNbMeshingEdgesAction);
 			_topologyMenu->addAction(getActions()._topoRefineAction);
 #ifdef _DEBUG
@@ -2036,6 +2035,7 @@ void QtMgx3DMainWindow::showReady ( )
 			_3dViewToolbar->addAction(getActions()._displayLandmarkAction);
 			_3dViewToolbar->addAction(getActions()._displayFocalPointAction);
 			_3dViewToolbar->addSeparator();
+			_3dViewToolbar->addAction(getActions()._2dModeAction);
 			_3dViewToolbar->addAction(getActions()._xOyViewAction);
 			_3dViewToolbar->addAction(getActions()._xOzViewAction);
 			_3dViewToolbar->addAction(getActions()._yOzViewAction);
@@ -2230,6 +2230,13 @@ void QtMgx3DMainWindow::showReady ( )
 			connect(_actions._executePythonScriptAction, SIGNAL(triggered()), this, SLOT(executePythonScriptCallback()), defaultConnectionType);
 
 			// La vue 3D :
+			_actions._2dModeAction		= new QAction (QIcon(":/images/mode_2d.png"), QString ("Affichage 2D"), this);
+			_actions._2dModeAction->setCheckable (true);
+			_actions._2dModeAction->setChecked (false);
+			UTF8String	tooltip (Charset::UTF_8);
+			tooltip << "Fige les interactions dans le plan courant. Pour basculer dans le plan xOy, presser préalablement la touche \'z\' dans la fenêtre graphique.";
+			_actions._2dModeAction->setToolTip (UTF8TOQSTRING (tooltip));
+			connect(_actions._2dModeAction, SIGNAL(toggled(bool)), this, SLOT(mode2DCallback(bool)),defaultConnectionType);
 			_actions._print3DViewAction = new QAction(QIcon(":/images/print.png"), "Imprimer ...", this);
 			connect(_actions._print3DViewAction, SIGNAL(triggered()), this, SLOT(print3DViewCallback()), defaultConnectionType);
 			_actions._print3DViewAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
@@ -6234,6 +6241,15 @@ void QtMgx3DMainWindow::executeRecentMgx3DScriptCallback ( )
 		_pythonPanel->setUsabled (true);
 }	// QtMgx3DMainWindow::executeRecentMgx3DScriptCallback
 
+
+void QtMgx3DMainWindow::mode2DCallback (bool enable2D)
+{
+    BEGIN_QT_TRY_CATCH_BLOCK
+
+	throw Exception (UTF8String ("QtMgx3DMainWindow::mode2DCallback : méthode à surcharger.", Charset::UTF_8));
+
+	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
+}	// QtMgx3DMainWindow::mode2DCallback
 
 
 void QtMgx3DMainWindow::print3DViewCallback ( )

@@ -88,6 +88,13 @@ class vtkUnifiedInteractorStyle : public vtkInteractorStyleTrackballCamera
 	{ return _enablePlaneKeys; }
 
 	/**
+	 * (Dés)Active le mode 2D, à savoir le plan de l'écran est le plan xOy, les rotations autour d'un axe sont interdites.
+	 */
+	 virtual void Set2DMode (bool enable);
+	 virtual bool Get2DMode ( ) const
+	 { return _2dMode; }
+
+	/**
 	 * <P>Surcharge pour éviter de redéterminer le renderer ou se trouve l'interacteur à chaque mouvement de souris : cela permet dans le cas de
 	 * renderers multiples d'appliquer les mouvements au renderer où l'action a debuté.</P>
 	 * <P>Ces évènements ponctuels provoquent l'invocation de <I>InvokeEvent (vtkCommand::InteractionEvent, NULL);</I>.
@@ -271,6 +278,11 @@ class vtkUnifiedInteractorStyle : public vtkInteractorStyleTrackballCamera
 	 * <I>true</I> si le positionnement de la vue dans un plan sur touche <I>x</I>, <I>X</I>, ... est activé, <I>false</I> dans le cas contraire.
 	 */
 	bool		_enablePlaneKeys;
+
+	/**
+	 * <I>true</I> si on est en mode 2D (plan de l'écran = xOy), <I>false</I> si on en mode 3D.
+	 */
+	 bool		_2dMode;
 };	// class vtkUnifiedInteractorStyle
 
 

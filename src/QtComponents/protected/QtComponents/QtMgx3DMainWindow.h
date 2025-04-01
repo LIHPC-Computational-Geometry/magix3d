@@ -377,7 +377,7 @@ class QtMgx3DMainWindow :
 		QAction			*_longCommandAction, *_openCascadeLongCommandAction;
 		QAction			*_executePythonScriptAction;
 		QAction			*_preferencesAction, *_editSettingsAction, *_quitAction;
-		QAction			*_print3DViewAction, *_print3DViewToFileAction;
+		QAction			*_2dModeAction, *_print3DViewAction, *_print3DViewToFileAction;
 		QAction			*_useGlobalDisplayPropertiesAction;
 		QAction			*_displayTrihedronAction, *_displayLandmarkAction,
 						*_parametrizeLandmarkAction, *_displayFocalPointAction,
@@ -1005,6 +1005,11 @@ class QtMgx3DMainWindow :
 	 * Callbacks du menu Vue
 	 */
 	//@{
+
+	/**
+	 * Passe en mode d'interaction 2D/3D.
+	 */
+	virtual void mode2DCallback (bool enable2D);
 
 	/**
 	 * Affiche une boite de dialogue d'impression de la vue 3D.

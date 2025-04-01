@@ -26,13 +26,13 @@ double	vtkUnifiedInteractorStyle::eyeAngleModifier	= 0.25;		// en degres
 bool	vtkUnifiedInteractorStyle::upZoom		= false;
 
 vtkUnifiedInteractorStyle::vtkUnifiedInteractorStyle ( )
-	: vtkInteractorStyleTrackballCamera ( ), _motionRatio (0.1), _enablePlaneKeys (true)
+	: vtkInteractorStyleTrackballCamera ( ), _motionRatio (0.1), _enablePlaneKeys (true), _2dMode (false)
 {
 }	// vtkUnifiedInteractorStyle::vtkUnifiedInteractorStyle
 
 
 vtkUnifiedInteractorStyle::vtkUnifiedInteractorStyle (const vtkUnifiedInteractorStyle&)
-	: vtkInteractorStyleTrackballCamera ( ), _motionRatio (0.1), _enablePlaneKeys (true)
+	: vtkInteractorStyleTrackballCamera ( ), _motionRatio (0.1), _enablePlaneKeys (true), _2dMode (false)
 {
 	assert (0 && "vtkUnifiedInteractorStyle copy constructor is not allowed.");
 }	// vtkUnifiedInteractorStyle copy constructor
@@ -69,12 +69,12 @@ void vtkUnifiedInteractorStyle::OnChar ( )
 			break;
 		case 'x'	:
 //		case 'X'	:
-			if ((true == GetEnablePlaneKeys ( )) && (false == hasModifier ( )))
+			if ((true != _2dMode) && (true == GetEnablePlaneKeys ( )) && (false == hasModifier ( )))
 				DisplayyOzViewPlane ( );
 			break;
 		case 'y'	:
 //		case 'Y'	:
-			if ((true == GetEnablePlaneKeys ( )) && (false == hasModifier ( )))
+			if ((true != _2dMode) && (true == GetEnablePlaneKeys ( )) && (false == hasModifier ( )))
 				DisplayxOzViewPlane ( );
 			break;
 		case 'z'	:
@@ -100,13 +100,33 @@ void vtkUnifiedInteractorStyle::OnChar ( )
 }	// vtkUnifiedInteractorStyle::OnChar
 
 
+void vtkUnifiedInteractorStyle::Set2DMode (bool enable)
+{
+	if (enable != _2dMode)
+	{
+		_2dMode	= enable;
+
+// Tel que c'est le plan courant qui est figé. Si on veut forcer d'emblée à ce que ce soit le plan
+// xOy il convient de décommenter les lignes suivantes.
+/*		if (true == enable)
+		{
+			DisplayxOyViewPlane ( );
+			ResetRoll ( );
+		}	// if (true == enable)	*/
+	}	// if (enable != _2dMode)
+}	// vtkUnifiedInteractorStyle::Set2DMode
+
+
 void vtkUnifiedInteractorStyle::OnMouseMove ( )
 {
 	switch (this->State)
 	{
 		case VTKIS_ROTATE	:
-			this->Rotate ( );
-			this->InvokeEvent (vtkCommand::InteractionEvent, NULL);
+			if (true != _2dMode)
+			{
+				this->Rotate ( );
+				this->InvokeEvent (vtkCommand::InteractionEvent, NULL);
+			}
 			break;
 		case VTKIS_PAN		:
 			this->Pan ( );
@@ -117,8 +137,11 @@ void vtkUnifiedInteractorStyle::OnMouseMove ( )
 			this->InvokeEvent (vtkCommand::InteractionEvent, NULL);
 			break;
 		case VTKIS_SPIN		:
-			this->Spin ( );
-			this->InvokeEvent (vtkCommand::InteractionEvent, NULL);
+			if (true != _2dMode)
+			{
+				this->Spin ( );
+				this->InvokeEvent (vtkCommand::InteractionEvent, NULL);
+			}
 			break;
 	}	// switch (this->State)
 }	// vtkUnifiedInteractorStyle::OnMouseMove
