@@ -35,10 +35,12 @@ def test_nsbox_scylinder_error(capfd):
     gm.rotate(["Vol0000"], Mgx3D.RotX(270))
     # Collage entre géométries
     gm.glue(["Vol0001", "Vol0000"])
-    # Création d'un bloc topologique sur une géométrie => PB: ce n'est plus un cylindre après le glue
-    tm.newTopoOGridOnGeometry("Vol0000", 0.5)
-
-    out, err = capfd.readouterr()
-    expected = "CommandNewTopoOGridOnGeometry impossible, entité Vol0000 n'est pas d'un type supporté pour le moment"
-    assert expected in err
+    try:
+        # Création d'un bloc topologique sur une géométrie => PB: ce n'est plus un cylindre après le glue
+        tm.newTopoOGridOnGeometry("Vol0000", 0.5)
+        assert False
+    except RuntimeError:
+        out, err = capfd.readouterr()
+        expected = "CommandNewTopoOGridOnGeometry impossible, entité Vol0000 n'est pas d'un type supporté pour le moment"
+        assert expected in err
 
