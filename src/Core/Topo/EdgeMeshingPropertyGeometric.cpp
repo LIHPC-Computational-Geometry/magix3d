@@ -209,17 +209,18 @@ getScriptCommand() const
 {
     TkUtil::UTF8String o (TkUtil::Charset::UTF_8);
     o << getMgx3DAlias() << ".EdgeMeshingPropertyGeometric("
-      << (long)m_nb_edges <<","
+      << (long)m_nb_edges <<", "
       << Utils::Math::MgxNumeric::userRepresentation(m_raison);
     if (isPolarCut())
     	o << ", "<<getPolarCenter().getScriptCommand();
-    if (!getDirect())
-    	o << ", False";
-    if (m_initWithArm1){
-    	 if (getDirect())
-    		 o << ", True"; // sinon Python bloque
-    	o << ","<<Utils::Math::MgxNumeric::userRepresentation(m_arm1);
+    if (m_initWithArm1) {
+        o << (getDirect() ? std::string(", True") : std::string(", False"));
+        o << ", True"; // this is for m_initWithArm1
+        o << ", " << Utils::Math::MgxNumeric::userRepresentation(m_arm1);
     }
+    else if (!getDirect())
+            o << ", False";
+
     o << ")";
     return o;
 }
