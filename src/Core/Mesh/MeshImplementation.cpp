@@ -323,7 +323,9 @@ void MeshImplementation::writeMli(std::string nom)
     // on ajoute les groupes de mailles de gmds
     bool isCreateGMDSGroupsOK = createGMDSGroups();
     if(!isCreateGMDSGroupsOK) {
-    	throw TkUtil::Exception (TkUtil::UTF8String ("MeshImplementation::writeMli ne peut créer les groupes.", TkUtil::Charset::UTF_8));
+    	throw TkUtil::Exception (TkUtil::UTF8String ("MeshImplementation::writeMli ne peut créer les groupes."
+                                                     "Veuillez fermer les panneaux qualité ou désafficher les classes de mailles de ces panneaux.",
+                                                     TkUtil::Charset::UTF_8));
     }
 
     try {
@@ -382,7 +384,9 @@ void MeshImplementation::writeVTK(std::string nom)
     // on ajoute les groupes de mailles de gmds
 	bool isCreateGMDSGroupsOK = createGMDSGroups();
 	if(!isCreateGMDSGroupsOK) {
-	  	throw TkUtil::Exception (TkUtil::UTF8String ("MeshImplementation::writeVTK ne peut créer les groupes.", TkUtil::Charset::UTF_8));
+	  	throw TkUtil::Exception (TkUtil::UTF8String ("MeshImplementation::writeVTK ne peut créer les groupes."
+                                                     "Veuillez fermer les panneaux qualité ou désafficher les classes de mailles de ces panneaux.",
+                                                     TkUtil::Charset::UTF_8));
 	}
 
 	try{
