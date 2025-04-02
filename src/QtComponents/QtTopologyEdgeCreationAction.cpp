@@ -90,6 +90,8 @@ QtTopologyEdgeCreationPanel::QtTopologyEdgeCreationPanel (
 	         this, SLOT (entitiesRemovedFromSelectionCallback (QString)));
     _curvePanel->setEnabled(false);
 
+    addPreviewCheckBox (true);
+
 	layout->addStretch (2);
 
 }	// QtTopologyEdgeCreationPanel::QtTopologyEdgeCreationPanel
@@ -230,11 +232,15 @@ void QtTopologyEdgeCreationPanel::preview (bool show, bool destroyInteractor){
 
         if(_verticesPanel->getUniqueNames().size() == 2){
 
+            Math::Point point0 = context->getTopoManager().getCoord(_verticesPanel->getUniqueNames()[0]);
+            Math::Point point1 = context->getTopoManager().getCoord(_verticesPanel->getUniqueNames()[1]);
+            vector<size_t>		indices;
 
-            //RenderingManager::RepresentationID	repID	= getRenderingManager ( ).createSegmentsWireRepresentation(points, graphicalProps, true);
-            //registerPreviewedObject (repID);
+            RenderingManager::RepresentationID	repID	=
+                    getRenderingManager ( ).createSegment(point0, point1, graphicalProps, true);
+            registerPreviewedObject (repID);
 
-            //getRenderingManager ( ).forceRender ( );
+            getRenderingManager ( ).forceRender ( );
         }
     }catch (...)
     {
