@@ -1,13 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file Curve.cpp
- *
- *  \author Franck Ledoux
- *
- *  \date 03/11/2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/Context.h"
-/*----------------------------------------------------------------------------*/
 #include <list>
 #include <string.h>
 #include <sys/types.h>
@@ -16,12 +7,16 @@
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
-#include "Group/Group1D.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/OCCHelper.h"
+#include "Geom/GeomProjectImplementation.h"
+
 #include "Internal/Context.h"
+
 #include "Topo/CoEdge.h"
 #include "Topo/Vertex.h"
+
+#include "Group/Group1D.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
@@ -201,6 +196,7 @@ bool Curve::contains(Curve* ACurve) const
     // TESTEE PEUT NE PAS ENCORE ETRE CONNECTEE TOPOLOGIQUEMENT
     // AVEC DES ENTITES M3D
     //===============================================================
+	GeomProjectImplementation gpi;
 	for (TopoDS_Shape shOther : ACurve->m_occ_edges)
 	{
 		//===============================================================
@@ -215,9 +211,7 @@ bool Curve::contains(Curve* ACurve) const
 			gp_Pnt p_i = BRep_Tool::Pnt(v_i);
 
 			Utils::Math::Point pi(p_i.X(),p_i.Y(),p_i.Z());
-			Utils::Math::Point proj_i;
-
-			project(pi, proj_i);
+			Utils::Math::Point proj_i = gpi.project(this, pi).first;
 			if(!Utils::Math::MgxNumeric::isNearlyZero(pi.length(proj_i),tol))
 				return false;
 		}
@@ -240,8 +234,7 @@ bool Curve::contains(Curve* ACurve) const
 			gp_Pnt pnt1 = curve_adaptor.Value(u1);
 			Utils::Math::Point pi1(pnt1.X(),pnt1.Y(),pnt1.Z());
 
-			Utils::Math::Point proj_i1;
-			project(pi1,proj_i1);
+			Utils::Math::Point proj_i1 = gpi.project(this, pi1).first;
 			if(!Utils::Math::MgxNumeric::isNearlyZero(pi1.length(proj_i1),tol))
 			{
 				//            std::cout<<"Point  :"<<pi1<<std::endl;
@@ -253,8 +246,7 @@ bool Curve::contains(Curve* ACurve) const
 			gp_Pnt pnt2 = curve_adaptor.Value(u2);
 			Utils::Math::Point pi2(pnt2.X(),pnt2.Y(),pnt2.Z());
 
-			Utils::Math::Point proj_i2;
-			project(pi2,proj_i2);
+			Utils::Math::Point proj_i2 = gpi.project(this, pi2).first;
 			if(!Utils::Math::MgxNumeric::isNearlyZero(pi2.length(proj_i2),tol))
 			{
 				//            std::cout<<"Point  :"<<pi2<<std::endl;
@@ -263,35 +255,6 @@ bool Curve::contains(Curve* ACurve) const
 		}
 	}
     return true;
-}
-/*----------------------------------------------------------------------------*/
-uint Curve::project(Utils::Math::Point& P) const
-{
-	Utils::Math::Point P2;
-	int idBest = project(P, P2);
-	P = P2;
-    return idBest;
-}
-/*----------------------------------------------------------------------------*/
-uint Curve::project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const
-{
-	P2 = P1;
-	OCCHelper::projectPointOn(m_occ_edges[0], P2);
-	Utils::Math::Point pBest = P2;
-	uint idBest = 0;
-	double norme2 = (P2-P1).norme2();
-	for (uint i=1; i<m_occ_edges.size(); i++){
-		P2 = P1;
-		OCCHelper::projectPointOn(m_occ_edges[i], P2);
-		double dist = (P2-P1).norme2();
-		if (dist<norme2){
-			norme2 = dist;
-			pBest = P2;
-        	idBest = i;
-		}
-	}
-	P2 = pBest;
-    return idBest;
 }
 /*----------------------------------------------------------------------------*/
 void Curve::
@@ -325,8 +288,7 @@ getPoint(const double& p, Utils::Math::Point& Pt, const bool in01) const
 void Curve::tangent(const Utils::Math::Point& P1, Utils::Math::Vector& V2) const
 {
 	// on va prendre la projection la plus courte pour le cas composé et utiliser la tangente associée
-	Utils::Math::Point P2;
-	uint idBest = project(P1, P2);
+	uint idBest = GeomProjectImplementation().project(this, P1).second;
 	OCCHelper::tangent(m_occ_edges[idBest], P1, V2);
 }
 /*----------------------------------------------------------------------------*/
@@ -874,8 +836,7 @@ getCenteredPosition() const
 
     pt /= (double)m_vertices.size();
 
-    project(pt);
-    return pt;
+	return GeomProjectImplementation().project(this, pt).first;
 }
 /*----------------------------------------------------------------------------*/
 bool Curve::isA(const std::string& name)

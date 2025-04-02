@@ -1,11 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandSetGeomAssociation.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 07/03/2011
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandSetGeomAssociation.h"
 #include "Topo/TopoManager.h"
 #include "Topo/Block.h"
@@ -13,12 +6,13 @@
 #include "Topo/FaceMeshingPropertyTransfinite.h"
 
 #include "Internal/Context.h"
+
 #include "Geom/CommandCreateGeom.h"
 #include "Geom/CommandEditGeom.h"
 #include "Geom/GeomModificationBaseClass.h"
 #include "Geom/IncidentGeomEntitiesVisitor.h"
 #include "Geom/EntityFactory.h"
-
+#include "Geom/GeomProjectImplementation.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/InformationLog.h>
@@ -284,8 +278,9 @@ void CommandSetGeomAssociation::project(Vertex* vtx)
 	// déplace le sommet topologique si la projection implique un déplacement
 	if (m_geom_entity && m_move_vertices){
 		Utils::Math::Point posTopo = vtx->getCoord();
-		Utils::Math::Point posGeom;
-		m_geom_entity->project(posTopo, posGeom);
+		Geom::GeomProjectVisitor gpv(posTopo);
+		m_geom_entity->accept(gpv);
+		Utils::Math::Point posGeom = gpv.getProjectedPoint();
 		if (!(posTopo == posGeom)){
 			vtx->saveVertexGeomProperty(&getInfoCommand(), true);
 			vtx->setCoord(posGeom);

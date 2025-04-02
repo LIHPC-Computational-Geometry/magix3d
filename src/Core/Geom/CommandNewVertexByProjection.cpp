@@ -1,13 +1,10 @@
-/*
- * CommandNewVertexByProjectionByProjection.cpp
- *
- *  Created on: 10 juil. 2012
- *      Author: ledouxf
- */
+/*----------------------------------------------------------------------------*/
 #include "Geom/CommandNewVertexByProjection.h"
 #include "Geom/GeomProperty.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomManager.h"
+#include "Geom/GeomProjectImplementation.h"
+/*----------------------------------------------------------------------------*/
 #include "Utils/MgxException.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
@@ -48,10 +45,11 @@ internalExecute()
 
     Utils::Math::Point p(m_v->getX(),m_v->getY(),m_v->getZ());
 
+    GeomProjectImplementation gpi;
     if (m_c)
-    	m_c->project(p);
+        p = gpi.project(m_c, p).first;
     else
-    	m_s->project(p);
+        p = gpi.project(m_s, p).first;
 
     Vertex* v= EntityFactory(getContext()).newVertex(p);
     m_createdEntities.push_back(v);

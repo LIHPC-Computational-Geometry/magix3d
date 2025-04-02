@@ -136,17 +136,6 @@ public:
     {m_computedArea = area;}
 
     /*------------------------------------------------------------------------*/
-    /** \brief Projete le point P sur le sommet. P est modifié
-     *  \param P le point à projeter
-     */
-    virtual uint project(Utils::Math::Point& P) const = 0;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Projete le point P1 sur le sommet, le résultat est le point P2.
-     */
-    virtual uint project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const = 0;
-
-    /*------------------------------------------------------------------------*/
     /** \brief  Calcul de la boite englobante orientée selon les axes Ox,Oy,Oz
      *
      *  \param pmin Les coordonnées min de la boite englobante

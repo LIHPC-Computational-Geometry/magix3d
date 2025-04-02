@@ -139,17 +139,6 @@ public:
     virtual bool contains(Curve* ACurve) const;
 
     /*------------------------------------------------------------------------*/
-    /** \brief Projete le point P sur la courbe. P est modifié
-     *  \param P le point à projeter
-     */
-    virtual uint project(Utils::Math::Point& P) const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Projete le point P1 sur la courbe, le résultat est le point P2.
-     */
-    virtual uint project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const ;
-
-    /*------------------------------------------------------------------------*/
     /** \brief Donne le point en fonction du paramètre sur la courbe
      * \param p le paramètre curviligne compris entre 0 et 1
      */

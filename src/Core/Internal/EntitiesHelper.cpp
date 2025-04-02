@@ -1,40 +1,32 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file EntitiesHelper.cpp
- *
- * \author Charles PIGNEROL
- *
- * \date 14/01/2011
- */
-/*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
 #include "Internal/EntitiesHelper.h"
 #include "Internal/M3DCommandResult.h"
 #include "Internal/CommandInternal.h"
+/*----------------------------------------------------------------------------*/
 #include "Utils/Common.h"
 #include "Utils/Command.h"
 #include "Utils/Vector.h"
-
+/*----------------------------------------------------------------------------*/
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
+#include "Geom/GeomProjectImplementation.h"
 #include "Geom/IncidentGeomEntitiesVisitor.h"
+/*----------------------------------------------------------------------------*/
 #include "Topo/Block.h"
 #include "Topo/CoFace.h"
 #include "Topo/Face.h"
 #include "Topo/CoEdge.h"
 #include "Topo/Vertex.h"
-
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/UTF8String.h>
-
-#include <sys/types.h>          // CP : uint sur Bull
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/NumericServices.h>
-
+/*----------------------------------------------------------------------------*/
+#include <sys/types.h>          // CP : uint sur Bull
 #include <limits>
-
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -570,16 +562,10 @@ double EntitiesHelper::length(const Utils::Entity* ce1, const Utils::Entity* ce2
 
 		Utils::Math::Point p2;
 		if (e2->isGeomEntity()){
-			Geom::Vertex* vertex = dynamic_cast<Geom::Vertex*>(e2);
-			if (vertex)
-				p2 = vertex->getCoord();
-			else {
-				Geom::GeomEntity* ge = dynamic_cast<Geom::GeomEntity*>(e2);
-				if (ge)
-					ge->project (p1, p2);
-				else
-					throw TkUtil::Exception (TkUtil::UTF8String ("La deuxième entité doit être une entité géométrique du type sommet, courbe ou surface", TkUtil::Charset::UTF_8));
-			}
+			Geom::GeomEntity* ge = dynamic_cast<Geom::GeomEntity*>(e2);
+			Geom::GeomProjectVisitor project_visitor(p1);
+			ge->accept(project_visitor);
+			p2 = project_visitor.getProjectedPoint();
 		} else if (e2->isTopoEntity()){
 			Topo::Vertex* vertex = dynamic_cast<Topo::Vertex*>(e2);
 			if (vertex)

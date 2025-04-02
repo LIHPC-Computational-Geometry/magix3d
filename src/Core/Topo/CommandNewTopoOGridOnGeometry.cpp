@@ -1,21 +1,16 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandNewTopoOGridOnGeometry.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 10/1/2012
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandNewTopoOGridOnGeometry.h"
 #include "Topo/TopoManager.h"
 #include "Topo/Block.h"
 #include "Topo/TopoHelper.h"
+
 #include "Utils/Common.h"
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
 #include "Utils/Spherical.h"
 #include "Utils/Matrix33.h"
-#include "Internal/Context.h"
+#include "Utils/TypeDedicatedNameManager.h"
+
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
@@ -27,11 +22,11 @@
 #include "Geom/GeomEntity.h"
 #include "Geom/GeomHelper.h"
 #include "Geom/IncidentGeomEntitiesVisitor.h"
+#include "Geom/GeomProjectImplementation.h"
+
 #include "Internal/NameManager.h"
 #include "Internal/Context.h"
 #include "Internal/EntitiesHelper.h"
-#include "Utils/TypeDedicatedNameManager.h"
-
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
@@ -4194,8 +4189,9 @@ snapVertices()
 				Geom::GeomEntity* ge = vtx->getGeomAssociation();
 				if (ge->getType() == Utils::Entity::GeomVertex){
 					Utils::Math::Point pt1 = vtx->getCoord();
-					Utils::Math::Point pt2;
-					ge->project(pt1, pt2);
+                    Geom::GeomProjectVisitor gpv(pt1);
+                    ge->accept(gpv);
+                    Utils::Math::Point pt2 = gpv.getProjectedPoint();
 					vtx->setCoord(pt2);
 				}
 			}

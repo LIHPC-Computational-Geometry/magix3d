@@ -43,6 +43,7 @@
 #include "Geom/Surface.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomModificationBaseClass.h"
+#include "Geom/GeomProjectImplementation.h"
 
 #include "Group/Group1D.h"
 /*----------------------------------------------------------------------------*/
@@ -351,7 +352,9 @@ split(uint nbMeshingEdges, Internal::InfoCommand* icmd)
 				}
 				else {
 					points.push_back(getVertex(0)->getCoord() + (getVertex(1)->getCoord() - getVertex(0)->getCoord()) * ratio);
-					getGeomAssociation()->project(points[0]);
+					Geom::GeomProjectVisitor gpv(points[0]);
+					getGeomAssociation()->accept(gpv);
+					points[0] = gpv.getProjectedPoint();
 				}
 			}
 			else {
@@ -498,7 +501,6 @@ std::vector<Topo::Vertex*> CoEdge::split(uint nbMeshingEdges1, uint nbMeshingEdg
 		if (getGeomAssociation()){
 			Geom::Curve* curve = dynamic_cast<Geom::Curve*> (getGeomAssociation());
 			if (curve){
-
 				curve->getParametricsPoints(getVertex(0)->getCoord(),
 						getVertex(1)->getCoord(),
 						2, l_ratios, points);
@@ -508,8 +510,14 @@ std::vector<Topo::Vertex*> CoEdge::split(uint nbMeshingEdges1, uint nbMeshingEdg
 						+ (getVertex(1)->getCoord() - getVertex(0)->getCoord()) * l_ratios[0]);
 				points.push_back(getVertex(0)->getCoord()
 						+ (getVertex(1)->getCoord() - getVertex(0)->getCoord()) * l_ratios[1]);
-				getGeomAssociation()->project(points[0]);
-				getGeomAssociation()->project(points[1]);
+
+				Geom::GeomProjectVisitor gpv0(points[0]);
+				getGeomAssociation()->accept(gpv0);
+				points[0] = gpv0.getProjectedPoint();
+
+				Geom::GeomProjectVisitor gpv1(points[1]);
+				getGeomAssociation()->accept(gpv1);
+				points[1] = gpv1.getProjectedPoint();
 			}
 		}
 		else {
@@ -838,8 +846,9 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
 #ifdef _DEBUG_REPRESENTATION
         std::cout<<"  pt1 "<<pt1<<std::endl;
 #endif
-        Utils::Math::Point pt2;
-        getGeomAssociation()->project(pt1, pt2);
+		Geom::GeomProjectVisitor gpv(pt1);
+		getGeomAssociation()->accept(gpv);
+		Utils::Math::Point pt2 = gpv.getProjectedPoint();
 #ifdef _DEBUG_REPRESENTATION
         std::cout<<"  pt2 "<<pt2<<std::endl;
 #endif
@@ -1106,7 +1115,7 @@ Geom::Curve* CoEdge::createBSplineByProj(Utils::Math::Point& pt0,
 	const uint nbPts = 20;
 	for (uint i=1; i<nbPts; i++){ // nbPts-2 points entre les 2 extrémités
 		Utils::Math::Point pt = pt0 + vect*((double)i)/((double)nbPts);
-		surface->project(pt);
+		pt = Geom::GeomProjectImplementation().project(surface, pt).first;
 #ifdef _DEBUG_GETPOINTS
 		std::cout<<" points_bspline["<<i<<"]: "<<pt0 + vect*((double)i)/((double)nbPts)<<" => "<<pt<<std::endl;
 #endif
@@ -1240,7 +1249,7 @@ Geom::Curve* CoEdge::createBSplineByProjWithOrthogonalIntersection(Utils::Math::
 		Utils::Math::Point vect = (ptI - pt0);
 		for (uint i=1; i<nbPts; i++){ // nbPts-2 points entre les 2 extrémités
 			Utils::Math::Point pt = pt0 + vect*((double)i)/((double)nbPts);
-			surface->project(pt);
+			pt = Geom::GeomProjectImplementation().project(surface, pt).first;
 #ifdef _DEBUG_GETPOINTS
 			std::cout<<" points_bspline["<<i<<"]: "<<pt0 + vect*((double)i)/((double)nbPts)<<" => "<<pt<<std::endl;
 #endif
@@ -1252,7 +1261,7 @@ Geom::Curve* CoEdge::createBSplineByProjWithOrthogonalIntersection(Utils::Math::
 		vect = (pt1 - ptI);
 		for (uint i=1; i<nbPts; i++){ // nbPts-2 points entre les 2 extrémités
 			Utils::Math::Point pt = ptI + vect*((double)i)/((double)nbPts);
-			surface->project(pt);
+			pt = Geom::GeomProjectImplementation().project(surface, pt).first;
 #ifdef _DEBUG_GETPOINTS
 			std::cout<<" points_bspline["<<i<<"]: "<<ptI + vect*((double)i)/((double)nbPts)<<" => "<<pt<<std::endl;
 #endif
@@ -1309,12 +1318,16 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 	if (project){
 		Geom::GeomEntity* ge0 = getVertex(0)->getGeomAssociation();
 		if (ge0 && !getVertex(0)->isMeshed()){
-			ge0->project(pt0);
+			Geom::GeomProjectVisitor gpv(pt0);
+			ge0->accept(gpv);
+			pt0 = gpv.getProjectedPoint();
 			pt0_projected = true;
 		}
 		Geom::GeomEntity* ge1 = getVertex(1)->getGeomAssociation();
 		if (ge1 && !getVertex(1)->isMeshed()){
-			ge1->project(pt1);
+			Geom::GeomProjectVisitor gpv(pt1);
+			ge1->accept(gpv);
+			pt1 = gpv.getProjectedPoint();
 			pt1_projected = true;
 		}
 	}
@@ -1548,7 +1561,6 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 			if (curveToBeDeleted){
 				Geom::Surface* surface = dynamic_cast<Geom::Surface*> (ge);
 				CHECK_NULL_PTR_ERROR(surface);
-				Utils::Math::Point newPt;
 				double lnVect = vect.norme();
 
 #ifdef _DEBUG_GETPOINTS
@@ -1556,7 +1568,7 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 #endif
 
 				for (uint i=1; i<points.size()/2; i++){
-					surface->project(points[i], newPt);
+					Utils::Math::Point newPt = Geom::GeomProjectImplementation().project(surface, points[i]).first;
 #ifdef _DEBUG_GETPOINTS
 					std::cout<<"dist newPt à pt0 = "<<(newPt-pt0).norme()<<std::endl;
 #endif
@@ -1566,7 +1578,7 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 						points[i] = newPt;
 				}
 				for (uint i=points.size()/2; i<points.size()-1; i++){
-					surface->project(points[i], newPt);
+					Utils::Math::Point newPt = Geom::GeomProjectImplementation().project(surface, points[i]).first;
 #ifdef _DEBUG_GETPOINTS
 					std::cout<<"dist newPt à pt1 = "<<(newPt-pt1).norme()<<std::endl;
 #endif
@@ -2026,8 +2038,11 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
         // reprojection sur la surface pour le cas où on l'aurait quitté
         if (getGeomAssociation() && getGeomAssociation()->getType() == Utils::Entity::GeomSurface){
         	Geom::GeomEntity* ge = getGeomAssociation();
-        	for (uint i=1; i<points.size()-1; i++)
-        		ge->project(points[i]);
+        	for (uint i=1; i<points.size()-1; i++) {
+				Geom::GeomProjectVisitor gpv(points[i]);
+				ge->accept(gpv);
+				points[i] = gpv.getProjectedPoint();
+			}
         }
 
     } // end if (dni->isOrthogonal())

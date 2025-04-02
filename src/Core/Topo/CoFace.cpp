@@ -1,13 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file CoFace.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 13/02/2012
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
 #include <iostream>
 #include <map>
 #include <vector>
@@ -42,6 +33,7 @@
 #include "Internal/InternalPreferences.h"
 
 #include "Geom/GeomEntity.h"
+#include "Geom/GeomProjectImplementation.h"
 
 #include "Group/Group2D.h"
 /*----------------------------------------------------------------------------*/
@@ -2007,8 +1999,9 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
         // on ajoute une flêche entre le barycentre de la face et la géométrie
         //std::cout<<"  SHOWASSOCIATION pour "<<getName()<<" -> vers "<<getGeomAssociation()->getName()<<std::endl;
         //std::cout<<"    barycentre : "<<repr_barycentre<<std::endl;
-        Utils::Math::Point pt2;
-        getGeomAssociation()->project(repr_barycentre, pt2);
+        Geom::GeomProjectVisitor gpv(repr_barycentre);
+        getGeomAssociation()->accept(gpv);
+        Utils::Math::Point pt2 = gpv.getProjectedPoint();
         //std::cout<<"    pt2 : "<<pt2<<std::endl;
         std::vector<Utils::Math::Point>& vecteur = tdr->getVector();
         vecteur.push_back(repr_barycentre);

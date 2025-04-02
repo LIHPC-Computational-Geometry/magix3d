@@ -122,17 +122,6 @@ public:
     virtual void get(std::vector<Topo::Vertex*>& vertices);
 
     /*------------------------------------------------------------------------*/
-    /** \brief Projete le point P sur le sommet. P est modifié
-     *  \param P le point à projeter
-     */
-    virtual uint project(Utils::Math::Point& P) const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Projete le point P1 sur le sommet, le résultat est le point P2.
-     */
-    virtual uint project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const ;
-
-    /*------------------------------------------------------------------------*/
     /** \brief  Ajoute c comme courbe incidente
      *
      *  \param c un pointeur sur une courbe

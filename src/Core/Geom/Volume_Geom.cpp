@@ -83,18 +83,6 @@ GeomEntity* Volume::clone(Internal::Context& c)
 Volume::~Volume()
 {}
 /*----------------------------------------------------------------------------*/
-uint Volume::project(Utils::Math::Point& P) const
-{
-    throw TkUtil::Exception (TkUtil::UTF8String ("Volume::project n'est pas disponible", TkUtil::Charset::UTF_8));
-    return 0;
-}
-/*----------------------------------------------------------------------------*/
-uint Volume::project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const
-{
-    throw TkUtil::Exception (TkUtil::UTF8String ("Volume::project n'est pas disponible", TkUtil::Charset::UTF_8));
-    return 0;
-}
-/*----------------------------------------------------------------------------*/
 void Volume::add(Surface* s)
 {
     m_surfaces.push_back(s);

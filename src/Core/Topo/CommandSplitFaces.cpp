@@ -1,20 +1,14 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandSplitFaces.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 9/3/2012
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandSplitFaces.h"
-
-#include "Utils/Common.h"
 #include "Topo/TopoHelper.h"
 #include "Topo/CoFace.h"
 #include "Topo/Edge.h"
 #include "Topo/CoEdge.h"
+
+#include "Utils/Common.h"
+
 #include "Geom/Curve.h"
+#include "Geom/GeomProjectImplementation.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
@@ -390,12 +384,13 @@ internalExecute()
     			if (ge){
     				Geom::Curve* curve = dynamic_cast<Geom::Curve*> (ge);
     				if (curve){
-
     					curve->getParametricsPoints(vtx0->getCoord(), vtx1->getCoord(), 1, &m_ratio_dec, points);
     				}
     				else {
     					points.push_back(vtx0->getCoord() + (vtx1->getCoord() - vtx0->getCoord()) * m_ratio_dec);
-    					ge->project(points[0]);
+						Geom::GeomProjectVisitor gpv(points[0]);
+						ge->accept(gpv);
+						points[0] = gpv.getProjectedPoint();
     				}
     			}
     			else {

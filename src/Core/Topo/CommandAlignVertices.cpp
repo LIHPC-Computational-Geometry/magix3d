@@ -1,12 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandAlignVertices.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 19/2/2013
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandAlignVertices.h"
 
 #include "Utils/Common.h"
@@ -17,7 +9,7 @@
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
 #include "Geom/EntityFactory.h"
-
+#include "Geom/GeomProjectImplementation.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
@@ -129,7 +121,7 @@ internalExecute()
         if (ge == 0){
             // cas sans association, on projette sur le segment entre les 2 extrémités
             try {
-                segment->project(pt1, pt2);
+                pt2 = Geom::GeomProjectImplementation().project(segment, pt1).first;
             }
             catch (const Standard_Failure& exc){
 				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -154,12 +146,15 @@ internalExecute()
                 do {
                     // pour mémoriser le pt de départ de l'itération
                     pt3 = pt2;
-                    segment->project(pt2);
+                    pt2 = Geom::GeomProjectImplementation().project(segment, pt2).first;
                     // si le sommet se retrouve à une extrémité, on l'en écarte
                     if (pt2 == m_p1 || pt2 == m_p2)
                     	pt2 = (indice*m_p1+(1+m_vertices.size()-indice)*m_p2)/(m_vertices.size()+1);
 
-                    ge->project(pt2);
+                    Geom::GeomProjectVisitor gpv(pt2);
+                    ge->accept(gpv);
+                    pt2 = gpv.getProjectedPoint();
+        
                     nb_iter++;
                 } while (!(pt2 == pt3) && nb_iter<10);
                 //std::cout<<"nb_iter = "<<nb_iter<<" pour sommet "<<ve->getName()<<std::endl;

@@ -1,15 +1,9 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandProjectVerticesOnNearestGeomEntities.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 6/11/2014
- */
-/*----------------------------------------------------------------------------*/
 
 #include "Geom/GeomEntity.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/IncidentGeomEntitiesVisitor.h"
+#include "Geom/GeomProjectImplementation.h"
 
 #include "Topo/TopoManager.h"
 #include "Topo/Vertex.h"
@@ -83,8 +77,9 @@ internalExecute()
 				iter2 != m_geom_entities.end(); ++iter2){
 			Geom::GeomEntity* ge = *iter2;
 			Utils::Math::Point pt1 = vtx->getCoord();
-			Utils::Math::Point pt2;
-			ge->project(pt1, pt2);
+			Geom::GeomProjectVisitor gpv(pt1);
+			ge->accept(gpv);
+			Utils::Math::Point pt2 = gpv.getProjectedPoint();
 			double dist = pt1.length2(pt2);
 
 			if (dist<dist_min){
@@ -111,8 +106,9 @@ void CommandProjectVerticesOnNearestGeomEntities::project(Vertex* vtx, Geom::Geo
 	// déplace le sommet topologique si la projection implique un déplacement
 	if (m_move_vertices){
 		Utils::Math::Point posTopo = vtx->getCoord();
-		Utils::Math::Point posGeom;
-		ge->project(posTopo, posGeom);
+		Geom::GeomProjectVisitor gpv(posTopo);
+		ge->accept(gpv);
+		Utils::Math::Point posGeom = gpv.getProjectedPoint();
 		if (!posTopo.isEpsilonEqual(posGeom, Utils::Math::MgxNumeric::mgxTopoDoubleEpsilon)){
 			vtx->saveVertexGeomProperty(&getInfoCommand(), true);
 			vtx->setCoord(posGeom);

@@ -1,14 +1,6 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file MeshImplementation.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 18 nov. 2011
- */
-/*----------------------------------------------------------------------------*/
+#include "Internal/Context.h"
 
-#include "Internal/ContextIfc.h"
 #include "Mesh/MeshImplementation.h"
 #include "Mesh/CommandCreateMesh.h"
 #include "Mesh/CommandModifyMesh.h"
@@ -26,18 +18,18 @@
 #include "Utils/MgxNumeric.h"
 #include "Utils/MgxException.h"
 
-#include "Internal/Context.h"
 #include "Geom/GeomEntity.h"
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
 #include "Geom/EntityFactory.h"
+#include "Geom/GeomProjectImplementation.h"
+/*----------------------------------------------------------------------------*/
 #include <gmds/io/IGMeshIOService.h>
 #include <gmds/io/VTKWriter.h>
 #include <gmds/io/VTKReader.h>
 #include <gmds/io/LimaWriter.h>
 #include <gmds/io/LimaReader.h>
-
 /*----------------------------------------------------------------------------*/
 /// OCC
 #include <Standard_Failure.hxx>
@@ -1257,28 +1249,10 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::Vertex* ve
 
         if (ve->getGeomAssociation()){
             Geom::GeomEntity* ge = ve->getGeomAssociation();
-            if (ge->getType() == Utils::Entity::GeomSurface
-                    || ge->getType() == Utils::Entity::GeomCurve
-                    || ge->getType() == Utils::Entity::GeomVertex){
-                try {
-                    ge->project(pt);
-                }
-                catch (const Standard_Failure& exc){
-					TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-                    message << "OCC a échoué, projection impossible pour le sommet "
-                            << ve->getName() << ", sur "<<ge->getName();
-                    throw TkUtil::Exception (message);
-                }
-            }
-            else {
-				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-                message << "Projection impossible pour le sommet \""
-                        << ve->getName() << "\", \n";
-                message << "il est projetée sur autre chose qu'un sommet, une courbe ou une surface";
-                throw TkUtil::Exception (message);
-            }
+			Geom::GeomProjectVisitor project_visitor(pt);
+			ge->accept(project_visitor);
+			pt = project_visitor.getProjectedPoint();
         } // end if (ve->getGeomAssociation())
-
 
         gmds::Node nd = getGMDSMesh().newNode(pt.getX(), pt.getY(), pt.getZ());
         ve->setNode(nd.id());

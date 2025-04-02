@@ -19,7 +19,7 @@ class GeomSplitImplementation
 {
 public:
     GeomSplitImplementation(Internal::Context& context);
-    ~GeomSplitImplementation()=default;
+    ~GeomSplitImplementation() = default;
 
     #ifndef SWIG
     /*------------------------------------------------------------------------*/
@@ -50,5 +50,5 @@ private:
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D
 /*----------------------------------------------------------------------------*/
-#endif /* COMMANDNEWVERTEX_H_ */
+#endif /* GEOMSPLITIMPLEMENTATION_H_ */
 /*----------------------------------------------------------------------------*/
