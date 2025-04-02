@@ -160,6 +160,9 @@ void QtTopologyVertexCreationPanel::reset ( )
 	{
 		CHECK_NULL_PTR_ERROR (_vertexPanel)
 		_vertexPanel->reset ( );
+        _xTextField->setValue(0);
+        _yTextField->setValue(0);
+        _zTextField->setValue(0);
 	}
 	catch (...)
 	{
@@ -316,21 +319,21 @@ void QtTopologyVertexCreationPanel::updateCoordinates (const string& name)
 
 void QtTopologyVertexCreationPanel::preview(bool show, bool destroyInteractor)
 {
+    // Lors de la construction getGraphicalWidget peut être nul ...
+    try
+    {
+        CHECK_NULL_PTR_ERROR (getMainWindow ( ))
+        getMainWindow ( )->getGraphicalWidget ( ).getRenderingManager ( );
+    }
+    catch (...)
+    {
+        return;
+    }
+
         QtMgx3DOperationPanel::preview (show, destroyInteractor);
 
         if ((false == show) || (false == previewResult ( )))
             return;
-
-        // Lors de la construction getGraphicalWidget peut être nul ...
-        try
-        {
-            CHECK_NULL_PTR_ERROR (getMainWindow ( ))
-            getMainWindow ( )->getGraphicalWidget ( ).getRenderingManager ( );
-        }
-        catch (...)
-        {
-            return;
-        }
 
         try
         {
@@ -364,6 +367,7 @@ void QtTopologyVertexCreationPanel::entitiesAddedToSelectionCallback (QString en
     BEGIN_QT_TRY_CATCH_BLOCK
 
     updateCoordinates (entitiesNames.toStdString ( ));
+    QtMgx3DOperationPanel::entitiesAddedToSelectionCallback(entitiesNames);
 
     COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Création sommet topologique")
 }

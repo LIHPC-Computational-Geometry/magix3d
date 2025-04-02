@@ -110,7 +110,7 @@ QtTopologyCreationPanel::QtTopologyCreationPanel (
 			layout->addWidget (_selectionEntitiesPanel);
 			break;
         case SelectionManagerIfc::D2    :
-            _selectionEntitiesPanel	= new QtMgx3DEntityPanel (this, "", true, "Sommets : ", "", &mainWindow, SelectionManagerIfc::D0, FilterEntity::AllPoints);
+            _selectionEntitiesPanel	= new QtMgx3DEntityPanel (this, "", true, "Sommets : ", "", &mainWindow, SelectionManagerIfc::D0, FilterEntity::TopoVertex);
             _selectionEntitiesPanel->setMultiSelectMode (true);
             layout->addWidget (_selectionEntitiesPanel);
             break;

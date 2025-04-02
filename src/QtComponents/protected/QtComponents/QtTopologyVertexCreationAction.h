@@ -107,15 +107,7 @@ class QtTopologyVertexCreationPanel : public QtMgx3DOperationPanel
 	 * \see			pointRemovedFromSelection
 	 * \see			selectionModified
 	 */
-    void pointAddedToSelection (QString);
-
-    /**
-	 * Signal émis lorsqu'un point est enlevé de la sélection.
-	 * \param		Nom du point enlevé.
-	 * \see			pointAddedToSelection
-	 * \see			selectionModified
-	 */
-    void pointRemovedFromSelection (QString);
+    void entitiesAddedToSelection (QString);
 
     protected slots :
 
@@ -151,9 +143,6 @@ class QtTopologyVertexCreationPanel : public QtMgx3DOperationPanel
 
     /** Les valeurs initiales des trois composantes. */
     double				_initialX, _initialY, _initialZ;
-
-    /** Les noms des types des composantes. */
-    QLabel			*_xTextLabel, *_yTextLabel, *_zTextLabel;
 
     /** Les champs de saisie des composantes de la donnée représentée.
      */
