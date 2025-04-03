@@ -206,12 +206,6 @@ internalExecute()
 				grp->add(cf);
 				cf->getGroupsContainer().add(grp);
 			}
-            else{
-                Group::Group2D* grp = getContext().getLocalGroupManager().getNewGroup2D(
-                                    getContext().getLocalGroupManager().getDefaultName(2), &getInfoCommand());
-                grp->add(cf);
-                cf->getGroupsContainer().add(grp);
-            }
 
 			 if (getGeomEntity()){
 				 cf->setGeomAssociation(getGeomEntity());
