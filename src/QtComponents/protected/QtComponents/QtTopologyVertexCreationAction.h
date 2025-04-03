@@ -9,6 +9,7 @@
 
 #include "QtComponents/QtMgx3DEntityPanel.h"
 #include "QtComponents/QtTopologyCreationAction.h"
+#include "QtMgx3DPointPanel.h"
 
 namespace Mgx3D 
 {
@@ -22,6 +23,9 @@ namespace QtComponents
  */
 class QtTopologyVertexCreationPanel : public QtMgx3DOperationPanel
 {
+
+    Q_OBJECT
+
 	public :
 
 	/**
@@ -34,6 +38,7 @@ class QtTopologyVertexCreationPanel : public QtMgx3DOperationPanel
 	 */
 	QtTopologyVertexCreationPanel (
 			QWidget* parent, const std::string& panelName,
+            QtMgx3DGroupNamePanel::POLICY creationPolicy,
 			Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
 			Mgx3D::QtComponents::QtMgx3DOperationAction* action);
 
@@ -74,6 +79,55 @@ class QtTopologyVertexCreationPanel : public QtMgx3DOperationPanel
 	 */
 	virtual void autoUpdate ( );
 
+    Utils::Math::Point getPoint ( ) const;
+
+    std::string getGroupName() const;
+
+    void updateCoordinates (const std::string& name);
+
+    /**
+ * \return			true si l'utilisateur a modifié une composante
+ *					de la donnée représentée.
+ */
+    virtual bool isModified ( ) const;
+
+    virtual void preview (bool show, bool destroyInteractor);
+
+    signals :
+
+    /**
+     * Signal émis lorsque l'utilisateur vient de finir une action de
+     * modification du point.
+     */
+    void pointModified ( );
+
+    /**
+	 * Signal émis lorsqu'un point est ajoutée à la sélection.
+	 * \param		Nom du point ajouté.
+	 * \see			pointRemovedFromSelection
+	 * \see			selectionModified
+	 */
+    void entitiesAddedToSelection (QString);
+
+    protected slots :
+
+    void entitiesAddedToSelectionCallback (QString entitiesNames);
+
+    /**
+	 * Callback appelé lorsque l'utilisateur modifie les coordonnées du point.
+	 * N'est pas appelé lorsque les coordonnées sont modifiées par le programme.
+	 * => Efface le contenu du champ de texte contenant l'ID du vertex.
+	 * Emet le signal <I>pointModified</I>.
+	 */
+    virtual void coordinatesEditedCallback ( );
+
+    /**
+     * Callback appelé lorsque les coordonnées du point sont modifiées
+     * (utilisateur et/ou programme).
+     * Emet le signal <I>pointModified</I>.
+     */
+    virtual void coordinatesModifiedCallback ( );
+
 
 	private :
 
@@ -86,6 +140,16 @@ class QtTopologyVertexCreationPanel : public QtMgx3DOperationPanel
 
 	/** La courbe associée. */
 	QtMgx3DEntityPanel*				_vertexPanel;
+
+    /** Les valeurs initiales des trois composantes. */
+    double				_initialX, _initialY, _initialZ;
+
+    /** Les champs de saisie des composantes de la donnée représentée.
+     */
+    QtDoubleTextField	*_xTextField, *_yTextField, *_zTextField;
+
+    /** Le sens de rotation. */
+    QtMgx3DGroupNamePanel*			_namePanel;
 
 };	// class QtTopologyVertexCreationPanel
 
@@ -112,7 +176,7 @@ class QtTopologyVertexCreationAction : public QtTopologyCreationAction
 	QtTopologyVertexCreationAction (
 		const QIcon& icon, const QString& text,
 		Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
-		const QString& tooltip);
+		const QString& tooltip, QtMgx3DGroupNamePanel::POLICY creationPolicy);
 
 	/**
 	 * Destructeur. RAS.
