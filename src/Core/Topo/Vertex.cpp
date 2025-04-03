@@ -1,13 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file Vertex.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 7/10/2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
 #include <iostream>
 #include <string>
 #include <string.h>
@@ -20,13 +11,20 @@
 #include "Topo/CommandEditTopo.h"
 #include "Topo/FaceMeshingPropertyTransfinite.h"
 #include "Topo/BlockMeshingPropertyTransfinite.h"
+
 #include "Mesh/CommandCreateMesh.h"
 #include "Mesh/MeshItf.h"
+
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/SerializedRepresentation.h"
+
+#include "Internal/ContextIfc.h"
 #include "Internal/InfoCommand.h"
+
 #include "Geom/GeomEntity.h"
+#include "Geom/GeomProjectImplementation.h"
+
 #include "Group/Group0D.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
@@ -326,8 +324,9 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
     if (tdr->hasRepresentation(Utils::DisplayRepresentation::SHOWASSOCIATION) && getGeomAssociation()){
         // on ajoute une flêche entre l'arête et la géométrie
         //std::cout<<"  SHOWASSOCIATION -> vers "<<getGeomAssociation()->getName()<<std::endl;
-        Utils::Math::Point pt2;
-        getGeomAssociation()->project(getCoord(), pt2);
+        Geom::GeomProjectVisitor gpv(getCoord());
+        getGeomAssociation()->accept(gpv);
+        Utils::Math::Point pt2 = gpv.getProjectedPoint();
         std::vector<Utils::Math::Point>& vecteur = tdr->getVector();
         vecteur.push_back(getCoord());
         vecteur.push_back(pt2);

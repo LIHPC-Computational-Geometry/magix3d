@@ -23,12 +23,10 @@
 #include <Bnd_Box.hxx>
 #include <BRepBndLib.hxx>
 #include <BRepClass3d_SolidClassifier.hxx>
-#include <BRepExtrema_DistShapeShape.hxx>
 #include <ShapeFix_Wire.hxx>
 #include <ShapeFix_Wireframe.hxx>
 #include <ShapeFix_FixSmallFace.hxx>
 #include <ShapeBuild_ReShape.hxx>
-#include <ShapeAnalysis.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -1272,74 +1270,6 @@ cleanShape(TopoDS_Shape& shape){
         shape = sffsm->FixShape();
     }
     return shape;
-}
-/*----------------------------------------------------------------------------*/
-void OCCHelper::
-projectPointOn(const TopoDS_Face& shape, Utils::Math::Point& P)
-{
-    // in gmsh ShapeFix_Wire::FixReorder is called in the surface setup step.
-    // Is it mandatory when meshing in the UV parametric space
-    // and not in our case ?
-
-    double umin, umax, vmin, vmax = 0.;
-    TopoDS_Face face = TopoDS::Face(shape);
-    ShapeAnalysis::GetFaceUVBounds(face, umin, umax, vmin, vmax);
-    Handle(Geom_Surface) surface = BRep_Tool::Surface(face);
-
-    GeomAPI_ProjectPointOnSurf projector;
-    gp_Pnt pnt(P.getX(),P.getY(),P.getZ());
-    projector.Init(pnt, surface, umin, umax, vmin, vmax);
-    bool isDone = false;
-    if (projector.NbPoints() > 0) {
-        gp_Pnt pnt2 = projector.NearestPoint();
-        P.setXYZ(pnt2.X(), pnt2.Y(), pnt2.Z());
-        isDone = true;
-    }
-    //    else {
-    //        std::cerr<<"OCCGeomRepresentation::project ERROR "<<P<<" on surface " <<S<<std::endl;
-    //        throw TkUtil::Exception("Echec d'une projection d'un point sur une courbe ou surface!!");
-    //    }
-
-    // this second projection in case the first one fails might not be necessary
-    if(!isDone) {
-        TopoDS_Vertex V = BRepBuilderAPI_MakeVertex(pnt);
-        BRepExtrema_DistShapeShape extrema(V, shape);
-        bool isDone = extrema.IsDone();
-        if (!isDone) {
-            isDone = extrema.Perform();
-        }
-        if (!isDone) {
-            std::cerr<<"OCCHelper::projectPointOn("<<P<<")\n";
-            throw TkUtil::Exception("Echec d'une projection d'un point sur une courbe ou surface!!");
-        }
-        gp_Pnt pnt2 = extrema.PointOnShape2(1);
-        P.setXYZ(pnt2.X(), pnt2.Y(), pnt2.Z());
-    }
-}
-/*----------------------------------------------------------------------------*/
-void OCCHelper::
-projectPointOn(const TopoDS_Vertex& shape, Utils::Math::Point& P)
-{
-    gp_Pnt pnt = BRep_Tool::Pnt(shape);
-    P.setXYZ(pnt.X(), pnt.Y(), pnt.Z());
-}
-/*----------------------------------------------------------------------------*/
-void OCCHelper::
-projectPointOn(const TopoDS_Edge& shape, Utils::Math::Point& P)
-{
-    gp_Pnt pnt(P.getX(),P.getY(),P.getZ());
-    TopoDS_Vertex V = BRepBuilderAPI_MakeVertex(pnt);
-    BRepExtrema_DistShapeShape extrema(V, shape);
-    bool isDone = extrema.IsDone();
-    if (!isDone) {
-        isDone = extrema.Perform();
-    }
-    if (!isDone) {
-        std::cerr<<"OCCHelper::projectPointOn("<<P<<")\n";
-        throw TkUtil::Exception("Echec d'une projection d'un point sur une courbe ou surface!!");
-    }
-    gp_Pnt pnt2 = extrema.PointOnShape2(1);
-    P.setXYZ(pnt2.X(), pnt2.Y(), pnt2.Z());
 }
 /*----------------------------------------------------------------------------*/
 void OCCHelper::

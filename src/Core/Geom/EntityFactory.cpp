@@ -1,18 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/** \file EntityFactory.cpp
- *
- *  \author Franck Ledoux
- *
- *  \date 08/11/2010
- */
-/*----------------------------------------------------------------------------*/
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomProperty.h"
+#include "Geom/GeomProjectImplementation.h"
 #include "Utils/Entity.h"
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
 #include "Utils/MgxException.h"
 #include "Utils/MgxNumeric.h"
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 //inclusion de fichiers en-tête d'Open Cascade
@@ -1460,23 +1455,23 @@ Curve* EntityFactory::newCurveByTopoDS_ShapeProjectionOnSurface(TopoDS_Edge shap
 		// identification des points aux extrémités de shape une fois projetés
 		// pour orienter la projection et distinguer les projections utiles de celles parasites
 		Utils::Math::Point extremaFirst, extremaLast;
-		if(shape.ShapeType()==TopAbs_EDGE){
+		if(shape.ShapeType()==TopAbs_EDGE) {
 			Utils::Math::Point extrema1, extrema2;
-			gp_Pnt res;
 			BRepAdaptor_Curve brepCurve(TopoDS::Edge(shape));
-			res = brepCurve.Value(brepCurve.FirstParameter());
+			gp_Pnt res = brepCurve.Value(brepCurve.FirstParameter());
 			extrema1.setXYZ(res.X(), res.Y(), res.Z());
-			surface->project(extrema1, extremaFirst);
+            GeomProjectImplementation gpi;
+			extremaFirst = gpi.project(surface, extrema1).first;
 			res = brepCurve.Value(brepCurve.LastParameter());
 			extrema2.setXYZ(res.X(), res.Y(), res.Z());
-			surface->project(extrema2, extremaLast);
+            extremaLast = gpi.project(surface, extrema2).first;
 		}
-		else
+		else {
 			throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, newCurveByTopoDS_ShapeProjectionOnSurface n'est pas prévu pour chose qu'une TopAbs_EDGE", TkUtil::Charset::UTF_8));
+        }
 
 		return newOCCCompositeCurve(v_ds_edge, extremaFirst, extremaLast);
 	}
-
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

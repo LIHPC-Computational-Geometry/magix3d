@@ -1,13 +1,6 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file MeshImplementationStructured.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 18 oct. 2013
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
+
 #include "Mesh/MeshImplementation.h"
 #include "Mesh/CommandCreateMesh.h"
 
@@ -22,11 +15,12 @@
 
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
-#include "Internal/Context.h"
+
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
 #include "Geom/Surface.h"
+#include "Geom/GeomProjectImplementation.h"
 /*----------------------------------------------------------------------------*/
 /// TkUtil
 #include <TkUtil/Exception.h>
@@ -534,7 +528,7 @@ void MeshImplementation::preMeshStructured(Topo::CoFace* coface)
             		Utils::Math::Point &pt = l_points[i+nbNoeudsI*j];
 
             		try {
-            			surf->project(pt);
+                        pt = Geom::GeomProjectImplementation().project(surf, pt).first;
             		}
             		catch (TkUtil::Exception& exc){
 						TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);

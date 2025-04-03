@@ -134,13 +134,6 @@ public:
      */
     static TopoDS_Shape cleanShape(TopoDS_Shape& sh);
 
-    /*------------------------------------------------------------------------*/
-    /** \brief  Projette le point P sur la shape OCC
-     */
-    static void projectPointOn(const TopoDS_Face& shape, Utils::Math::Point& P);
-    static void projectPointOn(const TopoDS_Vertex& shape, Utils::Math::Point& P);
-    static void projectPointOn(const TopoDS_Edge& shape, Utils::Math::Point& P);
-
 private:
     /*------------------------------------------------------------------------*/
     /** \brief  construction de map pour le nettoyage

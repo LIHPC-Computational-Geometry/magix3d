@@ -12,6 +12,7 @@
 #include "Geom/GeomEntity.h"
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
+#include "Geom/GeomProjectImplementation.h"
 
 #include "Topo/Block.h"
 #include "Topo/Face.h"
@@ -130,7 +131,9 @@ void MesquiteDomainImplAdapter::snap_to (
 	{
 		Utils::Math::Point pt (coordinate.x(),coordinate.y(),coordinate.z());
 		Mgx3D::Geom::GeomEntity* geomEntity = m_nodes2GeomEntity.find(node)->second;
-		geomEntity->project(pt);
+		Geom::GeomProjectVisitor gpv(pt);
+		geomEntity->accept(gpv);
+		pt = gpv.getProjectedPoint();
 		coordinate.set(pt.getX(), pt.getY(), pt.getZ());
 		return;
 

@@ -1,12 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandSnapProjectedVertices.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 10/10/2012
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandSnapProjectedVertices.h"
 
 #include "Utils/Common.h"
@@ -15,7 +7,7 @@
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
-
+#include "Geom/GeomProjectImplementation.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
@@ -74,31 +66,12 @@ internalExecute()
 
         Vertex* ve = *iter;
 
-        Utils::Math::Point pt1 = ve->getCoord();
-        Utils::Math::Point pt2;
-
         if (ve->getGeomAssociation()){
+            Utils::Math::Point pt1 = ve->getCoord();
             Geom::GeomEntity* ge = ve->getGeomAssociation();
-            if (ge->getType() == Utils::Entity::GeomSurface
-                    || ge->getType() == Utils::Entity::GeomCurve
-                    || ge->getType() == Utils::Entity::GeomVertex){
-                try {
-                    ge->project(pt1, pt2);
-                }
-                catch (const Standard_Failure& exc){
-					TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-                    message << "OCC a échoué, projection impossible pour le sommet "
-                            << ve->getName() << ", sur "<<ge->getName();
-                    throw TkUtil::Exception (message);
-                }
-            }
-            else {
-				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-                message << "Projection impossible pour le sommet \""
-                        << ve->getName() << "\", \n";
-                message << "il est projetée sur autre chose qu'un sommet, une courbe ou une surface";
-                throw TkUtil::Exception (message);
-            }
+            Geom::GeomProjectVisitor gpv(pt1);
+            ge->accept(gpv);
+            Utils::Math::Point pt2 = gpv.getProjectedPoint();
 
             if (!(pt1 == pt2)){
                 ve->saveVertexGeomProperty(&getInfoCommand(), true);

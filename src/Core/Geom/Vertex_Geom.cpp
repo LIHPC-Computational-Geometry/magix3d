@@ -131,18 +131,6 @@ void Vertex::get(std::vector<Topo::Vertex*>& vertices)
 		}
 }
 /*----------------------------------------------------------------------------*/
-uint Vertex::project(Utils::Math::Point& P) const
-{
-    P = getCenteredPosition();
-    return 0;
-}
-/*----------------------------------------------------------------------------*/
-uint Vertex::project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const
-{
-    P2 = getCenteredPosition();
-    return 0;
-}
-/*----------------------------------------------------------------------------*/
 void Vertex::add(Curve* c)
 {
     m_curves.push_back(c);

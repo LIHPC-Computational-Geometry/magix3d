@@ -113,19 +113,6 @@ public:
      virtual void get(std::vector<Topo::Block*>& blocs) const;
 
     /*------------------------------------------------------------------------*/
-    /** \brief Projete le point P sur le volume. P est modifié
-     *  \param P le point à projeter
-     *  [fonction non disponible]
-     */
-    virtual uint project(Utils::Math::Point& P) const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Projete le point P1 sur le volume, le résultat est le point P2.
-     * [fonction non disponible]
-     */
-    virtual uint project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const ;
-
-    /*------------------------------------------------------------------------*/
     /** \brief  Ajoute s comme surface incidente
      *
      *  \param s un pointeur sur une surface

@@ -1,17 +1,10 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file MesquiteDomainAdapter.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 25 févr. 2014
- */
-/*----------------------------------------------------------------------------*/
 #include "Smoothing/MesquiteDomainAdapter.h"
 #include "Geom/Surface.h"
+#include "Geom/GeomProjectImplementation.h"
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
-
+/*----------------------------------------------------------------------------*/
 #include <Vector3D.hpp>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
@@ -32,8 +25,7 @@ MesquiteDomainAdapter::~MesquiteDomainAdapter()
 void MesquiteDomainAdapter::snap_to (Mesquite2::Mesh::EntityHandle, Mesquite2::Vector3D & coordinate) const
 {
   Utils::Math::Point pt (coordinate.x(),coordinate.y(),coordinate.z());
-  Utils::Math::Point proj;
-  m_surface->project(pt, proj);
+  Utils::Math::Point proj = Geom::GeomProjectImplementation().project(m_surface, pt).first;
 #ifdef _DEBUG2
   std::cout << "snap_to : "<< pt << " => " << proj << " distance "<<(pt-proj).norme()<<std::endl;
 #endif

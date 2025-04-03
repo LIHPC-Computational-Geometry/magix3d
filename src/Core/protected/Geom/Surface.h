@@ -92,7 +92,7 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur
      */
-    virtual ~Surface();
+    virtual ~Surface() = default;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Calcul de la boite englobante orientée selon les axes Ox,Oy,Oz
@@ -135,17 +135,6 @@ public:
       *         levée. La robustesse de cette méthode repose sur OCC
       */
     virtual Utils::Math::Point getPoint(const double u, const double v) const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Projete le point P sur la surface. P est modifié
-     *  \param P le point à projeter
-     */
-    virtual uint project(Utils::Math::Point& P) const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Projete le point P1 sur la surface, le résultat est le point P2.
-     */
-    virtual uint project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Ajoute v comme volume incident

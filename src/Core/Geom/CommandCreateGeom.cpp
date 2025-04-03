@@ -161,8 +161,7 @@ split(Volume* v)
      *
      * On utilise l'InfoCommand pour stocker les différentes entités créées
      */
-    GeomSplitImplementation gsi(getContext());
-    gsi.split(v, surfaces, curves, vertices);
+    GeomSplitImplementation(getContext()).split(v, surfaces, curves, vertices);
 
     store(v);
 
@@ -192,8 +191,7 @@ split(Surface* s)
      *
      * On utilise l'InfoCommand pour stocker les différentes entités créées
      */
-    GeomSplitImplementation gsi(getContext());
-    gsi.split(s, curves,vertices);
+    GeomSplitImplementation(getContext()).split(s, curves,vertices);
 
     store(s);
 
@@ -219,8 +217,7 @@ split(Curve* c)
      *
      * On utilise l'InfoCommand pour stocker les différentes entités créées
      */
-    GeomSplitImplementation gsi(getContext());
-    gsi.split(c, vertices);
+    GeomSplitImplementation(getContext()).split(c, vertices);
 
     store(c);
 

@@ -1,11 +1,3 @@
-/*----------------------------------------------------------------------------*/
-/** \file Surface.cpp
- *
- *  \author Franck Ledoux
- *
- *  \date 25/10/2010
- */
-/*----------------------------------------------------------------------------*/
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 #include <list>
@@ -20,6 +12,7 @@
 #include "Geom/OCCHelper.h"
 #include "Group/Group2D.h"
 #include "Geom/EntityFactory.h"
+#include "Geom/GeomProjectImplementation.h"
 #include "Topo/CoFace.h"
 #include "Topo/CoEdge.h"
 #include "Topo/Vertex.h"
@@ -96,47 +89,14 @@ GeomEntity* Surface::clone(Internal::Context& c)
 			m_occ_faces);
 }
 /*----------------------------------------------------------------------------*/
-Surface::~Surface()
-{
-	//std::cout<<"Surface::~Surface() pour "<<getName()<<std::endl;
-}
-/*----------------------------------------------------------------------------*/
-uint Surface::project(Utils::Math::Point& P) const
-{
-	Utils::Math::Point P2;
-	int idBest = project(P, P2);
-	P = P2;
-    return idBest;
-}
-/*----------------------------------------------------------------------------*/
-uint Surface::project(const Utils::Math::Point& P1, Utils::Math::Point& P2) const
-{
-	P2 = P1;
-	OCCHelper::projectPointOn(m_occ_faces[0], P2);
-	Utils::Math::Point pBest = P2;
-	uint idBest = 0;
-	double norme2 = (P2-P1).norme2();
-	for (uint i=1; i<m_occ_faces.size(); i++){
-		P2 = P1;
-		OCCHelper::projectPointOn(m_occ_faces[i], P2);
-		double dist = (P2-P1).norme2();
-		if (dist<norme2){
-			norme2 = dist;
-			pBest = P2;
-        	idBest = i;
-		}
-	}
-	P2 = pBest;
-    return idBest;
-}
-/*----------------------------------------------------------------------------*/
 void Surface::normal(const Utils::Math::Point& P1, Utils::Math::Vector& V2) const
 {
 	TopoDS_Face face;
 	if (m_occ_faces.size() == 1) {
 		face = TopoDS::Face(m_occ_faces[0]);
 	} else {
-		uint idBest = project(P1, V2);
+		uint idBest;
+		std::tie(V2, idBest) = GeomProjectImplementation().project(this, P1);
 		face = TopoDS::Face(m_occ_faces[idBest]);
 	}
 
@@ -265,8 +225,7 @@ getCenteredPosition() const
     	for (uint i=0; i<m_curves.size(); i++)
     		pt += m_curves[i]->getCenteredPosition();
     	pt /= (double)m_curves.size();
-
-    	project(pt);
+    	pt = GeomProjectImplementation().project(this, pt).first;
     }
     return pt;
 }
@@ -396,6 +355,7 @@ bool Surface::contains(Surface* ASurf) const
     // TESTEE PEUT NE PAS ENCORE ETRE CONNECTEE TOPOLOGIQUEMENT
     // AVEC DES ENTITES M3D
     //===============================================================
+	GeomProjectImplementation gpi;
 	for (auto shOther : ASurf->getOCCFaces()) {
     	//===============================================================
     	// on teste les sommets
@@ -407,8 +367,7 @@ bool Surface::contains(Surface* ASurf) const
     		TopoDS_Vertex v_i = TopoDS::Vertex(s_i);
     		gp_Pnt p_i = BRep_Tool::Pnt(v_i);
     		Utils::Math::Point pi(p_i.X(),p_i.Y(),p_i.Z());
-    		Utils::Math::Point proj_i;
-    		project(pi,proj_i);
+    		Utils::Math::Point proj_i = gpi.project(this, pi).first;
     		if(!Utils::Math::MgxNumeric::isNearlyZero(pi.length(proj_i),tol))
     			return false;
 
@@ -429,9 +388,7 @@ bool Surface::contains(Surface* ASurf) const
 
             gp_Pnt pnt1 = curve_adaptor.Value(u1);
             Utils::Math::Point pi1(pnt1.X(),pnt1.Y(),pnt1.Z());
-
-            Utils::Math::Point proj_i1;
-            project(pi1,proj_i1);
+            Utils::Math::Point proj_i1 = gpi.project(this, pi1).first;
             if(!Utils::Math::MgxNumeric::isNearlyZero(pi1.length(proj_i1),tol))
             {
     			//            std::cout<<"Point  :"<<pi1<<std::endl;
@@ -446,8 +403,7 @@ bool Surface::contains(Surface* ASurf) const
             gp_Pnt pnt2 = curve_adaptor.Value(u2);
             Utils::Math::Point pi2(pnt2.X(),pnt2.Y(),pnt2.Z());
 
-            Utils::Math::Point proj_i2;
-            project(pi2,proj_i2);
+            Utils::Math::Point proj_i2 = gpi.project(this, pi2).first;
             if(!Utils::Math::MgxNumeric::isNearlyZero(pi2.length(proj_i2),tol))
             {
                 //            std::cout<<"Point  :"<<pi2<<std::endl;
@@ -522,8 +478,7 @@ bool Surface::contains(Surface* ASurf) const
 
     	//maintenant on projete sur la surface *this
     	Utils::Math::Point middle_point(res.X(), res.Y(), res.Z());
-    	Utils::Math::Point proj_i;
-    	project(middle_point,proj_i);
+    	Utils::Math::Point proj_i = gpi.project(this, middle_point).first;
     	if(!Utils::Math::MgxNumeric::isNearlyZero(middle_point.length(proj_i),tol))
     		return false;
     } // end for (uint j=0; j<loc_reps.size(); j++)
