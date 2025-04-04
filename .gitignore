@@ -1,0 +1,6 @@
+spack-build*
+spack-configure*
+__pycache__
+.pytest_cache
+*.mli2
+*.pyc
