@@ -1386,8 +1386,19 @@ public:
     virtual std::string getBlockAt(std::vector<Point>& pts) const;
 //	SET_SWIG_COMPLETABLE_METHOD_RET(std::string, getBlockAt)
 
+    /** \brief Export dans un fichier au format BLK de toute la topologie
+     *
+     *  \param n le nom du ficher dans lequel on exporte
+     */
     virtual Mgx3D::Internal::M3DCommandResultIfc* exportBlocks(const std::string& n);
-    SET_SWIG_COMPLETABLE_METHOD(exportBlocksForCGNS)
+    SET_SWIG_COMPLETABLE_METHOD(exportBlocks)
+
+    /** \brief Import de la topologie à partir d'un fichier au format BLK
+     *
+     *  \param n le nom du ficher à partir duquel on importe
+     */
+    virtual Mgx3D::Internal::M3DCommandResultIfc* importBlocks(const std::string& n);
+    SET_SWIG_COMPLETABLE_METHOD(importBlocks)
 
 private:
 
