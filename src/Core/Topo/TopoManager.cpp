@@ -908,7 +908,7 @@ std::string TopoManager::getBlockAt(std::vector<Point>& pts) const
     }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc*
-TopoManager::newTopoEntity(std::vector<std::string> ve, std::string groupName)
+TopoManager::newTopoEntity(std::vector<std::string>& ve, std::string groupName)
 {
     std::vector<Vertex*> vertices;
     for(auto v_name : ve){
