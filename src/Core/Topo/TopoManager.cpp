@@ -929,14 +929,14 @@ TopoManager::newTopoEntity(std::vector<Topo::Vertex*>& vertices, std::string gro
                                                              CommandNewTopo::STRUCTURED_BLOCK, groupName);
 
     TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().newTopoEntity (\""
-    <<"\", [";
+cmd << getContextAlias() << "." << "getTopoManager().newTopoEntity ([";
     for(unsigned int i=0;i<vertices.size();i++){
         if(i!=0)
             cmd << ", ";
         cmd << "\""<< vertices[i]->getName()<<"\"";
     }
-    cmd << "])";
+    cmd << "], ";
+    cmd<<"\""<<groupName<<"\")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
