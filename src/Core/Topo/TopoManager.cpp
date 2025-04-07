@@ -919,7 +919,7 @@ TopoManager::newTopoEntity(std::vector<std::string>& ve, std::string groupName)
 }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc*
-TopoManager::newTopoEntity(std::vector<Topo::Vertex*> vertices, std::string groupName)
+TopoManager::newTopoEntity(std::vector<Topo::Vertex*>& vertices, std::string groupName)
 {
     TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::newTopoEntity("<<")";
