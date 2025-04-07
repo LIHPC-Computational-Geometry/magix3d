@@ -18,7 +18,7 @@
 #include <QtUtil/QtUnicodeHelper.h>
 #include "Geom/Vertex.h"
 
-#include <values.h>
+#include <climits>
 
 
 using namespace std;
