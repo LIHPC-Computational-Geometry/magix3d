@@ -90,6 +90,7 @@
 #include "Mesh/CommandAddRemoveGroupName.h"
 #ifdef USE_MDLPARSER
 #include "Internal/CommandChangeLengthUnit.h"
+#include "Topo/CommandImportBlocks.h"
 #include "Topo/CommandImportTopoMDL.h"
 #endif
 /*----------------------------------------------------------------------------*/
