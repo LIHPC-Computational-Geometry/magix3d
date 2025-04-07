@@ -916,6 +916,11 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManagerIfc::exportBlocks(const std::st
     throw TkUtil::Exception ("TopoManagerIfc::exportBlocks should be overloaded.");
 }
 /*----------------------------------------------------------------------------*/
+Mgx3D::Internal::M3DCommandResultIfc* TopoManagerIfc::importBlocks(const std::string &n)
+{
+    throw TkUtil::Exception ("TopoManagerIfc::importBlocks should be overloaded.");
+}
+/*----------------------------------------------------------------------------*/
 } // end namespace Topo
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D

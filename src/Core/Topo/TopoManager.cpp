@@ -110,6 +110,7 @@
 #include "Internal/M3DCommandResult.h"
 #include "Internal/CommandChangeLengthUnit.h"
 #include "Internal/PythonWriter.h"
+#include "Topo/CommandImportBlocks.h"
 #include "Topo/CommandNewTopo.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
