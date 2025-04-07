@@ -440,7 +440,7 @@ type de construction :
    soit sans groupe (plus difficile de contrôler son affichage et donc
    sa sélection). Cette méthode permet également de sélectionner des sommets
    topologiques qui seronts les coins de la face, les arêtes déjà existantes
-   entres les sommets ne seront pas dupliquées.
+   entre les sommets ne seront pas dupliquées.
 
 -  Soit une *face non structurée*. Les arêtes seront alors associées aux
    courbes et les sommets topologiques aux sommets géométriques.
