@@ -4516,10 +4516,6 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 							command.setUserNotified (true);
 							QtMessageBox::systemNotification ("Magix3D", QtMgx3DApplication::getAppIcon ( ), "Commandes terminées en erreur.", QtMessageBox::URGENCY_NORMAL, Resources::instance ( )._commandNotificationDuration);
 							displayCommandError (command.getErrorMessage ( ));
-/*							if (false == Resources::instance ( )._showAmodalDialogOnCommandError.getValue ( ))
-								QtMessageBox::displayErrorMessage (this, getAppTitle ( ), command.getErrorMessage ( ));	// défaut
-							else
-								QtMessageBox::displayErrorMessageInAppWorkspace (this, getAppTitle ( ), command.getErrorMessage ( ));	// Expérimental, Issue#112	*/
 						}
 
 						// pour permettre de rejouer cette commande qui a échouée, elle est transmise avec le status en erreur, cela peut permettre de la corriger
