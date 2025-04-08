@@ -180,7 +180,8 @@ void QtMgx3DPythonConsole::run ( )
 	storePolicy ( );
 	
 	ActionCompletionNotifier actionCompletionNotifier (getAppName ( ), QtMgx3DApplication::getAppIcon ( ), UTF8String ("Instructions python exécutées", Charset::UTF_8), QtMessageBox::URGENCY_NORMAL, Resources::instance ( )._commandNotificationDuration, Resources::instance ( )._commandNotificationDelay);
-
+	AutoDisableCommandsErrorsNotifications	autoDisableCommandsErrorsNotifications (getMainWindow ( ));
+	
 	try
 	{
 		QtPythonConsole::run ( );
