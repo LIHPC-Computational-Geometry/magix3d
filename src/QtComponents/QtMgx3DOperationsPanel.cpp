@@ -136,6 +136,27 @@ void QtMgx3DOperationPanel::reset ( )
 }	// QtMgx3DOperationPanel::reset
 
 
+void QtMgx3DOperationPanel::updateGuiPostExecute ( )
+{	// Contrairement à reset il n'y a pas de surcharge qui "effacent" les panneaux
+	// => on maintient ici le paramétrage des panneaux et permet l'enchaînement
+	// d'opérations avec des paramétrages voisins.
+	try
+	{
+		preview (false, true);
+	}
+	catch (...)
+	{
+	}
+	try
+	{
+		highlight (false);
+	}
+	catch (...)
+	{
+	}
+}	// QtMgx3DOperationPanel::updateGuiPostExecute
+
+
 void QtMgx3DOperationPanel::validate ( )
 {
 	UTF8String	errors (Charset::UTF_8);
@@ -687,7 +708,7 @@ void QtMgx3DOperationPanel::applyCallback ( )
 	{
 		if (CommandIfc::DONE == commandResult->getStatus ( ))
 		{
-			reset ( );	// CP 18/02/25 : ne pas être tenté de modifier la surbrillance d'entités détruites.
+			updateGuiPostExecute ( );	// CP 18/02/25 : ne pas être tenté de modifier la surbrillance d'entités détruites => masquer preview + highlight.
 			hasError	= false;
 		}
 		else
@@ -709,15 +730,15 @@ void QtMgx3DOperationPanel::applyCallback ( )
 // On force à true car lors de pré-traitements (ex : liste d'entités vide, entité détruite) il n'y a pas création de commande donc
 // QtMgx3DMainWindow::commandModified n'est pas appelée donc pas de message d'erreur.
 // Le risque, avec true à la place de !QtMgx3DApplication::_showDialogOnCommandError.getValue( ), est que le message d'erreur soit affiché à 2 reprises.
-		(!userNotified && Resources::instance ( )._showDialogOnCommandError.getValue( )) && ((0 != getMgx3DOperationAction ( )) && (0 != getMgx3DOperationAction ( )->getCommandResult ( )) && (false == getMgx3DOperationAction ( )->getCommandResult ( )->isUserNotified ( ))),			// CP 21/11/24
+		(!userNotified && Resources::instance ( )._showDialogOnCommandError.getValue( )) && ((0 != getMgx3DOperationAction ( )) && ((0 == getMgx3DOperationAction ( )->getCommandResult ( )) || (0 != getMgx3DOperationAction ( )->getCommandResult ( )) && (false == getMgx3DOperationAction ( )->getCommandResult ( )->isUserNotified ( )))),			// CP 08/04/25
 		this, "Magix 3D : exécution d'une opération")
+
 
 	const bool succeeded	= !hasError;
 	RE_BEGIN_QT_TRY_CATCH_BLOCK
 
 	if (true == succeeded)
 	{	// Sinon on laisse le panneau tel que, avec la saisie invalide
-		getSelectionManager ( ).clearSelection ( );
 		operationCompleted ( );
 	}	// if (true == succeeded)
 

@@ -113,6 +113,11 @@ class QtMgx3DOperationPanel : public QWidget
 	 * surbrillance).
 	 */
 	virtual void reset ( );
+	
+	/**
+	 * Actualise la représentation de la sélection en sortie de commande.
+	 */
+	virtual void updateGuiPostExecute ( );
 
 	/**
 	 * Méthode appelée pour vérifier les paramètres saisis par l'utilisateur.
