@@ -846,6 +846,40 @@ namespace QtComponents
 		}    // QtMgx3DStateView::paintEvent
 
 
+
+// ===========================================================================
+//                  LA CLASSE AutoDisableCommandsErrorsNotifications
+// ===========================================================================
+
+AutoDisableCommandsErrorsNotifications::AutoDisableCommandsErrorsNotifications (QtMgx3DMainWindow* mainWindow)
+	: _mainWindow (mainWindow), _initialState (0 == mainWindow ? false : mainWindow->commandsErrorsNotificationsDisabled ( ))
+{
+	if (0 != _mainWindow)
+		_mainWindow->disableCommandsErrorsNotifications (true);
+}	// AutoDisableCommandsErrorsNotifications::AutoDisableCommandsErrorsNotifications
+
+
+AutoDisableCommandsErrorsNotifications::AutoDisableCommandsErrorsNotifications (const AutoDisableCommandsErrorsNotifications&)
+	: _mainWindow (0), _initialState (false)
+{
+	assert (0 && "AutoDisableCommandsErrorsNotifications copy constructor is not allowed.");
+}	// AutoDisableCommandsErrorsNotifications::AutoDisableCommandsErrorsNotifications
+
+
+AutoDisableCommandsErrorsNotifications& AutoDisableCommandsErrorsNotifications::operator = (const AutoDisableCommandsErrorsNotifications&)
+{
+	assert (0 && "AutoDisableCommandsErrorsNotifications assignment operator is not allowed.");
+	return *this;
+}	// AutoDisableCommandsErrorsNotifications::operator =
+
+
+AutoDisableCommandsErrorsNotifications::~AutoDisableCommandsErrorsNotifications ( )
+{
+	if ((false == _initialState) && (0 != _mainWindow))
+		_mainWindow->disableCommandsErrorsNotifications (false);
+}	// AutoDisableCommandsErrorsNotifications::~AutoDisableCommandsErrorsNotifications
+
+
 // ===========================================================================
 //                        LA CLASSE QtMgx3DMainWindow
 // ===========================================================================
@@ -913,7 +947,7 @@ Qt::AutoCompatConnection	3	The default type when Qt 3 support is enabled.
 				  _additionalPanels(),
 				  _projectMenu(0), _sessionMenu(0), _viewMenu(0),
 				  _cadMenu(0), _topologyMenu(0), _meshingMenu(0), _selectionMenu(0),
-                  _roomMenu(0), _toolsMenu(0), _helpMenu(0), _actionsDisabled(false), _pythonPanel(0),
+                  _roomMenu(0), _toolsMenu(0), _helpMenu(0), _actionsDisabled(false), _commandErrorsNotificationsDisabled (false), _pythonPanel(0),
                   _selectionCommonPropertiesPanel(0),
                   _selectionIndividualPropertiesPanel(0),
                   _logView(0), _statusView(0), _stateView(0), _pythonLogView(0),
@@ -948,7 +982,7 @@ Qt::AutoCompatConnection	3	The default type when Qt 3 support is enabled.
 				  _additionalPanels(),
 				  _projectMenu(0), _sessionMenu(0), _viewMenu(0),
 				  _cadMenu(0), _topologyMenu(0), _meshingMenu(0), _selectionMenu(0),
-                  _roomMenu(0), _toolsMenu(0), _helpMenu(0), _actionsDisabled(false), _pythonPanel(0),
+                  _roomMenu(0), _toolsMenu(0), _helpMenu(0), _actionsDisabled(false), _commandErrorsNotificationsDisabled (false), _pythonPanel(0),
                   _selectionCommonPropertiesPanel(0),
                   _selectionIndividualPropertiesPanel(0),
                   _logView(0), _statusView(0), _stateView(0), _pythonLogView(0),
@@ -4047,6 +4081,30 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 		}    // QtMgx3DMainWindow::disableActions
 
 
+bool QtMgx3DMainWindow::commandsErrorsNotificationsDisabled ( ) const
+{
+	return _commandErrorsNotificationsDisabled;
+}	// QtMgx3DMainWindow::commandsErrorsNotificationsDisabled
+
+
+void QtMgx3DMainWindow::disableCommandsErrorsNotifications (bool disable)
+{
+	_commandErrorsNotificationsDisabled	= disable;
+}	// QtMgx3DMainWindow::disableCommandsErrorsNotifications
+	
+
+void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
+{
+	if (false == commandsErrorsNotificationsDisabled ( ))
+	{
+		if (false == Resources::instance ( )._showAmodalDialogOnCommandError.getValue ( ))
+			QtMessageBox::displayErrorMessage (this, getAppTitle ( ), message);
+		else
+			QtMessageBox::displayErrorMessageInAppWorkspace (this, getAppTitle ( ), message);	// Experimental, Issue#112
+	}	// if (false == commandsErrorsNotificationsDisabled ( ))
+}	// QtMgx3DMainWindow::displayCommandError
+
+
 		const QtMgx3DOperationsPanel &QtMgx3DMainWindow::getOperationsPanel() const
 		{
 			if (0 == _operationsPanel)
@@ -4457,10 +4515,11 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 						{
 							command.setUserNotified (true);
 							QtMessageBox::systemNotification ("Magix3D", QtMgx3DApplication::getAppIcon ( ), "Commandes terminées en erreur.", QtMessageBox::URGENCY_NORMAL, Resources::instance ( )._commandNotificationDuration);
-							if (false == Resources::instance ( )._showAmodalDialogOnCommandError.getValue ( ))
+							displayCommandError (command.getErrorMessage ( ));
+/*							if (false == Resources::instance ( )._showAmodalDialogOnCommandError.getValue ( ))
 								QtMessageBox::displayErrorMessage (this, getAppTitle ( ), command.getErrorMessage ( ));	// défaut
 							else
-								QtMessageBox::displayErrorMessageInAppWorkspace (this, getAppTitle ( ), command.getErrorMessage ( ));	// Expérimental, Issue#112
+								QtMessageBox::displayErrorMessageInAppWorkspace (this, getAppTitle ( ), command.getErrorMessage ( ));	// Expérimental, Issue#112	*/
 						}
 
 						// pour permettre de rejouer cette commande qui a échouée, elle est transmise avec le status en erreur, cela peut permettre de la corriger

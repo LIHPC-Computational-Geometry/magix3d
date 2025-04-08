@@ -512,6 +512,20 @@ class QtMgx3DMainWindow :
 	 */
 	virtual bool actionsDisabled ( ) const;
 	virtual bool disableActions (bool);
+	
+	/**
+	 * Désactiver l'affichage de messages d'erreur relatifs à l'exécution des commandes (éviter les doublons).
+	 * @see		AutoDisableCommandsErrorsNotifications
+	 */
+	virtual bool commandsErrorsNotificationsDisabled ( ) const;
+	virtual void disableCommandsErrorsNotifications (bool disable);
+	
+	/**
+	 * Affiche le message d'erreur transmis en argument et relatif à l'exécution d'une commande si l'affichage de tels
+	 * messages n'est pas désactivé.
+	 * @see		disableCommandsErrorsNotifications
+	 */
+	virtual void displayCommandError (const TkUtil::UTF8String& message);
 
 	//@}	// Les opérations.
 
@@ -1532,7 +1546,7 @@ class QtMgx3DMainWindow :
 								*_cadMenu, *_topologyMenu,
 								*_meshingMenu, *_selectionMenu,	
 								*_roomMenu,	*_toolsMenu, *_helpMenu;
-	bool							_actionsDisabled;
+	bool						_actionsDisabled, _commandErrorsNotificationsDisabled;
 
 	/** Les commandes python. */
 	QtMgx3DPythonConsole*								_pythonPanel;
@@ -1704,6 +1718,26 @@ class QtMgx3DStateView : public QWidget
 	QTimer*								_labelTimer;
 };	// class QtMgx3DStateView
 
+
+/**
+ * Classe permettant de désactiver l'affichage de messages d'erreur relatifs à l'exécution des commandes et de réactiver automatiquement le service
+ * en fin de vie de l'instance.
+ */
+class AutoDisableCommandsErrorsNotifications
+{
+	public :
+	
+	AutoDisableCommandsErrorsNotifications (QtMgx3DMainWindow*);
+	~AutoDisableCommandsErrorsNotifications ( );
+
+
+	private :
+	
+	AutoDisableCommandsErrorsNotifications (const AutoDisableCommandsErrorsNotifications&);
+	AutoDisableCommandsErrorsNotifications& operator = (const AutoDisableCommandsErrorsNotifications&);
+	QtMgx3DMainWindow*	_mainWindow;
+	bool				_initialState;
+};	// class AutoDisableCommandsErrorsNotifications
 
 }	// namespace QtComponents
 
