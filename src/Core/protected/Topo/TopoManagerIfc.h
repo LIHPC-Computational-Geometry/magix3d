@@ -97,7 +97,7 @@ public:
      *  \param groupName le nom du groupe auquel est associée ou non l'entité créée
      */
     virtual Mgx3D::Internal::M3DCommandResultIfc*
-            newTopoEntity(std::vector<std::string>& ve, std::string groupName);
+            newTopoEntity(std::vector<std::string>& ve, int dim, std::string groupName);
     SET_SWIG_COMPLETABLE_METHOD(newTopoEntity)
 
    /*------------------------------------------------------------------------*/

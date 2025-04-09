@@ -323,7 +323,7 @@ void QtTopologyEdgeCreationAction::executeOperation ( )
     else{
         std::vector<string> vnames = panel->getVerticesNames();
         const string group = panel->getGroupName();
-        cmdResult	= getContext ( ).getTopoManager( ).newTopoEntity (vnames,group);
+        cmdResult	= getContext ( ).getTopoManager( ).newTopoEntity (vnames,1,group);
     }
 
 	setCommandResult (cmdResult);

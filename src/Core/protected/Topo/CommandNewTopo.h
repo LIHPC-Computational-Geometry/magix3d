@@ -36,9 +36,10 @@ namespace Mgx3D {
              *  \param c le contexte
              *  \param sommets la liste des sommets topologiques
              *  \param topoType un énuméré sur le type de topologie souhaitée
+             *  \param dim la dimension de l'entité topologique créée
              *  \param groupName le nom du groupe à associer l'entité, peut etre vide
              */
-            CommandNewTopo(Internal::Context& c, std::vector<Topo::Vertex*> sommets, eTopoType topoType,
+            CommandNewTopo(Internal::Context& c, std::vector<Topo::Vertex*> sommets, eTopoType topoType, int dim,
                            std::string groupName);
             /*------------------------------------------------------------------------*/
             /** \brief  Constructeur pour un sommet topologique uniquement par coordonées géométriques
