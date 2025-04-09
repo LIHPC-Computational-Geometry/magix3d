@@ -61,7 +61,7 @@ TopoManagerIfc::newTopoVertex(Utils::Math::Point pt, std::string groupName)
 }
 /*----------------------------------------------------------------------------*/
     Mgx3D::Internal::M3DCommandResultIfc*
-    TopoManagerIfc::newTopoEntity(std::vector<std::string>& ve, std::string groupName)
+    TopoManagerIfc::newTopoEntity(std::vector<std::string>& ve, int dim, std::string groupName)
     {
         throw TkUtil::Exception ("TopoManagerIfc::newTopoEntity should be overloaded.");
     }

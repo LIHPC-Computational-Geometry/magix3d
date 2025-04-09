@@ -30,7 +30,7 @@ namespace Mgx3D {
     namespace Topo {
 /*----------------------------------------------------------------------------*/
         CommandNewTopo::
-        CommandNewTopo(Internal::Context& c, std::vector<Topo::Vertex*> sommets, eTopoType topoType,
+        CommandNewTopo(Internal::Context& c, std::vector<Topo::Vertex*> sommets, eTopoType topoType, int dim,
                        std::string groupName)
                 : CommandEditTopo(c, "Nom de commande à définir")
                 , m_groupName(groupName)
@@ -38,22 +38,9 @@ namespace Mgx3D {
                 , m_nj(0)
                 , m_nk(0)
                 ,m_vertices(sommets)
+                ,m_dim(dim)
         {
             TkUtil::UTF8String	comments (TkUtil::Charset::UTF_8);
-
-            switch (sommets.size()) {
-                case 2:
-                    m_dim = 1;
-                    break;
-                case 4:
-                    m_dim = 2;
-                    break;
-                case 8:
-                    m_dim = 3;
-                    break;
-                default:
-                    throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo pour un nombre de sommets non prévu", TkUtil::Charset::UTF_8));
-            }
 
             switch (topoType){
                 case UNSTRUCTURED_BLOCK:
@@ -107,6 +94,15 @@ CommandNewTopo::
         void CommandNewTopo::
         internalExecute()
         {
+
+            if(m_dim == 1 && m_vertices.size() != 2)
+                throw TkUtil::Exception(TkUtil::UTF8String("CommandNewTopo nombre de sommets invalide pour créer une arete " + std::to_string(m_vertices.size()) + " au lieu de 2", TkUtil::Charset::UTF_8));
+            if(m_dim == 2 && m_vertices.size() != 4)
+                throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo nombre de sommets invalide pour créer une face " + std::to_string(m_vertices.size()) + " au lieu de 4", TkUtil::Charset::UTF_8));
+            if(m_dim == 3 && m_vertices.size() != 8)
+                throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo nombre de sommets invalide pour créer un bloc " + std::to_string(m_vertices.size()) + " au lieu de 8", TkUtil::Charset::UTF_8));
+
+
             TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
             message << "CommandNewTopo::execute pour la commande " << getName ( )
                     << " de nom unique " << getUniqueName ( );
@@ -364,7 +360,7 @@ void CommandNewTopo::createBlock(Mgx3D::Topo::Vertex *v0, Mgx3D::Topo::Vertex *v
                                  Mgx3D::Topo::Vertex *v3, Mgx3D::Topo::Vertex *v4, Mgx3D::Topo::Vertex *v5,
                                  Mgx3D::Topo::Vertex *v6, Mgx3D::Topo::Vertex *v7, std::string groupName)
 {
-    //Block b = new Block();
+    throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo la construction des blocs n'est pas prise en compte", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
 void CommandNewTopo::getPreviewRepresentation(Utils::DisplayRepresentation& dr)

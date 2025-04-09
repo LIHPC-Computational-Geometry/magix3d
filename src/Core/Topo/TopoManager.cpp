@@ -908,25 +908,25 @@ std::string TopoManager::getBlockAt(std::vector<Point>& pts) const
     }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc*
-TopoManager::newTopoEntity(std::vector<std::string>& ve, std::string groupName)
+TopoManager::newTopoEntity(std::vector<std::string>& ve, int dim, std::string groupName)
 {
     std::vector<Vertex*> vertices;
     for(auto v_name : ve){
         vertices.push_back(getVertex(v_name));
     }
 
-    return newTopoEntity(vertices, groupName);
+    return newTopoEntity(vertices, dim, groupName);
 }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc*
-TopoManager::newTopoEntity(std::vector<Topo::Vertex*>& vertices, std::string groupName)
+TopoManager::newTopoEntity(std::vector<Topo::Vertex*>& vertices, int dim, std::string groupName)
 {
     TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::newTopoEntity("<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
     Topo::CommandNewTopo* command = new Topo::CommandNewTopo(getLocalContext(), vertices,
-                                                             CommandNewTopo::STRUCTURED_BLOCK, groupName);
+                                                             CommandNewTopo::STRUCTURED_BLOCK, dim, groupName);
 
     TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
 cmd << getContextAlias() << "." << "getTopoManager().newTopoEntity ([";
@@ -936,6 +936,7 @@ cmd << getContextAlias() << "." << "getTopoManager().newTopoEntity ([";
         cmd << "\""<< vertices[i]->getName()<<"\"";
     }
     cmd << "], ";
+    cmd << (short)dim <<", ";
     cmd<<"\""<<groupName<<"\")";
     command->setScriptCommand(cmd);
 

@@ -144,7 +144,7 @@ void QtTopologyFaceCreationAction::executeOperation ( )
 			break;
 		case QtTopologyPanel::STRUCTURED_FREE_TOPOLOGY	:
             if(!vnames.empty()){
-                cmdResult	= getContext ( ).getTopoManager ( ).newTopoEntity(vnames,groupName);
+                cmdResult	= getContext ( ).getTopoManager ( ).newTopoEntity(vnames,2,groupName);
             }
 			else if (0 != name.length ( ))
 				cmdResult	= getContext ( ).getTopoManager ( ).newFreeTopoOnGeometry (name);
