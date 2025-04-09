@@ -78,6 +78,28 @@ public:
 	/** Réinitialisation     */
 	virtual void clear();
 #endif
+
+            /*------------------------------------------------------------------------*/
+            /** \brief Création d'un sommet topologique à partir de coordonnées
+             *
+             *  \param pt le point contenant les coordonnées
+             *  \param groupName le nom du groupe auquel est associée ou non l'entité créée
+             */
+            virtual Mgx3D::Internal::M3DCommandResultIfc*
+            newTopoVertex(Utils::Math::Point pt, std::string groupName);
+
+
+            /*------------------------------------------------------------------------*/
+    /** \brief Création d'une entité topologique à partir de sommets existants
+     *
+     *  \param dim la dimension de l'entité à créer
+     *  \param ve le nom des sommet topologiques qui permettent de créer l'entité
+     *  \param groupName le nom du groupe auquel est associée ou non l'entité créée
+     */
+    virtual Mgx3D::Internal::M3DCommandResultIfc*
+            newTopoEntity(std::vector<std::string>& ve, int dim, std::string groupName);
+    SET_SWIG_COMPLETABLE_METHOD(newTopoEntity)
+
    /*------------------------------------------------------------------------*/
      /** \brief Création d'une topologie s'appuyant sur une géométrie
       *

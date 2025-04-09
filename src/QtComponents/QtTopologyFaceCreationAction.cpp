@@ -132,6 +132,7 @@ void QtTopologyFaceCreationAction::executeOperation ( )
 	string							name	    = panel->getGeomEntityName ( );
 	string							groupName	= panel->getGroupName ( );
 	QtTopologyPanel::TOPOLOGY_TYPE	type	    = panel->getTopologyType ( );
+    std::vector<string>             vnames      = panel->getBoundingEntities ( );
 
 	switch (type)
 	{
@@ -142,14 +143,17 @@ void QtTopologyFaceCreationAction::executeOperation ( )
 			cmdResult	= getContext ( ).getTopoManager ( ).newStructuredTopoOnGeometry (name);
 			break;
 		case QtTopologyPanel::STRUCTURED_FREE_TOPOLOGY	:
-			if (0 != name.length ( ))
+            if(!vnames.empty()){
+                cmdResult	= getContext ( ).getTopoManager ( ).newTopoEntity(vnames,2,groupName);
+            }
+			else if (0 != name.length ( ))
 				cmdResult	= getContext ( ).getTopoManager ( ).newFreeTopoOnGeometry (name);
 			else
 			{
 				if (0 == groupName.length ( ))
 				{
 					UTF8String	warning (Charset::UTF_8);
-					warning << "Vous n'avez pas choisi de nom d'entité géométrique ou ou de groupe. Souhaitez-vous continuer la création de cette face topologique ?";
+					warning << "Vous n'avez pas choisi de nom d'entité géométrique, de groupe ou de sommets topologiques. Souhaitez-vous continuer la création de cette face topologique ?";
 					if (0 != QMessageBox::warning (0, "Magix 3D", UTF8TOQSTRING (warning), "Oui", "Non", "", 0, 2))
 						return;
 				}	// if (0 == groupName.length ( ))

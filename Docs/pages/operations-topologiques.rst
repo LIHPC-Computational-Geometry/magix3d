@@ -182,7 +182,8 @@ Créer un sommet topologique par association à un point |image135|
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 Ce panneau permet de sélectionner le point géométrique et de
-créer un sommet topologique qui lui soit associé.
+créer un sommet topologique qui lui soit associé ou bien de rentrer des
+coordonnées pour créer un sommet topologique libre.
 
 .. _fusion-sommets:
 
@@ -277,8 +278,9 @@ topologiques avec |image149|
 Créer une arête topologique par association à une courbe |image150|
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-Ce panneau permet la sélection d’une courbe et la création
-d’une arête qui lui soit associé. Il est nécessaire d’avoir
+Ce panneau permet de sélectionner des sommets topologiques pour
+créer une arête topologique. Une option permet à la place de sélectionner une courbe
+pour créer une arête qui lui soit associée, dans ce cas il est nécessaire d’avoir
 préalablement fait les associations de sommets pour les points aux
 extrémités de la courbe.
 
@@ -436,7 +438,9 @@ type de construction :
    optionnellement associée à une surface s’il y en a une de renseignée,
    soit simplement mise dans un groupe pour aider à sa manipulation,
    soit sans groupe (plus difficile de contrôler son affichage et donc
-   sa sélection).
+   sa sélection). Cette méthode permet également de sélectionner des sommets
+   topologiques qui seronts les coins de la face, les arêtes déjà existantes
+   entre les sommets ne seront pas dupliquées.
 
 -  Soit une *face non structurée*. Les arêtes seront alors associées aux
    courbes et les sommets topologiques aux sommets géométriques.

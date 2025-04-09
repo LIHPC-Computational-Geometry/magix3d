@@ -98,7 +98,7 @@ QtTopologyCreationPanel::QtTopologyCreationPanel (
 	connect (_topologyPanel, SIGNAL (topologyCreationModified ( )), this, SLOT (topologyModifiedCallback ( )));
 	connect (_topologyPanel, SIGNAL (topologyTypeModified ( )), this, SLOT (topologyModifiedCallback ( )));
 	layout->addWidget (_topologyPanel);
-	
+
 	// Utiliser la sélection pour positionner les vertex ?
 	switch (dimension)
 	{
@@ -109,6 +109,11 @@ QtTopologyCreationPanel::QtTopologyCreationPanel (
 			_selectionEntitiesPanel->setMultiSelectMode (true);
 			layout->addWidget (_selectionEntitiesPanel);
 			break;
+        case SelectionManagerIfc::D2    :
+            _selectionEntitiesPanel	= new QtMgx3DEntityPanel (this, "", true, "Sommets : ", "", &mainWindow, SelectionManagerIfc::D0, FilterEntity::TopoVertex);
+            _selectionEntitiesPanel->setMultiSelectMode (true);
+            layout->addWidget (_selectionEntitiesPanel);
+            break;
 	}	// switch (dimension)
 
 	CHECK_NULL_PTR_ERROR (_geomEntityPanel->getNameTextField ( ))
@@ -243,7 +248,6 @@ void QtTopologyCreationPanel::cancel ( )
 		BEGIN_QT_TRY_CATCH_BLOCK
 
 		setGeomEntityName ("");
-	
 
 		COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
 	}	// if (true == cancelClearEntities ( ))

@@ -22,6 +22,8 @@ namespace QtComponents
  */
 class QtTopologyEdgeCreationPanel : public QtMgx3DOperationPanel
 {
+    Q_OBJECT
+
 	public :
 
 	/**
@@ -34,6 +36,7 @@ class QtTopologyEdgeCreationPanel : public QtMgx3DOperationPanel
 	 */
 	QtTopologyEdgeCreationPanel (
 			QWidget* parent, const std::string& panelName,
+            QtMgx3DGroupNamePanel::POLICY creationPolicy,
 			Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
 			Mgx3D::QtComponents::QtMgx3DOperationAction* action);
 
@@ -47,6 +50,12 @@ class QtTopologyEdgeCreationPanel : public QtMgx3DOperationPanel
 	 * \see			getSurfaceName
 	 */
 	virtual std::string getCurveName ( ) const;
+
+    /**
+	 * \return		Le nom de la courbe à projeter.
+	 * \see			getSurfaceName
+	 */
+    virtual std::vector<std::string> getVerticesNames ( ) const;
 
 	/**
 	 * Réinitialise le panneau.
@@ -74,6 +83,23 @@ class QtTopologyEdgeCreationPanel : public QtMgx3DOperationPanel
 	 */
 	virtual void autoUpdate ( );
 
+    /**
+	 * La méthode de création de l'arete.
+	 */
+    bool curveMethod ( ) const;
+
+
+    std::string getGroupName() const;
+
+    /**
+	 * \param		<I>true</I> pour prévisualiser les entités créées, <I>false</I> pour arrêter la prévisualisation.
+	 * \param		<I>true</I> s'il faut détruire l'éventuel interacteur dans le cas d'un arrêt de la prévisualisation.
+	 */
+    virtual void preview (bool show, bool destroyInteractor);
+
+    protected slots :
+
+    void methodCallBack ( );
 
 	private :
 
@@ -86,6 +112,15 @@ class QtTopologyEdgeCreationPanel : public QtMgx3DOperationPanel
 
 	/** La courbe associée. */
 	QtMgx3DEntityPanel*				_curvePanel;
+
+    /** Les sommets topologiques. */
+    QtMgx3DEntityPanel*				_verticesPanel;
+
+    /** Le sens de rotation. */
+    QtMgx3DGroupNamePanel*			_namePanel;
+
+    /** Case à cocher <I>propager</I>. */
+    QCheckBox*									_curveCheckBox;
 
 };	// class QtTopologyEdgeCreationPanel
 
@@ -112,7 +147,7 @@ class QtTopologyEdgeCreationAction : public QtTopologyCreationAction
 	QtTopologyEdgeCreationAction (
 		const QIcon& icon, const QString& text,
 		Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
-		const QString& tooltip);
+		const QString& tooltip, QtMgx3DGroupNamePanel::POLICY creationPolicy);
 
 	/**
 	 * Destructeur. RAS.

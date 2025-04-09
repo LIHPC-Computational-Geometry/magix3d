@@ -132,6 +132,7 @@ void ExportBlocksImplementation::writeFaces(std::ofstream &str, std::vector<Topo
         auto blk_face_id = 0;
         for(auto f : faces){
 
+
             m_face_ids_mapping[f->getName()] = blk_face_id++;
             Edge* e0 = f->getEdge(0);
             Edge* e1 = f->getEdge(1);
