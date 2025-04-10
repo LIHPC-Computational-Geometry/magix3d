@@ -2408,9 +2408,18 @@ check() const
     	CHECK_NULL_PTR_ERROR(empi);
 
 		if (empi->getType() == EdgeMeshingPropertyInterpolate::with_coedge_list){
-			std::vector<std::string> coedges = empi->getCoEdges();
-			for (uint i=0; i<coedges.size(); i++)
-				getContext().getLocalTopoManager().getCoEdge(coedges[i], true);
+            try {
+                std::vector<std::string> coedges = empi->getCoEdges();
+                for (uint i = 0; i < coedges.size(); i++)
+                    getContext().getLocalTopoManager().getCoEdge(coedges[i], true);
+            }
+            catch (Utils::IsDestroyedException e)
+            {
+                TkUtil::UTF8String messErr (TkUtil::Charset::UTF_8);
+                messErr << "Erreur avec l'arête commune "<<getName()
+                        <<" dont la discrétisation est interpolée par rapport à des arêtes de référence dont l'une au moins est détruite ("<<e.getMessage()<<")";
+                throw TkUtil::Exception(messErr);
+            }
 		}
 		else if (empi->getType() == EdgeMeshingPropertyInterpolate::with_coface){
 			try {
