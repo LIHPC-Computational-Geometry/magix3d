@@ -2,6 +2,7 @@ import pyMagix3D as Mgx3D
 
 def test_ns_mesh(capfd):
     ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
     gm = ctx.getGeomManager()
     tm = ctx.getTopoManager()
     mm = ctx.getMeshManager()
