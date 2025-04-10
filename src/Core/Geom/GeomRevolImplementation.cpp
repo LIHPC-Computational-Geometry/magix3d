@@ -304,19 +304,9 @@ void GeomRevolImplementation::makeRevol2PIComposite(Curve* curve,std::vector<Geo
     // ON AURA BESOIN DES SOMMETS DE LA COURBE DE DEPART PAR LA SUITE
 	auto c_vertices = curve->getVertices();
 
-	if(c_vertices.size()!=2){ //cas d'un cercle
-		TkUtil::UTF8String	warningText (TkUtil::Charset::UTF_8);
-		warningText <<"Configuration imprévue lors de la révolution d'une courbe à 360 degré\n"
-				<<"Courbe (posant problème): "
-				<<curve->getName()
-				<<", avec comme sommets :";
-		for (uint i=0; i<c_vertices.size(); i++)
-			warningText<<" "<<c_vertices[i]->getName();
-
-		throw TkUtil::Exception(warningText);
-	}
-    Utils::Math::Point pt1 = c_vertices[0]->getCoord();
-    Utils::Math::Point pt2 = c_vertices[1]->getCoord();
+    if(c_vertices.size() < 2 && v_shape.size() > 1) {
+        throw TkUtil::Exception(TkUtil::UTF8String ("Une configuration imprévue a été rencontrée lors de la révolution d'une courbe composée: attention une courbe n'a pas deux sommets", TkUtil::Charset::UTF_8));
+    }
 
     // les infos communes pour la révolution
     gp_Pnt p1(m_axis1.getX(),m_axis1.getY(),m_axis1.getZ());
@@ -335,7 +325,7 @@ void GeomRevolImplementation::makeRevol2PIComposite(Curve* curve,std::vector<Geo
 
     // révolution pour les différentes shapes
     for (uint i=0; i<v_shape.size(); i++){
-    	TopoDS_Shape shape = v_shape[i];
+    	TopoDS_Edge shape = v_shape[i];
     	BRepPrimAPI_MakeRevol mkR(shape, axis, m_angle);
 
     	//======================================================================
@@ -374,18 +364,14 @@ void GeomRevolImplementation::makeRevol2PIComposite(Curve* curve,std::vector<Geo
 				 * de la courbe de départ. */
 
 				TopTools_IndexedMapOfShape local_map;
-				TopExp::MapShapes(shape,TopAbs_VERTEX, local_map);
-				if(local_map.Extent()!=2)
-					throw TkUtil::Exception(TkUtil::UTF8String ("configuration imprévue lors de la révolution d'une courbe à 360°: la courbe occ n'a pas 2 sommets", TkUtil::Charset::UTF_8));
+				TopExp::MapShapes(shape, TopAbs_VERTEX, local_map);
 
+				// Les extrémités de la courbe sont elles sur l'axe de révolution?
+                TopoDS_Vertex curve_extremities[2] = { TopoDS::Vertex(local_map(1)), TopoDS::Vertex(local_map(local_map.Extent())) };
+				bool isOnAxis[2] = { false, false };
 
-
-				//la courbe a bien deux sommets, sont-ils sur l'axe de révolution?
-				bool isOnAxis[2] = {false,false};
-
-				for(int i=0;i<2;i++){
-					TopoDS_Vertex current_vertex = TopoDS::Vertex(local_map(i+1));
-				    gp_Pnt p = BRep_Tool::Pnt(current_vertex);
+				for(int i=0 ; i<2 ; i++) {
+				    gp_Pnt p = BRep_Tool::Pnt(curve_extremities[i]);
 
 					gp_Vec v1;
 					if(p1.Distance(p)==0)//p1 et p confondus !!!
@@ -402,10 +388,13 @@ void GeomRevolImplementation::makeRevol2PIComposite(Curve* curve,std::vector<Geo
 					configuration_type = CONF_NO_AXIS;
 				else if (isOnAxis[0]!=isOnAxis[1])
 					configuration_type = CONF_ONE_END_AXIS;
-				else{
+				else if (local_map.Extent() == 1) {
+                    // cas du cercle
+                    configuration_type = CONF_ONE_END_AXIS;
+                } else {
 					//Les deux extrémités sont sur l'axe! Mais qu'en est-il de l'intégralité de la courbe?
 					gp_Pnt p;
-					BRepAdaptor_Curve brepCurve(TopoDS::Edge(shape));
+					BRepAdaptor_Curve brepCurve(shape);
 					double f= brepCurve.FirstParameter();
 					double l= brepCurve.LastParameter();
 					p = brepCurve.Value((l+f)/2);
@@ -426,7 +415,7 @@ void GeomRevolImplementation::makeRevol2PIComposite(Curve* curve,std::vector<Geo
 						configuration_type=CONF_PARTIAL_AXIS;
 				}
 
-				//======================================================================
+                //======================================================================
 				// TRAITEMENT DES DIFFÉRENTS CAS
 				//======================================================================
 //				TopoDS_Face f;
@@ -469,25 +458,28 @@ void GeomRevolImplementation::makeRevol2PIComposite(Curve* curve,std::vector<Geo
 				}
 				if(configuration_type==CONF_NO_AXIS && nb_curves>2)
 					cree_courbe = true;
-
     	} // end else / if (!mkR.IsDone () || mkR.Shape().IsNull())
     } // end for (uint i=0; i<v_shape.size(); i++)
 
-    Curve* c_copy=0;
-    Surface* surf=0;
-    if (cree_courbe){
-        if (v_shape.size() == 1)
+    Curve* c_copy = nullptr;
+    if (cree_courbe) {
+        if (v_shape.size() == 1) {
         	c_copy = EntityFactory(m_context).newOCCCurve(v_shape[0]);
-        else
-        	c_copy = EntityFactory(m_context).newOCCCompositeCurve(v_shape, pt1, pt2);
+        } else {
+            // si la courbe est composite, c_vertices.size() > 1, donc v1 et v2 existent
+            auto pt1 = c_vertices[0]->getCoord();
+            auto pt2 = c_vertices[1]->getCoord();
+            c_copy = EntityFactory(m_context).newOCCCompositeCurve(v_shape, pt1, pt2);
+        }
     }
+
+    Surface* surf = nullptr;
 	if (cree_face){
-		if (v_faces.size() == 0)
-			surf = 0;
-		else if (v_faces.size() == 1)
+		if (v_faces.size() == 1) {
 			surf = EntityFactory(m_context).newOCCSurface(v_faces[0]);
-		else
+        } else {
 			surf = EntityFactory(m_context).newOCCCompositeSurface(v_faces);
+        }
 	}
 
 	//======================================================================
@@ -495,14 +487,15 @@ void GeomRevolImplementation::makeRevol2PIComposite(Curve* curve,std::vector<Geo
 	//======================================================================
 	//on remplit le lien vers la copie pour toutes (même si c_copy est nulle)
 	// on fait de même pour la courbe opposée qui est confondue
-	if(c_copy!=0) {
+	if (c_copy) {
 		c2c[curve]    = c_copy;
 		c2cOpp[curve] = c_copy;
 		m_newEntities.push_back(c_copy);
 		m_newCurves.push_back(c_copy);
 		res.push_back(c_copy);
 	}
-	if(surf!=0){
+
+	if (surf) {
 		c2s[curve] = surf;
 		m_newEntities.push_back(surf);
 		m_newSurfaces.push_back(surf);
@@ -512,35 +505,39 @@ void GeomRevolImplementation::makeRevol2PIComposite(Curve* curve,std::vector<Geo
     //======================================================================
     // MISE A JOUR DES CONNECTIVITÉS ENTRE ENTITÉS M3D (nouvelles)
     //======================================================================
-    Vertex* v_copy0 = v2v[c_vertices[0]]; //=v2vOpp contient le même sommet normalement
-    Vertex* v_copy1 = v2v[c_vertices[1]];
-    Curve* v_curve0 = v2c[c_vertices[0]];
-    Curve* v_curve1 = v2c[c_vertices[1]];
+    //=v2vOpp contient le même sommet normalement
+    Vertex* v_copy0 = (c_vertices.size()>0 ? v2v[c_vertices[0]] : nullptr);
+    Vertex* v_copy1 = (c_vertices.size()>1 ? v2v[c_vertices[1]] : nullptr);
+    Curve* v_curve0 = (c_vertices.size()>0 ? v2c[c_vertices[0]] : nullptr);
+    Curve* v_curve1 = (c_vertices.size()>1 ? v2c[c_vertices[1]] : nullptr);
 
     // V <-> C
-    if(c_copy!=0){
-        v_copy0->add(c_copy);
-        v_copy1->add(c_copy);
-        c_copy->add(v_copy0);c_copy->add(v_copy1);
+    if (c_copy){
+        if (v_copy0) {
+            v_copy0->add(c_copy);
+            c_copy->add(v_copy0);
+        }
+        if (v_copy1) {
+            v_copy1->add(c_copy);
+            c_copy->add(v_copy1);
+        }
     }
     // S <-> C
-    if(surf!=0){
-        if(c_copy!=0){
+    if (surf){
+        if (c_copy) {
             surf->add(c_copy);
             surf->add(c_copy);
             c_copy->add(surf);
         }
-        if(v_curve0!=0){
+        if (v_curve0) {
             surf->add(v_curve0);
             v_curve0->add(surf);
         }
-        if(v_curve1!=0){
+        if (v_curve1) {
             surf->add(v_curve1);
             v_curve1->add(surf);
         }
-
     }
-
 }
 /*----------------------------------------------------------------------------*/
 /*----------------------------------------------------------------------------*/
@@ -561,11 +558,7 @@ void GeomRevolImplementation::makeRevolComposite(Curve* curve,std::vector<GeomEn
     // ON AURA BESOIN DES SOMMETS DE LA COURBE DE DEPART PAR LA SUITE
     auto c_vertices = curve->getVertices();
 
-    if(c_vertices.size()!=2){
-        std::cerr<<"Courbe (posant problème): "<<curve->getName()<<", avec comme sommet:";
-        for (uint i=0; i<c_vertices.size(); i++)
-            std::cerr<<" "<<c_vertices[i]->getName();
-        std::cerr<<std::endl;
+    if(c_vertices.size() < 2 && v_shape.size() > 1) {
         throw TkUtil::Exception(TkUtil::UTF8String ("Une configuration imprévue a été rencontrée lors de la révolution d'une courbe composée: attention une courbe n'a pas deux sommets", TkUtil::Charset::UTF_8));
     }
 
@@ -630,8 +623,8 @@ void GeomRevolImplementation::makeRevolComposite(Curve* curve,std::vector<GeomEn
     			TopExp::MapShapes(f,TopAbs_EDGE, map_result_edge);
 
     			int curve_index[2]={1,2};
+                int curve_index_index=0;
     			if(map_result_edge.Extent()!=2){
-    				int curve_index_index=0;
     				// on peut avoir des courbes de longueur nulle, on va les chercher
     				for(unsigned int i=1;i<=map_result_edge.Extent();i++){
     					TopoDS_Edge current_edge =  TopoDS::Edge(map_result_edge(i));
@@ -645,31 +638,27 @@ void GeomRevolImplementation::makeRevolComposite(Curve* curve,std::vector<GeomEn
     					if(BRepTools::Compare(current_vertex1,current_vertex2)==true)
     						continue;
 
-    					curve_index[curve_index_index]= i;
+    					curve_index[curve_index_index] = i;
     					curve_index_index++;
     				}
-
-    				if (curve_index_index!=2){
-    					std::cerr<<"Lors de la révolution de la courbe "<<curve->getName()<<std::endl;
-    					throw TkUtil::Exception(TkUtil::UTF8String ("Une configuration imprévue a été rencontrée lors de la révolution d'une courbe ayant 2 points sur l'axe", TkUtil::Charset::UTF_8));
-    				}
     			}
 
-    			TopoDS_Edge e1_occ =  TopoDS::Edge(map_result_edge(curve_index[0]));
-    			TopoDS_Edge e2_occ =  TopoDS::Edge(map_result_edge(curve_index[1]));
+                if (curve_index_index > 1) {
+                    TopoDS_Edge e1_occ =  TopoDS::Edge(map_result_edge(curve_index[0]));
+    			    TopoDS_Edge e2_occ =  TopoDS::Edge(map_result_edge(curve_index[curve_index_index]));
 
-    			TopoDS_Edge s_opp;
-    			if(e1_occ.IsSame(shape)){
-    				s_opp=e2_occ;
-    			}
-    			else if (e2_occ.IsSame(shape)){
-    				s_opp=e1_occ;
-    			}
-    			else
-    				throw TkUtil::Exception(TkUtil::UTF8String ("Une configuration imprévue a été rencontrée lors de la révolution d'une courbe : problème d'appariement de courbes ", TkUtil::Charset::UTF_8));
+                    TopoDS_Edge s_opp;
+                    if(e1_occ.IsSame(shape)){
+                        s_opp=e2_occ;
+                    }
+                    else if (e2_occ.IsSame(shape)){
+                        s_opp=e1_occ;
+                    }
+                    else
+                        throw TkUtil::Exception(TkUtil::UTF8String ("Une configuration imprévue a été rencontrée lors de la révolution d'une courbe : problème d'appariement de courbes ", TkUtil::Charset::UTF_8));
 
-    			v_shape_opp.push_back(s_opp);
-
+        			v_shape_opp.push_back(s_opp);
+                }
     		}
     		//---------------------------------------------------------------------------
     		else if(map_result_vertex.Extent()==4 || map_result_vertex.Extent()==3)// courbe ne touchant pas l'axe ou avec un sommet sur l'axe
@@ -688,9 +677,9 @@ void GeomRevolImplementation::makeRevolComposite(Curve* curve,std::vector<GeomEn
 				TopoDS_Vertex v_fixe_occ;
 				if (map_result_vertex.Extent()==3){
 	    			Vertex *v_fixe = 0;
-	    			for (uint j=0; j<2; j++)
-	    				if (v2vOpp[c_vertices[j]] == 0)
-	    					v_fixe = v2v[c_vertices[j]];
+                    for (auto c_vertex : c_vertices)
+	    				if (v2vOpp[c_vertex] == 0)
+	    					v_fixe = v2v[c_vertex];
 
 	    			if (v_fixe == 0){
 	    				throw TkUtil::Exception(TkUtil::UTF8String ("Une configuration imprévue a été rencontrée lors de la révolution d'une courbe composée avec 3 sommets pour une surface: on ne trouve pas de sommet sur l'axe", TkUtil::Charset::UTF_8));
@@ -721,8 +710,6 @@ void GeomRevolImplementation::makeRevolComposite(Curve* curve,std::vector<GeomEn
     			TopTools_IndexedMapOfShape map_result_edge;
     			TopExp::MapShapes(f,TopAbs_EDGE, map_result_edge);
     			if(map_result_edge.Extent()!=4 && map_result_edge.Extent()!=3){
-    				std::cout<<"map_result_edge.Extent() = "<<map_result_edge.Extent()<<std::endl;
-    				std::cout<<"map_result_vertex.Extent() = "<<map_result_vertex.Extent()<<std::endl;
     				throw TkUtil::Exception(TkUtil::UTF8String ("Une configuration imprévue a été rencontrée lors de la révolution d'une courbe: la surface obtenue par révolution n'a pas 3 ou 4 courbes", TkUtil::Charset::UTF_8));
     			}
     			for (uint j=1; j<=map_result_edge.Extent(); j++){
@@ -739,15 +726,14 @@ void GeomRevolImplementation::makeRevolComposite(Curve* curve,std::vector<GeomEn
     	} // end else / if (!mkR.IsDone () || mkR.Shape().IsNull())
     } // end for (uint i=0; i<v_shape.size(); i++)
 
-    Surface* surf = 0;
-    if (v_faces.size() == 0)
-    	surf = 0;
-    else if (v_faces.size() == 1)
+    Surface* surf = nullptr;
+    if (v_faces.size() == 1) {
     	surf = EntityFactory(m_context).newOCCSurface(v_faces[0]);
-    else
+    } else {
     	surf = EntityFactory(m_context).newOCCCompositeSurface(v_faces);
+    }
 
-    if (surf){
+    if (surf) {
     	m_newEntities.push_back(surf);
     	m_newSurfaces.push_back(surf);
     	res.push_back(surf);
@@ -761,15 +747,10 @@ void GeomRevolImplementation::makeRevolComposite(Curve* curve,std::vector<GeomEn
     	std::cout<<" pas de surface créée"<<std::endl;
 #endif
     }
-    Vertex *v1=0, *v2=0, *v1Opp=0, *v2Opp=0;
-    v1 = c_vertices[0];
-    v2 = c_vertices[1];
-    v1Opp = v2vOpp[v1];
-    if (v1Opp == 0)
-    	v1Opp = v2v[v1];
-    v2Opp = v2vOpp[v2];
-    if (v2Opp == 0)
-    	v2Opp = v2v[v2];
+    Vertex* v1 = (c_vertices.size()>0 ? c_vertices[0] : nullptr);
+    Vertex* v2 = (c_vertices.size()>1 ? c_vertices[1] : nullptr);
+    Vertex* v1Opp = (v1 ? v2v[v1] : nullptr);
+    Vertex* v2Opp = (v2 ? v2v[v2] : nullptr);
 #ifdef _DEBUG2
     std::cout<<" v1 : "<<v1->getName()<<std::endl;
     std::cout<<" v2 : "<<v2->getName()<<std::endl;
@@ -777,89 +758,87 @@ void GeomRevolImplementation::makeRevolComposite(Curve* curve,std::vector<GeomEn
     std::cout<<" v2Opp : "<<v2Opp->getName()<<std::endl;
 #endif
 
-    Utils::Math::Point pt1 = v1->getCoord();
-    Utils::Math::Point pt2 = v2->getCoord();
-    Curve* c_copy=0;
-    if (v_shape.size() == 1)
+    Curve* c_copy = nullptr;
+    if (v_shape.size() == 1) {
     	c_copy = EntityFactory(m_context).newOCCCurve(v_shape[0]);
-    else
-    	c_copy = EntityFactory(m_context).newOCCCompositeCurve(v_shape, pt1, pt2);
+    } else {
+        // si la courbe est composite, c_vertices.size() > 1, donc v1 et v2 existent
+        auto pt1 = v1->getCoord();
+        auto pt2 = v2->getCoord();
+        c_copy = EntityFactory(m_context).newOCCCompositeCurve(v_shape, pt1, pt2);
+    }
 #ifdef _DEBUG2
     std::cout<<" création de la copie "<<c_copy->getName()<<std::endl;
 #endif
 
-    pt1 = v1Opp->getCoord();
-    pt2 = v2Opp->getCoord();
-    Curve* c_opp=0;
-    if (v_shape_opp.size() == 0)
+    Curve* c_opp = nullptr;
+    if (v_shape_opp.size() == 0) {
     	c_opp = 0;
-    else if (v_shape_opp.size() == 1)
+    } else if (v_shape_opp.size() == 1) {
     	c_opp = EntityFactory(m_context).newOCCCurve(v_shape_opp[0]);
-    else
-    	c_opp = EntityFactory(m_context).newOCCCompositeCurve(v_shape_opp, pt1, pt2);
-    if (c_copy){
+    } else {
+        auto pt1 = v1Opp->getCoord();
+        auto pt2 = v2Opp->getCoord();
+        c_opp = EntityFactory(m_context).newOCCCompositeCurve(v_shape_opp, pt1, pt2);
+    }
+
+    v1 = (v1 ? v2v[v1] : nullptr);
+    v2 = (v2 ? v2v[v2] : nullptr);
+
+    if (c_copy) {
     	m_newEntities.push_back(c_copy);
     	m_newCurves.push_back(c_copy);
         res.push_back(c_copy);
         c2c[curve] = c_copy;
-    }
-    if (c_opp){
-    	m_newEntities.push_back(c_opp);
-    	m_newCurves.push_back(c_opp);
-        res.push_back(c_opp);
-        c2cOpp[curve] = c_opp;
-#ifdef _DEBUG2
-        std::cout<<" création de l'opposée "<<c_opp->getName()<<std::endl;
-#endif
-    }
 
-    v1 = v2v[v1];
-    v2 = v2v[v2];
-#ifdef _DEBUG2
-    std::cout<<" v1 = v2v[v1] ... "<<std::endl;
-    std::cout<<" v1 : "<<v1->getName()<<std::endl;
-    std::cout<<" v2 : "<<v2->getName()<<std::endl;
-    std::cout<<" v1Opp : "<<v1Opp->getName()<<std::endl;
-    std::cout<<" v2Opp : "<<v2Opp->getName()<<std::endl;
-#endif
-
-    //M3D CONNECTION UPDATE
-    CHECK_NULL_PTR_ERROR(v1);
-    CHECK_NULL_PTR_ERROR(v2);
-    if (c_copy){
-    	v1->add(c_copy);
-    	v2->add(c_copy);
-    	c_copy->add(v1);
-    	c_copy->add(v2);
-    	if (surf){
+    	if (v1) {
+            v1->add(c_copy);
+            c_copy->add(v1);
+        }
+    	if (v2) {
+            v2->add(c_copy);
+            c_copy->add(v2);
+        }
+    	if (surf) {
     		surf->add(c_copy);
     		c_copy->add(surf);
     	}
     }
-    if (c_opp){
-    	v1Opp->add(c_opp);
-    	v2Opp->add(c_opp);
-    	c_opp->add(v1Opp) ;
-    	c_opp->add(v2Opp);
+
+    if (c_opp) {
+    	m_newEntities.push_back(c_opp);
+    	m_newCurves.push_back(c_opp);
+        res.push_back(c_opp);
+        c2cOpp[curve] = c_opp;
+
+    	if (v1Opp) {
+            v1Opp->add(c_opp);
+            c_opp->add(v1Opp) ;
+        }
+    	if (v2Opp) {
+            v2Opp->add(c_opp);
+            c_opp->add(v2Opp);
+        }
     	if (surf){
     		surf->add(c_opp);
     		c_opp->add(surf);
     	}
-   }
+
+        #ifdef _DEBUG2
+        std::cout<<" création de l'opposée "<<c_opp->getName()<<std::endl;
+#endif
+    }
 
     // on récupère les courbes "latérales"
-    Curve *c11 = 0;
-    if (m_v2v_inv[v1])
-    	c11 = v2c[m_v2v_inv[v1]];
-    Curve *c22 = 0;
-    if (m_v2v_inv[v2])
-    	c22 = v2c[m_v2v_inv[v2]];
+    Curve* c11 = (v1 && m_v2v_inv[v1] ? v2c[m_v2v_inv[v1]] : nullptr);
+    Curve *c22 = (v2 && m_v2v_inv[v2] ? v2c[m_v2v_inv[v2]] : nullptr);
 
-    if (c11 && surf){
+    if (c11 && surf) {
     	surf->add(c11);
     	c11->add(surf);
     }
-    if (c22 && surf){
+
+    if (c22 && surf) {
     	surf->add(c22);
     	c22->add(surf);
     }
