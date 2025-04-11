@@ -1,8 +1,9 @@
 import pyMagix3D as Mgx3D
+import pytest
 
 # Met en évidence que les propriétés géométriques d'une entité géométrique sont perdues
 #  lors d'opérations de base comme la translation, l'hométhétie, la rotation.
-def test_nsbox_scylinder_error(capfd):
+def test_nsbox_scylinder_error():
     ctx = Mgx3D.getStdContext()
     gm = ctx.getGeomManager()
     tm = ctx.getTopoManager()
@@ -12,15 +13,11 @@ def test_nsbox_scylinder_error(capfd):
     gm.newCylinder(Mgx3D.Point(0, 0, 0), .2, Mgx3D.Vector(1, 0, 0), Mgx3D.Portion.QUART)
     # Rotation d'une géométrie
     gm.rotate(["Vol0000"], Mgx3D.RotX(270))
-    try:
+    with pytest.raises(RuntimeError) as excinfo:
         # Création d'un bloc topologique sur une géométrie => PB: ce n'est plus un cylindre après le rotate
         tm.newTopoOGridOnGeometry("Vol0000", 0.5)
-        assert False
-    except RuntimeError:
-        out, err = capfd.readouterr()
-        expected = "CommandNewTopoOGridOnGeometry impossible, entité Vol0000 n'est pas d'un type supporté pour le moment"
-        assert expected in err    
-
+    expected = "CommandNewTopoOGridOnGeometry impossible, entité Vol0000 n'est pas d'un type supporté pour le moment"
+    assert expected in str(excinfo.value)
 
 def test_curve_on_surf_proj_0():
     ctx = Mgx3D.getStdContext()
@@ -30,12 +27,11 @@ def test_curve_on_surf_proj_0():
 
     # Création d'une boite avec une topologie
     tm.newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
-    try:
+    with pytest.raises(RuntimeError) as excinfo:
         # Création d'une courbe par projection sur une surface
         ctx.getGeomManager().newCurveByCurveProjectionOnSurface("Crb0007", "Surf0002")
-    except RuntimeError as e:
-        expected = "OCC a échoué, création de la courbe composite entre  [ 1, 0, 0]  et  [ 1, 0, 0]"
-        assert expected in str(e)
+    expected = "OCC a échoué, création de la courbe composite entre  [ 1, 0, 0]  et  [ 1, 0, 0]"
+    assert expected in str(excinfo.value)
 
 # Met en évidence un bug lors la création d'une courbe composite 
 # après projection d'une courbe sur une surface
@@ -57,12 +53,11 @@ def test_curve_on_surf_proj_1():
     # Création du segment Crb0009
     gm.newSegment("Pt0006", "Pt0007", "TOTO")
 
-    try:
+    with pytest.raises(RuntimeError) as excinfo:
         # Création d'une courbe par projection sur une surface
         # OCC a échoué, création de la courbe composite entre  [ 3.63790805271381e-2, 1.15325625946708e-1, -0.04125]  et  [ 3.63790805271381e-2, 1.15325625946708e-1, -0.04125] 
         gm.newCurveByCurveProjectionOnSurface("Crb0009", "Surf0007", "TITI")
-    except RuntimeError as e: 
-        assert "OCC a échoué, création de la courbe composite" in str(e)
+    assert "OCC a échoué, création de la courbe composite" in str(excinfo.value)
 
 # Met en évidence un bug lors la création d'une courbe composite
 # après projection d'une courbe sur une surface
@@ -87,12 +82,11 @@ def test_curve_on_surf_proj_2():
     # Création du segment Crb0005
     gm.newSegment("Pt0008", "Pt0007")
 
-    try:
+    with pytest.raises(RuntimeError) as excinfo:
         # Création d'une courbe par projection sur une surface
         # Erreur OCC
         gm.newCurveByCurveProjectionOnSurface("Crb0005", "Surf0000")
-    except RuntimeError as e: 
-        assert "Erreur OCC" in str(e)
+    assert "Erreur OCC" in str(excinfo.value)
 
 # le maillage obtenu dans le fichier pb_perturbation.mli semble anormal
 def test_perturbation(capfd):
@@ -142,11 +136,11 @@ def test_circle_revol_180(capfd):
     gm.newVertex (Mgx3D.Point(1, 1, 0))
     # Création de l'arc de cercle Crb0000
     gm.newCircle("Pt0000", "Pt0001", "Pt0002")
-    try:
+    with pytest.raises(RuntimeError) as excinfo:
         # Révolution du cercle
         gm.makeRevol (["Crb0000"], Mgx3D.RotX(180), False)
-    except RuntimeError as e:
-        assert  "Une configuration imprévue a été rencontrée lors de la révolution d'une courbe composée: attention une courbe n'a pas deux sommets" in str(e)
+    expected = "Une configuration imprévue a été rencontrée lors de la révolution d'une courbe composée: attention une courbe n'a pas deux sommets"
+    assert expected in str(excinfo.value)
 
 def test_circle_revol_360(capfd):
     ctx = Mgx3D.getStdContext()
@@ -161,8 +155,7 @@ def test_circle_revol_360(capfd):
     gm.newVertex (Mgx3D.Point(1, 1, 0))
     # Création du cercle Crb0000
     gm.newCircle("Pt0000", "Pt0001", "Pt0002")
-    try:
+    with pytest.raises(RuntimeError) as excinfo:
         # Révolution du cercle à 2*Pi
         gm.makeRevol (["Crb0000"], Mgx3D.RotX(360), False)
-    except RuntimeError as e:
-        assert  "Configuration imprévue lors de la révolution d'une courbe à 360 degré" in str(e)
+    assert  "Configuration imprévue lors de la révolution d'une courbe à 360 degré" in str(excinfo.value)
