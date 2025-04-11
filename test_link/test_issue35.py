@@ -1,4 +1,5 @@
 import pyMagix3D as Mgx3D
+import pytest
 
 # [3D] Test 1 : 2 blocs ayant une arete commune
 def test_issue35_3D_1():
@@ -16,12 +17,10 @@ def test_issue35_3D_1():
     ctx.undo()
     # Collage entre géométries avec topologies
     ctx.getGeomManager().glue(["Vol0000", "Vol0001"])
-    try:
+    with pytest.raises(RuntimeError) as excinfo:
         tm.splitBlocksWithOgridV2(["Bl0000","Bl0001"],[],.5,10)
-        assert False # On devrait passer dans l'exception
-    except RuntimeError:
-        # Split non réalisé => toujours que 2 blocs
-        assert(tm.getNbBlocks() == 2)
+    # Split non réalisé => toujours que 2 blocs
+    assert(tm.getNbBlocks() == 2)
 
 # [3D] Test 2 : 2 blocs ayant une face commune
 def test_issue35_3D_2():
@@ -56,13 +55,11 @@ def test_issue35_3D_3():
     tm.splitAllBlocks ("Ar0011",.5)
     # Découpage de tous les blocs suivant l'arête Ar0005
     tm.splitAllBlocks ("Ar0005",.5)
-    try:
+    with pytest.raises(RuntimeError) as excinfo:
         # Découpage en O-grid des blocs structurés Bl0006 Bl0003
         tm.splitBlocksWithOgridV2 (["Bl0006", "Bl0003"], [], .5, 10)
-        assert False # On devrait passer dans l'exception
-    except RuntimeError:
-        # Split non réalisé => toujours que 4 blocs
-        assert(tm.getNbBlocks() == 4)
+    # Split non réalisé => toujours que 4 blocs
+    assert(tm.getNbBlocks() == 4)
 
     # Il faut vérifier que ça fonctionne toujours avec 1 seul bloc
     # Découpage en O-grid du bloc structuré Bl0006
@@ -168,12 +165,10 @@ def test_issue35_2D_3():
     tm.splitFace("Fa0000", "Ar0001", .2, True)
     tm.splitAllFaces("Ar0000", .5, .5)
     assert(tm.getNbFaces() == 4)
-    try:
+    with pytest.raises(RuntimeError) as excinfo:
         tm.splitFacesWithOgrid(["Fa0003", "Fa0006"], ["Ar0004", "Ar0010", "Ar0006", "Ar0015"], .5, 10)
-        assert False # On devrait passer dans l'exception
-    except RuntimeError:      
-        # Création du ogrid non réalisé => toujours que 4 faces
-        assert(tm.getNbFaces() == 4)
+    # Création du ogrid non réalisé => toujours que 4 faces
+    assert(tm.getNbFaces() == 4)
 
     # Il faut vérifier que ça fonctionne toujours avec 1 seule face
     # Création du ogrid sur une seule face
