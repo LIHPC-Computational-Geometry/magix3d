@@ -1,16 +1,10 @@
-import sys
 import pyMagix3D as Mgx3D
+import pytest
 
-# Test que le découpage en o-grid n'est PAS fait quand la contrainte d'Euler n'est pas vérifiée 
-def test_issue35():
+# [3D] Test 1 : 2 blocs ayant une arete commune
+def test_issue35_3D_1():
     ctx = Mgx3D.getStdContext()
-    gm = ctx.getGeomManager()
     tm = ctx.getTopoManager()
-
-    ######### 3D #########
-
-    # [3D] Test 1 : 2 blocs ayant une arete commune
-    # ---------------------------------------------
     ctx.clearSession() # Clean the session after the previous test
     # Création d'une boite avec une topologie
     tm.newBoxWithTopo(Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
@@ -23,16 +17,17 @@ def test_issue35():
     ctx.undo()
     # Collage entre géométries avec topologies
     ctx.getGeomManager().glue(["Vol0000", "Vol0001"])
-    try:
+    with pytest.raises(RuntimeError) as excinfo:
         tm.splitBlocksWithOgridV2(["Bl0000","Bl0001"],[],.5,10)
-        assert False # On devrait passer dans l'exception
-    except RuntimeError:
-        # Split non réalisé => toujours que 2 blocs
-        assert(tm.getNbBlocks() == 2)
+    # Split non réalisé => toujours que 2 blocs
+    assert(tm.getNbBlocks() == 2)
 
-    # [3D] Test 2 : 2 blocs ayant une face commune
-    # --------------------------------------------
+# [3D] Test 2 : 2 blocs ayant une face commune
+def test_issue35_3D_2():
+    ctx = Mgx3D.getStdContext()
+    tm = ctx.getTopoManager()
     ctx.clearSession() # Clean the session after the previous test
+
     # Création d'une boite avec une topologie
     tm.newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
     # Création d'une boite avec une topologie
@@ -48,31 +43,36 @@ def test_issue35():
     # Split réalisé pour l'ensemble
     assert(tm.getNbBlocks() == 12)
 
-    # [3D] Test 3 : avec des splits de blocs
-    # --------------------------------------
+# [3D] Test 3 : avec des splits de blocs
+def test_issue35_3D_3():
+    ctx = Mgx3D.getStdContext()
+    tm = ctx.getTopoManager()
     ctx.clearSession() # Clean the session after the previous test
+
     # Création d'une boite avec une topologie
     tm.newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
     # Découpage de tous les blocs suivant l'arête Ar0011
     tm.splitAllBlocks ("Ar0011",.5)
     # Découpage de tous les blocs suivant l'arête Ar0005
     tm.splitAllBlocks ("Ar0005",.5)
-    try:
+    with pytest.raises(RuntimeError) as excinfo:
         # Découpage en O-grid des blocs structurés Bl0006 Bl0003
         tm.splitBlocksWithOgridV2 (["Bl0006", "Bl0003"], [], .5, 10)
-        assert False # On devrait passer dans l'exception
-    except RuntimeError:
-        # Split non réalisé => toujours que 4 blocs
-        assert(tm.getNbBlocks() == 4)
+    # Split non réalisé => toujours que 4 blocs
+    assert(tm.getNbBlocks() == 4)
+
     # Il faut vérifier que ça fonctionne toujours avec 1 seul bloc
     # Découpage en O-grid du bloc structuré Bl0006
     tm.splitBlocksWithOgridV2 (["Bl0006"], [], .5, 10)
     # Split réalisé => 10 blocs
     assert(tm.getNbBlocks() == 10)
 
-    # [3D] Test 4 : avec des splits d'arêtes
-    # --------------------------------------
+# [3D] Test 4 : avec des splits d'arêtes
+def test_issue35_3D_4():
+    ctx = Mgx3D.getStdContext()
+    tm = ctx.getTopoManager()
     ctx.clearSession() # Clean the session after the previous test
+
     # Création d'une boite avec une topologie
     tm.newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
     # Découpage de l'arête Ar0005
@@ -83,11 +83,13 @@ def test_issue35():
     tm.splitBlocksWithOgridV2 (["Bl0000"], ["Fa0000", "Fa0001"], .5, 10)
     assert(tm.getNbBlocks() == 5)
 
-    ######### 2D #########
-    
-    # [2D] Test 1 : 2 faces totalement indépendantes accollées => 2 ogrids
-    # --------------------------------------------------------------------
+# [2D] Test 1 : 2 faces totalement indépendantes accollées => 2 ogrids
+def test_issue35_2D_1():
+    ctx = Mgx3D.getStdContext()
+    gm = ctx.getGeomManager()
+    tm = ctx.getTopoManager()
     ctx.clearSession() # Clean the session after the previous test
+
     # Création d'une 1ere surface avec topologie
     gm.newVertex(Mgx3D.Point(0,0,0))
     gm.newVertex(Mgx3D.Point(1,0,0))
@@ -115,9 +117,13 @@ def test_issue35():
     tm.splitFacesWithOgrid(["Fa0000", "Fa0001"], [], .5, 10)
     assert(tm.getNbFaces() == 10)
 
-    # [2D] Test 2 : 3 faces collées => 1 seul ogrid global
-    # ----------------------------------------------------
+# [2D] Test 2 : 3 faces collées => 1 seul ogrid global
+def test_issue35_2D_2():
+    ctx = Mgx3D.getStdContext()
+    gm = ctx.getGeomManager()
+    tm = ctx.getTopoManager()
     ctx.clearSession() # Clean the session after the previous test
+
     # Création d'une surface avec topologie
     gm.newVertex(Mgx3D.Point(0,0,0))
     gm.newVertex(Mgx3D.Point(2,0,0))
@@ -137,9 +143,13 @@ def test_issue35():
     tm.splitFacesWithOgrid(["Fa0001", "Fa0003", "Fa0004"], [], .5, 10)
     assert(tm.getNbFaces() == 11)
 
-    # [2D] Test 3 : 4 faces + ogrid sur 2 faces pas adjacentes => échec du ogrid
-    # --------------------------------------------------------------------------
+# [2D] Test 3 : 4 faces + ogrid sur 2 faces pas adjacentes => échec du ogrid
+def test_issue35_2D_3():
+    ctx = Mgx3D.getStdContext()
+    gm = ctx.getGeomManager()
+    tm = ctx.getTopoManager()
     ctx.clearSession() # Clean the session after the previous test
+
     # Création d'une surface avec topologie
     gm.newVertex(Mgx3D.Point(0,0,0))
     gm.newVertex(Mgx3D.Point(2,0,0))
@@ -155,12 +165,11 @@ def test_issue35():
     tm.splitFace("Fa0000", "Ar0001", .2, True)
     tm.splitAllFaces("Ar0000", .5, .5)
     assert(tm.getNbFaces() == 4)
-    try:
+    with pytest.raises(RuntimeError) as excinfo:
         tm.splitFacesWithOgrid(["Fa0003", "Fa0006"], ["Ar0004", "Ar0010", "Ar0006", "Ar0015"], .5, 10)
-        assert False # On devrait passer dans l'exception
-    except RuntimeError:      
-        # Création du ogrid non réalisé => toujours que 4 faces
-        assert(tm.getNbFaces() == 4)
+    # Création du ogrid non réalisé => toujours que 4 faces
+    assert(tm.getNbFaces() == 4)
+
     # Il faut vérifier que ça fonctionne toujours avec 1 seule face
     # Création du ogrid sur une seule face
     tm.splitFacesWithOgrid(["Fa0003"], [], .5, 10)

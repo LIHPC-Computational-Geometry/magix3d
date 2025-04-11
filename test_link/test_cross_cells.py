@@ -1,9 +1,9 @@
-import sys
 import pyMagix3D as Mgx3D
 
 # Test que le découpage en o-grid n'est PAS fait quand la contrainte d'Euler n'est pas vérifiée 
 def test_cross_cells(capfd):
     ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
     tm = ctx.getTopoManager()
     mm = ctx.getMeshManager()
 
