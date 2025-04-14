@@ -5538,7 +5538,7 @@ Internal::M3DCommandResult* TopoManager::exportBlocks(const std::string& n)
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().exportVTK(";
+    cmd << getContextAlias() << "." << "getTopoManager().exportBlocks(";
     cmd <<"\""<<n<<"\")";
     command->setScriptCommand(cmd);
 
@@ -5550,6 +5550,26 @@ Internal::M3DCommandResult* TopoManager::exportBlocks(const std::string& n)
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
+/*----------------------------------------------------------------------------*/
+    Internal::M3DCommandResultIfc* TopoManager::importBlocks(const std::string& n)
+    {
+        //creation de la commande d'exportation
+        CommandImportBlocks *command = new CommandImportBlocks(getLocalContext(), n);
+
+        // trace dans le script
+        TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
+        cmd << getContextAlias() << "." << "getTopoManager().importBlocks(";
+        cmd <<"\""<<n<<"\")";
+        command->setScriptCommand(cmd);
+
+        // on passe au gestionnaire de commandes qui exécute la commande en // ou non
+        // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
+        getCommandManager().addCommand(command, Utils::Command::DO);
+
+        Internal::M3DCommandResultIfc*  cmdResult   =
+                new Internal::M3DCommandResult (*command);
+        return cmdResult;
+    }
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo
 /*----------------------------------------------------------------------------*/

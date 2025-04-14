@@ -28,6 +28,24 @@ namespace Mgx3D {
         internalExecute()
         {
             m_impl->internalExecute();
+
+
+            for(auto te : getInfoCommand().getTopoInfoEntity()){
+                if(te.first->getDim() == 0){
+                    getTopoManager().add((Vertex*)te.first);
+                }else if(te.first->getDim() == 1){
+                    getTopoManager().add((CoEdge*)te.first);
+                }else if(te.first->getDim() == 2){
+                    getTopoManager().add((CoFace*)te.first);
+                }else if(te.first->getDim() == 3){
+                    getTopoManager().add((Block*)te.first);
+                }
+            }
+
+            //getInfoCommand().addGroupInfoEntity(group0,Internal::InfoCommand::DISPMODIFIED);
+            //getInfoCommand().addGroupInfoEntity(group1,Internal::InfoCommand::DISPMODIFIED);
+            //getInfoCommand().addGroupInfoEntity(group2,Internal::InfoCommand::DISPMODIFIED);
+            //getInfoCommand().addGroupInfoEntity(group3,Internal::InfoCommand::DISPMODIFIED);
         }
 /*----------------------------------------------------------------------------*/
         void CommandImportBlocks::getPreviewRepresentation(Utils::DisplayRepresentation& dr)
