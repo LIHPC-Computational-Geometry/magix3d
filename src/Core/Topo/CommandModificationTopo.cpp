@@ -1,34 +1,25 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandModificationTopo.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 21/3/2013
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandModificationTopo.h"
-
-#include "Geom/GeomModificationBaseClass.h"
-#include "Geom/CommandEditGeom.h"
-#include "Geom/Vertex.h"
-#include "Geom/Curve.h"
-#include "Geom/Surface.h"
-
-#include "Utils/Common.h"
-
 #include "Topo/TopoHelper.h"
 #include "Topo/Vertex.h"
 #include "Topo/CoEdge.h"
 #include "Topo/CoFace.h"
 #include "Topo/Block.h"
+#include "Geom/GeomModificationBaseClass.h"
+#include "Geom/GeomContainsImplementation.h"
+#include "Geom/CommandEditGeom.h"
+#include "Geom/Vertex.h"
+#include "Geom/Curve.h"
+#include "Geom/Surface.h"
+#include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/WarningLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/Exception.h>
-#include <set>
 #include <TkUtil/MemoryError.h>
+/*----------------------------------------------------------------------------*/
+#include <set>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -1152,6 +1143,7 @@ getCoEdges(Geom::GeomEntity* ge, Geom::GeomEntity* ge_init)
         	}
 
         	// on recommence la recherche à partir de la surface
+            Geom::GeomContainsImplementation gci;
         	for (std::vector<Geom::Curve*>::iterator iter = curves.begin();
         			iter != curves.end(); ++iter){
         		const std::vector<Topo::TopoEntity* >& topos = (*iter)->getRefTopo();
@@ -1167,7 +1159,7 @@ getCoEdges(Geom::GeomEntity* ge, Geom::GeomEntity* ge_init)
 
         			for (std::list<Geom::Curve*>::iterator iter2 = courbes_interessantes.begin();
         					iter2 != courbes_interessantes.end(); ++iter2){
-        				if ((*iter2)->contains(*iter)){
+        				if (gci.contains((*iter2), (*iter))){
         					// on va récupérer les coedges de cette courbe
         					const std::vector<Topo::TopoEntity* >& topos = (*iter2)->getRefTopo();
         					for (std::vector<Topo::TopoEntity* >::const_iterator iter3 = topos.begin();

@@ -89,13 +89,6 @@ public:
     virtual void computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const;
 
     /*------------------------------------------------------------------------*/
-    /** \brief Vérifie que la surface ASurf est contenue dans *this
-     *  \param ASurf la surface contenue
-     *  \return true si elle est contenue, false sinon
-     */
-    virtual bool contains(Volume* vol) const;
-
-    /*------------------------------------------------------------------------*/
     /** \brief  retourne la dimension de l'entité géométrique
      */
     int getDim() const {return 3;}

@@ -14,6 +14,7 @@
 #include "Geom/Volume.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/IncidentGeomEntitiesVisitor.h"
+#include "Geom/GeomContainsImplementation.h"
 #include "Geom/OCCHelper.h"
 #include "Utils/MgxNumeric.h"
 /*----------------------------------------------------------------------------*/
@@ -1009,6 +1010,7 @@ void GeomModificationBaseClass::computeReplacedCurve(Curve* e)
 	#ifdef _DEBUG2
 		std::cout<<"m_toKeepCurves :"<<std::endl;
 	#endif
+        GeomContainsImplementation gci;
 		for(unsigned int i=0;i<m_toKeepCurves.size() && !is_fully_replaced;i++){
 			Curve* c = m_toKeepCurves[i];
 	#ifdef _DEBUG2
@@ -1023,12 +1025,12 @@ void GeomModificationBaseClass::computeReplacedCurve(Curve* e)
 					m_replacedEntities[e].push_back(c); //e remplacee par c
 					is_fully_replaced = true;
 				}
-				if(!is_partly_replaced && !is_fully_replaced && c->contains(e)){
+				if(!is_partly_replaced && !is_fully_replaced && gci.contains(c, e)){
 					m_replacedEntities[e].push_back(c); //e remplacee par c
 					is_fully_replaced = true;
 				}
 
-				if(!is_fully_replaced && e->contains(c)){
+				if(!is_fully_replaced && gci.contains(e, c)){
 					m_replacedEntities[e].push_back(c); //e remplacee par c en partie
 					is_partly_replaced = true;
 				}
@@ -1053,12 +1055,12 @@ void GeomModificationBaseClass::computeReplacedCurve(Curve* e)
 					m_replacedEntities[e].push_back(c); //e remplacee par c
 					is_fully_replaced = true;
 				}
-				if(!is_partly_replaced && !is_fully_replaced && c->contains(e)){
+				if(!is_partly_replaced && !is_fully_replaced && gci.contains(c, e)){
 					m_replacedEntities[e].push_back(c); //e remplacee par c
 					is_fully_replaced = true;
 				}
 
-				if(!is_fully_replaced && e->contains(c)){
+				if(!is_fully_replaced && gci.contains(e, c)){
 					m_replacedEntities[e].push_back(c); //e remplacee par c en partie
 					is_partly_replaced = true;
 				}
@@ -1084,6 +1086,7 @@ void GeomModificationBaseClass::computeReplacedSurface(Surface* e)
 	std::cout<<" computeReplacedSurface("<<e->getName()<<")"<<std::endl;
 #endif
 
+    GeomContainsImplementation gci;
     for (auto occ_e : e->getOCCFaces()) {
 		//========================================================================
 		// Cela peut être une entité conservée (cas d'un glue par exemple) ou
@@ -1104,12 +1107,12 @@ void GeomModificationBaseClass::computeReplacedSurface(Surface* e)
 					m_replacedEntities[e].push_back(s); //e remplacee par s
 					is_fully_replaced = true;
 				}
-				if(!is_partly_replaced && !is_fully_replaced && s->contains(e)){
+				if(!is_partly_replaced && !is_fully_replaced && gci.contains(s, e)){
 					m_replacedEntities[e].push_back(s); //e remplacee par s
 					is_fully_replaced = true;
 				}
 
-				if(!is_fully_replaced && e->contains(s)){
+				if(!is_fully_replaced && gci.contains(e, s)){
 					m_replacedEntities[e].push_back(s); //e remplacee par c en partie
 					is_partly_replaced = true;
 				}
@@ -1131,12 +1134,12 @@ void GeomModificationBaseClass::computeReplacedSurface(Surface* e)
 					m_replacedEntities[e].push_back(s); //e remplacee par s
 					is_fully_replaced = true;
 				}
-				if(!is_partly_replaced && !is_fully_replaced && s->contains(e)){
+				if(!is_partly_replaced && !is_fully_replaced && gci.contains(s, e)){
 					m_replacedEntities[e].push_back(s); //e remplacee par s
 					is_fully_replaced = true;
 				}
 
-				if(!is_fully_replaced && e->contains(s)){
+				if(!is_fully_replaced && gci.contains(e, s)){
 					m_replacedEntities[e].push_back(s); //e remplacee par c en partie
 					is_partly_replaced = true;
 				}
@@ -1168,6 +1171,7 @@ void GeomModificationBaseClass::computeReplacedVolume(Volume* e)
 	// nouvelle
 	bool is_fully_replaced  = false;
 	bool is_partly_replaced = false;
+    GeomContainsImplementation gci;
 	for(unsigned int i=0;i<m_toKeepVolumes.size() && !is_fully_replaced;i++){
 		Volume* s = m_toKeepVolumes[i];
 #ifdef _DEBUG2
@@ -1182,12 +1186,12 @@ void GeomModificationBaseClass::computeReplacedVolume(Volume* e)
 			m_replacedEntities[e].push_back(s); //e remplacee par s
 			is_fully_replaced = true;
 		}
-		if(!is_partly_replaced && !is_fully_replaced && s->contains(e)){
+		if(!is_partly_replaced && !is_fully_replaced && gci.contains(s, e)){
 			m_replacedEntities[e].push_back(s); //e remplacee par s
 			is_fully_replaced = true;
 		}
 
-		if(!is_fully_replaced && e->contains(s)){
+		if(!is_fully_replaced && gci.contains(e, s)){
 			m_replacedEntities[e].push_back(s); //e remplacee par c en partie
 			is_partly_replaced = true;
 		}
@@ -1213,7 +1217,7 @@ void GeomModificationBaseClass::computeReplacedVolume(Volume* e)
 			std::cout<<"\t totalement remplacé par "<<s->getName()<<std::endl;
 #endif
 		}
-		if(!is_partly_replaced && !is_fully_replaced && s->contains(e)){
+		if(!is_partly_replaced && !is_fully_replaced && gci.contains(s, e)){
 			m_replacedEntities[e].push_back(s); //e remplacee par s
 			is_fully_replaced = true;
 #ifdef _DEBUG2
@@ -1221,7 +1225,7 @@ void GeomModificationBaseClass::computeReplacedVolume(Volume* e)
 #endif
 		}
 
-		if(!is_fully_replaced && e->contains(s)){
+		if(!is_fully_replaced && gci.contains(e, s)){
 			m_replacedEntities[e].push_back(s); //e remplacee par c en partie
 			is_partly_replaced = true;
 #ifdef _DEBUG2
@@ -2184,6 +2188,7 @@ void GeomModificationBaseClass::createNewAdjVolumes(
 {
     TopTools_IndexedMapOfShape entities;
     TopExp::MapShapes(entity,TopAbs_SOLID, entities);
+    GeomContainsImplementation gci;
     for(int i = 1; i <= entities.Extent(); i++)
     {
         TopoDS_Solid V = TopoDS::Solid(entities(i));
@@ -2229,7 +2234,7 @@ void GeomModificationBaseClass::createNewAdjVolumes(
             if (current->getOCCShape().ShapeType() != TopAbs_SOLID)
                 throw TkUtil::Exception(TkUtil::UTF8String("Le volume doit être de type SOLID : " + current->getName(), TkUtil::Charset::UTF_8));
             TopoDS_Solid rep_volume = TopoDS::Solid(current->getOCCShape());
-            if(OCCHelper::contains(V, rep_volume))
+            if(gci.contains(V, rep_volume))
             {
                 // on a trouve que le volume existe déjà, on en conserve la référence
                 to_keep = true;

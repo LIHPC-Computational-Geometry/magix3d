@@ -114,13 +114,6 @@ public:
     virtual int getDim() const {return 2;}
 
     /*------------------------------------------------------------------------*/
-    /** \brief Vérifie que la surface ASurf est contenue dans *this
-     *  \param ASurf la surface contenue
-     *  \return true si elle est contenue, false sinon
-     */
-    virtual bool contains(Surface* ASurf) const;
-
-    /*------------------------------------------------------------------------*/
     /** \brief Calcul la normale à une surface en un point
      *
      *  \param P1 le point à projeter

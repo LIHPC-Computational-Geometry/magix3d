@@ -123,12 +123,6 @@ public:
     static void computeBoundingBox(const TopoDS_Shape& shape, Utils::Math::Point& pmin, Utils::Math::Point& pmax, double tol=0.0);
 
     /*------------------------------------------------------------------------*/
-     /** \brief  Return true si la shape sh contient la shape shOther a epsilon
-      *          pres
-      */
-    static bool contains(const TopoDS_Shape& sh, const TopoDS_Shape& shOther);
-
-    /*------------------------------------------------------------------------*/
     /** \brief  Effectue le nettoyage topologique de la shape occ sh passée en
      *          paramètre
      */

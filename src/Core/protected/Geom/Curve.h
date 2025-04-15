@@ -132,13 +132,6 @@ public:
     virtual void get(std::vector<Topo::Vertex*>& vertices);
 
     /*------------------------------------------------------------------------*/
-    /** \brief Vérifie que la courbe ACurve est contenu dans *this
-     *  \param ACurve la courbe contenue
-     *  \return true si elle est contenue, false sinon
-     */
-    virtual bool contains(Curve* ACurve) const;
-
-    /*------------------------------------------------------------------------*/
     /** \brief Donne le point en fonction du paramètre sur la courbe
      * \param p le paramètre curviligne compris entre 0 et 1
      */
