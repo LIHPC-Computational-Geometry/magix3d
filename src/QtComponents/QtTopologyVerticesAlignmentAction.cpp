@@ -645,7 +645,7 @@ QtTopologyVerticesAlignmentPanel::QtTopologyVerticesAlignmentPanel (
     hlayout->addWidget (_operationMethodComboBox);
 
     // Définition de l'arc de cercle :
-	QtGroupBox*		groupBox	= new QtGroupBox(QString::fromUtf8("Paramètres de l'arc de cercle"), this);
+	QtGroupBox*		groupBox	= new QtGroupBox(QString::fromUtf8("Paramètres de l'alignement"), this);
 	QVBoxLayout*	vlayout	= new QVBoxLayout (groupBox);
 	vlayout->setContentsMargins  (
             Internal::Resources::instance ( )._margin.getValue ( ), Internal::Resources::instance ( )._margin.getValue ( ),
