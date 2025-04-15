@@ -154,6 +154,11 @@ class QtVtkMgx3DMainWindow : public QtComponents::QtMgx3DMainWindow
 	virtual void preferencesCallback ( );
 
 	/**
+	 * Passe en mode d'interaction 2D/3D.
+	 */
+	virtual void mode2DCallback (bool enable2D);
+
+	/**
 	 * Affiche une boite de dialogue d'impression de la vue 3D.
 	 */
 	virtual void print3DViewCallback ( );

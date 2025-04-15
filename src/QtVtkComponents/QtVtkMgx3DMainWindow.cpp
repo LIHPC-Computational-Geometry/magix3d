@@ -357,6 +357,19 @@ void QtVtkMgx3DMainWindow::preferencesCallback ( )
 }	// QtVtkMgx3DMainWindow::preferencesCallback
 
 
+void QtVtkMgx3DMainWindow::mode2DCallback (bool enable2D)
+{
+	BEGIN_QT_TRY_CATCH_BLOCK
+	
+	QtVtkGraphicalWidget*	vgw	= dynamic_cast<QtVtkGraphicalWidget*>(&getGraphicalWidget ( ));
+	CHECK_NULL_PTR_ERROR (vgw)
+	CHECK_NULL_PTR_ERROR (vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).GetMgx3DPicker ( ))
+	vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).Set2DMode (enable2D);
+	
+	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
+}	// QtVtkMgx3DMainWindow::mode2DCallback
+
+
 void QtVtkMgx3DMainWindow::print3DViewCallback ( )
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
