@@ -60,7 +60,7 @@ namespace QtVtkComponents
 {
 
 QtVtkMgx3DMainWindow::QtVtkMgx3DMainWindow (QWidget* parent, Qt::WindowFlags flags)
-	: QtMgx3DMainWindow (parent, 0, flags)
+	: QtMgx3DMainWindow (parent, 0, flags), _viewPointsToolbar (0)
 #ifdef USE_EXPERIMENTAL_ROOM
 	, _experimentalRoomPanel (0)
 #endif	// USE_EXPERIMENTAL_ROOM
@@ -69,7 +69,7 @@ QtVtkMgx3DMainWindow::QtVtkMgx3DMainWindow (QWidget* parent, Qt::WindowFlags fla
 
 
 QtVtkMgx3DMainWindow::QtVtkMgx3DMainWindow (const QtVtkMgx3DMainWindow&)
-	: QtMgx3DMainWindow (0, 0, 0)
+	: QtMgx3DMainWindow (0, 0, 0), _viewPointsToolbar (0)
 #ifdef USE_EXPERIMENTAL_ROOM
 	, _experimentalRoomPanel (0)
 #endif	// USE_EXPERIMENTAL_ROOM
@@ -89,6 +89,24 @@ QtVtkMgx3DMainWindow::~QtVtkMgx3DMainWindow ( )
 {
 	unregisterReferences ( );
 }	// QtVtkMgx3DMainWindow::~QtVtkMgx3DMainWindow
+
+
+void QtVtkMgx3DMainWindow::showReady ( )
+{
+	QtMgx3DMainWindow::showReady ( );
+
+	QtVtkGraphicalWidget*	vgw	= dynamic_cast<QtVtkGraphicalWidget*>(&getGraphicalWidget ( ));
+	CHECK_NULL_PTR_ERROR (vgw)
+//    CHECK_NULL_PTR_ERROR (vgw->getVTKWidget ( ).GetRenderWindow ( ))
+    vtkRenderer&    renderer	= vgw->getVTKRenderingManager ( ).getRenderer ( );
+    
+	vtkRenderWindow*	window	= vgw->getVTKWidget ( ).GetRenderWindow ( );
+	_viewPointsToolbar	= new QtVtkViewPointToolBar (this, *(renderer.GetActiveCamera ( )), &renderer);
+	_viewPointsToolbar->setObjectName("ViewPointsToolBar");
+	_viewPointsToolbar->setWindowTitle ("Outils Magix3D - Points de vue");
+//	_viewPointsToolbar->setIconSize (QtLemApplication::getIconSize ( ));
+	addToolBar(Qt::TopToolBarArea, _viewPointsToolbar);
+}	// QtVtkMgx3DMainWindow::showReady
 
 
 void QtVtkMgx3DMainWindow::init (const string& name, ContextIfc* context, QtGroupsPanel* groupsPanel, QtEntitiesPanel* entitiesPanel)

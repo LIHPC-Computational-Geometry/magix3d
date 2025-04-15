@@ -247,7 +247,7 @@ namespace QtComponents
 				: _preferencesAction(0), _editSettingsAction(0), _quitAction(0),
 				  _print3DViewAction(0), _print3DViewToFileAction(0),
 				  _useGlobalDisplayPropertiesAction(0),
-				  _displayTrihedronAction(0), _displayLandmarkAction(0),
+				  _displayTrihedronAction(0), _displayViewCubeAction (0), _displayLandmarkAction(0),
 				  _parametrizeLandmarkAction(0), _displayFocalPointAction(0),
 #ifdef USE_EXPERIMENTAL_ROOM
                   _loadRaysAction(0), _importRaysAction(0),
@@ -326,6 +326,7 @@ namespace QtComponents
 				  _print3DViewToFileAction(wa._print3DViewToFileAction),
 				  _useGlobalDisplayPropertiesAction(wa._useGlobalDisplayPropertiesAction),
 				  _displayTrihedronAction(wa._displayTrihedronAction),
+				  _displayViewCubeAction (wa._displayViewCubeAction),
 				  _displayLandmarkAction(wa._displayLandmarkAction),
 				  _parametrizeLandmarkAction(wa._parametrizeLandmarkAction),
 				  _displayFocalPointAction(wa._displayFocalPointAction),
@@ -461,6 +462,7 @@ namespace QtComponents
 				_print3DViewToFileAction = wa._print3DViewToFileAction;
 				_useGlobalDisplayPropertiesAction = wa._useGlobalDisplayPropertiesAction;
 				_displayTrihedronAction               = wa._displayTrihedronAction;
+				_displayViewCubeAction                = wa._displayViewCubeAction;
 				_displayLandmarkAction                = wa._displayLandmarkAction;
 				_parametrizeLandmarkAction            = wa._parametrizeLandmarkAction;
 				_displayFocalPointAction              = wa._displayFocalPointAction;
@@ -1789,6 +1791,7 @@ void QtMgx3DMainWindow::showReady ( )
 			_viewMenu->addAction(getActions()._print3DViewToFileAction);
 			_viewMenu->addAction(getActions()._useGlobalDisplayPropertiesAction);
 			_viewMenu->addAction(getActions()._displayTrihedronAction);
+			_viewMenu->addAction (getActions()._displayViewCubeAction);
 			_viewMenu->addAction(getActions()._displayLandmarkAction);
 			_viewMenu->addAction(getActions()._parametrizeLandmarkAction);
 			_viewMenu->addAction(getActions()._xOyViewAction);
@@ -2067,6 +2070,7 @@ void QtMgx3DMainWindow::showReady ( )
 			_3dViewToolbar->addAction(getActions()._print3DViewAction);
 			_3dViewToolbar->addSeparator();
 			_3dViewToolbar->addAction(getActions()._displayTrihedronAction);
+			_3dViewToolbar->addAction(getActions()._displayViewCubeAction);
 			_3dViewToolbar->addAction(getActions()._displayLandmarkAction);
 			_3dViewToolbar->addAction(getActions()._displayFocalPointAction);
 			_3dViewToolbar->addSeparator();
@@ -2278,6 +2282,10 @@ void QtMgx3DMainWindow::showReady ( )
 			_actions._displayTrihedronAction->setCheckable(true);
 			_actions._displayTrihedronAction->setChecked(Resources::instance()._displayTrihedron.getValue());
 			connect(_actions._displayTrihedronAction, SIGNAL(toggled(bool)), this, SLOT(displayTrihedronCallback(bool)), defaultConnectionType);
+			_actions._displayViewCubeAction		= new QAction(QIcon(":/images/viewcube.png"), QString::fromUtf8("Afficher cube d'orientation"), this);
+			_actions._displayViewCubeAction->setCheckable(true);
+			_actions._displayViewCubeAction->setChecked(Resources::instance()._displayTrihedron.getValue());
+			connect(_actions._displayViewCubeAction, SIGNAL(toggled(bool)), this, SLOT(displayViewCubeCallback(bool)), defaultConnectionType);
 			_actions._displayLandmarkAction = new QAction(QIcon(":/images/landmark.png"), QString::fromUtf8("Afficher le repère"), this);
 			_actions._displayLandmarkAction->setCheckable(true);
 			_actions._displayLandmarkAction->setChecked(false);
@@ -6332,11 +6340,36 @@ void QtMgx3DMainWindow::displayTrihedronCallback (bool display)
 
     BEGIN_QT_TRY_CATCH_BLOCK
 
+	if (true == display)	// Trièdre et cube d'orientation sont mutuellement exclusifs
+	{
+		_actions._displayViewCubeAction->setChecked (false);
+		getGraphicalWidget ( ).getRenderingManager ( ).setDisplayViewCube (false);
+	}
+		
 	getGraphicalWidget ( ).getRenderingManager ( ).setDisplayTrihedron(display);
 	Resources::instance ( )._displayTrihedron.setValue (display);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::displayTrihedronCallback
+
+
+void QtMgx3DMainWindow::displayViewCubeCallback (bool display)
+{
+	QtAutoWaitingCursor	cursor (true);
+	UTF8String			message (Charset::UTF_8);
+
+    BEGIN_QT_TRY_CATCH_BLOCK
+
+	if (true == display)	// Trièdre et cube d'orientation sont mutuellement exclusifs
+	{
+		_actions._displayTrihedronAction->setChecked (false);
+		getGraphicalWidget ( ).getRenderingManager ( ).setDisplayTrihedron (false);
+		Resources::instance ( )._displayTrihedron.setValue (false);
+	}	// if (true == display)
+	getGraphicalWidget ( ).getRenderingManager ( ).setDisplayViewCube (display);
+
+	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
+}	// QtMgx3DMainWindow::displayViewCubeCallback
 
 
 void QtMgx3DMainWindow::displayLandmarkCallback (bool display)
