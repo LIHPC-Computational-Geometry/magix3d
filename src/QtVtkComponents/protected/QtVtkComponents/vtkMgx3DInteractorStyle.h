@@ -46,6 +46,17 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	//@}	// Evènements déclenchés par cette classe ...
 
 	// Fin Evènements déclenchés par cette classe
+	
+	/**
+	 * Interactions type "motion" définies par cette classe dans le prolongement des <I>vtkInteractorStyle::VTKIS_*</I>.
+	 */
+	//@{
+	
+	/** Sélection par rectangle élastique. */
+	static int						VTKIS_RUBBER_BAND;
+	
+	
+	//@}	// Interactions type "motion" définies par cette classe...
 
 	/**
 	 * Destructeur. RAS.
