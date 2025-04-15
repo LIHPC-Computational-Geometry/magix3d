@@ -74,10 +74,10 @@ saveMemento(GeomEntity* e, const MementoEntity& mem)
 void MementoManager::
 permMementos()
 {
-    for(auto v : m_mementos) {
-        GeomEntity *e = v.first;
-        MementoEntity mem_saved = v.second;
-        v.second = createMemento(e);
+    for(auto it = m_mementos.begin();it!=m_mementos.end();it++){
+        GeomEntity *e = it->first;
+        MementoEntity mem_saved = it->second;
+        it->second = createMemento(e);
         setFromMemento(e, mem_saved);
     }
 }
