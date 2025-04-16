@@ -39,7 +39,7 @@ using namespace Mgx3D::QtVtkComponents;
 
 
 const unsigned long		vtkMgx3DInteractorStyle::ViewRedefinedEvent	= 105000;
-
+int						vtkMgx3DInteractorStyle::VTKIS_RUBBER_BAND	= 2048;
 
 
 /**
@@ -389,30 +389,27 @@ VTKMgx3DPicker* vtkMgx3DInteractorStyle::GetMgx3DPicker ( )
 
 void vtkMgx3DInteractorStyle::OnMouseMove ( )
 {
-	if (false == RubberBand)
+	if (VTKIS_RUBBER_BAND != GetState ( ))
 		vtkUnifiedInteractorStyle::OnMouseMove ( );
 	else
 	{
-		if ((GetInteractiveSelectionActivated ( ) == true)  && (true == RubberButtonDown))
+		vtkRenderWindowInteractor*	rwi	= this->Interactor;
+		if ((0 != rwi) && (0 != rwi->GetRenderWindow ( )))
 		{
-			vtkRenderWindowInteractor*	rwi	= this->Interactor;
-			if ((0 != rwi) && (0 != rwi->GetRenderWindow ( )))
-			{
-				EndPosition [0]	= rwi->GetEventPosition ( )[0];
-				EndPosition [1]	= rwi->GetEventPosition ( )[1];
-				int*	size	= rwi->GetRenderWindow ( )->GetSize ( );
-				if (EndPosition [0] > (size [0] - 1))
-					EndPosition [0]	= size [0] - 1;
-				if (EndPosition [0] < 0)
-					EndPosition [0] = 0;
-				if (EndPosition [1] > (size [1] - 1))
-					EndPosition [1] = size [1] - 1;
-				if (EndPosition [1] < 0)
-					EndPosition [1] = 0;
-				RedrawRubberBand ( );
-			}	// if ((0 != rwi) && (0 != rwi->GetRenderWindow ( )))
-		}	// if ((GetInteractiveSelectionActivated ( ) == true)  && (true == RubberButtonDown))
-	}	// if (false == RubberBand)
+			EndPosition [0]	= rwi->GetEventPosition ( )[0];
+			EndPosition [1]	= rwi->GetEventPosition ( )[1];
+			int*	size	= rwi->GetRenderWindow ( )->GetSize ( );
+			if (EndPosition [0] > (size [0] - 1))
+				EndPosition [0]	= size [0] - 1;
+			if (EndPosition [0] < 0)
+				EndPosition [0] = 0;
+			if (EndPosition [1] > (size [1] - 1))
+				EndPosition [1] = size [1] - 1;
+			if (EndPosition [1] < 0)
+				EndPosition [1] = 0;
+			RedrawRubberBand ( );
+		}	// if ((0 != rwi) && (0 != rwi->GetRenderWindow ( )))
+	}	// else if (VTKIS_RUBBER_BAND != GetState ( ))
 }	// vtkMgx3DInteractorStyle::OnMouseMove
 
 
@@ -424,18 +421,19 @@ void vtkMgx3DInteractorStyle::OnLeftButtonDown ( )
 
 	if (true == GetInteractiveSelectionActivated ( ))
 	{
-		if (false == RubberBand)
+		if ((false == RubberBand) || (true == isAltKeyPressed ( )))
 		{
 			if (true == Resources::instance ( )._pickOnLeftButtonDown.getValue ( ))
 				Pick ( );
 			else
 				vtkUnifiedInteractorStyle::OnLeftButtonDown ( );
-		}	// if (false == RubberBand)
+		}	// if ((false == RubberBand) || (true == isAltKeyPressed ( )))
 		else
 		{
 			if ((0 == rwi) || (0 == rwi->GetRenderWindow ( )))
 				return;
 
+			StartState (VTKIS_RUBBER_BAND);
 			RubberButtonDown	= true;
 			StartPosition [0]	= EndPosition [0]	= rwi->GetEventPosition ( )[0];
 			StartPosition [1]	= EndPosition [1]	= rwi->GetEventPosition ( )[1];
@@ -520,7 +518,7 @@ void vtkMgx3DInteractorStyle::OnLeftButtonUp ( )
 	{
 		vtkRenderWindowInteractor*	rwi	= this->Interactor;
 		
-		if (false == RubberBand)
+		if (VTKIS_RUBBER_BAND != GetState ( ))
 		{
 			// Si le curseur n'a pas bougé depuis la pression sur le bouton, et que c'est paramétré tel que, on fait un picking :
 			if ((0 == rwi) || (true == Resources::instance ( )._pickOnLeftButtonUp.getValue ( )))
@@ -536,7 +534,8 @@ void vtkMgx3DInteractorStyle::OnLeftButtonUp ( )
 			}	// if ((0 == rwi) || (true == Resources::instance ( )._pickOnLeftButtonUp.getValue ( )))
 		}	// if (false == RubberBand)
 		else
-		{
+		{	// => VTKIS_RUBBER_BAND == GetState ( )
+			StopState ( );
 			const int* const	size	= rwi->GetRenderWindow ( )->GetSize ( );
 			// Si on est en double buffering on met l'image dans le back buffer, Frame ( )la rebasculera dans le front buffer, sinon on la met dans le front buffer.
 			rwi->GetRenderWindow ( )->SetRGBACharPixelData (0, 0, size [0] - 1, size [1] - 1, PixelArray->GetPointer (0), !rwi->GetRenderWindow ( )->GetDoubleBuffer ( ));

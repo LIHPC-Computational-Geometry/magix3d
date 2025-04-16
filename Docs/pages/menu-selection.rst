@@ -254,7 +254,12 @@ En mode de sélection par rectangle élastique il est possible de ne
 sélectionner que les entités visibles à l'écran, c'est à dire non 
 masquées par d'autres qui seraient situées devant. Pour ce il convient
 de cocher au préalable le bouton "Sélection des entités visibles 
-uniquement".
+uniquement" et de définir la zone de sélection - un rectangle - en
+délçant le curseur de la souris bouton gauche enfoncé.
 
 .. image:: ../images/visible.png
    :width: 0.25in
+
+A noter que dans ce mode les interactions de modification de la vue avec
+le bouton gauche enfoncées ne sont possibles qu'en pressant 
+conjointement la touche ALT.
