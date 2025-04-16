@@ -20,7 +20,6 @@
 #include "Geom/PropertySphere.h"
 #include "Geom/PropertySpherePart.h"
 #include "Geom/PropertyHollowSpherePart.h"
-#include "Geom/PropertyPrism.h"
 #include "Geom/PropertyHollowCylinder.h"
 #include "Geom/PropertyHollowSphere.h"
 #include "Utils/Point.h"
@@ -89,7 +88,6 @@ class EntityFactory
     friend class CommandNewSurface;
     friend class CommandNewCurveByCurveProjectionOnSurface;
     friend class GeomModificationBaseClass;
-    friend class GeomNewPrismImplementation;
     friend class GeomCutImplementation;
     friend class GeomCommonImplementation;
     friend class GeomFuseImplementation;
