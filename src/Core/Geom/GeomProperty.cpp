@@ -41,8 +41,6 @@ std::string GeomProperty::typeToString(type& t)
 		return "cône";
 	else if (t == SPHERE)
 		return "sphère pleine";
-	else if (t == PRISM)
-		return "prisme";
 	else if (t == REVOL)
 		return "objet de révolution";
 	else if (t == HOLLOW_CYLINDER)

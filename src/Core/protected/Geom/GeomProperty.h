@@ -45,7 +45,6 @@ public:
         CYLINDER,
         CONE,
         SPHERE,
-        PRISM,
         REVOL,
         HOLLOW_CYLINDER,
         HOLLOW_SPHERE,
