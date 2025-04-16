@@ -67,8 +67,18 @@ def test_split_blocks_with_ogrid(capfd):
     tm.newBoxWithTopo (Mgx3D.Point(1, 0, 0), Mgx3D.Point(2, 1, 1), 10, 10, 10)
     # Création d'une boite avec une topologie
     tm.newBoxWithTopo (Mgx3D.Point(2, 0, 0), Mgx3D.Point(3, 1, 1), 10, 10, 10)
+
     # Collage entre géométries avec topologies
+    assert gm.getNbVolumes() == 3
+    assert gm.getNbSurfaces() == 18
+    assert tm.getNbBlocks() == 3
+    assert tm.getNbFaces() == 18
     gm.glue (["Vol0000","Vol0001","Vol0002"])
+    assert gm.getNbVolumes() == 3
+    assert gm.getNbSurfaces() == 16
+    assert tm.getNbBlocks() == 3
+    assert tm.getNbFaces() == 16
+
     # Découpage en O-grid des blocs structurés Bl0000
     tm.splitBlocksWithOgridV2 (["Bl0000"], ["Fa0001","Fa0005","Fa0004"], .5, 10)
     # Création du maillage pour tous les blocs
