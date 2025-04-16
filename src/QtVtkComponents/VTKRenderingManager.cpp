@@ -778,7 +778,7 @@ void VTKRenderingManager::VTKPlaneInteractor::vtkInteractorModified ( )
 // ===========================================================================
 
 /** La largeur normalisée de la fenêtre utilisée par les trièdres. */
-static const double	triedronViewportRatio	= 0.15;
+static const double	triedronViewportRatio	= 0.16;
 
 VTKRenderingManager::VTKRenderingManager (QtVtkGraphicWidget* vtkWidget, bool offScreen)
 	: QtComponents::RenderingManager ( ),
@@ -1890,8 +1890,10 @@ void VTKRenderingManager::setDisplayViewCube (bool display)
 {
 	BEGIN_TRY_CATCH_BLOCK
 
+	bool	created	= false;
 	if ((true == display) && (0 == _viewCubeActor))
 	{
+		created	= true;
 		_viewCubeActor	= vtkViewCubeActor::New ( );
 		vtkTransform*	transform	= vtkTransform::New ( );
 		transform->PostMultiply ( );
@@ -1906,10 +1908,7 @@ void VTKRenderingManager::setDisplayViewCube (bool display)
 		_viewCubeRenderer->AddActor (_viewCubeActor);
 		vtkCamera*	viewCubeCamera	= _viewCubeRenderer->GetActiveCamera ( );
 		viewCubeCamera->SetParallelProjection (1);
-	}	// if ((true == display) && (0 == _viewCube))
 
-	if (true == display)
-	{
 		vtkTrihedronCommand*	viewCubeCommand	= vtkTrihedronCommand::New ( );
 		viewCubeCommand->SetRenderer (_viewCubeRenderer);
 		getRenderWindow ( ).AddRenderer (_viewCubeRenderer);
@@ -1919,13 +1918,16 @@ void VTKRenderingManager::setDisplayViewCube (bool display)
 		if (0 != camera)
 			viewCubeCommand->SynchronizeViews (camera);
 		viewCubeCommand->Delete ( );
+	}	// if ((true == display) && (0 == _viewCube))
+
+	if (true == display)
+	{
+		if ((0 != _viewCubeRenderer) && (false == created))
+			getRenderWindow ( ).AddRenderer (_viewCubeRenderer);
 		_viewCubeRenderer->ResetCamera ( );
 	}	// if (true == display)
 	else
 	{
-		if (0 != _viewCubeCommandTag)
-			getRenderer ( ).RemoveObserver (_viewCubeCommandTag);
-		_viewCubeCommandTag	= 0;
 		if (0 != _viewCubeRenderer)
 			getRenderWindow ( ).RemoveRenderer (_viewCubeRenderer);
 	}	// else if (true == display)
