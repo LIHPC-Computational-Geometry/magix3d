@@ -2744,16 +2744,16 @@ void QtMgx3DMainWindow::showReady ( )
 					                       );
 			registerOperationAction(
 					*spherepartAction, QtMgx3DOperationsPanel::GEOM_VOLUME_OPERATION);
-			// Prisme :
-			QtMgx3DOperationAction *prismAction =
+            // Création d'entité par extrusion :
+			QtMgx3DOperationAction *entityByExtrusionAction =
 					                       new QtPrismCreationAction(
 							                       QIcon(
-									                       ":/images/create_prism.png"), QString::fromUtf8("Création de prisme"), *this,
-							                       QString::fromUtf8("Création de prisme."),
+									                       ":/images/create_prism_by_extrusion.png"), QString::fromUtf8("Création d'entité géométrique par extrusion"), *this,
+							                       QString::fromUtf8("Création d'entité géométrique par extrusion."),
 							                       QtMgx3DGroupNamePanel::CREATION
 					                       );
 			registerOperationAction(
-					*prismAction, QtMgx3DOperationsPanel::GEOM_VOLUME_OPERATION);
+					*entityByExtrusionAction, QtMgx3DOperationsPanel::GEOM_VOLUME_OPERATION);
 			// Création d'entité par révolution :
 			dim = 0;
 			for (int ot = (int) QtMgx3DOperationsPanel::GEOM_CURVE_OPERATION;
