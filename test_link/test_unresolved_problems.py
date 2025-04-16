@@ -23,13 +23,12 @@ def test_curve_on_surf_proj_0():
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     gm = ctx.getGeomManager()
-    tm = ctx.getTopoManager()
 
     # Création d'une boite avec une topologie
-    tm.newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
+    gm.newBox(Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1))
     with pytest.raises(RuntimeError) as excinfo:
         # Création d'une courbe par projection sur une surface
-        ctx.getGeomManager().newCurveByCurveProjectionOnSurface("Crb0007", "Surf0002")
+        gm.newCurveByCurveProjectionOnSurface("Crb0007", "Surf0002")
     expected = "OCC a échoué, création de la courbe composite entre  [ 1, 0, 0]  et  [ 1, 0, 0]"
     assert expected in str(excinfo.value)
 
@@ -65,6 +64,7 @@ def test_curve_on_surf_proj_2():
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     gm = ctx.getGeomManager()
+
     # Création du sommet Pt0000
     gm.newVertex (Mgx3D.Point(0, 0.0615, 0))
     # Création du sommet Pt0001
@@ -125,8 +125,6 @@ def test_circle_revol_180(capfd):
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     gm = ctx.getGeomManager()
-    tm = ctx.getTopoManager()
-    mm = ctx.getMeshManager()
 
     # Création du sommet Pt0000
     gm.newVertex (Mgx3D.Point(0, 1, 0))
@@ -142,20 +140,40 @@ def test_circle_revol_180(capfd):
     expected = "Une configuration imprévue a été rencontrée lors de la révolution d'une courbe composée: attention une courbe n'a pas deux sommets"
     assert expected in str(excinfo.value)
 
-def test_circle_revol_360(capfd):
+def test_glue_command_return():
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     gm = ctx.getGeomManager()
 
-    # Création du sommet Pt0000
-    gm.newVertex (Mgx3D.Point(0, 1, 0))
-    # Création du sommet Pt0001
-    gm.newVertex (Mgx3D.Point(0, 2, 0))
-    # Création du sommet Pt0002
-    gm.newVertex (Mgx3D.Point(1, 1, 0))
-    # Création du cercle Crb0000
-    gm.newCircle("Pt0000", "Pt0001", "Pt0002")
-    with pytest.raises(RuntimeError) as excinfo:
-        # Révolution du cercle à 2*Pi
-        gm.makeRevol (["Crb0000"], Mgx3D.RotX(360), False)
-    assert  "Configuration imprévue lors de la révolution d'une courbe à 360 degré" in str(excinfo.value)
+    b1 = gm.newBox(Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1))
+    assert b1.getVolume() == "Vol0000"
+    b2 = gm.newBox(Mgx3D.Point(1, 0, 0), Mgx3D.Point(2, 1, 1))
+    assert b2.getVolume() == "Vol0001"
+    collage = gm.glue ([b1.getVolume(),b2.getVolume()])
+    # la commande de glue ne renseigne pas le résultat (CommandResult)
+    # on devrait avoir la ligne suivante ; 
+    # assert collage.getVolumes() == ["Vol0000", "Vol00001"]
+    # Or on a :
+    assert collage.getVolumes() == []
+
+def test_ogrids_not_equal():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    gm = ctx.getGeomManager()
+    tm = ctx.getTopoManager()
+    mm = ctx.getMeshManager()
+
+    # création d'un cylindre avec topo + maillage
+    tm.newCylinderWithTopo (Mgx3D.Point(5, 4.5, 0), 1, Mgx3D.Vector(0, 3, 0), 360, True, .5, 10, 10, 10)
+    mm.newAllBlocksMesh()
+    nb_regions_1 = mm.getNbRegions()
+    ctx.clearSession()
+
+    # création d'un cylindre sans topo + topo + maillage
+    gm.newCylinder (Mgx3D.Point(5, 4.5, 0), 1, Mgx3D.Vector(0, 3, 0), 3.600000e+02)
+    tm.newTopoOGridOnGeometry ("Vol0000",.5)
+    mm.newAllBlocksMesh()
+    nb_regions_2 = mm.getNbRegions()
+
+    # le nombre de regions devrait être identique... et non
+    assert nb_regions_1 > nb_regions_2
