@@ -8,6 +8,8 @@
 
 #include "QtComponents/QtMgx3DMainWindow.h"
 
+#include <QtVtk/QtVtkViewPointToolBar.h>
+
 #ifdef USE_EXPERIMENTAL_ROOM
 #include "QtVtkComponents/QtVtkMgx3DExperimentalRoomPanel.h"
 #endif	// USE_EXPERIMENTAL_ROOM
@@ -44,6 +46,12 @@ class QtVtkMgx3DMainWindow : public QtComponents::QtMgx3DMainWindow
 	 * Divers IHM.
 	 */
 	//@{
+
+	/**
+	 * Affiche la fenêtre, menu actualisé. Initialise le graphique (Open GL) si nécessaire.
+	 * \warning	A utiliser à la place de <I>show</I>.
+	 */
+	 virtual void showReady ( );
 
 	/**
 	 * Appelle createGui.
@@ -261,6 +269,9 @@ class QtVtkMgx3DMainWindow : public QtComponents::QtMgx3DMainWindow
 	// Opérations interdites :
 	QtVtkMgx3DMainWindow (const QtVtkMgx3DMainWindow&);
 	QtVtkMgx3DMainWindow& operator = (const QtVtkMgx3DMainWindow&);
+
+	/** La barre d'outils "points de vue". */
+	QtVtkViewPointToolBar*				_viewPointsToolbar;
 
 #ifdef USE_EXPERIMENTAL_ROOM
 	/** Le panneau "Chambre expérimentale. */

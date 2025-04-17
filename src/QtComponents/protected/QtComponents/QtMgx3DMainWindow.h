@@ -379,7 +379,7 @@ class QtMgx3DMainWindow :
 		QAction			*_preferencesAction, *_editSettingsAction, *_quitAction;
 		QAction			*_print3DViewAction, *_print3DViewToFileAction;
 		QAction			*_useGlobalDisplayPropertiesAction;
-		QAction			*_displayTrihedronAction, *_displayLandmarkAction,
+		QAction			*_displayTrihedronAction, *_displayViewCubeAction, *_displayLandmarkAction,
 						*_parametrizeLandmarkAction, *_displayFocalPointAction,
 						*_xOyViewAction, *_xOzViewAction, *_yOzViewAction,
 						*_resetViewAction, *_clearViewAction, *_parallelViewAction;
@@ -1040,6 +1040,11 @@ class QtMgx3DMainWindow :
 	 */
 	virtual void displayTrihedronCallback (bool display);
 
+	/**
+	 * Affiche/masque le cube d'orientation.
+	 */
+	virtual void displayViewCubeCallback (bool display);
+	
 	/**
 	 * Affiche/masque le repère.
 	 */

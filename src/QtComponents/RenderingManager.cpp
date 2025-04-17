@@ -1306,6 +1306,11 @@ void RenderingManager::setDisplayTrihedron (bool display)
 }	// RenderingManager::setDisplayTrihedron
 
 
+void RenderingManager::setDisplayViewCube (bool display)
+{
+}	// RenderingManager::setDisplayViewCube
+
+
 void RenderingManager::setDisplayLandmark (bool display)
 {
 }	// RenderingManager::setDisplayLandmark

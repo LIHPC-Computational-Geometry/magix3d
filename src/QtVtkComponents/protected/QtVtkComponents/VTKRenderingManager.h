@@ -19,6 +19,7 @@
 #include <VtkContrib/vtkECMAxesActor.h>
 #include <VtkContrib/vtkLandmarkActor.h>
 #include <VtkContrib/vtkTrihedronCommand.h>
+#include <VtkContrib/vtkViewCubeActor.h>
 
 #include <vtkCamera.h>
 #include <vtkCommand.h>
@@ -752,6 +753,11 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 	 * Faut-il afficher ou non le trièdre dans la vue graphique ?
 	 */
 	virtual void setDisplayTrihedron (bool display);
+	
+		/**
+	 * Faut-il afficher ou non le cube d'orientation dans la vue graphique ?
+	 */
+	virtual void setDisplayViewCube (bool display);
 
 	/**
 	 * Faut-il afficher ou non le repere dans la vue graphique ?
@@ -1008,8 +1014,15 @@ class VTKRenderingManager : public QtComponents::RenderingManager
 	vtkTrihedron*									_trihedron;
 	unsigned long									_trihedronCommandTag;
 
+	/** L'éventuel cube d'orientation de la vue 3D. */
+	vtkViewCubeActor*								_viewCubeActor;
+	unsigned long									_viewCubeCommandTag;
+
 	/** Le renderer de l'éventuel triédron. */
 	vtkRenderer*									_trihedronRenderer;
+
+	/** Le renderer de l'éventuel cube d'orientation. */
+	vtkRenderer*									_viewCubeRenderer;
 
 	/** Le repère et ses propriétés. */
 	vtkLandmarkActor*								_axisActor;

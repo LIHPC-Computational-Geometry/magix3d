@@ -777,6 +777,9 @@ void VTKRenderingManager::VTKPlaneInteractor::vtkInteractorModified ( )
 //                        LA CLASSE VTKRenderingManager
 // ===========================================================================
 
+/** La largeur normalisée de la fenêtre utilisée par les trièdres. */
+static const double	triedronViewportRatio	= 0.16;
+
 VTKRenderingManager::VTKRenderingManager (QtVtkGraphicWidget* vtkWidget, bool offScreen)
 	: QtComponents::RenderingManager ( ),
 	  _vtkWidget (vtkWidget), _renderer (0), _renderWindow (0),
@@ -784,7 +787,7 @@ VTKRenderingManager::VTKRenderingManager (QtVtkGraphicWidget* vtkWidget, bool of
 	  _camera (0), _lightKit (0),
 	  _magix3dPicker (0), _pickerCommand (0), _pickerCommandTag (0),
 	  _focalPointAxesActor (0), _focalPointAxesTag ((unsigned long)-1),
-	  _trihedron (0), _trihedronCommandTag (0), _trihedronRenderer (0),
+	  _trihedron (0), _trihedronCommandTag (0), _viewCubeActor (0), _viewCubeCommandTag (0),_trihedronRenderer (0), _viewCubeRenderer (0),
 	  _axisActor (0), _axisProperties ( ),
 	  _colorTables ( )
 {
@@ -883,7 +886,7 @@ VTKRenderingManager::VTKRenderingManager ( )
 	  _camera (0), _lightKit (0),
 	  _magix3dPicker (0), _pickerCommand (0), _pickerCommandTag (0),
 	  _focalPointAxesActor (0), _focalPointAxesTag ((unsigned long)-1),
-	  _trihedron (0), _trihedronCommandTag (0), _trihedronRenderer (0),
+	  _trihedron (0), _trihedronCommandTag (0), _viewCubeActor (0), _viewCubeCommandTag (0), _trihedronRenderer (0), _viewCubeRenderer (0),
 	  _axisActor (0), _axisProperties ( ),
 	  _colorTables ( )
 {
@@ -897,7 +900,7 @@ VTKRenderingManager::VTKRenderingManager (const VTKRenderingManager&)
 	  _camera (0), _lightKit (0),
 	  _magix3dPicker (0), _pickerCommand (0), _pickerCommandTag (0),
 	  _focalPointAxesActor (0), _focalPointAxesTag ((unsigned long)-1),
-	  _trihedron (0), _trihedronCommandTag (0), _trihedronRenderer (0),
+	  _trihedron (0), _trihedronCommandTag (0), _viewCubeActor (0), _viewCubeCommandTag (0), _trihedronRenderer (0), _viewCubeRenderer (0),
 	  _axisActor (0), _axisProperties ( ),
 	  _colorTables ( )
 {
@@ -944,6 +947,19 @@ VTKRenderingManager::~VTKRenderingManager ( )
 
 	setDisplayLandmark (false);
 
+	if (0 != _viewCubeActor)
+	{
+		vtkRenderWindowInteractor*	interactor	= getRenderWindow ( ).GetInteractor ( );
+		vtkInteractorObserver*		interactorStyle	= interactor->GetInteractorStyle ( );
+		interactorStyle->RemoveObserver (_viewCubeCommandTag);
+		_viewCubeCommandTag	= 0;
+		if (0 != _viewCubeRenderer)
+			_viewCubeRenderer->RemoveActor (_viewCubeActor);
+		_viewCubeActor->Delete ( );		_viewCubeActor	= 0;
+		if (0 != _viewCubeRenderer)
+			_viewCubeRenderer->Delete ( );
+		_viewCubeRenderer	= 0;
+	}	// if (0 != _viewCubeActor)
 	if (0 != _trihedron)
 	{
 		if ((0 != _trihedronCommandTag) && (true == hasRenderWindow ( )))
@@ -1830,11 +1846,16 @@ void VTKRenderingManager::setDisplayTrihedron (bool display)
 		_trihedronRenderer  = vtkRenderer::New ( );
 		_trihedronRenderer->SetUseDepthPeeling (true);
 		_trihedronRenderer->SetInteractive (0);
-		_trihedronRenderer->SetViewport (0, 0, 0.2, 0.2);
+		_trihedronRenderer->SetViewport (0, 0, triedronViewportRatio, triedronViewportRatio);
 		_trihedronRenderer->SetLayer (_trihedronLayer);
 		_trihedronRenderer->AddActor (_trihedron);
 		vtkCamera*  trihedronCamera = _trihedronRenderer->GetActiveCamera ( );
 		trihedronCamera->SetParallelProjection (1);
+		vtkTransform*	transform	= vtkTransform::New ( );	// être aligné sur le viewcube, déborder un peu du viewcube
+		transform->PostMultiply ( );
+		transform->Translate (-0.5, -0.5, -0.5);
+		_trihedron->SetTransform (transform);
+		transform->Delete ( );	transform	= 0;
 	}	// if ((true == display) && (0 == _trihedron))
 
 	if (true == display)
@@ -1859,13 +1880,62 @@ void VTKRenderingManager::setDisplayTrihedron (bool display)
 			getRenderWindow ( ).RemoveRenderer (_trihedronRenderer);
 	}	// else if (true == display)
 
-// getRenderWindow ( ).Render ( ) : fout la pagaille en mode C/S avec rendu
-// côté serveur car pas de verrou MPI.	=> forceRender ( )
-//	getRenderWindow ( ).Render ( );
 	forceRender ( );
 
 	COMPLETE_TRY_CATCH_BLOCK
 }	// VTKRenderingManager::setDisplayTrihedron
+
+
+void VTKRenderingManager::setDisplayViewCube (bool display)
+{
+	BEGIN_TRY_CATCH_BLOCK
+
+	bool	created	= false;
+	if ((true == display) && (0 == _viewCubeActor))
+	{
+		created	= true;
+		_viewCubeActor	= vtkViewCubeActor::New ( );
+		vtkTransform*	transform	= vtkTransform::New ( );
+		transform->PostMultiply ( );
+		transform->Translate (-0.5, -0.5, -0.5);
+		_viewCubeActor->SetTransform (transform);
+		transform->Delete ( );	transform	= 0;
+		_viewCubeRenderer	= vtkRenderer::New ( );
+		_viewCubeRenderer->SetUseDepthPeeling (1);
+		_viewCubeRenderer->SetInteractive (0);
+		_viewCubeRenderer->SetViewport (0, 0, triedronViewportRatio, triedronViewportRatio);
+		_viewCubeRenderer->SetLayer (_trihedronLayer);
+		_viewCubeRenderer->AddActor (_viewCubeActor);
+		vtkCamera*	viewCubeCamera	= _viewCubeRenderer->GetActiveCamera ( );
+		viewCubeCamera->SetParallelProjection (1);
+
+		vtkTrihedronCommand*	viewCubeCommand	= vtkTrihedronCommand::New ( );
+		viewCubeCommand->SetRenderer (_viewCubeRenderer);
+		getRenderWindow ( ).AddRenderer (_viewCubeRenderer);
+		_viewCubeActor->SetRenderers (_viewCubeRenderer, &getRenderer ( ));
+		_viewCubeCommandTag	= getRenderer ( ).AddObserver (vtkCommand::StartEvent, viewCubeCommand);
+		vtkCamera*	camera	= getRenderer ( ).GetActiveCamera ( );
+		if (0 != camera)
+			viewCubeCommand->SynchronizeViews (camera);
+		viewCubeCommand->Delete ( );
+	}	// if ((true == display) && (0 == _viewCube))
+
+	if (true == display)
+	{
+		if ((0 != _viewCubeRenderer) && (false == created))
+			getRenderWindow ( ).AddRenderer (_viewCubeRenderer);
+		_viewCubeRenderer->ResetCamera ( );
+	}	// if (true == display)
+	else
+	{
+		if (0 != _viewCubeRenderer)
+			getRenderWindow ( ).RemoveRenderer (_viewCubeRenderer);
+	}	// else if (true == display)
+
+	forceRender ( );
+
+	COMPLETE_TRY_CATCH_BLOCK
+}	// VTKRenderingManager::setDisplayViewCube
 
 
 void VTKRenderingManager::setDisplayLandmark (bool display)

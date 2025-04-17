@@ -1077,6 +1077,11 @@ class RenderingManager : public Utils::SelectionManagerObserver
 	 * Faut-il afficher ou non le trièdre dans la vue graphique ?
 	 */
 	virtual void setDisplayTrihedron(bool display);
+	
+	/**
+	 * Faut-il afficher ou non le cube d'orientation dans la vue graphique ?
+	 */
+	virtual void setDisplayViewCube(bool display);
 
 	/**
 	 * Faut-il afficher ou non le repère dans la vue graphique ?
