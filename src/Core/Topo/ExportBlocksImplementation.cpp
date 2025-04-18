@@ -105,7 +105,7 @@ void ExportBlocksImplementation::writeEdges(std::ofstream &str, std::vector<Topo
                     for(auto e_name : dynamic_cast<EdgeMeshingPropertyGlobalInterpolate*>(prop)->getFirstCoEdges()){
                         str << m_edge_ids_mapping[e_name] << " ";
                     }
-                    str << "] ";
+                    str << "] [ ";
                     for(auto e_name : dynamic_cast<EdgeMeshingPropertyGlobalInterpolate*>(prop)->getSecondCoEdges()){
                         str << m_edge_ids_mapping[e_name] << " ";
                     }
@@ -181,6 +181,7 @@ void ExportBlocksImplementation::writeFaces(std::ofstream &str, std::vector<Topo
 void ExportBlocksImplementation::writeBlocks(std::ofstream &str, std::vector<Topo::Block*> blocks) {
         str  << "BLOCKS " << blocks.size() << "\n";
         for(auto b : blocks){
+
             int v0 = m_node_ids_mapping[b->getVertex(0)->getName()];
             int v1 = m_node_ids_mapping[b->getVertex(1)->getName()];
             int v2 = m_node_ids_mapping[b->getVertex(2)->getName()];
