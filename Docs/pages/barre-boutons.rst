@@ -169,3 +169,65 @@ L’icône *mode de sélection* permet de passer d’un mode à l’autre.
   | Il devient ainsi possible de sélectionner au travers de surfaces matérialisées par des segments de droites. 
   | Ce mode présente l’inconvénient d’être moins performant.
 
+
+.. _boutons-selection:
+
+Boutons "points de vue"
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Ces boutons permettent de définir, appliquer, enregistrer et recharger 
+des points de vue.
+
+.. image:: ../images/viewpoints.png
+   :height: 0.4in
+   
+Un *point de vue* définit la position de l'observateur, le point visé et
+l'orientation de la scène autour de l'axe observateur-point visé.
+Mémoriser un point de vue permet de le retrouver plus tard et de faire,
+par exemple, des captures d'écran avec le même cadrage. 
+Le bouton *Créer un point de vue* permet de créer un nouveau point de
+vue paramétré à la représentation courante. Un bouton numéroté
+correspondant à ce point de vue apparaît alors à la fin de cette barre
+de boutons.
+Le bouton *Réinitialiser les points de vue* supprime tous les points de
+vue existants.
+Le bouton *Exporter* permet d'enregistrer les points de vue existants
+dans un fichier XML.
+Le bouton *Importer* permet d'ajouter aux points de vue existants ceux
+du fichier XML sélectionné.
+Les boutons numérotés représentants les points de vue proposent 
+eux-mêmes les options suivantes :
+
+1. Appliquer : applique à la fenêtre graphique le point de vue associé,
+
+2. Réinitialiser : réinitialise le point de vue à partir de la vue 
+courante,
+
+3. Modifier : permet de modifier via une boite de dialogue le
+paramétrage du point de vue,
+
+4. Supprimer : supprime le point de vue associé,
+
+5. Exporter : exporte individuellement le point de vue associé dans un
+fichier XML.
+
+Les paramètres d'un point de vue sont les suivants :
+
+1. Nom du point de vue, afin de l'identifier dans le fichier de
+sauvegarde,
+
+2. Commentaire associé au point de vue : il est affiché en surimpression
+lorsqu'on maintient immobile le curseur de la souris sur le bouton
+associé au point de vue,
+
+3. La position de l'observateur,
+
+4. La position du point visé (point focale),
+
+5. Un vecteur indiquant le haut (pour orienter la scène),
+
+6. Un angle de roulis (rotation autour de l'axe observateur/point visé
+prenant en compte le haut).
+
+.. image:: ../images/viewpoint_editor.png
+   :height: 5.in
