@@ -1841,7 +1841,7 @@ void VTKRenderingManager::setDisplayTrihedron (bool display)
 	if ((true == display) && (0 == _trihedron))
 	{
 		_trihedron	= vtkTrihedron::New ( );
-		_trihedron->Label2DOn ( );
+//		_trihedron->Label2DOn ( );
 		_trihedron->PickableOff ( );
 		_trihedronRenderer  = vtkRenderer::New ( );
 		_trihedronRenderer->SetUseDepthPeeling (true);
