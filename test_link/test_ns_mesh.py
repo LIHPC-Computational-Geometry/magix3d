@@ -1,6 +1,6 @@
 import pyMagix3D as Mgx3D
 
-def test_ns_mesh(capfd):
+def test_ns_mesh_1(capfd):
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     gm = ctx.getGeomManager()
@@ -52,5 +52,41 @@ def test_ns_mesh(capfd):
     assert gm.getNbVolumes() == 1
     assert gm.getNbSurfaces() == 6
     assert mm.getNbFaces() == 5828
+    out, err = capfd.readouterr()
+    assert len(err) == 0
+
+def test_ns_mesh_2(capfd):
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    gm = ctx.getGeomManager()
+    tm = ctx.getTopoManager()
+    mm = ctx.getMeshManager()
+
+    gm.newBox(Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), "B")
+    gm.newCylinder(Mgx3D.Point(0.4, 0, 0.4), .1, Mgx3D.Vector(0, 1, 0), 3.600000e+02, "C")
+    gm.glue(["Vol0000", "Vol0001"])
+    tm.newUnstructuredTopoOnGeometry("Vol0002")
+    tm.newUnstructuredTopoOnGeometry("Vol0001")
+    mm.newAllBlocksMesh()
+
+    assert gm.getNbVolumes() == 2
+    out, err = capfd.readouterr()
+    assert len(err) == 0
+
+def test_block_on_box_union(capfd):
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    gm = ctx.getGeomManager()
+    tm = ctx.getTopoManager()
+    mm = ctx.getMeshManager()
+
+    gm.newBox(Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1))
+    gm.newBox(Mgx3D.Point(1, 0, 0), Mgx3D.Point(2, 1, 1))
+    gm.translate(["Vol0001"], Mgx3D.Vector(0, 0.5, 0.5))
+    gm.fuse(["Vol0000", "Vol0001"])
+    tm.newUnstructuredTopoOnGeometry("Vol0002")
+    mm.newAllBlocksMesh()
+
+    assert gm.getNbVolumes() == 1
     out, err = capfd.readouterr()
     assert len(err) == 0
