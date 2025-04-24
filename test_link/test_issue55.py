@@ -1,6 +1,6 @@
 import pyMagix3D as Mgx3D
 
-def test_issue55():
+def test_issue55(capfd):
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     tm = ctx.getTopoManager ()
@@ -11,5 +11,6 @@ def test_issue55():
     tm.splitEdge("Ar0033",.3)
     tm.splitEdge("Ar0035",.5)
     tm.splitBlocksWithOgridV2(["Bl0001","Bl0002"],[],.5,10)
-    # Erreur de la commande Découpage en O-grid des blocs structurés Bl0001 Bl0002 avec le message : 
-    # Erreur interne dans CommandSplitBlocksWithOgrid::createEdge, pas d'arêtes interne face à 2 sommets (Som0016,Som0017)
+
+    out, err = capfd.readouterr()
+    assert len(err) == 0
