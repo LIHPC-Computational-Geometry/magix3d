@@ -337,7 +337,7 @@ public:
     virtual void log (const TkUtil::Log& log) const;
 
     /// Fonction de comparaison suivant l'unique id
-    static bool compareEntity(const Entity* e1, const Entity* e2)
+    static bool compareEntity(Entity* e1, Entity* e2)
     {
         return (e1->getUniqueId()<e2->getUniqueId());
     }
