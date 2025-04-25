@@ -77,7 +77,8 @@ internalSpecificExecute()
 	// recherche des sommets au bord de la nouvelle courbe
 	std::vector<Vertex*> extremites;
 
-    std::map<Vertex*,uint> filtre;
+	// le map doit être trié de manière reproductible (pas par les pointeurs)
+	std::map<Vertex*, uint, decltype(&Utils::Entity::compareEntity)> filtre(&Utils::Entity::compareEntity);
     for (uint i=0;i<m_entities.size();i++){
 		Curve* ci = dynamic_cast<Curve*>(m_entities[i]);
     	auto vertices = ci->getVertices();
