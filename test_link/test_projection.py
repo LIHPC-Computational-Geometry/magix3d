@@ -1,7 +1,7 @@
 import math
 import pyMagix3D as Mgx3D
 
-def test_projection_cube():
+def test_projection_cube(capfd):
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     tm = ctx.getTopoManager ()
@@ -15,7 +15,10 @@ def test_projection_cube():
     vert = tm.getVertexAt(Mgx3D.Point(1, 0.5, 1))
     assert vert == 'Som0000'
 
-def test_projection_cube_inner():
+    out, err = capfd.readouterr()
+    assert len(err) == 0
+
+def test_projection_cube_inner(capfd):
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     tm = ctx.getTopoManager ()
@@ -33,7 +36,10 @@ def test_projection_cube_inner():
     vert = tm.getVertexAt(Mgx3D.Point(.5, 0.8, 1))
     assert vert == 'Som0000'
 
-def test_projection_disc_inner():
+    out, err = capfd.readouterr()
+    assert len(err) == 0
+
+def test_projection_disc_inner(capfd):
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     tm = ctx.getTopoManager ()
@@ -48,6 +54,9 @@ def test_projection_disc_inner():
     z = 0.5*math.sin(math.atan(.3/.2))
     vert = tm.getVertexAt(Mgx3D.Point(0, y, z))
     assert vert == 'Som0000'
+
+    out, err = capfd.readouterr()
+    assert len(err) == 0
 
 def test_projection_arc_circle(capfd):
     ctx = Mgx3D.getStdContext()
