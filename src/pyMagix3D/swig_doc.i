@@ -1777,15 +1777,15 @@ Fusion des faces communes entre 2 blocs.
 Le premier bloc dont les faces prennent la place des autres. Le deuxième bloc dont les sommets d'une de ses faces doivent être le plus proche possible de celle de l'autre 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::glue2Faces "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::glue2Faces(std::string na, std::string nb)
+%feature("docstring") Mgx3D::Topo::TopoManagerIfc::fuse2Faces "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::fuse2Faces(std::string na, std::string nb)
 
 Fusion de 2 faces communes. 
 La 1ère Face commune prend la place de l'autre. Les sommets doivent être le plus proche possible 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::glue2Vertices "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::glue2Vertices(std::string na, std::string nb)
+%feature("docstring") Mgx3D::Topo::TopoManagerIfc::fuse2Vertices "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::fuse2Vertices(std::string na, std::string nb)
 
 Fusion de 2 sommets. 
 Le 1er sommet prend la place de l'autre. Attention, les arêtes et les faces ne sont pas colléees pour autant 
