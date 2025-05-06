@@ -15,7 +15,7 @@
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManagerIfc.h"
+#include "Geom/GeomManager.h"
 #include "Geom/Surface.h"
 #include "QtComponents/QtPrismCreationAction.h"
 #include <QtUtil/QtErrorManagement.h>

@@ -19,7 +19,7 @@ namespace QtComponents
 }	// namespace Mgx3D
 
 #include "Internal/ContextIfc.h"
-#include "Geom/GeomManagerIfc.h"
+#include "Geom/GeomManager.h"
 #include "Topo/TopoManagerIfc.h"
 #include "Mesh/MeshManagerIfc.h"
 #include "Utils/CommandManagerIfc.h"
@@ -647,7 +647,7 @@ class QtMgx3DMainWindow :
 	/**
 	 * \return		Le gestionnaire de modélisation.
 	 */
-	virtual Mgx3D::Geom::GeomManagerIfc& getGeomManager ( );
+	virtual Mgx3D::Geom::GeomManager& getGeomManager ( );
 
     /**
      * \return      Le gestionnaire de topologie.

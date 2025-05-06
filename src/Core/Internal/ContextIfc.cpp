@@ -140,17 +140,17 @@ void ContextIfc::setPythonSession (TkUtil::PythonSession*)
 	throw TkUtil::Exception ("ContextIfc::getPythonSession should be overloaded.");
 }	// ContextIfc::setPythonSession
 /*----------------------------------------------------------------------------*/
-Geom::GeomManagerIfc& ContextIfc::getGeomManager ( )
+Geom::GeomManager& ContextIfc::getGeomManager ( )
 {
 	throw TkUtil::Exception ("ContextIfc::getGeomManager should be overloaded.");
 }	// ContextIfc::getGeomManager
 /*----------------------------------------------------------------------------*/
-const Geom::GeomManagerIfc& ContextIfc::getGeomManager ( ) const
+const Geom::GeomManager& ContextIfc::getGeomManager ( ) const
 {
 	throw TkUtil::Exception ("ContextIfc::getGeomManager should be overloaded.");
 }	// ContextIfc::getGeomManager
 /*----------------------------------------------------------------------------*/
-void ContextIfc::setGeomManager (Geom::GeomManagerIfc*)
+void ContextIfc::setGeomManager (Geom::GeomManager*)
 {
 	throw TkUtil::Exception ("ContextIfc::getGeomManager should be overloaded.");
 }	// ContextIfc::setGeomManager

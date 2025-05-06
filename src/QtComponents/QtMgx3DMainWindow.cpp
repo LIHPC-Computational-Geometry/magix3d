@@ -3919,7 +3919,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 		}    // QtMgx3DMainWindow::unregisterEntitySeizureManager
 
 
-		Geom::GeomManagerIfc &QtMgx3DMainWindow::getGeomManager()
+		Geom::GeomManager &QtMgx3DMainWindow::getGeomManager()
 		{
 			return getContext().getGeomManager();
 		}    // QtMgx3DMainWindow::getGeomManager

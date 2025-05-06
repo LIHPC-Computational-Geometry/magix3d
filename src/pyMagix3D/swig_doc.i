@@ -222,13 +222,13 @@ Réinitialisation de la session
 
 ";
 %feature("docstring") Mgx3D::Internal::ContextIfc::getGeomManager "
-virtual Mgx3D::Geom::GeomManagerIfc& Mgx3D::Internal::ContextIfc::getGeomManager()
+virtual Mgx3D::Geom::GeomManager& Mgx3D::Internal::ContextIfc::getGeomManager()
 
 Accesseur sur le manager géométrique Uneexception est levée en l'absence de manager associé. 
 
 ";
 %feature("docstring") Mgx3D::Internal::ContextIfc::getGeomManager "
-virtual const Mgx3D::Geom::GeomManagerIfc& Mgx3D::Internal::ContextIfc::getGeomManager() const 
+virtual const Mgx3D::Geom::GeomManager& Mgx3D::Internal::ContextIfc::getGeomManager() const
 
 
 
@@ -548,28 +548,28 @@ std::vector<std::string> Mgx3D::Geom::GeomInfo::volumes() const
 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc " 
+%feature("docstring") Mgx3D::Geom::GeomManager "
 Interface du gestionnaire des opérations effectuées au niveau du module géométrique. 
 Ce gestionnaire joue le rôle de fabrique de commande, mais aussi d' entités géométriques. La raison est technique et non pas conceptuelle. Lorsque l'on crée une entité géométrique via une commande, les entités incidentes de dimension inférieure doivent aussi être crées puis stockées au niveau du GeomManager. Il est donc le plus à même de remplir ce rôle. 
 ";
 
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::addToGroup "
-virtual Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::addToGroup(std::vector< std::string > &ve, int dim, const std::string &groupName)
+%feature("docstring") Mgx3D::Geom::GeomManager::addToGroup "
+virtual Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::addToGroup(std::vector< std::string > &ve, int dim, const std::string &groupName)
 
 
 Ajoute un volume au gestionnaire Ajoute une surface au gestionnaire Ajoute une courbe au gestionnaire Ajoute un sommet au gestionnaire Ajoute une entité au gestionnaire Enlève un volume du gestionnaire Enlève une surface au gestionnaire Enlève une courbe au gestionnaire Enlève un sommet au gestionnaire Enlève une entité au gestionnaire Retourne le nom du dernier Volume [OBSOLETE] Retourne le nom de la dernière Surface [OBSOLETE] Retourne le nom de la dernière Curve [OBSOLETE] Retourne le nom du dernier Vertex [OBSOLETE] Ajoute un groupe à un ensemble d'entités géométriques, suivant une dimension 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::common "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::common(std::vector< std::string > &entities)
+%feature("docstring") Mgx3D::Geom::GeomManager::common "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::common(std::vector< std::string > &entities)
 
 Intersection Booléenne de n entités géométriques. 
 
 entities : les entités sur lesquelles on travaille 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::copy "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::copy(std::vector< std::string > &e, bool withTopo, std::string groupName)
+%feature("docstring") Mgx3D::Geom::GeomManager::copy "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::copy(std::vector< std::string > &e, bool withTopo, std::string groupName)
 
 création d'entités géométrique par copie 
 
@@ -577,8 +577,8 @@ e : les entités géométriques que l'on veut copier
 withTopo : a vrai si l'on doit copier la topologie avec la géométrie NB: [EB] pas de paramètre par défaut (groupName=\"\") lorsqu'il y a un std::vector en argument (pb dans swig) 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::cut "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::cut(std::string tokeep, std::vector< std::string > &tocut)
+%feature("docstring") Mgx3D::Geom::GeomManager::cut "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::cut(std::string tokeep, std::vector< std::string > &tocut)
 
 Différence Booléenne de n entités géométriques avec la première entité qui est conservée. 
 
@@ -586,8 +586,8 @@ tokeep : l'entité que l'on conserve
 tocut : les entités que l'on retire de tokeep 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::destroy "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::destroy(std::vector< std::string > &es, bool propagateDown)
+%feature("docstring") Mgx3D::Geom::GeomManager::destroy "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::destroy(std::vector< std::string > &es, bool propagateDown)
 
 suppression d'entités géométriques. Si on supprime une entité géométrique incidente à des entités géométriques de dimension supérieure, ces dernières sont aussi supprimées. Pour les entités géométriques incidentes de dimension inférieure, elles sont supprimés si propagateDown vaut true, sinon elles sont conservées. 
 
@@ -595,16 +595,16 @@ es : les entités géométriques à supprimer
 propagateDown : indique si l'on supprime les entités incidentes de dimension inférieure 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::exportIGES "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::exportIGES(const std::string &n)
+%feature("docstring") Mgx3D::Geom::GeomManager::exportIGES "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::exportIGES(const std::string &n)
 
 Export au format IGES. 
 
 n : le nom du ficher dans lequel on exporte 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::exportMDL "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::exportMDL(std::vector< std::string > &ge, const std::string &n)
+%feature("docstring") Mgx3D::Geom::GeomManager::exportMDL "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::exportMDL(std::vector< std::string > &ge, const std::string &n)
 
 Export d'une sélection dans un fichier au format MDL. 
 
@@ -612,138 +612,138 @@ ge : la liste des noms des entités à exporter
 n : le nom du ficher dans lequel on exporte 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::exportBREP "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::exportBREP(const std::string &n)
+%feature("docstring") Mgx3D::Geom::GeomManager::exportBREP "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::exportBREP(const std::string &n)
 
 Export au format BREP.
 
 n : le nom du ficher dans lequel on exporte
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::exportSTEP "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::exportSTEP(const std::string &n)
+%feature("docstring") Mgx3D::Geom::GeomManager::exportSTEP "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::exportSTEP(const std::string &n)
 
 Export au format STEP.
 
 n : le nom du ficher dans lequel on exporte
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::exportVTK "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::exportVTK(const std::string &n)
+%feature("docstring") Mgx3D::Geom::GeomManager::exportVTK "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::exportVTK(const std::string &n)
 
 Export d'une sélection dans un fichier au format VTK. 
 
 n : le nom du ficher dans lequel on exporte 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::fuse "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::fuse(std::vector< std::string > &entities)
+%feature("docstring") Mgx3D::Geom::GeomManager::fuse "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::fuse(std::vector< std::string > &entities)
 
 Union Booléenne de n entités géométriques. 
 
 entities : les entités sur lesquelles on travaille 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::getCurves "
-virtual std::vector<std::string> Mgx3D::Geom::GeomManagerIfc::getCurves(bool onlyVisible=true) const 
+%feature("docstring") Mgx3D::Geom::GeomManager::getCurves "
+virtual std::vector<std::string> Mgx3D::Geom::GeomManager::getCurves(bool onlyVisible=true) const 
 
 retourne la liste des courbes gérées par le manager 
 
 onlyVisible : suivant si l'on veut les courbes \"détruites\" 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::getInfos "
-virtual GeomInfo Mgx3D::Geom::GeomManagerIfc::getInfos(std::string e, int dim)
+%feature("docstring") Mgx3D::Geom::GeomManager::getInfos "
+virtual GeomInfo Mgx3D::Geom::GeomManager::getInfos(std::string e, int dim)
 
 récupère des informations sur les entités géométriques. 
 
 e : l'entité géométrique dont on veut des informations. 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::getNbCurves "
-virtual int Mgx3D::Geom::GeomManagerIfc::getNbCurves(bool onlyVisible=true) const 
+%feature("docstring") Mgx3D::Geom::GeomManager::getNbCurves "
+virtual int Mgx3D::Geom::GeomManager::getNbCurves(bool onlyVisible=true) const 
 
 retourne le nombre de courbes gérées par le manager 
 
 onlyVisible : suivant si l'on veut les courbes \"détruites\" 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::getNbSurfaces "
-virtual int Mgx3D::Geom::GeomManagerIfc::getNbSurfaces(bool onlyVisible=true) const 
+%feature("docstring") Mgx3D::Geom::GeomManager::getNbSurfaces "
+virtual int Mgx3D::Geom::GeomManager::getNbSurfaces(bool onlyVisible=true) const 
 
 retourne le nombre de surfaces gérées par le manager 
 
 onlyVisible : suivant si l'on veut les surfaces \"détruites\" 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::getNbVertices "
-virtual int Mgx3D::Geom::GeomManagerIfc::getNbVertices(bool onlyVisible=true) const 
+%feature("docstring") Mgx3D::Geom::GeomManager::getNbVertices "
+virtual int Mgx3D::Geom::GeomManager::getNbVertices(bool onlyVisible=true) const 
 
 retourne le nombre de sommets gérées par le manager 
 
 onlyVisible : suivant si l'on veut les sommets \"détruits\" 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::getNbVolumes "
-virtual int Mgx3D::Geom::GeomManagerIfc::getNbVolumes(bool onlyVisible=true) const 
+%feature("docstring") Mgx3D::Geom::GeomManager::getNbVolumes "
+virtual int Mgx3D::Geom::GeomManager::getNbVolumes(bool onlyVisible=true) const 
 
 retourne le nombre de volumes gérés 
 
 onlyVisible : suivant si l'on veut les volumes \"détruits\" 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::getSurfaces "
-virtual std::vector<std::string> Mgx3D::Geom::GeomManagerIfc::getSurfaces(bool onlyVisible=true) const 
+%feature("docstring") Mgx3D::Geom::GeomManager::getSurfaces "
+virtual std::vector<std::string> Mgx3D::Geom::GeomManager::getSurfaces(bool onlyVisible=true) const 
 
 retourne la liste des surfaces gérées par le manager 
 
 onlyVisible : suivant si l'on veut les surfaces \"détruites\" 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::getVertices "
-virtual std::vector<std::string> Mgx3D::Geom::GeomManagerIfc::getVertices(bool onlyVisible=true) const 
+%feature("docstring") Mgx3D::Geom::GeomManager::getVertices "
+virtual std::vector<std::string> Mgx3D::Geom::GeomManager::getVertices(bool onlyVisible=true) const 
 
 retourne la liste des sommets gérées par le manager 
 
 onlyVisible : suivant si l'on veut les sommets \"détruits\" 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::getVolumes "
-virtual std::vector<std::string> Mgx3D::Geom::GeomManagerIfc::getVolumes(bool onlyVisible=true) const 
+%feature("docstring") Mgx3D::Geom::GeomManager::getVolumes "
+virtual std::vector<std::string> Mgx3D::Geom::GeomManager::getVolumes(bool onlyVisible=true) const 
 
 retourne la liste des volumes gérées par le manager 
 
 onlyVisible : suivant si l'on veut les volumes \"détruits\" 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::glue "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::glue(std::vector< std::string > &entities)
+%feature("docstring") Mgx3D::Geom::GeomManager::glue "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::glue(std::vector< std::string > &entities)
 
 Collage d'entités géométriques. 
 
 entities : les entités sur lesquelles on travaille 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::importCATIA "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::importCATIA(std::string n)
+%feature("docstring") Mgx3D::Geom::GeomManager::importCATIA "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::importCATIA(std::string n)
 
 Import d'un fichier au format CATIA. 
 
 n : le nom du ficher dont le contenu doit etre importe 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::importIGES "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::importIGES(std::string n)
+%feature("docstring") Mgx3D::Geom::GeomManager::importIGES "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::importIGES(std::string n)
 
 Import d'un fichier au format IGES. 
 
 n : le nom du ficher dont le contenu doit etre importe 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::importMDL "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::importMDL(std::string n, const bool all)
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::importMDL(std::string n, std::string groupe)
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::importMDL(std::string n, std::vector< std::string > &zones)
+%feature("docstring") Mgx3D::Geom::GeomManager::importMDL "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::importMDL(std::string n, const bool all)
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::importMDL(std::string n, std::string groupe)
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::importMDL(std::string n, std::vector< std::string > &zones)
 
 Import d'un fichier au format MDL. 
 
@@ -753,40 +753,40 @@ groupe : le nom du groupe dont on importe les zones et les entités associées
 zones : la liste des zones que l'on importe avec les entités associées 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::importBREP "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::importBREP(std::string n)
+%feature("docstring") Mgx3D::Geom::GeomManager::importBREP "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::importBREP(std::string n)
 
 Import d'un fichier au format BREP.
 
 n : le nom du ficher dont le contenu doit etre importe
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::importSTEP "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::importSTEP(std::string n)
+%feature("docstring") Mgx3D::Geom::GeomManager::importSTEP "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::importSTEP(std::string n)
 
 Import d'un fichier au format STEP.
 
 n : le nom du ficher dont le contenu doit etre importe
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::joinCurves "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::joinCurves(std::vector< std::string > &entities)
+%feature("docstring") Mgx3D::Geom::GeomManager::joinCurves "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::joinCurves(std::vector< std::string > &entities)
 
 joinCurves opération permettant de réunir plusieurs courbes en une seule 
 
 entities : les courbes à réunir 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::joinSurfaces "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::joinSurfaces(std::vector< std::string > &entities)
+%feature("docstring") Mgx3D::Geom::GeomManager::joinSurfaces "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::joinSurfaces(std::vector< std::string > &entities)
 
 joinSurfaces opération permettant de réunir plusieurs surfaces en une seule 
 
 entities : les surfaces à réunir 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::makeRevol "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::makeRevol(std::vector< std::string > &entities, const Utils::Math::Rotation &rot, const bool keep)
+%feature("docstring") Mgx3D::Geom::GeomManager::makeRevol "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::makeRevol(std::vector< std::string > &entities, const Utils::Math::Rotation &rot, const bool keep)
 
 création d'une entité surfacique ou volumique par révolution d'une entité géométrique de dimension 1 ou 2 respectivement. 
 
@@ -795,8 +795,8 @@ rot : une rotation
 keep : indique si l'on conserve (true) ou pas (false) les entités de départ 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::newArcCircle "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newArcCircle(std::string pc, std::string pd, std::string pe, const bool direct, std::string groupName=\"\")
+%feature("docstring") Mgx3D::Geom::GeomManager::newArcCircle "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::newArcCircle(std::string pc, std::string pd, std::string pe, const bool direct, std::string groupName=\"\")
 
 création d'un arc de cercle à partir de 3 sommets et de la donnée d'une direction de création (directe ou indirecte). 
    Une exception est retournée
@@ -808,8 +808,8 @@ pe : point de fin de l'arc de cercle
 direct : indique si l'on tourne dans le sens direct ou indirect 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::newArcEllipse "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newArcEllipse(std::string pc, std::string pd, std::string pe, const bool direct, std::string groupName=\"\")
+%feature("docstring") Mgx3D::Geom::GeomManager::newArcEllipse "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::newArcEllipse(std::string pc, std::string pd, std::string pe, const bool direct, std::string groupName=\"\")
 
 création d'un arc d'ellipse à partir de 3 sommets et de la donnée d'une direction de création (directe ou indirecte) 
 
@@ -819,8 +819,8 @@ pe : point de fin de l'arc de cercle
 direct : indique si l'on tourne dans le sens direct ou indirect 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::newBox "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newBox(const Point &pmin, const Point &pmax, std::string groupName=\"\")
+%feature("docstring") Mgx3D::Geom::GeomManager::newBox "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::newBox(const Point &pmin, const Point &pmax, std::string groupName=\"\")
 
 création d'une boite parallèle aux axes Ox,Oy et Oz à partir des points pmin et pmax où pmin est le point de plus petites coordonnées (x,y,z) et pmax le point de plus grandes coordonnées (x,y,z) 
 
@@ -829,16 +829,16 @@ pmax : le point max de la boite
 groupName : optionnellement un nom de groupe 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::newBSpline "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newBSpline(std::vector< std::string > &vp, std::string groupName)
+%feature("docstring") Mgx3D::Geom::GeomManager::newBSpline "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::newBSpline(std::vector< std::string > &vp, std::string groupName)
 
 création d'une bspline à partir de la liste ordonnée de points vp 
 
 points : une liste ordonnée de points 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::newCircle "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newCircle(std::string p1, std::string p2, std::string p3, std::string groupName=\"\")
+%feature("docstring") Mgx3D::Geom::GeomManager::newCircle "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::newCircle(std::string p1, std::string p2, std::string p3, std::string groupName=\"\")
 
 création d'un cercle à partir de 3 points par lesquels le cercle passera 
 
@@ -847,8 +847,8 @@ p2 : second point
 p3 : dernier point 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::newEllipse "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newEllipse(std::string p1, std::string p2, std::string center, std::string groupName=\"\")
+%feature("docstring") Mgx3D::Geom::GeomManager::newEllipse "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::newEllipse(std::string p1, std::string p2, std::string center, std::string groupName=\"\")
 
 création d'une ellipse centrée sur le point center, plan défini par center/p1/p2, grand axe défini par center/p1, grand rayon défini par la distance center-p1,
 petit rayon défini par la distance p2-axe principal
@@ -858,8 +858,8 @@ p2 : second point
 center : centre
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::newCone "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newCone(const double &dr1, const double &dr2, const Vector &dv, const double &da, std::string groupName=\"\")
+%feature("docstring") Mgx3D::Geom::GeomManager::newCone "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::newCone(const double &dr1, const double &dr2, const Vector &dv, const double &da, std::string groupName=\"\")
 
 création d'un cone suivant un axe, avec deux rayons et une longueur 
 
@@ -871,14 +871,14 @@ da : l'angle de la portion de cone
 groupName : optionnellement un nom de groupe 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::newCone "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newCone(const double &dr1, const double &dr2, const Vector &dv, const Utils::Portion::Type &dt, std::string groupName=\"\")
+%feature("docstring") Mgx3D::Geom::GeomManager::newCone "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::newCone(const double &dr1, const double &dr2, const Vector &dv, const Utils::Portion::Type &dt, std::string groupName=\"\")
 
 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::newCylinder "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newCylinder(const Point &pcentre, const double &dr, const Vector &dv, const double &da, std::string groupName=\"\")
+%feature("docstring") Mgx3D::Geom::GeomManager::newCylinder "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::newCylinder(const Point &pcentre, const double &dr, const Vector &dv, const double &da, std::string groupName=\"\")
 
 création d'un cylindre suivant un cercle, sa base (un cercle défini par un centre et un rayon) et son axe 
 
@@ -889,8 +889,8 @@ da : l'angle de la portion de cylindre
 groupName : optionnellement un nom de groupe 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::newCylinder "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newCylinder(const Point &pcentre, const double &dr, const Vector &dv, const Utils::Portion::Type &dt, std::string groupName=\"\")
+%feature("docstring") Mgx3D::Geom::GeomManager::newCylinder "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::newCylinder(const Point &pcentre, const double &dr, const Vector &dv, const Utils::Portion::Type &dt, std::string groupName=\"\")
 
 création d'un cylindre suivant un cercle, sa base (un cercle défini par un centre et un rayon) et son axe 
 
@@ -901,16 +901,16 @@ dt : le type de portion de cylindre que l'on crée
 groupName : optionnellement un nom de groupe 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::newPlanarSurface "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newPlanarSurface(std::vector< std::string > &curves, std::string groupName)
+%feature("docstring") Mgx3D::Geom::GeomManager::newPlanarSurface "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::newPlanarSurface(std::vector< std::string > &curves, std::string groupName)
 
 création d'une surface planaire à partir d'un ensemble de courbes 
 
 curves : le nom des courbes définissant le contour 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::newSegment "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newSegment(std::string n1, std::string n2, std::string groupName=\"\")
+%feature("docstring") Mgx3D::Geom::GeomManager::newSegment "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::newSegment(std::string n1, std::string n2, std::string groupName=\"\")
 
 création d'un segment à partir des sommets v1, v2 
 
@@ -918,9 +918,9 @@ v1 : le premier sommet
 v2 : le second somment 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::newSphere "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newSphere(const Point &pcentre, const double &radius, const double &angle, std::string groupName=\"\")
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newSphere(const Point &pcentre, const double &radius, const Utils::Portion::Type &dt, std::string groupName=\"\")
+%feature("docstring") Mgx3D::Geom::GeomManager::newSphere "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::newSphere(const Point &pcentre, const double &radius, const double &angle, std::string groupName=\"\")
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::newSphere(const Point &pcentre, const double &radius, const Utils::Portion::Type &dt, std::string groupName=\"\")
 
 Création d'une sphère. 
 
@@ -931,11 +931,11 @@ dt : portion de sphere à créer
 groupName : optionnellement un nom de groupe 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::newVertex "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newVertex(std::string vertexName, std::string curveName, std::string groupName=\"\")
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newVertex(std::string curveName, const double &param, std::string groupName=\"\")
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newVertex(const Point &p, std::string groupName=\"\")
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newVertex(const double &x, const double &y, const double &z, std::string groupName=\"\")
+%feature("docstring") Mgx3D::Geom::GeomManager::newVertex "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::newVertex(std::string vertexName, std::string curveName, std::string groupName=\"\")
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::newVertex(std::string curveName, const double &param, std::string groupName=\"\")
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::newVertex(const Point &p, std::string groupName=\"\")
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::newVertex(const double &x, const double &y, const double &z, std::string groupName=\"\")
 
 création d'un sommet géométrique à partir d'un point p(x,y,z) et d'une courbe. Le sommet crée est le projet de p sur la courbe. 
 création d'un sommet géométrique à partir d'une courbet et d'un parametrage a dans [0,1] indiquant la position du point sur la courbe. 
@@ -943,21 +943,21 @@ création d'un sommet géométrique à partir d'un point (x,y,z)
 création d'un sommet géométrique à partir d'un point (x,y,z) 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::newVerticesCurvesAndPlanarSurface "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::newVerticesCurvesAndPlanarSurface(std::vector< Utils::Math::Point > &points, std::string groupName)
+%feature("docstring") Mgx3D::Geom::GeomManager::newVerticesCurvesAndPlanarSurface "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::newVerticesCurvesAndPlanarSurface(std::vector< Utils::Math::Point > &points, std::string groupName)
 
 Création d'une surface planaire à partir d'un ensemble de points Création des sommets géométriques et des segments en même temps. 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::removeFromGroup "
-virtual Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::removeFromGroup(std::vector< std::string > &ve, int dim, const std::string &groupName)
+%feature("docstring") Mgx3D::Geom::GeomManager::removeFromGroup "
+virtual Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::removeFromGroup(std::vector< std::string > &ve, int dim, const std::string &groupName)
 
 
 Enlève un groupe à un ensemble d'entités géométriques, suivant une dimension 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::rotate "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::rotate(std::vector< std::string > &entities, const Utils::Math::Rotation &rot)
+%feature("docstring") Mgx3D::Geom::GeomManager::rotate "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::rotate(std::vector< std::string > &entities, const Utils::Math::Rotation &rot)
 
 rotation d'une ou plusieurs entités géométrique 
 
@@ -965,8 +965,8 @@ entities : les entities dont on fait la rotation
 rot : la rotation 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::scale "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::scale(std::vector< std::string > &geo, const double factor)
+%feature("docstring") Mgx3D::Geom::GeomManager::scale "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::scale(std::vector< std::string > &geo, const double factor)
 
 création d'un objet géométrique par homothétie 
 
@@ -974,8 +974,8 @@ geo : les objets d'origine
 factor : le facteur d'homothétie 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::section "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::section(std::vector< std::string > &entities, std::string tool)
+%feature("docstring") Mgx3D::Geom::GeomManager::section "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::section(std::vector< std::string > &entities, std::string tool)
 
 Section d'un groupe d'entités géométrique par un outil. 
 
@@ -984,21 +984,21 @@ tool : l'entité pour découper
 planeGroupName : le nom du groupe dans lequel on place toutes les entites sur le plan 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::sectionByPlane "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::sectionByPlane(std::vector< std::string > &entities, Utils::Math::Plane *tool, std::string planeGroupName)
+%feature("docstring") Mgx3D::Geom::GeomManager::sectionByPlane "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::sectionByPlane(std::vector< std::string > &entities, Utils::Math::Plane *tool, std::string planeGroupName)
 
 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::setGroup "
-virtual Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::setGroup(std::vector< std::string > &ve, int dim, const std::string &groupName)
+%feature("docstring") Mgx3D::Geom::GeomManager::setGroup "
+virtual Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::setGroup(std::vector< std::string > &ve, int dim, const std::string &groupName)
 
 
 Défini le groupe pour un ensemble d'entités géométriques, suivant une dimension 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::translate "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::translate(std::vector< std::string > &ve, const Vector &dp)
+%feature("docstring") Mgx3D::Geom::GeomManager::translate "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::translate(std::vector< std::string > &ve, const Vector &dp)
 
 translation des entités (identifiée par un nom unique pour python) suivant le vecteur de translation défini par dp 
 
@@ -1006,30 +1006,30 @@ ve : nom des entités géométrique à translater
 dp : le vecteur de translation 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::unionFaces "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManagerIfc::unionFaces(std::vector< std::string > &entities)
+%feature("docstring") Mgx3D::Geom::GeomManager::unionFaces "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Geom::GeomManager::unionFaces(std::vector< std::string > &entities)
 
 Nettoyage de volumes. 
 
 entities : les entités sur lesquelles on travaille 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::~GeomManagerIfc "
-virtual Mgx3D::Geom::GeomManagerIfc::~GeomManagerIfc()
+%feature("docstring") Mgx3D::Geom::GeomManager::~GeomManager "
+virtual Mgx3D::Geom::GeomManager::~GeomManager()
 
 Destructeur. RAS. 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::GeomManagerIfc "
-Mgx3D::Geom::GeomManagerIfc::GeomManagerIfc(const std::string &name, Internal::ContextIfc *c)
+%feature("docstring") Mgx3D::Geom::GeomManager::GeomManager "
+Mgx3D::Geom::GeomManager::GeomManager(const std::string &name, Internal::ContextIfc *c)
 
 Constructeur. 
 
 c : le contexte ce qui permet d'accéder entre autre au CommandManager 
 
 ";
-%feature("docstring") Mgx3D::Geom::GeomManagerIfc::GeomManagerIfc "
-Mgx3D::Geom::GeomManagerIfc::GeomManagerIfc(const GeomManagerIfc &)
+%feature("docstring") Mgx3D::Geom::GeomManager::GeomManager "
+Mgx3D::Geom::GeomManager::GeomManager(const GeomManager &)
 
 Constructeur de copie. Interdit. 
 

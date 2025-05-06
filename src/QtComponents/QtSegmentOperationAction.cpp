@@ -8,7 +8,6 @@
 #include "Internal/Resources.h"
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManagerIfc.h"
 #include "Geom/CommandNewSegment.h"
 #include "Geom/GeomDisplayRepresentation.h"
 #include "Geom/Vertex.h"

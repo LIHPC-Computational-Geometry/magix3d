@@ -46,24 +46,24 @@ void SysCoordManagerIfc::clear()
 Mgx3D::Internal::M3DCommandResultIfc*
 SysCoordManagerIfc::newSysCoord(std::string groupName)
 {
-	throw TkUtil::Exception ("GeomManagerIfc::newSysCoord should be overloaded.");
+	throw TkUtil::Exception ("SysCoordManagerIfc::newSysCoord should be overloaded.");
 }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc*
 SysCoordManagerIfc::newSysCoord(const Point& p, std::string groupName)
 {
-	throw TkUtil::Exception ("GeomManagerIfc::newSysCoord should be overloaded.");
+	throw TkUtil::Exception ("SysCoordManagerIfc::newSysCoord should be overloaded.");
 }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc*
 SysCoordManagerIfc::newSysCoord(const Point& pCentre, const Point& pX, const Point& pY, std::string groupName)
 {
-	throw TkUtil::Exception ("GeomManagerIfc::newSysCoord should be overloaded.");
+	throw TkUtil::Exception ("SysCoordManagerIfc::newSysCoord should be overloaded.");
 }
 /*----------------------------------------------------------------------------*/
 SysCoord* SysCoordManagerIfc::getSysCoord (const std::string& name, const bool exceptionIfNotFound) const
 {
-	throw TkUtil::Exception ("GeomManagerIfc::getSysCoord should be overloaded.");
+	throw TkUtil::Exception ("SysCoordManagerIfc::getSysCoord should be overloaded.");
 }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResultIfc*
