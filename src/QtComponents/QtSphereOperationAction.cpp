@@ -8,7 +8,6 @@
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManagerIfc.h"
 #include "Geom/Vertex.h"
 #include "Utils/Vector.h"
 #include "QtComponents/QtSphereOperationAction.h"

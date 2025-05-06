@@ -4,7 +4,6 @@
 #include "Internal/Context.h"
 #include "Geom/CommandCreateGeom.h"
 #include "Geom/EntityFactory.h"
-#include "Geom/GeomManager.h"
 #include "Geom/GeomEntity.h"
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"

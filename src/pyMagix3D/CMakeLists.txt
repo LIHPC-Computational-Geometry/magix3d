@@ -135,7 +135,7 @@ if (Doxygen_FOUND)
 	set (DOXYGEN_SOURCES ${CMAKE_SOURCE_DIR}/src/Doc/User 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Internal/M3DCommandManager.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Internal/M3DCommandResultIfc.h 
-                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Geom/GeomManagerIfc.h 
+                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Geom/GeomManager.h
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Geom/GeomInfo.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Internal/ContextIfc.h 
                          ${CMAKE_SOURCE_DIR}/src/Utils/protected/Utils/Point.h 

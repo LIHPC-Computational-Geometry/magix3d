@@ -103,7 +103,7 @@ namespace Mgx3D {
 namespace Geom {
 /*----------------------------------------------------------------------------*/
 GeomManager::GeomManager(const std::string& name, Internal::ContextIfc* c)
-:Geom::GeomManagerIfc(name, c)
+:Internal::CommandCreator(name, c)
 {
 }
 /*----------------------------------------------------------------------------*/
@@ -114,7 +114,6 @@ GeomManager::~GeomManager()
 /*----------------------------------------------------------------------------*/
 void GeomManager::clear()
 {
-    // destruction des entités référencées par le manager
     for (std::vector<Volume*>::const_iterator iter = m_volumes.begin();
             iter != m_volumes.end(); ++iter)
         delete *iter;

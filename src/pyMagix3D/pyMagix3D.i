@@ -33,7 +33,7 @@ using std::ptrdiff_t;
 #include "Utils/Unit.h"
 #include "Utils/SwigCompletion.h"
 
-#include "Geom/GeomManagerIfc.h"
+#include "Geom/GeomManager.h"
 #include "Geom/GeomInfo.h"
 
 #include "Topo/TopoInfo.h"
@@ -310,7 +310,7 @@ using std::ptrdiff_t;
 %include Utils/Unit.h
 
 %include Geom/GeomInfo.h
-%include Geom/GeomManagerIfc.h
+%include Geom/GeomManager.h
 
 %include Topo/TopoInfo.h
 %include Topo/TopoManagerIfc.h

@@ -18,7 +18,7 @@
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManagerIfc.h"
+#include "Geom/GeomManager.h"
 #include "Utils/Vector.h"
 #include "QtComponents/QtBooleanOpOperationAction.h"
 #include "QtComponents/QtMgx3DApplication.h"
