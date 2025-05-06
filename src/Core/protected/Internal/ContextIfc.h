@@ -15,7 +15,7 @@
 #include "Utils/Landmark.h"
 #include "Utils/Unit.h"
 #include "Utils/SwigCompletion.h"
-#include "Geom/GeomManagerIfc.h"
+#include "Geom/GeomManager.h"
 #include "Topo/TopoManagerIfc.h"
 #include "Mesh/MeshManagerIfc.h"
 #include "Structured/StructuredMeshManagerIfc.h"
@@ -127,10 +127,10 @@ public:
     /** \brief  Accesseur sur le manager géométrique
 	 * \exception	Une exception est levée en l'absence de manager associé.
      */
-    virtual Mgx3D::Geom::GeomManagerIfc& getGeomManager();
-    virtual const Mgx3D::Geom::GeomManagerIfc& getGeomManager() const;
+    virtual Mgx3D::Geom::GeomManager& getGeomManager();
+    virtual const Mgx3D::Geom::GeomManager& getGeomManager() const;
 #ifndef SWIG
-    virtual void setGeomManager (Mgx3D::Geom::GeomManagerIfc*);
+    virtual void setGeomManager (Mgx3D::Geom::GeomManager*);
 #endif
 
     /*------------------------------------------------------------------------*/

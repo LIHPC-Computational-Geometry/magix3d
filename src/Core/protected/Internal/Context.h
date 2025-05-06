@@ -151,9 +151,9 @@ public:
     /** \brief  Accesseur sur le manager géométrique
      */
 
-    virtual Mgx3D::Geom::GeomManagerIfc& getGeomManager();
-    virtual const Mgx3D::Geom::GeomManagerIfc& getGeomManager() const;
-	virtual void setGeomManager (Mgx3D::Geom::GeomManagerIfc* mgr);
+    virtual Mgx3D::Geom::GeomManager& getGeomManager();
+    virtual const Mgx3D::Geom::GeomManager& getGeomManager() const;
+	virtual void setGeomManager (Mgx3D::Geom::GeomManager* mgr);
     virtual Mgx3D::Geom::GeomManager& getLocalGeomManager();
 
     /*------------------------------------------------------------------------*/
@@ -625,7 +625,7 @@ protected:
 	/// Session Python :
 	TkUtil::PythonSession*				m_python_session;
     /// Manager pour les commandes géométriques
-    Mgx3D::Geom::GeomManagerIfc*		m_geom_manager;
+    Mgx3D::Geom::GeomManager*		m_geom_manager;
     /// Manager pour les commandes topologiques
     Mgx3D::Topo::TopoManagerIfc*		m_topo_manager;
     /// Manager pour le maillage

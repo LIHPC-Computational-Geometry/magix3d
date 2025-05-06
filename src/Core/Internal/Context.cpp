@@ -763,19 +763,19 @@ void Context::setPythonSession (TkUtil::PythonSession* session)
 	}	// if (m_python_session != session)
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Geom::GeomManagerIfc& Context::getGeomManager ( )
+Mgx3D::Geom::GeomManager& Context::getGeomManager ( )
 {
 	CHECK_NULL_PTR_ERROR (m_geom_manager)
 	return *m_geom_manager;
 }
 /*----------------------------------------------------------------------------*/
-const Mgx3D::Geom::GeomManagerIfc& Context::getGeomManager ( ) const
+const Mgx3D::Geom::GeomManager& Context::getGeomManager ( ) const
 {
 	CHECK_NULL_PTR_ERROR (m_geom_manager)
 	return *m_geom_manager;
 }
 /*----------------------------------------------------------------------------*/
-void Context::setGeomManager (Mgx3D::Geom::GeomManagerIfc* manager)
+void Context::setGeomManager (Mgx3D::Geom::GeomManager* manager)
 {
 	delete m_geom_manager;
 	m_geom_manager	= manager;

@@ -8,7 +8,7 @@
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManagerIfc.h"
+#include "Geom/GeomManager.h"
 #include "Geom/Vertex.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/Vector.h"

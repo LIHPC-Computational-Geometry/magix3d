@@ -28,7 +28,7 @@ set(DOXYGEN_DIRS
   ${PROJECT_SOURCE_DIR}/src/Utils/protected/Utils/Landmark.h
   ${PROJECT_SOURCE_DIR}/src/Utils/protected/Utils/Unit.h
   ${PROJECT_SOURCE_DIR}/src/Utils/protected/Utils/SwigCompletion.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Geom/GeomManagerIfc.h
+  ${PROJECT_SOURCE_DIR}/src/Core/protected/Geom/GeomManager.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Geom/GeomInfo.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/TopoInfo.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/TopoManagerIfc.h

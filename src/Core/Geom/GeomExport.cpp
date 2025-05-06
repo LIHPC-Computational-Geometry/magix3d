@@ -35,7 +35,7 @@ GeomExport::~GeomExport()
 /*----------------------------------------------------------------------------*/
 void GeomExport::perform(Internal::InfoCommand* icmd)
 {
-    Mgx3D::Geom::GeomManagerIfc& gm = m_context.getGeomManager();
+    Mgx3D::Geom::GeomManager& gm = m_context.getGeomManager();
 
     // si rien de sélectionné, on prend tout ce qui est dans le manager
     if (m_geomEntities.empty()){

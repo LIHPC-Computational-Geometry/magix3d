@@ -11,7 +11,7 @@
 #include "Geom/CommandNewCircle.h"
 #include "Geom/CommandNewEllipse.h"
 #include "Geom/GeomDisplayRepresentation.h"
-#include "Geom/GeomManagerIfc.h"
+#include "Geom/GeomManager.h"
 #include "Geom/Vertex.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtCircleOperationAction.h"

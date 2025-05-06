@@ -527,7 +527,7 @@ void QtGeometryHomothetyAction::executeOperation ( )
 	const bool		    processAll	= panel->processAllGeomEntities ( );
 	const QtGeometryHomothetyPanel::HOMOTHETY_TYPE	type	=
 											panel->getHomothetyType ( );
-	GeomManagerIfc&			geomManager	= getContext ( ).getGeomManager ( );
+	GeomManager&			geomManager	= getContext ( ).getGeomManager ( );
 	if (true == processAll)
 	{
 		if (copy)

@@ -9,7 +9,7 @@
 #include "Internal/Resources.h"
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManagerIfc.h"
+#include "Geom/GeomManager.h"
 #include "Geom/Vertex.h"
 #include "Geom/CommandNewArcCircle.h"
 #include "Geom/CommandNewArcCircleWithAngles.h"
