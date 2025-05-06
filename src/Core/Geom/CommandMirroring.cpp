@@ -1,14 +1,5 @@
-/*
- * CommandMirroring.cpp
- *
- *  Created on: 12/4/2016
- *      Author: Eric B
- */
 /*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
-#include "Utils/Common.h"
-/*----------------------------------------------------------------------------*/
 #include "Geom/CommandMirroring.h"
 #include "Geom/GeomManager.h"
 #include "Geom/GeomMirrorImplementation.h"

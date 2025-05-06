@@ -1,19 +1,3 @@
-/*----------------------------------------------------------------------------*/
-/*
- * CommandArcEllipse.h
- *
- *  Created on: 2 avr. 2012
- *      Author: ledouxf
- *
- *  EB:
- *     Cette ellipse est créée dans le plan XY et a pour axe 0X
- *     Si on veut pouvoir créer cette ellipse n'importe où,
- *     il est alors nécessaire de donner l'axe de l'ellipse
- *
- *     Les 3 points ne peuvent pas être alignés, sinon cela ne forme pas une unique ellipse
- *
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDNEWARCELLIPSE_H_
 #define COMMANDNEWARCELLIPSE_H_
 /*----------------------------------------------------------------------------*/
@@ -27,7 +11,12 @@ namespace Geom {
 /*----------------------------------------------------------------------------*/
 /** \class CommandNewArcEllipse
  *  \brief Commande permettant de créer un arc d'ellipse
- */
+ *     Cette ellipse est créée dans le plan XY et a pour axe 0X
+ *     Si on veut pouvoir créer cette ellipse n'importe où,
+ *     il est alors nécessaire de donner l'axe de l'ellipse
+ *
+ *     Les 3 points ne peuvent pas être alignés, sinon cela ne forme pas une unique ellipse
+*/
 /*----------------------------------------------------------------------------*/
 class CommandNewArcEllipse: public Geom::CommandCreateWithOtherGeomEntities{
 

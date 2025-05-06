@@ -1,17 +1,10 @@
-/*----------------------------------------------------------------------------*/
 #ifdef USE_MDLPARSER
-/** \file CommandImportMDL.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 10/5/2012
- */
 /*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
+#include "Internal/ImportMDLImplementation.h"
 #include "Utils/Common.h"
 #include "Geom/CommandImportMDL.h"
 #include "Geom/GeomManager.h"
-#include "Internal/ImportMDLImplementation.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/

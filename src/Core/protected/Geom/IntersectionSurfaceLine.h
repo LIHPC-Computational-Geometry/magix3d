@@ -1,12 +1,8 @@
-//
-// Created by calderans on 10/29/24.
-//
-
 #ifndef INTERSECTIONSURFACELINE_H
 #define INTERSECTIONSURFACELINE_H
 /*----------------------------------------------------------------------------*/
-#include "Geom/GeomEntity.h"
 #include "Geom/GeomModificationBaseClass.h"
+#include "Geom/GeomEntity.h"
 #include "Utils/Vector.h"
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>

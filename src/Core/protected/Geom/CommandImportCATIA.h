@@ -1,17 +1,7 @@
-/*----------------------------------------------------------------------------*/
-/*
- * CommandImportCATIA.h
- *
- *  Created on: 12 nov. 2012
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDIMPORTCATIA_H_
 #define COMMANDIMPORTCATIA_H_
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandCreateGeom.h"
-#include "Utils/Vector.h"
-#include "Geom/GeomEntity.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 #include <string>

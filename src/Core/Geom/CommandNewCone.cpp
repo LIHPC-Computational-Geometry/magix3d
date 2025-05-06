@@ -1,21 +1,12 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandNewCone.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 5/5/2014
- */
-/*----------------------------------------------------------------------------*/
-#include "Geom/CommandNewCone.h"
 #include "Geom/PropertyCone.h"
+#include "Geom/CommandNewCone.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomManager.h"
-#include "Utils/MgxException.h"
 #include "Utils/MgxNumeric.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-#include <cmath>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

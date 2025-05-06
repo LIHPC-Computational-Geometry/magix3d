@@ -1,22 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/*
- * CommandNewEllipse.cpp
- *
- *  Created on: 4 jul. 2024
- *      Author: lelandaisb
- */
-/*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
 #include "Geom/CommandNewEllipse.h"
-#include "Geom/PropertyBox.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomManager.h"
-#include "Utils/MgxException.h"
-
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

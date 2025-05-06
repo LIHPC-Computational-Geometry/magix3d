@@ -1,12 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/*
- * GeomModification.cpp
- *
- *  Created on: 21 mars 2012
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
 #include "Geom/GeomModificationBaseClass.h"
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
@@ -30,15 +22,9 @@
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Solid.hxx>
 #include <TopoDS_Compound.hxx>
-#include <TopoDS_CompSolid.hxx>
 #include <TopoDS.hxx>
 #include <TDF_Label.hxx>
-#include <TopoDS.hxx>
-#include <BRepAlgoAPI_Fuse.hxx>
 #include <BRepAlgoAPI_BuilderAlgo.hxx>
-#include <BRepFeat_Gluer.hxx>
-#include <BRep_Builder.hxx>
-#include <ShapeAnalysis_ShapeContents.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopTools_ListOfShape.hxx>
 #include <TopTools_IndexedMapOfShape.hxx>
@@ -47,24 +33,15 @@
 #include <BRep_Tool.hxx>
 #include <BRepTools.hxx>
 #include <BRepTools_ReShape.hxx>
-#include <TopTools_ListOfShape.hxx>
-#include <BRepBuilderAPI_MakeVertex.hxx>
 #include <BRepAdaptor_Curve.hxx>
 #include <ShapeFix_Shape.hxx>
 #include <BRepBndLib.hxx>
-#include<Bnd_Box.hxx>
+#include <Bnd_Box.hxx>
 #include <GeomAdaptor_Curve.hxx>
 #include <Extrema_ExtPC.hxx>
-
-#include <BRepTools.hxx>
 #include <BRepGProp.hxx>
 #include <GProp_GProps.hxx>
 #include <BRepCheck_Analyzer.hxx>
-#include <ShapeFix_Shape.hxx>
-#include <ShapeFix_Shell.hxx>
-#include <ShapeFix_Wireframe.hxx>
-#include <TopTools_ListIteratorOfListOfShape.hxx>
-#include <NCollection_IncAllocator.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

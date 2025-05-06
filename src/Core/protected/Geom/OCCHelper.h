@@ -1,8 +1,8 @@
 #ifndef MGX3D_GEOM_OCCHELPER_H_
 #define MGX3D_GEOM_OCCHELPER_H_
 /*----------------------------------------------------------------------------*/
-#include "Utils/Point.h"
 #include "Utils/Vector.h"
+#include "Utils/Point.h"
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Face.hxx>

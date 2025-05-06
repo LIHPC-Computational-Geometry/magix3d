@@ -1,13 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/*
- * GeomImport.cpp
- *
- *  Created on: 30 oct. 2014
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
 #include "Geom/GeomImport.h"
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
@@ -16,15 +7,13 @@
 #include "Geom/EntityFactory.h"
 #include "Geom/OCCHelper.h"
 #include "Geom/GeomSplitImplementation.h"
-
 #include "Group/GroupManager.h"
 #include "Group/Group3D.h"
 #include "Group/Group2D.h"
 #include "Group/Group1D.h"
 #include "Group/Group0D.h"
-
 #include "Internal/InfoCommand.h"
-
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/MemoryError.h>
@@ -33,8 +22,6 @@
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Solid.hxx>
 #include <TopoDS_Shell.hxx>
-#include <TopoDS_Compound.hxx>
-#include <TopoDS_CompSolid.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 #include <BRep_Builder.hxx>

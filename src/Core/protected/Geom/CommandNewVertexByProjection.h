@@ -1,17 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/*
- * CommandNewVertexByProjection.h
- *
- *  Created on: 10 juil. 2012
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDNEWVERTEXBYPROJECTION_H_
 #define COMMANDNEWVERTEXBYPROJECTION_H_
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandCreateGeom.h"
 #include "Geom/Vertex.h"
-#include "Geom/Curve.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

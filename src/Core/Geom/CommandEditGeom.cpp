@@ -1,12 +1,6 @@
-/*
- * CommandEditGeom.cpp
- *
- *  Created on: 25 janv. 2013
- *      Author: ledouxf
- */
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
 #include "Utils/Common.h"
+#include "Internal/ContextIfc.h"
 #include "Internal/InfoCommand.h"
 #include "Internal/Context.h"
 #include "Geom/CommandEditGeom.h"
@@ -26,9 +20,6 @@
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/Exception.h>
 #include <TkUtil/ReferencedMutex.h>
-#include <TkUtil/MemoryError.h>
-
-//#include <GMDSCommon/Timer.h>
 /*----------------------------------------------------------------------------*/
 using namespace TkUtil;
 using namespace Mgx3D::Utils;

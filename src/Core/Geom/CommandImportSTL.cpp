@@ -1,28 +1,14 @@
-/*
- * CommandImportSTL.cpp
- *
- *  Created on: 13/2/2017
- *      Author: Eric B
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandImportSTL.h"
 #include "Geom/GeomManager.h"
 #include "Geom/ImportSTLImplementation.h"
 #include "Geom/Curve.h"
 /*----------------------------------------------------------------------------*/
-#include <TkUtil/Exception.h>
-#include <TkUtil/ReferencedMutex.h>
-#include <TkUtil/MemoryError.h>
-/*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 
 class GeomVertex;
-//class Curve;
 class Surface;
 class Volume;
 /*----------------------------------------------------------------------------*/

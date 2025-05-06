@@ -1,13 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandCreateGeom.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 17/11/2010
- */
-/*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
 #include "Internal/InfoCommand.h"
 #include "Internal/Context.h"
 #include "Geom/CommandCreateGeom.h"
@@ -24,21 +16,17 @@
 #include "Group/Group2D.h"
 #include "Group/Group1D.h"
 #include "Group/Group0D.h"
-
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/Exception.h>
 #include <TkUtil/ReferencedMutex.h>
 #include <TkUtil/MemoryError.h>
-
+/*----------------------------------------------------------------------------*/
+#include <TDocStd_Document.hxx>
 /*----------------------------------------------------------------------------*/
 using namespace TkUtil;
 using namespace Mgx3D::Utils;
-
-/*----------------------------------------------------------------------------*/
-#include <TDocStd_Document.hxx>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

@@ -1,17 +1,12 @@
 /*----------------------------------------------------------------------------*/
-/** \file Edge.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 19/11/2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
 #include <iostream>
 #include <vector>
-#include <string.h>
+#include <string>
 /*----------------------------------------------------------------------------*/
+#include "Internal/ContextIfc.h"
+#include "Internal/InfoCommand.h"
+#include "Internal/InternalPreferences.h"
+#include "Internal/Resources.h"
 #include "Topo/Vertex.h"
 #include "Topo/CoEdge.h"
 #include "Topo/Edge.h"
@@ -23,38 +18,28 @@
 #include "Topo/EdgeMeshingPropertyTabulated.h"
 #include "Topo/CommandEditTopo.h"
 #include "Topo/TopoHelper.h"
-
 #include "Mesh/CommandCreateMesh.h"
 #include "Mesh/MeshImplementation.h"
 #include "Mesh/MeshItf.h"
-
 #include "Utils/Common.h"
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
 #include "Utils/SerializedRepresentation.h"
 #include "Utils/MgxException.h"
-
-#include "Internal/InfoCommand.h"
-#include "Internal/InternalPreferences.h"
-#include "Internal/Resources.h"
-
 #include "Geom/GeomEntity.h"
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/EntityFactory.h"
-#include "Geom/GeomModificationBaseClass.h"
+#include "Geom/Vertex.h"
 #include "Geom/GeomProjectImplementation.h"
-
 #include "Group/Group1D.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/TraceLog.h>
-#include <TkUtil/NumericConversions.h>
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/Mutex.h>
 /*----------------------------------------------------------------------------*/
-// OCC
 #include <Standard_Failure.hxx>
 #include <gp_Trsf.hxx>
 #include <gp_Ax1.hxx>
@@ -64,10 +49,6 @@
 #include <BRepBuilderAPI_MakeVertex.hxx>
 #include <BRepExtrema_DistShapeShape.hxx>
 #include <BRepAlgoAPI_Section.hxx>
-
-#include <GProp_GProps.hxx>
-#include <BRepGProp.hxx>
-
 /*----------------------------------------------------------------------------*/
 // protection pour les appels OCC et pour la création des points
 static TkUtil::Mutex					entityFactoryMutex;

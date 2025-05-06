@@ -1,27 +1,16 @@
-/*
- * CommandImportIGES.cpp
- *
- *  Created on: 21 juin 2013
- *      Author: ledouxf
- */
 /*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
-
-/*----------------------------------------------------------------------------*/
 #include "Geom/CommandImportIGES.h"
 #include "Geom/GeomManager.h"
 #include "Geom/ImportIGESImplementation.h"
 #include "Geom/Curve.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
-#include <TkUtil/ReferencedMutex.h>
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/File.h>
-#include <TkUtil/NumericConversions.h>
+/*----------------------------------------------------------------------------*/
 #include <fstream>
 #include <sstream>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

@@ -1,22 +1,12 @@
 /*----------------------------------------------------------------------------*/
-/*
- * CommandNewHollowCylinder.cpp
- *
- *  Created on: 12 nov. 2014
- *      Author: ledouxf
- */
-
-/*----------------------------------------------------------------------------*/
-#include "Geom/CommandNewHollowCylinder.h"
 #include "Geom/PropertyHollowCylinder.h"
+#include "Geom/CommandNewHollowCylinder.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomManager.h"
-#include "Utils/MgxException.h"
 #include "Utils/MgxNumeric.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-#include <cmath>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

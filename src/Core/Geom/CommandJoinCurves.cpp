@@ -1,15 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandJoinCurves.cpp
- *
- *  Created on: 17 déc. 2013
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
-#include "Utils/Common.h"
 #include "Geom/CommandJoinCurves.h"
 #include "Group/Group1D.h"
 /*----------------------------------------------------------------------------*/

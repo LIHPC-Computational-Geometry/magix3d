@@ -1,17 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file GeomManagerIfc.cpp
- *
- *  \author Franck Ledoux, Eric Brière de l'Isle, Charles Pignerol
- *
- *  \date 01/02/2012
- *
- *
- *
- *  Modified on: 21/02/2022
- *      Author: Simon C
- *      ajout de la possibilité de conserver les entités pour la fonction makeExtrude
- */
-/*----------------------------------------------------------------------------*/
 #include "Geom/GeomManagerIfc.h"
 #include "Utils/Point.h"
 #include "Utils/Vector.h"

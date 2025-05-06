@@ -1,11 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file GeomProperty.cpp
- *
- *  \author Franck Ledoux
- *
- *  \date 18/10/2010
- */
-/*----------------------------------------------------------------------------*/
 #include "Geom/GeomProperty.h"
 #include "Geom/PropertyBox.h"
 #include "Geom/PropertyCylinder.h"
