@@ -1,17 +1,7 @@
 /*----------------------------------------------------------------------------*/
-/*
- * GeomRemoveImplementation.cpp
- *
- *  Created on: 10 janv. 2014
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
 #include "Geom/GeomRemoveImplementation.h"
 #include "Geom/IncidentGeomEntitiesVisitor.h"
 #include "Geom/EntityFactory.h"
-/*----------------------------------------------------------------------------*/
-#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 #include <set>
 /*----------------------------------------------------------------------------*/

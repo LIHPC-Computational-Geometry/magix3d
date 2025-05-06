@@ -1,11 +1,3 @@
-/*----------------------------------------------------------------------------*/
-/*
- * CommandNewSphere.h
- *
- *  Created on: 23 mars 2012
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDNEWSPHERE_H_
 #define COMMANDNEWSPHERE_H_
 /*----------------------------------------------------------------------------*/
@@ -13,7 +5,6 @@
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
 #include "Internal/Context.h"
-#include "Geom/Volume.h"
 #include "Utils/Constants.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

@@ -1,20 +1,9 @@
-/*----------------------------------------------------------------------------*/
-/*
- * GeomCommonImplementation.h
- *
- *  Created on: 14 févr. 2012
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #ifndef GEOMCOMMONIMPLEMENTATION_H_
 #define GEOMCOMMONIMPLEMENTATION_H_
 /*----------------------------------------------------------------------------*/
-#include "Utils/Vector.h"
 #include "Geom/GeomModificationBaseClass.h"
 #include "Geom/GeomEntity.h"
 #include "Internal/Context.h"
-/*----------------------------------------------------------------------------*/
-#include <TopoDS_Shape.hxx>
 /*----------------------------------------------------------------------------*/
 #include <vector>
 /*----------------------------------------------------------------------------*/

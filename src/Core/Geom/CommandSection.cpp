@@ -1,12 +1,3 @@
-/*
- * CommandSection.cpp
- *
- *  Created on: 22 janv. 2013
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandSection.h"
 #include "Geom/GeomManager.h"

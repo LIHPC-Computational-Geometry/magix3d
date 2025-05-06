@@ -1,33 +1,12 @@
 /*----------------------------------------------------------------------------*/
-/** \file GeomCommonImplementation.cpp
- *
- *  \author Franck Ledoux
- *
- *  \date 04/02/2011
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
-#include <list>
-#include <map>
-#include <set>
-#include <algorithm>
-/*----------------------------------------------------------------------------*/
 #include "Geom/GeomCommonImplementation.h"
-#include "Geom/Vertex.h"
-#include "Geom/Curve.h"
-#include "Geom/Surface.h"
 #include "Geom/Volume.h"
-#include "Geom/EntityFactory.h"
-#include "Utils/MgxNumeric.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
-#include <TopoDS.hxx>
 #include <BRepAlgoAPI_Common.hxx>
 #include <ShapeAnalysis_ShapeContents.hxx>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -107,22 +86,6 @@ void GeomCommonImplementation::commonVolumes(std::vector<GeomEntity*>& res)
         for(unsigned int j=0;j<m_newVolumes.size();j++)
             rep_ei.push_back(m_newVolumes[j]);
     }
-//    std::cerr<<"Nb new vertices = "<<m_newVertices.size()<<std::endl;
-//    std::cerr<<"Nb new curves   = "<<m_newCurves.size()<<std::endl;
-//    std::cerr<<"Nb new surfaces = "<<m_newSurfaces.size()<<std::endl;
-    //=========================================================================
-//    std::map<GeomEntity*, std::vector<GeomEntity*> >::iterator it = m_replacedEntities.begin();
-//    while(it!=m_replacedEntities.end()){
-//        GeomEntity* oldE = it->first;
-//        std::vector<GeomEntity*> newE = it->second;
-//        std::cout<<oldE->getName()<<" replaced by"<<std::endl;
-//        for(unsigned int i=0;i<newE.size();i++)
-//            std::cout<<"\t "<<newE[i]->getName()<<std::endl;
-//        it++;
-//    }
-
-//    /* mise à jour des entités géométriques et des connectivités */
-//    res.insert(res.end(),new_volumes.begin(),new_volumes.end());
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

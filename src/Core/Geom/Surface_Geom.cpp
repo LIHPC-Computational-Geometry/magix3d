@@ -1,41 +1,32 @@
-#include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
-#include <list>
-#include <string.h>
-#include <sys/types.h>
-/*----------------------------------------------------------------------------*/
+#include "Geom/Surface.h"
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
-#include "Geom/Surface.h"
 #include "Geom/Volume.h"
-#include "Geom/Loop.h"
 #include "Geom/OCCHelper.h"
-#include "Group/Group2D.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomProjectImplementation.h"
 #include "Topo/CoFace.h"
 #include "Topo/CoEdge.h"
 #include "Topo/Vertex.h"
+#include "Group/Group2D.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
-#include <TopoDS_Edge.hxx>
 #include <TopoDS.hxx>
 #include <Geom_Plane.hxx>
 #include <Geom_Surface.hxx>
 #include <BRep_Tool.hxx>
-#include <BRepAdaptor_Surface.hxx>
 #include <TopTools_IndexedMapOfShape.hxx>
-#include <TopExp.hxx>
 #include <BRepAdaptor_Curve.hxx>
-#include <ShapeAnalysis.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
 #include <BRepExtrema_DistShapeShape.hxx>
-#include <GeomAPI_ProjectPointOnSurf.hxx>
 #include <Poly_Triangulation.hxx>
-#include <TopExp_Explorer.hxx>
 #include <Standard_Type.hxx>
+/*----------------------------------------------------------------------------*/
+#include <list>
+#include <string>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

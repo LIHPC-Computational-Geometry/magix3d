@@ -1,40 +1,18 @@
 /*----------------------------------------------------------------------------*/
-/** \file GeomCommon2DImplementation.cpp
- *
- *  \author Eric B
- *
- *  \date 7/9/2018
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
-#include <list>
-#include <map>
-#include <set>
-#include <algorithm>
-/*----------------------------------------------------------------------------*/
 #include "Geom/GeomCommon2DImplementation.h"
-#include "Geom/Vertex.h"
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/CommandGeomCopy.h"
-#include "Utils/MgxNumeric.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
-#include <TopoDS.hxx>
-#include <TopoDS.hxx>
-#include <BRepAlgoAPI_Common.hxx>
-#include <ShapeAnalysis_ShapeContents.hxx>
-#include <TopTools_ListOfShape.hxx>
 #include <TopTools_IndexedMapOfShape.hxx>
 #include <TopExp.hxx>
 #include <BRepAlgoAPI_Section.hxx>
 #include <BRep_Builder.hxx>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

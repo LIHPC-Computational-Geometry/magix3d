@@ -1,20 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/*
- * CommandNewHollowSphere.h
- *
- *  Created on: 12 nov. 2014
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDNEWHOLLOWSPHERE_H_
 #define COMMANDNEWHOLLOWSPHERE_H_
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandCreateGeom.h"
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
-#include "Internal/Context.h"
-#include "Geom/Volume.h"
 #include "Utils/Constants.h"
+#include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

@@ -1,21 +1,15 @@
 /*----------------------------------------------------------------------------*/
+#include <string>
 #include <list>
-#include <string.h>
-#include <sys/types.h>
 /*----------------------------------------------------------------------------*/
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
-#include "Geom/Volume.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/OCCHelper.h"
 #include "Geom/GeomProjectImplementation.h"
-
-#include "Internal/Context.h"
-
 #include "Topo/CoEdge.h"
 #include "Topo/Vertex.h"
-
 #include "Group/Group1D.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
@@ -29,17 +23,12 @@
 #include <Geom_BSplineCurve.hxx>
 #include <BRep_Tool.hxx>
 #include <gp_Circ.hxx>
-#include <gp_Elips.hxx>
 #include <gp_Pln.hxx>
 #include <TopTools_IndexedMapOfShape.hxx>
 #include <TopExp.hxx>
-#include <BRepAdaptor_Curve.hxx>
-#include <Geom2d_Curve.hxx>
 #include <BRep_Builder.hxx>
 #include <BRepBuilderAPI_Transform.hxx>
-#include <BRepBuilderAPI_MakeFace.hxx>
 #include <Geom2dAPI_ProjectPointOnCurve.hxx>
-#include <GeomAPI_ProjectPointOnSurf.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

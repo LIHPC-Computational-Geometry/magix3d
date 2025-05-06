@@ -1,31 +1,7 @@
 /*----------------------------------------------------------------------------*/
-/*
- * ImportSTLImplementation.cpp
- *
- *  Created on: 13/2/2017
- *      Author: Eric B
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
-#include <list>
-#include <map>
-#include <set>
-#include <algorithm>
-/*----------------------------------------------------------------------------*/
 #include "Geom/ImportSTLImplementation.h"
 #include "Geom/Vertex.h"
-#include "Geom/Curve.h"
-#include "Geom/Surface.h"
-#include "Geom/Volume.h"
-
-#include "Group/GroupManager.h"
-#include "Group/Group3D.h"
-#include "Group/Group2D.h"
-#include "Group/Group1D.h"
 #include "Group/Group0D.h"
-
-#include "Internal/InfoCommand.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
@@ -33,7 +9,6 @@
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
 #include <StlAPI.hxx>
-#include <Interface_Static.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

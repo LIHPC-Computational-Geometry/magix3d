@@ -1,18 +1,10 @@
 /*----------------------------------------------------------------------------*/
-/*
- * ExportSTLImplementation.cpp
- *
- *  Created on: 13/2/2017
- *      Author: Eric B
- */
-/*----------------------------------------------------------------------------*/
-#include "Geom/ExportSTLImplementation.h"
 #include "Geom/GeomEntity.h"
-#include "Utils/Entity.h"
+#include "Geom/ExportSTLImplementation.h"
 /*----------------------------------------------------------------------------*/
-#include <iostream>
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
+#include <BRep_Builder.hxx>
 #include <StlAPI.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

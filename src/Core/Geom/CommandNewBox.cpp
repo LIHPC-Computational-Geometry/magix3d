@@ -1,23 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandNewBox.cpp
- *
- *  \author Franck Ledoux
- *
- *  \date 15/10/2010
- */
-/*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
 #include "Geom/CommandNewBox.h"
 #include "Geom/PropertyBox.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomManager.h"
-#include "Utils/MgxException.h"
 #include "Utils/MgxNumeric.h"
-
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

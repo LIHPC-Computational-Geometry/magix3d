@@ -1,18 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file GeomManager.cpp
- *
- *  \author Franck Ledoux, Eric Brière de l'Isle
- *
- *  \date 14/10/2010
- *
- *
- *
- *  Modified on: 21/02/2022
- *      Author: Simon C
- *      ajout de la possibilité de conserver les entités géométriques
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
 #include "Geom/GeomManager.h"
 #include "Geom/GeomEntity.h"
 #include "Geom/Volume.h"
@@ -72,7 +58,6 @@
 #include "Geom/CommandJoinCurves.h"
 #include "Geom/CommandJoinSurfaces.h"
 #include "Geom/IncidentGeomEntitiesVisitor.h"
-
 #include "Internal/ImportMDLImplementation.h"
 #include "Internal/ImportMDL2Commandes.h"
 #include "Internal/ExportMDLImplementation.h"
@@ -81,27 +66,19 @@
 #include "Internal/CommandComposite.h"
 #include "Internal/EntitiesHelper.h"
 #include "Internal/M3DCommandResult.h"
-#include "Internal/CommandChangeLengthUnit.h"
 #include "Internal/PythonWriter.h"
-
-#include "Utils/Entity.h"
 #include "Utils/ErrorManagement.h"
-#include "Utils/MgxNumeric.h"
 #include "Utils/Plane.h"
 #include "Utils/Vector.h"
 #include "Utils/Rotation.h"
 #include "Utils/CommandManager.h"
 #include "Utils/TypeDedicatedNameManager.h"
 #include "Utils/MgxException.h"
-
 #include "Group/GroupManager.h"
-#include "Group/Group3D.h"
-
 #include "Mesh/CommandAddRemoveGroupName.h"
 #include "Mesh/CommandTranslateMesh.h"
 #include "Mesh/CommandRotateMesh.h"
 #include "Mesh/CommandScaleMesh.h"
-
 #include "Topo/CommandModificationTopo.h"
 #include "Topo/CommandTranslateTopo.h"
 #include "Topo/CommandRotateTopo.h"
@@ -112,12 +89,9 @@
 #include "Topo/CommandDestroyTopo.h"
 #include "Topo/CommandExtrudeTopo.h"
 #include "Topo/TopoHelper.h"
-
 #include "SysCoord/SysCoord.h"
-
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
-
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/MemoryError.h>

@@ -1,19 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/** \file CommandNewCone.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 5/5/2014
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDNEWCONE_H_
 #define COMMANDNEWCONE_H_
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandCreateGeom.h"
 #include "Utils/Vector.h"
-#include "Internal/Context.h"
-#include "Geom/Volume.h"
 #include "Utils/Constants.h"
+#include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

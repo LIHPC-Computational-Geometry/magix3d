@@ -1,15 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/** CommandRotation.cpp
- *
- *  Created on: 27 sept. 2012
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
-#include "Utils/MgxNumeric.h"
 #include "Utils/Rotation.h"
-/*----------------------------------------------------------------------------*/
 #include "Geom/CommandRotation.h"
 #include "Geom/GeomManager.h"
 #include "Geom/GeomRotationImplementation.h"

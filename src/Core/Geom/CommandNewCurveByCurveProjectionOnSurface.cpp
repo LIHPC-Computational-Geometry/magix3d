@@ -1,21 +1,12 @@
 /*----------------------------------------------------------------------------*/
-/*
- * CommandNewCurveByCurveProjectionOnSurface.cpp
- *
- *  Created on: 9/3/2015
- *      Author: Eric B
- */
-/*----------------------------------------------------------------------------*/
-#include "Geom/CommandNewCurveByCurveProjectionOnSurface.h"
 #include "Geom/PropertyBox.h"
+#include "Geom/CommandNewCurveByCurveProjectionOnSurface.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomManager.h"
-#include "Utils/MgxException.h"
-
+#include "Geom/Surface.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

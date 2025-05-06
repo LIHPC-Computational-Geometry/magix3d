@@ -1,22 +1,9 @@
 /*----------------------------------------------------------------------------*/
-/*
- * CommandJoinEntities.cpp
- *
- *  Created on: 24/6/2015
- *      Author: Eric B
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
-#include "Utils/MgxNumeric.h"
-/*----------------------------------------------------------------------------*/
 #include "Geom/CommandJoinEntities.h"
 #include "Geom/GeomManager.h"
 #include "Geom/IncidentGeomEntitiesVisitor.h"
 #include "Geom/EntityFactory.h"
-#include "Group/Group2D.h"
 /*----------------------------------------------------------------------------*/
-#include <TkUtil/Exception.h>
 #include <TkUtil/ReferencedMutex.h>
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/UTF8String.h>

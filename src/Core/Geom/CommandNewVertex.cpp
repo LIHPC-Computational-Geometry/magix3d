@@ -1,17 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandNewVertex.cpp
- *
- *  \author Franck Ledoux
- *
- *  \date 15/10/2010
- */
-/*----------------------------------------------------------------------------*/
 #include "Geom/CommandNewVertex.h"
-#include "Geom/GeomProperty.h"
 #include "Geom/EntityFactory.h"
+#include "Geom/Vertex.h"
 #include "Geom/GeomManager.h"
-#include "Utils/MgxException.h"
-#include "Utils/MgxNumeric.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>

@@ -1,26 +1,17 @@
-/*
- * CommandNewSurfaceByOffset.cpp
- *
- *  Created on: 19/09/2019
- *      Author: Eric B
- */
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
 #include "Geom/CommandNewSurfaceByOffset.h"
 #include "Geom/GeomManager.h"
 #include "Geom/EntityFactory.h"
+#include "Geom/Surface.h"
 /*----------------------------------------------------------------------------*/
-#include <TkUtil/Exception.h>
 #include <TkUtil/ReferencedMutex.h>
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
-
 /*----------------------------------------------------------------------------*/
 CommandNewSurfaceByOffset::
 CommandNewSurfaceByOffset(Internal::Context& c,

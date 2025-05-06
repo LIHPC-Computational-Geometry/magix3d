@@ -1,15 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandTranslation.cpp
- *
- *  \author Franck Ledoux
- *
- *  \date 04/11/2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
-#include "Utils/MgxNumeric.h"
-/*----------------------------------------------------------------------------*/
 #include "Geom/CommandTranslation.h"
 #include "Geom/GeomManager.h"
 #include "Geom/GeomTranslateImplementation.h"

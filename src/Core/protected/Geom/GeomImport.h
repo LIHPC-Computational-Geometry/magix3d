@@ -1,16 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/*
- * GeomImport.h
- *
- *  Created on: 30 oct. 2014
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #ifndef GEOMIMPORT_H_
 #define GEOMIMPORT_H_
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Vector.h"
 #include "Geom/GeomEntity.h"
 #include "Geom/GeomModificationBaseClass.h"
 #include "Internal/Context.h"

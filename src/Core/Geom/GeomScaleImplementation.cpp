@@ -1,20 +1,7 @@
-/*
- * GeomScaleImplementation.cpp
- *
- *  Created on: 19 juin 2013
- *      Author: ledouxf
- */
-
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
-#include <list>
-#include <set>
 /*----------------------------------------------------------------------------*/
 #include "Geom/GeomScaleImplementation.h"
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
-#include "Geom/Surface.h"
 #include "Geom/Volume.h"
 #include "Geom/CommandGeomCopy.h"
 /*----------------------------------------------------------------------------*/
@@ -22,6 +9,9 @@
 #include <BRepBndLib.hxx>
 #include <BRepBuilderAPI_Transform.hxx>
 #include <BRepBuilderAPI_GTransform.hxx>
+/*----------------------------------------------------------------------------*/
+#include <list>
+#include <set>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

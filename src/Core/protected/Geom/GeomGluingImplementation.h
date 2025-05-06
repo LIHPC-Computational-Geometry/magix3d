@@ -1,20 +1,9 @@
-/*----------------------------------------------------------------------------*/
-/*
- * GeomGluingImplementation.h
- *
- *  Created on: 1 déc. 2011
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #ifndef GEOMSEWINGIMPLEMENTATION_H_
 #define GEOMSEWINGIMPLEMENTATION_H_
 /*----------------------------------------------------------------------------*/
-#include "Utils/Vector.h"
 #include "Geom/GeomModificationBaseClass.h"
 #include "Geom/GeomEntity.h"
 #include "Internal/Context.h"
-/*----------------------------------------------------------------------------*/
-#include <TopoDS_Shape.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

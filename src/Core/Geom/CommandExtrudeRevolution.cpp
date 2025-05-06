@@ -1,26 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandExtrudeRevolution.cpp
- *
- *  \author Franck Ledoux
- *
- *  \date 04/11/2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
-/*----------------------------------------------------------------------------*/
 #include "Geom/CommandExtrudeRevolution.h"
 #include "Geom/GeomManager.h"
 #include "Geom/GeomRevolImplementation.h"
-#include "Geom/Volume.h"
-#include "Geom/Surface.h"
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
 #include "Group/Group3D.h"
-#include "Group/Group2D.h"
 #include "Group/Group1D.h"
-#include "Group/Group0D.h"
 #include "Group/GroupManager.h"
+#include "Utils/Rotation.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/ReferencedMutex.h>

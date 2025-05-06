@@ -1,11 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/*
- * ExportVTKImplementation.cpp
- *
- *  Created on: 14 avr. 2014
- *      Author: legoff
- */
-/*----------------------------------------------------------------------------*/
 #include "Geom/ExportVTKImplementation.h"
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
@@ -19,8 +12,6 @@
 #include <gmds/io/VTKWriter.h>
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
-#include <iostream>
-#include <set>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -151,55 +142,6 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 		}
 	}
 
-//	//post process
-//    {
-//        gmds::Mesh::cloud& cl1 = mesh.getCloud("Crb0006");
-//        gmds::Mesh::cloud& cl2 = mesh.getCloud("Crb0007");
-//        gmds::Mesh::cloud& cl  = mesh.newCloud("composite6-7");
-//
-//        std::vector<gmds::TCellID> cl1_nodes = cl1.cellIDs();
-//        std::vector<gmds::TCellID> cl2_nodes = cl2.cellIDs();
-//        std::set<gmds::TCellID> cl_ids;
-//
-//        for(unsigned int i=0; i<cl1_nodes.size();i++) {
-//            cl_ids.insert(cl1_nodes[i]);
-//        }
-//        for(unsigned int i=0; i<cl2_nodes.size();i++) {
-//            cl_ids.insert(cl2_nodes[i]);
-//        }
-//
-//        std::set<gmds::TCellID>::iterator it_set;
-//        for(it_set=cl_ids.begin();it_set!=cl_ids.end();it_set++)
-//        {
-//            gmds::TCellID node_id = *it_set;
-//            cl.add(mesh.get<gmds::Node>(node_id));
-//        }
-//
-//    }
-//    {
-//        gmds::Mesh::cloud& cl1 = mesh.getCloud("Crb0009");
-//        gmds::Mesh::cloud& cl2 = mesh.getCloud("Crb0010");
-//        gmds::Mesh::cloud& cl  = mesh.newCloud("composite9-10");
-//
-//        std::vector<gmds::TCellID> cl1_nodes = cl1.cellIDs();
-//        std::vector<gmds::TCellID> cl2_nodes = cl2.cellIDs();
-//        std::set<gmds::TCellID> cl_ids;
-//
-//        for(unsigned int i=0; i<cl1_nodes.size();i++) {
-//            cl_ids.insert(cl1_nodes[i]);
-//        }
-//        for(unsigned int i=0; i<cl2_nodes.size();i++) {
-//            cl_ids.insert(cl2_nodes[i]);
-//        }
-//
-//        std::set<gmds::TCellID>::iterator it_set;
-//        for(it_set=cl_ids.begin();it_set!=cl_ids.end();it_set++)
-//        {
-//            gmds::TCellID node_id = *it_set;
-//            cl.add(mesh.get<gmds::Node>(node_id));
-//        }
-//
-//    }
 	gmds::IGMeshIOService ioService(&mesh);
 	gmds::VTKWriter writer(&ioService);
 	writer.setCellOptions(gmds::N|gmds::F);

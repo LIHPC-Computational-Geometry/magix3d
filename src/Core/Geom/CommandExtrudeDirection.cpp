@@ -1,21 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandExtrudeDirection.cpp
- *
- *  Created on: 8/11/2019
- *      Author: Eric B
- *      à partir de CommandRevolution, renommé depuis en CommandExtrudeRevolution
- *
- *
- *
- *  Modified on: 21/02/2022
- *      Author: Simon C
- *      ajout de la possibilité de conserver les entités extrudées et correction du bug de perte de relations
- *      géométriques avec les entités créées
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
-/*----------------------------------------------------------------------------*/
 #include "Geom/CommandExtrudeDirection.h"
 #include "Geom/GeomManager.h"
 #include "Geom/GeomExtrudeImplementation.h"
@@ -24,10 +7,6 @@
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
 #include "Group/Group3D.h"
-#include "Group/Group2D.h"
-#include "Group/Group1D.h"
-#include "Group/Group0D.h"
-#include "Group/GroupManager.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/ReferencedMutex.h>

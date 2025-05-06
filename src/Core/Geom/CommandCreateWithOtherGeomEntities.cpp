@@ -1,12 +1,6 @@
-/*
- * CommandCreateWithOtherGeomEntities.cpp
- *
- *  Created on: 29/08/2018
- *      Author: Eric Brière de l'Isle
- */
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
 #include "Utils/Common.h"
+#include "Internal/ContextIfc.h"
 #include "Internal/InfoCommand.h"
 #include "Internal/Context.h"
 #include "Geom/CommandCreateWithOtherGeomEntities.h"
@@ -15,10 +9,7 @@
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-#include <TkUtil/Exception.h>
 #include <TkUtil/ReferencedMutex.h>
-#include <TkUtil/MemoryError.h>
-
 /*----------------------------------------------------------------------------*/
 using namespace TkUtil;
 using namespace Mgx3D::Utils;

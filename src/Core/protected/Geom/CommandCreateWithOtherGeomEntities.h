@@ -1,21 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/*
- * CommandCreateWithOtherGeomEntities.h
- *
- *  Created on: 29/08/2018
- *      Author: Eric Brière de l'Isle
- *
- *      Se base sur CommandEditGeom pour la gestion des mementos,
- *      mais sans lien avec GeomModificationBaseClass
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDCREATEWITHOTHERGEOMENTITIES_H_
 #define COMMANDCREATEWITHOTHERGEOMENTITIES_H_
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandCreateGeom.h"
 #include "Geom/MementoManager.h"
-/*----------------------------------------------------------------------------*/
-#include <vector>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

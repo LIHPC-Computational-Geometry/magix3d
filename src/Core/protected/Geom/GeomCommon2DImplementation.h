@@ -1,16 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/*
- * GeomCommon2DImplementation.h
- *
- *  \author Eric B
- *
- *  \date 7/9/2018
- */
-/*----------------------------------------------------------------------------*/
 #ifndef GEOMCOMMON2DIMPLEMENTATION_H_
 #define GEOMCOMMON2DIMPLEMENTATION_H_
 /*----------------------------------------------------------------------------*/
-#include "Utils/Vector.h"
 #include "Geom/GeomModificationBaseClass.h"
 #include "Geom/GeomEntity.h"
 #include "Internal/Context.h"

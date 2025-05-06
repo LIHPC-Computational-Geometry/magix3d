@@ -1,3 +1,4 @@
+/*----------------------------------------------------------------------------*/
 #include "Geom/OCCHelper.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/MgxException.h"

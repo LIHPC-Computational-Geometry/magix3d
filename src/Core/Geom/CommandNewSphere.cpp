@@ -1,21 +1,12 @@
 /*----------------------------------------------------------------------------*/
-/*
- * CommandNewSphere.cpp
- *
- *  Created on: 23 mars 2012
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
-#include "Geom/CommandNewSphere.h"
 #include "Geom/PropertySphere.h"
+#include "Geom/CommandNewSphere.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomManager.h"
-#include "Utils/MgxException.h"
 #include "Utils/MgxNumeric.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-#include <cmath>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

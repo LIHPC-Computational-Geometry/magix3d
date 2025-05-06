@@ -1,17 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/*
- * CommandJoinSurfaces.cpp
- *
- *  Created on: 10 mars 2014
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
-#include "Utils/Common.h"
 #include "Geom/CommandJoinSurfaces.h"
 #include "Group/Group2D.h"
 /*----------------------------------------------------------------------------*/
