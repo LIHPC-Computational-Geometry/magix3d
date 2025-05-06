@@ -1,14 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandSewing.cpp
- *
- *  \author Franck Ledoux
- *
- *  \date 01/12/2011
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
-/*----------------------------------------------------------------------------*/
 #include "Geom/CommandGluing.h"
 #include "Geom/GeomManager.h"
 #include "Geom/GeomGluingImplementation.h"
@@ -23,7 +13,6 @@ namespace Mgx3D {
 namespace Geom {
 
 class GeomVertex;
-//class Curve;
 class Surface;
 class Volume;
 /*----------------------------------------------------------------------------*/

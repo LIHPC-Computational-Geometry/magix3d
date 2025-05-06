@@ -1,16 +1,7 @@
-/*----------------------------------------------------------------------------*/
-/*
- * CommandExportMLI.h
- *
- *  Created on: 30 sep. 2016
- *      Author: legoff
- */
-/*----------------------------------------------------------------------------*/
 #ifndef MGX3D_GEOM_COMMANDEXPORTMLI_H_
 #define MGX3D_GEOM_COMMANDEXPORTMLI_H_
 /*----------------------------------------------------------------------------*/
 #include "Internal/CommandInternal.h"
-#include "Utils/Vector.h"
 #include "Geom/GeomEntity.h"
 #include "Internal/Context.h"
 #include "Geom/ExportMLIImplementation.h"

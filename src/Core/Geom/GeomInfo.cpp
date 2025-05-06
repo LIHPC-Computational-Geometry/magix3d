@@ -1,12 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/*
- * GeomInfo.cpp
- *
- *  Created on: 12 avr. 2012
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
 #include "Geom/GeomInfo.h"
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"

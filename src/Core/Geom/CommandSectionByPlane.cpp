@@ -1,15 +1,6 @@
-/*
- * CommandSectionByPlane.cpp
- *
- *  Created on: 24 june 2013
- *      Author: ledouxf
- */
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
 #include "Utils/Common.h"
-/*----------------------------------------------------------------------------*/
 #include "Geom/CommandSectionByPlane.h"
-#include "Geom/GeomManager.h"
 #include "Geom/GeomSectionByPlaneImplementation.h"
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
@@ -23,7 +14,6 @@
 #include <TkUtil/Exception.h>
 #include <TkUtil/ReferencedMutex.h>
 #include <TkUtil/MemoryError.h>
-#include <TkUtil/TraceLog.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

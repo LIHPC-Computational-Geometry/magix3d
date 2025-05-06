@@ -1,15 +1,8 @@
-/*
- * CommandNewVertexByCurveParameterization.cpp
- *
- *  Created on: 18 juin 2013
- *      Author: ledouxf
- */
-
-#include "Geom/CommandNewVertexByCurveParameterization.h"
+/*----------------------------------------------------------------------------*/
 #include "Geom/GeomProperty.h"
+#include "Geom/CommandNewVertexByCurveParameterization.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomManager.h"
-#include "Utils/MgxException.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>

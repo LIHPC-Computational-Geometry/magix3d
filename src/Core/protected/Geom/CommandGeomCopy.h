@@ -1,16 +1,7 @@
-/*
- * CommandGeomCopy.h
- *
- *  Created on: 19 juin 2013
- *      Author: ledouxf
- */
-
 #ifndef COMMANDGEOMCOPY_H_
 #define COMMANDGEOMCOPY_H_
-
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandEditGeom.h"
-#include "Utils/Point.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

@@ -1,16 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandExtrusion.cpp
- *
- *  Created on: 8/11/2019
- *      Author: Eric B
- *     à partir de CommandRevolution, renommé depuis en CommandExtrudeRevolution
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
-/*----------------------------------------------------------------------------*/
 #include "Geom/CommandExtrusion.h"
-#include "Geom/GeomManager.h"
 #include "Geom/GeomExtrudeImplementation.h"
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
@@ -22,8 +11,6 @@
 #include "Group/Group0D.h"
 #include "Group/GroupManager.h"
 /*----------------------------------------------------------------------------*/
-#include <TkUtil/Exception.h>
-#include <TkUtil/ReferencedMutex.h>
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

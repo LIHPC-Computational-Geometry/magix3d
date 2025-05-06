@@ -1,20 +1,9 @@
-/*----------------------------------------------------------------------------*/
-/*
- * GeomRemoveImplementation.h
- *
- *  Created on: 10 janv. 2014
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #ifndef GEOMREMOVEIMPLEMENTATION_H_
 #define GEOMREMOVEIMPLEMENTATION_H_
 /*----------------------------------------------------------------------------*/
-#include "Utils/Vector.h"
-#include "Geom/GeomModificationBaseClass.h"
 #include "Geom/GeomEntity.h"
+#include "Geom/GeomModificationBaseClass.h"
 #include "Internal/Context.h"
-/*----------------------------------------------------------------------------*/
-#include <TopoDS_Shape.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

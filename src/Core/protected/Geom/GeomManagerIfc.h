@@ -1,17 +1,3 @@
-/*----------------------------------------------------------------------------*/
-/** \file GeomManagerIfc.h
- *
- *  \author Franck Ledoux, Eric Brière de l'Isle, Charles Pignerol
- *
- *  \date 01/02/2012
- *
- *
- *
- *  Modified on: 21/02/2022
- *      Author: Simon C
- *      ajout de la possibilité de conserver les entités pour la fonction makeExtrude
- */
-/*----------------------------------------------------------------------------*/
 #ifndef MGX3D_GEOM_GEOMMANAGERIFC_H_
 #define MGX3D_GEOM_GEOMMANAGERIFC_H_
 /*----------------------------------------------------------------------------*/
@@ -20,11 +6,10 @@
 /*----------------------------------------------------------------------------*/
 #include "Internal/CommandCreator.h"
 #include "Internal/M3DCommandResultIfc.h"
-#include "Utils/Constants.h"
 #include "Geom/GeomInfo.h"
+#include "Utils/Constants.h"
 #include "Utils/Vector.h"
 #include "Utils/SwigCompletion.h"
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

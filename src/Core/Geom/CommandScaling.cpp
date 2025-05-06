@@ -1,12 +1,3 @@
-/*
- * CommandScaling.cpp
- *
- *  Created on: 19 juin 2013
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandScaling.h"
 #include "Geom/GeomManager.h"

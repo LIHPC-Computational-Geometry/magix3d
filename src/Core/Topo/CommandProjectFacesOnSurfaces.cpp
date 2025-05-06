@@ -1,26 +1,15 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandProjectFacesOnSurfaces.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 6/11/2014
- */
-/*----------------------------------------------------------------------------*/
-#include "Topo/CommandProjectFacesOnSurfaces.h"
 #include "Geom/EntityFactory.h"
+#include "Geom/Curve.h"
+#include "Geom/Surface.h"
+#include "Topo/CommandProjectFacesOnSurfaces.h"
 #include "Topo/TopoManager.h"
-#include "Topo/CoEdge.h"
 #include "Topo/FaceMeshingPropertyTransfinite.h"
-
-#include "Utils/Common.h"
 #include "Internal/Context.h"
 #include "Internal/EntitiesHelper.h"
-#include "Geom/Curve.h"
-
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 #include <set>
 /*----------------------------------------------------------------------------*/

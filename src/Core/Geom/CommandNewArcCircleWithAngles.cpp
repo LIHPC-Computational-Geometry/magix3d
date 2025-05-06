@@ -1,22 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/*
- * CommandNewArcCircleWithAngles.cpp
- *
- *  Created on: 29/9/2020
- *      Author: Eric B
- */
-/*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
 #include "Geom/CommandNewArcCircleWithAngles.h"
-#include "Geom/PropertyBox.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomManager.h"
-#include "Utils/MgxException.h"
-
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

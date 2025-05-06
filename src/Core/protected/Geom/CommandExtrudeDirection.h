@@ -1,22 +1,5 @@
-/*----------------------------------------------------------------------------*/
-/*
- * CommandExtrudeDirection.h
- *
- *  Created on: 8/11/2019
- *      Author: Eric B
- *      à partir de CommandRevolution, renommé depuis en CommandExtrudeRevolution
- *
- *
- *
- *  Modified on: 21/02/2022
- *      Author: Simon C
- *      ajout de la possibilité de conserver les entités extrudées
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDEXTRUDEDIRECTION_H_
 #define COMMANDEXTRUDEDIRECTION_H_
-/*----------------------------------------------------------------------------*/
-#include <map>
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandExtrusion.h"
 #include "Geom/GeomEntity.h"
@@ -25,6 +8,8 @@
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
+/*----------------------------------------------------------------------------*/
+class GeomExtrudeImplementation;
 /*----------------------------------------------------------------------------*/
 class CommandExtrudeDirection: public CommandExtrusion {
 
