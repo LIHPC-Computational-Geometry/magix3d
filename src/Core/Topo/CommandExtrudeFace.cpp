@@ -19,6 +19,7 @@
 
 
 #include "Group/Group2D.h"
+#include "Group/Group3D.h"
 
 //#define _DEBUG_MESH_LAW
 /*----------------------------------------------------------------------------*/
@@ -508,8 +509,14 @@ namespace Mgx3D {
                 } // end for i<coface_0->getNbEdges()
 
                 Block* newBlock = new Topo::Block(getContext(), faces, vertices, true);
+
+                Group::Group3D *group = getContext().getLocalGroupManager().getNewGroup3D(getContext().getLocalGroupManager().getDefaultName(3),
+                                                                                          &getInfoCommand());
+                group->add(newBlock);
+                newBlock->getGroupsContainer().add(group);
+                getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
+
                 getInfoCommand().addTopoInfoEntity(newBlock, Internal::InfoCommand::CREATED);
-                //updateGeomAssociation(coface_0->getGeomAssociation(), newBlock);
 #ifdef _DEBUG2
                 std::cout<<"\nCréation du bloc : "<<*newBlock;
         //newBlock->check();
