@@ -7,12 +7,8 @@
  *  \date 18/10/2012
  */
 /*----------------------------------------------------------------------------*/
-// pythonerie à mettre au début (pour permettre ifndef Py_PYTHON_H dans GroupManagerIfc.h)
-#include <Python.h>
-/*----------------------------------------------------------------------------*/
-#include <iostream>
+// pythonerie à mettre au début (pour permettre ifndef Py_PYTHON_H dans GroupManager.h)
 #include <set>
-#include <vector>
 /*----------------------------------------------------------------------------*/
 #include "Group/GroupManager.h"
 #include "Group/GroupEntity.h"
@@ -55,7 +51,6 @@
 #include "Mesh/Line.h"
 #include "Mesh/Cloud.h"
 #include "Mesh/MeshModificationByPythonFunction.h"
-#include "Mesh/CommandAddRemoveGroupName.h"
 #include "Mesh/MeshModificationBySepa.h"
 #include "Mesh/MeshModificationByProjectionOnP0.h"
 #include "Mesh/CommandClearGroupName.h"
@@ -66,15 +61,13 @@
 #include "Smoothing/VolumicSmoothing.h"
 
 #include <TkUtil/Exception.h>
-#include <TkUtil/TraceLog.h>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Group {
 /*----------------------------------------------------------------------------*/
 GroupManager::GroupManager(const std::string& name, Internal::ContextIfc* c)
-:Group::GroupManagerIfc(name, c)
+:Internal::CommandCreator(name, c)
 , m_visibilityMask(Utils::FilterEntity::NoneEntity)
 {
 }

@@ -50,14 +50,14 @@ CommandReadMLI::~CommandReadMLI()
         Mesh::SubVolume* sv = dynamic_cast<Mesh::SubVolume*>(me);
         Mesh::SubSurface* ss = dynamic_cast<Mesh::SubSurface*>(me);
         if (sv){
-        	Group::Group3D* gr = getContext().getLocalGroupManager().getGroup3D(sv->getName(), true);
+        	Group::Group3D* gr = getContext().getGroupManager().getGroup3D(sv->getName(), true);
         	gr->remove(sv);
         	getContext().getMeshManager().remove(sv);
         	sv->clear();
         	delete sv;
         }
         else if (ss){
-        	Group::Group2D* gr = getContext().getLocalGroupManager().getGroup2D(ss->getName(), true);
+        	Group::Group2D* gr = getContext().getGroupManager().getGroup2D(ss->getName(), true);
         	gr->remove(ss);
         	getContext().getMeshManager().remove(ss);
         	ss->clear();
@@ -111,7 +111,7 @@ void CommandReadMLI::internalExecute()
 
         getContext().newGraphicalRepresentation (*sv);
 
-        Group::Group3D* gr = getContext().getLocalGroupManager().getNewGroup3D(nomGr, &getInfoCommand());
+        Group::Group3D* gr = getContext().getGroupManager().getNewGroup3D(nomGr, &getInfoCommand());
 
         if (!gr->empty()){
 			TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
@@ -152,7 +152,7 @@ void CommandReadMLI::internalExecute()
 
         getContext().newGraphicalRepresentation (*ss);
 
-        Group::Group2D* gr = getContext().getLocalGroupManager().getNewGroup2D(nomGr, &getInfoCommand());
+        Group::Group2D* gr = getContext().getGroupManager().getNewGroup2D(nomGr, &getInfoCommand());
 
         if (!gr->empty()){
 			TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);

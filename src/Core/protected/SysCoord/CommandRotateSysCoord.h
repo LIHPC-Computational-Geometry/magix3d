@@ -65,7 +65,7 @@ private:
     CommandDuplicateSysCoord* m_command;
 
     /// objet définissant la rotation
-    Rotation m_rotation;
+    Utils::Math::Rotation m_rotation;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace CoordinateSystem

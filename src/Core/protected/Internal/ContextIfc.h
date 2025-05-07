@@ -10,7 +10,7 @@
 #define CONTEXT_IFC_H_
 /*----------------------------------------------------------------------------*/
 
-#include "Group/GroupManagerIfc.h"
+#include "Group/GroupManager.h"
 #include "Utils/SelectionManagerIfc.h"
 #include "Utils/Landmark.h"
 #include "Utils/Unit.h"
@@ -19,7 +19,7 @@
 #include "Topo/TopoManager.h"
 #include "Mesh/MeshManager.h"
 #include "Structured/StructuredMeshManager.h"
-#include "SysCoord/SysCoordManagerIfc.h"
+#include "SysCoord/SysCoordManager.h"
 #include "Internal/NameManager.h"
 #include "Internal/ScriptingManager.h"
 #include "Internal/M3DCommandResultIfc.h"
@@ -151,15 +151,15 @@ public:
     /** \brief  Accesseur sur le manager de groupes
      * \exception   Une exception est levée en l'absence de manager associé.
      */
-    virtual Mgx3D::Group::GroupManagerIfc& getGroupManager();
-    virtual const Mgx3D::Group::GroupManagerIfc& getGroupManager() const;
+    virtual Mgx3D::Group::GroupManager& getGroupManager();
+    virtual const Mgx3D::Group::GroupManager& getGroupManager() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Accesseur sur le manager de repères
      * \exception   Une exception est levée en l'absence de manager associé.
      */
-    virtual Mgx3D::CoordinateSystem::SysCoordManagerIfc& getSysCoordManager();
-    virtual const Mgx3D::CoordinateSystem::SysCoordManagerIfc& getSysCoordManager() const;
+    virtual Mgx3D::CoordinateSystem::SysCoordManager& getSysCoordManager();
+    virtual const Mgx3D::CoordinateSystem::SysCoordManager& getSysCoordManager() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Accesseur sur le manager de maillages structurés

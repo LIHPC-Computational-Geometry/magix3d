@@ -10,7 +10,7 @@
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include "SysCoord/CommandNewSysCoord.h"
-#include "SysCoord/SysCoordManagerIfc.h"
+#include "SysCoord/SysCoordManager.h"
 #include "SysCoord/SysCoordDisplayRepresentation.h"
 #include "QtComponents/QtSysCoordOperationAction.h"
 #include <QtUtil/QtErrorManagement.h>

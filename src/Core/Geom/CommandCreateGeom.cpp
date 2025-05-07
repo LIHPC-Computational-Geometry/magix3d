@@ -293,7 +293,7 @@ addToGroup(GeomEntity* e, bool use_default_name)
 void CommandCreateGeom::
 addToGroup(Volume* v, bool use_default_name)
 {
-    Group::Group3D* group = getContext().getLocalGroupManager().getNewGroup3D(use_default_name?"":m_group_name, &getInfoCommand());
+    Group::Group3D* group = getContext().getGroupManager().getNewGroup3D(use_default_name?"":m_group_name, &getInfoCommand());
     v->add(group);
     group->add(v);
     getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
@@ -302,7 +302,7 @@ addToGroup(Volume* v, bool use_default_name)
 void CommandCreateGeom::
 addToGroup(Surface* s, bool use_default_name)
 {
-    Group::Group2D* group = getContext().getLocalGroupManager().getNewGroup2D(use_default_name?"":m_group_name, &getInfoCommand());
+    Group::Group2D* group = getContext().getGroupManager().getNewGroup2D(use_default_name?"":m_group_name, &getInfoCommand());
     s->add(group);
     group->add(s);
     getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
@@ -311,7 +311,7 @@ addToGroup(Surface* s, bool use_default_name)
 void CommandCreateGeom::
 addToGroup(Curve* c, bool use_default_name)
 {
-    Group::Group1D* group = getContext().getLocalGroupManager().getNewGroup1D(use_default_name?"":m_group_name, &getInfoCommand());
+    Group::Group1D* group = getContext().getGroupManager().getNewGroup1D(use_default_name?"":m_group_name, &getInfoCommand());
     c->add(group);
     group->add(c);
     getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
@@ -320,7 +320,7 @@ addToGroup(Curve* c, bool use_default_name)
 void CommandCreateGeom::
 addToGroup(Vertex* v, bool use_default_name)
 {
-    Group::Group0D* group = getContext().getLocalGroupManager().getNewGroup0D(use_default_name?"":m_group_name, &getInfoCommand());
+    Group::Group0D* group = getContext().getGroupManager().getNewGroup0D(use_default_name?"":m_group_name, &getInfoCommand());
     v->add(group);
     group->add(v);
     getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);

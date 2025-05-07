@@ -59,9 +59,9 @@ using std::ptrdiff_t;
 
 #include "Mesh/MeshModificationBySepa.h"
 
-#include "Group/GroupManagerIfc.h"
+#include "Group/GroupManager.h"
 
-#include "SysCoord/SysCoordManagerIfc.h"
+#include "SysCoord/SysCoordManager.h"
 
 #include "Structured/StructuredMeshManager.h"
 
@@ -338,9 +338,9 @@ using std::ptrdiff_t;
 
 %include Mesh/MeshModificationBySepa.h
 
-%include Group/GroupManagerIfc.h
+%include Group/GroupManager.h
 
-%include SysCoord/SysCoordManagerIfc.h
+%include SysCoord/SysCoordManager.h
 
 %include Structured/StructuredMeshManager.h
 
