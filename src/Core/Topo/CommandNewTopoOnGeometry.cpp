@@ -202,7 +202,7 @@ internalExecute()
 			CoFace* cf = new CoFace(getContext());
 			addCreatedCoFace(cf);
 			if (!m_groupName.empty()){
-		    	Group::Group2D* grp = getContext().getLocalGroupManager().getNewGroup2D(m_groupName, &getInfoCommand());
+		    	Group::Group2D* grp = getContext().getGroupManager().getNewGroup2D(m_groupName, &getInfoCommand());
 				grp->add(cf);
 				cf->getGroupsContainer().add(grp);
 			}
@@ -248,7 +248,7 @@ internalExecute()
 			Block* bl = new Block(getContext(), 0,0,0);
 			addCreatedBlock(bl);
 			if (!m_groupName.empty()){
-		    	Group::Group3D* grp = getContext().getLocalGroupManager().getNewGroup3D(m_groupName, &getInfoCommand());
+		    	Group::Group3D* grp = getContext().getGroupManager().getNewGroup3D(m_groupName, &getInfoCommand());
 				grp->add(bl);
 				bl->getGroupsContainer().add(grp);
 			}

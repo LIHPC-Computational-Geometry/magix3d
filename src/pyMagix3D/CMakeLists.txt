@@ -173,7 +173,7 @@ if (Doxygen_FOUND)
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Smoothing/SurfacicSmoothing.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Smoothing/VolumicSmoothing.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Mesh/MeshModificationBySepa.h 
-                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Group/GroupManagerIfc.h
+                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Group/GroupManager.h
 	)
 	set (DOXYGEN_RECURSIVE YES)
 	set (DOXYGEN_IMAGE_PATH ../Doc/Images)

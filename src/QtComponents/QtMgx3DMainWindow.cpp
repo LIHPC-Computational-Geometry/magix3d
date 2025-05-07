@@ -3937,7 +3937,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 		}   // QtMgx3DMainWindow::getMeshManager
 
 
-		Group::GroupManagerIfc &QtMgx3DMainWindow::getGroupManager()
+		Group::GroupManager &QtMgx3DMainWindow::getGroupManager()
 		{
 			return getContext().getGroupManager();
 		}   // QtMgx3DMainWindow::getGroupManager

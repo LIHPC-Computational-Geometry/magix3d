@@ -819,45 +819,38 @@ void Context::setMeshManager (Mgx3D::Mesh::MeshManager* manager)
 }
 
 /*----------------------------------------------------------------------------*/
-Mgx3D::Group::GroupManagerIfc& Context::getGroupManager ( )
+Mgx3D::Group::GroupManager& Context::getGroupManager ( )
 {
     CHECK_NULL_PTR_ERROR (m_group_manager)
     return *m_group_manager;
 }
 /*----------------------------------------------------------------------------*/
-const Mgx3D::Group::GroupManagerIfc& Context::getGroupManager ( ) const
+const Mgx3D::Group::GroupManager& Context::getGroupManager ( ) const
 {
     CHECK_NULL_PTR_ERROR (m_group_manager)
     return *m_group_manager;
 }
 /*----------------------------------------------------------------------------*/
-void Context::setGroupManager (Mgx3D::Group::GroupManagerIfc* manager)
+void Context::setGroupManager (Mgx3D::Group::GroupManager* manager)
 {
     delete m_group_manager;
     m_group_manager  = manager;
 }
-/*----------------------------------------------------------------------------*/
-Mgx3D::Group::GroupManager& Context::getLocalGroupManager ( )
-{
-    Group::GroupManager*  manager = dynamic_cast<Group::GroupManager*>(m_group_manager);
-    CHECK_NULL_PTR_ERROR (manager)
-    return *manager;
-}
 
 /*----------------------------------------------------------------------------*/
-Mgx3D::CoordinateSystem::SysCoordManagerIfc& Context::getSysCoordManager()
+Mgx3D::CoordinateSystem::SysCoordManager& Context::getSysCoordManager()
 {
     CHECK_NULL_PTR_ERROR (m_sys_coord_manager)
     return *m_sys_coord_manager;
 }
 /*----------------------------------------------------------------------------*/
-const Mgx3D::CoordinateSystem::SysCoordManagerIfc& Context::getSysCoordManager() const
+const Mgx3D::CoordinateSystem::SysCoordManager& Context::getSysCoordManager() const
 {
     CHECK_NULL_PTR_ERROR (m_sys_coord_manager)
     return *m_sys_coord_manager;
 }
 /*----------------------------------------------------------------------------*/
-void Context::setSysCoordManager (Mgx3D::CoordinateSystem::SysCoordManagerIfc* mgr)
+void Context::setSysCoordManager (Mgx3D::CoordinateSystem::SysCoordManager* mgr)
 {
     delete m_sys_coord_manager;
     m_sys_coord_manager  = mgr;
