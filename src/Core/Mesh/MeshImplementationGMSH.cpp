@@ -281,14 +281,14 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
         std::string& nom = group_names[i];
 
         try {
-            getContext().getLocalMeshManager().getSurface(nom);
+            getContext().getMeshManager().getSurface(nom);
             command->addModifiedSurface(nom);
         } catch (...) {
             command->addNewSurface(nom);
         }
 
         // la surface de maillage que l'on vient de créer/modifier
-        Mesh::Surface* sf = getContext().getLocalMeshManager().getSurface(nom);
+        Mesh::Surface* sf = getContext().getMeshManager().getSurface(nom);
         sf->saveMeshSurfaceTopoProperty(&command->getInfoCommand());
         sf->addCoFace(fa);
     } // end for i<group_names.size()

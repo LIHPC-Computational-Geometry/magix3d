@@ -45,7 +45,7 @@ namespace Mgx3D {
 
             gmds::Mesh mesh(gmds::MeshModel(gmds::DIM3 | gmds::N | gmds::R | gmds::R2N | gmds::N2R));
 
-            gmds::Mesh localMesh = m_context.getLocalMeshManager().getMesh()->getGMDSMesh();
+            gmds::Mesh localMesh = m_context.getMeshManager().getMesh()->getGMDSMesh();
 
 
             for(int iVertex = 0; iVertex < localMesh.getNbNodes(); iVertex++){

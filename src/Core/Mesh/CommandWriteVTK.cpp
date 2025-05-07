@@ -26,7 +26,7 @@ CommandWriteVTK::CommandWriteVTK(Internal::Context& c, std::string& nom)
 /*----------------------------------------------------------------------------*/
 void CommandWriteVTK::internalExecute()
 {
-	getContext().getLocalMeshManager().getMesh()->writeVTK(m_file_name);
+	getContext().getMeshManager().getMesh()->writeVTK(m_file_name);
 }
 /*----------------------------------------------------------------------------*/
 void CommandWriteVTK::internalUndo()

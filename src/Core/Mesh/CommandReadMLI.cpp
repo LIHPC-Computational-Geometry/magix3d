@@ -52,20 +52,20 @@ CommandReadMLI::~CommandReadMLI()
         if (sv){
         	Group::Group3D* gr = getContext().getLocalGroupManager().getGroup3D(sv->getName(), true);
         	gr->remove(sv);
-        	getContext().getLocalMeshManager().remove(sv);
+        	getContext().getMeshManager().remove(sv);
         	sv->clear();
         	delete sv;
         }
         else if (ss){
         	Group::Group2D* gr = getContext().getLocalGroupManager().getGroup2D(ss->getName(), true);
         	gr->remove(ss);
-        	getContext().getLocalMeshManager().remove(ss);
+        	getContext().getMeshManager().remove(ss);
         	ss->clear();
         	delete ss;
         }
     }
 
-	MeshImplementation* mesh = dynamic_cast<MeshImplementation*>(getContext().getLocalMeshManager().getMesh());
+	MeshImplementation* mesh = dynamic_cast<MeshImplementation*>(getContext().getMeshManager().getMesh());
 	if (mesh == 0)
 		std::cerr<<"Erreur interne dans CommandReadMLI::~CommandReadMLI, mesh == 0"<<std::endl;
 	else
@@ -77,7 +77,7 @@ void CommandReadMLI::internalExecute()
 #ifdef _DEBUG_READ
 	std::cout<<"CommandReadMLI pour "<<m_file_name<<", "<<m_prefix<<std::endl;
 #endif
-	MeshImplementation* mesh = dynamic_cast<MeshImplementation*>(getContext().getLocalMeshManager().getMesh());
+	MeshImplementation* mesh = dynamic_cast<MeshImplementation*>(getContext().getMeshManager().getMesh());
 	if (mesh == 0)
 		throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne dans CommandReadMLI::internalExecute, mesh == 0", TkUtil::Charset::UTF_8));
 
@@ -120,7 +120,7 @@ void CommandReadMLI::internalExecute()
         }
         gr->add(sv);
 
-        getContext().getLocalMeshManager().add(sv);
+        getContext().getMeshManager().add(sv);
 
 	} // end for iter
 
@@ -161,7 +161,7 @@ void CommandReadMLI::internalExecute()
         }
         gr->add(ss);
 
-        getContext().getLocalMeshManager().add(ss);
+        getContext().getMeshManager().add(ss);
 
 	} // end for iter
 }

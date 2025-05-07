@@ -152,7 +152,7 @@ internalExecute()
 
     // effectue le maillage des faces communes
     // en forçant la visibilité des mailles hors groupes (en les mettant dans Hors Groupe 2D)
-    getContext().getLocalMeshManager().setCoFaceAllwaysInGroups(true);
+    getContext().getMeshManager().setCoFaceAllwaysInGroups(true);
 
 	setStepProgression (1.);
 	setStep (++step, "Pré-maillage des faces", 0.);
@@ -171,7 +171,7 @@ internalExecute()
     	setProgression(nbFaits/nb_faces);
     }
 	setStepProgression (1.);
-    getContext().getLocalMeshManager().setCoFaceAllwaysInGroups(false);
+    getContext().getMeshManager().setCoFaceAllwaysInGroups(false);
 
     // on parcours les entités modifiées pour sauvegarder leur état d'avant la commande
     saveInternalsStats();

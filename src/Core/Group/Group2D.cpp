@@ -253,7 +253,7 @@ getDescription (bool alsoComputed) const
     }
 
     // recherche du Mesh::Surface associé (suivant le nom)
-    Mesh::Surface* msurf = getContext().getLocalMeshManager().getSurface(getName(), false);
+    Mesh::Surface* msurf = getContext().getMeshManager().getSurface(getName(), false);
     if (msurf){
         Utils::SerializedRepresentation surfaces ("Surface maillage", std::string("1"));
         surfaces.addProperty (

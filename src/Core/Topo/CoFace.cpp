@@ -21,7 +21,7 @@
 #include "Topo/FaceMeshingPropertyDelaunayGMSH.h"
 
 #include "Mesh/CommandCreateMesh.h"
-#include "Mesh/MeshManagerIfc.h"
+#include "Mesh/MeshManager.h"
 #include "Mesh/MeshItf.h"
 
 #include "Utils/Common.h"

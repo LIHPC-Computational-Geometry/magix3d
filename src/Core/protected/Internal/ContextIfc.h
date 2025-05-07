@@ -17,8 +17,8 @@
 #include "Utils/SwigCompletion.h"
 #include "Geom/GeomManager.h"
 #include "Topo/TopoManager.h"
-#include "Mesh/MeshManagerIfc.h"
-#include "Structured/StructuredMeshManagerIfc.h"
+#include "Mesh/MeshManager.h"
+#include "Structured/StructuredMeshManager.h"
 #include "SysCoord/SysCoordManagerIfc.h"
 #include "Internal/NameManager.h"
 #include "Internal/ScriptingManager.h"
@@ -144,8 +144,8 @@ public:
     /** \brief  Accesseur sur le manager de maillage
 	 * \exception	Une exception est levée en l'absence de manager associé.
      */
-    virtual Mgx3D::Mesh::MeshManagerIfc& getMeshManager();
-    virtual const Mgx3D::Mesh::MeshManagerIfc& getMeshManager() const;
+    virtual Mgx3D::Mesh::MeshManager& getMeshManager();
+    virtual const Mgx3D::Mesh::MeshManager& getMeshManager() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Accesseur sur le manager de groupes
@@ -165,8 +165,8 @@ public:
     /** \brief  Accesseur sur le manager de maillages structurés
      * \exception   Une exception est levée en l'absence de manager associé.
      */
-    virtual Mgx3D::Structured::StructuredMeshManagerIfc& getStructuredMeshManager();
-    virtual const Mgx3D::Structured::StructuredMeshManagerIfc& getStructuredMeshManager() const;
+    virtual Mgx3D::Structured::StructuredMeshManager& getStructuredMeshManager();
+    virtual const Mgx3D::Structured::StructuredMeshManager& getStructuredMeshManager() const;
 
     /*------------------------------------------------------------------------*/
     /**

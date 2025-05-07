@@ -21,7 +21,6 @@ namespace Structured
 /**
  * \class	CommandReleaseStructuredData
  * \brief	Libération des données structurées.
- * \see		CommandLoadHICStructuredData
  */
 class CommandReleaseStructuredData : public Mgx3D::Internal::CommandInternal
 {

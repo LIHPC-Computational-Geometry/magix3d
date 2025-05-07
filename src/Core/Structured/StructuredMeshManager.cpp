@@ -28,13 +28,14 @@ namespace Structured
 
 
 StructuredMeshManager::StructuredMeshManager (const string& name, Mgx3D::Internal::ContextIfc* c)
-	: StructuredMeshManagerIfc (name, c), _meshes ( )
+: CommandCreator (name, c)
+, _meshes ( )
 {
-}	// StructuredMeshManagerIfc::StructuredMeshManager
+}	// StructuredMeshManager::StructuredMeshManager
 
 
 StructuredMeshManager::StructuredMeshManager (const StructuredMeshManager& mm)
-	: StructuredMeshManagerIfc ("Invalid StructuredMeshManager", 0), _meshes ( )
+	: CommandCreator (mm), _meshes ( )
 {
 	MGX_FORBIDDEN ("StructuredMeshManager copy constructor is not allowed.")
 }	// StructuredMeshManager::StructuredMeshManager

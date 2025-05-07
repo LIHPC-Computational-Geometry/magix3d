@@ -165,10 +165,9 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  Accesseur sur le manager de maillage
      */
-    virtual Mgx3D::Mesh::MeshManagerIfc& getMeshManager();
-    virtual const Mgx3D::Mesh::MeshManagerIfc& getMeshManager() const;
-	virtual void setMeshManager (Mgx3D::Mesh::MeshManagerIfc* mgr);
-    virtual Mgx3D::Mesh::MeshManager& getLocalMeshManager();
+    virtual Mgx3D::Mesh::MeshManager& getMeshManager();
+    virtual const Mgx3D::Mesh::MeshManager& getMeshManager() const;
+	virtual void setMeshManager (Mgx3D::Mesh::MeshManager* mgr);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Accesseur sur le manager de groupes
@@ -189,9 +188,9 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  Accesseur sur le manager de maillages structurés
      */
-    virtual Mgx3D::Structured::StructuredMeshManagerIfc& getStructuredMeshManager();
-    virtual const Mgx3D::Structured::StructuredMeshManagerIfc& getStructuredMeshManager() const;
-    virtual void setStructuredMeshManager (Mgx3D::Structured::StructuredMeshManagerIfc* mgr);
+    virtual Mgx3D::Structured::StructuredMeshManager& getStructuredMeshManager();
+    virtual const Mgx3D::Structured::StructuredMeshManager& getStructuredMeshManager() const;
+    virtual void setStructuredMeshManager (Mgx3D::Structured::StructuredMeshManager* mgr);
 
 
     /*------------------------------------------------------------------------*/
@@ -627,13 +626,13 @@ protected:
     /// Manager pour les commandes topologiques
     Mgx3D::Topo::TopoManager*		m_topo_manager;
     /// Manager pour le maillage
-    Mgx3D::Mesh::MeshManagerIfc*        m_mesh_manager;
+    Mgx3D::Mesh::MeshManager*        m_mesh_manager;
     /// Groupes pour les différents types d'entités
     Mgx3D::Group::GroupManagerIfc*      m_group_manager;
     /// Repères
     Mgx3D::CoordinateSystem::SysCoordManagerIfc* m_sys_coord_manager;
     /// Maillages structurés :
-    Mgx3D::Structured::StructuredMeshManagerIfc*	m_structured_mesh_manager;
+    Mgx3D::Structured::StructuredMeshManager*	m_structured_mesh_manager;
     /// Manager pour les commandes de niveau supérieur
     Mgx3D::Internal::M3DCommandManager  m_m3d_command_manager;
     /// Manager de sélection

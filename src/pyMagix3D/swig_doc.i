@@ -252,13 +252,13 @@ retourne l'unité de longueur
 
 ";
 %feature("docstring") Mgx3D::Internal::ContextIfc::getMeshManager "
-virtual Mgx3D::Mesh::MeshManagerIfc& Mgx3D::Internal::ContextIfc::getMeshManager()
+virtual Mgx3D::Mesh::MeshManager& Mgx3D::Internal::ContextIfc::getMeshManager()
 
 Accesseur sur le manager de maillage Uneexception est levée en l'absence de manager associé. 
 
 ";
 %feature("docstring") Mgx3D::Internal::ContextIfc::getMeshManager "
-virtual const Mgx3D::Mesh::MeshManagerIfc& Mgx3D::Internal::ContextIfc::getMeshManager() const 
+virtual const Mgx3D::Mesh::MeshManager& Mgx3D::Internal::ContextIfc::getMeshManager() const
 
 
 
@@ -1168,124 +1168,124 @@ virtual Mgx3D::Group::GroupManagerIfc::~GroupManagerIfc()
 Destructeur. 
 
 ";
-%feature("docstring") Mgx3D::Mesh::MeshManagerIfc " 
+%feature("docstring") Mgx3D::Mesh::MeshManager "
 Gestionnaire des opérations effectuées au niveau du module de maillage. Le gestionnaire de maillage est l'objet qui stocke un lien vers une interface avec le maillage (GMDS) pour une session donnée. 
 ";
 
-%feature("docstring") Mgx3D::Mesh::MeshManagerIfc::compareWithMesh "
-virtual bool Mgx3D::Mesh::MeshManagerIfc::compareWithMesh(std::string nom)
+%feature("docstring") Mgx3D::Mesh::MeshManager::compareWithMesh "
+virtual bool Mgx3D::Mesh::MeshManager::compareWithMesh(std::string nom)
 
 Compare le maillage actuel avec un maillage sur disque, return true si ok. 
 
 ";
-%feature("docstring") Mgx3D::Mesh::MeshManagerIfc::getInfos "
-virtual std::string Mgx3D::Mesh::MeshManagerIfc::getInfos(const std::string &name, int dim) const 
+%feature("docstring") Mgx3D::Mesh::MeshManager::getInfos "
+virtual std::string Mgx3D::Mesh::MeshManager::getInfos(const std::string &name, int dim) const
 
 
 Retourne une string avec les informations relatives à l'entité 
 
 ";
-%feature("docstring") Mgx3D::Mesh::MeshManagerIfc::getNbClouds "
-virtual int Mgx3D::Mesh::MeshManagerIfc::getNbClouds(bool onlyVisible=true) const 
+%feature("docstring") Mgx3D::Mesh::MeshManager::getNbClouds "
+virtual int Mgx3D::Mesh::MeshManager::getNbClouds(bool onlyVisible=true) const
 
 
 Retourne les Nuages Retourne les Surfaces Retourne les Volumes 
 
 ";
-%feature("docstring") Mgx3D::Mesh::MeshManagerIfc::getNbFaces "
-virtual int Mgx3D::Mesh::MeshManagerIfc::getNbFaces()
+%feature("docstring") Mgx3D::Mesh::MeshManager::getNbFaces "
+virtual int Mgx3D::Mesh::MeshManager::getNbFaces()
 
 
 
 ";
-%feature("docstring") Mgx3D::Mesh::MeshManagerIfc::getNbNodes "
-virtual int Mgx3D::Mesh::MeshManagerIfc::getNbNodes()
+%feature("docstring") Mgx3D::Mesh::MeshManager::getNbNodes "
+virtual int Mgx3D::Mesh::MeshManager::getNbNodes()
 
 
 
 ";
-%feature("docstring") Mgx3D::Mesh::MeshManagerIfc::getNbRegions "
-virtual int Mgx3D::Mesh::MeshManagerIfc::getNbRegions()
+%feature("docstring") Mgx3D::Mesh::MeshManager::getNbRegions "
+virtual int Mgx3D::Mesh::MeshManager::getNbRegions()
 
 
 
 ";
-%feature("docstring") Mgx3D::Mesh::MeshManagerIfc::getNbSurfaces "
-virtual int Mgx3D::Mesh::MeshManagerIfc::getNbSurfaces(bool onlyVisible=true) const 
+%feature("docstring") Mgx3D::Mesh::MeshManager::getNbSurfaces "
+virtual int Mgx3D::Mesh::MeshManager::getNbSurfaces(bool onlyVisible=true) const
 
 
 
 ";
-%feature("docstring") Mgx3D::Mesh::MeshManagerIfc::getNbVolumes "
-virtual int Mgx3D::Mesh::MeshManagerIfc::getNbVolumes(bool onlyVisible=true) const 
+%feature("docstring") Mgx3D::Mesh::MeshManager::getNbVolumes "
+virtual int Mgx3D::Mesh::MeshManager::getNbVolumes(bool onlyVisible=true) const
 
 
 
 ";
-%feature("docstring") Mgx3D::Mesh::MeshManagerIfc::getStrategy "
-virtual strategy Mgx3D::Mesh::MeshManagerIfc::getStrategy()
+%feature("docstring") Mgx3D::Mesh::MeshManager::getStrategy "
+virtual strategy Mgx3D::Mesh::MeshManager::getStrategy()
 
 Accesseur sur la strategie. 
 
 ";
-%feature("docstring") Mgx3D::Mesh::MeshManagerIfc::MeshManagerIfc "
-Mgx3D::Mesh::MeshManagerIfc::MeshManagerIfc(const std::string &name, Internal::ContextIfc *c)
+%feature("docstring") Mgx3D::Mesh::MeshManager::MeshManager "
+Mgx3D::Mesh::MeshManager::MeshManager(const std::string &name, Internal::ContextIfc *c)
 
 Constructeur. 
 
 c : le contexte ce qui permet d'accéder entre autre au CommandManager 
 
 ";
-%feature("docstring") Mgx3D::Mesh::MeshManagerIfc::newAllBlocksMesh "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Mesh::MeshManagerIfc::newAllBlocksMesh()
+%feature("docstring") Mgx3D::Mesh::MeshManager::newAllBlocksMesh "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Mesh::MeshManager::newAllBlocksMesh()
 
 Génère le maillage pour l'ensemble des blocs. 
 
 ";
-%feature("docstring") Mgx3D::Mesh::MeshManagerIfc::newAllFacesMesh "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Mesh::MeshManagerIfc::newAllFacesMesh()
+%feature("docstring") Mgx3D::Mesh::MeshManager::newAllFacesMesh "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Mesh::MeshManager::newAllFacesMesh()
 
 Génère le maillage pour l'ensemble des faces (communes) 
 
 ";
-%feature("docstring") Mgx3D::Mesh::MeshManagerIfc::newBlocksMesh "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Mesh::MeshManagerIfc::newBlocksMesh(std::vector< std::string > &entities)
+%feature("docstring") Mgx3D::Mesh::MeshManager::newBlocksMesh "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Mesh::MeshManager::newBlocksMesh(std::vector< std::string > &entities)
 
 Génère le maillage pour une liste de blocs. 
 
 ";
-%feature("docstring") Mgx3D::Mesh::MeshManagerIfc::newFacesMesh "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Mesh::MeshManagerIfc::newFacesMesh(std::vector< std::string > &entities)
+%feature("docstring") Mgx3D::Mesh::MeshManager::newFacesMesh "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Mesh::MeshManager::newFacesMesh(std::vector< std::string > &entities)
 
 Génère le maillage pour une liste de faces (communes) 
 
 ";
-%feature("docstring") Mgx3D::Mesh::MeshManagerIfc::setStrategy "
-virtual void Mgx3D::Mesh::MeshManagerIfc::setStrategy(const strategy &st)
+%feature("docstring") Mgx3D::Mesh::MeshManager::setStrategy "
+virtual void Mgx3D::Mesh::MeshManager::setStrategy(const strategy &st)
 
 Modificateur de strategie. 
 
 ";
-%feature("docstring") Mgx3D::Mesh::MeshManagerIfc::smooth "
-virtual void Mgx3D::Mesh::MeshManagerIfc::smooth()
+%feature("docstring") Mgx3D::Mesh::MeshManager::smooth "
+virtual void Mgx3D::Mesh::MeshManager::smooth()
 
 Lissage du maillage. 
 
 ";
-%feature("docstring") Mgx3D::Mesh::MeshManagerIfc::writeMli "
-virtual void Mgx3D::Mesh::MeshManagerIfc::writeMli(std::string nom)
+%feature("docstring") Mgx3D::Mesh::MeshManager::writeMli "
+virtual void Mgx3D::Mesh::MeshManager::writeMli(std::string nom)
 
 Sauvegarde d'un maillage au format lima (mli) 
 
 ";
-%feature("docstring") Mgx3D::Mesh::MeshManagerIfc::~MeshManagerIfc "
-virtual Mgx3D::Mesh::MeshManagerIfc::~MeshManagerIfc()
+%feature("docstring") Mgx3D::Mesh::MeshManager::~MeshManager "
+virtual Mgx3D::Mesh::MeshManager::~MeshManager()
 
 Destructeur. 
 
 ";
-%feature("docstring") Mgx3D::Mesh::MeshManagerIfc::MeshManagerIfc "
-Mgx3D::Mesh::MeshManagerIfc::MeshManagerIfc(const MeshManagerIfc &)
+%feature("docstring") Mgx3D::Mesh::MeshManager::MeshManager "
+Mgx3D::Mesh::MeshManager::MeshManager(const MeshManager &)
 
 Constructeur de copie. Interdit. 
 

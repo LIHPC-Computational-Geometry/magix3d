@@ -1,12 +1,3 @@
-/*----------------------------------------------------------------------------*/
-/*
- * \file MeshManager.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 7 nov. 2011
- */
-/*----------------------------------------------------------------------------*/
 #include "Internal/ContextIfc.h"
 #include "Internal/M3DCommandResult.h"
 #include "Utils/CommandManager.h"
@@ -24,7 +15,6 @@
 #include "Mesh/CommandExportBlocksForCGNS.h"
 #include "Mesh/SubVolume.h"
 #include "Mesh/CommandCreateSubVolumeBetweenSheets.h"
-#include "Mesh/CommandDestroyMesh.h"
 #include "Topo/Block.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
@@ -38,7 +28,7 @@ namespace Mesh {
 /*----------------------------------------------------------------------------*/
 
 MeshManager::MeshManager(const std::string& name, Internal::Context* c)
-:Mesh::MeshManagerIfc(name, c)
+: Internal::CommandCreator(name, c)
 , m_mesh_itf(new MeshImplementation(c))
 , m_strategy(MODIFIABLE)
 , m_coface_allways_in_groups(false)
