@@ -26,7 +26,7 @@ CommandWriteCGNS::CommandWriteCGNS(Internal::Context& c, std::string& nom)
 /*----------------------------------------------------------------------------*/
 void CommandWriteCGNS::internalExecute()
 {
-	getContext().getLocalMeshManager().getMesh()->writeCGNS(m_file_name);
+	getContext().getMeshManager().getMesh()->writeCGNS(m_file_name);
 }
 /*----------------------------------------------------------------------------*/
 void CommandWriteCGNS::internalUndo()

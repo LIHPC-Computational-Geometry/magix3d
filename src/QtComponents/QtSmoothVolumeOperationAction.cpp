@@ -8,7 +8,6 @@
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Mesh/MeshManagerIfc.h"
 #include "Smoothing/VolumicSmoothing.h"
 #include "Group/GroupManagerIfc.h"
 #include "QtComponents/QtSmoothVolumeOperationAction.h"

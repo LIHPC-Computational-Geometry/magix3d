@@ -37,19 +37,19 @@ void CommandDestroyMesh::internalExecute()
 {
 	std::vector<Mesh::MeshEntity*> me;
 	std::vector<Mesh::Volume*> mvol;
-	getContext().getLocalMeshManager().getVolumes(mvol);
+	getContext().getMeshManager().getVolumes(mvol);
 	for (uint i=0; i<mvol.size(); i++)
 		me.push_back(mvol[i]);
 	std::vector<Mesh::Surface*> msurf;
-	getContext().getLocalMeshManager().getSurfaces(msurf);
+	getContext().getMeshManager().getSurfaces(msurf);
 	for (uint i=0; i<msurf.size(); i++)
 		me.push_back(msurf[i]);
 	std::vector<Mesh::Line*> mline;
-	getContext().getLocalMeshManager().getLines(mline);
+	getContext().getMeshManager().getLines(mline);
 	for (uint i=0; i<mline.size(); i++)
 		me.push_back(mline[i]);
 	std::vector<Mesh::Cloud*> mcloud;
-	getContext().getLocalMeshManager().getClouds(mcloud);
+	getContext().getMeshManager().getClouds(mcloud);
 	for (uint i=0; i<mcloud.size(); i++)
 		me.push_back(mcloud[i]);
 

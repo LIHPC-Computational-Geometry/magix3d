@@ -42,7 +42,7 @@ void MeshEntity::getBounds (double bounds[6]) const
 	Entity::getBounds (bounds);	// RAZ
 }
 /*----------------------------------------------------------------------------*/
-Mesh::MeshManagerIfc& MeshEntity::getMeshManager() const
+Mesh::MeshManager& MeshEntity::getMeshManager() const
 {
 	CHECK_NULL_PTR_ERROR (m_mesh_manager)
 	return *m_mesh_manager;

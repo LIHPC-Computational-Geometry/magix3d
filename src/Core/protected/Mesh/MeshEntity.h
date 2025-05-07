@@ -13,7 +13,7 @@
 #include "Internal/InternalEntity.h"
 #include "Utils/Property.h"
 #include "Utils/DisplayProperties.h"
-#include "Mesh/MeshManagerIfc.h"
+#include "Mesh/MeshManager.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -138,12 +138,12 @@ public:
     /*------------------------------------------------------------------------*/
 #ifndef SWIG
     /// Accesseur sur le MeshManager (et donc sur le maillage)
-    Mesh::MeshManagerIfc& getMeshManager() const;
+    Mesh::MeshManager& getMeshManager() const;
 #endif
 
 private:
     /// Un accès au maillage via le manager
-    Mesh::MeshManagerIfc* m_mesh_manager;
+    Mesh::MeshManager* m_mesh_manager;
 
 	/// Les listes des éventuelles valeurs aux noeuds et aux mailles.
 	std::vector<std::string>	m_nodesValuesNames, m_cellsValuesNames;

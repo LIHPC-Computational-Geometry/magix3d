@@ -40,7 +40,7 @@ CommandModifyMesh::~CommandModifyMesh()
 void CommandModifyMesh::
 internalExecute()
 {
-	getContext().getLocalMeshManager().getMesh()->smooth();
+	getContext().getMeshManager().getMesh()->smooth();
 }
 /*----------------------------------------------------------------------------*/
 void CommandModifyMesh::

@@ -26,7 +26,7 @@ CommandWriteMLI::CommandWriteMLI(Internal::Context& c, std::string& nom)
 /*----------------------------------------------------------------------------*/
 void CommandWriteMLI::internalExecute()
 {
-	getContext().getLocalMeshManager().getMesh()->writeMli(m_file_name);
+	getContext().getMeshManager().getMesh()->writeMli(m_file_name);
 }
 /*----------------------------------------------------------------------------*/
 void CommandWriteMLI::internalUndo()
