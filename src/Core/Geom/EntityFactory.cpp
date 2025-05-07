@@ -2,6 +2,14 @@
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomProperty.h"
 #include "Geom/GeomProjectImplementation.h"
+#include "Geom/PropertyBox.h"
+#include "Geom/PropertyCylinder.h"
+#include "Geom/PropertyHollowCylinder.h"
+#include "Geom/PropertyCone.h"
+#include "Geom/PropertySphere.h"
+#include "Geom/PropertyHollowSphere.h"
+#include "Geom/Vertex.h"
+#include "Geom/Surface.h"
 #include "Utils/Entity.h"
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
@@ -10,15 +18,11 @@
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
-//inclusion de fichiers en-tête d'Open Cascade
-/*----------------------------------------------------------------------------*/
-// to build primitives
 #include <BRepPrimAPI_MakeBox.hxx>
 #include <BRepPrimAPI_MakeCylinder.hxx>
 #include <BRepPrimAPI_MakeSphere.hxx>
 #include <BRepPrimAPI_MakeCone.hxx>
 #include <BRepBuilderAPI_Transform.hxx>
-/*----------------------------------------------------------------------------*/
 #include <StdFail_NotDone.hxx>
 #include <gce_ErrorType.hxx>
 #include <gp_Pnt.hxx>
@@ -33,44 +37,25 @@
 #include <TopoDS.hxx>
 #include <TopExp_Explorer.hxx>
 #include <BRepAlgo_NormalProjection.hxx>
-#include <BRepAlgoAPI_Common.hxx>
-
 #include <BRepAlgoAPI_Cut.hxx>
-
 #include <ShapeAnalysis_ShapeContents.hxx>
-#include <GProp_GProps.hxx>
-#include <BRepGProp.hxx>
-#include <BRepAlgoAPI_Cut.hxx>
-#include <BRepAlgo_Cut.hxx>
 #include <gp_Pln.hxx>
 #include <gp_Vec.hxx>
-#include <gp_Dir.hxx>
-#include <gp_Ax2.hxx>
 #include <GC_MakeCircle.hxx>
 #include <GC_MakeEllipse.hxx>
 #include <GC_MakeArcOfCircle.hxx>
 #include <GC_MakeArcOfEllipse.hxx>
 #include <gp_Elips.hxx>
 #include <Geom_BSplineCurve.hxx>
-#include <Geom_Surface.hxx>
 #include <GeomAPI_PointsToBSpline.hxx>
-#include <GeomAPI_Interpolate.hxx>
-
 #include <TColgp_Array1OfPnt.hxx>
-#include <TColgp_HArray1OfPnt.hxx>
-
 #include <GeomConvert.hxx>
 #include <Geom_TrimmedCurve.hxx>
-#include <Geom_BSplineCurve.hxx>
-#include <GeomConvert_CompCurveToBSplineCurve.hxx>
-
 #include <BRepOffsetAPI_MakeOffsetShape.hxx>
-
 #include <TopTools_IndexedMapOfShape.hxx>
 #include <TopExp.hxx>
 #include <GeomPlate_BuildPlateSurface.hxx>
 #include <BRepAdaptor_Curve.hxx>
-
 #include <Geom_Circle.hxx>
 #include <Geom_Ellipse.hxx>
 /*----------------------------------------------------------------------------*/

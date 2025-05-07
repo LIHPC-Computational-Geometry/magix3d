@@ -462,7 +462,7 @@ computeFiltersWithAllFaces(std::map<Vertex*, uint>& filtre_vertex,
             std::map<CoFace*, uint>& filtre_coface)
 {
 	std::vector<CoFace*> cofaces;
-	getContext().getLocalTopoManager().getCoFaces(cofaces);
+	getContext().getTopoManager().getCoFaces(cofaces);
 
 	for (uint i=0; i<cofaces.size(); i++){
 		CoFace* coface = cofaces[i];
@@ -1475,7 +1475,7 @@ updateInterpolate(std::vector<CoFace*>& cofaces,
 						CHECK_NULL_PTR_ERROR(interpol);
 						std::vector<std::string> coedges_names = interpol->getCoEdges();
 						for (uint i=0; i<coedges_names.size(); i++){
-							CoEdge* coedge = getContext().getLocalTopoManager().getCoEdge(coedges_names[i], false);
+							CoEdge* coedge = getContext().getTopoManager().getCoEdge(coedges_names[i], false);
 
 							if (filtre_coedge[coedge] == 22){
 #ifdef _DEBUG_INTERPOLATE

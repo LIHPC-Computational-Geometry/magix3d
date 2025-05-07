@@ -151,49 +151,45 @@ public:
     /** \brief  Accesseur sur le manager géométrique
      */
 
-    virtual Mgx3D::Geom::GeomManagerIfc& getGeomManager();
-    virtual const Mgx3D::Geom::GeomManagerIfc& getGeomManager() const;
-	virtual void setGeomManager (Mgx3D::Geom::GeomManagerIfc* mgr);
-    virtual Mgx3D::Geom::GeomManager& getLocalGeomManager();
+    virtual Mgx3D::Geom::GeomManager& getGeomManager();
+    virtual const Mgx3D::Geom::GeomManager& getGeomManager() const;
+	virtual void setGeomManager (Mgx3D::Geom::GeomManager* mgr);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Accesseur sur le manager topologique
      */
-    virtual Mgx3D::Topo::TopoManagerIfc& getTopoManager();
-    virtual const Mgx3D::Topo::TopoManagerIfc& getTopoManager() const;
-	virtual void setTopoManager (Mgx3D::Topo::TopoManagerIfc* mgr);
-    virtual Mgx3D::Topo::TopoManager& getLocalTopoManager();
+    virtual Mgx3D::Topo::TopoManager& getTopoManager();
+    virtual const Mgx3D::Topo::TopoManager& getTopoManager() const;
+	virtual void setTopoManager (Mgx3D::Topo::TopoManager* mgr);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Accesseur sur le manager de maillage
      */
-    virtual Mgx3D::Mesh::MeshManagerIfc& getMeshManager();
-    virtual const Mgx3D::Mesh::MeshManagerIfc& getMeshManager() const;
-	virtual void setMeshManager (Mgx3D::Mesh::MeshManagerIfc* mgr);
-    virtual Mgx3D::Mesh::MeshManager& getLocalMeshManager();
+    virtual Mgx3D::Mesh::MeshManager& getMeshManager();
+    virtual const Mgx3D::Mesh::MeshManager& getMeshManager() const;
+	virtual void setMeshManager (Mgx3D::Mesh::MeshManager* mgr);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Accesseur sur le manager de groupes
      */
-    virtual Mgx3D::Group::GroupManagerIfc& getGroupManager();
-    virtual const Mgx3D::Group::GroupManagerIfc& getGroupManager() const;
-    virtual void setGroupManager (Mgx3D::Group::GroupManagerIfc* mgr);
-    virtual Mgx3D::Group::GroupManager& getLocalGroupManager();
+    virtual Mgx3D::Group::GroupManager& getGroupManager();
+    virtual const Mgx3D::Group::GroupManager& getGroupManager() const;
+    virtual void setGroupManager (Mgx3D::Group::GroupManager* mgr);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Accesseur sur le manager de repères
      */
-    virtual Mgx3D::CoordinateSystem::SysCoordManagerIfc& getSysCoordManager();
-    virtual const Mgx3D::CoordinateSystem::SysCoordManagerIfc& getSysCoordManager() const;
-    virtual void setSysCoordManager (Mgx3D::CoordinateSystem::SysCoordManagerIfc* mgr);
+    virtual Mgx3D::CoordinateSystem::SysCoordManager& getSysCoordManager();
+    virtual const Mgx3D::CoordinateSystem::SysCoordManager& getSysCoordManager() const;
+    virtual void setSysCoordManager (Mgx3D::CoordinateSystem::SysCoordManager* mgr);
     virtual Mgx3D::CoordinateSystem::SysCoordManager& getLocalSysCoordManager();
 
     /*------------------------------------------------------------------------*/
     /** \brief  Accesseur sur le manager de maillages structurés
      */
-    virtual Mgx3D::Structured::StructuredMeshManagerIfc& getStructuredMeshManager();
-    virtual const Mgx3D::Structured::StructuredMeshManagerIfc& getStructuredMeshManager() const;
-    virtual void setStructuredMeshManager (Mgx3D::Structured::StructuredMeshManagerIfc* mgr);
+    virtual Mgx3D::Structured::StructuredMeshManager& getStructuredMeshManager();
+    virtual const Mgx3D::Structured::StructuredMeshManager& getStructuredMeshManager() const;
+    virtual void setStructuredMeshManager (Mgx3D::Structured::StructuredMeshManager* mgr);
 
 
     /*------------------------------------------------------------------------*/
@@ -625,17 +621,17 @@ protected:
 	/// Session Python :
 	TkUtil::PythonSession*				m_python_session;
     /// Manager pour les commandes géométriques
-    Mgx3D::Geom::GeomManagerIfc*		m_geom_manager;
+    Mgx3D::Geom::GeomManager*		m_geom_manager;
     /// Manager pour les commandes topologiques
-    Mgx3D::Topo::TopoManagerIfc*		m_topo_manager;
+    Mgx3D::Topo::TopoManager*		m_topo_manager;
     /// Manager pour le maillage
-    Mgx3D::Mesh::MeshManagerIfc*        m_mesh_manager;
+    Mgx3D::Mesh::MeshManager*        m_mesh_manager;
     /// Groupes pour les différents types d'entités
-    Mgx3D::Group::GroupManagerIfc*      m_group_manager;
+    Mgx3D::Group::GroupManager*      m_group_manager;
     /// Repères
-    Mgx3D::CoordinateSystem::SysCoordManagerIfc* m_sys_coord_manager;
+    Mgx3D::CoordinateSystem::SysCoordManager* m_sys_coord_manager;
     /// Maillages structurés :
-    Mgx3D::Structured::StructuredMeshManagerIfc*	m_structured_mesh_manager;
+    Mgx3D::Structured::StructuredMeshManager*	m_structured_mesh_manager;
     /// Manager pour les commandes de niveau supérieur
     Mgx3D::Internal::M3DCommandManager  m_m3d_command_manager;
     /// Manager de sélection

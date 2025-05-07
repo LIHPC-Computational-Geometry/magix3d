@@ -1,20 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/*
- * CommandImportIGES.h
- *
- *  Created on: 21 juin 2013
- *      Author: ledouxf
- */
- /*----------------------------------------------------------------------------*/
-
 #ifndef COMMANDIMPORTIGES_H_
 #define COMMANDIMPORTIGES_H_
-
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandCreateGeom.h"
 #include "Utils/Unit.h"
-#include "Utils/Vector.h"
-#include "Geom/GeomEntity.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 #include <string>

@@ -763,121 +763,94 @@ void Context::setPythonSession (TkUtil::PythonSession* session)
 	}	// if (m_python_session != session)
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Geom::GeomManagerIfc& Context::getGeomManager ( )
+Mgx3D::Geom::GeomManager& Context::getGeomManager ( )
 {
 	CHECK_NULL_PTR_ERROR (m_geom_manager)
 	return *m_geom_manager;
 }
 /*----------------------------------------------------------------------------*/
-const Mgx3D::Geom::GeomManagerIfc& Context::getGeomManager ( ) const
+const Mgx3D::Geom::GeomManager& Context::getGeomManager ( ) const
 {
 	CHECK_NULL_PTR_ERROR (m_geom_manager)
 	return *m_geom_manager;
 }
 /*----------------------------------------------------------------------------*/
-void Context::setGeomManager (Mgx3D::Geom::GeomManagerIfc* manager)
+void Context::setGeomManager (Mgx3D::Geom::GeomManager* manager)
 {
 	delete m_geom_manager;
 	m_geom_manager	= manager;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Geom::GeomManager& Context::getLocalGeomManager ( )
-{
-	Geom::GeomManager*	manager	= dynamic_cast<Geom::GeomManager*>(m_geom_manager);
-	CHECK_NULL_PTR_ERROR (manager)
-	return *manager;
-}
-/*----------------------------------------------------------------------------*/
-Mgx3D::Topo::TopoManagerIfc& Context::getTopoManager ( )
+Mgx3D::Topo::TopoManager& Context::getTopoManager ( )
 {
 	CHECK_NULL_PTR_ERROR (m_topo_manager)
 	return *m_topo_manager;
 }
 /*----------------------------------------------------------------------------*/
-const Mgx3D::Topo::TopoManagerIfc& Context::getTopoManager ( ) const
+const Mgx3D::Topo::TopoManager& Context::getTopoManager ( ) const
 {
 	CHECK_NULL_PTR_ERROR (m_topo_manager)
 	return *m_topo_manager;
 }
 /*----------------------------------------------------------------------------*/
-void Context::setTopoManager (Mgx3D::Topo::TopoManagerIfc* manager)
+void Context::setTopoManager (Mgx3D::Topo::TopoManager* manager)
 {
 	delete m_topo_manager;
 	m_topo_manager	= manager;
 }
+
 /*----------------------------------------------------------------------------*/
-Mgx3D::Topo::TopoManager& Context::getLocalTopoManager ( )
-{
-	Topo::TopoManager*	manager	= dynamic_cast<Topo::TopoManager*>(m_topo_manager);
-	CHECK_NULL_PTR_ERROR (manager)
-	return *manager;
-}
-/*----------------------------------------------------------------------------*/
-Mgx3D::Mesh::MeshManagerIfc& Context::getMeshManager ( )
+Mgx3D::Mesh::MeshManager& Context::getMeshManager ( )
 {
 	CHECK_NULL_PTR_ERROR (m_mesh_manager)
 	return *m_mesh_manager;
 }
 /*----------------------------------------------------------------------------*/
-const Mgx3D::Mesh::MeshManagerIfc& Context::getMeshManager ( ) const
+const Mgx3D::Mesh::MeshManager& Context::getMeshManager ( ) const
 {
 	CHECK_NULL_PTR_ERROR (m_mesh_manager)
 	return *m_mesh_manager;
 }
 /*----------------------------------------------------------------------------*/
-void Context::setMeshManager (Mgx3D::Mesh::MeshManagerIfc* manager)
+void Context::setMeshManager (Mgx3D::Mesh::MeshManager* manager)
 {
 	delete m_mesh_manager;
 	m_mesh_manager	= manager;
 }
-/*----------------------------------------------------------------------------*/
-Mgx3D::Mesh::MeshManager& Context::getLocalMeshManager ( )
-{
-	Mesh::MeshManager*	manager	= dynamic_cast<Mesh::MeshManager*>(m_mesh_manager);
-	CHECK_NULL_PTR_ERROR (manager)
-	return *manager;
-}
 
 /*----------------------------------------------------------------------------*/
-Mgx3D::Group::GroupManagerIfc& Context::getGroupManager ( )
+Mgx3D::Group::GroupManager& Context::getGroupManager ( )
 {
     CHECK_NULL_PTR_ERROR (m_group_manager)
     return *m_group_manager;
 }
 /*----------------------------------------------------------------------------*/
-const Mgx3D::Group::GroupManagerIfc& Context::getGroupManager ( ) const
+const Mgx3D::Group::GroupManager& Context::getGroupManager ( ) const
 {
     CHECK_NULL_PTR_ERROR (m_group_manager)
     return *m_group_manager;
 }
 /*----------------------------------------------------------------------------*/
-void Context::setGroupManager (Mgx3D::Group::GroupManagerIfc* manager)
+void Context::setGroupManager (Mgx3D::Group::GroupManager* manager)
 {
     delete m_group_manager;
     m_group_manager  = manager;
 }
-/*----------------------------------------------------------------------------*/
-Mgx3D::Group::GroupManager& Context::getLocalGroupManager ( )
-{
-    Group::GroupManager*  manager = dynamic_cast<Group::GroupManager*>(m_group_manager);
-    CHECK_NULL_PTR_ERROR (manager)
-    return *manager;
-}
 
 /*----------------------------------------------------------------------------*/
-Mgx3D::CoordinateSystem::SysCoordManagerIfc& Context::getSysCoordManager()
+Mgx3D::CoordinateSystem::SysCoordManager& Context::getSysCoordManager()
 {
     CHECK_NULL_PTR_ERROR (m_sys_coord_manager)
     return *m_sys_coord_manager;
 }
 /*----------------------------------------------------------------------------*/
-const Mgx3D::CoordinateSystem::SysCoordManagerIfc& Context::getSysCoordManager() const
+const Mgx3D::CoordinateSystem::SysCoordManager& Context::getSysCoordManager() const
 {
     CHECK_NULL_PTR_ERROR (m_sys_coord_manager)
     return *m_sys_coord_manager;
 }
 /*----------------------------------------------------------------------------*/
-void Context::setSysCoordManager (Mgx3D::CoordinateSystem::SysCoordManagerIfc* mgr)
+void Context::setSysCoordManager (Mgx3D::CoordinateSystem::SysCoordManager* mgr)
 {
     delete m_sys_coord_manager;
     m_sys_coord_manager  = mgr;
@@ -890,19 +863,19 @@ Mgx3D::CoordinateSystem::SysCoordManager& Context::getLocalSysCoordManager()
     return *manager;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Structured::StructuredMeshManagerIfc& Context::getStructuredMeshManager ( )
+Mgx3D::Structured::StructuredMeshManager& Context::getStructuredMeshManager ( )
 {
 	CHECK_NULL_PTR_ERROR (m_structured_mesh_manager)
 	return *m_structured_mesh_manager;
 }
 /*----------------------------------------------------------------------------*/
-const Mgx3D::Structured::StructuredMeshManagerIfc& Context::getStructuredMeshManager ( ) const
+const Mgx3D::Structured::StructuredMeshManager& Context::getStructuredMeshManager ( ) const
 {
 	CHECK_NULL_PTR_ERROR (m_structured_mesh_manager)
 	return *m_structured_mesh_manager;
 }
 /*----------------------------------------------------------------------------*/
-void Context::setStructuredMeshManager (Mgx3D::Structured::StructuredMeshManagerIfc* manager)
+void Context::setStructuredMeshManager (Mgx3D::Structured::StructuredMeshManager* manager)
 {
 	delete m_structured_mesh_manager;
 	m_structured_mesh_manager	= manager;
@@ -1711,19 +1684,19 @@ void Context::clearSession()
 	// commande de destruction de toutes les entités topologiques qui ont pu être construites
 	std::vector<Topo::TopoEntity*> ve;
 	std::vector<Topo::Block*> blocks;
-	getLocalTopoManager().getBlocks(blocks);
+	getTopoManager().getBlocks(blocks);
 	for (uint i=0; i<blocks.size(); i++)
 		ve.push_back(blocks[i]);
 	std::vector<Topo::CoFace*> cofaces;
-	getLocalTopoManager().getCoFaces(cofaces);
+	getTopoManager().getCoFaces(cofaces);
 	for (uint i=0; i<cofaces.size(); i++)
 		ve.push_back(cofaces[i]);
 	std::vector<Topo::CoEdge*> coedges;
-	getLocalTopoManager().getCoEdges(coedges);
+	getTopoManager().getCoEdges(coedges);
 	for (uint i=0; i<coedges.size(); i++)
 		ve.push_back(coedges[i]);
 	std::vector<Topo::Vertex*> vertices;
-	getLocalTopoManager().getVertices(vertices);
+	getTopoManager().getVertices(vertices);
 	for (uint i=0; i<vertices.size(); i++)
 		ve.push_back(vertices[i]);
 
@@ -1733,16 +1706,16 @@ void Context::clearSession()
 
 	// commande de destruction de toutes les entités géométriques qui ont pu être construites
 	std::vector<Geom::GeomEntity*> entities;
-	std::vector<Geom::Volume*> volumes = getLocalGeomManager().getVolumesObj();
+	std::vector<Geom::Volume*> volumes = getGeomManager().getVolumesObj();
 	for (uint i=0; i<volumes.size(); i++)
 		entities.push_back(volumes[i]);
-	std::vector<Geom::Surface*> surfaces = getLocalGeomManager().getSurfacesObj();
+	std::vector<Geom::Surface*> surfaces = getGeomManager().getSurfacesObj();
 	for (uint i=0; i<surfaces.size(); i++)
 		entities.push_back(surfaces[i]);
-	std::vector<Geom::Curve*> curves = getLocalGeomManager().getCurvesObj();
+	std::vector<Geom::Curve*> curves = getGeomManager().getCurvesObj();
 	for (uint i=0; i<curves.size(); i++)
 		entities.push_back(curves[i]);
-	std::vector<Geom::Vertex*> vtx = getLocalGeomManager().getVerticesObj();
+	std::vector<Geom::Vertex*> vtx = getGeomManager().getVerticesObj();
 	for (uint i=0; i<vtx.size(); i++)
 		entities.push_back(vtx[i]);
 

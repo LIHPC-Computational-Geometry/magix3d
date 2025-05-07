@@ -9,9 +9,8 @@
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include "Internal/Resources.h"
-#include "Mesh/MeshManagerIfc.h"
 #include "Smoothing/SurfacicSmoothing.h"
-#include "Group/GroupManagerIfc.h"
+#include "Group/GroupManager.h"
 #include "QtComponents/QtSmoothSurfaceOperationAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"

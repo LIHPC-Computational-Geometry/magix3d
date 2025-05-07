@@ -85,7 +85,7 @@ CommandSplitFaces(Internal::Context& c, CoEdge* arete, double ratio_dec, double 
 	std::cout<<"CommandSplitFaces::CommandSplitFaces("<<arete->getName()<<", "<<ratio_dec<<", "<<ratio_ogrid<<")"<<std::endl;
 #endif
     std::vector<Topo::CoFace* > cofaces;
-    getContext().getLocalTopoManager().getCoFaces(cofaces);
+    getContext().getTopoManager().getCoFaces(cofaces);
     init2D(cofaces);
 }
 /*----------------------------------------------------------------------------*/
@@ -102,7 +102,7 @@ CommandSplitFaces(Internal::Context& c, CoEdge* arete, const Point& pt, double r
 	std::cout<<"CommandSplitFaces::CommandSplitFaces("<<arete->getName()<<", "<<m_ratio_dec<<", "<<ratio_ogrid<<")"<<std::endl;
 #endif
     std::vector<Topo::CoFace* > cofaces;
-    getContext().getLocalTopoManager().getCoFaces(cofaces);
+    getContext().getTopoManager().getCoFaces(cofaces);
     init2D(cofaces);
 }
 /*----------------------------------------------------------------------------*/

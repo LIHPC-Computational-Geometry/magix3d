@@ -1,16 +1,7 @@
-/*
- * GeomMirrorImplementation.h
- *
- *  Created on: 12/4/2016
- *      Author: Eric B
- */
-
 #ifndef GEOMMIRRORIMPLEMENTATION_H_
 #define GEOMMIRRORIMPLEMENTATION_H_
-
 /*----------------------------------------------------------------------------*/
 #include <vector>
-#include <list>
 /*----------------------------------------------------------------------------*/
 #include "Utils/Plane.h"
 #include "Geom/GeomEntity.h"

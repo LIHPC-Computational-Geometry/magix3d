@@ -28,10 +28,10 @@ set(DOXYGEN_DIRS
   ${PROJECT_SOURCE_DIR}/src/Utils/protected/Utils/Landmark.h
   ${PROJECT_SOURCE_DIR}/src/Utils/protected/Utils/Unit.h
   ${PROJECT_SOURCE_DIR}/src/Utils/protected/Utils/SwigCompletion.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Geom/GeomManagerIfc.h
+  ${PROJECT_SOURCE_DIR}/src/Core/protected/Geom/GeomManager.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Geom/GeomInfo.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/TopoInfo.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/TopoManagerIfc.h
+  ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/TopoManager.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/EdgeMeshingPropertyUniform.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/EdgeMeshingPropertyGeometric.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/EdgeMeshingPropertyBigeometric.h
@@ -46,13 +46,11 @@ set(DOXYGEN_DIRS
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyQuadPairing.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyTransfinite.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyDelaunayTetgen.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Mesh/MeshManagerIfc.h
+  ${PROJECT_SOURCE_DIR}/src/Core/protected/Mesh/MeshManager.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Mesh/MeshModificationBySepa.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Smoothing/SurfacicSmoothing.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Smoothing/VolumicSmoothing.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Group/GroupManagerIfc.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/SysCoord/SysCoordManagerIfc.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Structured/StructuredMeshManagerIfc.h
+  ${PROJECT_SOURCE_DIR}/src/Core/protected/Group/GroupsManager.h
 )
 
 string(REPLACE ";" " " DOXYGEN_DIRS_STR "${DOXYGEN_DIRS}")

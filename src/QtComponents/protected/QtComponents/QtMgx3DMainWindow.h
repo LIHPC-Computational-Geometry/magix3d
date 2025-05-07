@@ -19,9 +19,9 @@ namespace QtComponents
 }	// namespace Mgx3D
 
 #include "Internal/ContextIfc.h"
-#include "Geom/GeomManagerIfc.h"
-#include "Topo/TopoManagerIfc.h"
-#include "Mesh/MeshManagerIfc.h"
+#include "Geom/GeomManager.h"
+#include "Topo/TopoManager.h"
+#include "Mesh/MeshManager.h"
 #include "Utils/CommandManagerIfc.h"
 #include "Internal/M3DCommandManager.h"
 #include "Utils/UndoRedoManager.h"
@@ -647,22 +647,22 @@ class QtMgx3DMainWindow :
 	/**
 	 * \return		Le gestionnaire de modélisation.
 	 */
-	virtual Mgx3D::Geom::GeomManagerIfc& getGeomManager ( );
+	virtual Mgx3D::Geom::GeomManager& getGeomManager ( );
 
     /**
      * \return      Le gestionnaire de topologie.
      */
-    virtual Mgx3D::Topo::TopoManagerIfc& getTopoManager ( );
+    virtual Mgx3D::Topo::TopoManager& getTopoManager ( );
 
     /**
      * \return      Le gestionnaire de maillage.
      */
-    virtual Mgx3D::Mesh::MeshManagerIfc& getMeshManager ( );
+    virtual Mgx3D::Mesh::MeshManager& getMeshManager ( );
 
     /**
      * \return      Le gestionnaire de groupe d'entités.
      */
-    virtual Mgx3D::Group::GroupManagerIfc& getGroupManager ( );
+    virtual Mgx3D::Group::GroupManager& getGroupManager ( );
 
     /**
      * \return      Le gestionnaire de commandes composites.

@@ -13,7 +13,7 @@
 #include "Group/Group1D.h"
 #include "Group/Group2D.h"
 #include "Group/Group3D.h"
-#include "Group/GroupManagerIfc.h"
+#include "Group/GroupManager.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/UTF8String.h>

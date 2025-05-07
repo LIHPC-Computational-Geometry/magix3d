@@ -1,20 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/*
- * ExportIGESImplementation.cpp
- *
- *  Created on: 14 févr. 2014
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #include "Geom/ExportIGESImplementation.h"
 #include "Geom/Volume.h"
-#include "Geom/Surface.h"
 #include "Geom/Curve.h"
-#include "Geom/Vertex.h"
 #include "Utils/Unit.h"
-/*----------------------------------------------------------------------------*/
-#include <iostream>
-#include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 #include <IGESControl_Writer.hxx>
 #include <IGESControl_Controller.hxx>

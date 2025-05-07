@@ -853,7 +853,7 @@ getNodes(Vertex* v1, Vertex* v2, std::vector<gmds::Node>& vectNd)
 #endif
 
 
-    gmds::Mesh& gmds_mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
+    gmds::Mesh& gmds_mesh = getContext().getMeshManager().getMesh()->getGMDSMesh();
 
     // le premier noeud
     vectNd.clear();

@@ -1,17 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/*
- * CommandNewVertexByCurveParameterization.h
- *
- *  Created on: 18 juin 2013
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDNEWVERTEXBYCURVEPARAMETERIZATION_H_
 #define COMMANDNEWVERTEXBYCURVEPARAMETERIZATION_H_
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandCreateGeom.h"
 #include "Geom/Vertex.h"
-#include "Geom/Curve.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

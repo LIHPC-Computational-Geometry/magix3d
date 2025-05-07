@@ -1,18 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/*
- * PropertyHollowSpherePart.h
- *
- *  Created on: 29 mars 2016
- *      Author: Eric B
- */
-/*----------------------------------------------------------------------------*/
 #ifndef PROPERTYHOLLOWSPHEREPART_H_
 #define PROPERTYHOLLOWSPHEREPART_H_
 /*----------------------------------------------------------------------------*/
-//inclusion de fichiers de la STL
-#include <string>
-/*----------------------------------------------------------------------------*/
-#include "Utils/Constants.h"
 #include "Geom/GeomProperty.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

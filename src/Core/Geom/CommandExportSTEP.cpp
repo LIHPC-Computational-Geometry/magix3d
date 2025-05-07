@@ -1,18 +1,6 @@
 /*----------------------------------------------------------------------------*/
-/*
- * CommandExportSTEP.cpp
- *
- *  Created on: 14 févr. 2014
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
 #include "Geom/CommandExportSTEP.h"
-#include "Geom/GeomManager.h"
 #include "Geom/ExportSTEPImplementation.h"
-/*----------------------------------------------------------------------------*/
-#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

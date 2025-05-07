@@ -1,57 +1,19 @@
 /*----------------------------------------------------------------------------*/
-/*
- * GeomSectionImplementation.cpp
- *
- *  Created on: 7 oct. 2013
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
-#include <list>
-#include <map>
-#include <set>
-#include <algorithm>
-/*----------------------------------------------------------------------------*/
 #include "Geom/GeomSectionImplementation.h"
 #include "Geom/Vertex.h"
-#include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
-#include "Geom/EntityFactory.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Face.hxx>
-#include <TopoDS_Solid.hxx>
-#include <TopoDS_Compound.hxx>
-#include <TopoDS_CompSolid.hxx>
-#include <TopoDS.hxx>
-#include <TDF_Label.hxx>
-#include <TopoDS.hxx>
 #include <BRepAlgoAPI_BuilderAlgo.hxx>
 #include <BRepAlgoAPI_Fuse.hxx>
 #include <BRepAlgoAPI_Common.hxx>
 #include <BRepFeat_Gluer.hxx>
-#include <BRep_Builder.hxx>
-#include <ShapeAnalysis_ShapeContents.hxx>
-#include <TopExp_Explorer.hxx>
 #include <TopTools_ListOfShape.hxx>
-#include <TopTools_IndexedMapOfShape.hxx>
-#include <TopExp.hxx>
-#include <gp_Pnt.hxx>
-#include <gp_Pln.hxx>
-#include <gp_Dir.hxx>
-#include <BRep_Tool.hxx>
-#include <BRepTools.hxx>
-#include <BRepTools_ReShape.hxx>
-#include <TopTools_ListOfShape.hxx>
-#include <BRepBuilderAPI_MakeVertex.hxx>
-#include <BRepBuilderAPI_MakeFace.hxx>
-#include <GProp_GProps.hxx>
-#include <BRepGProp.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

@@ -1,10 +1,3 @@
-/*
- * CommandScaling.h
- *
- *  Created on: 19 juin 2013
- *      Author: ledouxf
- */
-
 #ifndef COMMANDSCALING_H_
 #define COMMANDSCALING_H_
 /*----------------------------------------------------------------------------*/

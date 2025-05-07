@@ -1,12 +1,13 @@
 #ifndef INCIDENTGEOMENTITIESVISITOR_H_
 #define INCIDENTGEOMENTITIESVISITOR_H_
 /*----------------------------------------------------------------------------*/
-#include "Utils/Entity.h"
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
 #include "Geom/GeomEntityVisitor.h"
+#include "Utils/Entity.h"
+/*----------------------------------------------------------------------------*/
 #include <set>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

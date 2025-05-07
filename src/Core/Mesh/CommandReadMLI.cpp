@@ -50,22 +50,22 @@ CommandReadMLI::~CommandReadMLI()
         Mesh::SubVolume* sv = dynamic_cast<Mesh::SubVolume*>(me);
         Mesh::SubSurface* ss = dynamic_cast<Mesh::SubSurface*>(me);
         if (sv){
-        	Group::Group3D* gr = getContext().getLocalGroupManager().getGroup3D(sv->getName(), true);
+        	Group::Group3D* gr = getContext().getGroupManager().getGroup3D(sv->getName(), true);
         	gr->remove(sv);
-        	getContext().getLocalMeshManager().remove(sv);
+        	getContext().getMeshManager().remove(sv);
         	sv->clear();
         	delete sv;
         }
         else if (ss){
-        	Group::Group2D* gr = getContext().getLocalGroupManager().getGroup2D(ss->getName(), true);
+        	Group::Group2D* gr = getContext().getGroupManager().getGroup2D(ss->getName(), true);
         	gr->remove(ss);
-        	getContext().getLocalMeshManager().remove(ss);
+        	getContext().getMeshManager().remove(ss);
         	ss->clear();
         	delete ss;
         }
     }
 
-	MeshImplementation* mesh = dynamic_cast<MeshImplementation*>(getContext().getLocalMeshManager().getMesh());
+	MeshImplementation* mesh = dynamic_cast<MeshImplementation*>(getContext().getMeshManager().getMesh());
 	if (mesh == 0)
 		std::cerr<<"Erreur interne dans CommandReadMLI::~CommandReadMLI, mesh == 0"<<std::endl;
 	else
@@ -77,7 +77,7 @@ void CommandReadMLI::internalExecute()
 #ifdef _DEBUG_READ
 	std::cout<<"CommandReadMLI pour "<<m_file_name<<", "<<m_prefix<<std::endl;
 #endif
-	MeshImplementation* mesh = dynamic_cast<MeshImplementation*>(getContext().getLocalMeshManager().getMesh());
+	MeshImplementation* mesh = dynamic_cast<MeshImplementation*>(getContext().getMeshManager().getMesh());
 	if (mesh == 0)
 		throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne dans CommandReadMLI::internalExecute, mesh == 0", TkUtil::Charset::UTF_8));
 
@@ -111,7 +111,7 @@ void CommandReadMLI::internalExecute()
 
         getContext().newGraphicalRepresentation (*sv);
 
-        Group::Group3D* gr = getContext().getLocalGroupManager().getNewGroup3D(nomGr, &getInfoCommand());
+        Group::Group3D* gr = getContext().getGroupManager().getNewGroup3D(nomGr, &getInfoCommand());
 
         if (!gr->empty()){
 			TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
@@ -120,7 +120,7 @@ void CommandReadMLI::internalExecute()
         }
         gr->add(sv);
 
-        getContext().getLocalMeshManager().add(sv);
+        getContext().getMeshManager().add(sv);
 
 	} // end for iter
 
@@ -152,7 +152,7 @@ void CommandReadMLI::internalExecute()
 
         getContext().newGraphicalRepresentation (*ss);
 
-        Group::Group2D* gr = getContext().getLocalGroupManager().getNewGroup2D(nomGr, &getInfoCommand());
+        Group::Group2D* gr = getContext().getGroupManager().getNewGroup2D(nomGr, &getInfoCommand());
 
         if (!gr->empty()){
 			TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
@@ -161,7 +161,7 @@ void CommandReadMLI::internalExecute()
         }
         gr->add(ss);
 
-        getContext().getLocalMeshManager().add(ss);
+        getContext().getMeshManager().add(ss);
 
 	} // end for iter
 }

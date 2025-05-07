@@ -33,11 +33,11 @@ using std::ptrdiff_t;
 #include "Utils/Unit.h"
 #include "Utils/SwigCompletion.h"
 
-#include "Geom/GeomManagerIfc.h"
+#include "Geom/GeomManager.h"
 #include "Geom/GeomInfo.h"
 
 #include "Topo/TopoInfo.h"
-#include "Topo/TopoManagerIfc.h"
+#include "Topo/TopoManager.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Topo/EdgeMeshingPropertyGeometric.h"
 #include "Topo/EdgeMeshingPropertyBigeometric.h"
@@ -53,17 +53,17 @@ using std::ptrdiff_t;
 #include "Topo/BlockMeshingPropertyTransfinite.h"
 #include "Topo/BlockMeshingPropertyDelaunayTetgen.h"
 
-#include "Mesh/MeshManagerIfc.h"
+#include "Mesh/MeshManager.h"
 #include "Smoothing/SurfacicSmoothing.h"
 #include "Smoothing/VolumicSmoothing.h"
 
 #include "Mesh/MeshModificationBySepa.h"
 
-#include "Group/GroupManagerIfc.h"
+#include "Group/GroupManager.h"
 
-#include "SysCoord/SysCoordManagerIfc.h"
+#include "SysCoord/SysCoordManager.h"
 
-#include "Structured/StructuredMeshManagerIfc.h"
+#include "Structured/StructuredMeshManager.h"
 
 #include <patchlevel.h>	// PY_VERSION
 %}
@@ -310,10 +310,10 @@ using std::ptrdiff_t;
 %include Utils/Unit.h
 
 %include Geom/GeomInfo.h
-%include Geom/GeomManagerIfc.h
+%include Geom/GeomManager.h
 
 %include Topo/TopoInfo.h
-%include Topo/TopoManagerIfc.h
+%include Topo/TopoManager.h
 %include Topo/CoEdgeMeshingProperty.h
 %include Topo/EdgeMeshingPropertyUniform.h
 %include Topo/EdgeMeshingPropertyGeometric.h
@@ -332,17 +332,17 @@ using std::ptrdiff_t;
 %include Topo/BlockMeshingPropertyTransfinite.h
 %include Topo/BlockMeshingPropertyDelaunayTetgen.h
 
-%include Mesh/MeshManagerIfc.h
+%include Mesh/MeshManager.h
 %include Smoothing/SurfacicSmoothing.h
 %include Smoothing/VolumicSmoothing.h
 
 %include Mesh/MeshModificationBySepa.h
 
-%include Group/GroupManagerIfc.h
+%include Group/GroupManager.h
 
-%include SysCoord/SysCoordManagerIfc.h
+%include SysCoord/SysCoordManager.h
 
-%include Structured/StructuredMeshManagerIfc.h
+%include Structured/StructuredMeshManager.h
 
 
 // extensions: fonctions supplémentaires depuis python

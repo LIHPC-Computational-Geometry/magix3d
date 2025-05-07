@@ -13,7 +13,6 @@
 #include <GeomAPI_ProjectPointOnSurf.hxx>
 #include <Poly_Triangulation.hxx>
 #include <Geom_Surface.hxx>
-#include <Geom_Curve.hxx>
 #include <TopExp.hxx>
 #include <TopoDS.hxx>
 #include <BRep_Tool.hxx>

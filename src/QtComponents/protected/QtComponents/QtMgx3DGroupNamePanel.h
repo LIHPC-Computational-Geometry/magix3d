@@ -8,7 +8,7 @@
 
 
 #include "Utils/ValidatedField.h"
-#include "Group/GroupManagerIfc.h"
+#include "Group/GroupManager.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 
 #include <QComboBox>
@@ -26,7 +26,7 @@ namespace QtComponents
  * Classe permettant la saisie d'un nom de groupe <I>Magix 3D</I> et offrant
  * une <I>API</I> de validation <I>ValidatedField</I>.
  * \see		ValidatedField
- * \see		GroupManagerIfc
+ * \see		GroupManager
  */
 class QtMgx3DGroupNamePanel :
 			public QWidget, public Mgx3D::Utils::ValidatedField

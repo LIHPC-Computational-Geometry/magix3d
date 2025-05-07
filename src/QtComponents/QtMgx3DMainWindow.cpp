@@ -3919,25 +3919,25 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 		}    // QtMgx3DMainWindow::unregisterEntitySeizureManager
 
 
-		Geom::GeomManagerIfc &QtMgx3DMainWindow::getGeomManager()
+		Geom::GeomManager &QtMgx3DMainWindow::getGeomManager()
 		{
 			return getContext().getGeomManager();
 		}    // QtMgx3DMainWindow::getGeomManager
 
 
-		Topo::TopoManagerIfc &QtMgx3DMainWindow::getTopoManager()
+		Topo::TopoManager &QtMgx3DMainWindow::getTopoManager()
 		{
 			return getContext().getTopoManager();
 		}   // QtMgx3DMainWindow::getTopoManager
 
 
-		Mesh::MeshManagerIfc &QtMgx3DMainWindow::getMeshManager()
+		Mesh::MeshManager &QtMgx3DMainWindow::getMeshManager()
 		{
 			return getContext().getMeshManager();
 		}   // QtMgx3DMainWindow::getMeshManager
 
 
-		Group::GroupManagerIfc &QtMgx3DMainWindow::getGroupManager()
+		Group::GroupManager &QtMgx3DMainWindow::getGroupManager()
 		{
 			return getContext().getGroupManager();
 		}   // QtMgx3DMainWindow::getGroupManager

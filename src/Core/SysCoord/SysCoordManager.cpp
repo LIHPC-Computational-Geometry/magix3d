@@ -28,12 +28,12 @@ namespace Mgx3D {
 namespace CoordinateSystem {
 /*----------------------------------------------------------------------------*/
 SysCoordManager::SysCoordManager(const std::string& name, Internal::ContextIfc* c)
-:SysCoordManagerIfc(name, c)
+:Internal::CommandCreator(name, c)
 {
 }
 /*----------------------------------------------------------------------------*/
 SysCoordManager::SysCoordManager(const SysCoordManager& scm)
-:SysCoordManagerIfc(scm)
+:Internal::CommandCreator(scm)
 {
 	MGX_FORBIDDEN ("SysCoordManager copy constructor is not allowed.")
 }

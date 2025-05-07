@@ -7,12 +7,8 @@
  *  \date 18/10/2012
  */
 /*----------------------------------------------------------------------------*/
-// pythonerie à mettre au début (pour permettre ifndef Py_PYTHON_H dans GroupManagerIfc.h)
-#include <Python.h>
-/*----------------------------------------------------------------------------*/
-#include <iostream>
+// pythonerie à mettre au début (pour permettre ifndef Py_PYTHON_H dans GroupManager.h)
 #include <set>
-#include <vector>
 /*----------------------------------------------------------------------------*/
 #include "Group/GroupManager.h"
 #include "Group/GroupEntity.h"
@@ -55,7 +51,6 @@
 #include "Mesh/Line.h"
 #include "Mesh/Cloud.h"
 #include "Mesh/MeshModificationByPythonFunction.h"
-#include "Mesh/CommandAddRemoveGroupName.h"
 #include "Mesh/MeshModificationBySepa.h"
 #include "Mesh/MeshModificationByProjectionOnP0.h"
 #include "Mesh/CommandClearGroupName.h"
@@ -66,15 +61,13 @@
 #include "Smoothing/VolumicSmoothing.h"
 
 #include <TkUtil/Exception.h>
-#include <TkUtil/TraceLog.h>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Group {
 /*----------------------------------------------------------------------------*/
 GroupManager::GroupManager(const std::string& name, Internal::ContextIfc* c)
-:Group::GroupManagerIfc(name, c)
+:Internal::CommandCreator(name, c)
 , m_visibilityMask(Utils::FilterEntity::NoneEntity)
 {
 }
@@ -1162,7 +1155,7 @@ void GroupManager::addMeshGroups(const std::vector<Group::GroupEntity*>& groups,
         const Utils::FilterEntity::objectType visibilityMask,
         std::vector<Mesh::MeshEntity*>& meshAdded)
 {
-    Mesh::MeshManager& mmng = getLocalContext().getLocalMeshManager();
+    Mesh::MeshManager& mmng = getLocalContext().getMeshManager();
 
     for (std::vector<Group::GroupEntity*>::const_iterator iter = groups.begin();
             iter != groups.end(); ++iter){
@@ -1218,7 +1211,7 @@ void GroupManager::addMeshGroups(const Utils::FilterEntity::objectType visibilit
 			<<std::endl;
 #endif
 
-    Mesh::MeshManager& mmng = getLocalContext().getLocalMeshManager();
+    Mesh::MeshManager& mmng = getLocalContext().getMeshManager();
 
     if (visibilityMask & Utils::FilterEntity::MeshVolume)
         for (std::vector<Group::Group3D*>::iterator iter = m_group3D.begin();
@@ -1929,7 +1922,7 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Topo::Ver
 /*------------------------------------------------------------------------*/
 void GroupManager::get(const std::vector<std::string>& vg, std::vector<Mesh::Volume*>& volumes)
 {
-	Mesh::MeshManager& mmng = getLocalContext().getLocalMeshManager();
+	Mesh::MeshManager& mmng = getLocalContext().getMeshManager();
 
 	for (uint i=0; i<vg.size(); i++){
 		Mesh::Volume* me = mmng.getVolume(vg[i], false);
@@ -1941,7 +1934,7 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Mesh::Vol
 /*------------------------------------------------------------------------*/
 void GroupManager::get(const std::vector<std::string>& vg, std::vector<Mesh::Surface*>& surfaces)
 {
-	Mesh::MeshManager& mmng = getLocalContext().getLocalMeshManager();
+	Mesh::MeshManager& mmng = getLocalContext().getMeshManager();
 
 	for (uint i=0; i<vg.size(); i++){
 		Mesh::Surface* me = mmng.getSurface(vg[i], false);
@@ -1953,7 +1946,7 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Mesh::Sur
 /*------------------------------------------------------------------------*/
 void GroupManager::get(const std::vector<std::string>& vg, std::vector<Mesh::Line*>& lines)
 {
-	Mesh::MeshManager& mmng = getLocalContext().getLocalMeshManager();
+	Mesh::MeshManager& mmng = getLocalContext().getMeshManager();
 
 	for (uint i=0; i<vg.size(); i++){
 		Mesh::Line* me = mmng.getLine(vg[i], false);
@@ -1965,7 +1958,7 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Mesh::Lin
 /*------------------------------------------------------------------------*/
 void GroupManager::get(const std::vector<std::string>& vg, std::vector<Mesh::Cloud*>& clouds)
 {
-	Mesh::MeshManager& mmng = getLocalContext().getLocalMeshManager();
+	Mesh::MeshManager& mmng = getLocalContext().getMeshManager();
 
 	for (uint i=0; i<vg.size(); i++){
 		Mesh::Cloud* me = mmng.getCloud(vg[i], false);

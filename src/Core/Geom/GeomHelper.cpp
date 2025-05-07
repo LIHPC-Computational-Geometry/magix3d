@@ -1,13 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file GeomHelper.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 14 nov. 2014
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
 #include "Geom/GeomHelper.h"
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"

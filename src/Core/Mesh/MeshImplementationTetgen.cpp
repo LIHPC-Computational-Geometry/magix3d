@@ -533,14 +533,14 @@ meshDelaunayTetgen(Mesh::CommandCreateMesh* command, Topo::Block* bl)
 
         bool isNewVolume = false;
         try {
-            getContext().getLocalMeshManager().getVolume(nom);
+            getContext().getMeshManager().getVolume(nom);
             command->addModifiedVolume(nom);
         } catch (...) {
             command->addNewVolume(nom);
             isNewVolume = true;
         }
         // le volume de maillage que l'on vient de créer/modifier
-        Mesh::Volume* vol = getContext().getLocalMeshManager().getVolume(nom);
+        Mesh::Volume* vol = getContext().getMeshManager().getVolume(nom);
         vol->addBlock(bl);
 
         if (isNewVolume)
@@ -642,7 +642,7 @@ meshDelaunayTetgen(Mesh::CommandCreateMesh* command, Topo::Block* bl)
 //            command->addNewSurface(nom);
 //        }
 //        // la surface de maillage que l'on vient de créer/modifier
-//        Mesh::Surface* sf = getContext().getLocalMeshManager().getSurface(nom);
+//        Mesh::Surface* sf = getContext().getMeshManager().getSurface(nom);
 //        sf->addCoFace(fa);
 //    } // end for i<groupsName.size()
 //

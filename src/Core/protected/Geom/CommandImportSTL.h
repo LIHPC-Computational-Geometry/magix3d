@@ -1,19 +1,7 @@
-/*----------------------------------------------------------------------------*/
-/*
- * CommandImportSTL.h
- *
- *  Created on: 13/2/2017
- *      Author: Eric B
- */
- /*----------------------------------------------------------------------------*/
-
 #ifndef COMMANDIMPORTSTL_H_
 #define COMMANDIMPORTSTL_H_
-
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandCreateGeom.h"
-#include "Utils/Vector.h"
-#include "Geom/GeomEntity.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 #include <string>

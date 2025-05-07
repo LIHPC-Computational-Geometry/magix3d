@@ -8,9 +8,8 @@
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Mesh/MeshManagerIfc.h"
 #include "Smoothing/VolumicSmoothing.h"
-#include "Group/GroupManagerIfc.h"
+#include "Group/GroupManager.h"
 #include "QtComponents/QtSmoothVolumeOperationAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"

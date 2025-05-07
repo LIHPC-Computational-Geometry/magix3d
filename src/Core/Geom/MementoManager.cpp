@@ -1,3 +1,4 @@
+/*----------------------------------------------------------------------------*/
 #include "Geom/MementoManager.h"
 #include "Geom/GeomEntity.h"
 #include "Geom/GeomEntityVisitor.h"

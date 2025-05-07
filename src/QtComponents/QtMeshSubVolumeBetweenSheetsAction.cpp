@@ -8,7 +8,6 @@
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Mesh/MeshManagerIfc.h"
 #include "QtComponents/QtMeshSubVolumeBetweenSheetsAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"

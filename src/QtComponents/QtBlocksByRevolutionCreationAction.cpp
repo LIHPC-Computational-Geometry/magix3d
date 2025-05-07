@@ -9,7 +9,6 @@
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/ValidatedField.h"
-#include "Topo/TopoManagerIfc.h"
 #include "QtComponents/QtBlocksByRevolutionCreationAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"

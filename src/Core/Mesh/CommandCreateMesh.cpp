@@ -380,7 +380,7 @@ CommandCreateMesh::~CommandCreateMesh()
 /*----------------------------------------------------------------------------*/
 MeshManager& CommandCreateMesh::getMeshManager()
 {
-    return getContext().getLocalMeshManager();
+    return getContext().getMeshManager();
 }
 /*----------------------------------------------------------------------------*/
 void CommandCreateMesh::

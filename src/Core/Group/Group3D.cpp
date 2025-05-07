@@ -307,7 +307,7 @@ getDescription (bool alsoComputed) const
     }
 
     // recherche du Mesh::Volume associé (suivant le nom)
-    Mesh::Volume* mvol = getContext().getLocalMeshManager().getVolume(getName(), false);
+    Mesh::Volume* mvol = getContext().getMeshManager().getVolume(getName(), false);
     if (mvol){
         Utils::SerializedRepresentation volumes ("Volume maillage", std::string("1"));
         volumes.addProperty (

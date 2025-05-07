@@ -140,67 +140,67 @@ void ContextIfc::setPythonSession (TkUtil::PythonSession*)
 	throw TkUtil::Exception ("ContextIfc::getPythonSession should be overloaded.");
 }	// ContextIfc::setPythonSession
 /*----------------------------------------------------------------------------*/
-Geom::GeomManagerIfc& ContextIfc::getGeomManager ( )
+Geom::GeomManager& ContextIfc::getGeomManager ( )
 {
 	throw TkUtil::Exception ("ContextIfc::getGeomManager should be overloaded.");
 }	// ContextIfc::getGeomManager
 /*----------------------------------------------------------------------------*/
-const Geom::GeomManagerIfc& ContextIfc::getGeomManager ( ) const
+const Geom::GeomManager& ContextIfc::getGeomManager ( ) const
 {
 	throw TkUtil::Exception ("ContextIfc::getGeomManager should be overloaded.");
 }	// ContextIfc::getGeomManager
 /*----------------------------------------------------------------------------*/
-void ContextIfc::setGeomManager (Geom::GeomManagerIfc*)
+void ContextIfc::setGeomManager (Geom::GeomManager*)
 {
 	throw TkUtil::Exception ("ContextIfc::getGeomManager should be overloaded.");
 }	// ContextIfc::setGeomManager
 /*----------------------------------------------------------------------------*/
-Topo::TopoManagerIfc& ContextIfc::getTopoManager ( )
+Topo::TopoManager& ContextIfc::getTopoManager ( )
 {
 	throw TkUtil::Exception ("ContextIfc::getTopoManager should be overloaded.");
 }	// ContextIfc::getTopoManager
 /*----------------------------------------------------------------------------*/
-const Topo::TopoManagerIfc& ContextIfc::getTopoManager ( ) const
+const Topo::TopoManager& ContextIfc::getTopoManager ( ) const
 {
 	throw TkUtil::Exception ("ContextIfc::getTopoManager should be overloaded.");
 }	// ContextIfc::getTopoManager
 /*----------------------------------------------------------------------------*/
-Mesh::MeshManagerIfc& ContextIfc::getMeshManager ( )
+Mesh::MeshManager& ContextIfc::getMeshManager ( )
 {
 	throw TkUtil::Exception ("ContextIfc::getMeshManager should be overloaded.");
 }	// ContextIfc::getMeshManager
 /*----------------------------------------------------------------------------*/
-const Mesh::MeshManagerIfc& ContextIfc::getMeshManager ( ) const
+const Mesh::MeshManager& ContextIfc::getMeshManager ( ) const
 {
 	throw TkUtil::Exception ("ContextIfc::getMeshManager should be overloaded.");
 }	// ContextIfc::getMeshManager
 /*----------------------------------------------------------------------------*/
-Group::GroupManagerIfc& ContextIfc::getGroupManager()
+Group::GroupManager& ContextIfc::getGroupManager()
 {
     throw TkUtil::Exception ("ContextIfc::getGroupManager should be overloaded.");
 }   // ContextIfc::getGroupManager
 /*----------------------------------------------------------------------------*/
-const Group::GroupManagerIfc& ContextIfc::getGroupManager() const
+const Group::GroupManager& ContextIfc::getGroupManager() const
 {
     throw TkUtil::Exception ("ContextIfc::getGroupManager should be overloaded.");
 }   // ContextIfc::getGroupManager
 /*----------------------------------------------------------------------------*/
-Mgx3D::CoordinateSystem::SysCoordManagerIfc& ContextIfc::getSysCoordManager()
+Mgx3D::CoordinateSystem::SysCoordManager& ContextIfc::getSysCoordManager()
 {
 	throw TkUtil::Exception ("ContextIfc::getSysCoordManager should be overloaded.");
 }
 /*----------------------------------------------------------------------------*/
-const Mgx3D::CoordinateSystem::SysCoordManagerIfc& ContextIfc::getSysCoordManager() const
+const Mgx3D::CoordinateSystem::SysCoordManager& ContextIfc::getSysCoordManager() const
 {
 	throw TkUtil::Exception ("ContextIfc::getSysCoordManager should be overloaded.");
 }
 /*----------------------------------------------------------------------------*/
-Structured::StructuredMeshManagerIfc& ContextIfc::getStructuredMeshManager ( )
+Structured::StructuredMeshManager& ContextIfc::getStructuredMeshManager ( )
 {
 	throw TkUtil::Exception ("ContextIfc::getStructuredMeshManager should be overloaded.");
 }	// ContextIfc::getStructuredMeshManager
 /*----------------------------------------------------------------------------*/
-const Structured::StructuredMeshManagerIfc& ContextIfc::getStructuredMeshManager ( ) const
+const Structured::StructuredMeshManager& ContextIfc::getStructuredMeshManager ( ) const
 {
 	throw TkUtil::Exception ("ContextIfc::getStructuredMeshManager should be overloaded.");
 }	// ContextIfc::getStructuredMeshManager

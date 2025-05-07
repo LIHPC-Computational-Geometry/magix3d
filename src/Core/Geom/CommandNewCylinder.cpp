@@ -1,20 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandNewCylinder.cpp
- *
- *  \author Franck Ledoux, Eric Brière de l'Isle
- *
- *  \date 15/10/2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Geom/CommandNewCylinder.h"
 #include "Geom/PropertyCylinder.h"
+#include "Geom/CommandNewCylinder.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomManager.h"
-#include "Utils/MgxException.h"
 #include "Utils/MgxNumeric.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
+/*----------------------------------------------------------------------------*/
 #include <cmath>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

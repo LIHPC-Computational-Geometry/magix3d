@@ -1,21 +1,12 @@
 /*----------------------------------------------------------------------------*/
-/*
- * CommandNewHollowSpherePart.cpp
- *
- *  Created on: 29 mars 2016
- *      Author: Eric B
- */
-/*----------------------------------------------------------------------------*/
-#include "Geom/CommandNewHollowSpherePart.h"
 #include "Geom/PropertyHollowSpherePart.h"
+#include "Geom/CommandNewHollowSpherePart.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomManager.h"
-#include "Utils/MgxException.h"
 #include "Utils/MgxNumeric.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-#include <cmath>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

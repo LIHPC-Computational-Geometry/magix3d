@@ -1,17 +1,7 @@
-/*----------------------------------------------------------------------------*/
-/*
- * CommandExportSTL.h
- *
- *  Created on: 13/2/2017
- *      Author: Eric B
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDEXPORTSTL_H_
 #define COMMANDEXPORTSTL_H_
 /*----------------------------------------------------------------------------*/
 #include "Internal/CommandInternal.h"
-#include "Utils/Vector.h"
-#include "Geom/GeomEntity.h"
 #include "Internal/Context.h"
 #include "Geom/ExportSTLImplementation.h"
 /*----------------------------------------------------------------------------*/
