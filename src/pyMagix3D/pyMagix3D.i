@@ -53,7 +53,7 @@ using std::ptrdiff_t;
 #include "Topo/BlockMeshingPropertyTransfinite.h"
 #include "Topo/BlockMeshingPropertyDelaunayTetgen.h"
 
-#include "Mesh/MeshManagerIfc.h"
+#include "Mesh/MeshManager.h"
 #include "Smoothing/SurfacicSmoothing.h"
 #include "Smoothing/VolumicSmoothing.h"
 
@@ -63,7 +63,7 @@ using std::ptrdiff_t;
 
 #include "SysCoord/SysCoordManagerIfc.h"
 
-#include "Structured/StructuredMeshManagerIfc.h"
+#include "Structured/StructuredMeshManager.h"
 
 #include <patchlevel.h>	// PY_VERSION
 %}
@@ -332,7 +332,7 @@ using std::ptrdiff_t;
 %include Topo/BlockMeshingPropertyTransfinite.h
 %include Topo/BlockMeshingPropertyDelaunayTetgen.h
 
-%include Mesh/MeshManagerIfc.h
+%include Mesh/MeshManager.h
 %include Smoothing/SurfacicSmoothing.h
 %include Smoothing/VolumicSmoothing.h
 
@@ -342,7 +342,7 @@ using std::ptrdiff_t;
 
 %include SysCoord/SysCoordManagerIfc.h
 
-%include Structured/StructuredMeshManagerIfc.h
+%include Structured/StructuredMeshManager.h
 
 
 // extensions: fonctions supplémentaires depuis python

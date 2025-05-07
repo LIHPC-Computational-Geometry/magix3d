@@ -795,7 +795,7 @@ updateMesh(std::vector<Topo::Block*>& blocs, std::string grpName, bool add)
 #ifdef _DEBUG_UPDATE
             std::cout<<"recherche getVolume "<<grpName<<std::endl;
 #endif
-            getContext().getLocalMeshManager().getVolume(grpName);
+            getContext().getMeshManager().getVolume(grpName);
 #ifdef _DEBUG_UPDATE
             std::cout<<"addModifiedVolume "<<grpName<<std::endl;
 #endif
@@ -807,7 +807,7 @@ updateMesh(std::vector<Topo::Block*>& blocs, std::string grpName, bool add)
             addNewVolume(grpName);
             isNewVolume = true;
         }
-        Mesh::Volume* mvol = getContext().getLocalMeshManager().getVolume(grpName);
+        Mesh::Volume* mvol = getContext().getMeshManager().getVolume(grpName);
 
         for (std::vector<Topo::Block*>::iterator iter = blocs.begin();
                 iter != blocs.end(); ++iter)
@@ -863,7 +863,7 @@ updateMesh(std::vector<Topo::CoFace*>& cofaces, std::string grpName, bool add)
 #ifdef _DEBUG_UPDATE
             std::cout<<"recherche getSurface "<<grpName<<std::endl;
 #endif
-            getContext().getLocalMeshManager().getSurface(grpName);
+            getContext().getMeshManager().getSurface(grpName);
 #ifdef _DEBUG_UPDATE
             std::cout<<"addModifiedSurface "<<grpName<<std::endl;
 #endif
@@ -874,7 +874,7 @@ updateMesh(std::vector<Topo::CoFace*>& cofaces, std::string grpName, bool add)
 #endif
             addNewSurface(grpName);
         }
-        Mesh::Surface* msurf = getContext().getLocalMeshManager().getSurface(grpName);
+        Mesh::Surface* msurf = getContext().getMeshManager().getSurface(grpName);
 
         for (std::vector<Topo::CoFace*>::iterator iter = cofaces.begin();
                 iter != cofaces.end(); ++iter)
@@ -928,7 +928,7 @@ updateMesh(std::vector<Topo::CoEdge*>& coedges, std::string grpName, bool add)
 #ifdef _DEBUG_UPDATE
             std::cout<<"recherche getCloud "<<grpName<<std::endl;
 #endif
-            getContext().getLocalMeshManager().getCloud(grpName);
+            getContext().getMeshManager().getCloud(grpName);
 #ifdef _DEBUG_UPDATE
             std::cout<<"addModifiedCloud "<<grpName<<std::endl;
 #endif
@@ -939,7 +939,7 @@ updateMesh(std::vector<Topo::CoEdge*>& coedges, std::string grpName, bool add)
 #endif
             addNewCloud(grpName);
         }
-        Mesh::Cloud* mcld = getContext().getLocalMeshManager().getCloud(grpName);
+        Mesh::Cloud* mcld = getContext().getMeshManager().getCloud(grpName);
 
         for (std::vector<Topo::CoEdge*>::iterator iter = coedges.begin();
                 iter != coedges.end(); ++iter)
@@ -963,7 +963,7 @@ updateMesh(std::vector<Topo::CoEdge*>& coedges, std::string grpName, bool add)
 #ifdef _DEBUG_UPDATE
             std::cout<<"recherche getLine "<<grpName<<std::endl;
 #endif
-            getContext().getLocalMeshManager().getLine(grpName);
+            getContext().getMeshManager().getLine(grpName);
 #ifdef _DEBUG_UPDATE
             std::cout<<"addModifiedLine "<<grpName<<std::endl;
 #endif
@@ -974,7 +974,7 @@ updateMesh(std::vector<Topo::CoEdge*>& coedges, std::string grpName, bool add)
 #endif
             addNewLine(grpName);
         }
-        Mesh::Line* mln = getContext().getLocalMeshManager().getLine(grpName);
+        Mesh::Line* mln = getContext().getMeshManager().getLine(grpName);
 
         for (std::vector<Topo::CoEdge*>::iterator iter = coedges.begin();
                 iter != coedges.end(); ++iter)

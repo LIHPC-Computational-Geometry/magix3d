@@ -633,7 +633,7 @@ Utils::Math::Point Vertex::getCoord() const
 {
 	Utils::Math::Point res;
 	if (isMeshed()){
-		gmds::Mesh& gmds_mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
+		gmds::Mesh& gmds_mesh = getContext().getMeshManager().getMesh()->getGMDSMesh();
 		gmds::math::Point pt = gmds_mesh.get<gmds::Node>(m_mesh_data->node()).point();
 		res.setX(pt.X());
 		res.setY(pt.Y());

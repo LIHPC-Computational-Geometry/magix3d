@@ -1,32 +1,27 @@
-/*
- * \file	StructuredMeshManagerIfc.h
- * \author	Charles PIGNEROL
- * \date	03/12/2018
- */
-
-
 #ifndef STRUCTURED_MESH_MANAGER_H
 #define STRUCTURED_MESH_MANAGER_H
-
-#include "Structured/StructuredMeshManagerIfc.h"
-#include "Internal/Context.h"
-
+/*----------------------------------------------------------------------------*/
+#include "Structured/StructuredMeshEntity.h"
+#include "Structured/Material.h"
+#include "Internal/CommandCreator.h"
+#include "Internal/M3DCommandResultIfc.h"
+#include "Utils/SwigCompletion.h"
+/*----------------------------------------------------------------------------*/
+#include <string>
+#include <vector>
 #include <map>
-
-
+/*----------------------------------------------------------------------------*/
 namespace Mgx3D 
 {
-
 namespace Structured
 {
-
 /*----------------------------------------------------------------------------*/
 /**
  * \class StructuredMeshManager
  * \brief Implémentation de gestionnaire des opérations effectuées au niveau du
  *        module de maillages structurés.
  */
-class StructuredMeshManager : public StructuredMeshManagerIfc 
+class StructuredMeshManager final : public Mgx3D::Internal::CommandCreator 
 {
 	public:
 
@@ -40,7 +35,7 @@ class StructuredMeshManager : public StructuredMeshManagerIfc
 	/** 
 	 * Destructeur
 	 */
-	virtual ~StructuredMeshManager ( );
+	~StructuredMeshManager ( );
 
 	/**
 	 * Les commandes proposées par le gestionnaire de données structurées.
@@ -50,10 +45,12 @@ class StructuredMeshManager : public StructuredMeshManagerIfc
 	/**
 	 * Libération du maillage structuré (toutes partitions).
 	 */
-	virtual Mgx3D::Internal::M3DCommandResultIfc* releaseMesh ( );
+	Mgx3D::Internal::M3DCommandResultIfc* releaseMesh ( );
+	SET_SWIG_COMPLETABLE_METHOD(releaseMesh)
 
 	//@}	// Les commandes proposées par le gestionnaire de données structurées.
 
+#ifndef SWIG
 	/**
 	 * Les données structurées.
 	 */
@@ -69,13 +66,13 @@ class StructuredMeshManager : public StructuredMeshManagerIfc
 	 * \warning	Le maillage (et ses matériaux) est adopté et de ce fait il
 	 *		sera détruit par ce gestionnaire.
 	 */
-	virtual void setMeshEntity (size_t procNum, StructuredMeshEntity*& mesh);
+	void setMeshEntity (size_t procNum, StructuredMeshEntity*& mesh);
 
 	/**
 	 * Décharger (toutes les partitions du) le maillage.
 	 * \see		setMeshEntity
 	 */
-	virtual void releaseMeshEntities ( );
+	void releaseMeshEntities ( );
 
 
 	/**
@@ -83,17 +80,18 @@ class StructuredMeshManager : public StructuredMeshManagerIfc
 	 * \return	Le(la partition demandée du) maillage structuré
 	 * \param	Numéro du processeur (cas d'un partitionnement au chargement).
 	 */
-	virtual const StructuredMeshEntity& getMeshEntity (size_t procNum) const;
-	virtual StructuredMeshEntity& getMeshEntity (size_t procNum);
-	virtual const StructuredMesh& getMesh (size_t procNum) const;
-	virtual StructuredMesh& getMesh (size_t procNum);
+	const StructuredMeshEntity& getMeshEntity (size_t procNum) const;
+	StructuredMeshEntity& getMeshEntity (size_t procNum);
+	const StructuredMesh& getMesh (size_t procNum) const;
+	StructuredMesh& getMesh (size_t procNum);
 
 	/**
 	 * \return	Les partitions chargées.
 	 */
-	virtual std::vector<StructuredMeshEntity*> getMeshEntities ( ) const;
+	std::vector<StructuredMeshEntity*> getMeshEntities ( ) const;
 
 	//@}	// Les données structurées.
+#endif	// SWIG
 
 
 	private:
@@ -112,14 +110,8 @@ class StructuredMeshManager : public StructuredMeshManagerIfc
 	 * Les maillages structurés pris en charge par l'instance.
 	 * Clé d'entrée : numéro de processeur.
 	 */
-	std::map<int, StructuredMeshEntity*>	_meshes;
+	std::map<int, StructuredMeshEntity*> _meshes;
 };	// class StructuredMeshManager
-
-
 }	// namespace Structured
-
-
 } // namespace Mgx3D
-
-
 #endif	// STRUCTURED_MESH_MANAGER_H

@@ -800,29 +800,22 @@ void Context::setTopoManager (Mgx3D::Topo::TopoManager* manager)
 }
 
 /*----------------------------------------------------------------------------*/
-Mgx3D::Mesh::MeshManagerIfc& Context::getMeshManager ( )
+Mgx3D::Mesh::MeshManager& Context::getMeshManager ( )
 {
 	CHECK_NULL_PTR_ERROR (m_mesh_manager)
 	return *m_mesh_manager;
 }
 /*----------------------------------------------------------------------------*/
-const Mgx3D::Mesh::MeshManagerIfc& Context::getMeshManager ( ) const
+const Mgx3D::Mesh::MeshManager& Context::getMeshManager ( ) const
 {
 	CHECK_NULL_PTR_ERROR (m_mesh_manager)
 	return *m_mesh_manager;
 }
 /*----------------------------------------------------------------------------*/
-void Context::setMeshManager (Mgx3D::Mesh::MeshManagerIfc* manager)
+void Context::setMeshManager (Mgx3D::Mesh::MeshManager* manager)
 {
 	delete m_mesh_manager;
 	m_mesh_manager	= manager;
-}
-/*----------------------------------------------------------------------------*/
-Mgx3D::Mesh::MeshManager& Context::getLocalMeshManager ( )
-{
-	Mesh::MeshManager*	manager	= dynamic_cast<Mesh::MeshManager*>(m_mesh_manager);
-	CHECK_NULL_PTR_ERROR (manager)
-	return *manager;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -877,19 +870,19 @@ Mgx3D::CoordinateSystem::SysCoordManager& Context::getLocalSysCoordManager()
     return *manager;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Structured::StructuredMeshManagerIfc& Context::getStructuredMeshManager ( )
+Mgx3D::Structured::StructuredMeshManager& Context::getStructuredMeshManager ( )
 {
 	CHECK_NULL_PTR_ERROR (m_structured_mesh_manager)
 	return *m_structured_mesh_manager;
 }
 /*----------------------------------------------------------------------------*/
-const Mgx3D::Structured::StructuredMeshManagerIfc& Context::getStructuredMeshManager ( ) const
+const Mgx3D::Structured::StructuredMeshManager& Context::getStructuredMeshManager ( ) const
 {
 	CHECK_NULL_PTR_ERROR (m_structured_mesh_manager)
 	return *m_structured_mesh_manager;
 }
 /*----------------------------------------------------------------------------*/
-void Context::setStructuredMeshManager (Mgx3D::Structured::StructuredMeshManagerIfc* manager)
+void Context::setStructuredMeshManager (Mgx3D::Structured::StructuredMeshManager* manager)
 {
 	delete m_structured_mesh_manager;
 	m_structured_mesh_manager	= manager;

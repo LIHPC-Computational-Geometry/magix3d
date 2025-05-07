@@ -169,7 +169,7 @@ if (Doxygen_FOUND)
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyTransfinite.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyDelaunayNetgen.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyDelaunayTetgen.h 
-                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Mesh/MeshManagerIfc.h 
+                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Mesh/MeshManager.h
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Smoothing/SurfacicSmoothing.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Smoothing/VolumicSmoothing.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Mesh/MeshModificationBySepa.h 

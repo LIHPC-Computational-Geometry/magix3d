@@ -3931,7 +3931,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 		}   // QtMgx3DMainWindow::getTopoManager
 
 
-		Mesh::MeshManagerIfc &QtMgx3DMainWindow::getMeshManager()
+		Mesh::MeshManager &QtMgx3DMainWindow::getMeshManager()
 		{
 			return getContext().getMeshManager();
 		}   // QtMgx3DMainWindow::getMeshManager

@@ -399,7 +399,7 @@ createSubVolume(std::vector<BlockDirPos>& bloc_dirPos)
 #endif
 
     // création du sous-volume
-    Mesh::SubVolume* sv = getContext().getLocalMeshManager().getNewSubVolume(m_group_name, &getInfoCommand());
+    Mesh::SubVolume* sv = getContext().getMeshManager().getNewSubVolume(m_group_name, &getInfoCommand());
 
     // recherche le groupe 3D et le construit si nécessaire
     Group::Group3D* gr = getContext().getLocalGroupManager().getNewGroup3D(m_group_name, &getInfoCommand());
@@ -408,7 +408,7 @@ createSubVolume(std::vector<BlockDirPos>& bloc_dirPos)
     if (!gr->find(sv))
     	gr->add(sv);
 
-    gmds::Mesh& gmds_mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
+    gmds::Mesh& gmds_mesh = getContext().getMeshManager().getMesh()->getGMDSMesh();
 
     // parcours les blocs
     for (std::vector<BlockDirPos>::iterator iter1 = bloc_dirPos.begin();

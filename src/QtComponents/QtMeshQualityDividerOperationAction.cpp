@@ -28,7 +28,7 @@
 #include <QVBoxLayout>
 #include <QScrollArea>
 
-#include "Mesh/MeshManagerIfc.h"
+#include "Mesh/MeshManager.h"
 #include "Mesh/MeshItf.h"
 #include "Mesh/Mgx3DQualifSerie.h"
 

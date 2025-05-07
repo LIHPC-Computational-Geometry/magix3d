@@ -453,7 +453,7 @@ createSubVolume(std::vector<BlockDirPos>& bloc_dirPos)
     std::map<std::string, Mesh::SubVolume*> corr_subVol;
 
 
-    gmds::Mesh& gmds_mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
+    gmds::Mesh& gmds_mesh = getContext().getMeshManager().getMesh()->getGMDSMesh();
 
 
     // parcours les blocs et y récupère les noms des groupes

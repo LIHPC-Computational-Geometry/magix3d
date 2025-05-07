@@ -69,10 +69,10 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 //
 //	std::vector<Mesh::Surface*> surfaces;
 //	std::vector<Mesh::Cloud*> clouds;
-//	m_context.getLocalMeshManager().getSurfaces(surfaces);
-//	m_context.getLocalMeshManager().getClouds(clouds);
+//	m_context.getMeshManager().getSurfaces(surfaces);
+//	m_context.getMeshManager().getClouds(clouds);
 
-	gmds::Mesh& mesh = m_context.getLocalMeshManager().getMesh()->getGMDSMesh();
+	gmds::Mesh& mesh = m_context.getMeshManager().getMesh()->getGMDSMesh();
 	{
 		// surfaces
 		for(unsigned int iCoFace=0; iCoFace<topo_cofaces.size(); iCoFace++) {

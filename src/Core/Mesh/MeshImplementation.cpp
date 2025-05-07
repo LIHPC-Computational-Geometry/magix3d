@@ -214,13 +214,13 @@ bool MeshImplementation::createGMDSGroups()
     // Mgx3D::Mesh::Cloud, Line, Surface et Volume
 
     std::vector<Mesh::Cloud*> clouds;
-    getContext().getLocalMeshManager().getClouds(clouds);
+    getContext().getMeshManager().getClouds(clouds);
     std::vector<Mesh::Line*> lines;
-    getContext().getLocalMeshManager().getLines(lines);
+    getContext().getMeshManager().getLines(lines);
     std::vector<Mesh::Surface*> surfaces;
-    getContext().getLocalMeshManager().getSurfaces(surfaces);
+    getContext().getMeshManager().getSurfaces(surfaces);
     std::vector<Mesh::Volume*> volumes;
-    getContext().getLocalMeshManager().getVolumes(volumes);
+    getContext().getMeshManager().getVolumes(volumes);
 
     std::vector<gmds::CellGroup<gmds::Node>*> createdGMDSClouds;
     std::vector<gmds::CellGroup<gmds::Edge>*> createdGMDSLines;
@@ -860,14 +860,14 @@ void MeshImplementation::smooth()
 //	Mesquite::MsqError err;
 //
 //	MesquiteMeshImplAdapter* meshAdapter = new MesquiteMeshImplAdapter(
-//			getContext().getLocalMeshManager(),
+//			getContext().getMeshManager(),
 //			getContext().getGeomManager());
 //
 //	std::map<Mesquite::Mesh::VertexHandle,gmds::Node*>* mesquite2GMDSNodes = meshAdapter->getMesquite2GMDSNodes();
 //	std::map<Mesquite::Mesh::ElementHandle,gmds::Mesh<MeshItf::TMask>::Cell*>* mesquite2GMDSCells = meshAdapter->getMesquite2GMDSCells();
 //
 //	MesquiteDomainImplAdapter* domainAdapter = new MesquiteDomainImplAdapter(
-//			getContext().getLocalMeshManager(),
+//			getContext().getMeshManager(),
 //			getContext().getTopoManager(),
 //			*mesquite2GMDSNodes,
 //			*mesquite2GMDSCells);
@@ -913,7 +913,7 @@ void MeshImplementation::smooth()
 //	meshAdapter->vertices_get_coordinates(verticesArray,coords,vertices.size(),err);
 //	MSQ_CHKERR (err);
 //
-//	gmds::Mesh<Mgx3D::Mesh::MeshItf::TMask>::nodes_iterator itn  = getContext().getLocalMeshManager().getMesh()->getGMDSMesh().nodes_begin();
+//	gmds::Mesh<Mgx3D::Mesh::MeshItf::TMask>::nodes_iterator itn  = getContext().getMeshManager().getMesh()->getGMDSMesh().nodes_begin();
 //
 //	for (unsigned int iVertex=0; iVertex<vertices.size(); iVertex++) {
 //
@@ -937,13 +937,13 @@ void MeshImplementation::deleteGMDSGroups()
     // Mgx3D::Mesh::Cloud, Surface et Volume
 
     std::vector<Mesh::Cloud*> clouds;
-    getContext().getLocalMeshManager().getClouds(clouds);
+    getContext().getMeshManager().getClouds(clouds);
     std::vector<Mesh::Line*> lines;
-    getContext().getLocalMeshManager().getLines(lines);
+    getContext().getMeshManager().getLines(lines);
     std::vector<Mesh::Surface*> surfaces;
-    getContext().getLocalMeshManager().getSurfaces(surfaces);
+    getContext().getMeshManager().getSurfaces(surfaces);
     std::vector<Mesh::Volume*> volumes;
-    getContext().getLocalMeshManager().getVolumes(volumes);
+    getContext().getMeshManager().getVolumes(volumes);
 
 
     for(unsigned int iCloud=0; iCloud<clouds.size(); iCloud++) {
@@ -1290,18 +1290,18 @@ void MeshImplementation::_addNodesInClouds(Mesh::CommandCreateMesh* command, Top
 #endif
 
     // getStrategy() permet l'utilisation pour le cas normal, sinon (cas d'un jalon) on ne fait rien
-    if (getContext().getLocalMeshManager().getStrategy() == MeshManager::MODIFIABLE)
+    if (getContext().getMeshManager().getStrategy() == MeshManager::MODIFIABLE)
         for (size_t i=0; i<groupsName.size(); i++){
             std::string& nom = groupsName[i];
 
             try {
-                getContext().getLocalMeshManager().getCloud(nom);
+                getContext().getMeshManager().getCloud(nom);
                 command->addModifiedCloud(nom);
             } catch (...) {
                 command->addNewCloud(nom);
             }
 
-            Mesh::Cloud* cl = getContext().getLocalMeshManager().getCloud(nom);
+            Mesh::Cloud* cl = getContext().getMeshManager().getCloud(nom);
             cl->saveMeshCloudTopoProperty(&command->getInfoCommand());
             cl->addCoEdge(ed);
         } // end for i<groupsName.size()
@@ -1326,18 +1326,18 @@ void MeshImplementation::_addNodesInClouds(Mesh::CommandCreateMesh* command, Top
 #endif
 
     // getStrategy() permet l'utilisation pour le cas normal, sinon (cas d'un jalon) on ne fait rien
-    if (getContext().getLocalMeshManager().getStrategy() == MeshManager::MODIFIABLE)
+    if (getContext().getMeshManager().getStrategy() == MeshManager::MODIFIABLE)
         for (size_t i=0; i<groupsName.size(); i++){
             std::string& nom = groupsName[i];
 
             try {
-                getContext().getLocalMeshManager().getCloud(nom);
+                getContext().getMeshManager().getCloud(nom);
                 command->addModifiedCloud(nom);
             } catch (...) {
                 command->addNewCloud(nom);
             }
 
-            Mesh::Cloud* cl = getContext().getLocalMeshManager().getCloud(nom);
+            Mesh::Cloud* cl = getContext().getMeshManager().getCloud(nom);
             cl->saveMeshCloudTopoProperty(&command->getInfoCommand());
             cl->addVertex(ve);
         } // end for i<groupsName.size()
@@ -1362,18 +1362,18 @@ void MeshImplementation::_addEdgesInLines(Mesh::CommandCreateMesh* command, Topo
 #endif
 
     // getStrategy() permet l'utilisation pour le cas normal, sinon (cas d'un jalon) on ne fait rien
-    if (getContext().getLocalMeshManager().getStrategy() == MeshManager::MODIFIABLE)
+    if (getContext().getMeshManager().getStrategy() == MeshManager::MODIFIABLE)
         for (size_t i=0; i<groupsName.size(); i++){
             std::string& nom = groupsName[i];
 
             try {
-                getContext().getLocalMeshManager().getLine(nom);
+                getContext().getMeshManager().getLine(nom);
                 command->addModifiedLine(nom);
             } catch (...) {
                 command->addNewLine(nom);
             }
 
-            Mesh::Line* ln = getContext().getLocalMeshManager().getLine(nom);
+            Mesh::Line* ln = getContext().getMeshManager().getLine(nom);
             ln->saveMeshLineTopoProperty(&command->getInfoCommand());
             ln->addCoEdge(ed);
         } // end for i<groupsName.size()
