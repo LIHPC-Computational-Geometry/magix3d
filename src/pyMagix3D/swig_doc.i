@@ -278,13 +278,13 @@ Retourne un vecteur avec les identifiants des entités actuellement sélectionn�
 
 ";
 %feature("docstring") Mgx3D::Internal::ContextIfc::getTopoManager "
-virtual Mgx3D::Topo::TopoManagerIfc& Mgx3D::Internal::ContextIfc::getTopoManager()
+virtual Mgx3D::Topo::TopoManager& Mgx3D::Internal::ContextIfc::getTopoManager()
 
 Accesseur sur le manager topologique Uneexception est levée en l'absence de manager associé. 
 
 ";
 %feature("docstring") Mgx3D::Internal::ContextIfc::getTopoManager "
-virtual const Mgx3D::Topo::TopoManagerIfc& Mgx3D::Internal::ContextIfc::getTopoManager() const 
+virtual const Mgx3D::Topo::TopoManager& Mgx3D::Internal::ContextIfc::getTopoManager() const
 
 
 
@@ -1650,13 +1650,13 @@ Mgx3D::Mesh::SurfacicSmoothing::SurfacicSmoothing(int nbIterations, eSurfacicMet
 Constructeur avec paramètres différents du défaut. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc " 
+%feature("docstring") Mgx3D::Topo::TopoManager " 
 Interface de gestionnaire des opérations effectuées au niveau du module topologique. 
 Pour une documentation plus complète, voir TopoManager TopoManager 
 ";
 
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::alignVertices "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::alignVertices(std::vector< std::string > &vertices_names)
+%feature("docstring") Mgx3D::Topo::TopoManager::alignVertices "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::alignVertices(std::vector< std::string > &vertices_names)
 
 Aligne les sommets sélectionnés en fonction de leur projection et des extrémités de la sélection. 
 Il faut sélectionner un ensemble de sommets reliés entre eux par des arêtes. Les sommets extrémités ne sont pas déplacés. Les sommets entre ces extrémités sont placés sur l'intersection entre le segment délimités par les 2 sommets et par la courbe ou surface sur laquelle est faite la projection et simplement projeté sur le segment s'il n'y a pas de projection (ou si elle est faite sur un point).
@@ -1664,8 +1664,8 @@ Il faut sélectionner un ensemble de sommets reliés entre eux par des arêtes. 
 vertices_names : la liste des noms des sommets concernés 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::copy "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::copy(std::vector< std::string > &vb, std::string vo)
+%feature("docstring") Mgx3D::Topo::TopoManager::copy "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::copy(std::vector< std::string > &vb, std::string vo)
 
 création d'entités topologique par copie 
 
@@ -1673,8 +1673,8 @@ vb : les blocs topologiques que l'on veut copier
 vo : le volume auquel on associe les blocs 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::destroy "
-virtual void Mgx3D::Topo::TopoManagerIfc::destroy(std::vector< std::string > &ve, bool propagate)
+%feature("docstring") Mgx3D::Topo::TopoManager::destroy "
+virtual void Mgx3D::Topo::TopoManager::destroy(std::vector< std::string > &ve, bool propagate)
 
 Destruction d'entités topologiques. 
 
@@ -1682,117 +1682,117 @@ ve : noms des entités topologiques à détruire
 propagate : booléen à faux si on ne détruit que les entités, à vrai si on détruit les entités de dimensions inférieures qui ne sont pas reliées à une autre entité de dimension dim 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::extendSplitBlock "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::extendSplitBlock(std::string nbloc, std::string narete)
+%feature("docstring") Mgx3D::Topo::TopoManager::extendSplitBlock "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::extendSplitBlock(std::string nbloc, std::string narete)
 
 Découpe un bloc en deux en utilisant une arête qui coupe déjà une de ses faces. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::extendSplitFace "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::extendSplitFace(std::string coface_name, std::string nsommet)
+%feature("docstring") Mgx3D::Topo::TopoManager::extendSplitFace "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::extendSplitFace(std::string coface_name, std::string nsommet)
 
 Découpage d'une face structurée 2D ou 3D en deux suivant un sommet. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::fuse "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::fuse(std::vector< std::string > &coedges_names)
+%feature("docstring") Mgx3D::Topo::TopoManager::fuse "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::fuse(std::vector< std::string > &coedges_names)
 
 Fait la fusion de contours (Topo::CoEdges) 
 getFusableEdges
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::getBorderFaces "
-virtual std::vector<std::string> Mgx3D::Topo::TopoManagerIfc::getBorderFaces() const 
+%feature("docstring") Mgx3D::Topo::TopoManager::getBorderFaces "
+virtual std::vector<std::string> Mgx3D::Topo::TopoManager::getBorderFaces() const 
 
 
 Retourne la liste des faces communes au bord Ce sont les cofaces reliés à un seul bloc 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::getDefaultNbMeshingEdges "
-virtual int Mgx3D::Topo::TopoManagerIfc::getDefaultNbMeshingEdges()
+%feature("docstring") Mgx3D::Topo::TopoManager::getDefaultNbMeshingEdges "
+virtual int Mgx3D::Topo::TopoManager::getDefaultNbMeshingEdges()
 
 
 Retourne la discrétisation par défaut pour les arêtes 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::getDirOnBlock "
-virtual std::string Mgx3D::Topo::TopoManagerIfc::getDirOnBlock(const std::string &aname, const std::string &bname) const 
+%feature("docstring") Mgx3D::Topo::TopoManager::getDirOnBlock "
+virtual std::string Mgx3D::Topo::TopoManager::getDirOnBlock(const std::string &aname, const std::string &bname) const 
 
 
 Retourne une string avec les informations sur la direction de l'arête dans le bloc 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::getFusableEdges "
-virtual std::vector<std::vector<std::string> > Mgx3D::Topo::TopoManagerIfc::getFusableEdges()
+%feature("docstring") Mgx3D::Topo::TopoManager::getFusableEdges "
+virtual std::vector<std::vector<std::string> > Mgx3D::Topo::TopoManager::getFusableEdges()
 
 Retourne la liste de groupes de noms d'arêtes succeptible d'être fusionnées. 
 fuse
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::getInfos "
-virtual std::string Mgx3D::Topo::TopoManagerIfc::getInfos(const std::string &name, int dim) const 
+%feature("docstring") Mgx3D::Topo::TopoManager::getInfos "
+virtual std::string Mgx3D::Topo::TopoManager::getInfos(const std::string &name, int dim) const 
 
 
 Retourne une string avec les informations relatives à l'entité 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::getInvalidBlocks "
-virtual std::vector<std::string> Mgx3D::Topo::TopoManagerIfc::getInvalidBlocks() const 
+%feature("docstring") Mgx3D::Topo::TopoManager::getInvalidBlocks "
+virtual std::vector<std::string> Mgx3D::Topo::TopoManager::getInvalidBlocks() const 
 
 
 Retourne la liste des blocs invalides 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::getInvalidFaces "
-virtual std::vector<std::string> Mgx3D::Topo::TopoManagerIfc::getInvalidFaces() const 
+%feature("docstring") Mgx3D::Topo::TopoManager::getInvalidFaces "
+virtual std::vector<std::string> Mgx3D::Topo::TopoManager::getInvalidFaces() const 
 
 
 Retourne la liste des faces communes invalides Par exemple les faces structurées avec des discrétisations inégales pour 2 côtés opposés 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::getNbBlocks "
-virtual int Mgx3D::Topo::TopoManagerIfc::getNbBlocks() const 
+%feature("docstring") Mgx3D::Topo::TopoManager::getNbBlocks "
+virtual int Mgx3D::Topo::TopoManager::getNbBlocks() const 
 
 
 le nombre de blocs référencés par le TopoManager 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::getSemiConformalFaces "
-virtual std::vector<std::string> Mgx3D::Topo::TopoManagerIfc::getSemiConformalFaces() const 
+%feature("docstring") Mgx3D::Topo::TopoManager::getSemiConformalFaces "
+virtual std::vector<std::string> Mgx3D::Topo::TopoManager::getSemiConformalFaces() const 
 
 
 Retourne la liste des faces communes semi-conformes 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::getVisibleBlocks "
-virtual std::vector<std::string> Mgx3D::Topo::TopoManagerIfc::getVisibleBlocks() const 
+%feature("docstring") Mgx3D::Topo::TopoManager::getVisibleBlocks "
+virtual std::vector<std::string> Mgx3D::Topo::TopoManager::getVisibleBlocks() const 
 
 retourne la liste des noms des blocs visibles 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::glue2Blocks "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::glue2Blocks(std::string na, std::string nb)
+%feature("docstring") Mgx3D::Topo::TopoManager::glue2Blocks "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::glue2Blocks(std::string na, std::string nb)
 
 Fusion des faces communes entre 2 blocs. 
 Le premier bloc dont les faces prennent la place des autres. Le deuxième bloc dont les sommets d'une de ses faces doivent être le plus proche possible de celle de l'autre 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::glue2Faces "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::glue2Faces(std::string na, std::string nb)
+%feature("docstring") Mgx3D::Topo::TopoManager::glue2Faces "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::glue2Faces(std::string na, std::string nb)
 
 Fusion de 2 faces communes. 
 La 1ère Face commune prend la place de l'autre. Les sommets doivent être le plus proche possible 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::glue2Vertices "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::glue2Vertices(std::string na, std::string nb)
+%feature("docstring") Mgx3D::Topo::TopoManager::glue2Vertices "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::glue2Vertices(std::string na, std::string nb)
 
 Fusion de 2 sommets. 
 Le 1er sommet prend la place de l'autre. Attention, les arêtes et les faces ne sont pas colléees pour autant 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::importMDL "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::importMDL(std::string n, const bool all)
+%feature("docstring") Mgx3D::Topo::TopoManager::importMDL "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::importMDL(std::string n, const bool all)
 
 Import d'un fichier au format MDL (Géométrie et topologie) 
 
@@ -1800,8 +1800,8 @@ n le nom du ficher dont le contenu doit etre importe
 all à vrai si l'on veut importer toutes les entités, faux si l'on ne prend que ce qui est utile au 2D
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::makeBlocksByRevol "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::makeBlocksByRevol(std::vector< std::string > &coedges_names, const Utils::Portion::Type &dt)
+%feature("docstring") Mgx3D::Topo::TopoManager::makeBlocksByRevol "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::makeBlocksByRevol(std::vector< std::string > &coedges_names, const Utils::Portion::Type &dt)
 
 Construction de la topologie 3D par extrusion/rotation de la topologie 2D tout en faisant apparaitre un o-grid au centre. 
 
@@ -1809,8 +1809,8 @@ coedges_names : Les noms des arêtes pour repérer le tracé de l'ogrid On fait 
 dt : la portion de révolution. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::newBoxWithTopo "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::newBoxWithTopo(const Point &pmin, const Point &pmax, bool meshStructured=true, std::string groupName=\"\")
+%feature("docstring") Mgx3D::Topo::TopoManager::newBoxWithTopo "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::newBoxWithTopo(const Point &pmin, const Point &pmax, bool meshStructured=true, std::string groupName=\"\")
 
 Création d'une boite parallèle aux axes Ox,Oy et Oz à partir des points pmin et pmax où pmin est le point de plus petites coordonnées (x,y,z) et pmax le point de plus grandes coordonnées (x,y,z), avec sa topologie associée. 
 
@@ -1820,8 +1820,8 @@ meshStructured : un booléen pour choisir si le maillage doit être structuré o
 groupName : optionnellement un nom de groupe
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::newBoxWithTopo "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::newBoxWithTopo(const Point &pmin, const Point &pmax, const int ni, const int nj, const int nk, std::string groupName=\"\")
+%feature("docstring") Mgx3D::Topo::TopoManager::newBoxWithTopo "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::newBoxWithTopo(const Point &pmin, const Point &pmax, const int ni, const int nj, const int nk, std::string groupName=\"\")
 
 Création d'une boite parallèle aux axes Ox,Oy et Oz à partir des points pmin et pmax où pmin est le point de plus petites coordonnées (x,y,z) et pmax le point de plus grandes coordonnées (x,y,z), avec sa topologie associée en ni X nj X nk mailles. 
 
@@ -1833,8 +1833,8 @@ nk : le nombre de bras sur la direction des z
 groupName : optionnellement un nom de groupe
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::newCylinderWithTopo "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::newCylinderWithTopo(const Point &pcentre, const double &dr, const Vector &dv, const double &da, bool meshStructured, const double &rat, const int naxe, const int ni, const int nr, std::string groupName=\"\")
+%feature("docstring") Mgx3D::Topo::TopoManager::newCylinderWithTopo "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::newCylinderWithTopo(const Point &pcentre, const double &dr, const Vector &dv, const double &da, bool meshStructured, const double &rat, const int naxe, const int ni, const int nr, std::string groupName=\"\")
 
 Création d'un cylindre avec une topologie, suivant un cercle, sa base (un cercle défini par un centre et un rayon) et son axe. 
 
@@ -1850,8 +1850,8 @@ nr : le nombre de couches entre le bloc central et la surface externe
 groupName : optionnellement un nom de groupe 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::newFreeTopoOnGeometry "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::newFreeTopoOnGeometry(std::string ne)
+%feature("docstring") Mgx3D::Topo::TopoManager::newFreeTopoOnGeometry "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::newFreeTopoOnGeometry(std::string ne)
 
 Création d'un block (ou d'une face) topologique structuré sans association. 
 Ne fonctionne que pour un volume ou une surface Seule l'entité de plus haut niveau (Block ou CoFace) sera associée à l'entité géométrique
@@ -1859,8 +1859,8 @@ Ne fonctionne que pour un volume ou une surface Seule l'entité de plus haut niv
 ne : le nom de l'entité géométrique sur laquelle s'appuiera la topologie 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::newIJBoxesWithTopo "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::newIJBoxesWithTopo(int ni, int nj, bool alternateStruture)
+%feature("docstring") Mgx3D::Topo::TopoManager::newIJBoxesWithTopo "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::newIJBoxesWithTopo(int ni, int nj, bool alternateStruture)
 
 Création d'une grille de ni par nj boites répartis sur Ox et Oy les boites sont toutes de taille 1x1x1 et ont une topologie associée structurée si alternateStruture == false et sinon alternativement une structurée une non-structurée. 
 
@@ -1869,8 +1869,8 @@ nj : le nombre de boite dans la direction Oy
 alternateStruture : vrai si l'on veut des blocs alternativement st/non-st
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::newIJKBoxesWithTopo "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::newIJKBoxesWithTopo(int ni, int nj, int nk, bool alternateStruture)
+%feature("docstring") Mgx3D::Topo::TopoManager::newIJKBoxesWithTopo "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::newIJKBoxesWithTopo(int ni, int nj, int nk, bool alternateStruture)
 
 Création d'une grille de ni par nj par nk boites répartis sur Ox, Oy et Oz les boites sont toutes de taille 1x1x1 et ont une topologie associée structurée si alternateStruture == false et sinon alternativement une structurée une non-structurée. 
 
@@ -1880,16 +1880,16 @@ nk : le nombre de boite dans la direction Oz
 alternateStruture : vrai si l'on veut des blocs alternativement st/non-st
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::newInsertionTopoOnGeometry "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::newInsertionTopoOnGeometry(std::string ne)
+%feature("docstring") Mgx3D::Topo::TopoManager::newInsertionTopoOnGeometry "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::newInsertionTopoOnGeometry(std::string ne)
 
 Création d'une topologie pour l'insertion s'appuyant sur une géométrie. 
 
 ne : le nom de l'entité géométrique sur laquelle s'appuiera la topologie 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::newSphereWithTopo "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::newSphereWithTopo(const Point &pcentre, const double &radius, const Utils::Portion::Type &dt, bool meshStructured, const double &rat, const int ni, const int nr, std::string groupName=\"\")
+%feature("docstring") Mgx3D::Topo::TopoManager::newSphereWithTopo "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::newSphereWithTopo(const Point &pcentre, const double &radius, const Utils::Portion::Type &dt, bool meshStructured, const double &rat, const int ni, const int nr, std::string groupName=\"\")
 
 Création d'une sphère avec une topologie, suivant un centre, son rayon et pour une portion donnée. 
 
@@ -1903,8 +1903,8 @@ nr : le nombre de couches entre le bloc central et la surface externe
 groupName : optionnellement un nom de groupe
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::newStructuredTopoOnGeometry "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::newStructuredTopoOnGeometry(std::string ne)
+%feature("docstring") Mgx3D::Topo::TopoManager::newStructuredTopoOnGeometry "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::newStructuredTopoOnGeometry(std::string ne)
 
 Création d'une topologie structurée s'appuyant sur une géométrie. 
 Retourne une exception si la topologie créée ne peut pas être rendue structurée
@@ -1913,8 +1913,8 @@ Ne fonctionne que pour un volume ou une surface
 ne : le nom de l'entité géométrique sur laquelle s'appuiera la topologie 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::newTopoOGridOnGeometry "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::newTopoOGridOnGeometry(std::string ne, const double &rat)
+%feature("docstring") Mgx3D::Topo::TopoManager::newTopoOGridOnGeometry "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::newTopoOGridOnGeometry(std::string ne, const double &rat)
 
 Création d'une topologie structurée en o-grid. 
 La topologie créée s'adapte à un cylindre (5 blocs) ou à une sphère
@@ -1923,8 +1923,8 @@ ne : le nom de l'entité géométrique sur laquelle s'appuiera la topologie
 rat : le ratio de la distance entre l'axe du cylindre et son rayon pour placer le sommet du o-grid 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::newUnstructuredTopoOnGeometry "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::newUnstructuredTopoOnGeometry(std::string ne)
+%feature("docstring") Mgx3D::Topo::TopoManager::newUnstructuredTopoOnGeometry "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::newUnstructuredTopoOnGeometry(std::string ne)
 
 Création d'une topologie non-structurée s'appuyant sur une géométrie. 
 La topologie créée est non-structurée
@@ -1932,20 +1932,20 @@ La topologie créée est non-structurée
 ne : le nom de l'entité géométrique sur laquelle s'appuiera la topologie 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::refine "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::refine(int ratio)
+%feature("docstring") Mgx3D::Topo::TopoManager::refine "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::refine(int ratio)
 
 Raffine toute les arêtes. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::reverseDirection "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::reverseDirection(std::vector< std::string > &edge_names)
+%feature("docstring") Mgx3D::Topo::TopoManager::reverseDirection "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::reverseDirection(std::vector< std::string > &edge_names)
 
 Change le sens de la discrétisation pour une liste d'arête communes. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::rotate "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::rotate(std::vector< std::string > &ve, const Utils::Math::Rotation &rot, const bool withGeom)
+%feature("docstring") Mgx3D::Topo::TopoManager::rotate "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::rotate(std::vector< std::string > &ve, const Utils::Math::Rotation &rot, const bool withGeom)
 
 
 Opération de rotation de la topologie (et de la géométrie suivant option)
@@ -1954,8 +1954,8 @@ La rotation des objets topologiques de haut niveau (bloc par exemple) entraine c
 rot : la rotation 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::scale "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::scale(std::vector< std::string > &ve, const double &facteur, const bool withGeom)
+%feature("docstring") Mgx3D::Topo::TopoManager::scale "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::scale(std::vector< std::string > &ve, const double &facteur, const bool withGeom)
 
 
 Opération d'homothétie de la topologie (et de la géométrie suivant option) L'homothétie des objets topologiques de haut niveau (bloc par exemple) entraine celle des objets de niveau inférieurs (face, arêtes et sommets) et réciproquement.
@@ -1963,87 +1963,87 @@ Opération d'homothétie de la topologie (et de la géométrie suivant option) L
 facteur : supérieur à 0 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::setAllMeshingProperty "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::setAllMeshingProperty(Topo::CoEdgeMeshingProperty &emp)
+%feature("docstring") Mgx3D::Topo::TopoManager::setAllMeshingProperty "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::setAllMeshingProperty(Topo::CoEdgeMeshingProperty &emp)
 
 Change la propriété de discrétisation pour toutes les arêtes. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::setAllMeshingProperty "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::setAllMeshingProperty(Topo::CoFaceMeshingProperty &emp)
+%feature("docstring") Mgx3D::Topo::TopoManager::setAllMeshingProperty "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::setAllMeshingProperty(Topo::CoFaceMeshingProperty &emp)
 
 Change la propriété de discrétisation pour toutes les faces. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::setAllMeshingProperty "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::setAllMeshingProperty(Topo::BlockMeshingProperty &emp)
+%feature("docstring") Mgx3D::Topo::TopoManager::setAllMeshingProperty "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::setAllMeshingProperty(Topo::BlockMeshingProperty &emp)
 
 Change la propriété de discrétisation pour tous les blocs. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::setBlockMeshingProperty "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::setBlockMeshingProperty(Topo::BlockMeshingProperty &emp, std::string bl)
+%feature("docstring") Mgx3D::Topo::TopoManager::setBlockMeshingProperty "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::setBlockMeshingProperty(Topo::BlockMeshingProperty &emp, std::string bl)
 
 Change la propriété de discrétisation pour un bloc. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::setDefaultNbMeshingEdges "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::setDefaultNbMeshingEdges(int nb)
+%feature("docstring") Mgx3D::Topo::TopoManager::setDefaultNbMeshingEdges "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::setDefaultNbMeshingEdges(int nb)
 
 
 Commande qui change le nombre de bras par défaut pour une arête 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::setEdgeMeshingProperty "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::setEdgeMeshingProperty(Topo::CoEdgeMeshingProperty &emp, std::string ed)
+%feature("docstring") Mgx3D::Topo::TopoManager::setEdgeMeshingProperty "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::setEdgeMeshingProperty(Topo::CoEdgeMeshingProperty &emp, std::string ed)
 
 Change la propriété de discrétisation pour une arête. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::setFaceMeshingProperty "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::setFaceMeshingProperty(Topo::CoFaceMeshingProperty &emp, std::string cf)
+%feature("docstring") Mgx3D::Topo::TopoManager::setFaceMeshingProperty "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::setFaceMeshingProperty(Topo::CoFaceMeshingProperty &emp, std::string cf)
 
 Change la propriété de discrétisation pour une face commune. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::setGeomAssociation "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::setGeomAssociation(std::vector< std::string > &topo_entities_names, std::string geom_entity_name, bool move_vertices)
+%feature("docstring") Mgx3D::Topo::TopoManager::setGeomAssociation "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::setGeomAssociation(std::vector< std::string > &topo_entities_names, std::string geom_entity_name, bool move_vertices)
 
 
 Affecte la projection des entités topologiques vers une entité géométrique
 Si le nom de l'entité géométrique est vide, on supprime les associations existantes. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::setMeshingProperty "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::setMeshingProperty(Topo::CoEdgeMeshingProperty &emp, std::vector< std::string > &edge_names)
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::setMeshingProperty(Topo::CoFaceMeshingProperty &emp, std::vector< std::string > &face_names)
+%feature("docstring") Mgx3D::Topo::TopoManager::setMeshingProperty "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::setMeshingProperty(Topo::CoEdgeMeshingProperty &emp, std::vector< std::string > &edge_names)
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::setMeshingProperty(Topo::CoFaceMeshingProperty &emp, std::vector< std::string > &face_names)
 
 Change la propriété de discrétisation pour une liste d'arête ou faces communes. 
 La propriété emp est clonée. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::setMeshingProperty "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::setMeshingProperty(Topo::BlockMeshingProperty &emp, std::vector< std::string > &bloc_names)
+%feature("docstring") Mgx3D::Topo::TopoManager::setMeshingProperty "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::setMeshingProperty(Topo::BlockMeshingProperty &emp, std::vector< std::string > &bloc_names)
 
 Change la propriété de discrétisation pour une liste de blocs. 
 La propriété emp est clonée. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::setNbMeshingEdges "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::setNbMeshingEdges(std::string edge, int nb, std::vector< std::string > &frozed_edges_names)
+%feature("docstring") Mgx3D::Topo::TopoManager::setNbMeshingEdges "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::setNbMeshingEdges(std::string edge, int nb, std::vector< std::string > &frozed_edges_names)
 
 Change la discrétisation pour une arête commune (en nombre de bras seulement) et propage le changement aux arêtes parallèles pour maintenir la structuration suivant les faces communes (si structuré) 
 Un ensemble d'arêtes peuvent être figées pour empécher le changement 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::setParallelMeshingProperty "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::setParallelMeshingProperty(CoEdgeMeshingProperty &emp, std::string coedge_name)
+%feature("docstring") Mgx3D::Topo::TopoManager::setParallelMeshingProperty "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::setParallelMeshingProperty(CoEdgeMeshingProperty &emp, std::string coedge_name)
 
 Change la propriété de discrétisation pour une arête et ses arêtes parallèles. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::setVertexLocation "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::setVertexLocation(std::vector< std::string > &vertices_names, const bool changeX, const double &xPos, const bool changeY, const double &yPos, const bool changeZ, const double &zPos)
+%feature("docstring") Mgx3D::Topo::TopoManager::setVertexLocation "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::setVertexLocation(std::vector< std::string > &vertices_names, const bool changeX, const double &xPos, const bool changeY, const double &yPos, const bool changeZ, const double &zPos)
 
 
 Opération de déplacement de sommets
@@ -2058,15 +2058,15 @@ changeZ : vrai si la coordonnée en Z est à modifier
 zPos : la nouvelle valeur pour la coordonnées en Z 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::snapAllProjectedVertices "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::snapAllProjectedVertices()
+%feature("docstring") Mgx3D::Topo::TopoManager::snapAllProjectedVertices "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::snapAllProjectedVertices()
 
 
 Déplace tous les sommets en fonction de leur projection 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::snapProjectedVertices "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::snapProjectedVertices(std::vector< std::string > &vertices_names)
+%feature("docstring") Mgx3D::Topo::TopoManager::snapProjectedVertices "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::snapProjectedVertices(std::vector< std::string > &vertices_names)
 
 
 Déplace les sommets sélectionnés en fonction de leur projection
@@ -2074,8 +2074,8 @@ Déplace les sommets sélectionnés en fonction de leur projection
 vertices_names : la liste des noms des sommets concernés 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::snapVertices "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::snapVertices(std::string nom1, std::string nom2, bool project_on_first)
+%feature("docstring") Mgx3D::Topo::TopoManager::snapVertices "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::snapVertices(std::string nom1, std::string nom2, bool project_on_first)
 
 Fusionne un sommet avec un autre, pour un couple de sommets ou pour les sommets de 2 faces, ou pour 2 arêtes. 
 On sélectionne une première face maitresse et une seconde qui va aller se coller sur la première. On peut aussi ne sélectionner que 2 sommets. Si désiré, on place chacun des sommets au milieu des couples.
@@ -2087,31 +2087,31 @@ nom2 : une deuxième entité du même type que la précédente
 project_on_first : si l'on projette sur la première entité, sinon on place au milieu des sommets 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::splitAllFaces "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::splitAllFaces(std::string narete, const double &ratio_dec=0.5, const double &ratio_ogrid=0.5)
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::splitAllFaces(std::string narete, const Point &pt, const double &ratio_ogrid=0.5)
+%feature("docstring") Mgx3D::Topo::TopoManager::splitAllFaces "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::splitAllFaces(std::string narete, const double &ratio_dec=0.5, const double &ratio_ogrid=0.5)
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::splitAllFaces(std::string narete, const Point &pt, const double &ratio_ogrid=0.5)
 
 Découpe toutes les faces structurées 2D en deux. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::splitBlock "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::splitBlock(std::string nbloc, std::string narete, const double &ratio)
+%feature("docstring") Mgx3D::Topo::TopoManager::splitBlock "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::splitBlock(std::string nbloc, std::string narete, const double &ratio)
 
 Découpe un bloc en deux. 
 On utilise une arête et un ratio pour positionner un premier sommet qui va être inséré sur l'arête. Les 3 autres arêtes parallèles sont aussi découpées avec le même ratio. Une face basée sur ces 4 arêtes est créée, elle coupe le bloc en 2. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::splitBlocks "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::splitBlocks(std::vector< std::string > &blocs_names, std::string narete, const double &ratio)
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::splitBlocks(std::vector< std::string > &blocs_names, std::string narete, const Point &pt)
+%feature("docstring") Mgx3D::Topo::TopoManager::splitBlocks "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::splitBlocks(std::vector< std::string > &blocs_names, std::string narete, const double &ratio)
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::splitBlocks(std::vector< std::string > &blocs_names, std::string narete, const Point &pt)
 
 Découpe un ensembles de blocs en deux. 
 On utilise une arête et un ratio pour positionner un premier sommet qui va être inséré sur l'arête. Les 3 autres arêtes parallèles sont aussi découpées avec le même ratio. Une face basée sur ces 4 arêtes est créée, elle coupe un premier bloc en 2. Ensuite les autres blocs sont découpés comme cela serait le cas avec extendSplitBlock. 
 On utilise une arête et un point que l'on projette sur cette arête pour positionner un premier sommet qui va être inséré sur l'arête. Les 3 autres arêtes parallèles sont aussi découpées avec le même ratio. Une face basée sur ces 4 arêtes est créée, elle coupe un premier bloc en 2. Ensuite les autres blocs sont découpés comme cela serait le cas avec extendSplitBlock. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::splitBlocksWithOgrid "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::splitBlocksWithOgrid(std::vector< std::string > &blocs_names, std::vector< std::string > &cofaces_names, const double &ratio, int nb_bras)
+%feature("docstring") Mgx3D::Topo::TopoManager::splitBlocksWithOgrid "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::splitBlocksWithOgrid(std::vector< std::string > &blocs_names, std::vector< std::string > &cofaces_names, const double &ratio, int nb_bras)
 
 Découpe un ensemble de blocs suivant un o-grid. 
 
@@ -2121,43 +2121,43 @@ ratio_ogrid : ratio pour positionner les nouveaux sommets, entre les sommets du 
 nb_bras : le nombre de couches de mailles autour du centre du o-grid à créer (c.a.d. le nombre de bras pour les arêtes entre les sommets du bord de la sélection et ceux créés) 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::splitEdge "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::splitEdge(std::string coedge_name, const double &ratio_dec=0.5)
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::splitEdge(std::string coedge_name, const Point &pt)
+%feature("docstring") Mgx3D::Topo::TopoManager::splitEdge "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::splitEdge(std::string coedge_name, const double &ratio_dec=0.5)
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::splitEdge(std::string coedge_name, const Point &pt)
 
 Découpe d'une arête commune en 2. 
 On utilise un ratio pour positionner le sommet 
 On utilise une arête et un point que l'on projette sur cette arête pour positionner un premier sommet qui va être inséré sur l'arête. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::splitFace "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::splitFace(std::string coface_name, std::string narete, const double &ratio_dec, bool project_on_meshing_edges=true)
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::splitFace(std::string coface_name, std::string narete, const Point &pt, bool project_on_meshing_edges=true)
+%feature("docstring") Mgx3D::Topo::TopoManager::splitFace "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::splitFace(std::string coface_name, std::string narete, const double &ratio_dec, bool project_on_meshing_edges=true)
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::splitFace(std::string coface_name, std::string narete, const Point &pt, bool project_on_meshing_edges=true)
 
 Découpage d'une face structurée 2D ou 3D en deux suivant un ratio. 
 On utilise une arête et un ratio pour positionner un premier sommet qui va être inséré sur l'arête. L'autre arête parallèle est aussi découpée avec le même ratio. 
 On utilise une arête et un point que l'on projette sur cette arête pour positionner un premier sommet qui va être inséré sur l'arête. L'autre arête parallèle est aussi découpée avec le même ratio induit de la première coupe. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::splitFaces "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::splitFaces(std::vector< std::string > &cofaces_names, std::string narete, const double &ratio_dec, const double &ratio_ogrid)
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::splitFaces(std::vector< std::string > &cofaces_names, std::string narete, const Point &pt, const double &ratio_ogrid)
+%feature("docstring") Mgx3D::Topo::TopoManager::splitFaces "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::splitFaces(std::vector< std::string > &cofaces_names, std::string narete, const double &ratio_dec, const double &ratio_ogrid)
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::splitFaces(std::vector< std::string > &cofaces_names, std::string narete, const Point &pt, const double &ratio_ogrid)
 
 Découpe des faces structurées 2D en deux. 
 On utilise une arête et un ratio pour positionner un premier sommet qui va être inséré sur l'arête. Les autres arêtes parallèles sont aussi découpées avec le même ratio. Si ratio_ogrid vaut 0, alors le tracé de l'ogrid peut passer par l'axe si une face n'a que 3 côté, sinon on découpe la face en 3 (ogrid en 2D) avec un sommet placé avec ce ratio entre le sommet dans le prolongement sur l'axe et le sommet à l'entrée dans la face. 
 On utilise une arête et un point que l'on projette sur cette arête pour positionner un premier sommet qui va être inséré sur l'arête. Les autres arêtes parallèles sont aussi découpées avec le même ratio induit par le premier sommet. Si ratio_ogrid vaut 0, alors le tracé de l'ogrid peut passer par l'axe si une face n'a que 3 côté, sinon on découpe la face en 3 (ogrid en 2D) avec un sommet placé avec ce ratio entre le sommet dans le prolongement sur l'axe et le sommet à l'entrée dans la face. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::TopoManagerIfc "
-Mgx3D::Topo::TopoManagerIfc::TopoManagerIfc(const std::string &name, Internal::ContextIfc *c)
+%feature("docstring") Mgx3D::Topo::TopoManager::TopoManager "
+Mgx3D::Topo::TopoManager::TopoManager(const std::string &name, Internal::ContextIfc *c)
 
 Constructeur. 
 
 c : le contexte ce qui permet d'accéder entre autre au CommandManager 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::translate "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::translate(std::vector< std::string > &ve, const Vector &dp, const bool withGeom)
+%feature("docstring") Mgx3D::Topo::TopoManager::translate "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::translate(std::vector< std::string > &ve, const Vector &dp, const bool withGeom)
 
 
 Opération de translation de la topologie (et de la géométrie suivant option)
@@ -2166,21 +2166,21 @@ La translation des objets topologiques de haut niveau (bloc par exemple) entrain
 dp : le vecteur de translation 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::unrefine "
-virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManagerIfc::unrefine(std::string nbloc, std::string narete, int ratio)
+%feature("docstring") Mgx3D::Topo::TopoManager::unrefine "
+virtual Mgx3D::Internal::M3DCommandResultIfc* Mgx3D::Topo::TopoManager::unrefine(std::string nbloc, std::string narete, int ratio)
 
 Déraffine un bloc structuré suivant une direction. 
 On utilise une arête pour déterminer la direction 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::~TopoManagerIfc "
-virtual Mgx3D::Topo::TopoManagerIfc::~TopoManagerIfc()
+%feature("docstring") Mgx3D::Topo::TopoManager::~TopoManager "
+virtual Mgx3D::Topo::TopoManager::~TopoManager()
 
 Destructeur. RAS. 
 
 ";
-%feature("docstring") Mgx3D::Topo::TopoManagerIfc::TopoManagerIfc "
-Mgx3D::Topo::TopoManagerIfc::TopoManagerIfc(const TopoManagerIfc &)
+%feature("docstring") Mgx3D::Topo::TopoManager::TopoManager "
+Mgx3D::Topo::TopoManager::TopoManager(const TopoManager &)
 
 
 Constructeur de copie : interdit. 

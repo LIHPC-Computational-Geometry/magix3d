@@ -38,7 +38,7 @@ CommandChangeDefaultNbMeshingEdges::~CommandChangeDefaultNbMeshingEdges()
 /*----------------------------------------------------------------------------*/
 TopoManager& CommandChangeDefaultNbMeshingEdges::getTopoManager()
 {
-    return getContext().getLocalTopoManager();
+    return getContext().getTopoManager();
 }
 /*----------------------------------------------------------------------------*/
 void CommandChangeDefaultNbMeshingEdges::

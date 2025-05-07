@@ -83,7 +83,7 @@ CoEdge(Internal::Context& ctx,
 
     // om met une discrétisation par défaut
     if (m_mesh_property == 0){
-        EdgeMeshingPropertyUniform loc_emp(ctx.getLocalTopoManager().getDefaultNbMeshingEdges());
+        EdgeMeshingPropertyUniform loc_emp(ctx.getTopoManager().getDefaultNbMeshingEdges());
         m_mesh_property = loc_emp.clone();
     }
 
@@ -1664,7 +1664,7 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 
 			CoFace* coface = 0;
 			try {
-				coface = getContext().getLocalTopoManager().getCoFace(coface_name, false);
+				coface = getContext().getTopoManager().getCoFace(coface_name, false);
 			}
 			catch (Utils::IsDestroyedException &e){
 				TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -1733,7 +1733,7 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 		uint nbMeshingEdges1 = 0;
 		uint nbMeshingEdges2 = 0;
 		for (uint i=0; i<first_coedges_names.size(); i++){
-			CoEdge* coedge = getContext().getLocalTopoManager().getCoEdge(first_coedges_names[i], false);
+			CoEdge* coedge = getContext().getTopoManager().getCoEdge(first_coedges_names[i], false);
 
 			if (coedge == 0){
 				TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -1756,7 +1756,7 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 		} // end for i<first_coedges_names.size()
 
 		for (uint i=0; i<second_coedges_names.size(); i++){
-			CoEdge* coedge = getContext().getLocalTopoManager().getCoEdge(second_coedges_names[i], false);
+			CoEdge* coedge = getContext().getTopoManager().getCoEdge(second_coedges_names[i], false);
 
 			if (coedge == 0){
 				TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -2392,7 +2392,7 @@ check() const
             try {
                 std::vector<std::string> coedges = empi->getCoEdges();
                 for (uint i = 0; i < coedges.size(); i++)
-                    getContext().getLocalTopoManager().getCoEdge(coedges[i], true);
+                    getContext().getTopoManager().getCoEdge(coedges[i], true);
             }
             catch (Utils::IsDestroyedException e)
             {
@@ -2405,7 +2405,7 @@ check() const
 		else if (empi->getType() == EdgeMeshingPropertyInterpolate::with_coface){
 			try {
 				std::string coface = empi->getCoFace();
-				getContext().getLocalTopoManager().getCoFace(coface, true);
+				getContext().getTopoManager().getCoFace(coface, true);
 			}
 			catch (Utils::IsDestroyedException e)
 			{
@@ -2424,11 +2424,11 @@ check() const
 
     	std::vector<std::string> coedges = empi->getFirstCoEdges();
     	for (uint i=0; i<coedges.size(); i++)
-    		getContext().getLocalTopoManager().getCoEdge(coedges[i], true);
+    		getContext().getTopoManager().getCoEdge(coedges[i], true);
 
     	coedges = empi->getSecondCoEdges();
     	for (uint i=0; i<coedges.size(); i++)
-    		getContext().getLocalTopoManager().getCoEdge(coedges[i], true);
+    		getContext().getTopoManager().getCoEdge(coedges[i], true);
     }
 
     // vérification qu'elle est maillable
@@ -2846,7 +2846,7 @@ detectLoopReference(const Topo::CoEdge* coedge_dep, std::vector<Topo::CoEdge*>& 
 
 				CoFace* coface = 0;
 				try {
-					coface = getContext().getLocalTopoManager().getCoFace(coface_name, false);
+					coface = getContext().getTopoManager().getCoFace(coface_name, false);
 				}
 				catch (Utils::IsDestroyedException &e){
 					TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -2927,7 +2927,7 @@ void CoEdge::updateModificationTime(const Topo::CoEdge* coedge_ref, std::vector<
 void CoEdge::getCoEdges(std::vector<std::string>& coedges_names, std::vector<Topo::CoEdge*>& coedges) const
 {
 	for (uint i=0; i<coedges_names.size(); i++){
-		CoEdge* coedge = getContext().getLocalTopoManager().getCoEdge(coedges_names[i], false);
+		CoEdge* coedge = getContext().getTopoManager().getCoEdge(coedges_names[i], false);
 
 		if (coedge == 0){
 			TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);

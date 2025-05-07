@@ -132,7 +132,7 @@ namespace Mgx3D {
 namespace Topo {
 /*----------------------------------------------------------------------------*/
 TopoManager::TopoManager(const std::string& name, Internal::ContextIfc* c)
-:Topo::TopoManagerIfc (name, c)
+: Internal::CommandCreator(name, c)
 , m_defaultNbMeshingEdges(10)
 {
 #ifdef _DEBUG_TIMER
@@ -2199,8 +2199,8 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::glue2Blocks(Block* bl_A, Bloc
 Internal::M3DCommandResultIfc* TopoManager::glue2Topo(
 		std::string volName1, std::string volName2)
 {
-	return glue2Topo(getLocalContext().getLocalGeomManager().getVolume(volName1, true),
-			getLocalContext().getLocalGeomManager().getVolume(volName2, true));
+	return glue2Topo(getLocalContext().getGeomManager().getVolume(volName1, true),
+			getLocalContext().getGeomManager().getVolume(volName2, true));
 }
 /*----------------------------------------------------------------------------*/
 Internal::M3DCommandResultIfc* TopoManager::glue2Topo(
@@ -3025,7 +3025,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::makeBlocksByRevol(std::vector
     std::map<Geom::GeomEntity*, uint> filtre_surf;
 
     if (coedges.empty()){
-    	std::vector<Geom::Surface*> surfs = getLocalContext().getLocalGeomManager().getSurfacesObj();
+    	std::vector<Geom::Surface*> surfs = getLocalContext().getGeomManager().getSurfacesObj();
     	geom_entities.insert(geom_entities.end(), surfs.begin(), surfs.end());
     }
 

@@ -106,7 +106,7 @@ void GeomModificationBaseClass::init(std::vector<GeomEntity*>& es)
 /*----------------------------------------------------------------------------*/
 void GeomModificationBaseClass::initWithAll()
 {
-	Geom::GeomManager& gm = getContext().getLocalGeomManager();
+	Geom::GeomManager& gm = getContext().getGeomManager();
 
 	std::vector<Volume*> volumes = gm.getVolumesObj();
 	for (uint i=0; i<volumes.size(); i++){

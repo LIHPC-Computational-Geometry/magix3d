@@ -149,7 +149,7 @@ if (Doxygen_FOUND)
                          ${CMAKE_SOURCE_DIR}/src/Utils/protected/Utils/Constants.h 
                          ${CMAKE_SOURCE_DIR}/src/Utils/protected/Utils/Unit.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/TopoInfo.h 
-                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/TopoManagerIfc.h 
+                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/TopoManager.h
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/CoEdgeMeshingProperty.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/EdgeMeshingPropertyUniform.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/EdgeMeshingPropertyGeometric.h 

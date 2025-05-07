@@ -155,12 +155,12 @@ void ContextIfc::setGeomManager (Geom::GeomManager*)
 	throw TkUtil::Exception ("ContextIfc::getGeomManager should be overloaded.");
 }	// ContextIfc::setGeomManager
 /*----------------------------------------------------------------------------*/
-Topo::TopoManagerIfc& ContextIfc::getTopoManager ( )
+Topo::TopoManager& ContextIfc::getTopoManager ( )
 {
 	throw TkUtil::Exception ("ContextIfc::getTopoManager should be overloaded.");
 }	// ContextIfc::getTopoManager
 /*----------------------------------------------------------------------------*/
-const Topo::TopoManagerIfc& ContextIfc::getTopoManager ( ) const
+const Topo::TopoManager& ContextIfc::getTopoManager ( ) const
 {
 	throw TkUtil::Exception ("ContextIfc::getTopoManager should be overloaded.");
 }	// ContextIfc::getTopoManager

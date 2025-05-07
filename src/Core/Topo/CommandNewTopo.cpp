@@ -180,7 +180,7 @@ CommandNewTopo::
         CoEdge* CommandNewTopo::createCoEdge(Vertex* v0,Vertex* v1, std::string groupName)
         {
 
-            EdgeMeshingPropertyUniform emp(getContext().getLocalTopoManager().getDefaultNbMeshingEdges());
+            EdgeMeshingPropertyUniform emp(getContext().getTopoManager().getDefaultNbMeshingEdges());
             CoEdge* coedge = new CoEdge(getContext(), &emp, v0, v1);
 
 

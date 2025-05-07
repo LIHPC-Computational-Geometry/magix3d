@@ -37,7 +37,7 @@ using std::ptrdiff_t;
 #include "Geom/GeomInfo.h"
 
 #include "Topo/TopoInfo.h"
-#include "Topo/TopoManagerIfc.h"
+#include "Topo/TopoManager.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Topo/EdgeMeshingPropertyGeometric.h"
 #include "Topo/EdgeMeshingPropertyBigeometric.h"
@@ -313,7 +313,7 @@ using std::ptrdiff_t;
 %include Geom/GeomManager.h
 
 %include Topo/TopoInfo.h
-%include Topo/TopoManagerIfc.h
+%include Topo/TopoManager.h
 %include Topo/CoEdgeMeshingProperty.h
 %include Topo/EdgeMeshingPropertyUniform.h
 %include Topo/EdgeMeshingPropertyGeometric.h

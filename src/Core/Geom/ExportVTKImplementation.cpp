@@ -38,7 +38,7 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 {
 
 
-	std::vector<std::string> volumesNames = m_context.getLocalGeomManager().getVolumes();
+	std::vector<std::string> volumesNames = m_context.getGeomManager().getVolumes();
 
 	if(1 != volumesNames.size()) {
 		std::cerr<<"ExportVTKImplementation::perform can only be called when there is "
@@ -47,28 +47,9 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 				"one and only one volume", TkUtil::Charset::UTF_8));
 	}
 
-	Geom::Volume* volume = m_context.getLocalGeomManager().getVolume(volumesNames[0]);
-//	std::vector<Geom::Surface*> surfaces;
-//	volume->get(surfaces);
+	Geom::Volume* volume = m_context.getGeomManager().getVolume(volumesNames[0]);
 
-//	std::vector<std::string> surfacesNames = m_context.getLocalGeomManager().getSurfaces();
-//	for(unsigned int iSurf=0; iSurf<surfaces.size(); iSurf++) {
-//		m_context.getLocalTopoManager().newUnstructuredTopoOnGeometry(surfaces[0]->getName());
-//	}
-
-	//m_context.getLocalTopoManager().newUnstructuredTopoOnGeometry(volumesNames[0]);
-//	m_context.getLocalTopoManager().newUnstructuredTopoOnGeometry(volume);
-//	m_context.getTopoManager().newUnstructuredTopoOnGeometry(volumesNames[0]);
-
-//	m_context.getLocalMeshManager().newAllFacesMesh();
-
-//	Geom::Volume* volume = m_context.getLocalGeomManager().getVolume(volumesNames[0]);
-//	std::vector<Geom::Surface*> surfaces;
-//	std::vector<Geom::Curve*> curves;
-//	volume->get(surfaces);
-//	volume->get(curves);
-
-	unsigned int nbBlocks = m_context.getLocalTopoManager().getNbBlocks();
+	unsigned int nbBlocks = m_context.getTopoManager().getNbBlocks();
 	if(1 != nbBlocks) {
 		std::cerr<<"ExportVTKImplementation::perform can only be called when there is "
 				"one and only one block"<<std::endl;
@@ -77,7 +58,7 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 	}
 
 	std::vector<Topo::Block*> topo_blocs;
-	m_context.getLocalTopoManager().getBlocks(topo_blocs);
+	m_context.getTopoManager().getBlocks(topo_blocs);
 
 	std::vector<Topo::CoFace*> topo_cofaces;
 	std::vector<Topo::CoEdge*> topo_coedges;

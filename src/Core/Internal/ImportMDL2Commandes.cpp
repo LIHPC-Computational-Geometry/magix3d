@@ -121,7 +121,7 @@ void ImportMDL2Commandes::performGeom()
     	 std::cout << "Création de la Surface "<<current_command.name<<std::endl;
 #endif
 
-    	 Internal::M3DCommandResultIfc* cmdIfc = m_context.getLocalGeomManager().newPlanarSurface(curves, "");
+    	 Internal::M3DCommandResultIfc* cmdIfc = m_context.getGeomManager().newPlanarSurface(curves, "");
     	 Internal::M3DCommandResult* cmd = dynamic_cast<Internal::M3DCommandResult*>(cmdIfc);
     	 CHECK_NULL_PTR_ERROR(cmd);
     	 Geom::Surface* surf = cmd->getSurfaceObj();
@@ -382,7 +382,7 @@ void ImportMDL2Commandes::performTopo()
             delete [] nb_mesh_cote;
 
             // création de la CoFace structurée
-        	Internal::M3DCommandResultIfc* cmdIfc = m_context.getLocalTopoManager()
+        	Internal::M3DCommandResultIfc* cmdIfc = m_context.getTopoManager()
         			.newStructuredTopoOnSurface(m_cor_name_surface[current_command.name.str()], vertices);
 
         	// mise à jour des interpolations / coface
@@ -391,7 +391,7 @@ void ImportMDL2Commandes::performTopo()
         }
         else {
         	// cas non structuré
-        	Internal::M3DCommandResultIfc* cmdIfc = m_context.getLocalTopoManager().newUnstructuredTopoOnGeometry(m_cor_name_surface[current_command.name.str()]);
+        	Internal::M3DCommandResultIfc* cmdIfc = m_context.getTopoManager().newUnstructuredTopoOnGeometry(m_cor_name_surface[current_command.name.str()]);
         }
 
     } // end for iter = m_vCmdArea.begin()
@@ -408,7 +408,7 @@ MAJInterpolated(std::vector<Topo::CoEdge*>& coedges, std::string coface)
 
 		std::vector<Topo::CoEdge*> loc_coedges;
 		loc_coedges.push_back(coedge);
-		m_context.getLocalTopoManager().setMeshingProperty(*interpol, loc_coedges);
+		m_context.getTopoManager().setMeshingProperty(*interpol, loc_coedges);
 	}
 }
 /*----------------------------------------------------------------------------*/
@@ -418,7 +418,7 @@ Geom::Vertex* ImportMDL2Commandes::getVertex(uint ptId)
 
     if (!vtx){
         const T_MdlCommand& command_pt = *m_vCmdPt[ptId];
-        Internal::M3DCommandResultIfc* cmdIfc = m_context.getLocalGeomManager().newVertex(Utils::Math::Point(command_pt.u.point.cd.x1,command_pt.u.point.cd.x2, 0.0)*m_scale_factor);
+        Internal::M3DCommandResultIfc* cmdIfc = m_context.getGeomManager().newVertex(Utils::Math::Point(command_pt.u.point.cd.x1,command_pt.u.point.cd.x2, 0.0)*m_scale_factor);
         Internal::M3DCommandResult* cmd = dynamic_cast<Internal::M3DCommandResult*>(cmdIfc);
         CHECK_NULL_PTR_ERROR(cmd);
         vtx = cmd->getVertexObj();
@@ -453,7 +453,7 @@ Geom::Curve* ImportMDL2Commandes::getCurve(const std::string name)
             	Geom::Vertex* vtx2 = getVertex(current_command.model1d.pt2);
             	if(vtx1!=vtx2)
             	{
-            		Internal::M3DCommandResultIfc* cmdIfc = m_context.getLocalGeomManager().newSegment(vtx1,vtx2);
+            		Internal::M3DCommandResultIfc* cmdIfc = m_context.getGeomManager().newSegment(vtx1,vtx2);
             		Internal::M3DCommandResult* cmd = dynamic_cast<Internal::M3DCommandResult*>(cmdIfc);
             		CHECK_NULL_PTR_ERROR(cmd);
             		crv = cmd->getCurveObj();
@@ -472,9 +472,9 @@ Geom::Curve* ImportMDL2Commandes::getCurve(const std::string name)
                 //std::cout<<"direction = "<<current_command.u.arc.direction<<" => dir = "<<(dir?"true":"false")<<std::endl;
                 Internal::M3DCommandResultIfc* cmdIfc = 0;
                 if(current_command.u.arc.is_circle)
-                	cmdIfc = m_context.getLocalGeomManager().newArcCircle(vtxcenter,vtx1,vtx2, dir);
+                	cmdIfc = m_context.getGeomManager().newArcCircle(vtxcenter,vtx1,vtx2, dir);
                 else
-                	cmdIfc = m_context.getLocalGeomManager().newArcEllipse(vtxcenter,vtx1,vtx2, dir);
+                	cmdIfc = m_context.getGeomManager().newArcEllipse(vtxcenter,vtx1,vtx2, dir);
 
                 Internal::M3DCommandResult* cmd = dynamic_cast<Internal::M3DCommandResult*>(cmdIfc);
                 CHECK_NULL_PTR_ERROR(cmd);
@@ -503,7 +503,7 @@ Geom::Curve* ImportMDL2Commandes::getCurve(const std::string name)
                                 command_support.u.linesup.y[id-1], 0.0)*m_scale_factor);
                     }
 
-                Internal::M3DCommandResultIfc* cmdIfc = m_context.getLocalGeomManager().newBSpline(vtx1,vertices, vtx2, 1, 2, "");
+                Internal::M3DCommandResultIfc* cmdIfc = m_context.getGeomManager().newBSpline(vtx1,vertices, vtx2, 1, 2, "");
                 Internal::M3DCommandResult* cmd = dynamic_cast<Internal::M3DCommandResult*>(cmdIfc);
                 CHECK_NULL_PTR_ERROR(cmd);
                 crv = cmd->getCurveObj();
@@ -549,7 +549,7 @@ Topo::Vertex* ImportMDL2Commandes::getTopoVertex(uint ptId)
 
     if (!vtx){
     	Geom::Vertex* gtx = getVertex(ptId);
-    	Internal::M3DCommandResultIfc* cmdIfc = m_context.getLocalTopoManager().newTopoOnGeometry(gtx);
+    	Internal::M3DCommandResultIfc* cmdIfc = m_context.getTopoManager().newTopoOnGeometry(gtx);
     	Internal::M3DCommandResult* cmd = dynamic_cast<Internal::M3DCommandResult*>(cmdIfc);
     	CHECK_NULL_PTR_ERROR(cmd);
     	vtx = cmd->getTopoVertexObj();
@@ -628,14 +628,14 @@ getCoEdge(T_MdlCutData *mcd, bool isConforme)
             throw TkUtil::Exception(TkUtil::UTF8String ("Erreur Interne, ImportMDL2Commandes::getCoEdge, commande Mdl non trouvée", TkUtil::Charset::UTF_8));
 
 
-        Internal::M3DCommandResultIfc* cmdIfc = m_context.getLocalTopoManager().newTopoOnGeometry(curve);
+        Internal::M3DCommandResultIfc* cmdIfc = m_context.getTopoManager().newTopoOnGeometry(curve);
         Internal::M3DCommandResult* cmd = dynamic_cast<Internal::M3DCommandResult*>(cmdIfc);
         CHECK_NULL_PTR_ERROR(cmd);
         coedge = cmd->getEdgeObj();
 
         std::vector<Topo::CoEdge*> coedges;
 		coedges.push_back(coedge);
-        m_context.getLocalTopoManager().setMeshingProperty(*emp, coedges);
+        m_context.getTopoManager().setMeshingProperty(*emp, coedges);
 
         delete emp;
 

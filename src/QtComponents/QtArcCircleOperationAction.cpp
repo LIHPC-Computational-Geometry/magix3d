@@ -856,9 +856,9 @@ void QtArcCircleOperationPanel::preview (bool on, bool destroyInteractor)
 				// pour l'arc de courbe
 				const Vector        normal   = getNormal();
 				const bool          direct   = directOrientation();
-				Vertex              *pc      = context->getLocalGeomManager().getVertex(getVertex1UniqueName());
-				Vertex              *pd      = context->getLocalGeomManager().getVertex(getVertex2UniqueName());
-				Vertex              *pe      = context->getLocalGeomManager().getVertex(getVertex3UniqueName());
+				Vertex              *pc      = context->getGeomManager().getVertex(getVertex1UniqueName());
+				Vertex              *pd      = context->getGeomManager().getVertex(getVertex2UniqueName());
+				Vertex              *pe      = context->getGeomManager().getVertex(getVertex3UniqueName());
 				command = new CommandNewArcCircle (*context, pc, pd, pe, direct, normal, groupName, false);
 				break;
 			}   // case QtArcCircleOperationPanel::EXTREMITIES_CENTER
@@ -874,18 +874,18 @@ void QtArcCircleOperationPanel::preview (bool on, bool destroyInteractor)
             case QtArcCircleOperationPanel::CIRCUMCIRCLE_PTS    :
             {
                 // pour l'arc de courbe
-                Vertex              *pc      = context->getLocalGeomManager().getVertex(getVertex1UniqueName());
-                Vertex              *pd      = context->getLocalGeomManager().getVertex(getVertex2UniqueName());
-                Vertex              *pe      = context->getLocalGeomManager().getVertex(getVertex3UniqueName());
+                Vertex              *pc      = context->getGeomManager().getVertex(getVertex1UniqueName());
+                Vertex              *pd      = context->getGeomManager().getVertex(getVertex2UniqueName());
+                Vertex              *pe      = context->getGeomManager().getVertex(getVertex3UniqueName());
                 command = new CommandNewArcCircle (*context, pc, pd, pe, true, Vector(0,0,0), groupName, true);
                 break;
 			}   // case QtArcCircleOperationPanel::CIRCUMCIRCLE_PTS
 			case QtArcCircleOperationPanel::ELLIPSE_EXTREMITIES_CENTER	:
 			{
 				const bool          direct   = directOrientation();
-				Vertex              *pc      = context->getLocalGeomManager().getVertex(getVertex1UniqueName());
-				Vertex              *pd      = context->getLocalGeomManager().getVertex(getVertex2UniqueName());
-				Vertex              *pe      = context->getLocalGeomManager().getVertex(getVertex3UniqueName());
+				Vertex              *pc      = context->getGeomManager().getVertex(getVertex1UniqueName());
+				Vertex              *pd      = context->getGeomManager().getVertex(getVertex2UniqueName());
+				Vertex              *pe      = context->getGeomManager().getVertex(getVertex3UniqueName());
 				command = new CommandNewArcEllipse (*context, pc, pd, pe, direct, groupName);
 				break;
 			}	// case QtArcCircleOperationPanel::ELLIPSE_EXTREMITIES_CENTER

@@ -186,9 +186,9 @@ Block(Internal::Context& ctx, int ni, int nj, int nk)
 
     // une discretisation par défaut (découpage uniforme suivant le nombre de bras par défaut)
     // à moins qu'un nombre de bras ait été demandé
-    EdgeMeshingPropertyUniform empI(ni?ni:ctx.getLocalTopoManager().getDefaultNbMeshingEdges());
-    EdgeMeshingPropertyUniform empJ(nj?nj:ctx.getLocalTopoManager().getDefaultNbMeshingEdges());
-    EdgeMeshingPropertyUniform empK(nk?nk:ctx.getLocalTopoManager().getDefaultNbMeshingEdges());
+    EdgeMeshingPropertyUniform empI(ni?ni:ctx.getTopoManager().getDefaultNbMeshingEdges());
+    EdgeMeshingPropertyUniform empJ(nj?nj:ctx.getTopoManager().getDefaultNbMeshingEdges());
+    EdgeMeshingPropertyUniform empK(nk?nk:ctx.getTopoManager().getDefaultNbMeshingEdges());
 
     coedges.push_back(new Topo::CoEdge(ctx, &empI, getVertex(0), getVertex(1)));
     coedges.push_back(new Topo::CoEdge(ctx, &empI, getVertex(2), getVertex(3)));

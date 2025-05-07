@@ -63,7 +63,7 @@ CommandSplitBlocks(Internal::Context& c, CoEdge* arete, double ratio)
 , m_allBlocksMustBeCut(false)
 {
 	std::vector<Topo::Block* > blocs;
-	c.getLocalTopoManager().getBlocks(blocs, true);
+	c.getTopoManager().getBlocks(blocs, true);
 	validateRatio();
 	initBlocks(blocs, false);
 	initCommentsAllBlocks(arete);
@@ -78,7 +78,7 @@ CommandSplitBlocks(Internal::Context& c, CoEdge* arete, const Point& pt)
 {
 	m_ratio = arete->computeRatio(pt);
 	std::vector<Topo::Block* > blocs;
-	c.getLocalTopoManager().getBlocks(blocs, true);
+	c.getTopoManager().getBlocks(blocs, true);
 
 	validateRatio();
 	initBlocks(blocs, false);

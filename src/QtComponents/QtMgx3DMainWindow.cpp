@@ -3925,7 +3925,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 		}    // QtMgx3DMainWindow::getGeomManager
 
 
-		Topo::TopoManagerIfc &QtMgx3DMainWindow::getTopoManager()
+		Topo::TopoManager &QtMgx3DMainWindow::getTopoManager()
 		{
 			return getContext().getTopoManager();
 		}   // QtMgx3DMainWindow::getTopoManager

@@ -48,7 +48,7 @@ CommandProjectEdgesOnCurves(Internal::Context& c)
 :CommandEditTopo(c, "Projection automatique pour toutes les arêtes topologiques")
 {
 	std::vector<Topo::CoEdge* > edges;
-	c.getLocalTopoManager().getCoEdges(edges);
+	c.getTopoManager().getCoEdges(edges);
 	m_coedges.insert(m_coedges.end(), edges.begin(), edges.end());
 }
 /*----------------------------------------------------------------------------*/

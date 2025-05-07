@@ -410,7 +410,7 @@ void CommandDuplicateTopo::updateInterpolate()
 				std::vector<std::string> new_coedges_names;
 
 				for (uint i=0; i<old_coedges_names.size(); i++){
-					CoEdge* old_coedge_ref = getContext().getLocalTopoManager().getCoEdge(old_coedges_names[i], false);
+					CoEdge* old_coedge_ref = getContext().getTopoManager().getCoEdge(old_coedges_names[i], false);
 					if (old_coedge_ref == 0){
 						TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
 						message<<"Erreur interne avec l'arête "<<old_coedge->getName()<<", on ne trouve pas l'arête "
@@ -433,7 +433,7 @@ void CommandDuplicateTopo::updateInterpolate()
 
 			std::string old_coface_name = interpol_old->getCoFace();
 			if (!old_coface_name.empty()){
-				CoFace* old_coface = getContext().getLocalTopoManager().getCoFace(old_coface_name, false);
+				CoFace* old_coface = getContext().getTopoManager().getCoFace(old_coface_name, false);
 
 				if (old_coface == 0){
 					TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);

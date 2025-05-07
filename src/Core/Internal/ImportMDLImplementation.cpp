@@ -287,7 +287,7 @@ void ImportMDLImplementation::performGeom(Internal::InfoCommand* icmd)
     for(int i=0;i<m_newGeomEntities.size();i++){
         Geom::GeomEntity* ge = m_newGeomEntities[i];
         icmd->addGeomInfoEntity (ge, Internal::InfoCommand::CREATED);
-        m_context.getLocalGeomManager().addEntity(ge);
+        m_context.getGeomManager().addEntity(ge);
     }
 }
 /*----------------------------------------------------------------------------*/
