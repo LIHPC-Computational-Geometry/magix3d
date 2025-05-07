@@ -40,7 +40,7 @@ CommandNewFacesMesh(Internal::Context& c, size_t tasksNum)
 : CommandCreateMesh(c, "Création du maillage pour toutes les faces", tasksNum)
 {
     std::vector<Topo::CoFace* > faces;
-    getContext().getLocalTopoManager().getCoFaces(faces);
+    getContext().getTopoManager().getCoFaces(faces);
 
     validate(faces);
 }

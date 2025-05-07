@@ -154,15 +154,13 @@ public:
     virtual Mgx3D::Geom::GeomManager& getGeomManager();
     virtual const Mgx3D::Geom::GeomManager& getGeomManager() const;
 	virtual void setGeomManager (Mgx3D::Geom::GeomManager* mgr);
-    virtual Mgx3D::Geom::GeomManager& getLocalGeomManager();
 
     /*------------------------------------------------------------------------*/
     /** \brief  Accesseur sur le manager topologique
      */
-    virtual Mgx3D::Topo::TopoManagerIfc& getTopoManager();
-    virtual const Mgx3D::Topo::TopoManagerIfc& getTopoManager() const;
-	virtual void setTopoManager (Mgx3D::Topo::TopoManagerIfc* mgr);
-    virtual Mgx3D::Topo::TopoManager& getLocalTopoManager();
+    virtual Mgx3D::Topo::TopoManager& getTopoManager();
+    virtual const Mgx3D::Topo::TopoManager& getTopoManager() const;
+	virtual void setTopoManager (Mgx3D::Topo::TopoManager* mgr);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Accesseur sur le manager de maillage
@@ -627,7 +625,7 @@ protected:
     /// Manager pour les commandes géométriques
     Mgx3D::Geom::GeomManager*		m_geom_manager;
     /// Manager pour les commandes topologiques
-    Mgx3D::Topo::TopoManagerIfc*		m_topo_manager;
+    Mgx3D::Topo::TopoManager*		m_topo_manager;
     /// Manager pour le maillage
     Mgx3D::Mesh::MeshManagerIfc*        m_mesh_manager;
     /// Groupes pour les différents types d'entités

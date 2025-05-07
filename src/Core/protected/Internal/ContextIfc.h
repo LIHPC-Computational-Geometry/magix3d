@@ -16,7 +16,7 @@
 #include "Utils/Unit.h"
 #include "Utils/SwigCompletion.h"
 #include "Geom/GeomManager.h"
-#include "Topo/TopoManagerIfc.h"
+#include "Topo/TopoManager.h"
 #include "Mesh/MeshManagerIfc.h"
 #include "Structured/StructuredMeshManagerIfc.h"
 #include "SysCoord/SysCoordManagerIfc.h"
@@ -137,8 +137,8 @@ public:
     /** \brief  Accesseur sur le manager topologique
 	 * \exception	Une exception est levée en l'absence de manager associé.
      */
-    virtual Mgx3D::Topo::TopoManagerIfc& getTopoManager();
-    virtual const Mgx3D::Topo::TopoManagerIfc& getTopoManager() const;
+    virtual Mgx3D::Topo::TopoManager& getTopoManager();
+    virtual const Mgx3D::Topo::TopoManager& getTopoManager() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Accesseur sur le manager de maillage

@@ -91,7 +91,7 @@ void CommandCreateGeom::postExecute(bool hasError)
 /*----------------------------------------------------------------------------*/
 GeomManager& CommandCreateGeom::getGeomManager()
 {
-    return getContext().getLocalGeomManager();
+    return getContext().getGeomManager();
 }
 /*----------------------------------------------------------------------------*/
 void CommandCreateGeom::internalUndo()

@@ -44,9 +44,9 @@ void ExportMLIImplementation::perform(Internal::InfoCommand* icmd)
 
 	
 	try {
-		std::vector<std::string> surfacesNames = m_context.getLocalGeomManager().getSurfaces();
+		std::vector<std::string> surfacesNames = m_context.getGeomManager().getSurfaces();
 		for(int iSurf=0; iSurf<surfacesNames.size(); iSurf++) {
-			Geom::Surface* surf = m_context.getLocalGeomManager().getSurface(surfacesNames[iSurf]);
+			Geom::Surface* surf = m_context.getGeomManager().getSurface(surfacesNames[iSurf]);
 			std::vector<gmds::math::Triangle> triangles;
 			auto add = [&](const TopoDS_Shape& sh) {
 				OCCFacetedRepresentationBuilder builder(sh);
@@ -64,9 +64,9 @@ void ExportMLIImplementation::perform(Internal::InfoCommand* icmd)
 			}
 		}
 
-		std::vector<std::string> curvesNames = m_context.getLocalGeomManager().getCurves();
+		std::vector<std::string> curvesNames = m_context.getGeomManager().getCurves();
 		for(int iCurv=0; iCurv<curvesNames.size(); iCurv++) {
-			Geom::Curve* curv = m_context.getLocalGeomManager().getCurve(curvesNames[iCurv]);
+			Geom::Curve* curv = m_context.getGeomManager().getCurve(curvesNames[iCurv]);
 			std::vector<gmds::math::Triangle> triangles;
 			auto add = [&](const TopoDS_Shape& sh) {
 				OCCFacetedRepresentationBuilder builder(sh);
@@ -83,9 +83,9 @@ void ExportMLIImplementation::perform(Internal::InfoCommand* icmd)
 			}
 		}
 
-		std::vector<std::string> verticesNames = m_context.getLocalGeomManager().getVertices();
+		std::vector<std::string> verticesNames = m_context.getGeomManager().getVertices();
 		for(int iVert=0; iVert<verticesNames.size(); iVert++) {
-			Geom::Vertex* vert = m_context.getLocalGeomManager().getVertex(verticesNames[iVert]);
+			Geom::Vertex* vert = m_context.getGeomManager().getVertex(verticesNames[iVert]);
 			std::vector<gmds::math::Triangle> triangles;
 			auto add = [&](const TopoDS_Shape& sh) {
 				OCCFacetedRepresentationBuilder builder(sh);

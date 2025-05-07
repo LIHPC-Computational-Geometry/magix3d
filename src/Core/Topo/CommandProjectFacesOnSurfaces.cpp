@@ -42,7 +42,7 @@ CommandProjectFacesOnSurfaces(Internal::Context& c)
 :CommandEditTopo(c, "Projection automatique pour toutes les faces topologiques")
 {
 	std::vector<Topo::CoFace* > faces;
-	c.getLocalTopoManager().getCoFaces(faces);
+	c.getTopoManager().getCoFaces(faces);
 	m_cofaces.insert(m_cofaces.end(), faces.begin(), faces.end());
 }
 /*----------------------------------------------------------------------------*/

@@ -416,7 +416,7 @@ void CommandNewTopoOnGeometry::createCoEdge()
 	else if (tvertices.size()>2)
 		throw TkUtil::Exception (TkUtil::UTF8String ("createCoEdge imposible, les sommets de la courbe référencent plus de 2 sommets topologiques", TkUtil::Charset::UTF_8));
 
-	EdgeMeshingPropertyUniform emp(getContext().getLocalTopoManager().getDefaultNbMeshingEdges());
+	EdgeMeshingPropertyUniform emp(getContext().getTopoManager().getDefaultNbMeshingEdges());
 	CoEdge* coedge = new CoEdge(getContext(), &emp, tvertices[0], tvertices[tvertices.size() == 1?0:1]);
 	coedge->setGeomAssociation(getGeomEntity());
 	getInfoCommand().addTopoInfoEntity(coedge, Internal::InfoCommand::CREATED);

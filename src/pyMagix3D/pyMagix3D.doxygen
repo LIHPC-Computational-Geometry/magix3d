@@ -758,7 +758,7 @@ INPUT                  = ../../src/Doc/User \
                          ../../src/Utils/protected/Utils/Constants.h \
                          ../../src/Utils/protected/Utils/Unit.h \
                          ../../src/Core/protected/Topo/TopoInfo.h \
-                         ../../src/Core/protected/Topo/TopoManagerIfc.h \
+                         ../../src/Core/protected/Topo/TopoManager.h \
                          ../../src/Core/protected/Topo/CoEdgeMeshingProperty.h \
                          ../../src/Core/protected/Topo/EdgeMeshingPropertyUniform.h \
                          ../../src/Core/protected/Topo/EdgeMeshingPropertyGeometric.h \

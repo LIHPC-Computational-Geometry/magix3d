@@ -781,37 +781,24 @@ void Context::setGeomManager (Mgx3D::Geom::GeomManager* manager)
 	m_geom_manager	= manager;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Geom::GeomManager& Context::getLocalGeomManager ( )
-{
-	Geom::GeomManager*	manager	= dynamic_cast<Geom::GeomManager*>(m_geom_manager);
-	CHECK_NULL_PTR_ERROR (manager)
-	return *manager;
-}
-/*----------------------------------------------------------------------------*/
-Mgx3D::Topo::TopoManagerIfc& Context::getTopoManager ( )
+Mgx3D::Topo::TopoManager& Context::getTopoManager ( )
 {
 	CHECK_NULL_PTR_ERROR (m_topo_manager)
 	return *m_topo_manager;
 }
 /*----------------------------------------------------------------------------*/
-const Mgx3D::Topo::TopoManagerIfc& Context::getTopoManager ( ) const
+const Mgx3D::Topo::TopoManager& Context::getTopoManager ( ) const
 {
 	CHECK_NULL_PTR_ERROR (m_topo_manager)
 	return *m_topo_manager;
 }
 /*----------------------------------------------------------------------------*/
-void Context::setTopoManager (Mgx3D::Topo::TopoManagerIfc* manager)
+void Context::setTopoManager (Mgx3D::Topo::TopoManager* manager)
 {
 	delete m_topo_manager;
 	m_topo_manager	= manager;
 }
-/*----------------------------------------------------------------------------*/
-Mgx3D::Topo::TopoManager& Context::getLocalTopoManager ( )
-{
-	Topo::TopoManager*	manager	= dynamic_cast<Topo::TopoManager*>(m_topo_manager);
-	CHECK_NULL_PTR_ERROR (manager)
-	return *manager;
-}
+
 /*----------------------------------------------------------------------------*/
 Mgx3D::Mesh::MeshManagerIfc& Context::getMeshManager ( )
 {
@@ -1711,19 +1698,19 @@ void Context::clearSession()
 	// commande de destruction de toutes les entités topologiques qui ont pu être construites
 	std::vector<Topo::TopoEntity*> ve;
 	std::vector<Topo::Block*> blocks;
-	getLocalTopoManager().getBlocks(blocks);
+	getTopoManager().getBlocks(blocks);
 	for (uint i=0; i<blocks.size(); i++)
 		ve.push_back(blocks[i]);
 	std::vector<Topo::CoFace*> cofaces;
-	getLocalTopoManager().getCoFaces(cofaces);
+	getTopoManager().getCoFaces(cofaces);
 	for (uint i=0; i<cofaces.size(); i++)
 		ve.push_back(cofaces[i]);
 	std::vector<Topo::CoEdge*> coedges;
-	getLocalTopoManager().getCoEdges(coedges);
+	getTopoManager().getCoEdges(coedges);
 	for (uint i=0; i<coedges.size(); i++)
 		ve.push_back(coedges[i]);
 	std::vector<Topo::Vertex*> vertices;
-	getLocalTopoManager().getVertices(vertices);
+	getTopoManager().getVertices(vertices);
 	for (uint i=0; i<vertices.size(); i++)
 		ve.push_back(vertices[i]);
 
@@ -1733,16 +1720,16 @@ void Context::clearSession()
 
 	// commande de destruction de toutes les entités géométriques qui ont pu être construites
 	std::vector<Geom::GeomEntity*> entities;
-	std::vector<Geom::Volume*> volumes = getLocalGeomManager().getVolumesObj();
+	std::vector<Geom::Volume*> volumes = getGeomManager().getVolumesObj();
 	for (uint i=0; i<volumes.size(); i++)
 		entities.push_back(volumes[i]);
-	std::vector<Geom::Surface*> surfaces = getLocalGeomManager().getSurfacesObj();
+	std::vector<Geom::Surface*> surfaces = getGeomManager().getSurfacesObj();
 	for (uint i=0; i<surfaces.size(); i++)
 		entities.push_back(surfaces[i]);
-	std::vector<Geom::Curve*> curves = getLocalGeomManager().getCurvesObj();
+	std::vector<Geom::Curve*> curves = getGeomManager().getCurvesObj();
 	for (uint i=0; i<curves.size(); i++)
 		entities.push_back(curves[i]);
-	std::vector<Geom::Vertex*> vtx = getLocalGeomManager().getVerticesObj();
+	std::vector<Geom::Vertex*> vtx = getGeomManager().getVerticesObj();
 	for (uint i=0; i<vtx.size(); i++)
 		entities.push_back(vtx[i]);
 

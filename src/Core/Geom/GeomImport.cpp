@@ -360,7 +360,7 @@ store(Volume* v)
 	m_newEntities.push_back(v);
 	m_newVolumes.push_back(v);
 	m_icmd->addGeomInfoEntity (v, Internal::InfoCommand::CREATED);
-	getContext().getLocalGeomManager().addEntity(v);
+	getContext().getGeomManager().addEntity(v);
 }
 /*----------------------------------------------------------------------------*/
 void GeomImport::
@@ -369,7 +369,7 @@ store(Surface* s)
 	m_newEntities.push_back(s);
 	m_newSurfaces.push_back(s);
 	m_icmd->addGeomInfoEntity (s, Internal::InfoCommand::CREATED);
-	getContext().getLocalGeomManager().addEntity(s);
+	getContext().getGeomManager().addEntity(s);
 }
 /*----------------------------------------------------------------------------*/
 void GeomImport::
@@ -378,7 +378,7 @@ store(Curve* c)
 	m_newEntities.push_back(c);
 	m_newCurves.push_back(c);
 	m_icmd->addGeomInfoEntity (c, Internal::InfoCommand::CREATED);
-	getContext().getLocalGeomManager().addEntity(c);
+	getContext().getGeomManager().addEntity(c);
 }
 /*----------------------------------------------------------------------------*/
 void GeomImport::
@@ -387,7 +387,7 @@ store(Vertex* v)
 	m_newEntities.push_back(v);
 	m_newVertices.push_back(v);
 	m_icmd->addGeomInfoEntity (v, Internal::InfoCommand::CREATED);
-	getContext().getLocalGeomManager().addEntity(v);
+	getContext().getGeomManager().addEntity(v);
 }
 /*----------------------------------------------------------------------------*/
 void GeomImport::

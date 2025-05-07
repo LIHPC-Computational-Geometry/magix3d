@@ -419,7 +419,7 @@ void MeshImplementation::writeCGNS(std::string nom)
 // ici la macro CGNS_ENUMV.
 
 	std::vector<Topo::Block*> blocks;
-	getContext().getLocalTopoManager().getBlocks(blocks, true);
+	getContext().getTopoManager().getBlocks(blocks, true);
 	gmds::Mesh& gmdsMesh = getGMDSMesh();
 
 	int index_file, icelldim, iphysdim, index_base;
@@ -861,14 +861,14 @@ void MeshImplementation::smooth()
 //
 //	MesquiteMeshImplAdapter* meshAdapter = new MesquiteMeshImplAdapter(
 //			getContext().getLocalMeshManager(),
-//			getContext().getLocalGeomManager());
+//			getContext().getGeomManager());
 //
 //	std::map<Mesquite::Mesh::VertexHandle,gmds::Node*>* mesquite2GMDSNodes = meshAdapter->getMesquite2GMDSNodes();
 //	std::map<Mesquite::Mesh::ElementHandle,gmds::Mesh<MeshItf::TMask>::Cell*>* mesquite2GMDSCells = meshAdapter->getMesquite2GMDSCells();
 //
 //	MesquiteDomainImplAdapter* domainAdapter = new MesquiteDomainImplAdapter(
 //			getContext().getLocalMeshManager(),
-//			getContext().getLocalTopoManager(),
+//			getContext().getTopoManager(),
 //			*mesquite2GMDSNodes,
 //			*mesquite2GMDSCells);
 //

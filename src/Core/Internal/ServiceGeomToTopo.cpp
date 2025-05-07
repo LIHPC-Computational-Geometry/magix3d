@@ -476,7 +476,7 @@ Topo::Edge* ServiceGeomToTopo::getEdge(Geom::Curve* curve)
                 throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, une courbe avec autre chose que 1 ou 2 Vertex", TkUtil::Charset::UTF_8));
             }
 
-            Topo::EdgeMeshingPropertyUniform emp(m_context.getLocalTopoManager().getDefaultNbMeshingEdges());
+            Topo::EdgeMeshingPropertyUniform emp(m_context.getTopoManager().getDefaultNbMeshingEdges());
 
             Geom::Vertex* ge1 = vertices.front();
             Geom::Vertex* ge2 = vertices.back();

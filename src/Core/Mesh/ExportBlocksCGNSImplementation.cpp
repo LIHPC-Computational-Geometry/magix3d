@@ -53,8 +53,8 @@ namespace Mgx3D {
                 gmds::Node n = mesh.newNode(n_local.X(),n_local.Y(),n_local.Z());
             }
 
-            m_context.getLocalTopoManager().getBlocks(topo_blocs);
-            m_context.getLocalTopoManager().getCoFaces(topo_faces);
+            m_context.getTopoManager().getBlocks(topo_blocs);
+            m_context.getTopoManager().getCoFaces(topo_faces);
 
             for(int iBlock = 0; iBlock < topo_blocs.size(); iBlock++){
                 std::vector<unsigned long> ids;
