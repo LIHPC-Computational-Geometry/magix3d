@@ -460,7 +460,7 @@ getDescription (bool alsoComputed) const
     Group::Group3D* gr = 0;
     MeshManager* mm = dynamic_cast<MeshManager*>(&getMeshManager());
     if (mm)
-    	gr = mm->getLocalContext().getLocalGroupManager().getGroup3D(getName(),false);
+    	gr = mm->getLocalContext().getGroupManager().getGroup3D(getName(),false);
     if (gr){
         Utils::SerializedRepresentation  groupeDescription (
                         "Groupe 3D associé", "");

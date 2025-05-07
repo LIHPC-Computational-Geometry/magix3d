@@ -50,8 +50,7 @@ set(DOXYGEN_DIRS
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Mesh/MeshModificationBySepa.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Smoothing/SurfacicSmoothing.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Smoothing/VolumicSmoothing.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Group/GroupManagerIfc.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/SysCoord/SysCoordManagerIfc.h
+  ${PROJECT_SOURCE_DIR}/src/Core/protected/Group/GroupsManager.h
 )
 
 string(REPLACE ";" " " DOXYGEN_DIRS_STR "${DOXYGEN_DIRS}")

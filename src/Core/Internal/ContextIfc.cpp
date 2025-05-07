@@ -175,22 +175,22 @@ const Mesh::MeshManager& ContextIfc::getMeshManager ( ) const
 	throw TkUtil::Exception ("ContextIfc::getMeshManager should be overloaded.");
 }	// ContextIfc::getMeshManager
 /*----------------------------------------------------------------------------*/
-Group::GroupManagerIfc& ContextIfc::getGroupManager()
+Group::GroupManager& ContextIfc::getGroupManager()
 {
     throw TkUtil::Exception ("ContextIfc::getGroupManager should be overloaded.");
 }   // ContextIfc::getGroupManager
 /*----------------------------------------------------------------------------*/
-const Group::GroupManagerIfc& ContextIfc::getGroupManager() const
+const Group::GroupManager& ContextIfc::getGroupManager() const
 {
     throw TkUtil::Exception ("ContextIfc::getGroupManager should be overloaded.");
 }   // ContextIfc::getGroupManager
 /*----------------------------------------------------------------------------*/
-Mgx3D::CoordinateSystem::SysCoordManagerIfc& ContextIfc::getSysCoordManager()
+Mgx3D::CoordinateSystem::SysCoordManager& ContextIfc::getSysCoordManager()
 {
 	throw TkUtil::Exception ("ContextIfc::getSysCoordManager should be overloaded.");
 }
 /*----------------------------------------------------------------------------*/
-const Mgx3D::CoordinateSystem::SysCoordManagerIfc& ContextIfc::getSysCoordManager() const
+const Mgx3D::CoordinateSystem::SysCoordManager& ContextIfc::getSysCoordManager() const
 {
 	throw TkUtil::Exception ("ContextIfc::getSysCoordManager should be overloaded.");
 }

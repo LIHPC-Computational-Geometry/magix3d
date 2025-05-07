@@ -111,7 +111,7 @@ void CommandJoinSurfaces::internalSpecificExecute()
 	m_entities[0]->getGroups(grp);
 	newSurface->setGroups(grp);
 	for (uint i=0; i<grp.size(); i++){
-		Group::Group2D* group = getContext().getLocalGroupManager().getNewGroup2D(grp[i]->getName(), &getInfoCommand());
+		Group::Group2D* group = getContext().getGroupManager().getNewGroup2D(grp[i]->getName(), &getInfoCommand());
 		group->add(newSurface);
 	}
 

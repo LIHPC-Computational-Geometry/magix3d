@@ -7,17 +7,18 @@
 #include "Internal/ContextIfc.h"
 
 #include "Utils/Common.h"
+#include "Utils/Plane.h"
 #include "Utils/ValidatedField.h"
-#include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtGeometryMirrorAction.h"
 #include "QtComponents/QtMgx3DApplication.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/RenderedEntityRepresentation.h"
 #include "QtComponents/QtMgx3DGroupNamePanel.h"
 
-#include <TkUtil/MemoryError.h>
-#include <TkUtil/InternalError.h>
+#include <QtUtil/QtErrorManagement.h>
 #include <QtUtil/QtConfiguration.h>
+
+#include <TkUtil/MemoryError.h>
 #include <TkUtil/NumericServices.h>
 
 #include <QLabel>
@@ -560,7 +561,7 @@ void QtGeometryMirrorAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (panel)
 	Math::Point		point (panel->getPoint ( ));
 	Math::Vector	normal (panel->getNormal ( ));
-	Plane			plane (point, normal);
+	Math::Plane		plane (point, normal);
 	//bool					propagate	= panel->doPropagate ( );
 	const bool			    copy        = panel->copyEntities();
 	const string	      	groupName	= panel->getGroupName ( );

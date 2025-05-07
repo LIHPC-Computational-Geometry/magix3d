@@ -244,7 +244,7 @@ bool MeshImplementation::createGMDSGroups()
         }
     }
 
-//    std::string lineDefaultName = getContext().getLocalGroupManager().getDefaultName(1);
+//    std::string lineDefaultName = getContext().getGroupManager().getDefaultName(1);
     for(unsigned int iLine=0; iLine<lines.size(); iLine++) {
         Mesh::Line* current_line = lines[iLine];
 

@@ -159,7 +159,7 @@ selectCoFaceAndBlocks(std::map<Topo::CoFace*, uint>& filtre_coface,
 {
     // tous les groupes 3D
     std::vector<Group::Group3D*> grp;
-    getContext().getLocalGroupManager().getGroup3D(grp);
+    getContext().getGroupManager().getGroup3D(grp);
 
     // le nombre de blocs maillés en structuré
     uint nb_blocks_marked = 0;
@@ -494,7 +494,7 @@ createSubVolume(std::vector<BlockDirPos>& bloc_dirPos)
                 getContext().newGraphicalRepresentation (*sv);
 
                 // recherche le groupe 3D de base pour connaitre sa visibilité
-                Group::Group3D* gr = getContext().getLocalGroupManager().getGroup3D(*iter2, true);
+                Group::Group3D* gr = getContext().getGroupManager().getGroup3D(*iter2, true);
                 sv->getDisplayProperties().setDisplayed(gr->isVisible());
 
                 corr_subVol[name] = sv;

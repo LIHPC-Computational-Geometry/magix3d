@@ -234,13 +234,13 @@ virtual const Mgx3D::Geom::GeomManager& Mgx3D::Internal::ContextIfc::getGeomMana
 
 ";
 %feature("docstring") Mgx3D::Internal::ContextIfc::getGroupManager "
-virtual Mgx3D::Group::GroupManagerIfc& Mgx3D::Internal::ContextIfc::getGroupManager()
+virtual Mgx3D::Group::GroupManager& Mgx3D::Internal::ContextIfc::getGroupManager()
 
 Accesseur sur le manager de groupes Uneexception est levée en l'absence de manager associé. 
 
 ";
 %feature("docstring") Mgx3D::Internal::ContextIfc::getGroupManager "
-virtual const Mgx3D::Group::GroupManagerIfc& Mgx3D::Internal::ContextIfc::getGroupManager() const 
+virtual const Mgx3D::Group::GroupManager& Mgx3D::Internal::ContextIfc::getGroupManager() const
 
 
 
@@ -1034,12 +1034,12 @@ Mgx3D::Geom::GeomManager::GeomManager(const GeomManager &)
 Constructeur de copie. Interdit. 
 
 ";
-%feature("docstring") Mgx3D::Group::GroupManagerIfc " 
+%feature("docstring") Mgx3D::Group::GroupManager "
 Interface de gestionnaire des opérations effectuées au niveau des groupes. 
 ";
 
-%feature("docstring") Mgx3D::Group::GroupManagerIfc::addCartesianPerturbation "
-virtual void Mgx3D::Group::GroupManagerIfc::addCartesianPerturbation(const std::string &nom, PyObject *py_obj)
+%feature("docstring") Mgx3D::Group::GroupManager::addCartesianPerturbation "
+virtual void Mgx3D::Group::GroupManager::addCartesianPerturbation(const std::string &nom, PyObject *py_obj)
 
 
 Ajoute une modification du maillage pour un groupe (2D ou 3D)
@@ -1049,8 +1049,8 @@ nom : nom du groupe avec lequel on effectue la perturbation
 py_obj : l'objet python auquel il est fait appel pour modifier le maillage 
 
 ";
-%feature("docstring") Mgx3D::Group::GroupManagerIfc::addPolarPerturbation "
-virtual void Mgx3D::Group::GroupManagerIfc::addPolarPerturbation(const std::string &nom, PyObject *py_obj)
+%feature("docstring") Mgx3D::Group::GroupManager::addPolarPerturbation "
+virtual void Mgx3D::Group::GroupManager::addPolarPerturbation(const std::string &nom, PyObject *py_obj)
 
 
 Ajoute une modification du maillage pour un groupe (2D ou 3D)
@@ -1060,9 +1060,9 @@ nom : nom du groupe avec lequel on effectue la perturbation
 py_obj : l'objet python auquel il est fait appel pour modifier le maillage 
 
 ";
-%feature("docstring") Mgx3D::Group::GroupManagerIfc::addSmoothing "
-virtual void Mgx3D::Group::GroupManagerIfc::addSmoothing(const std::string &nom, Mesh::SurfacicSmoothing &sm)
-virtual void Mgx3D::Group::GroupManagerIfc::addSmoothing(const std::string &nom, Mesh::VolumicSmoothing &sm)
+%feature("docstring") Mgx3D::Group::GroupManager::addSmoothing "
+virtual void Mgx3D::Group::GroupManager::addSmoothing(const std::string &nom, Mesh::SurfacicSmoothing &sm)
+virtual void Mgx3D::Group::GroupManager::addSmoothing(const std::string &nom, Mesh::VolumicSmoothing &sm)
 
 
 Ajoute un lissage surfacique ou volumique du maillage pour un groupe 2D ou 3D
@@ -1071,62 +1071,62 @@ nom : nom du groupe avec lequel on effectue le lissage
 sm : la classe qui défini le lissage surfacique ou volumique
 
 ";
-%feature("docstring") Mgx3D::Group::GroupManagerIfc::addToGroup "
-virtual void Mgx3D::Group::GroupManagerIfc::addToGroup(std::vector< std::string > &ve, int dim, const std::string &groupName)
+%feature("docstring") Mgx3D::Group::GroupManager::addToGroup "
+virtual void Mgx3D::Group::GroupManager::addToGroup(std::vector< std::string > &ve, int dim, const std::string &groupName)
 
 
 Ajoute le contenu d'un ensemble géométrique à un groupe donné 
 
 ";
-%feature("docstring") Mgx3D::Group::GroupManagerIfc::getBlocksEntities "
-virtual std::vector<std::string> Mgx3D::Group::GroupManagerIfc::getBlocksEntities(const std::vector< std::string > &vg)
+%feature("docstring") Mgx3D::Group::GroupManager::getBlocksEntities "
+virtual std::vector<std::string> Mgx3D::Group::GroupManager::getBlocksEntities(const std::vector< std::string > &vg)
 
 
 Retourne les noms des blocks géométriques à partir des groupes sélectionnées 
 
 ";
-%feature("docstring") Mgx3D::Group::GroupManagerIfc::getGeomEntities "
-virtual std::vector<std::string> Mgx3D::Group::GroupManagerIfc::getGeomEntities(std::vector< std::string > &vg)
+%feature("docstring") Mgx3D::Group::GroupManager::getGeomEntities "
+virtual std::vector<std::string> Mgx3D::Group::GroupManager::getGeomEntities(std::vector< std::string > &vg)
 
 
 Retourne les entités géométriques à partir des groupes sélectionnées 
 
 ";
-%feature("docstring") Mgx3D::Group::GroupManagerIfc::getInfos "
-virtual std::string Mgx3D::Group::GroupManagerIfc::getInfos(const std::string &name, int dim) const 
+%feature("docstring") Mgx3D::Group::GroupManager::getInfos "
+virtual std::string Mgx3D::Group::GroupManager::getInfos(const std::string &name, int dim) const
 
 
 Retourne une string avec les informations relatives à l'entité 
 
 ";
-%feature("docstring") Mgx3D::Group::GroupManagerIfc::getVisibles "
-virtual std::vector<std::string> Mgx3D::Group::GroupManagerIfc::getVisibles() const 
+%feature("docstring") Mgx3D::Group::GroupManager::getVisibles "
+virtual std::vector<std::string> Mgx3D::Group::GroupManager::getVisibles() const
 
 retourne la liste des noms des groupes visibles 
 
 ";
-%feature("docstring") Mgx3D::Group::GroupManagerIfc::GroupManagerIfc "
-Mgx3D::Group::GroupManagerIfc::GroupManagerIfc(const std::string &name, Internal::ContextIfc *c)
+%feature("docstring") Mgx3D::Group::GroupManager::GroupManager "
+Mgx3D::Group::GroupManager::GroupManager(const std::string &name, Internal::ContextIfc *c)
 
 Constructeur. 
 
 ";
-%feature("docstring") Mgx3D::Group::GroupManagerIfc::mesh "
-virtual void Mgx3D::Group::GroupManagerIfc::mesh(const std::vector< std::string > &vg)
+%feature("docstring") Mgx3D::Group::GroupManager::mesh "
+virtual void Mgx3D::Group::GroupManager::mesh(const std::vector< std::string > &vg)
 
 
 Lance la commande de maillage pour les entitées topologiques associées aux groupes sélectionnés 
 
 ";
-%feature("docstring") Mgx3D::Group::GroupManagerIfc::removeFromGroup "
-virtual void Mgx3D::Group::GroupManagerIfc::removeFromGroup(std::vector< std::string > &ve, int dim, const std::string &groupName)
+%feature("docstring") Mgx3D::Group::GroupManager::removeFromGroup "
+virtual void Mgx3D::Group::GroupManager::removeFromGroup(std::vector< std::string > &ve, int dim, const std::string &groupName)
 
 
 Enlève le contenu d'un ensemble géométrique à un groupe donné 
 
 ";
-%feature("docstring") Mgx3D::Group::GroupManagerIfc::rotate "
-virtual void Mgx3D::Group::GroupManagerIfc::rotate(std::vector< std::string > &vg, const Utils::Math::Rotation &rot)
+%feature("docstring") Mgx3D::Group::GroupManager::rotate "
+virtual void Mgx3D::Group::GroupManager::rotate(std::vector< std::string > &vg, const Utils::Math::Rotation &rot)
 
 
 Opération de rotation d'un ou plusieurs groupes donc des géométries et des topologies (si elles existent)
@@ -1135,8 +1135,8 @@ vg : noms des groupes à modifier
 rot : la rotation 
 
 ";
-%feature("docstring") Mgx3D::Group::GroupManagerIfc::scale "
-virtual void Mgx3D::Group::GroupManagerIfc::scale(std::vector< std::string > &vg, const double factor)
+%feature("docstring") Mgx3D::Group::GroupManager::scale "
+virtual void Mgx3D::Group::GroupManager::scale(std::vector< std::string > &vg, const double factor)
 
 
 Opération d'homothétie d'un ou plusieurs groupes donc des géométries et des topologies (si elles existent)
@@ -1145,15 +1145,15 @@ vg : noms des groupes à modifier
 factor : le facteur d'homothétie 
 
 ";
-%feature("docstring") Mgx3D::Group::GroupManagerIfc::setGroup "
-virtual void Mgx3D::Group::GroupManagerIfc::setGroup(std::vector< std::string > &ve, int dim, const std::string &groupName)
+%feature("docstring") Mgx3D::Group::GroupManager::setGroup "
+virtual void Mgx3D::Group::GroupManager::setGroup(std::vector< std::string > &ve, int dim, const std::string &groupName)
 
 
 Défini le contenu d'un ensemble géométrique à un groupe donné 
 
 ";
-%feature("docstring") Mgx3D::Group::GroupManagerIfc::translate "
-virtual void Mgx3D::Group::GroupManagerIfc::translate(std::vector< std::string > &vg, const Vector &dp)
+%feature("docstring") Mgx3D::Group::GroupManager::translate "
+virtual void Mgx3D::Group::GroupManager::translate(std::vector< std::string > &vg, const Vector &dp)
 
 
 Opération de translation d'un ou plusieurs groupes donc des géométries et des topologies (si elles existent)
@@ -1162,8 +1162,8 @@ vg : noms des groupes à translater
 dp : le vecteur de translation 
 
 ";
-%feature("docstring") Mgx3D::Group::GroupManagerIfc::~GroupManagerIfc "
-virtual Mgx3D::Group::GroupManagerIfc::~GroupManagerIfc()
+%feature("docstring") Mgx3D::Group::GroupManager::~GroupManager "
+virtual Mgx3D::Group::GroupManager::~GroupManager()
 
 Destructeur. 
 

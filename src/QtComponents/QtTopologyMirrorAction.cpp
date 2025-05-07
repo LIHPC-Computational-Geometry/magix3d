@@ -464,7 +464,7 @@ void QtTopologyMirrorAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (panel)
 	Math::Point		point (panel->getPoint ( ));
 	Math::Vector	normal (panel->getNormal ( ));
-	Plane			plane (point, normal);
+	Math::Plane			plane (point, normal);
 	bool			propagate	= panel->doPropagate ( );
 
 	vector<string>			entities	= panel->getTopoEntitiesNames ( );

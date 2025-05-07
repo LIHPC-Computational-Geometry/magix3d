@@ -1385,7 +1385,7 @@ void MeshImplementation::_addFacesInSurfaces(Mesh::CommandCreateMesh* command, T
 
     // on ajoute la face dans un groupe pour permettre de la représenter
     if (groupsName.empty() && getContext().getMeshManager().coFaceAllwaysInGroups())
-    	groupsName.push_back(getContext().getLocalGroupManager().getDefaultName(2));
+    	groupsName.push_back(getContext().getGroupManager().getDefaultName(2));
 
     // création des polygones même si aucune surface de maillage les attend
     // en effet, ces mailles seront utilies pour la représentation des blocs structurés

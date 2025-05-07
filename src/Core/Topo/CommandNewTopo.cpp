@@ -168,7 +168,7 @@ CommandNewTopo::
         {
             Vertex* vtx = new Vertex(getContext(), m_point);
 
-            Group::Group0D *group = getContext().getLocalGroupManager().getNewGroup0D(m_groupName,
+            Group::Group0D *group = getContext().getGroupManager().getNewGroup0D(m_groupName,
                                                                                       &getInfoCommand());
             group->add(vtx);
             vtx->getGroupsContainer().add(group);
@@ -184,7 +184,7 @@ CommandNewTopo::
             CoEdge* coedge = new CoEdge(getContext(), &emp, v0, v1);
 
 
-            Group::Group1D *group = getContext().getLocalGroupManager().getNewGroup1D(groupName,
+            Group::Group1D *group = getContext().getGroupManager().getNewGroup1D(groupName,
                                                                                       &getInfoCommand());
             group->add(coedge);
             coedge->getGroupsContainer().add(group);
@@ -345,7 +345,7 @@ CommandNewTopo::
 
             Topo::CoFace* face = new CoFace(getContext(), edges, true);
 
-            Group::Group2D *group = getContext().getLocalGroupManager().getNewGroup2D(groupName,
+            Group::Group2D *group = getContext().getGroupManager().getNewGroup2D(groupName,
                                                                                       &getInfoCommand());
             group->add(face);
             face->getGroupsContainer().add(group);

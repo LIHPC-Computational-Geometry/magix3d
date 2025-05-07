@@ -9,9 +9,18 @@
 #ifndef MGX3D_GROUP_GROUPMANAGER_H_
 #define MGX3D_GROUP_GROUPMANAGER_H_
 /*----------------------------------------------------------------------------*/
+#include "Utils/SelectionManagerIfc.h"
+#include "Internal/CommandCreator.h"
+#include "Internal/M3DCommandResultIfc.h"
+#include "Geom/GeomEntity.h"
+#include "Mesh/MeshEntity.h"
+#include "Topo/TopoEntity.h"
+#include "SysCoord/SysCoord.h"
+/*----------------------------------------------------------------------------*/
 #include <vector>
 #include <map>
-#include "Group/GroupManagerIfc.h"
+/*----------------------------------------------------------------------------*/
+#include <Python.h>
 #include <sys/types.h>           // uint sur Bull
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
@@ -37,6 +46,9 @@ class GeomEntity;
 }
 namespace Mesh {
 class MeshEntity;
+class SurfacicSmoothing;
+class VolumicSmoothing;
+class MeshModificationBySepa;
 }
 namespace SysCoord {
 class SysCoord;
@@ -56,7 +68,7 @@ class GroupEntity;
  * \brief Gestionnaire des opérations effectuées au niveau des groupes
  *
  */
-class GroupManager : public Group::GroupManagerIfc{
+class GroupManager final : public Internal::CommandCreator {
 public:
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur.
@@ -66,11 +78,13 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief   Destructeur
      */
-    virtual ~GroupManager();
+    ~GroupManager();
 
-	/*------------------------------------------------------------------------*/
-	/** Réinitialisation     */
-	virtual void clear();
+#ifndef SWIG
+    /*------------------------------------------------------------------------*/
+    /** Réinitialisation     */
+    void clear();
+#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief   Activativation ou non de la propagation
@@ -86,59 +100,60 @@ public:
      *  en ayant activer le groupe 3D et les volumes.
      *
      */
-    virtual bool getPropagate();
+    bool getPropagate();
 
     /*------------------------------------------------------------------------*/
     /** Retourne une string avec les informations relatives à l'entité */
-    virtual std::string getInfos(const std::string& name, int dim) const;
+    std::string getInfos(const std::string& name, int dim) const;
 
     /*------------------------------------------------------------------------*/
     /// retourne un nom par défaut pour les entités qui n'en aurait pas
     std::string getDefaultName(int dim) const;
 
+#ifndef SWIG
     /*------------------------------------------------------------------------*/
     /// retourne l'entité à partir du nom, une exception si elle n'existe pas
-    virtual Group3D* getGroup3D(const std::string& name, const bool exceptionIfNotFound=true) const;
+    Group3D* getGroup3D(const std::string& name, const bool exceptionIfNotFound=true) const;
 
     /// retourne l'entité à partir du nom, et la créé si elle n'existe pas
-    virtual Group3D* getNewGroup3D(const std::string& name, Internal::InfoCommand* icmd);
+    Group3D* getNewGroup3D(const std::string& name, Internal::InfoCommand* icmd);
 
     /*------------------------------------------------------------------------*/
     /// retourne l'entité à partir du nom, une exception si elle n'existe pas
-    virtual Group2D* getGroup2D(const std::string& name, const bool exceptionIfNotFound=true) const;
+    Group2D* getGroup2D(const std::string& name, const bool exceptionIfNotFound=true) const;
 
     /// retourne l'entité à partir du nom, et la créé si elle n'existe pas
-    virtual Group2D* getNewGroup2D(const std::string& name, Internal::InfoCommand* icmd);
+    Group2D* getNewGroup2D(const std::string& name, Internal::InfoCommand* icmd);
 
      /*------------------------------------------------------------------------*/
     /// retourne l'entité à partir du nom, une exception si elle n'existe pas
-    virtual Group1D* getGroup1D(const std::string& name, const bool exceptionIfNotFound=true) const;
+    Group1D* getGroup1D(const std::string& name, const bool exceptionIfNotFound=true) const;
 
     /// retourne l'entité à partir du nom, et la créé si elle n'existe pas
-    virtual Group1D* getNewGroup1D(const std::string& name, Internal::InfoCommand* icmd);
+    Group1D* getNewGroup1D(const std::string& name, Internal::InfoCommand* icmd);
 
     /*------------------------------------------------------------------------*/
     /// retourne l'entité à partir du nom, une exception si elle n'existe pas
-    virtual Group0D* getGroup0D(const std::string& name, const bool exceptionIfNotFound=true) const;
+    Group0D* getGroup0D(const std::string& name, const bool exceptionIfNotFound=true) const;
 
     /// retourne l'entité à partir du nom, et la créé si elle n'existe pas
-    virtual Group0D* getNewGroup0D(const std::string& name, Internal::InfoCommand* icmd);
+    Group0D* getNewGroup0D(const std::string& name, Internal::InfoCommand* icmd);
 
     /*------------------------------------------------------------------------*/
     /// retourne la liste des groupes 3D, sans ou avec ceux détruits
-    virtual void getGroup3D(std::vector<Group3D*>& grp, const bool onlyLive=true) const;
+    void getGroup3D(std::vector<Group3D*>& grp, const bool onlyLive=true) const;
 
     /// retourne la liste des groupes 2D, sans ou avec ceux détruits
-    virtual void getGroup2D(std::vector<Group2D*>& grp, const bool onlyLive=true) const;
+    void getGroup2D(std::vector<Group2D*>& grp, const bool onlyLive=true) const;
 
     /// retourne la liste des groupes 1D, sans ou avec ceux détruits
-    virtual void getGroup1D(std::vector<Group1D*>& grp, const bool onlyLive=true) const;
+    void getGroup1D(std::vector<Group1D*>& grp, const bool onlyLive=true) const;
 
     /// retourne la liste des groupes 0D, sans ou avec ceux détruits
-    virtual void getGroup0D(std::vector<Group0D*>& grp, const bool onlyLive=true) const;
+    void getGroup0D(std::vector<Group0D*>& grp, const bool onlyLive=true) const;
 
     /// retourne la liste des groupes de dimensions dims, sans ou avec ceux détruits
-    virtual void getGroups (std::vector<GroupEntity*>& grp, Mgx3D::Utils::SelectionManagerIfc::DIM dims, const bool onlyLive=true) const;
+    void getGroups (std::vector<GroupEntity*>& grp, Mgx3D::Utils::SelectionManagerIfc::DIM dims, const bool onlyLive=true) const;
 
     /*------------------------------------------------------------------------*/
     /** Fonction qui à partir d'un filtre (stocké) et des ensembles des groupes qui
@@ -146,7 +161,7 @@ public:
      * renseigne sur les entités à rendre visible ou invisible pour
      * la géométrie, la topologie et le maillage
      */
-    virtual void getAddedShownAndHidden(
+    void getAddedShownAndHidden(
             const std::vector<Group::GroupEntity*>& groupAddedShown,
             const std::vector<Group::GroupEntity*>& groupAddedHidden,
             std::vector<Geom::GeomEntity*>& geomAddedShown,
@@ -163,7 +178,7 @@ public:
      * renseigne sur les entités à rendre visible ou invisible pour
      * la géométrie, la topologie et le maillage
      */
-    virtual void getAddedShownAndHidden(
+    void getAddedShownAndHidden(
             const Utils::FilterEntity::objectType newVisibilityMask,
             std::vector<Geom::GeomEntity*>& geomAddedShown,
             std::vector<Geom::GeomEntity*>& geomAddedHidden,
@@ -174,19 +189,19 @@ public:
 			std::vector<CoordinateSystem::SysCoord*>& sysCoordAddedShown,
 			std::vector<CoordinateSystem::SysCoord*>& sysCoordAddedHidden);
 
-	/** Fonction qui à partir d'un filtre donné en argument retourne
-	 * la liste des entités visibles correspondantes.
-	 */
-	virtual void getShownEntities(
-			const Utils::FilterEntity::objectType visibilityMask,
-			std::vector<Utils::Entity*>& entities);
+    /** Fonction qui à partir d'un filtre donné en argument retourne
+     * la liste des entités visibles correspondantes.
+     */
+    void getShownEntities(
+		const Utils::FilterEntity::objectType visibilityMask,
+		std::vector<Utils::Entity*>& entities);
 
     /** Met à jour les DisplayProperties
      *
      * Pour le moment, se contente de modifier isDisplayed()
      * pour savoir si une entité est à afficher ou non
      */
-    virtual void updateDisplayProperties(Internal::InfoCommand* icmd);
+    void updateDisplayProperties(Internal::InfoCommand* icmd);
 
 
     /** Repère les groupes vides et les détruits
@@ -203,7 +218,7 @@ public:
      * parcours les entités non vues et accessibles via le masque
      * pour ajouter aux différents filtres la marque (mark)
      */
-    virtual void addMarkAllGroups(const Utils::FilterEntity::objectType visibilityMask,
+    void addMarkAllGroups(const Utils::FilterEntity::objectType visibilityMask,
             std::map<Geom::GeomEntity*, uint>& filtre_geom,
             std::map<Topo::TopoEntity*, uint>& filtre_topo,
 			std::map<CoordinateSystem::SysCoord*, uint>& filtre_rep,
@@ -213,7 +228,7 @@ public:
      * parcours les entités non vues et accessibles via le masque
      * pour ajouter aux différents filtres la marque (mark)
      */
-    virtual void addMark(const std::vector<Group::GroupEntity*>& groups,
+    void addMark(const std::vector<Group::GroupEntity*>& groups,
                 const Utils::FilterEntity::objectType visibilityMask,
                 std::map<Geom::GeomEntity*, uint>& filtre_geom,
                 std::map<Topo::TopoEntity*, uint>& filtre_topo,
@@ -224,7 +239,7 @@ public:
      * recherche les entités de maillage accessibles via le masque
      * et les ajoutes au vecteur résultant
      */
-    virtual void addMeshGroups(const std::vector<Group::GroupEntity*>& groups,
+    void addMeshGroups(const std::vector<Group::GroupEntity*>& groups,
             const Utils::FilterEntity::objectType visibilityMask,
             std::vector<Mesh::MeshEntity*>& meshAdded);
 
@@ -232,7 +247,7 @@ public:
      * recherche les entités de maillage accessibles via le masque
      * et les ajoutes au vecteur résultant
      */
-    virtual void addMeshGroups(const Utils::FilterEntity::objectType visibilityMask,
+    void addMeshGroups(const Utils::FilterEntity::objectType visibilityMask,
             std::vector<Mesh::MeshEntity*>& meshAdded);
 
     /*------------------------------------------------------------------------*/
@@ -240,7 +255,7 @@ public:
      * et accessibles via le masque
      * pour ajouter aux différents filtres la marque (mark)
      */
-    virtual void addMark(Group3D* grp,
+    void addMark(Group3D* grp,
             const Utils::FilterEntity::objectType visibilityMask,
             std::map<Utils::Entity*, bool>& filtre_vu,
             std::map<Geom::GeomEntity*, uint>& filtre_geom,
@@ -252,7 +267,7 @@ public:
      * et accessibles via le masque
      * pour ajouter aux différents filtres la marque (mark)
      */
-    virtual void addMark(Group2D* grp,
+    void addMark(Group2D* grp,
             const Utils::FilterEntity::objectType visibilityMask,
             std::map<Utils::Entity*, bool>& filtre_vu,
             std::map<Geom::GeomEntity*, uint>& filtre_geom,
@@ -263,7 +278,7 @@ public:
      * et accessibles via le masque
      * pour ajouter aux différents filtres la marque (mark)
      */
-    virtual void addMark(Group1D* grp,
+    void addMark(Group1D* grp,
             const Utils::FilterEntity::objectType visibilityMask,
             std::map<Utils::Entity*, bool>& filtre_vu,
             std::map<Geom::GeomEntity*, uint>& filtre_geom,
@@ -274,7 +289,7 @@ public:
      * et accessibles via le masque
      * pour ajouter aux différents filtres la marque (mark)
      */
-    virtual void addMark(Group0D* grp,
+    void addMark(Group0D* grp,
             const Utils::FilterEntity::objectType visibilityMask,
             std::map<Utils::Entity*, bool>& filtre_vu,
             std::map<Geom::GeomEntity*, uint>& filtre_geom,
@@ -285,7 +300,7 @@ public:
      * et accessibles via le masque
      * pour ajouter aux différents filtres la marque (mark)
      */
-    virtual void addMark(Topo::Block* blk,
+    void addMark(Topo::Block* blk,
             const Utils::FilterEntity::objectType visibilityMask,
             std::map<Utils::Entity*, bool>& filtre_vu,
             std::map<Topo::TopoEntity*, uint>& filtre_topo,
@@ -295,7 +310,7 @@ public:
      * et accessibles via le masque
      * pour ajouter aux différents filtres la marque (mark)
      */
-    virtual void addMark(Topo::Face* face,
+    void addMark(Topo::Face* face,
             const Utils::FilterEntity::objectType visibilityMask,
             std::map<Utils::Entity*, bool>& filtre_vu,
             std::map<Topo::TopoEntity*, uint>& filtre_topo,
@@ -305,7 +320,7 @@ public:
      * et accessibles via le masque
      * pour ajouter aux différents filtres la marque (mark)
      */
-    virtual void addMark(Topo::CoFace* coface,
+    void addMark(Topo::CoFace* coface,
             const Utils::FilterEntity::objectType visibilityMask,
             std::map<Utils::Entity*, bool>& filtre_vu,
             std::map<Topo::TopoEntity*, uint>& filtre_topo,
@@ -315,7 +330,7 @@ public:
      * et accessibles via le masque
      * pour ajouter aux différents filtres la marque (mark)
      */
-    virtual void addMark(Topo::Edge* edge,
+    void addMark(Topo::Edge* edge,
             const Utils::FilterEntity::objectType visibilityMask,
             std::map<Utils::Entity*, bool>& filtre_vu,
             std::map<Topo::TopoEntity*, uint>& filtre_topo,
@@ -325,7 +340,7 @@ public:
      * et accessibles via le masque
      * pour ajouter aux différents filtres la marque (mark)
      */
-    virtual void addMark(Topo::CoEdge* coedge,
+    void addMark(Topo::CoEdge* coedge,
             const Utils::FilterEntity::objectType visibilityMask,
             std::map<Utils::Entity*, bool>& filtre_vu,
             std::map<Topo::TopoEntity*, uint>& filtre_topo,
@@ -335,7 +350,7 @@ public:
      * et accessibles via le masque
      * pour ajouter aux différents filtres la marque (mark)
      */
-    virtual void addMark(Topo::Vertex* vertex,
+    void addMark(Topo::Vertex* vertex,
             const Utils::FilterEntity::objectType visibilityMask,
             std::map<Utils::Entity*, bool>& filtre_vu,
             std::map<Topo::TopoEntity*, uint>& filtre_topo,
@@ -345,7 +360,7 @@ public:
      * et accessibles via le masque
      * pour ajouter aux différents filtres la marque (mark)
      */
-    virtual void addMark(CoordinateSystem::SysCoord* rep,
+    void addMark(CoordinateSystem::SysCoord* rep,
             const Utils::FilterEntity::objectType visibilityMask,
             std::map<Utils::Entity*, bool>& filtre_vu,
             std::map<CoordinateSystem::SysCoord*, uint>& filtre_rep,
@@ -353,113 +368,113 @@ public:
 
     /*------------------------------------------------------------------------*/
     /** Retourne les volumes géométriques à partir des groupes sélectionnés   */
-    virtual void get(const std::vector<std::string>& vg, std::vector<Geom::Volume*>& volumes);
+    void get(const std::vector<std::string>& vg, std::vector<Geom::Volume*>& volumes);
 
     /*------------------------------------------------------------------------*/
     /** Retourne les surfaces géométriques à partir des groupes sélectionnés  */
-    virtual void get(const std::vector<std::string>& vg, std::vector<Geom::Surface*>& surfaces);
+    void get(const std::vector<std::string>& vg, std::vector<Geom::Surface*>& surfaces);
 
     /*------------------------------------------------------------------------*/
     /** Retourne les courbes géométriques à partir des groupes sélectionnés   */
-    virtual void get(const std::vector<std::string>& vg, std::vector<Geom::Curve*>& curves);
+    void get(const std::vector<std::string>& vg, std::vector<Geom::Curve*>& curves);
 
     /*------------------------------------------------------------------------*/
     /** Retourne les sommets géométriques à partir des groupes sélectionnés  */
-    virtual void get(const std::vector<std::string>& vg, std::vector<Geom::Vertex*>& vertices);
+    void get(const std::vector<std::string>& vg, std::vector<Geom::Vertex*>& vertices);
 
     /*------------------------------------------------------------------------*/
     /** Retourne les blocs topologiques à partir des groupes sélectionnés     */
-    virtual void get(const std::vector<std::string>& vg, std::vector<Topo::Block*>& blocks);
+    void get(const std::vector<std::string>& vg, std::vector<Topo::Block*>& blocks);
 
     /*------------------------------------------------------------------------*/
     /** Retourne les faces communes topologiques à partir des groupes sélectionnés */
-    virtual void get(const std::vector<std::string>& vg, std::vector<Topo::CoFace*>& cofaces);
+    void get(const std::vector<std::string>& vg, std::vector<Topo::CoFace*>& cofaces);
 
     /*------------------------------------------------------------------------*/
     /** Retourne les arêtes communes topologiques à partir des groupes sélectionnés */
-    virtual void get(const std::vector<std::string>& vg, std::vector<Topo::CoEdge*>& coedges);
+    void get(const std::vector<std::string>& vg, std::vector<Topo::CoEdge*>& coedges);
 
     /*------------------------------------------------------------------------*/
     /** Retourne les sommets topologiques à partir des groupes sélectionnés */
-    virtual void get(const std::vector<std::string>& vg, std::vector<Topo::Vertex*>& vertices);
+    void get(const std::vector<std::string>& vg, std::vector<Topo::Vertex*>& vertices);
 
     /*------------------------------------------------------------------------*/
     /** Retourne les volumes de mailles à partir des groupes sélectionnés   */
-    virtual void get(const std::vector<std::string>& vg, std::vector<Mesh::Volume*>& volumes);
+    void get(const std::vector<std::string>& vg, std::vector<Mesh::Volume*>& volumes);
 
     /*------------------------------------------------------------------------*/
     /** Retourne les surfaces de mailles à partir des groupes sélectionnés  */
-    virtual void get(const std::vector<std::string>& vg, std::vector<Mesh::Surface*>& surfaces);
+    void get(const std::vector<std::string>& vg, std::vector<Mesh::Surface*>& surfaces);
 
     /*------------------------------------------------------------------------*/
     /** Retourne les lignes de bras à partir des groupes sélectionnés  */
-    virtual void get(const std::vector<std::string>& vg, std::vector<Mesh::Line*>& lines);
+    void get(const std::vector<std::string>& vg, std::vector<Mesh::Line*>& lines);
 
     /*------------------------------------------------------------------------*/
     /** Retourne les nuages de noeuds à partir des groupes sélectionnés  */
-    virtual void get(const std::vector<std::string>& vg, std::vector<Mesh::Cloud*>& clouds);
-
+    void get(const std::vector<std::string>& vg, std::vector<Mesh::Cloud*>& clouds);
+#endif
 
     /*------------------------------------------------------------------------*/
     /** Retourne les noms des entités géométriques à partir des groupes sélectionnées */
-    virtual std::vector<std::string> getGeomEntities(const std::vector<std::string>& vg);
+    std::vector<std::string> getGeomEntities(const std::vector<std::string>& vg);
 
     /*------------------------------------------------------------------------*/
     /** Retourne les volumes géométriques à partir des groupes sélectionnés   */
-    virtual std::vector<std::string> getGeomVolumes(const std::vector<std::string>& vg);
+    std::vector<std::string> getGeomVolumes(const std::vector<std::string>& vg);
 
     /*------------------------------------------------------------------------*/
     /** Retourne les surfaces géométriques à partir des groupes sélectionnés  */
-    virtual std::vector<std::string> getGeomSurfaces(const std::vector<std::string>& vg);
+    std::vector<std::string> getGeomSurfaces(const std::vector<std::string>& vg);
 
     /*------------------------------------------------------------------------*/
     /** Retourne les courbes géométriques à partir des groupes sélectionnés   */
-    virtual std::vector<std::string> getGeomCurves(const std::vector<std::string>& vg);
+    std::vector<std::string> getGeomCurves(const std::vector<std::string>& vg);
 
     /*------------------------------------------------------------------------*/
     /** Retourne les sommets géométriques à partir des groupes sélectionnés  */
-    virtual std::vector<std::string> getGeomVertices(const std::vector<std::string>& vg);
+    std::vector<std::string> getGeomVertices(const std::vector<std::string>& vg);
 
     /*------------------------------------------------------------------------*/
     /** Retourne les blocs topologiques à partir des groupes sélectionnés     */
-    virtual std::vector<std::string> getTopoBlocks(const std::vector<std::string>& vg);
+    std::vector<std::string> getTopoBlocks(const std::vector<std::string>& vg);
 
     /*------------------------------------------------------------------------*/
     /** Retourne les faces communes topologiques à partir des groupes sélectionnés */
-    virtual std::vector<std::string> getTopoFaces(const std::vector<std::string>& vg);
+    std::vector<std::string> getTopoFaces(const std::vector<std::string>& vg);
 
     /*------------------------------------------------------------------------*/
     /** Retourne les arêtes communes topologiques à partir des groupes sélectionnés */
-    virtual std::vector<std::string> getTopoEdges(const std::vector<std::string>& vg);
+    std::vector<std::string> getTopoEdges(const std::vector<std::string>& vg);
 
     /*------------------------------------------------------------------------*/
     /** Retourne les sommets topologiques à partir des groupes sélectionnés */
-    virtual std::vector<std::string> getTopoVertices(const std::vector<std::string>& vg);
+    std::vector<std::string> getTopoVertices(const std::vector<std::string>& vg);
 
 
     /*------------------------------------------------------------------------*/
     /** \brief retourne la liste des noms des groupes visibles
      */
-    virtual std::vector<std::string> getVisibles() const;
+    std::vector<std::string> getVisibles() const;
 
     /*------------------------------------------------------------------------*/
     /** Ajoute une projection sur plan X=0 du maillage pour un groupe 2D
      *
      *  \param nom   nom du groupe avec lequel on effectue la projection
      */
-    virtual void addProjectionOnPX0(const std::string& nom);
+    void addProjectionOnPX0(const std::string& nom);
 
     /** Ajoute une projection sur plan Y=0 du maillage pour un groupe 2D
      *
      *  \param nom   nom du groupe avec lequel on effectue la projection
      */
-    virtual void addProjectionOnPY0(const std::string& nom);
+    void addProjectionOnPY0(const std::string& nom);
 
     /** Ajoute une projection sur plan Z=0 du maillage pour un groupe 2D
      *
      *  \param nom   nom du groupe avec lequel on effectue la projection
      */
-    virtual void addProjectionOnPZ0(const std::string& nom);
+    void addProjectionOnPZ0(const std::string& nom);
 
   /** Ajoute une modification du maillage pour un groupe (2D ou 3D)
      *
@@ -469,7 +484,7 @@ public:
      *  \param nom       nom du groupe avec lequel on effectue la perturbation
      *  \param py_obj    l'objet python auquel il est fait appel pour modifier le maillage
      */
-    virtual void addCartesianPerturbation(const std::string& nom, PyObject* py_obj);
+    void addCartesianPerturbation(const std::string& nom, PyObject* py_obj);
 
     /*------------------------------------------------------------------------*/
     /** Ajoute une modification du maillage pour un groupe (2D ou 3D)
@@ -480,7 +495,7 @@ public:
      *  \param nom       nom du groupe avec lequel on effectue la perturbation
      *  \param py_obj    l'objet python auquel il est fait appel pour modifier le maillage
      */
-    virtual void addPolarPerturbation(const std::string& nom, PyObject* py_obj);
+    void addPolarPerturbation(const std::string& nom, PyObject* py_obj);
 
     /*------------------------------------------------------------------------*/
     /** Ajoute un lissage surfacique du maillage pour un groupe 2D
@@ -488,7 +503,7 @@ public:
      * \param nom       nom du groupe 2D avec lequel on effectue le lissage
      * \param sm        la classe qui défini le lissage surfacique
      */
-    virtual void addSmoothing(const std::string& nom, Mesh::SurfacicSmoothing& sm);
+    void addSmoothing(const std::string& nom, Mesh::SurfacicSmoothing& sm);
 
     /*------------------------------------------------------------------------*/
     /** Ajoute un lissage volumique du maillage pour un groupe 3D
@@ -496,7 +511,7 @@ public:
      * \param nom       nom du groupe 3D avec lequel on effectue le lissage
      * \param sm        la classe qui défini le lissage volumique
      */
-    virtual void addSmoothing(const std::string& nom, Mesh::VolumicSmoothing& sm);
+    void addSmoothing(const std::string& nom, Mesh::VolumicSmoothing& sm);
 
     /*------------------------------------------------------------------------*/
     /** Ajoute une séparatrice pour un groupe 2D
@@ -504,31 +519,31 @@ public:
      * \param nom       nom du groupe 2D sur lequel on applique la séparatrice
      * \param ASepa		la séparatrice
      */
-    virtual void addSepa(const std::string& nom, Mesh::MeshModificationBySepa& ASepa);
+    void addSepa(const std::string& nom, Mesh::MeshModificationBySepa& ASepa);
 
     /*------------------------------------------------------------------------*/
     /** Ajoute le contenu d'un ensemble géométrique à un groupe donné
       *  */
-     virtual void addToGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
+     void addToGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
 
      /** Enlève le contenu d'un ensemble géométrique à un groupe donné
       *  */
-     virtual void removeFromGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
+     void removeFromGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
 
      /** Défini le contenu d'un ensemble géométrique à un groupe donné
       *  */
-     virtual void setGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
+     void setGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
 
      /** affecte un niveau pour classer les groupes
       *  \param vg la liste des noms de groupes
       *  \param dim la dimension des groupes
       *  \param level le niveau que l'on affecte aux groupes
       */
-     virtual void setLevel(std::vector<std::string>& vg, int dim, int level);
+     void setLevel(std::vector<std::string>& vg, int dim, int level);
 
      /*------------------------------------------------------------------------*/
      /** Vide un groupe suivant son nom et une dimension */
-     virtual Internal::M3DCommandResultIfc* clearGroup(int dim, const std::string& groupName);
+     Internal::M3DCommandResultIfc* clearGroup(int dim, const std::string& groupName);
 
 
 private:

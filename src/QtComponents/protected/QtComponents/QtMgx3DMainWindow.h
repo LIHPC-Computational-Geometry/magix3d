@@ -662,7 +662,7 @@ class QtMgx3DMainWindow :
     /**
      * \return      Le gestionnaire de groupe d'entités.
      */
-    virtual Mgx3D::Group::GroupManagerIfc& getGroupManager ( );
+    virtual Mgx3D::Group::GroupManager& getGroupManager ( );
 
     /**
      * \return      Le gestionnaire de commandes composites.

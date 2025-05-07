@@ -149,7 +149,7 @@ internalSpecificExecute()
 	m_entities[0]->getGroups(grp);
 	newCurve->setGroups(grp);
 	for (uint i=0; i<grp.size(); i++){
-		Group::Group1D* group = getContext().getLocalGroupManager().getNewGroup1D(grp[i]->getName(), &getInfoCommand());
+		Group::Group1D* group = getContext().getGroupManager().getNewGroup1D(grp[i]->getName(), &getInfoCommand());
 		group->add(newCurve);
 	}
 

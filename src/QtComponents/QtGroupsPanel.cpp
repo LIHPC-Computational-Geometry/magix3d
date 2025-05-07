@@ -26,7 +26,7 @@
 #include "QtComponents/QtMgx3DApplication.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtExpansionTreeRestorer.h"
-#include "Group/GroupManagerIfc.h"
+#include "Group/GroupManager.h"
 #include "Group/Group0D.h"
 #include "Group/Group1D.h"
 #include "Group/Group2D.h"

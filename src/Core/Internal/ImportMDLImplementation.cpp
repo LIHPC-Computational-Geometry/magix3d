@@ -145,7 +145,7 @@ void ImportMDLImplementation::performGeom(Internal::InfoCommand* icmd)
                     	id_grp++;
                     	if (!m_prefixName.empty())
                     		name = m_prefixName + name;
-                        Group::Group1D* group = m_context.getLocalGroupManager().getNewGroup1D(name, icmd);
+                        Group::Group1D* group = m_context.getGroupManager().getNewGroup1D(name, icmd);
                         if (id_grp == 1)
                         	group->setLevel(2);
                         else
@@ -155,8 +155,8 @@ void ImportMDLImplementation::performGeom(Internal::InfoCommand* icmd)
                 			if (crv->getNbGroups() == 1){
                 				std::vector<std::string> gn;
                 				crv->getGroupsName(gn);
-                				if (gn[0] == m_context.getLocalGroupManager().getDefaultName(1)){
-                					Group::Group1D* grp = m_context.getLocalGroupManager().getGroup1D(gn[0], icmd);
+                				if (gn[0] == m_context.getGroupManager().getDefaultName(1)){
+                					Group::Group1D* grp = m_context.getGroupManager().getGroup1D(gn[0], icmd);
                 					grp->remove(crv);
                 					crv->remove(grp);
                 					icmd->addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
@@ -205,7 +205,7 @@ void ImportMDLImplementation::performGeom(Internal::InfoCommand* icmd)
                     id_grp++;
                 	if (!m_prefixName.empty())
                 		name = m_prefixName + name;
-                    Group::Group2D* group = m_context.getLocalGroupManager().getNewGroup2D(name, icmd);
+                    Group::Group2D* group = m_context.getGroupManager().getNewGroup2D(name, icmd);
                     if (id_grp == 1)
                     	group->setLevel(2);
                     else
@@ -223,7 +223,7 @@ void ImportMDLImplementation::performGeom(Internal::InfoCommand* icmd)
             std::string nomDef = current_command.name.str();
         	if (!m_prefixName.empty())
         		nomDef = m_prefixName + nomDef;
-            Group::Group2D* group = m_context.getLocalGroupManager().getNewGroup2D(nomDef, icmd);
+            Group::Group2D* group = m_context.getGroupManager().getNewGroup2D(nomDef, icmd);
             group->setLevel(1);
             surf->add(group);
             group->add(surf);
@@ -254,7 +254,7 @@ void ImportMDLImplementation::performGeom(Internal::InfoCommand* icmd)
                                 id_grp++;
                                 if (!m_prefixName.empty())
                                     name = m_prefixName + name;
-                                Group::Group0D* group = m_context.getLocalGroupManager().getNewGroup0D(name, icmd);
+                                Group::Group0D* group = m_context.getGroupManager().getNewGroup0D(name, icmd);
                                 if (id_grp == 1)
                                     group->setLevel(2);
                                 else
@@ -606,7 +606,7 @@ Geom::Vertex* ImportMDLImplementation::getVertex(uint ptId)
         vtx = Geom::EntityFactory(m_context).newVertex(Utils::Math::Point(command_pt.u.point.cd.x1,command_pt.u.point.cd.x2, 0.0)*m_scale_factor);
         m_newGeomEntities.push_back(vtx);
         m_cor_ptId_vertex[ptId] = vtx;
-        Group::Group0D* group = m_context.getLocalGroupManager().getNewGroup0D("", m_icmd);
+        Group::Group0D* group = m_context.getGroupManager().getNewGroup0D("", m_icmd);
         vtx->add(group);
         group->add(vtx);
     }
@@ -752,7 +752,7 @@ Geom::Curve* ImportMDLImplementation::getCurve(const std::string name)
                 m_newGeomEntities.push_back(vtx1);
                 m_newGeomEntities.push_back(vtx2);
 
-                Group::Group0D* group = m_context.getLocalGroupManager().getNewGroup0D("", m_icmd);
+                Group::Group0D* group = m_context.getGroupManager().getNewGroup0D("", m_icmd);
                 vtx1->add(group);
                 vtx2->add(group);
                 group->add(vtx1);
@@ -772,7 +772,7 @@ Geom::Curve* ImportMDLImplementation::getCurve(const std::string name)
             	m_newGeomEntities.push_back(crv);
             	m_cor_name_curve[name] = crv;
 
-            	Group::Group1D* group = m_context.getLocalGroupManager().getNewGroup1D("", m_icmd);
+            	Group::Group1D* group = m_context.getGroupManager().getNewGroup1D("", m_icmd);
             	crv->add(group);
             	group->add(crv);
             }

@@ -780,7 +780,7 @@ INPUT                  = ../../src/Doc/User \
                          ../../src/Core/protected/Smoothing/SurfacicSmoothing.h \
                          ../../src/Core/protected/Smoothing/VolumicSmoothing.h \
                          ../../src/Core/protected/Mesh/MeshModificationBySepa.h \
-                         ../../src/Core/protected/Group/GroupManagerIfc.h 
+                         ../../src/Core/protected/Group/GroupManager.h
                          
                          
 

@@ -172,17 +172,16 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  Accesseur sur le manager de groupes
      */
-    virtual Mgx3D::Group::GroupManagerIfc& getGroupManager();
-    virtual const Mgx3D::Group::GroupManagerIfc& getGroupManager() const;
-    virtual void setGroupManager (Mgx3D::Group::GroupManagerIfc* mgr);
-    virtual Mgx3D::Group::GroupManager& getLocalGroupManager();
+    virtual Mgx3D::Group::GroupManager& getGroupManager();
+    virtual const Mgx3D::Group::GroupManager& getGroupManager() const;
+    virtual void setGroupManager (Mgx3D::Group::GroupManager* mgr);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Accesseur sur le manager de repères
      */
-    virtual Mgx3D::CoordinateSystem::SysCoordManagerIfc& getSysCoordManager();
-    virtual const Mgx3D::CoordinateSystem::SysCoordManagerIfc& getSysCoordManager() const;
-    virtual void setSysCoordManager (Mgx3D::CoordinateSystem::SysCoordManagerIfc* mgr);
+    virtual Mgx3D::CoordinateSystem::SysCoordManager& getSysCoordManager();
+    virtual const Mgx3D::CoordinateSystem::SysCoordManager& getSysCoordManager() const;
+    virtual void setSysCoordManager (Mgx3D::CoordinateSystem::SysCoordManager* mgr);
     virtual Mgx3D::CoordinateSystem::SysCoordManager& getLocalSysCoordManager();
 
     /*------------------------------------------------------------------------*/
@@ -628,9 +627,9 @@ protected:
     /// Manager pour le maillage
     Mgx3D::Mesh::MeshManager*        m_mesh_manager;
     /// Groupes pour les différents types d'entités
-    Mgx3D::Group::GroupManagerIfc*      m_group_manager;
+    Mgx3D::Group::GroupManager*      m_group_manager;
     /// Repères
-    Mgx3D::CoordinateSystem::SysCoordManagerIfc* m_sys_coord_manager;
+    Mgx3D::CoordinateSystem::SysCoordManager* m_sys_coord_manager;
     /// Maillages structurés :
     Mgx3D::Structured::StructuredMeshManager*	m_structured_mesh_manager;
     /// Manager pour les commandes de niveau supérieur
