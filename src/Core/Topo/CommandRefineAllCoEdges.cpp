@@ -43,7 +43,7 @@ internalExecute()
             << " de nom unique " << getUniqueName ( );
 
     std::vector<CoEdge*> coedges;
-    getContext().getLocalTopoManager().getCoEdges(coedges);
+    getContext().getTopoManager().getCoEdges(coedges);
 
     for (std::vector<CoEdge*>::iterator iter=coedges.begin();
     		iter!=coedges.end(); ++iter){

@@ -252,7 +252,7 @@ Mgx3D::Internal::M3DCommandResultIfc* MeshManager::newBlocksMesh(std::vector<std
 {
     std::vector<Mgx3D::Topo::Block*> entities;
     for(int i=0;i<names.size();i++)
-        entities.push_back(getLocalContext().getLocalTopoManager().getBlock(names[i]));
+        entities.push_back(getLocalContext().getTopoManager().getBlock(names[i]));
     return newBlocksMesh(entities);
 }
 /*----------------------------------------------------------------------------*/
@@ -285,7 +285,7 @@ Mgx3D::Internal::M3DCommandResultIfc* MeshManager::newFacesMesh(std::vector<std:
 {
     std::vector<Mgx3D::Topo::CoFace*> entities;
     for(int i=0;i<names.size();i++)
-        entities.push_back(getLocalContext().getLocalTopoManager().getCoFace(names[i]));
+        entities.push_back(getLocalContext().getTopoManager().getCoFace(names[i]));
     return newFacesMesh(entities);
 }
 /*----------------------------------------------------------------------------*/
@@ -358,10 +358,10 @@ MeshManager::newSubVolumeBetweenSheets(std::vector<std::string>& blocks_name, st
 {
     std::vector<Mgx3D::Topo::Block*> entities;
     for(int i=0;i<blocks_name.size();i++)
-        entities.push_back(getLocalContext().getLocalTopoManager().getBlock(blocks_name[i]));
+        entities.push_back(getLocalContext().getTopoManager().getBlock(blocks_name[i]));
 
     return newSubVolumeBetweenSheets(entities,
-    		getLocalContext().getLocalTopoManager().getCoEdge(narete),
+    		getLocalContext().getTopoManager().getCoEdge(narete),
 			pos1, pos2, groupName);
 }
 /*----------------------------------------------------------------------------*/
@@ -588,7 +588,7 @@ CommandMeshExplorer* MeshManager::newExplorer(CommandMeshExplorer* oldExplo, int
                     getLocalContext(),
                     oldExplo,
                     inc,
-                    getLocalContext().getLocalTopoManager().getCoEdge(narete));
+                    getLocalContext().getTopoManager().getCoEdge(narete));
 
     /// pas de trace dans le script
     command->setScriptable(asCommand);

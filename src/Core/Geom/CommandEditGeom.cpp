@@ -100,7 +100,7 @@ void CommandEditGeom::internalExecute()
         std::cerr<<"Ajoute --> "<<ge->getUniqueName()<<std::endl;
 #endif
         getInfoCommand ( ).addGeomInfoEntity (ge, Internal::InfoCommand::CREATED);
-        getContext().getLocalGeomManager().addEntity(ge);
+        getContext().getGeomManager().addEntity(ge);
     }
     for(int i=0;i<mod_entities.size();i++){
         GeomEntity* ge = mod_entities[i];

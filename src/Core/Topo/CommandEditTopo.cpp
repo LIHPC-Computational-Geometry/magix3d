@@ -56,7 +56,7 @@ CommandEditTopo::~CommandEditTopo()
 /*----------------------------------------------------------------------------*/
 TopoManager& CommandEditTopo::getTopoManager()
 {
-    return getContext().getLocalTopoManager();
+    return getContext().getTopoManager();
 }
 /*----------------------------------------------------------------------------*/
 void CommandEditTopo::

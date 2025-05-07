@@ -118,7 +118,7 @@ addDescription(Utils::SerializedRepresentation& topoProprietes) const
 		for (uint i=0; i<m_coedgesName.size(); i++){
 			CoEdge* edge = 0;
 			try {
-				edge = getStdContext()->getLocalTopoManager().getCoEdge(m_coedgesName[i], false);
+				edge = getStdContext()->getTopoManager().getCoEdge(m_coedgesName[i], false);
 			}
 			catch (Utils::IsDestroyedException& exc){
 				edge = 0;
@@ -136,7 +136,7 @@ addDescription(Utils::SerializedRepresentation& topoProprietes) const
 	else if (m_type == with_coface){
 		CoFace* coface = 0;
 		try {
-			coface = getStdContext()->getLocalTopoManager().getCoFace(m_cofaceName, false);
+			coface = getStdContext()->getTopoManager().getCoFace(m_cofaceName, false);
 		}
 		catch (Utils::IsDestroyedException& exc){
 			coface = 0;

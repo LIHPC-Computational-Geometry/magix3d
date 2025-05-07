@@ -20,7 +20,7 @@ namespace QtComponents
 
 #include "Internal/ContextIfc.h"
 #include "Geom/GeomManager.h"
-#include "Topo/TopoManagerIfc.h"
+#include "Topo/TopoManager.h"
 #include "Mesh/MeshManagerIfc.h"
 #include "Utils/CommandManagerIfc.h"
 #include "Internal/M3DCommandManager.h"
@@ -652,7 +652,7 @@ class QtMgx3DMainWindow :
     /**
      * \return      Le gestionnaire de topologie.
      */
-    virtual Mgx3D::Topo::TopoManagerIfc& getTopoManager ( );
+    virtual Mgx3D::Topo::TopoManager& getTopoManager ( );
 
     /**
      * \return      Le gestionnaire de maillage.

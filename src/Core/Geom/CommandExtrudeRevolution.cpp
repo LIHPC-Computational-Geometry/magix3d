@@ -57,7 +57,7 @@ internalExecute()
     for(int i=0;i<new_entities.size();i++){
         GeomEntity* ge = new_entities[i];
         getInfoCommand ( ).addGeomInfoEntity (ge, Internal::InfoCommand::CREATED);
-        getContext().getLocalGeomManager().addEntity(ge);
+        getContext().getGeomManager().addEntity(ge);
     }
     for(int i=0;i<rem_entities.size();i++){
         getInfoCommand ( ).addGeomInfoEntity (rem_entities[i], Internal::InfoCommand::DELETED);

@@ -61,19 +61,19 @@ void CommandDestroyMesh::internalExecute()
 
 	// commande de destruction de toutes les entités topologiques qui ont pu être construites
 	std::vector<Topo::Block*> blocks;
-	getContext().getLocalTopoManager().getBlocks(blocks);
+	getContext().getTopoManager().getBlocks(blocks);
 	for (uint i=0; i<blocks.size(); i++)
 		blocks[i]->getMeshingData()->setMeshed(false);
 	std::vector<Topo::CoFace*> cofaces;
-	getContext().getLocalTopoManager().getCoFaces(cofaces);
+	getContext().getTopoManager().getCoFaces(cofaces);
 	for (uint i=0; i<cofaces.size(); i++)
 		cofaces[i]->getMeshingData()->setMeshed(false);
 	std::vector<Topo::CoEdge*> coedges;
-	getContext().getLocalTopoManager().getCoEdges(coedges);
+	getContext().getTopoManager().getCoEdges(coedges);
 	for (uint i=0; i<coedges.size(); i++)
 		coedges[i]->getMeshingData()->setMeshed(false);
 	std::vector<Topo::Vertex*> vertices;
-	getContext().getLocalTopoManager().getVertices(vertices);
+	getContext().getTopoManager().getVertices(vertices);
 	for (uint i=0; i<vertices.size(); i++)
 		vertices[i]->getMeshingData()->setMeshed(false);
 }
