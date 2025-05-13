@@ -4,7 +4,7 @@
  * \date		31/01/2017
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtGroupsSelectorDialog.h"
 #include "QtComponents/QtMgx3DApplication.h"

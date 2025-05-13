@@ -4,7 +4,7 @@
  * \date        24/11/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtVtkComponents/QtVtkRepresentationTypesDialog.h"
 #include "Utils/Common.h"

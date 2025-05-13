@@ -6,7 +6,7 @@
 #ifndef QT_TOPOLOGY_DEGENERATE_BLOCK_ACTION_H
 #define QT_TOPOLOGY_DEGENERATE_BLOCK_ACTION_H
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtEntityByDimensionSelectorPanel.h"
 #include "QtComponents/QtMgx3DOperationsPanel.h"

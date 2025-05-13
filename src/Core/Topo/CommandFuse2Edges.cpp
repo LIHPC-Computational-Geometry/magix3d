@@ -1,19 +1,9 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandFuse2Edges.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 27/6/2016
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
+#include "Internal/Context.h"
 #include "Topo/CommandFuse2Edges.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

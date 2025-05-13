@@ -1,13 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file EdgeMeshingPropertyInterpolate.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 27/5/2014
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Topo/EdgeMeshingPropertyInterpolate.h"
 #include "Topo/CoEdge.h"
 #include "Topo/CoFace.h"
@@ -17,8 +9,7 @@
 #include "Utils/MgxNumeric.h"
 #include "Utils/Vector.h"
 #include "Utils/MgxException.h"
-#include "Internal/Context.h"
-
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/

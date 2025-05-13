@@ -1,29 +1,17 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandCreateMesh.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 7 nov. 2011
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
 #include "Internal/Resources.h"
+#include "Internal/Context.h"
+#include "Internal/InfoCommand.h"
 #include "Mesh/CommandCreateMesh.h"
 #include "Mesh/MeshItf.h"
 #include "Mesh/MeshManager.h"
 #include "Mesh/MeshModificationItf.h"
-#include "Mesh/MeshImplementation.h"
 #include "Mesh/MeshModificationByPythonFunction.h"
 #include "Mesh/MeshModificationBySepa.h"
 #include "Mesh/MeshModificationByProjectionOnP0.h"
-
 #include "Smoothing/SurfacicSmoothing.h"
 #include "Smoothing/VolumicSmoothing.h"
-
 #include "Utils/Command.h"
-#include "Internal/Context.h"
-#include "Internal/InfoCommand.h"
 #include "Group/Group2D.h"
 #include "Group/Group3D.h"
 #include "Topo/TopoHelper.h"

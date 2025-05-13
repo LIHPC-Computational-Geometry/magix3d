@@ -1,13 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file Face.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 19/11/2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
 #include <iostream>
 #include <map>
 #include <vector>
@@ -16,6 +7,8 @@
 #include <string.h>
 #include <limits.h>	// UINT_MAX sur Bull
 /*----------------------------------------------------------------------------*/
+#include "Internal/Context.h"
+#include "Internal/InfoCommand.h"
 #include "Topo/TopoHelper.h"
 #include "Topo/Face.h"
 #include "Topo/CoFace.h"
@@ -26,13 +19,12 @@
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/SerializedRepresentation.h"
-#include "Internal/InfoCommand.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-#include <TkUtil/NumericConversions.h>
 #include <TkUtil/MemoryError.h>
+/*----------------------------------------------------------------------------*/
 #include "gmds/ig/Node.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

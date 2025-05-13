@@ -1,13 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file TopoInfo.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 14 mars 2019
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Topo/TopoInfo.h"
 #include "Topo/Vertex.h"
 #include "Topo/CoEdge.h"

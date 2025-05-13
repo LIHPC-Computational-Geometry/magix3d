@@ -60,7 +60,7 @@ class QtVtkMgx3DMainWindow : public QtComponents::QtMgx3DMainWindow
 	 * \param	Eventuel widget"arbre" contenant les entités de la session.
 	 * \see		createGui
 	 */
-	virtual void init (const std::string& name, Mgx3D::Internal::ContextIfc* context,
+	virtual void init (const std::string& name, Mgx3D::Internal::Context* context,
 				QtComponents::QtGroupsPanel* groupsPanel = 0, QtComponents::QtEntitiesPanel* entitiesPanel = 0);
 
 	/**

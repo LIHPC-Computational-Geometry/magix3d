@@ -1,6 +1,5 @@
 /*----------------------------------------------------------------------------*/
 #include "Utils/Common.h"
-#include "Internal/ContextIfc.h"
 #include "Internal/InfoCommand.h"
 #include "Internal/Context.h"
 #include "Geom/CommandEditGeom.h"

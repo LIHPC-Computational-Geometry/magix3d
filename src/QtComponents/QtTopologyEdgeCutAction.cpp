@@ -4,7 +4,7 @@
  * \date        03/02/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Utils/Common.h"
 #include "Geom/GeomEntity.h"
 #include "QtComponents/QtMgx3DApplication.h"

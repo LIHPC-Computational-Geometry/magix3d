@@ -4,7 +4,7 @@
  * \date        08/09/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Geom/Vertex.h"
@@ -319,7 +319,7 @@ Utils::Math::Point Qt3VerticiesPanel::getPoint (const string& name) const
 }   // getPoint
 
 
-const ContextIfc& Qt3VerticiesPanel::getContext ( ) const
+const Context& Qt3VerticiesPanel::getContext ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
 	return _mainWindow->getContext ( );

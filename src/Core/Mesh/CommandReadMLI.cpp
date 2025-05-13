@@ -1,13 +1,6 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandReadMLI.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 9/2/2015
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
+#include "Internal/InfoCommand.h"
 #include "Mesh/CommandReadMLI.h"
 #include "Mesh/MeshItf.h"
 #include "Mesh/MeshManager.h"
@@ -16,8 +9,6 @@
 #include "Mesh/SubSurface.h"
 #include "Group/Group3D.h"
 #include "Group/Group2D.h"
-#include "Internal/Context.h"
-#include "Internal/InfoCommand.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/

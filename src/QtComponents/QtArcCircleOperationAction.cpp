@@ -4,7 +4,7 @@
  * \date        08/09/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Context.h"
 #include "Internal/Resources.h"
 #include "Utils/Common.h"

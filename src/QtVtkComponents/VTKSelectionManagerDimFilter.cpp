@@ -4,7 +4,7 @@
  * \date		18/10/2012
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtVtkComponents/VTKSelectionManagerDimFilter.h"
 #include "QtVtkComponents/VTKConfiguration.h"

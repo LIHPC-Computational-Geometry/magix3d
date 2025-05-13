@@ -1,36 +1,15 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file MeshImplementationGMSH.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 18 oct. 2013
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-
+#include "Internal/Context.h"
 #include "Mesh/MeshImplementation.h"
 #include "Mesh/CommandCreateMesh.h"
-
-#include "Topo/Block.h"
-#include "Topo/Face.h"
 #include "Topo/Edge.h"
 #include "Topo/FaceMeshingPropertyDelaunayGMSH.h"
-#include "Utils/Common.h"
-
-#include "Internal/Context.h"
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
-#include "Geom/Vertex.h"
 /*----------------------------------------------------------------------------*/
-/// OCC
-#include <TopTools_IndexedMapOfShape.hxx>
-#include <TopExp.hxx>
 #include <TopoDS_Face.hxx>
-#include <TopoDS.hxx>
 #include <BRepAdaptor_Curve.hxx>
 /*----------------------------------------------------------------------------*/
-/// TkUtil
 #include <TkUtil/Exception.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/TraceLog.h>

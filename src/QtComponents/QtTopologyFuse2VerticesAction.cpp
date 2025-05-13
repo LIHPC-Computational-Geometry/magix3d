@@ -4,7 +4,7 @@
  * \date        28/11/2017
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "QtComponents/QtTopologyFuse2VerticesAction.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "Utils/Common.h"

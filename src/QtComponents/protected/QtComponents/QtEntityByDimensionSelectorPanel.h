@@ -7,7 +7,7 @@
 #ifndef QT_ENTITY_BY_DIMENSION_SELECTOR_PANEL_H
 #define QT_ENTITY_BY_DIMENSION_SELECTOR_PANEL_H
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtDimensionsSelectorPanel.h"
 #include "QtComponents/QtMgx3DEntityPanel.h"

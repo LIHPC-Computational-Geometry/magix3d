@@ -1,16 +1,7 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file ServiceGeomToTopo.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 22 déc. 2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/ServiceGeomToTopo.h"
-#include "Utils/Common.h"
-
+#include "Internal/InfoCommand.h"
 #include "Topo/Block.h"
 #include "Topo/Face.h"
 #include "Topo/CoFace.h"
@@ -19,19 +10,15 @@
 #include "Topo/Vertex.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Topo/CoEdgeMeshingProperty.h"
-
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
 #include "Geom/IncidentGeomEntitiesVisitor.h"
-
-#include "Internal/Context.h"
-#include "Internal/InfoCommand.h"
-
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/MemoryError.h>
-
+/*----------------------------------------------------------------------------*/
 #include <map>
 #include <vector>
 /*----------------------------------------------------------------------------*/

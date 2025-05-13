@@ -15,7 +15,6 @@ using std::ptrdiff_t;
 // non interprété par swig : 
 // -------------------------
 %{
-#include "Internal/ContextIfc.h"
 #include "Internal/Context.h"
 #include "Internal/M3DCommandManager.h"
 #include "Internal/M3DCommandResultIfc.h"
@@ -289,7 +288,6 @@ using std::ptrdiff_t;
 // ---------------------------------------------------------
 %include Utils/SwigCompletion.h	// should be first !
 %include Utils/CommandIfc.h
-%include Internal/ContextIfc.h
 %include Internal/Context.h
 %include Internal/M3DCommandManager.h
 %include Utils/CommandResultIfc.h

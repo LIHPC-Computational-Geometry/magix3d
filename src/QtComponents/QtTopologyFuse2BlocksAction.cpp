@@ -4,7 +4,7 @@
  * \date        22/06/2015
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Geom/Volume.h"

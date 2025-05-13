@@ -1,24 +1,17 @@
 /*----------------------------------------------------------------------------*/
-/** \file		M3DCommandResult.cpp
- *  \author		Charles, Eric
- *  \date		02/04/2013
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/M3DCommandResult.h"
 #include "Internal/CommandInternalAdapter.h"
 #include "Utils/Common.h"
 #include "Geom/CommandEditGeom.h"
 #include "Geom/GeomEntity.h"
 #include "Mesh/MeshEntity.h"
-
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
-
+/*----------------------------------------------------------------------------*/
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Internal;
 using namespace TkUtil;
-
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 

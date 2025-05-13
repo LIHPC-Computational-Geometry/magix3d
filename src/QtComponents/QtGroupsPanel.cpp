@@ -4,7 +4,7 @@
  * \date        12/11/2012
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/SelectionManagerDimFilter.h"
@@ -435,7 +435,7 @@ QIcon*	QtGroupsPanel::_curvedEdgeIcon	= 0;
 QIcon*	QtGroupsPanel::_surfacicIcon	= 0;
 	
 	
-QtGroupsPanel::QtGroupsPanel (QWidget* parent, QtMgx3DMainWindow* mainWindow, const string& name, ContextIfc& context)
+QtGroupsPanel::QtGroupsPanel (QWidget* parent, QtMgx3DMainWindow* mainWindow, const string& name, Context& context)
 	: QtEntitiesItemViewPanel (parent, mainWindow, name, context),
 	  SelectionManagerObserver (&context.getSelectionManager ( )),
 	  _entitiesTypesWidget (0), _entitiesGroupsWidget (0),
@@ -776,7 +776,7 @@ static unsigned long menuToRepresentations (QMenu& menu, unsigned long oldrep)
 
 void QtGroupsPanel::updateQuickButtons ( )
 {
-	Context*	context		= dynamic_cast<Context*>(&getContext ( ));		// ContextIfc* :(
+	Context*	context		= dynamic_cast<Context*>(&getContext ( ));		// Context* :(
 	CHECK_NULL_PTR_ERROR (context)
 
 	if ((0 == _wireGeomVolumeButton) || (0 == _solidGeomVolumeButton) || (0 == _wireGeomSurfaceButton) || (0 == _solidGeomVolumeButton) ||
@@ -1539,7 +1539,7 @@ void QtGroupsPanel::quickDisplayRepresentationsCallback (bool display)
 
 	QtQuickRepToolButton*	button	= dynamic_cast<QtQuickRepToolButton*>(sender ( ));
 	CHECK_NULL_PTR_ERROR (button)
-	Context*		context	= dynamic_cast<Context*>(&getContext ( ));		// ContextIfc* :(
+	Context*		context	= dynamic_cast<Context*>(&getContext ( ));		// Context* :(
 	unsigned long	gmask	= 0;
 	CHECK_NULL_PTR_ERROR (context)
 	

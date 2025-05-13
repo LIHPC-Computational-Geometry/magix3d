@@ -4,7 +4,7 @@
  * \date        07/02/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Internal/EntitiesHelper.h"
@@ -56,7 +56,7 @@ namespace QtComponents
 
 QtEntitiesItemViewPanel::QtEntitiesItemViewPanel (
 	QWidget* parent, QtMgx3DMainWindow* mainWindow, const string& name,
-	ContextIfc& context)
+	Context& context)
 	: QtGroupBox (name.c_str ( ), parent),
 	  _mainWindow (mainWindow), _context (&context), _graphicalWidget (0),
 	  _logStream (0)
@@ -110,7 +110,7 @@ void QtEntitiesItemViewPanel::setMainWindow (QtMgx3DMainWindow* mainWindow)
 }	// QtEntitiesItemViewPanel::setMainWindow
 
 
-Mgx3D::Internal::ContextIfc& QtEntitiesItemViewPanel::getContext ( )
+Mgx3D::Internal::Context& QtEntitiesItemViewPanel::getContext ( )
 {
 	if (0 == _context)
 		throw Exception (UTF8String ("QtEntitiesItemViewPanel::getContext : absence de contexte.", Charset::UTF_8));
@@ -119,7 +119,7 @@ Mgx3D::Internal::ContextIfc& QtEntitiesItemViewPanel::getContext ( )
 }	// QtEntitiesItemViewPanel::getContext
 
 
-void QtEntitiesItemViewPanel::setContext (Mgx3D::Internal::ContextIfc* context)
+void QtEntitiesItemViewPanel::setContext (Mgx3D::Internal::Context* context)
 {
 	if (_context != context)
 	{

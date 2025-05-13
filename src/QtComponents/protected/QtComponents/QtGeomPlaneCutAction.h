@@ -6,7 +6,7 @@
 #ifndef QT_GEOM_PLANE_CUT_ACTION_H
 #define QT_GEOM_PLANE_CUT_ACTION_H
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtMgx3DGeomOperationAction.h"
 #include "QtComponents/QtMgx3DGroupNamePanel.h"

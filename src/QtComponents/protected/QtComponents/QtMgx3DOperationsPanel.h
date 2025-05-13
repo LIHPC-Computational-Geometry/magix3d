@@ -19,7 +19,7 @@ namespace QtComponents
 }	// namespace Mgx3D
 
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/CommandInternal.h"
 #include "Internal/Resources.h"
 
@@ -300,8 +300,8 @@ class QtMgx3DOperationPanel : public QWidget
 	 * \return	Une référence sur le contexte <I>Magix 3D</I> associé à
 	 *			l'opération.
 	 */
-	virtual const Mgx3D::Internal::ContextIfc& getContext ( ) const;
-	virtual Mgx3D::Internal::ContextIfc& getContext ( );
+	virtual const Mgx3D::Internal::Context& getContext ( ) const;
+	virtual Mgx3D::Internal::Context& getContext ( );
 
 	/**
 	 * \return	Une référence sur le gestionnaire de sélection.
@@ -770,8 +770,8 @@ class QtMgx3DWidgetedCheckedAction : public QtWidgetAction
 	 * \return		Une référence sur le contexte <I>Magix 3D</I> associé
 	 *				à cette opération.
 	 */
-	virtual const Mgx3D::Internal::ContextIfc& getContext ( ) const;
-	virtual Mgx3D::Internal::ContextIfc& getContext ( );
+	virtual const Mgx3D::Internal::Context& getContext ( ) const;
+	virtual Mgx3D::Internal::Context& getContext ( );
 
 	/**
 	 * \param		Le widget associé.
@@ -1135,8 +1135,8 @@ class QtMgx3DOperationsPanel : public QtGroupBox
 	/**
 	 * \return		Une référence sur le contexte <I>Magix 3D</I>.
 	 */
-	virtual const Mgx3D::Internal::ContextIfc& getContext ( ) const;
-	virtual Mgx3D::Internal::ContextIfc& getContext ( );
+	virtual const Mgx3D::Internal::Context& getContext ( ) const;
+	virtual Mgx3D::Internal::Context& getContext ( );
 
 	/**
 	 * Appellé lorsque la session va être réinitialisée. Purge les éventuels

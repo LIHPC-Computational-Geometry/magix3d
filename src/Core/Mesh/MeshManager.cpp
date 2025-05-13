@@ -1,4 +1,5 @@
-#include "Internal/ContextIfc.h"
+/*----------------------------------------------------------------------------*/
+#include "Internal/Context.h"
 #include "Internal/M3DCommandResult.h"
 #include "Utils/CommandManager.h"
 #include "Mesh/MeshManager.h"

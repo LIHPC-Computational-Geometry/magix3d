@@ -1,16 +1,6 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandNewFacesMesh.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 23/5/2012
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Mesh/CommandNewFacesMesh.h"
-#include "Utils/MgxException.h"
 #include "Internal/Context.h"
+#include "Mesh/CommandNewFacesMesh.h"
 #include "Topo/TopoManager.h"
 #include "Topo/CoFace.h"
 #include "Topo/TopoHelper.h"

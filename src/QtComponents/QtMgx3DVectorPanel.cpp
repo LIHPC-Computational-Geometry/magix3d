@@ -4,7 +4,7 @@
  * \date		25/11/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtMgx3DVectorPanel.h"
 #include <QtUtil/QtErrorManagement.h>

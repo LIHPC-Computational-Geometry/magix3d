@@ -27,7 +27,7 @@ namespace Structured
 {
 
 
-StructuredMeshManager::StructuredMeshManager (const string& name, Mgx3D::Internal::ContextIfc* c)
+StructuredMeshManager::StructuredMeshManager (const string& name, Mgx3D::Internal::Context* c)
 : CommandCreator (name, c)
 , _meshes ( )
 {

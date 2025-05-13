@@ -4,7 +4,7 @@
  * \date        11/12/2012
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "QtComponents/QtMgx3DGroupNamePanel.h"
@@ -81,7 +81,7 @@ QtMgx3DGroupNamePanel::~QtMgx3DGroupNamePanel ( )
 }	// QtMgx3DGroupNamePanel::~QtMgx3DGroupNamePanel
 
 
-ContextIfc& QtMgx3DGroupNamePanel::getContext ( )
+Context& QtMgx3DGroupNamePanel::getContext ( )
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
 	return _mainWindow->getContext ( );

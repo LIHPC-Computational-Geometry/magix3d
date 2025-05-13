@@ -1,14 +1,6 @@
-/*----------------------------------------------------------------------------*/
 #ifdef USE_MDLPARSER
-/*
- * \file ImportMDL2Commandes.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 8/7/16
- */
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/M3DCommandResult.h"
 #include "Internal/ImportMDL2Commandes.h"
 #include "Geom/GeomManager.h"

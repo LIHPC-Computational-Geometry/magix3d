@@ -4,7 +4,7 @@
  * \date        25/03/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Context.h"
 #include "Internal/Resources.h"
 
@@ -470,10 +470,10 @@ void QtTopologyProjectVerticesPanel::updateCoordinates (const string& name)
 	// on met les coordonnées dans le repère sélectionné si c'est le cas
 	string repName = getSysCoordName();
 	if (!repName.empty()){
-		Internal::ContextIfc* ctxifc = &getContext();
+		Internal::Context* ctxifc = &getContext();
 		Internal::Context* ctx = dynamic_cast<Internal::Context*>(ctxifc);
 		CHECK_NULL_PTR_ERROR(ctx);
-		CoordinateSystem::SysCoord* rep = ctx->getLocalSysCoordManager().getSysCoord(repName, true);
+		CoordinateSystem::SysCoord* rep = ctx->getSysCoordManager().getSysCoord(repName, true);
 		pt = rep->toLocal(pt);
 	}
 

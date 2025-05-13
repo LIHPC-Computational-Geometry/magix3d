@@ -1,18 +1,10 @@
 /*----------------------------------------------------------------------------*/
-/** \file TopoManager.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 2/12/2010
- *
- *
- *  Modified on: 23/02/2022
- *      Author: Simon C
- *      ajout de la fonction de création de blocs par extrusion de faces topologiques
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
+#include "Internal/Context.h"
+#include "Internal/CommandComposite.h"
+#include "Internal/ImportMDLImplementation.h"
+#include "Internal/NameManager.h"
+#include "Internal/M3DCommandResult.h"
+#include "Internal/PythonWriter.h"
 #include "Utils/CommandManager.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/Point.h"
@@ -20,10 +12,8 @@
 #include "Utils/TypeDedicatedNameManager.h"
 #include "Utils/ErrorManagement.h"
 #include "Utils/MgxException.h"
-
 #include "Topo/TopoManager.h"
 #include "Topo/TopoHelper.h"
-
 #include "Topo/CommandNewTopoOnGeometry.h"
 #include "Topo/CommandFuse2Vertices.h"
 #include "Topo/CommandGlue2Blocks.h"
@@ -42,10 +32,8 @@
 #include "Topo/CommandExtendSplitFace.h"
 #include "Topo/CommandUnrefineBlock.h"
 #include "Topo/CommandRefineAllCoEdges.h"
-#include "Topo/CommandImportTopoMDL.h"
 #include "Topo/CommandSetGeomAssociation.h"
 #include "Topo/CommandMakeBlocksByRevol.h"
-#include "Topo/CommandSetGeomAssociation.h"
 #include "Topo/CommandProjectVerticesOnNearestGeomEntities.h"
 #include "Topo/CommandProjectEdgesOnCurves.h"
 #include "Topo/CommandProjectFacesOnSurfaces.h"
@@ -68,7 +56,6 @@
 #include "Topo/CommandInsertHole.h"
 #include "Topo/CommandFuseCoEdges.h"
 #include "Topo/CommandFuse2Blocks.h"
-#include "Topo/CommandExtrudeTopo.h"
 #include "Topo/CommandExtrudeFace.h"
 #include "Topo/CommandAlignOnSurface.h"
 #include "Topo/CommandFuse2Edges.h"
@@ -81,7 +68,7 @@
 #include "Topo/Face.h"
 #include "Topo/CoEdge.h"
 #include "Topo/Vertex.h"
-
+#include "Topo/CommandNewTopo.h"
 #include "Geom/GeomManager.h"
 #include "Geom/GeomEntity.h"
 #include "Geom/CommandNewBox.h"
@@ -100,21 +87,10 @@
 #include "Geom/CommandTranslation.h"
 #include "Geom/CommandScaling.h"
 #include "Geom/CommandMirroring.h"
-
 #include "Mesh/CommandAddRemoveGroupName.h"
-
-#include "Internal/CommandComposite.h"
-#include "Internal/ImportMDLImplementation.h"
-#include "Internal/Context.h"
-#include "Internal/NameManager.h"
-#include "Internal/M3DCommandResult.h"
-#include "Internal/CommandChangeLengthUnit.h"
-#include "Internal/PythonWriter.h"
-#include "Topo/CommandNewTopo.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/TraceLog.h>
-#include <TkUtil/ErrorLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
@@ -124,14 +100,12 @@
 #include <string>
 #include <map>
 #include <algorithm>
-
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Topo {
 /*----------------------------------------------------------------------------*/
-TopoManager::TopoManager(const std::string& name, Internal::ContextIfc* c)
+TopoManager::TopoManager(const std::string& name, Internal::Context* c)
 : Internal::CommandCreator(name, c)
 , m_defaultNbMeshingEdges(10)
 {

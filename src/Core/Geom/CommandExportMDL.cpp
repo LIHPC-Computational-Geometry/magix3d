@@ -1,6 +1,6 @@
 #ifdef USE_MDLPARSER
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/ExportMDLImplementation.h"
 #include "Utils/Common.h"
 #include "Geom/CommandExportMDL.h"

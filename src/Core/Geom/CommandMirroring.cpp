@@ -1,7 +1,6 @@
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Geom/CommandMirroring.h"
-#include "Geom/GeomManager.h"
 #include "Geom/GeomMirrorImplementation.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

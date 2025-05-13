@@ -1,16 +1,10 @@
 /*----------------------------------------------------------------------------*/
 #ifdef USE_MDLPARSER
-/*
- * \file ImportMDLImplementation.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 10 mai 2012
- */
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Geom/GeomManager.h"
+#include "Internal/Context.h"
 #include "Internal/ImportMDLImplementation.h"
+#include "Internal/InfoCommand.h"
+#include "Geom/GeomManager.h"
 #include "Geom/EntityFactory.h"
 #include "Topo/EdgeMeshingPropertyGeometric.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
@@ -25,14 +19,14 @@
 #include "Group/Group2D.h"
 #include "Group/Group1D.h"
 #include "Group/Group0D.h"
-#include "Internal/InfoCommand.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
+#include <TkUtil/MemoryError.h>
+/*----------------------------------------------------------------------------*/
 #include <sstream>
 #include <iostream>
-#include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 //#define _DEBUG_MDL
 /*----------------------------------------------------------------------------*/

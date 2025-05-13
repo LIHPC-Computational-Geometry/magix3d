@@ -10,7 +10,7 @@
  *      ajout de la possibilité de conserver les entités géométriques
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"

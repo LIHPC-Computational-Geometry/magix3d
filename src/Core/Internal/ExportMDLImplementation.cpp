@@ -1,27 +1,20 @@
 /*----------------------------------------------------------------------------*/
 #ifdef USE_MDLPARSER
-/*
- * \file ExportMDLImplementation.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 28 juin 2013
- */
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
+#include "Internal/ExportMDLImplementation.h"
+#include "Internal/InfoCommand.h"
 #include "Geom/GeomManager.h"
 #include "Geom/GeomDisplayRepresentation.h"
-#include "Internal/ExportMDLImplementation.h"
+#include "Geom/Vertex.h"
+#include "Geom/Curve.h"
+#include "Geom/Surface.h"
 #include "Topo/Vertex.h"
 #include "Topo/CoEdge.h"
 #include "Topo/Edge.h"
 #include "Topo/CoFace.h"
-#include "Internal/InfoCommand.h"
 #include "Utils/Point.h"
 #include "Utils/Unit.h"
-#include "Geom/Vertex.h"
-#include "Geom/Curve.h"
-#include "Geom/Surface.h"
 /*----------------------------------------------------------------------------*/
 #include <TopoDS.hxx>
 #include <BRep_Tool.hxx>

@@ -95,7 +95,7 @@ void MeshImplementation::updateMeshDim()
 		std::cout<<"avant : getDim => "<<m_gmds_mesh[0]->getDim()<<std::endl;
 #endif
 	//delete m_gmds_mesh[0];
-	if (getContext().getMeshDim() == Internal::ContextIfc::MESH2D){
+	if (getContext().getMeshDim() == Internal::Context::MESH2D){
 #ifdef _DEBUG
 		std::cout<<"new gmds::Mesh(MeshItf::TMask2D) ..."<<std::endl;
 #endif
@@ -105,7 +105,7 @@ void MeshImplementation::updateMeshDim()
 		std::cout<<"après : getDim => "<<m_gmds_mesh[0]->getDim()<<std::endl;
 #endif
 	}
-	else if (getContext().getMeshDim() == Internal::ContextIfc::MESH3D){
+	else if (getContext().getMeshDim() == Internal::Context::MESH3D){
 		m_gmds_mesh[0]->changeModel(MeshItf::TMask3D);
 		//m_gmds_mesh[0] = new gmds::Mesh(MeshItf::TMask3D);
 #ifdef _DEBUG
@@ -1075,7 +1075,7 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::Block* bl)
 
     if (!bl->isMeshed()){
 
-        if (getContext().getMeshDim() == Internal::ContextIfc::MESH2D)
+        if (getContext().getMeshDim() == Internal::Context::MESH2D)
         	throw TkUtil::Exception (TkUtil::UTF8String ("Il n'est pas possible de mailler des blocs alors que le maillage n'est pas 3D en sortie", TkUtil::Charset::UTF_8));
 
 		std::vector<Topo::Face* > faces;

@@ -137,7 +137,7 @@ if (Doxygen_FOUND)
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Internal/M3DCommandResultIfc.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Geom/GeomManager.h
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Geom/GeomInfo.h 
-                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Internal/ContextIfc.h 
+                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Internal/Context.h
                          ${CMAKE_SOURCE_DIR}/src/Utils/protected/Utils/Point.h 
                          ${CMAKE_SOURCE_DIR}/src/Utils/protected/Utils/Spherical.h 
                          ${CMAKE_SOURCE_DIR}/src/Utils/protected/Utils/Vector.h 

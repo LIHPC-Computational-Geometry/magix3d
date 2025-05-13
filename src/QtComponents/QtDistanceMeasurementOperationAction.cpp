@@ -4,7 +4,7 @@
  * \date        27/01/2015
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
@@ -430,7 +430,7 @@ void QtDistanceMeasurementOperationPanel::updateDistance (double d)
 		wholeText << " : " << MgxNumeric::userRepresentation (d);
 	}	// if (valid == NumericServices::isValid (d))
 
-	ContextIfc&	context	= getContext ( );
+	Context&	context	= getContext ( );
 	if (Unit::undefined != context.getLengthUnit ( ))
 	{
 		text << Unit::toShortString (context.getLengthUnit ( ));

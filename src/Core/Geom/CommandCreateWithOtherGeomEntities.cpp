@@ -1,11 +1,8 @@
 /*----------------------------------------------------------------------------*/
 #include "Utils/Common.h"
-#include "Internal/ContextIfc.h"
 #include "Internal/InfoCommand.h"
 #include "Internal/Context.h"
 #include "Geom/CommandCreateWithOtherGeomEntities.h"
-#include "Geom/GeomManager.h"
-#include "Geom/GeomEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>

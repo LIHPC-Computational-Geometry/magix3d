@@ -4,7 +4,7 @@
  * \date        09/09/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"

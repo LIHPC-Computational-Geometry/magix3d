@@ -10,7 +10,6 @@ get_target_property(MGX_PUBLIC_HEADER_DIR Core INTERFACE_INCLUDE_DIRECTORIES)
 file(GLOB_RECURSE MGX_PUBLIC_HEADERS ${MGX_PUBLIC_HEADER_DIR}/*.h)
 
 set(DOXYGEN_DIRS
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Internal/ContextIfc.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Internal/Context.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Internal/M3DCommandManager.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Internal/M3DCommandResultIfc.h

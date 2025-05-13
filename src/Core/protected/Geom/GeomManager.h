@@ -25,7 +25,6 @@ using Mgx3D::Utils::Math::Point;
 using Mgx3D::Utils::Math::Vector;
 
 namespace Internal {
-class ContextIfc;
 class Context;
 }
 namespace CoordinateSystem {
@@ -68,7 +67,7 @@ public:
 	 *  \param		Nom unique de l'instance (utile en environnement distribué).
      *  \param c le contexte ce qui permet d'accéder entre autre au CommandManager
      */
-    GeomManager(const std::string& name, Internal::ContextIfc* c);
+    GeomManager(const std::string& name, Internal::Context* c);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur

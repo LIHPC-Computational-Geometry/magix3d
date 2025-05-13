@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"

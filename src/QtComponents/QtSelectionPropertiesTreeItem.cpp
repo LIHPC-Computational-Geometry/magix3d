@@ -5,7 +5,7 @@
  */
 
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 
 #include "QtComponents/QtSelectionIndividualPropertiesPanel.h"
@@ -166,7 +166,7 @@ RenderingManager* QtSelectionPropertiesTreeItem::getRenderingManager ( )
 }	// QtSelectionPropertiesTreeItem::getRenderingManager
 
 
-const ContextIfc& QtSelectionPropertiesTreeItem::getContext ( ) const
+const Context& QtSelectionPropertiesTreeItem::getContext ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_renderingManager)
 	return _renderingManager->getContext ( );

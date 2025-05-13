@@ -66,7 +66,7 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Group {
 /*----------------------------------------------------------------------------*/
-GroupManager::GroupManager(const std::string& name, Internal::ContextIfc* c)
+GroupManager::GroupManager(const std::string& name, Internal::Context* c)
 :Internal::CommandCreator(name, c)
 , m_visibilityMask(Utils::FilterEntity::NoneEntity)
 {

@@ -1,24 +1,10 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file Group2D.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 24/10/2012
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
-#include <iostream>
-/*----------------------------------------------------------------------------*/
 #include "Group/Group2D.h"
 #include "Internal/Context.h"
 #include "Internal/EntitiesHelper.h"
 #include "Geom/Surface.h"
 #include "Utils/SerializedRepresentation.h"
 #include "Mesh/Surface.h"
-
-#include <TkUtil/NumericConversions.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

@@ -1,17 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file Context.cpp
- *
- *  \author Franck Ledoux, Eric Brière de l'Isle, Charles Pignerol
- *
- *  \date 14/10/2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
-#include <iostream>
-/*----------------------------------------------------------------------------*/
-
 #include "Internal/Context.h"
 #include "Internal/NameManager.h"
 #include "Internal/EntitiesHelper.h"
@@ -29,7 +16,6 @@
 #include "Utils/GraphicalEntityRepresentation.h"
 #include "Utils/Property.h"
 #include "Utils/DisplayProperties.h"
-#include "Utils/CommandManager.h"
 #include "Utils/Entity.h"
 
 #include "Topo/Vertex.h"
@@ -59,19 +45,15 @@ extern TkUtil::PythonSession* createMgx3DPythonSession ( );
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/OstreamLogOutputStream.h>
-#include <TkUtil/TemporaryFile.h>
 #include <TkUtil/UserData.h>
 #include <TkUtil/File.h>
 #include <TkUtil/Process.h>
 #include <TkUtil/ThreadManager.h>
 #include <TkUtil/ThreadPool.h>
 
-#include <sys/signal.h>
 #include <signal.h>
 #include <unistd.h>
 #include <string.h>
-
-//#include <LM.h>	// Not mandatory :)
 
 /*----------------------------------------------------------------------------*/
 /**
@@ -92,12 +74,22 @@ _sigFunc(int val)
 
     exit(EXIT_FAILURE);
 }
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Internal {
-
+/*----------------------------------------------------------------------------*/
+/**
+ * La liste des contextes instanciés.
+ */
+static std::vector<Context*> contexts;
+/*----------------------------------------------------------------------------*/
+/**
+ * Un mutex pour protéger <I>contexts</I>.
+ */
+static TkUtil::Mutex contextsMutex;
+/*----------------------------------------------------------------------------*/
+pthread_t Context::threadId	= (pthread_t)-1;
 /*----------------------------------------------------------------------------*/
 static std::string scriptToMinScript (const std::string& fileName)
 {
@@ -114,8 +106,6 @@ static std::string scriptToMinScript (const std::string& fileName)
 
 	return userFileName.ascii ( );
 }	// scriptToMinScript
-/*----------------------------------------------------------------------------*/
-
 /*----------------------------------------------------------------------------*/
 static unsigned char toNormalizedUChar (double value)
 {
@@ -134,10 +124,9 @@ static unsigned char toNormalizedUChar (double value)
 	assert ((value >= 0.) && (value <= 1.) && "normalize failed.");
 	return (unsigned char)(value * 255);
 }   // Color::toNormalizedUChar
-
 /*----------------------------------------------------------------------------*/
 static TkUtil::Color nextColor (
-	ContextIfc& context,
+	Context& context,
 	const TkUtil::Color& color, double redInc, double greenInc, double blueInc,
 	const TkUtil::Color& farColor, size_t depth)
 {
@@ -228,7 +217,7 @@ static TkUtil::Color nextColor (
 
 /*----------------------------------------------------------------------------*/
 static TkUtil::Color nextColor (
-	ContextIfc& context,
+	Context& context,
 	const TkUtil::Color& color, double redInc, double greenInc, double blueInc,
 	const TkUtil::Color& farColor)
 {
@@ -251,7 +240,7 @@ TkUtil::Color	Context::m_initial_group_displayColor (0, 255, 127);
 
 /*----------------------------------------------------------------------------*/
 Context::Context(const std::string& name, bool withStdOutputs)
-: ContextIfc (name)
+: m_name(name)
 , m_command_manager (0)
 , m_python_session (0) //new TkUtil::PythonSession ( ))
 , m_geom_manager (new Geom::GeomManager (createName ("GeomManager"), this))
@@ -279,28 +268,6 @@ Context::Context(const std::string& name, bool withStdOutputs)
 , m_landmark(Utils::Landmark::undefined)
 , m_length_unit(Utils::Unit::undefined)
 , m_mesh_dim(MESH3D)
-, m_geomVertexDisplayProperties ( )
-, m_geomCurveDisplayProperties ( )
-, m_geomSurfaceDisplayProperties ( )
-, m_geomVolumeDisplayProperties ( )
-, m_topoVertexDisplayProperties ( )
-, m_topoEdgeDisplayProperties ( )
-, m_topoCoEdgeDisplayProperties ( )
-, m_topoFaceDisplayProperties ( )
-, m_topoCoFaceDisplayProperties ( )
-, m_topoBlockDisplayProperties ( )
-, m_meshCloudDisplayProperties ( )
-, m_meshLineDisplayProperties ( )
-, m_meshSurfaceDisplayProperties ( )
-, m_meshSubSurfaceDisplayProperties ( )
-, m_meshVolumeDisplayProperties ( )
-, m_meshSubVolumeDisplayProperties ( )
-, m_structuredMeshDisplayProperties ( )
-, m_group0DisplayProperties ( )
-, m_group1DisplayProperties ( )
-, m_group2DisplayProperties ( )
-, m_group3DisplayProperties ( )
-, m_sysCoordDisplayProperties ( )
 , m_geomVertexMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::GeomVertex))
 , m_geomCurveMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::GeomCurve))
 , m_geomSurfaceMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::GeomSurface))
@@ -325,6 +292,21 @@ Context::Context(const std::string& name, bool withStdOutputs)
 , m_topoSavedCoFaceMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::TopoCoFace))
 , m_topoSavedBlockMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::TopoBlock))
 {
+	// Enregistrement auprès de la liste des contextes. On en profite pour
+	// s'assurer de l'unicité du nom.
+	TkUtil::AutoMutex	autoMutex (&contextsMutex);
+	for (std::vector<Context*>::iterator it = contexts.begin ( );
+		 contexts.end ( ) != it; it++)
+	{
+		if ((*it)->getName ( ) == name)
+		{
+			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+			message << "Création d'un contexte de nom \"" << name << "\" : opération impossible, nom déjà utilisé par une autre instance.";
+			throw TkUtil::Exception (message);
+		}	// if ((*it).getName ( ) == name)
+	}	// for (std::vector<Context*>::iterator it = contexts.begin ( );
+	contexts.push_back (this);
+
 	// Garantir qu'un clic accès rapide sur affichage filaire ou surfacique sera suivi d'effet ... Ensuite, c'est les goûts et les couleurs ;)
 	if (0 == (m_geomSavedSurfaceMask & (Utils::GraphicalEntityRepresentation::CURVES | Utils::GraphicalEntityRepresentation::ISOCURVES)))
 		m_geomSavedSurfaceMask |= Utils::GraphicalEntityRepresentation::CURVES | Utils::GraphicalEntityRepresentation::ISOCURVES;
@@ -347,7 +329,7 @@ Context::Context(const std::string& name, bool withStdOutputs)
 		
 	// [EB] mis ici pour être pris en compte dans les scripts Python
 	// sinon on se retrouve en multi-thread systématiquement ...
-	ContextIfc::ContextIfc::initialize ( );
+	threadId = pthread_self ( );
 
 	char* env = getenv ("CODE");
 
@@ -575,7 +557,7 @@ Context::Context(const std::string& name, bool withStdOutputs)
 }
 /*----------------------------------------------------------------------------*/
 Context::Context (const Context&)
-: ContextIfc ("Bidon")
+: m_name ("Bidon")
 , m_command_manager (new Utils::CommandManager(createName ("Bidon")))
 , m_python_session (0)
 , m_geom_manager (0)
@@ -603,27 +585,6 @@ Context::Context (const Context&)
 , m_landmark(Utils::Landmark::undefined)
 , m_length_unit(Utils::Unit::undefined)
 , m_mesh_dim(MESH3D)
-, m_geomVertexDisplayProperties ( )
-, m_geomCurveDisplayProperties ( )
-, m_geomSurfaceDisplayProperties ( )
-, m_geomVolumeDisplayProperties ( )
-, m_topoVertexDisplayProperties ( )
-, m_topoEdgeDisplayProperties ( )
-, m_topoCoEdgeDisplayProperties ( )
-, m_topoFaceDisplayProperties ( )
-, m_topoCoFaceDisplayProperties ( )
-, m_topoBlockDisplayProperties ( )
-, m_meshCloudDisplayProperties ( )
-, m_meshLineDisplayProperties ( )
-, m_meshSurfaceDisplayProperties ( )
-, m_meshSubSurfaceDisplayProperties ( )
-, m_meshVolumeDisplayProperties ( )
-, m_structuredMeshDisplayProperties ( )
-, m_group0DisplayProperties ( )
-, m_group1DisplayProperties ( )
-, m_group2DisplayProperties ( )
-, m_group3DisplayProperties ( )
-, m_sysCoordDisplayProperties ( )
 , m_geomVertexMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::GeomVertex))
 , m_geomCurveMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::GeomCurve))
 , m_geomSurfaceMask (Utils::GraphicalEntityRepresentation::getDefaultRepresentationMask (Utils::Entity::GeomSurface))
@@ -671,6 +632,18 @@ Context::~Context()
     // permet de gagner un peu de temps
     clearIdToEntity();
 #endif
+
+	// Déréférencement auprès de la liste des contextes :
+	TkUtil::AutoMutex	autoMutex (&contextsMutex);
+	for (std::vector<Context*>::iterator it = contexts.begin ( );
+		 contexts.end ( ) != it; it++)
+	{
+		if (this == *it)
+		{
+			contexts.erase (it);
+			break;
+		}	// if (this == *it)
+	}	// for (std::vector<Context*>::iterator it = contexts.begin ( ); ...
 
 	delete m_selection_manager;		m_selection_manager	= 0;
 	delete m_scripting_manager;		m_scripting_manager	= 0;
@@ -736,6 +709,7 @@ void Context::initialize (int argc, char* argv [])
 /*----------------------------------------------------------------------------*/
 void Context::finalize ( )
 {
+	threadId = (pthread_t)-1;
 }
 /*----------------------------------------------------------------------------*/
 TkUtil::ArgumentsMap& Context::getArguments ( )
@@ -854,13 +828,6 @@ void Context::setSysCoordManager (Mgx3D::CoordinateSystem::SysCoordManager* mgr)
 {
     delete m_sys_coord_manager;
     m_sys_coord_manager  = mgr;
-}
-/*----------------------------------------------------------------------------*/
-Mgx3D::CoordinateSystem::SysCoordManager& Context::getLocalSysCoordManager()
-{
-	CoordinateSystem::SysCoordManager*  manager = dynamic_cast<CoordinateSystem::SysCoordManager*>(m_sys_coord_manager);
-    CHECK_NULL_PTR_ERROR (manager)
-    return *manager;
 }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Structured::StructuredMeshManager& Context::getStructuredMeshManager ( )
@@ -1815,7 +1782,7 @@ std::vector<Utils::Entity*> Context::get (
 	}
 
 	return entities;
-}	// ContextIfc::get
+}	// Context::get
 /*----------------------------------------------------------------------------*/
 std::vector<Utils::Entity*> Context::get (
 					const std::vector<std::string>& names, bool raises) const
@@ -1952,7 +1919,17 @@ Utils::Entity& Context::nameToEntity (const std::string& name) const
 Internal::Context* getStdContext ()
 {
 	try {
-		return dynamic_cast<Internal::Context*>(getFirstContextIfc ());
+		TkUtil::AutoMutex   autoMutex (&Internal::contextsMutex);
+
+		//std::cout << __FILE__ << ' ' << __LINE__ << " Context::getContext : recherche du contexte de nom " << name << " ..." << std::endl;
+
+		if (!Internal::contexts.empty())
+			return Internal::contexts.front();
+
+		//std::cout << __FILE__ << ' ' << __LINE__ << " Context::getStdContext : absence de contexte " << std::endl;
+		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+		message << "getFirstContext : absence d'un premier contexte.";
+		throw TkUtil::Exception (message);
 	}
 	catch (const TkUtil::Exception& exc) {
 		// si le contexte n'existe pas, on en créé un avec comme nom "python"
@@ -1967,7 +1944,22 @@ Internal::Context* getStdContext ()
 Internal::Context* getContext (const char* name)
 {
 	try {
-		return dynamic_cast<Internal::Context*>(getContextIfc (name));
+		TkUtil::AutoMutex autoMutex (&Internal::contextsMutex);
+
+		//std::cout << __FILE__ << ' ' << __LINE__ << " Context::getContext : recherche du contexte de nom " << name << " ..." << std::endl;
+		for (std::vector<Internal::Context*>::iterator it =
+				Internal::contexts.begin ( );
+				Internal::contexts.end ( ) != it; it++)
+			if ((*it)->getName ( ) == name)
+			{
+				//std::cout << __FILE__ << ' ' << __LINE__ << " Context::getContext. Contexte " << name << " trouvé." << std::endl;
+				return *it;
+			}
+
+		//std::cout << __FILE__ << ' ' << __LINE__ << " Context::getContext : absence de contexte de nom " << name << std::endl;
+		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+		message << "getContext : absence de contexte de nom \"" << name << "\" recensé.";
+		throw TkUtil::Exception (message);
 	}
 	catch (const TkUtil::Exception& exc) {
 		// si le contexte n'existe pas, on en créé un avec ce nom

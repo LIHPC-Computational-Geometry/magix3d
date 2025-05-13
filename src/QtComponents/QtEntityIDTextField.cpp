@@ -4,7 +4,7 @@
  * \date		11/09/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/EntitiesHelper.h"
 
 #include "QtComponents/QtEntityIDTextField.h"
@@ -722,14 +722,14 @@ void QtEntityIDTextField::textModifiedCallback ( )
 }	// QtEntityIDTextField::textModifiedCallback
 
 
-const ContextIfc& QtEntityIDTextField::getContext ( ) const
+const Context& QtEntityIDTextField::getContext ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
 	return _mainWindow->getContext ( );
 }	// QtEntityIDTextField::getContext
 
 
-ContextIfc& QtEntityIDTextField::getContext ( )
+Context& QtEntityIDTextField::getContext ( )
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
 	return _mainWindow->getContext ( );

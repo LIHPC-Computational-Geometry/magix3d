@@ -4,7 +4,7 @@
  * \date		17/12/2012
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 #include "QtComponents/QtAnglePanel.h"
 #include <QtUtil/QtErrorManagement.h>

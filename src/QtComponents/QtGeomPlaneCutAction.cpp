@@ -4,7 +4,7 @@
  * \date        22/11/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/Plane.h"

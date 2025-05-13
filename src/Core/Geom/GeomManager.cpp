@@ -102,7 +102,7 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 /*----------------------------------------------------------------------------*/
-GeomManager::GeomManager(const std::string& name, Internal::ContextIfc* c)
+GeomManager::GeomManager(const std::string& name, Internal::Context* c)
 :Internal::CommandCreator(name, c)
 {
 }

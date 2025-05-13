@@ -1,13 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandDestroyMesh.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 23 sept. 2014
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Mesh/CommandDestroyMesh.h"
 #include "Mesh/Volume.h"
 #include "Mesh/Surface.h"
@@ -15,9 +7,9 @@
 #include "Mesh/Cloud.h"
 #include "Mesh/MeshItf.h"
 #include "Mesh/MeshModificationItf.h"
-
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
-
+/*----------------------------------------------------------------------------*/
 #include <gmds/ig/Mesh.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

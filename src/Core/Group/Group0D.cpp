@@ -1,23 +1,9 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file Group0D.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 24/10/2012
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
-#include <iostream>
-/*----------------------------------------------------------------------------*/
 #include "Group/Group0D.h"
 #include "Internal/Context.h"
 #include "Internal/EntitiesHelper.h"
 #include "Geom/Vertex.h"
 #include "Utils/SerializedRepresentation.h"
-
-#include <TkUtil/NumericConversions.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

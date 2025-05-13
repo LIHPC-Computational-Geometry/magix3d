@@ -4,7 +4,7 @@
  * \date        12/05/2015
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "QtComponents/QtMgx3DSelectionDialog.h"

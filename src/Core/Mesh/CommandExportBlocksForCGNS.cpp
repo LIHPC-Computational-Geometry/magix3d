@@ -1,19 +1,6 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandExportBlocksForCGNS.cpp
- *
- *  \author legoff
- *
- *  \date 17/04/2014
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
-#include "Utils/Common.h"
+#include "Internal/Context.h"
 #include "Mesh/CommandExportBlocksForCGNS.h"
-#include "Geom/GeomManager.h"
-#include "Geom/ExportVTKImplementation.h"
-/*----------------------------------------------------------------------------*/
-#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

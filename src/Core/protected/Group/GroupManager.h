@@ -73,7 +73,7 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur.
      */
-    GroupManager(const std::string& name, Internal::ContextIfc* c);
+    GroupManager(const std::string& name, Internal::Context* c);
 
     /*------------------------------------------------------------------------*/
     /** \brief   Destructeur

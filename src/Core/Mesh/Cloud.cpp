@@ -1,13 +1,6 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file Cloud.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 25 nov. 2011
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
+#include "Internal/InfoCommand.h"
 #include "Mesh/Cloud.h"
 #include "Mesh/MeshDisplayRepresentation.h"
 #include "Mesh/MeshImplementation.h"
@@ -15,14 +8,13 @@
 #include "Utils/Common.h"
 #include "Utils/Bounds.h"
 #include "Utils/SerializedRepresentation.h"
-#include "Internal/InfoCommand.h"
-
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/InternalError.h>
-#include <TkUtil/NumericConversions.h>
 #include <TkUtil/MemoryError.h>
+/*----------------------------------------------------------------------------*/
 #include <memory>           // unique_ptr
-
+/*----------------------------------------------------------------------------*/
 #include "gmds/ig/Node.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

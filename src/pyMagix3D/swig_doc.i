@@ -208,96 +208,96 @@ Mgx3D::Topo::CoFaceMeshingProperty::CoFaceMeshingProperty()
 Constructeur par défaut. 
 
 ";
-%feature("docstring") Mgx3D::Internal::ContextIfc " 
+%feature("docstring") Mgx3D::Internal::Context " 
 Un contexte correspond à l'exécution d'une séance de travail où toutes les opérations de Magix 3D peuvent être effectuées et aussi défaites. 
 A un contexte est associé un certain de nombre de managers permettant la création d'entités propres à la session de travail. En particulier, si deux contextes de travail sont ouvertes simultanément, les opérations de undo/redo sont spécifiques à chaque contexte.
 Un contexte peut avoir des entités sélectionnées, sur lesquelles seront effectués des traitements. Chaque contexte est doté à cet effet d'un gestionnaire de sélection qui lui est spécifique. 
 ";
 
-%feature("docstring") Mgx3D::Internal::ContextIfc::clearSession "
-virtual void Mgx3D::Internal::ContextIfc::clearSession()
+%feature("docstring") Mgx3D::Internal::Context::clearSession "
+virtual void Mgx3D::Internal::Context::clearSession()
 
 
 Réinitialisation de la session 
 
 ";
-%feature("docstring") Mgx3D::Internal::ContextIfc::getGeomManager "
-virtual Mgx3D::Geom::GeomManager& Mgx3D::Internal::ContextIfc::getGeomManager()
+%feature("docstring") Mgx3D::Internal::Context::getGeomManager "
+virtual Mgx3D::Geom::GeomManager& Mgx3D::Internal::Context::getGeomManager()
 
 Accesseur sur le manager géométrique Uneexception est levée en l'absence de manager associé. 
 
 ";
-%feature("docstring") Mgx3D::Internal::ContextIfc::getGeomManager "
-virtual const Mgx3D::Geom::GeomManager& Mgx3D::Internal::ContextIfc::getGeomManager() const
+%feature("docstring") Mgx3D::Internal::Context::getGeomManager "
+virtual const Mgx3D::Geom::GeomManager& Mgx3D::Internal::Context::getGeomManager() const
 
 
 
 ";
-%feature("docstring") Mgx3D::Internal::ContextIfc::getGroupManager "
-virtual Mgx3D::Group::GroupManager& Mgx3D::Internal::ContextIfc::getGroupManager()
+%feature("docstring") Mgx3D::Internal::Context::getGroupManager "
+virtual Mgx3D::Group::GroupManager& Mgx3D::Internal::Context::getGroupManager()
 
 Accesseur sur le manager de groupes Uneexception est levée en l'absence de manager associé. 
 
 ";
-%feature("docstring") Mgx3D::Internal::ContextIfc::getGroupManager "
-virtual const Mgx3D::Group::GroupManager& Mgx3D::Internal::ContextIfc::getGroupManager() const
+%feature("docstring") Mgx3D::Internal::Context::getGroupManager "
+virtual const Mgx3D::Group::GroupManager& Mgx3D::Internal::Context::getGroupManager() const
 
 
 
 ";
-%feature("docstring") Mgx3D::Internal::ContextIfc::getLengthUnit "
-virtual Utils::Unit::lengthUnit Mgx3D::Internal::ContextIfc::getLengthUnit() const 
+%feature("docstring") Mgx3D::Internal::Context::getLengthUnit "
+virtual Utils::Unit::lengthUnit Mgx3D::Internal::Context::getLengthUnit() const 
 
 retourne l'unité de longueur 
 
 ";
-%feature("docstring") Mgx3D::Internal::ContextIfc::getMeshManager "
-virtual Mgx3D::Mesh::MeshManager& Mgx3D::Internal::ContextIfc::getMeshManager()
+%feature("docstring") Mgx3D::Internal::Context::getMeshManager "
+virtual Mgx3D::Mesh::MeshManager& Mgx3D::Internal::Context::getMeshManager()
 
 Accesseur sur le manager de maillage Uneexception est levée en l'absence de manager associé. 
 
 ";
-%feature("docstring") Mgx3D::Internal::ContextIfc::getMeshManager "
-virtual const Mgx3D::Mesh::MeshManager& Mgx3D::Internal::ContextIfc::getMeshManager() const
+%feature("docstring") Mgx3D::Internal::Context::getMeshManager "
+virtual const Mgx3D::Mesh::MeshManager& Mgx3D::Internal::Context::getMeshManager() const
 
 
 
 ";
-%feature("docstring") Mgx3D::Internal::ContextIfc::getName "
-const std::string& Mgx3D::Internal::ContextIfc::getName() const 
+%feature("docstring") Mgx3D::Internal::Context::getName "
+const std::string& Mgx3D::Internal::Context::getName() const 
 
 
 Accesseur sur le nom de l'instance du context Le nom unique de l'instance. 
 
 ";
-%feature("docstring") Mgx3D::Internal::ContextIfc::getSelectedEntities "
-virtual std::vector<std::string> Mgx3D::Internal::ContextIfc::getSelectedEntities() const 
+%feature("docstring") Mgx3D::Internal::Context::getSelectedEntities "
+virtual std::vector<std::string> Mgx3D::Internal::Context::getSelectedEntities() const 
 
 
 Retourne un vecteur avec les identifiants des entités actuellement sélectionnées 
 
 ";
-%feature("docstring") Mgx3D::Internal::ContextIfc::getTopoManager "
-virtual Mgx3D::Topo::TopoManager& Mgx3D::Internal::ContextIfc::getTopoManager()
+%feature("docstring") Mgx3D::Internal::Context::getTopoManager "
+virtual Mgx3D::Topo::TopoManager& Mgx3D::Internal::Context::getTopoManager()
 
 Accesseur sur le manager topologique Uneexception est levée en l'absence de manager associé. 
 
 ";
-%feature("docstring") Mgx3D::Internal::ContextIfc::getTopoManager "
-virtual const Mgx3D::Topo::TopoManager& Mgx3D::Internal::ContextIfc::getTopoManager() const
+%feature("docstring") Mgx3D::Internal::Context::getTopoManager "
+virtual const Mgx3D::Topo::TopoManager& Mgx3D::Internal::Context::getTopoManager() const
 
 
 
 ";
-%feature("docstring") Mgx3D::Internal::ContextIfc::redo "
-virtual void Mgx3D::Internal::ContextIfc::redo()
+%feature("docstring") Mgx3D::Internal::Context::redo "
+virtual void Mgx3D::Internal::Context::redo()
 
 
 Rejoue la dernière commande défaite 
 
 ";
-%feature("docstring") Mgx3D::Internal::ContextIfc::savePythonScript "
-virtual void Mgx3D::Internal::ContextIfc::savePythonScript(std::string fileName, bool withouEntityName, TkUtil::Charset::CHARSET charset)
+%feature("docstring") Mgx3D::Internal::Context::savePythonScript "
+virtual void Mgx3D::Internal::Context::savePythonScript(std::string fileName, bool withouEntityName, TkUtil::Charset::CHARSET charset)
 
 
 
@@ -306,21 +306,21 @@ withouEntityName : suivant que l'on accepte que les noms des entités apparaisse
 charset : jeu de caractères utilisé pour l'encodage du fichier (Charset::UTF_8, Charset::ISO_8859)
 
 ";
-%feature("docstring") Mgx3D::Internal::ContextIfc::setLengthUnit "
-virtual Internal::M3DCommandResultIfc* Mgx3D::Internal::ContextIfc::setLengthUnit(const Utils::Unit::lengthUnit &lu)
+%feature("docstring") Mgx3D::Internal::Context::setLengthUnit "
+virtual Internal::M3DCommandResultIfc* Mgx3D::Internal::Context::setLengthUnit(const Utils::Unit::lengthUnit &lu)
 
 change l'unité de longueur 
 
 ";
-%feature("docstring") Mgx3D::Internal::ContextIfc::undo "
-virtual void Mgx3D::Internal::ContextIfc::undo()
+%feature("docstring") Mgx3D::Internal::Context::undo "
+virtual void Mgx3D::Internal::Context::undo()
 
 
 Déseffectue la dernière commande effectuée 
 
 ";
-%feature("docstring") Mgx3D::Internal::ContextIfc::ContextIfc "
-Mgx3D::Internal::ContextIfc::ContextIfc(const ContextIfc &)
+%feature("docstring") Mgx3D::Internal::Context::Context "
+Mgx3D::Internal::Context::Context(const Context &)
 
 
 Constructeurs de copie et opérateurs = : interdits. 
@@ -1021,7 +1021,7 @@ Destructeur. RAS.
 
 ";
 %feature("docstring") Mgx3D::Geom::GeomManager::GeomManager "
-Mgx3D::Geom::GeomManager::GeomManager(const std::string &name, Internal::ContextIfc *c)
+Mgx3D::Geom::GeomManager::GeomManager(const std::string &name, Internal::Context *c)
 
 Constructeur. 
 
@@ -1106,7 +1106,7 @@ retourne la liste des noms des groupes visibles
 
 ";
 %feature("docstring") Mgx3D::Group::GroupManager::GroupManager "
-Mgx3D::Group::GroupManager::GroupManager(const std::string &name, Internal::ContextIfc *c)
+Mgx3D::Group::GroupManager::GroupManager(const std::string &name, Internal::Context *c)
 
 Constructeur. 
 
@@ -1229,7 +1229,7 @@ Accesseur sur la strategie.
 
 ";
 %feature("docstring") Mgx3D::Mesh::MeshManager::MeshManager "
-Mgx3D::Mesh::MeshManager::MeshManager(const std::string &name, Internal::ContextIfc *c)
+Mgx3D::Mesh::MeshManager::MeshManager(const std::string &name, Internal::Context *c)
 
 Constructeur. 
 
@@ -2149,7 +2149,7 @@ On utilise une arête et un point que l'on projette sur cette arête pour positi
 
 ";
 %feature("docstring") Mgx3D::Topo::TopoManager::TopoManager "
-Mgx3D::Topo::TopoManager::TopoManager(const std::string &name, Internal::ContextIfc *c)
+Mgx3D::Topo::TopoManager::TopoManager(const std::string &name, Internal::Context *c)
 
 Constructeur. 
 
@@ -2334,15 +2334,15 @@ Espace de nom du projet Magix 3D.
 Toutes les classes et types utilisés dans Magix3D sont dans ce namespace. 
 ";
 
-%feature("docstring") Mgx3D::getContextIfc "
-Mgx3D::Internal::ContextIfc* Mgx3D::getContextIfc(const char *name)
+%feature("docstring") Mgx3D::getContext "
+Mgx3D::Internal::Context* Mgx3D::getContext(const char *name)
 
 
 Pour les pythoneries. Le contexte dont le nom est transmis en argument. 
 
 ";
-%feature("docstring") Mgx3D::getFirstContextIfc "
-Mgx3D::Internal::ContextIfc* Mgx3D::getFirstContextIfc()
+%feature("docstring") Mgx3D::getFirstContext "
+Mgx3D::Internal::Context* Mgx3D::getFirstContext()
 
 
 Pour les pythoneries. Le premier contexte trouvé 

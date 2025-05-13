@@ -1,15 +1,12 @@
-	/*----------------------------------------------------------------------------*/
-/** \file InfoCommand.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 14/12/2010
- */
 /*----------------------------------------------------------------------------*/
 #ifndef INTERNAL_INFOCOMMAND_H_
 #define INTERNAL_INFOCOMMAND_H_
-
+/*----------------------------------------------------------------------------*/
+#include "Structured/StructuredMeshEntity.h"
+#include "Topo/TopoEntity.h"
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/Mutex.h>
+/*----------------------------------------------------------------------------*/
 #include <sys/types.h>
 #include <vector>
 #include <map>

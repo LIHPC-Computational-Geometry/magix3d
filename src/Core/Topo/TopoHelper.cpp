@@ -1,18 +1,9 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file TopoHelper.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 13 mars 2012
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
 #include <map>
 #include <set>
 #include <vector>
-
+/*----------------------------------------------------------------------------*/
+#include "Internal/Context.h"
 #include "Topo/Edge.h"
 #include "Topo/Face.h"
 #include "Topo/CoEdge.h"
@@ -21,21 +12,18 @@
 #include "Topo/TopoHelper.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Topo/EdgeMeshingPropertyTabulated.h"
-
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
 #include "Geom/GeomEntity.h"
 #include "Geom/IncidentGeomEntitiesVisitor.h"
-
-#include <TkUtil/Exception.h>
-#include <TkUtil/MemoryError.h>
-
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
 #include "Utils/MgxNumeric.h"
-
+/*----------------------------------------------------------------------------*/
+#include <TkUtil/Exception.h>
+#include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

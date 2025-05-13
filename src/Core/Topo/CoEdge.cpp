@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/InfoCommand.h"
 #include "Internal/InternalPreferences.h"
 #include "Internal/Resources.h"

@@ -5,7 +5,7 @@
  */
 
 #include "mgx_config.h"
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtMgx3DApplication.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -383,7 +383,7 @@ QtMgx3DApplication& QtMgx3DApplication::operator = (const QtMgx3DApplication&)
 QtMgx3DApplication::~QtMgx3DApplication ( )
 {
 	_instance	= 0;
-	ContextIfc::finalize ( );
+	Context::finalize ( );
 	QwtChartsManager::finalize ( );
 	QtHelpWindow::finalize ( );
 	QtStringHelper::finalize ( );
@@ -414,7 +414,6 @@ void QtMgx3DApplication::init (int argc, char* argv[], char* envp[])
 	// REM : QtPython::preInitialize ( ) doit avoir été appelé auparavant, et avant Py_Initialize. C'est actuellement fait en début de main.
 	QtPython::initialize (Context::getOutCharset ( ));
 	Process::initialize (argc, argv, envp);
-	ContextIfc::initialize ( );
 	try
 	{
 		Process::setCurrentSoftware ("Magix3D", Version (MAGIX3D_VERSION));
