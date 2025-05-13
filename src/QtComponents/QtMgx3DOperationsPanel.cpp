@@ -4,7 +4,7 @@
  * \date        05/12/2012
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtMgx3DOperationsPanel.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -376,14 +376,14 @@ void QtMgx3DOperationPanel::addValidatedField (ValidatedField& field)
 }	// QtMgx3DOperationPanel::addValidatedField
 
 
-const ContextIfc& QtMgx3DOperationPanel::getContext ( ) const
+const Context& QtMgx3DOperationPanel::getContext ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
 	return _mainWindow->getContext ( );
 }	// QtMgx3DOperationPanel::getContext
 
 
-ContextIfc& QtMgx3DOperationPanel::getContext ( )
+Context& QtMgx3DOperationPanel::getContext ( )
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
 	return _mainWindow->getContext ( );
@@ -1146,13 +1146,13 @@ QWidget& QtMgx3DWidgetedCheckedAction::getOperationPanelParent ( )
 }	// QtMgx3DWidgetedCheckedAction::getOperationPanelParent
 
 
-const ContextIfc& QtMgx3DWidgetedCheckedAction::getContext ( ) const
+const Context& QtMgx3DWidgetedCheckedAction::getContext ( ) const
 {
 	return getMainWindow ( ).getContext ( );
 }	// QtMgx3DWidgetedCheckedAction::getContext
 
 
-ContextIfc& QtMgx3DWidgetedCheckedAction::getContext ( )
+Context& QtMgx3DWidgetedCheckedAction::getContext ( )
 {
 	return getMainWindow ( ).getContext ( );
 }	// QtMgx3DWidgetedCheckedAction::getContext
@@ -1454,14 +1454,14 @@ QtMgx3DMainWindow& QtMgx3DOperationsPanel::getMainWindow ( )
 }	// QtMgx3DOperationsPanel::getMainWindow
 
 
-const ContextIfc& QtMgx3DOperationsPanel::getContext ( ) const
+const Context& QtMgx3DOperationsPanel::getContext ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
 	return _mainWindow->getContext ( );
 }	// QtMgx3DOperationsPanel::getContext
 
 
-ContextIfc& QtMgx3DOperationsPanel::getContext ( )
+Context& QtMgx3DOperationsPanel::getContext ( )
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
 	return _mainWindow->getContext ( );

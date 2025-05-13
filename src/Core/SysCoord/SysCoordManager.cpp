@@ -27,7 +27,7 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace CoordinateSystem {
 /*----------------------------------------------------------------------------*/
-SysCoordManager::SysCoordManager(const std::string& name, Internal::ContextIfc* c)
+SysCoordManager::SysCoordManager(const std::string& name, Internal::Context* c)
 :Internal::CommandCreator(name, c)
 {
 }

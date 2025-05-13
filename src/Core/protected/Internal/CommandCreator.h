@@ -27,7 +27,6 @@ class CommandManagerIfc;
 /*----------------------------------------------------------------------------*/
 namespace Internal {
 
-class ContextIfc;
 class Context;
 /*----------------------------------------------------------------------------*/
 /** \class CommandCreator
@@ -53,7 +52,7 @@ public:
 	 *			serveur.
      *  \param c le contexte ce qui permet d'accéder entre autre au CommandManager
      */
-    CommandCreator(const std::string& name, Internal::ContextIfc* c);
+    CommandCreator(const std::string& name, Internal::Context* c);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur
@@ -77,8 +76,8 @@ public:
     virtual Utils::CommandManagerIfc& getCommandManager();
 
     /** retourne le contexte */
-    virtual const Internal::ContextIfc& getContext() const;
-    virtual Internal::ContextIfc& getContext();
+    virtual const Internal::Context& getContext() const;
+    virtual Internal::Context& getContext();
 
     /** retourne le contexte local (même zone mémoire). */
     virtual const Internal::Context& getLocalContext() const;
@@ -91,11 +90,10 @@ public:
 	private :
 
 	/** Le nom de l'instance. */
-	std::string				m_name;
+	std::string m_name;
 
    /** le contexte */
-	Internal::ContextIfc*	m_context;
-
+	Internal::Context* m_context;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Internal

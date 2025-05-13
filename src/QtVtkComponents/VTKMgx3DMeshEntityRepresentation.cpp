@@ -4,7 +4,7 @@
  * \date        22/05/2012
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 
 #include "QtVtkComponents/VTKMgx3DMeshEntityRepresentation.h"

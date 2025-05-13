@@ -1,18 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandWriteCGNS.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 28 nov. 2013
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Mesh/CommandWriteCGNS.h"
 #include "Mesh/MeshItf.h"
 #include "Mesh/MeshManager.h"
-#include "Internal/Context.h"
-#include "Internal/InfoCommand.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

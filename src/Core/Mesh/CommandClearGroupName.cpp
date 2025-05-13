@@ -1,33 +1,24 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandClearGroupName.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 15/04/2019
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Group/Group3D.h"
 #include "Group/Group2D.h"
 #include "Group/Group1D.h"
 #include "Group/Group0D.h"
 #include "Group/GroupManager.h"
-#include "Mesh/CommandClearGroupName.h"
-#include "Internal/Context.h"
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
+#include "Mesh/CommandClearGroupName.h"
 #include "Mesh/MeshManager.h"
 #include "Mesh/Cloud.h"
 #include "Mesh/Surface.h"
 #include "Mesh/Volume.h"
-
+/*----------------------------------------------------------------------------*/
 #include <vector>
-
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
-
+/*----------------------------------------------------------------------------*/
 //#define _DEBUG_UPDATE
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

@@ -4,7 +4,7 @@
  * \date		01/03/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "QtComponents/EntitySeizureManager.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "Internal/EntitiesHelper.h"
@@ -296,13 +296,13 @@ bool EntitySeizureManager::criteriaMatch (int dimension, FilterEntity::objectTyp
 }	// EntitySeizureManager::criteriaMatch
 
 
-const ContextIfc& EntitySeizureManager::getContext ( ) const
+const Context& EntitySeizureManager::getContext ( ) const
 {
 	return getMainWindow ( ).getContext ( );
 }	// EntitySeizureManager::getContext
 
 
-ContextIfc& EntitySeizureManager::getContext ( )
+Context& EntitySeizureManager::getContext ( )
 {
 	return getMainWindow ( ).getContext ( );
 }	// EntitySeizureManager::getContext

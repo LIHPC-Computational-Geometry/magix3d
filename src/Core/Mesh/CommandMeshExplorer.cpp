@@ -1,32 +1,24 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandMeshExplorer.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 7 déc. 2012
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Mesh/CommandMeshExplorer.h"
+#include "Internal/Context.h"
+#include "Internal/InfoCommand.h"
 #include "Group/GroupManager.h"
+#include "Group/Group3D.h"
 #include "Geom/Volume.h"
 #include "Topo/TopoEntity.h"
 #include "Topo/Block.h"
 #include "Topo/CoFace.h"
 #include "Topo/Edge.h"
 #include "Topo/CoEdge.h"
-#include "Topo/Vertex.h"
-#include "Group/Group3D.h"
-#include "Internal/InfoCommand.h"
 #include "Topo/TopoHelper.h"
-#include <gmds/ig/Mesh.h>
 #include "Mesh/MeshItf.h"
+#include "Mesh/CommandMeshExplorer.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/ReferencedMutex.h>
+/*----------------------------------------------------------------------------*/
+#include <gmds/ig/Mesh.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

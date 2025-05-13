@@ -1,23 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file TopoEntity.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 18 nov. 2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
+#include "Internal/InternalPreferences.h"
 #include "Topo/TopoEntity.h"
 #include "Topo/CommandEditTopo.h"
 #include "Geom/GeomEntity.h"
-#include "Mesh/CommandCreateMesh.h"
-#include "Internal/InternalPreferences.h"
 #include "Utils/Bounds.h"
 #include "Utils/SerializedRepresentation.h"
-#include <TkUtil/TraceLog.h>
 /*----------------------------------------------------------------------------*/
-#include <iostream>
+#include <TkUtil/TraceLog.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

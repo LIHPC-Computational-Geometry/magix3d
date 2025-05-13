@@ -1,14 +1,6 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandCreateSubVolumeBetweenSheets.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 2/12/2016
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
 #include "Internal/InfoCommand.h"
+#include "Internal/Context.h"
 #include "Group/GroupManager.h"
 #include "Group/Group3D.h"
 #include "Geom/Volume.h"
@@ -17,7 +9,6 @@
 #include "Topo/CoFace.h"
 #include "Topo/Edge.h"
 #include "Topo/CoEdge.h"
-#include "Topo/Vertex.h"
 #include "Topo/TopoHelper.h"
 #include "Mesh/MeshItf.h"
 #include "Mesh/CommandCreateSubVolumeBetweenSheets.h"
@@ -26,6 +17,7 @@
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/ReferencedMutex.h>
+/*----------------------------------------------------------------------------*/
 #include <gmds/ig/Mesh.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

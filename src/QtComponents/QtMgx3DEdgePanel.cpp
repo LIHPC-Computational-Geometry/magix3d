@@ -4,7 +4,7 @@
  * \date		30/01/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtMgx3DEdgePanel.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -282,7 +282,7 @@ void QtMgx3DEdgePanel::edgesRemovedFromSelectionCallback (QString edgesNames)
 	emit edgesRemovedFromSelection (edgesNames);
 }	// QtMgx3DEdgePanel::edgesRemovedFromSelectionCallback
 
-const ContextIfc& QtMgx3DEdgePanel::getContext ( ) const
+const Context& QtMgx3DEdgePanel::getContext ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
 	return _mainWindow->getContext ( );

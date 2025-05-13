@@ -7,7 +7,7 @@
 #ifndef QT_MGX3D_QUALIF_WIDGET_H
 #define QT_MGX3D_QUALIF_WIDGET_H
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include <QtQualif/QtQualifWidget.h>
 #include <QMenu>

@@ -4,7 +4,7 @@
  * \date        29/11/2010
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Internal/EntitiesHelper.h"
@@ -948,7 +948,7 @@ void QTreeViewPopupActions::setEnabled (bool enable)
 
 QtEntitiesPanel::QtEntitiesPanel (
 	QWidget* parent, QtMgx3DMainWindow* mainWindow, const string& name,
-	ContextIfc& context)
+	Context& context)
 	: QtEntitiesItemViewPanel (parent, mainWindow, name, context),
 	  SelectionManagerObserver (&context.getSelectionManager ( )),
 	  _entitiesWidget (0),

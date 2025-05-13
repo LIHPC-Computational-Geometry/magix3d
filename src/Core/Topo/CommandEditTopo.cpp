@@ -1,12 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandEditTopo.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 16/12/2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/InfoCommand.h"
 #include "Topo/CommandEditTopo.h"
 #include "Topo/TopoManager.h"
@@ -18,13 +11,10 @@
 #include "Topo/CoFace.h"
 #include "Topo/Block.h"
 #include "Topo/EdgeMeshingPropertyInterpolate.h"
-
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
-
 #include "Utils/Command.h"
-#include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/ReferencedMutex.h>

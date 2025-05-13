@@ -6,7 +6,7 @@
 #ifndef QT_MESH_BLOCKS_OPERATION_ACTION_H
 #define QT_MESH_BLOCKS_OPERATION_ACTION_H
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtMgx3DMeshOperationAction.h"
 #include "QtComponents/QtMgx3DGroupNamePanel.h"

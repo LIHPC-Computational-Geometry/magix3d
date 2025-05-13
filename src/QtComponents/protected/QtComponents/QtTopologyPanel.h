@@ -7,7 +7,7 @@
 #define QT_TOPOLOGY_PANEL_H
 
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtMgx3DGroupNamePanel.h"
 

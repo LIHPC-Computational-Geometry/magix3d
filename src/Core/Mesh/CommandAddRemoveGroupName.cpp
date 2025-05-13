@@ -1,20 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandAddRemoveGroupName.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 22 oct. 2012
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Group/Group3D.h"
 #include "Group/Group2D.h"
 #include "Group/Group1D.h"
 #include "Group/Group0D.h"
 #include "Group/GroupManager.h"
 #include "Mesh/CommandAddRemoveGroupName.h"
-#include "Internal/Context.h"
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
@@ -23,11 +14,11 @@
 #include "Mesh/Cloud.h"
 #include "Mesh/Surface.h"
 #include "Mesh/Volume.h"
-
+/*----------------------------------------------------------------------------*/
 #include <vector>
-
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
-
+/*----------------------------------------------------------------------------*/
 //#define _DEBUG_UPDATE
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

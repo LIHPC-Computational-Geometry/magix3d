@@ -4,7 +4,7 @@
  * \date		11/12/2012 
  */ 
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtMgx3DGeomOperationAction.h"
 #include "QtComponents/QtMgx3DMainWindow.h"

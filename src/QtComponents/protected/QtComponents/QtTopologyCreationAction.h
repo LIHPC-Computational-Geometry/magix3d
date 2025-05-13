@@ -6,7 +6,7 @@
 #ifndef QT_TOPOLOGY_CREATION_ACTION_H
 #define QT_TOPOLOGY_CREATION_ACTION_H
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtMgx3DEntityPanel.h"
 #include "QtComponents/QtMgx3DTopoOperationAction.h"

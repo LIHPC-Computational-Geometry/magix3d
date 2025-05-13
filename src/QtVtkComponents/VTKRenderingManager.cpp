@@ -4,7 +4,7 @@
  * \date        04/06/2012
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 
 #include "QtVtkComponents/VTKRenderingManager.h"

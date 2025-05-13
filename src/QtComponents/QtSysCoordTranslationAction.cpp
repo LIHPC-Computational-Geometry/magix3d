@@ -4,7 +4,7 @@
  * \date		8/6/2018
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Utils/SelectionManagerIfc.h"
 
 #include "Utils/Common.h"

@@ -6,7 +6,7 @@
 #ifndef QT_SELECTION_INDIVIDUAL_PROPERTIES_PANEL_H
 #define QT_SELECTION_INDIVIDUAL_PROPERTIES_PANEL_H
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtSelectionPropertiesTreeItem.h"
 #include "QtComponents/Qt3DGraphicalWidget.h"

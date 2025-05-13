@@ -4,7 +4,7 @@
  *  Created on: 20 mars 2013
  *      Author: ledouxf
  */
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "QtComponents/QtMgx3DEntityNamePanel.h"
@@ -91,7 +91,7 @@ QtMgx3DEntityNamePanel::~QtMgx3DEntityNamePanel ( )
 }   // QtMgx3DEntityNamePanel::~QtMgx3DEntityNamePanel
 
 
-ContextIfc& QtMgx3DEntityNamePanel::getContext ( )
+Context& QtMgx3DEntityNamePanel::getContext ( )
 {
     CHECK_NULL_PTR_ERROR (_mainWindow)
     return _mainWindow->getContext ( );

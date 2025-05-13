@@ -47,7 +47,7 @@ class QtEntitiesItemViewPanel : public QtGroupBox
 	 */
 	QtEntitiesItemViewPanel (
 			QWidget* parent, QtMgx3DMainWindow* mainWindow,
-			const std::string& name, Internal::ContextIfc& context);
+			const std::string& name, Internal::Context& context);
 
 	/**
 	 * RAS.
@@ -82,13 +82,13 @@ class QtEntitiesItemViewPanel : public QtGroupBox
 	 * \return		Contexte <I>Magix 3D</I> courant.
 	 * \see			setContext
 	 */
-	virtual Mgx3D::Internal::ContextIfc& getContext ( );
+	virtual Mgx3D::Internal::Context& getContext ( );
 
 	/**
 	 * \param		Nouveau contexte <I>Magix 3D</I>.
 	 * \see			getContext
 	 */
-	virtual void setContext (Mgx3D::Internal::ContextIfc*);
+	virtual void setContext (Mgx3D::Internal::Context*);
 
 	//@}	// La gestion de la sélection.
 
@@ -158,7 +158,7 @@ class QtEntitiesItemViewPanel : public QtGroupBox
 	QtEntitiesItemViewPanel& operator = (const QtEntitiesItemViewPanel&);
 
 	/** Le context Magix 3D. */
-	Mgx3D::Internal::ContextIfc*	_context;
+	Mgx3D::Internal::Context*	_context;
 
 	/** La fenêtre principale à laquelle ce panneau est rattaché. */
 	QtMgx3DMainWindow*				_mainWindow;

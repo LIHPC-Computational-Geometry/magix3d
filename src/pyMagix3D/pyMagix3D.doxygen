@@ -746,7 +746,7 @@ INPUT                  = ../../src/Doc/User \
                          ../../src/Core/protected/Internal/M3DCommandResultIfc.h \
                          ../../src/Core/protected/Geom/GeomManager.h \
                          ../../src/Core/protected/Geom/GeomInfo.h \
-                         ../../src/Core/protected/Internal/ContextIfc.h \
+                         ../../src/Core/protected/Internal/Context.h \
                          ../../src/Utils/protected/Utils/Point.h \
                          ../../src/Utils/protected/Utils/Spherical.h \
                          ../../src/Utils/protected/Utils/Vector.h \

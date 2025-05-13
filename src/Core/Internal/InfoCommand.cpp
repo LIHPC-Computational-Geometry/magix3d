@@ -1,14 +1,6 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file InfoCommand.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 14 déc. 2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
 #include "Internal/InfoCommand.h"
+#include "Internal/Context.h"
 #include "Utils/Common.h"
 #include "Geom/GeomEntity.h"
 #include "Geom/Vertex.h"

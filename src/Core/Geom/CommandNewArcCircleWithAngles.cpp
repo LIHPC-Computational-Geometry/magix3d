@@ -1,8 +1,6 @@
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
 #include "Geom/CommandNewArcCircleWithAngles.h"
 #include "Geom/EntityFactory.h"
-#include "Geom/GeomManager.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>

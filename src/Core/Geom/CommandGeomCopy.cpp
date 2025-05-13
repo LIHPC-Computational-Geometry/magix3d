@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Geom/CommandGeomCopy.h"
 #include "Geom/GeomManager.h"
 #include "Geom/GeomFuseImplementation.h"

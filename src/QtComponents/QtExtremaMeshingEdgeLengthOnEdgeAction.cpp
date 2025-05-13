@@ -4,7 +4,7 @@
  * \date		05/12/2016
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
@@ -313,7 +313,7 @@ void QtExtremaMeshingEdgeLengthOnEdgePanel::updateLengths (double d1, double d2)
 		text2 << MgxNumeric::userRepresentation (d2);
 	}	// if (valid)
 
-	ContextIfc&	context	= getContext ( );
+	Context&	context	= getContext ( );
 	if (Unit::undefined != context.getLengthUnit ( )) {
 		text1 << Unit::toShortString (context.getLengthUnit ( ));
 		text2 << Unit::toShortString (context.getLengthUnit ( ));

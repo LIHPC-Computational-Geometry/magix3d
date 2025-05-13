@@ -9,7 +9,7 @@
 
 
 #include "Utils/SelectionManager.h"
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include <QColor>
 
@@ -146,8 +146,8 @@ class EntitySeizureManager
 	/**
 	 * \return		Une référence sur le contexte associé.
 	 */
-	virtual const Mgx3D::Internal::ContextIfc& getContext ( ) const;
-	virtual Mgx3D::Internal::ContextIfc& getContext ( );
+	virtual const Mgx3D::Internal::Context& getContext ( ) const;
+	virtual Mgx3D::Internal::Context& getContext ( );
 
 	/**
 	 * \return		Une référence sur la fenêtre principale associée.

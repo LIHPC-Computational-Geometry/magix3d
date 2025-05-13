@@ -6,7 +6,7 @@
 
 #include <mgx_config.h>
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 
 #include "QtVtkComponents/QtVtkMgx3DMainWindow.h"
@@ -109,7 +109,7 @@ void QtVtkMgx3DMainWindow::showReady ( )
 }	// QtVtkMgx3DMainWindow::showReady
 
 
-void QtVtkMgx3DMainWindow::init (const string& name, ContextIfc* context, QtGroupsPanel* groupsPanel, QtEntitiesPanel* entitiesPanel)
+void QtVtkMgx3DMainWindow::init (const string& name, Context* context, QtGroupsPanel* groupsPanel, QtEntitiesPanel* entitiesPanel)
 {
 	QtMgx3DMainWindow::init (name, context, groupsPanel, entitiesPanel);
 }	// QtVtkMgx3DMainWindow::QtVtkMgx3DMainWindow

@@ -1,25 +1,14 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandCreator.cpp
- *
- *  \author Franck Ledoux, Eric Brière de l'Isle
- *
- *  \date 14/10/2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Internal/CommandCreator.h"
-#include "Internal/ContextIfc.h"
 #include "Internal/Context.h"
+#include "Internal/CommandCreator.h"
 /*----------------------------------------------------------------------------*/
-#include <TkUtil/LogOutputStream.h>
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Internal {
 /*----------------------------------------------------------------------------*/
-CommandCreator::CommandCreator(const std::string& name, Internal::ContextIfc* c)
+CommandCreator::CommandCreator(const std::string& name, Internal::Context* c)
 : m_name (name), m_context(c)
 {
     if (c==0)
@@ -39,11 +28,11 @@ Utils::CommandManagerIfc& CommandCreator::getCommandManager()
     return m_context->getCommandManager();
 }
 /*----------------------------------------------------------------------------*/
-const Internal::ContextIfc& CommandCreator::getContext() const
+const Internal::Context& CommandCreator::getContext() const
 {
     return *(m_context);
 }
-Internal::ContextIfc& CommandCreator::getContext()
+Internal::Context& CommandCreator::getContext()
 {
     return *(m_context);
 }

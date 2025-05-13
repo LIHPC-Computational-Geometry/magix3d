@@ -1,9 +1,8 @@
 #ifndef COMMANDCREATEGEOM_H_
 #define COMMANDCREATEGEOM_H_
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/CommandInternal.h"
-/*----------------------------------------------------------------------------*/
 #include "Geom/Volume.h"
 /*----------------------------------------------------------------------------*/
 #include <vector>

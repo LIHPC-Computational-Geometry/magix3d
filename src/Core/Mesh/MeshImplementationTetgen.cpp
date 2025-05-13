@@ -1,35 +1,16 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file MeshImplementationTetgen.cpp
- *
- *  \author Nicolas Le Goff
- *
- *  \date 22 oct. 2013
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Mesh/MeshImplementation.h"
 #include "Mesh/CommandCreateMesh.h"
-
-#include "Topo/Block.h"
-#include "Topo/Face.h"
-#include "Topo/Edge.h"
-#include "Topo/TopoHelper.h"
-#include "Topo/BlockMeshingPropertyDelaunayTetgen.h"
-#include "Utils/Common.h"
-#include "Internal/Context.h"
-#include "Geom/Surface.h"
-#include "Geom/Curve.h"
-#include "Geom/Vertex.h"
 /*----------------------------------------------------------------------------*/
-/// TkUtil
 #include <TkUtil/Exception.h>
 #include <TkUtil/UTF8String.h>
-#include <TkUtil/TraceLog.h>
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 #ifdef USE_TRITON
 #include "Triton2/TetgenInterface/TetgenFacade.h"
+#include "Topo/BlockMeshingPropertyDelaunayTetgen.h"
+#include "Mesh/CommandCreateMesh.h"
 #endif
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

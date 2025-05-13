@@ -82,7 +82,7 @@ class QtSelectionPropertiesTreeItem : public QTreeWidgetItem
 	 * \return	Une référence sur le contexte <I>Magix 3D</I> associé à
 	 *			l'opération.
 	 */
-	virtual const Mgx3D::Internal::ContextIfc& getContext ( ) const;
+	virtual const Mgx3D::Internal::Context& getContext ( ) const;
 
 
 	protected :

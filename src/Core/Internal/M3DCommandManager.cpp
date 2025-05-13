@@ -7,18 +7,15 @@
  *  \date 20 déc. 2010
  */
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/M3DCommandManager.h"
 #include "Internal/M3DCommandResult.h"
 #include "Internal/CommandNewLongCommand.h"
 #include "Internal/OpenCascadeLongCommand.h"
-
 #include "Utils/CommandManager.h"
-
-#include <TkUtil/Exception.h>
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

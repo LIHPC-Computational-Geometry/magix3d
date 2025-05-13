@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/EntitiesHelper.h"
 #include "Internal/M3DCommandResult.h"
 #include "Internal/CommandInternal.h"
@@ -17,7 +17,6 @@
 /*----------------------------------------------------------------------------*/
 #include "Topo/Block.h"
 #include "Topo/CoFace.h"
-#include "Topo/Face.h"
 #include "Topo/CoEdge.h"
 #include "Topo/Vertex.h"
 /*----------------------------------------------------------------------------*/

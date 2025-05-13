@@ -1,7 +1,6 @@
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Geom/CommandImportIGES.h"
-#include "Geom/GeomManager.h"
 #include "Geom/ImportIGESImplementation.h"
 #include "Geom/Curve.h"
 /*----------------------------------------------------------------------------*/

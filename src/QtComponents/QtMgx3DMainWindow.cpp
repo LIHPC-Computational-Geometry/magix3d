@@ -4,7 +4,7 @@
  * \date        29/11/2010
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Command.h"
 #include "Utils/Magix3DEvents.h"
@@ -969,7 +969,7 @@ Qt::AutoCompatConnection	3	The default type when Qt 3 support is enabled.
 #endif	// USE_EXPERIMENTAL_ROOM
                   _repTypesDialog(0),
                   _pythonMinScript(), _pytMinScriptCharset(Charset::ASCII),
-                  _encodageScripts((ContextIfc::encodageScripts) - 1)
+                  _encodageScripts((Context::encodageScripts) - 1)
 		{
 			setObjectName(0 == name ? "QtMgx3DMainWindow" : name);
 		}    // QtMgx3DMainWindow::QtMgx3DMainWindow
@@ -1004,7 +1004,7 @@ Qt::AutoCompatConnection	3	The default type when Qt 3 support is enabled.
 #endif	// USE_EXPERIMENTAL_ROOM
                   _repTypesDialog(0),
                   _pythonMinScript(), _pytMinScriptCharset(Charset::UNKNOWN),
-                  _encodageScripts((ContextIfc::encodageScripts) - 1)
+                  _encodageScripts((Context::encodageScripts) - 1)
 		{
 			MGX_FORBIDDEN("QtMgx3DMainWindow copy constructor is not allowed.");
 		}    // QtMgx3DMainWindow::QtMgx3DMainWindow (const QtMgx3DMainWindow&)
@@ -1100,7 +1100,7 @@ void QtMgx3DMainWindow::showReady ( )
 }	// QtMgx3DMainWindow::showReady
 
 
-		void QtMgx3DMainWindow::init(const std::string &name, ContextIfc *context, QtGroupsPanel *groupsPanel, QtEntitiesPanel *entitiesPanel)
+		void QtMgx3DMainWindow::init(const std::string &name, Context *context, QtGroupsPanel *groupsPanel, QtEntitiesPanel *entitiesPanel)
 		{
 			if ((0 != _groupsPanel) || (0 != _entitiesPanel))
 				throw Exception("QtMgx3DMainWindow::init : fenêtre déjà initialisée.");
@@ -3692,7 +3692,7 @@ cout << ctime (&t);
 		}    // QtMgx3DMainWindow::updateActions
 
 
-		void QtMgx3DMainWindow::setContext(ContextIfc *context)
+		void QtMgx3DMainWindow::setContext(Context *context)
 		{
 			if (context == _context)
 				return;
@@ -3788,7 +3788,7 @@ cout << ctime (&t);
 		}    // QtMgx3DMainWindow::setContext
 
 
-		ContextIfc &QtMgx3DMainWindow::getContext()
+		Context &QtMgx3DMainWindow::getContext()
 		{
 			if (0 == _context)
 				throw Exception(UTF8String("QtMgx3DMainWindow::getContext : absence de contexte.", Charset::UTF_8));
@@ -3797,7 +3797,7 @@ cout << ctime (&t);
 		}    // QtMgx3DMainWindow::getContext
 
 
-		const ContextIfc &QtMgx3DMainWindow::getContext() const
+		const Context &QtMgx3DMainWindow::getContext() const
 		{
 			if (0 == _context)
 				throw Exception(UTF8String("QtMgx3DMainWindow::getContext : absence de contexte.", Charset::UTF_8));
@@ -6109,10 +6109,10 @@ void QtMgx3DMainWindow::saveAsMagix3DScriptCallback ( )
 
 	QtAutoWaitingCursor	cursor (true);
 
-	getContext ( ).savePythonScript (fileName.c_str ( ), (ContextIfc::encodageScripts) dialog.getEncodageScript(), dialog.getCharset ( ));
+	getContext ( ).savePythonScript (fileName.c_str ( ), (Context::encodageScripts) dialog.getEncodageScript(), dialog.getCharset ( ));
 
 	_pythonMinScript	= fileName;
-	_encodageScripts	= (ContextIfc::encodageScripts)dialog.getEncodageScript ( );
+	_encodageScripts	= (Context::encodageScripts)dialog.getEncodageScript ( );
 	_pytMinScriptCharset	= dialog.getCharset ( );
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))

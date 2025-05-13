@@ -4,7 +4,7 @@
  * \date        23/11/2011
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 
 #include "QtVtkComponents/QtVtkGraphicalWidget.h"

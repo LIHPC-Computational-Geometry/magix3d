@@ -118,7 +118,7 @@ class Qt3VerticiesPanel : public QtMgx3DOperationsSubPanel
 	/**
 	 * \return	Une référence sur le contexte <I>Magix 3D</I> associé à l'opération.
 	 */
-	virtual const Mgx3D::Internal::ContextIfc& getContext ( ) const;
+	virtual const Mgx3D::Internal::Context& getContext ( ) const;
 
 	/** \return le point pour un sommet topo ou géom */
 	Utils::Math::Point getPoint (const std::string& name) const;
@@ -157,7 +157,7 @@ class Qt3VerticiesPanel : public QtMgx3DOperationsSubPanel
 	QLabel											*_vertex1Label, *_vertex2Label, *_vertex3Label;
 
 //	/** Contexte d'utilisation du panneau. */
-//	Mgx3D::Internal::ContextIfc*	_context;
+//	Mgx3D::Internal::Context*	_context;
 };	// class Qt3VerticiesPanel
 
 

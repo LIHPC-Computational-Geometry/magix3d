@@ -30,7 +30,7 @@ class StructuredMeshManager final : public Mgx3D::Internal::CommandCreator
 	 *  \param	Nom unique de l'instance (utile en environnement distribué).
 	 *  \param	Contexte d'utilisation
 	 */
-	StructuredMeshManager (const std::string& name, Mgx3D::Internal::ContextIfc* c);
+	StructuredMeshManager (const std::string& name, Mgx3D::Internal::Context* c);
 
 	/** 
 	 * Destructeur

@@ -7,7 +7,7 @@
 #ifndef QT_MGX3D_ENTITY_PANEL_H
 #define QT_MGX3D_ENTITY_PANEL_H
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "QtComponents/QtEntityIDTextField.h"
 
 #include <TkUtil/util_config.h>

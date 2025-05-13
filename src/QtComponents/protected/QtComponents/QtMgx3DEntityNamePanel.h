@@ -8,7 +8,7 @@
 #ifndef QTMGX3DENTITYNAMEPANEL_H_
 #define QTMGX3DENTITYNAMEPANEL_H_
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/ValidatedField.h"
 #include "Group/GroupManager.h"
@@ -62,7 +62,7 @@ class QtMgx3DEntityNamePanel :
     /**
      * \return      Contexte <I>Magix 3D</I> courant.
      */
-     virtual Mgx3D::Internal::ContextIfc& getContext ( );
+     virtual Mgx3D::Internal::Context& getContext ( );
 
     /**
      * \return      La liste des noms saisies

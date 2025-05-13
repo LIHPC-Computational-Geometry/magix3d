@@ -1,9 +1,8 @@
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Geom/CommandNewBox.h"
 #include "Geom/PropertyBox.h"
 #include "Geom/EntityFactory.h"
-#include "Geom/GeomManager.h"
 #include "Utils/MgxNumeric.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>

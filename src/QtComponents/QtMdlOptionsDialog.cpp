@@ -4,7 +4,7 @@
  * \date        26/05/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "QtComponents/QtMdlOptionsDialog.h"
