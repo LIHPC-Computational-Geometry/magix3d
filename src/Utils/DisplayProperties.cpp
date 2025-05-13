@@ -8,6 +8,7 @@
  */
 /*----------------------------------------------------------------------------*/
 #include "Utils/DisplayProperties.h"
+#include "Utils/GraphicalEntityRepresentation.h"		// CP TO REMOVE ?
 #include "Utils/Common.h"
 
 #include <TkUtil/Exception.h>
@@ -188,9 +189,9 @@ void DisplayProperties::EntityView::entityDisplayed (bool displayed)
 
 
 unsigned short	DisplayProperties::_defaultFontFamily	= 0;
-unsigned short	DisplayProperties::_defaultFontSize	= 12;
-bool		DisplayProperties::_defaultFontBold	= false;
-bool		DisplayProperties::_defaultFontItalic	= false;
+unsigned short	DisplayProperties::_defaultFontSize		= 12;
+bool		DisplayProperties::_defaultFontBold			= false;
+bool		DisplayProperties::_defaultFontItalic		= false;
 
 
 DisplayProperties::DisplayProperties ( )
@@ -437,7 +438,15 @@ bool DisplayProperties::isDisplayed ( ) const
 void DisplayProperties::setDisplayed(bool disp)
 {
 	if (_displayed != disp)
+{
+	GraphicalEntityRepresentation*	ger	= static_cast<GraphicalEntityRepresentation*>(getGraphicalRepresentation ( ));
+	if (0 != ger)
+	{
+		Entity::setDisplayed (*(ger->getEntity ( )), disp);
+
+	}	// if (0 != ger)
 		notifyViews (disp);
+}
     _displayed = disp;
     // c'est la vue qui met à jour l'info, ou le GroupManager à la fin d'une commande [EB]
 }

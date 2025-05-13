@@ -22,6 +22,8 @@
 #include <vtkSmartPointer.h>
 #include <vtkUnsignedCharArray.h>
 
+#include <vector>
+
 
 /** <P>En plus de la classe <I>vtkUnifiedInteractorStyle</I> permet :<BR>
  * <OL>
@@ -74,6 +76,25 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	 * Affiche des informations dans os sur l'instance.
 	 */
 	virtual void PrintSelf (ostream& os, vtkIndent indent);
+
+	/**
+	 * Une interaction est-elle en cours dans cette session Magix3D ?
+	 */
+	static bool	InInteraction ( );
+
+	/**
+	 * Affecte true à inInteraction puis vtkUnifiedInteractorStyle::StartState (newstate).
+	 * Désactive l'affichage des vtkMgx3DActor dont <I>IsLodDisplayable ( )</I> retourne
+	 * <I>false</I>, et paramètre les autres en affichage LOD (points/arêtes plus petits).
+	 */
+	virtual void StartState (int newstate);
+
+	/**
+	 * Affecte false à inInteraction puis vtkUnifiedInteractorStyle::StopState ( ), puis
+	 * restaure les paramètres d'affichage normaux des vtkMgx3DActor affichés, et restaure 
+	 * l'affichage des vtkMgx3DActor suspendus.
+	 */
+	virtual void StopState ( );
 
 	/** <P>Surcharge les actions suivantes :<BR>
 	 * <OL>
@@ -303,6 +324,12 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	vtkMgx3DInteractorStyle (const vtkMgx3DInteractorStyle&);
 	vtkMgx3DInteractorStyle& operator = (const vtkMgx3DInteractorStyle&);
 
+	/** Une interaction utilisateur est-elle en cours dans cette session Magix3D ? */
+	static bool										InUserInteraction;
+	
+	/** Les acteurs suspendus lors d'une interaction dans la session Magix3D (émulation de mode LOD avec des acteurs n'affichant qu'une donnée. */
+	static std::vector<vtkActor*>					SuspendedActors;
+
 	/** Outils de sélection interactive à la souris. */
 	Mgx3D::QtVtkComponents::VTKMgx3DPicker*			Mgx3DPicker;
 	Mgx3D::QtVtkComponents::VTKMgx3DPickerCommand*	Mgx3DPickerCommand;
@@ -331,7 +358,7 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	
 	/** Vaut <I>true</I> en mode sélection au <I>rectangle élastique</I> lorsque une entité doit être complétement dans le rectangle pour être sélectionnée,
 	 * <I>false</I> (défaut) si une intersection suffit. */
-	 bool											CompletelyInsideSelection;
+	bool											CompletelyInsideSelection;
 
 	/** Position du curseur de la souris au moment où le bouton est pressé. */
 	int												ButtonPressPosition [2];

@@ -82,7 +82,13 @@ class Resources
 	 * Le prémaillage des arêtes, faces et blocs peut il être décomposé en plusieurs tâches exécutées parallèlement dans plusieurs threads ?
 	 */
 	Preferences::BoolNamedValue					_allowThreadedEdgePreMeshTasks, _allowThreadedFacePreMeshTasks, _allowThreadedBlockPreMeshTasks;
-	
+
+	/** La taille des points/noeuds/vertex lors des interactions. */
+	Preferences::UnsignedLongNamedValue			_lodPointSize;
+
+	/** L'épaisseur des lignes/arêtes lors des interactions. */
+	Preferences::UnsignedLongNamedValue			_lodLineWidth;
+
 	/**
 	 * La police de caractères à utiliser pour les affichages 2D dans la  fenêtre graphique. */
 	Preferences::StringNamedValue				_fontFamily;
@@ -459,6 +465,9 @@ class Resources
 	/** Faut-il détruire la représentation graphique des entités de maillage lorsqu'elles ne sont plus affichées ?
 	 */
 	Preferences::BoolNamedValue					_meshDestroyOnHide;
+
+	/** Les nombres d'entités maximum à afficher lors d'interactions. */
+	Preferences::UnsignedLongNamedValue			_topoVertexLodNumberThreshold, _topoEdgeLodNumberThreshold, _topoFaceLodNumberThreshold, _topoBlockLodNumberThreshold;
 
 	/** Les scripts à exécuter au lancement de l'application (arguments de ligne de commande suivant -scripts. */
 	std::vector<std::string>					_scripts;

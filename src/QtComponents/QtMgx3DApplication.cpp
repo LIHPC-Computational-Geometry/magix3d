@@ -697,6 +697,8 @@ void QtMgx3DApplication::applyConfiguration (const Section& mainSection)
 		Section&	geomSection	= representationsSection.getSection ("geomEntities");
 		Section&	topoSection	= representationsSection.getSection ("topoEntities");
 		Section&	meshSection	= representationsSection.getSection ("meshEntities");
+		PreferencesHelper::getUnsignedLong (representationsSection, Resources::instance ( )._lodPointSize);
+		PreferencesHelper::getUnsignedLong (representationsSection, Resources::instance ( )._lodLineWidth);
 		PreferencesHelper::getString (representationsSection, Resources::instance ( )._fontFamily);
 		DisplayProperties::_defaultFontFamily	= fontNameToInt (Resources::instance ( )._fontFamily.getValue ( ));
 		PreferencesHelper::getUnsignedLong (representationsSection, Resources::instance ( )._fontSize);
@@ -708,6 +710,10 @@ void QtMgx3DApplication::applyConfiguration (const Section& mainSection)
 		PreferencesHelper::getBoolean (geomSection, Resources::instance ( )._geomDestroyOnHide);
 		PreferencesHelper::getBoolean (topoSection, Resources::instance ( )._topoDestroyOnHide);
 		PreferencesHelper::getBoolean (meshSection, Resources::instance ( )._meshDestroyOnHide);
+		PreferencesHelper::getUnsignedLong (topoSection, Resources::instance ( )._topoVertexLodNumberThreshold);
+		PreferencesHelper::getUnsignedLong (topoSection, Resources::instance ( )._topoEdgeLodNumberThreshold);
+		PreferencesHelper::getUnsignedLong (topoSection, Resources::instance ( )._topoFaceLodNumberThreshold);
+		PreferencesHelper::getUnsignedLong (topoSection, Resources::instance ( )._topoBlockLodNumberThreshold);
 
 		Internal::InternalPreferences::instance ( ).loadPreferences(representationsSection);
 	}
@@ -1012,6 +1018,8 @@ void QtMgx3DApplication::saveConfiguration (Section& mainSection)
 	Section&	geomSection	= PreferencesHelper::getSection (representationsSection, "geomEntities");
 	Section&	topoSection	= PreferencesHelper::getSection (representationsSection, "topoEntities");
 	Section&	meshSection	= PreferencesHelper::getSection (representationsSection, "meshEntities");
+	PreferencesHelper::updateUnsignedLong (representationsSection, Resources::instance ( )._lodPointSize);
+	PreferencesHelper::updateUnsignedLong (representationsSection, Resources::instance ( )._lodLineWidth);
 	PreferencesHelper::updateString (representationsSection, Resources::instance ( )._fontFamily);
 	PreferencesHelper::updateUnsignedLong (representationsSection, Resources::instance ( )._fontSize);
 	PreferencesHelper::updateBoolean (representationsSection, Resources::instance ( )._fontBold);
@@ -1019,6 +1027,10 @@ void QtMgx3DApplication::saveConfiguration (Section& mainSection)
 	PreferencesHelper::updateBoolean (geomSection, Resources::instance ( )._geomDestroyOnHide);
 	PreferencesHelper::updateBoolean (topoSection, Resources::instance ( )._topoDestroyOnHide);
 	PreferencesHelper::updateBoolean (meshSection, Resources::instance ( )._meshDestroyOnHide);
+	PreferencesHelper::updateUnsignedLong (topoSection, Resources::instance ( )._topoVertexLodNumberThreshold);
+	PreferencesHelper::updateUnsignedLong (topoSection, Resources::instance ( )._topoEdgeLodNumberThreshold);
+	PreferencesHelper::updateUnsignedLong (topoSection, Resources::instance ( )._topoFaceLodNumberThreshold);
+	PreferencesHelper::updateUnsignedLong (topoSection, Resources::instance ( )._topoBlockLodNumberThreshold);
 	Internal::InternalPreferences::instance ( ).savePreferences(representationsSection);
 
 	// Interacteur :

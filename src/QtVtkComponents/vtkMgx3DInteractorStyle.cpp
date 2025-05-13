@@ -22,6 +22,7 @@
 #include <vtkAbstractPropPicker.h>
 #include <vtkAssemblyPath.h>
 #include <vtkInformation.h>
+#include <vtkProperty.h>
 #include <vtkProp3DCollection.h>
 #include <vtkSelection.h>
 #include <vtkSelectionNode.h>
@@ -38,6 +39,8 @@ using namespace Mgx3D::QtComponents;
 using namespace Mgx3D::QtVtkComponents;
 
 
+bool					vtkMgx3DInteractorStyle::InUserInteraction	= false;
+vector<vtkActor*>		vtkMgx3DInteractorStyle::SuspendedActors;
 const unsigned long		vtkMgx3DInteractorStyle::ViewRedefinedEvent	= 105000;
 int						vtkMgx3DInteractorStyle::VTKIS_RUBBER_BAND	= 2048;
 
@@ -110,6 +113,86 @@ void vtkMgx3DInteractorStyle::PrintSelf (ostream& os, vtkIndent indent)
 	   << "PickOnLeftButtonDown : " << (true == Resources::instance ( )._pickOnLeftButtonDown.getValue( ) ? "True" : "False") << endl
 	   << "PickOnRightButtonDown : " << (true == Resources::instance ( )._pickOnRightButtonDown.getValue( ) ? "True" : "False") << endl;
 }	// vtkMgx3DInteractorStyle::PrintSelf
+
+
+bool vtkMgx3DInteractorStyle::InInteraction ( )
+{
+	return InUserInteraction;
+}	// vtkMgx3DInteractorStyle::InInteraction
+
+
+void vtkMgx3DInteractorStyle::StartState (int newstate)
+{
+	InUserInteraction	= VTKIS_NONE == newstate ? false : true;
+	vtkUnifiedInteractorStyle::StartState (newstate);
+	
+	if ((true == InUserInteraction) && (0 != CurrentRenderer))
+	{
+		vtkActorCollection*	actors	= CurrentRenderer->GetActors ( );
+		if (0 != actors)
+		{
+			vtkActor*	actor	= 0;
+			for (actors->InitTraversal ( ); 0 != (actor = actors->GetNextItem ( )); )
+			{
+				VTKMgx3DActor*	mgxActor	= dynamic_cast<VTKMgx3DActor*>(actor);
+				if (0 != mgxActor)
+				{
+					if ((0 != mgxActor->GetVisibility ( )) && (false == mgxActor->IsLodDisplayable ( )))
+					{
+						SuspendedActors.push_back (actor);
+						actor->VisibilityOff ( );
+					}	// if ((0 != mgxActor->GetVisibility ( )) && (false == mgxActor->IsLodDisplayable ( )))
+					else
+					{
+						if ((0 != mgxActor->GetEntity ( )) && (true == mgxActor->GetEntity ( )->isTopoEntity ( )))
+						{
+							vtkProperty*	property	= mgxActor->GetProperty ( );
+							assert (0 != property);
+							property->SetPointSize (Resources::instance ( )._lodPointSize.getValue ( ));
+							property->SetLineWidth (Resources::instance ( )._lodLineWidth.getValue ( ));
+						}	// if ((0 != mgxActor->GetEntity ( )) && (true == mgxActor->GetEntity ( )->isTopoEntity ( )))
+					}	// else if ((0 != mgxActor->GetVisibility ( )) && (false == mgxActor->IsLodDisplayable ( )))
+				}	// if (0 != mgxActor)
+			}	// for (actors->InitTraversal ( ); 0 != (actor = actors->GetNextItem ( )); )
+		}	// if (0 != actors)
+	}	// if ((true == InUserInteraction) && (0 != CurrentRenderer))
+}	// vtkMgx3DInteractorStyle::StartState
+
+
+void vtkMgx3DInteractorStyle::StopState ( )
+{
+	InUserInteraction	= false;
+	vtkUnifiedInteractorStyle::StopState ( );
+	
+	if (0 != CurrentRenderer)
+	{
+		// Annulation de l'affichage en mode LOD :
+		vtkActorCollection*	actors	= CurrentRenderer->GetActors ( );
+		if (0 != actors)
+		{
+			vtkActor*	actor	= 0;
+			for (actors->InitTraversal ( ); 0 != (actor = actors->GetNextItem ( )); )
+			{
+				VTKMgx3DActor*	mgxActor	= dynamic_cast<VTKMgx3DActor*>(actor);
+				if (0 != mgxActor)
+				{
+					if ((0 != mgxActor->GetEntity ( )) && (true == mgxActor->GetEntity ( )->isTopoEntity ( )))
+					{
+						assert (0 != mgxActor->GetEntity ( )->getDisplayProperties ( ).getGraphicalRepresentation ( ));
+						mgxActor->GetEntity ( )->getDisplayProperties ( ).getGraphicalRepresentation ( )->updateRepresentationProperties ( );
+					}	// if ((0 != mgxActor->GetEntity ( )) && (true == mgxActor->GetEntity ( )->isTopoEntity ( )))
+				}	// if (0 != mgxActor)
+			}	// for (actors->InitTraversal ( ); 0 != (actor = actors->GetNextItem ( )); )
+		}	// if (0 != actors)
+
+		// Réaffichage des acteurs suspendus :
+		for (vector<vtkActor*>::iterator ita	= SuspendedActors.begin ( ); SuspendedActors.end ( ) != ita; ita++)
+			(*ita)->VisibilityOn ( );
+		SuspendedActors.clear ( );
+		if (0 != CurrentRenderer->GetRenderWindow ( ))
+			CurrentRenderer->GetRenderWindow ( )->Render ( );
+	}	// if (0 != CurrentRenderer)
+}	// vtkMgx3DInteractorStyle::StopState
 
 
 void vtkMgx3DInteractorStyle::OnChar ( )
