@@ -83,7 +83,7 @@ TkUtil::LogOutputStream* CommandInternal::getLogStream ( )
     return getContext().getLogStream();
 }
 /*----------------------------------------------------------------------------*/
-Utils::CommandIfc::status CommandInternal::execute()
+Utils::Command::status CommandInternal::execute()
 {
     startingOrcompletionLog (true); // log de début de commande
 

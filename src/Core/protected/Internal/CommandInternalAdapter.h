@@ -29,7 +29,7 @@ class CommandInternalAdapter : public Mgx3D::Utils::Command
 	virtual ~CommandInternalAdapter ( );
 
 	/**
-	 * \return	CommandIfc::FAIL
+	 * \return	Command::FAIL
 	 */
 	virtual Mgx3D::Utils::Command::status undo ( );
 	virtual Mgx3D::Utils::Command::status redo ( );

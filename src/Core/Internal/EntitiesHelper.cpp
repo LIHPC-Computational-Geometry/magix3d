@@ -252,7 +252,7 @@ std::vector<TkUtil::UTF8String> EntitiesHelper::replaceNameByCommandRef(std::vec
 
 	for (uint i=0; i<commands.size(); i++){
 		Utils::Command* command = commands[i];
-		if (command->isCompleted() && command->getStatus() != Utils::CommandIfc::FAIL){
+		if (command->isCompleted() && command->getStatus() != Utils::Command::FAIL){
 			Internal::CommandInternal* cmdi = dynamic_cast<Internal::CommandInternal*>(command);
 			results.push_back(new Internal::M3DCommandResult(*cmdi));
 			TkUtil::UTF8String newCmd;

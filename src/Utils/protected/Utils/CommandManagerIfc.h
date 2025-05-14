@@ -8,7 +8,7 @@
 #ifndef UTILS_COMMAND_MANAGER_IFC_H_
 #define UTILS_COMMAND_MANAGER_IFC_H_
 
-#include "Utils/CommandIfc.h"
+#include "Utils/Command.h"
 
 #include <TkUtil/ReferencedObject.h>
 
@@ -109,7 +109,7 @@ class CommandManagerIfc
 	 * \see		hasQueuedCommands
 	 * \see		processQueuedCommands
 	 */
-	virtual void addCommand (Utils::CommandIfc* command, CommandIfc::PLAY_TYPE pt);
+	virtual void addCommand (Utils::Command* command, Command::PLAY_TYPE pt);
 
 	/**
 	 * Exécute si possible les commandes en file d'attente.
@@ -122,7 +122,7 @@ class CommandManagerIfc
 	/**
 	 * \return		La liste des commandes.
 	 */
-	virtual std::vector<Utils::CommandIfc*> getCommandIfcs ( ) const;
+	virtual std::vector<Utils::Command*> getCommands ( ) const;
 
     /**
      *  Déseffectue la dernière commande effectuée dans son contexte.
@@ -161,7 +161,7 @@ class CommandManagerIfc
 	 *				commande exécutée ou en cours d'exécution.
 	 * \see			getCommandName
 	 */
-	virtual CommandIfc::status getStatus ( ) const;
+	virtual Command::status getStatus ( ) const;
 
 	/**
 	 * \return		Le nom de la commande courante, à savoir le nom de la

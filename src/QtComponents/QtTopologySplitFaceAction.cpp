@@ -549,9 +549,9 @@ void QtTopologySplitFaceAction::executeOperation ( )
 	}	// switch (panel->getCutDefinitionMethod ( ))
 	CHECK_NULL_PTR_ERROR (result)
 	setCommandResult (result);
-	if (CommandIfc::FAIL == result->getStatus ( ))
+	if (Command::FAIL == result->getStatus ( ))
 		throw Exception (result->getErrorMessage ( ));
-	else if (CommandIfc::CANCELED == result->getStatus ( ))
+	else if (Command::CANCELED == result->getStatus ( ))
 		throw Exception ("Opération annulée");
 }	// QtTopologySplitFaceAction::executeOperation
 

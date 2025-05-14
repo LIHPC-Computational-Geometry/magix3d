@@ -73,7 +73,7 @@ class CommandResult : public TkUtil::ObjectBase
 	 * \except	Lève une exception en l'absence de commande (ex : détruite).
 	 * \see		getStrStatus
 	 */	
-	virtual Mgx3D::Utils::CommandIfc::status getStatus ( ) const;
+	virtual Mgx3D::Utils::Command::status getStatus ( ) const;
 
 	/**
 	 * \return	Le status de la commande associée sous forme de chaîne de

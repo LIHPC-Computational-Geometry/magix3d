@@ -69,7 +69,7 @@ CommandManagerIfc::POLICY CommandManagerIfc::setPolicy (POLICY)
 
 
 void CommandManagerIfc::addCommand (
-							CommandIfc* command, CommandIfc::PLAY_TYPE pt)
+							Command* command, Command::PLAY_TYPE pt)
 {
 	throw Exception ("CommandManagerIfc::addCommand should be overloaded.");
 }	// CommandManagerIfc::addCommand
@@ -81,9 +81,9 @@ void CommandManagerIfc::processQueuedCommands ( )
 }	// CommandManagerIfc::processQueuedCommands
 
 
-std::vector<CommandIfc*> CommandManagerIfc::getCommandIfcs ( ) const
+std::vector<Command*> CommandManagerIfc::getCommands ( ) const
 {
-	throw Exception ("CommandManagerIfc::getCommandIfcs should be overloaded.");
+	throw Exception ("CommandManagerIfc::getCommands should be overloaded.");
 }	// CommandManagerIfc::getCommands
 
 
@@ -105,7 +105,7 @@ void CommandManagerIfc::wait ( )
 }	// CommandManagerIfc::wait
 
 
-CommandIfc::status CommandManagerIfc::getStatus ( ) const
+Command::status CommandManagerIfc::getStatus ( ) const
 {
 	throw Exception ("CommandManagerIfc::getStatus should be overloaded.");
 }	// CommandManagerIfc::getStatus

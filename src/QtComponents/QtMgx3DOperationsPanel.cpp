@@ -706,7 +706,7 @@ void QtMgx3DOperationPanel::applyCallback ( )
 
 	if (0 != commandResult)
 	{
-		if (CommandIfc::DONE == commandResult->getStatus ( ))
+		if (Command::DONE == commandResult->getStatus ( ))
 		{
 			updateGuiPostExecute ( );	// CP 18/02/25 : ne pas être tenté de modifier la surbrillance d'entités détruites => masquer preview + highlight.
 			hasError	= false;
@@ -717,7 +717,7 @@ void QtMgx3DOperationPanel::applyCallback ( )
 			hasError		= true;
 			errorString		= commandResult->getStrStatus ( );
 			commandResult->setUserNotified (true);
-		}	// else if (CommandIfc::DONE == commandResult->getStatus ( ))
+		}	// else if (Command::DONE == commandResult->getStatus ( ))
 	}	// if (0 != commandResult)
 	else
 	{

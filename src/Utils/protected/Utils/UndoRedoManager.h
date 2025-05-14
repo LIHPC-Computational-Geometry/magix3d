@@ -18,7 +18,7 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Utils {
 /*----------------------------------------------------------------------------*/
-class CommandIfc;
+class Command;
 /*----------------------------------------------------------------------------*/
 /** \class UndoRedoManager
  *  \brief La classe UndoRedoManager stocke l'ensemble des commandes effectuées
@@ -62,17 +62,17 @@ public:
      *  \param  command Une commande Magix	
 	 *	\see	has
      */
-    virtual void store(CommandIfc* command);
+    virtual void store(Command* command);
 
 	/**
 	 * \return		La liste des commandes effectuées
 	 */
-	virtual const std::vector<CommandIfc*>& getDoneCommands ( ) const;
+	virtual const std::vector<Command*>& getDoneCommands ( ) const;
 
 	/**
 	 * \return		La liste des commandes annulées
 	 */
-	virtual const std::vector<CommandIfc*>& getUndoneCommands ( ) const;
+	virtual const std::vector<Command*>& getUndoneCommands ( ) const;
 
 
 	/** Suppression des commandes undones
@@ -83,7 +83,7 @@ public:
     /**
 	 * \return Retourne un pointeur sur la dernière commande annulable, ou 0.
      */
-    virtual CommandIfc* undoableCommand ( );
+    virtual Command* undoableCommand ( );
 
     /*------------------------------------------------------------------------*/
     /**
@@ -96,13 +96,13 @@ public:
      *          pointeur dessus
 	 *			Avertit ses éventuels observateurs.
      */
-    virtual CommandIfc* undo();
+    virtual Command* undo();
 
     /*------------------------------------------------------------------------*/
     /**
 	 * \return Retourne un pointeur sur la dernière commande rejouable, ou 0.
      */
-    virtual CommandIfc* redoableCommand ( );
+    virtual Command* redoableCommand ( );
 
     /*------------------------------------------------------------------------*/
     /**
@@ -115,7 +115,7 @@ public:
      *          pointeur dessus
 	 *			Avertit ses éventuels observateurs.
      */
-    virtual CommandIfc* redo();
+    virtual Command* redo();
 
 	/**
 	 * Méthodes relatives à l'affichage d'informations relatives à l'instance
@@ -151,7 +151,7 @@ public:
 	 * \return	<I>true</I> si la commande est déjà recensée, <I>false</I>
 	 *			dans le cas contraire.
 	 */
-	virtual bool hasCommand (CommandIfc*);
+	virtual bool hasCommand (Command*);
 
 	/**
 	 * Envoit le <I>log</I> transmis en argument dans le flux de messages
@@ -166,9 +166,9 @@ private:
 	/** Nom unique de l'instance. */
 	std::string							m_name;
     /** operation effectuée (DONE)  */
-    std::vector<CommandIfc*>			m_done;
+    std::vector<Command*>				m_done;
     /** operation défaites (UNDONE) */
-    std::vector<CommandIfc*>			m_undone;
+    std::vector<Command*>				m_undone;
 	/** Le mutex pour protéger les listes de commandes. */
 	mutable TkUtil::Mutex*				m_mutex;
 	/** L'éventuel afficheur. */

@@ -81,7 +81,7 @@ string CommandResult::getUniqueName ( ) const
 }	// CommandResult::getUniqueName
 
 
-CommandIfc::status CommandResult::getStatus ( ) const
+Command::status CommandResult::getStatus ( ) const
 {
 	return getCommand ( ).getStatus ( );
 }	// CommandResult::getStatus
