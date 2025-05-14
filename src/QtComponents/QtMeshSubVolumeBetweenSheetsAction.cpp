@@ -67,7 +67,7 @@ QtMeshSubVolumeBetweenSheetsPanel::QtMeshSubVolumeBetweenSheetsPanel (
 	// La blocs sièges de l'extraction :
 	_blocksPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Blocs :", "", &mainWindow,
-			SelectionManagerIfc::D3, FilterEntity::TopoBlock);
+			SelectionManager::D3, FilterEntity::TopoBlock);
 	_blocksPanel->setToolTip (QString::fromUtf8("Blocs sièges de l'extraction. Doivent être structurés et maillés."));
 	_blocksPanel->setMultiSelectMode (true);
 	_verticalLayout->addWidget (_blocksPanel);
@@ -79,7 +79,7 @@ QtMeshSubVolumeBetweenSheetsPanel::QtMeshSubVolumeBetweenSheetsPanel (
 	// L'arête perpendiculaire aux feuillets :
 	_edgePanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Arête :", "", &mainWindow,
-			SelectionManagerIfc::D1, FilterEntity::TopoCoEdge);
+			SelectionManager::D1, FilterEntity::TopoCoEdge);
 	connect (_edgePanel->getNameTextField ( ),
 	         SIGNAL (selectionModified (QString)), this,
 	         SLOT (parametersModifiedCallback ( )));

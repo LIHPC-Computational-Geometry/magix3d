@@ -1874,7 +1874,7 @@ void QtGroupsPanel::levelSelectionCallback ( )
 		_entitiesGroupsWidget->clearSelection ( );
 //		getContext ( ).getSelectionManager ( ).clearSelection();
 
-	const SelectionManagerIfc::DIM	dimensions	= dialog.dimensions ( );
+	const SelectionManager::DIM	dimensions	= dialog.dimensions ( );
 	const set<unsigned long>		levels		= dialog.levels ( );
 	vector<GroupEntity*>			groups;
 //	vector<Entity*>					selection;

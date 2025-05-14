@@ -5,7 +5,7 @@
  */
 
 #include "Internal/Context.h"
-#include "Utils/SelectionManagerIfc.h"
+#include "Utils/SelectionManager.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
@@ -70,7 +70,7 @@ QtSysCoordTranslationPanel::QtSysCoordTranslationPanel (
 
 
 	_syscoordPanel	= new QtMgx3DEntityPanel (
-				this, "", true, "Repère à modifier :", "", &mainWindow, SelectionManagerIfc::D3,
+				this, "", true, "Repère à modifier :", "", &mainWindow, SelectionManager::D3,
 				FilterEntity::SysCoord);
 	_syscoordPanel->setMultiSelectMode (false);
 

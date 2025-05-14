@@ -431,7 +431,7 @@ void QtMgx3DPythonConsole::saveConsoleScript (const string filePath, Charset cha
 
 void QtMgx3DPythonConsole::insertSelectionCallback (Utils::Entity::objectType type)
 {
-	SelectionManagerIfc*	sm	= 0 == getMainWindow ( ) ? 0 : getMainWindow ( )->getSelectionManager ( );
+	SelectionManager*	sm	= 0 == getMainWindow ( ) ? 0 : getMainWindow ( )->getSelectionManager ( );
 	if (0 == sm)
 		return;
 

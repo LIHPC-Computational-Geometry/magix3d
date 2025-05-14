@@ -45,7 +45,7 @@ namespace QtComponents
 
 QtMgx3DEntityNamePanel::QtMgx3DEntityNamePanel (
     QWidget* parent, const string& name, QtMgx3DMainWindow& mainWindow,
-    SelectionManagerIfc::DIM dimensions, FilterEntity::objectType types)
+    SelectionManager::DIM dimensions, FilterEntity::objectType types)
     : QWidget (parent), ValidatedField ( ),
       _names(0), _mainWindow (&mainWindow), _label(0)
 
@@ -187,7 +187,7 @@ void QtMgx3DEntityNamePanel::setLabel (const std::string& label)
     _label->setText(QString::fromUtf8(label.c_str()));
 }
 
-void QtMgx3DEntityNamePanel::setDimensions (SelectionManagerIfc::DIM dimensions)
+void QtMgx3DEntityNamePanel::setDimensions (SelectionManager::DIM dimensions)
 {
     _names->selectionCleared();
     _names->setFilteredDimensions (dimensions);

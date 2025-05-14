@@ -151,7 +151,7 @@ QtMgx3DVectorPanel::QtMgx3DVectorPanel (QWidget* parent, const string& title,
 	label->setMinimumSize (label->sizeHint ( ));
 	hlayout->addWidget (label);
 	_segmentIDTextField	= new QtEntityIDTextField (
-							this, mainWindow, SelectionManagerIfc::D1, types);
+							this, mainWindow, SelectionManager::D1, types);
 	_segmentIDTextField->setToolTip (QString::fromUtf8("Segment/Arête représentant le vecteur."));
 	hlayout->addWidget (_segmentIDTextField);
 	connect (_segmentIDTextField, SIGNAL (selectionModified (QString)), this,
@@ -176,7 +176,7 @@ QtMgx3DVectorPanel::QtMgx3DVectorPanel (QWidget* parent, const string& title,
 	label1->setMinimumSize (label1->sizeHint ( ));
 	hlayout->addWidget (label1);
 	_point1IDTextField	= new QtEntityIDTextField (
-							this, mainWindow, SelectionManagerIfc::D0, types);
+							this, mainWindow, SelectionManager::D0, types);
 	_point1IDTextField->setToolTip (QString::fromUtf8("Origine du vecteur."));
 	hlayout->addWidget (_point1IDTextField);
 	connect (_point1IDTextField, SIGNAL (selectionModified (QString)), this,
@@ -186,7 +186,7 @@ QtMgx3DVectorPanel::QtMgx3DVectorPanel (QWidget* parent, const string& title,
 	label2->setMinimumSize (label2->sizeHint ( ));
 	hlayout->addWidget (label2);
 	_point2IDTextField	= new QtEntityIDTextField (
-							this, mainWindow, SelectionManagerIfc::D0, types);
+							this, mainWindow, SelectionManager::D0, types);
 	_point2IDTextField->setToolTip (QString::fromUtf8("Terminaison du vecteur."));
 	hlayout->addWidget (_point2IDTextField);
 	connect (_point2IDTextField, SIGNAL (selectionModified (QString)), this,

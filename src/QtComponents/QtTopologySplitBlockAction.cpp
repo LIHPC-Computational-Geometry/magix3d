@@ -75,7 +75,7 @@ QtTopologySplitBlockPanel::QtTopologySplitBlockPanel (
 	// Le bloc à découper :
 	_blocksPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Blocs  :", "", &mainWindow,
-			SelectionManagerIfc::D3, FilterEntity::TopoBlock);
+			SelectionManager::D3, FilterEntity::TopoBlock);
 	_blocksPanel->setMultiSelectMode (true);
 	connect (_blocksPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -86,7 +86,7 @@ QtTopologySplitBlockPanel::QtTopologySplitBlockPanel (
 	// L'arête orthogonale au plan de coupe :
 	_edgePanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Arête :", "", &mainWindow,
-			SelectionManagerIfc::D1, FilterEntity::TopoCoEdge);
+			SelectionManager::D1, FilterEntity::TopoCoEdge);
 	connect (_edgePanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
 	connect (_edgePanel, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -123,7 +123,7 @@ QtTopologySplitBlockPanel::QtTopologySplitBlockPanel (
 							FilterEntity::AllGeom | FilterEntity::TopoVertex);
 	_cutPointEntityPanel	=
 		new QtMgx3DEntityPanel (this, "", true, "", "", &mainWindow,
-								SelectionManagerIfc::ALL_DIMENSIONS, filter);
+								SelectionManager::ALL_DIMENSIONS, filter);
 	_cutPointEntityPanel->setToolTip (QString::fromUtf8("Entité géométrique dont le centre sert de position de découpe, ou sommet topologique."));
 	gridLayout->addWidget (_cutPointEntityPanel, row, col++, 1, 2);
 	connect (_cutPointEntityPanel, SIGNAL (entitiesAddedToSelection(QString)),

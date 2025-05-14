@@ -36,7 +36,7 @@ namespace QtComponents
 
 QtEntityIDTextField::QtEntityIDTextField (
 	QWidget* parent, QtMgx3DMainWindow* mainWindow,
-	SelectionManagerIfc::DIM dimensions,
+	SelectionManager::DIM dimensions,
 	FilterEntity::objectType types, char* name)
 	: QtTextField (parent, name),
 	  EntitySeizureManager (mainWindow, dimensions, types),
@@ -67,7 +67,7 @@ QtEntityIDTextField::QtEntityIDTextField (
 QtEntityIDTextField::QtEntityIDTextField (const QtEntityIDTextField&)
 	: QtTextField (0, 0),
 	  EntitySeizureManager (
-				0, SelectionManagerIfc::NO_DIM, FilterEntity::NoneEntity),
+				0, SelectionManager::NO_DIM, FilterEntity::NoneEntity),
 	_mainWindow (0), _addGraphicalSelectionAction (0), _addGroupsEntitiesAction (0),
 	_backgroundColor (Qt::white), _updating (false)
 {

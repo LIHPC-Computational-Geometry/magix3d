@@ -53,7 +53,7 @@ QtGeomPlaneCutPanel::QtGeomPlaneCutPanel (
 			QWidget* parent, const string& panelName, 
 			QtMgx3DGroupNamePanel::POLICY creationPolicy,
 			const string& entitiesLabel,
-			SelectionManagerIfc::DIM dimensions, FilterEntity::objectType types,
+			SelectionManager::DIM dimensions, FilterEntity::objectType types,
 			QtMgx3DMainWindow& mainWindow, QtMgx3DOperationAction* action)
 	: QtMgx3DOperationPanel (parent, mainWindow, action,
 			QtMgx3DApplication::HelpSystem::instance ( ).geomPlaneCutOperationURL,
@@ -105,8 +105,8 @@ QtGeomPlaneCutPanel::QtGeomPlaneCutPanel (
 	layout->addWidget (label);
 	QHBoxLayout*	hlayout	= new QHBoxLayout ( );
 	layout->addLayout (hlayout);
-	SelectionManagerIfc::DIM allowedDimensions	= (SelectionManagerIfc::DIM)(
-		SelectionManagerIfc::D1|SelectionManagerIfc::D2|SelectionManagerIfc::D3);
+	SelectionManager::DIM allowedDimensions	= (SelectionManager::DIM)(
+		SelectionManager::D1|SelectionManager::D2|SelectionManager::D3);
 	_entitiesPanel	= new QtEntityByDimensionSelectorPanel (
 			this, mainWindow, "", allowedDimensions, types, dimensions, true);
 	hlayout->addWidget (_entitiesPanel);
@@ -537,7 +537,7 @@ void QtGeomPlaneCutPanel::cutModifiedCallback ( )
 
 QtGeomPlaneCutAction::QtGeomPlaneCutAction (
 	const QIcon& icon, const QString& text,
-	SelectionManagerIfc::DIM  dimensions, FilterEntity::objectType types,
+	SelectionManager::DIM  dimensions, FilterEntity::objectType types,
 	QtMgx3DMainWindow& mainWindow,
 	const QString& tooltip, QtMgx3DGroupNamePanel::POLICY creationPolicy)
 	: QtMgx3DGeomOperationAction (icon, text, mainWindow, tooltip)
@@ -546,11 +546,11 @@ QtGeomPlaneCutAction::QtGeomPlaneCutAction (
 
 	switch (dimensions)
 	{
-		case	SelectionManagerIfc::D2	:
+		case	SelectionManager::D2	:
 			types			= FilterEntity::GeomSurface;
 			entitiesLabel	= "Surfaces :";
 			break;
-		case	SelectionManagerIfc::D3	:
+		case	SelectionManager::D3	:
 			types			= FilterEntity::GeomVolume;
 			entitiesLabel	= "Volumes :";
 			break;

@@ -93,7 +93,7 @@ class QtTopologyDegenerateBlockPanel : public QtMgx3DOperationPanel
 	/**
 	 * \param		Nouvelle dimension de saisie des entités topologiques.
 	 */
-	virtual void setDimension (Mgx3D::Utils::SelectionManagerIfc::DIM dim);
+	virtual void setDimension (Mgx3D::Utils::SelectionManager::DIM dim);
 
 
 	protected :

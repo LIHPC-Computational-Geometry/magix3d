@@ -71,7 +71,7 @@ QtBlockAssociationPanel::QtBlockAssociationPanel (
 	// Les blocs à associer :
 	_blocksPanel	= new QtMgx3DEntityPanel (
 						this, "", true, "Blocs :", "", &mainWindow, 
-						SelectionManagerIfc::D3, FilterEntity::TopoBlock);
+						SelectionManager::D3, FilterEntity::TopoBlock);
 	_blocksPanel->setMultiSelectMode (true);
 	layout->addWidget (_blocksPanel);
 	connect (_blocksPanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -82,7 +82,7 @@ QtBlockAssociationPanel::QtBlockAssociationPanel (
 	// L'éventuel volume à associer :
 	_volumePanel	= new QtMgx3DEntityPanel (
 						this, "", true, "Volume :", "", &mainWindow, 
-						SelectionManagerIfc::D3, FilterEntity::GeomVolume);
+						SelectionManager::D3, FilterEntity::GeomVolume);
 	layout->addWidget (_volumePanel);
 //	connect (_volumePanel->getNameTextField ( ),
 	connect (_volumePanel, SIGNAL (entitiesAddedToSelection(QString)),

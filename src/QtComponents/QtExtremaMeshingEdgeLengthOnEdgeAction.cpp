@@ -71,7 +71,7 @@ QtExtremaMeshingEdgeLengthOnEdgePanel::QtExtremaMeshingEdgeLengthOnEdgePanel (
 
 	_coedgePanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Arête :", "", &mainWindow,
-			SelectionManagerIfc::D1, FilterEntity::TopoCoEdge);
+			SelectionManager::D1, FilterEntity::TopoCoEdge);
 	_coedgePanel->setToolTip (QString::fromUtf8("Arête dont on souhaite connaitre la longueur des bras aux extrémités."));
 
 	vlayout->addWidget (_coedgePanel);

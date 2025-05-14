@@ -64,7 +64,7 @@ QtTopologySplitBlockWithOGridPanel::QtTopologySplitBlockWithOGridPanel (
 	// Les blocs à découper :
 	_blocksPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Blocs :", "", &mainWindow,
-			SelectionManagerIfc::D3, FilterEntity::TopoBlock);
+			SelectionManager::D3, FilterEntity::TopoBlock);
 	_blocksPanel->setMultiSelectMode (true);
 	connect (_blocksPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -75,7 +75,7 @@ QtTopologySplitBlockWithOGridPanel::QtTopologySplitBlockWithOGridPanel (
 	// Les éventuelles faces à découper :
 	_facesPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Faces :", "", &mainWindow,
-			SelectionManagerIfc::D2, FilterEntity::TopoCoFace);
+			SelectionManager::D2, FilterEntity::TopoCoFace);
 	_facesPanel->setMultiSelectMode (true);
 	connect (_facesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));

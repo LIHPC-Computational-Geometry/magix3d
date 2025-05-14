@@ -662,7 +662,7 @@ QtInterpolatedEdgeDiscretisationPanel::QtInterpolatedEdgeDiscretisationPanel (
 	         SLOT (refEntitiesCallback ( )));
 	hlayout->addWidget (_referenceComboBox);
 	_refEntitiesTextField	= new QtEntityIDTextField (
-		this, &window, SelectionManagerIfc::D1, FilterEntity::TopoCoEdge);
+		this, &window, SelectionManager::D1, FilterEntity::TopoCoEdge);
 	_refEntitiesTextField->setMultiSelectMode (true);
 	hlayout->addWidget (_refEntitiesTextField);
 	connect (_refEntitiesTextField, SIGNAL (entitiesAddedToSelection(QString)),
@@ -851,14 +851,14 @@ void QtInterpolatedEdgeDiscretisationPanel::refEntitiesCallback ( )
 				_refEntitiesTextField->setFilteredTypes (
 												FilterEntity::TopoCoEdge);
 				_refEntitiesTextField->setFilteredDimensions (
-												SelectionManagerIfc::D1);
+												SelectionManager::D1);
 				_refEntitiesTextField->setMultiSelectMode (true);
 				break;
 			case	1	:	// Face
 				_refEntitiesTextField->setFilteredTypes (
 												FilterEntity::TopoCoFace);
 				_refEntitiesTextField->setFilteredDimensions (
-												SelectionManagerIfc::D2);
+												SelectionManager::D2);
 				_refEntitiesTextField->setMultiSelectMode (false);
 				break;
 			default		:
@@ -900,7 +900,7 @@ QtGlobalInterpolatedEdgeDiscretisationPanel::QtGlobalInterpolatedEdgeDiscretisat
 	QLabel*	label	= new QLabel (QString::fromUtf8("Premières arêtes de référence :"), this);
 	hlayout->addWidget (label);
 	_firstEdgesPanel	= new QtEntityIDTextField (
-		this, &window, SelectionManagerIfc::D1, FilterEntity::TopoCoEdge);
+		this, &window, SelectionManager::D1, FilterEntity::TopoCoEdge);
 	_firstEdgesPanel->setMultiSelectMode (true);
 	hlayout->addWidget (_firstEdgesPanel);
 	connect (_firstEdgesPanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -913,7 +913,7 @@ QtGlobalInterpolatedEdgeDiscretisationPanel::QtGlobalInterpolatedEdgeDiscretisat
 	label	= new QLabel (QString::fromUtf8("Secondes arêtes de référence :"), this);
 	hlayout->addWidget (label);
 	_secondEdgesPanel	= new QtEntityIDTextField (
-		this, &window, SelectionManagerIfc::D1, FilterEntity::TopoCoEdge);
+		this, &window, SelectionManager::D1, FilterEntity::TopoCoEdge);
 	_secondEdgesPanel->setMultiSelectMode (true);
 	hlayout->addWidget (_secondEdgesPanel);
 	connect (_secondEdgesPanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -2525,7 +2525,7 @@ QtEdgeMeshingPropertyPanel::QtEdgeMeshingPropertyPanel (
 	// Les arêtes à discrétiser :
 	_edgesPanel	= new QtMgx3DEntityPanel (
 						this, "", true, "Arêtes :", "", &mainWindow,
-						SelectionManagerIfc::D1, FilterEntity::TopoCoEdge);
+						SelectionManager::D1, FilterEntity::TopoCoEdge);
 	_edgesPanel->setMultiSelectMode (true);
 	layout->addWidget (_edgesPanel);
 	connect (_edgesPanel, SIGNAL (entitiesAddedToSelection(QString)),

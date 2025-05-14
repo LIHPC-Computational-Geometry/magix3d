@@ -80,7 +80,7 @@ namespace Mgx3D {
             //Panneau de sélection des faces à extruder
             _facesPanel = new QtMgx3DEntityPanel(
                     groupBox, "", true, "Sélection des faces à extruder",
-                    "", &mainWindow, SelectionManagerIfc::D2,
+                    "", &mainWindow, SelectionManager::D2,
                     FilterEntity::TopoCoFace);
             _facesPanel->setMultiSelectMode(true);
             connect(_facesPanel, SIGNAL (entitiesAddedToSelection(QString)),

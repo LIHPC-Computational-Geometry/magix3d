@@ -62,7 +62,7 @@ QtBetween2PntsPanel::QtBetween2PntsPanel(QWidget *parent, QtComponents::QtMgx3DM
     label = new QLabel("Point 1 :", this);
     hlayout->addWidget(label, 0, 0);
     _point1TextField = new QtEntityIDTextField(
-            this, &window, SelectionManagerIfc::D0, pointTypes);
+            this, &window, SelectionManager::D0, pointTypes);
     connect(_point1TextField, SIGNAL (entitiesAddedToSelection(QString)),
             this, SLOT (entitiesAddedToSelectionCallback(QString)));
     connect(_point1TextField, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -74,7 +74,7 @@ QtBetween2PntsPanel::QtBetween2PntsPanel(QWidget *parent, QtComponents::QtMgx3DM
     label = new QLabel("Point 2 :", this);
     hlayout->addWidget(label, 1, 0);
     _point2TextField = new QtEntityIDTextField(
-            this, &window, SelectionManagerIfc::D0, pointTypes);
+            this, &window, SelectionManager::D0, pointTypes);
     connect(_point2TextField, SIGNAL (entitiesAddedToSelection(QString)),
             this, SLOT (entitiesAddedToSelectionCallback(QString)));
     connect(_point2TextField, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -86,7 +86,7 @@ QtBetween2PntsPanel::QtBetween2PntsPanel(QWidget *parent, QtComponents::QtMgx3DM
     // Les sommets à projeter :
     _verticesPanel = new QtMgx3DEntityPanel(
             this, "", true, "Sommets :", "", &window,
-            SelectionManagerIfc::D0, FilterEntity::TopoVertex);
+            SelectionManager::D0, FilterEntity::TopoVertex);
     _verticesPanel->setMultiSelectMode(true);
     connect(_verticesPanel, SIGNAL (entitiesAddedToSelection(QString)),
             this, SLOT (entitiesAddedToSelectionCallback(QString)));
@@ -331,7 +331,7 @@ void QtBetween2PntsPanel::autoUpdate ( )
             label = new QLabel("Point 1 :", this);
             hlayout->addWidget(label, 0, 0);
             _point1TextField = new QtEntityIDTextField(
-                    this, &window, SelectionManagerIfc::D0, pointTypes);
+                    this, &window, SelectionManager::D0, pointTypes);
             connect(_point1TextField, SIGNAL (entitiesAddedToSelection(QString)),
                     this, SLOT (entitiesAddedToSelectionCallback(QString)));
             connect(_point1TextField, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -343,7 +343,7 @@ void QtBetween2PntsPanel::autoUpdate ( )
             label = new QLabel("Point 2 :", this);
             hlayout->addWidget(label, 1, 0);
             _point2TextField = new QtEntityIDTextField(
-                    this, &window, SelectionManagerIfc::D0, pointTypes);
+                    this, &window, SelectionManager::D0, pointTypes);
             connect(_point2TextField, SIGNAL (entitiesAddedToSelection(QString)),
                     this, SLOT (entitiesAddedToSelectionCallback(QString)));
             connect(_point2TextField, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -357,7 +357,7 @@ void QtBetween2PntsPanel::autoUpdate ( )
             string entityNameType = "Surface :";
             _geomEntityPanel = new QtMgx3DEntityPanel(
                     this, "", true, entityNameType, "",
-                    &window, SelectionManagerIfc::D2, surfaceTypes);
+                    &window, SelectionManager::D2, surfaceTypes);
             connect(_geomEntityPanel, SIGNAL (entitiesAddedToSelection(QString)),
                     this, SLOT (entitiesAddedToSelectionCallback(QString)));
             connect(_geomEntityPanel, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -369,7 +369,7 @@ void QtBetween2PntsPanel::autoUpdate ( )
             // Les sommets à projeter :
             _verticesPanel = new QtMgx3DEntityPanel(
                     this, "", true, "Sommet :", "", &window,
-                    SelectionManagerIfc::D0, FilterEntity::TopoVertex);
+                    SelectionManager::D0, FilterEntity::TopoVertex);
             _verticesPanel->setMultiSelectMode(false);
             connect(_verticesPanel, SIGNAL (entitiesAddedToSelection(QString)),
                     this, SLOT (entitiesAddedToSelectionCallback(QString)));

@@ -143,13 +143,13 @@ QtMgx3DPointPanel::QtMgx3DPointPanel (QWidget* parent, const string& title,
 	label->setMinimumSize (label->sizeHint ( ));
 	hlayout->addWidget (label);
 	_vertexIDTextField	= new QtEntityIDTextField (
-							this, mainWindow, SelectionManagerIfc::D0, types);
+							this, mainWindow, SelectionManager::D0, types);
 	hlayout->addWidget (_vertexIDTextField);
 
 
 	_sysCoordPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Repère :", "", mainWindow,
-			SelectionManagerIfc::D3, FilterEntity::SysCoord);
+			SelectionManager::D3, FilterEntity::SysCoord);
 	_sysCoordPanel->setMultiSelectMode (false);
 	layout->addWidget (_sysCoordPanel);
 

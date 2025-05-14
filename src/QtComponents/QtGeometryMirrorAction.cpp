@@ -84,8 +84,8 @@ QtGeometryMirrorPanel::QtGeometryMirrorPanel (
 			FilterEntity::GeomVolume);
 	_geomEntitiesPanel	= new QtEntityByDimensionSelectorPanel (
 							this, mainWindow, "Entités géométriques :", 
-							SelectionManagerIfc::ALL_DIMENSIONS,
-							filter, SelectionManagerIfc::D3, true);
+							SelectionManager::ALL_DIMENSIONS,
+							filter, SelectionManager::D3, true);
 	_geomEntitiesPanel->setMultiSelectMode (true);
 	connect (_geomEntitiesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -206,7 +206,7 @@ void QtGeometryMirrorPanel::reset ( )
 }	// QtGeometryMirrorPanel::reset
 
 
-void QtGeometryMirrorPanel::setDimension (SelectionManagerIfc::DIM dim)
+void QtGeometryMirrorPanel::setDimension (SelectionManager::DIM dim)
 {
 	CHECK_NULL_PTR_ERROR (_geomEntitiesPanel)
 	_geomEntitiesPanel->clearSelection ( );

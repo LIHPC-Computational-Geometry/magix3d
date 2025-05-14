@@ -57,7 +57,7 @@ QtTopologyFuse2FacesPanel::QtTopologyFuse2FacesPanel (
 	// La face 1 à coller :
 	_faces1Panel	= new QtMgx3DEntityPanel (
 			this, "", true, "Faces 1 :", "", &mainWindow,
-			SelectionManagerIfc::D2, FilterEntity::TopoCoFace);
+			SelectionManager::D2, FilterEntity::TopoCoFace);
 	_faces1Panel->setMultiSelectMode (true);
 	connect (_faces1Panel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -68,7 +68,7 @@ QtTopologyFuse2FacesPanel::QtTopologyFuse2FacesPanel (
 	// La face 2 à coller :
 	_faces2Panel	= new QtMgx3DEntityPanel (
 			this, "", true, "Faces 2 :", "", &mainWindow,
-			SelectionManagerIfc::D2, FilterEntity::TopoCoFace);
+			SelectionManager::D2, FilterEntity::TopoCoFace);
 	_faces2Panel->setMultiSelectMode (true);
 	connect (_faces2Panel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));

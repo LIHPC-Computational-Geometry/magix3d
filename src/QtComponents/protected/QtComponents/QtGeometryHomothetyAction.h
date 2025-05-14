@@ -12,7 +12,7 @@
 #include "QtComponents/QtMgx3DHomothetyPanel.h"
 #include "QtComponents/QtMgx3DGeomOperationAction.h"
 
-#include "Utils/SelectionManagerIfc.h"
+#include "Utils/SelectionManager.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -56,7 +56,7 @@ class QtGeometryHomothetyPanel : public QtMgx3DOperationPanel
 	/**
 	 * \param		Nouvelle dimension de saisie des entités géométriques.
 	 */
-	virtual void setDimension (Mgx3D::Utils::SelectionManagerIfc::DIM dim);
+	virtual void setDimension (Mgx3D::Utils::SelectionManager::DIM dim);
 
 	/**
 	 * \return		<I>true</I> s'il faut soumettre toutes les entités

@@ -51,7 +51,7 @@ class QtMgx3DEntityNamePanel :
     QtMgx3DEntityNamePanel (
         QWidget* parent, const std::string& name,
         Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
-        Mgx3D::Utils::SelectionManagerIfc::DIM dimensions,
+        Mgx3D::Utils::SelectionManager::DIM dimensions,
 		Utils::FilterEntity::objectType types);
 
     /**
@@ -114,7 +114,7 @@ class QtMgx3DEntityNamePanel :
 	 * \see			getFilteredDimensions
 	 */
 	virtual void setDimensions (
-							Mgx3D::Utils::SelectionManagerIfc::DIM dimensions);
+							Mgx3D::Utils::SelectionManager::DIM dimensions);
 
     /**
      * Change le type des entités attendues

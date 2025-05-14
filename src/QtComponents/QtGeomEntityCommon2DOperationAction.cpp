@@ -72,7 +72,7 @@ QtGeomEntityCommon2DOperationPanel::QtGeomEntityCommon2DOperationPanel (
 
 	// Les entités à intersequer :
 	const FilterEntity::objectType	filter	= 1 == dimension ? FilterEntity::GeomCurve : FilterEntity::GeomSurface;
-	const SelectionManagerIfc::DIM	dims	= 1 == dimension ? SelectionManagerIfc::D1 : SelectionManagerIfc::D2;
+	const SelectionManager::DIM	dims	= 1 == dimension ? SelectionManager::D1 : SelectionManager::D2;
 	_firstEntityPanel			= new QtMgx3DEntityPanel (
 							this, "", true, "Entité 1 :", "", &mainWindow, dims, filter);
 	_firstEntityPanel->setMultiSelectMode (false);

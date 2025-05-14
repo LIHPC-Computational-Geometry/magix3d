@@ -62,7 +62,7 @@ QtTopologyExtendSplitBlockPanel::QtTopologyExtendSplitBlockPanel (
 	// Le bloc à découper :
 	_blockPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Bloc  :", "", &mainWindow,
-			SelectionManagerIfc::D3, FilterEntity::TopoBlock);
+			SelectionManager::D3, FilterEntity::TopoBlock);
 	connect (_blockPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
 	connect (_blockPanel, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -72,7 +72,7 @@ QtTopologyExtendSplitBlockPanel::QtTopologyExtendSplitBlockPanel (
 	// L'arête orthogonale au plan de coupe :
 	_edgePanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Arête :", "", &mainWindow,
-			SelectionManagerIfc::D1, FilterEntity::TopoCoEdge);
+			SelectionManager::D1, FilterEntity::TopoCoEdge);
 	connect (_edgePanel->getNameTextField ( ),
 	         SIGNAL (selectionModified (QString)), this,
 	         SLOT (parametersModifiedCallback ( )));

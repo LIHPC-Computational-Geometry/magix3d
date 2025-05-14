@@ -9,7 +9,7 @@
 #ifndef MGX3D_GROUP_GROUPMANAGER_H_
 #define MGX3D_GROUP_GROUPMANAGER_H_
 /*----------------------------------------------------------------------------*/
-#include "Utils/SelectionManagerIfc.h"
+#include "Utils/SelectionManager.h"
 #include "Internal/CommandCreator.h"
 #include "Internal/M3DCommandResult.h"
 #include "Geom/GeomEntity.h"
@@ -153,7 +153,7 @@ public:
     void getGroup0D(std::vector<Group0D*>& grp, const bool onlyLive=true) const;
 
     /// retourne la liste des groupes de dimensions dims, sans ou avec ceux détruits
-    void getGroups (std::vector<GroupEntity*>& grp, Mgx3D::Utils::SelectionManagerIfc::DIM dims, const bool onlyLive=true) const;
+    void getGroups (std::vector<GroupEntity*>& grp, Mgx3D::Utils::SelectionManager::DIM dims, const bool onlyLive=true) const;
 
     /*------------------------------------------------------------------------*/
     /** Fonction qui à partir d'un filtre (stocké) et des ensembles des groupes qui

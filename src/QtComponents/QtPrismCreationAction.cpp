@@ -76,7 +76,7 @@ QtPrismCreationPanel::QtPrismCreationPanel (
 	// Surfaces de base :
 	_surfacesPanel	= new QtMgx3DEntityPanel (
 						this, "", true, "Surfaces à extruder :", "",
-						&mainWindow, SelectionManagerIfc::D2,
+						&mainWindow, SelectionManager::D2,
 						FilterEntity::GeomSurface);
 	_surfacesPanel->setMultiSelectMode (true);
 	layout->addWidget (_surfacesPanel);

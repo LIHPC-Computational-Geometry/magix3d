@@ -58,7 +58,7 @@ QtTopologyFuse2VerticesPanel::QtTopologyFuse2VerticesPanel (
 	// Le sommet 1 à coller :
 	_vertex1Panel	= new QtMgx3DEntityPanel (
 			this, "", true, "Sommet 1 :", "", &mainWindow,
-			SelectionManagerIfc::D0, FilterEntity::TopoVertex);
+			SelectionManager::D0, FilterEntity::TopoVertex);
 //	_vertex1Panel->setMultiSelectMode (true);
 	connect (_vertex1Panel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -69,7 +69,7 @@ QtTopologyFuse2VerticesPanel::QtTopologyFuse2VerticesPanel (
 	// Le sommet 2 à coller :
 	_vertex2Panel	= new QtMgx3DEntityPanel (
 			this, "", true, "Sommet 2 :", "", &mainWindow,
-			SelectionManagerIfc::D0, FilterEntity::TopoVertex);
+			SelectionManager::D0, FilterEntity::TopoVertex);
 //	_vertex2Panel->setMultiSelectMode (true);
 	connect (_vertex2Panel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));

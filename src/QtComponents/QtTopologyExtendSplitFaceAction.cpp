@@ -62,7 +62,7 @@ QtTopologyExtendSplitFacePanel::QtTopologyExtendSplitFacePanel (
 	// La face à découper :
 	_facePanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Face  :", "", &mainWindow,
-			SelectionManagerIfc::D2, FilterEntity::TopoCoFace);
+			SelectionManager::D2, FilterEntity::TopoCoFace);
 	connect (_facePanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
 	connect (_facePanel, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -72,7 +72,7 @@ QtTopologyExtendSplitFacePanel::QtTopologyExtendSplitFacePanel (
 	// L'arête orthogonale au plan de coupe :
 	_vertexPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Sommet :", "", &mainWindow,
-			SelectionManagerIfc::D0, FilterEntity::TopoVertex);
+			SelectionManager::D0, FilterEntity::TopoVertex);
 	connect (_vertexPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
 	connect (_vertexPanel, SIGNAL (entitiesRemovedFromSelection(QString)),

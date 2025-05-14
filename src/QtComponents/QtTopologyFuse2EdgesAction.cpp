@@ -58,7 +58,7 @@ QtTopologyFuse2EdgesPanel::QtTopologyFuse2EdgesPanel (
 	// L'arête 1 à coller :
 	_edges1Panel	= new QtMgx3DEntityPanel (
 			this, "", true, "Arêtes 1 :", "", &mainWindow,
-			SelectionManagerIfc::D1, FilterEntity::TopoCoEdge);
+			SelectionManager::D1, FilterEntity::TopoCoEdge);
 	_edges1Panel->setMultiSelectMode (true);
 	connect (_edges1Panel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -69,7 +69,7 @@ QtTopologyFuse2EdgesPanel::QtTopologyFuse2EdgesPanel (
 	// L'arête 2 à coller :
 	_edges2Panel	= new QtMgx3DEntityPanel (
 			this, "", true, "Arêtes 2 :", "", &mainWindow,
-			SelectionManagerIfc::D1, FilterEntity::TopoCoEdge);
+			SelectionManager::D1, FilterEntity::TopoCoEdge);
 	_edges2Panel->setMultiSelectMode (true);
 	connect (_edges2Panel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));

@@ -75,19 +75,19 @@ QtAngleMeasurementOperationPanel::QtAngleMeasurementOperationPanel (
 				FilterEntity::GeomVertex | FilterEntity::TopoVertex);
 
 	_entityCenterPanel  = new QtMgx3DEntityPanel (this, "", true, "Centre (Vertex/Sommet) :", "",
-			&mainWindow, SelectionManagerIfc::D0, filter);
+			&mainWindow, SelectionManager::D0, filter);
 	vlayout->addWidget (_entityCenterPanel);
 	connect (_entityCenterPanel, SIGNAL (selectionModified (QString)),
 		         this, SLOT (selectionModifiedCallback ( )));
 
 	_entity1Panel  = new QtMgx3DEntityPanel (this, "", true, "Point 1 (Vertex/Sommet) :", "",
-			&mainWindow, SelectionManagerIfc::D0, filter);
+			&mainWindow, SelectionManager::D0, filter);
 	vlayout->addWidget (_entity1Panel);
 	connect (_entity1Panel, SIGNAL (selectionModified (QString)),
 		         this, SLOT (selectionModifiedCallback ( )));
 
 	_entity2Panel  = new QtMgx3DEntityPanel (this, "", true, "Point 2 (Vertex/Sommet) :", "",
-			&mainWindow, SelectionManagerIfc::D0, filter);
+			&mainWindow, SelectionManager::D0, filter);
 	vlayout->addWidget (_entity2Panel);
 	connect (_entity2Panel, SIGNAL (selectionModified (QString)),
 		         this, SLOT (selectionModifiedCallback ( )));

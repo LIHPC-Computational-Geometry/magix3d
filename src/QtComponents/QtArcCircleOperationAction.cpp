@@ -250,7 +250,7 @@ QtAnglesSysCoordsArcPanel::QtAnglesSysCoordsArcPanel (QWidget* parent, QtMgx3DMa
 	_rayLengthTextField->setRange (0., NumericServices::doubleMachMax ( ));
 	connect(_rayLengthTextField, SIGNAL (textEdited (const QString&)), this, SLOT (parametersModifiedCallback()));
 	hlayout->addWidget (_rayLengthTextField);
-	_sysCoordPanel	= new QtMgx3DEntityPanel (this, "", true, "Repère :", "", &window, SelectionManagerIfc::D3, FilterEntity::SysCoord);
+	_sysCoordPanel	= new QtMgx3DEntityPanel (this, "", true, "Repère :", "", &window, SelectionManager::D3, FilterEntity::SysCoord);
 	_sysCoordPanel->setMultiSelectMode (false);
 	connect(_sysCoordPanel, SIGNAL (selectionModified (QString)), this, SLOT (parametersModifiedCallback()));
 	layout->addWidget (_sysCoordPanel);

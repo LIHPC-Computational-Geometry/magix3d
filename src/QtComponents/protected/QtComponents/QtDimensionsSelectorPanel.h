@@ -7,7 +7,7 @@
 #define QT_DIMENSIONS_SELECTOR_PANEL_H
 
 
-#include "Utils/SelectionManagerIfc.h"
+#include "Utils/SelectionManager.h"
 
 #include <QButtonGroup>
 #include <QCheckBox>
@@ -22,7 +22,7 @@ namespace QtComponents
 
 /**
  * Classe permettant la saisie d'une combinaisons de dimensions selon le type
- * énuméré <I>SelectionManagerIfc::DIM</I>.
+ * énuméré <I>SelectionManager::DIM</I>.
  */
 class QtDimensionsSelectorPanel : public QWidget
 {
@@ -40,8 +40,8 @@ class QtDimensionsSelectorPanel : public QWidget
 	 */
 	QtDimensionsSelectorPanel (
 				QWidget* parent,
-				Mgx3D::Utils::SelectionManagerIfc::DIM allowedDimensions,
-				Mgx3D::Utils::SelectionManagerIfc::DIM defaultDimensions,
+				Mgx3D::Utils::SelectionManager::DIM allowedDimensions,
+				Mgx3D::Utils::SelectionManager::DIM defaultDimensions,
 				bool allowMultipleDimensions);
 
 	/**
@@ -60,34 +60,34 @@ class QtDimensionsSelectorPanel : public QWidget
 	 * \return		Les dimensions sélectionnées par l'utilisateur.
 	 * \see			setDimensions
 	 */
-	virtual Mgx3D::Utils::SelectionManagerIfc::DIM getDimensions ( ) const;
+	virtual Mgx3D::Utils::SelectionManager::DIM getDimensions ( ) const;
 
 	/**
 	 * \param		Nouvelles dimensions.
 	 * \see			getDimensions
 	 */
-	virtual void setDimensions (Mgx3D::Utils::SelectionManagerIfc::DIM dims);
+	virtual void setDimensions (Mgx3D::Utils::SelectionManager::DIM dims);
 
 	/**
 	 * \return		Les dimensions sélectionnables.
 	 * \see			setAllowedDimensions
 	 * \see			isDimensionAllowed
 	 */
-	virtual Mgx3D::Utils::SelectionManagerIfc::DIM getAllowedDimensions ( ) const;
+	virtual Mgx3D::Utils::SelectionManager::DIM getAllowedDimensions ( ) const;
 	
 	/**
 	 * \return		true si la dimension transmise en argument est séleectionnable, false dans le cas contraire.
 	 * \see			setAllowedDimensions
 	 * \see			getAllowedDimensions
 	 */
-	virtual bool isDimensionAllowed (Mgx3D::Utils::SelectionManagerIfc::DIM dimension) const;
+	virtual bool isDimensionAllowed (Mgx3D::Utils::SelectionManager::DIM dimension) const;
 	
 	/**
 	 * Actualise le panneau conformément aux dimensions reçues en argument.
 	 * \param		Nouvelles dimensions sélectionnables.
 	 * \see			getAllowedDimensions
 	 */
-	virtual void setAllowedDimensions (Mgx3D::Utils::SelectionManagerIfc::DIM dimensions);
+	virtual void setAllowedDimensions (Mgx3D::Utils::SelectionManager::DIM dimensions);
 
 
 	signals :
@@ -122,7 +122,7 @@ class QtDimensionsSelectorPanel : public QWidget
 	QCheckBox								*_d0CheckBox, *_d1CheckBox, *_d2CheckBox, *_d3CheckBox;
 	
 	/** Les dimensions autorisées. */
-	Mgx3D::Utils::SelectionManagerIfc::DIM	_allowedDimensions;
+	Mgx3D::Utils::SelectionManager::DIM	_allowedDimensions;
 };	// class QtDimensionsSelectorPanel
 
 

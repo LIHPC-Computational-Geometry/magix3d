@@ -70,8 +70,8 @@ QtTopologyTranslationPanel::QtTopologyTranslationPanel (
 			FilterEntity::TopoBlock);
 	_topoEntitiesPanel	= new QtEntityByDimensionSelectorPanel (
 							this, mainWindow, "Entités topologiques :", 
-							SelectionManagerIfc::ALL_DIMENSIONS,
-							filter, SelectionManagerIfc::D3, true);
+							SelectionManager::ALL_DIMENSIONS,
+							filter, SelectionManager::D3, true);
 	_topoEntitiesPanel->setMultiSelectMode (true);
 	connect (_topoEntitiesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -155,7 +155,7 @@ void QtTopologyTranslationPanel::reset ( )
 }	// QtTopologyTranslationPanel::reset
 
 
-void QtTopologyTranslationPanel::setDimension (SelectionManagerIfc::DIM dim)
+void QtTopologyTranslationPanel::setDimension (SelectionManager::DIM dim)
 {
 	CHECK_NULL_PTR_ERROR (_topoEntitiesPanel)
 	_topoEntitiesPanel->clearSelection ( );

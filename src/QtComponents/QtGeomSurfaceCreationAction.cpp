@@ -76,12 +76,12 @@ QtGeomSurfaceCreationPanel::QtGeomSurfaceCreationPanel (
 	const FilterEntity::objectType	filter	=
 				(FilterEntity::objectType)(
 							FilterEntity::GeomVertex | FilterEntity::GeomCurve);
-	const SelectionManagerIfc::DIM	dimensions	=
-				(SelectionManagerIfc::DIM)(
-							SelectionManagerIfc::D0 | SelectionManagerIfc::D1);
+	const SelectionManager::DIM	dimensions	=
+				(SelectionManager::DIM)(
+							SelectionManager::D0 | SelectionManager::D1);
 	_contourEntitiesPanel	= new QtEntityByDimensionSelectorPanel (
 						this, mainWindow, "Entités géométriques :", dimensions,
-						filter, SelectionManagerIfc::D1, false);
+						filter, SelectionManager::D1, false);
 	_contourEntitiesPanel->setMultiSelectMode (true);
 	connect (_contourEntitiesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -140,7 +140,7 @@ string QtGeomSurfaceCreationPanel::getGroupName ( ) const
 int QtGeomSurfaceCreationPanel::getDimension ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_contourEntitiesPanel)
-	return SelectionManagerIfc::dimensionsToDimension (
+	return SelectionManager::dimensionsToDimension (
 									_contourEntitiesPanel->getDimensions ( ));
 }	// QtGeomSurfaceCreationPanel::getDimension
 
@@ -153,7 +153,7 @@ void QtGeomSurfaceCreationPanel::setDimension (int dimension)
 	{
 		_contourEntitiesPanel->clearSelection ( );
 		_contourEntitiesPanel->setDimensions (
-						SelectionManagerIfc::dimensionToDimensions (dimension));
+						SelectionManager::dimensionToDimensions (dimension));
 		_namePanel->setDimension (dimension);
 	}	// if (dimension != getDimension ( ))
 }	// QtGeomSurfaceCreationPanel::setDimension

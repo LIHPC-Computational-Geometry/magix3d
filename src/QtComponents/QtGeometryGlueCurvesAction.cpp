@@ -60,7 +60,7 @@ QtGeometryGlueCurvesPanel::QtGeometryGlueCurvesPanel (
 	// Les courbes à coller :
 	_curvesPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Courbes :", "", &mainWindow,
-			SelectionManagerIfc::D1, FilterEntity::GeomCurve);
+			SelectionManager::D1, FilterEntity::GeomCurve);
 	_curvesPanel->setMultiSelectMode (true);
 	connect (_curvesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));

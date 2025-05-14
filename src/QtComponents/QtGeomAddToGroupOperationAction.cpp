@@ -101,8 +101,8 @@ QtGeomAddToGroupOperationPanel::QtGeomAddToGroupOperationPanel (
 			FilterEntity::GeomVolume);
 	_geomEntitiesPanel	= new QtEntityByDimensionSelectorPanel (
 							this, mainWindow, "Entités géométriques :", 
-							SelectionManagerIfc::ALL_DIMENSIONS,
-							filter, SelectionManagerIfc::D3, false);
+							SelectionManager::ALL_DIMENSIONS,
+							filter, SelectionManager::D3, false);
 	_geomEntitiesPanel->setMultiSelectMode (true);
 	connect (_geomEntitiesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -167,14 +167,14 @@ QtGeomAddToGroupOperationPanel::OPERATION
 }	// QtGeomAddToGroupOperationPanel::getOperation
 
 
-SelectionManagerIfc::DIM QtGeomAddToGroupOperationPanel::getDimension ( ) const
+SelectionManager::DIM QtGeomAddToGroupOperationPanel::getDimension ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_geomEntitiesPanel)
 	return _geomEntitiesPanel->getDimensions ( );
 }	// QtGeomAddToGroupOperationPanel::getDimension
 
 
-void QtGeomAddToGroupOperationPanel::setDimension (SelectionManagerIfc::DIM dim)
+void QtGeomAddToGroupOperationPanel::setDimension (SelectionManager::DIM dim)
 {
 	CHECK_NULL_PTR_ERROR (_geomEntitiesPanel)
 	CHECK_NULL_PTR_ERROR (_namePanel)
@@ -185,10 +185,10 @@ void QtGeomAddToGroupOperationPanel::setDimension (SelectionManagerIfc::DIM dim)
 		int	dimension	= 3;
 		switch (dim)
 		{
-			case	SelectionManagerIfc::D0	: dimension	= 0;	break;
-			case	SelectionManagerIfc::D1	: dimension	= 1;	break;
-			case	SelectionManagerIfc::D2	: dimension	= 2;	break;
-			case	SelectionManagerIfc::D3	: dimension	= 3;	break;
+			case	SelectionManager::D0	: dimension	= 0;	break;
+			case	SelectionManager::D1	: dimension	= 1;	break;
+			case	SelectionManager::D2	: dimension	= 2;	break;
+			case	SelectionManager::D3	: dimension	= 3;	break;
 		}	// switch (dim)
 		_namePanel->setDimension (dimension);
 	}	// if (dim != _geomEntitiesPanel->getDimensions ( ))
@@ -340,7 +340,7 @@ void QtGeomAddToGroupOperationPanel::dimensionsModifiedCallback ( )
 	if (0 != _namePanel)
 	{
 		_namePanel->setDimension (
-			SelectionManagerIfc::dimensionsToDimension (getDimension ( )));
+			SelectionManager::dimensionsToDimension (getDimension ( )));
 		_namePanel->autoUpdate ( );
 	}	// if (0 != _namePanel)
 	
@@ -405,7 +405,7 @@ void QtGeomAddToGroupOperationAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (panel)
 	const string		groupName	= panel->getGroupName ( );
 	vector<string>		entities	= panel->getGeomEntitiesNames ( );
-	const int			dim			= SelectionManagerIfc::dimensionsToDimension (panel->getDimension ( ));
+	const int			dim			= SelectionManager::dimensionsToDimension (panel->getDimension ( ));
 	const QtGeomAddToGroupOperationPanel::OPERATION	operation	= panel->getOperation ( );
 
 	switch (operation)
