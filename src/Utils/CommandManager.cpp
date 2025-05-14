@@ -34,11 +34,11 @@ namespace Utils {
 // on force le séquentiel comme défaut
 unsigned long   			CommandManager::sequentialDuration  = (unsigned long)-1;
 
-CommandManagerIfc::POLICY	CommandManager::runningPolicy		= CommandManagerIfc::THREADED;
+CommandManager::POLICY	CommandManager::runningPolicy		= CommandManager::THREADED;
 
 
 CommandManager::CommandManager (const string& name)
-	: CommandManagerIfc ( ), ReferencedNamedObject (name),
+	: ReferencedNamedObject (name),
 	  _runners ( ), _runnersMutex (false),
 	  _commandObservers ( ), _logStream (0),
 	  _undoManager (new UndoRedoManager ("UndoRedoManager")),
@@ -51,7 +51,7 @@ CommandManager::CommandManager (const string& name)
 
 
 CommandManager::CommandManager (const CommandManager&)
-	: CommandManagerIfc ( ), ReferencedNamedObject ("unamed"),
+	: ReferencedNamedObject ("unamed"),
 	  _runners ( ), _runnersMutex (false),
 	  _commandObservers ( ), _logStream (0), _undoManager(0),
 	  _commands ( ), _queuedCommands ( ),
@@ -105,13 +105,13 @@ const string& CommandManager::getName ( ) const
 }	// CommandManager::getName
 
 
-CommandManagerIfc::POLICY CommandManager::getPolicy ( ) const
+CommandManager::POLICY CommandManager::getPolicy ( ) const
 {
 	return _policy;
 }   // CommandManager::getPolicy
 
 
-CommandManagerIfc::POLICY CommandManager::setPolicy (POLICY policy)
+CommandManager::POLICY CommandManager::setPolicy (POLICY policy)
 {
 	AutoMutex	queuingAutoMutex (&_queuingMutex);
 
@@ -167,7 +167,7 @@ void CommandManager::addCommand (Command* cmd, Command::PLAY_TYPE pt)
 	{
 
 		if ((Command::QUEUED == pt) ||
-				((CommandManagerIfc::SEQUENTIAL == getPolicy ( )) &&
+				((SEQUENTIAL == getPolicy ( )) &&
 						((true == hasRunning) || (true == hasQueuedCommands( ))) ||
 						((true == hasRunning) &&
 								((Command::UNDO == pt) || Command::REDO == pt)))
@@ -247,7 +247,7 @@ void CommandManager::addCommand (Command* cmd, Command::PLAY_TYPE pt)
 		if (Command::UNDO != pt)
 			estimatedTime = command->getEstimatedDuration (pt);
 //unsigned long	estimatedTime	= 999999999999;
-		if ((CommandManagerIfc::SEQUENTIAL == getPolicy ( )) ||
+		if ((SEQUENTIAL == getPolicy ( )) ||
 				(false == command->threadable ( ))   ||
 				(estimatedTime < sequentialDuration) ||
 				(Command::UNDO == pt)             ||
@@ -766,7 +766,7 @@ void CommandManager::runQueuedCommand ( )
 			}
 
 			unsigned long	estimatedTime	= cmd->getEstimatedDuration (pt);
-			if ((CommandManagerIfc::SEQUENTIAL == getPolicy ( )) ||
+			if ((SEQUENTIAL == getPolicy ( )) ||
 			    (false == cmd->threadable ( ))       ||
 			    (estimatedTime < sequentialDuration) ||
 			    (Command::UNDO == pt)             ||

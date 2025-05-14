@@ -3,7 +3,7 @@
 
 
 #include "Internal/ScriptingManager.h"
-#include "Utils/CommandManagerIfc.h"
+#include "Utils/CommandManager.h"
 #include <QtPython3/QtPythonConsole.h>
 
 
@@ -173,7 +173,7 @@ class QtMgx3DPythonConsole : public QtPythonConsole
 	/** Police du gestionnaire de commandes à restaurer lorsque la console
 	 * aura fini de fonctionner.
 	 */
-	Mgx3D::Utils::CommandManagerIfc::POLICY			_cmdMgrPolicy;
+	Mgx3D::Utils::CommandManager::POLICY			_cmdMgrPolicy;
 	
 	/** Les actions d'insertion de la sélection courante. */
 	QAction											*_insertSelectedEntitiesAction,

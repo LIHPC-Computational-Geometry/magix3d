@@ -22,7 +22,7 @@ namespace QtComponents
 #include "Geom/GeomManager.h"
 #include "Topo/TopoManager.h"
 #include "Mesh/MeshManager.h"
-#include "Utils/CommandManagerIfc.h"
+#include "Utils/CommandManager.h"
 #include "Internal/M3DCommandManager.h"
 #include "Utils/UndoRedoManager.h"
 #include "QtComponents/EntitySeizureManager.h"
@@ -580,7 +580,7 @@ class QtMgx3DMainWindow :
 	/**
 	 * \return		Le gestionnaire de commandes.
 	 */
-	virtual Mgx3D::Utils::CommandManagerIfc& getCommandManager ( );
+	virtual Mgx3D::Utils::CommandManager& getCommandManager ( );
 
 	/**
 	 * Affiche une fenêtre informant du changement de version

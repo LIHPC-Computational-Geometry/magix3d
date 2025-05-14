@@ -22,7 +22,7 @@ class Log;
 namespace Mgx3D {
 
 namespace Utils {
-class CommandManagerIfc;
+class CommandManager;
 }
 /*----------------------------------------------------------------------------*/
 namespace Internal {
@@ -73,7 +73,7 @@ public:
     virtual void log (const TkUtil::Log& log);
 
     /** retourne le CommandManager */
-    virtual Utils::CommandManagerIfc& getCommandManager();
+    virtual Utils::CommandManager& getCommandManager();
 
     /** retourne le contexte */
     virtual const Internal::Context& getContext() const;

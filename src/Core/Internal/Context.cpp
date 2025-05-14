@@ -848,13 +848,13 @@ void Context::setStructuredMeshManager (Mgx3D::Structured::StructuredMeshManager
 	m_structured_mesh_manager	= manager;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Utils::CommandManagerIfc& Context::getCommandManager()
+Mgx3D::Utils::CommandManager& Context::getCommandManager()
 {
 	CHECK_NULL_PTR_ERROR (m_command_manager)
 	return *m_command_manager;
 }
 /*----------------------------------------------------------------------------*/
-void Context::setCommandManager (Mgx3D::Utils::CommandManagerIfc* mgr)
+void Context::setCommandManager (Mgx3D::Utils::CommandManager* mgr)
 {
 	delete m_command_manager;
 	m_command_manager	= mgr;

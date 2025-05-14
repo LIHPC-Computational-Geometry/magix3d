@@ -45,17 +45,17 @@ using namespace Mgx3D::Internal;
 #define USE_SEQUENTIAL_POLICY                                                \
 if (0 != getMainWindow ( ))                                                  \
 	cmdMgrPolicy	= getMainWindow ( )->getContext (                        \
-				).getCommandManager( ).setPolicy(CommandManagerIfc::SEQUENTIAL);
+				).getCommandManager( ).setPolicy(CommandManager::SEQUENTIAL);
 
 #define RETURN_TO_PREVIOUS_POLICY                                            \
 if (0 != getMainWindow ( ))                                                  \
 {                                                                            \
 	try                                                                      \
 	{                                                                        \
-		if ((CommandManagerIfc::POLICY)-1 != cmdMgrPolicy)                  \
+		if ((CommandManager::POLICY)-1 != cmdMgrPolicy)                  \
 			getMainWindow ( )->getContext (                                  \
 						).getCommandManager( ).setPolicy(cmdMgrPolicy);     \
-		cmdMgrPolicy	= (CommandManagerIfc::POLICY)-1;                     \
+		cmdMgrPolicy	= (CommandManager::POLICY)-1;                     \
 	}                                                                        \
 	catch (...)                                                              \
 	{                                                                        \
@@ -78,7 +78,7 @@ namespace QtComponents
 
 QtMgx3DPythonConsole::QtMgx3DPythonConsole (QWidget* parent, QtMgx3DMainWindow* mainWindow, const string& title)
 	: QtPythonConsole (parent, title),
-	  _mgxUserScriptingManager (0), _mainWindow (mainWindow), _graphicalWidget (0), _cmdMgrPolicy ((CommandManagerIfc::POLICY)-1),
+	  _mgxUserScriptingManager (0), _mainWindow (mainWindow), _graphicalWidget (0), _cmdMgrPolicy ((CommandManager::POLICY)-1),
 	  _insertSelectedEntitiesAction (0),
 	  _insertSelectedVolumesAction (0), _insertSelectedSurfacesAction (0), _insertSelectedCurvesAction (0), _insertSelectedGeomVerticesAction (0),
 	  _insertSelectedBlocksAction (0), _insertSelectedFacesAction (0), _insertSelectedEdgesAction (0), _insertSelectedTopoVerticesAction (0),
@@ -116,7 +116,7 @@ QtMgx3DPythonConsole::QtMgx3DPythonConsole (QWidget* parent, QtMgx3DMainWindow* 
 
 QtMgx3DPythonConsole::QtMgx3DPythonConsole (const QtMgx3DPythonConsole&)
 	: QtPythonConsole (0, ""),
-	  _mgxUserScriptingManager (0), _mainWindow (0), _graphicalWidget (0), _cmdMgrPolicy ((CommandManagerIfc::POLICY)-1),
+	  _mgxUserScriptingManager (0), _mainWindow (0), _graphicalWidget (0), _cmdMgrPolicy ((CommandManager::POLICY)-1),
 	  _insertSelectedEntitiesAction (0),
 	  _insertSelectedVolumesAction (0), _insertSelectedSurfacesAction (0), _insertSelectedCurvesAction (0), _insertSelectedGeomVerticesAction (0),
 	  _insertSelectedBlocksAction (0), _insertSelectedFacesAction (0), _insertSelectedEdgesAction (0), _insertSelectedTopoVerticesAction (0),
@@ -278,7 +278,7 @@ void QtMgx3DPythonConsole::executeFile (const std::string& fileName)
 	
 	unique_ptr<RenderingManager::DisplayLocker>	displayLocker (0 == _graphicalWidget ? 0 : new RenderingManager::DisplayLocker (_graphicalWidget->getRenderingManager ( )));
 
-	CommandManagerIfc::POLICY	cmdMgrPolicy	= CommandManagerIfc::THREADED;
+	CommandManager::POLICY	cmdMgrPolicy	= CommandManager::THREADED;
 // Le PythonConsole reposant sur la QConsole ne supporte pas les instructions écrites sur plusieurs lignes ... => on passe par PythonSession :
 	CHECK_NULL_PTR_ERROR (getMainWindow ( ))
 
@@ -565,8 +565,8 @@ QAction& QtMgx3DPythonConsole::insertSelectedCloudsAction ( )
 
 void QtMgx3DPythonConsole::storePolicy ( )
 {
-	if ((0 != getMainWindow ( )) && ((CommandManagerIfc::POLICY)-1 == _cmdMgrPolicy))
-		_cmdMgrPolicy	= getMainWindow ( )->getContext ( ).getCommandManager( ).setPolicy(CommandManagerIfc::SEQUENTIAL);
+	if ((0 != getMainWindow ( )) && ((CommandManager::POLICY)-1 == _cmdMgrPolicy))
+		_cmdMgrPolicy	= getMainWindow ( )->getContext ( ).getCommandManager( ).setPolicy(CommandManager::SEQUENTIAL);
 }	// QtMgx3DPythonConsole::storePolicy
 
 
@@ -576,9 +576,9 @@ void QtMgx3DPythonConsole::restorePolicy ( )
 	{
 		try
 		{
-			if ((CommandManagerIfc::POLICY)-1 != _cmdMgrPolicy)
+			if ((CommandManager::POLICY)-1 != _cmdMgrPolicy)
 				getMainWindow ( )->getContext ( ).getCommandManager( ).setPolicy(_cmdMgrPolicy);
-			_cmdMgrPolicy	= (CommandManagerIfc::POLICY)-1;
+			_cmdMgrPolicy	= (CommandManager::POLICY)-1;
 		}
 		catch (...)
 		{

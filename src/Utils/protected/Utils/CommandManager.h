@@ -10,7 +10,6 @@
 #ifndef UTILS_COMMAND_MANAGER_H_
 #define UTILS_COMMAND_MANAGER_H_
 
-#include "Utils/CommandManagerIfc.h"
 #include "Utils/CommandRunner.h"
 
 #include <TkUtil/ReferencedObject.h>
@@ -45,10 +44,23 @@ class UndoRedoManager;
  *         <I>TkUtil::Exception</I>.
  */
 /*----------------------------------------------------------------------------*/
-class CommandManager :
-	public Mgx3D::Utils::CommandManagerIfc, public TkUtil::ReferencedNamedObject
+class CommandManager : public TkUtil::ReferencedNamedObject
 {
 	public:
+
+	/**
+	 * Politique de fonctionnement du gestionnaire de commande :<BR>
+	 * <UL>
+	 * <LI><I>THREADED</I> : lancement possible de commandes dans des threads
+	 * dédiés,
+	 * <LI>SEQUENTIAL</I> : les tâches sont lancées séquentiellement. Si une
+	 * commande est soumise alors qu'une autre est en cours d'exécution, cette
+	 * nouvelle commande est mise en file d'attente. Les commandes en file
+	 * d'attente sont lancées une à une, dans leur ordre de soumission, lorsque
+	 * plus aucune commande n'est en cours d'exécution.
+	 * </UL>
+	 */
+	enum POLICY {THREADED, SEQUENTIAL};
 
 	/**
 	 * Durée estimée d'une commande, en secondes, à partir de laquelle la
@@ -67,7 +79,7 @@ class CommandManager :
 	 * que les politique peuvent évoluer temporairement, dans le cadre
 	 * d'exécution de scripts par exemple).
 	 */
-	static CommandManagerIfc::POLICY	runningPolicy;
+	static CommandManager::POLICY	runningPolicy;
 
 	/**
 	 * Constructeur. RAS.
@@ -100,15 +112,14 @@ class CommandManager :
 	 * \return  La politique d'exécution des commandes en cours.
 	 * \see		setPolicy
 	 */
-	virtual CommandManagerIfc::POLICY getPolicy ( ) const;
+	virtual POLICY getPolicy ( ) const;
 
 	/**
 	 * \param	Nouvelle politique d'exécution des commandes en cours.
 	 * \return	L'ancienne politique d'exécution des commandes en cours.
 	 * \see		getPolicy
 	 */
-	virtual CommandManagerIfc::POLICY setPolicy (
-											CommandManagerIfc::POLICY policy);
+	virtual POLICY setPolicy (POLICY policy);
 
 	/**
 	 * <P>Ajoute une commande à la liste des commandes gérées. Cette commande
@@ -389,7 +400,7 @@ class CommandManager :
 	std::deque< std::pair <Command*, Command::PLAY_TYPE> >	_queuedCommands;
 
 	/** La politique d'exécution des commandes. */
-	CommandManagerIfc::POLICY			_policy;
+	CommandManager::POLICY			_policy;
 
 	/** Un mutex non récursif pour gérer les commandes en file d'attente. */
 	mutable TkUtil::Mutex				_queuingMutex;
