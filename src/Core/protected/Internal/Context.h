@@ -182,9 +182,9 @@ public:
 	/*------------------------------------------------------------------------*/
 	/** \brief  Accesseur sur le gestionnaire de sélection.
 	 */
-	Mgx3D::Utils::SelectionManagerIfc& getSelectionManager ( );
-	const Mgx3D::Utils::SelectionManagerIfc& getSelectionManager ( ) const;
-	void setSelectionManager (Mgx3D::Utils::SelectionManagerIfc*);
+	Mgx3D::Utils::SelectionManager& getSelectionManager ( );
+	const Mgx3D::Utils::SelectionManager& getSelectionManager ( ) const;
+	void setSelectionManager (Mgx3D::Utils::SelectionManager*);
 	/*------------------------------------------------------------------------*/
 
 	/**
@@ -638,7 +638,7 @@ private:
     /// Manager pour les commandes de niveau supérieur
     Mgx3D::Internal::M3DCommandManager  m_m3d_command_manager;
     /// Manager de sélection
-    Mgx3D::Utils::SelectionManagerIfc*	m_selection_manager;
+    Mgx3D::Utils::SelectionManager*	m_selection_manager;
     /// Manager pour la gestion des noms
     Mgx3D::Internal::NameManager       *m_name_manager;
 

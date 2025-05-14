@@ -70,7 +70,7 @@ class QtGeomEntityByRevolutionCreationPanel : public QtMgx3DOperationPanel
 	/**
 	 * \param		La dimension de filtrage de l'entité soumise à la rotation.
 	 */
-	virtual void setDimension (Mgx3D::Utils::SelectionManagerIfc::DIM dim);
+	virtual void setDimension (Mgx3D::Utils::SelectionManager::DIM dim);
 
 	/**
 	 * Réinitialise le panneau.

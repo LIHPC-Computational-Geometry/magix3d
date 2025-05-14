@@ -68,7 +68,7 @@ QtMeshBlocksOperationPanel::QtMeshBlocksOperationPanel (
 	// La sélection à mailler :
 	_blocksPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Blocs à mailler :", "", &mainWindow,
-			SelectionManagerIfc::D3, FilterEntity::TopoBlock);
+			SelectionManager::D3, FilterEntity::TopoBlock);
 	_blocksPanel->setMultiSelectMode (true);
 	_verticalLayout->addWidget (_blocksPanel);
 	connect (_blocksPanel, SIGNAL (entitiesAddedToSelection(QString)),

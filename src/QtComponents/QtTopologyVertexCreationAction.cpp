@@ -65,7 +65,7 @@ QtTopologyVertexCreationPanel::QtTopologyVertexCreationPanel (
 	// Point à associer :
 	_vertexPanel	= new QtMgx3DEntityPanel (
 						this, "", true, "Point associé :", "",
-						&mainWindow, SelectionManagerIfc::D0,
+						&mainWindow, SelectionManager::D0,
 						FilterEntity::GeomVertex);
 	layout->addWidget (_vertexPanel);
 	connect (_vertexPanel, SIGNAL (entitiesAddedToSelection(QString)),

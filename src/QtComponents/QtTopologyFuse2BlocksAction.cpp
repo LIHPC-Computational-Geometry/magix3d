@@ -60,7 +60,7 @@ QtTopologyFuse2BlocksPanel::QtTopologyFuse2BlocksPanel (
 	// Le bloc 1 à fusionner :
 	_block1Panel	= new QtMgx3DEntityPanel (
 			this, "", true, "Bloc 1 :", "", &mainWindow,
-			SelectionManagerIfc::D3, FilterEntity::TopoBlock);
+			SelectionManager::D3, FilterEntity::TopoBlock);
 	connect (_block1Panel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
 	connect (_block1Panel, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -70,7 +70,7 @@ QtTopologyFuse2BlocksPanel::QtTopologyFuse2BlocksPanel (
 	// Le bloc 2 à fusionner :
 	_block2Panel	= new QtMgx3DEntityPanel (
 			this, "", true, "Bloc 2 :", "", &mainWindow,
-			SelectionManagerIfc::D3, FilterEntity::TopoBlock);
+			SelectionManager::D3, FilterEntity::TopoBlock);
 	connect (_block2Panel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
 	connect (_block2Panel, SIGNAL (entitiesRemovedFromSelection(QString)),

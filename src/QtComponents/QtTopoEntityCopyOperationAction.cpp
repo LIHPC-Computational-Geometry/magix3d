@@ -68,7 +68,7 @@ QtTopoEntityCopyOperationPanel::QtTopoEntityCopyOperationPanel (
 	// Dans la version actuelle ce ne peut être que des blocs topologiques.
 	_topoEntitiesPanel	= new QtMgx3DEntityPanel (
 							this, "", true, "Blocs à copier :", "",
-							&mainWindow, SelectionManagerIfc::D3,
+							&mainWindow, SelectionManager::D3,
 							FilterEntity::TopoBlock);
 	_topoEntitiesPanel->setMultiSelectMode (true);
 	connect (_topoEntitiesPanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -81,7 +81,7 @@ QtTopoEntityCopyOperationPanel::QtTopoEntityCopyOperationPanel (
 	// Le volume géométrique auquel on associe les blocs copiés :
 	_geomEntityPanel	= new QtMgx3DEntityPanel (
 							this, "", true, "Volume à associer :", "",
-							&mainWindow, SelectionManagerIfc::D3,
+							&mainWindow, SelectionManager::D3,
 							FilterEntity::GeomVolume);
 	connect (_geomEntityPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));

@@ -867,19 +867,19 @@ Mgx3D::Utils::CommandManager& Context::getLocalCommandManager()
     return *manager;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Utils::SelectionManagerIfc& Context::getSelectionManager ( )
+Mgx3D::Utils::SelectionManager& Context::getSelectionManager ( )
 {
 	CHECK_NULL_PTR_ERROR (m_selection_manager)
 	return *m_selection_manager;
 }
 /*----------------------------------------------------------------------------*/
-const Mgx3D::Utils::SelectionManagerIfc& Context::getSelectionManager ( ) const
+const Mgx3D::Utils::SelectionManager& Context::getSelectionManager ( ) const
 {
 	CHECK_NULL_PTR_ERROR (m_selection_manager)
 	return *m_selection_manager;
 }
 /*----------------------------------------------------------------------------*/
-void Context::setSelectionManager (Mgx3D::Utils::SelectionManagerIfc* mgr)
+void Context::setSelectionManager (Mgx3D::Utils::SelectionManager* mgr)
 {
 	delete m_selection_manager;
 	m_selection_manager	= mgr;

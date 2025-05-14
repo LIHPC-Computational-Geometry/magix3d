@@ -70,8 +70,8 @@ QtTopoEntityDestructionPanel::QtTopoEntityDestructionPanel (
 			FilterEntity::TopoBlock);
 	_topoEntitiesPanel	= new QtEntityByDimensionSelectorPanel (
 							this, mainWindow, "Entités topologiques :", 
-							SelectionManagerIfc::ALL_DIMENSIONS,
-							filter, SelectionManagerIfc::D3, true);
+							SelectionManager::ALL_DIMENSIONS,
+							filter, SelectionManager::D3, true);
 	_topoEntitiesPanel->setMultiSelectMode (true);
 	connect (_topoEntitiesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -249,7 +249,7 @@ void QtTopoEntityDestructionPanel::operationCompleted ( )
 	QtMgx3DOperationPanel::operationCompleted ( );
 }	// QtTopoEntityDestructionPanel::operationCompleted
 
-void QtTopoEntityDestructionPanel::setDimensions (Mgx3D::Utils::SelectionManagerIfc::DIM dims)
+void QtTopoEntityDestructionPanel::setDimensions (Mgx3D::Utils::SelectionManager::DIM dims)
 {
 
 	_topoEntitiesPanel->setDimensions(dims);

@@ -315,7 +315,7 @@ QtFaceMeshingPropertyPanel::QtFaceMeshingPropertyPanel (
 	// Les faces à mailler :
 	_facesPanel	= new QtMgx3DEntityPanel (
 						this, "", true, "Faces :", "", &mainWindow,
-						SelectionManagerIfc::D2, FilterEntity::TopoCoFace);
+						SelectionManager::D2, FilterEntity::TopoCoFace);
 	_facesPanel->setMultiSelectMode (true);
 	layout->addWidget (_facesPanel);
 	connect (_facesPanel, SIGNAL (entitiesAddedToSelection(QString)),

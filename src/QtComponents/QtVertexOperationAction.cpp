@@ -68,13 +68,13 @@ QtVertexOperationPanel::QtVertexCurveProjectionPanel::QtVertexCurveProjectionPan
 	setLayout (layout);
 
 	// Le point projeté :
-	_pointPanel	= new QtMgx3DEntityPanel (this, "", true, "Point projeté :", "", &window, SelectionManagerIfc::D0, FilterEntity::GeomVertex);
+	_pointPanel	= new QtMgx3DEntityPanel (this, "", true, "Point projeté :", "", &window, SelectionManager::D0, FilterEntity::GeomVertex);
 	layout->addWidget (_pointPanel);
 	connect (_pointPanel, SIGNAL (entitiesAddedToSelection(QString)), this, SLOT (entitiesAddedToSelectionCallback (QString)));
 	connect (_pointPanel, SIGNAL (entitiesRemovedFromSelection(QString)), this, SLOT (entitiesRemovedFromSelectionCallback (QString)));
 
 	// La courbe sur laquelle est projeté le point :
-	_curvePanel	= new QtMgx3DEntityPanel (this, "", true, "Courbe :", "", &window, SelectionManagerIfc::D1, FilterEntity::GeomCurve);
+	_curvePanel	= new QtMgx3DEntityPanel (this, "", true, "Courbe :", "", &window, SelectionManager::D1, FilterEntity::GeomCurve);
 	layout->addWidget (_curvePanel);
 	connect (_curvePanel, SIGNAL (entitiesAddedToSelection(QString)), this, SLOT (entitiesAddedToSelectionCallback (QString)));
 	connect (_curvePanel, SIGNAL (entitiesRemovedFromSelection(QString)), this, SLOT (entitiesRemovedFromSelectionCallback (QString)));
@@ -251,7 +251,7 @@ QtVertexOperationPanel::QtVertexSurfaceProjectionPanel::QtVertexSurfaceProjectio
 
 	// Le point projeté :
 	_pointPanel	= new QtMgx3DEntityPanel (
-			this, "", true, "Point projeté :", "", &window, SelectionManagerIfc::D0,
+			this, "", true, "Point projeté :", "", &window, SelectionManager::D0,
 			FilterEntity::GeomVertex);
 	layout->addWidget (_pointPanel);
 	connect (_pointPanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -261,7 +261,7 @@ QtVertexOperationPanel::QtVertexSurfaceProjectionPanel::QtVertexSurfaceProjectio
 
 	// La surface sur laquelle est projeté le point :
 	_surfacePanel	= new QtMgx3DEntityPanel (
-					this, "", true, "Surface :", "", &window, SelectionManagerIfc::D2,
+					this, "", true, "Surface :", "", &window, SelectionManager::D2,
 					FilterEntity::GeomSurface);
 	layout->addWidget (_surfacePanel);
 	connect (_surfacePanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -446,7 +446,7 @@ QtVertexOperationPanel::QtVerticesRatioPanel::QtVerticesRatioPanel (
 
     // Le premier point :
     _firstPointPanel	= new QtMgx3DEntityPanel (
-            this, "", true, "Premier point :", "", &window, SelectionManagerIfc::D0,
+            this, "", true, "Premier point :", "", &window, SelectionManager::D0,
             FilterEntity::GeomVertex);
     layout->addWidget (_firstPointPanel);
     connect (_firstPointPanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -456,7 +456,7 @@ QtVertexOperationPanel::QtVerticesRatioPanel::QtVerticesRatioPanel (
 
       // Le second point :
     _secondPointPanel	= new QtMgx3DEntityPanel (
-            this, "", true, "Second point :", "", &window, SelectionManagerIfc::D0,
+            this, "", true, "Second point :", "", &window, SelectionManager::D0,
             FilterEntity::GeomVertex);
     layout->addWidget (_secondPointPanel);
     connect (_secondPointPanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -637,7 +637,7 @@ QtVertexOperationPanel::QtVertexFromTopologicVertexPanel::QtVertexFromTopologicV
 	setLayout (layout);
 
 	// Le point projeté :
-	_topologicVertexPanel	= new QtMgx3DEntityPanel (this, "", true, "Sommet topologique :", "", &window, SelectionManagerIfc::D0, FilterEntity::TopoVertex);
+	_topologicVertexPanel	= new QtMgx3DEntityPanel (this, "", true, "Sommet topologique :", "", &window, SelectionManager::D0, FilterEntity::TopoVertex);
 	layout->addWidget (_topologicVertexPanel);
 	connect (_topologicVertexPanel, SIGNAL (entitiesAddedToSelection(QString)), this, SLOT (entitiesAddedToSelectionCallback (QString)));
 	connect (_topologicVertexPanel, SIGNAL (entitiesRemovedFromSelection(QString)), this, SLOT (entitiesRemovedFromSelectionCallback (QString)));

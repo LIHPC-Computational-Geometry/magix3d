@@ -149,7 +149,7 @@ class QtSelectionCommonPropertiesPanel :
 	 * \param	Eventuel gestionnaire de sélection.
 	 */
 	QtSelectionCommonPropertiesPanel (
-		QWidget* parent, const std::string& name, Utils::SelectionManagerIfc*);
+		QWidget* parent, const std::string& name, Utils::SelectionManager*);
 
 	/**
 	 * RAS.
@@ -200,7 +200,7 @@ class QtSelectionCommonPropertiesPanel :
 	 * \param		Nouveau gestionnaire de sélection. Peut être nul.
 	 */
 	virtual void setSelectionManager (
-						Mgx3D::Utils::SelectionManagerIfc* selectionManager);
+						Mgx3D::Utils::SelectionManager* selectionManager);
 
 	/**
 	 * Appelé lorsque la sélection change. Actualise l'affichage.

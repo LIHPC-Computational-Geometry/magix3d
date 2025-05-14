@@ -1149,7 +1149,7 @@ void RenderingManager::setTableDefinition (const RenderingManager::ColorTableDef
 }   // RenderingManager::setTableDefinition
 
 
-void RenderingManager::setSelectionManager (SelectionManagerIfc* manager)
+void RenderingManager::setSelectionManager (SelectionManager* manager)
 {
 	if ((manager != getSelectionManager ( )) && (0 != getSelectionManager ( )))
 	{	// TODO [CP] : annuler la sélection en cours (représentation)
@@ -1158,13 +1158,13 @@ void RenderingManager::setSelectionManager (SelectionManagerIfc* manager)
 }	// RenderingManager::setSelectionManager
 
 
-SelectionManagerIfc* RenderingManager::getSelectionManager ( )
+SelectionManager* RenderingManager::getSelectionManager ( )
 {
 	return SelectionManagerObserver::getSelectionManager ( );
 }	// RenderingManager::getSelectionManager
 
 
-const SelectionManagerIfc* RenderingManager::getSelectionManager ( ) const
+const SelectionManager* RenderingManager::getSelectionManager ( ) const
 {
 	return SelectionManagerObserver::getSelectionManager ( );
 }	// RenderingManager::getSelectionManager

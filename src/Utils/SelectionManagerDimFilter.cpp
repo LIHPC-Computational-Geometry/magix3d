@@ -33,7 +33,7 @@ namespace Utils {
 
 
 SelectionManagerDimFilter::SelectionManagerDimFilter (const string& name, LogOutputStream* los)
-	: SelectionManager (name, los), _dimensions (SelectionManagerIfc::NO_DIM),
+	: SelectionManager (name, los), _dimensions (SelectionManager::NO_DIM),
 	  _filteredTypes (FilterEntity::All)
 {
 }	// SelectionManagerDimFilter::SelectionManagerDimFilter
@@ -41,7 +41,7 @@ SelectionManagerDimFilter::SelectionManagerDimFilter (const string& name, LogOut
 
 SelectionManagerDimFilter::SelectionManagerDimFilter (const SelectionManagerDimFilter&)
 	: SelectionManager ("Invalid selection manager", 0),
-	  _dimensions (SelectionManagerIfc::NO_DIM),
+	  _dimensions (SelectionManager::NO_DIM),
 	  _filteredTypes (FilterEntity::All)
 {
     MGX_FORBIDDEN("SelectionManagerDimFilter::SelectionManagerDimFilter (const SelectionManagerDimFilter&) forbidden.");
@@ -91,7 +91,7 @@ FilterEntity::objectType SelectionManagerDimFilter::getFilteredTypes ( ) const
 }	// SelectionManagerDimFilter::getFilteredTypes
 
 
-SelectionManagerIfc::DIM SelectionManagerDimFilter::getFilteredDimensions ( ) const
+SelectionManager::DIM SelectionManagerDimFilter::getFilteredDimensions ( ) const
 {
 	return _dimensions;
 }	// SelectionManagerDimFilter::getFilteredDimensions
@@ -99,29 +99,29 @@ SelectionManagerIfc::DIM SelectionManagerDimFilter::getFilteredDimensions ( ) co
 
 bool SelectionManagerDimFilter::is0DSelectionActivated ( ) const
 {
-	return 0 != (_dimensions & SelectionManagerIfc::D0) ? true : false;
+	return 0 != (_dimensions & SelectionManager::D0) ? true : false;
 }	// SelectionManagerDimFilter::is0DSelectionActivated
 
 
 bool SelectionManagerDimFilter::is1DSelectionActivated ( ) const
 {
-	return 0 != (_dimensions & SelectionManagerIfc::D1) ? true : false;
+	return 0 != (_dimensions & SelectionManager::D1) ? true : false;
 }	// SelectionManagerDimFilter::is1DSelectionActivated
 
 
 bool SelectionManagerDimFilter::is2DSelectionActivated ( ) const
 {
-	return 0 != (_dimensions & SelectionManagerIfc::D2) ? true : false;
+	return 0 != (_dimensions & SelectionManager::D2) ? true : false;
 }	// SelectionManagerDimFilter::is2DSelectionActivated
 
 
 bool SelectionManagerDimFilter::is3DSelectionActivated ( ) const
 {
-	return 0 != (_dimensions & SelectionManagerIfc::D3) ? true : false;
+	return 0 != (_dimensions & SelectionManager::D3) ? true : false;
 }	// SelectionManagerDimFilter::is3DSelectionActivated
 
 
-void SelectionManagerDimFilter::activateSelection (SelectionManagerIfc::DIM dimensions, FilterEntity::objectType mask)
+void SelectionManagerDimFilter::activateSelection (SelectionManager::DIM dimensions, FilterEntity::objectType mask)
 {
 	AutoMutex	autoMutex (getMutex ( ));
 

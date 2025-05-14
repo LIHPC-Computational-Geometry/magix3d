@@ -40,7 +40,7 @@ QtTopologyFaceCreationPanel::QtTopologyFaceCreationPanel (
 			QWidget* parent, const string& panelName, 
 			QtMgx3DMainWindow& mainWindow, QtMgx3DOperationAction* action)
 	: QtTopologyCreationPanel (
-				parent, panelName, mainWindow, action, SelectionManagerIfc::D2,
+				parent, panelName, mainWindow, action, SelectionManager::D2,
 				QtTopologyPanel::STRUCTURED_TOPOLOGY,
 				QtTopologyPanel::NO_COORDINATES,
 				QtMgx3DApplication::HelpSystem::instance ( ).instance ( ).faceCreationURL,
@@ -57,7 +57,7 @@ QtTopologyFaceCreationPanel::QtTopologyFaceCreationPanel (
 										const QtTopologyFaceCreationPanel& cao)
 	: QtTopologyCreationPanel (
 			0, "Invalid panel", *new QtMgx3DMainWindow(0),
-			0, SelectionManagerIfc::D0,
+			0, SelectionManager::D0,
 			QtTopologyPanel::STRUCTURED_TOPOLOGY,
 			QtTopologyPanel::NO_COORDINATES,
 			QtMgx3DApplication::HelpSystem::instance ( ).instance ( ).faceCreationURL,

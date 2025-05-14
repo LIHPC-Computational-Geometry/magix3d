@@ -59,7 +59,7 @@ QtTopologyEdgeDirectionPanel::QtTopologyEdgeDirectionPanel (
 	// Les arêtes à modifier :
 	_edgesPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Arêtes :", "", &mainWindow,
-			SelectionManagerIfc::D1, FilterEntity::TopoCoEdge);
+			SelectionManager::D1, FilterEntity::TopoCoEdge);
 	_edgesPanel->setMultiSelectMode (true);
 	connect (_edgesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));

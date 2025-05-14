@@ -230,7 +230,7 @@ QtBlockMeshingPropertyPanel::QtBlockMeshingPropertyPanel (
 	// Les blocs à mailler :
 	_blocksPanel	= new QtMgx3DEntityPanel (
 						this, "", true, "Blocs :", "", &mainWindow,
-						SelectionManagerIfc::D3, FilterEntity::TopoBlock);
+						SelectionManager::D3, FilterEntity::TopoBlock);
 	_blocksPanel->setMultiSelectMode (true);
 	layout->addWidget (_blocksPanel);
 	connect (_blocksPanel, SIGNAL (entitiesAddedToSelection(QString)),

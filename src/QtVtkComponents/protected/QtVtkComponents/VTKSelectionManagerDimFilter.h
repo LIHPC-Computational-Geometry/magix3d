@@ -63,10 +63,10 @@ class VTKSelectionManagerDimFilter :
 	/**
 	 * Activation de la sélection d'entités de dimensions transmises en premier
 	 * argument et de type correspondant au masque transmis en 2nd argument.
-	 * \see		SelectionManagerIfc::selectionPolicyModified
+	 * \see		SelectionManager::selectionPolicyModified
 	 */
 	virtual void activateSelection (
-			SelectionManagerIfc::DIM dimensions, Mgx3D::Utils::FilterEntity::objectType mask = Mgx3D::Utils::FilterEntity::All);
+			SelectionManager::DIM dimensions, Mgx3D::Utils::FilterEntity::objectType mask = Mgx3D::Utils::FilterEntity::All);
 
 	//@}	// Politique évènementielle.
 

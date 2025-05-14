@@ -56,21 +56,21 @@ Qt3VerticiesPanel::Qt3VerticiesPanel (QWidget* parent, const string& appTitle, Q
 	// Les 3 vertex :
 	_vertex1Label	= new QLabel (QString::fromUtf8(extremities?"Centre :":"Point 1:"), this);
 	layout->addWidget (_vertex1Label, 0, 0);
-	_vertex1Panel	= new QtMgx3DEntityPanel (this, "", true, "", "", &window, SelectionManagerIfc::D0, types);
+	_vertex1Panel	= new QtMgx3DEntityPanel (this, "", true, "", "", &window, SelectionManager::D0, types);
 	layout->addWidget (_vertex1Panel, 0, 1);
 	connect (_vertex1Panel, SIGNAL (entitiesAddedToSelection (QString)), this,SLOT (pointsAddedToSelectionCallback (QString)));
 	connect (_vertex1Panel, SIGNAL (entitiesRemovedFromSelection (QString)), this, SLOT (pointsRemovedFromSelectionCallback (QString)));
 
 	_vertex2Label	= new QLabel (QString::fromUtf8(extremities?"Départ :":"Point 2:"), this);
 	layout->addWidget (_vertex2Label, 1, 0);
-	_vertex2Panel	= new QtMgx3DEntityPanel (this, "", true, "", "", &window, SelectionManagerIfc::D0, types);
+	_vertex2Panel	= new QtMgx3DEntityPanel (this, "", true, "", "", &window, SelectionManager::D0, types);
 	layout->addWidget (_vertex2Panel, 1, 1);
 	connect (_vertex2Panel, SIGNAL (entitiesAddedToSelection (QString)), this, SLOT (pointsAddedToSelectionCallback (QString)));
 	connect (_vertex2Panel, SIGNAL (entitiesRemovedFromSelection (QString)), this, SLOT (pointsRemovedFromSelectionCallback (QString)));
 
 	_vertex3Label	= new QLabel (QString::fromUtf8(extremities?"Fin :":"Point 3:"), this);
 	layout->addWidget (_vertex3Label, 2, 0);
-	_vertex3Panel	= new QtMgx3DEntityPanel (this, "", true, "", "", &window, SelectionManagerIfc::D0, types);
+	_vertex3Panel	= new QtMgx3DEntityPanel (this, "", true, "", "", &window, SelectionManager::D0, types);
 	layout->addWidget (_vertex3Panel, 2, 1);
 	connect (_vertex3Panel, SIGNAL (entitiesAddedToSelection (QString)), this, SLOT (pointsAddedToSelectionCallback (QString)));
 	connect (_vertex3Panel, SIGNAL (entitiesRemovedFromSelection (QString)), this, SLOT (pointsRemovedFromSelectionCallback (QString)));

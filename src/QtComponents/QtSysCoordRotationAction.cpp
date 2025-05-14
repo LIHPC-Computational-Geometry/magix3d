@@ -68,7 +68,7 @@ QtSysCoordRotationPanel::QtSysCoordRotationPanel (
 
 
 	_syscoordPanel	= new QtMgx3DEntityPanel (
-				this, "", true, "Repère à modifier :", "", &mainWindow, SelectionManagerIfc::D3,
+				this, "", true, "Repère à modifier :", "", &mainWindow, SelectionManager::D3,
 				FilterEntity::SysCoord);
 	_syscoordPanel->setMultiSelectMode (false);
 

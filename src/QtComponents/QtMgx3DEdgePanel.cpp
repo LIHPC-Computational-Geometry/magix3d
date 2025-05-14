@@ -73,7 +73,7 @@ QtMgx3DEdgePanel::QtMgx3DEdgePanel (
 	layout->addLayout (hlayout);
 	_entityTextField	= new QtMgx3DEntityPanel (
 				this, "", editable, "Arête : ", name, mainWindow,
-				SelectionManagerIfc::D1, types);
+				SelectionManager::D1, types);
 	connect (_entityTextField, SIGNAL (selectionModified (QString)), this,
 	         SLOT (selectionModifiedCallback (QString)));
 	connect (_entityTextField, SIGNAL (entitiesAddedToSelection (QString)),

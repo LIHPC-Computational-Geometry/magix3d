@@ -74,7 +74,7 @@ QtTopologyBlockExtractionOperationPanel::QtTopologyBlockExtractionOperationPanel
 	// Les blocs à extraire :
 	_topoEntitiesPanel	= new QtMgx3DEntityPanel (
 							this, "", true, "Blocs à extraire :", "",
-							&mainWindow, SelectionManagerIfc::D3,
+							&mainWindow, SelectionManager::D3,
 							FilterEntity::TopoBlock);
 	_topoEntitiesPanel->setMultiSelectMode (true);
 	connect (_topoEntitiesPanel, SIGNAL (entitiesAddedToSelection(QString)),

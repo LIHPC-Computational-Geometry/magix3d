@@ -76,7 +76,7 @@ QtTopologyProjectVerticesPanel::QtTopologyProjectVerticesPanel (
 	// Les sommets à projeter :
 	_verticesPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Sommets :", "", &mainWindow,
-			SelectionManagerIfc::D0, FilterEntity::TopoVertex);
+			SelectionManager::D0, FilterEntity::TopoVertex);
 	_verticesPanel->setMultiSelectMode (true);
 	connect (_verticesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -135,7 +135,7 @@ QtTopologyProjectVerticesPanel::QtTopologyProjectVerticesPanel (
 	label->setMinimumSize (label->sizeHint ( ));
 	hlayout->addWidget (label);
 	_vertexIDTextField	= new QtEntityIDTextField (
-			this, &mainWindow, SelectionManagerIfc::D0, FilterEntity::AllPoints);
+			this, &mainWindow, SelectionManager::D0, FilterEntity::AllPoints);
 	hlayout->addWidget (_vertexIDTextField);
 	connect (_vertexIDTextField, SIGNAL (selectionModified (QString)), this,
 	         SLOT (selectedVertexCallback(QString)));
@@ -144,7 +144,7 @@ QtTopologyProjectVerticesPanel::QtTopologyProjectVerticesPanel (
 	// [EB] repère local ou non
 	_sysCoordPanel	= new QtMgx3DEntityPanel (
 				this, "", true, "Repère :", "", &mainWindow,
-				SelectionManagerIfc::D3, FilterEntity::SysCoord);
+				SelectionManager::D3, FilterEntity::SysCoord);
 	_sysCoordPanel->setMultiSelectMode (false);
 	layout->addWidget (_sysCoordPanel);
 

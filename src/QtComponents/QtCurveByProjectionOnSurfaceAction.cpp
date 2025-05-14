@@ -73,7 +73,7 @@ QtCurveByProjectionOnSurfacePanel::QtCurveByProjectionOnSurfacePanel (
 	// Courbe à projeter :
 	_curvePanel	= new QtMgx3DEntityPanel (
 						this, "", true, "Courbe projetée :", "",
-						&mainWindow, SelectionManagerIfc::D1,
+						&mainWindow, SelectionManager::D1,
 						FilterEntity::GeomCurve);
 	layout->addWidget (_curvePanel);
 	connect (_curvePanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -84,7 +84,7 @@ QtCurveByProjectionOnSurfacePanel::QtCurveByProjectionOnSurfacePanel (
 	// Surface de projection :
 	_surfacePanel	= new QtMgx3DEntityPanel (
 						this, "", true, "Surface de projection :", "",
-						&mainWindow, SelectionManagerIfc::D2,
+						&mainWindow, SelectionManager::D2,
 						FilterEntity::GeomSurface);
 	layout->addWidget (_surfacePanel);
 	connect (_surfacePanel, SIGNAL (entitiesAddedToSelection(QString)),

@@ -60,7 +60,7 @@ QtGeometryGlueSurfacesPanel::QtGeometryGlueSurfacesPanel (
 	// Les surfaces à coller :
 	_surfacesPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Surfaces :", "", &mainWindow,
-			SelectionManagerIfc::D2, FilterEntity::GeomSurface);
+			SelectionManager::D2, FilterEntity::GeomSurface);
 	_surfacesPanel->setMultiSelectMode (true);
 	connect (_surfacesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));

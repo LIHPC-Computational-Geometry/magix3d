@@ -58,7 +58,7 @@ QtTopologyInsertHolePanel::QtTopologyInsertHolePanel (
 	// Les faces à dupliquer :
 	_facesPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Faces :", "", &mainWindow,
-			SelectionManagerIfc::D2, FilterEntity::TopoCoFace);
+			SelectionManager::D2, FilterEntity::TopoCoFace);
 	_facesPanel->setMultiSelectMode (true);
 	connect (_facesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));

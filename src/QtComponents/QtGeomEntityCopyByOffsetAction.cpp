@@ -75,7 +75,7 @@ QtGeomEntityCopyByOffsetPanel::QtGeomEntityCopyByOffsetPanel (
 		(FilterEntity::objectType)(FilterEntity::GeomVertex |
 			FilterEntity::GeomCurve | FilterEntity::GeomSurface |
 			FilterEntity::GeomVolume);
-	_geomEntityPanel	= new QtMgx3DEntityPanel (this, "", true, "Surface :", "", &mainWindow, SelectionManagerIfc::D2, FilterEntity::GeomSurface);
+	_geomEntityPanel	= new QtMgx3DEntityPanel (this, "", true, "Surface :", "", &mainWindow, SelectionManager::D2, FilterEntity::GeomSurface);
 	_geomEntityPanel->setMultiSelectMode (false);
 	connect (_geomEntityPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));

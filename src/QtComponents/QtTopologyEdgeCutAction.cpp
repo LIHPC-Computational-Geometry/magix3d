@@ -101,7 +101,7 @@ QtTopologyEdgeCutPanel::QtTopologyEdgeCutPanel (
 							FilterEntity::AllGeom | FilterEntity::TopoVertex);
 	_cutPointEntityPanel	=
 		new QtMgx3DEntityPanel (this, "", true, "", "", &mainWindow,
-								SelectionManagerIfc::ALL_DIMENSIONS, filter);
+								SelectionManager::ALL_DIMENSIONS, filter);
 	_cutPointEntityPanel->setToolTip (QString::fromUtf8("Entité géométrique dont le centre sert de position de découpe, ou sommet topologique."));
 	gridLayout->addWidget (_cutPointEntityPanel, row, col++, 1, 2);
 	connect (_cutPointEntityPanel, SIGNAL (entitiesAddedToSelection(QString)),

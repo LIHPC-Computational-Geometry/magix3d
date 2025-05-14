@@ -390,13 +390,13 @@ Context& QtMgx3DOperationPanel::getContext ( )
 }	// QtMgx3DOperationPanel::getContext
 
 
-SelectionManagerIfc& QtMgx3DOperationPanel::getSelectionManager ( )
+SelectionManager& QtMgx3DOperationPanel::getSelectionManager ( )
 {
 	return getContext ( ).getSelectionManager ( );
 }	// QtMgx3DOperationPanel::getSelectionManager
 
 
-const SelectionManagerIfc& QtMgx3DOperationPanel::getSelectionManager ( ) const
+const SelectionManager& QtMgx3DOperationPanel::getSelectionManager ( ) const
 {
 	return getContext ( ).getSelectionManager ( );
 }	// QtMgx3DOperationPanel::getSelectionManager

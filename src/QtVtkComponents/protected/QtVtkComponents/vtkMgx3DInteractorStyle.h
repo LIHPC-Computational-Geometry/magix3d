@@ -15,7 +15,7 @@
 #include "QtVtkComponents/VTKMgx3DPickerCommand.h"
 #include "QtComponents/EntitySeizureManager.h"
 #include "Utils/Entity.h"
-#include "Utils/SelectionManagerIfc.h"
+#include "Utils/SelectionManager.h"
 #include <TkUtil/LogOutputStream.h>
 
 #include <vtkHardwareSelector.h>
@@ -228,7 +228,7 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	/**
 	 * \param	Gestionnaire de sélection <I>Magix 3D</I> associé.
 	 */
-	virtual void SetSelectionManager (Mgx3D::Utils::SelectionManagerIfc*);
+	virtual void SetSelectionManager (Mgx3D::Utils::SelectionManager*);
 
 	/**
 	 * (Dés)Active le mode de <I>sélection interactive</I> par clic souris.
@@ -308,7 +308,7 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	Mgx3D::QtVtkComponents::VTKMgx3DPickerCommand*	Mgx3DPickerCommand;
 
 	/** Le gestionnaire de sélection associé. */
-	Mgx3D::Utils::SelectionManagerIfc*				SelectionManager;
+	Mgx3D::Utils::SelectionManager*				SelectionManager;
 
 	/** L'éventuelle fenêtre principale associée. */
 	Mgx3D::QtComponents::EntitySeizureManager*		SeizureManager;

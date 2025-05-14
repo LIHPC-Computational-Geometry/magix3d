@@ -32,8 +32,8 @@ namespace QtComponents
 
 QtEntityByDimensionSelectorPanel::QtEntityByDimensionSelectorPanel (
 	QWidget* parent, QtMgx3DMainWindow& mainWindow, const string& label,
-	SelectionManagerIfc::DIM allowedDimensions, FilterEntity::objectType types,
-	SelectionManagerIfc::DIM defaultDimensions, bool allowMultipleDimensions)
+	SelectionManager::DIM allowedDimensions, FilterEntity::objectType types,
+	SelectionManager::DIM defaultDimensions, bool allowMultipleDimensions)
 	: QWidget (parent),
 	  _dimensionsPanel (0), _entitiesPanel (0), _mainWindow (&mainWindow)
 {
@@ -146,7 +146,7 @@ bool QtEntityByDimensionSelectorPanel::actualizeGui (bool removeDestroyed)
 }	// QtEntityByDimensionSelectorPanel::actualizeGui
 
 
-SelectionManagerIfc::DIM
+SelectionManager::DIM
 					QtEntityByDimensionSelectorPanel::getDimensions ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_dimensionsPanel)
@@ -155,7 +155,7 @@ SelectionManagerIfc::DIM
 
 
 void QtEntityByDimensionSelectorPanel::setDimensions (
-												SelectionManagerIfc::DIM dims)
+												SelectionManager::DIM dims)
 {
 	CHECK_NULL_PTR_ERROR (_dimensionsPanel)
 	CHECK_NULL_PTR_ERROR (_entitiesPanel)
@@ -171,7 +171,7 @@ void QtEntityByDimensionSelectorPanel::setDimensions (
 }	// QtEntityByDimensionSelectorPanel::setDimensions
 
 
-SelectionManagerIfc::DIM
+SelectionManager::DIM
 				QtEntityByDimensionSelectorPanel::getAllowedDimensions ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_dimensionsPanel)
@@ -180,7 +180,7 @@ SelectionManagerIfc::DIM
 
 
 void QtEntityByDimensionSelectorPanel::setAllowedDimensions (
-												SelectionManagerIfc::DIM dims)
+												SelectionManager::DIM dims)
 {
 	CHECK_NULL_PTR_ERROR (_dimensionsPanel)
 	CHECK_NULL_PTR_ERROR (_entitiesPanel)

@@ -69,28 +69,28 @@ QtDistanceMeasurementOperationPanel::QtDistanceMeasurementOperationPanel (
 					QtConfiguration::margin, QtConfiguration::margin);
 	setLayout (vlayout);
 	// dim1 et dim2, filter1 et filter2 : cf. MGXDDD-237
-	const SelectionManagerIfc::DIM	allowedDimensions1	=
-												SelectionManagerIfc::D0;
+	const SelectionManager::DIM	allowedDimensions1	=
+												SelectionManager::D0;
 	const FilterEntity::objectType	filter1				=
 		(FilterEntity::objectType)(
 				FilterEntity::GeomVertex | FilterEntity::TopoVertex);
 	_entity1Panel	= new QtEntityByDimensionSelectorPanel (
 						this, mainWindow, "Vertex/Sommet :",
-						allowedDimensions1, filter1, SelectionManagerIfc::D0,	
+						allowedDimensions1, filter1, SelectionManager::D0,
 							true);
 	vlayout->addWidget (_entity1Panel);
 	connect (_entity1Panel, SIGNAL (selectionModified (QString)),
 	         this, SLOT (selectionModifiedCallback ( )));
-	const SelectionManagerIfc::DIM	allowedDimensions2	=
-			(SelectionManagerIfc::DIM)(SelectionManagerIfc::D0 |
-							SelectionManagerIfc::D1 | SelectionManagerIfc::D2);
+	const SelectionManager::DIM	allowedDimensions2	=
+			(SelectionManager::DIM)(SelectionManager::D0 |
+							SelectionManager::D1 | SelectionManager::D2);
 	const FilterEntity::objectType	filter2				=
 		(FilterEntity::objectType)(
 					FilterEntity::TopoVertex | FilterEntity::GeomVertex |
 					FilterEntity::GeomCurve | FilterEntity::GeomSurface);
 	_entity2Panel	= new QtEntityByDimensionSelectorPanel (
 						this, mainWindow, "Sommet/Vertex/Courbe/Surface :",
-						allowedDimensions2, filter2, SelectionManagerIfc::D0,
+						allowedDimensions2, filter2, SelectionManager::D0,
 						true);
 	vlayout->addWidget (_entity2Panel);
 	connect (_entity2Panel, SIGNAL (selectionModified (QString)),

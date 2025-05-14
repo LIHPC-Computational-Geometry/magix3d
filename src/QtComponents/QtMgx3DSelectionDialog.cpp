@@ -58,7 +58,7 @@ QtMgx3DSelectionDialog::QtMgx3DSelectionDialog (QtMgx3DMainWindow& mainWindow)
 	// La saisie des entités :
 	_entitiesPanel	= new QtMgx3DEntityPanel (
 				this, title, true, "Identifiants :", "", _mainWindow,
-				SelectionManagerIfc::ALL_DIMENSIONS, FilterEntity::All);
+				SelectionManager::ALL_DIMENSIONS, FilterEntity::All);
 	_entitiesPanel->setMultiSelectMode (true);
 	CHECK_NULL_PTR_ERROR (_entitiesPanel->getNameTextField ( ))
 	_entitiesPanel->getNameTextField ( )->setVisibleColumns (30);

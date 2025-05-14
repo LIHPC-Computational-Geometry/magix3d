@@ -68,7 +68,7 @@ QtMeshFacesOperationPanel::QtMeshFacesOperationPanel (
 	// Surfaces à mailler :
 	_facesPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Faces topologiques à mailler :", "", &mainWindow,
-			SelectionManagerIfc::D2, FilterEntity::TopoCoFace);
+			SelectionManager::D2, FilterEntity::TopoCoFace);
 	_facesPanel->setMultiSelectMode (true);
 	_verticalLayout->addWidget (_facesPanel);
 	connect (_facesPanel, SIGNAL (entitiesAddedToSelection(QString)),

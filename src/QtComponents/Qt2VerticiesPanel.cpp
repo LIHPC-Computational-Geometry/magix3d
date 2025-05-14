@@ -56,7 +56,7 @@ Qt2VerticiesPanel::Qt2VerticiesPanel (
 	// Les 2 vertex :
 	_vertex1Panel	= new QtMgx3DEntityPanel (
 				this, "", true, "Point 1 :", "", &window,
-				SelectionManagerIfc::D0, types);
+				SelectionManager::D0, types);
 	layout->addWidget (_vertex1Panel);
 	connect (_vertex1Panel, SIGNAL (entitiesAddedToSelection (QString)), this,
 	         SLOT (pointsAddedToSelectionCallback (QString)));
@@ -64,7 +64,7 @@ Qt2VerticiesPanel::Qt2VerticiesPanel (
 			this, SLOT (pointsRemovedFromSelectionCallback (QString)));
 	_vertex2Panel	= new QtMgx3DEntityPanel (
 				this, "", true, "Point 2 :", "", &window,
-				SelectionManagerIfc::D0, types);
+				SelectionManager::D0, types);
 	layout->addWidget (_vertex2Panel);
 	connect (_vertex2Panel, SIGNAL (entitiesAddedToSelection (QString)), this,
 	         SLOT (pointsAddedToSelectionCallback (QString)));

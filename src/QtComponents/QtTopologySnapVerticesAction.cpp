@@ -61,7 +61,7 @@ QtTopologySnapVerticesPanel::QtTopologySnapVerticesPanel (
 	// Les sommets à projeter :
 	_verticesPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Sommets :", "", &mainWindow,
-			SelectionManagerIfc::D0, FilterEntity::TopoVertex);
+			SelectionManager::D0, FilterEntity::TopoVertex);
 	_verticesPanel->setMultiSelectMode (true);
 	connect (_verticesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));

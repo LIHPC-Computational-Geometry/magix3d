@@ -12,7 +12,7 @@
 #include "QtComponents/QtEntityByDimensionSelectorPanel.h"
 #include "QtComponents/QtMgx3DGroupNamePanel.h"
 
-#include "Utils/SelectionManagerIfc.h"
+#include "Utils/SelectionManager.h"
 
 #include <QCheckBox>
 
@@ -56,7 +56,7 @@ class QtGeomEntityCopyOperationPanel : public QtMgx3DOperationPanel
 	/**
 	 * @param		Nouvelle dimension de saisie des entités topologiques.
 	 */
-	virtual void setDimension (Mgx3D::Utils::SelectionManagerIfc::DIM dim);
+	virtual void setDimension (Mgx3D::Utils::SelectionManager::DIM dim);
 
 	/**
 	 * \return		La liste des entités géométriques à copier.

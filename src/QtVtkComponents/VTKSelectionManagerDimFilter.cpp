@@ -69,7 +69,7 @@ VTKSelectionManagerDimFilter& VTKSelectionManagerDimFilter::operator = (
 
 
 void VTKSelectionManagerDimFilter::activateSelection (
-			SelectionManagerIfc::DIM dimensions, FilterEntity::objectType mask)
+			SelectionManager::DIM dimensions, FilterEntity::objectType mask)
 {
 	AutoMutex	autoMutex (&GetMutex ( ));
 
@@ -82,21 +82,21 @@ void VTKSelectionManagerDimFilter::activateSelection (
 		try
 		{
 			double	tolerance	= 0.;
-			if ((0 != (dimensions & SelectionManagerIfc::D0)) &&
+			if ((0 != (dimensions & SelectionManager::D0)) &&
 				(tolerance < VTKConfiguration::instance ( )._0DPickerTolerance.getValue ( )))
 				tolerance	= VTKConfiguration::instance ( )._0DPickerTolerance.getValue ( );
-			if ((0 != (dimensions & SelectionManagerIfc::D1)) &&
+			if ((0 != (dimensions & SelectionManager::D1)) &&
 				(tolerance < VTKConfiguration::instance ( )._1DPickerTolerance.getValue ( )))
 				tolerance	= VTKConfiguration::instance ( )._1DPickerTolerance.getValue ( );
-			if ((0 != (dimensions & SelectionManagerIfc::D2)) &&
+			if ((0 != (dimensions & SelectionManager::D2)) &&
 				(tolerance < VTKConfiguration::instance ( )._2DPickerTolerance.getValue ( )))
 				tolerance	= VTKConfiguration::instance ( )._2DPickerTolerance.getValue ( );
-			if ((0 != (dimensions & SelectionManagerIfc::D3)) &&
+			if ((0 != (dimensions & SelectionManager::D3)) &&
 				(tolerance < VTKConfiguration::instance ( )._3DPickerTolerance.getValue ( )))
 				tolerance	= VTKConfiguration::instance ( )._3DPickerTolerance.getValue ( );
 			getRenderingManager ( ).getPicker ( ).SetTolerance (tolerance);
 			getRenderingManager ( ).getPicker ( ).SetCellTolerance (VTKConfiguration::instance ( )._cellPickerTolerance.getValue( ));
-			getRenderingManager ( ).getMgx3DInteractorStyle ( ).SetInteractiveSelectionActivated (SelectionManagerIfc::NO_DIM == dimensions ? false : true);
+			getRenderingManager ( ).getMgx3DInteractorStyle ( ).SetInteractiveSelectionActivated (SelectionManager::NO_DIM == dimensions ? false : true);
 		}
 		catch (...)
 		{	// Côté serveur il n'y a pas toute cette mécanique ...
@@ -115,7 +115,7 @@ void VTKSelectionManagerDimFilter::activateSelection (
 			Entity*			entity		= 0 == mgxActor ? 0 : mgxActor->GetEntity  ( );
 			if (0 != entity)
 			{
-				if (SelectionManagerIfc::NO_DIM == dimensions)
+				if (SelectionManager::NO_DIM == dimensions)
 				{
 					entity->getDisplayProperties ( ).getGraphicalRepresentation ( )->setSelectable (false);
 					prop->SetPickable (false);

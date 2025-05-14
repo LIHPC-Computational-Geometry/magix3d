@@ -100,8 +100,8 @@ QtTopologyAddToGroupOperationPanel::QtTopologyAddToGroupOperationPanel (
 			FilterEntity::TopoBlock);
 	_topoEntitiesPanel	= new QtEntityByDimensionSelectorPanel (
 							this, mainWindow, "Entités topologiques :",
-							SelectionManagerIfc::ALL_DIMENSIONS,
-							filter, SelectionManagerIfc::D3, false);
+							SelectionManager::ALL_DIMENSIONS,
+							filter, SelectionManager::D3, false);
 	_topoEntitiesPanel->setMultiSelectMode (true);
 	connect (_topoEntitiesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -166,14 +166,14 @@ QtTopologyAddToGroupOperationPanel::OPERATION
 }	// QtTopologyAddToGroupOperationPanel::getOperation
 
 
-SelectionManagerIfc::DIM QtTopologyAddToGroupOperationPanel::getDimension ( ) const
+SelectionManager::DIM QtTopologyAddToGroupOperationPanel::getDimension ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_topoEntitiesPanel)
 	return _topoEntitiesPanel->getDimensions ( );
 }	// QtTopologyAddToGroupOperationPanel::getDimension
 
 
-void QtTopologyAddToGroupOperationPanel::setDimension (SelectionManagerIfc::DIM dim)
+void QtTopologyAddToGroupOperationPanel::setDimension (SelectionManager::DIM dim)
 {
 	CHECK_NULL_PTR_ERROR (_topoEntitiesPanel)
 	CHECK_NULL_PTR_ERROR (_namePanel)
@@ -184,10 +184,10 @@ void QtTopologyAddToGroupOperationPanel::setDimension (SelectionManagerIfc::DIM 
 		int	dimension	= 3;
 		switch (dim)
 		{
-			case	SelectionManagerIfc::D0	: dimension	= 0;	break;
-			case	SelectionManagerIfc::D1	: dimension	= 1;	break;
-			case	SelectionManagerIfc::D2	: dimension	= 2;	break;
-			case	SelectionManagerIfc::D3	: dimension	= 3;	break;
+			case	SelectionManager::D0	: dimension	= 0;	break;
+			case	SelectionManager::D1	: dimension	= 1;	break;
+			case	SelectionManager::D2	: dimension	= 2;	break;
+			case	SelectionManager::D3	: dimension	= 3;	break;
 		}	// switch (dim)
 		_namePanel->setDimension (dimension);
 	}	// if (dim != _topoEntitiesPanel->getDimensions ( ))
@@ -337,7 +337,7 @@ void QtTopologyAddToGroupOperationPanel::dimensionsModifiedCallback ( )
 	if (0 != _namePanel)
 	{
 		_namePanel->setDimension (
-			SelectionManagerIfc::dimensionsToDimension (getDimension ( )));
+			SelectionManager::dimensionsToDimension (getDimension ( )));
 		_namePanel->autoUpdate ( );
 	}	// if (0 != _namePanel)
 	
@@ -402,7 +402,7 @@ void QtTopologyAddToGroupOperationAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (panel)
 	const string		groupName	= panel->getGroupName ( );
 	vector<string>		entities	= panel->getTopoEntitiesNames ( );
-	const int			dim			= SelectionManagerIfc::dimensionsToDimension (panel->getDimension ( ));
+	const int			dim			= SelectionManager::dimensionsToDimension (panel->getDimension ( ));
 	const QtTopologyAddToGroupOperationPanel::OPERATION operation	= panel->getOperation ( );
 
 	switch (operation)

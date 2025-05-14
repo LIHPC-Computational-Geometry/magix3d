@@ -62,15 +62,15 @@ QtGeomEntityByRevolutionCreationPanel::QtGeomEntityByRevolutionCreationPanel (
 	layout->addWidget (label);
 
 	// Entités à soumettre à la rotation :
-	const SelectionManagerIfc::DIM	allowedDimensions	=
-		(SelectionManagerIfc::DIM)(
-				SelectionManagerIfc::D0 | SelectionManagerIfc::D1 | SelectionManagerIfc::D2);
+	const SelectionManager::DIM	allowedDimensions	=
+		(SelectionManager::DIM)(
+				SelectionManager::D0 | SelectionManager::D1 | SelectionManager::D2);
 	const FilterEntity::objectType	filter				=
 		(FilterEntity::objectType)(
 				FilterEntity::GeomVertex | FilterEntity::GeomCurve | FilterEntity::GeomSurface);
 	_entityPanel	= new QtEntityByDimensionSelectorPanel (
 						this, mainWindow, "Entités géométriques :",
-						allowedDimensions, filter, SelectionManagerIfc::D1, 
+						allowedDimensions, filter, SelectionManager::D1,
 						true);
 	_entityPanel->setMultiSelectMode (true);
 	layout->addWidget (_entityPanel);
@@ -165,7 +165,7 @@ bool QtGeomEntityByRevolutionCreationPanel::keepEntities ( ) const
 
 
 void QtGeomEntityByRevolutionCreationPanel::setDimension (
-										SelectionManagerIfc::DIM dimension)
+										SelectionManager::DIM dimension)
 {
 	CHECK_NULL_PTR_ERROR (_entityPanel)
 	_entityPanel->clearSelection ( );

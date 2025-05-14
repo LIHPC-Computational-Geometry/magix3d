@@ -54,7 +54,7 @@ class EntitySeizureManager
 	 * \see			criteriaMatch
 	 */
 	EntitySeizureManager (Mgx3D::QtComponents::QtMgx3DMainWindow* mainWindow,
-	                      Mgx3D::Utils::SelectionManagerIfc::DIM dimensions,
+	                      Mgx3D::Utils::SelectionManager::DIM dimensions,
 	                      Mgx3D::Utils::FilterEntity::objectType type);
 
 	/**
@@ -159,7 +159,7 @@ class EntitySeizureManager
 	 * \return		Un pointeur sur l'éventuel gestionnaire de sélection
 	 *				associé.
 	 */
-	virtual Mgx3D::Utils::SelectionManagerIfc* getSelectionManager ( );
+	virtual Mgx3D::Utils::SelectionManager* getSelectionManager ( );
 
 	/**
 	 * \return		Les types filtrés
@@ -199,7 +199,7 @@ class EntitySeizureManager
 	 * Change les dimensions possibles des entités à sélectionner
 	 * \see			getFilteredDimensions
 	 */
-	virtual void setFilteredDimensions (Mgx3D::Utils::SelectionManagerIfc::DIM dimensions);
+	virtual void setFilteredDimensions (Mgx3D::Utils::SelectionManager::DIM dimensions);
 
 	/**
 	 * \return		Les dimensions filtrées.
@@ -207,7 +207,7 @@ class EntitySeizureManager
 	 * \see			getFilteredTypes
 	 * \see			getObjectType
 	 */
-	virtual Mgx3D::Utils::SelectionManagerIfc::DIM getFilteredDimensions ( ) const;
+	virtual Mgx3D::Utils::SelectionManager::DIM getFilteredDimensions ( ) const;
 
     /**
      * Change le type des entités à sélectionner
@@ -325,7 +325,7 @@ class EntitySeizureManager
 	Mgx3D::QtComponents::QtMgx3DMainWindow*		_mainWindow;
 
 	/** Les dimensions possibles de l'entité à sélectionner. */
-	Mgx3D::Utils::SelectionManagerIfc::DIM		_dimensions;
+	Mgx3D::Utils::SelectionManager::DIM		_dimensions;
 
 	/** Le type d'entité à sélectionner. */
 	Mgx3D::Utils::FilterEntity::objectType		_types;
@@ -340,7 +340,7 @@ class EntitySeizureManager
 	std::vector<unsigned long>					_seizuredEntities;
 
 	/** L'ancien mode de sélection. */
-	Mgx3D::Utils::SelectionManagerIfc::DIM		_selectionDims;
+	Mgx3D::Utils::SelectionManager::DIM		_selectionDims;
 	Mgx3D::Utils::FilterEntity::objectType		_selectionTypes;
 
 	/** Le gestionnaires de saisie précédent et suivant. */

@@ -171,7 +171,7 @@ class QtSelectionIndividualPropertiesPanel :
 	 * \param	Eventuel gestionnaire de sélection.
 	 */
 	QtSelectionIndividualPropertiesPanel (
-		QWidget* parent, const std::string& name, Utils::SelectionManagerIfc*);
+		QWidget* parent, const std::string& name, Utils::SelectionManager*);
 
 	/**
 	 * RAS.
@@ -221,7 +221,7 @@ class QtSelectionIndividualPropertiesPanel :
 	 * \param		Nouveau gestionnaire de sélection. Peut être nul.
 	 */
 	virtual void setSelectionManager (
-				Mgx3D::Utils::SelectionManagerIfc* selectionManager);
+				Mgx3D::Utils::SelectionManager* selectionManager);
 
 	/**
 	 * @return		L'item correspondant à l'entité transmise en argument,

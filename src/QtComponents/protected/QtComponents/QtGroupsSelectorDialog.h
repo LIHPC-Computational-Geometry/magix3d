@@ -8,7 +8,7 @@
 #define QT_GROUP_SELECTOR_DIALOG_H
 
 #include <TkUtil/util_config.h>
-#include "Utils/SelectionManagerIfc.h"
+#include "Utils/SelectionManager.h"
 #include "QtComponents/QtDimensionsSelectorPanel.h"
 
 #include <QtUtil/QtDlgClosurePanel.h>
@@ -55,7 +55,7 @@ class QtGroupsSelectorDialog : public QDialog
 	/**
 	 * \return		Les dimensions des groupes à sélectionner.
 	 */
-	virtual Mgx3D::Utils::SelectionManagerIfc::DIM dimensions ( ) const;
+	virtual Mgx3D::Utils::SelectionManager::DIM dimensions ( ) const;
 
 	/**
 	 * \return		Les niveaux des groupes à sélectionner.
