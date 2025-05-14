@@ -343,7 +343,7 @@ void QtGeomEntityCommon2DOperationAction::executeOperation ( )
 	const string	secondName	= panel->getSecondGeomEntityName ( );
 	const bool			copy        = panel->copyEntities();
 
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	if (copy)
 		cmdResult = getContext ( ).getGeomManager ( ).common2DOnCopy (firstName, secondName, groupName);
 	else

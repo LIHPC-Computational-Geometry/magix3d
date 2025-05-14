@@ -1,19 +1,10 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandSetEdgeMeshingProperty.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 2 déc. 2011
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandSetEdgeMeshingProperty.h"
-
+#include "Topo/CoEdge.h"
 #include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

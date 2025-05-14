@@ -1,14 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/** \file		M3DCommandResult.h
- *	\author		Charles
- *	\date		02/04/2013
- */
-/*----------------------------------------------------------------------------*/
-
 #ifndef M3D_COMMAND_RESULT_H
 #define M3D_COMMAND_RESULT_H
-
-#include "Internal/M3DCommandResultIfc.h"
+/*----------------------------------------------------------------------------*/
+#include "Utils/CommandResult.h"
 #include "Internal/CommandInternal.h"
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
@@ -26,27 +20,24 @@
 #include "Group/Group1D.h"
 #include "Group/Group2D.h"
 #include "Group/Group3D.h"
-#include "SysCoord/SysCoord.h"
-
+/*----------------------------------------------------------------------------*/
+#include <vector>
+#include <string>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
-
-
 namespace Geom {
 class CommandEditGeom;
 }
 /*----------------------------------------------------------------------------*/
 namespace Internal
 {
-
-
 /** \class M3DCommandResult
  * <P>Fourniseur d'accès aux résultats d'une commande <I>Magix 3D</I>qui a été
  * exécutée.
  * </P>
  */
-class M3DCommandResult : public Mgx3D::Internal::M3DCommandResultIfc
+class M3DCommandResult : public Mgx3D::Utils::CommandResult
 {
 	public :
 
@@ -75,7 +66,6 @@ class M3DCommandResult : public Mgx3D::Internal::M3DCommandResultIfc
 	virtual ~M3DCommandResult ( );
 
 #ifndef SWIG
-
 	/**
 	 * Les callbacks sur les commandes associées.
 	 */
@@ -93,7 +83,6 @@ class M3DCommandResult : public Mgx3D::Internal::M3DCommandResultIfc
 	virtual void observableDeleted (TkUtil::ReferencedObject* object);
 
 	//@}	// Les callbacks sur les commandes associées.
-
 #endif	// SWIG
 
 	/**
@@ -101,6 +90,7 @@ class M3DCommandResult : public Mgx3D::Internal::M3DCommandResultIfc
 	 */
 	//@{
 
+#ifndef SWIG
 	/**
 	 * \return	La liste des volumes créés par la commande.
 	 */
@@ -168,7 +158,7 @@ class M3DCommandResult : public Mgx3D::Internal::M3DCommandResultIfc
 	 * \except	Lève une exception s'il n'existe pas ou s'il y en a plus.
 	 */
 	virtual Mgx3D::Geom::Vertex* getVertexObj ( );
-
+#endif
 
 	/**
 	 * \return	La liste des volumes créés par la commande.
@@ -238,15 +228,13 @@ class M3DCommandResult : public Mgx3D::Internal::M3DCommandResultIfc
 	 */
 	virtual std::string getVertex ( );
 
-
-
 	//@}	// Accesseurs aux entités géométriques.
 
 	/**
 	 * Accesseurs aux entités topologiques.
 	 */
 	//@{
-
+#ifndef SWIG
 	/**
 	 * \return	La liste des blocs créés par la commande.
 	 */
@@ -314,7 +302,7 @@ class M3DCommandResult : public Mgx3D::Internal::M3DCommandResultIfc
 	 * \except	Lève une exception s'il n'existe pas ou s'il y en a plus.
 	 */
 	virtual Mgx3D::Topo::Vertex* getTopoVertexObj ( );
-
+#endif
 
 	/**
 	 * \return	La liste des blocs créés par la commande.
@@ -384,14 +372,13 @@ class M3DCommandResult : public Mgx3D::Internal::M3DCommandResultIfc
 	 */
 	virtual std::string getTopoVertex ( );
 
-
 	//@}	// Accesseurs aux entités topologiques.
 
+#ifndef SWIG
 	/**
 	 * Accesseurs aux entités de maillage.
 	 */
 	//@{
-
 	/**
 	 * \return	La liste des volumes de mailles créés par la commande.
 	 */
@@ -413,7 +400,7 @@ class M3DCommandResult : public Mgx3D::Internal::M3DCommandResultIfc
 	virtual std::vector<Mgx3D::Mesh::Cloud*> getMeshCloudsObj ( );
 
 	//@}	// Accesseurs aux entités de maillage.
-
+#endif
 
 
 	/**
@@ -424,33 +411,42 @@ class M3DCommandResult : public Mgx3D::Internal::M3DCommandResultIfc
 	/**
 	 * \return	La liste des groupes 0D créés par la commande.
 	 */
+#ifndef SWIG
 	virtual std::vector<Mgx3D::Group::Group0D*> getGroups0DObj ( );
+#endif
 	virtual std::vector<std::string> getGroups0D ( );
 
 	/**
 	 * \return	La liste des groupes 1D créés par la commande.
 	 */
+#ifndef SWIG
 	virtual std::vector<Mgx3D::Group::Group1D*> getGroups1DObj ( );
+#endif
 	virtual std::vector<std::string> getGroups1D ( );
 
 	/**
 	 * \return	La liste des groupes 2D créés par la commande.
 	 */
+#ifndef SWIG
 	virtual std::vector<Mgx3D::Group::Group2D*> getGroups2DObj ( );
+#endif
 	virtual std::vector<std::string> getGroups2D ( );
 
 	/**
 	 * \return	La liste des groupes 3D créés par la commande.
 	 */
+#ifndef SWIG
 	virtual std::vector<Mgx3D::Group::Group3D*> getGroups3DObj ( );
+#endif
 	virtual std::vector<std::string> getGroups3D ( );
 
 	//@}	// Accesseurs aux entités groupes.
 
 	/// accesseur sur un repère local
 	virtual std::string getSysCoord ( );
+#ifndef SWIG
 	virtual Mgx3D::CoordinateSystem::SysCoord* getSysCoordObj ( );
-
+#endif
 
 	protected :
 
@@ -490,8 +486,6 @@ class M3DCommandResult : public Mgx3D::Internal::M3DCommandResultIfc
 /*----------------------------------------------------------------------------*/
 }	// namespace Mgx3D
 /*----------------------------------------------------------------------------*/
-
-
 
 #endif	// M3D_COMMAND_RESULT_H
 /*----------------------------------------------------------------------------*/

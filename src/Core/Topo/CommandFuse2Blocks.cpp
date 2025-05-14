@@ -1,15 +1,9 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandFuse2Blocks.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 11/6/2015
- */
-/*----------------------------------------------------------------------------*/
-#include "Topo/CommandFuse2Blocks.h"
 #include "Topo/TopoHelper.h"
-
+#include "Topo/CommandFuse2Blocks.h"
+#include "Topo/Block.h"
+#include "Topo/Face.h"
+#include "Topo/CoFace.h"
 #include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>

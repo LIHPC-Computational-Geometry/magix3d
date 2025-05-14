@@ -4,7 +4,7 @@
 #include "Structured/StructuredMeshEntity.h"
 #include "Structured/Material.h"
 #include "Internal/CommandCreator.h"
-#include "Internal/M3DCommandResultIfc.h"
+#include "Internal/M3DCommandResult.h"
 #include "Utils/SwigCompletion.h"
 /*----------------------------------------------------------------------------*/
 #include <string>
@@ -45,7 +45,7 @@ class StructuredMeshManager final : public Mgx3D::Internal::CommandCreator
 	/**
 	 * Libération du maillage structuré (toutes partitions).
 	 */
-	Mgx3D::Internal::M3DCommandResultIfc* releaseMesh ( );
+	Mgx3D::Internal::M3DCommandResult* releaseMesh ( );
 	SET_SWIG_COMPLETABLE_METHOD(releaseMesh)
 
 	//@}	// Les commandes proposées par le gestionnaire de données structurées.

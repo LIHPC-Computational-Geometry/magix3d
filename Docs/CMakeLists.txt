@@ -12,7 +12,7 @@ file(GLOB_RECURSE MGX_PUBLIC_HEADERS ${MGX_PUBLIC_HEADER_DIR}/*.h)
 set(DOXYGEN_DIRS
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Internal/Context.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Internal/M3DCommandManager.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Internal/M3DCommandResultIfc.h
+  ${PROJECT_SOURCE_DIR}/src/Core/protected/Internal/M3DCommandResult.h
   ${PROJECT_SOURCE_DIR}/src/Utils/protected/Utils/Point.h
   ${PROJECT_SOURCE_DIR}/src/Utils/protected/Utils/Spherical.h
   ${PROJECT_SOURCE_DIR}/src/Utils/protected/Utils/Cylindrical.h

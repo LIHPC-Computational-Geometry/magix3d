@@ -31,7 +31,7 @@ struct UnusedStructForSwigCompletion { };
 #define SET_SWIG_COMPLETABLE_METHOD_RET(rettype,method) \
     rettype method(UnusedStructForSwigCompletion){std::cerr<<"#method (UnusedStructForSwigCompletion) should not be called."<<std::endl; }
 #define SET_SWIG_COMPLETABLE_METHOD_CMD(method) \
-    Internal::M3DCommandResultIfc* method(UnusedStructForSwigCompletion){std::cerr<<"#method (UnusedStructForSwigCompletion) should not be called."<<std::endl; }
+    Internal::M3DCommandResult* method(UnusedStructForSwigCompletion){std::cerr<<"#method (UnusedStructForSwigCompletion) should not be called."<<std::endl; }
 
 
 #endif	// SWIG_COMPLETION_H

@@ -356,8 +356,8 @@ Block* TopoManager::getBlock (const std::string& name, const bool exceptionIfNot
     }
 
     std::string new_name;
-    if (getLocalContext().getNameManager().isShiftingIdActivated())
-        new_name = getLocalContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::TopoBlock)->renameWithShiftingId(name);
+    if (getContext().getNameManager().isShiftingIdActivated())
+        new_name = getContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::TopoBlock)->renameWithShiftingId(name);
     else
         new_name = name;
 
@@ -474,8 +474,8 @@ CoFace* TopoManager::getCoFace(const std::string& name, const bool exceptionIfNo
     }
 
     std::string new_name;
-    if (getLocalContext().getNameManager().isShiftingIdActivated())
-        new_name = getLocalContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::TopoCoFace)->renameWithShiftingId(name);
+    if (getContext().getNameManager().isShiftingIdActivated())
+        new_name = getContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::TopoCoFace)->renameWithShiftingId(name);
     else
         new_name = name;
 
@@ -513,8 +513,8 @@ Face* TopoManager::getFace(const std::string& name, const bool exceptionIfNotFou
     Face* face = 0;
 
     std::string new_name;
-    if (getLocalContext().getNameManager().isShiftingIdActivated())
-        new_name = getLocalContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::TopoFace)->renameWithShiftingId(name);
+    if (getContext().getNameManager().isShiftingIdActivated())
+        new_name = getContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::TopoFace)->renameWithShiftingId(name);
     else
         new_name = name;
 
@@ -585,8 +585,8 @@ CoEdge* TopoManager::getCoEdge(const std::string& name, const bool exceptionIfNo
     }
 
     std::string new_name;
-    if (getLocalContext().getNameManager().isShiftingIdActivated())
-        new_name = getLocalContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::TopoCoEdge)->renameWithShiftingId(name);
+    if (getContext().getNameManager().isShiftingIdActivated())
+        new_name = getContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::TopoCoEdge)->renameWithShiftingId(name);
     else
         new_name = name;
 
@@ -627,8 +627,8 @@ Edge* TopoManager::getEdge(const std::string& name, const bool exceptionIfNotFou
    Edge* edge = 0;
 
     std::string new_name;
-    if (getLocalContext().getNameManager().isShiftingIdActivated())
-        new_name = getLocalContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::TopoEdge)->renameWithShiftingId(name);
+    if (getContext().getNameManager().isShiftingIdActivated())
+        new_name = getContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::TopoEdge)->renameWithShiftingId(name);
     else
         new_name = name;
 
@@ -700,8 +700,8 @@ Vertex* TopoManager::getVertex(const std::string& name, const bool exceptionIfNo
     }
 
     std::string new_name;
-    if (getLocalContext().getNameManager().isShiftingIdActivated())
-        new_name = getLocalContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::TopoVertex)->renameWithShiftingId(name);
+    if (getContext().getNameManager().isShiftingIdActivated())
+        new_name = getContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::TopoVertex)->renameWithShiftingId(name);
     else
     	new_name = name;
 
@@ -863,10 +863,10 @@ std::string TopoManager::getBlockAt(std::vector<Point>& pts) const
 	}
 }
 /*----------------------------------------------------------------------------*/
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     TopoManager::newTopoVertex(Utils::Math::Point pt, std::string groupName)
     {
-        Topo::CommandNewTopo* command = new Topo::CommandNewTopo(getLocalContext(), pt, groupName);
+        Topo::CommandNewTopo* command = new Topo::CommandNewTopo(getContext(), pt, groupName);
 
         TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
         cmd << getContextAlias() << "." << "getTopoManager().newTopoVertex (";
@@ -875,13 +875,13 @@ std::string TopoManager::getBlockAt(std::vector<Point>& pts) const
 
         getCommandManager().addCommand(command, Utils::Command::DO);
 
-        Internal::M3DCommandResultIfc*  cmdResult   =
+        Internal::M3DCommandResult*  cmdResult   =
                 new Internal::M3DCommandResult (*command);
 
         return cmdResult;
     }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::newTopoEntity(std::vector<std::string>& ve, int dim, std::string groupName)
 {
     std::vector<Vertex*> vertices;
@@ -892,14 +892,14 @@ TopoManager::newTopoEntity(std::vector<std::string>& ve, int dim, std::string gr
     return newTopoEntity(vertices, dim, groupName);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::newTopoEntity(std::vector<Topo::Vertex*>& vertices, int dim, std::string groupName)
 {
     TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::newTopoEntity("<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandNewTopo* command = new Topo::CommandNewTopo(getLocalContext(), vertices,
+    Topo::CommandNewTopo* command = new Topo::CommandNewTopo(getContext(), vertices,
                                                              CommandNewTopo::STRUCTURED_BLOCK, dim, groupName);
 
     TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
@@ -916,26 +916,26 @@ cmd << getContextAlias() << "." << "getTopoManager().newTopoEntity ([";
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
 
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::newTopoOnGeometry(std::string ne)
 {
-	return newTopoOnGeometry(getLocalContext().getGeomManager().getEntity(ne));
+	return newTopoOnGeometry(getContext().getGeomManager().getEntity(ne));
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::newTopoOnGeometry(Geom::GeomEntity* ge)
 {
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::newTopoOnGeometry("<<ge->getName()<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandNewTopoOnGeometry* command = new Topo::CommandNewTopoOnGeometry(getLocalContext(), ge,
+    Topo::CommandNewTopoOnGeometry* command = new Topo::CommandNewTopoOnGeometry(getContext(), ge,
     		CommandNewTopoOnGeometry::ASSOCIATED_TOPO);
 
 	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
@@ -944,29 +944,29 @@ TopoManager::newTopoOnGeometry(Geom::GeomEntity* ge)
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
 
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::newStructuredTopoOnGeometry(std::string ne)
 {
     if (!ne.empty())
-        return newStructuredTopoOnGeometry(getLocalContext().getGeomManager().getEntity(ne));
+        return newStructuredTopoOnGeometry(getContext().getGeomManager().getEntity(ne));
     else
         return newStructuredTopoOnGeometry(0);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::newStructuredTopoOnGeometry(Geom::GeomEntity* ge)
 {
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::newStructuredTopoOnGeometry("<<(ge?ge->getName():"\"\"")<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandNewTopoOnGeometry* command = new Topo::CommandNewTopoOnGeometry(getLocalContext(), ge,
+    Topo::CommandNewTopoOnGeometry* command = new Topo::CommandNewTopoOnGeometry(getContext(), ge,
     		CommandNewTopoOnGeometry::STRUCTURED_BLOCK);
 
 	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
@@ -975,27 +975,27 @@ TopoManager::newStructuredTopoOnGeometry(Geom::GeomEntity* ge)
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
 
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
- Mgx3D::Internal::M3DCommandResultIfc*
+ Mgx3D::Internal::M3DCommandResult*
  TopoManager::newStructuredTopoOnSurface(std::string ne, std::vector<std::string>& ve)
  {
-	 Geom::Surface* surf = getLocalContext().getGeomManager().getSurface(ne, true);
+	 Geom::Surface* surf = getContext().getGeomManager().getSurface(ne, true);
 	 std::vector<Geom::Vertex*> vertices;
 	 for (uint i=0; i<ve.size(); i++)
-		 vertices.push_back(getLocalContext().getGeomManager().getVertex(ve[i], true));
+		 vertices.push_back(getContext().getGeomManager().getVertex(ve[i], true));
 
 	 return newStructuredTopoOnSurface(surf, vertices);
  }
  /*----------------------------------------------------------------------------*/
- Mgx3D::Internal::M3DCommandResultIfc*
+ Mgx3D::Internal::M3DCommandResult*
  TopoManager::newStructuredTopoOnSurface(Geom::Surface* surf, std::vector<Geom::Vertex*>& vertices)
  {
-	 Topo::CommandNewTopoOnGeometry* command = new Topo::CommandNewTopoOnGeometry(getLocalContext(), surf, vertices);
+	 Topo::CommandNewTopoOnGeometry* command = new Topo::CommandNewTopoOnGeometry(getContext(), surf, vertices);
 
 	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
 	 cmd << getContextAlias() << "." << "getTopoManager().newStructuredTopoOnSurface (\""<<surf->getName()
@@ -1011,26 +1011,26 @@ TopoManager::newStructuredTopoOnGeometry(Geom::GeomEntity* ge)
 
 	 getCommandManager().addCommand(command, Utils::Command::DO);
 
-	 Internal::M3DCommandResultIfc*  cmdResult   =
+	 Internal::M3DCommandResult*  cmdResult   =
 			 new Internal::M3DCommandResult (*command);
 
 	 return cmdResult;
  }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::newUnstructuredTopoOnGeometry(std::string ne)
 {
-    return newUnstructuredTopoOnGeometry(getLocalContext().getGeomManager().getEntity(ne));
+    return newUnstructuredTopoOnGeometry(getContext().getGeomManager().getEntity(ne));
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::newUnstructuredTopoOnGeometry(Geom::GeomEntity* ge)
 {
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::newUnstructuredTopoOnGeometry("<<ge->getName()<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandNewTopoOnGeometry* command = new Topo::CommandNewTopoOnGeometry(getLocalContext(), ge,
+    Topo::CommandNewTopoOnGeometry* command = new Topo::CommandNewTopoOnGeometry(getContext(), ge,
     		CommandNewTopoOnGeometry::UNSTRUCTURED_BLOCK);
 
 	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
@@ -1040,28 +1040,28 @@ TopoManager::newUnstructuredTopoOnGeometry(Geom::GeomEntity* ge)
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::newFreeTopoOnGeometry(std::string ne)
 {
     if (!ne.empty())
-        return newFreeTopoOnGeometry(getLocalContext().getGeomManager().getEntity(ne));
+        return newFreeTopoOnGeometry(getContext().getGeomManager().getEntity(ne));
     else
         return newFreeTopoOnGeometry(0);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::newFreeTopoOnGeometry(Geom::GeomEntity* ge)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::newFreeTopoOnGeometry("<<(ge?ge->getName():"\"\"")<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandNewTopoOnGeometry* command = new Topo::CommandNewTopoOnGeometry(getLocalContext(), ge,
+    Topo::CommandNewTopoOnGeometry* command = new Topo::CommandNewTopoOnGeometry(getContext(), ge,
     		CommandNewTopoOnGeometry::FREE_BLOCK);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -1071,19 +1071,19 @@ TopoManager::newFreeTopoOnGeometry(Geom::GeomEntity* ge)
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::newFreeTopoInGroup(std::string ng, int dim)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::newFreeTopoInGroup("<<ng<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandNewTopoOnGeometry* command = new Topo::CommandNewTopoOnGeometry(getLocalContext(), ng, dim);
+    Topo::CommandNewTopoOnGeometry* command = new Topo::CommandNewTopoOnGeometry(getContext(), ng, dim);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().newFreeTopoInGroup (\""
@@ -1092,20 +1092,20 @@ TopoManager::newFreeTopoInGroup(std::string ng, int dim)
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::newFreeBoundedTopoInGroup(std::string ng, int dim, const std::vector<std::string>& ve)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::newFreeBoundedTopoInGroup("<<ng<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandNewTopoOnGeometry* command = new Topo::CommandNewTopoOnGeometry(getLocalContext(), ng, dim);
-    std::vector<Utils::Entity*>	entities	= getLocalContext ( ).get (ve, true);
+    Topo::CommandNewTopoOnGeometry* command = new Topo::CommandNewTopoOnGeometry(getContext(), ng, dim);
+    std::vector<Utils::Entity*>	entities	= getContext ( ).get (ve, true);
     command->setBoundingEntities (entities);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -1115,12 +1115,12 @@ TopoManager::newFreeBoundedTopoInGroup(std::string ng, int dim, const std::vecto
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 newBoxWithTopo(const Utils::Math::Point& pmin, const Utils::Math::Point& pmax,
 		bool meshStructured, std::string groupName)
 {
@@ -1132,19 +1132,19 @@ newBoxWithTopo(const Utils::Math::Point& pmin, const Utils::Math::Point& pmax,
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
     // creation de la commande de création de la géométrie
-    Geom::CommandNewBox *commandGeom = new Geom::CommandNewBox(getLocalContext(),pmin,pmax,groupName);
+    Geom::CommandNewBox *commandGeom = new Geom::CommandNewBox(getContext(),pmin,pmax,groupName);
 
     // creation de la commande de création de la topologie
     // avec un volume à récupérer dans la commande
     // true <=> structuration demandée
     Topo::CommandNewTopoOnGeometry* commandTopo =
-    		new Topo::CommandNewTopoOnGeometry(getLocalContext(), commandGeom,
+    		new Topo::CommandNewTopoOnGeometry(getContext(), commandGeom,
     				meshStructured?CommandNewTopoOnGeometry::STRUCTURED_BLOCK
     						:CommandNewTopoOnGeometry::UNSTRUCTURED_BLOCK);
 
     // creation de la commande composite
     Internal::CommandComposite *command =
-            new Internal::CommandComposite(getLocalContext(), "Création d'une boite avec une topologie");
+            new Internal::CommandComposite(getContext(), "Création d'une boite avec une topologie");
     command->addCommand(commandGeom);
     command->addCommand(commandTopo);
 
@@ -1163,12 +1163,12 @@ newBoxWithTopo(const Utils::Math::Point& pmin, const Utils::Math::Point& pmax,
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 newBoxWithTopo(const Utils::Math::Point& pmin, const Utils::Math::Point& pmax,
 		const int ni, const int nj, const int nk,
 		std::string groupName)
@@ -1181,16 +1181,16 @@ newBoxWithTopo(const Utils::Math::Point& pmin, const Utils::Math::Point& pmax,
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
     // creation de la commande de création de la géométrie
-    Geom::CommandNewBox *commandGeom = new Geom::CommandNewBox(getLocalContext(),pmin,pmax,groupName);
+    Geom::CommandNewBox *commandGeom = new Geom::CommandNewBox(getContext(),pmin,pmax,groupName);
 
     // creation de la commande de création de la topologie
     // avec un volume à récupérer dans la commande
     // true <=> structuration demandée
-    Topo::CommandNewTopoOnGeometry* commandTopo = new Topo::CommandNewTopoOnGeometry(getLocalContext(), commandGeom, ni, nj, nk);
+    Topo::CommandNewTopoOnGeometry* commandTopo = new Topo::CommandNewTopoOnGeometry(getContext(), commandGeom, ni, nj, nk);
 
     // creation de la commande composite
     Internal::CommandComposite *command =
-            new Internal::CommandComposite(getLocalContext(), "Création d'une boite avec une topologie");
+            new Internal::CommandComposite(getContext(), "Création d'une boite avec une topologie");
     command->addCommand(commandGeom);
     command->addCommand(commandTopo);
 
@@ -1209,12 +1209,12 @@ newBoxWithTopo(const Utils::Math::Point& pmin, const Utils::Math::Point& pmax,
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 newCylinderWithTopo(const Point& pcentre, const double& dr,
         const Vector& dv, const double& da,
         bool meshStructured, const double& rat,
@@ -1234,7 +1234,7 @@ newCylinderWithTopo(const Point& pcentre, const double& dr,
      log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
      // creation de la commande de création de la géométrie
-     Geom::CommandNewCylinder *commandGeom = new Geom::CommandNewCylinder(getLocalContext(),pcentre, dr, dv, da, groupName);
+     Geom::CommandNewCylinder *commandGeom = new Geom::CommandNewCylinder(getContext(),pcentre, dr, dv, da, groupName);
 
      // creation de la commande de création de la topologie
      // avec un volume à récupérer dans la commande
@@ -1242,18 +1242,18 @@ newCylinderWithTopo(const Point& pcentre, const double& dr,
      Topo::CommandCreateTopo* commandTopo=0;
 
      if (meshStructured) {
-         CommandNewTopoOGridOnGeometry* commandTopoOGrid = new Topo::CommandNewTopoOGridOnGeometry(getLocalContext(), commandGeom, rat);
+         CommandNewTopoOGridOnGeometry* commandTopoOGrid = new Topo::CommandNewTopoOGridOnGeometry(getContext(), commandGeom, rat);
          commandTopoOGrid->setNaxe(naxe);
          commandTopoOGrid->setNi(ni);
          commandTopoOGrid->setNr(nr);
          commandTopo = commandTopoOGrid;
      }
      else
-         commandTopo = new Topo::CommandNewTopoOnGeometry(getLocalContext(), commandGeom, CommandNewTopoOnGeometry::UNSTRUCTURED_BLOCK);
+         commandTopo = new Topo::CommandNewTopoOnGeometry(getContext(), commandGeom, CommandNewTopoOnGeometry::UNSTRUCTURED_BLOCK);
 
      // creation de la commande composite
      Internal::CommandComposite *command =
-             new Internal::CommandComposite(getLocalContext(), "Création d'un cylindre avec une topologie");
+             new Internal::CommandComposite(getContext(), "Création d'un cylindre avec une topologie");
      command->addCommand(commandGeom);
      command->addCommand(commandTopo);
 
@@ -1278,12 +1278,12 @@ newCylinderWithTopo(const Point& pcentre, const double& dr,
      // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
      getCommandManager().addCommand(command, Utils::Command::DO);
 
-     Internal::M3DCommandResultIfc*  cmdResult   =
+     Internal::M3DCommandResult*  cmdResult   =
                                      new Internal::M3DCommandResult (*command);
      return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 newHollowCylinderWithTopo(const Point& pcentre, const double& dr_int, const double& dr_ext,
         const Vector& dv, const double& da,
         bool meshStructured,
@@ -1305,7 +1305,7 @@ newHollowCylinderWithTopo(const Point& pcentre, const double& dr_int, const doub
 
      // creation de la commande de création de la géométrie
      Geom::CommandNewHollowCylinder *commandGeom =
-    		 new Geom::CommandNewHollowCylinder(getLocalContext(),pcentre, dr_int, dr_ext, dv, da, groupName);
+    		 new Geom::CommandNewHollowCylinder(getContext(),pcentre, dr_int, dr_ext, dv, da, groupName);
 
      // creation de la commande de création de la topologie
      // avec un volume à récupérer dans la commande
@@ -1314,18 +1314,18 @@ newHollowCylinderWithTopo(const Point& pcentre, const double& dr_int, const doub
 
      if (meshStructured) {
          CommandNewTopoOGridOnGeometry* commandTopoOGrid =
-        		 new Topo::CommandNewTopoOGridOnGeometry(getLocalContext(), commandGeom, 0.0);
+        		 new Topo::CommandNewTopoOGridOnGeometry(getContext(), commandGeom, 0.0);
          commandTopoOGrid->setNaxe(naxe);
          commandTopoOGrid->setNi(ni);
          commandTopoOGrid->setNr(nr);
          commandTopo = commandTopoOGrid;
      }
      else
-         commandTopo = new Topo::CommandNewTopoOnGeometry(getLocalContext(), commandGeom, CommandNewTopoOnGeometry::UNSTRUCTURED_BLOCK);
+         commandTopo = new Topo::CommandNewTopoOnGeometry(getContext(), commandGeom, CommandNewTopoOnGeometry::UNSTRUCTURED_BLOCK);
 
      // creation de la commande composite
      Internal::CommandComposite *command =
-             new Internal::CommandComposite(getLocalContext(), "Création d'un cylindre creux avec une topologie");
+             new Internal::CommandComposite(getContext(), "Création d'un cylindre creux avec une topologie");
      command->addCommand(commandGeom);
      command->addCommand(commandTopo);
 
@@ -1350,12 +1350,12 @@ newHollowCylinderWithTopo(const Point& pcentre, const double& dr_int, const doub
      // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
      getCommandManager().addCommand(command, Utils::Command::DO);
 
-     Internal::M3DCommandResultIfc*  cmdResult   =
+     Internal::M3DCommandResult*  cmdResult   =
                                      new Internal::M3DCommandResult (*command);
      return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 newConeWithTopo(const double& dr1, const double& dr2,
     		const Vector& dv, const double& da,
 			bool meshStructured, const double& rat,
@@ -1377,7 +1377,7 @@ newConeWithTopo(const double& dr1, const double& dr2,
      log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
      // creation de la commande de création de la géométrie
-     Geom::CommandNewCone *commandGeom = new Geom::CommandNewCone(getLocalContext(), dr1, dr2, dv, da, groupName);
+     Geom::CommandNewCone *commandGeom = new Geom::CommandNewCone(getContext(), dr1, dr2, dv, da, groupName);
 
      // creation de la commande de création de la topologie
      // avec un volume à récupérer dans la commande
@@ -1385,18 +1385,18 @@ newConeWithTopo(const double& dr1, const double& dr2,
      Topo::CommandCreateTopo* commandTopo=0;
 
      if (meshStructured) {
-         CommandNewTopoOGridOnGeometry* commandTopoOGrid = new Topo::CommandNewTopoOGridOnGeometry(getLocalContext(), commandGeom, rat);
+         CommandNewTopoOGridOnGeometry* commandTopoOGrid = new Topo::CommandNewTopoOGridOnGeometry(getContext(), commandGeom, rat);
          commandTopoOGrid->setNaxe(naxe);
          commandTopoOGrid->setNi(ni);
          commandTopoOGrid->setNr(nr);
          commandTopo = commandTopoOGrid;
      }
      else
-         commandTopo = new Topo::CommandNewTopoOnGeometry(getLocalContext(), commandGeom, CommandNewTopoOnGeometry::UNSTRUCTURED_BLOCK);
+         commandTopo = new Topo::CommandNewTopoOnGeometry(getContext(), commandGeom, CommandNewTopoOnGeometry::UNSTRUCTURED_BLOCK);
 
      // creation de la commande composite
      Internal::CommandComposite *command =
-             new Internal::CommandComposite(getLocalContext(), "Création d'un cône avec une topologie");
+             new Internal::CommandComposite(getContext(), "Création d'un cône avec une topologie");
      command->addCommand(commandGeom);
      command->addCommand(commandTopo);
 
@@ -1421,12 +1421,12 @@ newConeWithTopo(const double& dr1, const double& dr2,
      // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
      getCommandManager().addCommand(command, Utils::Command::DO);
 
-     Internal::M3DCommandResultIfc*  cmdResult   =
+     Internal::M3DCommandResult*  cmdResult   =
                                      new Internal::M3DCommandResult (*command);
      return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 newSphereWithTopo(const Point& pcentre,  const double& dr,
                             const  Utils::Portion::Type& dt,
                             bool meshStructured, const double& rat,
@@ -1445,7 +1445,7 @@ newSphereWithTopo(const Point& pcentre,  const double& dr,
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
     // creation de la commande de création de la géométrie
-    Geom::CommandNewSphere *commandGeom = new Geom::CommandNewSphere(getLocalContext(),pcentre, dr, dt, groupName);
+    Geom::CommandNewSphere *commandGeom = new Geom::CommandNewSphere(getContext(),pcentre, dr, dt, groupName);
 
     // creation de la commande de création de la topologie
     // avec un volume à récupérer dans la commande
@@ -1453,17 +1453,17 @@ newSphereWithTopo(const Point& pcentre,  const double& dr,
     Topo::CommandCreateTopo* commandTopo=0;
 
     if (meshStructured){
-        CommandNewTopoOGridOnGeometry* commandTopoOGrid = new Topo::CommandNewTopoOGridOnGeometry(getLocalContext(), commandGeom, rat);
+        CommandNewTopoOGridOnGeometry* commandTopoOGrid = new Topo::CommandNewTopoOGridOnGeometry(getContext(), commandGeom, rat);
         commandTopoOGrid->setNi(ni);
         commandTopoOGrid->setNr(nr);
         commandTopo = commandTopoOGrid;
     }
     else
-        commandTopo = new Topo::CommandNewTopoOnGeometry(getLocalContext(), commandGeom, CommandNewTopoOnGeometry::UNSTRUCTURED_BLOCK);
+        commandTopo = new Topo::CommandNewTopoOnGeometry(getContext(), commandGeom, CommandNewTopoOnGeometry::UNSTRUCTURED_BLOCK);
 
     // creation de la commande composite
     Internal::CommandComposite *command =
-            new Internal::CommandComposite(getLocalContext(), "Création d'une sphère avec une topologie");
+            new Internal::CommandComposite(getContext(), "Création d'une sphère avec une topologie");
     command->addCommand(commandGeom);
     command->addCommand(commandTopo);
 
@@ -1486,12 +1486,12 @@ newSphereWithTopo(const Point& pcentre,  const double& dr,
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 newHollowSphereWithTopo(const Point& pcentre,  const double& dr_int,  const double& dr_ext,
                             const  Utils::Portion::Type& dt,
                             bool meshStructured,
@@ -1512,7 +1512,7 @@ newHollowSphereWithTopo(const Point& pcentre,  const double& dr_int,  const doub
 
     // creation de la commande de création de la géométrie
     Geom::CommandNewHollowSphere *commandGeom =
-    		new Geom::CommandNewHollowSphere(getLocalContext(),pcentre, dr_int, dr_ext, dt, groupName);
+    		new Geom::CommandNewHollowSphere(getContext(),pcentre, dr_int, dr_ext, dt, groupName);
 
     // creation de la commande de création de la topologie
     // avec un volume à récupérer dans la commande
@@ -1521,17 +1521,17 @@ newHollowSphereWithTopo(const Point& pcentre,  const double& dr_int,  const doub
 
     if (meshStructured){
         CommandNewTopoOGridOnGeometry* commandTopoOGrid =
-        		new Topo::CommandNewTopoOGridOnGeometry(getLocalContext(), commandGeom, 0.0);
+        		new Topo::CommandNewTopoOGridOnGeometry(getContext(), commandGeom, 0.0);
         commandTopoOGrid->setNi(ni);
         commandTopoOGrid->setNr(nr);
         commandTopo = commandTopoOGrid;
     }
     else
-        commandTopo = new Topo::CommandNewTopoOnGeometry(getLocalContext(), commandGeom, CommandNewTopoOnGeometry::UNSTRUCTURED_BLOCK);
+        commandTopo = new Topo::CommandNewTopoOnGeometry(getContext(), commandGeom, CommandNewTopoOnGeometry::UNSTRUCTURED_BLOCK);
 
     // creation de la commande composite
     Internal::CommandComposite *command =
-            new Internal::CommandComposite(getLocalContext(), "Création d'une sphère creuse avec une topologie");
+            new Internal::CommandComposite(getContext(), "Création d'une sphère creuse avec une topologie");
     command->addCommand(commandGeom);
     command->addCommand(commandTopo);
 
@@ -1554,12 +1554,12 @@ newHollowSphereWithTopo(const Point& pcentre,  const double& dr_int,  const doub
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* TopoManager::
+Internal::M3DCommandResult* TopoManager::
 newSpherePartWithTopo(const double& dr,
 		const double& angleY,
 		const double& angleZ,
@@ -1580,15 +1580,15 @@ newSpherePartWithTopo(const double& dr,
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
     // creation de la commande de création de la géométrie
-    Geom::CommandNewSpherePart *commandGeom = new Geom::CommandNewSpherePart(getLocalContext(),dr, angleY, angleZ, groupName);
+    Geom::CommandNewSpherePart *commandGeom = new Geom::CommandNewSpherePart(getContext(),dr, angleY, angleZ, groupName);
 
     // creation de la commande de création de la topologie
     // avec un volume à récupérer dans la commande
-    Topo::CommandCreateTopo* commandTopo = new Topo::CommandNewTopoOnGeometry(getLocalContext(), commandGeom, ni, nj, nk);
+    Topo::CommandCreateTopo* commandTopo = new Topo::CommandNewTopoOnGeometry(getContext(), commandGeom, ni, nj, nk);
 
     // creation de la commande composite
     Internal::CommandComposite *command =
-            new Internal::CommandComposite(getLocalContext(), "Création d'une aiguille pleine avec une topologie");
+            new Internal::CommandComposite(getContext(), "Création d'une aiguille pleine avec une topologie");
     command->addCommand(commandGeom);
     command->addCommand(commandTopo);
 
@@ -1610,12 +1610,12 @@ newSpherePartWithTopo(const double& dr,
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* TopoManager::
+Internal::M3DCommandResult* TopoManager::
 newHollowSpherePartWithTopo(const double& dr_int,
 		const double& dr_ext,
 		const double& angleY,
@@ -1637,15 +1637,15 @@ newHollowSpherePartWithTopo(const double& dr_int,
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
     // creation de la commande de création de la géométrie
-    Geom::CommandNewHollowSpherePart *commandGeom = new Geom::CommandNewHollowSpherePart(getLocalContext(),dr_int, dr_ext, angleY, angleZ, groupName);
+    Geom::CommandNewHollowSpherePart *commandGeom = new Geom::CommandNewHollowSpherePart(getContext(),dr_int, dr_ext, angleY, angleZ, groupName);
 
     // creation de la commande de création de la topologie
     // avec un volume à récupérer dans la commande
-    Topo::CommandCreateTopo* commandTopo = new Topo::CommandNewTopoOnGeometry(getLocalContext(), commandGeom, ni, nj, nk);
+    Topo::CommandCreateTopo* commandTopo = new Topo::CommandNewTopoOnGeometry(getContext(), commandGeom, ni, nj, nk);
 
     // creation de la commande composite
     Internal::CommandComposite *command =
-            new Internal::CommandComposite(getLocalContext(), "Création d'une aiguille creuse avec une topologie");
+            new Internal::CommandComposite(getContext(), "Création d'une aiguille creuse avec une topologie");
     command->addCommand(commandGeom);
     command->addCommand(commandTopo);
 
@@ -1668,12 +1668,12 @@ newHollowSpherePartWithTopo(const double& dr_int,
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 newIJBoxesWithTopo(int ni, int nj, bool alternateStruture)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
@@ -1686,7 +1686,7 @@ newIJBoxesWithTopo(int ni, int nj, bool alternateStruture)
     titreCmd << "Création d'une grille de "
             <<(int64_t)ni<<" X "<<(int64_t)nj<<" boites avec une topologie";
     Internal::CommandComposite *command =
-            new Internal::CommandComposite(getLocalContext(),titreCmd);
+            new Internal::CommandComposite(getContext(),titreCmd);
     std::vector<Topo::CommandCreateTopo*> topo_cmds;
     std::vector<Geom::CommandCreateGeom*> geom_cmds;
     bool structured = true;
@@ -1699,8 +1699,8 @@ newIJBoxesWithTopo(int ni, int nj, bool alternateStruture)
         for (uint i=0; i<ni; i++){
             TkUtil::UTF8String gname("B", TkUtil::Charset::UTF_8);
             gname<<(int64_t)i<<"."<<(int64_t)j;
-            Geom::CommandNewBox *commandGeom = new Geom::CommandNewBox(getLocalContext(),pmin,pmax,gname);
-            Topo::CommandNewTopoOnGeometry* commandTopo = new Topo::CommandNewTopoOnGeometry(getLocalContext(), commandGeom,
+            Geom::CommandNewBox *commandGeom = new Geom::CommandNewBox(getContext(),pmin,pmax,gname);
+            Topo::CommandNewTopoOnGeometry* commandTopo = new Topo::CommandNewTopoOnGeometry(getContext(), commandGeom,
             		(structured?CommandNewTopoOnGeometry::STRUCTURED_BLOCK:CommandNewTopoOnGeometry::UNSTRUCTURED_BLOCK));
 
             command->addCommand(commandGeom);
@@ -1723,10 +1723,10 @@ newIJBoxesWithTopo(int ni, int nj, bool alternateStruture)
     // commande de fusion (glue) géométrique de tous les volumes
     // (dont on ne dispose que de la commande de création)
     if (geom_cmds.size()>1){
-        Geom::CommandEditGeom *commandGeom = new Geom::CommandGluing(getLocalContext(),geom_cmds);
+        Geom::CommandEditGeom *commandGeom = new Geom::CommandGluing(getContext(),geom_cmds);
         command->addCommand(commandGeom);
 
-        Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getLocalContext(),
+        Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getContext(),
                 commandGeom);
         command->addCommand(commandTopo);
     }
@@ -1741,12 +1741,12 @@ newIJBoxesWithTopo(int ni, int nj, bool alternateStruture)
     // on passe au gestionnaire de commandes qui exécute la commande
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::newIJKBoxesWithTopo(int ni, int nj, int nk, bool alternateStruture)
+Mgx3D::Internal::M3DCommandResult* TopoManager::newIJKBoxesWithTopo(int ni, int nj, int nk, bool alternateStruture)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message << "TopoManager::newIJKBoxesWithTopo ("<<(int64_t)ni<<", "<<(int64_t)nj<<", "<<(int64_t)nk<<", "
@@ -1758,7 +1758,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::newIJKBoxesWithTopo(int ni, i
     titreCmd << "Création d'une grille de "
             <<(int64_t)ni<<" X "<<(int64_t)nj<<" X "<<(int64_t)nk<<" boites avec une topologie";
     Internal::CommandComposite *command =
-            new Internal::CommandComposite(getLocalContext(),titreCmd);
+            new Internal::CommandComposite(getContext(),titreCmd);
     std::vector<Topo::CommandCreateTopo*> topo_cmds;
     std::vector<Geom::CommandCreateGeom*> geom_cmds;
     bool structured = true;
@@ -1774,8 +1774,8 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::newIJKBoxesWithTopo(int ni, i
             for (uint i=0; i<ni; i++){
 				TkUtil::UTF8String	gname ("B", TkUtil::Charset::UTF_8);
                 gname<<(int64_t)i<<"."<<(int64_t)j<<"."<<(int64_t)k;
-                Geom::CommandNewBox *commandGeom = new Geom::CommandNewBox(getLocalContext(),pmin,pmax,gname);
-                Topo::CommandNewTopoOnGeometry* commandTopo = new Topo::CommandNewTopoOnGeometry(getLocalContext(), commandGeom,
+                Geom::CommandNewBox *commandGeom = new Geom::CommandNewBox(getContext(),pmin,pmax,gname);
+                Topo::CommandNewTopoOnGeometry* commandTopo = new Topo::CommandNewTopoOnGeometry(getContext(), commandGeom,
                 		(structured?CommandNewTopoOnGeometry::STRUCTURED_BLOCK:CommandNewTopoOnGeometry::UNSTRUCTURED_BLOCK));
 
                 command->addCommand(commandGeom);
@@ -1801,10 +1801,10 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::newIJKBoxesWithTopo(int ni, i
     // commande de fusion (glue) géométrique de tous les volumes
     // (dont on ne dispose que de la commande de création)
     if (geom_cmds.size()>1){
-        Geom::CommandEditGeom *commandGeom = new Geom::CommandGluing(getLocalContext(),geom_cmds);
+        Geom::CommandEditGeom *commandGeom = new Geom::CommandGluing(getContext(),geom_cmds);
         command->addCommand(commandGeom);
 
-        Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getLocalContext(),
+        Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getContext(),
                 commandGeom);
         command->addCommand(commandTopo);
     }
@@ -1819,23 +1819,23 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::newIJKBoxesWithTopo(int ni, i
     // on passe au gestionnaire de commandes qui exécute la commande
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::newTopoOGridOnGeometry(std::string ne, const double& rat)
+Mgx3D::Internal::M3DCommandResult* TopoManager::newTopoOGridOnGeometry(std::string ne, const double& rat)
 {
-    return newTopoOGridOnGeometry(getLocalContext().getGeomManager().getEntity(ne), rat);
+    return newTopoOGridOnGeometry(getContext().getGeomManager().getEntity(ne), rat);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::newTopoOGridOnGeometry(Geom::GeomEntity* ge, const double& rat)
+Mgx3D::Internal::M3DCommandResult* TopoManager::newTopoOGridOnGeometry(Geom::GeomEntity* ge, const double& rat)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::newTopoOGridOnGeometry("<<ge->getName()<<","<<rat<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandNewTopoOGridOnGeometry* command = new Topo::CommandNewTopoOGridOnGeometry(getLocalContext(), ge, rat);
+    Topo::CommandNewTopoOGridOnGeometry* command = new Topo::CommandNewTopoOGridOnGeometry(getContext(), ge, rat);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().newTopoOGridOnGeometry (\""
@@ -1844,7 +1844,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::newTopoOGridOnGeometry(Geom::
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
@@ -1870,7 +1870,7 @@ void TopoManager::destroy(std::vector<Topo::TopoEntity*>& ve, bool propagate)
     message <<"],"<<(propagate?"avec propagation":"sans propagation")<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandDestroyTopo* command = new Topo::CommandDestroyTopo(getLocalContext(), ve, propagate);
+    Topo::CommandDestroyTopo* command = new Topo::CommandDestroyTopo(getContext(), ve, propagate);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias ( ) << ".getTopoManager ( ).destroy (" << Internal::entitiesToPythonList<TopoEntity> (ve) << ", " << (propagate ? "True" : "False") << ")";
@@ -1879,7 +1879,7 @@ void TopoManager::destroy(std::vector<Topo::TopoEntity*>& ve, bool propagate)
     getCommandManager().addCommand(command, Utils::Command::DO);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::copy(std::vector<std::string>& vb, std::string vo)
 {
 	std::vector<Topo::Block* > blocs;
@@ -1893,11 +1893,11 @@ TopoManager::copy(std::vector<std::string>& vb, std::string vo)
 	return copy(blocs, vol);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::copy(std::vector<Topo::Block*>& vb, Geom::Volume* vo)
 {
 	CHECK_ENTITIES_LIST(vb)
-    Topo::CommandDuplicateTopo* command = new Topo::CommandDuplicateTopo(getLocalContext(),
+    Topo::CommandDuplicateTopo* command = new Topo::CommandDuplicateTopo(getContext(),
     		vb, vo);
 
     // trace dans le script
@@ -1911,12 +1911,12 @@ TopoManager::copy(std::vector<Topo::Block*>& vb, Geom::Volume* vo)
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::extract(std::vector<std::string>& vb, const std::string ng)
 {
 	std::vector<Topo::Block* > blocs;
@@ -1928,20 +1928,20 @@ TopoManager::extract(std::vector<std::string>& vb, const std::string ng)
 	return extract(blocs, ng);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::extract(std::vector<Topo::Block*>& vb, const std::string ng)
 {
 	CHECK_ENTITIES_LIST(vb)
     // creation de la commande composite
     Internal::CommandComposite *command =
-            new Internal::CommandComposite(getLocalContext(), std::string("Extraction de blocs dans ")+ng);
+            new Internal::CommandComposite(getContext(), std::string("Extraction de blocs dans ")+ng);
 
     std::vector<Topo::TopoEntity*> te;
     te.insert(te.end(), vb.begin(), vb.end());
 
-    Topo::CommandDuplicateTopo* command1 = new Topo::CommandDuplicateTopo(getLocalContext(), vb, ng);
+    Topo::CommandDuplicateTopo* command1 = new Topo::CommandDuplicateTopo(getContext(), vb, ng);
 
-    Topo::CommandDestroyTopo* command2 = new Topo::CommandDestroyTopo(getLocalContext(), te, true);
+    Topo::CommandDestroyTopo* command2 = new Topo::CommandDestroyTopo(getContext(), te, true);
 
     command->addCommand(command1);
     command->addCommand(command2);
@@ -1954,12 +1954,12 @@ TopoManager::extract(std::vector<Topo::Block*>& vb, const std::string ng)
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::insertHole(std::vector<std::string>& face_names)
 {
     std::vector<CoFace*> cofaces;
@@ -1970,7 +1970,7 @@ TopoManager::insertHole(std::vector<std::string>& face_names)
     return insertHole(cofaces);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::insertHole(std::vector<CoFace*>& cofaces)
 {
 	CHECK_ENTITIES_LIST(cofaces)
@@ -1978,7 +1978,7 @@ TopoManager::insertHole(std::vector<CoFace*>& cofaces)
     message <<"TopoManager::insertHole("<<cofaces.size()<<" faces)";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandInsertHole* command = new Topo::CommandInsertHole(getLocalContext(), cofaces);
+    Topo::CommandInsertHole* command = new Topo::CommandInsertHole(getContext(), cofaces);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias ( ) << ".getTopoManager ( ).insertHole (" << Internal::entitiesToPythonList<CoFace> (cofaces) << ")";
@@ -1986,23 +1986,23 @@ TopoManager::insertHole(std::vector<CoFace*>& cofaces)
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::fuse2Edges(std::string na, std::string nb)
+Mgx3D::Internal::M3DCommandResult* TopoManager::fuse2Edges(std::string na, std::string nb)
 {
     return fuse2Edges(getCoEdge(na), getCoEdge(nb));
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::fuse2Edges(CoEdge* edge_A, CoEdge* edge_B)
+Mgx3D::Internal::M3DCommandResult* TopoManager::fuse2Edges(CoEdge* edge_A, CoEdge* edge_B)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::fuse2Edges("<<edge_A->getName()<<","<<edge_B->getName()<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandFuse2Edges* command = new Topo::CommandFuse2Edges(getLocalContext(), edge_A, edge_B);
+    Topo::CommandFuse2Edges* command = new Topo::CommandFuse2Edges(getContext(), edge_A, edge_B);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().fuse2Edges (\""
@@ -2011,12 +2011,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::fuse2Edges(CoEdge* edge_A, Co
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::fuse2EdgeList(std::vector<std::string>& coedge_names1, std::vector<std::string>& coedge_names2)
 {
     std::vector<Topo::CoEdge* > coedges1;
@@ -2032,7 +2032,7 @@ TopoManager::fuse2EdgeList(std::vector<std::string>& coedge_names1, std::vector<
     return fuse2EdgeList(coedges1, coedges2);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::fuse2EdgeList(std::vector<Topo::CoEdge* > &coedges1, std::vector<Topo::CoEdge* > &coedges2)
 {
 	CHECK_ENTITIES_LIST(coedges1)
@@ -2053,7 +2053,7 @@ TopoManager::fuse2EdgeList(std::vector<Topo::CoEdge* > &coedges1, std::vector<To
     message <<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandFuse2EdgeList* command = new Topo::CommandFuse2EdgeList(getLocalContext(),
+    Topo::CommandFuse2EdgeList* command = new Topo::CommandFuse2EdgeList(getContext(),
     		coedges1, coedges2);
 
     // trace dans le script
@@ -2063,23 +2063,23 @@ TopoManager::fuse2EdgeList(std::vector<Topo::CoEdge* > &coedges1, std::vector<To
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::fuse2Faces(std::string na, std::string nb)
+Mgx3D::Internal::M3DCommandResult* TopoManager::fuse2Faces(std::string na, std::string nb)
 {
     return fuse2Faces(getCoFace(na), getCoFace(nb));
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::fuse2Faces(CoFace* face_A, CoFace* face_B)
+Mgx3D::Internal::M3DCommandResult* TopoManager::fuse2Faces(CoFace* face_A, CoFace* face_B)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::fuse2Faces("<<face_A->getName()<<","<<face_B->getName()<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandFuse2Faces* command = new Topo::CommandFuse2Faces(getLocalContext(), face_A, face_B);
+    Topo::CommandFuse2Faces* command = new Topo::CommandFuse2Faces(getContext(), face_A, face_B);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().fuse2Faces (\""
@@ -2088,12 +2088,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::fuse2Faces(CoFace* face_A, Co
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::fuse2FaceList(std::vector<std::string>& coface_names1, std::vector<std::string>& coface_names2)
 {
     std::vector<Topo::CoFace* > cofaces1;
@@ -2109,7 +2109,7 @@ TopoManager::fuse2FaceList(std::vector<std::string>& coface_names1, std::vector<
     return fuse2FaceList(cofaces1, cofaces2);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::fuse2FaceList(std::vector<Topo::CoFace* > &cofaces1, std::vector<Topo::CoFace* > &cofaces2)
 {
 	CHECK_ENTITIES_LIST(cofaces1)
@@ -2130,7 +2130,7 @@ TopoManager::fuse2FaceList(std::vector<Topo::CoFace* > &cofaces1, std::vector<To
     message <<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandFuse2FaceList* command = new Topo::CommandFuse2FaceList(getLocalContext(),
+    Topo::CommandFuse2FaceList* command = new Topo::CommandFuse2FaceList(getContext(),
     		cofaces1, cofaces2);
 
     // trace dans le script
@@ -2140,23 +2140,23 @@ TopoManager::fuse2FaceList(std::vector<Topo::CoFace* > &cofaces1, std::vector<To
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::glue2Blocks(std::string na, std::string nb)
+Mgx3D::Internal::M3DCommandResult* TopoManager::glue2Blocks(std::string na, std::string nb)
 {
     return glue2Blocks(getBlock(na), getBlock(nb));
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::glue2Blocks(Block* bl_A, Block* bl_B)
+Mgx3D::Internal::M3DCommandResult* TopoManager::glue2Blocks(Block* bl_A, Block* bl_B)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::glue2Blocks("<<bl_A->getName()<<","<<bl_B->getName()<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandGlue2Blocks* command = new Topo::CommandGlue2Blocks(getLocalContext(), bl_A, bl_B);
+    Topo::CommandGlue2Blocks* command = new Topo::CommandGlue2Blocks(getContext(), bl_A, bl_B);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().glue2Blocks (\""
@@ -2165,26 +2165,26 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::glue2Blocks(Block* bl_A, Bloc
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* TopoManager::glue2Topo(
+Internal::M3DCommandResult* TopoManager::glue2Topo(
 		std::string volName1, std::string volName2)
 {
-	return glue2Topo(getLocalContext().getGeomManager().getVolume(volName1, true),
-			getLocalContext().getGeomManager().getVolume(volName2, true));
+	return glue2Topo(getContext().getGeomManager().getVolume(volName1, true),
+			getContext().getGeomManager().getVolume(volName2, true));
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* TopoManager::glue2Topo(
+Internal::M3DCommandResult* TopoManager::glue2Topo(
 		Geom::Volume* vol1, Geom::Volume* vol2)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::glue2Topo("<<vol1->getName()<<","<<vol2->getName()<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandGlue2Topo* command = new Topo::CommandGlue2Topo(getLocalContext(), vol1, vol2);
+    Topo::CommandGlue2Topo* command = new Topo::CommandGlue2Topo(getContext(), vol1, vol2);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().glue2Topo (\""
@@ -2193,23 +2193,23 @@ Internal::M3DCommandResultIfc* TopoManager::glue2Topo(
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::fuse2Vertices(std::string na, std::string nb)
+Mgx3D::Internal::M3DCommandResult* TopoManager::fuse2Vertices(std::string na, std::string nb)
 {
     return fuse2Vertices(getVertex(na), getVertex(nb));
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::fuse2Vertices(Topo::Vertex* vtx_A, Topo::Vertex* vtx_B)
+Mgx3D::Internal::M3DCommandResult* TopoManager::fuse2Vertices(Topo::Vertex* vtx_A, Topo::Vertex* vtx_B)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::fuse2Vertices("<<vtx_A->getName()<<","<<vtx_B->getName()<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandFuse2Vertices* command = new Topo::CommandFuse2Vertices(getLocalContext(), vtx_A, vtx_B);
+    Topo::CommandFuse2Vertices* command = new Topo::CommandFuse2Vertices(getContext(), vtx_A, vtx_B);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().fuse2Vertices (\""
@@ -2218,17 +2218,17 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::fuse2Vertices(Topo::Vertex* v
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitBlock(std::string nbloc, std::string narete, const double& ratio)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitBlock(std::string nbloc, std::string narete, const double& ratio)
 {
     return splitBlock(getBlock(nbloc), getCoEdge(narete), ratio);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitBlock(Block* bloc, CoEdge* arete, const double& ratio)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitBlock(Block* bloc, CoEdge* arete, const double& ratio)
 {
     TkUtil::UTF8String   warning (TkUtil::Charset::UTF_8);
     warning <<"La fonction splitBlock est obsolete, il est préférable d'utiliser splitBlocks";
@@ -2238,7 +2238,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitBlock(Block* bloc, CoEdg
     message <<"TopoManager::splitBlock("<<bloc->getName()<<","<<arete->getName()<<","<<ratio<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSplitBlock* command = new Topo::CommandSplitBlock(getLocalContext(), bloc, arete, ratio);
+    Topo::CommandSplitBlock* command = new Topo::CommandSplitBlock(getContext(), bloc, arete, ratio);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().splitBlock (\""
@@ -2247,12 +2247,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitBlock(Block* bloc, CoEdg
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitBlock(Block* bloc, CoEdge* arete, const Point& pt)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitBlock(Block* bloc, CoEdge* arete, const Point& pt)
 {
     TkUtil::UTF8String   warning (TkUtil::Charset::UTF_8);
     warning <<"La fonction splitBlock est obsolete, il est préférable d'utiliser splitBlocks";
@@ -2262,7 +2262,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitBlock(Block* bloc, CoEdg
     message <<"TopoManager::splitBlock("<<bloc->getName()<<","<<arete->getName()<<","<<pt<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSplitBlock* command = new Topo::CommandSplitBlock(getLocalContext(), bloc, arete, pt);
+    Topo::CommandSplitBlock* command = new Topo::CommandSplitBlock(getContext(), bloc, arete, pt);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().splitBlock (\""
@@ -2271,12 +2271,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitBlock(Block* bloc, CoEdg
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::splitBlocks(std::vector<std::string> &blocs_names, std::string narete, const double& ratio)
 {
     std::vector<Topo::Block* > blocs;
@@ -2290,7 +2290,7 @@ TopoManager::splitBlocks(std::vector<std::string> &blocs_names, std::string nare
     	throw TkUtil::Exception (TkUtil::UTF8String ("Le découpage de blocs ne peut se faire sans aucun bloc", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::splitBlocks(std::vector<Topo::Block* > &blocs, CoEdge* arete, const double& ratio)
 {
 	CHECK_ENTITIES_LIST(blocs)
@@ -2298,24 +2298,24 @@ TopoManager::splitBlocks(std::vector<Topo::Block* > &blocs, CoEdge* arete, const
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
 	cmd << getContextAlias ( ) << ".getTopoManager().splitBlocks (" << Internal::entitiesToPythonList<Block> (blocs) << ",\"" << arete->getName ( ) << "\", " << Utils::Math::MgxNumeric::userRepresentation (ratio) << ")";
 
-    Topo::CommandSplitBlocks* command = new Topo::CommandSplitBlocks(getLocalContext(), blocs, arete, ratio);
+    Topo::CommandSplitBlocks* command = new Topo::CommandSplitBlocks(getContext(), blocs, arete, ratio);
 
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::splitAllBlocks(std::string narete, const double& ratio)
 {
 	return splitAllBlocks(getCoEdge(narete), ratio);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::splitAllBlocks(CoEdge* arete, const double& ratio)
 {
     // trace dans le script
@@ -2323,18 +2323,18 @@ TopoManager::splitAllBlocks(CoEdge* arete, const double& ratio)
     cmd << getContextAlias() << "." << "getTopoManager().splitAllBlocks (\""<<arete->getName()
     	<<"\","<<Utils::Math::MgxNumeric::userRepresentation (ratio)<<")";
 
-    Topo::CommandSplitBlocks* command = new Topo::CommandSplitBlocks(getLocalContext(), arete, ratio);
+    Topo::CommandSplitBlocks* command = new Topo::CommandSplitBlocks(getContext(), arete, ratio);
 
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::splitBlocks(std::vector<std::string> &blocs_names, std::string narete, const Point& pt)
 {
     std::vector<Topo::Block* > blocs;
@@ -2348,7 +2348,7 @@ TopoManager::splitBlocks(std::vector<std::string> &blocs_names, std::string nare
     	throw TkUtil::Exception (TkUtil::UTF8String ("Le découpage de blocs ne peut se faire sans aucun bloc", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::splitBlocks(std::vector<Topo::Block* > &blocs, CoEdge* arete, const Point& pt)
 {
 	CHECK_ENTITIES_LIST(blocs)
@@ -2356,24 +2356,24 @@ TopoManager::splitBlocks(std::vector<Topo::Block* > &blocs, CoEdge* arete, const
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias ( ) << ".getTopoManager ( ).splitBlocks (" << Internal::entitiesToPythonList<Block> (blocs) << ", \"" << arete->getName ( ) << "\"," << pt.getScriptCommand ( ) << ")";
 
-    Topo::CommandSplitBlocks* command = new Topo::CommandSplitBlocks(getLocalContext(), blocs, arete, pt);
+    Topo::CommandSplitBlocks* command = new Topo::CommandSplitBlocks(getContext(), blocs, arete, pt);
 
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::splitAllBlocks(std::string narete, const Point& pt)
 {
 	return splitAllBlocks(getCoEdge(narete), pt);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::splitAllBlocks(CoEdge* arete, const Point& pt)
 {
     // trace dans le script
@@ -2381,29 +2381,29 @@ TopoManager::splitAllBlocks(CoEdge* arete, const Point& pt)
     cmd << getContextAlias() << "." << "getTopoManager().splitAllBlocks (\""<<arete->getName()
     	<<"\","<<pt.getScriptCommand()<<")";
 
-    Topo::CommandSplitBlocks* command = new Topo::CommandSplitBlocks(getLocalContext(), arete, pt);
+    Topo::CommandSplitBlocks* command = new Topo::CommandSplitBlocks(getContext(), arete, pt);
 
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::extendSplitBlock(std::string nbloc, std::string narete)
+Mgx3D::Internal::M3DCommandResult* TopoManager::extendSplitBlock(std::string nbloc, std::string narete)
 {
     return extendSplitBlock(getBlock(nbloc), getCoEdge(narete));
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::extendSplitBlock(Block* bloc, CoEdge* arete)
+Mgx3D::Internal::M3DCommandResult* TopoManager::extendSplitBlock(Block* bloc, CoEdge* arete)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::extendSplitBlock("<<bloc->getName()<<","<<arete->getName()<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandExtendSplitBlock* command = new Topo::CommandExtendSplitBlock(getLocalContext(), bloc, arete);
+    Topo::CommandExtendSplitBlock* command = new Topo::CommandExtendSplitBlock(getContext(), bloc, arete);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().extendSplitBlock (\""
@@ -2412,12 +2412,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::extendSplitBlock(Block* bloc,
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitBlocksWithOgridV2(std::vector<std::string> &blocs_names,
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitBlocksWithOgridV2(std::vector<std::string> &blocs_names,
         std::vector<std::string> &cofaces_names,
         const double& ratio_ogrid, int nb_bras)
 {
@@ -2434,7 +2434,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitBlocksWithOgridV2(std::v
     return splitBlocksWithOgrid(blocs, cofaces, ratio_ogrid, nb_bras, false, false);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitBlocksWithOgrid(std::vector<std::string> &blocs_names,
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitBlocksWithOgrid(std::vector<std::string> &blocs_names,
             std::vector<std::string> &cofaces_names,
             const double& ratio_ogrid, int nb_bras)
 {
@@ -2451,7 +2451,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitBlocksWithOgrid(std::vec
     return splitBlocksWithOgrid(blocs, cofaces, ratio_ogrid, nb_bras, false, true);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitBlocksWithOgrid_old(std::vector<std::string> &blocs_names,
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitBlocksWithOgrid_old(std::vector<std::string> &blocs_names,
         std::vector<std::string> &cofaces_names,
         const double& ratio_ogrid, int nb_bras)
 {
@@ -2468,7 +2468,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitBlocksWithOgrid_old(std:
     return splitBlocksWithOgrid(blocs, cofaces, ratio_ogrid, nb_bras, true, true);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitBlocksWithOgrid(std::vector<Topo::Block* > &blocs,
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitBlocksWithOgrid(std::vector<Topo::Block* > &blocs,
         std::vector<Topo::CoFace* > &cofaces,
         const double& ratio_ogrid, int nb_bras,
 		bool create_internal_vertices,
@@ -2492,7 +2492,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitBlocksWithOgrid(std::vec
     message <<"],"<<Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid)<<","<<(short)nb_bras<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSplitBlocksWithOgrid* command = new Topo::CommandSplitBlocksWithOgrid(getLocalContext(),
+    Topo::CommandSplitBlocksWithOgrid* command = new Topo::CommandSplitBlocksWithOgrid(getContext(),
             blocs, cofaces, ratio_ogrid, nb_bras, create_internal_vertices, propagate_neighbor_block);
 
     // trace dans le script
@@ -2510,12 +2510,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitBlocksWithOgrid(std::vec
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFacesWithOgrid(std::vector<std::string> &cofaces_names,
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitFacesWithOgrid(std::vector<std::string> &cofaces_names,
         std::vector<std::string> &coedges_names,
         const double& ratio_ogrid, int nb_bras)
 {
@@ -2532,7 +2532,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFacesWithOgrid(std::vect
     return splitFacesWithOgrid(cofaces, coedges, ratio_ogrid, nb_bras);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFacesWithOgrid(std::vector<Topo::CoFace*> &cofaces,
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitFacesWithOgrid(std::vector<Topo::CoFace*> &cofaces,
         std::vector<Topo::CoEdge*> &coedges,
         const double& ratio_ogrid, int nb_bras)
 {
@@ -2554,7 +2554,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFacesWithOgrid(std::vect
     message <<"],"<<Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid)<<","<<(short)nb_bras<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSplitFacesWithOgrid* command = new Topo::CommandSplitFacesWithOgrid(getLocalContext(),
+    Topo::CommandSplitFacesWithOgrid* command = new Topo::CommandSplitFacesWithOgrid(getContext(),
             cofaces, coedges, ratio_ogrid, nb_bras);
 
     // trace dans le script
@@ -2565,12 +2565,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFacesWithOgrid(std::vect
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFaces(std::vector<std::string> &cofaces_names, std::string narete, const double& ratio_dec, const double& ratio_ogrid)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitFaces(std::vector<std::string> &cofaces_names, std::string narete, const double& ratio_dec, const double& ratio_ogrid)
 {
     std::vector<Topo::CoFace* > cofaces;
     for (std::vector<std::string>::iterator iter = cofaces_names.begin();
@@ -2580,7 +2580,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFaces(std::vector<std::s
     return splitFaces(cofaces, getCoEdge(narete), ratio_dec, ratio_ogrid);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFaces(std::vector<Topo::CoFace*  > &cofaces, CoEdge* arete, const double& ratio_dec, const double& ratio_ogrid)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitFaces(std::vector<Topo::CoFace*  > &cofaces, CoEdge* arete, const double& ratio_dec, const double& ratio_ogrid)
 {
 	CHECK_ENTITIES_LIST(cofaces)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
@@ -2593,7 +2593,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFaces(std::vector<Topo::
     message <<"],"<<arete->getName()<<","<<Utils::Math::MgxNumeric::userRepresentation (ratio_dec)<<","<<Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid)<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSplitFaces* command = new Topo::CommandSplitFaces(getLocalContext(), cofaces, arete, ratio_dec, ratio_ogrid);
+    Topo::CommandSplitFaces* command = new Topo::CommandSplitFaces(getContext(), cofaces, arete, ratio_dec, ratio_ogrid);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -2603,12 +2603,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFaces(std::vector<Topo::
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFaces(std::vector<std::string> &cofaces_names, std::string narete, const Point& pt, const double& ratio_ogrid)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitFaces(std::vector<std::string> &cofaces_names, std::string narete, const Point& pt, const double& ratio_ogrid)
 {
     std::vector<Topo::CoFace* > cofaces;
     for (std::vector<std::string>::iterator iter = cofaces_names.begin();
@@ -2618,7 +2618,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFaces(std::vector<std::s
     return splitFaces(cofaces, getCoEdge(narete), pt, ratio_ogrid);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFaces(std::vector<Topo::CoFace*  > &cofaces, CoEdge* arete, const Point& pt, const double& ratio_ogrid)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitFaces(std::vector<Topo::CoFace*  > &cofaces, CoEdge* arete, const Point& pt, const double& ratio_ogrid)
 {
 	CHECK_ENTITIES_LIST(cofaces)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
@@ -2631,7 +2631,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFaces(std::vector<Topo::
     message <<"],"<<arete->getName()<<","<<pt<<","<<Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid)<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSplitFaces* command = new Topo::CommandSplitFaces(getLocalContext(), cofaces, arete, pt, ratio_ogrid);
+    Topo::CommandSplitFaces* command = new Topo::CommandSplitFaces(getContext(), cofaces, arete, pt, ratio_ogrid);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -2641,24 +2641,24 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFaces(std::vector<Topo::
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFace(std::string coface_name, std::string narete, const double& ratio_dec, bool project_on_meshing_edges)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitFace(std::string coface_name, std::string narete, const double& ratio_dec, bool project_on_meshing_edges)
 {
     return splitFace(getCoFace(coface_name), getCoEdge(narete), ratio_dec, project_on_meshing_edges);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFace(Topo::CoFace* coface, CoEdge* coedge, const double& ratio_dec, bool project_on_meshing_edges)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitFace(Topo::CoFace* coface, CoEdge* coedge, const double& ratio_dec, bool project_on_meshing_edges)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
 
     message <<"TopoManager::splitFace("<<coface->getName()<<", "<< coedge->getName() <<", "<< ratio_dec<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSplitFaces* command = new Topo::CommandSplitFaces(getLocalContext(), coface, coedge, ratio_dec, project_on_meshing_edges);
+    Topo::CommandSplitFaces* command = new Topo::CommandSplitFaces(getContext(), coface, coedge, ratio_dec, project_on_meshing_edges);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -2672,24 +2672,24 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFace(Topo::CoFace* cofac
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFace(std::string coface_name, std::string narete, const Point& pt, bool project_on_meshing_edges)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitFace(std::string coface_name, std::string narete, const Point& pt, bool project_on_meshing_edges)
 {
     return splitFace(getCoFace(coface_name), getCoEdge(narete), pt, project_on_meshing_edges);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFace(Topo::CoFace* coface, CoEdge* coedge, const Point& pt, bool project_on_meshing_edges)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitFace(Topo::CoFace* coface, CoEdge* coedge, const Point& pt, bool project_on_meshing_edges)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
 
     message <<"TopoManager::splitFace("<<coface->getName()<<", "<< coedge->getName() <<", "<< pt<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSplitFaces* command = new Topo::CommandSplitFaces(getLocalContext(), coface, coedge, pt, project_on_meshing_edges);
+    Topo::CommandSplitFaces* command = new Topo::CommandSplitFaces(getContext(), coface, coedge, pt, project_on_meshing_edges);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -2703,18 +2703,18 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitFace(Topo::CoFace* cofac
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::extendSplitFace(std::string coface_name, std::string nsommet)
 {
 	return extendSplitFace(getCoFace(coface_name), getVertex(nsommet));
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::extendSplitFace(Topo::CoFace* coface, Vertex* vertex)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
@@ -2722,7 +2722,7 @@ TopoManager::extendSplitFace(Topo::CoFace* coface, Vertex* vertex)
     message <<"TopoManager::extendSplitFace("<<coface->getName()<<", "<< vertex->getName() <<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandExtendSplitFace* command = new Topo::CommandExtendSplitFace(getLocalContext(), coface, vertex);
+    Topo::CommandExtendSplitFace* command = new Topo::CommandExtendSplitFace(getContext(), coface, vertex);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -2733,24 +2733,24 @@ TopoManager::extendSplitFace(Topo::CoFace* coface, Vertex* vertex)
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitAllFaces(std::string narete, const double& ratio_dec, const double& ratio_ogrid)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitAllFaces(std::string narete, const double& ratio_dec, const double& ratio_ogrid)
 {
     return splitAllFaces(getCoEdge(narete), ratio_dec, ratio_ogrid);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitAllFaces(CoEdge* coedge, const double& ratio_dec, const double& ratio_ogrid)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitAllFaces(CoEdge* coedge, const double& ratio_dec, const double& ratio_ogrid)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::splitAllFaces(";
     message <<coedge->getName()<<","<<Utils::Math::MgxNumeric::userRepresentation (ratio_dec)<<","<<Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid)<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSplitFaces* command = new Topo::CommandSplitFaces(getLocalContext(), coedge, ratio_dec, ratio_ogrid);
+    Topo::CommandSplitFaces* command = new Topo::CommandSplitFaces(getContext(), coedge, ratio_dec, ratio_ogrid);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -2760,24 +2760,24 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitAllFaces(CoEdge* coedge,
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitAllFaces(std::string narete, const Point& pt, const double& ratio_ogrid)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitAllFaces(std::string narete, const Point& pt, const double& ratio_ogrid)
 {
     return splitAllFaces(getCoEdge(narete), pt, ratio_ogrid);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitAllFaces(CoEdge* coedge, const Point& pt, const double& ratio_ogrid)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitAllFaces(CoEdge* coedge, const Point& pt, const double& ratio_ogrid)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::splitAllFaces(";
     message <<coedge->getName()<<","<<pt<<","<<Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid)<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSplitFaces* command = new Topo::CommandSplitFaces(getLocalContext(), coedge, pt, ratio_ogrid);
+    Topo::CommandSplitFaces* command = new Topo::CommandSplitFaces(getContext(), coedge, pt, ratio_ogrid);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -2787,24 +2787,24 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitAllFaces(CoEdge* coedge,
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitEdge(std::string coedge_name, const double& ratio_dec)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitEdge(std::string coedge_name, const double& ratio_dec)
 {
    return splitEdge(getCoEdge(coedge_name), ratio_dec);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitEdge(CoEdge* coedge, const double& ratio_dec)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitEdge(CoEdge* coedge, const double& ratio_dec)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
 
     message <<"TopoManager::splitEdge("<<coedge->getName()<<", "<< Utils::Math::MgxNumeric::userRepresentation (ratio_dec)<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSplitEdge* command = new Topo::CommandSplitEdge(getLocalContext(), coedge, ratio_dec);
+    Topo::CommandSplitEdge* command = new Topo::CommandSplitEdge(getContext(), coedge, ratio_dec);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -2814,24 +2814,24 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitEdge(CoEdge* coedge, con
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitEdge(std::string coedge_name, const Point& pt)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitEdge(std::string coedge_name, const Point& pt)
 {
    return splitEdge(getCoEdge(coedge_name), pt);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitEdge(CoEdge* coedge, const Point& pt)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitEdge(CoEdge* coedge, const Point& pt)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
 
     message <<"TopoManager::splitEdge("<<coedge->getName()<<", "<< pt<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSplitEdge* command = new Topo::CommandSplitEdge(getLocalContext(), coedge, pt);
+    Topo::CommandSplitEdge* command = new Topo::CommandSplitEdge(getContext(), coedge, pt);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -2841,12 +2841,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::splitEdge(CoEdge* coedge, con
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::snapVertices(std::string nom1, std::string nom2, bool project_on_first)
+Mgx3D::Internal::M3DCommandResult* TopoManager::snapVertices(std::string nom1, std::string nom2, bool project_on_first)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
      message <<"TopoManager::snapVertices(";
@@ -2892,7 +2892,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::snapVertices(std::string nom1
 
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::snapVertices(Topo::Vertex* ve1, Topo::Vertex* ve2,
+Mgx3D::Internal::M3DCommandResult* TopoManager::snapVertices(Topo::Vertex* ve1, Topo::Vertex* ve2,
 		bool project_on_first,
 		TkUtil::UTF8String& scriptCommand)
 {
@@ -2905,7 +2905,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::snapVertices(Topo::Vertex* ve
     return snapVertices(vertices1, vertices2, project_on_first, scriptCommand);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::snapVertices(Topo::CoEdge* ce1, Topo::CoEdge* ce2,
+Mgx3D::Internal::M3DCommandResult* TopoManager::snapVertices(Topo::CoEdge* ce1, Topo::CoEdge* ce2,
 		bool project_on_first,
 		TkUtil::UTF8String& scriptCommand)
 {
@@ -2918,7 +2918,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::snapVertices(Topo::CoEdge* ce
     return snapVertices(vertices1, vertices2, project_on_first, scriptCommand);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::snapVertices(Topo::CoFace* cf1, Topo::CoFace* cf2,
+Mgx3D::Internal::M3DCommandResult* TopoManager::snapVertices(Topo::CoFace* cf1, Topo::CoFace* cf2,
 		bool project_on_first,
 		TkUtil::UTF8String& scriptCommand)
 {
@@ -2931,24 +2931,24 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::snapVertices(Topo::CoFace* cf
     return snapVertices(vertices1, vertices2, project_on_first, scriptCommand);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::snapVertices(std::vector<Topo::Vertex* > vertices1, std::vector<Topo::Vertex* > vertices2,
+Mgx3D::Internal::M3DCommandResult* TopoManager::snapVertices(std::vector<Topo::Vertex* > vertices1, std::vector<Topo::Vertex* > vertices2,
 		bool project_on_first,
 		TkUtil::UTF8String& scriptCommand)
 {
      // la commande avec les sommets dans n'importe quel ordre
-     Topo::CommandSnapVertices* command = new Topo::CommandSnapVertices(getLocalContext(),
+     Topo::CommandSnapVertices* command = new Topo::CommandSnapVertices(getContext(),
              vertices1, vertices2, project_on_first);
 
      command->setScriptCommand(scriptCommand);
 
      getCommandManager().addCommand(command, Utils::Command::DO);
 
-     Internal::M3DCommandResultIfc*  cmdResult   =
+     Internal::M3DCommandResult*  cmdResult   =
              new Internal::M3DCommandResult (*command);
      return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::makeBlocksByRevol(std::vector<std::string>& coedges_names, const  Utils::Portion::Type& dt)
+Mgx3D::Internal::M3DCommandResult* TopoManager::makeBlocksByRevol(std::vector<std::string>& coedges_names, const  Utils::Portion::Type& dt)
 {
     std::vector<CoEdge*> coedges;
     for (std::vector<std::string>::iterator iter = coedges_names.begin();
@@ -2958,7 +2958,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::makeBlocksByRevol(std::vector
     return makeBlocksByRevol(coedges, dt, 1.0);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::makeBlocksByRevolWithRatioOgrid(std::vector<std::string> &coedges_names, const  Utils::Portion::Type& dt, const double& ratio_ogrid)
+Mgx3D::Internal::M3DCommandResult* TopoManager::makeBlocksByRevolWithRatioOgrid(std::vector<std::string> &coedges_names, const  Utils::Portion::Type& dt, const double& ratio_ogrid)
 {
     std::vector<CoEdge*> coedges;
     for (std::vector<std::string>::iterator iter = coedges_names.begin();
@@ -2968,7 +2968,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::makeBlocksByRevolWithRatioOgr
     return makeBlocksByRevol(coedges, dt, ratio_ogrid);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::makeBlocksByRevol(std::vector<CoEdge*>& coedges, const  Utils::Portion::Type& dt, const double& ratio_ogrid)
+Mgx3D::Internal::M3DCommandResult* TopoManager::makeBlocksByRevol(std::vector<CoEdge*>& coedges, const  Utils::Portion::Type& dt, const double& ratio_ogrid)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::makeBlocksByRevol([";
@@ -2999,7 +2999,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::makeBlocksByRevol(std::vector
     std::map<Geom::GeomEntity*, uint> filtre_surf;
 
     if (coedges.empty()){
-    	std::vector<Geom::Surface*> surfs = getLocalContext().getGeomManager().getSurfacesObj();
+    	std::vector<Geom::Surface*> surfs = getContext().getGeomManager().getSurfacesObj();
     	geom_entities.insert(geom_entities.end(), surfs.begin(), surfs.end());
     }
 
@@ -3065,14 +3065,14 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::makeBlocksByRevol(std::vector
 
     // révolution de la géométrie sans conservation des données 2D initiales
     Geom::CommandExtrudeRevolution *commandGeom =
-               new Geom::CommandExtrudeRevolution(getLocalContext(), geom_entities, Utils::Math::Rotation(axis1, axis2, dt), false);
+               new Geom::CommandExtrudeRevolution(getContext(), geom_entities, Utils::Math::Rotation(axis1, axis2, dt), false);
 
     Topo::CommandMakeBlocksByRevol* commandTopo =
-            new Topo::CommandMakeBlocksByRevol(getLocalContext(), commandGeom, coedges, dt, ratio_ogrid);
+            new Topo::CommandMakeBlocksByRevol(getContext(), commandGeom, coedges, dt, ratio_ogrid);
 
     // creation de la commande composite
     Internal::CommandComposite *command =
-            new Internal::CommandComposite(getLocalContext(), "Construction Topo et Geom 3D avec o-grid par révolution");
+            new Internal::CommandComposite(getContext(), "Construction Topo et Geom 3D avec o-grid par révolution");
     command->addCommand(commandGeom);
     command->addCommand(commandTopo);
 
@@ -3095,12 +3095,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::makeBlocksByRevol(std::vector
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::makeBlocksByExtrude(std::vector<std::string>& cofaces_names, const  Utils::Math::Vector& dv)
+Mgx3D::Internal::M3DCommandResult* TopoManager::makeBlocksByExtrude(std::vector<std::string>& cofaces_names, const  Utils::Math::Vector& dv)
 {
     std::vector<TopoEntity*> cofaces;
     for (std::vector<std::string>::iterator iter = cofaces_names.begin(); iter != cofaces_names.end(); ++iter)
@@ -3109,7 +3109,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::makeBlocksByExtrude(std::vect
     return makeBlocksByExtrude(cofaces, dv);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::makeBlocksByExtrude(std::vector<TopoEntity*>& cofaces, const  Utils::Math::Vector& dv)
+Mgx3D::Internal::M3DCommandResult* TopoManager::makeBlocksByExtrude(std::vector<TopoEntity*>& cofaces, const  Utils::Math::Vector& dv)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::makeBlocksByExtrude([";
@@ -3121,7 +3121,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::makeBlocksByExtrude(std::vect
     message <<"],"<<dv.getScriptCommand()<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandExtrudeFace* command = new CommandExtrudeFace(getLocalContext(), cofaces, dv);
+    Topo::CommandExtrudeFace* command = new CommandExtrudeFace(getContext(), cofaces, dv);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().makeBlocksByExtrude ([";
@@ -3137,12 +3137,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::makeBlocksByExtrude(std::vect
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(CoEdgeMeshingProperty& emp, std::vector<std::string> &coedges_names)
+Mgx3D::Internal::M3DCommandResult* TopoManager::setMeshingProperty(CoEdgeMeshingProperty& emp, std::vector<std::string> &coedges_names)
 {
     std::vector<CoEdge*> coedges;
     for (std::vector<std::string>::iterator iter = coedges_names.begin();
@@ -3152,7 +3152,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(CoEdgeMesh
     return setMeshingProperty(emp, coedges);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(CoEdgeMeshingProperty& emp, std::vector<CoEdge*>& coedges)
+Mgx3D::Internal::M3DCommandResult* TopoManager::setMeshingProperty(CoEdgeMeshingProperty& emp, std::vector<CoEdge*>& coedges)
 {
 	CHECK_ENTITIES_LIST (coedges)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
@@ -3160,7 +3160,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(CoEdgeMesh
                     <<"),"<<coedges.size()<<" arêtes)";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSetEdgeMeshingProperty* command = new Topo::CommandSetEdgeMeshingProperty(getLocalContext(), emp, coedges);
+    Topo::CommandSetEdgeMeshingProperty* command = new Topo::CommandSetEdgeMeshingProperty(getContext(), emp, coedges);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << emp.getScriptCommandBegin()<<"\n" << getContextAlias() << ".getTopoManager().setMeshingProperty (" << emp.getScriptCommandRef ( ) 
@@ -3169,12 +3169,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(CoEdgeMesh
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setAllMeshingProperty(CoEdgeMeshingProperty& emp)
+Mgx3D::Internal::M3DCommandResult* TopoManager::setAllMeshingProperty(CoEdgeMeshingProperty& emp)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::setAllMeshingProperty(EdgeMeshingProperty("<<(long)emp.getNbEdges()<<","<<emp.getMeshLawName()
@@ -3184,7 +3184,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setAllMeshingProperty(CoEdgeM
     std::vector<Topo::CoEdge* > coedges;
     getCoEdges(coedges);
 
-    Topo::CommandSetEdgeMeshingProperty* command = new Topo::CommandSetEdgeMeshingProperty(getLocalContext(), emp, coedges);
+    Topo::CommandSetEdgeMeshingProperty* command = new Topo::CommandSetEdgeMeshingProperty(getContext(), emp, coedges);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << emp.getScriptCommandBegin()<<"\n";
@@ -3194,18 +3194,18 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setAllMeshingProperty(CoEdgeM
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::setParallelMeshingProperty(CoEdgeMeshingProperty& emp, std::string coedge_name)
 {
 	return setParallelMeshingProperty(emp, getCoEdge(coedge_name));
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::setParallelMeshingProperty(CoEdgeMeshingProperty& emp, Topo::CoEdge* coedge)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
@@ -3213,7 +3213,7 @@ TopoManager::setParallelMeshingProperty(CoEdgeMeshingProperty& emp, Topo::CoEdge
                     <<"),"<<coedge->getName()<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSetEdgeMeshingPropertyToParallelCoEdges* command = new Topo::CommandSetEdgeMeshingPropertyToParallelCoEdges(getLocalContext(), emp, coedge);
+    Topo::CommandSetEdgeMeshingPropertyToParallelCoEdges* command = new Topo::CommandSetEdgeMeshingPropertyToParallelCoEdges(getContext(), emp, coedge);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << emp.getScriptCommandBegin()<<"\n";
@@ -3223,12 +3223,12 @@ TopoManager::setParallelMeshingProperty(CoEdgeMeshingProperty& emp, Topo::CoEdge
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::reverseDirection(std::vector<std::string> &coedges_names)
 {
     std::vector<CoEdge*> coedges;
@@ -3239,7 +3239,7 @@ TopoManager::reverseDirection(std::vector<std::string> &coedges_names)
     return reverseDirection(coedges);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::reverseDirection(std::vector<CoEdge*>& coedges)
 {
 	CHECK_ENTITIES_LIST(coedges)
@@ -3247,7 +3247,7 @@ TopoManager::reverseDirection(std::vector<CoEdge*>& coedges)
     message <<"TopoManager::reverseDirection pour "<<coedges.size()<<" arêtes";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandReverseDirection* command = new Topo::CommandReverseDirection(getLocalContext(), coedges);
+    Topo::CommandReverseDirection* command = new Topo::CommandReverseDirection(getContext(), coedges);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias ( ) << ".getTopoManager ( ).reverseDirection (" << Internal::entitiesToPythonList<CoEdge> (coedges) << ")";
@@ -3255,12 +3255,12 @@ TopoManager::reverseDirection(std::vector<CoEdge*>& coedges)
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(CoFaceMeshingProperty& emp, std::vector<std::string> &face_names)
+Mgx3D::Internal::M3DCommandResult* TopoManager::setMeshingProperty(CoFaceMeshingProperty& emp, std::vector<std::string> &face_names)
 {
     std::vector<CoFace*> cofaces;
     for (std::vector<std::string>::iterator iter = face_names.begin();
@@ -3270,7 +3270,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(CoFaceMesh
     return setMeshingProperty(emp, cofaces);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(CoFaceMeshingProperty& emp, std::vector<CoFace*>& cofaces)
+Mgx3D::Internal::M3DCommandResult* TopoManager::setMeshingProperty(CoFaceMeshingProperty& emp, std::vector<CoFace*>& cofaces)
 {
 	CHECK_ENTITIES_LIST(cofaces)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
@@ -3278,7 +3278,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(CoFaceMesh
                     <<"),"<<cofaces.size()<<" faces)";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSetFaceMeshingProperty* command = new Topo::CommandSetFaceMeshingProperty(getLocalContext(), emp, cofaces);
+    Topo::CommandSetFaceMeshingProperty* command = new Topo::CommandSetFaceMeshingProperty(getContext(), emp, cofaces);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias ( ) << ".getTopoManager ( ).setMeshingProperty (" << emp.getScriptCommand ( ) << ", " << Internal::entitiesToPythonList<CoFace> (cofaces) << ")";
@@ -3286,12 +3286,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(CoFaceMesh
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setAllMeshingProperty(CoFaceMeshingProperty& emp)
+Mgx3D::Internal::M3DCommandResult* TopoManager::setAllMeshingProperty(CoFaceMeshingProperty& emp)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::setAllMeshingProperty(FaceMeshingProperty("<<emp.getMeshLawName()
@@ -3301,7 +3301,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setAllMeshingProperty(CoFaceM
     std::vector<Topo::CoFace* > cofaces;
     getCoFaces(cofaces);
 
-    Topo::CommandSetFaceMeshingProperty* command = new Topo::CommandSetFaceMeshingProperty(getLocalContext(), emp, cofaces);
+    Topo::CommandSetFaceMeshingProperty* command = new Topo::CommandSetFaceMeshingProperty(getContext(), emp, cofaces);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().setAllMeshingProperty ("
@@ -3310,12 +3310,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setAllMeshingProperty(CoFaceM
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(BlockMeshingProperty& emp, std::vector<std::string> &bloc_names)
+Mgx3D::Internal::M3DCommandResult* TopoManager::setMeshingProperty(BlockMeshingProperty& emp, std::vector<std::string> &bloc_names)
 {
     std::vector<Block*> blocks;
     for (std::vector<std::string>::iterator iter = bloc_names.begin();
@@ -3325,7 +3325,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(BlockMeshi
     return setMeshingProperty(emp, blocks);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(BlockMeshingProperty& emp, std::vector<Block*>& blocks)
+Mgx3D::Internal::M3DCommandResult* TopoManager::setMeshingProperty(BlockMeshingProperty& emp, std::vector<Block*>& blocks)
 {
 	CHECK_ENTITIES_LIST(blocks)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
@@ -3333,7 +3333,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(BlockMeshi
                     <<"),"<<blocks.size()<<" blocs)";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSetBlockMeshingProperty* command = new Topo::CommandSetBlockMeshingProperty(getLocalContext(), emp, blocks);
+    Topo::CommandSetBlockMeshingProperty* command = new Topo::CommandSetBlockMeshingProperty(getContext(), emp, blocks);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias ( ) << ".getTopoManager ( ).setMeshingProperty (" << emp.getScriptCommand ( ) << ", " << Internal::entitiesToPythonList<Block> (blocks) << ")";
@@ -3341,12 +3341,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setMeshingProperty(BlockMeshi
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setAllMeshingProperty(BlockMeshingProperty& emp)
+Mgx3D::Internal::M3DCommandResult* TopoManager::setAllMeshingProperty(BlockMeshingProperty& emp)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::setAllMeshingProperty(FaceMeshingProperty("<<emp.getMeshLawName()
@@ -3356,7 +3356,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setAllMeshingProperty(BlockMe
     std::vector<Topo::Block* > blocks;
     getBlocks(blocks);
 
-    Topo::CommandSetBlockMeshingProperty* command = new Topo::CommandSetBlockMeshingProperty(getLocalContext(), emp, blocks);
+    Topo::CommandSetBlockMeshingProperty* command = new Topo::CommandSetBlockMeshingProperty(getContext(), emp, blocks);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().setAllMeshingProperty ("
@@ -3365,14 +3365,14 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setAllMeshingProperty(BlockMe
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 
 
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setEdgeMeshingProperty(CoEdgeMeshingProperty& emp, std::string ed)
+Mgx3D::Internal::M3DCommandResult* TopoManager::setEdgeMeshingProperty(CoEdgeMeshingProperty& emp, std::string ed)
 {
     return setEdgeMeshingProperty(emp, getCoEdge(ed, true));
 }
@@ -3385,14 +3385,14 @@ TopoManager::getEdgeMeshingProperty(std::string ed)
     return *property;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setEdgeMeshingProperty(CoEdgeMeshingProperty& emp, CoEdge* ed)
+Mgx3D::Internal::M3DCommandResult* TopoManager::setEdgeMeshingProperty(CoEdgeMeshingProperty& emp, CoEdge* ed)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::setEdgeMeshingProperty(EdgeMeshingProperty("<<(long)emp.getNbEdges()<<","<<emp.getMeshLawName()
                     <<"),"<<ed->getName()<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSetEdgeMeshingProperty* command = new Topo::CommandSetEdgeMeshingProperty(getLocalContext(), emp, ed);
+    Topo::CommandSetEdgeMeshingProperty* command = new Topo::CommandSetEdgeMeshingProperty(getContext(), emp, ed);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << emp.getScriptCommandBegin()<<"\n";
@@ -3402,24 +3402,24 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setEdgeMeshingProperty(CoEdge
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setFaceMeshingProperty(CoFaceMeshingProperty& emp, std::string cf)
+Mgx3D::Internal::M3DCommandResult* TopoManager::setFaceMeshingProperty(CoFaceMeshingProperty& emp, std::string cf)
 {
     return setFaceMeshingProperty(emp, getCoFace(cf, true));
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setFaceMeshingProperty(CoFaceMeshingProperty& emp, CoFace* cf)
+Mgx3D::Internal::M3DCommandResult* TopoManager::setFaceMeshingProperty(CoFaceMeshingProperty& emp, CoFace* cf)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::setFaceMeshingProperty(FaceMeshingProperty("<<emp.getMeshLawName()
                     <<"),"<<cf->getName()<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSetFaceMeshingProperty* command = new Topo::CommandSetFaceMeshingProperty(getLocalContext(), emp, cf);
+    Topo::CommandSetFaceMeshingProperty* command = new Topo::CommandSetFaceMeshingProperty(getContext(), emp, cf);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().setFaceMeshingProperty ("
@@ -3428,24 +3428,24 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setFaceMeshingProperty(CoFace
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setBlockMeshingProperty(BlockMeshingProperty& emp, std::string bl)
+Mgx3D::Internal::M3DCommandResult* TopoManager::setBlockMeshingProperty(BlockMeshingProperty& emp, std::string bl)
 {
     return setBlockMeshingProperty(emp, getBlock(bl, true));
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setBlockMeshingProperty(BlockMeshingProperty& emp, Block* bl)
+Mgx3D::Internal::M3DCommandResult* TopoManager::setBlockMeshingProperty(BlockMeshingProperty& emp, Block* bl)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::setBlockMeshingProperty(BlockMeshingProperty("<<emp.getMeshLawName()
                     <<"),"<<bl->getName()<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSetBlockMeshingProperty* command = new Topo::CommandSetBlockMeshingProperty(getLocalContext(), emp, bl);
+    Topo::CommandSetBlockMeshingProperty* command = new Topo::CommandSetBlockMeshingProperty(getContext(), emp, bl);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().setBlockMeshingProperty ("
@@ -3454,23 +3454,23 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setBlockMeshingProperty(Block
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::unrefine(std::string nbloc, std::string narete, int ratio)
+Mgx3D::Internal::M3DCommandResult* TopoManager::unrefine(std::string nbloc, std::string narete, int ratio)
 {
     return unrefine(getBlock(nbloc), getCoEdge(narete), ratio);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::unrefine(Block* bloc, CoEdge* arete, int ratio)
+Mgx3D::Internal::M3DCommandResult* TopoManager::unrefine(Block* bloc, CoEdge* arete, int ratio)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::unrefine("<<bloc->getName()<<","<<arete->getName()<<","<<(short)ratio<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandUnrefineBlock* command = new Topo::CommandUnrefineBlock(getLocalContext(), bloc, arete, ratio);
+    Topo::CommandUnrefineBlock* command = new Topo::CommandUnrefineBlock(getContext(), bloc, arete, ratio);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().unrefine (\""
@@ -3479,18 +3479,18 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::unrefine(Block* bloc, CoEdge*
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::refine(int ratio)
+Mgx3D::Internal::M3DCommandResult* TopoManager::refine(int ratio)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::refine("<<(short)ratio<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandRefineAllCoEdges* command = new Topo::CommandRefineAllCoEdges(getLocalContext(), ratio);
+    Topo::CommandRefineAllCoEdges* command = new Topo::CommandRefineAllCoEdges(getContext(), ratio);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().refine ("<<(short)ratio<<")";
@@ -3498,12 +3498,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::refine(int ratio)
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::importMDL(std::string n, const bool all, const bool useAreaName,
+Mgx3D::Internal::M3DCommandResult* TopoManager::importMDL(std::string n, const bool all, const bool useAreaName,
 		std::string prefixName,int deg_min, int deg_max)
 {
 #ifdef USE_MDLPARSER
@@ -3512,14 +3512,14 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::importMDL(std::string n, cons
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
     // création de l'importateur de modélisation/topo MDL
-    Internal::ImportMDLImplementation* impl = new Internal::ImportMDLImplementation(getLocalContext(), n, all,
+    Internal::ImportMDLImplementation* impl = new Internal::ImportMDLImplementation(getContext(), n, all,
     		useAreaName, deg_min, deg_max);
     if (!prefixName.empty())
     	impl->setPrefix(prefixName);
 
     // creation de la commande composite
     Internal::CommandComposite *command =
-            new Internal::CommandComposite(getLocalContext(), "Import Mdl (géom et topo)");
+            new Internal::CommandComposite(getContext(), "Import Mdl (géom et topo)");
 
     Utils::Unit::lengthUnit luMdl = impl->getLengthUnit();
     Utils::Unit::lengthUnit luCtx = getContext().getLengthUnit();
@@ -3527,7 +3527,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::importMDL(std::string n, cons
     if (luCtx == Utils::Unit::undefined){
     	// si l'unité n'est pas définie, on se met dans celle du mdl
     	 Internal::CommandChangeLengthUnit* commandCU =
-    			 new Internal::CommandChangeLengthUnit(getLocalContext(), luMdl);
+    			 new Internal::CommandChangeLengthUnit(getContext(), luMdl);
     	command->addCommand(commandCU);
     }
     else if (luMdl != luCtx) {
@@ -3537,9 +3537,9 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::importMDL(std::string n, cons
     }
 
     //creation de la commande d'importation de la géométrie
-    Geom::CommandImportMDL *commandGeom = new Geom::CommandImportMDL(getLocalContext(), impl);
+    Geom::CommandImportMDL *commandGeom = new Geom::CommandImportMDL(getContext(), impl);
     //creation de la commande d'importation de la topologie
-    Topo::CommandImportTopoMDL *commandTopo = new Topo::CommandImportTopoMDL(getLocalContext(), impl);
+    Topo::CommandImportTopoMDL *commandTopo = new Topo::CommandImportTopoMDL(getContext(), impl);
 
     command->addCommand(commandGeom);
     command->addCommand(commandTopo);
@@ -3567,7 +3567,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::importMDL(std::string n, cons
     // on peut détruire l'importateur de MDL
     delete impl;
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 #else   // USE_MDLPARSER
@@ -3719,7 +3719,7 @@ std::vector<std::string> TopoManager::getInvalidEdges() const
     return invalidEdges;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 fuseEdges(std::vector<std::string> &coedges_names)
 {
     std::vector<CoEdge*> coedges;
@@ -3729,7 +3729,7 @@ fuseEdges(std::vector<std::string> &coedges_names)
     return fuseEdges(coedges);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 fuseEdges(std::vector<CoEdge*> &coedges)
 {
 	CHECK_ENTITIES_LIST(coedges)
@@ -3763,19 +3763,19 @@ fuseEdges(std::vector<CoEdge*> &coedges)
     Internal::CommandInternal *command = 0;
     if (courbes.size()){
     	// creation de la commande de modification/création de la géométrie
-    	Geom::CommandJoinCurves* commandGeom = new Geom::CommandJoinCurves(getLocalContext(), courbes);
+    	Geom::CommandJoinCurves* commandGeom = new Geom::CommandJoinCurves(getContext(), courbes);
 
     	// création de la commande de modification de la projection des arêtes
     	std::vector<Topo::TopoEntity*> topoEntities;
     	topoEntities.insert(topoEntities.end(), coedges.begin(), coedges.end());
-    	Topo::CommandSetGeomAssociation* commandTopo1 = new Topo::CommandSetGeomAssociation(getLocalContext(), topoEntities, commandGeom);
+    	Topo::CommandSetGeomAssociation* commandTopo1 = new Topo::CommandSetGeomAssociation(getContext(), topoEntities, commandGeom);
 
     	// creation de la commande de modification de la topologie
-    	Topo::CommandFuseCoEdges* commandTopo2 = new Topo::CommandFuseCoEdges(getLocalContext(), coedges);
+    	Topo::CommandFuseCoEdges* commandTopo2 = new Topo::CommandFuseCoEdges(getContext(), coedges);
 
     	// creation de la commande composite
 
-    	Internal::CommandComposite* commandCompo = new Internal::CommandComposite(getLocalContext(), "Fusion d'arêtes et des courbes associées");
+    	Internal::CommandComposite* commandCompo = new Internal::CommandComposite(getContext(), "Fusion d'arêtes et des courbes associées");
     	commandCompo->addCommand(commandGeom);
     	commandCompo->addCommand(commandTopo1);
     	commandCompo->addCommand(commandTopo2);
@@ -3783,7 +3783,7 @@ fuseEdges(std::vector<CoEdge*> &coedges)
     }
     else {
     	// creation de la commande de modification de la topologie
-    	command = new Topo::CommandFuseCoEdges(getLocalContext(), coedges);
+    	command = new Topo::CommandFuseCoEdges(getContext(), coedges);
     }
 
     // trace dans le script
@@ -3795,23 +3795,23 @@ fuseEdges(std::vector<CoEdge*> &coedges)
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::fuse2Blocks(std::string na, std::string nb)
+Mgx3D::Internal::M3DCommandResult* TopoManager::fuse2Blocks(std::string na, std::string nb)
 {
     return fuse2Blocks(getBlock(na), getBlock(nb));
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::fuse2Blocks(Block* bl_A, Block* bl_B)
+Mgx3D::Internal::M3DCommandResult* TopoManager::fuse2Blocks(Block* bl_A, Block* bl_B)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::fuse2Blocks("<<bl_A->getName()<<","<<bl_B->getName()<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandFuse2Blocks* command = new Topo::CommandFuse2Blocks(getLocalContext(), bl_A, bl_B);
+    Topo::CommandFuse2Blocks* command = new Topo::CommandFuse2Blocks(getContext(), bl_A, bl_B);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().fuse2Blocks (\""
@@ -3820,12 +3820,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::fuse2Blocks(Block* bl_A, Bloc
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 setGeomAssociation(std::vector<std::string> & topo_entities_names,
 		std::string geom_entity_name,
 		bool move_vertices)
@@ -3835,12 +3835,12 @@ setGeomAssociation(std::vector<std::string> & topo_entities_names,
 
     Geom::GeomEntity* geom_entity = 0;
     if (!geom_entity_name.empty())
-        geom_entity = getLocalContext().getGeomManager().getEntity(geom_entity_name, true);
+        geom_entity = getContext().getGeomManager().getEntity(geom_entity_name, true);
 
     return setGeomAssociation(topo_entities, geom_entity, move_vertices);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 setGeomAssociation(std::vector<TopoEntity*> & topo_entities,
 		Geom::GeomEntity* geom_entity,
 		bool move_vertices)
@@ -3858,7 +3858,7 @@ setGeomAssociation(std::vector<TopoEntity*> & topo_entities,
 
     // création de la commande
     Topo::CommandSetGeomAssociation* command =
-            new Topo::CommandSetGeomAssociation(getLocalContext(), topo_entities, geom_entity, move_vertices);
+            new Topo::CommandSetGeomAssociation(getContext(), topo_entities, geom_entity, move_vertices);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -3870,12 +3870,12 @@ setGeomAssociation(std::vector<TopoEntity*> & topo_entities,
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 projectVerticesOnNearestGeomEntities(std::vector<std::string> & vertices_names,
 		std::vector<std::string> & geom_entities_names,
 		bool move_vertices)
@@ -3891,14 +3891,14 @@ projectVerticesOnNearestGeomEntities(std::vector<std::string> & vertices_names,
 
     for (std::vector<std::string>::const_iterator iter = geom_entities_names.begin();
             iter != geom_entities_names.end(); ++iter){
-    	Geom::GeomEntity* ge = getLocalContext().getGeomManager().getEntity(*iter, true);
+    	Geom::GeomEntity* ge = getContext().getGeomManager().getEntity(*iter, true);
     	geom_entities.push_back(ge);
     }
 
     return projectVerticesOnNearestGeomEntities(vertices, geom_entities, move_vertices);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 projectVerticesOnNearestGeomEntities(std::vector<Vertex*> & vertices,
 		std::vector<Geom::GeomEntity*> & geom_entities,
 		bool move_vertices)
@@ -3907,7 +3907,7 @@ projectVerticesOnNearestGeomEntities(std::vector<Vertex*> & vertices,
 	CHECK_ENTITIES_LIST(geom_entities)
     // création de la commande
     Topo::CommandProjectVerticesOnNearestGeomEntities* command =
-            new Topo::CommandProjectVerticesOnNearestGeomEntities(getLocalContext(), vertices, geom_entities, move_vertices);
+            new Topo::CommandProjectVerticesOnNearestGeomEntities(getContext(), vertices, geom_entities, move_vertices);
 
 
     // trace dans le script
@@ -3920,12 +3920,12 @@ projectVerticesOnNearestGeomEntities(std::vector<Vertex*> & vertices,
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 projectEdgesOnCurves(std::vector<std::string> & coedges_names)
 {
 	std::vector<CoEdge*> coedges;
@@ -3938,7 +3938,7 @@ projectEdgesOnCurves(std::vector<std::string> & coedges_names)
     return projectEdgesOnCurves(coedges);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 projectEdgesOnCurves(std::vector<CoEdge*> & coedges)
 {
 	if (coedges.empty())
@@ -3946,7 +3946,7 @@ projectEdgesOnCurves(std::vector<CoEdge*> & coedges)
 
 	// création de la commande
     Topo::CommandProjectEdgesOnCurves* command =
-            new Topo::CommandProjectEdgesOnCurves(getLocalContext(), coedges);
+            new Topo::CommandProjectEdgesOnCurves(getContext(), coedges);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -3957,17 +3957,17 @@ projectEdgesOnCurves(std::vector<CoEdge*> & coedges)
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 projectAllEdgesOnCurves()
 {
     // création de la commande
     Topo::CommandProjectEdgesOnCurves* command =
-            new Topo::CommandProjectEdgesOnCurves(getLocalContext());
+            new Topo::CommandProjectEdgesOnCurves(getContext());
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -3978,12 +3978,12 @@ projectAllEdgesOnCurves()
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 projectFacesOnSurfaces(std::vector<std::string> & cofaces_names)
 {
 	std::vector<CoFace*> cofaces;
@@ -3996,7 +3996,7 @@ projectFacesOnSurfaces(std::vector<std::string> & cofaces_names)
     return projectFacesOnSurfaces(cofaces);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 projectFacesOnSurfaces(std::vector<CoFace*> & cofaces)
 {
 	if (cofaces.empty())
@@ -4004,7 +4004,7 @@ projectFacesOnSurfaces(std::vector<CoFace*> & cofaces)
 
 	// création de la commande
     Topo::CommandProjectFacesOnSurfaces* command =
-            new Topo::CommandProjectFacesOnSurfaces(getLocalContext(), cofaces);
+            new Topo::CommandProjectFacesOnSurfaces(getContext(), cofaces);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -4015,17 +4015,17 @@ projectFacesOnSurfaces(std::vector<CoFace*> & cofaces)
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 projectAllFacesOnSurfaces()
 {
     // création de la commande
     Topo::CommandProjectFacesOnSurfaces* command =
-            new Topo::CommandProjectFacesOnSurfaces(getLocalContext());
+            new Topo::CommandProjectFacesOnSurfaces(getContext());
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -4036,12 +4036,12 @@ projectAllFacesOnSurfaces()
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 translate(std::vector<std::string>& ve, const Vector& dp,
         const bool withGeom)
 {
@@ -4051,7 +4051,7 @@ translate(std::vector<std::string>& ve, const Vector& dp,
       return translate(entities, dp, withGeom);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 translate(std::vector<TopoEntity*>& ve, const Vector& dp,
         const bool withGeom)
 {
@@ -4075,20 +4075,20 @@ translate(std::vector<TopoEntity*>& ve, const Vector& dp,
     if (withGeom){
 
         Internal::CommandComposite* commandCompo =
-                new Internal::CommandComposite(getLocalContext(), "Translation d'une topologie avec sa géométrie");
+                new Internal::CommandComposite(getContext(), "Translation d'une topologie avec sa géométrie");
 
         std::vector<Geom::GeomEntity*> geomEntities = Topo::TopoHelper::getGeomEntities(ve);
 
-        Geom::CommandTranslation *commandGeom = new Geom::CommandTranslation(getLocalContext(), geomEntities, dp);
+        Geom::CommandTranslation *commandGeom = new Geom::CommandTranslation(getContext(), geomEntities, dp);
         commandCompo->addCommand(commandGeom);
 
-        Topo::CommandTranslateTopo* commandTopo = new Topo::CommandTranslateTopo(getLocalContext(), ve, dp);
+        Topo::CommandTranslateTopo* commandTopo = new Topo::CommandTranslateTopo(getContext(), ve, dp);
         commandCompo->addCommand(commandTopo);
 
         command = commandCompo;
     }
     else {
-        command = new Topo::CommandTranslateTopo(getLocalContext(), ve, dp);
+        command = new Topo::CommandTranslateTopo(getContext(), ve, dp);
     }
 
     // trace dans le script
@@ -4100,12 +4100,12 @@ translate(std::vector<TopoEntity*>& ve, const Vector& dp,
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 rotate(std::vector<std::string>& ve,
 		const Utils::Math::Rotation& rot,
 		const bool withGeom)
@@ -4116,7 +4116,7 @@ rotate(std::vector<std::string>& ve,
 	return rotate(entities, rot, withGeom);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::
+Mgx3D::Internal::M3DCommandResult* TopoManager::
 rotate(std::vector<TopoEntity*>& ve,
 		const Utils::Math::Rotation& rot,
 		const bool withGeom)
@@ -4141,15 +4141,15 @@ rotate(std::vector<TopoEntity*>& ve,
     if (withGeom){
 
         Internal::CommandComposite* commandCompo =
-                new Internal::CommandComposite(getLocalContext(), "Rotation d'une topologie avec sa géométrie");
+                new Internal::CommandComposite(getContext(), "Rotation d'une topologie avec sa géométrie");
 
         // constitution des entités géométriques à modifier
         std::vector<Geom::GeomEntity*> geomEntities = Topo::TopoHelper::getGeomEntities(ve);
 
         Geom::CommandRotation* commandGeom =
-                new Geom::CommandRotation(getLocalContext(), geomEntities, rot);
+                new Geom::CommandRotation(getContext(), geomEntities, rot);
         Topo::CommandRotateTopo* commandTopo =
-                new Topo::CommandRotateTopo(getLocalContext(), ve, rot);
+                new Topo::CommandRotateTopo(getContext(), ve, rot);
 
         commandCompo->addCommand(commandGeom);
         commandCompo->addCommand(commandTopo);
@@ -4157,7 +4157,7 @@ rotate(std::vector<TopoEntity*>& ve,
         command = commandCompo;
     }
     else {
-        command = new Topo::CommandRotateTopo(getLocalContext(), ve,  rot);
+        command = new Topo::CommandRotateTopo(getContext(), ve,  rot);
     }
 
     // trace dans le script
@@ -4169,12 +4169,12 @@ rotate(std::vector<TopoEntity*>& ve,
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<std::string>& ve,
+Mgx3D::Internal::M3DCommandResult* TopoManager::scale(std::vector<std::string>& ve,
         const double& facteur,
         const bool withGeom)
 {
@@ -4184,7 +4184,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<std::string
     return scale(entities, facteur, Utils::Math::Point(0,0,0), withGeom);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<std::string>& ve,
+Mgx3D::Internal::M3DCommandResult* TopoManager::scale(std::vector<std::string>& ve,
         const double& facteur,
         const Utils::Math::Point& pcentre,
         const bool withGeom)
@@ -4195,7 +4195,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<std::string
     return scale(entities, facteur, pcentre, withGeom);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<TopoEntity*>& ve,
+Mgx3D::Internal::M3DCommandResult* TopoManager::scale(std::vector<TopoEntity*>& ve,
         const double& facteur,
         const Point& pcentre,
         const bool withGeom)
@@ -4220,13 +4220,13 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<TopoEntity*
     if (withGeom){
 
         Internal::CommandComposite* commandCompo =
-                new Internal::CommandComposite(getLocalContext(), "Homothétie d'une topologie avec sa géométrie");
+                new Internal::CommandComposite(getContext(), "Homothétie d'une topologie avec sa géométrie");
 
         // constitution des entités géométriques à modifier
         std::vector<Geom::GeomEntity*> geomEntities = Topo::TopoHelper::getGeomEntities(ve);
 
-        Geom::CommandScaling* commandGeom = new Geom::CommandScaling(getLocalContext(), geomEntities, facteur, pcentre);
-        Topo::CommandScaleTopo* commandTopo = new Topo::CommandScaleTopo(getLocalContext(), ve, facteur, pcentre);
+        Geom::CommandScaling* commandGeom = new Geom::CommandScaling(getContext(), geomEntities, facteur, pcentre);
+        Topo::CommandScaleTopo* commandTopo = new Topo::CommandScaleTopo(getContext(), ve, facteur, pcentre);
 
         commandCompo->addCommand(commandGeom);
         commandCompo->addCommand(commandTopo);
@@ -4234,7 +4234,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<TopoEntity*
         command = commandCompo;
     }
     else {
-        command = new Topo::CommandScaleTopo(getLocalContext(), ve, facteur, pcentre);
+        command = new Topo::CommandScaleTopo(getContext(), ve, facteur, pcentre);
     }
 
     // trace dans le script
@@ -4249,12 +4249,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<TopoEntity*
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<std::string>& ve,
+Mgx3D::Internal::M3DCommandResult* TopoManager::scale(std::vector<std::string>& ve,
 		const double factorX,
 		const double factorY,
 		const double factorZ,
@@ -4266,7 +4266,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<std::string
     return scale(entities, factorX, factorY, factorZ, Utils::Math::Point(0,0,0), withGeom);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<std::string>& ve,
+Mgx3D::Internal::M3DCommandResult* TopoManager::scale(std::vector<std::string>& ve,
 		const double factorX,
 		const double factorY,
 		const double factorZ,
@@ -4279,7 +4279,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<std::string
     return scale(entities, factorX, factorY, factorZ, pcentre, withGeom);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<TopoEntity*>& ve,
+Mgx3D::Internal::M3DCommandResult* TopoManager::scale(std::vector<TopoEntity*>& ve,
 		const double factorX,
 		const double factorY,
 		const double factorZ,
@@ -4308,13 +4308,13 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<TopoEntity*
     if (withGeom){
 
         Internal::CommandComposite* commandCompo =
-                new Internal::CommandComposite(getLocalContext(), "Homothétie d'une topologie avec sa géométrie");
+                new Internal::CommandComposite(getContext(), "Homothétie d'une topologie avec sa géométrie");
 
         // constitution des entités géométriques à modifier
         std::vector<Geom::GeomEntity*> geomEntities = Topo::TopoHelper::getGeomEntities(ve);
 
-        Geom::CommandScaling* commandGeom = new Geom::CommandScaling(getLocalContext(), geomEntities, factorX, factorY, factorZ, pcentre);
-        Topo::CommandScaleTopo* commandTopo = new Topo::CommandScaleTopo(getLocalContext(), ve, factorX, factorY, factorZ, pcentre);
+        Geom::CommandScaling* commandGeom = new Geom::CommandScaling(getContext(), geomEntities, factorX, factorY, factorZ, pcentre);
+        Topo::CommandScaleTopo* commandTopo = new Topo::CommandScaleTopo(getContext(), ve, factorX, factorY, factorZ, pcentre);
 
         commandCompo->addCommand(commandGeom);
         commandCompo->addCommand(commandTopo);
@@ -4322,7 +4322,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<TopoEntity*
         command = commandCompo;
     }
     else {
-        command = new Topo::CommandScaleTopo(getLocalContext(), ve, factorX, factorY, factorZ, pcentre);
+        command = new Topo::CommandScaleTopo(getContext(), ve, factorX, factorY, factorZ, pcentre);
     }
 
     // trace dans le script
@@ -4340,12 +4340,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::scale(std::vector<TopoEntity*
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::mirror(std::vector<std::string>& ve,
     		Utils::Math::Plane* plane,
     		const bool withGeom)
@@ -4356,7 +4356,7 @@ TopoManager::mirror(std::vector<std::string>& ve,
     return mirror(entities, plane, withGeom);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 TopoManager::mirror(std::vector<TopoEntity*>& ve,
 			Utils::Math::Plane* plane,
     		const bool withGeom)
@@ -4381,15 +4381,15 @@ TopoManager::mirror(std::vector<TopoEntity*>& ve,
     if (withGeom){
 
         Internal::CommandComposite* commandCompo =
-                new Internal::CommandComposite(getLocalContext(), "Symétrie d'une topologie avec sa géométrie");
+                new Internal::CommandComposite(getContext(), "Symétrie d'une topologie avec sa géométrie");
 
         // constitution des entités géométriques à modifier
         std::vector<Geom::GeomEntity*> geomEntities = Topo::TopoHelper::getGeomEntities(ve);
 
         Geom::CommandMirroring* commandGeom =
-                new Geom::CommandMirroring(getLocalContext(), geomEntities, plane);
+                new Geom::CommandMirroring(getContext(), geomEntities, plane);
         Topo::CommandMirrorTopo* commandTopo =
-                new Topo::CommandMirrorTopo(getLocalContext(), ve, plane);
+                new Topo::CommandMirrorTopo(getContext(), ve, plane);
 
         commandCompo->addCommand(commandGeom);
         commandCompo->addCommand(commandTopo);
@@ -4397,7 +4397,7 @@ TopoManager::mirror(std::vector<TopoEntity*>& ve,
         command = commandCompo;
     }
     else {
-        command = new Topo::CommandMirrorTopo(getLocalContext(), ve,  plane);
+        command = new Topo::CommandMirrorTopo(getContext(), ve,  plane);
     }
 
     // trace dans le script
@@ -4409,12 +4409,12 @@ TopoManager::mirror(std::vector<TopoEntity*>& ve,
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexLocation(std::vector<std::string>& vertices_names,
+Mgx3D::Internal::M3DCommandResult* TopoManager::setVertexLocation(std::vector<std::string>& vertices_names,
         const bool changeX,
         const double& xPos,
         const bool changeY,
@@ -4439,12 +4439,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexLocation(std::vector
 
     CoordinateSystem::SysCoord* rep = 0;
     if (!sysCoordName.empty())
-    	rep = getLocalContext().getSysCoordManager().getSysCoord(sysCoordName, true);
+    	rep = getContext().getSysCoordManager().getSysCoord(sysCoordName, true);
 
     return setVertexLocation(vertices, changeX, xPos, changeY, yPos, changeZ, zPos, rep);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexLocation(std::vector<Vertex*>& vertices,
+Mgx3D::Internal::M3DCommandResult* TopoManager::setVertexLocation(std::vector<Vertex*>& vertices,
         const bool changeX,
         const double& xPos,
         const bool changeY,
@@ -4472,7 +4472,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexLocation(std::vector
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
     Topo::CommandChangeVerticesLocation* command =
-            new Topo::CommandChangeVerticesLocation(getLocalContext(),
+            new Topo::CommandChangeVerticesLocation(getContext(),
             		vertices, changeX, xPos, changeY, yPos, changeZ, zPos,
 					CommandChangeVerticesLocation::cartesian, rep);
 
@@ -4491,12 +4491,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexLocation(std::vector
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexSphericalLocation(std::vector<std::string>& vertices_names,
+Mgx3D::Internal::M3DCommandResult* TopoManager::setVertexSphericalLocation(std::vector<std::string>& vertices_names,
 		const bool changeRho,
 		const double& rhoPos,
 		const bool changeTheta,
@@ -4521,12 +4521,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexSphericalLocation(st
 
     CoordinateSystem::SysCoord* rep = 0;
     if (!sysCoordName.empty())
-    	rep = getLocalContext().getSysCoordManager().getSysCoord(sysCoordName, true);
+    	rep = getContext().getSysCoordManager().getSysCoord(sysCoordName, true);
 
     return setVertexSphericalLocation(vertices, changeRho, rhoPos, changeTheta, thetaPos, changePhi, phiPos, rep);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexSphericalLocation(std::vector<Vertex*>& vertices,
+Mgx3D::Internal::M3DCommandResult* TopoManager::setVertexSphericalLocation(std::vector<Vertex*>& vertices,
 		const bool changeRho,
 		const double& rhoPos,
 		const bool changeTheta,
@@ -4554,7 +4554,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexSphericalLocation(st
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
     Topo::CommandChangeVerticesLocation* command =
-            new Topo::CommandChangeVerticesLocation(getLocalContext(),
+            new Topo::CommandChangeVerticesLocation(getContext(),
             		vertices, changeRho, rhoPos, changeTheta, thetaPos, changePhi, phiPos,
 					CommandChangeVerticesLocation::spherical, rep);
 
@@ -4573,12 +4573,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexSphericalLocation(st
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexCylindricalLocation(std::vector<std::string>& vertices_names,
+Mgx3D::Internal::M3DCommandResult* TopoManager::setVertexCylindricalLocation(std::vector<std::string>& vertices_names,
         const bool changeRho,
         const double& rhoPos,
         const bool changePhi,
@@ -4603,12 +4603,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexCylindricalLocation(
 
     CoordinateSystem::SysCoord* rep = 0;
     if (!sysCoordName.empty())
-    	rep = getLocalContext().getSysCoordManager().getSysCoord(sysCoordName, true);
+    	rep = getContext().getSysCoordManager().getSysCoord(sysCoordName, true);
 
     return setVertexCylindricalLocation(vertices, changeRho, rhoPos, changePhi, phiPos, changeZ, zPos, rep);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexCylindricalLocation(std::vector<Vertex*>& vertices,
+Mgx3D::Internal::M3DCommandResult* TopoManager::setVertexCylindricalLocation(std::vector<Vertex*>& vertices,
 		const bool changeRho,
 		        const double& rhoPos,
 		        const bool changePhi,
@@ -4636,7 +4636,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexCylindricalLocation(
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
     Topo::CommandChangeVerticesLocation* command =
-            new Topo::CommandChangeVerticesLocation(getLocalContext(),
+            new Topo::CommandChangeVerticesLocation(getContext(),
             		vertices, changeRho, rhoPos, changePhi, phiPos, changeZ, zPos,
 					CommandChangeVerticesLocation::cylindrical, rep);
 
@@ -4655,12 +4655,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexCylindricalLocation(
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexSameLocation(std::string vertex_name,
+Mgx3D::Internal::M3DCommandResult* TopoManager::setVertexSameLocation(std::string vertex_name,
 		std::string target_name)
 {
 	Vertex* vtx = TopoManager::getVertex (vertex_name, true);
@@ -4668,7 +4668,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexSameLocation(std::st
 	return setVertexSameLocation(vtx, target);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexSameLocation(Vertex* vtx,
+Mgx3D::Internal::M3DCommandResult* TopoManager::setVertexSameLocation(Vertex* vtx,
 		Vertex* target)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
@@ -4677,7 +4677,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexSameLocation(Vertex*
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
     Topo::CommandChangeVertexSameLocation* command =
-            new Topo::CommandChangeVertexSameLocation(getLocalContext(), vtx, target);
+            new Topo::CommandChangeVertexSameLocation(getContext(), vtx, target);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -4688,12 +4688,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setVertexSameLocation(Vertex*
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::snapProjectedVertices(std::vector<std::string>& vertices_names)
+Mgx3D::Internal::M3DCommandResult* TopoManager::snapProjectedVertices(std::vector<std::string>& vertices_names)
 {
     std::vector<Vertex*> vertices;
 
@@ -4706,7 +4706,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::snapProjectedVertices(std::ve
     return snapProjectedVertices(vertices);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::snapProjectedVertices(std::vector<Vertex*>& vertices)
+Mgx3D::Internal::M3DCommandResult* TopoManager::snapProjectedVertices(std::vector<Vertex*>& vertices)
 {
 	CHECK_ENTITIES_LIST(vertices)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
@@ -4720,7 +4720,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::snapProjectedVertices(std::ve
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
     Topo::CommandSnapProjectedVertices* command =
-            new Topo::CommandSnapProjectedVertices(getLocalContext(), vertices);
+            new Topo::CommandSnapProjectedVertices(getContext(), vertices);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -4731,19 +4731,19 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::snapProjectedVertices(std::ve
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::snapAllProjectedVertices()
+Mgx3D::Internal::M3DCommandResult* TopoManager::snapAllProjectedVertices()
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message << "TopoManager::snapAllProjectedVertices ()";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
     Topo::CommandSnapProjectedVertices* command =
-            new Topo::CommandSnapProjectedVertices(getLocalContext());
+            new Topo::CommandSnapProjectedVertices(getContext());
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -4754,12 +4754,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::snapAllProjectedVertices()
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::alignVertices(std::vector<std::string>& vertices_names)
+Mgx3D::Internal::M3DCommandResult* TopoManager::alignVertices(std::vector<std::string>& vertices_names)
 {
     std::vector<Vertex*> vertices;
 
@@ -4772,7 +4772,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::alignVertices(std::vector<std
     return alignVertices(vertices);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::alignVertices(std::vector<Vertex*>& vertices)
+Mgx3D::Internal::M3DCommandResult* TopoManager::alignVertices(std::vector<Vertex*>& vertices)
 {
 	CHECK_ENTITIES_LIST(vertices)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
@@ -4786,7 +4786,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::alignVertices(std::vector<Ver
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
     Topo::CommandAlignVertices* command =
-            new Topo::CommandAlignVertices(getLocalContext(), vertices);
+            new Topo::CommandAlignVertices(getContext(), vertices);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -4797,12 +4797,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::alignVertices(std::vector<Ver
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::alignVertices(
+Mgx3D::Internal::M3DCommandResult* TopoManager::alignVertices(
 		const Point& p1, const Point& p2,
 		std::vector<std::string>& vertices_names)
 {
@@ -4817,13 +4817,13 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::alignVertices(
     return alignVertices(p1, p2, vertices);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::alignVertices(
+Mgx3D::Internal::M3DCommandResult* TopoManager::alignVertices(
 		const Point& p1, const Point& p2,
 		std::vector<Vertex*>& vertices)
 {
 	CHECK_ENTITIES_LIST(vertices)
     Topo::CommandAlignVertices* command =
-            new Topo::CommandAlignVertices(getLocalContext(), p1, p2, vertices);
+            new Topo::CommandAlignVertices(getContext(), p1, p2, vertices);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -4835,7 +4835,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::alignVertices(
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
@@ -4960,14 +4960,14 @@ int TopoManager::getDefaultNbMeshingEdges()
     return m_defaultNbMeshingEdges;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setDefaultNbMeshingEdges(int nb)
+Mgx3D::Internal::M3DCommandResult* TopoManager::setDefaultNbMeshingEdges(int nb)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::setDefaultNbMeshingEdges("<<(unsigned long)nb<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
     Topo::CommandChangeDefaultNbMeshingEdges* command =
-            new Topo::CommandChangeDefaultNbMeshingEdges(getLocalContext(), nb);
+            new Topo::CommandChangeDefaultNbMeshingEdges(getContext(), nb);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().setDefaultNbMeshingEdges ("<<(unsigned long)nb<<")";
@@ -4975,7 +4975,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setDefaultNbMeshingEdges(int 
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
@@ -5163,7 +5163,7 @@ std::vector<std::string> TopoManager::getTransfiniteMeshLawBlocks() const
     return selectedBlocks;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setNbMeshingEdges(std::string edge_name, int nb, std::vector<std::string>& frozed_edges_names)
+Mgx3D::Internal::M3DCommandResult* TopoManager::setNbMeshingEdges(std::string edge_name, int nb, std::vector<std::string>& frozed_edges_names)
 {
     CoEdge* coedge = getCoEdge(edge_name);
     std::vector<CoEdge*> frozed_coedges;
@@ -5173,7 +5173,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setNbMeshingEdges(std::string
     return setNbMeshingEdges(coedge, nb, frozed_coedges);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setNbMeshingEdges(CoEdge* coedge, int nb, std::vector<CoEdge*>& frozed_coedges)
+Mgx3D::Internal::M3DCommandResult* TopoManager::setNbMeshingEdges(CoEdge* coedge, int nb, std::vector<CoEdge*>& frozed_coedges)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::setNbMeshingEdges("<<coedge->getName()<<", "<<(unsigned long)nb<<", [";
@@ -5186,7 +5186,7 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setNbMeshingEdges(CoEdge* coe
 
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSetNbMeshingEdges* command = new Topo::CommandSetNbMeshingEdges(getLocalContext(), coedge, nb, frozed_coedges);
+    Topo::CommandSetNbMeshingEdges* command = new Topo::CommandSetNbMeshingEdges(getContext(), coedge, nb, frozed_coedges);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().setNbMeshingEdges (\""
@@ -5201,12 +5201,12 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::setNbMeshingEdges(CoEdge* coe
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* TopoManager::addToGroup(std::vector<std::string>& ve, int dim, const std::string& groupName)
+Internal::M3DCommandResult* TopoManager::addToGroup(std::vector<std::string>& ve, int dim, const std::string& groupName)
 {
 
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
@@ -5230,7 +5230,7 @@ Internal::M3DCommandResultIfc* TopoManager::addToGroup(std::vector<std::string>&
                 iter != ve.end(); ++iter)
             vertices.push_back(getVertex(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), vertices, groupName, Mesh::CommandAddRemoveGroupName::add);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), vertices, groupName, Mesh::CommandAddRemoveGroupName::add);
     }
     break;
     case(1):{
@@ -5240,7 +5240,7 @@ Internal::M3DCommandResultIfc* TopoManager::addToGroup(std::vector<std::string>&
                 iter != ve.end(); ++iter)
         	coedges.push_back(getCoEdge(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), coedges, groupName, Mesh::CommandAddRemoveGroupName::add);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), coedges, groupName, Mesh::CommandAddRemoveGroupName::add);
     }
     break;
     case(2):{
@@ -5250,7 +5250,7 @@ Internal::M3DCommandResultIfc* TopoManager::addToGroup(std::vector<std::string>&
                 iter != ve.end(); ++iter)
         	cofaces.push_back(getCoFace(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), cofaces, groupName, Mesh::CommandAddRemoveGroupName::add);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), cofaces, groupName, Mesh::CommandAddRemoveGroupName::add);
     }
     break;
     case(3):{
@@ -5260,7 +5260,7 @@ Internal::M3DCommandResultIfc* TopoManager::addToGroup(std::vector<std::string>&
                 iter != ve.end(); ++iter)
         	blocks.push_back(getBlock(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), blocks, groupName, Mesh::CommandAddRemoveGroupName::add);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), blocks, groupName, Mesh::CommandAddRemoveGroupName::add);
     }
     break;
     default:{
@@ -5286,12 +5286,12 @@ Internal::M3DCommandResultIfc* TopoManager::addToGroup(std::vector<std::string>&
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* TopoManager::removeFromGroup(std::vector<std::string>& ve, int dim, const std::string& groupName)
+Internal::M3DCommandResult* TopoManager::removeFromGroup(std::vector<std::string>& ve, int dim, const std::string& groupName)
 {
 
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
@@ -5315,7 +5315,7 @@ Internal::M3DCommandResultIfc* TopoManager::removeFromGroup(std::vector<std::str
                 iter != ve.end(); ++iter)
             vertices.push_back(getVertex(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), vertices, groupName, Mesh::CommandAddRemoveGroupName::remove);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), vertices, groupName, Mesh::CommandAddRemoveGroupName::remove);
     }
     break;
     case(1):{
@@ -5325,7 +5325,7 @@ Internal::M3DCommandResultIfc* TopoManager::removeFromGroup(std::vector<std::str
                 iter != ve.end(); ++iter)
         	coedges.push_back(getCoEdge(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), coedges, groupName, Mesh::CommandAddRemoveGroupName::remove);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), coedges, groupName, Mesh::CommandAddRemoveGroupName::remove);
     }
     break;
     case(2):{
@@ -5335,7 +5335,7 @@ Internal::M3DCommandResultIfc* TopoManager::removeFromGroup(std::vector<std::str
                 iter != ve.end(); ++iter)
         	cofaces.push_back(getCoFace(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), cofaces, groupName, Mesh::CommandAddRemoveGroupName::remove);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), cofaces, groupName, Mesh::CommandAddRemoveGroupName::remove);
     }
     break;
     case(3):{
@@ -5345,7 +5345,7 @@ Internal::M3DCommandResultIfc* TopoManager::removeFromGroup(std::vector<std::str
                 iter != ve.end(); ++iter)
         	blocks.push_back(getBlock(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), blocks, groupName, Mesh::CommandAddRemoveGroupName::remove);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), blocks, groupName, Mesh::CommandAddRemoveGroupName::remove);
     }
     break;
     default:{
@@ -5371,12 +5371,12 @@ Internal::M3DCommandResultIfc* TopoManager::removeFromGroup(std::vector<std::str
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* TopoManager::setGroup(std::vector<std::string>& ve, int dim, const std::string& groupName)
+Internal::M3DCommandResult* TopoManager::setGroup(std::vector<std::string>& ve, int dim, const std::string& groupName)
 {
 
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
@@ -5400,7 +5400,7 @@ Internal::M3DCommandResultIfc* TopoManager::setGroup(std::vector<std::string>& v
                 iter != ve.end(); ++iter)
             vertices.push_back(getVertex(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), vertices, groupName, Mesh::CommandAddRemoveGroupName::set);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), vertices, groupName, Mesh::CommandAddRemoveGroupName::set);
     }
     break;
     case(1):{
@@ -5410,7 +5410,7 @@ Internal::M3DCommandResultIfc* TopoManager::setGroup(std::vector<std::string>& v
                 iter != ve.end(); ++iter)
         	coedges.push_back(getCoEdge(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), coedges, groupName, Mesh::CommandAddRemoveGroupName::set);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), coedges, groupName, Mesh::CommandAddRemoveGroupName::set);
     }
     break;
     case(2):{
@@ -5420,7 +5420,7 @@ Internal::M3DCommandResultIfc* TopoManager::setGroup(std::vector<std::string>& v
                 iter != ve.end(); ++iter)
         	cofaces.push_back(getCoFace(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), cofaces, groupName, Mesh::CommandAddRemoveGroupName::set);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), cofaces, groupName, Mesh::CommandAddRemoveGroupName::set);
     }
     break;
     case(3):{
@@ -5430,7 +5430,7 @@ Internal::M3DCommandResultIfc* TopoManager::setGroup(std::vector<std::string>& v
                 iter != ve.end(); ++iter)
         	blocks.push_back(getBlock(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), blocks, groupName, Mesh::CommandAddRemoveGroupName::set);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), blocks, groupName, Mesh::CommandAddRemoveGroupName::set);
     }
     break;
     default:{
@@ -5456,7 +5456,7 @@ Internal::M3DCommandResultIfc* TopoManager::setGroup(std::vector<std::string>& v
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
@@ -5488,23 +5488,23 @@ std::vector<std::string> TopoManager::getCommonEdges(const std::string& face1, c
 }
 
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::alignVerticesOnSurface(
+Mgx3D::Internal::M3DCommandResult* TopoManager::alignVerticesOnSurface(
         const std::string &surface,
         const std::string &vertex,
         const Point &pnt1,const Point &pnt2) {
 
-            Geom::GeomEntity* surf = getLocalContext().getGeomManager().getSurface(surface, true);
+            Geom::GeomEntity* surf = getContext().getGeomManager().getSurface(surface, true);
             Vertex* vtx = TopoManager::getVertex (vertex, true);
 
     return alignVerticesOnSurface(surf, vtx, pnt1, pnt2);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* TopoManager::alignVerticesOnSurface(Geom::GeomEntity* surface, Vertex* vertex,
+Mgx3D::Internal::M3DCommandResult* TopoManager::alignVerticesOnSurface(Geom::GeomEntity* surface, Vertex* vertex,
                                          const Point &pnt1,const Point &pnt2) {
 
 
         Topo::CommandAlignOnSurface* command =
-                new Topo::CommandAlignOnSurface(getLocalContext(), surface, vertex, pnt1, pnt2);
+                new Topo::CommandAlignOnSurface(getContext(), surface, vertex, pnt1, pnt2);
 
         // trace dans le script
         TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -5519,17 +5519,17 @@ Mgx3D::Internal::M3DCommandResultIfc* TopoManager::alignVerticesOnSurface(Geom::
         // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
         getCommandManager().addCommand(command, Utils::Command::DO);
 
-        Internal::M3DCommandResultIfc*  cmdResult   =
+        Internal::M3DCommandResult*  cmdResult   =
                 new Internal::M3DCommandResult (*command);
         return cmdResult;
 
 
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* TopoManager::exportBlocks(const std::string& n)
+Internal::M3DCommandResult* TopoManager::exportBlocks(const std::string& n)
 {
     //creation de la commande d'exportation
-    CommandExportBlocks *command = new CommandExportBlocks(getLocalContext(), n);
+    CommandExportBlocks *command = new CommandExportBlocks(getContext(), n);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -5541,7 +5541,7 @@ Internal::M3DCommandResultIfc* TopoManager::exportBlocks(const std::string& n)
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }

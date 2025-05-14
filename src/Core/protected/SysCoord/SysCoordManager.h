@@ -10,7 +10,7 @@
 #define SYSCOORD_MANAGER_H_
 /*----------------------------------------------------------------------------*/
 #include "Internal/CommandCreator.h"
-#include "Internal/M3DCommandResultIfc.h"
+#include "Internal/M3DCommandResult.h"
 #include "Utils/Container.h"
 #include "Utils/Constants.h"
 #include "Utils/SwigCompletion.h"
@@ -70,13 +70,13 @@ public:
 	/*------------------------------------------------------------------------*/
 	/** \brief Création d'un repère centré
 	 */
-	Mgx3D::Internal::M3DCommandResultIfc*
+	Mgx3D::Internal::M3DCommandResult*
 		newSysCoord(std::string groupName);
 
 	/*------------------------------------------------------------------------*/
 	/** \brief Création d'un repère à partir d'un centre (simple translation)
 	 */
-	Mgx3D::Internal::M3DCommandResultIfc*
+	Mgx3D::Internal::M3DCommandResult*
 	   newSysCoord(const Point& p, std::string groupName);
 
 	/*------------------------------------------------------------------------*/
@@ -84,7 +84,7 @@ public:
 	 *
 	 * Le repère est ajusté pour être orthonormé
 	 */
-	Mgx3D::Internal::M3DCommandResultIfc*
+	Mgx3D::Internal::M3DCommandResult*
 	   newSysCoord(const Point& pCentre, const Point& pX, const Point& pY, std::string groupName);
 
 
@@ -95,12 +95,12 @@ public:
      *  \param name nom de l'entité repère
      *  \param dp le vecteur de translation
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	    translate(std::string name, const Vector& dp);
 	SET_SWIG_COMPLETABLE_METHOD(translate)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		translate(SysCoord* syscoord, const Vector& dp);
 #endif
 
@@ -112,12 +112,12 @@ public:
      *  \param dp le vecteur de translation
      *  \param groupName groupe dans lequel sont mise les nouvelles entités
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         copyAndTranslate(std::string name, const Vector& dp, std::string groupName);
 	SET_SWIG_COMPLETABLE_METHOD(copyAndTranslate)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	    copyAndTranslate(SysCoord* syscoord, const Vector& dp, std::string groupName);
 #endif
 
@@ -127,13 +127,13 @@ public:
      *  \param name nom de l'entité repère
      *  \param rot      la rotation
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		rotate(std::string name,
 				const Utils::Math::Rotation& rot);
 	SET_SWIG_COMPLETABLE_METHOD(rotate)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		rotate(SysCoord* syscoord,
 				const Utils::Math::Rotation& rot);
 #endif
@@ -145,13 +145,13 @@ public:
      *  \param rot la rotation
      *  \param groupName groupe dans lequel sont mise les nouvelles entités
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		copyAndRotate(std::string name,
 			const Utils::Math::Rotation& rot, std::string groupName);
 	SET_SWIG_COMPLETABLE_METHOD(copyAndRotate)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		copyAndRotate(SysCoord* syscoord,
 			const Utils::Math::Rotation& rot, std::string groupName);
 #endif
@@ -162,12 +162,12 @@ public:
      *  \param name nom de l'entité repère
      *  \param groupName groupe dans lequel sont mise les nouvelles entités
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         copy(std::string name, std::string groupName);
 	SET_SWIG_COMPLETABLE_METHOD(copy)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         copy(SysCoord* syscoord, std::string groupName);
 #endif
 

@@ -350,7 +350,7 @@ void QtTopologyExtendSplitFaceAction::executeOperation ( )
 	const string	faceName	= panel->getFaceName ( );
 	const string	vertexName	= panel->getVertexName ( );
 
-	Mgx3D::Internal::M3DCommandResultIfc*	result	= getContext ( ).getTopoManager ( ).extendSplitFace (faceName, vertexName);
+	Mgx3D::Internal::M3DCommandResult*	result	= getContext ( ).getTopoManager ( ).extendSplitFace (faceName, vertexName);
 	CHECK_NULL_PTR_ERROR (result)
 	setCommandResult (result);
 	if (CommandIfc::FAIL == result->getStatus ( ))

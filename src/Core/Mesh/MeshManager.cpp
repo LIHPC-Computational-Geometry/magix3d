@@ -50,7 +50,7 @@ void MeshManager::clear()
 {
     if (m_mesh_itf){
         delete m_mesh_itf;
-        m_mesh_itf = new MeshImplementation(&getLocalContext());
+        m_mesh_itf = new MeshImplementation(&getContext());
     }
     m_clouds.deleteAndClear();
     m_surfaces.deleteAndClear();
@@ -218,12 +218,12 @@ SubVolume* MeshManager::getNewSubVolume(const std::string& gr_name, Internal::In
 
 	if (sv == 0){
 		sv = new Mesh::SubVolume(
-				getLocalContext(),
-				getLocalContext().newProperty(Utils::Entity::MeshSubVolume, gr_name),
-				getLocalContext().newDisplayProperties(Utils::Entity::MeshSubVolume),
+				getContext(),
+				getContext().newProperty(Utils::Entity::MeshSubVolume, gr_name),
+				getContext().newDisplayProperties(Utils::Entity::MeshSubVolume),
 				0);
 		icmd->addMeshInfoEntity(sv, Internal::InfoCommand::CREATED);
-		getLocalContext().newGraphicalRepresentation (*sv);
+		getContext().newGraphicalRepresentation (*sv);
 		add(sv);
 	}
 	else if (sv->isDestroyed()){
@@ -239,21 +239,21 @@ void MeshManager::getVolumes(std::vector<Volume*>& AVolumes) const
     AVolumes = m_volumes.get();
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* MeshManager::newBlocksMesh(std::vector<std::string>& names)
+Mgx3D::Internal::M3DCommandResult* MeshManager::newBlocksMesh(std::vector<std::string>& names)
 {
     std::vector<Mgx3D::Topo::Block*> entities;
     for(int i=0;i<names.size();i++)
-        entities.push_back(getLocalContext().getTopoManager().getBlock(names[i]));
+        entities.push_back(getContext().getTopoManager().getBlock(names[i]));
     return newBlocksMesh(entities);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* MeshManager::newBlocksMesh(std::vector<Mgx3D::Topo::Block*>& blocks)
+Mgx3D::Internal::M3DCommandResult* MeshManager::newBlocksMesh(std::vector<Mgx3D::Topo::Block*>& blocks)
 {
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     message <<"MeshManager::newBlocksMesh( liste de "<<blocks.size()<<" blocs )";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_5));
 
-    Mesh::CommandNewBlocksMesh* command = new Mesh::CommandNewBlocksMesh(getLocalContext(), blocks, 0);
+    Mesh::CommandNewBlocksMesh* command = new Mesh::CommandNewBlocksMesh(getContext(), blocks, 0);
 
 	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getMeshManager().newBlocksMesh ( [\"";
@@ -267,26 +267,26 @@ Mgx3D::Internal::M3DCommandResultIfc* MeshManager::newBlocksMesh(std::vector<Mgx
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return (cmdResult);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* MeshManager::newFacesMesh(std::vector<std::string>& names)
+Mgx3D::Internal::M3DCommandResult* MeshManager::newFacesMesh(std::vector<std::string>& names)
 {
     std::vector<Mgx3D::Topo::CoFace*> entities;
     for(int i=0;i<names.size();i++)
-        entities.push_back(getLocalContext().getTopoManager().getCoFace(names[i]));
+        entities.push_back(getContext().getTopoManager().getCoFace(names[i]));
     return newFacesMesh(entities);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* MeshManager::newFacesMesh(std::vector<Mgx3D::Topo::CoFace*>& faces)
+Mgx3D::Internal::M3DCommandResult* MeshManager::newFacesMesh(std::vector<Mgx3D::Topo::CoFace*>& faces)
 {
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     message <<"MeshManager::newFacesMesh( liste de "<<faces.size()<<" faces )";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_5));
 
-    Mesh::CommandNewFacesMesh* command = new Mesh::CommandNewFacesMesh(getLocalContext(), faces, 0);
+    Mesh::CommandNewFacesMesh* command = new Mesh::CommandNewFacesMesh(getContext(), faces, 0);
 
 	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getMeshManager().newFacesMesh ( [\"";
@@ -300,18 +300,18 @@ Mgx3D::Internal::M3DCommandResultIfc* MeshManager::newFacesMesh(std::vector<Mgx3
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* MeshManager::newAllBlocksMesh()
+Mgx3D::Internal::M3DCommandResult* MeshManager::newAllBlocksMesh()
 {
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     message <<"MeshManager::newAllBlocksMesh()";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_5));
 
-    Mesh::CommandNewBlocksMesh* command = new Mesh::CommandNewBlocksMesh(getLocalContext(),0);
+    Mesh::CommandNewBlocksMesh* command = new Mesh::CommandNewBlocksMesh(getContext(),0);
 
 	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getMeshManager().newAllBlocksMesh()";
@@ -319,18 +319,18 @@ Mgx3D::Internal::M3DCommandResultIfc* MeshManager::newAllBlocksMesh()
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* MeshManager::newAllFacesMesh()
+Mgx3D::Internal::M3DCommandResult* MeshManager::newAllFacesMesh()
 {
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     message <<"MeshManager::newAllFacesMesh()";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_5));
 
-    Mesh::CommandNewFacesMesh* command = new Mesh::CommandNewFacesMesh(getLocalContext(),0);
+    Mesh::CommandNewFacesMesh* command = new Mesh::CommandNewFacesMesh(getContext(),0);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getMeshManager().newAllFacesMesh()";
@@ -338,25 +338,25 @@ Mgx3D::Internal::M3DCommandResultIfc* MeshManager::newAllFacesMesh()
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 MeshManager::newSubVolumeBetweenSheets(std::vector<std::string>& blocks_name, std::string narete,
 		int pos1, int pos2, std::string groupName)
 {
     std::vector<Mgx3D::Topo::Block*> entities;
     for(int i=0;i<blocks_name.size();i++)
-        entities.push_back(getLocalContext().getTopoManager().getBlock(blocks_name[i]));
+        entities.push_back(getContext().getTopoManager().getBlock(blocks_name[i]));
 
     return newSubVolumeBetweenSheets(entities,
-    		getLocalContext().getTopoManager().getCoEdge(narete),
+    		getContext().getTopoManager().getCoEdge(narete),
 			pos1, pos2, groupName);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 MeshManager::newSubVolumeBetweenSheets(std::vector<Mgx3D::Topo::Block*>& blocks, Topo::CoEdge* coedge,
 		int pos1, int pos2, std::string groupName)
 {
@@ -365,7 +365,7 @@ MeshManager::newSubVolumeBetweenSheets(std::vector<Mgx3D::Topo::Block*>& blocks,
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_5));
 
     Mesh::CommandCreateSubVolumeBetweenSheets* command =
-    		new Mesh::CommandCreateSubVolumeBetweenSheets(getLocalContext(), blocks, coedge, pos1, pos2, groupName);
+    		new Mesh::CommandCreateSubVolumeBetweenSheets(getContext(), blocks, coedge, pos1, pos2, groupName);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getMeshManager().newSubVolumeBetweenSheets ( [\"";
@@ -381,7 +381,7 @@ MeshManager::newSubVolumeBetweenSheets(std::vector<Mgx3D::Topo::Block*>& blocks,
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return (cmdResult);
 }
@@ -389,7 +389,7 @@ MeshManager::newSubVolumeBetweenSheets(std::vector<Mgx3D::Topo::Block*>& blocks,
 void MeshManager::readMli(std::string nom, std::string prefix)
 {
     // création de la commande d'écriture du maillage
-    CommandReadMLI* command = new CommandReadMLI(getLocalContext(), nom, prefix);
+    CommandReadMLI* command = new CommandReadMLI(getContext(), nom, prefix);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -403,7 +403,7 @@ void MeshManager::readMli(std::string nom, std::string prefix)
 void MeshManager::writeMli(std::string nom)
 {
     // création de la commande d'écriture du maillage
-    CommandWriteMLI* command = new CommandWriteMLI(getLocalContext(), nom);
+    CommandWriteMLI* command = new CommandWriteMLI(getContext(), nom);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -416,7 +416,7 @@ void MeshManager::writeMli(std::string nom)
 void MeshManager::writeVTK(std::string nom)
 {
     // création de la commande d'écriture du maillage
-    CommandWriteVTK* command = new CommandWriteVTK(getLocalContext(), nom);
+    CommandWriteVTK* command = new CommandWriteVTK(getContext(), nom);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -429,7 +429,7 @@ void MeshManager::writeVTK(std::string nom)
 void MeshManager::writeCGNS(std::string nom)
 {
     // création de la commande d'écriture du maillage
-    CommandWriteCGNS* command = new CommandWriteCGNS(getLocalContext(), nom);
+    CommandWriteCGNS* command = new CommandWriteCGNS(getContext(), nom);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -443,7 +443,7 @@ void MeshManager::smooth()
 {
     // création de la commande d'écriture du maillage
 	std::string str("lissage du maillage");
-    CommandModifyMesh* command = new CommandModifyMesh(getLocalContext(), str);
+    CommandModifyMesh* command = new CommandModifyMesh(getContext(), str);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -468,7 +468,7 @@ bool MeshManager::compareWithMesh(std::string nom)
     mesh->createGMDSGroups();
 
     // on pourrait prévoir plus de chose en retour
-    Compare2Meshes cmp(&getLocalContext(), gmdsMesh1, gmdsMesh2);
+    Compare2Meshes cmp(&getContext(), gmdsMesh1, gmdsMesh2);
     ok = cmp.perform();
 
     // on retire les groupes
@@ -576,10 +576,10 @@ CommandMeshExplorer* MeshManager::newExplorer(CommandMeshExplorer* oldExplo, int
 
     Mesh::CommandMeshExplorer* command =
             new Mesh::CommandMeshExplorer(
-                    getLocalContext(),
+                    getContext(),
                     oldExplo,
                     inc,
-                    getLocalContext().getTopoManager().getCoEdge(narete));
+                    getContext().getTopoManager().getCoEdge(narete));
 
     /// pas de trace dans le script
     command->setScriptable(asCommand);
@@ -598,7 +598,7 @@ CommandMeshExplorer* MeshManager::endExplorer(CommandMeshExplorer* oldExplo, boo
 
     Mesh::CommandMeshExplorer* command =
             new Mesh::CommandMeshExplorer(
-                    getLocalContext(),
+                    getContext(),
                     oldExplo);
 
     /// pas de trace dans le script
@@ -610,14 +610,14 @@ CommandMeshExplorer* MeshManager::endExplorer(CommandMeshExplorer* oldExplo, boo
     return command;
 }
 /*----------------------------------------------------------------------------*/
-    Internal::M3DCommandResultIfc* MeshManager::exportBlocksForCGNS(const std::string& n)
+    Internal::M3DCommandResult* MeshManager::exportBlocksForCGNS(const std::string& n)
     {
 #ifdef _DEBUG2
         std::cout<<"exportBlocks"<<std::endl;
 #endif
 
         //creation de la commande d'exportation
-        CommandExportBlocksForCGNS *command = new CommandExportBlocksForCGNS(getLocalContext(), n);
+        CommandExportBlocksForCGNS *command = new CommandExportBlocksForCGNS(getContext(), n);
 
         // trace dans le script
         TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -629,7 +629,7 @@ CommandMeshExplorer* MeshManager::endExplorer(CommandMeshExplorer* oldExplo, boo
         // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
         getCommandManager().addCommand(command, Utils::Command::DO);
 
-        Internal::M3DCommandResultIfc*  cmdResult   =
+        Internal::M3DCommandResult*  cmdResult   =
                 new Internal::M3DCommandResult (*command);
         return cmdResult;
     }

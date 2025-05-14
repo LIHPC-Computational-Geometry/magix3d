@@ -472,7 +472,7 @@ void QtBoxOperationAction::executeOperation ( )
 {
 	// Validation paramétrage :
 //	QtMgx3DGeomOperationAction::executeOperation ( );
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 
 	// Récupération des paramètres de création de la boite :
 	QtBoxOperationPanel*	panel	= getBoxPanel ( );

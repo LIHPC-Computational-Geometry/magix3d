@@ -1,19 +1,10 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandSetFaceMeshingProperty.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 15/10/13
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandSetFaceMeshingProperty.h"
-
+#include "Topo/CoFace.h"
 #include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-#include <TkUtil/Exception.h>
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

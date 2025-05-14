@@ -1,20 +1,14 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandInternal.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 14/12/2010
- */
-/*----------------------------------------------------------------------------*/
 #ifndef INTERNAL_COMMANDINTERNAL_H_
 #define INTERNAL_COMMANDINTERNAL_H_
-
-#include "Internal/Context.h"
-#include "Utils/Command.h"
+/*----------------------------------------------------------------------------*/
 #include "Internal/InfoCommand.h"
-
+#include "Utils/Command.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
+namespace Internal {
+class Context;
+}
 /*----------------------------------------------------------------------------*/
 namespace Internal {
 /*----------------------------------------------------------------------------*/
@@ -67,8 +61,7 @@ public:
      *              informations sur le déroulement de la commande, ou 0.
      * \see         log
      */
-    virtual TkUtil::LogOutputStream* getLogStream ( )
-            { return getContext().getLogStream(); }
+    virtual TkUtil::LogOutputStream* getLogStream ( );
 
     /*------------------------------------------------------------------------*/
     /** Ce qui est fait de propre à la commande pour l'execute */

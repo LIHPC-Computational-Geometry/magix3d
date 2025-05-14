@@ -397,7 +397,7 @@ QtGeomAddToGroupOperationPanel*
 void QtGeomAddToGroupOperationAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres d'addition des entités géométriques :

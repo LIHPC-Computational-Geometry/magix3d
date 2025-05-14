@@ -245,7 +245,7 @@ QtGeometryGlueCurvesPanel*
 
 void QtGeometryGlueCurvesAction::executeOperation ( )
 {
-	M3DCommandResultIfc*		cmdResult	= 0;
+	M3DCommandResult*		cmdResult	= 0;
 	QtGeometryGlueCurvesPanel*	panel	=
 			dynamic_cast<QtGeometryGlueCurvesPanel*>(getGeometryGlueCurvesPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)

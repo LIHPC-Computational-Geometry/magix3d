@@ -1,19 +1,12 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandSetEdgeMeshingPropertyToParallelCoEdges.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 2 déc. 2011
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandSetEdgeMeshingPropertyToParallelCoEdges.h"
-
+#include "Topo/CoFace.h"
+#include "Topo/CoEdge.h"
 #include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-#include <TkUtil/Exception.h>
+/*----------------------------------------------------------------------------*/
 #include <set>
 #include <map>
 /*----------------------------------------------------------------------------*/

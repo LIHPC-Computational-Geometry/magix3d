@@ -4,7 +4,6 @@
 #include "Internal/M3DCommandManager.h"
 #include "Internal/NameManager.h"
 #include "Internal/ScriptingManager.h"
-#include "Internal/M3DCommandResultIfc.h"
 
 #include "Utils/SelectionManager.h"
 #include "Utils/Unit.h"
@@ -18,7 +17,7 @@
 #include "Group/GroupManager.h"
 #include "SysCoord/SysCoordManager.h"
 #include "Structured/StructuredMeshManager.h"
-
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/ArgumentsMap.h>
 #include <TkUtil/PaintAttributes.h>
 #include <TkUtil/LogDispatcher.h>
@@ -30,7 +29,9 @@
 #include <map>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
-
+namespace Internal{
+class M3DCommandResult;
+}
 namespace Utils {
 class CommandManager;
 class Property;
@@ -489,7 +490,7 @@ public:
     Utils::Landmark::kind getLandmark() const {return m_landmark;}
 
     /// commande, change le repère dans lequel on travaille.
-    Internal::M3DCommandResultIfc* setLandmark(Utils::Landmark::kind l);
+    Internal::M3DCommandResult* setLandmark(Utils::Landmark::kind l);
 	SET_SWIG_COMPLETABLE_METHOD(setLandmark)
 
     /*------------------------------------------------------------------------*/
@@ -497,7 +498,7 @@ public:
     Utils::Unit::lengthUnit getLengthUnit() const {return m_length_unit;}
 
     /// commande, change l'unité de longueur
-    Internal::M3DCommandResultIfc* setLengthUnit(const Utils::Unit::lengthUnit& lu);
+    Internal::M3DCommandResult* setLengthUnit(const Utils::Unit::lengthUnit& lu);
 	SET_SWIG_COMPLETABLE_METHOD(setLengthUnit)
 
     /*------------------------------------------------------------------------*/
@@ -506,7 +507,7 @@ public:
 	SET_SWIG_COMPLETABLE_METHOD(getMeshDim)
 
 	/// change la dimension pour le maillage en sortie, 3D par défaut
-	Internal::M3DCommandResultIfc* setMesh2D();
+	Internal::M3DCommandResult* setMesh2D();
 	SET_SWIG_COMPLETABLE_METHOD(setMesh2D)
 
     /*------------------------------------------------------------------------*/

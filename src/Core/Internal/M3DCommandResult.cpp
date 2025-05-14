@@ -14,36 +14,34 @@ using namespace Mgx3D::Internal;
 using namespace TkUtil;
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
-
 /*----------------------------------------------------------------------------*/
 namespace Internal
 {
-
 /*----------------------------------------------------------------------------*/
 
 M3DCommandResult::M3DCommandResult (CommandInternal& cmd)
-	: M3DCommandResultIfc (cmd),
+	: CommandResult (cmd),
 	  _commandInternal (&cmd),
 	  m_geom_modif(0)
 {
 }	// M3DCommandResult::M3DCommandResult
 
 M3DCommandResult::M3DCommandResult (CommandInternal& cmd, Geom::CommandEditGeom* geom_modif)
-	: M3DCommandResultIfc (cmd),
+	: CommandResult (cmd),
 	  _commandInternal (&cmd),
 	  m_geom_modif(geom_modif)
 {
 }	// M3DCommandResult::M3DCommandResult
 
 M3DCommandResult::M3DCommandResult ()
-	: M3DCommandResultIfc (),
+	: CommandResult (*new CommandInternalAdapter ("invalid")),
 	  _commandInternal (0),
 	  m_geom_modif(0)
 {
 }	// M3DCommandResult::M3DCommandResult
 
 M3DCommandResult::M3DCommandResult (const M3DCommandResult&)
-	: M3DCommandResultIfc (*new CommandInternalAdapter ("invalid")),
+	: CommandResult (*new CommandInternalAdapter ("invalid")),
 	  _commandInternal (0),
 	  m_geom_modif(0)
 {

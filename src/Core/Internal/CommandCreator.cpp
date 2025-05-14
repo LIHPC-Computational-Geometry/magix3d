@@ -37,23 +37,6 @@ Internal::Context& CommandCreator::getContext()
     return *(m_context);
 }
 /*----------------------------------------------------------------------------*/
-Internal::Context& CommandCreator::getLocalContext()
-{
-	Internal::Context*	context = dynamic_cast<Internal::Context*>(m_context);
-	if (0 == context)
-		throw TkUtil::Exception ("CommandCreator::getLocalContext : no local context.");
-
-	return *context;
-}
-const Internal::Context& CommandCreator::getLocalContext() const
-{
-    Internal::Context*  context = dynamic_cast<Internal::Context*>(m_context);
-    if (0 == context)
-        throw TkUtil::Exception ("CommandCreator::getLocalContext : no local context.");
-
-    return *context;
-}
-/*----------------------------------------------------------------------------*/
 void CommandCreator::log (const TkUtil::Log& l)
 {
     // AutoMutex   autoMutex (mutex ( ));

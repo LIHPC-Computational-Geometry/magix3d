@@ -2,16 +2,18 @@
 #define COMMANDCOMMON_H_
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandEditGeom.h"
-#include "Geom/GeomEntity.h"
-#include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 #include <vector>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
+namespace Internal {
+class Context;
+}
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 /*----------------------------------------------------------------------------*/
 class GeomManager;
+class GeomEntity;
 /*----------------------------------------------------------------------------*/
 /** \class CommandCommon
  *  \brief Commande permettant de faire l'intersection Booléenne de 2 géométries 3D

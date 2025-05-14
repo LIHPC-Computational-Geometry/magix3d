@@ -8,6 +8,7 @@
 #include "Structured/CommandReleaseStructuredData.h"
 #include "Utils/Common.h"
 #include "Utils/CommandManagerIfc.h"
+#include "Internal/Context.h"
 #include "Internal/M3DCommandResult.h"
 
 #include <TkUtil/Exception.h>
@@ -62,7 +63,7 @@ StructuredMeshManager::~StructuredMeshManager ( )
 }	// StructuredMeshManager::~StructuredMeshManager
 
 
-M3DCommandResultIfc* StructuredMeshManager::releaseMesh ( )
+M3DCommandResult* StructuredMeshManager::releaseMesh ( )
 {
 	UTF8String message (Charset::UTF_8);
 	message << "StructuredMeshManager::releaseMesh ( )";
@@ -73,7 +74,7 @@ M3DCommandResultIfc* StructuredMeshManager::releaseMesh ( )
 	script << getContextAlias ( ) << "." << "getStructuredMeshManager ( ).releaseMesh ( )";
 	cmd->setScriptCommand (script);
 	getCommandManager ( ).addCommand (cmd, Utils::Command::DO);
-	M3DCommandResultIfc*	result	= new M3DCommandResult (*cmd);
+	M3DCommandResult*	result	= new M3DCommandResult (*cmd);
 
 	return result;
 }	// StructuredMeshManager::releaseMesh

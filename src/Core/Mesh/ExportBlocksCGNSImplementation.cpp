@@ -15,7 +15,7 @@
 #include "Mesh/Surface.h"
 /*----------------------------------------------------------------------------*/
 #include <gmds/ig/Mesh.h>
-#include "gmds/io/IGMeshIOService.h"
+#include <gmds/io/IGMeshIOService.h>
 #include <gmds/io/VTKWriter.h>
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>

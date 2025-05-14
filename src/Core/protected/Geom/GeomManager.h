@@ -5,7 +5,7 @@
 #include <vector>
 /*----------------------------------------------------------------------------*/
 #include "Internal/CommandCreator.h"
-#include "Internal/M3DCommandResultIfc.h"
+#include "Internal/M3DCommandResult.h"
 #include "Geom/GeomInfo.h"
 #include "Utils/Constants.h"
 #include "Utils/Vector.h"
@@ -103,12 +103,12 @@ public:
      *  \param withTopo a vrai si l'on doit copier la topologie avec la géométrie
      *  \param groupName groupe dans lequel sont mise les nouvelles entités
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         copy(std::vector<std::string>& e, bool withTopo, std::string groupName);
 	SET_SWIG_COMPLETABLE_METHOD(copy)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         copy(std::vector<GeomEntity*>& e, bool withTopo, std::string groupName);
 #endif
 
@@ -117,13 +117,13 @@ public:
      *         et d'une courbe ou surface. Le sommet créé est le projet de p sur la
      *         courbe ou la surface.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         newVertex(std::string vertexName, std::string curveName,
             std::string groupName="");
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         newVertex(const Vertex* ref, Curve* curve, std::string groupName="");
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         newVertex(const Vertex* ref, Surface* surface, std::string groupName="");
 #endif
 
@@ -132,11 +132,11 @@ public:
      *         parametrage dans [0,1] indiquant la position du point sur la
      *         courbe.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
                  newVertex(std::string curveName, const double& param,
                            std::string groupName="");
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
                  newVertex(Curve* curve, const double& param, std::string groupName="");
 #endif
 
@@ -145,13 +145,13 @@ public:
      *         et d'un ratio positionnant ce point sur la droite passant par
      *         ces 2 points.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
                  newVertex(std::string vertex1Name, std::string vertex2Name,
                            const double& param,
                            std::string groupName="");
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
                  newVertex(const Vertex* ref1, const Vertex* ref2,
                            const double& param,
                            std::string groupName="");
@@ -162,7 +162,7 @@ public:
      *
      *  \param p le point géométrique
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         newVertex(const Point& p, std::string groupName="");
 
     /*------------------------------------------------------------------------*/
@@ -172,7 +172,7 @@ public:
      *  \param y coordonnées en y
      *  \param z coordonnées en z
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         newVertex(const double& x, const double& y, const double& z,
             std::string groupName="");
 
@@ -182,7 +182,7 @@ public:
 	 *  \param vertexName	le sommet topologique
      *  \param asso			faut-il associer le sommet topologique au sommet géométrique créé
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		newVertexFromTopo(std::string vertexName, bool asso = true,
             std::string groupName="");
 
@@ -192,12 +192,12 @@ public:
      *  \param v1 le premier sommet
      *  \param v2 le second somment
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		newSegment(std::string n1,std::string n2, std::string groupName="");
 	SET_SWIG_COMPLETABLE_METHOD(newSegment)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		newSegment( Geom::Vertex* v1,  Geom::Vertex* v2, std::string groupName="");
 #endif
 
@@ -209,13 +209,13 @@ public:
      *  \param p2 second point
      *  \param p3 dernier point
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		newCircle( std::string p1, std::string p2, std::string p3,
 				   std::string groupName="");
 	SET_SWIG_COMPLETABLE_METHOD(newCircle)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		newCircle( Vertex* p1, Vertex* p2, Vertex* p3,
                    std::string groupName="");
 #endif
@@ -230,13 +230,13 @@ public:
      *  \param p2 second point
      *  \param center centre
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		newEllipse( std::string p1, std::string p2, std::string center,
 				   std::string groupName="");
 	SET_SWIG_COMPLETABLE_METHOD(newEllipse)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		newEllipse( Vertex* p1, Vertex* p2, Vertex* center,
                    std::string groupName="");
 #endif
@@ -251,7 +251,7 @@ public:
      *  \param direct indique si l'on tourne dans le sens direct ou indirect
      *  \param normal vecteur normal au plan pour lever l'ambiguïté dans le cas des 3 points alignés
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	newArcCircle( std::string pc,
 			std::string pd,
 			std::string pe,
@@ -259,7 +259,7 @@ public:
 			const Vector& normal,
 			std::string groupName="");
 
-	Mgx3D::Internal::M3DCommandResultIfc*
+	Mgx3D::Internal::M3DCommandResult*
 	newArcCircle( std::string pc,
 			std::string pd,
 			std::string pe,
@@ -275,7 +275,7 @@ public:
      *  \param pd point de départ de l'arc de cercle
      *  \param pe point de fin de l'arc de cercle
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     newArcCircle( std::string pc,
                   std::string pd,
                   std::string pe,
@@ -289,7 +289,7 @@ public:
      *  \param sysCoordName le repère dans lequel est défini le cercle (celui par défaut si pas défini)
      *  \param groupName groupe dans lequel est mis l'arc créé
      */
-    Internal::M3DCommandResultIfc*
+    Internal::M3DCommandResult*
     newArcCircle(const double& angleDep,
                  const double& angleFin,
                  const double& rayon,
@@ -297,19 +297,19 @@ public:
                  std::string groupName="");
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	newArcCircle( Vertex* pc,  Vertex* pd,  Vertex* pe,
 			const bool direct,
 			const Vector& normal,
 			std::string groupName="");
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	newArcCircle( Vertex* pc,  Vertex* pd,  Vertex* pe,
 			const bool direct,
 			std::string groupName="");
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     newArcCircle( Vertex* pc,  Vertex* pd,  Vertex* pe,
                   std::string groupName="");
-    Internal::M3DCommandResultIfc*
+    Internal::M3DCommandResult*
     newArcCircle(const double& angleDep,
                  const double& angleFin,
                  const double& rayon,
@@ -326,14 +326,14 @@ public:
      *  \param pe point de fin de l'arc de cercle
      *  \param direct indique si l'on tourne dans le sens direct ou indirect
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     newArcEllipse( std::string pc,  std::string pd,  std::string pe,
     		const bool direct,
     		std::string groupName="");
 	SET_SWIG_COMPLETABLE_METHOD(newArcEllipse)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     newArcEllipse( Vertex* pc,  Vertex* pd,  Vertex* pe,
     		const bool direct,
     		std::string groupName="");
@@ -348,12 +348,12 @@ public:
      *  \param deg_max degré maximum pour le polynome de la B-Spline
      *  \param groupName un nom de groupe
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		newBSpline(std::string n1, std::vector<Point>& vp, std::string n2,
 				int deg_min, int deg_max, std::string groupName);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		newBSpline(Vertex* vtx1, std::vector<Point>& vp, Vertex* vtx2,
 				int deg_min, int deg_max, std::string groupName);
 #endif
@@ -364,12 +364,12 @@ public:
      *  \param base le nom de la surface à copier
      *  \param offset la distance
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		newSurfaceByOffset(std::string name, const double& offset, std::string groupName);
 	SET_SWIG_COMPLETABLE_METHOD(newSurfaceByOffset)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		newSurfaceByOffset(Surface* base, const double& offset, std::string groupName);
 #endif
 
@@ -378,12 +378,12 @@ public:
      *
      *  \param curves le nom des courbes définissant le contour
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         newPlanarSurface(std::vector<std::string>& curves, std::string groupName);
 	SET_SWIG_COMPLETABLE_METHOD(newPlanarSurface)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         newPlanarSurface(const std::vector<Geom::Curve* >& curves, std::string groupName );
 #endif
 
@@ -391,18 +391,18 @@ public:
     /** \brief Création d'une surface planaire à partir d'un ensemble de points
      *  Création des sommets géométriques et des segments en même temps
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     	newVerticesCurvesAndPlanarSurface(std::vector<Point>& points, std::string groupName);
 
     /*------------------------------------------------------------------------*/
     /** \brief création d'une courbe par projection orthogonale d'une courbe sur une surface
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     newCurveByCurveProjectionOnSurface(const std::string& curveName, const std::string& surfaceName, std::string groupName="");
 	SET_SWIG_COMPLETABLE_METHOD(newCurveByCurveProjectionOnSurface)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     newCurveByCurveProjectionOnSurface(Geom::Curve* curve, Geom::Surface* surface, std::string groupName="");
 #endif
 
@@ -418,12 +418,12 @@ public:
      *  \param propagateDown indique si l'on supprime les entités incidentes de
      *                       dimension inférieure
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         destroy(std::vector<std::string>& es, bool propagateDown);
 	SET_SWIG_COMPLETABLE_METHOD(destroy)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         destroy(std::vector<GeomEntity*>& es, bool propagateDown);
 #endif
 
@@ -441,12 +441,12 @@ public:
      *  \param propagateDown indique si l'on supprime les entités incidentes de
      *                       dimension inférieure
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         destroyWithTopo(std::vector<std::string>& es, bool propagateDown);
 	SET_SWIG_COMPLETABLE_METHOD(destroyWithTopo)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         destroyWithTopo(std::vector<GeomEntity*>& es, bool propagateDown);
 #endif
 
@@ -456,12 +456,12 @@ public:
      *
      *  \param entities les courbes à réunir
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         joinCurves(std::vector<std::string>& entities);
 	SET_SWIG_COMPLETABLE_METHOD(joinCurves)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         joinCurves(std::vector<GeomEntity*>& entities);
 #endif
 
@@ -471,12 +471,12 @@ public:
      *
      *  \param entities les surfaces à réunir
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         joinSurfaces(std::vector<std::string>& entities);
 	SET_SWIG_COMPLETABLE_METHOD(joinSurfaces)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         joinSurfaces(std::vector<GeomEntity*>& entities);
 #endif
 
@@ -492,7 +492,7 @@ public:
      *
      *  \see getLastVolume pour obtenir le volume résultant
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		newBox(const Point& pmin, const Point& pmax, std::string groupName="");
 	SET_SWIG_COMPLETABLE_METHOD(newBox)
 
@@ -509,7 +509,7 @@ public:
      *
      *  \see getLastVolume pour obtenir le volume résultant
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		newCylinder(const Point& pcentre, const double& dr,
                     const Vector& dv, const double& da, std::string groupName="");
 
@@ -526,7 +526,7 @@ public:
      *
      *  \see getLastVolume pour obtenir le volume résultant
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		newCylinder(const Point& pcentre, const double& dr,
                     const Vector& dv, const  Utils::Portion::Type& dt, std::string groupName="");
 
@@ -540,7 +540,7 @@ public:
      *  \param groupName optionnellement un nom de groupe
      */
     /*------------------------------------------------------------------------*/
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		newSphere(const Point& pcentre,  const double& radius,
                   const double& angle, std::string groupName="");
 
@@ -553,7 +553,7 @@ public:
      *  \param groupName optionnellement un nom de groupe
      */
     /*------------------------------------------------------------------------*/
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		newSphere(const Point& pcentre,  const double& radius,
                   const  Utils::Portion::Type& dt, std::string groupName="");
 
@@ -566,7 +566,7 @@ public:
      *  \param groupName optionnellement un nom de groupe
      */
     /*------------------------------------------------------------------------*/
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		newSpherePart(const double& radius,
                       const double& angleY,
                       const double& angleZ,
@@ -583,7 +583,7 @@ public:
      *  \param groupName optionnellement un nom de groupe
      */
     /*------------------------------------------------------------------------*/
-	Mgx3D::Internal::M3DCommandResultIfc*
+	Mgx3D::Internal::M3DCommandResult*
 	 	 newHollowSpherePart(const double& dr_int,
 	 			 const double& dr_ext,
 				 const double& angleY,
@@ -602,7 +602,7 @@ public:
      *  \param groupName optionnellement un nom de groupe
      *
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     newHollowCylinder(const Point& pcentre,
             const double& dr_int,
             const double& dr_ext,
@@ -620,7 +620,7 @@ public:
      *  \param groupName optionnellement un nom de groupe
      *
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         newHollowCylinder(const Point& pcentre,
                 const double& dr_int,
                 const double& dr_ext,
@@ -638,7 +638,7 @@ public:
      *  \param groupName optionnellement un nom de groupe
      */
     /*------------------------------------------------------------------------*/
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         newHollowSphere(const Point& pcentre,
                 const double& radius_int,
                 const double& radius_ext,
@@ -655,7 +655,7 @@ public:
      *  \param groupName optionnellement un nom de groupe
      */
     /*------------------------------------------------------------------------*/
-     Mgx3D::Internal::M3DCommandResultIfc*
+     Mgx3D::Internal::M3DCommandResult*
         newHollowSphere(const Point& pcentre,
                 const double& radius_int,
                 const double& radius_ext,
@@ -673,7 +673,7 @@ public:
      *  \param groupName optionnellement un nom de groupe
      *
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     newCone(const double& dr1, const double& dr2,
     		const Vector& dv, const double& da, std::string groupName="");
 
@@ -688,7 +688,7 @@ public:
 	 *  \param groupName optionnellement un nom de groupe
 	 *
 	 */
-	Mgx3D::Internal::M3DCommandResultIfc*
+	Mgx3D::Internal::M3DCommandResult*
     newCone(const double& dr1, const double& dr2,
     		const Vector& dv, const  Utils::Portion::Type& dt, std::string groupName="");
 
@@ -701,13 +701,13 @@ public:
      *  \param keep     indique si l'on conserve (true) ou pas (false) les
      *                  entités de départ
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		makeRevol( std::vector<std::string>& entities,
 		            const Utils::Math::Rotation& rot, const bool keep);
 	SET_SWIG_COMPLETABLE_METHOD(makeRevol)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		makeRevol(  std::vector<GeomEntity*>& entities,
                     const Utils::Math::Rotation& rot, const bool keep);
 #endif
@@ -719,13 +719,13 @@ public:
      *  \param entities les entites dont on fait l'extrusion
      *  \param dp   le vecteur d'extrusion
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		makeExtrude(std::vector<std::string>& entities,
 					const Vector& dp, const bool keep);
 	SET_SWIG_COMPLETABLE_METHOD(makeExtrude)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		makeExtrude(  std::vector<GeomEntity*>& entities,
 					const Vector& dp, const bool keep);
 #endif
@@ -737,13 +737,13 @@ public:
      *  \param entities les entites dont on fait l'extrusion
      *  \param dp   le vecteur d'extrusion
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		makeBlocksByExtrude(std::vector<std::string>& entities,
 				const Vector& dp, const bool keep);
 	SET_SWIG_COMPLETABLE_METHOD(makeBlocksByExtrude)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		makeBlocksByExtrude(  std::vector<GeomEntity*>& entities,
 					const Vector& dp, const bool keep);
 #endif
@@ -755,15 +755,15 @@ public:
      *  \param ve nom des entités géométrique à translater
      *  \param dp le vecteur de translation
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	    translate(std::vector<std::string>& ve, const Vector& dp);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		translate(std::vector<GeomEntity*>& ve, const Vector& dp);
 #endif
 
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         translateAll(const Vector& dp);
 
     /*------------------------------------------------------------------------*/
@@ -775,16 +775,16 @@ public:
      *  \param withTopo a vrai si l'on doit copier la topologie avec la géométrie
      *  \param groupName groupe dans lequel sont mise les nouvelles entités
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         copyAndTranslate(std::vector<std::string>& ve, const Vector& dp, bool withTopo, std::string groupName);
 	SET_SWIG_COMPLETABLE_METHOD(copyAndTranslate)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	    copyAndTranslate(std::vector<GeomEntity*>& ve, const Vector& dp, bool withTopo, std::string groupName);
 #endif
 
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	    copyAndTranslateAll(const Vector& dp, std::string groupName);
 	SET_SWIG_COMPLETABLE_METHOD(copyAndTranslateAll)
 
@@ -794,18 +794,18 @@ public:
      *  \param entities les entities dont on fait la rotation
      *  \param rot      la rotation
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		rotate( std::vector<std::string>& entities,
 				const Utils::Math::Rotation& rot);
 	SET_SWIG_COMPLETABLE_METHOD(rotate)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		rotate( std::vector<GeomEntity*>& entities,
 				const Utils::Math::Rotation& rot);
 #endif
 
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         rotateAll( const Utils::Math::Rotation& rot);
     SET_SWIG_COMPLETABLE_METHOD(rotateAll)
 
@@ -817,18 +817,18 @@ public:
      *  \param withTopo a vrai si l'on doit copier la topologie avec la géométrie
      *  \param groupName groupe dans lequel sont mise les nouvelles entités
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	copyAndRotate( std::vector<std::string>& entities,
 				const Utils::Math::Rotation& rot, bool withTopo, std::string groupName);
 	SET_SWIG_COMPLETABLE_METHOD(copyAndRotate)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         copyAndRotate( std::vector<GeomEntity*>& entities,
         		const Utils::Math::Rotation& rot, bool withTopo, std::string groupName);
 #endif
 
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		copyAndRotateAll( const Utils::Math::Rotation& rot, std::string groupName);
 	SET_SWIG_COMPLETABLE_METHOD(copyAndRotateAll)
 
@@ -839,18 +839,18 @@ public:
      *  \param factor   le facteur d'homothétie
      *  \param center   le centre (optionnel)
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         scale(std::vector<std::string>& geo, const double factor);
 
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         scale(std::vector<std::string>& geo, const double factor, const Point& pcentre);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         scale(std::vector<Geom::GeomEntity*>& geo, const double factor, const Point& pcentre);
 #endif
 
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         scaleAll(const double factor, const Point& pcentre = Point(0,0,0));
 
     /** \brief homothétie d'un objet géométrique
@@ -861,13 +861,13 @@ public:
      *  \param factorZ   le facteur d'homothétie suivant l'axe des z
      *  \param center   le centre (optionnel)
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         scale(std::vector<std::string>& geo,
         		const double factorX,
 				const double factorY,
 				const double factorZ);
 
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         scale(std::vector<std::string>& geo,
 				const double factorX,
 				const double factorY,
@@ -875,7 +875,7 @@ public:
 				const Point& pcentre);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         scale(std::vector<Geom::GeomEntity*>& geo,
         		const double factorX,
 				const double factorY,
@@ -883,7 +883,7 @@ public:
                 const Point& pcentre);
 #endif
 
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		scaleAll(const double factorX,
 			const double factorY,
 			const double factorZ,
@@ -898,19 +898,19 @@ public:
      *  \param withTopo  a vrai si l'on doit copier la topologie avec la géométrie
      *  \param groupName groupe dans lequel sont mises les nouvelles entités
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	copyAndScale(std::vector<std::string>& geo, const double factor, const Point& pcenter, bool withTopo, std::string groupName);
 
-	Mgx3D::Internal::M3DCommandResultIfc*
+	Mgx3D::Internal::M3DCommandResult*
 	copyAndScale(std::vector<std::string>& geo, const double factor, bool withTopo, std::string groupName);
 
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	copyAndScale(std::vector<Geom::GeomEntity*>& geo, const double factor, const Point& pcenter, bool withTopo, std::string groupName);
 #endif
 
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	copyAndScaleAll(const double factor, const Point& pcenter, std::string groupName);
 
     /** \brief homothétie d'une copie d'un objet géométrique
@@ -923,7 +923,7 @@ public:
      *  \param withTopo  a vrai si l'on doit copier la topologie avec la géométrie
      *  \param groupName groupe dans lequel sont mises les nouvelles entités
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	copyAndScale(std::vector<std::string>& geo,
 				const double factorX,
 				const double factorY,
@@ -932,7 +932,7 @@ public:
 				bool withTopo,
 				std::string groupName);
 
-	Mgx3D::Internal::M3DCommandResultIfc*
+	Mgx3D::Internal::M3DCommandResult*
 	copyAndScale(std::vector<std::string>& geo,
         		const double factorX,
 				const double factorY,
@@ -941,7 +941,7 @@ public:
 				std::string groupName);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	copyAndScale(std::vector<Geom::GeomEntity*>& geo,
 				const double factorX,
 				const double factorY,
@@ -951,7 +951,7 @@ public:
 				std::string groupName);
 #endif
 
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	copyAndScaleAll(const double factorX,
 			const double factorY,
 			const double factorZ,
@@ -963,12 +963,12 @@ public:
      *  \param geo      les objets d'origine
      *  \param plane    le plan de symétrie
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
             mirror(std::vector<std::string>& geo, Utils::Math::Plane* plane);
     SET_SWIG_COMPLETABLE_METHOD(mirror)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
             mirror(std::vector<Geom::GeomEntity*>& geo, Utils::Math::Plane* plane);
 #endif
 
@@ -979,12 +979,12 @@ public:
      *  \param withTopo a vrai si l'on doit copier la topologie avec la géométrie
      *  \param groupName groupe dans lequel sont mise les nouvelles entités
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	copyAndMirror(std::vector<std::string>& geo, Utils::Math::Plane* plane, bool withTopo, std::string groupName);
 	SET_SWIG_COMPLETABLE_METHOD(copyAndMirror)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	copyAndMirror(std::vector<Geom::GeomEntity*>& geo, Utils::Math::Plane* plane, bool withTopo, std::string groupName);
 #endif
 
@@ -994,7 +994,7 @@ public:
      *  \param n le nom du ficher dont le contenu doit etre importe
      *  \param testVolumicProperties test que les volumes sont fermés
      */
-    Mgx3D::Internal::M3DCommandResultIfc* importBREP(std::string n,
+    Mgx3D::Internal::M3DCommandResult* importBREP(std::string n,
         const bool testVolumicProperties=true);
     SET_SWIG_COMPLETABLE_METHOD(importBREP)
 
@@ -1004,7 +1004,7 @@ public:
      *  \param n le nom du ficher dont le contenu doit etre importe
      *  \param testVolumicProperties test que les volumes sont fermés
      */
-    Mgx3D::Internal::M3DCommandResultIfc* importCATIA(std::string n,
+    Mgx3D::Internal::M3DCommandResult* importCATIA(std::string n,
         const bool testVolumicProperties=true);
     SET_SWIG_COMPLETABLE_METHOD(importCATIA)
 
@@ -1014,7 +1014,7 @@ public:
      *  \param n le nom du ficher dont le contenu doit etre importe
      *  \param testVolumicProperties test que les volumes sont fermés
      */
-    Mgx3D::Internal::M3DCommandResultIfc* importSTEP(std::string n,
+    Mgx3D::Internal::M3DCommandResult* importSTEP(std::string n,
         const bool testVolumicProperties=true);
     SET_SWIG_COMPLETABLE_METHOD(importSTEP)
 
@@ -1023,7 +1023,7 @@ public:
      *
      *  \param n le nom du ficher dont le contenu doit etre importe
      */
-    Mgx3D::Internal::M3DCommandResultIfc* importSTL(std::string n);
+    Mgx3D::Internal::M3DCommandResult* importSTL(std::string n);
     SET_SWIG_COMPLETABLE_METHOD(importSTL)
 
     /*------------------------------------------------------------------------*/
@@ -1031,7 +1031,7 @@ public:
      *
      *  \param n le nom du ficher dont le contenu doit etre importe
      */
-    Mgx3D::Internal::M3DCommandResultIfc* importIGES(std::string n);
+    Mgx3D::Internal::M3DCommandResult* importIGES(std::string n);
     SET_SWIG_COMPLETABLE_METHOD(importIGES)
 
     /*------------------------------------------------------------------------*/
@@ -1044,7 +1044,7 @@ public:
      *  \param deg_min degré minimum pour les polynomes des B-Splines
      *  \param deg_max degré maximum pour les polynomes des B-Splines
      */
-    Mgx3D::Internal::M3DCommandResultIfc* importMDL(
+    Mgx3D::Internal::M3DCommandResult* importMDL(
 			std::string n, const bool all, const bool useAreaName=false, std::string prefixName="",
 			int deg_min=1, int deg_max=2);
 
@@ -1054,7 +1054,7 @@ public:
      *  \param n le nom du ficher dont le contenu doit etre importe
      *  \param groupe le nom du groupe dont on importe les zones et les entités associées
      */
-    Mgx3D::Internal::M3DCommandResultIfc* importMDL(
+    Mgx3D::Internal::M3DCommandResult* importMDL(
 			std::string n, std::string groupe);
 
     /** \brief Import d'une partie d'un fichier au format MDL
@@ -1063,7 +1063,7 @@ public:
      *  \param n le nom du ficher dont le contenu doit etre importe
      *  \param zones la liste des zones que l'on importe avec les entités associées
      */
-    Mgx3D::Internal::M3DCommandResultIfc* importMDL(
+    Mgx3D::Internal::M3DCommandResult* importMDL(
 			std::string n, std::vector<std::string>& zones);
 
     /** \brief Import d'un fichier au format MDL avec création des commandes élémentaires
@@ -1080,12 +1080,12 @@ public:
      *  \param ge la liste des noms des entités à exporter
      *  \param n le nom du ficher dans lequel on exporte
      */
-    Mgx3D::Internal::M3DCommandResultIfc* exportMDL(std::vector<std::string>& ge,
+    Mgx3D::Internal::M3DCommandResult* exportMDL(std::vector<std::string>& ge,
             const std::string& n);
     SET_SWIG_COMPLETABLE_METHOD(exportMDL)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc* exportMDL(std::vector<Geom::GeomEntity*>& ge,
+    Mgx3D::Internal::M3DCommandResult* exportMDL(std::vector<Geom::GeomEntity*>& ge,
             const std::string& n);
 #endif
 
@@ -1094,18 +1094,18 @@ public:
      *
      *  \param n le nom du ficher dans lequel on exporte
      */
-    Mgx3D::Internal::M3DCommandResultIfc* exportVTK(const std::string& n);
+    Mgx3D::Internal::M3DCommandResult* exportVTK(const std::string& n);
 
     /** \brief Export d'une sélection dans un fichier au format VTK
      *
      *  \param ge la liste des noms des entités à exporter
      *  \param n le nom du ficher dans lequel on exporte
      */
-    Mgx3D::Internal::M3DCommandResultIfc* exportVTK(std::vector<std::string>& ge,
+    Mgx3D::Internal::M3DCommandResult* exportVTK(std::vector<std::string>& ge,
     		const std::string& n);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc* exportVTK(std::vector<Geom::GeomEntity*>& ge,
+    Mgx3D::Internal::M3DCommandResult* exportVTK(std::vector<Geom::GeomEntity*>& ge,
     		const std::string& n);
 #endif
 
@@ -1115,12 +1115,12 @@ public:
      *  \param ge le nom de l'entité que l'on exporte
      *  \param n le nom du ficher dans lequel on exporte
      */
-    Mgx3D::Internal::M3DCommandResultIfc* exportSTL(const std::string& ge,
+    Mgx3D::Internal::M3DCommandResult* exportSTL(const std::string& ge,
     		const std::string& n);
 	SET_SWIG_COMPLETABLE_METHOD(exportSTL)
 
 #ifndef SWIG
-	Mgx3D::Internal::M3DCommandResultIfc* exportSTL(Geom::GeomEntity* geomEntity,
+	Mgx3D::Internal::M3DCommandResult* exportSTL(Geom::GeomEntity* geomEntity,
     		const std::string& n);
 #endif
 
@@ -1129,18 +1129,18 @@ public:
      *
      *  \param n le nom du ficher dans lequel on exporte
      */
-    Mgx3D::Internal::M3DCommandResultIfc* exportMLI(const std::string& n);
+    Mgx3D::Internal::M3DCommandResult* exportMLI(const std::string& n);
 
     /** \brief Export d'une sélection au format Mli
      *
      *  \param ge la liste des noms des entités à exporter
      *  \param n le nom du ficher dans lequel on exporte
      */
-    Mgx3D::Internal::M3DCommandResultIfc* exportMLI(std::vector<std::string>& ge,
+    Mgx3D::Internal::M3DCommandResult* exportMLI(std::vector<std::string>& ge,
     		const std::string& n);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc* exportMLI(std::vector<Geom::GeomEntity*>& ge,
+    Mgx3D::Internal::M3DCommandResult* exportMLI(std::vector<Geom::GeomEntity*>& ge,
     		const std::string& n);
 #endif
 
@@ -1149,18 +1149,18 @@ public:
      *
      *  \param n le nom du ficher dans lequel on exporte
      */
-    Mgx3D::Internal::M3DCommandResultIfc* exportBREP(const std::string& n);
+    Mgx3D::Internal::M3DCommandResult* exportBREP(const std::string& n);
 
     /** \brief Export d'une sélection au format BREP
      *
      *  \param ge la liste des noms des entités à exporter
      *  \param n le nom du ficher dans lequel on exporte
      */
-    Mgx3D::Internal::M3DCommandResultIfc* exportBREP(std::vector<std::string>& ge,
+    Mgx3D::Internal::M3DCommandResult* exportBREP(std::vector<std::string>& ge,
             const std::string& n);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc* exportBREP(std::vector<Geom::GeomEntity*>& ge,
+    Mgx3D::Internal::M3DCommandResult* exportBREP(std::vector<Geom::GeomEntity*>& ge,
             const std::string& n);
 #endif
     /*------------------------------------------------------------------------*/
@@ -1168,18 +1168,18 @@ public:
      *
      *  \param n le nom du ficher dans lequel on exporte
      */
-    Mgx3D::Internal::M3DCommandResultIfc* exportSTEP(const std::string& n);
+    Mgx3D::Internal::M3DCommandResult* exportSTEP(const std::string& n);
 
     /** \brief Export d'une sélection au format STEP
      *
      *  \param ge la liste des noms des entités à exporter
      *  \param n le nom du ficher dans lequel on exporte
      */
-    Mgx3D::Internal::M3DCommandResultIfc* exportSTEP(std::vector<std::string>& ge,
+    Mgx3D::Internal::M3DCommandResult* exportSTEP(std::vector<std::string>& ge,
             const std::string& n);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc* exportSTEP(std::vector<Geom::GeomEntity*>& ge,
+    Mgx3D::Internal::M3DCommandResult* exportSTEP(std::vector<Geom::GeomEntity*>& ge,
             const std::string& n);
 #endif
 
@@ -1188,18 +1188,18 @@ public:
      *
      *  \param n le nom du ficher dans lequel on exporte
      */
-    Mgx3D::Internal::M3DCommandResultIfc* exportIGES(const std::string& n);
+    Mgx3D::Internal::M3DCommandResult* exportIGES(const std::string& n);
 
     /** \brief Export d'une sélection au format IGES
      *
      *  \param ge la liste des noms des entités à exporter
      *  \param n le nom du ficher dans lequel on exporte
      */
-    Mgx3D::Internal::M3DCommandResultIfc* exportIGES(std::vector<std::string>& ge,
+    Mgx3D::Internal::M3DCommandResult* exportIGES(std::vector<std::string>& ge,
     		const std::string& n);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc* exportIGES(std::vector<Geom::GeomEntity*>& ge,
+    Mgx3D::Internal::M3DCommandResult* exportIGES(std::vector<Geom::GeomEntity*>& ge,
             const std::string& n);
 #endif
 
@@ -1208,12 +1208,12 @@ public:
      *
      *  \param entities les entités sur lesquelles on travaille
      */
-    Mgx3D::Internal::M3DCommandResultIfc* fuse(
+    Mgx3D::Internal::M3DCommandResult* fuse(
 			std::vector<std::string>& entities);
 	SET_SWIG_COMPLETABLE_METHOD(fuse)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc* fuse(
+    Mgx3D::Internal::M3DCommandResult* fuse(
 			std::vector<Geom::GeomEntity*>& entities);
 #endif
 
@@ -1222,12 +1222,12 @@ public:
      *
      *  \param entities les entités sur lesquelles on travaille
      */
-    Mgx3D::Internal::M3DCommandResultIfc* common(
+    Mgx3D::Internal::M3DCommandResult* common(
 			std::vector<std::string>& entities);
 	SET_SWIG_COMPLETABLE_METHOD(common)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc* common(
+    Mgx3D::Internal::M3DCommandResult* common(
 			std::vector<Geom::GeomEntity*>& entities);
 #endif
 
@@ -1238,12 +1238,12 @@ public:
      *  \param entity2 (comme la précédente)
      *  \param groupName groupe dans lequel sont mise les nouvelles entités
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	     common2D(std::string entity1, std::string entity2, std::string groupName);
 	SET_SWIG_COMPLETABLE_METHOD(common2D)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	     common2D(Geom::GeomEntity* entity1, Geom::GeomEntity* entity2, std::string groupName);
 #endif
 
@@ -1254,12 +1254,12 @@ public:
      *  \param entity2 (comme la précédente)
      *  \param groupName groupe dans lequel sont mise les nouvelles entités
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	     common2DOnCopy(std::string entity1, std::string entity2, std::string groupName);
 	SET_SWIG_COMPLETABLE_METHOD(common2DOnCopy)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	     common2DOnCopy(Geom::GeomEntity* entity1, Geom::GeomEntity* entity2, std::string groupName);
 #endif
 
@@ -1270,19 +1270,19 @@ public:
      *  \param tokeep l(es) entité(s) que l'on conserve
      *  \param tocut  les entités que l'on retire de tokeep
      */
-    Mgx3D::Internal::M3DCommandResultIfc* cut(
+    Mgx3D::Internal::M3DCommandResult* cut(
             std::string tokeep,std::vector<std::string>& tocut);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc* cut(
+    Mgx3D::Internal::M3DCommandResult* cut(
             Geom::GeomEntity* tokeep, std::vector<Geom::GeomEntity*>& tocut);
 #endif
 
-    Mgx3D::Internal::M3DCommandResultIfc* cut(
+    Mgx3D::Internal::M3DCommandResult* cut(
             std::vector<std::string>& tokeep,std::vector<std::string>& tocut);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc* cut(
+    Mgx3D::Internal::M3DCommandResult* cut(
             std::vector<Geom::GeomEntity*>& tokeep, std::vector<Geom::GeomEntity*>& tocut);
 #endif
 
@@ -1291,12 +1291,12 @@ public:
      *
      *  \param entities les entités sur lesquelles on travaille
      */
-    Mgx3D::Internal::M3DCommandResultIfc* glue(
+    Mgx3D::Internal::M3DCommandResult* glue(
 			std::vector<std::string>& entities);
 	SET_SWIG_COMPLETABLE_METHOD(glue)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc* glue(
+    Mgx3D::Internal::M3DCommandResult* glue(
 			std::vector<Geom::GeomEntity*>& entities);
 #endif
 
@@ -1306,22 +1306,22 @@ public:
      *  \param entities les entités que l'on veut couper
      *  \param tool     l'entité pour découper
      */
-    Mgx3D::Internal::M3DCommandResultIfc* section(
+    Mgx3D::Internal::M3DCommandResult* section(
             std::vector<std::string>& entities, std::string tool);
     SET_SWIG_COMPLETABLE_METHOD(section)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc* section(
+    Mgx3D::Internal::M3DCommandResult* section(
             std::vector<Geom::GeomEntity*>& entities, Geom::GeomEntity* tool);
 #endif
 
-    Mgx3D::Internal::M3DCommandResultIfc* sectionByPlane(
+    Mgx3D::Internal::M3DCommandResult* sectionByPlane(
             std::vector<std::string>& entities,  Utils::Math::Plane* tool,
             std::string planeGroupName);
     SET_SWIG_COMPLETABLE_METHOD(sectionByPlane)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc* sectionByPlane(
+    Mgx3D::Internal::M3DCommandResult* sectionByPlane(
             std::vector<Geom::GeomEntity*>& entities, Utils::Math::Plane* tool,
             std::string planeGroupName);
 #endif
@@ -1446,15 +1446,15 @@ public:
     int getIndexOf(Volume* v) const;
 
     /** Ajoute un groupe à un ensemble d'entités géométriques, suivant une dimension */
-    Internal::M3DCommandResultIfc* addToGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
+    Internal::M3DCommandResult* addToGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
     SET_SWIG_COMPLETABLE_METHOD(addToGroup)
 
     /** Enlève un groupe à un ensemble d'entités géométriques, suivant une dimension */
-    Internal::M3DCommandResultIfc* removeFromGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
+    Internal::M3DCommandResult* removeFromGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
     SET_SWIG_COMPLETABLE_METHOD(removeFromGroup)
 
     /** Définit le groupe pour un ensemble d'entités géométriques, suivant une dimension */
-    Internal::M3DCommandResultIfc* setGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
+    Internal::M3DCommandResult* setGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
     SET_SWIG_COMPLETABLE_METHOD(setGroup)
 
 #ifndef SWIG

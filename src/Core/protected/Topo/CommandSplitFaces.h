@@ -1,16 +1,9 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandSplitFaces.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 9/3/2012
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDSPLITFACES_H_
 #define COMMANDSPLITFACES_H_
 /*----------------------------------------------------------------------------*/
 #include "Topo/CommandEditTopo.h"
+#include "Utils/Point.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -45,7 +38,7 @@ public:
      *  \param pt un point qui donnera un paramètre pour déterminer la position du sommet sur l'arête par projection sur cette dernière
      *  \param ratio_ogrid un autre paramètre pour positionner le sommet du ogrid en cas de rencontre avec une face dégénérée
      */
-    CommandSplitFaces(Internal::Context& c, std::vector<Topo::CoFace* > &cofaces, CoEdge* arete, const Point& pt, double ratio_ogrid);
+    CommandSplitFaces(Internal::Context& c, std::vector<Topo::CoFace* > &cofaces, CoEdge* arete, const Utils::Math::Point& pt, double ratio_ogrid);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur pour découper toutes les faces 2D structurées disponibles
@@ -65,7 +58,7 @@ public:
      *  \param pt un point qui donnera un paramètre pour déterminer la position du sommet sur l'arête par projection sur cette dernière
      *  \param ratio_ogrid un autre paramètre pour positionner le sommet du ogrid en cas de rencontre avec une face dégénérée
      */
-    CommandSplitFaces(Internal::Context& c, CoEdge* arete, const Point& pt, double ratio_ogrid);
+    CommandSplitFaces(Internal::Context& c, CoEdge* arete, const Utils::Math::Point& pt, double ratio_ogrid);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur pour une face (2D ou 3D) à découper
@@ -87,7 +80,7 @@ public:
      *  \param pt un point qui donnera un paramètre pour déterminer la position du sommet sur l'arête par projection sur cette dernière
      *  \param project_on_meshing_edges activation ou non de la projection des sommets issus de la coupe sur la discrétisation initiale
      */
-    CommandSplitFaces(Internal::Context& c, CoFace*  coface, CoEdge* coedge, const Point& pt,  bool project_on_meshing_edges);
+    CommandSplitFaces(Internal::Context& c, CoFace*  coface, CoEdge* coedge, const Utils::Math::Point& pt,  bool project_on_meshing_edges);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur

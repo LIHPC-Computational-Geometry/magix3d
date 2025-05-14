@@ -593,7 +593,7 @@ void QtTopologySplitBlockAction::executeOperation ( )
 	vector<string>	blocksNames	= panel->getBlocksNames ( );
 	const string	edgeName	= panel->getEdgeName ( );
 
-	Mgx3D::Internal::M3DCommandResultIfc*	result	= 0;
+	Mgx3D::Internal::M3DCommandResult*	result	= 0;
 	if (true == panel->allBlocks ( ))
 	{
 		switch (panel->getCutDefinitionMethod ( ))
