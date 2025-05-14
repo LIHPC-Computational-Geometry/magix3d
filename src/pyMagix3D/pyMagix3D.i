@@ -290,7 +290,6 @@ using std::ptrdiff_t;
 %include Utils/CommandIfc.h
 %include Internal/Context.h
 %include Internal/M3DCommandManager.h
-%include Utils/CommandResultIfc.h
 %include Utils/CommandResult.h
 %include Internal/M3DCommandResult.h
 %include Utils/Point.h

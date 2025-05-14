@@ -8,7 +8,6 @@
 #ifndef UTILS_COMMAND_RESULT_H
 #define UTILS_COMMAND_RESULT_H
 
-#include "Utils/CommandResultIfc.h"
 #include "Utils/Command.h"
 #include <TkUtil/ReferencedObject.h>
 
@@ -22,17 +21,16 @@ namespace Utils
 
 
 /** \class CommandResult
- * <P>Implémentation de base d'un fourniseur d'accès aux résultats d'une
- * commande qui a été exécutée (<I>CommandResultIfc</I>). Est actualisé lorsque
- * la commande est modifiée (ex : <I>undo</I>/<I>redo</I>, ou commande exécutée
- * dans un autre <I>thread</I>.
+ * <P>
+ * Fournit l'accès aux résultats d'une commande qui a été exécutée.
+ * Est actualisé lorsque la commande est modifiée (ex : <I>undo</I>/<I>redo</I>,
+ * ou commande exécutée dans un autre <I>thread</I>.
  * </P>
  * <P>Hérite de <I>TkUtil::ObjectBase</I> afin d'être informé des modifications
  * de la commande, notamment de son éventuelle destruction.
  * </P>
  */
-class CommandResult :
-			public Mgx3D::Utils::CommandResultIfc, public TkUtil::ObjectBase
+class CommandResult : public TkUtil::ObjectBase
 {
 	public :
 

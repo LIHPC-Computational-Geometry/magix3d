@@ -692,7 +692,7 @@ void QtMgx3DOperationPanel::discretisationModifiedCallback ( )
 
 void QtMgx3DOperationPanel::applyCallback ( )
 {
-	CommandResultIfc*	commandResult	= 0;
+	CommandResult*	commandResult	= 0;
 
 	bool	userNotified	= false;	// CP 16/09/24 false par défaut (cas où la création de commande lève une exception => pas de commandResult)																	// CP NEW
 	BEGIN_QT_TRY_CATCH_BLOCK
@@ -1211,13 +1211,13 @@ void QtMgx3DOperationAction::executeOperation ( )
 }	// QtMgx3DOperationAction::executeOperation
 
 
-CommandResultIfc* QtMgx3DOperationAction::getCommandResult ( )
+CommandResult* QtMgx3DOperationAction::getCommandResult ( )
 {
 	return _commandResult;
 }	// QtMgx3DOperationAction::getCommandResult
 
 
-void QtMgx3DOperationAction::setCommandResult (CommandResultIfc* commandResult)
+void QtMgx3DOperationAction::setCommandResult (CommandResult* commandResult)
 {
 	_commandResult	= commandResult;
 }	// QtMgx3DOperationAction::setCommandResult
