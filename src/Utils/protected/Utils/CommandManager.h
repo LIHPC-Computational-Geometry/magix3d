@@ -30,7 +30,7 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Utils {
 
-class UndoRedoManagerIfc;
+class UndoRedoManager;
 
 /*----------------------------------------------------------------------------*/
 /** \class CommandManager
@@ -220,9 +220,9 @@ class CommandManager :
 	/**
 	 * Le gestionnaire de <I>undo/redo</I>.
 	 */
-	virtual const UndoRedoManagerIfc& getUndoManager ( ) const;
-	virtual UndoRedoManagerIfc& getUndoManager ( );
-	virtual void setUndoManager (UndoRedoManagerIfc* mgr);
+	virtual const UndoRedoManager& getUndoManager ( ) const;
+	virtual UndoRedoManager& getUndoManager ( );
+	virtual void setUndoManager (UndoRedoManager* mgr);
 
 	//@}	// Méthodes relatives à la gestion du <I>undo/redo</I>.
 
@@ -372,7 +372,7 @@ class CommandManager :
 	TkUtil::LogOutputStream*			_logStream;
 
 	/** Gestionnaire (conteneur) pour undo/redo */
-	Utils::UndoRedoManagerIfc*        	 _undoManager;
+	Utils::UndoRedoManager*        	 _undoManager;
 
 	/** Les commandes prises en charges. On n'utilise pas <I>getObservables</I>
 	 * hérité de <I>TkUtil::ObjectBase</I> car cette liste est triée (par

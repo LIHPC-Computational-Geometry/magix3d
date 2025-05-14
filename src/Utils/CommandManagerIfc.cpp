@@ -1,7 +1,7 @@
 #include "Utils/Common.h"
 #include "Utils/CommandManagerIfc.h"
 #include "Utils/Magix3DEvents.h"
-#include "Utils/UndoRedoManagerIfc.h"
+#include "Utils/UndoRedoManager.h"
 
 #include <TkUtil/ErrorLog.h>
 #include <TkUtil/Exception.h>
@@ -134,19 +134,19 @@ void CommandManagerIfc::redo ( )
 }	// CommandManagerIfc::redo
 
 
-const UndoRedoManagerIfc& CommandManagerIfc::getUndoManager ( ) const
+const UndoRedoManager& CommandManagerIfc::getUndoManager ( ) const
 {
 	throw Exception ("CommandManagerIfc::getUndoManager should be overloaded.");
 }	// CommandManagerIfc::getUndoManager
 
 
-UndoRedoManagerIfc& CommandManagerIfc::getUndoManager ( )
+UndoRedoManager& CommandManagerIfc::getUndoManager ( )
 {
 	throw Exception ("CommandManagerIfc::getUndoManager should be overloaded.");
 }	// CommandManagerIfc::getUndoManager
 
 
-void CommandManagerIfc::setUndoManager (UndoRedoManagerIfc*)
+void CommandManagerIfc::setUndoManager (UndoRedoManager*)
 {
 	throw Exception ("CommandManagerIfc::setUndoManager should be overloaded.");
 }	// CommandManagerIfc::setUndoManager

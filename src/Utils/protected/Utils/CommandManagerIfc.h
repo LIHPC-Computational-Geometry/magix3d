@@ -23,7 +23,7 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Utils {
 
-class UndoRedoManagerIfc;
+class UndoRedoManager;
 
 /*----------------------------------------------------------------------------*/
 /** \class CommandManagerIfc
@@ -185,9 +185,9 @@ class CommandManagerIfc
 	/**
 	 * Le gestionnaire de <I>undo/redo</I>.
 	 */
-	virtual const UndoRedoManagerIfc& getUndoManager ( ) const;
-	virtual UndoRedoManagerIfc& getUndoManager ( );
-	virtual void setUndoManager (UndoRedoManagerIfc* mgr);
+	virtual const UndoRedoManager& getUndoManager ( ) const;
+	virtual UndoRedoManager& getUndoManager ( );
+	virtual void setUndoManager (UndoRedoManager* mgr);
 	//@}
 
 	/**

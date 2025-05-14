@@ -456,7 +456,7 @@ class QtMgx3DMainWindow :
 		QMenu			*_mgx3DScriptsMenu;
 		size_t			_recentFilesCapacity;
 		QAction			**_mgx3DScriptsActions;
-		Utils::UndoRedoManagerIfc*  _undoManager;
+		Utils::UndoRedoManager*  _undoManager;
 	};	// struct WindowsActions
 
 	/**
@@ -672,7 +672,7 @@ class QtMgx3DMainWindow :
 	/**
 	 * \return		Le gestionnaire de <I>undo/redo</I>.
 	 */
-	virtual Mgx3D::Utils::UndoRedoManagerIfc& getUndoManager ( );
+	virtual Mgx3D::Utils::UndoRedoManager& getUndoManager ( );
 
 	//@}	// La session de travail.
 
