@@ -865,13 +865,13 @@ class QtMgx3DOperationAction : public QtMgx3DWidgetedCheckedAction
 	 * \return		L'éventuel résultat associé à la commande en cours (concerne
 	 *				les commandes à exécution séquentielles).
 	 */
-	virtual Mgx3D::Utils::CommandResultIfc* getCommandResult ( );
+	virtual Mgx3D::Utils::CommandResult* getCommandResult ( );
 
 	/**
 	 * \return		L'éventuel résultat associé à la commande en cours (concerne
 	 *				les commandes à exécution séquentielles).
 	 */
-	virtual void setCommandResult (Mgx3D::Utils::CommandResultIfc*);
+	virtual void setCommandResult (Mgx3D::Utils::CommandResult*);
 
 	/**
 	 * <P>
@@ -933,7 +933,7 @@ class QtMgx3DOperationAction : public QtMgx3DWidgetedCheckedAction
 	QtMgx3DOperationAction& operator = (const QtMgx3DOperationAction&);
 	
 	/** L'éventuel résultat associé à la commande en cours. */
-	Mgx3D::Utils::CommandResultIfc*		_commandResult;
+	Mgx3D::Utils::CommandResult*		_commandResult;
 };	// class QtMgx3DOperationAction
 
 

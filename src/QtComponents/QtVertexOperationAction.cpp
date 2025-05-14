@@ -1536,7 +1536,7 @@ QtVertexOperationPanel* QtVertexOperationAction::getVertexPanel ( )
 void QtVertexOperationAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	CommandResultIfc*	cmdResult	= 0;
+	CommandResult*	cmdResult	= 0;
 //	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de création du vertex :
