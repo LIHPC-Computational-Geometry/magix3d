@@ -3948,7 +3948,7 @@ const SelectionManager& QtMgx3DMainWindow::getSelectionManager ( ) const
 			return getContext().getM3DCommandManager();
 		}
 
-		UndoRedoManagerIfc &QtMgx3DMainWindow::getUndoManager()
+		UndoRedoManager &QtMgx3DMainWindow::getUndoManager()
 		{
 			return getCommandManager().getUndoManager();
 		}    // QtMgx3DMainWindow::getUndoManager

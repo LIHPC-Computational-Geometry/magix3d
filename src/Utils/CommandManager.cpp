@@ -401,21 +401,21 @@ string CommandManager::getCommandName ( ) const
 }	// CommandManager::getCommandName
 
 
-const UndoRedoManagerIfc& CommandManager::getUndoManager ( ) const
+const UndoRedoManager& CommandManager::getUndoManager ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_undoManager)
 	return *_undoManager;
 }	// CommandManager::getUndoManager
 
 
-UndoRedoManagerIfc& CommandManager::getUndoManager ( )
+UndoRedoManager& CommandManager::getUndoManager ( )
 {
 	CHECK_NULL_PTR_ERROR (_undoManager)
 	return *_undoManager;
 }	// CommandManager::getUndoManager
 
 
-void CommandManager::setUndoManager (UndoRedoManagerIfc* mgr)
+void CommandManager::setUndoManager (UndoRedoManager* mgr)
 {
 	if (_undoManager == mgr)
 		return;

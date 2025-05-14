@@ -1,15 +1,7 @@
 /*----------------------------------------------------------------------------*/
-/** \file UndoRedoManager.h
- *
- *  \author Franck Ledoux
- *
- *  \date 14/10/2010
- */
-/*----------------------------------------------------------------------------*/
 #ifndef UTILS_UNDOREDOMANAGER_H_
 #define UTILS_UNDOREDOMANAGER_H_
 /*----------------------------------------------------------------------------*/
-#include "Utils/UndoRedoManagerIfc.h"
 #include <TkUtil/ReferencedObject.h>
 #include <TkUtil/LogOutputStream.h>
 #include <vector>
@@ -24,12 +16,11 @@ class Command;
  *  \brief La classe UndoRedoManager stocke l'ensemble des commandes effectuées
  *         et défaites lors d'une session de Magix. Elle permet aussi de
  *         défaire des opérations effectuées et de rejouer celles défaites.
- *         Elle implémente à ces effets l'interface UndoRedoManagerIfc.
+ *         Elle implémente à ces effets l'interface UndoRedoManager.
  *
  */
 /*----------------------------------------------------------------------------*/
-class UndoRedoManager :
-		public Mgx3D::Utils::UndoRedoManagerIfc, public TkUtil::ReferencedObject
+class UndoRedoManager : public TkUtil::ReferencedObject
 {
 
 public:

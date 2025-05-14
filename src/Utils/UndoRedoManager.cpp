@@ -1,12 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file UndoRedoManager.cpp
- *
- *  \author Franck Ledoux
- *
- *  \date 14/10/2010
- */
-/*----------------------------------------------------------------------------*/
 #include "Utils/UndoRedoManager.h"
 #include "Utils/Magix3DEvents.h"
 #include "Utils/Command.h"
@@ -21,7 +13,7 @@ namespace Mgx3D {
 namespace Utils {
 /*----------------------------------------------------------------------------*/
 UndoRedoManager::UndoRedoManager(const std::string& name)
-	: UndoRedoManagerIfc ( ), ReferencedObject ( ),
+	: ReferencedObject ( ),
 	  m_name (name), m_done ( ), m_undone ( ), m_mutex (0), m_logStream (0)
 {
 	m_mutex	= new Mutex ( );
