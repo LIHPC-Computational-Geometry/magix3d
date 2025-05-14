@@ -111,9 +111,9 @@ void EdgePreMesherTask::execute ( )
 		{
 			switch (cmdCreateMesh->getStatus ( ))
 			{
-				case Utils::CommandIfc::FAIL	:
+				case Utils::Command::FAIL	:
 					setStatus (TkUtil::ThreadPool::TaskIfc::IN_ERROR);	break;
-				case Utils::CommandIfc::CANCELED	:
+				case Utils::Command::CANCELED	:
 					setStatus (TkUtil::ThreadPool::TaskIfc::CANCELED);	break;
 				default					:
 					setStatus (TkUtil::ThreadPool::TaskIfc::IN_ERROR);
@@ -217,9 +217,9 @@ void FacePreMesherTask::execute ( )
 		{
 			switch (cmdCreateMesh->getStatus ( ))
 			{
-				case Utils::CommandIfc::FAIL		:
+				case Utils::Command::FAIL		:
 					setStatus (TkUtil::ThreadPool::TaskIfc::IN_ERROR);	break;
-				case Utils::CommandIfc::CANCELED	:
+				case Utils::Command::CANCELED	:
 					setStatus (TkUtil::ThreadPool::TaskIfc::CANCELED);	break;
 				default								:
 					setStatus (TkUtil::ThreadPool::TaskIfc::IN_ERROR);
@@ -324,9 +324,9 @@ void BlockPreMesherTask::execute ( )
 		{
 			switch (cmdCreateMesh->getStatus ( ))
 			{
-				case Utils::CommandIfc::FAIL		:
+				case Utils::Command::FAIL		:
 					setStatus (TkUtil::ThreadPool::TaskIfc::IN_ERROR);	break;
-				case Utils::CommandIfc::CANCELED	:
+				case Utils::Command::CANCELED	:
 					setStatus (TkUtil::ThreadPool::TaskIfc::CANCELED);	break;
 				default								:
 					setStatus (TkUtil::ThreadPool::TaskIfc::IN_ERROR);

@@ -43,7 +43,7 @@ public:
     /** Petit nettoyage dans InfoCommand pour le cas d'un redo,
      *  et appel à la fonction Command::execute()
      */
-    virtual Utils::CommandIfc::status execute();
+    virtual Utils::Command::status execute();
 
     /*------------------------------------------------------------------------*/
     /** \brief  déjoue la commande

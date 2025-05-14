@@ -16,7 +16,7 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Utils {
 /*----------------------------------------------------------------------------*/
-class CommandIfc;
+class Command;
 /*----------------------------------------------------------------------------*/
 /** \class UndoRedoManagerIfc
  *  \brief L'interface UndoRedoManagerIfc défini les services d'un gestionnaire
@@ -51,17 +51,17 @@ public:
      *  \param  command Une commande Magix	
 	 *	\see	has
      */
-    virtual void store(CommandIfc* command);
+    virtual void store(Command* command);
 
 	/**
 	 * \return		La liste des commandes effectuées
 	 */
-	virtual const std::vector<CommandIfc*>& getDoneCommands ( ) const;
+	virtual const std::vector<Command*>& getDoneCommands ( ) const;
 
 	/**
 	 * \return		La liste des commandes annulées
 	 */
-	virtual const std::vector<CommandIfc*>& getUndoneCommands ( ) const;
+	virtual const std::vector<Command*>& getUndoneCommands ( ) const;
 
     /// Suppression des commandes undones
     virtual void clearUndone();
@@ -70,7 +70,7 @@ public:
     /**
 	 * \return Retourne un pointeur sur la dernière commande annulable, ou 0.
      */
-    virtual CommandIfc* undoableCommand ( );
+    virtual Command* undoableCommand ( );
 
     /*------------------------------------------------------------------------*/
     /**
@@ -84,13 +84,13 @@ public:
      *          pointeur dessus
 	 *			Avertit ses éventuels observateurs.
      */
-    virtual CommandIfc* undo();
+    virtual Command* undo();
 
     /*------------------------------------------------------------------------*/
     /**
 	 * \return Retourne un pointeur sur la dernière commande rejouable, ou 0.
      */
-    virtual CommandIfc* redoableCommand ( );
+    virtual Command* redoableCommand ( );
 
     /*------------------------------------------------------------------------*/
     /**
@@ -103,7 +103,7 @@ public:
      *          pointeur dessus
 	 *			Avertit ses éventuels observateurs.
      */
-    virtual CommandIfc* redo();
+    virtual Command* redo();
 
 
 	protected :

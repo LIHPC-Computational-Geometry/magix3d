@@ -137,7 +137,7 @@ void CommandComposite::postExecute(bool hasError)
 		//std::cout<<"CommandComposite::postExecute, cas en erreur ..."<<std::endl;
 		for (std::vector<CommandInternal*>::reverse_iterator iter = m_commands.rbegin();
 				iter != m_commands.rend(); ++iter){
-			//std::cout<<" Etat de la commande "<<(*iter)->getName()<<" : "<<CommandIfc::statusToString((*iter)->getStatus())<<std::endl;
+			//std::cout<<" Etat de la commande "<<(*iter)->getName()<<" : "<<Command::statusToString((*iter)->getStatus())<<std::endl;
 			if ((*iter)->getStatus() == Command::DONE){
 				(*iter)->undo();
 				(*iter)->postExecute(true);

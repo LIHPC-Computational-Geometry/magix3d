@@ -1057,7 +1057,7 @@ CommandInternal& M3DCommandResult::getCommandInternal( )
 
 InfoCommand& M3DCommandResult::getInfoCommand()
 {
-    if (Mgx3D::Utils::CommandIfc::DONE == getStatus())
+    if (Mgx3D::Utils::Command::DONE == getStatus())
             return getCommandInternal().getInfoCommand();
         else {
 			TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);

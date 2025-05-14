@@ -93,7 +93,7 @@ using std::ptrdiff_t;
 	// à la ligne de commande ou depuis la console python.
 	Mgx3D::Internal::M3DCommandResult*	cmdResult	= $1;
 	
-	if (Mgx3D::Utils::CommandIfc::FAIL == cmdResult->getStatus ( ))
+	if (Mgx3D::Utils::Command::FAIL == cmdResult->getStatus ( ))
 	{
 		$result	= nullptr;
 		SWIG_exception (SWIG_RuntimeError, cmdResult->getErrorMessage ( ).utf8 ( ).c_str ( ));
@@ -287,7 +287,7 @@ using std::ptrdiff_t;
 // interprété par swig : déclaration des fonction pour swig
 // ---------------------------------------------------------
 %include Utils/SwigCompletion.h	// should be first !
-%include Utils/CommandIfc.h
+%include Utils/Command.h
 %include Internal/Context.h
 %include Internal/M3DCommandManager.h
 %include Utils/CommandResult.h

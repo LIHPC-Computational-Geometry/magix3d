@@ -1478,7 +1478,7 @@ void Context::savePythonScript (std::string fileName, encodageScripts enc, TkUti
 	if (enc == Context::WITHNAMES)
 		for (uint i=0; i<commands.size(); i++){
 			Utils::Command* command = commands[i];
-			if (command->isCompleted() && command->getStatus() != Utils::CommandIfc::FAIL){
+			if (command->isCompleted() && command->getStatus() != Utils::Command::FAIL){
 				scripting_manager.addComment(command->getInitialScriptComments());
 				scripting_manager.addCommand(command->getInitialScriptCommand());
 			}
@@ -1489,7 +1489,7 @@ void Context::savePythonScript (std::string fileName, encodageScripts enc, TkUti
 				EntitiesHelper::replaceNameByCommandRef(commands);
 		for (uint i=0; i<commands.size(); i++){
 			Utils::Command* command = commands[i];
-			if (command->isCompleted() && command->getStatus() != Utils::CommandIfc::FAIL){
+			if (command->isCompleted() && command->getStatus() != Utils::Command::FAIL){
 				scripting_manager.addComment(command->getInitialScriptComments());
 				scripting_manager.addComment(command->getInitialScriptCommand());
 				scripting_manager.addCommand(commandsWithIdRef[i]);
@@ -1512,7 +1512,7 @@ void Context::savePythonScript (std::string fileName, encodageScripts enc, TkUti
 
 		for (uint i=0; i<commands.size(); i++){
 			Utils::Command* command = commands[i];
-			if (command->isCompleted() && command->getStatus() != Utils::CommandIfc::FAIL){
+			if (command->isCompleted() && command->getStatus() != Utils::Command::FAIL){
 				scripting_manager.addComment(command->getInitialScriptComments());
 				scripting_manager.addCommand(command->getInitialScriptCommand());
 			}

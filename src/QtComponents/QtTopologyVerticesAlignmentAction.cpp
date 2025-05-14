@@ -961,9 +961,9 @@ void QtTopologyVerticesAlignmentAction::executeOperation ( )
 
 	CHECK_NULL_PTR_ERROR (cmdResult)
 	setCommandResult (cmdResult);
-	if (CommandIfc::FAIL == cmdResult->getStatus ( ))
+	if (Command::FAIL == cmdResult->getStatus ( ))
 		throw Exception (cmdResult->getErrorMessage ( ));
-	else if (CommandIfc::CANCELED == cmdResult->getStatus ( ))
+	else if (Command::CANCELED == cmdResult->getStatus ( ))
 		throw Exception ("Opération annulée");
 }	// QtTopologyVerticesAlignmentAction::executeOperation
 

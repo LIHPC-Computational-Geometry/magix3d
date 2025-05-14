@@ -1668,7 +1668,7 @@ class QtMgx3DStateView : public QWidget
 	 * \param		Etat de la commande concernée
 	 * \param		setLabel
 	 */
-	virtual void setState (const std::string& cmdName, Mgx3D::Utils::CommandIfc::status state);
+	virtual void setState (const std::string& cmdName, Mgx3D::Utils::Command::status state);
 
 	/**
  	 * \param		label où afficher des informations temporaires sur l'état de
@@ -1707,7 +1707,7 @@ class QtMgx3DStateView : public QWidget
 	QtMgx3DStateView& operator = (const QtMgx3DStateView&);
 
 	/** L'état courrant. */
-	Mgx3D::Utils::CommandIfc::status	_state;
+	Mgx3D::Utils::Command::status	_state;
 
 	/** Un chronomètre pour le l'affichage intermittent. */
 	QTimer*								_timer;

@@ -49,13 +49,13 @@ CommandInternalAdapter::~CommandInternalAdapter ( )
 
 Command::status CommandInternalAdapter::undo ( )
 {
-	return CommandIfc::FAIL;
+	return Command::FAIL;
 }	// CommandInternalAdapter::undo
 
 
 Command::status CommandInternalAdapter::redo ( )
 {
-	return CommandIfc::FAIL;
+	return Command::FAIL;
 }	// CommandInternalAdapter::redo
 
 }	// namespace Internal

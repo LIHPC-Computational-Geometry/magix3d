@@ -705,7 +705,7 @@ namespace QtComponents
 
 
 		QtMgx3DStateView::QtMgx3DStateView(const QString &title, QWidget *parent)
-				: QWidget(parent), _state(CommandIfc::DONE), _timer(0), _on(false),
+				: QWidget(parent), _state(Command::DONE), _timer(0), _on(false),
 				  _label(0), _labelTimer(0)
 		{
 			setFixedSize(gaugeSize, gaugeSize);
@@ -715,7 +715,7 @@ namespace QtComponents
 
 
 		QtMgx3DStateView::QtMgx3DStateView(const QtMgx3DStateView &)
-				: QWidget(0), _state(CommandIfc::DONE), _timer(0), _on(false),
+				: QWidget(0), _state(Command::DONE), _timer(0), _on(false),
 				  _label(0), _labelTimer(0)
 		{
 			MGX_FORBIDDEN("QtMgx3DStateView copy constructor is not allowed.");
@@ -741,7 +741,7 @@ namespace QtComponents
 
 
 		void QtMgx3DStateView::setState(
-				const string &cmdName, CommandIfc::status state)
+				const string &cmdName, Command::status state)
 		{
 			if (state != _state)
 			{
@@ -751,17 +751,17 @@ namespace QtComponents
 				_state = state;
 				switch (_state)
 				{
-					case CommandIfc::STARTING        :
-					case CommandIfc::PROCESSING        :
+					case Command::STARTING        :
+					case Command::PROCESSING        :
 						message << "en cours.";
 						if (0 != _timer)
 							_timer->start(timerDelay);
 						break;
-					case CommandIfc::INITED            :    // suite undo
-					case CommandIfc::FAIL            :
-					case CommandIfc::DONE            :
-					case CommandIfc::CANCELED        :
-						message << CommandIfc::statusToString(_state);
+					case Command::INITED            :    // suite undo
+					case Command::FAIL            :
+					case Command::DONE            :
+					case Command::CANCELED        :
+						message << Command::statusToString(_state);
 						if (0 != _timer)
 							_timer->stop();
 						break;
@@ -815,17 +815,17 @@ namespace QtComponents
 			int x = dimensions.width() / 2, y = dimensions.height() / 2;
 			switch (_state)
 			{
-				case CommandIfc::STARTING        :
-				case CommandIfc::PROCESSING        :
+				case Command::STARTING        :
+				case Command::PROCESSING        :
 					background   = orange;
 					intermittent = true;
 					break;
-				case CommandIfc::FAIL            :
+				case Command::FAIL            :
 					background = Qt::red;
 					break;
-				case CommandIfc::DONE            :
-				case CommandIfc::CANCELED        :
-				case CommandIfc::INITED            :
+				case Command::DONE            :
+				case Command::CANCELED        :
+				case Command::INITED            :
 					background = Qt::green;
 					break;
 			}    // switch (_state)
@@ -4197,7 +4197,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 					LOCK_INSTANCE
 
 					if (0 != _stateView)
-						_stateView->setState("Actualisation IHM", CommandIfc::PROCESSING);
+						_stateView->setState("Actualisation IHM", Command::PROCESSING);
 
 					InfoCommand &icmd = commandInternal->getInfoCommand();
 					InfoCommand::type t = InfoCommand::UNITIALIZED;
@@ -4513,7 +4513,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 					}
 
 					if (0 != _stateView)
-						_stateView->setState("Actualisation IHM", CommandIfc::DONE);
+						_stateView->setState("Actualisation IHM", Command::DONE);
 
 				}    // if ((COMMAND_STATE == event) && ...
 				else
@@ -4553,7 +4553,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 			if (true == doRender)
 			{
 				// [EB] pour la première commande on recentre la vue en + du forceRender
-				if (1 == getCommandManager().getCommandIfcs().size())
+				if (1 == getCommandManager().getCommands().size())
 					getGraphicalWidget().getRenderingManager().resetView(true);
 				else
 				{
@@ -4566,15 +4566,15 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 			{
 				switch (command.getStatus())
 				{
-					case CommandIfc::DONE        :
-					case CommandIfc::CANCELED    :
-					case CommandIfc::FAIL        :
+					case Command::DONE        :
+					case Command::CANCELED    :
+					case Command::FAIL        :
 //				getCommandManager ( ).processQueuedCommands ( );
 						if ((false == getCommandManager().hasRunningCommands()) && (false == getCommandManager().hasQueuedCommands()))
 							updateActions();
 						break;
-					case CommandIfc::INITED        :
-						if (CommandIfc::UNDO == command.getPlayType())
+					case Command::INITED        :
+						if (Command::UNDO == command.getPlayType())
 							getOperationsPanel().autoUpdate();
 						break;
 				}    // switch (command.getStatus( ))

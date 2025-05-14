@@ -142,7 +142,7 @@ class CommandManager :
 	 * \see		hasQueuedCommands
 	 * \see		processQueuedCommands
 	 */
-	virtual void addCommand (CommandIfc* command, Command::PLAY_TYPE pt);
+	virtual void addCommand (Command* command, Command::PLAY_TYPE pt);
 
 	/**
 	 * Exécute tant que c'est possible les commandes en file d'attente.
@@ -156,7 +156,6 @@ class CommandManager :
 	/**
 	 * \return		La liste des commandes (commandes en cours ou terminée, et pouvant être en erreur).
 	 */
-	virtual std::vector<CommandIfc*> getCommandIfcs ( ) const;
 	virtual std::vector<Command*> getCommands ( ) const;
 
 	/**
@@ -197,7 +196,7 @@ class CommandManager :
 	 *				commande exécutée ou en cours d'exécution.
 	 * \see			getCommandName
 	 */
-	 virtual CommandIfc::status getStatus ( ) const;
+	 virtual Command::status getStatus ( ) const;
 
 	/**
 	 * \return		Le nom de la commande courante, à savoir le nom de la
@@ -286,7 +285,7 @@ class CommandManager :
 	 *
 	 *  Il faut passer par le contexte pour l'utiliser.
 	 * Invoque <I>addCommand</I> avec la dernière commande et
-	 * <I>CommandIfc::UNDO</I>.
+	 * <I>Command::UNDO</I>.
 	 */
 	virtual void undo();
 
@@ -297,7 +296,7 @@ class CommandManager :
 	 * 
 	 *  Il faut passer par le contexte pour l'utiliser.
 	 * Invoque <I>addCommand</I> avec la dernière commande et
-	 * <I>CommandIfc::REDO</I>.
+	 * <I>Command::REDO</I>.
      */
 	virtual void redo();
 
@@ -316,7 +315,7 @@ class CommandManager :
 	 * \except		Si une commande est déjà en cours d'exécution séquentielle.
 	 * \see			executeThreaded
 	 */
-	virtual void executeSequential (CommandIfc* command, Command::PLAY_TYPE pt);
+	virtual void executeSequential (Command* command, Command::PLAY_TYPE pt);
 
 	/**
 	 * Execute de dans un thread dédié la commande transmise en argument selon
@@ -327,7 +326,7 @@ class CommandManager :
 	 *				d'exécution séquentielle.
 	 * \see			executeSequential
 	 */
-	virtual void executeThreaded (CommandIfc* command, Command::PLAY_TYPE pt);
+	virtual void executeThreaded (Command* command, Command::PLAY_TYPE pt);
 
 	/**
 	 * Lance de manière séquentielle la commande la plus ancienne de la file
@@ -338,10 +337,10 @@ class CommandManager :
 
 	/**
 	 * Met la commande transmise en file d'attente. Si <I>pt</I>
-	 * vaut <I>CommandIfc::QUEUED</I> alors la commande ets mise en file
-	 * d'attente avec pour valeur <I>CommandIfc::DO</I>.
+	 * vaut <I>Command::QUEUED</I> alors la commande ets mise en file
+	 * d'attente avec pour valeur <I>Command::DO</I>.
 	 */
-	virtual void addToQueue (CommandIfc* command, Command::PLAY_TYPE pt);
+	virtual void addToQueue (Command* command, Command::PLAY_TYPE pt);
 
 	/**
 	 * Envoit le <I>log</I> transmis en argument dans le flux de messages
@@ -387,7 +386,7 @@ class CommandManager :
 
 	/** Les éventuelles commandes en file d'attente. Les dernières soumises sont
 	 * ajoutées à la fin. Elle sont dépilées par le début => FIFO. */
-	std::deque< std::pair <Command*, CommandIfc::PLAY_TYPE> >	_queuedCommands;
+	std::deque< std::pair <Command*, Command::PLAY_TYPE> >	_queuedCommands;
 
 	/** La politique d'exécution des commandes. */
 	CommandManagerIfc::POLICY			_policy;
@@ -400,10 +399,10 @@ class CommandManager :
 	mutable TkUtil::Mutex				_sequentialMutex;
 
 	/** L'éventuelle commande exécutée séquentiellement. */
-	CommandIfc*							_sequentialCommand;
+	Command*							_sequentialCommand;
 
 	/** Le dernier status de commande reçu. */
-	CommandIfc::status					_currentStatus;
+	Command::status					_currentStatus;
 
 	/** Le nom de la dernière commande dont on a eu une modification de
 	 * status. */

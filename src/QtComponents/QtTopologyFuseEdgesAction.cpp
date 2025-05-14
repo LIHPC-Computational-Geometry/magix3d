@@ -255,9 +255,9 @@ void QtTopologyFuseEdgesAction::executeOperation ( )
 	Mgx3D::Internal::M3DCommandResult*	result	= getContext ( ).getTopoManager ( ).fuseEdges (edges);
 	CHECK_NULL_PTR_ERROR (result)
 	setCommandResult (result);
-	if (CommandIfc::FAIL == result->getStatus ( ))
+	if (Command::FAIL == result->getStatus ( ))
 		throw Exception (result->getErrorMessage ( ));
-	else if (CommandIfc::CANCELED == result->getStatus ( ))
+	else if (Command::CANCELED == result->getStatus ( ))
 		throw Exception ("Opération annulée");
 }	// QtTopologyFuseEdgesAction::executeOperation
 
