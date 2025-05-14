@@ -301,7 +301,7 @@ void QtTopologyFuse2EdgesAction::executeOperation ( )
 	vector<string>	names1	= panel->getEdges1Names ( );
 	vector<string>	names2	= panel->getEdges2Names ( );
 
-	Mgx3D::Internal::M3DCommandResultIfc*	result	= 0;
+	Mgx3D::Internal::M3DCommandResult*	result	= 0;
 	if ((names1.size ( ) == 1) && (names2.size ( ) == 1))
 		result	= getContext ( ).getTopoManager ( ).fuse2Edges (names1[0], names2[0]);
 	else

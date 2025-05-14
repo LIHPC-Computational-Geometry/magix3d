@@ -377,7 +377,7 @@ void QtTopologyGlue2BlocksAction::executeOperation ( )
 	const string	name1	= panel->getBlock1Name ( );
 	const string	name2	= panel->getBlock2Name ( );
 
-	Mgx3D::Internal::M3DCommandResultIfc*	result	= 0;
+	Mgx3D::Internal::M3DCommandResult*	result	= 0;
 	switch (panel->getGlueMethod ( ))
 	{
 		case QtTopologyGlue2BlocksPanel::VOLUMES	:

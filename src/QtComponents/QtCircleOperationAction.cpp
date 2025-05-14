@@ -432,7 +432,7 @@ QtCircleOperationPanel* QtCircleOperationAction::getCirclePanel ( )
 void QtCircleOperationAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 //	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de création du cercle :

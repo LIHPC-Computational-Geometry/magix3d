@@ -245,7 +245,7 @@ QtGeometryGlueSurfacesPanel*
 
 void QtGeometryGlueSurfacesAction::executeOperation ( )
 {
-	M3DCommandResultIfc*			cmdResult	= 0;
+	M3DCommandResult*			cmdResult	= 0;
 	QtGeometryGlueSurfacesPanel*	panel		= dynamic_cast<QtGeometryGlueSurfacesPanel*>(getGeometryGlueSurfacesPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)
 

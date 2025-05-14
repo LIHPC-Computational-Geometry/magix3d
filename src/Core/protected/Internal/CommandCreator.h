@@ -79,10 +79,6 @@ public:
     virtual const Internal::Context& getContext() const;
     virtual Internal::Context& getContext();
 
-    /** retourne le contexte local (même zone mémoire). */
-    virtual const Internal::Context& getLocalContext() const;
-    virtual Internal::Context& getLocalContext();
-
     /// retourne l'afficheur (qui peut être nul)
     virtual TkUtil::LogOutputStream* getLogStream ( );
 

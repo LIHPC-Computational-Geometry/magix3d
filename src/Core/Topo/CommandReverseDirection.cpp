@@ -1,19 +1,10 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandReverseDirection.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 4/2/2014
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandReverseDirection.h"
-
+#include "Topo/CoEdge.h"
 #include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

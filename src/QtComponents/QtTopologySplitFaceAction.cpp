@@ -527,7 +527,7 @@ void QtTopologySplitFaceAction::executeOperation ( )
 	const string	edgeName		= panel->getEdgeName ( );
 	const bool	 	projectVertices	= panel->projectCreatedVertices ( );
 
-	Mgx3D::Internal::M3DCommandResultIfc*	result	= 0;
+	Mgx3D::Internal::M3DCommandResult*	result	= 0;
 	switch (panel->getCutDefinitionMethod ( ))
 	{
 		case QtTopologySplitFacePanel::CDM_RATIO	:

@@ -1,16 +1,9 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandSplitBlock.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 9/3/2012
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandSplitBlock.h"
-
-#include "Utils/Common.h"
 #include "Topo/Block.h"
+#include "Topo/CoEdge.h"
+#include "Topo/Vertex.h"
+#include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
@@ -39,7 +32,7 @@ CommandSplitBlock(Internal::Context& c, Block* bloc, CoEdge* arete, double ratio
 }
 /*----------------------------------------------------------------------------*/
 CommandSplitBlock::
-CommandSplitBlock(Internal::Context& c, Block* bloc, CoEdge* arete, const Point& pt)
+CommandSplitBlock(Internal::Context& c, Block* bloc, CoEdge* arete, const Utils::Math::Point& pt)
 :CommandEditTopo(c, std::string("Découpage du bloc ") + bloc->getName())
 , m_bloc(bloc)
 , m_arete(arete)

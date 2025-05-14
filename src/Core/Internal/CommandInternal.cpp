@@ -78,6 +78,11 @@ CommandInternal& CommandInternal::operator = (const CommandInternal&)
     return *this;
 }
 /*----------------------------------------------------------------------------*/
+TkUtil::LogOutputStream* CommandInternal::getLogStream ( )
+{
+    return getContext().getLogStream();
+}
+/*----------------------------------------------------------------------------*/
 Utils::CommandIfc::status CommandInternal::execute()
 {
     startingOrcompletionLog (true); // log de début de commande

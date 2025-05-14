@@ -409,7 +409,7 @@ void QtMeshSubVolumeBetweenSheetsAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (getMeshPanel ( ))
 
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DMeshOperationAction::executeOperation ( );
 
 	getMeshPanel ( )->stopInteractiveMode ( );

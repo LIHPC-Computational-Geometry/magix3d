@@ -13,7 +13,6 @@
 
 namespace Mgx3D 
 {
-
 namespace Structured
 {
 

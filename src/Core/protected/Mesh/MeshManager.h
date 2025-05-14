@@ -2,7 +2,6 @@
 #define MGX3D_MESH_MESHMANAGER_H_
 /*----------------------------------------------------------------------------*/
 #include "Internal/CommandCreator.h"
-#include "Internal/M3DCommandResultIfc.h"
 #include "Utils/Container.h"
 #include "Utils/SwigCompletion.h"
 /*----------------------------------------------------------------------------*/
@@ -18,6 +17,7 @@ class Entity;
 namespace Internal {
 class Context;
 class InfoCommand;
+class M3DCommandResult;
 }
 namespace Topo {
 class Block;
@@ -105,7 +105,7 @@ public:
 	 *
 	 *  \param n le nom du ficher dans lequel on exporte
 	 */
-	Mgx3D::Internal::M3DCommandResultIfc* exportBlocksForCGNS(const std::string& n);
+	Mgx3D::Internal::M3DCommandResult* exportBlocksForCGNS(const std::string& n);
 	SET_SWIG_COMPLETABLE_METHOD(exportBlocksForCGNS)
 
 	/*------------------------------------------------------------------------*/
@@ -127,31 +127,31 @@ public:
 
     /*------------------------------------------------------------------------*/
     /** \brief  Génère le maillage pour une liste de blocs */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     newBlocksMesh(std::vector<std::string>& blocks_name);
 	SET_SWIG_COMPLETABLE_METHOD(newBlocksMesh)
 
 #ifndef	SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     newBlocksMesh(std::vector<Mgx3D::Topo::Block*>& blocks);
 #endif
 
     /** \brief  Génère le maillage pour une liste de faces (communes) */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     newFacesMesh(std::vector<std::string>& faces_name);
 	SET_SWIG_COMPLETABLE_METHOD(newFacesMesh)
 
 #ifndef	SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     newFacesMesh(std::vector<Mgx3D::Topo::CoFace*>& faces);
 #endif
 
     /*------------------------------------------------------------------------*/
     /** \brief  Génère le maillage pour l'ensemble des blocs */
-    Mgx3D::Internal::M3DCommandResultIfc* newAllBlocksMesh();
+    Mgx3D::Internal::M3DCommandResult* newAllBlocksMesh();
 
     /** \brief  Génère le maillage pour l'ensemble des faces (communes) */
-    Mgx3D::Internal::M3DCommandResultIfc* newAllFacesMesh();
+    Mgx3D::Internal::M3DCommandResult* newAllFacesMesh();
 
     /*------------------------------------------------------------------------*/
     /** \brief  Construction d'un sous-ensemble d'un volume
@@ -163,13 +163,13 @@ public:
      *  \param pos2 idem pos1
      *  \param groupName nom du groupe à créer
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	newSubVolumeBetweenSheets(std::vector<std::string>& blocks_name, std::string narete,
 			int pos1, int pos2, std::string groupName);
 	SET_SWIG_COMPLETABLE_METHOD(newSubVolumeBetweenSheets)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	newSubVolumeBetweenSheets(std::vector<Mgx3D::Topo::Block*>& blocks, Topo::CoEdge* coedge,
 			int pos1, int pos2, std::string groupName);
 

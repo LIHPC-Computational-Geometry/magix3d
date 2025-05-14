@@ -1,17 +1,10 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandMakeBlocksByRevol.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 12/6/2012
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDMAKEBLOCKSBYREVOL_H_
 #define COMMANDMAKEBLOCKSBYREVOL_H_
 /*----------------------------------------------------------------------------*/
-#include "Topo/CommandEditTopo.h"
 #include "Utils/Matrix33.h"
+#include "Utils/Constants.h"
+#include "Topo/CommandEditTopo.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

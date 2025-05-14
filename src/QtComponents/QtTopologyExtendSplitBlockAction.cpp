@@ -348,7 +348,7 @@ void QtTopologyExtendSplitBlockAction::executeOperation ( )
 	const string	blockName	= panel->getBlockName ( );
 	const string	edgeName	= panel->getEdgeName ( );
 
-	Mgx3D::Internal::M3DCommandResultIfc*	result	= getContext ( ).getTopoManager ( ).extendSplitBlock (blockName, edgeName);
+	Mgx3D::Internal::M3DCommandResult*	result	= getContext ( ).getTopoManager ( ).extendSplitBlock (blockName, edgeName);
 	CHECK_NULL_PTR_ERROR (result)
 	setCommandResult (result);
 	if (CommandIfc::FAIL == result->getStatus ( ))

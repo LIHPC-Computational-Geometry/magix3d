@@ -1,34 +1,22 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandDuplicateTopo.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 21/3/2013
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandDuplicateTopo.h"
-
-#include "Geom/CommandGeomCopy.h"
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
-
-#include "Utils/Common.h"
-
+#include "Geom/CommandGeomCopy.h"
 #include "Topo/TopoHelper.h"
 #include "Topo/Vertex.h"
 #include "Topo/CoEdge.h"
 #include "Topo/CoFace.h"
 #include "Topo/Block.h"
 #include "Topo/EdgeMeshingPropertyInterpolate.h"
-
 #include "Group/Group3D.h"
 #include "Group/Group2D.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/Exception.h>
+/*----------------------------------------------------------------------------*/
 #include <set>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

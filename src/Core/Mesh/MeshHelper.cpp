@@ -3,8 +3,8 @@
 #include "Utils/MgxException.h"
 #include "Mesh/MeshHelper.h"
 /*----------------------------------------------------------------------------*/
-#include "gmds/ig/Mesh.h"
-#include "gmds/ig/Edge.h"
+#include <gmds/ig/Mesh.h>
+#include <gmds/ig/Edge.h>
 /*----------------------------------------------------------------------------*/
 #include <map>
 /*----------------------------------------------------------------------------*/

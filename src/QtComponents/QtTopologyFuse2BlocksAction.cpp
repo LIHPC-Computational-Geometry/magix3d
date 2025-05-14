@@ -293,7 +293,7 @@ void QtTopologyFuse2BlocksAction::executeOperation ( )
 	const string	name1	= panel->getBlock1Name ( );
 	const string	name2	= panel->getBlock2Name ( );
 
-	Mgx3D::Internal::M3DCommandResultIfc*	result	= getContext ( ).getTopoManager ( ).fuse2Blocks (name1, name2);
+	Mgx3D::Internal::M3DCommandResult*	result	= getContext ( ).getTopoManager ( ).fuse2Blocks (name1, name2);
 	CHECK_NULL_PTR_ERROR (result)
 	setCommandResult (result);
 	if (CommandIfc::FAIL == result->getStatus ( ))

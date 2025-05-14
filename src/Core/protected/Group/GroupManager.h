@@ -11,7 +11,7 @@
 /*----------------------------------------------------------------------------*/
 #include "Utils/SelectionManagerIfc.h"
 #include "Internal/CommandCreator.h"
-#include "Internal/M3DCommandResultIfc.h"
+#include "Internal/M3DCommandResult.h"
 #include "Geom/GeomEntity.h"
 #include "Mesh/MeshEntity.h"
 #include "Topo/TopoEntity.h"
@@ -543,7 +543,7 @@ public:
 
      /*------------------------------------------------------------------------*/
      /** Vide un groupe suivant son nom et une dimension */
-     Internal::M3DCommandResultIfc* clearGroup(int dim, const std::string& groupName);
+     Internal::M3DCommandResult* clearGroup(int dim, const std::string& groupName);
 
 
 private:

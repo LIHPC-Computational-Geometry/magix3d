@@ -518,7 +518,7 @@ QtSysCoordOperationPanel* QtSysCoordOperationAction::getSysCoordPanel ( )
 
 void QtSysCoordOperationAction::executeOperation ( )
 {
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	
 	// Récupération des paramètres de création du repère :
 	QtSysCoordOperationPanel*	panel	= getSysCoordPanel ( );

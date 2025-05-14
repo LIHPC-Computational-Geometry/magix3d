@@ -929,7 +929,7 @@ QtTopologyVerticesAlignmentPanel*
 
 void QtTopologyVerticesAlignmentAction::executeOperation ( )
 {
-    Mgx3D::Internal::M3DCommandResultIfc*	cmdResult	= 0;
+    Mgx3D::Internal::M3DCommandResult*	cmdResult	= 0;
 
 	QtTopologyVerticesAlignmentPanel*	panel	= dynamic_cast<QtTopologyVerticesAlignmentPanel*>(getTopologyVerticesAlignmentPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)

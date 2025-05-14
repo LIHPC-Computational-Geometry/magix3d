@@ -15,6 +15,7 @@
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace CoordinateSystem {
+class SysCoordProperty;
 /*----------------------------------------------------------------------------*/
 class CommandEditSysCoord: public Internal::CommandInternal {
 

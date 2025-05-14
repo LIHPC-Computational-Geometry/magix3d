@@ -1,23 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandTranslateTopo.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 27/9/2012
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandTranslateTopo.h"
-
-#include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
-#include "Topo/Block.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
-// OCC
 #include <gp_Trsf.hxx>
 #include <gp_Vec.hxx>
 /*----------------------------------------------------------------------------*/
@@ -26,7 +14,7 @@ namespace Mgx3D {
 namespace Topo {
 /*----------------------------------------------------------------------------*/
 CommandTranslateTopo::
-CommandTranslateTopo(Internal::Context& c, std::vector<TopoEntity*>& ve, const Vector& dp)
+CommandTranslateTopo(Internal::Context& c, std::vector<TopoEntity*>& ve, const Utils::Math::Vector& dp)
 :CommandTransformTopo(c, "Translation d'une topologie seule", ve)
 , m_vector(dp)
 {
@@ -47,7 +35,7 @@ CommandTranslateTopo(Internal::Context& c, std::vector<TopoEntity*>& ve, const V
 CommandTranslateTopo::
 CommandTranslateTopo(Internal::Context& c,
 		CommandDuplicateTopo* cmd,
-		const Vector& dp,
+		const Utils::Math::Vector& dp,
 		bool all_topo)
 :CommandTransformTopo(c, "Translation d'une copie de la topologie", cmd, all_topo)
 , m_vector(dp)
@@ -57,7 +45,7 @@ CommandTranslateTopo(Internal::Context& c,
 }
 /*----------------------------------------------------------------------------*/
 CommandTranslateTopo::
-CommandTranslateTopo(Internal::Context& c, const Vector& dp)
+CommandTranslateTopo(Internal::Context& c, const Utils::Math::Vector& dp)
 :CommandTransformTopo(c, "Translation de tout")
 , m_vector(dp)
 {

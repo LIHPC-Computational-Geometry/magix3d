@@ -1,17 +1,10 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandSplitBlocks.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 14/5/2014
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandSplitBlocks.h"
-
-#include "Utils/Common.h"
 #include "Topo/Block.h"
+#include "Topo/CoEdge.h"
+#include "Topo/Vertex.h"
 #include "Topo/TopoHelper.h"
+#include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
@@ -43,7 +36,7 @@ CommandSplitBlocks(Internal::Context& c, std::vector<Topo::Block* > &blocs, CoEd
 }
 /*----------------------------------------------------------------------------*/
 CommandSplitBlocks::
-CommandSplitBlocks(Internal::Context& c, std::vector<Topo::Block* > &blocs, CoEdge* arete, const Point& pt)
+CommandSplitBlocks(Internal::Context& c, std::vector<Topo::Block* > &blocs, CoEdge* arete, const Utils::Math::Point& pt)
 :CommandEditTopo(c, std::string("Découpage de plusieurs blocs"))
 , m_arete(arete)
 , m_ratio(0)
@@ -70,7 +63,7 @@ CommandSplitBlocks(Internal::Context& c, CoEdge* arete, double ratio)
 }
 /*----------------------------------------------------------------------------*/
 CommandSplitBlocks::
-CommandSplitBlocks(Internal::Context& c, CoEdge* arete, const Point& pt)
+CommandSplitBlocks(Internal::Context& c, CoEdge* arete, const Utils::Math::Point& pt)
 :CommandEditTopo(c, std::string("Découpage de tous les blocs"))
 , m_arete(arete)
 , m_ratio(0.0)

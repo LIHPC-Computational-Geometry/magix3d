@@ -300,7 +300,7 @@ void QtTopologyFuse2FacesAction::executeOperation ( )
 	vector<string>	names1	= panel->getFaces1Names ( );
 	vector<string>	names2	= panel->getFaces2Names ( );
 
-	Mgx3D::Internal::M3DCommandResultIfc*	result	= 0;
+	Mgx3D::Internal::M3DCommandResult*	result	= 0;
 	if ((names1.size ( ) == 1) && (names2.size ( ) == 1))
 		result	= getContext ( ).getTopoManager ( ).fuse2Faces (names1 [0], names2 [0]);
 	else

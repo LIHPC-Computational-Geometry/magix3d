@@ -248,7 +248,7 @@ void QtTopologyInsertHoleAction::executeOperation ( )
 	// Récupération des paramètres d'insertion de trou dans la topologie :
 	vector<string>	names	= panel->getFacesNames ( );
 
-	Mgx3D::Internal::M3DCommandResultIfc*	result	= getContext ( ).getTopoManager ( ).insertHole (names);
+	Mgx3D::Internal::M3DCommandResult*	result	= getContext ( ).getTopoManager ( ).insertHole (names);
 	CHECK_NULL_PTR_ERROR (result)
 	setCommandResult (result);
 	if (CommandIfc::FAIL == result->getStatus ( ))

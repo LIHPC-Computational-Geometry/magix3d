@@ -743,7 +743,7 @@ WARN_LOGFILE           =
 
 INPUT                  = ../../src/Doc/User \
                          ../../src/Core/protected/Internal/M3DCommandManager.h \
-                         ../../src/Core/protected/Internal/M3DCommandResultIfc.h \
+                         ../../src/Core/protected/Internal/M3DCommandResult.h \
                          ../../src/Core/protected/Geom/GeomManager.h \
                          ../../src/Core/protected/Geom/GeomInfo.h \
                          ../../src/Core/protected/Internal/Context.h \

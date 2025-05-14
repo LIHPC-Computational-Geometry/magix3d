@@ -16,7 +16,7 @@
 #include <vector>
 /*----------------------------------------------------------------------------*/
 #include "Internal/CommandCreator.h"
-#include "Internal/M3DCommandResultIfc.h"
+#include "Internal/M3DCommandResult.h"
 #include "Topo/TopoInfo.h"
 #include "Topo/Block.h"
 #include "Topo/Face.h"
@@ -113,7 +113,7 @@ public:
      *  \param pt le point contenant les coordonnées
      *  \param groupName le nom du groupe auquel est associée ou non l'entité créée
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     newTopoVertex(Utils::Math::Point pt, std::string groupName);
 
 
@@ -124,12 +124,12 @@ public:
      *  \param ve le nom des sommet topologiques qui permettent de créer l'entité
      *  \param groupName le nom du groupe auquel est associée ou non l'entité créée
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     newTopoEntity(std::vector<std::string>& ve, int dim, std::string groupName);
     SET_SWIG_COMPLETABLE_METHOD(newTopoEntity)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     newTopoEntity(std::vector<Topo::Vertex*>& ve, int dim, std::string groupName);
 #endif
 
@@ -140,12 +140,12 @@ public:
      *
      *  \param ne le nom de l'entité géométrique sur laquelle s'appuiera la topologie
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         newTopoOnGeometry(std::string ne);
     SET_SWIG_COMPLETABLE_METHOD(newTopoOnGeometry)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         newTopoOnGeometry(Geom::GeomEntity* ge);
 #endif
 
@@ -157,12 +157,12 @@ public:
       *
       *  \param ne le nom de l'entité géométrique sur laquelle s'appuiera la topologie
       */
-     Mgx3D::Internal::M3DCommandResultIfc*
+     Mgx3D::Internal::M3DCommandResult*
          newStructuredTopoOnGeometry(std::string ne);
      SET_SWIG_COMPLETABLE_METHOD(newStructuredTopoOnGeometry)
 
 #ifndef SWIG
-     Mgx3D::Internal::M3DCommandResultIfc*
+     Mgx3D::Internal::M3DCommandResult*
      	 newStructuredTopoOnGeometry(Geom::GeomEntity* ge);
 #endif
 
@@ -175,12 +175,12 @@ public:
       *  \param ne le nom de la surface sur laquelle s'appuiera la topologie
       *  \param ve la liste des (3 ou 4) sommets qui sont aux extrémités topologiques
       */
-     Mgx3D::Internal::M3DCommandResultIfc*
+     Mgx3D::Internal::M3DCommandResult*
 	 newStructuredTopoOnSurface(std::string ne, std::vector<std::string>& ve);
     SET_SWIG_COMPLETABLE_METHOD(newStructuredTopoOnSurface)
 
 #ifndef SWIG
-     Mgx3D::Internal::M3DCommandResultIfc*
+     Mgx3D::Internal::M3DCommandResult*
 	 newStructuredTopoOnSurface(Geom::Surface* surf, std::vector<Geom::Vertex*>& vertices);
 #endif
 
@@ -192,12 +192,12 @@ public:
       *
       *  \param ne le nom de l'entité géométrique sur laquelle s'appuiera la topologie
       */
-     Mgx3D::Internal::M3DCommandResultIfc*
+     Mgx3D::Internal::M3DCommandResult*
          newFreeTopoOnGeometry(std::string ne);
      SET_SWIG_COMPLETABLE_METHOD(newFreeTopoOnGeometry)
 
 #ifndef SWIG
-     Mgx3D::Internal::M3DCommandResultIfc*
+     Mgx3D::Internal::M3DCommandResult*
      	 newFreeTopoOnGeometry(Geom::GeomEntity* ge);
 #endif
 
@@ -208,7 +208,7 @@ public:
        *  \param ng le nom du groupe dans lequel sera mis le bloc ou la face
        *  \param dim la dimension (2 ou 3) de ce que l'on veut créer
        */
-      Mgx3D::Internal::M3DCommandResultIfc*
+      Mgx3D::Internal::M3DCommandResult*
           newFreeTopoInGroup(std::string ng,  int dim);
       SET_SWIG_COMPLETABLE_METHOD(newFreeTopoInGroup)
 
@@ -222,7 +222,7 @@ public:
        *  \param ve est la liste des noms d'entités définissant la boite englobante de positionnement
        *         des sommets
       */
-     Mgx3D::Internal::M3DCommandResultIfc*
+     Mgx3D::Internal::M3DCommandResult*
          newFreeBoundedTopoInGroup(std::string ng, int dim, const std::vector<std::string>& ve);
      SET_SWIG_COMPLETABLE_METHOD(newFreeBoundedTopoInGroup)
 
@@ -234,12 +234,12 @@ public:
      *  \param ne le nom de l'entité géométrique sur laquelle s'appuiera la topologie
      *  \param rat le ratio de la distance entre l'axe du cylindre et son rayon pour placer le sommet du o-grid
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         newTopoOGridOnGeometry(std::string ne, const double& rat);
     SET_SWIG_COMPLETABLE_METHOD(newTopoOGridOnGeometry)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         newTopoOGridOnGeometry(Geom::GeomEntity* ge, const double& rat);
 #endif
 
@@ -250,12 +250,12 @@ public:
      *
      *  \param ne le nom de l'entité géométrique sur laquelle s'appuiera la topologie
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         newUnstructuredTopoOnGeometry(std::string ne);
     SET_SWIG_COMPLETABLE_METHOD(newUnstructuredTopoOnGeometry)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         newUnstructuredTopoOnGeometry(Geom::GeomEntity* ge);
 #endif
 
@@ -272,7 +272,7 @@ public:
      *
      *  \see GeomManager::newBox
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     newBoxWithTopo(const Point& pmin, const Point& pmax,
     		bool meshStructured=true, std::string groupName="");
 
@@ -291,7 +291,7 @@ public:
      *
      *  \see GeomManager::newBox
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     newBoxWithTopo(const Point& pmin, const Point& pmax,
     		const int ni, const int nj, const int nk,
     		std::string groupName="");
@@ -312,7 +312,7 @@ public:
      *  \param nr le nombre de couches entre le bloc central et la surface externe
      *  \param groupName optionnellement un nom de groupe
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         newCylinderWithTopo(const Point& pcentre, const double& dr,
                                  const Vector& dv, const double& da,
                                  bool meshStructured, const double& rat,
@@ -336,7 +336,7 @@ public:
      *  \param nr le nombre de couches entre la surface interne et la surface externe
      *  \param groupName optionnellement un nom de groupe
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         newHollowCylinderWithTopo(const Point& pcentre, const double& dr_int, const double& dr_ext,
                                  const Vector& dv, const double& da,
                                  bool meshStructured,
@@ -360,7 +360,7 @@ public:
      *  \param groupName optionnellement un nom de groupe
      *
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     newConeWithTopo(const double& dr1, const double& dr2,
     		const Vector& dv, const double& da,
 			bool meshStructured, const double& rat,
@@ -384,7 +384,7 @@ public:
      *   NB: en passant par les angles, le Huitième équivaut à 45 deg, ce qui empèche la création
      *   d'une sphère ouverte à 45 deg. Mais est-ce nécessaire de proposer autre chose qu'une portion ?
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         newSphereWithTopo(const Point& pcentre,  const double& dr,
                                 const  Utils::Portion::Type& dt,
                                 bool meshStructured, const double& rat,
@@ -406,7 +406,7 @@ public:
      *  \param groupName optionnellement un nom de groupe
      *
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         newHollowSphereWithTopo(const Point& pcentre,  const double& dr_int,  const double& dr_ext,
             const  Utils::Portion::Type& dt,
             bool meshStructured,
@@ -426,7 +426,7 @@ public:
      *  \param groupName optionnellement un nom de groupe
      */
     /*------------------------------------------------------------------------*/
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		newSpherePartWithTopo(const double& radius,
                       const double& angleY,
                       const double& angleZ,
@@ -449,7 +449,7 @@ public:
      *  \param groupName optionnellement un nom de groupe
      */
     /*------------------------------------------------------------------------*/
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		newHollowSpherePartWithTopo(const double& dr_int,
 				const double& dr_ext,
 				const double& angleY,
@@ -472,7 +472,7 @@ public:
      *
      *  \see TopoManager::newBoxWithTopo
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         newIJBoxesWithTopo(int ni, int nj, bool alternateStruture);
     SET_SWIG_COMPLETABLE_METHOD(newIJBoxesWithTopo)
 
@@ -489,7 +489,7 @@ public:
      *
      *  \see TopoManager::newBoxWithTopo
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         newIJKBoxesWithTopo(int ni, int nj, int nk, bool alternateStruture);
     SET_SWIG_COMPLETABLE_METHOD(newIJKBoxesWithTopo)
 
@@ -514,12 +514,12 @@ public:
      *  \param vo le volume auquel on associe les blocs
 
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         copy(std::vector<std::string>& vb, std::string vo);
     SET_SWIG_COMPLETABLE_METHOD(copy)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         copy(std::vector<Topo::Block*>& vb, Geom::Volume* vo);
 #endif
 
@@ -530,12 +530,12 @@ public:
      *  \param ng le nom du groupe 3D dans lequel on va stoquer ces nouveaux blocs
 
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         extract(std::vector<std::string>& vb, const std::string ng);
     SET_SWIG_COMPLETABLE_METHOD(extract)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         extract(std::vector<Topo::Block*>& vb, const std::string ng);
 #endif
 
@@ -546,12 +546,12 @@ public:
      *  \param faces les faces communes topologiques que l'on veut dupliquer
 
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         insertHole(std::vector<std::string>& faces);
     SET_SWIG_COMPLETABLE_METHOD(insertHole)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         insertHole(std::vector<CoFace*>& cofaces);
 #endif
 
@@ -561,12 +561,12 @@ public:
      *  La 1ère Arête commune prend la place de l'autre.
      *  Les sommets doivent être le plus proche possible
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         fuse2Edges(std::string na, std::string nb);
     SET_SWIG_COMPLETABLE_METHOD(fuse2Edges)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		fuse2Edges(CoEdge* edge_A, CoEdge* edge_B);
 #endif
 
@@ -576,12 +576,12 @@ public:
      *	Le collage se fait entre sommets les plus proches
      *  Les arêtes communes doivent toute avoir une arête avec qui faire le collage
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		fuse2EdgeList(std::vector<std::string>& coedge_names1, std::vector<std::string>& coedge_names2);
     SET_SWIG_COMPLETABLE_METHOD(fuse2EdgeList)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		fuse2EdgeList(std::vector<Topo::CoEdge* > &coedges1, std::vector<Topo::CoEdge* > &coedges2);
 #endif
 
@@ -591,12 +591,12 @@ public:
      *  La 1ère Face commune prend la place de l'autre.
      *  Les sommets doivent être le plus proche possible
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         fuse2Faces(std::string na, std::string nb);
     SET_SWIG_COMPLETABLE_METHOD(fuse2Faces)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         fuse2Faces(CoFace* face_A, CoFace* face_B);
 #endif
 
@@ -606,12 +606,12 @@ public:
      *	Le collage se fait entre sommets les plus proches
      *  Les faces communes doivent toute avoir une face avec qui faire le collage
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         fuse2FaceList(std::vector<std::string>& coface_names1, std::vector<std::string>& coface_names2);
     SET_SWIG_COMPLETABLE_METHOD(fuse2FaceList)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     	fuse2FaceList(std::vector<Topo::CoFace* > &cofaces1, std::vector<Topo::CoFace* > &cofaces2);
 #endif
 
@@ -621,12 +621,12 @@ public:
      *  Le premier bloc dont les faces prennent la place des autres.
      *  Le deuxième bloc dont les sommets d'une de ses faces doivent être le plus proche possible de celle de l'autre
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         glue2Blocks(std::string na, std::string nb);
     SET_SWIG_COMPLETABLE_METHOD(glue2Blocks)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         glue2Blocks(Block* bl_A, Block* bl_B);
 #endif
 
@@ -634,12 +634,12 @@ public:
     /** Collage entre 2 topologies suivant proximité des sommets.
      *  Topo prises dans 2 volumes.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     	glue2Topo(std::string volName1, std::string volName2);
     SET_SWIG_COMPLETABLE_METHOD(glue2Topo)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     	glue2Topo(Geom::Volume* vol1, Geom::Volume* vol2);
 #endif
 
@@ -648,12 +648,12 @@ public:
      *
      *  Le 1er sommet prend la place de l'autre.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         fuse2Vertices(std::string na, std::string nb);
     SET_SWIG_COMPLETABLE_METHOD(fuse2Vertices)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     	fuse2Vertices(Topo::Vertex* vtx_A, Topo::Vertex* vtx_B);
 #endif
 
@@ -667,15 +667,15 @@ public:
      *  Les 3 autres arêtes parallèles sont aussi découpées avec le même ratio.
      *  Une face basée sur ces 4 arêtes est créée, elle coupe le bloc en 2.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitBlock(std::string nbloc, std::string narete, const double& ratio);
     SET_SWIG_COMPLETABLE_METHOD(splitBlock)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitBlock(Block* bloc, CoEdge* arete, const double& ratio);
 
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitBlock(Block* bloc, CoEdge* arete, const Point& pt);
 #endif
 
@@ -688,11 +688,11 @@ public:
      *  Une face basée sur ces 4 arêtes est créée, elle coupe un premier bloc en 2.
      *  Ensuite les autres blocs sont découpés comme cela serait le cas avec extendSplitBlock.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitBlocks(std::vector<std::string> &blocs_names, std::string narete, const double& ratio);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitBlocks(std::vector<Topo::Block* > &blocs, CoEdge* arete, const double& ratio);
 #endif
 
@@ -704,11 +704,11 @@ public:
      *  Une face basée sur ces 4 arêtes est créée, elle coupe un premier bloc en 2.
      *  Ensuite les autres blocs sont découpés comme cela serait le cas avec extendSplitBlock.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitBlocks(std::vector<std::string> &blocs_names, std::string narete, const Point& pt);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitBlocks(std::vector<Topo::Block* > &blocs, CoEdge* arete, const Point& pt);
 #endif
 
@@ -720,11 +720,11 @@ public:
      *  Une face basée sur ces 4 arêtes est créée, elle coupe un premier bloc en 2.
      *  Ensuite les autres blocs sont découpés comme cela serait le cas avec extendSplitBlock.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	    splitAllBlocks(std::string narete, const double& ratio);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	    splitAllBlocks(CoEdge* arete, const double& ratio);
 #endif
 
@@ -736,22 +736,22 @@ public:
       *  Une face basée sur ces 4 arêtes est créée, elle coupe un premier bloc en 2.
       *  Ensuite les autres blocs sont découpés comme cela serait le cas avec extendSplitBlock.
       */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitAllBlocks(std::string narete, const Point& pt);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitAllBlocks(CoEdge* arete, const Point& pt);
 #endif
 
     /*------------------------------------------------------------------------*/
     /** \brief Découpe un bloc en deux en utilisant une arête qui coupe déjà une de ses faces
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         extendSplitBlock(std::string nbloc, std::string narete);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         extendSplitBlock(Block* bloc, CoEdge* arete);
 #endif
 
@@ -768,26 +768,26 @@ public:
      *  \param nb_bras le nombre de couches de mailles autour du centre du o-grid à créer
      *  (c.a.d. le nombre de bras pour les arêtes entre les sommets du bord de la sélection et ceux créés)
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitBlocksWithOgridV2(std::vector<std::string> &blocs_names,
             std::vector<std::string> &cofaces_names,
             const double& ratio_ogrid, int nb_bras);
     SET_SWIG_COMPLETABLE_METHOD(splitBlocksWithOgrid)
     /// version avec comportement équivalent à ce qui est fait dans ICEM, utilisé par défaut jusqu'au début 2019
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitBlocksWithOgrid(std::vector<std::string> &blocs_names,
             std::vector<std::string> &cofaces_names,
             const double& ratio, int nb_bras);
     SET_SWIG_COMPLETABLE_METHOD(splitBlocksWithOgrid_propagate_neighbor_block)
     /// version avec comportement antérieur à la version 1.6 de Magix3D
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitBlocksWithOgrid_old(std::vector<std::string> &blocs_names,
             std::vector<std::string> &cofaces_names,
             const double& ratio, int nb_bras);
     SET_SWIG_COMPLETABLE_METHOD(splitBlocksWithOgrid_old)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitBlocksWithOgrid(std::vector<Topo::Block* > &blocs,
             std::vector<Topo::CoFace* > &cofaces,
             const double& ratio_ogrid, int nb_bras,
@@ -808,13 +808,13 @@ public:
      *  \param nb_bras le nombre de couches de mailles autour du centre du o-grid à créer
      *  (c.a.d. le nombre de bras pour les arêtes entre les sommets du bord de la sélection et ceux créés)
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitFacesWithOgrid(std::vector<std::string> &faces_names,
             std::vector<std::string> &coedges_names,
             const double& ratio_ogrid, int nb_bras);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitFacesWithOgrid(std::vector<Topo::CoFace*> &cofaces,
             std::vector<Topo::CoEdge*> &coedges,
             const double& ratio_ogrid, int nb_bras);
@@ -830,11 +830,11 @@ public:
      *  sinon on découpe la face en 3 (ogrid en 2D) avec un sommet placé avec ce ratio entre le sommet dans
      *  le prolongement sur l'axe et le sommet à l'entrée dans la face.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitFaces(std::vector<std::string> &cofaces_names, std::string narete, const double& ratio_dec, const double& ratio_ogrid);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitFaces(std::vector<Topo::CoFace* > &cofaces, CoEdge* arete, const double& ratio_dec, const double& ratio_ogrid);
 #endif
 
@@ -847,33 +847,33 @@ public:
      *  sinon on découpe la face en 3 (ogrid en 2D) avec un sommet placé avec ce ratio entre le sommet dans
      *  le prolongement sur l'axe et le sommet à l'entrée dans la face.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitFaces(std::vector<std::string> &cofaces_names, std::string narete, const Point& pt, const double& ratio_ogrid);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitFaces(std::vector<Topo::CoFace* > &cofaces, CoEdge* arete, const Point& pt, const double& ratio_ogrid);
 #endif
 
     /** \brief Découpe toutes les faces structurées 2D en deux
      * \see splitFaces
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitAllFaces(std::string narete, const double& ratio_dec, const double& ratio_ogrid);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitAllFaces(CoEdge* arete, const double& ratio_dec, const double& ratio_ogrid);
 #endif
 
     /** \brief Découpe toutes les faces structurées 2D en deux suivant un point à projeter
      * \see splitFaces
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitAllFaces(std::string narete, const Point& pt, const double& ratio_ogrid);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitAllFaces(CoEdge* arete, const Point& pt, const double& ratio_ogrid);
 #endif
 
@@ -883,11 +883,11 @@ public:
      *  qui va être inséré sur l'arête.
      *  L'autre arête parallèle est aussi découpée avec le même ratio.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitFace(std::string coface_name, std::string narete, const double& ratio_dec, bool project_on_meshing_edges);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitFace(Topo::CoFace* coface, CoEdge* coedge, const double& ratio_dec, bool project_on_meshing_edges);
 #endif
 
@@ -897,22 +897,22 @@ public:
      *  qui va être inséré sur l'arête.
      *  L'autre arête parallèle est aussi découpée avec le même ratio induit de la première coupe.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitFace(std::string coface_name, std::string narete, const Point& pt, bool project_on_meshing_edges = true);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitFace(Topo::CoFace* coface, CoEdge* coedge, const Point& pt, bool project_on_meshing_edges);
 #endif
 
     /** \brief Découpage d'une face structurée 2D ou 3D en deux suivant un sommet
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         extendSplitFace(std::string coface_name, std::string nsommet);
     SET_SWIG_COMPLETABLE_METHOD(extendSplitFace)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         extendSplitFace(Topo::CoFace* coface, Vertex* vertex);
 #endif
 
@@ -921,11 +921,11 @@ public:
      *
      *  On utilise un ratio pour positionner le sommet
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitEdge(std::string coedge_name, const double& ratio_dec);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitEdge(CoEdge* coedge, const double& ratio_dec);
 #endif
 
@@ -934,11 +934,11 @@ public:
      *  On utilise une arête et un point que l'on projette sur cette arête pour positionner un premier sommet
      *  qui va être inséré sur l'arête.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitEdge(std::string coedge_name, const Point& pt);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         splitEdge(CoEdge* coedge, const Point& pt);
 #endif
 
@@ -959,18 +959,18 @@ public:
      * \param nom2 une deuxième entité du même type que la précédente
      * \param project_on_first si l'on projette sur la première entité, sinon on place au milieu des sommets
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         snapVertices(std::string nom1, std::string nom2, bool project_on_first);
     SET_SWIG_COMPLETABLE_METHOD(snapVertices)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         snapVertices(Topo::Vertex* ve1, Topo::Vertex* ve2, bool project_on_first, TkUtil::UTF8String& scriptCommand);
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         snapVertices(Topo::CoEdge* ce1, Topo::CoEdge* ce2, bool project_on_first, TkUtil::UTF8String& scriptCommand);
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         snapVertices(Topo::CoFace* cf1, Topo::CoFace* cf2, bool project_on_first, TkUtil::UTF8String& scriptCommand);
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         snapVertices(std::vector<Topo::Vertex* > vertices1, std::vector<Topo::Vertex* > vertices2, bool project_on_first, TkUtil::UTF8String& scriptCommand);
 #endif
 
@@ -983,16 +983,16 @@ public:
      *  \param dt la portion de révolution
      *  \param ratio_ogrid pour rapprocher de l'axe les sommets internes de l'o-grid
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         makeBlocksByRevol(std::vector<std::string> &coedges_names, const  Utils::Portion::Type& dt);
     SET_SWIG_COMPLETABLE_METHOD(makeBlocksByRevol)
 
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	    makeBlocksByRevolWithRatioOgrid(std::vector<std::string> &coedges_names, const  Utils::Portion::Type& dt, const double& ratio_ogrid);
     SET_SWIG_COMPLETABLE_METHOD(makeBlocksByRevolWithRatioOgrid)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         makeBlocksByRevol(std::vector<CoEdge*>& coedges, const  Utils::Portion::Type& dt, const double& ratio_ogrid);
 #endif
 
@@ -1002,12 +1002,12 @@ public:
     *  \param cofaces_names Les noms des faces qui vont servir d'origine à l'extrusion
     *  \param dv le vecteur que va suivre l'extrusion pour créer les blocs.
     */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         makeBlocksByExtrude(std::vector<std::string> &cofaces_names, const Utils::Math::Vector& dv);
     SET_SWIG_COMPLETABLE_METHOD(makeBlocksByExtrude)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     makeBlocksByExtrude(std::vector<TopoEntity*>& cofaces, const Utils::Math::Vector& dv);
 #endif
 
@@ -1021,7 +1021,7 @@ public:
      *  \param deg_min degré minimum pour les polynomes des B-Splines
      *  \param deg_max degré maximum pour les polynomes des B-Splines
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         importMDL(std::string n, const bool all, const bool useAreaName,
         		std::string prefixName="", int deg_min=1, int deg_max=2);
     SET_SWIG_COMPLETABLE_METHOD(importMDL)
@@ -1048,12 +1048,12 @@ public:
      *
      *  \see getFusableEdges
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	fuseEdges(std::vector<std::string> &coedges_names);
     SET_SWIG_COMPLETABLE_METHOD(fuseEdges)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	fuseEdges(std::vector<CoEdge*> &coedges);
 #endif
 
@@ -1062,12 +1062,12 @@ public:
      *
      *   Ils doivent partager une face, être dans un même volume et être structurés
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         fuse2Blocks(std::string na, std::string nb);
     SET_SWIG_COMPLETABLE_METHOD(fuse2Blocks)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         fuse2Blocks(Block* bl_A, Block* bl_B);
 #endif
 
@@ -1076,12 +1076,12 @@ public:
      *
      *  Si le nom de l'entité géométrique est vide, on supprime les associations existantes.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setGeomAssociation(std::vector<std::string> & topo_entities_names, std::string geom_entity_name, bool move_vertices);
     SET_SWIG_COMPLETABLE_METHOD(setGeomAssociation)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setGeomAssociation(std::vector<TopoEntity*> & topo_entities, Geom::GeomEntity* geom_entity, bool move_vertices);
 #endif
 
@@ -1089,12 +1089,12 @@ public:
     /** Projecte ces sommets topologiques vers l'entité géométrique la plus proche parmis
      *  celles passées en paramêtre
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         projectVerticesOnNearestGeomEntities(std::vector<std::string> & vertices_names, std::vector<std::string> & geom_entities_names, bool move_vertices);
     SET_SWIG_COMPLETABLE_METHOD(projectVerticesOnNearestGeomEntities)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         projectVerticesOnNearestGeomEntities(std::vector<Vertex*> & vertices, std::vector<Geom::GeomEntity*> & geom_entities, bool move_vertices);
 #endif
 
@@ -1102,12 +1102,12 @@ public:
     /** Projecte ces arêtes topologiques vers la courbe qui relie ses sommets topologiques.
      *  Il peut ne pas y avoir de courbe. La projection se fait également vers les surfaces.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         projectEdgesOnCurves(std::vector<std::string> & coedges_names);
     SET_SWIG_COMPLETABLE_METHOD(projectEdgesOnCurves)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         projectEdgesOnCurves(std::vector<CoEdge*> & coedges);
 #endif
 
@@ -1115,19 +1115,19 @@ public:
     /** Projecte toutes les arêtes topologiques vers la courbe qui relie ses sommets topologiques.
      *  Il peut ne pas y avoir de courbe. La projection se fait également vers les surfaces.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	    projectAllEdgesOnCurves();
 
     /*------------------------------------------------------------------------*/
     /** Projecte ces faces topologiques vers la surface en relation avec ses arêtes.
      *  Il peut ne pas y avoir de surface.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	    projectFacesOnSurfaces(std::vector<std::string> & cofaces_names);
     SET_SWIG_COMPLETABLE_METHOD(projectFacesOnSurfaces)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         projectFacesOnSurfaces(std::vector<CoFace*> & cofaces);
 #endif
 
@@ -1135,7 +1135,7 @@ public:
     /** Projecte toutes les faces topologiques vers la surface en relation avec ses arêtes.
      *  Il peut ne pas y avoir de surface.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	    projectAllFacesOnSurfaces();
 
     /*------------------------------------------------------------------------*/
@@ -1145,13 +1145,13 @@ public:
      * entraine celle des objets de niveau inférieurs (face, arêtes et sommets)
      * et réciproquement.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         translate(std::vector<std::string>& ve, const Vector& dp,
             const bool withGeom);
     SET_SWIG_COMPLETABLE_METHOD(translate)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         translate(std::vector<TopoEntity*>& ve, const Vector& dp,
             const bool withGeom);
 #endif
@@ -1165,14 +1165,14 @@ public:
      *
      * \param rot      la rotation
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         rotate(std::vector<std::string>& ve,
         		const Utils::Math::Rotation& rot,
         		const bool withGeom);
     SET_SWIG_COMPLETABLE_METHOD(rotate)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         rotate(std::vector<TopoEntity*>& ve,
         		const Utils::Math::Rotation& rot,
         		const bool withGeom);
@@ -1187,7 +1187,7 @@ public:
      * \param facteur supérieur à 0
      * \param withGeom si l'homothétie se fait également sur la géométrie
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         scale(std::vector<std::string>& ve,
             const double& facteur,
             const bool withGeom);
@@ -1201,14 +1201,14 @@ public:
      * \param pcentre le centre
      * \param withGeom si l'homothétie se fait également sur la géométrie
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
             scale(std::vector<std::string>& ve,
                 const double& facteur,
                 const Point& pcentre,
                 const bool withGeom);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         scale(std::vector<TopoEntity*>& ve,
             const double& facteur,
             const Point& pcentre,
@@ -1225,7 +1225,7 @@ public:
      * \param factorZ facteur suivant Z supérieur à 0
      * \param withGeom si l'homothétie se fait également sur la géométrie
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         scale(std::vector<std::string>& ve,
         	const double factorX,
         	const double factorY,
@@ -1243,7 +1243,7 @@ public:
      * \param pcentre le centre
      * \param withGeom si l'homothétie se fait également sur la géométrie
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         scale(std::vector<std::string>& ve,
             const double factorX,
             const double factorY,
@@ -1252,7 +1252,7 @@ public:
             const bool withGeom);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         scale(std::vector<TopoEntity*>& ve,
         	const double factorX,
 			const double factorY,
@@ -1270,14 +1270,14 @@ public:
      *
      * \param plane      le plan de symétrie
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         mirror(std::vector<std::string>& ve,
         		Utils::Math::Plane* plane,
         		const bool withGeom);
     SET_SWIG_COMPLETABLE_METHOD(mirror)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		mirror(std::vector<TopoEntity*>& ve,
 				Utils::Math::Plane* plane,
         		const bool withGeom);
@@ -1298,7 +1298,7 @@ public:
      * \param zPos la nouvelle valeur pour la coordonnées en Z
      * \param sysCoordName nom du repère dans lequel se fait le changement
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setVertexLocation(std::vector<std::string>& vertices_names,
             const bool changeX,
             const double& xPos,
@@ -1310,7 +1310,7 @@ public:
     SET_SWIG_COMPLETABLE_METHOD(setVertexLocation)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setVertexLocation(std::vector<Vertex*>& vertices,
             const bool changeX,
             const double& xPos,
@@ -1335,7 +1335,7 @@ public:
       * \param phiPos la nouvelle valeur pour la coordonnées en Phi
       * \param sysCoordName nom du repère dans lequel se fait le changement
       */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	setVertexSphericalLocation(std::vector<std::string>& vertices_names,
 			const bool changeRho,
 			const double& rhoPos,
@@ -1347,7 +1347,7 @@ public:
     SET_SWIG_COMPLETABLE_METHOD(setVertexSphericalLocation)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	setVertexSphericalLocation(std::vector<Vertex*>& vertices,
 			const bool changeRho,
 			const double& rhoPos,
@@ -1372,7 +1372,7 @@ public:
      * \param zPos la nouvelle valeur pour la coordonnées en Z
      * \param sysCoordName nom du repère dans lequel se fait le changement
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	setVertexCylindricalLocation(std::vector<std::string>& vertices_names,
 			const bool changeRho,
 			const double& rhoPos,
@@ -1384,7 +1384,7 @@ public:
     SET_SWIG_COMPLETABLE_METHOD(setVertexCylindricalLocation)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	setVertexCylindricalLocation(std::vector<Vertex*>& vertices,
 			const bool changeRho,
 			const double& rhoPos,
@@ -1403,13 +1403,13 @@ public:
      * \param vertex_name le nom du sommet modifié
      * \param targe_name le nom du sommet cible
      */
-	Mgx3D::Internal::M3DCommandResultIfc*
+	Mgx3D::Internal::M3DCommandResult*
 	setVertexSameLocation(std::string vertex_name,
 			std::string target_name);
     SET_SWIG_COMPLETABLE_METHOD(setVertexSameLocation)
 
 #ifndef SWIG
-	Mgx3D::Internal::M3DCommandResultIfc*
+	Mgx3D::Internal::M3DCommandResult*
 	setVertexSameLocation(Vertex* vtx,
 			Vertex* target);
 #endif
@@ -1419,18 +1419,18 @@ public:
      *
      * \param vertices_names la liste des noms des sommets concernés
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         snapProjectedVertices(std::vector<std::string> &vertices_names);
     SET_SWIG_COMPLETABLE_METHOD(snapProjectedVertices)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         snapProjectedVertices(std::vector<Vertex*> &vertices);
 #endif
 
     /** \brief Déplace tous les sommets en fonction de leur projection
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         snapAllProjectedVertices();
 
     /*------------------------------------------------------------------------*/
@@ -1446,11 +1446,11 @@ public:
      *
      * \param vertices_names la liste des noms des sommets concernés
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         alignVertices(std::vector<std::string> &vertices_names);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         alignVertices(std::vector<Vertex*> &vertices);
 #endif
 
@@ -1466,12 +1466,12 @@ public:
      *
      * \param vertices_names la liste des noms des sommets concernés
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		alignVertices(const Point& p1, const Point& p2,
 			std::vector<std::string> &vertices_names);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		alignVertices(const Point& p1, const Point& p2,
 			std::vector<Vertex*> &vertices);
 #endif
@@ -1481,39 +1481,39 @@ public:
      *
      *  La propriété emp est clonée.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setMeshingProperty(CoEdgeMeshingProperty& emp, std::vector<std::string> &edge_names);
     SET_SWIG_COMPLETABLE_METHOD(setMeshingProperty)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setMeshingProperty(CoEdgeMeshingProperty& emp, std::vector<Topo::CoEdge*> &coedges);
 #endif
 
     /// Change la propriété de discrétisation pour toutes les arêtes
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setAllMeshingProperty(CoEdgeMeshingProperty& emp);
     SET_SWIG_COMPLETABLE_METHOD(setAllMeshingProperty)
 
     /// Change la propriété de discrétisation pour une arête et ses arêtes parallèles
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setParallelMeshingProperty(CoEdgeMeshingProperty& emp, std::string coedge_name);
     SET_SWIG_COMPLETABLE_METHOD(setParallelMeshingProperty)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setParallelMeshingProperty(CoEdgeMeshingProperty& emp, Topo::CoEdge* coedge);
 #endif
 
     /*------------------------------------------------------------------------*/
     /** \brief Change le sens de la discrétisation pour une liste d'arête communes
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         reverseDirection(std::vector<std::string> &edge_names);
     SET_SWIG_COMPLETABLE_METHOD(reverseDirection)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         reverseDirection(std::vector<Topo::CoEdge*> &coedges);
 #endif
 
@@ -1522,16 +1522,16 @@ public:
      *
      *  La propriété emp est clonée.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setMeshingProperty(CoFaceMeshingProperty& emp, std::vector<std::string> &face_names);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setMeshingProperty(CoFaceMeshingProperty& emp, std::vector<Topo::CoFace*> &cofaces);
 #endif
 
     /// Change la propriété de discrétisation pour toutes les faces
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setAllMeshingProperty(CoFaceMeshingProperty& emp);
 
     /*------------------------------------------------------------------------*/
@@ -1539,16 +1539,16 @@ public:
      *
      *  La propriété emp est clonée.
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setMeshingProperty(BlockMeshingProperty& emp, std::vector<std::string> &bloc_names);
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setMeshingProperty(BlockMeshingProperty& emp, std::vector<Topo::Block*> &blocs);
 #endif
 
     /// Change la propriété de discrétisation pour tous les blocs
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setAllMeshingProperty(BlockMeshingProperty& emp);
 
     /*------------------------------------------------------------------------*/
@@ -1558,12 +1558,12 @@ public:
      *
      *  \see setMeshingProperty
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setEdgeMeshingProperty(CoEdgeMeshingProperty& emp, std::string ed);
     SET_SWIG_COMPLETABLE_METHOD(setEdgeMeshingProperty)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setEdgeMeshingProperty(CoEdgeMeshingProperty& emp, Topo::CoEdge* ed);
 #endif
 
@@ -1581,12 +1581,12 @@ public:
      *
      *  \see setMeshingProperty
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setFaceMeshingProperty(Topo::CoFaceMeshingProperty& emp, std::string cf);
     SET_SWIG_COMPLETABLE_METHOD(setFaceMeshingProperty)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setFaceMeshingProperty(Topo::CoFaceMeshingProperty& emp, Topo::CoFace* cf);
 #endif
 
@@ -1597,12 +1597,12 @@ public:
      *
      *  \see setMeshingProperty
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setBlockMeshingProperty(Topo::BlockMeshingProperty& emp, std::string bl);
     SET_SWIG_COMPLETABLE_METHOD(setBlockMeshingProperty)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setBlockMeshingProperty(Topo::BlockMeshingProperty& emp, Topo::Block* bl);
 #endif
 
@@ -1611,19 +1611,19 @@ public:
      *
      *  On utilise une arête pour déterminer la direction
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         unrefine(std::string nbloc, std::string narete, int ratio);
     SET_SWIG_COMPLETABLE_METHOD(unrefine)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         unrefine(Block* bloc, CoEdge* arete, int ratio);
 #endif
 
     /*------------------------------------------------------------------------*/
     /** \brief Raffine toute les arêtes
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
            refine(int ratio);
     SET_SWIG_COMPLETABLE_METHOD(refine)
 
@@ -1636,7 +1636,7 @@ public:
     int getDefaultNbMeshingEdges();
 
     /** Commande qui change le nombre de bras par défaut pour une arête */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setDefaultNbMeshingEdges(int nb);
     SET_SWIG_COMPLETABLE_METHOD(setDefaultNbMeshingEdges)
 
@@ -1647,26 +1647,26 @@ public:
      *
      * Un ensemble d'arêtes peuvent être figées pour empécher le changement
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setNbMeshingEdges(std::string edge, int nb, std::vector<std::string>& frozed_edges_names);
     SET_SWIG_COMPLETABLE_METHOD(setNbMeshingEdges)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         setNbMeshingEdges(CoEdge* coedge, int nb, std::vector<CoEdge*>& frozed_coedges);
 #endif
 
     /*------------------------------------------------------------------------*/
     /** Ajoute un groupe à un ensemble d'entités topologiques, suivant une dimension */
-    Internal::M3DCommandResultIfc* addToGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
+    Internal::M3DCommandResult* addToGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
     SET_SWIG_COMPLETABLE_METHOD(addToGroup)
 
     /** Enlève un groupe à un ensemble d'entités topologiques, suivant une dimension */
-    Internal::M3DCommandResultIfc* removeFromGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
+    Internal::M3DCommandResult* removeFromGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
     SET_SWIG_COMPLETABLE_METHOD(removeFromGroup)
 
     /** Défini le groupe pour un ensemble d'entités topologiques, suivant une dimension */
-    Internal::M3DCommandResultIfc* setGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
+    Internal::M3DCommandResult* setGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
     SET_SWIG_COMPLETABLE_METHOD(setGroup)
 
     /*------------------------------------------------------------------------*/
@@ -1837,7 +1837,7 @@ public:
     /** Retourne le nom du bloc en fonction des positions géométriques de ses sommets */
     std::string getBlockAt(std::vector<Point>& pts) const;
 
-    Mgx3D::Internal::M3DCommandResultIfc* exportBlocks(const std::string& n);
+    Mgx3D::Internal::M3DCommandResult* exportBlocks(const std::string& n);
     SET_SWIG_COMPLETABLE_METHOD(exportBlocksForCGNS)
 
     /*------------------------------------------------------------------------*/
@@ -1878,12 +1878,12 @@ public:
     /** \brief Aligne le sommet sélectionné sur l'intersection entre la droite définie
      * par 2 points et une surface
      */
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     alignVerticesOnSurface(const std::string &surface, const std::string &vertex, const Point &pnt1, const Point &pnt2);
     SET_SWIG_COMPLETABLE_METHOD(alignVerticesOnSurface)
 
 #ifndef SWIG
-    Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     alignVerticesOnSurface(Geom::GeomEntity* surface, Vertex* vertex, const Point &pnt1, const Point &pnt2);
 #endif
 

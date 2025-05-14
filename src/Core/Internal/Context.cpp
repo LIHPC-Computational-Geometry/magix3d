@@ -1559,7 +1559,7 @@ void Context::unactivateShiftingNameId()
 	getNameManager().unactivateShiftingId();
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* Context::setLandmark(Utils::Landmark::kind l)
+Internal::M3DCommandResult* Context::setLandmark(Utils::Landmark::kind l)
 {
     //creation de la commande
 	CommandChangeLandmark* command = new CommandChangeLandmark(*this, l);
@@ -1574,12 +1574,12 @@ Internal::M3DCommandResultIfc* Context::setLandmark(Utils::Landmark::kind l)
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* Context::setLengthUnit(const Utils::Unit::lengthUnit& lu)
+Internal::M3DCommandResult* Context::setLengthUnit(const Utils::Unit::lengthUnit& lu)
 {
     //creation de la commande
 	CommandChangeLengthUnit* command = new CommandChangeLengthUnit(*this, lu);
@@ -1594,12 +1594,12 @@ Internal::M3DCommandResultIfc* Context::setLengthUnit(const Utils::Unit::lengthU
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* Context::setMesh2D()
+Internal::M3DCommandResult* Context::setMesh2D()
 {
     //creation de la commande
 	Mesh::CommandChangeMeshDim* command = new Mesh::CommandChangeMeshDim(*this, MESH2D);
@@ -1613,7 +1613,7 @@ Internal::M3DCommandResultIfc* Context::setMesh2D()
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
@@ -1721,7 +1721,7 @@ void Context::clearSession()
 
 	setFinished(false);
 
-	// on ne peut pas retourner un M3DCommandResultIfc, la commande est détruite par m_command_manager->clear()
+	// on ne peut pas retourner un M3DCommandResult, la commande est détruite par m_command_manager->clear()
 }
 /*----------------------------------------------------------------------------*/
 void Context::add(unsigned long id,  Utils::Entity* entity)

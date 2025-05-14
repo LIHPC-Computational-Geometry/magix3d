@@ -252,7 +252,7 @@ void QtTopologyFuseEdgesAction::executeOperation ( )
 	// Récupération des paramètres de collage des arêtes topologiques :
 	vector<string>	edges	= panel->getEdgesNames ( );
 
-	Mgx3D::Internal::M3DCommandResultIfc*	result	= getContext ( ).getTopoManager ( ).fuseEdges (edges);
+	Mgx3D::Internal::M3DCommandResult*	result	= getContext ( ).getTopoManager ( ).fuseEdges (edges);
 	CHECK_NULL_PTR_ERROR (result)
 	setCommandResult (result);
 	if (CommandIfc::FAIL == result->getStatus ( ))
