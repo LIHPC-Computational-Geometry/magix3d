@@ -23,7 +23,7 @@ const std::string& CommandCreator::getName ( ) const
     return m_name;
 }
 /*----------------------------------------------------------------------------*/
-Utils::CommandManagerIfc& CommandCreator::getCommandManager()
+Utils::CommandManager& CommandCreator::getCommandManager()
 {
     return m_context->getCommandManager();
 }

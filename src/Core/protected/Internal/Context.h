@@ -171,8 +171,8 @@ public:
 	/*------------------------------------------------------------------------*/
 	/** \brief  Accesseur sur le manager de commandes
 	 */
-	Mgx3D::Utils::CommandManagerIfc& getCommandManager();
-	void setCommandManager (Mgx3D::Utils::CommandManagerIfc* mgr);
+	Mgx3D::Utils::CommandManager& getCommandManager();
+	void setCommandManager (Mgx3D::Utils::CommandManager* mgr);
 	Mgx3D::Utils::CommandManager& getLocalCommandManager();
 
 	/*------------------------------------------------------------------------*/
@@ -620,7 +620,7 @@ private:
 	Context& operator = (const Context&);
 
     /// Manager pour les commandes
-    Mgx3D::Utils::CommandManagerIfc*    m_command_manager; // on utilise un pointeur pour éviter d'inclure le .h car cela pose pb / swig
+    Mgx3D::Utils::CommandManager*    m_command_manager; // on utilise un pointeur pour éviter d'inclure le .h car cela pose pb / swig
 	/// Session Python :
 	TkUtil::PythonSession*				m_python_session;
     /// Manager pour les commandes géométriques

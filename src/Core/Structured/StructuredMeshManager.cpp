@@ -7,7 +7,7 @@
 #include "Structured/StructuredMeshManager.h"
 #include "Structured/CommandReleaseStructuredData.h"
 #include "Utils/Common.h"
-#include "Utils/CommandManagerIfc.h"
+#include "Utils/CommandManager.h"
 #include "Internal/Context.h"
 #include "Internal/M3DCommandResult.h"
 

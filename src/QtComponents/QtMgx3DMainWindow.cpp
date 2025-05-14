@@ -3840,7 +3840,7 @@ void QtMgx3DMainWindow::executePythonScript (const string &f)
 }    // QtMgx3DMainWindow::executePythonScript
 
 
-		CommandManagerIfc &QtMgx3DMainWindow::getCommandManager()
+		CommandManager &QtMgx3DMainWindow::getCommandManager()
 		{
 			return getContext().getCommandManager();
 		}    // QtMgx3DMainWindow::getCommandManager
@@ -4128,7 +4128,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 
 		void QtMgx3DMainWindow::registerToManagers()
 		{
-			CommandManagerIfc *cmdMgr = 0;    // 0 si pas de contexte
+			CommandManager *cmdMgr = 0;    // 0 si pas de contexte
 			UndoRedoManager   *urm    = 0;    // 0 si pas de contexte
 			SelectionManager  *sm     = 0;    // 0 si pas de contexte
 			// ATTENTION :
@@ -4138,7 +4138,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 			// jour ...
 			try
 			{
-				cmdMgr = dynamic_cast<CommandManagerIfc *>(&getCommandManager());
+				cmdMgr = dynamic_cast<CommandManager *>(&getCommandManager());
 			}
 			catch (...)
 			{
