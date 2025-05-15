@@ -536,6 +536,10 @@ void vtkMgx3DInteractorStyle::OnLeftButtonDown ( )
 
 void vtkMgx3DInteractorStyle::OnMiddleButtonDown ( )
 {
+	vtkRenderWindowInteractor*	rwi	= this->Interactor;
+	if (0 != rwi)
+		rwi->GetEventPosition (ButtonPressPosition);
+
 	if ((false == GetInteractiveSelectionActivated ( )) || (false == isControlKeyPressed ( )))
 	{
 		vtkUnifiedInteractorStyle::OnMiddleButtonDown ( );
@@ -595,12 +599,23 @@ void vtkMgx3DInteractorStyle::OnRightButtonDown ( )
 void vtkMgx3DInteractorStyle::OnLeftButtonUp ( )
 {
 	// Arrêter un éventuel déclenchement d'interaction :
+	vtkRenderWindowInteractor*	rwi	= this->Interactor;
+	bool	doRender	= true;
+	if (0 != rwi)
+	{	// Ne rien afficher si absence de déplacement entre le début et la fin du clic :
+		int	pos [2];
+		rwi->GetEventPosition (pos);
+		if (0 == memcmp (pos, ButtonPressPosition, 2 * sizeof (int)))
+			doRender	= false;
+	}	// if (0 != rwi)
+	if ((false == doRender) && (0 != CurrentRenderer))
+		CurrentRenderer->DrawOff ( );
 	vtkUnifiedInteractorStyle::OnLeftButtonUp ( );
+	if ((false == doRender) && (0 != CurrentRenderer))
+		CurrentRenderer->DrawOn ( );
 
 	if (true == GetInteractiveSelectionActivated ( ))
 	{
-		vtkRenderWindowInteractor*	rwi	= this->Interactor;
-		
 		if (VTKIS_RUBBER_BAND != GetState ( ))
 		{
 			// Si le curseur n'a pas bougé depuis la pression sur le bouton, et que c'est paramétré tel que, on fait un picking :
@@ -720,8 +735,21 @@ void vtkMgx3DInteractorStyle::OnLeftButtonUp ( )
 void vtkMgx3DInteractorStyle::OnRightButtonUp ( )
 {
 	// Arrêter un éventuel déclenchement d'interaction :
+	vtkRenderWindowInteractor*	rwi	= this->Interactor;
+	bool	doRender	= true;
+	if (0 != rwi)
+	{	// Ne rien afficher si absence de déplacement entre le début et la fin du clic :
+		int	pos [2];
+		rwi->GetEventPosition (pos);
+		if (0 == memcmp (pos, ButtonPressPosition, 2 * sizeof (int)))
+			doRender	= false;
+	}	// if (0 != rwi)
+	if ((false == doRender) && (0 != CurrentRenderer))
+		CurrentRenderer->DrawOff ( );
 	vtkUnifiedInteractorStyle::OnRightButtonUp ( );
-
+	if ((false == doRender) && (0 != CurrentRenderer))
+		CurrentRenderer->DrawOn ( );
+		
 	// Si le curseur n'a pas bougé depuis la pression sur le bouton, et que
 	// c'est paramétré tel que, on fait un picking :
 	if ((true == GetInteractiveSelectionActivated ( )) && (true == Resources::instance ( )._pickOnRightButtonUp.getValue ( )))
@@ -737,6 +765,25 @@ void vtkMgx3DInteractorStyle::OnRightButtonUp ( )
 		}
 	}	// if ((true == GetInteractiveSelectionActivated ( )) && ...
 }	// vtkMgx3DInteractorStyle::OnRightButtonUp
+
+
+void vtkMgx3DInteractorStyle::OnMiddleButtonUp ( )
+{
+	vtkRenderWindowInteractor*	rwi	= this->Interactor;
+	bool	doRender	= true;
+	if (0 != rwi)
+	{	// Ne rien afficher si absence de déplacement entre le début et la fin du clic :
+		int	pos [2];
+		rwi->GetEventPosition (pos);
+		if (0 == memcmp (pos, ButtonPressPosition, 2 * sizeof (int)))
+			doRender	= false;
+	}	// if (0 != rwi)
+	if ((false == doRender) && (0 != CurrentRenderer))
+		CurrentRenderer->DrawOff ( );
+	vtkUnifiedInteractorStyle::OnMiddleButtonUp ( );
+	if ((false == doRender) && (0 != CurrentRenderer))
+		CurrentRenderer->DrawOn ( );
+}	// vtkMgx3DInteractorStyle::OnMiddleButtonUp
 
 
 void vtkMgx3DInteractorStyle::SetSelectionManager (SelectionManagerIfc* mgr)

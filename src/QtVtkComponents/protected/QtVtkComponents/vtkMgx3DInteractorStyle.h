@@ -245,6 +245,8 @@ class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 	 * \see		SetInteractiveSelectionActivated
 	 */
 	virtual void OnRightButtonUp ( );
+	
+	virtual void OnMiddleButtonUp ( );
 
 	/**
 	 * \param	Gestionnaire de sélection <I>Magix 3D</I> associé.
