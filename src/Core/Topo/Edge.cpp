@@ -1,35 +1,23 @@
 /*----------------------------------------------------------------------------*/
-/** \file Edge.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 19/11/2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
 #include <iostream>
 #include <vector>
 #include <list>
 #include <map>
 #include <string.h>
 /*----------------------------------------------------------------------------*/
+#include "Internal/Context.h"
+#include "Internal/InfoCommand.h"
 #include "Topo/TopoHelper.h"
 #include "Topo/Edge.h"
 #include "Topo/CoFace.h"
 #include "Topo/TopoDisplayRepresentation.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Topo/CommandEditTopo.h"
-
 #include "Mesh/CommandCreateMesh.h"
 #include "Mesh/MeshItf.h"
-
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/SerializedRepresentation.h"
-
-#include "Internal/InfoCommand.h"
-#include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/UTF8String.h>
@@ -853,7 +841,7 @@ getNodes(Vertex* v1, Vertex* v2, std::vector<gmds::Node>& vectNd)
 #endif
 
 
-    gmds::Mesh& gmds_mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
+    gmds::Mesh& gmds_mesh = getContext().getMeshManager().getMesh()->getGMDSMesh();
 
     // le premier noeud
     vectNd.clear();

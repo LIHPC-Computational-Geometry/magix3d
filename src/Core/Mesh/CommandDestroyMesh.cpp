@@ -1,13 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandDestroyMesh.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 23 sept. 2014
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Mesh/CommandDestroyMesh.h"
 #include "Mesh/Volume.h"
 #include "Mesh/Surface.h"
@@ -15,9 +7,9 @@
 #include "Mesh/Cloud.h"
 #include "Mesh/MeshItf.h"
 #include "Mesh/MeshModificationItf.h"
-
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
-
+/*----------------------------------------------------------------------------*/
 #include <gmds/ig/Mesh.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
@@ -37,19 +29,19 @@ void CommandDestroyMesh::internalExecute()
 {
 	std::vector<Mesh::MeshEntity*> me;
 	std::vector<Mesh::Volume*> mvol;
-	getContext().getLocalMeshManager().getVolumes(mvol);
+	getContext().getMeshManager().getVolumes(mvol);
 	for (uint i=0; i<mvol.size(); i++)
 		me.push_back(mvol[i]);
 	std::vector<Mesh::Surface*> msurf;
-	getContext().getLocalMeshManager().getSurfaces(msurf);
+	getContext().getMeshManager().getSurfaces(msurf);
 	for (uint i=0; i<msurf.size(); i++)
 		me.push_back(msurf[i]);
 	std::vector<Mesh::Line*> mline;
-	getContext().getLocalMeshManager().getLines(mline);
+	getContext().getMeshManager().getLines(mline);
 	for (uint i=0; i<mline.size(); i++)
 		me.push_back(mline[i]);
 	std::vector<Mesh::Cloud*> mcloud;
-	getContext().getLocalMeshManager().getClouds(mcloud);
+	getContext().getMeshManager().getClouds(mcloud);
 	for (uint i=0; i<mcloud.size(); i++)
 		me.push_back(mcloud[i]);
 
@@ -61,19 +53,19 @@ void CommandDestroyMesh::internalExecute()
 
 	// commande de destruction de toutes les entités topologiques qui ont pu être construites
 	std::vector<Topo::Block*> blocks;
-	getContext().getLocalTopoManager().getBlocks(blocks);
+	getContext().getTopoManager().getBlocks(blocks);
 	for (uint i=0; i<blocks.size(); i++)
 		blocks[i]->getMeshingData()->setMeshed(false);
 	std::vector<Topo::CoFace*> cofaces;
-	getContext().getLocalTopoManager().getCoFaces(cofaces);
+	getContext().getTopoManager().getCoFaces(cofaces);
 	for (uint i=0; i<cofaces.size(); i++)
 		cofaces[i]->getMeshingData()->setMeshed(false);
 	std::vector<Topo::CoEdge*> coedges;
-	getContext().getLocalTopoManager().getCoEdges(coedges);
+	getContext().getTopoManager().getCoEdges(coedges);
 	for (uint i=0; i<coedges.size(); i++)
 		coedges[i]->getMeshingData()->setMeshed(false);
 	std::vector<Topo::Vertex*> vertices;
-	getContext().getLocalTopoManager().getVertices(vertices);
+	getContext().getTopoManager().getVertices(vertices);
 	for (uint i=0; i<vertices.size(); i++)
 		vertices[i]->getMeshingData()->setMeshed(false);
 }

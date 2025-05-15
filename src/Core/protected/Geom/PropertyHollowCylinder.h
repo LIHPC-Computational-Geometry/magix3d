@@ -1,16 +1,5 @@
-/*----------------------------------------------------------------------------*/
-/*
- * PropertyHollowCylinder.h
- *
- *  Created on: 12 nov. 2014
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #ifndef PROPERTYHOLLOWCYLINDER_H_
 #define PROPERTYHOLLOWCYLINDER_H_
-/*----------------------------------------------------------------------------*/
-//inclusion de fichiers de la STL
-#include <string>
 /*----------------------------------------------------------------------------*/
 #include "Utils/Point.h"
 #include "Utils/Vector.h"

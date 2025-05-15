@@ -4,7 +4,7 @@
  * \date        22/06/2015
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Geom/Volume.h"
@@ -60,7 +60,7 @@ QtTopologyFuse2BlocksPanel::QtTopologyFuse2BlocksPanel (
 	// Le bloc 1 à fusionner :
 	_block1Panel	= new QtMgx3DEntityPanel (
 			this, "", true, "Bloc 1 :", "", &mainWindow,
-			SelectionManagerIfc::D3, FilterEntity::TopoBlock);
+			SelectionManager::D3, FilterEntity::TopoBlock);
 	connect (_block1Panel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
 	connect (_block1Panel, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -70,7 +70,7 @@ QtTopologyFuse2BlocksPanel::QtTopologyFuse2BlocksPanel (
 	// Le bloc 2 à fusionner :
 	_block2Panel	= new QtMgx3DEntityPanel (
 			this, "", true, "Bloc 2 :", "", &mainWindow,
-			SelectionManagerIfc::D3, FilterEntity::TopoBlock);
+			SelectionManager::D3, FilterEntity::TopoBlock);
 	connect (_block2Panel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
 	connect (_block2Panel, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -293,12 +293,12 @@ void QtTopologyFuse2BlocksAction::executeOperation ( )
 	const string	name1	= panel->getBlock1Name ( );
 	const string	name2	= panel->getBlock2Name ( );
 
-	Mgx3D::Internal::M3DCommandResultIfc*	result	= getContext ( ).getTopoManager ( ).fuse2Blocks (name1, name2);
+	Mgx3D::Internal::M3DCommandResult*	result	= getContext ( ).getTopoManager ( ).fuse2Blocks (name1, name2);
 	CHECK_NULL_PTR_ERROR (result)
 	setCommandResult (result);
-	if (CommandIfc::FAIL == result->getStatus ( ))
+	if (Command::FAIL == result->getStatus ( ))
 		throw Exception (result->getErrorMessage ( ));
-	else if (CommandIfc::CANCELED == result->getStatus ( ))
+	else if (Command::CANCELED == result->getStatus ( ))
 		throw Exception ("Opération annulée");
 }	// QtTopologyFuse2BlocksAction::executeOperation
 

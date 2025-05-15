@@ -4,7 +4,7 @@
  * \date		15/3/2019
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -65,7 +65,7 @@ QtTopologyVertexCreationPanel::QtTopologyVertexCreationPanel (
 	// Point à associer :
 	_vertexPanel	= new QtMgx3DEntityPanel (
 						this, "", true, "Point associé :", "",
-						&mainWindow, SelectionManagerIfc::D0,
+						&mainWindow, SelectionManager::D0,
 						FilterEntity::GeomVertex);
 	layout->addWidget (_vertexPanel);
 	connect (_vertexPanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -461,7 +461,7 @@ void QtTopologyVertexCreationAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (panel)
 
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtTopologyCreationAction::executeOperation ( );
 
 	// Récupération des paramètres d'association des entités topologiques :

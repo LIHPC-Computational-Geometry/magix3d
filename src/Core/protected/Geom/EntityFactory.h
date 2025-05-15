@@ -1,27 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/** \file EntityFactory.h
- *
- *  \author Franck Ledoux
- *
- *  \date 14/10/2010
- */
-/*----------------------------------------------------------------------------*/
 #ifndef ENTITYFACTORY_H_
 #define ENTITYFACTORY_H_
 /*----------------------------------------------------------------------------*/
 #include "Internal/Context.h"
 #include "Geom/Volume.h"
-#include "Geom/Surface.h"
 #include "Geom/Curve.h"
-#include "Geom/Vertex.h"
-#include "Geom/PropertyBox.h"
-#include "Geom/PropertyCylinder.h"
-#include "Geom/PropertyCone.h"
-#include "Geom/PropertySphere.h"
 #include "Geom/PropertySpherePart.h"
 #include "Geom/PropertyHollowSpherePart.h"
-#include "Geom/PropertyHollowCylinder.h"
-#include "Geom/PropertyHollowSphere.h"
 #include "Utils/Point.h"
 /*----------------------------------------------------------------------------*/
 #include <vector>
@@ -31,11 +15,8 @@
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Vertex.hxx>
 #include <TopoDS_Shell.hxx>
-#include <TopoDS_Wire.hxx>
 #include <TopoDS_Shape.hxx>
-#include <gp_Pnt.hxx>
 #include <gp_Vec.hxx>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

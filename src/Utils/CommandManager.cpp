@@ -34,30 +34,30 @@ namespace Utils {
 // on force le séquentiel comme défaut
 unsigned long   			CommandManager::sequentialDuration  = (unsigned long)-1;
 
-CommandManagerIfc::POLICY	CommandManager::runningPolicy		= CommandManagerIfc::THREADED;
+CommandManager::POLICY	CommandManager::runningPolicy		= CommandManager::THREADED;
 
 
 CommandManager::CommandManager (const string& name)
-	: CommandManagerIfc ( ), ReferencedNamedObject (name),
+	: ReferencedNamedObject (name),
 	  _runners ( ), _runnersMutex (false),
 	  _commandObservers ( ), _logStream (0),
 	  _undoManager (new UndoRedoManager ("UndoRedoManager")),
 	  _commands ( ), _queuedCommands ( ),
 	  _policy (runningPolicy),
 	  _queuingMutex (false), _sequentialMutex (false), _sequentialCommand (0),
-	  _currentStatus (CommandIfc::DONE), _currentCommandName ( )
+	  _currentStatus (Command::DONE), _currentCommandName ( )
 {
 }	// CommandManager::CommandManager
 
 
 CommandManager::CommandManager (const CommandManager&)
-	: CommandManagerIfc ( ), ReferencedNamedObject ("unamed"),
+	: ReferencedNamedObject ("unamed"),
 	  _runners ( ), _runnersMutex (false),
 	  _commandObservers ( ), _logStream (0), _undoManager(0),
 	  _commands ( ), _queuedCommands ( ),
 	  _policy (runningPolicy),
 	  _queuingMutex (false), _sequentialMutex (false), _sequentialCommand (0),
-	  _currentStatus (CommandIfc::FAIL), _currentCommandName ( )
+	  _currentStatus (Command::FAIL), _currentCommandName ( )
 {
 	MGX_FORBIDDEN ("CommandManager copy constructor is not allowed.");
 }	// CommandManager::CommandManager
@@ -105,13 +105,13 @@ const string& CommandManager::getName ( ) const
 }	// CommandManager::getName
 
 
-CommandManagerIfc::POLICY CommandManager::getPolicy ( ) const
+CommandManager::POLICY CommandManager::getPolicy ( ) const
 {
 	return _policy;
 }   // CommandManager::getPolicy
 
 
-CommandManagerIfc::POLICY CommandManager::setPolicy (POLICY policy)
+CommandManager::POLICY CommandManager::setPolicy (POLICY policy)
 {
 	AutoMutex	queuingAutoMutex (&_queuingMutex);
 
@@ -122,7 +122,7 @@ CommandManagerIfc::POLICY CommandManager::setPolicy (POLICY policy)
 }   // CommandManager::setPolicy
 
 
-void CommandManager::addCommand (CommandIfc* cmd, Command::PLAY_TYPE pt)
+void CommandManager::addCommand (Command* cmd, Command::PLAY_TYPE pt)
 {
 	// ========================================================================
 	// Note CP : attention, pb rencontré lorsque l'on fait des successions de
@@ -166,11 +166,11 @@ void CommandManager::addCommand (CommandIfc* cmd, Command::PLAY_TYPE pt)
 	try
 	{
 
-		if ((CommandIfc::QUEUED == pt) ||
-				((CommandManagerIfc::SEQUENTIAL == getPolicy ( )) &&
+		if ((Command::QUEUED == pt) ||
+				((SEQUENTIAL == getPolicy ( )) &&
 						((true == hasRunning) || (true == hasQueuedCommands( ))) ||
 						((true == hasRunning) &&
-								((CommandIfc::UNDO == pt) || CommandIfc::REDO == pt)))
+								((Command::UNDO == pt) || Command::REDO == pt)))
 		)
 		{
 			addToQueue (cmd, pt);
@@ -247,11 +247,11 @@ void CommandManager::addCommand (CommandIfc* cmd, Command::PLAY_TYPE pt)
 		if (Command::UNDO != pt)
 			estimatedTime = command->getEstimatedDuration (pt);
 //unsigned long	estimatedTime	= 999999999999;
-		if ((CommandManagerIfc::SEQUENTIAL == getPolicy ( )) ||
+		if ((SEQUENTIAL == getPolicy ( )) ||
 				(false == command->threadable ( ))   ||
 				(estimatedTime < sequentialDuration) ||
-				(CommandIfc::UNDO == pt)             ||
-				(CommandIfc::REDO == pt)
+				(Command::UNDO == pt)             ||
+				(Command::REDO == pt)
 		)
 			executeSequential (command, pt);
 		else
@@ -280,19 +280,6 @@ void CommandManager::processQueuedCommands ( )
 	while ((false == hasRunningCommands ( )) && (true == hasQueuedCommands ( )))
 		runQueuedCommand ( );
 }	// CommandManager::processQueuedCommands
-
-
-std::vector<CommandIfc*> CommandManager::getCommandIfcs ( ) const
-{
-	AutoMutex	autoMutex (getMutex ( ));
-
-	std::vector<CommandIfc*>	commands;
-	for (std::vector<Command*>::const_iterator it = _commands.begin ( );
-	     _commands.end ( ) != it; it++)
-		commands.push_back (*it);
-
-	return commands;
-}	// CommandManager::getCommandIfcs
 
 
 std::vector<Command*> CommandManager::getCommands ( ) const
@@ -402,7 +389,7 @@ void CommandManager::wait ( )
 }	// CommandManager::wait
 
 
-CommandIfc::status CommandManager::getStatus ( ) const
+Command::status CommandManager::getStatus ( ) const
 {
 	return _currentStatus;
 }	// CommandManager::getStatus
@@ -414,21 +401,21 @@ string CommandManager::getCommandName ( ) const
 }	// CommandManager::getCommandName
 
 
-const UndoRedoManagerIfc& CommandManager::getUndoManager ( ) const
+const UndoRedoManager& CommandManager::getUndoManager ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_undoManager)
 	return *_undoManager;
 }	// CommandManager::getUndoManager
 
 
-UndoRedoManagerIfc& CommandManager::getUndoManager ( )
+UndoRedoManager& CommandManager::getUndoManager ( )
 {
 	CHECK_NULL_PTR_ERROR (_undoManager)
 	return *_undoManager;
 }	// CommandManager::getUndoManager
 
 
-void CommandManager::setUndoManager (UndoRedoManagerIfc* mgr)
+void CommandManager::setUndoManager (UndoRedoManager* mgr)
 {
 	if (_undoManager == mgr)
 		return;
@@ -515,7 +502,7 @@ void CommandManager::observableModified (ReferencedObject* object, unsigned long
         getUndoManager ( ).store (command);
 
     // suppression des commandes déjouées
-    if (Command::STARTING == status && command->getPlayType() == CommandIfc::DO)
+    if (Command::STARTING == status && command->getPlayType() == Command::DO)
         getUndoManager ( ).clearUndone ();
 
 	switch (status)
@@ -596,7 +583,7 @@ void CommandManager::undo ()
     TkUtil::UTF8String   message (Charset::UTF_8);
     std::string             name;
 
-    CommandIfc*    cmd = getUndoManager ( ).undoableCommand ( );
+    Command*    cmd = getUndoManager ( ).undoableCommand ( );
     if (0 == cmd)
     {
         throw Exception ("CommandManager::undo, Fonction annuler indisponible, absence de commande à annuler.");
@@ -631,7 +618,7 @@ void CommandManager::redo ()
     TkUtil::UTF8String   message (Charset::UTF_8);
     std::string             name;
 
-    CommandIfc*    cmd = getUndoManager ( ).redoableCommand ( );
+    Command*    cmd = getUndoManager ( ).redoableCommand ( );
     if (0 == cmd)
     {
         throw Exception ("CommandManager::redo, Fonction rejouer indisponible, absence de commande à rejouer.");
@@ -655,7 +642,7 @@ void CommandManager::redo ()
 }	// CommandManager::redo
 
 
-void CommandManager::executeSequential (CommandIfc* cmd, Command::PLAY_TYPE pt)
+void CommandManager::executeSequential (Command* cmd, Command::PLAY_TYPE pt)
 {
 	// Magix3D Issue #54 Un thread séquentiel (ex : écriture d'un maillage) ne doit pas s'exécuter en concurrence avec un autre thread (ex : génération d'un maillage) 
 	// => on s'assure qu'il n'y a pas d'éventuels autre thread en cours.
@@ -714,7 +701,7 @@ void CommandManager::executeSequential (CommandIfc* cmd, Command::PLAY_TYPE pt)
 }	// CommandManager::executeSequential
 
 
-void CommandManager::executeThreaded (CommandIfc* cmd, Command::PLAY_TYPE pt)
+void CommandManager::executeThreaded (Command* cmd, Command::PLAY_TYPE pt)
 {
 	MutexUnlocker	unlocker (&_sequentialMutex);
 	Command*	command	= dynamic_cast<Command*>(cmd);
@@ -766,24 +753,24 @@ void CommandManager::runQueuedCommand ( )
 	{
 		{
 			Command*				cmd	= 0;
-			CommandIfc::PLAY_TYPE	pt;
+			Command::PLAY_TYPE	pt;
 			{
 				AutoMutex	mutex (&_queuingMutex);
 				cmd	= (*(_queuedCommands.begin ( ))).first;
 				pt	= (*(_queuedCommands.begin ( ))).second;
-				if (CommandIfc::QUEUED == pt)
-					pt	= CommandIfc::DO;
+				if (Command::QUEUED == pt)
+					pt	= Command::DO;
 				_queuedCommands.pop_front (  );
 				if (0 == cmd)
 					return;
 			}
 
 			unsigned long	estimatedTime	= cmd->getEstimatedDuration (pt);
-			if ((CommandManagerIfc::SEQUENTIAL == getPolicy ( )) ||
+			if ((SEQUENTIAL == getPolicy ( )) ||
 			    (false == cmd->threadable ( ))       ||
 			    (estimatedTime < sequentialDuration) ||
-			    (CommandIfc::UNDO == pt)             ||
-			    (CommandIfc::REDO == pt)
+			    (Command::UNDO == pt)             ||
+			    (Command::REDO == pt)
 				)
 			{
 				executeSequential (cmd, pt);
@@ -795,7 +782,7 @@ void CommandManager::runQueuedCommand ( )
 }	// CommandManager::runQueuedCommand
 
 
-void CommandManager::addToQueue (CommandIfc* command, Command::PLAY_TYPE pt)
+void CommandManager::addToQueue (Command* command, Command::PLAY_TYPE pt)
 {
 	if (0 == command)
 	{
@@ -804,12 +791,12 @@ void CommandManager::addToQueue (CommandIfc* command, Command::PLAY_TYPE pt)
 	}	// if (0 == command)
 
 	Command*	cmd	= dynamic_cast<Command*>(command);
-	if (CommandIfc::QUEUED == pt)
-		pt	= CommandIfc::DO;
+	if (Command::QUEUED == pt)
+		pt	= Command::DO;
 	{
 		AutoMutex	queuingAutoMutex (&_queuingMutex);
 		_queuedCommands.push_back (
-								pair<Command*, CommandIfc::PLAY_TYPE>(cmd, pt));
+								pair<Command*, Command::PLAY_TYPE>(cmd, pt));
 	}
 
 	UTF8String	message (Charset::UTF_8);

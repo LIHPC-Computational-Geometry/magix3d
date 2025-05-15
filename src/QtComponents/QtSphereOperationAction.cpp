@@ -4,11 +4,10 @@
  * \date        27/05/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManagerIfc.h"
 #include "Geom/Vertex.h"
 #include "Utils/Vector.h"
 #include "QtComponents/QtSphereOperationAction.h"
@@ -641,7 +640,7 @@ QtSphereOperationPanel* QtSphereOperationAction::getSpherePanel ( )
 void QtSphereOperationAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 //	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de création de la sphère :

@@ -1,13 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/*
- * GeomImport.cpp
- *
- *  Created on: 30 oct. 2014
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
 #include "Geom/GeomImport.h"
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
@@ -16,15 +7,13 @@
 #include "Geom/EntityFactory.h"
 #include "Geom/OCCHelper.h"
 #include "Geom/GeomSplitImplementation.h"
-
 #include "Group/GroupManager.h"
 #include "Group/Group3D.h"
 #include "Group/Group2D.h"
 #include "Group/Group1D.h"
 #include "Group/Group0D.h"
-
 #include "Internal/InfoCommand.h"
-
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/MemoryError.h>
@@ -33,8 +22,6 @@
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Solid.hxx>
 #include <TopoDS_Shell.hxx>
-#include <TopoDS_Compound.hxx>
-#include <TopoDS_CompSolid.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 #include <BRep_Builder.hxx>
@@ -334,7 +321,7 @@ void GeomImport::add(TopoDS_Shape& AShape, const std::string& AName)
 void GeomImport::
 addToGroup(Volume* v, const std::string& AName)
 {
-    Group::Group3D* group = getContext().getLocalGroupManager().getNewGroup3D(AName, m_icmd);
+    Group::Group3D* group = getContext().getGroupManager().getNewGroup3D(AName, m_icmd);
     v->add(group);
     group->add(v);
     m_icmd->addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
@@ -343,7 +330,7 @@ addToGroup(Volume* v, const std::string& AName)
 void GeomImport::
 addToGroup(Surface* s, const std::string& AName)
 {
-    Group::Group2D* group = getContext().getLocalGroupManager().getNewGroup2D(AName, m_icmd);
+    Group::Group2D* group = getContext().getGroupManager().getNewGroup2D(AName, m_icmd);
     s->add(group);
     group->add(s);
     m_icmd->addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
@@ -352,7 +339,7 @@ addToGroup(Surface* s, const std::string& AName)
 void GeomImport::
 addToGroup(Curve* c, const std::string& AName)
 {
-    Group::Group1D* group = getContext().getLocalGroupManager().getNewGroup1D(AName, m_icmd);
+    Group::Group1D* group = getContext().getGroupManager().getNewGroup1D(AName, m_icmd);
     c->add(group);
     group->add(c);
     m_icmd->addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
@@ -361,7 +348,7 @@ addToGroup(Curve* c, const std::string& AName)
 void GeomImport::
 addToGroup(Vertex* v, const std::string& AName)
 {
-    Group::Group0D* group = getContext().getLocalGroupManager().getNewGroup0D(AName, m_icmd);
+    Group::Group0D* group = getContext().getGroupManager().getNewGroup0D(AName, m_icmd);
     v->add(group);
     group->add(v);
     m_icmd->addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
@@ -373,7 +360,7 @@ store(Volume* v)
 	m_newEntities.push_back(v);
 	m_newVolumes.push_back(v);
 	m_icmd->addGeomInfoEntity (v, Internal::InfoCommand::CREATED);
-	getContext().getLocalGeomManager().addEntity(v);
+	getContext().getGeomManager().addEntity(v);
 }
 /*----------------------------------------------------------------------------*/
 void GeomImport::
@@ -382,7 +369,7 @@ store(Surface* s)
 	m_newEntities.push_back(s);
 	m_newSurfaces.push_back(s);
 	m_icmd->addGeomInfoEntity (s, Internal::InfoCommand::CREATED);
-	getContext().getLocalGeomManager().addEntity(s);
+	getContext().getGeomManager().addEntity(s);
 }
 /*----------------------------------------------------------------------------*/
 void GeomImport::
@@ -391,7 +378,7 @@ store(Curve* c)
 	m_newEntities.push_back(c);
 	m_newCurves.push_back(c);
 	m_icmd->addGeomInfoEntity (c, Internal::InfoCommand::CREATED);
-	getContext().getLocalGeomManager().addEntity(c);
+	getContext().getGeomManager().addEntity(c);
 }
 /*----------------------------------------------------------------------------*/
 void GeomImport::
@@ -400,7 +387,7 @@ store(Vertex* v)
 	m_newEntities.push_back(v);
 	m_newVertices.push_back(v);
 	m_icmd->addGeomInfoEntity (v, Internal::InfoCommand::CREATED);
-	getContext().getLocalGeomManager().addEntity(v);
+	getContext().getGeomManager().addEntity(v);
 }
 /*----------------------------------------------------------------------------*/
 void GeomImport::

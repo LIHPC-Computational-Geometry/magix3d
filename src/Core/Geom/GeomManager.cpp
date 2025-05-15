@@ -1,18 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file GeomManager.cpp
- *
- *  \author Franck Ledoux, Eric Brière de l'Isle
- *
- *  \date 14/10/2010
- *
- *
- *
- *  Modified on: 21/02/2022
- *      Author: Simon C
- *      ajout de la possibilité de conserver les entités géométriques
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
 #include "Geom/GeomManager.h"
 #include "Geom/GeomEntity.h"
 #include "Geom/Volume.h"
@@ -72,7 +58,6 @@
 #include "Geom/CommandJoinCurves.h"
 #include "Geom/CommandJoinSurfaces.h"
 #include "Geom/IncidentGeomEntitiesVisitor.h"
-
 #include "Internal/ImportMDLImplementation.h"
 #include "Internal/ImportMDL2Commandes.h"
 #include "Internal/ExportMDLImplementation.h"
@@ -81,27 +66,19 @@
 #include "Internal/CommandComposite.h"
 #include "Internal/EntitiesHelper.h"
 #include "Internal/M3DCommandResult.h"
-#include "Internal/CommandChangeLengthUnit.h"
 #include "Internal/PythonWriter.h"
-
-#include "Utils/Entity.h"
 #include "Utils/ErrorManagement.h"
-#include "Utils/MgxNumeric.h"
 #include "Utils/Plane.h"
 #include "Utils/Vector.h"
 #include "Utils/Rotation.h"
 #include "Utils/CommandManager.h"
 #include "Utils/TypeDedicatedNameManager.h"
 #include "Utils/MgxException.h"
-
 #include "Group/GroupManager.h"
-#include "Group/Group3D.h"
-
 #include "Mesh/CommandAddRemoveGroupName.h"
 #include "Mesh/CommandTranslateMesh.h"
 #include "Mesh/CommandRotateMesh.h"
 #include "Mesh/CommandScaleMesh.h"
-
 #include "Topo/CommandModificationTopo.h"
 #include "Topo/CommandTranslateTopo.h"
 #include "Topo/CommandRotateTopo.h"
@@ -112,12 +89,12 @@
 #include "Topo/CommandDestroyTopo.h"
 #include "Topo/CommandExtrudeTopo.h"
 #include "Topo/TopoHelper.h"
-
 #include "SysCoord/SysCoord.h"
-
+#ifdef USE_MDLPARSER
+#include "Internal/CommandChangeLengthUnit.h"
+#endif
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
-
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/MemoryError.h>
@@ -128,8 +105,8 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 /*----------------------------------------------------------------------------*/
-GeomManager::GeomManager(const std::string& name, Internal::ContextIfc* c)
-:Geom::GeomManagerIfc(name, c)
+GeomManager::GeomManager(const std::string& name, Internal::Context* c)
+:Internal::CommandCreator(name, c)
 {
 }
 /*----------------------------------------------------------------------------*/
@@ -140,7 +117,6 @@ GeomManager::~GeomManager()
 /*----------------------------------------------------------------------------*/
 void GeomManager::clear()
 {
-    // destruction des entités référencées par le manager
     for (std::vector<Volume*>::const_iterator iter = m_volumes.begin();
             iter != m_volumes.end(); ++iter)
         delete *iter;
@@ -230,7 +206,7 @@ Utils::Math::Point GeomManager::getCoord(const std::string& name) const
 	return vtx->getCoord();
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 copy(std::vector<std::string>& e, bool withTopo, std::string groupName)
 {
     std::vector<GeomEntity*> vge;
@@ -240,7 +216,7 @@ copy(std::vector<std::string>& e, bool withTopo, std::string groupName)
     return copy(vge, withTopo, groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 copy(std::vector<GeomEntity*>& e, bool withTopo, std::string groupName)
 {
 	CHECK_ENTITIES_LIST(e)
@@ -260,20 +236,20 @@ copy(std::vector<GeomEntity*>& e, bool withTopo, std::string groupName)
     if (withTopo && Internal::EntitiesHelper::hasTopoRef(e)){
 
         Internal::CommandComposite* commandCompo =
-             new Internal::CommandComposite(getLocalContext(), "Copie de géométries avec topologies");
+             new Internal::CommandComposite(getContext(), "Copie de géométries avec topologies");
 
         CommandGeomCopy *commandGeom =
-                new CommandGeomCopy(getLocalContext(),e, groupName);
+                new CommandGeomCopy(getContext(),e, groupName);
         commandCompo->addCommand(commandGeom);
 
         Topo::CommandDuplicateTopo* commandTopo =
-                new Topo::CommandDuplicateTopo(getLocalContext(), commandGeom);
+                new Topo::CommandDuplicateTopo(getContext(), commandGeom);
         commandCompo->addCommand(commandTopo);
 
         command = commandCompo;
     }
     else {
-        command = new CommandGeomCopy(getLocalContext(),e,groupName);
+        command = new CommandGeomCopy(getContext(),e,groupName);
     }
 
     CHECK_NULL_PTR_ERROR(command);
@@ -292,13 +268,13 @@ copy(std::vector<GeomEntity*>& e, bool withTopo, std::string groupName)
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newVertex(std::string vertexName,std::string curveName, std::string groupName){
     Vertex *v = getVertex(vertexName);
     Curve  *c = getCurve(curveName, false);
@@ -315,7 +291,7 @@ newVertex(std::string vertexName,std::string curveName, std::string groupName){
     }
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newVertex(const Vertex* ref,  Curve* curve, std::string groupName)
 {
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -324,7 +300,7 @@ newVertex(const Vertex* ref,  Curve* curve, std::string groupName)
 
     //creation de la commande de création
     CommandNewVertexByProjection *command =
-            new CommandNewVertexByProjection(getLocalContext(),ref,curve, groupName);
+            new CommandNewVertexByProjection(getContext(),ref,curve, groupName);
 
     // trace dans le script
 	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
@@ -339,12 +315,12 @@ newVertex(const Vertex* ref,  Curve* curve, std::string groupName)
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newVertex(const Vertex* ref,  Surface* surface, std::string groupName)
 {
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -353,7 +329,7 @@ newVertex(const Vertex* ref,  Surface* surface, std::string groupName)
 
     //creation de la commande de création
     CommandNewVertexByProjection *command =
-            new CommandNewVertexByProjection(getLocalContext(),ref,surface, groupName);
+            new CommandNewVertexByProjection(getContext(),ref,surface, groupName);
 
     // trace dans le script
 	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
@@ -368,19 +344,19 @@ newVertex(const Vertex* ref,  Surface* surface, std::string groupName)
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newVertex(std::string curveName, const double& param, std::string groupName)
 {
     Curve  *c = getCurve(curveName);
     return newVertex(c,param, groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newVertex(Curve* curve, const double& param, std::string groupName)
 {
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -389,7 +365,7 @@ newVertex(Curve* curve, const double& param, std::string groupName)
 
     //creation de la commande de création
     CommandNewVertexByCurveParameterization *command =
-            new CommandNewVertexByCurveParameterization(getLocalContext(),curve, param, groupName);
+            new CommandNewVertexByCurveParameterization(getContext(),curve, param, groupName);
 
     // trace dans le script
 	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
@@ -404,12 +380,12 @@ newVertex(Curve* curve, const double& param, std::string groupName)
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newVertex(std::string vertex1Name, std::string vertex2Name, const double& param, std::string groupName)
 {
     Vertex* v1 = getVertex(vertex1Name);
@@ -417,7 +393,7 @@ newVertex(std::string vertex1Name, std::string vertex2Name, const double& param,
     return newVertex(v1, v2 ,param, groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newVertex(const Vertex* ref1, const Vertex* ref2, const double& param, std::string groupName)
 {
     TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -437,7 +413,7 @@ newVertex(const Vertex* ref1, const Vertex* ref2, const double& param, std::stri
 
     //creation de la commande de création
     CommandNewVertex *command =
-            new CommandNewVertex(getLocalContext(),p, groupName);
+            new CommandNewVertex(getContext(),p, groupName);
 
     // trace dans le script
     TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
@@ -452,18 +428,18 @@ newVertex(const Vertex* ref1, const Vertex* ref2, const double& param, std::stri
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newVertex(const double& x, const double& y, const double& z, std::string groupName)
 {
     return newVertex(Point(x,y,z), groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newVertex(const Point& p, std::string groupName)
 {
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -471,7 +447,7 @@ newVertex(const Point& p, std::string groupName)
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     //creation de la commande de création
-    CommandNewVertex *command = new CommandNewVertex(getLocalContext(),p, groupName);
+    CommandNewVertex *command = new CommandNewVertex(getContext(),p, groupName);
 
     // trace dans le script
 	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
@@ -485,29 +461,29 @@ newVertex(const Point& p, std::string groupName)
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 									new Internal::M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newVertexFromTopo(std::string vertexName, bool asso, std::string groupName)
 {
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
 	message << "GeomManager::newVertexFromTopo(" << vertexName << ", " << (true == asso ? "True" : "False") << ", " << groupName << ")";
 	log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
-	Topo::Vertex*	vertex	= getLocalContext ().getTopoManager ( ).getVertex (vertexName, true);
+	Topo::Vertex*	vertex	= getContext ().getTopoManager ( ).getVertex (vertexName, true);
 	CHECK_NULL_PTR_ERROR (vertex)
-	Internal::CommandComposite* commandCompo = new Internal::CommandComposite(getLocalContext(), "Création d'un sommet géométrique à partir d'un sommet topologique.");
+	Internal::CommandComposite* commandCompo = new Internal::CommandComposite(getContext(), "Création d'un sommet géométrique à partir d'un sommet topologique.");
 	CHECK_NULL_PTR_ERROR (commandCompo)
-	CommandNewVertex*	commandVertex = new CommandNewVertex(getLocalContext(),vertex->getCoord ( ), groupName);
+	CommandNewVertex*	commandVertex = new CommandNewVertex(getContext(),vertex->getCoord ( ), groupName);
 	CHECK_NULL_PTR_ERROR (commandVertex)
 	commandCompo->addCommand (commandVertex);
 	std::vector<Topo::TopoEntity*>	verticies;
 	verticies.push_back (vertex);
 	if (true == asso)
 	{
-		Topo::CommandSetGeomAssociation* commandAsso = new Topo::CommandSetGeomAssociation(getLocalContext(), verticies, commandVertex);
+		Topo::CommandSetGeomAssociation* commandAsso = new Topo::CommandSetGeomAssociation(getContext(), verticies, commandVertex);
 		CHECK_NULL_PTR_ERROR (commandAsso)
 		commandCompo->addCommand (commandAsso);
 	}	// if (true == asso)
@@ -519,11 +495,11 @@ newVertexFromTopo(std::string vertexName, bool asso, std::string groupName)
 
     getCommandManager().addCommand(commandCompo, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   = new Internal::M3DCommandResult (*commandCompo);
+    Internal::M3DCommandResult*  cmdResult   = new Internal::M3DCommandResult (*commandCompo);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newSegment(std::string n1,std::string n2, std::string groupName)
 {
     Vertex* v1 = getVertex(n1);
@@ -531,7 +507,7 @@ newSegment(std::string n1,std::string n2, std::string groupName)
     return newSegment(v1,v2, groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newSegment( Geom::Vertex* v1,  Geom::Vertex* v2, std::string groupName)
 {
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -539,7 +515,7 @@ newSegment( Geom::Vertex* v1,  Geom::Vertex* v2, std::string groupName)
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     //creation de la commande de création
-    CommandNewSegment*command = new CommandNewSegment(getLocalContext(),v1,v2, groupName);
+    CommandNewSegment*command = new CommandNewSegment(getContext(),v1,v2, groupName);
     // trace dans le script
 	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().newSegment(\""
@@ -553,12 +529,12 @@ newSegment( Geom::Vertex* v1,  Geom::Vertex* v2, std::string groupName)
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 									new Internal::M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newPlanarSurface(std::vector<std::string>& curve_names, std::string groupName)
 {
     const int nb_curves = curve_names.size();
@@ -569,7 +545,7 @@ newPlanarSurface(std::vector<std::string>& curve_names, std::string groupName)
     return newPlanarSurface(curves, groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newPlanarSurface(const std::vector<Geom::Curve* >& curves, std::string groupName )
 {
 	CHECK_ENTITIES_LIST(curves)
@@ -578,7 +554,7 @@ newPlanarSurface(const std::vector<Geom::Curve* >& curves, std::string groupName
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     //creation de la commande de création
-    CommandNewSurface* command = new CommandNewSurface(getLocalContext(),curves, groupName);
+    CommandNewSurface* command = new CommandNewSurface(getContext(),curves, groupName);
 
     // trace dans le script
 	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
@@ -589,18 +565,18 @@ newPlanarSurface(const std::vector<Geom::Curve* >& curves, std::string groupName
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newSurfaceByOffset(std::string name, const double& offset, std::string groupName)
 {
 	return newSurfaceByOffset(getSurface(name), offset, groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newSurfaceByOffset(Surface* base, const double& offset, std::string groupName)
 {
 	TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -610,7 +586,7 @@ newSurfaceByOffset(Surface* base, const double& offset, std::string groupName)
 	message<<")";
 	log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
-	Internal::CommandInternal* command = new CommandNewSurfaceByOffset(getLocalContext(), base, offset, groupName);
+	Internal::CommandInternal* command = new CommandNewSurfaceByOffset(getContext(), base, offset, groupName);
 
 	// trace dans le script
 	TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -623,12 +599,12 @@ newSurfaceByOffset(Surface* base, const double& offset, std::string groupName)
 
 	getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 			new Internal::M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc* GeomManager::
+Mgx3D::Internal::M3DCommandResult* GeomManager::
 newVerticesCurvesAndPlanarSurface(std::vector<Point>& points, std::string groupName)
 {
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -636,7 +612,7 @@ newVerticesCurvesAndPlanarSurface(std::vector<Point>& points, std::string groupN
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     Internal::CommandComposite* commandCompo =
-    		new Internal::CommandComposite(getLocalContext(), "Création d'une surface avec vecteur de points");
+    		new Internal::CommandComposite(getContext(), "Création d'une surface avec vecteur de points");
 
     uint nbPts = points.size();
 
@@ -644,7 +620,7 @@ newVerticesCurvesAndPlanarSurface(std::vector<Point>& points, std::string groupN
     enum typeCrv {undef, segment, bspline};
     std::vector<Geom::CommandCreateGeom*> cmdsVtx;
     // création du premier sommet
-    CommandNewVertex *commandVtx = new CommandNewVertex(getLocalContext(),points[0], groupName);
+    CommandNewVertex *commandVtx = new CommandNewVertex(getContext(),points[0], groupName);
     cmdsVtx.push_back(commandVtx);
     commandCompo->addCommand(commandVtx);
 
@@ -679,17 +655,17 @@ newVerticesCurvesAndPlanarSurface(std::vector<Point>& points, std::string groupN
     		} else if (dev < max_dev){
     			type_crv = bspline;
     			// construction du point et stokage
-    			CommandNewVertex *commandVtx = new CommandNewVertex(getLocalContext(),points[i], groupName);
+    			CommandNewVertex *commandVtx = new CommandNewVertex(getContext(),points[i], groupName);
     			cmdsVtx.push_back(commandVtx);
     			commandCompo->addCommand(commandVtx);
     		} else {
     			// construction du point
-    			CommandNewVertex *commandVtx = new CommandNewVertex(getLocalContext(),points[i], groupName);
+    			CommandNewVertex *commandVtx = new CommandNewVertex(getContext(),points[i], groupName);
     			cmdsVtx.push_back(commandVtx);
     			commandCompo->addCommand(commandVtx);
 
     			// construction du segment
-    	    	CommandNewSegment *commandSgt = new CommandNewSegment(getLocalContext(),cmdsVtx[0], cmdsVtx[1], groupName);
+    	    	CommandNewSegment *commandSgt = new CommandNewSegment(getContext(),cmdsVtx[0], cmdsVtx[1], groupName);
     	    	cmdsCrv.push_back(commandSgt);
     	    	commandCompo->addCommand(commandSgt);
     	    	//std::cout<<" construction d'un segment"<<std::endl;
@@ -705,12 +681,12 @@ newVerticesCurvesAndPlanarSurface(std::vector<Point>& points, std::string groupN
         			// on ne fait rien de particulier, on passe les points internes
         		} else {
         			// construction du point
-        			CommandNewVertex *commandVtx = new CommandNewVertex(getLocalContext(),points[i], groupName);
+        			CommandNewVertex *commandVtx = new CommandNewVertex(getContext(),points[i], groupName);
         			cmdsVtx.push_back(commandVtx);
         			commandCompo->addCommand(commandVtx);
 
         			// construction du segment
-        	    	CommandNewSegment *commandSgt = new CommandNewSegment(getLocalContext(),cmdsVtx[0], cmdsVtx[1], groupName);
+        	    	CommandNewSegment *commandSgt = new CommandNewSegment(getContext(),cmdsVtx[0], cmdsVtx[1], groupName);
         	    	cmdsCrv.push_back(commandSgt);
         	    	commandCompo->addCommand(commandSgt);
         	    	//std::cout<<" construction d'un segment"<<std::endl;
@@ -726,7 +702,7 @@ newVerticesCurvesAndPlanarSurface(std::vector<Point>& points, std::string groupN
     	} else if (type_crv == bspline) {
 
 			// construction du point
-			CommandNewVertex *commandVtx = new CommandNewVertex(getLocalContext(),points[i], groupName);
+			CommandNewVertex *commandVtx = new CommandNewVertex(getContext(),points[i], groupName);
 			cmdsVtx.push_back(commandVtx);
 			commandCompo->addCommand(commandVtx);
 
@@ -735,7 +711,7 @@ newVerticesCurvesAndPlanarSurface(std::vector<Point>& points, std::string groupN
     		} else {
 
     			// construction de la bspline
-    			CommandNewBSpline *commandCrv = new CommandNewBSpline(getLocalContext(),cmdsVtx, 1, 2, groupName);
+    			CommandNewBSpline *commandCrv = new CommandNewBSpline(getContext(),cmdsVtx, 1, 2, groupName);
     			cmdsCrv.push_back(commandCrv);
     			commandCompo->addCommand(commandCrv);
     	    	//std::cout<<" construction d'une b-spline"<<std::endl;
@@ -758,14 +734,14 @@ newVerticesCurvesAndPlanarSurface(std::vector<Point>& points, std::string groupN
     cmdsVtx.push_back(commandVtx_first);
     if (type_crv == undef || type_crv == segment){
 		// construction du segment
-    	CommandNewSegment *commandSgt = new CommandNewSegment(getLocalContext(),cmdsVtx[0], cmdsVtx[1], groupName);
+    	CommandNewSegment *commandSgt = new CommandNewSegment(getContext(),cmdsVtx[0], cmdsVtx[1], groupName);
     	cmdsCrv.push_back(commandSgt);
     	commandCompo->addCommand(commandSgt);
     	//std::cout<<" construction d'un segment"<<std::endl;
     }
     else if (type_crv == bspline) {
     	// construction de la bspline
-    	CommandNewBSpline *commandCrv = new CommandNewBSpline(getLocalContext(),cmdsVtx, 1, 2, groupName);
+    	CommandNewBSpline *commandCrv = new CommandNewBSpline(getContext(),cmdsVtx, 1, 2, groupName);
     	cmdsCrv.push_back(commandCrv);
     	commandCompo->addCommand(commandCrv);
     	//std::cout<<" construction d'une b-spline"<<std::endl;
@@ -773,7 +749,7 @@ newVerticesCurvesAndPlanarSurface(std::vector<Point>& points, std::string groupN
 
 
     //creation de la commande de création de la surface
-    CommandNewSurface* commandSrf = new CommandNewSurface(getLocalContext(),cmdsCrv, groupName);
+    CommandNewSurface* commandSrf = new CommandNewSurface(getContext(),cmdsCrv, groupName);
     
     commandCompo->addCommand(commandSrf);
 
@@ -786,18 +762,18 @@ newVerticesCurvesAndPlanarSurface(std::vector<Point>& points, std::string groupN
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(commandCompo, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*commandCompo);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc*
+Internal::M3DCommandResult*
 GeomManager::newCurveByCurveProjectionOnSurface(const std::string& curveName, const std::string& surfaceName, std::string groupName)
 {
 	return newCurveByCurveProjectionOnSurface(getCurve(curveName), getSurface(surfaceName), groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc*
+Internal::M3DCommandResult*
 GeomManager::newCurveByCurveProjectionOnSurface(Geom::Curve* curve, Geom::Surface* surface, std::string groupName)
 {
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -805,7 +781,7 @@ GeomManager::newCurveByCurveProjectionOnSurface(Geom::Curve* curve, Geom::Surfac
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     CommandNewCurveByCurveProjectionOnSurface *command =
-            new CommandNewCurveByCurveProjectionOnSurface(getLocalContext(), curve, surface, groupName);
+            new CommandNewCurveByCurveProjectionOnSurface(getContext(), curve, surface, groupName);
     // trace dans le script
 	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().newCurveByCurveProjectionOnSurface(\""
@@ -818,12 +794,12 @@ GeomManager::newCurveByCurveProjectionOnSurface(Geom::Curve* curve, Geom::Surfac
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 destroy(std::vector<std::string>& e_names, bool propagagetDown)
 {
     const int nb_entities= e_names.size();
@@ -835,7 +811,7 @@ destroy(std::vector<std::string>& e_names, bool propagagetDown)
     return destroy(es, propagagetDown);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 destroy(std::vector<Geom::GeomEntity*>& entities, bool propagagetDown)
 {
 	CHECK_ENTITIES_LIST(entities)
@@ -855,19 +831,19 @@ destroy(std::vector<Geom::GeomEntity*>& entities, bool propagagetDown)
     if (Internal::EntitiesHelper::hasTopoRef(entities)){
 
         Internal::CommandComposite* commandCompo =
-             new Internal::CommandComposite(getLocalContext(), "Suppression d'entités géométriques et suppression des liens topologiques");
+             new Internal::CommandComposite(getContext(), "Suppression d'entités géométriques et suppression des liens topologiques");
 
-        Geom::CommandEditGeom *commandGeom = new CommandRemove(getLocalContext(), entities, propagagetDown);
+        Geom::CommandEditGeom *commandGeom = new CommandRemove(getContext(), entities, propagagetDown);
         commandCompo->addCommand(commandGeom);
 
-        Topo::CommandSetGeomAssociation* commandTopo = new Topo::CommandSetGeomAssociation(getLocalContext(),
+        Topo::CommandSetGeomAssociation* commandTopo = new Topo::CommandSetGeomAssociation(getContext(),
         		commandGeom);
         commandCompo->addCommand(commandTopo);
 
         command = commandCompo;
     }
     else {
-    	command = new CommandRemove(getLocalContext(), entities, propagagetDown);
+    	command = new CommandRemove(getContext(), entities, propagagetDown);
     }
 
     // trace dans le script
@@ -887,12 +863,12 @@ destroy(std::vector<Geom::GeomEntity*>& entities, bool propagagetDown)
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 destroyWithTopo(std::vector<std::string>& e_names, bool propagagetDown)
 {
     const int nb_entities= e_names.size();
@@ -904,7 +880,7 @@ destroyWithTopo(std::vector<std::string>& e_names, bool propagagetDown)
     return destroyWithTopo(es, propagagetDown);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 destroyWithTopo(std::vector<Geom::GeomEntity*>& entities, bool propagagetDown)
 {
 	CHECK_ENTITIES_LIST(entities)
@@ -924,19 +900,19 @@ destroyWithTopo(std::vector<Geom::GeomEntity*>& entities, bool propagagetDown)
     if (Internal::EntitiesHelper::hasTopoRef(entities)){
 
         Internal::CommandComposite* commandCompo =
-             new Internal::CommandComposite(getLocalContext(), "Suppression d'entités géométriques et suppression des entités topologiques dépendantes");
+             new Internal::CommandComposite(getContext(), "Suppression d'entités géométriques et suppression des entités topologiques dépendantes");
 
-        Geom::CommandEditGeom *commandGeom = new CommandRemove(getLocalContext(), entities, propagagetDown);
+        Geom::CommandEditGeom *commandGeom = new CommandRemove(getContext(), entities, propagagetDown);
         commandCompo->addCommand(commandGeom);
 
-        Topo::CommandDestroyTopo* commandTopo = new Topo::CommandDestroyTopo(getLocalContext(),
+        Topo::CommandDestroyTopo* commandTopo = new Topo::CommandDestroyTopo(getContext(),
         		commandGeom, propagagetDown);
         commandCompo->addCommand(commandTopo);
 
         command = commandCompo;
     }
     else {
-    	command = new CommandRemove(getLocalContext(), entities, propagagetDown);
+    	command = new CommandRemove(getContext(), entities, propagagetDown);
     }
 
     // trace dans le script
@@ -956,12 +932,12 @@ destroyWithTopo(std::vector<Geom::GeomEntity*>& entities, bool propagagetDown)
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 scale(std::vector<std::string>& geo, const double factor)
 {
     std::vector<GeomEntity*> vge;
@@ -971,7 +947,7 @@ scale(std::vector<std::string>& geo, const double factor)
     return scale(vge,factor, Point(0,0,0));
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 scale(std::vector<std::string>& geo, const double factor, const Point& pcentre)
 {
     std::vector<GeomEntity*> vge;
@@ -981,7 +957,7 @@ scale(std::vector<std::string>& geo, const double factor, const Point& pcentre)
     return scale(vge,factor, pcentre);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 scale(std::vector<Geom::GeomEntity*>& entities, const double factor, const Point& pcentre)
 {
     if (entities.empty()){
@@ -1001,21 +977,21 @@ scale(std::vector<Geom::GeomEntity*>& entities, const double factor, const Point
     if (Internal::EntitiesHelper::hasTopoRef(entities)){
 
         Internal::CommandComposite* commandCompo =
-             new Internal::CommandComposite(getLocalContext(), "Homothétie d'une géométrie avec sa topologie");
+             new Internal::CommandComposite(getContext(), "Homothétie d'une géométrie avec sa topologie");
 
-        commandGeom = new CommandScaling(getLocalContext(), entities, factor, pcentre);
+        commandGeom = new CommandScaling(getContext(), entities, factor, pcentre);
         commandCompo->addCommand(commandGeom);
 
         std::vector<Topo::TopoEntity*> topoEntities = Topo::TopoHelper::getTopoEntities(entities);
 
         Topo::CommandScaleTopo* commandTopo =
-        		new Topo::CommandScaleTopo(getLocalContext(), topoEntities, factor, pcentre);
+        		new Topo::CommandScaleTopo(getContext(), topoEntities, factor, pcentre);
         commandCompo->addCommand(commandTopo);
 
         command = commandCompo;
     }
     else {
-    	commandGeom = new CommandScaling(getLocalContext(), entities, factor, pcentre);
+    	commandGeom = new CommandScaling(getContext(), entities, factor, pcentre);
     	command = commandGeom;
     }
 
@@ -1030,12 +1006,12 @@ scale(std::vector<Geom::GeomEntity*>& entities, const double factor, const Point
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command, commandGeom);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 scaleAll(const double factor, const Point& pcentre)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -1043,15 +1019,15 @@ scaleAll(const double factor, const Point& pcentre)
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     Internal::CommandComposite* commandCompo =
-    		new Internal::CommandComposite(getLocalContext(), "Homothétie de tout");
+    		new Internal::CommandComposite(getContext(), "Homothétie de tout");
 
-    Internal::CommandInternal *commandGeom = new CommandScaling(getLocalContext(), factor, pcentre);
+    Internal::CommandInternal *commandGeom = new CommandScaling(getContext(), factor, pcentre);
     commandCompo->addCommand(commandGeom);
 
-    Internal::CommandInternal* commandTopo = new Topo::CommandScaleTopo(getLocalContext(), factor, pcentre);
+    Internal::CommandInternal* commandTopo = new Topo::CommandScaleTopo(getContext(), factor, pcentre);
     commandCompo->addCommand(commandTopo);
 
-    Internal::CommandInternal* commandMesh = new Mesh::CommandScaleMesh(getLocalContext(), factor, pcentre);
+    Internal::CommandInternal* commandMesh = new Mesh::CommandScaleMesh(getContext(), factor, pcentre);
     commandCompo->addCommand(commandMesh);
 
 
@@ -1065,13 +1041,13 @@ scaleAll(const double factor, const Point& pcentre)
 
     getCommandManager().addCommand(commandCompo, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 			new Internal::M3DCommandResult (*commandCompo,0);
 
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 scale(std::vector<std::string>& geo,
 		const double factorX,
 		const double factorY,
@@ -1084,7 +1060,7 @@ scale(std::vector<std::string>& geo,
     return scale(vge, factorX, factorY, factorZ, Point(0,0,0));
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 scale(std::vector<std::string>& geo,
 		const double factorX,
 		const double factorY,
@@ -1098,7 +1074,7 @@ scale(std::vector<std::string>& geo,
     return scale(vge, factorX, factorY, factorZ, pcentre);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 scale(std::vector<Geom::GeomEntity*>& entities,
 		const double factorX,
 		const double factorY,
@@ -1125,21 +1101,21 @@ scale(std::vector<Geom::GeomEntity*>& entities,
     if (Internal::EntitiesHelper::hasTopoRef(entities)){
 
         Internal::CommandComposite* commandCompo =
-             new Internal::CommandComposite(getLocalContext(), "Homothétie d'une géométrie avec sa topologie");
+             new Internal::CommandComposite(getContext(), "Homothétie d'une géométrie avec sa topologie");
 
-        commandGeom = new CommandScaling(getLocalContext(), entities, factorX, factorY, factorZ, pcentre);
+        commandGeom = new CommandScaling(getContext(), entities, factorX, factorY, factorZ, pcentre);
         commandCompo->addCommand(commandGeom);
 
         std::vector<Topo::TopoEntity*> topoEntities = Topo::TopoHelper::getTopoEntities(entities);
 
         Topo::CommandScaleTopo* commandTopo =
-             new Topo::CommandScaleTopo(getLocalContext(), topoEntities, factorX, factorY, factorZ, pcentre);
+             new Topo::CommandScaleTopo(getContext(), topoEntities, factorX, factorY, factorZ, pcentre);
         commandCompo->addCommand(commandTopo);
 
         command = commandCompo;
     }
     else {
-        commandGeom = new CommandScaling(getLocalContext(), entities, factorX, factorY, factorZ, pcentre);
+        commandGeom = new CommandScaling(getContext(), entities, factorX, factorY, factorZ, pcentre);
         command = commandGeom;
     }
 
@@ -1160,12 +1136,12 @@ scale(std::vector<Geom::GeomEntity*>& entities,
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command, commandGeom);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 scaleAll(const double factorX,
 		const double factorY,
 		const double factorZ,
@@ -1179,15 +1155,15 @@ scaleAll(const double factorX,
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     Internal::CommandComposite* commandCompo =
-    		new Internal::CommandComposite(getLocalContext(), "Homothétie de tout");
+    		new Internal::CommandComposite(getContext(), "Homothétie de tout");
 
-    Internal::CommandInternal *commandGeom = new CommandScaling(getLocalContext(), factorX, factorY, factorZ, pcentre);
+    Internal::CommandInternal *commandGeom = new CommandScaling(getContext(), factorX, factorY, factorZ, pcentre);
     commandCompo->addCommand(commandGeom);
 
-    Internal::CommandInternal* commandTopo = new Topo::CommandScaleTopo(getLocalContext(), factorX, factorY, factorZ, pcentre);
+    Internal::CommandInternal* commandTopo = new Topo::CommandScaleTopo(getContext(), factorX, factorY, factorZ, pcentre);
     commandCompo->addCommand(commandTopo);
 
-    Internal::CommandInternal* commandMesh = new Mesh::CommandScaleMesh(getLocalContext(), factorX, factorY, factorZ, pcentre);
+    Internal::CommandInternal* commandMesh = new Mesh::CommandScaleMesh(getContext(), factorX, factorY, factorZ, pcentre);
     commandCompo->addCommand(commandMesh);
 
     // trace dans le script
@@ -1200,13 +1176,13 @@ scaleAll(const double factorX,
 
     getCommandManager().addCommand(commandCompo, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 			new Internal::M3DCommandResult (*commandCompo,0);
 
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 copyAndScale(std::vector<std::string>& geo, const double factor, bool withTopo, std::string groupName)
 {
     std::vector<GeomEntity*> vge;
@@ -1216,7 +1192,7 @@ copyAndScale(std::vector<std::string>& geo, const double factor, bool withTopo, 
     return copyAndScale(vge,factor, Point(0,0,0), withTopo, groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 copyAndScale(std::vector<std::string>& geo, const double factor, const Point& pcentre, bool withTopo, std::string groupName)
 {
     std::vector<GeomEntity*> vge;
@@ -1226,7 +1202,7 @@ copyAndScale(std::vector<std::string>& geo, const double factor, const Point& pc
     return copyAndScale(vge,factor, pcentre, withTopo, groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 copyAndScale(std::vector<Geom::GeomEntity*>& entities, const double factor, const Point& pcentre, bool withTopo, std::string groupName)
 {
     if (entities.empty()){
@@ -1246,34 +1222,34 @@ copyAndScale(std::vector<Geom::GeomEntity*>& entities, const double factor, cons
     if (withTopo && Internal::EntitiesHelper::hasTopoRef(entities)){
 
     	command =
-    			new Internal::CommandComposite(getLocalContext(), "Homothétie d'une copie d'une géométrie avec sa topologie");
+    			new Internal::CommandComposite(getContext(), "Homothétie d'une copie d'une géométrie avec sa topologie");
 
     	CommandGeomCopy *commandGeomCopy =
-    			new CommandGeomCopy(getLocalContext(), entities, groupName);
+    			new CommandGeomCopy(getContext(), entities, groupName);
     	command->addCommand(commandGeomCopy);
 
         Topo::CommandDuplicateTopo* commandTopoCopy =
-                new Topo::CommandDuplicateTopo(getLocalContext(), commandGeomCopy);
+                new Topo::CommandDuplicateTopo(getContext(), commandGeomCopy);
         command->addCommand(commandTopoCopy);
 
         CommandScaling* commandGeomScale =
-    			new CommandScaling(getLocalContext(), commandGeomCopy, factor, pcentre);
+    			new CommandScaling(getContext(), commandGeomCopy, factor, pcentre);
     	command->addCommand(commandGeomScale);
 
     	Topo::CommandScaleTopo* commandTopoScale =
-    			new Topo::CommandScaleTopo(getLocalContext(), commandTopoCopy, factor, pcentre, false);
+    			new Topo::CommandScaleTopo(getContext(), commandTopoCopy, factor, pcentre, false);
     	command->addCommand(commandTopoScale);
 
     }
     else {
     	command =
-             new Internal::CommandComposite(getLocalContext(), "Homothétie d'une copie d'une géométrie");
+             new Internal::CommandComposite(getContext(), "Homothétie d'une copie d'une géométrie");
 
     	CommandGeomCopy *commandCopy =
-    	                new CommandGeomCopy(getLocalContext(), entities, groupName);
+    	                new CommandGeomCopy(getContext(), entities, groupName);
     	command->addCommand(commandCopy);
 
-    	CommandScaling* commandGeom = new CommandScaling(getLocalContext(), commandCopy, factor, pcentre);
+    	CommandScaling* commandGeom = new CommandScaling(getContext(), commandCopy, factor, pcentre);
     	command->addCommand(commandGeom);
     }
 
@@ -1290,12 +1266,12 @@ copyAndScale(std::vector<Geom::GeomEntity*>& entities, const double factor, cons
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 copyAndScaleAll(const double factor, const Point& pcentre, std::string groupName)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -1303,26 +1279,26 @@ copyAndScaleAll(const double factor, const Point& pcentre, std::string groupName
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     Internal::CommandComposite* command =
-			new Internal::CommandComposite(getLocalContext(), "Homothétie d'une copie de tout");
+			new Internal::CommandComposite(getContext(), "Homothétie d'une copie de tout");
 
 	CommandGeomCopy *commandGeomCopy =
-			new CommandGeomCopy(getLocalContext(), groupName);
+			new CommandGeomCopy(getContext(), groupName);
 	command->addCommand(commandGeomCopy);
 
     Topo::CommandDuplicateTopo* commandTopoCopy =
-            new Topo::CommandDuplicateTopo(getLocalContext(), commandGeomCopy);
+            new Topo::CommandDuplicateTopo(getContext(), commandGeomCopy);
     command->addCommand(commandTopoCopy);
 
     CommandScaling* commandGeomScale =
-			new CommandScaling(getLocalContext(), commandGeomCopy, factor, pcentre);
+			new CommandScaling(getContext(), commandGeomCopy, factor, pcentre);
 	command->addCommand(commandGeomScale);
 
 	Topo::CommandScaleTopo* commandTopoScale =
-			new Topo::CommandScaleTopo(getLocalContext(), commandTopoCopy, factor, pcentre, true);
+			new Topo::CommandScaleTopo(getContext(), commandTopoCopy, factor, pcentre, true);
 	command->addCommand(commandTopoScale);
 
 	// on ne fait rien du maillage...
-//    Internal::CommandInternal* commandMesh = new Mesh::CommandScaleMesh(getLocalContext(), factor, pcentre);
+//    Internal::CommandInternal* commandMesh = new Mesh::CommandScaleMesh(getContext(), factor, pcentre);
 //    commandCompo->addCommand(commandMesh);
 
 
@@ -1335,13 +1311,13 @@ copyAndScaleAll(const double factor, const Point& pcentre, std::string groupName
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 			new Internal::M3DCommandResult (*command,0);
 
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 copyAndScale(std::vector<std::string>& geo,
 		const double factorX,
 		const double factorY,
@@ -1356,7 +1332,7 @@ copyAndScale(std::vector<std::string>& geo,
     return copyAndScale(vge, factorX, factorY, factorZ, Point(0,0,0), withTopo, groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 copyAndScale(std::vector<std::string>& geo,
 		const double factorX,
 		const double factorY,
@@ -1372,7 +1348,7 @@ copyAndScale(std::vector<std::string>& geo,
     return copyAndScale(vge, factorX, factorY, factorZ, pcentre, withTopo, groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 copyAndScale(std::vector<Geom::GeomEntity*>& entities,
 		const double factorX,
 		const double factorY,
@@ -1400,33 +1376,33 @@ copyAndScale(std::vector<Geom::GeomEntity*>& entities,
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
     if (withTopo && Internal::EntitiesHelper::hasTopoRef(entities)){
     	command =
-    			new Internal::CommandComposite(getLocalContext(), "Homothétie d'une copie d'une géométrie avec sa topologie");
+    			new Internal::CommandComposite(getContext(), "Homothétie d'une copie d'une géométrie avec sa topologie");
 
     	CommandGeomCopy *commandGeomCopy =
-    			new CommandGeomCopy(getLocalContext(), entities, groupName);
+    			new CommandGeomCopy(getContext(), entities, groupName);
     	command->addCommand(commandGeomCopy);
 
         Topo::CommandDuplicateTopo* commandTopoCopy =
-                new Topo::CommandDuplicateTopo(getLocalContext(), commandGeomCopy);
+                new Topo::CommandDuplicateTopo(getContext(), commandGeomCopy);
         command->addCommand(commandTopoCopy);
 
         CommandScaling* commandGeomScale =
-                new CommandScaling(getLocalContext(), commandGeomCopy, factorX, factorY, factorZ, pcentre);
+                new CommandScaling(getContext(), commandGeomCopy, factorX, factorY, factorZ, pcentre);
     	command->addCommand(commandGeomScale);
 
     	Topo::CommandScaleTopo* commandTopoScale =
-                new Topo::CommandScaleTopo(getLocalContext(), commandTopoCopy, factorX, factorY, factorZ, pcentre, false);
+                new Topo::CommandScaleTopo(getContext(), commandTopoCopy, factorX, factorY, factorZ, pcentre, false);
     	command->addCommand(commandTopoScale);
     }
     else {
     	command =
-    			new Internal::CommandComposite(getLocalContext(), "Homothétie d'une copie d'une géométrie");
+    			new Internal::CommandComposite(getContext(), "Homothétie d'une copie d'une géométrie");
 
     	CommandGeomCopy *commandCopy =
-    			new CommandGeomCopy(getLocalContext(), entities, groupName);
+    			new CommandGeomCopy(getContext(), entities, groupName);
     	command->addCommand(commandCopy);
 
-        CommandScaling* commandGeom = new CommandScaling(getLocalContext(), commandCopy, factorX, factorY, factorZ, pcentre);
+        CommandScaling* commandGeom = new CommandScaling(getContext(), commandCopy, factorX, factorY, factorZ, pcentre);
     	command->addCommand(commandGeom);
     }
 
@@ -1450,12 +1426,12 @@ copyAndScale(std::vector<Geom::GeomEntity*>& entities,
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 copyAndScaleAll(const double factorX,
 		const double factorY,
 		const double factorZ,
@@ -1470,26 +1446,26 @@ copyAndScaleAll(const double factorX,
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     Internal::CommandComposite* command =
-			new Internal::CommandComposite(getLocalContext(), "Homothétie d'une copie de tout");
+			new Internal::CommandComposite(getContext(), "Homothétie d'une copie de tout");
 
 	CommandGeomCopy *commandGeomCopy =
-			new CommandGeomCopy(getLocalContext(), groupName);
+			new CommandGeomCopy(getContext(), groupName);
 	command->addCommand(commandGeomCopy);
 
     Topo::CommandDuplicateTopo* commandTopoCopy =
-            new Topo::CommandDuplicateTopo(getLocalContext(), commandGeomCopy);
+            new Topo::CommandDuplicateTopo(getContext(), commandGeomCopy);
     command->addCommand(commandTopoCopy);
 
     CommandScaling* commandGeomScale =
-			new CommandScaling(getLocalContext(), commandGeomCopy, factorX, factorY, factorZ, pcentre);
+			new CommandScaling(getContext(), commandGeomCopy, factorX, factorY, factorZ, pcentre);
 	command->addCommand(commandGeomScale);
 
 	Topo::CommandScaleTopo* commandTopoScale =
-			new Topo::CommandScaleTopo(getLocalContext(), commandTopoCopy, factorX, factorY, factorZ, pcentre, true);
+			new Topo::CommandScaleTopo(getContext(), commandTopoCopy, factorX, factorY, factorZ, pcentre, true);
 	command->addCommand(commandTopoScale);
 
 	// on ne fait rien du maillage...
-//    Internal::CommandInternal* commandMesh = new Mesh::CommandScaleMesh(getLocalContext(), factorX, factorY, factorZ);
+//    Internal::CommandInternal* commandMesh = new Mesh::CommandScaleMesh(getContext(), factorX, factorY, factorZ);
 //    commandCompo->addCommand(commandMesh);
 
     // trace dans le script
@@ -1504,13 +1480,13 @@ copyAndScaleAll(const double factorX,
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 			new Internal::M3DCommandResult (*command,0);
 
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 mirror(std::vector<std::string>& geo, Utils::Math::Plane* plane)
 {
 	std::vector<GeomEntity*> vge;
@@ -1520,7 +1496,7 @@ mirror(std::vector<std::string>& geo, Utils::Math::Plane* plane)
 	return mirror(vge, plane);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 mirror(std::vector<Geom::GeomEntity*>& entities, Utils::Math::Plane* plane)
 {
     if (entities.empty()){
@@ -1540,21 +1516,21 @@ mirror(std::vector<Geom::GeomEntity*>& entities, Utils::Math::Plane* plane)
     if (Internal::EntitiesHelper::hasTopoRef(entities)){
 
         Internal::CommandComposite* commandCompo =
-             new Internal::CommandComposite(getLocalContext(), "Symétrie d'une géométrie avec sa topologie");
+             new Internal::CommandComposite(getContext(), "Symétrie d'une géométrie avec sa topologie");
 
-        commandGeom = new CommandMirroring(getLocalContext(), entities, plane);
+        commandGeom = new CommandMirroring(getContext(), entities, plane);
         commandCompo->addCommand(commandGeom);
 
         std::vector<Topo::TopoEntity*> topoEntities = Topo::TopoHelper::getTopoEntities(entities);
 
         Topo::CommandMirrorTopo* commandTopo =
-        		new Topo::CommandMirrorTopo(getLocalContext(), topoEntities, plane);
+        		new Topo::CommandMirrorTopo(getContext(), topoEntities, plane);
         commandCompo->addCommand(commandTopo);
 
         command = commandCompo;
     }
     else {
-    	commandGeom = new CommandMirroring(getLocalContext(), entities, plane);
+    	commandGeom = new CommandMirroring(getContext(), entities, plane);
     	command = commandGeom;
     }
 
@@ -1566,7 +1542,7 @@ mirror(std::vector<Geom::GeomEntity*>& entities, Utils::Math::Plane* plane)
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 				new Internal::M3DCommandResult (*command,0);
 
 	return cmdResult;
@@ -1574,7 +1550,7 @@ mirror(std::vector<Geom::GeomEntity*>& entities, Utils::Math::Plane* plane)
 
 
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 copyAndMirror(std::vector<std::string>& geo, Utils::Math::Plane* plane, bool withTopo, std::string groupName)
 {
 	std::vector<GeomEntity*> vge;
@@ -1584,7 +1560,7 @@ copyAndMirror(std::vector<std::string>& geo, Utils::Math::Plane* plane, bool wit
 	return copyAndMirror(vge, plane, withTopo, groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 copyAndMirror(std::vector<Geom::GeomEntity*>& entities, Utils::Math::Plane* plane, bool withTopo, std::string groupName)
 {
     if (entities.empty()){
@@ -1604,34 +1580,34 @@ copyAndMirror(std::vector<Geom::GeomEntity*>& entities, Utils::Math::Plane* plan
     if (withTopo && Internal::EntitiesHelper::hasTopoRef(entities)){
 
     	command =
-                new Internal::CommandComposite(getLocalContext(), "Symétrie d'une copie d'une géométrie avec sa topologie");
+                new Internal::CommandComposite(getContext(), "Symétrie d'une copie d'une géométrie avec sa topologie");
 
     	CommandGeomCopy *commandGeomCopy =
-    			new CommandGeomCopy(getLocalContext(), entities, groupName);
+    			new CommandGeomCopy(getContext(), entities, groupName);
     	command->addCommand(commandGeomCopy);
 
         Topo::CommandDuplicateTopo* commandTopoCopy =
-                new Topo::CommandDuplicateTopo(getLocalContext(), commandGeomCopy);
+                new Topo::CommandDuplicateTopo(getContext(), commandGeomCopy);
         command->addCommand(commandTopoCopy);
 
     	CommandMirroring* commandGeomMirror =
-    			new CommandMirroring(getLocalContext(), commandGeomCopy, plane);
+    			new CommandMirroring(getContext(), commandGeomCopy, plane);
     	command->addCommand(commandGeomMirror);
 
     	Topo::CommandMirrorTopo* commandTopoMirror =
-    			new Topo::CommandMirrorTopo(getLocalContext(), commandTopoCopy, plane, false);
+    			new Topo::CommandMirrorTopo(getContext(), commandTopoCopy, plane, false);
     	command->addCommand(commandTopoMirror);
 
     }
     else {
     	command =
-             new Internal::CommandComposite(getLocalContext(), "Symétrie d'une copie d'une géométrie");
+             new Internal::CommandComposite(getContext(), "Symétrie d'une copie d'une géométrie");
 
     	CommandGeomCopy *commandCopy =
-    	                new CommandGeomCopy(getLocalContext(), entities, groupName);
+    	                new CommandGeomCopy(getContext(), entities, groupName);
     	command->addCommand(commandCopy);
 
-    	CommandMirroring* commandGeom = new CommandMirroring(getLocalContext(), commandCopy, plane);
+    	CommandMirroring* commandGeom = new CommandMirroring(getContext(), commandCopy, plane);
     	command->addCommand(commandGeom);
     }
 
@@ -1647,13 +1623,13 @@ copyAndMirror(std::vector<Geom::GeomEntity*>& entities, Utils::Math::Plane* plan
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 				new Internal::M3DCommandResult (*command);
 
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newBox(const Utils::Math::Point& pmin, const Utils::Math::Point& pmax, std::string groupName)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -1664,7 +1640,7 @@ newBox(const Utils::Math::Point& pmin, const Utils::Math::Point& pmax, std::stri
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     //creation de la commande de création
-    CommandNewBox *command = new CommandNewBox(getLocalContext(),pmin,pmax, groupName);
+    CommandNewBox *command = new CommandNewBox(getContext(),pmin,pmax, groupName);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -1678,12 +1654,12 @@ newBox(const Utils::Math::Point& pmin, const Utils::Math::Point& pmax, std::stri
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 									new Internal::M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newCylinder(const Utils::Math::Point& pcentre, const double& dr,
             const Utils::Math::Vector& dv, const double& da, std::string groupName)
 {
@@ -1694,7 +1670,7 @@ newCylinder(const Utils::Math::Point& pcentre, const double& dr,
     message<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
-    CommandNewCylinder *command = new CommandNewCylinder(getLocalContext(), pcentre, dr, dv,da, groupName);
+    CommandNewCylinder *command = new CommandNewCylinder(getContext(), pcentre, dr, dv,da, groupName);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -1710,12 +1686,12 @@ newCylinder(const Utils::Math::Point& pcentre, const double& dr,
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 									new Internal::M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newCylinder(const Utils::Math::Point& pcentre, const double& dr,
             const Utils::Math::Vector& dv, const Utils::Portion::Type& dt, std::string groupName)
 {
@@ -1726,7 +1702,7 @@ newCylinder(const Utils::Math::Point& pcentre, const double& dr,
     message<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
-    CommandNewCylinder *command = new CommandNewCylinder(getLocalContext(), pcentre, dr, dv,dt, groupName);
+    CommandNewCylinder *command = new CommandNewCylinder(getContext(), pcentre, dr, dv,dt, groupName);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -1742,12 +1718,12 @@ newCylinder(const Utils::Math::Point& pcentre, const double& dr,
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 									new Internal::M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newHollowCylinder(
         const Utils::Math::Point& pcentre,
         const double& dr_int,
@@ -1768,7 +1744,7 @@ newHollowCylinder(
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     CommandNewHollowCylinder *command =
-            new CommandNewHollowCylinder(getLocalContext(), pcentre, dr_int, dr_ext,
+            new CommandNewHollowCylinder(getContext(), pcentre, dr_int, dr_ext,
                     dv,da, groupName);
 
     // trace dans le script
@@ -1786,12 +1762,12 @@ newHollowCylinder(
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newHollowCylinder(
         const Utils::Math::Point& pcentre,
         const double& dr_int,
@@ -1811,7 +1787,7 @@ newHollowCylinder(
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     CommandNewHollowCylinder *command =
-            new CommandNewHollowCylinder(getLocalContext(), pcentre, dr_int, dr_ext,
+            new CommandNewHollowCylinder(getContext(), pcentre, dr_int, dr_ext,
                     dv,dt, groupName);
 
     // trace dans le script
@@ -1829,13 +1805,13 @@ newHollowCylinder(
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newSphere(const Utils::Math::Point& pcentre, const double& dr,
             const double& da, std::string groupName)
 {
@@ -1846,7 +1822,7 @@ newSphere(const Utils::Math::Point& pcentre, const double& dr,
     message<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
-    CommandNewSphere *command = new CommandNewSphere(getLocalContext(), pcentre, dr,da, groupName);
+    CommandNewSphere *command = new CommandNewSphere(getContext(), pcentre, dr,da, groupName);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -1860,12 +1836,12 @@ newSphere(const Utils::Math::Point& pcentre, const double& dr,
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 									new Internal::M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newSphere(const Utils::Math::Point& pcentre, const double& dr,
           const Utils::Portion::Type& dt, std::string groupName)
 {
@@ -1876,7 +1852,7 @@ newSphere(const Utils::Math::Point& pcentre, const double& dr,
     message<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
-    CommandNewSphere *command = new CommandNewSphere(getLocalContext(), pcentre, dr,dt, groupName);
+    CommandNewSphere *command = new CommandNewSphere(getContext(), pcentre, dr,dt, groupName);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().newSphere ("
@@ -1889,18 +1865,18 @@ newSphere(const Utils::Math::Point& pcentre, const double& dr,
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 									new Internal::M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc *GeomManager::
+Internal::M3DCommandResult *GeomManager::
 newSpherePart(const double& dr,
 		const double& angleY,
 		const double& angleZ,
 		std::string groupName)
 {
-    CommandNewSpherePart *command = new CommandNewSpherePart(getLocalContext(), dr, angleY, angleZ, groupName);
+    CommandNewSpherePart *command = new CommandNewSpherePart(getContext(), dr, angleY, angleZ, groupName);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().newSpherePart ("
@@ -1914,19 +1890,19 @@ newSpherePart(const double& dr,
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 									new Internal::M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 	 	 newHollowSpherePart(const double& dr_int,
 	 			 const double& dr_ext,
 				 const double& angleY,
 				 const double& angleZ,
 				 std::string groupName)
 {
-	CommandNewHollowSpherePart *command = new CommandNewHollowSpherePart(getLocalContext(), dr_int, dr_ext, angleY, angleZ, groupName);
+	CommandNewHollowSpherePart *command = new CommandNewHollowSpherePart(getContext(), dr_int, dr_ext, angleY, angleZ, groupName);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().newHollowSpherePart ("
@@ -1941,12 +1917,12 @@ Internal::M3DCommandResultIfc* GeomManager::
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 			new Internal::M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newHollowSphere(
         const Utils::Math::Point& pcentre,
         const double& dr_int,
@@ -1962,7 +1938,7 @@ newHollowSphere(
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     CommandNewHollowSphere *command =
-            new CommandNewHollowSphere(getLocalContext(), pcentre, dr_int, dr_ext,da, groupName);
+            new CommandNewHollowSphere(getContext(), pcentre, dr_int, dr_ext,da, groupName);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -1978,12 +1954,12 @@ newHollowSphere(
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newHollowSphere(
         const Utils::Math::Point& pcentre,
         const double& dr_int,
@@ -2002,7 +1978,7 @@ newHollowSphere(
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     CommandNewHollowSphere *command =
-            new CommandNewHollowSphere(getLocalContext(), pcentre, dr_int,dr_ext, dt, groupName);
+            new CommandNewHollowSphere(getContext(), pcentre, dr_int,dr_ext, dt, groupName);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().newHollowSphere ("
@@ -2017,12 +1993,12 @@ newHollowSphere(
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 GeomManager::newCone(const double& dr1, const double& dr2,
    		const Vector& dv, const double& da, std::string groupName)
 {
@@ -2033,7 +2009,7 @@ GeomManager::newCone(const double& dr1, const double& dr2,
     message<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
-    CommandNewCone *command = new CommandNewCone(getLocalContext(), dr1, dr2, dv, da, groupName);
+    CommandNewCone *command = new CommandNewCone(getContext(), dr1, dr2, dv, da, groupName);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -2049,12 +2025,12 @@ GeomManager::newCone(const double& dr1, const double& dr2,
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 			new Internal::M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResultIfc*
+Mgx3D::Internal::M3DCommandResult*
 GeomManager::newCone(const double& dr1, const double& dr2,
    		const Vector& dv, const  Utils::Portion::Type& dt, std::string groupName)
 {
@@ -2065,7 +2041,7 @@ GeomManager::newCone(const double& dr1, const double& dr2,
     message<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
-    CommandNewCone *command = new CommandNewCone(getLocalContext(), dr1, dr2, dv, dt, groupName);
+    CommandNewCone *command = new CommandNewCone(getContext(), dr1, dr2, dv, dt, groupName);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -2081,12 +2057,12 @@ GeomManager::newCone(const double& dr1, const double& dr2,
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 			new Internal::M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newArcCircle(std::string pc,std::string pd, std::string pe, const bool direct, const Vector& normal, std::string groupName)
 {
     Vertex* vc = getVertex(pc);
@@ -2095,7 +2071,7 @@ newArcCircle(std::string pc,std::string pd, std::string pe, const bool direct, c
     return newArcCircle(vc,vd,ve,direct, normal, groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newArcCircle(std::string pc,std::string pd, std::string pe, const bool direct, std::string groupName)
 {
     Vertex* vc = getVertex(pc);
@@ -2104,7 +2080,7 @@ newArcCircle(std::string pc,std::string pd, std::string pe, const bool direct, s
     return newArcCircle(vc,vd,ve,direct, groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newArcCircle(std::string pc,std::string pd, std::string pe, std::string groupName)
 {
     Vertex* vc = getVertex(pc);
@@ -2113,7 +2089,7 @@ newArcCircle(std::string pc,std::string pd, std::string pe, std::string groupNam
     return newArcCircle(vc,vd,ve, groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newArcCircle(const double& angleDep,
              const double& angleFin,
              const double& rayon,
@@ -2122,12 +2098,12 @@ newArcCircle(const double& angleDep,
 {
     CoordinateSystem::SysCoord* rep = 0;
     if (!sysCoordName.empty())
-        rep = getLocalContext().getSysCoordManager().getSysCoord(sysCoordName, true);
+        rep = getContext().getSysCoordManager().getSysCoord(sysCoordName, true);
 
     return newArcCircle(angleDep, angleFin, rayon, rep, groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newArcCircle(Vertex* pc, Vertex* pd, Vertex* pe, const bool direct, std::string groupName)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -2137,7 +2113,7 @@ newArcCircle(Vertex* pc, Vertex* pd, Vertex* pe, const bool direct, std::string 
     Vector normal(0,0,1);
 
     CommandNewArcCircle *command =
-            new CommandNewArcCircle(getLocalContext(), pc,pd,pe,direct, normal, groupName, false);
+            new CommandNewArcCircle(getContext(), pc,pd,pe,direct, normal, groupName, false);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().newArcCircle(\""
@@ -2152,12 +2128,12 @@ newArcCircle(Vertex* pc, Vertex* pd, Vertex* pe, const bool direct, std::string 
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newArcCircle(Vertex* pc, Vertex* pd, Vertex* pe, const bool direct, const Vector& normal, std::string groupName)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -2166,7 +2142,7 @@ newArcCircle(Vertex* pc, Vertex* pd, Vertex* pe, const bool direct, const Vector
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     CommandNewArcCircle *command =
-            new CommandNewArcCircle(getLocalContext(), pc,pd,pe,direct, normal, groupName, false);
+            new CommandNewArcCircle(getContext(), pc,pd,pe,direct, normal, groupName, false);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().newArcCircle(\""
@@ -2182,12 +2158,12 @@ newArcCircle(Vertex* pc, Vertex* pd, Vertex* pe, const bool direct, const Vector
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-    Internal::M3DCommandResultIfc* GeomManager::
+    Internal::M3DCommandResult* GeomManager::
     newArcCircle(Vertex* pc, Vertex* pd, Vertex* pe, std::string groupName)
     {
         TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -2196,7 +2172,7 @@ newArcCircle(Vertex* pc, Vertex* pd, Vertex* pe, const bool direct, const Vector
         log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
         Vector normal(0,0,0);
         CommandNewArcCircle *command =
-                new CommandNewArcCircle(getLocalContext(), pc,pd,pe,false, normal, groupName, true);
+                new CommandNewArcCircle(getContext(), pc,pd,pe,false, normal, groupName, true);
         // trace dans le script
         TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
         cmd << getContextAlias() << "." << "getGeomManager().newArcCircle(\""
@@ -2210,12 +2186,12 @@ newArcCircle(Vertex* pc, Vertex* pd, Vertex* pe, const bool direct, const Vector
 
         getCommandManager().addCommand(command, Utils::Command::DO);
 
-        Internal::M3DCommandResultIfc*  cmdResult   =
+        Internal::M3DCommandResult*  cmdResult   =
                 new Internal::M3DCommandResult (*command);
         return cmdResult;
     }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newArcCircle(const double& angleDep,
              const double& angleFin,
              const double& rayon,
@@ -2223,7 +2199,7 @@ newArcCircle(const double& angleDep,
              std::string groupName)
 {
     CommandNewArcCircleWithAngles *command =
-            new CommandNewArcCircleWithAngles(getLocalContext(), angleDep, angleFin, rayon, sysCoord, groupName);
+            new CommandNewArcCircleWithAngles(getContext(), angleDep, angleFin, rayon, sysCoord, groupName);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -2242,12 +2218,12 @@ newArcCircle(const double& angleDep,
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newCircle(std::string p1,std::string p2, std::string p3, std::string groupName)
 {
     Vertex* v1 = getVertex(p1);
@@ -2257,7 +2233,7 @@ newCircle(std::string p1,std::string p2, std::string p3, std::string groupName)
 }
 
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newCircle(Vertex* p1, Vertex* p2, Vertex* p3, std::string groupName )
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -2265,7 +2241,7 @@ newCircle(Vertex* p1, Vertex* p2, Vertex* p3, std::string groupName )
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     CommandNewCircle *command =
-            new CommandNewCircle(getLocalContext(), p1,p2,p3, groupName);
+            new CommandNewCircle(getContext(), p1,p2,p3, groupName);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().newCircle(\""
@@ -2279,12 +2255,12 @@ newCircle(Vertex* p1, Vertex* p2, Vertex* p3, std::string groupName )
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newEllipse(std::string p1,std::string p2, std::string center, std::string groupName)
 {
     Vertex* v1 = getVertex(p1);
@@ -2294,7 +2270,7 @@ newEllipse(std::string p1,std::string p2, std::string center, std::string groupN
 }
 
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newEllipse(Vertex* p1, Vertex* p2, Vertex* center, std::string groupName )
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -2302,7 +2278,7 @@ newEllipse(Vertex* p1, Vertex* p2, Vertex* center, std::string groupName )
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     CommandNewEllipse *command =
-            new CommandNewEllipse(getLocalContext(),p1,p2,center,groupName);
+            new CommandNewEllipse(getContext(),p1,p2,center,groupName);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().newEllipse(\""
@@ -2316,12 +2292,12 @@ newEllipse(Vertex* p1, Vertex* p2, Vertex* center, std::string groupName )
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newArcEllipse(std::string pc,std::string pd, std::string pe, const bool direct, std::string groupName)
 {
     Vertex* vc = getVertex(pc);
@@ -2330,7 +2306,7 @@ newArcEllipse(std::string pc,std::string pd, std::string pe, const bool direct, 
     return newArcEllipse(vc,vd,ve,direct, groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newArcEllipse(  Vertex* pc, Vertex* pd, Vertex* pe, const bool direct, std::string groupName )
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -2339,7 +2315,7 @@ newArcEllipse(  Vertex* pc, Vertex* pd, Vertex* pe, const bool direct, std::stri
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     CommandNewArcEllipse *command =
-            new CommandNewArcEllipse(getLocalContext(),pc,pd,pe,direct, groupName);
+            new CommandNewArcEllipse(getContext(),pc,pd,pe,direct, groupName);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().newArcEllipse(\""
@@ -2354,12 +2330,12 @@ newArcEllipse(  Vertex* pc, Vertex* pd, Vertex* pe, const bool direct, std::stri
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 									new Internal::M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::newBSpline(std::string n1,
+Internal::M3DCommandResult* GeomManager::newBSpline(std::string n1,
 		std::vector<Point>& vp,
 		std::string n2,
 		int deg_min,
@@ -2372,7 +2348,7 @@ Internal::M3DCommandResultIfc* GeomManager::newBSpline(std::string n1,
     return newBSpline(v1, vp, v2, deg_min, deg_max, groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 newBSpline(Vertex* vtx1,
 		std::vector<Point>& vp,
 		Vertex* vtx2,
@@ -2389,7 +2365,7 @@ newBSpline(Vertex* vtx1,
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     CommandNewBSpline *command =
-            new CommandNewBSpline(getLocalContext(), vtx1, vp, vtx2, deg_min, deg_max, groupName);
+            new CommandNewBSpline(getContext(), vtx1, vp, vtx2, deg_min, deg_max, groupName);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias ( ) << ".getGeomManager ( ).newBSpline (" << Internal::scriptablesToPythonList<Point> (vp) << ", ";
@@ -2399,12 +2375,12 @@ newBSpline(Vertex* vtx1,
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 			new Internal::M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 translate(std::vector<std::string>& entities, const Utils::Math::Vector& dp){
 
     std::vector<GeomEntity*> vge;
@@ -2413,7 +2389,7 @@ translate(std::vector<std::string>& entities, const Utils::Math::Vector& dp){
     return translate(vge, dp);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 translate(std::vector<GeomEntity*>& entities, const Vector& dp)
 {
     if (entities.empty()){
@@ -2433,21 +2409,21 @@ translate(std::vector<GeomEntity*>& entities, const Vector& dp)
     if (Internal::EntitiesHelper::hasTopoRef(entities)){
 
         Internal::CommandComposite* commandCompo =
-             new Internal::CommandComposite(getLocalContext(), "Translation d'une géométrie avec sa topologie");
+             new Internal::CommandComposite(getContext(), "Translation d'une géométrie avec sa topologie");
 
-        commandGeom = new CommandTranslation(getLocalContext(), entities, dp);
+        commandGeom = new CommandTranslation(getContext(), entities, dp);
         commandCompo->addCommand(commandGeom);
 
         // recherche des entités topologiques parmis les entités géométriques sélectionnées
         std::vector<Topo::TopoEntity*> topoEntities = Topo::TopoHelper::getTopoEntities(entities);
 
-        Topo::CommandTranslateTopo* commandTopo = new Topo::CommandTranslateTopo(getLocalContext(), topoEntities, dp);
+        Topo::CommandTranslateTopo* commandTopo = new Topo::CommandTranslateTopo(getContext(), topoEntities, dp);
         commandCompo->addCommand(commandTopo);
 
         command = commandCompo;
     }
     else {
-    	commandGeom = new CommandTranslation(getLocalContext(), entities, dp);
+    	commandGeom = new CommandTranslation(getContext(), entities, dp);
     	command = commandGeom;
     }
 
@@ -2458,12 +2434,12 @@ translate(std::vector<GeomEntity*>& entities, const Vector& dp)
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 			new Internal::M3DCommandResult (*command,  commandGeom);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 translateAll(const Vector& dp)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -2471,15 +2447,15 @@ translateAll(const Vector& dp)
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     Internal::CommandComposite* commandCompo =
-    		new Internal::CommandComposite(getLocalContext(), "Translation de tout");
+    		new Internal::CommandComposite(getContext(), "Translation de tout");
 
-    Internal::CommandInternal *commandGeom = new CommandTranslation(getLocalContext(), dp);
+    Internal::CommandInternal *commandGeom = new CommandTranslation(getContext(), dp);
     commandCompo->addCommand(commandGeom);
 
-    Internal::CommandInternal* commandTopo = new Topo::CommandTranslateTopo(getLocalContext(), dp);
+    Internal::CommandInternal* commandTopo = new Topo::CommandTranslateTopo(getContext(), dp);
     commandCompo->addCommand(commandTopo);
 
-    Internal::CommandInternal* commandMesh = new Mesh::CommandTranslateMesh(getLocalContext(), dp);
+    Internal::CommandInternal* commandMesh = new Mesh::CommandTranslateMesh(getContext(), dp);
     commandCompo->addCommand(commandMesh);
 
     // trace dans le script
@@ -2489,13 +2465,13 @@ translateAll(const Vector& dp)
 
     getCommandManager().addCommand(commandCompo, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 			new Internal::M3DCommandResult (*commandCompo,0);
 
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 copyAndTranslate(std::vector<std::string>& entities, const Utils::Math::Vector& dp, bool withTopo, std::string groupName){
 
     std::vector<GeomEntity*> vge;
@@ -2504,7 +2480,7 @@ copyAndTranslate(std::vector<std::string>& entities, const Utils::Math::Vector& 
     return copyAndTranslate(vge, dp, withTopo, groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 copyAndTranslate(std::vector<GeomEntity*>& entities, const Vector& dp, bool withTopo, std::string groupName)
 {
     if (entities.empty()){
@@ -2524,34 +2500,34 @@ copyAndTranslate(std::vector<GeomEntity*>& entities, const Vector& dp, bool with
     if (withTopo && Internal::EntitiesHelper::hasTopoRef(entities)){
 
     	command =
-    			new Internal::CommandComposite(getLocalContext(), "Translation d'une copie d'une géométrie avec sa topologie");
+    			new Internal::CommandComposite(getContext(), "Translation d'une copie d'une géométrie avec sa topologie");
 
     	CommandGeomCopy *commandGeomCopy =
-    			new CommandGeomCopy(getLocalContext(), entities, groupName);
+    			new CommandGeomCopy(getContext(), entities, groupName);
     	command->addCommand(commandGeomCopy);
 
         Topo::CommandDuplicateTopo* commandTopoCopy =
-                new Topo::CommandDuplicateTopo(getLocalContext(), commandGeomCopy);
+                new Topo::CommandDuplicateTopo(getContext(), commandGeomCopy);
         command->addCommand(commandTopoCopy);
 
         CommandTranslation* commandGeomTranslate =
-    			new CommandTranslation(getLocalContext(), commandGeomCopy, dp);
+    			new CommandTranslation(getContext(), commandGeomCopy, dp);
     	command->addCommand(commandGeomTranslate);
 
     	Topo::CommandTranslateTopo* commandTopoTranslate =
-    			new Topo::CommandTranslateTopo(getLocalContext(), commandTopoCopy, dp, false);
+    			new Topo::CommandTranslateTopo(getContext(), commandTopoCopy, dp, false);
     	command->addCommand(commandTopoTranslate);
 
     }
     else {
     	command =
-             new Internal::CommandComposite(getLocalContext(), "Translation d'une copie d'une géométrie");
+             new Internal::CommandComposite(getContext(), "Translation d'une copie d'une géométrie");
 
     	CommandGeomCopy *commandCopy =
-    	                new CommandGeomCopy(getLocalContext(), entities, groupName);
+    	                new CommandGeomCopy(getContext(), entities, groupName);
     	command->addCommand(commandCopy);
 
-    	CommandTranslation* commandGeom = new CommandTranslation(getLocalContext(), commandCopy, dp);
+    	CommandTranslation* commandGeom = new CommandTranslation(getContext(), commandCopy, dp);
     	command->addCommand(commandGeom);
     }
 
@@ -2566,12 +2542,12 @@ copyAndTranslate(std::vector<GeomEntity*>& entities, const Vector& dp, bool with
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 			new Internal::M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 copyAndTranslateAll(const Vector& dp, std::string groupName)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -2579,26 +2555,26 @@ copyAndTranslateAll(const Vector& dp, std::string groupName)
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     Internal::CommandComposite*   command =
-			new Internal::CommandComposite(getLocalContext(), "Translation d'une copie de tout");
+			new Internal::CommandComposite(getContext(), "Translation d'une copie de tout");
 
 	CommandGeomCopy *commandGeomCopy =
-			new CommandGeomCopy(getLocalContext(), groupName);
+			new CommandGeomCopy(getContext(), groupName);
 	command->addCommand(commandGeomCopy);
 
     Topo::CommandDuplicateTopo* commandTopoCopy =
-            new Topo::CommandDuplicateTopo(getLocalContext(), commandGeomCopy);
+            new Topo::CommandDuplicateTopo(getContext(), commandGeomCopy);
     command->addCommand(commandTopoCopy);
 
     CommandTranslation* commandGeomTranslate =
-			new CommandTranslation(getLocalContext(), commandGeomCopy, dp);
+			new CommandTranslation(getContext(), commandGeomCopy, dp);
 	command->addCommand(commandGeomTranslate);
 
 	Topo::CommandTranslateTopo* commandTopoTranslate =
-			new Topo::CommandTranslateTopo(getLocalContext(), commandTopoCopy, dp, false);
+			new Topo::CommandTranslateTopo(getContext(), commandTopoCopy, dp, false);
 	command->addCommand(commandTopoTranslate);
 
 	// on ne fait rien au maillage...
-//    Internal::CommandInternal* commandMesh = new Mesh::CommandTranslateMesh(getLocalContext(), dp);
+//    Internal::CommandInternal* commandMesh = new Mesh::CommandTranslateMesh(getContext(), dp);
 //    commandCompo->addCommand(commandMesh);
 
     // trace dans le script
@@ -2609,13 +2585,13 @@ copyAndTranslateAll(const Vector& dp, std::string groupName)
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 			new Internal::M3DCommandResult (*command,0);
 
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 joinCurves(std::vector<std::string>& entities){
 
     std::vector<GeomEntity*> vge;
@@ -2625,7 +2601,7 @@ joinCurves(std::vector<std::string>& entities){
     return joinCurves(vge);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 joinCurves(std::vector<GeomEntity*>& entities)
 {
 	CHECK_ENTITIES_LIST(entities)
@@ -2642,9 +2618,9 @@ joinCurves(std::vector<GeomEntity*>& entities)
     if (Internal::EntitiesHelper::hasTopoRef(entities)){
 
         Internal::CommandComposite* commandCompo =
-             new Internal::CommandComposite(getLocalContext(), "Fusion de courbes avec maj de la topologie");
+             new Internal::CommandComposite(getContext(), "Fusion de courbes avec maj de la topologie");
 
-        Geom::CommandCreateGeom *commandGeom = new CommandJoinCurves(getLocalContext(), entities);
+        Geom::CommandCreateGeom *commandGeom = new CommandJoinCurves(getContext(), entities);
         commandCompo->addCommand(commandGeom);
 
         // recherche des entités topologiques parmis les entités géométriques sélectionnées
@@ -2657,13 +2633,13 @@ joinCurves(std::vector<GeomEntity*>& entities)
 
         // projection sur la nouvelle courbe pour les arêtes et sommets détruits
         if (selectedTopoEntities.size()){
-        	Topo::CommandSetGeomAssociation* commandTopo = new Topo::CommandSetGeomAssociation(getLocalContext(), selectedTopoEntities, commandGeom);
+        	Topo::CommandSetGeomAssociation* commandTopo = new Topo::CommandSetGeomAssociation(getContext(), selectedTopoEntities, commandGeom);
         	commandCompo->addCommand(commandTopo);
         }
         command = commandCompo;
     }
     else {
-        command = new CommandJoinCurves(getLocalContext(), entities);
+        command = new CommandJoinCurves(getContext(), entities);
     }
 
     // trace dans le script
@@ -2674,12 +2650,12 @@ joinCurves(std::vector<GeomEntity*>& entities)
     getCommandManager().addCommand(command, Utils::Command::DO);
 
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 joinSurfaces(std::vector<std::string>& entities){
 
     std::vector<GeomEntity*> vge;
@@ -2689,7 +2665,7 @@ joinSurfaces(std::vector<std::string>& entities){
     return joinSurfaces(vge);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 joinSurfaces(std::vector<GeomEntity*>& entities)
 {
 	CHECK_ENTITIES_LIST(entities)
@@ -2706,9 +2682,9 @@ joinSurfaces(std::vector<GeomEntity*>& entities)
     if (Internal::EntitiesHelper::hasTopoRef(entities))
     {
         Internal::CommandComposite* commandCompo =
-             new Internal::CommandComposite(getLocalContext(), "Fusion de surfaces avec maj de la topologie");
+             new Internal::CommandComposite(getContext(), "Fusion de surfaces avec maj de la topologie");
 
-        Geom::CommandCreateGeom *commandGeom = new CommandJoinSurfaces(getLocalContext(), entities);
+        Geom::CommandCreateGeom *commandGeom = new CommandJoinSurfaces(getContext(), entities);
         commandCompo->addCommand(commandGeom);
 
         // recherche des entités topologiques parmis les entités géométriques sélectionnées
@@ -2723,14 +2699,14 @@ joinSurfaces(std::vector<GeomEntity*>& entities)
 
         // projection sur la nouvelle surface pour les cofaces, arêtes et sommets détruits
         if (selectedTopoEntities.size()){
-        	Topo::CommandSetGeomAssociation* commandTopo = new Topo::CommandSetGeomAssociation(getLocalContext(), selectedTopoEntities, commandGeom);
+        	Topo::CommandSetGeomAssociation* commandTopo = new Topo::CommandSetGeomAssociation(getContext(), selectedTopoEntities, commandGeom);
         	commandCompo->addCommand(commandTopo);
         }
         command = commandCompo;
     }
     else
     {
-        command = new CommandJoinSurfaces(getLocalContext(), entities);
+        command = new CommandJoinSurfaces(getContext(), entities);
     }
 
     // trace dans le script
@@ -2741,12 +2717,12 @@ joinSurfaces(std::vector<GeomEntity*>& entities)
     getCommandManager().addCommand(command, Utils::Command::DO);
 
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 rotate( std::vector<std::string>& entities, const Utils::Math::Rotation& rot)
 {
     std::vector<GeomEntity*> vge;
@@ -2755,7 +2731,7 @@ rotate( std::vector<std::string>& entities, const Utils::Math::Rotation& rot)
     return rotate(vge, rot);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 rotate( std::vector<GeomEntity*>& entities, const Utils::Math::Rotation& rot)
 {
     if (entities.empty()){
@@ -2774,10 +2750,10 @@ rotate( std::vector<GeomEntity*>& entities, const Utils::Math::Rotation& rot)
     if (Internal::EntitiesHelper::hasTopoRef(entities)){
 
         Internal::CommandComposite* commandCompo =
-             new Internal::CommandComposite(getLocalContext(), "Rotation d'une géométrie avec sa topologie");
+             new Internal::CommandComposite(getContext(), "Rotation d'une géométrie avec sa topologie");
 
-//        Geom::CommandEditGeom *commandGeom = new CommandRotation(getLocalContext(), entities,rot);
-        Internal::CommandInternal *commandGeom = new CommandRotation(getLocalContext(), entities,rot);
+//        Geom::CommandEditGeom *commandGeom = new CommandRotation(getContext(), entities,rot);
+        Internal::CommandInternal *commandGeom = new CommandRotation(getContext(), entities,rot);
         commandCompo->addCommand(commandGeom);
 
 //        geom_modif = commandGeom->getGeomModificationBaseClass();
@@ -2786,13 +2762,13 @@ rotate( std::vector<GeomEntity*>& entities, const Utils::Math::Rotation& rot)
         std::vector<Topo::TopoEntity*> topoEntities = Topo::TopoHelper::getTopoEntities(entities);
 
         Topo::CommandRotateTopo* commandTopo =
-                       new Topo::CommandRotateTopo(getLocalContext(), topoEntities, rot);
+                       new Topo::CommandRotateTopo(getContext(), topoEntities, rot);
         commandCompo->addCommand(commandTopo);
 
         command = commandCompo;
     }
     else {
-        command = new CommandRotation(getLocalContext(), entities, rot);
+        command = new CommandRotation(getContext(), entities, rot);
         //geom_modif = commandGeom->getGeomModificationBaseClass();
     }
 
@@ -2803,13 +2779,13 @@ rotate( std::vector<GeomEntity*>& entities, const Utils::Math::Rotation& rot)
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 			new Internal::M3DCommandResult (*command,0);
 
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 rotateAll(const Utils::Math::Rotation& rot)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -2817,15 +2793,15 @@ rotateAll(const Utils::Math::Rotation& rot)
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     Internal::CommandComposite* commandCompo =
-    		new Internal::CommandComposite(getLocalContext(), "Rotation de tout");
+    		new Internal::CommandComposite(getContext(), "Rotation de tout");
 
-    Internal::CommandInternal *commandGeom = new CommandRotation(getLocalContext(), rot);
+    Internal::CommandInternal *commandGeom = new CommandRotation(getContext(), rot);
     commandCompo->addCommand(commandGeom);
 
-    Internal::CommandInternal* commandTopo = new Topo::CommandRotateTopo(getLocalContext(), rot);
+    Internal::CommandInternal* commandTopo = new Topo::CommandRotateTopo(getContext(), rot);
     commandCompo->addCommand(commandTopo);
 
-    Internal::CommandInternal* commandMesh = new Mesh::CommandRotateMesh(getLocalContext(), rot);
+    Internal::CommandInternal* commandMesh = new Mesh::CommandRotateMesh(getContext(), rot);
     commandCompo->addCommand(commandMesh);
 
     // trace dans le script
@@ -2835,13 +2811,13 @@ rotateAll(const Utils::Math::Rotation& rot)
 
     getCommandManager().addCommand(commandCompo, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 			new Internal::M3DCommandResult (*commandCompo,0);
 
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 copyAndRotate( std::vector<std::string>& entities,
 		const Utils::Math::Rotation& rot,
 		bool withTopo,
@@ -2853,7 +2829,7 @@ copyAndRotate( std::vector<std::string>& entities,
     return copyAndRotate(vge, rot, withTopo, groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 copyAndRotate( std::vector<GeomEntity*>& entities,
 		const Utils::Math::Rotation& rot,
 		bool withTopo,
@@ -2875,35 +2851,35 @@ copyAndRotate( std::vector<GeomEntity*>& entities,
     if (withTopo && Internal::EntitiesHelper::hasTopoRef(entities)){
 
     	command =
-    			new Internal::CommandComposite(getLocalContext(), "Rotation d'une copie d'une géométrie avec sa topologie");
+    			new Internal::CommandComposite(getContext(), "Rotation d'une copie d'une géométrie avec sa topologie");
 
     	CommandGeomCopy *commandGeomCopy =
-    			new CommandGeomCopy(getLocalContext(), entities, groupName);
+    			new CommandGeomCopy(getContext(), entities, groupName);
     	command->addCommand(commandGeomCopy);
 
         Topo::CommandDuplicateTopo* commandTopoCopy =
-                new Topo::CommandDuplicateTopo(getLocalContext(), commandGeomCopy);
+                new Topo::CommandDuplicateTopo(getContext(), commandGeomCopy);
         command->addCommand(commandTopoCopy);
 
         CommandRotation* commandGeomRotate =
-    			new CommandRotation(getLocalContext(), commandGeomCopy, rot);
+    			new CommandRotation(getContext(), commandGeomCopy, rot);
     	command->addCommand(commandGeomRotate);
 
     	Topo::CommandRotateTopo* commandTopoRotate =
-    			new Topo::CommandRotateTopo(getLocalContext(), commandTopoCopy, rot, false);
+    			new Topo::CommandRotateTopo(getContext(), commandTopoCopy, rot, false);
     	command->addCommand(commandTopoRotate);
 
     }
     else {
     	command =
-             new Internal::CommandComposite(getLocalContext(), "Rotation d'une copie d'une géométrie");
+             new Internal::CommandComposite(getContext(), "Rotation d'une copie d'une géométrie");
 
     	CommandGeomCopy *commandCopy =
-    			new CommandGeomCopy(getLocalContext(), entities, groupName);
+    			new CommandGeomCopy(getContext(), entities, groupName);
     	command->addCommand(commandCopy);
 
     	CommandRotation* commandGeom =
-    			new CommandRotation(getLocalContext(), commandCopy, rot);
+    			new CommandRotation(getContext(), commandCopy, rot);
     	command->addCommand(commandGeom);
 
     }
@@ -2919,13 +2895,13 @@ copyAndRotate( std::vector<GeomEntity*>& entities,
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 			new Internal::M3DCommandResult (*command);
 
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 copyAndRotateAll(const Utils::Math::Rotation& rot,
 		std::string groupName)
 {
@@ -2934,26 +2910,26 @@ copyAndRotateAll(const Utils::Math::Rotation& rot,
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     Internal::CommandComposite* command =
-			new Internal::CommandComposite(getLocalContext(), "Rotation d'une copie de tout");
+			new Internal::CommandComposite(getContext(), "Rotation d'une copie de tout");
 
 	CommandGeomCopy *commandGeomCopy =
-			new CommandGeomCopy(getLocalContext(), groupName);
+			new CommandGeomCopy(getContext(), groupName);
 	command->addCommand(commandGeomCopy);
 
     Topo::CommandDuplicateTopo* commandTopoCopy =
-            new Topo::CommandDuplicateTopo(getLocalContext(), commandGeomCopy);
+            new Topo::CommandDuplicateTopo(getContext(), commandGeomCopy);
     command->addCommand(commandTopoCopy);
 
     CommandRotation* commandGeomRotate =
-			new CommandRotation(getLocalContext(), commandGeomCopy, rot);
+			new CommandRotation(getContext(), commandGeomCopy, rot);
 	command->addCommand(commandGeomRotate);
 
 	Topo::CommandRotateTopo* commandTopoRotate =
-			new Topo::CommandRotateTopo(getLocalContext(), commandTopoCopy, rot, true);
+			new Topo::CommandRotateTopo(getContext(), commandTopoCopy, rot, true);
 	command->addCommand(commandTopoRotate);
 
 	// on ne fait rien pour le maillage ....
-//    Internal::CommandInternal* commandMesh = new Mesh::CommandRotateMesh(getLocalContext(), rot);
+//    Internal::CommandInternal* commandMesh = new Mesh::CommandRotateMesh(getContext(), rot);
 //    commandCompo->addCommand(commandMesh);
 
     // trace dans le script
@@ -2964,13 +2940,13 @@ copyAndRotateAll(const Utils::Math::Rotation& rot,
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 			new Internal::M3DCommandResult (*command,0);
 
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 makeRevol( std::vector<std::string>& entities,
         const Utils::Math::Rotation& rot,
         const bool keep)
@@ -2981,7 +2957,7 @@ makeRevol( std::vector<std::string>& entities,
     return makeRevol(vge, rot,keep);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 makeRevol( std::vector<GeomEntity*>& entities,
         const Utils::Math::Rotation& rot,
         const bool keep)
@@ -2994,7 +2970,7 @@ makeRevol( std::vector<GeomEntity*>& entities,
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     CommandExtrudeRevolution *command =
-            new CommandExtrudeRevolution(getLocalContext(), entities,rot,keep);
+            new CommandExtrudeRevolution(getContext(), entities,rot,keep);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -3003,12 +2979,12 @@ makeRevol( std::vector<GeomEntity*>& entities,
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 									new Internal::M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 makeExtrude(std::vector<std::string>& entities,
 					const Vector& dp, const bool keep)
 {
@@ -3018,7 +2994,7 @@ makeExtrude(std::vector<std::string>& entities,
     return makeExtrude(vge, dp, keep);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 makeExtrude( std::vector<GeomEntity*>& entities,
 		const Vector& dp, const bool keep)
 {
@@ -3030,7 +3006,7 @@ makeExtrude( std::vector<GeomEntity*>& entities,
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     CommandExtrudeDirection *command =
-            new CommandExtrudeDirection(getLocalContext(), entities, dp, keep);
+            new CommandExtrudeDirection(getContext(), entities, dp, keep);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -3039,12 +3015,12 @@ makeExtrude( std::vector<GeomEntity*>& entities,
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 			new Internal::M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 makeBlocksByExtrude(std::vector<std::string>& entities,
 					const Vector& dp, const bool keep)
 {
@@ -3054,7 +3030,7 @@ makeBlocksByExtrude(std::vector<std::string>& entities,
     return makeBlocksByExtrude(vge, dp, keep);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 makeBlocksByExtrude(std::vector<GeomEntity*>& entities, const Utils::Math::Vector& dv, const bool keep)
 {
 	CHECK_ENTITIES_LIST(entities)
@@ -3070,9 +3046,9 @@ makeBlocksByExtrude(std::vector<GeomEntity*>& entities, const Utils::Math::Vecto
     if (Internal::EntitiesHelper::hasTopoRef(entities))
     {
         Internal::CommandComposite* commandCompo =
-             new Internal::CommandComposite(getLocalContext(), "Création d'une topologie par extrusion");
+             new Internal::CommandComposite(getContext(), "Création d'une topologie par extrusion");
 
-        Geom::CommandExtrudeDirection *commandGeom = new CommandExtrudeDirection(getLocalContext(), entities, dv, keep);
+        Geom::CommandExtrudeDirection *commandGeom = new CommandExtrudeDirection(getContext(), entities, dv, keep);
         commandCompo->addCommand(commandGeom);
 
         // recherche des entités topologiques parmis les entités géométriques sélectionnées
@@ -3087,14 +3063,14 @@ makeBlocksByExtrude(std::vector<GeomEntity*>& entities, const Utils::Math::Vecto
 
         // extrusion de la topologie suivant une direction
         if (selectedCoFaces.size()){
-        	Topo::CommandExtrudeTopo* commandTopo = new Topo::CommandExtrudeTopo(getLocalContext(), commandGeom, selectedCoFaces, dv);
+        	Topo::CommandExtrudeTopo* commandTopo = new Topo::CommandExtrudeTopo(getContext(), commandGeom, selectedCoFaces, dv);
         	commandCompo->addCommand(commandTopo);
         }
         command = commandCompo;
     }
     else
     {
-        command = new CommandExtrudeDirection(getLocalContext(), entities, dv, keep);
+        command = new CommandExtrudeDirection(getContext(), entities, dv, keep);
     }
 
 
@@ -3106,12 +3082,12 @@ makeBlocksByExtrude(std::vector<GeomEntity*>& entities, const Utils::Math::Vecto
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 									new Internal::M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 fuse(std::vector<std::string>& entities)
 {
     std::vector<GeomEntity*> vge;
@@ -3120,7 +3096,7 @@ fuse(std::vector<std::string>& entities)
    return fuse(vge);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 fuse(std::vector<GeomEntity*>& entities)
 {
 	CHECK_ENTITIES_LIST (entities)
@@ -3140,19 +3116,19 @@ fuse(std::vector<GeomEntity*>& entities)
     if (Internal::EntitiesHelper::hasTopoRef(entities)){
 
         Internal::CommandComposite* commandCompo =
-             new Internal::CommandComposite(getLocalContext(), "Fusion booléenne entre géométries avec topologies");
+             new Internal::CommandComposite(getContext(), "Fusion booléenne entre géométries avec topologies");
 
-        commandGeom = new CommandFuse(getLocalContext(),entities);
+        commandGeom = new CommandFuse(getContext(),entities);
         commandCompo->addCommand(commandGeom);
 
-        Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getLocalContext(),
+        Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getContext(),
                 commandGeom);
         commandCompo->addCommand(commandTopo);
 
         command = commandCompo;
     }
     else {
-    	commandGeom = new CommandFuse(getLocalContext(),entities);
+    	commandGeom = new CommandFuse(getContext(),entities);
     	command = commandGeom;
     }
 
@@ -3165,13 +3141,13 @@ fuse(std::vector<GeomEntity*>& entities)
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 			new Internal::M3DCommandResult (*command, commandGeom);
 
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 common(std::vector<std::string>& entities)
 {
     std::vector<GeomEntity*> vge;
@@ -3180,7 +3156,7 @@ common(std::vector<std::string>& entities)
    return common(vge);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 common(std::vector<Geom::GeomEntity*>& entities)
 {
 	CHECK_ENTITIES_LIST(entities)
@@ -3200,19 +3176,19 @@ common(std::vector<Geom::GeomEntity*>& entities)
     if (Internal::EntitiesHelper::hasTopoRef(entities)){
 
         Internal::CommandComposite* commandCompo =
-             new Internal::CommandComposite(getLocalContext(), "Intersection booléenne entre géométries avec topologies");
+             new Internal::CommandComposite(getContext(), "Intersection booléenne entre géométries avec topologies");
 
-        commandGeom = new CommandCommon(getLocalContext(),entities);
+        commandGeom = new CommandCommon(getContext(),entities);
         commandCompo->addCommand(commandGeom);
 
-        Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getLocalContext(),
+        Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getContext(),
                 commandGeom);
         commandCompo->addCommand(commandTopo);
 
         command = commandCompo;
     }
     else {
-    	commandGeom = new CommandCommon(getLocalContext(), entities);
+    	commandGeom = new CommandCommon(getContext(), entities);
     	command = commandGeom;
     }
 
@@ -3225,19 +3201,19 @@ common(std::vector<Geom::GeomEntity*>& entities)
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 			new Internal::M3DCommandResult (*command, commandGeom);
 
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 common2D(std::string entity1, std::string entity2, std::string groupName)
 {
    return common2D(getEntity(entity1), getEntity(entity2), groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 common2D(Geom::GeomEntity* entity1, Geom::GeomEntity* entity2, std::string groupName)
 {
 
@@ -3250,19 +3226,19 @@ common2D(Geom::GeomEntity* entity1, Geom::GeomEntity* entity2, std::string group
     if (Internal::EntitiesHelper::hasTopoRef(entities)){
 
         Internal::CommandComposite* commandCompo =
-             new Internal::CommandComposite(getLocalContext(), "Intersection booléenne entre 2 géométries 1D ou 2D avec topologies");
+             new Internal::CommandComposite(getContext(), "Intersection booléenne entre 2 géométries 1D ou 2D avec topologies");
 
-        commandGeom = new CommandCommon2D(getLocalContext(), entity1, entity2, groupName);
+        commandGeom = new CommandCommon2D(getContext(), entity1, entity2, groupName);
         commandCompo->addCommand(commandGeom);
 
-        Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getLocalContext(),
+        Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getContext(),
                 commandGeom);
         commandCompo->addCommand(commandTopo);
 
         command = commandCompo;
     }
     else {
-    	commandGeom = new CommandCommon2D(getLocalContext(), entity1, entity2, groupName);
+    	commandGeom = new CommandCommon2D(getContext(), entity1, entity2, groupName);
     	command = commandGeom;
     }
 
@@ -3278,19 +3254,19 @@ common2D(Geom::GeomEntity* entity1, Geom::GeomEntity* entity2, std::string group
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 			new Internal::M3DCommandResult (*command, commandGeom);
 
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 common2DOnCopy(std::string entity1, std::string entity2, std::string groupName)
 {
    return common2DOnCopy(getEntity(entity1), getEntity(entity2), groupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 common2DOnCopy(Geom::GeomEntity* entity1, Geom::GeomEntity* entity2, std::string groupName)
 {
 
@@ -3302,12 +3278,12 @@ common2DOnCopy(Geom::GeomEntity* entity1, Geom::GeomEntity* entity2, std::string
     entities.push_back(entity2);
 
     Internal::CommandComposite* commandCompo =
-    		new Internal::CommandComposite(getLocalContext(), "Intersection booléenne entre 2 géométries 1D ou 2D, sans destruction");
+    		new Internal::CommandComposite(getContext(), "Intersection booléenne entre 2 géométries 1D ou 2D, sans destruction");
     CommandGeomCopy *commandGeomCopy =
-    		new CommandGeomCopy(getLocalContext(), entities, groupName);
+    		new CommandGeomCopy(getContext(), entities, groupName);
     commandCompo->addCommand(commandGeomCopy);
 
-    commandGeom = new CommandCommon2D(getLocalContext(), commandGeomCopy, groupName);
+    commandGeom = new CommandCommon2D(getContext(), commandGeomCopy, groupName);
     commandCompo->addCommand(commandGeom);
 
     command = commandCompo;
@@ -3324,20 +3300,20 @@ common2DOnCopy(Geom::GeomEntity* entity1, Geom::GeomEntity* entity2, std::string
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 			new Internal::M3DCommandResult (*command, commandGeom);
 
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::importBREP(std::string n, const bool testVolumicProperties)
+Internal::M3DCommandResult* GeomManager::importBREP(std::string n, const bool testVolumicProperties)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message << "GeomManager::importBREP ("<<n<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     //creation de la commande de création
-    CommandImportBREP *command = new CommandImportBREP(getLocalContext(), n, testVolumicProperties);
+    CommandImportBREP *command = new CommandImportBREP(getContext(), n, testVolumicProperties);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().importBREP(\""<<n<<"\"";
@@ -3350,19 +3326,19 @@ Internal::M3DCommandResultIfc* GeomManager::importBREP(std::string n, const bool
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::importSTEP(std::string n, const bool testVolumicProperties)
+Internal::M3DCommandResult* GeomManager::importSTEP(std::string n, const bool testVolumicProperties)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message << "GeomManager::importSTEP ("<<n<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     //creation de la commande de création
-    CommandImportSTEP *command = new CommandImportSTEP(getLocalContext(), n, testVolumicProperties);
+    CommandImportSTEP *command = new CommandImportSTEP(getContext(), n, testVolumicProperties);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().importSTEP(\""<<n<<"\"";
@@ -3375,19 +3351,19 @@ Internal::M3DCommandResultIfc* GeomManager::importSTEP(std::string n, const bool
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::importSTL(std::string n)
+Internal::M3DCommandResult* GeomManager::importSTL(std::string n)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message << "GeomManager::importSTL ("<<n<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     //creation de la commande de création
-    CommandImportSTL *command = new CommandImportSTL(getLocalContext(),n);
+    CommandImportSTL *command = new CommandImportSTL(getContext(),n);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().importSTL(\""<<n<< "\"";
@@ -3398,19 +3374,19 @@ Internal::M3DCommandResultIfc* GeomManager::importSTL(std::string n)
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::importIGES(std::string n)
+Internal::M3DCommandResult* GeomManager::importIGES(std::string n)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message << "GeomManager::importIGES ("<<n<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     //creation de la commande de création
-    CommandImportIGES *command = new CommandImportIGES(getLocalContext(), n);
+    CommandImportIGES *command = new CommandImportIGES(getContext(), n);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().importIGES(\"" << n << "\")";
@@ -3420,19 +3396,19 @@ Internal::M3DCommandResultIfc* GeomManager::importIGES(std::string n)
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::importCATIA(std::string n, const bool testVolumicProperties)
+Internal::M3DCommandResult* GeomManager::importCATIA(std::string n, const bool testVolumicProperties)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message << "GeomManager::importCATIA ("<<n<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     //creation de la commande de création
-    CommandImportCATIA *command = new CommandImportCATIA(getLocalContext(), n, testVolumicProperties);
+    CommandImportCATIA *command = new CommandImportCATIA(getContext(), n, testVolumicProperties);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().importCATIA(\""<<n<<"\"";
@@ -3445,12 +3421,12 @@ Internal::M3DCommandResultIfc* GeomManager::importCATIA(std::string n, const boo
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 									new Internal::M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::importMDL(std::string n, const bool all, const bool useAreaName,
+Internal::M3DCommandResult* GeomManager::importMDL(std::string n, const bool all, const bool useAreaName,
 		std::string prefixName, int deg_min, int deg_max)
 {
 #ifdef USE_MDLPARSER    
@@ -3460,7 +3436,7 @@ Internal::M3DCommandResultIfc* GeomManager::importMDL(std::string n, const bool 
 
     // création de l'importateur de modélisation/topo MDL
     Internal::ImportMDLImplementation* impl =
-	  new Internal::ImportMDLImplementation(getLocalContext(), n, all, useAreaName, deg_min, deg_max);
+	  new Internal::ImportMDLImplementation(getContext(), n, all, useAreaName, deg_min, deg_max);
     if (!prefixName.empty())
     	impl->setPrefix(prefixName);
 
@@ -3474,10 +3450,10 @@ Internal::M3DCommandResultIfc* GeomManager::importMDL(std::string n, const bool 
     Internal::CommandChangeLengthUnit* commandCU = 0;
     if (luCtx == Utils::Unit::undefined){
     	// si l'unité n'est pas définie, on se met dans celle du mdl
-    	commandCU = new Internal::CommandChangeLengthUnit(getLocalContext(), luMdl);
+    	commandCU = new Internal::CommandChangeLengthUnit(getContext(), luMdl);
 
     	commandCompo =
-    			new Internal::CommandComposite(getLocalContext(), "Import Mdl (géométrie) avec changement d'unité de longueur");
+    			new Internal::CommandComposite(getContext(), "Import Mdl (géométrie) avec changement d'unité de longueur");
 
     	commandCompo->addCommand(commandCU);
     }
@@ -3488,7 +3464,7 @@ Internal::M3DCommandResultIfc* GeomManager::importMDL(std::string n, const bool 
     }
 
     //creation de la commande d'importation
-    CommandImportMDL *commandImport = new CommandImportMDL(getLocalContext(), impl);
+    CommandImportMDL *commandImport = new CommandImportMDL(getContext(), impl);
 
     if (commandCompo){
     	commandCompo->addCommand(commandImport);
@@ -3519,7 +3495,7 @@ Internal::M3DCommandResultIfc* GeomManager::importMDL(std::string n, const bool 
     // on peut détruire l'importateur de MDL
     delete impl;
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 	        new Internal::M3DCommandResult (*command);
 	return cmdResult;
 #else   // USE_MDLPARSER
@@ -3527,7 +3503,7 @@ Internal::M3DCommandResultIfc* GeomManager::importMDL(std::string n, const bool 
 #endif  // USE_MDLPARSER    
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::importMDL(std::string n, std::string groupe)
+Internal::M3DCommandResult* GeomManager::importMDL(std::string n, std::string groupe)
 {
 #ifdef USE_MDLPARSER    
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -3535,7 +3511,7 @@ Internal::M3DCommandResultIfc* GeomManager::importMDL(std::string n, std::string
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     // création de l'importateur de modélisation/topo MDL
-    Internal::ImportMDLImplementation* impl = new Internal::ImportMDLImplementation(getLocalContext(), n, groupe);
+    Internal::ImportMDLImplementation* impl = new Internal::ImportMDLImplementation(getContext(), n, groupe);
 
     Utils::Unit::lengthUnit luMdl = impl->getLengthUnit();
     Utils::Unit::lengthUnit luCtx = getContext().getLengthUnit();
@@ -3547,10 +3523,10 @@ Internal::M3DCommandResultIfc* GeomManager::importMDL(std::string n, std::string
     Internal::CommandChangeLengthUnit* commandCU = 0;
     if (luCtx == Utils::Unit::undefined){
     	// si l'unité n'est pas définie, on se met en mètre
-    	commandCU = new Internal::CommandChangeLengthUnit(getLocalContext(), Utils::Unit::meter);
+    	commandCU = new Internal::CommandChangeLengthUnit(getContext(), Utils::Unit::meter);
 
     	commandCompo =
-    			new Internal::CommandComposite(getLocalContext(), "Import Mdl (géométrie) avec changement d'unité de longueur");
+    			new Internal::CommandComposite(getContext(), "Import Mdl (géométrie) avec changement d'unité de longueur");
 
     	commandCompo->addCommand(commandCU);
 
@@ -3564,7 +3540,7 @@ Internal::M3DCommandResultIfc* GeomManager::importMDL(std::string n, std::string
     }
 
     //creation de la commande d'importation
-    CommandImportMDL *commandImport = new CommandImportMDL(getLocalContext(), impl);
+    CommandImportMDL *commandImport = new CommandImportMDL(getContext(), impl);
 
     if (commandCompo){
     	commandCompo->addCommand(commandImport);
@@ -3586,7 +3562,7 @@ Internal::M3DCommandResultIfc* GeomManager::importMDL(std::string n, std::string
     // on peut détruire l'importateur de MDL
     delete impl;
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 	        new Internal::M3DCommandResult (*command);
 	return cmdResult;
 #else   // USE_MDLPARSER
@@ -3594,7 +3570,7 @@ Internal::M3DCommandResultIfc* GeomManager::importMDL(std::string n, std::string
 #endif  // USE_MDLPARSER    
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::importMDL(std::string n, std::vector<std::string>& zones)
+Internal::M3DCommandResult* GeomManager::importMDL(std::string n, std::vector<std::string>& zones)
 {
 #ifdef USE_MDLPARSER    
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -3602,7 +3578,7 @@ Internal::M3DCommandResultIfc* GeomManager::importMDL(std::string n, std::vector
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     // création de l'importateur de modélisation/topo MDL
-    Internal::ImportMDLImplementation* impl = new Internal::ImportMDLImplementation(getLocalContext(), n, zones);
+    Internal::ImportMDLImplementation* impl = new Internal::ImportMDLImplementation(getContext(), n, zones);
 
     Utils::Unit::lengthUnit luMdl = impl->getLengthUnit();
     Utils::Unit::lengthUnit luCtx = getContext().getLengthUnit();
@@ -3614,10 +3590,10 @@ Internal::M3DCommandResultIfc* GeomManager::importMDL(std::string n, std::vector
     Internal::CommandChangeLengthUnit* commandCU = 0;
     if (luCtx == Utils::Unit::undefined){
     	// si l'unité n'est pas définie, on se met en mètre
-    	commandCU = new Internal::CommandChangeLengthUnit(getLocalContext(), Utils::Unit::meter);
+    	commandCU = new Internal::CommandChangeLengthUnit(getContext(), Utils::Unit::meter);
 
     	commandCompo =
-    			new Internal::CommandComposite(getLocalContext(), "Import Mdl (géométrie) avec changement d'unité de longueur");
+    			new Internal::CommandComposite(getContext(), "Import Mdl (géométrie) avec changement d'unité de longueur");
 
     	commandCompo->addCommand(commandCU);
 
@@ -3631,7 +3607,7 @@ Internal::M3DCommandResultIfc* GeomManager::importMDL(std::string n, std::vector
     }
 
     //creation de la commande d'importation
-    CommandImportMDL *commandImport = new CommandImportMDL(getLocalContext(), impl);
+    CommandImportMDL *commandImport = new CommandImportMDL(getContext(), impl);
 
     if (commandCompo){
     	commandCompo->addCommand(commandImport);
@@ -3658,7 +3634,7 @@ Internal::M3DCommandResultIfc* GeomManager::importMDL(std::string n, std::vector
     // on peut détruire l'importateur de MDL
     delete impl;
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 	        new Internal::M3DCommandResult (*command);
 	return cmdResult;
 #else   // USE_MDLPARSER
@@ -3670,7 +3646,7 @@ void GeomManager::mdl2CommandesMagix3D(std::string n, const bool withTopo)
 {
 #ifdef USE_MDLPARSER
     // création de l'importateur de modélisation/topo MDL
-    Internal::ImportMDL2Commandes* impl = new Internal::ImportMDL2Commandes(getLocalContext(), n, withTopo);
+    Internal::ImportMDL2Commandes* impl = new Internal::ImportMDL2Commandes(getContext(), n, withTopo);
 
     Utils::Unit::lengthUnit luMdl = impl->getLengthUnit();
     Utils::Unit::lengthUnit luCtx = getContext().getLengthUnit();
@@ -3695,7 +3671,7 @@ void GeomManager::mdl2CommandesMagix3D(std::string n, const bool withTopo)
 #endif  // USE_MDLPARSER    
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::exportMDL(std::vector<std::string>& ge,
+Internal::M3DCommandResult* GeomManager::exportMDL(std::vector<std::string>& ge,
         const std::string& n)
 {
 #ifdef USE_MDLPARSER
@@ -3713,7 +3689,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportMDL(std::vector<std::string>& 
 #endif  // USE_MDLPARSER    
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::exportMDL(std::vector<Geom::GeomEntity*>& geomEntities,
+Internal::M3DCommandResult* GeomManager::exportMDL(std::vector<Geom::GeomEntity*>& geomEntities,
         const std::string& n)
 {
 #ifdef USE_MDLPARSER
@@ -3723,10 +3699,10 @@ Internal::M3DCommandResultIfc* GeomManager::exportMDL(std::vector<Geom::GeomEnti
 
     // création de l'exportateur de modélisation/topo MDL
     Internal::ExportMDLImplementation* impl =
-            new Internal::ExportMDLImplementation(getLocalContext(), geomEntities, n);
+            new Internal::ExportMDLImplementation(getContext(), geomEntities, n);
 
     //creation de la commande d'exportation
-    CommandExportMDL *command = new CommandExportMDL(getLocalContext(), impl);
+    CommandExportMDL *command = new CommandExportMDL(getContext(), impl);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -3740,7 +3716,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportMDL(std::vector<Geom::GeomEnti
     // on peut détruire l'exportateur de MDL
     delete impl;
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 #else   // USE_MDLPARSER
@@ -3748,14 +3724,14 @@ Internal::M3DCommandResultIfc* GeomManager::exportMDL(std::vector<Geom::GeomEnti
 #endif  // USE_MDLPARSER    
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::exportVTK(const std::string& n)
+Internal::M3DCommandResult* GeomManager::exportVTK(const std::string& n)
 {
 #ifdef _DEBUG2
     std::cout<<"exportVTK"<<std::endl;
 #endif
 
     //creation de la commande d'exportation
-    CommandExportVTK *command = new CommandExportVTK(getLocalContext(), n);
+    CommandExportVTK *command = new CommandExportVTK(getContext(), n);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -3767,12 +3743,12 @@ Internal::M3DCommandResultIfc* GeomManager::exportVTK(const std::string& n)
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::exportVTK(std::vector<std::string>& ge,
+Internal::M3DCommandResult* GeomManager::exportVTK(std::vector<std::string>& ge,
 		const std::string& n)
 {
     std::vector<Geom::GeomEntity*> geomEntities;
@@ -3782,7 +3758,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportVTK(std::vector<std::string>& 
     return exportVTK(geomEntities, n);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::exportVTK(std::vector<Geom::GeomEntity*>& geomEntities,
+Internal::M3DCommandResult* GeomManager::exportVTK(std::vector<Geom::GeomEntity*>& geomEntities,
         const std::string& n)
 {
 	CHECK_ENTITIES_LIST(geomEntities)
@@ -3791,7 +3767,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportVTK(std::vector<Geom::GeomEnti
 #endif
 
     //creation de la commande d'exportation
-    CommandExportVTK *command = new CommandExportVTK(getLocalContext(), geomEntities, n);
+    CommandExportVTK *command = new CommandExportVTK(getContext(), geomEntities, n);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -3802,18 +3778,18 @@ Internal::M3DCommandResultIfc* GeomManager::exportVTK(std::vector<Geom::GeomEnti
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::exportSTL(const std::string& ge,
+Internal::M3DCommandResult* GeomManager::exportSTL(const std::string& ge,
 		const std::string& n)
 {
     return exportSTL(getEntity(ge), n);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::exportSTL(Geom::GeomEntity* geomEntity,
+Internal::M3DCommandResult* GeomManager::exportSTL(Geom::GeomEntity* geomEntity,
         const std::string& n)
 {
 #ifdef _DEBUG2
@@ -3821,7 +3797,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportSTL(Geom::GeomEntity* geomEnti
 #endif
 
     //creation de la commande d'exportation
-    CommandExportSTL *command = new CommandExportSTL(getLocalContext(), geomEntity, n);
+    CommandExportSTL *command = new CommandExportSTL(getContext(), geomEntity, n);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -3834,12 +3810,12 @@ Internal::M3DCommandResultIfc* GeomManager::exportSTL(Geom::GeomEntity* geomEnti
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::exportMLI(const std::string& n)
+Internal::M3DCommandResult* GeomManager::exportMLI(const std::string& n)
 {
 	std::cout<<"exportMLI poyop"<<std::endl;
 #ifdef _DEBUG2
@@ -3847,7 +3823,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportMLI(const std::string& n)
 #endif
 
     //creation de la commande d'exportation
-    CommandExportMLI *command = new CommandExportMLI(getLocalContext(), n);
+    CommandExportMLI *command = new CommandExportMLI(getContext(), n);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -3859,12 +3835,12 @@ Internal::M3DCommandResultIfc* GeomManager::exportMLI(const std::string& n)
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::exportMLI(std::vector<std::string>& ge,
+Internal::M3DCommandResult* GeomManager::exportMLI(std::vector<std::string>& ge,
 		const std::string& n)
 {
     std::vector<Geom::GeomEntity*> geomEntities;
@@ -3874,7 +3850,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportMLI(std::vector<std::string>& 
     return exportMLI(geomEntities, n);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::exportMLI(std::vector<Geom::GeomEntity*>& geomEntities,
+Internal::M3DCommandResult* GeomManager::exportMLI(std::vector<Geom::GeomEntity*>& geomEntities,
         const std::string& n)
 {
 	CHECK_ENTITIES_LIST(geomEntities)
@@ -3883,7 +3859,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportMLI(std::vector<Geom::GeomEnti
 #endif
 
     //creation de la commande d'exportation
-    CommandExportMLI *command = new CommandExportMLI(getLocalContext(), geomEntities, n);
+    CommandExportMLI *command = new CommandExportMLI(getContext(), geomEntities, n);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -3894,19 +3870,19 @@ Internal::M3DCommandResultIfc* GeomManager::exportMLI(std::vector<Geom::GeomEnti
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::exportBREP(const std::string& n)
+Internal::M3DCommandResult* GeomManager::exportBREP(const std::string& n)
 {
 #ifdef _DEBUG2
     std::cout<<"exportBREP"<<std::endl;
 #endif
 
     //creation de la commande d'exportation
-    CommandExportBREP *command = new CommandExportBREP(getLocalContext(), n);
+    CommandExportBREP *command = new CommandExportBREP(getContext(), n);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -3918,12 +3894,12 @@ Internal::M3DCommandResultIfc* GeomManager::exportBREP(const std::string& n)
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::exportBREP(std::vector<std::string>& ge,
+Internal::M3DCommandResult* GeomManager::exportBREP(std::vector<std::string>& ge,
 		const std::string& n)
 {
     std::vector<Geom::GeomEntity*> geomEntities;
@@ -3933,7 +3909,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportBREP(std::vector<std::string>&
     return exportBREP(geomEntities, n);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::exportBREP(std::vector<Geom::GeomEntity*>& geomEntities,
+Internal::M3DCommandResult* GeomManager::exportBREP(std::vector<Geom::GeomEntity*>& geomEntities,
         const std::string& n)
 {
 	CHECK_ENTITIES_LIST(geomEntities)
@@ -3942,7 +3918,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportBREP(std::vector<Geom::GeomEnt
 #endif
 
     //creation de la commande d'exportation
-    CommandExportBREP *command = new CommandExportBREP(getLocalContext(), geomEntities, n);
+    CommandExportBREP *command = new CommandExportBREP(getContext(), geomEntities, n);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -3953,19 +3929,19 @@ Internal::M3DCommandResultIfc* GeomManager::exportBREP(std::vector<Geom::GeomEnt
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::exportSTEP(const std::string& n)
+Internal::M3DCommandResult* GeomManager::exportSTEP(const std::string& n)
 {
 #ifdef _DEBUG2
     std::cout<<"exportSTEP"<<std::endl;
 #endif
 
     //creation de la commande d'exportation
-    CommandExportSTEP *command = new CommandExportSTEP(getLocalContext(), n);
+    CommandExportSTEP *command = new CommandExportSTEP(getContext(), n);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -3977,12 +3953,12 @@ Internal::M3DCommandResultIfc* GeomManager::exportSTEP(const std::string& n)
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::exportSTEP(std::vector<std::string>& ge,
+Internal::M3DCommandResult* GeomManager::exportSTEP(std::vector<std::string>& ge,
 		const std::string& n)
 {
     std::vector<Geom::GeomEntity*> geomEntities;
@@ -3992,7 +3968,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportSTEP(std::vector<std::string>&
     return exportSTEP(geomEntities, n);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::exportSTEP(std::vector<Geom::GeomEntity*>& geomEntities,
+Internal::M3DCommandResult* GeomManager::exportSTEP(std::vector<Geom::GeomEntity*>& geomEntities,
         const std::string& n)
 {
 	CHECK_ENTITIES_LIST(geomEntities)
@@ -4001,7 +3977,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportSTEP(std::vector<Geom::GeomEnt
 #endif
 
     //creation de la commande d'exportation
-    CommandExportSTEP *command = new CommandExportSTEP(getLocalContext(), geomEntities, n);
+    CommandExportSTEP *command = new CommandExportSTEP(getContext(), geomEntities, n);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -4012,19 +3988,19 @@ Internal::M3DCommandResultIfc* GeomManager::exportSTEP(std::vector<Geom::GeomEnt
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::exportIGES(const std::string& n)
+Internal::M3DCommandResult* GeomManager::exportIGES(const std::string& n)
 {
 #ifdef _DEBUG2
     std::cout<<"exportIGES"<<std::endl;
 #endif
 
     //creation de la commande d'exportation
-    CommandExportIGES *command = new CommandExportIGES(getLocalContext(), n);
+    CommandExportIGES *command = new CommandExportIGES(getContext(), n);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -4036,12 +4012,12 @@ Internal::M3DCommandResultIfc* GeomManager::exportIGES(const std::string& n)
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::exportIGES(std::vector<std::string>& ge,
+Internal::M3DCommandResult* GeomManager::exportIGES(std::vector<std::string>& ge,
 		const std::string& n)
 {
     std::vector<Geom::GeomEntity*> geomEntities;
@@ -4051,7 +4027,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportIGES(std::vector<std::string>&
     return exportIGES(geomEntities, n);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::exportIGES(std::vector<Geom::GeomEntity*>& geomEntities,
+Internal::M3DCommandResult* GeomManager::exportIGES(std::vector<Geom::GeomEntity*>& geomEntities,
         const std::string& n)
 {
 	CHECK_ENTITIES_LIST(geomEntities)
@@ -4060,7 +4036,7 @@ Internal::M3DCommandResultIfc* GeomManager::exportIGES(std::vector<Geom::GeomEnt
 #endif
 
     //creation de la commande d'exportation
-    CommandExportIGES *command = new CommandExportIGES(getLocalContext(), geomEntities, n);
+    CommandExportIGES *command = new CommandExportIGES(getContext(), geomEntities, n);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -4071,12 +4047,12 @@ Internal::M3DCommandResultIfc* GeomManager::exportIGES(std::vector<Geom::GeomEnt
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 cut(std::string tokeep,std::vector<std::string>& tocut)
 {
     std::vector<GeomEntity*> vge;
@@ -4085,7 +4061,7 @@ cut(std::string tokeep,std::vector<std::string>& tocut)
    return cut(getEntity(tokeep),vge);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 cut(Geom::GeomEntity* tokeep, std::vector<Geom::GeomEntity*>& tocut)
 {
 	CHECK_ENTITIES_LIST(tocut)
@@ -4108,19 +4084,19 @@ cut(Geom::GeomEntity* tokeep, std::vector<Geom::GeomEntity*>& tocut)
     if (Internal::EntitiesHelper::hasTopoRef(tokeeps)){
 
         Internal::CommandComposite* commandCompo =
-             new Internal::CommandComposite(getLocalContext(), "Différences entre géométries avec topologies");
+             new Internal::CommandComposite(getContext(), "Différences entre géométries avec topologies");
 
-        commandGeom = new CommandCut(getLocalContext(),tokeep, tocut);
+        commandGeom = new CommandCut(getContext(),tokeep, tocut);
         commandCompo->addCommand(commandGeom);
 
-        Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getLocalContext(),
+        Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getContext(),
                 commandGeom);
         commandCompo->addCommand(commandTopo);
 
         command = commandCompo;
     }
     else {
-        commandGeom = new CommandCut(getLocalContext(),tokeep, tocut);
+        commandGeom = new CommandCut(getContext(),tokeep, tocut);
         command = commandGeom;
     }
 
@@ -4133,13 +4109,13 @@ cut(Geom::GeomEntity* tokeep, std::vector<Geom::GeomEntity*>& tocut)
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command, commandGeom);
 
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 cut(std::vector<std::string>& tokeep,std::vector<std::string>& tocut)
 {
     std::vector<GeomEntity*> vge_keep, vge_cut;
@@ -4153,7 +4129,7 @@ cut(std::vector<std::string>& tokeep,std::vector<std::string>& tocut)
    return cut(vge_keep, vge_cut);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 cut(std::vector<Geom::GeomEntity*>& tokeep,
         std::vector<Geom::GeomEntity*>& tocut)
 {
@@ -4181,16 +4157,16 @@ cut(std::vector<Geom::GeomEntity*>& tokeep,
 
 
     Internal::CommandComposite* commandCompo =
-         new Internal::CommandComposite(getLocalContext(), "Différences entre géométries avec plusieurs entités à couper");
+         new Internal::CommandComposite(getContext(), "Différences entre géométries avec plusieurs entités à couper");
 
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
     if (Internal::EntitiesHelper::hasTopoRef(tokeep)){
     	for(unsigned int i=0;i<tokeep.size();i++)
     	{
-    		commandGeom = new CommandCut(getLocalContext(),tokeep[i], tocut);
+    		commandGeom = new CommandCut(getContext(),tokeep[i], tocut);
     		commandCompo->addCommand(commandGeom);
 
-    		Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getLocalContext(),
+    		Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getContext(),
     				commandGeom);
     		commandCompo->addCommand(commandTopo);
     	}
@@ -4198,7 +4174,7 @@ cut(std::vector<Geom::GeomEntity*>& tokeep,
     else {
     	for(unsigned int i=0;i<tokeep.size();i++)
     	{
-    		commandGeom = new CommandCut(getLocalContext(),tokeep[i], tocut);
+    		commandGeom = new CommandCut(getContext(),tokeep[i], tocut);
     		commandCompo->addCommand(commandGeom);
     	}
     }
@@ -4214,14 +4190,14 @@ cut(std::vector<Geom::GeomEntity*>& tokeep,
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
             new Internal::M3DCommandResult (*command, commandGeom);
 
     return cmdResult;
 }
 
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 glue(std::vector<std::string>& entities)
 {
     std::vector<GeomEntity*> vge;
@@ -4231,7 +4207,7 @@ glue(std::vector<std::string>& entities)
     return glue(vge);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::glue( std::vector<Geom::GeomEntity*>& entities)
+Internal::M3DCommandResult* GeomManager::glue( std::vector<Geom::GeomEntity*>& entities)
 {
 	CHECK_ENTITIES_LIST(entities)
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -4250,19 +4226,19 @@ Internal::M3DCommandResultIfc* GeomManager::glue( std::vector<Geom::GeomEntity*>
     if (Internal::EntitiesHelper::hasTopoRef(entities)){
 
         Internal::CommandComposite* commandCompo =
-             new Internal::CommandComposite(getLocalContext(), "Collage entre géométries avec topologies");
+             new Internal::CommandComposite(getContext(), "Collage entre géométries avec topologies");
 
-        Geom::CommandEditGeom *commandGeom = new CommandGluing(getLocalContext(),entities);
+        Geom::CommandEditGeom *commandGeom = new CommandGluing(getContext(),entities);
         commandCompo->addCommand(commandGeom);
 
-        Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getLocalContext(),
+        Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getContext(),
                 commandGeom);
         commandCompo->addCommand(commandTopo);
 
         command = commandCompo;
     }
     else {
-        command = new CommandGluing(getLocalContext(),entities);
+        command = new CommandGluing(getContext(),entities);
     }
 
     // trace dans le script
@@ -4274,12 +4250,12 @@ Internal::M3DCommandResultIfc* GeomManager::glue( std::vector<Geom::GeomEntity*>
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	Internal::M3DCommandResultIfc*	cmdResult	=
+	Internal::M3DCommandResult*	cmdResult	=
 									new Internal::M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 section(std::vector<std::string>& entities, std::string tool)
 {
     std::vector<GeomEntity*> vge;
@@ -4290,7 +4266,7 @@ section(std::vector<std::string>& entities, std::string tool)
     return section(vge,ge_tool);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::section( std::vector<Geom::GeomEntity*>& entities,
+Internal::M3DCommandResult* GeomManager::section( std::vector<Geom::GeomEntity*>& entities,
     GeomEntity* tool)
 {
 	CHECK_ENTITIES_LIST(entities)
@@ -4312,21 +4288,21 @@ Internal::M3DCommandResultIfc* GeomManager::section( std::vector<Geom::GeomEntit
         if (Internal::EntitiesHelper::hasTopoRef(entities)){
 
             Internal::CommandComposite* commandCompo =
-                    new Internal::CommandComposite(getLocalContext(), "Section par un plan entre géométries avec topologies");
+                    new Internal::CommandComposite(getContext(), "Section par un plan entre géométries avec topologies");
 
             Geom::CommandEditGeom *commandGeom =
-                    new CommandSection(getLocalContext(), entities, tool);
+                    new CommandSection(getContext(), entities, tool);
 
             commandCompo->addCommand(commandGeom);
 
-            Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getLocalContext(),
+            Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getContext(),
                     commandGeom);
             commandCompo->addCommand(commandTopo);
 
             command = commandCompo;
         }
         else {
-            command = new CommandSection(getLocalContext(),entities,tool);
+            command = new CommandSection(getContext(),entities,tool);
         }
     }
     else{
@@ -4334,13 +4310,13 @@ Internal::M3DCommandResultIfc* GeomManager::section( std::vector<Geom::GeomEntit
         if (Internal::EntitiesHelper::hasTopoRef(entities)){
 
             Internal::CommandComposite* commandCompo=
-                 new Internal::CommandComposite(getLocalContext(), "Section entre géométries avec topologies");
+                 new Internal::CommandComposite(getContext(), "Section entre géométries avec topologies");
 
             Geom::CommandEditGeom *commandGeom =
-                    new CommandSection(getLocalContext(),entities, tool);
+                    new CommandSection(getContext(),entities, tool);
 
             commandCompo->addCommand(commandGeom);
-            Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getLocalContext(),
+            Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getContext(),
                     commandGeom);
             commandCompo->addCommand(commandTopo);
 
@@ -4348,11 +4324,11 @@ Internal::M3DCommandResultIfc* GeomManager::section( std::vector<Geom::GeomEntit
 //                std::vector<GeomEntity*> singleEntity;
 //                singleEntity.push_back( entities[i_entities]);
 //                Geom::CommandEditGeom *commandGeom =
-//                        new CommandSection(getLocalContext(),singleEntity, tool);
+//                        new CommandSection(getContext(),singleEntity, tool);
 //
 //                commandCompo->addCommand(commandGeom);
 //
-//                Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getLocalContext(),
+//                Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getContext(),
 //                        commandGeom);
 //                commandCompo->addCommand(commandTopo);
 //
@@ -4363,17 +4339,17 @@ Internal::M3DCommandResultIfc* GeomManager::section( std::vector<Geom::GeomEntit
         else {
 
             Internal::CommandComposite* commandCompo =
-                 new Internal::CommandComposite(getLocalContext(), "Section entre géométries");
+                 new Internal::CommandComposite(getContext(), "Section entre géométries");
 
             Geom::CommandEditGeom *commandGeom =
-                    new CommandSection(getLocalContext(),entities, tool);
+                    new CommandSection(getContext(),entities, tool);
 
             commandCompo->addCommand(commandGeom);
 //            for(unsigned int i_entities=0;i_entities<entities.size();i_entities++){
 //                std::vector<GeomEntity*> singleEntity;
 //                singleEntity.push_back( entities[i_entities]);
 //                Geom::CommandEditGeom *commandGeom =
-//                        new CommandSection(getLocalContext(),singleEntity, tool);
+//                        new CommandSection(getContext(),singleEntity, tool);
 //
 //                commandCompo->addCommand(commandGeom);
 //            }
@@ -4392,12 +4368,12 @@ Internal::M3DCommandResultIfc* GeomManager::section( std::vector<Geom::GeomEntit
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 sectionByPlane(std::vector<std::string>& entities,
         Utils::Math::Plane* tool, std::string planeGroupName)
 {
@@ -4409,7 +4385,7 @@ sectionByPlane(std::vector<std::string>& entities,
     return sectionByPlane(vge,tool,planeGroupName);
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::
+Internal::M3DCommandResult* GeomManager::
 sectionByPlane( std::vector<Geom::GeomEntity*>& entities,
                 Utils::Math::Plane* tool, std::string planeGroupName)
 {
@@ -4432,21 +4408,21 @@ sectionByPlane( std::vector<Geom::GeomEntity*>& entities,
     if (Internal::EntitiesHelper::hasTopoRef(entities)){
 
     	Internal::CommandComposite* commandCompo =
-    			new Internal::CommandComposite(getLocalContext(), "Section par un plan entre géométries avec topologies");
+    			new Internal::CommandComposite(getContext(), "Section par un plan entre géométries avec topologies");
 
     	Geom::CommandEditGeom *commandGeom =
-    			new CommandSectionByPlane(getLocalContext(), entities, tool, planeGroupName);
+    			new CommandSectionByPlane(getContext(), entities, tool, planeGroupName);
 
     	commandCompo->addCommand(commandGeom);
 
-    	Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getLocalContext(),
+    	Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getContext(),
     			commandGeom);
     	commandCompo->addCommand(commandTopo);
 
     	command = commandCompo;
     }
     else {
-    	command = new CommandSectionByPlane(getLocalContext(),entities,tool,planeGroupName);
+    	command = new CommandSectionByPlane(getContext(),entities,tool,planeGroupName);
     }
 
     // trace dans le script
@@ -4461,7 +4437,7 @@ sectionByPlane( std::vector<Geom::GeomEntity*>& entities,
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
@@ -4579,9 +4555,9 @@ Volume* GeomManager::getVolume(const std::string& name, const bool exceptionIfNo
     Volume* vol = 0;
 
     std::string new_name;
-    if (getLocalContext().getNameManager().isShiftingIdActivated()){
+    if (getContext().getNameManager().isShiftingIdActivated()){
     	if (Volume::isA(name))
-    		new_name = getLocalContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::GeomVolume)->renameWithShiftingId(name);
+    		new_name = getContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::GeomVolume)->renameWithShiftingId(name);
     	else
     		return vol;
     }
@@ -4613,9 +4589,9 @@ Surface* GeomManager::getSurface(const std::string& name, const bool exceptionIf
     Surface* surf = 0;
 
     std::string new_name;
-    if (getLocalContext().getNameManager().isShiftingIdActivated()){
+    if (getContext().getNameManager().isShiftingIdActivated()){
     	if (Surface::isA(name))
-    		new_name = getLocalContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::GeomSurface)->renameWithShiftingId(name);
+    		new_name = getContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::GeomSurface)->renameWithShiftingId(name);
     	else
     		return surf;
     }
@@ -4647,9 +4623,9 @@ Curve* GeomManager::getCurve(const std::string& name, const bool exceptionIfNotF
     Curve* curve = 0;
 
     std::string new_name;
-    if (getLocalContext().getNameManager().isShiftingIdActivated()){
+    if (getContext().getNameManager().isShiftingIdActivated()){
     	if (Curve::isA(name))
-    		new_name = getLocalContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::GeomCurve)->renameWithShiftingId(name);
+    		new_name = getContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::GeomCurve)->renameWithShiftingId(name);
     	else
     		return curve;
     }
@@ -4681,9 +4657,9 @@ Vertex* GeomManager::getVertex(const std::string& name, const bool exceptionIfNo
     Vertex* vertex = 0;
 
     std::string new_name;
-    if (getLocalContext().getNameManager().isShiftingIdActivated()){
+    if (getContext().getNameManager().isShiftingIdActivated()){
     	if (Vertex::isA(name))
-    		new_name = getLocalContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::GeomVertex)->renameWithShiftingId(name);
+    		new_name = getContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::GeomVertex)->renameWithShiftingId(name);
     	else
     		return vertex;
     }
@@ -5052,7 +5028,7 @@ std::string GeomManager::getLastVertex() const
     return nom;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::addToGroup(std::vector<std::string>& ve, int dim, const std::string& groupName)
+Internal::M3DCommandResult* GeomManager::addToGroup(std::vector<std::string>& ve, int dim, const std::string& groupName)
 {
 
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -5076,7 +5052,7 @@ Internal::M3DCommandResultIfc* GeomManager::addToGroup(std::vector<std::string>&
                 iter != ve.end(); ++iter)
             vertices.push_back(getVertex(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), vertices, groupName, Mesh::CommandAddRemoveGroupName::add);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), vertices, groupName, Mesh::CommandAddRemoveGroupName::add);
     }
     break;
     case(1):{
@@ -5086,7 +5062,7 @@ Internal::M3DCommandResultIfc* GeomManager::addToGroup(std::vector<std::string>&
                 iter != ve.end(); ++iter)
             curves.push_back(getCurve(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), curves, groupName, Mesh::CommandAddRemoveGroupName::add);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), curves, groupName, Mesh::CommandAddRemoveGroupName::add);
     }
     break;
     case(2):{
@@ -5096,7 +5072,7 @@ Internal::M3DCommandResultIfc* GeomManager::addToGroup(std::vector<std::string>&
                 iter != ve.end(); ++iter)
             surfaces.push_back(getSurface(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), surfaces, groupName, Mesh::CommandAddRemoveGroupName::add);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), surfaces, groupName, Mesh::CommandAddRemoveGroupName::add);
     }
     break;
     case(3):{
@@ -5106,7 +5082,7 @@ Internal::M3DCommandResultIfc* GeomManager::addToGroup(std::vector<std::string>&
                 iter != ve.end(); ++iter)
             volumes.push_back(getVolume(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), volumes, groupName, Mesh::CommandAddRemoveGroupName::add);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), volumes, groupName, Mesh::CommandAddRemoveGroupName::add);
     }
     break;
     default:{
@@ -5132,12 +5108,12 @@ Internal::M3DCommandResultIfc* GeomManager::addToGroup(std::vector<std::string>&
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::removeFromGroup(std::vector<std::string>& ve, int dim, const std::string& groupName)
+Internal::M3DCommandResult* GeomManager::removeFromGroup(std::vector<std::string>& ve, int dim, const std::string& groupName)
 {
 
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -5161,7 +5137,7 @@ Internal::M3DCommandResultIfc* GeomManager::removeFromGroup(std::vector<std::str
                 iter != ve.end(); ++iter)
             vertices.push_back(getVertex(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), vertices, groupName, Mesh::CommandAddRemoveGroupName::remove);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), vertices, groupName, Mesh::CommandAddRemoveGroupName::remove);
     }
     break;
     case(1):{
@@ -5171,7 +5147,7 @@ Internal::M3DCommandResultIfc* GeomManager::removeFromGroup(std::vector<std::str
                 iter != ve.end(); ++iter)
             curves.push_back(getCurve(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), curves, groupName, Mesh::CommandAddRemoveGroupName::remove);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), curves, groupName, Mesh::CommandAddRemoveGroupName::remove);
     }
     break;
     case(2):{
@@ -5181,7 +5157,7 @@ Internal::M3DCommandResultIfc* GeomManager::removeFromGroup(std::vector<std::str
                 iter != ve.end(); ++iter)
             surfaces.push_back(getSurface(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), surfaces, groupName, Mesh::CommandAddRemoveGroupName::remove);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), surfaces, groupName, Mesh::CommandAddRemoveGroupName::remove);
     }
     break;
     case(3):{
@@ -5191,7 +5167,7 @@ Internal::M3DCommandResultIfc* GeomManager::removeFromGroup(std::vector<std::str
                 iter != ve.end(); ++iter)
             volumes.push_back(getVolume(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), volumes, groupName, Mesh::CommandAddRemoveGroupName::remove);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), volumes, groupName, Mesh::CommandAddRemoveGroupName::remove);
     }
     break;
     default:{
@@ -5217,12 +5193,12 @@ Internal::M3DCommandResultIfc* GeomManager::removeFromGroup(std::vector<std::str
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResultIfc* GeomManager::setGroup(std::vector<std::string>& ve, int dim, const std::string& groupName)
+Internal::M3DCommandResult* GeomManager::setGroup(std::vector<std::string>& ve, int dim, const std::string& groupName)
 {
 
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -5246,7 +5222,7 @@ Internal::M3DCommandResultIfc* GeomManager::setGroup(std::vector<std::string>& v
                 iter != ve.end(); ++iter)
             vertices.push_back(getVertex(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), vertices, groupName, Mesh::CommandAddRemoveGroupName::set);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), vertices, groupName, Mesh::CommandAddRemoveGroupName::set);
     }
     break;
     case(1):{
@@ -5256,7 +5232,7 @@ Internal::M3DCommandResultIfc* GeomManager::setGroup(std::vector<std::string>& v
                 iter != ve.end(); ++iter)
             curves.push_back(getCurve(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), curves, groupName, Mesh::CommandAddRemoveGroupName::set);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), curves, groupName, Mesh::CommandAddRemoveGroupName::set);
     }
     break;
     case(2):{
@@ -5266,7 +5242,7 @@ Internal::M3DCommandResultIfc* GeomManager::setGroup(std::vector<std::string>& v
                 iter != ve.end(); ++iter)
             surfaces.push_back(getSurface(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), surfaces, groupName, Mesh::CommandAddRemoveGroupName::set);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), surfaces, groupName, Mesh::CommandAddRemoveGroupName::set);
     }
     break;
     case(3):{
@@ -5276,7 +5252,7 @@ Internal::M3DCommandResultIfc* GeomManager::setGroup(std::vector<std::string>& v
                 iter != ve.end(); ++iter)
             volumes.push_back(getVolume(*iter, true));
 
-        command = new Mesh::CommandAddRemoveGroupName(getLocalContext(), volumes, groupName, Mesh::CommandAddRemoveGroupName::set);
+        command = new Mesh::CommandAddRemoveGroupName(getContext(), volumes, groupName, Mesh::CommandAddRemoveGroupName::set);
     }
     break;
     default:{
@@ -5302,7 +5278,7 @@ Internal::M3DCommandResultIfc* GeomManager::setGroup(std::vector<std::string>& v
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
                                     new Internal::M3DCommandResult (*command);
     return cmdResult;
 }

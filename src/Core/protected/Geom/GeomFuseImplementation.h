@@ -1,20 +1,9 @@
-/*----------------------------------------------------------------------------*/
-/** \file GeomFuseImplementation.h
- *
- *  \author Franck Ledoux
- *
- *  \date 04/02/2011
- */
-/*----------------------------------------------------------------------------*/
 #ifndef GEOMFUSEIMPLEMENTATION_H_
 #define GEOMFUSEIMPLEMENTATION_H_
 /*----------------------------------------------------------------------------*/
-#include "Utils/Vector.h"
 #include "Geom/GeomEntity.h"
 #include "Geom/GeomModificationBaseClass.h"
 #include "Internal/Context.h"
-/*----------------------------------------------------------------------------*/
-#include <TopoDS_Shape.hxx>
 /*----------------------------------------------------------------------------*/
 #include <vector>
 /*----------------------------------------------------------------------------*/

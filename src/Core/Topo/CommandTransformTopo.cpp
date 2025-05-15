@@ -1,24 +1,12 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandTransformTopo.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 10/2/2012
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandTransformTopo.h"
-
-#include "Utils/Common.h"
+#include "Topo/TopoManager.h"
 #include "Topo/Block.h"
 #include "Topo/TopoHelper.h"
 #include "Topo/CommandDuplicateTopo.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
-#include <TkUtil/Exception.h>
-#include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
-// OCC
 #include <gp_Trsf.hxx>
 #include <gp_GTrsf.hxx>
 /*----------------------------------------------------------------------------*/

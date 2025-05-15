@@ -7,7 +7,7 @@
 #ifndef QT_MGX3D_ENTITY_PANEL_H
 #define QT_MGX3D_ENTITY_PANEL_H
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "QtComponents/QtEntityIDTextField.h"
 
 #include <TkUtil/util_config.h>
@@ -48,7 +48,7 @@ class QtMgx3DEntityPanel : public QWidget
 					QWidget* parent, const std::string& title, bool editable,
 					const std::string& label, const std::string& uniqueName,
 					Mgx3D::QtComponents::QtMgx3DMainWindow* mainWindow,
-					Mgx3D::Utils::SelectionManagerIfc::DIM dimensions,
+					Mgx3D::Utils::SelectionManager::DIM dimensions,
 					Mgx3D::Utils::FilterEntity::objectType type);
 
 	/** Destructeur. */
@@ -112,14 +112,14 @@ class QtMgx3DEntityPanel : public QWidget
 	 * \param		Nouvelles dimensions possibles.
 	 * \see			getFilteredDimensions
 	 */
-	virtual void setFilteredDimensions (Mgx3D::Utils::SelectionManagerIfc::DIM dimensions);
+	virtual void setFilteredDimensions (Mgx3D::Utils::SelectionManager::DIM dimensions);
 
 	/**
 	 * \return		Les dimensions possibles.
 	 * \see			setFilteredDimensions
 	 * \see			getFilteredTypes
 	 */
-	virtual Mgx3D::Utils::SelectionManagerIfc::DIM getFilteredDimensions ( ) const;
+	virtual Mgx3D::Utils::SelectionManager::DIM getFilteredDimensions ( ) const;
 
 	/**
 	 * \return		Les types filtrés.

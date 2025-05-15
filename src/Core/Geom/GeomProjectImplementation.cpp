@@ -1,17 +1,19 @@
 /*----------------------------------------------------------------------------*/
+//#define TEST_NEW_PROJECTION
+/*----------------------------------------------------------------------------*/
 #include "Geom/GeomProjectImplementation.h"
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
 #include "Geom/Surface.h"
 /*----------------------------------------------------------------------------*/
-#include <TopoDS.hxx>
 #include <BRep_Tool.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
 #include <BRepExtrema_DistShapeShape.hxx>
+#ifdef TEST_NEW_PROJECTION
 #include <GeomAPI_ProjectPointOnSurf.hxx>
 #include <ShapeAnalysis.hxx>
+#endif
 /*----------------------------------------------------------------------------*/
-//#define TEST_NEW_PROJECTION
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

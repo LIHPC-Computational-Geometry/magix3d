@@ -202,7 +202,7 @@ internalExecute()
 			CoFace* cf = new CoFace(getContext());
 			addCreatedCoFace(cf);
 			if (!m_groupName.empty()){
-		    	Group::Group2D* grp = getContext().getLocalGroupManager().getNewGroup2D(m_groupName, &getInfoCommand());
+		    	Group::Group2D* grp = getContext().getGroupManager().getNewGroup2D(m_groupName, &getInfoCommand());
 				grp->add(cf);
 				cf->getGroupsContainer().add(grp);
 			}
@@ -248,7 +248,7 @@ internalExecute()
 			Block* bl = new Block(getContext(), 0,0,0);
 			addCreatedBlock(bl);
 			if (!m_groupName.empty()){
-		    	Group::Group3D* grp = getContext().getLocalGroupManager().getNewGroup3D(m_groupName, &getInfoCommand());
+		    	Group::Group3D* grp = getContext().getGroupManager().getNewGroup3D(m_groupName, &getInfoCommand());
 				grp->add(bl);
 				bl->getGroupsContainer().add(grp);
 			}
@@ -416,7 +416,7 @@ void CommandNewTopoOnGeometry::createCoEdge()
 	else if (tvertices.size()>2)
 		throw TkUtil::Exception (TkUtil::UTF8String ("createCoEdge imposible, les sommets de la courbe référencent plus de 2 sommets topologiques", TkUtil::Charset::UTF_8));
 
-	EdgeMeshingPropertyUniform emp(getContext().getLocalTopoManager().getDefaultNbMeshingEdges());
+	EdgeMeshingPropertyUniform emp(getContext().getTopoManager().getDefaultNbMeshingEdges());
 	CoEdge* coedge = new CoEdge(getContext(), &emp, tvertices[0], tvertices[tvertices.size() == 1?0:1]);
 	coedge->setGeomAssociation(getGeomEntity());
 	getInfoCommand().addTopoInfoEntity(coedge, Internal::InfoCommand::CREATED);

@@ -4,7 +4,7 @@
  * \date        10/03/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 
 #include "Utils/Common.h"
@@ -62,7 +62,7 @@ QtTopologyExtendSplitBlockPanel::QtTopologyExtendSplitBlockPanel (
 	// Le bloc à découper :
 	_blockPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Bloc  :", "", &mainWindow,
-			SelectionManagerIfc::D3, FilterEntity::TopoBlock);
+			SelectionManager::D3, FilterEntity::TopoBlock);
 	connect (_blockPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
 	connect (_blockPanel, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -72,7 +72,7 @@ QtTopologyExtendSplitBlockPanel::QtTopologyExtendSplitBlockPanel (
 	// L'arête orthogonale au plan de coupe :
 	_edgePanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Arête :", "", &mainWindow,
-			SelectionManagerIfc::D1, FilterEntity::TopoCoEdge);
+			SelectionManager::D1, FilterEntity::TopoCoEdge);
 	connect (_edgePanel->getNameTextField ( ),
 	         SIGNAL (selectionModified (QString)), this,
 	         SLOT (parametersModifiedCallback ( )));
@@ -348,12 +348,12 @@ void QtTopologyExtendSplitBlockAction::executeOperation ( )
 	const string	blockName	= panel->getBlockName ( );
 	const string	edgeName	= panel->getEdgeName ( );
 
-	Mgx3D::Internal::M3DCommandResultIfc*	result	= getContext ( ).getTopoManager ( ).extendSplitBlock (blockName, edgeName);
+	Mgx3D::Internal::M3DCommandResult*	result	= getContext ( ).getTopoManager ( ).extendSplitBlock (blockName, edgeName);
 	CHECK_NULL_PTR_ERROR (result)
 	setCommandResult (result);
-	if (CommandIfc::FAIL == result->getStatus ( ))
+	if (Command::FAIL == result->getStatus ( ))
 		throw Exception (result->getErrorMessage ( ));
-	else if (CommandIfc::CANCELED == result->getStatus ( ))
+	else if (Command::CANCELED == result->getStatus ( ))
 		throw Exception ("Opération annulée");	
 }	// QtTopologyExtendSplitBlockAction::executeOperation
 

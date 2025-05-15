@@ -1,13 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandInternal.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 14 déc. 2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Utils/Common.h"
 #include "Internal/CommandInternal.h"
 /*----------------------------------------------------------------------------*/
@@ -16,13 +8,11 @@
 #include <TkUtil/ReferencedMutex.h>
 #include <TkUtil/Mutex.h>
 #include <TkUtil/UTF8String.h>
-
+/*----------------------------------------------------------------------------*/
 #include <stdio.h>	// stderr, ...
 #include <ostream>
-
-// OCC
+/*----------------------------------------------------------------------------*/
 #include <Standard_Failure.hxx>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -63,7 +53,7 @@ CommandInternal::~CommandInternal()
 #ifdef _DEBUG_MEMORY
 			std::cout<<"groupe détruit car créé avec cette commande: "<< iter->first->getName()<<", id "<<iter->first->getUniqueId()<<std::endl;
 #endif
-			getContext().getLocalGroupManager().deleteEntity(iter->first);
+			getContext().getGroupManager().deleteEntity(iter->first);
 		}
 #ifdef _DEBUG_MEMORY
 		else {
@@ -88,7 +78,12 @@ CommandInternal& CommandInternal::operator = (const CommandInternal&)
     return *this;
 }
 /*----------------------------------------------------------------------------*/
-Utils::CommandIfc::status CommandInternal::execute()
+TkUtil::LogOutputStream* CommandInternal::getLogStream ( )
+{
+    return getContext().getLogStream();
+}
+/*----------------------------------------------------------------------------*/
+Utils::Command::status CommandInternal::execute()
 {
     startingOrcompletionLog (true); // log de début de commande
 
@@ -118,11 +113,11 @@ Utils::CommandIfc::status CommandInternal::execute()
         if (Command::CANCELED != getStatus ( )){
             // met à jour l'état de la visibilité des entités
             if (getContext().isGraphical())
-                getContext().getLocalGroupManager().updateDisplayProperties(&getInfoCommand());
+                getContext().getGroupManager().updateDisplayProperties(&getInfoCommand());
 
             // recherche les groupes vides, les détruits et ajoute l'info dans InfoCommand
             // et réciproquement pour les groupes détruits mais non vides
-            getContext().getLocalGroupManager().updateDeletedGroups(&getInfoCommand());
+            getContext().getGroupManager().updateDeletedGroups(&getInfoCommand());
 
 			// Avant de changer le status, ce qui va informer tous les
 			// observateurs, y compris la visu 3D, qui peut être tentée de faire
@@ -247,7 +242,7 @@ Utils::Command::status CommandInternal::undo ( )
 
     // met à jour l'état de la visibilité des entités
     if (getContext().isGraphical())
-        getContext().getLocalGroupManager().updateDisplayProperties(&getInfoCommand());
+        getContext().getGroupManager().updateDisplayProperties(&getInfoCommand());
 
     // change le status et fait les callbacks
     setStatus (Command::INITED);
@@ -279,7 +274,7 @@ Utils::Command::status CommandInternal::redo ( )
 
         // met à jour l'état de la visibilité des entités
         if (getContext().isGraphical())
-            getContext().getLocalGroupManager().updateDisplayProperties(&getInfoCommand());
+            getContext().getGroupManager().updateDisplayProperties(&getInfoCommand());
 
         // change le status et fait les callbacks
         setStatus (Command::DONE);

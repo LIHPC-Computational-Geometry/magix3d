@@ -1,30 +1,23 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file Volume.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 25 nov. 2011
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
+#include "Internal/InfoCommand.h"
 #include "Mesh/Volume.h"
 #include "Mesh/MeshDisplayRepresentation.h"
 #include "Mesh/MeshImplementation.h"
 #include "Mesh/CommandCreateMesh.h"
 #include "Utils/Common.h"
 #include "Utils/Bounds.h"
+#include "Utils/SerializedRepresentation.h"
 #include "Topo/CoFace.h"
 #include "Topo/Face.h"
 #include "Topo/Block.h"
-#include "Utils/SerializedRepresentation.h"
-#include "Internal/InfoCommand.h"
 #include "Group/Group3D.h"
-
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/NumericConversions.h>
 #include <TkUtil/Exception.h>
 #include <TkUtil/InternalError.h>
 #include <TkUtil/MemoryError.h>
+/*----------------------------------------------------------------------------*/
 #include <memory>           // unique_ptr
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
@@ -460,7 +453,7 @@ getDescription (bool alsoComputed) const
     Group::Group3D* gr = 0;
     MeshManager* mm = dynamic_cast<MeshManager*>(&getMeshManager());
     if (mm)
-    	gr = mm->getLocalContext().getLocalGroupManager().getGroup3D(getName(),false);
+    	gr = mm->getContext().getGroupManager().getGroup3D(getName(),false);
     if (gr){
         Utils::SerializedRepresentation  groupeDescription (
                         "Groupe 3D associé", "");

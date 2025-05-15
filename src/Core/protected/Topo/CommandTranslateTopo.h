@@ -1,17 +1,9 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandTranslateTopo.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 27/9/2012
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDTRANSLATETOPO_H_
 #define COMMANDTRANSLATETOPO_H_
 /*----------------------------------------------------------------------------*/
-#include "Topo/CommandTransformTopo.h"
 #include "Utils/Vector.h"
+#include "Topo/CommandTransformTopo.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -33,7 +25,7 @@ public:
      *  \param ve la liste des entités topologiques sélectionnnées pour la translation
      *  \param dp le vecteur de translation
      */
-    CommandTranslateTopo(Internal::Context& c, std::vector<TopoEntity*>& ve, const Vector& dp);
+    CommandTranslateTopo(Internal::Context& c, std::vector<TopoEntity*>& ve, const Utils::Math::Vector& dp);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur
@@ -45,7 +37,7 @@ public:
      */
     CommandTranslateTopo(Internal::Context& c,
     		CommandDuplicateTopo* cmd,
-    		const Vector& dp,
+    		const Utils::Math::Vector& dp,
 			bool all_topo);
 
     /*------------------------------------------------------------------------*/
@@ -54,7 +46,7 @@ public:
      *  \param c le contexte
      *  \param dp le vecteur de translation
      */
-    CommandTranslateTopo(Internal::Context& c, const Vector& dp);
+    CommandTranslateTopo(Internal::Context& c, const Utils::Math::Vector& dp);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur

@@ -1,11 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandNewTopoOGridOnGeometry.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 10/1/2012
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDNEWTOPOOGRIDONGEOMETRY_H_
 #define COMMANDNEWTOPOOGRIDONGEOMETRY_H_
 /*----------------------------------------------------------------------------*/
@@ -17,6 +10,8 @@ namespace Geom {
 class CommandCreateGeom;
 class PropertyCylinder;
 class PropertySphere;
+class PropertyHollowCylinder;
+class PropertyHollowSphere;
 }
 /*----------------------------------------------------------------------------*/
 namespace Topo {

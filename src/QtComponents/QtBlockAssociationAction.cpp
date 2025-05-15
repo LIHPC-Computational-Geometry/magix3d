@@ -4,7 +4,7 @@
  * \date        15/11/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
@@ -71,7 +71,7 @@ QtBlockAssociationPanel::QtBlockAssociationPanel (
 	// Les blocs à associer :
 	_blocksPanel	= new QtMgx3DEntityPanel (
 						this, "", true, "Blocs :", "", &mainWindow, 
-						SelectionManagerIfc::D3, FilterEntity::TopoBlock);
+						SelectionManager::D3, FilterEntity::TopoBlock);
 	_blocksPanel->setMultiSelectMode (true);
 	layout->addWidget (_blocksPanel);
 	connect (_blocksPanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -82,7 +82,7 @@ QtBlockAssociationPanel::QtBlockAssociationPanel (
 	// L'éventuel volume à associer :
 	_volumePanel	= new QtMgx3DEntityPanel (
 						this, "", true, "Volume :", "", &mainWindow, 
-						SelectionManagerIfc::D3, FilterEntity::GeomVolume);
+						SelectionManager::D3, FilterEntity::GeomVolume);
 	layout->addWidget (_volumePanel);
 //	connect (_volumePanel->getNameTextField ( ),
 	connect (_volumePanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -347,7 +347,7 @@ QtBlockAssociationPanel*
 void QtBlockAssociationAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DTopoOperationAction::executeOperation ( );
 
 	// Récupération des paramètres d'association des blocs :

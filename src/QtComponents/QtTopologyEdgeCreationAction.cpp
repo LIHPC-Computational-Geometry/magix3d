@@ -4,7 +4,7 @@
  * \date		15/3/2019
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -62,7 +62,7 @@ QtTopologyEdgeCreationPanel::QtTopologyEdgeCreationPanel (
     addValidatedField (*_namePanel);
 
     _verticesPanel = new QtMgx3DEntityPanel(this, "", true, "Sommets :", "",
-                                            &mainWindow, SelectionManagerIfc::D0,
+                                            &mainWindow, SelectionManager::D0,
                                             FilterEntity::TopoVertex);
     _verticesPanel->setMultiSelectMode(true);
     layout->addWidget (_verticesPanel);
@@ -81,7 +81,7 @@ QtTopologyEdgeCreationPanel::QtTopologyEdgeCreationPanel (
 	// Courbe à associer :
 	_curvePanel	= new QtMgx3DEntityPanel (
 						this, "", true, "Courbe associée :", "",
-						&mainWindow, SelectionManagerIfc::D1,
+						&mainWindow, SelectionManager::D1,
 						FilterEntity::GeomCurve);
 	layout->addWidget (_curvePanel);
 	connect (_curvePanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -311,7 +311,7 @@ void QtTopologyEdgeCreationAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (panel)
 
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtTopologyCreationAction::executeOperation ( );
 
 

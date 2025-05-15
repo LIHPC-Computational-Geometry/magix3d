@@ -4,7 +4,7 @@
  * \date        09/01/2015
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtNumericFieldsFactory.h"
 #include "Utils/Common.h"

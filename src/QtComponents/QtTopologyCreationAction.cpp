@@ -4,7 +4,7 @@
  * \date        20/11/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
@@ -47,7 +47,7 @@ namespace QtComponents
 QtTopologyCreationPanel::QtTopologyCreationPanel (
 			QWidget* parent, const string& panelName, 
 			QtMgx3DMainWindow& mainWindow, QtMgx3DOperationAction* action,
-			SelectionManagerIfc::DIM dimension,
+			SelectionManager::DIM dimension,
 			QtTopologyPanel::TOPOLOGY_TYPE defaultTopo,
 			QtTopologyPanel::COORDINATES_TYPE defaultCoords,
 			const string& helpURL,
@@ -72,11 +72,11 @@ QtTopologyCreationPanel::QtTopologyCreationPanel (
 	string entityNameType = "A définir";
 	switch (dimension)
 	{
-		case SelectionManagerIfc::D2	:
+		case SelectionManager::D2	:
 					filter	= FilterEntity::GeomSurface;
 					entityNameType = "Surface :";
 					break;
-		case SelectionManagerIfc::D3	:
+		case SelectionManager::D3	:
 					filter	= FilterEntity::GeomVolume;
 					entityNameType = "Volume :";
 					break;
@@ -90,8 +90,8 @@ QtTopologyCreationPanel::QtTopologyCreationPanel (
 	layout->addWidget (ouLabel);
 
 	// Le panneau "Topologie créée" :
-	bool	use3DLabels	= SelectionManagerIfc::D3 <= dimension ? true : false;
-	int	groupDimension	= SelectionManagerIfc::dimensionsToDimension (dimension);
+	bool	use3DLabels	= SelectionManager::D3 <= dimension ? true : false;
+	int	groupDimension	= SelectionManager::dimensionsToDimension (dimension);
 	_topologyPanel	= new QtTopologyPanel (this, mainWindow, true, true, groupDimension, defaultTopo, defaultCoords, 10, 10, 10, use3DLabels, true);
 	_topologyPanel->createTopology (true);
 	_topologyPanel->displayTopologyCreation (false);
@@ -102,15 +102,15 @@ QtTopologyCreationPanel::QtTopologyCreationPanel (
 	// Utiliser la sélection pour positionner les vertex ?
 	switch (dimension)
 	{
-		case SelectionManagerIfc::D3	:
+		case SelectionManager::D3	:
 			_selectionCheckBox	= new QCheckBox ("Sommets aux coins de la sélection", this);
 			layout->addWidget (_selectionCheckBox);
-			_selectionEntitiesPanel	= new QtMgx3DEntityPanel (this, "", true, "Entités : ", "", &mainWindow, SelectionManagerIfc::ALL_DIMENSIONS, FilterEntity::All);
+			_selectionEntitiesPanel	= new QtMgx3DEntityPanel (this, "", true, "Entités : ", "", &mainWindow, SelectionManager::ALL_DIMENSIONS, FilterEntity::All);
 			_selectionEntitiesPanel->setMultiSelectMode (true);
 			layout->addWidget (_selectionEntitiesPanel);
 			break;
-        case SelectionManagerIfc::D2    :
-            _selectionEntitiesPanel	= new QtMgx3DEntityPanel (this, "", true, "Sommets : ", "", &mainWindow, SelectionManagerIfc::D0, FilterEntity::TopoVertex);
+        case SelectionManager::D2    :
+            _selectionEntitiesPanel	= new QtMgx3DEntityPanel (this, "", true, "Sommets : ", "", &mainWindow, SelectionManager::D0, FilterEntity::TopoVertex);
             _selectionEntitiesPanel->setMultiSelectMode (true);
             layout->addWidget (_selectionEntitiesPanel);
             break;

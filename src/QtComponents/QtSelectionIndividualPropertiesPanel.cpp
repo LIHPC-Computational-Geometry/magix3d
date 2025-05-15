@@ -4,7 +4,7 @@
  * \date        12/09/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 
 #include "Utils/Common.h"
@@ -339,7 +339,7 @@ vector<QTreeWidgetItem*>
 // ===========================================================================
 
 QtSelectionIndividualPropertiesPanel::QtSelectionIndividualPropertiesPanel (
-			QWidget* parent, const string& name, SelectionManagerIfc* manager)
+			QWidget* parent, const string& name, SelectionManager* manager)
 	: QtGroupBox (name.c_str ( ), parent), SelectionManagerObserver (manager),
 	  _entitiesWidget (0), _graphicalWidget (0),
 	  _displayProperties (true), _displayComputedProperties (true)
@@ -449,7 +449,7 @@ void QtSelectionIndividualPropertiesPanel::displayComputedProperties (bool displ
 }	// QtSelectionIndividualPropertiesPanel::displayComputedProperties
 
 
-void QtSelectionIndividualPropertiesPanel::setSelectionManager (SelectionManagerIfc* selectionManager)
+void QtSelectionIndividualPropertiesPanel::setSelectionManager (SelectionManager* selectionManager)
 {
 	if (selectionManager == getSelectionManager ( ))
 		return;

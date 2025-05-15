@@ -8,10 +8,10 @@
 #ifndef QTMGX3DENTITYNAMEPANEL_H_
 #define QTMGX3DENTITYNAMEPANEL_H_
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/ValidatedField.h"
-#include "Group/GroupManagerIfc.h"
+#include "Group/GroupManager.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 
 #include "QtComponents/QtEntityIDTextField.h"
@@ -51,7 +51,7 @@ class QtMgx3DEntityNamePanel :
     QtMgx3DEntityNamePanel (
         QWidget* parent, const std::string& name,
         Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
-        Mgx3D::Utils::SelectionManagerIfc::DIM dimensions,
+        Mgx3D::Utils::SelectionManager::DIM dimensions,
 		Utils::FilterEntity::objectType types);
 
     /**
@@ -62,7 +62,7 @@ class QtMgx3DEntityNamePanel :
     /**
      * \return      Contexte <I>Magix 3D</I> courant.
      */
-     virtual Mgx3D::Internal::ContextIfc& getContext ( );
+     virtual Mgx3D::Internal::Context& getContext ( );
 
     /**
      * \return      La liste des noms saisies
@@ -114,7 +114,7 @@ class QtMgx3DEntityNamePanel :
 	 * \see			getFilteredDimensions
 	 */
 	virtual void setDimensions (
-							Mgx3D::Utils::SelectionManagerIfc::DIM dimensions);
+							Mgx3D::Utils::SelectionManager::DIM dimensions);
 
     /**
      * Change le type des entités attendues

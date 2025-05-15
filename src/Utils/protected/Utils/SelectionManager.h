@@ -2,12 +2,10 @@
 #define SELECTION_MANAGER_H
 
 
-#include "SelectionManagerIfc.h"
 #include "Entity.h"
 
 #include <TkUtil/Mutex.h>
 
-#include <ostream>
 #include <string>
 #include <vector>
 #include <sys/types.h>
@@ -35,59 +33,60 @@ class SelectionManagerObserver;
  *
  * @author		Charles PIGNEROL, CEA/DAM/DSSI
  */
-class SelectionManagerObserver : public Mgx3D::Utils::SelectionManagerObserverIfc
+class SelectionManagerObserver
 {
 	public :
 
 	/** Constructeur. Se référence auprès du gérant de sélection.
 	 */
-	SelectionManagerObserver (Mgx3D::Utils::SelectionManagerIfc* selectionManager);
+	SelectionManagerObserver (Mgx3D::Utils::SelectionManager* selectionManager);
 
 	/**
 	 * Destructeur. Se désenregistre auprès de son gestionnaire de 
 	 * sélection.
 	 */
-	virtual ~SelectionManagerObserver ( );
+	~SelectionManagerObserver ( );
 
 	/** Se déréférence auprès de son éventuel gestionnaire de
 	 * sélection, puis se référence auprès de celui reçu en 
 	 * argument.
 	 * @param		Nouveau gestionnaire de sélection. Peut être nul.
 	 */
-	virtual void setSelectionManager (Mgx3D::Utils::SelectionManagerIfc* selectionManager);
+	void setSelectionManager (Mgx3D::Utils::SelectionManager* selectionManager);
 
 	/**
 	 * @return		le gestionnaire de sélection
 	 */
-	virtual Mgx3D::Utils::SelectionManagerIfc* getSelectionManager ( )
+	Mgx3D::Utils::SelectionManager* getSelectionManager ( )
 	{ return _selectionManager; }
-	virtual const Mgx3D::Utils::SelectionManagerIfc* getSelectionManager ( ) const
+	const Mgx3D::Utils::SelectionManager* getSelectionManager ( ) const
 	{ return _selectionManager; }
 
 	/**
 	 * Appelé lorsque le gérant de la sélection est détruit.
 	 * Perd sa référence sur son gestionnaire de sélection.
 	 */
-	virtual void selectionManagerDeleted ( );
+	void selectionManagerDeleted ( );
 
 	/** 
 	 * Appelé lorsque la sélection change.
 	 * Ne fait rien par défaut.
 	 */
-	virtual void selectionModified ( );
+	void selectionModified ( );
 
 	/** 
 	 * Appelé lorsque la sélection est annulée.
 	 * Ne fait rien par défaut.
 	 */
-	virtual void selectionCleared ( );
+	void selectionCleared ( );
 
 	/**
 	 * Appelé lorsque les entités reçues en arguments sont ajoutées à
 	 * la sélection.
 	 * Ne fait rien par défaut.
 	 */
-	virtual void entitiesAddedToSelection (const std::vector<Mgx3D::Utils::Entity*>& entities);
+	void entitiesAddedToSelection (const std::vector<Mgx3D::Utils::Entity*>& entities);
+	void entitiesAddedToSelection (const std::vector<std::string>& uniqueNames);
 
 	/**
 	 * Appelé lorsque les entités reçues en arguments sont supprimées de
@@ -97,7 +96,20 @@ class SelectionManagerObserver : public Mgx3D::Utils::SelectionManagerObserverIf
 	 * @param	<I>true</I> s'il s'agit d'un <I>clearSelection</I>, à des fins
 	 * 			d'optimisation.
 	 */
-	virtual void entitiesRemovedFromSelection (const std::vector<Mgx3D::Utils::Entity*>& entities, bool clear);
+	void entitiesRemovedFromSelection (const std::vector<Mgx3D::Utils::Entity*>& entities, bool clear);
+	void entitiesRemovedFromSelection (const std::vector<std::string>& uniqueNames);
+
+	/**
+	 * Appelé lorsque la politique de sélection du gestionnaire de sélection
+	 * est modifiée. La politique de sélection dépend du type de gestionnaire.
+	 * \param	Eventuel pointeur sur des données décrivant ce changement de
+	 * 			politique de sélection. Informations optionnelles et spécifiques
+	 * 			au gestionnaire de sélection.
+	 * Ne fait rien par défaut.
+	 * \see		isSelectionPolicyAdaptationEnabled
+	 * \see		enableSelectionPolicyAdaptation
+	 */
+	virtual void selectionPolicyModified (void* smp);
 
 	/**
 	 * \return  <I>true</I> si le panneau s'adapte à la politique de sélection
@@ -105,7 +117,7 @@ class SelectionManagerObserver : public Mgx3D::Utils::SelectionManagerObserverIf
 	 *          cas contraire.
 	 * Ne fait rien par défaut.
 	 */
-	virtual bool isSelectionPolicyAdaptationEnabled ( ) const;
+	bool isSelectionPolicyAdaptationEnabled ( ) const;
 
 	/**
 	 * Si <I>true</I> est transmis en argument (défaut), le panneau s'adapte
@@ -117,7 +129,7 @@ class SelectionManagerObserver : public Mgx3D::Utils::SelectionManagerObserverIf
 	 * \see		selectionPolicyModified
 	 * \see		isSelectionPolicyAdaptationEnabled
 	 */
-	virtual void enableSelectionPolicyAdaptation (bool enable);
+	void enableSelectionPolicyAdaptation (bool enable);
 
 
 	protected :
@@ -125,7 +137,7 @@ class SelectionManagerObserver : public Mgx3D::Utils::SelectionManagerObserverIf
 	/**
 	 * Le mutex qui protège l'instance.
 	 */
-	virtual TkUtil::Mutex* getMutex ( ) const;
+	TkUtil::Mutex* getMutex ( ) const;
 
 
 	private :
@@ -141,7 +153,7 @@ class SelectionManagerObserver : public Mgx3D::Utils::SelectionManagerObserverIf
 	SelectionManagerObserver& operator = (const SelectionManagerObserver&);
 
 	/** Le gestionnaire de sélection. */
-	Mgx3D::Utils::SelectionManagerIfc*			_selectionManager;
+	Mgx3D::Utils::SelectionManager*			_selectionManager;
 
 	/** Mutext pour protéger certaines opérations. */
 	mutable TkUtil::Mutex*						_mutex;
@@ -160,7 +172,7 @@ class SelectionManagerObserver : public Mgx3D::Utils::SelectionManagerObserverIf
  * </P>
  * @author		Charles PIGNEROL, CEA/DAM/DSSI
  */
-class SelectionManager : public Mgx3D::Utils::SelectionManagerIfc
+class SelectionManager
 {
 	public :
 
@@ -201,6 +213,7 @@ class SelectionManager : public Mgx3D::Utils::SelectionManagerIfc
 	 * @return		les entités de la sélection.
 	 */
 	virtual std::vector<Mgx3D::Utils::Entity*> getEntities ( ) const;
+	virtual std::vector<unsigned long> getEntitiesIds ( ) const;
 
     /**
      * @return      les noms des entités de la sélection.
@@ -295,6 +308,97 @@ class SelectionManager : public Mgx3D::Utils::SelectionManagerIfc
 	//@}	// Les actions directes sur la sélection
 
 	/**
+	 * Politique évènementielle et évènements pouvant arriver au gestionnaire de
+	 * sélection.
+	 * Ce comportement sur évènements, la politique évènementielle du
+	 * gestionnaire, est à définir dans les classes dérivées. Ces méthodes ne
+	 * font rien par défaut.
+	 */
+	//@{
+
+	/** Les dimensions possibles des entités sélectionnables. Ces dimensions
+	 * sont encodées à l'aide de bits décalables à gauche => masque possible
+	 * avec les opérateurs & et |.
+	 */
+	enum DIM { NO_DIM = 0, D0 = 1, D1 = 1<<1, D2 = 1<<2, D3 = 1<<3 };
+
+	static DIM dimensionToDimensions (int dimension);
+	static int dimensionsToDimension (DIM dimensions);
+
+	/** La combinaison de toutes les dimensions. */
+	static const DIM ALL_DIMENSIONS;
+
+	/** Pour des opérations bit à bit, les compléments à 2. */
+	static const DIM	NOT_NO_DIM, NOT_D0, NOT_D1, NOT_D2, NOT_D3;
+
+	/**
+	 * \return		<I>true</I> si la sélection est activée pour l'entité
+	 *				transmise en argument, sinon <I>false</I>. Le choix
+	 *				repose sur la dimension et le type de l'entité.
+	 * \warning		Méthode à surcharger, retourne <I>false</I> par défaut.
+	 * \see			is0DSelectionActivated
+	 * \see			is1DSelectionActivated
+	 * \see			is2DSelectionActivated
+	 * \see			is3DSelectionActivated
+	 * \see			getFilteredTypes
+	 */
+	virtual bool isSelectionActivated (const Mgx3D::Utils::Entity&) const;
+
+	/**
+	 * \return		Le masque de sélection sur le type d'entité sélectionnable.
+	 * \see			getFilteredDimensions
+	 */
+	virtual Mgx3D::Utils::FilterEntity::objectType getFilteredTypes ( ) const;
+
+	/**
+	 * \return		Le masque de sélection sur les dimensions sélectionnables.
+	 * \see			getFilteredTypes
+	 */
+	virtual DIM getFilteredDimensions ( ) const;
+
+	/**
+	 * \return		<I>true</I> si la sélection d'entités 0D est activée, sinon
+	 *				<I>false</I>.
+	 * \warning		Méthode à surcharger, retourne <I>false</I> par défaut.
+	 * \see			activateSelection
+	 */
+	virtual bool is0DSelectionActivated ( ) const;
+
+	/**
+	 * \return		<I>true</I> si la sélection d'entités 1D est activée, sinon
+	 *				<I>false</I>.
+	 * \warning		Méthode à surcharger, retourne <I>false</I> par défaut.
+	 * \see			activateSelection
+	 */
+	virtual bool is1DSelectionActivated ( ) const;
+
+	/**
+	 * \return		<I>true</I> si la sélection d'entités 2D est activée, sinon
+	 *				<I>false</I>.
+	 * \warning		Méthode à surcharger, retourne <I>false</I> par défaut.
+	 * \see			activateSelection
+	 */
+	virtual bool is2DSelectionActivated ( ) const;
+
+	/**
+	 * \return		<I>true</I> si la sélection d'entités 3D est activée, sinon
+	 *				<I>false</I>.
+	 * \warning		Méthode à surcharger, retourne <I>false</I> par défaut.
+	 * \see			activateSelection
+	 */
+	virtual bool is3DSelectionActivated ( ) const;
+
+	/**
+	 * Activation de la sélection d'entités de dimensions et de types
+	 * correspondant au masque.
+	 * \see		is3DSelectionActivated
+	 */
+	virtual void activateSelection (
+			DIM dimensions, Mgx3D::Utils::FilterEntity::objectType mask = Mgx3D::Utils::FilterEntity::All);
+
+	//@}	// Politique évènementielle.
+
+	/**
 	 * Les observateurs de sélection.
 	 */
 	//@{
@@ -304,14 +408,14 @@ class SelectionManager : public Mgx3D::Utils::SelectionManagerIfc
 	 * sélection à venir.
 	 * @param		Observateur à recencer, non nul.
 	 */
-	virtual void addSelectionObserver (Mgx3D::Utils::SelectionManagerObserverIfc& observer);
+	virtual void addSelectionObserver (Mgx3D::Utils::SelectionManagerObserver& observer);
 
 	/** Désenregistre l'observateur de sélection reçu en argument. Cet
 	 * observateur ne sera plus informé des modifications de la
 	 * sélection à venir.
 	 * @param		Observateur à désenregistrer, non nul.
 	 */
-	virtual void removeSelectionObserver (Mgx3D::Utils::SelectionManagerObserverIfc& observer);
+	virtual void removeSelectionObserver (Mgx3D::Utils::SelectionManagerObserver& observer);
 
 	//@}	// Les observateurs de sélection.
 
@@ -321,7 +425,7 @@ class SelectionManager : public Mgx3D::Utils::SelectionManagerIfc
 	/**
 	 * @return		La liste des observateurs.
 	 */
-	virtual std::vector<Mgx3D::Utils::SelectionManagerObserverIfc*> getObservers ( );
+	virtual std::vector<Mgx3D::Utils::SelectionManagerObserver*> getObservers ( );
 
 	/**
 	 * Le mutex qui protège l'instance.
@@ -331,14 +435,14 @@ class SelectionManager : public Mgx3D::Utils::SelectionManagerIfc
 	/**
 	 * Envoie le log transmis en argument dans le flux de logs associés.
 	 */
-	 virtual void log (const TkUtil::Log& log);
+	virtual  void log (const TkUtil::Log& log);
 
 	/**
 	 * Informe les observateurs d'une modification de la politique de sélection.
 	 * \param	Eventuel pointeur sur des données décrivant ce changement de
 	 * 			politique de sélection. Informations optionnelles et spécifiques
 	 * 			au gestionnaire de sélection.
-	 * \see		SelectionManagerObserverIfc::selectionPolicyModified
+	 * \see		SelectionManager::selectionPolicyModified
 	 */
 	virtual void notifyObserversForNewPolicy (void* smp = 0);
 
@@ -392,7 +496,7 @@ class SelectionManager : public Mgx3D::Utils::SelectionManagerIfc
 	 * Affiche la pile d'actions dans le flux transmis en argument à raison d'une ligne par action. L'action de sélection
 	 * courante, si il y en a, est précédée de "=>". Pour aide à la mise au point.
 	 */
-	 virtual void printActionsStack (std::ostream& stream) const;
+	virtual void printActionsStack (std::ostream& stream) const;
 	//@}	// Les actions directes sur la sélection
 
 
@@ -415,7 +519,7 @@ class SelectionManager : public Mgx3D::Utils::SelectionManagerIfc
 	std::vector<Mgx3D::Utils::Entity*>						_entities;
 
 	/** Les observateurs de la sélection. */
-	std::vector<Mgx3D::Utils::SelectionManagerObserverIfc*>	_observers;
+	std::vector<Mgx3D::Utils::SelectionManagerObserver*>	_observers;
 
 	/** Mutex pour protéger certaines opérations. */
 	mutable TkUtil::Mutex*									_mutex;

@@ -8,7 +8,7 @@
 #ifndef QtBooleanOpOPERATIONACTION_H_
 #define QtBooleanOpOPERATIONACTION_H_
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtAnglePanel.h"
 #include "QtComponents/QtMgx3DGeomOperationAction.h"

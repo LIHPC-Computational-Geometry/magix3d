@@ -7,13 +7,10 @@
  *  \date 17 janv. 2011
  */
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/NameManager.h"
 #include "Utils/TypeDedicatedNameManager.h"
-#include <TkUtil/Exception.h>
-
 #include "Utils/Entity.h"
-
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
@@ -25,9 +22,8 @@
 #include "Topo/Face.h"
 #include "Topo/Block.h"
 #include "SysCoord/SysCoord.h"
-
-#include <string>
-
+/*----------------------------------------------------------------------------*/
+#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

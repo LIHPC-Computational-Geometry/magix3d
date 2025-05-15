@@ -1,14 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandFuse.cpp
- *
- *  \author Franck Ledoux
- *
- *  \date 04/02/2011
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
-/*----------------------------------------------------------------------------*/
 #include "Geom/CommandFuse.h"
 #include "Geom/GeomManager.h"
 #include "Geom/GeomFuseImplementation.h"

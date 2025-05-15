@@ -1,34 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/*
- * ImportIGESImplementation.cpp
- *
- *  Created on: 21 juin 2013
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
-#include <list>
-#include <map>
-#include <set>
-#include <algorithm>
-/*----------------------------------------------------------------------------*/
 #include "Geom/ImportIGESImplementation.h"
 #include "Geom/Vertex.h"
-#include "Geom/Curve.h"
-#include "Geom/Surface.h"
-#include "Geom/Volume.h"
-
-#include "Group/GroupManager.h"
-#include "Group/Group3D.h"
-#include "Group/Group2D.h"
-#include "Group/Group1D.h"
-#include "Group/Group0D.h"
-
-#include "Internal/InfoCommand.h"
-
 #include "Utils/MgxException.h"
-
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/Exception.h>

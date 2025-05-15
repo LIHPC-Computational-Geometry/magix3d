@@ -1,13 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file EdgeMeshingPropertyInterpolate.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 27/5/2014
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Topo/EdgeMeshingPropertyInterpolate.h"
 #include "Topo/CoEdge.h"
 #include "Topo/CoFace.h"
@@ -17,8 +9,7 @@
 #include "Utils/MgxNumeric.h"
 #include "Utils/Vector.h"
 #include "Utils/MgxException.h"
-#include "Internal/Context.h"
-
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
@@ -118,7 +109,7 @@ addDescription(Utils::SerializedRepresentation& topoProprietes) const
 		for (uint i=0; i<m_coedgesName.size(); i++){
 			CoEdge* edge = 0;
 			try {
-				edge = getStdContext()->getLocalTopoManager().getCoEdge(m_coedgesName[i], false);
+				edge = getStdContext()->getTopoManager().getCoEdge(m_coedgesName[i], false);
 			}
 			catch (Utils::IsDestroyedException& exc){
 				edge = 0;
@@ -136,7 +127,7 @@ addDescription(Utils::SerializedRepresentation& topoProprietes) const
 	else if (m_type == with_coface){
 		CoFace* coface = 0;
 		try {
-			coface = getStdContext()->getLocalTopoManager().getCoFace(m_cofaceName, false);
+			coface = getStdContext()->getTopoManager().getCoFace(m_cofaceName, false);
 		}
 		catch (Utils::IsDestroyedException& exc){
 			coface = 0;

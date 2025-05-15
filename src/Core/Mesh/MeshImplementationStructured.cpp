@@ -1348,7 +1348,7 @@ void MeshImplementation::_addRegionsInVolumes(Mesh::CommandCreateMesh* command, 
         bool isNewVolume = false;
         try {
             //std::cout<<"appel à getVolume("<<nom<<")"<<std::endl;
-            Mesh::Volume* vol = getContext().getLocalMeshManager().getVolume(nom);
+            Mesh::Volume* vol = getContext().getMeshManager().getVolume(nom);
             //std::cout<<"vol est détruit : "<<(vol->isDestroyed()?"vrai":"faux")<<std::endl;
             //std::cout<<"appel à addModifiedVolume("<<nom<<")"<<std::endl;
             command->addModifiedVolume(nom);
@@ -1360,7 +1360,7 @@ void MeshImplementation::_addRegionsInVolumes(Mesh::CommandCreateMesh* command, 
             //std::cout<<"fin alternative"<<std::endl;
         }
         // le volume de maillage que l'on vient de créer/modifier
-        Mesh::Volume* vol = getContext().getLocalMeshManager().getVolume(nom);
+        Mesh::Volume* vol = getContext().getMeshManager().getVolume(nom);
         vol->addBlock(bl);
         if (isNewVolume)
             getContext().newGraphicalRepresentation (*vol);
@@ -1384,8 +1384,8 @@ void MeshImplementation::_addFacesInSurfaces(Mesh::CommandCreateMesh* command, T
 #endif
 
     // on ajoute la face dans un groupe pour permettre de la représenter
-    if (groupsName.empty() && getContext().getLocalMeshManager().coFaceAllwaysInGroups())
-    	groupsName.push_back(getContext().getLocalGroupManager().getDefaultName(2));
+    if (groupsName.empty() && getContext().getMeshManager().coFaceAllwaysInGroups())
+    	groupsName.push_back(getContext().getGroupManager().getDefaultName(2));
 
     // création des polygones même si aucune surface de maillage les attend
     // en effet, ces mailles seront utilies pour la représentation des blocs structurés
@@ -1470,13 +1470,13 @@ void MeshImplementation::_addFacesInSurfaces(Mesh::CommandCreateMesh* command, T
         std::string& nom = groupsName[i];
 
         try {
-            getContext().getLocalMeshManager().getSurface(nom);
+            getContext().getMeshManager().getSurface(nom);
             command->addModifiedSurface(nom);
         } catch (...) {
             command->addNewSurface(nom);
         }
         // la surface de maillage que l'on vient de créer/modifier
-        Mesh::Surface* sf = getContext().getLocalMeshManager().getSurface(nom);
+        Mesh::Surface* sf = getContext().getMeshManager().getSurface(nom);
         sf->addCoFace(fa);
     } // end for i<groupsName.size()
 

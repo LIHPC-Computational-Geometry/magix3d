@@ -79,7 +79,7 @@ class SelectionManagerDimFilter : public virtual Mgx3D::Utils::SelectionManager
 	 * \return		Le masque de sélection sur les dimensions sélectionnables.
 	 * \see			getFilteredTypes
 	 */
-	virtual SelectionManagerIfc::DIM getFilteredDimensions ( ) const;
+	virtual SelectionManager::DIM getFilteredDimensions ( ) const;
 
 	/**
 	 * \return		<I>true</I> si la sélection d'entités 0D est activée, sinon
@@ -112,10 +112,10 @@ class SelectionManagerDimFilter : public virtual Mgx3D::Utils::SelectionManager
 	/**
 	 * Activation de la sélection d'entités 3D de dimensions et de type
 	 * correspondant au masque.
-	 * \see		SelectionManagerIfc::selectionPolicyModified
+	 * \see		SelectionManager::selectionPolicyModified
 	 */
 	virtual void activateSelection (
-			SelectionManagerIfc::DIM dimensions,
+			SelectionManager::DIM dimensions,
 			Mgx3D::Utils::FilterEntity::objectType mask = Mgx3D::Utils::FilterEntity::All);
 
 	//@}	// Politique évènementielle.
@@ -138,7 +138,7 @@ class SelectionManagerDimFilter : public virtual Mgx3D::Utils::SelectionManager
 									const SelectionManagerDimFilter&);
 
 	/** Les dimensions d'entités sélectionnables. */
-	SelectionManagerIfc::DIM					_dimensions;
+	SelectionManager::DIM					_dimensions;
 
 	/** Les types d'entités sélectionnables. */
 	Mgx3D::Utils::FilterEntity::objectType		_filteredTypes;

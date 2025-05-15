@@ -10,12 +10,12 @@
  *      ajout de la possibilité de conserver les entités géométriques
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManagerIfc.h"
+#include "Geom/GeomManager.h"
 #include "Geom/Surface.h"
 #include "QtComponents/QtPrismCreationAction.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -76,7 +76,7 @@ QtPrismCreationPanel::QtPrismCreationPanel (
 	// Surfaces de base :
 	_surfacesPanel	= new QtMgx3DEntityPanel (
 						this, "", true, "Surfaces à extruder :", "",
-						&mainWindow, SelectionManagerIfc::D2,
+						&mainWindow, SelectionManager::D2,
 						FilterEntity::GeomSurface);
 	_surfacesPanel->setMultiSelectMode (true);
 	layout->addWidget (_surfacesPanel);
@@ -338,7 +338,7 @@ QtPrismCreationPanel* QtPrismCreationAction::getPrismPanel ( )
 void QtPrismCreationAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de création des prismes :

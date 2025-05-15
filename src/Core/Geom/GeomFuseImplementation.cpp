@@ -1,18 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file GeomFuseImplementation.cpp
- *
- *  \author Franck Ledoux
- *
- *  \date 04/02/2011
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
-#include <list>
-#include <map>
-#include <set>
-#include <algorithm>
-/*----------------------------------------------------------------------------*/
 #include "Geom/GeomFuseImplementation.h"
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
@@ -24,28 +10,9 @@
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Face.hxx>
-#include <TopoDS_Solid.hxx>
-#include <TopoDS_Compound.hxx>
-#include <TopoDS_CompSolid.hxx>
-#include <TopoDS.hxx>
-#include <TDF_Label.hxx>
-#include <TopoDS.hxx>
 #include <BRepAlgoAPI_Fuse.hxx>
 #include <BRepFeat_Gluer.hxx>
-
-#include <BRep_Builder.hxx>
 #include <ShapeAnalysis_ShapeContents.hxx>
-#include <TopExp_Explorer.hxx>
-#include <TopTools_ListOfShape.hxx>
-#include <TopTools_IndexedMapOfShape.hxx>
-#include <TopExp.hxx>
-#include <gp_Pnt.hxx>
-#include <BRep_Tool.hxx>
-#include <BRepTools.hxx>
-#include <BRepTools_ReShape.hxx>
-#include <TopTools_ListOfShape.hxx>
-#include <BRepBuilderAPI_MakeVertex.hxx>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -132,18 +99,6 @@ void GeomFuseImplementation::fuseVolumes(std::vector<GeomEntity*>& res)
         for(unsigned int j=0;j<m_newVolumes.size();j++)
             rep_ei.push_back(m_newVolumes[j]);
     }
-    //=========================================================================
-//    std::map<GeomEntity*, std::vector<GeomEntity*> >::iterator it = m_replacedEntities.begin();
-//    while(it!=m_replacedEntities.end()){
-//        GeomEntity* oldE = it->first;
-//        std::vector<GeomEntity*> newE = it->second;
-//        std::cout<<oldE->getName()<<" replaced by"<<std::endl;
-//        for(unsigned int i=0;i<newE.size();i++)
-//            std::cout<<"\t "<<newE[i]->getName()<<std::endl;
-//        it++;
-//    }
-
-//    res.insert(res.end(),new_volumes.begin(),new_volumes.end());
 }
 /*----------------------------------------------------------------------------*/
 void GeomFuseImplementation::fuseSurfaces(std::vector<GeomEntity*>& res)
@@ -196,18 +151,6 @@ void GeomFuseImplementation::fuseSurfaces(std::vector<GeomEntity*>& res)
         for(unsigned int j=0;j<m_newSurfaces.size();j++)
             rep_ei.push_back(m_newSurfaces[j]);
     }
-    //=========================================================================
-//    std::map<GeomEntity*, std::vector<GeomEntity*> >::iterator it = m_replacedEntities.begin();
-//    while(it!=m_replacedEntities.end()){
-//        GeomEntity* oldE = it->first;
-//        std::vector<GeomEntity*> newE = it->second;
-//        std::cout<<oldE->getName()<<" replaced by"<<std::endl;
-//        for(unsigned int i=0;i<newE.size();i++)
-//            std::cout<<"\t "<<newE[i]->getName()<<std::endl;
-//        it++;
-//    }
-
-//    res.insert(res.end(),new_volumes.begin(),new_volumes.end());
 }
 
 /*----------------------------------------------------------------------------*/
@@ -248,18 +191,6 @@ void GeomFuseImplementation::fuseCurves(std::vector<GeomEntity*>& res)
     }
 
     createGeomEntities(s1);
-//    //=========================================================================
-//    std::map<GeomEntity*, std::vector<GeomEntity*> >::iterator it = m_replacedEntities.begin();
-//    while(it!=m_replacedEntities.end()){
-//        GeomEntity* oldE = it->first;
-//        std::vector<GeomEntity*> newE = it->second;
-//        std::cout<<oldE->getName()<<" replaced by"<<std::endl;
-//        for(unsigned int i=0;i<newE.size();i++)
-//            std::cout<<"\t "<<newE[i]->getName()<<std::endl;
-//        it++;
-//    }
-
-//    res.insert(res.end(),new_curves.begin(),new_curves.end());
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

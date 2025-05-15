@@ -1,26 +1,20 @@
-#include "Internal/ContextIfc.h"
-
+/*----------------------------------------------------------------------------*/
+#include "Internal/Context.h"
 #include "QtVtkComponents/QtVtkMgx3DMainWindow.h"
 #include "QtVtkComponents/QtVtkMgx3DApplication.h"
 #include "QtVtkComponents/QtVtkGraphicalWidget.h"
 #include "QtVtkComponents/VTKSelectionManagerDimFilter.h"
 #include "QtVtkComponents/VTKRenderingManager.h"
-#include "Internal/Context.h"
 #include "Utils/ErrorManagement.h"
 #include "Utils/CommandManager.h"
 #include "Internal/Mgx3DArguments.h"
 #include "Python/M3DPythonSession.h"
-
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/ErrorLog.h>
-#include <TkUtil/InformationLog.h>
 #include <TkUtil/MemoryError.h>
-#include <TkUtil/ProcessLog.h>
-#include <TkUtil/WarningLog.h>
-#include <TkUtil/ScriptingLog.h>
-#include <TkUtil/TraceLog.h>
 #include <QTextCodec>
 #include <QtPython3/QtPython.h>
-
+/*----------------------------------------------------------------------------*/
 #ifdef QT_4
 #include <QX11Info>
 #endif	// QT_4
@@ -79,7 +73,7 @@ int main (int argc, char* argv[], char* envp[])
 	QtPython::preInitialize ( );
 	VTKRenderingManager::initialize (false);
 	const string			sessionName ("session_1");
-	ContextIfc*	context	= new Internal::Context (sessionName, true);
+	Context*	context	= new Internal::Context (sessionName, true);
 	CHECK_NULL_PTR_ERROR (context)
 	context->setPythonSession (createMgx3DPythonSession ( ));
 	QtVtkMgx3DApplication	mgxApplication (argc, argv, envp);

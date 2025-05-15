@@ -4,7 +4,7 @@
  * \date        28/11/2011
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtVtkComponents/VTKMgx3DGeomEntityRepresentation.h"
 #include "Geom/GeomEntity.h"

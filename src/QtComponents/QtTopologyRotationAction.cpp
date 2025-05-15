@@ -4,7 +4,7 @@
  * \date        22/05/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
@@ -70,8 +70,8 @@ QtTopologyRotationPanel::QtTopologyRotationPanel (
 			FilterEntity::TopoBlock);
 	_topoEntitiesPanel	= new QtEntityByDimensionSelectorPanel (
 							this, mainWindow, "Entités topologiques :", 
-							SelectionManagerIfc::ALL_DIMENSIONS,
-							filter, SelectionManagerIfc::D3, true);
+							SelectionManager::ALL_DIMENSIONS,
+							filter, SelectionManager::D3, true);
 	_topoEntitiesPanel->setMultiSelectMode (true);
 	connect (_topoEntitiesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -142,7 +142,7 @@ void QtTopologyRotationPanel::reset ( )
 }	// QtTopologyRotationPanel::reset
 
 
-void QtTopologyRotationPanel::setDimension (SelectionManagerIfc::DIM dim)
+void QtTopologyRotationPanel::setDimension (SelectionManager::DIM dim)
 {
 	CHECK_NULL_PTR_ERROR (_topoEntitiesPanel)
 	_topoEntitiesPanel->clearSelection ( );
@@ -329,7 +329,7 @@ QtTopologyRotationPanel*
 void QtTopologyRotationAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DTopoOperationAction::executeOperation ( );
 
 	// Récupération des paramètres d'association des entités topologiques :

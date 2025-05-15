@@ -1,16 +1,7 @@
-/*----------------------------------------------------------------------------*/
-/*
- * CommandExportBREP.h
- *
- *  Created on: 23 aout 2024
- *      Author: lelandaisb
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDEXPORTBREP_H_
 #define COMMANDEXPORTBREP_H_
 /*----------------------------------------------------------------------------*/
 #include "Internal/CommandInternal.h"
-#include "Utils/Vector.h"
 #include "Geom/GeomEntity.h"
 #include "Internal/Context.h"
 #include "Geom/ExportBREPImplementation.h"

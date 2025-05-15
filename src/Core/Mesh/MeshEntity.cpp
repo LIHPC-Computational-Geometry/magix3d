@@ -1,19 +1,12 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file MeshEntity.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 25 nov. 2011
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Mesh/MeshEntity.h"
-#include <TkUtil/MemoryError.h>
-#include "Utils/SerializedRepresentation.h"
 #include "Internal/Context.h"
+#include "Mesh/MeshEntity.h"
+#include "Utils/SerializedRepresentation.h"
+/*----------------------------------------------------------------------------*/
+#include <TkUtil/MemoryError.h>
+/*----------------------------------------------------------------------------*/
 #include <memory>           // unique_ptr
-#include <sys/types.h>			// CP : uint sur Bull
+#include <sys/types.h>		// CP : uint sur Bull
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -42,7 +35,7 @@ void MeshEntity::getBounds (double bounds[6]) const
 	Entity::getBounds (bounds);	// RAZ
 }
 /*----------------------------------------------------------------------------*/
-Mesh::MeshManagerIfc& MeshEntity::getMeshManager() const
+Mesh::MeshManager& MeshEntity::getMeshManager() const
 {
 	CHECK_NULL_PTR_ERROR (m_mesh_manager)
 	return *m_mesh_manager;

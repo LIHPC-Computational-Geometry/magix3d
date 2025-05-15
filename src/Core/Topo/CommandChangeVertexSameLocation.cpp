@@ -1,21 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/*
- * \file CommandChangeVertexSameLocation.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 24/11/2017
- */
-/*----------------------------------------------------------------------------*/
-#include "Topo/CommandChangeVertexSameLocation.h"
-
-#include "Utils/Common.h"
+#include "Topo/Block.h"
 #include "Topo/Vertex.h"
-
+#include "Topo/CoFace.h"
+#include "Topo/CommandChangeVertexSameLocation.h"
+#include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

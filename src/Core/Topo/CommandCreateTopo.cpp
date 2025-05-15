@@ -1,12 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandCreateTopo.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 16/12/2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/InfoCommand.h"
 #include "Topo/CommandCreateTopo.h"
 #include "Topo/TopoManager.h"
@@ -15,19 +8,12 @@
 #include "Topo/Edge.h"
 #include "Topo/Face.h"
 #include "Topo/Block.h"
-
 #include "Geom/Volume.h"
-#include "Geom/Surface.h"
 #include "Geom/CommandCreateGeom.h"
-
-#include "Utils/Command.h"
-#include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
-#include <TkUtil/ReferencedMutex.h>
-
+/*----------------------------------------------------------------------------*/
 #include <list>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

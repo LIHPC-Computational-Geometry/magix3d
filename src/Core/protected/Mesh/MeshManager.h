@@ -1,17 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/*
- * \file MeshManager.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 7 nov. 2011
- */
-/*----------------------------------------------------------------------------*/
 #ifndef MGX3D_MESH_MESHMANAGER_H_
 #define MGX3D_MESH_MESHMANAGER_H_
 /*----------------------------------------------------------------------------*/
-#include "Mesh/MeshManagerIfc.h"
+#include "Internal/CommandCreator.h"
 #include "Utils/Container.h"
+#include "Utils/SwigCompletion.h"
+/*----------------------------------------------------------------------------*/
+#include <string>
+#include <vector>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -22,6 +17,7 @@ class Entity;
 namespace Internal {
 class Context;
 class InfoCommand;
+class M3DCommandResult;
 }
 namespace Topo {
 class Block;
@@ -36,7 +32,7 @@ class Cloud;
 class Surface;
 class Volume;
 class SubVolume;
-
+class Line;
 class CommandMeshExplorer;
 
 /*----------------------------------------------------------------------------*/
@@ -47,10 +43,22 @@ class CommandMeshExplorer;
  *        un lien vers une interface avec le maillage (GMDS) pour une session donnée.
  *
  */
-class MeshManager: public Mesh::MeshManagerIfc {
+class MeshManager final : public Internal::CommandCreator {
 public:
 
-    /*------------------------------------------------------------------------*/
+	/*------------------------------------------------------------------------*/
+	/** \brief  Strategies possibles pour la création d'un maillage
+	 * <P> GRANDCHALLENGE:  Création d'un maillage en une fois, le undo détruit tout le maillage,<BR>
+	 *     MODIFIABLE: Création et modification du maillage par partie possible,
+	 *    il est mémorisé ce qui a été créé pour pouvoir faire un undo
+	 * </P>
+	 */
+	enum strategy {
+		GRANDCHALLENGE,
+		MODIFIABLE
+	};
+
+	/*------------------------------------------------------------------------*/
     /** \brief  Constructeur
      *
 	 *  \param		Nom unique de l'instance (utile en environnement distribué).
@@ -60,65 +68,90 @@ public:
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur */
-    virtual ~MeshManager();
+    ~MeshManager();
 
 	/*------------------------------------------------------------------------*/
+#ifndef SWIG
 	/** Réinitialisation     */
-	virtual void clear();
+	void clear();
 
-    /*------------------------------------------------------------------------*/
+	/*------------------------------------------------------------------------*/
     /// Accesseur sur le maillage
-    virtual MeshItf* getMesh() {return m_mesh_itf;}
+    MeshItf* getMesh() {return m_mesh_itf;}
+#endif
 
     /*------------------------------------------------------------------------*/
     /// Lecture d'un maillage au format lima (mli)
-    virtual void readMli(std::string nom, std::string prefix);
+    void readMli(std::string nom, std::string prefix);
+	SET_SWIG_COMPLETABLE_METHOD(readMli)
 
     /*------------------------------------------------------------------------*/
     /// Sauvegarde d'un maillage au format lima (mli)
-    virtual void writeMli(std::string nom);
+    void writeMli(std::string nom);
+	SET_SWIG_COMPLETABLE_METHOD(writeMli)
 
     /*------------------------------------------------------------------------*/
     /// Sauvegarde d'un maillage au format vtk (vtk vtp vtu)
-    virtual void writeVTK(std::string nom);
+    void writeVTK(std::string nom);
+	SET_SWIG_COMPLETABLE_METHOD(writeVTK)
 
     /*------------------------------------------------------------------------*/
     /// Sauvegarde d'un maillage au format CGNS
-    virtual void writeCGNS(std::string nom);
+    void writeCGNS(std::string nom);
+	SET_SWIG_COMPLETABLE_METHOD(writeCGNS)
 
-    /*------------------------------------------------------------------------*/
+	/*------------------------------------------------------------------------*/
+	/** \brief Export dans un fichier au format VTK de la structure de blocs
+	 *
+	 *  \param n le nom du ficher dans lequel on exporte
+	 */
+	Mgx3D::Internal::M3DCommandResult* exportBlocksForCGNS(const std::string& n);
+	SET_SWIG_COMPLETABLE_METHOD(exportBlocksForCGNS)
+
+	/*------------------------------------------------------------------------*/
     /// Lissage du maillage
-    virtual void smooth();
+    void smooth();
 
     /*------------------------------------------------------------------------*/
     /// Compare le maillage actuel avec un maillage sur disque, return true si ok
-    virtual bool compareWithMesh(std::string nom);
+    bool compareWithMesh(std::string nom);
+	SET_SWIG_COMPLETABLE_METHOD(compareWithMesh)
 
     /*------------------------------------------------------------------------*/
     /// Accesseur sur la strategie
-    virtual strategy getStrategy() {return m_strategy;}
-    /// Modificateur de strategie
-    virtual void setStrategy(const strategy& st) {m_strategy = st;}
+    strategy getStrategy() {return m_strategy;}
+
+	/// Modificateur de strategie
+    void setStrategy(const strategy& st) {m_strategy = st;}
+	SET_SWIG_COMPLETABLE_METHOD(setStrategy)
 
     /*------------------------------------------------------------------------*/
     /** \brief  Génère le maillage pour une liste de blocs */
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     newBlocksMesh(std::vector<std::string>& blocks_name);
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
+	SET_SWIG_COMPLETABLE_METHOD(newBlocksMesh)
+
+#ifndef	SWIG
+    Mgx3D::Internal::M3DCommandResult*
     newBlocksMesh(std::vector<Mgx3D::Topo::Block*>& blocks);
+#endif
 
     /** \brief  Génère le maillage pour une liste de faces (communes) */
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
     newFacesMesh(std::vector<std::string>& faces_name);
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
+	SET_SWIG_COMPLETABLE_METHOD(newFacesMesh)
+
+#ifndef	SWIG
+    Mgx3D::Internal::M3DCommandResult*
     newFacesMesh(std::vector<Mgx3D::Topo::CoFace*>& faces);
+#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief  Génère le maillage pour l'ensemble des blocs */
-    virtual Mgx3D::Internal::M3DCommandResultIfc* newAllBlocksMesh();
+    Mgx3D::Internal::M3DCommandResult* newAllBlocksMesh();
 
     /** \brief  Génère le maillage pour l'ensemble des faces (communes) */
-    virtual Mgx3D::Internal::M3DCommandResultIfc* newAllFacesMesh();
+    Mgx3D::Internal::M3DCommandResult* newAllFacesMesh();
 
     /*------------------------------------------------------------------------*/
     /** \brief  Construction d'un sous-ensemble d'un volume
@@ -130,11 +163,13 @@ public:
      *  \param pos2 idem pos1
      *  \param groupName nom du groupe à créer
      */
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	newSubVolumeBetweenSheets(std::vector<std::string>& blocks_name, std::string narete,
 			int pos1, int pos2, std::string groupName);
+	SET_SWIG_COMPLETABLE_METHOD(newSubVolumeBetweenSheets)
 
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
+#ifndef SWIG
+    Mgx3D::Internal::M3DCommandResult*
 	newSubVolumeBetweenSheets(std::vector<Mgx3D::Topo::Block*>& blocks, Topo::CoEdge* coedge,
 			int pos1, int pos2, std::string groupName);
 
@@ -147,7 +182,7 @@ public:
 	 *  gérée par le undo/redo manager, n'est pas scriptable et n'est pas
 	 *  exécutée (juste créée).
      */
-    virtual CommandMeshExplorer* newExplorer(CommandMeshExplorer* oldExplo, int inc, std::string narete, bool asCommand);
+    CommandMeshExplorer* newExplorer(CommandMeshExplorer* oldExplo, int inc, std::string narete, bool asCommand);
 
     /** Terminaison de l'exploration
      *  On renseigne sur l'exporateur précédent
@@ -156,91 +191,90 @@ public:
 	 *  gérée par le undo/redo manager, n'est pas scriptable et n'est pas
 	 *  exécutée (juste créée).
      */
-    virtual CommandMeshExplorer* endExplorer(CommandMeshExplorer* oldExplo, bool asCommand);
+    CommandMeshExplorer* endExplorer(CommandMeshExplorer* oldExplo, bool asCommand);
+#endif
 
     /*------------------------------------------------------------------------*/
-    virtual int getNbClouds(bool onlyVisible) const;
-    virtual int getNbSurfaces(bool onlyVisible) const;
-    virtual int getNbVolumes(bool onlyVisible) const;
-
-    virtual int getNbNodes();
-    virtual int getNbFaces();
-    virtual int getNbRegions();
+    int getNbClouds(bool onlyVisible = true) const;
+	SET_SWIG_COMPLETABLE_METHOD(getNbClouds)
+    int getNbSurfaces(bool onlyVisible = true) const;
+	SET_SWIG_COMPLETABLE_METHOD(getNbSurfaces)
+    int getNbVolumes(bool onlyVisible = true) const;
+	SET_SWIG_COMPLETABLE_METHOD(getNbVolumes)
+    int getNbNodes();
+    int getNbFaces();
+    int getNbRegions();
 
     /** Retourne une string avec les informations relatives à l'entité */
-    virtual std::string getInfos(const std::string& name, int dim) const;
+    std::string getInfos(const std::string& name, int dim) const;
+	SET_SWIG_COMPLETABLE_METHOD(getInfos)
 
-    virtual std::string getInfos(const Cloud* me) const;
-    virtual std::string getInfos(const Surface* me) const;
-    virtual std::string getInfos(const Volume* me) const;
+#ifndef SWIG
+    std::string getInfos(const Cloud* me) const;
+    std::string getInfos(const Surface* me) const;
+    std::string getInfos(const Volume* me) const;
 
     /*------------------------------------------------------------------------*/
     /** Ajoute un Nuage au manager */
-    virtual void add(Cloud* cl);
+    void add(Cloud* cl);
 
     /** Enlève un Nuage au manager */
-    virtual void remove(Cloud* cl);
+    void remove(Cloud* cl);
 
     /** Retourne le Nuage suivant le nom en argument */
-    virtual Cloud* getCloud(const std::string& name, const bool exceptionIfNotFound=true) const;
+    Cloud* getCloud(const std::string& name, const bool exceptionIfNotFound=true) const;
 
     /** Retourne les Nuages */
-    virtual void getClouds(std::vector<Cloud*>& AClouds) const;
+    void getClouds(std::vector<Cloud*>& AClouds) const;
 
     /*------------------------------------------------------------------------*/
     /** Ajoute une Ligne au manager */
-    virtual void add(Line* ln);
+    void add(Line* ln);
 
     /** Enlève une Line au manager */
-    virtual void remove(Line* ln);
+    void remove(Line* ln);
 
     /** Retourne la Ligne suivant le nom en argument */
-    virtual Line* getLine(const std::string& name, const bool exceptionIfNotFound=true) const;
+    Line* getLine(const std::string& name, const bool exceptionIfNotFound=true) const;
 
     /** Retourne les Lignes */
-    virtual void getLines(std::vector<Line*>& ALines) const;
+    void getLines(std::vector<Line*>& ALines) const;
 
     /*------------------------------------------------------------------------*/
     /** Ajoute une Surface au manager */
-    virtual void add(Surface* sf);
+    void add(Surface* sf);
 
     /** Enlève une Surface au manager */
-    virtual void remove(Surface* sf);
+    void remove(Surface* sf);
 
     /** Retourne la Surface suivant le nom en argument */
-    virtual Surface* getSurface(const std::string& name, const bool exceptionIfNotFound=true) const;
+    Surface* getSurface(const std::string& name, const bool exceptionIfNotFound=true) const;
 
     /** Retourne les Surfaces */
-    virtual void getSurfaces(std::vector<Surface*>& ASurfaces) const;
+    void getSurfaces(std::vector<Surface*>& ASurfaces) const;
 
     /*------------------------------------------------------------------------*/
     /** Ajoute un Volume au manager */
-    virtual void add(Volume* vo);
+    void add(Volume* vo);
 
     /** Enlève un Volume au manager */
-    virtual void remove(Volume* vo);
+    void remove(Volume* vo);
 
     /** Retourne le Volume suivant le nom en argument */
-    virtual Volume* getVolume(const std::string& name, const bool exceptionIfNotFound=true) const;
+    Volume* getVolume(const std::string& name, const bool exceptionIfNotFound=true) const;
 
     /** Retourne les Volumes */
-    virtual void getVolumes(std::vector<Volume*>& AVolumes) const;
+    void getVolumes(std::vector<Volume*>& AVolumes) const;
 
     /** Création d'un sous-volume ou réutilisation d'un existant */
-    virtual SubVolume* getNewSubVolume(const std::string& gr_name, Internal::InfoCommand* icmd);
+    SubVolume* getNewSubVolume(const std::string& gr_name, Internal::InfoCommand* icmd);
 
     /*------------------------------------------------------------------------*/
     /// accès à m_coface_allways_in_groups
     bool coFaceAllwaysInGroups() const {return m_coface_allways_in_groups;}
     /// modif de m_coface_allways_in_groups
     void setCoFaceAllwaysInGroups(bool vis) {m_coface_allways_in_groups = vis;}
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Export dans un fichier au format VTK de la structure de blocs
-     *
-     *  \param n le nom du ficher dans lequel on exporte
-     */
-    virtual Mgx3D::Internal::M3DCommandResultIfc* exportBlocksForCGNS(const std::string& n);
+#endif
 
 private:
     /// Lien sur la structure de maillage et ses algos

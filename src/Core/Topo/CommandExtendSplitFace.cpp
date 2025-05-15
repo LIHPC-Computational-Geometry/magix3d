@@ -1,18 +1,10 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandExtendSplitFace.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 15/5/2014
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandExtendSplitFace.h"
-
-#include "Utils/Common.h"
 #include "Topo/TopoHelper.h"
 #include "Topo/CoFace.h"
+#include "Topo/CoEdge.h"
 #include "Topo/Vertex.h"
+#include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>

@@ -28,9 +28,9 @@ namespace Utils
 //                            LA CLASSE MgxThreadedTask
 // ============================================================================
 
-MgxThreadedTask::MgxThreadedTask (CommandIfc& command)
+MgxThreadedTask::MgxThreadedTask (Command& command)
 	: ThreadPool::TaskIfc ( ),
-	  _mutex (true), _command (&command), _status (CommandIfc::INITED),
+	  _mutex (true), _command (&command), _status (Command::INITED),
 	  _message ( )
 {
 }	// MgxThreadedTask::MgxThreadedTask
@@ -62,13 +62,13 @@ MgxThreadedTask::~MgxThreadedTask ( )
 }	// MgxThreadedTask::~MgxThreadedTask
 
 
-CommandIfc* MgxThreadedTask::getCommand ( )
+Command* MgxThreadedTask::getCommand ( )
 {
 	return _command;
 }	// MgxThreadedTask::getCommand
 
 
-const CommandIfc* MgxThreadedTask::getCommand ( ) const
+const Command* MgxThreadedTask::getCommand ( ) const
 {
 	return _command;
 }	// MgxThreadedTask::getCommand
@@ -76,7 +76,7 @@ const CommandIfc* MgxThreadedTask::getCommand ( ) const
 
 bool MgxThreadedTask::isCanceled ( ) const
 {
-	return CommandIfc::CANCELED == _command->getStatus( ) ? true : false;
+	return Command::CANCELED == _command->getStatus( ) ? true : false;
 }	// MgxThreadedTask::isCanceled
 
 

@@ -4,7 +4,7 @@
  * \date        07/12/2018
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtVtkComponents/VTKMgx3DStructuredMeshEntityRepresentation.h"
 #include "QtComponents/QtMgx3DApplication.h"

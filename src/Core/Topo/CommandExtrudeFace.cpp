@@ -510,7 +510,7 @@ namespace Mgx3D {
 
                 Block* newBlock = new Topo::Block(getContext(), faces, vertices, true);
 
-                Group::Group3D *group = getContext().getLocalGroupManager().getNewGroup3D(getContext().getLocalGroupManager().getDefaultName(3),
+                Group::Group3D *group = getContext().getGroupManager().getNewGroup3D(getContext().getGroupManager().getDefaultName(3),
                                                                                           &getInfoCommand());
                 group->add(newBlock);
                 newBlock->getGroupsContainer().add(group);

@@ -44,7 +44,7 @@ CommandSnapProjectedVertices(Internal::Context& c)
 {
     std::vector<Topo::Vertex* > vertices;
 
-    c.getLocalTopoManager().getVertices(vertices);
+    c.getTopoManager().getVertices(vertices);
 
     m_vertices.insert(m_vertices.end(), vertices.begin(), vertices.end());
 }

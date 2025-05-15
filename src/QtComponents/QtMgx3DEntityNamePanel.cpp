@@ -4,7 +4,7 @@
  *  Created on: 20 mars 2013
  *      Author: ledouxf
  */
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "QtComponents/QtMgx3DEntityNamePanel.h"
@@ -13,7 +13,7 @@
 #include "Group/Group1D.h"
 #include "Group/Group2D.h"
 #include "Group/Group3D.h"
-#include "Group/GroupManagerIfc.h"
+#include "Group/GroupManager.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/UTF8String.h>
@@ -45,7 +45,7 @@ namespace QtComponents
 
 QtMgx3DEntityNamePanel::QtMgx3DEntityNamePanel (
     QWidget* parent, const string& name, QtMgx3DMainWindow& mainWindow,
-    SelectionManagerIfc::DIM dimensions, FilterEntity::objectType types)
+    SelectionManager::DIM dimensions, FilterEntity::objectType types)
     : QWidget (parent), ValidatedField ( ),
       _names(0), _mainWindow (&mainWindow), _label(0)
 
@@ -91,7 +91,7 @@ QtMgx3DEntityNamePanel::~QtMgx3DEntityNamePanel ( )
 }   // QtMgx3DEntityNamePanel::~QtMgx3DEntityNamePanel
 
 
-ContextIfc& QtMgx3DEntityNamePanel::getContext ( )
+Context& QtMgx3DEntityNamePanel::getContext ( )
 {
     CHECK_NULL_PTR_ERROR (_mainWindow)
     return _mainWindow->getContext ( );
@@ -187,7 +187,7 @@ void QtMgx3DEntityNamePanel::setLabel (const std::string& label)
     _label->setText(QString::fromUtf8(label.c_str()));
 }
 
-void QtMgx3DEntityNamePanel::setDimensions (SelectionManagerIfc::DIM dimensions)
+void QtMgx3DEntityNamePanel::setDimensions (SelectionManager::DIM dimensions)
 {
     _names->selectionCleared();
     _names->setFilteredDimensions (dimensions);

@@ -1,17 +1,9 @@
-/*----------------------------------------------------------------------------*/
-/**
- * CommandRotation.h
- *
- *  Created on: 27 sept. 2012
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDROTATION_H_
 #define COMMANDROTATION_H_
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandEditGeom.h"
-#include "Utils/Rotation.h"
 #include "Geom/GeomEntity.h"
+#include "Utils/Rotation.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

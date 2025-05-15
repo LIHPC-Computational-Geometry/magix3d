@@ -4,14 +4,14 @@
  * \date        09/09/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include "Geom/CommandNewCircle.h"
 #include "Geom/CommandNewEllipse.h"
 #include "Geom/GeomDisplayRepresentation.h"
-#include "Geom/GeomManagerIfc.h"
+#include "Geom/GeomManager.h"
 #include "Geom/Vertex.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtCircleOperationAction.h"
@@ -432,7 +432,7 @@ QtCircleOperationPanel* QtCircleOperationAction::getCirclePanel ( )
 void QtCircleOperationAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 //	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de création du cercle :

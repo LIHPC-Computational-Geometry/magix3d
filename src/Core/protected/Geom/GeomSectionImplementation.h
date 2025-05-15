@@ -1,19 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/*
- * GeomSectionImplementation.h
- *
- *  Created on: 7 oct. 2013
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #ifndef GEOMSECTIONIMPLEMENTATION_H_
 #define GEOMSECTIONIMPLEMENTATION_H_
 /*----------------------------------------------------------------------------*/
-#include "Utils/Vector.h"
 #include "Geom/GeomModificationBaseClass.h"
 #include "Geom/GeomEntity.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
+#include <TopoDS_Face.hxx>
 #include <TopoDS_Shape.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

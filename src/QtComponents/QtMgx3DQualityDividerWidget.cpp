@@ -4,7 +4,7 @@
  * \date		07/01/2025
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtMgx3DQualityDividerWidget.h"
 #include "QtComponents/QtMgx3DMainWindow.h"

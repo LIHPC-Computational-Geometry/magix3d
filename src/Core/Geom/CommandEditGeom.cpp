@@ -1,11 +1,4 @@
-/*
- * CommandEditGeom.cpp
- *
- *  Created on: 25 janv. 2013
- *      Author: ledouxf
- */
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
 #include "Utils/Common.h"
 #include "Internal/InfoCommand.h"
 #include "Internal/Context.h"
@@ -26,9 +19,6 @@
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/Exception.h>
 #include <TkUtil/ReferencedMutex.h>
-#include <TkUtil/MemoryError.h>
-
-//#include <GMDSCommon/Timer.h>
 /*----------------------------------------------------------------------------*/
 using namespace TkUtil;
 using namespace Mgx3D::Utils;
@@ -109,7 +99,7 @@ void CommandEditGeom::internalExecute()
         std::cerr<<"Ajoute --> "<<ge->getUniqueName()<<std::endl;
 #endif
         getInfoCommand ( ).addGeomInfoEntity (ge, Internal::InfoCommand::CREATED);
-        getContext().getLocalGeomManager().addEntity(ge);
+        getContext().getGeomManager().addEntity(ge);
     }
     for(int i=0;i<mod_entities.size();i++){
         GeomEntity* ge = mod_entities[i];

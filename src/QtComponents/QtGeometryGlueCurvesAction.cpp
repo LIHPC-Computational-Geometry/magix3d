@@ -4,7 +4,7 @@
  * \date        20/11/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Geom/Curve.h"
@@ -60,7 +60,7 @@ QtGeometryGlueCurvesPanel::QtGeometryGlueCurvesPanel (
 	// Les courbes à coller :
 	_curvesPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Courbes :", "", &mainWindow,
-			SelectionManagerIfc::D1, FilterEntity::GeomCurve);
+			SelectionManager::D1, FilterEntity::GeomCurve);
 	_curvesPanel->setMultiSelectMode (true);
 	connect (_curvesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -245,7 +245,7 @@ QtGeometryGlueCurvesPanel*
 
 void QtGeometryGlueCurvesAction::executeOperation ( )
 {
-	M3DCommandResultIfc*		cmdResult	= 0;
+	M3DCommandResult*		cmdResult	= 0;
 	QtGeometryGlueCurvesPanel*	panel	=
 			dynamic_cast<QtGeometryGlueCurvesPanel*>(getGeometryGlueCurvesPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)

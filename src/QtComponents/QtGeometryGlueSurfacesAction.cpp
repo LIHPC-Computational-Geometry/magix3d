@@ -4,7 +4,7 @@
  * \date        01/12/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Geom/Surface.h"
@@ -60,7 +60,7 @@ QtGeometryGlueSurfacesPanel::QtGeometryGlueSurfacesPanel (
 	// Les surfaces à coller :
 	_surfacesPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Surfaces :", "", &mainWindow,
-			SelectionManagerIfc::D2, FilterEntity::GeomSurface);
+			SelectionManager::D2, FilterEntity::GeomSurface);
 	_surfacesPanel->setMultiSelectMode (true);
 	connect (_surfacesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -245,7 +245,7 @@ QtGeometryGlueSurfacesPanel*
 
 void QtGeometryGlueSurfacesAction::executeOperation ( )
 {
-	M3DCommandResultIfc*			cmdResult	= 0;
+	M3DCommandResult*			cmdResult	= 0;
 	QtGeometryGlueSurfacesPanel*	panel		= dynamic_cast<QtGeometryGlueSurfacesPanel*>(getGeometryGlueSurfacesPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)
 

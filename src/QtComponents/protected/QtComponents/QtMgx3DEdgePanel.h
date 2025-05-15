@@ -7,7 +7,7 @@
 #ifndef QT_MGX3D_EDGE_PANEL_H
 #define QT_MGX3D_EDGE_PANEL_H
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include <TkUtil/util_config.h>
 
@@ -129,7 +129,7 @@ class QtMgx3DEdgePanel : public QWidget
 	 * \return	Une référence sur le contexte <I>Magix 3D</I> associé à
 	 *			l'opération.
 	 */
-	virtual const Mgx3D::Internal::ContextIfc& getContext ( ) const;
+	virtual const Mgx3D::Internal::Context& getContext ( ) const;
 
 
 	signals :

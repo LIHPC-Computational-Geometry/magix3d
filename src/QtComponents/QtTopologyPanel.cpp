@@ -4,7 +4,7 @@
  * \date        18/12/2012
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "QtComponents/QtTopologyPanel.h"

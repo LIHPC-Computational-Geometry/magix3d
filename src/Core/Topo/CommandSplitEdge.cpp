@@ -1,16 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandSplitEdge.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 8/11/2012
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandSplitEdge.h"
-
-#include "Utils/Common.h"
 #include "Topo/CoEdge.h"
+#include "Topo/Vertex.h"
+#include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
@@ -35,7 +27,7 @@ CommandSplitEdge(Internal::Context& c, CoEdge* arete, double ratio_dec)
 }
 /*----------------------------------------------------------------------------*/
 CommandSplitEdge::
-CommandSplitEdge(Internal::Context& c, CoEdge* arete, const Point& pt)
+CommandSplitEdge(Internal::Context& c, CoEdge* arete, const Utils::Math::Point& pt)
 :CommandEditTopo(c, std::string("Découpage de l'arête ") + arete->getName())
 , m_arete(arete)
 , m_ratio_dec(0)

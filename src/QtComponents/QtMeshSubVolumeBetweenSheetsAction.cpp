@@ -4,11 +4,10 @@
  * \date        07/12/2016
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Mesh/MeshManagerIfc.h"
 #include "QtComponents/QtMeshSubVolumeBetweenSheetsAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
@@ -68,7 +67,7 @@ QtMeshSubVolumeBetweenSheetsPanel::QtMeshSubVolumeBetweenSheetsPanel (
 	// La blocs sièges de l'extraction :
 	_blocksPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Blocs :", "", &mainWindow,
-			SelectionManagerIfc::D3, FilterEntity::TopoBlock);
+			SelectionManager::D3, FilterEntity::TopoBlock);
 	_blocksPanel->setToolTip (QString::fromUtf8("Blocs sièges de l'extraction. Doivent être structurés et maillés."));
 	_blocksPanel->setMultiSelectMode (true);
 	_verticalLayout->addWidget (_blocksPanel);
@@ -80,7 +79,7 @@ QtMeshSubVolumeBetweenSheetsPanel::QtMeshSubVolumeBetweenSheetsPanel (
 	// L'arête perpendiculaire aux feuillets :
 	_edgePanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Arête :", "", &mainWindow,
-			SelectionManagerIfc::D1, FilterEntity::TopoCoEdge);
+			SelectionManager::D1, FilterEntity::TopoCoEdge);
 	connect (_edgePanel->getNameTextField ( ),
 	         SIGNAL (selectionModified (QString)), this,
 	         SLOT (parametersModifiedCallback ( )));
@@ -410,7 +409,7 @@ void QtMeshSubVolumeBetweenSheetsAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (getMeshPanel ( ))
 
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DMeshOperationAction::executeOperation ( );
 
 	getMeshPanel ( )->stopInteractiveMode ( );

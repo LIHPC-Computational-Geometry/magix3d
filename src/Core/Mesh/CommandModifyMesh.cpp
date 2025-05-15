@@ -1,25 +1,12 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandModifyMesh.cpp
- *
- *  \author Nicolas Le Goff
- *
- *  \date 20 mar. 2014
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Mesh/CommandModifyMesh.h"
 #include "Mesh/MeshItf.h"
 #include "Mesh/MeshManager.h"
-
-/// TkUtil
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/TraceLog.h>
-
-#include "Utils/Command.h"
-#include "Internal/Context.h"
-#include "Internal/InfoCommand.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -40,7 +27,7 @@ CommandModifyMesh::~CommandModifyMesh()
 void CommandModifyMesh::
 internalExecute()
 {
-	getContext().getLocalMeshManager().getMesh()->smooth();
+	getContext().getMeshManager().getMesh()->smooth();
 }
 /*----------------------------------------------------------------------------*/
 void CommandModifyMesh::

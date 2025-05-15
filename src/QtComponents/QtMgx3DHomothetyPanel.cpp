@@ -4,7 +4,7 @@
  * \date        05/05/2017
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
@@ -186,7 +186,7 @@ vector<Entity*> QtMgx3DHomogeneousHomothetyPanel::getInvolvedEntities ( )
 }	// QtMgx3DHomogeneousHomothetyPanel::getInvolvedEntities
 
 
-const ContextIfc& QtMgx3DHomogeneousHomothetyPanel::getContext ( ) const
+const Context& QtMgx3DHomogeneousHomothetyPanel::getContext ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
 	return _mainWindow->getContext ( );
@@ -392,7 +392,7 @@ vector<Entity*> QtMgx3DHeterogeneousHomothetyPanel::getInvolvedEntities ( )
 }	// QtMgx3DHeterogeneousHomothetyPanel::getInvolvedEntities
 
 
-const ContextIfc& QtMgx3DHeterogeneousHomothetyPanel::getContext ( ) const
+const Context& QtMgx3DHeterogeneousHomothetyPanel::getContext ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
 	return _mainWindow->getContext ( );

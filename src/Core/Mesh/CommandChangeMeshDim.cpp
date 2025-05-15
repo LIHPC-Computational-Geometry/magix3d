@@ -15,7 +15,7 @@ namespace Mgx3D {
 namespace Mesh {
 /*----------------------------------------------------------------------------*/
 CommandChangeMeshDim::
-CommandChangeMeshDim(Internal::Context& context, const Internal::ContextIfc::meshDim& dim)
+CommandChangeMeshDim(Internal::Context& context, const Internal::Context::meshDim& dim)
 : Internal::CommandInternal (context, "Changement de dimension du maillage en sortie")
 , m_new_mesh_dim(dim)
 , m_old_mesh_dim(context.m_mesh_dim)

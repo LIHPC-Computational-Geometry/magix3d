@@ -1,36 +1,14 @@
-/*
- * GeomRotationImplementation.cpp
- *
- *  Created on: 27 sept. 2012
- *      Author: ledouxf
- */
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
-#include <list>
-#include <set>
-/*----------------------------------------------------------------------------*/
+#include "Geom/GeomRotationImplementation.h"
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
-#include "Geom/Surface.h"
-#include "Geom/Volume.h"
-#include "Geom/EntityFactory.h"
-#include "Geom/GeomRotationImplementation.h"
 #include "Geom/CommandGeomCopy.h"
 /*----------------------------------------------------------------------------*/
-//inclusion de fichiers en-tête d'Open Cascade
 #include <TopoDS_Shape.hxx>
-#include <BRepPrimAPI_MakeRevol.hxx>
 #include <BRepBuilderAPI_Transform.hxx>
 #include <gp_Ax1.hxx>
-#include <TopoDS.hxx>
-#include <TopoDS_Edge.hxx>
-#include <TopoDS_Face.hxx>
-#include <TopoDS_Solid.hxx>
-#include <TopoDS_Shell.hxx>
-#include <TopExp.hxx>
-#include <TopTools_IndexedMapOfShape.hxx>
-#include <BRepTools.hxx>
+/*----------------------------------------------------------------------------*/
+#include <set>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

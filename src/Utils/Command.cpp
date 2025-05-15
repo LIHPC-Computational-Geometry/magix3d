@@ -1,3 +1,4 @@
+/*----------------------------------------------------------------------------*/
 #include "Utils/Common.h"
 #include "Utils/Command.h"
 #include "Utils/CommandManager.h"
@@ -5,29 +6,23 @@
 #include "Utils/ErrorManagement.h"
 #include "Utils/Magix3DEvents.h"
 #include "Utils/MgxNumeric.h"
-
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/ErrorLog.h>
 #include <TkUtil/InformationLog.h>
 #include <TkUtil/InternalError.h>
-#include <TkUtil/MemoryError.h>
 #include <TkUtil/NetworkData.h>
-#include <TkUtil/ReferencedMutex.h>
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-
+/*----------------------------------------------------------------------------*/
 #include <time.h>
-
+/*----------------------------------------------------------------------------*/
 using namespace Mgx3D::Utils::Math;
 using namespace TkUtil;
 using namespace std;
-
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
-
 /*----------------------------------------------------------------------------*/
 namespace Utils {
-
 /*----------------------------------------------------------------------------*/
 
 
@@ -40,20 +35,21 @@ Mutex	Command::_mutex;
 
 
 Command::Command (const string& name)
-	: CommandIfc ( ), ReferencedNamedObject (name, true),
-	  _status (Command::INITED), _isCompleted(false), _playType (Command::QUEUED), _progress (0.), _timer ( ),
+	: ReferencedNamedObject (name, true), _commandMutex (0), _userNotified (false)
+	,  _status (Command::INITED), _isCompleted(false), _playType (Command::QUEUED), _progress (0.), _timer ( ),
 	  _completionTasks ( ), _commandRunner (0), _logStream (0),
 	  _scriptComments(name, Charset::UTF_8), _savedScriptComments (Charset::UTF_8),
 	  _scriptCommand("Script pour la commande non renseigné !!!", Charset::UTF_8),
           _savedScriptCommand (Charset::UTF_8), _errorMessage  (Charset::UTF_8),
 	  _isScriptable(true)
 {
+	_commandMutex	= new Mutex ( );
 	setUniqueName (createUniqueName ( ));
 }	// Command::Command
 
 
 Command::Command (const Command& c)
-	: CommandIfc ( ), ReferencedNamedObject ("", true),	
+	: _commandMutex (0), _userNotified (c._userNotified), ReferencedNamedObject ("", true),
 	  _status (c._status), _isCompleted(c._isCompleted), _playType (c._playType), _progress (c._progress), _timer ( ),
 	  _completionTasks (c._completionTasks), _commandRunner (0), _logStream (0), _isScriptable(true)
 {
@@ -86,6 +82,8 @@ Command::~Command ( )
 
 	notifyObserversForDestruction ( );
 	unregisterReferences ( );
+	delete _commandMutex;
+	_commandMutex	= 0;
 
 	message2 << " effectué.";
 	MGX_TRACE_LOG_3 (trace2, message2)
@@ -119,6 +117,32 @@ string Command::createUniqueName ( )
 	return name.iso ( );
 }	// Command::createUniqueName
 
+TkUtil::Mutex* Command::getCommandMutex ( )
+{
+	return _commandMutex;
+}	// Command::getCommandMutex
+
+
+const TkUtil::Mutex* Command::getCommandMutex ( ) const
+{
+	return _commandMutex;
+}	// Command::getCommandMutex
+
+
+UTF8String Command::statusToString (Command::status s)
+{
+	switch (s)
+	{
+	case Command::INITED			: return UTF8String ("initialisé", Charset::UTF_8);
+	case Command::STARTING       : return UTF8String ("démarre", Charset::UTF_8);
+	case Command::PROCESSING		: return UTF8String ("en cours de traitement", Charset::UTF_8);
+	case Command::DONE			: return UTF8String ("achevé", Charset::UTF_8);
+	case Command::CANCELED		: return UTF8String ("annulé", Charset::UTF_8);
+	case Command::FAIL			: return UTF8String ("en erreur", Charset::UTF_8);
+	}   // switch (s)
+
+	return UTF8String ("inconnu", Charset::UTF_8);
+}   // Command::statusToString
 
 Command::status Command::execute (Command::PLAY_TYPE playType)
 {
@@ -315,6 +339,25 @@ void Command::notifyObserversForModification (unsigned long event)
 	ReferencedNamedObject::notifyObserversForModification (event);
 }	// Command::notifyObserversForModification
 
+UTF8String Command::getStrStatus ( ) const
+{
+	return Command::statusToString (getStatus ( ));
+}	// Command::getStrStatus
+
+bool Command::isUserNotified ( ) const
+{
+	return _userNotified;
+}	// Command::isUserNotified
+
+void Command::setUserNotified (bool notified)
+{
+	_userNotified	= notified;
+}	// Command::setUserNotified
+
+UTF8String Command::getStrPlayType ( ) const
+{
+	return Command::playTypeToString (getPlayType ( ));
+}	// Command::getStrPlayType
 
 void Command::setStatus (Command::status status)
 {
@@ -414,6 +457,30 @@ void Command::setPlayType (Command::PLAY_TYPE pt)
 	log (trace1);
 }	// Command::setPlayType
 
+void Command::taskCompleted ( )
+{
+}	// Command::taskCompleted
+
+
+void Command::notifyObserversForModifications ( )
+{
+}	// Command::notifyObserversForModifications
+
+UTF8String Command::playTypeToString (Command::PLAY_TYPE pt)
+{
+	switch (pt)
+	{
+	case Command::QUEUED	: return UTF8String ("mise en file d'attente", Charset::UTF_8);
+	case Command::DO		: return UTF8String ("exécutée", Charset::UTF_8);
+	case Command::UNDO		: return UTF8String ("défaite", Charset::UTF_8);
+	case Command::REDO		: return UTF8String ("rejouée", Charset::UTF_8);
+	}	// switch (pt)
+
+	UTF8String	message (Charset::UTF_8);
+	message << "Type d'exécution de commande inconnu : " << (unsigned long)pt << ".";
+	INTERNAL_ERROR (exc, message, "Command::playTypeToString")
+	throw exc;
+}	// Command::playTypeToString
 
 void Command::atCompletion ( )
 {

@@ -1,14 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandCommon.cpp
- *
- *  \author Franck Ledoux
- *
- *  \date 04/02/2011
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
-/*----------------------------------------------------------------------------*/
 #include "Geom/CommandCommon.h"
 #include "Geom/GeomManager.h"
 #include "Geom/GeomCommonImplementation.h"
