@@ -88,6 +88,10 @@
 #include "Geom/CommandScaling.h"
 #include "Geom/CommandMirroring.h"
 #include "Mesh/CommandAddRemoveGroupName.h"
+#ifdef USE_MDLPARSER
+#include "Internal/CommandChangeLengthUnit.h"
+#include "Topo/CommandImportTopoMDL.h"
+#endif
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/TraceLog.h>
