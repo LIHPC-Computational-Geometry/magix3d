@@ -90,6 +90,9 @@
 #include "Topo/CommandExtrudeTopo.h"
 #include "Topo/TopoHelper.h"
 #include "SysCoord/SysCoord.h"
+#ifdef USE_MDLPARSER
+#include "Internal/CommandChangeLengthUnit.h"
+#endif
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/TraceLog.h>
