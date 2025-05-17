@@ -62,8 +62,7 @@ class VTKMgx3DActor : public vtkLODActor
 	 * \param		Le type de représentation portée par l'acteur.
 	 * \see			GetRepresentationType
 	 */
-	virtual void SetRepresentationType (
-									Mgx3D::Utils::DisplayRepresentation::type);
+	virtual void SetRepresentationType (Mgx3D::Utils::DisplayRepresentation::type);
 
 	/**
 	 * \return		Le type de représentation portée par l'acteur.
@@ -71,8 +70,7 @@ class VTKMgx3DActor : public vtkLODActor
 	 * \see			IsSolid
 	 * \see			IsWire
 	 */
-	virtual Mgx3D::Utils::DisplayRepresentation::type
-												GetRepresentationType ( ) const;
+	virtual Mgx3D::Utils::DisplayRepresentation::type GetRepresentationType ( ) const;
 
 	/**
 	 * \return		<I>true</I> si la représentation est solide, <I>false</I>
@@ -90,6 +88,13 @@ class VTKMgx3DActor : public vtkLODActor
 	 */
 	virtual bool IsWire ( ) const;
 
+	/**
+	 * \return		<I>true</I> si lors d'une interaction l'acteur doit être représenté en mode LOD (Level Of Detail) au sens
+	 *				Magix3D. En VTK en mode LOD une donnée sur n d'un dataset est représentée. Dans Magix3D la plupart des
+	 *				datasets ne contiennent qu'une donnée, et, en mode LOD, c'est un acteur sur n qui et affiché.
+	 */
+	virtual bool IsLodDisplayable ( ) const;
+	
 
 	protected :
 
@@ -111,6 +116,9 @@ class VTKMgx3DActor : public vtkLODActor
 
 	/** Le type de représentation de l'acteur. */
 	Mgx3D::Utils::DisplayRepresentation::type	_representationType;
+
+	/** Un nombre aléatoire compris entre 0 et 100 pour savoir si l'acteur doit être affiché en mode LOD. */
+	long										_lodAlea;
 };	// class VTKMgx3DActor
 
 

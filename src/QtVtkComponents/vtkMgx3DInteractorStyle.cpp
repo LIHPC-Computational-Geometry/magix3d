@@ -22,6 +22,7 @@
 #include <vtkAbstractPropPicker.h>
 #include <vtkAssemblyPath.h>
 #include <vtkInformation.h>
+#include <vtkProperty.h>
 #include <vtkProp3DCollection.h>
 #include <vtkSelection.h>
 #include <vtkSelectionNode.h>
@@ -38,6 +39,8 @@ using namespace Mgx3D::QtComponents;
 using namespace Mgx3D::QtVtkComponents;
 
 
+bool					vtkMgx3DInteractorStyle::InUserInteraction	= false;
+vector<vtkActor*>		vtkMgx3DInteractorStyle::SuspendedActors;
 const unsigned long		vtkMgx3DInteractorStyle::ViewRedefinedEvent	= 105000;
 int						vtkMgx3DInteractorStyle::VTKIS_RUBBER_BAND	= 2048;
 
@@ -110,6 +113,93 @@ void vtkMgx3DInteractorStyle::PrintSelf (ostream& os, vtkIndent indent)
 	   << "PickOnLeftButtonDown : " << (true == Resources::instance ( )._pickOnLeftButtonDown.getValue( ) ? "True" : "False") << endl
 	   << "PickOnRightButtonDown : " << (true == Resources::instance ( )._pickOnRightButtonDown.getValue( ) ? "True" : "False") << endl;
 }	// vtkMgx3DInteractorStyle::PrintSelf
+
+
+bool vtkMgx3DInteractorStyle::InInteraction ( )
+{
+	return InUserInteraction;
+}	// vtkMgx3DInteractorStyle::InInteraction
+
+
+void vtkMgx3DInteractorStyle::StartState (int newstate)
+{
+	InUserInteraction	= VTKIS_NONE == newstate ? false : true;
+	vtkUnifiedInteractorStyle::StartState (newstate);
+	
+	if ((true == InUserInteraction) && (0 != CurrentRenderer))
+	{
+		vtkActorCollection*	actors	= CurrentRenderer->GetActors ( );
+		if (0 != actors)
+		{
+			vtkActor*	actor	= 0;
+			for (actors->InitTraversal ( ); 0 != (actor = actors->GetNextItem ( )); )
+			{
+				VTKMgx3DActor*	mgxActor	= dynamic_cast<VTKMgx3DActor*>(actor);
+				if (0 != mgxActor)
+				{
+					if ((0 != mgxActor->GetVisibility ( )) && (false == mgxActor->IsLodDisplayable ( )))
+					{
+						SuspendedActors.push_back (actor);
+						actor->VisibilityOff ( );
+					}	// if ((0 != mgxActor->GetVisibility ( )) && (false == mgxActor->IsLodDisplayable ( )))
+					else
+					{
+						if ((0 != mgxActor->GetEntity ( )) && (true == mgxActor->GetEntity ( )->isTopoEntity ( )))
+						{
+							vtkProperty*	property	= mgxActor->GetProperty ( );
+							assert (0 != property);
+							property->SetPointSize (Resources::instance ( )._lodPointSize.getValue ( ));
+							property->SetLineWidth (Resources::instance ( )._lodLineWidth.getValue ( ));
+						}	// if ((0 != mgxActor->GetEntity ( )) && (true == mgxActor->GetEntity ( )->isTopoEntity ( )))
+					}	// else if ((0 != mgxActor->GetVisibility ( )) && (false == mgxActor->IsLodDisplayable ( )))
+				}	// if (0 != mgxActor)
+			}	// for (actors->InitTraversal ( ); 0 != (actor = actors->GetNextItem ( )); )
+		}	// if (0 != actors)
+	}	// if ((true == InUserInteraction) && (0 != CurrentRenderer))
+}	// vtkMgx3DInteractorStyle::StartState
+
+
+void vtkMgx3DInteractorStyle::StopState ( )
+{
+	// Eviter un effet "flash" en mode ruban élastique (Render inutilement appelé)
+	const int	oldState		= GetState ( );
+	const int	oldAnimState	= this->AnimState;
+	if (VTKIS_RUBBER_BAND == oldState)
+		this->AnimState	= -1;
+	InUserInteraction	= false;
+	vtkUnifiedInteractorStyle::StopState ( );	// Invoque rwi->Render() si AnimState == VTKIS_ANIM_OFF
+	if (VTKIS_RUBBER_BAND == oldState)
+		this->AnimState	= oldAnimState;
+	
+	if (0 != CurrentRenderer)
+	{
+		// Annulation de l'affichage en mode LOD :
+		vtkActorCollection*	actors	= CurrentRenderer->GetActors ( );
+		if (0 != actors)
+		{
+			vtkActor*	actor	= 0;
+			for (actors->InitTraversal ( ); 0 != (actor = actors->GetNextItem ( )); )
+			{
+				VTKMgx3DActor*	mgxActor	= dynamic_cast<VTKMgx3DActor*>(actor);
+				if (0 != mgxActor)
+				{
+					if ((0 != mgxActor->GetEntity ( )) && (true == mgxActor->GetEntity ( )->isTopoEntity ( )))
+					{
+						assert (0 != mgxActor->GetEntity ( )->getDisplayProperties ( ).getGraphicalRepresentation ( ));
+						mgxActor->GetEntity ( )->getDisplayProperties ( ).getGraphicalRepresentation ( )->updateRepresentationProperties ( );
+					}	// if ((0 != mgxActor->GetEntity ( )) && (true == mgxActor->GetEntity ( )->isTopoEntity ( )))
+				}	// if (0 != mgxActor)
+			}	// for (actors->InitTraversal ( ); 0 != (actor = actors->GetNextItem ( )); )
+		}	// if (0 != actors)
+
+		// Réaffichage des acteurs suspendus :
+		for (vector<vtkActor*>::iterator ita	= SuspendedActors.begin ( ); SuspendedActors.end ( ) != ita; ita++)
+			(*ita)->VisibilityOn ( );
+		SuspendedActors.clear ( );
+		if ((0 != CurrentRenderer->GetRenderWindow ( )) && (VTKIS_RUBBER_BAND != oldState))
+			CurrentRenderer->GetRenderWindow ( )->Render ( );
+	}	// if (0 != CurrentRenderer)
+}	// vtkMgx3DInteractorStyle::StopState
 
 
 void vtkMgx3DInteractorStyle::OnChar ( )
@@ -453,6 +543,10 @@ void vtkMgx3DInteractorStyle::OnLeftButtonDown ( )
 
 void vtkMgx3DInteractorStyle::OnMiddleButtonDown ( )
 {
+	vtkRenderWindowInteractor*	rwi	= this->Interactor;
+	if (0 != rwi)
+		rwi->GetEventPosition (ButtonPressPosition);
+
 	if ((false == GetInteractiveSelectionActivated ( )) || (false == isControlKeyPressed ( )))
 	{
 		vtkUnifiedInteractorStyle::OnMiddleButtonDown ( );
@@ -512,12 +606,23 @@ void vtkMgx3DInteractorStyle::OnRightButtonDown ( )
 void vtkMgx3DInteractorStyle::OnLeftButtonUp ( )
 {
 	// Arrêter un éventuel déclenchement d'interaction :
+	vtkRenderWindowInteractor*	rwi	= this->Interactor;
+	bool	doRender	= true;
+	if (0 != rwi)
+	{	// Ne rien afficher si absence de déplacement entre le début et la fin du clic :
+		int	pos [2];
+		rwi->GetEventPosition (pos);
+		if (0 == memcmp (pos, ButtonPressPosition, 2 * sizeof (int)))
+			doRender	= false;
+	}	// if (0 != rwi)
+	if ((false == doRender) && (0 != CurrentRenderer))
+		CurrentRenderer->DrawOff ( );
 	vtkUnifiedInteractorStyle::OnLeftButtonUp ( );
+	if ((false == doRender) && (0 != CurrentRenderer))
+		CurrentRenderer->DrawOn ( );
 
 	if (true == GetInteractiveSelectionActivated ( ))
 	{
-		vtkRenderWindowInteractor*	rwi	= this->Interactor;
-		
 		if (VTKIS_RUBBER_BAND != GetState ( ))
 		{
 			// Si le curseur n'a pas bougé depuis la pression sur le bouton, et que c'est paramétré tel que, on fait un picking :
@@ -536,11 +641,17 @@ void vtkMgx3DInteractorStyle::OnLeftButtonUp ( )
 		else
 		{	// => VTKIS_RUBBER_BAND == GetState ( )
 			StopState ( );
+			RubberButtonDown		= false;
+			if (false == doRender)	// pas de mouvement, on se contente d'annuler la sélection.
+			{
+				SelectionManager->clearSelection ( );
+				return;
+			}	// if (false == doRender)
+
 			const int* const	size	= rwi->GetRenderWindow ( )->GetSize ( );
 			// Si on est en double buffering on met l'image dans le back buffer, Frame ( )la rebasculera dans le front buffer, sinon on la met dans le front buffer.
 			rwi->GetRenderWindow ( )->SetRGBACharPixelData (0, 0, size [0] - 1, size [1] - 1, PixelArray->GetPointer (0), !rwi->GetRenderWindow ( )->GetDoubleBuffer ( ));
 			rwi->GetRenderWindow ( )->Frame ( );
-			RubberButtonDown		= false;
 
 			if (0 == SelectionManager)
 				return;
@@ -637,8 +748,21 @@ void vtkMgx3DInteractorStyle::OnLeftButtonUp ( )
 void vtkMgx3DInteractorStyle::OnRightButtonUp ( )
 {
 	// Arrêter un éventuel déclenchement d'interaction :
+	vtkRenderWindowInteractor*	rwi	= this->Interactor;
+	bool	doRender	= true;
+	if (0 != rwi)
+	{	// Ne rien afficher si absence de déplacement entre le début et la fin du clic :
+		int	pos [2];
+		rwi->GetEventPosition (pos);
+		if (0 == memcmp (pos, ButtonPressPosition, 2 * sizeof (int)))
+			doRender	= false;
+	}	// if (0 != rwi)
+	if ((false == doRender) && (0 != CurrentRenderer))
+		CurrentRenderer->DrawOff ( );
 	vtkUnifiedInteractorStyle::OnRightButtonUp ( );
-
+	if ((false == doRender) && (0 != CurrentRenderer))
+		CurrentRenderer->DrawOn ( );
+		
 	// Si le curseur n'a pas bougé depuis la pression sur le bouton, et que
 	// c'est paramétré tel que, on fait un picking :
 	if ((true == GetInteractiveSelectionActivated ( )) && (true == Resources::instance ( )._pickOnRightButtonUp.getValue ( )))
@@ -654,6 +778,25 @@ void vtkMgx3DInteractorStyle::OnRightButtonUp ( )
 		}
 	}	// if ((true == GetInteractiveSelectionActivated ( )) && ...
 }	// vtkMgx3DInteractorStyle::OnRightButtonUp
+
+
+void vtkMgx3DInteractorStyle::OnMiddleButtonUp ( )
+{
+	vtkRenderWindowInteractor*	rwi	= this->Interactor;
+	bool	doRender	= true;
+	if (0 != rwi)
+	{	// Ne rien afficher si absence de déplacement entre le début et la fin du clic :
+		int	pos [2];
+		rwi->GetEventPosition (pos);
+		if (0 == memcmp (pos, ButtonPressPosition, 2 * sizeof (int)))
+			doRender	= false;
+	}	// if (0 != rwi)
+	if ((false == doRender) && (0 != CurrentRenderer))
+		CurrentRenderer->DrawOff ( );
+	vtkUnifiedInteractorStyle::OnMiddleButtonUp ( );
+	if ((false == doRender) && (0 != CurrentRenderer))
+		CurrentRenderer->DrawOn ( );
+}	// vtkMgx3DInteractorStyle::OnMiddleButtonUp
 
 
 void vtkMgx3DInteractorStyle::SetSelectionManager (SelectionManagerIfc* mgr)
@@ -779,7 +922,6 @@ void vtkMgx3DInteractorStyle::RedrawRubberBand ( )
 	vtkRenderWindowInteractor*	rwi	= this->Interactor;
 	if ((0 == rwi) || (0 == rwi->GetRenderWindow ( )))
 		return;
-
 	TmpPixelArray->DeepCopy (PixelArray);
 	unsigned char*		pixels	= TmpPixelArray->GetPointer (0);
 	const int* const	size	= rwi->GetRenderWindow ( )->GetSize ( );

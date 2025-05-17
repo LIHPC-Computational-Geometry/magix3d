@@ -205,6 +205,24 @@ public:
 
     /*------------------------------------------------------------------------*/
     /**
+     * Appelé par une DisplayProperty lorsqu'une entité devient affichée ou non
+     * affichée. Gère un compteur d'entités affichées par type à des fins 
+     * d'affichage type LOD.
+     */
+#ifndef SWIG
+    static void setDisplayed (const Entity& entity, bool displayed);
+#endif
+
+#ifndef SWIG
+	/** Les nombres de vertex, arêtes, faces et blocs affichés. */
+	static size_t	getDisplayedTopoVertexCount ( );
+	static size_t	getDisplayedTopoEdgeCount ( );
+	static size_t	getDisplayedTopoFaceCount ( );
+	static size_t	getDisplayedTopoBlockCount ( );
+#endif
+
+    /*------------------------------------------------------------------------*/
+    /**
      *  \return		Le nom est unique pour un type d'entité donné.
      *  Mais pas unique pour tous type confondus
      *  \see getUniqueName()
@@ -376,6 +394,11 @@ private :
 	/** Le gestionnaire de message */
 	TkUtil::LogOutputStream* m_log_stream;
 
+	/** Les nombres de vertex, arêtes, faces et blocs affichés. */
+	static size_t	displayedTopoVertexCount;
+	static size_t	displayedTopoEdgeCount;
+	static size_t	displayedTopoFaceCount;
+	static size_t	displayedTopoBlockCount;
 };
 
 Entity::objectType typesToType (FilterEntity::objectType types);

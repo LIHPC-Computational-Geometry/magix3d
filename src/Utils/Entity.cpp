@@ -152,6 +152,13 @@ std::string FilterEntity::filterToFullObjectTypeName (FilterEntity::objectType o
 	INTERNAL_ERROR(exc, error, "FilterEntity::filterToFullObjectTypeName")
 	throw TkUtil::Exception (exc);
 }
+
+/*----------------------------------------------------------------------------*/
+size_t	Entity::displayedTopoVertexCount	= 0;
+size_t	Entity::displayedTopoEdgeCount		= 0;
+size_t	Entity::displayedTopoFaceCount		= 0;
+size_t	Entity::displayedTopoBlockCount		= 0;
+
 /*----------------------------------------------------------------------------*/
 std::string Entity::objectTypeToObjectTypeName (objectType t)
 {
@@ -355,6 +362,45 @@ Property* Entity::setProperties (Property* prop)
     return old;
 }
 
+/*----------------------------------------------------------------------------*/
+void Entity::setDisplayed (const Entity& entity, bool displayed)
+{
+	const int	added	= true == displayed ? 1 : -1;
+	switch (entity.getType ( ))
+	{
+		case Entity::TopoVertex	: displayedTopoVertexCount	+= added;	break;
+		case Entity::TopoEdge	:
+		case Entity::TopoCoEdge	: displayedTopoEdgeCount	+= added;	break;
+		case Entity::TopoFace	:
+		case Entity::TopoCoFace	: displayedTopoFaceCount	+= added;	break;
+		case Entity::TopoBlock	: displayedTopoBlockCount	+= added;	break;
+	}	// switch (entity.getType ( ))
+}
+
+/*----------------------------------------------------------------------------*/
+size_t Entity::getDisplayedTopoVertexCount ( )
+{
+	return displayedTopoVertexCount;
+}
+
+/*----------------------------------------------------------------------------*/
+size_t Entity::getDisplayedTopoEdgeCount ( )
+{
+	return displayedTopoEdgeCount;
+}
+
+/*----------------------------------------------------------------------------*/
+size_t Entity::getDisplayedTopoFaceCount ( )
+{
+	return displayedTopoFaceCount;
+}
+
+/*----------------------------------------------------------------------------*/
+size_t Entity::getDisplayedTopoBlockCount ( )
+{
+	return displayedTopoBlockCount;
+}
+	
 /*----------------------------------------------------------------------------*/
 std::string Entity::getName() const
 {

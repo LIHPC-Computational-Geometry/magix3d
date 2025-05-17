@@ -166,6 +166,30 @@
             <green>1.000000e+00</green>
             <blue>1.000000e+00</blue>
           </element>
+          <element name="topoVertexLodNumberThreshold" type="unsignedLong">
+          <annotation>
+            <documentation>Nombre maximum de vertex topologiques à afficher lors d'interactions.</documentation>
+          </annotation>
+          <value>250</value>
+        </element>
+        <element name="topoEdgeLodNumberThreshold" type="unsignedLong">
+          <annotation>
+            <documentation>Nombre maximum d'arêtes topologiques à afficher lors d'interactions.</documentation>
+          </annotation>
+          <value>250</value>
+        </element>
+        <element name="topoFaceLodNumberThreshold" type="unsignedLong">
+          <annotation>
+            <documentation>Nombre maximum de faces topologiques à afficher lors d'interactions.</documentation>
+          </annotation>
+          <value>250</value>
+        </element>
+        <element name="topoBlockLodNumberThreshold" type="unsignedLong">
+          <annotation>
+            <documentation>Nombre maximum de blocs topologiques à afficher lors d'interactions.</documentation>
+          </annotation>
+          <value>250</value>
+        </element>
         </Section>
         <Section name="meshEntities" type="container">
           <element name="destroyOnHide" type="boolean">
@@ -175,6 +199,18 @@
             <value>true</value>
           </element>
         </Section>
+        <element name="lodPointSize" type="unsignedLong">
+          <annotation>
+            <documentation>Taille des points/noeuds/vertex lors des interactions.</documentation>
+          </annotation>
+          <value>1</value>
+        </element>
+        <element name="lodLineWidth" type="unsignedLong">
+          <annotation>
+            <documentation>Epaisseur des lignes/arêtes lors des interactions.</documentation>
+          </annotation>
+          <value>1</value>
+        </element>
         <element name="fontFamily" type="string">
           <annotation>
             <documentation>Police de caractères utilisée pour les affichages graphiques. Valeurs possibles : Arial, Times, Courier.</documentation>

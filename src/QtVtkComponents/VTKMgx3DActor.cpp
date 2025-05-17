@@ -1,4 +1,6 @@
 #include "Internal/ContextIfc.h"
+#include "Internal/Resources.h"
+#include "QtVtkComponents/vtkMgx3DInteractorStyle.h"
 
 #include "QtVtkComponents/VTKMgx3DActor.h"
 #include "Utils/DisplayProperties.h"
@@ -7,20 +9,27 @@
 #include <vtkRenderer.h>
 
 #include <assert.h>
+#include <random>
 
 
 using namespace std;
 using namespace Mgx3D::Utils;
+using namespace Mgx3D::Internal;
 
+
+// On préfère uniform_int_distribution à random pour avoir une distribution homogène des nombres aléatoires :
+static random_device				rd;					// a seed source for the random number engine
+static mt19937						gen (rd ( ));		// mersenne_twister_engine seeded with rd()
+static uniform_int_distribution<>	distrib (0, 100);
 
 VTKMgx3DActor::VTKMgx3DActor ( )
-	: vtkLODActor ( ), _entity (0), _representationType ((DisplayRepresentation::type)0)
+	: vtkLODActor ( ), _entity (0), _representationType ((DisplayRepresentation::type)0), _lodAlea (distrib (gen))
 {
 }	// VTKMgx3DActor::VTKMgx3DActor
 
 
 VTKMgx3DActor::VTKMgx3DActor (const VTKMgx3DActor&)
-	: vtkLODActor ( ), _entity (0), _representationType ((DisplayRepresentation::type)0)
+	: vtkLODActor ( ), _entity (0), _representationType ((DisplayRepresentation::type)0), _lodAlea (-1)
 {
 	assert (0 && "VTKMgx3DActor copy constructor is not allowed.");
 }	// VTKMgx3DActor copy constructor
@@ -63,7 +72,9 @@ const char* VTKMgx3DActor::GetClassName ( )
 
 void VTKMgx3DActor::Render (vtkRenderer* renderer, vtkMapper* mapper)
 {
-//cout << __FILE__ << ' ' << __LINE__ << " VTKMgx3DActor::Render ALLOCATED RENDER TIME = " << AllocatedRenderTime << " ESTIMATED RENDER TIME = " << EstimatedRenderTime << " SAVED ESTIMATED RENDER TIME = " << SavedEstimatedRenderTime << " RENDERER ALLOCATED TIME = " << renderer->GetAllocatedRenderTime ( ) << endl;
+	if (0 == GetEntity ( ))
+		return;
+
 	vtkLODActor::Render (renderer, mapper);
 }	// VTKMgx3DActor::Render
 
@@ -118,6 +129,55 @@ bool VTKMgx3DActor::IsWire ( ) const
 
 	return false;
 }	// VTKMgx3DActor::IsWire
+
+
+bool VTKMgx3DActor::IsLodDisplayable ( ) const
+{
+	if (0 == GetEntity ( ))
+		return false;
+
+	// On veut qu'à cet instant au plus Resources::instance ( )._topo*LodNumberThreshold.getValue ( ) soit affiché.
+	// _lodAlea est un nombre aléatoire compris entre 0 et 100 à l'acteur.
+	switch (GetEntity ( )->getType ( ))
+	{
+		case Entity::TopoVertex	:
+		{
+			const size_t	topoVertexLodNumberThreshold	= Resources::instance ( )._topoVertexLodNumberThreshold.getValue ( );
+			const int		threshold						= (int)(100. * topoVertexLodNumberThreshold / (double)Entity::getDisplayedTopoVertexCount ( ));
+			if ((_lodAlea >= threshold) && (Entity::getDisplayedTopoVertexCount ( ) > topoVertexLodNumberThreshold))
+				return false;
+		}
+		break;
+		case Entity::TopoEdge	:
+		case Entity::TopoCoEdge	:
+		{
+			const size_t	topoEdgeLodNumberThreshold	= Resources::instance ( )._topoEdgeLodNumberThreshold.getValue ( );
+			const int		threshold					= (int)(100. * topoEdgeLodNumberThreshold / (double)Entity::getDisplayedTopoEdgeCount ( ));
+			if ((_lodAlea >= threshold) && (Entity::getDisplayedTopoEdgeCount ( ) > topoEdgeLodNumberThreshold))
+				return false;
+		}
+		break;
+		case Entity::TopoFace	:
+		case Entity::TopoCoFace	:
+		{
+			const size_t	topoFaceLodNumberThreshold	= Resources::instance ( )._topoFaceLodNumberThreshold.getValue ( );
+			const int		threshold					= (int)(100. * topoFaceLodNumberThreshold / (double)Entity::getDisplayedTopoFaceCount ( ));
+			if ((_lodAlea >= threshold) && (Entity::getDisplayedTopoFaceCount ( ) > topoFaceLodNumberThreshold))
+				return false;
+		}
+		break;
+		case Entity::TopoBlock	:
+		{
+			const size_t	topoBlockLodNumberThreshold	= Resources::instance ( )._topoBlockLodNumberThreshold.getValue ( );
+			const int		threshold					= (int)(100. * topoBlockLodNumberThreshold / (double)Entity::getDisplayedTopoBlockCount ( ));
+			if ((_lodAlea >= threshold) && (Entity::getDisplayedTopoBlockCount ( ) > topoBlockLodNumberThreshold))
+				return false;
+		}
+		break;
+	}	// switch (GetEntity ( )->getType ( ))
+
+	return true;
+}	// VTKMgx3DActor::IsLodDisplayable
 
 
 void VTKMgx3DActor::CreateOwnLODs ( )

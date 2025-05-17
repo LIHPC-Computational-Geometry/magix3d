@@ -34,6 +34,8 @@ _allowThreadedFacePreMeshTasks ("allowThreadedFacePreMeshTasks", true, UTF8Strin
 _allowThreadedBlockPreMeshTasks ("allowThreadedBlockPreMeshTasks", true, UTF8String ("true si le prémaillage des blocs peut être décomposé en plusieurs tâches exécutées parallèlement dans plusieurs threads, false si l'exécution doit être séquentielle.")),
 _displayScriptOutputs ("displayScriptOutputs", true, UTF8String ("true si le programme doit afficher les sorties des commandes script, false dans le cas contraire.")),
 _memorizeEdgePreMesh ("memorizeEdgePreMesh", true, UTF8String ("true si le programme doit mémoriser le prémaillage des arêtes, false dans le cas contraire.")),
+_lodPointSize ("lodPointSize", 1, UTF8String ("Taille des points/noeuds/vertex lors des interactions.", Charset::UTF_8)),
+_lodLineWidth ("lodLineWidth", 1, UTF8String ("Epaisseur des lignes/arêtes lors des interactions.", Charset::UTF_8)),
 _fontFamily ("fontFamily", "Arial", UTF8String ("Police de caractères utilisée pour les affichages graphiques. Valeurs possibles : Arial, Times, Courier.", Charset::UTF_8)),
 _fontSize ("fontSize", 12, UTF8String ("Taille de la police de caractères utilisée pour les affichages graphiques.", Charset::UTF_8)),
 _fontBold ("bold", false, UTF8String ("Caractère gras de la police de caractères utilisée pour les affichages graphiques. Si true la police est grasse.", Charset::UTF_8)),
@@ -104,7 +106,10 @@ _loadGuiState ("loadGuiState", true, UTF8String ("True si l'état de l'IHM (posi
 _geomDestroyOnHide ("destroyOnHide", false, UTF8String ("True si la représentation graphique des entités géométriques doit être détruite lorsque ces entités ne sont plus affichées, false dans le cas contraire.", Charset::UTF_8)),
 _topoDestroyOnHide ("destroyOnHide", false, UTF8String ("True si la représentation graphique des entités topologiques doit être détruite lorsque ces entités ne sont plus affichées, false dans le cas contraire.", Charset::UTF_8)),
 _meshDestroyOnHide ("destroyOnHide", true, UTF8String ("True si la représentation graphique des entités de maillage doit être détruite lorsque ces entités ne sont plus affichées, false dans le cas contraire.", Charset::UTF_8)),
-
+_topoVertexLodNumberThreshold ("topoVertexLodNumberThreshold", 250, UTF8String ("Nombre maximum de vertex topologiques à afficher lors d'interactions.", Charset::UTF_8)),
+_topoEdgeLodNumberThreshold ("topoEdgeLodNumberThreshold", 250, UTF8String ("Nombre maximum d'arêtes topologiques à afficher lors d'interactions.", Charset::UTF_8)),
+_topoFaceLodNumberThreshold ("topoFaceLodNumberThreshold", 250, UTF8String ("Nombre maximum de faces topologiques à afficher lors d'interactions.", Charset::UTF_8)),
+_topoBlockLodNumberThreshold ("topoBlockLodNumberThreshold", 250, UTF8String ("Nombre maximum de blocs topologiques à afficher lors d'interactions.", Charset::UTF_8)),
 
 _organisation ("CEA.DAM.DSSI"),
 _softwareName ("Magix3D"),
@@ -130,6 +135,8 @@ _allowThreadedFacePreMeshTasks ("allowThreadedFacePreMeshTasks", true, UTF8Strin
 _allowThreadedBlockPreMeshTasks ("allowThreadedBlockPreMeshTasks", true, UTF8String ("true si le prémaillage des blocs peut être décomposé en plusieurs tâches exécutées parallèlement dans plusieurs threads, false si l'exécution doit être séquentielle.")),
 _displayScriptOutputs ("displayScriptOutputs", true, UTF8String ("true si le programme doit afficher les sorties des commandes script, false dans le cas contraire.")),
 _memorizeEdgePreMesh ("memorizeEdgePreMesh", true, UTF8String ("true si le programme doit mémoriser le prémaillage des arêtes, false dans le cas contraire.")),
+_lodPointSize ("lodPointSize", 1, UTF8String ("Taille des points/noeuds/vertex lors des interactions.", Charset::UTF_8)),
+_lodLineWidth ("lodLineWidth", 1, UTF8String ("Epaisseur des lignes/arêtes lors des interactions.", Charset::UTF_8)),
 _fontFamily ("fontFamily", "Arial", "Police de caractères utilisée pour les affichages graphiques. Valeurs possibles : Arial, Times, Courier."),
 _fontSize ("fontSize", 12, "Taille de la police de caractères utilisée pour les affichages graphiques."),
 _fontBold ("bold", false, "Caractère gras de la police de caractères utilisée pour les affichages graphiques. Si true la police est grasse."),
@@ -200,7 +207,10 @@ _loadGuiState ("loadGuiState", true, "True si l'état de l'IHM (position, taille
 _geomDestroyOnHide ("destroyOnHide", false, "True si la représentation graphique des entités géométriques doit être détruite lorsque ces entités ne sont plus affichées, false dans le cas contraire."),
 _topoDestroyOnHide ("destroyOnHide", false, "True si la représentation graphique des entités topologiques doit être détruite lorsque ces entités ne sont plus affichées, false dans le cas contraire."),
 _meshDestroyOnHide ("destroyOnHide", true, "True si la représentation graphique des entités de maillage doit être détruite lorsque ces entités ne sont plus affichées, false dans le cas contraire."),
-
+_topoVertexLodNumberThreshold ("topoVertexLodNumberThreshold", 250, UTF8String ("Nombre maximum de vertex topologiques à afficher lors d'interactions.", Charset::UTF_8)),
+_topoEdgeLodNumberThreshold ("topoEdgeLodNumberThreshold", 250, UTF8String ("Nombre maximum d'arêtes topologiques à afficher lors d'interactions.", Charset::UTF_8)),
+_topoFaceLodNumberThreshold ("topoFaceLodNumberThreshold", 250, UTF8String ("Nombre maximum de faces topologiques à afficher lors d'interactions.", Charset::UTF_8)),
+_topoBlockLodNumberThreshold ("topoBlockLodNumberThreshold", 250, UTF8String ("Nombre maximum de blocs topologiques à afficher lors d'interactions.", Charset::UTF_8)),
 
 _organisation ("CEA.DAM.DSSI"),
 _softwareName ("Magix3D"),
