@@ -161,8 +161,15 @@ void vtkMgx3DInteractorStyle::StartState (int newstate)
 
 void vtkMgx3DInteractorStyle::StopState ( )
 {
+	// Eviter un effet "flash" en mode ruban élastique (Render inutilement appelé)
+	const int	oldState		= GetState ( );
+	const int	oldAnimState	= this->AnimState;
+	if (VTKIS_RUBBER_BAND == oldState)
+		this->AnimState	= -1;
 	InUserInteraction	= false;
-	vtkUnifiedInteractorStyle::StopState ( );
+	vtkUnifiedInteractorStyle::StopState ( );	// Invoque rwi->Render() si AnimState == VTKIS_ANIM_OFF
+	if (VTKIS_RUBBER_BAND == oldState)
+		this->AnimState	= oldAnimState;
 	
 	if (0 != CurrentRenderer)
 	{
@@ -189,7 +196,7 @@ void vtkMgx3DInteractorStyle::StopState ( )
 		for (vector<vtkActor*>::iterator ita	= SuspendedActors.begin ( ); SuspendedActors.end ( ) != ita; ita++)
 			(*ita)->VisibilityOn ( );
 		SuspendedActors.clear ( );
-		if (0 != CurrentRenderer->GetRenderWindow ( ))
+		if ((0 != CurrentRenderer->GetRenderWindow ( )) && (VTKIS_RUBBER_BAND != oldState))
 			CurrentRenderer->GetRenderWindow ( )->Render ( );
 	}	// if (0 != CurrentRenderer)
 }	// vtkMgx3DInteractorStyle::StopState
@@ -634,11 +641,17 @@ void vtkMgx3DInteractorStyle::OnLeftButtonUp ( )
 		else
 		{	// => VTKIS_RUBBER_BAND == GetState ( )
 			StopState ( );
+			RubberButtonDown		= false;
+			if (false == doRender)	// pas de mouvement, on se contente d'annuler la sélection.
+			{
+				SelectionManager->clearSelection ( );
+				return;
+			}	// if (false == doRender)
+
 			const int* const	size	= rwi->GetRenderWindow ( )->GetSize ( );
 			// Si on est en double buffering on met l'image dans le back buffer, Frame ( )la rebasculera dans le front buffer, sinon on la met dans le front buffer.
 			rwi->GetRenderWindow ( )->SetRGBACharPixelData (0, 0, size [0] - 1, size [1] - 1, PixelArray->GetPointer (0), !rwi->GetRenderWindow ( )->GetDoubleBuffer ( ));
 			rwi->GetRenderWindow ( )->Frame ( );
-			RubberButtonDown		= false;
 
 			if (0 == SelectionManager)
 				return;
@@ -909,7 +922,6 @@ void vtkMgx3DInteractorStyle::RedrawRubberBand ( )
 	vtkRenderWindowInteractor*	rwi	= this->Interactor;
 	if ((0 == rwi) || (0 == rwi->GetRenderWindow ( )))
 		return;
-
 	TmpPixelArray->DeepCopy (PixelArray);
 	unsigned char*		pixels	= TmpPixelArray->GetPointer (0);
 	const int* const	size	= rwi->GetRenderWindow ( )->GetSize ( );
