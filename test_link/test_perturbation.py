@@ -66,6 +66,23 @@ def test_perturbation3(capfd):
 def test_perturbation4(capfd):
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
+    def pert(x, y, z):
+        return [x+0.1, y+0.1, z]
+
+    ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10, "A")
+    ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(1, 0, 0), Mgx3D.Point(2, 1, 1), 10, 10, 10, "B")
+    ctx.getGeomManager().glue(["Vol0000", "Vol0001"])
+    ctx.getGroupManager().addCartesianPerturbation("B", pert)
+    ctx.getTopoManager().setGeomAssociation(["Ar0011", "Ar0010", "Ar0008", "Ar0009", "Fa0003", "Fa0005", "Fa0004", "Fa0002"], "", True)
+    ctx.getMeshManager().newBlocksMesh(["Bl0001"])
+    ctx.getMeshManager().newBlocksMesh(["Bl0000"])
+
+    out, err = capfd.readouterr()
+    assert len(err) == 0
+
+def test_perturbation5(capfd):
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
 
     def pert(r, t, p):
         return [ r*(1+cos(t*7)/20*cos(p*5)), t, p ]
