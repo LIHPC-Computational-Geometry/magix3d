@@ -45,48 +45,48 @@ class SelectionManagerObserver
 	 * Destructeur. Se désenregistre auprès de son gestionnaire de 
 	 * sélection.
 	 */
-	~SelectionManagerObserver ( );
+	virtual ~SelectionManagerObserver ( );
 
 	/** Se déréférence auprès de son éventuel gestionnaire de
 	 * sélection, puis se référence auprès de celui reçu en 
 	 * argument.
 	 * @param		Nouveau gestionnaire de sélection. Peut être nul.
 	 */
-	void setSelectionManager (Mgx3D::Utils::SelectionManager* selectionManager);
+	virtual void setSelectionManager (Mgx3D::Utils::SelectionManager* selectionManager);
 
 	/**
 	 * @return		le gestionnaire de sélection
 	 */
-	Mgx3D::Utils::SelectionManager* getSelectionManager ( )
+	virtual Mgx3D::Utils::SelectionManager* getSelectionManager ( )
 	{ return _selectionManager; }
-	const Mgx3D::Utils::SelectionManager* getSelectionManager ( ) const
+	virtual const Mgx3D::Utils::SelectionManager* getSelectionManager ( ) const
 	{ return _selectionManager; }
 
 	/**
 	 * Appelé lorsque le gérant de la sélection est détruit.
 	 * Perd sa référence sur son gestionnaire de sélection.
 	 */
-	void selectionManagerDeleted ( );
+	virtual void selectionManagerDeleted ( );
 
 	/** 
 	 * Appelé lorsque la sélection change.
 	 * Ne fait rien par défaut.
 	 */
-	void selectionModified ( );
+	virtual void selectionModified ( );
 
 	/** 
 	 * Appelé lorsque la sélection est annulée.
 	 * Ne fait rien par défaut.
 	 */
-	void selectionCleared ( );
+	virtual void selectionCleared ( );
 
 	/**
 	 * Appelé lorsque les entités reçues en arguments sont ajoutées à
 	 * la sélection.
 	 * Ne fait rien par défaut.
 	 */
-	void entitiesAddedToSelection (const std::vector<Mgx3D::Utils::Entity*>& entities);
-	void entitiesAddedToSelection (const std::vector<std::string>& uniqueNames);
+	virtual void entitiesAddedToSelection (const std::vector<Mgx3D::Utils::Entity*>& entities);
+	virtual void entitiesAddedToSelection (const std::vector<std::string>& uniqueNames);
 
 	/**
 	 * Appelé lorsque les entités reçues en arguments sont supprimées de
@@ -96,8 +96,8 @@ class SelectionManagerObserver
 	 * @param	<I>true</I> s'il s'agit d'un <I>clearSelection</I>, à des fins
 	 * 			d'optimisation.
 	 */
-	void entitiesRemovedFromSelection (const std::vector<Mgx3D::Utils::Entity*>& entities, bool clear);
-	void entitiesRemovedFromSelection (const std::vector<std::string>& uniqueNames);
+	virtual void entitiesRemovedFromSelection (const std::vector<Mgx3D::Utils::Entity*>& entities, bool clear);
+	virtual void entitiesRemovedFromSelection (const std::vector<std::string>& uniqueNames);
 
 	/**
 	 * Appelé lorsque la politique de sélection du gestionnaire de sélection
@@ -117,7 +117,7 @@ class SelectionManagerObserver
 	 *          cas contraire.
 	 * Ne fait rien par défaut.
 	 */
-	bool isSelectionPolicyAdaptationEnabled ( ) const;
+	virtual bool isSelectionPolicyAdaptationEnabled ( ) const;
 
 	/**
 	 * Si <I>true</I> est transmis en argument (défaut), le panneau s'adapte
@@ -129,7 +129,7 @@ class SelectionManagerObserver
 	 * \see		selectionPolicyModified
 	 * \see		isSelectionPolicyAdaptationEnabled
 	 */
-	void enableSelectionPolicyAdaptation (bool enable);
+	virtual void enableSelectionPolicyAdaptation (bool enable);
 
 
 	protected :
@@ -137,7 +137,7 @@ class SelectionManagerObserver
 	/**
 	 * Le mutex qui protège l'instance.
 	 */
-	TkUtil::Mutex* getMutex ( ) const;
+	virtual TkUtil::Mutex* getMutex ( ) const;
 
 
 	private :
