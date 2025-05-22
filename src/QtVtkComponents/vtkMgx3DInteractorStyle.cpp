@@ -1,4 +1,4 @@
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 #include "Utils/MgxNumeric.h"
 
@@ -656,7 +656,7 @@ void vtkMgx3DInteractorStyle::OnRightButtonUp ( )
 }	// vtkMgx3DInteractorStyle::OnRightButtonUp
 
 
-void vtkMgx3DInteractorStyle::SetSelectionManager (SelectionManagerIfc* mgr)
+void vtkMgx3DInteractorStyle::SetSelectionManager (Mgx3D::Utils::SelectionManager* mgr)
 {
 	SelectionManager	= mgr;
 }	// vtkMgx3DInteractorStyle::SetSelectionManager

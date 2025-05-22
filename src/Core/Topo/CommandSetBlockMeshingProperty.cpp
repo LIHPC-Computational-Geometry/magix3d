@@ -1,16 +1,9 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandSetBlockMeshingProperty.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 15/10/13
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandSetBlockMeshingProperty.h"
 #include "Topo/Block.h"
+#include "Topo/CoFace.h"
+#include "Topo/Face.h"
 #include "Topo/TopoHelper.h"
-
 #include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>

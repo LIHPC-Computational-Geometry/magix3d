@@ -46,7 +46,7 @@ CommandNewBlocksMesh(Internal::Context& c, size_t tasksNum)
 : CommandCreateMesh(c, "Création du maillage pour tous les blocs", tasksNum)
 {
     std::vector<Topo::Block* > blocs;
-    getContext().getLocalTopoManager().getBlocks(blocs, true);
+    getContext().getTopoManager().getBlocks(blocs, true);
 
     validate(blocs);
 }
@@ -79,9 +79,9 @@ internalExecute()
 
 #ifdef _DEBUG2
 	std::cout<<"CommandNewBlocksMesh::internalExecute()"<<std::endl;
-	std::cout<<" getNbNodes() = "<<getContext().getLocalMeshManager().getNbNodes()<<std::endl;
-	std::cout<<" getNbFaces() = "<<getContext().getLocalMeshManager().getNbFaces()<<std::endl;
-	std::cout<<" getNbRegions() = "<<getContext().getLocalMeshManager().getNbRegions()<<std::endl;
+	std::cout<<" getNbNodes() = "<<getContext().getMeshManager().getNbNodes()<<std::endl;
+	std::cout<<" getNbFaces() = "<<getContext().getMeshManager().getNbFaces()<<std::endl;
+	std::cout<<" getNbRegions() = "<<getContext().getMeshManager().getNbRegions()<<std::endl;
 #endif
 
 	setStepProgression (1.);

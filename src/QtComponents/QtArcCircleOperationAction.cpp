@@ -4,12 +4,12 @@
  * \date        08/09/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Context.h"
 #include "Internal/Resources.h"
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManagerIfc.h"
+#include "Geom/GeomManager.h"
 #include "Geom/Vertex.h"
 #include "Geom/CommandNewArcCircle.h"
 #include "Geom/CommandNewArcCircleWithAngles.h"
@@ -250,7 +250,7 @@ QtAnglesSysCoordsArcPanel::QtAnglesSysCoordsArcPanel (QWidget* parent, QtMgx3DMa
 	_rayLengthTextField->setRange (0., NumericServices::doubleMachMax ( ));
 	connect(_rayLengthTextField, SIGNAL (textEdited (const QString&)), this, SLOT (parametersModifiedCallback()));
 	hlayout->addWidget (_rayLengthTextField);
-	_sysCoordPanel	= new QtMgx3DEntityPanel (this, "", true, "Repère :", "", &window, SelectionManagerIfc::D3, FilterEntity::SysCoord);
+	_sysCoordPanel	= new QtMgx3DEntityPanel (this, "", true, "Repère :", "", &window, SelectionManager::D3, FilterEntity::SysCoord);
 	_sysCoordPanel->setMultiSelectMode (false);
 	connect(_sysCoordPanel, SIGNAL (selectionModified (QString)), this, SLOT (parametersModifiedCallback()));
 	layout->addWidget (_sysCoordPanel);
@@ -856,9 +856,9 @@ void QtArcCircleOperationPanel::preview (bool on, bool destroyInteractor)
 				// pour l'arc de courbe
 				const Vector        normal   = getNormal();
 				const bool          direct   = directOrientation();
-				Vertex              *pc      = context->getLocalGeomManager().getVertex(getVertex1UniqueName());
-				Vertex              *pd      = context->getLocalGeomManager().getVertex(getVertex2UniqueName());
-				Vertex              *pe      = context->getLocalGeomManager().getVertex(getVertex3UniqueName());
+				Vertex              *pc      = context->getGeomManager().getVertex(getVertex1UniqueName());
+				Vertex              *pd      = context->getGeomManager().getVertex(getVertex2UniqueName());
+				Vertex              *pe      = context->getGeomManager().getVertex(getVertex3UniqueName());
 				command = new CommandNewArcCircle (*context, pc, pd, pe, direct, normal, groupName, false);
 				break;
 			}   // case QtArcCircleOperationPanel::EXTREMITIES_CENTER
@@ -874,18 +874,18 @@ void QtArcCircleOperationPanel::preview (bool on, bool destroyInteractor)
             case QtArcCircleOperationPanel::CIRCUMCIRCLE_PTS    :
             {
                 // pour l'arc de courbe
-                Vertex              *pc      = context->getLocalGeomManager().getVertex(getVertex1UniqueName());
-                Vertex              *pd      = context->getLocalGeomManager().getVertex(getVertex2UniqueName());
-                Vertex              *pe      = context->getLocalGeomManager().getVertex(getVertex3UniqueName());
+                Vertex              *pc      = context->getGeomManager().getVertex(getVertex1UniqueName());
+                Vertex              *pd      = context->getGeomManager().getVertex(getVertex2UniqueName());
+                Vertex              *pe      = context->getGeomManager().getVertex(getVertex3UniqueName());
                 command = new CommandNewArcCircle (*context, pc, pd, pe, true, Vector(0,0,0), groupName, true);
                 break;
 			}   // case QtArcCircleOperationPanel::CIRCUMCIRCLE_PTS
 			case QtArcCircleOperationPanel::ELLIPSE_EXTREMITIES_CENTER	:
 			{
 				const bool          direct   = directOrientation();
-				Vertex              *pc      = context->getLocalGeomManager().getVertex(getVertex1UniqueName());
-				Vertex              *pd      = context->getLocalGeomManager().getVertex(getVertex2UniqueName());
-				Vertex              *pe      = context->getLocalGeomManager().getVertex(getVertex3UniqueName());
+				Vertex              *pc      = context->getGeomManager().getVertex(getVertex1UniqueName());
+				Vertex              *pd      = context->getGeomManager().getVertex(getVertex2UniqueName());
+				Vertex              *pe      = context->getGeomManager().getVertex(getVertex3UniqueName());
 				command = new CommandNewArcEllipse (*context, pc, pd, pe, direct, groupName);
 				break;
 			}	// case QtArcCircleOperationPanel::ELLIPSE_EXTREMITIES_CENTER
@@ -1025,7 +1025,7 @@ QtArcCircleOperationPanel* QtArcCircleOperationAction::getArcCirclePanel ( )
 void QtArcCircleOperationAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 
 //	QtMgx3DGeomOperationAction::executeOperation ( );
 

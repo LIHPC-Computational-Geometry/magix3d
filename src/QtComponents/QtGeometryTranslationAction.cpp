@@ -4,7 +4,7 @@
  * \date        26/05/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
@@ -82,8 +82,8 @@ QtGeometryTranslationPanel::QtGeometryTranslationPanel (
 			FilterEntity::GeomVolume);
 	_geomEntitiesPanel	= new QtEntityByDimensionSelectorPanel (
 							this, mainWindow, "Entités géométriques :", 
-							SelectionManagerIfc::ALL_DIMENSIONS,
-							filter, SelectionManagerIfc::D3, true);
+							SelectionManager::ALL_DIMENSIONS,
+							filter, SelectionManager::D3, true);
 	_geomEntitiesPanel->setMultiSelectMode (true);
 	connect (_geomEntitiesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -176,7 +176,7 @@ QtGeometryTranslationPanel::~QtGeometryTranslationPanel ( )
 }	// QtGeometryTranslationPanel::~QtGeometryTranslationPanel
 
 
-void QtGeometryTranslationPanel::setDimension (SelectionManagerIfc::DIM dim)
+void QtGeometryTranslationPanel::setDimension (SelectionManager::DIM dim)
 {
 	CHECK_NULL_PTR_ERROR (_geomEntitiesPanel)
 	_geomEntitiesPanel->clearSelection ( );
@@ -439,7 +439,7 @@ QtGeometryTranslationPanel*
 void QtGeometryTranslationAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres d'association des entités géométriques :

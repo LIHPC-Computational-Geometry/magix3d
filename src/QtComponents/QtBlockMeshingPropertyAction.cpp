@@ -4,7 +4,7 @@
  * \date        14/11/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
@@ -230,7 +230,7 @@ QtBlockMeshingPropertyPanel::QtBlockMeshingPropertyPanel (
 	// Les blocs à mailler :
 	_blocksPanel	= new QtMgx3DEntityPanel (
 						this, "", true, "Blocs :", "", &mainWindow,
-						SelectionManagerIfc::D3, FilterEntity::TopoBlock);
+						SelectionManager::D3, FilterEntity::TopoBlock);
 	_blocksPanel->setMultiSelectMode (true);
 	layout->addWidget (_blocksPanel);
 	connect (_blocksPanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -631,7 +631,7 @@ QtBlockMeshingPropertyPanel*
 void QtBlockMeshingPropertyAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DTopoOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de maillage des blocs :

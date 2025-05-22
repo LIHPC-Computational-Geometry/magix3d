@@ -4,11 +4,11 @@
  * \date        29/01/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Mesh/MeshManagerIfc.h"
+#include "Mesh/MeshManager.h"
 #include "QtComponents/QtMeshExplorerOperationAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"

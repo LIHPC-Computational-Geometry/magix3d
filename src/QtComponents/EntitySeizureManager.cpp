@@ -4,7 +4,7 @@
  * \date		01/03/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "QtComponents/EntitySeizureManager.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "Internal/EntitiesHelper.h"
@@ -32,12 +32,12 @@ QColor	EntitySeizureManager::interactiveModeBackground	(220, 200, 240);
 
 
 EntitySeizureManager::EntitySeizureManager (
-	QtMgx3DMainWindow* mainWindow, SelectionManagerIfc::DIM dimensions,
+	QtMgx3DMainWindow* mainWindow, SelectionManager::DIM dimensions,
 	FilterEntity::objectType types)
 	: _mainWindow (mainWindow),
 	  _dimensions (dimensions), _types (types), _interactiveMode (false),
 	  _multiSelectMode(false), _seizuredEntities ( ),
-	  _selectionDims (SelectionManagerIfc::NO_DIM),
+	  _selectionDims (SelectionManager::NO_DIM),
 	  _selectionTypes (FilterEntity::All),
 	  _previousSeizureManager (0), _nextSeizureManager (0)
 {
@@ -46,10 +46,10 @@ EntitySeizureManager::EntitySeizureManager (
 
 EntitySeizureManager::EntitySeizureManager (const EntitySeizureManager&)
 	: _mainWindow (0),
-	  _dimensions (SelectionManagerIfc::NO_DIM), _types (FilterEntity::All),
+	  _dimensions (SelectionManager::NO_DIM), _types (FilterEntity::All),
 	  _interactiveMode (false),
       _multiSelectMode(false), _seizuredEntities ( ),
-	  _selectionDims (SelectionManagerIfc::NO_DIM),
+	  _selectionDims (SelectionManager::NO_DIM),
 	  _selectionTypes (FilterEntity::All),
 	  _previousSeizureManager (0), _nextSeizureManager (0)
 {
@@ -254,7 +254,7 @@ void EntitySeizureManager::setInteractiveMode (bool enable)
 		{
 			getSelectionManager( )->activateSelection (
 											_selectionDims, _selectionTypes);
-			_selectionDims	= SelectionManagerIfc::NO_DIM;
+			_selectionDims	= SelectionManager::NO_DIM;
 			_selectionTypes	= FilterEntity::NoneEntity;
 		}	// if (0 != getSelectionManager ( ))
 	}	// else if (true == _interactiveMode)
@@ -288,7 +288,7 @@ void EntitySeizureManager::updateGui (bool enable)
 
 bool EntitySeizureManager::criteriaMatch (int dimension, FilterEntity::objectType types) const
 {
-	if ((0 != (SelectionManagerIfc::dimensionToDimensions (dimension) &
+	if ((0 != (SelectionManager::dimensionToDimensions (dimension) &
 			getFilteredDimensions ( ))) && (0 != (types & getFilteredTypes( ))))
 		return true;
 
@@ -296,13 +296,13 @@ bool EntitySeizureManager::criteriaMatch (int dimension, FilterEntity::objectTyp
 }	// EntitySeizureManager::criteriaMatch
 
 
-const ContextIfc& EntitySeizureManager::getContext ( ) const
+const Context& EntitySeizureManager::getContext ( ) const
 {
 	return getMainWindow ( ).getContext ( );
 }	// EntitySeizureManager::getContext
 
 
-ContextIfc& EntitySeizureManager::getContext ( )
+Context& EntitySeizureManager::getContext ( )
 {
 	return getMainWindow ( ).getContext ( );
 }	// EntitySeizureManager::getContext
@@ -322,7 +322,7 @@ QtMgx3DMainWindow& EntitySeizureManager::getMainWindow ( )
 }	// EntitySeizureManager::getMainWindow
 
 
-SelectionManagerIfc* EntitySeizureManager::getSelectionManager ( )
+SelectionManager* EntitySeizureManager::getSelectionManager ( )
 {
 	try
 	{
@@ -341,7 +341,7 @@ FilterEntity::objectType EntitySeizureManager::getFilteredTypes ( ) const
 	// On retourne les types filtrés en prenant en compte les
 	// dimensions filtrées.
 	FilterEntity::objectType	types	= FilterEntity::NoneEntity;
-	if (0 != (getFilteredDimensions ( ) & SelectionManagerIfc::D0))
+	if (0 != (getFilteredDimensions ( ) & SelectionManager::D0))
 	{
 		if (0 != (_types & FilterEntity::GeomVertex))
 			types	= (FilterEntity::objectType)(types | FilterEntity::GeomVertex);
@@ -351,8 +351,8 @@ FilterEntity::objectType EntitySeizureManager::getFilteredTypes ( ) const
 			types	= (FilterEntity::objectType)(types | FilterEntity::MeshCloud);
 		if (0 != (_types & FilterEntity::Group0D))
 			types	= (FilterEntity::objectType)(types | FilterEntity::Group0D);
-	}	// if (0 != (getFilteredDimensions ( ) & SelectionManagerIfc::D0))
-	if (0 != (getFilteredDimensions ( ) & SelectionManagerIfc::D1))
+	}	// if (0 != (getFilteredDimensions ( ) & SelectionManager::D0))
+	if (0 != (getFilteredDimensions ( ) & SelectionManager::D1))
 	{
 		if (0 != (_types & FilterEntity::GeomCurve))
 			types	= (FilterEntity::objectType)(types | FilterEntity::GeomCurve);
@@ -364,8 +364,8 @@ FilterEntity::objectType EntitySeizureManager::getFilteredTypes ( ) const
 			types	= (FilterEntity::objectType)(types | FilterEntity::MeshLine);
 		if (0 != (_types & FilterEntity::Group1D))
 			types	= (FilterEntity::objectType)(types | FilterEntity::Group1D);
-	}	// if (0 != (getFilteredDimensions ( ) & SelectionManagerIfc::D1))
-	if (0 != (getFilteredDimensions ( ) & SelectionManagerIfc::D2))
+	}	// if (0 != (getFilteredDimensions ( ) & SelectionManager::D1))
+	if (0 != (getFilteredDimensions ( ) & SelectionManager::D2))
 	{
 		if (0 != (_types & FilterEntity::GeomSurface))
 			types	= (FilterEntity::objectType)(types | FilterEntity::GeomSurface);
@@ -377,8 +377,8 @@ FilterEntity::objectType EntitySeizureManager::getFilteredTypes ( ) const
 			types	= (FilterEntity::objectType)(types | FilterEntity::MeshSurface);
 		if (0 != (_types & FilterEntity::Group2D))
 			types	= (FilterEntity::objectType)(types | FilterEntity::Group2D);
-	}	// if (0 != (getFilteredDimensions ( ) & SelectionManagerIfc::D2))
-	if (0 != (getFilteredDimensions ( ) & SelectionManagerIfc::D3))
+	}	// if (0 != (getFilteredDimensions ( ) & SelectionManager::D2))
+	if (0 != (getFilteredDimensions ( ) & SelectionManager::D3))
 	{
 		if (0 != (_types & FilterEntity::GeomVolume))
 			types	= (FilterEntity::objectType)(types | FilterEntity::GeomVolume);
@@ -392,7 +392,7 @@ FilterEntity::objectType EntitySeizureManager::getFilteredTypes ( ) const
 			types	= (FilterEntity::objectType)(types | FilterEntity::Group3D);
 		if (0 != (_types & FilterEntity::SysCoord))
 			types	= (FilterEntity::objectType)(types | FilterEntity::SysCoord);
-	}	// if (0 != (getFilteredDimensions ( ) & SelectionManagerIfc::D3))
+	}	// if (0 != (getFilteredDimensions ( ) & SelectionManager::D3))
 
 	return types;
 }	// EntitySeizureManager::getFilteredTypes
@@ -498,7 +498,7 @@ void EntitySeizureManager::clearSeizuredEntities ( )
 }	// EntitySeizureManager::clearSeizuredEntities
 
 
-void EntitySeizureManager::setFilteredDimensions (SelectionManagerIfc::DIM dimensions)
+void EntitySeizureManager::setFilteredDimensions (SelectionManager::DIM dimensions)
 {
     _dimensions = dimensions;
 	if ((true == inInteractiveMode ( )) && (0 != getSelectionManager( )))
@@ -507,7 +507,7 @@ void EntitySeizureManager::setFilteredDimensions (SelectionManagerIfc::DIM dimen
 }	// EntitySeizureManager::setFilteredDimensions
 
 
-SelectionManagerIfc::DIM EntitySeizureManager::getFilteredDimensions ( ) const
+SelectionManager::DIM EntitySeizureManager::getFilteredDimensions ( ) const
 {
 	return _dimensions;
 }	// EntitySeizureManager::getFilteredDimensions

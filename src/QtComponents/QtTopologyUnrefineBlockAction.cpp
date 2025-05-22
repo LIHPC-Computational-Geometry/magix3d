@@ -4,7 +4,7 @@
  * \date        11/12/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -62,7 +62,7 @@ QtTopologyUnrefineBlockPanel::QtTopologyUnrefineBlockPanel (
 	// Le bloc à déraffiner :
 	_blockPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Bloc  :", "", &mainWindow,
-			SelectionManagerIfc::D3, FilterEntity::TopoBlock);
+			SelectionManager::D3, FilterEntity::TopoBlock);
 	connect (_blockPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
 	connect (_blockPanel, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -72,7 +72,7 @@ QtTopologyUnrefineBlockPanel::QtTopologyUnrefineBlockPanel (
 	// L'arête orthogonale au plan de coupe :
 	_edgePanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Arête :", "", &mainWindow,
-			SelectionManagerIfc::D1, FilterEntity::TopoCoEdge);
+			SelectionManager::D1, FilterEntity::TopoCoEdge);
 	connect (_edgePanel->getNameTextField ( ),
 	         SIGNAL (selectionModified (QString)), this,
 	         SLOT (parametersModifiedCallback ( )));
@@ -366,7 +366,7 @@ void QtTopologyUnrefineBlockAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (panel)
 
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de déraffinement du bloc topologique :

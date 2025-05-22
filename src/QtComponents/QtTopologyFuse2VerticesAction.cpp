@@ -4,7 +4,7 @@
  * \date        28/11/2017
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "QtComponents/QtTopologyFuse2VerticesAction.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "Utils/Common.h"
@@ -58,7 +58,7 @@ QtTopologyFuse2VerticesPanel::QtTopologyFuse2VerticesPanel (
 	// Le sommet 1 à coller :
 	_vertex1Panel	= new QtMgx3DEntityPanel (
 			this, "", true, "Sommet 1 :", "", &mainWindow,
-			SelectionManagerIfc::D0, FilterEntity::TopoVertex);
+			SelectionManager::D0, FilterEntity::TopoVertex);
 //	_vertex1Panel->setMultiSelectMode (true);
 	connect (_vertex1Panel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -69,7 +69,7 @@ QtTopologyFuse2VerticesPanel::QtTopologyFuse2VerticesPanel (
 	// Le sommet 2 à coller :
 	_vertex2Panel	= new QtMgx3DEntityPanel (
 			this, "", true, "Sommet 2 :", "", &mainWindow,
-			SelectionManagerIfc::D0, FilterEntity::TopoVertex);
+			SelectionManager::D0, FilterEntity::TopoVertex);
 //	_vertex2Panel->setMultiSelectMode (true);
 	connect (_vertex2Panel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -295,7 +295,7 @@ void QtTopologyFuse2VerticesAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (panel)
 
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de collage des sommets topologiques :

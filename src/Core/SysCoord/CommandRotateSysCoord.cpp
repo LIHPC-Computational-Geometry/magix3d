@@ -1,27 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandRotateSysCoord.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 6 Juin 2018
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
-#include "Utils/Vector.h"
-#include "Internal/InfoCommand.h"
 #include "Internal/Context.h"
+#include "Internal/InfoCommand.h"
 #include "SysCoord/CommandRotateSysCoord.h"
 #include "SysCoord/CommandDuplicateSysCoord.h"
-#include "SysCoord/SysCoordManager.h"
-
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
-// OCC
 #include "gp_Dir.hxx"
 #include "gp_Ax3.hxx"
 /*----------------------------------------------------------------------------*/

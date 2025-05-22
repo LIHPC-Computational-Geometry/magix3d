@@ -1,14 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandFuse2Faces.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 2 déc. 2011
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
+#include "Internal/Context.h"
 #include "Topo/CommandFuse2Faces.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>

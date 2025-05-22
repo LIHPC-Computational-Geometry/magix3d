@@ -6,7 +6,7 @@
 
 #ifdef USE_EXPERIMENTAL_ROOM
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "QtComponents/QtRepresentationTypesPanel.h"
 #include "QtVtkComponents/QtVtkMgx3DExperimentalRoomPanel.h"
 #include "QtVtkComponents/VTKEntityRepresentation.h"

@@ -4,13 +4,13 @@
  * \date		7/6/2018
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include "SysCoord/CommandNewSysCoord.h"
-#include "SysCoord/SysCoordManagerIfc.h"
+#include "SysCoord/SysCoordManager.h"
 #include "SysCoord/SysCoordDisplayRepresentation.h"
 #include "QtComponents/QtSysCoordOperationAction.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -518,7 +518,7 @@ QtSysCoordOperationPanel* QtSysCoordOperationAction::getSysCoordPanel ( )
 
 void QtSysCoordOperationAction::executeOperation ( )
 {
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	
 	// Récupération des paramètres de création du repère :
 	QtSysCoordOperationPanel*	panel	= getSysCoordPanel ( );

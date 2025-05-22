@@ -4,7 +4,7 @@
  * \date        18/12/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -59,7 +59,7 @@ QtTopologyEdgeDirectionPanel::QtTopologyEdgeDirectionPanel (
 	// Les arêtes à modifier :
 	_edgesPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Arêtes :", "", &mainWindow,
-			SelectionManagerIfc::D1, FilterEntity::TopoCoEdge);
+			SelectionManager::D1, FilterEntity::TopoCoEdge);
 	_edgesPanel->setMultiSelectMode (true);
 	connect (_edgesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -248,7 +248,7 @@ void QtTopologyEdgeDirectionAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (panel)
 
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de modification des arêtes topologiques :

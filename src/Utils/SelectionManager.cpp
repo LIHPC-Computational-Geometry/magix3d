@@ -28,9 +28,8 @@ namespace Utils {
 //                          SelectionManagerObserver
 // =========================================================================
 
-SelectionManagerObserver::SelectionManagerObserver (SelectionManagerIfc* selectionManager)
-	: SelectionManagerObserverIfc (selectionManager),
-	  _selectionManager (0), _mutex (0), _selectionPolicyAdaptation (false)
+SelectionManagerObserver::SelectionManagerObserver (SelectionManager* selectionManager)
+	: _selectionManager (0), _mutex (0), _selectionPolicyAdaptation (false)
 {
 	_mutex	= new Mutex ( );
 
@@ -39,8 +38,7 @@ SelectionManagerObserver::SelectionManagerObserver (SelectionManagerIfc* selecti
 
 
 SelectionManagerObserver::SelectionManagerObserver (const SelectionManagerObserver&)
-	: SelectionManagerObserverIfc (0),
-	  _selectionManager (0), _mutex (0), _selectionPolicyAdaptation (false)
+	: _selectionManager (0), _mutex (0), _selectionPolicyAdaptation (false)
 {
     MGX_FORBIDDEN("SelectionManagerObserver::SelectionManagerObserver is not allowed.");
 }	// SelectionManagerObserver::SelectionManagerObserver
@@ -63,7 +61,7 @@ SelectionManagerObserver::~SelectionManagerObserver ( )
 }	// SelectionManagerObserver::~SelectionManagerObserver
 
 
-void SelectionManagerObserver::setSelectionManager (SelectionManagerIfc* selectionManager)
+void SelectionManagerObserver::setSelectionManager (SelectionManager* selectionManager)
 {
 	AutoMutex	autoMutex (getMutex ( ));
 
@@ -95,11 +93,22 @@ void SelectionManagerObserver::entitiesAddedToSelection (const vector<Entity*>&)
 {
 }	// SelectionManagerObserver::entitiesAddedToSelection
 
+void SelectionManagerObserver::entitiesAddedToSelection (const vector<string>& uniqueNames)
+{
+}	// SelectionManagerObserver::entitiesAddedToSelection
+
 
 void SelectionManagerObserver::entitiesRemovedFromSelection (const vector<Entity*>& entities, bool clear)
 {
 }	// SelectionManagerObserver::entitiesRemovedFromSelection
 
+void SelectionManagerObserver::entitiesRemovedFromSelection (const vector<string>& uniqueNames)
+{
+}	// SelectionManagerObserver::entitiesRemovedFromSelection
+
+void SelectionManagerObserver::selectionPolicyModified (void* smp)
+{
+}	// SelectionManagerObserver::selectionPolicyModified
 
 bool SelectionManagerObserver::isSelectionPolicyAdaptationEnabled ( ) const
 {
@@ -126,10 +135,22 @@ Mutex* SelectionManagerObserver::getMutex ( ) const
 //                              SelectionManager
 // =========================================================================
 
+const SelectionManager::DIM SelectionManager::ALL_DIMENSIONS	=
+					(SelectionManager::DIM)(SelectionManager::D0 | SelectionManager::D1 |
+					SelectionManager::D2 | SelectionManager::D3);
+const SelectionManager::DIM	SelectionManager::NOT_NO_DIM	=
+					(SelectionManager::DIM)~SelectionManager::NO_DIM;
+const SelectionManager::DIM	SelectionManager::NOT_D0		=
+					(SelectionManager::DIM)~SelectionManager::D0;
+const SelectionManager::DIM	SelectionManager::NOT_D1		=
+					(SelectionManager::DIM)~SelectionManager::D1;
+const SelectionManager::DIM	SelectionManager::NOT_D2		=
+					(SelectionManager::DIM)~SelectionManager::D2;
+const SelectionManager::DIM	SelectionManager::NOT_D3		=
+					(SelectionManager::DIM)~SelectionManager::D3;
 
 SelectionManager::SelectionManager (const string& name, TkUtil::LogOutputStream* los)
-	: SelectionManagerIfc ( ),
-	  _name (name), _entities ( ), _observers ( ), _mutex (0),
+	: _name (name), _entities ( ), _observers ( ), _mutex (0),
 	  _undoStack ( ), _currentAction ((size_t)-1), m_logOutputStream(los)
 {
 	_mutex	= new Mutex ( );
@@ -137,8 +158,7 @@ SelectionManager::SelectionManager (const string& name, TkUtil::LogOutputStream*
 
 
 SelectionManager::SelectionManager (const SelectionManager&)
-	: SelectionManagerIfc ( ),
-	  _name ("Invalid name"), _entities ( ), _observers ( ), _mutex (0),
+	: _name ("Invalid name"), _entities ( ), _observers ( ), _mutex (0),
 	  _undoStack ( ), _currentAction ((size_t)-1), m_logOutputStream (0)
 {
     MGX_FORBIDDEN("SelectionManager::SelectionManager (const SelectionManager&) forbidden.");
@@ -149,7 +169,7 @@ SelectionManager::~SelectionManager ( )
 {
 	_mutex->lock ( );
 
-	for (vector<SelectionManagerObserverIfc*>::iterator it = _observers.begin ( ); _observers.end ( ) != it; it++)
+	for (vector<SelectionManagerObserver*>::iterator it = _observers.begin ( ); _observers.end ( ) != it; it++)
 		(*it)->selectionManagerDeleted ( );
 
 	clearSelection (false);
@@ -201,6 +221,18 @@ vector<Entity*> SelectionManager::getEntities ( ) const
 {
 	return _entities;
 }	// SelectionManager::getMeshes
+
+vector<unsigned long> SelectionManager::getEntitiesIds ( ) const
+{
+	vector<unsigned long>		ids;
+	const vector<Entity*>		entities	= getEntities ( );
+
+	for (vector<Entity*>::const_iterator it = entities.begin ( );
+		 entities.end ( ) != it; it++)
+		ids.push_back ((*it)->getUniqueId ( ));
+
+	return ids;
+}	// SelectionManager::getEntitiesIds
 
 std::vector<std::string> SelectionManager::getEntitiesNames ( ) const
 {
@@ -399,11 +431,11 @@ void SelectionManager::addToSelection (const vector<Entity*>& entities, bool und
 	if (0 != m_logOutputStream)
 		m_logOutputStream->log (TraceLog (message, Log::INFORMATION));
 
-	for (vector<SelectionManagerObserverIfc*>::iterator it = _observers.begin ( ); _observers.end ( ) != it; it++)
+	for (vector<SelectionManagerObserver*>::iterator it = _observers.begin ( ); _observers.end ( ) != it; it++)
 	{
 		(*it)->selectionModified ( );
 		(*it)->entitiesAddedToSelection (entities);
-	}	// for (vector<SelectionManagerObserverIfc*>::iterator it = ...
+	}	// for (vector<SelectionManagerObserver*>::iterator it = ...
 }	// SelectionManager::addToSelection
 
 
@@ -456,11 +488,11 @@ void SelectionManager::removeFromSelection (const vector<Entity*>& entities, boo
 	if (0 != m_logOutputStream)
 		m_logOutputStream->log (TraceLog (message, Log::INFORMATION));
 
-	for (vector<SelectionManagerObserverIfc*>::iterator it = _observers.begin ( ); _observers.end ( ) != it; it++)
+	for (vector<SelectionManagerObserver*>::iterator it = _observers.begin ( ); _observers.end ( ) != it; it++)
 	{
 		(*it)->selectionModified ( );
 		(*it)->entitiesRemovedFromSelection (entities, false);
-	}	// for (vector<SelectionManagerObserverIfc*>::iterator it = ...
+	}	// for (vector<SelectionManagerObserver*>::iterator it = ...
 }	// SelectionManager::removeFromSelection
 
 
@@ -476,11 +508,11 @@ void SelectionManager::clearSelection (bool undoable)
 	if (0 != _entities.size ( ))
 	{
 		_entities.clear ( );
-		for (vector<SelectionManagerObserverIfc*>::iterator	its	= _observers.begin ( ); _observers.end ( ) != its; its++)
+		for (vector<SelectionManagerObserver*>::iterator	its	= _observers.begin ( ); _observers.end ( ) != its; its++)
 		{
 			(*its)->selectionModified ( );
 			(*its)->entitiesRemovedFromSelection (unselected, true);
-		}	// for (vector<SelectionManagerObserverIfc*>::iterator its = ...
+		}	// for (vector<SelectionManagerObserver*>::iterator its = ...
 	}	// if (0 != _entities.size ( ))
 	
 	if (true == undoable)
@@ -570,12 +602,90 @@ void SelectionManager::printActionsStack (ostream& stream) const
 	}	// if ((size_t)-1 == _currentAction)
 }	// SelectionManager::printActionsStack
 
+SelectionManager::DIM SelectionManager::dimensionToDimensions (int dimension)
+{
+	switch (dimension)
+	{
+	case	0	: return D0;
+	case	1	: return D1;
+	case	2	: return D2;
+	case	3	: return D3;
+	}	// switch (dimension)
 
-void SelectionManager::addSelectionObserver (SelectionManagerObserverIfc& observer)
+	UTF8String	message (Charset::UTF_8);
+	message << "Dimension " << (long)dimension << " non supportée.";
+	throw Exception (message);
+}	// SelectionManager::dimensionToDimensions
+
+
+int SelectionManager::dimensionsToDimension (SelectionManager::DIM dimensions)
+{
+	switch (dimensions)
+	{
+	case	D0	: return 0;
+	case	D1	: return 1;
+	case	D2	: return 2;
+	case	D3	: return 3;
+	}	// switch (dimensions)
+
+	UTF8String	message (Charset::UTF_8);
+	message << "Dimension " << (long)dimensions << " non supportée.";
+	throw Exception (message);
+}	// SelectionManager::dimensionsToDimension
+
+
+bool SelectionManager::isSelectionActivated (const Entity& e) const
+{
+	return false;
+}   // SelectionManager::isSelectionActivated
+
+
+FilterEntity::objectType SelectionManager::getFilteredTypes ( ) const
+{
+	return FilterEntity::NoneEntity;
+}	// SelectionManager::getFilteredTypes
+
+
+SelectionManager::DIM SelectionManager::getFilteredDimensions ( ) const
+{
+	return SelectionManager::NO_DIM;
+}	// SelectionManager::getFilteredDimensions
+
+
+bool SelectionManager::is0DSelectionActivated ( ) const
+{
+	return false;
+}	// SelectionManager::is0DSelectionActivated
+
+
+bool SelectionManager::is1DSelectionActivated ( ) const
+{
+	return false;
+}	// SelectionManager::is1DSelectionActivated
+
+
+bool SelectionManager::is2DSelectionActivated ( ) const
+{
+	return false;
+}	// SelectionManager::is2DSelectionActivated
+
+
+bool SelectionManager::is3DSelectionActivated ( ) const
+{
+	return false;
+}	// SelectionManager::is3DSelectionActivated
+
+	
+void SelectionManager::activateSelection (SelectionManager::DIM dimensions, FilterEntity::objectType mask)
+{
+}	// SelectionManager::activate3DSelection
+
+	
+void SelectionManager::addSelectionObserver (SelectionManagerObserver& observer)
 {
 	AutoMutex	autoMutex (getMutex ( ));
 
-	for (vector<SelectionManagerObserverIfc*>::iterator  it = _observers.begin ( ); _observers.end ( ) != it; it++)
+	for (vector<SelectionManagerObserver*>::iterator  it = _observers.begin ( ); _observers.end ( ) != it; it++)
 		if ((*it) == &observer)
 			return;
 
@@ -583,11 +693,11 @@ void SelectionManager::addSelectionObserver (SelectionManagerObserverIfc& observ
 }	// SelectionManager::addSelectionObserver
 
 
-void SelectionManager::removeSelectionObserver (SelectionManagerObserverIfc& observer)
+void SelectionManager::removeSelectionObserver (SelectionManagerObserver& observer)
 {
 	AutoMutex	autoMutex (getMutex ( ));
 
-	for (vector<SelectionManagerObserverIfc*>::iterator  it = _observers.begin ( ); _observers.end ( ) != it; it++)
+	for (vector<SelectionManagerObserver*>::iterator  it = _observers.begin ( ); _observers.end ( ) != it; it++)
 		if ((*it) == &observer)
 		{
 			_observers.erase (it);
@@ -596,7 +706,7 @@ void SelectionManager::removeSelectionObserver (SelectionManagerObserverIfc& obs
 }	// SelectionManager::removeSelectionObserver
 
 
-vector<SelectionManagerObserverIfc*> SelectionManager::getObservers ( )
+vector<SelectionManagerObserver*> SelectionManager::getObservers ( )
 {
 	return _observers;
 }	// SelectionManager::getObservers
@@ -619,7 +729,7 @@ void SelectionManager::notifyObserversForNewPolicy (void* smp)
 {
 	AutoMutex	autoMutex (getMutex ( ));
 
-	for (vector<SelectionManagerObserverIfc*>::iterator it = _observers.begin ( ); _observers.end ( ) != it; it++)
+	for (vector<SelectionManagerObserver*>::iterator it = _observers.begin ( ); _observers.end ( ) != it; it++)
 		(*it)->selectionPolicyModified (smp);
 }	// SelectionManager::notifyObserversForNewPolicy
 

@@ -1,19 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/** \file OCCDisplayRepresentationBuilder.h
- *
- *  \author Franck Ledoux
- *
- *  \date 02/12/2010
- */
-/*----------------------------------------------------------------------------*/
 #ifndef MGX3D_GEOM_OCCDISPLAYREPRESENTATIONBUILDER_H_
 #define MGX3D_GEOM_OCCDISPLAYREPRESENTATIONBUILDER_H_
 /*----------------------------------------------------------------------------*/
 #include "Geom/GeomDisplayRepresentation.h"
 /*----------------------------------------------------------------------------*/
-//#include <TopoDS_Shape.hxx>
 #include <GeomAbs_IsoType.hxx>
 #include <BRepAdaptor_Surface.hxx>
+/*----------------------------------------------------------------------------*/
 class TopoDS_Face;
 class TopoDS_Shape;
 /*----------------------------------------------------------------------------*/

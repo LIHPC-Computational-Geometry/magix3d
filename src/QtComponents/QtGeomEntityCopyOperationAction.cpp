@@ -4,7 +4,7 @@
  * \date        25/06/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
@@ -77,8 +77,8 @@ QtGeomEntityCopyOperationPanel::QtGeomEntityCopyOperationPanel (
 			FilterEntity::GeomVolume);
 	_geomEntitiesPanel	= new QtEntityByDimensionSelectorPanel (
 							this, mainWindow, "Entités géométriques :", 
-							SelectionManagerIfc::ALL_DIMENSIONS,
-							filter, SelectionManagerIfc::D3, true);
+							SelectionManager::ALL_DIMENSIONS,
+							filter, SelectionManager::D3, true);
 	_geomEntitiesPanel->setMultiSelectMode (true);
 	connect (_geomEntitiesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -138,7 +138,7 @@ string QtGeomEntityCopyOperationPanel::getGroupName ( ) const
 }	// QtGeomEntityCopyOperationPanel::getGroupName
 
 
-void QtGeomEntityCopyOperationPanel::setDimension (SelectionManagerIfc::DIM dim)
+void QtGeomEntityCopyOperationPanel::setDimension (SelectionManager::DIM dim)
 {
 	CHECK_NULL_PTR_ERROR (_geomEntitiesPanel)
 	CHECK_NULL_PTR_ERROR (_namePanel)
@@ -149,10 +149,10 @@ void QtGeomEntityCopyOperationPanel::setDimension (SelectionManagerIfc::DIM dim)
 		int	dimension	= 3;
 		switch (dim)
 		{
-			case	SelectionManagerIfc::D0	: dimension	= 0;	break;
-			case	SelectionManagerIfc::D1	: dimension	= 1;	break;
-			case	SelectionManagerIfc::D2	: dimension	= 2;	break;
-			case	SelectionManagerIfc::D3	: dimension	= 3;	break;
+			case	SelectionManager::D0	: dimension	= 0;	break;
+			case	SelectionManager::D1	: dimension	= 1;	break;
+			case	SelectionManager::D2	: dimension	= 2;	break;
+			case	SelectionManager::D3	: dimension	= 3;	break;
 		}	// switch (dim)
 		_namePanel->setDimension (dimension);
 	}	// if (dim != _geomEntitiesPanel->getDimensions ( ))
@@ -345,7 +345,7 @@ QtGeomEntityCopyOperationPanel*
 void QtGeomEntityCopyOperationAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de copie des entités géométriques :

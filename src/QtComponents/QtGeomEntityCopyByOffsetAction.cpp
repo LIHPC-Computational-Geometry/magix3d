@@ -4,7 +4,7 @@
  * \date        25/09/2019
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
@@ -75,7 +75,7 @@ QtGeomEntityCopyByOffsetPanel::QtGeomEntityCopyByOffsetPanel (
 		(FilterEntity::objectType)(FilterEntity::GeomVertex |
 			FilterEntity::GeomCurve | FilterEntity::GeomSurface |
 			FilterEntity::GeomVolume);
-	_geomEntityPanel	= new QtMgx3DEntityPanel (this, "", true, "Surface :", "", &mainWindow, SelectionManagerIfc::D2, FilterEntity::GeomSurface);
+	_geomEntityPanel	= new QtMgx3DEntityPanel (this, "", true, "Surface :", "", &mainWindow, SelectionManager::D2, FilterEntity::GeomSurface);
 	_geomEntityPanel->setMultiSelectMode (false);
 	connect (_geomEntityPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -294,7 +294,7 @@ QtGeomEntityCopyByOffsetPanel* QtGeomEntityCopyByOffsetAction::getCopyPanel ( )
 void QtGeomEntityCopyByOffsetAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de copie des entités géométriques :

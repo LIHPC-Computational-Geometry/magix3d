@@ -4,11 +4,11 @@
  * \date        09/09/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Mesh/MeshManagerIfc.h"
+#include "Mesh/MeshManager.h"
 #include "QtComponents/QtMeshFacesOperationAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
@@ -68,7 +68,7 @@ QtMeshFacesOperationPanel::QtMeshFacesOperationPanel (
 	// Surfaces à mailler :
 	_facesPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Faces topologiques à mailler :", "", &mainWindow,
-			SelectionManagerIfc::D2, FilterEntity::TopoCoFace);
+			SelectionManager::D2, FilterEntity::TopoCoFace);
 	_facesPanel->setMultiSelectMode (true);
 	_verticalLayout->addWidget (_facesPanel);
 	connect (_facesPanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -319,7 +319,7 @@ void QtMeshFacesOperationAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (getMeshPanel ( ))
 
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DMeshOperationAction::executeOperation ( );
 
 	if (true == getMeshPanel ( )->meshAll ( ))

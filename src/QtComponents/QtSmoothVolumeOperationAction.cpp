@@ -4,13 +4,12 @@
  * \date        8/4/2016
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Mesh/MeshManagerIfc.h"
 #include "Smoothing/VolumicSmoothing.h"
-#include "Group/GroupManagerIfc.h"
+#include "Group/GroupManager.h"
 #include "QtComponents/QtSmoothVolumeOperationAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"

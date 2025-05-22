@@ -743,10 +743,10 @@ WARN_LOGFILE           =
 
 INPUT                  = ../../src/Doc/User \
                          ../../src/Core/protected/Internal/M3DCommandManager.h \
-                         ../../src/Core/protected/Internal/M3DCommandResultIfc.h \
-                         ../../src/Core/protected/Geom/GeomManagerIfc.h \
+                         ../../src/Core/protected/Internal/M3DCommandResult.h \
+                         ../../src/Core/protected/Geom/GeomManager.h \
                          ../../src/Core/protected/Geom/GeomInfo.h \
-                         ../../src/Core/protected/Internal/ContextIfc.h \
+                         ../../src/Core/protected/Internal/Context.h \
                          ../../src/Utils/protected/Utils/Point.h \
                          ../../src/Utils/protected/Utils/Spherical.h \
                          ../../src/Utils/protected/Utils/Vector.h \
@@ -758,7 +758,7 @@ INPUT                  = ../../src/Doc/User \
                          ../../src/Utils/protected/Utils/Constants.h \
                          ../../src/Utils/protected/Utils/Unit.h \
                          ../../src/Core/protected/Topo/TopoInfo.h \
-                         ../../src/Core/protected/Topo/TopoManagerIfc.h \
+                         ../../src/Core/protected/Topo/TopoManager.h \
                          ../../src/Core/protected/Topo/CoEdgeMeshingProperty.h \
                          ../../src/Core/protected/Topo/EdgeMeshingPropertyUniform.h \
                          ../../src/Core/protected/Topo/EdgeMeshingPropertyGeometric.h \
@@ -776,11 +776,11 @@ INPUT                  = ../../src/Doc/User \
                          ../../src/Core/protected/Topo/BlockMeshingProperty.h \
                          ../../src/Core/protected/Topo/BlockMeshingPropertyTransfinite.h \
                          ../../src/Core/protected/Topo/BlockMeshingPropertyDelaunayTetgen.h \
-                         ../../src/Core/protected/Mesh/MeshManagerIfc.h \
+                         ../../src/Core/protected/Mesh/MeshManager.h \
                          ../../src/Core/protected/Smoothing/SurfacicSmoothing.h \
                          ../../src/Core/protected/Smoothing/VolumicSmoothing.h \
                          ../../src/Core/protected/Mesh/MeshModificationBySepa.h \
-                         ../../src/Core/protected/Group/GroupManagerIfc.h 
+                         ../../src/Core/protected/Group/GroupManager.h
                          
                          
 

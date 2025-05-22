@@ -4,7 +4,7 @@
  * \date		09/09/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtMgx3DEntityPanel.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -35,7 +35,7 @@ namespace QtComponents
 QtMgx3DEntityPanel::QtMgx3DEntityPanel (
 	QWidget* parent, const string& title, bool editable,
 	const string& tfLabel, const string& name,
-	QtMgx3DMainWindow* mainWindow, SelectionManagerIfc::DIM dimensions,
+	QtMgx3DMainWindow* mainWindow, SelectionManager::DIM dimensions,
 	FilterEntity::objectType types)
 	: QWidget (parent),
 	  _nameTextField (0), _initialUniqueName (name), _label (0), _title (title)
@@ -182,14 +182,14 @@ const QtEntityIDTextField* QtMgx3DEntityPanel::getNameTextField ( ) const
 }	// QtMgx3DEntityPanel::getNameTextField
 
 
-void QtMgx3DEntityPanel::setFilteredDimensions (SelectionManagerIfc::DIM dimensions)
+void QtMgx3DEntityPanel::setFilteredDimensions (SelectionManager::DIM dimensions)
 {
 	CHECK_NULL_PTR_ERROR (_nameTextField)
 	_nameTextField->setFilteredDimensions (dimensions);
 }	// QtMgx3DEntityPanel::setFilteredDimensions
 
 
-SelectionManagerIfc::DIM QtMgx3DEntityPanel::getFilteredDimensions ( ) const
+SelectionManager::DIM QtMgx3DEntityPanel::getFilteredDimensions ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_nameTextField)
 	return _nameTextField->getFilteredDimensions ( );

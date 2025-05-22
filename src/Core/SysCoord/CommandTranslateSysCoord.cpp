@@ -1,21 +1,10 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandTranslateSysCoord.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 6 Juin 2018
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
-#include "Utils/Vector.h"
-#include "Internal/InfoCommand.h"
 #include "Internal/Context.h"
+#include "Internal/InfoCommand.h"
+#include "Utils/Vector.h"
 #include "SysCoord/CommandTranslateSysCoord.h"
 #include "SysCoord/CommandDuplicateSysCoord.h"
 #include "SysCoord/SysCoordManager.h"
-
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/UTF8String.h>

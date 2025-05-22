@@ -1,16 +1,9 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandFuse2Vertices.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 13/1/2014
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandFuse2Vertices.h"
-
-#include "Utils/Common.h"
 #include "Topo/Vertex.h"
+#include "Topo/CoFace.h"
+#include "Topo/CoEdge.h"
+#include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>

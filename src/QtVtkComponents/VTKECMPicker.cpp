@@ -1,4 +1,4 @@
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtVtkComponents/VTKECMPicker.h"
 #include "QtVtkComponents/VTKConfiguration.h"

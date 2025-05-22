@@ -1,21 +1,15 @@
-/*----------------------------------------------------------------------------*/
-/*
- * GeomRevolImplementation.h
- *
- *  Created on: 18 juin 2012
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #ifndef GEOMREVOLIMPLEMENTATION_H_
 #define GEOMREVOLIMPLEMENTATION_H_
 /*----------------------------------------------------------------------------*/
-#include <vector>
 #include <map>
-#include <set>
+#include <vector>
 /*----------------------------------------------------------------------------*/
 #include "Utils/Point.h"
 #include "Geom/GeomEntity.h"
 #include "Geom/GeomModificationBaseClass.h"
+/*----------------------------------------------------------------------------*/
+#include <TopoDS_Vertex.hxx>
+#include <TopoDS_Edge.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

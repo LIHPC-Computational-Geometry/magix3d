@@ -1,18 +1,8 @@
-/*
- * GeomScaleImplementation.h
- *
- *  Created on: 19 juin 2013
- *      Author: ledouxf
- */
-
 #ifndef GEOMSCALEIMPLEMENTATION_H_
 #define GEOMSCALEIMPLEMENTATION_H_
-
 /*----------------------------------------------------------------------------*/
 #include <vector>
-#include <list>
 /*----------------------------------------------------------------------------*/
-#include "Utils/Vector.h"
 #include "Geom/GeomEntity.h"
 #include "Geom/GeomModificationBaseClass.h"
 #include "Internal/Context.h"

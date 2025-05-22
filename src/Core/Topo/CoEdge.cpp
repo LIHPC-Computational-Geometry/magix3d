@@ -1,17 +1,12 @@
 /*----------------------------------------------------------------------------*/
-/** \file Edge.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 19/11/2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
 #include <iostream>
 #include <vector>
-#include <string.h>
+#include <string>
 /*----------------------------------------------------------------------------*/
+#include "Internal/Context.h"
+#include "Internal/InfoCommand.h"
+#include "Internal/InternalPreferences.h"
+#include "Internal/Resources.h"
 #include "Topo/Vertex.h"
 #include "Topo/CoEdge.h"
 #include "Topo/Edge.h"
@@ -23,38 +18,28 @@
 #include "Topo/EdgeMeshingPropertyTabulated.h"
 #include "Topo/CommandEditTopo.h"
 #include "Topo/TopoHelper.h"
-
 #include "Mesh/CommandCreateMesh.h"
 #include "Mesh/MeshImplementation.h"
 #include "Mesh/MeshItf.h"
-
 #include "Utils/Common.h"
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
 #include "Utils/SerializedRepresentation.h"
 #include "Utils/MgxException.h"
-
-#include "Internal/InfoCommand.h"
-#include "Internal/InternalPreferences.h"
-#include "Internal/Resources.h"
-
 #include "Geom/GeomEntity.h"
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/EntityFactory.h"
-#include "Geom/GeomModificationBaseClass.h"
+#include "Geom/Vertex.h"
 #include "Geom/GeomProjectImplementation.h"
-
 #include "Group/Group1D.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/TraceLog.h>
-#include <TkUtil/NumericConversions.h>
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/Mutex.h>
 /*----------------------------------------------------------------------------*/
-// OCC
 #include <Standard_Failure.hxx>
 #include <gp_Trsf.hxx>
 #include <gp_Ax1.hxx>
@@ -64,10 +49,6 @@
 #include <BRepBuilderAPI_MakeVertex.hxx>
 #include <BRepExtrema_DistShapeShape.hxx>
 #include <BRepAlgoAPI_Section.hxx>
-
-#include <GProp_GProps.hxx>
-#include <BRepGProp.hxx>
-
 /*----------------------------------------------------------------------------*/
 // protection pour les appels OCC et pour la création des points
 static TkUtil::Mutex					entityFactoryMutex;
@@ -102,7 +83,7 @@ CoEdge(Internal::Context& ctx,
 
     // om met une discrétisation par défaut
     if (m_mesh_property == 0){
-        EdgeMeshingPropertyUniform loc_emp(ctx.getLocalTopoManager().getDefaultNbMeshingEdges());
+        EdgeMeshingPropertyUniform loc_emp(ctx.getTopoManager().getDefaultNbMeshingEdges());
         m_mesh_property = loc_emp.clone();
     }
 
@@ -1060,7 +1041,7 @@ void CoEdge::getPoints(std::vector<Utils::Math::Point> &points) const
 
 	if (isMeshed()){
 
-	    gmds::Mesh& gmds_mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
+	    gmds::Mesh& gmds_mesh = getContext().getMeshManager().getMesh()->getGMDSMesh();
 
 		for (std::vector<gmds::TCellID>::iterator iter = m_mesh_data->nodes().begin();
 		    			iter != m_mesh_data->nodes().end(); ++iter){
@@ -1683,7 +1664,7 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 
 			CoFace* coface = 0;
 			try {
-				coface = getContext().getLocalTopoManager().getCoFace(coface_name, false);
+				coface = getContext().getTopoManager().getCoFace(coface_name, false);
 			}
 			catch (Utils::IsDestroyedException &e){
 				TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -1752,7 +1733,7 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 		uint nbMeshingEdges1 = 0;
 		uint nbMeshingEdges2 = 0;
 		for (uint i=0; i<first_coedges_names.size(); i++){
-			CoEdge* coedge = getContext().getLocalTopoManager().getCoEdge(first_coedges_names[i], false);
+			CoEdge* coedge = getContext().getTopoManager().getCoEdge(first_coedges_names[i], false);
 
 			if (coedge == 0){
 				TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -1775,7 +1756,7 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 		} // end for i<first_coedges_names.size()
 
 		for (uint i=0; i<second_coedges_names.size(); i++){
-			CoEdge* coedge = getContext().getLocalTopoManager().getCoEdge(second_coedges_names[i], false);
+			CoEdge* coedge = getContext().getTopoManager().getCoEdge(second_coedges_names[i], false);
 
 			if (coedge == 0){
 				TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -2411,7 +2392,7 @@ check() const
             try {
                 std::vector<std::string> coedges = empi->getCoEdges();
                 for (uint i = 0; i < coedges.size(); i++)
-                    getContext().getLocalTopoManager().getCoEdge(coedges[i], true);
+                    getContext().getTopoManager().getCoEdge(coedges[i], true);
             }
             catch (Utils::IsDestroyedException e)
             {
@@ -2424,7 +2405,7 @@ check() const
 		else if (empi->getType() == EdgeMeshingPropertyInterpolate::with_coface){
 			try {
 				std::string coface = empi->getCoFace();
-				getContext().getLocalTopoManager().getCoFace(coface, true);
+				getContext().getTopoManager().getCoFace(coface, true);
 			}
 			catch (Utils::IsDestroyedException e)
 			{
@@ -2443,11 +2424,11 @@ check() const
 
     	std::vector<std::string> coedges = empi->getFirstCoEdges();
     	for (uint i=0; i<coedges.size(); i++)
-    		getContext().getLocalTopoManager().getCoEdge(coedges[i], true);
+    		getContext().getTopoManager().getCoEdge(coedges[i], true);
 
     	coedges = empi->getSecondCoEdges();
     	for (uint i=0; i<coedges.size(); i++)
-    		getContext().getLocalTopoManager().getCoEdge(coedges[i], true);
+    		getContext().getTopoManager().getCoEdge(coedges[i], true);
     }
 
     // vérification qu'elle est maillable
@@ -2552,7 +2533,7 @@ getNodes(Topo::Vertex* v1, Topo::Vertex* v2,
         throw TkUtil::Exception (message);
     }
 
-    gmds::Mesh& gmds_mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
+    gmds::Mesh& gmds_mesh = getContext().getMeshManager().getMesh()->getGMDSMesh();
 
     if (v1 == getVertex(0) && v2 == getVertex(1)){
     	for (std::vector<gmds::TCellID>::iterator iter = m_mesh_data->nodes().begin();
@@ -2865,7 +2846,7 @@ detectLoopReference(const Topo::CoEdge* coedge_dep, std::vector<Topo::CoEdge*>& 
 
 				CoFace* coface = 0;
 				try {
-					coface = getContext().getLocalTopoManager().getCoFace(coface_name, false);
+					coface = getContext().getTopoManager().getCoFace(coface_name, false);
 				}
 				catch (Utils::IsDestroyedException &e){
 					TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
@@ -2946,7 +2927,7 @@ void CoEdge::updateModificationTime(const Topo::CoEdge* coedge_ref, std::vector<
 void CoEdge::getCoEdges(std::vector<std::string>& coedges_names, std::vector<Topo::CoEdge*>& coedges) const
 {
 	for (uint i=0; i<coedges_names.size(); i++){
-		CoEdge* coedge = getContext().getLocalTopoManager().getCoEdge(coedges_names[i], false);
+		CoEdge* coedge = getContext().getTopoManager().getCoEdge(coedges_names[i], false);
 
 		if (coedge == 0){
 			TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);

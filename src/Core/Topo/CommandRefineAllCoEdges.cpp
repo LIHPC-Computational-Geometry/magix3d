@@ -1,15 +1,7 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandRefineAllCoEdges.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 26/2/2014
- */
-/*----------------------------------------------------------------------------*/
-#include "Topo/CommandRefineAllCoEdges.h"
 #include "Topo/EdgeMeshingPropertyGeometric.h"
-
+#include "Topo/CommandRefineAllCoEdges.h"
+#include "Internal/Context.h"
 #include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
@@ -43,7 +35,7 @@ internalExecute()
             << " de nom unique " << getUniqueName ( );
 
     std::vector<CoEdge*> coedges;
-    getContext().getLocalTopoManager().getCoEdges(coedges);
+    getContext().getTopoManager().getCoEdges(coedges);
 
     for (std::vector<CoEdge*>::iterator iter=coedges.begin();
     		iter!=coedges.end(); ++iter){

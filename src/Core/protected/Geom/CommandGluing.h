@@ -1,16 +1,7 @@
-/*----------------------------------------------------------------------------*/
-/*
- * CommandSewing.h
- *
- *  Created on: 1 déc. 2011
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDGLUING_H_
 #define COMMANDGLUING_H_
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandEditGeom.h"
-#include "Utils/Vector.h"
 #include "Geom/GeomEntity.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/

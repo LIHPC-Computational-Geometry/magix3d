@@ -6,7 +6,7 @@
 #ifndef QT_GEOM_PLANE_CUT_ACTION_H
 #define QT_GEOM_PLANE_CUT_ACTION_H
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtMgx3DGeomOperationAction.h"
 #include "QtComponents/QtMgx3DGroupNamePanel.h"
@@ -57,7 +57,7 @@ class QtGeomPlaneCutPanel :
 			QWidget* parent, const std::string& panelName,
 			QtMgx3DGroupNamePanel::POLICY creationPolicy,
 			const std::string& entitiesLabel,
-			Mgx3D::Utils::SelectionManagerIfc::DIM	dimensions, 
+			Mgx3D::Utils::SelectionManager::DIM	dimensions,
 			Mgx3D::Utils::FilterEntity::objectType types,
 			Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
 			Mgx3D::QtComponents::QtMgx3DOperationAction* action);
@@ -213,7 +213,7 @@ class QtGeomPlaneCutAction : public QtMgx3DGeomOperationAction
 	 */
 	QtGeomPlaneCutAction (
 		const QIcon& icon, const QString& text,
-		Mgx3D::Utils::SelectionManagerIfc::DIM	dimensions, 
+		Mgx3D::Utils::SelectionManager::DIM	dimensions,
 		Mgx3D::Utils::FilterEntity::objectType types,
 		Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
 		const QString& tooltip, QtMgx3DGroupNamePanel::POLICY creationPolicy);

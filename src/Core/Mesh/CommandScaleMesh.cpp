@@ -1,22 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandScaleMesh.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 9/2/2016
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Mesh/CommandScaleMesh.h"
-
-#include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
-// OCC
 #include <gp_Trsf.hxx>
 #include <gp_GTrsf.hxx>
 /*----------------------------------------------------------------------------*/

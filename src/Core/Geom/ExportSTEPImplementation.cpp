@@ -1,19 +1,7 @@
 /*----------------------------------------------------------------------------*/
-/*
- * ExportSTEPImplementation.cpp
- *
- *  Created on: 14 févr. 2014
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #include "Geom/ExportSTEPImplementation.h"
 #include "Geom/Volume.h"
-#include "Geom/Surface.h"
 #include "Geom/Curve.h"
-#include "Geom/Vertex.h"
-/*----------------------------------------------------------------------------*/
-#include <iostream>
-#include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 #include <STEPControl_Writer.hxx>
 #include <Interface_Static.hxx>

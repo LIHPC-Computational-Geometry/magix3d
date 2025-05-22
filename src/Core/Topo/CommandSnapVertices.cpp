@@ -1,18 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandSnapVertices.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 17/9/2012
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandSnapVertices.h"
-
 #include "Utils/Common.h"
 #include "Topo/Vertex.h"
 #include "Topo/TopoHelper.h"
 #include "Topo/Block.h"
+#include "Topo/Edge.h"
+#include "Topo/CoFace.h"
 #include "Topo/BlockTopoProperty.h"
 #include "Topo/BlockMeshingProperty.h"
 #include "Topo/BlockMeshingPropertyDelaunayTetgen.h"

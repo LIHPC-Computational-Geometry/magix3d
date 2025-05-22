@@ -4,11 +4,11 @@
  * \date        19/05/2015
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManagerIfc.h"
+#include "Geom/GeomManager.h"
 #include "QtComponents/QtCurveByProjectionOnSurfaceAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
@@ -73,7 +73,7 @@ QtCurveByProjectionOnSurfacePanel::QtCurveByProjectionOnSurfacePanel (
 	// Courbe à projeter :
 	_curvePanel	= new QtMgx3DEntityPanel (
 						this, "", true, "Courbe projetée :", "",
-						&mainWindow, SelectionManagerIfc::D1,
+						&mainWindow, SelectionManager::D1,
 						FilterEntity::GeomCurve);
 	layout->addWidget (_curvePanel);
 	connect (_curvePanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -84,7 +84,7 @@ QtCurveByProjectionOnSurfacePanel::QtCurveByProjectionOnSurfacePanel (
 	// Surface de projection :
 	_surfacePanel	= new QtMgx3DEntityPanel (
 						this, "", true, "Surface de projection :", "",
-						&mainWindow, SelectionManagerIfc::D2,
+						&mainWindow, SelectionManager::D2,
 						FilterEntity::GeomSurface);
 	layout->addWidget (_surfacePanel);
 	connect (_surfacePanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -331,7 +331,7 @@ QtCurveByProjectionOnSurfacePanel*
 void QtCurveByProjectionOnSurfaceAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de création de la courbe :

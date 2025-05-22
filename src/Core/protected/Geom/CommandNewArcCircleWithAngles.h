@@ -1,16 +1,7 @@
-/*----------------------------------------------------------------------------*/
-/*
- * CommandNewArcCircleWithAngles.h
- *
- *  Created on: 29/9/2020
- *      Author: Eric B
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDNEWARCCIRCLEWITHANGLES_H_
 #define COMMANDNEWARCCIRCLEWITHANGLES_H_
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandCreateWithOtherGeomEntities.h"
-#include "Geom/Vertex.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

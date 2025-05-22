@@ -1,22 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file  GeomExtrudeImplementation.cpp
- *
- *  Created on: 8/11/2019
- *      Author: Eric B
- *      à partir de GeomRevolImplementation
- *
- *
- *
- *  Modified on: 21/02/2022
- *      Author: Simon C
- *      ajout de la possibilité de conserver les entités extrudées
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
-#include <list>
-#include <set>
-/*----------------------------------------------------------------------------*/
 #include "Geom/GeomExtrudeImplementation.h"
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
@@ -25,20 +7,20 @@
 #include "Geom/EntityFactory.h"
 #include "Geom/OCCHelper.h"
 /*----------------------------------------------------------------------------*/
-//inclusion de fichiers en-tête d'Open Cascade
 #include <TopoDS_Shape.hxx>
 #include <BRepPrimAPI_MakePrism.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Solid.hxx>
-#include <TopoDS_Shell.hxx>
 #include <TopExp.hxx>
 #include <TopTools_IndexedMapOfShape.hxx>
 #include <BRepTools.hxx>
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/MemoryError.h>
+/*----------------------------------------------------------------------------*/
+#include <list>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

@@ -1,16 +1,9 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandSplitBlock.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 9/3/2012
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDSPLITBLOCK_H_
 #define COMMANDSPLITBLOCK_H_
 /*----------------------------------------------------------------------------*/
 #include "Topo/CommandEditTopo.h"
+#include "Utils/Point.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -42,7 +35,7 @@ public:
      *  \param arete l'arête qui sert à déterminer la direction de la coupe structurée
      *  \param pt un point qui donnera un paramètre pour déterminer la position du sommet sur l'arête par projection sur cette dernière
      */
-    CommandSplitBlock(Internal::Context& c, Block* bloc, CoEdge* arete, const Point& pt);
+    CommandSplitBlock(Internal::Context& c, Block* bloc, CoEdge* arete, const Utils::Math::Point& pt);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur

@@ -1,24 +1,14 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file EdgeMeshingPropertyGlobalInterpolate.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 14/11/2016
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Topo/EdgeMeshingPropertyGlobalInterpolate.h"
-#include <TkUtil/UTF8String.h>
-#include <TkUtil/Exception.h>
-#include "Utils/Common.h"
-#include "Utils/MgxNumeric.h"
 #include "Topo/CoEdge.h"
 #include "Topo/TopoHelper.h"
-#include "Mesh/MeshImplementation.h"
-#include "Internal/Context.h"
+#include "Utils/Common.h"
 #include "Utils/MgxException.h"
-
+#include "Mesh/MeshImplementation.h"
+/*----------------------------------------------------------------------------*/
+#include <TkUtil/UTF8String.h>
+#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -106,7 +96,7 @@ addDescription(Utils::SerializedRepresentation& topoProprietes) const
 	for (uint i=0; i<m_firstCoedgesName.size(); i++){
 		CoEdge* edge = 0;
 		try {
-			edge = getStdContext()->getLocalTopoManager().getCoEdge(m_firstCoedgesName[i], false);
+			edge = getStdContext()->getTopoManager().getCoEdge(m_firstCoedgesName[i], false);
 		}
 		catch (Utils::IsDestroyedException& exc){
 			edge = 0;
@@ -124,7 +114,7 @@ addDescription(Utils::SerializedRepresentation& topoProprietes) const
 	for (uint i=0; i<m_secondCoedgesName.size(); i++){
 		CoEdge* edge = 0;
 		try {
-			edge = getStdContext()->getLocalTopoManager().getCoEdge(m_secondCoedgesName[i], false);
+			edge = getStdContext()->getTopoManager().getCoEdge(m_secondCoedgesName[i], false);
 		}
 		catch (Utils::IsDestroyedException& exc){
 			edge = 0;

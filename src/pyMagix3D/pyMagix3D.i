@@ -15,10 +15,9 @@ using std::ptrdiff_t;
 // non interprété par swig : 
 // -------------------------
 %{
-#include "Internal/ContextIfc.h"
 #include "Internal/Context.h"
 #include "Internal/M3DCommandManager.h"
-#include "Internal/M3DCommandResultIfc.h"
+#include "Internal/M3DCommandResult.h"
 #include "Utils/Point.h"
 #include "Utils/Spherical.h"
 #include "Utils/Cylindrical.h"
@@ -33,11 +32,11 @@ using std::ptrdiff_t;
 #include "Utils/Unit.h"
 #include "Utils/SwigCompletion.h"
 
-#include "Geom/GeomManagerIfc.h"
+#include "Geom/GeomManager.h"
 #include "Geom/GeomInfo.h"
 
 #include "Topo/TopoInfo.h"
-#include "Topo/TopoManagerIfc.h"
+#include "Topo/TopoManager.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Topo/EdgeMeshingPropertyGeometric.h"
 #include "Topo/EdgeMeshingPropertyBigeometric.h"
@@ -53,17 +52,17 @@ using std::ptrdiff_t;
 #include "Topo/BlockMeshingPropertyTransfinite.h"
 #include "Topo/BlockMeshingPropertyDelaunayTetgen.h"
 
-#include "Mesh/MeshManagerIfc.h"
+#include "Mesh/MeshManager.h"
 #include "Smoothing/SurfacicSmoothing.h"
 #include "Smoothing/VolumicSmoothing.h"
 
 #include "Mesh/MeshModificationBySepa.h"
 
-#include "Group/GroupManagerIfc.h"
+#include "Group/GroupManager.h"
 
-#include "SysCoord/SysCoordManagerIfc.h"
+#include "SysCoord/SysCoordManager.h"
 
-#include "Structured/StructuredMeshManagerIfc.h"
+#include "Structured/StructuredMeshManager.h"
 
 #include <patchlevel.h>	// PY_VERSION
 %}
@@ -88,22 +87,22 @@ using std::ptrdiff_t;
   }
 }
 
-%typemap(out) Mgx3D::Internal::M3DCommandResultIfc*
+%typemap(out) Mgx3D::Internal::M3DCommandResult*
 {	// Objectif : lever une exception lorsqu'une commande se termine en erreur
 	// => interrompt l'exécution du script par l'interprêteur python, que ce soit 
 	// à la ligne de commande ou depuis la console python.
-	Mgx3D::Internal::M3DCommandResultIfc*	cmdResult	= $1;
+	Mgx3D::Internal::M3DCommandResult*	cmdResult	= $1;
 	
-	if (Mgx3D::Utils::CommandIfc::FAIL == cmdResult->getStatus ( ))
+	if (Mgx3D::Utils::Command::FAIL == cmdResult->getStatus ( ))
 	{
 		$result	= nullptr;
 		SWIG_exception (SWIG_RuntimeError, cmdResult->getErrorMessage ( ).utf8 ( ).c_str ( ));
 	}
 	else
 	{
-		$result	= SWIG_NewPointerObj (SWIG_as_voidptr (result), SWIGTYPE_p_Mgx3D__Internal__M3DCommandResultIfc, 0);
+		$result	= SWIG_NewPointerObj (SWIG_as_voidptr (result), SWIGTYPE_p_Mgx3D__Internal__M3DCommandResult, 0);
 	}
-}	// %typemap(out) Mgx3D::Internal::M3DCommandResultIfc*
+}	// %typemap(out) Mgx3D::Internal::M3DCommandResult*
 
 // -------------------------------
 
@@ -288,13 +287,11 @@ using std::ptrdiff_t;
 // interprété par swig : déclaration des fonction pour swig
 // ---------------------------------------------------------
 %include Utils/SwigCompletion.h	// should be first !
-%include Utils/CommandIfc.h
-%include Internal/ContextIfc.h
+%include Utils/Command.h
 %include Internal/Context.h
 %include Internal/M3DCommandManager.h
-%include Utils/CommandResultIfc.h
 %include Utils/CommandResult.h
-%include Internal/M3DCommandResultIfc.h
+%include Internal/M3DCommandResult.h
 %include Utils/Point.h
 %include Utils/Spherical.h
 %include Utils/Cylindrical.h
@@ -310,10 +307,10 @@ using std::ptrdiff_t;
 %include Utils/Unit.h
 
 %include Geom/GeomInfo.h
-%include Geom/GeomManagerIfc.h
+%include Geom/GeomManager.h
 
 %include Topo/TopoInfo.h
-%include Topo/TopoManagerIfc.h
+%include Topo/TopoManager.h
 %include Topo/CoEdgeMeshingProperty.h
 %include Topo/EdgeMeshingPropertyUniform.h
 %include Topo/EdgeMeshingPropertyGeometric.h
@@ -332,17 +329,17 @@ using std::ptrdiff_t;
 %include Topo/BlockMeshingPropertyTransfinite.h
 %include Topo/BlockMeshingPropertyDelaunayTetgen.h
 
-%include Mesh/MeshManagerIfc.h
+%include Mesh/MeshManager.h
 %include Smoothing/SurfacicSmoothing.h
 %include Smoothing/VolumicSmoothing.h
 
 %include Mesh/MeshModificationBySepa.h
 
-%include Group/GroupManagerIfc.h
+%include Group/GroupManager.h
 
-%include SysCoord/SysCoordManagerIfc.h
+%include SysCoord/SysCoordManager.h
 
-%include Structured/StructuredMeshManagerIfc.h
+%include Structured/StructuredMeshManager.h
 
 
 // extensions: fonctions supplémentaires depuis python
@@ -544,17 +541,17 @@ def common(l1,l2):
 %}
 // ---------------------------------------------------------
 
-%extend Mgx3D::Internal::M3DCommandResultIfc {
+%extend Mgx3D::Internal::M3DCommandResult {
 public:
     // - __sub__ cut
-    Mgx3D::Internal::M3DCommandResultIfc* __sub__(Mgx3D::Internal::M3DCommandResultIfc* autre) {
+    Mgx3D::Internal::M3DCommandResult* __sub__(Mgx3D::Internal::M3DCommandResult* autre) {
         std::vector<std::string> to_cut = $self->getVolumes();
         std::vector<std::string> cutter = autre->getVolumes();
         return Mgx3D::getStdContext()->getGeomManager().cut(to_cut, cutter);
     }
     
     // & __and__ common
-    Mgx3D::Internal::M3DCommandResultIfc* __and__(Mgx3D::Internal::M3DCommandResultIfc* autre) {
+    Mgx3D::Internal::M3DCommandResult* __and__(Mgx3D::Internal::M3DCommandResult* autre) {
         std::vector<std::string> vols = $self->getVolumes();
         std::vector<std::string> vol2 = autre->getVolumes();
         vols.insert(vols.end(), vol2.begin(), vol2.end());
@@ -562,7 +559,7 @@ public:
     }
     
     // | __or__ fuse
-    Mgx3D::Internal::M3DCommandResultIfc* __or__(Mgx3D::Internal::M3DCommandResultIfc* autre) {
+    Mgx3D::Internal::M3DCommandResult* __or__(Mgx3D::Internal::M3DCommandResult* autre) {
         std::vector<std::string> vols = $self->getVolumes();
         std::vector<std::string> vol2 = autre->getVolumes();
         vols.insert(vols.end(), vol2.begin(), vol2.end());
@@ -570,13 +567,13 @@ public:
     }
     
     // Not
-    Mgx3D::Internal::M3DCommandResultIfc* Not(){
+    Mgx3D::Internal::M3DCommandResult* Not(){
         std::cout<< "Not A FAIRE ???"<<std::endl;
         return 0;
     }
     
     // ^ __xor__ rotate
-    Mgx3D::Internal::M3DCommandResultIfc* __xor__(Mgx3D::Utils::Math::Rotation* rotation) {
+    Mgx3D::Internal::M3DCommandResult* __xor__(Mgx3D::Utils::Math::Rotation* rotation) {
         std::vector<std::string> vols = $self->getVolumes();
         //return Mgx3D::getStdContext()->getGeomManager().rotate(vols, *rotation);
         Mgx3D::getStdContext()->getGeomManager().rotate(vols, *rotation);
@@ -584,7 +581,7 @@ public:
     }
 
     // + Vect __add__ translate
-    Mgx3D::Internal::M3DCommandResultIfc* __add__(Mgx3D::Utils::Math::Vector* vect){
+    Mgx3D::Internal::M3DCommandResult* __add__(Mgx3D::Utils::Math::Vector* vect){
         std::vector<std::string> vols = $self->getVolumes();
         //return 
         Mgx3D::getStdContext()->getGeomManager().translate(vols, *vect);
@@ -592,7 +589,7 @@ public:
     }
     
     // - Vect __add__ translate
-    Mgx3D::Internal::M3DCommandResultIfc* __sub__(Mgx3D::Utils::Math::Vector* vect){
+    Mgx3D::Internal::M3DCommandResult* __sub__(Mgx3D::Utils::Math::Vector* vect){
         std::vector<std::string> vols = $self->getVolumes();
         Mgx3D::Utils::Math::Vector vect2(-vect->getX(), -vect->getY(), -vect->getZ());
         //return 
@@ -601,13 +598,13 @@ public:
     }
     
     // * __mul__ scale
-    Mgx3D::Internal::M3DCommandResultIfc* __mul__(double factor) {
+    Mgx3D::Internal::M3DCommandResult* __mul__(double factor) {
         std::vector<std::string> vols = $self->getVolumes();
         return Mgx3D::getStdContext()->getGeomManager().scale(vols, factor);
     }
     
     // Rev
-    Mgx3D::Internal::M3DCommandResultIfc* Rev () {
+    Mgx3D::Internal::M3DCommandResult* Rev () {
         Mgx3D::Utils::Math::Rotation rotation = Mgx3D::Utils::Math::RotX(360);
         std::vector<std::string> surfs = $self->getSurfaces();
         return Mgx3D::getStdContext()->getGeomManager().makeRevol(surfs, rotation, false);

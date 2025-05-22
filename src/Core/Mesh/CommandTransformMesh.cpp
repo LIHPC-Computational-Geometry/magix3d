@@ -1,27 +1,14 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandTransformMesh.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 9/2/2016
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Mesh/CommandTransformMesh.h"
 #include "Mesh/MeshManager.h"
 #include "Mesh/MeshItf.h"
 #include "Mesh/Volume.h"
 #include "Mesh/Surface.h"
 #include "Mesh/Cloud.h"
-
-#include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
-#include <TkUtil/Exception.h>
-#include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
-// OCC
 #include <gp_Trsf.hxx>
 #include <gp_GTrsf.hxx>
 /*----------------------------------------------------------------------------*/
@@ -43,7 +30,7 @@ CommandTransformMesh::
 void CommandTransformMesh::
 transform(gp_Trsf* transf)
 {
-	gmds::Mesh& mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
+	gmds::Mesh& mesh = getContext().getMeshManager().getMesh()->getGMDSMesh();
 
 	std::vector<gmds::Node> nodes;
 	mesh.getAll(nodes);
@@ -81,7 +68,7 @@ transform(gp_Trsf* transf)
 void CommandTransformMesh::
 transform(gp_GTrsf* transf)
 {
-	gmds::Mesh& mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
+	gmds::Mesh& mesh = getContext().getMeshManager().getMesh()->getGMDSMesh();
 
 	std::vector<gmds::Node> nodes;
 	mesh.getAll(nodes);

@@ -1,16 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandExtendSplitBlock.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 9/3/2012
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandExtendSplitBlock.h"
-
-#include "Utils/Common.h"
 #include "Topo/Block.h"
+#include "Topo/Vertex.h"
+#include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>

@@ -4,7 +4,7 @@
  * \date		4/3/2016
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"

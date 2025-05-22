@@ -25,7 +25,7 @@ namespace Utils
 /*----------------------------------------------------------------------------*/
 
 CommandResult::CommandResult (Command& cmd)
-	: CommandResultIfc ( ), ObjectBase ( ), _command (0)
+	: ObjectBase ( ), _command (0)
 {
 	// La commande informera cette instance de CommandResult à chacune de ses
 	// modifications (invocation de observableModified) et lors de sa
@@ -40,14 +40,14 @@ CommandResult::CommandResult (Command& cmd)
 
 
 CommandResult::CommandResult ()
-	: CommandResultIfc ( ), ObjectBase ( ),
+	: ObjectBase ( ),
 	  _command (0)
 {
 }   // CommandResult::CommandResult
 
 
 CommandResult::CommandResult (const CommandResult&)
-	: CommandResultIfc ( ), ObjectBase ( ),
+	: ObjectBase ( ),
 	  _command (0)
 {
 	MGX_FORBIDDEN ("CommandResult copy constructor is not allowed.")
@@ -81,7 +81,7 @@ string CommandResult::getUniqueName ( ) const
 }	// CommandResult::getUniqueName
 
 
-CommandIfc::status CommandResult::getStatus ( ) const
+Command::status CommandResult::getStatus ( ) const
 {
 	return getCommand ( ).getStatus ( );
 }	// CommandResult::getStatus

@@ -1,16 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/*
- * GeomModificationBaseClass.h
- *
- *  Created on: 21 mars 2012
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
-
 #ifndef GEOMMODIFICATIONBASECLASS_H_
 #define GEOMMODIFICATIONBASECLASS_H_
 /*----------------------------------------------------------------------------*/
-#include "Utils/Vector.h"
 #include "Geom/GeomEntity.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
@@ -18,12 +8,6 @@
 #include <list>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
-#include <TopoDS_Vertex.hxx>
-#include <TopoDS_Edge.hxx>
-#include <TopoDS_Face.hxx>
-#include <TopoDS_Solid.hxx>
-
-#include <BRepBuilderAPI_MakeShape.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

@@ -1,19 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/** \file Block.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 22/11/2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
 #include <iostream>
 #include <vector>
 #include <list>
 #include <map>
 #include <string.h>
 /*----------------------------------------------------------------------------*/
+#include "Internal/Context.h"
+#include "Internal/InfoCommand.h"
+#include "Internal/InternalPreferences.h"
 #include "Topo/TopoHelper.h"
 #include "Topo/Vertex.h"
 #include "Topo/CoEdge.h"
@@ -28,26 +22,17 @@
 #include "Topo/FaceMeshingPropertyDelaunayGMSH.h"
 #include "Topo/BlockMeshingPropertyTransfinite.h"
 #include "Topo/BlockMeshingPropertyDelaunayTetgen.h"
-
 #include "Mesh/CommandCreateMesh.h"
-
-#include "Internal/Context.h"
-#include "Internal/InfoCommand.h"
-#include "Internal/InternalPreferences.h"
-
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
 #include "Utils/Common.h"
 #include "Utils/SerializedRepresentation.h"
-
 #include "Geom/GeomEntity.h"
-
 #include "Group/Group3D.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-#include <TkUtil/NumericConversions.h>
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/Timer.h>
 /*----------------------------------------------------------------------------*/
@@ -186,9 +171,9 @@ Block(Internal::Context& ctx, int ni, int nj, int nk)
 
     // une discretisation par défaut (découpage uniforme suivant le nombre de bras par défaut)
     // à moins qu'un nombre de bras ait été demandé
-    EdgeMeshingPropertyUniform empI(ni?ni:ctx.getLocalTopoManager().getDefaultNbMeshingEdges());
-    EdgeMeshingPropertyUniform empJ(nj?nj:ctx.getLocalTopoManager().getDefaultNbMeshingEdges());
-    EdgeMeshingPropertyUniform empK(nk?nk:ctx.getLocalTopoManager().getDefaultNbMeshingEdges());
+    EdgeMeshingPropertyUniform empI(ni?ni:ctx.getTopoManager().getDefaultNbMeshingEdges());
+    EdgeMeshingPropertyUniform empJ(nj?nj:ctx.getTopoManager().getDefaultNbMeshingEdges());
+    EdgeMeshingPropertyUniform empK(nk?nk:ctx.getTopoManager().getDefaultNbMeshingEdges());
 
     coedges.push_back(new Topo::CoEdge(ctx, &empI, getVertex(0), getVertex(1)));
     coedges.push_back(new Topo::CoEdge(ctx, &empI, getVertex(2), getVertex(3)));

@@ -1,17 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/*
- * CommandJoinSurfaces.cpp
- *
- *  Created on: 10 mars 2014
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
+#include "Internal/Context.h"
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
-#include "Utils/Common.h"
 #include "Geom/CommandJoinSurfaces.h"
 #include "Group/Group2D.h"
 /*----------------------------------------------------------------------------*/
@@ -120,7 +111,7 @@ void CommandJoinSurfaces::internalSpecificExecute()
 	m_entities[0]->getGroups(grp);
 	newSurface->setGroups(grp);
 	for (uint i=0; i<grp.size(); i++){
-		Group::Group2D* group = getContext().getLocalGroupManager().getNewGroup2D(grp[i]->getName(), &getInfoCommand());
+		Group::Group2D* group = getContext().getGroupManager().getNewGroup2D(grp[i]->getName(), &getInfoCommand());
 		group->add(newSurface);
 	}
 

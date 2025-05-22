@@ -1,21 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/*
- * CommandExtrudeRevolution.h
- *
- *  Created on: 18 juin 2012
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDREVOLUTION_H_
 #define COMMANDREVOLUTION_H_
 /*----------------------------------------------------------------------------*/
-#include <map>
-/*----------------------------------------------------------------------------*/
 #include "Geom/CommandExtrusion.h"
 #include "Geom/GeomRevolImplementation.h"
-#include "Utils/Point.h"
-#include "Utils/Rotation.h"
 #include "Geom/GeomEntity.h"
+#include "Utils/Point.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

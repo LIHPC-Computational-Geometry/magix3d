@@ -1,27 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/** \file Vertex.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 5/10/2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
-#include <list>
-#include <memory>
-/*----------------------------------------------------------------------------*/
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
-#include "Geom/Volume.h"
-#include "Geom/GeomDisplayRepresentation.h"
 #include "Geom/OCCHelper.h"
 #include "Group/Group0D.h"
 #include "Internal/Context.h"
 #include "Topo/Vertex.h"
-/*----------------------------------------------------------------------------*/
-#include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Vertex.hxx>
 #include <TopoDS_Shape.hxx>
@@ -31,6 +15,8 @@
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/MemoryError.h>
+/*----------------------------------------------------------------------------*/
+#include <memory>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

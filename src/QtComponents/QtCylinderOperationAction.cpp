@@ -4,11 +4,11 @@
  * \date        11/12/2012
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManagerIfc.h"
+#include "Geom/GeomManager.h"
 #include "Geom/Vertex.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/Vector.h"
@@ -646,7 +646,7 @@ QtCylinderOperationPanel* QtCylinderOperationAction::getCylinderPanel ( )
 void QtCylinderOperationAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 //	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de création du cylindre :

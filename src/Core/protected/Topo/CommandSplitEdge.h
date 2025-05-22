@@ -1,16 +1,9 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandSplitEdge.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 8/11/2012
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDSPLITEDGE_H_
 #define COMMANDSPLITEDGE_H_
 /*----------------------------------------------------------------------------*/
 #include "Topo/CommandEditTopo.h"
+#include "Utils/Point.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -41,7 +34,7 @@ public:
      *  \param arete l'arête à couper
      *  \param pt un point qui donnera un paramètre pour déterminer la position du sommet sur l'arête par projection sur cette dernière
      */
-    CommandSplitEdge(Internal::Context& c, CoEdge* arete, const Point& pt);
+    CommandSplitEdge(Internal::Context& c, CoEdge* arete, const Utils::Math::Point& pt);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur

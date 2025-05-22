@@ -1,17 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandChangeDefaultNbMeshingEdges.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 8/11/2012
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Internal/InfoCommand.h"
 #include "Internal/Context.h"
+#include "Internal/InfoCommand.h"
 #include "Topo/TopoManager.h"
 #include "Topo/CommandChangeDefaultNbMeshingEdges.h"
-
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/ReferencedMutex.h>
@@ -38,7 +29,7 @@ CommandChangeDefaultNbMeshingEdges::~CommandChangeDefaultNbMeshingEdges()
 /*----------------------------------------------------------------------------*/
 TopoManager& CommandChangeDefaultNbMeshingEdges::getTopoManager()
 {
-    return getContext().getLocalTopoManager();
+    return getContext().getTopoManager();
 }
 /*----------------------------------------------------------------------------*/
 void CommandChangeDefaultNbMeshingEdges::

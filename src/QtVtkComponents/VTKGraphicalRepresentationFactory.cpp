@@ -4,7 +4,7 @@
  * \date		02/07/2012
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtVtkComponents/VTKGraphicalRepresentationFactory.h"
 #include "QtVtkComponents/VTKGMDSEntityRepresentation.h"

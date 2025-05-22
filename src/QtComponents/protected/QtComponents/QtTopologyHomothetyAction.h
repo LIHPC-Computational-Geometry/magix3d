@@ -6,13 +6,13 @@
 #ifndef QT_TOPOLOGY_HOMOTHETY_ACTION_H
 #define QT_TOPOLOGY_HOMOTHETY_ACTION_H
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtEntityByDimensionSelectorPanel.h"
 #include "QtComponents/QtMgx3DHomothetyPanel.h"
 #include "QtComponents/QtMgx3DTopoOperationAction.h"
 
-#include "Utils/SelectionManagerIfc.h"
+#include "Utils/SelectionManager.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -73,7 +73,7 @@ class QtTopologyHomothetyPanel : public QtMgx3DOperationPanel
 	/**
 	 * \param		Nouvelle dimension de saisie des entités topologiques.
 	 */
-	virtual void setDimension (Mgx3D::Utils::SelectionManagerIfc::DIM dim);
+	virtual void setDimension (Mgx3D::Utils::SelectionManager::DIM dim);
 
 	/**
 	 * \return		La liste des entités topologiques devant effectuer une

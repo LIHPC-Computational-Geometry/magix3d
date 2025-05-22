@@ -14,11 +14,11 @@
  * \date        11/12/2012
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManagerIfc.h"
+#include "Geom/GeomManager.h"
 #include "Utils/Vector.h"
 #include "QtComponents/QtBooleanOpOperationAction.h"
 #include "QtComponents/QtMgx3DApplication.h"
@@ -95,7 +95,7 @@ setPalette (p);
 
     // Nom volumes sur lesquels se font l'opération
     _entitiesPanel  = new QtMgx3DEntityNamePanel (
-			this, "Volumes", mainWindow, SelectionManagerIfc::D3, FilterEntity::GeomVolume);
+			this, "Volumes", mainWindow, SelectionManager::D3, FilterEntity::GeomVolume);
 	connect (_entitiesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
 	connect (_entitiesPanel, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -104,7 +104,7 @@ setPalette (p);
 
     // Nom volumes à supprimer pour le CUT
     _toolsToCutPanel  = new QtMgx3DEntityNamePanel (
-            this, "a définir", mainWindow, SelectionManagerIfc::D3, FilterEntity::GeomVolume);
+            this, "a définir", mainWindow, SelectionManager::D3, FilterEntity::GeomVolume);
 
     layout->addWidget (_entitiesPanel);
     layout->addWidget (_toolsToCutPanel);
@@ -372,7 +372,7 @@ QtBooleanOpOperationPanel* QtBooleanOpOperationAction::getBooleanPanel ( )
 void QtBooleanOpOperationAction::executeOperation ( )
 {
     // Validation paramétrage :
-    M3DCommandResultIfc*	cmdResult	= 0;
+    M3DCommandResult*	cmdResult	= 0;
 //  QtMgx3DGeomOperationAction::executeOperation ( );
 
     // Récupération des paramètres de création du cylindre :
@@ -414,7 +414,7 @@ void QtBooleanOpOperationPanel::newOperationType (int index)
         _entitiesPanel->show();
 
         // on rogne avec d'autres volumes
-        _toolsToCutPanel->setDimensions(SelectionManagerIfc::D3);
+        _toolsToCutPanel->setDimensions(SelectionManager::D3);
         _toolsToCutPanel->setFilteredTypes (FilterEntity::GeomVolume);
         _toolsToCutPanel->setLabel("Volumes à supprimer");
         _toolsToCutPanel->setMultiSelectMode(true);
@@ -430,7 +430,7 @@ void QtBooleanOpOperationPanel::newOperationType (int index)
         _entitiesPanel->show();
 
         // on coupe avec une surface
-        _toolsToCutPanel->setDimensions(SelectionManagerIfc::D2);
+        _toolsToCutPanel->setDimensions(SelectionManager::D2);
         _toolsToCutPanel->setFilteredTypes (FilterEntity::GeomSurface);
         _toolsToCutPanel->setLabel("Surface pour couper");
         _toolsToCutPanel->setMultiSelectMode(false);

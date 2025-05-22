@@ -13,7 +13,7 @@
 #include <TkUtil/UTF8String.h>
 /*----------------------------------------------------------------------------*/
 #include <gmds/io/VTKWriter.h>
-#include "gmds/ig/Node.h"
+#include <gmds/ig/Node.h>
 #ifdef USE_SEPA3D
 #include "Sepa3DCore/Separatrice.h"
 #endif

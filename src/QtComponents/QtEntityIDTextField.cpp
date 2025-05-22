@@ -4,7 +4,7 @@
  * \date		11/09/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/EntitiesHelper.h"
 
 #include "QtComponents/QtEntityIDTextField.h"
@@ -36,7 +36,7 @@ namespace QtComponents
 
 QtEntityIDTextField::QtEntityIDTextField (
 	QWidget* parent, QtMgx3DMainWindow* mainWindow,
-	SelectionManagerIfc::DIM dimensions,
+	SelectionManager::DIM dimensions,
 	FilterEntity::objectType types, char* name)
 	: QtTextField (parent, name),
 	  EntitySeizureManager (mainWindow, dimensions, types),
@@ -67,7 +67,7 @@ QtEntityIDTextField::QtEntityIDTextField (
 QtEntityIDTextField::QtEntityIDTextField (const QtEntityIDTextField&)
 	: QtTextField (0, 0),
 	  EntitySeizureManager (
-				0, SelectionManagerIfc::NO_DIM, FilterEntity::NoneEntity),
+				0, SelectionManager::NO_DIM, FilterEntity::NoneEntity),
 	_mainWindow (0), _addGraphicalSelectionAction (0), _addGroupsEntitiesAction (0),
 	_backgroundColor (Qt::white), _updating (false)
 {
@@ -722,14 +722,14 @@ void QtEntityIDTextField::textModifiedCallback ( )
 }	// QtEntityIDTextField::textModifiedCallback
 
 
-const ContextIfc& QtEntityIDTextField::getContext ( ) const
+const Context& QtEntityIDTextField::getContext ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
 	return _mainWindow->getContext ( );
 }	// QtEntityIDTextField::getContext
 
 
-ContextIfc& QtEntityIDTextField::getContext ( )
+Context& QtEntityIDTextField::getContext ( )
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
 	return _mainWindow->getContext ( );

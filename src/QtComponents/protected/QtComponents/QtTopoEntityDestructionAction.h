@@ -11,7 +11,7 @@
 #include "QtComponents/QtMgx3DTopoOperationAction.h"
 #include "QtComponents/QtEntityByDimensionSelectorPanel.h"
 
-#include "Utils/SelectionManagerIfc.h"
+#include "Utils/SelectionManager.h"
 
 #include <QCheckBox>
 
@@ -93,7 +93,7 @@ class QtTopoEntityDestructionPanel : public QtMgx3DOperationPanel
 	/**
 	 * \param		Nouvelles dimensions.
 	 */
-	virtual void setDimensions (Mgx3D::Utils::SelectionManagerIfc::DIM dims);
+	virtual void setDimensions (Mgx3D::Utils::SelectionManager::DIM dims);
 
 
 	protected :

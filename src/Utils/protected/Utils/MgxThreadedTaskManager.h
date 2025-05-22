@@ -10,7 +10,7 @@
 #ifndef MGX_THREADED_TASK_MANAGER_H
 #define MGX_THREADED_TASK_MANAGER_H
 
-#include "Utils/CommandIfc.h"
+#include "Utils/Command.h"
 
 #include <TkUtil/Mutex.h>
 #include <TkUtil/ThreadPool.h>
@@ -38,7 +38,7 @@ class MgxThreadedTask : public TkUtil::ThreadPool::TaskIfc
 	/**
 	 * \param	Commande associée.
 	 */
-	MgxThreadedTask (Utils::CommandIfc& command);
+	MgxThreadedTask (Utils::Command& command);
 
 	/**
 	 * Constructeur de copie, opérateur = : RAS.
@@ -54,8 +54,8 @@ class MgxThreadedTask : public TkUtil::ThreadPool::TaskIfc
 	/**
 	 * \return	L'éventuelle commande associée.
 	 */
-	virtual Utils::CommandIfc* getCommand ( );
-	virtual const Utils::CommandIfc* getCommand ( ) const;
+	virtual Utils::Command* getCommand ( );
+	virtual const Utils::Command* getCommand ( ) const;
 
 	/**
 	 * \return	<I>true</I> si la commande associée est annulée, <I>false</I>
@@ -85,8 +85,8 @@ class MgxThreadedTask : public TkUtil::ThreadPool::TaskIfc
 	private :
 
 	TkUtil::Mutex						_mutex;
-	Utils::CommandIfc*					_command;
-	Mgx3D::Utils::CommandIfc::status	_status;
+	Utils::Command*					_command;
+	Mgx3D::Utils::Command::status	_status;
 	std::string							_message;
 };	// MgxThreadedTask
 

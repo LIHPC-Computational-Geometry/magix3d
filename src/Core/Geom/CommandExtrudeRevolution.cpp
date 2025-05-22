@@ -1,26 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandExtrudeRevolution.cpp
- *
- *  \author Franck Ledoux
- *
- *  \date 04/11/2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
-/*----------------------------------------------------------------------------*/
 #include "Geom/CommandExtrudeRevolution.h"
 #include "Geom/GeomManager.h"
 #include "Geom/GeomRevolImplementation.h"
-#include "Geom/Volume.h"
-#include "Geom/Surface.h"
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
 #include "Group/Group3D.h"
-#include "Group/Group2D.h"
 #include "Group/Group1D.h"
-#include "Group/Group0D.h"
 #include "Group/GroupManager.h"
+#include "Utils/Rotation.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/ReferencedMutex.h>
@@ -70,7 +57,7 @@ internalExecute()
     for(int i=0;i<new_entities.size();i++){
         GeomEntity* ge = new_entities[i];
         getInfoCommand ( ).addGeomInfoEntity (ge, Internal::InfoCommand::CREATED);
-        getContext().getLocalGeomManager().addEntity(ge);
+        getContext().getGeomManager().addEntity(ge);
     }
     for(int i=0;i<rem_entities.size();i++){
         getInfoCommand ( ).addGeomInfoEntity (rem_entities[i], Internal::InfoCommand::DELETED);
@@ -109,7 +96,7 @@ void CommandExtrudeRevolution::
 addGroupOnAxis()
 {
     // le groupe pour les courbes sur l'axe
-    Group::Group1D* grp = getContext().getLocalGroupManager().getNewGroup1D("AXE", &getInfoCommand());
+    Group::Group1D* grp = getContext().getGroupManager().getNewGroup1D("AXE", &getInfoCommand());
 
     // on commence par identifier les sommets sur l'axe, on les marque à 2, sinon 1
     std::map<Geom::Vertex* ,uint> filtre_vertices;

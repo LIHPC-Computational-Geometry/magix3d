@@ -6,7 +6,7 @@
 #ifndef QT_TOPO_INFORMATION_OPERATION_ACTION_H
 #define QT_TOPO_INFORMATION_OPERATION_ACTION_H
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Entity.h"
 #include "QtComponents/QtMgx3DGeomOperationAction.h"

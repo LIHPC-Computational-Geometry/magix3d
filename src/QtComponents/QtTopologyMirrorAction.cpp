@@ -4,7 +4,7 @@
  * \date		13/4/2016
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
@@ -74,8 +74,8 @@ QtTopologyMirrorPanel::QtTopologyMirrorPanel (
 			FilterEntity::TopoBlock);
 	_topoEntitiesPanel	= new QtEntityByDimensionSelectorPanel (
 							this, mainWindow, "Entités topologiques :",
-							SelectionManagerIfc::ALL_DIMENSIONS,
-							filter, SelectionManagerIfc::D3, true);
+							SelectionManager::ALL_DIMENSIONS,
+							filter, SelectionManager::D3, true);
 	_topoEntitiesPanel->setMultiSelectMode (true);
 	connect (_topoEntitiesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -164,7 +164,7 @@ void QtTopologyMirrorPanel::reset ( )
 }	// QtTopologyMirrorPanel::reset
 
 
-void QtTopologyMirrorPanel::setDimension (SelectionManagerIfc::DIM dim)
+void QtTopologyMirrorPanel::setDimension (SelectionManager::DIM dim)
 {
 	CHECK_NULL_PTR_ERROR (_topoEntitiesPanel)
 	_topoEntitiesPanel->clearSelection ( );
@@ -456,7 +456,7 @@ QtTopologyMirrorPanel*
 void QtTopologyMirrorAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DTopoOperationAction::executeOperation ( );
 
 	// Récupération des paramètres d'association des entités topologiques :
@@ -464,7 +464,7 @@ void QtTopologyMirrorAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (panel)
 	Math::Point		point (panel->getPoint ( ));
 	Math::Vector	normal (panel->getNormal ( ));
-	Plane			plane (point, normal);
+	Math::Plane			plane (point, normal);
 	bool			propagate	= panel->doPropagate ( );
 
 	vector<string>			entities	= panel->getTopoEntitiesNames ( );

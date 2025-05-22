@@ -4,7 +4,7 @@
  * \date        09/10/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 
 #include "QtComponents/RenderedEntityRepresentation.h"

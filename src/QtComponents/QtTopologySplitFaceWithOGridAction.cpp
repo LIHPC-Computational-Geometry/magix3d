@@ -4,7 +4,7 @@
  * \date		23/11/2017
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -63,7 +63,7 @@ QtTopologySplitFaceWithOGridPanel::QtTopologySplitFaceWithOGridPanel (
 	// Les faces à découper :
 	_facesPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Faces :", "", &mainWindow,
-			SelectionManagerIfc::D2, FilterEntity::TopoCoFace);
+			SelectionManager::D2, FilterEntity::TopoCoFace);
 	_facesPanel->setMultiSelectMode (true);
 	connect (_facesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -74,7 +74,7 @@ QtTopologySplitFaceWithOGridPanel::QtTopologySplitFaceWithOGridPanel (
 	// Les éventuelles arêtes à découper :
 	_edgesPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Arêtes :", "", &mainWindow,
-			SelectionManagerIfc::D1, FilterEntity::TopoCoEdge);
+			SelectionManager::D1, FilterEntity::TopoCoEdge);
 	_edgesPanel->setMultiSelectMode (true);
 	connect (_edgesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -414,7 +414,7 @@ void QtTopologySplitFaceWithOGridAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (panel)
 
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de découpage en o-grid des faces

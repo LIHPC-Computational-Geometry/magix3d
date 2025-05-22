@@ -4,7 +4,7 @@
  * \date        07/01/2025
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
@@ -28,7 +28,7 @@
 #include <QVBoxLayout>
 #include <QScrollArea>
 
-#include "Mesh/MeshManagerIfc.h"
+#include "Mesh/MeshManager.h"
 #include "Mesh/MeshItf.h"
 #include "Mesh/Mgx3DQualifSerie.h"
 
