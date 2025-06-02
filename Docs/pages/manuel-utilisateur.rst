@@ -23,7 +23,7 @@ Il en est de même pour les groupes de boutons.
 L'aide détaille chacun des menu et chacune des ces vues. Vous trouverez les sections suivantes :
 
 :doc:`menus`
-   Les menus Projet, Session, Vue, Topologie, Maillage, Sélection, Chambre expérimentale, Outils et Aide
+   Les menus Projet, Session, Vue, Topologie, Maillage, Sélection, Outils et Aide
 
 :doc:`onglets`
    Les onglets Propriétés individuelles et communes de la sélection, Commandes python et Historique

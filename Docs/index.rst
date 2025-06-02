@@ -24,6 +24,8 @@ Documentation utilisateur
 :doc:`pages/methodologie`
    Méthodologie de construction d’un maillage
 
+.. include:: cea_index-historique.rst
+
 :doc:`pages/annexes`
     Documentation annexe
 
@@ -48,11 +50,6 @@ Tutoriels
 :doc:`pages/tuto-Groupes`
    |PlaqueEtCylindreMaille| Tutoriel qui montre comment utiliser les groupes
 
-:doc:`pages/tuto-3DRevolution`
-   Tutoriel qui explique comment réaliser une modélisation avec sa topologie, le tout en 3D, en partant d'un modèle 2D. Work in progress.
-
-Pour aller plus loin avec votre cas 2D, il est nécessaire de voir les :ref:`recommandations générales<generation3D>` pour le passage de votre cas 2D au modèle bloc structuré en 3D.
-
 .. include:: cea_index-tuto.rst
 
 .. Hidden TOCs
@@ -66,6 +63,7 @@ Pour aller plus loin avec votre cas 2D, il est nécessaire de voir les :ref:`rec
    pages/manuel-utilisateur
    pages/api-python
    pages/methodologie
+   pages/cea_historique
    pages/annexes
 
 .. toctree::
@@ -86,9 +84,7 @@ Pour aller plus loin avec votre cas 2D, il est nécessaire de voir les :ref:`rec
    pages/tuto-2BoitesConformes
    pages/tuto-2BoitesAvecRecouvrement
    pages/tuto-Groupes
-   pages/tuto-3DRevolution
    pages/cea_tuto-*
-
 
 .. |deuxBoitesMaillage| image:: ./images/DeuxBoites_maillage.png
    :width: 100px
