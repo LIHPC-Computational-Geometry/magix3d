@@ -315,7 +315,7 @@ défaut (xOy), ainsi que l’arc en cours de construction.
 .. _creation-cercle:
 
 Créer un cercle / une ellipse |image78| 
-''''''''''''''''''''''''''''''
+'''''''''''''''''''''''''''''''''''''''''
 
 Se fait avec la méthode de *saisie de 3 points*.
 

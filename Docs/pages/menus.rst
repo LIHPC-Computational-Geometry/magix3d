@@ -24,8 +24,7 @@ raccourci dans la barre des boutons voire un raccourci clavier.
 :doc:`menu-selection`
    Pour sélectionner les entités et configurer leur représentation graphique
 
-:doc:`menu-chambre-experimentale`
-   Pour mettre au point les jeux de données pour un cas laser
+.. include:: cea_index-chambre-experimentale.rst
 
 :doc:`menu-outils`
    Pour obtenir des mesures de distances, angles et longueurs
@@ -43,6 +42,6 @@ raccourci dans la barre des boutons voire un raccourci clavier.
    menu-topologie
    menu-maillage
    menu-selection
-   menu-chambre-experimentale
+   cea_menu-chambre-experimentale
    menu-outils
    menu-aide

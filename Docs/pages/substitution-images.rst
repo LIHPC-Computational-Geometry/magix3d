@@ -90,10 +90,6 @@
    :width: 0.31458in
    :height: 0.31458in
 
-.. |image64| image:: ../images/image2.jpeg
-   :width: 1.78403in
-   :height: 3.35833in
-
 .. |image66| image:: ../images/image48.png
    :width: 0.31686in
    :height: 0.31686in

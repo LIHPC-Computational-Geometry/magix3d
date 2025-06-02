@@ -85,26 +85,4 @@ par groupe.
 Un menu contextuel permet la modification de la représentation de la
 sélection.
 
-.. _onglet-pointages-laser:
-
-Onglet Pointages laser
-----------------------
-
-Cet onglet dispose d’un menu contextuel (bouton droit de la souris)
-équivalent à ce que l’on trouve dans le :ref:`menu-chambre-experimentale`. 
-Ce menu tient compte des entités sélectionnés lors de son
-ouverture.
-
-Les pointages laser sont en général regroupés par anneau.
-
-Ce panneau dispose de cases à cocher qui permettent d’activer ou non la
-représentation des pointages laser, des taches et des diagnostics. Le
-regroupement par anneau permet d’avoir des actions par anneau ou par
-pointage. La sélection d’un anneau provoque automatiquement celle des
-pointages laser qui le composent.
-
-En faisant survoler le curseur de la souris quelques secondes sur une
-entité une bulle contenant sa description (coordonnés et angles dans les
-différents repères, ...) apparait. Dans le cas où l’entité est un anneau
-la description correspond aux valeurs moyennes des pointages laser qui
-le composent.
+.. include:: cea_onglet-pointages-laser.rst
