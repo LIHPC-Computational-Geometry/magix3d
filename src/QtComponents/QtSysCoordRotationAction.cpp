@@ -4,7 +4,7 @@
  * \date		7/6/2018
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
@@ -68,7 +68,7 @@ QtSysCoordRotationPanel::QtSysCoordRotationPanel (
 
 
 	_syscoordPanel	= new QtMgx3DEntityPanel (
-				this, "", true, "Repère à modifier :", "", &mainWindow, SelectionManagerIfc::D3,
+				this, "", true, "Repère à modifier :", "", &mainWindow, SelectionManager::D3,
 				FilterEntity::SysCoord);
 	_syscoordPanel->setMultiSelectMode (false);
 
@@ -318,7 +318,7 @@ QtSysCoordRotationPanel*
 void QtSysCoordRotationAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	QtSysCoordRotationPanel*	panel	= getRotationPanel ( );

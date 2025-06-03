@@ -1,29 +1,17 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandCreateMesh.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 7 nov. 2011
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
 #include "Internal/Resources.h"
+#include "Internal/Context.h"
+#include "Internal/InfoCommand.h"
 #include "Mesh/CommandCreateMesh.h"
 #include "Mesh/MeshItf.h"
 #include "Mesh/MeshManager.h"
 #include "Mesh/MeshModificationItf.h"
-#include "Mesh/MeshImplementation.h"
 #include "Mesh/MeshModificationByPythonFunction.h"
 #include "Mesh/MeshModificationBySepa.h"
 #include "Mesh/MeshModificationByProjectionOnP0.h"
-
 #include "Smoothing/SurfacicSmoothing.h"
 #include "Smoothing/VolumicSmoothing.h"
-
 #include "Utils/Command.h"
-#include "Internal/Context.h"
-#include "Internal/InfoCommand.h"
 #include "Group/Group2D.h"
 #include "Group/Group3D.h"
 #include "Topo/TopoHelper.h"
@@ -123,9 +111,9 @@ void EdgePreMesherTask::execute ( )
 		{
 			switch (cmdCreateMesh->getStatus ( ))
 			{
-				case Utils::CommandIfc::FAIL	:
+				case Utils::Command::FAIL	:
 					setStatus (TkUtil::ThreadPool::TaskIfc::IN_ERROR);	break;
-				case Utils::CommandIfc::CANCELED	:
+				case Utils::Command::CANCELED	:
 					setStatus (TkUtil::ThreadPool::TaskIfc::CANCELED);	break;
 				default					:
 					setStatus (TkUtil::ThreadPool::TaskIfc::IN_ERROR);
@@ -229,9 +217,9 @@ void FacePreMesherTask::execute ( )
 		{
 			switch (cmdCreateMesh->getStatus ( ))
 			{
-				case Utils::CommandIfc::FAIL		:
+				case Utils::Command::FAIL		:
 					setStatus (TkUtil::ThreadPool::TaskIfc::IN_ERROR);	break;
-				case Utils::CommandIfc::CANCELED	:
+				case Utils::Command::CANCELED	:
 					setStatus (TkUtil::ThreadPool::TaskIfc::CANCELED);	break;
 				default								:
 					setStatus (TkUtil::ThreadPool::TaskIfc::IN_ERROR);
@@ -336,9 +324,9 @@ void BlockPreMesherTask::execute ( )
 		{
 			switch (cmdCreateMesh->getStatus ( ))
 			{
-				case Utils::CommandIfc::FAIL		:
+				case Utils::Command::FAIL		:
 					setStatus (TkUtil::ThreadPool::TaskIfc::IN_ERROR);	break;
-				case Utils::CommandIfc::CANCELED	:
+				case Utils::Command::CANCELED	:
 					setStatus (TkUtil::ThreadPool::TaskIfc::CANCELED);	break;
 				default								:
 					setStatus (TkUtil::ThreadPool::TaskIfc::IN_ERROR);
@@ -380,7 +368,7 @@ CommandCreateMesh::~CommandCreateMesh()
 /*----------------------------------------------------------------------------*/
 MeshManager& CommandCreateMesh::getMeshManager()
 {
-    return getContext().getLocalMeshManager();
+    return getContext().getMeshManager();
 }
 /*----------------------------------------------------------------------------*/
 void CommandCreateMesh::

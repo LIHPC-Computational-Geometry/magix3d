@@ -4,7 +4,7 @@
  * \date        11/09/2018
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
@@ -72,7 +72,7 @@ QtGeomEntityCommon2DOperationPanel::QtGeomEntityCommon2DOperationPanel (
 
 	// Les entités à intersequer :
 	const FilterEntity::objectType	filter	= 1 == dimension ? FilterEntity::GeomCurve : FilterEntity::GeomSurface;
-	const SelectionManagerIfc::DIM	dims	= 1 == dimension ? SelectionManagerIfc::D1 : SelectionManagerIfc::D2;
+	const SelectionManager::DIM	dims	= 1 == dimension ? SelectionManager::D1 : SelectionManager::D2;
 	_firstEntityPanel			= new QtMgx3DEntityPanel (
 							this, "", true, "Entité 1 :", "", &mainWindow, dims, filter);
 	_firstEntityPanel->setMultiSelectMode (false);
@@ -343,7 +343,7 @@ void QtGeomEntityCommon2DOperationAction::executeOperation ( )
 	const string	secondName	= panel->getSecondGeomEntityName ( );
 	const bool			copy        = panel->copyEntities();
 
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	if (copy)
 		cmdResult = getContext ( ).getGeomManager ( ).common2DOnCopy (firstName, secondName, groupName);
 	else

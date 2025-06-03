@@ -1,13 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file InternalEntity.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 2 mars 2015
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
 #include "Internal/InternalEntity.h"
 #include "Internal/Context.h"
 #include "Utils/SerializedRepresentation.h"

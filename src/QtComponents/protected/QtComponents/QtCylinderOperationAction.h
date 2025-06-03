@@ -6,7 +6,7 @@
 #ifndef QT_CYLINDER_OPERATION_ACTION_H
 #define QT_CYLINDER_OPERATION_ACTION_H
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtAnglePanel.h"
 #include "QtComponents/QtMgx3DGeomOperationAction.h"

@@ -1,24 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file Group3D.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 18/10/2012
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
-#include <iostream>
-/*----------------------------------------------------------------------------*/
 #include "Group/Group3D.h"
 #include "Internal/Context.h"
 #include "Internal/EntitiesHelper.h"
 #include "Geom/Volume.h"
 #include "Mesh/Volume.h"
 #include "Utils/SerializedRepresentation.h"
-
-#include <TkUtil/NumericConversions.h>
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/WarningLog.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
@@ -307,7 +294,7 @@ getDescription (bool alsoComputed) const
     }
 
     // recherche du Mesh::Volume associé (suivant le nom)
-    Mesh::Volume* mvol = getContext().getLocalMeshManager().getVolume(getName(), false);
+    Mesh::Volume* mvol = getContext().getMeshManager().getVolume(getName(), false);
     if (mvol){
         Utils::SerializedRepresentation volumes ("Volume maillage", std::string("1"));
         volumes.addProperty (

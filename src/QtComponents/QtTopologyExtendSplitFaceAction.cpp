@@ -4,7 +4,7 @@
  * \date        22/05/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 
 #include "Utils/Common.h"
@@ -62,7 +62,7 @@ QtTopologyExtendSplitFacePanel::QtTopologyExtendSplitFacePanel (
 	// La face à découper :
 	_facePanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Face  :", "", &mainWindow,
-			SelectionManagerIfc::D2, FilterEntity::TopoCoFace);
+			SelectionManager::D2, FilterEntity::TopoCoFace);
 	connect (_facePanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
 	connect (_facePanel, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -72,7 +72,7 @@ QtTopologyExtendSplitFacePanel::QtTopologyExtendSplitFacePanel (
 	// L'arête orthogonale au plan de coupe :
 	_vertexPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Sommet :", "", &mainWindow,
-			SelectionManagerIfc::D0, FilterEntity::TopoVertex);
+			SelectionManager::D0, FilterEntity::TopoVertex);
 	connect (_vertexPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
 	connect (_vertexPanel, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -350,12 +350,12 @@ void QtTopologyExtendSplitFaceAction::executeOperation ( )
 	const string	faceName	= panel->getFaceName ( );
 	const string	vertexName	= panel->getVertexName ( );
 
-	Mgx3D::Internal::M3DCommandResultIfc*	result	= getContext ( ).getTopoManager ( ).extendSplitFace (faceName, vertexName);
+	Mgx3D::Internal::M3DCommandResult*	result	= getContext ( ).getTopoManager ( ).extendSplitFace (faceName, vertexName);
 	CHECK_NULL_PTR_ERROR (result)
 	setCommandResult (result);
-	if (CommandIfc::FAIL == result->getStatus ( ))
+	if (Command::FAIL == result->getStatus ( ))
 		throw Exception (result->getErrorMessage ( ));
-	else if (CommandIfc::CANCELED == result->getStatus ( ))
+	else if (Command::CANCELED == result->getStatus ( ))
 		throw Exception ("Opération annulée");
 }	// QtTopologyExtendSplitFaceAction::executeOperation
 

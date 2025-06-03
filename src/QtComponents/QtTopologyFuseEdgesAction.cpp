@@ -4,7 +4,7 @@
  * \date        25/03/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtTopologyFuseEdgesAction.h"
 #include "Utils/Common.h"
@@ -58,7 +58,7 @@ QtTopologyFuseEdgesPanel::QtTopologyFuseEdgesPanel (
 	// Les arêtes à coller :
 	_edgesPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Arêtes :", "", &mainWindow,
-			SelectionManagerIfc::D1, FilterEntity::TopoCoEdge);
+			SelectionManager::D1, FilterEntity::TopoCoEdge);
 	_edgesPanel->setMultiSelectMode (true);
 	connect (_edgesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -252,12 +252,12 @@ void QtTopologyFuseEdgesAction::executeOperation ( )
 	// Récupération des paramètres de collage des arêtes topologiques :
 	vector<string>	edges	= panel->getEdgesNames ( );
 
-	Mgx3D::Internal::M3DCommandResultIfc*	result	= getContext ( ).getTopoManager ( ).fuseEdges (edges);
+	Mgx3D::Internal::M3DCommandResult*	result	= getContext ( ).getTopoManager ( ).fuseEdges (edges);
 	CHECK_NULL_PTR_ERROR (result)
 	setCommandResult (result);
-	if (CommandIfc::FAIL == result->getStatus ( ))
+	if (Command::FAIL == result->getStatus ( ))
 		throw Exception (result->getErrorMessage ( ));
-	else if (CommandIfc::CANCELED == result->getStatus ( ))
+	else if (Command::CANCELED == result->getStatus ( ))
 		throw Exception ("Opération annulée");
 }	// QtTopologyFuseEdgesAction::executeOperation
 

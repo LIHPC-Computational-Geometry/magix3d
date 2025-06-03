@@ -4,7 +4,7 @@
  * \date		23/5/2018
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "SysCoord/SysCoordDisplayRepresentation.h"
 
 #include "QtVtkComponents/VTKMgx3DSysCoordEntityRepresentation.h"

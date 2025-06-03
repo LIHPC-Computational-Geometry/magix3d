@@ -1,34 +1,22 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandDuplicateTopo.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 21/3/2013
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandDuplicateTopo.h"
-
-#include "Geom/CommandGeomCopy.h"
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
-
-#include "Utils/Common.h"
-
+#include "Geom/CommandGeomCopy.h"
 #include "Topo/TopoHelper.h"
 #include "Topo/Vertex.h"
 #include "Topo/CoEdge.h"
 #include "Topo/CoFace.h"
 #include "Topo/Block.h"
 #include "Topo/EdgeMeshingPropertyInterpolate.h"
-
 #include "Group/Group3D.h"
 #include "Group/Group2D.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/Exception.h>
+/*----------------------------------------------------------------------------*/
 #include <set>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
@@ -350,7 +338,7 @@ duplicate(Block* bl)
         getInfoCommand().addTopoInfoEntity(new_block, Internal::InfoCommand::CREATED);
 
         if (!m_groupName.empty()){
-	    	Group::Group3D* grp = getContext().getLocalGroupManager().getNewGroup3D(m_groupName, &getInfoCommand());
+	    	Group::Group3D* grp = getContext().getGroupManager().getNewGroup3D(m_groupName, &getInfoCommand());
 			grp->add(new_block);
 			new_block->getGroupsContainer().add(grp);
 		}
@@ -410,7 +398,7 @@ void CommandDuplicateTopo::updateInterpolate()
 				std::vector<std::string> new_coedges_names;
 
 				for (uint i=0; i<old_coedges_names.size(); i++){
-					CoEdge* old_coedge_ref = getContext().getLocalTopoManager().getCoEdge(old_coedges_names[i], false);
+					CoEdge* old_coedge_ref = getContext().getTopoManager().getCoEdge(old_coedges_names[i], false);
 					if (old_coedge_ref == 0){
 						TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
 						message<<"Erreur interne avec l'arête "<<old_coedge->getName()<<", on ne trouve pas l'arête "
@@ -433,7 +421,7 @@ void CommandDuplicateTopo::updateInterpolate()
 
 			std::string old_coface_name = interpol_old->getCoFace();
 			if (!old_coface_name.empty()){
-				CoFace* old_coface = getContext().getLocalTopoManager().getCoFace(old_coface_name, false);
+				CoFace* old_coface = getContext().getTopoManager().getCoFace(old_coface_name, false);
 
 				if (old_coface == 0){
 					TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);

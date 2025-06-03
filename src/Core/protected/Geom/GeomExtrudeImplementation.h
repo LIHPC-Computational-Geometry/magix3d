@@ -1,28 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/*
- * GeomExtrudeImplementation.h
- *
- *  Created on: 8/11/2019
- *      Author: Eric B
- *      à partir de GeomRevolImplementation
- *
- *
- *
- *  Modified on: 21/02/2022
- *      Author: Simon C
- *      ajout de la possibilité de conserver les entités extrudées
- */
-/*----------------------------------------------------------------------------*/
 #ifndef GEOMEXTRUDEIMPLEMENTATION_H_
 #define GEOMEXTRUDEIMPLEMENTATION_H_
 /*----------------------------------------------------------------------------*/
-#include <vector>
 #include <map>
-#include <set>
+#include <vector>
 /*----------------------------------------------------------------------------*/
-#include "Utils/Point.h"
 #include "Geom/GeomEntity.h"
 #include "Geom/GeomModificationBaseClass.h"
+/*----------------------------------------------------------------------------*/
+#include <TopoDS_Vertex.hxx>
+#include <TopoDS_Edge.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

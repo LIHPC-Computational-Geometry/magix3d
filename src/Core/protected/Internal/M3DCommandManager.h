@@ -13,7 +13,7 @@
 #include "Geom/GeomManager.h"
 #include "Topo/TopoManager.h"
 #include "Internal/CommandCreator.h"
-#include "Internal/M3DCommandResultIfc.h"
+#include "Internal/M3DCommandResult.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 
@@ -46,13 +46,13 @@ public:
     /** \brief création d'une commande longue, pour tester l'interuption
      *
      */
-    Mgx3D::Internal::M3DCommandResultIfc* newLongCommand();
+    Mgx3D::Internal::M3DCommandResult* newLongCommand();
 
     /*------------------------------------------------------------------------*/
     /** \brief création d'une commande longue non inyterruptible (pour tests).
      *
      */
-    Mgx3D::Internal::M3DCommandResultIfc* newOpenCascadeLongCommand();
+    Mgx3D::Internal::M3DCommandResult* newOpenCascadeLongCommand();
 
 private :
 };

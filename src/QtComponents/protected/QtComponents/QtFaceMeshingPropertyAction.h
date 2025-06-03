@@ -6,7 +6,7 @@
 #ifndef QT_FACE_MESHING_PROPERTY_ACTION_H
 #define QT_FACE_MESHING_PROPERTY_ACTION_H
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtMgx3DEntityPanel.h"
 #include "QtComponents/QtMgx3DEdgePanel.h"

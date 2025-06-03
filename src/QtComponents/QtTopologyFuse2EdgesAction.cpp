@@ -4,7 +4,7 @@
  * \date        28/06/2016
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtTopologyFuse2EdgesAction.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -58,7 +58,7 @@ QtTopologyFuse2EdgesPanel::QtTopologyFuse2EdgesPanel (
 	// L'arête 1 à coller :
 	_edges1Panel	= new QtMgx3DEntityPanel (
 			this, "", true, "Arêtes 1 :", "", &mainWindow,
-			SelectionManagerIfc::D1, FilterEntity::TopoCoEdge);
+			SelectionManager::D1, FilterEntity::TopoCoEdge);
 	_edges1Panel->setMultiSelectMode (true);
 	connect (_edges1Panel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -69,7 +69,7 @@ QtTopologyFuse2EdgesPanel::QtTopologyFuse2EdgesPanel (
 	// L'arête 2 à coller :
 	_edges2Panel	= new QtMgx3DEntityPanel (
 			this, "", true, "Arêtes 2 :", "", &mainWindow,
-			SelectionManagerIfc::D1, FilterEntity::TopoCoEdge);
+			SelectionManager::D1, FilterEntity::TopoCoEdge);
 	_edges2Panel->setMultiSelectMode (true);
 	connect (_edges2Panel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -301,16 +301,16 @@ void QtTopologyFuse2EdgesAction::executeOperation ( )
 	vector<string>	names1	= panel->getEdges1Names ( );
 	vector<string>	names2	= panel->getEdges2Names ( );
 
-	Mgx3D::Internal::M3DCommandResultIfc*	result	= 0;
+	Mgx3D::Internal::M3DCommandResult*	result	= 0;
 	if ((names1.size ( ) == 1) && (names2.size ( ) == 1))
 		result	= getContext ( ).getTopoManager ( ).fuse2Edges (names1[0], names2[0]);
 	else
 		result	= getContext ( ).getTopoManager ( ).fuse2EdgeList (names1, names2);
 	CHECK_NULL_PTR_ERROR (result)
 	setCommandResult (result);
-	if (CommandIfc::FAIL == result->getStatus ( ))
+	if (Command::FAIL == result->getStatus ( ))
 		throw Exception (result->getErrorMessage ( ));
-	else if (CommandIfc::CANCELED == result->getStatus ( ))
+	else if (Command::CANCELED == result->getStatus ( ))
 		throw Exception ("Opération annulée");
 }	// QtTopologyFuse2EdgesAction::executeOperation
 

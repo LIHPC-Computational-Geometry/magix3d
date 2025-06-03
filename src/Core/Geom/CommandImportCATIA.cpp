@@ -1,29 +1,14 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandImportCATIA.cpp
- *
- *  \author Franck Ledoux
- *
- *  \date 04/02/2011
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
-/*----------------------------------------------------------------------------*/
 #include "Geom/CommandImportCATIA.h"
 #include "Geom/GeomManager.h"
 #include "Geom/ImportCATIAImplementation.h"
 #include "Geom/Curve.h"
-/*----------------------------------------------------------------------------*/
-#include <TkUtil/Exception.h>
-#include <TkUtil/ReferencedMutex.h>
-#include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 
 class GeomVertex;
-//class Curve;
 class Surface;
 class Volume;
 /*----------------------------------------------------------------------------*/

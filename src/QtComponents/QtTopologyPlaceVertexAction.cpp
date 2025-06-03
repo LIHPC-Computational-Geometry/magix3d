@@ -4,7 +4,7 @@
  * \date        01/02/2017
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
@@ -63,7 +63,7 @@ QtTopologyPlaceVertexPanel::QtTopologyPlaceVertexPanel (
 	layout->addWidget (label);
 
 	// Le sommet à positionner :
-	_vertexPanel	= new QtMgx3DEntityPanel (this, "", true, "Sommet :", "", &mainWindow, SelectionManagerIfc::D0, FilterEntity::TopoVertex);
+	_vertexPanel	= new QtMgx3DEntityPanel (this, "", true, "Sommet :", "", &mainWindow, SelectionManager::D0, FilterEntity::TopoVertex);
 	connect (_vertexPanel, SIGNAL (entitiesAddedToSelection(QString)), this, SLOT (entitiesAddedToSelectionCallback (QString)));
 	connect (_vertexPanel, SIGNAL (entitiesRemovedFromSelection(QString)), this, SLOT (entitiesRemovedFromSelectionCallback (QString)));
 	layout->addWidget (_vertexPanel);
@@ -117,7 +117,7 @@ QtTopologyPlaceVertexPanel::QtTopologyPlaceVertexPanel (
 	/** L'éventuelle contrainte. */
 	FilterEntity::objectType	filter	= (FilterEntity::objectType)(FilterEntity::AllEdges | FilterEntity::AllSurfaces);
 	_entityConstraintPanel	= new QtEntityByDimensionSelectorPanel (
-		this, mainWindow, "Entité de contrainte :", (SelectionManagerIfc::DIM)(SelectionManagerIfc::D1 | SelectionManagerIfc::D2), filter, SelectionManagerIfc::D1, false);
+		this, mainWindow, "Entité de contrainte :", (SelectionManager::DIM)(SelectionManager::D1 | SelectionManager::D2), filter, SelectionManager::D1, false);
 	_entityConstraintPanel->setToolTip ("Le sommet sera placé sur l'entité sélectionnée.\nPour déplacer le point presser le bouton gauche de la souris\net déplacer la souris.");
 	connect (_entityConstraintPanel, SIGNAL (entitiesAddedToSelection(QString)), this,  SLOT (constraintSelectedCallback (QString)));
 	connect (_entityConstraintPanel, SIGNAL (entitiesRemovedFromSelection(QString)), this, SLOT (constraintUnselectedCallback (QString)));
@@ -745,7 +745,7 @@ void QtTopologyPlaceVertexAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (panel)
 
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de projection des sommets topologiques :

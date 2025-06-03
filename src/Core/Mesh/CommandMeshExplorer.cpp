@@ -1,32 +1,24 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandMeshExplorer.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 7 déc. 2012
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Mesh/CommandMeshExplorer.h"
+#include "Internal/Context.h"
+#include "Internal/InfoCommand.h"
 #include "Group/GroupManager.h"
+#include "Group/Group3D.h"
 #include "Geom/Volume.h"
 #include "Topo/TopoEntity.h"
 #include "Topo/Block.h"
 #include "Topo/CoFace.h"
 #include "Topo/Edge.h"
 #include "Topo/CoEdge.h"
-#include "Topo/Vertex.h"
-#include "Group/Group3D.h"
-#include "Internal/InfoCommand.h"
 #include "Topo/TopoHelper.h"
-#include <gmds/ig/Mesh.h>
 #include "Mesh/MeshItf.h"
+#include "Mesh/CommandMeshExplorer.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/ReferencedMutex.h>
+/*----------------------------------------------------------------------------*/
+#include <gmds/ig/Mesh.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -159,7 +151,7 @@ selectCoFaceAndBlocks(std::map<Topo::CoFace*, uint>& filtre_coface,
 {
     // tous les groupes 3D
     std::vector<Group::Group3D*> grp;
-    getContext().getLocalGroupManager().getGroup3D(grp);
+    getContext().getGroupManager().getGroup3D(grp);
 
     // le nombre de blocs maillés en structuré
     uint nb_blocks_marked = 0;
@@ -453,7 +445,7 @@ createSubVolume(std::vector<BlockDirPos>& bloc_dirPos)
     std::map<std::string, Mesh::SubVolume*> corr_subVol;
 
 
-    gmds::Mesh& gmds_mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
+    gmds::Mesh& gmds_mesh = getContext().getMeshManager().getMesh()->getGMDSMesh();
 
 
     // parcours les blocs et y récupère les noms des groupes
@@ -494,7 +486,7 @@ createSubVolume(std::vector<BlockDirPos>& bloc_dirPos)
                 getContext().newGraphicalRepresentation (*sv);
 
                 // recherche le groupe 3D de base pour connaitre sa visibilité
-                Group::Group3D* gr = getContext().getLocalGroupManager().getGroup3D(*iter2, true);
+                Group::Group3D* gr = getContext().getGroupManager().getGroup3D(*iter2, true);
                 sv->getDisplayProperties().setDisplayed(gr->isVisible());
 
                 corr_subVol[name] = sv;

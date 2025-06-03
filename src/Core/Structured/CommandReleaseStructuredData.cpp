@@ -6,6 +6,7 @@
 
 #include "Structured/CommandReleaseStructuredData.h"
 #include "Utils/Common.h"
+#include "Internal/Context.h"
 
 #include <TkUtil/Exception.h>
 

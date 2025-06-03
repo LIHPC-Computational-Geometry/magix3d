@@ -1,16 +1,7 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandFuse2EdgeList.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 18/04/2019
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Topo/TopoHelper.h"
 #include "Topo/CommandFuse2EdgeList.h"
-#include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>

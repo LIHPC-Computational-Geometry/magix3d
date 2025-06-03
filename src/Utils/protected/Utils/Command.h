@@ -1,25 +1,14 @@
 /*----------------------------------------------------------------------------*/
-/** \file Command.h
- *
- *  \author Team Magix3D
- *
- *  \date 14/10/2010 and later ...
- */
-/*----------------------------------------------------------------------------*/
 #ifndef UTIL_COMMAND_H_
 #define UTIL_COMMAND_H_
-
-#include "Utils/CommandIfc.h"
-
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/LogOutputStream.h>
 #include <TkUtil/Mutex.h>
 #include <TkUtil/ReferencedObject.h>
-#include <TkUtil/Threads.h>
 #include <TkUtil/Timer.h>
-
+/*----------------------------------------------------------------------------*/
 #include <map>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 
@@ -53,9 +42,36 @@ class CommandRunner;
  * 			</P>
  */
 /*----------------------------------------------------------------------------*/
-class Command : public Utils::CommandIfc, public TkUtil::ReferencedNamedObject
+class Command : public TkUtil::ReferencedNamedObject
 {
 	public:
+
+	/*------------------------------------------------------------------------*/
+	/** \brief  Status possibles d'une commande.
+	 * <P>INITED : initialisé, en attente d'être exécutée,<BR>
+	 *    STARTING : en cours de démarrage,<BR>
+	 *    PROCESSING : en cours d'exécution,<BR>
+	 *    DONE : exécution achevée sans erreur,<BR>
+	 *    CANCELED : interrompue, dans un état stable,<BR>
+	 *    FAIL : exécution achevée, en erreur,
+	 * </P>
+	 */
+	enum status
+	{
+		INITED,
+		STARTING,
+		PROCESSING,
+		DONE,
+		CANCELED,
+		FAIL
+	};
+
+	/**
+	 * @return		Le mutex utilisé pour protéger les attributs spécifiques
+	 *				à l'instance.
+	 */
+	virtual TkUtil::Mutex* getCommandMutex ( );
+	virtual const TkUtil::Mutex* getCommandMutex ( ) const;
 
 	/**
 	 * \return	  Le nom de la commande telle qu'elle est vue de l'IHM.
@@ -82,6 +98,11 @@ class Command : public Utils::CommandIfc, public TkUtil::ReferencedNamedObject
 	 */
 	//@{
 	/**
+	 * Convertit le status en une chaîne de caractères.
+	 */
+	static TkUtil::UTF8String statusToString (Command::status);
+
+	/**
 	 * \return	le status de la commande.
 	 * \see		getProgression
 	 * \see		setStatus
@@ -91,6 +112,14 @@ class Command : public Utils::CommandIfc, public TkUtil::ReferencedNamedObject
 	 */
 	 virtual status getStatus ( ) const
 	{ return _status; }
+
+	/**
+	 * \return	le status de la commande, sous forme de chaîne de caractères.
+	 * \see		getStatus
+	 * \see		statusToString
+	 * \see		getPlayType
+	 */
+	virtual TkUtil::UTF8String getStrStatus ( ) const;
 
 	/**
 	 * \return	<I>true</I> si la commande est achevée (succès ou non), <I>false</I> dans le cas contraire.
@@ -112,6 +141,26 @@ class Command : public Utils::CommandIfc, public TkUtil::ReferencedNamedObject
 	 * \see		getProgression
 	 */
 	virtual TkUtil::UTF8String getStrProgression ( ) const;
+
+	/** Accès au message d'erreur
+	 * \see getStatus
+	 */
+	virtual const TkUtil::UTF8String& getErrorMessage ( ) const
+	{ return _errorMessage; }
+
+	/**
+	 * \return	<I>true</I> si l'utilisateur a été informé du résultat de la commande,
+	 *			<I>false</I> dans le cas contraire.
+	 * \see		setUserNotified
+	 */
+	virtual bool isUserNotified ( ) const;
+
+	/**
+	 * \return	<I>true</I> si l'utilisateur a été informé du résultat de la commande,
+	 *			<I>false</I> dans le cas contraire.
+	 * \see		setUserNotified
+	 */
+	virtual void setUserNotified (bool notified);
 	//@}
 
     /*------------------------------------------------------------------------*/
@@ -120,6 +169,18 @@ class Command : public Utils::CommandIfc, public TkUtil::ReferencedNamedObject
 	 */
 	//@{
 	/**
+	 * La manière de jouer une commande :<BR>
+	 * <OL>
+	 * <LI><B>QUEUED</B> : en file d'attente (non jouée),
+	 * <LI><B>DO</B> : première exécution de la commande,
+	 * <LI><B>UNDO</B> : annulation de la commande,
+	 * <LI><B>REDO</B> : rejeu de la commande,
+	 * </OL>
+	 * \see		getPlayType
+	 */
+	enum PLAY_TYPE { QUEUED, DO, UNDO, REDO };
+
+	/**
 	 * \return	La manière dont a été jouée la commande.
 	 * \see		setPlayType
 	 * \see		getStrPlayType
@@ -127,6 +188,15 @@ class Command : public Utils::CommandIfc, public TkUtil::ReferencedNamedObject
 	 */
 	virtual PLAY_TYPE getPlayType ( ) const
 	{ return _playType; }
+
+	/**
+	 * \return	La manière dont a été jouée la commande, sous forme de chaine de
+	 *			caractères.
+	 * \see		getPlayType
+	 * \see		playTypeToString
+	 * \see		getStatus
+	 */
+	virtual TkUtil::UTF8String getStrPlayType ( ) const;
 
 	/**
 	 * \brief	joue/défait/rejoue la commande, selon la valeur reçu en argument. Invoque préalablement setPlayType (playType).
@@ -155,15 +225,27 @@ class Command : public Utils::CommandIfc, public TkUtil::ReferencedNamedObject
      */
     virtual status execute ( );
 
-    /*------------------------------------------------------------------------*/
-    /** \brief  déjoue la commande
-     */
-    virtual status undo ( )=0;
+	/*------------------------------------------------------------------------*/
+	/** \brief  déjoue la commande
+	 * <P>Si le status est <I>DONE</I>, réaffecte le status <I>INITED</I> et
+	 * réinitialise le chronomètre. C'est à la classe spécialisée que revient
+	 * alors de faire le traitement.
+	 * Dans le cas contraire cette méthode lève une exception.
+	 * </P>
+	 * \warning	N'écrit rien dans le flux de logs.
+	 * \see		execute
+	 * \see		getTimer
+	 * \see		getPlayType
+	 */
+	virtual status undo ( )=0;
 
-    /*------------------------------------------------------------------------*/
-    /** \brief  rejoue la commande
-     */
-    virtual status redo ( )=0;
+	/*------------------------------------------------------------------------*/
+	/** \brief  rejoue la commande
+	 * Appelle <I>execute</I> par défaut.
+	 * \warning	N'écrit rien dans le flux de logs.
+	 * \see		getPlayType
+	 */
+	virtual status redo ( )=0;
 	//@}
 
 	/**
@@ -219,6 +301,21 @@ class Command : public Utils::CommandIfc, public TkUtil::ReferencedNamedObject
 	 * Appellé lorsque le thread est annulé. Doit libérer les ressources de manière thread safe.
 	 */
 	virtual void cancelledCleanup ( );
+
+	/**
+	 * Méthode potentiellement appelée par un gestionnaire multi-thread
+	 * lorsqu'une tâche de la commande est achevée. Ne fait rien par défaut.
+	 */
+	virtual void taskCompleted ( );
+
+	/**
+	 * Méthode potentiellement appelée par un gestionnaire multi-thread pour
+	 * demander l'éventuelle notification de modifications aux observateurs
+	 * de la commande.
+	 * @warning	Cette méthode doit être appelée depuis le thread principal
+	 * 			de la commande en vue d'éviter des dead-locks.
+	 */
+	virtual void notifyObserversForModifications ( );
 	//@}
 
 	/**
@@ -238,6 +335,29 @@ class Command : public Utils::CommandIfc, public TkUtil::ReferencedNamedObject
 	 * Méthodes relatives aux traitements à effectuer en fin de commande.
 	 */
 	//@{
+	/**
+	 * \return		Une chaîne de caractère représentant le type d'exécution
+	 *				reçu en argument. Pour les messages destinés à
+	 *				l'utilisateur.
+	 */
+	static TkUtil::UTF8String playTypeToString (PLAY_TYPE pt);
+
+	/**
+	 * Le temps estimé pour exécuter une commande. Peut permettre à un
+	 * gestionnaire de prendre la décision de lancer séquentiellement une
+	 * commande dont le temps d'exécution est instantané, ou de lancer dans un
+	 * thread une commande interruptible dont le temps d'exécution est élevé.
+	 * Par convention cette fonction retourne 0 pour une commande "instantanée",
+	 * et (unsigned long)-1 pour une commande interruptible à lancer dans un
+	 * thread dédié.
+	 * \param		Type d'exécution visée, sachant qu'une annulation voire un
+	 *				rejeu peuvent être quasi-instantanés, ce qui n'est pas
+	 *				forcément le cas de (la première) exécution d'une commande.
+	 * \return		Le temps estimé, en seconde, pour exécuter la commande.
+	 */
+	virtual unsigned long getEstimatedDuration (PLAY_TYPE playType = DO)
+	{ return 0; }
+
 	/**
 	 * <P>
 	 * Tâche éventuellement effectuée par la commande à un moment donné (exemple : en fin de commande, remise en service d'une partie des menus de l'IHM).
@@ -317,13 +437,6 @@ class Command : public Utils::CommandIfc, public TkUtil::ReferencedNamedObject
     /// Modificateur sur le fait de devoir tenir compte de la commande dans le script
     virtual void setScriptable(bool sc)
     {_isScriptable = sc;}
-
-    /** Accès au message d'erreur
-	 * \see getStatus
-	 */
-    virtual const TkUtil::UTF8String& getErrorMessage ( ) const
-    { return _errorMessage; }
-
 
 	protected :
 
@@ -450,6 +563,12 @@ class Command : public Utils::CommandIfc, public TkUtil::ReferencedNamedObject
 
 	/** Vrai s'il y a lieu de mettre une trace dans le script */
 	bool _isScriptable;
+
+	/** Un mutex pour protéger les attributs de la commande. */
+	mutable TkUtil::Mutex*				_commandMutex;
+
+	/** L'utilisateur a t'il déjà été informé du résultat de la commande ? */
+	mutable bool						_userNotified;
 };
 
 /*----------------------------------------------------------------------------*/

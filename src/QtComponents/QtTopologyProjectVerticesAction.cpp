@@ -4,7 +4,7 @@
  * \date        25/03/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Context.h"
 #include "Internal/Resources.h"
 
@@ -76,7 +76,7 @@ QtTopologyProjectVerticesPanel::QtTopologyProjectVerticesPanel (
 	// Les sommets à projeter :
 	_verticesPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Sommets :", "", &mainWindow,
-			SelectionManagerIfc::D0, FilterEntity::TopoVertex);
+			SelectionManager::D0, FilterEntity::TopoVertex);
 	_verticesPanel->setMultiSelectMode (true);
 	connect (_verticesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -135,7 +135,7 @@ QtTopologyProjectVerticesPanel::QtTopologyProjectVerticesPanel (
 	label->setMinimumSize (label->sizeHint ( ));
 	hlayout->addWidget (label);
 	_vertexIDTextField	= new QtEntityIDTextField (
-			this, &mainWindow, SelectionManagerIfc::D0, FilterEntity::AllPoints);
+			this, &mainWindow, SelectionManager::D0, FilterEntity::AllPoints);
 	hlayout->addWidget (_vertexIDTextField);
 	connect (_vertexIDTextField, SIGNAL (selectionModified (QString)), this,
 	         SLOT (selectedVertexCallback(QString)));
@@ -144,7 +144,7 @@ QtTopologyProjectVerticesPanel::QtTopologyProjectVerticesPanel (
 	// [EB] repère local ou non
 	_sysCoordPanel	= new QtMgx3DEntityPanel (
 				this, "", true, "Repère :", "", &mainWindow,
-				SelectionManagerIfc::D3, FilterEntity::SysCoord);
+				SelectionManager::D3, FilterEntity::SysCoord);
 	_sysCoordPanel->setMultiSelectMode (false);
 	layout->addWidget (_sysCoordPanel);
 
@@ -470,10 +470,10 @@ void QtTopologyProjectVerticesPanel::updateCoordinates (const string& name)
 	// on met les coordonnées dans le repère sélectionné si c'est le cas
 	string repName = getSysCoordName();
 	if (!repName.empty()){
-		Internal::ContextIfc* ctxifc = &getContext();
+		Internal::Context* ctxifc = &getContext();
 		Internal::Context* ctx = dynamic_cast<Internal::Context*>(ctxifc);
 		CHECK_NULL_PTR_ERROR(ctx);
-		CoordinateSystem::SysCoord* rep = ctx->getLocalSysCoordManager().getSysCoord(repName, true);
+		CoordinateSystem::SysCoord* rep = ctx->getSysCoordManager().getSysCoord(repName, true);
 		pt = rep->toLocal(pt);
 	}
 
@@ -597,7 +597,7 @@ void QtTopologyProjectVerticesAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (panel)
 
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de projection des sommets topologiques :

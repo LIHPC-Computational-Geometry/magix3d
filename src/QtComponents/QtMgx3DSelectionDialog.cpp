@@ -4,7 +4,7 @@
  * \date        12/05/2015
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "QtComponents/QtMgx3DSelectionDialog.h"
@@ -58,7 +58,7 @@ QtMgx3DSelectionDialog::QtMgx3DSelectionDialog (QtMgx3DMainWindow& mainWindow)
 	// La saisie des entités :
 	_entitiesPanel	= new QtMgx3DEntityPanel (
 				this, title, true, "Identifiants :", "", _mainWindow,
-				SelectionManagerIfc::ALL_DIMENSIONS, FilterEntity::All);
+				SelectionManager::ALL_DIMENSIONS, FilterEntity::All);
 	_entitiesPanel->setMultiSelectMode (true);
 	CHECK_NULL_PTR_ERROR (_entitiesPanel->getNameTextField ( ))
 	_entitiesPanel->getNameTextField ( )->setVisibleColumns (30);

@@ -1,11 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/*
- * ExportVTKImplementation.cpp
- *
- *  Created on: 14 avr. 2014
- *      Author: legoff
- */
-/*----------------------------------------------------------------------------*/
 #include "Geom/ExportVTKImplementation.h"
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
@@ -19,8 +12,6 @@
 #include <gmds/io/VTKWriter.h>
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
-#include <iostream>
-#include <set>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -47,7 +38,7 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 {
 
 
-	std::vector<std::string> volumesNames = m_context.getLocalGeomManager().getVolumes();
+	std::vector<std::string> volumesNames = m_context.getGeomManager().getVolumes();
 
 	if(1 != volumesNames.size()) {
 		std::cerr<<"ExportVTKImplementation::perform can only be called when there is "
@@ -56,28 +47,9 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 				"one and only one volume", TkUtil::Charset::UTF_8));
 	}
 
-	Geom::Volume* volume = m_context.getLocalGeomManager().getVolume(volumesNames[0]);
-//	std::vector<Geom::Surface*> surfaces;
-//	volume->get(surfaces);
+	Geom::Volume* volume = m_context.getGeomManager().getVolume(volumesNames[0]);
 
-//	std::vector<std::string> surfacesNames = m_context.getLocalGeomManager().getSurfaces();
-//	for(unsigned int iSurf=0; iSurf<surfaces.size(); iSurf++) {
-//		m_context.getLocalTopoManager().newUnstructuredTopoOnGeometry(surfaces[0]->getName());
-//	}
-
-	//m_context.getLocalTopoManager().newUnstructuredTopoOnGeometry(volumesNames[0]);
-//	m_context.getLocalTopoManager().newUnstructuredTopoOnGeometry(volume);
-//	m_context.getTopoManager().newUnstructuredTopoOnGeometry(volumesNames[0]);
-
-//	m_context.getLocalMeshManager().newAllFacesMesh();
-
-//	Geom::Volume* volume = m_context.getLocalGeomManager().getVolume(volumesNames[0]);
-//	std::vector<Geom::Surface*> surfaces;
-//	std::vector<Geom::Curve*> curves;
-//	volume->get(surfaces);
-//	volume->get(curves);
-
-	unsigned int nbBlocks = m_context.getLocalTopoManager().getNbBlocks();
+	unsigned int nbBlocks = m_context.getTopoManager().getNbBlocks();
 	if(1 != nbBlocks) {
 		std::cerr<<"ExportVTKImplementation::perform can only be called when there is "
 				"one and only one block"<<std::endl;
@@ -86,7 +58,7 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 	}
 
 	std::vector<Topo::Block*> topo_blocs;
-	m_context.getLocalTopoManager().getBlocks(topo_blocs);
+	m_context.getTopoManager().getBlocks(topo_blocs);
 
 	std::vector<Topo::CoFace*> topo_cofaces;
 	std::vector<Topo::CoEdge*> topo_coedges;
@@ -97,10 +69,10 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 //
 //	std::vector<Mesh::Surface*> surfaces;
 //	std::vector<Mesh::Cloud*> clouds;
-//	m_context.getLocalMeshManager().getSurfaces(surfaces);
-//	m_context.getLocalMeshManager().getClouds(clouds);
+//	m_context.getMeshManager().getSurfaces(surfaces);
+//	m_context.getMeshManager().getClouds(clouds);
 
-	gmds::Mesh& mesh = m_context.getLocalMeshManager().getMesh()->getGMDSMesh();
+	gmds::Mesh& mesh = m_context.getMeshManager().getMesh()->getGMDSMesh();
 	{
 		// surfaces
 		for(unsigned int iCoFace=0; iCoFace<topo_cofaces.size(); iCoFace++) {
@@ -151,55 +123,6 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 		}
 	}
 
-//	//post process
-//    {
-//        gmds::Mesh::cloud& cl1 = mesh.getCloud("Crb0006");
-//        gmds::Mesh::cloud& cl2 = mesh.getCloud("Crb0007");
-//        gmds::Mesh::cloud& cl  = mesh.newCloud("composite6-7");
-//
-//        std::vector<gmds::TCellID> cl1_nodes = cl1.cellIDs();
-//        std::vector<gmds::TCellID> cl2_nodes = cl2.cellIDs();
-//        std::set<gmds::TCellID> cl_ids;
-//
-//        for(unsigned int i=0; i<cl1_nodes.size();i++) {
-//            cl_ids.insert(cl1_nodes[i]);
-//        }
-//        for(unsigned int i=0; i<cl2_nodes.size();i++) {
-//            cl_ids.insert(cl2_nodes[i]);
-//        }
-//
-//        std::set<gmds::TCellID>::iterator it_set;
-//        for(it_set=cl_ids.begin();it_set!=cl_ids.end();it_set++)
-//        {
-//            gmds::TCellID node_id = *it_set;
-//            cl.add(mesh.get<gmds::Node>(node_id));
-//        }
-//
-//    }
-//    {
-//        gmds::Mesh::cloud& cl1 = mesh.getCloud("Crb0009");
-//        gmds::Mesh::cloud& cl2 = mesh.getCloud("Crb0010");
-//        gmds::Mesh::cloud& cl  = mesh.newCloud("composite9-10");
-//
-//        std::vector<gmds::TCellID> cl1_nodes = cl1.cellIDs();
-//        std::vector<gmds::TCellID> cl2_nodes = cl2.cellIDs();
-//        std::set<gmds::TCellID> cl_ids;
-//
-//        for(unsigned int i=0; i<cl1_nodes.size();i++) {
-//            cl_ids.insert(cl1_nodes[i]);
-//        }
-//        for(unsigned int i=0; i<cl2_nodes.size();i++) {
-//            cl_ids.insert(cl2_nodes[i]);
-//        }
-//
-//        std::set<gmds::TCellID>::iterator it_set;
-//        for(it_set=cl_ids.begin();it_set!=cl_ids.end();it_set++)
-//        {
-//            gmds::TCellID node_id = *it_set;
-//            cl.add(mesh.get<gmds::Node>(node_id));
-//        }
-//
-//    }
 	gmds::IGMeshIOService ioService(&mesh);
 	gmds::VTKWriter writer(&ioService);
 	writer.setCellOptions(gmds::N|gmds::F);

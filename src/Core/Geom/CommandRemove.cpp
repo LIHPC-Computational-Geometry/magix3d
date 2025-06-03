@@ -1,19 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/*
- * CommandRemove.cpp
- *
- *  Created on: 10 janv. 2014
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
-/*----------------------------------------------------------------------------*/
 #include "Geom/CommandRemove.h"
-#include "Geom/GeomManager.h"
 #include "Geom/EntityFactory.h"
+#include "Geom/GeomRemoveImplementation.h"
 /*----------------------------------------------------------------------------*/
-#include <TkUtil/Exception.h>
 #include <TkUtil/ReferencedMutex.h>
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/UTF8String.h>

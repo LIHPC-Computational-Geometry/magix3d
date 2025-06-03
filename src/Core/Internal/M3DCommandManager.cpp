@@ -7,18 +7,15 @@
  *  \date 20 déc. 2010
  */
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/M3DCommandManager.h"
 #include "Internal/M3DCommandResult.h"
 #include "Internal/CommandNewLongCommand.h"
 #include "Internal/OpenCascadeLongCommand.h"
-
 #include "Utils/CommandManager.h"
-
-#include <TkUtil/Exception.h>
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -29,13 +26,13 @@ M3DCommandManager::M3DCommandManager(const std::string& name, Internal::Context*
 {
 }
 /*----------------------------------------------------------------------------*/
-M3DCommandResultIfc* M3DCommandManager::newLongCommand()
+M3DCommandResult* M3DCommandManager::newLongCommand()
 {
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     message << "M3DCommandManager::newLongCommand ()";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_1));
 
-    CommandNewLongCommand *command = new CommandNewLongCommand(getLocalContext(), "Création d'une longue commande");
+    CommandNewLongCommand *command = new CommandNewLongCommand(getContext(), "Création d'une longue commande");
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -44,21 +41,21 @@ M3DCommandResultIfc* M3DCommandManager::newLongCommand()
 
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-	M3DCommandResultIfc*	cmdResult	= new M3DCommandResult (*command);
+	M3DCommandResult* cmdResult	= new M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-M3DCommandResultIfc* M3DCommandManager::newOpenCascadeLongCommand()
+M3DCommandResult* M3DCommandManager::newOpenCascadeLongCommand()
 {
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     message << "M3DCommandManager::openCascadeLongCommand ()";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_1));
 
-    OpenCascadeLongCommand *command = new OpenCascadeLongCommand(getLocalContext(), "Création d'une longue commande Open Cascade");
+    OpenCascadeLongCommand *command = new OpenCascadeLongCommand(getContext(), "Création d'une longue commande Open Cascade");
 
     getCommandManager ( ).addCommand(command, Utils::Command::DO);
 
-	M3DCommandResultIfc*	cmdResult	= new M3DCommandResult (*command);
+	M3DCommandResult* cmdResult	= new M3DCommandResult (*command);
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/

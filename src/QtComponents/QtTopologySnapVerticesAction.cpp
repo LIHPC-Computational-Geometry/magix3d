@@ -4,7 +4,7 @@
  * \date        31/03/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
@@ -61,7 +61,7 @@ QtTopologySnapVerticesPanel::QtTopologySnapVerticesPanel (
 	// Les sommets à projeter :
 	_verticesPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Sommets :", "", &mainWindow,
-			SelectionManagerIfc::D0, FilterEntity::TopoVertex);
+			SelectionManager::D0, FilterEntity::TopoVertex);
 	_verticesPanel->setMultiSelectMode (true);
 	connect (_verticesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -264,7 +264,7 @@ void QtTopologySnapVerticesAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (panel)
 
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de projection des sommets topologiques :

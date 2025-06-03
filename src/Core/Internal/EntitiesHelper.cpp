@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/EntitiesHelper.h"
 #include "Internal/M3DCommandResult.h"
 #include "Internal/CommandInternal.h"
@@ -17,7 +17,6 @@
 /*----------------------------------------------------------------------------*/
 #include "Topo/Block.h"
 #include "Topo/CoFace.h"
-#include "Topo/Face.h"
 #include "Topo/CoEdge.h"
 #include "Topo/Vertex.h"
 /*----------------------------------------------------------------------------*/
@@ -253,7 +252,7 @@ std::vector<TkUtil::UTF8String> EntitiesHelper::replaceNameByCommandRef(std::vec
 
 	for (uint i=0; i<commands.size(); i++){
 		Utils::Command* command = commands[i];
-		if (command->isCompleted() && command->getStatus() != Utils::CommandIfc::FAIL){
+		if (command->isCompleted() && command->getStatus() != Utils::Command::FAIL){
 			Internal::CommandInternal* cmdi = dynamic_cast<Internal::CommandInternal*>(command);
 			results.push_back(new Internal::M3DCommandResult(*cmdi));
 			TkUtil::UTF8String newCmd;

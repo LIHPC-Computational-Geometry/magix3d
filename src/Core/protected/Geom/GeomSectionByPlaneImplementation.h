@@ -1,17 +1,9 @@
-/*----------------------------------------------------------------------------*/
-/*
- * GeomSectionByPlaneImplementation.h
- *
- *  Created on: 24 juin 2013
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #ifndef GEOMSECTIONIMPLEMENTATION_H_
 #define GEOMSECTIONIMPLEMENTATION_H_
 /*----------------------------------------------------------------------------*/
-#include "Utils/Plane.h"
 #include "Geom/GeomEntity.h"
 #include "Geom/GeomModificationBaseClass.h"
+#include "Utils/Plane.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>

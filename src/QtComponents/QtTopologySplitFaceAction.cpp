@@ -4,7 +4,7 @@
  * \date        17/03/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -70,7 +70,7 @@ QtTopologySplitFacePanel::QtTopologySplitFacePanel (
 	// La face à découper :
 	_facePanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Face  :", "", &mainWindow,
-			SelectionManagerIfc::D2, FilterEntity::TopoCoFace);
+			SelectionManager::D2, FilterEntity::TopoCoFace);
 	_facePanel->setToolTip (QString::fromUtf8("Face soumise au découpage."));
 	connect (_facePanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -81,7 +81,7 @@ QtTopologySplitFacePanel::QtTopologySplitFacePanel (
 	// L'arête orthogonale au plan de coupe :
 	_edgePanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Arête :", "", &mainWindow,
-			SelectionManagerIfc::D1, FilterEntity::TopoCoEdge);
+			SelectionManager::D1, FilterEntity::TopoCoEdge);
 	_edgePanel->setToolTip (QString::fromUtf8("Arête orthogonale au plan de coupe."));
 	connect (_edgePanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -119,7 +119,7 @@ QtTopologySplitFacePanel::QtTopologySplitFacePanel (
 							FilterEntity::AllGeom | FilterEntity::TopoVertex);
 	_cutPointEntityPanel	=
 		new QtMgx3DEntityPanel (this, "", true, "", "", &mainWindow,
-								SelectionManagerIfc::ALL_DIMENSIONS, filter);
+								SelectionManager::ALL_DIMENSIONS, filter);
 	_cutPointEntityPanel->setToolTip (QString::fromUtf8("Entité géométrique dont le centre sert de position de découpe, ou sommet topologique."));
 	gridLayout->addWidget (_cutPointEntityPanel, row, col++, 1, 2);
 	connect (_cutPointEntityPanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -527,7 +527,7 @@ void QtTopologySplitFaceAction::executeOperation ( )
 	const string	edgeName		= panel->getEdgeName ( );
 	const bool	 	projectVertices	= panel->projectCreatedVertices ( );
 
-	Mgx3D::Internal::M3DCommandResultIfc*	result	= 0;
+	Mgx3D::Internal::M3DCommandResult*	result	= 0;
 	switch (panel->getCutDefinitionMethod ( ))
 	{
 		case QtTopologySplitFacePanel::CDM_RATIO	:
@@ -549,9 +549,9 @@ void QtTopologySplitFaceAction::executeOperation ( )
 	}	// switch (panel->getCutDefinitionMethod ( ))
 	CHECK_NULL_PTR_ERROR (result)
 	setCommandResult (result);
-	if (CommandIfc::FAIL == result->getStatus ( ))
+	if (Command::FAIL == result->getStatus ( ))
 		throw Exception (result->getErrorMessage ( ));
-	else if (CommandIfc::CANCELED == result->getStatus ( ))
+	else if (Command::CANCELED == result->getStatus ( ))
 		throw Exception ("Opération annulée");
 }	// QtTopologySplitFaceAction::executeOperation
 

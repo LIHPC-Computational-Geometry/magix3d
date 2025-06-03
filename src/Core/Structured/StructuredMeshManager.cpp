@@ -7,7 +7,8 @@
 #include "Structured/StructuredMeshManager.h"
 #include "Structured/CommandReleaseStructuredData.h"
 #include "Utils/Common.h"
-#include "Utils/CommandManagerIfc.h"
+#include "Utils/CommandManager.h"
+#include "Internal/Context.h"
 #include "Internal/M3DCommandResult.h"
 
 #include <TkUtil/Exception.h>
@@ -27,14 +28,15 @@ namespace Structured
 {
 
 
-StructuredMeshManager::StructuredMeshManager (const string& name, Mgx3D::Internal::ContextIfc* c)
-	: StructuredMeshManagerIfc (name, c), _meshes ( )
+StructuredMeshManager::StructuredMeshManager (const string& name, Mgx3D::Internal::Context* c)
+: CommandCreator (name, c)
+, _meshes ( )
 {
-}	// StructuredMeshManagerIfc::StructuredMeshManager
+}	// StructuredMeshManager::StructuredMeshManager
 
 
 StructuredMeshManager::StructuredMeshManager (const StructuredMeshManager& mm)
-	: StructuredMeshManagerIfc ("Invalid StructuredMeshManager", 0), _meshes ( )
+	: CommandCreator (mm), _meshes ( )
 {
 	MGX_FORBIDDEN ("StructuredMeshManager copy constructor is not allowed.")
 }	// StructuredMeshManager::StructuredMeshManager
@@ -61,7 +63,7 @@ StructuredMeshManager::~StructuredMeshManager ( )
 }	// StructuredMeshManager::~StructuredMeshManager
 
 
-M3DCommandResultIfc* StructuredMeshManager::releaseMesh ( )
+M3DCommandResult* StructuredMeshManager::releaseMesh ( )
 {
 	UTF8String message (Charset::UTF_8);
 	message << "StructuredMeshManager::releaseMesh ( )";
@@ -72,7 +74,7 @@ M3DCommandResultIfc* StructuredMeshManager::releaseMesh ( )
 	script << getContextAlias ( ) << "." << "getStructuredMeshManager ( ).releaseMesh ( )";
 	cmd->setScriptCommand (script);
 	getCommandManager ( ).addCommand (cmd, Utils::Command::DO);
-	M3DCommandResultIfc*	result	= new M3DCommandResult (*cmd);
+	M3DCommandResult*	result	= new M3DCommandResult (*cmd);
 
 	return result;
 }	// StructuredMeshManager::releaseMesh

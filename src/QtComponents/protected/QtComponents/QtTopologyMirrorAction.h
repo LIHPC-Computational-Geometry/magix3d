@@ -14,7 +14,7 @@
 #include "QtComponents/RenderingManager.h"
 
 #include "Utils/Vector.h"
-#include "Utils/SelectionManagerIfc.h"
+#include "Utils/SelectionManager.h"
 
 #include <QCheckBox>
 
@@ -62,7 +62,7 @@ class QtTopologyMirrorPanel :
 	/**
 	 * \param		Nouvelle dimension de saisie des entités topologiques.
 	 */
-	virtual void setDimension (Mgx3D::Utils::SelectionManagerIfc::DIM dim);
+	virtual void setDimension (Mgx3D::Utils::SelectionManager::DIM dim);
 
 
 	/**

@@ -1,22 +1,10 @@
 /*----------------------------------------------------------------------------*/
-/*
- * CommandNewCircle.cpp
- *
- *  Created on: 28 oct. 2013
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Geom/CommandNewCircle.h"
-#include "Geom/PropertyBox.h"
 #include "Geom/EntityFactory.h"
-#include "Geom/GeomManager.h"
-#include "Utils/MgxException.h"
-
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

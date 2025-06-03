@@ -1,15 +1,9 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandGlue2Blocks.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 2/3/2014
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandGlue2Blocks.h"
-
 #include "Utils/Common.h"
+#include "Topo/Block.h"
+#include "Topo/Face.h"
+#include "Topo/CoFace.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>

@@ -18,11 +18,11 @@ namespace QtComponents
 
 }	// namespace Mgx3D
 
-#include "Internal/ContextIfc.h"
-#include "Geom/GeomManagerIfc.h"
-#include "Topo/TopoManagerIfc.h"
-#include "Mesh/MeshManagerIfc.h"
-#include "Utils/CommandManagerIfc.h"
+#include "Internal/Context.h"
+#include "Geom/GeomManager.h"
+#include "Topo/TopoManager.h"
+#include "Mesh/MeshManager.h"
+#include "Utils/CommandManager.h"
 #include "Internal/M3DCommandManager.h"
 #include "Utils/UndoRedoManager.h"
 #include "QtComponents/EntitySeizureManager.h"
@@ -128,7 +128,7 @@ class QtMgx3DMainWindow :
 	 * \param	Eventuel widget"arbre" contenant les entités de la session.
 	 * \see		createGui
 	 */
-	virtual void init (const std::string& name, Mgx3D::Internal::ContextIfc* context,
+	virtual void init (const std::string& name, Mgx3D::Internal::Context* context,
 				QtComponents::QtGroupsPanel* groupsPanel = 0, QtComponents::QtEntitiesPanel* entitiesPanel = 0);
 
 	/**
@@ -456,7 +456,7 @@ class QtMgx3DMainWindow :
 		QMenu			*_mgx3DScriptsMenu;
 		size_t			_recentFilesCapacity;
 		QAction			**_mgx3DScriptsActions;
-		Utils::UndoRedoManagerIfc*  _undoManager;
+		Utils::UndoRedoManager*  _undoManager;
 	};	// struct WindowsActions
 
 	/**
@@ -554,13 +554,13 @@ class QtMgx3DMainWindow :
 	 *			qui se chargera de ce fait de sa destruction.
 	 * \see			registerToManagers
 	 */
-	virtual void setContext (Mgx3D::Internal::ContextIfc* context);
+	virtual void setContext (Mgx3D::Internal::Context* context);
 
 	/**
 	 * \return		Le contexte de la session de travail.
 	 */
-	virtual Mgx3D::Internal::ContextIfc& getContext ( );
-	virtual const Mgx3D::Internal::ContextIfc& getContext ( ) const;
+	virtual Mgx3D::Internal::Context& getContext ( );
+	virtual const Mgx3D::Internal::Context& getContext ( ) const;
 
 	/**
 	 * \return		La console python.
@@ -580,7 +580,7 @@ class QtMgx3DMainWindow :
 	/**
 	 * \return		Le gestionnaire de commandes.
 	 */
-	virtual Mgx3D::Utils::CommandManagerIfc& getCommandManager ( );
+	virtual Mgx3D::Utils::CommandManager& getCommandManager ( );
 
 	/**
 	 * Affiche une fenêtre informant du changement de version
@@ -647,22 +647,22 @@ class QtMgx3DMainWindow :
 	/**
 	 * \return		Le gestionnaire de modélisation.
 	 */
-	virtual Mgx3D::Geom::GeomManagerIfc& getGeomManager ( );
+	virtual Mgx3D::Geom::GeomManager& getGeomManager ( );
 
     /**
      * \return      Le gestionnaire de topologie.
      */
-    virtual Mgx3D::Topo::TopoManagerIfc& getTopoManager ( );
+    virtual Mgx3D::Topo::TopoManager& getTopoManager ( );
 
     /**
      * \return      Le gestionnaire de maillage.
      */
-    virtual Mgx3D::Mesh::MeshManagerIfc& getMeshManager ( );
+    virtual Mgx3D::Mesh::MeshManager& getMeshManager ( );
 
     /**
      * \return      Le gestionnaire de groupe d'entités.
      */
-    virtual Mgx3D::Group::GroupManagerIfc& getGroupManager ( );
+    virtual Mgx3D::Group::GroupManager& getGroupManager ( );
 
     /**
      * \return      Le gestionnaire de commandes composites.
@@ -672,7 +672,7 @@ class QtMgx3DMainWindow :
 	/**
 	 * \return		Le gestionnaire de <I>undo/redo</I>.
 	 */
-	virtual Mgx3D::Utils::UndoRedoManagerIfc& getUndoManager ( );
+	virtual Mgx3D::Utils::UndoRedoManager& getUndoManager ( );
 
 	//@}	// La session de travail.
 
@@ -1526,7 +1526,7 @@ class QtMgx3DMainWindow :
 	bool							_maxSizeSet;
 
 	/** Le contexte de la session de travail. */
-	Mgx3D::Internal::ContextIfc*				_context;
+	Mgx3D::Internal::Context*				_context;
 
 	/** Le panneau de gestion des groupes d'entités. */
 	QtGroupsPanel*						_groupsPanel;
@@ -1604,7 +1604,7 @@ class QtMgx3DMainWindow :
 	 */
 	std::string											_pythonMinScript;
 	TkUtil::Charset::CHARSET							_pytMinScriptCharset;
-	Internal::ContextIfc::encodageScripts				_encodageScripts;
+	Internal::Context::encodageScripts				_encodageScripts;
 
 	/** La liste des scripts <I>Magix 3D</I> récemments exécutés. */
 	static TkUtil::UrlFifo								_recentScriptsURLFifo;
@@ -1668,7 +1668,7 @@ class QtMgx3DStateView : public QWidget
 	 * \param		Etat de la commande concernée
 	 * \param		setLabel
 	 */
-	virtual void setState (const std::string& cmdName, Mgx3D::Utils::CommandIfc::status state);
+	virtual void setState (const std::string& cmdName, Mgx3D::Utils::Command::status state);
 
 	/**
  	 * \param		label où afficher des informations temporaires sur l'état de
@@ -1707,7 +1707,7 @@ class QtMgx3DStateView : public QWidget
 	QtMgx3DStateView& operator = (const QtMgx3DStateView&);
 
 	/** L'état courrant. */
-	Mgx3D::Utils::CommandIfc::status	_state;
+	Mgx3D::Utils::Command::status	_state;
 
 	/** Un chronomètre pour le l'affichage intermittent. */
 	QTimer*								_timer;

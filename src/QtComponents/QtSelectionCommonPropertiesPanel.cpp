@@ -4,7 +4,7 @@
  * \date        07/10/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 
 #include "Utils/Common.h"
@@ -231,7 +231,7 @@ vector<QTreeWidgetItem*>
 // ===========================================================================
 
 QtSelectionCommonPropertiesPanel::QtSelectionCommonPropertiesPanel (
-			QWidget* parent, const string& name, SelectionManagerIfc* manager)
+			QWidget* parent, const string& name, SelectionManager* manager)
 	: QtGroupBox (name.c_str ( ), parent), SelectionManagerObserver (manager),
 	  _boundingBoxWidget (0), _entitiesWidget (0),
 	  _displayProperties (true), _displayComputedProperties (true)
@@ -369,7 +369,7 @@ void QtSelectionCommonPropertiesPanel::displayComputedProperties (bool display)
 
 
 void QtSelectionCommonPropertiesPanel::setSelectionManager (
-										SelectionManagerIfc* selectionManager)
+										SelectionManager* selectionManager)
 {
 	if (selectionManager == getSelectionManager ( ))
 		return;

@@ -1,17 +1,10 @@
-/*----------------------------------------------------------------------------*/
 #ifdef USE_MDLPARSER
-/** \file CommandExportMDL.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 28/6/2013
- */
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
+#include "Internal/ExportMDLImplementation.h"
 #include "Utils/Common.h"
 #include "Geom/CommandExportMDL.h"
 #include "Geom/GeomManager.h"
-#include "Internal/ExportMDLImplementation.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/

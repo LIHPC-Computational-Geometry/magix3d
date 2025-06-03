@@ -1,13 +1,5 @@
-/*
- * CommandNewSurfaceByOffset.h
- *
- *  Created on: 19/09/2019
- *      Author: Eric B
- */
-
 #ifndef COMMAND_NEW_SURFACE_BY_OFFSET_H_
 #define COMMAND_NEW_SURFACE_BY_OFFSET_H_
-
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandCreateGeom.h"
 #include "Internal/Context.h"

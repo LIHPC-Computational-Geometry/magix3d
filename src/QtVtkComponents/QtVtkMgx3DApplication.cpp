@@ -4,7 +4,7 @@
  * \date        24/11/2011
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 
 #include "QtVtkComponents/QtVtkMgx3DApplication.h"

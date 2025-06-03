@@ -1,11 +1,9 @@
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandNewVertexByProjection.h"
-#include "Geom/GeomProperty.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomManager.h"
 #include "Geom/GeomProjectImplementation.h"
-/*----------------------------------------------------------------------------*/
-#include "Utils/MgxException.h"
+#include "Geom/Surface.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>

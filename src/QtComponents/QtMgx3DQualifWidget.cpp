@@ -4,7 +4,7 @@
  * \date		02/08/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtMgx3DQualifWidget.h"
 

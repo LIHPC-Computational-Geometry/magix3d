@@ -4,7 +4,7 @@
  * \date        16/12/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
@@ -62,7 +62,7 @@ QtBetween2PntsPanel::QtBetween2PntsPanel(QWidget *parent, QtComponents::QtMgx3DM
     label = new QLabel("Point 1 :", this);
     hlayout->addWidget(label, 0, 0);
     _point1TextField = new QtEntityIDTextField(
-            this, &window, SelectionManagerIfc::D0, pointTypes);
+            this, &window, SelectionManager::D0, pointTypes);
     connect(_point1TextField, SIGNAL (entitiesAddedToSelection(QString)),
             this, SLOT (entitiesAddedToSelectionCallback(QString)));
     connect(_point1TextField, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -74,7 +74,7 @@ QtBetween2PntsPanel::QtBetween2PntsPanel(QWidget *parent, QtComponents::QtMgx3DM
     label = new QLabel("Point 2 :", this);
     hlayout->addWidget(label, 1, 0);
     _point2TextField = new QtEntityIDTextField(
-            this, &window, SelectionManagerIfc::D0, pointTypes);
+            this, &window, SelectionManager::D0, pointTypes);
     connect(_point2TextField, SIGNAL (entitiesAddedToSelection(QString)),
             this, SLOT (entitiesAddedToSelectionCallback(QString)));
     connect(_point2TextField, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -86,7 +86,7 @@ QtBetween2PntsPanel::QtBetween2PntsPanel(QWidget *parent, QtComponents::QtMgx3DM
     // Les sommets à projeter :
     _verticesPanel = new QtMgx3DEntityPanel(
             this, "", true, "Sommets :", "", &window,
-            SelectionManagerIfc::D0, FilterEntity::TopoVertex);
+            SelectionManager::D0, FilterEntity::TopoVertex);
     _verticesPanel->setMultiSelectMode(true);
     connect(_verticesPanel, SIGNAL (entitiesAddedToSelection(QString)),
             this, SLOT (entitiesAddedToSelectionCallback(QString)));
@@ -331,7 +331,7 @@ void QtBetween2PntsPanel::autoUpdate ( )
             label = new QLabel("Point 1 :", this);
             hlayout->addWidget(label, 0, 0);
             _point1TextField = new QtEntityIDTextField(
-                    this, &window, SelectionManagerIfc::D0, pointTypes);
+                    this, &window, SelectionManager::D0, pointTypes);
             connect(_point1TextField, SIGNAL (entitiesAddedToSelection(QString)),
                     this, SLOT (entitiesAddedToSelectionCallback(QString)));
             connect(_point1TextField, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -343,7 +343,7 @@ void QtBetween2PntsPanel::autoUpdate ( )
             label = new QLabel("Point 2 :", this);
             hlayout->addWidget(label, 1, 0);
             _point2TextField = new QtEntityIDTextField(
-                    this, &window, SelectionManagerIfc::D0, pointTypes);
+                    this, &window, SelectionManager::D0, pointTypes);
             connect(_point2TextField, SIGNAL (entitiesAddedToSelection(QString)),
                     this, SLOT (entitiesAddedToSelectionCallback(QString)));
             connect(_point2TextField, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -357,7 +357,7 @@ void QtBetween2PntsPanel::autoUpdate ( )
             string entityNameType = "Surface :";
             _geomEntityPanel = new QtMgx3DEntityPanel(
                     this, "", true, entityNameType, "",
-                    &window, SelectionManagerIfc::D2, surfaceTypes);
+                    &window, SelectionManager::D2, surfaceTypes);
             connect(_geomEntityPanel, SIGNAL (entitiesAddedToSelection(QString)),
                     this, SLOT (entitiesAddedToSelectionCallback(QString)));
             connect(_geomEntityPanel, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -369,7 +369,7 @@ void QtBetween2PntsPanel::autoUpdate ( )
             // Les sommets à projeter :
             _verticesPanel = new QtMgx3DEntityPanel(
                     this, "", true, "Sommet :", "", &window,
-                    SelectionManagerIfc::D0, FilterEntity::TopoVertex);
+                    SelectionManager::D0, FilterEntity::TopoVertex);
             _verticesPanel->setMultiSelectMode(false);
             connect(_verticesPanel, SIGNAL (entitiesAddedToSelection(QString)),
                     this, SLOT (entitiesAddedToSelectionCallback(QString)));
@@ -929,7 +929,7 @@ QtTopologyVerticesAlignmentPanel*
 
 void QtTopologyVerticesAlignmentAction::executeOperation ( )
 {
-    Mgx3D::Internal::M3DCommandResultIfc*	cmdResult	= 0;
+    Mgx3D::Internal::M3DCommandResult*	cmdResult	= 0;
 
 	QtTopologyVerticesAlignmentPanel*	panel	= dynamic_cast<QtTopologyVerticesAlignmentPanel*>(getTopologyVerticesAlignmentPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)
@@ -961,9 +961,9 @@ void QtTopologyVerticesAlignmentAction::executeOperation ( )
 
 	CHECK_NULL_PTR_ERROR (cmdResult)
 	setCommandResult (cmdResult);
-	if (CommandIfc::FAIL == cmdResult->getStatus ( ))
+	if (Command::FAIL == cmdResult->getStatus ( ))
 		throw Exception (cmdResult->getErrorMessage ( ));
-	else if (CommandIfc::CANCELED == cmdResult->getStatus ( ))
+	else if (Command::CANCELED == cmdResult->getStatus ( ))
 		throw Exception ("Opération annulée");
 }	// QtTopologyVerticesAlignmentAction::executeOperation
 

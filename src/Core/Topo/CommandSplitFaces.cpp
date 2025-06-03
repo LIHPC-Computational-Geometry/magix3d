@@ -4,9 +4,6 @@
 #include "Topo/CoFace.h"
 #include "Topo/Edge.h"
 #include "Topo/CoEdge.h"
-
-#include "Utils/Common.h"
-
 #include "Geom/Curve.h"
 #include "Geom/GeomProjectImplementation.h"
 /*----------------------------------------------------------------------------*/
@@ -46,7 +43,7 @@ CommandSplitFaces(Internal::Context& c, std::vector<Topo::CoFace* > &cofaces, Co
 }
 /*----------------------------------------------------------------------------*/
 CommandSplitFaces::
-CommandSplitFaces(Internal::Context& c, std::vector<Topo::CoFace* > &cofaces, CoEdge* arete, const Point& pt, double ratio_ogrid)
+CommandSplitFaces(Internal::Context& c, std::vector<Topo::CoFace* > &cofaces, CoEdge* arete, const Utils::Math::Point& pt, double ratio_ogrid)
 :CommandEditTopo(c, "Découpage des faces 2D structurées")
 , m_arete(arete)
 , m_ratio_dec(0)
@@ -85,7 +82,7 @@ CommandSplitFaces(Internal::Context& c, CoEdge* arete, double ratio_dec, double 
 	std::cout<<"CommandSplitFaces::CommandSplitFaces("<<arete->getName()<<", "<<ratio_dec<<", "<<ratio_ogrid<<")"<<std::endl;
 #endif
     std::vector<Topo::CoFace* > cofaces;
-    getContext().getLocalTopoManager().getCoFaces(cofaces);
+    getContext().getTopoManager().getCoFaces(cofaces);
     init2D(cofaces);
 }
 /*----------------------------------------------------------------------------*/
@@ -102,7 +99,7 @@ CommandSplitFaces(Internal::Context& c, CoEdge* arete, const Point& pt, double r
 	std::cout<<"CommandSplitFaces::CommandSplitFaces("<<arete->getName()<<", "<<m_ratio_dec<<", "<<ratio_ogrid<<")"<<std::endl;
 #endif
     std::vector<Topo::CoFace* > cofaces;
-    getContext().getLocalTopoManager().getCoFaces(cofaces);
+    getContext().getTopoManager().getCoFaces(cofaces);
     init2D(cofaces);
 }
 /*----------------------------------------------------------------------------*/

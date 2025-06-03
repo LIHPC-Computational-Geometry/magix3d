@@ -4,7 +4,7 @@
  * \date		31/01/2017
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtGroupsSelectorDialog.h"
 #include "QtComponents/QtMgx3DApplication.h"
@@ -54,8 +54,8 @@ QtGroupsSelectorDialog::QtGroupsSelectorDialog (
 	// Le panneau :
 	QHBoxLayout*	hlayout	= new QHBoxLayout ( );
 	layout->addLayout (hlayout);
-	const SelectionManagerIfc::DIM	dims	=
-										SelectionManagerIfc::ALL_DIMENSIONS;
+	const SelectionManager::DIM	dims	=
+										SelectionManager::ALL_DIMENSIONS;
 	_dimensionsPanel	= new QtDimensionsSelectorPanel(this, dims, dims, true);
 	hlayout->addWidget (_dimensionsPanel);
 	QVBoxLayout*	vlayout	= new QVBoxLayout ( );
@@ -133,7 +133,7 @@ QtGroupsSelectorDialog::~QtGroupsSelectorDialog ( )
 }	// QtGroupsSelectorDialog::~QtGroupsSelectorDialog
 
 
-SelectionManagerIfc::DIM QtGroupsSelectorDialog::dimensions ( ) const
+SelectionManager::DIM QtGroupsSelectorDialog::dimensions ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_dimensionsPanel)
 	return _dimensionsPanel->getDimensions ( );
@@ -214,12 +214,12 @@ void QtGroupsSelectorDialog::removeLevelCallback ( )
 
 void QtGroupsSelectorDialog::accept ( )
 {
-	if (SelectionManagerIfc::NO_DIM == dimensions ( ))
+	if (SelectionManager::NO_DIM == dimensions ( ))
 	{
 		QtMessageBox::displayErrorMessage (this, windowTitle( ).toStdString( ),
 											"Absence de dimension retenue.");
 		return;
-	}	// if (SelectionManagerIfc::NO_DIM == dimensions ( ))
+	}	// if (SelectionManager::NO_DIM == dimensions ( ))
 	if (0 == _levels.size ( ))
 	{
 		QtMessageBox::displayErrorMessage (this, windowTitle( ).toStdString( ),

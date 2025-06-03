@@ -1,18 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandWriteVTK.cpp
- *
- *  \author legoff
- *
- *  \date 10 jun. 2015
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Mesh/CommandWriteVTK.h"
 #include "Mesh/MeshItf.h"
 #include "Mesh/MeshManager.h"
-#include "Internal/Context.h"
-#include "Internal/InfoCommand.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -26,7 +16,7 @@ CommandWriteVTK::CommandWriteVTK(Internal::Context& c, std::string& nom)
 /*----------------------------------------------------------------------------*/
 void CommandWriteVTK::internalExecute()
 {
-	getContext().getLocalMeshManager().getMesh()->writeVTK(m_file_name);
+	getContext().getMeshManager().getMesh()->writeVTK(m_file_name);
 }
 /*----------------------------------------------------------------------------*/
 void CommandWriteVTK::internalUndo()

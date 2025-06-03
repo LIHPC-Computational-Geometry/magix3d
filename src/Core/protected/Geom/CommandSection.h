@@ -1,16 +1,7 @@
-/*----------------------------------------------------------------------------*/
-/*
- * CommandSection.h
- *
- *  Created on: 22 janv. 2013
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDSECTION_H_
 #define COMMANDSECTION_H_
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandEditGeom.h"
-#include "Utils/Vector.h"
 #include "Geom/GeomEntity.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/

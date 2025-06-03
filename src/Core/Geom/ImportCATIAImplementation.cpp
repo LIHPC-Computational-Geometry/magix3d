@@ -1,38 +1,10 @@
 /*----------------------------------------------------------------------------*/
-/*
- * ImportCATIAImplementation.cpp
- *
- *  Created on: 15 févr. 2012
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
-#include <list>
-#include <map>
-#include <set>
-#include <algorithm>
-/*----------------------------------------------------------------------------*/
 #include "Geom/ImportCATIAImplementation.h"
-#include "Geom/Vertex.h"
-#include "Geom/Curve.h"
-#include "Geom/Surface.h"
-#include "Geom/Volume.h"
 #include "Geom/EntityFactory.h"
-
-#include "Group/GroupManager.h"
-#include "Group/Group3D.h"
-#include "Group/Group2D.h"
-#include "Group/Group1D.h"
 #include "Group/Group0D.h"
-
-#include "Internal/InfoCommand.h"
-
-#include <TkUtil/TraceLog.h>
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/Exception.h>
-/*----------------------------------------------------------------------------*/
-#include <mgx_config.h>
 /*----------------------------------------------------------------------------*/
 #ifdef USE_DKOC
 // fichiers d'en-tête de DataKit pour le lecteur Catia

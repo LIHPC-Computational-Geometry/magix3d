@@ -7,7 +7,7 @@
 #define QT_GROUPS_PANEL_H
 
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Group/GroupEntity.h"
 #include "QtComponents/QtEntitiesItemViewPanel.h"
@@ -309,7 +309,7 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionMan
 	 * \see		createGui
 	 * \see		createPopupMenus
 	 */
-	QtGroupsPanel (QWidget* parent, QtMgx3DMainWindow* mainWindow, const std::string& name, Internal::ContextIfc& context);
+	QtGroupsPanel (QWidget* parent, QtMgx3DMainWindow* mainWindow, const std::string& name, Internal::Context& context);
 
 	/**
 	 * RAS.

@@ -1,16 +1,7 @@
-/*----------------------------------------------------------------------------*/
-/*
- * CommandExportSTEP.h
- *
- *  Created on: 14 févr. 2014
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDEXPORTSTEP_H_
 #define COMMANDEXPORTSTEP_H_
 /*----------------------------------------------------------------------------*/
 #include "Internal/CommandInternal.h"
-#include "Utils/Vector.h"
 #include "Geom/GeomEntity.h"
 #include "Internal/Context.h"
 #include "Geom/ExportSTEPImplementation.h"

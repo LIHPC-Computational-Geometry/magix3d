@@ -1,15 +1,6 @@
 /*----------------------------------------------------------------------------*/
-/** \file GeomEntity.cpp
- *
- *  \author Franck Ledoux
- *
- *  \date 18/10/2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/Context.h"
 #include "Geom/GeomEntity.h"
 #include "Geom/Volume.h"
-#include "Geom/Surface.h"
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
 #include "Geom/OCCHelper.h"
@@ -18,26 +9,24 @@
 #include "Geom/OCCDisplayRepresentationBuilder.h"
 #include "Geom/OCCFacetedRepresentationBuilder.h"
 #include "Geom/IncidentGeomEntitiesVisitor.h"
-
-#include <TkUtil/Exception.h>
-#include <TkUtil/InternalError.h>
-#include <TkUtil/MemoryError.h>
-#include <TkUtil/UTF8String.h>
-#include <TkUtil/NumericConversions.h>
-
+/*----------------------------------------------------------------------------*/
 #include "Topo/TopoEntity.h"
 #include "Topo/Vertex.h"
 #include "Topo/CoEdge.h"
 #include "Topo/CoFace.h"
 #include "Topo/Block.h"
-
+/*----------------------------------------------------------------------------*/
 #include "Group/Group0D.h"
 #include "Group/Group1D.h"
 #include "Group/Group2D.h"
 #include "Group/Group3D.h"
-
+/*----------------------------------------------------------------------------*/
+#include <TkUtil/Exception.h>
+#include <TkUtil/InternalError.h>
+#include <TkUtil/MemoryError.h>
+#include <TkUtil/UTF8String.h>
+/*----------------------------------------------------------------------------*/
 #include <memory>			// unique_ptr
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

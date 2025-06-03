@@ -1,11 +1,3 @@
-/*----------------------------------------------------------------------------*/
-/*
- * CommandNewCurveByCurveProjectionOnSurface.h
- *
- *  Created on: 9/3/2015
- *      Author: Eric B
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDNEWCURVEBYCURVEPROJECTIONONSURFACE_H_
 #define COMMANDNEWCURVEBYCURVEPROJECTIONONSURFACE_H_
 /*----------------------------------------------------------------------------*/

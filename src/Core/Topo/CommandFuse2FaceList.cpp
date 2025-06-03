@@ -1,16 +1,7 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandFuse2FaceList.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 10/12/14
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Topo/TopoHelper.h"
 #include "Topo/CommandFuse2FaceList.h"
-#include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>

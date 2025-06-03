@@ -1,16 +1,8 @@
-/*----------------------------------------------------------------------------*//*
- * CommandNewBSpline.cpp
- *
- *  Created on: 2 avr. 2012
- *      Author: ledouxf
- */
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Geom/CommandNewBSpline.h"
 #include "Geom/PropertyBox.h"
 #include "Geom/EntityFactory.h"
-#include "Geom/GeomManager.h"
-#include "Utils/MgxException.h"
 #include "Utils/MgxNumeric.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>

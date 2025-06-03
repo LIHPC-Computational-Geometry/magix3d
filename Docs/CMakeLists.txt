@@ -10,10 +10,9 @@ get_target_property(MGX_PUBLIC_HEADER_DIR Core INTERFACE_INCLUDE_DIRECTORIES)
 file(GLOB_RECURSE MGX_PUBLIC_HEADERS ${MGX_PUBLIC_HEADER_DIR}/*.h)
 
 set(DOXYGEN_DIRS
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Internal/ContextIfc.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Internal/Context.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Internal/M3DCommandManager.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Internal/M3DCommandResultIfc.h
+  ${PROJECT_SOURCE_DIR}/src/Core/protected/Internal/M3DCommandResult.h
   ${PROJECT_SOURCE_DIR}/src/Utils/protected/Utils/Point.h
   ${PROJECT_SOURCE_DIR}/src/Utils/protected/Utils/Spherical.h
   ${PROJECT_SOURCE_DIR}/src/Utils/protected/Utils/Cylindrical.h
@@ -28,10 +27,10 @@ set(DOXYGEN_DIRS
   ${PROJECT_SOURCE_DIR}/src/Utils/protected/Utils/Landmark.h
   ${PROJECT_SOURCE_DIR}/src/Utils/protected/Utils/Unit.h
   ${PROJECT_SOURCE_DIR}/src/Utils/protected/Utils/SwigCompletion.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Geom/GeomManagerIfc.h
+  ${PROJECT_SOURCE_DIR}/src/Core/protected/Geom/GeomManager.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Geom/GeomInfo.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/TopoInfo.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/TopoManagerIfc.h
+  ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/TopoManager.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/EdgeMeshingPropertyUniform.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/EdgeMeshingPropertyGeometric.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/EdgeMeshingPropertyBigeometric.h
@@ -46,13 +45,11 @@ set(DOXYGEN_DIRS
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/FaceMeshingPropertyQuadPairing.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyTransfinite.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyDelaunayTetgen.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Mesh/MeshManagerIfc.h
+  ${PROJECT_SOURCE_DIR}/src/Core/protected/Mesh/MeshManager.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Mesh/MeshModificationBySepa.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Smoothing/SurfacicSmoothing.h
   ${PROJECT_SOURCE_DIR}/src/Core/protected/Smoothing/VolumicSmoothing.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Group/GroupManagerIfc.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/SysCoord/SysCoordManagerIfc.h
-  ${PROJECT_SOURCE_DIR}/src/Core/protected/Structured/StructuredMeshManagerIfc.h
+  ${PROJECT_SOURCE_DIR}/src/Core/protected/Group/GroupsManager.h
 )
 
 string(REPLACE ";" " " DOXYGEN_DIRS_STR "${DOXYGEN_DIRS}")

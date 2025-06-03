@@ -134,10 +134,10 @@ if (Doxygen_FOUND)
 	set (DOXYGEN_SHOW_FILES NO)
 	set (DOXYGEN_SOURCES ${CMAKE_SOURCE_DIR}/src/Doc/User 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Internal/M3DCommandManager.h 
-                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Internal/M3DCommandResultIfc.h 
-                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Geom/GeomManagerIfc.h 
+                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Internal/M3DCommandResult.h
+                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Geom/GeomManager.h
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Geom/GeomInfo.h 
-                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Internal/ContextIfc.h 
+                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Internal/Context.h
                          ${CMAKE_SOURCE_DIR}/src/Utils/protected/Utils/Point.h 
                          ${CMAKE_SOURCE_DIR}/src/Utils/protected/Utils/Spherical.h 
                          ${CMAKE_SOURCE_DIR}/src/Utils/protected/Utils/Vector.h 
@@ -149,7 +149,7 @@ if (Doxygen_FOUND)
                          ${CMAKE_SOURCE_DIR}/src/Utils/protected/Utils/Constants.h 
                          ${CMAKE_SOURCE_DIR}/src/Utils/protected/Utils/Unit.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/TopoInfo.h 
-                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/TopoManagerIfc.h 
+                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/TopoManager.h
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/CoEdgeMeshingProperty.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/EdgeMeshingPropertyUniform.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/EdgeMeshingPropertyGeometric.h 
@@ -169,11 +169,11 @@ if (Doxygen_FOUND)
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyTransfinite.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyDelaunayNetgen.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Topo/BlockMeshingPropertyDelaunayTetgen.h 
-                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Mesh/MeshManagerIfc.h 
+                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Mesh/MeshManager.h
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Smoothing/SurfacicSmoothing.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Smoothing/VolumicSmoothing.h 
                          ${CMAKE_SOURCE_DIR}/src/Core/protected/Mesh/MeshModificationBySepa.h 
-                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Group/GroupManagerIfc.h
+                         ${CMAKE_SOURCE_DIR}/src/Core/protected/Group/GroupManager.h
 	)
 	set (DOXYGEN_RECURSIVE YES)
 	set (DOXYGEN_IMAGE_PATH ../Doc/Images)

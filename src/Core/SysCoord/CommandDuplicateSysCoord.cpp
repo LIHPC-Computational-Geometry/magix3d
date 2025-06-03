@@ -1,24 +1,10 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandDuplicateSysCoord.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 6 Juin 2018
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
-#include "Internal/InfoCommand.h"
 #include "Internal/Context.h"
+#include "Internal/InfoCommand.h"
 #include "Group/Group3D.h"
 #include "SysCoord/CommandDuplicateSysCoord.h"
-#include "SysCoord/SysCoordManager.h"
-
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
-#include <TkUtil/UTF8String.h>
-#include <TkUtil/Exception.h>
 #include <TkUtil/ReferencedMutex.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
@@ -53,7 +39,7 @@ void CommandDuplicateSysCoord::internalExecute()
 
 	addToGroup (m_new_syscoord, false);
 
-	getContext().getLocalSysCoordManager().add(m_new_syscoord);
+	getContext().getSysCoordManager().add(m_new_syscoord);
 
 	getInfoCommand().addSysCoordInfoEntity(m_new_syscoord, Internal::InfoCommand::CREATED);
 }
@@ -78,7 +64,7 @@ void CommandDuplicateSysCoord::internalRedo()
 /*----------------------------------------------------------------------------*/
 void CommandDuplicateSysCoord::addToGroup(SysCoord* rep, bool use_default_name)
 {
-    Group::Group3D* group = getContext().getLocalGroupManager().getNewGroup3D(use_default_name?"":m_group_name, &getInfoCommand());
+    Group::Group3D* group = getContext().getGroupManager().getNewGroup3D(use_default_name?"":m_group_name, &getInfoCommand());
     //rep->add(group);
     group->add(rep);
     getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);

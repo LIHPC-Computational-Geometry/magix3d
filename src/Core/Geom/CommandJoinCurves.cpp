@@ -1,15 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandJoinCurves.cpp
- *
- *  Created on: 17 déc. 2013
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
-#include "Utils/Common.h"
 #include "Geom/CommandJoinCurves.h"
 #include "Group/Group1D.h"
 /*----------------------------------------------------------------------------*/
@@ -156,7 +149,7 @@ internalSpecificExecute()
 	m_entities[0]->getGroups(grp);
 	newCurve->setGroups(grp);
 	for (uint i=0; i<grp.size(); i++){
-		Group::Group1D* group = getContext().getLocalGroupManager().getNewGroup1D(grp[i]->getName(), &getInfoCommand());
+		Group::Group1D* group = getContext().getGroupManager().getNewGroup1D(grp[i]->getName(), &getInfoCommand());
 		group->add(newCurve);
 	}
 

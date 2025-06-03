@@ -1,22 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandRotateTopo.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 27/9/2012
- */
-/*----------------------------------------------------------------------------*/
 #include "Topo/CommandRotateTopo.h"
-
-#include "Utils/Common.h"
-#include "Utils/MgxNumeric.h"
 #include "Topo/Block.h"
 #include "Topo/TopoHelper.h"
+#include "Utils/Point.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-#include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 // OCC
 #include <gp_Trsf.hxx>
@@ -81,8 +70,8 @@ internalExecute()
 
     // création de l'opérateur de rotation via OCC
     gp_Trsf transf;
-    Point axis1 = m_rotation.getAxis1();
-    Point axis2 = m_rotation.getAxis2();
+    Utils::Math::Point axis1 = m_rotation.getAxis1();
+    Utils::Math::Point axis2 = m_rotation.getAxis2();
 
     gp_Pnt p1(axis1.getX(),axis1.getY(),axis1.getZ());
     gp_Dir dir( axis2.getX()-axis1.getX(),

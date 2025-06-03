@@ -1,10 +1,3 @@
-/*
- * CommandMirroring.h
- *
- *  Created on: 12/4/2016
- *      Author: Eric B
- */
-
 #ifndef COMMANDMIRRORING_H_
 #define COMMANDMIRRORING_H_
 /*----------------------------------------------------------------------------*/

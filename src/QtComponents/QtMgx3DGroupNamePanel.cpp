@@ -4,7 +4,7 @@
  * \date        11/12/2012
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "QtComponents/QtMgx3DGroupNamePanel.h"
@@ -13,7 +13,7 @@
 #include "Group/Group1D.h"
 #include "Group/Group2D.h"
 #include "Group/Group3D.h"
-#include "Group/GroupManagerIfc.h"
+#include "Group/GroupManager.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/UTF8String.h>
@@ -81,7 +81,7 @@ QtMgx3DGroupNamePanel::~QtMgx3DGroupNamePanel ( )
 }	// QtMgx3DGroupNamePanel::~QtMgx3DGroupNamePanel
 
 
-ContextIfc& QtMgx3DGroupNamePanel::getContext ( )
+Context& QtMgx3DGroupNamePanel::getContext ( )
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
 	return _mainWindow->getContext ( );
@@ -222,7 +222,7 @@ void QtMgx3DGroupNamePanel::getGroupNames (vector< string >& names)
 	CHECK_NULL_PTR_ERROR (_mainWindow)
 	names.clear ( );
 
-	GroupManagerIfc&	groupManager	= _mainWindow->getContext ( ).getGroupManager ( );
+	GroupManager&	groupManager	= _mainWindow->getContext ( ).getGroupManager ( );
 
 	switch (getDimension ( ))
 	{

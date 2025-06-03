@@ -1,18 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandCreateGeom.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 17/11/2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
 #include "Internal/InfoCommand.h"
 #include "Internal/Context.h"
 #include "Geom/CommandCreateGeom.h"
 #include "Geom/EntityFactory.h"
-#include "Geom/GeomManager.h"
 #include "Geom/GeomEntity.h"
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
@@ -24,21 +14,17 @@
 #include "Group/Group2D.h"
 #include "Group/Group1D.h"
 #include "Group/Group0D.h"
-
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/Exception.h>
 #include <TkUtil/ReferencedMutex.h>
 #include <TkUtil/MemoryError.h>
-
+/*----------------------------------------------------------------------------*/
+#include <TDocStd_Document.hxx>
 /*----------------------------------------------------------------------------*/
 using namespace TkUtil;
 using namespace Mgx3D::Utils;
-
-/*----------------------------------------------------------------------------*/
-#include <TDocStd_Document.hxx>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -104,7 +90,7 @@ void CommandCreateGeom::postExecute(bool hasError)
 /*----------------------------------------------------------------------------*/
 GeomManager& CommandCreateGeom::getGeomManager()
 {
-    return getContext().getLocalGeomManager();
+    return getContext().getGeomManager();
 }
 /*----------------------------------------------------------------------------*/
 void CommandCreateGeom::internalUndo()
@@ -306,7 +292,7 @@ addToGroup(GeomEntity* e, bool use_default_name)
 void CommandCreateGeom::
 addToGroup(Volume* v, bool use_default_name)
 {
-    Group::Group3D* group = getContext().getLocalGroupManager().getNewGroup3D(use_default_name?"":m_group_name, &getInfoCommand());
+    Group::Group3D* group = getContext().getGroupManager().getNewGroup3D(use_default_name?"":m_group_name, &getInfoCommand());
     v->add(group);
     group->add(v);
     getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
@@ -315,7 +301,7 @@ addToGroup(Volume* v, bool use_default_name)
 void CommandCreateGeom::
 addToGroup(Surface* s, bool use_default_name)
 {
-    Group::Group2D* group = getContext().getLocalGroupManager().getNewGroup2D(use_default_name?"":m_group_name, &getInfoCommand());
+    Group::Group2D* group = getContext().getGroupManager().getNewGroup2D(use_default_name?"":m_group_name, &getInfoCommand());
     s->add(group);
     group->add(s);
     getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
@@ -324,7 +310,7 @@ addToGroup(Surface* s, bool use_default_name)
 void CommandCreateGeom::
 addToGroup(Curve* c, bool use_default_name)
 {
-    Group::Group1D* group = getContext().getLocalGroupManager().getNewGroup1D(use_default_name?"":m_group_name, &getInfoCommand());
+    Group::Group1D* group = getContext().getGroupManager().getNewGroup1D(use_default_name?"":m_group_name, &getInfoCommand());
     c->add(group);
     group->add(c);
     getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
@@ -333,7 +319,7 @@ addToGroup(Curve* c, bool use_default_name)
 void CommandCreateGeom::
 addToGroup(Vertex* v, bool use_default_name)
 {
-    Group::Group0D* group = getContext().getLocalGroupManager().getNewGroup0D(use_default_name?"":m_group_name, &getInfoCommand());
+    Group::Group0D* group = getContext().getGroupManager().getNewGroup0D(use_default_name?"":m_group_name, &getInfoCommand());
     v->add(group);
     group->add(v);
     getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);

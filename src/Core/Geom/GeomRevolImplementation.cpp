@@ -1,16 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file GeomRevolImplementation.cpp
- *
- *  \author Franck Ledoux
- *
- *  \date 10/12/2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
-#include <list>
-#include <set>
-/*----------------------------------------------------------------------------*/
 #include "Geom/GeomRevolImplementation.h"
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
@@ -19,7 +7,8 @@
 #include "Geom/EntityFactory.h"
 #include "Geom/OCCHelper.h"
 /*----------------------------------------------------------------------------*/
-//inclusion de fichiers en-tête d'Open Cascade
+#include <list>
+/*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
 #include <BRepPrimAPI_MakeRevol.hxx>
 #include <gp_Ax1.hxx>
@@ -27,15 +16,13 @@
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Solid.hxx>
-#include <TopoDS_Shell.hxx>
 #include <TopExp.hxx>
 #include <TopTools_IndexedMapOfShape.hxx>
 #include <BRepTools.hxx>
 #include <BRepAdaptor_HCurve.hxx>
-
-#include<BRepCheck_Analyzer.hxx>
-#include<GProp_GProps.hxx>
-#include<BRepGProp.hxx>
+#include <BRepCheck_Analyzer.hxx>
+#include <GProp_GProps.hxx>
+#include <BRepGProp.hxx>
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/MemoryError.h>

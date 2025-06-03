@@ -1,18 +1,8 @@
-/*
- * GeomRotationImplementation.h
- *
- *  Created on: 27 sept. 2012
- *      Author: ledouxf
- */
-
 #ifndef GEOMROTATIONIMPLEMENTATION_H_
 #define GEOMROTATIONIMPLEMENTATION_H_
 /*----------------------------------------------------------------------------*/
-#include <set>
-#include "Utils/Vector.h"
-#include "Geom/GeomEntity.h"
 #include "Geom/GeomModificationBaseClass.h"
-#include "Internal/Context.h"
+#include "Geom/GeomEntity.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

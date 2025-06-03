@@ -4,7 +4,7 @@
  * \date        03/02/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Utils/Common.h"
 #include "Geom/GeomEntity.h"
 #include "QtComponents/QtMgx3DApplication.h"
@@ -101,7 +101,7 @@ QtTopologyEdgeCutPanel::QtTopologyEdgeCutPanel (
 							FilterEntity::AllGeom | FilterEntity::TopoVertex);
 	_cutPointEntityPanel	=
 		new QtMgx3DEntityPanel (this, "", true, "", "", &mainWindow,
-								SelectionManagerIfc::ALL_DIMENSIONS, filter);
+								SelectionManager::ALL_DIMENSIONS, filter);
 	_cutPointEntityPanel->setToolTip (QString::fromUtf8("Entité géométrique dont le centre sert de position de découpe, ou sommet topologique."));
 	gridLayout->addWidget (_cutPointEntityPanel, row, col++, 1, 2);
 	connect (_cutPointEntityPanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -449,7 +449,7 @@ void QtTopologyEdgeCutAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (panel)
 
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DTopoOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de découpage de l'arête topologique :

@@ -4,7 +4,7 @@
  * \date        05/11/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
@@ -315,7 +315,7 @@ QtFaceMeshingPropertyPanel::QtFaceMeshingPropertyPanel (
 	// Les faces à mailler :
 	_facesPanel	= new QtMgx3DEntityPanel (
 						this, "", true, "Faces :", "", &mainWindow,
-						SelectionManagerIfc::D2, FilterEntity::TopoCoFace);
+						SelectionManager::D2, FilterEntity::TopoCoFace);
 	_facesPanel->setMultiSelectMode (true);
 	layout->addWidget (_facesPanel);
 	connect (_facesPanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -707,7 +707,7 @@ QtFaceMeshingPropertyPanel*
 void QtFaceMeshingPropertyAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DTopoOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de maillage des faces :

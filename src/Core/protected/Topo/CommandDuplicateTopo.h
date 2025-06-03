@@ -1,12 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandDuplicateTopo.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 27/6/2013
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDDUPLICATETOPO_H_
 #define COMMANDDUPLICATETOPO_H_
 /*----------------------------------------------------------------------------*/
@@ -17,6 +9,7 @@ namespace Mgx3D {
 namespace Geom{
 class CommandGeomCopy;
 class GeomEntity;
+class Volume;
 }
 /*----------------------------------------------------------------------------*/
 namespace Topo {

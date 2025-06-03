@@ -4,7 +4,7 @@
  * \date        11/05/2015
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
@@ -74,7 +74,7 @@ QtTopologyBlockExtractionOperationPanel::QtTopologyBlockExtractionOperationPanel
 	// Les blocs à extraire :
 	_topoEntitiesPanel	= new QtMgx3DEntityPanel (
 							this, "", true, "Blocs à extraire :", "",
-							&mainWindow, SelectionManagerIfc::D3,
+							&mainWindow, SelectionManager::D3,
 							FilterEntity::TopoBlock);
 	_topoEntitiesPanel->setMultiSelectMode (true);
 	connect (_topoEntitiesPanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -299,7 +299,7 @@ QtTopologyBlockExtractionOperationPanel*
 void QtTopologyBlockExtractionOperationAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DTopoOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de copie des entités topologiques :

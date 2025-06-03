@@ -4,11 +4,10 @@
  * \date        10/09/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManagerIfc.h"
 #include "Geom/CommandNewSegment.h"
 #include "Geom/GeomDisplayRepresentation.h"
 #include "Geom/Vertex.h"
@@ -383,7 +382,7 @@ QtSegmentOperationPanel* QtSegmentOperationAction::getSegmentPanel ( )
 void QtSegmentOperationAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 //	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de création du segment :

@@ -4,12 +4,11 @@
  * \date        28/10/1312
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/ValidatedField.h"
-#include "Topo/TopoManagerIfc.h"
 #include "QtComponents/QtBlocksByRevolutionCreationAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
@@ -372,7 +371,7 @@ QtBlocksByRevolutionCreationPanel*
 void QtBlocksByRevolutionCreationAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DTopoOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de création du cylindre :

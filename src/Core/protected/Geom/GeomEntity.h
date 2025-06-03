@@ -1,17 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/** \file GeomEntity.h
- *
- *  \author Franck Ledoux
- *
- *  \date 14/10/2010
- */
-/*----------------------------------------------------------------------------*/
 #ifndef MGX3D_GEOM_GEOMENTITY_H_
 #define MGX3D_GEOM_GEOMENTITY_H_
 /*----------------------------------------------------------------------------*/
-#include <vector>
 #include <set>
-#include <list>
+#include <vector>
 #include <functional>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>

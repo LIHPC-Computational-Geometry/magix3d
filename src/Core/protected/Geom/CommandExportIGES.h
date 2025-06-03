@@ -1,16 +1,7 @@
-/*----------------------------------------------------------------------------*/
-/*
- * CommandExportIGES.h
- *
- *  Created on: 14 févr. 2014
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDEXPORTIGES_H_
 #define COMMANDEXPORTIGES_H_
 /*----------------------------------------------------------------------------*/
 #include "Internal/CommandInternal.h"
-#include "Utils/Vector.h"
 #include "Geom/GeomEntity.h"
 #include "Internal/Context.h"
 #include "Geom/ExportIGESImplementation.h"

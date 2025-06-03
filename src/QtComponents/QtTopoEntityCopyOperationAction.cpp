@@ -4,7 +4,7 @@
  * \date        25/06/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
@@ -68,7 +68,7 @@ QtTopoEntityCopyOperationPanel::QtTopoEntityCopyOperationPanel (
 	// Dans la version actuelle ce ne peut être que des blocs topologiques.
 	_topoEntitiesPanel	= new QtMgx3DEntityPanel (
 							this, "", true, "Blocs à copier :", "",
-							&mainWindow, SelectionManagerIfc::D3,
+							&mainWindow, SelectionManager::D3,
 							FilterEntity::TopoBlock);
 	_topoEntitiesPanel->setMultiSelectMode (true);
 	connect (_topoEntitiesPanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -81,7 +81,7 @@ QtTopoEntityCopyOperationPanel::QtTopoEntityCopyOperationPanel (
 	// Le volume géométrique auquel on associe les blocs copiés :
 	_geomEntityPanel	= new QtMgx3DEntityPanel (
 							this, "", true, "Volume à associer :", "",
-							&mainWindow, SelectionManagerIfc::D3,
+							&mainWindow, SelectionManager::D3,
 							FilterEntity::GeomVolume);
 	connect (_geomEntityPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -327,7 +327,7 @@ QtTopoEntityCopyOperationPanel*
 void QtTopoEntityCopyOperationAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DTopoOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de copie des entités topologiques :

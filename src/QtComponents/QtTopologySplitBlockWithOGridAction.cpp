@@ -4,7 +4,7 @@
  * \date        14/03/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Internal/Resources.h"
@@ -64,7 +64,7 @@ QtTopologySplitBlockWithOGridPanel::QtTopologySplitBlockWithOGridPanel (
 	// Les blocs à découper :
 	_blocksPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Blocs :", "", &mainWindow,
-			SelectionManagerIfc::D3, FilterEntity::TopoBlock);
+			SelectionManager::D3, FilterEntity::TopoBlock);
 	_blocksPanel->setMultiSelectMode (true);
 	connect (_blocksPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -75,7 +75,7 @@ QtTopologySplitBlockWithOGridPanel::QtTopologySplitBlockWithOGridPanel (
 	// Les éventuelles faces à découper :
 	_facesPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Faces :", "", &mainWindow,
-			SelectionManagerIfc::D2, FilterEntity::TopoCoFace);
+			SelectionManager::D2, FilterEntity::TopoCoFace);
 	_facesPanel->setMultiSelectMode (true);
 	connect (_facesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -431,7 +431,7 @@ void QtTopologySplitBlockWithOGridAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (panel)
 
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de découpage en o-grid des blocs

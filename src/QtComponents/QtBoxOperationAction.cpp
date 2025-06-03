@@ -4,12 +4,12 @@
  * \date        06/09/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManagerIfc.h"
+#include "Geom/GeomManager.h"
 #include "Geom/Vertex.h"
 #include "Utils/Vector.h"
 #include "QtComponents/QtBoxOperationAction.h"
@@ -472,7 +472,7 @@ void QtBoxOperationAction::executeOperation ( )
 {
 	// Validation paramétrage :
 //	QtMgx3DGeomOperationAction::executeOperation ( );
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 
 	// Récupération des paramètres de création de la boite :
 	QtBoxOperationPanel*	panel	= getBoxPanel ( );

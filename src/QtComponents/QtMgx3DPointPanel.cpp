@@ -4,7 +4,7 @@
  * \date		19/12/2012
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 
 #include "QtComponents/QtMgx3DPointPanel.h"
@@ -143,13 +143,13 @@ QtMgx3DPointPanel::QtMgx3DPointPanel (QWidget* parent, const string& title,
 	label->setMinimumSize (label->sizeHint ( ));
 	hlayout->addWidget (label);
 	_vertexIDTextField	= new QtEntityIDTextField (
-							this, mainWindow, SelectionManagerIfc::D0, types);
+							this, mainWindow, SelectionManager::D0, types);
 	hlayout->addWidget (_vertexIDTextField);
 
 
 	_sysCoordPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Repère :", "", mainWindow,
-			SelectionManagerIfc::D3, FilterEntity::SysCoord);
+			SelectionManager::D3, FilterEntity::SysCoord);
 	_sysCoordPanel->setMultiSelectMode (false);
 	layout->addWidget (_sysCoordPanel);
 
@@ -535,7 +535,7 @@ CoordinateSystem::SysCoord* QtMgx3DPointPanel::getSysCoord() const
 	string repName = _sysCoordPanel->getUniqueName();
 
 	if (!repName.empty()){
-		return getContext().getLocalSysCoordManager().getSysCoord(repName, true);
+		return getContext().getSysCoordManager().getSysCoord(repName, true);
 	}
 	else
 		return 0;
@@ -545,7 +545,7 @@ Internal::Context& QtMgx3DPointPanel::getContext() const
 {
 	// TODO peu mieux faire ...
 	CHECK_NULL_PTR_ERROR(_vertexIDTextField);
-	Internal::ContextIfc* ctxifc = &_vertexIDTextField->getMainWindow ( ).getContext();
+	Internal::Context* ctxifc = &_vertexIDTextField->getMainWindow ( ).getContext();
 	Internal::Context* ctx = dynamic_cast<Internal::Context*>(ctxifc);
 	CHECK_NULL_PTR_ERROR(ctx);
 	return *ctx;

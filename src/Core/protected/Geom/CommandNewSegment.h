@@ -1,16 +1,7 @@
-/*----------------------------------------------------------------------------*/
-/** \file CommandNewSegment.h
- *
- *  \author Franck Ledoux
- *
- *  \date 14/01/2011
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDNEWSEGMENT_H_
 #define COMMANDNEWSEGMENT_H_
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandCreateWithOtherGeomEntities.h"
-#include "Geom/Vertex.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
@@ -52,7 +43,7 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur
      */
-    virtual ~CommandNewSegment();
+    virtual ~CommandNewSegment() = default;
 
     /*------------------------------------------------------------------------*/
     /** \brief  exécute la commande

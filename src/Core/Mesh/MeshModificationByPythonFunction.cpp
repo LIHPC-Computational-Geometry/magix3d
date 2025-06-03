@@ -20,7 +20,7 @@
 #include <TkUtil/Exception.h>
 #include <TkUtil/UTF8String.h>
 /*----------------------------------------------------------------------------*/
-#include "gmds/ig/Node.h"
+#include <gmds/ig/Node.h>
 /*----------------------------------------------------------------------------*/
 
 namespace Mgx3D {

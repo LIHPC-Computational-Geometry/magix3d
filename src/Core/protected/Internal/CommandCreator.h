@@ -22,12 +22,11 @@ class Log;
 namespace Mgx3D {
 
 namespace Utils {
-class CommandManagerIfc;
+class CommandManager;
 }
 /*----------------------------------------------------------------------------*/
 namespace Internal {
 
-class ContextIfc;
 class Context;
 /*----------------------------------------------------------------------------*/
 /** \class CommandCreator
@@ -53,7 +52,7 @@ public:
 	 *			serveur.
      *  \param c le contexte ce qui permet d'accéder entre autre au CommandManager
      */
-    CommandCreator(const std::string& name, Internal::ContextIfc* c);
+    CommandCreator(const std::string& name, Internal::Context* c);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur
@@ -74,15 +73,11 @@ public:
     virtual void log (const TkUtil::Log& log);
 
     /** retourne le CommandManager */
-    virtual Utils::CommandManagerIfc& getCommandManager();
+    virtual Utils::CommandManager& getCommandManager();
 
     /** retourne le contexte */
-    virtual const Internal::ContextIfc& getContext() const;
-    virtual Internal::ContextIfc& getContext();
-
-    /** retourne le contexte local (même zone mémoire). */
-    virtual const Internal::Context& getLocalContext() const;
-    virtual Internal::Context& getLocalContext();
+    virtual const Internal::Context& getContext() const;
+    virtual Internal::Context& getContext();
 
     /// retourne l'afficheur (qui peut être nul)
     virtual TkUtil::LogOutputStream* getLogStream ( );
@@ -91,11 +86,10 @@ public:
 	private :
 
 	/** Le nom de l'instance. */
-	std::string				m_name;
+	std::string m_name;
 
    /** le contexte */
-	Internal::ContextIfc*	m_context;
-
+	Internal::Context* m_context;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Internal

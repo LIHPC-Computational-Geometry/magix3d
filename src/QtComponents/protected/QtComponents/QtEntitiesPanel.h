@@ -6,7 +6,7 @@
 #ifndef QT_ENTITIES_PANEL_H
 #define QT_ENTITIES_PANEL_H
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include <QSettings>
 #include <QItemDelegate>
@@ -533,7 +533,7 @@ class QtEntitiesPanel :public QtEntitiesItemViewPanel, public Utils::SelectionMa
 	 * \see		createPopupMenu
 	 */
 	QtEntitiesPanel (QWidget* parent, QtMgx3DMainWindow* mainWindow,
-	                 const std::string& name, Internal::ContextIfc& context);
+	                 const std::string& name, Internal::Context& context);
 
 	/**
 	 * RAS.

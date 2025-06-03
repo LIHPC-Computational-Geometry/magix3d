@@ -1,56 +1,47 @@
 /*----------------------------------------------------------------------------*/
-/** \file		M3DCommandResult.cpp
- *  \author		Charles, Eric
- *  \date		02/04/2013
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/M3DCommandResult.h"
 #include "Internal/CommandInternalAdapter.h"
 #include "Utils/Common.h"
 #include "Geom/CommandEditGeom.h"
 #include "Geom/GeomEntity.h"
 #include "Mesh/MeshEntity.h"
-
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
-
+/*----------------------------------------------------------------------------*/
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Internal;
 using namespace TkUtil;
-
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
-
 /*----------------------------------------------------------------------------*/
 namespace Internal
 {
-
 /*----------------------------------------------------------------------------*/
 
 M3DCommandResult::M3DCommandResult (CommandInternal& cmd)
-	: M3DCommandResultIfc (cmd),
+	: CommandResult (cmd),
 	  _commandInternal (&cmd),
 	  m_geom_modif(0)
 {
 }	// M3DCommandResult::M3DCommandResult
 
 M3DCommandResult::M3DCommandResult (CommandInternal& cmd, Geom::CommandEditGeom* geom_modif)
-	: M3DCommandResultIfc (cmd),
+	: CommandResult (cmd),
 	  _commandInternal (&cmd),
 	  m_geom_modif(geom_modif)
 {
 }	// M3DCommandResult::M3DCommandResult
 
 M3DCommandResult::M3DCommandResult ()
-	: M3DCommandResultIfc (),
+	: CommandResult (*new CommandInternalAdapter ("invalid")),
 	  _commandInternal (0),
 	  m_geom_modif(0)
 {
 }	// M3DCommandResult::M3DCommandResult
 
 M3DCommandResult::M3DCommandResult (const M3DCommandResult&)
-	: M3DCommandResultIfc (*new CommandInternalAdapter ("invalid")),
+	: CommandResult (*new CommandInternalAdapter ("invalid")),
 	  _commandInternal (0),
 	  m_geom_modif(0)
 {
@@ -1066,7 +1057,7 @@ CommandInternal& M3DCommandResult::getCommandInternal( )
 
 InfoCommand& M3DCommandResult::getInfoCommand()
 {
-    if (Mgx3D::Utils::CommandIfc::DONE == getStatus())
+    if (Mgx3D::Utils::Command::DONE == getStatus())
             return getCommandInternal().getInfoCommand();
         else {
 			TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);

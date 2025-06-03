@@ -1,20 +1,9 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandNewSurface.cpp
- *
- *  \author Franck Ledoux
- *
- *  \date 31/01/2011
- */
-/*----------------------------------------------------------------------------*/
-#include "Geom/CommandNewSurface.h"
 #include "Geom/CommandCreateGeom.h"
-#include "Geom/PropertyBox.h"
+#include "Geom/CommandNewSurface.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomManager.h"
-#include "Utils/MgxException.h"
-
-#include <TopoDS.hxx>
-#include <TopoDS_Edge.hxx>
+#include "Geom/Surface.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>

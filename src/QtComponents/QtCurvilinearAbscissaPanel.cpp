@@ -4,7 +4,7 @@
  * \date		09/09/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtCurvilinearAbscissaPanel.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -55,7 +55,7 @@ QtCurvilinearAbscissaPanel::QtCurvilinearAbscissaPanel (
 
 	// La courbe :
 	_curvePanel	= new QtMgx3DEntityPanel (
-			this, "", true, "Courbe :", "", mainWindow, SelectionManagerIfc::D1,
+			this, "", true, "Courbe :", "", mainWindow, SelectionManager::D1,
 			FilterEntity::GeomCurve);
 	layout->addWidget (_curvePanel);
 

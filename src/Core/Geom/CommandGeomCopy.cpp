@@ -1,11 +1,5 @@
-/*
- * CommandGeomCopy.cpp
- *
- *  Created on: 19 juin 2013
- *      Author: ledouxf
- */
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Geom/CommandGeomCopy.h"
 #include "Geom/GeomManager.h"
 #include "Geom/GeomFuseImplementation.h"
@@ -13,19 +7,16 @@
 #include "Geom/EntityFactory.h"
 #include "Geom/IncidentGeomEntitiesVisitor.h"
 /*----------------------------------------------------------------------------*/
-#include <TkUtil/Exception.h>
 #include <TkUtil/ReferencedMutex.h>
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 
 class GeomVertex;
-//class Curve;
 class Surface;
 class Volume;
 /*----------------------------------------------------------------------------*/
@@ -62,7 +53,7 @@ CommandGeomCopy(Internal::Context& c,
 : CommandEditGeom(c, "Copie", groupName)
 , m_entities()
 {
-	Geom::GeomManager& gm = getContext().getLocalGeomManager();
+	Geom::GeomManager& gm = getContext().getGeomManager();
 
 	std::vector<Volume*> volumes = gm.getVolumesObj();
 	for (uint i=0; i<volumes.size(); i++)

@@ -6,7 +6,7 @@
 #ifndef QT_SMOOTH_VOLUME_OPERATION_ACTION_H
 #define QT_SMOOTH_VOLUME_OPERATION_ACTION_H
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Smoothing/VolumicSmoothing.h"
 

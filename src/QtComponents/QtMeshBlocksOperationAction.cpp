@@ -4,11 +4,11 @@
  * \date        06/09/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Mesh/MeshManagerIfc.h"
+#include "Mesh/MeshManager.h"
 #include "QtComponents/QtMeshBlocksOperationAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
@@ -68,7 +68,7 @@ QtMeshBlocksOperationPanel::QtMeshBlocksOperationPanel (
 	// La sélection à mailler :
 	_blocksPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Blocs à mailler :", "", &mainWindow,
-			SelectionManagerIfc::D3, FilterEntity::TopoBlock);
+			SelectionManager::D3, FilterEntity::TopoBlock);
 	_blocksPanel->setMultiSelectMode (true);
 	_verticalLayout->addWidget (_blocksPanel);
 	connect (_blocksPanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -319,7 +319,7 @@ void QtMeshBlocksOperationAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (getMeshPanel ( ))
 
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DMeshOperationAction::executeOperation ( );
 
 	if (true == getMeshPanel ( )->meshAll ( ))

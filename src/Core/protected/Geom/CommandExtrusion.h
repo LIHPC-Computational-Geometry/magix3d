@@ -1,22 +1,9 @@
-/*----------------------------------------------------------------------------*/
-/*
- * CommandExtrusion.h
- *
- *  Created on: 8/11/2019
- *      Author: Eric B
- *     à partir de CommandRevolution, renommé depuis en CommandExtrudeRevolution
- *
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDEXTRUSION_H_
 #define COMMANDEXTRUSION_H_
 /*----------------------------------------------------------------------------*/
 #include <map>
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandCreateGeom.h"
-#include "Geom/GeomExtrudeImplementation.h"
-#include "Utils/Point.h"
-#include "Utils/Vector.h"
 #include "Geom/GeomEntity.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/

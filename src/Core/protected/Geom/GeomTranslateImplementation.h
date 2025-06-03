@@ -1,17 +1,7 @@
-/*----------------------------------------------------------------------------*/
-/** \file GeomTranslateImplementation.h
- *
- *  \author Franck Ledoux
- *
- *  \date 10/12/2010
- */
-/*----------------------------------------------------------------------------*/
 #ifndef GEOMTRANSLATEIMPLEMENTATION_H_
 #define GEOMTRANSLATEIMPLEMENTATION_H_
 /*----------------------------------------------------------------------------*/
 #include <vector>
-#include <list>
-#include <set>
 /*----------------------------------------------------------------------------*/
 #include "Utils/Vector.h"
 #include "Geom/GeomEntity.h"

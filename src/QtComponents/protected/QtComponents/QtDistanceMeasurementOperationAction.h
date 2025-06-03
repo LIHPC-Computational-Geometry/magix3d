@@ -6,7 +6,7 @@
 #ifndef QT_DISTANCE_MEASUREMENT_OPERATION_ACTION_H
 #define QT_DISTANCE_MEASUREMENT_OPERATION_ACTION_H
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Entity.h"
 #include "Geom/GeomEntity.h"

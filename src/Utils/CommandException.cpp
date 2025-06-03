@@ -16,7 +16,7 @@ namespace Mgx3D
 namespace Utils 
 {
 
-CommandException::CommandException (const UTF8String& msg, CommandIfc* cmd)
+CommandException::CommandException (const UTF8String& msg, Command* cmd)
 	: TkUtil::Exception (msg), _command (cmd)
 {
 }	// CommandException::CommandException
@@ -28,7 +28,7 @@ CommandException::CommandException (const CommandException& ce)
 }	// CommandException::CommandException
 
 
-CommandException::CommandException (const Exception& e, CommandIfc* cmd)
+CommandException::CommandException (const Exception& e, Command* cmd)
 	: TkUtil::Exception (e.getFullMessage ( )), _command (cmd)
 {
 }	// CommandException::CommandException
@@ -51,13 +51,13 @@ CommandException::~CommandException ( )
 }	// CommandException::~CommandException
 	
 	
-const CommandIfc* CommandException::getCommand ( ) const
+const Command* CommandException::getCommand ( ) const
 {
 	return _command;
 }	// CommandException::getCommand
 
 
-CommandIfc* CommandException::getCommand ( )
+Command* CommandException::getCommand ( )
 {
 	return _command;
 }	 // CommandException::getCommand

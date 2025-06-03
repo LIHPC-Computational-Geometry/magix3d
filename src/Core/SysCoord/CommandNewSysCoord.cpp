@@ -1,21 +1,10 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandNewSysCoord.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 22 mai 2018
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
-#include "Internal/InfoCommand.h"
 #include "Internal/Context.h"
+#include "Internal/InfoCommand.h"
 #include "Group/Group3D.h"
 #include "SysCoord/CommandNewSysCoord.h"
 #include "SysCoord/SysCoordManager.h"
 #include "SysCoord/SysCoordDisplayRepresentation.h"
-
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
@@ -73,7 +62,7 @@ CommandNewSysCoord::~CommandNewSysCoord()
 
             if (rep){
             	if (Internal::InfoCommand::DELETED == t) {
-            		getContext().getLocalSysCoordManager().remove(rep);
+            		getContext().getSysCoordManager().remove(rep);
             		// destruction des entités que l'on avait construites
             		delete rep;
             	}
@@ -98,7 +87,7 @@ void CommandNewSysCoord::internalExecute()
 
 	addToGroup (rep, false);
 
-	getContext().getLocalSysCoordManager().add(rep);
+	getContext().getSysCoordManager().add(rep);
 
 	getInfoCommand().addSysCoordInfoEntity(rep, Internal::InfoCommand::CREATED);
 }
@@ -121,7 +110,7 @@ void CommandNewSysCoord::internalRedo()
 /*----------------------------------------------------------------------------*/
 void CommandNewSysCoord::addToGroup(SysCoord* rep, bool use_default_name)
 {
-    Group::Group3D* group = getContext().getLocalGroupManager().getNewGroup3D(use_default_name?"":m_group_name, &getInfoCommand());
+    Group::Group3D* group = getContext().getGroupManager().getNewGroup3D(use_default_name?"":m_group_name, &getInfoCommand());
     //rep->add(group);
     group->add(rep);
     getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);

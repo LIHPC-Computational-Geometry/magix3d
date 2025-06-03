@@ -31,7 +31,7 @@ public:
      *  \param context  le contexte
      *  \param dim la nouvelle dimension
      */
-    CommandChangeMeshDim(Internal::Context& context, const Internal::ContextIfc::meshDim& dim);
+    CommandChangeMeshDim(Internal::Context& context, const Internal::Context::meshDim& dim);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur
@@ -56,10 +56,10 @@ private:
 protected:
 
     /* nouvelle unité */
-    Internal::ContextIfc::meshDim m_new_mesh_dim;
+    Internal::Context::meshDim m_new_mesh_dim;
 
     /* ancienne unité */
-    Internal::ContextIfc::meshDim m_old_mesh_dim;
+    Internal::Context::meshDim m_old_mesh_dim;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Internal

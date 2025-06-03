@@ -4,8 +4,8 @@
  * \date		8/6/2018
  */
 
-#include "Internal/ContextIfc.h"
-#include "Utils/SelectionManagerIfc.h"
+#include "Internal/Context.h"
+#include "Utils/SelectionManager.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
@@ -70,7 +70,7 @@ QtSysCoordTranslationPanel::QtSysCoordTranslationPanel (
 
 
 	_syscoordPanel	= new QtMgx3DEntityPanel (
-				this, "", true, "Repère à modifier :", "", &mainWindow, SelectionManagerIfc::D3,
+				this, "", true, "Repère à modifier :", "", &mainWindow, SelectionManager::D3,
 				FilterEntity::SysCoord);
 	_syscoordPanel->setMultiSelectMode (false);
 
@@ -327,7 +327,7 @@ QtSysCoordTranslationPanel*
 void QtSysCoordTranslationAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	QtSysCoordTranslationPanel*	panel	= getTranslationPanel ( );

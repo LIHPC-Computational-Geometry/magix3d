@@ -1,51 +1,22 @@
 /*----------------------------------------------------------------------------*/
-/** \file Volume.cpp
- *
- *  \author Franck Ledoux
- *
- *  \date 15/10/2010
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
-#include <list>
-#include <algorithm>	// CP : find sur Bull
-#include <string.h>
-#include <sys/types.h>
-/*----------------------------------------------------------------------------*/
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
-#include "Geom/Shell.h"
-#include "Geom/EntityFactory.h"
 #include "Geom/OCCHelper.h"
 #include "Group/Group3D.h"
 #include "Internal/Context.h"
 #include "Topo/Block.h"
-#include "Topo/CoFace.h"
-#include "Topo/CoEdge.h"
-#include "Topo/Vertex.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/MemoryError.h>
-#include <TkUtil/Exception.h>
-#include <TkUtil/TraceLog.h>
 /*----------------------------------------------------------------------------*/
-#include <BRepClass3d_SolidClassifier.hxx>
 #include <TopTools_IndexedMapOfShape.hxx>
-#include <TopExp.hxx>
-#include <TopoDS.hxx>
-#include <BRep_Tool.hxx>
-#include <gp_Pnt.hxx>
 #include <BRepAdaptor_Curve.hxx>
-#include <Poly_Triangulation.hxx>
-#include <Poly_Array1OfTriangle.hxx>
-#include <TColgp_Array1OfPnt.hxx>
 #include <GeomAPI_ProjectPointOnSurf.hxx>
-#include <BRepCheck_Analyzer.hxx>
-#include <GProp_GProps.hxx>
-#include <BRepGProp.hxx>
+/*----------------------------------------------------------------------------*/
+#include <list>
+#include <string>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

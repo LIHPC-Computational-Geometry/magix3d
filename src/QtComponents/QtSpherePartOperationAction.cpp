@@ -6,11 +6,10 @@
  * à partir de QtSphereOperationAction fait par Charles
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManagerIfc.h"
 #include "Geom/Vertex.h"
 #include "Utils/Vector.h"
 #include "QtComponents/QtSpherePartOperationAction.h"
@@ -567,7 +566,7 @@ QtSpherePartOperationPanel* QtSpherePartOperationAction::getSpherePartPanel ( )
 void QtSpherePartOperationAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 //	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de création de l'aiguille :

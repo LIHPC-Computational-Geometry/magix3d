@@ -1,6 +1,5 @@
-box.vtk
 cube_sphere.step
-deuxBoites.mli2
-deuxBoitesRP.mli2
 test_brep_all.brep
 test_brep_select.brep
+*.mli2
+*.vtk

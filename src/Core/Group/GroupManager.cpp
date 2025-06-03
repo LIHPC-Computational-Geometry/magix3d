@@ -7,12 +7,8 @@
  *  \date 18/10/2012
  */
 /*----------------------------------------------------------------------------*/
-// pythonerie à mettre au début (pour permettre ifndef Py_PYTHON_H dans GroupManagerIfc.h)
-#include <Python.h>
-/*----------------------------------------------------------------------------*/
-#include <iostream>
+// pythonerie à mettre au début (pour permettre ifndef Py_PYTHON_H dans GroupManager.h)
 #include <set>
-#include <vector>
 /*----------------------------------------------------------------------------*/
 #include "Group/GroupManager.h"
 #include "Group/GroupEntity.h"
@@ -55,7 +51,6 @@
 #include "Mesh/Line.h"
 #include "Mesh/Cloud.h"
 #include "Mesh/MeshModificationByPythonFunction.h"
-#include "Mesh/CommandAddRemoveGroupName.h"
 #include "Mesh/MeshModificationBySepa.h"
 #include "Mesh/MeshModificationByProjectionOnP0.h"
 #include "Mesh/CommandClearGroupName.h"
@@ -66,15 +61,13 @@
 #include "Smoothing/VolumicSmoothing.h"
 
 #include <TkUtil/Exception.h>
-#include <TkUtil/TraceLog.h>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Group {
 /*----------------------------------------------------------------------------*/
-GroupManager::GroupManager(const std::string& name, Internal::ContextIfc* c)
-:Group::GroupManagerIfc(name, c)
+GroupManager::GroupManager(const std::string& name, Internal::Context* c)
+:Internal::CommandCreator(name, c)
 , m_visibilityMask(Utils::FilterEntity::NoneEntity)
 {
 }
@@ -110,10 +103,10 @@ void GroupManager::clear()
 }
 /*------------------------------------------------------------------------*/
 /** Vide un groupe suivant son nom et une dimension */
-Internal::M3DCommandResultIfc* GroupManager::clearGroup(int dim, const std::string& groupName)
+Internal::M3DCommandResult* GroupManager::clearGroup(int dim, const std::string& groupName)
 {
 	Mesh::CommandClearGroupName* command =
-			new Mesh::CommandClearGroupName(getLocalContext(), dim, groupName);
+			new Mesh::CommandClearGroupName(getContext(), dim, groupName);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -124,7 +117,7 @@ Internal::M3DCommandResultIfc* GroupManager::clearGroup(int dim, const std::stri
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResultIfc*  cmdResult   =
+    Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
 
@@ -218,7 +211,7 @@ Group3D* GroupManager::getNewGroup3D(const std::string& gr_name, Internal::InfoC
             gr = (*iter);
 
     if (gr == 0){
-        gr = new Group3D(getLocalContext(), name, gr_name.empty());
+        gr = new Group3D(getContext(), name, gr_name.empty());
         m_group3D.push_back(gr);
         if (icmd)
             icmd->addGroupInfoEntity(gr,Internal::InfoCommand::CREATED);
@@ -262,7 +255,7 @@ Group2D* GroupManager::getNewGroup2D(const std::string& gr_name, Internal::InfoC
             gr = (*iter);
 
     if (gr == 0){
-        gr = new Group2D(getLocalContext(), name, gr_name.empty());
+        gr = new Group2D(getContext(), name, gr_name.empty());
         m_group2D.push_back(gr);
         if (icmd)
             icmd->addGroupInfoEntity(gr,Internal::InfoCommand::CREATED);
@@ -306,7 +299,7 @@ Group1D* GroupManager::getNewGroup1D(const std::string& gr_name, Internal::InfoC
             gr = (*iter);
 
     if (gr == 0){
-        gr = new Group1D(getLocalContext(), name, gr_name.empty());
+        gr = new Group1D(getContext(), name, gr_name.empty());
         m_group1D.push_back(gr);
         if (icmd)
             icmd->addGroupInfoEntity(gr,Internal::InfoCommand::CREATED);
@@ -339,10 +332,10 @@ Group0D* GroupManager::getGroup0D(const std::string& gr_name, const bool excepti
     return gr;
 }
 /*----------------------------------------------------------------------------*/
-void GroupManager::getGroups(std::vector<GroupEntity*>& grp, Utils::SelectionManagerIfc::DIM dimensions, const bool onlyLive) const
+void GroupManager::getGroups(std::vector<GroupEntity*>& grp, Utils::SelectionManager::DIM dimensions, const bool onlyLive) const
 {
 	for (int i = 0; i < 4; i++){
-		const Utils::SelectionManagerIfc::DIM dim = Utils::SelectionManagerIfc::dimensionToDimensions(i);
+		const Utils::SelectionManager::DIM dim = Utils::SelectionManager::dimensionToDimensions(i);
 		if (0 == (dimensions&dim))
 			continue;
 		switch (i)
@@ -390,7 +383,7 @@ Group0D* GroupManager::getNewGroup0D(const std::string& gr_name, Internal::InfoC
             gr = (*iter);
 
     if (gr == 0){
-        gr = new Group0D(getLocalContext(), name, gr_name.empty());
+        gr = new Group0D(getContext(), name, gr_name.empty());
         m_group0D.push_back(gr);
         if (icmd)
             icmd->addGroupInfoEntity(gr,Internal::InfoCommand::CREATED);
@@ -1162,7 +1155,7 @@ void GroupManager::addMeshGroups(const std::vector<Group::GroupEntity*>& groups,
         const Utils::FilterEntity::objectType visibilityMask,
         std::vector<Mesh::MeshEntity*>& meshAdded)
 {
-    Mesh::MeshManager& mmng = getLocalContext().getLocalMeshManager();
+    Mesh::MeshManager& mmng = getContext().getMeshManager();
 
     for (std::vector<Group::GroupEntity*>::const_iterator iter = groups.begin();
             iter != groups.end(); ++iter){
@@ -1218,7 +1211,7 @@ void GroupManager::addMeshGroups(const Utils::FilterEntity::objectType visibilit
 			<<std::endl;
 #endif
 
-    Mesh::MeshManager& mmng = getLocalContext().getLocalMeshManager();
+    Mesh::MeshManager& mmng = getContext().getMeshManager();
 
     if (visibilityMask & Utils::FilterEntity::MeshVolume)
         for (std::vector<Group::Group3D*>::iterator iter = m_group3D.begin();
@@ -1929,7 +1922,7 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Topo::Ver
 /*------------------------------------------------------------------------*/
 void GroupManager::get(const std::vector<std::string>& vg, std::vector<Mesh::Volume*>& volumes)
 {
-	Mesh::MeshManager& mmng = getLocalContext().getLocalMeshManager();
+	Mesh::MeshManager& mmng = getContext().getMeshManager();
 
 	for (uint i=0; i<vg.size(); i++){
 		Mesh::Volume* me = mmng.getVolume(vg[i], false);
@@ -1941,7 +1934,7 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Mesh::Vol
 /*------------------------------------------------------------------------*/
 void GroupManager::get(const std::vector<std::string>& vg, std::vector<Mesh::Surface*>& surfaces)
 {
-	Mesh::MeshManager& mmng = getLocalContext().getLocalMeshManager();
+	Mesh::MeshManager& mmng = getContext().getMeshManager();
 
 	for (uint i=0; i<vg.size(); i++){
 		Mesh::Surface* me = mmng.getSurface(vg[i], false);
@@ -1953,7 +1946,7 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Mesh::Sur
 /*------------------------------------------------------------------------*/
 void GroupManager::get(const std::vector<std::string>& vg, std::vector<Mesh::Line*>& lines)
 {
-	Mesh::MeshManager& mmng = getLocalContext().getLocalMeshManager();
+	Mesh::MeshManager& mmng = getContext().getMeshManager();
 
 	for (uint i=0; i<vg.size(); i++){
 		Mesh::Line* me = mmng.getLine(vg[i], false);
@@ -1965,7 +1958,7 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Mesh::Lin
 /*------------------------------------------------------------------------*/
 void GroupManager::get(const std::vector<std::string>& vg, std::vector<Mesh::Cloud*>& clouds)
 {
-	Mesh::MeshManager& mmng = getLocalContext().getLocalMeshManager();
+	Mesh::MeshManager& mmng = getContext().getMeshManager();
 
 	for (uint i=0; i<vg.size(); i++){
 		Mesh::Cloud* me = mmng.getCloud(vg[i], false);
@@ -2114,7 +2107,7 @@ void GroupManager::addProjectionOnPX0(const std::string& nom)
 	// création de l'objet qui va modifier le maillage
 	Mesh::MeshModificationItf* modif = new Mesh::MeshModificationByProjectionOnP0(Mesh::MeshModificationByProjectionOnP0::X);
 
-	CommandAddMeshModification* command = new CommandAddMeshModification(getLocalContext(), gr2d, modif);
+	CommandAddMeshModification* command = new CommandAddMeshModification(getContext(), gr2d, modif);
 	TkUtil::UTF8String	cmt (TkUtil::Charset::UTF_8);
 	cmt<<"Projette les noeuds du groupe "<<nom<<" sur le plan X=0";
 	command->setScriptComments(cmt);
@@ -2136,7 +2129,7 @@ void GroupManager::addProjectionOnPY0(const std::string& nom)
 	// création de l'objet qui va modifier le maillage
 	Mesh::MeshModificationItf* modif = new Mesh::MeshModificationByProjectionOnP0(Mesh::MeshModificationByProjectionOnP0::Y);
 
-	CommandAddMeshModification* command = new CommandAddMeshModification(getLocalContext(), gr2d, modif);
+	CommandAddMeshModification* command = new CommandAddMeshModification(getContext(), gr2d, modif);
 	TkUtil::UTF8String	cmt (TkUtil::Charset::UTF_8);
 	cmt<<"Projette les noeuds du groupe "<<nom<<" sur le plan Y=0";
 	command->setScriptComments(cmt);
@@ -2158,7 +2151,7 @@ void GroupManager::addProjectionOnPZ0(const std::string& nom)
 	// création de l'objet qui va modifier le maillage
 	Mesh::MeshModificationItf* modif = new Mesh::MeshModificationByProjectionOnP0(Mesh::MeshModificationByProjectionOnP0::Z);
 
-	CommandAddMeshModification* command = new CommandAddMeshModification(getLocalContext(), gr2d, modif);
+	CommandAddMeshModification* command = new CommandAddMeshModification(getContext(), gr2d, modif);
 	TkUtil::UTF8String	cmt (TkUtil::Charset::UTF_8);
 	cmt<<"Projette les noeuds du groupe "<<nom<<" sur le plan Z=0";
 	command->setScriptComments(cmt);
@@ -2195,7 +2188,7 @@ void GroupManager::addCartesianPerturbation(const std::string& nom, PyObject* py
 	// création de l'objet qui va modifier le maillage
 	Mesh::MeshModificationItf* modif = new Mesh::MeshModificationByPythonFunction(py_obj,
 			Mesh::MeshModificationByPythonFunction::cartesian);
-	CommandAddMeshModification* command = new CommandAddMeshModification(getLocalContext(), grp, modif);
+	CommandAddMeshModification* command = new CommandAddMeshModification(getContext(), grp, modif);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -2229,7 +2222,7 @@ void GroupManager::addPolarPerturbation(const std::string& nom, PyObject* py_obj
 	// création de l'objet qui va modifier le maillage
 	Mesh::MeshModificationItf* modif = new Mesh::MeshModificationByPythonFunction(py_obj,
 			Mesh::MeshModificationByPythonFunction::polar);
-	CommandAddMeshModification* command = new CommandAddMeshModification(getLocalContext(), grp, modif);
+	CommandAddMeshModification* command = new CommandAddMeshModification(getContext(), grp, modif);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -2248,7 +2241,7 @@ void GroupManager::addSmoothing(const std::string& nom, Mesh::SurfacicSmoothing&
 	// recherche du groupe 2D
 	Group2D* gr2d = getGroup2D(nom, true);
 
-	CommandAddMeshModification* command = new CommandAddMeshModification(getLocalContext(), gr2d, sm.clone());
+	CommandAddMeshModification* command = new CommandAddMeshModification(getContext(), gr2d, sm.clone());
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -2267,7 +2260,7 @@ void GroupManager::addSmoothing(const std::string& nom, Mesh::VolumicSmoothing& 
 	// recherche du groupe 3D
 	Group3D* gr3d = getGroup3D(nom, true);
 
-	CommandAddMeshModification* command = new CommandAddMeshModification(getLocalContext(), gr3d, sm.clone());
+	CommandAddMeshModification* command = new CommandAddMeshModification(getContext(), gr3d, sm.clone());
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -2286,7 +2279,7 @@ void GroupManager::addSepa(const std::string& nom, Mesh::MeshModificationBySepa&
 	// recherche du groupe 2D
 	Group2D* gr2d = getGroup2D(nom, true);
 
-	CommandAddMeshModification* command = new CommandAddMeshModification(getLocalContext(), gr2d, ASepa.clone());
+	CommandAddMeshModification* command = new CommandAddMeshModification(getContext(), gr2d, ASepa.clone());
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);

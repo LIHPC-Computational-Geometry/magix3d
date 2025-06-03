@@ -9,9 +9,11 @@
 #ifndef SYSCOORD_MANAGER_H_
 #define SYSCOORD_MANAGER_H_
 /*----------------------------------------------------------------------------*/
-#include "SysCoord/SysCoord.h"
-#include "SysCoord/SysCoordManagerIfc.h"
+#include "Internal/CommandCreator.h"
+#include "Internal/M3DCommandResult.h"
 #include "Utils/Container.h"
+#include "Utils/Constants.h"
+#include "Utils/SwigCompletion.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -26,13 +28,14 @@ using Mgx3D::Utils::Math::Point;
 using Mgx3D::Utils::Math::Vector;
 
 namespace Internal {
-class ContextIfc;
 class Context;
 }
 
 /*----------------------------------------------------------------------------*/
 namespace CoordinateSystem {
 /*----------------------------------------------------------------------------*/
+class SysCoord;
+
 /**
  * \class SysCoordManager
  * \brief Gestionnaire des repères
@@ -40,8 +43,7 @@ namespace CoordinateSystem {
  * Ceux-ci sont orthonormés
  *
  */
-class SysCoordManager: public SysCoordManagerIfc {
-
+class SysCoordManager final : public Internal::CommandCreator {
 
 public:
 
@@ -51,7 +53,7 @@ public:
 	 *  \param		Nom unique de l'instance (utile en environnement distribué).
      *  \param c le contexte ce qui permet d'accéder entre autre au CommandManager
      */
-	SysCoordManager(const std::string& name, Internal::ContextIfc* c);
+	SysCoordManager(const std::string& name, Internal::Context* c);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur
@@ -59,20 +61,22 @@ public:
      */
     ~SysCoordManager();
 
+#ifndef SWIG
 	/*------------------------------------------------------------------------*/
 	/** Réinitialisation     */
-	virtual void clear();
+	void clear();
+#endif
 
 	/*------------------------------------------------------------------------*/
 	/** \brief Création d'un repère centré
 	 */
-	virtual Mgx3D::Internal::M3DCommandResultIfc*
+	Mgx3D::Internal::M3DCommandResult*
 		newSysCoord(std::string groupName);
 
 	/*------------------------------------------------------------------------*/
 	/** \brief Création d'un repère à partir d'un centre (simple translation)
 	 */
-	virtual Mgx3D::Internal::M3DCommandResultIfc*
+	Mgx3D::Internal::M3DCommandResult*
 	   newSysCoord(const Point& p, std::string groupName);
 
 	/*------------------------------------------------------------------------*/
@@ -80,7 +84,7 @@ public:
 	 *
 	 * Le repère est ajusté pour être orthonormé
 	 */
-	virtual Mgx3D::Internal::M3DCommandResultIfc*
+	Mgx3D::Internal::M3DCommandResult*
 	   newSysCoord(const Point& pCentre, const Point& pX, const Point& pY, std::string groupName);
 
 
@@ -91,11 +95,14 @@ public:
      *  \param name nom de l'entité repère
      *  \param dp le vecteur de translation
      */
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 	    translate(std::string name, const Vector& dp);
+	SET_SWIG_COMPLETABLE_METHOD(translate)
 
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
+#ifndef SWIG
+    Mgx3D::Internal::M3DCommandResult*
 		translate(SysCoord* syscoord, const Vector& dp);
+#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief translation d'une copie d'un repère (identifié par un nom unique pour python)
@@ -105,11 +112,14 @@ public:
      *  \param dp le vecteur de translation
      *  \param groupName groupe dans lequel sont mise les nouvelles entités
      */
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         copyAndTranslate(std::string name, const Vector& dp, std::string groupName);
+	SET_SWIG_COMPLETABLE_METHOD(copyAndTranslate)
 
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
+#ifndef SWIG
+    Mgx3D::Internal::M3DCommandResult*
 	    copyAndTranslate(SysCoord* syscoord, const Vector& dp, std::string groupName);
+#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief rotation d'une ou plusieurs entités repère
@@ -117,13 +127,16 @@ public:
      *  \param name nom de l'entité repère
      *  \param rot      la rotation
      */
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		rotate(std::string name,
 				const Utils::Math::Rotation& rot);
+	SET_SWIG_COMPLETABLE_METHOD(rotate)
 
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
+#ifndef SWIG
+    Mgx3D::Internal::M3DCommandResult*
 		rotate(SysCoord* syscoord,
 				const Utils::Math::Rotation& rot);
+#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief rotation d'une copie d'entitée repère
@@ -132,13 +145,16 @@ public:
      *  \param rot la rotation
      *  \param groupName groupe dans lequel sont mise les nouvelles entités
      */
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
 		copyAndRotate(std::string name,
 			const Utils::Math::Rotation& rot, std::string groupName);
+	SET_SWIG_COMPLETABLE_METHOD(copyAndRotate)
 
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
+#ifndef SWIG
+    Mgx3D::Internal::M3DCommandResult*
 		copyAndRotate(SysCoord* syscoord,
 			const Utils::Math::Rotation& rot, std::string groupName);
+#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief création d'entités repère par copie
@@ -146,22 +162,23 @@ public:
      *  \param name nom de l'entité repère
      *  \param groupName groupe dans lequel sont mise les nouvelles entités
      */
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
+    Mgx3D::Internal::M3DCommandResult*
         copy(std::string name, std::string groupName);
+	SET_SWIG_COMPLETABLE_METHOD(copy)
 
-    virtual Mgx3D::Internal::M3DCommandResultIfc*
+#ifndef SWIG
+    Mgx3D::Internal::M3DCommandResult*
         copy(SysCoord* syscoord, std::string groupName);
+#endif
 
-
+#ifndef SWIG
     /*------------------------------------------------------------------------*/
 	/// retourne le repère à partir de son nom
-	virtual SysCoord* getSysCoord (const std::string& name, const bool exceptionIfNotFound=true) const;
+	SysCoord* getSysCoord (const std::string& name, const bool exceptionIfNotFound=true) const;
 
 	void add(SysCoord* rep) {m_reperes.add(rep);}
 	void remove(SysCoord* rep) {m_reperes.remove(rep, true);}
-
-
-
+#endif
 
 private:
 	/** Constructeur de copie : interdit. */
@@ -172,7 +189,6 @@ private:
 
     /** repères accessibles depuis le manager */
     Utils::Container<CoordinateSystem::SysCoord> m_reperes;
-
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace CoordinateSystem

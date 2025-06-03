@@ -1,23 +1,12 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file Compare2Meshes.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 15 juin 2012
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Mesh/Compare2Meshes.h"
-#include "Utils/Common.h"
-#include "Utils/MgxNumeric.h"
 #include "Internal/Context.h"
+#include "Mesh/Compare2Meshes.h"
+#include "Utils/MgxNumeric.h"
 /*----------------------------------------------------------------------------*/
-#include <TkUtil/Exception.h>
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/TraceLog.h>
 /*----------------------------------------------------------------------------*/
-#include "gmds/ig/Mesh.h"
+#include <gmds/ig/Mesh.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

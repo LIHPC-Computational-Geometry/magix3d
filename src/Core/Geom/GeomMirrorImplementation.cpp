@@ -1,19 +1,7 @@
-/*
- * GeomMirrorImplementation.cpp
- *
- *  Created on: 12/4/2016
- *      Author: Eric B
- */
-
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
-#include <list>
 /*----------------------------------------------------------------------------*/
 #include "Geom/GeomMirrorImplementation.h"
 #include "Geom/Vertex.h"
 #include "Geom/Curve.h"
-#include "Geom/Surface.h"
 #include "Geom/Volume.h"
 #include "Geom/CommandGeomCopy.h"
 /*----------------------------------------------------------------------------*/

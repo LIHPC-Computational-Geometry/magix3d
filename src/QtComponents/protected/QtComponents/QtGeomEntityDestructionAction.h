@@ -11,7 +11,7 @@
 #include "QtComponents/QtMgx3DGeomOperationAction.h"
 #include "QtComponents/QtEntityByDimensionSelectorPanel.h"
 
-#include "Utils/SelectionManagerIfc.h"
+#include "Utils/SelectionManager.h"
 
 #include <QCheckBox>
 

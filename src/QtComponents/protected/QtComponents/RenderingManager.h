@@ -979,14 +979,14 @@ class RenderingManager : public Utils::SelectionManagerObserver
 	 * \see			entitiesAddedToSelection
 	 * \see			entitiesRemovedFromSelection
 	 */
-	virtual void setSelectionManager(Utils::SelectionManagerIfc *);
+	virtual void setSelectionManager(Utils::SelectionManager *);
 
 	/**
 	 * \return		L'éventuel gestionnaire de sélection associé.
 	 * \see			setSelectionManager
 	 */
-	virtual Utils::SelectionManagerIfc *getSelectionManager();
-	virtual const Utils::SelectionManagerIfc *getSelectionManager() const;
+	virtual Utils::SelectionManager *getSelectionManager();
+	virtual const Utils::SelectionManager *getSelectionManager() const;
 
 	/**
 	 * Ajoute les entités tranmises en argument de la sélection.

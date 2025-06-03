@@ -4,7 +4,7 @@
  * \date        20/11/2013
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
@@ -52,7 +52,7 @@ QtTopoToGeomAssociationPanel::QtTopoToGeomAssociationPanel (
 			QWidget* parent,
 			QtTopoToGeomAssociationPanel::PROJECTION_METHOD method,
 			Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
-			Mgx3D::Utils::SelectionManagerIfc::DIM defaultDimensions)
+			Mgx3D::Utils::SelectionManager::DIM defaultDimensions)
 	: QtMgx3DOperationsSubPanel (parent, mainWindow),
 	  _projectionMethod (method), _topoEntitiesPanel (0),
 	  _geomEntitiesPanel (0), _projectAllCheckBox (0)
@@ -62,9 +62,9 @@ QtTopoToGeomAssociationPanel::QtTopoToGeomAssociationPanel (
 	layout->setContentsMargins (0, 0, 0, 0);
 
 	// Les entités à associer :
-	SelectionManagerIfc::DIM	allowedDimensions	= SelectionManagerIfc::D0;
-	//SelectionManagerIfc::DIM	defaultDimension	= SelectionManagerIfc::D2;
-	SelectionManagerIfc::DIM	defaultDimension = defaultDimensions;
+	SelectionManager::DIM	allowedDimensions	= SelectionManager::D0;
+	//SelectionManager::DIM	defaultDimension	= SelectionManager::D2;
+	SelectionManager::DIM	defaultDimension = defaultDimensions;
 	FilterEntity::objectType	filter				= FilterEntity::NoneEntity;
 	bool						allowDifferentDims	= false;
 	bool						multiMode			= true;
@@ -74,29 +74,29 @@ QtTopoToGeomAssociationPanel::QtTopoToGeomAssociationPanel (
 	{
 		case QtTopoToGeomAssociationPanel::TOPO_ENTITIES_GEOM_ENTITY	:
 			allowedDimensions	=
-				(SelectionManagerIfc::DIM)(SelectionManagerIfc::D0 |
-							SelectionManagerIfc::D1 | SelectionManagerIfc::D2);
+				(SelectionManager::DIM)(SelectionManager::D0 |
+							SelectionManager::D1 | SelectionManager::D2);
 			filter	= (FilterEntity::objectType)(FilterEntity::TopoVertex |
 						  FilterEntity::TopoCoEdge | FilterEntity::TopoCoFace);	
 			allowDifferentDims	= true;
 			break;
 		case QtTopoToGeomAssociationPanel::VERTICES_GEOM_ENTITIES		:
 			name	= "Sommets :";
-			allowedDimensions	= SelectionManagerIfc::D0;
-			defaultDimension	= SelectionManagerIfc::D0;
+			allowedDimensions	= SelectionManager::D0;
+			defaultDimension	= SelectionManager::D0;
 			filter				= FilterEntity::TopoVertex;
 			break;
 		case QtTopoToGeomAssociationPanel::EDGES_CURVES					:
 			name	= "Arêtes :";
-			allowedDimensions	= SelectionManagerIfc::D1;
-			defaultDimension	= SelectionManagerIfc::D1;
+			allowedDimensions	= SelectionManager::D1;
+			defaultDimension	= SelectionManager::D1;
 			filter				= FilterEntity::TopoCoEdge;
 			projectAllLabel		= "Toutes les arêtes";
 			break;
 		case QtTopoToGeomAssociationPanel::FACES_SURFACES				:
 			name	= "Faces :";
-			allowedDimensions	= SelectionManagerIfc::D2;
-			defaultDimension	= SelectionManagerIfc::D2;
+			allowedDimensions	= SelectionManager::D2;
+			defaultDimension	= SelectionManager::D2;
 			filter				= FilterEntity::TopoCoFace;
 			projectAllLabel		= "Toutes les faces";
 			break;
@@ -119,11 +119,11 @@ QtTopoToGeomAssociationPanel::QtTopoToGeomAssociationPanel (
 	// Les entités géométriques à associer :
 	name	= "Entités géométriques :";
 	allowDifferentDims	= false;
-//	defaultDimension	= SelectionManagerIfc::D2;
+//	defaultDimension	= SelectionManager::D2;
 	defaultDimension = defaultDimensions;
 	allowedDimensions	=
-				(SelectionManagerIfc::DIM)(SelectionManagerIfc::D0 |
-							SelectionManagerIfc::D1 | SelectionManagerIfc::D2);
+				(SelectionManager::DIM)(SelectionManager::D0 |
+							SelectionManager::D1 | SelectionManager::D2);
 	filter	= (FilterEntity::objectType)(FilterEntity::GeomVertex |
 						  FilterEntity::GeomCurve | FilterEntity::GeomSurface);	
 	multiMode			= true;
@@ -139,14 +139,14 @@ QtTopoToGeomAssociationPanel::QtTopoToGeomAssociationPanel (
 			break;
 /*		case QtTopoToGeomAssociationPanel::EDGES_CURVES					:
 			name				= "Courbes :";
-			allowedDimensions	= SelectionManagerIfc::D1;
-			defaultDimension	= SelectionManagerIfc::D1;
+			allowedDimensions	= SelectionManager::D1;
+			defaultDimension	= SelectionManager::D1;
 			filter				= FilterEntity::GeomCurve;
 			break;
 		case QtTopoToGeomAssociationPanel::FACES_SURFACES				:
 			name				= "Surfaces :";
-			allowedDimensions	= SelectionManagerIfc::D2;
-			defaultDimension	= SelectionManagerIfc::D2;
+			allowedDimensions	= SelectionManager::D2;
+			defaultDimension	= SelectionManager::D2;
 			filter				= FilterEntity::GeomSurface;
 			break;*/
 	}	// switch (_projectionMethod)
@@ -381,25 +381,25 @@ void QtTopoToGeomAssociationPanel::dimensionsModifiedCallback ( )
 
 	CHECK_NULL_PTR_ERROR (_topoEntitiesPanel)
 
-	const SelectionManagerIfc::DIM	topoDims	=
+	const SelectionManager::DIM	topoDims	=
 										_topoEntitiesPanel->getDimensions ( );
-	SelectionManagerIfc::DIM	geomDim	= SelectionManagerIfc::ALL_DIMENSIONS;
+	SelectionManager::DIM	geomDim	= SelectionManager::ALL_DIMENSIONS;
 	// On enlève les dimensions interdites : l'association se fait vers une
 	// entité géométrique de dimension au moins égale et au plus 2 :
-	geomDim	= (SelectionManagerIfc::DIM)(geomDim & SelectionManagerIfc::NOT_D3);
-	if (0 == (topoDims & SelectionManagerIfc::D0))
+	geomDim	= (SelectionManager::DIM)(geomDim & SelectionManager::NOT_D3);
+	if (0 == (topoDims & SelectionManager::D0))
 	{
-		geomDim	= (SelectionManagerIfc::DIM)(
-									geomDim & SelectionManagerIfc::NOT_D0);
-		if (0 == (topoDims & SelectionManagerIfc::D1))
+		geomDim	= (SelectionManager::DIM)(
+									geomDim & SelectionManager::NOT_D0);
+		if (0 == (topoDims & SelectionManager::D1))
 		{
-			geomDim	= (SelectionManagerIfc::DIM)(
-									geomDim & SelectionManagerIfc::NOT_D1);
-			if (0 == (topoDims & SelectionManagerIfc::D2))
-				geomDim	= (SelectionManagerIfc::DIM)(
-									geomDim & SelectionManagerIfc::NOT_D2);
-		}	// if (0 == (topoDims & SelectionManagerIfc::D1))
-	}	// if (0 == (topoDims & SelectionManagerIfc::D0))
+			geomDim	= (SelectionManager::DIM)(
+									geomDim & SelectionManager::NOT_D1);
+			if (0 == (topoDims & SelectionManager::D2))
+				geomDim	= (SelectionManager::DIM)(
+									geomDim & SelectionManager::NOT_D2);
+		}	// if (0 == (topoDims & SelectionManager::D1))
+	}	// if (0 == (topoDims & SelectionManager::D0))
 	_geomEntitiesPanel->setAllowedDimensions (geomDim);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
@@ -425,7 +425,7 @@ void QtTopoToGeomAssociationPanel::projectAllTopoEntitiesModifiedCallback ( )
 QtTopoEntitiesAssociationsPanel::QtTopoEntitiesAssociationsPanel (
 			QWidget* parent, const string& panelName, 
 			QtMgx3DMainWindow& mainWindow, QtMgx3DOperationAction* action,
-			Mgx3D::Utils::SelectionManagerIfc::DIM defaultDimensions)
+			Mgx3D::Utils::SelectionManager::DIM defaultDimensions)
 	: QtMgx3DOperationPanel (parent, mainWindow, action,
 			QtMgx3DApplication::HelpSystem::instance ( ).associateOperationURL,
 			QtMgx3DApplication::HelpSystem::instance ( ).associateOperationTag),
@@ -980,7 +980,7 @@ void QtTopoEntitiesAssociationsPanel::projectionMethodCallback ( )
 QtTopoEntitiesAssociationsAction::QtTopoEntitiesAssociationsAction (
 	const QIcon& icon, const QString& text, QtMgx3DMainWindow& mainWindow,
 	const QString& tooltip,
-	Mgx3D::Utils::SelectionManagerIfc::DIM defaultDimensions)
+	Mgx3D::Utils::SelectionManager::DIM defaultDimensions)
 	: QtMgx3DTopoOperationAction (icon, text, mainWindow, tooltip)
 {
 	QtTopoEntitiesAssociationsPanel*	operationPanel	=
@@ -1023,7 +1023,7 @@ QtTopoEntitiesAssociationsPanel*
 void QtTopoEntitiesAssociationsAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DTopoOperationAction::executeOperation ( );
 
 	// Récupération des paramètres d'association des entités topologiques :

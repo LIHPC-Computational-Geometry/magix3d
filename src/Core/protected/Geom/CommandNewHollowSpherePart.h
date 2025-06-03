@@ -1,20 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/*
- * CommandNewHollowSpherePart.h
- *
- *  Created on: 29 mars 2016
- *      Author: Eric B
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDNEWHOLLOWSPHEREPART_H_
 #define COMMANDNEWHOLLOWSPHEREPART_H_
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandCreateGeom.h"
-#include "Utils/Point.h"
-#include "Utils/Vector.h"
 #include "Internal/Context.h"
-#include "Geom/Volume.h"
-#include "Utils/Constants.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

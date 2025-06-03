@@ -1,22 +1,17 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandSplitBlocks.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 14/5/2014
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDSPLITBLOCKS_H_
 #define COMMANDSPLITBLOCKS_H_
 /*----------------------------------------------------------------------------*/
 #include "Topo/CommandEditTopo.h"
+#include "Utils/Point.h"
+/*----------------------------------------------------------------------------*/
 #include <map>
 #include <set>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Topo {
+class CoEdge;
 /*----------------------------------------------------------------------------*/
 /** \class CommandSplitBlocks
  *  \brief Commande permettant de découper un ensemble de blocs (structuré) en 2
@@ -44,7 +39,7 @@ public:
      *  \param arete l'arête qui sert à déterminer la direction de la coupe structurée
      *  \param pt un point qui donnera un paramètre pour déterminer la position du sommet sur l'arête par projection sur cette dernière
      */
-    CommandSplitBlocks(Internal::Context& c, std::vector<Topo::Block* > &blocs, CoEdge* arete, const Point& pt);
+    CommandSplitBlocks(Internal::Context& c, std::vector<Topo::Block* > &blocs, CoEdge* arete, const Utils::Math::Point& pt);
 
     /** \brief  Constructeur pour tous les blocs blocs, une arête et un ratio
      *
@@ -60,7 +55,7 @@ public:
      *  \param arete l'arête qui sert à déterminer la direction de la coupe structurée
      *  \param pt un point qui donnera un paramètre pour déterminer la position du sommet sur l'arête par projection sur cette dernière
      */
-    CommandSplitBlocks(Internal::Context& c, CoEdge* arete, const Point& pt);
+    CommandSplitBlocks(Internal::Context& c, CoEdge* arete, const Utils::Math::Point& pt);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur

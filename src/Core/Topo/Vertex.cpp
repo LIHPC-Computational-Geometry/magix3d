@@ -3,6 +3,8 @@
 #include <string>
 #include <string.h>
 /*----------------------------------------------------------------------------*/
+#include "Internal/Context.h"
+#include "Internal/InfoCommand.h"
 #include "Topo/Vertex.h"
 #include "Topo/CoEdge.h"
 #include "Topo/CoFace.h"
@@ -11,20 +13,13 @@
 #include "Topo/CommandEditTopo.h"
 #include "Topo/FaceMeshingPropertyTransfinite.h"
 #include "Topo/BlockMeshingPropertyTransfinite.h"
-
 #include "Mesh/CommandCreateMesh.h"
 #include "Mesh/MeshItf.h"
-
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/SerializedRepresentation.h"
-
-#include "Internal/ContextIfc.h"
-#include "Internal/InfoCommand.h"
-
 #include "Geom/GeomEntity.h"
 #include "Geom/GeomProjectImplementation.h"
-
 #include "Group/Group0D.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
@@ -633,7 +628,7 @@ Utils::Math::Point Vertex::getCoord() const
 {
 	Utils::Math::Point res;
 	if (isMeshed()){
-		gmds::Mesh& gmds_mesh = getContext().getLocalMeshManager().getMesh()->getGMDSMesh();
+		gmds::Mesh& gmds_mesh = getContext().getMeshManager().getMesh()->getGMDSMesh();
 		gmds::math::Point pt = gmds_mesh.get<gmds::Node>(m_mesh_data->node()).point();
 		res.setX(pt.X());
 		res.setY(pt.Y());

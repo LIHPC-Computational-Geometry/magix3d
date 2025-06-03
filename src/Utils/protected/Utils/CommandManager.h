@@ -10,7 +10,6 @@
 #ifndef UTILS_COMMAND_MANAGER_H_
 #define UTILS_COMMAND_MANAGER_H_
 
-#include "Utils/CommandManagerIfc.h"
 #include "Utils/CommandRunner.h"
 
 #include <TkUtil/ReferencedObject.h>
@@ -30,7 +29,7 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Utils {
 
-class UndoRedoManagerIfc;
+class UndoRedoManager;
 
 /*----------------------------------------------------------------------------*/
 /** \class CommandManager
@@ -45,10 +44,23 @@ class UndoRedoManagerIfc;
  *         <I>TkUtil::Exception</I>.
  */
 /*----------------------------------------------------------------------------*/
-class CommandManager :
-	public Mgx3D::Utils::CommandManagerIfc, public TkUtil::ReferencedNamedObject
+class CommandManager : public TkUtil::ReferencedNamedObject
 {
 	public:
+
+	/**
+	 * Politique de fonctionnement du gestionnaire de commande :<BR>
+	 * <UL>
+	 * <LI><I>THREADED</I> : lancement possible de commandes dans des threads
+	 * dédiés,
+	 * <LI>SEQUENTIAL</I> : les tâches sont lancées séquentiellement. Si une
+	 * commande est soumise alors qu'une autre est en cours d'exécution, cette
+	 * nouvelle commande est mise en file d'attente. Les commandes en file
+	 * d'attente sont lancées une à une, dans leur ordre de soumission, lorsque
+	 * plus aucune commande n'est en cours d'exécution.
+	 * </UL>
+	 */
+	enum POLICY {THREADED, SEQUENTIAL};
 
 	/**
 	 * Durée estimée d'une commande, en secondes, à partir de laquelle la
@@ -67,7 +79,7 @@ class CommandManager :
 	 * que les politique peuvent évoluer temporairement, dans le cadre
 	 * d'exécution de scripts par exemple).
 	 */
-	static CommandManagerIfc::POLICY	runningPolicy;
+	static CommandManager::POLICY	runningPolicy;
 
 	/**
 	 * Constructeur. RAS.
@@ -100,15 +112,14 @@ class CommandManager :
 	 * \return  La politique d'exécution des commandes en cours.
 	 * \see		setPolicy
 	 */
-	virtual CommandManagerIfc::POLICY getPolicy ( ) const;
+	virtual POLICY getPolicy ( ) const;
 
 	/**
 	 * \param	Nouvelle politique d'exécution des commandes en cours.
 	 * \return	L'ancienne politique d'exécution des commandes en cours.
 	 * \see		getPolicy
 	 */
-	virtual CommandManagerIfc::POLICY setPolicy (
-											CommandManagerIfc::POLICY policy);
+	virtual POLICY setPolicy (POLICY policy);
 
 	/**
 	 * <P>Ajoute une commande à la liste des commandes gérées. Cette commande
@@ -142,7 +153,7 @@ class CommandManager :
 	 * \see		hasQueuedCommands
 	 * \see		processQueuedCommands
 	 */
-	virtual void addCommand (CommandIfc* command, Command::PLAY_TYPE pt);
+	virtual void addCommand (Command* command, Command::PLAY_TYPE pt);
 
 	/**
 	 * Exécute tant que c'est possible les commandes en file d'attente.
@@ -156,7 +167,6 @@ class CommandManager :
 	/**
 	 * \return		La liste des commandes (commandes en cours ou terminée, et pouvant être en erreur).
 	 */
-	virtual std::vector<CommandIfc*> getCommandIfcs ( ) const;
 	virtual std::vector<Command*> getCommands ( ) const;
 
 	/**
@@ -197,7 +207,7 @@ class CommandManager :
 	 *				commande exécutée ou en cours d'exécution.
 	 * \see			getCommandName
 	 */
-	 virtual CommandIfc::status getStatus ( ) const;
+	 virtual Command::status getStatus ( ) const;
 
 	/**
 	 * \return		Le nom de la commande courante, à savoir le nom de la
@@ -221,9 +231,9 @@ class CommandManager :
 	/**
 	 * Le gestionnaire de <I>undo/redo</I>.
 	 */
-	virtual const UndoRedoManagerIfc& getUndoManager ( ) const;
-	virtual UndoRedoManagerIfc& getUndoManager ( );
-	virtual void setUndoManager (UndoRedoManagerIfc* mgr);
+	virtual const UndoRedoManager& getUndoManager ( ) const;
+	virtual UndoRedoManager& getUndoManager ( );
+	virtual void setUndoManager (UndoRedoManager* mgr);
 
 	//@}	// Méthodes relatives à la gestion du <I>undo/redo</I>.
 
@@ -286,7 +296,7 @@ class CommandManager :
 	 *
 	 *  Il faut passer par le contexte pour l'utiliser.
 	 * Invoque <I>addCommand</I> avec la dernière commande et
-	 * <I>CommandIfc::UNDO</I>.
+	 * <I>Command::UNDO</I>.
 	 */
 	virtual void undo();
 
@@ -297,7 +307,7 @@ class CommandManager :
 	 * 
 	 *  Il faut passer par le contexte pour l'utiliser.
 	 * Invoque <I>addCommand</I> avec la dernière commande et
-	 * <I>CommandIfc::REDO</I>.
+	 * <I>Command::REDO</I>.
      */
 	virtual void redo();
 
@@ -316,7 +326,7 @@ class CommandManager :
 	 * \except		Si une commande est déjà en cours d'exécution séquentielle.
 	 * \see			executeThreaded
 	 */
-	virtual void executeSequential (CommandIfc* command, Command::PLAY_TYPE pt);
+	virtual void executeSequential (Command* command, Command::PLAY_TYPE pt);
 
 	/**
 	 * Execute de dans un thread dédié la commande transmise en argument selon
@@ -327,7 +337,7 @@ class CommandManager :
 	 *				d'exécution séquentielle.
 	 * \see			executeSequential
 	 */
-	virtual void executeThreaded (CommandIfc* command, Command::PLAY_TYPE pt);
+	virtual void executeThreaded (Command* command, Command::PLAY_TYPE pt);
 
 	/**
 	 * Lance de manière séquentielle la commande la plus ancienne de la file
@@ -338,10 +348,10 @@ class CommandManager :
 
 	/**
 	 * Met la commande transmise en file d'attente. Si <I>pt</I>
-	 * vaut <I>CommandIfc::QUEUED</I> alors la commande ets mise en file
-	 * d'attente avec pour valeur <I>CommandIfc::DO</I>.
+	 * vaut <I>Command::QUEUED</I> alors la commande ets mise en file
+	 * d'attente avec pour valeur <I>Command::DO</I>.
 	 */
-	virtual void addToQueue (CommandIfc* command, Command::PLAY_TYPE pt);
+	virtual void addToQueue (Command* command, Command::PLAY_TYPE pt);
 
 	/**
 	 * Envoit le <I>log</I> transmis en argument dans le flux de messages
@@ -373,7 +383,7 @@ class CommandManager :
 	TkUtil::LogOutputStream*			_logStream;
 
 	/** Gestionnaire (conteneur) pour undo/redo */
-	Utils::UndoRedoManagerIfc*        	 _undoManager;
+	Utils::UndoRedoManager*        	 _undoManager;
 
 	/** Les commandes prises en charges. On n'utilise pas <I>getObservables</I>
 	 * hérité de <I>TkUtil::ObjectBase</I> car cette liste est triée (par
@@ -387,10 +397,10 @@ class CommandManager :
 
 	/** Les éventuelles commandes en file d'attente. Les dernières soumises sont
 	 * ajoutées à la fin. Elle sont dépilées par le début => FIFO. */
-	std::deque< std::pair <Command*, CommandIfc::PLAY_TYPE> >	_queuedCommands;
+	std::deque< std::pair <Command*, Command::PLAY_TYPE> >	_queuedCommands;
 
 	/** La politique d'exécution des commandes. */
-	CommandManagerIfc::POLICY			_policy;
+	CommandManager::POLICY			_policy;
 
 	/** Un mutex non récursif pour gérer les commandes en file d'attente. */
 	mutable TkUtil::Mutex				_queuingMutex;
@@ -400,10 +410,10 @@ class CommandManager :
 	mutable TkUtil::Mutex				_sequentialMutex;
 
 	/** L'éventuelle commande exécutée séquentiellement. */
-	CommandIfc*							_sequentialCommand;
+	Command*							_sequentialCommand;
 
 	/** Le dernier status de commande reçu. */
-	CommandIfc::status					_currentStatus;
+	Command::status					_currentStatus;
 
 	/** Le nom de la dernière commande dont on a eu une modification de
 	 * status. */

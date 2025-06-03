@@ -1,11 +1,3 @@
-/*----------------------------------------------------------------------------*/
-/** \file CommandNewCylinder.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 15/11/2010
- */
-/*----------------------------------------------------------------------------*/
 #ifndef COMMANDNEWCYLINDER_H_
 #define COMMANDNEWCYLINDER_H_
 /*----------------------------------------------------------------------------*/
@@ -13,7 +5,6 @@
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
 #include "Internal/Context.h"
-#include "Geom/Volume.h"
 #include "Utils/Constants.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

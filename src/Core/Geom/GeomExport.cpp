@@ -1,18 +1,9 @@
 /*----------------------------------------------------------------------------*/
-/*
- * GeomExport.cpp
- *
- *  Created on: 4 nov. 2014
- *      Author: ledouxf
- */
-/*----------------------------------------------------------------------------*/
 #include "Geom/GeomExport.h"
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
-/*----------------------------------------------------------------------------*/
-#include <iostream>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -44,7 +35,7 @@ GeomExport::~GeomExport()
 /*----------------------------------------------------------------------------*/
 void GeomExport::perform(Internal::InfoCommand* icmd)
 {
-    Mgx3D::Geom::GeomManagerIfc& gm = m_context.getGeomManager();
+    Mgx3D::Geom::GeomManager& gm = m_context.getGeomManager();
 
     // si rien de sélectionné, on prend tout ce qui est dans le manager
     if (m_geomEntities.empty()){

@@ -1,17 +1,7 @@
-/*----------------------------------------------------------------------------*/
-/*
- *  CommandExportVTK.h
- *
- *  Created on: 17/04/2014
- *
- *  Author: legoff
- */
-/*----------------------------------------------------------------------------*/
 #ifndef MGX3D_GEOM_COMMANDEXPORTVTK_H_
 #define MGX3D_GEOM_COMMANDEXPORTVTK_H_
 /*----------------------------------------------------------------------------*/
 #include "Internal/CommandInternal.h"
-#include "Utils/Vector.h"
 #include "Geom/GeomEntity.h"
 #include "Internal/Context.h"
 #include "Geom/ExportVTKImplementation.h"

@@ -1,11 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file OCCFacetedRepresentationBuilder.cpp
- *
- *  \author legoff
- *
- *  \date 08/07/2013
- */
-/*----------------------------------------------------------------------------*/
 #include "Geom/OCCFacetedRepresentationBuilder.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
@@ -13,42 +6,26 @@
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
-//// inclusion de fichiers en-tête OCC
-#include<Poly_Polygon3D.hxx>
-#include<Poly_PolygonOnTriangulation.hxx>
-#include<BRepBndLib.hxx>
-#include<BRepMesh.hxx>
-#include<BRepTools.hxx>
-#include<BRep_Tool.hxx>
-#include<TopExp.hxx>
-#include<TopoDS.hxx>
-#include<Geom_Curve.hxx>
-#include<Geom_BSplineCurve.hxx>
-#include<Geom_BezierCurve.hxx>
-#include<Geom_OffsetCurve.hxx>
-#include<Geom_Ellipse.hxx>
-#include<Geom_Parabola.hxx>
-#include<Geom_Hyperbola.hxx>
-#include<Geom_TrimmedCurve.hxx>
-#include<Geom_Circle.hxx>
-#include<Geom_Line.hxx>
-#include<Geom_Conic.hxx>
-#include<TopoDS_Shape.hxx>
-#include<TopoDS_Wire.hxx>
-#include<TopoDS_Edge.hxx>
-#include<TopoDS_Face.hxx>
-#include<TopoDS_Iterator.hxx>
-#include<TopExp_Explorer.hxx>
-#include<Poly_Array1OfTriangle.hxx>
-#include<Poly_Triangulation.hxx>
-#include<TColgp_Array1OfPnt.hxx>
-#include<TColStd_Array1OfInteger.hxx>
-#include<GeomLProp_SLProps.hxx>
-#include<gp_Trsf.hxx>
-#include<TopTools_ListOfShape.hxx>
-#include<TopTools_IndexedMapOfShape.hxx>
-#include<TopTools_IndexedDataMapOfShapeListOfShape.hxx>
-#include<ShapeAnalysis_ShapeContents.hxx>
+#include <Poly_PolygonOnTriangulation.hxx>
+#include <BRepBndLib.hxx>
+#include <BRepMesh.hxx>
+#include <BRepTools.hxx>
+#include <BRep_Tool.hxx>
+#include <TopExp.hxx>
+#include <TopoDS.hxx>
+#include <Geom_Curve.hxx>
+#include <Geom_OffsetCurve.hxx>
+#include <TopoDS_Shape.hxx>
+#include <TopoDS_Edge.hxx>
+#include <TopoDS_Face.hxx>
+#include <TopoDS_Iterator.hxx>
+#include <TopExp_Explorer.hxx>
+#include <Poly_Array1OfTriangle.hxx>
+#include <Poly_Triangulation.hxx>
+#include <TColgp_Array1OfPnt.hxx>
+#include <TColStd_Array1OfInteger.hxx>
+#include <gp_Trsf.hxx>
+#include <TopTools_IndexedMapOfShape.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

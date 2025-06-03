@@ -4,12 +4,11 @@
  * \date		23/02/2022
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/ValidatedField.h"
-#include "Topo/TopoManagerIfc.h"
 #include "QtComponents/QtBlocksByExtrusionCreationAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
@@ -81,7 +80,7 @@ namespace Mgx3D {
             //Panneau de sélection des faces à extruder
             _facesPanel = new QtMgx3DEntityPanel(
                     groupBox, "", true, "Sélection des faces à extruder",
-                    "", &mainWindow, SelectionManagerIfc::D2,
+                    "", &mainWindow, SelectionManager::D2,
                     FilterEntity::TopoCoFace);
             _facesPanel->setMultiSelectMode(true);
             connect(_facesPanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -315,7 +314,7 @@ namespace Mgx3D {
         void QtBlocksByExtrusionCreationAction::executeOperation ( )
         {
             // Validation paramétrage :
-            M3DCommandResultIfc*	cmdResult	= 0;
+            M3DCommandResult*	cmdResult	= 0;
             QtMgx3DTopoOperationAction::executeOperation ( );
 
             // Récupération des paramètres de création du cylindre :

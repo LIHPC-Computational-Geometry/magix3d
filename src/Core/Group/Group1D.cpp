@@ -1,23 +1,9 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file Group1D.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 24/10/2012
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-/*----------------------------------------------------------------------------*/
-#include <iostream>
-/*----------------------------------------------------------------------------*/
 #include "Group/Group1D.h"
 #include "Internal/Context.h"
 #include "Internal/EntitiesHelper.h"
 #include "Geom/Curve.h"
 #include "Utils/SerializedRepresentation.h"
-
-#include <TkUtil/NumericConversions.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/

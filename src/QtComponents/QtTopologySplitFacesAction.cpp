@@ -4,7 +4,7 @@
  * \date        17/03/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -77,7 +77,7 @@ QtTopologySplitFacesPanel::QtTopologySplitFacesPanel (
 	// Les faces à découper :
 	_facesPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Faces  :", "", &mainWindow,
-			SelectionManagerIfc::D2, FilterEntity::TopoCoFace);
+			SelectionManager::D2, FilterEntity::TopoCoFace);
 	_facesPanel->setMultiSelectMode (true);
 	_facesPanel->setToolTip (QString::fromUtf8("Faces soumises au découpage si \"Toutes les faces\" n'est pas coché."));
 	connect (_facesPanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -89,7 +89,7 @@ QtTopologySplitFacesPanel::QtTopologySplitFacesPanel (
 	// L'arête orthogonale au plan de coupe :
 	_edgePanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Arête :", "", &mainWindow,
-			SelectionManagerIfc::D1, FilterEntity::TopoCoEdge);
+			SelectionManager::D1, FilterEntity::TopoCoEdge);
 	_edgePanel->setToolTip (QString::fromUtf8("Arête orthogonale au plan de coupe."));
 	connect (_edgePanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -127,7 +127,7 @@ QtTopologySplitFacesPanel::QtTopologySplitFacesPanel (
 							FilterEntity::AllGeom | FilterEntity::TopoVertex);
 	_cutPointEntityPanel	=
 		new QtMgx3DEntityPanel (this, "", true, "", "", &mainWindow,
-								SelectionManagerIfc::ALL_DIMENSIONS, filter);
+								SelectionManager::ALL_DIMENSIONS, filter);
 	_cutPointEntityPanel->setToolTip (QString::fromUtf8("Entité géométrique dont le centre sert de position de découpe, ou sommet topologique."));
 	gridLayout->addWidget (_cutPointEntityPanel, row, col++, 1, 2);
 	connect (_cutPointEntityPanel, SIGNAL (entitiesAddedToSelection(QString)),
@@ -616,7 +616,7 @@ void QtTopologySplitFacesAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (panel)
 
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de découpage des faces topologiques :

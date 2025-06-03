@@ -6,7 +6,7 @@
 #ifndef QT_2_VERTICES_PANEL_H
 #define QT_2_VERTICES_PANEL_H
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtMgx3DOperationsPanel.h"
 #include "QtComponents/QtMgx3DEntityPanel.h"
@@ -122,7 +122,7 @@ class Qt2VerticiesPanel : public QtMgx3DOperationsSubPanel
 	 * \return	Une référence sur le contexte <I>Magix 3D</I> associé à
 	 *			l'opération.
 	 */
-	virtual const Mgx3D::Internal::ContextIfc& getContext ( ) const;
+	virtual const Mgx3D::Internal::Context& getContext ( ) const;
 
 	/** \return le point pour un sommet topo ou géom */
 	Utils::Math::Point getPoint (const std::string& name) const;

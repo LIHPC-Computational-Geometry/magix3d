@@ -1,16 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/** \file Context.h
- *
- *  \author Franck Ledoux, Eric Brière de l'Isle, Charles Pignerol
- *
- *  \date 14/10/2010
- */
-/*----------------------------------------------------------------------------*/
 #ifndef CONTEXT_H_
 #define CONTEXT_H_
 /*----------------------------------------------------------------------------*/
-
-#include "Internal/ContextIfc.h"
 #include "Internal/M3DCommandManager.h"
 #include "Internal/NameManager.h"
 #include "Internal/ScriptingManager.h"
@@ -18,6 +8,8 @@
 #include "Utils/SelectionManager.h"
 #include "Utils/Unit.h"
 #include "Utils/Entity.h"
+#include "Utils/Landmark.h"
+#include "Utils/SwigCompletion.h"
 
 #include "Geom/GeomManager.h"
 #include "Topo/TopoManager.h"
@@ -25,19 +17,21 @@
 #include "Group/GroupManager.h"
 #include "SysCoord/SysCoordManager.h"
 #include "Structured/StructuredMeshManager.h"
-
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/ArgumentsMap.h>
 #include <TkUtil/PaintAttributes.h>
 #include <TkUtil/LogDispatcher.h>
 #include <TkUtil/OstreamLogOutputStream.h>
-#include <PrefsCore/BoolNamedValue.h>
-#include <PrefsCore/Section.h>
-
 #include <TkUtil/Mutex.h>
+#include <PrefsCore/Section.h>
+#include <PythonUtil/PythonSession.h>
+/*----------------------------------------------------------------------------*/
 #include <map>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
-
+namespace Internal{
+class M3DCommandResult;
+}
 namespace Utils {
 class CommandManager;
 class Property;
@@ -83,7 +77,7 @@ namespace Internal {
  * \see		getContext
  */
 /*----------------------------------------------------------------------------*/
-class Context : public ContextIfc {
+class Context {
 
 	friend class CommandChangeLengthUnit;
 	friend class CommandChangeLandmark;
@@ -91,7 +85,24 @@ class Context : public ContextIfc {
 	friend class Mesh::MeshImplementation;
 
 public:
+	/*------------------------------------------------------------------------*/
+	/** Suivant ce que l'on souhaite voir apparaitre dans le script de sauvegarde
+	 */
+	enum encodageScripts {
+		WITHNAMES=0,
+		WITHIDREF=1,
+		WITHCOORD=2
+	};
 
+	/*------------------------------------------------------------------------*/
+	/** Possibilité de spécifier que le maillage est 2D
+	 */
+	enum meshDim {
+		MESH2D=2,
+		MESH3D=3
+	};
+
+#ifndef SWIG
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur. S'enregistre auprès d'une liste de contextes
 	 *			existants et accessibles via la fonction <I>getContext</I>.
@@ -107,7 +118,8 @@ public:
 	 *			existants et accessibles via la fonction <I>getContext</I>.
 	 * \see		getContext
      */
-    virtual ~Context();
+    ~Context();
+#endif
 
     /** \brief	Initialisation de l'API.
      *  \param	argv argc et argv du main. Utilisation des éventuels arguments :<BR>
@@ -135,136 +147,63 @@ public:
 
 #ifndef SWIG
     /** Booléen qui permet de savoir si l'on est en train de quitter la session ou non */
-    virtual bool isFinished() {return m_is_finish;}
-    virtual void setFinished(bool b) {m_is_finish = b;}
+    bool isFinished() {return m_is_finish;}
+    void setFinished(bool b) {m_is_finish = b;}
 
-    /*------------------------------------------------------------------------*/
+
+	/*------------------------------------------------------------------------*/
+	/** \param  name Le nouveau nom unique de l'instance.
+	 */
+	void setName (const std::string& name) {m_name=name;}
+
+	/*------------------------------------------------------------------------*/
     /** \brief  Accesseur sur la session de scripting <I>Python</I>.
 	 * \exception	Une exception est levée en l'absence de session associée.
      */
-    virtual TkUtil::PythonSession& getPythonSession();
-    virtual void setPythonSession (TkUtil::PythonSession*);
-
-#endif
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Accesseur sur le manager géométrique
-     */
-
-    virtual Mgx3D::Geom::GeomManagerIfc& getGeomManager();
-    virtual const Mgx3D::Geom::GeomManagerIfc& getGeomManager() const;
-	virtual void setGeomManager (Mgx3D::Geom::GeomManagerIfc* mgr);
-    virtual Mgx3D::Geom::GeomManager& getLocalGeomManager();
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Accesseur sur le manager topologique
-     */
-    virtual Mgx3D::Topo::TopoManagerIfc& getTopoManager();
-    virtual const Mgx3D::Topo::TopoManagerIfc& getTopoManager() const;
-	virtual void setTopoManager (Mgx3D::Topo::TopoManagerIfc* mgr);
-    virtual Mgx3D::Topo::TopoManager& getLocalTopoManager();
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Accesseur sur le manager de maillage
-     */
-    virtual Mgx3D::Mesh::MeshManagerIfc& getMeshManager();
-    virtual const Mgx3D::Mesh::MeshManagerIfc& getMeshManager() const;
-	virtual void setMeshManager (Mgx3D::Mesh::MeshManagerIfc* mgr);
-    virtual Mgx3D::Mesh::MeshManager& getLocalMeshManager();
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Accesseur sur le manager de groupes
-     */
-    virtual Mgx3D::Group::GroupManagerIfc& getGroupManager();
-    virtual const Mgx3D::Group::GroupManagerIfc& getGroupManager() const;
-    virtual void setGroupManager (Mgx3D::Group::GroupManagerIfc* mgr);
-    virtual Mgx3D::Group::GroupManager& getLocalGroupManager();
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Accesseur sur le manager de repères
-     */
-    virtual Mgx3D::CoordinateSystem::SysCoordManagerIfc& getSysCoordManager();
-    virtual const Mgx3D::CoordinateSystem::SysCoordManagerIfc& getSysCoordManager() const;
-    virtual void setSysCoordManager (Mgx3D::CoordinateSystem::SysCoordManagerIfc* mgr);
-    virtual Mgx3D::CoordinateSystem::SysCoordManager& getLocalSysCoordManager();
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Accesseur sur le manager de maillages structurés
-     */
-    virtual Mgx3D::Structured::StructuredMeshManagerIfc& getStructuredMeshManager();
-    virtual const Mgx3D::Structured::StructuredMeshManagerIfc& getStructuredMeshManager() const;
-    virtual void setStructuredMeshManager (Mgx3D::Structured::StructuredMeshManagerIfc* mgr);
-
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Accesseur sur le manager de créations de niveau supérieur (compositions)
-     */
-#ifndef SWIG
-    virtual Mgx3D::Internal::M3DCommandManager& getM3DCommandManager() {return m_m3d_command_manager;}
-#endif
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Accesseur sur le manager de commandes
-     */
-#ifndef SWIG
-    virtual Mgx3D::Utils::CommandManagerIfc& getCommandManager();
-	virtual void setCommandManager (Mgx3D::Utils::CommandManagerIfc* mgr);
-    virtual Mgx3D::Utils::CommandManager& getLocalCommandManager();
-#endif
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Accesseur sur le manager de noms
-     */
-#ifndef SWIG
-    virtual Mgx3D::Internal::NameManager& getNameManager() {return *m_name_manager;}
-    virtual const Mgx3D::Internal::NameManager& getNameManager() const {return *m_name_manager;}
-#endif
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Accesseur sur le gestionnaire de sélection.
-     */
-#ifndef SWIG
-    virtual Mgx3D::Utils::SelectionManagerIfc& getSelectionManager ( );
-    virtual const Mgx3D::Utils::SelectionManagerIfc& getSelectionManager ( ) const;
-    virtual void setSelectionManager (Mgx3D::Utils::SelectionManagerIfc*);
-#endif
+    TkUtil::PythonSession& getPythonSession();
+    void setPythonSession (TkUtil::PythonSession*);
 
 	/*------------------------------------------------------------------------*/
-    /**
-     * Sauvegarde dans un fichier les commandes Python actuellement
-     * dans le commandManager (les undo n'apparaissent pas)
-     * \param fileName nom du fichier pour la sauvegarde
-     * \param enc le type d'information dans le script (nom, référence / commandes, coordonnées)
-     */
-    virtual void savePythonScript (std::string fileName, encodageScripts enc, TkUtil::Charset::CHARSET charset);
+	/** \brief  Accesseur sur le manager de créations de niveau supérieur (compositions)
+	 */
+	Mgx3D::Internal::M3DCommandManager& getM3DCommandManager() {return m_m3d_command_manager;}
 
-    /*------------------------------------------------------------------------*/
-    /// active le décalage des id pour renommer les entités
-    virtual void activateShiftingNameId();
+	/*------------------------------------------------------------------------*/
+	/** \brief  Accesseur sur le manager de commandes
+	 */
+	Mgx3D::Utils::CommandManager& getCommandManager();
+	void setCommandManager (Mgx3D::Utils::CommandManager* mgr);
+	Mgx3D::Utils::CommandManager& getLocalCommandManager();
 
-    /// désactive le décalage des id pour renommer les entités
-    virtual void unactivateShiftingNameId();
+	/*------------------------------------------------------------------------*/
+	/** Le thread principal de l'application. */
+	static pthread_t threadId;
 
-    /*------------------------------------------------------------------------*/
+	/*------------------------------------------------------------------------*/
+	/** \brief  Accesseur sur le gestionnaire de sélection.
+	 */
+	Mgx3D::Utils::SelectionManager& getSelectionManager ( );
+	const Mgx3D::Utils::SelectionManager& getSelectionManager ( ) const;
+	void setSelectionManager (Mgx3D::Utils::SelectionManager*);
+	/*------------------------------------------------------------------------*/
 
 	/**
 	 * La gestion de l'affichage des informations relatives au déroulement des
 	 * sessions.
 	 */
 	//@{
-    /*------------------------------------------------------------------------*/
-    /** \brief  Accesseur sur le gestionnaire de flux.
-     */
-#ifndef SWIG
-    virtual TkUtil::LogDispatcher& getLogDispatcher ( ) {return m_log_dispatcher;}
-    virtual const TkUtil::LogDispatcher& getLogDispatcher ( ) const {return m_log_dispatcher;}
+	/*------------------------------------------------------------------------*/
+	/** \brief  Accesseur sur le gestionnaire de flux.
+	 */
+	TkUtil::LogDispatcher& getLogDispatcher ( ) {return m_log_dispatcher;}
+	const TkUtil::LogDispatcher& getLogDispatcher ( ) const {return m_log_dispatcher;}
+	TkUtil::LogOutputStream* getLogStream ( ) {return &m_log_dispatcher; }
 
-    virtual TkUtil::LogOutputStream* getLogStream ( ) {return &m_log_dispatcher; }
 	/** \brief	Accesseur sur les flux de logs sur sortie standard et sortie
 	 *			en erreur.
 	 */
-	virtual TkUtil::OstreamLogOutputStream& getStdLogStream ( );
-	virtual TkUtil::OstreamLogOutputStream& getErrLogStream ( );
+	TkUtil::OstreamLogOutputStream& getStdLogStream ( );
+	TkUtil::OstreamLogOutputStream& getErrLogStream ( );
 
 	/**
 	 * \return		Le masque à appliquer par défaut aux flux sortants de logs.
@@ -278,50 +217,173 @@ public:
 	static void setLogsMask (TkUtil::Log::TYPE mask);
 	//@}	// gestion des logs
 
-    /*------------------------------------------------------------------------*/
-    /**
-    * \brief  Accesseur sur le gestionnaire d'écrivain de scripts
-    */
-    virtual Internal::ScriptingManager& getScriptingManager();
+	/*------------------------------------------------------------------------*/
+	/**
+	* \brief  Accesseur sur le gestionnaire d'écrivain de scripts
+	*/
+	Internal::ScriptingManager& getScriptingManager();
 
 	/*------------------------------------------------------------------------*/
 	/**
 	 * \param	manager Nouveau gestionnaire d'écrivain de scripts (adoption).
 	 */
-	virtual void setScriptingManager (Internal::ScriptingManager* manager);
+	void setScriptingManager (Internal::ScriptingManager* manager);
 
+	/*------------------------------------------------------------------------*/
+	/**
+	 * Choix d'un nom de fichier pour stockage des commandes Python
+	 */
+	std::string newScriptingFileName();
 
+	/*------------------------------------------------------------------------*/
+	/**
+	 *  Retourne vrai si le contexte est graphique
+	 *  c'est à dire s'il existe une représentation des entités
+	 */
+	bool isGraphical() const
+	{return m_is_graphical;}
+
+	/// modifie le contexte (avec affichage graphique ou non)
+	void setGraphical(bool gr)
+	{m_is_graphical = gr;}
+
+	/**
+	 * \return  La couleur de fond du système graphique.
+	 */
+	TkUtil::Color getBackground ( ) const;
+
+	/**
+	 * \param   bg La nouvelle couleur de fond du système graphique.
+	 */
+	void setBackground (const TkUtil::Color& bg);
+
+	/**
+	 * \return  Le ratio de dégradation pour l'affichage du maillage en mode dégradé
+	 */
+	int getRatioDegrad() {return m_ratio_degrad;}
+
+	/**
+	 * Modifie le ratio de dégradation pour l'affichage du maillage en mode dégradé
+	 */
+	void setRatioDegrad(int ratio) {m_ratio_degrad = ratio;}
+
+	/*------------------------------------------------------------------------*/
+	/** \brief  Adapte les Managers pour le cas d'une importation de script.
+	 *
+	 * Il sera fait un décalage sur les Id des noms des entités
+	 */
+	void beginImportScript();
+
+	/** \brief  Termine l'adaptation des Managers pour le cas d'une importation de script.
+	 */
+	void endImportScript();
 #endif
+
+    /*------------------------------------------------------------------------*/
+    /** \brief  Accesseur sur le manager géométrique
+     */
+
+    Mgx3D::Geom::GeomManager& getGeomManager();
+    const Mgx3D::Geom::GeomManager& getGeomManager() const;
+#ifndef SWIG
+	void setGeomManager (Mgx3D::Geom::GeomManager* mgr);
+#endif
+
+    /*------------------------------------------------------------------------*/
+    /** \brief  Accesseur sur le manager topologique
+     */
+    Mgx3D::Topo::TopoManager& getTopoManager();
+    const Mgx3D::Topo::TopoManager& getTopoManager() const;
+#ifndef SWIG
+	void setTopoManager (Mgx3D::Topo::TopoManager* mgr);
+#endif
+
+    /*------------------------------------------------------------------------*/
+    /** \brief  Accesseur sur le manager de maillage
+     */
+    Mgx3D::Mesh::MeshManager& getMeshManager();
+    const Mgx3D::Mesh::MeshManager& getMeshManager() const;
+#ifndef SWIG
+	void setMeshManager (Mgx3D::Mesh::MeshManager* mgr);
+#endif
+
+    /*------------------------------------------------------------------------*/
+    /** \brief  Accesseur sur le manager de groupes
+     */
+    Mgx3D::Group::GroupManager& getGroupManager();
+    const Mgx3D::Group::GroupManager& getGroupManager() const;
+#ifndef SWIG
+    void setGroupManager (Mgx3D::Group::GroupManager* mgr);
+#endif
+
+    /*------------------------------------------------------------------------*/
+    /** \brief  Accesseur sur le manager de repères
+     */
+    Mgx3D::CoordinateSystem::SysCoordManager& getSysCoordManager();
+    const Mgx3D::CoordinateSystem::SysCoordManager& getSysCoordManager() const;
+#ifndef SWIG
+    void setSysCoordManager (Mgx3D::CoordinateSystem::SysCoordManager* mgr);
+#endif
+
+    /*------------------------------------------------------------------------*/
+    /** \brief  Accesseur sur le manager de maillages structurés
+     */
+    Mgx3D::Structured::StructuredMeshManager& getStructuredMeshManager();
+    const Mgx3D::Structured::StructuredMeshManager& getStructuredMeshManager() const;
+#ifndef SWIG
+    void setStructuredMeshManager (Mgx3D::Structured::StructuredMeshManager* mgr);
+#endif
+
+    /*------------------------------------------------------------------------*/
+    /** \brief  Accesseur sur le manager de noms
+     */
+#ifndef SWIG
+    Mgx3D::Internal::NameManager& getNameManager() {return *m_name_manager;}
+    const Mgx3D::Internal::NameManager& getNameManager() const {return *m_name_manager;}
+#endif
+
+
+	/*------------------------------------------------------------------------*/
+    /**
+     * Sauvegarde dans un fichier les commandes Python actuellement
+     * dans le commandManager (les undo n'apparaissent pas)
+     * \param fileName nom du fichier pour la sauvegarde
+     * \param enc le type d'information dans le script (nom, référence / commandes, coordonnées)
+     */
+    void savePythonScript (std::string fileName, encodageScripts enc, TkUtil::Charset::CHARSET charset);
+
+    /*------------------------------------------------------------------------*/
+    /// active le décalage des id pour renommer les entités
+    void activateShiftingNameId();
+
+    /// désactive le décalage des id pour renommer les entités
+    void unactivateShiftingNameId();
+
+
+#ifndef SWIG
     /*------------------------------------------------------------------------*/
     /**
      * Attribution d'un nouveau id unique par entité, incrémentation automatique
      */
-#ifndef SWIG
     unsigned long newUniqueId();
-#endif
-    /**
+
+	/**
       * Attribution d'un nouveau id unique par entité, sans incrémentation
       */
-#ifndef SWIG
     unsigned long nextUniqueId();
-#endif
 
     /*------------------------------------------------------------------------*/
     /**
      * Attribution d'un nouveau id unique par explorateur
      */
-#ifndef SWIG
     unsigned long newExplorerId();
-#endif
 
     /*------------------------------------------------------------------------*/
     /**
     * Allocation d'une nouvelle propriété pour une entité (le nom)
     * \param ot le type d'objet
     */
-#ifndef SWIG
     Utils::Property* newProperty(const Utils::Entity::objectType& ot);
-#endif
 
     /*------------------------------------------------------------------------*/
     /**
@@ -329,31 +391,25 @@ public:
     * \param ot le type d'objet
     * \param name le nom de l'objet
     */
-#ifndef SWIG
     Utils::Property* newProperty(const Utils::Entity::objectType& ot, const std::string& name);
-#endif
 
     /*------------------------------------------------------------------------*/
     /**
     * \return	Les propriétés d'affichage globale pour une entité (la couleur)
     * \param	ot le type d'objet
     */
-#ifndef SWIG
     Utils::DisplayProperties& globalDisplayProperties (
 										Utils::Entity::objectType ot);
     const Utils::DisplayProperties& globalDisplayProperties (
 										Utils::Entity::objectType ot) const;
-#endif
 
     /*------------------------------------------------------------------------*/
     /**
     * \return	Le masque d'affichage global pour une entité (filaire, surfacique, ...)
     * \param	ot le type d'objet
     */
-#ifndef SWIG
     unsigned long& globalMask (Utils::Entity::objectType ot);
     unsigned long globalMask (Utils::Entity::objectType ot) const;
-#endif
 
     /*------------------------------------------------------------------------*/
     /**
@@ -362,184 +418,128 @@ public:
     * \see		restoreGlobalMaskWireProperties
     * \see		restoreGlobalMaskSolidProperties
     */
-#ifndef SWIG
     unsigned long& savedGlobalMask (Utils::Entity::objectType ot);
     unsigned long savedGlobalMask (Utils::Entity::objectType ot) const;
-#endif
 
     /*------------------------------------------------------------------------*/
     /**
     * Restaure les propriétés filaires/solides au masque pour le type d'entité transmis en argument.
     * \param	ot le type d'objet
     */
-#ifndef SWIG
     void restoreGlobalMaskWireProperties (Utils::Entity::objectType ot);
     void restoreGlobalMaskSolidProperties (Utils::Entity::objectType ot);
-#endif
 
     /*------------------------------------------------------------------------*/
     /**
     * Allocation d'une nouvelle propriété d'affichage pour une entité (la couleur)
     * \param ot le type d'objet
     */
-#ifndef SWIG
     Utils::DisplayProperties* newDisplayProperties(const Utils::Entity::objectType& ot);
+	/*------------------------------------------------------------------------*/
+	/**
+	* Affectation d'une nouvelle représentation graphique pour une entité
+	* SI l'entité est affichable
+	* (<I>true == getDisplayProperties ( ).isDisplayable</I>.
+	*/
+	void newGraphicalRepresentation(Utils::Entity& entity);
 #endif
 
     /** Passage en mode apperçu ou non. En mode apperçu les couleurs fournies
      * par newDisplayProperties n'interviennent pas dans l'algorithme d'attribution
      * des couleurs.
      */
-     virtual bool isPreviewMode ( ) const
+     bool isPreviewMode ( ) const
      { return m_preview_mode; }
-     virtual void setPreviewMode (bool preview)
+     void setPreviewMode (bool preview)
      { m_preview_mode = preview; }
-
-    /*------------------------------------------------------------------------*/
-    /**
-    * Affectation d'une nouvelle représentation graphique pour une entité
-	* SI l'entité est affichable
-	* (<I>true == getDisplayProperties ( ).isDisplayable</I>.
-    */
-#ifndef SWIG
-    virtual void newGraphicalRepresentation(Utils::Entity& entity);
-#endif
 
     /*------------------------------------------------------------------------*/
     /**
      *  Déseffectue la dernière commande effectuée
      */
-    virtual void undo();
+    void undo();
     /**
      *  Rejoue la dernière commande défaite
      */
-    virtual void redo();
+    void redo();
 
     /*------------------------------------------------------------------------*/
     /**
      *  Retourne un vecteur avec les identifiants des entités actuellement sélectionnées
      */
-    virtual std::vector<std::string> getSelectedEntities ( ) const;
+    std::vector<std::string> getSelectedEntities ( ) const;
 
     /**
      *  Ajoute à la sélection un ensemble d'entités suivant leurs noms
      */
-    virtual void addToSelection (std::vector<std::string>& names);
+    void addToSelection (std::vector<std::string>& names);
 
     /**
      *  Retire de la sélection un ensemble d'entités suivant leurs noms
      */
-    virtual void removeFromSelection (std::vector<std::string>& names);
-
-    /*------------------------------------------------------------------------*/
-    /**
-     * Choix d'un nom de fichier pour stockage des commandes Python
-     */
-#ifndef SWIG
-    virtual std::string newScriptingFileName();
-#endif
-
-    /*------------------------------------------------------------------------*/
-    /**
-     *  Retourne vrai si le contexte est graphique
-     *  c'est à dire s'il existe une représentation des entités
-     */
-    virtual bool isGraphical() const
-    {return m_is_graphical;}
-
-    /// modifie le contexte (avec affichage graphique ou non)
-    virtual void setGraphical(bool gr)
-    {m_is_graphical = gr;}
-
-#ifndef SWIG
-
-	/**
-	 * \return  La couleur de fond du système graphique.
-	 */
-	virtual TkUtil::Color getBackground ( ) const;
-
-    /**
-	 * \param   bg La nouvelle couleur de fond du système graphique.
-	 */
-	virtual void setBackground (const TkUtil::Color& bg);
-
-#endif	// SWIG
-
-	/**
-	 * \return  Le ratio de dégradation pour l'affichage du maillage en mode dégradé
-	 */
-	virtual int getRatioDegrad() {return m_ratio_degrad;}
-
-	/**
-	 * Modifie le ratio de dégradation pour l'affichage du maillage en mode dégradé
-	 */
-	virtual void setRatioDegrad(int ratio) {m_ratio_degrad = ratio;}
+    void removeFromSelection (std::vector<std::string>& names);
 
 	/*------------------------------------------------------------------------*/
-    /** \brief  Adapte les Managers pour le cas d'une importation de script.
-     *
-     * Il sera fait un décalage sur les Id des noms des entités
-     */
-#ifndef SWIG
-    virtual void beginImportScript();
-#endif
-    /** \brief  Termine l'adaptation des Managers pour le cas d'une importation de script.
-     */
-#ifndef SWIG
-    virtual void endImportScript();
-#endif
+	/** Accesseur sur le nom de l'instance du context
+	 * \return  Le nom unique de l'instance.
+	 */
+	const std::string& getName() const {return m_name;}
 
     /*------------------------------------------------------------------------*/
     /// retourne le repère dans lequel on travaille.
-    virtual Utils::Landmark::kind getLandmark() const {return m_landmark;}
+    Utils::Landmark::kind getLandmark() const {return m_landmark;}
 
     /// commande, change le repère dans lequel on travaille.
-    virtual Internal::M3DCommandResultIfc* setLandmark(Utils::Landmark::kind l);
+    Internal::M3DCommandResult* setLandmark(Utils::Landmark::kind l);
+	SET_SWIG_COMPLETABLE_METHOD(setLandmark)
 
     /*------------------------------------------------------------------------*/
     /// retourne l'unité de longueur
-    virtual Utils::Unit::lengthUnit getLengthUnit() const {return m_length_unit;}
+    Utils::Unit::lengthUnit getLengthUnit() const {return m_length_unit;}
 
     /// commande, change l'unité de longueur
-    virtual Internal::M3DCommandResultIfc* setLengthUnit(const Utils::Unit::lengthUnit& lu);
+    Internal::M3DCommandResult* setLengthUnit(const Utils::Unit::lengthUnit& lu);
+	SET_SWIG_COMPLETABLE_METHOD(setLengthUnit)
 
     /*------------------------------------------------------------------------*/
 	/// retourne la dimension du maillage en sortie
-	virtual meshDim getMeshDim() const {return m_mesh_dim;}
+	meshDim getMeshDim() const {return m_mesh_dim;}
+	SET_SWIG_COMPLETABLE_METHOD(getMeshDim)
 
 	/// change la dimension pour le maillage en sortie, 3D par défaut
-	virtual Internal::M3DCommandResultIfc* setMesh2D();
+	Internal::M3DCommandResult* setMesh2D();
+	SET_SWIG_COMPLETABLE_METHOD(setMesh2D)
 
     /*------------------------------------------------------------------------*/
     /** Réinitialisation de la session
      */
-    virtual void clearSession();
+    void clearSession();
 
     /** Retourne toutes les entités visibles, y compris celle détruites mais visibles !
      */
-    virtual const std::vector<Utils::Entity*> getAllVisibleEntities();
+    const std::vector<Utils::Entity*> getAllVisibleEntities();
 
     /*------------------------------------------------------------------------*/
     /** \brief  Ajoute un couple unique id et entité.
      */
 #ifndef SWIG
-    virtual void add(unsigned long id,  Utils::Entity* entity);
+    void add(unsigned long id,  Utils::Entity* entity);
 
     /** \brief  Retire un couple référencé par un unique id.
      */
-    virtual void remove(unsigned long id);
+    void remove(unsigned long id);
 
 	/** \brief Retourne les entités dont les ids sont transmis en argument.
 	 *         Une exception est levée si une entité n'est pas dans le contexte
 	 *         et si le second argument vaut true.
 	 */
-	virtual std::vector<Utils::Entity*> get(const std::vector<unsigned long>& ids, bool raisesIfNotFound) const;
+	std::vector<Utils::Entity*> get(const std::vector<unsigned long>& ids, bool raisesIfNotFound) const;
 
 	/** \brief Retourne les entités dont les noms sont transmis en argument.
 	 *         Une exception est levée si une entité n'est pas dans le contexte
 	 *         et si le second argument vaut true.
 	 */
-	virtual std::vector<Utils::Entity*> get(const std::vector<std::string>& names, bool raisesIfNotFound) const;
+	std::vector<Utils::Entity*> get(const std::vector<std::string>& names, bool raisesIfNotFound) const;
 
     /**  Vide la table de correspondance entre un unique id et l'objet
      *
@@ -567,7 +567,8 @@ public:
 	 * \exception	Une exception est levée s'il n'y a pas d'entité ayant cet
 	 *				identifiant unique.
 	 */
-	virtual Utils::Entity& uniqueIdToEntity (unsigned long uid) const;
+	Utils::Entity& uniqueIdToEntity (unsigned long uid) const;
+	SET_SWIG_COMPLETABLE_METHOD(uniqueIdToEntity)
 
 	/*------------------------------------------------------------------------*/
 	/** \return		Une référence sur l'entité dont le nom est
@@ -575,14 +576,15 @@ public:
 	 * \exception	Une exception est levée s'il n'y a pas d'entité ayant ce
 	 *				nom.
 	 */
-	virtual Utils::Entity& nameToEntity (const std::string& name) const;
-
+	Utils::Entity& nameToEntity (const std::string& name) const;
+	SET_SWIG_COMPLETABLE_METHOD(nameToEntity)
 
 	/// accesseur sur ne nom de l'exe
-	virtual std::string getExeName() const {return m_exeName;}
+	std::string getExeName() const {return m_exeName;}
 
 	/// modificateur sur nom de l'exe
-	virtual void setExeName(std::string name) {m_exeName = name;}
+	void setExeName(std::string name) {m_exeName = name;}
+	SET_SWIG_COMPLETABLE_METHOD(setExeName)
 
     /** Les couleurs initiales des représentations des entités. */
     static TkUtil::Color	m_initial_geom_displayColor;
@@ -590,16 +592,6 @@ public:
     static TkUtil::Color	m_initial_mesh_displayColor;
     static TkUtil::Color	m_initial_group_displayColor;
 
-
-protected:
-    /*------------------------------------------------------------------------*/
-    /**
-     * Redirige les signaux en vue d'intervenir avec un debuggeur
-     * Pourrait effectuer une procedure d'urgence avant de quitter.
-     */
-    void _redirect_signals(fSignalFunc sig_func);
-
-public :
 	/**
 	 * Créé un nom supposé unique d'instance en utilisant son propre nom comme
 	 * suffixe.
@@ -608,11 +600,18 @@ public :
 	 * <I>"GeomManager_Session_1"</I>.
 	 * \param	base Suffixe du nom créé
 	 */
-	virtual std::string createName (const std::string& base) const;
+	std::string createName (const std::string& base) const;
 
-	//avant private, passe en protected par F. Ledoux car accès par des classes
-	//filles utile en parallele
-protected:
+private:
+	/** Nom unique de l'instance. */
+	std::string m_name;
+
+	/*------------------------------------------------------------------------*/
+    /**
+     * Redirige les signaux en vue d'intervenir avec un debuggeur
+     * Pourrait effectuer une procedure d'urgence avant de quitter.
+     */
+    void _redirect_signals(fSignalFunc sig_func);
 
 	/**
  	 * Constructeurs de copie et opérateurs = : interdits.
@@ -621,25 +620,25 @@ protected:
 	Context& operator = (const Context&);
 
     /// Manager pour les commandes
-    Mgx3D::Utils::CommandManagerIfc*    m_command_manager; // on utilise un pointeur pour éviter d'inclure le .h car cela pose pb / swig
+    Mgx3D::Utils::CommandManager*    m_command_manager; // on utilise un pointeur pour éviter d'inclure le .h car cela pose pb / swig
 	/// Session Python :
 	TkUtil::PythonSession*				m_python_session;
     /// Manager pour les commandes géométriques
-    Mgx3D::Geom::GeomManagerIfc*		m_geom_manager;
+    Mgx3D::Geom::GeomManager*		m_geom_manager;
     /// Manager pour les commandes topologiques
-    Mgx3D::Topo::TopoManagerIfc*		m_topo_manager;
+    Mgx3D::Topo::TopoManager*		m_topo_manager;
     /// Manager pour le maillage
-    Mgx3D::Mesh::MeshManagerIfc*        m_mesh_manager;
+    Mgx3D::Mesh::MeshManager*        m_mesh_manager;
     /// Groupes pour les différents types d'entités
-    Mgx3D::Group::GroupManagerIfc*      m_group_manager;
+    Mgx3D::Group::GroupManager*      m_group_manager;
     /// Repères
-    Mgx3D::CoordinateSystem::SysCoordManagerIfc* m_sys_coord_manager;
+    Mgx3D::CoordinateSystem::SysCoordManager* m_sys_coord_manager;
     /// Maillages structurés :
-    Mgx3D::Structured::StructuredMeshManagerIfc*	m_structured_mesh_manager;
+    Mgx3D::Structured::StructuredMeshManager*	m_structured_mesh_manager;
     /// Manager pour les commandes de niveau supérieur
     Mgx3D::Internal::M3DCommandManager  m_m3d_command_manager;
     /// Manager de sélection
-    Mgx3D::Utils::SelectionManagerIfc*	m_selection_manager;
+    Mgx3D::Utils::SelectionManager*	m_selection_manager;
     /// Manager pour la gestion des noms
     Mgx3D::Internal::NameManager       *m_name_manager;
 

@@ -4,7 +4,7 @@
  * \date        06/03/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 #include "QtComponents/QtTopologyFuse2FacesAction.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "Utils/Common.h"
@@ -57,7 +57,7 @@ QtTopologyFuse2FacesPanel::QtTopologyFuse2FacesPanel (
 	// La face 1 à coller :
 	_faces1Panel	= new QtMgx3DEntityPanel (
 			this, "", true, "Faces 1 :", "", &mainWindow,
-			SelectionManagerIfc::D2, FilterEntity::TopoCoFace);
+			SelectionManager::D2, FilterEntity::TopoCoFace);
 	_faces1Panel->setMultiSelectMode (true);
 	connect (_faces1Panel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -68,7 +68,7 @@ QtTopologyFuse2FacesPanel::QtTopologyFuse2FacesPanel (
 	// La face 2 à coller :
 	_faces2Panel	= new QtMgx3DEntityPanel (
 			this, "", true, "Faces 2 :", "", &mainWindow,
-			SelectionManagerIfc::D2, FilterEntity::TopoCoFace);
+			SelectionManager::D2, FilterEntity::TopoCoFace);
 	_faces2Panel->setMultiSelectMode (true);
 	connect (_faces2Panel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -300,16 +300,16 @@ void QtTopologyFuse2FacesAction::executeOperation ( )
 	vector<string>	names1	= panel->getFaces1Names ( );
 	vector<string>	names2	= panel->getFaces2Names ( );
 
-	Mgx3D::Internal::M3DCommandResultIfc*	result	= 0;
+	Mgx3D::Internal::M3DCommandResult*	result	= 0;
 	if ((names1.size ( ) == 1) && (names2.size ( ) == 1))
 		result	= getContext ( ).getTopoManager ( ).fuse2Faces (names1 [0], names2 [0]);
 	else
 		result	= getContext ( ).getTopoManager ( ).fuse2FaceList (names1, names2);
 	CHECK_NULL_PTR_ERROR (result)
 	setCommandResult (result);
-	if (CommandIfc::FAIL == result->getStatus ( ))
+	if (Command::FAIL == result->getStatus ( ))
 		throw Exception (result->getErrorMessage ( ));
-	else if (CommandIfc::CANCELED == result->getStatus ( ))
+	else if (Command::CANCELED == result->getStatus ( ))
 		throw Exception ("Opération annulée");
 }	// QtTopologyFuse2FacesAction::executeOperation
 

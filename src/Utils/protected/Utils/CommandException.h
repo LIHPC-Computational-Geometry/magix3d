@@ -8,7 +8,7 @@
 #ifndef UTILS_COMMAND_EXCEPTION_H
 #define UTILS_COMMAND_EXCEPTION_H
 
-#include "Utils/CommandIfc.h"
+#include "Utils/Command.h"
 
 
 namespace Mgx3D 
@@ -27,18 +27,18 @@ class CommandException : public TkUtil::Exception
 {
 	public :
 	
-	CommandException (const TkUtil::UTF8String& msg, Mgx3D::Utils::CommandIfc* cmd);
+	CommandException (const TkUtil::UTF8String& msg, Mgx3D::Utils::Command* cmd);
 	CommandException (const CommandException& ce);
-	CommandException (const Exception& e, Mgx3D::Utils::CommandIfc* cmd);
+	CommandException (const Exception& e, Mgx3D::Utils::Command* cmd);
 	CommandException& operator = (const CommandException& ce);
 	virtual ~CommandException ( );
-	const Mgx3D::Utils::CommandIfc* getCommand ( ) const;
-	Mgx3D::Utils::CommandIfc* getCommand ( );
+	const Mgx3D::Utils::Command* getCommand ( ) const;
+	Mgx3D::Utils::Command* getCommand ( );
 	
 	
 	private :
 	
-	Mgx3D::Utils::CommandIfc*	_command;
+	Mgx3D::Utils::Command*	_command;
 };	// class CommandException
 
 }	// namespace Utils

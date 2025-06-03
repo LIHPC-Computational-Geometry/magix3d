@@ -1,24 +1,12 @@
 /*----------------------------------------------------------------------------*/
-/** \file CommandNewSegment.cpp
- *
- *  \author Franck Ledoux
- *
- *  \date 15/10/2010
- *
- *  Gestion avec memento par EB à partir du 29/8/2018
- */
-/*----------------------------------------------------------------------------*/
 #include "Geom/CommandNewSegment.h"
-#include "Geom/PropertyBox.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomManager.h"
-#include "Utils/MgxException.h"
+#include "Geom/Vertex.h"
 #include "Utils/MgxNumeric.h"
-
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -36,10 +24,6 @@ CommandNewSegment::CommandNewSegment(  Internal::Context& c,
              Geom::CommandCreateGeom* cmd2,
              const std::string& groupName)
 :CommandCreateWithOtherGeomEntities(c, "Création d'un segment", groupName), m_v1(0), m_v2(0), m_cmd_v1(cmd1), m_cmd_v2(cmd2)
-{}
-/*----------------------------------------------------------------------------*/
-CommandNewSegment::
-~CommandNewSegment()
 {}
 /*----------------------------------------------------------------------------*/
 void CommandNewSegment::

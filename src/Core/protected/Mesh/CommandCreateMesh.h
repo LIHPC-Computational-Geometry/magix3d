@@ -12,23 +12,28 @@
 /*----------------------------------------------------------------------------*/
 #include "Internal/MultiTaskedCommand.h"
 #include "Utils/Container.h"
-
 #include "Mesh/Cloud.h"
 #include "Mesh/Line.h"
 #include "Mesh/Surface.h"
 #include "Mesh/Volume.h"
+/*----------------------------------------------------------------------------*/
+#include <gmds/ig/Mesh.h>
 /*----------------------------------------------------------------------------*/
 namespace gmds {
 class Node;
 class Face;
 class Region;
 }
+/*----------------------------------------------------------------------------*/
+namespace Mgx3D {
 namespace Topo {
 class CoFaceMeshingProperty;
 class BlockMeshingProperty;
+class VertexMeshingData;
+class CoEdgeMeshingData;
+class CoFaceMeshingData;
+class BlockMeshingData;
 }
-/*----------------------------------------------------------------------------*/
-namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Mesh {
 /*----------------------------------------------------------------------------*/

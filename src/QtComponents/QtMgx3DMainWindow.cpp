@@ -4,7 +4,7 @@
  * \date        29/11/2010
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Command.h"
 #include "Utils/Magix3DEvents.h"
@@ -705,7 +705,7 @@ namespace QtComponents
 
 
 		QtMgx3DStateView::QtMgx3DStateView(const QString &title, QWidget *parent)
-				: QWidget(parent), _state(CommandIfc::DONE), _timer(0), _on(false),
+				: QWidget(parent), _state(Command::DONE), _timer(0), _on(false),
 				  _label(0), _labelTimer(0)
 		{
 			setFixedSize(gaugeSize, gaugeSize);
@@ -715,7 +715,7 @@ namespace QtComponents
 
 
 		QtMgx3DStateView::QtMgx3DStateView(const QtMgx3DStateView &)
-				: QWidget(0), _state(CommandIfc::DONE), _timer(0), _on(false),
+				: QWidget(0), _state(Command::DONE), _timer(0), _on(false),
 				  _label(0), _labelTimer(0)
 		{
 			MGX_FORBIDDEN("QtMgx3DStateView copy constructor is not allowed.");
@@ -741,7 +741,7 @@ namespace QtComponents
 
 
 		void QtMgx3DStateView::setState(
-				const string &cmdName, CommandIfc::status state)
+				const string &cmdName, Command::status state)
 		{
 			if (state != _state)
 			{
@@ -751,17 +751,17 @@ namespace QtComponents
 				_state = state;
 				switch (_state)
 				{
-					case CommandIfc::STARTING        :
-					case CommandIfc::PROCESSING        :
+					case Command::STARTING        :
+					case Command::PROCESSING        :
 						message << "en cours.";
 						if (0 != _timer)
 							_timer->start(timerDelay);
 						break;
-					case CommandIfc::INITED            :    // suite undo
-					case CommandIfc::FAIL            :
-					case CommandIfc::DONE            :
-					case CommandIfc::CANCELED        :
-						message << CommandIfc::statusToString(_state);
+					case Command::INITED            :    // suite undo
+					case Command::FAIL            :
+					case Command::DONE            :
+					case Command::CANCELED        :
+						message << Command::statusToString(_state);
 						if (0 != _timer)
 							_timer->stop();
 						break;
@@ -815,17 +815,17 @@ namespace QtComponents
 			int x = dimensions.width() / 2, y = dimensions.height() / 2;
 			switch (_state)
 			{
-				case CommandIfc::STARTING        :
-				case CommandIfc::PROCESSING        :
+				case Command::STARTING        :
+				case Command::PROCESSING        :
 					background   = orange;
 					intermittent = true;
 					break;
-				case CommandIfc::FAIL            :
+				case Command::FAIL            :
 					background = Qt::red;
 					break;
-				case CommandIfc::DONE            :
-				case CommandIfc::CANCELED        :
-				case CommandIfc::INITED            :
+				case Command::DONE            :
+				case Command::CANCELED        :
+				case Command::INITED            :
 					background = Qt::green;
 					break;
 			}    // switch (_state)
@@ -969,7 +969,7 @@ Qt::AutoCompatConnection	3	The default type when Qt 3 support is enabled.
 #endif	// USE_EXPERIMENTAL_ROOM
                   _repTypesDialog(0),
                   _pythonMinScript(), _pytMinScriptCharset(Charset::ASCII),
-                  _encodageScripts((ContextIfc::encodageScripts) - 1)
+                  _encodageScripts((Context::encodageScripts) - 1)
 		{
 			setObjectName(0 == name ? "QtMgx3DMainWindow" : name);
 		}    // QtMgx3DMainWindow::QtMgx3DMainWindow
@@ -1004,7 +1004,7 @@ Qt::AutoCompatConnection	3	The default type when Qt 3 support is enabled.
 #endif	// USE_EXPERIMENTAL_ROOM
                   _repTypesDialog(0),
                   _pythonMinScript(), _pytMinScriptCharset(Charset::UNKNOWN),
-                  _encodageScripts((ContextIfc::encodageScripts) - 1)
+                  _encodageScripts((Context::encodageScripts) - 1)
 		{
 			MGX_FORBIDDEN("QtMgx3DMainWindow copy constructor is not allowed.");
 		}    // QtMgx3DMainWindow::QtMgx3DMainWindow (const QtMgx3DMainWindow&)
@@ -1100,7 +1100,7 @@ void QtMgx3DMainWindow::showReady ( )
 }	// QtMgx3DMainWindow::showReady
 
 
-		void QtMgx3DMainWindow::init(const std::string &name, ContextIfc *context, QtGroupsPanel *groupsPanel, QtEntitiesPanel *entitiesPanel)
+		void QtMgx3DMainWindow::init(const std::string &name, Context *context, QtGroupsPanel *groupsPanel, QtEntitiesPanel *entitiesPanel)
 		{
 			if ((0 != _groupsPanel) || (0 != _entitiesPanel))
 				throw Exception("QtMgx3DMainWindow::init : fenêtre déjà initialisée.");
@@ -2768,7 +2768,7 @@ void QtMgx3DMainWindow::showReady ( )
 						                                       );
 				CHECK_NULL_PTR_ERROR(entityByRevolutionAction->getGeomEntityByRevolutionPanel())
 				entityByRevolutionAction->getGeomEntityByRevolutionPanel(
-				)->setDimension(SelectionManagerIfc::dimensionToDimensions(dim));
+				)->setDimension(SelectionManager::dimensionToDimensions(dim));
 				registerOperationAction(*entityByRevolutionAction,
 				                        (QtMgx3DOperationsPanel::OPERATION_TYPES) ot);
 			}    // for (int ot = (int)QtMgx3DOperationsPanel::GEOM_CURVE_OPERATION; ...
@@ -2784,7 +2784,7 @@ void QtMgx3DMainWindow::showReady ( )
 								                                *this, QString::fromUtf8("Copie d'entités géométriques"));
 				CHECK_NULL_PTR_ERROR(copyAction->getCopyPanel())
 				copyAction->getCopyPanel()->setDimension(
-						SelectionManagerIfc::dimensionToDimensions(dim));
+						SelectionManager::dimensionToDimensions(dim));
 				registerOperationAction(
 						*copyAction, (QtMgx3DOperationsPanel::OPERATION_TYPES) ot);
 			}    // for (int ot = (int)QtMgx3DOperationsPanel::GEOM_POINT_OPERATION; ...
@@ -2829,7 +2829,7 @@ void QtMgx3DMainWindow::showReady ( )
 						                              );
 				geomDestructionAction->getDestructionPanel()
 						->getEntityByDimensionSelectorPanel()->setDimensions(
-								SelectionManagerIfc::dimensionToDimensions(dim));
+								SelectionManager::dimensionToDimensions(dim));
 				registerOperationAction(
 						*geomDestructionAction, (QtMgx3DOperationsPanel::OPERATION_TYPES) ot);
 			}    // for (QtMgx3DOperationsPanel::OPERATION_TYPES ot = ...
@@ -2860,8 +2860,8 @@ void QtMgx3DMainWindow::showReady ( )
 			// Coupe :
 			FilterEntity::objectType cutTypes      = (FilterEntity::objectType)(
 					FilterEntity::GeomSurface | FilterEntity::GeomVolume);
-			SelectionManagerIfc::DIM cutDimensions = (SelectionManagerIfc::DIM)(
-					SelectionManagerIfc::D2 | SelectionManagerIfc::D3);
+			SelectionManager::DIM cutDimensions = (SelectionManager::DIM)(
+					SelectionManager::D2 | SelectionManager::D3);
 			QtMgx3DOperationAction *cutAction =
 					                       new QtGeomPlaneCutAction(
 							                       QIcon(":/images/geom_plane_cut.png"), QString::fromUtf8("Coupe par un plan d'entités géométriques"),
@@ -2893,7 +2893,7 @@ void QtMgx3DMainWindow::showReady ( )
 								                                *this, QString::fromUtf8("Ajout/suppression/affectation d'entités géométriques à un groupe"));
 				CHECK_NULL_PTR_ERROR(addAction->getAdditionPanel())
 				addAction->getAdditionPanel()->setDimension(
-						SelectionManagerIfc::dimensionToDimensions(dim));
+						SelectionManager::dimensionToDimensions(dim));
 				registerOperationAction(
 						*addAction, (QtMgx3DOperationsPanel::OPERATION_TYPES) ot);
 			}    // for (int ot = (int)QtMgx3DOperationsPanel::GEOM_POINT_OPERATION; ...
@@ -2909,7 +2909,7 @@ void QtMgx3DMainWindow::showReady ( )
 								                            *this, QString::fromUtf8("Translation d'entités géométriques"));
 				CHECK_NULL_PTR_ERROR(translateAction->getTranslationPanel())
 				translateAction->getTranslationPanel()->setDimension(
-						SelectionManagerIfc::dimensionToDimensions(dim));
+						SelectionManager::dimensionToDimensions(dim));
 				registerOperationAction(
 						*translateAction, (QtMgx3DOperationsPanel::OPERATION_TYPES) ot);
 			}    // for (int ot = (int)QtMgx3DOperationsPanel::GEOM_POINT_OPERATION; ...
@@ -2925,7 +2925,7 @@ void QtMgx3DMainWindow::showReady ( )
 								                         *this, QString::fromUtf8("Rotation d'entités géométriques"));
 				CHECK_NULL_PTR_ERROR(rotateAction->getRotationPanel())
 				rotateAction->getRotationPanel()->setDimension(
-						SelectionManagerIfc::dimensionToDimensions(dim));
+						SelectionManager::dimensionToDimensions(dim));
 				registerOperationAction(
 						*rotateAction, (QtMgx3DOperationsPanel::OPERATION_TYPES) ot);
 			}    // for (int ot = (int)QtMgx3DOperationsPanel::GEOM_POINT_OPERATION; ...
@@ -2941,7 +2941,7 @@ void QtMgx3DMainWindow::showReady ( )
 								                          *this, QString::fromUtf8("Homothétie d'entités géométriques"));
 				CHECK_NULL_PTR_ERROR(homothetyAction->getHomothetyPanel())
 				homothetyAction->getHomothetyPanel()->setDimension(
-						SelectionManagerIfc::dimensionToDimensions(dim));
+						SelectionManager::dimensionToDimensions(dim));
 				registerOperationAction(
 						*homothetyAction, (QtMgx3DOperationsPanel::OPERATION_TYPES) ot);
 			}    // for (int ot = (int)QtMgx3DOperationsPanel::GEOM_POINT_OPERATION; ...
@@ -2957,7 +2957,7 @@ void QtMgx3DMainWindow::showReady ( )
 								                       *this, QString::fromUtf8("Symétrie d'entités géométriques"));
 				CHECK_NULL_PTR_ERROR(mirrorAction->getMirrorPanel())
 				mirrorAction->getMirrorPanel()->setDimension(
-						SelectionManagerIfc::dimensionToDimensions(dim));
+						SelectionManager::dimensionToDimensions(dim));
 				registerOperationAction(
 						*mirrorAction, (QtMgx3DOperationsPanel::OPERATION_TYPES) ot);
 			}    // for (int ot = (int)QtMgx3DOperationsPanel::GEOM_POINT_OPERATION; ...
@@ -3046,7 +3046,7 @@ void QtMgx3DMainWindow::showReady ( )
 						*topoDestructionAction, (QtMgx3DOperationsPanel::OPERATION_TYPES) ot);
 				// initialise avec la bonne dimension
 				topoDestructionAction->getDestructionPanel()->setDimensions(
-						SelectionManagerIfc::dimensionToDimensions(dim));
+						SelectionManager::dimensionToDimensions(dim));
 
 			}    // for (QtMgx3DOperationsPanel::OPERATION_TYPES ot = ...
 			for (int ot = (int) QtMgx3DOperationsPanel::TOPO_VERTEX_OPERATION;
@@ -3066,7 +3066,7 @@ void QtMgx3DMainWindow::showReady ( )
 								                                    *this, QString::fromUtf8("Ajout/suppression/affectation d'entités topologiques à un groupe"));
 				CHECK_NULL_PTR_ERROR(addAction->getAdditionPanel())
 				addAction->getAdditionPanel()->setDimension(
-						SelectionManagerIfc::dimensionToDimensions(dim));
+						SelectionManager::dimensionToDimensions(dim));
 				registerOperationAction(
 						*addAction, (QtMgx3DOperationsPanel::OPERATION_TYPES) ot);
 			}    // for (int ot = (int)QtMgx3DOperationsPanel::TOPO_VERTEX_OPERATION; ...
@@ -3185,7 +3185,7 @@ void QtMgx3DMainWindow::showReady ( )
 								                                *this, QString::fromUtf8("Fusion de sommets topologiques dans un même bloc, dégénérescence du bloc"));
 				CHECK_NULL_PTR_ERROR(degenerateBlockAction->getTopologyDegenerateBlockPanel())
 				degenerateBlockAction->getTopologyDegenerateBlockPanel()->setDimension(
-						SelectionManagerIfc::dimensionToDimensions(dim));
+						SelectionManager::dimensionToDimensions(dim));
 				registerOperationAction(
 						*degenerateBlockAction, (QtMgx3DOperationsPanel::OPERATION_TYPES) ot);
 			}    // for (int ot = (int)QtMgx3DOperationsPanel::TOPO_VERTEX_OPERATION; ...
@@ -3246,11 +3246,11 @@ void QtMgx3DMainWindow::showReady ( )
 							                                 QString::fromUtf8("Associations entités topologiques\n0D, 1D, 2D -> entité(s) géométrique(s)"),
 							                                 *this,
 							                                 QString::fromUtf8("Modification des associations entités topologiques (0/1/2D) vers entité(s) géométrique(s)."),
-							                                 SelectionManagerIfc::D0
+							                                 SelectionManager::D0
 					                                 );
 			CHECK_NULL_PTR_ERROR(topoAssociationAction->getAssociationPanel())
 //	topoAssociationAction->getAssociationPanel ( )->setDimension (
-//								SelectionManagerIfc::dimensionToDimensions (0));
+//								SelectionManager::dimensionToDimensions (0));
 			registerOperationAction(
 					*topoAssociationAction, QtMgx3DOperationsPanel::TOPO_VERTEX_OPERATION);
 			topoAssociationAction =
@@ -3259,7 +3259,7 @@ void QtMgx3DMainWindow::showReady ( )
 							QString::fromUtf8("Associations entités topologiques\n0D, 1D, 2D -> entité géométrique"),
 							*this,
 							QString::fromUtf8("Modification des associations entités topologiques (0/1/2D) vers entité géométrique."),
-							SelectionManagerIfc::D1
+							SelectionManager::D1
 					);
 			CHECK_NULL_PTR_ERROR(topoAssociationAction->getAssociationPanel())
 			registerOperationAction(
@@ -3270,7 +3270,7 @@ void QtMgx3DMainWindow::showReady ( )
 							QString::fromUtf8("Associations entités topologiques\n0D, 1D, 2D -> entité géométrique"),
 							*this,
 							QString::fromUtf8("Modification des associations entités topologiques (0/1/2D) vers entité géométrique."),
-							SelectionManagerIfc::D2
+							SelectionManager::D2
 					);
 			CHECK_NULL_PTR_ERROR(topoAssociationAction->getAssociationPanel())
 			registerOperationAction(
@@ -3347,7 +3347,7 @@ void QtMgx3DMainWindow::showReady ( )
 								                            *this, QString::fromUtf8("Translation d'entités topologiques"));
 				CHECK_NULL_PTR_ERROR(translateAction->getTranslationPanel())
 				translateAction->getTranslationPanel()->setDimension(
-						SelectionManagerIfc::dimensionToDimensions(dim));
+						SelectionManager::dimensionToDimensions(dim));
 				registerOperationAction(
 						*translateAction, (QtMgx3DOperationsPanel::OPERATION_TYPES) ot);
 			}    // for (int ot = (int)QtMgx3DOperationsPanel::TOPO_VERTEX_OPERATION; ...
@@ -3363,7 +3363,7 @@ void QtMgx3DMainWindow::showReady ( )
 								                         *this, QString::fromUtf8("Rotation d'entités topologiques"));
 				CHECK_NULL_PTR_ERROR(rotateAction->getRotationPanel())
 				rotateAction->getRotationPanel()->setDimension(
-						SelectionManagerIfc::dimensionToDimensions(dim));
+						SelectionManager::dimensionToDimensions(dim));
 				registerOperationAction(
 						*rotateAction, (QtMgx3DOperationsPanel::OPERATION_TYPES) ot);
 			}    // for (int ot = (int)QtMgx3DOperationsPanel::TOPO_VERTEX_OPERATION; ...
@@ -3379,7 +3379,7 @@ void QtMgx3DMainWindow::showReady ( )
 								                          *this, QString::fromUtf8("Homothétie d'entités topologiques"));
 				CHECK_NULL_PTR_ERROR(homothetyAction->getHomothetyPanel())
 				homothetyAction->getHomothetyPanel()->setDimension(
-						SelectionManagerIfc::dimensionToDimensions(dim));
+						SelectionManager::dimensionToDimensions(dim));
 				registerOperationAction(
 						*homothetyAction, (QtMgx3DOperationsPanel::OPERATION_TYPES) ot);
 			}    // for (int ot = (int)QtMgx3DOperationsPanel::TOPO_VERTEX_OPERATION; ...
@@ -3395,7 +3395,7 @@ void QtMgx3DMainWindow::showReady ( )
 								                       *this, QString::fromUtf8("Symétrie d'entités topologiques"));
 				CHECK_NULL_PTR_ERROR(mirrorAction->getMirrorPanel())
 				mirrorAction->getMirrorPanel()->setDimension(
-						SelectionManagerIfc::dimensionToDimensions(dim));
+						SelectionManager::dimensionToDimensions(dim));
 				registerOperationAction(
 						*mirrorAction, (QtMgx3DOperationsPanel::OPERATION_TYPES) ot);
 			}    // for (int ot = (int)QtMgx3DOperationsPanel::TOPO_VERTEX_OPERATION; ...
@@ -3692,7 +3692,7 @@ cout << ctime (&t);
 		}    // QtMgx3DMainWindow::updateActions
 
 
-		void QtMgx3DMainWindow::setContext(ContextIfc *context)
+		void QtMgx3DMainWindow::setContext(Context *context)
 		{
 			if (context == _context)
 				return;
@@ -3788,7 +3788,7 @@ cout << ctime (&t);
 		}    // QtMgx3DMainWindow::setContext
 
 
-		ContextIfc &QtMgx3DMainWindow::getContext()
+		Context &QtMgx3DMainWindow::getContext()
 		{
 			if (0 == _context)
 				throw Exception(UTF8String("QtMgx3DMainWindow::getContext : absence de contexte.", Charset::UTF_8));
@@ -3797,7 +3797,7 @@ cout << ctime (&t);
 		}    // QtMgx3DMainWindow::getContext
 
 
-		const ContextIfc &QtMgx3DMainWindow::getContext() const
+		const Context &QtMgx3DMainWindow::getContext() const
 		{
 			if (0 == _context)
 				throw Exception(UTF8String("QtMgx3DMainWindow::getContext : absence de contexte.", Charset::UTF_8));
@@ -3840,19 +3840,19 @@ void QtMgx3DMainWindow::executePythonScript (const string &f)
 }    // QtMgx3DMainWindow::executePythonScript
 
 
-		CommandManagerIfc &QtMgx3DMainWindow::getCommandManager()
+		CommandManager &QtMgx3DMainWindow::getCommandManager()
 		{
 			return getContext().getCommandManager();
 		}    // QtMgx3DMainWindow::getCommandManager
 
 
-/*SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( )
+/*SelectionManager& QtMgx3DMainWindow::getSelectionManager ( )
 {
 	return getContext ( ).getSelectionManager ( );
 }	// QtMgx3DMainWindow::getSelectionManager
 
 
-const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
+const SelectionManager& QtMgx3DMainWindow::getSelectionManager ( ) const
 {
 	return getContext ( ).getSelectionManager ( );
 }	// QtMgx3DMainWindow::getSelectionManager*/
@@ -3919,25 +3919,25 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 		}    // QtMgx3DMainWindow::unregisterEntitySeizureManager
 
 
-		Geom::GeomManagerIfc &QtMgx3DMainWindow::getGeomManager()
+		Geom::GeomManager &QtMgx3DMainWindow::getGeomManager()
 		{
 			return getContext().getGeomManager();
 		}    // QtMgx3DMainWindow::getGeomManager
 
 
-		Topo::TopoManagerIfc &QtMgx3DMainWindow::getTopoManager()
+		Topo::TopoManager &QtMgx3DMainWindow::getTopoManager()
 		{
 			return getContext().getTopoManager();
 		}   // QtMgx3DMainWindow::getTopoManager
 
 
-		Mesh::MeshManagerIfc &QtMgx3DMainWindow::getMeshManager()
+		Mesh::MeshManager &QtMgx3DMainWindow::getMeshManager()
 		{
 			return getContext().getMeshManager();
 		}   // QtMgx3DMainWindow::getMeshManager
 
 
-		Group::GroupManagerIfc &QtMgx3DMainWindow::getGroupManager()
+		Group::GroupManager &QtMgx3DMainWindow::getGroupManager()
 		{
 			return getContext().getGroupManager();
 		}   // QtMgx3DMainWindow::getGroupManager
@@ -3948,7 +3948,7 @@ const SelectionManagerIfc& QtMgx3DMainWindow::getSelectionManager ( ) const
 			return getContext().getM3DCommandManager();
 		}
 
-		UndoRedoManagerIfc &QtMgx3DMainWindow::getUndoManager()
+		UndoRedoManager &QtMgx3DMainWindow::getUndoManager()
 		{
 			return getCommandManager().getUndoManager();
 		}    // QtMgx3DMainWindow::getUndoManager
@@ -4128,7 +4128,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 
 		void QtMgx3DMainWindow::registerToManagers()
 		{
-			CommandManagerIfc *cmdMgr = 0;    // 0 si pas de contexte
+			CommandManager *cmdMgr = 0;    // 0 si pas de contexte
 			UndoRedoManager   *urm    = 0;    // 0 si pas de contexte
 			SelectionManager  *sm     = 0;    // 0 si pas de contexte
 			// ATTENTION :
@@ -4138,7 +4138,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 			// jour ...
 			try
 			{
-				cmdMgr = dynamic_cast<CommandManagerIfc *>(&getCommandManager());
+				cmdMgr = dynamic_cast<CommandManager *>(&getCommandManager());
 			}
 			catch (...)
 			{
@@ -4165,7 +4165,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 					setSelectionManager(&_context->getSelectionManager());
 				sm = dynamic_cast<SelectionManager *>(getSelectionManager());
 //		if (0 != sm)
-//			sm->addSelectionObserver ((SelectionManagerObserverIfc&)*this);
+//			sm->addSelectionObserver ((SelectionManagerObserver&)*this);
 			}
 			catch (...)
 			{
@@ -4197,7 +4197,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 					LOCK_INSTANCE
 
 					if (0 != _stateView)
-						_stateView->setState("Actualisation IHM", CommandIfc::PROCESSING);
+						_stateView->setState("Actualisation IHM", Command::PROCESSING);
 
 					InfoCommand &icmd = commandInternal->getInfoCommand();
 					InfoCommand::type t = InfoCommand::UNITIALIZED;
@@ -4513,7 +4513,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 					}
 
 					if (0 != _stateView)
-						_stateView->setState("Actualisation IHM", CommandIfc::DONE);
+						_stateView->setState("Actualisation IHM", Command::DONE);
 
 				}    // if ((COMMAND_STATE == event) && ...
 				else
@@ -4553,7 +4553,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 			if (true == doRender)
 			{
 				// [EB] pour la première commande on recentre la vue en + du forceRender
-				if (1 == getCommandManager().getCommandIfcs().size())
+				if (1 == getCommandManager().getCommands().size())
 					getGraphicalWidget().getRenderingManager().resetView(true);
 				else
 				{
@@ -4566,15 +4566,15 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 			{
 				switch (command.getStatus())
 				{
-					case CommandIfc::DONE        :
-					case CommandIfc::CANCELED    :
-					case CommandIfc::FAIL        :
+					case Command::DONE        :
+					case Command::CANCELED    :
+					case Command::FAIL        :
 //				getCommandManager ( ).processQueuedCommands ( );
 						if ((false == getCommandManager().hasRunningCommands()) && (false == getCommandManager().hasQueuedCommands()))
 							updateActions();
 						break;
-					case CommandIfc::INITED        :
-						if (CommandIfc::UNDO == command.getPlayType())
+					case Command::INITED        :
+						if (Command::UNDO == command.getPlayType())
 							getOperationsPanel().autoUpdate();
 						break;
 				}    // switch (command.getStatus( ))
@@ -5801,13 +5801,13 @@ void QtMgx3DMainWindow::exportAllCallback ( )
 	}	// IGES
 	else if (true == isLimaWExtension (file.getExtension ( )))
 	{
-		SelectionManagerIfc&	selectionManager	= getContext ( ).getSelectionManager ( );
+		SelectionManager&	selectionManager	= getContext ( ).getSelectionManager ( );
 		log (InformationLog (msg));
 		getContext ( ).getMeshManager ( ).writeMli (fileName);
 	}	// Lima++
 	else if (true == compareExtensions (file.getExtension ( ), "cgns"))
 	{
-		SelectionManagerIfc&	selectionManager	=
+		SelectionManager&	selectionManager	=
 									getContext ( ).getSelectionManager ( );
 		log (InformationLog (msg));
 		getContext ( ).getMeshManager ( ).writeCGNS (fileName);
@@ -5923,7 +5923,7 @@ void QtMgx3DMainWindow::exportSelectionCallback ( )
 	DISABLE_GRAPHICAL_OPERATIONS
 
 	QtAutoWaitingCursor	cursor (true);
-	SelectionManagerIfc&	selectionManager	= getContext ( ).getSelectionManager ( );
+	SelectionManager&	selectionManager	= getContext ( ).getSelectionManager ( );
 	vector<string>			selection;
 
 	UTF8String	msg (Charset::UTF_8);
@@ -6109,10 +6109,10 @@ void QtMgx3DMainWindow::saveAsMagix3DScriptCallback ( )
 
 	QtAutoWaitingCursor	cursor (true);
 
-	getContext ( ).savePythonScript (fileName.c_str ( ), (ContextIfc::encodageScripts) dialog.getEncodageScript(), dialog.getCharset ( ));
+	getContext ( ).savePythonScript (fileName.c_str ( ), (Context::encodageScripts) dialog.getEncodageScript(), dialog.getCharset ( ));
 
 	_pythonMinScript	= fileName;
-	_encodageScripts	= (ContextIfc::encodageScripts)dialog.getEncodageScript ( );
+	_encodageScripts	= (Context::encodageScripts)dialog.getEncodageScript ( );
 	_pytMinScriptCharset	= dialog.getCharset ( );
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
@@ -7740,7 +7740,7 @@ void QtMgx3DMainWindow::selectNodesCallback (bool enabled)
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	getContext ( ).getSelectionManager ( ).activateSelection (
-		true==enabled ? SelectionManagerIfc::D0 : SelectionManagerIfc::NO_DIM);
+		true==enabled ? SelectionManager::D0 : SelectionManager::NO_DIM);
 	CHECK_NULL_PTR_ERROR (getActions ( )._selectEdgesAction)
 	CHECK_NULL_PTR_ERROR (getActions ( )._selectSurfacesAction)
 	CHECK_NULL_PTR_ERROR (getActions ( )._selectVolumesAction)
@@ -7763,7 +7763,7 @@ void QtMgx3DMainWindow::selectEdgesCallback (bool enabled)
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	getContext ( ).getSelectionManager ( ).activateSelection (
-		true==enabled ? SelectionManagerIfc::D1 : SelectionManagerIfc::NO_DIM);
+		true==enabled ? SelectionManager::D1 : SelectionManager::NO_DIM);
 	CHECK_NULL_PTR_ERROR ( getActions ( )._selectNodesAction)
 	CHECK_NULL_PTR_ERROR ( getActions ( )._selectSurfacesAction)
 	CHECK_NULL_PTR_ERROR ( getActions ( )._selectVolumesAction)
@@ -7786,7 +7786,7 @@ void QtMgx3DMainWindow::selectSurfacesCallback (bool enabled)
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	getContext ( ).getSelectionManager ( ).activateSelection (
-		true==enabled ? SelectionManagerIfc::D2 : SelectionManagerIfc::NO_DIM);
+		true==enabled ? SelectionManager::D2 : SelectionManager::NO_DIM);
 	CHECK_NULL_PTR_ERROR ( getActions ( )._selectNodesAction)
 	CHECK_NULL_PTR_ERROR ( getActions ( )._selectEdgesAction)
 	CHECK_NULL_PTR_ERROR ( getActions ( )._selectVolumesAction)
@@ -7809,7 +7809,7 @@ void QtMgx3DMainWindow::selectVolumesCallback (bool enabled)
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	getContext ( ).getSelectionManager ( ).activateSelection (
-		true==enabled ? SelectionManagerIfc::D3 : SelectionManagerIfc::NO_DIM);
+		true==enabled ? SelectionManager::D3 : SelectionManager::NO_DIM);
 	CHECK_NULL_PTR_ERROR ( getActions ( )._selectNodesAction)
 	CHECK_NULL_PTR_ERROR ( getActions ( )._selectEdgesAction)
 	CHECK_NULL_PTR_ERROR ( getActions ( )._selectSurfacesAction)

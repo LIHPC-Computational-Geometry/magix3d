@@ -4,7 +4,7 @@
  * \date        07/03/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtTopologyDegenerateBlockAction.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -57,16 +57,16 @@ QtTopologyDegenerateBlockPanel::QtTopologyDegenerateBlockPanel (
 	layout->addWidget (label);
 
 	// Le vertex 1 à coller :
-	SelectionManagerIfc::DIM	ALLOWED_DIMENSIONS	=
-		(SelectionManagerIfc::DIM)(
-			SelectionManagerIfc::D0 | SelectionManagerIfc::D1 |
-			SelectionManagerIfc::D2);
+	SelectionManager::DIM	ALLOWED_DIMENSIONS	=
+		(SelectionManager::DIM)(
+			SelectionManager::D0 | SelectionManager::D1 |
+			SelectionManager::D2);
 	FilterEntity::objectType	filter	= (FilterEntity::objectType)(
 			FilterEntity::TopoVertex | FilterEntity::TopoCoEdge |
 			FilterEntity::TopoCoFace);
 	_vertex1Panel	= new QtEntityByDimensionSelectorPanel (
 			this, mainWindow, "Entité 1 :", ALLOWED_DIMENSIONS,
-			filter, SelectionManagerIfc::D0, false);
+			filter, SelectionManager::D0, false);
 	connect (_vertex1Panel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
 	connect (_vertex1Panel, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -79,7 +79,7 @@ QtTopologyDegenerateBlockPanel::QtTopologyDegenerateBlockPanel (
 	// Le vertex 2 à coller :
 	_vertex2Panel	= new QtEntityByDimensionSelectorPanel (
 			this, mainWindow, "Entité 2 :", ALLOWED_DIMENSIONS,
-			filter, SelectionManagerIfc::D0, false);
+			filter, SelectionManager::D0, false);
 	connect (_vertex2Panel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
 	connect (_vertex2Panel, SIGNAL (entitiesRemovedFromSelection(QString)),
@@ -250,7 +250,7 @@ bool QtTopologyDegenerateBlockPanel::projectOnFirst ( ) const
 }	// QtTopologyDegenerateBlockPanel::projectOnFirst
 
 
-void QtTopologyDegenerateBlockPanel::setDimension (SelectionManagerIfc::DIM dim)
+void QtTopologyDegenerateBlockPanel::setDimension (SelectionManager::DIM dim)
 {
 	CHECK_NULL_PTR_ERROR (_vertex1Panel)
 	CHECK_NULL_PTR_ERROR (_vertex2Panel)
@@ -373,7 +373,7 @@ void QtTopologyDegenerateBlockAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (panel)
 
 	// Validation paramétrage :
-	M3DCommandResultIfc*	cmdResult	= 0;
+	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de collage des vertices topologiques :

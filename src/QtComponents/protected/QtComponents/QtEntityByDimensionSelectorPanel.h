@@ -7,7 +7,7 @@
 #ifndef QT_ENTITY_BY_DIMENSION_SELECTOR_PANEL_H
 #define QT_ENTITY_BY_DIMENSION_SELECTOR_PANEL_H
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "QtComponents/QtDimensionsSelectorPanel.h"
 #include "QtComponents/QtMgx3DEntityPanel.h"
@@ -47,9 +47,9 @@ class QtEntityByDimensionSelectorPanel : public QWidget
 				QWidget* parent,
 				Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
 				const std::string& label,
-				Mgx3D::Utils::SelectionManagerIfc::DIM allowedDimensions,
+				Mgx3D::Utils::SelectionManager::DIM allowedDimensions,
 				Mgx3D::Utils::FilterEntity::objectType types,
-				Mgx3D::Utils::SelectionManagerIfc::DIM defaultDimensions,
+				Mgx3D::Utils::SelectionManager::DIM defaultDimensions,
 				bool allowMultipleDimensions);
 
 	/**
@@ -102,27 +102,27 @@ class QtEntityByDimensionSelectorPanel : public QWidget
 	 * \return		Les dimensions sélectionnées par l'utilisateur.
 	 * \see			setDimensions
 	 */
-	virtual Mgx3D::Utils::SelectionManagerIfc::DIM getDimensions ( ) const;
+	virtual Mgx3D::Utils::SelectionManager::DIM getDimensions ( ) const;
 
 	/**
 	 * \param		Nouvelles dimensions.
 	 * \see			getDimensions
 	 */
-	virtual void setDimensions (Mgx3D::Utils::SelectionManagerIfc::DIM dims);
+	virtual void setDimensions (Mgx3D::Utils::SelectionManager::DIM dims);
 
 	/**
 	 * \return		Les dimensions autorisées.
 	 * \see			setAllowedDimensions
 	 * \see			getAllowedTypes
 	 */
-	virtual Mgx3D::Utils::SelectionManagerIfc::DIM getAllowedDimensions ( ) const;
+	virtual Mgx3D::Utils::SelectionManager::DIM getAllowedDimensions ( ) const;
 
 	/**
 	 * \param		Les dimensions à autoriser.
 	 * \see			getAllowedDimensions
 	 * \see			setFilteredDimensions
 	 */
-	virtual void setAllowedDimensions (Mgx3D::Utils::SelectionManagerIfc::DIM);
+	virtual void setAllowedDimensions (Mgx3D::Utils::SelectionManager::DIM);
 
 	/**
 	 * \return		Les types autorisés.

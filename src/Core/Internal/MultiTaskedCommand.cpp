@@ -1,28 +1,20 @@
-/*
- * \file	MultiTaskedCommand.cpp
- *
- * \author	Charles PIGNEROL
- *
- * \date	23/03/201710
- */
-#include "Internal/ContextIfc.h"
+/*----------------------------------------------------------------------------*/
+#include "Internal/Context.h"
 #include "Internal/Resources.h"
+#include "Internal/MultiTaskedCommand.h"
 #include "Utils/Common.h"
 #include "Utils/Magix3DEvents.h"
-#include "Internal/MultiTaskedCommand.h"
-
+/*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
-
+/*----------------------------------------------------------------------------*/
 #include <sched.h>	// sched_yield
-
-
+/*----------------------------------------------------------------------------*/
 using namespace Mgx3D;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Internal;
 using namespace TkUtil;
 using namespace std;
-
-
+/*----------------------------------------------------------------------------*/
 static bool operator < (const struct timeval& l, const struct timeval& r)
 {
 	if (l.tv_sec < r.tv_sec)
@@ -187,17 +179,6 @@ void MultiTaskedCommand::notifyObserversForModifications ( )
 		cerr << "ERREUR non documentée lors de la notification aux observateurs d'une modification de la commande " << getName ( ) << "." << endl;
 	}
 }	// MultiTaskedCommand::notifyObserversForModifications
-
-
-//bool MultiTaskedCommand::threadingEnabled ( ) const
-//{	// ATTENTION : pour pouvoir effectuer des taches élémentaires d'une commande
-//	// dans différents threads il faut que cette commande soit elle même lancée
-//	// dans un thread (autre que le thread principal == graphique).
-//	//std::cout<<"MultiTaskedCommand::threadingEnabled avec threadId = "<<ContextIfc::threadId<<" et pthread_self = "<<pthread_self ( )<<std::endl;
-//	return (true==Internal::ContextIfc::allowThreadedCommandTasks.getValue( ))&&
-//			(ContextIfc::threadId != pthread_self ( )) ?
-//		true : false;
-//}	// MultiTaskedCommand::threadingEnabled
 
 bool MultiTaskedCommand::threadingEnabled ( ) const
 {	// EB: version qui accepte d'être dans le thread principal

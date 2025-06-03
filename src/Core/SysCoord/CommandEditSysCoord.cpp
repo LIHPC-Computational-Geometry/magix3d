@@ -1,20 +1,6 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandEditSysCoord.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 6 Juin 2018
- */
-/*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
-#include "Utils/Common.h"
-#include "Internal/InfoCommand.h"
 #include "Internal/Context.h"
-#include "Group/Group3D.h"
 #include "SysCoord/CommandEditSysCoord.h"
-#include "SysCoord/SysCoordManager.h"
-
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>

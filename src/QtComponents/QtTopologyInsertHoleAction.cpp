@@ -4,7 +4,7 @@
  * \date        06/03/2014
  */
 
-#include "Internal/ContextIfc.h"
+#include "Internal/Context.h"
 
 #include "Utils/Common.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -58,7 +58,7 @@ QtTopologyInsertHolePanel::QtTopologyInsertHolePanel (
 	// Les faces à dupliquer :
 	_facesPanel	= new QtMgx3DEntityPanel (
 			this, "", true, "Faces :", "", &mainWindow,
-			SelectionManagerIfc::D2, FilterEntity::TopoCoFace);
+			SelectionManager::D2, FilterEntity::TopoCoFace);
 	_facesPanel->setMultiSelectMode (true);
 	connect (_facesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
@@ -248,12 +248,12 @@ void QtTopologyInsertHoleAction::executeOperation ( )
 	// Récupération des paramètres d'insertion de trou dans la topologie :
 	vector<string>	names	= panel->getFacesNames ( );
 
-	Mgx3D::Internal::M3DCommandResultIfc*	result	= getContext ( ).getTopoManager ( ).insertHole (names);
+	Mgx3D::Internal::M3DCommandResult*	result	= getContext ( ).getTopoManager ( ).insertHole (names);
 	CHECK_NULL_PTR_ERROR (result)
 	setCommandResult (result);
-	if (CommandIfc::FAIL == result->getStatus ( ))
+	if (Command::FAIL == result->getStatus ( ))
 		throw Exception (result->getErrorMessage ( ));
-	else if (CommandIfc::CANCELED == result->getStatus ( ))
+	else if (Command::CANCELED == result->getStatus ( ))
 		throw Exception ("Opération annulée");
 }	// QtTopologyInsertHoleAction::executeOperation
 

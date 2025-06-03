@@ -1,16 +1,9 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandGlue2Topo.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 2/3/2014
- */
-/*----------------------------------------------------------------------------*/
-#include "Topo/CommandGlue2Topo.h"
 #include "Topo/TopoHelper.h"
+#include "Topo/CommandGlue2Topo.h"
+#include "Topo/CoFace.h"
+#include "Topo/Vertex.h"
 #include "Geom/Volume.h"
-#include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
