@@ -177,3 +177,26 @@ def test_ogrids_not_equal():
 
     # le nombre de regions devrait être identique... et non
     assert nb_regions_1 > nb_regions_2
+
+def test_undo_clear_group():
+    ctx = Mgx3D.getContext()
+    ctx.clearSession() # Clean the session after the previous test
+    # Création d'une boite avec une topologie
+    ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10, "BOX1")
+    # Vide le groupe BOX1
+    ctx.getGroupManager().clearGroup (3, "BOX1")
+    # Annulation de : Vide le groupe BOX1
+    ctx.undo()
+    # Vol0000 ne devrait pas être dans Hors_Groupe_3D mais seulement dans BOX1
+    # assert "Vol0000" not in ctx.getGroupManager().getGeomEntities(["Hors_Groupe_3D"])
+
+def test_undo_add_to_group():
+    ctx = Mgx3D.getContext()
+    ctx.clearSession() # Clean the session after the previous test
+    # Création d'une boite avec une topologie
+    ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
+    # Modifie le groupe AAA
+    ctx.getGeomManager().addToGroup (["Vol0000"], 3, "AAA")
+    # Annulation de : Modifie le groupe AAA
+    ctx.undo()
+    #Vol0000 est bien dans Hors_Groupe_3D qui est destroyed (en rouge dans l'ihm)
