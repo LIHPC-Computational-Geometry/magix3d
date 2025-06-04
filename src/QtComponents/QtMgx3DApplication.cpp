@@ -500,21 +500,6 @@ void QtMgx3DApplication::init (int argc, char* argv[], char* envp[])
 		     << "\nErreur non documentée." << endl;
 	}
 
-    QPalette p;
-    p = qApp->palette();
-    p.setColor(QPalette::Window, QColor(53,53,53));
-    p.setColor(QPalette::Button, QColor(64,64,64));
-    //p.setColor(QPalette::Highlight, QColor(142,45,197));
-    p.setColor(QPalette::Highlight, QColor(237,108,73));
-    p.setColor(QPalette::ButtonText, QColor(255,255,255));
-    p.setColor(QPalette::WindowText,QColor(255,255,255));
-    p.setColor(QPalette::Text,QColor(255,255,255));
-    p.setColor(QPalette::Base,QColor(53,53,53));
-    p.setColor(QPalette::NoRole,QColor(255,0,0));
-    //p.setColor(QPalette::NColorRoles,QColor(255,0,0));
-    p.setColor(QPalette::Midlight,QColor(0,255,0));
-    qApp->setPalette(p);
-
 	// Initialisation de l'aide en ligne :
 	QtHelpWindow::initialize (HelpSystem::instance ( ).rootURL, HelpSystem::instance ( ).indexURL, "Magix 3D : Aide en ligne", "Magix 3D");
 }	// QtMgx3DApplication::init

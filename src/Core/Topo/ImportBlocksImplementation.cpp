@@ -26,13 +26,13 @@ ImportBlocksImplementation::ImportBlocksImplementation(Internal::Context &c, Int
                             const std::string &n) : m_c(c), m_icmd(icmd), m_filename(n) {
 }
 /*----------------------------------------------------------------------------*/
-ImportBlocksImplementation::~ImportBlocksImplementation() {}
+//ImportBlocksImplementation::~ImportBlocksImplementation() {}
 /*----------------------------------------------------------------------------*/
 void ImportBlocksImplementation::internalExecute() {
 
     // check file extension
     std::string suffix = m_filename;
-    int suffix_start = m_filename.find_last_of(".");
+    int suffix_start = m_filename.find_last_of('.');
     suffix.erase(0, suffix_start + 1);
     if (suffix != "blk")
         throw TkUtil::Exception(
@@ -44,10 +44,10 @@ void ImportBlocksImplementation::internalExecute() {
         throw TkUtil::Exception(mess);
     }
 
-        Group::Group0D* group0 = getStdContext()->getLocalGroupManager().getNewGroup0D("Hors_Groupe_0D", m_icmd);
-        Group::Group1D* group1 = getStdContext()->getLocalGroupManager().getNewGroup1D("Hors_Groupe_1D", m_icmd);
-        Group::Group2D* group2 = getStdContext()->getLocalGroupManager().getNewGroup2D("Hors_Groupe_2D", m_icmd);
-        Group::Group3D* group3 = getStdContext()->getLocalGroupManager().getNewGroup3D("Hors_Groupe_3D", m_icmd);
+        Group::Group0D* group0 = getStdContext()->getGroupManager().getNewGroup0D("Hors_Groupe_0D", m_icmd);
+        Group::Group1D* group1 = getStdContext()->getGroupManager().getNewGroup1D("Hors_Groupe_1D", m_icmd);
+        Group::Group2D* group2 = getStdContext()->getGroupManager().getNewGroup2D("Hors_Groupe_2D", m_icmd);
+        Group::Group3D* group3 = getStdContext()->getGroupManager().getNewGroup3D("Hors_Groupe_3D", m_icmd);
 
     /*----------------------------------------------------------------------------*/
     if (!moveStreamOntoFirst(s, "POINTS")) {
@@ -425,11 +425,6 @@ bool ImportBlocksImplementation::moveStreamOntoFirst(std::ifstream &s, const std
 
     return found;
 }
-
-    void ImportBlocksImplementation::getPreviewRepresentation(Utils::DisplayRepresentation &dr) {
-
-    }
-
 
 /*----------------------------------------------------------------------------*/
 }

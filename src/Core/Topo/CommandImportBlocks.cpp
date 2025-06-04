@@ -42,15 +42,6 @@ namespace Mgx3D {
                 }
             }
 
-            //getInfoCommand().addGroupInfoEntity(group0,Internal::InfoCommand::DISPMODIFIED);
-            //getInfoCommand().addGroupInfoEntity(group1,Internal::InfoCommand::DISPMODIFIED);
-            //getInfoCommand().addGroupInfoEntity(group2,Internal::InfoCommand::DISPMODIFIED);
-            //getInfoCommand().addGroupInfoEntity(group3,Internal::InfoCommand::DISPMODIFIED);
-        }
-/*----------------------------------------------------------------------------*/
-        void CommandImportBlocks::getPreviewRepresentation(Utils::DisplayRepresentation& dr)
-        {
-            MGX_FORBIDDEN("getPreviewRepresentation non prévu");
         }
 /*----------------------------------------------------------------------------*/
     } // end namespace Topo

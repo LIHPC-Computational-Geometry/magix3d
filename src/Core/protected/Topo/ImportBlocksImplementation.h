@@ -5,7 +5,6 @@
 #ifndef MAGIX3D_IMPORTBLOCKSIMPLEMENTATION_H
 #define MAGIX3D_IMPORTBLOCKSIMPLEMENTATION_H
 /*----------------------------------------------------------------------------*/
-#include "Internal/ContextIfc.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
@@ -27,19 +26,14 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief   Destructeur
     */
-    virtual ~ImportBlocksImplementation();
+    ~ImportBlocksImplementation() =default;
 
     void internalExecute();
 
-    /*------------------------------------------------------------------------*/
-    /** \brief  appel non prévu
-     */
-    virtual void getPreviewRepresentation(Utils::DisplayRepresentation& dr);
-
-protected:
+private:
     bool moveStreamOntoFirst(std::ifstream& s,const std::string &AString);
 
-protected:
+private:
     /** Informations sur la commande: entités modifiées */
     Internal::InfoCommand* m_icmd;
 

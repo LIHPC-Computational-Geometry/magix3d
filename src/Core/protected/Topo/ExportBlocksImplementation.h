@@ -28,14 +28,14 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief   Destructeur
      */
-    virtual ~ExportBlocksImplementation();
+    ~ExportBlocksImplementation()=default;
 
     /*------------------------------------------------------------------------*/
     /** \brief  réalisation de l'exportation
      */
     void perform(Internal::InfoCommand* icmd);
 
-protected:
+private:
 
     void writeNodes(std::ofstream& str, std::vector<Topo::Vertex*> vertices);
     void writeEdges(std::ofstream& str, std::vector<Topo::CoEdge*> edges);

@@ -15,9 +15,6 @@ ExportBlocksImplementation(Internal::Context& c, const std::string& n)
 : m_context(c), m_filename(n)
 {}
 /*----------------------------------------------------------------------------*/
-ExportBlocksImplementation::
-~ExportBlocksImplementation()
-{}
 /*----------------------------------------------------------------------------*/
 void ExportBlocksImplementation::perform(Internal::InfoCommand* icmd)
 {

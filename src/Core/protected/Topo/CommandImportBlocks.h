@@ -34,10 +34,6 @@ public:
      */
     void internalExecute();
 
-    /*------------------------------------------------------------------------*/
-    /** \brief  appel non prévu
-     */
-    virtual void getPreviewRepresentation(Utils::DisplayRepresentation& dr);
 
 protected:
 
