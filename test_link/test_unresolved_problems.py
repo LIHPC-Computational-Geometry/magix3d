@@ -180,7 +180,7 @@ def test_ogrids_not_equal():
 
 # Issue #214
 def test_undo_clear_group():
-    ctx = Mgx3D.getContext()
+    ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     # Création d'une boite avec une topologie
     ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10, "BOX")
@@ -193,7 +193,7 @@ def test_undo_clear_group():
 
 # Issue #215
 def test_undo_add_to_group():
-    ctx = Mgx3D.getContext()
+    ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     # Création d'une boite avec une topologie
     ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
