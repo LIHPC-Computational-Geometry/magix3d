@@ -8,6 +8,7 @@ def test_export_import_step():
     ctx.clearSession() # Clean the session after the previous test
     gm = ctx.getGeomManager ()
     tm = ctx.getTopoManager ()
+
     # Changement d'unité de longueur
     ctx.setLengthUnit(Mgx3D.Unit.meter)
     # Création de la boite Vol0000

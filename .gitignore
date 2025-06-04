@@ -3,3 +3,8 @@
 cmake-build-debug
 __pycache__
 build-linux-ubuntu*
+spack-build*
+spack-configure*
+.pytest_cache
+*.mli2
+*.pyc
