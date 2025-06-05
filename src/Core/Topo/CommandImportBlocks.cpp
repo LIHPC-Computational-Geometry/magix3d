@@ -44,6 +44,11 @@ namespace Mgx3D {
 
         }
 /*----------------------------------------------------------------------------*/
+         void CommandImportBlocks::getPreviewRepresentation(Utils::DisplayRepresentation& dr)
+        {
+            MGX_FORBIDDEN("getPreviewRepresentation non prévu");
+        }
+/*----------------------------------------------------------------------------*/
     } // end namespace Topo
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D
