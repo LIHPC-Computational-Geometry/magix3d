@@ -45,6 +45,8 @@ public:
 
 protected:
 
+    std::string m_filename;
+
     /* objet gérant l'opération d'exportation */
     ExportBlocksImplementation m_impl;
 };
