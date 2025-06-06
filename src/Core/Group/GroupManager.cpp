@@ -2290,30 +2290,6 @@ void GroupManager::addSepa(const std::string& nom, Mesh::MeshModificationBySepa&
     getContext().getCommandManager().addCommand(command, Utils::Command::DO);
 }
 /*----------------------------------------------------------------------------*/
-void GroupManager::addToGroup(std::vector<std::string>& ve, int dim, const std::string& groupName)
-{
-    // récupération des entités géométriques associées
-    std::vector<std::string> geom_entity_names = getGeomEntities(ve);
-
-    getContext().getGeomManager().addToGroup(geom_entity_names, dim, groupName);
-}
-/*----------------------------------------------------------------------------*/
-void GroupManager::removeFromGroup(std::vector<std::string>& ve, int dim, const std::string& groupName)
-{
-    // récupération des entités géométriques associées
-    std::vector<std::string> geom_entity_names = getGeomEntities(ve);
-
-    getContext().getGeomManager().removeFromGroup(geom_entity_names, dim, groupName);
-}
-/*----------------------------------------------------------------------------*/
-void GroupManager::setGroup(std::vector<std::string>& ve, int dim, const std::string& groupName)
-{
-    // récupération des entités géométriques associées
-    std::vector<std::string> geom_entity_names = getGeomEntities(ve);
-
-    getContext().getGeomManager().setGroup(geom_entity_names, dim, groupName);
-}
-/*----------------------------------------------------------------------------*/
 void GroupManager::setLevel(std::vector<std::string>& vg, int dim, int level)
 {
 	   switch(dim){

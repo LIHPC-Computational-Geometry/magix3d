@@ -521,19 +521,6 @@ public:
      */
     void addSepa(const std::string& nom, Mesh::MeshModificationBySepa& ASepa);
 
-    /*------------------------------------------------------------------------*/
-    /** Ajoute le contenu d'un ensemble géométrique à un groupe donné
-      *  */
-     void addToGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
-
-     /** Enlève le contenu d'un ensemble géométrique à un groupe donné
-      *  */
-     void removeFromGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
-
-     /** Défini le contenu d'un ensemble géométrique à un groupe donné
-      *  */
-     void setGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
-
      /** affecte un niveau pour classer les groupes
       *  \param vg la liste des noms de groupes
       *  \param dim la dimension des groupes
