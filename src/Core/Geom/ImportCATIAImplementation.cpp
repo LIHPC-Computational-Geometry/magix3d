@@ -7,6 +7,7 @@
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 #ifdef USE_DKOC
+#include <mgx_config.h>
 // fichiers d'en-tête de DataKit pour le lecteur Catia
 #include <DKOC/OCCTopoDSRead.h>
 #endif
