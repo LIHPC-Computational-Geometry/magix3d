@@ -1802,8 +1802,8 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Topo::Blo
 {
 	std::set<Topo::Block*> initTopoEntities;
 
-	for (uint i=0; i<vg.size(); i++){
-		Group3D* gr3d = getGroup3D(vg[i], false);
+    for (auto vn : vg){
+		Group3D* gr3d = getGroup3D(vn, false);
 		if (gr3d){
 			Topo::TopoHelper::get(gr3d->getVolumes(), initTopoEntities);
 			std::vector<Topo::Block*>& te = gr3d->getBlocks();
@@ -1822,14 +1822,14 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Topo::CoF
 
 	std::set<Topo::CoFace*> initTopoEntities;
 
-	for (uint i=0; i<vg.size(); i++){
-		Group3D* gr3d = getGroup3D(vg[i], false);
+    for (auto vn : vg){
+		Group3D* gr3d = getGroup3D(vn, false);
 		if (gr3d){
 			Topo::TopoHelper::get(gr3d->getVolumes(), initTopoEntities, propagate);
 			Topo::TopoHelper::get(gr3d->getBlocks(), initTopoEntities);
 		}
 		else {
-			Group2D* gr2d = getGroup2D(vg[i], false);
+			Group2D* gr2d = getGroup2D(vn, false);
 			if (gr2d){
 				Topo::TopoHelper::get(gr2d->getSurfaces(), initTopoEntities);
 				std::vector<Topo::CoFace*>& te = gr2d->getCoFaces();
@@ -1849,20 +1849,20 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Topo::CoE
 
 	std::set<Topo::CoEdge*> initTopoEntities;
 
-	for (uint i=0; i<vg.size(); i++){
-		Group3D* gr3d = getGroup3D(vg[i], false);
+    for (auto vn : vg){
+		Group3D* gr3d = getGroup3D(vn, false);
 		if (gr3d){
 			Topo::TopoHelper::get(gr3d->getVolumes(), initTopoEntities, propagate);
 			Topo::TopoHelper::get(gr3d->getBlocks(), initTopoEntities);
 		}
 		else {
-			Group2D* gr2d = getGroup2D(vg[i], false);
+			Group2D* gr2d = getGroup2D(vn, false);
 			if (gr2d){
 				Topo::TopoHelper::get(gr2d->getSurfaces(), initTopoEntities, propagate);
 				Topo::TopoHelper::get(gr2d->getCoFaces(), initTopoEntities);
 			}
 			else {
-				Group1D* gr1d = getGroup1D(vg[i], false);
+				Group1D* gr1d = getGroup1D(vn, false);
 				if (gr1d){
 					Topo::TopoHelper::get(gr1d->getCurves(), initTopoEntities);
 					std::vector<Topo::CoEdge*>& te = gr1d->getCoEdges();
@@ -1883,26 +1883,26 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Topo::Ver
 
 	std::set<Topo::Vertex*> initTopoEntities;
 
-	for (uint i=0; i<vg.size(); i++){
-		Group3D* gr3d = getGroup3D(vg[i], false);
+    for (auto vn : vg){
+		Group3D* gr3d = getGroup3D(vn, false);
 		if (gr3d){
 			Topo::TopoHelper::get(gr3d->getVolumes(), initTopoEntities, propagate);
 			Topo::TopoHelper::get(gr3d->getBlocks(), initTopoEntities);
 		}
 		else {
-			Group2D* gr2d = getGroup2D(vg[i], false);
+			Group2D* gr2d = getGroup2D(vn, false);
 			if (gr2d){
 				Topo::TopoHelper::get(gr2d->getSurfaces(), initTopoEntities, propagate);
 				Topo::TopoHelper::get(gr2d->getCoFaces(), initTopoEntities);
 			}
 			else {
-				Group1D* gr1d = getGroup1D(vg[i], false);
+				Group1D* gr1d = getGroup1D(vn, false);
 				if (gr1d){
 					Topo::TopoHelper::get(gr1d->getCurves(), initTopoEntities, propagate);
 					Topo::TopoHelper::get(gr1d->getCoEdges(), initTopoEntities);
 				}
 				else {
-					Group0D* gr0d = getGroup0D(vg[i], false);
+					Group0D* gr0d = getGroup0D(vn, false);
 					if (gr0d){
 						Topo::TopoHelper::get(gr0d->getVertices(), initTopoEntities);
 						std::vector<Topo::Vertex*>& te = gr0d->getTopoVertices();
@@ -1924,8 +1924,8 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Mesh::Vol
 {
 	Mesh::MeshManager& mmng = getContext().getMeshManager();
 
-	for (uint i=0; i<vg.size(); i++){
-		Mesh::Volume* me = mmng.getVolume(vg[i], false);
+    for (auto vn : vg){
+		Mesh::Volume* me = mmng.getVolume(vn, false);
 
 		if (me)
 			volumes.push_back(me);
@@ -1936,8 +1936,8 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Mesh::Sur
 {
 	Mesh::MeshManager& mmng = getContext().getMeshManager();
 
-	for (uint i=0; i<vg.size(); i++){
-		Mesh::Surface* me = mmng.getSurface(vg[i], false);
+    for (auto vn : vg){
+		Mesh::Surface* me = mmng.getSurface(vn, false);
 
 		if (me)
 			surfaces.push_back(me);
@@ -1948,8 +1948,8 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Mesh::Lin
 {
 	Mesh::MeshManager& mmng = getContext().getMeshManager();
 
-	for (uint i=0; i<vg.size(); i++){
-		Mesh::Line* me = mmng.getLine(vg[i], false);
+    for (auto vn : vg){
+		Mesh::Line* me = mmng.getLine(vn, false);
 
 		if (me)
 			lines.push_back(me);
@@ -1960,8 +1960,8 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Mesh::Clo
 {
 	Mesh::MeshManager& mmng = getContext().getMeshManager();
 
-	for (uint i=0; i<vg.size(); i++){
-		Mesh::Cloud* me = mmng.getCloud(vg[i], false);
+    for (auto vn : vg){
+		Mesh::Cloud* me = mmng.getCloud(vn, false);
 
 		if (me)
 			clouds.push_back(me);
