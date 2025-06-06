@@ -416,10 +416,6 @@ public:
 #endif
 
     /*------------------------------------------------------------------------*/
-    /** Retourne les noms des entités géométriques à partir des groupes sélectionnées */
-    std::vector<std::string> getGeomEntities(const std::vector<std::string>& vg);
-
-    /*------------------------------------------------------------------------*/
     /** Retourne les volumes géométriques à partir des groupes sélectionnés   */
     std::vector<std::string> getGeomVolumes(const std::vector<std::string>& vg);
 

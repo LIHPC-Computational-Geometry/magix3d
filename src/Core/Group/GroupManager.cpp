@@ -1639,43 +1639,6 @@ void GroupManager::addMark(CoordinateSystem::SysCoord* rep,
 
 }
 /*----------------------------------------------------------------------------*/
-std::vector<std::string> GroupManager::getGeomEntities(const std::vector<std::string>& vg)
-{
-    std::set<Geom::GeomEntity*> initGeomEntities;
-    for (auto vn : vg){
-        Group3D* gr3d = getGroup3D(vn, false);
-        if (gr3d){
-            auto volumes = gr3d->getVolumes();
-            initGeomEntities.insert(volumes.begin(), volumes.end());
-        } else {
-            Group2D* gr2d = getGroup2D(vn, false);
-            if (gr2d){
-                auto surfaces = gr2d->getSurfaces();
-                initGeomEntities.insert(surfaces.begin(), surfaces.end());
-            } else {
-                Group1D* gr1d = getGroup1D(vn, false);
-                if (gr1d){
-                    auto curves = gr1d->getCurves();
-                    initGeomEntities.insert(curves.begin(), curves.end());
-                } else {
-                    Group0D* gr0d = getGroup0D(vn, false);
-                    if (gr0d){
-                        auto vertices = gr0d->getVertices();
-                        initGeomEntities.insert(vertices.begin(), vertices.end());
-                    }
-                }
-            }
-        }
-    } // end for i<vg.size()
-
-    std::vector<std::string> geomEntities;
-    for (std::set<Geom::GeomEntity*>::iterator iter = initGeomEntities.begin();
-    		iter != initGeomEntities.end(); ++iter)
-    	geomEntities.push_back((*iter)->getName());
-
-    return geomEntities;
-}
-/*----------------------------------------------------------------------------*/
 void GroupManager::get(const std::vector<std::string>& vg, std::vector<Geom::Volume*>& volumes)
 {
     std::set<Geom::Volume*> initGeomEntities;
