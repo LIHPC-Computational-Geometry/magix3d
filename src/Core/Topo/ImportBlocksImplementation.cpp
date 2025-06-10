@@ -6,10 +6,19 @@
 #include "Topo/ImportBlocksImplementation.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Topo/EdgeMeshingPropertyGeometric.h"
+#include "Topo/EdgeMeshingPropertyBigeometric.h"
+#include "Topo/EdgeMeshingPropertyBeta.h"
+#include "Topo/EdgeMeshingPropertyHyperbolic.h"
+#include "Topo/EdgeMeshingPropertyInterpolate.h"
+#include "Topo/EdgeMeshingPropertySpecificSize.h"
+#include "Topo/EdgeMeshingPropertyTabulated.h"
 #include "Topo/EdgeMeshingPropertyGlobalInterpolate.h"
 #include "Internal/InfoCommand.h"
-#include "Group/GroupManager.h"
-#include "Group/GroupEntity.h"
+
+#include "Group/Group0D.h"
+#include "Group/Group1D.h"
+#include "Group/Group2D.h"
+#include "Group/Group3D.h"
 /*----------------------------------------------------------------------------*/
 #include <iostream>
 /*----------------------------------------------------------------------------*/
@@ -20,7 +29,7 @@ namespace Topo {
 /*----------------------------------------------------------------------------*/
 
 ImportBlocksImplementation::ImportBlocksImplementation(Internal::Context &c, Internal::InfoCommand *icmd,
-                            const std::string &n) 
+                            const std::string &n)
 : m_group_helper(*icmd, c.getGroupManager())
 , m_icmd(icmd)
 , m_c(c)
@@ -114,79 +123,6 @@ void ImportBlocksImplementation::internalExecute() {
         }
 
 
-
-    if (!moveStreamOntoFirst(s, "Discr")) {
-        std::string mess = "BLK read error: no Discr keyword found";
-        throw TkUtil::Exception(mess);
-    }
-    int nb_discr;
-    s >> nb_discr;
-    if (nb_edges != nb_discr) {
-        std::string mess = "BLK read error: number of discretization info different from number of edges";
-        throw TkUtil::Exception(mess);
-    }
-    std::vector<CoEdgeMeshingProperty*> emps;
-    emps.resize(nb_discr);
-    int disc_type;
-    int nb;
-    for (int i = 0; i < nb_discr; i++) {
-        s >> disc_type;
-        if (disc_type == 0) {
-            s >> nb;
-            //EdgeMeshingPropertyUniform emp(nb);
-            emps[i] = new EdgeMeshingPropertyUniform(nb);
-        } else if (disc_type == 1) {
-            double raison;
-            s >> nb >> raison;
-            //EdgeMeshingPropertyGeometric emp(nb, raison);
-            emps[i] = new EdgeMeshingPropertyGeometric(nb, raison);
-        } else if (disc_type == 6) {
-            s >> nb;
-            std::vector<std::vector<int>> interpolate_edges(2,std::vector<int>());
-
-            std::string str;
-            for (int e_i = 0; e_i < 2; e_i++) {
-                std::vector<int> edges;
-                s >> str;
-                while (str != "]") {
-                    if (str == "[") {
-                        s >> str;
-                    } else {
-                        int e_id;
-                        e_id = std::stoi(str);
-                        edges.push_back(e_id);
-                        s >> str;
-
-                    }
-                }
-                interpolate_edges[e_i] = edges;
-            }
-
-            std::vector<std::string> firstCoedgesNames;
-            firstCoedgesNames.resize(interpolate_edges[0].size());
-            std::vector<std::string> secondCoedgesNames;
-            secondCoedgesNames.resize(interpolate_edges[1].size());
-
-            int indice = 0;
-            for (auto e_id : interpolate_edges[0]) {
-                firstCoedgesNames[indice] = enames[e_id];
-                indice++;
-            }
-            indice = 0;
-            for (auto e_id : interpolate_edges[1]) {
-                secondCoedgesNames[indice] = enames[e_id];
-                indice++;
-            }
-            emps[i] = new EdgeMeshingPropertyGlobalInterpolate(nb, firstCoedgesNames,secondCoedgesNames);
-        } else {
-            std::string mess = "BLK read error: type of discretization not supported";
-            throw TkUtil::Exception(mess);
-        }
-    }
-
-        for (int i=0; i<coedges.size(); i++) {
-            coedges[i]->setProperty(emps[i]);
-        }
 
     /*----------------------------------------------------------------------------*/
     if (!moveStreamOntoFirst(s, "FACES")) {
@@ -289,7 +225,148 @@ void ImportBlocksImplementation::internalExecute() {
             face->add(group2);
         }
 
-    /*----------------------------------------------------------------------------*/
+
+            if (!moveStreamOntoFirst(s, "Discr")) {
+                std::string mess = "BLK read error: no Discr keyword found";
+                throw TkUtil::Exception(mess);
+            }
+            int nb_discr;
+            s >> nb_discr;
+            if (nb_edges != nb_discr) {
+                std::string mess = "BLK read error: number of discretization info different from number of edges";
+                throw TkUtil::Exception(mess);
+            }
+            std::vector<CoEdgeMeshingProperty*> emps;
+            emps.resize(nb_discr);
+            int disc_type;
+            int nb;
+            for (int i = 0; i < nb_discr; i++) {
+                s >> disc_type;
+                if (disc_type == 0) {
+                    s >> nb;
+                    emps[i] = new EdgeMeshingPropertyUniform(nb);
+                }
+                else if (disc_type == 1) {
+                    double raison;
+                    s >> nb >> raison;
+                    emps[i] = new EdgeMeshingPropertyGeometric(nb, raison);
+                }
+                else if (disc_type == 2) {
+                    double r1, sp1, r2, sp2;
+                    s >> nb >> r1 >> sp1 >> r2 >> sp2;
+                    emps[i] = new EdgeMeshingPropertyBigeometric(nb, r1, sp1, r2, sp2);
+                }
+                else if (disc_type == 3) {
+                    double sp1, sp2;
+                    s >> nb >> sp1 >> sp2;
+                    emps[i] = new EdgeMeshingPropertyHyperbolic(nb, sp1, sp2);
+                }
+                else if (disc_type == 4) {
+                    double size;
+                    s >> nb >> size;
+                    emps[i] = new EdgeMeshingPropertySpecificSize(size);
+                }
+                else if (disc_type == 5) {
+                    s >> nb;
+                    std::string str;
+                    std::vector<int> edges;
+                    int type;
+                    s >> type;
+                    if(type == 0){
+                        s >> str;
+                        while (str != "]") {
+                            if (str == "[") {
+                                s >> str;
+                            } else {
+                                int e_id;
+                                e_id = std::stoi(str);
+                                edges.push_back(e_id);
+                                s >> str;
+
+                            }
+                        }
+                        std::vector<std::string> coedgesNames;
+                        coedgesNames.resize(edges.size());
+                        int indice = 0;
+                        for (auto e_id : edges) {
+                            coedgesNames[indice] = enames[e_id];
+                            indice++;
+                        }
+
+                        emps[i] = new EdgeMeshingPropertyInterpolate(nb, coedgesNames);
+                    }
+                    else{
+                        std::string str;
+                        s >> str;
+                        std::string cofaceName;
+                        s >> cofaceName;
+                        s >> str;
+
+                        emps[i] = new EdgeMeshingPropertyInterpolate(nb, cofaceName);
+                    }
+                }
+                else if (disc_type == 6) {
+                    s >> nb;
+                    std::vector<std::vector<int>> interpolate_edges(2,std::vector<int>());
+
+                    std::string str;
+                    for (int e_i = 0; e_i < 2; e_i++) {
+                        std::vector<int> edges;
+                        s >> str;
+                        while (str != "]") {
+                            if (str == "[") {
+                                s >> str;
+                            } else {
+                                int e_id;
+                                e_id = std::stoi(str);
+                                edges.push_back(e_id);
+                                s >> str;
+
+                            }
+                        }
+                        interpolate_edges[e_i] = edges;
+                    }
+
+                    std::vector<std::string> firstCoedgesNames;
+                    firstCoedgesNames.resize(interpolate_edges[0].size());
+                    std::vector<std::string> secondCoedgesNames;
+                    secondCoedgesNames.resize(interpolate_edges[1].size());
+
+                    int indice = 0;
+                    for (auto e_id : interpolate_edges[0]) {
+                        firstCoedgesNames[indice] = enames[e_id];
+                        indice++;
+                    }
+                    indice = 0;
+                    for (auto e_id : interpolate_edges[1]) {
+                        secondCoedgesNames[indice] = enames[e_id];
+                        indice++;
+                    }
+                    emps[i] = new EdgeMeshingPropertyGlobalInterpolate(nb, firstCoedgesNames,secondCoedgesNames);
+                }
+                    /*else if (disc_type == 7) {
+                        double x,y,z;
+                        s >> nb >> x >> y >> z;
+                        std::vector<double> tabulation = {x,y,z};
+                        emps[i] = new EdgeMeshingPropertyTabulated(tabulation);
+                    }*/
+                else if (disc_type == 8) {
+                    double beta;
+                    s >> nb >> beta;
+                    emps[i] = new EdgeMeshingPropertyBeta(nb, beta);
+                }
+                else {
+                    std::string mess = "BLK read error: type of discretization not supported";
+                    throw TkUtil::Exception(mess);
+                }
+            }
+
+            for (int i=0; i<coedges.size(); i++) {
+                coedges[i]->setProperty(emps[i]);
+            }
+
+
+            /*----------------------------------------------------------------------------*/
 
         if (!moveStreamOntoFirst(s, "BLOCKS")) {
             std::string mess = "BLK read error: no BLOCKS keyword found";
