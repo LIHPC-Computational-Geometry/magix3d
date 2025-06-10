@@ -6798,29 +6798,29 @@ void QtMgx3DMainWindow::meshVisibleCallback ( )
 	DISABLE_GRAPHICAL_OPERATIONS
 
 	// On récupère la liste des groupes visibles :
-	const vector<string> visibleGroups	= getGroupManager ( ).getVisibles ( );
+	const vector<Group::GroupEntity*> visibleGroups	= getGroupManager ( ).getVisibles ( );
 	if (0 == visibleGroups.size ( ))
 		throw Exception (UTF8String ("Mailler les groupes visibles : absence de groupes visibles.", Charset::UTF_8));
 
 	if (visibleGroups.size ( ) == 1)
 		message << "Création du maillage pour le groupe "
-		        << visibleGroups [0];
+		        << visibleGroups [0]->getName();
 	else
 	{
 		message << "Création du maillage pour les groupes :";
-		for (vector<string>::const_iterator itg = visibleGroups.begin ( );
-		     itg != visibleGroups.end ( ); itg++)
-				message << " " << (*itg);
+		for (auto g : visibleGroups)
+				message << " " << g->getName();
 	}	// else if (visibleGroups.size ( ) == 1)
 	//getGroupManager ( ).mesh (visibleGroups);
-	std::vector<std::string> topo;
-	topo = getGroupManager().getTopoBlocks(visibleGroups);
-	if (!topo.empty())
-		getMeshManager().newBlocksMesh(topo);
+	std::vector<Topo::Block*> topo_blocks;
+	getGroupManager().get(visibleGroups, topo_blocks);
+	if (!topo_blocks.empty())
+		getMeshManager().newBlocksMesh(topo_blocks);
 	else {
-		topo = getGroupManager().getTopoFaces(visibleGroups);
-		if (!topo.empty())
-			getMeshManager().newFacesMesh(topo);
+		std::vector<Topo::CoFace*> topo_faces;
+		getGroupManager().get(visibleGroups, topo_faces);
+		if (!topo_faces.empty())
+			getMeshManager().newFacesMesh(topo_faces);
 		else {
 			throw Exception (UTF8String ("Mailler les groupes visibles : absence de blocs et de faces à mailler.", Charset::UTF_8));
 		}

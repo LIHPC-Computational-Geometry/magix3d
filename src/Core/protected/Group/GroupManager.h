@@ -368,90 +368,89 @@ public:
 
     /*------------------------------------------------------------------------*/
     /** Retourne les volumes géométriques à partir des groupes sélectionnés   */
-    void get(const std::vector<std::string>& vg, std::vector<Geom::Volume*>& volumes);
+    void get(const std::vector<GroupEntity*>& vg, std::vector<Geom::Volume*>& volumes);
 
     /*------------------------------------------------------------------------*/
     /** Retourne les surfaces géométriques à partir des groupes sélectionnés  */
-    void get(const std::vector<std::string>& vg, std::vector<Geom::Surface*>& surfaces);
+    void get(const std::vector<GroupEntity*>& vg, std::vector<Geom::Surface*>& surfaces);
 
     /*------------------------------------------------------------------------*/
     /** Retourne les courbes géométriques à partir des groupes sélectionnés   */
-    void get(const std::vector<std::string>& vg, std::vector<Geom::Curve*>& curves);
+    void get(const std::vector<GroupEntity*>& vg, std::vector<Geom::Curve*>& curves);
 
     /*------------------------------------------------------------------------*/
-    /** Retourne les sommets géométriques à partir des groupes sélectionnés  */
-    void get(const std::vector<std::string>& vg, std::vector<Geom::Vertex*>& vertices);
-
-    /*------------------------------------------------------------------------*/
-    /** Retourne les blocs topologiques à partir des groupes sélectionnés     */
-    void get(const std::vector<std::string>& vg, std::vector<Topo::Block*>& blocks);
-
-    /*------------------------------------------------------------------------*/
-    /** Retourne les faces communes topologiques à partir des groupes sélectionnés */
-    void get(const std::vector<std::string>& vg, std::vector<Topo::CoFace*>& cofaces);
-
-    /*------------------------------------------------------------------------*/
-    /** Retourne les arêtes communes topologiques à partir des groupes sélectionnés */
-    void get(const std::vector<std::string>& vg, std::vector<Topo::CoEdge*>& coedges);
-
-    /*------------------------------------------------------------------------*/
-    /** Retourne les sommets topologiques à partir des groupes sélectionnés */
-    void get(const std::vector<std::string>& vg, std::vector<Topo::Vertex*>& vertices);
-
-    /*------------------------------------------------------------------------*/
-    /** Retourne les volumes de mailles à partir des groupes sélectionnés   */
-    void get(const std::vector<std::string>& vg, std::vector<Mesh::Volume*>& volumes);
-
-    /*------------------------------------------------------------------------*/
-    /** Retourne les surfaces de mailles à partir des groupes sélectionnés  */
-    void get(const std::vector<std::string>& vg, std::vector<Mesh::Surface*>& surfaces);
-
-    /*------------------------------------------------------------------------*/
-    /** Retourne les lignes de bras à partir des groupes sélectionnés  */
-    void get(const std::vector<std::string>& vg, std::vector<Mesh::Line*>& lines);
-
-    /*------------------------------------------------------------------------*/
-    /** Retourne les nuages de noeuds à partir des groupes sélectionnés  */
-    void get(const std::vector<std::string>& vg, std::vector<Mesh::Cloud*>& clouds);
-#endif
-
-    /*------------------------------------------------------------------------*/
-    /** Retourne les volumes géométriques à partir des groupes sélectionnés   */
-    std::vector<std::string> getGeomVolumes(const std::vector<std::string>& vg);
-
-    /*------------------------------------------------------------------------*/
-    /** Retourne les surfaces géométriques à partir des groupes sélectionnés  */
-    std::vector<std::string> getGeomSurfaces(const std::vector<std::string>& vg);
-
-    /*------------------------------------------------------------------------*/
-    /** Retourne les courbes géométriques à partir des groupes sélectionnés   */
-    std::vector<std::string> getGeomCurves(const std::vector<std::string>& vg);
-
-    /*------------------------------------------------------------------------*/
-    /** Retourne les sommets géométriques à partir des groupes sélectionnés  */
-    std::vector<std::string> getGeomVertices(const std::vector<std::string>& vg);
+    /** Retourne les sommets géométriques à partir des groupes sélectionnés   */
+    void get(const std::vector<GroupEntity*>& vg, std::vector<Geom::Vertex*>& vertices);
 
     /*------------------------------------------------------------------------*/
     /** Retourne les blocs topologiques à partir des groupes sélectionnés     */
-    std::vector<std::string> getTopoBlocks(const std::vector<std::string>& vg);
+    void get(const std::vector<GroupEntity*>& vg, std::vector<Topo::Block*>& blocks);
 
-    /*------------------------------------------------------------------------*/
+    /*-----------------------------------------------------------------------------*/
     /** Retourne les faces communes topologiques à partir des groupes sélectionnés */
-    std::vector<std::string> getTopoFaces(const std::vector<std::string>& vg);
+    void get(const std::vector<GroupEntity*>& vg, std::vector<Topo::CoFace*>& cofaces);
 
-    /*------------------------------------------------------------------------*/
+    /*------------------------------------------------------------------------------*/
     /** Retourne les arêtes communes topologiques à partir des groupes sélectionnés */
-    std::vector<std::string> getTopoEdges(const std::vector<std::string>& vg);
+    void get(const std::vector<GroupEntity*>& vg, std::vector<Topo::CoEdge*>& coedges);
 
     /*------------------------------------------------------------------------*/
-    /** Retourne les sommets topologiques à partir des groupes sélectionnés */
-    std::vector<std::string> getTopoVertices(const std::vector<std::string>& vg);
+    /** Retourne les sommets topologiques à partir des groupes sélectionnés   */
+    void get(const std::vector<GroupEntity*>& vg, std::vector<Topo::Vertex*>& vertices);
 
+    /*------------------------------------------------------------------------*/
+    /** Retourne les volumes de mailles à partir des groupes sélectionnés     */
+    void get(const std::vector<GroupEntity*>& vg, std::vector<Mesh::Volume*>& volumes);
+
+    /*------------------------------------------------------------------------*/
+    /** Retourne les surfaces de mailles à partir des groupes sélectionnés    */
+    void get(const std::vector<GroupEntity*>& vg, std::vector<Mesh::Surface*>& surfaces);
+
+    /*------------------------------------------------------------------------*/
+    /** Retourne les lignes de bras à partir des groupes sélectionnés         */
+    void get(const std::vector<GroupEntity*>& vg, std::vector<Mesh::Line*>& lines);
+
+    /*------------------------------------------------------------------------*/
+    /** Retourne les nuages de noeuds à partir des groupes sélectionnés       */
+    void get(const std::vector<GroupEntity*>& vg, std::vector<Mesh::Cloud*>& clouds);
 
     /*------------------------------------------------------------------------*/
     /** \brief retourne la liste des noms des groupes visibles
      */
-    std::vector<std::string> getVisibles() const;
+    std::vector<GroupEntity*> getVisibles() const;
+#endif
+
+    /*------------------------------------------------------------------------*/
+    /** Retourne les volumes géométriques du groupe g de dimension d          */
+    std::vector<std::string> getGeomVolumes(const std::string& g, const int d);
+
+    /*------------------------------------------------------------------------*/
+    /** Retourne les surfaces géométriques du groupe g de dimension d         */
+    std::vector<std::string> getGeomSurfaces(const std::string& g, const int d);
+
+    /*------------------------------------------------------------------------*/
+    /** Retourne les courbes géométriques du groupe g de dimension d          */
+    std::vector<std::string> getGeomCurves(const std::string& g, const int d);
+
+    /*------------------------------------------------------------------------*/
+    /** Retourne les sommets géométriques du groupe g de dimension d          */
+    std::vector<std::string> getGeomVertices(const std::string& g, const int d);
+
+    /*------------------------------------------------------------------------*/
+    /** Retourne les blocs topologiques du groupe g de dimension d            */
+    std::vector<std::string> getTopoBlocks(const std::string& g, const int d);
+
+    /*------------------------------------------------------------------------*/
+    /** Retourne les faces communes topologiques du groupe g de dimension d   */
+    std::vector<std::string> getTopoFaces(const std::string& g, const int d);
+
+    /*------------------------------------------------------------------------*/
+    /** Retourne les arêtes communes topologiques du groupe g de dimension d  */
+    std::vector<std::string> getTopoEdges(const std::string& g, const int d);
+
+    /*------------------------------------------------------------------------*/
+    /** Retourne les sommets topologiques du groupe g de dimension d          */
+    std::vector<std::string> getTopoVertices(const std::string& g, const int d);
 
     /*------------------------------------------------------------------------*/
     /** Ajoute une projection sur plan X=0 du maillage pour un groupe 2D
@@ -530,6 +529,9 @@ public:
 
 
 private:
+    /// Retourne le groupe correspondant à la dimension
+    GroupEntity* getGroup(const std::string& name, const int dim) const;
+
     /// Conteneur pour les groupes 3D
     std::vector<Group3D*> m_group3D;
 
