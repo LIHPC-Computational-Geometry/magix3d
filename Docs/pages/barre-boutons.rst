@@ -107,7 +107,7 @@ Ces boutons permettent un accès rapide aux commandes de création de maillage.
 Pour le fonctionnement, voir les paragraphes :ref:`mailler-selection`, 
 :ref:`mailler-visible` et :ref:`tout-mailler`.
 
-.. _boutons-selection:
+.. _boutons-mode-selection:
 
 Boutons associés au mode de sélection
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -169,8 +169,6 @@ L’icône *mode de sélection* permet de passer d’un mode à l’autre.
   | Il devient ainsi possible de sélectionner au travers de surfaces matérialisées par des segments de droites. 
   | Ce mode présente l’inconvénient d’être moins performant.
 
-
-.. _boutons-selection:
 
 Boutons "points de vue"
 ~~~~~~~~~~~~~~~~~~~~~~~
