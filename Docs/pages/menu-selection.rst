@@ -216,7 +216,7 @@ Sélection d'entités selon la dimension
 
 Pour permettre la sélection d’entités, il est nécessaire de sélectionner
 la dimension des entités que l’on souhaite sélectionner. Voir la 
-description des :ref:`boutons-selection`.
+description des :ref:`boutons-mode-selection`.
 
 Les panneaux de commandes sélectionnent automatiquement les ou les
 dimensions adaptées lorsqu’il s’agit de remplir un des champs.
@@ -230,7 +230,7 @@ Mode de sélection des entités
    :width: 0.25in
    :height: 0.25in
 
-Voir la description :ref:`boutons-selection`.
+Voir la description :ref:`boutons-mode-selection`.
 
 Il recommandé d’utiliser le mode de sélection filaire, proposé par
 défaut.
@@ -248,7 +248,7 @@ Sélection par rectangle élastique
    :width: 0.25in
    :height: 0.25in
 
-Voir la description :ref:`boutons-selection`.
+Voir la description :ref:`boutons-mode-selection`.
 
 En mode de sélection par rectangle élastique il est possible de ne 
 sélectionner que les entités visibles à l'écran, c'est à dire non 

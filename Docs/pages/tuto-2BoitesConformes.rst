@@ -115,7 +115,7 @@ en sélectionnant les boutons suivants :
 Ensuite, sélectionner comme type d'opération le *Collage*. 
 Positionner le curseur sur le champ *Volumes* et sélectionner les deux volumes présents à l'aide de la souris en maintenant la touche *Ctrl* enfoncée.
 
-Plus d'information sur les méthodes de sélection :ref:`ici<boutons-selection>`. 
+Plus d'information sur les méthodes de sélection :ref:`ici<boutons-mode-selection>`. 
 Terminer par *Appliquer*.
 
 Le panneau *Commandes python* fait alors apparaître la commande équivalente:
