@@ -51,13 +51,13 @@ def assert_all(ctx, block, group_names):
     assert 0 == len(block_info.groupsName())
     for group_name in group_names:
         # Lien implicite group -> block
-        assert block in ctx.getGroupManager().getTopoBlocks([group_name])
+        assert block in ctx.getGroupManager().getTopoBlocks(group_name, 3)
         # Lien implicite group -> faces
-        assert set(block_info.cofaces()) == set(ctx.getGroupManager().getTopoFaces([group_name]))
+        assert set(block_info.cofaces()) == set(ctx.getGroupManager().getTopoFaces(group_name, 3))
         # Lien implicite group -> edges
-        assert set(block_info.coedges()) == set(ctx.getGroupManager().getTopoEdges([group_name]))
+        assert set(block_info.coedges()) == set(ctx.getGroupManager().getTopoEdges(group_name, 3))
         # Lien implicite group -> vertices
-        assert set(block_info.vertices()) == set(ctx.getGroupManager().getTopoVertices([group_name]))
+        assert set(block_info.vertices()) == set(ctx.getGroupManager().getTopoVertices(group_name, 3))
 
     vol = block_info.geomEntity()
     vol_info = ctx.getGeomManager().getInfos(vol, 3)
@@ -66,10 +66,10 @@ def assert_all(ctx, block, group_names):
         # Lien explicite volume -> group
         assert group_name in vol_info.groupsName()
         # Lien explicite group -> volume
-        assert vol in ctx.getGroupManager().getGeomVolumes([group_name])
+        assert vol in ctx.getGroupManager().getGeomVolumes(group_name, 3)
         # Lien implicite group -> surfaces
-        assert set(vol_info.surfaces()) == set(ctx.getGroupManager().getGeomSurfaces([group_name]))
+        assert set(vol_info.surfaces()) == set(ctx.getGroupManager().getGeomSurfaces(group_name, 3))
         # Lien implicite group -> curves
-        assert set(vol_info.curves()) == set(ctx.getGroupManager().getGeomCurves([group_name]))
+        assert set(vol_info.curves()) == set(ctx.getGroupManager().getGeomCurves(group_name, 3))
         # Lien implicite group -> vertices
-        assert set(vol_info.vertices()) == set(ctx.getGroupManager().getGeomVertices([group_name]))
+        assert set(vol_info.vertices()) == set(ctx.getGroupManager().getGeomVertices(group_name, 3))

@@ -1099,12 +1099,6 @@ virtual std::string Mgx3D::Group::GroupManager::getInfos(const std::string &name
 Retourne une string avec les informations relatives à l'entité 
 
 ";
-%feature("docstring") Mgx3D::Group::GroupManager::getVisibles "
-virtual std::vector<std::string> Mgx3D::Group::GroupManager::getVisibles() const
-
-retourne la liste des noms des groupes visibles 
-
-";
 %feature("docstring") Mgx3D::Group::GroupManager::GroupManager "
 Mgx3D::Group::GroupManager::GroupManager(const std::string &name, Internal::Context *c)
 

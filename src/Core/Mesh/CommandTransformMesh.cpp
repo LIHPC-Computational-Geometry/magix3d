@@ -47,7 +47,7 @@ transform(gp_Trsf* transf)
 	}
 
 	// les groupes visibles ont leur display de changé
-	std::vector<std::string> visibles = getContext().getGroupManager().getVisibles();
+	auto visibles = getContext().getGroupManager().getVisibles();
 
 	std::vector<Mesh::Volume*> volumes;
 	getContext().getGroupManager().get(visibles, volumes);
@@ -85,7 +85,7 @@ transform(gp_GTrsf* transf)
 	}
 
 	// les groupes visibles ont leur display de changé
-	std::vector<std::string> visibles = getContext().getGroupManager().getVisibles();
+	auto visibles = getContext().getGroupManager().getVisibles();
 
 	std::vector<Mesh::Volume*> volumes;
 	getContext().getGroupManager().get(visibles, volumes);

@@ -130,30 +130,7 @@ bool GroupManager::getPropagate()
 /*----------------------------------------------------------------------------*/
 std::string GroupManager::getInfos(const std::string& name, int dim) const
 {
-    switch(dim){
-    case(3):{
-        Group3D* gr = getGroup3D(name);
-        return gr->getInfos();
-    }
-    break;
-    case(2):{
-        Group2D* gr = getGroup2D(name);
-        return gr->getInfos();
-    }
-    break;
-    case(1):{
-        Group1D* gr = getGroup1D(name);
-        return gr->getInfos();
-    }
-    break;
-    case(0):{
-        Group0D* gr = getGroup0D(name);
-        return gr->getInfos();
-    }
-    break;
-    default:
-        throw TkUtil::Exception (TkUtil::UTF8String ("dimension non prévue pour GroupManager::getInfos", TkUtil::Charset::UTF_8));
-    }
+    return getGroup(name, dim)->getInfos();
 }
 /*----------------------------------------------------------------------------*/
 std::string GroupManager::getDefaultName(int dim) const
@@ -1639,11 +1616,11 @@ void GroupManager::addMark(CoordinateSystem::SysCoord* rep,
 
 }
 /*----------------------------------------------------------------------------*/
-void GroupManager::get(const std::vector<std::string>& vg, std::vector<Geom::Volume*>& volumes)
+void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Geom::Volume*>& volumes)
 {
     std::set<Geom::Volume*> initGeomEntities;
     for (auto vn : vg){
-        Group3D* gr3d = getGroup3D(vn, false);
+        Group3D* gr3d = dynamic_cast<Group3D*>(vn);
         if (gr3d){
         	auto loc_volumes = gr3d->getVolumes();
         	initGeomEntities.insert(loc_volumes.begin(), loc_volumes.end());
@@ -1655,18 +1632,18 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Geom::Vol
     	volumes.push_back((*iter));
 }
 /*----------------------------------------------------------------------------*/
-void GroupManager::get(const std::vector<std::string>& vg, std::vector<Geom::Surface*>& surfaces)
+void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Geom::Surface*>& surfaces)
 {
     std::set<Geom::Surface*> initGeomEntities;
     for (auto vn : vg){
-    	Group3D* gr3d = getGroup3D(vn, false);
+    	Group3D* gr3d = dynamic_cast<Group3D*>(vn);
     	if (gr3d){
     		for (auto volume : gr3d->getVolumes()){
     			auto loc_surfaces = volume->getSurfaces();
     			initGeomEntities.insert(loc_surfaces.begin(), loc_surfaces.end());
     		}
     	} else {
-    		Group2D* gr2d = getGroup2D(vn, false);
+    		Group2D* gr2d = dynamic_cast<Group2D*>(vn);
     		if (gr2d){
     			auto loc_surfaces = gr2d->getSurfaces();
     			initGeomEntities.insert(loc_surfaces.begin(), loc_surfaces.end());
@@ -1679,11 +1656,11 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Geom::Sur
     	surfaces.push_back((*iter));
 }
 /*----------------------------------------------------------------------------*/
-void GroupManager::get(const std::vector<std::string>& vg, std::vector<Geom::Curve*>& curves)
+void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Geom::Curve*>& curves)
 {
     std::set<Geom::Curve*> initGeomEntities;
     for (auto vn : vg){
-    	Group3D* gr3d = getGroup3D(vn, false);
+    	Group3D* gr3d = dynamic_cast<Group3D*>(vn);
     	if (gr3d){
     		for (auto volume : gr3d->getVolumes()){
                 for (auto surface : volume->getSurfaces()){
@@ -1692,14 +1669,14 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Geom::Cur
                 }
     		}
     	} else {
-            Group2D* gr2d = getGroup2D(vn, false);
+            Group2D* gr2d = dynamic_cast<Group2D*>(vn);
             if (gr2d){
                 for (auto surface : gr2d->getSurfaces()){
                 	auto loc_curves = surface->getCurves();
                 	initGeomEntities.insert(loc_curves.begin(), loc_curves.end());
                 }
             } else {
-                Group1D* gr1d = getGroup1D(vn, false);
+                Group1D* gr1d = dynamic_cast<Group1D*>(vn);
                 if (gr1d){
                 	auto loc_curves = gr1d->getCurves();
                 	initGeomEntities.insert(loc_curves.begin(), loc_curves.end());
@@ -1713,11 +1690,11 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Geom::Cur
     	curves.push_back((*iter));
 }
 /*----------------------------------------------------------------------------*/
-void GroupManager::get(const std::vector<std::string>& vg, std::vector<Geom::Vertex*>& vertices)
+void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Geom::Vertex*>& vertices)
 {
     std::set<Geom::Vertex*> initGeomEntities;
     for (auto vn : vg){
-    	Group3D* gr3d = getGroup3D(vn, false);
+    	Group3D* gr3d = dynamic_cast<Group3D*>(vn);
     	if (gr3d){
     		std::vector<Geom::Volume*> volumes = gr3d->getVolumes();
     		for (auto volume : volumes){
@@ -1728,7 +1705,7 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Geom::Ver
                     }
     		}
     	} else {
-            Group2D* gr2d = getGroup2D(vn, false);
+            Group2D* gr2d = dynamic_cast<Group2D*>(vn);
             if (gr2d){
                 std::vector<Geom::Surface*> surfaces = gr2d->getSurfaces();
                 for (auto surface : surfaces){
@@ -1738,7 +1715,7 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Geom::Ver
                     }
                 }
             } else {
-            	Group1D* gr1d = getGroup1D(vn, false);
+            	Group1D* gr1d = dynamic_cast<Group1D*>(vn);
             	if (gr1d){
             		std::vector<Geom::Curve*> curves = gr1d->getCurves();
             		for (auto curve : curves){
@@ -1746,7 +1723,7 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Geom::Ver
             			initGeomEntities.insert(loc_vertices.begin(), loc_vertices.end());
             		}
             	} else {
-            		Group0D* gr0d = getGroup0D(vn, false);
+            		Group0D* gr0d = dynamic_cast<Group0D*>(vn);
             		if (gr0d){
             			auto loc_vertices = gr0d->getVertices();
             			initGeomEntities.insert(loc_vertices.begin(), loc_vertices.end());
@@ -1761,12 +1738,12 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Geom::Ver
     	vertices.push_back((*iter));
 }
 /*----------------------------------------------------------------------------*/
-void GroupManager::get(const std::vector<std::string>& vg, std::vector<Topo::Block*>& blocks)
+void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Topo::Block*>& blocks)
 {
 	std::set<Topo::Block*> initTopoEntities;
 
     for (auto vn : vg){
-		Group3D* gr3d = getGroup3D(vn, false);
+		Group3D* gr3d = dynamic_cast<Group3D*>(vn);
 		if (gr3d){
 			Topo::TopoHelper::get(gr3d->getVolumes(), initTopoEntities);
 			std::vector<Topo::Block*>& te = gr3d->getBlocks();
@@ -1779,20 +1756,20 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Topo::Blo
 		blocks.push_back((*iter));
 }
 /*----------------------------------------------------------------------------*/
-void GroupManager::get(const std::vector<std::string>& vg, std::vector<Topo::CoFace*>& cofaces)
+void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Topo::CoFace*>& cofaces)
 {
 	bool propagate = getPropagate();
 
 	std::set<Topo::CoFace*> initTopoEntities;
 
     for (auto vn : vg){
-		Group3D* gr3d = getGroup3D(vn, false);
+		Group3D* gr3d = dynamic_cast<Group3D*>(vn);
 		if (gr3d){
 			Topo::TopoHelper::get(gr3d->getVolumes(), initTopoEntities, propagate);
 			Topo::TopoHelper::get(gr3d->getBlocks(), initTopoEntities);
 		}
 		else {
-			Group2D* gr2d = getGroup2D(vn, false);
+			Group2D* gr2d = dynamic_cast<Group2D*>(vn);
 			if (gr2d){
 				Topo::TopoHelper::get(gr2d->getSurfaces(), initTopoEntities);
 				std::vector<Topo::CoFace*>& te = gr2d->getCoFaces();
@@ -1806,26 +1783,26 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Topo::CoF
 		cofaces.push_back((*iter));
 }
 /*----------------------------------------------------------------------------*/
-void GroupManager::get(const std::vector<std::string>& vg, std::vector<Topo::CoEdge*>& coedges)
+void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Topo::CoEdge*>& coedges)
 {
 	bool propagate = getPropagate();
 
 	std::set<Topo::CoEdge*> initTopoEntities;
 
     for (auto vn : vg){
-		Group3D* gr3d = getGroup3D(vn, false);
+		Group3D* gr3d = dynamic_cast<Group3D*>(vn);
 		if (gr3d){
 			Topo::TopoHelper::get(gr3d->getVolumes(), initTopoEntities, propagate);
 			Topo::TopoHelper::get(gr3d->getBlocks(), initTopoEntities);
 		}
 		else {
-			Group2D* gr2d = getGroup2D(vn, false);
+			Group2D* gr2d = dynamic_cast<Group2D*>(vn);
 			if (gr2d){
 				Topo::TopoHelper::get(gr2d->getSurfaces(), initTopoEntities, propagate);
 				Topo::TopoHelper::get(gr2d->getCoFaces(), initTopoEntities);
 			}
 			else {
-				Group1D* gr1d = getGroup1D(vn, false);
+				Group1D* gr1d = dynamic_cast<Group1D*>(vn);
 				if (gr1d){
 					Topo::TopoHelper::get(gr1d->getCurves(), initTopoEntities);
 					std::vector<Topo::CoEdge*>& te = gr1d->getCoEdges();
@@ -1840,32 +1817,32 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Topo::CoE
 		coedges.push_back((*iter));
 }
 /*----------------------------------------------------------------------------*/
-void GroupManager::get(const std::vector<std::string>& vg, std::vector<Topo::Vertex*>& vertices)
+void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Topo::Vertex*>& vertices)
 {
 	bool propagate = getPropagate();
 
 	std::set<Topo::Vertex*> initTopoEntities;
 
     for (auto vn : vg){
-		Group3D* gr3d = getGroup3D(vn, false);
+		Group3D* gr3d = dynamic_cast<Group3D*>(vn);
 		if (gr3d){
 			Topo::TopoHelper::get(gr3d->getVolumes(), initTopoEntities, propagate);
 			Topo::TopoHelper::get(gr3d->getBlocks(), initTopoEntities);
 		}
 		else {
-			Group2D* gr2d = getGroup2D(vn, false);
+			Group2D* gr2d = dynamic_cast<Group2D*>(vn);
 			if (gr2d){
 				Topo::TopoHelper::get(gr2d->getSurfaces(), initTopoEntities, propagate);
 				Topo::TopoHelper::get(gr2d->getCoFaces(), initTopoEntities);
 			}
 			else {
-				Group1D* gr1d = getGroup1D(vn, false);
+				Group1D* gr1d = dynamic_cast<Group1D*>(vn);
 				if (gr1d){
 					Topo::TopoHelper::get(gr1d->getCurves(), initTopoEntities, propagate);
 					Topo::TopoHelper::get(gr1d->getCoEdges(), initTopoEntities);
 				}
 				else {
-					Group0D* gr0d = getGroup0D(vn, false);
+					Group0D* gr0d = dynamic_cast<Group0D*>(vn);
 					if (gr0d){
 						Topo::TopoHelper::get(gr0d->getVertices(), initTopoEntities);
 						std::vector<Topo::Vertex*>& te = gr0d->getTopoVertices();
@@ -1883,59 +1860,60 @@ void GroupManager::get(const std::vector<std::string>& vg, std::vector<Topo::Ver
 }
 
 /*------------------------------------------------------------------------*/
-void GroupManager::get(const std::vector<std::string>& vg, std::vector<Mesh::Volume*>& volumes)
+void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Mesh::Volume*>& volumes)
 {
 	Mesh::MeshManager& mmng = getContext().getMeshManager();
 
     for (auto vn : vg){
-		Mesh::Volume* me = mmng.getVolume(vn, false);
+		Mesh::Volume* me = mmng.getVolume(vn->getName(), false);
 
 		if (me)
 			volumes.push_back(me);
 	}
 }
 /*------------------------------------------------------------------------*/
-void GroupManager::get(const std::vector<std::string>& vg, std::vector<Mesh::Surface*>& surfaces)
+void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Mesh::Surface*>& surfaces)
 {
 	Mesh::MeshManager& mmng = getContext().getMeshManager();
 
     for (auto vn : vg){
-		Mesh::Surface* me = mmng.getSurface(vn, false);
+		Mesh::Surface* me = mmng.getSurface(vn->getName(), false);
 
 		if (me)
 			surfaces.push_back(me);
 	}
 }
 /*------------------------------------------------------------------------*/
-void GroupManager::get(const std::vector<std::string>& vg, std::vector<Mesh::Line*>& lines)
+void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Mesh::Line*>& lines)
 {
 	Mesh::MeshManager& mmng = getContext().getMeshManager();
 
     for (auto vn : vg){
-		Mesh::Line* me = mmng.getLine(vn, false);
+		Mesh::Line* me = mmng.getLine(vn->getName(), false);
 
 		if (me)
 			lines.push_back(me);
 	}
 }
 /*------------------------------------------------------------------------*/
-void GroupManager::get(const std::vector<std::string>& vg, std::vector<Mesh::Cloud*>& clouds)
+void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Mesh::Cloud*>& clouds)
 {
 	Mesh::MeshManager& mmng = getContext().getMeshManager();
 
     for (auto vn : vg){
-		Mesh::Cloud* me = mmng.getCloud(vn, false);
+		Mesh::Cloud* me = mmng.getCloud(vn->getName(), false);
 
 		if (me)
 			clouds.push_back(me);
 	}
 }
 /*----------------------------------------------------------------------------*/
-std::vector<std::string> GroupManager::getGeomVolumes(const std::vector<std::string>& vg)
+std::vector<std::string> GroupManager::getGeomVolumes(const std::string& g, const int d)
 {
 	std::vector<std::string> result;
+    std::vector<GroupEntity*> groups = { getGroup(g, d) };
 	std::vector<Geom::Volume*> geom_entities;
-	get(vg, geom_entities);
+	get(groups, geom_entities);
 
 	for (std::vector<Geom::Volume*>::iterator iter=geom_entities.begin();
 			iter!=geom_entities.end(); ++iter)
@@ -1944,11 +1922,12 @@ std::vector<std::string> GroupManager::getGeomVolumes(const std::vector<std::str
 	return result;
 }
 /*----------------------------------------------------------------------------*/
-std::vector<std::string> GroupManager::getGeomSurfaces(const std::vector<std::string>& vg)
+std::vector<std::string> GroupManager::getGeomSurfaces(const std::string& g, const int d)
 {
 	std::vector<std::string> result;
+    std::vector<GroupEntity*> groups = { getGroup(g, d) };
 	std::vector<Geom::Surface*> geom_entities;
-	get(vg, geom_entities);
+	get(groups, geom_entities);
 
 	for (std::vector<Geom::Surface*>::iterator iter=geom_entities.begin();
 			iter!=geom_entities.end(); ++iter)
@@ -1957,11 +1936,12 @@ std::vector<std::string> GroupManager::getGeomSurfaces(const std::vector<std::st
 	return result;
 }
 /*----------------------------------------------------------------------------*/
-std::vector<std::string> GroupManager::getGeomCurves(const std::vector<std::string>& vg)
+std::vector<std::string> GroupManager::getGeomCurves(const std::string& g, const int d)
 {
 	std::vector<std::string> result;
+    std::vector<GroupEntity*> groups = { getGroup(g, d) };
 	std::vector<Geom::Curve*> geom_entities;
-	get(vg, geom_entities);
+	get(groups, geom_entities);
 
 	for (std::vector<Geom::Curve*>::iterator iter=geom_entities.begin();
 			iter!=geom_entities.end(); ++iter)
@@ -1970,11 +1950,12 @@ std::vector<std::string> GroupManager::getGeomCurves(const std::vector<std::stri
 	return result;
 }
 /*----------------------------------------------------------------------------*/
-std::vector<std::string> GroupManager::getGeomVertices(const std::vector<std::string>& vg)
+std::vector<std::string> GroupManager::getGeomVertices(const std::string& g, const int d)
 {
 	std::vector<std::string> result;
+    std::vector<GroupEntity*> groups = { getGroup(g, d) };
 	std::vector<Geom::Vertex*> geom_entities;
-	get(vg, geom_entities);
+	get(groups, geom_entities);
 
 	for (std::vector<Geom::Vertex*>::iterator iter=geom_entities.begin();
 			iter!=geom_entities.end(); ++iter)
@@ -1983,11 +1964,12 @@ std::vector<std::string> GroupManager::getGeomVertices(const std::vector<std::st
 	return result;
 }
 /*----------------------------------------------------------------------------*/
-std::vector<std::string> GroupManager::getTopoBlocks(const std::vector<std::string>& vg)
+std::vector<std::string> GroupManager::getTopoBlocks(const std::string& g, const int d)
 {
 	std::vector<std::string> result;
+    std::vector<GroupEntity*> groups = { getGroup(g, d) };
 	std::vector<Topo::Block*> topo_entities;
-	get(vg, topo_entities);
+	get(groups, topo_entities);
 
 	for (std::vector<Topo::Block*>::iterator iter=topo_entities.begin();
 			iter!=topo_entities.end(); ++iter)
@@ -1996,11 +1978,12 @@ std::vector<std::string> GroupManager::getTopoBlocks(const std::vector<std::stri
 	return result;
 }
 /*----------------------------------------------------------------------------*/
-std::vector<std::string> GroupManager::getTopoFaces(const std::vector<std::string>& vg)
+std::vector<std::string> GroupManager::getTopoFaces(const std::string& g, const int d)
 {
 	std::vector<std::string> result;
+    std::vector<GroupEntity*> groups = { getGroup(g, d) };
 	std::vector<Topo::CoFace*> topo_entities;
-	get(vg, topo_entities);
+	get(groups, topo_entities);
 
 	for (std::vector<Topo::CoFace*>::iterator iter=topo_entities.begin();
 			iter!=topo_entities.end(); ++iter)
@@ -2009,11 +1992,12 @@ std::vector<std::string> GroupManager::getTopoFaces(const std::vector<std::strin
 	return result;
 }
 /*----------------------------------------------------------------------------*/
-std::vector<std::string> GroupManager::getTopoEdges(const std::vector<std::string>& vg)
+std::vector<std::string> GroupManager::getTopoEdges(const std::string& g, const int d)
 {
 	std::vector<std::string> result;
+    std::vector<GroupEntity*> groups = { getGroup(g, d) };
 	std::vector<Topo::CoEdge*> topo_entities;
-	get(vg, topo_entities);
+	get(groups, topo_entities);
 
 	for (std::vector<Topo::CoEdge*>::iterator iter=topo_entities.begin();
 			iter!=topo_entities.end(); ++iter)
@@ -2022,11 +2006,12 @@ std::vector<std::string> GroupManager::getTopoEdges(const std::vector<std::strin
 	return result;
 }
 /*----------------------------------------------------------------------------*/
-std::vector<std::string> GroupManager::getTopoVertices(const std::vector<std::string>& vg)
+std::vector<std::string> GroupManager::getTopoVertices(const std::string& g, const int d)
 {
 	std::vector<std::string> result;
+    std::vector<GroupEntity*> groups = { getGroup(g, d) };
 	std::vector<Topo::Vertex*> topo_entities;
-	get(vg, topo_entities);
+	get(groups, topo_entities);
 
 	for (std::vector<Topo::Vertex*>::iterator iter=topo_entities.begin();
 			iter!=topo_entities.end(); ++iter)
@@ -2035,29 +2020,29 @@ std::vector<std::string> GroupManager::getTopoVertices(const std::vector<std::st
 	return result;
 }
 /*----------------------------------------------------------------------------*/
-std::vector<std::string> GroupManager::getVisibles() const
+std::vector<GroupEntity*> GroupManager::getVisibles() const
 {
-	std::vector<std::string> visibles;
+	std::vector<GroupEntity*> visibles;
 
 	for (std::vector<Group3D*>::const_iterator iter = m_group3D.begin();
 			iter != m_group3D.end(); ++iter)
 		if ((*iter)->isVisible() && !(*iter)->isDestroyed())
-			visibles.push_back((*iter)->getName());
+			visibles.push_back((*iter));
 
 	for (std::vector<Group2D*>::const_iterator iter = m_group2D.begin();
 			iter != m_group2D.end(); ++iter)
 		if ((*iter)->isVisible() && !(*iter)->isDestroyed())
-			visibles.push_back((*iter)->getName());
+			visibles.push_back((*iter));
 
 	for (std::vector<Group1D*>::const_iterator iter = m_group1D.begin();
 			iter != m_group1D.end(); ++iter)
 		if ((*iter)->isVisible() && !(*iter)->isDestroyed())
-			visibles.push_back((*iter)->getName());
+			visibles.push_back((*iter));
 
 	for (std::vector<Group0D*>::const_iterator iter = m_group0D.begin();
 			iter != m_group0D.end(); ++iter)
 		if ((*iter)->isVisible() && !(*iter)->isDestroyed())
-			visibles.push_back((*iter)->getName());
+			visibles.push_back((*iter));
 
 	return visibles;
 }
@@ -2288,6 +2273,19 @@ void GroupManager::setLevel(std::vector<std::string>& vg, int dim, int level)
 	        throw TkUtil::Exception (TkUtil::UTF8String ("dimension non prévue pour GroupManager::getInfos", TkUtil::Charset::UTF_8));
 	    }
 
+}
+/*----------------------------------------------------------------------------*/
+GroupEntity* GroupManager::getGroup(const std::string& name, const int dim) const
+{
+    switch(dim){
+    case(3): return getGroup3D(name);
+    case(2): return getGroup2D(name);
+    case(1): return getGroup1D(name);
+    case(0): return getGroup0D(name);
+    default: {
+        throw TkUtil::Exception (TkUtil::UTF8String ("dimension non prévue pour GroupManager::getGroup", TkUtil::Charset::UTF_8));
+    }
+    }
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Group

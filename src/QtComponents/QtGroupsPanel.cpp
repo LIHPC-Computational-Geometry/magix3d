@@ -2052,7 +2052,7 @@ void QtGroupsPanel::selectGeomVolumesCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2060,12 +2060,12 @@ void QtGroupsPanel::selectGeomVolumesCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Geom::Volume*> volumes;
-	getContext ( ).getGroupManager ( ).get(groupsNames, volumes);
+	getContext ( ).getGroupManager ( ).get(groups, volumes);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), volumes.begin(), volumes.end());
@@ -2084,7 +2084,7 @@ void QtGroupsPanel::selectGeomSurfacesCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2092,12 +2092,12 @@ void QtGroupsPanel::selectGeomSurfacesCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Geom::Surface*> ge;
-	getContext ( ).getGroupManager ( ).get(groupsNames, ge);
+	getContext ( ).getGroupManager ( ).get(groups, ge);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), ge.begin(), ge.end());
@@ -2116,7 +2116,7 @@ void QtGroupsPanel::selectGeomCurvesCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2124,12 +2124,12 @@ void QtGroupsPanel::selectGeomCurvesCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Geom::Curve*> ge;
-	getContext ( ).getGroupManager ( ).get(groupsNames, ge);
+	getContext ( ).getGroupManager ( ).get(groups, ge);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), ge.begin(), ge.end());
@@ -2148,7 +2148,7 @@ void QtGroupsPanel::selectGeomVerticesCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2156,12 +2156,12 @@ void QtGroupsPanel::selectGeomVerticesCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Geom::Vertex*> ge;
-	getContext ( ).getGroupManager ( ).get(groupsNames, ge);
+	getContext ( ).getGroupManager ( ).get(groups, ge);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), ge.begin(), ge.end());
@@ -2180,7 +2180,7 @@ void QtGroupsPanel::selectTopoBlocksCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2188,12 +2188,12 @@ void QtGroupsPanel::selectTopoBlocksCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Topo::Block*> te;
-	getContext ( ).getGroupManager ( ).get(groupsNames, te);
+	getContext ( ).getGroupManager ( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
@@ -2212,7 +2212,7 @@ void QtGroupsPanel::selectTopoCoFacesCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2220,12 +2220,12 @@ void QtGroupsPanel::selectTopoCoFacesCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Topo::CoFace*> te;
-	getContext ( ).getGroupManager ( ).get(groupsNames, te);
+	getContext ( ).getGroupManager ( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
@@ -2244,7 +2244,7 @@ void QtGroupsPanel::selectTopoCoEdgesCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2252,12 +2252,12 @@ void QtGroupsPanel::selectTopoCoEdgesCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Topo::CoEdge*> te;
-	getContext ( ).getGroupManager ( ).get(groupsNames, te);
+	getContext ( ).getGroupManager ( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
@@ -2276,7 +2276,7 @@ void QtGroupsPanel::selectTopoVerticesCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2284,12 +2284,12 @@ void QtGroupsPanel::selectTopoVerticesCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Topo::Vertex*> te;
-	getContext ( ).getGroupManager ( ).get(groupsNames, te);
+	getContext ( ).getGroupManager ( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
@@ -2308,7 +2308,7 @@ void QtGroupsPanel::selectMeshVolumesCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2316,12 +2316,12 @@ void QtGroupsPanel::selectMeshVolumesCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Mesh::Volume*> te;
-	getContext ( ).getGroupManager ( ).get(groupsNames, te);
+	getContext ( ).getGroupManager ( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
@@ -2340,7 +2340,7 @@ void QtGroupsPanel::selectMeshSurfacesCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2348,12 +2348,12 @@ void QtGroupsPanel::selectMeshSurfacesCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Mesh::Surface*> te;
-	getContext ( ).getGroupManager ( ).get(groupsNames, te);
+	getContext ( ).getGroupManager ( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
@@ -2372,7 +2372,7 @@ void QtGroupsPanel::selectMeshLinesCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2380,12 +2380,12 @@ void QtGroupsPanel::selectMeshLinesCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Mesh::Line*> te;
-	getContext ( ).getGroupManager ( ).get(groupsNames, te);
+	getContext ( ).getGroupManager ( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
@@ -2404,7 +2404,7 @@ void QtGroupsPanel::selectMeshCloudsCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>		groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2412,12 +2412,12 @@ void QtGroupsPanel::selectMeshCloudsCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Mesh::Cloud*> te;
-	getContext ( ).getGroupManager ( ).get(groupsNames, te);
+	getContext ( ).getGroupManager ( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
@@ -2436,7 +2436,7 @@ void QtGroupsPanel::unselectGeomVolumesCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2444,12 +2444,12 @@ void QtGroupsPanel::unselectGeomVolumesCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Geom::Volume*> volumes;
-	getContext ( ).getGroupManager ( ).get(groupsNames, volumes);
+	getContext ( ).getGroupManager ( ).get(groups, volumes);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), volumes.begin(), volumes.end());
@@ -2468,7 +2468,7 @@ void QtGroupsPanel::unselectGeomSurfacesCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2476,12 +2476,12 @@ void QtGroupsPanel::unselectGeomSurfacesCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Geom::Surface*> ge;
-	getContext ( ).getGroupManager ( ).get(groupsNames, ge);
+	getContext ( ).getGroupManager ( ).get(groups, ge);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), ge.begin(), ge.end());
@@ -2500,7 +2500,7 @@ void QtGroupsPanel::unselectGeomCurvesCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2508,12 +2508,12 @@ void QtGroupsPanel::unselectGeomCurvesCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Geom::Curve*> ge;
-	getContext ( ).getGroupManager ( ).get(groupsNames, ge);
+	getContext ( ).getGroupManager ( ).get(groups, ge);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), ge.begin(), ge.end());
@@ -2532,7 +2532,7 @@ void QtGroupsPanel::unselectGeomVerticesCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2540,12 +2540,12 @@ void QtGroupsPanel::unselectGeomVerticesCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Geom::Vertex*> ge;
-	getContext ( ).getGroupManager ( ).get(groupsNames, ge);
+	getContext ( ).getGroupManager ( ).get(groups, ge);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), ge.begin(), ge.end());
@@ -2564,7 +2564,7 @@ void QtGroupsPanel::unselectTopoBlocksCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2572,12 +2572,12 @@ void QtGroupsPanel::unselectTopoBlocksCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Topo::Block*> te;
-	getContext ( ).getGroupManager ( ).get(groupsNames, te);
+	getContext ( ).getGroupManager ( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
@@ -2596,7 +2596,7 @@ void QtGroupsPanel::unselectTopoCoFacesCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2604,12 +2604,12 @@ void QtGroupsPanel::unselectTopoCoFacesCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Topo::CoFace*> te;
-	getContext ( ).getGroupManager ( ).get(groupsNames, te);
+	getContext ( ).getGroupManager ( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
@@ -2628,7 +2628,7 @@ void QtGroupsPanel::unselectTopoCoEdgesCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2636,12 +2636,12 @@ void QtGroupsPanel::unselectTopoCoEdgesCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Topo::CoEdge*> te;
-	getContext ( ).getGroupManager ( ).get(groupsNames, te);
+	getContext ( ).getGroupManager ( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
@@ -2660,7 +2660,7 @@ void QtGroupsPanel::unselectTopoVerticesCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2668,12 +2668,12 @@ void QtGroupsPanel::unselectTopoVerticesCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Topo::Vertex*> te;
-	getContext ( ).getGroupManager ( ).get(groupsNames, te);
+	getContext ( ).getGroupManager ( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
@@ -2692,7 +2692,7 @@ void QtGroupsPanel::unselectMeshVolumesCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2700,12 +2700,12 @@ void QtGroupsPanel::unselectMeshVolumesCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Mesh::Volume*> te;
-	getContext ( ).getGroupManager ( ).get(groupsNames, te);
+	getContext ( ).getGroupManager ( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
@@ -2724,7 +2724,7 @@ void QtGroupsPanel::unselectMeshSurfacesCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2732,12 +2732,12 @@ void QtGroupsPanel::unselectMeshSurfacesCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Mesh::Surface*> te;
-	getContext ( ).getGroupManager ( ).get(groupsNames, te);
+	getContext ( ).getGroupManager ( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
@@ -2756,7 +2756,7 @@ void QtGroupsPanel::unselectMeshLinesCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2764,12 +2764,12 @@ void QtGroupsPanel::unselectMeshLinesCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Mesh::Line*> te;
-	getContext ( ).getGroupManager ( ).get(groupsNames, te);
+	getContext ( ).getGroupManager ( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
@@ -2788,7 +2788,7 @@ void QtGroupsPanel::unselectMeshCloudsCallback ( )
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
 	// On s'intéresse aux groupes sélectionnés :
-	vector<string>			groupsNames;
+	vector<GroupEntity*>			groups;
 
 	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
 	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
@@ -2796,12 +2796,12 @@ void QtGroupsPanel::unselectMeshCloudsCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			CHECK_NULL_PTR_ERROR ((*it)->getGroup ( ))
-		    groupsNames.push_back((*it)->getGroup ( )->getName());
+		    groups.push_back((*it)->getGroup ( ));
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Mesh::Cloud*> te;
-	getContext ( ).getGroupManager ( ).get(groupsNames, te);
+	getContext ( ).getGroupManager ( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
