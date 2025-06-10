@@ -63,6 +63,7 @@
 #include "Topo/CommandFuse2Faces.h"
 #include "Topo/CommandFuse2FaceList.h"
 #include "Topo/CommandExportBlocks.h"
+#include "Topo/CommandImportBlocks.h"
 #include "Topo/Block.h"
 #include "Topo/CoFace.h"
 #include "Topo/Face.h"
@@ -90,6 +91,7 @@
 #include "Mesh/CommandAddRemoveGroupName.h"
 #ifdef USE_MDLPARSER
 #include "Internal/CommandChangeLengthUnit.h"
+#include "Topo/CommandImportBlocks.h"
 #include "Topo/CommandImportTopoMDL.h"
 #endif
 /*----------------------------------------------------------------------------*/
@@ -5537,7 +5539,7 @@ Internal::M3DCommandResult* TopoManager::exportBlocks(const std::string& n)
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().exportVTK(";
+    cmd << getContextAlias() << "." << "getTopoManager().exportBlocks(";
     cmd <<"\""<<n<<"\")";
     command->setScriptCommand(cmd);
 
@@ -5549,6 +5551,26 @@ Internal::M3DCommandResult* TopoManager::exportBlocks(const std::string& n)
             new Internal::M3DCommandResult (*command);
     return cmdResult;
 }
+/*----------------------------------------------------------------------------*/
+    Internal::M3DCommandResult* TopoManager::importBlocks(const std::string& n)
+    {
+        //creation de la commande d'exportation
+        CommandImportBlocks *command = new CommandImportBlocks(getContext(), n);
+
+        // trace dans le script
+        TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
+        cmd << getContextAlias() << "." << "getTopoManager().importBlocks(";
+        cmd <<"\""<<n<<"\")";
+        command->setScriptCommand(cmd);
+
+        // on passe au gestionnaire de commandes qui exécute la commande en // ou non
+        // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
+        getCommandManager().addCommand(command, Utils::Command::DO);
+
+        Internal::M3DCommandResult*  cmdResult   =
+                new Internal::M3DCommandResult (*command);
+        return cmdResult;
+    }
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo
 /*----------------------------------------------------------------------------*/
