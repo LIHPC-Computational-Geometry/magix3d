@@ -5515,6 +5515,7 @@ cout << __FILE__ << ' ' << __LINE__ << " QtMgx3DMainWindow::exitCallback" << end
 			filters << "BREP (*.brep)";
 			filters << "STEP (*.stp *.step)";
 			filters << "IGES (*.igs *.iges)";
+            filters << "BLOCKS (*.blk)";
 			UTF8String limaFilter(Charset::UTF_8);
 			limaFilter << "Lima++ (";
 			const char **limaExt = Lima::liste_format_lecture();
@@ -5656,6 +5657,12 @@ cout << __FILE__ << ' ' << __LINE__ << " QtMgx3DMainWindow::exitCallback" << end
 										log(InformationLog(msg));
 										getContext().getMeshManager().readMli(fileName, pre);
 									}    // Lima
+                                    else
+                                    if (true == compareExtensions(file.getExtension(), "blk"))
+                                    {
+                                        QtAutoWaitingCursor cursor(true);
+                                        getContext().getTopoManager().importBlocks(fileName);
+                                    }    // BREP
 									else
 									{
 										UTF8String error(Charset::UTF_8);
@@ -5737,6 +5744,7 @@ void QtMgx3DMainWindow::exportAllCallback ( )
 	filters << "STEP (*.stp *.step)";
 	filters << "IGES (*.igs *.iges)";
 	filters << "CGNS (*.cgns)";
+    filters << "BLOCKS (*.blk)";
 	dialog.setNameFilters (filters);
 
 	while (0 == fileName.length ( ))
@@ -5857,6 +5865,13 @@ void QtMgx3DMainWindow::exportAllCallback ( )
 		log (InformationLog (msg));
 		getContext ( ).getMeshManager ( ).writeCGNS (fileName);
 	}	// cgns
+    else if (true == compareExtensions (file.getExtension ( ), "blk"))
+    {
+        SelectionManager&	selectionManager	=
+                getContext ( ).getSelectionManager ( );
+        log (InformationLog (msg));
+        getContext ( ).getTopoManager ( ).exportBlocks(fileName);
+    }	// blk
 	else
 	{
 		UTF8String	error (Charset::UTF_8);
