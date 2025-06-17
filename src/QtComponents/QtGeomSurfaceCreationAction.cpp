@@ -289,8 +289,8 @@ void QtGeomSurfaceCreationPanel::operationCompleted ( )
 
 	// Actualisation des groupes : certains peuvent être créés, d'autres
 	// détruits (ex : "Hors Groupes 3D" :
-	if (0 != _namePanel)
-		_namePanel->autoUpdate ( );
+	// if (0 != _namePanel)
+	//	_namePanel->autoUpdate ( );
 }	// QtGeomSurfaceCreationPanel::operationCompleted
 
 
