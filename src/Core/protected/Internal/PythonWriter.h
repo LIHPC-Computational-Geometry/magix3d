@@ -113,11 +113,11 @@ template <class Scriptable> std::string scriptablesToPythonList (const std::vect
 	typename std::vector<Scriptable>::const_iterator it = objects.begin ( );
 	if (objects.end ( ) != it)
 	{
-		list << "\"" << (*it).getScriptCommand ( ) << "\"";
+		list << (*it).getScriptCommand ( );
 		it++;
 	}
 	for ( ; objects.end ( ) != it; it++)
-		list << ",\"" << (*it).getScriptCommand ( ) << "\"";
+		list << "," << (*it).getScriptCommand ( );
 	list << ']';
 
 	return list.utf8 ( );
