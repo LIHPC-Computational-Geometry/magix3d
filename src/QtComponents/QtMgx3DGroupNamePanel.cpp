@@ -229,7 +229,7 @@ void QtMgx3DGroupNamePanel::getGroupNames (vector< string >& names)
 		case 0	:
 		{
 			vector<Group0D*>	groups;
-			groupManager.getGroup0D (groups, true);
+			groupManager.getGroups<Group0D> (groups, true);
 			for (vector<Group0D*>::const_iterator it = groups.begin ( ); groups.end ( ) != it; it++)
 				names.push_back ((*it)->getName ( ));
 		}
@@ -237,7 +237,7 @@ void QtMgx3DGroupNamePanel::getGroupNames (vector< string >& names)
 		case 1	:
 		{
 			vector<Group1D*>	groups;
-			groupManager.getGroup1D (groups, true);
+			groupManager.getGroups<Group1D> (groups, true);
 			for (vector<Group1D*>::const_iterator it = groups.begin ( ); groups.end ( ) != it; it++)
 				names.push_back ((*it)->getName ( ));
 		}
@@ -245,7 +245,7 @@ void QtMgx3DGroupNamePanel::getGroupNames (vector< string >& names)
 		case 2	:
 		{
 			vector<Group2D*>	groups;
-			groupManager.getGroup2D (groups, true);
+			groupManager.getGroups<Group2D> (groups, true);
 			for (vector<Group2D*>::const_iterator it = groups.begin ( ); groups.end ( ) != it; it++)
 				names.push_back ((*it)->getName ( ));
 		}
@@ -253,7 +253,7 @@ void QtMgx3DGroupNamePanel::getGroupNames (vector< string >& names)
 		case 3	:
 		{
 			vector<Group3D*>	groups;
-			groupManager.getGroup3D (groups, true);
+			groupManager.getGroups<Group3D> (groups, true);
 			for (vector<Group3D*>::const_iterator it = groups.begin ( ); groups.end ( ) != it; it++)
 				names.push_back ((*it)->getName ( ));
 		}

@@ -194,6 +194,7 @@ internalExecute()
 
 
 	// cas d'un bloc ou d'une face simple
+	auto& gm = getContext().getGroupManager();
 	if (m_freeTopo){
 
 		// création d'une CoFace dans le cas d'une surface
@@ -202,7 +203,7 @@ internalExecute()
 			CoFace* cf = new CoFace(getContext());
 			addCreatedCoFace(cf);
 			if (!m_groupName.empty()){
-		    	Group::Group2D* grp = getContext().getGroupManager().getNewGroup2D(m_groupName, &getInfoCommand());
+		    	Group::Group2D* grp = gm.getNewGroup<Group::Group2D>(m_groupName, &getInfoCommand());
 				grp->add(cf);
 				cf->getGroupsContainer().add(grp);
 			}
@@ -248,7 +249,7 @@ internalExecute()
 			Block* bl = new Block(getContext(), 0,0,0);
 			addCreatedBlock(bl);
 			if (!m_groupName.empty()){
-		    	Group::Group3D* grp = getContext().getGroupManager().getNewGroup3D(m_groupName, &getInfoCommand());
+		    	Group::Group3D* grp = gm.getNewGroup<Group::Group3D>(m_groupName, &getInfoCommand());
 				grp->add(bl);
 				bl->getGroupsContainer().add(grp);
 			}

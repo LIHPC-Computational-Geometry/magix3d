@@ -37,6 +37,8 @@ class Group0D : public GroupEntity{
     static const char* typeNameGroup0D;
 
 public:
+    static constexpr int Dim = 0;
+
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur.
      */
@@ -51,7 +53,7 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  retourne la dimension du groupe
      */
-    int getDim() const {return 0;}
+    int getDim() const {return Dim;}
 
     /*------------------------------------------------------------------------*/
     /** \brief Donne le nom du type d'objet (un nom distinct par type d'objet)

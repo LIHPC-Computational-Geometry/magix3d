@@ -96,7 +96,8 @@ void CommandExtrudeRevolution::
 addGroupOnAxis()
 {
     // le groupe pour les courbes sur l'axe
-    Group::Group1D* grp = getContext().getGroupManager().getNewGroup1D("AXE", &getInfoCommand());
+    auto& gm = getContext().getGroupManager();
+    Group::Group1D* grp = gm.getNewGroup<Group::Group1D>("AXE", &getInfoCommand());
 
     // on commence par identifier les sommets sur l'axe, on les marque à 2, sinon 1
     std::map<Geom::Vertex* ,uint> filtre_vertices;

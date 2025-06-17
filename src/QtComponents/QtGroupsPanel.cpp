@@ -724,20 +724,21 @@ void QtGroupsPanel::displaySelectedGroupsNames (bool display)
 //			}
 
 			std::string nom = (*it)->getGroup ( )->getName();
+			auto& gm = getStdContext()->getGroupManager();
 
-			GroupEntity* gr0 = getStdContext()->getGroupManager().getGroup0D(nom, false);
+			GroupEntity* gr0 = gm.getGroup<Group0D>(nom, false);
 			if (gr0)
 				groups.push_back (gr0);
 
-			GroupEntity* gr1 = getStdContext()->getGroupManager().getGroup1D(nom, false);
+			GroupEntity* gr1 = gm.getGroup<Group1D>(nom, false);
 			if (gr1)
 				groups.push_back (gr1);
 
-			GroupEntity* gr2 = getStdContext()->getGroupManager().getGroup2D(nom, false);
+			GroupEntity* gr2 = gm.getGroup<Group2D>(nom, false);
 			if (gr2)
 				groups.push_back (gr2);
 
-			GroupEntity* gr3 = getStdContext()->getGroupManager().getGroup3D(nom, false);
+			GroupEntity* gr3 = gm.getGroup<Group3D>(nom, false);
 			if (gr3)
 				groups.push_back (gr3);
 

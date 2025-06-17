@@ -19,6 +19,7 @@
 /*----------------------------------------------------------------------------*/
 #include <vector>
 #include <map>
+#include <tuple>
 /*----------------------------------------------------------------------------*/
 #include <Python.h>
 #include <sys/types.h>           // uint sur Bull
@@ -104,7 +105,7 @@ public:
 
     /*------------------------------------------------------------------------*/
     /** Retourne une string avec les informations relatives à l'entité */
-    std::string getInfos(const std::string& name, int dim) const;
+    std::string getInfos(const std::string& name, const int dim) const;
 
     /*------------------------------------------------------------------------*/
     /// retourne un nom par défaut pour les entités qui n'en aurait pas
@@ -113,47 +114,19 @@ public:
 #ifndef SWIG
     /*------------------------------------------------------------------------*/
     /// retourne l'entité à partir du nom, une exception si elle n'existe pas
-    Group3D* getGroup3D(const std::string& name, const bool exceptionIfNotFound=true) const;
+    template <typename T> T*
+    getGroup(const std::string& gr_name, const bool exceptionIfNotFound=true) const;
 
     /// retourne l'entité à partir du nom, et la créé si elle n'existe pas
-    Group3D* getNewGroup3D(const std::string& name, Internal::InfoCommand* icmd);
+    template <typename T> T*
+    getNewGroup(const std::string& name, Internal::InfoCommand* icmd);
 
     /*------------------------------------------------------------------------*/
-    /// retourne l'entité à partir du nom, une exception si elle n'existe pas
-    Group2D* getGroup2D(const std::string& name, const bool exceptionIfNotFound=true) const;
-
-    /// retourne l'entité à partir du nom, et la créé si elle n'existe pas
-    Group2D* getNewGroup2D(const std::string& name, Internal::InfoCommand* icmd);
-
-     /*------------------------------------------------------------------------*/
-    /// retourne l'entité à partir du nom, une exception si elle n'existe pas
-    Group1D* getGroup1D(const std::string& name, const bool exceptionIfNotFound=true) const;
-
-    /// retourne l'entité à partir du nom, et la créé si elle n'existe pas
-    Group1D* getNewGroup1D(const std::string& name, Internal::InfoCommand* icmd);
-
-    /*------------------------------------------------------------------------*/
-    /// retourne l'entité à partir du nom, une exception si elle n'existe pas
-    Group0D* getGroup0D(const std::string& name, const bool exceptionIfNotFound=true) const;
-
-    /// retourne l'entité à partir du nom, et la créé si elle n'existe pas
-    Group0D* getNewGroup0D(const std::string& name, Internal::InfoCommand* icmd);
-
-    /*------------------------------------------------------------------------*/
-    /// retourne la liste des groupes 3D, sans ou avec ceux détruits
-    void getGroup3D(std::vector<Group3D*>& grp, const bool onlyLive=true) const;
-
-    /// retourne la liste des groupes 2D, sans ou avec ceux détruits
-    void getGroup2D(std::vector<Group2D*>& grp, const bool onlyLive=true) const;
-
-    /// retourne la liste des groupes 1D, sans ou avec ceux détruits
-    void getGroup1D(std::vector<Group1D*>& grp, const bool onlyLive=true) const;
-
-    /// retourne la liste des groupes 0D, sans ou avec ceux détruits
-    void getGroup0D(std::vector<Group0D*>& grp, const bool onlyLive=true) const;
-
-    /// retourne la liste des groupes de dimensions dims, sans ou avec ceux détruits
-    void getGroups (std::vector<GroupEntity*>& grp, Mgx3D::Utils::SelectionManager::DIM dims, const bool onlyLive=true) const;
+    /// retourne la liste des groupes, sans ou avec ceux détruits
+    template <typename T> void
+    getGroups(std::vector<T*>& grps, const bool onlyLive=true) const;
+    template <size_t dim> void
+    getGroups(std::vector<GroupEntity*>& grps, const bool onlyLive=true) const;
 
     /*------------------------------------------------------------------------*/
     /** Fonction qui à partir d'un filtre (stocké) et des ensembles des groupes qui
@@ -260,7 +233,7 @@ public:
             std::map<Utils::Entity*, bool>& filtre_vu,
             std::map<Geom::GeomEntity*, uint>& filtre_geom,
             std::map<Topo::TopoEntity*, uint>& filtre_topo,
-			std::map<CoordinateSystem::SysCoord*, uint>& filtre_rep,
+	    std::map<CoordinateSystem::SysCoord*, uint>& filtre_rep,
             uint mark);
 
     /** Fonction qui à partir d'un Group2D, parcours les entités non vues
@@ -518,31 +491,22 @@ public:
 
      /** affecte un niveau pour classer les groupes
       *  \param vg la liste des noms de groupes
-      *  \param dim la dimension des groupes
       *  \param level le niveau que l'on affecte aux groupes
       */
-     void setLevel(std::vector<std::string>& vg, int dim, int level);
+     template <size_t dim>
+     void setLevel(std::vector<std::string>& vg, int level);
 
      /*------------------------------------------------------------------------*/
      /** Vide un groupe suivant son nom et une dimension */
      Internal::M3DCommandResult* clearGroup(int dim, const std::string& groupName);
 
+    /// méthodes pour "détemplater" les dimensions pour SWIG et l'IHM
+    GroupEntity* getGroup(const std::string& gr_name, const int dim) const;
+    void getGroups(std::vector<GroupEntity*>& grps, const int dim, const bool onlyLive=true) const;
 
 private:
-    /// Retourne le groupe correspondant à la dimension
-    GroupEntity* getGroup(const std::string& name, const int dim) const;
-
-    /// Conteneur pour les groupes 3D
-    std::vector<Group3D*> m_group3D;
-
-    /// Conteneur pour les groupes 2D
-    std::vector<Group2D*> m_group2D;
-
-    /// Conteneur pour les groupes 1D
-    std::vector<Group1D*> m_group1D;
-
-    /// Conteneur pour les groupes 0D
-    std::vector<Group0D*> m_group0D;
+    /// Conteneur pour les groupes
+    std::tuple<std::vector<Group0D*>, std::vector<Group1D*>, std::vector<Group2D*>, std::vector<Group3D*>> m_groups;
 
     /// ancien masque
     Utils::FilterEntity::objectType m_visibilityMask;

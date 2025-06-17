@@ -170,6 +170,7 @@ void CommandSectionByPlane::internalSpecificExecute()
     //on place dans le groupe les entites intersectees
     GeomSectionByPlaneImplementation* impl = dynamic_cast<GeomSectionByPlaneImplementation*>(m_impl);
     CHECK_NULL_PTR_ERROR(impl);
+    auto& gm = getContext().getGroupManager();
     std::vector<GeomEntity*> planeEntities = impl->getEntitiesOnPlane();
     if (!m_planeName.empty())
     	for(unsigned int i=0;i<planeEntities.size();i++) {
@@ -177,7 +178,7 @@ void CommandSectionByPlane::internalSpecificExecute()
     		if(e->getDim()==0){
     			Vertex *v = dynamic_cast<Vertex*>(e);
     			CHECK_NULL_PTR_ERROR(v);
-    			Group::Group0D* group = getContext().getGroupManager().getNewGroup0D(m_planeName, &getInfoCommand());
+    			Group::Group0D* group = gm.getNewGroup<Group::Group0D>(m_planeName, &getInfoCommand());
     			v->add(group);
     			group->add(v);
     			getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
@@ -185,7 +186,7 @@ void CommandSectionByPlane::internalSpecificExecute()
     		else if(e->getDim()==1){
     			Curve *c = dynamic_cast<Curve*>(e);
     			CHECK_NULL_PTR_ERROR(c);
-    			Group::Group1D* group = getContext().getGroupManager().getNewGroup1D(m_planeName, &getInfoCommand());
+    			Group::Group1D* group = gm.getNewGroup<Group::Group1D>(m_planeName, &getInfoCommand());
     			c->add(group);
     			group->add(c);
     			getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
@@ -193,7 +194,7 @@ void CommandSectionByPlane::internalSpecificExecute()
     		if(e->getDim()==2){
     			Surface *s = dynamic_cast<Surface*>(e);
     			CHECK_NULL_PTR_ERROR(s);
-    			Group::Group2D* group = getContext().getGroupManager().getNewGroup2D(m_planeName, &getInfoCommand());
+    			Group::Group2D* group = gm.getNewGroup<Group::Group2D>(m_planeName, &getInfoCommand());
     			s->add(group);
     			group->add(s);
     			getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);

@@ -78,8 +78,10 @@ public:
      /// accès au niveau d'un groupe
      uint getLevel () const {return m_level;}
 
-     /*------------------------------------------------------------------------*/
+    virtual bool empty() const = 0;
+
 #ifndef SWIG
+    /*------------------------------------------------------------------------*/
     /** \brief  Fournit une représentation textuelle de l'entité.
 	 * \param	true si l'entité fourni la totalité de sa description, false si
 	 * 			elle ne fournit que les informations non calculées (objectif :

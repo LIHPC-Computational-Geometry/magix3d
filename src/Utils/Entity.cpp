@@ -485,7 +485,7 @@ void Entity::setDestroyed(bool b)
     m_destroyed = b;
     // En cas de redo ...
     // [EB] seulement pour b==false pour éviter updateRepresentation sur une entité marquée comme détruite
-	if (0 != getDisplayProperties ( ).getGraphicalRepresentation ( ) && !b)
+	if (0 != getDisplayProperties ( ).getGraphicalRepresentation ( ) && b)
 	{
 		getDisplayProperties ( ).getGraphicalRepresentation ( )->setHighlighted (false);
 		getDisplayProperties ( ).getGraphicalRepresentation ( )->setSelected (false);

@@ -148,8 +148,9 @@ internalSpecificExecute()
 	std::vector<Group::GroupEntity*> grp;
 	m_entities[0]->getGroups(grp);
 	newCurve->setGroups(grp);
+	auto& gm = getContext().getGroupManager();
 	for (uint i=0; i<grp.size(); i++){
-		Group::Group1D* group = getContext().getGroupManager().getNewGroup1D(grp[i]->getName(), &getInfoCommand());
+		Group::Group1D* group = gm.getNewGroup<Group::Group1D>(grp[i]->getName(), &getInfoCommand());
 		group->add(newCurve);
 	}
 

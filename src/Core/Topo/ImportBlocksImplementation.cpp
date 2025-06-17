@@ -44,10 +44,11 @@ void ImportBlocksImplementation::internalExecute() {
         throw TkUtil::Exception(mess);
     }
 
-        Group::Group0D* group0 = getStdContext()->getGroupManager().getNewGroup0D("Hors_Groupe_0D", m_icmd);
-        Group::Group1D* group1 = getStdContext()->getGroupManager().getNewGroup1D("Hors_Groupe_1D", m_icmd);
-        Group::Group2D* group2 = getStdContext()->getGroupManager().getNewGroup2D("Hors_Groupe_2D", m_icmd);
-        Group::Group3D* group3 = getStdContext()->getGroupManager().getNewGroup3D("Hors_Groupe_3D", m_icmd);
+    auto& gm = getStdContext()->getGroupManager();
+    Group::Group0D* group0 = gm.getNewGroup<Group::Group0D>("Hors_Groupe_0D", m_icmd);
+    Group::Group1D* group1 = gm.getNewGroup<Group::Group1D>("Hors_Groupe_1D", m_icmd);
+    Group::Group2D* group2 = gm.getNewGroup<Group::Group2D>("Hors_Groupe_2D", m_icmd);
+    Group::Group3D* group3 = gm.getNewGroup<Group::Group3D>("Hors_Groupe_3D", m_icmd);
 
     /*----------------------------------------------------------------------------*/
     if (!moveStreamOntoFirst(s, "POINTS")) {

@@ -40,6 +40,8 @@ class Group2D : public GroupEntity{
     static const char* typeNameGroup2D;
 
 public:
+    static constexpr int Dim = 2;
+
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur.
      */
@@ -54,7 +56,7 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  retourne la dimension du groupe
      */
-    int getDim() const {return 2;}
+    int getDim() const {return Dim;}
 
     /*------------------------------------------------------------------------*/
     /** \brief Donne le nom du type d'objet (un nom distinct par type d'objet)

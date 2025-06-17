@@ -321,7 +321,8 @@ void GeomImport::add(TopoDS_Shape& AShape, const std::string& AName)
 void GeomImport::
 addToGroup(Volume* v, const std::string& AName)
 {
-    Group::Group3D* group = getContext().getGroupManager().getNewGroup3D(AName, m_icmd);
+    auto& gm = getContext().getGroupManager();
+    Group::Group3D* group = gm.getNewGroup<Group::Group3D>(AName, m_icmd);
     v->add(group);
     group->add(v);
     m_icmd->addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
@@ -330,7 +331,8 @@ addToGroup(Volume* v, const std::string& AName)
 void GeomImport::
 addToGroup(Surface* s, const std::string& AName)
 {
-    Group::Group2D* group = getContext().getGroupManager().getNewGroup2D(AName, m_icmd);
+    auto& gm = getContext().getGroupManager();
+    Group::Group2D* group = gm.getNewGroup<Group::Group2D>(AName, m_icmd);
     s->add(group);
     group->add(s);
     m_icmd->addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
@@ -339,7 +341,8 @@ addToGroup(Surface* s, const std::string& AName)
 void GeomImport::
 addToGroup(Curve* c, const std::string& AName)
 {
-    Group::Group1D* group = getContext().getGroupManager().getNewGroup1D(AName, m_icmd);
+    auto& gm = getContext().getGroupManager();
+    Group::Group1D* group = gm.getNewGroup<Group::Group1D>(AName, m_icmd);
     c->add(group);
     group->add(c);
     m_icmd->addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
@@ -348,7 +351,8 @@ addToGroup(Curve* c, const std::string& AName)
 void GeomImport::
 addToGroup(Vertex* v, const std::string& AName)
 {
-    Group::Group0D* group = getContext().getGroupManager().getNewGroup0D(AName, m_icmd);
+    auto& gm = getContext().getGroupManager();
+    Group::Group0D* group = gm.getNewGroup<Group::Group0D>(AName, m_icmd);
     v->add(group);
     group->add(v);
     m_icmd->addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);

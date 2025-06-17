@@ -43,6 +43,8 @@ class Group3D : public GroupEntity{
     static const char* typeNameGroup3D;
 
 public:
+    static constexpr int Dim = 3;
+
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur.
      */
@@ -57,7 +59,7 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  retourne la dimension du groupe
      */
-    int getDim() const {return 3;}
+    int getDim() const {return Dim;}
 
     /*------------------------------------------------------------------------*/
     /** \brief Donne le nom du type d'objet (un nom distinct par type d'objet)

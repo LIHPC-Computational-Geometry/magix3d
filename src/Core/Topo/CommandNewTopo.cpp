@@ -168,8 +168,8 @@ CommandNewTopo::
         {
             Vertex* vtx = new Vertex(getContext(), m_point);
 
-            Group::Group0D *group = getContext().getGroupManager().getNewGroup0D(m_groupName,
-                                                                                      &getInfoCommand());
+            auto& gm = getContext().getGroupManager();
+            Group::Group0D *group = gm.getNewGroup<Group::Group0D>(m_groupName, &getInfoCommand());
             group->add(vtx);
             vtx->getGroupsContainer().add(group);
             getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
@@ -183,9 +183,8 @@ CommandNewTopo::
             EdgeMeshingPropertyUniform emp(getContext().getTopoManager().getDefaultNbMeshingEdges());
             CoEdge* coedge = new CoEdge(getContext(), &emp, v0, v1);
 
-
-            Group::Group1D *group = getContext().getGroupManager().getNewGroup1D(groupName,
-                                                                                      &getInfoCommand());
+            auto& gm = getContext().getGroupManager();
+            Group::Group1D *group = gm.getNewGroup<Group::Group1D>(groupName, &getInfoCommand());
             group->add(coedge);
             coedge->getGroupsContainer().add(group);
             getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
@@ -345,8 +344,8 @@ CommandNewTopo::
 
             Topo::CoFace* face = new CoFace(getContext(), edges, true);
 
-            Group::Group2D *group = getContext().getGroupManager().getNewGroup2D(groupName,
-                                                                                      &getInfoCommand());
+            auto& gm = getContext().getGroupManager();
+            Group::Group2D *group = gm.getNewGroup<Group::Group2D>(groupName, &getInfoCommand());
             group->add(face);
             face->getGroupsContainer().add(group);
             getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
