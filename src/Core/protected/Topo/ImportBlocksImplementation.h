@@ -34,6 +34,10 @@ public:
 private:
     bool moveStreamOntoFirst(std::ifstream& s,const std::string &AString);
 
+    void readAssociation(std::ifstream &str);
+
+    std::string findGeom(int dim, int id);
+
 private:
     /// helper pour la gestion des groupes dans les commandes
     Group::GroupHelperForCommand m_group_helper;
@@ -45,6 +49,20 @@ private:
 
     /// le nom du fichier en entier
     std::string m_filename;
+
+
+    std::vector<Vertex*> m_vertices;
+    std::vector<std::string> m_vnames;
+
+    std::vector<CoEdge*> m_coedges;
+    std::vector<std::string> m_enames;
+
+    std::vector<CoFace*> m_cofaces;
+    std::vector<std::string > m_fnames;
+
+    std::vector<std::string > m_bnames;
+    std::vector<Block*> m_blocks;
+
 };
 }
 }

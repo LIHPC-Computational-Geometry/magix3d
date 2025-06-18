@@ -254,8 +254,11 @@ void ExportBlocksImplementation::writeBlocks(std::ofstream &str, std::vector<Top
         str  << "\n";
 }
 /*----------------------------------------------------------------------------*/
-void ExportBlocksImplementation::writeAssociationNodes(std::ofstream &str,std::vector<Topo::Vertex*> vs){
-    str  << "GEOM Nodes \n";
+void ExportBlocksImplementation::writeAssociationNodes(std::ofstream &str,const std::vector<Topo::Vertex*>& vs){
+
+    int nb_infos = 0;
+    std::vector<std::string> infos;
+
     for (auto te : vs) {
         Geom::GeomEntity* ge = te->getGeomAssociation();
         if(ge != nullptr){
@@ -267,10 +270,7 @@ void ExportBlocksImplementation::writeAssociationNodes(std::ofstream &str,std::v
                 id.erase(0, 2);
             }else{
                 id.erase(0, 3);
-
             }
-
-
 
             while(id[0] == '0')
                 id.erase(0,1);
@@ -279,14 +279,22 @@ void ExportBlocksImplementation::writeAssociationNodes(std::ofstream &str,std::v
                 id = "0";
             }
 
-            str << m_node_ids_mapping[te->getName()] <<" "<<dim<<" "<<id <<"\n";
+            nb_infos++;
+            infos.push_back(std::to_string(m_node_ids_mapping[te->getName()]) +" "+std::to_string(dim)+" "+id +"\n");
         }
+    }
+    str  << "GEOM_Nodes "<< nb_infos<<"\n";
+    for (const auto& info : infos) {
+        str << info;
     }
     str  << "\n";
 }
 /*----------------------------------------------------------------------------*/
-void ExportBlocksImplementation::writeAssociationEdges(std::ofstream &str,std::vector<Topo::CoEdge*> es){
-    str  << "GEOM Edges \n";
+void ExportBlocksImplementation::writeAssociationEdges(std::ofstream &str,const std::vector<Topo::CoEdge*>& es){
+
+    int nb_infos = 0;
+    std::vector<std::string> infos;
+
     for (auto te : es) {
         Geom::GeomEntity* ge = te->getGeomAssociation();
         if(ge != nullptr){
@@ -298,8 +306,6 @@ void ExportBlocksImplementation::writeAssociationEdges(std::ofstream &str,std::v
                 id.erase(0, 3);
             }
 
-
-
             while(id[0] == '0')
                 id.erase(0,1);
 
@@ -307,14 +313,22 @@ void ExportBlocksImplementation::writeAssociationEdges(std::ofstream &str,std::v
                 id = "0";
             }
 
-            str << m_edge_ids_mapping[te->getName()] <<" "<<dim<<" "<<id <<"\n";
+            nb_infos++;
+            infos.push_back(std::to_string(m_edge_ids_mapping[te->getName()]) +" "+std::to_string(dim)+" "+id +"\n");
         }
+    }
+    str  << "GEOM_Edges "<< nb_infos<<"\n";
+    for (const auto& info : infos) {
+        str << info;
     }
     str  << "\n";
 }
 /*----------------------------------------------------------------------------*/
-void ExportBlocksImplementation::writeAssociationFaces(std::ofstream &str,std::vector<Topo::CoFace*> fs){
-    str  << "GEOM Faces \n";
+void ExportBlocksImplementation::writeAssociationFaces(std::ofstream &str,const std::vector<Topo::CoFace*>& fs){
+
+    int nb_infos = 0;
+    std::vector<std::string> infos;
+
     for (auto te : fs) {
         Geom::GeomEntity* ge = te->getGeomAssociation();
         if(ge != nullptr){
@@ -333,14 +347,22 @@ void ExportBlocksImplementation::writeAssociationFaces(std::ofstream &str,std::v
                 id = "0";
             }
 
-            str << m_face_ids_mapping[te->getName()] <<" "<<dim<<" "<<id <<"\n";
+            nb_infos++;
+            infos.push_back(std::to_string(m_face_ids_mapping[te->getName()]) +" "+std::to_string(dim)+" "+id +"\n");
         }
+    }
+    str  << "GEOM_Faces "<< nb_infos<<"\n";
+    for (const auto& info : infos) {
+        str << info;
     }
     str  << "\n";
 }
 /*----------------------------------------------------------------------------*/
-void ExportBlocksImplementation::writeAssociationBlocks(std::ofstream &str,std::vector<Topo::Block*> bs){
-    str  << "GEOM Blocks \n";
+void ExportBlocksImplementation::writeAssociationBlocks(std::ofstream &str,const std::vector<Topo::Block*>& bs){
+
+    int nb_infos = 0;
+    std::vector<std::string> infos;
+
     for (auto te : bs) {
         Geom::GeomEntity* ge = te->getGeomAssociation();
         if(ge != nullptr){
@@ -354,8 +376,13 @@ void ExportBlocksImplementation::writeAssociationBlocks(std::ofstream &str,std::
                 id = "0";
             }
 
-            str << m_block_ids_mapping[te->getName()] <<" "<<3<<" "<<id <<"\n";
+            nb_infos++;
+            infos.push_back(std::to_string(m_block_ids_mapping[te->getName()]) +" 3 "+id +"\n");
         }
+    }
+    str  << "GEOM_Blocks "<< nb_infos<<"\n";
+    for (const auto& info : infos) {
+        str << info;
     }
 }
 /*----------------------------------------------------------------------------*/
