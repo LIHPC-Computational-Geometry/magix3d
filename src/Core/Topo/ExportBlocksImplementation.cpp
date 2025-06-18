@@ -24,6 +24,9 @@ ExportBlocksImplementation(Internal::Context& c, const std::string& n)
 void ExportBlocksImplementation::perform(Internal::InfoCommand* icmd)
 {
 
+    ///TODO mettre un param pour activer ou non la geom
+    with_geom = true;
+
     std::ofstream str(m_filename, std::ios::out);
     if (!str){
         std::string s ="Impossible to create a Blocking File: "+m_filename;
@@ -47,6 +50,15 @@ void ExportBlocksImplementation::perform(Internal::InfoCommand* icmd)
 
     std::vector<Block*> blocks = tm.getBlocksObj();
     writeBlocks(str, blocks);
+
+
+    if(with_geom){
+        writeAssociationNodes(str, vertices);
+        writeAssociationEdges(str, edges);
+        writeAssociationFaces(str, faces);
+        writeAssociationBlocks(str, blocks);
+
+    }
 
     str.close();
 }
@@ -196,6 +208,7 @@ void ExportBlocksImplementation::writeFaces(std::ofstream &str, std::vector<Topo
 /*----------------------------------------------------------------------------*/
 void ExportBlocksImplementation::writeBlocks(std::ofstream &str, std::vector<Topo::Block*> blocks) {
         str  << "BLOCKS " << blocks.size() << "\n";
+        auto blk_block_id = 0;
         for(auto b : blocks){
             const std::vector<Vertex*>& vertices = b->getVertices();
             int v0 = m_node_ids_mapping[vertices[0]->getName()];
@@ -235,7 +248,115 @@ void ExportBlocksImplementation::writeBlocks(std::ofstream &str, std::vector<Top
             for (int i = 0; i < f5->getCoFaces().size(); i++)
                 str << m_face_ids_mapping[f5->getCoFaces()[i]->getName()]<<" ";
             str << "]\n";
+
+            m_block_ids_mapping[b->getName()] = blk_block_id++;
         }
+        str  << "\n";
+}
+/*----------------------------------------------------------------------------*/
+void ExportBlocksImplementation::writeAssociationNodes(std::ofstream &str,std::vector<Topo::Vertex*> vs){
+    str  << "GEOM Nodes \n";
+    for (auto te : vs) {
+        Geom::GeomEntity* ge = te->getGeomAssociation();
+        if(ge != nullptr){
+            std::string id = ge->getName();
+            int dim = ge->getDim();
+            if(dim == 2){
+                id.erase(0, 4);
+            }else if(dim == 0) {
+                id.erase(0, 2);
+            }else{
+                id.erase(0, 3);
+
+            }
+
+
+
+            while(id[0] == '0')
+                id.erase(0,1);
+
+            if(id.empty()){
+                id = "0";
+            }
+
+            str << m_node_ids_mapping[te->getName()] <<" "<<dim<<" "<<id <<"\n";
+        }
+    }
+    str  << "\n";
+}
+/*----------------------------------------------------------------------------*/
+void ExportBlocksImplementation::writeAssociationEdges(std::ofstream &str,std::vector<Topo::CoEdge*> es){
+    str  << "GEOM Edges \n";
+    for (auto te : es) {
+        Geom::GeomEntity* ge = te->getGeomAssociation();
+        if(ge != nullptr){
+            std::string id = ge->getName();
+            int dim = ge->getDim();
+            if(dim == 2){
+                id.erase(0, 4);
+            }else{
+                id.erase(0, 3);
+            }
+
+
+
+            while(id[0] == '0')
+                id.erase(0,1);
+
+            if(id.empty()){
+                id = "0";
+            }
+
+            str << m_edge_ids_mapping[te->getName()] <<" "<<dim<<" "<<id <<"\n";
+        }
+    }
+    str  << "\n";
+}
+/*----------------------------------------------------------------------------*/
+void ExportBlocksImplementation::writeAssociationFaces(std::ofstream &str,std::vector<Topo::CoFace*> fs){
+    str  << "GEOM Faces \n";
+    for (auto te : fs) {
+        Geom::GeomEntity* ge = te->getGeomAssociation();
+        if(ge != nullptr){
+            std::string id = ge->getName();
+            int dim = ge->getDim();
+            if(dim == 2){
+                id.erase(0, 4);
+            }else{
+                id.erase(0, 3);
+            }
+
+            while(id[0] == '0')
+                id.erase(0,1);
+
+            if(id.empty()){
+                id = "0";
+            }
+
+            str << m_face_ids_mapping[te->getName()] <<" "<<dim<<" "<<id <<"\n";
+        }
+    }
+    str  << "\n";
+}
+/*----------------------------------------------------------------------------*/
+void ExportBlocksImplementation::writeAssociationBlocks(std::ofstream &str,std::vector<Topo::Block*> bs){
+    str  << "GEOM Blocks \n";
+    for (auto te : bs) {
+        Geom::GeomEntity* ge = te->getGeomAssociation();
+        if(ge != nullptr){
+            std::string id = ge->getName();
+            id.erase(0, 3);
+
+            while(id[0] == '0')
+                id.erase(0,1);
+
+            if(id.empty()){
+                id = "0";
+            }
+
+            str << m_block_ids_mapping[te->getName()] <<" "<<3<<" "<<id <<"\n";
+        }
+    }
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom
