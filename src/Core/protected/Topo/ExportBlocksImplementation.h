@@ -42,15 +42,26 @@ private:
     void writeFaces(std::ofstream& str, std::vector<Topo::CoFace*> faces);
     void writeBlocks(std::ofstream& str, std::vector<Topo::Block*> blocks);
 
+    void writeAssociationNodes(ofstream &str, std::vector<Topo::Vertex*> vs);
+    void writeAssociationEdges(ofstream &str, std::vector<Topo::CoEdge*> es);
+    void writeAssociationFaces(ofstream &str, std::vector<Topo::CoFace*> fs);
+    void writeAssociationBlocks(ofstream &str, std::vector<Topo::Block*> bs);
+
+
     /// contexte d'exécution
     Internal::Context& m_context;
 
     /// fichier dans lequel on exporte
     std::string m_filename;
 
+    /// si oui ou non l'association géometrique est activée
+    bool with_geom;
+
     std::map<std::string, int> m_node_ids_mapping;
     std::map<std::string, int> m_edge_ids_mapping;
     std::map<std::string, int> m_face_ids_mapping;
+    std::map<std::string, int> m_block_ids_mapping;
+
 };
 }
 }
