@@ -190,15 +190,3 @@ def test_undo_clear_group():
     # ctx.undo()
     # Vol0000 ne devrait pas être dans Hors_Groupe_3D mais seulement dans BOX
     # assert "Vol0000" not in ctx.getGroupManager().getGeomEntities(["Hors_Groupe_3D"])
-
-# Issue #215
-def test_undo_add_to_group():
-    ctx = Mgx3D.getStdContext()
-    ctx.clearSession() # Clean the session after the previous test
-    # Création d'une boite avec une topologie
-    ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
-    # Modifie le groupe BOX
-    ctx.getGeomManager().addToGroup (["Vol0000"], 3, "BOX")
-    # Annulation de : Modifie le groupe BOX
-    # ctx.undo()
-    #Vol0000 est bien dans Hors_Groupe_3D qui est destroyed (en rouge dans l'ihm)
