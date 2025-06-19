@@ -574,10 +574,18 @@ void CommandAddRemoveGroupName::internalExecute()
 /*----------------------------------------------------------------------------*/
 void CommandAddRemoveGroupName::internalUndo()
 {
+	// on commence par remettre les anciens groupes
+    getInfoCommand().permCreatedDeleted();
+
+    // suppression de ce qui a été ajouté
+    deleteCreatedMeshEntities();
+
+    // permute toutes les propriétés internes avec leur sauvegarde
+    permInternalsStats();
 
 	switch(m_dim){
 	case(0):{
-		Group::Group0D* grp = getContext().getGroupManager().getNewGroup0D(m_groupName, &getInfoCommand());
+		Group::Group0D* grp = getContext().getGroupManager().getGroup0D(m_groupName);
 
 		for (std::vector<Geom::GeomEntity*>::iterator iter = m_geom_entities.begin();
 				iter != m_geom_entities.end(); ++iter){
@@ -615,7 +623,7 @@ void CommandAddRemoveGroupName::internalUndo()
 	}
 	break;
 	case(1):{
-		Group::Group1D* grp = getContext().getGroupManager().getNewGroup1D(m_groupName, &getInfoCommand());
+		Group::Group1D* grp = getContext().getGroupManager().getGroup1D(m_groupName);
 
 		for (std::vector<Geom::GeomEntity*>::iterator iter = m_geom_entities.begin();
 				iter != m_geom_entities.end(); ++iter){
@@ -653,7 +661,7 @@ void CommandAddRemoveGroupName::internalUndo()
 	}
 	break;
 	case(2):{
-		Group::Group2D* grp = getContext().getGroupManager().getNewGroup2D(m_groupName, &getInfoCommand());
+		Group::Group2D* grp = getContext().getGroupManager().getGroup2D(m_groupName);
 
 		for (std::vector<Geom::GeomEntity*>::iterator iter = m_geom_entities.begin();
 				iter != m_geom_entities.end(); ++iter){
@@ -691,7 +699,7 @@ void CommandAddRemoveGroupName::internalUndo()
 	}
 	break;
 	case(3):{
-		Group::Group3D* grp = getContext().getGroupManager().getNewGroup3D(m_groupName, &getInfoCommand());
+		Group::Group3D* grp = getContext().getGroupManager().getGroup3D(m_groupName);
 
 		for (std::vector<Geom::GeomEntity*>::iterator iter = m_geom_entities.begin();
 				iter != m_geom_entities.end(); ++iter){
@@ -734,14 +742,6 @@ void CommandAddRemoveGroupName::internalUndo()
 	}
 	break;
 	}
-
-    getInfoCommand().permCreatedDeleted();
-
-    // suppression de ce qui a été ajouté
-    deleteCreatedMeshEntities();
-
-    // permute toutes les propriétés internes avec leur sauvegarde
-    permInternalsStats();
 }
 /*----------------------------------------------------------------------------*/
 void CommandAddRemoveGroupName::internalRedo()

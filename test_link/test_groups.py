@@ -94,15 +94,40 @@ def test_section_by_plane():
     ctx.clearSession() # Clean the session after the previous test
     # Création d'une boite avec une topologie
     ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10, "box")
+    vol_info = ctx.getGeomManager().getInfos("Vol0000",3)
+    assert "box" in vol_info.groupsName()
     # Section par un plan entre géométries avec topologies
     ctx.getGeomManager ( ).sectionByPlane (["Vol0000"], Mgx3D.Plane(Mgx3D.Point(0, 0, .5), Mgx3D.Vector(0, 0, 1)), "aaa")
     # Les entités de dimension inférieure à 2 sont affectées au groupe aaa de manière explicite
+    vol_info = ctx.getGeomManager().getInfos("Vol0001",3)
+    assert "box" in vol_info.groupsName()
     surf_info = ctx.getGeomManager().getInfos("Surf0010",2)
     assert "aaa" in surf_info.groupsName()
     crb_info = ctx.getGeomManager().getInfos("Crb0014",1)
     assert "aaa" in crb_info.groupsName()
     pt_info = ctx.getGeomManager().getInfos("Pt0008",0)
     assert "aaa" in pt_info.groupsName()
+    # Destruction de  Pt0008
+    ctx.getGeomManager().destroy(["Pt0008"], False)
+    assert "DETRUIT" in ctx.getGroupManager().getInfos("aaa", 2)
+    assert "DETRUIT" in ctx.getGroupManager().getInfos("box", 3)
+    # Annulation de : Destruction de  Pt0008
+    ctx.undo()
+    # Les entités de dimension inférieure à 2 sont affectées au groupe aaa de manière explicite
+    vol_info = ctx.getGeomManager().getInfos("Vol0001",3)
+    assert "box" in vol_info.groupsName()
+    surf_info = ctx.getGeomManager().getInfos("Surf0010",2)
+    assert "aaa" in surf_info.groupsName()
+    crb_info = ctx.getGeomManager().getInfos("Crb0014",1)
+    assert "aaa" in crb_info.groupsName()
+    pt_info = ctx.getGeomManager().getInfos("Pt0008",0)
+    assert "aaa" in pt_info.groupsName()
+    # Annulation de : Section par un plan entre géométries avec topologies
+    ctx.undo()
+    vol_info = ctx.getGeomManager().getInfos("Vol0000",3)
+    assert "box" in vol_info.groupsName()
+    assert "DETRUIT" in ctx.getGroupManager().getInfos("aaa", 1)
+    assert "DETRUIT" in ctx.getGroupManager().getInfos("aaa", 2)
 
 def test_new_vertices_curves_and_planar_surface():
     ctx = Mgx3D.getStdContext()
@@ -135,3 +160,16 @@ def test_new_planar_surface():
     assert "aaa" not in crb_info.groupsName()
     pt_info = ctx.getGeomManager().getInfos("Pt0002",0)
     assert "aaa" not in pt_info.groupsName()
+
+# Issue #215
+def test_undo_add_to_group():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    # Création d'une boite avec une topologie
+    ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
+    # Modifie le groupe BOX
+    ctx.getGeomManager().addToGroup (["Vol0000"], 3, "BOX")
+    # Annulation de : Modifie le groupe BOX
+    ctx.undo()
+    # Hors_Groupe_3D n'est plus détruit après fix de l'issue#215
+    assert "DETRUIT" not in ctx.getGroupManager().getInfos("Hors_Groupe_3D", 3)
