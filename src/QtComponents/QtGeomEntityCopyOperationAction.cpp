@@ -293,6 +293,10 @@ void QtGeomEntityCopyOperationPanel::operationCompleted ( )
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
 
 	QtMgx3DOperationPanel::operationCompleted ( );
+
+	// Actualisation des groupes (certains peuvent être créés) :
+	if (0 != _namePanel)
+		_namePanel->autoUpdate ( );
 }	// QtGeomEntityCopyOperationPanel::operationCompleted
 
 

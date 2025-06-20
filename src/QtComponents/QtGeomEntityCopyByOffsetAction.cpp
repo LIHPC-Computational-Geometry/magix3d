@@ -66,7 +66,7 @@ QtGeomEntityCopyByOffsetPanel::QtGeomEntityCopyByOffsetPanel (
 	layout->addWidget (label);
 
 	// Nom groupe :
-	_namePanel	= new QtMgx3DGroupNamePanel (this, "Groupe", mainWindow, 3, QtMgx3DGroupNamePanel::CREATION, "");
+	_namePanel	= new QtMgx3DGroupNamePanel (this, "Groupe", mainWindow, 2, QtMgx3DGroupNamePanel::CREATION, "");
 	layout->addWidget (_namePanel);
 	addValidatedField (*_namePanel);
 
@@ -249,6 +249,10 @@ void QtGeomEntityCopyByOffsetPanel::operationCompleted ( )
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
 
 	QtMgx3DOperationPanel::operationCompleted ( );
+
+	// Actualisation des groupes (certains peuvent être créés) :
+	if (0 != _namePanel)
+		_namePanel->autoUpdate ( );
 }	// QtGeomEntityCopyByOffsetPanel::operationCompleted
 
 
