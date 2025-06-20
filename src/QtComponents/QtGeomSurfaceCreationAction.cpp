@@ -289,8 +289,8 @@ void QtGeomSurfaceCreationPanel::operationCompleted ( )
 
 	// Actualisation des groupes : certains peuvent être créés, d'autres
 	// détruits (ex : "Hors Groupes 3D" :
-	// if (0 != _namePanel)
-	//	_namePanel->autoUpdate ( );
+	if (0 != _namePanel)
+		_namePanel->autoUpdate ( );
 }	// QtGeomSurfaceCreationPanel::operationCompleted
 
 
@@ -298,11 +298,12 @@ void QtGeomSurfaceCreationPanel::dimensionsModifiedCallback ( )
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
 
+/* S'agissant de création de surface on reste en dimension 2 !
 	if (0 != _namePanel)
 	{
 		_namePanel->setDimension (getDimension ( ));
 		_namePanel->autoUpdate ( );
-	}	// if (0 != _namePanel)
+	}	// if (0 != _namePanel)	*/
 	
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
 }	// QtGeomSurfaceCreationPanel::dimensionsModifiedCallback
