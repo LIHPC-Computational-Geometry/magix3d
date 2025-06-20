@@ -192,6 +192,10 @@ void QtMgx3DGroupNamePanel::validate ( )
 }	// QtMgx3DGroupNamePanel::validate
 
 
+/* Juin 2025 : Il est décidé de laisser affiché le dernier nom de groupe sélectionné dans les panneaux.
+ * => #define AUTO_UPDATE_OLD_SCHEME 1
+ */
+#define AUTO_UPDATE_OLD_SCHEME 1
 void QtMgx3DGroupNamePanel::autoUpdate ( )
 {
 	CHECK_NULL_PTR_ERROR (_nameComboBox)
