@@ -26,10 +26,12 @@
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtLandmarkDialog.h"
 #include "QtComponents/QtMdlOptionsDialog.h"
+#include "QtComponents/QtBlocksOptionsDialog.h"
 #include "QtComponents/QtMgx3DScriptFileDialog.h"
 #include "QtComponents/QtGuiStateDialog.h"
 #include "QtComponents/RenderedEntityRepresentation.h"
 #include "QtComponents/QtColorTablesEditorDialog.h"
+
 
 // Les opérations géométriques :
 #include "QtComponents/QtArcCircleOperationAction.h"
@@ -5660,8 +5662,18 @@ cout << __FILE__ << ' ' << __LINE__ << " QtMgx3DMainWindow::exitCallback" << end
                                     else
                                     if (true == compareExtensions(file.getExtension(), "blk"))
                                     {
+                                        QtBlocksOptionsDialog blocksDialog(this, getAppTitle(), fileName);
+                                        if (QDialog::Rejected == blocksDialog.exec())
+                                        {
+                                            msg << " Opération annulée par l'utilisateur.";
+                                            log(InformationLog(msg));
+                                            return;
+                                        }    // if (QDialog::Rejected == mdlDialog.exec ( ))
+
                                         QtAutoWaitingCursor cursor(true);
-                                        getContext().getTopoManager().importBlocks(fileName);
+                                        const bool          geomAssoc    = blocksDialog.geometricAssociation();
+
+                                        getContext().getTopoManager().importBlocks(fileName, geomAssoc);
                                     }    // BREP
 									else
 									{
