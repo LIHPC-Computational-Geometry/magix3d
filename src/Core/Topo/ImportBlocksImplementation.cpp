@@ -29,7 +29,7 @@ namespace Topo {
 /*----------------------------------------------------------------------------*/
 
 ImportBlocksImplementation::ImportBlocksImplementation(Internal::Context &c, Internal::InfoCommand *icmd,
-                            const std::string &n) : m_c(c), m_icmd(icmd), m_filename(n) {
+                            const std::string &n, bool withGeom) : m_c(c), m_icmd(icmd), m_filename(n), m_geom(withGeom) {
 }
 /*----------------------------------------------------------------------------*/
 //ImportBlocksImplementation::~ImportBlocksImplementation() {}
@@ -37,7 +37,6 @@ ImportBlocksImplementation::ImportBlocksImplementation(Internal::Context &c, Int
 void ImportBlocksImplementation::internalExecute() {
 
     //TODO faire une méthode pour chaque type d'entité
-    //TODO ajouter la lecture de l'association géom
 
     // check file extension
     std::string suffix = m_filename;
@@ -480,13 +479,13 @@ void ImportBlocksImplementation::internalExecute() {
         m_blocks[i] = block;
     }
 
-    readAssociation(s);
+    if(m_geom)
+        readAssociation(s);
 
     s.close();
 }
 /*----------------------------------------------------------------------------*/
 void ImportBlocksImplementation::readAssociation(std::ifstream &str){
-    std::cout<<"Read association"<<std::endl;
 
     int id, dim, geom_id;
     std::string g_name;
@@ -500,7 +499,13 @@ void ImportBlocksImplementation::readAssociation(std::ifstream &str){
 
         g_name = findGeom(dim, geom_id);
         Vertex* v = m_vertices[id];
-        v->setGeomAssociation(getStdContext()->getGeomManager().getEntity(g_name));
+        Geom::GeomEntity* ge = getStdContext()->getGeomManager().getEntity(g_name, false);
+        if(ge != nullptr){
+            v->setGeomAssociation(ge);
+        }else{
+            m_warning += v->getName()+" ";
+        }
+
     }
 
     moveStreamOntoFirst(str, "GEOM_Edges");
@@ -510,7 +515,12 @@ void ImportBlocksImplementation::readAssociation(std::ifstream &str){
 
         g_name = findGeom(dim, geom_id);
         CoEdge* e = m_coedges[id];
-        e->setGeomAssociation(getStdContext()->getGeomManager().getEntity(g_name));
+        Geom::GeomEntity* ge = getStdContext()->getGeomManager().getEntity(g_name, false);
+        if(ge != nullptr){
+            e->setGeomAssociation(ge);
+        }else{
+            m_warning += e->getName()+" ";
+        }
     }
 
     moveStreamOntoFirst(str, "GEOM_Faces");
@@ -520,7 +530,12 @@ void ImportBlocksImplementation::readAssociation(std::ifstream &str){
 
         g_name = findGeom(dim, geom_id);
         CoFace* f = m_cofaces[id];
-        f->setGeomAssociation(getStdContext()->getGeomManager().getEntity(g_name));
+        Geom::GeomEntity* ge = getStdContext()->getGeomManager().getEntity(g_name, false);
+        if(ge != nullptr){
+            f->setGeomAssociation(ge);
+        }else{
+            m_warning += f->getName()+" ";
+        }
     }
 
     moveStreamOntoFirst(str, "GEOM_Blocks");
@@ -530,7 +545,12 @@ void ImportBlocksImplementation::readAssociation(std::ifstream &str){
 
         g_name = findGeom(dim, geom_id);
         Block* b = m_blocks[id];
-        b->setGeomAssociation(getStdContext()->getGeomManager().getEntity(g_name));
+        Geom::GeomEntity* ge = getStdContext()->getGeomManager().getEntity(g_name, false);
+        if(ge != nullptr){
+            b->setGeomAssociation(ge);
+        }else{
+            m_warning += b->getName()+" ";
+        }
     }
 
 }
@@ -567,7 +587,10 @@ bool ImportBlocksImplementation::moveStreamOntoFirst(std::ifstream &s, const std
 
     return found;
 }
-
+/*----------------------------------------------------------------------------*/
+std::string ImportBlocksImplementation::getWarning(){
+    return m_warning;
+}
 /*----------------------------------------------------------------------------*/
 }
 }

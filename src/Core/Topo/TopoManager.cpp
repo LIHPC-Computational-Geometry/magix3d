@@ -5552,15 +5552,16 @@ Internal::M3DCommandResult* TopoManager::exportBlocks(const std::string& n)
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-    Internal::M3DCommandResult* TopoManager::importBlocks(const std::string& n)
+    Internal::M3DCommandResult* TopoManager::importBlocks(const std::string& n,bool withGeom)
     {
         //creation de la commande d'exportation
-        CommandImportBlocks *command = new CommandImportBlocks(getContext(), n);
+        CommandImportBlocks *command = new CommandImportBlocks(getContext(), n, withGeom);
 
         // trace dans le script
         TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
         cmd << getContextAlias() << "." << "getTopoManager().importBlocks(";
-        cmd <<"\""<<n<<"\")";
+        cmd <<"\""<<n<<"\", ";
+        cmd << (withGeom ? "True" : "False") << " )";
         command->setScriptCommand(cmd);
 
         // on passe au gestionnaire de commandes qui exécute la commande en // ou non

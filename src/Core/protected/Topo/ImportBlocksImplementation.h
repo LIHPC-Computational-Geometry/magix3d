@@ -21,7 +21,7 @@ public:
      *  \param n le nom du fichier à importer
      */
     ImportBlocksImplementation(Internal::Context& c, Internal::InfoCommand* icmd,
-                               const std::string& n);
+                               const std::string& n, bool withGeom);
 
     /*------------------------------------------------------------------------*/
     /** \brief   Destructeur
@@ -30,12 +30,15 @@ public:
 
     void internalExecute();
 
+    std::string getWarning();
+
+
 private:
     bool moveStreamOntoFirst(std::ifstream& s,const std::string &AString);
 
     void readAssociation(std::ifstream &str);
 
-    std::string findGeom(int dim, int id);
+    static std::string findGeom(int dim, int id);
 
 private:
     /** Informations sur la commande: entités modifiées */
@@ -45,7 +48,9 @@ private:
 
     /// le nom du fichier en entier
     std::string m_filename;
+    bool m_geom;
 
+    std::string m_warning;
 
     std::vector<Vertex*> m_vertices;
     std::vector<std::string> m_vnames;
