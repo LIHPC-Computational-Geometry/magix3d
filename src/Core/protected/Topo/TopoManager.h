@@ -1845,7 +1845,7 @@ public:
      *
      *  \param n le nom du ficher à partir duquel on importe
      */
-    virtual Mgx3D::Internal::M3DCommandResult* importBlocks(const std::string& n);
+    virtual Mgx3D::Internal::M3DCommandResult* importBlocks(const std::string& n, bool withGeom);
 
     /*------------------------------------------------------------------------*/
     /// retourne le nombre de blocs non détruits référencés par le TopoManager

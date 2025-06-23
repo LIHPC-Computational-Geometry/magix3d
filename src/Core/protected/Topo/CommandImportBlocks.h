@@ -22,7 +22,7 @@ public:
      *  \param c le contexte
      *  \param impl l'implémentation de l'importation de Blocs
      */
-    CommandImportBlocks(Internal::Context& c, const std::string& n);
+    CommandImportBlocks(Internal::Context& c, const std::string& n, bool withGeom);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur
