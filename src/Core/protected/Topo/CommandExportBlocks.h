@@ -25,7 +25,7 @@ public:
      *  \param context  le contexte
      *  \param fileName le nom du fichier de sortie
      */
-    CommandExportBlocks(Internal::Context& context, const std::string &fileName);
+    CommandExportBlocks(Internal::Context& context, const std::string &fileName, const bool& with_geom);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur

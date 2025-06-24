@@ -69,12 +69,12 @@ namespace Mgx3D {
 
             // Nom du fichier de sauvegarde de l'état de l'IHM :
             UTF8String	name (Charset::UTF_8);
-            name << "Fichier BLK importé : " << fileName;
+            name << "Fichier BLK : " << fileName;
             QLabel*	label	= new QLabel (UTF8TOQSTRING (name), this);
             layout->addWidget (label);
             layout->addSpacing (20);
 
-            // Importer la topologie ? :
+            // Prendre en compte l'association géométrique ? :
             _geomAssocCheckBox	=
                     new QCheckBox ("Associer la topologie", this);
             _geomAssocCheckBox->setCheckState (Qt::Checked);
