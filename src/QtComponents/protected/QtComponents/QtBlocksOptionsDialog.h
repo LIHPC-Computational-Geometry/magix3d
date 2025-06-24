@@ -40,8 +40,7 @@ class QtBlocksOptionsDialog : public QDialog {
     virtual ~QtBlocksOptionsDialog ( );
 
     /**
-	 * \return	<I>true</I> si l'application doit importer la topologie du
-	 *			fichier <I>MDL</I>, <I>false</I> dans le cas contraire.
+	 * \return	<I>true</I> l'association géométrique est prise en compte dans l'opération I/O.
 	 */
     virtual bool geometricAssociation ( ) const;
 

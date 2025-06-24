@@ -35,10 +35,16 @@ public:
 
 
 private:
-    bool moveStreamOntoFirst(std::ifstream& s,const std::string &AString);
+    void readNodes(ifstream &str, Group::Group0D* group);
+    int readEdges(ifstream &str, Group::Group1D* group);
+    void readFaces(ifstream &str, Group::Group2D* group);
+    void readBlocks(ifstream &str, Group::Group3D* group);
+
+    void readDiscr(ifstream &str, const int &nbEdges);
 
     void readAssociation(std::ifstream &str);
 
+    bool moveStreamOntoFirst(std::ifstream& s,const std::string &AString);
     static std::string findGeom(int dim, int id);
 
 private:

@@ -5881,8 +5881,20 @@ void QtMgx3DMainWindow::exportAllCallback ( )
     {
         SelectionManager&	selectionManager	=
                 getContext ( ).getSelectionManager ( );
+
+        QtBlocksOptionsDialog blocksDialog(this, getAppTitle(), fileName);
+        if (QDialog::Rejected == blocksDialog.exec())
+        {
+            msg << " Opération annulée par l'utilisateur.";
+            log(InformationLog(msg));
+            return;
+        }    // if (QDialog::Rejected == mdlDialog.exec ( ))
+
+        QtAutoWaitingCursor cursor(true);
+        const bool          geomAssoc    = blocksDialog.geometricAssociation();
+
         log (InformationLog (msg));
-        getContext ( ).getTopoManager ( ).exportBlocks(fileName);
+        getContext ( ).getTopoManager ( ).exportBlocks(fileName, geomAssoc);
     }	// blk
 	else
 	{

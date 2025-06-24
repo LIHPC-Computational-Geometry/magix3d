@@ -23,7 +23,7 @@ public:
      *  \param c le contexte
      *  \param n le nom du fichier dans lequel se fait l'exportation
      */
-    ExportBlocksImplementation(Internal::Context& c, const std::string& n);
+    ExportBlocksImplementation(Internal::Context& c, const std::string& n, const bool& withGeom);
 
     /*------------------------------------------------------------------------*/
     /** \brief   Destructeur

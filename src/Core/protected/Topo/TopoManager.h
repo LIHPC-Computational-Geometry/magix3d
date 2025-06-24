@@ -1839,7 +1839,7 @@ public:
      *
      *  \param n le nom du ficher dans lequel on exporte
      */
-    virtual Mgx3D::Internal::M3DCommandResult* exportBlocks(const std::string& n);
+    virtual Mgx3D::Internal::M3DCommandResult* exportBlocks(const std::string& n, bool withGeom);
 
     /** \brief Import de la topologie à partir d'un fichier au format BLK
      *
