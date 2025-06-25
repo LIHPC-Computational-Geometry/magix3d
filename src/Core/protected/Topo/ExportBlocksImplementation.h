@@ -22,6 +22,7 @@ public:
      *
      *  \param c le contexte
      *  \param n le nom du fichier dans lequel se fait l'exportation
+     *  \param withGeom <I>True</I> si on importe l'association
      */
     ExportBlocksImplementation(Internal::Context& c, const std::string& n, const bool& withGeom);
 
@@ -57,6 +58,7 @@ private:
     /// si oui ou non l'association géometrique est activée
     bool with_geom;
 
+    /// stockage des noms des entités topo vers un id local à écrire
     std::map<std::string, int> m_node_ids_mapping;
     std::map<std::string, int> m_edge_ids_mapping;
     std::map<std::string, int> m_face_ids_mapping;

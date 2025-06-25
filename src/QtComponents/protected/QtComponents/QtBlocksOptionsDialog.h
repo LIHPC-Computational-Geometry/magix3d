@@ -16,8 +16,8 @@ namespace Mgx3D {
 namespace QtComponents {
 
 /**
- * Boite de dialogue pemettant de modifier les paramètres d'importation de CAO
- * au format <I>MDL</I>.
+ * Boite de dialogue pemettant de modifier les paramètres d'importation de topologie
+ * au format <I>BLK</I>.
  */
 class QtBlocksOptionsDialog : public QDialog {
 

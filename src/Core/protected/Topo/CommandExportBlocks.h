@@ -24,6 +24,7 @@ public:
      *
      *  \param context  le contexte
      *  \param fileName le nom du fichier de sortie
+     *  \param with_geom <I>True</I> export de l'association
      */
     CommandExportBlocks(Internal::Context& context, const std::string &fileName, const bool& with_geom);
 
