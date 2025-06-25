@@ -39,13 +39,13 @@ namespace Mgx3D {
         QtBlocksOptionsDialog::QtBlocksOptionsDialog (const QtBlocksOptionsDialog&)
                 : QDialog (0), _geomAssocCheckBox (0), _closurePanel (0)
         {
-            MGX_FORBIDDEN ("QtMdlOptionsDialog copy constructor is not allowed.");
+            MGX_FORBIDDEN ("QtBlocksOptionsDialog copy constructor is not allowed.");
         }	// QtBlocksOptionsDialog::QtBlocksOptionsDialog (const QtBlocksOptionsDialog&)
 
 
         QtBlocksOptionsDialog& QtBlocksOptionsDialog::operator = (const QtBlocksOptionsDialog&)
         {
-            MGX_FORBIDDEN ("QtMdlOptionsDialog assignment operator is not allowed.");
+            MGX_FORBIDDEN ("QtBlocksOptionsDialog assignment operator is not allowed.");
             return *this;
         }	// QtBlocksOptionsDialog::QtBlocksOptionsDialog (const QtBlocksOptionsDialog&)
 

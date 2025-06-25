@@ -19,6 +19,7 @@ public:
      *
      *  \param c le contexte
      *  \param n le nom du fichier à importer
+     *  \param withGeom <I>True</I> si on importe l'association
      */
     ImportBlocksImplementation(Internal::Context& c, Internal::InfoCommand* icmd,
                                const std::string& n, bool withGeom);

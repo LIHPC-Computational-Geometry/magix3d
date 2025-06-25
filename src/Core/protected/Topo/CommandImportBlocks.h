@@ -21,6 +21,7 @@ public:
      *
      *  \param c le contexte
      *  \param impl l'implémentation de l'importation de Blocs
+     *  \param with_geom <I>True</I> import de l'association
      */
     CommandImportBlocks(Internal::Context& c, const std::string& n, bool withGeom);
 
