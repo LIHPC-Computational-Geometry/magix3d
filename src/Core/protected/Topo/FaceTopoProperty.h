@@ -42,24 +42,24 @@ class Block;
      FaceTopoProperty* clone() {
          FaceTopoProperty* prop = new FaceTopoProperty();
 
-         prop->m_vertices.clone(m_vertices);
-         prop->m_cofaces.clone(m_cofaces);
-         prop->m_blocks.clone(m_blocks);
+         prop->m_vertices.insert(prop->m_vertices.end(), m_vertices.begin(), m_vertices.end());
+         prop->m_cofaces.insert(prop->m_cofaces.end(), m_cofaces.begin(), m_cofaces.end());
+         prop->m_blocks.insert(prop->m_blocks.end(), m_blocks.begin(), m_blocks.end());
 
          return prop;
      }
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des sommets
-     Utils::Container<Vertex>& getVertexContainer() {return m_vertices;}
+     std::vector<Vertex*>& getVertexContainer() {return m_vertices;}
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des faces communes
-     Utils::Container<CoFace>& getCoFaceContainer() {return m_cofaces;}
+     std::vector<CoFace*>& getCoFaceContainer() {return m_cofaces;}
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des blocs
-     Utils::Container<Block>& getBlockContainer() {return m_blocks;}
+     std::vector<Block*>& getBlockContainer() {return m_blocks;}
 
      /*------------------------------------------------------------------------*/
      /** \brief   Suppression des dépendances (entités topologiques incidentes)
@@ -73,13 +73,13 @@ class Block;
 
  private:
      /// Lien avec les blocs incidents
-     Utils::Container<Block> m_blocks;
+     std::vector<Block*> m_blocks;
 
      /// Lien avec les faces communes
-     Utils::Container<CoFace> m_cofaces;
+     std::vector<CoFace*> m_cofaces;
 
       /// Lien avec les sommets extrémités
-     Utils::Container<Vertex> m_vertices;
+     std::vector<Vertex*> m_vertices;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo

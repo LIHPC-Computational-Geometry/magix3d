@@ -37,10 +37,8 @@ internalExecute()
             << " de nom unique " << getUniqueName ( );
 
     // vérification que le sommet n'est pas à une extrémité de la coface, sinon cela ne ferait rien
-    std::vector<Vertex* > vertices;
-    m_coface->getVertices(vertices);
-    for (std::vector<Vertex* >::iterator iter = vertices.begin(); iter != vertices.end(); ++iter)
-    	if (m_sommet == *iter)
+    for (Vertex* v : m_coface->getVertices())
+    	if (m_sommet == v)
     		throw TkUtil::Exception (TkUtil::UTF8String ("La face ne peut être découpée avec un sommet au sommet de la face (en prendre un sur un côté)", TkUtil::Charset::UTF_8));
 
 

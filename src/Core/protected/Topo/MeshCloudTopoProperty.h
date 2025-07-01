@@ -40,18 +40,18 @@ class Vertex;
      /** Création d'un clone, on copie toutes les informations */
      MeshCloudTopoProperty* clone() {
          MeshCloudTopoProperty* prop = new MeshCloudTopoProperty();
-         prop->m_coedges.clone(m_coedges);
-         prop->m_vertices.clone(m_vertices);
+         prop->m_coedges.insert(prop->m_coedges.end(), m_coedges.begin(), m_coedges.end());
+         prop->m_vertices.insert(prop->m_vertices.end(), m_vertices.begin(), m_vertices.end());
 
          return prop;
      }
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des arêtes communes
-     Utils::Container<CoEdge>& getCoEdgeContainer() {return m_coedges;}
+     std::vector<CoEdge*>& getCoEdgeContainer() {return m_coedges;}
 
      /// accesseur sur le conteneur des sommets
-     Utils::Container<Vertex>& getVertexContainer() {return m_vertices;}
+     std::vector<Vertex*>& getVertexContainer() {return m_vertices;}
 
      /*------------------------------------------------------------------------*/
      /** \brief   Suppression des relations
@@ -64,10 +64,10 @@ class Vertex;
 
  private:
      /// Lien avec les arêtes communes sur lesquelles se base ce nuage
-     Utils::Container<CoEdge> m_coedges;
+     std::vector<CoEdge*> m_coedges;
 
      /// Lien avec les sommets sur lesquels se base ce nuage
-     Utils::Container<Vertex> m_vertices;
+     std::vector<Vertex*> m_vertices;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo

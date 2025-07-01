@@ -50,9 +50,12 @@ Edge(Internal::Context& ctx,
     ce->addEdge(this);
 
     const std::vector<Vertex* > & vertices = ce->getVertices();
-    m_topo_property->getVertexContainer().add(vertices);
+    m_topo_property->getVertexContainer().insert(
+        m_topo_property->getVertexContainer().end(),
+        vertices.begin(),
+        vertices.end());
 
-    m_topo_property->getCoEdgeContainer().add(ce);
+    m_topo_property->getCoEdgeContainer().push_back(ce);
 	ctx.newGraphicalRepresentation (*this);
 }
 /*----------------------------------------------------------------------------*/
@@ -69,10 +72,13 @@ Edge(Internal::Context& ctx,
 , m_mesh_property (new EdgeMeshingProperty())
 , m_save_mesh_property (0)
 {
-    m_topo_property->getVertexContainer().add(v1);
-    m_topo_property->getVertexContainer().add(v2);
+    m_topo_property->getVertexContainer().push_back(v1);
+    m_topo_property->getVertexContainer().push_back(v2);
 
-    m_topo_property->getCoEdgeContainer().add(coedges);
+    m_topo_property->getCoEdgeContainer().insert(
+        m_topo_property->getCoEdgeContainer().end(),
+        coedges.begin(),
+        coedges.end());
 
     // association remontante
     for (uint i=0; i<getNbCoEdges(); i++)
@@ -83,9 +89,7 @@ Edge(Internal::Context& ctx,
 Edge* Edge::
 clone()
 {
-    std::vector<CoEdge* > coedges;
-    getCoEdges(coedges);
-
+    std::vector<CoEdge* > coedges = getCoEdges();
     Edge* new_edge = new Edge(getContext(), getVertex(0), getVertex(1), coedges);
 
     delete new_edge->m_mesh_property;
@@ -147,7 +151,10 @@ void Edge::sortCoEdges()
     }
 
     m_topo_property->getCoEdgeContainer().clear();
-    m_topo_property->getCoEdgeContainer().add(sorted_coedges);
+    m_topo_property->getCoEdgeContainer().insert(
+        m_topo_property->getCoEdgeContainer().end(),
+        sorted_coedges.begin(),
+        sorted_coedges.end());
 }
 /*----------------------------------------------------------------------------*/
 void Edge::replace(Vertex* v1, Vertex* v2, bool propagate_up, bool propagate_down, Internal::InfoCommand* icmd)
@@ -160,13 +167,8 @@ void Edge::replace(Vertex* v1, Vertex* v2, bool propagate_up, bool propagate_dow
         // si le sommet est interne à l'arête, tout va bien,
         // il n'y a rien à faire pour l'arête ni pour la face,
         // sinon erreur ...
-
-        std::vector<CoEdge* > coedges;
-        getCoEdges(coedges);
-
-        for (std::vector<CoEdge* >::iterator iter = coedges.begin();
-                iter != coedges.end(); ++iter)
-            if ((*iter)->find(v1))
+        for (CoEdge* coedge : getCoEdges())
+            if (coedge->find(v1))
                 return;
     }
 
@@ -181,16 +183,18 @@ void Edge::replace(Vertex* v1, Vertex* v2, bool propagate_up, bool propagate_dow
 
 
     bool found = false;
-    for (uint i=0; i<getNbVertices(); i++)
+    for (uint i=0; i<getNbVertices(); i++) {
         if (v1 == getVertex(i)){
             found = true;
 
             saveEdgeTopoProperty(icmd);
-            m_topo_property->getVertexContainer().set(i,v2);
+            m_topo_property->getVertexContainer()[i] = v2;
         }
+    }
 
-    if (propagate_up && !found)
+    if (propagate_up && !found) {
         throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne (sommet non trouvé), avec Edge::replace", TkUtil::Charset::UTF_8));
+    }
 
     if (getNbVertices() == 2 && getVertex(0) == getVertex(1))
         free(icmd);
@@ -236,7 +240,7 @@ void Edge::replace(CoEdge* e1, CoEdge* e2, Internal::InfoCommand* icmd)
         	}
 
             saveEdgeTopoProperty(icmd);
-            m_topo_property->getCoEdgeContainer().set(i, e2);
+            m_topo_property->getCoEdgeContainer()[i] = e2;
 
             e1->saveCoEdgeTopoProperty(icmd);
             e2->saveCoEdgeTopoProperty(icmd);
@@ -265,8 +269,7 @@ void Edge::replace(CoEdge* e1, std::vector<CoEdge*>& coedges, Internal::InfoComm
     saveEdgeTopoProperty(icmd);
 
     std::vector<CoEdge*> new_edges;
-    std::vector<CoEdge*> old_edges;
-    getCoEdges(old_edges);
+    std::vector<CoEdge*> old_edges = getCoEdges();
     std::vector<CoEdge*>::iterator iter = old_edges.begin();
     while (e1 != *iter){
     	new_edges.push_back(*iter);
@@ -293,7 +296,10 @@ void Edge::replace(CoEdge* e1, std::vector<CoEdge*>& coedges, Internal::InfoComm
     	coedges[i]->addEdge(this);
     }
     m_topo_property->getCoEdgeContainer().clear();
-    m_topo_property->getCoEdgeContainer().add(new_edges);
+    m_topo_property->getCoEdgeContainer().insert(
+        m_topo_property->getCoEdgeContainer().end(),
+        new_edges.begin(),
+        new_edges.end());
 #ifdef _DEBUG2
 	std::cout<<"new_edges:";
 	for (uint i=0; i<new_edges.size(); i++)
@@ -328,28 +334,19 @@ void Edge::merge(Edge* ed, Internal::InfoCommand* icmd, bool updateOtherEdges)
 
     // on remplace ed dans les faces associées à ed
     // On travaille sur une copie car il y a une mise à jour en même temps des faces communes
-    std::vector<CoFace* > cofaces;
-    ed->getCoFaces(cofaces);
-
-    for (std::vector<CoFace* >::iterator iter=cofaces.begin();
-            iter != cofaces.end(); ++iter)
-        (*iter)->replace(ed, this, icmd);
+    for (CoFace* coface : ed->getCoFaces())
+        coface->replace(ed, this, icmd);
 
     // les arêtes qui disparaissent
-    std::vector<CoEdge* > old_coedges;
-    ed->getCoEdges(old_coedges);
+    std::vector<CoEdge* > old_coedges = ed->getCoEdges();
 
     // changement des coedges de ed par celle de this dans les edges qui références
     if (updateOtherEdges){
     	if (old_coedges.size() == 1){
-    		std::vector<CoEdge* > new_coedges;
-    		getCoEdges(new_coedges);
-
-    		std::vector<Edge* > edges;
-    		old_coedges[0]->getEdges(edges);
-    		for (uint i=0; i<edges.size(); i++)
-    			if (edges[i] != this)
-    				edges[i]->replace(old_coedges[0], new_coedges, icmd);
+    		std::vector<CoEdge* > new_coedges = getCoEdges();
+    		for (Edge* edge : old_coedges[0]->getEdges())
+    			if (edge != this)
+    				edge->replace(old_coedges[0], new_coedges, icmd);
     	}
     	else {
 			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -379,12 +376,8 @@ collapse(Internal::InfoCommand* icmd)
     if (getVertex(0) == getVertex(1))
         throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne Edge::collapse avec 2 sommets identiques", TkUtil::Charset::UTF_8));
 
-    std::vector<CoEdge* > coedges;
-    getCoEdges(coedges);
-
-    for (std::vector<CoEdge* >::iterator iter = coedges.begin();
-            iter != coedges.end(); ++iter){
-        (*iter)->collapse(icmd);
+    for (CoEdge* coedge : getCoEdges()){
+        coedge->collapse(icmd);
     }
 
     free(icmd);
@@ -462,12 +455,9 @@ split(Vertex* new_vtx, std::vector<Edge*>& new_edges, Internal::InfoCommand* icm
 #ifdef _DEBUG_TIMER
    TkUtil::Timer timer(true);
 #endif
-    std::vector<CoEdge* > coedges;
-    getCoEdges(coedges);
-
-    for (std::vector<CoEdge* >::iterator iter = coedges.begin();
-            iter != coedges.end(); ++iter)
-        (*iter)->saveCoEdgeTopoProperty(icmd);
+    std::vector<CoEdge* > coedges = getCoEdges();
+    for (CoEdge* coedge : coedges)
+        coedge->saveCoEdgeTopoProperty(icmd);
 
     // recherche des 2 groupes d'arêtes communes
     // on part d'une extrémité de l'arête
@@ -515,12 +505,9 @@ split(Vertex* new_vtx1, Vertex* new_vtx2, std::vector<Edge*>& new_edges, Interna
    TkUtil::Timer timer(true);
 #endif
 
-    std::vector<CoEdge* > coedges;
-    getCoEdges(coedges);
-
-    for (std::vector<CoEdge* >::iterator iter = coedges.begin();
-            iter != coedges.end(); ++iter)
-        (*iter)->saveCoEdgeTopoProperty(icmd);
+    std::vector<CoEdge* > coedges = getCoEdges();
+    for (CoEdge* coedge : coedges)
+        coedge->saveCoEdgeTopoProperty(icmd);
 
     // recherche des 3 groupes d'arêtes communes
     // on part d'une extrémité de l'arête
@@ -643,9 +630,7 @@ getDescription (bool alsoComputed) const
     topoProprietes.addProperty (
             Utils::SerializedRepresentation::Property ("Nombre de bras", (long)getNbMeshingEdges()));
 
-    std::vector<CoEdge* > ce;
-    getCoEdges(ce);
-
+    std::vector<CoEdge* > ce = getCoEdges();
     for (std::vector<Topo::CoEdge*>::iterator iter = ce.begin( ); ce.end( )!=iter; iter++)
     	if (getRatio(*iter) > 1)
     		topoProprietes.addProperty (
@@ -659,9 +644,7 @@ getDescription (bool alsoComputed) const
 
     Utils::SerializedRepresentation  topoRelation ("Relations topologiques", "");
 
-    std::vector<Topo::Vertex* > vtx;
-    getVertices(vtx);
-
+    std::vector<Topo::Vertex* > vtx = getVertices();
     Utils::SerializedRepresentation  vertices ("Sommets topologiques",
             TkUtil::NumericConversions::toStr(vtx.size()));
     for (std::vector<Topo::Vertex*>::iterator iter = vtx.begin( ); vtx.end( )!=iter; iter++)
@@ -680,9 +663,7 @@ getDescription (bool alsoComputed) const
    topoRelation.addPropertiesSet (coedges);
 
 
-   std::vector<CoFace* > fa;
-   getCoFaces(fa);
-
+   std::vector<CoFace* > fa = getCoFaces();
    Utils::SerializedRepresentation  cofaces ("Faces communes topologiques",
            TkUtil::NumericConversions::toStr(fa.size()));
    for (std::vector<Topo::CoFace*>::iterator iter = fa.begin( ); fa.end( )!=iter; iter++)
@@ -821,9 +802,9 @@ Topo::TopoInfo Edge::getInfos() const
 	Topo::TopoInfo infos;
 	infos.name = getName();
 	infos.dimension = getDim();
-	getVertices(infos.incident_vertices);
-	getCoEdges(infos.incident_coedges);
-	getCoFaces(infos.incident_cofaces);
+	infos.incident_vertices = getVertices();
+	infos.incident_coedges = getCoEdges();
+	infos.incident_cofaces = getCoFaces();
 	infos.geom_entity = getGeomAssociation();
 	return infos;
 }
@@ -899,27 +880,23 @@ void Edge::getPoints(std::vector<Utils::Math::Point> &points) const
 //	std::cout<<"Edge::getPoints pour "<<getName()<<std::endl;
 
     // utilise les CoEdge pour obtenir les points internes de l'arête
-
-    std::vector<CoEdge* > coedges;
-    getCoEdges(coedges);
     Vertex* v_dep = getVertex(0);
     Vertex* v_opp = 0;
 
-	for (std::vector<CoEdge* >::iterator iter = coedges.begin();
-			iter != coedges.end(); ++iter){
+	for (CoEdge* coedge : getCoEdges()){
 
-		int ratio = getRatio(*iter);
+		int ratio = getRatio(coedge);
 
-		v_opp = (*iter)->getOppositeVertex(v_dep);
+		v_opp = coedge->getOppositeVertex(v_dep);
 
 		std::vector<Utils::Math::Point> coedge_points; // les points de la CoEdge
-		(*iter)->getPoints(coedge_points);
+		coedge->getPoints(coedge_points);
 
-//		std::cout<<" => CoEdge::getPoints pour "<<(*iter)->getName()
+//		std::cout<<" => CoEdge::getPoints pour "<<(coedge)->getName()
 //				<<", v_dep : "<<v_dep->getName()<<", v_opp : "<<v_opp->getName()<<std::endl;
 
 		// si sens inverse / edge, on permute les points
-		if ((*iter)->getVertex(0) != v_dep){
+		if (coedge->getVertex(0) != v_dep){
 //			std::cout<<"  inversion du sens ..."<<std::endl;
 			uint nb = coedge_points.size();
 			for (uint i=0; i<nb/2; i++){
@@ -931,7 +908,7 @@ void Edge::getPoints(std::vector<Utils::Math::Point> &points) const
 
 		std::vector<Utils::Math::Point>::iterator iter2 = coedge_points.begin();
 
-		uint nb_bras = (*iter)->getNbMeshingEdges() / ratio;
+		uint nb_bras = coedge->getNbMeshingEdges() / ratio;
 
 		if (v_dep == getVertex(0))
 			points.push_back(*iter2);
@@ -959,7 +936,7 @@ getNbVertices() const
         log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
     }
 #endif
-    return m_topo_property->getVertexContainer().getNb();
+    return m_topo_property->getVertexContainer().size();
 }
 /*----------------------------------------------------------------------------*/
 void Edge::getAllVertices(std::vector<Vertex* >& vertices, const bool unique) const
@@ -1235,13 +1212,8 @@ isEdited() const
 /*----------------------------------------------------------------------------*/
 CoEdge* Edge::getCoEdge(Vertex* vtx1, Vertex* vtx2)
 {
-    std::vector<CoEdge* > coedges;
-    getCoEdges(coedges);
-
     uint nb = 0;
-    for (std::vector<CoEdge* >::iterator iter = coedges.begin();
-            iter != coedges.end(); ++iter){
-     CoEdge* coedge = *iter;
+    for (CoEdge* coedge : getCoEdges()){
         if ((vtx1 == coedge->getVertex(0) && vtx2 == coedge->getVertex(1))
                 || (vtx2 == coedge->getVertex(0) && vtx1 == coedge->getVertex(1)))
             return coedge;
@@ -1254,8 +1226,7 @@ CoEdge* Edge::getCoEdge(Vertex* vtx1, Vertex* vtx2)
 /*----------------------------------------------------------------------------*/
 void Edge::computeCoEdgesPath(Vertex* v1, Vertex* v2, std::list<std::pair<CoEdge*, bool>>& path)
 {
-    std::vector<CoEdge* > coedges;
-    getCoEdges(coedges);
+    std::vector<CoEdge* > coedges = getCoEdges();
     Vertex* from_vertex = v1;
 
     if (from_vertex == v2 && coedges.size()==1) {

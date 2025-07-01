@@ -1694,7 +1694,7 @@ createSphereTopo1BlockDemi(Geom::PropertySphere* propertySph)
     for (uint i=0; i<8; i++)
         b1->getVertex(i)->setGeomAssociation(surfaces[0]);
 
-    b1->getFace(Block::j_min)->getCoFaces(cofaces);
+    cofaces = b1->getFace(Block::j_min)->getCoFaces();
     if (cofaces[0]->find(b1->getVertex(0))){
         cofaces[0]->setGeomAssociation(surfaces[2]);
         cofaces[1]->setGeomAssociation(surfaces[1]);
@@ -2287,7 +2287,7 @@ createSphereTopoOGridDemiDeg(Geom::PropertySphere* propertySph)
     Vertex* v2 = b5->getVertex(0);
     Vertex* v3 = b5->getVertex(2);
 
-    b4->getFace(Block::i_min)->getCoFaces(cofaces);
+    cofaces = b4->getFace(Block::i_min)->getCoFaces();
     if (cofaces[0]->find(v0)){
         cofaces[0]->setGeomAssociation(surfaces[2]);
         cofaces[1]->setGeomAssociation(surfaces[1]);
@@ -2297,7 +2297,7 @@ createSphereTopoOGridDemiDeg(Geom::PropertySphere* propertySph)
     } else
         throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b4", TkUtil::Charset::UTF_8));
 
-    b5->getFace(Block::i_min)->getCoFaces(cofaces);
+    cofaces = b5->getFace(Block::i_min)->getCoFaces();
     if (cofaces[0]->find(v2)){
         cofaces[0]->setGeomAssociation(surfaces[2]);
         cofaces[1]->setGeomAssociation(surfaces[1]);
@@ -2505,7 +2505,7 @@ createSphereTopoOGridDemiNonDeg(Geom::PropertySphere* propertySph)
     Vertex* v6 = b1->getVertex(6);
     Vertex* v7 = b1->getVertex(7);
 
-    b1->getFace(Block::k_max)->getCoFaces(cofaces);
+    cofaces = b1->getFace(Block::k_max)->getCoFaces();
     if (cofaces[0]->find(v4) || cofaces[0]->find(v6)){
         cofaces[0]->setGeomAssociation(surfaces[2]);
         cofaces[1]->setGeomAssociation(surfaces[1]);
@@ -2515,7 +2515,7 @@ createSphereTopoOGridDemiNonDeg(Geom::PropertySphere* propertySph)
     } else
         throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b1", TkUtil::Charset::UTF_8));
 
-    b4->getFace(Block::i_min)->getCoFaces(cofaces);
+    cofaces = b4->getFace(Block::i_min)->getCoFaces();
     if (cofaces[0]->find(v4) || cofaces[0]->find(v6)){
         cofaces[0]->setGeomAssociation(surfaces[2]);
         cofaces[1]->setGeomAssociation(surfaces[1]);
@@ -2525,7 +2525,7 @@ createSphereTopoOGridDemiNonDeg(Geom::PropertySphere* propertySph)
     } else
         throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b4", TkUtil::Charset::UTF_8));
 
-    b5->getFace(Block::i_min)->getCoFaces(cofaces);
+    cofaces = b5->getFace(Block::i_min)->getCoFaces();
     if (cofaces[0]->find(v4) || cofaces[0]->find(v6)){
         cofaces[0]->setGeomAssociation(surfaces[2]);
         cofaces[1]->setGeomAssociation(surfaces[1]);
@@ -4180,11 +4180,8 @@ snapVertices()
 	std::vector<Block*> blocks;
 	getBlocks(blocks);
 
-	for (uint i=0; i<blocks.size(); i++){
-		std::vector<Vertex*> vertices;
-		blocks[i]->getVertices(vertices);
-		for (uint j=0; j<vertices.size(); j++){
-			Vertex* vtx = vertices[j];
+	for (Block* block : blocks){
+		for (Vertex* vtx : block->getVertices()){
 			if (vtx->getGeomAssociation()){
 				Geom::GeomEntity* ge = vtx->getGeomAssociation();
 				if (ge->getType() == Utils::Entity::GeomVertex){

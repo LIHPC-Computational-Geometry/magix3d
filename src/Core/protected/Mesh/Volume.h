@@ -128,7 +128,7 @@ public:
 
     /*----------------------------------------------------------------------------*/
     ///  Fournit l'accès aux blocs topologiques qui ont participées à la constitution du volume
-    void getBlocks(std::vector<Topo::Block* >& blocs) const;
+    std::vector<Topo::Block* >& getBlocks() const;
 
     /** supprime les relations vers les blocs */
     void clearBlocks()

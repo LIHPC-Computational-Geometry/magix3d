@@ -40,28 +40,12 @@ MesquiteDomainImplAdapter(
   m_mesquite2GMDSNodes(AMesquite2GMDSNodes),
   m_mesquite2GMDSCells2D(AMesquite2GMDSCells2D), m_mesquite2GMDSCells3D(AMesquite2GMDSCells3D)
 {
-	std::vector<Topo::Block*  > blocks;
-	std::vector<Topo::CoFace* > coFaces;
-	std::vector<Topo::CoEdge* > coEdges;
-	std::vector<Topo::Vertex* > vertices;
-
-	m_topoManager.getBlocks(blocks);
-	m_topoManager.getCoFaces(coFaces);
-	m_topoManager.getCoEdges(coEdges);
-	m_topoManager.getVertices(vertices);
-
-//	for(unsigned int iBlock=0; iBlock<blocks.size(); iBlock++) {
-//		std::vector<gmds::Region*>& regions = blocks[iBlock]->regions();
-//		Geom::GeomEntity* vol_tmp = blocks[iBlock]->getGeomAssociation();
-//		Geom::Volume* vol_tmp2 = dynamic_cast<Geom::Volume*> (vol_tmp);
-//	}
-
 	gmds::Mesh & gmds_mesh = m_meshManager.getMesh()->getGMDSMesh();
-	for(unsigned int iCoFace=0; iCoFace<coFaces.size(); iCoFace++) {
+	for(Topo::CoFace* coface : m_topoManager.getCoFacesObj()) {
 
-		if(coFaces[iCoFace]->isMeshed()) {
-			std::vector<gmds::TCellID>& faces = coFaces[iCoFace]->faces();
-			Geom::GeomEntity* surf = coFaces[iCoFace]->getGeomAssociation();
+		if(coface->isMeshed()) {
+			std::vector<gmds::TCellID>& faces = coface->faces();
+			Geom::GeomEntity* surf = coface->getGeomAssociation();
 
 			// a CoFace is not necessarily associated to a geometry
 			if(NULL != surf) {
@@ -78,12 +62,12 @@ MesquiteDomainImplAdapter(
 		}
 	}
 
-	for(unsigned int iCoEdge=0; iCoEdge<coEdges.size(); iCoEdge++) {
+	for(Topo::CoEdge* coedge : m_topoManager.getCoEdgesObj()) {
 
-		if(coEdges[iCoEdge]->isMeshed()) {
-			std::vector<gmds::TCellID>& nodes = coEdges[iCoEdge]->nodes();
+		if(coedge->isMeshed()) {
+			std::vector<gmds::TCellID>& nodes = coedge->nodes();
 
-			Geom::GeomEntity* curv = coEdges[iCoEdge]->getGeomAssociation();
+			Geom::GeomEntity* curv = coedge->getGeomAssociation();
 
 			// a CoEdge is not necessarily associated to a geometry
 			if(NULL != curv) {
@@ -95,23 +79,18 @@ MesquiteDomainImplAdapter(
 		}
 	}
 
-	for(unsigned int iVertex=0; iVertex<vertices.size(); iVertex++) {
+	for(Topo::Vertex* topovert : m_topoManager.getVerticesObj()) {
 
-		if(vertices[iVertex]->isMeshed()) {
-			gmds::Node node = gmds_mesh.get<gmds::Node>(vertices[iVertex]->getNode());
-			Geom::GeomEntity* vertex = vertices[iVertex]->getGeomAssociation();
+		if(topovert->isMeshed()) {
+			gmds::Node node = gmds_mesh.get<gmds::Node>(topovert->getNode());
+			Geom::GeomEntity* vertex = topovert->getGeomAssociation();
 
 			if(NULL != vertex) {
-
 				m_nodes2GeomEntity[node.id()] = vertex;
 				m_nodesIsOnVertex[node.id()] = true;
 			}
 		}
 	}
-
-//	ABlock->getCoFaces(block_faces);
-//	ABlock->getCoEdges(block_edges);
-//	ABlock->getVertices(block_vertices);
 }
 /*----------------------------------------------------------------------------*/
 MesquiteDomainImplAdapter::~MesquiteDomainImplAdapter()

@@ -166,10 +166,8 @@ void CommandExtrudeTopo::constructExtrudeCoEdges(std::vector<CoFace*>& cofaces_0
 
     for (; iter1_0 != cofaces_0.end(); ++iter1_0, ++iter1_1){
 
-        std::vector<Edge* > edges_0;
-        std::vector<Edge* > edges_1;
-        (*iter1_0)->getEdges(edges_0);
-        (*iter1_1)->getEdges(edges_1);
+        std::vector<Edge* > edges_0 = (*iter1_0)->getEdges();
+        std::vector<Edge* > edges_1 = (*iter1_1)->getEdges();
 
         if (edges_0.size() != edges_1.size())
             throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructExtrudeCoEdges avec des nombres de Edge différents", TkUtil::Charset::UTF_8));
@@ -179,10 +177,8 @@ void CommandExtrudeTopo::constructExtrudeCoEdges(std::vector<CoFace*>& cofaces_0
 
         for (; iter2_0 != edges_0.end(); ++iter2_0, ++iter2_1){
 
-            std::vector<CoEdge* > coedges_0;
-            std::vector<CoEdge* > coedges_1;
-            (*iter2_0)->getCoEdges(coedges_0);
-            (*iter2_1)->getCoEdges(coedges_1);
+            std::vector<CoEdge* > coedges_0 = (*iter2_0)->getCoEdges();
+            std::vector<CoEdge* > coedges_1 = (*iter2_1)->getCoEdges();
 
             if (coedges_0.size() != coedges_1.size())
                 throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructExtrudeCoEdges avec des nombres de CoEdge différents", TkUtil::Charset::UTF_8));
@@ -192,10 +188,8 @@ void CommandExtrudeTopo::constructExtrudeCoEdges(std::vector<CoFace*>& cofaces_0
 
             for (; iter3_0 != coedges_0.end(); ++iter3_0, ++iter3_1){
 
-                std::vector<Vertex* > vertices_0;
-                std::vector<Vertex* > vertices_1;
-                (*iter3_0)->getVertices(vertices_0);
-                (*iter3_1)->getVertices(vertices_1);
+                std::vector<Vertex* > vertices_0 = (*iter3_0)->getVertices();
+                std::vector<Vertex* > vertices_1 = (*iter3_1)->getVertices();
 
                 if (vertices_0.size() != vertices_1.size())
                     throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructExtrudeCoEdges avec des nombres de Vertex différents", TkUtil::Charset::UTF_8));
@@ -246,10 +240,8 @@ void CommandExtrudeTopo::constructExtrudeFaces(std::vector<CoFace*>& cofaces_0,
 
     for (; iter1_0 != cofaces_0.end(); ++iter1_0, ++iter1_1){
 
-        std::vector<Edge* > edges_0;
-        std::vector<Edge* > edges_1;
-        (*iter1_0)->getEdges(edges_0);
-        (*iter1_1)->getEdges(edges_1);
+        std::vector<Edge* > edges_0 = (*iter1_0)->getEdges();
+        std::vector<Edge* > edges_1 = (*iter1_1)->getEdges();
 
         if (edges_0.size() != edges_1.size())
             throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructExtrudeFaces avec des nombres de Edge différents", TkUtil::Charset::UTF_8));
@@ -259,10 +251,8 @@ void CommandExtrudeTopo::constructExtrudeFaces(std::vector<CoFace*>& cofaces_0,
 
         for (; iter2_0 != edges_0.end(); ++iter2_0, ++iter2_1){
 
-            std::vector<CoEdge* > coedges_0;
-            std::vector<CoEdge* > coedges_1;
-            (*iter2_0)->getCoEdges(coedges_0);
-            (*iter2_1)->getCoEdges(coedges_1);
+            std::vector<CoEdge* > coedges_0 = (*iter2_0)->getCoEdges();
+            std::vector<CoEdge* > coedges_1 = (*iter2_1)->getCoEdges();
 
             if (coedges_0.size() != coedges_1.size())
                 throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructExtrudeFaces avec des nombres de CoEdge différents", TkUtil::Charset::UTF_8));
@@ -277,10 +267,8 @@ void CommandExtrudeTopo::constructExtrudeFaces(std::vector<CoFace*>& cofaces_0,
                 if (filtre_vu[coedge_0] == 0){
                     filtre_vu[coedge_0] = 1;
 
-                    std::vector<Vertex* > vertices_0;
-                    std::vector<Vertex* > vertices_1;
-                    (*iter3_0)->getVertices(vertices_0);
-                    (*iter3_1)->getVertices(vertices_1);
+                    std::vector<Vertex* > vertices_0 = (*iter3_0)->getVertices();
+                    std::vector<Vertex* > vertices_1 = (*iter3_1)->getVertices();
 
                     if (vertices_0.size() != vertices_1.size())
                         throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructExtrudeFaces avec des nombres de Vertex différents", TkUtil::Charset::UTF_8));
@@ -427,9 +415,7 @@ void CommandExtrudeTopo::constructExtrudeBlocks(std::vector<CoFace*>& cofaces_0,
 
         	std::vector<CoFace* > face_cofaces;
 
-        	std::vector<CoEdge* > coedges_0;
-        	edge_0->getCoEdges(coedges_0);
-
+        	std::vector<CoEdge* > coedges_0 = edge_0->getCoEdges();
         	for (std::vector<CoEdge* >::iterator iter3 = coedges_0.begin();
         			iter3 != coedges_0.end(); ++iter3){
         		std::vector<CoFace* >& revol_cofaces = coedge2cofaces[*iter3];

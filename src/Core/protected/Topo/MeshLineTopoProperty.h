@@ -39,14 +39,14 @@ class CoEdge;
      /** Création d'un clone, on copie toutes les informations */
      MeshLineTopoProperty* clone() {
          MeshLineTopoProperty* prop = new MeshLineTopoProperty();
-         prop->m_coedges.clone(m_coedges);
+         prop->m_coedges.insert(prop->m_coedges.end(), m_coedges.begin(), m_coedges.end());
 
          return prop;
      }
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des arêtes communes
-     Utils::Container<CoEdge>& getCoEdgeContainer() {return m_coedges;}
+     std::vector<CoEdge*>& getCoEdgeContainer() {return m_coedges;}
 
      /*------------------------------------------------------------------------*/
      /** \brief   Suppression des relations
@@ -58,7 +58,7 @@ class CoEdge;
 
  private:
      /// Lien avec les arêtes communes sur lesquelles se base ce nuage
-     Utils::Container<CoEdge> m_coedges;
+     std::vector<CoEdge*> m_coedges;
 
 };
 /*----------------------------------------------------------------------------*/

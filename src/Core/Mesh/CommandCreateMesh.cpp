@@ -697,7 +697,7 @@ void CommandCreateMesh::addNewCloud(const std::string& name)
 
     getInfoCommand().addMeshInfoEntity(cl, Internal::InfoCommand::CREATED);
     getMeshManager().add(cl);
-    m_created_clouds.add(cl);
+    m_created_clouds.push_back(cl);
 }
 /*----------------------------------------------------------------------------*/
 void CommandCreateMesh::addNewLine(const std::string& name)
@@ -710,7 +710,7 @@ void CommandCreateMesh::addNewLine(const std::string& name)
 
     getInfoCommand().addMeshInfoEntity(ln, Internal::InfoCommand::CREATED);
     getMeshManager().add(ln);
-    m_created_lines.add(ln);
+    m_created_lines.push_back(ln);
 }
 /*----------------------------------------------------------------------------*/
 void CommandCreateMesh::addNewSurface(const std::string& name)
@@ -723,7 +723,7 @@ void CommandCreateMesh::addNewSurface(const std::string& name)
 
     getInfoCommand().addMeshInfoEntity(sf, Internal::InfoCommand::CREATED);
     getMeshManager().add(sf);
-    m_created_surfaces.add(sf);
+    m_created_surfaces.push_back(sf);
 }
 /*----------------------------------------------------------------------------*/
 void CommandCreateMesh::addNewVolume(const std::string& name)
@@ -736,7 +736,7 @@ void CommandCreateMesh::addNewVolume(const std::string& name)
 
     getInfoCommand().addMeshInfoEntity(vo, Internal::InfoCommand::CREATED);
     getMeshManager().add(vo);
-    m_created_volumes.add(vo);
+    m_created_volumes.push_back(vo);
 }
 /*----------------------------------------------------------------------------*/
 void CommandCreateMesh::addModifiedCloud(const std::string& name)
@@ -954,27 +954,26 @@ deleteCreatedMeshGroups()
     if (m_strategy == MeshManager::MODIFIABLE){
 
         // désenregistrement du MeshManager des groupes créés
-        for (std::vector<Cloud*>::const_iterator iter = m_created_clouds.get().begin();
-                iter != m_created_clouds.get().end(); ++iter)
+        for (std::vector<Cloud*>::const_iterator iter = m_created_clouds.begin();
+                iter != m_created_clouds.end(); ++iter)
             getMeshManager().remove(*iter);
 
-        for (std::vector<Line*>::const_iterator iter = m_created_lines.get().begin();
-                iter != m_created_lines.get().end(); ++iter)
+        for (std::vector<Line*>::const_iterator iter = m_created_lines.begin();
+                iter != m_created_lines.end(); ++iter)
             getMeshManager().remove(*iter);
 
-        for (std::vector<Surface*>::const_iterator iter = m_created_surfaces.get().begin();
-                iter != m_created_surfaces.get().end(); ++iter)
+        for (std::vector<Surface*>::const_iterator iter = m_created_surfaces.begin();
+                iter != m_created_surfaces.end(); ++iter)
             getMeshManager().remove(*iter);
 
-        for (std::vector<Volume*>::const_iterator iter = m_created_volumes.get().begin();
-                iter != m_created_volumes.get().end(); ++iter)
+        for (std::vector<Volume*>::const_iterator iter = m_created_volumes.begin();
+                iter != m_created_volumes.end(); ++iter)
             getMeshManager().remove(*iter);
 
-        m_created_clouds.deleteAndClear();
-        m_created_lines.deleteAndClear();
-        m_created_surfaces.deleteAndClear();
-        m_created_volumes.deleteAndClear();
-
+        Utils::deleteAndClear(m_created_clouds);
+        Utils::deleteAndClear(m_created_lines);
+        Utils::deleteAndClear(m_created_surfaces);
+        Utils::deleteAndClear(m_created_volumes);
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -1015,9 +1014,7 @@ meshAndModify(std::list<Topo::CoFace*>& list_cofaces)
 		} // end if getGeomAssociation
 
 		// les groupes depuis les faces
-		Utils::Container<Group::Group2D>& grp2d = coface->getGroupsContainer();
-		for (uint i=0; i<grp2d.getNb(); i++){
-			Group::Group2D* grp = grp2d.get(i);
+		for (Group::Group2D* grp : coface->getGroupsContainer()){
 			if (grp->getNbMeshModif() != 0)
 				list_grp.push_back(grp);
 		}
@@ -1073,11 +1070,9 @@ meshAndModify(std::list<Topo::CoFace*>& list_cofaces)
 #ifdef _DEBUG2
 				std::cout<<"  on doit mailler "<<coface->getName()<<std::endl;
 #endif
-				std::vector<Topo::Vertex*> vertices;
-				coface->getVertices(vertices);
-				for (uint i=0; i<vertices.size(); i++){
-					if (!vertices[i]->isMeshed())
-						mesh (vertices[i]);
+				for (Topo::Vertex* v : coface->getVertices()) {
+					if (!v->isMeshed())
+						mesh (v);
 				}
 
 				std::vector<Topo::CoEdge*> aretes;
@@ -1282,9 +1277,7 @@ modify(std::vector<Topo::Block*>& list_blocks)
 		}
 
 		// les groupes depuis les blocs
-		Utils::Container<Group::Group3D>& grp3d = block->getGroupsContainer();
-		for (uint i=0; i<grp3d.getNb(); i++){
-			Group::Group3D* grp = grp3d.get(i);
+		for (Group::Group3D* grp : block->getGroupsContainer()){
 			if (grp->getNbMeshModif() != 0)
 				list_grp.push_back(grp);
 		}

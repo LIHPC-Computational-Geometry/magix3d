@@ -4444,90 +4444,42 @@ sectionByPlane( std::vector<Geom::GeomEntity*>& entities,
 /*----------------------------------------------------------------------------*/
 std::vector<Volume*> GeomManager::getVolumesObj() const
 {
-    std::vector<Volume*> v_vol;
-    for (std::vector<Volume*>::const_iterator iter = m_volumes.begin();
-    		iter != m_volumes.end(); ++iter)
-    	if (!(*iter)->isDestroyed())
-    		v_vol.push_back(*iter);
-
-    return v_vol;
+    return Utils::getEntities(m_volumes);
 }
 /*----------------------------------------------------------------------------*/
 std::vector<std::string> GeomManager::getVolumes() const
 {
-    std::vector<std::string> v_vol;
-    for (std::vector<Volume*>::const_iterator iter = m_volumes.begin();
-    		iter != m_volumes.end(); ++iter)
-    	if (!(*iter)->isDestroyed())
-    		v_vol.push_back((*iter)->getName());
-
-    return v_vol;
+    return Utils::getEntityNames(m_volumes);
 }
 /*----------------------------------------------------------------------------*/
 std::vector<Surface*> GeomManager::getSurfacesObj() const
 {
-    std::vector<Surface*> v_surf;
-    for (std::vector<Surface*>::const_iterator iter = m_surfaces.begin();
-    		iter != m_surfaces.end(); ++iter)
-    	if (!(*iter)->isDestroyed())
-    		v_surf.push_back(*iter);
-
-    return v_surf;
+    return Utils::getEntities(m_surfaces);
 }
 /*----------------------------------------------------------------------------*/
 std::vector<std::string> GeomManager::getSurfaces() const
 {
-    std::vector<std::string> v_surf;
-    for (std::vector<Surface*>::const_iterator iter = m_surfaces.begin();
-    		iter != m_surfaces.end(); ++iter)
-    	if (!(*iter)->isDestroyed())
-    		v_surf.push_back((*iter)->getName());
-
-    return v_surf;
+    return Utils::getEntityNames(m_surfaces);
 }
 /*----------------------------------------------------------------------------*/
 std::vector<Curve*> GeomManager::getCurvesObj() const
 {
-    std::vector<Curve*> v_cur;
-    for (std::vector<Curve*>::const_iterator iter = m_curves.begin();
-    		iter != m_curves.end(); ++iter)
-    	if (!(*iter)->isDestroyed())
-    		v_cur.push_back(*iter);
-
-    return v_cur;
+    return Utils::getEntities(m_curves);
 }
 /*----------------------------------------------------------------------------*/
 std::vector<std::string> GeomManager::getCurves() const
 {
-    std::vector<std::string> v_cur;
-    for (std::vector<Curve*>::const_iterator iter = m_curves.begin();
-    		iter != m_curves.end(); ++iter)
-    	if (!(*iter)->isDestroyed())
-    		v_cur.push_back((*iter)->getName());
-
-    return v_cur;
+    return Utils::getEntityNames(m_curves);
 }
 /*----------------------------------------------------------------------------*/
 std::vector<Vertex*> GeomManager::getVerticesObj() const
 {
-    std::vector<Vertex*> v_ver;
-    for (std::vector<Vertex*>::const_iterator iter = m_vertices.begin();
-    		iter != m_vertices.end(); ++iter)
-    	if (!(*iter)->isDestroyed())
-    		v_ver.push_back(*iter);
-
-    return v_ver;
+    return Utils::getEntities(m_vertices);
 }
 /*----------------------------------------------------------------------------*/
 std::vector<std::string> GeomManager::getVertices() const
 {
-    std::vector<std::string> v_ver;
-    for (std::vector<Vertex*>::const_iterator iter = m_vertices.begin();
-    		iter != m_vertices.end(); ++iter)
-    	if (!(*iter)->isDestroyed())
-    		v_ver.push_back((*iter)->getName());
-
-    return v_ver;
+    return Utils::getEntityNames(m_vertices);
 }
 /*----------------------------------------------------------------------------*/
 int GeomManager::getNbVertices() const

@@ -404,8 +404,7 @@ void VTKGMDSEntityRepresentation::createMeshEntityCloudRepresentation( Mesh::Mes
             }
 
             // la liste des Topo::CoFace qui ont contribuées
-            std::vector<Topo::CoFace* > faces;
-            surf->getCoFaces(faces);
+            std::vector<Topo::CoFace* > faces = surf->getCoFaces();
 
             // calcul le nombre total de noeuds (il y a des doublons sur les arêtes, tant pis)
             for (std::vector<Topo::CoFace* >::iterator iter =
@@ -441,8 +440,7 @@ void VTKGMDSEntityRepresentation::createMeshEntityCloudRepresentation( Mesh::Mes
             }
 
             // la liste des Topo::Block qui ont contribués
-            std::vector<Topo::Block* > blocs;
-            vol->getBlocks(blocs);
+            std::vector<Topo::Block* > blocs = vol->getBlocks();
 
             // calcul le nombre total de noeuds (il y a des doublons sur les faces, tant pis)
             for (std::vector<Topo::Block* >::iterator iter =
@@ -689,9 +687,7 @@ createMeshEntitySurfacicRepresentation2D(Mesh::MeshEntity* meshEntity, gmds::Mes
 		throw exc;
 	}
 
-	std::vector<Topo::CoFace*> cofaces;
-
-	surf->getCoFaces(cofaces);
+	std::vector<Topo::CoFace*> cofaces = surf->getCoFaces();
 
 	if (meshEntity->getContext().getRatioDegrad() == 1 || !surf->isStructured())
 		createCoFacesSurfacicRepresentationRatio1(cofaces, gmdsMesh);
@@ -717,8 +713,7 @@ createMeshEntitySurfacicRepresentation3D(Mesh::MeshEntity* meshEntity, gmds::Mes
 		throw exc;
 	}
 	// la liste des Topo::Block qui ont contribués
-	std::vector<Topo::Block* > blocs;
-	vol->getBlocks(blocs);
+	std::vector<Topo::Block* > blocs = vol->getBlocks();
 
 	// la liste des faces externes au groupe de blocs
 	// on utilise une map et on marque les faces à chaque fois qu'elles sont vus
@@ -728,13 +723,13 @@ createMeshEntitySurfacicRepresentation3D(Mesh::MeshEntity* meshEntity, gmds::Mes
 	for (std::vector<Topo::Block* >::iterator iter1 =
 			blocs.begin(); iter1 != blocs.end(); ++iter1)
 	{
-		(*iter1)->getFaces(faces);
+		faces = (*iter1)->getFaces();
 
 		std::vector<Topo::CoFace* > cofaces;
 		for (std::vector<Topo::Face* >::iterator iter2 =
 				faces.begin(); iter2 != faces.end(); ++iter2)
 		{
-			(*iter2)->getCoFaces(cofaces);
+			cofaces = (*iter2)->getCoFaces();
 
 			for (std::vector<Topo::CoFace* >::iterator iter3 =
 					cofaces.begin(); iter3 != cofaces.end();

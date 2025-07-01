@@ -536,8 +536,7 @@ getPreviewRepresentationTopoModif(Utils::DisplayRepresentation& dr)
 #endif
     		// on regarde si l'un des sommets a son nombre d'arêtes qui n'a pas changé
     		bool nb_change = true;
-    		std::vector<Topo::Vertex* > vertices;
-    		coedge->getVertices(vertices);
+    		std::vector<Topo::Vertex* > vertices = coedge->getVertices();
     		for (uint i=0; i<vertices.size(); i++)
     			if (vertices[i]->getNbCoEdges() == nb_coedges_by_vertex[vertices[i]]){
     				nb_change = false;
@@ -585,8 +584,7 @@ getPreviewRepresentationNewCoedges(Utils::DisplayRepresentation& dr)
     	if (t == Internal::InfoCommand::CREATED && te->getType() == Utils::Entity::TopoCoEdge){
     		CoEdge* coedge = dynamic_cast<CoEdge*>(te);
     		CHECK_NULL_PTR_ERROR(coedge);
-    		std::vector<Topo::Vertex* > vertices;
-    		coedge->getVertices(vertices);
+    		std::vector<Topo::Vertex* > vertices = coedge->getVertices();
 #ifdef _DEBUG_PREVIEW
     		std::cout<<"  On ajoute l'arête "<<coedge->getName()<<std::endl;
 #endif
@@ -625,8 +623,7 @@ getPreviewRepresentationCoedgeDisplayModified(Utils::DisplayRepresentation& dr)
     	if (t == Internal::InfoCommand::DISPMODIFIED && te->getType() == Utils::Entity::TopoCoEdge){
     		CoEdge* coedge = dynamic_cast<CoEdge*>(te);
     		CHECK_NULL_PTR_ERROR(coedge);
-    		std::vector<Topo::Vertex* > vertices;
-    		coedge->getVertices(vertices);
+    		std::vector<Topo::Vertex* > vertices = coedge->getVertices();
 #ifdef _DEBUG_PREVIEW
     		std::cout<<"  On ajoute l'arête "<<coedge->getName()<<std::endl;
 #endif
@@ -695,9 +692,8 @@ duplicate(std::vector<CoFace*>& cofaces_dep,
 #ifdef _DEBUG_REVOL
             std::cout<<"== duplique "<<(*iter1)->getName()<<std::endl;
 #endif
-            std::vector<Edge* > edges_dep;
+            std::vector<Edge* > edges_dep = (*iter1)->getEdges();
             std::vector<Edge* > edges_arr;
-            (*iter1)->getEdges(edges_dep);
 
             for (std::vector<Edge* >::iterator iter2 = edges_dep.begin();
                     iter2 != edges_dep.end(); ++iter2){
@@ -705,9 +701,8 @@ duplicate(std::vector<CoFace*>& cofaces_dep,
                 Edge* newEdge = corr_edge[*iter2];
                 if (!newEdge){
 
-                    std::vector<CoEdge* > coedges_dep;
+                    std::vector<CoEdge* > coedges_dep = (*iter2)->getCoEdges();
                     std::vector<CoEdge* > coedges_arr;
-                    (*iter2)->getCoEdges(coedges_dep);
 
                     for (std::vector<CoEdge* >::iterator iter3 = coedges_dep.begin();
                             iter3 != coedges_dep.end(); ++iter3){
@@ -893,8 +888,7 @@ updateGeomAssociation(std::vector<CoFace*>& cofaces,
                     }
                 }
 
-                std::vector<Vertex* > vertices;
-                (*iter3)->getVertices(vertices);
+                std::vector<Vertex* > vertices = (*iter3)->getVertices();
                 getInfoCommand().addTopoInfoEntity(*iter3,Internal::InfoCommand::DISPMODIFIED);
 
                 for (std::vector<Vertex* >::iterator iter4 = vertices.begin();
@@ -968,8 +962,7 @@ updateGeomAssociation(std::vector<CoFace*>& cofaces,
                 if (getInfoCommand().addTopoInfoEntity(*iter3,Internal::InfoCommand::DISPMODIFIED))
                     (*iter3)->saveTopoProperty();
 
-                std::vector<Vertex* > vertices;
-                (*iter3)->getVertices(vertices);
+                std::vector<Vertex* > vertices = (*iter3)->getVertices();
                 getInfoCommand().addTopoInfoEntity(*iter3,Internal::InfoCommand::DISPMODIFIED);
 
                 for (std::vector<Vertex* >::iterator iter4 = vertices.begin();
@@ -1081,8 +1074,7 @@ void CommandEditTopo::mergeCoEdges(Vertex* vtx, std::map<CoEdge*,uint>& keep_coe
 {
 	std::map<Vertex*, CoEdge*> filtre_vertices;
 
-	std::vector<CoEdge*> coedges;
-	vtx->getCoEdges(coedges);
+	std::vector<CoEdge*> coedges = vtx->getCoEdges();
 	for (uint i=0; i<coedges.size(); i++){
 		CoEdge* coedge = coedges[i];
 		Vertex* opp_vtx = coedge->getOppositeVertex(vtx);
@@ -1130,8 +1122,7 @@ void CommandEditTopo::mergeCoFaces(Vertex* vtx, std::map<CoFace*,uint>& keep_cof
 #endif
 
 			// pour chacun des sommets, marque les cofaces adjacentes
-			std::vector<Vertex*> vertices;
-			coface->getVertices(vertices);
+			std::vector<Vertex*> vertices = coface->getVertices();
 
 			for (uint j=0; j<vertices.size(); j++){
 #ifdef _DEBUG_MERGE
@@ -1169,11 +1160,11 @@ void CommandEditTopo::mergeCoFaces(Vertex* vtx, std::map<CoFace*,uint>& keep_cof
 
 				// on vérifie que les sommets communs sont aux extrémités des faces et pas internes à un côté
 				std::map<Vertex*, uint> filtre_vertices;
-				coface1->getVertices(vertices);
+				vertices = coface1->getVertices();
 				for (uint j=0; j<vertices.size(); j++)
 					filtre_vertices[vertices[j]] = 1;
 				uint nb_communs = 0;
-				coface2->getVertices(vertices);
+				vertices = coface2->getVertices();
 				for (uint j=0; j<vertices.size(); j++)
 					nb_communs += filtre_vertices[vertices[j]];
 #ifdef _DEBUG_MERGE

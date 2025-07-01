@@ -213,14 +213,11 @@ bool MeshImplementation::createGMDSGroups()
     // création des clouds, lines, surfaces et volumes gmds correspondants aux
     // Mgx3D::Mesh::Cloud, Line, Surface et Volume
 
-    std::vector<Mesh::Cloud*> clouds;
-    getContext().getMeshManager().getClouds(clouds);
-    std::vector<Mesh::Line*> lines;
-    getContext().getMeshManager().getLines(lines);
-    std::vector<Mesh::Surface*> surfaces;
-    getContext().getMeshManager().getSurfaces(surfaces);
-    std::vector<Mesh::Volume*> volumes;
-    getContext().getMeshManager().getVolumes(volumes);
+	MeshManager& mm = getContext().getMeshManager();
+    std::vector<Mesh::Cloud*> clouds = mm.getClouds();
+    std::vector<Mesh::Line*> lines = mm.getLines();
+    std::vector<Mesh::Surface*> surfaces = mm.getSurfaces();
+    std::vector<Mesh::Volume*> volumes = mm.getVolumes();
 
     std::vector<gmds::CellGroup<gmds::Node>*> createdGMDSClouds;
     std::vector<gmds::CellGroup<gmds::Edge>*> createdGMDSLines;
@@ -268,9 +265,6 @@ bool MeshImplementation::createGMDSGroups()
         auto su = getGMDSMesh().newGroup<gmds::Face>(current_surf->getName());
         createdGMDSSurfaces.push_back(su);
 
-        std::vector<Topo::CoFace* > coFaces;
-        current_surf->getCoFaces(coFaces);
-
         std::vector<gmds::Face> faces;
         current_surf->getGMDSFaces(faces);
 
@@ -283,9 +277,6 @@ bool MeshImplementation::createGMDSGroups()
         Mesh::Volume* current_vol = volumes[iVol];
         auto vo = getGMDSMesh().newGroup<gmds::Region>(current_vol->getName());
         createdGMDSVolumes.push_back(vo);
-
-        std::vector<Topo::Block* > blocks;
-        current_vol->getBlocks(blocks);
 
         std::vector<gmds::Region> regions;
         current_vol->getGMDSRegions(regions);
@@ -418,8 +409,6 @@ void MeshImplementation::writeCGNS(std::string nom)
 // REM CP : pour ne pas dépendre de l'option +scoping (sous spack) de CGNS on utilise
 // ici la macro CGNS_ENUMV.
 
-	std::vector<Topo::Block*> blocks;
-	getContext().getTopoManager().getBlocks(blocks, true);
 	gmds::Mesh& gmdsMesh = getGMDSMesh();
 
 	int index_file, icelldim, iphysdim, index_base;
@@ -439,8 +428,7 @@ void MeshImplementation::writeCGNS(std::string nom)
 		throw TkUtil::Exception (TkUtil::UTF8String ("Erreur dans cg_base_write", TkUtil::Charset::UTF_8));
 
 	// on ajoute un à un tous les blocks maillés et structurés
-	for (uint i=0; i<blocks.size(); i++){
-		Topo::Block* bloc = blocks[i];
+	for (Topo::Block* bloc : getContext().getTopoManager().getBlocksObj(true)){
 		if (bloc->isMeshed() && bloc->isStructured()){
 
 			if (bloc->getNbVertices() != 8){
@@ -541,8 +529,7 @@ void MeshImplementation::writeCGNS(std::string nom)
 					}
 
 					// recherche des indices de noeuds dans les blocs pour les extrémités (les sommets) des faces communes
-					std::vector<Topo::Vertex*> coface_vertices;
-					coface->getVertices(coface_vertices);
+					std::vector<Topo::Vertex*>& coface_vertices = coface->getVertices();
 
 					// stockage des indices par sommet
 					std::vector<std::vector<uint> > idxIJK_vertices;
@@ -936,15 +923,11 @@ void MeshImplementation::deleteGMDSGroups()
     // destruction des clouds, surfaces et volumes gmds correspondants aux
     // Mgx3D::Mesh::Cloud, Surface et Volume
 
-    std::vector<Mesh::Cloud*> clouds;
-    getContext().getMeshManager().getClouds(clouds);
-    std::vector<Mesh::Line*> lines;
-    getContext().getMeshManager().getLines(lines);
-    std::vector<Mesh::Surface*> surfaces;
-    getContext().getMeshManager().getSurfaces(surfaces);
-    std::vector<Mesh::Volume*> volumes;
-    getContext().getMeshManager().getVolumes(volumes);
-
+	MeshManager& mm = getContext().getMeshManager();
+    std::vector<Mesh::Cloud*> clouds = mm.getClouds();
+    std::vector<Mesh::Line*> lines = mm.getLines();
+    std::vector<Mesh::Surface*> surfaces = mm.getSurfaces();
+    std::vector<Mesh::Volume*> volumes = mm.getVolumes();
 
     for(unsigned int iCloud=0; iCloud<clouds.size(); iCloud++) {
         Mesh::Cloud* current_cloud = clouds[iCloud];
@@ -1078,10 +1061,8 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::Block* bl)
         if (getContext().getMeshDim() == Internal::Context::MESH2D)
         	throw TkUtil::Exception (TkUtil::UTF8String ("Il n'est pas possible de mailler des blocs alors que le maillage n'est pas 3D en sortie", TkUtil::Charset::UTF_8));
 
-		std::vector<Topo::Face* > faces;
-		bl->getFaces(faces);
-		for (uint i=0; i<faces.size(); i++) {
-			mesh(command, faces[i]);
+		for (Topo::Face* f : bl->getFaces()) {
+			mesh(command, f);
 		}
 
         bl->saveBlockMeshingData(&command->getInfoCommand());
@@ -1102,10 +1083,8 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::Block* bl)
 /*----------------------------------------------------------------------------*/
 void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::Face* fa)
 {
-    std::vector<Topo::CoFace* > cofaces;
-    fa->getCoFaces(cofaces);
-    for (uint i=0; i<cofaces.size(); i++) {
-        mesh(command, cofaces[i]);
+    for (Topo::CoFace* f : fa->getCoFaces()) {
+        mesh(command, f);
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -1158,10 +1137,8 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::CoFace* fa
 /*----------------------------------------------------------------------------*/
 void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::Edge* ed)
 {
-    std::vector<Topo::CoEdge* > coedges;
-    ed->getCoEdges(coedges);
-    for (uint i=0; i<coedges.size(); i++)
-        mesh(command, coedges[i]);
+    for (Topo::CoEdge* e : ed->getCoEdges())
+        mesh(command, e);
 }
 /*----------------------------------------------------------------------------*/
 /// Construction des points du maillage d'une arête

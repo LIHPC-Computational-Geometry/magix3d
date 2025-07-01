@@ -288,14 +288,11 @@ getDescription (bool alsoComputed) const
     return description.release ( );
 }
 /*----------------------------------------------------------------------------*/
-std::string TopoEntity::getSummary ( ) const
+std::string TopoEntity::getSummary(const std::vector<Topo::Vertex*>& vertices) const
 {
-    std::vector<Topo::Vertex* > vertices;
-    getVertices(vertices);
 	TkUtil::UTF8String	summary (TkUtil::Charset::UTF_8);
-    for (std::vector<Topo::Vertex*>::iterator itv = vertices.begin( ); vertices.end( )!=itv; itv++)
-            summary << (*itv)->getName ( ) <<" ";
-
+    for (Topo::Vertex* vtx : vertices)
+            summary << vtx->getName ( ) <<" ";
 	return summary.ascii ( );
 }
 /*----------------------------------------------------------------------------*/

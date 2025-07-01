@@ -96,28 +96,22 @@ namespace Mgx3D {
                 f->setGeomAssociation(0);
 
                 //Réinitialisation associations géométriques des sommets des faces, possible doublons
-                std::vector<Vertex*> f_vertices;
-                f->getVertices(f_vertices);
-                for(auto v : f_vertices){
+                for(auto v : f->getVertices()){
                     v->setGeomAssociation(0);
                 }
 
                 //Réinitialisation associations géométriques des aretes des faces, possible doublons
-                std::vector<Edge*> f_edges;
-                f->getEdges(f_edges);
-                for(auto e : f_edges){
+                for(auto e : f->getEdges()){
                     e->setGeomAssociation(0);
                 }
                 //------------------------
                 //------------------------
 
                 //Chaque face dupliquée est associée aux groupe de la face de base
-                Utils::Container<Group::Group2D>& groups = m_cofaces[i_f]->getGroupsContainer();
-                for (uint i=0; i<groups.size(); i++){
-                    Group::Group2D* gr = groups.get(i);
+                for (Group::Group2D* gr : m_cofaces[i_f]->getGroupsContainer()){
                     std::cout<<gr->getName()<<std::endl;
                     gr->add(f);
-                    f->getGroupsContainer().add(gr);
+                    f->getGroupsContainer().push_back(gr);
                 }
             }
 
@@ -200,10 +194,8 @@ namespace Mgx3D {
 
             for (; iter1_0 != cofaces_0.end(); ++iter1_0, ++iter1_1){
 
-                std::vector<Edge* > edges_0;
-                std::vector<Edge* > edges_1;
-                (*iter1_0)->getEdges(edges_0);
-                (*iter1_1)->getEdges(edges_1);
+                std::vector<Edge* > edges_0 = (*iter1_0)->getEdges();
+                std::vector<Edge* > edges_1 = (*iter1_1)->getEdges();
 
                 if (edges_0.size() != edges_1.size())
                     throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructExtrudeCoEdges avec des nombres de Edge différents", TkUtil::Charset::UTF_8));
@@ -213,10 +205,8 @@ namespace Mgx3D {
 
                 for (; iter2_0 != edges_0.end(); ++iter2_0, ++iter2_1){
 
-                    std::vector<CoEdge* > coedges_0;
-                    std::vector<CoEdge* > coedges_1;
-                    (*iter2_0)->getCoEdges(coedges_0);
-                    (*iter2_1)->getCoEdges(coedges_1);
+                    std::vector<CoEdge* > coedges_0 = (*iter2_0)->getCoEdges();
+                    std::vector<CoEdge* > coedges_1 = (*iter2_1)->getCoEdges();
 
                     if (coedges_0.size() != coedges_1.size())
                         throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructExtrudeCoEdges avec des nombres de CoEdge différents", TkUtil::Charset::UTF_8));
@@ -226,10 +216,8 @@ namespace Mgx3D {
 
                     for (; iter3_0 != coedges_0.end(); ++iter3_0, ++iter3_1){
 
-                        std::vector<Vertex* > vertices_0;
-                        std::vector<Vertex* > vertices_1;
-                        (*iter3_0)->getVertices(vertices_0);
-                        (*iter3_1)->getVertices(vertices_1);
+                        std::vector<Vertex* > vertices_0 = (*iter3_0)->getVertices();
+                        std::vector<Vertex* > vertices_1 = (*iter3_1)->getVertices();
 
                         if (vertices_0.size() != vertices_1.size())
                             throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructExtrudeCoEdges avec des nombres de Vertex différents", TkUtil::Charset::UTF_8));
@@ -280,10 +268,8 @@ namespace Mgx3D {
 
             for (; iter1_0 != cofaces_0.end(); ++iter1_0, ++iter1_1){
 
-                std::vector<Edge* > edges_0;
-                std::vector<Edge* > edges_1;
-                (*iter1_0)->getEdges(edges_0);
-                (*iter1_1)->getEdges(edges_1);
+                std::vector<Edge* > edges_0 = (*iter1_0)->getEdges();
+                std::vector<Edge* > edges_1 = (*iter1_1)->getEdges();
 
                 if (edges_0.size() != edges_1.size())
                     throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructExtrudeFaces avec des nombres de Edge différents", TkUtil::Charset::UTF_8));
@@ -293,10 +279,8 @@ namespace Mgx3D {
 
                 for (; iter2_0 != edges_0.end(); ++iter2_0, ++iter2_1){
 
-                    std::vector<CoEdge* > coedges_0;
-                    std::vector<CoEdge* > coedges_1;
-                    (*iter2_0)->getCoEdges(coedges_0);
-                    (*iter2_1)->getCoEdges(coedges_1);
+                    std::vector<CoEdge* > coedges_0 = (*iter2_0)->getCoEdges();
+                    std::vector<CoEdge* > coedges_1 = (*iter2_1)->getCoEdges();
 
                     if (coedges_0.size() != coedges_1.size())
                         throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructExtrudeFaces avec des nombres de CoEdge différents", TkUtil::Charset::UTF_8));
@@ -311,10 +295,8 @@ namespace Mgx3D {
                         if (filtre_vu[coedge_0] == 0){
                             filtre_vu[coedge_0] = 1;
 
-                            std::vector<Vertex* > vertices_0;
-                            std::vector<Vertex* > vertices_1;
-                            (*iter3_0)->getVertices(vertices_0);
-                            (*iter3_1)->getVertices(vertices_1);
+                            std::vector<Vertex* > vertices_0 = (*iter3_0)->getVertices();
+                            std::vector<Vertex* > vertices_1 = (*iter3_1)->getVertices();
 
                             if (vertices_0.size() != vertices_1.size())
                                 throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructExtrudeFaces avec des nombres de Vertex différents", TkUtil::Charset::UTF_8));
@@ -461,15 +443,10 @@ namespace Mgx3D {
 
                     std::vector<CoFace* > face_cofaces;
 
-                    std::vector<CoEdge* > coedges_0;
-                    edge_0->getCoEdges(coedges_0);
-
-                    for (std::vector<CoEdge* >::iterator iter3 = coedges_0.begin();
-                         iter3 != coedges_0.end(); ++iter3){
-                        std::vector<CoFace* >& revol_cofaces = coedge2cofaces[*iter3];
-                        for (std::vector<CoFace* >::iterator iter4 = revol_cofaces.begin();
-                             iter4 != revol_cofaces.end(); ++iter4)
-                            face_cofaces.push_back(*iter4);
+                    for (CoEdge* coedge_0 : edge_0->getCoEdges()){
+                        std::vector<CoFace* >& revol_cofaces = coedge2cofaces[coedge_0];
+                        for (CoFace* revol_coface : revol_cofaces)
+                            face_cofaces.push_back(revol_coface);
                     }
 #ifdef _DEBUG2
                     std::cout<<" création d'une Face avec cofaces:";
@@ -487,17 +464,15 @@ namespace Mgx3D {
                         getInfoCommand().addTopoInfoEntity(faces.back(), Internal::InfoCommand::CREATED);
 
                         // reprise de la semi-conformité pour les faces de part et d'autre de l'arête dont on fait la révolution
-                        for (std::vector<CoEdge* >::iterator iter3 = coedges_0.begin();
-                             iter3 != coedges_0.end(); ++iter3){
-                            uint ratio = edge_0->getRatio(*iter3);
+                        for (CoEdge* coedge_0 : edge_0->getCoEdges()){
+                            uint ratio = edge_0->getRatio(coedge_0);
                             if (ratio != 1){
 #ifdef _DEBUG2
                                 std::cout<<" ratio de "<<ratio<<" reporté de "<<edge_0->getName()<<" vers "<<faces.back()->getName()<<std::endl;
 #endif
-                                std::vector<CoFace* >& revol_cofaces = coedge2cofaces[*iter3];
-                                for (std::vector<CoFace* >::iterator iter4 = revol_cofaces.begin();
-                                     iter4 != revol_cofaces.end(); ++iter4)
-                                    faces.back()->setRatio(*iter4, ratio, 1);
+                                std::vector<CoFace* >& revol_cofaces = coedge2cofaces[coedge_0];
+                                for (CoFace* revol_coface : revol_cofaces)
+                                    faces.back()->setRatio(revol_coface, ratio, 1);
                             }
                         }
 
@@ -513,7 +488,7 @@ namespace Mgx3D {
                 Group::Group3D *group = getContext().getGroupManager().getNewGroup3D(getContext().getGroupManager().getDefaultName(3),
                                                                                           &getInfoCommand());
                 group->add(newBlock);
-                newBlock->getGroupsContainer().add(group);
+                newBlock->getGroupsContainer().push_back(group);
                 getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
 
                 getInfoCommand().addTopoInfoEntity(newBlock, Internal::InfoCommand::CREATED);

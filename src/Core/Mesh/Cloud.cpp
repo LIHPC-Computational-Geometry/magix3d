@@ -99,36 +99,18 @@ TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const Cloud & cl)
     return o;
 }
 /*----------------------------------------------------------------------------*/
-void Cloud::addCoEdge(Topo::CoEdge* ed)
+std::vector<Topo::CoEdge*>& Cloud::getCoEdges() const
 {
-    m_topo_property->getCoEdgeContainer().add(ed);
+    auto& edges = m_topo_property->getCoEdgeContainer();
+    Utils::checkIfDestroyed(edges);
+    return edges;
 }
 /*----------------------------------------------------------------------------*/
-void Cloud::removeCoEdge(Topo::CoEdge* ed)
+std::vector<Topo::Vertex*>& Cloud::getVertices() const
 {
-    m_topo_property->getCoEdgeContainer().remove(ed, true);
-}
-/*----------------------------------------------------------------------------*/
-void Cloud::getCoEdges(std::vector<Topo::CoEdge* >& edges) const
-{
-    m_topo_property->getCoEdgeContainer().checkIfDestroyed();
-    m_topo_property->getCoEdgeContainer().get(edges);
-}
-/*----------------------------------------------------------------------------*/
-void Cloud::addVertex(Topo::Vertex* vtx)
-{
-    m_topo_property->getVertexContainer().add(vtx);
-}
-/*----------------------------------------------------------------------------*/
-void Cloud::removeVertex(Topo::Vertex* vtx)
-{
-    m_topo_property->getVertexContainer().remove(vtx, true);
-}
-/*----------------------------------------------------------------------------*/
-void Cloud::getVertices(std::vector<Topo::Vertex* >& vertices) const
-{
-    m_topo_property->getVertexContainer().checkIfDestroyed();
-    m_topo_property->getVertexContainer().get(vertices);
+    auto& vertices = m_topo_property->getVertexContainer();
+    Utils::checkIfDestroyed(vertices);
+    return vertices;
 }
 /*----------------------------------------------------------------------------*/
 Utils::SerializedRepresentation* Cloud::
@@ -140,10 +122,8 @@ getDescription (bool alsoComputed) const
     // le maillage vu depuis les arêtes et celui stocké dans GMDS
     Utils::SerializedRepresentation  meshProprietes ("Propriétés du maillage", "");
 
-    std::vector<Topo::CoEdge* > coedges;
-    getCoEdges(coedges);
-    std::vector<Topo::Vertex* > vertices;
-    getVertices(vertices);
+    std::vector<Topo::CoEdge*>& coedges = getCoEdges();
+    std::vector<Topo::Vertex*>& vertices = getVertices();
 
     uint nbNodes = 0;
     for (uint i=0; i<coedges.size(); i++){
@@ -194,10 +174,8 @@ void Cloud::getGMDSNodes(std::vector<gmds::Node >& ANodes) const
 {
     ANodes.clear();
 
-    std::vector<Topo::CoEdge* > coEdges;
-    getCoEdges(coEdges);
-    std::vector<Topo::Vertex* > vertices;
-    getVertices(vertices);
+    std::vector<Topo::CoEdge*>& coEdges = getCoEdges();
+    std::vector<Topo::Vertex*>& vertices = getVertices();
 
     Mesh::MeshItf*              meshItf     = getMeshManager ( ).getMesh ( );
     Mesh::MeshImplementation*   meshImpl    =

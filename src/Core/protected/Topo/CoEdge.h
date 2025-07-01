@@ -99,26 +99,22 @@ public:
 
     /*------------------------------------------------------------------------*/
     /// ajoute une relation vers une arête
-    void addEdge(Edge* e) {m_topo_property->getEdgeContainer().add(e);}
+    void addEdge(Edge* e) {m_topo_property->getEdgeContainer().push_back(e);}
 
     /// enlève une relation vers une arête
     void removeEdge(Edge* e, const bool exceptionIfNotFound=true)
-    {m_topo_property->getEdgeContainer().remove(e, exceptionIfNotFound);}
-
-    /// Fournit l'accès aux arêtes topologiques qui utilisent cette CoEdge avec une copie
-    void getEdges(std::vector<Edge* >& edges) const
-    { m_topo_property->getEdgeContainer().get(edges); }
+    {Utils::remove(m_topo_property->getEdgeContainer(), e, exceptionIfNotFound);}
 
     /// Fournit l'accès aux arêtes topologiques qui utilisent cette CoEdge sans copie
-    const std::vector<Edge* > & getEdges() const
-    {return m_topo_property->getEdgeContainer().get();}
+    std::vector<Edge* > & getEdges() const
+    {return m_topo_property->getEdgeContainer();}
 
     /// fournit l'accès à l'une des arêtes
     Edge* getEdge(uint ind) const
-    {return m_topo_property->getEdgeContainer().get(ind);}
+    {return m_topo_property->getEdgeContainer().at(ind);}
 
     uint getNbEdges() const
-    {return m_topo_property->getEdgeContainer().getNb();}
+    {return m_topo_property->getEdgeContainer().size();}
 
     /*------------------------------------------------------------------------*/
     /** \brief Remplace un sommet v1 par le sommet v2
@@ -186,28 +182,21 @@ public:
     std::vector<CoEdge*> split(Topo::Vertex* vtx, uint nbMeshingEdges, Internal::InfoCommand* icmd, bool sortCoEdges);
 
     /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux sommets topologiques incidents avec une copie
-     *
-     *  \param vertices les sommets incidents
-     */
-    void getVertices(std::vector<Topo::Vertex* >& vertices) const
-    {m_topo_property->getVertexContainer().get(vertices);}
-
     /** Fournit l'accès aux sommets topologiques incidents sans copie
      */
-    const std::vector<Topo::Vertex* >& getVertices() const
-        {return m_topo_property->getVertexContainer().get();}
+    std::vector<Topo::Vertex* >& getVertices() const
+        {return m_topo_property->getVertexContainer();}
 
     /// fournit l'accès à l'un des sommets
     Topo::Vertex* getVertex(uint ind) const
-    {return m_topo_property->getVertexContainer().get(ind);}
+    {return m_topo_property->getVertexContainer().at(ind);}
 
     /// \return le nombre de Vertex
     uint getNbVertices() const;
 
     /// vérifie si cette arête commune contient ou non ce sommet
     bool find(Topo::Vertex* v) const
-    {return m_topo_property->getVertexContainer().find(v);}
+    {return Utils::find(m_topo_property->getVertexContainer(), v);}
 
     /// accès à tous les sommets
     void getAllVertices(std::vector<Topo::Vertex* >& vertices, const bool unique=true) const;
@@ -241,8 +230,12 @@ public:
 	 * 			optimisation)
      * \return  Description, à détruire par l'appelant.
      */
-    virtual Mgx3D::Utils::SerializedRepresentation* getDescription (
-													bool alsoComputed) const;
+    virtual Mgx3D::Utils::SerializedRepresentation* getDescription (bool alsoComputed) const;
+
+    /*------------------------------------------------------------------------*/
+    /** \brief  Fournit un résumé textuel de l'entité.
+     */
+    virtual std::string getSummary ( ) const {return TopoEntity::getSummary(getVertices());}
 
     /*------------------------------------------------------------------------*/
     /** Vérification de l'arête
@@ -416,11 +409,8 @@ public:
     virtual void getGroupsName (std::vector<std::string>& gn, bool byGeom=true, bool byTopo=true) const;
 
     /// Accesseur sur le conteneur pour les groupes
-    Utils::Container<Group::Group1D>& getGroupsContainer() {return m_topo_property->getGroupsContainer();}
-    const Utils::Container<Group::Group1D>& getGroupsContainer() const {return m_topo_property->getGroupsContainer();}
-
-    void getGroups(std::vector<Group::Group1D*>& grp) const
-          {grp = getGroupsContainer().get();}
+    std::vector<Group::Group1D*>& getGroupsContainer() {return m_topo_property->getGroupsContainer();}
+    const std::vector<Group::Group1D*>& getGroupsContainer() const {return m_topo_property->getGroupsContainer();}
 
     /*------------------------------------------------------------------------*/
     /// Nombre de noeuds internes: le nombre de noeuds sans ceux du bord

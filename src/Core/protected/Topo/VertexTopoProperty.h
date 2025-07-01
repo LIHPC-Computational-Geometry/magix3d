@@ -41,19 +41,19 @@ class CoEdge;
      VertexTopoProperty* clone() {
          VertexTopoProperty* prop = new VertexTopoProperty();
 
-         prop->m_coedges.clone(m_coedges);
-         prop->m_groups.clone(m_groups);
+         prop->m_coedges.insert(prop->m_coedges.end(), m_coedges.begin(), m_coedges.end());
+         prop->m_groups.insert(prop->m_groups.end(), m_groups.begin(), m_groups.end());
 
          return prop;
      }
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des arêtes communes
-     Utils::Container<CoEdge>& getCoEdgeContainer() {return m_coedges;}
+     std::vector<CoEdge*>& getCoEdgeContainer() {return m_coedges;}
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des groupes
-     Utils::Container<Group::Group0D>& getGroupsContainer() {return m_groups;}
+     std::vector<Group::Group0D*>& getGroupsContainer() {return m_groups;}
 
      /*------------------------------------------------------------------------*/
      /** \brief   Suppression des dépendances (entités topologiques incidentes)
@@ -66,10 +66,10 @@ class CoEdge;
 
  private:
      /// accès aux arêtes incidentes communes
-     Utils::Container<CoEdge> m_coedges;
+     std::vector<CoEdge*> m_coedges;
 
      /// Listes des groupes 0D
-     Utils::Container<Group::Group0D> m_groups;
+     std::vector<Group::Group0D*> m_groups;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo

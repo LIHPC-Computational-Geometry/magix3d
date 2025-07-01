@@ -100,18 +100,19 @@ TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const Line & cl)
 /*----------------------------------------------------------------------------*/
 void Line::addCoEdge(Topo::CoEdge* ed)
 {
-    m_topo_property->getCoEdgeContainer().add(ed);
+    m_topo_property->getCoEdgeContainer().push_back(ed);
 }
 /*----------------------------------------------------------------------------*/
 void Line::removeCoEdge(Topo::CoEdge* ed)
 {
-    m_topo_property->getCoEdgeContainer().remove(ed, true);
+    Utils::remove(m_topo_property->getCoEdgeContainer(), ed, true);
 }
 /*----------------------------------------------------------------------------*/
-void Line::getCoEdges(std::vector<Topo::CoEdge* >& edges) const
+std::vector<Topo::CoEdge*>& Line::getCoEdges() const
 {
-    m_topo_property->getCoEdgeContainer().checkIfDestroyed();
-    m_topo_property->getCoEdgeContainer().get(edges);
+    auto& edges = m_topo_property->getCoEdgeContainer();
+    Utils::checkIfDestroyed(edges);
+    return edges;
 }
 /*----------------------------------------------------------------------------*/
 Utils::SerializedRepresentation* Line::
@@ -123,12 +124,9 @@ getDescription (bool alsoComputed) const
     // le maillage vu depuis les arêtes et celui stocké dans GMDS
     Utils::SerializedRepresentation  meshProprietes ("Propriétés du maillage", "");
 
-    std::vector<Topo::CoEdge* > coedges;
-    getCoEdges(coedges);
-
     uint nbEdges = 0;
-    for (uint i=0; i<coedges.size(); i++){
-        Topo::CoEdge* ce = coedges[i];
+    auto& coedges = getCoEdges();
+    for (Topo::CoEdge* ce : coedges){
         nbEdges += ce->edges().size();
     }
     meshProprietes.addProperty (
@@ -140,8 +138,7 @@ getDescription (bool alsoComputed) const
     if (!coedges.empty()){
         Utils::SerializedRepresentation aretes ("Arêtes topologiques",
                 TkUtil::NumericConversions::toStr((short)coedges.size()));
-        for (uint i=0; i<coedges.size(); i++){
-            Topo::CoEdge* ce = coedges[i];
+        for (Topo::CoEdge* ce : coedges){
             aretes.addProperty (
                     Utils::SerializedRepresentation::Property (
                             ce->getName ( ), *ce));
@@ -158,8 +155,7 @@ void Line::getGMDSEdges(std::vector<gmds::Edge >& AEdges) const
 {
     AEdges.clear();
 
-    std::vector<Topo::CoEdge* > coEdges;
-    getCoEdges(coEdges);
+    auto& coEdges = getCoEdges();
 
     Mesh::MeshItf*              meshItf     = getMeshManager ( ).getMesh ( );
     Mesh::MeshImplementation*   meshImpl    =

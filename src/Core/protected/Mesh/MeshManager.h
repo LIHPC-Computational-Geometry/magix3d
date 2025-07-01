@@ -225,7 +225,7 @@ public:
     Cloud* getCloud(const std::string& name, const bool exceptionIfNotFound=true) const;
 
     /** Retourne les Nuages */
-    void getClouds(std::vector<Cloud*>& AClouds) const;
+    std::vector<Cloud*>& getClouds() {return m_clouds;}
 
     /*------------------------------------------------------------------------*/
     /** Ajoute une Ligne au manager */
@@ -238,7 +238,7 @@ public:
     Line* getLine(const std::string& name, const bool exceptionIfNotFound=true) const;
 
     /** Retourne les Lignes */
-    void getLines(std::vector<Line*>& ALines) const;
+    std::vector<Line*>& getLines() {return m_lines;}
 
     /*------------------------------------------------------------------------*/
     /** Ajoute une Surface au manager */
@@ -251,7 +251,7 @@ public:
     Surface* getSurface(const std::string& name, const bool exceptionIfNotFound=true) const;
 
     /** Retourne les Surfaces */
-    void getSurfaces(std::vector<Surface*>& ASurfaces) const;
+    std::vector<Surface*>& getSurfaces() {return m_surfaces;}
 
     /*------------------------------------------------------------------------*/
     /** Ajoute un Volume au manager */
@@ -264,7 +264,7 @@ public:
     Volume* getVolume(const std::string& name, const bool exceptionIfNotFound=true) const;
 
     /** Retourne les Volumes */
-    void getVolumes(std::vector<Volume*>& AVolumes) const;
+    std::vector<Volume*>& getVolumes() {return m_volumes;}
 
     /** Création d'un sous-volume ou réutilisation d'un existant */
     SubVolume* getNewSubVolume(const std::string& gr_name, Internal::InfoCommand* icmd);
@@ -281,16 +281,16 @@ private:
     MeshItf* m_mesh_itf;
 
     // stockage des groupes de noeuds
-    Utils::Container<Cloud> m_clouds;
+    std::vector<Cloud*> m_clouds;
 
     // stockage des groupes de lignes
-    Utils::Container<Line> m_lines;
+    std::vector<Line*> m_lines;
 
     // stockage des groupes de polygones
-    Utils::Container<Surface> m_surfaces;
+    std::vector<Surface*> m_surfaces;
 
     // stockage des groupes de polyèdres
-    Utils::Container<Volume> m_volumes;
+    std::vector<Volume*> m_volumes;
 
 
     /// Stategie pour la conservation des créations et modifications de maillage

@@ -101,8 +101,7 @@ DisplayProperties::GraphicalRepresentation* VTKGraphicalRepresentationFactory::c
 			Mesh::Volume*	volume	= dynamic_cast<Mesh::Volume*>(meshEntity);
 			if (0 != volume)
 			{
-				vector<Topo::Block*>	blocks;
-				volume->getBlocks (blocks);
+				vector<Topo::Block*> blocks = volume->getBlocks ();
 				//std::cout<<"blocks.size() "<<blocks.size()<<std::endl;
 
 				hasBlocks = !blocks.empty();

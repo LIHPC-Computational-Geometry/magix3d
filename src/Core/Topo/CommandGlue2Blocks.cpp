@@ -38,11 +38,8 @@ internalExecute()
     Face* faceA = getNearestFace(m_bl_A, m_bl_B->getBarycentre());
     Face* faceB = getNearestFace(m_bl_B, m_bl_A->getBarycentre());
 
-    std::vector<CoFace*> cofaces_A;
-    std::vector<CoFace*> cofaces_B;
-
-    faceA->getCoFaces(cofaces_A);
-    faceB->getCoFaces(cofaces_B);
+    std::vector<CoFace*> cofaces_A = faceA->getCoFaces();
+    std::vector<CoFace*> cofaces_B = faceB->getCoFaces();
 
     if (cofaces_A.size() > cofaces_B.size()){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);

@@ -259,9 +259,8 @@ void CommandModificationTopo::MAJCoEdges()
                 					std::cout<<"Vertex::merge, "<<vtx0->getName()<<" est remplacé par "<<vtx0new->getName()<<std::endl;
 #endif
                 					// avant le merge des sommets, on cherche les arêtes reliées qui sont équivalentes (ayant 2 sommets égaux)
-                					std::vector<Topo::CoEdge*> coedges_loc1, coedges_loc2;
-                					vtx0->getCoEdges(coedges_loc1);
-                					vtx0new->getCoEdges(coedges_loc2);
+                					std::vector<Topo::CoEdge*> coedges_loc1 = vtx0->getCoEdges();
+                					std::vector<Topo::CoEdge*> coedges_loc2 = vtx0new->getCoEdges();
 
                 					// fusion des sommets
                 					vtx0new->merge(vtx0, &getInfoCommand());
@@ -448,13 +447,12 @@ void CommandModificationTopo::MAJCoEdges()
 
                         // tri des coedges dans les edges
                         std::set<Topo::Edge*> all_edges;
-                        std::vector<Topo::Edge*> edges;
                         for (uint i=0; i<coedges1sorted.size(); i++){
-                            coedges1sorted[i]->getEdges(edges);
+                            std::vector<Topo::Edge*> edges = coedges1sorted[i]->getEdges();
                             all_edges.insert(edges.begin(), edges.end());
                         }
                         for (uint i=0; i<coedges2sorted.size(); i++){
-                            coedges2sorted[i]->getEdges(edges);
+                            std::vector<Topo::Edge*> edges = coedges2sorted[i]->getEdges();
                             all_edges.insert(edges.begin(), edges.end());
                         }
 
@@ -525,13 +523,11 @@ void CommandModificationTopo::updateGeomAssociation(std::vector<CoFace*>& coface
 #ifdef _DEBUG_MAJTOPO
         	std::cout<<"   on traite le cas de "<<*coedges[j]<<std::endl;
 #endif
-            std::vector<Vertex*> vertices;
-            coedges[j]->getVertices(vertices);
-            for (uint k=0; k<vertices.size(); k++)
-                if (vertices[k]->getGeomAssociation() == oldGE){
-                    getInfoCommand().addTopoInfoEntity(vertices[k], Internal::InfoCommand::DISPMODIFIED);
-                    vertices[k]->saveTopoProperty();
-                    vertices[k]->setGeomAssociation(newGE);
+            for (Vertex* vtx : coedges[j]->getVertices())
+                if (vtx->getGeomAssociation() == oldGE){
+                    getInfoCommand().addTopoInfoEntity(vtx, Internal::InfoCommand::DISPMODIFIED);
+                    vtx->saveTopoProperty();
+                    vtx->setGeomAssociation(newGE);
                 }
             if (coedges[j]->getGeomAssociation() == oldGE){
                 getInfoCommand().addTopoInfoEntity(coedges[j], Internal::InfoCommand::DISPMODIFIED);
@@ -893,20 +889,17 @@ MAJInternalsCoFaces()
 
     std::list<Topo::Face*> l_faces;
     for (uint i=0; i<v_blocks.size(); i++){
-        std::vector<Face*> faces;
-        v_blocks[i]->getFaces(faces);
-        for (uint j=0; j<faces.size(); j++) {
-            std::vector<CoFace*> cofaces;
-            faces[j]->getCoFaces(cofaces);
+        for (Face* face : v_blocks[i]->getFaces()) {
+            std::vector<CoFace*> cofaces = face->getCoFaces();
             if (cofaces.size() != 1){
                 TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-                message << "Une face ("<<faces[j]->getName()
+                message << "Une face ("<<face->getName()
                         <<") contient plusieurs cofaces ce qui n'est pas vraiment compatible avec le cas non-structuré";
                 log (TkUtil::TraceLog (message, TkUtil::Log::WARNING));
                 return;
             }
             if (filtre_cofaces[cofaces[0]] == 0) {
-                l_faces.push_back(faces[j]);
+                l_faces.push_back(face);
                 filtre_cofaces[cofaces[0]] = 1;
             }
         }
@@ -923,12 +916,10 @@ MAJInternalsCoFaces()
     std::map<Topo::Vertex*, uint> filtre_vertices;
     for (uint i=0; i<v_faces.size(); i++){
         v_faces[i]->saveFaceTopoProperty(&getInfoCommand());
-        std::vector<Vertex*> vertices;
-        v_faces[i]->getVertices(vertices);
-        for (uint j=0; j<vertices.size(); j++)
-            if (filtre_vertices[vertices[j]] == 0){
-                v_vertices.push_back(vertices[j]);
-                filtre_vertices[vertices[j]] = 1;
+        for (Vertex* vtx : v_faces[i]->getVertices())
+            if (filtre_vertices[vtx] == 0){
+                v_vertices.push_back(vtx);
+                filtre_vertices[vtx] = 1;
             }
     }
 
@@ -941,12 +932,9 @@ MAJInternalsCoFaces()
     for (uint i=0; i<v_blocks.size(); i++)
         v_blocks[i]->free(&getInfoCommand());
     // destruction des cofaces et des faces
-    for (uint i=0; i<v_cofaces_to_delete.size(); i++){
-        Topo::CoFace* coface = v_cofaces_to_delete[i];
-        std::vector<Face*> faces;
-        coface->getFaces(faces);
-        for (uint j=0; j<faces.size(); j++)
-            faces[j]->free(&getInfoCommand());
+    for (Topo::CoFace* coface : v_cofaces_to_delete){
+        for (Face* f : coface->getFaces())
+            f->free(&getInfoCommand());
         coface->free(&getInfoCommand());
     }
 }
@@ -1287,8 +1275,7 @@ fuseInternalCoEdgesAndVertices(Geom::GeomEntity* ge, std::vector<Geom::GeomEntit
             	std::cout<<"      "<<(*iter1)->getName()<<" en relation avec "<<((*iter1)->getGeomAssociation() == 0?"rien":(*iter1)->getGeomAssociation()->getName())<<std::endl;
 #endif
                 filtre_coedges[*iter1] = ((*iter1)->getGeomAssociation() == ge?1:2);
-                std::vector<Vertex*> vertices;
-                (*iter1)->getVertices(vertices);
+                std::vector<Vertex*> vertices = (*iter1)->getVertices();
                 for (std::vector<Vertex*>::iterator iter2 = vertices.begin();
                         iter2 != vertices.end(); ++iter2){
 #ifdef _DEBUG_MAJTOPO2
@@ -1302,8 +1289,7 @@ fuseInternalCoEdgesAndVertices(Geom::GeomEntity* ge, std::vector<Geom::GeomEntit
             CoEdge* coedge = dynamic_cast<Topo::CoEdge*>(topos[i]);
             CHECK_NULL_PTR_ERROR(coedge);
             filtre_coedges[coedge] = (coedge->getGeomAssociation() == ge?1:2);
-            std::vector<Vertex*> vertices;
-            coedge->getVertices(vertices);
+            std::vector<Vertex*> vertices = coedge->getVertices();
             for (std::vector<Vertex*>::iterator iter2 = vertices.begin();
                     iter2 != vertices.end(); ++iter2){
 #ifdef _DEBUG_MAJTOPO2
@@ -1549,10 +1535,7 @@ getSameCoEdges(Topo::CoEdge* coedge)
 
     std::map<Vertex*, uint> filtre_vertices;
 
-    std::vector<Vertex*> vertices;
-
-    coedge->getVertices(vertices);
-
+    std::vector<Vertex*> vertices = coedge->getVertices();
     for (uint i=0; i<vertices.size(); i++)
         filtre_vertices[vertices[i]] = 1;
 
@@ -1560,17 +1543,14 @@ getSameCoEdges(Topo::CoEdge* coedge)
         return coedges_trouvees;
 
     // recherche parmi les coedges du premier vertex venu
-    std::vector<Topo::CoEdge*> coedges;
-    vertices[0]->getCoEdges(coedges);
-
-    for (uint i=0; i<coedges.size(); i++){
-        coedges[i]->getVertices(vertices);
+    for (Topo::CoEdge* vtx0_ce : vertices[0]->getCoEdges()){
+        vertices = vtx0_ce->getVertices();
         uint nbVertexMarques = 0;
-        for (uint j=0; j<vertices.size(); j++)
-            nbVertexMarques += filtre_vertices[vertices[j]];
+        for (Topo::Vertex* vtx : vertices)
+            nbVertexMarques += filtre_vertices[vtx];
 
-        if (nbVertexMarques == vertices.size() && coedges[i] != coedge)
-            coedges_trouvees.push_back(coedges[i]);
+        if (nbVertexMarques == vertices.size() && vtx0_ce != coedge)
+            coedges_trouvees.push_back(vtx0_ce);
     }
 
 #ifdef _DEBUG_MAJTOPO

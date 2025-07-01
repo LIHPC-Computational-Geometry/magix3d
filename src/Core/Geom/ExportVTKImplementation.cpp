@@ -57,15 +57,12 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 				"one and only one block", TkUtil::Charset::UTF_8));
 	}
 
-	std::vector<Topo::Block*> topo_blocs;
-	m_context.getTopoManager().getBlocks(topo_blocs);
-
+	std::vector<Topo::Block*> topo_blocs = m_context.getTopoManager().getBlocksObj();
 	std::vector<Topo::CoFace*> topo_cofaces;
 	std::vector<Topo::CoEdge*> topo_coedges;
-	std::vector<Topo::Vertex*> topo_vertices;
 	topo_blocs[0]->getCoFaces(topo_cofaces);
 	topo_blocs[0]->getCoEdges(topo_coedges);
-	topo_blocs[0]->getVertices(topo_vertices);
+	std::vector<Topo::Vertex*> topo_vertices = topo_blocs[0]->getVertices();
 //
 //	std::vector<Mesh::Surface*> surfaces;
 //	std::vector<Mesh::Cloud*> clouds;

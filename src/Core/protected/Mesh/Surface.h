@@ -128,7 +128,7 @@ public:
 
     /*----------------------------------------------------------------------------*/
     ///  Fournit l'accès aux faces topologiques communes qui ont participées à la constitution de la surface
-    void getCoFaces(std::vector<Topo::CoFace* >& faces) const;
+    std::vector<Topo::CoFace* >& getCoFaces() const;
 
     /** supprime les relations vers les cofaces */
     void clearCoFaces()

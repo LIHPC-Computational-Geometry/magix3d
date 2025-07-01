@@ -205,7 +205,7 @@ getPointsRef(std::vector<Utils::Math::Point> &points_ref, const Topo::CoEdge* co
 	}
 
 	// déterminer les indices sur l'edge
-	uint ind_edge = coface->getIndex(edge_dep);
+	uint ind_edge = coface->getIndexOf(edge_dep);
 	//Vertex* v_dep = coface->getVertex(ind_edge);
 	Vertex* v_dep = edge_dep->getVertex(0);
 	uint nb_bras1, nb_bras2;

@@ -89,13 +89,10 @@ internalExecute()
     			}
 
     			// recherche une face dont aucun sommet n'est marqué
-    			for (uint i=0; i<(*iter)->getNbFaces(); i++){
-    				Face* face=(*iter)->getFace(i);
-    				std::vector<Vertex*> face_vertices;
-    				face->getVertices(face_vertices);
+    			for (Face* face : (*iter)->getFaces()){
     				bool acceptable = true;
-    				for (uint j=0; j<face_vertices.size(); j++)
-    					if (filtre_sommets[face_vertices[j]] == 1 )
+    				for (Vertex* vtx : face->getVertices())
+    					if (filtre_sommets[vtx] == 1 )
     						acceptable = false;
     				if (acceptable)
     					face_base = face;
@@ -194,7 +191,10 @@ internalExecute()
 
      		// change l'ordre des sommets
      		(*iter)->m_topo_property->getVertexContainer().clear();
-    		(*iter)->m_topo_property->getVertexContainer().add(sorted_vertices);
+    		(*iter)->m_topo_property->getVertexContainer().insert(
+				(*iter)->m_topo_property->getVertexContainer().end(),
+				sorted_vertices.begin(),
+				sorted_vertices.end());
 
      		//	réordonne les faces en fonction des sommets
     		std::vector<Face* > sorted_faces;
@@ -205,12 +205,13 @@ internalExecute()
     	        		hexa_vertices[TopoHelper::tabIndVtxByFaceOnBlock[i][1]],
     	        		hexa_vertices[TopoHelper::tabIndVtxByFaceOnBlock[i][2]],
     	        		hexa_vertices[TopoHelper::tabIndVtxByFaceOnBlock[i][3]]));
-
     	    }
 
     	    (*iter)->m_topo_property->getFaceContainer().clear();
-    	    (*iter)->m_topo_property->getFaceContainer().add(sorted_faces);
-
+    	    (*iter)->m_topo_property->getFaceContainer().insert(
+				(*iter)->m_topo_property->getFaceContainer().end(),
+				sorted_faces.begin(),
+				sorted_faces.end());
 
     	} // end if (!(*iter)->isStructured() && m_prop->isStructured())
 
@@ -241,8 +242,7 @@ getNextVertex(Block* bloc, Vertex* vtx1, Vertex* vtx2, std::map<Topo::Vertex*, u
 	for (uint i=0; i<bloc->getNbFaces(); i++){
 		Face* face=bloc->getFace(i);
 		//std::cout<<"face : "<<face->getName()<<std::endl;
-		std::vector<Vertex*> face_vertices;
-		face->getVertices(face_vertices);
+		std::vector<Vertex*> face_vertices = face->getVertices();
 		uint nb2 = 0; // sommets dans la face de base (autre que les 2 de départ)
 		uint nb3 = 0; // sommets qui valide la face avec 2 des sommets sélectionnés
 		for (uint j=0; j<face_vertices.size(); j++)
@@ -256,8 +256,8 @@ getNextVertex(Block* bloc, Vertex* vtx1, Vertex* vtx2, std::map<Topo::Vertex*, u
 
 	Vertex* vtx_suiv = 0;
 	if (face_select){
-		uint ind1 = face_select->getIndex(vtx1);
-		uint ind2 = face_select->getIndex(vtx2);
+		uint ind1 = face_select->getIndexOf(vtx1);
+		uint ind2 = face_select->getIndexOf(vtx2);
 		uint ind3;
 		uint nbVtx = face_select->getNbVertices();
 		if (ind2==((ind1+1)%nbVtx))

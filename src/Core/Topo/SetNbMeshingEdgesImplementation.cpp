@@ -97,7 +97,7 @@ execute()
     		continue;
 
     	// déséquilibre dans cette face
-    	uint cote_dep = coface->getIndex(coedge_dep);
+    	uint cote_dep = coface->getIndexOf(coedge_dep);
     	int delta = computeDelta(coface, cote_dep);
 
     	if (delta){
@@ -167,7 +167,7 @@ addParalelCoEdges(CoEdge* coedge_dep, std::vector<CoEdge*>& whole_coedges)
     		continue;
 
     	// coté touché par le déséquilibre
-    	uint cote_dep = coface->getIndex(coedge_dep);
+    	uint cote_dep = coface->getIndexOf(coedge_dep);
     	uint cote_opp = (cote_dep+2)%4;
     	// cas d'une face dégénérée en triangle
     	if (cote_opp == 3 && coface->getNbEdges() == 3)
@@ -256,16 +256,14 @@ findOppositeCoEdge(CoEdge* coedge_dep, uint cote_dep, CoFace* coface)
 	// recherche des arêtes triées côté départ
 	Vertex* vtx1_dep = coface->getVertex(cote_dep);
 	Vertex* vtx2_dep = coface->getVertex((cote_dep+1)%4);
-	std::vector<CoEdge*> coedges_dep;
-	edge_dep->getCoEdges(coedges_dep);
+	std::vector<CoEdge*> coedges_dep = edge_dep->getCoEdges();
 	std::vector<CoEdge*> coedges_dep_sort;
 	TopoHelper::getCoEdgesBetweenVertices(vtx1_dep, vtx2_dep, coedges_dep, coedges_dep_sort);
 
 	// idem côté opposé
 	Vertex* vtx1_opp = coface->getVertex((cote_dep+3)%4);
 	Vertex* vtx2_opp = coface->getVertex((cote_dep+2)%4);
-	std::vector<CoEdge*> coedges_opp;
-	edge_opp->getCoEdges(coedges_opp);
+	std::vector<CoEdge*> coedges_opp = edge_opp->getCoEdges();
 	std::vector<CoEdge*> coedges_opp_sort;
 	TopoHelper::getCoEdgesBetweenVertices(vtx1_opp, vtx2_opp, coedges_opp, coedges_opp_sort);
 
@@ -321,21 +319,15 @@ computeDelta(CoFace* coface, uint cote)
     if (cote_opp == 3 && coface->getNbEdges() == 3)
         return 0;
     else {
-        std::vector<CoEdge* > coedges;
-
         int nb_init = 0;
-        coface->getEdge(cote)->getCoEdges(coedges);
-        for (std::vector<CoEdge* >::iterator iter = coedges.begin();
-                iter != coedges.end(); ++iter){
-            nb_init += (*iter)->getNbMeshingEdges() + m_coedge_delta[*iter];
+        for (CoEdge* coedge : coface->getEdge(cote)->getCoEdges()){
+            nb_init += coedge->getNbMeshingEdges() + m_coedge_delta[coedge];
             //std::cout<<"nb_init += "<<(*iter)->getNbMeshingEdges()<<" + "<<m_coedge_delta[*iter]<<std::endl;
         }
 
         int nb_opp = 0;
-        coface->getEdge(cote_opp)->getCoEdges(coedges);
-        for (std::vector<CoEdge* >::iterator iter = coedges.begin();
-                iter != coedges.end(); ++iter){
-            nb_opp += (*iter)->getNbMeshingEdges() + m_coedge_delta[*iter];
+        for (CoEdge* coedge : coface->getEdge(cote_opp)->getCoEdges()){
+            nb_opp += (coedge)->getNbMeshingEdges() + m_coedge_delta[coedge];
             //std::cout<<"nb_opp += "<<(*iter)->getNbMeshingEdges()<<" + "<<m_coedge_delta[*iter]<<std::endl;
         }
 
@@ -352,10 +344,9 @@ getStructuredCoFaces(CoEdge* coedge, std::vector<CoFace* >& cofaces)
     std::vector<CoFace* > all_cofaces;
     coedge->getCoFaces(all_cofaces);
 
-    for (std::vector<CoFace* >::iterator iter = all_cofaces.begin();
-            iter != all_cofaces.end(); ++iter)
-        if ((*iter)->isStructured())
-            cofaces.push_back(*iter);
+    for (CoFace* coface : all_cofaces)
+        if (coface->isStructured())
+            cofaces.push_back(coface);
 }
 /*----------------------------------------------------------------------------*/
 void SetNbMeshingEdgesImplementation::

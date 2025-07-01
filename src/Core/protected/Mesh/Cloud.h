@@ -113,16 +113,18 @@ public:
     /*------------------------------------------------------------------------*/
     /// \brief Ajoute une relation vers une arête commune
 #ifndef SWIG
-    void addCoEdge(Topo::CoEdge* e);
+    void addCoEdge(Topo::CoEdge* e)
+    {m_topo_property->getCoEdgeContainer().push_back(e);}
 #endif
 
     /// Retire une relation vers une Edge
 #ifndef SWIG
-    void removeCoEdge(Topo::CoEdge* e);
+    void removeCoEdge(Topo::CoEdge* e)
+    {Utils::remove(m_topo_property->getCoEdgeContainer(), e, true);}
 #endif
 
     ///  Fournit l'accès aux arêtes topologiques qui ont participées à la constitution du nuage
-    void getCoEdges(std::vector<Topo::CoEdge* >& edges) const;
+    std::vector<Topo::CoEdge*>& getCoEdges() const;
 
     /** supprime les relations vers les arêtes */
     void clearCoEdges()
@@ -131,16 +133,18 @@ public:
     /*------------------------------------------------------------------------*/
     /// \brief Ajoute une relation vers un sommet
 #ifndef SWIG
-    void addVertex(Topo::Vertex* v);
+    void addVertex(Topo::Vertex* v)
+    {m_topo_property->getVertexContainer().push_back(v);}
 #endif
 
     /// Retire une relation vers un Vertex
 #ifndef SWIG
-    void removeVertex(Topo::Vertex* v);
+    void removeVertex(Topo::Vertex* v)
+    {Utils::remove(m_topo_property->getVertexContainer(), v, true);}
 #endif
 
     ///  Fournit l'accès aux sommets topologiques qui ont participées à la constitution du nuage
-    void getVertices(std::vector<Topo::Vertex* >& vertices) const;
+    std::vector<Topo::Vertex*>& getVertices() const;
 
     /** supprime les relations vers les sommets */
     void clearVertices()

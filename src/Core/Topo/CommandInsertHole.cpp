@@ -207,27 +207,13 @@ duplicate()
     // un sommet est dupliqué dès lors qu'il est relié à une arête à dupliquée et à aucune arête
     // commune non dupliquée
 	std::vector<Vertex*> duplicatedVertices;
-	for (std::vector<CoFace*>::iterator iter_cf=m_cofaces.begin();
-			iter_cf!=m_cofaces.end(); ++iter_cf){
-		CoFace* coface = *iter_cf;
-
-		std::vector<Vertex*> vertices;
-		coface->getVertices(vertices);
-
-		for (std::vector<Vertex*>::iterator iter_vt=vertices.begin();
-				iter_vt!=vertices.end(); ++iter_vt){
-			Vertex* vertex = *iter_vt;
+	for (CoFace* coface : m_cofaces){
+		for (Vertex* vertex : coface->getVertices()){
 			if (m_filtre_vertex[vertex] == 0){
-
-				std::vector<CoEdge* > coedges;
-				vertex->getCoEdges(coedges);
-
 				// a-t-on trouvé une arête marquée à 3 ?
 				bool haveCoEdgeConservated = false;
 
-				for (std::vector<CoEdge*>::iterator iter_ce=coedges.begin();
-						iter_ce!=coedges.end(); ++iter_ce){
-					CoEdge* coedge = *iter_ce;
+				for (CoEdge* coedge : vertex->getCoEdges()){
 					if (m_filtre_coedge[coedge] == 3)
 						haveCoEdgeConservated = true;
 				}
@@ -294,17 +280,12 @@ duplicate()
 
 	// duplique les Edges qui apparaissent dans plusieurs cofaces alors que l'arête commune
 	// va être dupliquée. Et cela sans dupliquer les sommets ni les arêtes,
-	for (std::vector<CoFace*>::iterator iter_cf=m_cofaces.begin();
-			iter_cf!=m_cofaces.end(); ++iter_cf){
+	for (CoFace* coface : m_cofaces){
 		std::vector<CoEdge*> coedges;
-		(*iter_cf)->getCoEdges(coedges);
-		for (std::vector<CoEdge*>::iterator iter_ce=coedges.begin();
-				iter_ce!= coedges.end(); ++iter_ce){
-			std::vector<Edge*> edges;
-			(*iter_ce)->getEdges(edges);
-			for (std::vector<Edge*>::iterator iter_ed=edges.begin();
-					iter_ed!=edges.end(); ++iter_ed){
-				separate(*iter_ed);
+		coface->getCoEdges(coedges);
+		for (CoEdge* coedge : coedges){
+			for (Edge* edge : coedge->getEdges()){
+				separate(edge);
 			} // end for iter_ed
 		} // end for iter_ce
 	} // end for iter_cf
@@ -326,16 +307,14 @@ duplicate()
 		CoFace* new_coface = duplicate(old_coface);
 
 		// mise à jour dans les faces des blocs du côté marqué à 2
-		std::vector<Face*> faces;
-		old_coface->getFaces(faces);
+		std::vector<Face*> faces = old_coface->getFaces();
 		if (faces.size()!=2)
 			throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne dans CommandInsertHole, face commune reliée à autre chose que 2 faces", TkUtil::Charset::UTF_8));
 
 		// recherche celle avec bloc dans groupe 2
 		Face* face = 0;
 		for (uint i=0; i<faces.size(); i++){
-			std::vector<Block*> blocs;
-			faces[i]->getBlocks(blocs);
+			std::vector<Block*> blocs = faces[i]->getBlocks();
 			if (blocs.size()!=1)
 				throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne dans CommandInsertHole, face reliée à autre chose qu'un unique bloc", TkUtil::Charset::UTF_8));
 			if (m_filtre_block[blocs[0]] == 2)
@@ -353,9 +332,7 @@ duplicate()
 
 
 	// duplique les arêtes des blocs2 et propage
-	for (std::vector<Block*>::iterator iter_bl=blocs2.begin();
-			iter_bl!=blocs2.end(); ++iter_bl){
-		Block* bloc = *iter_bl;
+	for (Block* bloc : blocs2){
 		std::vector<CoEdge*> coedges;
 		bloc->getCoEdges(coedges);
 
@@ -374,15 +351,8 @@ duplicate()
 
 
 	// duplique les sommets des blocs2 et propage aux entités de niveaux inférieurs
-	for (std::vector<Block*>::iterator iter_bl=blocs2.begin();
-			iter_bl!=blocs2.end(); ++iter_bl){
-		Block* bloc = *iter_bl;
-		std::vector<Vertex*> vertices;
-		bloc->getVertices(vertices);
-
-		for (std::vector<Vertex*>::iterator iter_vtx=vertices.begin();
-				iter_vtx!= vertices.end(); ++iter_vtx){
-			Vertex* old_vtx = *iter_vtx;
+	for (Block* bloc : blocs2){
+		for (Vertex* old_vtx : bloc->getVertices()){
 			Vertex* new_vtx = duplicate(old_vtx);
 			if (old_vtx != new_vtx){
 				bloc->saveBlockTopoProperty(&getInfoCommand());
@@ -594,14 +564,10 @@ separate(Edge* ed)
 #ifdef _DEBUG_INSERTHOLE
     std::cout<<" separate pour "<<ed->getName()<<std::endl;
 #endif
-	std::vector<CoFace*> cofaces;
-	ed->getCoFaces(cofaces);
-
 	for (uint i=0; i<ed->getNbCoEdges(); i++)
 		ed->getCoEdge(i)->saveCoEdgeTopoProperty(&getInfoCommand());
 
-	for (uint i=1; i<cofaces.size(); i++){
-		CoFace* coface = cofaces[i];
+	for (CoFace* coface : ed->getCoFaces()){
 		Edge* new_edge = ed->clone();
 #ifdef _DEBUG_INSERTHOLE
     std::cout<<"  => création par clone de "<<new_edge->getName()<<std::endl;

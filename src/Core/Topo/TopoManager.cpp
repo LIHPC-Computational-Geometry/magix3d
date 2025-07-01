@@ -142,97 +142,38 @@ TopoManager::~TopoManager()
 /*----------------------------------------------------------------------------*/
 void TopoManager::clear()
 {
-    m_blocks.deleteAndClear();
-    m_faces.deleteAndClear();
-    m_cofaces.deleteAndClear();
-    m_edges.deleteAndClear();
-    m_coedges.deleteAndClear();
-    m_vertices.deleteAndClear();
+    Utils::deleteAndClear(m_blocks);
+    Utils::deleteAndClear(m_faces);
+    Utils::deleteAndClear(m_cofaces);
+    Utils::deleteAndClear(m_edges);
+    Utils::deleteAndClear(m_coedges);
+    Utils::deleteAndClear(m_vertices);
     m_defaultNbMeshingEdges = 10;
 }
 /*----------------------------------------------------------------------------*/
 std::vector<std::string> TopoManager::getBlocks() const
 {
-    std::vector<std::string> entities_names;
-
-    const std::vector<Block* >& entities_all = m_blocks.get();
-    for(auto e: entities_all) {
-        if(!e->isDestroyed()) {
-            entities_names.push_back(e->getName());
-        }
-    }
-    std::sort(entities_names.begin(), entities_names.end());
-
-    return entities_names;
+    return Utils::getEntityNames(m_blocks);
 }
 /*----------------------------------------------------------------------------*/
 std::vector<std::string> TopoManager::getCoFaces() const
 {
-    std::vector<std::string> entities_names;
-
-    const std::vector<CoFace* >& entities_all = m_cofaces.get();
-    for(auto e: entities_all) {
-        if(!e->isDestroyed()) {
-            entities_names.push_back(e->getName());
-        }
-    }
-    std::sort(entities_names.begin(), entities_names.end());
-
-    return entities_names;
+    return Utils::getEntityNames(m_cofaces);
 }
 /*----------------------------------------------------------------------------*/
 std::vector<std::string> TopoManager::getCoEdges() const
 {
-    std::vector<std::string> entities_names;
-
-    const std::vector<CoEdge* >& entities_all = m_coedges.get();
-    for(auto e: entities_all) {
-        if(!e->isDestroyed()) {
-            entities_names.push_back(e->getName());
-        }
-    }
-    std::sort(entities_names.begin(), entities_names.end());
-
-    return entities_names;
+    return Utils::getEntityNames(m_coedges);
 }
 /*----------------------------------------------------------------------------*/
-std::vector<std::string>  TopoManager::getVertices() const
+std::vector<std::string> TopoManager::getVertices() const
 {
-    std::vector<std::string> entities_names;
-
-    const std::vector<Vertex* >& entities_all = m_vertices.get();
-    for(auto e: entities_all) {
-        if(!e->isDestroyed()) {
-            entities_names.push_back(e->getName());
-        }
-    }
-    std::sort(entities_names.begin(), entities_names.end());
-
-    return entities_names;
+    return Utils::getEntityNames(m_vertices);
 }
 /*----------------------------------------------------------------------------*/
-void TopoManager::getBlocks(std::vector<Block* > &blocks, bool sort) const
+std::vector<Block*> TopoManager::getBlocksObj(bool sort) const
 {
-    blocks.clear();
-
-    if (sort){
-        std::list<Topo::Block*> l_te;
-        const std::vector<Block* >& blks = m_blocks.get();
-        for (std::vector<Block* >::const_iterator iter = blks.begin();
-                iter != blks.end(); ++iter)
-            if (!(*iter)->isDestroyed())
-                l_te.push_back(*iter);
-        l_te.sort(Utils::Entity::compareEntity);
-        l_te.unique();
-        blocks.insert(blocks.end(), l_te.begin(), l_te.end());
-    }
-    else {
-        const std::vector<Block* >& blks = m_blocks.get();
-        for (std::vector<Block* >::const_iterator iter = blks.begin();
-                iter != blks.end(); ++iter)
-            if (!(*iter)->isDestroyed())
-                blocks.push_back(*iter);
-    }
+    return Utils::getEntities(m_blocks, sort);
 }
 /*----------------------------------------------------------------------------*/
 void TopoManager::add(Block* b)
@@ -241,7 +182,7 @@ void TopoManager::add(Block* b)
     std::cout<<"TopoManager::add("<<b->getName()<<")"<<std::endl;
 #endif
 
-    m_blocks.add(b);
+    m_blocks.push_back(b);
 }
 /*----------------------------------------------------------------------------*/
 void TopoManager::remove(Block* b)
@@ -250,8 +191,7 @@ void TopoManager::remove(Block* b)
     std::cout<<"TopoManager::remove("<<b->getName()<<")"<<std::endl;
 #endif
 
-    m_blocks.remove(b, true);
-
+    Utils::remove(m_blocks, b, true);
 }
 /*----------------------------------------------------------------------------*/
 void TopoManager::add(Face* f)
@@ -260,7 +200,7 @@ void TopoManager::add(Face* f)
     std::cout<<"TopoManager::add("<<f->getName()<<")"<<std::endl;
 #endif
 
-    m_faces.add(f);
+    m_faces.push_back(f);
 }
 /*----------------------------------------------------------------------------*/
 void TopoManager::remove(Face* f)
@@ -269,7 +209,7 @@ void TopoManager::remove(Face* f)
     std::cout<<"TopoManager::remove("<<f->getName()<<")"<<std::endl;
 #endif
 
-    m_faces.remove(f, true);
+    Utils::remove(m_faces, f, true);
 }
 /*----------------------------------------------------------------------------*/
 void TopoManager::add(CoFace* f)
@@ -278,7 +218,7 @@ void TopoManager::add(CoFace* f)
     std::cout<<"TopoManager::add("<<f->getName()<<")"<<std::endl;
 #endif
 
-    m_cofaces.add(f);
+    m_cofaces.push_back(f);
 }
 /*----------------------------------------------------------------------------*/
 void TopoManager::remove(CoFace* f)
@@ -287,7 +227,7 @@ void TopoManager::remove(CoFace* f)
     std::cout<<"TopoManager::remove("<<f->getName()<<")"<<std::endl;
 #endif
 
-    m_cofaces.remove(f, true);
+    Utils::remove(m_cofaces, f, true);
 }
 /*----------------------------------------------------------------------------*/
 void TopoManager::add(Edge* ce)
@@ -296,7 +236,7 @@ void TopoManager::add(Edge* ce)
     std::cout<<"TopoManager::add("<<ce->getName()<<")"<<std::endl;
 #endif
 
-    m_edges.add(ce);
+    m_edges.push_back(ce);
 }
 /*----------------------------------------------------------------------------*/
 void TopoManager::remove(Edge* ce)
@@ -305,7 +245,7 @@ void TopoManager::remove(Edge* ce)
     std::cout<<"TopoManager::remove("<<ce->getName()<<")"<<std::endl;
 #endif
 
-    m_edges.remove(ce, true);
+    Utils::remove(m_edges, ce, true);
 }
 /*----------------------------------------------------------------------------*/
 void TopoManager::add(CoEdge* ce)
@@ -314,7 +254,7 @@ void TopoManager::add(CoEdge* ce)
     std::cout<<"TopoManager::add("<<ce->getName()<<")"<<std::endl;
 #endif
 
-    m_coedges.add(ce);
+    m_coedges.push_back(ce);
 }
 /*----------------------------------------------------------------------------*/
 void TopoManager::remove(CoEdge* ce)
@@ -323,7 +263,7 @@ void TopoManager::remove(CoEdge* ce)
     std::cout<<"TopoManager::remove("<<ce->getName()<<")"<<std::endl;
 #endif
 
-    m_coedges.remove(ce, true);
+    Utils::remove(m_coedges, ce, true);
 }
 /*----------------------------------------------------------------------------*/
 void TopoManager::add(Vertex* v)
@@ -332,7 +272,7 @@ void TopoManager::add(Vertex* v)
     std::cout<<"TopoManager::add("<<v->getName()<<")"<<std::endl;
 #endif
 
-    m_vertices.add(v);
+    m_vertices.push_back(v);
 }
 /*----------------------------------------------------------------------------*/
 void TopoManager::remove(Vertex* v)
@@ -341,7 +281,7 @@ void TopoManager::remove(Vertex* v)
     std::cout<<"TopoManager::remove("<<v->getName()<<")"<<std::endl;
 #endif
 
-    m_vertices.remove(v, true);
+    Utils::remove(m_vertices, v, true);
 }
 /*----------------------------------------------------------------------------*/
 Block* TopoManager::getBlock (const std::string& name, const bool exceptionIfNotFound) const
@@ -367,11 +307,9 @@ Block* TopoManager::getBlock (const std::string& name, const bool exceptionIfNot
     else
         new_name = name;
 
-    const std::vector<Block* >& blocks = m_blocks.get();
-    for (std::vector<Block* >::const_iterator iter = blocks.begin();
-    		iter != blocks.end(); ++iter)
-    	if (new_name == (*iter)->getName())
-    		bloc = (*iter);
+    for (Block* b : m_blocks)
+    	if (new_name == b->getName())
+    		bloc = b;
 
 #ifdef _DEBUG_TIMER
 	timer.stop();
@@ -394,13 +332,12 @@ Block* TopoManager::getBlock (const std::string& name, const bool exceptionIfNot
 /*----------------------------------------------------------------------------*/
 std::string TopoManager::getLastBlock()
 {
-    const std::vector<Block* >& blocks = m_blocks.get();
 #ifdef _DEBUG
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     message << "TopoManager::getLastBlock ()\n";
-    message << "m_blocks de taille:" << blocks.size() << "\n";
-   for (uint i=0; i<m_blocks.getNb(); i++)
-        message << " bloc "<<blocks[i]->getName()<<(blocks[i]->isDestroyed()?" détruit":" non détruit")<<"\n";
+    message << "m_blocks de taille:" << m_blocks.size() << "\n";
+   for (uint i=0; i<m_blocks.size(); i++)
+        message << " bloc "<<m_blocks[i]->getName()<<(m_blocks[i]->isDestroyed()?" détruit":" non détruit")<<"\n";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 #endif
 
@@ -409,57 +346,31 @@ std::string TopoManager::getLastBlock()
         return nom;
     // recherche du dernier non détruit, en partant de la fin
     int i;
-    for (i=blocks.size()-1; i>=0 && blocks[i]->isDestroyed(); i--)
+    for (i=m_blocks.size()-1; i>=0 && m_blocks[i]->isDestroyed(); i--)
     {}
     if (i>=0)
-        nom = blocks[i]->getName();
+        nom = m_blocks[i]->getName();
     return nom;
 }
 /*----------------------------------------------------------------------------*/
 int TopoManager::getNbBlocks() const
 {
-	const std::vector<Block* >& blocs = m_blocks.get();
-	int nb = 0;
-	for (uint i=0; i<blocs.size(); i++)
-		if (!blocs[i]->isDestroyed())
-			nb++;
-	return nb;
+	return Utils::getVisibleNb(m_blocks);
 }
 /*----------------------------------------------------------------------------*/
 int TopoManager::getNbFaces() const
 {
-	const std::vector<CoFace* >& cofaces = m_cofaces.get();
-	int nb = 0;
-	for (uint i=0; i<cofaces.size(); i++)
-		if (!cofaces[i]->isDestroyed())
-			nb++;
-	return nb;
+	return Utils::getVisibleNb(m_cofaces);
 }
 /*----------------------------------------------------------------------------*/
 int TopoManager::getNbEdges() const
 {
-	const std::vector<CoEdge* >& coedges = m_coedges.get();
-	int nb = 0;
-	for (uint i=0; i<coedges.size(); i++)
-		if (!coedges[i]->isDestroyed())
-			nb++;
-	return nb;
+	return Utils::getVisibleNb(m_coedges);
 }
 /*----------------------------------------------------------------------------*/
-void TopoManager::getCoFaces(std::vector<Topo::CoFace* >& faces) const
+std::vector<Topo::CoFace*> TopoManager::getCoFacesObj() const
 {
-    faces.clear();
-
-    const std::vector<CoFace* >& cofaces = m_cofaces.get();
-
-    std::list<Topo::CoFace*> l_te;
-    for (std::vector<CoFace* >::const_iterator iter = cofaces.begin();
-            iter != cofaces.end(); ++iter)
-        if (!(*iter)->isDestroyed())
-            l_te.push_back(*iter);
-    l_te.sort(Utils::Entity::compareEntity);
-    l_te.unique();
-    faces.insert(faces.end(), l_te.begin(), l_te.end());
+    return Utils::getEntities(m_cofaces, true);
 }
 /*----------------------------------------------------------------------------*/
 CoFace* TopoManager::getCoFace(const std::string& name, const bool exceptionIfNotFound) const
@@ -485,11 +396,9 @@ CoFace* TopoManager::getCoFace(const std::string& name, const bool exceptionIfNo
     else
         new_name = name;
 
-    const std::vector<CoFace* >& cofaces = m_cofaces.get();
-    for (std::vector<CoFace* >::const_iterator iter3 = cofaces.begin();
-    		iter3 != cofaces.end(); ++iter3)
-    	if (new_name == (*iter3)->getName())
-    		face = (*iter3);
+    for (CoFace* cf : m_cofaces)
+    	if (new_name == cf->getName())
+    		face = cf;
 
     #ifdef _DEBUG_TIMER
 	timer.stop();
@@ -525,11 +434,9 @@ Face* TopoManager::getFace(const std::string& name, const bool exceptionIfNotFou
         new_name = name;
 
     if (Face::isA(new_name)){
-        const std::vector<Face* >& faces = m_faces.get();
-        for (std::vector<Face* >::const_iterator iter2 = faces.begin();
-                iter2 != faces.end() && face == 0; ++iter2){
-            if (new_name == (*iter2)->getName())
-                face = (*iter2);
+        for (Face* f : m_faces){
+            if (new_name == f->getName())
+                face = f;
         }
     }
     else if (exceptionIfNotFound){
@@ -557,20 +464,9 @@ Face* TopoManager::getFace(const std::string& name, const bool exceptionIfNotFou
     return face;
 }
 /*----------------------------------------------------------------------------*/
-void TopoManager::getCoEdges(std::vector<Topo::CoEdge* >& edges) const
+std::vector<Topo::CoEdge*> TopoManager::getCoEdgesObj() const
 {
-    edges.clear();
-
-    const std::vector<CoEdge* >& coedges = m_coedges.get();
-
-    std::list<Topo::CoEdge*> l_te;
-    for (std::vector<CoEdge* >::const_iterator iter = coedges.begin();
-            iter != coedges.end(); ++iter)
-        if (!(*iter)->isDestroyed())
-            l_te.push_back(*iter);
-    l_te.sort(Utils::Entity::compareEntity);
-    l_te.unique();
-    edges.insert(edges.end(), l_te.begin(), l_te.end());
+    return Utils::getEntities(m_coedges, true);
 }
 /*----------------------------------------------------------------------------*/
 CoEdge* TopoManager::getCoEdge(const std::string& name, const bool exceptionIfNotFound) const
@@ -598,12 +494,9 @@ CoEdge* TopoManager::getCoEdge(const std::string& name, const bool exceptionIfNo
 
     //std::cout<<"TopoManager::getCoEdge("<<name<<") recherche de "<<new_name<<std::endl;
 
-    const std::vector<CoEdge* >& coedges = m_coedges.get();
-    for (std::vector<CoEdge* >::const_iterator iter4 = coedges.begin();
-    		iter4 != coedges.end(); ++iter4)
-
-    	if (new_name == (*iter4)->getName())
-    		edge = (*iter4);
+    for (CoEdge* ce : m_coedges)
+    	if (new_name == ce->getName())
+    		edge = ce;
 
 #ifdef _DEBUG_TIMER
 	timer.stop();
@@ -639,12 +532,9 @@ Edge* TopoManager::getEdge(const std::string& name, const bool exceptionIfNotFou
         new_name = name;
 
     if (Edge::isA(new_name)) {
-        const std::vector<Edge* >& edges = m_edges.get();
-        for (std::vector<Edge* >::const_iterator iter4 = edges.begin();
-                iter4 != edges.end(); ++iter4)
-
-            if (new_name == (*iter4)->getName())
-                edge = (*iter4);
+        for (Edge* e : m_edges)
+            if (new_name == e->getName())
+                edge = e;
     }
     else if (exceptionIfNotFound){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -672,20 +562,9 @@ Edge* TopoManager::getEdge(const std::string& name, const bool exceptionIfNotFou
     return edge;
 }
 /*----------------------------------------------------------------------------*/
-void TopoManager::getVertices(std::vector<Topo::Vertex* >& vertices) const
+std::vector<Topo::Vertex*> TopoManager::getVerticesObj() const
 {
-    vertices.clear();
-
-    const std::vector<Vertex* >& vtx = m_vertices.get();
-
-    std::list<Topo::Vertex*> l_te;
-    for (std::vector<Vertex* >::const_iterator iter = vtx.begin();
-            iter != vtx.end(); ++iter)
-        if (!(*iter)->isDestroyed())
-            l_te.push_back(*iter);
-    l_te.sort(Utils::Entity::compareEntity);
-    l_te.unique();
-    vertices.insert(vertices.end(), l_te.begin(), l_te.end());
+    return Utils::getEntities(m_vertices, true);
 }
 /*----------------------------------------------------------------------------*/
 Vertex* TopoManager::getVertex(const std::string& name, const bool exceptionIfNotFound) const
@@ -711,12 +590,9 @@ Vertex* TopoManager::getVertex(const std::string& name, const bool exceptionIfNo
     else
     	new_name = name;
 
-    const std::vector<Vertex* >& vertices = m_vertices.get();
-    for (std::vector<Vertex* >::const_iterator iter2 = vertices.begin();
-    		iter2 != vertices.end(); ++iter2)
-
-    	if (new_name == (*iter2)->getName())
-    		vertex = (*iter2);
+    for (Vertex* v : m_vertices)
+    	if (new_name == v->getName())
+    		vertex = v;
 
 #ifdef _DEBUG_TIMER
 	timer.stop();
@@ -761,12 +637,9 @@ std::string TopoManager::getVertexAt(const Point& pt1) const
 {
 	// il pourrait y en avoir aucun ou plusieurs, on n'en veut qu'un
 	std::vector<Vertex*> selected;
-
-	const std::vector<Vertex* >& all = m_vertices.get();
-	for (std::vector<Vertex*>::const_iterator iter = all.begin();
-			iter != all.end(); ++iter)
-		if ((*iter)->getCoord() == pt1)
-			selected.push_back(*iter);
+	for (Vertex* v : m_vertices)
+		if (v->getCoord() == pt1)
+			selected.push_back(v);
 
 	if (selected.size() == 1)
 		return selected[0]->getName();
@@ -782,11 +655,9 @@ std::string TopoManager::getEdgeAt(const Point& pt1, const Point& pt2) const
 	// il pourrait y en avoir aucune ou plusieurs, on n'en veut qu'un
 	std::vector<CoEdge*> selected;
 
-	const std::vector<CoEdge* >& all = m_coedges.get();
-	for (std::vector<CoEdge*>::const_iterator iter = all.begin();
-			iter != all.end(); ++iter)
-		if ((*iter)->getVertex(0)->getCoord() == pt1 && (*iter)->getVertex(1)->getCoord() == pt2)
-			selected.push_back(*iter);
+	for (CoEdge* ce : m_coedges)
+		if (ce->getVertex(0)->getCoord() == pt1 && ce->getVertex(1)->getCoord() == pt2)
+			selected.push_back(ce);
 
 	if (selected.size() == 1)
 		return selected[0]->getName();
@@ -808,23 +679,20 @@ std::string TopoManager::getFaceAt(std::vector<Point>& pts) const
 #endif
 	// il pourrait y en avoir aucune ou plusieurs, on n'en veut qu'une
 	std::vector<CoFace*> cofaces;
-
-	const std::vector<CoFace* >& all = m_cofaces.get();
-	for (std::vector<CoFace*>::const_iterator iter = all.begin();
-	            iter != all.end(); ++iter){
+	for (CoFace* cf : m_cofaces){
 		std::vector<Topo::Vertex*> vertices;
-		(*iter)->getAllVertices(vertices);
+		cf->getAllVertices(vertices);
 		uint i;
 		if (vertices.size() != pts.size())
 			continue;
 		for (i=0; i<vertices.size() && vertices[i]->getCoord() == pts[i]; i++){
 		}
 #ifdef _DEBUG2
-		std::cout<<"Pour "<<(*iter)->getName()<<" vertices.size() = "<<vertices.size()<<" et i = "<<i<<std::endl;
+		std::cout<<"Pour "<<cf->getName()<<" vertices.size() = "<<vertices.size()<<" et i = "<<i<<std::endl;
 #endif
 
 		if (i == vertices.size())
-			cofaces.push_back(*iter);
+			cofaces.push_back(cf);
 	} // end for iter = m_cofaces.begin()
 
 	if (cofaces.size() == 1)
@@ -843,11 +711,9 @@ std::string TopoManager::getBlockAt(std::vector<Point>& pts) const
 	// il pourrait y en avoir aucune ou plusieurs, on n'en veut qu'une
 	std::vector<Block*> blocks;
 
-	const std::vector<Block* >& all = m_blocks.get();
-	for (std::vector<Block*>::const_iterator iter = all.begin();
-	            iter != all.end(); ++iter){
+	for (Block* b : m_blocks){
 		std::vector<Topo::Vertex*> vertices;
-		(*iter)->getAllVertices(vertices);
+		b->getAllVertices(vertices);
 		uint i;
 		if (vertices.size() != pts.size())
 			continue;
@@ -855,14 +721,14 @@ std::string TopoManager::getBlockAt(std::vector<Point>& pts) const
 		}
 
 		if (i == vertices.size())
-			blocks.push_back(*iter);
+			blocks.push_back(b);
 	} // end for iter = m_blocks.begin()
 
-	if (blocks.size() == 1)
-		return blocks[0]->getName();
+	if (m_blocks.size() == 1)
+		return m_blocks[0]->getName();
 	else {
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-		message <<"getFaceAt impossible, on trouve "<<blocks.size()
+		message <<"getFaceAt impossible, on trouve "<<m_blocks.size()
 				<<" blocs avec ces "
 				<<pts.size()<<" positions";
 		throw TkUtil::Exception(message);
@@ -2915,12 +2781,8 @@ Mgx3D::Internal::M3DCommandResult* TopoManager::snapVertices(Topo::CoEdge* ce1, 
 		bool project_on_first,
 		TkUtil::UTF8String& scriptCommand)
 {
-    std::vector<Topo::Vertex* > vertices1;
-    std::vector<Topo::Vertex* > vertices2;
-
-    ce1->getVertices(vertices1);
-    ce2->getVertices(vertices2);
-
+    std::vector<Topo::Vertex*> vertices1 = ce1->getVertices();
+    std::vector<Topo::Vertex*> vertices2 = ce2->getVertices();
     return snapVertices(vertices1, vertices2, project_on_first, scriptCommand);
 }
 /*----------------------------------------------------------------------------*/
@@ -2928,12 +2790,8 @@ Mgx3D::Internal::M3DCommandResult* TopoManager::snapVertices(Topo::CoFace* cf1, 
 		bool project_on_first,
 		TkUtil::UTF8String& scriptCommand)
 {
-    std::vector<Topo::Vertex* > vertices1;
-    std::vector<Topo::Vertex* > vertices2;
-
-    cf1->getVertices(vertices1);
-    cf2->getVertices(vertices2);
-
+    std::vector<Topo::Vertex*> vertices1 = cf1->getVertices();
+    std::vector<Topo::Vertex*> vertices2 = cf2->getVertices();
     return snapVertices(vertices1, vertices2, project_on_first, scriptCommand);
 }
 /*----------------------------------------------------------------------------*/
@@ -3187,9 +3045,7 @@ Mgx3D::Internal::M3DCommandResult* TopoManager::setAllMeshingProperty(CoEdgeMesh
                     <<"), toutes les arêtes)";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    std::vector<Topo::CoEdge* > coedges;
-    getCoEdges(coedges);
-
+    std::vector<Topo::CoEdge*> coedges = getCoEdgesObj();
     Topo::CommandSetEdgeMeshingProperty* command = new Topo::CommandSetEdgeMeshingProperty(getContext(), emp, coedges);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -3304,9 +3160,7 @@ Mgx3D::Internal::M3DCommandResult* TopoManager::setAllMeshingProperty(CoFaceMesh
                     <<"), toutes les faces)";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    std::vector<Topo::CoFace* > cofaces;
-    getCoFaces(cofaces);
-
+    std::vector<Topo::CoFace*> cofaces = getCoFacesObj();
     Topo::CommandSetFaceMeshingProperty* command = new Topo::CommandSetFaceMeshingProperty(getContext(), emp, cofaces);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -3359,9 +3213,7 @@ Mgx3D::Internal::M3DCommandResult* TopoManager::setAllMeshingProperty(BlockMeshi
                     <<"), toutes les faces)";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    std::vector<Topo::Block* > blocks;
-    getBlocks(blocks);
-
+    std::vector<Topo::Block*> blocks = getBlocksObj();
     Topo::CommandSetBlockMeshingProperty* command = new Topo::CommandSetBlockMeshingProperty(getContext(), emp, blocks);
 
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -3585,15 +3437,11 @@ std::vector<std::vector<Topo::CoEdge*> > TopoManager::
 getFusableEdgesObj()
 {
     // Récupérations de toutes les faces communes
-    std::vector<Topo::CoFace* > all_cofaces;
-    getCoFaces(all_cofaces);
-
     // On ne conserve que les CoFaces dans une topo 2D (non utilisées par une Face)
     std::vector<Topo::CoFace* > cofaces;
-    for (std::vector<Topo::CoFace* >::iterator iter = all_cofaces.begin();
-            iter != all_cofaces.end(); ++iter)
-        if ((*iter)->getNbFaces() == 0)
-            cofaces.push_back(*iter);
+    for (Topo::CoFace* cf : getCoFacesObj())
+        if (cf->getNbFaces() == 0)
+            cofaces.push_back(cf);
 
     // On fait une recherche des groupes de CoEdges partagées par les même CoFaces
     std::vector<std::vector<Topo::CoEdge*> > l_coedges;
@@ -3602,17 +3450,9 @@ getFusableEdgesObj()
     std::map<uint, uint> coedge_color;
     uint color = 0; // la couleur pour les prochaines coedges vues
 
-    for (std::vector<Topo::CoFace* >::iterator iter1 = cofaces.begin();
-            iter1 != cofaces.end(); ++iter1){
-        Topo::CoFace* coface = *iter1;
-        std::vector<Edge* > edges;
-        coface->getEdges(edges);
-
-        for (std::vector<Topo::Edge* >::iterator iter2 = edges.begin();
-                iter2 != edges.end(); ++iter2){
-            Topo::Edge* edge = *iter2;
-            std::vector<CoEdge* > coedges;
-            edge->getCoEdges(coedges);
+    for (Topo::CoFace* coface : cofaces){
+        for (Topo::Edge* edge : coface->getEdges()){
+            std::vector<CoEdge*> coedges = edge->getCoEdges();
             // on change de couleur à chaque nouvelle arête
             color += 1;
 
@@ -3637,20 +3477,11 @@ getFusableEdgesObj()
 
     // après coloration, on recherche les groupes de même couleur
     // on remet à 0 les couleurs des groupes sélectionnés pour éviter de les prendre 2 fois
-    for (std::vector<Topo::CoFace* >::iterator iter1 = cofaces.begin();
-            iter1 != cofaces.end(); ++iter1){
-        Topo::CoFace* coface = *iter1;
-        std::vector<Edge* > edges;
-        coface->getEdges(edges);
-
-        for (std::vector<Topo::Edge* >::iterator iter2 = edges.begin();
-                iter2 != edges.end(); ++iter2){
-            Topo::Edge* edge = *iter2;
-            std::vector<CoEdge* > coedges;
-            edge->getCoEdges(coedges);
-
+    for (Topo::CoFace* coface : cofaces){
+        for (Topo::Edge* edge : coface->getEdges()){
             uint prec_color = 0;
             std::vector<CoEdge*> fusesableCoedges;
+            std::vector<CoEdge*> coedges = edge->getCoEdges();
 
             for (std::vector<Topo::CoEdge* >::iterator iter3 = coedges.begin();
                     iter3 != coedges.end(); ++iter3){
@@ -3706,19 +3537,13 @@ getFusableEdges()
 std::vector<std::string> TopoManager::getInvalidEdges() const
 {
     std::vector<std::string> invalidEdges;
-
-    // on prend toutes les CoEdges disponibles
-    std::vector<Topo::CoEdge* > coedges;
-    getCoEdges(coedges);
-
-    for (std::vector<Topo::CoEdge* >::iterator iter = coedges.begin();
-            iter != coedges.end(); ++iter){
+    for (Topo::CoEdge* ce : getCoEdgesObj()){
         try {
-            (*iter)->check();
+            ce->check();
         }
         catch (const TkUtil::Exception& exc)
         {
-        	invalidEdges.push_back((*iter)->getName());
+        	invalidEdges.push_back(ce->getName());
         }
     }
 
@@ -3729,9 +3554,8 @@ Mgx3D::Internal::M3DCommandResult* TopoManager::
 fuseEdges(std::vector<std::string> &coedges_names)
 {
     std::vector<CoEdge*> coedges;
-    for (std::vector<std::string>::iterator iter = coedges_names.begin();
-            iter != coedges_names.end(); ++iter)
-        coedges.push_back(getCoEdge(*iter));
+    for (std::string s : coedges_names)
+        coedges.push_back(getCoEdge(s));
     return fuseEdges(coedges);
 }
 /*----------------------------------------------------------------------------*/
@@ -4989,55 +4813,39 @@ Mgx3D::Internal::M3DCommandResult* TopoManager::setDefaultNbMeshingEdges(int nb)
 std::vector<std::string> TopoManager::getBorderFaces() const
 {
     std::vector<std::string> borderFaces;
-
     // on prend toutes les CoFaces disponibles
-    std::vector<Topo::CoFace* > cofaces;
-    getCoFaces(cofaces);
-
-    for (std::vector<Topo::CoFace* >::iterator iter = cofaces.begin();
-    		iter != cofaces.end(); ++iter)
-    	if ((*iter)->getNbBlocks() == 1)
-    		borderFaces.push_back((*iter)->getName());
-
+    for (Topo::CoFace* cf : getCoFacesObj())
+    	if (cf->getNbBlocks() == 1)
+    		borderFaces.push_back(cf->getName());
     return borderFaces;
 }
 /*----------------------------------------------------------------------------*/
 std::vector<std::string> TopoManager::getFacesWithoutBlock() const
 {
     std::vector<std::string> facesWB;
-
     // on prend toutes les CoFaces disponibles
-    std::vector<Topo::CoFace* > cofaces;
-    getCoFaces(cofaces);
-
-    for (std::vector<Topo::CoFace* >::iterator iter = cofaces.begin();
-    		iter != cofaces.end(); ++iter)
-    	if ((*iter)->getNbBlocks() == 0)
-    		facesWB.push_back((*iter)->getName());
-
+    for (Topo::CoFace* cf : getCoFacesObj())
+    	if (cf->getNbBlocks() == 0)
+    		facesWB.push_back(cf->getName());
     return facesWB;
 }
 /*----------------------------------------------------------------------------*/
 std::vector<std::string> TopoManager::getSemiConformalFaces() const
 {
-	std::vector<Topo::CoFace* > cofaces;
-	getCoFaces(cofaces);
-
 	// recherches parmis ces cofaces celles qui sont reliées à deux faces et pour lesquelles
 	// il y a une semi-conformité
 	std::vector<std::string> semiConf;
-	for (uint i=0; i<cofaces.size(); i++){
-		CoFace* coface = cofaces[i];
+    for (Topo::CoFace* cf : getCoFacesObj()){
 		bool isSemiConf = false;
-		if (coface->getNbFaces() == 2 && coface->isStructured())
+		if (cf->getNbFaces() == 2 && cf->isStructured())
 			for (uint j=0; j<2; j++){
-				Face* face = coface->getFace(j);
+				Face* face = cf->getFace(j);
 				for (uint dir=0; dir<2; dir++)
-					if (face->getRatio(coface,dir) != 1)
+					if (face->getRatio(cf,dir) != 1)
 						isSemiConf = true;
 			} // end for j
 		if (isSemiConf)
-			semiConf.push_back(coface->getName());
+			semiConf.push_back(cf->getName());
 	} // end for i
 
 	return semiConf;
@@ -5046,126 +4854,79 @@ std::vector<std::string> TopoManager::getSemiConformalFaces() const
 std::vector<std::string> TopoManager::getInvalidFaces() const
 {
     std::vector<std::string> invalidFaces;
-
     // on prend toutes les CoFaces disponibles
-    std::vector<Topo::CoFace* > cofaces;
-    getCoFaces(cofaces);
-
-    for (std::vector<Topo::CoFace* >::iterator iter = cofaces.begin();
-            iter != cofaces.end(); ++iter){
+    for (Topo::CoFace* cf : getCoFacesObj()){
         try {
-            (*iter)->check();
+            cf->check();
         }
         catch (const TkUtil::Exception& exc)
         {
-            invalidFaces.push_back((*iter)->getName());
+            invalidFaces.push_back(cf->getName());
         }
     }
-
     return invalidFaces;
 }
 /*----------------------------------------------------------------------------*/
 std::vector<std::string> TopoManager::getUnstructuredFaces() const
 {
     std::vector<std::string> unstructuredFaces;
-
     // on prend toutes les CoFaces disponibles
-    std::vector<Topo::CoFace* > cofaces;
-    getCoFaces(cofaces);
-
-    for (std::vector<Topo::CoFace* >::iterator iter = cofaces.begin();
-            iter != cofaces.end(); ++iter){
-        if (!(*iter)->isStructured())
-        	unstructuredFaces.push_back((*iter)->getName());
-    }
-
+    for (Topo::CoFace* cf : getCoFacesObj())
+        if (!cf->isStructured())
+        	unstructuredFaces.push_back(cf->getName());
     return unstructuredFaces;
 }
 /*----------------------------------------------------------------------------*/
 std::vector<std::string> TopoManager::getTransfiniteMeshLawFaces() const
 {
     std::vector<std::string> selectedFaces;
-
     // on prend toutes les CoFaces disponibles
-    std::vector<Topo::CoFace* > cofaces;
-    getCoFaces(cofaces);
-
-    for (std::vector<Topo::CoFace* >::iterator iter = cofaces.begin();
-            iter != cofaces.end(); ++iter){
-        if ((*iter)->getMeshLaw() == CoFaceMeshingProperty::transfinite)
-        	selectedFaces.push_back((*iter)->getName());
-    }
-
+    for (Topo::CoFace* cf : getCoFacesObj())
+        if (cf->getMeshLaw() == CoFaceMeshingProperty::transfinite)
+        	selectedFaces.push_back(cf->getName());
     return selectedFaces;
 }
 /*----------------------------------------------------------------------------*/
 std::vector<std::string> TopoManager::getInvalidBlocks() const
 {
     std::vector<std::string> invalidBlocks;
-
     // on prend tous les blocs disponibles
-    std::vector<Topo::Block* > blocs;
-    getBlocks(blocs);
-
-    for (std::vector<Topo::Block* >::iterator iter = blocs.begin();
-            iter != blocs.end(); ++iter){
+    for (Topo::Block* b : getBlocksObj()){
         try {
-            (*iter)->check();
+            b->check();
         }
         catch (const TkUtil::Exception& exc)
         {
-        	invalidBlocks.push_back((*iter)->getName());
+        	invalidBlocks.push_back(b->getName());
         }
     }
-
     return invalidBlocks;
 }
 /*----------------------------------------------------------------------------*/
 std::vector<std::string> TopoManager::getVisibleBlocks() const
 {
     std::vector<std::string> visibleBlocks;
-
-    std::vector<Topo::Block* > blocs;
-    getBlocks(blocs);
-
-    for (std::vector<Topo::Block* >::iterator iter = blocs.begin();
-            iter != blocs.end(); ++iter){
-    	if ((*iter)->isVisible())
-    		visibleBlocks.push_back((*iter)->getName());
-    }
-
+    for (Topo::Block* b : getBlocksObj())
+    	if (b->isVisible())
+    		visibleBlocks.push_back(b->getName());
     return visibleBlocks;
 }
 /*----------------------------------------------------------------------------*/
 std::vector<std::string> TopoManager::getUnstructuredBlocks() const
 {
     std::vector<std::string> unstructuredBlocks;
-
-    std::vector<Topo::Block* > blocs;
-    getBlocks(blocs);
-
-    for (std::vector<Topo::Block* >::iterator iter = blocs.begin();
-            iter != blocs.end(); ++iter){
-    	if (!(*iter)->isStructured())
-    		unstructuredBlocks.push_back((*iter)->getName());
-    }
-
+    for (Topo::Block* b : getBlocksObj())
+    	if (!b->isStructured())
+    		unstructuredBlocks.push_back(b->getName());
     return unstructuredBlocks;
 }
 /*----------------------------------------------------------------------------*/
 std::vector<std::string> TopoManager::getTransfiniteMeshLawBlocks() const
 {
     std::vector<std::string> selectedBlocks;
-
-    std::vector<Topo::Block* > blocs;
-    getBlocks(blocs);
-
-    for (std::vector<Topo::Block* >::iterator iter = blocs.begin();
-            iter != blocs.end(); ++iter){
-    	if ((*iter)->getMeshLaw() == BlockMeshingProperty::transfinite)
-    		selectedBlocks.push_back((*iter)->getName());
-    }
-
+    for (Topo::Block* b : getBlocksObj())
+    	if (b->getMeshLaw() == BlockMeshingProperty::transfinite)
+    		selectedBlocks.push_back(b->getName());
     return selectedBlocks;
 }
 /*----------------------------------------------------------------------------*/
