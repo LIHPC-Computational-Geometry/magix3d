@@ -41,24 +41,24 @@ class CoEdge;
      /** Création d'un clone, on copie toutes les informations */
      EdgeTopoProperty* clone() {
          EdgeTopoProperty* prop = new EdgeTopoProperty();
-         prop->m_vertices.clone(m_vertices);
-         prop->m_coedges.clone(m_coedges);
-         prop->m_cofaces.clone(m_cofaces);
+         prop->m_vertices.insert(prop->m_vertices.end(), m_vertices.begin(), m_vertices.end());
+         prop->m_coedges.insert(prop->m_coedges.end(), m_coedges.begin(), m_coedges.end());
+         prop->m_cofaces.insert(prop->m_cofaces.end(), m_cofaces.begin(), m_cofaces.end());
 
          return prop;
      }
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des sommets
-     Utils::Container<Vertex>& getVertexContainer() {return m_vertices;}
+     std::vector<Vertex*>& getVertexContainer() {return m_vertices;}
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des faces communes
-     Utils::Container<CoFace>& getCoFaceContainer() {return m_cofaces;}
+     std::vector<CoFace*>& getCoFaceContainer() {return m_cofaces;}
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des arêtes communes
-     Utils::Container<CoEdge>& getCoEdgeContainer() {return m_coedges;}
+     std::vector<CoEdge*>& getCoEdgeContainer() {return m_coedges;}
 
      /*------------------------------------------------------------------------*/
      /** \brief   Suppression des dépendances (entités topologiques incidentes)
@@ -72,13 +72,13 @@ class CoEdge;
 
  private:
      /// Lien avec les faces incidentes communes
-     Utils::Container<CoFace> m_cofaces;
+     std::vector<CoFace*> m_cofaces;
 
      /// Lien avec les arêtes communes sur lesquelles se base cette arête
-     Utils::Container<CoEdge> m_coedges;
+     std::vector<CoEdge*> m_coedges;
 
      /// Lien avec les sommets extrémités
-     Utils::Container<Vertex> m_vertices;
+     std::vector<Vertex*> m_vertices;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo

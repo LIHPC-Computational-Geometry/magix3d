@@ -291,11 +291,9 @@ SysCoord* SysCoordManager::getSysCoord (const std::string& name, const bool exce
         new_name = name;
 
     if (SysCoord::isA(new_name)){
-        const std::vector<SysCoord* >& sysCoord = m_reperes.get();
-        for (std::vector<SysCoord* >::const_iterator iter2 = sysCoord.begin();
-                iter2 != sysCoord.end() && rep == 0; ++iter2){
-            if (new_name == (*iter2)->getName())
-                rep = (*iter2);
+        for (SysCoord* sc : m_reperes){
+            if (new_name == sc->getName())
+                rep = sc;
         }
     }
     else if (exceptionIfNotFound){

@@ -274,11 +274,8 @@ vector<string> QtTopologySplitBlockPanel::getBlocksNames ( ) const
 	CHECK_NULL_PTR_ERROR (_blocksPanel)
 	if (true == allBlocks ( ))
 	{
-		vector<Block*>	blocks;
-		getContext ( ).getTopoManager ( ).getBlocks (blocks);
-		for (vector<Block*>::iterator	it	= blocks.begin ( );
-		     blocks.end ( ) != it; it++)
-			names.push_back ((*it)->getUniqueName ( ));
+		for (Block* bl : getContext ( ).getTopoManager ( ).getBlocksObj())
+			names.push_back (bl->getUniqueName ( ));
 	}	// if (true == allBlocks ( ))
 	else
 		names	= _blocksPanel->getUniqueNames ( );
@@ -429,11 +426,8 @@ vector<Entity*> QtTopologySplitBlockPanel::getInvolvedEntities ( )
 
 	if (true == allBlocks ( ))
 	{
-		vector<Block*>	blocks;
-		getContext ( ).getTopoManager ( ).getBlocks (blocks);
-		for (vector<Block*>::iterator	it	= blocks.begin ( );
-		     blocks.end ( ) != it; it++)
-			entities.push_back (*it);
+		for (Block* bl : getContext ( ).getTopoManager ( ).getBlocksObj())
+			entities.push_back (bl);
 	}	// if (true == allBlocks ( ))
 	else
 	{

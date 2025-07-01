@@ -171,7 +171,7 @@ CommandNewTopo::
             Group::Group0D *group = getContext().getGroupManager().getNewGroup0D(m_groupName,
                                                                                       &getInfoCommand());
             group->add(vtx);
-            vtx->getGroupsContainer().add(group);
+            vtx->getGroupsContainer().push_back(group);
             getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
 
             getInfoCommand().addTopoInfoEntity(vtx, Internal::InfoCommand::CREATED);
@@ -187,7 +187,7 @@ CommandNewTopo::
             Group::Group1D *group = getContext().getGroupManager().getNewGroup1D(groupName,
                                                                                       &getInfoCommand());
             group->add(coedge);
-            coedge->getGroupsContainer().add(group);
+            coedge->getGroupsContainer().push_back(group);
             getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
 
             getInfoCommand().addTopoInfoEntity(coedge, Internal::InfoCommand::CREATED);
@@ -348,7 +348,7 @@ CommandNewTopo::
             Group::Group2D *group = getContext().getGroupManager().getNewGroup2D(groupName,
                                                                                       &getInfoCommand());
             group->add(face);
-            face->getGroupsContainer().add(group);
+            face->getGroupsContainer().push_back(group);
             getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
 
             getInfoCommand().addTopoInfoEntity(face, Internal::InfoCommand::CREATED);
@@ -371,7 +371,7 @@ void CommandNewTopo::getPreviewRepresentation(Utils::DisplayRepresentation& dr)
 Topo::CoEdge* CommandNewTopo::getCommonEdge(const Vertex* v1, const Vertex* v2) {
 
     std::vector<CoEdge*> test1 = v1->getCoEdges();
-            std::vector<CoEdge*> test2 = v2->getCoEdges();
+    std::vector<CoEdge*> test2 = v2->getCoEdges();
 
     for(auto v1_e : v1->getCoEdges()){
         for(auto v2_e : v2->getCoEdges()){

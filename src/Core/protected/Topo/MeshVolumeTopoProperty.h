@@ -39,14 +39,14 @@ class Block;
      MeshVolumeTopoProperty* clone() {
          MeshVolumeTopoProperty* prop = new MeshVolumeTopoProperty();
 
-         prop->m_blocks.clone(m_blocks);
+         prop->m_blocks.insert(prop->m_blocks.end(), m_blocks.begin(), m_blocks.end());
 
          return prop;
      }
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des blocs
-     Utils::Container<Block>& getBlockContainer() {return m_blocks;}
+     std::vector<Block*>& getBlockContainer() {return m_blocks;}
 
      /*------------------------------------------------------------------------*/
      /** \brief   Suppression des relations
@@ -58,7 +58,7 @@ class Block;
 
  private:
      /// lien sur les Topo::Block qui ont participés à la constitution des mailles
-     Utils::Container<Block> m_blocks;
+     std::vector<Block*> m_blocks;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo

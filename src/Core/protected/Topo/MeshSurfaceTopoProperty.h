@@ -40,14 +40,14 @@ class CoFace;
      MeshSurfaceTopoProperty* clone() {
          MeshSurfaceTopoProperty* prop = new MeshSurfaceTopoProperty();
 
-         prop->m_cofaces.clone(m_cofaces);
+         prop->m_cofaces.insert(prop->m_cofaces.end(), m_cofaces.begin(), m_cofaces.end());
 
          return prop;
      }
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des faces
-     Utils::Container<CoFace>& getCoFaceContainer() {return m_cofaces;}
+     std::vector<CoFace*>& getCoFaceContainer() {return m_cofaces;}
 
      /*------------------------------------------------------------------------*/
      /** \brief   Suppression des relations
@@ -59,7 +59,7 @@ class CoFace;
 
  private:
      /// lien sur les Topo::CoFace qui ont participées à la constitution des mailles
-     Utils::Container<CoFace>  m_cofaces;
+     std::vector<CoFace*>  m_cofaces;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo

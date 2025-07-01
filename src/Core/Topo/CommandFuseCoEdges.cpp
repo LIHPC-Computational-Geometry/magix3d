@@ -69,17 +69,15 @@ internalExecute()
 
     // Vérification qu'elles appartiennent aux mêmes arêtes
     std::map<uint, uint> filtre_edges;
-    std::vector<Edge* > edges;
-    m_coedges[0]->getEdges(edges);
+    std::vector<Edge* > edges = m_coedges[0]->getEdges();
     uint nb_edges = edges.size();
-    for (std::vector<Topo::Edge* >::iterator iter2 = edges.begin();
-            iter2 != edges.end(); ++iter2)
-        filtre_edges[(*iter2)->getUniqueId()] = 1;
+    for (Topo::Edge* edge : edges)
+        filtre_edges[edge->getUniqueId()] = 1;
 
     for (std::vector<Topo::CoEdge* >::iterator iter1 = m_coedges.begin();
                 iter1 != m_coedges.end(); ++iter1){
 
-        (*iter1)->getEdges(edges);
+        edges = (*iter1)->getEdges();
         if (nb_edges != edges.size())
             throw TkUtil::Exception (TkUtil::UTF8String ("La fusion d'arêtes communes ne peut se faire car elles ne sont pas toutes utilisées par le même nombre arêtes", TkUtil::Charset::UTF_8));
 
@@ -124,12 +122,9 @@ internalExecute()
     m_coedges.pop_back();
     for (std::vector<Topo::CoEdge* >::iterator iter1 = m_coedges.begin();
             iter1 != m_coedges.end(); ++iter1){
-    	std::vector<Topo::Vertex*> vertices;
-    	(*iter1)->getVertices(vertices);
-    	for (std::vector<Topo::Vertex*>::iterator iter2 = vertices.begin();
-    			iter2 != vertices.end(); ++iter2)
-    		if (*iter2 != vtx1 && *iter2 != vtx2)
-    			(*iter2)->free(&getInfoCommand());
+    	for (Topo::Vertex* v : (*iter1)->getVertices())
+    		if (v != vtx1 && v != vtx2)
+    			v->free(&getInfoCommand());
 
     	(*iter1)->free(&getInfoCommand());
     }

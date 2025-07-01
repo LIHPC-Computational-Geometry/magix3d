@@ -370,8 +370,7 @@ std::vector<Topo::Edge*> ServiceGeomToTopo::getEdges(std::vector<Topo::CoEdge*>&
 		// accumulation des coedges pour une edge
 		do {
 //			std::cout<<"vtx_i = "<<vtx_i->getName()<<std::endl;
-			std::vector<Topo::CoEdge*> coedges_loc;
-			vtx_i->getCoEdges(coedges_loc);
+			std::vector<Topo::CoEdge*> coedges_loc = vtx_i->getCoEdges();
 //			std::cout<<"coedges_loc.size() = "<<coedges_loc.size()<<std::endl;
 			// recherche d'une arête non marquée
 			Topo::CoEdge* coedge = 0;

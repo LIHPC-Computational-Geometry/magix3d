@@ -176,8 +176,8 @@ public:
 	/// retourne le repère à partir de son nom
 	SysCoord* getSysCoord (const std::string& name, const bool exceptionIfNotFound=true) const;
 
-	void add(SysCoord* rep) {m_reperes.add(rep);}
-	void remove(SysCoord* rep) {m_reperes.remove(rep, true);}
+	void add(SysCoord* rep) {m_reperes.push_back(rep);}
+	void remove(SysCoord* rep) {Utils::remove(m_reperes, rep, true);}
 #endif
 
 private:
@@ -188,7 +188,7 @@ private:
 	SysCoordManager& operator = (const SysCoordManager&);
 
     /** repères accessibles depuis le manager */
-    Utils::Container<CoordinateSystem::SysCoord> m_reperes;
+    std::vector<CoordinateSystem::SysCoord*> m_reperes;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace CoordinateSystem

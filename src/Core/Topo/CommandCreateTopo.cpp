@@ -94,8 +94,7 @@ void CommandCreateTopo::split()
 
         // entités pour lesquelles il n'est pas prévu de les représenté ni de les utiliser
         // mais pour lesquelles il est utile de les marquer comme CREATED
-        std::vector<Topo::Edge* > edges;
-        (*iter)->getEdges(edges);
+        std::vector<Topo::Edge* > edges = (*iter)->getEdges();
         l_e.insert(l_e.end(), edges.begin(), edges.end());
     }
 

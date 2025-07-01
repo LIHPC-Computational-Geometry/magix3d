@@ -36,25 +36,19 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
         void ExportBlocksCGNSImplementation::perform(Internal::InfoCommand* icmd)
         {
-
-            std::vector<Topo::Vertex*> topo_vertices;
-            std::vector<Topo::Block*> topo_blocs;
-            std::vector<Topo::CoFace*> topo_faces;
-
             std::map<gmds::TCellID,unsigned long> n2v;
 
             gmds::Mesh mesh(gmds::MeshModel(gmds::DIM3 | gmds::N | gmds::R | gmds::R2N | gmds::N2R));
 
             gmds::Mesh localMesh = m_context.getMeshManager().getMesh()->getGMDSMesh();
 
-
             for(int iVertex = 0; iVertex < localMesh.getNbNodes(); iVertex++){
                 gmds::Node n_local = localMesh.get<gmds::Node>(iVertex);
                 gmds::Node n = mesh.newNode(n_local.X(),n_local.Y(),n_local.Z());
             }
 
-            m_context.getTopoManager().getBlocks(topo_blocs);
-            m_context.getTopoManager().getCoFaces(topo_faces);
+            std::vector<Topo::Block*> topo_blocs = m_context.getTopoManager().getBlocksObj();
+            std::vector<Topo::CoFace*> topo_faces = m_context.getTopoManager().getCoFacesObj();
 
             for(int iBlock = 0; iBlock < topo_blocs.size(); iBlock++){
                 std::vector<unsigned long> ids;

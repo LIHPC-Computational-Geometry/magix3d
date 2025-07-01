@@ -47,10 +47,10 @@ class Block;
      CoFaceTopoProperty* clone() {
          CoFaceTopoProperty* prop = new CoFaceTopoProperty();
 
-         prop->m_vertices.clone(m_vertices);
-         prop->m_edges.clone(m_edges);
-         prop->m_faces.clone(m_faces);
-         prop->m_groups.clone(m_groups);
+         prop->m_vertices.insert(prop->m_vertices.end(), m_vertices.begin(), m_vertices.end());
+         prop->m_edges.insert(prop->m_edges.end(), m_edges.begin(), m_edges.end());
+         prop->m_faces.insert(prop->m_faces.end(), m_faces.begin(), m_faces.end());
+         prop->m_groups.insert(prop->m_groups.end(), m_groups.begin(), m_groups.end());
          prop->m_hasHole = m_hasHole;
 
          return prop;
@@ -58,19 +58,19 @@ class Block;
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des sommets
-     Utils::Container<Vertex>& getVertexContainer() {return m_vertices;}
+     std::vector<Vertex*>& getVertexContainer() {return m_vertices;}
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des arêtes
-     Utils::Container<Edge>& getEdgeContainer() {return m_edges;}
+     std::vector<Edge*>& getEdgeContainer() {return m_edges;}
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des faces
-     Utils::Container<Face>& getFaceContainer() {return m_faces;}
+     std::vector<Face*>& getFaceContainer() {return m_faces;}
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des groupes
-     Utils::Container<Group::Group2D>& getGroupsContainer() {return m_groups;}
+     std::vector<Group::Group2D*>& getGroupsContainer() {return m_groups;}
 
      /*------------------------------------------------------------------------*/
      /** \brief   Suppression des dépendances (entités topologiques incidentes)
@@ -92,16 +92,16 @@ class Block;
 
  private:
      /// Lien avec les faces incidentes
-     Utils::Container<Face>  m_faces;
+     std::vector<Face*>  m_faces;
 
      /// Lien avec les arêtes incidentes
-     Utils::Container<Edge> m_edges;
+     std::vector<Edge*> m_edges;
 
      /// Lien avec les sommets extrémités
-     Utils::Container<Vertex> m_vertices;
+     std::vector<Vertex*> m_vertices;
 
      /// Listes des groupes 2D
-     Utils::Container<Group::Group2D> m_groups;
+     std::vector<Group::Group2D*> m_groups;
 
      /// vrai si les arêtes ne forment pas un unique cycle (il y a des trous)
      bool m_hasHole;

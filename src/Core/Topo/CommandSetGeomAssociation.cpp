@@ -254,13 +254,7 @@ void CommandSetGeomAssociation::project(CoEdge* coedge)
 	coedge->saveTopoProperty();
 	coedge->setGeomAssociation(m_geom_entity);
 
-	std::vector<Vertex*> vertices;
-	coedge->getVertices(vertices);
-
-	for (std::vector<Vertex*>::iterator iter = vertices.begin();
-			iter != vertices.end(); ++iter){
-		Vertex* vtx = *iter;
-
+	for (Vertex* vtx : coedge->getVertices()){
 		// on propage si on projète sur une entité de dimension inférieure à la projection précédente
 		if (m_geom_entity
 				&& (vtx->getGeomAssociation() == 0 || vtx->getGeomAssociation()->isDestroyed()

@@ -81,8 +81,7 @@ CommandSplitFaces(Internal::Context& c, CoEdge* arete, double ratio_dec, double 
 #ifdef _DEBUG_SPLIT
 	std::cout<<"CommandSplitFaces::CommandSplitFaces("<<arete->getName()<<", "<<ratio_dec<<", "<<ratio_ogrid<<")"<<std::endl;
 #endif
-    std::vector<Topo::CoFace* > cofaces;
-    getContext().getTopoManager().getCoFaces(cofaces);
+    std::vector<Topo::CoFace*> cofaces = getContext().getTopoManager().getCoFacesObj();
     init2D(cofaces);
 }
 /*----------------------------------------------------------------------------*/
@@ -98,8 +97,7 @@ CommandSplitFaces(Internal::Context& c, CoEdge* arete, const Point& pt, double r
 #ifdef _DEBUG_SPLIT
 	std::cout<<"CommandSplitFaces::CommandSplitFaces("<<arete->getName()<<", "<<m_ratio_dec<<", "<<ratio_ogrid<<")"<<std::endl;
 #endif
-    std::vector<Topo::CoFace* > cofaces;
-    getContext().getTopoManager().getCoFaces(cofaces);
+    std::vector<Topo::CoFace*> cofaces = getContext().getTopoManager().getCoFacesObj();
     init2D(cofaces);
 }
 /*----------------------------------------------------------------------------*/
@@ -211,24 +209,19 @@ void CommandSplitFaces::verif(Topo::CoFace* coface)
 		for (uint i=0; i<coedges.size(); i++)
 			filtre_ce[coedges[i]] = 1;
 
-		std::vector<Vertex*> vertices;
-		coface->getVertices(vertices);
-
 		// pour tous les sommets de la coface
 		// recherche d'un couple d'arêtes de la face de part et d'autre d'un sommet
-		for (uint i=0; i<vertices.size(); i++){
-			Vertex* vtx = vertices[i];
+		for (Vertex* vtx : coface->getVertices()){
 #ifdef _DEBUG2
 			std::cout<<"sommet "<<vtx->getName()<<std::endl;
 #endif
 			std::vector<CoEdge*> aretes;
 
 			// on se limite aux arêtes reliés au sommet
-			vtx->getCoEdges(coedges);
-			for (uint j=0; j<coedges.size(); j++)
-				if (filtre_ce[coedges[j]] == 1){
-					filtre_ce[coedges[j]] = 2;
-					aretes.push_back(coedges[j]);
+			for (CoEdge* vtx_ce : vtx->getCoEdges())
+				if (filtre_ce[vtx_ce] == 1){
+					filtre_ce[vtx_ce] = 2;
+					aretes.push_back(vtx_ce);
 				}
 
 			if (aretes.size() == 2){
@@ -328,13 +321,10 @@ internalExecute()
     	for (uint i=0; i<splitingEdges.size(); i++){
     		Edge* edge = splitingEdges[i];
     		// recherche les cofaces de part et d'autre de cette edge
-    		std::vector<CoFace*> cofaces;
-
-    		std::vector<CoFace*> edge_cofaces;
-    		edge->getCoFaces(edge_cofaces);
-    		for (uint j=0; j<edge_cofaces.size(); j++)
-    			if (getInfoCommand().getTopoInfoEntity()[edge_cofaces[j]] == Internal::InfoCommand::CREATED)
-    				cofaces.push_back(edge_cofaces[j]);
+    		std::vector<CoFace*> cofaces = edge->getCoFaces();
+    		for (CoFace* edge_coface : cofaces)
+    			if (getInfoCommand().getTopoInfoEntity()[edge_coface] == Internal::InfoCommand::CREATED)
+    				cofaces.push_back(edge_coface);
 
     		// cas avec découpage au bord (sans coupe en fait)
     		if (cofaces.size() == 0)

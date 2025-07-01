@@ -41,11 +41,8 @@ CommandTransformTopo(Internal::Context& c, std::string name)
 , m_all_topo(true)
 {
 	// on prend tous les blocs et les faces
-	std::vector<Topo::Block* > blocs;
-	std::vector<Topo::CoFace* > cofaces;
-
-	getTopoManager().getBlocks(blocs);
-	getTopoManager().getCoFaces(cofaces);
+	std::vector<Topo::Block*> blocs = getTopoManager().getBlocksObj();
+	std::vector<Topo::CoFace*> cofaces = getTopoManager().getCoFacesObj();
 	m_entities.insert(m_entities.end(), blocs.begin(), blocs.end());
 	m_entities.insert(m_entities.end(), cofaces.begin(), cofaces.end());
 }
@@ -126,15 +123,9 @@ transform(Block* bl, gp_Trsf* transf, std::map<TopoEntity*, bool>& filtre)
     if (filtre[bl] == 1)
         return;
 
-    std::vector<Face* > faces;
-    bl->getFaces(faces);
-    for (std::vector<Face* >::iterator iter1 = faces.begin();
-            iter1 != faces.end(); ++iter1){
-        std::vector<CoFace* > cofaces;
-        (*iter1)->getCoFaces(cofaces);
-        for (std::vector<CoFace* >::iterator iter2 = cofaces.begin();
-                iter2 != cofaces.end(); ++iter2){
-            transform(*iter2, transf, filtre);
+    for (Face* face : bl->getFaces()){
+        for (CoFace* coface : face->getCoFaces()){
+            transform(coface, transf, filtre);
         }
     }
 
@@ -147,15 +138,9 @@ transform(Block* bl, gp_GTrsf* transf, std::map<TopoEntity*, bool>& filtre)
     if (filtre[bl] == 1)
         return;
 
-    std::vector<Face* > faces;
-    bl->getFaces(faces);
-    for (std::vector<Face* >::iterator iter1 = faces.begin();
-            iter1 != faces.end(); ++iter1){
-        std::vector<CoFace* > cofaces;
-        (*iter1)->getCoFaces(cofaces);
-        for (std::vector<CoFace* >::iterator iter2 = cofaces.begin();
-                iter2 != cofaces.end(); ++iter2){
-            transform(*iter2, transf, filtre);
+    for (Face* face : bl->getFaces()){
+        for (CoFace* coface : face->getCoFaces()){
+            transform(coface, transf, filtre);
         }
     }
 
@@ -168,15 +153,9 @@ transform(CoFace* co, gp_Trsf* transf, std::map<TopoEntity*, bool>& filtre)
     if (filtre[co] == 1)
          return;
 
-    std::vector<Edge* > edges;
-    co->getEdges(edges);
-    for (std::vector<Edge* >::iterator iter1 = edges.begin();
-            iter1 != edges.end(); ++iter1){
-        std::vector<CoEdge* > coedges;
-        (*iter1)->getCoEdges(coedges);
-        for (std::vector<CoEdge* >::iterator iter2 = coedges.begin();
-                iter2 != coedges.end(); ++iter2){
-            transform(*iter2, transf, filtre);
+    for (Edge* edge : co->getEdges()){
+        for (CoEdge* coedge : edge->getCoEdges()){
+            transform(coedge, transf, filtre);
         }
     }
 
@@ -189,15 +168,9 @@ transform(CoFace* co, gp_GTrsf* transf, std::map<TopoEntity*, bool>& filtre)
     if (filtre[co] == 1)
          return;
 
-    std::vector<Edge* > edges;
-    co->getEdges(edges);
-    for (std::vector<Edge* >::iterator iter1 = edges.begin();
-            iter1 != edges.end(); ++iter1){
-        std::vector<CoEdge* > coedges;
-        (*iter1)->getCoEdges(coedges);
-        for (std::vector<CoEdge* >::iterator iter2 = coedges.begin();
-                iter2 != coedges.end(); ++iter2){
-            transform(*iter2, transf, filtre);
+    for (Edge* edge : co->getEdges()){
+        for (CoEdge* coedge : edge->getCoEdges()){
+            transform(coedge, transf, filtre);
         }
     }
 
@@ -210,10 +183,8 @@ transform(CoEdge* co, gp_Trsf* transf, std::map<TopoEntity*, bool>& filtre)
     if (filtre[co] == 1)
          return;
 
-    const std::vector<Vertex* > & vertices = co->getVertices();
-    for (std::vector<Vertex* >::const_iterator iter1 = vertices.begin();
-            iter1 != vertices.end(); ++iter1){
-        transform(*iter1, transf, filtre);
+    for (Vertex* vtx : co->getVertices()){
+        transform(vtx, transf, filtre);
     }
     if (co->getMeshingProperty()->isPolarCut()){
     	Utils::Math::Point pt = co->getMeshingProperty()->getPolarCenter();
@@ -234,10 +205,8 @@ transform(CoEdge* co, gp_GTrsf* transf, std::map<TopoEntity*, bool>& filtre)
     if (filtre[co] == 1)
          return;
 
-    const std::vector<Vertex* > & vertices = co->getVertices();
-    for (std::vector<Vertex* >::const_iterator iter1 = vertices.begin();
-            iter1 != vertices.end(); ++iter1){
-        transform(*iter1, transf, filtre);
+    for (Vertex* vtx : co->getVertices()){
+        transform(vtx, transf, filtre);
     }
     if (co->getMeshingProperty()->isPolarCut()){
     	Utils::Math::Point pt = co->getMeshingProperty()->getPolarCenter();

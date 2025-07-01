@@ -41,9 +41,9 @@ MeshManager::~MeshManager()
 {
     if (m_mesh_itf)
         delete m_mesh_itf;
-    m_clouds.deleteAndClear();
-    m_surfaces.deleteAndClear();
-    m_volumes.deleteAndClear();
+    Utils::deleteAndClear(m_clouds);
+    Utils::deleteAndClear(m_surfaces);
+    Utils::deleteAndClear(m_volumes);
 }
 /*----------------------------------------------------------------------------*/
 void MeshManager::clear()
@@ -52,27 +52,26 @@ void MeshManager::clear()
         delete m_mesh_itf;
         m_mesh_itf = new MeshImplementation(&getContext());
     }
-    m_clouds.deleteAndClear();
-    m_surfaces.deleteAndClear();
-    m_volumes.deleteAndClear();
+    Utils::deleteAndClear(m_clouds);
+    Utils::deleteAndClear(m_surfaces);
+    Utils::deleteAndClear(m_volumes);
 }
 /*----------------------------------------------------------------------------*/
 void MeshManager::add(Cloud* cl)
 {
-    m_clouds.add(cl);
+    m_clouds.push_back(cl);
 }
 /*----------------------------------------------------------------------------*/
 void MeshManager::remove(Cloud* cl)
 {
-    m_clouds.remove(cl, true);
+    Utils::remove(m_clouds, cl, true);
 }
 /*----------------------------------------------------------------------------*/
 Cloud* MeshManager::getCloud(const std::string& name, const bool exceptionIfNotFound) const
 {
     Cloud* cloud = 0;
-    const std::vector<Cloud*>& clouds = m_clouds.get();
-    for (std::vector<Cloud*>::const_iterator iter = clouds.begin();
-            iter != clouds.end(); ++iter)
+    for (std::vector<Cloud*>::const_iterator iter = m_clouds.begin();
+            iter != m_clouds.end(); ++iter)
         if (name == (*iter)->getName())
             cloud = (*iter);
 
@@ -86,27 +85,21 @@ Cloud* MeshManager::getCloud(const std::string& name, const bool exceptionIfNotF
     return cloud;
 }
 /*----------------------------------------------------------------------------*/
-void MeshManager::getClouds(std::vector<Cloud*>& AClouds) const
-{
-    AClouds = m_clouds.get();
-}
-/*----------------------------------------------------------------------------*/
 void MeshManager::add(Line* ln)
 {
-    m_lines.add(ln);
+    m_lines.push_back(ln);
 }
 /*----------------------------------------------------------------------------*/
 void MeshManager::remove(Line* ln)
 {
-	m_lines.remove(ln, true);
+	Utils::remove(m_lines, ln, true);
 }
 /*----------------------------------------------------------------------------*/
 Line* MeshManager::getLine(const std::string& name, const bool exceptionIfNotFound) const
 {
 	Line* line = 0;
-    const std::vector<Line*>& lines = m_lines.get();
-    for (std::vector<Line*>::const_iterator iter = lines.begin();
-            iter != lines.end(); ++iter)
+    for (std::vector<Line*>::const_iterator iter = m_lines.begin();
+            iter != m_lines.end(); ++iter)
         if (name == (*iter)->getName())
             line = (*iter);
 
@@ -120,28 +113,22 @@ Line* MeshManager::getLine(const std::string& name, const bool exceptionIfNotFou
     return line;
 }
 /*----------------------------------------------------------------------------*/
-void MeshManager::getLines(std::vector<Line*>& ALines) const
-{
-	ALines = m_lines.get();
-}
-/*----------------------------------------------------------------------------*/
 void MeshManager::add(Surface* sf)
 {
-    m_surfaces.add(sf);
+    m_surfaces.push_back(sf);
 }
 /*----------------------------------------------------------------------------*/
 void MeshManager::remove(Surface* sf)
 {
-    m_surfaces.remove(sf, true);
+    Utils::remove(m_surfaces, sf, true);
 }
 /*----------------------------------------------------------------------------*/
 Surface* MeshManager::getSurface(const std::string& name, const bool exceptionIfNotFound) const
 {
     Surface* surf = 0;
 
-    const std::vector<Surface*>& surfaces = m_surfaces.get();
-    for (std::vector<Surface* >::const_iterator iter = surfaces.begin();
-            iter != surfaces.end(); ++iter)
+    for (std::vector<Surface* >::const_iterator iter = m_surfaces.begin();
+            iter != m_surfaces.end(); ++iter)
         if (name == (*iter)->getName())
             surf = (*iter);
 
@@ -155,29 +142,23 @@ Surface* MeshManager::getSurface(const std::string& name, const bool exceptionIf
     return surf;
 }
 /*----------------------------------------------------------------------------*/
-void MeshManager::getSurfaces(std::vector<Surface*>& ASurfaces) const
-{
-    ASurfaces = m_surfaces.get();
-}
-/*----------------------------------------------------------------------------*/
 void MeshManager::add(Volume* vo)
 {
-    m_volumes.add(vo);
+    m_volumes.push_back(vo);
 }
 /*----------------------------------------------------------------------------*/
 void MeshManager::remove(Volume* vo)
 {
     //std::cout<<"MeshManager::remove("<<vo->getName()<<")"<<std::endl;
-    m_volumes.remove(vo, true);
+    Utils::remove(m_volumes, vo, true);
 }
 /*----------------------------------------------------------------------------*/
 Volume* MeshManager::getVolume(const std::string& name, const bool exceptionIfNotFound) const
 {
     Volume* vol = 0;
 
-    const std::vector<Volume*>& volumes = m_volumes.get();
-    for (std::vector<Volume* >::const_iterator iter = volumes.begin();
-            iter != volumes.end(); ++iter)
+    for (std::vector<Volume* >::const_iterator iter = m_volumes.begin();
+            iter != m_volumes.end(); ++iter)
         if (name == (*iter)->getName())
             vol = (*iter);
 
@@ -199,9 +180,8 @@ SubVolume* MeshManager::getNewSubVolume(const std::string& gr_name, Internal::In
 		throw TkUtil::Exception (TkUtil::UTF8String ("Création d'un sous-volume impossible sans un nom", TkUtil::Charset::UTF_8));
 
 	Volume* vol = 0;
-	const std::vector<Volume*>& volumes = m_volumes.get();
-	for (std::vector<Volume* >::const_iterator iter = volumes.begin();
-			iter != volumes.end(); ++iter)
+	for (std::vector<Volume* >::const_iterator iter = m_volumes.begin();
+			iter != m_volumes.end(); ++iter)
 		if (gr_name == (*iter)->getName())
 			vol = (*iter);
 
@@ -232,11 +212,6 @@ SubVolume* MeshManager::getNewSubVolume(const std::string& gr_name, Internal::In
 	}
 
 	return sv;
-}
-/*----------------------------------------------------------------------------*/
-void MeshManager::getVolumes(std::vector<Volume*>& AVolumes) const
-{
-    AVolumes = m_volumes.get();
 }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResult* MeshManager::newBlocksMesh(std::vector<std::string>& names)
@@ -532,25 +507,25 @@ std::string MeshManager::getInfos(const Volume* me) const
 int MeshManager::getNbClouds(bool onlyVisible) const
 {
     if (onlyVisible)
-        return m_clouds.getVisibleNb();
+        return Utils::getVisibleNb(m_clouds);
     else
-        return m_clouds.getNb();
+        return m_clouds.size();
 }
 /*----------------------------------------------------------------------------*/
 int MeshManager::getNbSurfaces(bool onlyVisible) const
 {
     if (onlyVisible)
-        return m_surfaces.getVisibleNb();
+        return Utils::getVisibleNb(m_surfaces);
     else
-        return m_surfaces.getNb();
+        return m_surfaces.size();
 }
 /*----------------------------------------------------------------------------*/
 int MeshManager::getNbVolumes(bool onlyVisible) const
 {
     if (onlyVisible)
-        return m_volumes.getVisibleNb();
+        return Utils::getVisibleNb(m_volumes);
     else
-        return m_volumes.getNb();
+        return m_volumes.size();
 }
 /*----------------------------------------------------------------------------*/
 int MeshManager::getNbNodes()

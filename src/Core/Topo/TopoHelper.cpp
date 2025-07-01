@@ -513,8 +513,7 @@ void TopoHelper::get(std::vector<Topo::Block*>& blocks, std::set<Topo::CoEdge*>&
 void TopoHelper::get(std::vector<Topo::Block*>& blocks, std::set<Topo::Vertex*>& vertices)
 {
 	for (uint k=0; k<blocks.size(); k++){
-		std::vector<Topo::Vertex* > loc_vertices;
-		blocks[k]->getVertices(loc_vertices);
+		std::vector<Topo::Vertex* > loc_vertices = blocks[k]->getVertices();
 		vertices.insert(loc_vertices.begin(), loc_vertices.end());
 	}
 }
@@ -531,8 +530,7 @@ void TopoHelper::get(std::vector<Topo::CoFace*>& cofaces, std::set<Topo::CoEdge*
 void TopoHelper::get(std::vector<Topo::CoFace*>& cofaces, std::set<Topo::Vertex*>& vertices)
 {
 	for (uint k=0; k<cofaces.size(); k++){
-		std::vector<Topo::Vertex* > loc_vertices;
-		cofaces[k]->getVertices(loc_vertices);
+		std::vector<Topo::Vertex* > loc_vertices = cofaces[k]->getVertices();
 		vertices.insert(loc_vertices.begin(), loc_vertices.end());
 	}
 }
@@ -540,8 +538,7 @@ void TopoHelper::get(std::vector<Topo::CoFace*>& cofaces, std::set<Topo::Vertex*
 void TopoHelper::get(std::vector<Topo::CoEdge*>& coedges, std::set<Topo::Vertex*>& vertices)
 {
 	for (uint k=0; k<coedges.size(); k++){
-		std::vector<Topo::Vertex* > loc_vertices;
-		coedges[k]->getVertices(loc_vertices);
+		std::vector<Topo::Vertex* > loc_vertices = coedges[k]->getVertices();
 		vertices.insert(loc_vertices.begin(), loc_vertices.end());
 	}
 }
@@ -730,7 +727,7 @@ void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
 
         // recherche du côté dans lequel est cette arête, et le nombre de bras de maillage jusqu'à la coupe
         Edge* edge_dep = coface->getEdgeContaining(coedge_dep);
-        uint ind_edge_dep = coface->getIndex(edge_dep);
+        uint ind_edge_dep = coface->getIndexOf(edge_dep);
 #ifdef _DEBUG_SPLIT
         std::cout<<"edge_dep = "<<edge_dep->getName()<<std::endl;
 #endif
@@ -889,8 +886,8 @@ void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
         }
         else {
             // si la face a déjà été vu, c'est peut-être en parcourant dans l'autre sens, il faut peut-être inverser
-        	uint ind_dep_0 = coface->getIndex(is->coedge_dep[0]);
-        	uint ind_dep_1 = coface->getIndex(coedge_dep);
+        	uint ind_dep_0 = coface->getIndexOf(is->coedge_dep[0]);
+        	uint ind_dep_1 = coface->getIndexOf(coedge_dep);
         	bool inverse = (ind_dep_0 != ind_dep_1);
 
 #ifdef _DEBUG_SPLIT
@@ -1253,7 +1250,7 @@ void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
 
             // on découpe les 2 autres arêtes
             // indice de l'arête / face (1 pour les face dégénérées)
-            uint ind_ar_dep = coface->getIndex(is->edge_dep);
+            uint ind_ar_dep = coface->getIndexOf(is->edge_dep);
             if (ind_ar_dep!=1)
                 throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, Topo::splitFaces ne trouve pas l'arête de départ en position 1", TkUtil::Charset::UTF_8));
 
@@ -1570,11 +1567,7 @@ void TopoHelper::deleteAllAdjacentTopoEntitiesGeomAssociation(Vertex* vtx)
         vtx->saveTopoProperty();
         vtx->setGeomAssociation(0);
     }
-    std::vector<CoEdge* > loc_coedges;
-    vtx->getCoEdges(loc_coedges);
-    for (std::vector<CoEdge* >::iterator iter = loc_coedges.begin();
-            iter != loc_coedges.end(); ++iter){
-        CoEdge* coedge = *iter;
+    for (CoEdge* coedge : vtx->getCoEdges()){
         if (coedge->getGeomAssociation()){
             coedge->saveTopoProperty();
             coedge->setGeomAssociation(0);
@@ -1582,9 +1575,7 @@ void TopoHelper::deleteAllAdjacentTopoEntitiesGeomAssociation(Vertex* vtx)
     }
     std::vector<CoFace* > loc_cofaces;
     vtx->getCoFaces(loc_cofaces);
-    for (std::vector<CoFace* >::iterator iter = loc_cofaces.begin();
-            iter != loc_cofaces.end(); ++iter){
-        CoFace* coface = *iter;
+    for (CoFace* coface : loc_cofaces) {
         if (coface->getGeomAssociation()){
             coface->saveTopoProperty();
             coface->setGeomAssociation(0);
@@ -1610,20 +1601,14 @@ Vertex* TopoHelper::getCommonVertex(Face* face1, Face* face2)
 {
 	// on marque les sommets de la première face
 	std::set<Vertex*> filtre_vertices;
-
-	std::vector<Vertex* > vertices;
-	face1->getVertices(vertices);
-
-	for (std::vector<Vertex*>::iterator iter=vertices.begin(); iter!=vertices.end(); ++iter)
-		filtre_vertices.insert(*iter);
+	for (Vertex* vtx : face1->getVertices())
+		filtre_vertices.insert(vtx);
 
 	// on recherche parmis les sommets de la deuxième faces les somets marqués
 	std::vector<Vertex* > selected_vertices;
-
-	face2->getVertices(vertices);
-	for (std::vector<Vertex*>::iterator iter=vertices.begin(); iter!=vertices.end(); ++iter)
-		if (filtre_vertices.find(*iter) != filtre_vertices.end())
-			selected_vertices.push_back(*iter);
+	for (Vertex* vtx : face2->getVertices())
+		if (filtre_vertices.find(vtx) != filtre_vertices.end())
+			selected_vertices.push_back(vtx);
 
 	if (1 != selected_vertices.size()){
 		TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
@@ -1796,13 +1781,9 @@ Topo::Vertex* TopoHelper::getVertexAtPosition(std::vector<Topo::Vertex*>& vertic
 std::vector<Vertex*> TopoHelper::getVerticesNeighbour(Vertex* vtx)
 {
     std::vector<Vertex*> vertices;
-    std::vector<CoEdge*> coedges;
-    vtx->getCoEdges(coedges);
-
-    for (std::vector<Topo::CoEdge*>::iterator iter = coedges.begin();
-            iter != coedges.end(); ++iter)
-        if (!(*iter)->isDestroyed() && (*iter)->getNbVertices() == 2)
-            vertices.push_back((*iter)->getOppositeVertex(vtx));
+    for (Topo::CoEdge* coedge : vtx->getCoEdges())
+        if (!coedge->isDestroyed() && coedge->getNbVertices() == 2)
+            vertices.push_back(coedge->getOppositeVertex(vtx));
 
     return vertices;
 }
@@ -1899,11 +1880,9 @@ std::vector<CoEdge*> TopoHelper::getCommonCoEdges(CoFace* face1, CoFace* face2)
 /*----------------------------------------------------------------------------*/
 CoEdge* TopoHelper::getCommonCoEdge(Topo::Vertex* v0, Topo::Vertex* v1)
 {
-	std::vector<CoEdge*> coedges;
-	v0->getCoEdges(coedges);
-	for (uint i=0; i<coedges.size(); i++)
-		if (v1 == coedges[i]->getOppositeVertex(v0))
-			return coedges[i];
+	for (CoEdge* coedge : v0->getCoEdges())
+		if (v1 == coedge->getOppositeVertex(v0))
+			return coedge;
 
 	TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
     messErr << "Erreur interne dans TopoHelper::getCommonCoEdge avec sommets "
@@ -1930,8 +1909,7 @@ getCoedge(std::vector<Vertex*>& vertices, std::vector<CoEdge*>& coedges)
 
 	for (std::vector<CoEdge*>::iterator iter1 = coedges.begin();
 			iter1 != coedges.end(); ++iter1){
-		std::vector<Vertex*> loc_vertices;
-		(*iter1)->getVertices(loc_vertices);
+		std::vector<Vertex*> loc_vertices = (*iter1)->getVertices();
 		uint nbSommetsMarques = 0;
 		for (std::vector<Vertex*>::iterator iter2 = loc_vertices.begin();
 				iter2 != loc_vertices.end(); ++iter2)
@@ -2277,11 +2255,11 @@ computeInvertedDir(std::vector<Topo::CoFace*>& cofaces, std::map<Topo::CoFace*, 
 bool TopoHelper::
 cofacesInverted(Topo::CoFace* coface, Topo::CoFace* coface_vois, Topo::CoEdge* coedge)
 {
-	uint ind1 = coface->getIndex(coedge);
+	uint ind1 = coface->getIndexOf(coedge);
 	Topo::Edge* edge1 = coface->getEdge(ind1);
 	bool sens1 = edge1->isSameSense(coface->getVertex(ind1),coedge);
 
-	uint ind2 = coface_vois->getIndex(coedge);
+	uint ind2 = coface_vois->getIndexOf(coedge);
 	Topo::Edge* edge2 = coface_vois->getEdge(ind2);
 	bool sens2 = edge2->isSameSense(coface_vois->getVertex(ind2),coedge);
 

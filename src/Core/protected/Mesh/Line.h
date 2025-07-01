@@ -123,7 +123,7 @@ public:
 #endif
 
     ///  Fournit l'accès aux arêtes topologiques qui ont participées à la constitution de la ligne
-    void getCoEdges(std::vector<Topo::CoEdge* >& edges) const;
+    std::vector<Topo::CoEdge*>& getCoEdges() const;
 
     /** supprime les relations vers les arêtes */
     void clearCoEdges()

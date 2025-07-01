@@ -49,16 +49,15 @@ internalExecute()
     Face* faceA = getNearestFace(m_bl_A, m_bl_B->getBarycentre());
     Face* faceB = getNearestFace(m_bl_B, m_bl_A->getBarycentre());
     // vérification : les 2 faces doivent avoir les même sommets
-    std::vector<Topo::Vertex*> verticesFA;
-    std::vector<Topo::Vertex*> verticesFB;
-    faceA->getVertices(verticesFA);
-    faceB->getVertices(verticesFB);
+    std::vector<Topo::Vertex*> verticesFA = faceA->getVertices();
+    std::vector<Topo::Vertex*> verticesFB = faceB->getVertices();
+    
     if (!TopoHelper::haveSame(verticesFA, verticesFB))
     	throw TkUtil::Exception (TkUtil::UTF8String ("On ne trouve pas de face en commun (avec les même sommets) pour les 2 blocs", TkUtil::Charset::UTF_8));
 
     // recherche des 8 sommets pour le nouveau bloc
-    uint idA = m_bl_A->getIndex(faceA); // indice de la face dans le bloc A
-    uint idB = m_bl_B->getIndex(faceB); // indice de la face dans le bloc B
+    uint idA = m_bl_A->getIndexOf(faceA); // indice de la face dans le bloc A
+    uint idB = m_bl_B->getIndexOf(faceB); // indice de la face dans le bloc B
     uint idA_op = ((idA/2)*2+(idA%2+1)%2); // indice de la face opposée
     uint idB_op = ((idB/2)*2+(idB%2+1)%2); // indice de la face opposée
 
@@ -153,13 +152,10 @@ internalExecute()
     newBlock->setGeomAssociation(m_bl_A->getGeomAssociation());
 
     // destruction des faces et cofaces entre les 2
-    std::vector<CoFace*> loc_cofaces;
-    faceA->getCoFaces(loc_cofaces);
-    for (uint i=0; i<loc_cofaces.size(); i++)
-    	loc_cofaces[i]->free(&getInfoCommand());
-    faceB->getCoFaces(loc_cofaces);
-    for (uint i=0; i<loc_cofaces.size(); i++)
-    	loc_cofaces[i]->free(&getInfoCommand());
+    for (CoFace* loc_coface : faceA->getCoFaces())
+    	loc_coface->free(&getInfoCommand());
+    for (CoFace* loc_coface : faceB->getCoFaces())
+    	loc_coface->free(&getInfoCommand());
 
     // destructions des faces inutiles
     faceA->free(&getInfoCommand());

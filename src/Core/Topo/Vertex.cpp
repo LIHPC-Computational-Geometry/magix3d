@@ -167,38 +167,35 @@ merge(Vertex* ve, Internal::InfoCommand* icmd)
     	// si le sommet bouge suffisament, il faut éviter les méthodes de maillage autres que transfini
     	std::vector<CoFace* > cofaces;
     	ve->getCoFaces(cofaces);
-    	for (uint i=0; i<cofaces.size(); i++){
-    		if (cofaces[i]->getMeshLaw() < CoFaceMeshingProperty::transfinite){
+    	for (CoFace* coface : cofaces){
+    		if (coface->getMeshLaw() < CoFaceMeshingProperty::transfinite){
 #ifdef _DEBUG2
     			std::cout<<"modification méthode de maillage pour "<<cofaces[i]->getName()<<std::endl;
 #endif
 
     		    CoFaceMeshingProperty* prop = new FaceMeshingPropertyTransfinite();
-    		    cofaces[i]->switchCoFaceMeshingProperty(icmd, prop);
+    		    coface->switchCoFaceMeshingProperty(icmd, prop);
     		    delete prop;
     		}
     	}
 
     	std::vector<Block* > blocs;
     	ve->getBlocks(blocs);
-    	for (uint i=0; i<blocs.size(); i++){
-    		if (blocs[i]->getMeshLaw() < BlockMeshingProperty::transfinite){
+    	for (Block* bloc : blocs){
+    		if (bloc->getMeshLaw() < BlockMeshingProperty::transfinite){
 #ifdef _DEBUG2
     			std::cout<<"modification méthode de maillage pour "<<blocs[i]->getName()<<std::endl;
 #endif
 
     		    BlockMeshingProperty* prop = new BlockMeshingPropertyTransfinite();
-    		    blocs[i]->switchBlockMeshingProperty(icmd, prop);
+    		    bloc->switchBlockMeshingProperty(icmd, prop);
     		    delete prop;
 
     		}
     	}
 
     	// les arêtes voisines sont déplacées donc avec une association invalide
-        std::vector<CoEdge* > coedges;
-        ve->getCoEdges(coedges);
-        for (uint i=0; i<coedges.size(); i++){
-        	CoEdge* coedge = coedges[i];
+        for (CoEdge* coedge : getCoEdges()){
         	if (coedge->isDestroyed()){
         		if (icmd)
         			icmd->addTopoInfoEntity(coedge, Internal::InfoCommand::DISPMODIFIED);
@@ -208,8 +205,7 @@ merge(Vertex* ve, Internal::InfoCommand* icmd)
         }
 
         // idem avec les cofaces
-        for (uint i=0; i<cofaces.size(); i++){
-        	CoFace* coface = cofaces[i];
+        for (CoFace* coface : cofaces){
         	if (icmd)
         		icmd->addTopoInfoEntity(coface, Internal::InfoCommand::DISPMODIFIED);
         	coface->saveTopoProperty();
@@ -220,12 +216,9 @@ merge(Vertex* ve, Internal::InfoCommand* icmd)
 
     // on remplace le sommet dans les arêtes associées à ve
     // On travaille sur une copie car il y a une mise à jour en même temps de m_coedges
-    std::vector<CoEdge* > coedges;
-    ve->getCoEdges(coedges);
-
-    for (std::vector<CoEdge* >::iterator iter=coedges.begin();
-            iter != coedges.end(); ++iter)
-        (*iter)->replace(ve, this, true, false, icmd);
+    std::vector<CoEdge*> coedges = ve->getCoEdges();
+    for (CoEdge* coedge : coedges)
+        coedge->replace(ve, this, true, false, icmd);
 
     // récupère l'association côté ve si celle de this est détruite, ou si la dimension de la geom est inférieure
     if (getGeomAssociation() && ve->getGeomAssociation()
@@ -253,15 +246,12 @@ setDestroyed(bool b)
 	if (isDestroyed() == b)
 		return;
 
-	Utils::Container<Group::Group0D>& groups = getGroupsContainer();
 	if (b)
-		for (uint i=0; i<groups.size(); i++){
-			Group::Group0D* gr = groups.get(i);
+		for (Group::Group0D* gr : getGroupsContainer()){
 			gr->remove(this);
 		}
 	else
-		for (uint i=0; i<groups.size(); i++){
-			Group::Group0D* gr = groups.get(i);
+		for (Group::Group0D* gr : getGroupsContainer()){
 			gr->add(this);
 		}
 
@@ -365,9 +355,7 @@ getDescription (bool alsoComputed) const
     // les relations vers les autres types d'entités topologiques
     // on cache l'existance des Edge et Face
 
-    std::vector<CoEdge* > ce;
-    getCoEdges(ce);
-
+    std::vector<CoEdge* > ce = getCoEdges();
     Utils::SerializedRepresentation  topoRelation ("Relations topologiques", "");
 
     Utils::SerializedRepresentation  coedges ("Arêtes topologiques",
@@ -380,8 +368,7 @@ getDescription (bool alsoComputed) const
 
     description->addPropertiesSet (topoRelation);
 
-    std::vector<Group::Group0D*> grp;
-    getGroups(grp);
+    std::vector<Group::Group0D*> grp = getGroupsContainer();
     if (!grp.empty()){
     	Utils::SerializedRepresentation  groupe ("Relation vers les groupes",
     			TkUtil::NumericConversions::toStr(grp.size()));
@@ -407,37 +394,16 @@ saveVertexGeomProperty(Internal::InfoCommand* icmd, bool propagate)
 
             // les blocs, faces, arêtes ont leur aspect qui change
             if (propagate){
-
-                std::vector<CoEdge* > loc_coedges;
-                getCoEdges(loc_coedges);
-
-                for (std::vector<CoEdge* >::iterator iter1=loc_coedges.begin();
-                        iter1 != loc_coedges.end(); ++iter1){
-                    std::vector<Edge* > local_edges;
-                    (*iter1)->getEdges(local_edges);
-                    icmd->addTopoInfoEntity(*iter1, Internal::InfoCommand::DISPMODIFIED);
-
-                    for (std::vector<Edge* >::iterator iter2 = local_edges.begin();
-                            iter2 != local_edges.end(); ++iter2){
-                        std::vector<CoFace* > loc_cofaces;
-                        (*iter2)->getCoFaces(loc_cofaces);
-                        icmd->addTopoInfoEntity(*iter2, Internal::InfoCommand::DISPMODIFIED);
-
-                        for (std::vector<CoFace* >::iterator iter3 = loc_cofaces.begin();
-                                iter3 != loc_cofaces.end(); ++iter3){
-                            std::vector<Face* > loc_faces;
-                            (*iter3)->getFaces(loc_faces);
-                            icmd->addTopoInfoEntity(*iter3, Internal::InfoCommand::DISPMODIFIED);
-
-                            for (std::vector<Face* >::iterator iter4 = loc_faces.begin();
-                                    iter4 != loc_faces.end(); ++iter4){
-                                std::vector<Block* > loc_bl;
-                                (*iter4)->getBlocks(loc_bl);
-                                icmd->addTopoInfoEntity(*iter4, Internal::InfoCommand::DISPMODIFIED);
-
-                                for (std::vector<Block* >::iterator iter5 = loc_bl.begin();
-                                        iter5 != loc_bl.end(); ++iter5){
-                                    icmd->addTopoInfoEntity(*iter5, Internal::InfoCommand::DISPMODIFIED);
+                for (CoEdge* coedge : getCoEdges()){
+                    icmd->addTopoInfoEntity(coedge, Internal::InfoCommand::DISPMODIFIED);
+                    for (Edge* edge : coedge->getEdges()){
+                        icmd->addTopoInfoEntity(edge, Internal::InfoCommand::DISPMODIFIED);
+                        for (CoFace* coface : edge->getCoFaces()){
+                            icmd->addTopoInfoEntity(coface, Internal::InfoCommand::DISPMODIFIED);
+                            for (Face* face : coface->getFaces()){
+                                icmd->addTopoInfoEntity(face, Internal::InfoCommand::DISPMODIFIED);
+                                for (Block* bl : face->getBlocks()){
+                                    icmd->addTopoInfoEntity(bl, Internal::InfoCommand::DISPMODIFIED);
                                 } // end for iter5
                             } // end for iter4
                         } // end for iter3
@@ -579,12 +545,10 @@ TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const Vertex & v)
         o << ", sans projection";
 
     o << v.getCoord();
-    std::vector<Topo::CoEdge* > coedges;
-    v.getCoEdges(coedges);
     o << " relié à "<<(short int)v.getNbCoEdges()<<" arêtes communes : ";
-    for (uint j=0; j<coedges.size(); j++){
-        o << " " << coedges[j]->getName();
-        if (coedges[j]->isDestroyed())
+    for (CoEdge* coedge : v.getCoEdges()){
+        o << " " << coedge->getName();
+        if (coedge->isDestroyed())
             o << "  [DETRUITE] ";
     }
 
@@ -604,7 +568,7 @@ Topo::TopoInfo Vertex::getInfos() const
 	Topo::TopoInfo infos;
 	infos.name = getName();
 	infos.dimension = getDim();
-	getCoEdges(infos.incident_coedges);
+	infos.incident_coedges = getCoEdges();
 	getEdges(infos.incident_edges);
 	getCoFaces(infos.incident_cofaces);
 	getBlocks(infos.incident_blocks);
@@ -675,9 +639,8 @@ getEdges(std::vector<Edge* >& edges) const
 {
     edges.clear();
     std::list<Topo::Edge*> l_e;
-    for(uint i=0; i <getNbCoEdges();i++) {
-        std::vector<Edge* > local_edges;
-        getCoEdge(i)->getEdges(local_edges);
+    for(CoEdge* coedge : getCoEdges()) {
+        std::vector<Edge* > local_edges = coedge->getEdges();
         l_e.insert(l_e.end(), local_edges.begin(), local_edges.end());
     }
     l_e.sort(Utils::Entity::compareEntity);
@@ -690,15 +653,10 @@ void Vertex::
 getCoFaces(std::vector<CoFace* >& cofaces) const
 {
     std::list<Topo::CoFace*> l_f;
-
     std::vector<Edge* > edges;
     getEdges(edges);
-
-    for (std::vector<Edge* >::iterator iter1 = edges.begin();
-            iter1 != edges.end(); ++iter1){
-        std::vector<CoFace* > loc_cofaces;
-        (*iter1)->getCoFaces(loc_cofaces);
-
+    for (Edge* edge : edges){
+        std::vector<CoFace* > loc_cofaces = edge->getCoFaces();
         l_f.insert(l_f.end(), loc_cofaces.begin(), loc_cofaces.end());
     }
 
@@ -716,25 +674,11 @@ getBlocks(std::vector<Block* >& blocks) const
 #endif
     std::list<Topo::Block*> l_b;
 
-    for(uint i=0; i <getNbCoEdges();i++) {
-        std::vector<Edge* > local_edges;
-        getCoEdge(i)->getEdges(local_edges);
-
-        for (std::vector<Edge* >::iterator iter1 = local_edges.begin();
-                iter1 != local_edges.end(); ++iter1){
-            std::vector<CoFace* > loc_cofaces;
-            (*iter1)->getCoFaces(loc_cofaces);
-
-            for (std::vector<CoFace* >::iterator iter2 = loc_cofaces.begin();
-                    iter2 != loc_cofaces.end(); ++iter2){
-                std::vector<Face* > loc_faces;
-                (*iter2)->getFaces(loc_faces);
-
-                for (std::vector<Face* >::iterator iter3 = loc_faces.begin();
-                        iter3 != loc_faces.end(); ++iter3){
-                    std::vector<Block* > loc_bl;
-                    (*iter3)->getBlocks(loc_bl);
-
+    for(CoEdge* coedge : getCoEdges()) {
+        for (Edge* local_edge : coedge->getEdges()){
+            for (CoFace* loc_coface : local_edge->getCoFaces()){
+                for (Face* loc_face : loc_coface->getFaces()){
+                    std::vector<Block* > loc_bl = loc_face->getBlocks();
                     l_b.insert(l_b.end(), loc_bl.begin(), loc_bl.end());
                 }
             }
@@ -773,18 +717,14 @@ void Vertex::getGroupsName (std::vector<std::string>& gn, bool byGeom, bool byTo
 		TopoEntity::getGroupsName(gn, byGeom, byTopo);
 
 	if (byTopo)
-		for (uint i = 0; i<m_topo_property->getGroupsContainer().size(); ++i)
-			gn.push_back(m_topo_property->getGroupsContainer().get(i)->getName());
+		for (Group::Group0D* gr : m_topo_property->getGroupsContainer())
+			gn.push_back(gr->getName());
 }
 /*----------------------------------------------------------------------------*/
 void Vertex::updateCoEdgeModificationTime()
 {
-    std::vector<CoEdge* > coedges;
-    getCoEdges(coedges);
-
-    for (std::vector<CoEdge* >::iterator iter=coedges.begin();
-            iter != coedges.end(); ++iter)
-    	(*iter)->getMeshingProperty()->updateModificationTime();
+    for (CoEdge* ce : getCoEdges())
+    	ce->getMeshingProperty()->updateModificationTime();
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo

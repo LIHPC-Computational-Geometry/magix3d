@@ -97,59 +97,45 @@ public:
     /*------------------------------------------------------------------------*/
     /// ajoute une relation vers un bloc
     void addBlock(Block* b)
-    {m_topo_property->getBlockContainer().add(b);}
+    {m_topo_property->getBlockContainer().push_back(b);}
 
     /// enlève une relation vers un bloc
     void removeBlock(Block* b, const bool exceptionIfNotFound=true)
-    {m_topo_property->getBlockContainer().remove(b, exceptionIfNotFound);}
+    {Utils::remove(m_topo_property->getBlockContainer(), b, exceptionIfNotFound);}
 
     /// le nombre de block incidents
     uint getNbBlocks() const
-    {return m_topo_property->getBlockContainer().getNb();}
+    {return m_topo_property->getBlockContainer().size();}
 
     /// accès à un des blocks
     Block* getBlock(uint ind) const
-    {return m_topo_property->getBlockContainer().get(ind);}
-
-    /** \brief  Fournit l'accès aux blocs topologiques incidents avec une copie
-     *
-     *  \param blocks les blocs incidents
-     */
-    void getBlocks(std::vector<Block* >& blocks) const
-    {m_topo_property->getBlockContainer().get(blocks);}
+    {return m_topo_property->getBlockContainer().at(ind);}
 
     /** \brief  Fournit l'accès aux blocs topologiques incidents sans copie
     */
-    const std::vector<Block* >& getBlocks() const
-    {return m_topo_property->getBlockContainer().get();}
+    std::vector<Block* >& getBlocks() const
+    {return m_topo_property->getBlockContainer();}
 
     /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux sommets topologiques incidents avec une copie
-     *
-     *  \param vertices les sommets incidents
-     */
-    void getVertices(std::vector<Vertex* >& vertices) const
-    {m_topo_property->getVertexContainer().get(vertices);}
-
     /** Fournit l'accès aux sommets topologiques incidents sans copie
      */
-    const std::vector<Vertex* >& getVertices() const
-    {return m_topo_property->getVertexContainer().get();}
+    std::vector<Vertex* >& getVertices() const
+    {return m_topo_property->getVertexContainer();}
 
     /// fournit l'accès à l'un des sommets
     Vertex* getVertex(uint ind) const
-    {return m_topo_property->getVertexContainer().get(ind);}
+    {return m_topo_property->getVertexContainer().at(ind);}
 
     /// retourne le nombre de sommets
     uint getNbVertices() const;
 
     /// vérifie si cette face contient ou non ce sommet
     bool find(Vertex* v) const
-    {return m_topo_property->getVertexContainer().find(v);}
+    {return Utils::find(m_topo_property->getVertexContainer(), v);}
 
     /// retourne l'indice d'un sommet
-    uint getIndex(Vertex* v) const
-    {return m_topo_property->getVertexContainer().getIndex(v);}
+    uint getIndexOf(Vertex* v) const
+    {return Utils::getIndexOf(m_topo_property->getVertexContainer(), v);}
 
     /// accès à tous les sommets y compris ceux internes
     void getAllVertices(std::vector<Topo::Vertex* >& vertices, const bool unique=true) const;
@@ -158,38 +144,31 @@ public:
     /*------------------------------------------------------------------------*/
     void addCoFace(CoFace* f)
     {
-        m_topo_property->getCoFaceContainer().add(f);
+        m_topo_property->getCoFaceContainer().push_back(f);
     }
 
     void addCoFaces(std::vector<CoFace*> faces)
     {
-        m_topo_property->getCoFaceContainer().add(faces);
+        m_topo_property->getCoFaceContainer().insert(m_topo_property->getCoFaceContainer().end(), faces.begin(), faces.end());
     }
 
     void removeCoFace(CoFace* f, const bool exceptionIfNotFound=true)
     {
-        m_topo_property->getCoFaceContainer().remove(f, exceptionIfNotFound);
+        Utils::remove(m_topo_property->getCoFaceContainer(), f, exceptionIfNotFound);
     }
-
-    /** \brief  Fournit l'accès aux faces topologiques communes avec copie
-     *
-     *  \param faces les faces communes
-     */
-    void getCoFaces(std::vector<CoFace* >& faces) const
-    {m_topo_property->getCoFaceContainer().get(faces);}
 
     /** Fournit l'accès aux faces topologiques incidentes sans copie
      */
-    const std::vector<CoFace* > & getCoFaces() const
-    {return m_topo_property->getCoFaceContainer().get();}
+    std::vector<CoFace* > & getCoFaces() const
+    {return m_topo_property->getCoFaceContainer();}
 
     /// Accesseur pour l'une des faces communes
     CoFace* getCoFace(uint id) const
-    {return m_topo_property->getCoFaceContainer().get(id);}
+    {return m_topo_property->getCoFaceContainer().at(id);}
 
     /// retourne le nombre de faces communes
     uint getNbCoFaces() const
-    {return m_topo_property->getCoFaceContainer().getNb();}
+    {return m_topo_property->getCoFaceContainer().size();}
 
     /*------------------------------------------------------------------------*/
     /** \brief Remplace un sommet v1 par le sommet v2
@@ -263,8 +242,12 @@ public:
 	 * 			optimisation)
      * \return  Description, à détruire par l'appelant.
      */
-    virtual Mgx3D::Utils::SerializedRepresentation* getDescription (
-													bool alsoComputed) const;
+    virtual Mgx3D::Utils::SerializedRepresentation* getDescription (bool alsoComputed) const;
+
+    /*------------------------------------------------------------------------*/
+    /** \brief  Fournit un résumé textuel de l'entité.
+     */
+    virtual std::string getSummary ( ) const {return TopoEntity::getSummary(getVertices());}
 
     /*------------------------------------------------------------------------*/
     /** \brief  Indique si la face est structurée

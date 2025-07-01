@@ -38,31 +38,26 @@ internalExecute()
     for (uint i=0; i<m_edge_A->getNbVertices(); i++){
     	Vertex* vtx = m_edge_A->getVertex(i);
     	if (!m_edge_B->find(vtx)){
-    		std::vector<CoEdge*> loc_coedges;
-    		vtx->getCoEdges(loc_coedges);
-    		for (uint j=0; j<loc_coedges.size(); j++)
-    			keep_coedges[loc_coedges[j]] = 1;
+    		for (CoEdge* loc_coedge : vtx->getCoEdges())
+    			keep_coedges[loc_coedge] = 1;
     	}
     }
 
     std::vector<CoFace*> loc_cofaces;
     m_edge_A->getCoFaces(loc_cofaces);
-    for (uint i=0; i<loc_cofaces.size(); i++)
-    	keep_cofaces[loc_cofaces[i]] = 1;
+    for (CoFace* loc_coface : loc_cofaces)
+    	keep_cofaces[loc_coface] = 1;
 
     // fusion avec recherche des sommets les plus proche possible
     m_edge_A->fuse(m_edge_B, &getInfoCommand());
 
-    std::vector<Vertex*> vertices;
-    m_edge_A->getVertices(vertices);
-
     // fusion des arêtes autour
-    for (uint i=0; i<vertices.size(); i++)
-    	mergeCoEdges(vertices[i], keep_coedges);
+    for (Vertex* v : m_edge_A->getVertices())
+    	mergeCoEdges(v, keep_coedges);
 
     // fusion des faces autour des 2 sommets
-    for (uint i=0; i<vertices.size(); i++)
-    	mergeCoFaces(vertices[i], keep_cofaces);
+    for (Vertex* v : m_edge_A->getVertices())
+    	mergeCoFaces(v, keep_cofaces);
 
     // suppression des entités temporaires
     cleanTemporaryEntities();

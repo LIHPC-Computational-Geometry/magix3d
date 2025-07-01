@@ -99,14 +99,6 @@ public:
 #endif
 
     /*------------------------------------------------------------------------*/
-      /** \brief  Fournit l'accès aux sommets topologiques incidents
-       *
-       *  \param vertices les sommets incidents
-       */
-     virtual void getVertices(std::vector<Topo::Vertex* >& vertices) const
-      {}
-
-      /*------------------------------------------------------------------------*/
     /// Accesseur sur la liste de noms de groupes
     virtual void getGroupsName (std::vector<std::string>& gn, bool byGeom, bool byTopo) const;
 
@@ -159,15 +151,15 @@ public:
      * \return  Description, à détruire par l'appelant.
      */
 #ifndef SWIG
-    virtual Mgx3D::Utils::SerializedRepresentation* getDescription (
-													bool alsoComputed) const;
+    virtual Mgx3D::Utils::SerializedRepresentation* getDescription (bool alsoComputed) const;
 #endif
 
     /*------------------------------------------------------------------------*/
     /** \brief  Fournit un résumé textuel de l'entité.
      */
 #ifndef SWIG
-    virtual std::string getSummary ( ) const;
+    virtual std::string getSummary ( ) const = 0;
+    std::string getSummary(const std::vector<Topo::Vertex*>& vertices) const;
 #endif
 
     /*------------------------------------------------------------------------*/

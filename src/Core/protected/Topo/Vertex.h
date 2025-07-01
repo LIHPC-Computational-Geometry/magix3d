@@ -107,19 +107,15 @@ public:
      *  Attention à sauvegarder pour le undo
      *  \see saveVertexTopoProperty
      */
-
     void setCoord(const Utils::Math::Point & pt, bool acceptMeshed = false);
-
 
     /*------------------------------------------------------------------------*/
     /**  Ajoute une relation vers une arête commune
      * Attention à sauvegarder pour le undo
      * \see saveVertexTopoProperty
      */
-
     void addCoEdge(CoEdge* e)
-    {m_topo_property->getCoEdgeContainer().add(e);}
-
+    {m_topo_property->getCoEdgeContainer().push_back(e);}
 
     /*------------------------------------------------------------------------*/
     /** \brief Enlève une relation vers une arête commune
@@ -128,31 +124,21 @@ public:
      * Attention à sauvegarder pour le undo
      * \see saveVertexTopoProperty
      */
-
-   void removeCoEdge(CoEdge* e, const bool exceptionIfNotFound=true)
-    {m_topo_property->getCoEdgeContainer().remove(e, exceptionIfNotFound);}
-
-
+    void removeCoEdge(CoEdge* e, const bool exceptionIfNotFound=true)
+    {Utils::remove(m_topo_property->getCoEdgeContainer(), e, exceptionIfNotFound);}
     /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux arêtes topologiques communes incidentes avec copie
-     *
-     *  \param edges les arêtes incidentes
-     */
-    void getCoEdges(std::vector<CoEdge* >& edges) const
-    {m_topo_property->getCoEdgeContainer().get(edges);}
-
-    /// Fournit l'accès aux arêtes topologiques communes incidentes sans copie
-    const std::vector<CoEdge* > & getCoEdges() const
-    {return m_topo_property->getCoEdgeContainer().get();}
+     /// Fournit l'accès aux arêtes topologiques communes incidentes sans copie
+    std::vector<CoEdge* > & getCoEdges() const
+    {return m_topo_property->getCoEdgeContainer();}
 
     /*------------------------------------------------------------------------*/
     /// fournit l'accès à l'une des arêtes communes
     CoEdge* getCoEdge(uint ind) const
-    {return m_topo_property->getCoEdgeContainer().get(ind);}
+    {return m_topo_property->getCoEdgeContainer().at(ind);}
 
     /// retourne le nombre d'arêtes communes
     uint getNbCoEdges() const
-    {return m_topo_property->getCoEdgeContainer().getNb();}
+    {return m_topo_property->getCoEdgeContainer().size();}
 
     /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès aux arêtes topologiques incidentes
@@ -161,7 +147,6 @@ public:
      */
 
     void getEdges(std::vector<Edge* >& edges) const;
-
 
     /*------------------------------------------------------------------------*/
     /** Constitue la liste des CoFaces adjacentes */
@@ -213,8 +198,12 @@ public:
      * \return  Description, à détruire par l'appelant.
      */
 
-    virtual Mgx3D::Utils::SerializedRepresentation* getDescription (
-													bool alsoComputed) const;
+    virtual Mgx3D::Utils::SerializedRepresentation* getDescription (bool alsoComputed) const;
+
+    /*------------------------------------------------------------------------*/
+    /** \brief  Fournit un résumé textuel de l'entité.
+     */
+    virtual std::string getSummary ( ) const {return "";}
 
     /*------------------------------------------------------------------------*/
     /** Vérification du sommet
@@ -366,11 +355,8 @@ public:
     virtual void getGroupsName (std::vector<std::string>& gn, bool byGeom=true, bool byTopo=true) const;
 
     /// Accesseur sur le conteneur pour les groupes
-    Utils::Container<Group::Group0D>& getGroupsContainer() {return m_topo_property->getGroupsContainer();}
-    const Utils::Container<Group::Group0D>& getGroupsContainer() const {return m_topo_property->getGroupsContainer();}
-
-    void getGroups(std::vector<Group::Group0D*>& grp) const
-          {grp = getGroupsContainer().get();}
+    std::vector<Group::Group0D*>& getGroupsContainer() {return m_topo_property->getGroupsContainer();}
+    const std::vector<Group::Group0D*>& getGroupsContainer() const {return m_topo_property->getGroupsContainer();}
 
     /*------------------------------------------------------------------------*/
     /** Nombre de noeuds internes

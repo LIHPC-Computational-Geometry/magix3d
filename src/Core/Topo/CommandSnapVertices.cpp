@@ -334,12 +334,9 @@ internalExecute()
 
         // recherche d'une arête entre 2 sommets fusionnés
         CoEdge* coedge_between = 0;
-        std::vector<CoEdge* > loc_coedges;
-        som1->getCoEdges(loc_coedges);
-        for (std::vector<CoEdge* >::iterator iter = loc_coedges.begin();
-                iter != loc_coedges.end(); ++iter)
-            if (filtre_coedge[*iter] == 1 && som2 == (*iter)->getOppositeVertex(som1))
-                coedge_between = *iter;
+        for (CoEdge* loc_coedge : som1->getCoEdges())
+            if (filtre_coedge[loc_coedge] == 1 && som2 == (loc_coedge)->getOppositeVertex(som1))
+                coedge_between = loc_coedge;
 
         // on ne trouve pas d'arête, peut-être parce qu'elle est composée
         if(0 == coedge_between)
@@ -437,7 +434,7 @@ internalExecute()
                             <<" et pour Face "<<face->getName()<<std::endl;
 #endif
                 bloc->saveBlockTopoProperty(&getInfoCommand());
-                bloc->permuteToKmaxFace(bloc->getIndex(face), &getInfoCommand());
+                bloc->permuteToKmaxFace(bloc->getIndexOf(face), &getInfoCommand());
             }
         } // end if bloc->isStructured() && getNbFaces() == 6
 
@@ -540,11 +537,7 @@ internalExecute()
                 throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, CommandSnapVertices, le filtre_edge ne nous apprend rien", TkUtil::Charset::UTF_8));
 
             // il faut supprimer les Faces des blocs
-            std::vector<Face* > loc_faces;
-            coface->getFaces(loc_faces);
-            for (std::vector<Face* >::iterator iter2 = loc_faces.begin();
-                    iter2 != loc_faces.end(); ++iter2){
-                Face* face = *iter2;
+            for (Face* face : coface->getFaces()){
 #ifdef _DEBUG_SNAP
                 std::cout<<"  face impactée "<<face->getName()<<std::endl;
 #endif
@@ -553,7 +546,7 @@ internalExecute()
 
                 Block* bloc = face->getBlock(0);
                 bloc->saveBlockTopoProperty(&getInfoCommand());
-                bloc->getBlockTopoProperty()->getFaceContainer().remove(face, true);
+                Utils::remove(bloc->getBlockTopoProperty()->getFaceContainer(), face, true);
                 face->free(&getInfoCommand());
             }
 
@@ -584,11 +577,8 @@ internalExecute()
             }
 
             // suppression des faces
-            std::vector<Face* > loc_faces;
-            bloc->getFaces(loc_faces);
-            for (std::vector<Face* >::iterator iter2 = loc_faces.begin();
-                    iter2 != loc_faces.end(); ++iter2)
-                (*iter2)->free(&getInfoCommand());
+            for (Face* loc_face : bloc->getFaces())
+                loc_face->free(&getInfoCommand());
 
             // suppression du bloc
             bloc->free(&getInfoCommand());
@@ -600,7 +590,7 @@ internalExecute()
 #endif
             // cas similaire à Block::degenerateFaceInEdge
             if (bloc->getVertex(4) == bloc->getVertex(5))
-                bloc->getBlockTopoProperty()->getVertexContainer().set(5, bloc->getVertex(6));
+                bloc->getBlockTopoProperty()->getVertexContainer()[5] = bloc->getVertex(6);
             bloc->getBlockTopoProperty()->getVertexContainer().resize(6);
         }
         else {
@@ -632,8 +622,10 @@ internalExecute()
             		filtre_vertex[vtx] = 4;
             }
             bloc->getBlockTopoProperty()->getVertexContainer().clear();
-            bloc->getBlockTopoProperty()->getVertexContainer().add(loc_vtx);
-
+            bloc->getBlockTopoProperty()->getVertexContainer().insert(
+                bloc->getBlockTopoProperty()->getVertexContainer().end(),
+                loc_vtx.begin(),
+                loc_vtx.end());
 
             // on remet le filtre à l'état d'avant pour le prochain bloc
             for (uint i=0;i<loc_vtx.size(); i++)

@@ -110,8 +110,7 @@ void VTKMgx3DMeshEntityRepresentation::createSurfacicRepresentation ( )
 	{
 		Mesh::Volume*	volume	= dynamic_cast<Mesh::Volume*>(getEntity ( ));
 		CHECK_NULL_PTR_ERROR (volume)
-		vector<Topo::Block*>	blocks;
-		volume->getBlocks (blocks);
+		vector<Topo::Block*>	blocks = volume->getBlocks ();
 		mdr.setSkinDisplayed (0 == blocks.size ( ) ? false : true);
 	}	// if (3 == getEntity ( )->getDim ( ))
 	getEntity ( )->getRepresentation (mdr, true);

@@ -184,7 +184,7 @@ computePosCoEdge(std::map<Topo::CoFace*, uint>& filtre_coface,
                 // recherche du côté dans lequel est cette arête, et le nombre de bras de maillage jusqu'à la coupe
                 Topo::Edge* edge_dep = coface->getEdgeContaining(coedge_dep);
                 //std::cout<<"edge_dep : "<<*edge_dep;
-                uint ind_edge_dep = coface->getIndex(edge_dep);
+                uint ind_edge_dep = coface->getIndexOf(edge_dep);
 
                 // direction de la face qui est coupée
                 Topo::CoFace::eDirOnCoFace dirCoFaceSplit = (ind_edge_dep%2?Topo::CoFace::i_dir:Topo::CoFace::j_dir);

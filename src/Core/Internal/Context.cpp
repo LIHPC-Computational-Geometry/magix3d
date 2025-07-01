@@ -1650,22 +1650,14 @@ void Context::clearSession()
 
 	// commande de destruction de toutes les entités topologiques qui ont pu être construites
 	std::vector<Topo::TopoEntity*> ve;
-	std::vector<Topo::Block*> blocks;
-	getTopoManager().getBlocks(blocks);
-	for (uint i=0; i<blocks.size(); i++)
-		ve.push_back(blocks[i]);
-	std::vector<Topo::CoFace*> cofaces;
-	getTopoManager().getCoFaces(cofaces);
-	for (uint i=0; i<cofaces.size(); i++)
-		ve.push_back(cofaces[i]);
-	std::vector<Topo::CoEdge*> coedges;
-	getTopoManager().getCoEdges(coedges);
-	for (uint i=0; i<coedges.size(); i++)
-		ve.push_back(coedges[i]);
-	std::vector<Topo::Vertex*> vertices;
-	getTopoManager().getVertices(vertices);
-	for (uint i=0; i<vertices.size(); i++)
-		ve.push_back(vertices[i]);
+	for (Topo::Block* b : getTopoManager().getBlocksObj())
+		ve.push_back(b);
+	for (Topo::CoFace* cf : getTopoManager().getCoFacesObj())
+		ve.push_back(cf);
+	for (Topo::CoEdge* ce : getTopoManager().getCoEdgesObj())
+		ve.push_back(ce);
+	for (Topo::Vertex* v : getTopoManager().getVerticesObj())
+		ve.push_back(v);
 
 	Topo::CommandDestroyTopo* commandTopo = new Topo::CommandDestroyTopo(*this, ve, true);
 

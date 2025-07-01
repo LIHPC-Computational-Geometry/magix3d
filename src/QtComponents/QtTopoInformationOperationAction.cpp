@@ -316,10 +316,8 @@ void QtTopoInformationOperationPanel::autoUpdate ( )
 
 		QtMgx3DOperationPanel::autoUpdate ( );
 
-		std::vector<Topo::Block*> blocks;
-		std::vector<Topo::CoFace*> cofaces;
-		manager->getBlocks(blocks);
-		manager->getCoFaces(cofaces);
+		std::vector<Topo::Block*> blocks = manager->getBlocksObj();
+		std::vector<Topo::CoFace*> cofaces = manager->getCoFacesObj();
 
 		uint nb_blocs = blocks.size();
 	    uint nb_dom_str_dir = 0;

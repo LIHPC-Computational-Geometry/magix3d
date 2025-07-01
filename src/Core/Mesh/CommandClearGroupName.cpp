@@ -73,10 +73,10 @@ void CommandClearGroupName::internalExecute()
 
     		// on retire le groupe
     		grp->remove(topo);
-    		topo->getGroupsContainer().remove(grp, true);
+    		Utils::remove(topo->getGroupsContainer(), grp, true);
 
     		// il faut peut-être ajouter au groupe par défaut
-    		if (topo->getGroupsContainer().getNb() == 0 && topo->getGeomAssociation() == 0)
+    		if (topo->getGroupsContainer().size() == 0 && topo->getGeomAssociation() == 0)
     			addGroup("", topo);
 
     		// le sommet n'est peut-être plus visible / groupe visibles
@@ -119,10 +119,10 @@ void CommandClearGroupName::internalExecute()
 
     		// on retire le groupe
     		grp->remove(topo);
-    		topo->getGroupsContainer().remove(grp, true);
+    		Utils::remove(topo->getGroupsContainer(), grp, true);
 
     		// il faut peut-être ajouter au groupe par défaut
-    		if (topo->getGroupsContainer().getNb() == 0 && topo->getGeomAssociation() == 0)
+    		if (topo->getGroupsContainer().size() == 0 && topo->getGeomAssociation() == 0)
     			addGroup("", topo);
 
     		// l'arête n'est peut-être plus visible / groupe visibles
@@ -165,10 +165,10 @@ void CommandClearGroupName::internalExecute()
 
         	// on retire le groupe
         	grp->remove(topo);
-        	topo->getGroupsContainer().remove(grp, true);
+        	Utils::remove(topo->getGroupsContainer(), grp, true);
 
         	// il faut peut-être ajouter au groupe par défaut
-        	if (topo->getGroupsContainer().getNb() == 0 && topo->getGeomAssociation() == 0)
+        	if (topo->getGroupsContainer().size() == 0 && topo->getGeomAssociation() == 0)
         		addGroup("", topo);
 
     		// la face n'est peut-être plus visible / groupe visibles
@@ -211,10 +211,10 @@ void CommandClearGroupName::internalExecute()
 
         	// on retire le groupe
         	grp->remove(topo);
-        	topo->getGroupsContainer().remove(grp, true);
+        	Utils::remove(topo->getGroupsContainer(), grp, true);
 
         	// il faut peut-être ajouter au groupe par défaut
-        	if (topo->getGroupsContainer().getNb() == 0 && topo->getGeomAssociation() == 0)
+        	if (topo->getGroupsContainer().size() == 0 && topo->getGeomAssociation() == 0)
         		addGroup("", topo);
 
     		// le bloc n'est peut-être plus visible / groupe visibles
@@ -709,7 +709,7 @@ addGroup(std::string ng, Topo::Vertex* vtx)
 {
 	Group::Group0D* grp = getContext().getGroupManager().getNewGroup0D(ng, &getInfoCommand());
 	grp->add(vtx);
-	vtx->getGroupsContainer().add(grp);
+	vtx->getGroupsContainer().push_back(grp);
 	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
 }
 /*----------------------------------------------------------------------------*/
@@ -727,7 +727,7 @@ removeGroup(std::string ng, Topo::Vertex* vtx)
 {
 	Group::Group0D* grp = getContext().getGroupManager().getGroup0D(ng, &getInfoCommand());
 	grp->remove(vtx);
-	vtx->getGroupsContainer().remove(grp, true);
+	Utils::remove(vtx->getGroupsContainer(), grp, true);
 	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
 }
 /*----------------------------------------------------------------------------*/
@@ -746,7 +746,7 @@ addGroup(std::string ng, Topo::CoEdge* coedge)
 {
 	Group::Group1D* grp = getContext().getGroupManager().getNewGroup1D(ng, &getInfoCommand());
 	grp->add(coedge);
-	coedge->getGroupsContainer().add(grp);
+	coedge->getGroupsContainer().push_back(grp);
 	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
 	std::vector<Topo::CoEdge*>  coedges;
 	coedges.push_back(coedge);
@@ -768,7 +768,7 @@ removeGroup(std::string ng, Topo::CoEdge* coedge)
 {
 	Group::Group1D* grp = getContext().getGroupManager().getGroup1D(ng, &getInfoCommand());
 	grp->remove(coedge);
-	coedge->getGroupsContainer().remove(grp, true);
+	Utils::remove(coedge->getGroupsContainer(), grp, true);
 	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
 	std::vector<Topo::CoEdge*>  coedges;
 	coedges.push_back(coedge);
@@ -790,7 +790,7 @@ addGroup(std::string ng, Topo::CoFace* coface)
 {
 	Group::Group2D* grp = getContext().getGroupManager().getNewGroup2D(ng, &getInfoCommand());
 	grp->add(coface);
-	coface->getGroupsContainer().add(grp);
+	coface->getGroupsContainer().push_back(grp);
 	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
 	std::vector<Topo::CoFace*>  cofaces;
 	cofaces.push_back(coface);
@@ -812,7 +812,7 @@ removeGroup(std::string ng, Topo::CoFace* coface)
 {
 	Group::Group2D* grp = getContext().getGroupManager().getGroup2D(ng, &getInfoCommand());
 	grp->remove(coface);
-	coface->getGroupsContainer().remove(grp, true);
+	Utils::remove(coface->getGroupsContainer(), grp, true);
 	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
 	std::vector<Topo::CoFace*>  cofaces;
 	cofaces.push_back(coface);
@@ -834,7 +834,7 @@ addGroup(std::string ng, Topo::Block* bloc)
 {
 	Group::Group3D* grp = getContext().getGroupManager().getNewGroup3D(ng, &getInfoCommand());
 	grp->add(bloc);
-	bloc->getGroupsContainer().add(grp);
+	bloc->getGroupsContainer().push_back(grp);
 	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
 	std::vector<Topo::Block*>  blocs;
 	blocs.push_back(bloc);
@@ -856,7 +856,7 @@ removeGroup(std::string ng, Topo::Block* bloc)
 {
 	Group::Group3D* grp = getContext().getGroupManager().getGroup3D(ng, &getInfoCommand());
 	grp->remove(bloc);
-	bloc->getGroupsContainer().remove(grp, true);
+	Utils::remove(bloc->getGroupsContainer(), grp, true);
 	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
 	std::vector<Topo::Block*>  blocs;
 	blocs.push_back(bloc);

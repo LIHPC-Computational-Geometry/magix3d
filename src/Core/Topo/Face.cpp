@@ -50,10 +50,13 @@ Face(Internal::Context& ctx,
 
     m_mesh_property = new FaceMeshingProperty(coface->isStructured());
 
-    m_topo_property->getCoFaceContainer().add(coface);
+    m_topo_property->getCoFaceContainer().push_back(coface);
 
     const std::vector<Vertex* > & vertices = coface->getVertices();
-    m_topo_property->getVertexContainer().add(vertices);
+    m_topo_property->getVertexContainer().insert(
+        m_topo_property->getVertexContainer().end(),
+        vertices.begin(),
+        vertices.end());
 
     coface->addFace(this);
 	ctx.newGraphicalRepresentation (*this);
@@ -80,8 +83,14 @@ Face(Internal::Context& ctx,
     if (cofaces.empty())
          throw TkUtil::Exception (TkUtil::UTF8String ("Tentative de création d'une face sans coface", TkUtil::Charset::UTF_8));
 
-    m_topo_property->getCoFaceContainer().add(cofaces);
-    m_topo_property->getVertexContainer().add(vertices);
+    m_topo_property->getCoFaceContainer().insert(
+        m_topo_property->getCoFaceContainer().end(),
+        cofaces.begin(),
+        cofaces.end());
+    m_topo_property->getVertexContainer().insert(
+        m_topo_property->getVertexContainer().end(),
+        vertices.begin(),
+        vertices.end());
     for (uint i=0; i<getNbCoFaces(); i++)
         getCoFace(i)->addFace(this);
 	ctx.newGraphicalRepresentation (*this);
@@ -155,7 +164,7 @@ replace(Vertex* v1, Vertex* v2, bool propagate_up, bool propagate_down, Internal
             // 2 cas de figure
             // soit v2 est déjà présent, donc la face commune va être dégénérée (v1 disparait)
             // soit v2 est nouveau, on remplace v1 par v2
-            if (m_topo_property->getVertexContainer().find(v2)){
+            if (Utils::find(m_topo_property->getVertexContainer(), v2)){
                 if (isStructured()){
                     if (getNbVertices() == 4){
                         // il faut mettre en premier le sommet conservé
@@ -165,17 +174,17 @@ replace(Vertex* v1, Vertex* v2, bool propagate_up, bool propagate_down, Internal
                         m_topo_property->getVertexContainer().resize(3);
                     }
                     else {
-                        m_topo_property->getVertexContainer().remove(v1, true);
+                        Utils::remove(m_topo_property->getVertexContainer(), v1, true);
                     }
                 }
                 else {
                     _permuteToFirstAndLastVertices(v2, v1, icmd);
-                    uint new_size = m_topo_property->getVertexContainer().getNb()-1;
+                    uint new_size = m_topo_property->getVertexContainer().size()-1;
                     m_topo_property->getVertexContainer().resize(new_size);
                 }
 
             } else
-                m_topo_property->getVertexContainer().set(i, v2);
+                m_topo_property->getVertexContainer()[i] = v2;
 
         } // end if (v1 == getVertex(i))
 
@@ -207,7 +216,7 @@ replace(CoFace* cf1, CoFace* cf2, Internal::InfoCommand* icmd)
     for (uint i=0; i<getNbCoFaces(); i++)
         if (cf1 == getCoFace(i)){
             saveFaceTopoProperty(icmd);
-            m_topo_property->getCoFaceContainer().set(i, cf2);
+            m_topo_property->getCoFaceContainer()[i] = cf2;
 
             cf1->saveCoFaceTopoProperty(icmd);
             cf2->saveCoFaceTopoProperty(icmd);
@@ -275,7 +284,7 @@ getNbVertices() const
         log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
     }
 #endif
-    return m_topo_property->getVertexContainer().getNb();
+    return m_topo_property->getVertexContainer().size();
 }
 /*----------------------------------------------------------------------------*/
 void Face::getAllVertices(std::vector<Vertex* >& vertices, const bool unique) const
@@ -418,9 +427,7 @@ getDescription (bool alsoComputed) const
          }
      }
 
-    std::vector<CoFace* > fa;
-    getCoFaces(fa);
-
+    std::vector<CoFace* > fa = getCoFaces();
     for (std::vector<Topo::CoFace*>::iterator iter = fa.begin( ); fa.end( )!=iter; iter++){
     	if (getRatio(*iter,0) > 1)
     		topoProprietes.addProperty (
@@ -438,9 +445,7 @@ getDescription (bool alsoComputed) const
     description->addPropertiesSet (topoProprietes);
 
     // les relations vers les autres types d'entités topologiques
-    std::vector<Topo::Vertex* > vtx;
-    getVertices(vtx);
-
+    std::vector<Topo::Vertex* > vtx = getVertices();
     Utils::SerializedRepresentation  topoRelation ("Relations topologiques", "");
 
     Utils::SerializedRepresentation  vertices ("Sommets topologiques",
@@ -461,9 +466,7 @@ getDescription (bool alsoComputed) const
     topoRelation.addPropertiesSet (cofaces);
 
 
-    std::vector<Block* > bl;
-    getBlocks(bl);
-
+    std::vector<Block* > bl = getBlocks();
     Utils::SerializedRepresentation  blocks ("Blocs topologiques",
     		TkUtil::NumericConversions::toStr(bl.size()));
     for (std::vector<Topo::Block*>::iterator iter = bl.begin( ); bl.end( )!=iter; iter++)
@@ -547,10 +550,8 @@ void Face::setStructured(Internal::InfoCommand* icmd, bool str)
     if (isStructured()){
         saveFaceMeshingProperty(icmd);
         m_mesh_property->setStructured(str);
-        std::vector<Block*> blocs;
-        getBlocks(blocs);
-        for (std::vector<Block*>::iterator iter = blocs.begin(); iter != blocs.end(); ++iter)
-            (*iter)->setStructured(icmd, false);
+        for (Block* bl : getBlocks())
+            bl->setStructured(icmd, false);
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -724,10 +725,10 @@ Topo::TopoInfo Face::getInfos() const
 	Topo::TopoInfo infos;
 	infos.name = getName();
 	infos.dimension = getDim();
-	getVertices(infos.incident_vertices);
+	infos.incident_vertices = getVertices();
 	getCoEdges(infos.incident_coedges);
-	getCoFaces(infos.incident_cofaces);
-	getBlocks(infos.incident_blocks);
+	infos.incident_cofaces = getCoFaces();
+	infos.incident_blocks = getBlocks();
 	infos.geom_entity = getGeomAssociation();
 	return infos;
 }
@@ -1182,14 +1183,9 @@ split(std::vector<Edge* > & splitingEdges,
 
     // on marque les CoEdges qui délimitent la coupe (comme étant en dehors de la face)
     // on marque égallement ces sommets
-    for(std::vector<Edge* >::iterator iter = splitingEdges.begin();
-            iter != splitingEdges.end(); ++iter){
-        Edge* edge = *iter;
-
-        std::vector<CoEdge* > coedges;
-        edge->getCoEdges(coedges);
-        for(uint j=0; j < coedges.size(); j++)
-        	filtre_coedges[coedges[j]] = 2;
+    for(Edge* edge : splitingEdges){
+        for(CoEdge* coedge : edge->getCoEdges())
+        	filtre_coedges[coedge] = 2;
 
         filtre_vertex[edge->getVertex(0)] = 2;
         filtre_vertex[edge->getVertex(1)] = 2;
@@ -1929,7 +1925,7 @@ getOppositeVertex(Vertex* v, eDirOnFace& dir) const
 {
 //    std::cout<<"Face::getOppositeVertex("<<v->getName()<<", "<<dir<<")\n";
     // recherche de l'indice du sommet
-    uint ind = getIndex(v);
+    uint ind = getIndexOf(v);
     if (dir == i_dir){
         if (ind == 1)
             return getVertex(2);
@@ -2016,9 +2012,7 @@ _permuteToFirstAndLastVertices(Vertex* v1, Vertex* v2, Internal::InfoCommand* ic
     if (!trouve1 || !trouve2)
         throw TkUtil::Exception (TkUtil::UTF8String ("Face::_permuteToFirstAndLastVertices ne trouve pas l'un des sommets", TkUtil::Charset::UTF_8));
 
-    std::vector<Vertex* > initial_vertices;
-    m_topo_property->getVertexContainer().get(initial_vertices);
-
+    std::vector<Vertex* > initial_vertices = m_topo_property->getVertexContainer();
     std::vector<Vertex* > sorted_vertices;
 
     // le changement implique-t-il de permuter les ratios de FaceMeshProperty ?
@@ -2071,7 +2065,10 @@ _permuteToFirstAndLastVertices(Vertex* v1, Vertex* v2, Internal::InfoCommand* ic
     }
 
     m_topo_property->getVertexContainer().clear();
-    m_topo_property->getVertexContainer().add(sorted_vertices);
+    m_topo_property->getVertexContainer().insert(
+        m_topo_property->getVertexContainer().end(),
+        sorted_vertices.begin(),
+        sorted_vertices.end());
 
     if (perm_ratio)
         _permuteMeshingRatios(icmd);
@@ -2103,9 +2100,7 @@ isEdited() const
 Utils::Math::Point Face::getBarycentre() const
 {
 	Utils::Math::Point barycentre;
-
-	std::vector<Topo::Vertex* > vertices;
-	getVertices(vertices);
+	std::vector<Topo::Vertex* > vertices = getVertices();
 	for (uint i=0; i<vertices.size(); i++)
 		barycentre += vertices[i]->getCoord();
 	barycentre /= (double)vertices.size();
