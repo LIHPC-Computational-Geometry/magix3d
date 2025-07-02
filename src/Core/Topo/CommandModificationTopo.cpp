@@ -2020,16 +2020,14 @@ std::vector<Topo::Block*> CommandModificationTopo::getInnerBlocks(std::vector<To
             //std::cout<<"bloc = "<<bloc->getName()<<std::endl;
 
             // analyse des cofaces du bloc: au bord ou interne
-            std::vector<Topo::CoFace*> loc_cofaces;
-            bloc->getCoFaces(loc_cofaces);
-            for (uint j=0; j<loc_cofaces.size(); j++)
-                if (filtre_cofaces[loc_cofaces[j]]==0){
+            for (Topo::CoFace* loc_coface : bloc->getCoFaces())
+                if (filtre_cofaces[loc_coface]==0){
                     // cas d'une face interne nouvelle (reliée à un seul bloc)
-                    innerCoFaces.push_back(loc_cofaces[j]);
-                    filtre_cofaces[loc_cofaces[j]] = 2;
-                } else if (filtre_cofaces[loc_cofaces[j]]==2){
+                    innerCoFaces.push_back(loc_coface);
+                    filtre_cofaces[loc_coface] = 2;
+                } else if (filtre_cofaces[loc_coface]==2){
                     // cas d'une face interne reliée à 2 blocs
-                	filtre_cofaces[loc_cofaces[j]] = 3;
+                	filtre_cofaces[loc_coface] = 3;
                     nbInnerCoFacesMarqued += 1;
                 }
             //std::cout<<" nbInnerCoFacesMarqued = "<<nbInnerCoFacesMarqued<<std::endl;
@@ -2056,16 +2054,14 @@ std::vector<Topo::Block*> CommandModificationTopo::getInnerBlocks(std::vector<To
                                 filtre_blocks[bloc] = 2;
 
                                 // analyse des faces du bloc: au bord ou interne
-                                std::vector<Topo::CoFace*> loc_cofaces;
-                                bloc->getCoFaces(loc_cofaces);
-                                for (uint j=0; j<loc_cofaces.size(); j++)
-                                    if (filtre_cofaces[loc_cofaces[j]]==0){
+                                for (Topo::CoFace* loc_coface : bloc->getCoFaces())
+                                    if (filtre_cofaces[loc_coface]==0){
                                         // cas d'une face interne nouvelle (reliée à un seul bloc)
-                                        innerCoFaces.push_back(loc_cofaces[j]);
-                                        filtre_cofaces[loc_cofaces[j]] = 2;
-                                    } else if (filtre_cofaces[loc_cofaces[j]]==2){
+                                        innerCoFaces.push_back(loc_coface);
+                                        filtre_cofaces[loc_coface] = 2;
+                                    } else if (filtre_cofaces[loc_coface]==2){
                                         // cas d'une face interne reliée à 2 blocs
-                                    	filtre_cofaces[loc_cofaces[j]] = 3;
+                                    	filtre_cofaces[loc_coface] = 3;
                                         nbInnerCoFacesMarqued += 1;
                                     }
                                 //std::cout<<" nbInnerCoFacesMarqued = "<<nbInnerCoFacesMarqued<<std::endl;
@@ -2265,11 +2261,8 @@ void CommandModificationTopo::associateInnerCoFaces(std::vector<Geom::GeomEntity
     }
 
     for (uint k=0; k<blocks.size(); k++){
-    	std::vector<Topo::CoFace*> cofaces;
-    	blocks[k]->getCoFaces(cofaces);
-
-    	for (uint j=0; j<cofaces.size(); ++j)
-    		filtre_cofaces[cofaces[j]] += 1;
+    	for (Topo::CoFace* coface : blocks[k]->getCoFaces())
+    		filtre_cofaces[coface] += 1;
     }
 
     std::vector<Topo::CoFace*> inner_cofaces;

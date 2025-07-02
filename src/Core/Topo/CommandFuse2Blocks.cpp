@@ -26,7 +26,7 @@ CommandFuse2Blocks(Internal::Context& c, Block* bl_A, Block* bl_B)
 	if (!bl_A->isStructured() || !bl_B->isStructured())
 		throw TkUtil::Exception (TkUtil::UTF8String ("Le collage n'est possible qu'avec des blocs structurés", TkUtil::Charset::UTF_8));
 
-	if (bl_A->getNbVertices()!=8 || bl_B->getNbVertices()!=8)
+	if (bl_A->getVertices().size()!=8 || bl_B->getVertices().size()!=8)
 		throw TkUtil::Exception (TkUtil::UTF8String ("Le collage n'est possible qu'avec des blocs non dégénérés", TkUtil::Charset::UTF_8));
 
 	if (bl_A->getGeomAssociation() != bl_B->getGeomAssociation())
@@ -196,7 +196,7 @@ Face* CommandFuse2Blocks::getNearestFace(Block* bl, Utils::Math::Point pt)
 {
 	uint id_best = 0;
 	double dist2 = bl->getFace(0)->getBarycentre().length2(pt);
-	uint nb_faces = bl->getNbFaces();
+	uint nb_faces = bl->getFaces().size();
 	for (uint i=1; i<nb_faces; i++){
 		double d2 = bl->getFace(i)->getBarycentre().length2(pt);
 		if (d2<dist2){

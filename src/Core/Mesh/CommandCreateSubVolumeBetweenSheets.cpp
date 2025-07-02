@@ -112,21 +112,11 @@ internalRedo()
 void CommandCreateSubVolumeBetweenSheets::
 selectCoFaces(std::map<Topo::CoFace*, uint>& filtre_coface)
 {
-	for (uint j=0; j<m_blocks.size(); j++){
-		Topo::Block* blk = m_blocks[j];
-
+	for (Topo::Block* blk : m_blocks){
 		if (blk->isStructured() && blk->isMeshed()){
-
-			std::vector<Topo::CoFace* > cofaces;
-
-			blk->getCoFaces(cofaces);
-
-			for (std::vector<Topo::CoFace* >::iterator iter1 = cofaces.begin();
-					iter1 != cofaces.end(); ++iter1){
-				filtre_coface[*iter1] = 1;
-				//std::cout<<"filtre_coface à 1 pour "<<(*iter1)->getName()<<std::endl;
+			for (Topo::CoFace* coface : blk->getCoFaces()){
+				filtre_coface[coface] = 1;
 			}
-
 		} // end if (blk->isStructured() && blk->isMeshed())
 		else if (!blk->isStructured()){
 			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -140,7 +130,7 @@ selectCoFaces(std::map<Topo::CoFace*, uint>& filtre_coface)
     			    <<" n'est pas maillé";
 			throw TkUtil::Exception(message);
 		}
-	} // end for j
+	} // end for blk
 }
 /*----------------------------------------------------------------------------*/
 void CommandCreateSubVolumeBetweenSheets::

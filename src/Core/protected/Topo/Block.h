@@ -40,9 +40,7 @@ class CommandSetBlockMeshingProperty;
 
  */
 class Block : public TopoEntity {
-
-	friend class CommandSetBlockMeshingProperty;
-
+    friend class CommandSetBlockMeshingProperty;
     static const char* typeNameTopoBlock;
 
 public:
@@ -193,10 +191,6 @@ public:
     std::vector<Topo::Vertex* >& getVertices() const
     {return m_topo_property->getVertexContainer();}
 
-    /// \return le nombre de Vertex
-    uint getNbVertices() const
-    {return m_topo_property->getVertexContainer().size();}
-
     /// fournit l'accès à l'un des sommets
     Topo::Vertex* getVertex(uint ind) const
     {return m_topo_property->getVertexContainer().at(ind);}
@@ -213,10 +207,10 @@ public:
     {return Utils::getIndexOf(m_topo_property->getVertexContainer(), v);}
 
     /// retourne la liste des 8 sommets en duplicant les derniers en cas de dégénérescence
-    void getHexaVertices(std::vector<Topo::Vertex* >& vertices) const;
+    std::vector<Topo::Vertex* > getHexaVertices() const;
 
     /// accès à tous les sommets y compris ceux internes
-    void getAllVertices(std::vector<Topo::Vertex* >& vertices, bool unique = true) const;
+    Utils::EntitySet<Vertex*> getAllVertices() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès aux faces topologiques incidentes sans copie
@@ -228,10 +222,6 @@ public:
     Face* getFace(uint id) const
     {return m_topo_property->getFaceContainer().at(id);}
 
-    /// retourne le nombre de faces
-    uint getNbFaces() const
-    {return m_topo_property->getFaceContainer().size();}
-
     /// retourne l'indice d'une face
     const uint getIndexOf(Face* f) const
     {return Utils::getIndexOf(m_topo_property->getFaceContainer(), f);}
@@ -241,27 +231,21 @@ public:
      *
      *  \param cofaces les faces communes incidentes en retour
      */
-    void getCoFaces(std::vector<CoFace* >& cofaces) const;
-
-    uint getNbCoFaces() const;
+    Utils::EntitySet<CoFace*> getCoFaces() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès aux arêtes topologiques incidentes
      *
      *  \param edges les arêtes incidentes
      */
-    void getEdges(std::vector<Edge* >& edges) const;
-
-    uint getNbEdges() const;
+    Utils::EntitySet<Edge*> getEdges() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès aux arêtes communes topologiques incidentes
      *
      *  \param coedges les arêtes communes incidentes
      */
-    void getCoEdges(std::vector<CoEdge* >& coedges, bool unique = true) const;
-
-    uint getNbCoEdges() const;
+    Utils::EntitySet<CoEdge*> getCoEdges() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Fournit une représentation affichable de l'entité en se basant

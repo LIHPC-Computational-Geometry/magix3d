@@ -712,13 +712,15 @@ std::string TopoManager::getBlockAt(std::vector<Point>& pts) const
 	std::vector<Block*> blocks;
 
 	for (Block* b : m_blocks){
-		std::vector<Topo::Vertex*> vertices;
-		b->getAllVertices(vertices);
-		uint i;
+		auto vertices = b->getAllVertices();
 		if (vertices.size() != pts.size())
 			continue;
-		for (i=0; i<vertices.size() && vertices[i]->getCoord() == pts[i]; i++){
-		}
+		uint i = 0;
+        for (Topo::Vertex* vtx : vertices) {
+            if (vtx->getCoord() == pts[i]) 
+                break;
+            i++;
+        }
 
 		if (i == vertices.size())
 			blocks.push_back(b);

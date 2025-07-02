@@ -11,7 +11,9 @@
 /*----------------------------------------------------------------------------*/
 #include "Utils/DisplayRepresentation.h"
 #include "Utils/SerializedRepresentation.h"
+/*----------------------------------------------------------------------------*/
 #include <vector>
+#include <set>
 #include <map>
 /*----------------------------------------------------------------------------*/
 namespace TkUtil {
@@ -380,7 +382,9 @@ private :
 
 Entity::objectType typesToType (FilterEntity::objectType types);
 FilterEntity::objectType typeToTypes (Entity::objectType type);
-
+#ifndef SWIG
+template<typename T> using EntitySet = std::set<T, decltype(&Utils::Entity::compareEntity)>;
+#endif
 /*----------------------------------------------------------------------------*/
 } // end namespace Utils
 /*----------------------------------------------------------------------------*/

@@ -150,19 +150,16 @@ selectCoFaceAndBlocks(std::map<Topo::CoFace*, uint>& filtre_coface,
         std::map<Topo::Block*, uint>& filtre_block)
 {
     // tous les groupes 3D
-    std::vector<Group::Group3D*> grp;
-    getContext().getGroupManager().getGroup3D(grp);
+    std::vector<Group::Group3D*> groups;
+    getContext().getGroupManager().getGroup3D(groups);
 
     // le nombre de blocs maillés en structuré
     uint nb_blocks_marked = 0;
 
-    for (uint ig=0; ig<grp.size(); ig++){
-    	std::vector<Geom::Volume*>& volumes = grp[ig]->getVolumes();
-    	for (uint i=0; i<volumes.size(); i++){
-    		std::vector<Topo::TopoEntity* >  topos = volumes[i]->getRefTopo();
-    		for (uint j=0; j<topos.size(); j++){
-    			if (topos[j]->getDim() == 3){
-    				Topo::TopoEntity* te = topos[j];
+    for (Group::Group3D* grp : groups){
+    	for (Geom::Volume* volume : grp->getVolumes()){
+    		for (Topo::TopoEntity* te : volume->getRefTopo()){
+    			if (te->getDim() == 3){
     				Topo::Block* blk = dynamic_cast<Topo::Block*>(te);
     				if (blk == 0)
     					throw TkUtil::Exception (TkUtil::UTF8String ("CommandMeshExplorer a échoué pour récupérer un bloc", TkUtil::Charset::UTF_8));
@@ -174,13 +171,8 @@ selectCoFaceAndBlocks(std::map<Topo::CoFace*, uint>& filtre_coface,
     					std::cout<<"  bloc pris en compte : "<<blk->getName()<<std::endl;
 #endif
 
-    					std::vector<Topo::CoFace* > cofaces;
-
-    					blk->getCoFaces(cofaces);
-
-    					for (std::vector<Topo::CoFace* >::iterator iter1 = cofaces.begin();
-    							iter1 != cofaces.end(); ++iter1){
-    						filtre_coface[*iter1] = 1;
+    					for (Topo::CoFace* coface : blk->getCoFaces()){
+    						filtre_coface[coface] = 1;
     						//std::cout<<"filtre_coface à 1 pour "<<(*iter1)->getName()<<std::endl;
     					}
 
@@ -189,10 +181,7 @@ selectCoFaceAndBlocks(std::map<Topo::CoFace*, uint>& filtre_coface,
     		} // end for j
     	} // end for i
 
-    	std::vector<Topo::Block*>& blocks = grp[ig]->getBlocks();
-    	for (uint j=0; j<blocks.size(); j++){
-    		Topo::Block* blk = blocks[j];
-
+    	for (Topo::Block* blk : grp->getBlocks()){
     		if (blk->isStructured()){ // && blk->isMeshed()
     			filtre_block[blk] = 1;
     			nb_blocks_marked += 1;
@@ -200,14 +189,8 @@ selectCoFaceAndBlocks(std::map<Topo::CoFace*, uint>& filtre_coface,
     			std::cout<<"  bloc pris en compte : "<<blk->getName()<<std::endl;
 #endif
 
-    			std::vector<Topo::CoFace* > cofaces;
-
-    			blk->getCoFaces(cofaces);
-
-    			for (std::vector<Topo::CoFace* >::iterator iter1 = cofaces.begin();
-    					iter1 != cofaces.end(); ++iter1){
-    				filtre_coface[*iter1] = 1;
-    				//std::cout<<"filtre_coface à 1 pour "<<(*iter1)->getName()<<std::endl;
+    			for (Topo::CoFace* coface : blk->getCoFaces()){
+    				filtre_coface[coface] = 1;
     			}
 
     		} // end if (blk->isStructured() && blk->isMeshed())

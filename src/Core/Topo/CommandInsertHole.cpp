@@ -333,12 +333,7 @@ duplicate()
 
 	// duplique les arêtes des blocs2 et propage
 	for (Block* bloc : blocs2){
-		std::vector<CoEdge*> coedges;
-		bloc->getCoEdges(coedges);
-
-		for (std::vector<CoEdge*>::iterator iter_ce=coedges.begin();
-				iter_ce!= coedges.end(); ++iter_ce){
-			CoEdge* old_ce = *iter_ce;
+		for (CoEdge* old_ce : bloc->getCoEdges()){
 			CoEdge* new_ce = duplicate(old_ce);
 			if (old_ce != new_ce){
 				bloc->replace(old_ce, new_ce, &getInfoCommand());
@@ -424,15 +419,10 @@ std::vector<Block*> CommandInsertHole::getConnectedBlocks()
 	while(bl_dep) {
 		m_filtre_block[bl_dep] = 3;
 		// récupération des blocs voisins suivant voisinage par coface
-
-		std::vector<Topo::CoFace*> cofaces;
-		bl_dep->getCoFaces(cofaces);
-
-		for (std::vector<Topo::CoFace*>::iterator iter_cf=cofaces.begin();
-				iter_cf!=cofaces.end();++iter_cf)
-			if (m_filtre_coface[*iter_cf] != 4){
+		for (Topo::CoFace* coface : bl_dep->getCoFaces())
+			if (m_filtre_coface[coface] != 4){
 				std::vector<Block* > blocks_vois;
-				(*iter_cf)->getBlocks(blocks_vois);
+				coface->getBlocks(blocks_vois);
 
 				for (std::vector<Block*>::iterator iter_bl=blocks_vois.begin();
 						iter_bl!=blocks_vois.end(); ++iter_bl)
@@ -626,11 +616,11 @@ bool CommandInsertHole::findCoFace_Block_relation(CoEdge* coedge, CoFace* coface
     coedge->getCoFaces(cofaces);
     coedge->getBlocks(blocks);
 
-    for (std::vector<Topo::CoFace*>::iterator iter=cofaces.begin(); iter != cofaces.end(); ++iter)
-    	filtre_coface[*iter] = 1;
+    for (Topo::CoFace* coface : cofaces)
+    	filtre_coface[coface] = 1;
 
-    for (std::vector<Topo::Block*>::iterator iter=blocks.begin(); iter != blocks.end(); ++iter)
-    	filtre_block[*iter] = 1;
+    for (Topo::Block* block : blocks)
+    	filtre_block[block] = 1;
 
     // on s'interdit la coface
     filtre_coface[coface] = 2;
@@ -653,12 +643,9 @@ bool CommandInsertHole::findCoFace_Block_relation(CoEdge* coedge, CoFace* coface
 
 		// une (unique il me semble) coface dans bl_dep et marquée à 1
 		CoFace* coface_suiv = 0;
-		cofaces.clear();
-		bl_dep->getCoFaces(cofaces);
-		for (std::vector<Topo::CoFace*>::iterator iter=cofaces.begin();
-				iter != cofaces.end() && coface_suiv==0; ++iter)
-			if (filtre_coface[*iter] == 1)
-				coface_suiv = *iter;
+		for (Topo::CoFace* coface : bl_dep->getCoFaces())
+			if (filtre_coface[coface] == 1)
+				coface_suiv = coface;
 
 		if (coface_suiv == 0)
 			return false;
@@ -671,9 +658,9 @@ bool CommandInsertHole::findCoFace_Block_relation(CoEdge* coedge, CoFace* coface
 		coface_suiv->getBlocks(blocks);
 
 		Block* bl_suiv = 0;
-		for (std::vector<Topo::Block*>::iterator iter=blocks.begin(); iter != blocks.end(); ++iter)
-			if (filtre_block[*iter] == 1)
-				bl_suiv = *iter;
+		for (Topo::Block* block : blocks)
+			if (filtre_block[block] == 1)
+				bl_suiv = block;
 		if (bl_suiv == bl_fin)
 			return true;
 

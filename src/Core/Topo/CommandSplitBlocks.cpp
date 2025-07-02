@@ -208,18 +208,15 @@ findBlockUnmarkedWithCoEdgeMarked(std::set<Block*>& filtre_blocs,
 		std::set<CoEdge*>& filtre_coedges, Block* &bloc, CoEdge* &arete)
 {
 	//std::cout<<"findBlockUnmarkedWithCoEdgeMarked ..."<<std::endl;
-	for (std::vector<Block*>::iterator iter1 = m_blocs.begin(); iter1 != m_blocs.end(); ++iter1){
+	for (Block* bl : m_blocs){
 		// le bloc est-il marqué ?
 		//std::cout<<" bloc "<<(*iter1)->getName()<<std::endl;
-		if (filtre_blocs.find(*iter1) == filtre_blocs.end()){
-			Block* bl = *iter1;
+		if (filtre_blocs.find(bl) == filtre_blocs.end()){
 			//std::cout<<"   pas encore vu, on recherche une arête ..."<<std::endl;
 			// possède-t-il une arête marquée ?
-			std::vector<CoEdge* > coedges;
-			bl->getCoEdges(coedges);
-			for (std::vector<CoEdge*>::iterator iter2 = coedges.begin(); iter2 != coedges.end(); ++iter2){
-				if (filtre_coedges.find(*iter2) != filtre_coedges.end()){
-					arete = *iter2;
+			for (CoEdge* coedge : bl->getCoEdges()){
+				if (filtre_coedges.find(coedge) != filtre_coedges.end()){
+					arete = coedge;
 					bloc = bl;
 					return;
 				}
@@ -233,14 +230,9 @@ void CommandSplitBlocks::
 countNbCoEdgesByVertices(std::map<Topo::Vertex*, uint> &nb_coedges_by_vertex)
 {
 	// stocke pour chacun des sommets le nombre d'arêtes auxquelles il est relié
-	for (std::vector<Block* >::iterator iter1 = m_blocs.begin();
-	            iter1 != m_blocs.end(); ++iter1){
-		Block* bloc = *iter1;
-		std::vector<Topo::Vertex* > all_vertices;
-		bloc->getAllVertices(all_vertices);
-		for (uint i=0; i<all_vertices.size(); i++)
-			nb_coedges_by_vertex[all_vertices[i]] = all_vertices[i]->getNbCoEdges();
-	}
+	for (Block* bloc : m_blocs)
+		for (Vertex* vtx : bloc->getAllVertices())
+			nb_coedges_by_vertex[vtx] = vtx->getNbCoEdges();
 }
 /*----------------------------------------------------------------------------*/
 void CommandSplitBlocks::getPreviewRepresentation(Utils::DisplayRepresentation& dr)

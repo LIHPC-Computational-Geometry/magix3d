@@ -55,41 +55,36 @@ internalExecute()
     message << "CommandSetBlockMeshingProperty::execute pour la commande " << getName ( )
             << " de nom unique " << getUniqueName ( );
 
-    for (std::vector<Block*>::iterator iter = m_blocks.begin(); iter!=m_blocks.end(); ++iter){
+    for (Block* block : m_blocks){
 
     	// cas avec passage d'une méthode non-structurée vers une méthode structurée
-    	if (!(*iter)->isStructured() && m_prop->isStructured()) {
+    	if (!block->isStructured() && m_prop->isStructured()) {
     		// vérification que les faces sont structurées
-
-    		std::vector<CoFace*> cofaces;
-    		(*iter)->getCoFaces(cofaces);
-
-    		for (uint i=0; i<cofaces.size(); i++)
-    			if (!cofaces[i]->isStructured()){
+    		for (CoFace* coface : block->getCoFaces())
+    			if (!coface->isStructured()){
 					TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-    				messErr << "Il n'est pas possible de rendre le bloc "<<(*iter)->getName()
-    				        << " structuré car sa face " <<cofaces[i]->getName()
+    				messErr << "Il n'est pas possible de rendre le bloc "<<block->getName()
+    				        << " structuré car sa face " <<coface->getName()
     				        <<" n'est pas structurée";
     				throw TkUtil::Exception(messErr);
     			}
 
     		// on va certainement modifier l'ordre des faces et des sommets
-    		(*iter)->saveBlockMeshingProperty(&getInfoCommand());
+    		block->saveBlockMeshingProperty(&getInfoCommand());
 
     		Face* face_base = 0;
-    		if ((*iter)->getNbFaces()==4 || (*iter)->getNbFaces()==5){
+    		if (block->getFaces().size()==4 || block->getFaces().size()==5){
     			// recherche d'une face à l'opposé de la dégénérence
 
     			// filtre pour marquer à 1 les sommets qui sont à la dégénérence d'une face
     			std::map<Topo::Vertex*, uint> filtre_sommets;
-    			for (uint i=0; i<(*iter)->getNbFaces(); i++){
-    				Face* face=(*iter)->getFace(i);
+    			for (Face* face : block->getFaces()){
     				if (face->getNbVertices()==3)
     					filtre_sommets[face->getVertex(0)] = 1;
     			}
 
     			// recherche une face dont aucun sommet n'est marqué
-    			for (Face* face : (*iter)->getFaces()){
+    			for (Face* face : block->getFaces()){
     				bool acceptable = true;
     				for (Vertex* vtx : face->getVertices())
     					if (filtre_sommets[vtx] == 1 )
@@ -99,20 +94,20 @@ internalExecute()
     			}
 
     		}
-    		else if ((*iter)->getNbFaces()==6){
+    		else if (block->getFaces().size()==6){
 				TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-    			messErr << "Il n'est pas possible de rendre le bloc "<<(*iter)->getName()
-    			    	<< " structuré car il a " <<(short)(*iter)->getNbFaces()
+    			messErr << "Il n'est pas possible de rendre le bloc "<<block->getName()
+    			    	<< " structuré car il a " <<(short)block->getFaces().size()
     			    	<<" faces et non 6 (voir 4 ou 5 pour cas dégénérés)";
     			throw TkUtil::Exception(messErr);
     		} else {
     			// cas à 6 faces, on prend la première venue
-    			face_base = (*iter)->getFace(0);
+    			face_base = block->getFace(0);
     		}
 
     		if (face_base == 0){
 				TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-    			messErr << "Il n'est pas possible de rendre le bloc "<<(*iter)->getName()
+    			messErr << "Il n'est pas possible de rendre le bloc "<<block->getName()
     			    	<< " structuré car on ne trouve pas de face non relié à un sommet de dégénérence";
     			throw TkUtil::Exception(messErr);
     		}
@@ -131,13 +126,13 @@ internalExecute()
      		// marque à 2 les sommets vus (ceux de la face de base)
      		// on marque à 1 ceux vu en dehors de cette face
 			std::map<Topo::Vertex*, uint> filtre_sommets;
-     		for (uint i=0; i<sorted_vertices.size(); i++)
-     			filtre_sommets[sorted_vertices[i]] = 2;
+     		for (Vertex* vtx : sorted_vertices)
+     			filtre_sommets[vtx] = 2;
 
 
      		// recherche le sommet suivant pour une face dans un bloc avec 2 sommets non marqués à 2
      		for (uint i=0; i<4; i++){
-     			Vertex* vtx_suiv = getNextVertex(*iter,
+     			Vertex* vtx_suiv = getNextVertex(block,
      					face_base->getVertex((i+1)%4),
      					face_base->getVertex(i),
      					filtre_sommets);
@@ -174,53 +169,53 @@ internalExecute()
      		}
      		else {
 				TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-     			messErr << "Erreur interne pour le bloc "<<(*iter)->getName()
+     			messErr << "Erreur interne pour le bloc "<<block->getName()
      			    	<< ", le nombre de sommets pour bloc hexa n'est pas de 8 mais de "
      			    	<<(short)hexa_vertices.size() ;
      			throw TkUtil::Exception(messErr);
      		}
 
-     		if ((*iter)->getNbVertices() != sorted_vertices.size()){
+     		if (block->getVertices().size() != sorted_vertices.size()){
 				TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-     			messErr << "Erreur interne pour le bloc "<<(*iter)->getName()
+     			messErr << "Erreur interne pour le bloc "<<block->getName()
      			    	<< ", le nombre de sommets a changé ("
      			    	<<(short)sorted_vertices.size() <<" trouvés au lieu de "
-     			    	<<(short)(*iter)->getNbVertices()<<")";
+     			    	<<(short)block->getVertices().size()<<")";
      			throw TkUtil::Exception(messErr);
      		}
 
      		// change l'ordre des sommets
-     		(*iter)->m_topo_property->getVertexContainer().clear();
-    		(*iter)->m_topo_property->getVertexContainer().insert(
-				(*iter)->m_topo_property->getVertexContainer().end(),
+     		block->m_topo_property->getVertexContainer().clear();
+    		block->m_topo_property->getVertexContainer().insert(
+				block->m_topo_property->getVertexContainer().end(),
 				sorted_vertices.begin(),
 				sorted_vertices.end());
 
      		//	réordonne les faces en fonction des sommets
     		std::vector<Face* > sorted_faces;
 
-    	    for (uint i=0; i<(*iter)->getNbFaces(); i++){
-    	        sorted_faces.push_back((*iter)->getFace(
+    	    for (uint i=0; i<block->getFaces().size(); i++){
+    	        sorted_faces.push_back(block->getFace(
     	        		hexa_vertices[TopoHelper::tabIndVtxByFaceOnBlock[i][0]],
     	        		hexa_vertices[TopoHelper::tabIndVtxByFaceOnBlock[i][1]],
     	        		hexa_vertices[TopoHelper::tabIndVtxByFaceOnBlock[i][2]],
     	        		hexa_vertices[TopoHelper::tabIndVtxByFaceOnBlock[i][3]]));
     	    }
 
-    	    (*iter)->m_topo_property->getFaceContainer().clear();
-    	    (*iter)->m_topo_property->getFaceContainer().insert(
-				(*iter)->m_topo_property->getFaceContainer().end(),
+    	    block->m_topo_property->getFaceContainer().clear();
+    	    block->m_topo_property->getFaceContainer().insert(
+				block->m_topo_property->getFaceContainer().end(),
 				sorted_faces.begin(),
 				sorted_faces.end());
 
-    	} // end if (!(*iter)->isStructured() && m_prop->isStructured())
+    	} // end if (!block->isStructured() && m_prop->isStructured())
 
 
     	// remplace la propriété (fait une copie) et met l'ancienne dans la sauvegarde interne
-    	(*iter)->switchBlockMeshingProperty(&getInfoCommand(), m_prop);
+    	block->switchBlockMeshingProperty(&getInfoCommand(), m_prop);
 
     	// initialise la direction si nécessaire
-    	(*iter)->getBlockMeshingProperty()->initDir((*iter));
+    	block->getBlockMeshingProperty()->initDir(block);
 
     } // end for (std::vector<Block*>::iterator iter = m_blocks.begin() ...
 
@@ -239,16 +234,14 @@ getNextVertex(Block* bloc, Vertex* vtx1, Vertex* vtx2, std::map<Topo::Vertex*, u
 	filtre_sommets[vtx2] = 3;
 
 	Face* face_select = 0;
-	for (uint i=0; i<bloc->getNbFaces(); i++){
-		Face* face=bloc->getFace(i);
+	for (Face* face : bloc->getFaces()){
 		//std::cout<<"face : "<<face->getName()<<std::endl;
-		std::vector<Vertex*> face_vertices = face->getVertices();
 		uint nb2 = 0; // sommets dans la face de base (autre que les 2 de départ)
 		uint nb3 = 0; // sommets qui valide la face avec 2 des sommets sélectionnés
-		for (uint j=0; j<face_vertices.size(); j++)
-			if (filtre_sommets[face_vertices[j]] == 3)
+		for (Vertex* vtx : face->getVertices())
+			if (filtre_sommets[vtx] == 3)
 				nb3 += 1;
-			else if (filtre_sommets[face_vertices[j]] == 2)
+			else if (filtre_sommets[vtx] == 2)
 				nb2 += 2;
 		if (nb3 == 2 && nb2 == 0)
 			face_select = face;

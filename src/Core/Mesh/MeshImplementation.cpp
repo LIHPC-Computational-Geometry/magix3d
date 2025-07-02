@@ -431,7 +431,7 @@ void MeshImplementation::writeCGNS(std::string nom)
 	for (Topo::Block* bloc : getContext().getTopoManager().getBlocksObj(true)){
 		if (bloc->isMeshed() && bloc->isStructured()){
 
-			if (bloc->getNbVertices() != 8){
+			if (bloc->getVertices().size() != 8){
 				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
 				message << "Erreur dans MeshImplementation::writeCGNS, cas dégénéré non implémenté pour "
 						<<bloc->getName();
@@ -505,14 +505,11 @@ void MeshImplementation::writeCGNS(std::string nom)
 
 
 			// les relations avec les autres blocs
-			std::vector<Topo::CoFace*> cofaces;
-			bloc->getCoFaces(cofaces);
-			for (uint j=0; j<cofaces.size(); j++){
+			for (Topo::CoFace* coface : bloc->getCoFaces()){
 				// on ne s'occupe que des cofaces entre 2 blocs
 				std::vector<Topo::Block*> coface_blocks;
-				cofaces[j]->getBlocks(coface_blocks);
+				coface->getBlocks(coface_blocks);
 				if (coface_blocks.size() == 2){
-					Topo::CoFace* coface = cofaces[j];
 					Topo::Block* bloc_vois = (coface_blocks[0] == bloc?coface_blocks[1]:coface_blocks[0]);
 					cgsize_t ipnts[9]; // plus grand que nécessaire (6), ce qui permet de stocker l'"autre" sommet
 					cgsize_t ipntsdonor[9]; // autre sommet utile pour déterminer la transformation
@@ -1066,7 +1063,7 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::Block* bl)
 		}
 
         bl->saveBlockMeshingData(&command->getInfoCommand());
-
+		
         if (bl->getMeshLaw() <= Topo::BlockMeshingProperty::transfinite){
             meshStructured(command,bl);
         }

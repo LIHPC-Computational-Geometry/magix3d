@@ -314,7 +314,9 @@ internalExecute()
     // les Edges qui coupent les faces en deux
     std::vector<Edge* > splitingEdges;
     // découpage des faces sans chercher à boucler
-    TopoHelper::splitFaces(m_cofaces, m_arete, m_ratio_dec, m_ratio_ogrid, false, true, splitingEdges, &getInfoCommand());
+	Utils::EntitySet<CoFace*> cofaces(&Utils::Entity::compareEntity);
+	cofaces.insert(m_cofaces.begin(), m_cofaces.end());
+    TopoHelper::splitFaces(cofaces, m_arete, m_ratio_dec, m_ratio_ogrid, false, true, splitingEdges, &getInfoCommand());
 
     // on replace les sommets en fonction de m_ratio_dec
     if (!m_project_on_meshing_edges)

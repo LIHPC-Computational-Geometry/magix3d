@@ -209,7 +209,7 @@ protected:
 
     /*------------------------------------------------------------------------*/
     /// Maille et modifie le maillage pour les modifications 2D
-    void meshAndModify(std::list<Topo::CoFace*>& list_cofaces);
+    void meshAndModify(const Utils::EntitySet<Topo::CoFace*>& cofaces);
 
     /*------------------------------------------------------------------------*/
     /// Modifie le maillage pour les modifications 3D (lissage)

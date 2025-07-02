@@ -124,8 +124,7 @@ CommandSnapVertices(Internal::Context& c,
         Block::eDirOnBlock dir_bl = Block::unknown;
 
         // les 8 sommets du bloc (en dupliquant si bloc dégénéré)
-    	std::vector<Vertex* > vertices;
-    	m_common_block->getHexaVertices(vertices);
+    	std::vector<Vertex* > vertices = m_common_block->getHexaVertices();
 
 #ifdef _DEBUG_SNAP
     	std::cout<<"getHexaVertices => ";
@@ -303,17 +302,17 @@ internalExecute()
     // force la sauvegarde des relations topologiques pour toutes les entités et celles de niveau inférieur
     TopoHelper::saveTopoEntities(cofaces, &getInfoCommand());
 
-    std::vector<CoEdge* > coedges;
-    if (m_common_block)
-    	m_common_block->getCoEdges(coedges);
-    else if (m_common_coface)
-    	m_common_coface->getCoEdges(coedges);
-
     // on marque les arêtes dans le bloc
     std::map<CoEdge*, uint> filtre_coedge;
-    for (std::vector<CoEdge* >::iterator iter = coedges.begin();
-            iter != coedges.end(); ++iter)
-        filtre_coedge[*iter] = 1;
+    if (m_common_block) {
+        for (CoEdge* coedge : m_common_block->getCoEdges())
+            filtre_coedge[coedge] = 1;
+    } else if (m_common_coface) {
+        std::vector<CoEdge* > coedges;
+        m_common_coface->getCoEdges(coedges);
+        for (CoEdge* coedge : coedges)
+            filtre_coedge[coedge] = 1;
+    }
 
     // liste des cofaces concernées par la fusion
     std::list<CoFace*> cofaces_degenerated;
@@ -370,47 +369,35 @@ internalExecute()
 
     // filtre pour marquer les sommets en fonction de leur appartenance aux 2 listes
     std::map<Topo::Vertex*, uint> filtre_vertex;
-    for (std::vector<Topo::Vertex* >::iterator iter1 = m_vertices1.begin();
-            iter1 != m_vertices1.end(); ++iter1)
-        filtre_vertex[*iter1] = 1;
-    for (std::vector<Topo::Vertex* >::iterator iter1 = m_vertices2.begin();
-            iter1 != m_vertices2.end(); ++iter1)
-        filtre_vertex[*iter1] = 2;
+    for (Vertex* vtx : m_vertices1) filtre_vertex[vtx] = 1;
+    for (Vertex* vtx : m_vertices2) filtre_vertex[vtx] = 2;
     // nombre de sommets de m_vertices1 qui sont dans le bloc
     std::map<Topo::Block*, uint> filtre_block;
     // nombre de sommets de m_vertices1 qui sont dans la face commune
     std::map<Topo::CoFace*, uint> filtre_coface;
 
-    for (std::list<Block*>::iterator iter = blocks_degenerated.begin();
-            iter != blocks_degenerated.end(); ++iter){
-        Block* bloc = *iter;
-
+    for (Block* bloc : blocks_degenerated){
         // remplissage de filtre_block
-        for (uint i=0; i<bloc->getNbVertices(); i++)
-            if (filtre_vertex[bloc->getVertex(i)] == 1)
+        for (Vertex* vtx : bloc->getVertices())
+            if (filtre_vertex[vtx] == 1)
                 filtre_block[bloc] += 1;
 
         // remplissage de filtre_coface
-        std::vector<CoFace* > loc_cofaces;
-        bloc->getCoFaces(loc_cofaces);
-        for (std::vector<CoFace* >::iterator iter2 = loc_cofaces.begin();
-                        iter2 != loc_cofaces.end(); ++iter2){
-            CoFace* coface = *iter2;
+        for (CoFace* coface : bloc->getCoFaces()){
             for (uint i=0; i<coface->getNbVertices(); i++)
                 if (filtre_vertex[coface->getVertex(i)] == 1)
                     filtre_coface[coface] += 1;
         }
 
         // réorientation du bloc
-        if (bloc->isStructured() && bloc->getNbFaces() == 6){
+        if (bloc->isStructured() && bloc->getFaces().size() == 6){
 
             // recherche d'une Face
             Face* face = 0;
             uint nb_vtx_max = 0;
 
-            for (uint i=0; i<bloc->getNbFaces(); i++){
+            for (Face* loc_face : bloc->getFaces()){
                 uint nb_vtx = 0;
-                Face* loc_face = bloc->getFace(i);
                 for (uint j=0; j<loc_face->getNbVertices(); j++)
                     if (filtre_vertex[loc_face->getVertex(j)] != 0)
                         nb_vtx+=1;
@@ -438,7 +425,7 @@ internalExecute()
             }
         } // end if bloc->isStructured() && getNbFaces() == 6
 
-        if (!bloc->isStructured() && bloc->getNbVertices() == 7 && filtre_block[bloc] == 1){
+        if (!bloc->isStructured() && bloc->getVertices().size() == 7 && filtre_block[bloc] == 1){
         	// si c'est l'un des 4 premiers sommets qui est pris dans la fusion,
         	// alors on symétrise ce bloc / arête opposée au 7ème sommet
         	bool symNeeded = false;
@@ -555,10 +542,8 @@ internalExecute()
     } // end for iter = cofaces_degenerated.begin()
 
     // on supprime les sommets des blocs, et les blocs si nécessaire
-    for (std::list<Block*>::iterator iter = blocks_degenerated.begin();
-            iter != blocks_degenerated.end(); ++iter){
-        Block* bloc = *iter;
-        if (bloc->getNbFaces() == 2){
+    for (Block* bloc : blocks_degenerated){
+        if (bloc->getFaces().size() == 2){
 #ifdef _DEBUG_SNAP
             std::cout<<"  bloc "<<bloc->getName()
                      <<" avec plus que 2 faces"<<std::endl;
@@ -583,7 +568,7 @@ internalExecute()
             // suppression du bloc
             bloc->free(&getInfoCommand());
         }
-        else if (bloc->isStructured() && bloc->getNbVertices() == 8 && filtre_block[bloc] == 2){
+        else if (bloc->isStructured() && bloc->getVertices().size() == 8 && filtre_block[bloc] == 2){
 #ifdef _DEBUG_SNAP
             std::cout<<"  bloc "<<bloc->getName()
                      <<" avec dégénérescence en prisme [cas structuré]"<<std::endl;
@@ -609,8 +594,7 @@ internalExecute()
             bloc->saveBlockTopoProperty(&getInfoCommand());
 
             std::vector<Vertex*> loc_vtx;
-            for (uint i=0;i<bloc->getNbVertices(); i++){
-            	Vertex* vtx = bloc->getVertex(i);
+            for (Vertex* vtx : bloc->getVertices()){
 #ifdef _DEBUG_SNAP
             	std::cout<<"    "<<vtx->getName()<<" , filtre_vertex: "<<filtre_vertex[vtx]<<std::endl;
 #endif
@@ -628,9 +612,9 @@ internalExecute()
                 loc_vtx.end());
 
             // on remet le filtre à l'état d'avant pour le prochain bloc
-            for (uint i=0;i<loc_vtx.size(); i++)
-            	if (4 == filtre_vertex[loc_vtx[i]])
-            		filtre_vertex[loc_vtx[i]] = 1;
+            for (Vertex* vtx : loc_vtx)
+            	if (4 == filtre_vertex[vtx])
+            		filtre_vertex[vtx] = 1;
         }
 
     } // end for iter = blocks_degenerated.begin()

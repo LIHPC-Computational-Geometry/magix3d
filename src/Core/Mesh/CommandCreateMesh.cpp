@@ -978,14 +978,14 @@ deleteCreatedMeshGroups()
 }
 /*----------------------------------------------------------------------------*/
 void CommandCreateMesh::
-meshAndModify(std::list<Topo::CoFace*>& list_cofaces)
+meshAndModify(const Utils::EntitySet<Topo::CoFace*>& cofaces)
 {
 #ifdef _DEBUG2
-	std::cout<<"CommandCreateMesh::meshAndModify avec "<<list_cofaces.size()<<" cofaces"<<std::endl;
+	std::cout<<"CommandCreateMesh::meshAndModify avec "<<cofaces.size()<<" cofaces"<<std::endl;
 #endif
 
 	// recherche des groupes 2D, parmis les cofaces en entrée, qui ont une modification
-	std::list<Group::Group2D*> list_grp;
+	Utils::EntitySet<Group::Group2D*> groups(&Utils::Entity::compareEntity);
 
 	// filtre pour identifier les cofaces à mailler (marque à 1)
 	std::map<Topo::CoFace*, uint> filtre_cofaces;
@@ -995,34 +995,26 @@ meshAndModify(std::list<Topo::CoFace*>& list_cofaces)
 	// 1 pour les anciens (ceux créés avant cette commande)
 	std::map<gmds::TCellID, uint> filtre_nodes_pert;
 
-	for (std::list<Topo::CoFace*>::iterator iter1 = list_cofaces.begin();
-			iter1 != list_cofaces.end(); ++iter1){
-		Topo::CoFace* coface = *iter1;
+	for (Topo::CoFace* coface : cofaces){
 		filtre_cofaces[coface] = 1;
 
 		if (coface->getGeomAssociation() && coface->getGeomAssociation()->getDim() == 2){
 			Geom::Surface* surface = dynamic_cast<Geom::Surface*>(coface->getGeomAssociation());
 			CHECK_NULL_PTR_ERROR(surface);
-			const std::vector<Group::Group2D*>& grps = surface->getGroups();
 
-			for (std::vector<Group::Group2D*>::const_iterator iter2 = grps.begin();
-					iter2 != grps.end(); ++iter2){
-				Group::Group2D* grp = *iter2;
+			for (Group::Group2D* grp : surface->getGroups()){
 				if (grp->getNbMeshModif() != 0)
-					list_grp.push_back(grp);
+					groups.insert(grp);
 			} // end for iter2
 		} // end if getGeomAssociation
 
 		// les groupes depuis les faces
 		for (Group::Group2D* grp : coface->getGroupsContainer()){
 			if (grp->getNbMeshModif() != 0)
-				list_grp.push_back(grp);
+				groups.insert(grp);
 		}
 
 	} // end for iter1
-
-	list_grp.sort();
-	list_grp.unique();
 
 #ifdef _DEBUG2
 	std::cout<<" => list_grp avec "<<list_grp.size()<<" groupes 2D"<<std::endl;
@@ -1039,32 +1031,23 @@ meshAndModify(std::list<Topo::CoFace*>& list_cofaces)
 	}
 
 	// application de la modif pour chacun des groupes 2D
-	for (std::list<Group::Group2D*>::iterator iter1 = list_grp.begin();
-			iter1 != list_grp.end(); ++iter1){
-		Group::Group2D* grp = *iter1;
+	for (Group::Group2D* grp : groups) {
 
 		// liste des cofaces associé au groupe
-		std::list<Topo::CoFace*> cofaces_grp;
-
-		std::vector<Geom::Surface*> surfaces = grp->getSurfaces();
-		for (std::vector<Geom::Surface*>::iterator iter2 = surfaces.begin();
-				iter2 != surfaces.end(); ++iter2){
+		Utils::EntitySet<Topo::CoFace*> cofaces_grp(&Utils::Entity::compareEntity);
+		for (Geom::Surface* surface : grp->getSurfaces()){
 			std::vector<Topo::CoFace*> cofaces;
-			(*iter2)->get(cofaces);
-			cofaces_grp.insert(cofaces_grp.end(), cofaces.begin(), cofaces.end());
+			surface->get(cofaces);
+			for (Topo::CoFace* coface : cofaces)
+				cofaces_grp.insert(coface);
 		} // end for iter2
 
-		std::vector<Topo::CoFace*>& cofaces = grp->getCoFaces();
-		cofaces_grp.insert(cofaces_grp.end(), cofaces.begin(), cofaces.end());
-
-		cofaces_grp.sort(Utils::Entity::compareEntity);
-		cofaces_grp.unique();
+		for (Topo::CoFace* coface : grp->getCoFaces())
+			cofaces_grp.insert(coface);
 
 		std::vector<Topo::CoFace*> cofaces_to_be_meshed;
 
-		for (std::list<Topo::CoFace*>::iterator iter2 = cofaces_grp.begin();
-				iter2 != cofaces_grp.end(); ++iter2){
-			Topo::CoFace* coface = *iter2;
+		for (Topo::CoFace* coface : cofaces_grp){
 
 			if (!coface->isMeshed() && filtre_cofaces[coface] == 1){
 #ifdef _DEBUG2
@@ -1077,11 +1060,11 @@ meshAndModify(std::list<Topo::CoFace*>& list_cofaces)
 
 				std::vector<Topo::CoEdge*> aretes;
 				coface->getCoEdges(aretes);
-				for (uint i=0; i<aretes.size(); i++){
-					if (!aretes[i]->isPreMeshed() && !aretes[i]->isMeshed())
-						preMesh (aretes[i]);
-					if (!aretes[i]->isMeshed())
-						mesh (aretes[i]);
+				for (Topo::CoEdge* coedge : aretes){
+					if (!coedge->isPreMeshed() && !coedge->isMeshed())
+						preMesh (coedge);
+					if (!coedge->isMeshed())
+						mesh (coedge);
 				}
 				cofaces_to_be_meshed.push_back(coface);
 			}
@@ -1156,9 +1139,7 @@ meshAndModify(std::list<Topo::CoFace*>& list_cofaces)
 
 
 				// le lissage dépend de la surface sur laquelle se fait la projection
-				for (std::vector<Geom::Surface*>::iterator iter2 = surfaces.begin();
-						iter2 != surfaces.end(); ++iter2){
-					Geom::Surface* surface = *iter2;
+				for (Geom::Surface* surface : grp->getSurfaces()){
 					std::vector<Topo::CoFace*> cofaces;
 					surface->get(cofaces);
 
@@ -1170,12 +1151,10 @@ meshAndModify(std::list<Topo::CoFace*>& list_cofaces)
 					// ensemble des cofaces d'une surface du groupe qui sont maillées à la fin
 					std::vector<Topo::CoFace*> meshed_cofaces;
 
-					for (std::vector<Topo::CoFace*>::iterator iter3 = cofaces.begin();
-							iter3 != cofaces.end(); ++iter3){
-						Topo::CoFace* coface = *iter3;
+					for (Topo::CoFace* coface : cofaces){
 						if (coface->isMeshed())
 							meshed_cofaces.push_back(coface);
-					} // end for iter3
+					}
 
 					// la liste des polygones dans ces cofaces
 					std::vector<gmds::Face> polygones;
@@ -1187,9 +1166,7 @@ meshAndModify(std::list<Topo::CoFace*>& list_cofaces)
 					// 2 pour les noeuds au bord d'une surface de maillage
 					std::map<gmds::TCellID, uint> filtre_nodes_lisse;
 
-					for (std::vector<Topo::CoFace*>::iterator iter3 = meshed_cofaces.begin();
-							iter3 != meshed_cofaces.end(); ++iter3){
-						Topo::CoFace* coface = *iter3;
+					for (Topo::CoFace* coface : meshed_cofaces){
 						bool isInverted = isCoFaceInverted[coface];
 						std::vector<gmds::TCellID>& l_nds = coface->nodes();
 						std::vector<gmds::TCellID>& l_poly = coface->faces();
@@ -1212,9 +1189,8 @@ meshAndModify(std::list<Topo::CoFace*>& list_cofaces)
 					border_meshed_coedges = Topo::TopoHelper::getBorder(meshed_cofaces);
 
 					// on marque les noeuds des arêtes au bord à 2 pour ne pas les déplacer
-					for (std::vector<Topo::CoEdge*>::iterator iter3 = border_meshed_coedges.begin();
-							iter3 != border_meshed_coedges.end(); ++iter3){
-						std::vector<gmds::TCellID>& nodes = (*iter3)->nodes();
+					for (Topo::CoEdge* coedge : border_meshed_coedges){
+						std::vector<gmds::TCellID>& nodes = coedge->nodes();
 						for (std::vector<gmds::TCellID>::iterator iter4 = nodes.begin();
 								iter4 != nodes.end(); ++iter4)
 							filtre_nodes_lisse[*iter4] = 2;
@@ -1252,23 +1228,18 @@ void CommandCreateMesh::
 modify(std::vector<Topo::Block*>& list_blocks)
 {
 	// recherche des groupes 3D, parmis les blocs en entrée, qui ont une modification
-	std::list<Group::Group3D*> list_grp;
+	Utils::EntitySet<Group::Group3D*> list_grp(&Utils::Entity::compareEntity);
 
-	for (std::vector<Topo::Block*>::iterator iter1 = list_blocks.begin();
-			iter1 != list_blocks.end(); ++iter1){
-		Topo::Block* block = *iter1;
+	for (Topo::Block* block : list_blocks){
 
 		if (block->getGeomAssociation() && block->getGeomAssociation()->getDim() == 3){
 			Geom::Volume* volume = dynamic_cast<Geom::Volume*>(block->getGeomAssociation());
 			CHECK_NULL_PTR_ERROR(volume);
 			const std::vector<Group::Group3D*>& grps = volume->getGroups();
 
-			for (std::vector<Group::Group3D*>::const_iterator iter2 = grps.begin();
-					iter2 != grps.end(); ++iter2){
-				Group::Group3D* grp = *iter2;
+			for (Group::Group3D* grp :grps)
 				if (grp->getNbMeshModif() != 0)
-					list_grp.push_back(grp);
-			} // end for iter2
+					list_grp.insert(grp);
 		} // end if getGeomAssociation
 		else {
 			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -1279,13 +1250,10 @@ modify(std::vector<Topo::Block*>& list_blocks)
 		// les groupes depuis les blocs
 		for (Group::Group3D* grp : block->getGroupsContainer()){
 			if (grp->getNbMeshModif() != 0)
-				list_grp.push_back(grp);
+				list_grp.insert(grp);
 		}
 
-	} // end for iter1
-
-	list_grp.sort();
-	list_grp.unique();
+	}
 
 #ifdef _DEBUG2
 	std::cout<<" => list_grp avec "<<list_grp.size()<<" groupes 3D"<<std::endl;
@@ -1294,35 +1262,25 @@ modify(std::vector<Topo::Block*>& list_blocks)
 	gmds::Mesh& gmds_mesh = getMeshManager().getMesh()->getGMDSMesh();
 
 	// application de la modif pour chacun des groupes 3D
-	for (std::list<Group::Group3D*>::iterator iter1 = list_grp.begin();
-			iter1 != list_grp.end(); ++iter1){
-		Group::Group3D* grp = *iter1;
-
+	for (Group::Group3D* grp : list_grp){
 		// liste des blocs associés au groupe
-		std::list<Topo::Block*> blocks_grp;
+		Utils::EntitySet<Topo::Block*> blocks_grp(&Utils::Entity::compareEntity);
 
-		std::vector<Geom::Volume*> volumes = grp->getVolumes();
-		for (std::vector<Geom::Volume*>::iterator iter2 = volumes.begin();
-				iter2 != volumes.end(); ++iter2){
+		for (Geom::Volume* vol : grp->getVolumes()){
 			std::vector<Topo::Block*> blocks;
-			(*iter2)->get(blocks);
-			blocks_grp.insert(blocks_grp.end(), blocks.begin(), blocks.end());
-		} // end for iter2
+			vol->get(blocks);
+			for (Topo::Block* block : blocks)
+				blocks_grp.insert(block);
+		}
 
-		blocks_grp.sort(Utils::Entity::compareEntity);
-		blocks_grp.unique();
-
-		for (std::list<Topo::Block*>::iterator iter2 = blocks_grp.begin();
-				iter2 != blocks_grp.end(); ++iter2){
-			Topo::Block* block = *iter2;
-
+		for (Topo::Block* block : blocks_grp){
 			if (!block->isMeshed()){
 				TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
 				messErr <<"Le bloc "<<block->getName()<<" n'est pas maillé ce qui pose problème pour permettre la perturbation sur le groupe.\n";
 				messErr <<"Il est nécessaire de mailler tous les blocs perturbés en une fois";
 				throw TkUtil::Exception(messErr);
 			}
-		} // end for iter2
+		}
 
 #ifdef _DEBUG2
 		std::cout<<grp->getName()<<" avec "<<blocks_grp.size()<<" blocs"<<std::endl;
@@ -1337,18 +1295,14 @@ modify(std::vector<Topo::Block*>& list_blocks)
 			if (lissageVol){
 
 				// le lissage dépend du volume sur lequel se fait la projection
-				for (std::vector<Geom::Volume*>::iterator iter2 = volumes.begin();
-						iter2 != volumes.end(); ++iter2){
-					Geom::Volume* volume = *iter2;
+				for (Geom::Volume* volume : grp->getVolumes()){
 					std::vector<Topo::Block*> blocks;
 					volume->get(blocks);
 
 					// ensemble des blocs d'un volume du groupe qui sont maillés à la fin
 					std::vector<Topo::Block*> meshed_blocks;
 
-					for (std::vector<Topo::Block*>::iterator iter3 = blocks.begin();
-							iter3 != blocks.end(); ++iter3){
-						Topo::Block* block = *iter3;
+					for (Topo::Block* block : blocks){
 						if (block->isMeshed())
 							meshed_blocks.push_back(block);
 					} // end for iter3
@@ -1363,9 +1317,7 @@ modify(std::vector<Topo::Block*>& list_blocks)
 					// 2 pour les noeuds au bord d'un volume de maillage
 					std::map<gmds::TCellID, uint> filtre_nodes_lisse;
 
-					for (std::vector<Topo::Block*>::iterator iter3 = meshed_blocks.begin();
-							iter3 != meshed_blocks.end(); ++iter3){
-						Topo::Block* block = *iter3;
+					for (Topo::Block* block : meshed_blocks){
 						std::vector<gmds::TCellID>& l_nds = block->nodes();
 						std::vector<gmds::TCellID>& l_poly = block->regions();
 
@@ -1387,13 +1339,12 @@ modify(std::vector<Topo::Block*>& list_blocks)
 					border_meshed_cofaces = Topo::TopoHelper::getBorder(meshed_blocks);
 
 					// on marque les noeuds des arêtes au bord à 2 pour ne pas les déplacer
-					for (std::vector<Topo::CoFace*>::iterator iter3 = border_meshed_cofaces.begin();
-							iter3 != border_meshed_cofaces.end(); ++iter3){
-						std::vector<gmds::TCellID>& nodes = (*iter3)->nodes();
+					for (Topo::CoFace* coface : border_meshed_cofaces){
+						std::vector<gmds::TCellID>& nodes = coface->nodes();
 						for (std::vector<gmds::TCellID>::iterator iter4 = nodes.begin();
 								iter4 != nodes.end(); ++iter4)
 							filtre_nodes_lisse[*iter4] = 2;
-					} // end for iter3
+					}
 
 					// applique le lissage uniquement aux noeuds internes au volume (non marqués à 2)
 					lissageVol->applyModification(nodes, polygedres, filtre_nodes_lisse, 2, volume);

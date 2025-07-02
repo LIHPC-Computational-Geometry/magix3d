@@ -113,6 +113,13 @@ getEntityNames(const std::vector<T*>& container)
     return ret;
 }
 /*----------------------------------------------------------------------------*/
+template <typename T> static std::vector<T*>
+toVector(const Utils::EntitySet<T*>& container)
+{
+    std::vector<T*> vect(container.begin(), container.end());
+    return vect;
+}
+/*----------------------------------------------------------------------------*/
 } // end namespace Utils
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D

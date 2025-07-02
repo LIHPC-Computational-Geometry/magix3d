@@ -57,8 +57,8 @@ internalExecute()
 
     // les Edges qui coupent la face en deux (inutilisé)
     std::vector<Edge* > splitingEdges;
-    std::vector<CoFace* > cofaces;
-    cofaces.push_back(m_coface);
+    Utils::EntitySet<CoFace* > cofaces(&Utils::Entity::compareEntity);
+    cofaces.insert(m_coface);
 
     if (coedge->getVertex(0) == m_sommet)
     	TopoHelper::splitFaces(cofaces, coedge, 0, 0, false, false, splitingEdges, &getInfoCommand());

@@ -83,7 +83,7 @@ Face* CommandGlue2Blocks::getNearestFace(Block* bl, Utils::Math::Point pt)
 {
 	uint id_best = 0;
 	double dist2 = bl->getFace(0)->getBarycentre().length2(pt);
-	uint nb_faces = bl->getNbFaces();
+	uint nb_faces = bl->getFaces().size();
 	for (uint i=1; i<nb_faces; i++){
 		double d2 = bl->getFace(i)->getBarycentre().length2(pt);
 		if (d2<dist2){

@@ -423,10 +423,8 @@ std::vector<CoEdge*> CoEdge::split(Topo::Vertex* vtx, uint nbMeshingEdges, Inter
 
     // remet les CoEdges dans l'ordre / arête
     if (sortCoEdges)
-        for (Edge* edge : edges) {
-			std::cout << "   - " << edge->getName() << std::endl;
+        for (Edge* edge : edges)
             edge->sortCoEdges();
-		}
 
 #ifdef _DEBUG_SPLIT
     std::cout<<" les 2 nouvelles arêtes communes :\n";

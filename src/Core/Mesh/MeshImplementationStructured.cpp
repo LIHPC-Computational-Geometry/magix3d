@@ -157,7 +157,7 @@ void MeshImplementation::preMeshStructured(Topo::Block* bl)
         }
 
         // cas pour les faces non-dégénérées (celles qui existent)
-        if (cote<bl->getNbFaces()){
+        if (cote<bl->getFaces().size()){
             Topo::Face* face = bl->getFace(cote);
 
 
@@ -168,7 +168,7 @@ void MeshImplementation::preMeshStructured(Topo::Block* bl)
             nbPtI += 1;
             nbPtJ += 1;
 
-            if (bl->getNbVertices() == 8){
+            if (bl->getVertices().size() == 8){
                 Topo::Face::eDirOnFace iDir = face->getDir(bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnBlock[cote][1]),
                         bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnBlock[cote][2]));
                 Topo::Face::eDirOnFace jDir = face->getDir(bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnBlock[cote][1]),
@@ -206,7 +206,7 @@ void MeshImplementation::preMeshStructured(Topo::Block* bl)
             // elle l'est sur sa dernière arête
             if (face->getNbVertices() == 4)
                 // demander les points de la face avec respect de l'ordre des sommets internes du bloc
-                if (bl->getNbVertices() == 8)
+                if (bl->getVertices().size() == 8)
                     face->getNodes(bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnBlock[cote][0]),
                             bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnBlock[cote][1]),
                             bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnBlock[cote][2]),
@@ -269,7 +269,7 @@ void MeshImplementation::preMeshStructured(Topo::Block* bl)
             // cas de la dernière face dégénérées
             // 3 cas possibles: en un point ou suivant l'un des 2 côtés
 
-            if (bl->getNbVertices() == 5){
+            if (bl->getVertices().size() == 5){
                 // copie le noeud au sommet
                 gmds::Node node = getGMDSMesh().get<gmds::Node>(bl->getVertex(4)->getNode());
                 Utils::Math::Point pt = getCoordNode(node);
@@ -1005,7 +1005,7 @@ void MeshImplementation::_addRegionsInVolumes(Mesh::CommandCreateMesh* command, 
     uint jBegin = 0, jEnd = nbBrasJ;
     uint kBegin = 0, kEnd = nbBrasK;
 
-    if (bl->getNbVertices() != 8) // K MAX
+    if (bl->getVertices().size() != 8) // K MAX
         kEnd-=1;
 
     gmds::Mesh& gmds_mesh = getGMDSMesh();
@@ -1147,7 +1147,7 @@ void MeshImplementation::_addRegionsInVolumes(Mesh::CommandCreateMesh* command, 
     } // for (uint k=kBegin; k<kEnd; k++) {
 
     // s'il y a une dégénérescence, on traite ici la création d'une couche de mailles
-    if (bl->getNbVertices() != 8){  // K MAX
+    if (bl->getVertices().size() != 8){  // K MAX
         bool degI = (bl->getFace(2)->getNbVertices() == 3);
         bool degJ = (bl->getFace(0)->getNbVertices() == 3);
 

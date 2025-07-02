@@ -54,89 +54,63 @@ void CommandCreateTopo::split()
     // on utilise une liste pour cumuler les recherches sur les différents blocs
     // et pour faire un tri et supprimer les doublons
 
-    std::list<Topo::Vertex*> l_v;
-    std::list<Topo::CoEdge*> l_ce;
-    std::list<Topo::Edge*> l_e;
-    std::list<Topo::CoFace*> l_cf;
-    std::list<Topo::Face*> l_f;
+    Utils::EntitySet<Topo::Vertex*> l_v(&Utils::Entity::compareEntity);
+    Utils::EntitySet<Topo::CoEdge*> l_ce(&Utils::Entity::compareEntity);
+    Utils::EntitySet<Topo::Edge*> l_e(&Utils::Entity::compareEntity);
+    Utils::EntitySet<Topo::CoFace*> l_cf(&Utils::Entity::compareEntity);
+    Utils::EntitySet<Topo::Face*> l_f(&Utils::Entity::compareEntity);
 
-    for (std::vector<Block* >::const_iterator iter = m_blocks.begin();
-            iter != m_blocks.end(); ++iter) {
-        const std::vector<Topo::Vertex* > & vertices = (*iter)->getVertices();
-        std::vector<Topo::CoEdge* > coedges;
-        std::vector<Topo::CoFace* > cofaces;
-
-        (*iter)->getCoEdges(coedges);
-        (*iter)->getCoFaces(cofaces);
-
-        l_v.insert(l_v.end(), vertices.begin(), vertices.end());
-        l_ce.insert(l_ce.end(), coedges.begin(), coedges.end());
-        l_cf.insert(l_cf.end(), cofaces.begin(), cofaces.end());
+    for (Block* block : m_blocks) {
+        auto vertices = block->getVertices();
+        auto coedges = block->getCoEdges();
+        auto cofaces = block->getCoFaces();
+        l_v.insert(vertices.begin(), vertices.end());
+        l_ce.insert(coedges.begin(), coedges.end());
+        l_cf.insert(cofaces.begin(), cofaces.end());
 
         // entités pour lesquelles il n'est pas prévu de les représenté ni de les utiliser
         // mais pour lesquelles il est utile de les marquer comme CREATED
-        std::vector<Topo::Edge* > edges;
-        const std::vector<Topo::Face* > & faces = (*iter)->getFaces();
-        (*iter)->getEdges(edges);
-        l_e.insert(l_e.end(), edges.begin(), edges.end());
-        l_f.insert(l_f.end(), faces.begin(), faces.end());
+        auto edges = block->getEdges();
+        auto faces = block->getFaces();
+        l_e.insert(edges.begin(), edges.end());
+        l_f.insert(faces.begin(), faces.end());
     }
 
-    for (std::vector<CoFace* >::const_iterator iter = m_cofaces.begin();
-            iter != m_cofaces.end(); ++iter) {
-        const std::vector<Topo::Vertex* > & vertices = (*iter)->getVertices();
+    for (CoFace* coface : m_cofaces) {
+        const std::vector<Topo::Vertex* > & vertices = coface->getVertices();
         std::vector<Topo::CoEdge* > coedges;
-        (*iter)->getCoEdges(coedges);
+        coface->getCoEdges(coedges);
 
-        l_v.insert(l_v.end(), vertices.begin(), vertices.end());
-        l_ce.insert(l_ce.end(), coedges.begin(), coedges.end());
-        l_cf.push_back(*iter);
+        l_v.insert(vertices.begin(), vertices.end());
+        l_ce.insert(coedges.begin(), coedges.end());
+        l_cf.insert(coface);
 
         // entités pour lesquelles il n'est pas prévu de les représenté ni de les utiliser
         // mais pour lesquelles il est utile de les marquer comme CREATED
-        std::vector<Topo::Edge* > edges = (*iter)->getEdges();
-        l_e.insert(l_e.end(), edges.begin(), edges.end());
+        std::vector<Topo::Edge* > edges = coface->getEdges();
+        l_e.insert(edges.begin(), edges.end());
     }
-
-
-    l_v.sort(Utils::Entity::compareEntity);
-    l_v.unique();
-    l_e.sort(Utils::Entity::compareEntity);
-    l_e.unique();
-    l_f.sort(Utils::Entity::compareEntity);
-    l_f.unique();
-    l_ce.sort(Utils::Entity::compareEntity);
-    l_ce.unique();
-    l_cf.sort(Utils::Entity::compareEntity);
-    l_cf.unique();
 
     // enregistrement dans InfoCommand de toutes les entités topologiques associées
     // aux différents blocs
     Internal::InfoCommand& icmd = getInfoCommand();
+    for (Block* block : m_blocks)
+        icmd.addTopoInfoEntity(block, Internal::InfoCommand::CREATED);
 
-    for (std::vector<Block* >::const_iterator iter = m_blocks.begin();
-                iter != m_blocks.end(); ++iter)
-        icmd.addTopoInfoEntity(*iter, Internal::InfoCommand::CREATED);
+    for (Topo::Vertex* vertex : l_v)
+        icmd.addTopoInfoEntity(vertex, Internal::InfoCommand::CREATED);
 
-    for (std::list<Topo::Vertex*>::const_iterator iter = l_v.begin();
-            iter != l_v.end(); ++iter)
-        icmd.addTopoInfoEntity(*iter, Internal::InfoCommand::CREATED);
+    for (Topo::Edge* edge : l_e)
+        icmd.addTopoInfoEntity(edge, Internal::InfoCommand::CREATED);
 
-    for (std::list<Topo::Edge*>::const_iterator iter = l_e.begin();
-            iter != l_e.end(); ++iter)
-        icmd.addTopoInfoEntity(*iter, Internal::InfoCommand::CREATED);
+    for (Topo::Face* face: l_f)
+        icmd.addTopoInfoEntity(face, Internal::InfoCommand::CREATED);
 
-    for (std::list<Topo::Face*>::const_iterator iter = l_f.begin();
-            iter != l_f.end(); ++iter)
-        icmd.addTopoInfoEntity(*iter, Internal::InfoCommand::CREATED);
+    for (Topo::CoEdge* coedge : l_ce)
+        icmd.addTopoInfoEntity(coedge, Internal::InfoCommand::CREATED);
 
-    for (std::list<Topo::CoEdge*>::const_iterator iter = l_ce.begin();
-            iter != l_ce.end(); ++iter)
-        icmd.addTopoInfoEntity(*iter, Internal::InfoCommand::CREATED);
-
-    for (std::list<Topo::CoFace*>::const_iterator iter = l_cf.begin();
-            iter != l_cf.end(); ++iter)
-        icmd.addTopoInfoEntity(*iter, Internal::InfoCommand::CREATED);
+    for (Topo::CoFace* coface : l_cf)
+        icmd.addTopoInfoEntity(coface, Internal::InfoCommand::CREATED);
 }
 /*----------------------------------------------------------------------------*/
 void CommandCreateTopo::validGeomEntity()

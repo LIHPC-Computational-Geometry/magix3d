@@ -361,8 +361,8 @@ createCylinderTopo1BlockDemi(Geom::PropertyCylinder* propertyCyl)
 
     // on coupe la face du bloc b1 pour qu'une arête soit sur la courbe 8
     std::vector<Edge* > splitingEdges;
-    std::vector<CoFace* > cofaces;
-    cofaces.push_back(b1->getFace(Block::j_min)->getCoFace(0));
+    Utils::EntitySet<CoFace* > cofaces(&Utils::Entity::compareEntity);
+    cofaces.insert(b1->getFace(Block::j_min)->getCoFace(0));
     TopoHelper::splitFaces(cofaces,
             b1->getFace(Block::k_min)->getEdge(b1->getVertex(0), b1->getVertex(1))->getCoEdge(0),
             0.5, 0.0, false, false,
@@ -1409,8 +1409,8 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridDemiNonDeg(Geom::Prop
 
     // on coupe la face du bloc b1 pour qu'une arête soit sur la courbe 8
     std::vector<Edge* > splitingEdges;
-    std::vector<CoFace* > cofaces;
-    cofaces.push_back(b1->getFace(Block::j_min)->getCoFace(0));
+    Utils::EntitySet<CoFace* > cofaces(&Utils::Entity::compareEntity);
+    cofaces.insert(b1->getFace(Block::j_min)->getCoFace(0));
     TopoHelper::splitFaces(cofaces,
             b1->getFace(Block::k_min)->getEdge(b1->getVertex(0), b1->getVertex(1))->getCoEdge(0),
             0.5, 0.0, false, false,
@@ -1660,8 +1660,8 @@ createSphereTopo1BlockDemi(Geom::PropertySphere* propertySph)
 
     // on coupe la face du bloc b1 pour qu'une arête soit sur la courbe 2
     std::vector<Edge* > splitingEdges;
-    std::vector<CoFace* > cofaces;
-    cofaces.push_back(b1->getFace(Block::j_min)->getCoFace(0));
+    Utils::EntitySet<CoFace* > cofaces(&Utils::Entity::compareEntity);
+    cofaces.insert(b1->getFace(Block::j_min)->getCoFace(0));
     TopoHelper::splitFaces(cofaces,
             b1->getFace(Block::j_min)->getEdge(b1->getVertex(0), b1->getVertex(1))->getCoEdge(0),
             0.5, 0.0, false, false,
@@ -1694,13 +1694,13 @@ createSphereTopo1BlockDemi(Geom::PropertySphere* propertySph)
     for (uint i=0; i<8; i++)
         b1->getVertex(i)->setGeomAssociation(surfaces[0]);
 
-    cofaces = b1->getFace(Block::j_min)->getCoFaces();
-    if (cofaces[0]->find(b1->getVertex(0))){
-        cofaces[0]->setGeomAssociation(surfaces[2]);
-        cofaces[1]->setGeomAssociation(surfaces[1]);
-    } else if (cofaces[0]->find(b1->getVertex(1))){
-        cofaces[0]->setGeomAssociation(surfaces[1]);
-        cofaces[1]->setGeomAssociation(surfaces[2]);
+    std::vector<CoFace* > bmin_cofaces = b1->getFace(Block::j_min)->getCoFaces();
+    if (bmin_cofaces[0]->find(b1->getVertex(0))){
+        bmin_cofaces[0]->setGeomAssociation(surfaces[2]);
+        bmin_cofaces[1]->setGeomAssociation(surfaces[1]);
+    } else if (bmin_cofaces[0]->find(b1->getVertex(1))){
+        bmin_cofaces[0]->setGeomAssociation(surfaces[1]);
+        bmin_cofaces[1]->setGeomAssociation(surfaces[2]);
     } else
         throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b1", TkUtil::Charset::UTF_8));
 
@@ -2235,8 +2235,8 @@ createSphereTopoOGridDemiDeg(Geom::PropertySphere* propertySph)
     // on coupe les faces des blocs b4 et b5 pour qu'une arête soit sur la courbe 2
     std::vector<Edge* > splitingEdges;
     std::vector<CoEdge* > coedges;
-    std::vector<CoFace* > cofaces;
-    cofaces.push_back(b4->getFace(Block::i_min)->getCoFace(0));
+    Utils::EntitySet<CoFace* > cofaces(&Utils::Entity::compareEntity);
+    cofaces.insert(b4->getFace(Block::i_min)->getCoFace(0));
     TopoHelper::splitFaces(cofaces,
             b4->getFace(Block::i_min)->getEdge(b4->getVertex(0), b4->getVertex(2))->getCoEdge(0),
             0.5, 0.0, false, false,
@@ -2245,7 +2245,7 @@ createSphereTopoOGridDemiDeg(Geom::PropertySphere* propertySph)
 
     coedges.push_back(splitingEdges[0]->getCoEdge(0));
     cofaces.clear();
-    cofaces.push_back(b5->getFace(Block::i_min)->getCoFace(0));
+    cofaces.insert(b5->getFace(Block::i_min)->getCoFace(0));
     TopoHelper::splitFaces(cofaces,
             b5->getFace(Block::i_min)->getEdge(b5->getVertex(0), b5->getVertex(2))->getCoEdge(0),
             0.5, 0.0, false, false,
@@ -2287,23 +2287,23 @@ createSphereTopoOGridDemiDeg(Geom::PropertySphere* propertySph)
     Vertex* v2 = b5->getVertex(0);
     Vertex* v3 = b5->getVertex(2);
 
-    cofaces = b4->getFace(Block::i_min)->getCoFaces();
-    if (cofaces[0]->find(v0)){
-        cofaces[0]->setGeomAssociation(surfaces[2]);
-        cofaces[1]->setGeomAssociation(surfaces[1]);
-    } else if (cofaces[0]->find(v1)){
-        cofaces[0]->setGeomAssociation(surfaces[1]);
-        cofaces[1]->setGeomAssociation(surfaces[2]);
+    std::vector<CoFace* > bmin_cofaces = b4->getFace(Block::i_min)->getCoFaces();
+    if (bmin_cofaces[0]->find(v0)){
+        bmin_cofaces[0]->setGeomAssociation(surfaces[2]);
+        bmin_cofaces[1]->setGeomAssociation(surfaces[1]);
+    } else if (bmin_cofaces[0]->find(v1)){
+        bmin_cofaces[0]->setGeomAssociation(surfaces[1]);
+        bmin_cofaces[1]->setGeomAssociation(surfaces[2]);
     } else
         throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b4", TkUtil::Charset::UTF_8));
 
-    cofaces = b5->getFace(Block::i_min)->getCoFaces();
-    if (cofaces[0]->find(v2)){
-        cofaces[0]->setGeomAssociation(surfaces[2]);
-        cofaces[1]->setGeomAssociation(surfaces[1]);
-    } else if (cofaces[0]->find(v3)){
-        cofaces[0]->setGeomAssociation(surfaces[1]);
-        cofaces[1]->setGeomAssociation(surfaces[2]);
+    bmin_cofaces = b5->getFace(Block::i_min)->getCoFaces();
+    if (bmin_cofaces[0]->find(v2)){
+        bmin_cofaces[0]->setGeomAssociation(surfaces[2]);
+        bmin_cofaces[1]->setGeomAssociation(surfaces[1]);
+    } else if (bmin_cofaces[0]->find(v3)){
+        bmin_cofaces[0]->setGeomAssociation(surfaces[1]);
+        bmin_cofaces[1]->setGeomAssociation(surfaces[2]);
     } else
         throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b5", TkUtil::Charset::UTF_8));
 
@@ -2460,10 +2460,10 @@ createSphereTopoOGridDemiNonDeg(Geom::PropertySphere* propertySph)
     // on coupe la face du bloc b1 pour qu'une arête soit sur la courbe 2
     // et les faces des blocs b4 et b5
     std::vector<Edge* > splitingEdges;
-    std::vector<CoFace* > cofaces;
-    cofaces.push_back(b1->getFace(Block::k_max)->getCoFace(0));
-    cofaces.push_back(b4->getFace(Block::i_min)->getCoFace(0));
-    cofaces.push_back(b5->getFace(Block::i_min)->getCoFace(0));
+    Utils::EntitySet<CoFace* > cofaces(&Utils::Entity::compareEntity);
+    cofaces.insert(b1->getFace(Block::k_max)->getCoFace(0));
+    cofaces.insert(b4->getFace(Block::i_min)->getCoFace(0));
+    cofaces.insert(b5->getFace(Block::i_min)->getCoFace(0));
     TopoHelper::splitFaces(cofaces,
             b4->getFace(Block::i_min)->getEdge(b4->getVertex(0), b4->getVertex(2))->getCoEdge(0),
             0.5, 0.0, false, false,
@@ -2505,33 +2505,33 @@ createSphereTopoOGridDemiNonDeg(Geom::PropertySphere* propertySph)
     Vertex* v6 = b1->getVertex(6);
     Vertex* v7 = b1->getVertex(7);
 
-    cofaces = b1->getFace(Block::k_max)->getCoFaces();
-    if (cofaces[0]->find(v4) || cofaces[0]->find(v6)){
-        cofaces[0]->setGeomAssociation(surfaces[2]);
-        cofaces[1]->setGeomAssociation(surfaces[1]);
-    } else if (cofaces[0]->find(v5) || cofaces[0]->find(v7)){
-        cofaces[0]->setGeomAssociation(surfaces[1]);
-        cofaces[1]->setGeomAssociation(surfaces[2]);
+    std::vector<CoFace* > bmin_cofaces = b1->getFace(Block::k_max)->getCoFaces();
+    if (bmin_cofaces[0]->find(v4) || bmin_cofaces[0]->find(v6)){
+        bmin_cofaces[0]->setGeomAssociation(surfaces[2]);
+        bmin_cofaces[1]->setGeomAssociation(surfaces[1]);
+    } else if (bmin_cofaces[0]->find(v5) || bmin_cofaces[0]->find(v7)){
+        bmin_cofaces[0]->setGeomAssociation(surfaces[1]);
+        bmin_cofaces[1]->setGeomAssociation(surfaces[2]);
     } else
         throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b1", TkUtil::Charset::UTF_8));
 
-    cofaces = b4->getFace(Block::i_min)->getCoFaces();
-    if (cofaces[0]->find(v4) || cofaces[0]->find(v6)){
-        cofaces[0]->setGeomAssociation(surfaces[2]);
-        cofaces[1]->setGeomAssociation(surfaces[1]);
-    } else if (cofaces[0]->find(v5) || cofaces[0]->find(v7)){
-        cofaces[0]->setGeomAssociation(surfaces[1]);
-        cofaces[1]->setGeomAssociation(surfaces[2]);
+    bmin_cofaces = b4->getFace(Block::i_min)->getCoFaces();
+    if (bmin_cofaces[0]->find(v4) || bmin_cofaces[0]->find(v6)){
+        bmin_cofaces[0]->setGeomAssociation(surfaces[2]);
+        bmin_cofaces[1]->setGeomAssociation(surfaces[1]);
+    } else if (bmin_cofaces[0]->find(v5) || bmin_cofaces[0]->find(v7)){
+        bmin_cofaces[0]->setGeomAssociation(surfaces[1]);
+        bmin_cofaces[1]->setGeomAssociation(surfaces[2]);
     } else
         throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b4", TkUtil::Charset::UTF_8));
 
-    cofaces = b5->getFace(Block::i_min)->getCoFaces();
-    if (cofaces[0]->find(v4) || cofaces[0]->find(v6)){
-        cofaces[0]->setGeomAssociation(surfaces[2]);
-        cofaces[1]->setGeomAssociation(surfaces[1]);
-    } else if (cofaces[0]->find(v5) || cofaces[0]->find(v7)){
-        cofaces[0]->setGeomAssociation(surfaces[1]);
-        cofaces[1]->setGeomAssociation(surfaces[2]);
+    bmin_cofaces = b5->getFace(Block::i_min)->getCoFaces();
+    if (bmin_cofaces[0]->find(v4) || bmin_cofaces[0]->find(v6)){
+        bmin_cofaces[0]->setGeomAssociation(surfaces[2]);
+        bmin_cofaces[1]->setGeomAssociation(surfaces[1]);
+    } else if (bmin_cofaces[0]->find(v5) || bmin_cofaces[0]->find(v7)){
+        bmin_cofaces[0]->setGeomAssociation(surfaces[1]);
+        bmin_cofaces[1]->setGeomAssociation(surfaces[2]);
     } else
         throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b5", TkUtil::Charset::UTF_8));
 
@@ -3964,8 +3964,8 @@ createHollowSphereTopoDemi(Geom::PropertyHollowSphere* propertySph)
     // on coupe les faces des blocs b4 et b5 pour qu'une arête soit sur la courbe 2
     std::vector<Edge* > splitingEdges;
     std::vector<CoEdge* > coedges;
-    std::vector<CoFace* > cofaces;
-    cofaces.push_back(b4->getFace(Block::i_min)->getCoFace(0));
+    Utils::EntitySet<CoFace* > cofaces(&Utils::Entity::compareEntity);
+    cofaces.insert(b4->getFace(Block::i_min)->getCoFace(0));
     TopoHelper::splitFaces(cofaces,
             b4->getFace(Block::i_min)->getEdge(b4->getVertex(0), b4->getVertex(2))->getCoEdge(0),
             0.5, 0.0, false, false,
@@ -3974,7 +3974,7 @@ createHollowSphereTopoDemi(Geom::PropertyHollowSphere* propertySph)
 
     coedges.push_back(splitingEdges[0]->getCoEdge(0));
     cofaces.clear();
-    cofaces.push_back(b5->getFace(Block::i_min)->getCoFace(0));
+    cofaces.insert(b5->getFace(Block::i_min)->getCoFace(0));
     TopoHelper::splitFaces(cofaces,
             b5->getFace(Block::i_min)->getEdge(b5->getVertex(0), b5->getVertex(2))->getCoEdge(0),
             0.5, 0.0, false, false,
@@ -4203,11 +4203,7 @@ projectEdgesOnCurves()
 	getBlocks(blocks);
 
 	for (uint i=0; i<blocks.size(); i++){
-		std::vector<CoEdge*> coedges;
-		blocks[i]->getCoEdges(coedges);
-		for (uint j=0; j<coedges.size(); j++){
-			CoEdge* coedge = coedges[j];
-
+		for (CoEdge* coedge : blocks[i]->getCoEdges()){
 			// pour éviter de refaire 2 fois la même chose
 			if (coedge->getGeomAssociation() != 0)
 				continue;
@@ -4250,11 +4246,8 @@ projectFacesOnSurfaces()
 	std::vector<Block*> blocks;
 	getBlocks(blocks);
 
-	for (uint i=0; i<blocks.size(); i++){
-		std::vector<CoFace*> cofaces;
-		blocks[i]->getCoFaces(cofaces);
-		for (uint j=0; j<cofaces.size(); j++){
-			CoFace* coface = cofaces[j];
+	for (Block* block : blocks){
+		for (CoFace* coface : block->getCoFaces()) {
 
 			// pour éviter de refaire 2 fois la même chose
 			if (coface->getGeomAssociation() != 0)
@@ -4569,10 +4562,11 @@ void CommandNewTopoOGridOnGeometry::createConeTopo1BlockDemiR0()
 
     // découpage de la face
     std::vector<Edge* > splitingEdges;
-    std::vector<CoFace* > cofaces;
-    cofaces.push_back(b1->getFace(Block::j_max)->getCoFace(0));
+    CoFace* cf = b1->getFace(Block::j_max)->getCoFace(0);
+    Utils::EntitySet<CoFace* > cofaces(&Utils::Entity::compareEntity);
+    cofaces.insert(cf);
     TopoHelper::splitFaces(cofaces,
-    		cofaces[0]->getEdge(b1->getVertex(2), b1->getVertex(3))->getCoEdge(0),
+    		cf->getEdge(b1->getVertex(2), b1->getVertex(3))->getCoEdge(0),
 			0.5, 0.0, false, false,
 			splitingEdges,
 			&getInfoCommand());
@@ -4656,10 +4650,11 @@ void CommandNewTopoOGridOnGeometry::createConeTopo1BlockDemi()
 
     // découpage de la face
     std::vector<Edge* > splitingEdges;
-    std::vector<CoFace* > cofaces;
-    cofaces.push_back(b1->getFace(Block::j_max)->getCoFace(0));
+    CoFace* cf = b1->getFace(Block::j_max)->getCoFace(0);
+    Utils::EntitySet<CoFace* > cofaces(&Utils::Entity::compareEntity);
+    cofaces.insert(cf);
     TopoHelper::splitFaces(cofaces,
-    		cofaces[0]->getEdge(b1->getVertex(2), b1->getVertex(3))->getCoEdge(0),
+    		cf->getEdge(b1->getVertex(2), b1->getVertex(3))->getCoEdge(0),
 			0.5, 0.0, false, false,
 			splitingEdges,
 			&getInfoCommand());
@@ -5279,10 +5274,11 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridDemiNonDegR0()
 
     // découpage de la face
     std::vector<Edge* > splitingEdges;
-    std::vector<CoFace* > cofaces;
-    cofaces.push_back(b5->getFace(Block::i_max)->getCoFace(0));
+    CoFace* cf = b5->getFace(Block::i_max)->getCoFace(0);
+    Utils::EntitySet<CoFace* > cofaces(&Utils::Entity::compareEntity);
+    cofaces.insert(cf);
     TopoHelper::splitFaces(cofaces,
-    		cofaces[0]->getEdge(b5->getVertex(1), b5->getVertex(3))->getCoEdge(0),
+    		cf->getEdge(b5->getVertex(1), b5->getVertex(3))->getCoEdge(0),
 			0.5, 0.0, false, false,
 			splitingEdges,
 			&getInfoCommand());
@@ -5562,10 +5558,11 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridDemiNonDeg()
 
     // découpage de la face
     std::vector<Edge* > splitingEdges;
-    std::vector<CoFace* > cofaces;
-    cofaces.push_back(b5->getFace(Block::i_max)->getCoFace(0));
+    CoFace* cf = b5->getFace(Block::i_max)->getCoFace(0);
+    Utils::EntitySet<CoFace* > cofaces(&Utils::Entity::compareEntity);
+    cofaces.insert(cf);
     TopoHelper::splitFaces(cofaces,
-    		cofaces[0]->getEdge(b5->getVertex(1), b5->getVertex(3))->getCoEdge(0),
+    		cf->getEdge(b5->getVertex(1), b5->getVertex(3))->getCoEdge(0),
 			0.5, 0.0, false, false,
 			splitingEdges,
 			&getInfoCommand());

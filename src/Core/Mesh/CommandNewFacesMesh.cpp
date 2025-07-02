@@ -77,40 +77,37 @@ internalExecute()
 
 	setStepProgression (1.);
 	setStep (step, "Recensement des faces", 0.);
-    std::list<Topo::CoFace*> list_cofaces;
+    Utils::EntitySet<Topo::CoFace*> cofaces(&Utils::Entity::compareEntity);
 
-    for (uint j=0; j<m_faces.size(); j++)
-    	list_cofaces.push_back(m_faces[j]);
-    list_cofaces.sort(Utils::Entity::compareEntity);
-    list_cofaces.unique();
+    for (Topo::CoFace* coface : m_faces)
+    	cofaces.insert(coface);
 
     // Vérification des faces, et des entités en dessous
-    for (std::vector<Topo::CoFace* >::iterator iter = m_faces.begin();
-            iter != m_faces.end(); ++iter)
-        (*iter)->check();
+    for (Topo::CoFace* coface : m_faces)
+        coface->check();
 
     // delete the premesh of the edges to accommodate for possible smooth/pert modifications
     // applied to adjacent surfaces
     {
-        std::set<Topo::CoEdge *> set_coedges;
-        for (auto cf: list_cofaces) {
+        Utils::EntitySet<Topo::CoEdge*> set_coedges(&Utils::Entity::compareEntity);
+        for (Topo::CoFace* coface : cofaces) {
             std::vector<Topo::CoEdge *> coedges;
-            cf->getCoEdges(coedges);
+            coface->getCoEdges(coedges);
 
-            for (auto ce: coedges) {
-                set_coedges.insert(ce);
+            for (Topo::CoEdge* coedge: coedges) {
+                set_coedges.insert(coedge);
             }
         }
-        for (auto ce: set_coedges) {
-            ce->clearPoints();
-            ce->getMeshingData()->setPreMeshed(false);
+        for (Topo::CoEdge* coedge : set_coedges) {
+            coedge->clearPoints();
+            coedge->getMeshingData()->setPreMeshed(false);
         }
     }
 
     // maille et modifie le maillage pour les modifications 2D, s'il y en a
     setStepProgression (1.);
 	setStep (++step, "Lissage et perturbation des surfaces", 0.);
-    meshAndModify(list_cofaces);
+    meshAndModify(cofaces);
 
 	setStepProgression (1.);
 	setStep (++step, "Maillage des sommets", 0.);
@@ -132,10 +129,10 @@ internalExecute()
 
 	setStepProgression (1.);
 	setStep (++step, "Maillage des arêtes", 0.);
-    for (uint i=0; i<aretes.size(); i++){
+    for (Topo::CoEdge* coedge : aretes){
     	if (Command::CANCELED == getStatus ( ))
     		break;
-    	mesh(aretes[i]);
+    	mesh(coedge);
     }
 
     // effectue le maillage des faces communes

@@ -63,21 +63,20 @@ bool ServiceGeomToTopo::convertBlockStructured(const int ni, const int nj, const
 
         // cas où le nombre de bras est donné par l'utilisateur
         if (ni>0 && nj>0 && nk>0){
-        	std::vector<Topo::CoEdge*> coedges;
-        	bloc->getCoEdges(coedges);
+        	auto coedges = bloc->getCoEdges();
         	if (coedges.size() != 12){
         		throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, on impose une discrétisation à un bloc qui n'a pas que 12 arêtes", TkUtil::Charset::UTF_8));
         	}
         	int nb[3] = {ni, nj, nk};
 
-        	for (uint i=0; i<12; i++){
-        		Topo::CoEdge* coedge = coedges[i];
-
+            int i=0;
+        	for (Topo::CoEdge* coedge : coedges) {
         		Topo::CoEdgeMeshingProperty* mp = coedge->getMeshingProperty();
         		Topo::CoEdgeMeshingProperty* new_mp = mp->clone();
         		new_mp->setNbEdges(nb[tabIndEdgeOnBlock[i]]);
         		coedge->switchCoEdgeMeshingProperty(m_icmd, new_mp);
         		delete new_mp;
+                i++;
         	}
         }
 

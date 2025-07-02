@@ -32,6 +32,7 @@ class TopoInfo{
 public:
     std::string name;
     int dimension;
+
 #ifndef SWIG
     std::vector<Vertex*> incident_vertices;
     std::vector<CoEdge*> incident_coedges;
@@ -43,6 +44,7 @@ public:
     std::vector<std::string> groups_name;
 #endif
 
+public:
     std::vector<std::string> vertices() const;
     std::vector<std::string> coedges() const;
     std::vector<std::string> edges() const;

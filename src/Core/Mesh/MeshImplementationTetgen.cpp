@@ -53,7 +53,7 @@ meshDelaunayTetgen(Mesh::CommandCreateMesh* command, Topo::Block* bl)
 
     double ratio_hauteur_pyramides = meshingProp->getRatioPyramidSize();
 
-   for(unsigned int i=0;i<faces.size();i++){
+    for(unsigned int i=0;i<faces.size();i++){
         auto cofaces = faces[i]->getCoFaces();
         for(unsigned int k=0;k<cofaces.size();k++){
 

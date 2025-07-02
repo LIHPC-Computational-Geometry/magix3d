@@ -1,12 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandNewBlocksMesh.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 8/12/2011
- */
-/*----------------------------------------------------------------------------*/
 #include "Mesh/CommandNewBlocksMesh.h"
 
 #include "Topo/TopoManager.h"
@@ -84,17 +76,12 @@ internalExecute()
 
 	setStepProgression (1.);
 	setStep (++step, "Recensement des faces", 0.);
-	std::list<Topo::CoFace*> list_cofaces;
-    std::vector<Topo::CoFace* > cofaces;
-    for (uint i=0; i<m_blocks.size(); i++){
-        m_blocks[i]->getCoFaces(cofaces);
-
-        for (uint j=0; j<cofaces.size(); j++)
-            if (!cofaces[j]->isMeshed())
-                list_cofaces.push_back(cofaces[j]);
+	Utils::EntitySet<Topo::CoFace*> cofaces(&Utils::Entity::compareEntity);
+    for (Topo::Block* block : m_blocks){
+        for (Topo::CoFace* coface : block->getCoFaces())
+            if (!coface->isMeshed())
+                cofaces.insert(coface);
     }
-    list_cofaces.sort(Utils::Entity::compareEntity);
-    list_cofaces.unique();
 
 #ifdef _DEBUG_TIMER
    TkUtil::Timer timer(false);
@@ -103,18 +90,15 @@ internalExecute()
     // delete the premesh of the edges to accommodate for possible smooth/pert modifications
     // applied to adjacent surfaces
     {
-        std::set<Topo::CoEdge *> set_coedges;
-        for (auto b: m_blocks) {
-            std::vector<Topo::CoEdge *> coedges;
-            b->getCoEdges(coedges);
-
-            for (auto ce: coedges) {
-                set_coedges.insert(ce);
+        Utils::EntitySet<Topo::CoEdge *> coedges(&Utils::Entity::compareEntity);
+        for (Topo::Block* block : m_blocks) {
+            for (Topo::CoEdge* coedge : block->getCoEdges()) {
+                coedges.insert(coedge);
             }
         }
-        for (auto ce: set_coedges) {
-            ce->clearPoints();
-            ce->getMeshingData()->setPreMeshed(false);
+        for (Topo::CoEdge* coedge : coedges) {
+            coedge->clearPoints();
+            coedge->getMeshingData()->setPreMeshed(false);
         }
     }
 
@@ -128,12 +112,11 @@ internalExecute()
     setStepProgression (1.);
 	setStep (++step, "Lissage et perturbation des surfaces", 0.);
 
-    meshAndModify(list_cofaces);
+    meshAndModify(cofaces);
 #ifdef _DEBUG_TIMER
     timer.stop();
     std::cout<<"création et modification du maillage surfacique en "<<timer.strDuration()<<std::endl;
 #endif
-
 
     // le maillage se faisait avant les perturbations mais dans ce cas les sommets ne bougent plus.
     // pas de trace de pourquoi il était indiqué de faire le maillage des sommets avant de perturber
@@ -146,17 +129,15 @@ internalExecute()
      timer.reset();
      timer.start();
  #endif
-     for (uint i=0; i<vertices.size(); i++){
+     for (Topo::Vertex* vertex : vertices){
      	if (Command::CANCELED == getStatus ( ))
      		break;
-     	mesh(vertices[i]);
+     	mesh(vertex);
      }
  #ifdef _DEBUG_TIMER
      timer.stop();
      std::cout<<"  maillage des sommets en "<<timer.strDuration()<<std::endl;
  #endif
-
-
 
     std::vector<Topo::CoEdge*> aretes;
     Topo::TopoHelper::getCoEdges(m_blocks, aretes);
@@ -203,6 +184,7 @@ internalExecute()
     timer.reset();
     timer.start();
 #endif
+
     setStepProgression (1.);
 	setStep (++step, "Maillage des faces", 0.);
     double nbTotFa = (double)faces.size();
@@ -262,7 +244,6 @@ internalExecute()
     std::cout<<"  maillage des blocs en "<<timer.strDuration()<<std::endl;
 #endif
 
-
     setStepProgression (1.);
 	setStep (++step, "Vérifications", 0.);
     // vérification de la présence de blocs avec mailles croisées
@@ -288,9 +269,8 @@ unsigned long CommandNewBlocksMesh::getEstimatedDuration (PLAY_TYPE playType)
 {
 	uint nbTot = 0;
 	// Vérification des blocs, et des entités en dessous (faces)
-	for (std::vector<Topo::Block* >::iterator iter = m_blocks.begin();
-			iter != m_blocks.end(); ++iter) {
-		nbTot += (*iter)->check();
+	for (Topo::Block* block : m_blocks) {
+		nbTot += block->check();
 	}
 
     uint val = nbTot/50000; // 50 000 polyèdres à la seconde

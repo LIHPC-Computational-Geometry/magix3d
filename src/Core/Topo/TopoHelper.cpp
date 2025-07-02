@@ -235,109 +235,76 @@ uint TopoHelper::getInternalDir(Vertex* v1, Vertex* v2,
 void TopoHelper::getCoEdges(const std::vector<Edge* > & edges,
         std::vector<CoEdge* > & coedges)
 {
-    for (std::vector<Edge* >::const_iterator iter = edges.begin();
-                iter != edges.end(); ++iter){
-        const std::vector<CoEdge* > & l_coedges = (*iter)->getCoEdges();
-        coedges.insert(coedges.end(), l_coedges.begin(), l_coedges.end());
-    }
+    for (Edge* edge : edges)
+        for (CoEdge* coedge : edge->getCoEdges())
+            coedges.push_back(coedge);
 }
 /*----------------------------------------------------------------------------*/
 void TopoHelper::getCoFaces(const std::vector<Block* > & blocs,
             std::vector<CoFace* > & cofaces)
 {
-	std::list<CoFace*> liste;
-
-	for (std::vector<Block* >::const_iterator iter = blocs.begin();
-				iter != blocs.end(); ++iter){
-			std::vector<CoFace* > l_cofaces;
-			(*iter)->getCoFaces(l_cofaces);
-			liste.insert(liste.end(), l_cofaces.begin(), l_cofaces.end());
-		}
-
-	liste.sort(Utils::Entity::compareEntity);
-	liste.unique();
-
+	Utils::EntitySet<CoFace*> liste(&Utils::Entity::compareEntity);
+	for (Block* bloc : blocs)
+        for (CoFace* coface : bloc->getCoFaces())
+    		liste.insert(coface);
 	cofaces.insert(cofaces.end(), liste.begin(), liste.end());
 }
 /*----------------------------------------------------------------------------*/
 void TopoHelper::getCoEdges(const std::vector<CoFace* > & faces,
             std::vector<CoEdge* > & coedges)
 {
-	std::list<CoEdge*> liste;
-
-	for (std::vector<CoFace* >::const_iterator iter = faces.begin();
-			iter != faces.end(); ++iter){
+	Utils::EntitySet<CoEdge*> liste(&Utils::Entity::compareEntity);
+	for (CoFace* coface : faces){
 		std::vector<CoEdge* > l_coedges;
-		(*iter)->getCoEdges(l_coedges, false);
-		liste.insert(liste.end(), l_coedges.begin(), l_coedges.end());
+		coface->getCoEdges(l_coedges, false);
+        for (CoEdge* coedge : l_coedges)
+		    liste.insert(coedge);
 	}
-
-	liste.sort(Utils::Entity::compareEntity);
-	liste.unique();
-
 	coedges.insert(coedges.end(), liste.begin(), liste.end());
 }
 /*----------------------------------------------------------------------------*/
 void TopoHelper::getCoEdges(const std::vector<Block* > & blocs,
             std::vector<CoEdge* > & coedges)
 {
-	std::list<CoEdge*> liste;
+	Utils::EntitySet<CoEdge*> liste(&Utils::Entity::compareEntity);
 
-	for (std::vector<Block* >::const_iterator iter = blocs.begin();
-			iter != blocs.end(); ++iter){
-		std::vector<CoEdge* > l_coedges;
-		(*iter)->getCoEdges(l_coedges, false);
-		liste.insert(liste.end(), l_coedges.begin(), l_coedges.end());
-	}
-
-	liste.sort(Utils::Entity::compareEntity);
-	liste.unique();
-
+	for (Block* bloc : blocs)
+        for (CoEdge* coedge : bloc->getCoEdges())
+		    liste.insert(coedge);
 	coedges.insert(coedges.end(), liste.begin(), liste.end());
 }
 /*----------------------------------------------------------------------------*/
 void TopoHelper::getVertices(const std::vector<CoFace* > & faces,
     		std::vector<Vertex* > & vertices)
 {
-	std::list<Vertex*> liste;
+	Utils::EntitySet<Vertex*> liste(&Utils::Entity::compareEntity);
 
-	for (std::vector<CoFace* >::const_iterator iter = faces.begin();
-			iter != faces.end(); ++iter){
+	for (CoFace* coface : faces){
 		std::vector<Vertex* > l_vertices;
-		(*iter)->getAllVertices(l_vertices, false);
-		liste.insert(liste.end(), l_vertices.begin(), l_vertices.end());
+		coface->getAllVertices(l_vertices, false);
+        for (Vertex* vtx : vertices)
+    		liste.insert(vtx);
 	}
-
-	liste.sort(Utils::Entity::compareEntity);
-	liste.unique();
-
 	vertices.insert(vertices.end(), liste.begin(), liste.end());
 }
 /*----------------------------------------------------------------------------*/
 void TopoHelper::getVertices(const std::vector<Block* > & blocs,
     		std::vector<Vertex* > & vertices)
 {
-	std::list<Vertex*> liste;
-
-	for (std::vector<Block* >::const_iterator iter = blocs.begin();
-			iter != blocs.end(); ++iter){
-		std::vector<Vertex* > l_vertices;
-		(*iter)->getAllVertices(l_vertices, false);
-		liste.insert(liste.end(), l_vertices.begin(), l_vertices.end());
-	}
-
-	liste.sort(Utils::Entity::compareEntity);
-	liste.unique();
-
+	Utils::EntitySet<Vertex*> liste(&Utils::Entity::compareEntity);
+	for (Block* bloc : blocs)
+        for (Vertex* vtx : bloc->getAllVertices())
+    		liste.insert(vtx);
 	vertices.insert(vertices.end(), liste.begin(), liste.end());
 }
 /*----------------------------------------------------------------------------*/
 void TopoHelper::get(std::vector<Geom::Volume*>& volumes, std::set<Topo::Block*>& blocks)
 {
-	for (uint j=0; j<volumes.size(); j++){
+	for (Geom::Volume* vol : volumes){
 		std::vector<Topo::Block*> loc_blocks;
-		volumes[j]->get(loc_blocks);
-		blocks.insert(loc_blocks.begin(), loc_blocks.end());
+		vol->get(loc_blocks);
+        for (Block* bloc : loc_blocks)
+    		blocks.insert(bloc);
 	}
 }
 /*----------------------------------------------------------------------------*/
@@ -411,10 +378,11 @@ void TopoHelper::get(std::vector<Geom::Volume*>& volumes, std::set<Topo::Vertex*
 /*----------------------------------------------------------------------------*/
 void TopoHelper::get(std::vector<Geom::Surface*>& surfaces, std::set<Topo::CoFace*>& cofaces)
 {
-	for (uint k=0; k<surfaces.size(); k++){
+	for (Geom::Surface* surf : surfaces){
 		std::vector<Topo::CoFace* > loc_cofaces;
-		surfaces[k]->get(loc_cofaces);
-		cofaces.insert(loc_cofaces.begin(), loc_cofaces.end());
+		surf->get(loc_cofaces);
+        for (Topo::CoFace* coface : loc_cofaces)
+    		cofaces.insert(coface);
 	}
 }
 /*----------------------------------------------------------------------------*/
@@ -461,23 +429,24 @@ void TopoHelper::get(std::vector<Geom::Surface*>& surfaces, std::set<Topo::Verte
 /*----------------------------------------------------------------------------*/
 void TopoHelper::get(std::vector<Geom::Curve*>& curves, std::set<Topo::CoEdge*>& coedges)
 {
-	for (uint k=0; k<curves.size(); k++){
+	for (Geom::Curve* curve : curves){
 		std::vector<Topo::CoEdge* > loc_coedges;
-		curves[k]->get(loc_coedges);
-		coedges.insert(loc_coedges.begin(), loc_coedges.end());
+		curve->get(loc_coedges);
+        for (CoEdge* coedge : loc_coedges)
+    		coedges.insert(coedge);
 	}
 }
 /*----------------------------------------------------------------------------*/
 void TopoHelper::get(std::vector<Geom::Curve*>& curves, std::set<Topo::Vertex*>& vertices, bool propagate)
 {
-	for (uint k=0; k<curves.size(); k++){
+	for (Geom::Curve* curve : curves){
 		std::vector<Topo::CoEdge* > loc_coedges;
-		curves[k]->get(loc_coedges);
+		curve->get(loc_coedges);
 		Topo::TopoHelper::get(loc_coedges, vertices);
 
 		if (propagate){
 			// on parcourt les sommets pour les cas sans arêtes ...
-			auto vtx = curves[k]->getVertices();
+			auto vtx = curve->getVertices();
 			Topo::TopoHelper::get(vtx, vertices);
 		}
 	}
@@ -485,61 +454,60 @@ void TopoHelper::get(std::vector<Geom::Curve*>& curves, std::set<Topo::Vertex*>&
 /*----------------------------------------------------------------------------*/
 void TopoHelper::get(std::vector<Geom::Vertex*>& vtx, std::set<Topo::Vertex*>& vertices)
 {
-	for (uint k=0; k<vtx.size(); k++){
+	for (Geom::Vertex* geom_vtx : vtx){
 		std::vector<Topo::Vertex* > loc_vertices;
-		vtx[k]->get(loc_vertices);
-		vertices.insert(loc_vertices.begin(), loc_vertices.end());
+		geom_vtx->get(loc_vertices);
+        for (Topo::Vertex* topo_vtx : loc_vertices)
+    		vertices.insert(topo_vtx);
 	}
 }
 /*----------------------------------------------------------------------------*/
 void TopoHelper::get(std::vector<Topo::Block*>& blocks, std::set<Topo::CoFace*>& cofaces)
 {
-	for (uint k=0; k<blocks.size(); k++){
-		std::vector<Topo::CoFace* > loc_cofaces;
-		blocks[k]->getCoFaces(loc_cofaces);
-		cofaces.insert(loc_cofaces.begin(), loc_cofaces.end());
-	}
+	for (Topo::Block* bloc : blocks)
+        for (CoFace* coface : bloc->getCoFaces())
+    		cofaces.insert(coface);
 }
 /*----------------------------------------------------------------------------*/
 void TopoHelper::get(std::vector<Topo::Block*>& blocks, std::set<Topo::CoEdge*>& coedges)
 {
-	for (uint k=0; k<blocks.size(); k++){
-		std::vector<Topo::CoEdge* > loc_coedges;
-		blocks[k]->getCoEdges(loc_coedges);
-		coedges.insert(loc_coedges.begin(), loc_coedges.end());
-	}
+	for (Topo::Block* bloc : blocks)
+        for (Topo::CoEdge* coedge : bloc->getCoEdges())
+		    coedges.insert(coedge);
 }
 /*----------------------------------------------------------------------------*/
 void TopoHelper::get(std::vector<Topo::Block*>& blocks, std::set<Topo::Vertex*>& vertices)
 {
-	for (uint k=0; k<blocks.size(); k++){
-		std::vector<Topo::Vertex* > loc_vertices = blocks[k]->getVertices();
-		vertices.insert(loc_vertices.begin(), loc_vertices.end());
-	}
+	for (Topo::Block* bloc : blocks)
+        for (Topo::Vertex* vtx : bloc->getVertices())
+    		vertices.insert(vtx);
 }
 /*----------------------------------------------------------------------------*/
 void TopoHelper::get(std::vector<Topo::CoFace*>& cofaces, std::set<Topo::CoEdge*>& coedges)
 {
-	for (uint k=0; k<cofaces.size(); k++){
+	for (Topo::CoFace* coface : cofaces){
 		std::vector<Topo::CoEdge* > loc_coedges;
-		cofaces[k]->getCoEdges(loc_coedges);
-		coedges.insert(loc_coedges.begin(), loc_coedges.end());
+		coface->getCoEdges(loc_coedges);
+        for (Topo::CoEdge* coedge : loc_coedges)
+		    coedges.insert(coedge);
 	}
 }
 /*----------------------------------------------------------------------------*/
 void TopoHelper::get(std::vector<Topo::CoFace*>& cofaces, std::set<Topo::Vertex*>& vertices)
 {
-	for (uint k=0; k<cofaces.size(); k++){
-		std::vector<Topo::Vertex* > loc_vertices = cofaces[k]->getVertices();
-		vertices.insert(loc_vertices.begin(), loc_vertices.end());
+	for (Topo::CoFace* coface : cofaces){
+		std::vector<Topo::Vertex* > loc_vertices = coface->getVertices();
+        for (Topo::Vertex* vtx : loc_vertices)
+    		vertices.insert(vtx);
 	}
 }
 /*----------------------------------------------------------------------------*/
 void TopoHelper::get(std::vector<Topo::CoEdge*>& coedges, std::set<Topo::Vertex*>& vertices)
 {
-	for (uint k=0; k<coedges.size(); k++){
-		std::vector<Topo::Vertex* > loc_vertices = coedges[k]->getVertices();
-		vertices.insert(loc_vertices.begin(), loc_vertices.end());
+	for (Topo::CoEdge* coedge : coedges){
+		std::vector<Topo::Vertex* > loc_vertices = coedge->getVertices();
+        for (Topo::Vertex* vtx : loc_vertices)
+    		vertices.insert(vtx);
 	}
 }
 /*----------------------------------------------------------------------------*/
@@ -616,7 +584,7 @@ void TopoHelper::getVerticesTip(const std::vector<CoEdge* > & coedges, Vertex* &
 }
 /*----------------------------------------------------------------------------*/
 //#define _DEBUG_SPLIT
-void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
+void TopoHelper::splitFaces(Utils::EntitySet<CoFace* > cofaces,
         CoEdge* arete, double ratio_dec, double ratio_ogrid,
         bool boucleDemandee, bool rebondAutorise,
         std::vector<Edge* > &splitingEdges,
@@ -633,9 +601,8 @@ void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
     // on marque les CoFaces autorisées à 1,
     // et on incrémente à chaque fois que l'on sélectionne la face
     std::map<CoFace*, uint> filtre_cofaces;
-    for (std::vector<CoFace* >::iterator iter = cofaces.begin();
-            iter != cofaces.end(); ++iter)
-        filtre_cofaces[*iter] = 1;
+    for (CoFace* coface : cofaces)
+        filtre_cofaces[coface] = 1;
 
 
     // on recherche le nombre de bras de maillage correspondant au ratio
@@ -1816,13 +1783,10 @@ std::vector<Topo::CoFace*> TopoHelper::getBorder(std::vector<Topo::Block*>& bloc
 	// on marque les cofaces suivant le nombre de fois où elles sont référencées par un bloc
 	std::map<CoFace*, uint> filtre_cofaces;
 
-	for (uint i=0; i<blocks.size(); i++){
-		std::vector<CoFace* > cofaces;
+	for (Topo::Block* block : blocks){
 		// les coedges qui apparaissent 2 fois dans une même coface ne seront pas au bord
-		blocks[i]->getCoFaces(cofaces);
-
-		for (uint j=0; j<cofaces.size(); j++)
-			filtre_cofaces[cofaces[j]] += 1;
+		for (Topo::CoFace* coface : block->getCoFaces())
+			filtre_cofaces[coface] += 1;
 	}
 
 	std::vector<CoFace*> cofaces;
@@ -1838,20 +1802,14 @@ std::vector<CoEdge*> TopoHelper::getCommonCoEdges(Block* bloc1, Block* bloc2)
 {
 	// on marque les arêtes du premier bloc
 	std::set<CoEdge*> filtre_coedges;
-
-	std::vector<CoEdge* > coedges;
-	bloc1->getCoEdges(coedges);
-
-	for (std::vector<CoEdge*>::iterator iter=coedges.begin(); iter!=coedges.end(); ++iter)
-		filtre_coedges.insert(*iter);
+	for (CoEdge* coedge : bloc1->getCoEdges())
+		filtre_coedges.insert(coedge);
 
 	// on recherche parmis les arêtes du deuxième bloc les arêtes marquées
 	std::vector<CoEdge* > selected_coedges;
-
-	bloc2->getCoEdges(coedges);
-	for (std::vector<CoEdge*>::iterator iter=coedges.begin(); iter!=coedges.end(); ++iter)
-		if (filtre_coedges.find(*iter) != filtre_coedges.end())
-			selected_coedges.push_back(*iter);
+	for (CoEdge* coedge : bloc2->getCoEdges())
+		if (filtre_coedges.find(coedge) != filtre_coedges.end())
+			selected_coedges.push_back(coedge);
 
 	return selected_coedges;
 }
@@ -1864,16 +1822,16 @@ std::vector<CoEdge*> TopoHelper::getCommonCoEdges(CoFace* face1, CoFace* face2)
 	std::vector<CoEdge* > coedges;
 	face1->getCoEdges(coedges);
 
-	for (std::vector<CoEdge*>::iterator iter=coedges.begin(); iter!=coedges.end(); ++iter)
-		filtre_coedges.insert(*iter);
+	for (CoEdge* coedge : coedges)
+		filtre_coedges.insert(coedge);
 
 	// on recherche parmis les arêtes de la deuxième coface les arêtes marquées
 	std::vector<CoEdge* > selected_coedges;
 
 	face2->getCoEdges(coedges);
-	for (std::vector<CoEdge*>::iterator iter=coedges.begin(); iter!=coedges.end(); ++iter)
-		if (filtre_coedges.find(*iter) != filtre_coedges.end())
-			selected_coedges.push_back(*iter);
+	for (CoEdge* coedge : coedges)
+		if (filtre_coedges.find(coedge) != filtre_coedges.end())
+			selected_coedges.push_back(coedge);
 
 	return selected_coedges;
 }
@@ -2094,23 +2052,21 @@ computeNormale(Topo::Vertex* vtx0, const Topo::CoEdge* coedge)
 	coedge->getBlocks(blocks);
 	std::vector<Topo::CoFace*> cofaces;
 	coedge->getCoFaces(cofaces);
-	for (uint i=0; i<cofaces.size(); i++)
-		filtre_coface[cofaces[i]] = 1;
+	for (Topo::CoFace* coface : cofaces)
+		filtre_coface[coface] = 1;
 
-	for (uint i=0; i<blocks.size(); i++){
+	for (Topo::Block* block : blocks){
 		// recherche d'une coface reliée au sommet mais pas encore marquée
 		Topo::CoFace* coface = 0;
-		blocks[i]->getCoFaces(cofaces);
-
-		for (uint j=0; j<cofaces.size(); j++)
-			if (filtre_coface[cofaces[j]] == 0 && cofaces[j]->find(vtx0))
-				coface = cofaces[j];
+		for (Topo::CoFace* cf : block->getCoFaces())
+			if (filtre_coface[cf] == 0 && cf->find(vtx0))
+				coface = cf;
 
 		if (coface == 0){
 			TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
 			messErr << "Erreur interne dans TopoHelper::computeNormale pour sommet "
 					<<vtx0->getName()<<" et arête "<<coedge->getName()
-					<<" lors de la recherche de la face dans le bloc "<<blocks[i]->getName();
+					<<" lors de la recherche de la face dans le bloc "<<block->getName();
 			throw TkUtil::Exception(messErr);
 		}
 		else {
