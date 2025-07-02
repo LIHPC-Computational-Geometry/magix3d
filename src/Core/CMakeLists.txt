@@ -70,8 +70,6 @@ if (NOT TARGET Mesquite::Mesquite)
 endif (NOT TARGET Mesquite::Mesquite)
 
 pkg_check_modules (GTS REQUIRED IMPORTED_TARGET gts)  # GTS (GNU Triangulated Surface Library)
-pkg_check_modules (GLIB2 REQUIRED IMPORTED_TARGET glib-2.0) # glib-2.0 (pour GTS)
-pkg_check_modules (PCRE REQUIRED IMPORTED_TARGET libpcre)  # PCRE (Perl compatible regular expressions pour glib-2.0)
 
 find_package (OpenCASCADE 7.1.0 REQUIRED)
 
@@ -108,7 +106,7 @@ endif()
 if (SEPA3D)
     target_include_directories (Core PUBLIC ${SEPARATRICE3D_INCLUDE_DIR})
 endif (SEPA3D)
-target_link_libraries (Core PUBLIC ${CORE_OPTIONAL_LIBRARIES_LIST} Mesquite::Mesquite cgns::cgns PkgConfig::GTS PkgConfig::GLIB2 PkgConfig::PCRE GMDSIg GMDSIo)
+target_link_libraries (Core PUBLIC ${CORE_OPTIONAL_LIBRARIES_LIST} Mesquite::Mesquite cgns::cgns PkgConfig::GTS GMDSIg GMDSIo)
 # Etre capable une fois installée de retrouver vtk*, ... :
 # (Rem : en son absence on a Set runtime path of "/tmp/pignerol/install/lib/libCore.so.5.0.0" to "") ...
 set_target_properties (Core PROPERTIES INSTALL_RPATH_USE_LINK_PATH 1)
