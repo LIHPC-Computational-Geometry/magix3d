@@ -74,8 +74,8 @@ CoEdge(Internal::Context& ctx,
 , m_mesh_data(new CoEdgeMeshingData())
 , m_save_mesh_data(0)
 {
-    m_topo_property->getVertexContainer().push_back(v1);
-    m_topo_property->getVertexContainer().push_back(v2);
+    m_topo_property->getVertices().push_back(v1);
+    m_topo_property->getVertices().push_back(v2);
 
     // association remontante
     v1->addCoEdge(this);
@@ -170,7 +170,7 @@ replace(Topo::Vertex* v1, Topo::Vertex* v2, bool propagate_up, bool propagate_do
             v2->saveVertexTopoProperty(icmd);
 
             saveCoEdgeTopoProperty(icmd);
-            m_topo_property->getVertexContainer()[i] = v2;
+            m_topo_property->getVertices()[i] = v2;
             v1->removeCoEdge(this);
             v2->addCoEdge(this);
         }
@@ -241,13 +241,13 @@ setDestroyed(bool b)
 	if (isDestroyed() == b)
 		return;
 
-	auto& groups = getGroupsContainer();
+	auto& groups = getGroups();
 	if (b)
-		for (Group::Group1D* gr : getGroupsContainer()) {
+		for (Group::Group1D* gr : getGroups()) {
 			gr->remove(this);
 		}
 	else
-		for (Group::Group1D* gr : getGroupsContainer()){
+		for (Group::Group1D* gr : getGroups()){
 			gr->add(this);
 		}
 
@@ -388,11 +388,11 @@ std::vector<CoEdge*> CoEdge::split(Topo::Vertex* vtx, uint nbMeshingEdges, Inter
         coedge2->setGeomAssociation(getGeomAssociation());
     }
 
-    for (Group::Group1D* gr : getGroupsContainer()){
+    for (Group::Group1D* gr : getGroups()){
     	gr->add(coedge1);
     	gr->add(coedge2);
-    	coedge1->getGroupsContainer().push_back(gr);
-    	coedge2->getGroupsContainer().push_back(gr);
+    	coedge1->getGroups().push_back(gr);
+    	coedge2->getGroups().push_back(gr);
     }
 
     delete cemp1;
@@ -569,13 +569,13 @@ std::vector<Topo::Vertex*> CoEdge::split(uint nbMeshingEdges1, uint nbMeshingEdg
         new_vertex2->setGeomAssociation(getGeomAssociation());
     }
 
-    for (Group::Group1D* gr : getGroupsContainer()){
+    for (Group::Group1D* gr : getGroups()){
     	gr->add(coedge1);
     	gr->add(coedge2);
     	gr->add(coedge3);
-    	coedge1->getGroupsContainer().push_back(gr);
-    	coedge2->getGroupsContainer().push_back(gr);
-    	coedge3->getGroupsContainer().push_back(gr);
+    	coedge1->getGroups().push_back(gr);
+    	coedge2->getGroups().push_back(gr);
+    	coedge3->getGroups().push_back(gr);
     }
 
     delete cemp1;
@@ -2124,7 +2124,7 @@ getDescription (bool alsoComputed) const
 
     description->addPropertiesSet (topoRelation);
 
-    std::vector<Group::Group1D*> grp = getGroupsContainer();
+    std::vector<Group::Group1D*> grp = getGroups();
     if (!grp.empty()){
     	Utils::SerializedRepresentation  groupe ("Relation vers les groupes",
     			TkUtil::NumericConversions::toStr(grp.size()));
@@ -2564,7 +2564,7 @@ getNbVertices() const
         log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
     }
 #endif
-    return m_topo_property->getVertexContainer().size();
+    return m_topo_property->getVertices().size();
 }
 /*----------------------------------------------------------------------------*/
 void CoEdge::getAllVertices(std::vector<Vertex* >& vertices, const bool unique) const
@@ -2735,8 +2735,8 @@ void CoEdge::getGroupsName (std::vector<std::string>& gn, bool byGeom, bool byTo
 		TopoEntity::getGroupsName(gn, byGeom, byTopo);
 
 	if (byTopo)
-		for (uint i = 0; i<m_topo_property->getGroupsContainer().size(); ++i)
-		        gn.push_back(m_topo_property->getGroupsContainer()[i]->getName());
+		for (uint i = 0; i<m_topo_property->getGroups().size(); ++i)
+		        gn.push_back(m_topo_property->getGroups()[i]->getName());
 }
 /*----------------------------------------------------------------------------*/
 unsigned long CoEdge::getNbInternalMeshingNodes()

@@ -212,10 +212,10 @@ init(std::vector<Edge* > &edges,
         (*iter)->addCoFace(this);
 
     // on copie les arêtes
-    m_topo_property->getEdgeContainer().insert(m_topo_property->getEdgeContainer().end(), edges.begin(), edges.end());
+    m_topo_property->getEdges().insert(m_topo_property->getEdges().end(), edges.begin(), edges.end());
 
     // on copie les sommets
-    m_topo_property->getVertexContainer().insert(m_topo_property->getVertexContainer().end(), vertices.begin(), vertices.end());
+    m_topo_property->getVertices().insert(m_topo_property->getVertices().end(), vertices.begin(), vertices.end());
 
 	getContext ( ).newGraphicalRepresentation (*this);
 }
@@ -238,7 +238,7 @@ init(std::vector<Edge* > &edges)
         (*iter)->addCoFace(this);
 
     // on copie les arêtes
-    m_topo_property->getEdgeContainer().insert(m_topo_property->getEdgeContainer().end(), edges.begin(), edges.end());
+    m_topo_property->getEdges().insert(m_topo_property->getEdges().end(), edges.begin(), edges.end());
 
     // dans le cas non structuré, on s'arrange pour que les arêtes soient ordonnées
     // (forment un ou plusieurs cycles), pas seulement suivant l'id
@@ -254,7 +254,7 @@ init(std::vector<Edge* > &edges)
                 Topo::Vertex* som = getEdge(i)->getVertex(j);
                 if (filtre_sommets[som] == 0){
                     filtre_sommets[som] = 1;
-                    m_topo_property->getVertexContainer().push_back(som);
+                    m_topo_property->getVertices().push_back(som);
                 }
             }
         }
@@ -280,7 +280,7 @@ init(std::vector<Edge* > &edges)
             if (getEdge(0)->getVertex(0) != getEdge(0)->getVertex(1))
                 throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne (une unique arête avec des sommets différents), avec CoFace::CoFace",  TkUtil::Charset::UTF_8));
             else
-                m_topo_property->getVertexContainer().push_back(getEdge(0)->getVertex(0));
+                m_topo_property->getVertices().push_back(getEdge(0)->getVertex(0));
         }
         else {
             // recherche du sens de la première arête et du sommet commun avec la dernière
@@ -303,7 +303,7 @@ init(std::vector<Edge* > &edges)
 
             // sommet commun avec l'arête précédente
             Topo::Vertex* som_commun = (sens_normal?getEdge(0)->getVertex(0):getEdge(0)->getVertex(1));
-            m_topo_property->getVertexContainer().push_back(som_commun);
+            m_topo_property->getVertices().push_back(som_commun);
 
             // on boucle sur les arêtes en cherchant le sens de l'arête en fonction du sommet commun
             for (uint i=0; i<getNbEdges()-1; i++){
@@ -326,7 +326,7 @@ init(std::vector<Edge* > &edges)
                 }
                 // sommet commun avec l'arête suivante
                 som_commun = (sens_normal?ei->getVertex(1):ei->getVertex(0));
-                m_topo_property->getVertexContainer().push_back(som_commun);
+                m_topo_property->getVertices().push_back(som_commun);
             }
 
             //        // suppression du dernier sommet (aussi le premier)
@@ -347,7 +347,7 @@ sortEdges()
         return;
 
     // liste des arêtes initiales (sous forme de liste pour optimiser les erase())
-    std::list<Edge* > initial_edges(m_topo_property->getEdgeContainer().begin(), m_topo_property->getEdgeContainer().end());
+    std::list<Edge* > initial_edges(m_topo_property->getEdges().begin(), m_topo_property->getEdges().end());
 
     // arêtes ordonnées
     std::vector<Edge* > sorted_edges;
@@ -410,8 +410,8 @@ sortEdges()
     if (getNbEdges() != sorted_edges.size())
         throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne dans CoFace::sortEdges(), vecteurs de tailles différentes",  TkUtil::Charset::UTF_8));
 
-    m_topo_property->getEdgeContainer().clear();
-    m_topo_property->getEdgeContainer().insert(m_topo_property->getEdgeContainer().end(), sorted_edges.begin(), sorted_edges.end());
+    m_topo_property->getEdges().clear();
+    m_topo_property->getEdges().insert(m_topo_property->getEdges().end(), sorted_edges.begin(), sorted_edges.end());
 }
 /*----------------------------------------------------------------------------*/
 CoFace::
@@ -477,31 +477,31 @@ replace(Topo::Vertex* v1, Topo::Vertex* v2, bool propagate_up, bool propagate_do
             // 2 cas de figure
             // soit v2 est déjà présent, donc la face va être dégénérée (v1 disparait)
             // soit v2 est nouveau, on remplace v1 par v2
-            if (Utils::find(m_topo_property->getVertexContainer(), v2)){
+            if (Utils::find(m_topo_property->getVertices(), v2)){
                 if (isStructured()){
                     if (getNbVertices() == 4){
                         permuteToJmaxEdge(getEdge(v1,v2), icmd);
                         if (v1 == getVertex(0))
-                            m_topo_property->getVertexContainer()[0] = v2;
-                        m_topo_property->getVertexContainer().resize(3);
+                            m_topo_property->getVertices()[0] = v2;
+                        m_topo_property->getVertices().resize(3);
                         // suppression de l'arête
-                        m_topo_property->getEdgeContainer().resize(3);
+                        m_topo_property->getEdges().resize(3);
                     }
                     else {
-                        Utils::remove(m_topo_property->getEdgeContainer(), getEdge(v1,v2), true);
-                        Utils::remove(m_topo_property->getVertexContainer(), v1, true);
+                        Utils::remove(m_topo_property->getEdges(), getEdge(v1,v2), true);
+                        Utils::remove(m_topo_property->getVertices(), v1, true);
                     }
                 }
                 else {
                     permuteToLastEdge(getEdge(v1,v2), icmd);
                     if (v1 == getVertex(0))
-                        m_topo_property->getVertexContainer()[0] = v2;
-                    uint new_size = m_topo_property->getVertexContainer().size()-1;
-                    m_topo_property->getVertexContainer().resize(new_size);
-                    m_topo_property->getEdgeContainer().resize(new_size);
+                        m_topo_property->getVertices()[0] = v2;
+                    uint new_size = m_topo_property->getVertices().size()-1;
+                    m_topo_property->getVertices().resize(new_size);
+                    m_topo_property->getEdges().resize(new_size);
                 }
             } else
-                m_topo_property->getVertexContainer()[i] = v2;
+                m_topo_property->getVertices()[i] = v2;
 
         }// end if (v1 == getVertex(i))
 
@@ -539,7 +539,7 @@ replace(Edge* e1, Edge* e2, Internal::InfoCommand* icmd)
     for (uint i=0; i<getNbEdges(); i++)
         if (e1 == getEdge(i)){
             saveCoFaceTopoProperty(icmd);
-            m_topo_property->getEdgeContainer()[i] = e2;
+            m_topo_property->getEdges()[i] = e2;
 
             e1->saveEdgeTopoProperty(icmd);
             e2->saveEdgeTopoProperty(icmd);
@@ -610,11 +610,11 @@ setDestroyed(bool b)
 
     // on retire la relation depuis les groupes
     if (b)
-        for (Group::Group2D* gr : getGroupsContainer()){
+        for (Group::Group2D* gr : getGroups()){
             gr->remove(this);
         }
     else
-        for (Group::Group2D* gr : getGroupsContainer()){
+        for (Group::Group2D* gr : getGroups()){
             gr->add(this);
         }
 
@@ -914,11 +914,11 @@ split2(eDirOnCoFace dir, std::vector<Edge*>& edges1, std::vector<Edge*>& edges3,
         coface2->setGeomAssociation(getGeomAssociation());
     }
 
-    for (Group::Group2D* gr : getGroupsContainer()){
+    for (Group::Group2D* gr : getGroups()){
     	gr->add(coface1);
     	gr->add(coface2);
-    	coface1->getGroupsContainer().push_back(gr);
-    	coface2->getGroupsContainer().push_back(gr);
+    	coface1->getGroups().push_back(gr);
+    	coface2->getGroups().push_back(gr);
     }
 
     // on ajoute les 2 CoFaces aux faces
@@ -1166,13 +1166,13 @@ split3(eDirOnCoFace dir, std::vector<Edge*>& edges1, std::vector<Edge*>& edges3,
         coface3->setGeomAssociation(getGeomAssociation());
     }
 
-    for (Group::Group2D* gr : getGroupsContainer()){
+    for (Group::Group2D* gr : getGroups()){
     	gr->add(coface1);
     	gr->add(coface2);
     	gr->add(coface3);
-    	coface1->getGroupsContainer().push_back(gr);
-    	coface2->getGroupsContainer().push_back(gr);
-    	coface3->getGroupsContainer().push_back(gr);
+    	coface1->getGroups().push_back(gr);
+    	coface2->getGroups().push_back(gr);
+    	coface3->getGroups().push_back(gr);
     }
 
     // on ajoute les 3 CoFaces aux faces
@@ -1439,13 +1439,13 @@ splitOgrid(eDirOnCoFace dir,
             new_vertex->setGeomAssociation(getGeomAssociation());
         }
 
-        for (Group::Group2D* gr : getGroupsContainer()){
+        for (Group::Group2D* gr : getGroups()){
         	gr->add(coface0);
         	gr->add(coface1);
         	gr->add(coface2);
-        	coface0->getGroupsContainer().push_back(gr);
-        	coface1->getGroupsContainer().push_back(gr);
-        	coface2->getGroupsContainer().push_back(gr);
+        	coface0->getGroups().push_back(gr);
+        	coface1->getGroups().push_back(gr);
+        	coface2->getGroups().push_back(gr);
         }
 
 
@@ -1653,15 +1653,15 @@ splitOgrid(eDirOnCoFace dir,
             new_vtx[1]->setGeomAssociation(getGeomAssociation());
         }
 
-        for (Group::Group2D* gr : getGroupsContainer()){
+        for (Group::Group2D* gr : getGroups()){
         	gr->add(coface0);
         	gr->add(coface1);
         	gr->add(coface2);
         	gr->add(coface3);
-        	coface0->getGroupsContainer().push_back(gr);
-        	coface1->getGroupsContainer().push_back(gr);
-        	coface2->getGroupsContainer().push_back(gr);
-        	coface3->getGroupsContainer().push_back(gr);
+        	coface0->getGroups().push_back(gr);
+        	coface1->getGroups().push_back(gr);
+        	coface2->getGroups().push_back(gr);
+        	coface3->getGroups().push_back(gr);
         }
 
 
@@ -1680,7 +1680,7 @@ uint CoFace::getNbVertices() const
         log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
     }
 #endif
-    return m_topo_property->getVertexContainer().size();
+    return m_topo_property->getVertices().size();
 }
 /*----------------------------------------------------------------------------*/
 Edge* CoFace::
@@ -2355,7 +2355,7 @@ getDescription (bool alsoComputed) const
 
    description->addPropertiesSet (topoRelation);
 
-   std::vector<Group::Group2D*> grp = getGroupsContainer();
+   std::vector<Group::Group2D*> grp = getGroups();
    if (!grp.empty()){
 	   Utils::SerializedRepresentation  groupe ("Relation vers les groupes",
 			   TkUtil::NumericConversions::toStr(grp.size()));
@@ -3279,9 +3279,9 @@ permuteToJmaxEdge(Edge* edge, Internal::InfoCommand* icmd)
 
     if (ind != 3){
         uint dec = j_max - ind;
-        std::vector<Edge* > initial_edges = m_topo_property->getEdgeContainer();
+        std::vector<Edge* > initial_edges = m_topo_property->getEdges();
         std::vector<Edge* > sorted_edges(4);
-        std::vector<Topo::Vertex* > initial_vertices = m_topo_property->getVertexContainer();
+        std::vector<Topo::Vertex* > initial_vertices = m_topo_property->getVertices();
         std::vector<Topo::Vertex* > sorted_vertices(4);
 
         for (uint i=0; i<4; i++){
@@ -3289,10 +3289,10 @@ permuteToJmaxEdge(Edge* edge, Internal::InfoCommand* icmd)
             sorted_vertices[(i+dec)%4] = initial_vertices[i];
         }
 
-        m_topo_property->getEdgeContainer().clear();
-        m_topo_property->getEdgeContainer().insert(m_topo_property->getEdgeContainer().end(), sorted_edges.begin(), sorted_edges.end());
-        m_topo_property->getVertexContainer().clear();
-        m_topo_property->getVertexContainer().insert(m_topo_property->getVertexContainer().end(), sorted_vertices.begin(), sorted_vertices.end());
+        m_topo_property->getEdges().clear();
+        m_topo_property->getEdges().insert(m_topo_property->getEdges().end(), sorted_edges.begin(), sorted_edges.end());
+        m_topo_property->getVertices().clear();
+        m_topo_property->getVertices().insert(m_topo_property->getVertices().end(), sorted_vertices.begin(), sorted_vertices.end());
     } // end if (ind != 4)
 }
 /*----------------------------------------------------------------------------*/
@@ -3325,9 +3325,9 @@ permuteToLastEdge(Edge* edge, Internal::InfoCommand* icmd)
 
     if (ind != nb-1){
         uint dec = nb-1 - ind;
-        std::vector<Edge* > initial_edges = m_topo_property->getEdgeContainer();
+        std::vector<Edge* > initial_edges = m_topo_property->getEdges();
         std::vector<Edge* > sorted_edges(nb);
-        std::vector<Topo::Vertex* > initial_vertices = m_topo_property->getVertexContainer();
+        std::vector<Topo::Vertex* > initial_vertices = m_topo_property->getVertices();
         std::vector<Topo::Vertex* > sorted_vertices(nb);
 
         for (uint i=0; i<nb; i++){
@@ -3335,10 +3335,10 @@ permuteToLastEdge(Edge* edge, Internal::InfoCommand* icmd)
             sorted_vertices[(i+dec)%nb] = initial_vertices[i];
         }
 
-        m_topo_property->getEdgeContainer().clear();
-        m_topo_property->getEdgeContainer().insert(m_topo_property->getEdgeContainer().end(), sorted_edges.begin(), sorted_edges.end());
-        m_topo_property->getVertexContainer().clear();
-        m_topo_property->getVertexContainer().insert(m_topo_property->getVertexContainer().end(), sorted_vertices.begin(), sorted_vertices.end());
+        m_topo_property->getEdges().clear();
+        m_topo_property->getEdges().insert(m_topo_property->getEdges().end(), sorted_edges.begin(), sorted_edges.end());
+        m_topo_property->getVertices().clear();
+        m_topo_property->getVertices().insert(m_topo_property->getVertices().end(), sorted_vertices.begin(), sorted_vertices.end());
     } // end if (ind != nb-1)
 }
 /*----------------------------------------------------------------------------*/
@@ -3632,8 +3632,8 @@ void CoFace::getGroupsName (std::vector<std::string>& gn, bool byGeom, bool byTo
 		TopoEntity::getGroupsName(gn, byGeom, byTopo);
 
 	if (byTopo)
-		for (uint i = 0; i<m_topo_property->getGroupsContainer().size(); ++i)
-		        gn.push_back(m_topo_property->getGroupsContainer()[i]->getName());
+		for (uint i = 0; i<m_topo_property->getGroups().size(); ++i)
+		        gn.push_back(m_topo_property->getGroups()[i]->getName());
 }
 /*----------------------------------------------------------------------------*/
 unsigned long CoFace::getNbInternalMeshingNodes()

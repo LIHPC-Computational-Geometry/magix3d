@@ -49,11 +49,11 @@ class CoEdge;
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des arêtes communes
-     std::vector<CoEdge*>& getCoEdgeContainer() {return m_coedges;}
+     std::vector<CoEdge*>& getCoEdges() {return m_coedges;}
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des groupes
-     std::vector<Group::Group0D*>& getGroupsContainer() {return m_groups;}
+     std::vector<Group::Group0D*>& getGroups() {return m_groups;}
 
      /*------------------------------------------------------------------------*/
      /** \brief   Suppression des dépendances (entités topologiques incidentes)

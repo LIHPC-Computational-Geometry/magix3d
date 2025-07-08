@@ -100,17 +100,17 @@ TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const Line & cl)
 /*----------------------------------------------------------------------------*/
 void Line::addCoEdge(Topo::CoEdge* ed)
 {
-    m_topo_property->getCoEdgeContainer().push_back(ed);
+    m_topo_property->getCoEdges().push_back(ed);
 }
 /*----------------------------------------------------------------------------*/
 void Line::removeCoEdge(Topo::CoEdge* ed)
 {
-    Utils::remove(m_topo_property->getCoEdgeContainer(), ed, true);
+    Utils::remove(m_topo_property->getCoEdges(), ed, true);
 }
 /*----------------------------------------------------------------------------*/
 std::vector<Topo::CoEdge*>& Line::getCoEdges() const
 {
-    auto& edges = m_topo_property->getCoEdgeContainer();
+    auto& edges = m_topo_property->getCoEdges();
     Utils::checkIfDestroyed(edges);
     return edges;
 }

@@ -185,9 +185,9 @@ internalExecute()
      		}
 
      		// change l'ordre des sommets
-     		block->m_topo_property->getVertexContainer().clear();
-    		block->m_topo_property->getVertexContainer().insert(
-				block->m_topo_property->getVertexContainer().end(),
+     		block->m_topo_property->getVertices().clear();
+    		block->m_topo_property->getVertices().insert(
+				block->m_topo_property->getVertices().end(),
 				sorted_vertices.begin(),
 				sorted_vertices.end());
 
@@ -202,9 +202,9 @@ internalExecute()
     	        		hexa_vertices[TopoHelper::tabIndVtxByFaceOnBlock[i][3]]));
     	    }
 
-    	    block->m_topo_property->getFaceContainer().clear();
-    	    block->m_topo_property->getFaceContainer().insert(
-				block->m_topo_property->getFaceContainer().end(),
+    	    block->m_topo_property->getFaces().clear();
+    	    block->m_topo_property->getFaces().insert(
+				block->m_topo_property->getFaces().end(),
 				sorted_faces.begin(),
 				sorted_faces.end());
 

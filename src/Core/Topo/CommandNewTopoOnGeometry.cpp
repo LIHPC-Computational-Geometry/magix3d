@@ -204,7 +204,7 @@ internalExecute()
 			if (!m_groupName.empty()){
 		    	Group::Group2D* grp = getContext().getGroupManager().getNewGroup2D(m_groupName, &getInfoCommand());
 				grp->add(cf);
-				cf->getGroupsContainer().push_back(grp);
+				cf->getGroups().push_back(grp);
 			}
 
 			 if (getGeomEntity()){
@@ -250,7 +250,7 @@ internalExecute()
 			if (!m_groupName.empty()){
 		    	Group::Group3D* grp = getContext().getGroupManager().getNewGroup3D(m_groupName, &getInfoCommand());
 				grp->add(bl);
-				bl->getGroupsContainer().push_back(grp);
+				bl->getGroups().push_back(grp);
 			}
 
 			if (getGeomEntity()){

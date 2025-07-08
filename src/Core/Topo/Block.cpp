@@ -131,8 +131,8 @@ Block(Internal::Context& ctx,
             throw TkUtil::Exception(messErr);
         }
 
-    m_topo_property->getFaceContainer().insert(m_topo_property->getFaceContainer().end(), faces.begin(), faces.end());
-    m_topo_property->getVertexContainer().insert(m_topo_property->getVertexContainer().end(), vertices.begin(), vertices.end());
+    m_topo_property->getFaces().insert(m_topo_property->getFaces().end(), faces.begin(), faces.end());
+    m_topo_property->getVertices().insert(m_topo_property->getVertices().end(), vertices.begin(), vertices.end());
 
     _init();
 }
@@ -157,14 +157,14 @@ Block(Internal::Context& ctx, int ni, int nj, int nk)
 
     // bloc avec les sommets équivalents à ceux d'une boite de taille 1
 
-    m_topo_property->getVertexContainer().push_back(new Topo::Vertex(ctx, Utils::Math::Point(0,0,0)));
-    m_topo_property->getVertexContainer().push_back(new Topo::Vertex(ctx, Utils::Math::Point(1,0,0)));
-    m_topo_property->getVertexContainer().push_back(new Topo::Vertex(ctx, Utils::Math::Point(0,1,0)));
-    m_topo_property->getVertexContainer().push_back(new Topo::Vertex(ctx, Utils::Math::Point(1,1,0)));
-    m_topo_property->getVertexContainer().push_back(new Topo::Vertex(ctx, Utils::Math::Point(0,0,1)));
-    m_topo_property->getVertexContainer().push_back(new Topo::Vertex(ctx, Utils::Math::Point(1,0,1)));
-    m_topo_property->getVertexContainer().push_back(new Topo::Vertex(ctx, Utils::Math::Point(0,1,1)));
-    m_topo_property->getVertexContainer().push_back(new Topo::Vertex(ctx, Utils::Math::Point(1,1,1)));
+    m_topo_property->getVertices().push_back(new Topo::Vertex(ctx, Utils::Math::Point(0,0,0)));
+    m_topo_property->getVertices().push_back(new Topo::Vertex(ctx, Utils::Math::Point(1,0,0)));
+    m_topo_property->getVertices().push_back(new Topo::Vertex(ctx, Utils::Math::Point(0,1,0)));
+    m_topo_property->getVertices().push_back(new Topo::Vertex(ctx, Utils::Math::Point(1,1,0)));
+    m_topo_property->getVertices().push_back(new Topo::Vertex(ctx, Utils::Math::Point(0,0,1)));
+    m_topo_property->getVertices().push_back(new Topo::Vertex(ctx, Utils::Math::Point(1,0,1)));
+    m_topo_property->getVertices().push_back(new Topo::Vertex(ctx, Utils::Math::Point(0,1,1)));
+    m_topo_property->getVertices().push_back(new Topo::Vertex(ctx, Utils::Math::Point(1,1,1)));
 
     // les arêtes (communes) dont on ne conserve pas de lien dans le bloc
     std::vector<CoEdge* > coedges;
@@ -199,17 +199,17 @@ Block(Internal::Context& ctx, int ni, int nj, int nk)
     CoFace* coface;
 
     coface = new Topo::CoFace(ctx, edges[4], edges[8], edges[6], edges[10]);
-    m_topo_property->getFaceContainer().push_back(new Topo::Face(ctx, coface));
+    m_topo_property->getFaces().push_back(new Topo::Face(ctx, coface));
     coface = new Topo::CoFace(ctx, edges[5], edges[9], edges[7], edges[11]);
-    m_topo_property->getFaceContainer().push_back(new Topo::Face(ctx, coface));
+    m_topo_property->getFaces().push_back(new Topo::Face(ctx, coface));
     coface = new Topo::CoFace(ctx, edges[0], edges[8], edges[2], edges[9]);
-    m_topo_property->getFaceContainer().push_back(new Topo::Face(ctx, coface));
+    m_topo_property->getFaces().push_back(new Topo::Face(ctx, coface));
     coface = new Topo::CoFace(ctx, edges[1], edges[10], edges[3], edges[11]);
-    m_topo_property->getFaceContainer().push_back(new Topo::Face(ctx, coface));
+    m_topo_property->getFaces().push_back(new Topo::Face(ctx, coface));
     coface = new Topo::CoFace(ctx, edges[0], edges[4], edges[1], edges[5]);
-    m_topo_property->getFaceContainer().push_back(new Topo::Face(ctx, coface));
+    m_topo_property->getFaces().push_back(new Topo::Face(ctx, coface));
     coface = new Topo::CoFace(ctx, edges[2], edges[6], edges[3], edges[7]);
-    m_topo_property->getFaceContainer().push_back(new Topo::Face(ctx, coface));
+    m_topo_property->getFaces().push_back(new Topo::Face(ctx, coface));
 
     _init();
 
@@ -341,7 +341,7 @@ replace(Topo::Vertex* v1, Topo::Vertex* v2, bool propagate_up, bool propagate_do
     for (uint i=0; i<getVertices().size(); i++){
         if (v1 == getVertex(i)){
             saveBlockTopoProperty(icmd);
-            m_topo_property->getVertexContainer()[i] = v2;
+            m_topo_property->getVertices()[i] = v2;
         }
     }
     if (propagate_down)
@@ -355,7 +355,7 @@ replace(Face* f1, Face* f2, Internal::InfoCommand* icmd)
     for (uint i=0; i<getFaces().size(); i++){
         if (f1 == getFace(i)){
             saveBlockTopoProperty(icmd);
-            m_topo_property->getFaceContainer()[i] = f2;
+            m_topo_property->getFaces()[i] = f2;
 
             f1->saveFaceTopoProperty(icmd);
             f2->saveFaceTopoProperty(icmd);
@@ -1041,11 +1041,11 @@ getDescription (bool alsoComputed) const
 
     description->addPropertiesSet (topoRelation);
 
-    auto size = getGroupsContainer().size();
+    auto size = getGroups().size();
     if (size > 0){
     	Utils::SerializedRepresentation  groupe ("Relation vers les groupes",
     			TkUtil::NumericConversions::toStr(size));
-    	for (Group::Group3D* grp : getGroupsContainer())
+    	for (Group::Group3D* grp : getGroups())
     		groupe.addProperty (
     				Utils::SerializedRepresentation::Property (
     						grp->getName ( ),  *grp));
@@ -1131,8 +1131,8 @@ structure(Internal::InfoCommand* icmd)
 
     }
 
-    m_topo_property->getFaceContainer().clear();
-    m_topo_property->getFaceContainer().insert(m_topo_property->getFaceContainer().end(), sorted_faces.begin(), sorted_faces.end());
+    m_topo_property->getFaces().clear();
+    m_topo_property->getFaces().insert(m_topo_property->getFaces().end(), sorted_faces.begin(), sorted_faces.end());
 
     BlockMeshingProperty* prop = new BlockMeshingPropertyTransfinite();
     switchBlockMeshingProperty(icmd, prop);
@@ -1759,7 +1759,7 @@ saveInternals(CommandEditTopo* cet)
         m_save_mesh_property = 0;
     }
     if (m_save_topo_property) {
-//        std::cout<<"m_save_topo_property avec "<<m_save_topo_property->getVertexContainer().size()<<" sommets"<<std::endl;
+//        std::cout<<"m_save_topo_property avec "<<m_save_topo_property->getVertices().size()<<" sommets"<<std::endl;
         cet->addBlockInfoTopoProperty(this, m_save_topo_property);
         m_save_topo_property = 0;
     }
@@ -2435,11 +2435,11 @@ split(CoEdge* arete, double ratio,
     block_1->setGeomAssociation(getGeomAssociation());
     block_2->setGeomAssociation(getGeomAssociation());
 
-    for (Group::Group3D* gr : getGroupsContainer()){
+    for (Group::Group3D* gr : getGroups()){
     	gr->add(block_1);
     	gr->add(block_2);
-    	block_1->getGroupsContainer().push_back(gr);
-    	block_2->getGroupsContainer().push_back(gr);
+    	block_1->getGroups().push_back(gr);
+    	block_2->getGroups().push_back(gr);
     }
 
     if (icmd){
@@ -2690,10 +2690,10 @@ degenerateFaceInVertex(uint id, Internal::InfoCommand* icmd)
 
     coface->free(icmd);
     face->free(icmd);
-    Utils::remove(m_topo_property->getFaceContainer(), face, true);
+    Utils::remove(m_topo_property->getFaces(), face, true);
 
     // suppression des sommets de la liste
-    m_topo_property->getVertexContainer().resize(5);
+    m_topo_property->getVertices().resize(5);
 
     // des fois que ...
     if (getVertex(4)->isDestroyed())
@@ -2733,13 +2733,13 @@ degenerateFaceInEdge(uint id, Topo::Vertex* v1, Topo::Vertex* v2,
 
 	coface->free(icmd);
 	face->free(icmd);
-	Utils::remove(m_topo_property->getFaceContainer(), face, true);
+	Utils::remove(m_topo_property->getFaces(), face, true);
 
 	// suppression des sommets de la liste
 	// tout d'abord, on évite de se retrouver avec 2 sommets identiques dans la liste restante
 	if (getVertex(4) == getVertex(5))
-		m_topo_property->getVertexContainer()[5] = getVertex(6);
-	m_topo_property->getVertexContainer().resize(6);
+		m_topo_property->getVertices()[5] = getVertex(6);
+	m_topo_property->getVertices().resize(6);
 
 	// des fois que ...
 	if (getVertex(4)->isDestroyed() || getVertex(5)->isDestroyed())
@@ -2896,14 +2896,14 @@ permuteToKmaxFace(uint id, Internal::InfoCommand* icmd)
     std::cout<<"p2 = "<<somOpp[2]->getName()<<std::endl;
 #endif
     // les sommets réordonnés
-    m_topo_property->getVertexContainer()[0] = somOpp[0];
-    m_topo_property->getVertexContainer()[1] = somOpp[1];
-    m_topo_property->getVertexContainer()[2] = somOpp[2];
-    m_topo_property->getVertexContainer()[3] = p3;
-    m_topo_property->getVertexContainer()[4] = p4;
-    m_topo_property->getVertexContainer()[5] = p5;
-    m_topo_property->getVertexContainer()[6] = p6;
-    m_topo_property->getVertexContainer()[7] = p7;
+    m_topo_property->getVertices()[0] = somOpp[0];
+    m_topo_property->getVertices()[1] = somOpp[1];
+    m_topo_property->getVertices()[2] = somOpp[2];
+    m_topo_property->getVertices()[3] = p3;
+    m_topo_property->getVertices()[4] = p4;
+    m_topo_property->getVertices()[5] = p5;
+    m_topo_property->getVertices()[6] = p6;
+    m_topo_property->getVertices()[7] = p7;
 
     // Réordonne les Faces
     std::vector<Face* > sorted_faces;
@@ -2916,8 +2916,8 @@ permuteToKmaxFace(uint id, Internal::InfoCommand* icmd)
 
     }
 
-    m_topo_property->getFaceContainer().clear();
-    m_topo_property->getFaceContainer().insert(m_topo_property->getFaceContainer().end(), sorted_faces.begin(), sorted_faces.end());
+    m_topo_property->getFaces().clear();
+    m_topo_property->getFaces().insert(m_topo_property->getFaces().end(), sorted_faces.begin(), sorted_faces.end());
 
 #ifdef _DEBUG_PERM
     std::cout<<" ==> Block : "<<*this<<std::endl;
@@ -3100,12 +3100,12 @@ void Block::reverseOrder7Vertices()
 	}
 
 	// met en place la nouvelle liste de sommets réordonnés
-	getBlockTopoProperty()->getVertexContainer().clear();
-	getBlockTopoProperty()->getVertexContainer().insert(getBlockTopoProperty()->getVertexContainer().end(), loc_vtx.begin(), loc_vtx.end());
+	getBlockTopoProperty()->getVertices().clear();
+	getBlockTopoProperty()->getVertices().insert(getBlockTopoProperty()->getVertices().end(), loc_vtx.begin(), loc_vtx.end());
 
 	// idem avec les faces
-	getBlockTopoProperty()->getFaceContainer().clear();
-	getBlockTopoProperty()->getFaceContainer().insert(getBlockTopoProperty()->getFaceContainer().end(), loc_faces.begin(), loc_faces.end());
+	getBlockTopoProperty()->getFaces().clear();
+	getBlockTopoProperty()->getFaces().insert(getBlockTopoProperty()->getFaces().end(), loc_faces.begin(), loc_faces.end());
 
 #ifdef _DEBUG_REVERSE
 	std::cout<<" bloc après reverseOrder7Vertices : "<<*this<<std::endl;
@@ -3279,7 +3279,7 @@ void Block::getGroupsName(std::vector<std::string>& gn, bool byGeom, bool byTopo
 		TopoEntity::getGroupsName(gn, byGeom, byTopo);
 
 	if (byTopo)
-		for (Group::Group3D* grp : m_topo_property->getGroupsContainer())
+		for (Group::Group3D* grp : m_topo_property->getGroups())
 		    gn.push_back(grp->getName());
 }
 /*----------------------------------------------------------------------------*/
@@ -3294,11 +3294,11 @@ void Block::setDestroyed(bool b)
 
     // on retire la relation depuis les groupes
      if (b)
-    	 for (Group::Group3D* gr : getGroupsContainer()){
+    	 for (Group::Group3D* gr : getGroups()){
     		 gr->remove(this);
     	 }
      else
-    	 for (Group::Group3D* gr : getGroupsContainer()){
+    	 for (Group::Group3D* gr : getGroups()){
     		 gr->add(this);
     	 }
 

@@ -99,22 +99,22 @@ public:
 
     /*------------------------------------------------------------------------*/
     /// ajoute une relation vers une arête
-    void addEdge(Edge* e) {m_topo_property->getEdgeContainer().push_back(e);}
+    void addEdge(Edge* e) {m_topo_property->getEdges().push_back(e);}
 
     /// enlève une relation vers une arête
     void removeEdge(Edge* e, const bool exceptionIfNotFound=true)
-    {Utils::remove(m_topo_property->getEdgeContainer(), e, exceptionIfNotFound);}
+    {Utils::remove(m_topo_property->getEdges(), e, exceptionIfNotFound);}
 
     /// Fournit l'accès aux arêtes topologiques qui utilisent cette CoEdge sans copie
     std::vector<Edge* > & getEdges() const
-    {return m_topo_property->getEdgeContainer();}
+    {return m_topo_property->getEdges();}
 
     /// fournit l'accès à l'une des arêtes
     Edge* getEdge(uint ind) const
-    {return m_topo_property->getEdgeContainer().at(ind);}
+    {return m_topo_property->getEdges().at(ind);}
 
     uint getNbEdges() const
-    {return m_topo_property->getEdgeContainer().size();}
+    {return m_topo_property->getEdges().size();}
 
     /*------------------------------------------------------------------------*/
     /** \brief Remplace un sommet v1 par le sommet v2
@@ -185,18 +185,18 @@ public:
     /** Fournit l'accès aux sommets topologiques incidents sans copie
      */
     std::vector<Topo::Vertex* >& getVertices() const
-        {return m_topo_property->getVertexContainer();}
+        {return m_topo_property->getVertices();}
 
     /// fournit l'accès à l'un des sommets
     Topo::Vertex* getVertex(uint ind) const
-    {return m_topo_property->getVertexContainer().at(ind);}
+    {return m_topo_property->getVertices().at(ind);}
 
     /// \return le nombre de Vertex
     uint getNbVertices() const;
 
     /// vérifie si cette arête commune contient ou non ce sommet
     bool find(Topo::Vertex* v) const
-    {return Utils::find(m_topo_property->getVertexContainer(), v);}
+    {return Utils::find(m_topo_property->getVertices(), v);}
 
     /// accès à tous les sommets
     void getAllVertices(std::vector<Topo::Vertex* >& vertices, const bool unique=true) const;
@@ -409,8 +409,8 @@ public:
     virtual void getGroupsName (std::vector<std::string>& gn, bool byGeom=true, bool byTopo=true) const;
 
     /// Accesseur sur le conteneur pour les groupes
-    std::vector<Group::Group1D*>& getGroupsContainer() {return m_topo_property->getGroupsContainer();}
-    const std::vector<Group::Group1D*>& getGroupsContainer() const {return m_topo_property->getGroupsContainer();}
+    std::vector<Group::Group1D*>& getGroups() {return m_topo_property->getGroups();}
+    const std::vector<Group::Group1D*>& getGroups() const {return m_topo_property->getGroups();}
 
     /*------------------------------------------------------------------------*/
     /// Nombre de noeuds internes: le nombre de noeuds sans ceux du bord

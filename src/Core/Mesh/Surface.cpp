@@ -240,17 +240,17 @@ TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const Surface & cl)
 /*----------------------------------------------------------------------------*/
 void Surface::addCoFace(Topo::CoFace* f)
 {
-    m_topo_property->getCoFaceContainer().push_back(f);
+    m_topo_property->getCoFaces().push_back(f);
 }
 /*----------------------------------------------------------------------------*/
 void Surface::removeCoFace(Topo::CoFace* f)
 {
-    Utils::remove(m_topo_property->getCoFaceContainer(), f, true);
+    Utils::remove(m_topo_property->getCoFaces(), f, true);
 }
 /*----------------------------------------------------------------------------*/
 std::vector<Topo::CoFace* >& Surface::getCoFaces() const
 {
-	auto& cofaces = m_topo_property->getCoFaceContainer();
+	auto& cofaces = m_topo_property->getCoFaces();
     Utils::checkIfDestroyed(cofaces);
     return cofaces;
 }

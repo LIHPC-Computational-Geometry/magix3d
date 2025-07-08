@@ -46,7 +46,7 @@ class Block;
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des blocs
-     std::vector<Block*>& getBlockContainer() {return m_blocks;}
+     std::vector<Block*>& getBlocks() {return m_blocks;}
 
      /*------------------------------------------------------------------------*/
      /** \brief   Suppression des relations

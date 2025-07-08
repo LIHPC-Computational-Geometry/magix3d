@@ -1100,9 +1100,9 @@ freeUnused(std::map<Vertex*, uint> & filtre_vertex,
         if (newCoface) {
             newCoface->setGeomAssociation(ga);
 
-            for (Group::Group2D* gr : coface->getGroupsContainer()){
+            for (Group::Group2D* gr : coface->getGroups()){
             	gr->add(newCoface);
-            	newCoface->getGroupsContainer().push_back(gr);
+            	newCoface->getGroups().push_back(gr);
             }
 
             // pour les faces entre les bords de la face initiale et celle au centre
@@ -1115,9 +1115,9 @@ freeUnused(std::map<Vertex*, uint> & filtre_vertex,
 
                 newCoface = corr_2vtx_coface[std::pair<Vertex*, Vertex*>(vtx0, vtx1)];
                 if (newCoface)
-                	for (Group::Group2D* gr : coface->getGroupsContainer()){
+                	for (Group::Group2D* gr : coface->getGroups()){
                 		gr->add(newCoface);
-                		newCoface->getGroupsContainer().push_back(gr);
+                		newCoface->getGroups().push_back(gr);
                 	}
             } // end for i
         } // end if (newCoface)

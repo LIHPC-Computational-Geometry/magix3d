@@ -48,10 +48,10 @@ class Vertex;
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des arêtes communes
-     std::vector<CoEdge*>& getCoEdgeContainer() {return m_coedges;}
+     std::vector<CoEdge*>& getCoEdges() {return m_coedges;}
 
      /// accesseur sur le conteneur des sommets
-     std::vector<Vertex*>& getVertexContainer() {return m_vertices;}
+     std::vector<Vertex*>& getVertices() {return m_vertices;}
 
      /*------------------------------------------------------------------------*/
      /** \brief   Suppression des relations

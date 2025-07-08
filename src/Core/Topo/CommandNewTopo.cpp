@@ -171,7 +171,7 @@ CommandNewTopo::
             Group::Group0D *group = getContext().getGroupManager().getNewGroup0D(m_groupName,
                                                                                       &getInfoCommand());
             group->add(vtx);
-            vtx->getGroupsContainer().push_back(group);
+            vtx->getGroups().push_back(group);
             getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
 
             getInfoCommand().addTopoInfoEntity(vtx, Internal::InfoCommand::CREATED);
@@ -187,7 +187,7 @@ CommandNewTopo::
             Group::Group1D *group = getContext().getGroupManager().getNewGroup1D(groupName,
                                                                                       &getInfoCommand());
             group->add(coedge);
-            coedge->getGroupsContainer().push_back(group);
+            coedge->getGroups().push_back(group);
             getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
 
             getInfoCommand().addTopoInfoEntity(coedge, Internal::InfoCommand::CREATED);
@@ -348,7 +348,7 @@ CommandNewTopo::
             Group::Group2D *group = getContext().getGroupManager().getNewGroup2D(groupName,
                                                                                       &getInfoCommand());
             group->add(face);
-            face->getGroupsContainer().push_back(group);
+            face->getGroups().push_back(group);
             getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
 
             getInfoCommand().addTopoInfoEntity(face, Internal::InfoCommand::CREATED);

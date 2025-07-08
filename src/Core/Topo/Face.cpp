@@ -50,11 +50,11 @@ Face(Internal::Context& ctx,
 
     m_mesh_property = new FaceMeshingProperty(coface->isStructured());
 
-    m_topo_property->getCoFaceContainer().push_back(coface);
+    m_topo_property->getCoFaces().push_back(coface);
 
     const std::vector<Vertex* > & vertices = coface->getVertices();
-    m_topo_property->getVertexContainer().insert(
-        m_topo_property->getVertexContainer().end(),
+    m_topo_property->getVertices().insert(
+        m_topo_property->getVertices().end(),
         vertices.begin(),
         vertices.end());
 
@@ -83,12 +83,12 @@ Face(Internal::Context& ctx,
     if (cofaces.empty())
          throw TkUtil::Exception (TkUtil::UTF8String ("Tentative de création d'une face sans coface", TkUtil::Charset::UTF_8));
 
-    m_topo_property->getCoFaceContainer().insert(
-        m_topo_property->getCoFaceContainer().end(),
+    m_topo_property->getCoFaces().insert(
+        m_topo_property->getCoFaces().end(),
         cofaces.begin(),
         cofaces.end());
-    m_topo_property->getVertexContainer().insert(
-        m_topo_property->getVertexContainer().end(),
+    m_topo_property->getVertices().insert(
+        m_topo_property->getVertices().end(),
         vertices.begin(),
         vertices.end());
     for (uint i=0; i<getNbCoFaces(); i++)
@@ -164,27 +164,27 @@ replace(Vertex* v1, Vertex* v2, bool propagate_up, bool propagate_down, Internal
             // 2 cas de figure
             // soit v2 est déjà présent, donc la face commune va être dégénérée (v1 disparait)
             // soit v2 est nouveau, on remplace v1 par v2
-            if (Utils::find(m_topo_property->getVertexContainer(), v2)){
+            if (Utils::find(m_topo_property->getVertices(), v2)){
                 if (isStructured()){
                     if (getNbVertices() == 4){
                         // il faut mettre en premier le sommet conservé
                         // et en dernier le sommet qui va disparaitre
                         _permuteToFirstAndLastVertices(v2, v1, icmd);
 
-                        m_topo_property->getVertexContainer().resize(3);
+                        m_topo_property->getVertices().resize(3);
                     }
                     else {
-                        Utils::remove(m_topo_property->getVertexContainer(), v1, true);
+                        Utils::remove(m_topo_property->getVertices(), v1, true);
                     }
                 }
                 else {
                     _permuteToFirstAndLastVertices(v2, v1, icmd);
-                    uint new_size = m_topo_property->getVertexContainer().size()-1;
-                    m_topo_property->getVertexContainer().resize(new_size);
+                    uint new_size = m_topo_property->getVertices().size()-1;
+                    m_topo_property->getVertices().resize(new_size);
                 }
 
             } else
-                m_topo_property->getVertexContainer()[i] = v2;
+                m_topo_property->getVertices()[i] = v2;
 
         } // end if (v1 == getVertex(i))
 
@@ -216,7 +216,7 @@ replace(CoFace* cf1, CoFace* cf2, Internal::InfoCommand* icmd)
     for (uint i=0; i<getNbCoFaces(); i++)
         if (cf1 == getCoFace(i)){
             saveFaceTopoProperty(icmd);
-            m_topo_property->getCoFaceContainer()[i] = cf2;
+            m_topo_property->getCoFaces()[i] = cf2;
 
             cf1->saveCoFaceTopoProperty(icmd);
             cf2->saveCoFaceTopoProperty(icmd);
@@ -284,7 +284,7 @@ getNbVertices() const
         log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
     }
 #endif
-    return m_topo_property->getVertexContainer().size();
+    return m_topo_property->getVertices().size();
 }
 /*----------------------------------------------------------------------------*/
 void Face::getAllVertices(std::vector<Vertex* >& vertices, const bool unique) const
@@ -2012,7 +2012,7 @@ _permuteToFirstAndLastVertices(Vertex* v1, Vertex* v2, Internal::InfoCommand* ic
     if (!trouve1 || !trouve2)
         throw TkUtil::Exception (TkUtil::UTF8String ("Face::_permuteToFirstAndLastVertices ne trouve pas l'un des sommets", TkUtil::Charset::UTF_8));
 
-    std::vector<Vertex* > initial_vertices = m_topo_property->getVertexContainer();
+    std::vector<Vertex* > initial_vertices = m_topo_property->getVertices();
     std::vector<Vertex* > sorted_vertices;
 
     // le changement implique-t-il de permuter les ratios de FaceMeshProperty ?
@@ -2064,9 +2064,9 @@ _permuteToFirstAndLastVertices(Vertex* v1, Vertex* v2, Internal::InfoCommand* ic
             throw TkUtil::Exception (TkUtil::UTF8String ("Face::_permuteToFirstAndLastVertices n'arrive pas à ordonner les sommets", TkUtil::Charset::UTF_8));
     }
 
-    m_topo_property->getVertexContainer().clear();
-    m_topo_property->getVertexContainer().insert(
-        m_topo_property->getVertexContainer().end(),
+    m_topo_property->getVertices().clear();
+    m_topo_property->getVertices().insert(
+        m_topo_property->getVertices().end(),
         sorted_vertices.begin(),
         sorted_vertices.end());
 

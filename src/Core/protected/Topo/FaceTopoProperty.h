@@ -51,15 +51,15 @@ class Block;
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des sommets
-     std::vector<Vertex*>& getVertexContainer() {return m_vertices;}
+     std::vector<Vertex*>& getVertices() {return m_vertices;}
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des faces communes
-     std::vector<CoFace*>& getCoFaceContainer() {return m_cofaces;}
+     std::vector<CoFace*>& getCoFaces() {return m_cofaces;}
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des blocs
-     std::vector<Block*>& getBlockContainer() {return m_blocks;}
+     std::vector<Block*>& getBlocks() {return m_blocks;}
 
      /*------------------------------------------------------------------------*/
      /** \brief   Suppression des dépendances (entités topologiques incidentes)

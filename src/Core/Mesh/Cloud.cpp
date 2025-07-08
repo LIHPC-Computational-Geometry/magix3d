@@ -101,14 +101,14 @@ TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const Cloud & cl)
 /*----------------------------------------------------------------------------*/
 std::vector<Topo::CoEdge*>& Cloud::getCoEdges() const
 {
-    auto& edges = m_topo_property->getCoEdgeContainer();
+    auto& edges = m_topo_property->getCoEdges();
     Utils::checkIfDestroyed(edges);
     return edges;
 }
 /*----------------------------------------------------------------------------*/
 std::vector<Topo::Vertex*>& Cloud::getVertices() const
 {
-    auto& vertices = m_topo_property->getVertexContainer();
+    auto& vertices = m_topo_property->getVertices();
     Utils::checkIfDestroyed(vertices);
     return vertices;
 }

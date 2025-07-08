@@ -47,7 +47,7 @@ class CoFace;
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des faces
-     std::vector<CoFace*>& getCoFaceContainer() {return m_cofaces;}
+     std::vector<CoFace*>& getCoFaces() {return m_cofaces;}
 
      /*------------------------------------------------------------------------*/
      /** \brief   Suppression des relations

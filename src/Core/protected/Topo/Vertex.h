@@ -115,7 +115,7 @@ public:
      * \see saveVertexTopoProperty
      */
     void addCoEdge(CoEdge* e)
-    {m_topo_property->getCoEdgeContainer().push_back(e);}
+    {m_topo_property->getCoEdges().push_back(e);}
 
     /*------------------------------------------------------------------------*/
     /** \brief Enlève une relation vers une arête commune
@@ -125,20 +125,20 @@ public:
      * \see saveVertexTopoProperty
      */
     void removeCoEdge(CoEdge* e, const bool exceptionIfNotFound=true)
-    {Utils::remove(m_topo_property->getCoEdgeContainer(), e, exceptionIfNotFound);}
+    {Utils::remove(m_topo_property->getCoEdges(), e, exceptionIfNotFound);}
     /*------------------------------------------------------------------------*/
      /// Fournit l'accès aux arêtes topologiques communes incidentes sans copie
     std::vector<CoEdge* > & getCoEdges() const
-    {return m_topo_property->getCoEdgeContainer();}
+    {return m_topo_property->getCoEdges();}
 
     /*------------------------------------------------------------------------*/
     /// fournit l'accès à l'une des arêtes communes
     CoEdge* getCoEdge(uint ind) const
-    {return m_topo_property->getCoEdgeContainer().at(ind);}
+    {return m_topo_property->getCoEdges().at(ind);}
 
     /// retourne le nombre d'arêtes communes
     uint getNbCoEdges() const
-    {return m_topo_property->getCoEdgeContainer().size();}
+    {return m_topo_property->getCoEdges().size();}
 
     /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès aux arêtes topologiques incidentes
@@ -355,8 +355,8 @@ public:
     virtual void getGroupsName (std::vector<std::string>& gn, bool byGeom=true, bool byTopo=true) const;
 
     /// Accesseur sur le conteneur pour les groupes
-    std::vector<Group::Group0D*>& getGroupsContainer() {return m_topo_property->getGroupsContainer();}
-    const std::vector<Group::Group0D*>& getGroupsContainer() const {return m_topo_property->getGroupsContainer();}
+    std::vector<Group::Group0D*>& getGroups() {return m_topo_property->getGroups();}
+    const std::vector<Group::Group0D*>& getGroups() const {return m_topo_property->getGroups();}
 
     /*------------------------------------------------------------------------*/
     /** Nombre de noeuds internes

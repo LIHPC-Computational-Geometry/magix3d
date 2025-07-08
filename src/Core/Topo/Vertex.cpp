@@ -247,11 +247,11 @@ setDestroyed(bool b)
 		return;
 
 	if (b)
-		for (Group::Group0D* gr : getGroupsContainer()){
+		for (Group::Group0D* gr : getGroups()){
 			gr->remove(this);
 		}
 	else
-		for (Group::Group0D* gr : getGroupsContainer()){
+		for (Group::Group0D* gr : getGroups()){
 			gr->add(this);
 		}
 
@@ -368,7 +368,7 @@ getDescription (bool alsoComputed) const
 
     description->addPropertiesSet (topoRelation);
 
-    std::vector<Group::Group0D*> grp = getGroupsContainer();
+    std::vector<Group::Group0D*> grp = getGroups();
     if (!grp.empty()){
     	Utils::SerializedRepresentation  groupe ("Relation vers les groupes",
     			TkUtil::NumericConversions::toStr(grp.size()));
@@ -717,7 +717,7 @@ void Vertex::getGroupsName (std::vector<std::string>& gn, bool byGeom, bool byTo
 		TopoEntity::getGroupsName(gn, byGeom, byTopo);
 
 	if (byTopo)
-		for (Group::Group0D* gr : m_topo_property->getGroupsContainer())
+		for (Group::Group0D* gr : m_topo_property->getGroups())
 			gn.push_back(gr->getName());
 }
 /*----------------------------------------------------------------------------*/

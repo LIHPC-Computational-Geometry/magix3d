@@ -46,7 +46,7 @@ class CoEdge;
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des arêtes communes
-     std::vector<CoEdge*>& getCoEdgeContainer() {return m_coedges;}
+     std::vector<CoEdge*>& getCoEdges() {return m_coedges;}
 
      /*------------------------------------------------------------------------*/
      /** \brief   Suppression des relations

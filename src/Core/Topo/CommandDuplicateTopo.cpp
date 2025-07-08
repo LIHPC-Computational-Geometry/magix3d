@@ -340,7 +340,7 @@ duplicate(Block* bl)
         if (!m_groupName.empty()){
 	    	Group::Group3D* grp = getContext().getGroupManager().getNewGroup3D(m_groupName, &getInfoCommand());
 			grp->add(new_block);
-			new_block->getGroupsContainer().push_back(grp);
+			new_block->getGroups().push_back(grp);
 		}
     }
 
@@ -452,18 +452,18 @@ void CommandDuplicateTopo::updateGroups()
 				iter!=m_corr_block.end(); ++iter){
 		Block* t1 = (*iter).first;
 		Block* t2 = (*iter).second;
-		for (Group::Group3D* grp : t1->getGroupsContainer()){
+		for (Group::Group3D* grp : t1->getGroups()){
 			grp->add(t2);
-			t2->getGroupsContainer().push_back(grp);
+			t2->getGroups().push_back(grp);
 		}
 	}
 	for (std::map<CoFace*, CoFace*>::iterator iter = m_corr_coface.begin();
 				iter!=m_corr_coface.end(); ++iter){
 		CoFace* t1 = (*iter).first;
 		CoFace* t2 = (*iter).second;
-		for (Group::Group2D* grp : t1->getGroupsContainer()){
+		for (Group::Group2D* grp : t1->getGroups()){
 			grp->add(t2);
-			t2->getGroupsContainer().push_back(grp);
+			t2->getGroups().push_back(grp);
 		}
 	}
 }

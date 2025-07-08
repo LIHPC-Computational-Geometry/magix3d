@@ -193,7 +193,7 @@ void CommandAddRemoveGroupName::internalExecute()
             if (m_ope == add){
 
                 // il faut peut-être enlever le groupe par défaut
-                if (vtx->getGroupsContainer().size() == 1){
+                if (vtx->getGroups().size() == 1){
                     std::vector<std::string> gn;
                     vtx->getGroupsName(gn, false, true);
                     if (gn[0] == getContext().getGroupManager().getDefaultName(0))
@@ -202,15 +202,15 @@ void CommandAddRemoveGroupName::internalExecute()
 
                 // on ajoute le groupe
                 grp->add(vtx);
-                vtx->getGroupsContainer().push_back(grp);
+                vtx->getGroups().push_back(grp);
             }
             else if (m_ope == remove) {
                 // on retire le groupe
                 grp->remove(vtx);
-                Utils::remove(vtx->getGroupsContainer(), grp, true);
+                Utils::remove(vtx->getGroups(), grp, true);
 
                 // il faut peut-être ajouter au groupe par défaut
-                if (vtx->getGroupsContainer().size() == 0 && vtx->getGeomAssociation() == 0)
+                if (vtx->getGroups().size() == 0 && vtx->getGeomAssociation() == 0)
                     addGroup("", vtx);
 
             } else if (m_ope == set){
@@ -222,7 +222,7 @@ void CommandAddRemoveGroupName::internalExecute()
 
                 // on ajoute le groupe
                 grp->add(vtx);
-                vtx->getGroupsContainer().push_back(grp);
+                vtx->getGroups().push_back(grp);
 
             } else {
             	TkUtil::Exception ("[Erreur interne] Opération non prévue");
@@ -296,7 +296,7 @@ void CommandAddRemoveGroupName::internalExecute()
     		if (m_ope == add){
 
     			// il faut peut-être enlever le groupe par défaut
-    			if (coedge->getGroupsContainer().size() == 1){
+    			if (coedge->getGroups().size() == 1){
     				std::vector<std::string> gn;
     				coedge->getGroupsName(gn);
     				if (gn[0] == getContext().getGroupManager().getDefaultName(1))
@@ -305,17 +305,17 @@ void CommandAddRemoveGroupName::internalExecute()
 
     			// on ajoute le groupe
     			grp->add(coedge);
-    			coedge->getGroupsContainer().push_back(grp);
+    			coedge->getGroups().push_back(grp);
     			updateMesh(coedges, grp->getName(), true);
     		}
     		else if (m_ope == remove) {
     			// on retire le groupe
     			grp->remove(coedge);
-    			Utils::remove(coedge->getGroupsContainer(), grp, true);
+    			Utils::remove(coedge->getGroups(), grp, true);
     			updateMesh(coedges, grp->getName(), false);
 
     			// il faut peut-être ajouter au groupe par défaut
-    			if (coedge->getGroupsContainer().size() == 0 && coedge->getGeomAssociation() == 0)
+    			if (coedge->getGroups().size() == 0 && coedge->getGeomAssociation() == 0)
     				addGroup("", coedge);
 
     		} else if (m_ope == set){
@@ -327,7 +327,7 @@ void CommandAddRemoveGroupName::internalExecute()
 
                 // on ajoute le groupe
                 grp->add(coedge);
-                coedge->getGroupsContainer().push_back(grp);
+                coedge->getGroups().push_back(grp);
 
             } else {
             	TkUtil::Exception ("[Erreur interne] Opération non prévue");
@@ -401,7 +401,7 @@ void CommandAddRemoveGroupName::internalExecute()
     		if (m_ope == add){
 
     			// il faut peut-être enlever le groupe par défaut
-    			if (coface->getGroupsContainer().size() == 1){
+    			if (coface->getGroups().size() == 1){
     				std::vector<std::string> gn;
     				coface->getGroupsName(gn);
     				if (gn[0] == getContext().getGroupManager().getDefaultName(2))
@@ -410,17 +410,17 @@ void CommandAddRemoveGroupName::internalExecute()
 
     			// on ajoute le groupe
     			grp->add(coface);
-    			coface->getGroupsContainer().push_back(grp);
+    			coface->getGroups().push_back(grp);
     			updateMesh(cofaces, grp->getName(), true);
     		}
     		else if (m_ope == remove) {
     			// on retire le groupe
     			grp->remove(coface);
-    			Utils::remove(coface->getGroupsContainer(), grp, true);
+    			Utils::remove(coface->getGroups(), grp, true);
     			updateMesh(cofaces, grp->getName(), false);
 
     			// il faut peut-être ajouter au groupe par défaut
-    			if (coface->getGroupsContainer().size() == 0 && coface->getGeomAssociation() == 0)
+    			if (coface->getGroups().size() == 0 && coface->getGeomAssociation() == 0)
     				addGroup("", coface);
 
     		} else if (m_ope == set){
@@ -432,7 +432,7 @@ void CommandAddRemoveGroupName::internalExecute()
 
                 // on ajoute le groupe
                 grp->add(coface);
-                coface->getGroupsContainer().push_back(grp);
+                coface->getGroups().push_back(grp);
 
             } else {
             	TkUtil::Exception ("[Erreur interne] Opération non prévue");
@@ -507,7 +507,7 @@ void CommandAddRemoveGroupName::internalExecute()
     		if (m_ope == add){
 
     			// il faut peut-être enlever le groupe par défaut
-    			if (bloc->getGroupsContainer().size() == 1){
+    			if (bloc->getGroups().size() == 1){
     				std::vector<std::string> gn;
     				bloc->getGroupsName(gn);
     				if (gn[0] == getContext().getGroupManager().getDefaultName(3))
@@ -516,17 +516,17 @@ void CommandAddRemoveGroupName::internalExecute()
 
     			// on ajoute le groupe
     			grp->add(bloc);
-    			bloc->getGroupsContainer().push_back(grp);
+    			bloc->getGroups().push_back(grp);
     			updateMesh(blocs, grp->getName(), true);
     		}
     		else if (m_ope == remove) {
     			// on retire le groupe
     			grp->remove(bloc);
-    			Utils::remove(bloc->getGroupsContainer(), grp, true);
+    			Utils::remove(bloc->getGroups(), grp, true);
     			updateMesh(blocs, grp->getName(), false);
 
     			// il faut peut-être ajouter au groupe par défaut
-    			if (bloc->getGroupsContainer().size() == 0 && bloc->getGeomAssociation() == 0)
+    			if (bloc->getGroups().size() == 0 && bloc->getGeomAssociation() == 0)
     				addGroup("", bloc);
 
     		} else if (m_ope == set){
@@ -538,7 +538,7 @@ void CommandAddRemoveGroupName::internalExecute()
 
                 // on ajoute le groupe
                 grp->add(bloc);
-                bloc->getGroupsContainer().push_back(grp);
+                bloc->getGroups().push_back(grp);
                 updateMesh(blocs, grp->getName(), true);
 
             } else {
@@ -1005,7 +1005,7 @@ addGroup(std::string ng, Topo::Vertex* vtx)
 {
 	Group::Group0D* grp = getContext().getGroupManager().getNewGroup0D(ng, &getInfoCommand());
 	grp->add(vtx);
-	vtx->getGroupsContainer().push_back(grp);
+	vtx->getGroups().push_back(grp);
 	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
 }
 /*----------------------------------------------------------------------------*/
@@ -1023,7 +1023,7 @@ removeGroup(std::string ng, Topo::Vertex* vtx)
 {
 	Group::Group0D* grp = getContext().getGroupManager().getGroup0D(ng, &getInfoCommand());
 	grp->remove(vtx);
-	Utils::remove(vtx->getGroupsContainer(), grp, true);
+	Utils::remove(vtx->getGroups(), grp, true);
 	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
 }
 /*----------------------------------------------------------------------------*/
@@ -1042,7 +1042,7 @@ addGroup(std::string ng, Topo::CoEdge* coedge)
 {
 	Group::Group1D* grp = getContext().getGroupManager().getNewGroup1D(ng, &getInfoCommand());
 	grp->add(coedge);
-	coedge->getGroupsContainer().push_back(grp);
+	coedge->getGroups().push_back(grp);
 	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
 	std::vector<Topo::CoEdge*>  coedges;
 	coedges.push_back(coedge);
@@ -1064,7 +1064,7 @@ removeGroup(std::string ng, Topo::CoEdge* coedge)
 {
 	Group::Group1D* grp = getContext().getGroupManager().getGroup1D(ng, &getInfoCommand());
 	grp->remove(coedge);
-	Utils::remove(coedge->getGroupsContainer(), grp, true);
+	Utils::remove(coedge->getGroups(), grp, true);
 	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
 	std::vector<Topo::CoEdge*>  coedges;
 	coedges.push_back(coedge);
@@ -1086,7 +1086,7 @@ addGroup(std::string ng, Topo::CoFace* coface)
 {
 	Group::Group2D* grp = getContext().getGroupManager().getNewGroup2D(ng, &getInfoCommand());
 	grp->add(coface);
-	coface->getGroupsContainer().push_back(grp);
+	coface->getGroups().push_back(grp);
 	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
 	std::vector<Topo::CoFace*>  cofaces;
 	cofaces.push_back(coface);
@@ -1108,7 +1108,7 @@ removeGroup(std::string ng, Topo::CoFace* coface)
 {
 	Group::Group2D* grp = getContext().getGroupManager().getGroup2D(ng, &getInfoCommand());
 	grp->remove(coface);
-	Utils::remove(coface->getGroupsContainer(), grp, true);
+	Utils::remove(coface->getGroups(), grp, true);
 	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
 	std::vector<Topo::CoFace*>  cofaces;
 	cofaces.push_back(coface);
@@ -1130,7 +1130,7 @@ addGroup(std::string ng, Topo::Block* bloc)
 {
 	Group::Group3D* grp = getContext().getGroupManager().getNewGroup3D(ng, &getInfoCommand());
 	grp->add(bloc);
-	bloc->getGroupsContainer().push_back(grp);
+	bloc->getGroups().push_back(grp);
 	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
 	std::vector<Topo::Block*>  blocs;
 	blocs.push_back(bloc);
@@ -1152,7 +1152,7 @@ removeGroup(std::string ng, Topo::Block* bloc)
 {
 	Group::Group3D* grp = getContext().getGroupManager().getGroup3D(ng, &getInfoCommand());
 	grp->remove(bloc);
-	Utils::remove(bloc->getGroupsContainer(), grp, true);
+	Utils::remove(bloc->getGroups(), grp, true);
 	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
 	std::vector<Topo::Block*>  blocs;
 	blocs.push_back(bloc);

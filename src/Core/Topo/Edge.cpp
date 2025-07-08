@@ -50,12 +50,12 @@ Edge(Internal::Context& ctx,
     ce->addEdge(this);
 
     const std::vector<Vertex* > & vertices = ce->getVertices();
-    m_topo_property->getVertexContainer().insert(
-        m_topo_property->getVertexContainer().end(),
+    m_topo_property->getVertices().insert(
+        m_topo_property->getVertices().end(),
         vertices.begin(),
         vertices.end());
 
-    m_topo_property->getCoEdgeContainer().push_back(ce);
+    m_topo_property->getCoEdges().push_back(ce);
 	ctx.newGraphicalRepresentation (*this);
 }
 /*----------------------------------------------------------------------------*/
@@ -72,11 +72,11 @@ Edge(Internal::Context& ctx,
 , m_mesh_property (new EdgeMeshingProperty())
 , m_save_mesh_property (0)
 {
-    m_topo_property->getVertexContainer().push_back(v1);
-    m_topo_property->getVertexContainer().push_back(v2);
+    m_topo_property->getVertices().push_back(v1);
+    m_topo_property->getVertices().push_back(v2);
 
-    m_topo_property->getCoEdgeContainer().insert(
-        m_topo_property->getCoEdgeContainer().end(),
+    m_topo_property->getCoEdges().insert(
+        m_topo_property->getCoEdges().end(),
         coedges.begin(),
         coedges.end());
 
@@ -150,9 +150,9 @@ void Edge::sortCoEdges()
         throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne avec Edge::sortCoEdges()", TkUtil::Charset::UTF_8));
     }
 
-    m_topo_property->getCoEdgeContainer().clear();
-    m_topo_property->getCoEdgeContainer().insert(
-        m_topo_property->getCoEdgeContainer().end(),
+    m_topo_property->getCoEdges().clear();
+    m_topo_property->getCoEdges().insert(
+        m_topo_property->getCoEdges().end(),
         sorted_coedges.begin(),
         sorted_coedges.end());
 }
@@ -188,7 +188,7 @@ void Edge::replace(Vertex* v1, Vertex* v2, bool propagate_up, bool propagate_dow
             found = true;
 
             saveEdgeTopoProperty(icmd);
-            m_topo_property->getVertexContainer()[i] = v2;
+            m_topo_property->getVertices()[i] = v2;
         }
     }
 
@@ -240,7 +240,7 @@ void Edge::replace(CoEdge* e1, CoEdge* e2, Internal::InfoCommand* icmd)
         	}
 
             saveEdgeTopoProperty(icmd);
-            m_topo_property->getCoEdgeContainer()[i] = e2;
+            m_topo_property->getCoEdges()[i] = e2;
 
             e1->saveCoEdgeTopoProperty(icmd);
             e2->saveCoEdgeTopoProperty(icmd);
@@ -295,9 +295,9 @@ void Edge::replace(CoEdge* e1, std::vector<CoEdge*>& coedges, Internal::InfoComm
     	coedges[i]->saveCoEdgeTopoProperty(icmd);
     	coedges[i]->addEdge(this);
     }
-    m_topo_property->getCoEdgeContainer().clear();
-    m_topo_property->getCoEdgeContainer().insert(
-        m_topo_property->getCoEdgeContainer().end(),
+    m_topo_property->getCoEdges().clear();
+    m_topo_property->getCoEdges().insert(
+        m_topo_property->getCoEdges().end(),
         new_edges.begin(),
         new_edges.end());
 #ifdef _DEBUG2
@@ -936,7 +936,7 @@ getNbVertices() const
         log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
     }
 #endif
-    return m_topo_property->getVertexContainer().size();
+    return m_topo_property->getVertices().size();
 }
 /*----------------------------------------------------------------------------*/
 void Edge::getAllVertices(std::vector<Vertex* >& vertices, const bool unique) const

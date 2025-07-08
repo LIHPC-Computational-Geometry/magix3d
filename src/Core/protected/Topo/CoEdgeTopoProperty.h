@@ -52,15 +52,15 @@ class Edge;
      }
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des sommets
-     std::vector<Vertex*>& getVertexContainer() {return m_vertices;}
+     std::vector<Vertex*>& getVertices() {return m_vertices;}
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des arêtes
-     std::vector<Edge*>& getEdgeContainer() {return m_edges;}
+     std::vector<Edge*>& getEdges() {return m_edges;}
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des groupes
-     std::vector<Group::Group1D*>& getGroupsContainer() {return m_groups;}
+     std::vector<Group::Group1D*>& getGroups() {return m_groups;}
 
     /*------------------------------------------------------------------------*/
      /** \brief   Suppression des dépendances (entités topologiques incidentes)

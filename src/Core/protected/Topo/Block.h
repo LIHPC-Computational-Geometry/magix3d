@@ -189,11 +189,11 @@ public:
     /** Fournit l'accès aux sommets topologiques incidents sans copie
      */
     std::vector<Topo::Vertex* >& getVertices() const
-    {return m_topo_property->getVertexContainer();}
+    {return m_topo_property->getVertices();}
 
     /// fournit l'accès à l'un des sommets
     Topo::Vertex* getVertex(uint ind) const
-    {return m_topo_property->getVertexContainer().at(ind);}
+    {return m_topo_property->getVertices().at(ind);}
 
     /** Retourne le sommet suivant ses coordonnées logiques dans le bloc lorsqu'il est structuré
     @param cote_i faux pour i minimum
@@ -204,7 +204,7 @@ public:
 
     /// retourne l'indice d'un sommet
     uint getIndexOf(Topo::Vertex* v)
-    {return Utils::getIndexOf(m_topo_property->getVertexContainer(), v);}
+    {return Utils::getIndexOf(m_topo_property->getVertices(), v);}
 
     /// retourne la liste des 8 sommets en duplicant les derniers en cas de dégénérescence
     std::vector<Topo::Vertex* > getHexaVertices() const;
@@ -216,15 +216,15 @@ public:
     /** \brief  Fournit l'accès aux faces topologiques incidentes sans copie
      */
     std::vector<Face* > getFaces() const
-    {return m_topo_property->getFaceContainer();}
+    {return m_topo_property->getFaces();}
 
     /// Accesseur pour l'une des faces
     Face* getFace(uint id) const
-    {return m_topo_property->getFaceContainer().at(id);}
+    {return m_topo_property->getFaces().at(id);}
 
     /// retourne l'indice d'une face
     const uint getIndexOf(Face* f) const
-    {return Utils::getIndexOf(m_topo_property->getFaceContainer(), f);}
+    {return Utils::getIndexOf(m_topo_property->getFaces(), f);}
 
     /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès aux faces communes topologiques incidentes
@@ -496,8 +496,8 @@ public:
     virtual void getGroupsName (std::vector<std::string>& gn, bool byGeom=true, bool byTopo=true) const;
 
     /// Accesseur sur le conteneur pour les groupes
-    std::vector<Group::Group3D*>& getGroupsContainer() {return m_topo_property->getGroupsContainer();}
-    const std::vector<Group::Group3D*>& getGroupsContainer() const {return m_topo_property->getGroupsContainer();}
+    std::vector<Group::Group3D*>& getGroups() {return m_topo_property->getGroups();}
+    const std::vector<Group::Group3D*>& getGroups() const {return m_topo_property->getGroups();}
 
     /*------------------------------------------------------------------------*/
     /// Nombre de noeuds internes: le nombre de noeuds sans ceux du bord

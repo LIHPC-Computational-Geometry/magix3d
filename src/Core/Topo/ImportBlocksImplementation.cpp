@@ -78,7 +78,7 @@ void ImportBlocksImplementation::internalExecute() {
             vnames[i] = vtx->getName();
             m_icmd->addTopoInfoEntity(vtx, Internal::InfoCommand::CREATED);
             group0->add(vtx);
-            vtx->getGroupsContainer().push_back(group0);
+            vtx->getGroups().push_back(group0);
         }
 
 
@@ -111,7 +111,7 @@ void ImportBlocksImplementation::internalExecute() {
             enames[i] = edge->getName();
             m_icmd->addTopoInfoEntity(edge, Internal::InfoCommand::CREATED);
             group1->add(edge);
-            edge->getGroupsContainer().push_back(group1);
+            edge->getGroups().push_back(group1);
         }
 
 
@@ -291,7 +291,7 @@ void ImportBlocksImplementation::internalExecute() {
             fnames[i] = face->getName();
             m_icmd->addTopoInfoEntity(face, Internal::InfoCommand::CREATED);
             group2->add(face);
-            face->getGroupsContainer().push_back(group2);
+            face->getGroups().push_back(group2);
         }
 
     /*----------------------------------------------------------------------------*/
@@ -402,7 +402,7 @@ void ImportBlocksImplementation::internalExecute() {
             Block* block = new Block(m_c, faces, vs, true);
             m_icmd->addTopoInfoEntity(block, Internal::InfoCommand::CREATED);
             group3->add(block);
-            block->getGroupsContainer().push_back(group3);
+            block->getGroups().push_back(group3);
 
 
             //block->check();

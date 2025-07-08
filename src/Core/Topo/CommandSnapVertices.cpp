@@ -533,7 +533,7 @@ internalExecute()
 
                 Block* bloc = face->getBlock(0);
                 bloc->saveBlockTopoProperty(&getInfoCommand());
-                Utils::remove(bloc->getBlockTopoProperty()->getFaceContainer(), face, true);
+                Utils::remove(bloc->getBlockTopoProperty()->getFaces(), face, true);
                 face->free(&getInfoCommand());
             }
 
@@ -575,8 +575,8 @@ internalExecute()
 #endif
             // cas similaire à Block::degenerateFaceInEdge
             if (bloc->getVertex(4) == bloc->getVertex(5))
-                bloc->getBlockTopoProperty()->getVertexContainer()[5] = bloc->getVertex(6);
-            bloc->getBlockTopoProperty()->getVertexContainer().resize(6);
+                bloc->getBlockTopoProperty()->getVertices()[5] = bloc->getVertex(6);
+            bloc->getBlockTopoProperty()->getVertices().resize(6);
         }
         else {
 #ifdef _DEBUG_SNAP
@@ -605,9 +605,9 @@ internalExecute()
             		// pour ne prendre qu'une fois le sommet
             		filtre_vertex[vtx] = 4;
             }
-            bloc->getBlockTopoProperty()->getVertexContainer().clear();
-            bloc->getBlockTopoProperty()->getVertexContainer().insert(
-                bloc->getBlockTopoProperty()->getVertexContainer().end(),
+            bloc->getBlockTopoProperty()->getVertices().clear();
+            bloc->getBlockTopoProperty()->getVertices().insert(
+                bloc->getBlockTopoProperty()->getVertices().end(),
                 loc_vtx.begin(),
                 loc_vtx.end());
 

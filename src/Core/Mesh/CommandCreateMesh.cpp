@@ -1009,7 +1009,7 @@ meshAndModify(const Utils::EntitySet<Topo::CoFace*>& cofaces)
 		} // end if getGeomAssociation
 
 		// les groupes depuis les faces
-		for (Group::Group2D* grp : coface->getGroupsContainer()){
+		for (Group::Group2D* grp : coface->getGroups()){
 			if (grp->getNbMeshModif() != 0)
 				groups.insert(grp);
 		}
@@ -1248,7 +1248,7 @@ modify(std::vector<Topo::Block*>& list_blocks)
 		}
 
 		// les groupes depuis les blocs
-		for (Group::Group3D* grp : block->getGroupsContainer()){
+		for (Group::Group3D* grp : block->getGroups()){
 			if (grp->getNbMeshModif() != 0)
 				list_grp.insert(grp);
 		}

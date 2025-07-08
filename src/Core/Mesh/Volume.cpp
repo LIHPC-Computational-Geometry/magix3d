@@ -347,17 +347,17 @@ TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const Volume & cl)
 /*----------------------------------------------------------------------------*/
 void Volume::addBlock(Topo::Block* b)
 {
-    m_topo_property->getBlockContainer().push_back(b);
+    m_topo_property->getBlocks().push_back(b);
 }
 /*----------------------------------------------------------------------------*/
 void Volume::removeBlock(Topo::Block* b)
 {
-    Utils::remove(m_topo_property->getBlockContainer(), b, true);
+    Utils::remove(m_topo_property->getBlocks(), b, true);
 }
 /*----------------------------------------------------------------------------*/
 std::vector<Topo::Block* >& Volume::getBlocks() const
 {
-	auto& blocks = m_topo_property->getBlockContainer();
+	auto& blocks = m_topo_property->getBlocks();
     Utils::checkIfDestroyed(blocks);
     return blocks;
 }
@@ -466,7 +466,7 @@ saveMeshVolumeTopoProperty(Internal::InfoCommand* icmd)
         icmd->addMeshInfoEntity(this,Internal::InfoCommand::DISPMODIFIED);
         if (m_save_topo_property == 0){
 //            std::cout<<"  clone du MeshVolumeTopoProperty avec "
-//                    <<m_topo_property->getBlockContainer().size()<<" blocs"<<std::endl;
+//                    <<m_topo_property->getBlocks().size()<<" blocs"<<std::endl;
             m_save_topo_property = m_topo_property->clone();
         }
     }
@@ -477,8 +477,8 @@ Topo::MeshVolumeTopoProperty* Volume::
 setProperty(Topo::MeshVolumeTopoProperty* prop)
 {
 //    std::cout<<"Mesh::Volume::setProperty, on passe de "
-//            <<m_topo_property->getBlockContainer().size()
-//            <<" à "<<prop->getBlockContainer().size()<<" blocs"<<std::endl;
+//            <<m_topo_property->getBlocks().size()
+//            <<" à "<<prop->getBlocks().size()<<" blocs"<<std::endl;
     Topo::MeshVolumeTopoProperty* tmp = m_topo_property;
     m_topo_property = prop;
     m_bounds_to_be_calculate = true;
@@ -492,7 +492,7 @@ saveInternals(Mesh::CommandCreateMesh* ccm)
     if (m_save_topo_property) {
         ccm->addVolumeInfoTopoProperty(this, m_save_topo_property);
 //        std::cout<<"  -> sauvegarde m_save_topo_property avec "
-//                <<m_save_topo_property->getBlockContainer().size()<<" blocs"<<std::endl;
+//                <<m_save_topo_property->getBlocks().size()<<" blocs"<<std::endl;
         m_save_topo_property = 0;
     }
     m_bounds_to_be_calculate = true;
