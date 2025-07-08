@@ -246,10 +246,12 @@ void CommandClearGroupName::internalExecute()
 /*----------------------------------------------------------------------------*/
 void CommandClearGroupName::internalUndo()
 {
+	Group::GroupManager& gm = getContext().getGroupManager();
+	std::string default_group_name = gm.getDefaultName(m_dim);
 
 	switch(m_dim){
 	case(0):{
-		Group::Group0D* grp = getContext().getGroupManager().getNewGroup0D(m_groupName, &getInfoCommand());
+		Group::Group0D* grp = gm.getNewGroup0D(m_groupName, &getInfoCommand());
 
 		for (std::vector<Geom::GeomEntity*>::iterator iter = m_geom_entities.begin();
 				iter != m_geom_entities.end(); ++iter){
@@ -257,7 +259,6 @@ void CommandClearGroupName::internalUndo()
 			CHECK_NULL_PTR_ERROR(vtx);
 
 			addGroup(m_groupName, vtx);
-
 		} // end for iter
 
 		for (std::vector<Topo::TopoEntity*>::iterator iter = m_topo_entities.begin();
@@ -266,20 +267,24 @@ void CommandClearGroupName::internalUndo()
 			CHECK_NULL_PTR_ERROR(te);
 
 			addGroup(m_groupName, te);
-
 		} // end for iter
 	}
 	break;
 	case(1):{
-		Group::Group1D* grp = getContext().getGroupManager().getNewGroup1D(m_groupName, &getInfoCommand());
+		Group::Group1D* grp = gm.getNewGroup1D(m_groupName, &getInfoCommand());
 
 		for (std::vector<Geom::GeomEntity*>::iterator iter = m_geom_entities.begin();
 				iter != m_geom_entities.end(); ++iter){
 			Geom::Curve* crv =  dynamic_cast<Geom::Curve*>(*iter);
 			CHECK_NULL_PTR_ERROR(crv);
 
-			addGroup(m_groupName, crv);
+			// 1 seul groupe qui est le groupe par défaut ? => on le supprime
+			std::vector<std::string> groupsName;
+			crv->getGroupsName(groupsName);
+			if (groupsName.size() == 1 && groupsName[0] == default_group_name)
+				removeGroup("", crv);
 
+			addGroup(m_groupName, crv);
 		} // end for iter
 
 		for (std::vector<Topo::TopoEntity*>::iterator iter = m_topo_entities.begin();
@@ -288,20 +293,24 @@ void CommandClearGroupName::internalUndo()
 			CHECK_NULL_PTR_ERROR(te);
 
 			addGroup(m_groupName, te);
-
 		} // end for iter
 	}
 	break;
 	case(2):{
-		Group::Group2D* grp = getContext().getGroupManager().getNewGroup2D(m_groupName, &getInfoCommand());
+		Group::Group2D* grp = gm.getNewGroup2D(m_groupName, &getInfoCommand());
 
 		for (std::vector<Geom::GeomEntity*>::iterator iter = m_geom_entities.begin();
 				iter != m_geom_entities.end(); ++iter){
 			Geom::Surface* srf =  dynamic_cast<Geom::Surface*>(*iter);
 			CHECK_NULL_PTR_ERROR(srf);
 
-			addGroup(m_groupName, srf);
+			// 1 seul groupe qui est le groupe par défaut ? => on le supprime
+			std::vector<std::string> groupsName;
+			srf->getGroupsName(groupsName);
+			if (groupsName.size() == 1 && groupsName[0] == default_group_name)
+				removeGroup("", srf);
 
+			addGroup(m_groupName, srf);
 		} // end for iter
 
 		for (std::vector<Topo::TopoEntity*>::iterator iter = m_topo_entities.begin();
@@ -310,20 +319,24 @@ void CommandClearGroupName::internalUndo()
 			CHECK_NULL_PTR_ERROR(te);
 
 			addGroup(m_groupName, te);
-
 		} // end for iter
 	}
 	break;
 	case(3):{
-		Group::Group3D* grp = getContext().getGroupManager().getNewGroup3D(m_groupName, &getInfoCommand());
+		Group::Group3D* grp = gm.getNewGroup3D(m_groupName, &getInfoCommand());
 
 		for (std::vector<Geom::GeomEntity*>::iterator iter = m_geom_entities.begin();
 				iter != m_geom_entities.end(); ++iter){
 			Geom::Volume* vol =  dynamic_cast<Geom::Volume*>(*iter);
 			CHECK_NULL_PTR_ERROR(vol);
 
-			addGroup(m_groupName, vol);
+			// 1 seul groupe qui est le groupe par défaut ? => on le supprime
+			std::vector<std::string> groupsName;
+			vol->getGroupsName(groupsName);
+			if (groupsName.size() == 1 && groupsName[0] == default_group_name)
+				removeGroup("", vol);
 
+			addGroup(m_groupName, vol);
 		} // end for iter
 
 		for (std::vector<Topo::TopoEntity*>::iterator iter = m_topo_entities.begin();
@@ -332,7 +345,6 @@ void CommandClearGroupName::internalUndo()
 			CHECK_NULL_PTR_ERROR(te);
 
 			addGroup(m_groupName, te);
-
 		} // end for iter
 	}
 	break;
