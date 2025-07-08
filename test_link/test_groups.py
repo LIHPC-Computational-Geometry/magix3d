@@ -173,3 +173,16 @@ def test_undo_add_to_group():
     ctx.undo()
     # Hors_Groupe_3D n'est plus détruit après fix de l'issue#215
     assert "DETRUIT" not in ctx.getGroupManager().getInfos("Hors_Groupe_3D", 3)
+
+# Issue #214
+def test_undo_clear_group():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    # Création d'une boite avec une topologie
+    ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10, "BOX")
+    # Vide le groupe BOX
+    ctx.getGroupManager().clearGroup (3, "BOX")
+    # Annulation de : Vide le groupe BOX
+    ctx.undo()
+    # Vol0000 ne devrait pas être dans Hors_Groupe_3D mais seulement dans BOX
+    assert "Vol0000" not in ctx.getGroupManager().getGeomVolumes("Hors_Groupe_3D", 3)
