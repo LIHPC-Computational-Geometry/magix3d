@@ -171,9 +171,9 @@ std::vector<std::string> TopoManager::getVertices() const
     return Utils::getEntityNames(m_vertices);
 }
 /*----------------------------------------------------------------------------*/
-std::vector<Block*> TopoManager::getBlocksObj(bool sort) const
+std::vector<Block*> TopoManager::getBlocksObj() const
 {
-    return Utils::getEntities(m_blocks, sort);
+    return Utils::getEntities(m_blocks);
 }
 /*----------------------------------------------------------------------------*/
 void TopoManager::add(Block* b)
@@ -370,7 +370,7 @@ int TopoManager::getNbEdges() const
 /*----------------------------------------------------------------------------*/
 std::vector<Topo::CoFace*> TopoManager::getCoFacesObj() const
 {
-    return Utils::getEntities(m_cofaces, true);
+    return Utils::getEntities(m_cofaces);
 }
 /*----------------------------------------------------------------------------*/
 CoFace* TopoManager::getCoFace(const std::string& name, const bool exceptionIfNotFound) const
@@ -466,7 +466,7 @@ Face* TopoManager::getFace(const std::string& name, const bool exceptionIfNotFou
 /*----------------------------------------------------------------------------*/
 std::vector<Topo::CoEdge*> TopoManager::getCoEdgesObj() const
 {
-    return Utils::getEntities(m_coedges, true);
+    return Utils::getEntities(m_coedges);
 }
 /*----------------------------------------------------------------------------*/
 CoEdge* TopoManager::getCoEdge(const std::string& name, const bool exceptionIfNotFound) const
@@ -564,7 +564,7 @@ Edge* TopoManager::getEdge(const std::string& name, const bool exceptionIfNotFou
 /*----------------------------------------------------------------------------*/
 std::vector<Topo::Vertex*> TopoManager::getVerticesObj() const
 {
-    return Utils::getEntities(m_vertices, true);
+    return Utils::getEntities(m_vertices);
 }
 /*----------------------------------------------------------------------------*/
 Vertex* TopoManager::getVertex(const std::string& name, const bool exceptionIfNotFound) const

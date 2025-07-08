@@ -428,7 +428,7 @@ void MeshImplementation::writeCGNS(std::string nom)
 		throw TkUtil::Exception (TkUtil::UTF8String ("Erreur dans cg_base_write", TkUtil::Charset::UTF_8));
 
 	// on ajoute un à un tous les blocks maillés et structurés
-	for (Topo::Block* bloc : getContext().getTopoManager().getBlocksObj(true)){
+	for (Topo::Block* bloc : getContext().getTopoManager().getBlocksObj()){
 		if (bloc->isMeshed() && bloc->isStructured()){
 
 			if (bloc->getVertices().size() != 8){

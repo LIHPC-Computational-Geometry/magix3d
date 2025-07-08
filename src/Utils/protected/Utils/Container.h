@@ -88,16 +88,14 @@ getVisibleNb(const std::vector<T*>& container)
 }
 /*----------------------------------------------------------------------------*/
 template <typename T> static std::vector<T*>
-getEntities(const std::vector<T*>& container, bool sort = false)
+getEntities(const std::vector<T*>& container)
 {
     std::vector<T*> ret;
     for (T* entity : container)
         if (!entity->isDestroyed())
             ret.push_back(entity);
 
-    if (sort) {
-        std::sort(ret.begin(), ret.end(), Utils::Entity::compareEntity);
-    }
+    std::sort(ret.begin(), ret.end(), Utils::Entity::compareEntity);
     return ret;
 }
 /*----------------------------------------------------------------------------*/

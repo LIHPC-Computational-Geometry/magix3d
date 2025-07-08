@@ -1746,7 +1746,7 @@ public:
     /** \brief retourne la liste des blocs gérées par le manager,
      * optionnellement triés par id
      * */
-    std::vector<Topo::Block*> getBlocksObj(bool sort=false) const;
+    std::vector<Topo::Block*> getBlocksObj() const;
 
     /*------------------------------------------------------------------------*/
     /** Retourne le Block suivant le nom en argument */
