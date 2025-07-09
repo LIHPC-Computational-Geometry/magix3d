@@ -157,6 +157,12 @@ replace(Topo::Vertex* v1, Topo::Vertex* v2, bool propagate_up, bool propagate_do
 
     // transmet aux Edges
 	if (propagate_up)
+		/* 
+		 * 9/7/2025  ** ATTENTION **
+		 * Ne pas passer en "modern C++ loop" : for (Edge* e : getEdges())
+		 * car Edge::replace appelle Edge::free qui modifie la liste
+		 * des edges de la coedge ce qui perturbe le parcours de la boucle.
+		*/
 		for (uint j=0; j<getNbEdges(); j++)
 			getEdge(j)->replace(v1, v2, propagate_up, propagate_down, icmd);
 
