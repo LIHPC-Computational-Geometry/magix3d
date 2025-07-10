@@ -29,7 +29,8 @@ class GeomProperty;
  *        géométrique
  */
 class Volume: public GeomEntity {
-
+    
+    friend class GeomModificationBaseClass;
     friend class MementoManager;
     static const char* typeNameGeomVolume;
 
