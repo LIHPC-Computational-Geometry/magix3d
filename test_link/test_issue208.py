@@ -1,7 +1,6 @@
 import pyMagix3D as Mgx3D
 
-# Vérification que le maillage Tetra fonctionne
-def test_issue208():
+def test_issue208_2_sectionByPlane():
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     gm = ctx.getGeomManager()
@@ -23,3 +22,21 @@ def test_issue208():
     assert len(surf22_vertices) == 4
     assert "Pt0026" in surf22_vertices
     assert "Pt0027" in surf22_vertices
+
+def test_issue208_single_sectionByPlane():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    gm = ctx.getGeomManager()
+
+    # Création de la boite Vol0000
+    gm.newBox(Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1))
+    # Création de la boite Vol0001
+    gm.newBox(Mgx3D.Point(1, 0, 0), Mgx3D.Point(1.5, 1, 1))
+    # Création de la boite Vol0002
+    gm.newBox(Mgx3D.Point(1.5, 0, 0), Mgx3D.Point(3, 1, 1))
+    # Collage entre Vol0000 Vol0001 Vol0002
+    gm.glue(["Vol0000","Vol0001","Vol0002"])
+    gm.sectionByPlane(["Vol0000", "Vol0002"], Mgx3D.Plane(Mgx3D.Point(0, 0, .2), Mgx3D.Vector(0, 0, 1)), "")
+
+    # Vol0001 se trouve découpé à tort => 6 volumes au lieu de 5
+    assert gm.getNbVolumes() == 5
