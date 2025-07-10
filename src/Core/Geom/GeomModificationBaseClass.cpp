@@ -2217,6 +2217,8 @@ void GeomModificationBaseClass::createNewAdjVolumes(
                 to_keep = true;
                 newVolume = current;
                 newOCCVolume = V;
+                // il faut mettre à jour la OCC shape en cas de non conformité d'une face (issue#208)
+                newVolume->m_occ_shape = V;
                 m_toKeepVolumes.push_back(current);
 #ifdef _DEBUG2
                 std::cout<<"=*= VOLUME ADJ CONSERVE "<<newVolume->getName()<<std::endl;
