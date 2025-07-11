@@ -783,10 +783,10 @@ void GeomModificationBaseClass::rebuildAdjacencyEntities(const TopoDS_Shape& sha
 
         for(unsigned int is=0;is<surfs.size();is++)
         {
-#ifdef _DEBUG2
-            std::cout<<" \t surf. "<<surfs[is]->getName()<<std::endl;
-#endif
             std::map<GeomEntity*,std::vector<GeomEntity*> >::const_iterator it=m_replacedEntities.find(surfs[is]);
+#ifdef _DEBUG2
+            std::cout<<" \t surf. "<<surfs[is]->getName()<<(it==m_replacedEntities.end()?" modifiée":" intacte")<<std::endl;
+#endif
             if(it!=m_replacedEntities.end())
             {
                 surf_modified=true;

@@ -24,10 +24,10 @@ public:
     /** \brief Constructeur
      *
      *  \param c    le contexte
-     *  \param es   les entités à découper
+     *  \param e   l'entité à découper
      *  \param p    le plan de coupe
      */
-    CommandSectionByPlane(Internal::Context& c, std::vector<GeomEntity*>& es,
+    CommandSectionByPlane(Internal::Context& c, GeomEntity* e,
                             Utils::Math::Plane* p,
                             std::string planeGroupName);
 
@@ -46,20 +46,17 @@ public:
      */
     void internalSpecificPreExecute();
 
-
-    void removeNonIntersectedEntities();
-
 protected:
+    bool isIntersected();
 
     /// valide les paramètres
     void validate();
 
-    /* entités à découper*/
-    std::vector<GeomEntity*> m_entities;
+    /* entité à découper*/
+    GeomEntity* m_entity;
 
     /* outil de découpe */
     Utils::Math::Plane* m_tool;
-
 
     /* outil de découpe */
     std::string m_planeName;
