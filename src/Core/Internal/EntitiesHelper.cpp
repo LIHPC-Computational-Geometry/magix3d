@@ -646,7 +646,7 @@ double EntitiesHelper::angle(const Utils::Entity* cec, const Utils::Entity* ce1,
 bool EntitiesHelper::getBounds (const std::vector<Utils::Entity*>& entities, double bounds [6])
 {
 	bounds [0]	= bounds [2]	= bounds [4]	= std::numeric_limits<double>::max();
-	bounds [1]	= bounds [3]	= bounds [5]	= std::numeric_limits<double>::min();
+	bounds [1]	= bounds [3]	= bounds [5]	= std::numeric_limits<double>::lowest();
 	if (true == entities.empty ( ))
 		return false;
 
