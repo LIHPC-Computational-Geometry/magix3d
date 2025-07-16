@@ -7,6 +7,7 @@ enable_testing()
 find_program(PYTEST_LOCATION pytest)
 message("PYTEST_LOCATION= ${PYTEST_LOCATION}")
 message("ENVIRONMENT PYTHONPATH ${PYTHONPATH}")
+message("ENVIRONMENT MAGIX3D_TEST_DATA_DIR ${MAGIX3D_TEST_DATA_DIR}")
 #message("ENVIRONMENT PYTHONPATH ${CMAKE_PREFIX_PATH}/lib/python3.10/site-packages:$PYTHONPATH")
 
 add_test(NAME test_link
