@@ -99,7 +99,7 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
 template<typename T>
 void GeomEntity::
 buildSerializedRepresentation(Utils::SerializedRepresentation& description, const std::string& title, 
-    const std::set<T*, decltype(&Utils::Entity::compareEntity)> elements) const
+    const Utils::EntitySet<T*> elements) const
 {
     if (!elements.empty()){
         Utils::SerializedRepresentation	sr (title,TkUtil::NumericConversions::toStr(elements.size()));
