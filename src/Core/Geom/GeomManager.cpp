@@ -1613,7 +1613,7 @@ copyAndMirror(std::vector<Geom::GeomEntity*>& entities, Utils::Math::Plane* plan
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias ( ) << ".getGeomManager ( ).copyAndMirror (" << Internal::entitiesToPythonList<GeomEntity> (entities) << ", " << plane->getScriptCommand ( ) << ")";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).copyAndMirror (" << Internal::entitiesToPythonList<GeomEntity> (entities) << ", " << plane->getScriptCommand ( );
     if(withTopo)
         cmd <<", True,\""<<groupName<<"\")";
     else
