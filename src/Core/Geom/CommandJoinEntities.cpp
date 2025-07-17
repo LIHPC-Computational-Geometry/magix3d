@@ -90,6 +90,11 @@ std::list<GeomEntity*>& CommandJoinEntities::getRefEntities(const int dim)
     return m_ref_entities[dim];
 }
 /*----------------------------------------------------------------------------*/
+std::list<GeomEntity*>& CommandJoinEntities::getAdjEntities(const int dim)
+{
+    return m_adj_entities[dim];
+}
+/*----------------------------------------------------------------------------*/
 std::map<GeomEntity*,std::vector<GeomEntity*> >& CommandJoinEntities::getReplacedEntities()
 {
     return m_replacedEntities;

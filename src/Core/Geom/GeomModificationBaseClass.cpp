@@ -69,22 +69,20 @@ void GeomModificationBaseClass::init(std::vector<GeomEntity*>& es)
 {
     // pour chacune des entités passées en argument, on ajoute les entités de
     // dimension inférieure et supérieure ou égale en référence.
-    for(unsigned int i=0;i<es.size();i++){
-        GeomEntity* esi = es[i];
+    for(GeomEntity* esi : es){
         m_init_entities.push_back(esi);
         addReference(esi);
         addDownIncidentReference(esi);
         addUpIncidentReference(esi);
     }
 
-    for(unsigned int i=0;i<es.size();i++){
-        GeomEntity* esi = es[i];
-        addAdjacencyReference(esi);
-    }
+    for(int i=0 ; i<4 ; i++)
+        for(GeomEntity* esi : m_ref_entities[i])
+            addAdjacencyReference(esi);
 
     // une entité a pu être ajoutée plusieurs fois, on élimine maintenant les
     // occurrences multiples
-    for(int i=0;i<4;i++){
+    for(int i=0 ; i<4 ; i++){
         m_ref_entities[i].sort(Utils::Entity::compareEntity);
         m_ref_entities[i].unique();
         m_adj_entities[i].sort(Utils::Entity::compareEntity);
@@ -165,8 +163,28 @@ addAdjacencyReference(GeomEntity* e)
     for (auto ei : va.get())
     {
         int dim = ei->getDim();
-        if (dim > 0 && std::find(m_ref_entities[dim].begin(),m_ref_entities[dim].end(),ei)==m_ref_entities[dim].end())
+        auto& ref = m_ref_entities[dim];
+        if (std::find(ref.begin(), ref.end(), ei) == ref.end()) {
             m_adj_entities[dim].push_back(ei);
+
+            // issue#208 : split d'un volume Vol0 à gauche collé (glue) à un volume Vol1 à droite
+            // la surface Surf0007 de droite de Vol1 n'est pas adjacente à Vol0 mais ses relations
+            // géométriques vont être changées car elle est adjacente à des surfaces
+            // qui vont être recréées (changement nb arêtes et shape OCC).
+            // Il faut donc que Surf0007 soit prise en compte par les mementos en cas de undo
+            // => on garde les objets "down incident" aux objets adjacents car Surf0007 est
+            // "down incidente" de Vol1.
+            GetDownIncidentGeomEntitiesVisitor v_down;
+            ei->accept(v_down);
+            for (auto e_down : v_down.get())
+            {
+                int dim_down = e_down->getDim();
+                auto& ref_down = m_ref_entities[dim_down];
+                if (std::find(ref_down.begin(), ref_down.end(), e_down) == ref_down.end()) {
+                    m_adj_entities[dim_down].push_back(e_down);
+                }
+            }
+        }
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -598,13 +616,6 @@ createGeomEntities(const TopoDS_Shape& shape, const bool replaceVolumes, const b
     //===================================================================
     rebuildAdjacencyEntities(shape);
 
-
-    //    std::vector<Volume*>::iterator it_vKeep = m_toKeepVolumes.begin();
-    //    while(it_vKeep!=m_toKeepVolumes.end()){
-    //        Volume* v = *it_vKeep;
-    //        std::cout<<"\t keep "<<v->getName()<<std::endl;
-    //        it_vKeep++;
-    //    }
     std::vector<GeomEntity*>::iterator it_rem = m_removedEntities.begin();
     std::vector<GeomEntity*> toErase;
     while(it_rem!=m_removedEntities.end()){
@@ -2048,7 +2059,7 @@ void GeomModificationBaseClass::createNewSurfaces(
 #endif
     	}
 
-    } // end for i
+    }
 
 }
 /*----------------------------------------------------------------------------*/

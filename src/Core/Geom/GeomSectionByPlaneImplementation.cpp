@@ -139,8 +139,6 @@ void GeomSectionByPlaneImplementation::split(std::vector<GeomEntity*>& res)
             rep_ei.push_back(m_newVolumes[j]);
     }
 
-    //    res.insert(res.end(),new_volumes.begin(),new_volumes.end());
-
     res.insert(res.end(), m_newEntities.begin(), m_newEntities.end());
 }
 /*----------------------------------------------------------------------------*/
