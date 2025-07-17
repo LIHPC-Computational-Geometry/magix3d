@@ -72,6 +72,7 @@ public:
      *          l'algorithme travaille
      */
     virtual std::list<GeomEntity*>& getRefEntities(const int dim);
+    virtual std::list<GeomEntity*>& getAdjEntities(const int dim);
 
     /*------------------------------------------------------------------------*/
     /** \brief  retourne une référence sur une map indiquant par quelles
@@ -119,6 +120,8 @@ protected:
 
     /// référence sur toutes les entités  sur lesquelles l'algorithme travaille
     std::list<GeomEntity*> m_ref_entities[4];
+    /// liste inutilisée : juste pour répondre à la méthode get de la classe mère
+    std::list<GeomEntity*> m_adj_entities[4];
 
     /* entités que l'on a conservées (modifiées ou non)*/
     std::vector<Vertex*> m_toKeepVertices;
