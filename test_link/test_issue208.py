@@ -23,6 +23,17 @@ def test_issue208_2_sectionByPlane():
     assert "Pt0026" in surf22_vertices
     assert "Pt0027" in surf22_vertices
 
+    # Juste pour tester undo/redo
+    assert gm.getNbVolumes() == 5
+    ctx.undo()
+    assert gm.getNbVolumes() == 4
+    ctx.undo()
+    assert gm.getNbVolumes() == 3
+    ctx.redo()
+    assert gm.getNbVolumes() == 4
+    ctx.redo()
+    assert gm.getNbVolumes() == 5
+
 def test_issue208_single_sectionByPlane():
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
@@ -39,4 +50,10 @@ def test_issue208_single_sectionByPlane():
     gm.sectionByPlane(["Vol0000", "Vol0002"], Mgx3D.Plane(Mgx3D.Point(0, 0, .2), Mgx3D.Vector(0, 0, 1)), "")
 
     # Vol0001 se trouve découpé à tort => 6 volumes au lieu de 5
+    assert gm.getNbVolumes() == 5
+
+    # Juste pour tester undo/redo
+    ctx.undo()
+    assert gm.getNbVolumes() == 3
+    ctx.redo()
     assert gm.getNbVolumes() == 5
