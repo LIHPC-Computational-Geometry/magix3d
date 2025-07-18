@@ -102,10 +102,6 @@ setFromMemento(GeomEntity* e, const MementoEntity& mem)
             for (auto sh : m_mem.getOCCShapes())
                 c->m_occ_edges.push_back(TopoDS::Edge(sh));
             setCommonFields(c);
-
-            // pour le cas des courbes composites, on force la mise à jour des paramètres
-            if (!c->m_vertices.empty())
-                c->computeParams(c->m_vertices[0]->getPoint());
         }
 
         void visit(Surface* s) override {

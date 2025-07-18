@@ -16,8 +16,14 @@
 #include <BRep_Tool.hxx>
 #include <GeomAPI_ProjectPointOnSurf.hxx>
 #include <GeomAPI_ProjectPointOnCurve.hxx>
+#include <GeomAPI_ProjectPointOnCurve.hxx>
+#include <GeomConvert.hxx>
+#include <GeomConvert_CompCurveToBSplineCurve.hxx>
+#include <Geom_TrimmedCurve.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
+#include <BRepBuilderAPI_MakeWire.hxx>
 #include <BRepAdaptor_Curve.hxx>
+#include <BRepAdaptor_CompCurve.hxx>
 #include <BRepMesh_IncrementalMesh.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <GeomAPI_IntCS.hxx>
@@ -28,6 +34,7 @@
 #include <ShapeFix_Wireframe.hxx>
 #include <ShapeFix_FixSmallFace.hxx>
 #include <ShapeBuild_ReShape.hxx>
+
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -692,6 +699,26 @@ getPoint(const TopoDS_Edge& edge, const double& p, Utils::Math::Point& Pt, const
 }
 /*----------------------------------------------------------------------------*/
 void OCCHelper::
+getPoint(const std::vector<TopoDS_Edge>& edges, const double& p, Utils::Math::Point& Pt, const bool in01)
+{
+    Handle(Geom_BSplineCurve) bsplineCurve = makeBSplineCurve(edges);
+    gp_Pnt res;
+    if (in01) {
+        double f = bsplineCurve->FirstParameter();
+        double l = bsplineCurve->LastParameter();
+
+        //p dans [0,1] a positionner dans [f,l]
+        if(f<l)
+            res = bsplineCurve->Value(f+p*(l-f));
+        else
+            res = bsplineCurve->Value(l+p*(f-l));
+    } else {
+        res = bsplineCurve->Value(p);
+    }
+    Pt.setXYZ(res.X(), res.Y(), res.Z());
+}
+/*----------------------------------------------------------------------------*/
+void OCCHelper::
 tangent(const TopoDS_Edge& edge, const Utils::Math::Point& P1, Utils::Math::Vector& V2)
 {
 	double first, last;
@@ -805,6 +832,7 @@ getParameter(const TopoDS_Edge& edge, const Utils::Math::Point& Pt, double& p)
     std::cout<<"last  = "<<last<<std::endl;
 #endif
 
+    //Idée : Pourrait-on passer une liste de TopoDS_Edge et espérer que OCC fasse le job
     GeomAPI_ProjectPointOnCurve proj(pnt,curv, first, last);
 
     proj.Perform(pnt);
@@ -872,7 +900,7 @@ getParameter(const TopoDS_Edge& edge, const Utils::Math::Point& Pt, double& p)
             message <<"===================\n";
             message<<"On cherche le parametre de "<<Pt<<"\n";
             message<<"first: "<<first<<" -> "<<pfirst<<", dist: "<<Pt.length(pfirst)<<"\n";
-            message<<"last : "<<first<<" -> "<<plast<<", dist: "<<Pt.length(plast)<<"\n";
+            message<<"last : "<<last<<" -> "<<plast<<", dist: "<<Pt.length(plast)<<"\n";
             message<<"avec epsilon = "<<tol<<"\n";
             message<<"===================\n";
             throw TkUtil::Exception(message);
@@ -882,12 +910,49 @@ getParameter(const TopoDS_Edge& edge, const Utils::Math::Point& Pt, double& p)
     return distance;
 }
 /*----------------------------------------------------------------------------*/
+double OCCHelper::
+getParameter(const std::vector<TopoDS_Edge>& edges, const Utils::Math::Point& Pt, double& p)
+{
+    Handle(Geom_BSplineCurve) bsplineCurve = makeBSplineCurve(edges);
+ 
+    // Project the point
+    gp_Pnt pnt(Pt.getX(),Pt.getY(),Pt.getZ());
+    GeomAPI_ProjectPointOnCurve projector(pnt, bsplineCurve);
+    if (projector.NbPoints() > 0) {
+        gp_Pnt projected = projector.NearestPoint();
+        p = projector.LowerDistanceParameter();
+#ifdef _DEBUG_GETPARAMETER
+        std::cout << "Projected point: " << projected.X() << ", "
+                  << projected.Y() << ", " << projected.Z() << std::endl;
+        std::cout << "Parameter on curve: " << p << std::endl;
+        std::cout << "First p "<< bsplineCurve->FirstParameter() << " Last p " <<  bsplineCurve->LastParameter()<<std::endl; 
+#endif
+    } else {
+        TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+        message <<"Echec de la récupération d'un paramétrage d'un point sur une courbe!!\n";
+        message <<"===================\n";
+        message<<"On cherche le parametre de "<<Pt<<"\n";
+        message<<"first: "<<bsplineCurve->FirstParameter()<<"\n";
+        message<<"last : "<<bsplineCurve->LastParameter()<<"\n";
+        message<<"===================\n";
+        throw TkUtil::Exception(message);
+    }
+}
+/*----------------------------------------------------------------------------*/
 void OCCHelper::
 getParameters(const TopoDS_Edge& edge, double& first, double& last)
 {
     BRepAdaptor_Curve curve_adaptor(edge);
     first = curve_adaptor.FirstParameter();
     last= curve_adaptor.LastParameter();
+}
+/*----------------------------------------------------------------------------*/
+void OCCHelper::
+getParameters(const std::vector<TopoDS_Edge>& edges, double& first, double& last)
+{
+    Handle(Geom_BSplineCurve) bsplineCurve = makeBSplineCurve(edges);
+    first = bsplineCurve->FirstParameter();
+    last = bsplineCurve->LastParameter();
 }
 /*----------------------------------------------------------------------------*/
 bool OCCHelper::
@@ -1071,6 +1136,46 @@ cleanShape(TopoDS_Shape& shape){
         shape = sffsm->FixShape();
     }
     return shape;
+}
+/*----------------------------------------------------------------------------*/
+Handle(Geom_BSplineCurve) OCCHelper::
+makeBSplineCurve(const std::vector<TopoDS_Edge>& edges)
+{
+    Handle(Geom_BSplineCurve) baseBSpline;
+    GeomConvert_CompCurveToBSplineCurve* builder = nullptr;
+
+    for (const TopoDS_Edge& edge : edges) {
+        Standard_Real first, last;
+        Handle(Geom_Curve) curve = BRep_Tool::Curve(edge, first, last);
+        if (curve.IsNull())
+            continue;
+
+        Handle(Geom_Curve) trimmed = new Geom_TrimmedCurve(curve, first, last);
+
+        // Convertir en BSpline
+        Handle(Geom_BSplineCurve) bspline = GeomConvert::CurveToBSplineCurve(trimmed);
+
+        if (baseBSpline.IsNull()) {
+            baseBSpline = bspline;
+            builder = new GeomConvert_CompCurveToBSplineCurve(baseBSpline);
+        } else {
+            if (!builder->Add(bspline, Precision::Confusion())) {
+                throw TkUtil::Exception("Impossible d'ajouter une courbe (non continue ?)");
+            }
+        }
+    }
+
+    if (!builder) {
+        throw TkUtil::Exception("Aucune courbe valide trouvée.");
+    }
+
+    Handle(Geom_BSplineCurve) bsplineCurve = builder->BSplineCurve();
+
+    if (bsplineCurve.IsNull()) {
+        throw TkUtil::Exception("Echec de création de la BSpline à partir des edges.");
+    }
+
+    return bsplineCurve;
 }
 /*----------------------------------------------------------------------------*/
 void OCCHelper::
