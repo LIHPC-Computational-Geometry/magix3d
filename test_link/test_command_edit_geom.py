@@ -190,6 +190,36 @@ def test_command_common(capfd):
     assert gm.getNbSurfaces()==11
     assert gm.getNbCurves()==20
 
+def test_command_common2d(capfd):
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    gm = ctx.getGeomManager ()
+    tm = ctx.getTopoManager()
+
+    # Création d'une boite avec une topologie
+    tm.newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
+    # Création d'une boite avec une topologie
+    tm.newBoxWithTopo (Mgx3D.Point(.2, .2, .2), Mgx3D.Point(.8, .8, .8), 10, 10, 10)
+    # Création d'une boite avec une topologie
+    tm.newBoxWithTopo (Mgx3D.Point(.2, .8, .2), Mgx3D.Point(.8, 1.4, .8), 10, 10, 10)
+    # Collage entre géométries avec topologies
+    gm.glue (["Vol0001","Vol0002"])
+    assert gm.getNbSurfaces()==17
+    assert gm.getNbCurves()==32
+
+    # Intersection booléenne entre 2 géométries 1D ou 2D avec topologies
+    gm.common2D("Surf0003", "Surf0016", "")
+    assert gm.getNbSurfaces()==15
+    assert gm.getNbCurves()==25
+    # Annulation de : Intersection booléenne entre 2 géométries 1D ou 2D, sans destruction
+    ctx.undo()
+    assert gm.getNbSurfaces()==17
+    assert gm.getNbCurves()==32
+    # Rejeu de : Intersection booléenne entre 2 géométries 1D ou 2D, sans destruction
+    ctx.redo()
+    assert gm.getNbSurfaces()==15
+    assert gm.getNbCurves()==25
+
 def assertPoint(gm, point, x, y, z):
     p = gm.getCoord(point)
     assert p.getX() == x
