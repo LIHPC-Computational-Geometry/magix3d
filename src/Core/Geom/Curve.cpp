@@ -155,6 +155,7 @@ getPoint(const double& p, Utils::Math::Point& Pt, const bool in01) const
 	}
 	else
 	{
+		/*
 		// vérification que computeParams a bien été utilisé
 		checkParams();
 
@@ -171,6 +172,8 @@ getPoint(const double& p, Utils::Math::Point& Pt, const bool in01) const
 		double ratio = (p-paramImgFirst[ind])/(paramImgLast[ind]-paramImgFirst[ind]);
 		double paramLoc = paramLocFirst[ind]+ratio*(paramLocLast[ind]-paramLocFirst[ind]);
 		OCCHelper::getPoint(m_occ_edges[ind], paramLoc, Pt, false);
+		*/
+		OCCHelper::getPoint(m_occ_edges, p, Pt, false);
 	}
 }
 /*----------------------------------------------------------------------------*/
@@ -191,13 +194,15 @@ void Curve::getIntersection(gp_Pln& plan_cut, Utils::Math::Point& Pt) const
 /*----------------------------------------------------------------------------*/
 void Curve::getParameter(const Utils::Math::Point& Pt, double& p) const
 {
-    //std::cout<<setprecision(14)<<"Curve::getParameter pour pt "<<Pt<<std::endl;
+    std::cout<<setprecision(14)<<"Curve::getParameter pour pt "<<Pt<<std::endl;
 	if (m_occ_edges.size() == 1)
 	{
 		OCCHelper::getParameter(m_occ_edges[0], Pt, p);
 	}
 	else
 	{
+		OCCHelper::getParameter(m_occ_edges, Pt, p);
+		/*
 		// vérification que computeParams a bien été utilisé
 		checkParams();
 
@@ -217,13 +222,14 @@ void Curve::getParameter(const Utils::Math::Point& Pt, double& p) const
 		for (uint ind=0; ind<m_occ_edges.size(); ind++){
 
 			try{
+				std::cout <<"ind = "<<ind<<std::endl;
 				double paramLoc = 0.0;
 				OCCHelper::getParameter(m_occ_edges[ind], Pt, paramLoc);
-				//std::cout<<" paramLoc "<<paramLoc<<std::endl;
+				std::cout<<" paramLoc "<<paramLoc<<std::endl;
 
 				double ratio = (paramLoc-paramLocFirst[ind])/(paramLocLast[ind]-paramLocFirst[ind]);
 				p = paramImgFirst[ind]+ratio*(paramImgLast[ind]-paramImgFirst[ind]);
-				//std::cout<<" p "<<p<<std::endl;
+				std::cout<<" p "<<p<<std::endl;
 				return;
 			}
 			catch(TkUtil::Exception &e){
@@ -232,8 +238,9 @@ void Curve::getParameter(const Utils::Math::Point& Pt, double& p) const
 		}
 
     	throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, le point n'a pas permis de trouver un paramètre sur l'une des courbes", TkUtil::Charset::UTF_8));
+	*/
 	}
-    //std::cout<<"  => p = "<<p<<std::endl;
+    std::cout<<"  => p = "<<p<<std::endl;
 }
 /*----------------------------------------------------------------------------*/
 void Curve::getParameters(double& first, double& last) const
@@ -242,13 +249,14 @@ void Curve::getParameters(double& first, double& last) const
 		OCCHelper::getParameters(m_occ_edges[0], first, last);
 	} else {
 		// vérification que computeParams a bien été utilisé
-		checkParams();
-		first = 0.0;
-		last = 1.0;
+		//checkParams();
+		OCCHelper::getParameters(m_occ_edges, first, last);
+		//first = 0.0;
+		//last = 1.0;
 	}
 }
 /*----------------------------------------------------------------------------*/
-//#define _DEBUG_GETPARAMETRICSPOINTS
+#define _DEBUG_GETPARAMETRICSPOINTS
 void Curve::getParametricsPoints(const Utils::Math::Point& Pt0,
         const Utils::Math::Point& Pt1,
         const uint nbPt,
@@ -280,17 +288,12 @@ void Curve::getParametricsPoints(const Utils::Math::Point& Pt0,
 	getParameter(Pt1, paramPt1);
 
 #ifdef _DEBUG_GETPARAMETRICSPOINTS
-    std::cout<<"paramPt0 = "<<paramPt0<<std::endl;
-    std::cout<<"paramPt1 = "<<paramPt1<<std::endl;
+    std::cout<<"paramPt0 = "<<paramPt0<<" pour "<<Pt0<<std::endl;
+    std::cout<<"paramPt1 = "<<paramPt1<<" pour "<<Pt1<<std::endl;
 #endif
 
     if (m_vertices.size() == 1){
-		if (m_occ_edges.size() != 1) {
-			TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-			messErr << "[Erreur interne] La courbe "<<getName()<<" est une courbe composée ce qui ne permet pas de trouver les points en fonction d'une paramétrisation";
-			throw TkUtil::Exception(messErr);
-		}
-        getParameters(first, last);
+		getParameters(first, last);
 
 
 #ifdef _DEBUG_GETPARAMETRICSPOINTS
@@ -932,6 +935,7 @@ Utils::SerializedRepresentation* Curve::getDescription (bool alsoComputed) const
 /*----------------------------------------------------------------------------*/
 void Curve::computeParams(Utils::Math::Point ptStart)
 {
+	dans quel cas entre-on ici ?
 //#define _DEBUG_PARAMS
 
 	paramImgFirst.clear();

@@ -79,6 +79,7 @@ public:
      * \param Pt le résultat
      */
     static void getPoint(const TopoDS_Edge& edge, const double& p, Utils::Math::Point& Pt, const bool in01 = false);
+    static void getPoint(const std::vector<TopoDS_Edge>& edges, const double& p, Utils::Math::Point& Pt, const bool in01 = false);
 
     /*------------------------------------------------------------------------*/
     /** \brief Calcul la tangente à une courbe en un point
@@ -102,7 +103,10 @@ public:
      * \param Pt le point sur la courbe
      */
     static double getParameter(const TopoDS_Edge& edge, const Utils::Math::Point& Pt, double& p);
+    static double getParameter(const std::vector<TopoDS_Edge>& edges, const Utils::Math::Point& Pt, double& p);
+
     static void getParameters(const TopoDS_Edge& edge, double& first, double& last);
+    static void getParameters(const std::vector<TopoDS_Edge>& edges, double& first, double& last);
 
     /// Teste le type de la courbe
     static bool isTypeOf(const TopoDS_Edge& edge, const Handle_Standard_Type& type);
@@ -122,16 +126,14 @@ public:
     /// Calcule la boite englobante
     static void computeBoundingBox(const TopoDS_Shape& shape, Utils::Math::Point& pmin, Utils::Math::Point& pmax, double tol=0.0);
 
-    /*------------------------------------------------------------------------*/
-    /** \brief  Effectue le nettoyage topologique de la shape occ sh passée en
-     *          paramètre
-     */
+    /// Effectue le nettoyage topologique de la shape occ sh passée en paramètre
     static TopoDS_Shape cleanShape(TopoDS_Shape& sh);
 
 private:
-    /*------------------------------------------------------------------------*/
-    /** \brief  construction de map pour le nettoyage
-     */
+    /// Construit un Wire à partir d'une collection de Edge
+    static TopoDS_Wire makeWire(const std::vector<TopoDS_Edge>& edges);
+
+    /// Construction de map pour le nettoyage
     static void addShapeToLists(TopoDS_Shape& shape,
         TopTools_IndexedMapOfShape& fmap,
         TopTools_IndexedMapOfShape& emap,
