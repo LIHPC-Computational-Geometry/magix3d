@@ -141,9 +141,6 @@ internalSpecificExecute()
 	getContext().newGraphicalRepresentation (*newCurve);
 	m_newEntities.push_back(newCurve);
 
-	// mise en place des paramètres pour cette courbe composée
-	newCurve->computeParams(extremites[0]->getPoint());
-
 	// reprise des groupes de la première courbe
 	std::vector<Group::GroupEntity*> grp;
 	m_entities[0]->getGroups(grp);
