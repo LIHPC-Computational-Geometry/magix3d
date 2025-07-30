@@ -914,13 +914,16 @@ double OCCHelper::
 getParameter(const std::vector<TopoDS_Edge>& edges, const Utils::Math::Point& Pt, double& p)
 {
     Handle(Geom_BSplineCurve) bsplineCurve = makeBSplineCurve(edges);
- 
+    double distance = 0;
+
     // Project the point
     gp_Pnt pnt(Pt.getX(),Pt.getY(),Pt.getZ());
-    GeomAPI_ProjectPointOnCurve projector(pnt, bsplineCurve);
-    if (projector.NbPoints() > 0) {
-        gp_Pnt projected = projector.NearestPoint();
-        p = projector.LowerDistanceParameter();
+    GeomAPI_ProjectPointOnCurve proj(pnt, bsplineCurve);
+    if (proj.NbPoints() > 0) {
+        gp_Pnt projected = proj.NearestPoint();
+        p = proj.LowerDistanceParameter();
+        distance = proj.LowerDistance();
+
 #ifdef _DEBUG_GETPARAMETER
         std::cout << "Projected point: " << projected.X() << ", "
                   << projected.Y() << ", " << projected.Z() << std::endl;
@@ -937,6 +940,8 @@ getParameter(const std::vector<TopoDS_Edge>& edges, const Utils::Math::Point& Pt
         message<<"===================\n";
         throw TkUtil::Exception(message);
     }
+
+    return distance;
 }
 /*----------------------------------------------------------------------------*/
 void OCCHelper::
@@ -1141,41 +1146,36 @@ cleanShape(TopoDS_Shape& shape){
 Handle(Geom_BSplineCurve) OCCHelper::
 makeBSplineCurve(const std::vector<TopoDS_Edge>& edges)
 {
-    Handle(Geom_BSplineCurve) baseBSpline;
-    GeomConvert_CompCurveToBSplineCurve* builder = nullptr;
+    // Étape 1 : Créer un convertisseur de courbes composées
+    GeomConvert_CompCurveToBSplineCurve converter;
 
-    for (const TopoDS_Edge& edge : edges) {
+    for (const auto& edge : edges) {
         Standard_Real first, last;
         Handle(Geom_Curve) curve = BRep_Tool::Curve(edge, first, last);
+
         if (curve.IsNull())
-            continue;
+            throw TkUtil::Exception("Erreur : courbe nulle extraite d'une arête.");
 
         Handle(Geom_Curve) trimmed = new Geom_TrimmedCurve(curve, first, last);
 
         // Convertir en BSpline
         Handle(Geom_BSplineCurve) bspline = GeomConvert::CurveToBSplineCurve(trimmed);
 
-        if (baseBSpline.IsNull()) {
-            baseBSpline = bspline;
-            builder = new GeomConvert_CompCurveToBSplineCurve(baseBSpline);
-        } else {
-            if (!builder->Add(bspline, Precision::Confusion())) {
-                throw TkUtil::Exception("Impossible d'ajouter une courbe (non continue ?)");
-            }
-        }
+        if (bspline.IsNull())
+            throw TkUtil::Exception("Erreur : approximation BSpline échouée pour une arête.");
+
+        // Ajouter la courbe à approximer
+        if (!converter.Add(bspline, Precision::Confusion()))
+            throw TkUtil::Exception("Erreur : impossible d'ajouter une courbe (non continue ?)");
     }
 
-    if (!builder) {
-        throw TkUtil::Exception("Aucune courbe valide trouvée.");
-    }
+    // Étape 2 : Obtenir la courbe BSpline finale
+    Handle(Geom_BSplineCurve) final_bspline = converter.BSplineCurve();
 
-    Handle(Geom_BSplineCurve) bsplineCurve = builder->BSplineCurve();
+    if (final_bspline.IsNull())
+        throw TkUtil::Exception("Erreur : approximation BSpline échouée.");
 
-    if (bsplineCurve.IsNull()) {
-        throw TkUtil::Exception("Echec de création de la BSpline à partir des edges.");
-    }
-
-    return bsplineCurve;
+    return final_bspline;
 }
 /*----------------------------------------------------------------------------*/
 void OCCHelper::
