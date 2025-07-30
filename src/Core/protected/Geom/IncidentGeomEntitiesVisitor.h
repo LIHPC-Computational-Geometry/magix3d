@@ -55,10 +55,10 @@ public:
         } 
     }
 
-    const std::set<GeomEntity*, decltype(&Utils::Entity::compareEntity)>& get() {return m_down_incident_entities;}
-    const std::set<Surface*, decltype(&Utils::Entity::compareEntity)>& getSurfaces() {return m_down_incident_surfaces;}
-    const std::set<Curve*, decltype(&Utils::Entity::compareEntity)>& getCurves() {return m_down_incident_curves;}
-    const std::set<Vertex*, decltype(&Utils::Entity::compareEntity)>& getVertices() {return m_down_incident_vertices;}
+    const Utils::EntitySet<GeomEntity*>& get() {return m_down_incident_entities;}
+    const Utils::EntitySet<Surface*>& getSurfaces() {return m_down_incident_surfaces;}
+    const Utils::EntitySet<Curve*>& getCurves() {return m_down_incident_curves;}
+    const Utils::EntitySet<Vertex*>& getVertices() {return m_down_incident_vertices;}
 
     GetDownIncidentGeomEntitiesVisitor()
     : m_down_incident_entities(&Utils::Entity::compareEntity)
@@ -69,10 +69,10 @@ public:
     virtual ~GetDownIncidentGeomEntitiesVisitor() = default;
 
 private:
-    std::set<GeomEntity*, decltype(&Utils::Entity::compareEntity)> m_down_incident_entities;
-    std::set<Surface*, decltype(&Utils::Entity::compareEntity)> m_down_incident_surfaces;
-    std::set<Curve*, decltype(&Utils::Entity::compareEntity)> m_down_incident_curves;
-    std::set<Vertex*, decltype(&Utils::Entity::compareEntity)> m_down_incident_vertices;
+    Utils::EntitySet<GeomEntity*> m_down_incident_entities;
+    Utils::EntitySet<Surface*> m_down_incident_surfaces;
+    Utils::EntitySet<Curve*> m_down_incident_curves;
+    Utils::EntitySet<Vertex*> m_down_incident_vertices;
 };
 
 class GetUpIncidentGeomEntitiesVisitor : public ConstGeomEntityVisitor
@@ -116,10 +116,10 @@ public:
     }
     virtual void visit(const Volume*) {}
 
-    const std::set<GeomEntity*, decltype(&Utils::Entity::compareEntity)>& get() {return m_up_incident_entities;}
-    const std::set<Volume*, decltype(&Utils::Entity::compareEntity)>& getVolumes() {return m_up_incident_volumes;}
-    const std::set<Surface*, decltype(&Utils::Entity::compareEntity)>& getSurfaces() {return m_up_incident_surfaces;}
-    const std::set<Curve*, decltype(&Utils::Entity::compareEntity)>& getCurves() {return m_up_incident_curves;}
+    const Utils::EntitySet<GeomEntity*>& get() {return m_up_incident_entities;}
+    const Utils::EntitySet<Volume*>& getVolumes() {return m_up_incident_volumes;}
+    const Utils::EntitySet<Surface*>& getSurfaces() {return m_up_incident_surfaces;}
+    const Utils::EntitySet<Curve*>& getCurves() {return m_up_incident_curves;}
 
     GetUpIncidentGeomEntitiesVisitor()
     : m_up_incident_entities(&Utils::Entity::compareEntity)
@@ -130,10 +130,10 @@ public:
     virtual ~GetUpIncidentGeomEntitiesVisitor() = default;
 
 private:    
-    std::set<GeomEntity*, decltype(&Utils::Entity::compareEntity)> m_up_incident_entities;
-    std::set<Volume*, decltype(&Utils::Entity::compareEntity)> m_up_incident_volumes;
-    std::set<Surface*, decltype(&Utils::Entity::compareEntity)> m_up_incident_surfaces;
-    std::set<Curve*, decltype(&Utils::Entity::compareEntity)> m_up_incident_curves;
+    Utils::EntitySet<GeomEntity*> m_up_incident_entities;
+    Utils::EntitySet<Volume*> m_up_incident_volumes;
+    Utils::EntitySet<Surface*> m_up_incident_surfaces;
+    Utils::EntitySet<Curve*> m_up_incident_curves;
 };
 
 class GetAdjacentGeomEntitiesVisitor : public ConstGeomEntityVisitor
@@ -176,11 +176,11 @@ public:
         m_adjacent_entities.insert(m_adjacent_volumes.begin(), m_adjacent_volumes.end());
     }
 
-    const std::set<GeomEntity*, decltype(&Utils::Entity::compareEntity)>& get() {return m_adjacent_entities;}
-    const std::set<Volume*, decltype(&Utils::Entity::compareEntity)>& getVolumes() {return m_adjacent_volumes;}
-    const std::set<Surface*, decltype(&Utils::Entity::compareEntity)>& getSurfaces() {return m_adjacent_surfaces;}
-    const std::set<Curve*, decltype(&Utils::Entity::compareEntity)>& getCurves() {return m_adjacent_curves;}
-    const std::set<Vertex*, decltype(&Utils::Entity::compareEntity)>& getVertices() {return m_adjacent_vertices;}
+    const Utils::EntitySet<GeomEntity*>& get() {return m_adjacent_entities;}
+    const Utils::EntitySet<Volume*>& getVolumes() {return m_adjacent_volumes;}
+    const Utils::EntitySet<Surface*>& getSurfaces() {return m_adjacent_surfaces;}
+    const Utils::EntitySet<Curve*>& getCurves() {return m_adjacent_curves;}
+    const Utils::EntitySet<Vertex*>& getVertices() {return m_adjacent_vertices;}
     
     GetAdjacentGeomEntitiesVisitor()
     : m_adjacent_entities(&Utils::Entity::compareEntity)
@@ -192,11 +192,11 @@ public:
     virtual ~GetAdjacentGeomEntitiesVisitor() = default;
 
 private:    
-    std::set<GeomEntity*, decltype(&Utils::Entity::compareEntity)> m_adjacent_entities; 
-    std::set<Volume*, decltype(&Utils::Entity::compareEntity)> m_adjacent_volumes;
-    std::set<Surface*, decltype(&Utils::Entity::compareEntity)> m_adjacent_surfaces;
-    std::set<Curve*, decltype(&Utils::Entity::compareEntity)> m_adjacent_curves;
-    std::set<Vertex*, decltype(&Utils::Entity::compareEntity)> m_adjacent_vertices;
+    Utils::EntitySet<GeomEntity*> m_adjacent_entities; 
+    Utils::EntitySet<Volume*> m_adjacent_volumes;
+    Utils::EntitySet<Surface*> m_adjacent_surfaces;
+    Utils::EntitySet<Curve*> m_adjacent_curves;
+    Utils::EntitySet<Vertex*> m_adjacent_vertices;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

@@ -34,7 +34,7 @@
 #include <ShapeFix_Wireframe.hxx>
 #include <ShapeFix_FixSmallFace.hxx>
 #include <ShapeBuild_ReShape.hxx>
-
+#include <ShapeAnalysis_ShapeContents.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -1334,6 +1334,54 @@ addShapeToLists(TopoDS_Shape& shape,
       vmap.Add(vertex);
   }
 
+}
+/*----------------------------------------------------------------------------*/
+void OCCHelper::
+printInfos(const TopoDS_Shape& shape, const std::string& indent)
+{
+    std::cout << indent << "Shape de type ";
+    TopAbs_ShapeEnum type = shape.ShapeType();
+    switch (type) {
+        case TopAbs_COMPOUND: std::cout << "Compound"; break;
+        case TopAbs_COMPSOLID: std::cout << "CompSolid"; break;
+        case TopAbs_SOLID: std::cout << "Solid"; break;
+        case TopAbs_SHELL: std::cout << "Shell"; break;
+        case TopAbs_FACE: std::cout << "Face"; break;
+        case TopAbs_WIRE: std::cout << "Wire"; break;
+        case TopAbs_EDGE: std::cout << "Edge"; break;
+        case TopAbs_VERTEX: std::cout << "Vertex"; break;
+        case TopAbs_SHAPE: std::cout << "Generic Shape"; break;
+    }
+    std::cout << " : " << std::endl;
+
+    ShapeAnalysis_ShapeContents analysis;
+    analysis.Perform(shape);
+    std::cout << indent << "\tNb solids : " << analysis.NbSolids() << std::endl;
+    std::cout << indent << "\tNb faces : " << analysis.NbFaces() << std::endl;
+
+    if (type == TopAbs_COMPOUND) {
+        std::cout << indent << "\tDétails du compound :" << std::endl;
+        exploreCompound(TopoDS::Compound(shape), indent);
+    }
+}
+/*----------------------------------------------------------------------------*/
+void OCCHelper::
+printInfos(const TopTools_ListOfShape& shapes)
+{
+    for (TopTools_ListIteratorOfListOfShape it(shapes); it.More(); it.Next()) {
+        TopoDS_Shape shape = it.Value();
+        printInfos(shape);
+    }
+}
+/*----------------------------------------------------------------------------*/
+void OCCHelper::
+exploreCompound(const TopoDS_Compound& compound, const std::string& indent)
+{
+    std::string new_indent = indent + "\t";
+    for (TopExp_Explorer exp(compound, TopAbs_SOLID); exp.More(); exp.Next()) {
+        TopoDS_Shape sub_shape = exp.Current();
+        printInfos(sub_shape, new_indent);
+    }
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

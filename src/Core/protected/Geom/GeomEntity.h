@@ -169,7 +169,7 @@ private:
 #ifndef SWIG
     template<typename T>
     void buildSerializedRepresentation(Utils::SerializedRepresentation& description, const std::string& title, 
-                                                const std::set<T*, decltype(&Utils::Entity::compareEntity)> elements) const;
+                                                const Utils::EntitySet<T*> elements) const;
 #endif
 
 private:
