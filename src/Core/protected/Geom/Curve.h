@@ -91,16 +91,6 @@ public:
     virtual int getDim() const {return 1;}
 
     /*------------------------------------------------------------------------*/
-    /** Renseigne les paramètres pour les courbes composées
-     *
-     * \param ptStart position du sommet de départ pour ordonner la courbe
-     */
-    virtual void computeParams(Utils::Math::Point ptStart);
-
-    /// Vérification que computeParams a bien été utilisé pour initialisé le cas composite
-    void checkParams() const;
-
-    /*------------------------------------------------------------------------*/
     /** \brief  Calcule l'aire d'une entité:  Pour une courbe, c'est la
      *          longueur, pour une surface, l'aire, pour un volume le volume.
      */
@@ -124,10 +114,10 @@ public:
 
     /*------------------------------------------------------------------------*/
     /** \brief Donne le point en fonction du paramètre sur la courbe
-     * \param p le paramètre curviligne compris entre 0 et 1
+     * \param p le paramètre curviligne
+     * \param in01 Si le paramétre est compris entre 0 et 1
      */
-    void getPoint(const double& p, Utils::Math::Point& Pt, const bool inO1=false) const ;
-
+    void getPoint(const double& p, Utils::Math::Point& Pt, const bool in01=false) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief Calcul la tangente à une courbe en un point
@@ -356,14 +346,6 @@ private:
     std::vector<Group::Group1D*> m_groups;
     /// représentation open cascade
     std::vector<TopoDS_Edge> m_occ_edges;
-    /// premier paramètre local à une des composantes
-    std::vector<double> paramLocFirst;
-    /// dernier paramètre local à une des composantes
-    std::vector<double> paramLocLast;
-    /// premier paramètre image pour une des composantes, dans [0,1]
-    std::vector<double> paramImgFirst;
-    /// dernier paramètre image pour une des composantes, dans [0,1]
-    std::vector<double> paramImgLast;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

@@ -71,11 +71,6 @@ GeomEntity* Curve::clone(Internal::Context& c)
             new GeomProperty(),
 			m_occ_edges);
 
-	newCrv->paramLocFirst = paramLocFirst;
-	newCrv->paramLocLast = paramLocLast;
-	newCrv->paramImgFirst = paramImgFirst;
-	newCrv->paramImgLast = paramImgLast;
-
 	return newCrv;
 }
 /*----------------------------------------------------------------------------*/
@@ -155,22 +150,7 @@ getPoint(const double& p, Utils::Math::Point& Pt, const bool in01) const
 	}
 	else
 	{
-		// vérification que computeParams a bien été utilisé
-		checkParams();
-
-		// on cherche la section paramètrée correspondante
-		if (p<0.0 || p>1.0)
-	    	throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, le paramètre doit être dans l'interval [0,1] pour les courbes composées", TkUtil::Charset::UTF_8));
-
-		uint ind = 0;
-		for (; ind<paramImgLast.size() && p>paramImgLast[ind]; ind++)
-			;
-		if (ind>=paramImgLast.size())
-			throw TkUtil::Exception("Erreur interne, l'indice est en dehors des bornes");
-
-		double ratio = (p-paramImgFirst[ind])/(paramImgLast[ind]-paramImgFirst[ind]);
-		double paramLoc = paramLocFirst[ind]+ratio*(paramLocLast[ind]-paramLocFirst[ind]);
-		OCCHelper::getPoint(m_occ_edges[ind], paramLoc, Pt, false);
+		OCCHelper::getPoint(m_occ_edges, p, Pt, in01);
 	}
 }
 /*----------------------------------------------------------------------------*/
@@ -191,64 +171,20 @@ void Curve::getIntersection(gp_Pln& plan_cut, Utils::Math::Point& Pt) const
 /*----------------------------------------------------------------------------*/
 void Curve::getParameter(const Utils::Math::Point& Pt, double& p) const
 {
-    //std::cout<<setprecision(14)<<"Curve::getParameter pour pt "<<Pt<<std::endl;
 	if (m_occ_edges.size() == 1)
-	{
 		OCCHelper::getParameter(m_occ_edges[0], Pt, p);
-	}
 	else
-	{
-		// vérification que computeParams a bien été utilisé
-		checkParams();
-
-		// en général on cherche les points aux extrémités... mais ils ne sont pas toujours renseignés
-		// c'est le cas d'une arête projetée sur une surface composite
-//		if (vertices.size() != 2 && vertices.size() != 1)
-//			throw TkUtil::Exception("Erreur interne, Courbe composite avec autre chose que 1 ou 2 sommets");
-		if (m_vertices.size() >= 1 && m_vertices[0]->getPoint() == Pt){
-			p=0.0;
-			return;
-		}
-		else if (m_vertices.size() == 2 && m_vertices[1]->getPoint() == Pt){
-			p=1.0;
-			return;
-		}
-
-		for (uint ind=0; ind<m_occ_edges.size(); ind++){
-
-			try{
-				double paramLoc = 0.0;
-				OCCHelper::getParameter(m_occ_edges[ind], Pt, paramLoc);
-				//std::cout<<" paramLoc "<<paramLoc<<std::endl;
-
-				double ratio = (paramLoc-paramLocFirst[ind])/(paramLocLast[ind]-paramLocFirst[ind]);
-				p = paramImgFirst[ind]+ratio*(paramImgLast[ind]-paramImgFirst[ind]);
-				//std::cout<<" p "<<p<<std::endl;
-				return;
-			}
-			catch(TkUtil::Exception &e){
-
-			}
-		}
-
-    	throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, le point n'a pas permis de trouver un paramètre sur l'une des courbes", TkUtil::Charset::UTF_8));
-	}
-    //std::cout<<"  => p = "<<p<<std::endl;
+		OCCHelper::getParameter(m_occ_edges, Pt, p);
 }
 /*----------------------------------------------------------------------------*/
 void Curve::getParameters(double& first, double& last) const
 {
-	if (m_occ_edges.size() == 1) {
+	if (m_occ_edges.size() == 1)
 		OCCHelper::getParameters(m_occ_edges[0], first, last);
-	} else {
-		// vérification que computeParams a bien été utilisé
-		checkParams();
-		first = 0.0;
-		last = 1.0;
-	}
+	else
+		OCCHelper::getParameters(m_occ_edges, first, last);
 }
 /*----------------------------------------------------------------------------*/
-//#define _DEBUG_GETPARAMETRICSPOINTS
 void Curve::getParametricsPoints(const Utils::Math::Point& Pt0,
         const Utils::Math::Point& Pt1,
         const uint nbPt,
@@ -280,17 +216,12 @@ void Curve::getParametricsPoints(const Utils::Math::Point& Pt0,
 	getParameter(Pt1, paramPt1);
 
 #ifdef _DEBUG_GETPARAMETRICSPOINTS
-    std::cout<<"paramPt0 = "<<paramPt0<<std::endl;
-    std::cout<<"paramPt1 = "<<paramPt1<<std::endl;
+    std::cout<<"paramPt0 = "<<paramPt0<<" pour "<<Pt0<<std::endl;
+    std::cout<<"paramPt1 = "<<paramPt1<<" pour "<<Pt1<<std::endl;
 #endif
 
     if (m_vertices.size() == 1){
-		if (m_occ_edges.size() != 1) {
-			TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-			messErr << "[Erreur interne] La courbe "<<getName()<<" est une courbe composée ce qui ne permet pas de trouver les points en fonction d'une paramétrisation";
-			throw TkUtil::Exception(messErr);
-		}
-        getParameters(first, last);
+		getParameters(first, last);
 
 
 #ifdef _DEBUG_GETPARAMETRICSPOINTS
@@ -928,143 +859,6 @@ Utils::SerializedRepresentation* Curve::getDescription (bool alsoComputed) const
     description->addPropertiesSet (propertyGeomDescription);
 
 	return description.release ( );
-}
-/*----------------------------------------------------------------------------*/
-void Curve::computeParams(Utils::Math::Point ptStart)
-{
-//#define _DEBUG_PARAMS
-
-	paramImgFirst.clear();
-	paramImgLast.clear();
-	paramLocFirst.clear();
-	paramLocLast.clear();
-
-	// NB, on ne fait rien si la courbe n'est pas composite
-
-	// on renseigne les paramLocFirst et autres
-
-	// pour cela on commence par calculer les longueurs des différentes parties
-	std::vector<double> areasLoc;
-	double areaTot = 0.0;
-	if (m_occ_edges.size() == 1)
-		return;
-
-	for (uint i=0; i<m_occ_edges.size(); i++){
-		double area = OCCHelper::getLength(m_occ_edges[i]);
-		areasLoc.push_back(area);
-		areaTot+=area;
-	}
-
-	// calcul des paramImgFirst et paramImgLast
-	double areaI = 0.0;
-	double paramI = 0.0;
-	for (uint i=0; i<areasLoc.size(); i++){
-		paramImgFirst.push_back(paramI);
-		areaI += areasLoc[i];
-		paramI = areaI/areaTot;
-		paramImgLast.push_back(paramI);
-	}
-
-	// epsilon relatif à la longueur totale
-	double epsilon = areaTot*Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon*10;
-
-#ifdef _DEBUG_PARAMS
-	std::cout<<"Curve::computeParams ptStart :"<<ptStart<<std::endl;
-	std::cout<<"epsilon loc = "<<epsilon<<std::endl;
-	std::cout<<"areasLoc:";
-	for (uint i=0; i<areasLoc.size(); i++)
-		std::cout<<" "<<areasLoc[i];
-	std::cout<<std::endl;
-	std::cout<<"paramImgFirst:";
-	for (uint i=0; i<paramImgFirst.size(); i++)
-		std::cout<<" "<<paramImgFirst[i];
-	std::cout<<std::endl;
-	std::cout<<"paramImgLast:";
-	for (uint i=0; i<paramImgLast.size(); i++)
-		std::cout<<" "<<paramImgLast[i];
-	std::cout<<std::endl;
-	std::cout<<"couples de points: "<<std::endl;
-	Utils::Math::Point ptBegin, ptEnd;
-	for (uint i=0; i<m_occ_edges.size(); i++){
-		m_occ_edges[i]->getPoint(0.0, ptBegin, true);
-		m_occ_edges[i]->getPoint(1.0, ptEnd, true);
-		std::cout<<ptBegin<<" "<<ptEnd<<std::endl;
-	}
-#endif
-
-	// remplissage des paramLocFirst et paramLocLast et tenant compte du sens
-	Utils::Math::Point ptPrec;
-	TopoDS_Edge edge_0 = m_occ_edges[0];
-	OCCHelper::getPoint(edge_0, 0.0, ptPrec, true);
-#ifdef _DEBUG_PARAMS
-	std::cout<<"longueur ptStart-ptPrec "<<ptPrec.length(ptStart)<<std::endl;
-#endif
-	if (not (ptPrec.isEpsilonEqual(ptStart, epsilon))){
-		OCCHelper::getPoint(edge_0, 1.0, ptPrec, true);
-#ifdef _DEBUG_PARAMS
-		std::cout<<"longueur ptStart-ptPrec "<<ptPrec.length(ptStart)<<std::endl;
-#endif
-		if (not (ptPrec.isEpsilonEqual(ptStart, epsilon))){
-			throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, Courbe composite où on ne retrouve pas le premier sommet", TkUtil::Charset::UTF_8));
-		}
-	}
-	for (uint i=0; i<m_occ_edges.size(); i++){
-		double inverse = false;
-		Utils::Math::Point pt1, pt2;
-		TopoDS_Edge edge_i = m_occ_edges[i];
-		OCCHelper::getPoint(edge_i, 0.0, pt1, true);
-		OCCHelper::getPoint(edge_i, 1.0, pt2, true);
-#ifdef _DEBUG_PARAMS
-		std::cout<<"i="<<i<<" ptPrec: "<<ptPrec<<std::endl;
-		std::cout<<"longueur pt1-ptPrec "<<ptPrec.length(pt1)<<" pt2-ptPrec "<<ptPrec.length(pt2)<<std::endl;
-#endif
-		if (not (pt1.isEpsilonEqual(ptPrec, epsilon))){
-			inverse = true;
-			if (not (pt2.isEpsilonEqual(ptPrec, epsilon))){
-				throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, Courbe composite où on ne retrouve pas le sommet précédent", TkUtil::Charset::UTF_8));
-			}
-		}
-
-		double first, last;
-		if (inverse){
-			OCCHelper::getParameters(edge_i, last, first);
-			ptPrec = pt1;
-		}
-		else {
-			ptPrec = pt2;
-			OCCHelper::getParameters(edge_i, first, last);
-		}
-		paramLocFirst.push_back(first);
-		paramLocLast.push_back(last);
-	}
-#ifdef _DEBUG_PARAMS
-	std::cout<<"paramLocFirst:";
-	for (uint i=0; i<paramLocFirst.size(); i++)
-		std::cout<<" "<<paramLocFirst[i];
-	std::cout<<std::endl;
-	std::cout<<"paramLocLast:";
-	for (uint i=0; i<paramLocLast.size(); i++)
-		std::cout<<" "<<paramLocLast[i];
-	std::cout<<std::endl;
-#endif
-}
-/*----------------------------------------------------------------------------*/
-void Curve::checkParams() const
-{
-	if (m_occ_edges.size() == 1)
-		return;
-
-	if (m_occ_edges.size() != paramLocFirst.size()){
-		TkUtil::UTF8String messErr (TkUtil::Charset::UTF_8);
-		messErr << "Erreur interne, paramLocFirst non itialisé correctement pour "<<getName();
-		throw TkUtil::Exception(messErr);
-	}
-	if (m_occ_edges.size() != paramLocLast.size())
-		throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, paramLocLast non itialisé correctement", TkUtil::Charset::UTF_8));
-	if (m_occ_edges.size() != paramImgFirst.size())
-		throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, paramImgFirst non itialisé correctement", TkUtil::Charset::UTF_8));
-	if (m_occ_edges.size() != paramImgLast.size())
-		throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, paramImgLast non itialisé correctement", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

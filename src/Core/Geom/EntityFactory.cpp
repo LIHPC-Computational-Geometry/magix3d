@@ -1356,8 +1356,6 @@ Curve* EntityFactory::newOCCCompositeCurve(std::vector<TopoDS_Edge>& v_ds_edge,
 			reps);
 	CHECK_NULL_PTR_ERROR (curve)
 	m_context.newGraphicalRepresentation (*curve);
-	if (reps.size() > 1)
-		curve->computeParams(extremaFirst);
 	return curve;
 }
 /*----------------------------------------------------------------------------*/

@@ -11,6 +11,7 @@
 #include <TopoDS_Vertex.hxx>
 #include <TopoDS_Solid.hxx>
 #include <TopTools_IndexedMapOfShape.hxx>
+#include <Geom_BSplineCurve.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -77,8 +78,10 @@ public:
      * \param edge l'arête représentant la courbe
      * \param p le paramètre curviligne
      * \param Pt le résultat
+     * \param in01 Si le paramétre est compris entre 0 et 1
      */
     static void getPoint(const TopoDS_Edge& edge, const double& p, Utils::Math::Point& Pt, const bool in01 = false);
+    static void getPoint(const std::vector<TopoDS_Edge>& edges, const double& p, Utils::Math::Point& Pt, const bool in01 = false);
 
     /*------------------------------------------------------------------------*/
     /** \brief Calcul la tangente à une courbe en un point
@@ -102,7 +105,10 @@ public:
      * \param Pt le point sur la courbe
      */
     static double getParameter(const TopoDS_Edge& edge, const Utils::Math::Point& Pt, double& p);
+    static double getParameter(const std::vector<TopoDS_Edge>& edges, const Utils::Math::Point& Pt, double& p);
+
     static void getParameters(const TopoDS_Edge& edge, double& first, double& last);
+    static void getParameters(const std::vector<TopoDS_Edge>& edges, double& first, double& last);
 
     /// Teste le type de la courbe
     static bool isTypeOf(const TopoDS_Edge& edge, const Handle_Standard_Type& type);
@@ -122,16 +128,14 @@ public:
     /// Calcule la boite englobante
     static void computeBoundingBox(const TopoDS_Shape& shape, Utils::Math::Point& pmin, Utils::Math::Point& pmax, double tol=0.0);
 
-    /*------------------------------------------------------------------------*/
-    /** \brief  Effectue le nettoyage topologique de la shape occ sh passée en
-     *          paramètre
-     */
+    /// Effectue le nettoyage topologique de la shape occ sh passée en paramètre
     static TopoDS_Shape cleanShape(TopoDS_Shape& sh);
 
 private:
-    /*------------------------------------------------------------------------*/
-    /** \brief  construction de map pour le nettoyage
-     */
+    /// Construit une courbe BSpline à partir d'une collection de Edge
+    static Handle(Geom_BSplineCurve) makeBSplineCurve(const std::vector<TopoDS_Edge>& edges);
+
+    /// Construction de map pour le nettoyage
     static void addShapeToLists(TopoDS_Shape& shape,
         TopTools_IndexedMapOfShape& fmap,
         TopTools_IndexedMapOfShape& emap,
