@@ -207,7 +207,7 @@ QtSpherePartOperationPanel::QtSpherePartOperationPanel (
 	const int	defaultEdgesNum	=
 		mainWindow.getContext( ).getTopoManager( ).getDefaultNbMeshingEdges( );
 	_topologyPanel	= new QtTopologyPanel (
-			groupBox, mainWindow, true, false, 3, QtTopologyPanel::STRUCTURED_TOPOLOGY,
+			groupBox, mainWindow, false, false, 3, QtTopologyPanel::STRUCTURED_TOPOLOGY,
 			QtTopologyPanel::CARTESIAN,
 			defaultEdgesNum, defaultEdgesNum, defaultEdgesNum, true, true);
 	_topologyPanel->enableTopologyType (

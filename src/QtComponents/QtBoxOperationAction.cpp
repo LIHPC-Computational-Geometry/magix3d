@@ -116,7 +116,7 @@ QtBoxOperationPanel::QtBoxOperationPanel (
 	groupBox->setLayout (vlayout);
 	const int	defaultEdgesNum	= mainWindow.getContext( ).getTopoManager( ).getDefaultNbMeshingEdges( );
 	_topologyPanel	= new QtTopologyPanel (
-		groupBox, mainWindow, true, false, 3, QtTopologyPanel::STRUCTURED_TOPOLOGY, QtTopologyPanel::CARTESIAN, defaultEdgesNum, defaultEdgesNum, defaultEdgesNum, true, true);
+		groupBox, mainWindow, false, false, 3, QtTopologyPanel::STRUCTURED_TOPOLOGY, QtTopologyPanel::CARTESIAN, defaultEdgesNum, defaultEdgesNum, defaultEdgesNum, true, true);
 	_topologyPanel->enableTopologyType (QtTopologyPanel::OGRID_BLOCKS, false);
 	_topologyPanel->enableTopologyType (QtTopologyPanel::STRUCTURED_FREE_TOPOLOGY, false);
 	_topologyPanel->enableTopologyType (QtTopologyPanel::INSERTION_TOPOLOGY, false);
