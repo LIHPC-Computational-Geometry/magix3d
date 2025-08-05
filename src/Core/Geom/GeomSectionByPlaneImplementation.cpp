@@ -121,7 +121,7 @@ void GeomSectionByPlaneImplementation::split(std::vector<GeomEntity*>& res)
         getUniqueOCCShape(ei, si);
         list_of_arguments.Append(si);
     }
-    list_of_arguments.Append(wf);
+    list_of_arguments.Append(m_restricted_section_tool);
     splitter.SetArguments(list_of_arguments);
     splitter.Build();
 
