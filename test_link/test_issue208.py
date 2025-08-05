@@ -57,3 +57,30 @@ def test_issue208_single_sectionByPlane():
     assert gm.getNbVolumes() == 3
     ctx.redo()
     assert gm.getNbVolumes() == 5
+
+def test_issue208_nested_volumes():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    gm = ctx.getGeomManager()
+
+    # Création de la sphère creuse Vol0000
+    gm.newHollowSphere (Mgx3D.Point(0, 0, 0), 1, 2, Mgx3D.Portion.ENTIER)
+    # Création du volume Vol0001
+    gm.newSphere (Mgx3D.Point(0, 0, 0), 1, Mgx3D.Portion.ENTIER)
+    # Collage entre Vol0000 Vol0001
+    gm.glue (["Vol0000","Vol0001"])
+    # Section par un plan de Vol0000 suivant [ [ 0, 0, -6.64992e-1] , [ 0, 0, 1] ]
+    gm.sectionByPlane (["Vol0000"], Mgx3D.Plane(Mgx3D.Point(0, 0, -6.64992e-1), Mgx3D.Vector(0, 0, 1)), "")
+
+    # Vol0001 se trouve découpé à tort => 4 volumes au lieu de 3
+    assert gm.getNbVolumes() == 3
+    assert gm.getNbSurfaces() == 5
+
+    # Annulation de : Section par un plan de Vol0000 suivant [ [ 0, 0, -6.64992e-1] , [ 0, 0, 1] ]
+    ctx.undo()
+    # Section par un plan entre géométries avec topologies
+    gm.sectionByPlane (["Vol0000","Vol0001"], Mgx3D.Plane(Mgx3D.Point(0, 0, -6.64992e-1), Mgx3D.Vector(0, 0, 1)), "")
+
+    # Des volumes sont créés en double => 6 volumes au lieu de 4
+    assert gm.getNbVolumes() == 4
+    assert gm.getNbSurfaces() == 6
