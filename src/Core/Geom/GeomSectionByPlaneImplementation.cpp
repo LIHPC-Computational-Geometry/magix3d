@@ -40,11 +40,11 @@ namespace Geom
 /*----------------------------------------------------------------------------*/
 GeomSectionByPlaneImplementation::GeomSectionByPlaneImplementation(
         Internal::Context& c,
-        GeomEntity* e, Utils::Math::Plane* p)
-: GeomModificationBaseClass(c)
-, m_plane(p)
-, m_entity_param(e)
+        std::vector<GeomEntity*>& es, Utils::Math::Plane* p) :
+        GeomModificationBaseClass(c), m_plane(p)
 {
+    m_entities_param.insert(m_entities_param.end(),es.begin(),es.end());
+
 }
 /*----------------------------------------------------------------------------*/
 GeomSectionByPlaneImplementation::~GeomSectionByPlaneImplementation()
@@ -56,19 +56,18 @@ void GeomSectionByPlaneImplementation::prePerform()
     //========================================================================
     // Mise à jour des connectivés de références
     //========================================================================
-    std::vector<GeomEntity*> es = {m_entity_param};
-    init(es);
+    init(m_entities_param);
 }
 /*----------------------------------------------------------------------------*/
 void GeomSectionByPlaneImplementation::perform(std::vector<GeomEntity*>& res)
 {
-	split(res);
+	splitEntities(res);
 }
 /*----------------------------------------------------------------------------*/
-void GeomSectionByPlaneImplementation::split(std::vector<GeomEntity*>& res)
+void GeomSectionByPlaneImplementation::splitEntities(std::vector<GeomEntity*>& res)
 {
 #ifdef _DEBUG2
-	std::cout<<"GeomSectionByPlaneImplementation::split ..."<<std::endl;
+	std::cout<<"GeomSectionByPlaneImplementation::splitEntities ..."<<std::endl;
 #endif
     //========================================================================
     // 1 - Définition du plan de coupe

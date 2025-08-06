@@ -19,10 +19,10 @@ def test_order_join_curves():
 	gm.scaleAll(1.000000e+00, 2.000000e+00, 3.000000e+00)
 	# Fusion Booléenne de  Vol0009 Vol0006 Vol0005 Vol0010 Vol0008 ... 
 	gm.fuse (["Vol0005","Vol0006","Vol0007","Vol0008","Vol0009","Vol0010"])
-	gm.joinSurfaces (["Surf0035","Surf0037","Surf0044","Surf0043","Surf0022","Surf0024"])
-	gm.joinSurfaces (["Surf0021","Surf0020","Surf0032","Surf0031","Surf0041","Surf0040"])
-	gm.joinSurfaces (["Surf0019","Surf0028","Surf0017","Surf0025","Surf0016","Surf0045","Surf0046"])
-	gm.joinCurves (["Crb0021","Crb0020","Crb0048","Crb0050","Crb0024","Crb0035","Crb0033"])
-	gm.joinCurves (["Crb0014","Crb0013","Crb0044","Crb0046","Crb0018","Crb0028","Crb0026"])
+	gm.joinSurfaces (["Surf0020","Surf0021","Surf0022","Surf0023","Surf0024","Surf0025"])
+	gm.joinSurfaces (["Surf0026","Surf0029","Surf0034","Surf0035","Surf0037","Surf0038"])
+	gm.joinSurfaces (["Surf0016","Surf0017","Surf0019","Surf0030","Surf0040","Surf0041","Surf0042"])
+	gm.joinCurves (["Crb0020","Crb0021","Crb0024","Crb0040","Crb0043","Crb0045","Crb0050"])
+	gm.joinCurves (["Crb0013","Crb0014","Crb0018","Crb0026","Crb0028","Crb0030","Crb0038"])
 
-	assert gm.getVertices() == ["Pt0000", "Pt0001", "Pt0011", "Pt0013", "Pt0014", "Pt0015"]
+	assert gm.getVertices() == ["Pt0000", "Pt0001", "Pt0011", "Pt0012", "Pt0015", "Pt0016"]

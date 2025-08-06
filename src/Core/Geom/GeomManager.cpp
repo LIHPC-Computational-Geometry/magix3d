@@ -4405,26 +4405,24 @@ sectionByPlane( std::vector<Geom::GeomEntity*>& entities,
 
     Internal::CommandInternal* command = 0;
 
-    if (entities.size() == 1 && !Internal::EntitiesHelper::hasTopoRef(entities)) {
-    	command = new CommandSectionByPlane(getContext(), entities[0], tool, planeGroupName);
-    } else {
+    if (Internal::EntitiesHelper::hasTopoRef(entities)){
+
     	Internal::CommandComposite* commandCompo =
     			new Internal::CommandComposite(getContext(), "Section par un plan entre géométries avec topologies");
 
-        for (GeomEntity* e : entities) {
-            Geom::CommandEditGeom *commandGeom =
-                    new CommandSectionByPlane(getContext(), e, tool, planeGroupName);
-            commandCompo->addCommand(commandGeom);
+    	Geom::CommandEditGeom *commandGeom =
+    			new CommandSectionByPlane(getContext(), entities, tool, planeGroupName);
 
-            std::vector<Geom::GeomEntity*> es = {e};
-            if (Internal::EntitiesHelper::hasTopoRef(es)) {
-                Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getContext(),
-                        commandGeom);
-                commandCompo->addCommand(commandTopo);
-            }
-        }
+    	commandCompo->addCommand(commandGeom);
+
+    	Topo::CommandModificationTopo* commandTopo = new Topo::CommandModificationTopo(getContext(),
+    			commandGeom);
+    	commandCompo->addCommand(commandTopo);
 
     	command = commandCompo;
+    }
+    else {
+    	command = new CommandSectionByPlane(getContext(),entities,tool,planeGroupName);
     }
 
     // trace dans le script

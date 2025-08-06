@@ -35,11 +35,11 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur.
      *
-     *  \param e l' entité à traiter
+     *  \param e les entités à traiter
      *  \param p le plan de coupe
 
      */
-    GeomSectionByPlaneImplementation(Internal::Context& c, GeomEntity* e,
+    GeomSectionByPlaneImplementation(Internal::Context& c, std::vector<GeomEntity*>& e,
             Utils::Math::Plane* p);
 
     /*------------------------------------------------------------------------*/
@@ -71,7 +71,7 @@ protected:
         /** \brief  réalisation de la découpe.
          *  Les entités créées sont stockées dans res
          */
-    void split(std::vector<GeomEntity*>& res);
+    void splitEntities(std::vector<GeomEntity*>& res);
 
     /**
      * Methodes surchargée pour mettre à jour la shape OCC d'entités M3D adjacentes
@@ -90,8 +90,17 @@ protected:
     void getUniqueOCCShape(GeomEntity* ge, TopoDS_Shape& sh) const;
 
 private:
-    /* entité passée en argument à la commande. */
-    GeomEntity* m_entity_param;
+
+    /** Entités qui vont être modifiées par l'algorithme. Purement technique pour
+     * faire le lien entre initialize() et finalize()
+     *
+     */
+    std::vector<GeomEntity*> entities_to_update;
+    std::vector<GeomEntity*> entities_new;
+
+
+    /* entités passées en argument à la commande. */
+    std::vector<GeomEntity*> m_entities_param;
 
     TopoDS_Shape m_restricted_section_tool;
 };
