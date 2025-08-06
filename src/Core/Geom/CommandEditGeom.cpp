@@ -45,36 +45,18 @@ void CommandEditGeom::internalExecute()
     internalSpecificPreExecute();
 
     // on recupere toutes les entites concernes par l'opération géométrique
-    std::map<GeomEntity*,MementoEntity> ref;
-    std::vector<std::list<GeomEntity*>*> refEntities;
+    std::map<GeomEntity*, MementoEntity> mementos_by_entity;
+    std::set<GeomEntity*> to_mem_entities[4];
 
-    refEntities.push_back(&(getRefEntities(0))); //sommets
-    refEntities.push_back(&(getRefEntities(1))); //courbes
-    refEntities.push_back(&(getRefEntities(2))); //surfaces
-    refEntities.push_back(&(getRefEntities(3))); //volumes
-
-    // MODIF - LES ENTITES ADJ NE SONT PAS DES ENTITES DE REF
-//    refEntities[0]->insert(refEntities[0]->begin(),getAdjEntities(0).begin(),getAdjEntities(0).end());
-//    refEntities[1]->insert(refEntities[1]->begin(),getAdjEntities(1).begin(),getAdjEntities(1).end());
-//    refEntities[2]->insert(refEntities[2]->begin(),getAdjEntities(2).begin(),getAdjEntities(2).end());
-//    refEntities[3]->insert(refEntities[3]->begin(),getAdjEntities(3).begin(),getAdjEntities(3).end());
-
-#ifdef _DEBUG2
-    std::cerr<<"nb refs sommets = "<<getRefEntities(0).size()<<std::endl;
-    std::cerr<<"nb refs curves  = "<<getRefEntities(1).size()<<std::endl;
-    std::cerr<<"nb refs surfaces= "<<getRefEntities(2).size()<<std::endl;
-    std::cerr<<"nb refs volumes = "<<getRefEntities(3).size()<<std::endl;
-#endif
-    for(unsigned int i=0;i<4;i++){
-        std::list<GeomEntity*>* refList = refEntities[i];
-        std::list<GeomEntity*>::iterator it;
-        for(it=refList->begin();it!=refList->end();it++){
-            GeomEntity* e = *it;
+    for(unsigned int i=0;i<4;i++) {
+        to_mem_entities[i].insert(getRefEntities(i).begin(), getRefEntities(i).end());
+        to_mem_entities[i].insert(getAdjEntities(i).begin(), getAdjEntities(i).end());
+        for (GeomEntity* e : to_mem_entities[i]) {
             MementoEntity mem = m_memento_manager.createMemento(e);
 #ifdef _DEBUG2
            std::cerr<<"Memento cree pour "<<e->getName()<<std::endl;
 #endif
-            ref.insert({e, mem});
+            mementos_by_entity.insert({e, mem});
         }
     }
 //    gmds::Timer t2;
@@ -134,19 +116,27 @@ void CommandEditGeom::internalExecute()
     }
 #endif
 
-    //sauvegarde des mementos pour le undo/redo
+    // Sauvegarde des mementos pour le undo/redo
+    // Utiliser at en lecture pour avoir une exception si
+    // la clef est absente (ne pas utiliser l'opérateur [])
     std::map<GeomEntity*,MementoEntity> keeped_ref;
     for(unsigned int i=0;i<mod_entities.size();i++){
         GeomEntity* e = mod_entities[i];
-        keeped_ref[e] = ref[e];
+        if (mementos_by_entity.find(e) == mementos_by_entity.end())
+            std::cout << "*** MOD les mementos ne contiennent pas " << e->getName() << std::endl;
+        keeped_ref[e] = mementos_by_entity.at(e);
     }
     for(unsigned int i=0;i<mov_entities.size();i++){
         GeomEntity* e = mov_entities[i];
-        keeped_ref[e] = ref[e];
+        if (mementos_by_entity.find(e) == mementos_by_entity.end())
+            std::cout << "*** MOV les mementos ne contiennent pas " << e->getName() << std::endl;
+        keeped_ref[e] = mementos_by_entity.at(e);
     }
     for(unsigned int i=0;i<rem_entities.size();i++){
         GeomEntity* e = rem_entities[i];
-        keeped_ref[e] = ref[e];
+        if (mementos_by_entity.find(e) == mementos_by_entity.end())
+            std::cout << "*** REM les mementos ne contiennent pas " << e->getName() << std::endl;
+        keeped_ref[e] = mementos_by_entity.at(e);
     }
     saveMementos(keeped_ref);
     getInfoCommand().setDestroyAndUpdateConnectivity(rem_entities);

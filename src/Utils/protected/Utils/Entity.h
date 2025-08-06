@@ -13,6 +13,7 @@
 #include "Utils/SerializedRepresentation.h"
 #include <vector>
 #include <map>
+#include <set>
 /*----------------------------------------------------------------------------*/
 namespace TkUtil {
 class Log;
@@ -380,7 +381,9 @@ private :
 
 Entity::objectType typesToType (FilterEntity::objectType types);
 FilterEntity::objectType typeToTypes (Entity::objectType type);
-
+#ifndef SWIG
+template<typename T> using EntitySet = std::set<T, decltype(&Utils::Entity::compareEntity)>;
+#endif
 /*----------------------------------------------------------------------------*/
 } // end namespace Utils
 /*----------------------------------------------------------------------------*/
