@@ -1,6 +1,10 @@
 import pyMagix3D as Mgx3D
 
-def test_issue208_2_sectionByPlane():
+# Tests de la fonction sectionByPlane du GeomManager
+# pour laquelle un certain nombres de bug a été trouvé
+# (cf. Issue#208)
+
+def test_3_boxes():
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     gm = ctx.getGeomManager()
@@ -34,7 +38,7 @@ def test_issue208_2_sectionByPlane():
     ctx.redo()
     assert gm.getNbVolumes() == 5
 
-def test_issue208_single_sectionByPlane():
+def test_3_boxes_two_sections():
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     gm = ctx.getGeomManager()
@@ -58,7 +62,7 @@ def test_issue208_single_sectionByPlane():
     ctx.redo()
     assert gm.getNbVolumes() == 5
 
-def test_issue208_nested_volumes():
+def test_nested_spheres():
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     gm = ctx.getGeomManager()
@@ -84,3 +88,26 @@ def test_issue208_nested_volumes():
     # Des volumes sont créés en double => 6 volumes au lieu de 4
     assert gm.getNbVolumes() == 4
     assert gm.getNbSurfaces() == 6
+
+def test_nested_surfaces():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    gm = ctx.getGeomManager()
+
+    # Création d'une boite avec une topologie
+    gm.newBox(Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1))
+    # Création d'une boite avec une topologie
+    gm.newBox(Mgx3D.Point(-1, -1, -1), Mgx3D.Point(1, 2, 2))
+    # Collage entre Vol0000 Vol0001
+    gm.glue (["Vol0000","Vol0001"])
+    # Destruction de  Vol0002 Vol0000
+    gm.destroy(["Vol0002", "Vol0000"], False)
+    assert gm.getNbSurfaces() == 12
+
+    # Section par un plan de Surf0012 suivant  [  [ 1, .5, 0] ,  [ 0, 1, 0] ] 
+    gm.sectionByPlane (["Surf0012"], Mgx3D.Plane(Mgx3D.Point(1, .5, 0), Mgx3D.Vector(0, 1, 0)), "")
+    assert gm.getNbSurfaces() == 13
+    ctx.undo()
+    assert gm.getNbSurfaces() == 12
+    gm.sectionByPlane (["Surf0012", "Surf0001"], Mgx3D.Plane(Mgx3D.Point(1, .5, 0), Mgx3D.Vector(0, 1, 0)), "")
+    assert gm.getNbSurfaces() == 14

@@ -87,26 +87,35 @@ void GeomSectionByPlaneImplementation::split(std::vector<GeomEntity*>& res)
 #ifdef _DEBUG2
 	std::cout<<"m_init_entities.size = "<<m_init_entities.size()<<std::endl;
 #endif
-    GeomEntity* e1 = m_init_entities[0];
-    TopoDS_Shape s_fuse;
-    getUniqueOCCShape(e1, s_fuse);
-    for(unsigned int i=1;i<m_init_entities.size();i++){
-        GeomEntity* e2 = m_init_entities[i];
-        TopoDS_Shape s2;
-        getUniqueOCCShape(e2, s2);
+    bool all_volumes = std::all_of(m_init_entities.begin(), m_init_entities.end(), [](GeomEntity* x) {
+        return (x->getDim() == 3);
+    });
 
-        BRepAlgoAPI_Fuse fuse_operator(s_fuse,s2);
-        if(fuse_operator.IsDone())
-            s_fuse = fuse_operator.Shape();
+    if (all_volumes) {
+        GeomEntity* e1 = m_init_entities[0];
+        TopoDS_Shape s_fuse;
+        getUniqueOCCShape(e1, s_fuse);
+        for(unsigned int i=1;i<m_init_entities.size();i++){
+            GeomEntity* e2 = m_init_entities[i];
+            TopoDS_Shape s2;
+            getUniqueOCCShape(e2, s2);
+
+            BRepAlgoAPI_Fuse fuse_operator(s_fuse,s2);
+            if(fuse_operator.IsDone())
+                s_fuse = fuse_operator.Shape();
+            else
+                throw TkUtil::Exception (TkUtil::UTF8String ("Problème OCC lors de l'union avant coupe", TkUtil::Charset::UTF_8));
+        }
+        // On recupere l'intersection de la surface wf et de l'union des entites à couper
+        BRepAlgoAPI_Common common_operator(s_fuse, wf);
+        if(common_operator.IsDone())
+            m_restricted_section_tool = common_operator.Shape();
         else
-            throw TkUtil::Exception (TkUtil::UTF8String ("Problème OCC lors de l'union avant coupe", TkUtil::Charset::UTF_8));
+            throw TkUtil::Exception (TkUtil::UTF8String ("Problème OCC lors de l'intersection avant coupe", TkUtil::Charset::UTF_8));
+    } else {
+        // les opérations fuse + common ne fonctionnent pas s'il y a une surface
+        m_restricted_section_tool = wf;
     }
-    // On recupere l'intersection de la surface wf et de l'union des entites à couper
-    BRepAlgoAPI_Common common_operator(s_fuse,wf);
-    if(common_operator.IsDone())
-        m_restricted_section_tool = common_operator.Shape();
-    else
-        throw TkUtil::Exception (TkUtil::UTF8String ("Problème OCC lors de l'intersection avant coupe", TkUtil::Charset::UTF_8));
 
     //========================================================================
     // 3 - Decoupe des entités
