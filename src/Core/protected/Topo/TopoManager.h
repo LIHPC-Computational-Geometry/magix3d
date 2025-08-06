@@ -1022,7 +1022,7 @@ public:
      *  \param deg_max degré maximum pour les polynomes des B-Splines
      */
     Mgx3D::Internal::M3DCommandResult*
-        importMDL(std::string n, const bool all, const bool useAreaName,
+        importMDL(std::string n, const bool all, const bool useAreaName=false,
         		std::string prefixName="", int deg_min=1, int deg_max=2);
     SET_SWIG_COMPLETABLE_METHOD(importMDL)
 
