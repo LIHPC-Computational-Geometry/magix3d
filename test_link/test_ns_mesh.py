@@ -70,6 +70,25 @@ def test_ns_mesh_2(capfd):
     mm.newAllBlocksMesh()
 
     assert gm.getNbVolumes() == 2
+    assert mm.getNbFaces() < 1900
+    assert mm.getNbFaces() > 1850
+    out, err = capfd.readouterr()
+    assert len(err) == 0
+
+def test_ns_mesh_2(capfd):
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    gm = ctx.getGeomManager()
+    tm = ctx.getTopoManager()
+    mm = ctx.getMeshManager()
+
+    tm.newCylinderWithTopo (Mgx3D.Point(0, 0, 0), 1, Mgx3D.Vector(5, 0, 0), 90, False, 1, 10, 10, 10)
+    emp = Mgx3D.EdgeMeshingPropertyUniform(30)
+    ctx.getTopoManager().setMeshingProperty (emp, ["Ar0003","Ar0008","Ar0001"])
+    ctx.getMeshManager().newAllBlocksMesh()
+
+    assert mm.getNbFaces() < 1980
+    assert mm.getNbFaces() > 1940
     out, err = capfd.readouterr()
     assert len(err) == 0
 

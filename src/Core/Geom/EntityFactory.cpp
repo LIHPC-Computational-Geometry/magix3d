@@ -675,10 +675,8 @@ Surface* EntityFactory::newSurface(const std::vector<Geom::Curve*>& curves)
             if(!curve->isLinear()){
                 Utils::Math::Point pnew;
                 curve->getPoint(0.3,pnew,true);
-                std::cout << "Point à 0.3 " << pnew << std::endl;
                 vec_vertices.push_back(pnew);
                 curve->getPoint(0.7,pnew,true);
-                std::cout << "Point à 0.7 " << pnew << std::endl;
                 vec_vertices.push_back(pnew);
             }
         }
