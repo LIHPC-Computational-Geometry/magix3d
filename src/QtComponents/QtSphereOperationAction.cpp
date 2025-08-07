@@ -194,7 +194,7 @@ QtSphereOperationPanel::QtSphereOperationPanel (
 	const int	defaultEdgesNum	=
 		mainWindow.getContext( ).getTopoManager( ).getDefaultNbMeshingEdges( );
 	_topologyPanel	= new QtTopologyPanel (
-			groupBox, mainWindow, true, false, 3, QtTopologyPanel::OGRID_BLOCKS,
+			groupBox, mainWindow, false, false, 3, QtTopologyPanel::OGRID_BLOCKS,
 			QtTopologyPanel::OGRID,
 			-1 /* Pas d'axe 1 */, defaultEdgesNum, defaultEdgesNum, true, true);
 	_topologyPanel->enableTopologyType (

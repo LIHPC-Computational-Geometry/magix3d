@@ -194,7 +194,7 @@ QtConeOperationPanel::QtConeOperationPanel (
 	const int	defaultEdgesNum	=
 		mainWindow.getContext( ).getTopoManager( ).getDefaultNbMeshingEdges( );
 	_topologyPanel	= new QtTopologyPanel (
-			groupCone, mainWindow, true, false, 3,
+			groupCone, mainWindow, false, false, 3,
 			QtTopologyPanel::OGRID_BLOCKS, QtTopologyPanel::OGRID,
 			defaultEdgesNum, defaultEdgesNum, defaultEdgesNum, true, true);
 	_topologyPanel->enableTopologyType (
