@@ -93,6 +93,22 @@ def test_command_scaling(capfd):
     ctx.redo()
     assertPoint(gm, "Pt0001", 1, 1, 1)
 
+def test_command_scaling_2(capfd):
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    gm = ctx.getGeomManager ()
+    tm = ctx.getTopoManager()
+
+    # Création de la boite Vol0000
+    gm.newBox (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1))
+    # Création d'un bloc topologique structuré sur une géométrie (Vol0000)
+    tm.newStructuredTopoOnGeometry ("Vol0000")
+    assertPoint(tm, "Som0006", 1, 1, 1)
+
+    # Homothétie d'une géométrie avec sa topologie
+    gm.scale (["Vol0000"], 3.000000e+00)
+    assertPoint(tm, "Som0006", 3, 3, 3)
+
 def test_command_remove(capfd):
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
@@ -220,8 +236,8 @@ def test_command_common2d(capfd):
     assert gm.getNbSurfaces()==15
     assert gm.getNbCurves()==25
 
-def assertPoint(gm, point, x, y, z):
-    p = gm.getCoord(point)
+def assertPoint(m, point, x, y, z):
+    p = m.getCoord(point)
     assert p.getX() == x
     assert p.getY() == y
     assert p.getZ() == z
