@@ -209,7 +209,6 @@ Utils::Math::Point MeshImplementation::getCoordNode(gmds::Node nd)
 /*----------------------------------------------------------------------------*/
 bool MeshImplementation::createGMDSGroups()
 {
-    std::cout<<"MeshImplementation::createGMDSGroups()"<<std::endl;
     // création des clouds, lines, surfaces et volumes gmds correspondants aux
     // Mgx3D::Mesh::Cloud, Line, Surface et Volume
 
