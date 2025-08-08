@@ -44,14 +44,13 @@ CommandSection::~CommandSection()
 void CommandSection::validate()
 {
     for(unsigned int i=0;i<m_entities.size();i++){
-        if(m_entities[i]->getDim()<2)
+        if(m_entities[i]->getDim()<=2)
         throw TkUtil::Exception(TkUtil::UTF8String ("Seuls des volumes géométriques peuvent être découpés", TkUtil::Charset::UTF_8));
     }
 
     int dim_tool = m_tool->getDim();
     if(dim_tool!=2)
         throw TkUtil::Exception(TkUtil::UTF8String ("L'outil de découpe doit être une surface", TkUtil::Charset::UTF_8));
-
 }
 /*----------------------------------------------------------------------------*/
 void CommandSection::internalSpecificPreExecute()

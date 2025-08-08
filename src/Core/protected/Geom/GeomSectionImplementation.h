@@ -68,11 +68,6 @@ protected:
      */
     void sectionVolumes(std::vector<GeomEntity*>& res);
 
-    /*------------------------------------------------------------------------*/
-    /** \brief  réalisation de la coupe par m_tool
-     */
-    void sectionSurfaces(std::vector<GeomEntity*>& res);
-
 private:
     TopoDS_Face checkSurface(GeomEntity* ge) const;
     TopoDS_Shape checkVolume(GeomEntity* ge) const;

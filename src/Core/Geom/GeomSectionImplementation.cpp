@@ -12,6 +12,7 @@
 #include <BRepAlgoAPI_BuilderAlgo.hxx>
 #include <BRepAlgoAPI_Fuse.hxx>
 #include <BRepAlgoAPI_Common.hxx>
+#include <BRepAlgoAPI_Cut.hxx>
 #include <BRepFeat_Gluer.hxx>
 #include <TopTools_ListOfShape.hxx>
 /*----------------------------------------------------------------------------*/
@@ -67,10 +68,8 @@ void GeomSectionImplementation::perform(std::vector<GeomEntity*>& res)
     if(dim_ref==3){
     	sectionVolumes(res);
     }
-    else if(dim_ref==2)
-        sectionSurfaces(res);
     else
-        throw TkUtil::Exception (TkUtil::UTF8String ("La section géométrique ne s'applique qu'aux volumes ou surfaces", TkUtil::Charset::UTF_8));
+        throw TkUtil::Exception (TkUtil::UTF8String ("La section géométrique ne s'applique qu'aux volumes", TkUtil::Charset::UTF_8));
 
 }
 /*----------------------------------------------------------------------------*/
@@ -119,61 +118,6 @@ void GeomSectionImplementation::sectionVolumes(std::vector<GeomEntity*>& res)
     splitter.Build();
     s = splitter.Shape();
 
-    createGeomEntities(s,true);
-
-    res.insert(res.end(), entities_new.begin(), entities_new.end());
-}
-/*----------------------------------------------------------------------------*/
-void GeomSectionImplementation::sectionSurfaces(std::vector<GeomEntity*>& res)
-{
-    //========================================================================
-    //1 - Recuperation de la surface de coupe
-    //========================================================================
-    TopoDS_Face tool_face = checkSurface(m_tool);
-
-    //========================================================================
-    // 2 - Conservation du plan de coupe réduit aux objets coupés
-    //========================================================================
-    // On commence par fusionner toutes les entites a couper
-
-    GeomEntity* e1 = m_init_entities[0];
-//    TopoDS_Shape s_fuse;
-//    getOCCShape(e1, s_fuse);
-//    for(unsigned int i=1;i<m_init_entities.size();i++){
-//        GeomEntity* e2 = m_init_entities[i];
-//        TopoDS_Shape s2;
-//        getOCCShape(e2, s2);
-//
-//        BRepAlgoAPI_Fuse fuse_operator(s_fuse,s2);
-//        if(fuse_operator.IsDone())
-//            s_fuse = fuse_operator.Shape();
-//        else
-//            throw TkUtil::Exception (TkUtil::UTF8String ("Problème OCC lors de l'union avant coupe", TkUtil::Charset::UTF_8);
-//    }
-//    // On recupere l'intersection de la surface wf et de l'union des entites à
-//    // couper
-//    BRepAlgoAPI_Common common_operator(s_fuse,tool_face);
-//    if(common_operator.IsDone())
-//        m_restricted_section_tool = common_operator.Shape();
-//    else
-//        throw TkUtil::Exception (TkUtil::UTF8String ("Problème OCC lors de l'intersection avant coupe", TkUtil::Charset::UTF_8);
-
-    //========================================================================
-    //3 - Decoupe des entités
-    //========================================================================
-    TopoDS_Shape s;
-    BRepAlgoAPI_BuilderAlgo splitter;
-    TopTools_ListOfShape list_of_arguments;
-    for (unsigned int i = 0; i < m_init_entities.size(); i++) {
-        TopoDS_Shape si = checkSurface(m_init_entities[i]);
-        list_of_arguments.Append(si);
-    }
-    list_of_arguments.Append(tool_face);
-    splitter.Build();
-    s = splitter.Shape();
-
-
-    //createGeomEntitiesBut(s,tool_shape);
     createGeomEntities(s,true);
 
     res.insert(res.end(), entities_new.begin(), entities_new.end());
