@@ -4,6 +4,21 @@ import pyMagix3D as Mgx3D
 # pour laquelle un certain nombres de bug a été trouvé
 # (cf. Issue#208)
 
+def test_cylinder(capfd):
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    gm = ctx.getGeomManager()
+
+    # Création du cylindre Vol0000
+    gm.newCylinder (Mgx3D.Point(0, 0, 0), .1, Mgx3D.Vector(0, 0, 1), 180, "CYL")
+    # Section par un plan de Vol0000 suivant  [  [ 0, 0, .31833] ,  [ 0, 0, 1] ]
+    gm.sectionByPlane (["Vol0000"], Mgx3D.Plane(Mgx3D.Point(0, 0, .31833), Mgx3D.Vector(0, 0, 1)), "XY")
+
+    assert gm.getNbVolumes() == 2
+    assert gm.getNbSurfaces() == 9
+    out, err = capfd.readouterr()
+    assert len(err) == 0
+
 def test_3_boxes():
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test

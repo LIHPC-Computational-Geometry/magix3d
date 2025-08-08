@@ -83,6 +83,7 @@ def test_section_box2(capfd):
     out, err = capfd.readouterr()
     assert len(err) == 0
 
+
 def test_section_box_by_cylinder(capfd):
     ctx = Mgx3D.getStdContext()
     gm = ctx.getGeomManager()
