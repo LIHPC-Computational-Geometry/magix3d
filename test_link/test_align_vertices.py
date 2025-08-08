@@ -17,6 +17,9 @@ def test_align_vertices(capfd):
     tm.alignVertices(Mgx3D.Point(0, 0, 1), Mgx3D.Point(0, 0, 0), ["Som0008"])
     assertPoint(tm, 0, 0, 0.5)
 
+    out, err = capfd.readouterr()
+    assert len(err) == 0
+
 def assertPoint(tm, x, y, z):
     p = tm.getCoord("Som0008")
     assert p.getX() == x
