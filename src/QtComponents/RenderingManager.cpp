@@ -957,16 +957,17 @@ void RenderingManager::updateRepresentation (Mgx3D::Utils::Entity& entity)
 void RenderingManager::updateRepresentations ( )
 {
 	vector<Entity*>	entities	= getDisplayedEntities ( );
-	for (vector<Entity*>::iterator it = entities.begin ( );
-	     entities.end ( ) !=it; it++)
+	size_t			count		= 1;
+	for (vector<Entity*>::iterator it = entities.begin ( ); entities.end ( ) !=it; it++, count++)
 	{
-		DisplayProperties::GraphicalRepresentation*	rep	=
-				(*it)->getDisplayProperties ( ).getGraphicalRepresentation ( );
+		DisplayProperties::GraphicalRepresentation*	rep	= (*it)->getDisplayProperties ( ).getGraphicalRepresentation ( );
 		if (0 != rep)
 		{
 			unsigned long	mask	= rep->getRepresentationMask ( );
 			rep->updateRepresentation (mask, true);
 		}
+		if (0 == count % Resources::instance ( )._updateRefreshRate.getValue ( ))
+			forceRender ( );
 	}	// for (vector<Entity*>::iterator it = entities.begin ( ); ...
 }	// RenderingManager::updateRepresentations
 
