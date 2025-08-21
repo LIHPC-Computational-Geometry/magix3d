@@ -154,12 +154,12 @@ protected:
 
     /* pour conserver les entités de départ ou non*/
     bool m_keep;
+
     /* entités que l'on a modifiées */
     std::vector<GeomEntity*> m_modifiedEntities;
 
     /* map inverse entre sommet "2D" et sommet copie*/
     std::map<Geom::Vertex* ,Geom::Vertex*> m_v2v_inv;
-
 
     /* entités passées en argument à la commande. */
     std::vector<GeomEntity*> m_entities_param;

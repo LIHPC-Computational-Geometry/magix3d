@@ -21,9 +21,10 @@ CommandExtrudeRevolution::
 CommandExtrudeRevolution(Internal::Context& c,
         std::vector<GeomEntity*>& entities,
         const Utils::Math::Rotation& rot,  const bool keep)
-:   CommandExtrusion(c, "Revolution"),
-    m_entities(entities), m_axis1(rot.getAxis1()), m_axis2(rot.getAxis2()),
-    m_angle(rot.getAngle()), m_keep(keep)
+: CommandExtrusion(c, "Revolution", entities, keep)
+, m_axis1(rot.getAxis1())
+, m_axis2(rot.getAxis2())
+, m_angle(rot.getAngle())
 {
     if (m_angle<0.0 || m_angle>360.0)
         throw TkUtil::Exception(TkUtil::UTF8String ("L'angle est en degrés et doit être compris entre 0 et 360", TkUtil::Charset::UTF_8));
@@ -40,30 +41,11 @@ CommandExtrudeRevolution(Internal::Context& c,
 	setName(comments);
 }
 /*----------------------------------------------------------------------------*/
-CommandExtrudeRevolution::~CommandExtrudeRevolution()
-{
-    if(m_impl)
-        delete m_impl;
-}
-/*----------------------------------------------------------------------------*/
 void CommandExtrudeRevolution::
-internalExecute()
+internalSpecificExecute()
 {
-    m_impl->prePerform();
-    m_impl->perform(m_createdEntities,m_v2v, m_v2v_opp,m_v2c,
+    getImpl()->perform(m_createdEntities,m_v2v, m_v2v_opp,m_v2c,
             m_c2c, m_c2c_opp, m_c2s, m_s2s, m_s2s_opp, m_s2v);
-    std::vector<GeomEntity*>& new_entities = m_impl->getNewEntities();
-    std::vector<GeomEntity*>& rem_entities = m_impl->getRemovedEntities();
-    for(int i=0;i<new_entities.size();i++){
-        GeomEntity* ge = new_entities[i];
-        getInfoCommand ( ).addGeomInfoEntity (ge, Internal::InfoCommand::CREATED);
-        getContext().getGeomManager().addEntity(ge);
-    }
-    for(int i=0;i<rem_entities.size();i++){
-        getInfoCommand ( ).addGeomInfoEntity (rem_entities[i], Internal::InfoCommand::DELETED);
-    }
-
-    getInfoCommand().setDestroyAndUpdateConnectivity(rem_entities);
 
     // transmet les groupes du 2D vers le 3D
     groups2DTo3D();
@@ -83,12 +65,6 @@ internalExecute()
         prefixGroupsName("PZ0", m_v2v, m_c2c, m_s2s);
         prefixGroupsName("P72", m_v2v_opp, m_c2c_opp, m_s2s_opp);
         addGroupOnAxis();
-    }
-    for(int i=0;i<new_entities.size();i++){
-    	GeomEntity* ge = new_entities[i];
-    	if (ge->getNbGroups() == 0)
-    		// ajoute à un groupe par défaut
-    		m_group_helper.addToGroup("", ge);
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -125,7 +101,6 @@ addGroupOnAxis()
             m_group_helper.addToGroup("AXE", crv2);
         }
     }
-
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom
