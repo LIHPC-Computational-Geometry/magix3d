@@ -30,12 +30,12 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur
      */
-    virtual ~CommandExtrudeRevolution();
+    virtual ~CommandExtrudeRevolution() = default;
 
     /*------------------------------------------------------------------------*/
     /** \brief  exécute la commande
      */
-    void internalExecute();
+    void internalSpecificExecute();
 
 
 private:
@@ -45,10 +45,9 @@ private:
      */
     void addGroupOnAxis();
 
-protected:
-
-    /* entités à unir */
-    std::vector<GeomEntity*> m_entities;
+    /* Pour caster l'implémentation... */
+    GeomRevolImplementation* getImpl()
+    { return dynamic_cast<GeomRevolImplementation*>(m_impl); }
 
     /* points définissant l'axe de révolution */
     Utils::Math::Point m_axis1;
@@ -56,12 +55,6 @@ protected:
 
     /* angle de révolution */
     double m_angle;
-
-    /* conservation des entités initiales*/
-    bool m_keep;
-
-    /* objet gérant l'opération de révolution*/
-    GeomRevolImplementation* m_impl;
 };
 /*----------------------------------------------------------------------------*/
 } /* namespace Geom */

@@ -6,6 +6,7 @@
 #include "Geom/Volume.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/OCCHelper.h"
+#include "Geom/IncidentGeomEntitiesVisitor.h"
 /*----------------------------------------------------------------------------*/
 #include <list>
 /*----------------------------------------------------------------------------*/
@@ -26,6 +27,7 @@
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/MemoryError.h>
+#include <TkUtil/TraceLog.h>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -81,7 +83,7 @@ void GeomRevolImplementation::perform(std::vector<GeomEntity*>& res,
     for(unsigned int i=1;i<m_init_entities.size();i++){
         int dimi = m_init_entities[i]->getDim();
         if(dimi==3)
-            throw TkUtil::Exception(TkUtil::UTF8String ("La révolution ne s'applique qu'à des objets de dimension inférieur à 3", TkUtil::Charset::UTF_8));
+            throw TkUtil::Exception(TkUtil::UTF8String ("La révolution ne s'applique qu'à des objets de dimension inférieure à 3", TkUtil::Charset::UTF_8));
     }
 
     /* les deux points passes en paramètres ne peuvent être égaux */
@@ -123,12 +125,36 @@ void GeomRevolImplementation::perform(std::vector<GeomEntity*>& res,
     }
 
     if(!m_keep){
-        for(int i=0;i<3;i++){
-            std::list<GeomEntity*>::iterator it;
-            for(it=m_ref_entities[i].begin();it!=m_ref_entities[i].end();it++){
-                m_removedEntities.push_back(*it);
+        // m_keep à vrai => l'utilisateur demande la suppression des entités de départ
+        // impliquées dans la révolution. Néanmoins, ces dernières ne seront pas 
+        // détruites si elles ont une adjacence "up" sur une autre entité (pas impliquée)
+        Utils::EntitySet<GeomEntity*> cleanable_entities(Utils::Entity::compareEntity);
+        Utils::EntitySet<GeomEntity*> uncleanable_entities(Utils::Entity::compareEntity);
+        for(int i=2;i>=0;i--){
+            for (GeomEntity* ge : m_ref_entities[i]) {
+                GetUpIncidentGeomEntitiesVisitor v_up;
+                ge->accept(v_up);
+                Utils::EntitySet<GeomEntity*> up_entities = v_up.get();
+                if (std::includes(cleanable_entities.begin(), cleanable_entities.end(), up_entities.begin(), up_entities.end(), Utils::Entity::compareEntity)) {
+                    cleanable_entities.insert(ge);
+                } else {
+                    uncleanable_entities.insert(ge);
+                }
             }
         }
+
+        if (uncleanable_entities.size() > 0) {
+            TkUtil::UTF8String warning;
+            warning << "Certaines entités ne peuvent pas être supprimées ";
+            warning << "car elles sont incidentes/adjacentes à des entités non supprimées : ";
+            for (GeomEntity* ge : uncleanable_entities)
+                warning << ge->getName() << " ";
+            m_context.getLogStream()->log(TkUtil::TraceLog(warning));
+            std::cout << warning << std::endl;
+        }
+
+        for (GeomEntity* ge : cleanable_entities)
+            m_removedEntities.push_back(ge);
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -542,7 +568,6 @@ void GeomRevolImplementation::makeRevol2PIComposite(Curve* curve,std::vector<Geo
     }
 
 }
-/*----------------------------------------------------------------------------*/
 /*----------------------------------------------------------------------------*/
 void GeomRevolImplementation::makeRevolComposite(Curve* curve,std::vector<GeomEntity*>& res,
         std::map<Geom::Vertex*,Geom::Vertex*>  & v2v,
@@ -1069,7 +1094,7 @@ void GeomRevolImplementation::makeRevol(Surface* surf,
             vol->add(si);
         }
 
-        //surface <-> courbes
+        // surface <-> courbes
         // les surfaces surf_copy et surf_opp sont nouvelles, elles doivent donc
         // etre connectées à des courbes
         for(unsigned int i=0;i<curves_of_surf.size();i++){
