@@ -201,7 +201,6 @@ void CommandSectionByPlane::internalSpecificExecute()
     	}
 
 }
-
 /*----------------------------------------------------------------------------*/
 void CommandSectionByPlane::internalSpecificPreExecute()
 {

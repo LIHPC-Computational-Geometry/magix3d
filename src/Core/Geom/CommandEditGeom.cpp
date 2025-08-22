@@ -294,14 +294,14 @@ void CommandEditGeom::updateGroups()
         }
     }
 
-    // on utilise le groupe m_group_name (suivant la dimention)
+    // on utilise le groupe m_group_name (suivant la dimension)
     std::vector<GeomEntity*>& newEntities = getNewEntities();
     for (std::vector<GeomEntity*>::iterator iter = newEntities.begin();
             iter != newEntities.end(); ++iter){
         GeomEntity* ge = *iter;
         if (filtre_ge[ge] == 0){
-            bool use_group_name = (ge->getDim() == m_dim_new_group); // && (filtre_ge[ge] == 0)
-            addToGroup(ge, !use_group_name);
+            std::string group_name = (ge->getDim() == m_dim_new_group ? m_group_name : ""); // && (filtre_ge[ge] == 0)
+            m_group_helper.addToGroup(group_name, ge);
 #ifdef _DEBUG2
             std::cout<<"  addToGroup de "<<ge->getName()<<" avec groupe: "<<(use_group_name?m_group_name:"")<<std::endl;
 #endif

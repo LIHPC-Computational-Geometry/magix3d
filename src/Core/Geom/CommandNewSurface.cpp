@@ -64,7 +64,7 @@ internalExecute()
     store(s);
 
     // ajoute la surface au groupe s'il y en a un de spécifié
-    addToGroup(s);
+    m_group_helper.addToGroup(m_group_name, s);
 
     //creation des connections topologiques
     for(unsigned int i=0;i<m_curves.size();i++)

@@ -47,7 +47,7 @@ internalExecute()
     split(v);
 
     // ajoute le sommet au groupe s'il y en a un de spécifié
-    addToGroup(v);
+    m_group_helper.addToGroup(m_group_name, v);
 
     // information un peu plus parlante
     TkUtil::UTF8String comments (TkUtil::Charset::UTF_8);

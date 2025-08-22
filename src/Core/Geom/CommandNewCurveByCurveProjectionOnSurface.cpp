@@ -37,7 +37,7 @@ internalExecute()
 
 
     // ajoute la courbe au groupe s'il y en a un de spécifié
-    addToGroup(c);
+    m_group_helper.addToGroup(m_group_name, c);
 
     //aucune creation de connections topologiques
     split(c);
