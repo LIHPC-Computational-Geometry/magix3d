@@ -112,12 +112,10 @@ namespace Mgx3D {
                 //------------------------
 
                 //Chaque face dupliquée est associée aux groupe de la face de base
-                Utils::Container<Group::Group2D>& groups = m_cofaces[i_f]->getGroupsContainer();
-                for (uint i=0; i<groups.size(); i++){
-                    Group::Group2D* gr = groups.get(i);
-                    std::cout<<gr->getName()<<std::endl;
+                std::vector<Group::Group2D*> groups = m_cofaces[i_f]->getGroups();
+                for (Group::Group2D* gr : groups) {
                     gr->add(f);
-                    f->getGroupsContainer().add(gr);
+                    f->add(gr);
                 }
             }
 
@@ -513,7 +511,7 @@ namespace Mgx3D {
                 Group::Group3D *group = getContext().getGroupManager().getNewGroup3D(getContext().getGroupManager().getDefaultName(3),
                                                                                           &getInfoCommand());
                 group->add(newBlock);
-                newBlock->getGroupsContainer().add(group);
+                newBlock->add(group);
                 getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
 
                 getInfoCommand().addTopoInfoEntity(newBlock, Internal::InfoCommand::CREATED);

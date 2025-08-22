@@ -1,11 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file Block
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 22/11/2010
- */
-/*----------------------------------------------------------------------------*/
 #ifndef MGX3D_TOPO_BLOCK_H_
 #define MGX3D_TOPO_BLOCK_H_
 /*----------------------------------------------------------------------------*/
@@ -521,12 +514,10 @@ public:
     /// Accesseur sur la liste de noms de groupes
     virtual void getGroupsName (std::vector<std::string>& gn, bool byGeom=true, bool byTopo=true) const;
 
-    /// Accesseur sur le conteneur pour les groupes
-    Utils::Container<Group::Group3D>& getGroupsContainer() {return m_topo_property->getGroupsContainer();}
-    const Utils::Container<Group::Group3D>& getGroupsContainer() const {return m_topo_property->getGroupsContainer();}
-
-    void getGroups(std::vector<Group::Group3D*>& g3) const
-         {g3 = getGroupsContainer().get();}
+    void add(Group::Group3D* grp);
+    void remove(Group::Group3D* grp);
+    int getNbGroups() const;
+    std::vector<Group::Group3D*> getGroups() const;
 
     /*------------------------------------------------------------------------*/
     /// Nombre de noeuds internes: le nombre de noeuds sans ceux du bord

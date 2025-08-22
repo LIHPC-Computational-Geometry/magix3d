@@ -1005,19 +1005,15 @@ meshAndModify(std::list<Topo::CoFace*>& list_cofaces)
 			Geom::Surface* surface = dynamic_cast<Geom::Surface*>(coface->getGeomAssociation());
 			CHECK_NULL_PTR_ERROR(surface);
 			const std::vector<Group::Group2D*>& grps = surface->getGroups();
-
-			for (std::vector<Group::Group2D*>::const_iterator iter2 = grps.begin();
-					iter2 != grps.end(); ++iter2){
-				Group::Group2D* grp = *iter2;
+			for (Group::Group2D* grp : grps){
 				if (grp->getNbMeshModif() != 0)
 					list_grp.push_back(grp);
-			} // end for iter2
+			}
 		} // end if getGeomAssociation
 
 		// les groupes depuis les faces
-		Utils::Container<Group::Group2D>& grp2d = coface->getGroupsContainer();
-		for (uint i=0; i<grp2d.getNb(); i++){
-			Group::Group2D* grp = grp2d.get(i);
+		std::vector<Group::Group2D*> grps = coface->getGroups();
+		for (Group::Group2D* grp : grps){
 			if (grp->getNbMeshModif() != 0)
 				list_grp.push_back(grp);
 		}
@@ -1268,9 +1264,7 @@ modify(std::vector<Topo::Block*>& list_blocks)
 			CHECK_NULL_PTR_ERROR(volume);
 			const std::vector<Group::Group3D*>& grps = volume->getGroups();
 
-			for (std::vector<Group::Group3D*>::const_iterator iter2 = grps.begin();
-					iter2 != grps.end(); ++iter2){
-				Group::Group3D* grp = *iter2;
+			for (Group::Group3D* grp : grps) {
 				if (grp->getNbMeshModif() != 0)
 					list_grp.push_back(grp);
 			} // end for iter2
@@ -1282,13 +1276,11 @@ modify(std::vector<Topo::Block*>& list_blocks)
 		}
 
 		// les groupes depuis les blocs
-		Utils::Container<Group::Group3D>& grp3d = block->getGroupsContainer();
-		for (uint i=0; i<grp3d.getNb(); i++){
-			Group::Group3D* grp = grp3d.get(i);
+		std::vector<Group::Group3D*> grps = block->getGroups();
+		for (Group::Group3D* grp : grps){
 			if (grp->getNbMeshModif() != 0)
 				list_grp.push_back(grp);
 		}
-
 	} // end for iter1
 
 	list_grp.sort();

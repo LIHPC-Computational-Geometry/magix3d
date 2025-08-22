@@ -366,11 +366,10 @@ public:
     virtual void getGroupsName (std::vector<std::string>& gn, bool byGeom=true, bool byTopo=true) const;
 
     /// Accesseur sur le conteneur pour les groupes
-    Utils::Container<Group::Group0D>& getGroupsContainer() {return m_topo_property->getGroupsContainer();}
-    const Utils::Container<Group::Group0D>& getGroupsContainer() const {return m_topo_property->getGroupsContainer();}
-
-    void getGroups(std::vector<Group::Group0D*>& grp) const
-          {grp = getGroupsContainer().get();}
+    void add(Group::Group0D* grp);
+    void remove(Group::Group0D* grp);
+    int getNbGroups() const;
+    std::vector<Group::Group0D*> getGroups() const;
 
     /*------------------------------------------------------------------------*/
     /** Nombre de noeuds internes
