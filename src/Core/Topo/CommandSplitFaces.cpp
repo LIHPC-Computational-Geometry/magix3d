@@ -145,7 +145,7 @@ void CommandSplitFaces::init2D(std::vector<Topo::CoFace* > &cofaces)
 #ifdef _DEBUG_SPLIT
 	std::cout<<"init2D avec "<<cofaces.size() <<" cofaces"<<std::endl;
 #endif
-    // on ne concerve que les faces 2D structurées
+    // on ne conserve que les faces 2D structurées
     for (std::vector<Topo::CoFace* >::iterator iter = cofaces.begin();
             iter != cofaces.end(); ++iter){
         Topo::CoFace* hcf = *iter;
@@ -162,6 +162,12 @@ void CommandSplitFaces::init2D(std::vector<Topo::CoFace* > &cofaces)
             log (TkUtil::TraceLog (message, TkUtil::Log::WARNING));
         }
     }
+	if (m_cofaces.size() < 1)
+	{
+		TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
+		messErr<<"Aucune face selectionnée n'est 2D stucturée, pour découper une face 3D structurée, utilisez le panneau correspondant.";
+		throw TkUtil::Exception(messErr);
+	}
 }
 /*----------------------------------------------------------------------------*/
 void CommandSplitFaces::verif(Topo::CoFace* coface)
@@ -298,7 +304,6 @@ internalExecute()
     	messErr<<"Le ratio pour le découpage doit être dans l'interval [0 1] et non "<<m_ratio_dec;
     	throw TkUtil::Exception(messErr);
     }
-
 
     if (m_ratio_ogrid<0.0 || m_ratio_ogrid>=1.0)
         throw TkUtil::Exception (TkUtil::UTF8String ("Le ratio pour l'ogrid doit être dans l'interval [0 1[", TkUtil::Charset::UTF_8));
