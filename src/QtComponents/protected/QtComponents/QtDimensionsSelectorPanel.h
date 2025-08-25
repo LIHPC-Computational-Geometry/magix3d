@@ -7,7 +7,7 @@
 #define QT_DIMENSIONS_SELECTOR_PANEL_H
 
 
-#include "Utils/SelectionManager.h"
+#include "Internal/SelectionManager.h"
 
 #include <QButtonGroup>
 #include <QCheckBox>

@@ -9,7 +9,7 @@
 #ifndef MGX3D_GROUP_GROUPMANAGER_H_
 #define MGX3D_GROUP_GROUPMANAGER_H_
 /*----------------------------------------------------------------------------*/
-#include "Utils/SelectionManager.h"
+#include "Internal/SelectionManager.h"
 #include "Internal/CommandCreator.h"
 #include "Internal/M3DCommandResult.h"
 #include "Geom/GeomEntity.h"

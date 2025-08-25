@@ -15,7 +15,7 @@
 #include "QtVtkComponents/VTKMgx3DPickerCommand.h"
 #include "QtComponents/EntitySeizureManager.h"
 #include "Utils/Entity.h"
-#include "Utils/SelectionManager.h"
+#include "Internal/SelectionManager.h"
 #include <TkUtil/LogOutputStream.h>
 
 #include <vtkHardwareSelector.h>

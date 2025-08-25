@@ -8,7 +8,7 @@
 #define QT_GROUP_SELECTOR_DIALOG_H
 
 #include <TkUtil/util_config.h>
-#include "Utils/SelectionManager.h"
+#include "Internal/SelectionManager.h"
 #include "QtComponents/QtDimensionsSelectorPanel.h"
 
 #include <QtUtil/QtDlgClosurePanel.h>

@@ -8,7 +8,7 @@
 #define VTK_SELECTION_MANAGER_DIM_FILTER_H
 
 
-#include "Utils/SelectionManagerDimFilter.h"
+#include "Internal/SelectionManagerDimFilter.h"
 #include "QtVtkComponents/VTKMgx3DSelectionManager.h"
 
 

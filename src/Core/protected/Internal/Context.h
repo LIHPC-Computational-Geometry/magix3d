@@ -5,7 +5,7 @@
 #include "Internal/NameManager.h"
 #include "Internal/ScriptingManager.h"
 
-#include "Utils/SelectionManager.h"
+#include "SelectionManager.h"
 #include "Utils/Unit.h"
 #include "Utils/Entity.h"
 #include "Utils/Landmark.h"

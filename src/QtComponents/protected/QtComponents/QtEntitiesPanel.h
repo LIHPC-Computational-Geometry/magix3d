@@ -14,7 +14,7 @@
 #include <QTreeWidget>
 
 #include "QtComponents/QtEntitiesItemViewPanel.h"
-#include "Utils/SelectionManager.h"
+#include "Internal/SelectionManager.h"
 #include "Geom/GeomEntity.h"
 #include "Topo/TopoEntity.h"
 #include "Mesh/MeshEntity.h"

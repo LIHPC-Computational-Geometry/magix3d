@@ -3,7 +3,7 @@
 
 #include "VTKMgx3DPicker.h"
 #include "QtVtkComponents/VTKECMPickerCommand.h"
-#include "Utils/SelectionManager.h"
+#include "Internal/SelectionManager.h"
 
 #include <TkUtil/LogDispatcher.h>
 

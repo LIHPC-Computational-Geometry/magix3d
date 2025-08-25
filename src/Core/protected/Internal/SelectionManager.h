@@ -2,7 +2,7 @@
 #define SELECTION_MANAGER_H
 
 
-#include "Entity.h"
+#include "Utils/Entity.h"
 
 #include <TkUtil/Mutex.h>
 

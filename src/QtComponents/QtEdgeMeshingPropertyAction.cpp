@@ -456,7 +456,7 @@ void QtGeometricProgressionPanel::reset ( )
 	_factorTextField->setValue (1.1);
 
 	CHECK_NULL_PTR_ERROR (_firstEdgeLengthTextField)
-	_firstEdgeLengthTextField->setValue (0.0);
+	_firstEdgeLengthTextField->setValue (1.0);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
 

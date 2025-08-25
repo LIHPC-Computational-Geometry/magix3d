@@ -10,7 +10,7 @@
 
 #include "QtComponents/QtSelectionPropertiesTreeItem.h"
 #include "QtComponents/Qt3DGraphicalWidget.h"
-#include "Utils/SelectionManager.h"
+#include "Internal/SelectionManager.h"
 
 #include <QtUtil/QtGroupBox.h>
 

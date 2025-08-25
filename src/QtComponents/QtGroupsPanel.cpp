@@ -7,7 +7,7 @@
 #include "Internal/Context.h"
 
 #include "Utils/Common.h"
-#include "Utils/SelectionManagerDimFilter.h"
+#include "Internal/SelectionManagerDimFilter.h"
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"

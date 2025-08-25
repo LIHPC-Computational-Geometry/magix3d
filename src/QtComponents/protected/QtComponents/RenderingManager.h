@@ -9,7 +9,7 @@
 
 #include "Group/GroupEntity.h"
 #include "Internal/Context.h"
-#include "Utils/SelectionManager.h"
+#include "Internal/SelectionManager.h"
 #include "Utils/GraphicalEntityRepresentation.h"
 #include "Internal/CommandInternal.h"
 #include "QtComponents/LandmarkAttributes.h"

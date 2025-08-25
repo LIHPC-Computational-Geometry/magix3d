@@ -9,7 +9,7 @@
 #include "Internal/Context.h"
 
 #include "QtComponents/QtSelectionPropertiesTreeItem.h"
-#include "Utils/SelectionManager.h"
+#include "Internal/SelectionManager.h"
 
 #include <QtUtil/QtGroupBox.h>
 

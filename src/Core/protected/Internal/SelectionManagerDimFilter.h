@@ -8,7 +8,7 @@
 #define SELECTION_MANAGER_DIM_FILTER_H
 
 
-#include "Utils/SelectionManager.h"
+#include "SelectionManager.h"
 
 
 /*----------------------------------------------------------------------------*/

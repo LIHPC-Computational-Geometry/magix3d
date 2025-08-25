@@ -8,7 +8,7 @@
 #define VTK_MGX3D_SELECTION_MANAGER_H
 
 
-#include "Utils/SelectionManager.h"
+#include "Internal/SelectionManager.h"
 #include "QtVtkComponents/VTKECMSelectionManager.h"
 #include "QtVtkComponents/VTKRenderingManager.h"
 
