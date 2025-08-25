@@ -53,7 +53,7 @@ public:
 
     /*----------------------------------------------------------------------------*/
     /// recherche et enlève l'entité
-    void remove(T* entity, const bool exceptionIfNotFound)
+    void remove(T* entity, const bool exceptionIfNotFound=true)
     {
         uint i = 0;
         for (; i<m_entities.size() && entity != m_entities[i]; ++i)
@@ -67,13 +67,6 @@ public:
             //message << ", pour " << entity->getName();
             throw TkUtil::Exception (message);
         }
-        // la même chose mais le compilo n'en veut pas !!!
-        //        std::vector<T* >::iterator iter;
-        //        iter = find(m_entities.begin(), m_entities.end(), entity);
-        //        if (iter != m_entities.end())
-        //            m_entities.erase(iter);
-        //        else if(exceptionIfNotFound)
-        //            throw TkUtil::Exception("Erreur interne (pas d'entité), avec Container::remove");
     }
 
     /*----------------------------------------------------------------------------*/

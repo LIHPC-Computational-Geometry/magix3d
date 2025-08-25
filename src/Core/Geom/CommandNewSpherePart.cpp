@@ -43,7 +43,7 @@ internalExecute()
     split(vol);
 
     // ajoute le volume au groupe s'il y en a un de spécifié
-    addToGroup(vol);
+    m_group_helper.addToGroup(m_group_name, vol);
 
     // information un peu plus parlante
     TkUtil::UTF8String comments (TkUtil::Charset::UTF_8);

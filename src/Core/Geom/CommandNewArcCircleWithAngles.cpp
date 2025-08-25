@@ -44,7 +44,7 @@ internalExecute()
     store(c);
 
     // ajoute la courbe au groupe s'il y en a un de spécifié
-    addToGroup(c);
+    m_group_helper.addToGroup(m_group_name, c);
 
     // information un peu plus parlante
     TkUtil::UTF8String comments (TkUtil::Charset::UTF_8);

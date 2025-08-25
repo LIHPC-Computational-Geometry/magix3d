@@ -23,8 +23,12 @@ namespace Topo {
 /*----------------------------------------------------------------------------*/
 
 ImportBlocksImplementation::ImportBlocksImplementation(Internal::Context &c, Internal::InfoCommand *icmd,
-                            const std::string &n) : m_c(c), m_icmd(icmd), m_filename(n) {
-}
+                            const std::string &n) 
+: m_group_helper(*icmd, c.getGroupManager())
+, m_icmd(icmd)
+, m_c(c)
+, m_filename(n)
+{}
 /*----------------------------------------------------------------------------*/
 //ImportBlocksImplementation::~ImportBlocksImplementation() {}
 /*----------------------------------------------------------------------------*/
@@ -44,7 +48,6 @@ void ImportBlocksImplementation::internalExecute() {
         throw TkUtil::Exception(mess);
     }
 
-        Group::Group0D* group0 = getStdContext()->getGroupManager().getNewGroup0D("Hors_Groupe_0D", m_icmd);
         Group::Group1D* group1 = getStdContext()->getGroupManager().getNewGroup1D("Hors_Groupe_1D", m_icmd);
         Group::Group2D* group2 = getStdContext()->getGroupManager().getNewGroup2D("Hors_Groupe_2D", m_icmd);
         Group::Group3D* group3 = getStdContext()->getGroupManager().getNewGroup3D("Hors_Groupe_3D", m_icmd);
@@ -77,8 +80,7 @@ void ImportBlocksImplementation::internalExecute() {
             vertices[i] = vtx;
             vnames[i] = vtx->getName();
             m_icmd->addTopoInfoEntity(vtx, Internal::InfoCommand::CREATED);
-            group0->add(vtx);
-            vtx->getGroupsContainer().add(group0);
+            m_group_helper.addToGroup("Hors_Groupe_0D", vtx);
         }
 
 
@@ -111,7 +113,7 @@ void ImportBlocksImplementation::internalExecute() {
             enames[i] = edge->getName();
             m_icmd->addTopoInfoEntity(edge, Internal::InfoCommand::CREATED);
             group1->add(edge);
-            edge->getGroupsContainer().add(group1);
+            edge->add(group1);
         }
 
 
@@ -291,7 +293,7 @@ void ImportBlocksImplementation::internalExecute() {
             fnames[i] = face->getName();
             m_icmd->addTopoInfoEntity(face, Internal::InfoCommand::CREATED);
             group2->add(face);
-            face->getGroupsContainer().add(group2);
+            face->add(group2);
         }
 
     /*----------------------------------------------------------------------------*/
@@ -402,7 +404,7 @@ void ImportBlocksImplementation::internalExecute() {
             Block* block = new Block(m_c, faces, vs, true);
             m_icmd->addTopoInfoEntity(block, Internal::InfoCommand::CREATED);
             group3->add(block);
-            block->getGroupsContainer().add(group3);
+            block->add(group3);
 
 
             //block->check();

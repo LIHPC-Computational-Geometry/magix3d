@@ -36,9 +36,10 @@ namespace Geom {
 GeomImport::
 GeomImport(Internal::Context& c, Internal::InfoCommand* icmd,
         const std::string& n, const bool onlySolidsAndFaces)
-: GeomModificationBaseClass(c /*on ne garde pas les entités initiales*/),
-  m_icmd(icmd), m_filename(n), m_onlySolidsAndFaces(onlySolidsAndFaces),
-  m_testVolumicProperties(true)
+: GeomModificationBaseClass(c /*on ne garde pas les entités initiales*/)
+, m_group_helper(*icmd, c.getGroupManager())
+, m_icmd(icmd), m_filename(n), m_onlySolidsAndFaces(onlySolidsAndFaces)
+, m_testVolumicProperties(true)
 {
 	// récupération du nom du fichier sans chemin ni extension
 	std::string suffix = m_filename;
@@ -217,36 +218,36 @@ void GeomImport::add(TopoDS_Shape& AShape, const std::string& AName)
     case TopAbs_SOLID:
     {
         Volume* vol=EntityFactory(m_context).newOCCVolume(TopoDS::Solid(AShape));
-    	addToGroup(vol, AName);
+    	m_group_helper.addToGroup(AName, vol);
         gsi.split(vol, surfs, curvs, verts);
         store(vol);
         for(unsigned int i=0;i<surfs.size();i++){
         	store(surfs[i]);
-        	addToGroup(surfs[i],"");
+        	m_group_helper.addToGroup("", surfs[i]);
         }
         for(unsigned int i=0;i<curvs.size();i++){
         	store(curvs[i]);
-        	addToGroup(curvs[i],"");
+        	m_group_helper.addToGroup("", curvs[i]);
         }
         for(unsigned int i=0;i<verts.size();i++){
         	store(verts[i]);
-        	addToGroup(verts[i],"");
+        	m_group_helper.addToGroup("", verts[i]);
         }
     }
     break;
     case TopAbs_FACE:
     {
         Surface* surf=EntityFactory(m_context).newOCCSurface(TopoDS::Face(AShape));
-        addToGroup(surf, AName);
+        m_group_helper.addToGroup(AName, surf);
         gsi.split(surf, curvs, verts);
         store(surf);
         for(unsigned int i=0;i<curvs.size();i++){
         	store(curvs[i]);
-        	addToGroup(curvs[i],"");
+        	m_group_helper.addToGroup("", curvs[i]);
         }
         for(unsigned int i=0;i<verts.size();i++){
         	store(verts[i]);
-        	addToGroup(verts[i],"");
+        	m_group_helper.addToGroup("", verts[i]);
         }
     }
     break;
@@ -262,20 +263,20 @@ void GeomImport::add(TopoDS_Shape& AShape, const std::string& AName)
             curvs.push_back(curve);
             TkUtil::UTF8String	name (TkUtil::Charset::UTF_8);
             name << AName<< "-edge";
-            addToGroup(curve, AName);
+            m_group_helper.addToGroup(AName, curve);
             store(curve);
         }
         splitManyCurves(curvs, verts);
         for(unsigned int i=0;i<verts.size();i++){
             store(verts[i]);
-            addToGroup(verts[i],"");
+            m_group_helper.addToGroup("", verts[i]);
         }
     }
     break;
     case TopAbs_EDGE:
     {
         Curve* curve=EntityFactory(m_context).newOCCCurve(TopoDS::Edge(AShape));
-        addToGroup(curve, AName);
+        m_group_helper.addToGroup(AName, curve);
         gsi.split(curve, verts);
         store(curve);
         for(unsigned int i=0;i<verts.size();i++)
@@ -285,7 +286,7 @@ void GeomImport::add(TopoDS_Shape& AShape, const std::string& AName)
     case TopAbs_VERTEX:
     {
         Vertex* vertex=EntityFactory(m_context).newOCCVertex(TopoDS::Vertex(AShape));
-        addToGroup(vertex, AName);
+        m_group_helper.addToGroup(AName, vertex);
         store(vertex);
      }
     break;
@@ -298,60 +299,24 @@ void GeomImport::add(TopoDS_Shape& AShape, const std::string& AName)
     case TopAbs_SHELL:
     {
         Volume* vol=EntityFactory(m_context).newOCCVolume(TopoDS::Shell(AShape));
-    	addToGroup(vol, AName);
+    	m_group_helper.addToGroup(AName, vol);
         gsi.split(vol, surfs, curvs, verts);
         store(vol);
         for(unsigned int i=0;i<surfs.size();i++){
         	store(surfs[i]);
-        	addToGroup(surfs[i],"");
+        	m_group_helper.addToGroup("", surfs[i]);
         }
         for(unsigned int i=0;i<curvs.size();i++){
         	store(curvs[i]);
-        	addToGroup(curvs[i],"");
+        	m_group_helper.addToGroup("", curvs[i]);
         }
         for(unsigned int i=0;i<verts.size();i++){
         	store(verts[i]);
-        	addToGroup(verts[i],"");
+        	m_group_helper.addToGroup("", verts[i]);
         }
     }
         break;
     }
-}
-/*----------------------------------------------------------------------------*/
-void GeomImport::
-addToGroup(Volume* v, const std::string& AName)
-{
-    Group::Group3D* group = getContext().getGroupManager().getNewGroup3D(AName, m_icmd);
-    v->add(group);
-    group->add(v);
-    m_icmd->addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
-}
-/*----------------------------------------------------------------------------*/
-void GeomImport::
-addToGroup(Surface* s, const std::string& AName)
-{
-    Group::Group2D* group = getContext().getGroupManager().getNewGroup2D(AName, m_icmd);
-    s->add(group);
-    group->add(s);
-    m_icmd->addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
-}
-/*----------------------------------------------------------------------------*/
-void GeomImport::
-addToGroup(Curve* c, const std::string& AName)
-{
-    Group::Group1D* group = getContext().getGroupManager().getNewGroup1D(AName, m_icmd);
-    c->add(group);
-    group->add(c);
-    m_icmd->addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
-}
-/*----------------------------------------------------------------------------*/
-void GeomImport::
-addToGroup(Vertex* v, const std::string& AName)
-{
-    Group::Group0D* group = getContext().getGroupManager().getNewGroup0D(AName, m_icmd);
-    v->add(group);
-    group->add(v);
-    m_icmd->addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
 }
 /*----------------------------------------------------------------------------*/
 void GeomImport::

@@ -6,6 +6,7 @@
 #define MAGIX3D_IMPORTBLOCKSIMPLEMENTATION_H
 /*----------------------------------------------------------------------------*/
 #include "Internal/Context.h"
+#include "Group/GroupHelperForCommand.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -34,15 +35,16 @@ private:
     bool moveStreamOntoFirst(std::ifstream& s,const std::string &AString);
 
 private:
-    /** Informations sur la commande: entités modifiées */
+    /// helper pour la gestion des groupes dans les commandes
+    Group::GroupHelperForCommand m_group_helper;
+
+    /// Informations sur la commande: entités modifiées
     Internal::InfoCommand* m_icmd;
 
     Internal::Context& m_c;
 
     /// le nom du fichier en entier
     std::string m_filename;
-
-
 };
 }
 }

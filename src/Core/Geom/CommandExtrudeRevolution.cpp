@@ -88,16 +88,13 @@ internalExecute()
     	GeomEntity* ge = new_entities[i];
     	if (ge->getNbGroups() == 0)
     		// ajoute à un groupe par défaut
-    		addToGroup(ge);
+    		m_group_helper.addToGroup("", ge);
     }
 }
 /*----------------------------------------------------------------------------*/
 void CommandExtrudeRevolution::
 addGroupOnAxis()
 {
-    // le groupe pour les courbes sur l'axe
-    Group::Group1D* grp = getContext().getGroupManager().getNewGroup1D("AXE", &getInfoCommand());
-
     // on commence par identifier les sommets sur l'axe, on les marque à 2, sinon 1
     std::map<Geom::Vertex* ,uint> filtre_vertices;
 
@@ -125,8 +122,7 @@ addGroupOnAxis()
                 && crv1->isLinear())
         {
             //std::cout<<crv1->getName()<< " sur l'axe, et donne "<<crv2->getName()<<std::endl;
-            crv2->add(grp);
-            grp->add(crv2);
+            m_group_helper.addToGroup("AXE", crv2);
         }
     }
 

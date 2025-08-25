@@ -116,7 +116,7 @@ internalExecute()
     	GeomEntity* ge = new_entities[i];
     	if (ge->getNbGroups() == 0)
     		// ajoute à un groupe par défaut
-    		addToGroup(ge);
+    		m_group_helper.addToGroup("", ge);
     }
 }
 /*----------------------------------------------------------------------------*/
