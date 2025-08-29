@@ -32,7 +32,8 @@ namespace Geom {
 /*----------------------------------------------------------------------------*/
 CommandCreateGeom::CommandCreateGeom(Internal::Context& c, std::string name,
                                      const std::string& groupName)
-	: Internal::CommandInternal (c, name)
+: Internal::CommandInternal (c, name)
+, m_group_helper(getInfoCommand(), c.getGroupManager())
 , m_group_name(groupName)
 , m_dim_new_group(3)
 , m_isPreview(false)
@@ -153,15 +154,15 @@ split(Volume* v)
 
     for(unsigned int i=0;i<surfaces.size();i++){
         store(surfaces[i]);
-        addToGroup(surfaces[i], true);
+        m_group_helper.addToGroup("", surfaces[i]);
     }
     for(unsigned int i=0;i<curves.size();i++){
         store(curves[i]);
-        addToGroup(curves[i], true);
+        m_group_helper.addToGroup("", curves[i]);
     }
     for(unsigned int i=0;i<vertices.size();i++){
         store(vertices[i]);
-        addToGroup(vertices[i], true);
+        m_group_helper.addToGroup("", vertices[i]);
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -183,11 +184,11 @@ split(Surface* s)
 
     for(unsigned int i=0;i<curves.size();i++){
         store(curves[i]);
-        addToGroup(curves[i], true);
+        m_group_helper.addToGroup("", curves[i]);
     }
     for(unsigned int i=0;i<vertices.size();i++){
         store(vertices[i]);
-        addToGroup(vertices[i], true);
+        m_group_helper.addToGroup("", vertices[i]);
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -209,7 +210,7 @@ split(Curve* c)
 
     for(unsigned int i=0;i<vertices.size();i++){
         store(vertices[i]);
-        addToGroup(vertices[i], true);
+        m_group_helper.addToGroup("", vertices[i]);
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -270,59 +271,6 @@ store(std::vector<GeomEntity*>& e){
     for(unsigned int i=0;i<e.size();i++){
         store(e[i]);
     }
-}
-/*----------------------------------------------------------------------------*/
-void CommandCreateGeom::
-addToGroup(GeomEntity* e, bool use_default_name)
-{
-#ifdef _DEBUG2
-	std::cout<<"CommandCreateGeom::addToGroup("<<e->getName()<<", "<<use_default_name<<") avec m_group_name "<<m_group_name<<std::endl;
-#endif
-   if(e->getDim()==0)
-        addToGroup(dynamic_cast<Vertex*>(e), use_default_name);
-    else if(e->getDim()==1)
-        addToGroup(dynamic_cast<Curve*>(e), use_default_name);
-    else if(e->getDim()==2)
-        addToGroup(dynamic_cast<Surface*>(e), use_default_name);
-    else
-        addToGroup(dynamic_cast<Volume*>(e), use_default_name);
-
-}
-/*----------------------------------------------------------------------------*/
-void CommandCreateGeom::
-addToGroup(Volume* v, bool use_default_name)
-{
-    Group::Group3D* group = getContext().getGroupManager().getNewGroup3D(use_default_name?"":m_group_name, &getInfoCommand());
-    v->add(group);
-    group->add(v);
-    getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
-}
-/*----------------------------------------------------------------------------*/
-void CommandCreateGeom::
-addToGroup(Surface* s, bool use_default_name)
-{
-    Group::Group2D* group = getContext().getGroupManager().getNewGroup2D(use_default_name?"":m_group_name, &getInfoCommand());
-    s->add(group);
-    group->add(s);
-    getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
-}
-/*----------------------------------------------------------------------------*/
-void CommandCreateGeom::
-addToGroup(Curve* c, bool use_default_name)
-{
-    Group::Group1D* group = getContext().getGroupManager().getNewGroup1D(use_default_name?"":m_group_name, &getInfoCommand());
-    c->add(group);
-    group->add(c);
-    getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
-}
-/*----------------------------------------------------------------------------*/
-void CommandCreateGeom::
-addToGroup(Vertex* v, bool use_default_name)
-{
-    Group::Group0D* group = getContext().getGroupManager().getNewGroup0D(use_default_name?"":m_group_name, &getInfoCommand());
-    v->add(group);
-    group->add(v);
-    getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
 }
 /*----------------------------------------------------------------------------*/
 void CommandCreateGeom::

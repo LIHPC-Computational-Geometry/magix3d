@@ -616,7 +616,7 @@ setDestroyed(bool b)
         return;
 
     // on retire la relation depuis les groupes
-     Utils::Container<Group::Group2D>& groups = getGroupsContainer();
+     Utils::Container<Group::Group2D>& groups = m_topo_property->getGroupsContainer();
 #ifdef _DEBUG2
     std::cout<<"Les groupes:";
     for  (uint i=0; i<groups.size(); i++)
@@ -932,13 +932,13 @@ split2(eDirOnCoFace dir, std::vector<Edge*>& edges1, std::vector<Edge*>& edges3,
         coface2->setGeomAssociation(getGeomAssociation());
     }
 
-    Utils::Container<Group::Group2D>& groups = getGroupsContainer();
+    Utils::Container<Group::Group2D>& groups = m_topo_property->getGroupsContainer();
     for (uint i=0; i<groups.size(); i++){
     	Group::Group2D* gr = groups.get(i);
     	gr->add(coface1);
     	gr->add(coface2);
-    	coface1->getGroupsContainer().add(gr);
-    	coface2->getGroupsContainer().add(gr);
+    	coface1->add(gr);
+    	coface2->add(gr);
     }
 
     // on ajoute les 2 CoFaces aux faces
@@ -1186,15 +1186,15 @@ split3(eDirOnCoFace dir, std::vector<Edge*>& edges1, std::vector<Edge*>& edges3,
         coface3->setGeomAssociation(getGeomAssociation());
     }
 
-    Utils::Container<Group::Group2D>& groups = getGroupsContainer();
+    Utils::Container<Group::Group2D>& groups = m_topo_property->getGroupsContainer();
     for (uint i=0; i<groups.size(); i++){
     	Group::Group2D* gr = groups.get(i);
     	gr->add(coface1);
     	gr->add(coface2);
     	gr->add(coface3);
-    	coface1->getGroupsContainer().add(gr);
-    	coface2->getGroupsContainer().add(gr);
-    	coface3->getGroupsContainer().add(gr);
+    	coface1->add(gr);
+    	coface2->add(gr);
+    	coface3->add(gr);
     }
 
     // on ajoute les 3 CoFaces aux faces
@@ -1461,15 +1461,15 @@ splitOgrid(eDirOnCoFace dir,
             new_vertex->setGeomAssociation(getGeomAssociation());
         }
 
-        Utils::Container<Group::Group2D>& groups = getGroupsContainer();
+        Utils::Container<Group::Group2D>& groups = m_topo_property->getGroupsContainer();
         for (uint i=0; i<groups.size(); i++){
         	Group::Group2D* gr = groups.get(i);
         	gr->add(coface0);
         	gr->add(coface1);
         	gr->add(coface2);
-        	coface0->getGroupsContainer().add(gr);
-        	coface1->getGroupsContainer().add(gr);
-        	coface2->getGroupsContainer().add(gr);
+        	coface0->add(gr);
+        	coface1->add(gr);
+        	coface2->add(gr);
         }
 
 
@@ -1677,17 +1677,17 @@ splitOgrid(eDirOnCoFace dir,
             new_vtx[1]->setGeomAssociation(getGeomAssociation());
         }
 
-        Utils::Container<Group::Group2D>& groups = getGroupsContainer();
+        Utils::Container<Group::Group2D>& groups = m_topo_property->getGroupsContainer();
         for (uint i=0; i<groups.size(); i++){
         	Group::Group2D* gr = groups.get(i);
         	gr->add(coface0);
         	gr->add(coface1);
         	gr->add(coface2);
         	gr->add(coface3);
-        	coface0->getGroupsContainer().add(gr);
-        	coface1->getGroupsContainer().add(gr);
-        	coface2->getGroupsContainer().add(gr);
-        	coface3->getGroupsContainer().add(gr);
+        	coface0->add(gr);
+        	coface1->add(gr);
+        	coface2->add(gr);
+        	coface3->add(gr);
         }
 
 
@@ -2393,8 +2393,7 @@ getDescription (bool alsoComputed) const
 
    description->addPropertiesSet (topoRelation);
 
-   std::vector<Group::Group2D*> grp;
-   getGroups(grp);
+   std::vector<Group::Group2D*> grp = getGroups();
    if (!grp.empty()){
 	   Utils::SerializedRepresentation  groupe ("Relation vers les groupes",
 			   TkUtil::NumericConversions::toStr(grp.size()));
@@ -3697,6 +3696,26 @@ void CoFace::getGroupsName (std::vector<std::string>& gn, bool byGeom, bool byTo
 	if (byTopo)
 		for (uint i = 0; i<m_topo_property->getGroupsContainer().size(); ++i)
 		        gn.push_back(m_topo_property->getGroupsContainer().get(i)->getName());
+}
+/*----------------------------------------------------------------------------*/
+void CoFace::add(Group::Group2D* grp)
+{
+    m_topo_property->getGroupsContainer().add(grp);
+}
+/*----------------------------------------------------------------------------*/
+void CoFace::remove(Group::Group2D* grp)
+{
+    m_topo_property->getGroupsContainer().remove(grp);
+}
+/*----------------------------------------------------------------------------*/
+int CoFace::getNbGroups() const
+{
+    return m_topo_property->getGroupsContainer().getNb();
+}
+/*----------------------------------------------------------------------------*/
+std::vector<Group::Group2D*> CoFace::getGroups() const
+{
+    return m_topo_property->getGroupsContainer().get();
 }
 /*----------------------------------------------------------------------------*/
 unsigned long CoFace::getNbInternalMeshingNodes()

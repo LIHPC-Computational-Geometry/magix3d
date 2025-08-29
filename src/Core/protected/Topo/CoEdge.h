@@ -1,11 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file CoEdge.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 07/02/2012
- */
-/*----------------------------------------------------------------------------*/
 #ifndef TOPO_COEDGE_H_
 #define TOPO_COEDGE_H_
 /*----------------------------------------------------------------------------*/
@@ -414,13 +407,10 @@ public:
 
     /// Accesseur sur la liste de noms de groupes
     virtual void getGroupsName (std::vector<std::string>& gn, bool byGeom=true, bool byTopo=true) const;
-
-    /// Accesseur sur le conteneur pour les groupes
-    Utils::Container<Group::Group1D>& getGroupsContainer() {return m_topo_property->getGroupsContainer();}
-    const Utils::Container<Group::Group1D>& getGroupsContainer() const {return m_topo_property->getGroupsContainer();}
-
-    void getGroups(std::vector<Group::Group1D*>& grp) const
-          {grp = getGroupsContainer().get();}
+    void add(Group::Group1D* grp);
+    void remove(Group::Group1D* grp);
+    int getNbGroups() const;
+    std::vector<Group::Group1D*> getGroups() const;
 
     /*------------------------------------------------------------------------*/
     /// Nombre de noeuds internes: le nombre de noeuds sans ceux du bord

@@ -13,6 +13,8 @@
 #include "Internal/CommandInternal.h"
 #include "Mesh/CommandCreateMesh.h"
 #include "Utils/Vector.h"
+#include "Group/GroupHelperForCommand.h"
+/*----------------------------------------------------------------------------*/
 #include <vector>
 #include <string>
 /*----------------------------------------------------------------------------*/
@@ -181,53 +183,10 @@ public:
     void updateMesh(Geom::Curve* crv, std::string grpName, bool add);
     void updateMesh(std::vector<Topo::CoEdge*>& coedges, std::string grpName, bool add);
 
-
 private:
+    /// helper pour la gestion des groupes dans les commandes
+    Group::GroupHelperForCommand m_group_helper;
 
-    /// ajoute un sommet à un groupe et réciproquement
-    void addGroup(std::string ng, Geom::Vertex* vtx);
-    /// enlève un sommet à un groupe et réciproquement
-    void removeGroup(std::string ng, Geom::Vertex* vtx);
-
-    /// ajoute une courbe à un groupe et réciproquement
-    void addGroup(std::string ng, Geom::Curve* crv);
-    /// enlève une courbe à un groupe et réciproquement
-    void removeGroup(std::string ng, Geom::Curve* crv);
-
-    /// ajoute une surface à un groupe et réciproquement
-    void addGroup(std::string ng, Geom::Surface* srf);
-    /// enlève une surface à un groupe et réciproquement
-    void removeGroup(std::string ng, Geom::Surface* srf);
-
-    /// ajoute un volume à un groupe et réciproquement
-    void addGroup(std::string ng, Geom::Volume* vol);
-    /// enlève un volume à un groupe et réciproquement
-    void removeGroup(std::string ng, Geom::Volume* vol);
-
-
-    /// ajoute un sommet à un groupe et réciproquement
-    void addGroup(std::string ng, Topo::Vertex* vtx);
-    /// enlève un sommet à un groupe et réciproquement
-    void removeGroup(std::string ng, Topo::Vertex* vtx);
-
-    /// ajoute une arête à un groupe et réciproquement
-    void addGroup(std::string ng, Topo::CoEdge* coedge);
-    /// enlève une arête à un groupe et réciproquement
-    void removeGroup(std::string ng, Topo::CoEdge* coedge);
-
-    /// ajoute une face à un groupe et réciproquement
-    void addGroup(std::string ng, Topo::CoFace* coface);
-    /// enlève une face à un groupe et réciproquement
-    void removeGroup(std::string ng, Topo::CoFace* coface);
-
-    /// ajoute un bloc à un groupe et réciproquement
-    void addGroup(std::string ng, Topo::Block* bloc);
-    /// enlève un bloc à un groupe et réciproquement
-    void removeGroup(std::string ng, Topo::Block* bloc);
-
-
-
-private:
     /// la liste des entités géométriques concernées
     std::vector<Geom::GeomEntity*> m_geom_entities;
 

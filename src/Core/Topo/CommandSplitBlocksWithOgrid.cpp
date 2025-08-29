@@ -1610,10 +1610,10 @@ createBlock(std::map<Vertex*, uint> & filtre_vertex,
                         getInfoCommand().addTopoInfoEntity(newBlock, Internal::InfoCommand::CREATED);
 
                         // met les mêmes groupes que pour le bloc découpé
-                        for (uint i=0; i<bloc->getGroupsContainer().size(); i++){
-                        	Group::Group3D* gr = bloc->getGroupsContainer().get(i);
+                        std::vector<Group::Group3D*> grps = bloc->getGroups();
+                        for (Group::Group3D* gr : grps) {
                         	gr->add(newBlock);
-                        	newBlock->getGroupsContainer().add(gr);
+                        	newBlock->add(gr);
                         }
 
                         // copie le lien sur la géométrie
@@ -1677,10 +1677,10 @@ createBlock(std::map<Vertex*, uint> & filtre_vertex,
                 getInfoCommand().addTopoInfoEntity(newBlock, Internal::InfoCommand::CREATED);
 
                 // met les mêmes groupes que pour le bloc découpé
-                for (uint i=0; i<bloc->getGroupsContainer().size(); i++){
-                	Group::Group3D* gr = bloc->getGroupsContainer().get(i);
-                	gr->add(newBlock);
-                	newBlock->getGroupsContainer().add(gr);
+                std::vector<Group::Group3D*> grps = bloc->getGroups();
+                for (Group::Group3D* gr : grps) {
+                    gr->add(newBlock);
+                    newBlock->add(gr);
                 }
 
                 // copie le lien sur la géométrie
@@ -1714,10 +1714,10 @@ createBlock(std::map<Vertex*, uint> & filtre_vertex,
         getInfoCommand().addTopoInfoEntity(newBlock, Internal::InfoCommand::CREATED);
 
         // met les mêmes groupes que pour le bloc découpé
-        for (uint i=0; i<bloc->getGroupsContainer().size(); i++){
-        	Group::Group3D* gr = bloc->getGroupsContainer().get(i);
-        	gr->add(newBlock);
-        	newBlock->getGroupsContainer().add(gr);
+        std::vector<Group::Group3D*> grps = bloc->getGroups();
+        for (Group::Group3D* gr : grps) {
+            gr->add(newBlock);
+            newBlock->add(gr);
         }
 
         // copie le lien sur la géométrie
@@ -1945,15 +1945,15 @@ freeUnused(std::map<Vertex*, uint> & filtre_vertex,
 						} // end if (newCoface)
 					} // end if (ga)
 
-					if (!coface->getGroupsContainer().empty()) {
+					if (coface->getNbGroups() > 0) {
 						// pour la coface centrale
 						CoFace* newCoface = corr_coface[coface];
 						if (newCoface && newCoface != coface) {
 							// met les mêmes groupes que pour la face découpée
-							for (uint i=0; i<coface->getGroupsContainer().size(); i++){
-								Group::Group2D* gr = coface->getGroupsContainer().get(i);
+                            std::vector<Group::Group2D*> grps = coface->getGroups();
+							for (Group::Group2D* gr : grps) {
 								gr->add(newCoface);
-								newCoface->getGroupsContainer().add(gr);
+								newCoface->add(gr);
 							}
 
 							// pour les faces entre les bords de la face initiale et celle au centre
@@ -1966,11 +1966,10 @@ freeUnused(std::map<Vertex*, uint> & filtre_vertex,
 
 								newCoface = corr_2vtx_coface[std::pair<Vertex*, Vertex*>(vtx0, vtx1)];
 								if (newCoface){
-									for (uint i=0; i<coface->getGroupsContainer().size(); i++){
-										Group::Group2D* gr = coface->getGroupsContainer().get(i);
-										gr->add(newCoface);
-										newCoface->getGroupsContainer().add(gr);
-									}
+                                    for (Group::Group2D* gr : grps) {
+                                        gr->add(newCoface);
+                                        newCoface->add(gr);
+                                    }
 								}
 							}
 						}

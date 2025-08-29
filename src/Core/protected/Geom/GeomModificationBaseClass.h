@@ -277,7 +277,7 @@ protected:
     std::vector<Surface*> m_newSurfaces;
     std::vector<Volume*> m_newVolumes;
 
-    /*entités ajoutées */
+    /* entités ajoutées */
     std::vector<GeomEntity*> m_newEntities;
     /* entités que l'on a supprimées */
     std::vector<GeomEntity*> m_removedEntities;
