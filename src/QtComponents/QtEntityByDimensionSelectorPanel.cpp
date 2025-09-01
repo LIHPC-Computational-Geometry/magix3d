@@ -20,6 +20,7 @@ using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils;
+using namespace Mgx3D::Internal;
 using namespace Mgx3D::QtComponents;
 
 

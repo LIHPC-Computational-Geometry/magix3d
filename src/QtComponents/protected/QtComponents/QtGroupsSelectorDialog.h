@@ -55,7 +55,7 @@ class QtGroupsSelectorDialog : public QDialog
 	/**
 	 * \return		Les dimensions des groupes à sélectionner.
 	 */
-	virtual Mgx3D::Utils::SelectionManager::DIM dimensions ( ) const;
+	virtual Mgx3D::Internal::SelectionManager::DIM dimensions ( ) const;
 
 	/**
 	 * \return		Les niveaux des groupes à sélectionner.

@@ -7,6 +7,7 @@
 #define SELECTIONHELPER_H
 /*----------------------------------------------------------------------------*/
 #include "Utils/Entity.h"
+#include "Internal/SelectionManager.h"
 #include "Topo/TopoEntity.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
@@ -14,7 +15,9 @@ namespace Mgx3D {
         class SelectionHelper {
 
         public:
-            static void selectSheet(Topo::TopoEntity* entity);
+            static void selectSheet(Topo::TopoEntity* entity, double* point, SelectionManager* selectionManager);
+
+            static void selectChord(Topo::TopoEntity* entity, double* point, SelectionManager* selectionManager);
 
         private:
             SelectionHelper ( );

@@ -71,13 +71,13 @@ class QtTopologyAddToGroupOperationPanel : public QtMgx3DOperationPanel
 	 * \return		La dimension des entités sélectionnées
 	 * \see			setDimension
 	 */
-	virtual Mgx3D::Utils::SelectionManager::DIM getDimension ( ) const;
+	virtual Mgx3D::Internal::SelectionManager::DIM getDimension ( ) const;
 
 	/**
 	 * \param		Nouvelle dimension de saisie des entités topologiques.
 	 * \see			getDimension
 	 */
-	virtual void setDimension (Mgx3D::Utils::SelectionManager::DIM dim);
+	virtual void setDimension (Mgx3D::Internal::SelectionManager::DIM dim);
 
 	/**
 	 * \return		La liste des entités topologiques à ajouter.

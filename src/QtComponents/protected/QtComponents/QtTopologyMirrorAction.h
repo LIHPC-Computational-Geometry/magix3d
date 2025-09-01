@@ -62,7 +62,7 @@ class QtTopologyMirrorPanel :
 	/**
 	 * \param		Nouvelle dimension de saisie des entités topologiques.
 	 */
-	virtual void setDimension (Mgx3D::Utils::SelectionManager::DIM dim);
+	virtual void setDimension (Mgx3D::Internal::SelectionManager::DIM dim);
 
 
 	/**

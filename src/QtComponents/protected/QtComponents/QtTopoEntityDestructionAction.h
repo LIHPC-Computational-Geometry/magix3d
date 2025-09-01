@@ -93,7 +93,7 @@ class QtTopoEntityDestructionPanel : public QtMgx3DOperationPanel
 	/**
 	 * \param		Nouvelles dimensions.
 	 */
-	virtual void setDimensions (Mgx3D::Utils::SelectionManager::DIM dims);
+	virtual void setDimensions (Mgx3D::Internal::SelectionManager::DIM dims);
 
 
 	protected :

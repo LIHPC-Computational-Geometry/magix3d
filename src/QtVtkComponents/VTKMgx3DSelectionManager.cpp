@@ -111,9 +111,17 @@ void VTKMgx3DSelectionManager::AddToSelection (vtkActor& actor)
 	Entity*		entity		= 0 == mgxActor ? 0 : mgxActor->GetEntity ( );
 	if (0 != entity)
 	{
-		vector<Entity*>	entities;
-		entities.push_back (entity);
-		addToSelection (entities);
+		if(getRenderingManager().getRenderWindow().GetInteractor()->GetAltKey()) {
+			double* point = getRenderingManager().getRenderWindow().GetInteractor()->GetPicker()->GetPickPosition();
+			selectSheet(entity, point);
+		}else if(getRenderingManager().getRenderWindow().GetInteractor()->GetShiftKey()) {
+			double* point = getRenderingManager().getRenderWindow().GetInteractor()->GetPicker()->GetPickPosition();
+			selectChord(entity, point);
+		}else{
+			vector<Entity*>	entities;
+			entities.push_back (entity);
+			addToSelection (entities);
+		}
 	}	// if (0 != entity)
 }	// VTKMgx3DSelectionManager::AddToSelection
 

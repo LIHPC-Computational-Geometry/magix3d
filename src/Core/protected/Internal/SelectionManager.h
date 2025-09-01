@@ -14,7 +14,7 @@
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
-namespace Utils {
+namespace Internal {
 
 
 class SelectionManager;
@@ -39,7 +39,7 @@ class SelectionManagerObserver
 
 	/** Constructeur. Se référence auprès du gérant de sélection.
 	 */
-	SelectionManagerObserver (Mgx3D::Utils::SelectionManager* selectionManager);
+	SelectionManagerObserver (Mgx3D::Internal::SelectionManager* selectionManager);
 
 	/**
 	 * Destructeur. Se désenregistre auprès de son gestionnaire de 
@@ -52,14 +52,14 @@ class SelectionManagerObserver
 	 * argument.
 	 * @param		Nouveau gestionnaire de sélection. Peut être nul.
 	 */
-	virtual void setSelectionManager (Mgx3D::Utils::SelectionManager* selectionManager);
+	virtual void setSelectionManager (Mgx3D::Internal::SelectionManager* selectionManager);
 
 	/**
 	 * @return		le gestionnaire de sélection
 	 */
-	virtual Mgx3D::Utils::SelectionManager* getSelectionManager ( )
+	virtual Mgx3D::Internal::SelectionManager* getSelectionManager ( )
 	{ return _selectionManager; }
-	virtual const Mgx3D::Utils::SelectionManager* getSelectionManager ( ) const
+	virtual const Mgx3D::Internal::SelectionManager* getSelectionManager ( ) const
 	{ return _selectionManager; }
 
 	/**
@@ -153,7 +153,7 @@ class SelectionManagerObserver
 	SelectionManagerObserver& operator = (const SelectionManagerObserver&);
 
 	/** Le gestionnaire de sélection. */
-	Mgx3D::Utils::SelectionManager*			_selectionManager;
+	Mgx3D::Internal::SelectionManager*			_selectionManager;
 
 	/** Mutext pour protéger certaines opérations. */
 	mutable TkUtil::Mutex*						_mutex;
@@ -224,18 +224,18 @@ class SelectionManager
      * @return      les entités de la sélection filtrées suivant le type d'objet
      * \param 		type le type d'entité que l'on souhaite avoir
      */
-    virtual std::vector<Mgx3D::Utils::Entity*> getEntities (Entity::objectType type) const;
+    virtual std::vector<Mgx3D::Utils::Entity*> getEntities (Utils::Entity::objectType type) const;
 
     /**
      * @return      les noms des entités de la sélection correspondant au filtre transmis en argument.
      */
-    virtual std::vector<std::string> getEntitiesNames (FilterEntity::objectType mask) const;
+    virtual std::vector<std::string> getEntitiesNames (Utils::FilterEntity::objectType mask) const;
 
     /**
      * @return      les noms des entités de la sélection filtrées suivant le type d'objet
      * \param 		type le type d'entité que l'on souhaite avoir
      */
-    virtual std::vector<std::string> getEntitiesNames (Entity::objectType type) const;
+    virtual std::vector<std::string> getEntitiesNames (Utils::Entity::objectType type) const;
 
     /** \return le nombre d'entités sélectionnées */
     virtual uint getNbEntities()
@@ -408,16 +408,19 @@ class SelectionManager
 	 * sélection à venir.
 	 * @param		Observateur à recencer, non nul.
 	 */
-	virtual void addSelectionObserver (Mgx3D::Utils::SelectionManagerObserver& observer);
+	virtual void addSelectionObserver (Mgx3D::Internal::SelectionManagerObserver& observer);
 
 	/** Désenregistre l'observateur de sélection reçu en argument. Cet
 	 * observateur ne sera plus informé des modifications de la
 	 * sélection à venir.
 	 * @param		Observateur à désenregistrer, non nul.
 	 */
-	virtual void removeSelectionObserver (Mgx3D::Utils::SelectionManagerObserver& observer);
+	virtual void removeSelectionObserver (Mgx3D::Internal::SelectionManagerObserver& observer);
 
 	//@}	// Les observateurs de sélection.
+
+	void selectSheet(Utils::Entity *e, double* point);
+	void selectChord(Utils::Entity *e, double *point);
 
 
 	protected :
@@ -425,7 +428,7 @@ class SelectionManager
 	/**
 	 * @return		La liste des observateurs.
 	 */
-	virtual std::vector<Mgx3D::Utils::SelectionManagerObserver*> getObservers ( );
+	virtual std::vector<Mgx3D::Internal::SelectionManagerObserver*> getObservers ( );
 
 	/**
 	 * Le mutex qui protège l'instance.
@@ -519,7 +522,7 @@ class SelectionManager
 	std::vector<Mgx3D::Utils::Entity*>						_entities;
 
 	/** Les observateurs de la sélection. */
-	std::vector<Mgx3D::Utils::SelectionManagerObserver*>	_observers;
+	std::vector<Mgx3D::Internal::SelectionManagerObserver*>	_observers;
 
 	/** Mutex pour protéger certaines opérations. */
 	mutable TkUtil::Mutex*									_mutex;

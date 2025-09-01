@@ -41,7 +41,7 @@ class VTKRenderingManager;
  * @date		23/04/2013
  */
 class VTKMgx3DSelectionManager :
-						public virtual Mgx3D::Utils::SelectionManager,
+						public virtual Mgx3D::Internal::SelectionManager,
 						public VTKECMSelectionManager
 {
 	public :

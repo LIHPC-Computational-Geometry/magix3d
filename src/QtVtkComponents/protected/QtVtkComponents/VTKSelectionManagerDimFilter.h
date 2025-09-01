@@ -34,7 +34,7 @@ namespace QtVtkComponents {
  * @date		18/10/2012
  */
 class VTKSelectionManagerDimFilter :
-						public Mgx3D::Utils::SelectionManagerDimFilter,
+						public Mgx3D::Internal::SelectionManagerDimFilter,
 						public Mgx3D::QtVtkComponents::VTKMgx3DSelectionManager
 {
 	public :

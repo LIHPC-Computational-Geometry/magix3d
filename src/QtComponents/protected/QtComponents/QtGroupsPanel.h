@@ -294,7 +294,7 @@ class QtMgx3DTBTreeWidget : public QTreeWidget
  *				de groupes sélectionnés.
  *				</P>
  */
-class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionManagerObserver
+class QtGroupsPanel : public QtEntitiesItemViewPanel, public Internal::SelectionManagerObserver
 {
 	Q_OBJECT
 

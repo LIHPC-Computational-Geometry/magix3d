@@ -300,9 +300,11 @@ public:
     /// recherche si 2 cofaces sont orientées dans la même direction (cofaces avec une coedge commune)
     static bool cofacesInverted(Topo::CoFace* coface, Topo::CoFace* coface_vois, Topo::CoEdge* coedge);
 
-    static std::vector<TopoEntity*> getSheet(TopoEntity * startEdge);
+    static std::vector<TopoEntity*> getSheet(TopoEntity * startEdge, double* point);
 
-    std::vector<Block *> getChord(CoEdge *);
+    static std::vector<TopoEntity *> getChord(TopoEntity * startEdge, double* point);
+
+    static std::map<CoEdge*, bool> parallelEdges(Topo::CoEdge* edgeStart);
 
 private :
 

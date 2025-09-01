@@ -515,7 +515,7 @@ struct QTreeViewPopupActions
  *				gestion de la sélection est effectuée au niveau du contexte.
  *				</P>
  */
-class QtEntitiesPanel :public QtEntitiesItemViewPanel, public Utils::SelectionManagerObserver
+class QtEntitiesPanel :public QtEntitiesItemViewPanel, public Internal::SelectionManagerObserver
 {
 	friend class QtEntitiesTreeWidget;	// beurk
 

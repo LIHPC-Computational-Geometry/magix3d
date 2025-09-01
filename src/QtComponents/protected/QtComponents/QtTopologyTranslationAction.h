@@ -56,7 +56,7 @@ class QtTopologyTranslationPanel : public QtMgx3DOperationPanel
 	/**
 	 * \param		Nouvelle dimension de saisie des entités topologiques.
 	 */
-	virtual void setDimension (Mgx3D::Utils::SelectionManager::DIM dim);
+	virtual void setDimension (Mgx3D::Internal::SelectionManager::DIM dim);
 
 	/**
 	 * \return		La liste des entités topologiques devant effectuer une

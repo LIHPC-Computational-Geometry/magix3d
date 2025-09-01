@@ -57,7 +57,7 @@ class QtEntityIDTextField : public QtTextField, public Mgx3D::QtComponents::Enti
 	 */
 	QtEntityIDTextField (
 		QWidget* parent, Mgx3D::QtComponents::QtMgx3DMainWindow* mainWindow,
-	    Mgx3D::Utils::SelectionManager::DIM dimensions,
+	    Mgx3D::Internal::SelectionManager::DIM dimensions,
 		Mgx3D::Utils::FilterEntity::objectType types,
 		char* name = 0);
 

@@ -307,8 +307,8 @@ class QtMgx3DOperationPanel : public QWidget
 	 * \return	Une référence sur le gestionnaire de sélection.
 	 * \except	Une exception est levée en l'absence de gestionnaire associé.
 	 */
-	virtual Mgx3D::Utils::SelectionManager& getSelectionManager ( );
-	virtual const Mgx3D::Utils::SelectionManager&
+	virtual Mgx3D::Internal::SelectionManager& getSelectionManager ( );
+	virtual const Mgx3D::Internal::SelectionManager&
 											getSelectionManager ( ) const;
 
 	/**

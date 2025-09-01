@@ -2297,55 +2297,15 @@ cofacesInverted(Topo::CoFace* coface, Topo::CoFace* coface_vois, Topo::CoEdge* c
 	return sens1 == sens2;
 }
 /*----------------------------------------------------------------------------*/
-std::vector<TopoEntity*> TopoHelper::getSheet(Topo::TopoEntity* edgeStart)
+std::vector<TopoEntity*> TopoHelper::getSheet(Topo::TopoEntity* entityStart, double* point)
 {
+	std::vector<Topo::TopoEntity *> entitiesResult;
 
-    if(edgeStart->getDim() == 1) {
 
-        CoEdge *convertStartEdge = dynamic_cast<CoEdge *>(edgeStart);
-        // stockage des arêtes en cours de traitement
-        std::vector<CoEdge *> coedges_in;
+    if(entityStart->getDim() == 1) {
+        CoEdge *convertStartEdge = dynamic_cast<CoEdge *>(entityStart);
 
-        // stockage des arêtes parallèles et du sens / discrétisation à cloner
-        std::map<CoEdge *, bool> parallel_coedges;
-
-        // filtre sur les coedges pour éviter de boucler indéfiniement
-        std::set<CoEdge *> filtre_coedge;
-
-        // on initialise avec celle passée en paramètre
-        if (convertStartEdge) {
-            coedges_in.push_back(convertStartEdge);
-            parallel_coedges[convertStartEdge] = false;
-            filtre_coedge.insert(convertStartEdge);
-        }
-
-        // boucle tant que l'on a des arêtes non traitées
-        while (!coedges_in.empty()) {
-
-            CoEdge *coedge_dep = coedges_in.back();
-            coedges_in.pop_back();
-
-            // boucle sur les cofaces autour
-            std::vector<CoFace *> cofaces;
-            coedge_dep->getCoFaces(cofaces);
-
-            for (uint i = 0; i < cofaces.size(); i++) {
-                CoFace *coface = cofaces[i];
-
-                bool inverse_sens;
-                CoEdge *coedge_vois = coface->getOppositeCoEdge(coedge_dep, inverse_sens);
-
-                if (coedge_vois && filtre_coedge.find(coedge_vois) == filtre_coedge.end()) {
-                    coedges_in.push_back(coedge_vois);
-                    if (parallel_coedges[coedge_dep])
-                        parallel_coedges[coedge_vois] = inverse_sens;
-                    else
-                        parallel_coedges[coedge_vois] = !inverse_sens;
-                    // pour ne pas la reprendre
-                    filtre_coedge.insert(coedge_vois);
-                }
-            } // end for i
-        } // end while
+		std::map<CoEdge*, bool> parallel_coedges = parallelEdges(convertStartEdge);
 
         std::set<Topo::Block *> blocks;
 
@@ -2353,28 +2313,208 @@ std::vector<TopoEntity*> TopoHelper::getSheet(Topo::TopoEntity* edgeStart)
              iter != parallel_coedges.end(); ++iter) {
             CoEdge *coedge = (*iter).first;
 
-            std::vector<Topo::Block *> edge_blocks;
-            coedge->getBlocks(edge_blocks);
-            for (auto b: edge_blocks) {
-                blocks.insert(b);
-            }
+			entitiesResult.push_back(coedge);
         }
-
-        std::vector<Topo::TopoEntity *> blocks_result;
-        blocks_result.reserve(blocks.size());
-
-        int i = 0;
-        for (auto b: blocks) {
-            blocks_result[i] = b;
-            i++;
-        }
-        return blocks_result;
     }
+	else if(entityStart->getDim() == 3){
+		double x = point[0];
+		double y = point[1];
+		double z = point[2];
+
+		Utils::Math::Point point1(x,y,z);
+
+		Block *convertStartBlock = dynamic_cast<Block *>(entityStart);
+
+		std::vector<CoEdge*> b_coedges;
+		convertStartBlock->getCoEdges(b_coedges);
+
+		CoEdge* startingEdge;
+		double distance = MAXFLOAT;
+		for (auto e : b_coedges) {
+			double centerX = (e->getVertex(0)->getX()+e->getVertex(1)->getX())/2;
+			double centerY = (e->getVertex(0)->getY()+e->getVertex(1)->getY())/2;
+			double centerZ = (e->getVertex(0)->getZ()+e->getVertex(1)->getZ())/2;
+
+			Utils::Math::Point center(centerX,centerY,centerZ);
+
+			double current_dist = point1.length(center);
+			if(current_dist <= distance){
+				distance = current_dist;
+				startingEdge = e;
+			}
+		}
+
+		std::map<CoEdge*, bool> parallel_coedges = parallelEdges(startingEdge);
+
+		std::set<Topo::Block *> blocks;
+
+		for (std::map<CoEdge *, bool>::iterator iter = parallel_coedges.begin();
+			 iter != parallel_coedges.end(); ++iter) {
+			CoEdge *coedge = (*iter).first;
+
+			std::vector<Topo::Block *> edge_blocks;
+			coedge->getBlocks(edge_blocks);
+			for (auto b: edge_blocks) {
+				blocks.insert(b);
+			}
+		}
+
+		for (auto b: blocks) {
+			entitiesResult.push_back(b);
+		}
+	}
+	return entitiesResult;
 }
 /*----------------------------------------------------------------------------*/
-std::vector<Topo::Block*> TopoHelper::getChord(Topo::CoEdge*)
+std::vector<TopoEntity *> TopoHelper::getChord(Topo::TopoEntity * entityStart, double* point)
 {
+	std::vector<Topo::TopoEntity *> entitiesResult;
+	if(entityStart->getDim() == 3){
+		double x = point[0];
+		double y = point[1];
+		double z = point[2];
 
+		Utils::Math::Point point1(x,y,z);
+
+		Block *convertStartBlock = dynamic_cast<Block *>(entityStart);
+
+		std::vector<CoFace*> b_cofaces;
+		convertStartBlock->getCoFaces(b_cofaces);
+
+		CoFace* startingFace;
+		double distance = MAXFLOAT;
+		for (auto f : b_cofaces) {
+			double centerX = (f->getVertex(0)->getX()+f->getVertex(1)->getX()+f->getVertex(2)->getX()+f->getVertex(3)->getX())/4;
+			double centerY = (f->getVertex(0)->getY()+f->getVertex(1)->getY()+f->getVertex(2)->getY()+f->getVertex(3)->getY())/4;
+			double centerZ = (f->getVertex(0)->getZ()+f->getVertex(1)->getZ()+f->getVertex(2)->getZ()+f->getVertex(3)->getZ())/4;
+
+			Utils::Math::Point center(centerX,centerY,centerZ);
+
+			double current_dist = point1.length(center);
+			if(current_dist <= distance){
+				distance = current_dist;
+				startingFace = f;
+			}
+		}
+
+		// filtre sur les coedges pour éviter de boucler indéfiniement
+		std::set<CoFace *> filtre_coface;
+		std::vector<CoFace*> cofaces_in;
+		std::vector<CoFace*> parallel_cofaces;
+
+		if (startingFace) {
+			cofaces_in.push_back(startingFace);
+			parallel_cofaces.push_back(startingFace);
+			filtre_coface.insert(startingFace);
+		}
+		while (!cofaces_in.empty()) {
+			CoFace *coface_dep = cofaces_in.back();
+			cofaces_in.pop_back();
+
+			// boucle sur les cofaces autour
+			std::vector<Block *> blocks;
+			coface_dep->getBlocks(blocks);
+
+			for (uint i = 0; i < blocks.size(); i++) {
+				Block *block = blocks[i];
+
+				std::vector<CoFace*> block_cofaces;
+				CoFace *coface_vois;
+				block->getCoFaces(block_cofaces);
+
+				//Ici on veut trouver la face opposee
+				if(block_cofaces.size() == 6){
+
+					std::vector<CoEdge*> cf_coedges;
+					coface_dep->getCoEdges(cf_coedges);
+
+					for(auto f : block_cofaces){
+						std::vector<CoEdge*> cfv_coedges;
+						f->getCoEdges(cfv_coedges);
+						int cpt_e = 0;
+						for (auto cfv_e : cfv_coedges) {
+							if(std::find(cf_coedges.begin(), cf_coedges.end(), cfv_e) != cf_coedges.end())
+								cpt_e++;
+						}
+						if (cpt_e == 0){
+							coface_vois = f;
+						}
+					}
+
+					if (coface_vois && filtre_coface.find(coface_vois) == filtre_coface.end()) {
+						cofaces_in.push_back(coface_vois);
+						parallel_cofaces.push_back(coface_vois);
+						// pour ne pas la reprendre
+						filtre_coface.insert(coface_vois);
+					}
+				}
+			} // end for i
+		} // end while
+
+		std::set<Block*> blocks;
+
+		for (auto f : parallel_cofaces) {
+
+			std::vector<Topo::Block *> face_blocks;
+			f->getBlocks(face_blocks);
+			for (auto b: face_blocks) {
+				blocks.insert(b);
+			}
+		}
+
+		for (auto b: blocks) {
+			entitiesResult.push_back(b);
+		}
+	}
+	return entitiesResult;
+}
+/*----------------------------------------------------------------------------*/
+std::map<CoEdge*, bool> TopoHelper::parallelEdges(Topo::CoEdge* edgeStart)
+{
+	// stockage des arêtes en cours de traitement
+	std::vector<CoEdge *> coedges_in;
+
+	// stockage des arêtes parallèles et du sens / discrétisation à cloner
+	std::map<CoEdge *, bool> parallel_coedges;
+
+	// filtre sur les coedges pour éviter de boucler indéfiniement
+	std::set<CoEdge *> filtre_coedge;
+
+	// on initialise avec celle passée en paramètre
+	if (edgeStart) {
+		coedges_in.push_back(edgeStart);
+		parallel_coedges[edgeStart] = false;
+		filtre_coedge.insert(edgeStart);
+	}
+
+	// boucle tant que l'on a des arêtes non traitées
+	while (!coedges_in.empty()) {
+
+		CoEdge *coedge_dep = coedges_in.back();
+		coedges_in.pop_back();
+
+		// boucle sur les cofaces autour
+		std::vector<CoFace *> cofaces;
+		coedge_dep->getCoFaces(cofaces);
+
+		for (uint i = 0; i < cofaces.size(); i++) {
+			CoFace *coface = cofaces[i];
+
+			bool inverse_sens;
+			CoEdge *coedge_vois = coface->getOppositeCoEdge(coedge_dep, inverse_sens);
+
+			if (coedge_vois && filtre_coedge.find(coedge_vois) == filtre_coedge.end()) {
+				coedges_in.push_back(coedge_vois);
+				if (parallel_coedges[coedge_dep])
+					parallel_coedges[coedge_vois] = inverse_sens;
+				else
+					parallel_coedges[coedge_vois] = !inverse_sens;
+				// pour ne pas la reprendre
+				filtre_coedge.insert(coedge_vois);
+			}
+		} // end for i
+	} // end while
+	return parallel_coedges;
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo

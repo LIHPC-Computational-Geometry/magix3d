@@ -45,7 +45,7 @@ namespace QtComponents
  *				fonction du caractère sélectionné ou non des entités.</P>
  * \author		Charles PIGNEROL, CEA/DAM/DSSI
  */
-class RenderingManager : public Utils::SelectionManagerObserver
+class RenderingManager : public Internal::SelectionManagerObserver
 {
 	public :
 
@@ -979,14 +979,14 @@ class RenderingManager : public Utils::SelectionManagerObserver
 	 * \see			entitiesAddedToSelection
 	 * \see			entitiesRemovedFromSelection
 	 */
-	virtual void setSelectionManager(Utils::SelectionManager *);
+	virtual void setSelectionManager(Internal::SelectionManager *);
 
 	/**
 	 * \return		L'éventuel gestionnaire de sélection associé.
 	 * \see			setSelectionManager
 	 */
-	virtual Utils::SelectionManager *getSelectionManager();
-	virtual const Utils::SelectionManager *getSelectionManager() const;
+	virtual Internal::SelectionManager *getSelectionManager();
+	virtual const Internal::SelectionManager *getSelectionManager() const;
 
 	/**
 	 * Ajoute les entités tranmises en argument de la sélection.
