@@ -33,29 +33,14 @@ namespace Mgx3D {
 
 /*------------------------------------------------------------------------*/
 
-        void SelectionHelper::selectSheet(Topo::TopoEntity *entity, double* point, SelectionManager* selectionManager) {
-            std::cout<<"selection helper"<<std::endl;
-            std::vector<Topo::TopoEntity *> topoEntities = Topo::TopoHelper::getSheet(entity, point);
-
-            std::vector<Utils::Entity *> entities;
-            for (auto topoEntity : topoEntities) {
-                entities.push_back(topoEntity);
-            }
-
-            selectionManager->addToSelection(entities);
+        std::vector<Topo::TopoEntity*> SelectionHelper::selectSheet(Topo::TopoEntity *entity, double* point) {
+            return Topo::TopoHelper::getSheet(entity, point);
         }
 
         /*------------------------------------------------------------------------*/
 
-        void SelectionHelper::selectChord(Topo::TopoEntity *entity, double* point, SelectionManager* selectionManager) {
-            std::vector<Topo::TopoEntity *> topoEntities = Topo::TopoHelper::getChord(entity, point);
-
-            std::vector<Utils::Entity *> entities;
-            for (auto topoEntity : topoEntities) {
-                entities.push_back(topoEntity);
-            }
-
-            selectionManager->addToSelection(entities);
+        std::vector<Topo::TopoEntity*> SelectionHelper::selectChord(Topo::TopoEntity *entity, double* point) {
+            return Topo::TopoHelper::getChord(entity, point);
         }
     }
 }

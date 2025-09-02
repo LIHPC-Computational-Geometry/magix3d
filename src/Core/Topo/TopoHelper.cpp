@@ -2299,15 +2299,14 @@ cofacesInverted(Topo::CoFace* coface, Topo::CoFace* coface_vois, Topo::CoEdge* c
 /*----------------------------------------------------------------------------*/
 std::vector<TopoEntity*> TopoHelper::getSheet(Topo::TopoEntity* entityStart, double* point)
 {
+	//entities in the sheet, of type TopoEntit to represent an abstract sheet
 	std::vector<Topo::TopoEntity *> entitiesResult;
 
-
-    if(entityStart->getDim() == 1) {
+	//First check entityStart dim
+    if(entityStart->getDim() == 1) {	//Edge
         CoEdge *convertStartEdge = dynamic_cast<CoEdge *>(entityStart);
 
 		std::map<CoEdge*, bool> parallel_coedges = parallelEdges(convertStartEdge);
-
-        std::set<Topo::Block *> blocks;
 
         for (std::map<CoEdge *, bool>::iterator iter = parallel_coedges.begin();
              iter != parallel_coedges.end(); ++iter) {
@@ -2316,7 +2315,7 @@ std::vector<TopoEntity*> TopoHelper::getSheet(Topo::TopoEntity* entityStart, dou
 			entitiesResult.push_back(coedge);
         }
     }
-	else if(entityStart->getDim() == 3){
+	else if(entityStart->getDim() == 3){	//Block
 		double x = point[0];
 		double y = point[1];
 		double z = point[2];
@@ -2325,9 +2324,12 @@ std::vector<TopoEntity*> TopoHelper::getSheet(Topo::TopoEntity* entityStart, dou
 
 		Block *convertStartBlock = dynamic_cast<Block *>(entityStart);
 
+
+		//Need to find the sheet direction, using the point given in parameter
 		std::vector<CoEdge*> b_coedges;
 		convertStartBlock->getCoEdges(b_coedges);
 
+		// Naive algorithm, get the nearest edge center
 		CoEdge* startingEdge;
 		double distance = MAXFLOAT;
 		for (auto e : b_coedges) {
@@ -2346,7 +2348,7 @@ std::vector<TopoEntity*> TopoHelper::getSheet(Topo::TopoEntity* entityStart, dou
 
 		std::map<CoEdge*, bool> parallel_coedges = parallelEdges(startingEdge);
 
-		std::set<Topo::Block *> blocks;
+		std::set<Topo::Block *> blocks; //To avoid duplicate blocks in list
 
 		for (std::map<CoEdge *, bool>::iterator iter = parallel_coedges.begin();
 			 iter != parallel_coedges.end(); ++iter) {

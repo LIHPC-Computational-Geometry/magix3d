@@ -736,11 +736,45 @@ void SelectionManager::notifyObserversForNewPolicy (void* smp)
 
 
 void SelectionManager::selectSheet(Utils::Entity* e, double* point){
-	Internal::SelectionHelper::selectSheet(dynamic_cast<Topo::TopoEntity *>(e), point, this);
+	//We need to filter to topoEntities
+	std::vector<Utils::Entity::objectType> validTypes =
+			{Utils::Entity::TopoBlock,Utils::Entity::TopoFace,Utils::Entity::TopoCoFace,
+			 Utils::Entity::TopoEdge,Utils::Entity::TopoCoEdge};
+
+	if(std::find(validTypes.begin(), validTypes.end(),e->getType()) != validTypes.end()) {
+		std::vector<Topo::TopoEntity *> topoEntities =
+				Internal::SelectionHelper::selectSheet(dynamic_cast<Topo::TopoEntity *>(e), point);
+
+		std::vector<Utils::Entity *> entities;
+		entities.reserve(topoEntities.size());
+		for (auto topoEntity: topoEntities) {
+			entities.push_back(topoEntity);
+		}
+
+		addToSelection(entities);
+	}
+	//If not topoEntity do nothing
 }
 
 void SelectionManager::selectChord(Utils::Entity* e, double* point){
-	Internal::SelectionHelper::selectChord(dynamic_cast<Topo::TopoEntity *>(e), point, this);
+	//We need to filter to topoEntities
+	std::vector<Utils::Entity::objectType> validTypes =
+			{Utils::Entity::TopoBlock,Utils::Entity::TopoFace,Utils::Entity::TopoCoFace,
+			 Utils::Entity::TopoEdge,Utils::Entity::TopoCoEdge};
+
+	if(std::find(validTypes.begin(), validTypes.end(),e->getType()) != validTypes.end()) {
+		std::vector<Topo::TopoEntity *> topoEntities =
+				Internal::SelectionHelper::selectChord(dynamic_cast<Topo::TopoEntity *>(e), point);
+
+		std::vector<Utils::Entity *> entities;
+		entities.reserve(topoEntities.size());
+		for (auto topoEntity: topoEntities) {
+			entities.push_back(topoEntity);
+		}
+
+		addToSelection(entities);
+	}
+	//If not topoEntity do nothing
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Utils

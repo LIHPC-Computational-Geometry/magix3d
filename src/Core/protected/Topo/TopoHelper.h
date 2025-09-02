@@ -300,10 +300,21 @@ public:
     /// recherche si 2 cofaces sont orientées dans la même direction (cofaces avec une coedge commune)
     static bool cofacesInverted(Topo::CoFace* coface, Topo::CoFace* coface_vois, Topo::CoEdge* coedge);
 
-    static std::vector<TopoEntity*> getSheet(TopoEntity * startEdge, double* point);
+    /** Donne le feuillet d'entités topologiques en fonction du type de départ startEntity
+     *  @param startEntity l'entité de départ du feuillet
+     *  @param point un point mathématique qui permet d'obtenir le sens du feuillet à retourner
+     *  @return la liste des entités topo composant le feuillet
+     */
+    static std::vector<TopoEntity*> getSheet(TopoEntity * startEntity, double* point);
 
-    static std::vector<TopoEntity *> getChord(TopoEntity * startEdge, double* point);
+    /** Donne la corde d'entités topologiques en fonction du type de départ startEntity
+     *  @param startEntity l'entité de départ de la corde
+     *  @param point un point mathématique qui permet d'obtenir le sens de la corde à retourner
+     *  @return la liste des entités topo composant la corde
+     */
+    static std::vector<TopoEntity *> getChord(TopoEntity * startEntity, double* point);
 
+    /// fonction de récupération des arêtes topo paralleles à @param edgeStart
     static std::map<CoEdge*, bool> parallelEdges(Topo::CoEdge* edgeStart);
 
 private :

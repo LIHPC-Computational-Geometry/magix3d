@@ -15,9 +15,21 @@ namespace Mgx3D {
         class SelectionHelper {
 
         public:
-            static void selectSheet(Topo::TopoEntity* entity, double* point, SelectionManager* selectionManager);
+            /**
+             * This method allows bridge between @class selectionManager and TopoHelper by passing argument
+             * @param entity the entity of which the sheet will be build
+             * @param point a mathematical point used to get the direction of the sheet
+             * @return the list containing all topoEntities that make up the sheet
+             */
+            static std::vector<Topo::TopoEntity*> selectSheet(Topo::TopoEntity* entity, double* point);
 
-            static void selectChord(Topo::TopoEntity* entity, double* point, SelectionManager* selectionManager);
+            /**
+             * This method allows bridge between @class selectionManager and TopoHelper by passing argument
+             * @param entity the entity of which the chord will be build
+             * @param point a mathematical point used to get the direction of the chord
+             * @returnthe list containing all topoEntities that make up the chord
+             */
+            static std::vector<Topo::TopoEntity*> selectChord(Topo::TopoEntity* entity, double* point);
 
         private:
             SelectionHelper ( );
