@@ -855,9 +855,9 @@ void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
 #endif
         }
         // on recherche si cette face est déjà coupée
-        InfoSplit* is = cofaceInfoSplit[coface->getUniqueId()];
+        InfoSplit* is = 0;
 
-        if (is == 0){
+        if (cofaceInfoSplit.find(coface->getUniqueId()) == cofaceInfoSplit.end()){
         	if (coface->getNbEdges() == 3 && ind_edge_dep != 1 && !boucleDemandee){
         		// cas où on arrive sur face dégénérée par un côté autre que celui qui fait face à la dégénérescence
 #ifdef _DEBUG_SPLIT
