@@ -723,9 +723,8 @@ void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
         std::cout<<"coface trouvée : "<<coface->getName()<<std::endl;
 #endif
         // pour ne pas réutiliser cette coface
-        if (boucleDemandee)
-            filtre_cofaces[coface] = 2;
-        else if (0 == coface_begin)
+        filtre_cofaces[coface] = 2;
+        if (0 == coface_begin)
             coface_begin = coface;
 
         // recherche du côté dans lequel est cette arête, et le nombre de bras de maillage jusqu'à la coupe
