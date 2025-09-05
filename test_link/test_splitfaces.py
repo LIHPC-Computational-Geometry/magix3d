@@ -59,3 +59,16 @@ def test_no_more_infinite_loop():
     tm.destroy (["Bl0000"], False)
     tm.splitFaces (["Fa0005", "Fa0001", "Fa0004", "Fa0000"], "Ar0005", .5, .5)
     assert tm.getNbFaces() == 10
+
+def test_split_adjacent_faces_with_common_edge():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    tm = ctx.getTopoManager()
+    # Création d'une boite avec une topologie
+    ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
+    # Suppression d'entités géométriques et suppression des entités topologiques dépendantes
+    ctx.getGeomManager().destroyWithTopo(["Vol0000"], False)
+    assert tm.getNbFaces() == 6
+    # Découpage des faces 2D structurées Fa0005 Fa0001 suivant l'arête Ar0005 avec comme ratio 5.000000e-01
+    ctx.getTopoManager().splitFaces (["Fa0005","Fa0001"], "Ar0005", .5, .5)
+    assert tm.getNbFaces() == 8
