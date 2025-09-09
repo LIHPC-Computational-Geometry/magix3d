@@ -1423,7 +1423,7 @@ void QtGroupsPanel::createPopupMenus ( )
 
 	_groupsPopupMenu->addSeparator ( );
 
-	QAction* updateGroupAction = createAction (*_groupsPopupMenu, QString::fromUtf8("Renommage d'un groupe"),
+	QAction* updateGroupAction = createAction (*_groupsPopupMenu, QString::fromUtf8("Renommer le groupe"),
 											   QString::fromUtf8("Le groupe change de nom tout en conservant son contenu"),
 											   SLOT (updateGroupCallback ( )), this, false, OFF);
 
