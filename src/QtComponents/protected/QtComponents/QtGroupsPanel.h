@@ -751,6 +751,11 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionMan
 	virtual void unselectMeshCloudsCallback ( );
 
 	/**
+	 * Le groupe change de nom tout en conservant son contenu
+	 */
+	void updateGroupCallback ( );
+
+	/**
 	 * Destruction d'un groupe, on lui retire toute les entités qu'il contient
 	 */
 	virtual void clearGroupCallback ( );
