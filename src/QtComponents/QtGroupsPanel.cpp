@@ -622,6 +622,12 @@ void QtGroupsPanel::removeGroups (const vector<Group::GroupEntity*>& groups)
 }	// QtGroupsPanel::removeGroups
 
 
+void QtGroupsPanel::updateGroup (const Group::GroupEntity& group)
+{
+	getGroupItem(group)->update(true);
+}
+
+
 vector<Group::GroupEntity*> QtGroupsPanel::getSelectedGroups ( ) const
 {
 	vector<Group::GroupEntity*>		groups;

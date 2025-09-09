@@ -386,6 +386,12 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionMan
 	virtual void removeGroups (const std::vector<Mgx3D::Group::GroupEntity*>& groups);
 
 	/**
+	 * Met à jour l'affichage du groupe.
+	 * \param		Instance du groupe à réafficher
+	 */
+	virtual void updateGroup (const Group::GroupEntity& group);
+
+	/**
 	 * \return		Les groupes sélectionnés.
 	 */
 	virtual std::vector<Mgx3D::Group::GroupEntity*> getSelectedGroups ( ) const;
