@@ -6,6 +6,7 @@
 #include "Geom/Volume.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/OCCHelper.h"
+#include "Geom/IncidentGeomEntitiesVisitor.h"
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
 #include <BRepPrimAPI_MakePrism.hxx>
@@ -19,6 +20,7 @@
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/MemoryError.h>
+#include <TkUtil/TraceLog.h>
 /*----------------------------------------------------------------------------*/
 #include <list>
 /*----------------------------------------------------------------------------*/
@@ -74,7 +76,7 @@ void GeomExtrudeImplementation::perform(std::vector<GeomEntity*>& res,
     for(unsigned int i=1;i<m_init_entities.size();i++){
         int dimi = m_init_entities[i]->getDim();
         if(dimi==3)
-            throw TkUtil::Exception(TkUtil::UTF8String ("l'extrusion ne s'applique qu'à des objets de dimension inférieur à 3", TkUtil::Charset::UTF_8));
+            throw TkUtil::Exception(TkUtil::UTF8String ("L'extrusion ne s'applique qu'à des objets de dimension inférieure à 3", TkUtil::Charset::UTF_8));
     }
 
     /* le vecteur d'extrusion ne doit pas être de longueur nulle */
@@ -105,15 +107,37 @@ void GeomExtrudeImplementation::perform(std::vector<GeomEntity*>& res,
     }
 
     if(!m_keep) {
-        for (int i = 0; i < 3; i++) {
-            std::list<GeomEntity *>::iterator it_rem;
-            for (it_rem = m_ref_entities[i].begin(); it_rem != m_ref_entities[i].end(); it_rem++) {
-                m_removedEntities.push_back(*it_rem);
+        // m_keep à vrai => l'utilisateur demande la suppression des entités de départ
+        // impliquées dans la révolution. Néanmoins, ces dernières ne seront pas 
+        // détruites si elles ont une adjacence "up" sur une autre entité (pas impliquée)
+        Utils::EntitySet<GeomEntity*> cleanable_entities(Utils::Entity::compareEntity);
+        Utils::EntitySet<GeomEntity*> uncleanable_entities(Utils::Entity::compareEntity);
+        for(int i=2;i>=0;i--){
+            for (GeomEntity* ge : m_ref_entities[i]) {
+                GetUpIncidentGeomEntitiesVisitor v_up;
+                ge->accept(v_up);
+                Utils::EntitySet<GeomEntity*> up_entities = v_up.get();
+                if (std::includes(cleanable_entities.begin(), cleanable_entities.end(), up_entities.begin(), up_entities.end(), Utils::Entity::compareEntity)) {
+                    cleanable_entities.insert(ge);
+                } else {
+                    uncleanable_entities.insert(ge);
+                }
             }
         }
+
+        if (uncleanable_entities.size() > 0) {
+            TkUtil::UTF8String warning;
+            warning << "Certaines entités ne peuvent pas être supprimées ";
+            warning << "car elles sont incidentes/adjacentes à des entités non supprimées : ";
+            for (GeomEntity* ge : uncleanable_entities)
+                warning << ge->getName() << " ";
+            m_context.getLogStream()->log(TkUtil::TraceLog(warning));
+            std::cout << warning << std::endl;
+        }
+
+        for (GeomEntity* ge : cleanable_entities)
+            m_removedEntities.push_back(ge);
     }
-
-
 }
 /*----------------------------------------------------------------------------*/
 void GeomExtrudeImplementation::makeExtrude(Vertex* v,std::vector<GeomEntity*>& res,
@@ -189,8 +213,6 @@ void GeomExtrudeImplementation::makeExtrude(Vertex* v,std::vector<GeomEntity*>& 
     	throw TkUtil::Exception(TkUtil::UTF8String ("OCC n'a pas pu effectuer une extrusion d'un sommet : pas une EDGE", TkUtil::Charset::UTF_8));
 
 }
-/*----------------------------------------------------------------------------*/
-/*----------------------------------------------------------------------------*/
 /*----------------------------------------------------------------------------*/
 void GeomExtrudeImplementation::makeExtrudeComposite(Curve* curve,std::vector<GeomEntity*>& res,
         std::map<Geom::Vertex*,Geom::Vertex*>  & v2v,

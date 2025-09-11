@@ -20,10 +20,8 @@ CommandExtrudeDirection::
 CommandExtrudeDirection(Internal::Context& c,
         std::vector<GeomEntity*>& entities,
 		const Vector& dp, const bool keep)
-:   CommandExtrusion(c, "Direction"),
-    m_entities(entities),
-    m_vector(dp),
-    m_keep(keep)
+: CommandExtrusion(c, "Direction", entities, keep)
+, m_vector(dp)
 {
     if (m_vector.abs2()==0.0)
         throw TkUtil::Exception(TkUtil::UTF8String ("Le vecteur pour l'extrusion ne doit pas être nul", TkUtil::Charset::UTF_8));
@@ -40,84 +38,14 @@ CommandExtrudeDirection(Internal::Context& c,
 	setName(comments);
 }
 /*----------------------------------------------------------------------------*/
-CommandExtrudeDirection::~CommandExtrudeDirection()
-{
-    if(m_impl)
-        delete m_impl;
-}
-/*----------------------------------------------------------------------------*/
 void CommandExtrudeDirection::
-internalExecute()
+internalSpecificExecute()
 {
-    m_impl->prePerform();
-    m_impl->perform(m_createdEntities,m_v2v, m_v2v_opp,m_v2c,
+    getImpl()->perform(m_createdEntities,m_v2v, m_v2v_opp,m_v2c,
             m_c2c, m_c2c_opp, m_c2s, m_s2s, m_s2s_opp, m_s2v);
-    std::vector<GeomEntity*>& new_entities = m_impl->getNewEntities();
-    std::vector<GeomEntity*>& rem_entities = m_impl->getRemovedEntities();
-    for(int i=0;i<new_entities.size();i++){
-        GeomEntity* ge = new_entities[i];
-        getInfoCommand ( ).addGeomInfoEntity (ge, Internal::InfoCommand::CREATED);
-        getContext().getGeomManager().addEntity(ge);
-    }
-
-    // Si on ne garde pas, alors on transmet les relations géométriques des entités supprimées aux entités copiées pour
-    // l'extrusion
-    if(!m_keep) {
-
-        //On reconstruit les relations points <-> courbes
-        for (auto v2v : m_v2v) {
-            Vertex *v_ref = v2v.first;
-            Vertex *v_created = v2v.second;
-            auto curves = v_ref->getCurves();
-            for (int i = 0; i < curves.size(); i++) {
-                Curve *c = curves[i];
-                v_created->add(c);
-                c->add(v_created);
-            }
-        }
-
-        //On reconstruit les relations courbes <-> surfaces
-        for (auto c2c : m_c2c) {
-            Curve *c_ref = c2c.first;
-            Curve *c_created = c2c.second;
-            auto surfaces = c_ref->getSurfaces();
-            for (int i = 0; i < surfaces.size(); i++) {
-                Surface *s = surfaces[i];
-                c_created->add(s);
-                s->add(c_created);
-            }
-        }
-
-        //On reconstruit les relations surfaces <-> volumes
-        for (auto s2s : m_s2s) {
-            Surface *s_ref = s2s.first;
-            Surface *s_created = s2s.second;
-            auto volumes = s_ref->getVolumes();
-            for (int i = 0; i < volumes.size(); i++) {
-                Volume *vol = volumes[i];
-                s_created->add(vol);
-                vol->add(s_created);
-            }
-        }
-
-        //On a besoin de gérer que les relations de dimension n <-> n+1, le reste est créé implicitement par ces relations
-    }
-
-    for(int i=0;i<rem_entities.size();i++){
-        getInfoCommand ( ).addGeomInfoEntity (rem_entities[i], Internal::InfoCommand::DELETED);
-    }
-
-    getInfoCommand().setDestroyAndUpdateConnectivity(rem_entities);
 
     // transmet les groupes du 2D vers le 3D
     groups2DTo3D();
-
-    for(int i=0;i<new_entities.size();i++){
-    	GeomEntity* ge = new_entities[i];
-    	if (ge->getNbGroups() == 0)
-    		// ajoute à un groupe par défaut
-    		m_group_helper.addToGroup("", ge);
-    }
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

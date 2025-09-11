@@ -3,7 +3,7 @@
 /*----------------------------------------------------------------------------*/
 #include <map>
 /*----------------------------------------------------------------------------*/
-#include "Geom/CommandCreateGeom.h"
+#include "Geom/CommandEditGeom.h"
 #include "Geom/GeomEntity.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
@@ -11,19 +11,27 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 /*----------------------------------------------------------------------------*/
-class CommandExtrusion: public CommandCreateGeom {
+class CommandExtrusion: public CommandEditGeom {
 
 protected:
 
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur
      */
-    CommandExtrusion(Internal::Context& c, std::string name);
+    CommandExtrusion(Internal::Context& c, 
+        std::string name,
+        std::vector<GeomEntity*>& entities, 
+        const bool keep);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur
      */
-    virtual ~CommandExtrusion();
+    virtual ~CommandExtrusion() = default;
+
+    /*------------------------------------------------------------------------*/
+    /** \brief  initialisation de la commande
+     */
+    void internalSpecificPreExecute();
 
 public:
     /*------------------------------------------------------------------------*/
@@ -65,6 +73,11 @@ protected:
 
 
 protected:
+    /* entités à unir */
+    std::vector<GeomEntity*> m_entities;
+
+    /* conservation des entités initiales*/
+    bool m_keep;
 
     std::map<Geom::Vertex* ,Geom::Vertex*>  m_v2v;
     std::map<Geom::Vertex* ,Geom::Vertex*>  m_v2v_opp;
