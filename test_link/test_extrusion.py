@@ -16,8 +16,10 @@ def test_makeExtrude(capfd):
     # Annulation de : Extrusion de Surf0000
     ctx.undo()
 
-    surf0_vertices = gm.getInfos("Surf0000", 2).vertices()
-    assert len(surf0_vertices) == 4
+    assert len(gm.getInfos("Surf0000", 2).vertices()) == 4
+
+    gm.makeExtrude (["Surf0000"], Mgx3D.Vector(0, 0, 5), False)
+    assert gm.getNbVolumes() == 1
 
     out, err = capfd.readouterr()
     assert len(err) == 0
