@@ -38,13 +38,17 @@ public:
 
 private:
     template <typename TGroup, typename TEntity>
-    void removeDefaultGroup(TEntity* entity, const int dim)
+    void removeDefaultGroup(TEntity* entity)
     {
         if (entity->getNbGroups() == 1) {
             std::vector<TGroup*> groups = entity->getGroups();
-            if (groups[0]->getName() == m_group_manager.getDefaultName(dim)) {
+            if (groups[0]->isDefaultGroup()) {
                 groups[0]->remove(entity);
                 entity->remove(groups[0]);
+                if (groups[0]->empty())
+                    m_info_command.addGroupInfoEntity(groups[0], Internal::InfoCommand::DISABLE);
+                else
+                    m_info_command.addGroupInfoEntity(groups[0], Internal::InfoCommand::DISPMODIFIED);
             }
         }
     }
@@ -53,10 +57,10 @@ private:
     void addEntityToGroup(TGroup* group, TEntity* entity)
     {
         // il faut peut-être enlever le groupe par défaut
-        removeDefaultGroup<TGroup, TEntity>(entity, entity->getDim());
+        removeDefaultGroup<TGroup, TEntity>(entity);
 
         // on ajoute sauf si l'entité est déjà dans un groupe
-        // est que le groupe correspond au groupe par defaut
+        // et que le groupe correspond au groupe par defaut
         if (! (entity->getNbGroups() > 0 && group->isDefaultGroup())) {
             group->add(entity);
             entity->add(group);
