@@ -318,12 +318,85 @@ internalExecute()
     	throw TkUtil::Exception (TkUtil::UTF8String ("L'arête sélectionnée doit appartenir à l'une des faces topologiques", TkUtil::Charset::UTF_8));
 
 
-    // les Edges qui coupent les faces en deux
-    std::vector<Edge* > splitingEdges;
-    // découpage des faces sans chercher à boucler
-    TopoHelper::splitFaces(m_cofaces, m_arete, m_ratio_dec, m_ratio_ogrid, false, true, splitingEdges, &getInfoCommand());
+	uint nb_faces_dep = m_cofaces.size();
+	uint nb_faces_split = 0;
 
-    // on replace les sommets en fonction de m_ratio_dec
+	std::set<Vertex*> filtre_vertices;
+	std::set<CoFace*> filtre_faces;
+
+	std::vector<Edge*> splitingEdges;
+
+	try {
+		do {
+			Vertex* sommet = 0;
+			CoFace* coface = 0;
+
+			std::vector<Edge* > current_splitingEdge;
+			std::vector<CoFace*> coface_vec;
+
+			if (nb_faces_split){
+
+				// recherche d'un bloc suivant avec une arête
+				if(findFaceUnmarkedWithVertexMarked(filtre_faces, filtre_vertices, coface, sommet)) {
+					coface_vec = {coface};
+
+					std::vector<CoEdge *> coedges;
+					coface->getCoEdges(coedges);
+
+					CoEdge *coedge = 0;
+					for (std::vector<Topo::CoEdge *>::iterator iter = coedges.begin();
+						 iter != coedges.end(); ++iter)
+						if ((*iter)->find(sommet))
+							coedge = *iter;
+
+					if (coedge->getVertex(0) == sommet)
+						TopoHelper::splitFaces(coface_vec, coedge, 0, m_ratio_ogrid, false, false, current_splitingEdge,
+											   &getInfoCommand());
+					else if (coedge->getVertex(1) == sommet)
+						TopoHelper::splitFaces(coface_vec, coedge, 1, m_ratio_ogrid, false, false, current_splitingEdge,
+											   &getInfoCommand());
+
+					filtre_faces.insert(coface);
+				}
+			}
+			else{
+				std::vector<CoFace*> arete_cofaces;
+				m_arete->getCoFaces(arete_cofaces);
+
+				for (std::vector<Topo::CoFace* >::iterator iter = arete_cofaces.begin();
+					 iter != arete_cofaces.end(); ++iter)
+					if (std::find(m_cofaces.begin(), m_cofaces.end(),*iter) != m_cofaces.end())
+						coface = *iter;
+
+				coface_vec = {coface};
+
+				TopoHelper::splitFaces(coface_vec, m_arete, m_ratio_dec, m_ratio_ogrid, false, false, current_splitingEdge, &getInfoCommand());
+
+				filtre_faces.insert(coface);
+			}
+
+			nb_faces_split+=1;
+
+			for(auto e : current_splitingEdge){
+				splitingEdges.push_back(e);
+				filtre_vertices.insert(e->getVertex(0));
+				filtre_vertices.insert(e->getVertex(1));
+			}
+
+		} while (nb_faces_dep != nb_faces_split);
+	}
+	catch (const TkUtil::Exception& exc){
+		throw TkUtil::Exception(exc);
+	}
+
+
+
+    // les Edges qui coupent les faces en deux
+    //std::vector<Edge* > splitingEdges;
+    // découpage des faces sans chercher à boucler
+    //TopoHelper::splitFaces(m_cofaces, m_arete, m_ratio_dec, m_ratio_ogrid, false, false, splitingEdges, &getInfoCommand());
+
+	// on replace les sommets en fonction de m_ratio_dec
     if (!m_project_on_meshing_edges)
     	for (uint i=0; i<splitingEdges.size(); i++){
     		Edge* edge = splitingEdges[i];
@@ -408,6 +481,30 @@ internalExecute()
     saveInternalsStats();
 
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_1));
+}
+/*----------------------------------------------------------------------------*/
+bool CommandSplitFaces::
+findFaceUnmarkedWithVertexMarked(std::set<CoFace*>& filtre_faces,
+										  std::set<Vertex*>& filtre_vertices, CoFace* &face, Vertex* &noeud)
+{
+	//std::cout<<"findBlockUnmarkedWithCoEdgeMarked ..."<<std::endl;
+	for (std::vector<CoFace*>::iterator iter1 = m_cofaces.begin(); iter1 != m_cofaces.end(); ++iter1){
+		// le bloc est-il marqué ?
+		if (filtre_faces.find(*iter1) == filtre_faces.end()){
+			CoFace* cf = *iter1;
+			// possède-t-il une arête marquée ?
+			std::vector<Vertex* > vertices;
+			cf->getAllVertices(vertices);
+			for (std::vector<Vertex*>::iterator iter2 = vertices.begin(); iter2 != vertices.end(); ++iter2){
+				if (filtre_vertices.find(*iter2) != filtre_vertices.end()){
+					noeud = *iter2;
+					face = cf;
+					return true;
+				}
+			}
+		}
+	}
+	return false;
 }
 /*----------------------------------------------------------------------------*/
 void CommandSplitFaces::

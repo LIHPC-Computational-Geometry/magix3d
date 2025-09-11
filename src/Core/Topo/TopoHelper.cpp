@@ -805,8 +805,10 @@ void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
         	else {
         		// cas 2D
         		edge_ar = 0;
-        		if (ind_edge_dep != 1)
-        			reprendreCetteFace = true;
+				if (ind_edge_dep == 0)
+					edge_ar = coface->getEdge(2);
+				else if (ind_edge_dep == 2)
+					edge_ar = coface->getEdge(0);
 
         		// on test pour détecter le cas d'une zone avec 1 seul sommet sur l'axe
         		uint nb_sur_axe = 0;
@@ -858,6 +860,7 @@ void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
         InfoSplit* is = cofaceInfoSplit[coface->getUniqueId()];
 
         if (is == 0){
+			std::cout<<"name = "<<coface->getName()<<std::endl;
         	if (coface->getNbEdges() == 3 && ind_edge_dep != 1 && !boucleDemandee){
         		// cas où on arrive sur face dégénérée par un côté autre que celui qui fait face à la dégénérescence
 #ifdef _DEBUG_SPLIT
@@ -874,6 +877,17 @@ void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
 #ifdef _DEBUG_SPLIT
         		std::cout<<" => nbMeshingEdges_edge =  "<<nbMeshingEdges_edge<<std::endl;
 #endif
+				is = new InfoSplit();
+				is->dirCoFaceSplit = dirCoFaceSplit;
+				is->coedge_dep.push_back(coedge_dep);
+				is->edge_dep = edge_dep;
+				is->coedge_ar.push_back(coedge_ar);
+				is->edge_ar = edge_ar;
+				is->nbMeshingEdges_dep.push_back(nbMeshingEdges_dep);
+				is->nbMeshingEdges_ar.push_back(nbMeshingEdges_ar);
+
+				cofaceInfoSplit[coface->getUniqueId()] = is;
+				id2coface[coface->getUniqueId()] = coface;
         	}
         	else {
 #ifdef _DEBUG_SPLIT
@@ -1445,7 +1459,7 @@ void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
             Edge* oldEdge0 = coface->getEdge(0);
             Edge* oldEdge2 = coface->getEdge(2);
 
-            coface->splitOgrid((CoFace::eDirOnCoFace)is->dirCoFaceSplit,
+			std::vector<Edge*> newEdges = coface->splitOgrid((CoFace::eDirOnCoFace)is->dirCoFaceSplit,
                     old2newEdges[oldEdge0],
                     newEdges_dep,
                     old2newEdges[oldEdge2],
@@ -1454,6 +1468,8 @@ void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
                     newVertices2,
                     ratio_ogrid,
                     icmd);
+
+			splitingEdges.insert(splitingEdges.begin(), newEdges.begin(), newEdges.end());
 
             // Destruction des arêtes inutiles (celles sans relation vers une CoFace)
             if (oldEdge0->getNbCoFaces() == 0)

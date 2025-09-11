@@ -1230,7 +1230,7 @@ split3(eDirOnCoFace dir, std::vector<Edge*>& edges1, std::vector<Edge*>& edges3,
 
 }
 /*----------------------------------------------------------------------------*/
-void CoFace::
+std::vector<Edge*> CoFace::
 splitOgrid(eDirOnCoFace dir,
         std::vector<Edge*>& edges0,
         std::vector<Edge*>& edges1,
@@ -1269,6 +1269,8 @@ splitOgrid(eDirOnCoFace dir,
     std::cout<<"edges2 disc en "<<edges2[0]->getNbMeshingEdges()<<" et "<<edges2[1]->getNbMeshingEdges()<<std::endl;
     std::cout<<"edges1 disc en "<<edges1[0]->getNbMeshingEdges()<<" et "<<edges1[1]->getNbMeshingEdges()<<std::endl;
 #endif
+
+    std::vector<Edge*> splitingEdges;
 
     if (edges1.size() == 2){
         // cas de la création de 3 faces en Ogrid
@@ -1472,6 +1474,9 @@ splitOgrid(eDirOnCoFace dir,
         	coface2->getGroupsContainer().add(gr);
         }
 
+        splitingEdges.push_back(newEdge0);
+        splitingEdges.push_back(newEdge1);
+        splitingEdges.push_back(newEdge2);
 
     } else if (edges1.size() == 3){
         // cas de la création de 4 faces en Ogrid
@@ -1691,10 +1696,17 @@ splitOgrid(eDirOnCoFace dir,
         }
 
 
+        splitingEdges.push_back(newEdge1);
+        splitingEdges.push_back(newEdge2);
+        splitingEdges.push_back(newEdge3);
+        splitingEdges.push_back(newEdge4);
+        splitingEdges.push_back(newEdge5);
+        splitingEdges.push_back(newEdge6);
     } // end else if (edges1.size() == 3)
 
     // destruction de la face commune actuelle
     free(icmd);
+    return splitingEdges;
 }
 /*----------------------------------------------------------------------------*/
 uint CoFace::getNbVertices() const
