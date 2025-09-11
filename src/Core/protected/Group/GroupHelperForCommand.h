@@ -45,6 +45,10 @@ private:
             if (groups[0]->isDefaultGroup()) {
                 groups[0]->remove(entity);
                 entity->remove(groups[0]);
+                if (groups[0]->empty())
+                    m_info_command.addGroupInfoEntity(groups[0], Internal::InfoCommand::DISABLE);
+                else
+                    m_info_command.addGroupInfoEntity(groups[0], Internal::InfoCommand::DISPMODIFIED);
             }
         }
     }
