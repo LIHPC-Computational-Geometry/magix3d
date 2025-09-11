@@ -253,7 +253,7 @@ setDestroyed(bool b)
 	if (isDestroyed() == b)
 		return;
 
-	Utils::Container<Group::Group0D>& groups = getGroupsContainer();
+	Utils::Container<Group::Group0D>& groups = m_topo_property->getGroupsContainer();
 	if (b)
 		for (uint i=0; i<groups.size(); i++){
 			Group::Group0D* gr = groups.get(i);
@@ -380,8 +380,7 @@ getDescription (bool alsoComputed) const
 
     description->addPropertiesSet (topoRelation);
 
-    std::vector<Group::Group0D*> grp;
-    getGroups(grp);
+    std::vector<Group::Group0D*> grp = getGroups();
     if (!grp.empty()){
     	Utils::SerializedRepresentation  groupe ("Relation vers les groupes",
     			TkUtil::NumericConversions::toStr(grp.size()));
@@ -775,6 +774,26 @@ void Vertex::getGroupsName (std::vector<std::string>& gn, bool byGeom, bool byTo
 	if (byTopo)
 		for (uint i = 0; i<m_topo_property->getGroupsContainer().size(); ++i)
 			gn.push_back(m_topo_property->getGroupsContainer().get(i)->getName());
+}
+/*----------------------------------------------------------------------------*/
+void Vertex::add(Group::Group0D* grp)
+{
+    m_topo_property->getGroupsContainer().add(grp);
+}
+/*----------------------------------------------------------------------------*/
+void Vertex::remove(Group::Group0D* grp)
+{
+    m_topo_property->getGroupsContainer().remove(grp);
+}
+/*----------------------------------------------------------------------------*/
+int Vertex::getNbGroups() const
+{
+    return m_topo_property->getGroupsContainer().getNb();
+}
+/*----------------------------------------------------------------------------*/
+std::vector<Group::Group0D*> Vertex::getGroups() const
+{
+    return m_topo_property->getGroupsContainer().get();
 }
 /*----------------------------------------------------------------------------*/
 void Vertex::updateCoEdgeModificationTime()

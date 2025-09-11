@@ -162,9 +162,7 @@ groups2DTo3D()
                 if (i == 0 && nom == getContext().getGroupManager().getDefaultName(2))
                 	nom = getContext().getGroupManager().getDefaultName(3);
 
-                Group::Group3D* new_grp = getContext().getGroupManager().getNewGroup3D(nom, &getInfoCommand());
-                new_grp->add(vol);
-                vol->add(new_grp);
+                Group::Group3D* new_grp = m_group_helper.addToGroup(nom, vol);
                 new_grp->setLevel(grp[i]->getLevel());
             }
         }
@@ -183,9 +181,7 @@ groups2DTo3D()
             	if (i == 0 && nom == getContext().getGroupManager().getDefaultName(1))
             		nom = getContext().getGroupManager().getDefaultName(2);
 
-                Group::Group2D* new_grp = getContext().getGroupManager().getNewGroup2D(nom, &getInfoCommand());
-                new_grp->add(surf);
-                surf->add(new_grp);
+                Group::Group2D* new_grp = m_group_helper.addToGroup(nom, surf);
                 new_grp->setLevel(grp[i]->getLevel());
             }
         }
@@ -204,9 +200,7 @@ groups2DTo3D()
             	if (i == 0 && nom == getContext().getGroupManager().getDefaultName(0))
             		nom = getContext().getGroupManager().getDefaultName(1);
 
-                Group::Group1D* new_grp = getContext().getGroupManager().getNewGroup1D(nom, &getInfoCommand());
-                new_grp->add(curve);
-                curve->add(new_grp);
+                Group::Group1D* new_grp = m_group_helper.addToGroup(nom, curve);
                 new_grp->setLevel(grp[i]->getLevel());
             }
         }
@@ -219,8 +213,6 @@ void CommandExtrusion::prefixGroupsName(const std::string& pre,
         std::map<Geom::Surface*,Geom::Surface*>& s2s)
 {
     // le groupe commun pour toutes les surfaces
-    Group::Group2D* grp_comm = getContext().getGroupManager().getNewGroup2D(pre, &getInfoCommand());
-
     for (std::map<Geom::Surface*,Geom::Surface*>::iterator iter = s2s.begin();
             iter != s2s.end(); ++iter){
         Geom::Surface* surf1 = iter->first;
@@ -231,14 +223,11 @@ void CommandExtrusion::prefixGroupsName(const std::string& pre,
             surf1->getGroupsName(gn);
             for (uint i=0; i<gn.size(); i++){
                 std::string& nom = gn[i];
-                Group::Group2D* grp = getContext().getGroupManager().getNewGroup2D(pre + "_" + nom, &getInfoCommand());
-                grp->add(surf2);
-                surf2->add(grp);
+                m_group_helper.addToGroup(pre + "_" + nom, surf2);
             }
 
             // ajoute la surface dans le groupe / plan de sym
-            grp_comm->add(surf2);
-            surf2->add(grp_comm);
+            m_group_helper.addToGroup(pre, surf2);
         }
     }
 
@@ -252,9 +241,7 @@ void CommandExtrusion::prefixGroupsName(const std::string& pre,
             crv1->getGroupsName(gn);
             for (uint i=0; i<gn.size(); i++){
                 std::string& nom = gn[i];
-                Group::Group1D* grp = getContext().getGroupManager().getNewGroup1D(pre + "_" + nom, &getInfoCommand());
-                grp->add(crv2);
-                crv2->add(grp);
+                m_group_helper.addToGroup(pre + "_" + nom, crv2);
             }
         }
     }
@@ -269,9 +256,7 @@ void CommandExtrusion::prefixGroupsName(const std::string& pre,
             vtx1->getGroupsName(gn);
             for (uint i=0; i<gn.size(); i++){
                 std::string& nom = gn[i];
-                Group::Group0D* grp = getContext().getGroupManager().getNewGroup0D(pre + "_" + nom, &getInfoCommand());
-                grp->add(vtx2);
-                vtx2->add(grp);
+                m_group_helper.addToGroup(pre + "_" + nom, vtx2);
             }
         }
     }

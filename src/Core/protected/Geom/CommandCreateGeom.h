@@ -3,6 +3,7 @@
 /*----------------------------------------------------------------------------*/
 #include "Internal/CommandInternal.h"
 #include "Geom/Volume.h"
+#include "Group/GroupHelperForCommand.h"
 /*----------------------------------------------------------------------------*/
 #include <vector>
 /*----------------------------------------------------------------------------*/
@@ -113,26 +114,6 @@ protected:
     virtual std::string getGroupName() const {return m_group_name;}
 
     /*------------------------------------------------------------------------*/
-    /** \brief  ajoute à un groupe un volume
-     */
-    virtual void addToGroup(Volume* v, bool use_default_name = false);
-
-    /** \brief  ajoute à un groupe une surface
-     */
-    virtual void addToGroup(Surface* s, bool use_default_name = false);
-
-    /** \brief  ajoute à un groupe une courbe
-     */
-    virtual void addToGroup(Curve* c, bool use_default_name = false);
-
-    /** \brief  ajoute à un groupe un sommet
-     */
-    virtual void addToGroup(Vertex* v, bool use_default_name = false);
-
-    /** \brief  ajoute à un groupe d'une entité géométrique
-     */
-    virtual void addToGroup(GeomEntity* e, bool use_default_name = false);
-
     /// change la dimension des entités sur lesquels on travaille
     virtual void setDimensionGroup(uint dim)
     {m_dim_new_group = dim;}
@@ -162,8 +143,10 @@ protected:
 
 
 protected:
+    /// helper pour la gestion des groupes dans les commandes
+    Group::GroupHelperForCommand m_group_helper;
 
-    /** resultat de l'opération */
+    /// resultat de l'opération 
     std::vector<GeomEntity*> m_createdEntities;
 
     /// le nom d'un groupe dans lequel on met les nouvelles entités (peut être vide)

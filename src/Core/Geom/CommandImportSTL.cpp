@@ -38,7 +38,7 @@ internalExecute()
 
     //gestion de l'appartenance aux groupes
     for(unsigned int i=0;i<m_createdEntities.size();i++)
-        addToGroup(m_createdEntities[i]);
+        m_group_helper.addToGroup(m_group_name, m_createdEntities[i]);
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

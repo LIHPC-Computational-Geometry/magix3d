@@ -29,6 +29,7 @@ CommandClearGroupName::CommandClearGroupName(Internal::Context& c,
         int dim,
         const std::string& groupName)
 : CommandCreateMesh(c, (std::string("Vide le groupe ")+groupName),0)
+, m_group_helper(getInfoCommand(), c.getGroupManager())
 , m_groupName(groupName)
 , m_dim(dim)
 {
@@ -55,13 +56,7 @@ void CommandClearGroupName::internalExecute()
     		m_geom_entities.push_back(vtx);
 
     		// on retire le groupe
-    		grp->remove(vtx);
-    		vtx->remove(grp);
-
-    		// il faut peut-être ajouter au groupe par défaut
-    		if (vtx->getNbGroups() == 0)
-    			addGroup("", vtx);
-
+			m_group_helper.removeFromGroup(m_groupName, vtx);
     	} // end for iter
 
     	std::vector<Topo::Vertex*> topos = grp->getTopoVertices();
@@ -72,22 +67,12 @@ void CommandClearGroupName::internalExecute()
     		m_topo_entities.push_back(topo);
 
     		// on retire le groupe
-    		grp->remove(topo);
-    		topo->getGroupsContainer().remove(grp, true);
-
-    		// il faut peut-être ajouter au groupe par défaut
-    		if (topo->getGroupsContainer().getNb() == 0 && topo->getGeomAssociation() == 0)
-    			addGroup("", topo);
+			m_group_helper.removeFromGroup(m_groupName, topo);
 
     		// le sommet n'est peut-être plus visible / groupe visibles
     		getInfoCommand().addTopoInfoEntity(topo, Internal::InfoCommand::VISIBILYCHANGED);
 
     	} // end for iter
-
-    	if (grp->empty())
-    		getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISABLE);
-    	else
-    		throw TkUtil::Exception("Le groupe n'est pas vide");
     }
     break;
     case(1):{
@@ -101,13 +86,7 @@ void CommandClearGroupName::internalExecute()
     		m_geom_entities.push_back(geom);
 
     		// on retire le groupe
-    		grp->remove(geom);
-    		geom->remove(grp);
-
-    		// il faut peut-être ajouter au groupe par défaut
-    		if (geom->getNbGroups() == 0)
-    			addGroup("", geom);
-
+			m_group_helper.removeFromGroup(m_groupName, geom);
     	} // end for iter
 
     	std::vector<Topo::CoEdge*> topos = grp->getCoEdges();
@@ -118,22 +97,12 @@ void CommandClearGroupName::internalExecute()
     		m_topo_entities.push_back(topo);
 
     		// on retire le groupe
-    		grp->remove(topo);
-    		topo->getGroupsContainer().remove(grp, true);
-
-    		// il faut peut-être ajouter au groupe par défaut
-    		if (topo->getGroupsContainer().getNb() == 0 && topo->getGeomAssociation() == 0)
-    			addGroup("", topo);
+			m_group_helper.removeFromGroup(m_groupName, topo);
 
     		// l'arête n'est peut-être plus visible / groupe visibles
     		getInfoCommand().addTopoInfoEntity(topo, Internal::InfoCommand::VISIBILYCHANGED);
 
     	} // end for iter
-
-    	if (grp->empty())
-    		getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISABLE);
-    	else
-    		throw TkUtil::Exception("Le groupe n'est pas vide");
     }
     break;
     case(2):{
@@ -147,13 +116,7 @@ void CommandClearGroupName::internalExecute()
         	m_geom_entities.push_back(geom);
 
         	// on retire le groupe
-        	grp->remove(geom);
-        	geom->remove(grp);
-
-        	// il faut peut-être ajouter au groupe par défaut
-        	if (geom->getNbGroups() == 0)
-        		addGroup("", geom);
-
+			m_group_helper.removeFromGroup(m_groupName, geom);
         } // end for iter
 
         std::vector<Topo::CoFace*> topos = grp->getCoFaces();
@@ -164,22 +127,12 @@ void CommandClearGroupName::internalExecute()
         	m_topo_entities.push_back(topo);
 
         	// on retire le groupe
-        	grp->remove(topo);
-        	topo->getGroupsContainer().remove(grp, true);
-
-        	// il faut peut-être ajouter au groupe par défaut
-        	if (topo->getGroupsContainer().getNb() == 0 && topo->getGeomAssociation() == 0)
-        		addGroup("", topo);
+			m_group_helper.removeFromGroup(m_groupName, topo);
 
     		// la face n'est peut-être plus visible / groupe visibles
 			getInfoCommand().addTopoInfoEntity(topo, Internal::InfoCommand::VISIBILYCHANGED);
 
         } // end for iter
-
-        if (grp->empty())
-            getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISABLE);
-        else
-        	throw TkUtil::Exception("Le groupe n'est pas vide");
     }
     break;
     case(3):{
@@ -193,13 +146,7 @@ void CommandClearGroupName::internalExecute()
         	m_geom_entities.push_back(geom);
 
         	// on retire le groupe
-        	grp->remove(geom);
-        	geom->remove(grp);
-
-        	// il faut peut-être ajouter au groupe par défaut
-        	if (geom->getNbGroups() == 0)
-        		addGroup("", geom);
-
+			m_group_helper.removeFromGroup(m_groupName, geom);
         } // end for iter
 
         std::vector<Topo::Block*> topos = grp->getBlocks();
@@ -210,22 +157,12 @@ void CommandClearGroupName::internalExecute()
         	m_topo_entities.push_back(topo);
 
         	// on retire le groupe
-        	grp->remove(topo);
-        	topo->getGroupsContainer().remove(grp, true);
-
-        	// il faut peut-être ajouter au groupe par défaut
-        	if (topo->getGroupsContainer().getNb() == 0 && topo->getGeomAssociation() == 0)
-        		addGroup("", topo);
+			m_group_helper.removeFromGroup(m_groupName, topo);
 
     		// le bloc n'est peut-être plus visible / groupe visibles
 			getInfoCommand().addTopoInfoEntity(topo, Internal::InfoCommand::VISIBILYCHANGED);
 
         } // end for iter
-
-        if (grp->empty())
-            getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISABLE);
-        else
-        	throw TkUtil::Exception("Le groupe n'est pas vide");
     }
     break;
 
@@ -251,14 +188,12 @@ void CommandClearGroupName::internalUndo()
 
 	switch(m_dim){
 	case(0):{
-		Group::Group0D* grp = gm.getNewGroup0D(m_groupName, &getInfoCommand());
-
 		for (std::vector<Geom::GeomEntity*>::iterator iter = m_geom_entities.begin();
 				iter != m_geom_entities.end(); ++iter){
 			Geom::Vertex* vtx =  dynamic_cast<Geom::Vertex*>(*iter);
 			CHECK_NULL_PTR_ERROR(vtx);
 
-			addGroup(m_groupName, vtx);
+			m_group_helper.addToGroup(m_groupName, vtx);
 		} // end for iter
 
 		for (std::vector<Topo::TopoEntity*>::iterator iter = m_topo_entities.begin();
@@ -266,25 +201,17 @@ void CommandClearGroupName::internalUndo()
 			Topo::Vertex* te =  dynamic_cast<Topo::Vertex*>(*iter);
 			CHECK_NULL_PTR_ERROR(te);
 
-			addGroup(m_groupName, te);
+			m_group_helper.addToGroup(m_groupName, te);
 		} // end for iter
 	}
 	break;
 	case(1):{
-		Group::Group1D* grp = gm.getNewGroup1D(m_groupName, &getInfoCommand());
-
 		for (std::vector<Geom::GeomEntity*>::iterator iter = m_geom_entities.begin();
 				iter != m_geom_entities.end(); ++iter){
 			Geom::Curve* crv =  dynamic_cast<Geom::Curve*>(*iter);
 			CHECK_NULL_PTR_ERROR(crv);
 
-			// 1 seul groupe qui est le groupe par défaut ? => on le supprime
-			std::vector<std::string> groupsName;
-			crv->getGroupsName(groupsName);
-			if (groupsName.size() == 1 && groupsName[0] == default_group_name)
-				removeGroup("", crv);
-
-			addGroup(m_groupName, crv);
+			m_group_helper.addToGroup(m_groupName, crv);
 		} // end for iter
 
 		for (std::vector<Topo::TopoEntity*>::iterator iter = m_topo_entities.begin();
@@ -292,25 +219,17 @@ void CommandClearGroupName::internalUndo()
 			Topo::CoEdge* te =  dynamic_cast<Topo::CoEdge*>(*iter);
 			CHECK_NULL_PTR_ERROR(te);
 
-			addGroup(m_groupName, te);
+			m_group_helper.addToGroup(m_groupName, te);
 		} // end for iter
 	}
 	break;
 	case(2):{
-		Group::Group2D* grp = gm.getNewGroup2D(m_groupName, &getInfoCommand());
-
 		for (std::vector<Geom::GeomEntity*>::iterator iter = m_geom_entities.begin();
 				iter != m_geom_entities.end(); ++iter){
 			Geom::Surface* srf =  dynamic_cast<Geom::Surface*>(*iter);
 			CHECK_NULL_PTR_ERROR(srf);
 
-			// 1 seul groupe qui est le groupe par défaut ? => on le supprime
-			std::vector<std::string> groupsName;
-			srf->getGroupsName(groupsName);
-			if (groupsName.size() == 1 && groupsName[0] == default_group_name)
-				removeGroup("", srf);
-
-			addGroup(m_groupName, srf);
+			m_group_helper.addToGroup(m_groupName,  srf);
 		} // end for iter
 
 		for (std::vector<Topo::TopoEntity*>::iterator iter = m_topo_entities.begin();
@@ -318,7 +237,8 @@ void CommandClearGroupName::internalUndo()
 			Topo::CoFace* te =  dynamic_cast<Topo::CoFace*>(*iter);
 			CHECK_NULL_PTR_ERROR(te);
 
-			addGroup(m_groupName, te);
+			m_group_helper.addToGroup(m_groupName,  te);
+
 		} // end for iter
 	}
 	break;
@@ -330,13 +250,7 @@ void CommandClearGroupName::internalUndo()
 			Geom::Volume* vol =  dynamic_cast<Geom::Volume*>(*iter);
 			CHECK_NULL_PTR_ERROR(vol);
 
-			// 1 seul groupe qui est le groupe par défaut ? => on le supprime
-			std::vector<std::string> groupsName;
-			vol->getGroupsName(groupsName);
-			if (groupsName.size() == 1 && groupsName[0] == default_group_name)
-				removeGroup("", vol);
-
-			addGroup(m_groupName, vol);
+			m_group_helper.addToGroup(m_groupName,  vol);
 		} // end for iter
 
 		for (std::vector<Topo::TopoEntity*>::iterator iter = m_topo_entities.begin();
@@ -344,7 +258,7 @@ void CommandClearGroupName::internalUndo()
 			Topo::Block* te =  dynamic_cast<Topo::Block*>(*iter);
 			CHECK_NULL_PTR_ERROR(te);
 
-			addGroup(m_groupName, te);
+			m_group_helper.addToGroup(m_groupName,  te);
 		} // end for iter
 	}
 	break;
@@ -368,15 +282,12 @@ void CommandClearGroupName::internalRedo()
 {
 	switch(m_dim){
 	case(0):{
-		Group::Group0D* grp = getContext().getGroupManager().getNewGroup0D(m_groupName, &getInfoCommand());
-
 		for (std::vector<Geom::GeomEntity*>::iterator iter = m_geom_entities.begin();
 				iter != m_geom_entities.end(); ++iter){
 			Geom::Vertex* vtx =  dynamic_cast<Geom::Vertex*>(*iter);
 			CHECK_NULL_PTR_ERROR(vtx);
 
-			removeGroup(m_groupName, vtx);
-
+			m_group_helper.removeFromGroup(m_groupName, vtx);
 		} // end for iter
 
 		for (std::vector<Topo::TopoEntity*>::iterator iter = m_topo_entities.begin();
@@ -384,21 +295,17 @@ void CommandClearGroupName::internalRedo()
 			Topo::Vertex* te =  dynamic_cast<Topo::Vertex*>(*iter);
 			CHECK_NULL_PTR_ERROR(te);
 
-			removeGroup(m_groupName, te);
-
+			m_group_helper.removeFromGroup(m_groupName, te);
 		} // end for iter
 	}
 	break;
 	case(1):{
-		Group::Group1D* grp = getContext().getGroupManager().getNewGroup1D(m_groupName, &getInfoCommand());
-
 		for (std::vector<Geom::GeomEntity*>::iterator iter = m_geom_entities.begin();
 				iter != m_geom_entities.end(); ++iter){
 			Geom::Curve* crv =  dynamic_cast<Geom::Curve*>(*iter);
 			CHECK_NULL_PTR_ERROR(crv);
 
-			removeGroup(m_groupName, crv);
-
+			m_group_helper.removeFromGroup(m_groupName, crv);
 		} // end for iter
 
 		for (std::vector<Topo::TopoEntity*>::iterator iter = m_topo_entities.begin();
@@ -406,21 +313,17 @@ void CommandClearGroupName::internalRedo()
 			Topo::CoEdge* te =  dynamic_cast<Topo::CoEdge*>(*iter);
 			CHECK_NULL_PTR_ERROR(te);
 
-			removeGroup(m_groupName, te);
-
+			m_group_helper.removeFromGroup(m_groupName, te);
 		} // end for iter
 	}
 	break;
 	case(2):{
-		Group::Group2D* grp = getContext().getGroupManager().getNewGroup2D(m_groupName, &getInfoCommand());
-
 		for (std::vector<Geom::GeomEntity*>::iterator iter = m_geom_entities.begin();
 				iter != m_geom_entities.end(); ++iter){
 			Geom::Surface* srf =  dynamic_cast<Geom::Surface*>(*iter);
 			CHECK_NULL_PTR_ERROR(srf);
 
-			removeGroup(m_groupName, srf);
-
+			m_group_helper.removeFromGroup(m_groupName, srf);
 		} // end for iter
 
 		for (std::vector<Topo::TopoEntity*>::iterator iter = m_topo_entities.begin();
@@ -428,21 +331,18 @@ void CommandClearGroupName::internalRedo()
 			Topo::CoFace* te =  dynamic_cast<Topo::CoFace*>(*iter);
 			CHECK_NULL_PTR_ERROR(te);
 
-			removeGroup(m_groupName, te);
+			m_group_helper.removeFromGroup(m_groupName, te);
 
 		} // end for iter
 	}
 	break;
 	case(3):{
-		Group::Group3D* grp = getContext().getGroupManager().getNewGroup3D(m_groupName, &getInfoCommand());
-
 		for (std::vector<Geom::GeomEntity*>::iterator iter = m_geom_entities.begin();
 				iter != m_geom_entities.end(); ++iter){
 			Geom::Volume* vol =  dynamic_cast<Geom::Volume*>(*iter);
 			CHECK_NULL_PTR_ERROR(vol);
 
-			removeGroup(m_groupName, vol);
-
+			m_group_helper.removeFromGroup(m_groupName, vol);
 		} // end for iter
 
 		for (std::vector<Topo::TopoEntity*>::iterator iter = m_topo_entities.begin();
@@ -450,8 +350,7 @@ void CommandClearGroupName::internalRedo()
 			Topo::Block* te =  dynamic_cast<Topo::Block*>(*iter);
 			CHECK_NULL_PTR_ERROR(te);
 
-			removeGroup(m_groupName, te);
-
+			m_group_helper.removeFromGroup(m_groupName, te);
 		} // end for iter
 	}
 	break;
@@ -705,174 +604,6 @@ updateMesh(std::vector<Topo::CoEdge*>& coedges, std::string grpName, bool add)
 #ifdef _DEBUG_UPDATE
     std::cout<<"end updateMesh"<<std::endl;
 #endif
-}
-/*----------------------------------------------------------------------------*/
-void CommandClearGroupName::
-addGroup(std::string ng, Geom::Vertex* vtx)
-{
-	Group::Group0D* grp = getContext().getGroupManager().getNewGroup0D(ng, &getInfoCommand());
-	grp->add(vtx);
-	vtx->add(grp);
-	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
-}
-/*----------------------------------------------------------------------------*/
-void CommandClearGroupName::
-addGroup(std::string ng, Topo::Vertex* vtx)
-{
-	Group::Group0D* grp = getContext().getGroupManager().getNewGroup0D(ng, &getInfoCommand());
-	grp->add(vtx);
-	vtx->getGroupsContainer().add(grp);
-	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
-}
-/*----------------------------------------------------------------------------*/
-void CommandClearGroupName::
-removeGroup(std::string ng, Geom::Vertex* vtx)
-{
-	Group::Group0D* grp = getContext().getGroupManager().getGroup0D(ng, &getInfoCommand());
-	grp->remove(vtx);
-	vtx->remove(grp);
-	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
-}
-/*----------------------------------------------------------------------------*/
-void CommandClearGroupName::
-removeGroup(std::string ng, Topo::Vertex* vtx)
-{
-	Group::Group0D* grp = getContext().getGroupManager().getGroup0D(ng, &getInfoCommand());
-	grp->remove(vtx);
-	vtx->getGroupsContainer().remove(grp, true);
-	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
-}
-/*----------------------------------------------------------------------------*/
-void CommandClearGroupName::
-addGroup(std::string ng, Geom::Curve* crv)
-{
-	Group::Group1D* grp = getContext().getGroupManager().getNewGroup1D(ng, &getInfoCommand());
-	grp->add(crv);
-	crv->add(grp);
-	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
-	updateMesh(crv, grp->getName(), true);
-}
-/*----------------------------------------------------------------------------*/
-void CommandClearGroupName::
-addGroup(std::string ng, Topo::CoEdge* coedge)
-{
-	Group::Group1D* grp = getContext().getGroupManager().getNewGroup1D(ng, &getInfoCommand());
-	grp->add(coedge);
-	coedge->getGroupsContainer().add(grp);
-	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
-	std::vector<Topo::CoEdge*>  coedges;
-	coedges.push_back(coedge);
-	updateMesh(coedges, grp->getName(), true);
-}
-/*----------------------------------------------------------------------------*/
-void CommandClearGroupName::
-removeGroup(std::string ng, Geom::Curve* crv)
-{
-	Group::Group1D* grp = getContext().getGroupManager().getGroup1D(ng, &getInfoCommand());
-	grp->remove(crv);
-	crv->remove(grp);
-	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
-	updateMesh(crv, grp->getName(), false);
-}
-/*----------------------------------------------------------------------------*/
-void CommandClearGroupName::
-removeGroup(std::string ng, Topo::CoEdge* coedge)
-{
-	Group::Group1D* grp = getContext().getGroupManager().getGroup1D(ng, &getInfoCommand());
-	grp->remove(coedge);
-	coedge->getGroupsContainer().remove(grp, true);
-	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
-	std::vector<Topo::CoEdge*>  coedges;
-	coedges.push_back(coedge);
-	updateMesh(coedges, grp->getName(), false);
-}
-/*----------------------------------------------------------------------------*/
-void CommandClearGroupName::
-addGroup(std::string ng, Geom::Surface* srf)
-{
-	Group::Group2D* grp = getContext().getGroupManager().getNewGroup2D(ng, &getInfoCommand());
-	grp->add(srf);
-	srf->add(grp);
-	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
-	updateMesh(srf, grp->getName(), true);
-}
-/*----------------------------------------------------------------------------*/
-void CommandClearGroupName::
-addGroup(std::string ng, Topo::CoFace* coface)
-{
-	Group::Group2D* grp = getContext().getGroupManager().getNewGroup2D(ng, &getInfoCommand());
-	grp->add(coface);
-	coface->getGroupsContainer().add(grp);
-	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
-	std::vector<Topo::CoFace*>  cofaces;
-	cofaces.push_back(coface);
-	updateMesh(cofaces, grp->getName(), true);
-}
-/*----------------------------------------------------------------------------*/
-void CommandClearGroupName::
-removeGroup(std::string ng, Geom::Surface* srf)
-{
-	Group::Group2D* grp = getContext().getGroupManager().getGroup2D(ng, &getInfoCommand());
-	grp->remove(srf);
-	srf->remove(grp);
-	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
-	updateMesh(srf, grp->getName(), false);
-}
-/*----------------------------------------------------------------------------*/
-void CommandClearGroupName::
-removeGroup(std::string ng, Topo::CoFace* coface)
-{
-	Group::Group2D* grp = getContext().getGroupManager().getGroup2D(ng, &getInfoCommand());
-	grp->remove(coface);
-	coface->getGroupsContainer().remove(grp, true);
-	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
-	std::vector<Topo::CoFace*>  cofaces;
-	cofaces.push_back(coface);
-	updateMesh(cofaces, grp->getName(), false);
-}
-/*----------------------------------------------------------------------------*/
-void CommandClearGroupName::
-addGroup(std::string ng, Geom::Volume* vol)
-{
-	Group::Group3D* grp = getContext().getGroupManager().getNewGroup3D(ng, &getInfoCommand());
-	grp->add(vol);
-	vol->add(grp);
-	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
-	updateMesh(vol, grp->getName(), true);
-}
-/*----------------------------------------------------------------------------*/
-void CommandClearGroupName::
-addGroup(std::string ng, Topo::Block* bloc)
-{
-	Group::Group3D* grp = getContext().getGroupManager().getNewGroup3D(ng, &getInfoCommand());
-	grp->add(bloc);
-	bloc->getGroupsContainer().add(grp);
-	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
-	std::vector<Topo::Block*>  blocs;
-	blocs.push_back(bloc);
-	updateMesh(blocs, grp->getName(), true);
-}
-/*----------------------------------------------------------------------------*/
-void CommandClearGroupName::
-removeGroup(std::string ng, Geom::Volume* vol)
-{
-	Group::Group3D* grp = getContext().getGroupManager().getGroup3D(ng, &getInfoCommand());
-	grp->remove(vol);
-	vol->remove(grp);
-	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
-	updateMesh(vol, grp->getName(), false);
-}
-/*----------------------------------------------------------------------------*/
-void CommandClearGroupName::
-removeGroup(std::string ng, Topo::Block* bloc)
-{
-	Group::Group3D* grp = getContext().getGroupManager().getGroup3D(ng, &getInfoCommand());
-	grp->remove(bloc);
-	bloc->getGroupsContainer().remove(grp, true);
-	getInfoCommand().addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
-	std::vector<Topo::Block*>  blocs;
-	blocs.push_back(bloc);
-	updateMesh(blocs, grp->getName(), false);
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Mesh

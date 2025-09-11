@@ -45,7 +45,7 @@ void CommandNewSurfaceByOffset::internalExecute()
     // découpage de la surface en entités de dimensions inférieures et stockage dans le manager géométrique
     split(surf);
 
-	addToGroup(surf);
+    m_group_helper.addToGroup(m_group_name, surf);
 
 	log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_1));
 

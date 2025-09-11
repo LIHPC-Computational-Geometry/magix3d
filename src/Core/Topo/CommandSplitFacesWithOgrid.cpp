@@ -1168,16 +1168,15 @@ freeUnused(std::map<Vertex*, uint> & filtre_vertex,
         } // end if (ga)
 
         // récupération des groupes pour les cofaces
-        Utils::Container<Group::Group2D>& groups = coface->getGroupsContainer();
+        std::vector<Group::Group2D*> grps = coface->getGroups();
         // pour la coface centrale
         CoFace* newCoface = corr_coface[coface];
         if (newCoface) {
             newCoface->setGeomAssociation(ga);
 
-            for (uint i=0; i<groups.size(); i++){
-            	Group::Group2D* gr = groups.get(i);
+            for (Group::Group2D* gr : grps) {
             	gr->add(newCoface);
-            	newCoface->getGroupsContainer().add(gr);
+            	newCoface->add(gr);
             }
 
             // pour les faces entre les bords de la face initiale et celle au centre
@@ -1189,12 +1188,12 @@ freeUnused(std::map<Vertex*, uint> & filtre_vertex,
                 TopoHelper::sortVertices(vtx0, vtx1);
 
                 newCoface = corr_2vtx_coface[std::pair<Vertex*, Vertex*>(vtx0, vtx1)];
-                if (newCoface)
-                	for (uint i=0; i<groups.size(); i++){
-                		Group::Group2D* gr = groups.get(i);
-                		gr->add(newCoface);
-                		newCoface->getGroupsContainer().add(gr);
-                	}
+                if (newCoface) {
+                    for (Group::Group2D* gr : grps) {
+                        gr->add(newCoface);
+                        newCoface->add(gr);
+                    }
+                }
             } // end for i
         } // end if (newCoface)
 

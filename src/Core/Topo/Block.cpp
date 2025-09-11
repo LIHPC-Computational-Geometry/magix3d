@@ -1163,8 +1163,7 @@ getDescription (bool alsoComputed) const
 
     description->addPropertiesSet (topoRelation);
 
-    std::vector<Group::Group3D*> grp;
-    getGroups(grp);
+    std::vector<Group::Group3D*> grp = getGroups();
     if (!grp.empty()){
     	Utils::SerializedRepresentation  groupe ("Relation vers les groupes",
     			TkUtil::NumericConversions::toStr(grp.size()));
@@ -2576,13 +2575,13 @@ split(CoEdge* arete, double ratio,
     block_1->setGeomAssociation(getGeomAssociation());
     block_2->setGeomAssociation(getGeomAssociation());
 
-    Utils::Container<Group::Group3D>& groups = getGroupsContainer();
+    Utils::Container<Group::Group3D>& groups = m_topo_property->getGroupsContainer();
     for (uint i=0; i<groups.size(); i++){
     	Group::Group3D* gr = groups.get(i);
     	gr->add(block_1);
     	gr->add(block_2);
-    	block_1->getGroupsContainer().add(gr);
-    	block_2->getGroupsContainer().add(gr);
+    	block_1->add(gr);
+    	block_2->add(gr);
     }
 
     if (icmd){
@@ -3452,8 +3451,28 @@ void Block::getGroupsName (std::vector<std::string>& gn, bool byGeom, bool byTop
 		TopoEntity::getGroupsName(gn, byGeom, byTopo);
 
 	if (byTopo)
-		for (uint i = 0; i<m_topo_property->getGroupsContainer().size(); ++i)
+		for (uint i = 0; i<getNbGroups(); ++i)
 		        gn.push_back(m_topo_property->getGroupsContainer().get(i)->getName());
+}
+/*----------------------------------------------------------------------------*/
+void Block::add(Group::Group3D* grp)
+{
+    m_topo_property->getGroupsContainer().add(grp);
+}
+/*----------------------------------------------------------------------------*/
+void Block::remove(Group::Group3D* grp)
+{
+    m_topo_property->getGroupsContainer().remove(grp);
+}
+/*----------------------------------------------------------------------------*/
+int Block::getNbGroups() const
+{
+    return m_topo_property->getGroupsContainer().getNb();
+}
+/*----------------------------------------------------------------------------*/
+std::vector<Group::Group3D*> Block::getGroups() const
+{
+    return m_topo_property->getGroupsContainer().get();
 }
 /*----------------------------------------------------------------------------*/
 void Block::setDestroyed(bool b)
@@ -3466,7 +3485,7 @@ void Block::setDestroyed(bool b)
         return;
 
     // on retire la relation depuis les groupes
-     Utils::Container<Group::Group3D>& groups = getGroupsContainer();
+     Utils::Container<Group::Group3D>& groups = m_topo_property->getGroupsContainer();
 #ifdef _DEBUG2
     std::cout<<"Les groupes:";
     for  (uint i=0; i<groups.size(); i++)

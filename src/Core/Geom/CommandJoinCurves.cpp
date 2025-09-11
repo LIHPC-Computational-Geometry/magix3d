@@ -144,10 +144,8 @@ internalSpecificExecute()
 	// reprise des groupes de la première courbe
 	std::vector<Group::GroupEntity*> grp;
 	m_entities[0]->getGroups(grp);
-	newCurve->setGroups(grp);
 	for (uint i=0; i<grp.size(); i++){
-		Group::Group1D* group = getContext().getGroupManager().getNewGroup1D(grp[i]->getName(), &getInfoCommand());
-		group->add(newCurve);
+		m_group_helper.addToGroup(grp[i]->getName(), newCurve);
 	}
 
 	// destruction des anciennes courbes
