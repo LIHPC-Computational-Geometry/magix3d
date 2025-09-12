@@ -320,10 +320,10 @@ Group0D* GroupManager::getGroup0D(const std::string& gr_name, const bool excepti
     return gr;
 }
 /*----------------------------------------------------------------------------*/
-void GroupManager::getGroups(std::vector<GroupEntity*>& grp, Utils::SelectionManager::DIM dimensions, const bool onlyLive) const
+void GroupManager::getGroups(std::vector<GroupEntity*>& grp, Internal::SelectionManager::DIM dimensions, const bool onlyLive) const
 {
 	for (int i = 0; i < 4; i++){
-		const Utils::SelectionManager::DIM dim = Utils::SelectionManager::dimensionToDimensions(i);
+		const Internal::SelectionManager::DIM dim = Internal::SelectionManager::dimensionToDimensions(i);
 		if (0 == (dimensions&dim))
 			continue;
 		switch (i)

@@ -12,7 +12,7 @@
 #include "QtComponents/QtMgx3DGroupNamePanel.h"
 #include "QtComponents/QtMgx3DEntityPanel.h"
 
-#include "Utils/SelectionManager.h"
+#include "Internal/SelectionManager.h"
 
 #include <QCheckBox>
 

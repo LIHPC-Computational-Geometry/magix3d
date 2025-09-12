@@ -249,7 +249,7 @@ void QtTopoEntityDestructionPanel::operationCompleted ( )
 	QtMgx3DOperationPanel::operationCompleted ( );
 }	// QtTopoEntityDestructionPanel::operationCompleted
 
-void QtTopoEntityDestructionPanel::setDimensions (Mgx3D::Utils::SelectionManager::DIM dims)
+void QtTopoEntityDestructionPanel::setDimensions (Mgx3D::Internal::SelectionManager::DIM dims)
 {
 
 	_topoEntitiesPanel->setDimensions(dims);

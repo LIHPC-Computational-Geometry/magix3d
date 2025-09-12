@@ -15,7 +15,7 @@
 #include "QtComponents/RenderingManager.h"
 
 #include "Utils/Vector.h"
-#include "Utils/SelectionManager.h"
+#include "Internal/SelectionManager.h"
 
 #include <QCheckBox>
 
@@ -65,7 +65,7 @@ class QtGeometryMirrorPanel :
 	/**
 	 * \param		Nouvelle dimension de saisie des entités géométriques.
 	 */
-	virtual void setDimension (Mgx3D::Utils::SelectionManager::DIM dim);
+	virtual void setDimension (Mgx3D::Internal::SelectionManager::DIM dim);
 
 //	/**
 //	 * \return		<I>true</I> s'il faut soumettre toutes les entités

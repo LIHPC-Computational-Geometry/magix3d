@@ -8,7 +8,7 @@
 #define VTK_SELECTION_MANAGER_DIM_FILTER_H
 
 
-#include "Utils/SelectionManagerDimFilter.h"
+#include "Internal/SelectionManagerDimFilter.h"
 #include "QtVtkComponents/VTKMgx3DSelectionManager.h"
 
 
@@ -34,7 +34,7 @@ namespace QtVtkComponents {
  * @date		18/10/2012
  */
 class VTKSelectionManagerDimFilter :
-						public Mgx3D::Utils::SelectionManagerDimFilter,
+						public Mgx3D::Internal::SelectionManagerDimFilter,
 						public Mgx3D::QtVtkComponents::VTKMgx3DSelectionManager
 {
 	public :

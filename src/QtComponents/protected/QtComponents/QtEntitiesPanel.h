@@ -14,7 +14,7 @@
 #include <QTreeWidget>
 
 #include "QtComponents/QtEntitiesItemViewPanel.h"
-#include "Utils/SelectionManager.h"
+#include "Internal/SelectionManager.h"
 #include "Geom/GeomEntity.h"
 #include "Topo/TopoEntity.h"
 #include "Mesh/MeshEntity.h"
@@ -515,7 +515,7 @@ struct QTreeViewPopupActions
  *				gestion de la sélection est effectuée au niveau du contexte.
  *				</P>
  */
-class QtEntitiesPanel :public QtEntitiesItemViewPanel, public Utils::SelectionManagerObserver
+class QtEntitiesPanel :public QtEntitiesItemViewPanel, public Internal::SelectionManagerObserver
 {
 	friend class QtEntitiesTreeWidget;	// beurk
 

@@ -11,7 +11,7 @@
 #include "QtComponents/QtMgx3DTopoOperationAction.h"
 #include "QtComponents/QtMgx3DGroupNamePanel.h"
 
-#include "Utils/SelectionManager.h"
+#include "Internal/SelectionManager.h"
 
 
 

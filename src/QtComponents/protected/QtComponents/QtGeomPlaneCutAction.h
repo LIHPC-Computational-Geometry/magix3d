@@ -57,7 +57,7 @@ class QtGeomPlaneCutPanel :
 			QWidget* parent, const std::string& panelName,
 			QtMgx3DGroupNamePanel::POLICY creationPolicy,
 			const std::string& entitiesLabel,
-			Mgx3D::Utils::SelectionManager::DIM	dimensions,
+			Mgx3D::Internal::SelectionManager::DIM	dimensions,
 			Mgx3D::Utils::FilterEntity::objectType types,
 			Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
 			Mgx3D::QtComponents::QtMgx3DOperationAction* action);
@@ -213,7 +213,7 @@ class QtGeomPlaneCutAction : public QtMgx3DGeomOperationAction
 	 */
 	QtGeomPlaneCutAction (
 		const QIcon& icon, const QString& text,
-		Mgx3D::Utils::SelectionManager::DIM	dimensions,
+		Mgx3D::Internal::SelectionManager::DIM	dimensions,
 		Mgx3D::Utils::FilterEntity::objectType types,
 		Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
 		const QString& tooltip, QtMgx3DGroupNamePanel::POLICY creationPolicy);

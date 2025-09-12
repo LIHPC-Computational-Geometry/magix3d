@@ -344,8 +344,8 @@ Context::Context(const std::string& name, bool withStdOutputs)
 		Mgx3D::Utils::GraphicalRepresentationFactoryIfc::setInstance (
 				new Mgx3D::Utils::DefaultGraphicalRepresentationFactory ( ));
 
-	Utils::SelectionManager*	selectionManager	=
-		new Utils::SelectionManager (createName ("SelectionManager"), getLogStream ( ));
+	Internal::SelectionManager*	selectionManager	=
+		new Internal::SelectionManager (createName ("SelectionManager"), getLogStream ( ));
 	m_selection_manager	= selectionManager;
 	Utils::CommandManager*	commandManager	=
 					new Utils::CommandManager (createName ("CommandManager"));
@@ -867,19 +867,19 @@ Mgx3D::Utils::CommandManager& Context::getLocalCommandManager()
     return *manager;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Utils::SelectionManager& Context::getSelectionManager ( )
+Mgx3D::Internal::SelectionManager& Context::getSelectionManager ( )
 {
 	CHECK_NULL_PTR_ERROR (m_selection_manager)
 	return *m_selection_manager;
 }
 /*----------------------------------------------------------------------------*/
-const Mgx3D::Utils::SelectionManager& Context::getSelectionManager ( ) const
+const Mgx3D::Internal::SelectionManager& Context::getSelectionManager ( ) const
 {
 	CHECK_NULL_PTR_ERROR (m_selection_manager)
 	return *m_selection_manager;
 }
 /*----------------------------------------------------------------------------*/
-void Context::setSelectionManager (Mgx3D::Utils::SelectionManager* mgr)
+void Context::setSelectionManager (Mgx3D::Internal::SelectionManager* mgr)
 {
 	delete m_selection_manager;
 	m_selection_manager	= mgr;

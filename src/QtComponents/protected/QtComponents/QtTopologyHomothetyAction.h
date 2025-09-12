@@ -12,7 +12,7 @@
 #include "QtComponents/QtMgx3DHomothetyPanel.h"
 #include "QtComponents/QtMgx3DTopoOperationAction.h"
 
-#include "Utils/SelectionManager.h"
+#include "Internal/SelectionManager.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -73,7 +73,7 @@ class QtTopologyHomothetyPanel : public QtMgx3DOperationPanel
 	/**
 	 * \param		Nouvelle dimension de saisie des entités topologiques.
 	 */
-	virtual void setDimension (Mgx3D::Utils::SelectionManager::DIM dim);
+	virtual void setDimension (Mgx3D::Internal::SelectionManager::DIM dim);
 
 	/**
 	 * \return		La liste des entités topologiques devant effectuer une

@@ -90,7 +90,10 @@ suivants :
 
 -  **Sélection** d’une entité : touche **P** (ou **clic gauche**
    souris). Possibilité d’étendre la sélection en pressant simultanément
-   la touche **CTRL**.
+   la touche **CTRL**. La combinaison **ALT+clic gauche** permet la sélection
+   de feuillets en fonction du filtre de sélection appliqué. La combinaison
+   **SHIFT+clic gauche** permet la sélection de corde en fonction du filtre
+   de sélection appliqué.
 
    Il est possible d'annuler la dernière opération de sélection effectuée : combinaison de touches **SHIFT-Z**
 

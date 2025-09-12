@@ -11,7 +11,7 @@
 #include "QtComponents/QtMgx3DTopoOperationAction.h"
 #include "QtComponents/QtEntityByDimensionSelectorPanel.h"
 
-#include "Utils/SelectionManager.h"
+#include "Internal/SelectionManager.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -56,7 +56,7 @@ class QtTopoToGeomAssociationPanel : public QtMgx3DOperationsSubPanel
 	QtTopoToGeomAssociationPanel (
 			QWidget* parent, PROJECTION_METHOD method,
 			Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
-			Mgx3D::Utils::SelectionManager::DIM defaultDimensions);
+			Mgx3D::Internal::SelectionManager::DIM defaultDimensions);
 
 	/**
 	 * Destructeur. RAS.
@@ -186,7 +186,7 @@ class QtTopoEntitiesAssociationsPanel : public QtMgx3DOperationPanel
 			QWidget* parent, const std::string& panelName,
 			Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
 			Mgx3D::QtComponents::QtMgx3DOperationAction* action,
-			Mgx3D::Utils::SelectionManager::DIM defaultDimensions);
+			Mgx3D::Internal::SelectionManager::DIM defaultDimensions);
 
 	/**
 	 * RAS.
@@ -345,7 +345,7 @@ class QtTopoEntitiesAssociationsAction : public QtMgx3DTopoOperationAction
 		const QIcon& icon, const QString& text,
 		Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
 		const QString& tooltip,
-		Mgx3D::Utils::SelectionManager::DIM defaultDimensions);
+		Mgx3D::Internal::SelectionManager::DIM defaultDimensions);
 
 	/**
 	 * Destructeur. RAS.

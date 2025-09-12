@@ -4,7 +4,7 @@
  * \date		14/10/2013
  */
 
-#include "Utils/SelectionManagerDimFilter.h"
+#include "Internal/SelectionManagerDimFilter.h"
 
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/Exception.h>
@@ -22,7 +22,7 @@ using namespace std;
 namespace Mgx3D {
 
 /*----------------------------------------------------------------------------*/
-namespace Utils {
+namespace Internal {
 
 /*----------------------------------------------------------------------------*/
 
