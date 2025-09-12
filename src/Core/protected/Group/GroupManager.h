@@ -1,11 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file GroupManager.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 18/10/2012
- */
-/*----------------------------------------------------------------------------*/
 #ifndef MGX3D_GROUP_GROUPMANAGER_H_
 #define MGX3D_GROUP_GROUPMANAGER_H_
 /*----------------------------------------------------------------------------*/
@@ -103,12 +96,16 @@ public:
     bool getPropagate();
 
     /*------------------------------------------------------------------------*/
-    /** Retourne une string avec les informations relatives à l'entité */
+    /// Retourne une string avec les informations relatives à l'entité */
     std::string getInfos(const std::string& name, int dim) const;
 
     /*------------------------------------------------------------------------*/
     /// retourne un nom par défaut pour les entités qui n'en aurait pas
     std::string getDefaultName(int dim) const;
+
+    /*------------------------------------------------------------------------*/
+    /// Retourne une string avec les informations relatives à l'entité */
+    Internal::M3DCommandResult* changeGroupName(const std::string& oldName, const std::string& newName, int dim);
 
 #ifndef SWIG
     /*------------------------------------------------------------------------*/
@@ -367,6 +364,10 @@ public:
             uint mark);
 
     /*------------------------------------------------------------------------*/
+    /** Retourne le groupe correspondant à la dimension                       */
+    GroupEntity* getGroup(const std::string& name, const int dim, const bool exceptionIfNotFound=true) const;
+
+    /*------------------------------------------------------------------------*/
     /** Retourne les volumes géométriques à partir des groupes sélectionnés   */
     void get(const std::vector<GroupEntity*>& vg, std::vector<Geom::Volume*>& volumes);
 
@@ -529,9 +530,6 @@ public:
 
 
 private:
-    /// Retourne le groupe correspondant à la dimension
-    GroupEntity* getGroup(const std::string& name, const int dim) const;
-
     /// Conteneur pour les groupes 3D
     std::vector<Group3D*> m_group3D;
 

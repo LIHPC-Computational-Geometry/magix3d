@@ -10,6 +10,7 @@
 #define COMMANDEDITTOPO_H_
 /*----------------------------------------------------------------------------*/
 #include "Internal/CommandInternal.h"
+#include "Group/GroupHelperForCommand.h"
 /*----------------------------------------------------------------------------*/
 #include <vector>
 #include <map>
@@ -349,10 +350,11 @@ protected:
     std::vector <BlockTopoPropertyInfo> m_block_topo_property_info;
 
 protected:
+    /// helper pour la gestion des groupes dans les commandes
+    Group::GroupHelperForCommand m_group_helper;
 
     /// mode preview activé
     bool m_isPreview;
-
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo

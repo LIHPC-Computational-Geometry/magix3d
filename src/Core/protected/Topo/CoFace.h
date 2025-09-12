@@ -1,11 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file CoFace
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 13/02/2012
- */
-/*----------------------------------------------------------------------------*/
 #ifndef TOPO_COFACE_H_
 #define TOPO_COFACE_H_
 /*----------------------------------------------------------------------------*/
@@ -122,16 +115,11 @@ public:
 
     /** \brief  Fournit l'accès aux faces topologiques incidentes sans copie
      */
-
-    const std::vector<Face* > getFaces() const
+   const std::vector<Face* > getFaces() const
     {return m_topo_property->getFaceContainer().get();}
-
-
 
     uint getNbFaces() const
     { return m_topo_property->getFaceContainer().getNb(); }
-
-
 
     Face* getFace(uint ind) const
     { return m_topo_property->getFaceContainer().get(ind); }
@@ -158,13 +146,10 @@ public:
 
     virtual void replace(Topo::Vertex* v1, Topo::Vertex* v2, bool propagate_up, bool propagate_down, Internal::InfoCommand* icmd);
 
-
     /** \brief Remplace une arête e1 par e2
      *
      */
-
    virtual void replace(Edge* e1, Edge* e2, Internal::InfoCommand* icmd);
-
 
    /** \brief Remplace une arête commune e1 par e2
     *
@@ -649,13 +634,10 @@ public:
 
     /// Accesseur sur la liste de noms de groupes
     virtual void getGroupsName (std::vector<std::string>& gn, bool byGeom=true, bool byTopo=true) const;
-
-    /// Accesseur sur le conteneur pour les groupes
-    Utils::Container<Group::Group2D>& getGroupsContainer() {return m_topo_property->getGroupsContainer();}
-    const Utils::Container<Group::Group2D>& getGroupsContainer() const {return m_topo_property->getGroupsContainer();}
-
-    void getGroups(std::vector<Group::Group2D*>& grp) const
-          {grp = getGroupsContainer().get();}
+    void add(Group::Group2D* grp);
+    void remove(Group::Group2D* grp);
+    int getNbGroups() const;
+    std::vector<Group::Group2D*> getGroups() const;
 
     /*------------------------------------------------------------------------*/
     /// Nombre de noeuds internes: le nombre de noeuds sans ceux du bord

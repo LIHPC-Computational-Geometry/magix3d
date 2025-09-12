@@ -622,6 +622,12 @@ void QtGroupsPanel::removeGroups (const vector<Group::GroupEntity*>& groups)
 }	// QtGroupsPanel::removeGroups
 
 
+void QtGroupsPanel::updateGroup (const Group::GroupEntity& group)
+{
+	getGroupItem(group)->update(true);
+}
+
+
 vector<Group::GroupEntity*> QtGroupsPanel::getSelectedGroups ( ) const
 {
 	vector<Group::GroupEntity*>		groups;
@@ -849,6 +855,26 @@ void QtGroupsPanel::updateQuickButtons ( )
 	_wireTopoCoEdgeButton->setChecked (0 == rep ? false : true);
 }	// QtGroupsPanel::updateQuickButtons
 
+void QtGroupsPanel::updateGroupCallback ( )
+{
+	vector<QtGroupTreeWidgetItem*>	items	= getSelectedGroupsItems ( );
+	for (vector<QtGroupTreeWidgetItem*>::iterator it = items.begin ( ); items.end ( ) != it; it++)
+	{
+		if (true == (*it)->isSelected ( ))
+		{
+			QString newName;
+			bool ok = true;
+			newName = QInputDialog::getText(this, "Magix 3D", "Renommage de Groupe :",QLineEdit::Normal, "",&ok);
+
+			std::string str_newName = newName.toStdString();
+
+			GroupEntity* gr = (*it)->getGroup ( );
+			getContext().getGroupManager().changeGroupName(gr->getName(), str_newName, gr->getDim());
+
+			updateGroup(*gr);
+		}
+	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
+}	// QtGroupsPanel::displaySelectedGroups
 
 void QtGroupsPanel::clearGroupCallback ( )
 {
@@ -1396,6 +1422,10 @@ void QtGroupsPanel::createPopupMenus ( )
 			SLOT (unselectMeshCloudsCallback ( )), this, false, OFF);
 
 	_groupsPopupMenu->addSeparator ( );
+
+	QAction* updateGroupAction = createAction (*_groupsPopupMenu, QString::fromUtf8("Renommer le groupe"),
+											   QString::fromUtf8("Le groupe change de nom tout en conservant son contenu"),
+											   SLOT (updateGroupCallback ( )), this, false, OFF);
 
 	QAction* clearGroupAction = createAction (*_groupsPopupMenu, QString::fromUtf8("Destruction d'un groupe"),
 			QString::fromUtf8("Un groupe perd toute les entités qu'il contenait et disparait"),

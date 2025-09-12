@@ -4386,6 +4386,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 								groupsRemoved.push_back((*itg).first);
 								break;
 							case InfoCommand::DISPMODIFIED    :
+								getGroupsPanel().updateGroup(*((*itg).first));
 								break;
 						}    // switch ((*itg).second)
 					}    // for (map<Group::GroupEntity*, type>::const_iterator ...

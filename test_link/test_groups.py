@@ -1,5 +1,6 @@
 
 import pyMagix3D as Mgx3D
+import pytest
 
 def test_group_box():
     ctx = Mgx3D.getStdContext()
@@ -186,3 +187,27 @@ def test_undo_clear_group():
     ctx.undo()
     # Vol0000 ne devrait pas être dans Hors_Groupe_3D mais seulement dans BOX
     assert "Vol0000" not in ctx.getGroupManager().getGeomVolumes("Hors_Groupe_3D", 3)
+    assert "Vol0000" in ctx.getGroupManager().getGeomVolumes("BOX", 3)
+
+# Issue #219
+def test_changeGroupName():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    # Création d'une boite avec une topologie
+    ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10, "BOX")
+    # Création d'une boite avec une topologie
+    ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(1, 0, 0), Mgx3D.Point(2, 1, 1), 10, 10, 10, "BOX2")
+    # Vol0000 est dans BOX. Vol0001 est dans BOX2.
+    assert "Vol0000" in ctx.getGroupManager().getGeomVolumes("BOX", 3)
+    assert "Vol0001" in ctx.getGroupManager().getGeomVolumes("BOX2", 3)
+    ctx.getGroupManager().changeGroupName("BOX2", "NEW_BOX", 3)
+    assert "Vol0000" in ctx.getGroupManager().getGeomVolumes("BOX", 3)
+    assert "Vol0001" in ctx.getGroupManager().getGeomVolumes("NEW_BOX", 3)
+    ctx.undo()
+    assert "Vol0000" in ctx.getGroupManager().getGeomVolumes("BOX", 3)
+    assert "Vol0001" in ctx.getGroupManager().getGeomVolumes("BOX2", 3)
+    ctx.getGroupManager().clearGroup (3, "BOX")
+    assert "Vol0000" in ctx.getGroupManager().getGeomVolumes("Hors_Groupe_3D", 3)
+    with pytest.raises(RuntimeError) as excinfo:
+        ctx.getGroupManager().changeGroupName("Hors_Groupe_3D", "TOTO", 3)
+    assert "Il n'est pas possible de changer le nom du groupe par défaut" in str(excinfo.value)

@@ -2,14 +2,13 @@
 #define COMMANDEXTRUDEDIRECTION_H_
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandExtrusion.h"
+#include "Geom/GeomExtrudeImplementation.h"
 #include "Geom/GeomEntity.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
-/*----------------------------------------------------------------------------*/
-class GeomExtrudeImplementation;
 /*----------------------------------------------------------------------------*/
 class CommandExtrudeDirection: public CommandExtrusion {
 
@@ -30,29 +29,20 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur
      */
-    virtual ~CommandExtrudeDirection();
+    virtual ~CommandExtrudeDirection() = default;
 
     /*------------------------------------------------------------------------*/
     /** \brief  exécute la commande
      */
-    void internalExecute();
+    void internalSpecificExecute();
 
 private:
-
-
-protected:
-
-    /* entités à unir */
-    std::vector<GeomEntity*> m_entities;
+    /* Pour caster l'implémentation... */
+    GeomExtrudeImplementation* getImpl()
+    { return dynamic_cast<GeomExtrudeImplementation*>(m_impl); }
 
     /* le vecteur de l'extrusion */
     Utils::Math::Vector m_vector;
-
-    /* objet gérant l'opération d'extrusion */
-    GeomExtrudeImplementation* m_impl;
-
-    /* pour conserver les entités de départ ou non*/
-    bool m_keep;
 };
 /*----------------------------------------------------------------------------*/
 } /* namespace Geom */
