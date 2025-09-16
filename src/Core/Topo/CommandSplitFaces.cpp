@@ -149,8 +149,9 @@ void CommandSplitFaces::init2D(std::vector<Topo::CoFace* > &cofaces)
     for (std::vector<Topo::CoFace* >::iterator iter = cofaces.begin();
             iter != cofaces.end(); ++iter){
         Topo::CoFace* hcf = *iter;
+		m_cofaces.push_back(hcf);
+
         if (!hcf->getNbFaces() && hcf->isStructured()){
-            m_cofaces.push_back(hcf);
             verif(hcf);
 #ifdef _DEBUG_SPLIT
             std::cout<< hcf->getName()<<" est retenue"<<std::endl;
