@@ -87,9 +87,12 @@ public:
      */
     GeomInfo getInfos(std::string e, int dim);
 	SET_SWIG_COMPLETABLE_METHOD(getInfos)
+    std::string getTextualDescription(std::string e, int dim, bool useService);
+	SET_SWIG_COMPLETABLE_METHOD(getTextualDescription)
 
 #ifndef SWIG
     GeomInfo getInfos(const GeomEntity* e);
+    std::string getTextualDescription(const GeomEntity* e, bool useService);
 #endif
 
     /** retourne les coordonnés d'un sommet */

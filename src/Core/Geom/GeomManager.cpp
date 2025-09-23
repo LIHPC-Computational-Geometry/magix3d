@@ -90,6 +90,7 @@
 #include "Topo/CommandExtrudeTopo.h"
 #include "Topo/TopoHelper.h"
 #include "SysCoord/SysCoord.h"
+#include "Services/DescriptionService.h"
 #ifdef USE_MDLPARSER
 #include "Internal/CommandChangeLengthUnit.h"
 #endif
@@ -198,6 +199,42 @@ Geom::GeomInfo GeomManager::getInfos(const GeomEntity* e)
     e->getRefTopo(infos.topo_entities);
     e->getGroupsName(infos.groups_name);
     return infos;
+}
+/*----------------------------------------------------------------------------*/
+std::string GeomManager::getTextualDescription(std::string name, int dim, bool useService)
+{
+    GeomEntity* e = 0;
+    switch(dim){
+    case(0):{
+        e =getVertex(name);
+    }
+    break;
+    case(1):{
+        e =getCurve(name);
+    }
+    break;
+    case(2):{
+        e =getSurface(name);
+    }
+    break;
+    case(3):{
+        e =getVolume(name);
+    }
+    break;
+    default:{
+        throw TkUtil::Exception (TkUtil::UTF8String ("Dimension erronée", TkUtil::Charset::UTF_8));
+    }
+    break;
+    }
+    return getTextualDescription(e, useService);
+}
+/*----------------------------------------------------------------------------*/
+std::string GeomManager::getTextualDescription(const GeomEntity* e, bool useService)
+{
+    if (useService)
+        return Services::DescriptionService::describe(e, true)->toString();
+    else
+        return e->getDescription(true)->toString();
 }
 /*----------------------------------------------------------------------------*/
 Utils::Math::Point GeomManager::getCoord(const std::string& name) const
