@@ -194,34 +194,6 @@ get(std::vector<Topo::Block*>& blocs) const
 			blocs.push_back(dynamic_cast<Topo::Block*>(*iter));
 }
 /*----------------------------------------------------------------------------*/
-Utils::SerializedRepresentation* Volume::getDescription (bool alsoComputed) const
-{
-	std::unique_ptr<Utils::SerializedRepresentation>	description	(
-			GeomEntity::getDescription (alsoComputed));
-	CHECK_NULL_PTR_ERROR (description.get ( ))
-
-    Utils::SerializedRepresentation  propertyGeomDescription (
-                                                "Propriétés géométriques", "");
-
-	if (true == alsoComputed)
-	{
-		// récupération du volume
-		TkUtil::UTF8String	volStr (TkUtil::Charset::UTF_8);
-		volStr<<getArea();
-
-		propertyGeomDescription.addProperty (
-			Utils::SerializedRepresentation::Property ("Volume", volStr.ascii()) );
-	}
-
-    // pour afficher les spécifictés de certaines propriétés
-    getGeomProperty()->addDescription(propertyGeomDescription);
-
-
-    description->addPropertiesSet (propertyGeomDescription);
-
-	return description.release ( );
-}
-/*----------------------------------------------------------------------------*/
 } // end namespace Geom
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D

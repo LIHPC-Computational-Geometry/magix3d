@@ -53,36 +53,6 @@ GeomEntity* Vertex::clone(Internal::Context& c)
 Vertex::~Vertex()
 {}
 /*----------------------------------------------------------------------------*/
-Mgx3D::Utils::SerializedRepresentation* Vertex::getDescription (bool alsoComputed) const
-{
-	std::unique_ptr<Mgx3D::Utils::SerializedRepresentation>	description (
-											GeomEntity::getDescription (alsoComputed));
-	CHECK_NULL_PTR_ERROR (description.get ( ))
-	std::vector<double>	coords;
-	coords.push_back (getX ( ));
-	coords.push_back (getY ( ));
-	coords.push_back (getZ ( ));
-	Mgx3D::Utils::SerializedRepresentation::Property	coordsProp (
-														"Coordonnées", coords);
-	Mgx3D::Utils::SerializedRepresentation	propertyGeomDescription (
-											"Propriété géométrique", coordsProp.getValue ( ));
-	propertyGeomDescription.addProperty (coordsProp);
-
-#ifdef _DEBUG		// Issue#111
-    // précision OpenCascade ou autre
-	TkUtil::UTF8String	precStr (TkUtil::Charset::UTF_8);
-    precStr << BRep_Tool::Tolerance(m_occ_vertex);;
-
-    propertyGeomDescription.addProperty (
-    	        Utils::SerializedRepresentation::Property ("Précision", precStr.ascii()) );
-#endif	// _DEBUG
-
-	description->addPropertiesSet (propertyGeomDescription);
-	description->setSummary (coordsProp.getValue ( ));
-
-	return description.release ( );
-}
-/*----------------------------------------------------------------------------*/
 std::string Vertex::getSummary ( ) const
 {
 	std::vector<double>	coords;

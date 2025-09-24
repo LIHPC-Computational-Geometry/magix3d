@@ -17,6 +17,13 @@ using Property = Mgx3D::Utils::SerializedRepresentation::Property;
 
 namespace Mgx3D::Services
 {
+	Utils::SerializedRepresentation *DescriptionService::describe(const Geom::GeomEntity *e, const bool alsoComputed)
+	{
+		DescriptionService ds(alsoComputed);
+		e->accept(ds);
+		return ds.m_representation;
+	}
+
 	DescriptionService::DescriptionService(const bool alsoComputed)
 		: m_also_computed(alsoComputed), m_representation(nullptr)
 	{
@@ -58,9 +65,9 @@ namespace Mgx3D::Services
 			propertyGeomDescription.addProperty(Property("Longueur", volStr.ascii()));
 		}
 
+		auto occ_edges = e->getOCCEdges();
 #ifdef _DEBUG // Issue#111
 		// précision OpenCascade
-		auto occ_edges = e->getOCCEdges();
 		for (uint i = 0; i < occ_edges.size(); i++)
 		{
 			TkUtil::UTF8String precStr(TkUtil::Charset::UTF_8);
@@ -183,48 +190,7 @@ namespace Mgx3D::Services
 
 	void DescriptionService::visitEntity(const Utils::Entity *e)
 	{
-		m_representation = new Utils::SerializedRepresentation("Description", "");
-
-		Utils::SerializedRepresentation properties("Propriétés génériques", "");
-		properties.addProperty(Property("Nom unique", e->getUniqueName()));
-		properties.addProperty(Property("Identifiant unique", e->getUniqueId()));
-		properties.addProperty(Property("Type", e->getTypeName()));
-		properties.addProperty(Property("Dimension", (long)e->getDim()));
-		properties.addProperty(Property("Est détruit", e->isDestroyed()));
-		properties.addProperty(Property("Est visible", e->isVisible()));
-
-		// la boite englobante pour les entités autres que des groupes
-		if (true == m_also_computed)
-		{
-			if (e->getType() < Utils::Entity::Group0D)
-			{
-				Utils::SerializedRepresentation boundingBox("Boite englobante", "");
-				double bounds[] = {
-					TkUtil::NumericServices::doubleMachMax(),
-					-TkUtil::NumericServices::doubleMachMax(),
-					TkUtil::NumericServices::doubleMachMax(),
-					-TkUtil::NumericServices::doubleMachMax(),
-					TkUtil::NumericServices::doubleMachMax(),
-					-TkUtil::NumericServices::doubleMachMax()};
-				e->getBounds(bounds);
-
-				boundingBox.addProperty(Property("X min", bounds[0]));
-				boundingBox.addProperty(Property("X max", bounds[1]));
-				boundingBox.addProperty(Property("Y min", bounds[2]));
-				boundingBox.addProperty(Property("Y max", bounds[3]));
-				boundingBox.addProperty(Property("Z min", bounds[4]));
-				boundingBox.addProperty(Property("Z max", bounds[5]));
-
-				// calcul de la longueur de la diagonale de la boite
-				Utils::Math::Vector v1(bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]);
-				double lg = v1.abs();
-				boundingBox.setSummary(Utils::Math::MgxNumeric::userRepresentation(lg));
-
-				properties.addPropertiesSet(boundingBox);
-			}
-		} // if (true == alsoComputed)
-
-		m_representation->addPropertiesSet(properties);
+		m_representation = e->Utils::Entity::getDescription(m_also_computed);
 	}
 
 	void DescriptionService::visitGeomEntity(const Geom::GeomEntity *e)

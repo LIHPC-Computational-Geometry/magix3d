@@ -68,8 +68,8 @@ internalExecute()
 		    << Utils::Math::MgxNumeric::userRepresentation (m_v2->getZ ( )) << ").";
 
     // sauvegarde des relations (connections topologiques) avant modification
-    m_memento_manager.saveMemento(m_v1);
-    m_memento_manager.saveMemento(m_v2);
+    m_memento_service.saveMemento(m_v1);
+    m_memento_service.saveMemento(m_v2);
 
     Curve* c = EntityFactory(getContext()).newSegment(m_v1,m_v2);
     m_createdEntities.push_back(c);

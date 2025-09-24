@@ -1,9 +1,14 @@
 #ifndef _DESCRIPTION_SERVICE_H_
 #define _DESCRIPTION_SERVICE_H_
 
+#include "Utils/Entity.h"
 #include "Utils/SerializedRepresentation.h"
 #include "Geom/GeomEntityVisitor.h"
-#include "Geom/GeomEntity.h"
+
+namespace Mgx3D::Geom
+{
+    class GeomEntity;
+}
 
 /**
  * - voir si alsoComputed est vraiment utile, pas réussi à comprendre comment Qt le passe à vrai
@@ -14,13 +19,7 @@ namespace Mgx3D::Services
     class DescriptionService : public Geom::ConstGeomEntityVisitor
     {
     public:
-        template <typename T>
-        static Utils::SerializedRepresentation* describe(const T* e, const bool alsoComputed)
-        {
-            DescriptionService ds(alsoComputed);
-            e->accept(ds);
-            return ds.m_representation;
-        }
+        static Utils::SerializedRepresentation* describe(const Geom::GeomEntity* e, const bool alsoComputed);
 
         DescriptionService(const bool alsoComputed);
         ~DescriptionService() override = default;

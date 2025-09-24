@@ -45,14 +45,14 @@ void CommandEditGeom::internalExecute()
     internalSpecificPreExecute();
 
     // on recupere toutes les entites concernes par l'opération géométrique
-    std::map<GeomEntity*, MementoEntity> mementos_by_entity;
+    std::map<GeomEntity*, Services::Memento> mementos_by_entity;
     std::set<GeomEntity*> to_mem_entities[4];
 
     for(unsigned int i=0;i<4;i++) {
         to_mem_entities[i].insert(getRefEntities(i).begin(), getRefEntities(i).end());
         to_mem_entities[i].insert(getAdjEntities(i).begin(), getAdjEntities(i).end());
         for (GeomEntity* e : to_mem_entities[i]) {
-            MementoEntity mem = m_memento_manager.createMemento(e);
+            Services::Memento mem = m_memento_service.createMemento(e);
 #ifdef _DEBUG2
            std::cerr<<"Memento cree pour "<<e->getName()<<std::endl;
 #endif
@@ -119,7 +119,7 @@ void CommandEditGeom::internalExecute()
     // Sauvegarde des mementos pour le undo/redo
     // Utiliser at en lecture pour avoir une exception si
     // la clef est absente (ne pas utiliser l'opérateur [])
-    std::map<GeomEntity*,MementoEntity> keeped_ref;
+    std::map<GeomEntity*,Services::Memento> keeped_ref;
     for(unsigned int i=0;i<mod_entities.size();i++){
         GeomEntity* e = mod_entities[i];
         if (mementos_by_entity.find(e) == mementos_by_entity.end())
@@ -161,7 +161,7 @@ void CommandEditGeom::internalUndo()
     AutoReferencedMutex autoMutex (getMutex ( ));
 
     // permute toutes les propriétés internes avec leur sauvegarde
-    m_memento_manager.permMementos();
+    m_memento_service.permMementos();
 
     // les entités détruites sont dites créées et inversement
     getInfoCommand().permCreatedDeleted();
@@ -183,7 +183,7 @@ void CommandEditGeom::internalRedo()
     startingOrcompletionLog (true);
 
     // permute toutes les propriétés internes avec leur sauvegarde
-    m_memento_manager.permMementos();
+    m_memento_service.permMementos();
 
     // les entités détruites sont dites créées et inversement
     getInfoCommand().permCreatedDeleted();
@@ -199,10 +199,10 @@ void CommandEditGeom::internalRedo()
 /*----------------------------------------------------------------------------*/
 //#define _DEBUG_CANCEL
 void CommandEditGeom::
-saveMementos(std::map<GeomEntity*,MementoEntity> & candidates)
+saveMementos(std::map<GeomEntity*,Services::Memento> & candidates)
 {
     for (const auto& pair : candidates) {
-        m_memento_manager.saveMemento(pair.first, pair.second);
+        m_memento_service.saveMemento(pair.first, pair.second);
 #ifdef _DEBUG_CANCEL
         std::cout<<"save Memento pour "<<e->getName()<<std::endl;
 #endif

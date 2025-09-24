@@ -2,6 +2,7 @@
 #define MGX3D_GEOM_SURFACE_H_
 /*----------------------------------------------------------------------------*/
 #include "Geom/GeomEntity.h"
+#include "Services/MementoService.h"
 #include "Utils/Vector.h"
 #include "Utils/Point.h"
 /*----------------------------------------------------------------------------*/
@@ -36,7 +37,7 @@ class GeomProperty;
  */
 class Surface: public GeomEntity {
 
-    friend class MementoManager;
+    friend class Services::MementoService;
     static const char* typeNameGeomSurface;
 
 public:
@@ -50,10 +51,8 @@ public:
      *  \param gprop les propriétés associées à la surface
      *  \param shape la shape OCC
      */
-#ifndef SWIG
     Surface(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
             GeomProperty* gprop, TopoDS_Face& shape);
-#endif
 
     /** \brief  Constructeur
      *
@@ -63,10 +62,9 @@ public:
      *  \param gprop les propriétés associées à la surface composite
      *  \param shapes les shapes OCC
      */
-#ifndef SWIG
     Surface(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
             GeomProperty* gprop, std::vector<TopoDS_Face>& shapes);
-#endif
+
     const std::vector<TopoDS_Face>& getOCCFaces() const { return m_occ_faces; }
 
     virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const;
@@ -125,15 +123,14 @@ public:
      *
      *  \param v un pointeur sur un volume
      */
-#ifndef SWIG
-      virtual void add(Volume* v);
+    virtual void add(Volume* v);
 
-#endif
-
-
-#ifndef SWIG
+    /*------------------------------------------------------------------------*/
+    /** \brief  Ajoute c comme courbe incidente
+     *
+     *  \param c un pointeur sur une courbe
+     */
     virtual void add(Curve* c);
-#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief  Supprime v de la liste des volumes incidents. Si v n'apparait
@@ -141,9 +138,7 @@ public:
      *
      *  \param v un pointeur sur un volume
      */
-#ifndef SWIG
     virtual void remove(Volume* v);
-#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief  Supprime c de la liste des courbes incidentes. Si c n'apparait
@@ -151,9 +146,7 @@ public:
      *
      *  \param v un pointeur sur un volume
      */
-#ifndef SWIG
     virtual void remove(Curve* c);
-#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief  Ajoute à la liste les entités de niveaux inférieurs
@@ -161,9 +154,7 @@ public:
      *
      *  \param liste d'entity
      */
-#ifndef SWIG
     virtual void addAllDownLevelEntity(std::list<GeomEntity*>& l_entity) const;
-#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief   retourne un point sur l'objet au centre si possible
@@ -193,20 +184,14 @@ public:
 
     /*------------------------------------------------------------------------*/
     /** Ajoute le groupe parmis ceux auxquels appartient la surface */
-#ifndef SWIG
     virtual void add(Group::Group2D* grp);
-#endif
 
     /** Retire le groupe parmis ceux auxquels appartient la surface */
-#ifndef SWIG
     virtual void remove(Group::Group2D* grp);
-#endif
 
     /** Recherche le groupe parmis ceux auxquels appartient la surface
      * return vrai si trouvé */
-#ifndef SWIG
     virtual bool find(Group::Group2D* grp);
-#endif
 
     /// Retourne les noms des groupes auxquels appartient cette entité
     virtual void getGroupsName (std::vector<std::string>& gn) const;
@@ -246,26 +231,12 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief   détruit l'objet
      */
-#ifndef SWIG
     virtual void setDestroyed(bool b);
-#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief   indique si la surface est un plan ou pas
      */
     virtual bool isPlanar() const;
-
-	/*------------------------------------------------------------------------*/
-	/** \brief	Fournit une représentation textuelle de l'entité.
-	 * \param	true si l'entité fourni la totalité de sa description, false si
-	 * 			elle ne fournit que les informations non calculées (objectif :
-	 * 			optimisation)
-	 * \return	Description, à détruire par l'appelant.
-	 */
-#ifndef SWIG
-    virtual Mgx3D::Utils::SerializedRepresentation* getDescription (
-													bool alsoComputed) const;
-#endif
 
 private:
     std::vector<Curve*> m_curves;
