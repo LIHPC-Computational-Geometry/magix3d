@@ -37,8 +37,8 @@ internalExecute()
                     <<".";
 
     // sauvegarde des relations (connections topologiques) avant modification
-    m_memento_manager.saveMemento(m_start);
-    m_memento_manager.saveMemento(m_end);
+    m_memento_service.saveMemento(m_start);
+    m_memento_service.saveMemento(m_end);
 
     Curve* c = EntityFactory(getContext()).newArcEllipse(m_center,m_start,m_end,m_direction);
     m_createdEntities.push_back(c);

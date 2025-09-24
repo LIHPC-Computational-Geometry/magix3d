@@ -361,53 +361,6 @@ void Surface::get(std::vector<Topo::Vertex*>& vertices)
 		}
 }
 /*----------------------------------------------------------------------------*/
-Utils::SerializedRepresentation* Surface::getDescription (bool alsoComputed) const
-{
-	std::unique_ptr<Utils::SerializedRepresentation>	description	(
-			GeomEntity::getDescription (alsoComputed));
-	CHECK_NULL_PTR_ERROR (description.get ( ))
-
-    Utils::SerializedRepresentation  propertyGeomDescription (
-                                                "Propriétés géométriques", "");
-
-	if (true == alsoComputed)
-	{
-		//recuperation de l'aire
-		TkUtil::UTF8String	volStr (TkUtil::Charset::UTF_8);
-		volStr<<getArea();
-
-		propertyGeomDescription.addProperty (
-	        Utils::SerializedRepresentation::Property ("Aire", volStr.ascii()) );
-	}
-
-
-#ifdef _DEBUG		// Issue#111
-    // précision OpenCascade ou autre
-	for (uint i=0; i<m_occ_faces.size(); i++){
-		TkUtil::UTF8String	precStr (TkUtil::Charset::UTF_8);
-		precStr << BRep_Tool::Tolerance(m_occ_faces[i]);
-	    propertyGeomDescription.addProperty (
-	    	        Utils::SerializedRepresentation::Property ("Précision", precStr.ascii()) );
-	}
-#endif	// _DEBUG
-
-    // on ajoute des infos du style: c'est un plan
-	TkUtil::UTF8String	typeStr (TkUtil::Charset::UTF_8);
-    if (isPlanar())
-    	typeStr<<"plan";
-    else if (m_occ_faces.size()>1)
-    	typeStr<<"composée";
-    else
-    	typeStr<<"quelconque";
-
-    propertyGeomDescription.addProperty (
-    		Utils::SerializedRepresentation::Property ("Type", typeStr.ascii()) );
-
-    description->addPropertiesSet (propertyGeomDescription);
-
-	return description.release ( );
-}
-/*----------------------------------------------------------------------------*/
 } // end namespace Geom
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D

@@ -201,7 +201,7 @@ Geom::GeomInfo GeomManager::getInfos(const GeomEntity* e)
     return infos;
 }
 /*----------------------------------------------------------------------------*/
-std::string GeomManager::getTextualDescription(std::string name, int dim, bool useService)
+std::string GeomManager::getTextualDescription(std::string name, int dim)
 {
     GeomEntity* e = 0;
     switch(dim){
@@ -226,15 +226,12 @@ std::string GeomManager::getTextualDescription(std::string name, int dim, bool u
     }
     break;
     }
-    return getTextualDescription(e, useService);
+    return getTextualDescription(e);
 }
 /*----------------------------------------------------------------------------*/
-std::string GeomManager::getTextualDescription(const GeomEntity* e, bool useService)
+std::string GeomManager::getTextualDescription(const GeomEntity* e)
 {
-    if (useService)
-        return Services::DescriptionService::describe(e, true)->toString();
-    else
-        return e->getDescription(true)->toString();
+    return e->getDescription(true)->toString();
 }
 /*----------------------------------------------------------------------------*/
 Utils::Math::Point GeomManager::getCoord(const std::string& name) const

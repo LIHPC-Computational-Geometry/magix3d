@@ -2,6 +2,7 @@
 #define MGX3D_GEOM_VOLUME_H_
 /*----------------------------------------------------------------------------*/
 #include "Geom/GeomEntity.h"
+#include "Services/MementoService.h"
 /*----------------------------------------------------------------------------*/
 #include <list>
 /*----------------------------------------------------------------------------*/
@@ -29,9 +30,8 @@ class GeomProperty;
  *        géométrique
  */
 class Volume: public GeomEntity {
-    
+    friend class Services::MementoService;
     friend class GeomModificationBaseClass;
-    friend class MementoManager;
     static const char* typeNameGeomVolume;
 
 public:
@@ -45,10 +45,9 @@ public:
      *  \param gprop    les propriétés associées au volume
      *  \param compProp les propriétés de calcul
      */
-#ifndef SWIG
     Volume(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
             GeomProperty* gprop, TopoDS_Shape& shape);
-#endif
+
     const TopoDS_Shape& getOCCShape() const { return m_occ_shape; }
 
     virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const;
@@ -103,9 +102,7 @@ public:
      *
      *  \param s un pointeur sur une surface
      */
-#ifndef SWIG
     void add(Surface* s);
-#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief  Supprime s de la liste des surfaces incidentes. Si s n'apparait
@@ -113,9 +110,7 @@ public:
      *
      *  \param s un pointeur sur une surface
      */
-#ifndef SWIG
     void remove(Surface* s);
-#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief  Ajoute à la liste les entités de niveaux inférieurs
@@ -123,9 +118,7 @@ public:
      *
      *  \param liste d'entity
      */
-#ifndef SWIG
     virtual void addAllDownLevelEntity(std::list<GeomEntity*>& l_entity) const;
-#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief   retourne un point sur l'objet au centre si possible
@@ -155,20 +148,14 @@ public:
 
     /*------------------------------------------------------------------------*/
     /** Ajoute le groupe parmis ceux auxquels appartient le volume */
-#ifndef SWIG
     void add(Group::Group3D* grp);
-#endif
 
     /** Retire le groupe parmis ceux auxquels appartient le volume */
-#ifndef SWIG
     void remove(Group::Group3D* grp);
-#endif
 
     /** Recherche le groupe parmis ceux auxquels appartient le volume
      * return vrai si trouvé */
-#ifndef SWIG
     bool find(Group::Group3D* grp);
-#endif
 
     /// Retourne les noms des groupes auxquels appartient cette entité
     virtual void getGroupsName (std::vector<std::string>& gn) const;
@@ -188,21 +175,7 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief   détruit l'objet
      */
-#ifndef SWIG
     virtual void setDestroyed(bool b);
-#endif
-
-	/*------------------------------------------------------------------------*/
-	/** \brief	Fournit une représentation textuelle de l'entité.
-	 * \param	true si l'entité fourni la totalité de sa description, false si
-	 * 			elle ne fournit que les informations non calculées (objectif :
-	 * 			optimisation)
-	 * \return	Description, à détruire par l'appelant.
-	 */
-#ifndef SWIG
-    virtual Mgx3D::Utils::SerializedRepresentation* getDescription (
-													bool alsoComputed) const;
-#endif
 
 private:
     /// surfaces incidentes au volume
