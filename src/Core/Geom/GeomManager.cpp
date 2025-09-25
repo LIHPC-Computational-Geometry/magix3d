@@ -3010,7 +3010,7 @@ makeExtrude( std::vector<GeomEntity*>& entities,
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias ( ) << ".getGeomManager ( ).makeExtrude (" << Internal::entitiesToPythonList<GeomEntity> (entities) << dp.getScriptCommand ( ) << ", " << (keep ? "True":"False") << ")";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).makeExtrude (" << Internal::entitiesToPythonList<GeomEntity> (entities) << ", " <<dp.getScriptCommand ( ) << ", " << (keep ? "True":"False") << ")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
