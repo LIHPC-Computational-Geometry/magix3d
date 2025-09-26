@@ -371,7 +371,7 @@ internalExecute()
 
 				coface_vec = {coface};
 
-				TopoHelper::splitFaces(coface_vec, m_arete, m_ratio_dec, m_ratio_ogrid, false, false, current_splitingEdge, &getInfoCommand());
+				TopoHelper::splitFaces(coface_vec, m_arete, m_ratio_dec, m_ratio_ogrid, false, true, current_splitingEdge, &getInfoCommand());
 
 				filtre_faces.insert(coface);
 			}
