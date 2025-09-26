@@ -2603,7 +2603,7 @@ Mgx3D::Internal::M3DCommandResult* TopoManager::splitFaces(std::vector<Topo::CoF
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias ( ) << ".getTopoManager().splitFaces (" << Internal::entitiesToPythonList<CoFace> (cofaces) << ", ";
+    cmd << getContextAlias ( ) << ".getTopoManager().splitFaces (" << Internal::entitiesToPythonList<CoFace> (cofaces) << ", \"";
     cmd << arete->getName() <<"\", "<<Utils::Math::MgxNumeric::userRepresentation (ratio_dec)<<", "<<Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid)<<")";
     command->setScriptCommand(cmd);
 
@@ -2641,7 +2641,7 @@ Mgx3D::Internal::M3DCommandResult* TopoManager::splitFaces(std::vector<Topo::CoF
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias ( ) << ".getTopoManager().splitFaces (" << Internal::entitiesToPythonList<CoFace> (cofaces) << ", ";
+    cmd << getContextAlias ( ) << ".getTopoManager().splitFaces (" << Internal::entitiesToPythonList<CoFace> (cofaces) << ", \"";
     cmd << arete->getName() <<"\", "<<pt.getScriptCommand()<<", "<<Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid)<<")";
     command->setScriptCommand(cmd);
 
