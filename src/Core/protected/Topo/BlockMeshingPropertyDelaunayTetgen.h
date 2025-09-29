@@ -36,7 +36,7 @@ public:
     /// Constructeur pour la méthode de maillage d'un bloc avec le Delaunay de Tetgen
     BlockMeshingPropertyDelaunayTetgen(const DelaunayLaw delLaw = QC,
                                        const double val=2.0, const double val2 = 2.0, double ratio_pyramid_size=1.0)
-    : m_law(delLaw), m_verbose(false), m_is_default(true), m_ratio_pyramid_size(ratio_pyramid_size)
+    : m_law(delLaw), m_verbose(false), m_is_default(delLaw == QC && val==2.0 && val2==2.0 && ratio_pyramid_size==1.0), m_ratio_pyramid_size(ratio_pyramid_size)
     {
         if(m_law==QC){
             m_radius_edge_ratio=val;
@@ -63,7 +63,7 @@ public:
       m_radius_edge_ratio(radius_edge_ratio),
       m_max_volume(max_volume),
       m_verbose(false),
-      m_is_default(true),
+      m_is_default(m_radius_edge_ratio==2.0 && m_max_volume==2.0 && m_ratio_pyramid_size==1.0),
 	  m_ratio_pyramid_size(ratio_pyramid_size)
     {}
 
@@ -176,7 +176,6 @@ public:
 #endif
 
 private:
-
     DelaunayLaw m_law;
 
     // indique de passer en mode verbose pour remonter des informations de

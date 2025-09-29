@@ -1,6 +1,7 @@
+import math
 import pyMagix3D as Mgx3D
 
-def test_command_join_entities(capfd):
+def test_command_join_entities():
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     gm = ctx.getGeomManager ()
@@ -56,7 +57,7 @@ def test_command_join_entities(capfd):
     ctx.redo()
     assert gm.getNbCurves()==25
 
-def test_command_scaling(capfd):
+def test_command_scaling():
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     gm = ctx.getGeomManager ()
@@ -93,7 +94,7 @@ def test_command_scaling(capfd):
     ctx.redo()
     assertPoint(gm, "Pt0001", 1, 1, 1)
 
-def test_command_scaling_2(capfd):
+def test_command_scaling_2():
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     gm = ctx.getGeomManager ()
@@ -109,7 +110,7 @@ def test_command_scaling_2(capfd):
     gm.scale (["Vol0000"], 3.000000e+00)
     assertPoint(tm, "Som0006", 3, 3, 3)
 
-def test_command_remove(capfd):
+def test_command_remove():
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     gm = ctx.getGeomManager ()
@@ -146,7 +147,17 @@ def test_command_remove(capfd):
     assert gm.getNbSurfaces()==3
     assert gm.getNbCurves()==10
 
-def test_command_mirroring(capfd):
+def test_command_mirror():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    gm = ctx.getGeomManager ()
+    tm = ctx.getTopoManager()
+    tm.newSphereWithTopo (Mgx3D.Point(0, 0, 0), 1, Mgx3D.Portion.HUITIEME, True, 0.5, 10, 10, "A")
+    assertClosePoint(gm, "Pt0000", 0, 0, 1)
+    gm.mirror(["Vol0000"], Mgx3D.Plane(Mgx3D.Point(0, 0, 0), Mgx3D.Vector(0, 0, 1)))
+    assertClosePoint(gm, "Pt0000", 0, 0, -1)
+
+def test_command_copy_mirror():
     #Ce test prend aussi en charge l'appel à CommandGeomCopy
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
@@ -176,7 +187,7 @@ def test_command_mirroring(capfd):
     assert gm.getNbSurfaces()==17
     assert gm.getNbCurves()==32
 
-def test_command_common(capfd):
+def test_command_common():
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     gm = ctx.getGeomManager ()
@@ -206,7 +217,7 @@ def test_command_common(capfd):
     assert gm.getNbSurfaces()==11
     assert gm.getNbCurves()==20
 
-def test_command_common2d(capfd):
+def test_command_common2d():
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     gm = ctx.getGeomManager ()
@@ -241,3 +252,9 @@ def assertPoint(m, point, x, y, z):
     assert p.getX() == x
     assert p.getY() == y
     assert p.getZ() == z
+
+def assertClosePoint(m, point, x, y, z):
+    p = m.getCoord(point)
+    assert math.isclose(p.getX(), x, abs_tol=1e-15)
+    assert math.isclose(p.getY(), y, abs_tol=1e-15)
+    assert math.isclose(p.getZ(), z, abs_tol=1e-15)
