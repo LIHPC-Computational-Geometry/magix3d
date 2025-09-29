@@ -17,20 +17,20 @@ namespace Topo {
 //#define _DEBUG_SPLIT
 /*----------------------------------------------------------------------------*/
 CommandSplitFaces::
-CommandSplitFaces(Internal::Context& c, std::vector<Topo::CoFace* > &cofaces, CoEdge* arete, double ratio_dec, double ratio_ogrid)
-:CommandEditTopo(c, "Découpage des faces 2D structurées")
+CommandSplitFaces(Internal::Context& c, std::vector<Topo::CoFace* > &cofaces, CoEdge* arete, double ratio_dec, double ratio_ogrid, bool project_on_meshing_edges)
+:CommandEditTopo(c, "Découpage des faces structurées")
 , m_arete(arete)
 , m_ratio_dec(ratio_dec)
 , m_ratio_ogrid(ratio_ogrid)
-, m_project_on_meshing_edges(true)
+, m_project_on_meshing_edges(project_on_meshing_edges)
 {
 #ifdef _DEBUG_SPLIT
-	std::cout<<"CommandSplitFaces::CommandSplitFaces("<<cofaces.size()<<" cofaces, "<<arete->getName()<<", "<<ratio_dec<<", "<<ratio_ogrid<<")"<<std::endl;
+	std::cout<<"CommandSplitFaces::CommandSplitFaces("<<cofaces.size()<<" cofaces, "<<arete->getName()<<", "<<ratio_dec<<", "<<ratio_ogrid<<", "<<project_on_meshing_edges<<")"<<std::endl;
 #endif
-	init2D(cofaces);
+	init(cofaces);
 
 	TkUtil::UTF8String	comments (TkUtil::Charset::UTF_8);
-	comments << "Découpage des faces 2D structurées";
+	comments << "Découpage des faces structurées";
 	for (uint i=0; i<cofaces.size() && i<5; i++)
 		comments << " " << cofaces[i]->getName();
 	if (cofaces.size()>5)
@@ -43,22 +43,22 @@ CommandSplitFaces(Internal::Context& c, std::vector<Topo::CoFace* > &cofaces, Co
 }
 /*----------------------------------------------------------------------------*/
 CommandSplitFaces::
-CommandSplitFaces(Internal::Context& c, std::vector<Topo::CoFace* > &cofaces, CoEdge* arete, const Utils::Math::Point& pt, double ratio_ogrid)
-:CommandEditTopo(c, "Découpage des faces 2D structurées")
+CommandSplitFaces(Internal::Context& c, std::vector<Topo::CoFace* > &cofaces, CoEdge* arete, const Utils::Math::Point& pt, double ratio_ogrid, bool project_on_meshing_edges)
+:CommandEditTopo(c, "Découpage des faces structurées")
 , m_arete(arete)
 , m_ratio_dec(0)
 , m_ratio_ogrid(ratio_ogrid)
-, m_project_on_meshing_edges(true)
+, m_project_on_meshing_edges(project_on_meshing_edges)
 {
 	m_ratio_dec = arete->computeRatio(pt);
 
 #ifdef _DEBUG_SPLIT
-	std::cout<<"CommandSplitFaces::CommandSplitFaces("<<cofaces.size()<<" cofaces, "<<arete->getName()<<", "<<m_ratio_dec<<", "<<ratio_ogrid<<")"<<std::endl;
+	std::cout<<"CommandSplitFaces::CommandSplitFaces("<<cofaces.size()<<" cofaces, "<<arete->getName()<<", "<<m_ratio_dec<<", "<<ratio_ogrid<<", "<<project_on_meshing_edges<<")"<<std::endl;
 #endif
-	init2D(cofaces);
+	init(cofaces);
 
 	TkUtil::UTF8String	comments (TkUtil::Charset::UTF_8);
-	comments << "Découpage des faces 2D structurées";
+	comments << "Découpage des faces structurées";
 	for (uint i=0; i<cofaces.size() && i<5; i++)
 		comments << " " << cofaces[i]->getName();
 	if (cofaces.size()>5)
@@ -71,87 +71,50 @@ CommandSplitFaces(Internal::Context& c, std::vector<Topo::CoFace* > &cofaces, Co
 }
 /*----------------------------------------------------------------------------*/
 CommandSplitFaces::
-CommandSplitFaces(Internal::Context& c, CoEdge* arete, double ratio_dec, double ratio_ogrid)
-:CommandEditTopo(c, "Découpage de toutes les faces 2D structurées")
+CommandSplitFaces(Internal::Context& c, CoEdge* arete, double ratio_dec, double ratio_ogrid, bool project_on_meshing_edges)
+:CommandEditTopo(c, "Découpage de toutes les faces structurées")
 , m_arete(arete)
 , m_ratio_dec(ratio_dec)
 , m_ratio_ogrid(ratio_ogrid)
-, m_project_on_meshing_edges(true)
+, m_project_on_meshing_edges(project_on_meshing_edges)
 {
 #ifdef _DEBUG_SPLIT
-	std::cout<<"CommandSplitFaces::CommandSplitFaces("<<arete->getName()<<", "<<ratio_dec<<", "<<ratio_ogrid<<")"<<std::endl;
+	std::cout<<"CommandSplitFaces::CommandSplitFaces("<<arete->getName()<<", "<<ratio_dec<<", "<<ratio_ogrid<<", "<<project_on_meshing_edges<<")"<<std::endl;
 #endif
     std::vector<Topo::CoFace* > cofaces;
     getContext().getTopoManager().getCoFaces(cofaces);
-    init2D(cofaces);
+   init(cofaces);
 }
 /*----------------------------------------------------------------------------*/
 CommandSplitFaces::
-CommandSplitFaces(Internal::Context& c, CoEdge* arete, const Point& pt, double ratio_ogrid)
-:CommandEditTopo(c, "Découpage de toutes les faces 2D structurées")
+CommandSplitFaces(Internal::Context& c, CoEdge* arete, const Point& pt, double ratio_ogrid, bool project_on_meshing_edges)
+:CommandEditTopo(c, "Découpage de toutes les faces structurées")
 , m_arete(arete)
 , m_ratio_dec(0)
 , m_ratio_ogrid(ratio_ogrid)
-, m_project_on_meshing_edges(true)
+, m_project_on_meshing_edges(project_on_meshing_edges)
 {
     m_ratio_dec = arete->computeRatio(pt);
 #ifdef _DEBUG_SPLIT
-	std::cout<<"CommandSplitFaces::CommandSplitFaces("<<arete->getName()<<", "<<m_ratio_dec<<", "<<ratio_ogrid<<")"<<std::endl;
+	std::cout<<"CommandSplitFaces::CommandSplitFaces("<<arete->getName()<<", "<<m_ratio_dec<<", "<<ratio_ogrid<<", "<<project_on_meshing_edges<<")"<<std::endl;
 #endif
     std::vector<Topo::CoFace* > cofaces;
     getContext().getTopoManager().getCoFaces(cofaces);
-    init2D(cofaces);
+    init(cofaces);
 }
 /*----------------------------------------------------------------------------*/
-CommandSplitFaces::
-CommandSplitFaces(Internal::Context& c, CoFace*  coface, CoEdge* coedge, double ratio_dec, bool project_on_meshing_edges)
-:CommandEditTopo(c, "Découpage de la face "+coface->getName())
-, m_arete(coedge)
-, m_ratio_dec(ratio_dec)
-, m_ratio_ogrid(0.0)
-, m_project_on_meshing_edges(project_on_meshing_edges)
-{
-    if (!coface->isStructured())
-        throw TkUtil::Exception (TkUtil::UTF8String ("Le découpage d'une face n'est possible que si elle est structurée", TkUtil::Charset::UTF_8));
-
-    m_cofaces.push_back(coface);
-#ifdef _DEBUG_SPLIT
-	std::cout<<"CommandSplitFaces::CommandSplitFaces("<<coface->getName()<<", "<<coedge->getName()<<", "<<ratio_dec<<")"<<std::endl;
-#endif
-}
-/*----------------------------------------------------------------------------*/
-CommandSplitFaces::
-CommandSplitFaces(Internal::Context& c, CoFace*  coface, CoEdge* coedge, const Point& pt, bool project_on_meshing_edges)
-:CommandEditTopo(c, "Découpage de la face "+coface->getName())
-, m_arete(coedge)
-, m_ratio_dec(0)
-, m_ratio_ogrid(0.0)
-, m_project_on_meshing_edges(project_on_meshing_edges)
-{
-    if (!coface->isStructured())
-        throw TkUtil::Exception (TkUtil::UTF8String ("Le découpage d'une face n'est possible que si elle est structurée", TkUtil::Charset::UTF_8));
-
-    m_ratio_dec = coedge->computeRatio(pt);
-
-    m_cofaces.push_back(coface);
-
-#ifdef _DEBUG_SPLIT
-	std::cout<<"CommandSplitFaces::CommandSplitFaces("<<coface->getName()<<", "<<coedge->getName()<<", "<<m_ratio_dec<<")"<<std::endl;
-#endif
-}
-/*----------------------------------------------------------------------------*/
-void CommandSplitFaces::init2D(std::vector<Topo::CoFace* > &cofaces)
+void CommandSplitFaces::init(std::vector<Topo::CoFace* > &cofaces)
 {
 #ifdef _DEBUG_SPLIT
-	std::cout<<"init2D avec "<<cofaces.size() <<" cofaces"<<std::endl;
+	std::cout<<"init avec "<<cofaces.size() <<" cofaces"<<std::endl;
 #endif
-    // on ne concerve que les faces 2D structurées
+    // on ne conserve que les faces  structurées
     for (std::vector<Topo::CoFace* >::iterator iter = cofaces.begin();
             iter != cofaces.end(); ++iter){
         Topo::CoFace* hcf = *iter;
-		m_cofaces.push_back(hcf);
-
-        if (!hcf->getNbFaces() && hcf->isStructured()){
+		
+        if (hcf->isStructured()){
+			m_cofaces.push_back(hcf);
             verif(hcf);
 #ifdef _DEBUG_SPLIT
             std::cout<< hcf->getName()<<" est retenue"<<std::endl;
@@ -389,13 +352,6 @@ internalExecute()
 	catch (const TkUtil::Exception& exc){
 		throw TkUtil::Exception(exc);
 	}
-
-
-
-    // les Edges qui coupent les faces en deux
-    //std::vector<Edge* > splitingEdges;
-    // découpage des faces sans chercher à boucler
-    //TopoHelper::splitFaces(m_cofaces, m_arete, m_ratio_dec, m_ratio_ogrid, false, false, splitingEdges, &getInfoCommand());
 
 	// on replace les sommets en fonction de m_ratio_dec
     if (!m_project_on_meshing_edges)
