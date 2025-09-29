@@ -2,6 +2,26 @@
 import pyMagix3D as Mgx3D
 import pytest
 
+def test_undo_hg():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+
+    ctx.getGeomManager().newBox (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), "GGG")
+    with pytest.raises(RuntimeError) as excinfo:
+        ctx.getGroupManager().getInfos("Hors_Groupe_3D", 3)
+    ctx.getGroupManager().clearGroup(3, "GGG")
+    ctx.undo()
+    #with pytest.raises(RuntimeError) as excinfo:
+    #    ctx.getGroupManager().getInfos("Hors_Groupe_3D", 3)
+
+def test_set_topo_group():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
+    with pytest.raises(RuntimeError) as excinfo:
+        ctx.getTopoManager().setGroup(["Bl0000"], 3, "AAA")
+    assert "Le groupe Hors_Groupe_3D ne contient pas Bl0000" in str(excinfo.value)
+
 def test_group_box():
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
@@ -13,9 +33,13 @@ def test_group_box():
     coque = "Coque"
     ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10, acier)
     assert_all(ctx, "Bl0000", [acier])
-    
+
+    # Création d'une box avec topo sans groupe
     ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
     assert_all(ctx, "Bl0001", [hors_group])
+
+    # On ajoute le volume geom dans le groupe plastique 
+    # => le bloc topo est aussi dans le groupe plastique
     ctx.getGeomManager().addToGroup(["Vol0001"], 3, plastique)
     assert_all(ctx, "Bl0001", [plastique])
     ctx.undo()
@@ -23,27 +47,31 @@ def test_group_box():
     ctx.redo()
     assert_all(ctx, "Bl0001", [plastique])
 
+    # On affecte le volume geom dans le groupe coque 
+    # => le bloc topo est aussi et seulement dans le groupe coque
     ctx.getGeomManager().setGroup(["Vol0001"], 3, coque)
     assert_all(ctx, "Bl0001", [coque])
     ctx.undo()
     assert_all(ctx, "Bl0001", [plastique])
     ctx.redo()
     assert_all(ctx, "Bl0001", [coque])
-    
+
+    # On retire le volume geom du groupe coque 
+    # => le bloc topo est dans le groupe Hors_Groupe_3D
     ctx.getGeomManager().removeFromGroup(["Vol0001"], 3, coque)
     assert_all(ctx, "Bl0001", [hors_group])
     ctx.undo()
     assert_all(ctx, "Bl0001", [coque])
-    
+
+    # On détruit le groupe coque
+    # => le bloc topo est dans le groupe Hors_Groupe_3D
     ctx.getGroupManager().clearGroup(3, coque)
     assert_all(ctx, "Bl0001", [hors_group])
     ctx.undo()
-    #TODO Créer une issue
-    #assert_all(ctx, "Bl0001", [coque])
+    assert_all(ctx, "Bl0001", [coque])
 
     ctx.getGeomManager().addToGroup(["Vol0001"], 3, plastique) 
-    #TODO Cf issue précédente
-    #assert_all(ctx, "Bl0001", [plastique, coque])
+    assert_all(ctx, "Bl0001", [plastique, coque])
 
 
 def assert_all(ctx, block, group_names):
