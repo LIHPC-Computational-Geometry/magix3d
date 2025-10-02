@@ -18,10 +18,6 @@ namespace Mgx3D {
 namespace Group {
 class Group1D;
 }
-namespace Topo {
-class CoEdge;
-class Vertex;
-}
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 
@@ -101,14 +97,6 @@ public:
      *  \param pmax Les coordonnées max de la boite englobante
      */
     virtual void computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const;
-
-    /*------------------------------------------------------------------------*/
-    /// retourne la liste des arêtes topologiques communes qui pointent sur cette courbe
-    virtual void get(std::vector<Topo::CoEdge*>& coedges);
-
-    /*------------------------------------------------------------------------*/
-   /// retourne la liste des sommets topologiques qui pointent sur cette courbe
-    virtual void get(std::vector<Topo::Vertex*>& vertices);
 
     /*------------------------------------------------------------------------*/
     /** \brief Donne le point en fonction du paramètre sur la courbe

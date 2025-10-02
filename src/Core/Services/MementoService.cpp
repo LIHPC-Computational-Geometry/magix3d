@@ -5,6 +5,8 @@
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
+#include "Topo/TopoManager.h"
+#include "Internal/Context.h"
 #include <TopoDS.hxx>
 
 namespace Mgx3D::Services
@@ -56,7 +58,8 @@ namespace Mgx3D::Services
 
             void fillCommonFields(const Geom::GeomEntity *e)
             {
-                mem.topo_entities = const_cast<std::vector<Topo::TopoEntity *> &>(e->getRefTopo());
+        		Topo::TopoManager& tm = e->getContext().getTopoManager();
+                mem.topo_entities = tm.getRefTopos(e);
                 mem.property = e->getGeomProperty();
             }
 
@@ -127,7 +130,8 @@ namespace Mgx3D::Services
 
             void setCommonFields(Geom::GeomEntity *e)
             {
-                e->setRefTopo(m_mem.topo_entities);
+        		Topo::TopoManager& tm = e->getContext().getTopoManager();
+                tm.setRefTopos(e, m_mem.topo_entities);
                 e->setGeomProperty(m_mem.property);
                 e->forceComputeArea();
             }

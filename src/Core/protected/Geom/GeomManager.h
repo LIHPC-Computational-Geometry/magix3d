@@ -1466,6 +1466,9 @@ public:
 #endif
 
 private:
+	/// Retourne vrai si l'une des entités géométriques a un lien sur une entité topologique
+	bool hasRefTopo(std::vector<Geom::GeomEntity*>& entities);
+
     /** volumes gérés par le manager */
     std::vector<Volume*>  m_volumes;
     /** surfaces gérées par le manager */

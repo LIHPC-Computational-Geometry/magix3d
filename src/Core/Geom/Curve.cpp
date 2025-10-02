@@ -8,8 +8,6 @@
 #include "Geom/EntityFactory.h"
 #include "Geom/OCCHelper.h"
 #include "Geom/GeomProjectImplementation.h"
-#include "Topo/CoEdge.h"
-#include "Topo/Vertex.h"
 #include "Group/Group1D.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
@@ -113,32 +111,6 @@ bool Curve::isEqual(Geom::Curve* curve)
 	}
 
     return true;
-}
-/*----------------------------------------------------------------------------*/
-void Curve::get(std::vector<Topo::CoEdge*>& coedges)
-{
-	const std::vector<Topo::TopoEntity* >& topos = getRefTopo();
-
-	for (std::vector<Topo::TopoEntity* >::const_iterator iter = topos.begin();
-			iter != topos.end(); ++iter)
-		if ((*iter)->getDim() == 1){
-			Topo::CoEdge* coedge = dynamic_cast<Topo::CoEdge*>(*iter);
-			if (coedge)
-				coedges.push_back(coedge);
-		}
-}
-/*----------------------------------------------------------------------------*/
-void Curve::get(std::vector<Topo::Vertex*>& vertices)
-{
-	const std::vector<Topo::TopoEntity* >& topos = getRefTopo();
-
-	for (std::vector<Topo::TopoEntity* >::const_iterator iter = topos.begin();
-			iter != topos.end(); ++iter)
-		if ((*iter)->getDim() == 0){
-			Topo::Vertex* vertex = dynamic_cast<Topo::Vertex*>(*iter);
-			if (vertex)
-				vertices.push_back(vertex);
-		}
 }
 /*----------------------------------------------------------------------------*/
 void Curve::

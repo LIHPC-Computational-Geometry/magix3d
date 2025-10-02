@@ -5574,25 +5574,48 @@ Internal::M3DCommandResult* TopoManager::exportBlocks(const std::string& n)
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-    Internal::M3DCommandResult* TopoManager::importBlocks(const std::string& n)
-    {
-        //creation de la commande d'exportation
-        CommandImportBlocks *command = new CommandImportBlocks(getContext(), n);
+Internal::M3DCommandResult* TopoManager::importBlocks(const std::string& n)
+{
+    //creation de la commande d'exportation
+    CommandImportBlocks *command = new CommandImportBlocks(getContext(), n);
 
-        // trace dans le script
-        TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-        cmd << getContextAlias() << "." << "getTopoManager().importBlocks(";
-        cmd <<"\""<<n<<"\")";
-        command->setScriptCommand(cmd);
+    // trace dans le script
+    TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
+    cmd << getContextAlias() << "." << "getTopoManager().importBlocks(";
+    cmd <<"\""<<n<<"\")";
+    command->setScriptCommand(cmd);
 
-        // on passe au gestionnaire de commandes qui exécute la commande en // ou non
-        // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
-        getCommandManager().addCommand(command, Utils::Command::DO);
+    // on passe au gestionnaire de commandes qui exécute la commande en // ou non
+    // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
+    getCommandManager().addCommand(command, Utils::Command::DO);
 
-        Internal::M3DCommandResult*  cmdResult   =
-                new Internal::M3DCommandResult (*command);
-        return cmdResult;
-    }
+    Internal::M3DCommandResult*  cmdResult   =
+            new Internal::M3DCommandResult (*command);
+    return cmdResult;
+}
+/*----------------------------------------------------------------------------*/
+const std::vector<TopoEntity*>& TopoManager::getRefTopos(const Geom::GeomEntity* ge)
+{
+    return m_geom_associations[ge];
+}
+/*----------------------------------------------------------------------------*/
+void TopoManager::addRefTopo(const Geom::GeomEntity* ge, TopoEntity* te)
+{
+        m_geom_associations[ge].push_back(te);
+}
+/*----------------------------------------------------------------------------*/
+void TopoManager::removeRefTopo(const Geom::GeomEntity* ge, TopoEntity* te)
+{
+    std::vector<TopoEntity*>& v = m_geom_associations[ge];
+    // on supprime toutes les occurrences de te dans le vecteur
+    // (même si en principe il ne devrait y en avoir qu'une seule)
+    v.erase(std::remove(v.begin(), v.end(), te), v.end());
+}
+/*----------------------------------------------------------------------------*/
+void TopoManager::setRefTopos(const Geom::GeomEntity* ge, const std::vector<TopoEntity*>& tes)
+{
+    m_geom_associations[ge] = tes;
+}
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo
 /*----------------------------------------------------------------------------*/

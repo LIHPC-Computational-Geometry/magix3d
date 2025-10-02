@@ -182,7 +182,8 @@ Topo::Face* ServiceGeomToTopo::getFace(Geom::Surface* surf)
         Topo::CoFace* coface = 0;
 
         // utilisation si possible d'une topologie s'il y en a une
-        const std::vector<Topo::TopoEntity* >& topos = surf->getRefTopo();
+        Topo::TopoManager& tm = m_context.getTopoManager();
+        const std::vector<Topo::TopoEntity* >& topos = tm.getRefTopos(surf);
         if (topos.size() > 1){
 
             // il faut récupérer les différentes cofaces qui pointent sur cette surface
@@ -263,7 +264,8 @@ Topo::CoFace* ServiceGeomToTopo::getCoFace(Geom::Surface* surf)
             return 0;
 
         // utilisation si possible d'une topologie s'il y en a une
-        const std::vector<Topo::TopoEntity* >& topos = surf->getRefTopo();
+        Topo::TopoManager& tm = m_context.getTopoManager();
+        const std::vector<Topo::TopoEntity* >& topos = tm.getRefTopos(surf);
         if (topos.size() > 1){
 
             throw TkUtil::Exception(TkUtil::UTF8String ("Erreur, la surface possède déjà une topologie composée de plusieurs entités topologiques", TkUtil::Charset::UTF_8));
@@ -337,10 +339,10 @@ std::vector<Topo::Edge*> ServiceGeomToTopo::getEdges(std::vector<Topo::CoEdge*>&
 		filtre_coedges[coedges[i]] = 1;
 
 	Topo::Vertex* first_vertex = 0;
+    Topo::TopoManager& tm = m_context.getTopoManager();
 	for (uint i=0; i<m_extrem_vertices.size(); i++){
 		Geom::Vertex* vtx = m_extrem_vertices[i];
-		std::vector<Topo::TopoEntity*> topos;
-		vtx->getRefTopo(topos);
+        const std::vector<Topo::TopoEntity* >& topos = tm.getRefTopos(vtx);
 		if (topos.size() == 1){
 			if (topos[0]->getType() == Utils::Entity::TopoVertex){
 				Topo::Vertex* vertex = dynamic_cast<Topo::Vertex*>(topos[0]);
@@ -408,7 +410,8 @@ Topo::Edge* ServiceGeomToTopo::getEdge(Geom::Curve* curve)
 
 
         // utilisation si possible d'une topologie s'il y en a une
-        const std::vector<Topo::TopoEntity* >& topos = curve->getRefTopo();
+        Topo::TopoManager& tm = m_context.getTopoManager();
+        const std::vector<Topo::TopoEntity* >& topos = tm.getRefTopos(curve);
         if (topos.size() > 1){
 
             // il faut récupérer les différentes coedges qui pointent sur cette courbe
@@ -488,7 +491,8 @@ Topo::Edge* ServiceGeomToTopo::getEdge(Geom::Curve* curve)
 Topo::CoEdge* ServiceGeomToTopo::getCoEdge(Geom::Curve* curve)
 {
 	Topo::CoEdge* coedge = 0;
-	const std::vector<Topo::TopoEntity* >& topos = curve->getRefTopo();
+    Topo::TopoManager& tm = m_context.getTopoManager();
+    const std::vector<Topo::TopoEntity* >& topos = tm.getRefTopos(curve);
 	if (topos.size() == 1){
 		Topo::TopoEntity* te = topos[0];
 		if (te->getDim() != 1)
@@ -511,7 +515,8 @@ Topo::Vertex* ServiceGeomToTopo::getVertex(Geom::Vertex* gv)
     if (tv == 0){
 
         // utilisation si possible d'une topologie s'il y en a une
-        const std::vector<Topo::TopoEntity* >& topos = gv->getRefTopo();
+        Topo::TopoManager& tm = m_context.getTopoManager();
+        const std::vector<Topo::TopoEntity* >& topos = tm.getRefTopos(gv);
         if (topos.size() > 1)
             throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, plusieurs entités topologiques pointent sur un sommet géométrique", TkUtil::Charset::UTF_8));
         else if (topos.size() == 1){

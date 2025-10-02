@@ -1,15 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file TopoManager.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 2/12/2010
- *
- *  Modified on: 23/02/2022
- *      Author: Simon C
- *      ajout de la fonction de création de blocs par extrusion de faces topologiques
- */
-/*----------------------------------------------------------------------------*/
 #ifndef TOPO_MANAGER_H_
 #define TOPO_MANAGER_H_
 /*----------------------------------------------------------------------------*/
@@ -1900,6 +1889,30 @@ public:
     alignVerticesOnSurface(Geom::GeomEntity* surface, Vertex* vertex, const Point &pnt1, const Point &pnt2);
 #endif
 
+#ifndef SWIG
+    /// Retourne les entités topologiques associées, léve une exception si aucune
+    const std::vector<TopoEntity*>& getRefTopos(const Geom::GeomEntity* ge);
+    /// Ajoute une association Geom-->Topo
+    void addRefTopo(const Geom::GeomEntity* ge, TopoEntity* te);
+    /// Positionne les associations Geom-->Topo
+    void setRefTopos(const Geom::GeomEntity* ge, const std::vector<TopoEntity*>& tes);
+    /// Enlève une association Geom-->Topo
+    void removeRefTopo(const Geom::GeomEntity* ge, TopoEntity* te);
+    /// Retourne les entités topologiques filtrées, léve une exception si aucune
+    template <class T>
+    std::vector<T*> getFilteredRefTopos(const Geom::GeomEntity* ge)
+    {
+        static_assert(std::is_base_of<Topo::TopoEntity, T>::value, "T doit hériter de TopoEntity");
+        std::vector<T*> result;
+        for (Topo::TopoEntity* te : getRefTopos(ge)) {
+            if (T* casted = dynamic_cast<T*>(te)) {
+                result.push_back(casted);
+            }
+        }
+        return result;
+    }
+#endif
+
 private:
     /** Recherche un vecteur d'entités topologiques suivant leur nom,
      *  lève une exception en cas d'erreur.
@@ -1930,6 +1943,9 @@ private:
 
     /// Nombre de bras par défaut pour une arête
     int m_defaultNbMeshingEdges;
+
+    /// Relation Geom --> Topo
+    std::map<const Geom::GeomEntity*, std::vector<Topo::TopoEntity*>> m_geom_associations;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo
