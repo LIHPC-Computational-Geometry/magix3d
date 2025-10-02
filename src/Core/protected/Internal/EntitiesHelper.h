@@ -101,10 +101,6 @@ public:
 
 	//@}	// Utilitaires concernant les noms des entités.
 
-
-	/// Retourne vrai si l'une des entités géométriques a un lien sur une entité topologique
-	static bool hasTopoRef(std::vector<Geom::GeomEntity*>& entities);
-
 	/** Conversion d'une liste de commandes en une liste de lignes de scripts
 	 *  sans avoir de noms qui apparaissent mais juste des références sur les objets créés par les commandes précédentes
 	 */

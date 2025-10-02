@@ -5,7 +5,6 @@
 #include "Geom/OCCHelper.h"
 #include "Group/Group0D.h"
 #include "Internal/Context.h"
-#include "Topo/Vertex.h"
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Vertex.hxx>
 #include <TopoDS_Shape.hxx>
@@ -72,19 +71,6 @@ double Vertex::computeArea() const
 void Vertex::computeBoundingBox(Utils::Math::Point& pmin,Utils::Math::Point& pmax) const
 {
     OCCHelper::computeBoundingBox(m_occ_vertex, pmin, pmax);
-}
-/*----------------------------------------------------------------------------*/
-void Vertex::get(std::vector<Topo::Vertex*>& vertices)
-{
-	const std::vector<Topo::TopoEntity* >& topos = getRefTopo();
-
-	for (std::vector<Topo::TopoEntity* >::const_iterator iter = topos.begin();
-			iter != topos.end(); ++iter)
-		if ((*iter)->getDim() == 0){
-			Topo::Vertex* vertex = dynamic_cast<Topo::Vertex*>(*iter);
-			if (vertex)
-				vertices.push_back(vertex);
-		}
 }
 /*----------------------------------------------------------------------------*/
 void Vertex::add(Curve* c)

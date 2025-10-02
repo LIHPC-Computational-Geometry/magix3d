@@ -228,23 +228,6 @@ std::string EntitiesHelper::entitiesNames (
 	return names.iso ( );
 }	// EntitiesHelper::entitiesNames
 /*----------------------------------------------------------------------------*/
-bool EntitiesHelper::hasTopoRef(std::vector<Geom::GeomEntity*>& entities)
-{
-    for (uint i=0; i<entities.size(); i++){	
-        if (!entities[i]->getRefTopo().empty())
-            return true;
-
-		Geom::GetDownIncidentGeomEntitiesVisitor v;
-		entities[i]->accept(v);
-		for (auto sub_entity : v.get())
-			if (!sub_entity->getRefTopo().empty())
-				return true;
-
-    } // end for i<entities.size()
-
-    return false;
-}
-/*----------------------------------------------------------------------------*/
 std::vector<TkUtil::UTF8String> EntitiesHelper::replaceNameByCommandRef(std::vector<Utils::Command*>& commands)
 {
 	std::vector<TkUtil::UTF8String> scripts;

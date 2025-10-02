@@ -16,11 +16,6 @@ namespace Group {
 class Group2D;
 }
 
-namespace Topo {
-class CoFace;
-class CoEdge;
-class Vertex;
-}
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 /*----------------------------------------------------------------------------*/
@@ -217,16 +212,6 @@ public:
     /** \brief  Return the volumes incident to this surface
      */
     const std::vector<Volume*>& getVolumes() const { return m_volumes; }    
-
-    /*------------------------------------------------------------------------*/
-    /// retourne la liste des faces topologiques communes qui pointent sur cette surface
-    virtual void get(std::vector<Topo::CoFace*>& cofaces);
-
-    /// retourne la liste des arêtes topologiques communes qui pointent sur cette surface
-    virtual void get(std::vector<Topo::CoEdge*>& coedges);
-
-    /// retourne la liste des sommets topologiques qui pointent sur cette surface
-    virtual void get(std::vector<Topo::Vertex*>& vertices);
 
     /*------------------------------------------------------------------------*/
     /** \brief   détruit l'objet

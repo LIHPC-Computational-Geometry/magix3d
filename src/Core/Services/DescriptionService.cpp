@@ -1,6 +1,8 @@
 #include "Services/DescriptionService.h"
 #include "Utils/SerializedRepresentation.h"
+#include "Internal/Context.h"
 #include "Geom/IncidentGeomEntitiesVisitor.h"
+#include "Topo/TopoManager.h"
 #include "Topo/Vertex.h"
 #include "Topo/CoEdge.h"
 #include "Topo/CoFace.h"
@@ -17,7 +19,7 @@ using Property = Mgx3D::Utils::SerializedRepresentation::Property;
 
 namespace Mgx3D::Services
 {
-	Utils::SerializedRepresentation *DescriptionService::describe(const Geom::GeomEntity *e, const bool alsoComputed)
+	Utils::SerializedRepresentation *DescriptionService::getDescription(const Geom::GeomEntity *e, const bool alsoComputed)
 	{
 		DescriptionService ds(alsoComputed);
 		e->accept(ds);
@@ -230,8 +232,9 @@ namespace Mgx3D::Services
 		m_representation->addPropertiesSet(relationsGeomDescription);
 
 		// la Topologie s'il y en a une
-		std::vector<Topo::TopoEntity *> topo_entities = e->getRefTopo();
-		if (!topo_entities.empty())
+		Topo::TopoManager& tm = e->getContext().getTopoManager();
+		std::vector<Topo::TopoEntity *> topo_entities = tm.getRefTopos(e);
+		if (topo_entities.size() > 0)
 		{
 			Utils::SerializedRepresentation topoDescription("Relations topologiques", "");
 

@@ -1,63 +1,35 @@
-/*----------------------------------------------------------------------------*/
-/*
- * TopoInfo.h
- *
- *  Created on: 14/3/2019
- *      Author: Eric B
- */
-/*----------------------------------------------------------------------------*/
 #ifndef TOPOINFO_H_
 #define TOPOINFO_H_
-/*----------------------------------------------------------------------------*/
+
 #include <vector>
 #include <string>
-/*----------------------------------------------------------------------------*/
-namespace Mgx3D {
-/*----------------------------------------------------------------------------*/
-namespace Geom {
-class GeomEntity;
-}
-/*----------------------------------------------------------------------------*/
-namespace Topo {
-/*----------------------------------------------------------------------------*/
-class Vertex;
-class CoEdge;
-class Edge;
-class CoFace;
-class Face;
-class Block;
-/*----------------------------------------------------------------------------*/
-class TopoInfo{
 
-public:
-    std::string name;
-    int dimension;
+namespace Mgx3D::Topo
+{
+    struct TopoInfo
+    {
+        std::string name;
+        int dimension;
+        std::string geom_entity;
+
+        std::vector<std::string> vertices() const { return _vertices; }
+        std::vector<std::string> coedges() const { return _coedges; }
+        std::vector<std::string> edges() const { return _edges; }
+        std::vector<std::string> cofaces() const { return _cofaces; }
+        std::vector<std::string> faces() const { return _faces; }
+        std::vector<std::string> blocks() const { return _blocks; }
+        std::vector<std::string> groups() const { return _groups; }
+
 #ifndef SWIG
-    std::vector<Vertex*> incident_vertices;
-    std::vector<CoEdge*> incident_coedges;
-    std::vector<Edge*> incident_edges;
-    std::vector<CoFace*> incident_cofaces;
-    std::vector<Face*> incident_faces;
-    std::vector<Block*> incident_blocks;
-    Geom::GeomEntity* geom_entity;
-    std::vector<std::string> groups_name;
+        std::vector<std::string> _vertices;
+        std::vector<std::string> _coedges;
+        std::vector<std::string> _edges;
+        std::vector<std::string> _cofaces;
+        std::vector<std::string> _faces;
+        std::vector<std::string> _blocks;
+        std::vector<std::string> _groups;
 #endif
-
-    std::vector<std::string> vertices() const;
-    std::vector<std::string> coedges() const;
-    std::vector<std::string> edges() const;
-    std::vector<std::string> cofaces() const;
-    std::vector<std::string> faces() const;
-    std::vector<std::string> blocks() const;
-    std::string geomEntity() const;
-    std::vector<std::string> groupsName() const;
-};
-/*----------------------------------------------------------------------------*/
-} // end namespace Topo
-/*----------------------------------------------------------------------------*/
-} // end namespace Mgx3D
-/*----------------------------------------------------------------------------*/
+    };
+} 
 #endif /* TOPOINFO_H_ */
-
-/*----------------------------------------------------------------------------*/
 

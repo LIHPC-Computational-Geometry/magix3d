@@ -14,7 +14,6 @@
 #include "Geom/GeomProperty.h"
 #include "Geom/GeomEntityVisitor.h"
 #include "Services/DescriptionService.h"
-#include "Topo/TopoEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <gmds/math/Triangle.h>
 /*----------------------------------------------------------------------------*/
@@ -166,24 +165,6 @@ public:
     virtual Mgx3D::Utils::SerializedRepresentation* getDescription (bool alsoComputed) const;
 
     /*------------------------------------------------------------------------*/
-    /** Ajoute une relation vers la topologie
-     *  Il est vérifié que la relation n'y ait pas déjà
-     * */
-    virtual void addRefTopo(Topo::TopoEntity* te);
-
-    /** Enlève une relation vers la topologie
-     *  Il est vérifié que la relation y ait déjà
-     * */
-    virtual void removeRefTopo(Topo::TopoEntity* te);
-
-    /** Retourne la liste des entités topologiques référencées */
-    virtual void getRefTopo(std::vector<Topo::TopoEntity* >& vte) const;
-    virtual const std::vector<Topo::TopoEntity* >& getRefTopo() const
-    { return m_topo_entities; }
-    virtual void setRefTopo(const std::vector<Topo::TopoEntity* >& vte)
-    { m_topo_entities = vte; }
-
-    /*------------------------------------------------------------------------*/
     /// Retourne les noms des groupes auxquels appartient cette entité
     virtual void getGroupsName (std::vector<std::string>& gn) const;
 
@@ -199,9 +180,6 @@ public:
 private:
     /// Propriétés géométriques (qui peut être spécifique, PropertyBox par exemple)
     GeomProperty* m_geomProp;
-
-    /// liens vers la topologie
-    std::vector<Topo::TopoEntity* > m_topo_entities;
 
     /// pour savoir si computeArea doit être appelé
     mutable bool m_computedAreaIsUpToDate;

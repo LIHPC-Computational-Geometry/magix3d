@@ -14,9 +14,6 @@ namespace Mgx3D {
 namespace Group {
 class Group0D;
 }
-namespace Topo {
-class Vertex;
-}
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 class Curve;
@@ -93,10 +90,6 @@ public:
      *  \param curves les courbes incidents
      */
     const std::vector<Curve*>& getCurves() const {return m_curves;}
-
-    /*------------------------------------------------------------------------*/
-    /// retourne la liste des sommets topologiques qui pointent sur cette courbe
-    virtual void get(std::vector<Topo::Vertex*>& vertices);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Ajoute c comme courbe incidente

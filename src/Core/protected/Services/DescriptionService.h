@@ -19,7 +19,7 @@ namespace Mgx3D::Services
     class DescriptionService : public Geom::ConstGeomEntityVisitor
     {
     public:
-        static Utils::SerializedRepresentation* describe(const Geom::GeomEntity* e, const bool alsoComputed);
+        static Utils::SerializedRepresentation* getDescription(const Geom::GeomEntity* e, const bool alsoComputed);
 
         DescriptionService(const bool alsoComputed);
         ~DescriptionService() override = default;

@@ -6,9 +6,6 @@
 #include "Geom/OCCHelper.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomProjectImplementation.h"
-#include "Topo/CoFace.h"
-#include "Topo/CoEdge.h"
-#include "Topo/Vertex.h"
 #include "Group/Group2D.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
@@ -320,45 +317,6 @@ Utils::Math::Point Surface::getPoint(const double u, const double v) const
 	}
 
     throw TkUtil::Exception (TkUtil::UTF8String ("Parametre u hors de la plage [UMIN, UMAX]", TkUtil::Charset::UTF_8));
-}
-/*----------------------------------------------------------------------------*/
-void Surface::get(std::vector<Topo::CoFace*>& cofaces)
-{
-	const std::vector<Topo::TopoEntity* >& topos = getRefTopo();
-
-	for (std::vector<Topo::TopoEntity* >::const_iterator iter = topos.begin();
-			iter != topos.end(); ++iter)
-		if ((*iter)->getDim() == 2){
-			Topo::CoFace* coface = dynamic_cast<Topo::CoFace*>(*iter);
-			if (coface)
-				cofaces.push_back(coface);
-		}
-}
-/*----------------------------------------------------------------------------*/
-void Surface::get(std::vector<Topo::CoEdge*>& coedges)
-{
-	const std::vector<Topo::TopoEntity* >& topos = getRefTopo();
-
-	for (std::vector<Topo::TopoEntity* >::const_iterator iter = topos.begin();
-			iter != topos.end(); ++iter)
-		if ((*iter)->getDim() == 1){
-			Topo::CoEdge* coedge = dynamic_cast<Topo::CoEdge*>(*iter);
-			if (coedge)
-				coedges.push_back(coedge);
-		}
-}
-/*----------------------------------------------------------------------------*/
-void Surface::get(std::vector<Topo::Vertex*>& vertices)
-{
-	const std::vector<Topo::TopoEntity* >& topos = getRefTopo();
-
-	for (std::vector<Topo::TopoEntity* >::const_iterator iter = topos.begin();
-			iter != topos.end(); ++iter)
-		if ((*iter)->getDim() == 0){
-			Topo::Vertex* vertex = dynamic_cast<Topo::Vertex*>(*iter);
-			if (vertex)
-				vertices.push_back(vertex);
-		}
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

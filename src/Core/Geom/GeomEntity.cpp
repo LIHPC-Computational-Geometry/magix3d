@@ -12,12 +12,6 @@
 /*----------------------------------------------------------------------------*/
 #include "Services/DescriptionService.h"
 /*----------------------------------------------------------------------------*/
-#include "Topo/TopoEntity.h"
-#include "Topo/Vertex.h"
-#include "Topo/CoEdge.h"
-#include "Topo/CoFace.h"
-#include "Topo/Block.h"
-/*----------------------------------------------------------------------------*/
 #include "Group/Group0D.h"
 #include "Group/Group1D.h"
 #include "Group/Group2D.h"
@@ -100,7 +94,7 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
 /*----------------------------------------------------------------------------*/
 Mgx3D::Utils::SerializedRepresentation* GeomEntity::getDescription (bool alsoComputed) const
 {
-    return Services::DescriptionService::describe(this, alsoComputed);
+    return Services::DescriptionService::getDescription(this, alsoComputed);
 }
 /*----------------------------------------------------------------------------*/
 GeomProperty::type GeomEntity::getGeomType ( ) const
@@ -108,51 +102,6 @@ GeomProperty::type GeomEntity::getGeomType ( ) const
 	CHECK_NULL_PTR_ERROR (getGeomProperty ( ))
 	return getGeomProperty ( )->getType ( );
 }	// GeomEntity::getGeomType
-/*----------------------------------------------------------------------------*/
-void GeomEntity::addRefTopo(Topo::TopoEntity* te)
-{
-#ifdef _DEBUG2
-    std::cout<<"GeomEntity::addRefTopo("<<(te?te->getName():"0")<<") à "<<getName()<<std::endl;
-#endif
-
-    // recherche si l'entité topologique ne serait pas déjà référencée
-    uint i = 0;
-    for (; i<m_topo_entities.size() && te != m_topo_entities[i]; ++i)
-        ;
-
-    // elle est déjà présente, on ne fait rien
-    if (i != m_topo_entities.size())
-        return;
-
-    m_topo_entities.push_back(te);
-}
-/*----------------------------------------------------------------------------*/
-void GeomEntity::removeRefTopo(Topo::TopoEntity* te)
-{
-#ifdef _DEBUG2
-    std::cout<<"GeomEntity::removeRefTopo("<<(te?te->getName():"0")<<") à "<<getName()<<std::endl;
-#endif
-    uint i = 0;
-    for (; i<m_topo_entities.size() && te != m_topo_entities[i]; ++i)
-        ;
-
-    // on la retire si elle est présente
-    if (i!=m_topo_entities.size())
-        m_topo_entities.erase(m_topo_entities.begin()+i);
-//    else {
-//        std::cout<<"m_topo_entities : ";
-//        for(int i=0;i<m_topo_entities.size();i++)
-//            std::cout<<" "<<m_topo_entities[i]->getName();
-//        std::cout<<std::endl;
-//        throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne (pas d'entité), avec GeomEntity::removeRefTopo", TkUtil::Charset::UTF_8));
-//    }
-}
-/*----------------------------------------------------------------------------*/
-void GeomEntity::getRefTopo(std::vector<Topo::TopoEntity* >& vte) const
-{
-    vte.clear();
-    vte.insert(vte.end(), m_topo_entities.begin(), m_topo_entities.end());
-}
 /*----------------------------------------------------------------------------*/
 void GeomEntity::getGroupsName (std::vector<std::string>& gn) const
 {

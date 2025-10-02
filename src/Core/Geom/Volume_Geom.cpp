@@ -6,7 +6,6 @@
 #include "Geom/OCCHelper.h"
 #include "Group/Group3D.h"
 #include "Internal/Context.h"
-#include "Topo/Block.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/MemoryError.h>
@@ -182,16 +181,6 @@ void Volume::setDestroyed(bool b)
             m_groups[i]->add(this);
 
     Entity::setDestroyed(b);
-}
-/*----------------------------------------------------------------------------*/
-void Volume::
-get(std::vector<Topo::Block*>& blocs) const
-{
-	const std::vector<Topo::TopoEntity*>& topo_entities = getRefTopo();
-	for (std::vector<Topo::TopoEntity* >::const_iterator iter = topo_entities.begin();
-			iter != topo_entities.end(); ++iter)
-		if ((*iter)->getDim() == 3)
-			blocs.push_back(dynamic_cast<Topo::Block*>(*iter));
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

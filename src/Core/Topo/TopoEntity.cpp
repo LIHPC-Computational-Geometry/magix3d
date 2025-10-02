@@ -83,9 +83,9 @@ void TopoEntity::setDestroyed(bool b)
     std::cout<<"  en relation avec "<<ge->getName()<<std::endl;
 #endif
         if (b) // cas de la destruction
-            ge->removeRefTopo(this);
+            getContext().getTopoManager().removeRefTopo(ge, this);
         else // on remet la relation
-            ge->addRefTopo(this);
+            getContext().getTopoManager().addRefTopo(ge, this);
     }
 #ifdef _DEBUG2
     else
@@ -112,10 +112,11 @@ setGeomAssociation(Geom::GeomEntity* ge)
 #endif
 
     // on met à jour la relation réciproque (de Geom vers Topo)
+    Topo::TopoManager& tm = getContext().getTopoManager();
     if (m_topo_property->getGeomAssociation())
-        m_topo_property->getGeomAssociation()->removeRefTopo(this);
+        tm.removeRefTopo(m_topo_property->getGeomAssociation(), this);
     if (ge)
-        ge->addRefTopo(this);
+        tm.addRefTopo(ge, this);
 
     // mise à jour de la couleur si changement de dimension pour la projection
     Geom::GeomEntity* oldGe = m_topo_property->getGeomAssociation();
@@ -209,10 +210,11 @@ TopoProperty* TopoEntity::setProperty(TopoProperty* new_tp)
     // on met à jour la géométrie s'il y a une relation
     Geom::GeomEntity* oldge = m_topo_property->getGeomAssociation();
     Geom::GeomEntity* newge = new_tp->getGeomAssociation();
+    Topo::TopoManager& tm = getContext().getTopoManager();
     if (oldge)
-        oldge->removeRefTopo(this);
+        tm.removeRefTopo(oldge, this);
     if (newge)
-        newge->addRefTopo(this);
+        tm.addRefTopo(newge, this);
 
     TopoProperty* old_tp = m_topo_property;
     m_topo_property = new_tp;

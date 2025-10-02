@@ -13,12 +13,6 @@ namespace Mgx3D {
 namespace Group {
 class Group3D;
 }
-namespace Topo {
-class Block;
-class CoFace;
-class CoEdge;
-class Vertex;
-}
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 
@@ -91,11 +85,6 @@ public:
      *  \param surfaces les surfaces incidentes
      */
     virtual const std::vector<Surface*>& getSurfaces() const {return m_surfaces;}
-
-    /*------------------------------------------------------------------------*/
-     /** \brief  Fournit l'accès aux blocs topologiques qui pointent sur ce volume
-      */
-     virtual void get(std::vector<Topo::Block*>& blocs) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Ajoute s comme surface incidente

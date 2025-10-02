@@ -1,9 +1,11 @@
 /*----------------------------------------------------------------------------*/
-#include "Topo/TopoHelper.h"
 #include "Topo/CommandGlue2Topo.h"
+#include "Topo/TopoHelper.h"
+#include "Topo/TopoManager.h"
 #include "Topo/CoFace.h"
 #include "Topo/Vertex.h"
 #include "Geom/Volume.h"
+#include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
@@ -46,46 +48,42 @@ internalExecute()
     message << "CommandGlue2Topo::execute pour la commande " << getName ( )
             << " de nom unique " << getUniqueName ( );
 
+	Topo::TopoManager& tm = getContext().getTopoManager();
     // les cofaces au bord associées au premier volume
-    std::vector<CoFace*> cofaces1;
-    std::set<Topo::CoFace*> cofaces;
-    std::vector<Topo::Block*> blocs;
-    m_vol_A->get(blocs);
-    Topo::TopoHelper::get(blocs, cofaces);
+	std::vector<CoFace*> cofaces1;
+	{
+		std::set<Topo::CoFace*> cofaces;
+		std::vector<Topo::Block*> blocs = tm.getFilteredRefTopos<Topo::Block>(m_vol_A);
+		Topo::TopoHelper::get(blocs, cofaces);
 
-    for (std::set<Topo::CoFace*>::iterator iter = cofaces.begin();
-    		iter != cofaces.end(); ++iter)
-    	if ((*iter)->getNbBlocks() == 1)
-    		cofaces1.push_back(*iter);
+		for (Topo::CoFace* coface : cofaces)
+			if (coface->getNbBlocks() == 1)
+				cofaces1.push_back(coface);
 #ifdef _DEBUG_GLUE
-    std::cout<<"cofaces1: ";
-    for (std::vector<CoFace*>::iterator iter = cofaces1.begin();
-    		iter!=cofaces1.end(); ++iter){
-    	std::cout<<(*iter)->getName()<<" ";
-    }
-    std::cout<<std::endl;
+		std::cout<<"cofaces1: ";
+		for (Topo::CoFace* coface : cofaces)
+			std::cout<<coface->getName()<<" ";
+		std::cout<<std::endl;
 #endif
+	}
 
-    // les cofaces au bord associées au deuxième volume
-    std::vector<CoFace*> cofaces2;
-    cofaces.clear();
-    blocs.clear();
-    m_vol_B->get(blocs);
-    Topo::TopoHelper::get(blocs, cofaces);
+	// les cofaces au bord associées au deuxième volume
+	std::vector<CoFace*> cofaces2;
+	{
+		std::set<Topo::CoFace*> cofaces;
+		std::vector<Topo::Block*> blocs = tm.getFilteredRefTopos<Topo::Block>(m_vol_B);
+		Topo::TopoHelper::get(blocs, cofaces);
 
-    for (std::set<Topo::CoFace*>::iterator iter = cofaces.begin();
-    		iter != cofaces.end(); ++iter)
-    	if ((*iter)->getNbBlocks() == 1)
-    		cofaces2.push_back(*iter);
+		for (Topo::CoFace* coface : cofaces)
+			if (coface->getNbBlocks() == 1)
+				cofaces2.push_back(coface);
 #ifdef _DEBUG_GLUE
-    std::cout<<"cofaces2: ";
-    for (std::vector<CoFace*>::iterator iter = cofaces2.begin();
-    		iter!=cofaces2.end(); ++iter){
-    	std::cout<<(*iter)->getName()<<" ";
-    }
-    std::cout<<std::endl;
+		std::cout<<"cofaces2: ";
+		for (Topo::CoFace* coface : cofaces)
+			std::cout<<coface->getName()<<" ";
+		std::cout<<std::endl;
 #endif
-
+	}
 
     // filtre sur les sommets topologiques de ces faces au bord
     // à 1 pour les sommets uniquement dans cofaces1
