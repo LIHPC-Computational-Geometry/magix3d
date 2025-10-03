@@ -197,9 +197,6 @@ public:
     /// Retourne la liste des groupes 2D auxquels appartient cette entité
     virtual const std::vector<Group::Group2D*>& getGroups() const {return m_groups;}
 
-    /// Affecte une nouvelle liste des groupes auxquels appartient cette entité
-    virtual void setGroups(std::vector<Group::GroupEntity*>& grp);
-
     /// Retourne le nombre de groupes
     virtual int getNbGroups() const;
 

@@ -113,11 +113,6 @@ void GeomEntity::getGroups(std::vector<Group::GroupEntity*>& grp) const
     MGX_FORBIDDEN("getGroups est à redéfinir dans les classes dérivées");
 }
 /*----------------------------------------------------------------------------*/
-void GeomEntity::setGroups(std::vector<Group::GroupEntity*>& grp)
-{
-    MGX_FORBIDDEN("setGroups est à redéfinir dans les classes dérivées");
-}
-/*----------------------------------------------------------------------------*/
 int GeomEntity::getNbGroups() const
 {
     MGX_FORBIDDEN("getNbGroups est à redéfinir dans les classes dérivées");
