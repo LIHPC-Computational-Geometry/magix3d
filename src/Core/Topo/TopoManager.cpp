@@ -2667,8 +2667,11 @@ Mgx3D::Internal::M3DCommandResult* TopoManager::splitFace(std::string coface_nam
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResult* TopoManager::splitFace(Topo::CoFace* coface, CoEdge* coedge, const double& ratio_dec, bool project_on_meshing_edges)
 {
-    TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
+    TkUtil::UTF8String   warning (TkUtil::Charset::UTF_8);
+    warning <<"La fonction splitFace est obsolete, il est préférable d'utiliser splitFaces";
+    log (TkUtil::TraceLog (warning, TkUtil::Log::WARNING));
 
+    TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::splitFace("<<coface->getName()<<", "<< coedge->getName() <<", "<< ratio_dec<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
