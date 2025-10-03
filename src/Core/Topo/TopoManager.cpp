@@ -2576,17 +2576,17 @@ Mgx3D::Internal::M3DCommandResult* TopoManager::splitFacesWithOgrid(std::vector<
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResult* TopoManager::splitFaces(std::vector<std::string> &cofaces_names, std::string narete, const double& ratio_dec, const double& ratio_ogrid)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitFaces(std::vector<std::string> &cofaces_names, std::string narete, const double& ratio_dec, const double& ratio_ogrid, bool project_on_meshing_edges)
 {
     std::vector<Topo::CoFace* > cofaces;
     for (std::vector<std::string>::iterator iter = cofaces_names.begin();
             iter != cofaces_names.end(); ++iter){
         cofaces.push_back(getCoFace(*iter));
     }
-    return splitFaces(cofaces, getCoEdge(narete), ratio_dec, ratio_ogrid);
+    return splitFaces(cofaces, getCoEdge(narete), ratio_dec, ratio_ogrid, project_on_meshing_edges);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResult* TopoManager::splitFaces(std::vector<Topo::CoFace*  > &cofaces, CoEdge* arete, const double& ratio_dec, const double& ratio_ogrid)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitFaces(std::vector<Topo::CoFace*  > &cofaces, CoEdge* arete, const double& ratio_dec, const double& ratio_ogrid, bool project_on_meshing_edges)
 {
 	CHECK_ENTITIES_LIST(cofaces)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
@@ -2599,12 +2599,16 @@ Mgx3D::Internal::M3DCommandResult* TopoManager::splitFaces(std::vector<Topo::CoF
     message <<"],"<<arete->getName()<<","<<Utils::Math::MgxNumeric::userRepresentation (ratio_dec)<<","<<Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid)<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSplitFaces* command = new Topo::CommandSplitFaces(getContext(), cofaces, arete, ratio_dec, ratio_ogrid);
+    Topo::CommandSplitFaces* command = new Topo::CommandSplitFaces(getContext(), cofaces, arete, ratio_dec, ratio_ogrid, project_on_meshing_edges);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias ( ) << ".getTopoManager().splitFaces (" << Internal::entitiesToPythonList<CoFace> (cofaces) << ", ";
-    cmd << arete->getName() <<"\", "<<Utils::Math::MgxNumeric::userRepresentation (ratio_dec)<<", "<<Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid)<<")";
+    cmd << getContextAlias ( ) << ".getTopoManager().splitFaces (" << Internal::entitiesToPythonList<CoFace> (cofaces) << ", \"";
+    cmd << arete->getName() <<"\", "<<Utils::Math::MgxNumeric::userRepresentation (ratio_dec)<<", "<<Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid);
+    if (project_on_meshing_edges)
+        cmd << ", True)";
+    else
+        cmd << ", False)";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -2614,17 +2618,17 @@ Mgx3D::Internal::M3DCommandResult* TopoManager::splitFaces(std::vector<Topo::CoF
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResult* TopoManager::splitFaces(std::vector<std::string> &cofaces_names, std::string narete, const Point& pt, const double& ratio_ogrid)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitFaces(std::vector<std::string> &cofaces_names, std::string narete, const Point& pt, const double& ratio_ogrid, bool project_on_meshing_edges)
 {
     std::vector<Topo::CoFace* > cofaces;
     for (std::vector<std::string>::iterator iter = cofaces_names.begin();
             iter != cofaces_names.end(); ++iter){
         cofaces.push_back(getCoFace(*iter));
     }
-    return splitFaces(cofaces, getCoEdge(narete), pt, ratio_ogrid);
+    return splitFaces(cofaces, getCoEdge(narete), pt, ratio_ogrid, project_on_meshing_edges);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResult* TopoManager::splitFaces(std::vector<Topo::CoFace*  > &cofaces, CoEdge* arete, const Point& pt, const double& ratio_ogrid)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitFaces(std::vector<Topo::CoFace*  > &cofaces, CoEdge* arete, const Point& pt, const double& ratio_ogrid, bool project_on_meshing_edges)
 {
 	CHECK_ENTITIES_LIST(cofaces)
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
@@ -2637,12 +2641,16 @@ Mgx3D::Internal::M3DCommandResult* TopoManager::splitFaces(std::vector<Topo::CoF
     message <<"],"<<arete->getName()<<","<<pt<<","<<Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid)<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSplitFaces* command = new Topo::CommandSplitFaces(getContext(), cofaces, arete, pt, ratio_ogrid);
+    Topo::CommandSplitFaces* command = new Topo::CommandSplitFaces(getContext(), cofaces, arete, pt, ratio_ogrid, project_on_meshing_edges);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias ( ) << ".getTopoManager().splitFaces (" << Internal::entitiesToPythonList<CoFace> (cofaces) << ", ";
-    cmd << arete->getName() <<"\", "<<pt.getScriptCommand()<<", "<<Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid)<<")";
+    cmd << getContextAlias ( ) << ".getTopoManager().splitFaces (" << Internal::entitiesToPythonList<CoFace> (cofaces) << ", \"";
+    cmd << arete->getName() <<"\", "<<pt.getScriptCommand()<<", "<<Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid);
+    if (project_on_meshing_edges)
+        cmd << ", True)";
+    else
+        cmd << ", False)";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -2659,12 +2667,16 @@ Mgx3D::Internal::M3DCommandResult* TopoManager::splitFace(std::string coface_nam
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResult* TopoManager::splitFace(Topo::CoFace* coface, CoEdge* coedge, const double& ratio_dec, bool project_on_meshing_edges)
 {
-    TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
+    TkUtil::UTF8String   warning (TkUtil::Charset::UTF_8);
+    warning <<"La fonction splitFace est obsolete, il est préférable d'utiliser splitFaces";
+    log (TkUtil::TraceLog (warning, TkUtil::Log::WARNING));
 
+    TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::splitFace("<<coface->getName()<<", "<< coedge->getName() <<", "<< ratio_dec<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSplitFaces* command = new Topo::CommandSplitFaces(getContext(), coface, coedge, ratio_dec, project_on_meshing_edges);
+    std::vector<Topo::CoFace* > cofaces = {coface};
+    Topo::CommandSplitFaces* command = new Topo::CommandSplitFaces(getContext(), cofaces, coedge, ratio_dec, 0, project_on_meshing_edges);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -2695,7 +2707,8 @@ Mgx3D::Internal::M3DCommandResult* TopoManager::splitFace(Topo::CoFace* coface, 
     message <<"TopoManager::splitFace("<<coface->getName()<<", "<< coedge->getName() <<", "<< pt<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSplitFaces* command = new Topo::CommandSplitFaces(getContext(), coface, coedge, pt, project_on_meshing_edges);
+    std::vector<Topo::CoFace* > cofaces = {coface};
+    Topo::CommandSplitFaces* command = new Topo::CommandSplitFaces(getContext(), cofaces, coedge, pt, 0, project_on_meshing_edges);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -2744,24 +2757,29 @@ TopoManager::extendSplitFace(Topo::CoFace* coface, Vertex* vertex)
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResult* TopoManager::splitAllFaces(std::string narete, const double& ratio_dec, const double& ratio_ogrid)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitAllFaces(std::string narete, const double& ratio_dec, const double& ratio_ogrid, bool project_on_meshing_edges)
 {
-    return splitAllFaces(getCoEdge(narete), ratio_dec, ratio_ogrid);
+    return splitAllFaces(getCoEdge(narete), ratio_dec, ratio_ogrid, project_on_meshing_edges);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResult* TopoManager::splitAllFaces(CoEdge* coedge, const double& ratio_dec, const double& ratio_ogrid)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitAllFaces(CoEdge* coedge, const double& ratio_dec, const double& ratio_ogrid, bool project_on_meshing_edges)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::splitAllFaces(";
     message <<coedge->getName()<<","<<Utils::Math::MgxNumeric::userRepresentation (ratio_dec)<<","<<Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid)<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandSplitFaces* command = new Topo::CommandSplitFaces(getContext(), coedge, ratio_dec, ratio_ogrid);
+    Topo::CommandSplitFaces* command = new Topo::CommandSplitFaces(getContext(), coedge, ratio_dec, ratio_ogrid, project_on_meshing_edges);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().splitAllFaces (\"";
-    cmd << coedge->getName() <<"\", "<<Utils::Math::MgxNumeric::userRepresentation (ratio_dec)<<", "<<Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid)<<")";
+    cmd << coedge->getName() <<"\", "<<Utils::Math::MgxNumeric::userRepresentation (ratio_dec)<<", ";
+    cmd << Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid);
+    if (project_on_meshing_edges)
+    	cmd << ", True)";
+    else
+    	cmd << ", False)";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -2771,12 +2789,12 @@ Mgx3D::Internal::M3DCommandResult* TopoManager::splitAllFaces(CoEdge* coedge, co
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResult* TopoManager::splitAllFaces(std::string narete, const Point& pt, const double& ratio_ogrid)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitAllFaces(std::string narete, const Point& pt, const double& ratio_ogrid, bool project_on_meshing_edges)
 {
-    return splitAllFaces(getCoEdge(narete), pt, ratio_ogrid);
+    return splitAllFaces(getCoEdge(narete), pt, ratio_ogrid, project_on_meshing_edges);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Internal::M3DCommandResult* TopoManager::splitAllFaces(CoEdge* coedge, const Point& pt, const double& ratio_ogrid)
+Mgx3D::Internal::M3DCommandResult* TopoManager::splitAllFaces(CoEdge* coedge, const Point& pt, const double& ratio_ogrid, bool project_on_meshing_edges)
 {
     TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::splitAllFaces(";
@@ -2788,7 +2806,11 @@ Mgx3D::Internal::M3DCommandResult* TopoManager::splitAllFaces(CoEdge* coedge, co
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().splitAllFaces (\"";
-    cmd << coedge->getName() <<"\", "<<pt.getScriptCommand()<<", "<<Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid)<<")";
+    cmd << coedge->getName() <<"\", "<<pt.getScriptCommand()<<", "<<Utils::Math::MgxNumeric::userRepresentation (ratio_ogrid);
+    if (project_on_meshing_edges)
+        cmd << ", True)";
+    else
+        cmd << ", False)";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);

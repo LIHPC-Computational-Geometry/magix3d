@@ -119,6 +119,12 @@ class QtTopologySplitFacesPanel : public QtMgx3DOperationPanel
 	virtual double getOGridRatio ( ) const;
 
 	/**
+	 * \return		<I>true</I> s'il faut projeter les sommets créés sur la
+	 *				discrétisation initiale, <I>false</I> dans le cas contraire.
+	 */
+	virtual bool projectCreatedVertices ( ) const;
+
+	/**
 	 * \param		<I>true</I> pour prévisualiser les entités concernées par
 	 * 				le découpage, <I>false</I> pour arrêter la prévisualisation.
 	 * \param		<I>true</I> s'il faut détruire l'éventuel interacteur dans 
@@ -182,6 +188,9 @@ class QtTopologySplitFacesPanel : public QtMgx3DOperationPanel
 
 	/** Le ratio de découpage de l'o-grid. */
 	QtDoubleTextField*			_oGridRatioTextField;
+
+	/** Faut-il projeter les sommets créés sur la discrétisation initiale ? */
+	QCheckBox*					_projectVerticesCheckBox;
 
 	/** La case à cocher "Toutes les faces ?". */
 	QCheckBox*					_allFacesCheckBox;

@@ -85,7 +85,6 @@
 #include "QtComponents/QtTopologySplitBlockWithOGridAction.h"
 #include "QtComponents/QtTopologyExtendSplitBlockAction.h"
 #include "QtComponents/QtTopologyExtendSplitFaceAction.h"
-#include "QtComponents/QtTopologySplitFaceAction.h"
 #include "QtComponents/QtTopologySplitFacesAction.h"
 #include "QtComponents/QtTopologyVerticesAlignmentAction.h"
 #include "QtComponents/QtTopoEntityDestructionAction.h"
@@ -3081,18 +3080,11 @@ void QtMgx3DMainWindow::showReady ( )
 			// Coupe de faces :
 			QtMgx3DOperationAction *splitFacesAction =
 					                       new QtTopologySplitFacesAction(
-							                       QIcon(":/images/topo_split_faces.png"), QString::fromUtf8("[2D] Découpage de faces selon une arête"), *this,
-							                       QString::fromUtf8("Découpage de faces selon une arête (uniquement pour cas 2D).")
+							                       QIcon(":/images/topo_split_faces.png"), QString::fromUtf8("Découpage de faces selon une arête"), *this,
+							                       QString::fromUtf8("Découpage de faces selon une arête.")
 					                       );
 			registerOperationAction(
 					*splitFacesAction, QtMgx3DOperationsPanel::TOPO_FACE_OPERATION);
-			QtMgx3DOperationAction *splitFaceAction =
-					                       new QtTopologySplitFaceAction(
-							                       QIcon(":/images/topo_split_face.png"), QString::fromUtf8("Découpage d'une face selon une arête"), *this,
-							                       QString::fromUtf8("Découpage d'une face selon une arête.")
-					                       );
-			registerOperationAction(
-					*splitFaceAction, QtMgx3DOperationsPanel::TOPO_FACE_OPERATION);
 			QtMgx3DOperationAction *splitFaceWithOGridAction =
 					                       new QtTopologySplitFaceWithOGridAction(
 							                       QIcon(":/images/topo_split_face_with_ogrid.png"),
