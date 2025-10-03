@@ -150,17 +150,6 @@ void Volume::getGroups(std::vector<Group::GroupEntity*>& grp) const
     grp.insert(grp.end(), m_groups.begin(), m_groups.end());
 }
 /*----------------------------------------------------------------------------*/
-void Volume::setGroups(std::vector<Group::GroupEntity*>& grp)
-{
-	m_groups.clear();
-	for (std::vector<Group::GroupEntity*>::iterator iter = grp.begin(); iter != grp.end(); iter++){
-		Group::Group3D* g3 = dynamic_cast<Group::Group3D*>(*iter);
-		if (g3 == 0)
-			throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne avec conversion en groupe local dans setGroups", TkUtil::Charset::UTF_8));
-		m_groups.push_back(g3);
-	}
-}
-/*----------------------------------------------------------------------------*/
 int Volume::getNbGroups() const
 {
     return m_groups.size();

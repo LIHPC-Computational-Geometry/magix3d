@@ -171,9 +171,6 @@ public:
     /// Retourne la liste des groupes auxquels appartient cette entité
     virtual void getGroups(std::vector<Group::GroupEntity*>& grp) const;
 
-    /// Affecte une nouvelle liste des groupes auxquels appartient cette entité
-    virtual void setGroups(std::vector<Group::GroupEntity*>& grp);
-
     /// Retourne le nombre de groupes
     virtual int getNbGroups() const;
 
