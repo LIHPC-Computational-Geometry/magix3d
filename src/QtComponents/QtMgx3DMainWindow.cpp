@@ -5191,7 +5191,7 @@ void QtMgx3DMainWindow::preferencesCallback()
 	const TkUtil::Color	oldTopoColorWithoutProj (Internal::InternalPreferences::instance ( )._topoColorWithoutProj.getRed ( ), Internal::InternalPreferences::instance ( )._topoColorWithoutProj.getGreen ( ), Internal::InternalPreferences::instance ( )._topoColorWithoutProj.getBlue ( ));
 	const TkUtil::Color	oldTopoColorWith0DProj (Internal::InternalPreferences::instance ( )._topoColorWith0DProj.getRed ( ), Internal::InternalPreferences::instance ( )._topoColorWith0DProj.getGreen ( ), Internal::InternalPreferences::instance ( )._topoColorWith0DProj.getBlue ( ));
 	const TkUtil::Color	oldTopoColorWith1DProj (Internal::InternalPreferences::instance ( )._topoColorWith1DProj.getRed ( ), Internal::InternalPreferences::instance ( )._topoColorWith1DProj.getGreen ( ), Internal::InternalPreferences::instance ( )._topoColorWith1DProj.getBlue ( ));
-	const TkUtil::Color	oldTopoColorWith2DProj (Internal::InternalPreferences::instance ( )._topoColorWith2DProj.getRed ( ), Internal::InternalPreferences::instance ( )._topoColorWith1DProj.getGreen ( ), Internal::InternalPreferences::instance ( )._topoColorWith2DProj.getBlue ( ));
+	const TkUtil::Color	oldTopoColorWith2DProj (Internal::InternalPreferences::instance ( )._topoColorWith2DProj.getRed ( ), Internal::InternalPreferences::instance ( )._topoColorWith2DProj.getGreen ( ), Internal::InternalPreferences::instance ( )._topoColorWith2DProj.getBlue ( ));
 	const TkUtil::Color	oldTopoColorWith3DProj (Internal::InternalPreferences::instance ( )._topoColorWith3DProj.getRed ( ), Internal::InternalPreferences::instance ( )._topoColorWith3DProj.getGreen ( ), Internal::InternalPreferences::instance ( )._topoColorWith3DProj.getBlue ( ));
 
 	QtMgx3DApplication::editConfiguration(this, UTF8String("Magix 3D : préférences utilisateur.", Charset::UTF_8));
@@ -5249,42 +5249,43 @@ log (t5);
 	const TkUtil::Color	currentTopoColorWithoutProj (Internal::InternalPreferences::instance ( )._topoColorWithoutProj.getRed ( ), Internal::InternalPreferences::instance ( )._topoColorWithoutProj.getGreen ( ), Internal::InternalPreferences::instance ( )._topoColorWithoutProj.getBlue ( ));
 	const TkUtil::Color	currentTopoColorWith0DProj (Internal::InternalPreferences::instance ( )._topoColorWith0DProj.getRed ( ), Internal::InternalPreferences::instance ( )._topoColorWith0DProj.getGreen ( ), Internal::InternalPreferences::instance ( )._topoColorWith0DProj.getBlue ( ));;
 	const TkUtil::Color	currentTopoColorWith1DProj (Internal::InternalPreferences::instance ( )._topoColorWith1DProj.getRed ( ), Internal::InternalPreferences::instance ( )._topoColorWith1DProj.getGreen ( ), Internal::InternalPreferences::instance ( )._topoColorWith1DProj.getBlue ( ));;
-	const TkUtil::Color	currentTopoColorWith2DProj (Internal::InternalPreferences::instance ( )._topoColorWith2DProj.getRed ( ), Internal::InternalPreferences::instance ( )._topoColorWith1DProj.getGreen ( ), Internal::InternalPreferences::instance ( )._topoColorWith2DProj.getBlue ( ));;
+	const TkUtil::Color	currentTopoColorWith2DProj (Internal::InternalPreferences::instance ( )._topoColorWith2DProj.getRed ( ), Internal::InternalPreferences::instance ( )._topoColorWith2DProj.getGreen ( ), Internal::InternalPreferences::instance ( )._topoColorWith2DProj.getBlue ( ));;
 	const TkUtil::Color	currentTopoColorWith3DProj (Internal::InternalPreferences::instance ( )._topoColorWith3DProj.getRed ( ), Internal::InternalPreferences::instance ( )._topoColorWith3DProj.getGreen ( ), Internal::InternalPreferences::instance ( )._topoColorWith3DProj.getBlue ( ));;
-	const bool	updateAll	= currentTopoColorWithoutProj != oldTopoColorWithoutProj ? true : false;
-	const bool	update0D	= (true == updateAll) || (currentTopoColorWith0DProj != oldTopoColorWith0DProj) ? true : false;
-	const bool	update1D	= (true == updateAll) || (currentTopoColorWith1DProj != oldTopoColorWith1DProj) ? true : false;
-	const bool	update2D	= (true == updateAll) || (currentTopoColorWith2DProj != oldTopoColorWith2DProj) ? true : false;
-	const bool	update3D	= (true == updateAll) || (currentTopoColorWith3DProj != oldTopoColorWith3DProj) ? true : false;
-	if (true == update0D)
+	const bool	updateAll	= (currentTopoColorWithoutProj != oldTopoColorWithoutProj);
+    const bool	update3D	= (updateAll || (currentTopoColorWith3DProj != oldTopoColorWith3DProj));
+    const bool	update2D	= (update3D  || (currentTopoColorWith2DProj != oldTopoColorWith2DProj));
+    const bool	update1D	= (update2D  || (currentTopoColorWith1DProj != oldTopoColorWith1DProj));
+    const bool	update0D	= (update1D  || (currentTopoColorWith0DProj != oldTopoColorWith0DProj));
+
+	if (update0D)
 	{
 		std::vector<Topo::Vertex* >	vertices;
 		getContext ( ).getTopoManager ( ).getVertices (vertices);
 		for (std::vector<Topo::Vertex*>::iterator itv = vertices.begin ( ); vertices.end ( ) != itv; itv++)
 			(*itv)->updateDisplayPropertiesColor ( );
 	}	// if (true == update0D)
-	if (true == update1D)
+	if (update1D)
 	{
 		std::vector<Topo::CoEdge*>	edges;
 		getContext ( ).getTopoManager ( ).getCoEdges (edges);
 		for (std::vector<Topo::CoEdge*>::iterator ite = edges.begin ( ); edges.end ( ) != ite; ite++)
 			(*ite)->updateDisplayPropertiesColor ( );
 	}	// if (true == update1D)
-	if (true == update2D)
+	if (update2D)
 	{
 		std::vector<Topo::CoFace*>	faces;
 		getContext ( ).getTopoManager ( ).getCoFaces (faces);
 		for (std::vector<Topo::CoFace*>::iterator itf = faces.begin ( ); faces.end ( ) != itf; itf++)
 			(*itf)->updateDisplayPropertiesColor ( );
 	}	// if (true == update2D)
-	if (true == update3D)
+	if (update3D)
 	{
 		std::vector<Topo::Block* >	blocks;
 		getContext ( ).getTopoManager ( ).getBlocks (blocks);
 		for (std::vector<Topo::Block*>::iterator itb = blocks.begin ( ); blocks.end ( ) != itb; itb++)
 			(*itb)->updateDisplayPropertiesColor ( );
 	}	// if (true == update3D)
-	if ((true == updateAll) || (true == update0D) || (true == update1D) || (true == update2D) || (true == update3D))
+	if (updateAll || update0D || update1D || update2D || update3D)
 		getGraphicalWidget ( ).getRenderingManager ( ).updateRepresentations ( );
 
 	COMPLETE_QT_TRY_CATCH_BLOCK(true, this, getAppTitle())
