@@ -9,7 +9,7 @@
 #include "QtVtkComponents/VTKSelectionManagerDimFilter.h"
 #include "QtVtkComponents/VTKConfiguration.h"
 #include "QtVtkComponents/VTKMgx3DActor.h"
-#include "Utils/SelectionManagerDimFilter.h"
+#include "Internal/SelectionManagerDimFilter.h"
 
 #include <TkUtil/Exception.h>
 #include <TkUtil/InternalError.h>

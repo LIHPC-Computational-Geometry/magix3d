@@ -5,7 +5,7 @@
 #include "Internal/NameManager.h"
 #include "Internal/ScriptingManager.h"
 
-#include "Utils/SelectionManager.h"
+#include "SelectionManager.h"
 #include "Utils/Unit.h"
 #include "Utils/Entity.h"
 #include "Utils/Landmark.h"
@@ -182,9 +182,9 @@ public:
 	/*------------------------------------------------------------------------*/
 	/** \brief  Accesseur sur le gestionnaire de sélection.
 	 */
-	Mgx3D::Utils::SelectionManager& getSelectionManager ( );
-	const Mgx3D::Utils::SelectionManager& getSelectionManager ( ) const;
-	void setSelectionManager (Mgx3D::Utils::SelectionManager*);
+	Mgx3D::Internal::SelectionManager& getSelectionManager ( );
+	const Mgx3D::Internal::SelectionManager& getSelectionManager ( ) const;
+	void setSelectionManager (Mgx3D::Internal::SelectionManager*);
 	/*------------------------------------------------------------------------*/
 
 	/**
@@ -638,7 +638,7 @@ private:
     /// Manager pour les commandes de niveau supérieur
     Mgx3D::Internal::M3DCommandManager  m_m3d_command_manager;
     /// Manager de sélection
-    Mgx3D::Utils::SelectionManager*	m_selection_manager;
+    Mgx3D::Internal::SelectionManager*	m_selection_manager;
     /// Manager pour la gestion des noms
     Mgx3D::Internal::NameManager       *m_name_manager;
 

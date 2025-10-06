@@ -219,9 +219,7 @@ void CommandEditGeom::copyGroups(GeomEntity* ge1, GeomEntity* ge2)
                 iter != grp.end(); ++iter){
             Group::Group3D* grp = dynamic_cast<Group::Group3D*>(*iter);
             if (res && grp && !res->find(grp)){
-                grp->add(res);
-                res->add(grp);
-                //std::cout<<"grp : "<<grp->getInfos()<<std::endl;
+                m_group_helper.addToGroup(grp->getName(), res);
             }
         }
     }
@@ -233,8 +231,7 @@ void CommandEditGeom::copyGroups(GeomEntity* ge1, GeomEntity* ge2)
                 iter != grp.end(); ++iter){
             Group::Group2D* grp = dynamic_cast<Group::Group2D*>(*iter);
             if (res && grp && !res->find(grp)){
-                grp->add(res);
-                res->add(grp);
+                m_group_helper.addToGroup(grp->getName(), res);
             }
         }
     }
@@ -246,21 +243,15 @@ void CommandEditGeom::copyGroups(GeomEntity* ge1, GeomEntity* ge2)
                 iter != grp.end(); ++iter){
             Group::Group1D* grp = dynamic_cast<Group::Group1D*>(*iter);
             if (res && grp && !res->find(grp)){
-                grp->add(res);
-                res->add(grp);
+                m_group_helper.addToGroup(grp->getName(), res);
             }
         }
     }
     else if (ge1->getDim() == 0 && ge2->getDim() == 0){
-    std::vector<Group::GroupEntity*> grp;
-        ge1->getGroups(grp);
         Vertex* res = dynamic_cast<Vertex*>(ge2);
-        for (std::vector<Group::GroupEntity*>::iterator iter = grp.begin();
-                iter != grp.end(); ++iter){
-            Group::Group0D* grp = dynamic_cast<Group::Group0D*>(*iter);
+        for (Group::Group0D* grp : res->getGroups()) {
             if (res && grp && !res->find(grp)){
-                grp->add(res);
-                res->add(grp);
+                m_group_helper.addToGroup(grp->getName(), res);
             }
         }
     }
@@ -294,14 +285,14 @@ void CommandEditGeom::updateGroups()
         }
     }
 
-    // on utilise le groupe m_group_name (suivant la dimention)
+    // on utilise le groupe m_group_name (suivant la dimension)
     std::vector<GeomEntity*>& newEntities = getNewEntities();
     for (std::vector<GeomEntity*>::iterator iter = newEntities.begin();
             iter != newEntities.end(); ++iter){
         GeomEntity* ge = *iter;
         if (filtre_ge[ge] == 0){
-            bool use_group_name = (ge->getDim() == m_dim_new_group); // && (filtre_ge[ge] == 0)
-            addToGroup(ge, !use_group_name);
+            std::string group_name = (ge->getDim() == m_dim_new_group ? m_group_name : ""); // && (filtre_ge[ge] == 0)
+            m_group_helper.addToGroup(group_name, ge);
 #ifdef _DEBUG2
             std::cout<<"  addToGroup de "<<ge->getName()<<" avec groupe: "<<(use_group_name?m_group_name:"")<<std::endl;
 #endif

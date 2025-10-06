@@ -656,7 +656,7 @@ void vtkMgx3DInteractorStyle::OnRightButtonUp ( )
 }	// vtkMgx3DInteractorStyle::OnRightButtonUp
 
 
-void vtkMgx3DInteractorStyle::SetSelectionManager (Mgx3D::Utils::SelectionManager* mgr)
+void vtkMgx3DInteractorStyle::SetSelectionManager (Mgx3D::Internal::SelectionManager* mgr)
 {
 	SelectionManager	= mgr;
 }	// vtkMgx3DInteractorStyle::SetSelectionManager

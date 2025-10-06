@@ -31,6 +31,7 @@ namespace Topo {
 /*----------------------------------------------------------------------------*/
 CommandEditTopo::CommandEditTopo(Internal::Context& c, std::string name)
 : Internal::CommandInternal (c, name)
+, m_group_helper(getInfoCommand(), c.getGroupManager())
 , m_isPreview(false)
 {}
 /*----------------------------------------------------------------------------*/

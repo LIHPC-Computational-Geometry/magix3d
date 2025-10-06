@@ -9,7 +9,7 @@
 #include "Internal/Context.h"
 
 #include "QtComponents/QtSelectionPropertiesTreeItem.h"
-#include "Utils/SelectionManager.h"
+#include "Internal/SelectionManager.h"
 
 #include <QtUtil/QtGroupBox.h>
 
@@ -139,7 +139,7 @@ class QtSelectionCommonPropertiesTreeWidget : public QTreeWidget
  *				des entités sélectionnées.
  */
 class QtSelectionCommonPropertiesPanel :
-			public QtGroupBox, public Mgx3D::Utils::SelectionManagerObserver
+			public QtGroupBox, public Mgx3D::Internal::SelectionManagerObserver
 {
 	public :
 
@@ -149,7 +149,7 @@ class QtSelectionCommonPropertiesPanel :
 	 * \param	Eventuel gestionnaire de sélection.
 	 */
 	QtSelectionCommonPropertiesPanel (
-		QWidget* parent, const std::string& name, Utils::SelectionManager*);
+		QWidget* parent, const std::string& name, Internal::SelectionManager*);
 
 	/**
 	 * RAS.
@@ -200,7 +200,7 @@ class QtSelectionCommonPropertiesPanel :
 	 * \param		Nouveau gestionnaire de sélection. Peut être nul.
 	 */
 	virtual void setSelectionManager (
-						Mgx3D::Utils::SelectionManager* selectionManager);
+						Mgx3D::Internal::SelectionManager* selectionManager);
 
 	/**
 	 * Appelé lorsque la sélection change. Actualise l'affichage.

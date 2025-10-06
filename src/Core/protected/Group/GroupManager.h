@@ -1,15 +1,8 @@
 /*----------------------------------------------------------------------------*/
-/** \file GroupManager.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 18/10/2012
- */
-/*----------------------------------------------------------------------------*/
 #ifndef MGX3D_GROUP_GROUPMANAGER_H_
 #define MGX3D_GROUP_GROUPMANAGER_H_
 /*----------------------------------------------------------------------------*/
-#include "Utils/SelectionManager.h"
+#include "Internal/SelectionManager.h"
 #include "Internal/CommandCreator.h"
 #include "Internal/M3DCommandResult.h"
 #include "Geom/GeomEntity.h"
@@ -103,12 +96,16 @@ public:
     bool getPropagate();
 
     /*------------------------------------------------------------------------*/
-    /** Retourne une string avec les informations relatives à l'entité */
+    /// Retourne une string avec les informations relatives à l'entité */
     std::string getInfos(const std::string& name, int dim) const;
 
     /*------------------------------------------------------------------------*/
     /// retourne un nom par défaut pour les entités qui n'en aurait pas
     std::string getDefaultName(int dim) const;
+
+    /*------------------------------------------------------------------------*/
+    /// Retourne une string avec les informations relatives à l'entité */
+    Internal::M3DCommandResult* changeGroupName(const std::string& oldName, const std::string& newName, int dim);
 
 #ifndef SWIG
     /*------------------------------------------------------------------------*/
@@ -153,7 +150,7 @@ public:
     void getGroup0D(std::vector<Group0D*>& grp, const bool onlyLive=true) const;
 
     /// retourne la liste des groupes de dimensions dims, sans ou avec ceux détruits
-    void getGroups (std::vector<GroupEntity*>& grp, Mgx3D::Utils::SelectionManager::DIM dims, const bool onlyLive=true) const;
+    void getGroups (std::vector<GroupEntity*>& grp, Mgx3D::Internal::SelectionManager::DIM dims, const bool onlyLive=true) const;
 
     /*------------------------------------------------------------------------*/
     /** Fonction qui à partir d'un filtre (stocké) et des ensembles des groupes qui
@@ -367,6 +364,10 @@ public:
             uint mark);
 
     /*------------------------------------------------------------------------*/
+    /** Retourne le groupe correspondant à la dimension                       */
+    GroupEntity* getGroup(const std::string& name, const int dim, const bool exceptionIfNotFound=true) const;
+
+    /*------------------------------------------------------------------------*/
     /** Retourne les volumes géométriques à partir des groupes sélectionnés   */
     void get(const std::vector<GroupEntity*>& vg, std::vector<Geom::Volume*>& volumes);
 
@@ -529,9 +530,6 @@ public:
 
 
 private:
-    /// Retourne le groupe correspondant à la dimension
-    GroupEntity* getGroup(const std::string& name, const int dim) const;
-
     /// Conteneur pour les groupes 3D
     std::vector<Group3D*> m_group3D;
 

@@ -5,7 +5,7 @@
  */
 
 #include "Internal/Context.h"
-#include "Utils/SelectionManager.h"
+#include "Internal/SelectionManager.h"
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"

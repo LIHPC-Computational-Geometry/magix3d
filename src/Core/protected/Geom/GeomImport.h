@@ -3,6 +3,7 @@
 /*----------------------------------------------------------------------------*/
 #include "Geom/GeomEntity.h"
 #include "Geom/GeomModificationBaseClass.h"
+#include "Group/GroupHelperForCommand.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
@@ -69,23 +70,6 @@ protected:
     void add(TopoDS_Shape& AShape, const std::string& AName);
 
     /*------------------------------------------------------------------------*/
-    /** \brief  ajoute à un groupe un volume
-     */
-    virtual void addToGroup(Volume* v, const std::string& AName);
-
-    /** \brief  ajoute à un groupe une surface
-     */
-    virtual void addToGroup(Surface* s, const std::string& AName);
-
-    /** \brief  ajoute à un groupe une courbe
-     */
-    virtual void addToGroup(Curve* c, const std::string& AName);
-
-    /** \brief  ajoute à un groupe un sommet
-     */
-    virtual void addToGroup(Vertex* v, const std::string& AName);
-
-    /*------------------------------------------------------------------------*/
     /** \brief  stockage dans le manager géométrique pour un volume
      *
      *          Attention pour tous les stockages, on ne vérifie pas que l'
@@ -115,8 +99,10 @@ protected:
     virtual void splitManyCurves(std::vector<Curve*>& curvs, std::vector<Vertex*>& verts);
 
 protected:
+    /// helper pour la gestion des groupes dans les commandes
+    Group::GroupHelperForCommand m_group_helper;
 
-    /** Informations sur la commande: entités modifiées */
+    /// Informations sur la commande: entités modifiées
     Internal::InfoCommand* m_icmd;
 
     /// le nom du fichier en entier

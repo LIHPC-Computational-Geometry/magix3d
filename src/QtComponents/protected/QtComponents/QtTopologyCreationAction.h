@@ -12,7 +12,7 @@
 #include "QtComponents/QtMgx3DTopoOperationAction.h"
 #include "QtComponents/QtTopologyPanel.h"
 
-#include "Utils/SelectionManager.h"
+#include "Internal/SelectionManager.h"
 
 #include <QCheckBox>
 
@@ -52,7 +52,7 @@ class QtTopologyCreationPanel : public QtMgx3DOperationPanel
 			QWidget* parent, const std::string& panelName,
 			Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
 			Mgx3D::QtComponents::QtMgx3DOperationAction* action,
-			Mgx3D::Utils::SelectionManager::DIM dimension,
+			Mgx3D::Internal::SelectionManager::DIM dimension,
 			QtTopologyPanel::TOPOLOGY_TYPE defaultTopology,
 			QtTopologyPanel::COORDINATES_TYPE defaultCoords,
 			const std::string& helpURL,

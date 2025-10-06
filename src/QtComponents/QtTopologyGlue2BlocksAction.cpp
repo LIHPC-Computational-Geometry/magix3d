@@ -23,6 +23,7 @@ using namespace Mgx3D;
 using namespace Mgx3D::Geom;
 using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
+using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D

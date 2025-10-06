@@ -48,7 +48,7 @@ class QtMgx3DEntityPanel : public QWidget
 					QWidget* parent, const std::string& title, bool editable,
 					const std::string& label, const std::string& uniqueName,
 					Mgx3D::QtComponents::QtMgx3DMainWindow* mainWindow,
-					Mgx3D::Utils::SelectionManager::DIM dimensions,
+					Mgx3D::Internal::SelectionManager::DIM dimensions,
 					Mgx3D::Utils::FilterEntity::objectType type);
 
 	/** Destructeur. */
@@ -112,14 +112,14 @@ class QtMgx3DEntityPanel : public QWidget
 	 * \param		Nouvelles dimensions possibles.
 	 * \see			getFilteredDimensions
 	 */
-	virtual void setFilteredDimensions (Mgx3D::Utils::SelectionManager::DIM dimensions);
+	virtual void setFilteredDimensions (Mgx3D::Internal::SelectionManager::DIM dimensions);
 
 	/**
 	 * \return		Les dimensions possibles.
 	 * \see			setFilteredDimensions
 	 * \see			getFilteredTypes
 	 */
-	virtual Mgx3D::Utils::SelectionManager::DIM getFilteredDimensions ( ) const;
+	virtual Mgx3D::Internal::SelectionManager::DIM getFilteredDimensions ( ) const;
 
 	/**
 	 * \return		Les types filtrés.

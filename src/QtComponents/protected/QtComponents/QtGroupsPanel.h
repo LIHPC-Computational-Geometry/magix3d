@@ -294,7 +294,7 @@ class QtMgx3DTBTreeWidget : public QTreeWidget
  *				de groupes sélectionnés.
  *				</P>
  */
-class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionManagerObserver
+class QtGroupsPanel : public QtEntitiesItemViewPanel, public Internal::SelectionManagerObserver
 {
 	Q_OBJECT
 
@@ -384,6 +384,12 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionMan
 	 * \see			addGroups
 	 */
 	virtual void removeGroups (const std::vector<Mgx3D::Group::GroupEntity*>& groups);
+
+	/**
+	 * Met à jour l'affichage du groupe.
+	 * \param		Instance du groupe à réafficher
+	 */
+	virtual void updateGroup (const Group::GroupEntity& group);
 
 	/**
 	 * \return		Les groupes sélectionnés.
@@ -743,6 +749,11 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Utils::SelectionMan
 	 * Désélectionne les nuages de mailles correspondants aux groupes sélectionnés
 	 */
 	virtual void unselectMeshCloudsCallback ( );
+
+	/**
+	 * Le groupe change de nom tout en conservant son contenu
+	 */
+	void updateGroupCallback ( );
 
 	/**
 	 * Destruction d'un groupe, on lui retire toute les entités qu'il contient

@@ -89,7 +89,7 @@ class QtAutoDisablabledAction : public QAction
  */
 class QtMgx3DMainWindow :
 				public QMainWindow, public TkUtil::ObjectBase,
-				public Mgx3D::Utils::SelectionManagerObserver
+				public Mgx3D::Internal::SelectionManagerObserver
 {
 	Q_OBJECT
 

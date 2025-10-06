@@ -21,6 +21,7 @@ using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils;
+using namespace Mgx3D::Internal;
 using namespace Mgx3D::QtComponents;
 
 
@@ -173,7 +174,7 @@ SelectionManager::DIM QtDimensionsSelectorPanel::getAllowedDimensions ( ) const
 }	// QtDimensionsSelectorPanel::getAllowedDimensions
 
 
-bool QtDimensionsSelectorPanel::isDimensionAllowed (Mgx3D::Utils::SelectionManager::DIM dimension) const
+bool QtDimensionsSelectorPanel::isDimensionAllowed (Mgx3D::Internal::SelectionManager::DIM dimension) const
 {
 	return 0 == (dimension & _allowedDimensions) ? false : true;
 }	// QtDimensionsSelectorPanel::isDimensionAllowed

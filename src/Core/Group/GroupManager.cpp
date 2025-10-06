@@ -1,12 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file GroupManager.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 18/10/2012
- */
-/*----------------------------------------------------------------------------*/
 // pythonerie à mettre au début (pour permettre ifndef Py_PYTHON_H dans GroupManager.h)
 #include <set>
 /*----------------------------------------------------------------------------*/
@@ -54,7 +46,7 @@
 #include "Mesh/MeshModificationBySepa.h"
 #include "Mesh/MeshModificationByProjectionOnP0.h"
 #include "Mesh/CommandClearGroupName.h"
-
+#include "Mesh/CommandChangeGroupName.h"
 #include "SysCoord/SysCoord.h"
 
 #include "Smoothing/SurfacicSmoothing.h"
@@ -120,7 +112,6 @@ Internal::M3DCommandResult* GroupManager::clearGroup(int dim, const std::string&
     Internal::M3DCommandResult*  cmdResult   =
     		new Internal::M3DCommandResult (*command);
     return cmdResult;
-
 }
 /*----------------------------------------------------------------------------*/
 bool GroupManager::getPropagate()
@@ -156,6 +147,26 @@ std::string GroupManager::getDefaultName(int dim) const
     default:
         throw TkUtil::Exception (TkUtil::UTF8String ("dimension non prévue pour GroupManager::getDefaultName", TkUtil::Charset::UTF_8));
     }
+}
+/*----------------------------------------------------------------------------*/
+Internal::M3DCommandResult*
+GroupManager::changeGroupName(const std::string& oldName, const std::string& newName, int dim)
+{
+	Mesh::CommandChangeGroupName* command =
+			new Mesh::CommandChangeGroupName(getContext(), oldName, newName, dim);
+
+    // trace dans le script
+    TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
+    cmd << getContextAlias() << "." << "getGroupManager().changeGroupName (\""<<oldName<<"\", \""<<newName<<"\", "<<(short)dim<<")";
+    command->setScriptCommand(cmd);
+
+    // on passe au gestionnaire de commandes qui exécute la commande en // ou non
+    // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
+    getCommandManager().addCommand(command, Utils::Command::DO);
+
+    Internal::M3DCommandResult*  cmdResult   =
+    		new Internal::M3DCommandResult (*command);
+    return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
 Group3D* GroupManager::getGroup3D(const std::string& gr_name, const bool exceptionIfNotFound) const
@@ -309,10 +320,10 @@ Group0D* GroupManager::getGroup0D(const std::string& gr_name, const bool excepti
     return gr;
 }
 /*----------------------------------------------------------------------------*/
-void GroupManager::getGroups(std::vector<GroupEntity*>& grp, Utils::SelectionManager::DIM dimensions, const bool onlyLive) const
+void GroupManager::getGroups(std::vector<GroupEntity*>& grp, Internal::SelectionManager::DIM dimensions, const bool onlyLive) const
 {
 	for (int i = 0; i < 4; i++){
-		const Utils::SelectionManager::DIM dim = Utils::SelectionManager::dimensionToDimensions(i);
+		const Internal::SelectionManager::DIM dim = Internal::SelectionManager::dimensionToDimensions(i);
 		if (0 == (dimensions&dim))
 			continue;
 		switch (i)
@@ -2275,13 +2286,13 @@ void GroupManager::setLevel(std::vector<std::string>& vg, int dim, int level)
 
 }
 /*----------------------------------------------------------------------------*/
-GroupEntity* GroupManager::getGroup(const std::string& name, const int dim) const
+GroupEntity* GroupManager::getGroup(const std::string& name, const int dim, const bool exceptionIfNotFound) const
 {
     switch(dim){
-    case(3): return getGroup3D(name);
-    case(2): return getGroup2D(name);
-    case(1): return getGroup1D(name);
-    case(0): return getGroup0D(name);
+    case(3): return getGroup3D(name, exceptionIfNotFound);
+    case(2): return getGroup2D(name, exceptionIfNotFound);
+    case(1): return getGroup1D(name, exceptionIfNotFound);
+    case(0): return getGroup0D(name, exceptionIfNotFound);
     default: {
         throw TkUtil::Exception (TkUtil::UTF8String ("dimension non prévue pour GroupManager::getGroup", TkUtil::Charset::UTF_8));
     }

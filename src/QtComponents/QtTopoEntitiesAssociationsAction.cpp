@@ -52,7 +52,7 @@ QtTopoToGeomAssociationPanel::QtTopoToGeomAssociationPanel (
 			QWidget* parent,
 			QtTopoToGeomAssociationPanel::PROJECTION_METHOD method,
 			Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
-			Mgx3D::Utils::SelectionManager::DIM defaultDimensions)
+			Mgx3D::Internal::SelectionManager::DIM defaultDimensions)
 	: QtMgx3DOperationsSubPanel (parent, mainWindow),
 	  _projectionMethod (method), _topoEntitiesPanel (0),
 	  _geomEntitiesPanel (0), _projectAllCheckBox (0)
@@ -425,7 +425,7 @@ void QtTopoToGeomAssociationPanel::projectAllTopoEntitiesModifiedCallback ( )
 QtTopoEntitiesAssociationsPanel::QtTopoEntitiesAssociationsPanel (
 			QWidget* parent, const string& panelName, 
 			QtMgx3DMainWindow& mainWindow, QtMgx3DOperationAction* action,
-			Mgx3D::Utils::SelectionManager::DIM defaultDimensions)
+			Mgx3D::Internal::SelectionManager::DIM defaultDimensions)
 	: QtMgx3DOperationPanel (parent, mainWindow, action,
 			QtMgx3DApplication::HelpSystem::instance ( ).associateOperationURL,
 			QtMgx3DApplication::HelpSystem::instance ( ).associateOperationTag),
@@ -980,7 +980,7 @@ void QtTopoEntitiesAssociationsPanel::projectionMethodCallback ( )
 QtTopoEntitiesAssociationsAction::QtTopoEntitiesAssociationsAction (
 	const QIcon& icon, const QString& text, QtMgx3DMainWindow& mainWindow,
 	const QString& tooltip,
-	Mgx3D::Utils::SelectionManager::DIM defaultDimensions)
+	Mgx3D::Internal::SelectionManager::DIM defaultDimensions)
 	: QtMgx3DTopoOperationAction (icon, text, mainWindow, tooltip)
 {
 	QtTopoEntitiesAssociationsPanel*	operationPanel	=

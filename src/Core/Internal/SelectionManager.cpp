@@ -1,4 +1,5 @@
-#include "Utils/SelectionManager.h"
+#include "Internal/SelectionManager.h"
+#include "Internal/SelectionHelper.h"
 #include "Utils/Common.h"
 #include "Utils/DisplayProperties.h"
 
@@ -20,7 +21,7 @@ using namespace std;
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
-namespace Utils {
+namespace Internal {
 /*----------------------------------------------------------------------------*/
 
 
@@ -89,7 +90,7 @@ void SelectionManagerObserver::selectionCleared ( )
 }	// SelectionManagerObserver::selectionCleared
 
 
-void SelectionManagerObserver::entitiesAddedToSelection (const vector<Entity*>&)
+void SelectionManagerObserver::entitiesAddedToSelection (const vector<Utils::Entity*>&)
 {
 }	// SelectionManagerObserver::entitiesAddedToSelection
 
@@ -98,7 +99,7 @@ void SelectionManagerObserver::entitiesAddedToSelection (const vector<string>& u
 }	// SelectionManagerObserver::entitiesAddedToSelection
 
 
-void SelectionManagerObserver::entitiesRemovedFromSelection (const vector<Entity*>& entities, bool clear)
+void SelectionManagerObserver::entitiesRemovedFromSelection (const vector<Utils::Entity*>& entities, bool clear)
 {
 }	// SelectionManagerObserver::entitiesRemovedFromSelection
 
@@ -198,7 +199,7 @@ void SelectionManager::getBounds (double bounds [6])
 
 	AutoMutex	autoMutex (getMutex ( ));
 
-	for (vector<Entity*>::iterator	it = _entities.begin ( ); _entities.end ( ) != it; it++)
+	for (vector<Utils::Entity*>::iterator	it = _entities.begin ( ); _entities.end ( ) != it; it++)
 	{
 		double	entityBounds [6];
 		(*it)->getBounds (entityBounds);
@@ -217,7 +218,7 @@ bool SelectionManager::isSelectionEmpty ( ) const
 }	// SelectionManager::isSelectionEmpty
 
 
-vector<Entity*> SelectionManager::getEntities ( ) const
+vector<Utils::Entity*> SelectionManager::getEntities ( ) const
 {
 	return _entities;
 }	// SelectionManager::getMeshes
@@ -225,9 +226,9 @@ vector<Entity*> SelectionManager::getEntities ( ) const
 vector<unsigned long> SelectionManager::getEntitiesIds ( ) const
 {
 	vector<unsigned long>		ids;
-	const vector<Entity*>		entities	= getEntities ( );
+	const vector<Utils::Entity*>		entities	= getEntities ( );
 
-	for (vector<Entity*>::const_iterator it = entities.begin ( );
+	for (vector<Utils::Entity*>::const_iterator it = entities.begin ( );
 		 entities.end ( ) != it; it++)
 		ids.push_back ((*it)->getUniqueId ( ));
 
@@ -243,7 +244,7 @@ std::vector<std::string> SelectionManager::getEntitiesNames ( ) const
         return entites;
 }
 
-std::vector<Mgx3D::Utils::Entity*> SelectionManager::getEntities (Entity::objectType type) const
+std::vector<Mgx3D::Utils::Entity*> SelectionManager::getEntities (Utils::Entity::objectType type) const
 {
     std::vector<Mgx3D::Utils::Entity*> entites_filtrees;
 
@@ -255,7 +256,7 @@ std::vector<Mgx3D::Utils::Entity*> SelectionManager::getEntities (Entity::object
 }
 
 
-std::vector<std::string> SelectionManager::getEntitiesNames (Entity::objectType type) const
+std::vector<std::string> SelectionManager::getEntitiesNames (Utils::Entity::objectType type) const
 {
     std::vector<std::string> entites_filtrees;
 
@@ -267,7 +268,7 @@ std::vector<std::string> SelectionManager::getEntitiesNames (Entity::objectType 
 }
 
 
-std::vector<std::string> SelectionManager::getEntitiesNames (FilterEntity::objectType mask) const
+std::vector<std::string> SelectionManager::getEntitiesNames (Utils::FilterEntity::objectType mask) const
 {
 	std::vector<std::string> entites_filtrees;
 
@@ -279,19 +280,19 @@ std::vector<std::string> SelectionManager::getEntitiesNames (FilterEntity::objec
 }
 
 
-void SelectionManager::addToSelection (const vector<Entity*>& entities)
+void SelectionManager::addToSelection (const vector<Utils::Entity*>& entities)
 {
 	addToSelection (entities, true);
 }	// SelectionManager::addToSelection
 
 
-void SelectionManager::removeFromSelection (const vector<Entity*>& entities)
+void SelectionManager::removeFromSelection (const vector<Utils::Entity*>& entities)
 {
 	removeFromSelection (entities, true);
 }	// SelectionManager::removeFromSelection
 
 
-bool SelectionManager::isSelected (const Entity& entity) const
+bool SelectionManager::isSelected (const Utils::Entity& entity) const
 {
     // TODO [EB]: {Optimisation} partie pouvant être couteuse il me semble
     // [CP] : OPTIMISATION
@@ -301,7 +302,7 @@ bool SelectionManager::isSelected (const Entity& entity) const
 	// A priori on ne devrait pas passer ci-dessous :
 	AutoMutex	autoMutex (getMutex ( ));
 
-	for (vector<Entity*>::const_iterator it = _entities.begin ( ); _entities.end ( ) != it; it++)
+	for (vector<Utils::Entity*>::const_iterator it = _entities.begin ( ); _entities.end ( ) != it; it++)
 		if (*it == &entity)
 			return true;
 
@@ -386,7 +387,7 @@ bool SelectionManager::isRedoable ( ) const
 }	// SelectionManager::isRedoable
 
 
-void SelectionManager::addToSelection (const vector<Entity*>& entities, bool undoable)
+void SelectionManager::addToSelection (const vector<Utils::Entity*>& entities, bool undoable)
 {
 	AutoMutex	autoMutex (getMutex ( ));
 
@@ -398,13 +399,13 @@ void SelectionManager::addToSelection (const vector<Entity*>& entities, bool und
 	UTF8String   message (Charset::UTF_8);
 	message << (1 == entities.size ( ) ? "Sélection de l'entité " : "Sélection des entités ");
 
-	for (vector<Entity*>::const_iterator it = entities.begin ( ); entities.end ( ) != it; it++)
+	for (vector<Utils::Entity*>::const_iterator it = entities.begin ( ); entities.end ( ) != it; it++)
 	{
 		CHECK_NULL_PTR_ERROR (*it)
 
 		// On filtre, certaines entités peuvent être présentes 2 fois (acteurs VTK filaire + isofilaire par ex) :
-		vector<Entity*>::const_iterator itnext	= it;	itnext++;
-		vector<Entity*>::const_iterator itfound	= find (itnext, entities.end ( ), *it);
+		vector<Utils::Entity*>::const_iterator itnext	= it;	itnext++;
+		vector<Utils::Entity*>::const_iterator itfound	= find (itnext, entities.end ( ), *it);
 		if (entities.end ( ) != itfound)
 			continue;	// La dernière occurence sera ajoutée
 
@@ -439,7 +440,7 @@ void SelectionManager::addToSelection (const vector<Entity*>& entities, bool und
 }	// SelectionManager::addToSelection
 
 
-void SelectionManager::removeFromSelection (const vector<Entity*>& entities, bool undoable)
+void SelectionManager::removeFromSelection (const vector<Utils::Entity*>& entities, bool undoable)
 {
 	AutoMutex	autoMutex (getMutex ( ));
 
@@ -451,12 +452,12 @@ void SelectionManager::removeFromSelection (const vector<Entity*>& entities, boo
 	UTF8String   message (Charset::UTF_8);
 	message << (1 == entities.size ( ) ? "Désélection de l'entité " : "Désélection des entités ");
 
-	for (vector<Entity*>::const_iterator it1 = entities.begin ( ); entities.end ( ) != it1; it1++)
+	for (vector<Utils::Entity*>::const_iterator it1 = entities.begin ( ); entities.end ( ) != it1; it1++)
 	{
 		CHECK_NULL_PTR_ERROR (*it1)
 
 		bool	removed	= false;
-		for (vector<Entity*>::iterator it2 = _entities.begin ( ); _entities.end ( ) != it2; it2++)
+		for (vector<Utils::Entity*>::iterator it2 = _entities.begin ( ); _entities.end ( ) != it2; it2++)
 		{
 			if (*it1 == *it2)
 			{
@@ -504,7 +505,7 @@ void SelectionManager::clearSelection (bool undoable)
 	// effet, ceux-ci peuvent etre tentés d'effectuer des requêtes auprès de ce gestionnaire de sélection, notamment un removeFromSelection. C'est
 	// par exemple le cas d'un observateur Qt où il est difficile de savoir si l'évènement de désenregistrement provient de ce gestionnaire ou d'un 
 	// évenement au niveau de l'IHM.
-	const vector<Entity*>	unselected	= _entities;
+	const vector<Utils::Entity*>	unselected	= _entities;
 	if (0 != _entities.size ( ))
 	{
 		_entities.clear ( );
@@ -634,15 +635,15 @@ int SelectionManager::dimensionsToDimension (SelectionManager::DIM dimensions)
 }	// SelectionManager::dimensionsToDimension
 
 
-bool SelectionManager::isSelectionActivated (const Entity& e) const
+bool SelectionManager::isSelectionActivated (const Utils::Entity& e) const
 {
 	return false;
 }   // SelectionManager::isSelectionActivated
 
 
-FilterEntity::objectType SelectionManager::getFilteredTypes ( ) const
+		Utils::FilterEntity::objectType SelectionManager::getFilteredTypes ( ) const
 {
-	return FilterEntity::NoneEntity;
+	return Utils::FilterEntity::NoneEntity;
 }	// SelectionManager::getFilteredTypes
 
 
@@ -676,7 +677,7 @@ bool SelectionManager::is3DSelectionActivated ( ) const
 }	// SelectionManager::is3DSelectionActivated
 
 	
-void SelectionManager::activateSelection (SelectionManager::DIM dimensions, FilterEntity::objectType mask)
+void SelectionManager::activateSelection (SelectionManager::DIM dimensions, Utils::FilterEntity::objectType mask)
 {
 }	// SelectionManager::activate3DSelection
 
@@ -734,6 +735,47 @@ void SelectionManager::notifyObserversForNewPolicy (void* smp)
 }	// SelectionManager::notifyObserversForNewPolicy
 
 
+void SelectionManager::selectSheet(Utils::Entity* e, double* point){
+	//We need to filter to topoEntities
+	std::vector<Utils::Entity::objectType> validTypes =
+			{Utils::Entity::TopoBlock,Utils::Entity::TopoFace,Utils::Entity::TopoCoFace,
+			 Utils::Entity::TopoEdge,Utils::Entity::TopoCoEdge};
+
+	if(std::find(validTypes.begin(), validTypes.end(),e->getType()) != validTypes.end()) {
+		std::vector<Topo::TopoEntity *> topoEntities =
+				Internal::SelectionHelper::selectSheet(dynamic_cast<Topo::TopoEntity *>(e), point);
+
+		std::vector<Utils::Entity *> entities;
+		entities.reserve(topoEntities.size());
+		for (auto topoEntity: topoEntities) {
+			entities.push_back(topoEntity);
+		}
+
+		addToSelection(entities);
+	}
+	//If not topoEntity do nothing
+}
+
+void SelectionManager::selectChord(Utils::Entity* e, double* point){
+	//We need to filter to topoEntities
+	std::vector<Utils::Entity::objectType> validTypes =
+			{Utils::Entity::TopoBlock,Utils::Entity::TopoFace,Utils::Entity::TopoCoFace,
+			 Utils::Entity::TopoEdge,Utils::Entity::TopoCoEdge};
+
+	if(std::find(validTypes.begin(), validTypes.end(),e->getType()) != validTypes.end()) {
+		std::vector<Topo::TopoEntity *> topoEntities =
+				Internal::SelectionHelper::selectChord(dynamic_cast<Topo::TopoEntity *>(e), point);
+
+		std::vector<Utils::Entity *> entities;
+		entities.reserve(topoEntities.size());
+		for (auto topoEntity: topoEntities) {
+			entities.push_back(topoEntity);
+		}
+
+		addToSelection(entities);
+	}
+	//If not topoEntity do nothing
+}
 /*----------------------------------------------------------------------------*/
 } // end namespace Utils
 /*----------------------------------------------------------------------------*/

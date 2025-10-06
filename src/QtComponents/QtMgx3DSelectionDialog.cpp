@@ -24,6 +24,7 @@ using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Utils;
+using namespace Internal;
 
 
 namespace Mgx3D

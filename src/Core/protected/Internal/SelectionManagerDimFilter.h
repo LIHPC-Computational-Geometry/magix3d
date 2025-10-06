@@ -8,14 +8,14 @@
 #define SELECTION_MANAGER_DIM_FILTER_H
 
 
-#include "Utils/SelectionManager.h"
+#include "Internal/SelectionManager.h"
 
 
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 
 /*----------------------------------------------------------------------------*/
-namespace Utils {
+namespace Internal {
 
 
 /**
@@ -32,7 +32,7 @@ namespace Utils {
  * @author		Charles PIGNEROL, CEA/DAM/DSSI
  * @date		14/10/2013
  */
-class SelectionManagerDimFilter : public virtual Mgx3D::Utils::SelectionManager
+class SelectionManagerDimFilter : public virtual Mgx3D::Internal::SelectionManager
 {
 	public :
 
