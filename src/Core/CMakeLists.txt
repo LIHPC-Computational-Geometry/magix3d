@@ -106,7 +106,7 @@ endif()
 if (SEPA3D)
     target_include_directories (Core PUBLIC ${SEPARATRICE3D_INCLUDE_DIR})
 endif (SEPA3D)
-target_link_libraries (Core PUBLIC ${CORE_OPTIONAL_LIBRARIES_LIST} Mesquite::Mesquite cgns::cgns PkgConfig::GTS GMDSIg GMDSIo)
+target_link_libraries (Core PUBLIC ${CORE_OPTIONAL_LIBRARIES_LIST} Mesquite::Mesquite cgns::cgns PkgConfig::GTS GMDSIg GMDSIo GMDSAero)
 # Etre capable une fois installée de retrouver vtk*, ... :
 # (Rem : en son absence on a Set runtime path of "/tmp/pignerol/install/lib/libCore.so.5.0.0" to "") ...
 set_target_properties (Core PROPERTIES INSTALL_RPATH_USE_LINK_PATH 1)
