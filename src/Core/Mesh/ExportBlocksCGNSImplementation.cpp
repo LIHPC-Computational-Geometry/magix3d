@@ -7,16 +7,13 @@
  */
 /*----------------------------------------------------------------------------*/
 #include "Mesh/ExportBlocksCGNSImplementation.h"
-#include "Geom/Volume.h"
-#include "Geom/Surface.h"
-#include "Geom/Curve.h"
-#include "Geom/Vertex.h"
 #include "Mesh/MeshItf.h"
 #include "Mesh/Surface.h"
 /*----------------------------------------------------------------------------*/
 #include <gmds/ig/Mesh.h>
 #include <gmds/io/IGMeshIOService.h>
 #include <gmds/io/VTKWriter.h>
+#include <gmds/aero/CGNSWriter3D.h>
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
 #include <iostream>
@@ -26,8 +23,8 @@ namespace Mgx3D {
     namespace Mesh {
 /*----------------------------------------------------------------------------*/
         ExportBlocksCGNSImplementation::
-        ExportBlocksCGNSImplementation(Internal::Context& c, const std::string& n)
-                : m_context(c), m_filename(n)
+        ExportBlocksCGNSImplementation(Internal::Context& c, const std::string& filename)
+                : m_context(c), m_filename(filename)
         {}
 
 /*----------------------------------------------------------------------------*/
@@ -43,7 +40,7 @@ namespace Mgx3D {
 
             std::map<gmds::TCellID,unsigned long> n2v;
 
-            gmds::Mesh mesh(gmds::MeshModel(gmds::DIM3 | gmds::N | gmds::R | gmds::R2N | gmds::N2R));
+            gmds::Mesh mesh(gmds::MeshModel(gmds::DIM3 | gmds::N | gmds::F | gmds::R | gmds::R2N | gmds::N2R | gmds::R2F |  gmds::F2R | gmds::F2N | gmds::N2F));
 
             gmds::Mesh localMesh = m_context.getMeshManager().getMesh()->getGMDSMesh();
 
@@ -150,11 +147,15 @@ namespace Mgx3D {
                 }
             }
 
-            gmds::IGMeshIOService ioService(&mesh);
-            gmds::VTKWriter writer(&ioService);
-            writer.setCellOptions(gmds::N|gmds::R);
-            writer.setDataOptions(gmds::N|gmds::R);
-            writer.write(m_filename);
+            int position = m_filename.find_last_of('/');
+
+            m_basename = m_filename.substr(position+1, m_filename.length()-position+1);
+
+            m_path = m_filename.substr(0, position+1);
+
+            gmds::aero::CGNSWriter3D writer3D(&mesh);
+            writer3D.write("",m_basename,m_path);
+
         }
 /*----------------------------------------------------------------------------*/
     } // end namespace Topo
