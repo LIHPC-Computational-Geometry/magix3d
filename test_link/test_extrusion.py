@@ -122,7 +122,7 @@ def test_makeExtrude_groups():
     # Extrusion de Surf0000
     gm.makeExtrude (["Surf0000"], Mgx3D.Vector(0, 0, 5), False)
 
-    assert gm.getInfos("Vol0000",3).groupsName() == ['PLAN']
+    assert gm.getInfos("Vol0000",3).groups() == ['PLAN']
     assert sorted(grm.getGeomSurfaces("PLAN", 2)) == ['Surf0001', 'Surf0002', 'Surf0003', 'Surf0004']
     assert sorted(grm.getGeomSurfaces("Hors_Groupe_2D", 2)) == ['Surf0005', 'Surf0006']
     assert sorted(grm.getGeomCurves("PLAN", 1)) == ['Crb0004', 'Crb0005', 'Crb0006', 'Crb0007']
@@ -140,7 +140,7 @@ def test_makeRevol_groups():
     # Révolution de Surf0000
     gm.makeRevol (["Surf0000"], Mgx3D.RotX(120), False)
 
-    assert gm.getInfos("Vol0000",3).groupsName() == ['PLAN']
+    assert gm.getInfos("Vol0000",3).groups() == ['PLAN']
     assert sorted(grm.getGeomSurfaces("PLAN", 2)) == ['Surf0001', 'Surf0002', 'Surf0003']
     assert sorted(grm.getGeomSurfaces("Hors_Groupe_2D", 2)) == ['Surf0004', 'Surf0005']
     assert sorted(grm.getGeomCurves("PLAN", 1)) == ['Crb0004', 'Crb0005']
@@ -158,7 +158,7 @@ def test_makeRevol_groups():
     # Révolution de Surf0000
     gm.makeRevol (["Surf0000"], Mgx3D.RotX(180), False)
 
-    assert gm.getInfos("Vol0000",3).groupsName() == ['PLAN']
+    assert gm.getInfos("Vol0000",3).groups() == ['PLAN']
     assert sorted(grm.getGeomSurfaces("PLAN", 2)) == ['Surf0001', 'Surf0002', 'Surf0003']
     assert sorted(grm.getGeomSurfaces("PZ0_PLAN", 2)) == ['Surf0004', 'Surf0005']
     assert sorted(grm.getGeomCurves("PLAN", 1)) == ['Crb0004', 'Crb0005']

@@ -2510,12 +2510,29 @@ Topo::TopoInfo CoEdge::getInfos() const
 	Topo::TopoInfo infos;
 	infos.name = getName();
 	infos.dimension = getDim();
-	getVertices(infos.incident_vertices);
-	//getCoEdges(infos.incident_coedges);
-	getEdges(infos.incident_edges);
-	getCoFaces(infos.incident_cofaces);
-	getBlocks(infos.incident_blocks);
-	infos.geom_entity = getGeomAssociation();
+	if (getGeomAssociation() != 0)
+		infos.geom_entity = getGeomAssociation()->getName();
+
+    std::vector<Vertex*> vertices;
+    getVertices(vertices);
+    for (Vertex* v : vertices)
+        infos._vertices.push_back(v->getName());
+
+    std::vector<Edge*> edges;
+    getEdges(edges);
+    for (Edge* e : edges)
+    	infos._edges.push_back(e->getName());
+
+    std::vector<CoFace*> cofaces;
+	getCoFaces(cofaces);
+    for (CoFace* f : cofaces)
+        infos._cofaces.push_back(f->getName());
+
+    std::vector<Block*> blocks;
+	getBlocks(blocks);
+	for (Block* b : blocks)
+        infos._blocks.push_back(b->getName());
+
 	return infos;
 }
 /*----------------------------------------------------------------------------*/

@@ -37,16 +37,15 @@ TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const Group2D & g)
         o << " vide.";
     o << "\n";
 
-    const std::vector<Geom::Surface*>& surf = g.getSurfaces();
-    for (std::vector<Geom::Surface*>::const_iterator iter1 = surf.begin();
-            iter1 != surf.end(); ++iter1){
-        const std::vector<Topo::TopoEntity* >& topo = (*iter1)->getRefTopo();
-
-        o<<"  "<<(*iter1)->getName()<<" ->";
-        for (std::vector<Topo::TopoEntity* >::const_iterator iter2 = topo.begin();
-                iter2 != topo.end(); ++iter2)
-            o<<" "<<(*iter2)->getName();
-        o << "\n";
+    Topo::TopoManager& topo_manager = g.getContext().getTopoManager();
+    for (Geom::Surface* surf : g.getSurfaces()) {
+        const std::vector<Topo::TopoEntity*>& topos = topo_manager.getRefTopos(surf);
+        if (topos.size() > 0) {
+            o<<"  "<<surf->getName()<<" ->";
+            for (Topo::TopoEntity* te : topos)
+                o<<" "<<te->getName();
+            o << "\n";
+        }
     }
 
     return o;

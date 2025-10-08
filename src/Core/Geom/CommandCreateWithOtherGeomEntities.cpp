@@ -31,7 +31,7 @@ void CommandCreateWithOtherGeomEntities::internalUndo()
     AutoReferencedMutex autoMutex (getMutex ( ));
 
     // permute toutes les propriétés internes avec leur sauvegarde
-    m_memento_manager.permMementos();
+    m_memento_service.permMementos();
 
     // les entités détruites sont dites créées et inversement
     getInfoCommand().permCreatedDeleted();
@@ -50,7 +50,7 @@ void CommandCreateWithOtherGeomEntities::internalRedo()
     startingOrcompletionLog (true);
 
     // permute toutes les propriétés internes avec leur sauvegarde
-    m_memento_manager.permMementos();
+    m_memento_service.permMementos();
 
     // les entités détruites sont dites créées et inversement
     getInfoCommand().permCreatedDeleted();

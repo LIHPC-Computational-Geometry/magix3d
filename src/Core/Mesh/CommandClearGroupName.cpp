@@ -374,9 +374,9 @@ void CommandClearGroupName::
 updateMesh(Geom::Volume* vol, std::string grpName, bool add)
 {
     // récupération de la liste des blocs
-    std::vector<Topo::Block*>  blocs;
-    vol->get(blocs);
-    updateMesh(blocs, grpName, add);
+	Topo::TopoManager& tm = getContext().getTopoManager();
+	std::vector<Topo::Block*> blocs = tm.getFilteredRefTopos<Topo::Block>(vol);
+	updateMesh(blocs, grpName, add);
 }
 /*----------------------------------------------------------------------------*/
 void CommandClearGroupName::
@@ -443,8 +443,8 @@ void CommandClearGroupName::
 updateMesh(Geom::Surface* surf, std::string grpName, bool add)
 {
 	// récupération de la liste des CoFaces
-	std::vector<Topo::CoFace*>  cofaces;
-	surf->get(cofaces);
+	Topo::TopoManager& tm = getContext().getTopoManager();
+	std::vector<Topo::CoFace*> cofaces = tm.getFilteredRefTopos<Topo::CoFace>(surf);
 	updateMesh(cofaces, grpName, add);
 }
 /*----------------------------------------------------------------------------*/
@@ -508,9 +508,9 @@ void CommandClearGroupName::
 updateMesh(Geom::Curve* crv, std::string grpName, bool add)
 {
     // récupération de la liste des CoEdges
-    std::vector<Topo::CoEdge*>  coedges;
-    crv->get(coedges);
-    updateMesh(coedges, grpName, add);
+	Topo::TopoManager& tm = getContext().getTopoManager();
+	std::vector<Topo::CoEdge*> coedges = tm.getFilteredRefTopos<Topo::CoEdge>(crv);
+	updateMesh(coedges, grpName, add);
 }
 /*----------------------------------------------------------------------------*/
 void CommandClearGroupName::

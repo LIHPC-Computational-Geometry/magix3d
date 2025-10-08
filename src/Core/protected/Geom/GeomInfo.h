@@ -1,51 +1,33 @@
 #ifndef GEOMINFO_H_
 #define GEOMINFO_H_
-/*----------------------------------------------------------------------------*/
+
 #include <string>
 #include <vector>
-/*----------------------------------------------------------------------------*/
-namespace Mgx3D {
-/*----------------------------------------------------------------------------*/
-namespace Topo {
-class TopoEntity;
-}
-/*----------------------------------------------------------------------------*/
-namespace Geom {
-/*----------------------------------------------------------------------------*/
-class Vertex;
-class Curve;
-class Surface;
-class Volume;
-/*----------------------------------------------------------------------------*/
-class GeomInfo{
 
-public:
-    std::string name;
-    int dimension;
-    /// longueur d'une courbe, aire d'une surface, volume d'un volume
-    double area;
+namespace Mgx3D::Geom
+{
+    struct GeomInfo
+    {
+        std::string name;
+        int dimension;
+        /// longueur d'une courbe, aire d'une surface, volume d'un volume
+        double area;
+
+        std::vector<std::string> vertices() const { return _vertices; }
+        std::vector<std::string> curves() const { return _curves; }
+        std::vector<std::string> surfaces() const { return _surfaces; }
+        std::vector<std::string> volumes() const { return _volumes; }
+        std::vector<std::string> topo_entities() const { return _topo_entities; }
+        std::vector<std::string> groups() const { return _groups; }
+
 #ifndef SWIG
-    std::vector<Vertex*> incident_vertices;
-    std::vector<Curve*> incident_curves;
-    std::vector<Surface*> incident_surfaces;
-    std::vector<Volume*> incident_volumes;
-    std::vector<Topo::TopoEntity*> topo_entities;
-    std::vector<std::string> groups_name;
+        std::vector<std::string> _vertices;
+        std::vector<std::string> _curves;
+        std::vector<std::string> _surfaces;
+        std::vector<std::string> _volumes;
+        std::vector<std::string> _topo_entities;
+        std::vector<std::string> _groups;
 #endif
-
-    std::vector<std::string> vertices() const;
-    std::vector<std::string> curves() const;
-    std::vector<std::string> surfaces() const;
-    std::vector<std::string> volumes() const;
-    std::vector<std::string> topoEntities() const;
-    std::vector<std::string> groupsName() const;
-};
-/*----------------------------------------------------------------------------*/
-} // end namespace Geom
-/*----------------------------------------------------------------------------*/
-} // end namespace Mgx3D
-/*----------------------------------------------------------------------------*/
+    };
+}
 #endif /* GEOMINFO_H_ */
-
-/*----------------------------------------------------------------------------*/
-

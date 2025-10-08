@@ -13,7 +13,7 @@
 #include "Utils/Point.h"
 #include "Geom/GeomProperty.h"
 #include "Geom/GeomEntityVisitor.h"
-#include "Topo/TopoEntity.h"
+#include "Services/DescriptionService.h"
 /*----------------------------------------------------------------------------*/
 #include <gmds/math/Triangle.h>
 /*----------------------------------------------------------------------------*/
@@ -57,9 +57,6 @@ class MementoEntity;
  *
  */
 class GeomEntity : public Internal::InternalEntity{
-
-    friend class MementoManager;
-
 protected:
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur. Une entité délègue un certain nombre de calculs
@@ -95,19 +92,14 @@ public:
 	 * \param	En retour, la boite englobante définit comme suit
 	 * 			<I>(xmin, xmax, ymin, ymax, zmin, zmax)</I>.
 	 */
-#ifndef SWIG
 	virtual void getBounds (double bounds[6]) const;
-#endif	// SWIG
 
     /*------------------------------------------------------------------------*/
     /** \brief  MAJ de la propriété. Par défaut, la propriété précédente est
      *          retournée
      */
-#ifndef SWIG
     GeomProperty* setGeomProperty(GeomProperty* prop);
-#endif
 
-public:
     /*------------------------------------------------------------------------*/
     /** \brief  Calcule l'aire d'une entité:  Pour une courbe, c'est la
      *          longueur, pour une surface, l'aire, pour un volume le volume.
@@ -126,6 +118,8 @@ public:
     virtual void setArea(double area)
     {m_computedArea = area;}
 
+    void forceComputeArea() { m_computedAreaIsUpToDate = false; }
+
     /*------------------------------------------------------------------------*/
     /** \brief  Calcul de la boite englobante orientée selon les axes Ox,Oy,Oz
      *
@@ -143,9 +137,7 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès à la propriété de l'entité géométrique
      */
-#ifndef SWIG
     virtual GeomProperty* getGeomProperty() const { return m_geomProp; }
-#endif
 
 	/*------------------------------------------------------------------------*/
 	/** \return		Le type d'entité géométrique. Raccourci sur
@@ -160,60 +152,17 @@ public:
      *  \param  dr la représentation que l'on demande à afficher
      *  \param	Lève une exception si checkDestroyed vaut true
      */
-#ifndef SWIG
     virtual void getRepresentation(
 			Mgx3D::Utils::DisplayRepresentation& dr, bool checkDestroyed) const;
-#endif
 
-private:
-#ifndef SWIG
-    template<typename T>
-    void buildSerializedRepresentation(Utils::SerializedRepresentation& description, const std::string& title, 
-                                                const Utils::EntitySet<T*> elements) const;
-#endif
-
-private:
-#ifndef SWIG
-    template<typename T>
-    void buildSerializedRepresentation(Utils::SerializedRepresentation& description, const std::string& title, 
-                                                const std::vector<T*> elements) const;
-#endif
-public:
-	/*------------------------------------------------------------------------*/
+   	/*------------------------------------------------------------------------*/
 	/** \brief	Fournit une représentation textuelle de l'entité.
 	 * \param	true si l'entité fourni la totalité de sa description, false si
 	 * 			elle ne fournit que les informations non calculées (objectif :
 	 * 			optimisation)
 	 * \return	Description, à détruire par l'appelant.
 	 */
-#ifndef SWIG
-    virtual Mgx3D::Utils::SerializedRepresentation* getDescription (
-													bool alsoComputed) const;
-#endif
-
-    /*------------------------------------------------------------------------*/
-    /** Ajoute une relation vers la topologie
-     *  Il est vérifié que la relation n'y ait pas déjà
-     * */
-#ifndef SWIG
-    virtual void addRefTopo(Topo::TopoEntity* te);
-#endif
-
-    /** Enlève une relation vers la topologie
-     *  Il est vérifié que la relation y ait déjà
-     * */
-#ifndef SWIG
-    virtual void removeRefTopo(Topo::TopoEntity* te);
-#endif
-
-    /** Retourne la liste des entités topologiques référencées */
-#ifndef SWIG
-    virtual void getRefTopo(std::vector<Topo::TopoEntity* >& vte) const;
-    virtual const std::vector<Topo::TopoEntity* >& getRefTopo() const
-    { return m_topo_entities; }
-    virtual void setRefTopo(const std::vector<Topo::TopoEntity* >& vte)
-    { m_topo_entities = vte; }
-#endif
+    virtual Mgx3D::Utils::SerializedRepresentation* getDescription (bool alsoComputed) const;
 
     /*------------------------------------------------------------------------*/
     /// Retourne les noms des groupes auxquels appartient cette entité
@@ -222,18 +171,12 @@ public:
     /// Retourne la liste des groupes auxquels appartient cette entité
     virtual void getGroups(std::vector<Group::GroupEntity*>& grp) const;
 
-    /// Affecte une nouvelle liste des groupes auxquels appartient cette entité
-    virtual void setGroups(std::vector<Group::GroupEntity*>& grp);
-
     /// Retourne le nombre de groupes
     virtual int getNbGroups() const;
 
 private:
     /// Propriétés géométriques (qui peut être spécifique, PropertyBox par exemple)
     GeomProperty* m_geomProp;
-
-    /// liens vers la topologie
-    std::vector<Topo::TopoEntity* > m_topo_entities;
 
     /// pour savoir si computeArea doit être appelé
     mutable bool m_computedAreaIsUpToDate;

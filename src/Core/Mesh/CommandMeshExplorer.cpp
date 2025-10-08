@@ -156,37 +156,30 @@ selectCoFaceAndBlocks(std::map<Topo::CoFace*, uint>& filtre_coface,
     // le nombre de blocs maillés en structuré
     uint nb_blocks_marked = 0;
 
+    Topo::TopoManager& tm = getContext().getTopoManager();
     for (uint ig=0; ig<grp.size(); ig++){
     	std::vector<Geom::Volume*>& volumes = grp[ig]->getVolumes();
     	for (uint i=0; i<volumes.size(); i++){
-    		std::vector<Topo::TopoEntity* >  topos = volumes[i]->getRefTopo();
-    		for (uint j=0; j<topos.size(); j++){
-    			if (topos[j]->getDim() == 3){
-    				Topo::TopoEntity* te = topos[j];
-    				Topo::Block* blk = dynamic_cast<Topo::Block*>(te);
-    				if (blk == 0)
-    					throw TkUtil::Exception (TkUtil::UTF8String ("CommandMeshExplorer a échoué pour récupérer un bloc", TkUtil::Charset::UTF_8));
-
-    				if (blk->isStructured()){ // && blk->isMeshed()
-    					filtre_block[blk] = 1;
-    					nb_blocks_marked += 1;
+            std::vector<Topo::Block*> topos = tm.getFilteredRefTopos<Topo::Block>(volumes[i]);
+            for (Topo::Block* blk : topos) {
+                if (blk->isStructured()){ // && blk->isMeshed()
+                    filtre_block[blk] = 1;
+                    nb_blocks_marked += 1;
 #ifdef _DEBUG_EXPLORER
-    					std::cout<<"  bloc pris en compte : "<<blk->getName()<<std::endl;
+                    std::cout<<"  bloc pris en compte : "<<blk->getName()<<std::endl;
 #endif
 
-    					std::vector<Topo::CoFace* > cofaces;
+                    std::vector<Topo::CoFace* > cofaces;
 
-    					blk->getCoFaces(cofaces);
+                    blk->getCoFaces(cofaces);
 
-    					for (std::vector<Topo::CoFace* >::iterator iter1 = cofaces.begin();
-    							iter1 != cofaces.end(); ++iter1){
-    						filtre_coface[*iter1] = 1;
-    						//std::cout<<"filtre_coface à 1 pour "<<(*iter1)->getName()<<std::endl;
-    					}
+                    for (Topo::CoFace* coface : cofaces){
+                        filtre_coface[coface] = 1;
+                        //std::cout<<"filtre_coface à 1 pour "<<(coface)->getName()<<std::endl;
+                    }
 
-    				} // end if (blk->isStructured() && blk->isMeshed())
-    			} // end if (topos[j]->getDim() == 3)
-    		} // end for j
+                } // end if (blk->isStructured() && blk->isMeshed())
+            } // end for blk : topos
     	} // end for i
 
     	std::vector<Topo::Block*>& blocks = grp[ig]->getBlocks();

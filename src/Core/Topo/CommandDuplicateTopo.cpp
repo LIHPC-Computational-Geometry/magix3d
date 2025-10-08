@@ -34,14 +34,11 @@ CommandDuplicateTopo(Internal::Context& c,
 {
 	// récupération des entités topologiques référencées par la géométrie concernée par la copie
 	std::list<TopoEntity*> l_te;
-	const std::vector<Geom::GeomEntity*>& geom_entities = geom_cmd->getEntities();
-	for (std::vector<Geom::GeomEntity*>::const_iterator iter = geom_entities.begin();
-	iter != geom_entities.end(); ++iter){
-		const std::vector<Topo::TopoEntity* >& refTopo = (*iter)->getRefTopo();
-
-		l_te.insert(l_te.end(), refTopo.begin(), refTopo.end());
+    Topo::TopoManager& tm = getContext().getTopoManager();
+	for (Geom::GeomEntity* ge : geom_cmd->getEntities()){
+        const std::vector<Topo::TopoEntity* >& topos = tm.getRefTopos(ge);
+        l_te.insert(l_te.end(), topos.begin(), topos.end());
 	}
-
 
 	l_te.sort(Utils::Entity::compareEntity);
 	l_te.unique();

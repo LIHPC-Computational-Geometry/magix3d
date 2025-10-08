@@ -2,7 +2,7 @@
 #define COMMANDCREATEWITHOTHERGEOMENTITIES_H_
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandCreateGeom.h"
-#include "Geom/MementoManager.h"
+#include "Services/MementoService.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -44,7 +44,7 @@ public:
     void internalRedo();
 
 protected:
-    MementoManager m_memento_manager;
+    Services::MementoService m_memento_service;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

@@ -7,6 +7,7 @@
 /*----------------------------------------------------------------------------*/
 #include "Geom/GeomEntity.h"
 #include "Geom/GeomProperty.h"
+#include "Services/MementoService.h"
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
 /*----------------------------------------------------------------------------*/
@@ -16,10 +17,6 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Group {
 class Group1D;
-}
-namespace Topo {
-class CoEdge;
-class Vertex;
 }
 /*----------------------------------------------------------------------------*/
 namespace Geom {
@@ -33,7 +30,7 @@ class GeomProperty;
  */
 class Curve: public GeomEntity {
 
-    friend class MementoManager;
+    friend class Services::MementoService;
     static const char* typeNameGeomCurve;
 
 public:
@@ -47,10 +44,8 @@ public:
      *  \param gprop les propriétés associées à la courbe
      *  \param shape la shape OCC
      */
-#ifndef SWIG
     Curve(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
             GeomProperty* gprop, TopoDS_Edge& shape);
-#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur
@@ -61,10 +56,9 @@ public:
      *  \param gprop les propriétés associées à la courbe
      *  \param shapes les shapes OCC
      */
-#ifndef SWIG
     Curve(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
             GeomProperty* gprop, std::vector<TopoDS_Edge>& shapes);
-#endif
+
     const std::vector<TopoDS_Edge>& getOCCEdges() const { return m_occ_edges; }
 
     virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const;
@@ -103,14 +97,6 @@ public:
      *  \param pmax Les coordonnées max de la boite englobante
      */
     virtual void computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const;
-
-    /*------------------------------------------------------------------------*/
-    /// retourne la liste des arêtes topologiques communes qui pointent sur cette courbe
-    virtual void get(std::vector<Topo::CoEdge*>& coedges);
-
-    /*------------------------------------------------------------------------*/
-   /// retourne la liste des sommets topologiques qui pointent sur cette courbe
-    virtual void get(std::vector<Topo::Vertex*>& vertices);
 
     /*------------------------------------------------------------------------*/
     /** \brief Donne le point en fonction du paramètre sur la courbe
@@ -152,7 +138,6 @@ public:
      * \param l_ratios les ratios pour les paramètres entre Pt0 et Pt1
      * \param l_points les points calculés, en retour
      */
-#ifndef SWIG
     void getParametricsPoints(const Utils::Math::Point& Pt0,
             const Utils::Math::Point& Pt1,
             const uint nbPt,
@@ -170,7 +155,7 @@ public:
             double* l_ratios,
             std::vector<Utils::Math::Point> &points,
 			const Utils::Math::Point& polar_center);
-#endif
+
     /*------------------------------------------------------------------------*/
     /** \brief  Access to the first end point
      *
@@ -188,19 +173,14 @@ public:
      *
      *  \param s un pointeur sur une surface
      */
-
-#ifndef SWIG
     void add(Surface* s);
-#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief  Ajoute v comme sommet incident
      *
      *  \param v un pointeur sur un sommet
      */
-#ifndef SWIG
     void add (Vertex* v);
-#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief  Supprime s de la liste des surfaces incidentes. Si s n'apparait
@@ -208,9 +188,7 @@ public:
      *
      *  \param s un pointeur sur une surface
      */
-#ifndef SWIG
     void remove(Surface* s);
-#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief  Supprime v de la liste des sommets incidents. Si v n'apparait
@@ -218,9 +196,7 @@ public:
      *
      *  \param v un pointeur sur un sommet
      */
-#ifndef SWIG
     void remove(Vertex* v);
-#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief  Ajoute à la liste les entités de niveaux inférieurs
@@ -228,9 +204,7 @@ public:
      *
      *  \param liste d'entity
      */
-#ifndef SWIG
     virtual void addAllDownLevelEntity(std::list<GeomEntity*>& l_entity) const;
-#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief   retourne un point sur l'objet au centre si possible
@@ -260,20 +234,14 @@ public:
 
     /*------------------------------------------------------------------------*/
     /** Ajoute le groupe parmis ceux auxquels appartient la courbe */
-#ifndef SWIG
     void add(Group::Group1D* grp);
-#endif
 
     /** Retire le groupe parmis ceux auxquels appartient la courbe */
-#ifndef SWIG
     void remove(Group::Group1D* grp);
-#endif
 
     /** Recherche le groupe parmis ceux auxquels appartient la courbe
      * return vrai si trouvé */
-#ifndef SWIG
     bool find(Group::Group1D* grp);
-#endif
 
     /// Retourne les noms des groupes auxquels appartient cette entité
     virtual void getGroupsName (std::vector<std::string>& gn) const;
@@ -283,9 +251,6 @@ public:
 
     /// Retourne la liste des groupes auxquels appartient cette entité
     virtual const std::vector<Group::Group1D*>& getGroups() const {return m_groups;}
-
-    /// Affecte une nouvelle liste des groupes auxquels appartient cette entité
-    virtual void setGroups(std::vector<Group::GroupEntity*>& grp);
 
     /// Retourne le nombre de groupes
     virtual int getNbGroups() const;
@@ -303,9 +268,7 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief   détruit l'objet
      */
-#ifndef SWIG
     virtual void setDestroyed(bool b);
-#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief   indique si la courbe est un segment ou pas
@@ -326,18 +289,6 @@ public:
     /** \brief   indique si la courbe est une BSpline ou pas
      */
     bool isBSpline() const;
-
-	/*------------------------------------------------------------------------*/
-	/** \brief	Fournit une représentation textuelle de l'entité.
-	 * \param	true si l'entité fourni la totalité de sa description, false si
-	 * 			elle ne fournit que les informations non calculées (objectif :
-	 * 			optimisation)
-	 * \return	Description, à détruire par l'appelant.
-	 */
-#ifndef SWIG
-    virtual Mgx3D::Utils::SerializedRepresentation* getDescription (
-													bool alsoComputed) const;
-#endif
 
 private:
     std::vector<Surface*> m_surfaces;

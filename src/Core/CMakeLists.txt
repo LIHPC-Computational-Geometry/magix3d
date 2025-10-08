@@ -7,10 +7,10 @@ find_package (GUIToolkitsVariables REQUIRED)
 include (${GUIToolkitsVariables_CMAKE_DIR}/python_binding.cmake)
 
 file (GLOB HEADERS protected/*/*.h)
-file (GLOB CPP_SOURCES Internal/*.cpp Geom/*.cpp Topo/*.cpp Mesh/*.cpp Structured/*.cpp Group/*.cpp SysCoord/*.cpp Smoothing/*.cpp )
+file (GLOB CPP_SOURCES Internal/*.cpp Geom/*.cpp Topo/*.cpp Mesh/*.cpp Services/*.cpp Structured/*.cpp Group/*.cpp SysCoord/*.cpp Smoothing/*.cpp )
 
 # Répertoire d'en-têtes installés. Certains sont optionnels et ajoutés plus loin.
-set (HEADERS_DIRECTORIES protected/Geom protected/Group protected/Internal protected/Mesh protected/Smoothing protected/Structured protected/SysCoord protected/Topo)
+set (HEADERS_DIRECTORIES protected/Geom protected/Group protected/Internal protected/Mesh protected/Services protected/Smoothing protected/Structured protected/SysCoord protected/Topo)
 
 # On ajoute les en-têtes aux sources. C'est utile pour cmake dans certains cas,
 # par exemple lorsqu'ils doivent être pré-processés (moc, ...).

@@ -3,7 +3,7 @@
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandCreateGeom.h"
 #include "Geom/GeomModificationBaseClass.h"
-#include "Geom/MementoManager.h"
+#include "Services/MementoService.h"
 /*----------------------------------------------------------------------------*/
 #include <vector>
 /*----------------------------------------------------------------------------*/
@@ -126,7 +126,7 @@ protected:
     /** parcours les entités modifiées par l'opération géométrique et pour
      *  celles modifiées dans entities, conserve le memento associé
      */
-    void saveMementos(std::map<GeomEntity*,MementoEntity> & entities);
+    void saveMementos(std::map<GeomEntity*,Services::Memento> & entities);
 
     /*------------------------------------------------------------------------*/
     /** Copie les groupes d'une entité vers une autre (de même dimension) */
@@ -137,8 +137,7 @@ protected:
 
 
 protected:
-
-    MementoManager m_memento_manager;
+    Services::MementoService m_memento_service;
 
     /* objet gérant l'opération OCC*/
     GeomModificationBaseClass* m_impl;
