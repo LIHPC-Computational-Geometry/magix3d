@@ -1230,7 +1230,7 @@ split3(eDirOnCoFace dir, std::vector<Edge*>& edges1, std::vector<Edge*>& edges3,
 
 }
 /*----------------------------------------------------------------------------*/
-void CoFace::
+std::vector<Edge*> CoFace::
 splitOgrid(eDirOnCoFace dir,
         std::vector<Edge*>& edges0,
         std::vector<Edge*>& edges1,
@@ -1269,6 +1269,8 @@ splitOgrid(eDirOnCoFace dir,
     std::cout<<"edges2 disc en "<<edges2[0]->getNbMeshingEdges()<<" et "<<edges2[1]->getNbMeshingEdges()<<std::endl;
     std::cout<<"edges1 disc en "<<edges1[0]->getNbMeshingEdges()<<" et "<<edges1[1]->getNbMeshingEdges()<<std::endl;
 #endif
+
+    std::vector<Edge*> splitingEdges;
 
     if (edges1.size() == 2){
         // cas de la création de 3 faces en Ogrid
@@ -1472,6 +1474,9 @@ splitOgrid(eDirOnCoFace dir,
         	coface2->add(gr);
         }
 
+        splitingEdges.push_back(newEdge0);
+        splitingEdges.push_back(newEdge1);
+        splitingEdges.push_back(newEdge2);
 
     } else if (edges1.size() == 3){
         // cas de la création de 4 faces en Ogrid
@@ -1691,10 +1696,17 @@ splitOgrid(eDirOnCoFace dir,
         }
 
 
+        splitingEdges.push_back(newEdge1);
+        splitingEdges.push_back(newEdge2);
+        splitingEdges.push_back(newEdge3);
+        splitingEdges.push_back(newEdge4);
+        splitingEdges.push_back(newEdge5);
+        splitingEdges.push_back(newEdge6);
     } // end else if (edges1.size() == 3)
 
     // destruction de la face commune actuelle
     free(icmd);
+    return splitingEdges;
 }
 /*----------------------------------------------------------------------------*/
 uint CoFace::getNbVertices() const
@@ -2649,12 +2661,34 @@ Topo::TopoInfo CoFace::getInfos() const
 	Topo::TopoInfo infos;
 	infos.name = getName();
 	infos.dimension = getDim();
-	getVertices(infos.incident_vertices);
-	getCoEdges(infos.incident_coedges);
-	getEdges(infos.incident_edges);
-	getFaces(infos.incident_faces);
-	getBlocks(infos.incident_blocks);
-	infos.geom_entity = getGeomAssociation();
+	if (getGeomAssociation() != 0)
+		infos.geom_entity = getGeomAssociation()->getName();
+
+    std::vector<Vertex*> vertices;
+    getVertices(vertices);
+    for (Vertex* v : vertices)
+        infos._vertices.push_back(v->getName());
+
+    std::vector<CoEdge*> coedges;
+    getCoEdges(coedges);
+    for (CoEdge* e : coedges)
+        infos._coedges.push_back(e->getName());
+
+    std::vector<Edge*> edges;
+    getEdges(edges);
+    for (Edge* e : edges)
+    	infos._edges.push_back(e->getName());
+
+    std::vector<Face*> faces;
+	getFaces(faces);
+    for (Face* f : faces)
+        infos._faces.push_back(f->getName());
+
+    std::vector<Block*> blocks;
+	getBlocks(blocks);
+	for (Block* b : blocks)
+        infos._blocks.push_back(b->getName());
+    
 	return infos;
 }
 /*----------------------------------------------------------------------------*/

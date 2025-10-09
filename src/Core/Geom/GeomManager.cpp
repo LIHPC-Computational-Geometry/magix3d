@@ -90,6 +90,7 @@
 #include "Topo/CommandExtrudeTopo.h"
 #include "Topo/TopoHelper.h"
 #include "SysCoord/SysCoord.h"
+#include "Services/InfoService.h"
 #ifdef USE_MDLPARSER
 #include "Internal/CommandChangeLengthUnit.h"
 #endif
@@ -168,36 +169,40 @@ Geom::GeomInfo GeomManager::getInfos(std::string name, int dim)
 /*----------------------------------------------------------------------------*/
 Geom::GeomInfo GeomManager::getInfos(const GeomEntity* e)
 {
-    Geom::GeomInfo infos;
-    infos.name = e->getName();
-    infos.dimension = e->getDim();
-    infos.area = e->computeArea();
-
-    GetUpIncidentGeomEntitiesVisitor vup;
-    GetDownIncidentGeomEntitiesVisitor vdown;
-    GetAdjacentGeomEntitiesVisitor vadj;
-    e->accept(vup);
-    e->accept(vdown);
-    e->accept(vadj);
-
-	// On y ajoute les éléments géométriques en relation avec celui-ci :
-    infos.incident_vertices.insert(infos.incident_vertices.end(), vdown.getVertices().begin(), vdown.getVertices().end());
-    infos.incident_vertices.insert(infos.incident_vertices.end(), vadj.getVertices().begin(), vadj.getVertices().end());
-
-    infos.incident_curves.insert(infos.incident_curves.end(), vup.getCurves().begin(), vup.getCurves().end());
-    infos.incident_curves.insert(infos.incident_curves.end(), vdown.getCurves().begin(), vdown.getCurves().end());
-    infos.incident_curves.insert(infos.incident_curves.end(), vadj.getCurves().begin(), vadj.getCurves().end());
-
-    infos.incident_surfaces.insert(infos.incident_surfaces.end(), vup.getSurfaces().begin(), vup.getSurfaces().end());
-    infos.incident_surfaces.insert(infos.incident_surfaces.end(), vdown.getSurfaces().begin(), vdown.getSurfaces().end());
-    infos.incident_surfaces.insert(infos.incident_surfaces.end(), vadj.getSurfaces().begin(), vadj.getSurfaces().end());
-
-    infos.incident_volumes.insert(infos.incident_volumes.end(), vup.getVolumes().begin(), vup.getVolumes().end());
-    infos.incident_volumes.insert(infos.incident_volumes.end(), vadj.getVolumes().begin(), vadj.getVolumes().end());
-
-    e->getRefTopo(infos.topo_entities);
-    e->getGroupsName(infos.groups_name);
-    return infos;
+    return Services::InfoService::getInfos(e);
+}
+/*----------------------------------------------------------------------------*/
+std::string GeomManager::getTextualDescription(std::string name, int dim)
+{
+    GeomEntity* e = 0;
+    switch(dim){
+    case(0):{
+        e =getVertex(name);
+    }
+    break;
+    case(1):{
+        e =getCurve(name);
+    }
+    break;
+    case(2):{
+        e =getSurface(name);
+    }
+    break;
+    case(3):{
+        e =getVolume(name);
+    }
+    break;
+    default:{
+        throw TkUtil::Exception (TkUtil::UTF8String ("Dimension erronée", TkUtil::Charset::UTF_8));
+    }
+    break;
+    }
+    return getTextualDescription(e);
+}
+/*----------------------------------------------------------------------------*/
+std::string GeomManager::getTextualDescription(const GeomEntity* e)
+{
+    return e->getDescription(true)->toString();
 }
 /*----------------------------------------------------------------------------*/
 Utils::Math::Point GeomManager::getCoord(const std::string& name) const
@@ -217,15 +222,15 @@ copy(std::vector<std::string>& e, bool withTopo, std::string groupName)
 }
 /*----------------------------------------------------------------------------*/
 Internal::M3DCommandResult* GeomManager::
-copy(std::vector<GeomEntity*>& e, bool withTopo, std::string groupName)
+copy(std::vector<GeomEntity*>& entities, bool withTopo, std::string groupName)
 {
-	CHECK_ENTITIES_LIST(e)
+	CHECK_ENTITIES_LIST(entities)
 	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     message << "GeomManager::copy (";
-    for(unsigned int i=0;i<e.size();i++){
+    for(unsigned int i=0;i<entities.size();i++){
         if(i!=0)
             message<<", ";
-        message << e[i]->getName();
+        message << entities[i]->getName();
     }
     message<<", "<<groupName<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
@@ -233,13 +238,13 @@ copy(std::vector<GeomEntity*>& e, bool withTopo, std::string groupName)
     Internal::CommandInternal* command = 0;
 
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
-    if (withTopo && Internal::EntitiesHelper::hasTopoRef(e)){
+    if (withTopo && hasRefTopo(entities)){
 
         Internal::CommandComposite* commandCompo =
              new Internal::CommandComposite(getContext(), "Copie de géométries avec topologies");
 
         CommandGeomCopy *commandGeom =
-                new CommandGeomCopy(getContext(),e, groupName);
+                new CommandGeomCopy(getContext(), entities, groupName);
         commandCompo->addCommand(commandGeom);
 
         Topo::CommandDuplicateTopo* commandTopo =
@@ -249,14 +254,14 @@ copy(std::vector<GeomEntity*>& e, bool withTopo, std::string groupName)
         command = commandCompo;
     }
     else {
-        command = new CommandGeomCopy(getContext(),e,groupName);
+        command = new CommandGeomCopy(getContext(), entities, groupName);
     }
 
     CHECK_NULL_PTR_ERROR(command);
 
     // trace dans le script
 	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias( ) << ".getGeomManager ( ).copy (" << Internal::entitiesToPythonList<GeomEntity> (e);
+    cmd << getContextAlias( ) << ".getGeomManager ( ).copy (" << Internal::entitiesToPythonList<GeomEntity> (entities);
     if(withTopo)
         cmd <<", True,\""<<groupName<<"\")";
     else
@@ -268,10 +273,8 @@ copy(std::vector<GeomEntity*>& e, bool withTopo, std::string groupName)
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
     getCommandManager().addCommand(command, Utils::Command::DO);
 
-    Internal::M3DCommandResult*  cmdResult   =
-                                    new Internal::M3DCommandResult (*command);
+    Internal::M3DCommandResult* cmdResult = new Internal::M3DCommandResult (*command);
     return cmdResult;
-
 }
 /*----------------------------------------------------------------------------*/
 Internal::M3DCommandResult* GeomManager::
@@ -828,7 +831,7 @@ destroy(std::vector<Geom::GeomEntity*>& entities, bool propagagetDown)
     Internal::CommandInternal* command = 0;
 
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
-    if (Internal::EntitiesHelper::hasTopoRef(entities)){
+    if (hasRefTopo(entities)){
 
         Internal::CommandComposite* commandCompo =
              new Internal::CommandComposite(getContext(), "Suppression d'entités géométriques et suppression des liens topologiques");
@@ -897,7 +900,7 @@ destroyWithTopo(std::vector<Geom::GeomEntity*>& entities, bool propagagetDown)
     Internal::CommandInternal* command = 0;
 
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
-    if (Internal::EntitiesHelper::hasTopoRef(entities)){
+    if (hasRefTopo(entities)){
 
         Internal::CommandComposite* commandCompo =
              new Internal::CommandComposite(getContext(), "Suppression d'entités géométriques et suppression des entités topologiques dépendantes");
@@ -974,7 +977,7 @@ scale(std::vector<Geom::GeomEntity*>& entities, const double factor, const Point
     Internal::CommandInternal* command = 0;
     Geom::CommandEditGeom *commandGeom = 0;
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
-    if (Internal::EntitiesHelper::hasTopoRef(entities)){
+    if (hasRefTopo(entities)){
 
         Internal::CommandComposite* commandCompo =
              new Internal::CommandComposite(getContext(), "Homothétie d'une géométrie avec sa topologie");
@@ -1098,7 +1101,7 @@ scale(std::vector<Geom::GeomEntity*>& entities,
     Internal::CommandInternal* command = 0;
     Geom::CommandEditGeom *commandGeom = 0;
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
-    if (Internal::EntitiesHelper::hasTopoRef(entities)){
+    if (hasRefTopo(entities)){
 
         Internal::CommandComposite* commandCompo =
              new Internal::CommandComposite(getContext(), "Homothétie d'une géométrie avec sa topologie");
@@ -1219,7 +1222,7 @@ copyAndScale(std::vector<Geom::GeomEntity*>& entities, const double factor, cons
     Internal::CommandComposite* command = 0;
 
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
-    if (withTopo && Internal::EntitiesHelper::hasTopoRef(entities)){
+    if (withTopo && hasRefTopo(entities)){
 
     	command =
     			new Internal::CommandComposite(getContext(), "Homothétie d'une copie d'une géométrie avec sa topologie");
@@ -1374,7 +1377,7 @@ copyAndScale(std::vector<Geom::GeomEntity*>& entities,
     Internal::CommandComposite* command = 0;
 
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
-    if (withTopo && Internal::EntitiesHelper::hasTopoRef(entities)){
+    if (withTopo && hasRefTopo(entities)){
     	command =
     			new Internal::CommandComposite(getContext(), "Homothétie d'une copie d'une géométrie avec sa topologie");
 
@@ -1513,7 +1516,7 @@ mirror(std::vector<Geom::GeomEntity*>& entities, Utils::Math::Plane* plane)
     Internal::CommandInternal* command = 0;
     Geom::CommandEditGeom *commandGeom = 0;
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
-    if (Internal::EntitiesHelper::hasTopoRef(entities)){
+    if (hasRefTopo(entities)){
 
         Internal::CommandComposite* commandCompo =
              new Internal::CommandComposite(getContext(), "Symétrie d'une géométrie avec sa topologie");
@@ -1577,7 +1580,7 @@ copyAndMirror(std::vector<Geom::GeomEntity*>& entities, Utils::Math::Plane* plan
     Internal::CommandComposite* command = 0;
 
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
-    if (withTopo && Internal::EntitiesHelper::hasTopoRef(entities)){
+    if (withTopo && hasRefTopo(entities)){
 
     	command =
                 new Internal::CommandComposite(getContext(), "Symétrie d'une copie d'une géométrie avec sa topologie");
@@ -2406,7 +2409,7 @@ translate(std::vector<GeomEntity*>& entities, const Vector& dp)
     Internal::CommandInternal* command = 0;
     Geom::CommandEditGeom *commandGeom = 0;
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
-    if (Internal::EntitiesHelper::hasTopoRef(entities)){
+    if (hasRefTopo(entities)){
 
         Internal::CommandComposite* commandCompo =
              new Internal::CommandComposite(getContext(), "Translation d'une géométrie avec sa topologie");
@@ -2497,7 +2500,7 @@ copyAndTranslate(std::vector<GeomEntity*>& entities, const Vector& dp, bool with
     Internal::CommandComposite* command = 0;
 
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
-    if (withTopo && Internal::EntitiesHelper::hasTopoRef(entities)){
+    if (withTopo && hasRefTopo(entities)){
 
     	command =
     			new Internal::CommandComposite(getContext(), "Translation d'une copie d'une géométrie avec sa topologie");
@@ -2615,7 +2618,7 @@ joinCurves(std::vector<GeomEntity*>& entities)
     Internal::CommandInternal* command = 0;
 
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
-    if (Internal::EntitiesHelper::hasTopoRef(entities)){
+    if (hasRefTopo(entities)){
 
         Internal::CommandComposite* commandCompo =
              new Internal::CommandComposite(getContext(), "Fusion de courbes avec maj de la topologie");
@@ -2679,7 +2682,7 @@ joinSurfaces(std::vector<GeomEntity*>& entities)
     Internal::CommandInternal* command = 0;
 
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
-    if (Internal::EntitiesHelper::hasTopoRef(entities))
+    if (hasRefTopo(entities))
     {
         Internal::CommandComposite* commandCompo =
              new Internal::CommandComposite(getContext(), "Fusion de surfaces avec maj de la topologie");
@@ -2747,7 +2750,7 @@ rotate( std::vector<GeomEntity*>& entities, const Utils::Math::Rotation& rot)
     Internal::CommandInternal* command = 0;
 
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
-    if (Internal::EntitiesHelper::hasTopoRef(entities)){
+    if (hasRefTopo(entities)){
 
         Internal::CommandComposite* commandCompo =
              new Internal::CommandComposite(getContext(), "Rotation d'une géométrie avec sa topologie");
@@ -2848,7 +2851,7 @@ copyAndRotate( std::vector<GeomEntity*>& entities,
     Internal::CommandComposite* command = 0;
 
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
-    if (withTopo && Internal::EntitiesHelper::hasTopoRef(entities)){
+    if (withTopo && hasRefTopo(entities)){
 
     	command =
     			new Internal::CommandComposite(getContext(), "Rotation d'une copie d'une géométrie avec sa topologie");
@@ -3010,7 +3013,7 @@ makeExtrude( std::vector<GeomEntity*>& entities,
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias ( ) << ".getGeomManager ( ).makeExtrude (" << Internal::entitiesToPythonList<GeomEntity> (entities) << dp.getScriptCommand ( ) << ", " << (keep ? "True":"False") << ")";
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).makeExtrude (" << Internal::entitiesToPythonList<GeomEntity> (entities) << ", " <<dp.getScriptCommand ( ) << ", " << (keep ? "True":"False") << ")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -3043,7 +3046,7 @@ makeBlocksByExtrude(std::vector<GeomEntity*>& entities, const Utils::Math::Vecto
     Internal::CommandInternal* command = 0;
 
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
-    if (Internal::EntitiesHelper::hasTopoRef(entities))
+    if (hasRefTopo(entities))
     {
         Internal::CommandComposite* commandCompo =
              new Internal::CommandComposite(getContext(), "Création d'une topologie par extrusion");
@@ -3113,7 +3116,7 @@ fuse(std::vector<GeomEntity*>& entities)
     Internal::CommandInternal* command = 0;
     Geom::CommandEditGeom *commandGeom = 0;
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
-    if (Internal::EntitiesHelper::hasTopoRef(entities)){
+    if (hasRefTopo(entities)){
 
         Internal::CommandComposite* commandCompo =
              new Internal::CommandComposite(getContext(), "Fusion booléenne entre géométries avec topologies");
@@ -3173,7 +3176,7 @@ common(std::vector<Geom::GeomEntity*>& entities)
     Internal::CommandInternal* command = 0;
     Geom::CommandEditGeom *commandGeom = 0;
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
-    if (Internal::EntitiesHelper::hasTopoRef(entities)){
+    if (hasRefTopo(entities)){
 
         Internal::CommandComposite* commandCompo =
              new Internal::CommandComposite(getContext(), "Intersection booléenne entre géométries avec topologies");
@@ -3223,7 +3226,7 @@ common2D(Geom::GeomEntity* entity1, Geom::GeomEntity* entity2, std::string group
     std::vector<Geom::GeomEntity*> entities;
     entities.push_back(entity1);
     entities.push_back(entity2);
-    if (Internal::EntitiesHelper::hasTopoRef(entities)){
+    if (hasRefTopo(entities)){
 
         Internal::CommandComposite* commandCompo =
              new Internal::CommandComposite(getContext(), "Intersection booléenne entre 2 géométries 1D ou 2D avec topologies");
@@ -4081,7 +4084,7 @@ cut(Geom::GeomEntity* tokeep, std::vector<Geom::GeomEntity*>& tocut)
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
     std::vector<Geom::GeomEntity*> tokeeps;
     tokeeps.push_back(tokeep);
-    if (Internal::EntitiesHelper::hasTopoRef(tokeeps)){
+    if (hasRefTopo(tokeeps)){
 
         Internal::CommandComposite* commandCompo =
              new Internal::CommandComposite(getContext(), "Différences entre géométries avec topologies");
@@ -4160,7 +4163,7 @@ cut(std::vector<Geom::GeomEntity*>& tokeep,
          new Internal::CommandComposite(getContext(), "Différences entre géométries avec plusieurs entités à couper");
 
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
-    if (Internal::EntitiesHelper::hasTopoRef(tokeep)){
+    if (hasRefTopo(tokeep)){
     	for(unsigned int i=0;i<tokeep.size();i++)
     	{
     		commandGeom = new CommandCut(getContext(),tokeep[i], tocut);
@@ -4223,7 +4226,7 @@ Internal::M3DCommandResult* GeomManager::glue( std::vector<Geom::GeomEntity*>& e
     Internal::CommandInternal* command = 0;
 
     // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
-    if (Internal::EntitiesHelper::hasTopoRef(entities)){
+    if (hasRefTopo(entities)){
 
         Internal::CommandComposite* commandCompo =
              new Internal::CommandComposite(getContext(), "Collage entre géométries avec topologies");
@@ -4285,7 +4288,7 @@ Internal::M3DCommandResult* GeomManager::section( std::vector<Geom::GeomEntity*>
 
     if(entities.size()==1){
         // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
-        if (Internal::EntitiesHelper::hasTopoRef(entities)){
+        if (hasRefTopo(entities)){
 
             Internal::CommandComposite* commandCompo =
                     new Internal::CommandComposite(getContext(), "Section par un plan entre géométries avec topologies");
@@ -4307,7 +4310,7 @@ Internal::M3DCommandResult* GeomManager::section( std::vector<Geom::GeomEntity*>
     }
     else{
         // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
-        if (Internal::EntitiesHelper::hasTopoRef(entities)){
+        if (hasRefTopo(entities)){
 
             Internal::CommandComposite* commandCompo=
                  new Internal::CommandComposite(getContext(), "Section entre géométries avec topologies");
@@ -4405,7 +4408,7 @@ sectionByPlane( std::vector<Geom::GeomEntity*>& entities,
 
     Internal::CommandInternal* command = 0;
 
-    if (Internal::EntitiesHelper::hasTopoRef(entities)){
+    if (hasRefTopo(entities)){
 
     	Internal::CommandComposite* commandCompo =
     			new Internal::CommandComposite(getContext(), "Section par un plan entre géométries avec topologies");
@@ -5289,6 +5292,25 @@ convert(std::vector<std::string>& names, std::vector<GeomEntity*>& entities)
 {
 	for (uint i=0; i<names.size(); i++)
 		entities.push_back(getEntity(names[i], true));
+}
+/*----------------------------------------------------------------------------*/
+bool GeomManager::
+hasRefTopo(std::vector<Geom::GeomEntity*>& entities)
+{
+    Topo::TopoManager& tm = getContext().getTopoManager();
+    for (uint i=0; i<entities.size(); i++){
+        if (tm.getRefTopos(entities[i]).size() > 0)
+            return true;
+
+		Geom::GetDownIncidentGeomEntitiesVisitor v;
+		entities[i]->accept(v);
+		for (auto sub_entity : v.get())
+			if (tm.getRefTopos(sub_entity).size() > 0)
+				return true;
+
+    } // end for i<entities.size()
+
+    return false;
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

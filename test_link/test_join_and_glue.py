@@ -19,8 +19,8 @@ def test_join_surfaces():
     assert "Surf0003" not in gm.getSurfaces()
     assert "Surf0009" not in gm.getSurfaces()
     assert "Surf0012" in gm.getSurfaces()
-    assert "Surf0012" == tm.getInfos("Fa0003", 2).geomEntity()
-    assert "Surf0012" == tm.getInfos("Fa0009", 2).geomEntity()
+    assert "Surf0012" == tm.getInfos("Fa0003", 2).geom_entity
+    assert "Surf0012" == tm.getInfos("Fa0009", 2).geom_entity
 
 def test_glue_with_joined_surfaces(capfd):
     ctx = Mgx3D.getStdContext()

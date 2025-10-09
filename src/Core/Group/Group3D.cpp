@@ -38,16 +38,15 @@ TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const Group3D & g)
         o << " vide.";
     o << "\n";
 
-    const std::vector<Geom::Volume*>& vol = g.getVolumes();
-    for (std::vector<Geom::Volume*>::const_iterator iter1 = vol.begin();
-            iter1 != vol.end(); ++iter1){
-        const std::vector<Topo::TopoEntity* >& topo = (*iter1)->getRefTopo();
-
-        o<<"  "<<(*iter1)->getName()<<" ->";
-        for (std::vector<Topo::TopoEntity* >::const_iterator iter2 = topo.begin();
-                iter2 != topo.end(); ++iter2)
-            o<<" "<<(*iter2)->getName();
-        o << "\n";
+    Topo::TopoManager& topo_manager = g.getContext().getTopoManager();
+    for (Geom::Volume* vol : g.getVolumes()) {
+        const std::vector<Topo::TopoEntity*>& topos = topo_manager.getRefTopos(vol);
+        if (topos.size() > 0) {
+            o<<"  "<<vol->getName()<<" ->";
+            for (Topo::TopoEntity* te : topos)
+                o<<" "<<te->getName();
+            o << "\n";
+        }
     }
 
     return o;

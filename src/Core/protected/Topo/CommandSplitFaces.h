@@ -19,68 +19,50 @@ class CommandSplitFaces: public Topo::CommandEditTopo {
 public:
 
     /*------------------------------------------------------------------------*/
-    /** \brief  Constructeur pour découper une liste de faces (dont on ne garde que celles 2D structurées)
+    /** \brief  Constructeur pour découper une liste de faces (dont on ne garde que celles structurées)
      *
      *  \param c le contexte
      *  \param cofaces les faces communes à découper
      *  \param arete l'arête qui sert à déterminer la direction de la coupe structurée
      *  \param ratio_dec un paramètre pour déterminer la position du sommet sur l'arête
      *  \param ratio_ogrid un autre paramètre pour positionner le sommet du ogrid en cas de rencontre avec une face dégénérée
+     *  \param project_on_meshing_edges activation ou non de la projection des sommets issus de la coupe sur la discrétisation initiale
      */
-    CommandSplitFaces(Internal::Context& c, std::vector<Topo::CoFace* > &cofaces, CoEdge* arete, double ratio_dec, double ratio_ogrid);
+    CommandSplitFaces(Internal::Context& c, std::vector<Topo::CoFace* > &cofaces, CoEdge* arete, double ratio_dec, double ratio_ogrid, bool project_on_meshing_edges=true);
 
     /*------------------------------------------------------------------------*/
-    /** \brief  Constructeur pour découper une liste de faces (dont on ne garde que celles 2D structurées)
+    /** \brief  Constructeur pour découper une liste de faces (dont on ne garde que celles structurées)
      *
      *  \param c le contexte
      *  \param cofaces les faces communes à découper
      *  \param arete l'arête qui sert à déterminer la direction de la coupe structurée
      *  \param pt un point qui donnera un paramètre pour déterminer la position du sommet sur l'arête par projection sur cette dernière
      *  \param ratio_ogrid un autre paramètre pour positionner le sommet du ogrid en cas de rencontre avec une face dégénérée
+     *  \param project_on_meshing_edges activation ou non de la projection des sommets issus de la coupe sur la discrétisation initiale
      */
-    CommandSplitFaces(Internal::Context& c, std::vector<Topo::CoFace* > &cofaces, CoEdge* arete, const Utils::Math::Point& pt, double ratio_ogrid);
+    CommandSplitFaces(Internal::Context& c, std::vector<Topo::CoFace* > &cofaces, CoEdge* arete, const Utils::Math::Point& pt, double ratio_ogrid, bool project_on_meshing_edges=true);
 
     /*------------------------------------------------------------------------*/
-    /** \brief  Constructeur pour découper toutes les faces 2D structurées disponibles
+    /** \brief  Constructeur pour découper toutes les faces structurées disponibles
      *
      *  \param c le contexte
      *  \param arete l'arête qui sert à déterminer la direction de la coupe structurée
      *  \param ratio_dec un paramètre pour déterminer la position du sommet sur l'arête
      *  \param ratio_ogrid un autre paramètre pour positionner le sommet du ogrid en cas de rencontre avec une face dégénérée
+     *  \param project_on_meshing_edges activation ou non de la projection des sommets issus de la coupe sur la discrétisation initiale
      */
-    CommandSplitFaces(Internal::Context& c, CoEdge* arete, double ratio_dec, double ratio_ogrid);
+    CommandSplitFaces(Internal::Context& c, CoEdge* arete, double ratio_dec, double ratio_ogrid, bool project_on_meshing_edges=true);
 
     /*------------------------------------------------------------------------*/
-    /** \brief  Constructeur pour découper toutes les faces 2D structurées disponibles
+    /** \brief  Constructeur pour découper toutes les faces structurées disponibles
      *
      *  \param c le contexte
      *  \param arete l'arête qui sert à déterminer la direction de la coupe structurée
      *  \param pt un point qui donnera un paramètre pour déterminer la position du sommet sur l'arête par projection sur cette dernière
      *  \param ratio_ogrid un autre paramètre pour positionner le sommet du ogrid en cas de rencontre avec une face dégénérée
-     */
-    CommandSplitFaces(Internal::Context& c, CoEdge* arete, const Utils::Math::Point& pt, double ratio_ogrid);
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Constructeur pour une face (2D ou 3D) à découper
-     *
-     *  \param c le contexte
-     *  \param coface la face commune à découper
-     *  \param arete celle qui sert à déterminer la direction de la coupe structurée
-     *  \param ratio_dec un paramètre pour déterminer la position du sommet sur l'arête
      *  \param project_on_meshing_edges activation ou non de la projection des sommets issus de la coupe sur la discrétisation initiale
      */
-    CommandSplitFaces(Internal::Context& c, CoFace*  coface, CoEdge* coedge, double ratio_dec,  bool project_on_meshing_edges);
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Constructeur pour une face (2D ou 3D) à découper
-     *
-     *  \param c le contexte
-     *  \param coface la face commune à découper
-     *  \param arete celle qui sert à déterminer la direction de la coupe structurée
-     *  \param pt un point qui donnera un paramètre pour déterminer la position du sommet sur l'arête par projection sur cette dernière
-     *  \param project_on_meshing_edges activation ou non de la projection des sommets issus de la coupe sur la discrétisation initiale
-     */
-    CommandSplitFaces(Internal::Context& c, CoFace*  coface, CoEdge* coedge, const Utils::Math::Point& pt,  bool project_on_meshing_edges);
+    CommandSplitFaces(Internal::Context& c, CoEdge* arete, const Utils::Math::Point& pt, double ratio_ogrid, bool project_on_meshing_edges=true);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur
@@ -105,13 +87,13 @@ public:
     virtual void getPreviewRepresentation(Utils::DisplayRepresentation& dr);
 
 private:
-    /// stocke les faces communes 2D structurées parmi celles données en paramètre
-    void init2D(std::vector<Topo::CoFace* > &cofaces);
+    /// stocke les faces communes structurées parmi celles données en paramètre
+    void init(std::vector<Topo::CoFace* > &cofaces);
 
     /// Vérification de la face topologique (pas d'arête colinéaires ...)
     void verif(Topo::CoFace* coface);
 
-    /// les faces communes 2D structurées à découper
+    /// les faces communes structurées à découper
     std::vector<CoFace* > m_cofaces;
 
     /// l'arête qui sert à déterminer la direction de la coupe structurée
@@ -125,6 +107,11 @@ private:
 
     /// activation ou non de la projection des sommets créés sur la discrétisation initiale
     bool m_project_on_meshing_edges;
+
+    bool
+    findFaceUnmarkedWithVertexMarked(std::set<CoFace *> &filtre_faces, std::set<Vertex *> &filtre_vertices,
+                                     CoFace *&face,
+                                     Vertex *&noeud);
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo

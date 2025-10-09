@@ -32,9 +32,9 @@ internalExecute()
             << *m_p2<< ", center "<<*m_center<<".";
 
     // sauvegarde des relations (connections topologiques) avant modification
-    m_memento_manager.saveMemento(m_p1);
-    m_memento_manager.saveMemento(m_p2);
-    m_memento_manager.saveMemento(m_center);
+    m_memento_service.saveMemento(m_p1);
+    m_memento_service.saveMemento(m_p2);
+    m_memento_service.saveMemento(m_center);
 
     Curve* c = EntityFactory(getContext()).newEllipse(m_p1,m_p2,m_center);
     m_createdEntities.push_back(c);

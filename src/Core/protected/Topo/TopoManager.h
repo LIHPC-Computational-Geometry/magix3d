@@ -1,15 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file TopoManager.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 2/12/2010
- *
- *  Modified on: 23/02/2022
- *      Author: Simon C
- *      ajout de la fonction de création de blocs par extrusion de faces topologiques
- */
-/*----------------------------------------------------------------------------*/
 #ifndef TOPO_MANAGER_H_
 #define TOPO_MANAGER_H_
 /*----------------------------------------------------------------------------*/
@@ -821,21 +810,21 @@ public:
 #endif
 
     /*------------------------------------------------------------------------*/
-    /** \brief Découpe des faces structurées 2D en deux
+    /** \brief Découpe des faces structurées en deux
      *
      *  On utilise une arête et un ratio pour positionner un premier sommet
      *  qui va être inséré sur l'arête.
      *  Les autres arêtes parallèles sont aussi découpées avec le même ratio.
-     *  Si ratio_ogrid vaut 0, alors le tracé de l'ogrid peut passer par l'axe si une face n'a que 3 côté,
+     *  Si ratio_ogrid vaut 0, alors le tracé de l'ogrid peut passer par l'axe si une face n'a que 3 côtés,
      *  sinon on découpe la face en 3 (ogrid en 2D) avec un sommet placé avec ce ratio entre le sommet dans
      *  le prolongement sur l'axe et le sommet à l'entrée dans la face.
      */
     Mgx3D::Internal::M3DCommandResult*
-        splitFaces(std::vector<std::string> &cofaces_names, std::string narete, const double& ratio_dec, const double& ratio_ogrid);
+        splitFaces(std::vector<std::string> &cofaces_names, std::string narete, const double& ratio_dec, const double& ratio_ogrid,  bool project_on_meshing_edge = true);
 
 #ifndef SWIG
     Mgx3D::Internal::M3DCommandResult*
-        splitFaces(std::vector<Topo::CoFace* > &cofaces, CoEdge* arete, const double& ratio_dec, const double& ratio_ogrid);
+        splitFaces(std::vector<Topo::CoFace* > &cofaces, CoEdge* arete, const double& ratio_dec, const double& ratio_ogrid, bool project_on_meshing_edge);
 #endif
 
     /** \brief Découpe des faces structurées 2D en deux suivant un point à projeter
@@ -848,36 +837,38 @@ public:
      *  le prolongement sur l'axe et le sommet à l'entrée dans la face.
      */
     Mgx3D::Internal::M3DCommandResult*
-        splitFaces(std::vector<std::string> &cofaces_names, std::string narete, const Point& pt, const double& ratio_ogrid);
+        splitFaces(std::vector<std::string> &cofaces_names, std::string narete, const Point& pt, const double& ratio_ogrid, bool project_on_meshing_edge = true);
 
 #ifndef SWIG
     Mgx3D::Internal::M3DCommandResult*
-        splitFaces(std::vector<Topo::CoFace* > &cofaces, CoEdge* arete, const Point& pt, const double& ratio_ogrid);
+        splitFaces(std::vector<Topo::CoFace* > &cofaces, CoEdge* arete, const Point& pt, const double& ratio_ogrid, bool project_on_meshing_edge);
 #endif
 
     /** \brief Découpe toutes les faces structurées 2D en deux
      * \see splitFaces
      */
     Mgx3D::Internal::M3DCommandResult*
-        splitAllFaces(std::string narete, const double& ratio_dec, const double& ratio_ogrid);
+        splitAllFaces(std::string narete, const double& ratio_dec, const double& ratio_ogrid, bool project_on_meshing_edge = true);
 
 #ifndef SWIG
     Mgx3D::Internal::M3DCommandResult*
-        splitAllFaces(CoEdge* arete, const double& ratio_dec, const double& ratio_ogrid);
+        splitAllFaces(CoEdge* arete, const double& ratio_dec, const double& ratio_ogrid, bool project_on_meshing_edge);
 #endif
 
-    /** \brief Découpe toutes les faces structurées 2D en deux suivant un point à projeter
+    /** \brief Découpe toutes les faces structurées en deux suivant un point à projeter
      * \see splitFaces
      */
     Mgx3D::Internal::M3DCommandResult*
-        splitAllFaces(std::string narete, const Point& pt, const double& ratio_ogrid);
+        splitAllFaces(std::string narete, const Point& pt, const double& ratio_ogrid, bool project_on_meshing_edge = true);
 
 #ifndef SWIG
     Mgx3D::Internal::M3DCommandResult*
-        splitAllFaces(CoEdge* arete, const Point& pt, const double& ratio_ogrid);
+        splitAllFaces(CoEdge* arete, const Point& pt, const double& ratio_ogrid, bool project_on_meshing_edge);
 #endif
 
     /** \brief Découpage d'une face structurée 2D ou 3D en deux suivant un ratio
+     *
+     *	OBSOLETE: Issue201 - Homogénéisation de l'API : utiliser splitFaces
      *
      *  On utilise une arête et un ratio pour positionner un premier sommet
      *  qui va être inséré sur l'arête.
@@ -893,12 +884,14 @@ public:
 
     /** \brief Découpage d'une face structurée 2D ou 3D en deux suivant un point à projeter
      *
+     *	OBSOLETE: Issue201 - Homogénéisation de l'API : utiliser splitFaces
+     *
      *  On utilise une arête et un point que l'on projette sur cette arête pour positionner un premier sommet
      *  qui va être inséré sur l'arête.
      *  L'autre arête parallèle est aussi découpée avec le même ratio induit de la première coupe.
      */
     Mgx3D::Internal::M3DCommandResult*
-        splitFace(std::string coface_name, std::string narete, const Point& pt, bool project_on_meshing_edges = true);
+        splitFace(std::string coface_name, std::string narete, const Point& pt, bool project_on_meshing_edges);
 
 #ifndef SWIG
     Mgx3D::Internal::M3DCommandResult*
@@ -1896,6 +1889,30 @@ public:
     alignVerticesOnSurface(Geom::GeomEntity* surface, Vertex* vertex, const Point &pnt1, const Point &pnt2);
 #endif
 
+#ifndef SWIG
+    /// Retourne les entités topologiques associées, léve une exception si aucune
+    const std::vector<TopoEntity*>& getRefTopos(const Geom::GeomEntity* ge);
+    /// Ajoute une association Geom-->Topo
+    void addRefTopo(const Geom::GeomEntity* ge, TopoEntity* te);
+    /// Positionne les associations Geom-->Topo
+    void setRefTopos(const Geom::GeomEntity* ge, const std::vector<TopoEntity*>& tes);
+    /// Enlève une association Geom-->Topo
+    void removeRefTopo(const Geom::GeomEntity* ge, TopoEntity* te);
+    /// Retourne les entités topologiques filtrées, léve une exception si aucune
+    template <class T>
+    std::vector<T*> getFilteredRefTopos(const Geom::GeomEntity* ge)
+    {
+        static_assert(std::is_base_of<Topo::TopoEntity, T>::value, "T doit hériter de TopoEntity");
+        std::vector<T*> result;
+        for (Topo::TopoEntity* te : getRefTopos(ge)) {
+            if (T* casted = dynamic_cast<T*>(te)) {
+                result.push_back(casted);
+            }
+        }
+        return result;
+    }
+#endif
+
 private:
     /** Recherche un vecteur d'entités topologiques suivant leur nom,
      *  lève une exception en cas d'erreur.
@@ -1926,6 +1943,9 @@ private:
 
     /// Nombre de bras par défaut pour une arête
     int m_defaultNbMeshingEdges;
+
+    /// Relation Geom --> Topo
+    std::map<const Geom::GeomEntity*, std::vector<Topo::TopoEntity*>> m_geom_associations;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo

@@ -6,9 +6,6 @@
 #include "Geom/OCCHelper.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomProjectImplementation.h"
-#include "Topo/CoFace.h"
-#include "Topo/CoEdge.h"
-#include "Topo/Vertex.h"
 #include "Group/Group2D.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
@@ -264,17 +261,6 @@ void Surface::getGroups(std::vector<Group::GroupEntity*>& grp) const
     grp.insert(grp.end(), m_groups.begin(), m_groups.end());
 }
 /*----------------------------------------------------------------------------*/
-void Surface::setGroups(std::vector<Group::GroupEntity*>& grp)
-{
-	m_groups.clear();
-	for (std::vector<Group::GroupEntity*>::iterator iter = grp.begin(); iter != grp.end(); iter++){
-		Group::Group2D* g2 = dynamic_cast<Group::Group2D*>(*iter);
-		if (g2 == 0)
-			throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne avec conversion en groupe local dans setGroups", TkUtil::Charset::UTF_8));
-		m_groups.push_back(g2);
-	}
-}
-/*----------------------------------------------------------------------------*/
 int Surface::getNbGroups() const
 {
     return m_groups.size();
@@ -320,92 +306,6 @@ Utils::Math::Point Surface::getPoint(const double u, const double v) const
 	}
 
     throw TkUtil::Exception (TkUtil::UTF8String ("Parametre u hors de la plage [UMIN, UMAX]", TkUtil::Charset::UTF_8));
-}
-/*----------------------------------------------------------------------------*/
-void Surface::get(std::vector<Topo::CoFace*>& cofaces)
-{
-	const std::vector<Topo::TopoEntity* >& topos = getRefTopo();
-
-	for (std::vector<Topo::TopoEntity* >::const_iterator iter = topos.begin();
-			iter != topos.end(); ++iter)
-		if ((*iter)->getDim() == 2){
-			Topo::CoFace* coface = dynamic_cast<Topo::CoFace*>(*iter);
-			if (coface)
-				cofaces.push_back(coface);
-		}
-}
-/*----------------------------------------------------------------------------*/
-void Surface::get(std::vector<Topo::CoEdge*>& coedges)
-{
-	const std::vector<Topo::TopoEntity* >& topos = getRefTopo();
-
-	for (std::vector<Topo::TopoEntity* >::const_iterator iter = topos.begin();
-			iter != topos.end(); ++iter)
-		if ((*iter)->getDim() == 1){
-			Topo::CoEdge* coedge = dynamic_cast<Topo::CoEdge*>(*iter);
-			if (coedge)
-				coedges.push_back(coedge);
-		}
-}
-/*----------------------------------------------------------------------------*/
-void Surface::get(std::vector<Topo::Vertex*>& vertices)
-{
-	const std::vector<Topo::TopoEntity* >& topos = getRefTopo();
-
-	for (std::vector<Topo::TopoEntity* >::const_iterator iter = topos.begin();
-			iter != topos.end(); ++iter)
-		if ((*iter)->getDim() == 0){
-			Topo::Vertex* vertex = dynamic_cast<Topo::Vertex*>(*iter);
-			if (vertex)
-				vertices.push_back(vertex);
-		}
-}
-/*----------------------------------------------------------------------------*/
-Utils::SerializedRepresentation* Surface::getDescription (bool alsoComputed) const
-{
-	std::unique_ptr<Utils::SerializedRepresentation>	description	(
-			GeomEntity::getDescription (alsoComputed));
-	CHECK_NULL_PTR_ERROR (description.get ( ))
-
-    Utils::SerializedRepresentation  propertyGeomDescription (
-                                                "Propriétés géométriques", "");
-
-	if (true == alsoComputed)
-	{
-		//recuperation de l'aire
-		TkUtil::UTF8String	volStr (TkUtil::Charset::UTF_8);
-		volStr<<getArea();
-
-		propertyGeomDescription.addProperty (
-	        Utils::SerializedRepresentation::Property ("Aire", volStr.ascii()) );
-	}
-
-
-#ifdef _DEBUG		// Issue#111
-    // précision OpenCascade ou autre
-	for (uint i=0; i<m_occ_faces.size(); i++){
-		TkUtil::UTF8String	precStr (TkUtil::Charset::UTF_8);
-		precStr << BRep_Tool::Tolerance(m_occ_faces[i]);
-	    propertyGeomDescription.addProperty (
-	    	        Utils::SerializedRepresentation::Property ("Précision", precStr.ascii()) );
-	}
-#endif	// _DEBUG
-
-    // on ajoute des infos du style: c'est un plan
-	TkUtil::UTF8String	typeStr (TkUtil::Charset::UTF_8);
-    if (isPlanar())
-    	typeStr<<"plan";
-    else if (m_occ_faces.size()>1)
-    	typeStr<<"composée";
-    else
-    	typeStr<<"quelconque";
-
-    propertyGeomDescription.addProperty (
-    		Utils::SerializedRepresentation::Property ("Type", typeStr.ascii()) );
-
-    description->addPropertiesSet (propertyGeomDescription);
-
-	return description.release ( );
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

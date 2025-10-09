@@ -6,7 +6,6 @@
 #include "Geom/OCCHelper.h"
 #include "Group/Group3D.h"
 #include "Internal/Context.h"
-#include "Topo/Block.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/MemoryError.h>
@@ -151,17 +150,6 @@ void Volume::getGroups(std::vector<Group::GroupEntity*>& grp) const
     grp.insert(grp.end(), m_groups.begin(), m_groups.end());
 }
 /*----------------------------------------------------------------------------*/
-void Volume::setGroups(std::vector<Group::GroupEntity*>& grp)
-{
-	m_groups.clear();
-	for (std::vector<Group::GroupEntity*>::iterator iter = grp.begin(); iter != grp.end(); iter++){
-		Group::Group3D* g3 = dynamic_cast<Group::Group3D*>(*iter);
-		if (g3 == 0)
-			throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne avec conversion en groupe local dans setGroups", TkUtil::Charset::UTF_8));
-		m_groups.push_back(g3);
-	}
-}
-/*----------------------------------------------------------------------------*/
 int Volume::getNbGroups() const
 {
     return m_groups.size();
@@ -182,44 +170,6 @@ void Volume::setDestroyed(bool b)
             m_groups[i]->add(this);
 
     Entity::setDestroyed(b);
-}
-/*----------------------------------------------------------------------------*/
-void Volume::
-get(std::vector<Topo::Block*>& blocs) const
-{
-	const std::vector<Topo::TopoEntity*>& topo_entities = getRefTopo();
-	for (std::vector<Topo::TopoEntity* >::const_iterator iter = topo_entities.begin();
-			iter != topo_entities.end(); ++iter)
-		if ((*iter)->getDim() == 3)
-			blocs.push_back(dynamic_cast<Topo::Block*>(*iter));
-}
-/*----------------------------------------------------------------------------*/
-Utils::SerializedRepresentation* Volume::getDescription (bool alsoComputed) const
-{
-	std::unique_ptr<Utils::SerializedRepresentation>	description	(
-			GeomEntity::getDescription (alsoComputed));
-	CHECK_NULL_PTR_ERROR (description.get ( ))
-
-    Utils::SerializedRepresentation  propertyGeomDescription (
-                                                "Propriétés géométriques", "");
-
-	if (true == alsoComputed)
-	{
-		// récupération du volume
-		TkUtil::UTF8String	volStr (TkUtil::Charset::UTF_8);
-		volStr<<getArea();
-
-		propertyGeomDescription.addProperty (
-			Utils::SerializedRepresentation::Property ("Volume", volStr.ascii()) );
-	}
-
-    // pour afficher les spécifictés de certaines propriétés
-    getGeomProperty()->addDescription(propertyGeomDescription);
-
-
-    description->addPropertiesSet (propertyGeomDescription);
-
-	return description.release ( );
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

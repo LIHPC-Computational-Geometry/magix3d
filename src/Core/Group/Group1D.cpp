@@ -35,16 +35,15 @@ TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const Group1D & g)
         o << " vide.";
     o << "\n";
 
-    const std::vector<Geom::Curve*>& crv = g.getCurves();
-    for (std::vector<Geom::Curve*>::const_iterator iter1 = crv.begin();
-            iter1 != crv.end(); ++iter1){
-        const std::vector<Topo::TopoEntity* >& topo = (*iter1)->getRefTopo();
-
-        o<<"  "<<(*iter1)->getName()<<" ->";
-        for (std::vector<Topo::TopoEntity* >::const_iterator iter2 = topo.begin();
-                iter2 != topo.end(); ++iter2)
-            o<<" "<<(*iter2)->getName();
-        o << "\n";
+    Topo::TopoManager& topo_manager = g.getContext().getTopoManager();
+    for (Geom::Curve* curv : g.getCurves()) {
+        const std::vector<Topo::TopoEntity*>& topos = topo_manager.getRefTopos(curv);
+        if (topos.size() > 0) {
+            o<<"  "<<curv->getName()<<" ->";
+            for (Topo::TopoEntity* te : topos)
+                o<<" "<<te->getName();
+            o << "\n";
+        }
     }
 
     return o;

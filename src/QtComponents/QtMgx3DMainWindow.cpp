@@ -18,6 +18,7 @@
 #include "Internal/Resources.h"
 #include "Internal/CommandInternal.h"
 #include "Internal/EntitiesHelper.h"
+#include "Internal/InternalPreferences.h"
 #include "Internal/PythonWriter.h"
 #include "QtComponents/QtMgx3DApplication.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -85,7 +86,6 @@
 #include "QtComponents/QtTopologySplitBlockWithOGridAction.h"
 #include "QtComponents/QtTopologyExtendSplitBlockAction.h"
 #include "QtComponents/QtTopologyExtendSplitFaceAction.h"
-#include "QtComponents/QtTopologySplitFaceAction.h"
 #include "QtComponents/QtTopologySplitFacesAction.h"
 #include "QtComponents/QtTopologyVerticesAlignmentAction.h"
 #include "QtComponents/QtTopoEntityDestructionAction.h"
@@ -3081,18 +3081,11 @@ void QtMgx3DMainWindow::showReady ( )
 			// Coupe de faces :
 			QtMgx3DOperationAction *splitFacesAction =
 					                       new QtTopologySplitFacesAction(
-							                       QIcon(":/images/topo_split_faces.png"), QString::fromUtf8("[2D] Découpage de faces selon une arête"), *this,
-							                       QString::fromUtf8("Découpage de faces selon une arête (uniquement pour cas 2D).")
+							                       QIcon(":/images/topo_split_faces.png"), QString::fromUtf8("Découpage de faces selon une arête"), *this,
+							                       QString::fromUtf8("Découpage de faces selon une arête.")
 					                       );
 			registerOperationAction(
 					*splitFacesAction, QtMgx3DOperationsPanel::TOPO_FACE_OPERATION);
-			QtMgx3DOperationAction *splitFaceAction =
-					                       new QtTopologySplitFaceAction(
-							                       QIcon(":/images/topo_split_face.png"), QString::fromUtf8("Découpage d'une face selon une arête"), *this,
-							                       QString::fromUtf8("Découpage d'une face selon une arête.")
-					                       );
-			registerOperationAction(
-					*splitFaceAction, QtMgx3DOperationsPanel::TOPO_FACE_OPERATION);
 			QtMgx3DOperationAction *splitFaceWithOGridAction =
 					                       new QtTopologySplitFaceWithOGridAction(
 							                       QIcon(":/images/topo_split_face_with_ogrid.png"),
@@ -5190,47 +5183,45 @@ void QtMgx3DMainWindow::savePythonConsole (bool withEnv)
 }	// QtMgx3DMainWindow::savePythonConsole
 
 
-		void QtMgx3DMainWindow::preferencesCallback()
-		{
-			BEGIN_QT_TRY_CATCH_BLOCK
+void QtMgx3DMainWindow::preferencesCallback()
+{
+	BEGIN_QT_TRY_CATCH_BLOCK
 
-					QtMgx3DApplication::editConfiguration(this, UTF8String("Magix 3D : préférences utilisateur.", Charset::UTF_8));
+	// Mémorisation des couleurs pour entités topologiques : on actualisera lesdites entités topologiques si leur couleur est modifiée :
+	const TkUtil::Color	oldTopoColorWithoutProj (Internal::InternalPreferences::instance ( )._topoColorWithoutProj.getRed ( ), Internal::InternalPreferences::instance ( )._topoColorWithoutProj.getGreen ( ), Internal::InternalPreferences::instance ( )._topoColorWithoutProj.getBlue ( ));
+	const TkUtil::Color	oldTopoColorWith0DProj (Internal::InternalPreferences::instance ( )._topoColorWith0DProj.getRed ( ), Internal::InternalPreferences::instance ( )._topoColorWith0DProj.getGreen ( ), Internal::InternalPreferences::instance ( )._topoColorWith0DProj.getBlue ( ));
+	const TkUtil::Color	oldTopoColorWith1DProj (Internal::InternalPreferences::instance ( )._topoColorWith1DProj.getRed ( ), Internal::InternalPreferences::instance ( )._topoColorWith1DProj.getGreen ( ), Internal::InternalPreferences::instance ( )._topoColorWith1DProj.getBlue ( ));
+	const TkUtil::Color	oldTopoColorWith2DProj (Internal::InternalPreferences::instance ( )._topoColorWith2DProj.getRed ( ), Internal::InternalPreferences::instance ( )._topoColorWith2DProj.getGreen ( ), Internal::InternalPreferences::instance ( )._topoColorWith2DProj.getBlue ( ));
+	const TkUtil::Color	oldTopoColorWith3DProj (Internal::InternalPreferences::instance ( )._topoColorWith3DProj.getRed ( ), Internal::InternalPreferences::instance ( )._topoColorWith3DProj.getGreen ( ), Internal::InternalPreferences::instance ( )._topoColorWith3DProj.getBlue ( ));
 
-			// Les préférences ont peut être été modifiées => on actualise ce qui doit
-			// l'être :
-			// Interacteur :
-			if (0 != _graphicalWidget)
-				_graphicalWidget->updateConfiguration();
+	QtMgx3DApplication::editConfiguration(this, UTF8String("Magix 3D : préférences utilisateur.", Charset::UTF_8));
 
-			// Vue 3D :
-			_actions._displayTrihedronAction->setChecked(
-					Resources::instance()._displayTrihedron.getValue());
-//	_actions._displayLandmarkAction->setChecked (
-//						Resources::instance ( )._displayLandmark.getValue ( ));
-			_actions._displayFocalPointAction->setChecked(
-					Resources::instance()._displayFocalPoint.getValue());
+	// Les préférences ont peut être été modifiées => on actualise ce qui doit l'être :
+	// Interacteur :
+	if (0 != _graphicalWidget)
+		_graphicalWidget->updateConfiguration();
 
-			// Logs :
-			Log::TYPE mask = QtMgx3DApplication::getLogsMask();
-			getLogDispatcher().setMask(mask);
+	// Vue 3D :
+	_actions._displayTrihedronAction->setChecked(Resources::instance()._displayTrihedron.getValue());
+//	_actions._displayLandmarkAction->setChecked (Resources::instance ( )._displayLandmark.getValue ( ));
+	_actions._displayFocalPointAction->setChecked(Resources::instance()._displayFocalPoint.getValue());
+
+	// Logs :
+	Log::TYPE mask = QtMgx3DApplication::getLogsMask();
+	getLogDispatcher().setMask(mask);
 //	Context*	context	= dynamic_cast<Context*>(&getContext ( ));
 //	if (0 != context)
 //	{
-//		context->getStdLogStream ( ).setMask (
-//										QtMgx3DApplication::getLogsMask ( ));
-//		context->getErrLogStream ( ).setMask (
-//										QtMgx3DApplication::getLogsMask ( ));
+//		context->getStdLogStream ( ).setMask (QtMgx3DApplication::getLogsMask ( ));
+//		context->getErrLogStream ( ).setMask (QtMgx3DApplication::getLogsMask ( ));
 //	}
-			getLogDispatcher().enableDate(
-					Resources::instance()._logDate, Resources::instance()._logTime);
+			getLogDispatcher().enableDate(Resources::instance()._logDate, Resources::instance()._logTime);
 			getLogDispatcher().enableThreadID(Resources::instance()._logThreadID);
 			getLogView().setLogMask(mask);
 			if (0 != _statusView)
 				_statusView->setMask(mask);
-			if (getActions()._recentFilesCapacity !=
-			    Resources::instance()._recentScriptCapacity.getValue())
-				updateRecentScriptsURLFifoCapacity(
-						Resources::instance()._recentScriptCapacity.getValue());
+			if (getActions()._recentFilesCapacity != Resources::instance ( )._recentScriptCapacity.getValue ( ))
+				updateRecentScriptsURLFifoCapacity (Resources::instance ( )._recentScriptCapacity.getValue ( ));
 // Tester les logs :
 /*
 InformationLog  i ("Information");
@@ -5255,8 +5246,50 @@ log (t4);
 log (t5);
 */
 
-			COMPLETE_QT_TRY_CATCH_BLOCK(true, this, getAppTitle())
-		}    // QtMgx3DMainWindow::preferencesCallback
+	const TkUtil::Color	currentTopoColorWithoutProj (Internal::InternalPreferences::instance ( )._topoColorWithoutProj.getRed ( ), Internal::InternalPreferences::instance ( )._topoColorWithoutProj.getGreen ( ), Internal::InternalPreferences::instance ( )._topoColorWithoutProj.getBlue ( ));
+	const TkUtil::Color	currentTopoColorWith0DProj (Internal::InternalPreferences::instance ( )._topoColorWith0DProj.getRed ( ), Internal::InternalPreferences::instance ( )._topoColorWith0DProj.getGreen ( ), Internal::InternalPreferences::instance ( )._topoColorWith0DProj.getBlue ( ));;
+	const TkUtil::Color	currentTopoColorWith1DProj (Internal::InternalPreferences::instance ( )._topoColorWith1DProj.getRed ( ), Internal::InternalPreferences::instance ( )._topoColorWith1DProj.getGreen ( ), Internal::InternalPreferences::instance ( )._topoColorWith1DProj.getBlue ( ));;
+	const TkUtil::Color	currentTopoColorWith2DProj (Internal::InternalPreferences::instance ( )._topoColorWith2DProj.getRed ( ), Internal::InternalPreferences::instance ( )._topoColorWith2DProj.getGreen ( ), Internal::InternalPreferences::instance ( )._topoColorWith2DProj.getBlue ( ));;
+	const TkUtil::Color	currentTopoColorWith3DProj (Internal::InternalPreferences::instance ( )._topoColorWith3DProj.getRed ( ), Internal::InternalPreferences::instance ( )._topoColorWith3DProj.getGreen ( ), Internal::InternalPreferences::instance ( )._topoColorWith3DProj.getBlue ( ));;
+	const bool	updateAll	= (currentTopoColorWithoutProj != oldTopoColorWithoutProj);
+    const bool	update3D	= (updateAll || (currentTopoColorWith3DProj != oldTopoColorWith3DProj));
+    const bool	update2D	= (update3D  || (currentTopoColorWith2DProj != oldTopoColorWith2DProj));
+    const bool	update1D	= (update2D  || (currentTopoColorWith1DProj != oldTopoColorWith1DProj));
+    const bool	update0D	= (update1D  || (currentTopoColorWith0DProj != oldTopoColorWith0DProj));
+
+	if (update0D)
+	{
+		std::vector<Topo::Vertex* >	vertices;
+		getContext ( ).getTopoManager ( ).getVertices (vertices);
+		for (std::vector<Topo::Vertex*>::iterator itv = vertices.begin ( ); vertices.end ( ) != itv; itv++)
+			(*itv)->updateDisplayPropertiesColor ( );
+	}	// if (true == update0D)
+	if (update1D)
+	{
+		std::vector<Topo::CoEdge*>	edges;
+		getContext ( ).getTopoManager ( ).getCoEdges (edges);
+		for (std::vector<Topo::CoEdge*>::iterator ite = edges.begin ( ); edges.end ( ) != ite; ite++)
+			(*ite)->updateDisplayPropertiesColor ( );
+	}	// if (true == update1D)
+	if (update2D)
+	{
+		std::vector<Topo::CoFace*>	faces;
+		getContext ( ).getTopoManager ( ).getCoFaces (faces);
+		for (std::vector<Topo::CoFace*>::iterator itf = faces.begin ( ); faces.end ( ) != itf; itf++)
+			(*itf)->updateDisplayPropertiesColor ( );
+	}	// if (true == update2D)
+	if (update3D)
+	{
+		std::vector<Topo::Block* >	blocks;
+		getContext ( ).getTopoManager ( ).getBlocks (blocks);
+		for (std::vector<Topo::Block*>::iterator itb = blocks.begin ( ); blocks.end ( ) != itb; itb++)
+			(*itb)->updateDisplayPropertiesColor ( );
+	}	// if (true == update3D)
+	if (updateAll || update0D || update1D || update2D || update3D)
+		getGraphicalWidget ( ).getRenderingManager ( ).updateRepresentations ( );
+
+	COMPLETE_QT_TRY_CATCH_BLOCK(true, this, getAppTitle())
+}    // QtMgx3DMainWindow::preferencesCallback
 
 
 		void QtMgx3DMainWindow::editSettingsCallback()

@@ -397,8 +397,9 @@ void CommandNewTopoOnGeometry::createCoEdge()
 	// récupéaration des sommets
 	auto gvertices = crv->getVertices();
 	std::vector<Topo::Vertex*> tvertices;
+	Topo::TopoManager& tm = getContext().getTopoManager();
 	for (uint i=0; i<gvertices.size(); i++){
-		const std::vector<Topo::TopoEntity* > ref_topo = gvertices[i]->getRefTopo();
+		const std::vector<Topo::TopoEntity* > ref_topo = tm.getRefTopos(gvertices[i]);
 		if (ref_topo.size() == 1){
 			Topo::Vertex* vtx = dynamic_cast<Topo::Vertex*>(ref_topo[0]);
 			if (vtx == 0)

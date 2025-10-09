@@ -52,7 +52,7 @@ QtTopologySplitFacesPanel::QtTopologySplitFacesPanel (
 				QtMgx3DApplication::HelpSystem::instance ( ).splitFacesOperationTag),
 	  _facesPanel (0), _cutDefinitionButtonGroup (0), _edgePanel (0),
 	  _ratioTextField (0), _cutPointEntityPanel (0), _oGridRatioTextField (0),
-	  _allFacesCheckBox (0)
+	   _projectVerticesCheckBox (0), _allFacesCheckBox (0)
 {
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	setLayout (layout);
@@ -157,6 +157,14 @@ QtTopologySplitFacesPanel::QtTopologySplitFacesPanel (
 	connect (_oGridRatioTextField, SIGNAL (textEdited (const QString&)), this,
 	         SLOT (parametersModifiedCallback ( )));
 
+	// Faut il projeter les sommets créés sur la discrétisation initiale ?
+	_projectVerticesCheckBox	= new QCheckBox (
+			"Projeter les sommets créés sur la discrétisation initiale", this);
+	_projectVerticesCheckBox->setChecked (true);
+	layout->addWidget (_projectVerticesCheckBox);
+	connect (_projectVerticesCheckBox, SIGNAL (stateChanged (int)), this,
+	         SLOT (parametersModifiedCallback ( )));
+	
 	addPreviewCheckBox (false);
 
 	layout->addStretch (2);
@@ -179,7 +187,7 @@ QtTopologySplitFacesPanel::QtTopologySplitFacesPanel (
 			0, *new QtMgx3DMainWindow (0), 0, "", ""),
 	  _facesPanel (0), _cutDefinitionButtonGroup (0), _edgePanel (0),
 	  _ratioTextField (0), _cutPointEntityPanel (0),
-	  _oGridRatioTextField (0), _allFacesCheckBox (0)
+	  _oGridRatioTextField (0), _projectVerticesCheckBox (0), _allFacesCheckBox (0)
 {
 	MGX_FORBIDDEN ("QtTopologySplitFacesPanel copy constructor is not allowed.");
 }	// QtTopologySplitFacesPanel::QtTopologySplitFacesPanel (const QtTopologySplitFacesPanel&)
@@ -354,6 +362,12 @@ double QtTopologySplitFacesPanel::getOGridRatio ( ) const
 	return _oGridRatioTextField->getValue ( );
 }	// QtTopologySplitFacesPanel::getOGridRatio
 
+bool QtTopologySplitFacesPanel::projectCreatedVertices ( ) const
+{
+	CHECK_NULL_PTR_ERROR (_projectVerticesCheckBox)
+	return Qt::Checked == _projectVerticesCheckBox->checkState ( ) ?
+	       true : false;
+}	// QtTopologySplitFacePanel::projectCreatedVertices
 
 void QtTopologySplitFacesPanel::preview (bool show, bool destroyInteractor)
 {
@@ -381,6 +395,7 @@ void QtTopologySplitFacesPanel::preview (bool show, bool destroyInteractor)
 		const double			oGridRatio	= getOGridRatio ( );
 		CoEdge*					edge		=
 				 getContext ( ).getTopoManager ( ).getCoEdge (edgeName, true);
+		const bool projectVertices	= projectCreatedVertices ( );
 
 		if (true == allFaces ( ))
 		{
@@ -389,12 +404,12 @@ void QtTopologySplitFacesPanel::preview (bool show, bool destroyInteractor)
 				case QtTopologySplitFacesPanel::CDM_RATIO	:
 					command.reset (
 						new CommandSplitFaces (
-								*context,  edge, getRatio ( ), oGridRatio));
+								*context,  edge, getRatio ( ), oGridRatio, projectVertices));
 				break;
 				case QtTopologySplitFacesPanel::CDM_POINT	:
 					command.reset (
 						new CommandSplitFaces (
-								*context,  edge, getCutPoint ( ), oGridRatio));
+								*context,  edge, getCutPoint ( ), oGridRatio, projectVertices));
 				break;
 				default	:
 					throw Exception (UTF8String ("QtTopologySplitFacesPanel::preview : cas non implémenté.", Charset::UTF_8));
@@ -622,16 +637,19 @@ void QtTopologySplitFacesAction::executeOperation ( )
 	// Récupération des paramètres de découpage des faces topologiques :
 	const string	edgeName	= panel->getEdgeName ( );
 	const double	oGridRatio	= panel->getOGridRatio ( );
+	const bool	 	projectVertices	= panel->projectCreatedVertices ( );
 
 	if (true == panel->allFaces ( ))
 	{
 		switch (panel->getCutDefinitionMethod ( ))
 		{
 			case QtTopologySplitFacesPanel::CDM_RATIO	:
-				cmdResult	= getContext ( ).getTopoManager ( ).splitAllFaces (edgeName, panel->getRatio ( ), oGridRatio);
+				cmdResult	= getContext ( ).getTopoManager ( ).splitAllFaces (
+					edgeName, panel->getRatio ( ), oGridRatio, projectVertices);
 				break;
 			case QtTopologySplitFacesPanel::CDM_POINT	:
-				cmdResult	= getContext ( ).getTopoManager ( ).splitAllFaces (edgeName, panel->getCutPoint ( ), oGridRatio);
+				cmdResult	= getContext ( ).getTopoManager ( ).splitAllFaces (
+					edgeName, panel->getCutPoint ( ), oGridRatio, projectVertices);
 				break;
 			default	:
 			{
@@ -650,10 +668,10 @@ void QtTopologySplitFacesAction::executeOperation ( )
 		switch (panel->getCutDefinitionMethod ( ))
 		{
 			case QtTopologySplitFacesPanel::CDM_RATIO	:
-				cmdResult	= getContext ( ).getTopoManager ( ).splitFaces (facesNames, edgeName, panel->getRatio ( ), oGridRatio);
+				cmdResult	= getContext ( ).getTopoManager ( ).splitFaces (facesNames, edgeName, panel->getRatio ( ), oGridRatio, projectVertices);
 				break;
 			case QtTopologySplitFacesPanel::CDM_POINT	:
-				cmdResult	= getContext ( ).getTopoManager ( ).splitFaces (facesNames, edgeName, panel->getCutPoint ( ), oGridRatio);
+				cmdResult	= getContext ( ).getTopoManager ( ).splitFaces (facesNames, edgeName, panel->getCutPoint ( ), oGridRatio, projectVertices);
 				break;
 			default	:
 			{

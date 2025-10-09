@@ -614,9 +614,9 @@ void CommandAddRemoveGroupName::
 updateMesh(Geom::Volume* vol, std::string grpName, bool add)
 {
     // récupération de la liste des blocs
-    std::vector<Topo::Block*>  blocs;
-    vol->get(blocs);
-    updateMesh(blocs, grpName, add);
+	Topo::TopoManager& tm = getContext().getTopoManager();
+	std::vector<Topo::Block*> blocs = tm.getFilteredRefTopos<Topo::Block>(vol);
+	updateMesh(blocs, grpName, add);
 }
 /*----------------------------------------------------------------------------*/
 void CommandAddRemoveGroupName::
@@ -628,9 +628,8 @@ updateMesh(std::vector<Topo::Block*>& blocs, std::string grpName, bool add)
 
     // recherche si l'un d'entre eux est maillé
     bool is_meshed = false;
-    for (std::vector<Topo::Block*>::iterator iter = blocs.begin();
-            iter != blocs.end(); ++iter){
-        if ((*iter)->isMeshed())
+    for (Topo::Block* blk : blocs){
+        if (blk->isMeshed())
             is_meshed = true;
     }
 
@@ -655,20 +654,19 @@ updateMesh(std::vector<Topo::Block*>& blocs, std::string grpName, bool add)
         }
         Mesh::Volume* mvol = getContext().getMeshManager().getVolume(grpName);
 
-        for (std::vector<Topo::Block*>::iterator iter = blocs.begin();
-                iter != blocs.end(); ++iter)
-            if ((*iter)->isMeshed()){
+        for (Topo::Block* blk : blocs)
+            if (blk->isMeshed()){
                 if (add){
 #ifdef _DEBUG_UPDATE
                     std::cout<<" "<<mvol->getName()<<" addBlock("<<(*iter)->getName()<<")"<<std::endl;
 #endif
-                    mvol->addBlock(*iter);
+                    mvol->addBlock(blk);
                 }
                 else {
 #ifdef _DEBUG_UPDATE
                     std::cout<<" "<<mvol->getName()<<" removeBlock("<<(*iter)->getName()<<")"<<std::endl;
 #endif
-                    mvol->removeBlock(*iter);
+                    mvol->removeBlock(blk);
                 }
             }
         if (isNewVolume)
@@ -683,8 +681,8 @@ void CommandAddRemoveGroupName::
 updateMesh(Geom::Surface* surf, std::string grpName, bool add)
 {
 	// récupération de la liste des CoFaces
-	std::vector<Topo::CoFace*>  cofaces;
-	surf->get(cofaces);
+	Topo::TopoManager& tm = getContext().getTopoManager();
+	std::vector<Topo::CoFace*> cofaces = tm.getFilteredRefTopos<Topo::CoFace>(surf);
 	updateMesh(cofaces, grpName, add);
 }
 /*----------------------------------------------------------------------------*/
@@ -748,9 +746,9 @@ void CommandAddRemoveGroupName::
 updateMesh(Geom::Curve* crv, std::string grpName, bool add)
 {
     // récupération de la liste des CoEdges
-    std::vector<Topo::CoEdge*>  coedges;
-    crv->get(coedges);
-    updateMesh(coedges, grpName, add);
+	Topo::TopoManager& tm = getContext().getTopoManager();
+	std::vector<Topo::CoEdge*> coedges = tm.getFilteredRefTopos<Topo::CoEdge>(crv);
+	updateMesh(coedges, grpName, add);
 }
 /*----------------------------------------------------------------------------*/
 void CommandAddRemoveGroupName::

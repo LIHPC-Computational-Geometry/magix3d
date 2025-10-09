@@ -5,7 +5,6 @@
 #include "Geom/OCCHelper.h"
 #include "Group/Group0D.h"
 #include "Internal/Context.h"
-#include "Topo/Vertex.h"
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Vertex.hxx>
 #include <TopoDS_Shape.hxx>
@@ -53,36 +52,6 @@ GeomEntity* Vertex::clone(Internal::Context& c)
 Vertex::~Vertex()
 {}
 /*----------------------------------------------------------------------------*/
-Mgx3D::Utils::SerializedRepresentation* Vertex::getDescription (bool alsoComputed) const
-{
-	std::unique_ptr<Mgx3D::Utils::SerializedRepresentation>	description (
-											GeomEntity::getDescription (alsoComputed));
-	CHECK_NULL_PTR_ERROR (description.get ( ))
-	std::vector<double>	coords;
-	coords.push_back (getX ( ));
-	coords.push_back (getY ( ));
-	coords.push_back (getZ ( ));
-	Mgx3D::Utils::SerializedRepresentation::Property	coordsProp (
-														"Coordonnées", coords);
-	Mgx3D::Utils::SerializedRepresentation	propertyGeomDescription (
-											"Propriété géométrique", coordsProp.getValue ( ));
-	propertyGeomDescription.addProperty (coordsProp);
-
-#ifdef _DEBUG		// Issue#111
-    // précision OpenCascade ou autre
-	TkUtil::UTF8String	precStr (TkUtil::Charset::UTF_8);
-    precStr << BRep_Tool::Tolerance(m_occ_vertex);;
-
-    propertyGeomDescription.addProperty (
-    	        Utils::SerializedRepresentation::Property ("Précision", precStr.ascii()) );
-#endif	// _DEBUG
-
-	description->addPropertiesSet (propertyGeomDescription);
-	description->setSummary (coordsProp.getValue ( ));
-
-	return description.release ( );
-}
-/*----------------------------------------------------------------------------*/
 std::string Vertex::getSummary ( ) const
 {
 	std::vector<double>	coords;
@@ -102,19 +71,6 @@ double Vertex::computeArea() const
 void Vertex::computeBoundingBox(Utils::Math::Point& pmin,Utils::Math::Point& pmax) const
 {
     OCCHelper::computeBoundingBox(m_occ_vertex, pmin, pmax);
-}
-/*----------------------------------------------------------------------------*/
-void Vertex::get(std::vector<Topo::Vertex*>& vertices)
-{
-	const std::vector<Topo::TopoEntity* >& topos = getRefTopo();
-
-	for (std::vector<Topo::TopoEntity* >::const_iterator iter = topos.begin();
-			iter != topos.end(); ++iter)
-		if ((*iter)->getDim() == 0){
-			Topo::Vertex* vertex = dynamic_cast<Topo::Vertex*>(*iter);
-			if (vertex)
-				vertices.push_back(vertex);
-		}
 }
 /*----------------------------------------------------------------------------*/
 void Vertex::add(Curve* c)
@@ -216,17 +172,6 @@ void Vertex::getGroupsName (std::vector<std::string>& gn) const
 void Vertex::getGroups(std::vector<Group::GroupEntity*>& grp) const
 {
     grp.insert(grp.end(), m_groups.begin(), m_groups.end());
-}
-/*----------------------------------------------------------------------------*/
-void Vertex::setGroups(std::vector<Group::GroupEntity*>& grp)
-{
-	m_groups.clear();
-	for (std::vector<Group::GroupEntity*>::iterator iter = grp.begin(); iter != grp.end(); iter++){
-		Group::Group0D* g0 = dynamic_cast<Group::Group0D*>(*iter);
-		if (g0 == 0)
-			throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne avec conversion en groupe local dans setGroups", TkUtil::Charset::UTF_8));
-		m_groups.push_back(g0);
-	}
 }
 /*----------------------------------------------------------------------------*/
 int Vertex::getNbGroups() const

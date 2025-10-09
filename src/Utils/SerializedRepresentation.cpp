@@ -525,7 +525,7 @@ string SerializedRepresentation::toString ( ) const
 				<< "\t" << (*itps)->toString( );
 	}
 
-	return description.iso ( );
+	return description;
 }	// SerializedRepresentation::toString
 
 

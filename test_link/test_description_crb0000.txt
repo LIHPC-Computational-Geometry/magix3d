@@ -1,0 +1,77 @@
+SerializedRepresentation Description
+Path                             : Description
+Properties                       : 
+	Relations topologiques			: Aucune
+Properties sets                  : 
+	SerializedRepresentation Propriétés génériques
+Path                             : Description.Propriétés génériques
+Properties                       : 
+	Nom unique			: GeomCurve_Crb0000
+	Identifiant unique			: 8
+	Type			: GeomCurve
+	Dimension			: 1
+	Est détruit			: false
+	Est visible			: false
+Properties sets                  : 
+	SerializedRepresentation Boite englobante
+Path                             : Description.Propriétés génériques.Boite englobante
+Properties                       : 
+	X min			: -1e-7
+	X max			: 1e-7
+	Y min			: -1e-7
+	Y max			: 1e-7
+	Z min			: -1e-7
+	Z max			: 1.0000001
+Properties sets                  : 
+	SerializedRepresentation Relations géométriques
+Path                             : Description.Relations géométriques
+Properties                       : 
+Properties sets                  : 
+	SerializedRepresentation Sommets
+Path                             : Description.Relations géométriques.Sommets
+Properties                       : 
+	Pt0000			: GeomVertex
+	Pt0001			: GeomVertex
+Properties sets                  : 
+	SerializedRepresentation Courbes
+Path                             : Description.Relations géométriques.Courbes
+Properties                       : 
+	Crb0001			: GeomCurve
+	Crb0003			: GeomCurve
+	Crb0008			: GeomCurve
+	Crb0009			: GeomCurve
+Properties sets                  : 
+	SerializedRepresentation Surfaces
+Path                             : Description.Relations géométriques.Surfaces
+Properties                       : 
+	Surf0000			: GeomSurface
+	Surf0002			: GeomSurface
+Properties sets                  : 
+	SerializedRepresentation Volumes
+Path                             : Description.Relations géométriques.Volumes
+Properties                       : 
+	Vol0000			: GeomVolume
+Properties sets                  : 
+	SerializedRepresentation Relations vers des groupes
+Path                             : Description.Relations vers des groupes
+Properties                       : 
+Properties sets                  : 
+	SerializedRepresentation Groupes 1D
+Path                             : Description.Relations vers des groupes.Groupes 1D
+Properties                       : 
+	Hors_Groupe_1D			: Group1D
+Properties sets                  : 
+	SerializedRepresentation Propriétés OCC
+Path                             : Description.Propriétés OCC
+Properties                       : 
+	HashCode			: 698035809
+Properties sets                  : 
+	SerializedRepresentation Propriétés géométriques
+Path                             : Description.Propriétés géométriques
+Properties                       : 
+	Longueur			: 1.000000e+00
+	Précision			: 1.000000e-07
+	Type			: segment
+	Param first			: 0.000000e+00
+	Param last			: 1.000000e+00
+Properties sets                  : 
