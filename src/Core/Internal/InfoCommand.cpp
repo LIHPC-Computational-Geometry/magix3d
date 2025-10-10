@@ -217,12 +217,15 @@ void InfoCommand::addGroupInfoEntity(Group::GroupEntity* entity, type t)
 	TkUtil::AutoMutex	autoMutex (&m_mutex);
 #ifdef _DEBUG2
     std::cout<<"addGroupInfoEntity("<<entity->getName()<<" (id "<<entity->getUniqueId()<<"),"
-            <<type2String(m_group_entities_info[entity])<<" => "<<type2String(t)
-            <<")"<<std::endl;
+            <<type2String(m_group_entities_info[entity])<<" -> "<<type2String(t);
 #endif
     type old_t = m_group_entities_info[entity];
     if (old_t < t)
         m_group_entities_info[entity] = t;
+
+#ifdef _DEBUG2
+    std::cout<<" ==> "<<type2String(m_group_entities_info[entity])<<")"<<std::endl;
+#endif
 }
 /*----------------------------------------------------------------------------*/
 void InfoCommand::getGeomInfoEntity(uint ind, Geom::GeomEntity* &entity, type &t)
