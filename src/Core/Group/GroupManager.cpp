@@ -73,25 +73,10 @@ GroupManager::~GroupManager()
 void GroupManager::clear()
 {
     // destruction des entités référencées par le manager
-    for (std::vector<Group3D*>::const_iterator iter = m_group3D.begin();
-            iter != m_group3D.end(); ++iter)
+    for (std::vector<GroupEntity*>::const_iterator iter = m_groups.begin();
+            iter != m_groups.end(); ++iter)
         delete *iter;
-    m_group3D.clear();
-
-    for (std::vector<Group2D*>::const_iterator iter = m_group2D.begin();
-            iter != m_group2D.end(); ++iter)
-        delete *iter;
-    m_group2D.clear();
-
-    for (std::vector<Group1D*>::const_iterator iter = m_group1D.begin();
-            iter != m_group1D.end(); ++iter)
-        delete *iter;
-    m_group1D.clear();
-
-    for (std::vector<Group0D*>::const_iterator iter = m_group0D.begin();
-            iter != m_group0D.end(); ++iter)
-        delete *iter;
-    m_group0D.clear();
+    m_groups.clear();
 }
 /*------------------------------------------------------------------------*/
 /** Vide un groupe suivant son nom et une dimension */
@@ -169,38 +154,35 @@ GroupManager::changeGroupName(const std::string& oldName, const std::string& new
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Group3D* GroupManager::getGroup3D(const std::string& gr_name, const bool exceptionIfNotFound) const
+template <typename T, typename = std::enable_if_t<std::is_base_of<GroupEntity, T>::value>>
+T* GroupManager::getGroup(const std::string& gr_name, const bool exceptionIfNotFound) const
 {
-    std::string name(gr_name.empty()?getDefaultName(3):gr_name);
+    std::string name(gr_name.empty()?getDefaultName(T::DIM):gr_name);
 
-    Group3D* gr = 0;
-    for (std::vector<Group3D*>::const_iterator iter = m_group3D.begin();
-            iter != m_group3D.end(); ++iter)
-        if ((*iter)->getName() == name)
-            gr = (*iter);
+    T* gr = 0;
+    for (GroupEntity* g : m_groups)
+        if (g->getName() == name)
+            if (T* casted = dynamic_cast<T*>(g))
+                return casted;
 
-    if (exceptionIfNotFound && gr == 0){
+    if (exceptionIfNotFound){
 		TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-        messErr <<"On ne trouve pas "<<name<<" dans le GroupManager / 3D";
+        messErr <<"On ne trouve pas "<<name<<" dans le GroupManager";
         throw TkUtil::Exception(messErr);
     }
 
     return gr;
 }
 /*----------------------------------------------------------------------------*/
-Group3D* GroupManager::getNewGroup3D(const std::string& gr_name, Internal::InfoCommand* icmd)
+template <typename T, typename = std::enable_if_t<std::is_base_of<GroupEntity, T>::value>>
+T* GroupManager::getNewGroup(const std::string& gr_name, Internal::InfoCommand* icmd)
 {
-    std::string name(gr_name.empty()?getDefaultName(3):gr_name);
-
-    Group3D* gr = 0;
-    for (std::vector<Group3D*>::const_iterator iter = m_group3D.begin();
-            iter != m_group3D.end(); ++iter)
-        if ((*iter)->getName() == name)
-            gr = (*iter);
+    T* gr = getGroup<T>(gr_name, false);
 
     if (gr == 0){
-        gr = new Group3D(getContext(), name, gr_name.empty());
-        m_group3D.push_back(gr);
+        std::string name(gr_name.empty()?getDefaultName(T::DIM):gr_name);
+        gr = new T(getContext(), name, gr_name.empty());
+        m_groups.push_back(gr);
         if (icmd)
             icmd->addGroupInfoEntity(gr,Internal::InfoCommand::CREATED);
     }
@@ -213,228 +195,45 @@ Group3D* GroupManager::getNewGroup3D(const std::string& gr_name, Internal::InfoC
     return gr;
 }
 /*----------------------------------------------------------------------------*/
-Group2D* GroupManager::getGroup2D(const std::string& gr_name, const bool exceptionIfNotFound) const
+template <typename T, typename = std::enable_if_t<std::is_base_of<GroupEntity, T>::value>>
+std::vector<T*> GroupManager::getGroups(const bool onlyLive) const
 {
-    std::string name(gr_name.empty()?getDefaultName(2):gr_name);
-
-    Group2D* gr = 0;
-    for (std::vector<Group2D*>::const_iterator iter = m_group2D.begin();
-            iter != m_group2D.end(); ++iter)
-        if ((*iter)->getName() == name)
-            gr = (*iter);
-
-    if (exceptionIfNotFound && gr == 0){
-		TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-        messErr <<"On ne trouve pas "<<name<<" dans le GroupManager / 2D";
-        throw TkUtil::Exception(messErr);
-    }
-
-    return gr;
+    std::vector<T*> groups;
+    for (GroupEntity* g : m_groups)
+        if (T* casted = dynamic_cast<T*>(g))
+            if (!onlyLive || !casted->isDestroyed())
+                groups.push_back(casted);
+    return groups;
 }
 /*----------------------------------------------------------------------------*/
-Group2D* GroupManager::getNewGroup2D(const std::string& gr_name, Internal::InfoCommand* icmd)
+std::vector<GroupEntity*> GroupManager::getGroups(Internal::SelectionManager::DIM dimensions, const bool onlyLive) const
 {
-    std::string name(gr_name.empty()?getDefaultName(2):gr_name);
-
-    Group2D* gr = 0;
-    for (std::vector<Group2D*>::const_iterator iter = m_group2D.begin();
-            iter != m_group2D.end(); ++iter)
-        if ((*iter)->getName() == name)
-            gr = (*iter);
-
-    if (gr == 0){
-        gr = new Group2D(getContext(), name, gr_name.empty());
-        m_group2D.push_back(gr);
-        if (icmd)
-            icmd->addGroupInfoEntity(gr,Internal::InfoCommand::CREATED);
-    }
-    else if (gr->isDestroyed()) {
-        gr->setDestroyed(false);
-        if (icmd)
-            icmd->addGroupInfoEntity(gr,Internal::InfoCommand::ENABLE);
-    }
-
-    return gr;
-}
-/*----------------------------------------------------------------------------*/
-Group1D* GroupManager::getGroup1D(const std::string& gr_name, const bool exceptionIfNotFound) const
-{
-    std::string name(gr_name.empty()?getDefaultName(1):gr_name);
-
-    Group1D* gr = 0;
-    for (std::vector<Group1D*>::const_iterator iter = m_group1D.begin();
-            iter != m_group1D.end(); ++iter)
-        if ((*iter)->getName() == name)
-            gr = (*iter);
-
-    if (exceptionIfNotFound && gr == 0){
-		TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-        messErr <<"On ne trouve pas "<<name<<" dans le GroupManager / 1D";
-        throw TkUtil::Exception(messErr);
-    }
-
-    return gr;
-}
-/*----------------------------------------------------------------------------*/
-Group1D* GroupManager::getNewGroup1D(const std::string& gr_name, Internal::InfoCommand* icmd)
-{
-    std::string name(gr_name.empty()?getDefaultName(1):gr_name);
-
-    Group1D* gr = 0;
-    for (std::vector<Group1D*>::const_iterator iter = m_group1D.begin();
-            iter != m_group1D.end(); ++iter)
-        if ((*iter)->getName() == name)
-            gr = (*iter);
-
-    if (gr == 0){
-        gr = new Group1D(getContext(), name, gr_name.empty());
-        m_group1D.push_back(gr);
-        if (icmd)
-            icmd->addGroupInfoEntity(gr,Internal::InfoCommand::CREATED);
-    }
-    else if (gr->isDestroyed()) {
-        gr->setDestroyed(false);
-        if (icmd)
-            icmd->addGroupInfoEntity(gr,Internal::InfoCommand::ENABLE);
-    }
-
-    return gr;
-}
-/*----------------------------------------------------------------------------*/
-Group0D* GroupManager::getGroup0D(const std::string& gr_name, const bool exceptionIfNotFound) const
-{
-    std::string name(gr_name.empty()?getDefaultName(0):gr_name);
-
-    Group0D* gr = 0;
-    for (std::vector<Group0D*>::const_iterator iter = m_group0D.begin();
-            iter != m_group0D.end(); ++iter)
-        if ((*iter)->getName() == name)
-            gr = (*iter);
-
-    if (exceptionIfNotFound && gr == 0){
-		TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-        messErr <<"On ne trouve pas "<<name<<" dans le GroupManager / 0D";
-        throw TkUtil::Exception(messErr);
-    }
-
-    return gr;
-}
-/*----------------------------------------------------------------------------*/
-void GroupManager::getGroups(std::vector<GroupEntity*>& grp, Internal::SelectionManager::DIM dimensions, const bool onlyLive) const
-{
+    std::vector<GroupEntity*> groups;
 	for (int i = 0; i < 4; i++){
 		const Internal::SelectionManager::DIM dim = Internal::SelectionManager::dimensionToDimensions(i);
 		if (0 == (dimensions&dim))
 			continue;
 		switch (i)
 		{
-			case 0 : {
-				std::vector<Group0D*>	groups;
-				getGroup0D (groups, onlyLive);
-				for (std::vector<Group0D*>::iterator it=groups.begin( ); groups.end() != it; it++)
-					grp.push_back (*it);
-			}
-			break;
-			case 1 : {
-				std::vector<Group1D*>	groups;
-				getGroup1D (groups, onlyLive);
-				for (std::vector<Group1D*>::iterator it=groups.begin( ); groups.end() != it; it++)
-					grp.push_back (*it);
-			}
-			break;
-			case 2 : {
-				std::vector<Group2D*>	groups;
-				getGroup2D (groups, onlyLive);
-				for (std::vector<Group2D*>::iterator it=groups.begin( ); groups.end() != it; it++)
-					grp.push_back (*it);
-			}
-			break;
-			case 3 : {
-				std::vector<Group3D*>	groups;
-				getGroup3D (groups, onlyLive);
-				for (std::vector<Group3D*>::iterator it=groups.begin( ); groups.end() != it; it++)
-					grp.push_back (*it);
-			}
-			break;
+			case 0 :
+				for (Group0D* g : getGroups<Group0D>(onlyLive))
+					groups.push_back (g);
+    			break;
+			case 1 :
+				for (Group1D* g : getGroups<Group1D>(onlyLive))
+					groups.push_back (g);
+    			break;
+			case 2 :
+				for (Group2D* g : getGroups<Group2D>(onlyLive))
+					groups.push_back (g);
+    			break;
+			case 3 :
+				for (Group3D* g : getGroups<Group3D>(onlyLive))
+					groups.push_back (g);
+    			break;
 		}
 	}
-}
-/*----------------------------------------------------------------------------*/
-Group0D* GroupManager::getNewGroup0D(const std::string& gr_name, Internal::InfoCommand* icmd)
-{
-    std::string name(gr_name.empty()?getDefaultName(0):gr_name);
-
-    Group0D* gr = 0;
-    for (std::vector<Group0D*>::const_iterator iter = m_group0D.begin();
-            iter != m_group0D.end(); ++iter)
-        if ((*iter)->getName() == name)
-            gr = (*iter);
-
-    if (gr == 0){
-        gr = new Group0D(getContext(), name, gr_name.empty());
-        m_group0D.push_back(gr);
-        if (icmd)
-            icmd->addGroupInfoEntity(gr,Internal::InfoCommand::CREATED);
-    }
-    else if (gr->isDestroyed()) {
-        gr->setDestroyed(false);
-        if (icmd)
-            icmd->addGroupInfoEntity(gr,Internal::InfoCommand::ENABLE);
-    }
-
-    return gr;
-}
-/*----------------------------------------------------------------------------*/
-void GroupManager::getGroup3D(std::vector<Group3D*>& grp, const bool onlyLive) const
-{
-    grp.clear();
-    if (onlyLive){
-        for (std::vector<Group3D*>::const_iterator iter = m_group3D.begin();
-                iter != m_group3D.end(); ++iter)
-            if (!(*iter)->isDestroyed())
-                grp.push_back(*iter);
-    }
-    else
-        grp.insert(grp.end(), m_group3D.begin(), m_group3D.end());
-}
-/*----------------------------------------------------------------------------*/
-void GroupManager::getGroup2D(std::vector<Group2D*>& grp, const bool onlyLive) const
-{
-    grp.clear();
-    if (onlyLive){
-        for (std::vector<Group2D*>::const_iterator iter = m_group2D.begin();
-                iter != m_group2D.end(); ++iter)
-            if (!(*iter)->isDestroyed())
-                grp.push_back(*iter);
-    }
-    else
-        grp.insert(grp.end(), m_group2D.begin(), m_group2D.end());
-}
-/*----------------------------------------------------------------------------*/
-void GroupManager::getGroup1D(std::vector<Group1D*>& grp, const bool onlyLive) const
-{
-    grp.clear();
-    if (onlyLive){
-        for (std::vector<Group1D*>::const_iterator iter = m_group1D.begin();
-                iter != m_group1D.end(); ++iter)
-            if (!(*iter)->isDestroyed())
-                grp.push_back(*iter);
-    }
-    else
-        grp.insert(grp.end(), m_group1D.begin(), m_group1D.end());
-}
-/*----------------------------------------------------------------------------*/
-void GroupManager::getGroup0D(std::vector<Group0D*>& grp, const bool onlyLive) const
-{
-    grp.clear();
-    if (onlyLive){
-        for (std::vector<Group0D*>::const_iterator iter = m_group0D.begin();
-                iter != m_group0D.end(); ++iter)
-            if (!(*iter)->isDestroyed())
-                grp.push_back(*iter);
-    }
-    else
-        grp.insert(grp.end(), m_group0D.begin(), m_group0D.end());
+    return groups;
 }
 /*----------------------------------------------------------------------------*/
 void GroupManager::getAddedShownAndHidden(
@@ -945,67 +744,16 @@ void GroupManager::updateDeletedGroups(Internal::InfoCommand* icmd)
 	std::cout<<"GroupManager::updateDeletedGroups ..."<<std::endl;
 #endif
 
-    // on parcours tous les groupes
-    for (std::vector<Group0D*>::iterator iter = m_group0D.begin();
-            iter != m_group0D.end(); ++iter)
-        if ((*iter)->empty() && !(*iter)->isDestroyed()){
-//        	if ((*iter)->isDefaultGroup()){
-//        		icmd->addGroupInfoEntity(*iter,Internal::InfoCommand::DISABLE);
-//        	}
-//        	else {
-        		(*iter)->setDestroyed(true);
-        		icmd->addGroupInfoEntity(*iter,Internal::InfoCommand::DELETED);
-//        	}
+    for (GroupEntity* grp : m_groups) {
+        if (grp->empty() && !grp->isDestroyed()) {
+            grp->setDestroyed(true);
+            icmd->addGroupInfoEntity(grp,Internal::InfoCommand::DELETED);
         }
-        else if (!(*iter)->empty() && (*iter)->isDestroyed()){
-            (*iter)->setDestroyed(false);
-            icmd->addGroupInfoEntity(*iter,Internal::InfoCommand::NONE);
+        else if (!grp->empty() && grp->isDestroyed()) {
+            grp->setDestroyed(false);
+            icmd->addGroupInfoEntity(grp,Internal::InfoCommand::NONE);
         }
-    for (std::vector<Group1D*>::iterator iter = m_group1D.begin();
-            iter != m_group1D.end(); ++iter)
-        if ((*iter)->empty() && !(*iter)->isDestroyed()){
-//        	if ((*iter)->isDefaultGroup()){
-//        		icmd->addGroupInfoEntity(*iter,Internal::InfoCommand::DISABLE);
-//        	}
-//        	else {
-        		(*iter)->setDestroyed(true);
-        		icmd->addGroupInfoEntity(*iter,Internal::InfoCommand::DELETED);
-//        	}
-        }
-        else if (!(*iter)->empty() && (*iter)->isDestroyed()){
-            (*iter)->setDestroyed(false);
-            icmd->addGroupInfoEntity(*iter,Internal::InfoCommand::NONE);
-        }
-    for (std::vector<Group2D*>::iterator iter = m_group2D.begin();
-            iter != m_group2D.end(); ++iter)
-        if ((*iter)->empty() && !(*iter)->isDestroyed()){
-//        	if ((*iter)->isDefaultGroup()){
-//        		icmd->addGroupInfoEntity(*iter,Internal::InfoCommand::DISABLE);
-//        	}
-//        	else {
-        		(*iter)->setDestroyed(true);
-        		icmd->addGroupInfoEntity(*iter,Internal::InfoCommand::DELETED);
-//        	}
-        }
-        else if (!(*iter)->empty() && (*iter)->isDestroyed()){
-            (*iter)->setDestroyed(false);
-            icmd->addGroupInfoEntity(*iter,Internal::InfoCommand::NONE);
-        }
-    for (std::vector<Group3D*>::iterator iter = m_group3D.begin();
-            iter != m_group3D.end(); ++iter)
-        if ((*iter)->empty() && !(*iter)->isDestroyed()){
-//        	if ((*iter)->isDefaultGroup()){
-//        		icmd->addGroupInfoEntity(*iter,Internal::InfoCommand::DISABLE);
-//        	}
-//        	else {
-        		(*iter)->setDestroyed(true);
-        		icmd->addGroupInfoEntity(*iter,Internal::InfoCommand::DELETED);
-//        	}
-        }
-        else if (!(*iter)->empty() && (*iter)->isDestroyed()){
-            (*iter)->setDestroyed(false);
-            icmd->addGroupInfoEntity(*iter,Internal::InfoCommand::NONE);
-        }
+    }
 }
 /*----------------------------------------------------------------------------*/
 void GroupManager::deleteEntity(GroupEntity* ge)
@@ -1014,52 +762,19 @@ void GroupManager::deleteEntity(GroupEntity* ge)
 	// on teste la présence dans l'une des listes
 	// cela peut arriver pour le cas d'un groupe détruit en cours de route et réutilisé
 	// cela pose problème avec le clearSession
-	bool found = false;
-
-	if (!found && !m_group3D.empty()){
+    bool found = false;
+	if (!m_groups.empty()) {
 		// on le retire de la liste
-	    std::vector<Group3D*>::iterator it= m_group3D.begin();
-	    while(it!=m_group3D.end() && *it!=ge)
+	    std::vector<GroupEntity*>::iterator it = m_groups.begin();
+	    while (it != m_groups.end() && *it != ge)
 	        it++;
-	    if(it!=m_group3D.end()){
+	    if (it != m_groups.end()) {
 	    	found = true;
-	    	m_group3D.erase(it);
-	    }
-	}
-	if (!found && !m_group2D.empty()){
-		// on le retire de la liste
-	    std::vector<Group2D*>::iterator it= m_group2D.begin();
-	    while(it!=m_group2D.end() && *it!=ge)
-	        it++;
-	    if(it!=m_group2D.end()){
-	    	found = true;
-	    	m_group2D.erase(it);
-	    }
-	}
-	if (!found && !m_group1D.empty()){
-		// on le retire de la liste
-	    std::vector<Group1D*>::iterator it= m_group1D.begin();
-	    while(it!=m_group1D.end() && *it!=ge)
-	        it++;
-	    if(it!=m_group1D.end()){
-	    	found = true;
-	    	m_group1D.erase(it);
-	    }
-	}
-	if (!found && !m_group0D.empty()){
-		// on le retire de la liste
-	    std::vector<Group0D*>::iterator it= m_group0D.begin();
-	    while(it!=m_group0D.end() && *it!=ge)
-	        it++;
-	    if(it!=m_group0D.end()){
-	    	found = true;
-	    	m_group0D.erase(it);
+	    	m_groups.erase(it);
 	    }
 	}
 
-	//std::cout<<"delete de "<<ge->getName()<<" (uid "<< ge->getUniqueId()<<") found = "<<(found?"true":"false")<<std::endl;
-
-	if (found)
+    if (found)
 		delete ge;
 }
 /*----------------------------------------------------------------------------*/
@@ -1075,29 +790,34 @@ void GroupManager::addMarkAllGroups(const Utils::FilterEntity::objectType visibi
     // utilisation d'un filtre pour ne pas parcourir inutilement les même entités
     std::map<Utils::Entity*, bool> filtre_vu;
 
-    for (std::vector<Group::Group3D*>::iterator iter = m_group3D.begin();
-            iter != m_group3D.end(); ++iter)
-        if ((*iter)->isVisible())
-            addMark(*iter, visibilityMask, filtre_vu, filtre_geom, filtre_topo, filtre_rep, mark);
-
-    for (std::vector<Group::Group2D*>::iterator iter = m_group2D.begin();
-            iter != m_group2D.end(); ++iter){
-//#ifdef _DEBUG_ADDED
-//    	std::cout<<" groupe 2D "<<(*iter)->getName()<<", isVisible = "<<(*iter)->isVisible()<<std::endl;
-//#endif
-    	if ((*iter)->isVisible())
-            addMark(*iter, visibilityMask, filtre_vu, filtre_geom, filtre_topo, mark);
-    }
-
-    for (std::vector<Group::Group1D*>::iterator iter = m_group1D.begin();
-            iter != m_group1D.end(); ++iter)
-        if ((*iter)->isVisible())
-            addMark(*iter, visibilityMask, filtre_vu, filtre_geom, filtre_topo, mark);
-
-    for (std::vector<Group::Group0D*>::iterator iter = m_group0D.begin();
-            iter != m_group0D.end(); ++iter)
-        if ((*iter)->isVisible())
-            addMark(*iter, visibilityMask, filtre_vu, filtre_geom, filtre_topo, mark);
+    for (GroupEntity* e : m_groups) {
+        if (e->isVisible()) {
+            switch (e->getDim()) {
+            case 3: {
+                Group3D* grp = dynamic_cast<Group3D*>(e);
+                addMark(grp, visibilityMask, filtre_vu, filtre_geom, filtre_topo, filtre_rep, mark);
+            }
+            break;
+            case 2: {
+                Group2D* grp = dynamic_cast<Group2D*>(e);
+                addMark(grp, visibilityMask, filtre_vu, filtre_geom, filtre_topo, mark);
+            }
+            break;
+            case 1: {
+                Group1D* grp = dynamic_cast<Group1D*>(e);
+                addMark(grp, visibilityMask, filtre_vu, filtre_geom, filtre_topo, mark);
+            }
+            break;
+            case 0: {
+                Group0D* grp = dynamic_cast<Group0D*>(e);
+                addMark(grp, visibilityMask, filtre_vu, filtre_geom, filtre_topo, mark);
+            }
+            break;
+            default:
+                MGX_NOT_YET_IMPLEMENTED("GroupManager::addMark pour cette dimension de groupe");
+            }
+        }
+    } // end for iter = groups.begin()
 }
 /*----------------------------------------------------------------------------*/
 void GroupManager::addMark(const std::vector<Group::GroupEntity*>& groups,
@@ -1202,40 +922,35 @@ void GroupManager::addMeshGroups(const Utils::FilterEntity::objectType visibilit
     Mesh::MeshManager& mmng = getContext().getMeshManager();
 
     if (visibilityMask & Utils::FilterEntity::MeshVolume)
-        for (std::vector<Group::Group3D*>::iterator iter = m_group3D.begin();
-                iter != m_group3D.end(); ++iter){
-            Mesh::MeshEntity* me = mmng.getVolume((*iter)->getName(), false);
-            if (me && (*iter)->isVisible())
+        for (Group3D* g : getGroups<Group3D>()){
+            Mesh::MeshEntity* me = mmng.getVolume(g->getName(), false);
+            if (me && g->isVisible())
                 meshAdded.push_back(me);
         }
 
     if (visibilityMask & Utils::FilterEntity::MeshSurface)
-        for (std::vector<Group::Group2D*>::iterator iter = m_group2D.begin();
-                iter != m_group2D.end(); ++iter){
-            Mesh::MeshEntity* me = mmng.getSurface((*iter)->getName(), false);
-            if (me && (*iter)->isVisible())
+        for (Group2D* g : getGroups<Group2D>()){
+            Mesh::MeshEntity* me = mmng.getSurface(g->getName(), false);
+            if (me && g->isVisible())
                 meshAdded.push_back(me);
         }
 
     if (visibilityMask & Utils::FilterEntity::MeshLine)
-        for (std::vector<Group::Group1D*>::iterator iter = m_group1D.begin();
-                iter != m_group1D.end(); ++iter){
-            Mesh::MeshEntity* me = mmng.getLine((*iter)->getName(), false);
-            if (me && (*iter)->isVisible())
+        for (Group1D* g : getGroups<Group1D>()){
+            Mesh::MeshEntity* me = mmng.getLine(g->getName(), false);
+            if (me && g->isVisible())
                 meshAdded.push_back(me);
         }
 
     if (visibilityMask & Utils::FilterEntity::MeshCloud){
-        for (std::vector<Group::Group0D*>::iterator iter = m_group0D.begin();
-                iter != m_group0D.end(); ++iter){
-            Mesh::MeshEntity* me = mmng.getCloud((*iter)->getName(), false);
-            if (me && (*iter)->isVisible())
+        for (Group0D* g : getGroups<Group0D>()){
+            Mesh::MeshEntity* me = mmng.getCloud(g->getName(), false);
+            if (me && g->isVisible())
                 meshAdded.push_back(me);
         }
-        for (std::vector<Group::Group1D*>::iterator iter = m_group1D.begin();
-                iter != m_group1D.end(); ++iter){
-            Mesh::MeshEntity* me = mmng.getCloud((*iter)->getName(), false);
-            if (me && (*iter)->isVisible())
+        for (Group1D* g : getGroups<Group1D>()){
+            Mesh::MeshEntity* me = mmng.getCloud(g->getName(), false);
+            if (me && g->isVisible())
                 meshAdded.push_back(me);
         }
     }
@@ -2006,34 +1721,16 @@ std::vector<std::string> GroupManager::getTopoVertices(const std::string& g, con
 std::vector<GroupEntity*> GroupManager::getVisibles() const
 {
 	std::vector<GroupEntity*> visibles;
-
-	for (std::vector<Group3D*>::const_iterator iter = m_group3D.begin();
-			iter != m_group3D.end(); ++iter)
-		if ((*iter)->isVisible() && !(*iter)->isDestroyed())
-			visibles.push_back((*iter));
-
-	for (std::vector<Group2D*>::const_iterator iter = m_group2D.begin();
-			iter != m_group2D.end(); ++iter)
-		if ((*iter)->isVisible() && !(*iter)->isDestroyed())
-			visibles.push_back((*iter));
-
-	for (std::vector<Group1D*>::const_iterator iter = m_group1D.begin();
-			iter != m_group1D.end(); ++iter)
-		if ((*iter)->isVisible() && !(*iter)->isDestroyed())
-			visibles.push_back((*iter));
-
-	for (std::vector<Group0D*>::const_iterator iter = m_group0D.begin();
-			iter != m_group0D.end(); ++iter)
-		if ((*iter)->isVisible() && !(*iter)->isDestroyed())
-			visibles.push_back((*iter));
-
+	for (GroupEntity* g : m_groups)
+		if (g->isVisible() && !g->isDestroyed())
+			visibles.push_back(g);
 	return visibles;
 }
 /*----------------------------------------------------------------------------*/
 void GroupManager::addProjectionOnPX0(const std::string& nom)
 {
 	// recherche du groupe 2D
-	Group2D* gr2d = getGroup2D(nom, true);
+	Group2D* gr2d = getGroup<Group2D>(nom, true);
 
 	// création de l'objet qui va modifier le maillage
 	Mesh::MeshModificationItf* modif = new Mesh::MeshModificationByProjectionOnP0(Mesh::MeshModificationByProjectionOnP0::X);
@@ -2055,7 +1752,7 @@ void GroupManager::addProjectionOnPX0(const std::string& nom)
 void GroupManager::addProjectionOnPY0(const std::string& nom)
 {
 	// recherche du groupe 2D
-	Group2D* gr2d = getGroup2D(nom, true);
+	Group2D* gr2d = getGroup<Group2D>(nom, true);
 
 	// création de l'objet qui va modifier le maillage
 	Mesh::MeshModificationItf* modif = new Mesh::MeshModificationByProjectionOnP0(Mesh::MeshModificationByProjectionOnP0::Y);
@@ -2077,7 +1774,7 @@ void GroupManager::addProjectionOnPY0(const std::string& nom)
 void GroupManager::addProjectionOnPZ0(const std::string& nom)
 {
 	// recherche du groupe 2D
-	Group2D* gr2d = getGroup2D(nom, true);
+	Group2D* gr2d = getGroup<Group2D>(nom, true);
 
 	// création de l'objet qui va modifier le maillage
 	Mesh::MeshModificationItf* modif = new Mesh::MeshModificationByProjectionOnP0(Mesh::MeshModificationByProjectionOnP0::Z);
@@ -2103,8 +1800,8 @@ void GroupManager::addCartesianPerturbation(const std::string& nom, PyObject* py
 	std::cout<<"GroupManager::addCartesianPerturbation("<<nom<<", "<<PyUnicode_AsUTF8(pyName)<<")"<<std::endl;
 #endif
 	// recherche du groupe 2D ou 3D
-	Group2D* gr2d = getGroup2D(nom, false);
-	Group3D* gr3d = getGroup3D(nom, false);
+	Group2D* gr2d = getGroup<Group2D>(nom, false);
+	Group3D* gr3d = getGroup<Group3D>(nom, false);
 
 	if (gr2d==0 && gr3d==0){
 		TkUtil::UTF8String messErr (TkUtil::Charset::UTF_8);
@@ -2137,8 +1834,8 @@ void GroupManager::addPolarPerturbation(const std::string& nom, PyObject* py_obj
 	std::cout<<"GroupManager::addPolarPerturbation("<<nom<<", "<<PyUnicode_AsUTF8(pyName)<<")"<<std::endl;
 #endif
 	// recherche du groupe 2D ou 3D
-	Group2D* gr2d = getGroup2D(nom, false);
-	Group3D* gr3d = getGroup3D(nom, false);
+	Group2D* gr2d = getGroup<Group2D>(nom, false);
+	Group3D* gr3d = getGroup<Group3D>(nom, false);
 
 	if (gr2d==0 && gr3d==0){
 		TkUtil::UTF8String messErr (TkUtil::Charset::UTF_8);
@@ -2170,7 +1867,7 @@ void GroupManager::addSmoothing(const std::string& nom, Mesh::SurfacicSmoothing&
 	std::cout<<"GroupManager::addSmoothing("<<nom<<", SurfacicSmoothing)"<<std::endl;
 #endif
 	// recherche du groupe 2D
-	Group2D* gr2d = getGroup2D(nom, true);
+	Group2D* gr2d = getGroup<Group2D>(nom, true);
 
 	CommandAddMeshModification* command = new CommandAddMeshModification(getContext(), gr2d, sm.clone());
 
@@ -2189,7 +1886,7 @@ void GroupManager::addSmoothing(const std::string& nom, Mesh::VolumicSmoothing& 
 	std::cout<<"GroupManager::addSmoothing("<<nom<<", VolumicSmoothing)"<<std::endl;
 #endif
 	// recherche du groupe 3D
-	Group3D* gr3d = getGroup3D(nom, true);
+	Group3D* gr3d = getGroup<Group3D>(nom, true);
 
 	CommandAddMeshModification* command = new CommandAddMeshModification(getContext(), gr3d, sm.clone());
 
@@ -2208,7 +1905,7 @@ void GroupManager::addSepa(const std::string& nom, Mesh::MeshModificationBySepa&
 	std::cout<<"GroupManager::addSepa("<<nom<<", MeshModificationBySepa)"<<std::endl;
 #endif
 	// recherche du groupe 2D
-	Group2D* gr2d = getGroup2D(nom, true);
+	Group2D* gr2d = getGroup<Group2D>(nom, true);
 
 	CommandAddMeshModification* command = new CommandAddMeshModification(getContext(), gr2d, ASepa.clone());
 
@@ -2223,53 +1920,35 @@ void GroupManager::addSepa(const std::string& nom, Mesh::MeshModificationBySepa&
 /*----------------------------------------------------------------------------*/
 void GroupManager::setLevel(std::vector<std::string>& vg, int dim, int level)
 {
-	   switch(dim){
-	    case(3):{
-	        for (uint i=0; i<vg.size(); i++){
-	            Group3D* gr = getGroup3D(vg[i], true);
-	            gr->setLevel(level);
-	        } // end for i
-	    }
-	    break;
-	    case(2):{
-	        for (uint i=0; i<vg.size(); i++){
-	            Group2D* gr = getGroup2D(vg[i], true);
-	            gr->setLevel(level);
-	        } // end for i
-	    }
-	    break;
-	    case(1):{
-	        for (uint i=0; i<vg.size(); i++){
-	            Group1D* gr = getGroup1D(vg[i], true);
-	            gr->setLevel(level);
-	        } // end for i
-	    }
-	    break;
-	    case(0):{
-	        for (uint i=0; i<vg.size(); i++){
-	            Group0D* gr = getGroup0D(vg[i], true);
-	            gr->setLevel(level);
-	        } // end for i
-	    }
-	    break;
-	    default:
-	        throw TkUtil::Exception (TkUtil::UTF8String ("dimension non prévue pour GroupManager::getInfos", TkUtil::Charset::UTF_8));
-	    }
-
+    for (std::string n : vg)
+        getGroup(n, dim, true)->setLevel(level);
 }
 /*----------------------------------------------------------------------------*/
 GroupEntity* GroupManager::getGroup(const std::string& name, const int dim, const bool exceptionIfNotFound) const
 {
     switch(dim){
-    case(3): return getGroup3D(name, exceptionIfNotFound);
-    case(2): return getGroup2D(name, exceptionIfNotFound);
-    case(1): return getGroup1D(name, exceptionIfNotFound);
-    case(0): return getGroup0D(name, exceptionIfNotFound);
-    default: {
-        throw TkUtil::Exception (TkUtil::UTF8String ("dimension non prévue pour GroupManager::getGroup", TkUtil::Charset::UTF_8));
-    }
+    case(3): return getGroup<Group3D>(name, exceptionIfNotFound);
+    case(2): return getGroup<Group2D>(name, exceptionIfNotFound);
+    case(1): return getGroup<Group1D>(name, exceptionIfNotFound);
+    case(0): return getGroup<Group0D>(name, exceptionIfNotFound);
+    default: throw TkUtil::Exception (TkUtil::UTF8String ("dimension non prévue pour GroupManager::getGroup", TkUtil::Charset::UTF_8));
     }
 }
+/*----------------------------------------------------------------------------*/
+template Group0D* GroupManager::getGroup<Group0D>(const std::string&, const bool) const;
+template Group1D* GroupManager::getGroup<Group1D>(const std::string&, const bool) const;
+template Group2D* GroupManager::getGroup<Group2D>(const std::string&, const bool) const;
+template Group3D* GroupManager::getGroup<Group3D>(const std::string&, const bool) const;
+/*----------------------------------------------------------------------------*/
+template Group0D* GroupManager::getNewGroup<Group0D>(const std::string&, Internal::InfoCommand*);
+template Group1D* GroupManager::getNewGroup<Group1D>(const std::string&, Internal::InfoCommand*);
+template Group2D* GroupManager::getNewGroup<Group2D>(const std::string&, Internal::InfoCommand*);
+template Group3D* GroupManager::getNewGroup<Group3D>(const std::string&, Internal::InfoCommand*);
+/*----------------------------------------------------------------------------*/
+template std::vector<Group0D*> GroupManager::getGroups<Group0D>(const bool) const;
+template std::vector<Group1D*> GroupManager::getGroups<Group1D>(const bool) const;
+template std::vector<Group2D*> GroupManager::getGroups<Group2D>(const bool) const;
+template std::vector<Group3D*> GroupManager::getGroups<Group3D>(const bool) const;
 /*----------------------------------------------------------------------------*/
 } // end namespace Group
 /*----------------------------------------------------------------------------*/

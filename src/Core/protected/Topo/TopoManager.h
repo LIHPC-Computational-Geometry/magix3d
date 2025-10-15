@@ -1899,10 +1899,9 @@ public:
     /// Enlève une association Geom-->Topo
     void removeRefTopo(const Geom::GeomEntity* ge, TopoEntity* te);
     /// Retourne les entités topologiques filtrées, léve une exception si aucune
-    template <class T>
+    template <typename T, typename = std::enable_if<std::is_base_of<Topo::TopoEntity, T>::value>>
     std::vector<T*> getFilteredRefTopos(const Geom::GeomEntity* ge)
     {
-        static_assert(std::is_base_of<Topo::TopoEntity, T>::value, "T doit hériter de TopoEntity");
         std::vector<T*> result;
         for (Topo::TopoEntity* te : getRefTopos(ge)) {
             if (T* casted = dynamic_cast<T*>(te)) {
