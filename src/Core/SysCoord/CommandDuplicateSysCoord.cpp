@@ -64,7 +64,7 @@ void CommandDuplicateSysCoord::internalRedo()
 /*----------------------------------------------------------------------------*/
 void CommandDuplicateSysCoord::addToGroup(SysCoord* rep, bool use_default_name)
 {
-    Group::Group3D* group = getContext().getGroupManager().getNewGroup3D(use_default_name?"":m_group_name, &getInfoCommand());
+    Group::Group3D* group = getContext().getGroupManager().getNewGroup<Group::Group3D>(use_default_name?"":m_group_name, &getInfoCommand());
     //rep->add(group);
     group->add(rep);
     getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);

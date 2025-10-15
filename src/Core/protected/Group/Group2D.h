@@ -40,6 +40,8 @@ class Group2D : public GroupEntity{
     static const char* typeNameGroup2D;
 
 public:
+    static const uint DIM = 2;
+
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur.
      */
@@ -54,7 +56,7 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  retourne la dimension du groupe
      */
-    int getDim() const {return 2;}
+    int getDim() const {return DIM;}
 
     /*------------------------------------------------------------------------*/
     /** \brief Donne le nom du type d'objet (un nom distinct par type d'objet)
@@ -90,7 +92,7 @@ public:
     std::vector<Mesh::Surface*>& getMeshSurfaces() {return m_mesh_surfaces;}
     const std::vector<Mesh::Surface*>& getMeshSurfaces() const {return m_mesh_surfaces;}
 
-    bool empty() const {return m_surfaces.empty() && m_cofaces.empty() && m_mesh_surfaces.empty();}
+    virtual bool empty() const {return m_surfaces.empty() && m_cofaces.empty() && m_mesh_surfaces.empty();}
 
     /*------------------------------------------------------------------------*/
     /// Enlève une Surface du groupe

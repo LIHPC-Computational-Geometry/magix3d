@@ -149,16 +149,12 @@ void CommandMeshExplorer::
 selectCoFaceAndBlocks(std::map<Topo::CoFace*, uint>& filtre_coface,
         std::map<Topo::Block*, uint>& filtre_block)
 {
-    // tous les groupes 3D
-    std::vector<Group::Group3D*> grp;
-    getContext().getGroupManager().getGroup3D(grp);
-
     // le nombre de blocs maillés en structuré
     uint nb_blocks_marked = 0;
 
     Topo::TopoManager& tm = getContext().getTopoManager();
-    for (uint ig=0; ig<grp.size(); ig++){
-    	std::vector<Geom::Volume*>& volumes = grp[ig]->getVolumes();
+    for (Group::Group3D* grp : getContext().getGroupManager().getGroups<Group::Group3D>()){
+    	std::vector<Geom::Volume*>& volumes = grp->getVolumes();
     	for (uint i=0; i<volumes.size(); i++){
             std::vector<Topo::Block*> topos = tm.getFilteredRefTopos<Topo::Block>(volumes[i]);
             for (Topo::Block* blk : topos) {
@@ -182,10 +178,7 @@ selectCoFaceAndBlocks(std::map<Topo::CoFace*, uint>& filtre_coface,
             } // end for blk : topos
     	} // end for i
 
-    	std::vector<Topo::Block*>& blocks = grp[ig]->getBlocks();
-    	for (uint j=0; j<blocks.size(); j++){
-    		Topo::Block* blk = blocks[j];
-
+    	for (Topo::Block* blk : grp->getBlocks()) {
     		if (blk->isStructured()){ // && blk->isMeshed()
     			filtre_block[blk] = 1;
     			nb_blocks_marked += 1;
@@ -197,15 +190,14 @@ selectCoFaceAndBlocks(std::map<Topo::CoFace*, uint>& filtre_coface,
 
     			blk->getCoFaces(cofaces);
 
-    			for (std::vector<Topo::CoFace* >::iterator iter1 = cofaces.begin();
-    					iter1 != cofaces.end(); ++iter1){
-    				filtre_coface[*iter1] = 1;
-    				//std::cout<<"filtre_coface à 1 pour "<<(*iter1)->getName()<<std::endl;
+    			for (Topo::CoFace* coface : cofaces){
+    				filtre_coface[coface] = 1;
+    				//std::cout<<"filtre_coface à 1 pour "<<coface->getName()<<std::endl;
     			}
 
     		} // end if (blk->isStructured() && blk->isMeshed())
-    	} // end for j
-    } // end for ig
+    	} // end for blk
+    } // end for grp
 
     if (nb_blocks_marked == 0){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -479,7 +471,7 @@ createSubVolume(std::vector<BlockDirPos>& bloc_dirPos)
                 getContext().newGraphicalRepresentation (*sv);
 
                 // recherche le groupe 3D de base pour connaitre sa visibilité
-                Group::Group3D* gr = getContext().getGroupManager().getGroup3D(*iter2, true);
+                Group::Group3D* gr = getContext().getGroupManager().getGroup<Group::Group3D>(*iter2, true);
                 sv->getDisplayProperties().setDisplayed(gr->isVisible());
 
                 corr_subVol[name] = sv;

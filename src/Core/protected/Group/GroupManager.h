@@ -110,47 +110,21 @@ public:
 #ifndef SWIG
     /*------------------------------------------------------------------------*/
     /// retourne l'entité à partir du nom, une exception si elle n'existe pas
-    Group3D* getGroup3D(const std::string& name, const bool exceptionIfNotFound=true) const;
+    template <typename T, typename = std::enable_if_t<std::is_base_of<GroupEntity, T>::value>>
+    T* getGroup(const std::string& name, const bool exceptionIfNotFound=true) const;
 
     /// retourne l'entité à partir du nom, et la créé si elle n'existe pas
-    Group3D* getNewGroup3D(const std::string& name, Internal::InfoCommand* icmd);
+    template <typename T, typename = std::enable_if_t<std::is_base_of<GroupEntity, T>::value>>
+    T* getNewGroup(const std::string& name, Internal::InfoCommand* icmd);
 
     /*------------------------------------------------------------------------*/
-    /// retourne l'entité à partir du nom, une exception si elle n'existe pas
-    Group2D* getGroup2D(const std::string& name, const bool exceptionIfNotFound=true) const;
-
-    /// retourne l'entité à partir du nom, et la créé si elle n'existe pas
-    Group2D* getNewGroup2D(const std::string& name, Internal::InfoCommand* icmd);
-
-     /*------------------------------------------------------------------------*/
-    /// retourne l'entité à partir du nom, une exception si elle n'existe pas
-    Group1D* getGroup1D(const std::string& name, const bool exceptionIfNotFound=true) const;
-
-    /// retourne l'entité à partir du nom, et la créé si elle n'existe pas
-    Group1D* getNewGroup1D(const std::string& name, Internal::InfoCommand* icmd);
+    /// retourne la liste des groupes, sans ou avec ceux détruits
+    template <typename T, typename = std::enable_if_t<std::is_base_of<GroupEntity, T>::value>>
+    std::vector<T*> getGroups(const bool onlyLive=true) const;
 
     /*------------------------------------------------------------------------*/
-    /// retourne l'entité à partir du nom, une exception si elle n'existe pas
-    Group0D* getGroup0D(const std::string& name, const bool exceptionIfNotFound=true) const;
-
-    /// retourne l'entité à partir du nom, et la créé si elle n'existe pas
-    Group0D* getNewGroup0D(const std::string& name, Internal::InfoCommand* icmd);
-
-    /*------------------------------------------------------------------------*/
-    /// retourne la liste des groupes 3D, sans ou avec ceux détruits
-    void getGroup3D(std::vector<Group3D*>& grp, const bool onlyLive=true) const;
-
-    /// retourne la liste des groupes 2D, sans ou avec ceux détruits
-    void getGroup2D(std::vector<Group2D*>& grp, const bool onlyLive=true) const;
-
-    /// retourne la liste des groupes 1D, sans ou avec ceux détruits
-    void getGroup1D(std::vector<Group1D*>& grp, const bool onlyLive=true) const;
-
-    /// retourne la liste des groupes 0D, sans ou avec ceux détruits
-    void getGroup0D(std::vector<Group0D*>& grp, const bool onlyLive=true) const;
-
     /// retourne la liste des groupes de dimensions dims, sans ou avec ceux détruits
-    void getGroups (std::vector<GroupEntity*>& grp, Mgx3D::Internal::SelectionManager::DIM dims, const bool onlyLive=true) const;
+    std::vector<GroupEntity*> getGroups (Mgx3D::Internal::SelectionManager::DIM dims, const bool onlyLive=true) const;
 
     /*------------------------------------------------------------------------*/
     /** Fonction qui à partir d'un filtre (stocké) et des ensembles des groupes qui
@@ -530,17 +504,8 @@ public:
 
 
 private:
-    /// Conteneur pour les groupes 3D
-    std::vector<Group3D*> m_group3D;
-
-    /// Conteneur pour les groupes 2D
-    std::vector<Group2D*> m_group2D;
-
-    /// Conteneur pour les groupes 1D
-    std::vector<Group1D*> m_group1D;
-
-    /// Conteneur pour les groupes 0D
-    std::vector<Group0D*> m_group0D;
+    /// Conteneur pour les groupes
+    std::vector<GroupEntity*> m_groups;
 
     /// ancien masque
     Utils::FilterEntity::objectType m_visibilityMask;

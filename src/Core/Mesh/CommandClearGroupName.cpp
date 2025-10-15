@@ -46,7 +46,7 @@ void CommandClearGroupName::internalExecute()
 
     switch(m_dim){
     case(0):{
-    	Group::Group0D* grp = getContext().getGroupManager().getNewGroup0D(m_groupName, &getInfoCommand());
+    	Group::Group0D* grp = getContext().getGroupManager().getNewGroup<Group::Group0D>(m_groupName, &getInfoCommand());
 
     	std::vector<Geom::Vertex*> geoms = grp->getVertices();
     	for (std::vector<Geom::Vertex*>::iterator iter = geoms.begin();
@@ -76,7 +76,7 @@ void CommandClearGroupName::internalExecute()
     }
     break;
     case(1):{
-    	Group::Group1D* grp = getContext().getGroupManager().getNewGroup1D(m_groupName, &getInfoCommand());
+    	Group::Group1D* grp = getContext().getGroupManager().getNewGroup<Group::Group1D>(m_groupName, &getInfoCommand());
 
     	std::vector<Geom::Curve*> geoms = grp->getCurves();
     	for (std::vector<Geom::Curve*>::iterator iter = geoms.begin();
@@ -106,7 +106,7 @@ void CommandClearGroupName::internalExecute()
     }
     break;
     case(2):{
-        Group::Group2D* grp = getContext().getGroupManager().getNewGroup2D(m_groupName, &getInfoCommand());
+        Group::Group2D* grp = getContext().getGroupManager().getNewGroup<Group::Group2D>(m_groupName, &getInfoCommand());
 
         std::vector<Geom::Surface*> geoms = grp->getSurfaces();
         for (std::vector<Geom::Surface*>::iterator iter = geoms.begin();
@@ -136,7 +136,7 @@ void CommandClearGroupName::internalExecute()
     }
     break;
     case(3):{
-        Group::Group3D* grp = getContext().getGroupManager().getNewGroup3D(m_groupName, &getInfoCommand());
+        Group::Group3D* grp = getContext().getGroupManager().getNewGroup<Group::Group3D>(m_groupName, &getInfoCommand());
 
         std::vector<Geom::Volume*> geoms = grp->getVolumes();
         for (std::vector<Geom::Volume*>::iterator iter = geoms.begin();
@@ -252,7 +252,7 @@ void CommandClearGroupName::internalUndo()
 	}
 	break;
 	case(3):{
-		Group::Group3D* grp = gm.getNewGroup3D(m_groupName, &getInfoCommand());
+		Group::Group3D* grp = gm.getNewGroup<Group::Group3D>(m_groupName, &getInfoCommand());
 
 		for (std::vector<Geom::GeomEntity*>::iterator iter = m_geom_entities.begin();
 				iter != m_geom_entities.end(); ++iter){

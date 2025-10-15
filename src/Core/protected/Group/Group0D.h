@@ -37,6 +37,8 @@ class Group0D : public GroupEntity{
     static const char* typeNameGroup0D;
 
 public:
+    static const uint DIM = 0;
+
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur.
      */
@@ -51,7 +53,7 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  retourne la dimension du groupe
      */
-    int getDim() const {return 0;}
+    int getDim() const {return DIM;}
 
     /*------------------------------------------------------------------------*/
     /** \brief Donne le nom du type d'objet (un nom distinct par type d'objet)
@@ -73,7 +75,7 @@ public:
 
      /*------------------------------------------------------------------------*/
 	/// retourne les entités du groupe.
-     virtual std::vector<Utils::Entity*> getEntities() const;
+    virtual std::vector<Utils::Entity*> getEntities() const;
 
     /*------------------------------------------------------------------------*/
     /// accesseur sur la liste des Vertices référencées
@@ -84,7 +86,7 @@ public:
     std::vector<Topo::Vertex*>& getTopoVertices() {return m_topo_vertices;}
     const std::vector<Topo::Vertex*>& getTopoVertices() const {return m_topo_vertices;}
 
-    bool empty() const {return m_vertices.empty() && m_topo_vertices.empty();}
+    virtual bool empty() const {return m_vertices.empty() && m_topo_vertices.empty();}
 
     /*------------------------------------------------------------------------*/
     /// Enlève un Vertex du groupe
