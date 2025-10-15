@@ -43,6 +43,8 @@ class Group3D : public GroupEntity{
     static const char* typeNameGroup3D;
 
 public:
+    static const uint DIM = 3;
+
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur.
      */
@@ -57,7 +59,7 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  retourne la dimension du groupe
      */
-    int getDim() const {return 3;}
+    int getDim() const {return DIM;}
 
     /*------------------------------------------------------------------------*/
     /** \brief Donne le nom du type d'objet (un nom distinct par type d'objet)
@@ -98,7 +100,7 @@ public:
     std::vector<CoordinateSystem::SysCoord*>& getSysCoord() {return m_sys_coord;}
     const std::vector<CoordinateSystem::SysCoord*>& getSysCoord() const {return m_sys_coord;}
 
-   bool empty() const {return m_volumes.empty() && m_blocks.empty() && m_mesh_volumes.empty() && m_sys_coord.empty();}
+    virtual bool empty() const {return m_volumes.empty() && m_blocks.empty() && m_mesh_volumes.empty() && m_sys_coord.empty();}
 
     /*------------------------------------------------------------------------*/
     /// Enlève un volume du groupe

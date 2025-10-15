@@ -180,7 +180,7 @@ vector<Entity*> QtGroupProjectionOnPlanePanel::getInvolvedEntities ( )
 	const string		groupName	= getGroupName ( );
 	if (false == groupName.empty ( ))
 	{
-		Group2D*	group	= getContext ( ).getGroupManager ( ).getGroup2D (groupName, false);
+		Group2D*	group	= getContext ( ).getGroupManager ( ).getGroup<Group::Group2D> (groupName, false);
 		if (0 != group)
 			entities.push_back (group);
 	}	// if (false == groupName.empty ( ))

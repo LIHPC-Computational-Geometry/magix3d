@@ -335,7 +335,7 @@ duplicate(Block* bl)
         getInfoCommand().addTopoInfoEntity(new_block, Internal::InfoCommand::CREATED);
 
         if (!m_groupName.empty()){
-	    	Group::Group3D* grp = getContext().getGroupManager().getNewGroup3D(m_groupName, &getInfoCommand());
+	    	Group::Group3D* grp = getContext().getGroupManager().getNewGroup<Group::Group3D>(m_groupName, &getInfoCommand());
 			grp->add(new_block);
 			new_block->add(grp);
 		}

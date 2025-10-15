@@ -743,19 +743,19 @@ void QtGroupsPanel::displaySelectedGroupsNames (bool display)
 
 			std::string nom = (*it)->getGroup ( )->getName();
 
-			GroupEntity* gr0 = getStdContext()->getGroupManager().getGroup0D(nom, false);
+			GroupEntity* gr0 = getStdContext()->getGroupManager().getGroup<Group::Group0D>(nom, false);
 			if (gr0)
 				groups.push_back (gr0);
 
-			GroupEntity* gr1 = getStdContext()->getGroupManager().getGroup1D(nom, false);
+			GroupEntity* gr1 = getStdContext()->getGroupManager().getGroup<Group::Group1D>(nom, false);
 			if (gr1)
 				groups.push_back (gr1);
 
-			GroupEntity* gr2 = getStdContext()->getGroupManager().getGroup2D(nom, false);
+			GroupEntity* gr2 = getStdContext()->getGroupManager().getGroup<Group::Group2D>(nom, false);
 			if (gr2)
 				groups.push_back (gr2);
 
-			GroupEntity* gr3 = getStdContext()->getGroupManager().getGroup3D(nom, false);
+			GroupEntity* gr3 = getStdContext()->getGroupManager().getGroup<Group::Group3D>(nom, false);
 			if (gr3)
 				groups.push_back (gr3);
 
@@ -1916,11 +1916,10 @@ void QtGroupsPanel::levelSelectionCallback ( )
 		_entitiesGroupsWidget->clearSelection ( );
 //		getContext ( ).getSelectionManager ( ).clearSelection();
 
-	const SelectionManager::DIM	dimensions	= dialog.dimensions ( );
-	const set<unsigned long>		levels		= dialog.levels ( );
-	vector<GroupEntity*>			groups;
+	const SelectionManager::DIM	dimensions = dialog.dimensions ( );
+	const set<unsigned long>		levels = dialog.levels ( );
+	vector<GroupEntity*>			groups = getContext ( ).getGroupManager( ).getGroups (dimensions, true);
 //	vector<Entity*>					selection;
-	getContext ( ).getGroupManager( ).getGroups (groups, dimensions, true);
 	for (vector<GroupEntity*>::iterator itg = groups.begin ( ); groups.end ( ) != itg; itg++)
 	{
 		for (set<unsigned long>::const_iterator itl = levels.begin ( ); levels.end ( ) != itl; itl++)

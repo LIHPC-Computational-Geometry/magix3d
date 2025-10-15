@@ -178,8 +178,7 @@ CommandNewTopo::
             CoEdge* coedge = new CoEdge(getContext(), &emp, v0, v1);
 
 
-            Group::Group1D *group = getContext().getGroupManager().getNewGroup1D(groupName,
-                                                                                      &getInfoCommand());
+            Group::Group1D *group = getContext().getGroupManager().getNewGroup<Group::Group1D>(groupName, &getInfoCommand());
             group->add(coedge);
             coedge->add(group);
             getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
@@ -339,8 +338,7 @@ CommandNewTopo::
 
             Topo::CoFace* face = new CoFace(getContext(), edges, true);
 
-            Group::Group2D *group = getContext().getGroupManager().getNewGroup2D(groupName,
-                                                                                      &getInfoCommand());
+            Group::Group2D *group = getContext().getGroupManager().getNewGroup<Group::Group2D>(groupName, &getInfoCommand());
             group->add(face);
             face->add(group);
             getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
