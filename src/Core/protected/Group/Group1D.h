@@ -37,6 +37,8 @@ class Group1D : public GroupEntity{
     static const char* typeNameGroup1D;
 
 public:
+    static const uint DIM = 1;
+
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur.
      */
@@ -51,7 +53,7 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  retourne la dimension du groupe
      */
-    int getDim() const {return 1;}
+    int getDim() const {return DIM;}
 
     /*------------------------------------------------------------------------*/
     /** \brief Donne le nom du type d'objet (un nom distinct par type d'objet)
@@ -84,7 +86,7 @@ public:
     std::vector<Topo::CoEdge*>& getCoEdges() {return m_coedges;}
     const std::vector<Topo::CoEdge*>& getCoEdges() const {return m_coedges;}
 
-    bool empty() const {return m_curves.empty() && m_coedges.empty();}
+    virtual bool empty() const {return m_curves.empty() && m_coedges.empty();}
 
     /*------------------------------------------------------------------------*/
     /// Enlève une Curve du groupe

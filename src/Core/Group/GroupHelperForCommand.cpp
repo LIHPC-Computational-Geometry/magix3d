@@ -15,7 +15,7 @@ GroupHelperForCommand(Internal::InfoCommand& info_command, GroupManager& group_m
 Group3D* GroupHelperForCommand::
 addToGroup(const std::string group_name, Geom::Volume* v)
 {
-	Group3D* grp = m_group_manager.getNewGroup3D(group_name, &m_info_command);
+	Group3D* grp = m_group_manager.getNewGroup<Group3D>(group_name, &m_info_command);
     addEntityToGroup(grp, v);
     return grp;
 }
@@ -23,7 +23,7 @@ addToGroup(const std::string group_name, Geom::Volume* v)
 Group2D* GroupHelperForCommand::
 addToGroup(const std::string group_name, Geom::Surface* s)
 {
-	Group2D* grp = m_group_manager.getNewGroup2D(group_name, &m_info_command);
+	Group2D* grp = m_group_manager.getNewGroup<Group2D>(group_name, &m_info_command);
     addEntityToGroup(grp, s);
     return grp;
 }
@@ -31,7 +31,7 @@ addToGroup(const std::string group_name, Geom::Surface* s)
 Group1D* GroupHelperForCommand::
 addToGroup(const std::string group_name, Geom::Curve* c)
 {
-	Group1D* grp = m_group_manager.getNewGroup1D(group_name, &m_info_command);
+	Group1D* grp = m_group_manager.getNewGroup<Group1D>(group_name, &m_info_command);
     addEntityToGroup(grp, c);
     return grp;
 }
@@ -39,7 +39,7 @@ addToGroup(const std::string group_name, Geom::Curve* c)
 Group0D* GroupHelperForCommand::
 addToGroup(const std::string group_name, Geom::Vertex* v)
 {
-	Group0D* grp = m_group_manager.getNewGroup0D(group_name, &m_info_command);
+	Group0D* grp = m_group_manager.getNewGroup<Group0D>(group_name, &m_info_command);
     addEntityToGroup(grp, v);
     return grp;
 }
@@ -59,7 +59,7 @@ addToGroup(const std::string group_name, Geom::GeomEntity* e)
 Group3D* GroupHelperForCommand::
 addToGroup(const std::string group_name, Topo::Block* b)
 {
-	Group3D* grp = m_group_manager.getNewGroup3D(group_name, &m_info_command);
+	Group3D* grp = m_group_manager.getNewGroup<Group3D>(group_name, &m_info_command);
     addEntityToGroup(grp, b);
     return grp;
 }
@@ -67,7 +67,7 @@ addToGroup(const std::string group_name, Topo::Block* b)
 Group2D* GroupHelperForCommand::
 addToGroup(const std::string group_name, Topo::CoFace* f)
 {
-	Group2D* grp = m_group_manager.getNewGroup2D(group_name, &m_info_command);
+	Group2D* grp = m_group_manager.getNewGroup<Group2D>(group_name, &m_info_command);
     addEntityToGroup(grp, f);
     return grp;
 }
@@ -75,7 +75,7 @@ addToGroup(const std::string group_name, Topo::CoFace* f)
 Group1D* GroupHelperForCommand::
 addToGroup(const std::string group_name, Topo::CoEdge* e)
 {
-	Group1D* grp = m_group_manager.getNewGroup1D(group_name, &m_info_command);
+	Group1D* grp = m_group_manager.getNewGroup<Group1D>(group_name, &m_info_command);
     addEntityToGroup(grp, e);
     return grp;
 }
@@ -83,7 +83,7 @@ addToGroup(const std::string group_name, Topo::CoEdge* e)
 Group0D* GroupHelperForCommand::
 addToGroup(const std::string group_name, Topo::Vertex* v)
 {
-	Group0D* grp = m_group_manager.getNewGroup0D(group_name, &m_info_command);
+	Group0D* grp = m_group_manager.getNewGroup<Group0D>(group_name, &m_info_command);
     addEntityToGroup(grp, v);
     return grp;
 }
@@ -91,7 +91,7 @@ addToGroup(const std::string group_name, Topo::Vertex* v)
 Group3D* GroupHelperForCommand::
 removeFromGroup(const std::string group_name, Geom::Volume* v)
 {
-	Group3D* grp = m_group_manager.getGroup3D(group_name, &m_info_command);
+	Group3D* grp = m_group_manager.getGroup<Group3D>(group_name, &m_info_command);
     removeEntityFromGroup(grp, v);
     return grp;
 }
@@ -99,7 +99,7 @@ removeFromGroup(const std::string group_name, Geom::Volume* v)
 Group2D* GroupHelperForCommand::
 removeFromGroup(const std::string group_name, Geom::Surface* s)
 {
-	Group2D* grp = m_group_manager.getGroup2D(group_name, &m_info_command);
+	Group2D* grp = m_group_manager.getGroup<Group2D>(group_name, &m_info_command);
     removeEntityFromGroup(grp, s);
     return grp;
 }
@@ -107,7 +107,7 @@ removeFromGroup(const std::string group_name, Geom::Surface* s)
 Group1D* GroupHelperForCommand::
 removeFromGroup(const std::string group_name, Geom::Curve* c)
 {
-	Group1D* grp = m_group_manager.getGroup1D(group_name, &m_info_command);
+	Group1D* grp = m_group_manager.getGroup<Group1D>(group_name, &m_info_command);
     removeEntityFromGroup(grp, c);
     return grp;
 }
@@ -115,7 +115,7 @@ removeFromGroup(const std::string group_name, Geom::Curve* c)
 Group0D* GroupHelperForCommand::
 removeFromGroup(const std::string group_name, Geom::Vertex* v)
 {
-	Group0D* grp = m_group_manager.getGroup0D(group_name, &m_info_command);
+	Group0D* grp = m_group_manager.getGroup<Group0D>(group_name, &m_info_command);
     removeEntityFromGroup(grp, v);
     return grp;
 }
@@ -123,7 +123,7 @@ removeFromGroup(const std::string group_name, Geom::Vertex* v)
 Group3D* GroupHelperForCommand::
 removeFromGroup(const std::string group_name, Topo::Block* b)
 {
-	Group3D* grp = m_group_manager.getGroup3D(group_name, &m_info_command);
+	Group3D* grp = m_group_manager.getGroup<Group3D>(group_name, &m_info_command);
     removeEntityFromGroup(grp, b);
     return grp;
 }
@@ -131,7 +131,7 @@ removeFromGroup(const std::string group_name, Topo::Block* b)
 Group2D* GroupHelperForCommand::
 removeFromGroup(const std::string group_name, Topo::CoFace* f)
 {
-	Group2D* grp = m_group_manager.getGroup2D(group_name, &m_info_command);
+	Group2D* grp = m_group_manager.getGroup<Group2D>(group_name, &m_info_command);
     removeEntityFromGroup(grp, f);
     return grp;
 }
@@ -139,7 +139,7 @@ removeFromGroup(const std::string group_name, Topo::CoFace* f)
 Group1D* GroupHelperForCommand::
 removeFromGroup(const std::string group_name, Topo::CoEdge* e)
 {
-	Group1D* grp = m_group_manager.getGroup1D(group_name, &m_info_command);
+	Group1D* grp = m_group_manager.getGroup<Group1D>(group_name, &m_info_command);
     removeEntityFromGroup(grp, e);
     return grp;
 }
@@ -147,7 +147,7 @@ removeFromGroup(const std::string group_name, Topo::CoEdge* e)
 Group0D* GroupHelperForCommand::
 removeFromGroup(const std::string group_name, Topo::Vertex* v)
 {
-	Group0D* grp = m_group_manager.getGroup0D(group_name, &m_info_command);
+	Group0D* grp = m_group_manager.getGroup<Group0D>(group_name, &m_info_command);
     removeEntityFromGroup(grp, v);
     return grp;
 }

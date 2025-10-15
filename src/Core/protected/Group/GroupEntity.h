@@ -63,22 +63,25 @@ public:
     /// retourne les infos sur l'entité
      virtual std::string getInfos() =0;
 
-     /*------------------------------------------------------------------------*/
+    /*------------------------------------------------------------------------*/
     virtual void getRepresentation(
 			Mgx3D::Utils::DisplayRepresentation& dr, bool checkDestroyed) const;
 
-     /*------------------------------------------------------------------------*/
-     /// Identification des groupes avec nom par défaut (type Hors_Groupe...)
-     bool isDefaultGroup() const {return m_isDefaultGroup;}
+    /*------------------------------------------------------------------------*/
+    /// Identification des groupes avec nom par défaut (type Hors_Groupe...)
+    bool isDefaultGroup() const {return m_isDefaultGroup;}
 
-     /*------------------------------------------------------------------------*/
-     /// changement de niveau d'un groupe
-     void setLevel (uint level) {m_level = level;}
+    /*------------------------------------------------------------------------*/
+    /// changement de niveau d'un groupe
+    void setLevel (uint level) {m_level = level;}
 
-     /// accès au niveau d'un groupe
-     uint getLevel () const {return m_level;}
+    /// accès au niveau d'un groupe
+    uint getLevel () const {return m_level;}
 
-     /*------------------------------------------------------------------------*/
+    /// Retourne vrai si le groupe est vide
+    virtual bool empty() const = 0;
+
+    /*------------------------------------------------------------------------*/
 #ifndef SWIG
     /** \brief  Fournit une représentation textuelle de l'entité.
 	 * \param	true si l'entité fourni la totalité de sa description, false si
