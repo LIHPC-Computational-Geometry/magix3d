@@ -12,7 +12,6 @@
 /*----------------------------------------------------------------------------*/
 #include <gmds/ig/Mesh.h>
 #include <gmds/io/IGMeshIOService.h>
-#include <gmds/io/VTKWriter.h>
 #include <gmds/aero/CGNSWriter3D.h>
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
@@ -40,13 +39,14 @@ namespace Mgx3D {
 
             std::map<gmds::TCellID,unsigned long> n2v;
 
-            gmds::Mesh mesh(gmds::MeshModel(gmds::DIM3 | gmds::N | gmds::F | gmds::R | gmds::R2N | gmds::N2R | gmds::R2F |  gmds::F2R | gmds::F2N | gmds::N2F));
+            gmds::Mesh mesh(gmds::MeshModel(gmds::DIM3 | gmds::N | gmds::F | gmds::R |
+                gmds::R2N | gmds::N2R | gmds::R2F |  gmds::F2R | gmds::F2N | gmds::N2F));
 
-            gmds::Mesh localMesh = m_context.getMeshManager().getMesh()->getGMDSMesh();
+            gmds::Mesh* localMesh = &m_context.getMeshManager().getMesh()->getGMDSMesh();
 
 
-            for(int iVertex = 0; iVertex < localMesh.getNbNodes(); iVertex++){
-                gmds::Node n_local = localMesh.get<gmds::Node>(iVertex);
+            for(int iVertex = 0; iVertex < localMesh->getNbNodes(); iVertex++){
+                gmds::Node n_local = localMesh->get<gmds::Node>(iVertex);
                 gmds::Node n = mesh.newNode(n_local.X(),n_local.Y(),n_local.Z());
             }
 
@@ -158,7 +158,7 @@ namespace Mgx3D {
 
         }
 /*----------------------------------------------------------------------------*/
-    } // end namespace Topo
+    } // end namespace Mesh
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D
 /*----------------------------------------------------------------------------*/

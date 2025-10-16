@@ -7,12 +7,11 @@
  *  Author: legoff
  */
 /*----------------------------------------------------------------------------*/
-#ifndef MGX3D_GEOM_COMMANDEXPORTBLOCKSFORCGNS_H_
-#define MGX3D_GEOM_COMMANDEXPORTBLOCKSFORCGNS_H_
+#ifndef MGX3D_COMMANDEXPORTBLOCKSFORCGNS_H_
+#define MGX3D_COMMANDEXPORTBLOCKSFORCGNS_H_
 /*----------------------------------------------------------------------------*/
 #include "Internal/CommandInternal.h"
 #include "Utils/Vector.h"
-#include "Geom/GeomEntity.h"
 #include "Internal/Context.h"
 #include "ExportBlocksCGNSImplementation.h"
 /*----------------------------------------------------------------------------*/
@@ -25,8 +24,7 @@ namespace Mesh {
 class GeomManager;
 /*----------------------------------------------------------------------------*/
 /** \class CommandExportBlocksForCGNS
- *  \brief Commande permettant d'exporter l'ensemble des entités géométriques
- *         dans un fichier au format VTK
+ *  \brief Commande permettant d'exporter le maillage au format CGNS
  */
 /*----------------------------------------------------------------------------*/
 class CommandExportBlocksForCGNS: public Internal::CommandInternal{
@@ -64,9 +62,9 @@ protected:
     ExportBlocksCGNSImplementation m_impl;
 };
 /*----------------------------------------------------------------------------*/
-} // end namespace Geom
+} // end namespace Mesh
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D
 /*----------------------------------------------------------------------------*/
-#endif /* MGX3D_GEOM_COMMANDEXPORTBLOCKSFORCGNS_H_ */
+#endif /* MGX3D_COMMANDEXPORTBLOCKSFORCGNS_H_ */
 /*----------------------------------------------------------------------------*/

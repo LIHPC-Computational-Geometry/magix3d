@@ -22,7 +22,7 @@ namespace Mgx3D {
         public:
 
             /*------------------------------------------------------------------------*/
-            /** \brief  Constructeur (exportation de toutes entités du GeomManager)
+            /** \brief  Constructeur
              *
              *  \param c le contexte
              *  \param n le nom du fichier dans lequel se fait l'exportation
@@ -58,7 +58,7 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D
 /*----------------------------------------------------------------------------*/
-#endif /* EXPORTBLOCKCGNSSIMPLEMENTATION_H_ */
+#endif //EXPORTBLOCKSCGNSIMPLEMENTATION_H_
 /*----------------------------------------------------------------------------*/
 
 

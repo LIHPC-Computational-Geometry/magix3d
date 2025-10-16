@@ -101,7 +101,7 @@ public:
 	SET_SWIG_COMPLETABLE_METHOD(writeCGNS)
 
 	/*------------------------------------------------------------------------*/
-	/** \brief Export dans un fichier au format VTK de la structure de blocs
+	/** \brief Export dans un fichier au format CGNS du maillage
 	 *
 	 *  \param n le nom du ficher dans lequel on exporte
 	 */

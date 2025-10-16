@@ -8,7 +8,7 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
         CommandExportBlocksForCGNS::
         CommandExportBlocksForCGNS(Internal::Context& context, const std::string& fileName)
-                : Internal::CommandInternal(context, "Export VTK total (géométrie)")
+                : Internal::CommandInternal(context, "Export CGNS total")
                 , m_impl(context,fileName)
         {
         }
@@ -21,7 +21,7 @@ namespace Mgx3D {
         void CommandExportBlocksForCGNS::
         internalExecute()
         {
-            // écriture du VTK
+            // écriture du CGNS
             m_impl.perform(&getInfoCommand());
         }
 /*----------------------------------------------------------------------------*/
