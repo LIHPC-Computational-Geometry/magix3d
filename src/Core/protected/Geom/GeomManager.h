@@ -87,9 +87,12 @@ public:
      */
     GeomInfo getInfos(std::string e, int dim);
 	SET_SWIG_COMPLETABLE_METHOD(getInfos)
+    std::string getTextualDescription(std::string e, int dim);
+	SET_SWIG_COMPLETABLE_METHOD(getTextualDescription)
 
 #ifndef SWIG
     GeomInfo getInfos(const GeomEntity* e);
+    std::string getTextualDescription(const GeomEntity* e);
 #endif
 
     /** retourne les coordonnés d'un sommet */
@@ -1463,6 +1466,9 @@ public:
 #endif
 
 private:
+	/// Retourne vrai si l'une des entités géométriques a un lien sur une entité topologique
+	bool hasRefTopo(std::vector<Geom::GeomEntity*>& entities);
+
     /** volumes gérés par le manager */
     std::vector<Volume*>  m_volumes;
     /** surfaces gérées par le manager */

@@ -334,24 +334,24 @@ void TopoHelper::getVertices(const std::vector<Block* > & blocs,
 /*----------------------------------------------------------------------------*/
 void TopoHelper::get(std::vector<Geom::Volume*>& volumes, std::set<Topo::Block*>& blocks)
 {
-	for (uint j=0; j<volumes.size(); j++){
-		std::vector<Topo::Block*> loc_blocks;
-		volumes[j]->get(loc_blocks);
+	for (Geom::Volume* vol : volumes){
+        Topo::TopoManager& tm = vol->getContext().getTopoManager();
+		std::vector<Topo::Block*> loc_blocks = tm.getFilteredRefTopos<Topo::Block>(vol);
 		blocks.insert(loc_blocks.begin(), loc_blocks.end());
 	}
 }
 /*----------------------------------------------------------------------------*/
 void TopoHelper::get(std::vector<Geom::Volume*>& volumes, std::set<Topo::CoFace*>& cofaces, bool propagate)
 {
-	for (uint j=0; j<volumes.size(); j++){
+	for (Geom::Volume* vol : volumes){
 		// les cofaces depuis les blocs
-		std::vector<Topo::Block*> blocs;
-		volumes[j]->get(blocs);
+        Topo::TopoManager& tm = vol->getContext().getTopoManager();
+		std::vector<Topo::Block*> blocs = tm.getFilteredRefTopos<Topo::Block>(vol);
 		Topo::TopoHelper::get(blocs, cofaces);
 
 		if (propagate){
 			// on parcourt les surfaces pour les cas sans blocs ...
-			auto surfaces = volumes[j]->getSurfaces();
+			auto surfaces = vol->getSurfaces();
 			Topo::TopoHelper::get(surfaces, cofaces);
 		}
 	}
@@ -359,16 +359,16 @@ void TopoHelper::get(std::vector<Geom::Volume*>& volumes, std::set<Topo::CoFace*
 /*----------------------------------------------------------------------------*/
 void TopoHelper::get(std::vector<Geom::Volume*>& volumes, std::set<Topo::CoEdge*>& coedges, bool propagate)
 {
-	for (uint j=0; j<volumes.size(); j++){
+	for (Geom::Volume* vol : volumes){
 		// les coedges depuis les blocs
-		std::vector<Topo::Block*> blocs;
-		volumes[j]->get(blocs);
+        Topo::TopoManager& tm = vol->getContext().getTopoManager();
+		std::vector<Topo::Block*> blocs = tm.getFilteredRefTopos<Topo::Block>(vol);
 		Topo::TopoHelper::get(blocs, coedges);
 
 		if (propagate){
 
             Geom::GetDownIncidentGeomEntitiesVisitor v;
-            volumes[j]->accept(v);
+            vol->accept(v);
             std::vector<Geom::Surface*> surfaces (v.getSurfaces().begin(), v.getSurfaces().end());
             std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
 
@@ -385,8 +385,8 @@ void TopoHelper::get(std::vector<Geom::Volume*>& volumes, std::set<Topo::Vertex*
 {
 	for (uint j=0; j<volumes.size(); j++){
 		// les vertices depuis les blocs
-		std::vector<Topo::Block*> blocs;
-		volumes[j]->get(blocs);
+        Topo::TopoManager& tm = volumes[j]->getContext().getTopoManager();
+		std::vector<Topo::Block*> blocs = tm.getFilteredRefTopos<Topo::Block>(volumes[j]);
 		Topo::TopoHelper::get(blocs, vertices);
 
 		if (propagate){
@@ -412,8 +412,8 @@ void TopoHelper::get(std::vector<Geom::Volume*>& volumes, std::set<Topo::Vertex*
 void TopoHelper::get(std::vector<Geom::Surface*>& surfaces, std::set<Topo::CoFace*>& cofaces)
 {
 	for (uint k=0; k<surfaces.size(); k++){
-		std::vector<Topo::CoFace* > loc_cofaces;
-		surfaces[k]->get(loc_cofaces);
+        Topo::TopoManager& tm = surfaces[k]->getContext().getTopoManager();
+		std::vector<Topo::CoFace* > loc_cofaces = tm.getFilteredRefTopos<Topo::CoFace>(surfaces[k]);
 		cofaces.insert(loc_cofaces.begin(), loc_cofaces.end());
 	}
 }
@@ -422,8 +422,8 @@ void TopoHelper::get(std::vector<Geom::Surface*>& surfaces, std::set<Topo::CoEdg
 {
 	for (uint j=0; j<surfaces.size(); j++){
 		// les coedges depuis les faces
-		std::vector<Topo::CoFace*> cofaces;
-		surfaces[j]->get(cofaces);
+        Topo::TopoManager& tm = surfaces[j]->getContext().getTopoManager();
+		std::vector<Topo::CoFace*> cofaces = tm.getFilteredRefTopos<Topo::CoFace>(surfaces[j]);
 		Topo::TopoHelper::get(cofaces, coedges);
 
 		if (propagate){
@@ -437,10 +437,9 @@ void TopoHelper::get(std::vector<Geom::Surface*>& surfaces, std::set<Topo::CoEdg
 void TopoHelper::get(std::vector<Geom::Surface*>& surfaces, std::set<Topo::Vertex*>& vertices, bool propagate)
 {
 	for (uint j=0; j<surfaces.size(); j++){
-
 		// les vertices depuis les faces
-		std::vector<Topo::CoFace*> cofaces;
-		surfaces[j]->get(cofaces);
+        Topo::TopoManager& tm = surfaces[j]->getContext().getTopoManager();
+		std::vector<Topo::CoFace*> cofaces = tm.getFilteredRefTopos<Topo::CoFace>(surfaces[j]);
 		Topo::TopoHelper::get(cofaces, vertices);
 
 		if (propagate){
@@ -462,8 +461,8 @@ void TopoHelper::get(std::vector<Geom::Surface*>& surfaces, std::set<Topo::Verte
 void TopoHelper::get(std::vector<Geom::Curve*>& curves, std::set<Topo::CoEdge*>& coedges)
 {
 	for (uint k=0; k<curves.size(); k++){
-		std::vector<Topo::CoEdge* > loc_coedges;
-		curves[k]->get(loc_coedges);
+        Topo::TopoManager& tm = curves[k]->getContext().getTopoManager();
+		std::vector<Topo::CoEdge* > loc_coedges = tm.getFilteredRefTopos<Topo::CoEdge>(curves[k]);
 		coedges.insert(loc_coedges.begin(), loc_coedges.end());
 	}
 }
@@ -471,8 +470,8 @@ void TopoHelper::get(std::vector<Geom::Curve*>& curves, std::set<Topo::CoEdge*>&
 void TopoHelper::get(std::vector<Geom::Curve*>& curves, std::set<Topo::Vertex*>& vertices, bool propagate)
 {
 	for (uint k=0; k<curves.size(); k++){
-		std::vector<Topo::CoEdge* > loc_coedges;
-		curves[k]->get(loc_coedges);
+        Topo::TopoManager& tm = curves[k]->getContext().getTopoManager();
+		std::vector<Topo::CoEdge* > loc_coedges = tm.getFilteredRefTopos<Topo::CoEdge>(curves[k]);
 		Topo::TopoHelper::get(loc_coedges, vertices);
 
 		if (propagate){
@@ -486,8 +485,8 @@ void TopoHelper::get(std::vector<Geom::Curve*>& curves, std::set<Topo::Vertex*>&
 void TopoHelper::get(std::vector<Geom::Vertex*>& vtx, std::set<Topo::Vertex*>& vertices)
 {
 	for (uint k=0; k<vtx.size(); k++){
-		std::vector<Topo::Vertex* > loc_vertices;
-		vtx[k]->get(loc_vertices);
+        Topo::TopoManager& tm = vtx[k]->getContext().getTopoManager();
+		std::vector<Topo::Vertex* > loc_vertices = tm.getFilteredRefTopos<Topo::Vertex>(vtx[k]);
 		vertices.insert(loc_vertices.begin(), loc_vertices.end());
 	}
 }
@@ -805,8 +804,10 @@ void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
         	else {
         		// cas 2D
         		edge_ar = 0;
-        		if (ind_edge_dep != 1)
-        			reprendreCetteFace = true;
+				if (ind_edge_dep == 0)
+					edge_ar = coface->getEdge(2);
+				else if (ind_edge_dep == 2)
+					edge_ar = coface->getEdge(0);
 
         		// on test pour détecter le cas d'une zone avec 1 seul sommet sur l'axe
         		uint nb_sur_axe = 0;
@@ -874,6 +875,17 @@ void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
 #ifdef _DEBUG_SPLIT
         		std::cout<<" => nbMeshingEdges_edge =  "<<nbMeshingEdges_edge<<std::endl;
 #endif
+				is = new InfoSplit();
+				is->dirCoFaceSplit = dirCoFaceSplit;
+				is->coedge_dep.push_back(coedge_dep);
+				is->edge_dep = edge_dep;
+				is->coedge_ar.push_back(coedge_ar);
+				is->edge_ar = edge_ar;
+				is->nbMeshingEdges_dep.push_back(nbMeshingEdges_dep);
+				is->nbMeshingEdges_ar.push_back(nbMeshingEdges_ar);
+
+				cofaceInfoSplit[coface->getUniqueId()] = is;
+				id2coface[coface->getUniqueId()] = coface;
         	}
         	else {
 #ifdef _DEBUG_SPLIT
@@ -1445,7 +1457,7 @@ void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
             Edge* oldEdge0 = coface->getEdge(0);
             Edge* oldEdge2 = coface->getEdge(2);
 
-            coface->splitOgrid((CoFace::eDirOnCoFace)is->dirCoFaceSplit,
+			std::vector<Edge*> newEdges = coface->splitOgrid((CoFace::eDirOnCoFace)is->dirCoFaceSplit,
                     old2newEdges[oldEdge0],
                     newEdges_dep,
                     old2newEdges[oldEdge2],
@@ -1454,6 +1466,8 @@ void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
                     newVertices2,
                     ratio_ogrid,
                     icmd);
+
+			splitingEdges.insert(splitingEdges.begin(), newEdges.begin(), newEdges.end());
 
             // Destruction des arêtes inutiles (celles sans relation vers une CoFace)
             if (oldEdge0->getNbCoFaces() == 0)
@@ -1756,8 +1770,8 @@ std::vector<Topo::TopoEntity*> TopoHelper::getTopoEntities(std::vector<Geom::Geo
     //std::set<Topo::TopoEntity*> initTopoEntities;
     for (uint i=0; i<geomEntities.size(); i++){
 //        std::cout<<" "<<geomEntities[i]->getName()<<" ->";
-        std::vector<Topo::TopoEntity* > vte;
-        geomEntities[i]->getRefTopo(vte);
+        Topo::TopoManager& tm = geomEntities[i]->getContext().getTopoManager();
+        std::vector<Topo::TopoEntity* > vte = tm.getRefTopos(geomEntities[i]);
 //        for (uint j=0; j<vte.size();j++)
 //            std::cout<<" "<<vte[j]->getName();
 //        std::cout<<std::endl;

@@ -1283,17 +1283,10 @@ void GroupManager::addMark(Group3D* grp,
 
             // faut-il propager à la topologie ?
             if (visibilityMask >= Utils::FilterEntity::TopoBlock){
-                const std::vector<Topo::TopoEntity* >& topo = (vol)->getRefTopo();
-
-                for (std::vector<Topo::TopoEntity* >::const_iterator iter2 = topo.begin();
-                        iter2 != topo.end(); ++iter2){
-                    if ((*iter2)->getDim() == 3){
-                        Topo::TopoEntity* te = *iter2;
-                        Topo::Block* blk = dynamic_cast<Topo::Block*>(te);
-                        addMark(blk, visibilityMask, filtre_vu, filtre_topo, mark);
-                    }
-                }
-            } // end if (visibilityMask >= Utils::FilterEntity::TopoBlock)
+                Topo::TopoManager& topo_manager = getContext().getTopoManager();
+                for (Topo::Block* blk : topo_manager.getFilteredRefTopos<Topo::Block>(vol))
+                    addMark(blk, visibilityMask, filtre_vu, filtre_topo, mark);
+            }
         } // end if (filtre_vu[vol] == false)
     }
     
@@ -1349,16 +1342,9 @@ void GroupManager::addMark(Group2D* grp,
 
             // faut-il propager à la topologie ?
             if (visibilityMask >= Utils::FilterEntity::TopoCoFace){
-                const std::vector<Topo::TopoEntity* >& topo = surf->getRefTopo();
-
-                for (std::vector<Topo::TopoEntity* >::const_iterator iter2 = topo.begin();
-                        iter2 != topo.end(); ++iter2){
-                    if ((*iter2)->getDim() == 2){
-                        Topo::TopoEntity* te = *iter2;
-                        Topo::CoFace* coface = dynamic_cast<Topo::CoFace*>(te);
-                        addMark(coface, visibilityMask, filtre_vu, filtre_topo, mark);
-                    }
-                }
+                Topo::TopoManager& topo_manager = getContext().getTopoManager();
+                for (Topo::CoFace* coface : topo_manager.getFilteredRefTopos<Topo::CoFace>(surf))
+                    addMark(coface, visibilityMask, filtre_vu, filtre_topo, mark);
             } // end if (visibilityMask >= Utils::FilterEntity::TopoCoFace)
 
         } // end if (filtre_vu[surf] == false)
@@ -1399,16 +1385,9 @@ void GroupManager::addMark(Group1D* grp,
 
             // faut-il propager à la topologie ?
             if (visibilityMask >= Utils::FilterEntity::TopoCoEdge){
-                const std::vector<Topo::TopoEntity* >& topo = c->getRefTopo();
-
-                for (std::vector<Topo::TopoEntity* >::const_iterator iter2 = topo.begin();
-                        iter2 != topo.end(); ++iter2){
-                    if ((*iter2)->getDim() == 1){
-                        Topo::TopoEntity* te = *iter2;
-                        Topo::CoEdge* coedge = dynamic_cast<Topo::CoEdge*>(te);
-                        addMark(coedge, visibilityMask, filtre_vu, filtre_topo, mark);
-                    }
-                }
+                Topo::TopoManager& topo_manager = getContext().getTopoManager();
+                for (Topo::CoEdge* coedge : topo_manager.getFilteredRefTopos<Topo::CoEdge>(c))
+                    addMark(coedge, visibilityMask, filtre_vu, filtre_topo, mark);
             } // end if (visibilityMask >= Utils::FilterEntity::TopoCoEdge)
 
         } // end if (filtre_vu[c] == false)
@@ -1441,16 +1420,9 @@ void GroupManager::addMark(Group0D* grp,
 
                 // faut-il propager à la topologie ?
                 if (visibilityMask >= Utils::FilterEntity::TopoVertex){
-                    const std::vector<Topo::TopoEntity* >& topo = vert->getRefTopo();
-
-                    for (std::vector<Topo::TopoEntity* >::const_iterator iter2 = topo.begin();
-                            iter2 != topo.end(); ++iter2){
-                        if ((*iter2)->getDim() == 0){
-                            Topo::TopoEntity* te = *iter2;
-                            Topo::Vertex* vertex = dynamic_cast<Topo::Vertex*>(te);
-                            addMark(vertex, visibilityMask, filtre_vu, filtre_topo, mark);
-                        }
-                    }
+                    Topo::TopoManager& topo_manager = getContext().getTopoManager();
+                    for (Topo::Vertex* vertex : topo_manager.getFilteredRefTopos<Topo::Vertex>(vert))
+                        addMark(vertex, visibilityMask, filtre_vu, filtre_topo, mark);
                 } // end if (visibilityMask >= Utils::FilterEntity::TopoVertex)
 
             } // end if (filtre_vu[vert] == false)

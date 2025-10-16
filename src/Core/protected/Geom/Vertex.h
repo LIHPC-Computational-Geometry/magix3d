@@ -6,15 +6,13 @@
 #include <vector>
 /*----------------------------------------------------------------------------*/
 #include "Geom/GeomEntity.h"
+#include "Services/MementoService.h"
 #include "Utils/Point.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Group {
 class Group0D;
-}
-namespace Topo {
-class Vertex;
 }
 /*----------------------------------------------------------------------------*/
 namespace Geom {
@@ -29,7 +27,7 @@ class GeomProperty;
  */
 class Vertex: public GeomEntity {
 
-    friend class MementoManager;
+    friend class Services::MementoService;
     static const char* typeNameGeomVertex;
 
 public:
@@ -43,10 +41,9 @@ public:
      *  \param gprop    les propriétés associées à la courbe
      *  \param compProp les propriétés de calcul
      */
-#ifndef SWIG
     Vertex(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
             GeomProperty* gprop, TopoDS_Vertex& shape);
-#endif
+
     const TopoDS_Vertex& getOCCVertex() const { return m_occ_vertex; }
 
     virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const;
@@ -68,24 +65,10 @@ public:
      */
     int getDim() const {return 0;}
 
-	/*------------------------------------------------------------------------*/
-	/** \brief	Fournit une représentation textuelle de l'entité.
-	 * \param	true si l'entité fourni la totalité de sa description, false si
-	 * 			elle ne fournit que les informations non calculées (objectif :
-	 * 			optimisation)
-	 * \return	Description, à détruire par l'appelant.
-	 */
-#ifndef SWIG
-    virtual Mgx3D::Utils::SerializedRepresentation* getDescription (
-													bool alsoComputed) const;
-#endif
-
     /*------------------------------------------------------------------------*/
     /** \brief  Fournit un résumé textuel de l'entité.
      */
-#ifndef SWIG
     virtual std::string getSummary ( ) const;
-#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief  Calcule l'aire d'une entité:  Pour une courbe, c'est la
@@ -109,17 +92,11 @@ public:
     const std::vector<Curve*>& getCurves() const {return m_curves;}
 
     /*------------------------------------------------------------------------*/
-    /// retourne la liste des sommets topologiques qui pointent sur cette courbe
-    virtual void get(std::vector<Topo::Vertex*>& vertices);
-
-    /*------------------------------------------------------------------------*/
     /** \brief  Ajoute c comme courbe incidente
      *
      *  \param c un pointeur sur une courbe
      */
-#ifndef SWIG
     void add(Curve* c);
-#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief  Supprime c de la liste des courbes incidentes. Si c n'apparait
@@ -127,9 +104,7 @@ public:
      *
      *  \param v un pointeur sur un volume
      */
-#ifndef SWIG
     void remove(Curve* c);
-#endif
 
     /*------------------------------------------------------------------------*/
     /** \brief   retourne un point sur l'objet au centre si possible
@@ -181,30 +156,22 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief Surcharge pour l'écriture dans les flux
      */
-#ifndef SWIG
     friend std::ostream& operator<<(std::ostream& str, const Vertex& v);
     /*------------------------------------------------------------------------*/
     /** \brief Surcharge pour l'écriture dans les flux
      */
     friend TkUtil::UTF8String& operator<<(TkUtil::UTF8String& str, const Vertex& v);
-#endif
 
     /*------------------------------------------------------------------------*/
     /** Ajoute le groupe parmis ceux auxquels appartient le sommet */
-#ifndef SWIG
     void add(Group::Group0D* grp);
-#endif
 
     /** Retire le groupe parmis ceux auxquels appartient le sommet */
-#ifndef SWIG
     void remove(Group::Group0D* grp);
-#endif
 
     /** Recherche le groupe parmis ceux auxquels appartient le sommet
      * return vrai si trouvé */
-#ifndef SWIG
     bool find(Group::Group0D* grp);
-#endif
 
     /// Retourne les noms des groupes auxquels appartient cette entité
     virtual void getGroupsName (std::vector<std::string>& gn) const;
@@ -215,18 +182,13 @@ public:
     /// Retourne la liste des groupes auxquels appartient cette entité
     virtual const std::vector<Group::Group0D*>& getGroups() const {return m_groups;}
 
-    /// Affecte une nouvelle liste des groupes auxquels appartient cette entité
-    virtual void setGroups(std::vector<Group::GroupEntity*>& grp);
-
     /// Retourne le nombre de groupes
     virtual int getNbGroups() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief   détruit l'objet
      */
-#ifndef SWIG
     virtual void setDestroyed(bool b);
-#endif
 
 private:
     /// accès aux courbes incidentes

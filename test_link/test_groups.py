@@ -49,7 +49,7 @@ def test_group_box():
 def assert_all(ctx, block, group_names):
     block_info = ctx.getTopoManager().getInfos(block, 3)
     # Lien explicite block -> group
-    assert 0 == len(block_info.groupsName())
+    assert 0 == len(block_info.groups())
     for group_name in group_names:
         # Lien implicite group -> block
         assert block in ctx.getGroupManager().getTopoBlocks(group_name, 3)
@@ -60,12 +60,12 @@ def assert_all(ctx, block, group_names):
         # Lien implicite group -> vertices
         assert set(block_info.vertices()) == set(ctx.getGroupManager().getTopoVertices(group_name, 3))
 
-    vol = block_info.geomEntity()
+    vol = block_info.geom_entity
     vol_info = ctx.getGeomManager().getInfos(vol, 3)
-    assert len(group_names) == len(vol_info.groupsName())
+    assert len(group_names) == len(vol_info.groups())
     for group_name in group_names:
         # Lien explicite volume -> group
-        assert group_name in vol_info.groupsName()
+        assert group_name in vol_info.groups()
         # Lien explicite group -> volume
         assert vol in ctx.getGroupManager().getGeomVolumes(group_name, 3)
         # Lien implicite group -> surfaces
@@ -82,13 +82,13 @@ def test_new_box():
     ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10, "aaa")
     vol_info = ctx.getGeomManager().getInfos("Vol0000",3)
     # Les entités de dimension inférieure à 3 sont affectées au groupe aaa de manière implicite
-    assert "aaa" in vol_info.groupsName()
+    assert "aaa" in vol_info.groups()
     surf_info = ctx.getGeomManager().getInfos("Surf0000",2)
-    assert "aaa" not in surf_info.groupsName()
+    assert "aaa" not in surf_info.groups()
     crb_info = ctx.getGeomManager().getInfos("Crb0000",1)
-    assert "aaa" not in crb_info.groupsName()
+    assert "aaa" not in crb_info.groups()
     pt_info = ctx.getGeomManager().getInfos("Pt0000",0)
-    assert "aaa" not in pt_info.groupsName()
+    assert "aaa" not in pt_info.groups()
 
 def test_section_by_plane():
     ctx = Mgx3D.getStdContext()
@@ -96,18 +96,18 @@ def test_section_by_plane():
     # Création d'une boite avec une topologie
     ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10, "box")
     vol_info = ctx.getGeomManager().getInfos("Vol0000",3)
-    assert "box" in vol_info.groupsName()
+    assert "box" in vol_info.groups()
     # Section par un plan entre géométries avec topologies
     ctx.getGeomManager ( ).sectionByPlane (["Vol0000"], Mgx3D.Plane(Mgx3D.Point(0, 0, .5), Mgx3D.Vector(0, 0, 1)), "aaa")
     # Les entités de dimension inférieure à 2 sont affectées au groupe aaa de manière explicite
     vol_info = ctx.getGeomManager().getInfos("Vol0001",3)
-    assert "box" in vol_info.groupsName()
+    assert "box" in vol_info.groups()
     surf_info = ctx.getGeomManager().getInfos("Surf0010",2)
-    assert "aaa" in surf_info.groupsName()
+    assert "aaa" in surf_info.groups()
     crb_info = ctx.getGeomManager().getInfos("Crb0014",1)
-    assert "aaa" in crb_info.groupsName()
+    assert "aaa" in crb_info.groups()
     pt_info = ctx.getGeomManager().getInfos("Pt0008",0)
-    assert "aaa" in pt_info.groupsName()
+    assert "aaa" in pt_info.groups()
     # Destruction de  Pt0008
     ctx.getGeomManager().destroy(["Pt0008"], False)
     assert "DETRUIT" in ctx.getGroupManager().getInfos("aaa", 2)
@@ -116,17 +116,17 @@ def test_section_by_plane():
     ctx.undo()
     # Les entités de dimension inférieure à 2 sont affectées au groupe aaa de manière explicite
     vol_info = ctx.getGeomManager().getInfos("Vol0001",3)
-    assert "box" in vol_info.groupsName()
+    assert "box" in vol_info.groups()
     surf_info = ctx.getGeomManager().getInfos("Surf0010",2)
-    assert "aaa" in surf_info.groupsName()
+    assert "aaa" in surf_info.groups()
     crb_info = ctx.getGeomManager().getInfos("Crb0014",1)
-    assert "aaa" in crb_info.groupsName()
+    assert "aaa" in crb_info.groups()
     pt_info = ctx.getGeomManager().getInfos("Pt0008",0)
-    assert "aaa" in pt_info.groupsName()
+    assert "aaa" in pt_info.groups()
     # Annulation de : Section par un plan entre géométries avec topologies
     ctx.undo()
     vol_info = ctx.getGeomManager().getInfos("Vol0000",3)
-    assert "box" in vol_info.groupsName()
+    assert "box" in vol_info.groups()
     assert "DETRUIT" in ctx.getGroupManager().getInfos("aaa", 1)
     assert "DETRUIT" in ctx.getGroupManager().getInfos("aaa", 2)
 
@@ -140,11 +140,11 @@ def test_new_vertices_curves_and_planar_surface():
     # Les entités de dimension inférieure à 2 sont affectées au groupe aaa de manière explicite
     # Cette commande crée 4 points + 4 courbes + 1 surface
     surf_info = ctx.getGeomManager().getInfos("Surf0006",2)
-    assert "aaa" in surf_info.groupsName()
+    assert "aaa" in surf_info.groups()
     crb_info = ctx.getGeomManager().getInfos("Crb0012",1)
-    assert "aaa" in crb_info.groupsName()
+    assert "aaa" in crb_info.groups()
     pt_info = ctx.getGeomManager().getInfos("Pt0008",0)
-    assert "aaa" in pt_info.groupsName()
+    assert "aaa" in pt_info.groups()
 
 def test_new_planar_surface():
     ctx = Mgx3D.getStdContext()
@@ -156,11 +156,11 @@ def test_new_planar_surface():
     # Les entités de dimension inférieure à 2 sont affectées au groupe aaa de manière implicite
     # Cette commande crée 1 surface à partir de 4 courbes existantes
     surf_info = ctx.getGeomManager().getInfos("Surf0006",2)
-    assert "aaa" in surf_info.groupsName()
+    assert "aaa" in surf_info.groups()
     crb_info = ctx.getGeomManager().getInfos("Crb0002",1)
-    assert "aaa" not in crb_info.groupsName()
+    assert "aaa" not in crb_info.groups()
     pt_info = ctx.getGeomManager().getInfos("Pt0002",0)
-    assert "aaa" not in pt_info.groupsName()
+    assert "aaa" not in pt_info.groups()
 
 # Issue #215
 def test_undo_add_to_group():

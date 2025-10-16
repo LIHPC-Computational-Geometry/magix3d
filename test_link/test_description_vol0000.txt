@@ -1,0 +1,93 @@
+SerializedRepresentation Description
+Path                             : Description
+Properties                       : 
+	Relations topologiques			: Aucune
+Properties sets                  : 
+	SerializedRepresentation Propriétés génériques
+Path                             : Description.Propriétés génériques
+Properties                       : 
+	Nom unique			: GeomVolume_Vol0000
+	Identifiant unique			: 1
+	Type			: GeomVolume
+	Dimension			: 3
+	Est détruit			: false
+	Est visible			: false
+Properties sets                  : 
+	SerializedRepresentation Boite englobante
+Path                             : Description.Propriétés génériques.Boite englobante
+Properties                       : 
+	X min			: -1e-7
+	X max			: 1.0000001
+	Y min			: -1e-7
+	Y max			: 1.0000001
+	Z min			: -1e-7
+	Z max			: 1.0000001
+Properties sets                  : 
+	SerializedRepresentation Relations géométriques
+Path                             : Description.Relations géométriques
+Properties                       : 
+Properties sets                  : 
+	SerializedRepresentation Sommets
+Path                             : Description.Relations géométriques.Sommets
+Properties                       : 
+	Pt0000			: GeomVertex
+	Pt0001			: GeomVertex
+	Pt0002			: GeomVertex
+	Pt0003			: GeomVertex
+	Pt0004			: GeomVertex
+	Pt0005			: GeomVertex
+	Pt0006			: GeomVertex
+	Pt0007			: GeomVertex
+Properties sets                  : 
+	SerializedRepresentation Courbes
+Path                             : Description.Relations géométriques.Courbes
+Properties                       : 
+	Crb0000			: GeomCurve
+	Crb0001			: GeomCurve
+	Crb0002			: GeomCurve
+	Crb0003			: GeomCurve
+	Crb0004			: GeomCurve
+	Crb0005			: GeomCurve
+	Crb0006			: GeomCurve
+	Crb0007			: GeomCurve
+	Crb0008			: GeomCurve
+	Crb0009			: GeomCurve
+	Crb0010			: GeomCurve
+	Crb0011			: GeomCurve
+Properties sets                  : 
+	SerializedRepresentation Surfaces
+Path                             : Description.Relations géométriques.Surfaces
+Properties                       : 
+	Surf0000			: GeomSurface
+	Surf0001			: GeomSurface
+	Surf0002			: GeomSurface
+	Surf0003			: GeomSurface
+	Surf0004			: GeomSurface
+	Surf0005			: GeomSurface
+Properties sets                  : 
+	SerializedRepresentation Relations vers des groupes
+Path                             : Description.Relations vers des groupes
+Properties                       : 
+Properties sets                  : 
+	SerializedRepresentation Groupes 3D
+Path                             : Description.Relations vers des groupes.Groupes 3D
+Properties                       : 
+	Hors_Groupe_3D			: Group3D
+Properties sets                  : 
+	SerializedRepresentation Propriétés OCC
+Path                             : Description.Propriétés OCC
+Properties                       : 
+	HashCode			: 1386224161
+Properties sets                  : 
+	SerializedRepresentation Propriétés géométriques
+Path                             : Description.Propriétés géométriques
+Properties                       : 
+	Volume			: 1.000000e+00
+	Type			: boîte
+	X min			: 0
+	Y min			: 0
+	Z min			: 0
+	Longueur en X			: 1
+	Longueur en Y			: 1
+	Longueur en Z			: 1
+Properties sets                  : 

@@ -203,7 +203,7 @@ public:
      * Sont données les nouvelles arêtes et les sommets le long de la coupe
      */
 
-    void splitOgrid(eDirOnCoFace dir,
+    std::vector<Edge*> splitOgrid(eDirOnCoFace dir,
             std::vector<Edge*>& edges0,
             std::vector<Edge*>& edges1,
             std::vector<Edge*>& edges2,
