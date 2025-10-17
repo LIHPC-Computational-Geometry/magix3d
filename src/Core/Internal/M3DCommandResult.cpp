@@ -6,6 +6,7 @@
 #include "Geom/CommandEditGeom.h"
 #include "Geom/GeomEntity.h"
 #include "Mesh/MeshEntity.h"
+#include "SysCoord/SysCoord.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/

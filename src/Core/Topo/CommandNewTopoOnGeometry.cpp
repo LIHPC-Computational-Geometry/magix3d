@@ -19,6 +19,7 @@
 #include "Internal/EntitiesHelper.h"
 #include "Group/Group3D.h"
 #include "Group/Group2D.h"
+#include "Group/GroupManager.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>

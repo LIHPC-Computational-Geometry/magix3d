@@ -1,15 +1,9 @@
 /*----------------------------------------------------------------------------*/
-/** \file GroupEntity.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 18/10/2012
- */
-/*----------------------------------------------------------------------------*/
 #ifndef MGX3D_GROUP_GROUPENTITY_H_
 #define MGX3D_GROUP_GROUPENTITY_H_
 /*----------------------------------------------------------------------------*/
 #include "Internal/InternalEntity.h"
+#include "Group/GroupEntityVisitor.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -49,10 +43,13 @@ protected:
 			   uint level);
 
 public:
+    virtual void accept(ConstGroupEntityVisitor& visitor) const = 0 ;
+    virtual void accept(GroupEntityVisitor& visitor) = 0 ;
+
     /*------------------------------------------------------------------------*/
     /** \brief   Destructeur
      */
-    virtual ~GroupEntity();
+    virtual ~GroupEntity() = default;
 
     /*------------------------------------------------------------------------*/
     /** \brief   détruit l'objet (mais pas ses dépendances !)
@@ -60,8 +57,7 @@ public:
     virtual void setDestroyed(bool b);
 
     /*------------------------------------------------------------------------*/
-    virtual void getRepresentation(
-			Mgx3D::Utils::DisplayRepresentation& dr, bool checkDestroyed) const;
+    virtual void getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const;
 
     /*------------------------------------------------------------------------*/
     /// Identification des groupes avec nom par défaut (type Hors_Groupe...)
@@ -115,20 +111,17 @@ public:
 	 * 			optimisation)
       * \return  Description, à détruire par l'appelant.
       */
-    virtual Mgx3D::Utils::SerializedRepresentation* getDescription (bool alsoComputed) const;
+    virtual Utils::SerializedRepresentation* getDescription (bool alsoComputed) const;
 
      /*------------------------------------------------------------------------*/
-     /// Accesseur sur le id ème objet de modification du maillage pour un groupe
-     virtual Mesh::MeshModificationItf* getMeshModif(size_t id) {return m_meshModif[id];}
-
      /// Ajout d'un objet de modification du maillage pour un groupe
-     virtual void addMeshModif(Mesh::MeshModificationItf* modif) {m_meshModif.push_back(modif);}
+     void addMeshModif(Mesh::MeshModificationItf* modif) {m_meshModif.push_back(modif);}
 
      /// Suppression du dernier objet de modification
-     virtual void popBackMeshModif() {m_meshModif.pop_back();}
+     void popBackMeshModif() {m_meshModif.pop_back();}
 
-     /// Retourne le nombre de modifications pour ce groupe
-     virtual size_t getNbMeshModif() {return m_meshModif.size();}
+     /// Accesseurs sur les modifications pour ce groupe
+     const std::vector<Mesh::MeshModificationItf*>& getMeshModifications() const {return m_meshModif;}
 #endif
 
 protected:

@@ -15,6 +15,7 @@
 #include "Utils/Vector.h"
 #include "Utils/MgxException.h"
 #include "Utils/MgxNumeric.h"
+#include "SysCoord/SysCoord.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/

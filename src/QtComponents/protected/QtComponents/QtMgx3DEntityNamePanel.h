@@ -11,7 +11,6 @@
 #include "Internal/Context.h"
 
 #include "Utils/ValidatedField.h"
-#include "Group/GroupManager.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 
 #include "QtComponents/QtEntityIDTextField.h"

@@ -3,11 +3,24 @@
 #define GROUP_HELPER_FOR_COMMAND_H_
 /*----------------------------------------------------------------------------*/
 #include "Internal/InfoCommand.h"
-#include "Group/GroupManager.h"
+#include "Group/Group0D.h"
+#include "Group/Group1D.h"
+#include "Group/Group2D.h"
+#include "Group/Group3D.h"
+#include "Topo/Block.h"
+#include "Topo/CoFace.h"
+#include "Topo/CoEdge.h"
+#include "Topo/Vertex.h"
+#include "Geom/Volume.h"
+#include "Geom/Surface.h"
+#include "Geom/Curve.h"
+#include "Geom/Vertex.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Group {
+/*----------------------------------------------------------------------------*/
+class GroupManager;
 /*----------------------------------------------------------------------------*/
 class GroupHelperForCommand {
 

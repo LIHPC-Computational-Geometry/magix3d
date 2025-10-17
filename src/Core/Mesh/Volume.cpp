@@ -11,6 +11,7 @@
 #include "Topo/CoFace.h"
 #include "Topo/Face.h"
 #include "Topo/Block.h"
+#include "Group/GroupManager.h"
 #include "Group/Group3D.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/NumericConversions.h>
