@@ -89,6 +89,7 @@
 #include "Geom/CommandScaling.h"
 #include "Geom/CommandMirroring.h"
 #include "Mesh/CommandAddRemoveGroupName.h"
+#include "SysCoord/SysCoord.h"
 #ifdef USE_MDLPARSER
 #include "Internal/CommandChangeLengthUnit.h"
 #include "Topo/CommandImportBlocks.h"

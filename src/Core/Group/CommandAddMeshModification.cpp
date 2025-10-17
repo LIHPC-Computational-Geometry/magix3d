@@ -1,12 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/*
- * \file CommandAddMeshModification.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 5 déc. 2013
- */
-/*----------------------------------------------------------------------------*/
 #include "Group/CommandAddMeshModification.h"
 #include "Group/GroupEntity.h"
 #include "Utils/Command.h"

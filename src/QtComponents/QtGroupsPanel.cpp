@@ -8,6 +8,11 @@
 
 #include "Utils/Common.h"
 #include "Internal/SelectionManagerDimFilter.h"
+#include "Group/GroupManager.h"
+#include "Group/Group0D.h"
+#include "Group/Group1D.h"
+#include "Group/Group2D.h"
+#include "Group/Group3D.h"
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
@@ -26,11 +31,6 @@
 #include "QtComponents/QtMgx3DApplication.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtExpansionTreeRestorer.h"
-#include "Group/GroupManager.h"
-#include "Group/Group0D.h"
-#include "Group/Group1D.h"
-#include "Group/Group2D.h"
-#include "Group/Group3D.h"
 
 #include <TkUtil/ErrorLog.h>
 #include <TkUtil/InternalError.h>

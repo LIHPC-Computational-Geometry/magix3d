@@ -1,6 +1,7 @@
 /*----------------------------------------------------------------------------*/
 #include "Internal/Context.h"
 #include "Internal/InfoCommand.h"
+#include "SysCoord/SysCoord.h"
 #include "SysCoord/CommandRotateSysCoord.h"
 #include "SysCoord/CommandDuplicateSysCoord.h"
 /*----------------------------------------------------------------------------*/

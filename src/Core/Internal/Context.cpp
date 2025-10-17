@@ -34,6 +34,8 @@
 #include "Mesh/CommandDestroyMesh.h"
 #include "Mesh/CommandChangeMeshDim.h"
 
+#include "Group/GroupManager.h"
+
 #include "SysCoord/SysCoordManager.h"
 
 extern TkUtil::PythonSession* createMgx3DPythonSession ( );

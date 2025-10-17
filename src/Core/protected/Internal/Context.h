@@ -14,7 +14,6 @@
 #include "Geom/GeomManager.h"
 #include "Topo/TopoManager.h"
 #include "Mesh/MeshManager.h"
-#include "Group/GroupManager.h"
 #include "SysCoord/SysCoordManager.h"
 #include "Structured/StructuredMeshManager.h"
 /*----------------------------------------------------------------------------*/
@@ -41,7 +40,9 @@ namespace Mesh {
 class CommandChangeMeshDim;
 class MeshImplementation;
 }
-
+namespace Group {
+	class GroupManager;
+}
 typedef void (*fSignalFunc)(int);
 
 /*----------------------------------------------------------------------------*/
