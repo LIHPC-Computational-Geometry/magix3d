@@ -27,8 +27,7 @@ def test_export_box(capfd):
     emp = Mgx3D.EdgeMeshingPropertyUniform(10)
     ctx.getTopoManager().setParallelMeshingProperty (emp,"Ar0270")
     ctx.getMeshManager().newAllBlocksMesh()
-    ctx.getMeshManager().exportBlocksForCGNS("")
-    ctx.getGeomManager().exportVTK(cgnsfilename)
+    ctx.getMeshManager().exportBlocksForCGNS(cgnsfilename)
 
     assert os.path.exists(cgnsfilename)
     assert os.path.getsize(cgnsfilename) > 0
