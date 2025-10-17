@@ -154,7 +154,7 @@ selectCoFaceAndBlocks(std::map<Topo::CoFace*, uint>& filtre_coface,
 
     Topo::TopoManager& tm = getContext().getTopoManager();
     for (Group::Group3D* grp : getContext().getGroupManager().getGroups<Group::Group3D>()){
-    	std::vector<Geom::Volume*>& volumes = grp->getVolumes();
+    	std::vector<Geom::Volume*> volumes = grp->getFilteredEntities<Geom::Volume>();
     	for (uint i=0; i<volumes.size(); i++){
             std::vector<Topo::Block*> topos = tm.getFilteredRefTopos<Topo::Block>(volumes[i]);
             for (Topo::Block* blk : topos) {
@@ -178,7 +178,7 @@ selectCoFaceAndBlocks(std::map<Topo::CoFace*, uint>& filtre_coface,
             } // end for blk : topos
     	} // end for i
 
-    	for (Topo::Block* blk : grp->getBlocks()) {
+    	for (Topo::Block* blk : grp->getFilteredEntities<Topo::Block>()) {
     		if (blk->isStructured()){ // && blk->isMeshed()
     			filtre_block[blk] = 1;
     			nb_blocks_marked += 1;
