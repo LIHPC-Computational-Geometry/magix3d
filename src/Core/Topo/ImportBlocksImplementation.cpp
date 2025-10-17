@@ -12,6 +12,7 @@
 #include "Group/Group1D.h"
 #include "Group/Group2D.h"
 #include "Group/Group3D.h"
+#include "Group/GroupManager.h"
 #include "Topo/EdgeMeshingPropertyGlobalInterpolate.h"
 /*----------------------------------------------------------------------------*/
 #include <iostream>

@@ -21,6 +21,8 @@
 #include "Geom/Vertex.h"
 #include "Geom/Surface.h"
 #include "Geom/GeomProjectImplementation.h"
+
+#include "Group/GroupManager.h"
 /*----------------------------------------------------------------------------*/
 /// TkUtil
 #include <TkUtil/Exception.h>

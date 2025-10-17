@@ -6,6 +6,7 @@
 #include "Mesh/Volume.h"
 #include "Mesh/Surface.h"
 #include "Mesh/Cloud.h"
+#include "Group/GroupManager.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 /*----------------------------------------------------------------------------*/

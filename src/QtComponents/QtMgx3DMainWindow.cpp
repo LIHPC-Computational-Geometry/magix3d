@@ -5,7 +5,7 @@
  */
 
 #include "Internal/Context.h"
-
+#include "Group/GroupManager.h"
 #include "Utils/Command.h"
 #include "Utils/Magix3DEvents.h"
 #include "Utils/Point.h"

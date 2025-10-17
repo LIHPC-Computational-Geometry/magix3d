@@ -1,7 +1,9 @@
 /*----------------------------------------------------------------------------*/
 #include "Internal/Context.h"
 #include "Internal/InfoCommand.h"
+#include "Group/GroupManager.h"
 #include "Group/Group3D.h"
+#include "SysCoord/SysCoord.h"
 #include "SysCoord/CommandNewSysCoord.h"
 #include "SysCoord/SysCoordManager.h"
 #include "SysCoord/SysCoordDisplayRepresentation.h"

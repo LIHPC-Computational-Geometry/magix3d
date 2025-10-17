@@ -2,6 +2,7 @@
 #include "Internal/Context.h"
 #include "Internal/InfoCommand.h"
 #include "Utils/Vector.h"
+#include "SysCoord/SysCoord.h"
 #include "SysCoord/CommandTranslateSysCoord.h"
 #include "SysCoord/CommandDuplicateSysCoord.h"
 #include "SysCoord/SysCoordManager.h"

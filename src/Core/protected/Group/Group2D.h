@@ -1,72 +1,32 @@
-/*----------------------------------------------------------------------------*/
 #ifndef MGX3D_GROUP_GROUP2D_H_
 #define MGX3D_GROUP_GROUP2D_H_
 /*----------------------------------------------------------------------------*/
 #include "Group/GroupEntity.h"
-#include <TkUtil/UTF8String.h>
 /*----------------------------------------------------------------------------*/
-namespace Mgx3D {
-
-namespace Internal {
-class Context;
-}
+namespace Mgx3D::Internal { class Context; }
 /*----------------------------------------------------------------------------*/
-namespace Group {
+namespace Mgx3D::Group {
 /*----------------------------------------------------------------------------*/
 /**
  * \brief Groupe 2D.
  * Permet l'accès aux entités 2D appartenant à un même groupe, ainsi qu'aux entités
  * de niveaux inférieurs
  */
-class Group2D : public GroupEntity{
-
+struct Group2D : public GroupEntity
+{
     static const char* typeNameGroup2D;
-
-public:
     static const uint DIM = 2;
 
-    /*------------------------------------------------------------------------*/
-    /** \brief  Constructeur.
-     */
-    Group2D(Internal::Context& ctx, const std::string & nom,
- 		   bool isDefaultGroup, uint level=1);
-
-    /*------------------------------------------------------------------------*/
-    /** \brief   Destructeur
-     */
-    virtual ~Group2D();
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  retourne la dimension du groupe
-     */
-    int getDim() const {return DIM;}
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Donne le nom du type d'objet (un nom distinct par type d'objet)
-     */
-    virtual std::string getTypeName() const {return typeNameGroup2D;}
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Donne le type de l'objet
-     */
-    virtual Utils::Entity::objectType getType() const {return Utils::Entity::Group2D;}
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Fournit une représentation textuelle de l'entité.
-	 * \param	true si l'entité fourni la totalité de sa description, false si
-	 * 			elle ne fournit que les informations non calculées (objectif :
-	 * 			optimisation)
-     * \return  Description, à détruire par l'appelant.
-     */
-#ifndef SWIG
-    virtual Mgx3D::Utils::SerializedRepresentation* getDescription (
-													bool alsoComputed) const;
-#endif
+    void accept(ConstGroupEntityVisitor& v) const override {v.visit(this);}
+    void accept(GroupEntityVisitor& v) override {v.visit(this);}
+    Group2D(Internal::Context& ctx, const std::string & nom, bool isDefaultGroup, uint level=1);
+    virtual ~Group2D() = default;
+    int getDim() const override {return DIM;}
+    std::string getTypeName() const override {return typeNameGroup2D;}
+    Utils::Entity::objectType getType() const override {return Utils::Entity::Group2D;}
 };
 /*----------------------------------------------------------------------------*/
-} // end namespace Group
-/*----------------------------------------------------------------------------*/
-} // end namespace Mgx3D
+} // end namespace Mgx3D::Group
 /*----------------------------------------------------------------------------*/
 #endif /* MGX3D_GROUP_GROUP2D_H_ */
 /*----------------------------------------------------------------------------*/
