@@ -48,120 +48,72 @@ void CommandClearGroupName::internalExecute()
     case(0):{
     	Group::Group0D* grp = getContext().getGroupManager().getNewGroup<Group::Group0D>(m_groupName, &getInfoCommand());
 
-    	std::vector<Geom::Vertex*> geoms = grp->getVertices();
-    	for (std::vector<Geom::Vertex*>::iterator iter = geoms.begin();
-    			iter != geoms.end(); ++iter){
-
-    		Geom::Vertex* vtx = *iter;
-    		m_geom_entities.push_back(vtx);
-
+    	for (Geom::Vertex* ge : grp->getFilteredEntities<Geom::Vertex>()) {
+    		m_geom_entities.push_back(ge);
     		// on retire le groupe
-			m_group_helper.removeFromGroup(m_groupName, vtx);
+			m_group_helper.removeFromGroup(m_groupName, ge);
     	} // end for iter
 
-    	std::vector<Topo::Vertex*> topos = grp->getTopoVertices();
-    	for (std::vector<Topo::Vertex*>::iterator iter = topos.begin();
-    			iter != topos.end(); ++iter){
-
-    		Topo::Vertex* topo = *iter;
-    		m_topo_entities.push_back(topo);
-
+    	for (Topo::Vertex* te : grp->getFilteredEntities<Topo::Vertex>()){
+    		m_topo_entities.push_back(te);
     		// on retire le groupe
-			m_group_helper.removeFromGroup(m_groupName, topo);
-
+			m_group_helper.removeFromGroup(m_groupName, te);
     		// le sommet n'est peut-être plus visible / groupe visibles
-    		getInfoCommand().addTopoInfoEntity(topo, Internal::InfoCommand::VISIBILYCHANGED);
-
+    		getInfoCommand().addTopoInfoEntity(te, Internal::InfoCommand::VISIBILYCHANGED);
     	} // end for iter
     }
     break;
     case(1):{
     	Group::Group1D* grp = getContext().getGroupManager().getNewGroup<Group::Group1D>(m_groupName, &getInfoCommand());
 
-    	std::vector<Geom::Curve*> geoms = grp->getCurves();
-    	for (std::vector<Geom::Curve*>::iterator iter = geoms.begin();
-    			iter != geoms.end(); ++iter){
-
-    		Geom::Curve* geom = *iter;
-    		m_geom_entities.push_back(geom);
-
+    	for (Geom::Curve* ge : grp->getFilteredEntities<Geom::Curve>()) {
+    		m_geom_entities.push_back(ge);
     		// on retire le groupe
-			m_group_helper.removeFromGroup(m_groupName, geom);
+			m_group_helper.removeFromGroup(m_groupName, ge);
     	} // end for iter
 
-    	std::vector<Topo::CoEdge*> topos = grp->getCoEdges();
-    	for (std::vector<Topo::CoEdge*>::iterator iter = topos.begin();
-    			iter != topos.end(); ++iter){
-
-    		Topo::CoEdge* topo = *iter;
-    		m_topo_entities.push_back(topo);
-
+    	for (Topo::CoEdge* te : grp->getFilteredEntities<Topo::CoEdge>()){
+    		m_topo_entities.push_back(te);
     		// on retire le groupe
-			m_group_helper.removeFromGroup(m_groupName, topo);
-
+			m_group_helper.removeFromGroup(m_groupName, te);
     		// l'arête n'est peut-être plus visible / groupe visibles
-    		getInfoCommand().addTopoInfoEntity(topo, Internal::InfoCommand::VISIBILYCHANGED);
-
+    		getInfoCommand().addTopoInfoEntity(te, Internal::InfoCommand::VISIBILYCHANGED);
     	} // end for iter
     }
     break;
     case(2):{
         Group::Group2D* grp = getContext().getGroupManager().getNewGroup<Group::Group2D>(m_groupName, &getInfoCommand());
 
-        std::vector<Geom::Surface*> geoms = grp->getSurfaces();
-        for (std::vector<Geom::Surface*>::iterator iter = geoms.begin();
-                iter != geoms.end(); ++iter){
-
-        	Geom::Surface* geom = *iter;
-        	m_geom_entities.push_back(geom);
-
+        for (Geom::Surface* ge : grp->getFilteredEntities<Geom::Surface>()) {
+        	m_geom_entities.push_back(ge);
         	// on retire le groupe
-			m_group_helper.removeFromGroup(m_groupName, geom);
+			m_group_helper.removeFromGroup(m_groupName, ge);
         } // end for iter
 
-        std::vector<Topo::CoFace*> topos = grp->getCoFaces();
-        for (std::vector<Topo::CoFace*>::iterator iter = topos.begin();
-                        iter != topos.end(); ++iter){
-
-        	Topo::CoFace* topo = *iter;
-        	m_topo_entities.push_back(topo);
-
+        for (Topo::CoFace*te : grp->getFilteredEntities<Topo::CoFace>()) {
+        	m_topo_entities.push_back(te);
         	// on retire le groupe
-			m_group_helper.removeFromGroup(m_groupName, topo);
-
+			m_group_helper.removeFromGroup(m_groupName, te);
     		// la face n'est peut-être plus visible / groupe visibles
-			getInfoCommand().addTopoInfoEntity(topo, Internal::InfoCommand::VISIBILYCHANGED);
-
+			getInfoCommand().addTopoInfoEntity(te, Internal::InfoCommand::VISIBILYCHANGED);
         } // end for iter
     }
     break;
     case(3):{
         Group::Group3D* grp = getContext().getGroupManager().getNewGroup<Group::Group3D>(m_groupName, &getInfoCommand());
 
-        std::vector<Geom::Volume*> geoms = grp->getVolumes();
-        for (std::vector<Geom::Volume*>::iterator iter = geoms.begin();
-                iter != geoms.end(); ++iter){
-
-        	Geom::Volume* geom = *iter;
-        	m_geom_entities.push_back(geom);
-
+        for (Geom::Volume* ge : grp->getFilteredEntities<Geom::Volume>()) {
+        	m_geom_entities.push_back(ge);
         	// on retire le groupe
-			m_group_helper.removeFromGroup(m_groupName, geom);
+			m_group_helper.removeFromGroup(m_groupName, ge);
         } // end for iter
 
-        std::vector<Topo::Block*> topos = grp->getBlocks();
-        for (std::vector<Topo::Block*>::iterator iter = topos.begin();
-                        iter != topos.end(); ++iter){
-
-        	Topo::Block* topo = *iter;
-        	m_topo_entities.push_back(topo);
-
+        for (Topo::Block* te : grp->getFilteredEntities<Topo::Block>()) {
+        	m_topo_entities.push_back(te);
         	// on retire le groupe
-			m_group_helper.removeFromGroup(m_groupName, topo);
-
+			m_group_helper.removeFromGroup(m_groupName, te);
     		// le bloc n'est peut-être plus visible / groupe visibles
-			getInfoCommand().addTopoInfoEntity(topo, Internal::InfoCommand::VISIBILYCHANGED);
-
+			getInfoCommand().addTopoInfoEntity(te, Internal::InfoCommand::VISIBILYCHANGED);
         } // end for iter
     }
     break;

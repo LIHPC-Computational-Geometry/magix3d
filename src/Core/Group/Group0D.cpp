@@ -26,145 +26,28 @@ Group0D::~Group0D()
 {
 }
 /*----------------------------------------------------------------------------*/
-TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const Group0D & g)
-{
-    o << g.getName()
-      << " (uniqueId "<<g.getUniqueId()<<")"
-      << (g.isDestroyed()?" (DETRUIT)":"");
-    o << (g.isVisible()?" visible":" caché");
-    if (g.getVertices().empty())
-        o << " vide.";
-    o << "\n";
-
-    Topo::TopoManager& topo_manager = g.getContext().getTopoManager();
-    for (Geom::Vertex* vtx : g.getVertices()) {
-        const std::vector<Topo::TopoEntity*>& topos = topo_manager.getRefTopos(vtx);
-        if (topos.size() > 0) {
-            o<<"  "<<vtx->getName()<<" ->";
-            for (Topo::TopoEntity* te : topos)
-                o<<" "<<te->getName();
-            o << "\n";
-        }
-    }
-
-    return o;
-}
-/*----------------------------------------------------------------------------*/
-std::ostream & operator << (std::ostream & o, const Group0D & g)
-{
-	TkUtil::UTF8String	us (TkUtil::Charset::UTF_8);
-    us << g;
-    o << us;
-    return o;
-}
-/*----------------------------------------------------------------------------*/
-std::string Group0D::getInfos()
-{
-	TkUtil::UTF8String	us (TkUtil::Charset::UTF_8);
-    us << *this;
-    return us.iso();
-}
-/*----------------------------------------------------------------------------*/
-std::vector<Utils::Entity*> Group0D::getEntities() const
-{
-//	return Internal::entitiesFromTypedEntities (getVertices ( ));
-return std::vector<Utils::Entity*> ( );
-}
-/*----------------------------------------------------------------------------*/
-void Group0D::remove(Geom::Vertex* vtx, const bool exceptionIfNotFound)
-{
-    uint i = 0;
-    for (; i<m_vertices.size() && vtx != m_vertices[i]; ++i)
-        ;
-
-    if (i!=m_vertices.size())
-        m_vertices.erase(m_vertices.begin()+i);
-    else if(exceptionIfNotFound){
-		TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-        messErr << "Le groupe "<<getName()<<" ne contient pas "<<vtx->getName();
-        throw TkUtil::Exception(messErr);
-    }
-}
-/*----------------------------------------------------------------------------*/
-void Group0D::remove(Topo::Vertex* vtx, const bool exceptionIfNotFound)
-{
-    uint i = 0;
-    for (; i<m_topo_vertices.size() && vtx != m_topo_vertices[i]; ++i)
-        ;
-
-    if (i!=m_topo_vertices.size())
-    	m_topo_vertices.erase(m_topo_vertices.begin()+i);
-    else if(exceptionIfNotFound){
-		TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-        messErr << "Le groupe "<<getName()<<" ne contient pas "<<vtx->getName();
-        throw TkUtil::Exception(messErr);
-    }
-}
-/*----------------------------------------------------------------------------*/
-void Group0D::add(Geom::Vertex* vtx)
-{
-	if (find(vtx)){
-		TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-        messErr << "Le groupe "<<getName()<<" possède déjà "<<vtx->getName();
-        throw TkUtil::Exception(messErr);
-	}
-
-    m_vertices.push_back(vtx);
-}
-/*----------------------------------------------------------------------------*/
-void Group0D::add(Topo::Vertex* vtx)
-{
-	if (find(vtx)){
-		TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-        messErr << "Le groupe "<<getName()<<" possède déjà "<<vtx->getName();
-        throw TkUtil::Exception(messErr);
-	}
-
-    m_topo_vertices.push_back(vtx);
-}
-/*----------------------------------------------------------------------------*/
-bool Group0D::find(Geom::Vertex* vtx)
-{
-    uint i = 0;
-    for (; i<m_vertices.size() && vtx != m_vertices[i]; ++i)
-        ;
-
-    return (i!=m_vertices.size());
-}
-/*----------------------------------------------------------------------------*/
-bool Group0D::find(Topo::Vertex* vtx)
-{
-    uint i = 0;
-    for (; i<m_topo_vertices.size() && vtx != m_topo_vertices[i]; ++i)
-        ;
-
-    return (i!=m_topo_vertices.size());
-}
-/*----------------------------------------------------------------------------*/
 Utils::SerializedRepresentation* Group0D::
 getDescription (bool alsoComputed) const
 {
     std::unique_ptr<Utils::SerializedRepresentation>   description (
             GroupEntity::getDescription (alsoComputed));
 
-    if (!m_vertices.empty()){
-        Utils::SerializedRepresentation vertices ("Sommets géométriques",
-                TkUtil::NumericConversions::toStr(m_vertices.size()));
-        for (std::vector<Geom::Vertex*>::const_iterator its = m_vertices.begin( ); m_vertices.end( )!=its; its++)
-            vertices.addProperty (
-                    Utils::SerializedRepresentation::Property (
-                            (*its)->getName ( ), *(*its)));
-        description->addPropertiesSet (vertices);
+    std::vector<Geom::Vertex*> vertices = getFilteredEntities<Geom::Vertex>();
+    if (!vertices.empty()){
+        Utils::SerializedRepresentation sr ("Sommets géométriques",
+                TkUtil::NumericConversions::toStr(vertices.size()));
+        for (Geom::Vertex* v : vertices)
+            sr.addProperty(Utils::SerializedRepresentation::Property(v->getName(), *v));
+        description->addPropertiesSet (sr);
     }
 
-    if (!m_topo_vertices.empty()){
-        Utils::SerializedRepresentation vertices ("Sommets topologiques",
-                TkUtil::NumericConversions::toStr(m_vertices.size()));
-        for (std::vector<Topo::Vertex*>::const_iterator its = m_topo_vertices.begin( ); m_topo_vertices.end( )!=its; its++)
-            vertices.addProperty (
-                    Utils::SerializedRepresentation::Property (
-                            (*its)->getName ( ), *(*its)));
-        description->addPropertiesSet (vertices);
+    std::vector<Topo::Vertex*> topo_vertices = getFilteredEntities<Topo::Vertex>();
+    if (!topo_vertices.empty()){
+        Utils::SerializedRepresentation sr ("Sommets topologiques",
+                TkUtil::NumericConversions::toStr(topo_vertices.size()));
+        for (Topo::Vertex* v : topo_vertices)
+            sr.addProperty(Utils::SerializedRepresentation::Property(v->getName(), *v));
+        description->addPropertiesSet (sr);
     }
 
     return description.release ( );

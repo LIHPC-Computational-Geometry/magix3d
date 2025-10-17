@@ -60,10 +60,6 @@ public:
     virtual void setDestroyed(bool b);
 
     /*------------------------------------------------------------------------*/
-    /// retourne les infos sur l'entité
-     virtual std::string getInfos() =0;
-
-    /*------------------------------------------------------------------------*/
     virtual void getRepresentation(
 			Mgx3D::Utils::DisplayRepresentation& dr, bool checkDestroyed) const;
 
@@ -78,8 +74,38 @@ public:
     /// accès au niveau d'un groupe
     uint getLevel () const {return m_level;}
 
+    /*------------------------------------------------------------------------*/
+	/// retourne les entités du groupe.
+    const std::vector<Utils::Entity*>& getEntities() const {return m_entities;}
+
+    /// accesseur sur la liste des Vertices référencées
+    template <typename T, typename = std::enable_if_t<std::is_base_of<Utils::Entity, T>::value>>
+    const std::vector<T*> getFilteredEntities() const
+    {
+        std::vector<T*> entities;
+        for (Utils::Entity* e : m_entities)
+            if (T* casted = dynamic_cast<T*>(e))
+                entities.push_back(casted);
+        return entities;
+    }
+
     /// Retourne vrai si le groupe est vide
-    virtual bool empty() const = 0;
+    bool empty() const {return m_entities.empty();}
+
+    /// Enlève une entité du groupe
+    void remove(Utils::Entity* e, const bool exceptionIfNotFound=true);
+
+    /// Ajoute une entité au groupe
+    void add(Utils::Entity* e);
+
+    /// Recherche une entité dans le groupe
+    bool find(Utils::Entity* e);
+
+    /*------------------------------------------------------------------------*/
+    /// pour l'affichage d'informations
+    friend TkUtil::UTF8String & operator << (TkUtil::UTF8String & , const GroupEntity &);
+    friend std::ostream & operator << (std::ostream & , const GroupEntity &);
+    std::string getInfos();
 
     /*------------------------------------------------------------------------*/
 #ifndef SWIG
@@ -89,12 +115,7 @@ public:
 	 * 			optimisation)
       * \return  Description, à détruire par l'appelant.
       */
-    virtual Mgx3D::Utils::SerializedRepresentation* getDescription (
-													bool alsoComputed) const;
-
-     /*------------------------------------------------------------------------*/
-	/// retourne les entités du groupe. Méthode à surcharger.
-     virtual std::vector<Utils::Entity*> getEntities() const;
+    virtual Mgx3D::Utils::SerializedRepresentation* getDescription (bool alsoComputed) const;
 
      /*------------------------------------------------------------------------*/
      /// Accesseur sur le id ème objet de modification du maillage pour un groupe
@@ -110,6 +131,8 @@ public:
      virtual size_t getNbMeshModif() {return m_meshModif.size();}
 #endif
 
+protected:
+    std::vector<Utils::Entity*> m_entities;
 
 private:
     /// Les modifications du maillage associé au groupe
