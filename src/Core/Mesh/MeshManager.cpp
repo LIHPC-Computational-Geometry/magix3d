@@ -621,7 +621,7 @@ CommandMeshExplorer* MeshManager::endExplorer(CommandMeshExplorer* oldExplo, boo
 
         // trace dans le script
         TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-        cmd << getContextAlias() << "." << "getTopoManager().exportBlocks(";
+        cmd << getContextAlias() << "." << "getTopoManager().exportBlocksForCGNS(";
         cmd <<"\""<<n<<"\")";
         command->setScriptCommand(cmd);
 

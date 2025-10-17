@@ -22,12 +22,12 @@ namespace Mgx3D {
         public:
 
             /*------------------------------------------------------------------------*/
-            /** \brief  Constructeur (exportation de toutes entités du GeomManager)
+            /** \brief  Constructeur
              *
              *  \param c le contexte
              *  \param n le nom du fichier dans lequel se fait l'exportation
              */
-            ExportBlocksCGNSImplementation(Internal::Context& c, const std::string& n);
+            ExportBlocksCGNSImplementation(Internal::Context& c, const std::string& filename);
 
             /*------------------------------------------------------------------------*/
             /** \brief   Destructeur
@@ -45,8 +45,12 @@ namespace Mgx3D {
             /// contexte d'exécution
             Internal::Context& m_context;
 
+            std::string m_path;
+
             /// fichier dans lequel on exporte
             std::string m_filename;
+
+            std::string m_basename;
         };
 
 /*----------------------------------------------------------------------------*/
@@ -54,7 +58,7 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D
 /*----------------------------------------------------------------------------*/
-#endif /* EXPORTBLOCKCGNSSIMPLEMENTATION_H_ */
+#endif //EXPORTBLOCKSCGNSIMPLEMENTATION_H_
 /*----------------------------------------------------------------------------*/
 
 
