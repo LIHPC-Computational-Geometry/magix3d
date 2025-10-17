@@ -1044,14 +1044,14 @@ meshAndModify(std::list<Topo::CoFace*>& list_cofaces)
 		Group::Group2D* grp = *iter1;
 
 		// liste des cofaces associé au groupe
-		std::vector<Geom::Surface*> surfaces = grp->getSurfaces();
+		std::vector<Geom::Surface*> surfaces = grp->getFilteredEntities<Geom::Surface>();
 		std::list<Topo::CoFace*> cofaces_grp;
 		for (Geom::Surface* surf : surfaces) {
 			std::vector<Topo::CoFace*> cofaces = tm.getFilteredRefTopos<Topo::CoFace>(surf);
 			cofaces_grp.insert(cofaces_grp.end(), cofaces.begin(), cofaces.end());
 		} // end for surf
 
-		std::vector<Topo::CoFace*>& cofaces = grp->getCoFaces();
+		std::vector<Topo::CoFace*> cofaces = grp->getFilteredEntities<Topo::CoFace>();
 		cofaces_grp.insert(cofaces_grp.end(), cofaces.begin(), cofaces.end());
 
 		cofaces_grp.sort(Utils::Entity::compareEntity);
@@ -1286,7 +1286,7 @@ modify(std::vector<Topo::Block*>& list_blocks)
 		// liste des blocs associés au groupe
 		std::list<Topo::Block*> blocks_grp;
 
-		std::vector<Geom::Volume*> volumes = grp->getVolumes();
+		std::vector<Geom::Volume*> volumes = grp->getFilteredEntities<Geom::Volume>();
 		for (Geom::Volume* vol : volumes){
 			std::vector<Topo::Block*> blocks = tm.getFilteredRefTopos<Topo::Block>(vol);
 			blocks_grp.insert(blocks_grp.end(), blocks.begin(), blocks.end());
