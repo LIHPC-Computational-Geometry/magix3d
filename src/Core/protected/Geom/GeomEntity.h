@@ -152,8 +152,7 @@ public:
      *  \param  dr la représentation que l'on demande à afficher
      *  \param	Lève une exception si checkDestroyed vaut true
      */
-    virtual void getRepresentation(
-			Mgx3D::Utils::DisplayRepresentation& dr, bool checkDestroyed) const;
+    virtual void getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const;
 
    	/*------------------------------------------------------------------------*/
 	/** \brief	Fournit une représentation textuelle de l'entité.
@@ -162,7 +161,7 @@ public:
 	 * 			optimisation)
 	 * \return	Description, à détruire par l'appelant.
 	 */
-    virtual Mgx3D::Utils::SerializedRepresentation* getDescription (bool alsoComputed) const;
+    virtual Utils::SerializedRepresentation* getDescription (bool alsoComputed) const;
 
     /*------------------------------------------------------------------------*/
     /// Retourne les noms des groupes auxquels appartient cette entité

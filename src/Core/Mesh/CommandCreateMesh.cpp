@@ -1006,7 +1006,7 @@ meshAndModify(std::list<Topo::CoFace*>& list_cofaces)
 			CHECK_NULL_PTR_ERROR(surface);
 			const std::vector<Group::Group2D*>& grps = surface->getGroups();
 			for (Group::Group2D* grp : grps){
-				if (grp->getNbMeshModif() != 0)
+				if (!grp->getMeshModifications().empty())
 					list_grp.push_back(grp);
 			}
 		} // end if getGeomAssociation
@@ -1014,7 +1014,7 @@ meshAndModify(std::list<Topo::CoFace*>& list_cofaces)
 		// les groupes depuis les faces
 		std::vector<Group::Group2D*> grps = coface->getGroups();
 		for (Group::Group2D* grp : grps){
-			if (grp->getNbMeshModif() != 0)
+			if (!grp->getMeshModifications().empty())
 				list_grp.push_back(grp);
 		}
 
@@ -1096,8 +1096,7 @@ meshAndModify(std::list<Topo::CoFace*>& list_cofaces)
 		std::cout<<grp->getName()<<" avec "<<cofaces_grp.size()<<" cofaces"<<std::endl;
 #endif
 
-		for (uint i=0; i<grp->getNbMeshModif(); i++){
-			Mesh::MeshModificationItf* modif = grp->getMeshModif(i);
+		for (Mesh::MeshModificationItf* modif : grp->getMeshModifications()){
 
 			MeshModificationBySepa* sepa           = dynamic_cast<MeshModificationBySepa*>(modif);
 			MeshModificationByProjectionOnP0* proj = dynamic_cast<MeshModificationByProjectionOnP0*>(modif);
@@ -1252,7 +1251,7 @@ modify(std::vector<Topo::Block*>& list_blocks)
 			const std::vector<Group::Group3D*>& grps = volume->getGroups();
 
 			for (Group::Group3D* grp : grps) {
-				if (grp->getNbMeshModif() != 0)
+				if (!grp->getMeshModifications().empty())
 					list_grp.push_back(grp);
 			} // end for iter2
 		} // end if getGeomAssociation
@@ -1264,7 +1263,7 @@ modify(std::vector<Topo::Block*>& list_blocks)
 
 		// les groupes depuis les blocs
 		for (Group::Group3D* grp : block->getGroups()){
-			if (grp->getNbMeshModif() != 0)
+			if (!grp->getMeshModifications().empty())
 				list_grp.push_back(grp);
 		}
 	} // end for iter1
@@ -1308,9 +1307,7 @@ modify(std::vector<Topo::Block*>& list_blocks)
 		std::cout<<grp->getName()<<" avec "<<blocks_grp.size()<<" blocs"<<std::endl;
 #endif
 
-		for (uint i=0; i<grp->getNbMeshModif(); i++){
-			Mesh::MeshModificationItf* modif = grp->getMeshModif(i);
-
+		for (Mesh::MeshModificationItf* modif : grp->getMeshModifications()){
 			VolumicSmoothing* lissageVol = dynamic_cast<VolumicSmoothing*>(modif);
 			MeshModificationByPythonFunction* pert = dynamic_cast<MeshModificationByPythonFunction*>(modif);
 

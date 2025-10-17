@@ -92,7 +92,7 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
 			pts[i] = (barycentre + (pts[i] - barycentre) * shrink);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Utils::SerializedRepresentation* GeomEntity::getDescription (bool alsoComputed) const
+Utils::SerializedRepresentation* GeomEntity::getDescription (bool alsoComputed) const
 {
     return Services::DescriptionService::getDescription(this, alsoComputed);
 }

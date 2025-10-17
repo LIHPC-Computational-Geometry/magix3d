@@ -12,6 +12,7 @@
 /*----------------------------------------------------------------------------*/
 #include "Mesh/MeshModificationItf.h"
 #include <gmds/utils/CommonTypes.h>
+#include <Python.h>
 /*----------------------------------------------------------------------------*/
 namespace gmds{
 class Node;

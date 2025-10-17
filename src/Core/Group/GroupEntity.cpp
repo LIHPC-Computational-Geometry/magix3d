@@ -23,13 +23,6 @@ GroupEntity::GroupEntity(Internal::Context& ctx,
 #endif
 }
 /*----------------------------------------------------------------------------*/
-GroupEntity::~GroupEntity()
-{
-#ifdef _DEBUG2
-    std::cout<<"GroupEntity::~GroupEntity() de "<<getName()<<std::endl;
-#endif
-}
-/*----------------------------------------------------------------------------*/
 void GroupEntity::setDestroyed(bool b)
 {
     // cas sans changement
@@ -52,23 +45,7 @@ void GroupEntity::getRepresentation(Utils::DisplayRepresentation& dr, bool check
 Utils::SerializedRepresentation* GroupEntity::
 getDescription (bool alsoComputed) const
 {
-    std::unique_ptr<Mgx3D::Utils::SerializedRepresentation>   description (
-    		InternalEntity::getDescription (alsoComputed));
-
-    description->addProperty(Utils::SerializedRepresentation::Property ("Niveau", (long)getLevel()));
-
-    if (!m_meshModif.empty()){
-    	Utils::SerializedRepresentation  modification (
-    			            "Modification du maillage", "");
-    	for (std::vector<Mesh::MeshModificationItf*>::const_iterator iter = m_meshModif.begin();
-    			iter != m_meshModif.end(); ++iter)
-
-    		(*iter)->addToDescription(&modification);
-
-    	description->addPropertiesSet(modification);
-    }
-
-    return description.release ( );
+    return Services::DescriptionService::getDescription(this, alsoComputed);
 }
 /*----------------------------------------------------------------------------*/
 void GroupEntity::remove(Utils::Entity* e, const bool exceptionIfNotFound)
