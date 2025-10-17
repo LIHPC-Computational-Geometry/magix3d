@@ -966,7 +966,7 @@ void GroupManager::addMark(Group3D* grp,
 {
 	bool propagate = getPropagate();
 
-    for (auto vol : grp->getVolumes()) {
+    for (Geom::Volume* vol : grp->getFilteredEntities<Geom::Volume>()) {
         // on n'observe les entités qu'une fois
         if (filtre_vu[vol] == false){
             filtre_vu[vol] = true;
@@ -1006,19 +1006,13 @@ void GroupManager::addMark(Group3D* grp,
     }
     
     if (visibilityMask >= Utils::FilterEntity::TopoBlock){
-    	std::vector<Topo::Block*>& blocs = grp->getBlocks();
-
-    	for (std::vector<Topo::Block*>::iterator iter1=blocs.begin();
-    			iter1!=blocs.end(); ++iter1)
-    		addMark(*iter1, visibilityMask, filtre_vu, filtre_topo, mark);
+    	for (Topo::Block* blk : grp->getFilteredEntities<Topo::Block>())
+    		addMark(blk, visibilityMask, filtre_vu, filtre_topo, mark);
     }
 
     if (visibilityMask >= Utils::FilterEntity::SysCoord){
-    	std::vector<CoordinateSystem::SysCoord*>& rep = grp->getSysCoord();
-
-    	for (std::vector<CoordinateSystem::SysCoord*>::iterator iter1=rep.begin();
-    			iter1!=rep.end(); ++iter1)
-    		addMark(*iter1, visibilityMask, filtre_vu, filtre_rep, mark);
+    	for (CoordinateSystem::SysCoord* sc : grp->getFilteredEntities<CoordinateSystem::SysCoord>())
+    		addMark(sc, visibilityMask, filtre_vu, filtre_rep, mark);
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -1031,7 +1025,7 @@ void GroupManager::addMark(Group2D* grp,
 {
 	bool propagate = getPropagate();
 
-    for (auto surf : grp->getSurfaces()) {
+    for (Geom::Surface* surf : grp->getFilteredEntities<Geom::Surface>()) {
         // on n'observe les entités qu'une fois
         if (filtre_vu[surf] == false){
             filtre_vu[surf] = true;
@@ -1066,11 +1060,8 @@ void GroupManager::addMark(Group2D* grp,
     }
 
     if (visibilityMask >= Utils::FilterEntity::TopoCoFace){
-    	std::vector<Topo::CoFace*>& cofaces = grp->getCoFaces();
-
-    	for (std::vector<Topo::CoFace*>::iterator iter1=cofaces.begin();
-    			iter1!=cofaces.end(); ++iter1)
-    		addMark(*iter1, visibilityMask, filtre_vu, filtre_topo, mark);
+    	for (Topo::CoFace* cf : grp->getFilteredEntities<Topo::CoFace>())
+    		addMark(cf, visibilityMask, filtre_vu, filtre_topo, mark);
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -1083,7 +1074,7 @@ void GroupManager::addMark(Group1D* grp,
 {
 	bool propagate = getPropagate();
 
-    for (auto c : grp->getCurves()){
+    for (Geom::Curve* c : grp->getFilteredEntities<Geom::Curve>()) {
         // on n'observe les entités qu'une fois
         if (filtre_vu[c] == false){
             filtre_vu[c] = true;
@@ -1109,11 +1100,8 @@ void GroupManager::addMark(Group1D* grp,
     }
 
     if (visibilityMask >= Utils::FilterEntity::TopoCoEdge){
-    	std::vector<Topo::CoEdge*>& coedges = grp->getCoEdges();
-
-    	for (std::vector<Topo::CoEdge*>::iterator iter1=coedges.begin();
-    			iter1!=coedges.end(); ++iter1)
-    		addMark(*iter1, visibilityMask, filtre_vu, filtre_topo, mark);
+    	for (Topo::CoEdge* ce : grp->getFilteredEntities<Topo::CoEdge>())
+    		addMark(ce, visibilityMask, filtre_vu, filtre_topo, mark);
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -1126,7 +1114,7 @@ void GroupManager::addMark(Group0D* grp,
 {
     // on tient compte du masque pour savoir si on s'interesse à la visibilité de ce type d'entité
     if (visibilityMask & Utils::FilterEntity::GeomVertex){
-        for (auto vert : grp->getVertices()){
+        for (Geom::Vertex* vert : grp->getFilteredEntities<Geom::Vertex>()){
             // on n'observe les entités qu'une fois
             if (filtre_vu[vert] == false){
                 filtre_vu[vert] = true;
@@ -1144,11 +1132,8 @@ void GroupManager::addMark(Group0D* grp,
         }
     }
     if (visibilityMask >= Utils::FilterEntity::TopoVertex){
-    	std::vector<Topo::Vertex*>& vertices = grp->getTopoVertices();
-
-    	for (std::vector<Topo::Vertex*>::iterator iter1=vertices.begin();
-    			iter1!=vertices.end(); ++iter1)
-    		addMark(*iter1, visibilityMask, filtre_vu, filtre_topo, mark);
+    	for (Topo::Vertex* vert : grp->getFilteredEntities<Topo::Vertex>())
+    		addMark(vert, visibilityMask, filtre_vu, filtre_topo, mark);
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -1317,85 +1302,78 @@ void GroupManager::addMark(CoordinateSystem::SysCoord* rep,
 void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Geom::Volume*>& volumes)
 {
     std::set<Geom::Volume*> initGeomEntities;
-    for (auto vn : vg){
-        Group3D* gr3d = dynamic_cast<Group3D*>(vn);
-        if (gr3d){
-        	auto loc_volumes = gr3d->getVolumes();
-        	initGeomEntities.insert(loc_volumes.begin(), loc_volumes.end());
-        }
-    } // end for i
+    for (GroupEntity* g : vg) {
+        std::vector<Geom::Volume*> loc_volumes = g->getFilteredEntities<Geom::Volume>();
+        initGeomEntities.insert(loc_volumes.begin(), loc_volumes.end());
+    }
 
-    for (std::set<Geom::Volume*>::iterator iter = initGeomEntities.begin();
-    		iter != initGeomEntities.end(); ++iter)
-    	volumes.push_back((*iter));
+    for (Geom::Volume* v : initGeomEntities)
+    	volumes.push_back(v);
 }
 /*----------------------------------------------------------------------------*/
 void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Geom::Surface*>& surfaces)
 {
     std::set<Geom::Surface*> initGeomEntities;
-    for (auto vn : vg){
-    	Group3D* gr3d = dynamic_cast<Group3D*>(vn);
-    	if (gr3d){
-    		for (auto volume : gr3d->getVolumes()){
+    for (GroupEntity* g : vg) {
+    	Group3D* gr3d = dynamic_cast<Group3D*>(g);
+    	if (gr3d) {
+    		for (Geom::Volume* volume : gr3d->getFilteredEntities<Geom::Volume>()){
     			auto loc_surfaces = volume->getSurfaces();
     			initGeomEntities.insert(loc_surfaces.begin(), loc_surfaces.end());
     		}
     	} else {
-    		Group2D* gr2d = dynamic_cast<Group2D*>(vn);
+    		Group2D* gr2d = dynamic_cast<Group2D*>(g);
     		if (gr2d){
-    			auto loc_surfaces = gr2d->getSurfaces();
+    			auto loc_surfaces = gr2d->getFilteredEntities<Geom::Surface>();
     			initGeomEntities.insert(loc_surfaces.begin(), loc_surfaces.end());
     		}
     	}
     }
 
-    for (std::set<Geom::Surface*>::iterator iter = initGeomEntities.begin();
-    		iter != initGeomEntities.end(); ++iter)
-    	surfaces.push_back((*iter));
+    for (Geom::Surface* s : initGeomEntities)
+    	surfaces.push_back(s);
 }
 /*----------------------------------------------------------------------------*/
 void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Geom::Curve*>& curves)
 {
     std::set<Geom::Curve*> initGeomEntities;
-    for (auto vn : vg){
-    	Group3D* gr3d = dynamic_cast<Group3D*>(vn);
+    for (GroupEntity* g : vg) {
+    	Group3D* gr3d = dynamic_cast<Group3D*>(g);
     	if (gr3d){
-    		for (auto volume : gr3d->getVolumes()){
+    		for (auto volume : gr3d->getFilteredEntities<Geom::Volume>()){
                 for (auto surface : volume->getSurfaces()){
                     auto loc_curves = surface->getCurves();
                     initGeomEntities.insert(loc_curves.begin(), loc_curves.end());
                 }
     		}
     	} else {
-            Group2D* gr2d = dynamic_cast<Group2D*>(vn);
+            Group2D* gr2d = dynamic_cast<Group2D*>(g);
             if (gr2d){
-                for (auto surface : gr2d->getSurfaces()){
+                for (auto surface : gr2d->getFilteredEntities<Geom::Surface>()){
                 	auto loc_curves = surface->getCurves();
                 	initGeomEntities.insert(loc_curves.begin(), loc_curves.end());
                 }
             } else {
-                Group1D* gr1d = dynamic_cast<Group1D*>(vn);
+                Group1D* gr1d = dynamic_cast<Group1D*>(g);
                 if (gr1d){
-                	auto loc_curves = gr1d->getCurves();
+                	auto loc_curves = gr1d->getFilteredEntities<Geom::Curve>();
                 	initGeomEntities.insert(loc_curves.begin(), loc_curves.end());
                 }
             }
     	}
     }
 
-    for (std::set<Geom::Curve*>::iterator iter = initGeomEntities.begin();
-    		iter != initGeomEntities.end(); ++iter)
-    	curves.push_back((*iter));
+    for (Geom::Curve* c : initGeomEntities)
+    	curves.push_back(c);
 }
 /*----------------------------------------------------------------------------*/
 void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Geom::Vertex*>& vertices)
 {
     std::set<Geom::Vertex*> initGeomEntities;
-    for (auto vn : vg){
-    	Group3D* gr3d = dynamic_cast<Group3D*>(vn);
+    for (GroupEntity* g : vg) {
+    	Group3D* gr3d = dynamic_cast<Group3D*>(g);
     	if (gr3d){
-    		std::vector<Geom::Volume*> volumes = gr3d->getVolumes();
-    		for (auto volume : volumes){
+    		for (auto volume : gr3d->getFilteredEntities<Geom::Volume>()){
                 for (auto surface : volume->getSurfaces())
                     for (auto curve : surface->getCurves()) {
     			        auto loc_vertices = curve->getVertices();
@@ -1403,27 +1381,25 @@ void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Geom::Ve
                     }
     		}
     	} else {
-            Group2D* gr2d = dynamic_cast<Group2D*>(vn);
+            Group2D* gr2d = dynamic_cast<Group2D*>(g);
             if (gr2d){
-                std::vector<Geom::Surface*> surfaces = gr2d->getSurfaces();
-                for (auto surface : surfaces){
+                for (auto surface : gr2d->getFilteredEntities<Geom::Surface>()){
                     for (auto curve : surface->getCurves()){
                 	    auto loc_vertices = curve->getVertices();
                 	    initGeomEntities.insert(loc_vertices.begin(), loc_vertices.end());
                     }
                 }
             } else {
-            	Group1D* gr1d = dynamic_cast<Group1D*>(vn);
+            	Group1D* gr1d = dynamic_cast<Group1D*>(g);
             	if (gr1d){
-            		std::vector<Geom::Curve*> curves = gr1d->getCurves();
-            		for (auto curve : curves){
+            		for (auto curve : gr1d->getFilteredEntities<Geom::Curve>()){
             			auto loc_vertices = curve->getVertices();
             			initGeomEntities.insert(loc_vertices.begin(), loc_vertices.end());
             		}
             	} else {
-            		Group0D* gr0d = dynamic_cast<Group0D*>(vn);
+            		Group0D* gr0d = dynamic_cast<Group0D*>(g);
             		if (gr0d){
-            			auto loc_vertices = gr0d->getVertices();
+            			auto loc_vertices = gr0d->getFilteredEntities<Geom::Vertex>();
             			initGeomEntities.insert(loc_vertices.begin(), loc_vertices.end());
             		}
             	}
@@ -1431,120 +1407,126 @@ void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Geom::Ve
     	}
     }
 
-    for (std::set<Geom::Vertex*>::iterator iter = initGeomEntities.begin();
-    		iter != initGeomEntities.end(); ++iter)
-    	vertices.push_back((*iter));
+    for (Geom::Vertex* v : initGeomEntities)
+    	vertices.push_back(v);
 }
 /*----------------------------------------------------------------------------*/
 void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Topo::Block*>& blocks)
 {
 	std::set<Topo::Block*> initTopoEntities;
 
-    for (auto vn : vg){
-		Group3D* gr3d = dynamic_cast<Group3D*>(vn);
+    for (GroupEntity* g : vg) {
+		Group3D* gr3d = dynamic_cast<Group3D*>(g);
 		if (gr3d){
-			Topo::TopoHelper::get(gr3d->getVolumes(), initTopoEntities);
-			std::vector<Topo::Block*>& te = gr3d->getBlocks();
+            auto ge = gr3d->getFilteredEntities<Geom::Volume>();
+			Topo::TopoHelper::get(ge, initTopoEntities);
+			auto te = gr3d->getFilteredEntities<Topo::Block>();
 			initTopoEntities.insert(te.begin(), te.end());
 		}
 	}
 
-	for (std::set<Topo::Block*>::iterator iter = initTopoEntities.begin();
-			iter != initTopoEntities.end(); ++iter)
-		blocks.push_back((*iter));
+	for (Topo::Block* b : initTopoEntities)
+		blocks.push_back(b);
 }
 /*----------------------------------------------------------------------------*/
 void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Topo::CoFace*>& cofaces)
 {
 	bool propagate = getPropagate();
-
 	std::set<Topo::CoFace*> initTopoEntities;
-
-    for (auto vn : vg){
-		Group3D* gr3d = dynamic_cast<Group3D*>(vn);
+    for (GroupEntity* g : vg) {
+		Group3D* gr3d = dynamic_cast<Group3D*>(g);
 		if (gr3d){
-			Topo::TopoHelper::get(gr3d->getVolumes(), initTopoEntities, propagate);
-			Topo::TopoHelper::get(gr3d->getBlocks(), initTopoEntities);
+            auto ge = gr3d->getFilteredEntities<Geom::Volume>();
+			Topo::TopoHelper::get(ge, initTopoEntities, propagate);
+            auto te = gr3d->getFilteredEntities<Topo::Block>();
+			Topo::TopoHelper::get(te, initTopoEntities);
 		}
 		else {
-			Group2D* gr2d = dynamic_cast<Group2D*>(vn);
+			Group2D* gr2d = dynamic_cast<Group2D*>(g);
 			if (gr2d){
-				Topo::TopoHelper::get(gr2d->getSurfaces(), initTopoEntities);
-				std::vector<Topo::CoFace*>& te = gr2d->getCoFaces();
+                auto ge = gr2d->getFilteredEntities<Geom::Surface>();
+				Topo::TopoHelper::get(ge, initTopoEntities);
+				auto te = gr2d->getFilteredEntities<Topo::CoFace>();
 				initTopoEntities.insert(te.begin(), te.end());
 			}
 		}
 	}
 
-	for (std::set<Topo::CoFace*>::iterator iter = initTopoEntities.begin();
-			iter != initTopoEntities.end(); ++iter)
-		cofaces.push_back((*iter));
+	for (Topo::CoFace* cf : initTopoEntities)
+		cofaces.push_back(cf);
 }
 /*----------------------------------------------------------------------------*/
 void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Topo::CoEdge*>& coedges)
 {
 	bool propagate = getPropagate();
-
 	std::set<Topo::CoEdge*> initTopoEntities;
-
-    for (auto vn : vg){
-		Group3D* gr3d = dynamic_cast<Group3D*>(vn);
+    for (GroupEntity* g : vg) {
+		Group3D* gr3d = dynamic_cast<Group3D*>(g);
 		if (gr3d){
-			Topo::TopoHelper::get(gr3d->getVolumes(), initTopoEntities, propagate);
-			Topo::TopoHelper::get(gr3d->getBlocks(), initTopoEntities);
+            auto ge = gr3d->getFilteredEntities<Geom::Volume>();
+			Topo::TopoHelper::get(ge, initTopoEntities, propagate);
+            auto te = gr3d->getFilteredEntities<Topo::Block>();
+			Topo::TopoHelper::get(te, initTopoEntities);
 		}
 		else {
-			Group2D* gr2d = dynamic_cast<Group2D*>(vn);
+			Group2D* gr2d = dynamic_cast<Group2D*>(g);
 			if (gr2d){
-				Topo::TopoHelper::get(gr2d->getSurfaces(), initTopoEntities, propagate);
-				Topo::TopoHelper::get(gr2d->getCoFaces(), initTopoEntities);
+                auto ge = gr2d->getFilteredEntities<Geom::Surface>();
+				Topo::TopoHelper::get(ge, initTopoEntities, propagate);
+                auto te = gr2d->getFilteredEntities<Topo::CoFace>();
+				Topo::TopoHelper::get(te, initTopoEntities);
 			}
 			else {
-				Group1D* gr1d = dynamic_cast<Group1D*>(vn);
+				Group1D* gr1d = dynamic_cast<Group1D*>(g);
 				if (gr1d){
-					Topo::TopoHelper::get(gr1d->getCurves(), initTopoEntities);
-					std::vector<Topo::CoEdge*>& te = gr1d->getCoEdges();
+                    auto ge = gr1d->getFilteredEntities<Geom::Curve>();
+					Topo::TopoHelper::get(ge, initTopoEntities);
+					auto te = gr1d->getFilteredEntities<Topo::CoEdge>();
 					initTopoEntities.insert(te.begin(), te.end());
 				}
 			}
 		}
 	}
 
-	for (std::set<Topo::CoEdge*>::iterator iter = initTopoEntities.begin();
-			iter != initTopoEntities.end(); ++iter)
-		coedges.push_back((*iter));
+	for (Topo::CoEdge* ce : initTopoEntities)
+		coedges.push_back(ce);
 }
 /*----------------------------------------------------------------------------*/
 void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Topo::Vertex*>& vertices)
 {
 	bool propagate = getPropagate();
-
 	std::set<Topo::Vertex*> initTopoEntities;
-
-    for (auto vn : vg){
-		Group3D* gr3d = dynamic_cast<Group3D*>(vn);
+    for (GroupEntity* g : vg) {
+		Group3D* gr3d = dynamic_cast<Group3D*>(g);
 		if (gr3d){
-			Topo::TopoHelper::get(gr3d->getVolumes(), initTopoEntities, propagate);
-			Topo::TopoHelper::get(gr3d->getBlocks(), initTopoEntities);
+            auto ge = gr3d->getFilteredEntities<Geom::Volume>();
+			Topo::TopoHelper::get(ge, initTopoEntities, propagate);
+            auto te = gr3d->getFilteredEntities<Topo::Block>();
+			Topo::TopoHelper::get(te, initTopoEntities);
 		}
 		else {
-			Group2D* gr2d = dynamic_cast<Group2D*>(vn);
+			Group2D* gr2d = dynamic_cast<Group2D*>(g);
 			if (gr2d){
-				Topo::TopoHelper::get(gr2d->getSurfaces(), initTopoEntities, propagate);
-				Topo::TopoHelper::get(gr2d->getCoFaces(), initTopoEntities);
+                auto ge = gr2d->getFilteredEntities<Geom::Surface>();
+				Topo::TopoHelper::get(ge, initTopoEntities, propagate);
+                auto te = gr2d->getFilteredEntities<Topo::CoFace>();
+				Topo::TopoHelper::get(te, initTopoEntities);
 			}
 			else {
-				Group1D* gr1d = dynamic_cast<Group1D*>(vn);
+				Group1D* gr1d = dynamic_cast<Group1D*>(g);
 				if (gr1d){
-					Topo::TopoHelper::get(gr1d->getCurves(), initTopoEntities, propagate);
-					Topo::TopoHelper::get(gr1d->getCoEdges(), initTopoEntities);
+                    auto ge = gr1d->getFilteredEntities<Geom::Curve>();
+					Topo::TopoHelper::get(ge, initTopoEntities, propagate);
+                    auto te = gr1d->getFilteredEntities<Topo::CoEdge>();
+					Topo::TopoHelper::get(te, initTopoEntities);
 				}
 				else {
-					Group0D* gr0d = dynamic_cast<Group0D*>(vn);
+					Group0D* gr0d = dynamic_cast<Group0D*>(g);
 					if (gr0d){
-						Topo::TopoHelper::get(gr0d->getVertices(), initTopoEntities);
-						std::vector<Topo::Vertex*>& te = gr0d->getTopoVertices();
-						initTopoEntities.insert(te.begin(), te.end());
+                        auto ge = gr0d->getFilteredEntities<Geom::Vertex>();
+						Topo::TopoHelper::get(ge, initTopoEntities);
+						auto tv = gr0d->getFilteredEntities<Topo::Vertex>();
+						initTopoEntities.insert(tv.begin(), tv.end());
 					}
 
 				}
@@ -1552,9 +1534,8 @@ void GroupManager::get(const std::vector<GroupEntity*>& vg, std::vector<Topo::Ve
 		}
 	}
 
-	for (std::set<Topo::Vertex*>::iterator iter = initTopoEntities.begin();
-			iter != initTopoEntities.end(); ++iter)
-		vertices.push_back((*iter));
+	for (Topo::Vertex* v : initTopoEntities)
+		vertices.push_back(v);
 }
 
 /*------------------------------------------------------------------------*/
@@ -1613,9 +1594,8 @@ std::vector<std::string> GroupManager::getGeomVolumes(const std::string& g, cons
 	std::vector<Geom::Volume*> geom_entities;
 	get(groups, geom_entities);
 
-	for (std::vector<Geom::Volume*>::iterator iter=geom_entities.begin();
-			iter!=geom_entities.end(); ++iter)
-		result.push_back((*iter)->getName());
+	for (auto e : geom_entities)
+		result.push_back(e->getName());
 
 	return result;
 }
@@ -1627,9 +1607,8 @@ std::vector<std::string> GroupManager::getGeomSurfaces(const std::string& g, con
 	std::vector<Geom::Surface*> geom_entities;
 	get(groups, geom_entities);
 
-	for (std::vector<Geom::Surface*>::iterator iter=geom_entities.begin();
-			iter!=geom_entities.end(); ++iter)
-		result.push_back((*iter)->getName());
+	for (auto e : geom_entities)
+		result.push_back(e->getName());
 
 	return result;
 }
@@ -1641,9 +1620,8 @@ std::vector<std::string> GroupManager::getGeomCurves(const std::string& g, const
 	std::vector<Geom::Curve*> geom_entities;
 	get(groups, geom_entities);
 
-	for (std::vector<Geom::Curve*>::iterator iter=geom_entities.begin();
-			iter!=geom_entities.end(); ++iter)
-		result.push_back((*iter)->getName());
+	for (auto e : geom_entities)
+		result.push_back(e->getName());
 
 	return result;
 }
@@ -1655,9 +1633,8 @@ std::vector<std::string> GroupManager::getGeomVertices(const std::string& g, con
 	std::vector<Geom::Vertex*> geom_entities;
 	get(groups, geom_entities);
 
-	for (std::vector<Geom::Vertex*>::iterator iter=geom_entities.begin();
-			iter!=geom_entities.end(); ++iter)
-		result.push_back((*iter)->getName());
+	for (auto e : geom_entities)
+		result.push_back(e->getName());
 
 	return result;
 }
@@ -1669,9 +1646,8 @@ std::vector<std::string> GroupManager::getTopoBlocks(const std::string& g, const
 	std::vector<Topo::Block*> topo_entities;
 	get(groups, topo_entities);
 
-	for (std::vector<Topo::Block*>::iterator iter=topo_entities.begin();
-			iter!=topo_entities.end(); ++iter)
-		result.push_back((*iter)->getName());
+	for (auto e : topo_entities)
+		result.push_back(e->getName());
 
 	return result;
 }
@@ -1683,9 +1659,8 @@ std::vector<std::string> GroupManager::getTopoFaces(const std::string& g, const 
 	std::vector<Topo::CoFace*> topo_entities;
 	get(groups, topo_entities);
 
-	for (std::vector<Topo::CoFace*>::iterator iter=topo_entities.begin();
-			iter!=topo_entities.end(); ++iter)
-		result.push_back((*iter)->getName());
+	for (auto e : topo_entities)
+		result.push_back(e->getName());
 
 	return result;
 }
@@ -1697,9 +1672,8 @@ std::vector<std::string> GroupManager::getTopoEdges(const std::string& g, const 
 	std::vector<Topo::CoEdge*> topo_entities;
 	get(groups, topo_entities);
 
-	for (std::vector<Topo::CoEdge*>::iterator iter=topo_entities.begin();
-			iter!=topo_entities.end(); ++iter)
-		result.push_back((*iter)->getName());
+	for (auto e : topo_entities)
+		result.push_back(e->getName());
 
 	return result;
 }
@@ -1711,9 +1685,8 @@ std::vector<std::string> GroupManager::getTopoVertices(const std::string& g, con
 	std::vector<Topo::Vertex*> topo_entities;
 	get(groups, topo_entities);
 
-	for (std::vector<Topo::Vertex*>::iterator iter=topo_entities.begin();
-			iter!=topo_entities.end(); ++iter)
-		result.push_back((*iter)->getName());
+	for (auto e : topo_entities)
+		result.push_back(e->getName());
 
 	return result;
 }
