@@ -10,15 +10,13 @@
 #define VERTEX_TOPO_PROPERTY_H_
 /*----------------------------------------------------------------------------*/
 #include "Utils/Container.h"
+#include "Group/GroupEntity.h"
 #include <TkUtil/Exception.h>
 #include <vector>
 #include <algorithm>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
-namespace Group {
-class Group0D;
-}
 namespace Topo {
 class CoEdge;
 /*----------------------------------------------------------------------------*/

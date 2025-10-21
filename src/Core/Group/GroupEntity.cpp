@@ -1,5 +1,6 @@
 /*----------------------------------------------------------------------------*/
 #include "Group/GroupEntity.h"
+#include "Group/GroupEntityVisitor.h"
 #include "Internal/Context.h"
 #include "Mesh/MeshModificationItf.h"
 /*----------------------------------------------------------------------------*/
@@ -153,6 +154,28 @@ std::string GroupEntity::getInfos()
     us << *this;
     return us.iso();
 }
+/*----------------------------------------------------------------------------*/
+template <uint TDIM, Utils::Entity::objectType TTYPE>
+GroupEntityT<TDIM, TTYPE>::GroupEntityT(Internal::Context& ctx, const std::string& nom, bool isDefaultGroup, uint level)
+: GroupEntity(ctx, ctx.newProperty(TTYPE, nom), ctx.newDisplayProperties(TTYPE), isDefaultGroup, level)
+{}
+/*----------------------------------------------------------------------------*/
+template <uint TDIM, Utils::Entity::objectType TTYPE> void
+GroupEntityT<TDIM, TTYPE>::accept(ConstGroupEntityVisitor& v) const
+{
+    v.visit(this);
+}
+/*----------------------------------------------------------------------------*/
+template <uint TDIM, Utils::Entity::objectType TTYPE> void
+GroupEntityT<TDIM, TTYPE>::accept(GroupEntityVisitor& v)
+{
+    v.visit(this);
+}
+/*----------------------------------------------------------------------------*/
+template class GroupEntityT<0, Utils::Entity::Group0D>;
+template class GroupEntityT<1, Utils::Entity::Group1D>;
+template class GroupEntityT<2, Utils::Entity::Group2D>;
+template class GroupEntityT<3, Utils::Entity::Group3D>;
 /*----------------------------------------------------------------------------*/
 } // end namespace Group
 /*----------------------------------------------------------------------------*/

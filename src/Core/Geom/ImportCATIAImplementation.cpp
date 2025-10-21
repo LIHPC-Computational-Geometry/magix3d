@@ -1,7 +1,6 @@
 /*----------------------------------------------------------------------------*/
 #include "Geom/ImportCATIAImplementation.h"
 #include "Geom/EntityFactory.h"
-#include "Group/Group0D.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/UTF8String.h>
 #include <TkUtil/Exception.h>

@@ -28,7 +28,6 @@
 #include "Utils/Common.h"
 #include "Utils/SerializedRepresentation.h"
 #include "Geom/GeomEntity.h"
-#include "Group/Group3D.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/TraceLog.h>

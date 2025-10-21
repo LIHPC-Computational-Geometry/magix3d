@@ -4,7 +4,7 @@
 #include <map>
 #include <vector>
 #include <TopoDS_Shape.hxx>
-
+#include "Group/GroupEntity.h"
 namespace Mgx3D
 {
     namespace Geom
@@ -20,14 +20,6 @@ namespace Mgx3D
     namespace Topo
     {
         class TopoEntity;
-    }
-
-    namespace Group
-    {
-        class Group0D;
-        class Group1D;
-        class Group2D;
-        class Group3D;
     }
 }
 

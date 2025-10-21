@@ -10,6 +10,7 @@
 #define BLOCK_TOPO_PROPERTY_H_
 /*----------------------------------------------------------------------------*/
 #include "Utils/Container.h"
+#include "Group/GroupEntity.h"
 #include <TkUtil/Exception.h>
 #include <sys/types.h>
 #include <vector>
@@ -18,9 +19,6 @@
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
-namespace Group {
-class Group3D;
-}
 namespace Topo {
 class Vertex;
 class Face;
