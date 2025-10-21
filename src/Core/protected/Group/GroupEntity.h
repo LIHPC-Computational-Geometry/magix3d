@@ -1,9 +1,7 @@
-/*----------------------------------------------------------------------------*/
 #ifndef MGX3D_GROUP_GROUPENTITY_H_
 #define MGX3D_GROUP_GROUPENTITY_H_
 /*----------------------------------------------------------------------------*/
 #include "Internal/InternalEntity.h"
-#include "Group/GroupEntityVisitor.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -23,6 +21,9 @@ class Context;
  *
  */
 namespace Group {
+/*----------------------------------------------------------------------------*/
+class GroupEntityVisitor;
+class ConstGroupEntityVisitor;
 /*----------------------------------------------------------------------------*/
 /**
  * \class GroupEntity
@@ -137,6 +138,29 @@ private:
     /// Distinction des groupes suivant un niveau (~ notion de matériau)
     uint m_level;
 };
+/*----------------------------------------------------------------------------*/
+template <uint TDIM, Utils::Entity::objectType TTYPE>
+class GroupEntityT : public GroupEntity 
+{
+public:
+    static const uint DIM = TDIM;
+
+    void accept(ConstGroupEntityVisitor& v) const override;
+    void accept(GroupEntityVisitor& v) override;
+
+    GroupEntityT(Internal::Context& ctx, const std::string& nom, bool isDefaultGroup, uint level=1);
+    virtual ~GroupEntityT() = default;
+
+    int getDim() const override { return TDIM; }
+    Utils::Entity::objectType getType() const override { return TTYPE; }
+    std::string getTypeName() const override
+    { return Utils::Entity::objectTypeToObjectTypeName(TTYPE); }
+};
+/*----------------------------------------------------------------------------*/
+using Group0D = GroupEntityT<0, Utils::Entity::Group0D>;
+using Group1D = GroupEntityT<1, Utils::Entity::Group1D>;
+using Group2D = GroupEntityT<2, Utils::Entity::Group2D>;
+using Group3D = GroupEntityT<3, Utils::Entity::Group3D>;
 /*----------------------------------------------------------------------------*/
 } // end namespace Group
 /*----------------------------------------------------------------------------*/

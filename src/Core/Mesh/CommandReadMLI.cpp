@@ -8,8 +8,7 @@
 #include "Mesh/SubVolume.h"
 #include "Mesh/SubSurface.h"
 #include "Group/GroupManager.h"
-#include "Group/Group3D.h"
-#include "Group/Group2D.h"
+#include "Group/GroupEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/

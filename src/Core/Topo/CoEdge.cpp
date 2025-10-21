@@ -32,7 +32,6 @@
 #include "Geom/EntityFactory.h"
 #include "Geom/Vertex.h"
 #include "Geom/GeomProjectImplementation.h"
-#include "Group/Group1D.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/UTF8String.h>

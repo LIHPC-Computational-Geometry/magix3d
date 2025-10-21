@@ -10,14 +10,11 @@
 #include "Services/MementoService.h"
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
+#include "Group/GroupEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Edge.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
-/*----------------------------------------------------------------------------*/
-namespace Group {
-class Group1D;
-}
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 

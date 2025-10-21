@@ -8,8 +8,8 @@
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Group/Group2D.h"
 #include "Group/GroupManager.h"
+#include "Group/GroupEntity.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtGroupProjectionOnPlaneAction.h"
 #include "QtComponents/QtMgx3DApplication.h"

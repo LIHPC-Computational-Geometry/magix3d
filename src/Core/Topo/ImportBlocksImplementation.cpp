@@ -6,14 +6,10 @@
 #include "Topo/ImportBlocksImplementation.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Topo/EdgeMeshingPropertyGeometric.h"
-#include "Internal/InfoCommand.h"
-
-#include "Group/Group0D.h"
-#include "Group/Group1D.h"
-#include "Group/Group2D.h"
-#include "Group/Group3D.h"
-#include "Group/GroupManager.h"
 #include "Topo/EdgeMeshingPropertyGlobalInterpolate.h"
+#include "Internal/InfoCommand.h"
+#include "Group/GroupManager.h"
+#include "Group/GroupEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <iostream>
 /*----------------------------------------------------------------------------*/

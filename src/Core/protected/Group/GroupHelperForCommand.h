@@ -3,10 +3,7 @@
 #define GROUP_HELPER_FOR_COMMAND_H_
 /*----------------------------------------------------------------------------*/
 #include "Internal/InfoCommand.h"
-#include "Group/Group0D.h"
-#include "Group/Group1D.h"
-#include "Group/Group2D.h"
-#include "Group/Group3D.h"
+#include "Group/GroupEntity.h"
 #include "Topo/Block.h"
 #include "Topo/CoFace.h"
 #include "Topo/CoEdge.h"

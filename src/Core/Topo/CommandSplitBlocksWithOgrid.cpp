@@ -16,8 +16,7 @@
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Topo/EdgeMeshingPropertyInterpolate.h"
 #include "Topo/SetNbMeshingEdgesImplementation.h"
-#include "Group/Group3D.h"
-#include "Group/Group2D.h"
+#include "Group/GroupEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>

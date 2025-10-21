@@ -10,10 +10,7 @@
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
 #include "Group/GroupManager.h"
-#include "Group/Group3D.h"
-#include "Group/Group2D.h"
-#include "Group/Group1D.h"
-#include "Group/Group0D.h"
+#include "Group/GroupEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>

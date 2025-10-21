@@ -15,7 +15,7 @@
 #include "Topo/Edge.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Topo/EdgeMeshingPropertyInterpolate.h"
-#include "Group/Group2D.h"
+#include "Group/GroupEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>

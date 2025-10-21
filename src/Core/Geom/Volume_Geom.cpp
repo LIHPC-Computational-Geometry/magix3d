@@ -4,7 +4,6 @@
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
 #include "Geom/OCCHelper.h"
-#include "Group/Group3D.h"
 #include "Internal/Context.h"
 #include "Internal/EntitiesHelper.h"
 /*----------------------------------------------------------------------------*/

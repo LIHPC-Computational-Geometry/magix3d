@@ -15,11 +15,8 @@
 #include "Utils/Common.h"
 #include "Internal/ServiceGeomToTopo.h"
 #include "Internal/Context.h"
-#include "Group/Group3D.h"
-#include "Group/Group2D.h"
-#include "Group/Group1D.h"
-#include "Group/Group0D.h"
 #include "Group/GroupManager.h"
+#include "Group/GroupEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>

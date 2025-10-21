@@ -34,8 +34,6 @@
 
 #include "Geom/GeomEntity.h"
 #include "Geom/GeomProjectImplementation.h"
-
-#include "Group/Group2D.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/TraceLog.h>

@@ -1,13 +1,10 @@
 #ifndef GROUPENTITYVISITOR_H_
 #define GROUPENTITYVISITOR_H_
 /*----------------------------------------------------------------------------*/
+#include "Group/GroupEntity.h"
+/*----------------------------------------------------------------------------*/
 namespace Mgx3D::Group 
 {
-/*----------------------------------------------------------------------------*/
-class Group0D;
-class Group1D;
-class Group2D;
-class Group3D;
 /*----------------------------------------------------------------------------*/
 struct ConstGroupEntityVisitor
 {

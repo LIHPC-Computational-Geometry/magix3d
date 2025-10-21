@@ -9,6 +9,7 @@
 #include "Mesh/MeshEntity.h"
 #include "Topo/TopoEntity.h"
 #include "SysCoord/SysCoord.h"
+#include "Group/GroupEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <vector>
 #include <map>
@@ -49,10 +50,6 @@ class SysCoord;
 /*----------------------------------------------------------------------------*/
 namespace Group {
 
-class Group3D;
-class Group2D;
-class Group1D;
-class Group0D;
 class GroupEntity;
 
 /*----------------------------------------------------------------------------*/

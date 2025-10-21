@@ -8,12 +8,9 @@
 #include "Geom/GeomEntity.h"
 #include "Services/MementoService.h"
 #include "Utils/Point.h"
+#include "Group/GroupEntity.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
-/*----------------------------------------------------------------------------*/
-namespace Group {
-class Group0D;
-}
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 class Curve;

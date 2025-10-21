@@ -8,7 +8,6 @@
 #include "Geom/EntityFactory.h"
 #include "Geom/OCCHelper.h"
 #include "Geom/GeomProjectImplementation.h"
-#include "Group/Group1D.h"
 #include "Internal/EntitiesHelper.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>

@@ -1,7 +1,6 @@
 /*----------------------------------------------------------------------------*/
 #include "Geom/ImportSTLImplementation.h"
 #include "Geom/Vertex.h"
-#include "Group/Group0D.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
