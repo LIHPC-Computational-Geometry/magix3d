@@ -17,10 +17,8 @@
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 
-
-#include "Group/Group2D.h"
-#include "Group/Group3D.h"
 #include "Group/GroupManager.h"
+#include "Group/GroupEntity.h"
 
 //#define _DEBUG_MESH_LAW
 /*----------------------------------------------------------------------------*/

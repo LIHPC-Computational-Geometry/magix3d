@@ -7,10 +7,7 @@
 #include "Topo/CoEdge.h"
 #include "Topo/CoFace.h"
 #include "Topo/Block.h"
-#include "Group/Group0D.h"
-#include "Group/Group1D.h"
-#include "Group/Group2D.h"
-#include "Group/Group3D.h"
+#include "Group/GroupEntity.h"
 #include "SysCoord/SysCoord.h"
 #include "Mesh/MeshModificationItf.h"
 #include <TkUtil/NumericServices.h>

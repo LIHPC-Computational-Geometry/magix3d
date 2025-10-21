@@ -10,6 +10,7 @@
 #define COFACE_TOPO_PROPERTY_H_
 /*----------------------------------------------------------------------------*/
 #include "Utils/Container.h"
+#include "Group/GroupEntity.h"
 #include <TkUtil/Exception.h>
 #include <vector>
 #include <list>
@@ -17,9 +18,6 @@
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
-namespace Group {
-class Group2D;
-}
 namespace Topo {
 class Vertex;
 class Edge;

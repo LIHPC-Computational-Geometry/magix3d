@@ -3,7 +3,6 @@
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/OCCHelper.h"
-#include "Group/Group0D.h"
 #include "Internal/Context.h"
 #include "Internal/EntitiesHelper.h"
 /*----------------------------------------------------------------------------*/

@@ -4,7 +4,7 @@
 #include "Geom/Surface.h"
 #include "Geom/Volume.h"
 #include "Geom/CommandJoinSurfaces.h"
-#include "Group/Group2D.h"
+#include "Group/GroupEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/UTF8String.h>

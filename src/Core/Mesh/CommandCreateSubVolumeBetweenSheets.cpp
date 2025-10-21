@@ -2,7 +2,7 @@
 #include "Internal/InfoCommand.h"
 #include "Internal/Context.h"
 #include "Group/GroupManager.h"
-#include "Group/Group3D.h"
+#include "Group/GroupEntity.h"
 #include "Geom/Volume.h"
 #include "Topo/TopoEntity.h"
 #include "Topo/Block.h"

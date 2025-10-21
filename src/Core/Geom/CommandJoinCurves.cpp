@@ -4,7 +4,7 @@
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/CommandJoinCurves.h"
-#include "Group/Group1D.h"
+#include "Group/GroupEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/UTF8String.h>
