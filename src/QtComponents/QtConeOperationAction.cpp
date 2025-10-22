@@ -9,12 +9,12 @@
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include "Geom/GeomManager.h"
+#include "Geom/GeomDisplayRepresentation.h"
+#include "Geom/CommandNewCone.h"
 #include "QtComponents/QtConeOperationAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
 #include "QtComponents/QtNumericFieldsFactory.h"
-#include "Geom/GeomDisplayRepresentation.h"
-#include "Geom/CommandNewCone.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>

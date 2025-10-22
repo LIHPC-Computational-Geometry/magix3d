@@ -7,12 +7,12 @@
 #include "Internal/Context.h"
 
 #include "Utils/Common.h"
+#include "Topo/CommandSplitFacesWithOgrid.h"
+#include "Topo/TopoDisplayRepresentation.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtNumericFieldsFactory.h"
 #include "QtComponents/QtTopologySplitFaceWithOGridAction.h"
-#include "Topo/CommandSplitFacesWithOgrid.h"
-#include "Topo/TopoDisplayRepresentation.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>

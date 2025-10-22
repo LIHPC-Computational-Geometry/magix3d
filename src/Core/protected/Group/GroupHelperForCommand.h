@@ -3,6 +3,7 @@
 #define GROUP_HELPER_FOR_COMMAND_H_
 /*----------------------------------------------------------------------------*/
 #include "Internal/InfoCommand.h"
+#include "Group/GroupManager.h"
 #include "Group/GroupEntity.h"
 #include "Topo/Block.h"
 #include "Topo/CoFace.h"
@@ -25,26 +26,27 @@ public:
 	GroupHelperForCommand(Internal::InfoCommand& info_command, GroupManager& group_manager);
 	virtual ~GroupHelperForCommand() = default;
 
-    Group3D* addToGroup(const std::string group_name, Geom::Volume* v);
-    Group2D* addToGroup(const std::string group_name, Geom::Surface* s);
-    Group1D* addToGroup(const std::string group_name, Geom::Curve* c);
-    Group0D* addToGroup(const std::string group_name, Geom::Vertex* v);
-    GroupEntity* addToGroup(const std::string group_name, Geom::GeomEntity* e);
+    template <typename TGroup, typename TEntity>
+    TGroup* addToGroup(const std::string& group_name, TEntity* e)
+    {
+        TGroup* grp = m_group_manager.getNewGroup<TGroup>(group_name, &m_info_command);
+        addEntityToGroup(grp, e);
+        return grp;
+    }
 
-    Group3D* addToGroup(const std::string group_name, Topo::Block* b);
-    Group2D* addToGroup(const std::string group_name, Topo::CoFace* f);
-    Group1D* addToGroup(const std::string group_name, Topo::CoEdge* e);
-    Group0D* addToGroup(const std::string group_name, Topo::Vertex* v);
+    GroupEntity* addToGroup(const std::string& group_name, Geom::GeomEntity* e);
+    GroupEntity* addToGroup(const std::string& group_name, Topo::TopoEntity* e);
 
-    Group3D* removeFromGroup(const std::string group_name, Geom::Volume* v);
-    Group2D* removeFromGroup(const std::string group_name, Geom::Surface* s);
-    Group1D* removeFromGroup(const std::string group_name, Geom::Curve* c);
-    Group0D* removeFromGroup(const std::string group_name, Geom::Vertex* v);
+    template <typename TGroup, typename TEntity>
+    TGroup* removeFromGroup(const std::string& group_name, TEntity* e)
+    {
+        TGroup* grp = m_group_manager.getGroup<TGroup>(group_name, &m_info_command);
+        removeEntityFromGroup(grp, e);
+        return grp;
+    }
 
-    Group3D* removeFromGroup(const std::string group_name, Topo::Block* b);
-    Group2D* removeFromGroup(const std::string group_name, Topo::CoFace* f);
-    Group1D* removeFromGroup(const std::string group_name, Topo::CoEdge* e);
-    Group0D* removeFromGroup(const std::string group_name, Topo::Vertex* v);
+    GroupEntity* removeFromGroup(const std::string& group_name, Geom::GeomEntity* e);
+    GroupEntity* removeFromGroup(const std::string& group_name, Topo::TopoEntity* e);
 
 private:
     template <typename TGroup, typename TEntity>
