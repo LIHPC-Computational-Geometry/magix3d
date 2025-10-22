@@ -9,14 +9,14 @@
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
+#include "Geom/CommandNewBox.h"
+#include "Geom/GeomDisplayRepresentation.h"
 #include "Geom/GeomManager.h"
 #include "Geom/Vertex.h"
 #include "Utils/Vector.h"
 #include "QtComponents/QtBoxOperationAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
-#include "Geom/CommandNewBox.h"
-#include "Geom/GeomDisplayRepresentation.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>

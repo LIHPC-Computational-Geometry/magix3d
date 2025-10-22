@@ -9,14 +9,14 @@
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include "Geom/Vertex.h"
+#include "Geom/GeomDisplayRepresentation.h"
+#include "Geom/CommandNewSphere.h"
+#include "Geom/CommandNewHollowSphere.h"
 #include "Utils/Vector.h"
 #include "QtComponents/QtSphereOperationAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
 #include "QtComponents/QtNumericFieldsFactory.h"
-#include "Geom/GeomDisplayRepresentation.h"
-#include "Geom/CommandNewSphere.h"
-#include "Geom/CommandNewHollowSphere.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>

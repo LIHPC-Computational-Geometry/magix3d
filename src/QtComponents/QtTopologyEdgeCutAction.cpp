@@ -7,12 +7,12 @@
 #include "Internal/Context.h"
 #include "Utils/Common.h"
 #include "Geom/GeomEntity.h"
+#include "Topo/CommandSplitEdge.h"
+#include "Topo/TopoDisplayRepresentation.h"
 #include "QtComponents/QtMgx3DApplication.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtTopologyEdgeCutAction.h"
-#include "Topo/CommandSplitEdge.h"
-#include "Topo/TopoDisplayRepresentation.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>

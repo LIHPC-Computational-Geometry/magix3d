@@ -12,14 +12,14 @@
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
-#include <QtUtil/QtErrorManagement.h>
-#include "QtComponents/QtVertexOperationAction.h"
-#include "QtComponents/QtMgx3DApplication.h"
-#include "QtComponents/QtNumericFieldsFactory.h"
 #include "Geom/CommandNewVertexByCurveParameterization.h"
 #include "Geom/CommandNewVertexByProjection.h"
 #include "Geom/CommandNewVertex.h"
 #include "Geom/GeomDisplayRepresentation.h"
+#include <QtUtil/QtErrorManagement.h>
+#include "QtComponents/QtVertexOperationAction.h"
+#include "QtComponents/QtMgx3DApplication.h"
+#include "QtComponents/QtNumericFieldsFactory.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>

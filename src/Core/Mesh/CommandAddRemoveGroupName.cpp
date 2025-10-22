@@ -207,12 +207,12 @@ void CommandAddRemoveGroupName::internalExecute()
     		CHECK_NULL_PTR_ERROR(crv);
     		if (m_ope == add){
     			// on ajoute le groupe
-				Group::Group1D* grp = m_group_helper.addToGroup(m_groupName, crv);
+				Group::Group1D* grp = m_group_helper.addToGroup<Group::Group1D>(m_groupName, crv);
     			updateMesh(crv, grp->getName(), true);
     		}
     		else if (m_ope == remove) {
     			// on retire le groupe
-				Group::Group1D* grp = m_group_helper.removeFromGroup(m_groupName, crv);
+				Group::Group1D* grp = m_group_helper.removeFromGroup<Group::Group1D>(m_groupName, crv);
     			updateMesh(crv, grp->getName(), false);
     		} else if (m_ope == set){
             	// on retire tous les groupes
@@ -235,12 +235,12 @@ void CommandAddRemoveGroupName::internalExecute()
     		std::vector<Topo::CoEdge*> coedges = {coedge};
     		if (m_ope == add){
     			// on ajoute le groupe
-				Group::Group1D* grp = m_group_helper.addToGroup(m_groupName, coedge);
+				Group::Group1D* grp = m_group_helper.addToGroup<Group::Group1D>(m_groupName, coedge);
     			updateMesh(coedges, grp->getName(), true);
     		}
     		else if (m_ope == remove) {
     			// on retire le groupe
-				Group::Group1D* grp = m_group_helper.removeFromGroup(m_groupName, coedge);
+				Group::Group1D* grp = m_group_helper.removeFromGroup<Group::Group1D>(m_groupName, coedge);
     			updateMesh(coedges, grp->getName(), false);
     		} else if (m_ope == set){
             	// on retire tous les groupes
@@ -268,12 +268,12 @@ void CommandAddRemoveGroupName::internalExecute()
     		CHECK_NULL_PTR_ERROR(surf);
     		if (m_ope == add){
     			// on ajoute le groupe
-				Group::Group2D* grp = m_group_helper.addToGroup(m_groupName, surf);
+				Group::Group2D* grp = m_group_helper.addToGroup<Group::Group2D>(m_groupName, surf);
     			updateMesh(surf, grp->getName(), true);
     		}
     		else if (m_ope == remove) {
     			// on retire le groupe
-				Group::Group2D* grp = m_group_helper.removeFromGroup(m_groupName, surf);
+				Group::Group2D* grp = m_group_helper.removeFromGroup<Group::Group2D>(m_groupName, surf);
     			updateMesh(surf, grp->getName(), false);
     		} else if (m_ope == set){
             	// on retire tous les groupes
@@ -296,12 +296,12 @@ void CommandAddRemoveGroupName::internalExecute()
     		std::vector<Topo::CoFace*> cofaces = {coface};
     		if (m_ope == add){
     			// on ajoute le groupe
-				Group::Group2D* grp = m_group_helper.addToGroup(m_groupName, coface);
+				Group::Group2D* grp = m_group_helper.addToGroup<Group::Group2D>(m_groupName, coface);
     			updateMesh(cofaces, grp->getName(), true);
     		}
     		else if (m_ope == remove) {
     			// on retire le groupe
-				Group::Group2D* grp = m_group_helper.removeFromGroup(m_groupName, coface);
+				Group::Group2D* grp = m_group_helper.removeFromGroup<Group::Group2D>(m_groupName, coface);
     			updateMesh(cofaces, grp->getName(), false);
     		} else if (m_ope == set){
             	// on retire tous les groupes
@@ -329,12 +329,12 @@ void CommandAddRemoveGroupName::internalExecute()
     		CHECK_NULL_PTR_ERROR(vol);
     		if (m_ope == add){
     			// on ajoute le groupe
-				Group::Group3D* grp = m_group_helper.addToGroup(m_groupName, vol);
+				Group::Group3D* grp = m_group_helper.addToGroup<Group::Group3D>(m_groupName, vol);
     			updateMesh(vol, grp->getName(), true);
     		}
     		else if (m_ope == remove) {
     			// on retire le groupe
-				Group::Group3D* grp = m_group_helper.removeFromGroup(m_groupName, vol);
+				Group::Group3D* grp = m_group_helper.removeFromGroup<Group::Group3D>(m_groupName, vol);
     			updateMesh(vol, grp->getName(), false);
     		} else if (m_ope == set){
             	// on retire tous les groupes
@@ -344,7 +344,7 @@ void CommandAddRemoveGroupName::internalExecute()
             		m_group_helper.removeFromGroup(gn[i], vol);
 
                 // on ajoute le groupe
-				Group::Group3D* grp = m_group_helper.addToGroup(m_groupName, vol);
+				Group::Group3D* grp = m_group_helper.addToGroup<Group::Group3D>(m_groupName, vol);
                 updateMesh(vol, grp->getName(), true);
             } else {
             	TkUtil::Exception ("[Erreur interne] Opération non prévue");
@@ -358,12 +358,12 @@ void CommandAddRemoveGroupName::internalExecute()
     		std::vector<Topo::Block*> blocs = {bloc};
     		if (m_ope == add){
     			// on ajoute le groupe
-				Group::Group3D* grp = m_group_helper.addToGroup(m_groupName, bloc);
+				Group::Group3D* grp = m_group_helper.addToGroup<Group::Group3D>(m_groupName, bloc);
     			updateMesh(blocs, grp->getName(), true);
     		}
     		else if (m_ope == remove) {
     			// on retire le groupe
-				Group::Group3D* grp = m_group_helper.removeFromGroup(m_groupName, bloc);
+				Group::Group3D* grp = m_group_helper.removeFromGroup<Group::Group3D>(m_groupName, bloc);
     			updateMesh(blocs, grp->getName(), false);
     		} else if (m_ope == set){
             	// on retire tous les groupes
@@ -373,7 +373,7 @@ void CommandAddRemoveGroupName::internalExecute()
             		m_group_helper.removeFromGroup(gn[i], bloc);
 
                 // on ajoute le groupe
-				Group::Group3D* grp = m_group_helper.addToGroup(m_groupName, bloc);
+				Group::Group3D* grp = m_group_helper.addToGroup<Group::Group3D>(m_groupName, bloc);
                 updateMesh(blocs, grp->getName(), true);
             } else {
             	TkUtil::Exception ("[Erreur interne] Opération non prévue");
@@ -463,14 +463,14 @@ void CommandAddRemoveGroupName::internalUndo()
 			crv->getGroupsName(gnOld);
 			// on retire tous les groupes actuellement présents
 			for (uint i=0; i<gnOld.size(); i++) {
-				Group::Group1D* grp = m_group_helper.removeFromGroup(gnOld[i], crv);
+				Group::Group1D* grp = m_group_helper.removeFromGroup<Group::Group1D>(gnOld[i], crv);
 				updateMesh(crv, grp->getName(), false);
 			}
 
 			std::vector<std::string>& gnNew = m_geom_groups[crv];
 			// on ajoute tous les groupes archivés
 			for (uint i=0; i<gnNew.size(); i++) {
-				Group::Group1D* grp = m_group_helper.addToGroup(gnNew[i], crv);
+				Group::Group1D* grp = m_group_helper.addToGroup<Group::Group1D>(gnNew[i], crv);
 				updateMesh(crv, grp->getName(), true);
 			}
 		} // end for iter
@@ -485,14 +485,14 @@ void CommandAddRemoveGroupName::internalUndo()
 			coedge->getGroupsName(gnOld, false, true);
 			// on retire tous les groupes actuellement présents
 			for (uint i=0; i<gnOld.size(); i++) {
-				Group::Group1D* grp = m_group_helper.removeFromGroup(gnOld[i], coedge);
+				Group::Group1D* grp = m_group_helper.removeFromGroup<Group::Group1D>(gnOld[i], coedge);
 				updateMesh(coedges, grp->getName(), false);
 			}
 
 			std::vector<std::string>& gnNew = m_topo_groups[coedge];
 			// on ajoute tous les groupes archivés
 			for (uint i=0; i<gnNew.size(); i++) {
-				Group::Group1D* grp = m_group_helper.addToGroup(gnNew[i], coedge);
+				Group::Group1D* grp = m_group_helper.addToGroup<Group::Group1D>(gnNew[i], coedge);
 				updateMesh(coedges, grp->getName(), true);
 			}
 		} // end for iter
@@ -508,14 +508,14 @@ void CommandAddRemoveGroupName::internalUndo()
 			srf->getGroupsName(gnOld);
 			// on retire tous les groupes actuellement présents
 			for (uint i=0; i<gnOld.size(); i++) {
-				Group::Group2D* grp = m_group_helper.removeFromGroup(gnOld[i], srf);
+				Group::Group2D* grp = m_group_helper.removeFromGroup<Group::Group2D>(gnOld[i], srf);
 				updateMesh(srf, grp->getName(), false);
 			}
 
 			std::vector<std::string>& gnNew = m_geom_groups[srf];
 			// on ajoute tous les groupes archivés
 			for (uint i=0; i<gnNew.size(); i++) {
-				Group::Group2D* grp = m_group_helper.addToGroup(gnNew[i], srf);
+				Group::Group2D* grp = m_group_helper.addToGroup<Group::Group2D>(gnNew[i], srf);
 				updateMesh(srf, grp->getName(), true);
 			}
 		} // end for iter
@@ -530,14 +530,14 @@ void CommandAddRemoveGroupName::internalUndo()
 			coface->getGroupsName(gnOld, false, true);
 			// on retire tous les groupes actuellement présents
 			for (uint i=0; i<gnOld.size(); i++) {
-				Group::Group2D* grp = m_group_helper.removeFromGroup(gnOld[i], coface);
+				Group::Group2D* grp = m_group_helper.removeFromGroup<Group::Group2D>(gnOld[i], coface);
 				updateMesh(cofaces, grp->getName(), false);
 			}
 
 			std::vector<std::string>& gnNew = m_topo_groups[coface];
 			// on ajoute tous les groupes archivés
 			for (uint i=0; i<gnNew.size(); i++) {
-				Group::Group2D* grp = m_group_helper.addToGroup(gnNew[i], coface);
+				Group::Group2D* grp = m_group_helper.addToGroup<Group::Group2D>(gnNew[i], coface);
 				updateMesh(cofaces, grp->getName(), true);
 			}
 		} // end for iter
@@ -553,14 +553,14 @@ void CommandAddRemoveGroupName::internalUndo()
 			vol->getGroupsName(gnOld);
 			// on retire tous les groupes actuellement présents
 			for (uint i=0; i<gnOld.size(); i++) {
-				Group::Group3D* grp = m_group_helper.removeFromGroup(gnOld[i], vol);
+				Group::Group3D* grp = m_group_helper.removeFromGroup<Group::Group3D>(gnOld[i], vol);
 				updateMesh(vol, grp->getName(), false);
 			}
 
 			std::vector<std::string>& gnNew = m_geom_groups[vol];
 			// on ajoute tous les groupes archivés
 			for (uint i=0; i<gnNew.size(); i++) {
-				Group::Group3D* grp = m_group_helper.addToGroup(gnNew[i], vol);
+				Group::Group3D* grp = m_group_helper.addToGroup<Group::Group3D>(gnNew[i], vol);
 				updateMesh(vol, grp->getName(), true);
 			}
 		} // end for iter
@@ -575,14 +575,14 @@ void CommandAddRemoveGroupName::internalUndo()
 			bloc->getGroupsName(gnOld, false, true);
 			// on retire tous les groupes actuellement présents
 			for (uint i=0; i<gnOld.size(); i++) {
-				Group::Group3D* grp = m_group_helper.removeFromGroup(gnOld[i], bloc);
+				Group::Group3D* grp = m_group_helper.removeFromGroup<Group::Group3D>(gnOld[i], bloc);
 				updateMesh(blocs, grp->getName(), false);
 			}
 
 			std::vector<std::string>& gnNew = m_topo_groups[bloc];
 			// on ajoute tous les groupes archivés
 			for (uint i=0; i<gnNew.size(); i++) {
-				Group::Group3D* grp = m_group_helper.addToGroup(gnNew[i], bloc);
+				Group::Group3D* grp = m_group_helper.addToGroup<Group::Group3D>(gnNew[i], bloc);
 				updateMesh(blocs, grp->getName(), true);
 			}
 		} // end for iter
