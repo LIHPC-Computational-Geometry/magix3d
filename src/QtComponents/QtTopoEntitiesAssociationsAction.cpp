@@ -8,15 +8,15 @@
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include <QtUtil/QtErrorManagement.h>
-#include "QtComponents/QtTopoEntitiesAssociationsAction.h"
-#include "QtComponents/QtMgx3DApplication.h"
-#include "QtComponents/QtMgx3DMainWindow.h"
 #include "Topo/CommandSetGeomAssociation.h"
 #include "Topo/CommandProjectVerticesOnNearestGeomEntities.h"
 #include "Topo/CommandProjectEdgesOnCurves.h"
 #include "Topo/CommandProjectFacesOnSurfaces.h"
 #include "Topo/TopoDisplayRepresentation.h"
+#include <QtUtil/QtErrorManagement.h>
+#include "QtComponents/QtTopoEntitiesAssociationsAction.h"
+#include "QtComponents/QtMgx3DApplication.h"
+#include "QtComponents/QtMgx3DMainWindow.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>

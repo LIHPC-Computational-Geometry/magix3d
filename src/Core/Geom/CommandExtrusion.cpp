@@ -163,7 +163,7 @@ groups2DTo3D()
             for (uint i=0; i<grp.size(); i++){
                 std::string nom = grp[i]->getName();
                 if (nom != getContext().getGroupManager().getDefaultName(2)) {
-                    Group::Group3D* new_grp = m_group_helper.addToGroup(nom, vol);
+                    Group::Group3D* new_grp = m_group_helper.addToGroup<Group::Group3D>(nom, vol);
                     new_grp->setLevel(grp[i]->getLevel());
                 }
             }
@@ -180,7 +180,7 @@ groups2DTo3D()
             for (uint i=0; i<grp.size(); i++){
             	std::string nom = grp[i]->getName();
             	if (nom != getContext().getGroupManager().getDefaultName(1)) {
-                    Group::Group2D* new_grp = m_group_helper.addToGroup(nom, surf);
+                    Group::Group2D* new_grp = m_group_helper.addToGroup<Group::Group2D>(nom, surf);
                     new_grp->setLevel(grp[i]->getLevel());
                 }
             }
@@ -197,7 +197,7 @@ groups2DTo3D()
             for (uint i=0; i<grp.size(); i++){
             	std::string nom = grp[i]->getName();
             	if (nom != getContext().getGroupManager().getDefaultName(0)) {
-                    Group::Group1D* new_grp = m_group_helper.addToGroup(nom, curve);
+                    Group::Group1D* new_grp = m_group_helper.addToGroup<Group::Group1D>(nom, curve);
                     new_grp->setLevel(grp[i]->getLevel());
                 }
             }
