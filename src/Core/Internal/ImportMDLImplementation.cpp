@@ -633,16 +633,16 @@ Geom::Curve* ImportMDLImplementation::getCurve(const std::string name)
                 Geom::Vertex* vtx2 = getVertex(current_command.model1d.pt2);
                 if(vtx1!=vtx2)
                 {
-                crv = Geom::EntityFactory(m_context).newSegment(vtx1,vtx2);
+                    crv = Geom::EntityFactory(m_context).newSegment(vtx1,vtx2);
 
-                //creation des connections topologiques
-                crv->add(vtx1);
-                crv->add(vtx2);
-                vtx1->add(crv);
-                vtx2->add(crv);
+                    //creation des connections topologiques
+                    crv->add(vtx1);
+                    crv->add(vtx2);
+                    vtx1->add(crv);
+                    vtx2->add(crv);
                 }
                 else {
-                	//std::cerr<<"IMPORT D'UN SEGMENT DE LONGUEUR NULLE NON EFFECTUEE ("<<name<<")"<<std::endl;
+                	//std::cerr<<"IMPORT D'UN SEGMENT DE LONGUEUR NULLE NON EFFECTUE ("<<name<<")"<<std::endl;
 					TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
                 	messErr << "On ne peut créer un segment de taille nulle pour "<<name;
                 	throw TkUtil::Exception(messErr);
@@ -656,19 +656,28 @@ Geom::Curve* ImportMDLImplementation::getCurve(const std::string name)
                 Geom::Vertex* vtxcenter = getVertex(current_command.u.arc.center);
                 bool dir = bool(current_command.u.arc.direction);
                 //std::cout<<"direction = "<<current_command.u.arc.direction<<" => dir = "<<(dir?"true":"false")<<std::endl;
-                if(current_command.u.arc.is_circle)
-                    crv = Geom::EntityFactory(m_context).newArcCircle2D(vtxcenter,vtx1,vtx2, dir);
-                else
-                    crv = Geom::EntityFactory(m_context).newArcEllipse(vtxcenter,vtx1,vtx2, dir);
+                if(vtx1!=vtx2)
+                {
+                    if(current_command.u.arc.is_circle)
+                        crv = Geom::EntityFactory(m_context).newArcCircle2D(vtxcenter,vtx1,vtx2, dir);
+                    else
+                        crv = Geom::EntityFactory(m_context).newArcEllipse(vtxcenter,vtx1,vtx2, dir);
 
-                //creation des connections topologiques
-                crv->add(vtx1);
-                vtx1->add(crv);
-                if(vtx2!=vtx1){
-                    crv->add(vtx2);
-                    vtx2->add(crv);
+                    //creation des connections topologiques
+                    crv->add(vtx1);
+                    vtx1->add(crv);
+                    if(vtx2!=vtx1){
+                        crv->add(vtx2);
+                        vtx2->add(crv);
+                    }
                 }
-            }
+                else {
+                	//std::cerr<<"IMPORT D'UNE COURBE AVEC DEUX POINTS IDENTIQUES NON EFFECTUE ("<<name<<")"<<std::endl;
+					TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
+                	messErr << "On ne peut créer une courbe avec un point de départ et un point d'arrivée identiques pour "<<name;
+                	throw TkUtil::Exception(messErr);
+                }
+         }
             else if (current_command.type == MdlLine){
                 // on va créer des Vertex même pour les points interne au support
                 // de manière à rendre se dernier modifiable
