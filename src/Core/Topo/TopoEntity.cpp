@@ -250,11 +250,14 @@ isEdited() const
 }
 /*----------------------------------------------------------------------------*/
 void TopoEntity::
-getGroupsName (std::vector<std::string>& gn, bool byGeom, bool byTopo) const
+getGroupsName (std::vector<std::string>& gn) const
 {
     // on filtre les groupes suivant la dimension
-    if (getGeomAssociation() && getGeomAssociation()->getDim() == getDim())
-        getGeomAssociation()->getGroupsName(gn);
+    Group::GroupManager& gm = getContext().getGroupManager();
+    Geom::GeomEntity* asso = getGeomAssociation();
+    if (asso && asso->getDim() == getDim()) {
+        gn = Utils::toNames(gm.getGroupsFor(asso));
+    }
 }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Utils::SerializedRepresentation* TopoEntity::

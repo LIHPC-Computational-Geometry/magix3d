@@ -383,6 +383,13 @@ Entity::objectType typesToType (FilterEntity::objectType types);
 FilterEntity::objectType typeToTypes (Entity::objectType type);
 #ifndef SWIG
 template<typename T> using EntitySet = std::set<T, decltype(&Utils::Entity::compareEntity)>;
+template<typename T> std::vector<std::string> toNames(const std::vector<T*>& entities) {
+    std::vector<std::string> result;
+    result.reserve(entities.size());
+    std::transform(entities.begin(), entities.end(), std::back_inserter(result),
+                   [](T* e){ return e->getName(); });
+    return result;
+}
 #endif
 /*----------------------------------------------------------------------------*/
 } // end namespace Utils

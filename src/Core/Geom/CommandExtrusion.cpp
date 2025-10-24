@@ -151,54 +151,48 @@ groups2DTo3D()
     // Les nouveaux objets ont été mis "hors groupe" à la création
     // On se sert de la correspondance entre les entités initiales et finales
     // pour transmetre les groupes de la dimension N à la dimension N+1
+    Group::GroupManager& gm = getContext().getGroupManager();
 
-    for (std::map<Geom::Surface*,Geom::Volume*>::iterator iter = m_s2v.begin();
+    for (std::map<Geom::Surface*, Geom::Volume*>::iterator iter = m_s2v.begin();
             iter != m_s2v.end(); ++iter){
         Geom::Surface* surf = iter->first;
         Geom::Volume*  vol  = iter->second;
         if (vol){
-        	std::vector<Group::GroupEntity*> grp;
-            surf->getGroups(grp);
-
-            for (uint i=0; i<grp.size(); i++){
-                std::string nom = grp[i]->getName();
-                if (nom != getContext().getGroupManager().getDefaultName(2)) {
-                    Group::Group3D* new_grp = m_group_helper.addToGroup<Group::Group3D>(nom, vol);
-                    new_grp->setLevel(grp[i]->getLevel());
+            for (Group::GroupEntity* grp : gm.getGroupsFor(surf)) {
+                std::string nom = grp->getName();
+                if (nom != gm.getDefaultName(2)) {
+                    Group::GroupEntity* new_grp = m_group_helper.addToGroup(nom, vol);
+                    new_grp->setLevel(grp->getLevel());
                 }
             }
         }
     }
 
-    for (std::map<Geom::Curve*  ,Geom::Surface*>::iterator iter = m_c2s.begin();
+    for (std::map<Geom::Curve*, Geom::Surface*>::iterator iter = m_c2s.begin();
             iter != m_c2s.end(); ++iter){
         Geom::Curve*    curve = iter->first;
         Geom::Surface*  surf  = iter->second;
         if (surf){
-            std::vector<Group::GroupEntity*> grp;
-            curve->getGroups(grp);
-            for (uint i=0; i<grp.size(); i++){
-            	std::string nom = grp[i]->getName();
-            	if (nom != getContext().getGroupManager().getDefaultName(1)) {
-                    Group::Group2D* new_grp = m_group_helper.addToGroup<Group::Group2D>(nom, surf);
-                    new_grp->setLevel(grp[i]->getLevel());
+            for (Group::GroupEntity* grp : gm.getGroupsFor(curve)) {
+            	std::string nom = grp->getName();
+            	if (nom != gm.getDefaultName(1)) {
+                    Group::GroupEntity* new_grp = m_group_helper.addToGroup(nom, surf);
+                    new_grp->setLevel(grp->getLevel());
                 }
             }
         }
     }
 
-    for (std::map<Geom::Vertex* ,Geom::Curve*>::iterator iter = m_v2c.begin();
+    for (std::map<Geom::Vertex*, Geom::Curve*>::iterator iter = m_v2c.begin();
             iter != m_v2c.end(); ++iter){
         Geom::Vertex*  vtx  = iter->first;
         Geom::Curve*  curve = iter->second;
         if (curve){
-        	std::vector<Group::GroupEntity*> grp;
-            vtx->getGroups(grp);
-            for (uint i=0; i<grp.size(); i++){
-            	std::string nom = grp[i]->getName();
-            	if (nom != getContext().getGroupManager().getDefaultName(0)) {
-                    Group::Group1D* new_grp = m_group_helper.addToGroup<Group::Group1D>(nom, curve);
-                    new_grp->setLevel(grp[i]->getLevel());
+            for (Group::GroupEntity* grp : gm.getGroupsFor(vtx)) {
+            	std::string nom = grp->getName();
+            	if (nom != gm.getDefaultName(0)) {
+                    Group::GroupEntity* new_grp = m_group_helper.addToGroup(nom, curve);
+                    new_grp->setLevel(grp->getLevel());
                 }
             }
         }
@@ -210,6 +204,8 @@ void CommandExtrusion::prefixGroupsName(const std::string& pre,
         std::map<Geom::Curve*  ,Geom::Curve*>&   c2c,
         std::map<Geom::Surface*,Geom::Surface*>& s2s)
 {
+    Group::GroupManager& gm = getContext().getGroupManager();
+
     // le groupe commun pour toutes les surfaces
     for (std::map<Geom::Surface*,Geom::Surface*>::iterator iter = s2s.begin();
             iter != s2s.end(); ++iter){
@@ -217,10 +213,8 @@ void CommandExtrusion::prefixGroupsName(const std::string& pre,
         Geom::Surface* surf2 = iter->second;
 
         if (surf2){
-            std::vector<std::string> gn;
-            surf1->getGroupsName(gn);
-            for (uint i=0; i<gn.size(); i++){
-                std::string& nom = gn[i];
+            for (Group::GroupEntity* grp : gm.getGroupsFor(surf1)) {
+                std::string nom = grp->getName();
                 m_group_helper.addToGroup(pre + "_" + nom, surf2);
             }
 
@@ -235,10 +229,8 @@ void CommandExtrusion::prefixGroupsName(const std::string& pre,
         Geom::Curve* crv2 = iter->second;
 
         if (crv2){
-            std::vector<std::string> gn;
-            crv1->getGroupsName(gn);
-            for (uint i=0; i<gn.size(); i++){
-                std::string& nom = gn[i];
+            for (Group::GroupEntity* grp : gm.getGroupsFor(crv1)) {
+                std::string nom = grp->getName();
                 m_group_helper.addToGroup(pre + "_" + nom, crv2);
             }
         }
@@ -250,10 +242,8 @@ void CommandExtrusion::prefixGroupsName(const std::string& pre,
         Geom::Vertex* vtx2 = iter->second;
 
         if (vtx2){
-            std::vector<std::string> gn;
-            vtx1->getGroupsName(gn);
-            for (uint i=0; i<gn.size(); i++){
-                std::string& nom = gn[i];
+            for (Group::GroupEntity* grp : gm.getGroupsFor(vtx1)) {
+                std::string nom = grp->getName();
                 m_group_helper.addToGroup(pre + "_" + nom, vtx2);
             }
         }

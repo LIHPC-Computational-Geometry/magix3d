@@ -52,16 +52,11 @@ namespace Mgx3D::Services
     struct Memento
     {
         std::vector<Topo::TopoEntity *> topo_entities;
+        std::vector<Group::GroupEntity *> groups;
         std::vector<Geom::Volume *> volumes;
         std::vector<Geom::Surface *> surfaces;
         std::vector<Geom::Curve *> curves;
         std::vector<Geom::Vertex *> vertices;
-
-        /// Listes des groupes 1D auxquels appartient cette courbe
-        std::vector<Group::Group0D *> groups0D;
-        std::vector<Group::Group1D *> groups1D;
-        std::vector<Group::Group2D *> groups2D;
-        std::vector<Group::Group3D *> groups3D;
 
         /* ancienne représentation géométrique des entités que l'on a modifiées */
         std::vector<TopoDS_Shape> occ_shapes;

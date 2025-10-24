@@ -3,6 +3,7 @@
 #include "Geom/GeomEntity.h"
 #include "Geom/IncidentGeomEntitiesVisitor.h"
 #include "Topo/TopoEntity.h"
+#include "Group/GroupManager.h"
 
 namespace Mgx3D::Services
 {
@@ -47,8 +48,9 @@ namespace Mgx3D::Services
 		Topo::TopoManager& tm = e->getContext().getTopoManager();
         for (Topo::TopoEntity* te : tm.getRefTopos(e))
             info._topo_entities.push_back(e->getName());
-        
-        e->getGroupsName(info._groups);
+
+		Group::GroupManager& gm = e->getContext().getGroupManager();
+		info._groups = Utils::toNames(gm.getGroupsFor(e));
 
         return info;
     }

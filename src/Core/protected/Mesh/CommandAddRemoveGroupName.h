@@ -170,20 +170,19 @@ public:
      */
     void internalRedo();
 
+private:
     /*------------------------------------------------------------------------*/
     ///  met à jour les relation entre volumes de maillage et la topologie
-    void updateMesh(Geom::Volume* vol, std::string grpName, bool add);
+    void updateMesh(Geom::GeomEntity* e, std::string grpName, bool add);
+    void updateMesh(Geom::Volume* e, std::string grpName, bool add);
+    void updateMesh(Geom::Surface* e, std::string grpName, bool add);
+    void updateMesh(Geom::Curve* e, std::string grpName, bool add);
+
+    void updateMesh(Topo::TopoEntity* e, std::string grpName, bool add);
     void updateMesh(std::vector<Topo::Block*>& blocs, std::string grpName, bool add);
-
-    ///  met à jour les relation entre surface de maillage et la topologie
-    void updateMesh(Geom::Surface* surf, std::string grpName, bool add);
     void updateMesh(std::vector<Topo::CoFace*>& cofaces, std::string grpName, bool add);
-
-    ///  met à jour les relation entre nuages de maillage et la topologie
-    void updateMesh(Geom::Curve* crv, std::string grpName, bool add);
     void updateMesh(std::vector<Topo::CoEdge*>& coedges, std::string grpName, bool add);
 
-private:
     /// helper pour la gestion des groupes dans les commandes
     Group::GroupHelperForCommand m_group_helper;
 

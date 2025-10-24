@@ -5,7 +5,6 @@
 #include "Services/MementoService.h"
 #include "Utils/Vector.h"
 #include "Utils/Point.h"
-#include "Group/GroupEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <list>
 /*----------------------------------------------------------------------------*/
@@ -174,29 +173,6 @@ public:
     static bool isA(const std::string& name);
 
     /*------------------------------------------------------------------------*/
-    /** Ajoute le groupe parmis ceux auxquels appartient la surface */
-    virtual void add(Group::Group2D* grp);
-
-    /** Retire le groupe parmis ceux auxquels appartient la surface */
-    virtual void remove(Group::Group2D* grp);
-
-    /** Recherche le groupe parmis ceux auxquels appartient la surface
-     * return vrai si trouvé */
-    virtual bool find(Group::Group2D* grp);
-
-    /// Retourne les noms des groupes auxquels appartient cette entité
-    virtual void getGroupsName (std::vector<std::string>& gn) const;
-
-    /// Retourne la liste des groupes auxquels appartient cette entité
-    virtual void getGroups(std::vector<Group::GroupEntity*>& grp) const;
-
-    /// Retourne la liste des groupes 2D auxquels appartient cette entité
-    virtual const std::vector<Group::Group2D*>& getGroups() const {return m_groups;}
-
-    /// Retourne le nombre de groupes
-    virtual int getNbGroups() const;
-
-    /*------------------------------------------------------------------------*/
     /** \brief  Return the curves incident to this surface
      */
     const std::vector<Curve*>& getCurves() const { return m_curves; }
@@ -204,12 +180,7 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief  Return the volumes incident to this surface
      */
-    const std::vector<Volume*>& getVolumes() const { return m_volumes; }    
-
-    /*------------------------------------------------------------------------*/
-    /** \brief   détruit l'objet
-     */
-    virtual void setDestroyed(bool b);
+    const std::vector<Volume*>& getVolumes() const { return m_volumes; } 
 
     /*------------------------------------------------------------------------*/
     /** \brief   indique si la surface est un plan ou pas
@@ -221,8 +192,6 @@ private:
     std::vector<Volume*> m_volumes;
     /// représentation open cascade
     std::vector<TopoDS_Face> m_occ_faces;
-    /// Listes des groupes 2D auxquels appartient cette surface
-    std::vector<Group::Group2D*> m_groups;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

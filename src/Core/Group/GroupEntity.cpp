@@ -51,18 +51,19 @@ getDescription (bool alsoComputed) const
 /*----------------------------------------------------------------------------*/
 void GroupEntity::remove(Utils::Entity* e, const bool exceptionIfNotFound)
 {
-    if (!find(e)) {
+    if (find(e)) {
+        m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), e), m_entities.end());
+    } else if (exceptionIfNotFound) {
 		TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
         messErr << "Le groupe "<<getName()<<" ne contient pas "<<e->getName();
         throw TkUtil::Exception(messErr);
     }
-
-    m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), e), m_entities.end());
 }
+    
 /*----------------------------------------------------------------------------*/
 void GroupEntity::add(Utils::Entity* e)
 {
-	if (find(e)) {
+    if (find(e)) {
 		TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
         messErr << "Le groupe "<<getName()<<" possède déjà "<<e->getName();
         throw TkUtil::Exception(messErr);

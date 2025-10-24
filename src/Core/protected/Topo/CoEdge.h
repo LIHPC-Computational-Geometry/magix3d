@@ -1,7 +1,5 @@
-/*----------------------------------------------------------------------------*/
 #ifndef TOPO_COEDGE_H_
 #define TOPO_COEDGE_H_
-/*----------------------------------------------------------------------------*/
 /*----------------------------------------------------------------------------*/
 #include <set>
 #include "Topo/TopoEntity.h"
@@ -406,7 +404,7 @@ public:
     virtual double computeRatio(const Utils::Math::Point& pt);
 
     /// Accesseur sur la liste de noms de groupes
-    virtual void getGroupsName (std::vector<std::string>& gn, bool byGeom=true, bool byTopo=true) const;
+    virtual void getGroupsName (std::vector<std::string>& gn) const;
     void add(Group::Group1D* grp);
     void remove(Group::Group1D* grp);
     int getNbGroups() const;

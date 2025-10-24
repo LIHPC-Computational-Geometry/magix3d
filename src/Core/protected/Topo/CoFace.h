@@ -1,4 +1,3 @@
-/*----------------------------------------------------------------------------*/
 #ifndef TOPO_COFACE_H_
 #define TOPO_COFACE_H_
 /*----------------------------------------------------------------------------*/
@@ -633,7 +632,7 @@ public:
 
 
     /// Accesseur sur la liste de noms de groupes
-    virtual void getGroupsName (std::vector<std::string>& gn, bool byGeom=true, bool byTopo=true) const;
+    virtual void getGroupsName (std::vector<std::string>& gn) const;
     void add(Group::Group2D* grp);
     void remove(Group::Group2D* grp);
     int getNbGroups() const;

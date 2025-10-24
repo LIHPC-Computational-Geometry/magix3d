@@ -1,11 +1,3 @@
-/*----------------------------------------------------------------------------*/
-/** \file Vertex.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 7/10/2010
- */
-/*----------------------------------------------------------------------------*/
 #ifndef TOPO_VERTEX_H_
 #define TOPO_VERTEX_H_
 /*----------------------------------------------------------------------------*/
@@ -363,7 +355,7 @@ public:
     virtual bool isEdited() const;
 
     /// Accesseur sur la liste de noms de groupes
-    virtual void getGroupsName (std::vector<std::string>& gn, bool byGeom=true, bool byTopo=true) const;
+    virtual void getGroupsName (std::vector<std::string>& gn) const;
 
     /// Accesseur sur le conteneur pour les groupes
     void add(Group::Group0D* grp);

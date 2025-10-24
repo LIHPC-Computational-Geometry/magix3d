@@ -636,6 +636,7 @@ bool Curve::isA(const std::string& name)
     return (name.compare(0,getTinyName().size(),getTinyName()) == 0);
 }
 /*----------------------------------------------------------------------------*/
+<<<<<<< HEAD
 void Curve::add(Group::Group1D* grp)
 {
     //std::cout<<"Curve::add("<<grp->getName()<<") à "<<getName()<<std::endl;
@@ -707,6 +708,8 @@ void Curve::setDestroyed(bool b)
     Entity::setDestroyed(b);
 }
 /*----------------------------------------------------------------------------*/
+=======
+>>>>>>> 3e32643 (Reduce dependencencies Geom --> Group)
 bool Curve::isLinear() const
 {
 	if (m_occ_edges.size() == 1)

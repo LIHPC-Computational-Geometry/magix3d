@@ -1,4 +1,3 @@
-/*----------------------------------------------------------------------------*/
 #include <iostream>
 #include <map>
 #include <vector>
@@ -2591,12 +2590,12 @@ TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const CoFace & f)
         o << ", projetée sur " << f.getGeomAssociation()->getName()
         <<(f.getGeomAssociation()->isDestroyed()?" (DETRUITE)":"");
 
-        std::vector<std::string> gn;
-        f.getGeomAssociation()->getGroupsName(gn);
+        Group::GroupManager& gm = f.getContext().getGroupManager();
+        std::vector<Group::GroupEntity*> gn = gm.getGroupsFor(f.getGeomAssociation());
         if (!gn.empty()) {
             o << " (groupes:";
             for (size_t i=0; i<gn.size(); i++)
-                o << " "<<gn[i];
+                o << " "<<gn[i]->getName();
             o << ")";
         }
         else {
@@ -2659,6 +2658,7 @@ Topo::TopoInfo CoFace::getInfos() const
 	Topo::TopoInfo infos;
 	infos.name = getName();
 	infos.dimension = getDim();
+    infos._groups = Utils::toNames(getGroups());
 	if (getGeomAssociation() != 0)
 		infos.geom_entity = getGeomAssociation()->getName();
 
@@ -3720,14 +3720,12 @@ Utils::Math::Point CoFace::getBarycentre() const
 	return barycentre;
 }
 /*----------------------------------------------------------------------------*/
-void CoFace::getGroupsName (std::vector<std::string>& gn, bool byGeom, bool byTopo) const
+void CoFace::getGroupsName (std::vector<std::string>& gn) const
 {
-	if (byGeom)
-		TopoEntity::getGroupsName(gn, byGeom, byTopo);
+    TopoEntity::getGroupsName(gn);
 
-	if (byTopo)
-		for (uint i = 0; i<m_topo_property->getGroupsContainer().size(); ++i)
-		        gn.push_back(m_topo_property->getGroupsContainer().get(i)->getName());
+    for (uint i = 0; i<m_topo_property->getGroupsContainer().size(); ++i)
+            gn.push_back(m_topo_property->getGroupsContainer().get(i)->getName());
 }
 /*----------------------------------------------------------------------------*/
 void CoFace::add(Group::Group2D* grp)

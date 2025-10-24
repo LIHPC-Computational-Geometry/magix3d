@@ -5603,7 +5603,12 @@ const std::vector<TopoEntity*>& TopoManager::getRefTopos(const Geom::GeomEntity*
 /*----------------------------------------------------------------------------*/
 void TopoManager::addRefTopo(const Geom::GeomEntity* ge, TopoEntity* te)
 {
-        m_geom_associations[ge].push_back(te);
+    m_geom_associations[ge].push_back(te);
+}
+/*----------------------------------------------------------------------------*/
+void TopoManager::setRefTopos(const Geom::GeomEntity* ge, const std::vector<TopoEntity*>& tes)
+{
+    m_geom_associations[ge] = tes;
 }
 /*----------------------------------------------------------------------------*/
 void TopoManager::removeRefTopo(const Geom::GeomEntity* ge, TopoEntity* te)
@@ -5612,11 +5617,6 @@ void TopoManager::removeRefTopo(const Geom::GeomEntity* ge, TopoEntity* te)
     // on supprime toutes les occurrences de te dans le vecteur
     // (même si en principe il ne devrait y en avoir qu'une seule)
     v.erase(std::remove(v.begin(), v.end(), te), v.end());
-}
-/*----------------------------------------------------------------------------*/
-void TopoManager::setRefTopos(const Geom::GeomEntity* ge, const std::vector<TopoEntity*>& tes)
-{
-    m_geom_associations[ge] = tes;
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo

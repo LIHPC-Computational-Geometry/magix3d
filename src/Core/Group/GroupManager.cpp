@@ -69,10 +69,10 @@ GroupManager::~GroupManager()
 void GroupManager::clear()
 {
     // destruction des entités référencées par le manager
-    for (std::vector<GroupEntity*>::const_iterator iter = m_groups.begin();
-            iter != m_groups.end(); ++iter)
+    for (auto iter = m_groups.begin(); iter != m_groups.end(); ++iter)
         delete *iter;
     m_groups.clear();
+    m_entities_groups.clear();
 }
 /*------------------------------------------------------------------------*/
 /** Vide un groupe suivant son nom et une dimension */
@@ -170,6 +170,17 @@ T* GroupManager::getGroup(const std::string& gr_name, const bool exceptionIfNotF
     return gr;
 }
 /*----------------------------------------------------------------------------*/
+GroupEntity* GroupManager::getGroup(const std::string& name, const int dim, const bool exceptionIfNotFound) const
+{
+    switch(dim){
+    case(3): return getGroup<Group3D>(name, exceptionIfNotFound);
+    case(2): return getGroup<Group2D>(name, exceptionIfNotFound);
+    case(1): return getGroup<Group1D>(name, exceptionIfNotFound);
+    case(0): return getGroup<Group0D>(name, exceptionIfNotFound);
+    default: throw TkUtil::Exception (TkUtil::UTF8String ("dimension non prévue pour GroupManager::getGroup", TkUtil::Charset::UTF_8));
+    }
+}
+/*----------------------------------------------------------------------------*/
 template <typename T, typename = std::enable_if_t<std::is_base_of<GroupEntity, T>::value>>
 T* GroupManager::getNewGroup(const std::string& gr_name, Internal::InfoCommand* icmd)
 {
@@ -189,6 +200,17 @@ T* GroupManager::getNewGroup(const std::string& gr_name, Internal::InfoCommand* 
     }
 
     return gr;
+}
+/*----------------------------------------------------------------------------*/
+GroupEntity* GroupManager::getNewGroup(const std::string& name, const int dim, Internal::InfoCommand* icmd)
+{
+    switch(dim){
+    case(3): return getNewGroup<Group3D>(name, icmd);
+    case(2): return getNewGroup<Group2D>(name, icmd);
+    case(1): return getNewGroup<Group1D>(name, icmd);
+    case(0): return getNewGroup<Group0D>(name, icmd);
+    default: throw TkUtil::Exception (TkUtil::UTF8String ("dimension non prévue pour GroupManager::getNewGroup", TkUtil::Charset::UTF_8));
+    }
 }
 /*----------------------------------------------------------------------------*/
 template <typename T, typename = std::enable_if_t<std::is_base_of<GroupEntity, T>::value>>
@@ -1893,15 +1915,45 @@ void GroupManager::setLevel(std::vector<std::string>& vg, int dim, int level)
         getGroup(n, dim, true)->setLevel(level);
 }
 /*----------------------------------------------------------------------------*/
-GroupEntity* GroupManager::getGroup(const std::string& name, const int dim, const bool exceptionIfNotFound) const
+const std::vector<GroupEntity*>& GroupManager::getGroupsFor(const Geom::GeomEntity* e)
 {
-    switch(dim){
-    case(3): return getGroup<Group3D>(name, exceptionIfNotFound);
-    case(2): return getGroup<Group2D>(name, exceptionIfNotFound);
-    case(1): return getGroup<Group1D>(name, exceptionIfNotFound);
-    case(0): return getGroup<Group0D>(name, exceptionIfNotFound);
-    default: throw TkUtil::Exception (TkUtil::UTF8String ("dimension non prévue pour GroupManager::getGroup", TkUtil::Charset::UTF_8));
+    return m_entities_groups[e];
+}
+/*----------------------------------------------------------------------------*/
+void GroupManager::addGroupFor(const Geom::GeomEntity* e, GroupEntity* g)
+{
+    if (e->getDim() != g->getDim()) {
+        TkUtil::UTF8String messErr (TkUtil::Charset::UTF_8);
+        messErr << e->getName() << " doit être de même dimension que " << g->getName();
+        throw TkUtil::Exception(messErr);
     }
+    if (!hasGroupFor(e, g))
+        m_entities_groups[e].push_back(g);
+}
+/*----------------------------------------------------------------------------*/
+void GroupManager::setGroupsFor(const Geom::GeomEntity* e, const std::vector<GroupEntity*>& gs)
+{
+    m_entities_groups[e].clear();
+    for (GroupEntity* g : gs) addGroupFor(e, g);
+}
+/*----------------------------------------------------------------------------*/
+void GroupManager::removeGroupFor(const Geom::GeomEntity* e, GroupEntity* g)
+{
+    std::vector<GroupEntity*>& v = m_entities_groups[e];
+    // on supprime toutes les occurrences de g dans le vecteur
+    // (même si en principe il ne devrait y en avoir qu'une seule)
+    v.erase(std::remove(v.begin(), v.end(), g), v.end());
+}
+/*----------------------------------------------------------------------------*/
+void GroupManager::removeAllGroupsFor(const Geom::GeomEntity* e)
+{
+    m_entities_groups.erase(e);
+}
+/*----------------------------------------------------------------------------*/
+bool GroupManager::hasGroupFor(const Geom::GeomEntity* e, GroupEntity* g)
+{
+    const std::vector<Group::GroupEntity*>& groups = m_entities_groups[e];
+    return (std::find(groups.begin(), groups.end(), g) != groups.end());
 }
 /*----------------------------------------------------------------------------*/
 template Group0D* GroupManager::getGroup<Group0D>(const std::string&, const bool) const;

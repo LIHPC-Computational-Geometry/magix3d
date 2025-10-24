@@ -1,4 +1,3 @@
-/*----------------------------------------------------------------------------*/
 #include <iostream>
 #include <vector>
 #include <string>
@@ -2459,12 +2458,12 @@ TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const CoEdge & e)
         o << ", projetée sur " << e.getGeomAssociation()->getName()
         <<(e.getGeomAssociation()->isDestroyed()?" (DETRUITE)":"");
 
-        std::vector<std::string> gn;
-        e.getGeomAssociation()->getGroupsName(gn);
+        Group::GroupManager& gm = e.getContext().getGroupManager();
+        std::vector<Group::GroupEntity*> gn = gm.getGroupsFor(e.getGeomAssociation());
         if (!gn.empty()) {
             o << " (groupes:";
             for (size_t i=0; i<gn.size(); i++)
-                o << " "<<gn[i];
+                o << " "<<gn[i]->getName();
             o << ")";
         }
         else {
@@ -2509,6 +2508,7 @@ Topo::TopoInfo CoEdge::getInfos() const
 	Topo::TopoInfo infos;
 	infos.name = getName();
 	infos.dimension = getDim();
+    infos._groups = Utils::toNames(getGroups());
 	if (getGeomAssociation() != 0)
 		infos.geom_entity = getGeomAssociation()->getName();
 
@@ -2784,14 +2784,12 @@ computeRatio(const Utils::Math::Point& pt)
 //	return scale/norme;
 }
 /*----------------------------------------------------------------------------*/
-void CoEdge::getGroupsName (std::vector<std::string>& gn, bool byGeom, bool byTopo) const
+void CoEdge::getGroupsName (std::vector<std::string>& gn) const
 {
-	if (byGeom)
-		TopoEntity::getGroupsName(gn, byGeom, byTopo);
+	TopoEntity::getGroupsName(gn);
 
-	if (byTopo)
-		for (uint i = 0; i<m_topo_property->getGroupsContainer().size(); ++i)
-		        gn.push_back(m_topo_property->getGroupsContainer().get(i)->getName());
+	for (uint i = 0; i<m_topo_property->getGroupsContainer().size(); ++i)
+			gn.push_back(m_topo_property->getGroupsContainer().get(i)->getName());
 }
 /*----------------------------------------------------------------------------*/
 void CoEdge::add(Group::Group1D* grp)

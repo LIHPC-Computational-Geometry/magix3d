@@ -19,10 +19,6 @@
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
-namespace Group {
-class GroupEntity;
-}
-/*----------------------------------------------------------------------------*/
 /*!
  * \namespace Mgx3D::Geom
  *
@@ -164,14 +160,9 @@ public:
     virtual Utils::SerializedRepresentation* getDescription (bool alsoComputed) const;
 
     /*------------------------------------------------------------------------*/
-    /// Retourne les noms des groupes auxquels appartient cette entité
-    virtual void getGroupsName (std::vector<std::string>& gn) const;
-
-    /// Retourne la liste des groupes auxquels appartient cette entité
-    virtual void getGroups(std::vector<Group::GroupEntity*>& grp) const;
-
-    /// Retourne le nombre de groupes
-    virtual int getNbGroups() const;
+    /** \brief   détruit l'objet
+     */
+    virtual void setDestroyed(bool b);
 
 private:
     /// Propriétés géométriques (qui peut être spécifique, PropertyBox par exemple)
