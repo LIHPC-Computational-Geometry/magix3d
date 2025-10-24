@@ -1,14 +1,12 @@
 #ifndef MGX3D_GEOM_VERTEX_H_
 #define MGX3D_GEOM_VERTEX_H_
 /*----------------------------------------------------------------------------*/
-/*----------------------------------------------------------------------------*/
 #include <TopoDS_Vertex.hxx>
 #include <vector>
 /*----------------------------------------------------------------------------*/
 #include "Geom/GeomEntity.h"
 #include "Services/MementoService.h"
 #include "Utils/Point.h"
-#include "Group/GroupEntity.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -159,39 +157,9 @@ public:
      */
     friend TkUtil::UTF8String& operator<<(TkUtil::UTF8String& str, const Vertex& v);
 
-    /*------------------------------------------------------------------------*/
-    /** Ajoute le groupe parmis ceux auxquels appartient le sommet */
-    void add(Group::Group0D* grp);
-
-    /** Retire le groupe parmis ceux auxquels appartient le sommet */
-    void remove(Group::Group0D* grp);
-
-    /** Recherche le groupe parmis ceux auxquels appartient le sommet
-     * return vrai si trouvé */
-    bool find(Group::Group0D* grp);
-
-    /// Retourne les noms des groupes auxquels appartient cette entité
-    virtual void getGroupsName (std::vector<std::string>& gn) const;
-
-    /// Retourne la liste des groupes auxquels appartient cette entité
-    virtual void getGroups(std::vector<Group::GroupEntity*>& grp) const;
-
-    /// Retourne la liste des groupes auxquels appartient cette entité
-    virtual const std::vector<Group::Group0D*>& getGroups() const {return m_groups;}
-
-    /// Retourne le nombre de groupes
-    virtual int getNbGroups() const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief   détruit l'objet
-     */
-    virtual void setDestroyed(bool b);
-
 private:
     /// accès aux courbes incidentes
     std::vector<Curve*> m_curves;
-    /// Listes des groupes 0D auxquels appartient ce sommet
-    std::vector<Group::Group0D*> m_groups;
     /// représentation open cascade
     TopoDS_Vertex m_occ_vertex;
 };

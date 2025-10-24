@@ -451,7 +451,7 @@ createSubVolume(std::vector<BlockDirPos>& bloc_dirPos)
         	continue;
 
         std::vector<std::string> groupsName;
-        blk->getGroupsName(groupsName, true, true);
+        blk->getGroupsName(groupsName);
 
         for (std::vector<std::string>::iterator iter2 = groupsName.begin();
                 iter2 != groupsName.end(); ++iter2){

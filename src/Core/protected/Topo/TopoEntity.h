@@ -1,11 +1,4 @@
 /*----------------------------------------------------------------------------*/
-/** \file TopoEntity.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 18 nov. 2010
- */
-/*----------------------------------------------------------------------------*/
 #ifndef MGX3D_GEOM_TOPOENTITY_H_
 #define MGX3D_GEOM_TOPOENTITY_H_
 /*----------------------------------------------------------------------------*/
@@ -108,7 +101,7 @@ public:
 
       /*------------------------------------------------------------------------*/
     /// Accesseur sur la liste de noms de groupes
-    virtual void getGroupsName (std::vector<std::string>& gn, bool byGeom, bool byTopo) const;
+    virtual void getGroupsName (std::vector<std::string>& gn) const;
 
     /*------------------------------------------------------------------------*/
     /** Duplique le TopoProperty pour en conserver une copie

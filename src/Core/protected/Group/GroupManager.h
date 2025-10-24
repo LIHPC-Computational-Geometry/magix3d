@@ -109,10 +109,12 @@ public:
     /// retourne l'entité à partir du nom, une exception si elle n'existe pas
     template <typename T, typename = std::enable_if_t<std::is_base_of<GroupEntity, T>::value>>
     T* getGroup(const std::string& name, const bool exceptionIfNotFound=true) const;
+    GroupEntity* getGroup(const std::string& name, const int dim, const bool exceptionIfNotFound=true) const;
 
     /// retourne l'entité à partir du nom, et la créé si elle n'existe pas
     template <typename T, typename = std::enable_if_t<std::is_base_of<GroupEntity, T>::value>>
     T* getNewGroup(const std::string& name, Internal::InfoCommand* icmd);
+    GroupEntity* getNewGroup(const std::string& name, const int dim, Internal::InfoCommand* icmd);
 
     /*------------------------------------------------------------------------*/
     /// retourne la liste des groupes, sans ou avec ceux détruits
@@ -335,10 +337,6 @@ public:
             uint mark);
 
     /*------------------------------------------------------------------------*/
-    /** Retourne le groupe correspondant à la dimension                       */
-    GroupEntity* getGroup(const std::string& name, const int dim, const bool exceptionIfNotFound=true) const;
-
-    /*------------------------------------------------------------------------*/
     /** Retourne les volumes géométriques à partir des groupes sélectionnés   */
     void get(const std::vector<GroupEntity*>& vg, std::vector<Geom::Volume*>& volumes);
 
@@ -499,6 +497,32 @@ public:
      /** Vide un groupe suivant son nom et une dimension */
      Internal::M3DCommandResult* clearGroup(int dim, const std::string& groupName);
 
+#ifndef SWIG
+    /// Retourne les groupes associés à une entité
+    const std::vector<GroupEntity*>& getGroupsFor(const Geom::GeomEntity* e);
+    /// Ajoute une association Entité-->Group
+    void addGroupFor(const Geom::GeomEntity* e, GroupEntity* g);
+    /// Positionne les associations Entité-->Group
+    void setGroupsFor(const Geom::GeomEntity* e, const std::vector<GroupEntity*>& gs);
+    /// Enlève une association Entité-->Group
+    void removeGroupFor(const Geom::GeomEntity* e, GroupEntity* g);
+    /// Enlève toutes les associations Entité-->Group
+    void removeAllGroupsFor(const Geom::GeomEntity* e);
+    /// Retourne vrai si l'entité possède le groupe
+    bool hasGroupFor(const Geom::GeomEntity* e, GroupEntity* g);
+    /// Retourne les groupes filtrés
+    template <typename T, typename = std::enable_if<std::is_base_of<GroupEntity, T>::value>>
+    std::vector<T*> getFilteredGroupsFor(const Geom::GeomEntity* e)
+    {
+        std::vector<T*> result;
+        for (GroupEntity* g : getGroupsFor(e)) {
+            if (T* casted = dynamic_cast<T*>(g)) {
+                result.push_back(casted);
+            }
+        }
+        return result;
+    }
+#endif
 
 private:
     /// Conteneur pour les groupes
@@ -506,6 +530,9 @@ private:
 
     /// ancien masque
     Utils::FilterEntity::objectType m_visibilityMask;
+
+    /// Relation Entité --> Group
+    std::map<const Geom::GeomEntity*, std::vector<GroupEntity*>> m_entities_groups;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Group
