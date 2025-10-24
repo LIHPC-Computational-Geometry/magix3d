@@ -8,6 +8,7 @@
 #include "Topo/CoFace.h"
 #include "Topo/Block.h"
 #include "Group/GroupEntity.h"
+#include "Group/GroupManager.h"
 #include "SysCoord/SysCoord.h"
 #include "Mesh/MeshModificationItf.h"
 #include <TkUtil/NumericServices.h>
@@ -327,8 +328,8 @@ namespace Mgx3D::Services
 		}
 
 		// Les groupes s'il y en a
-		std::vector<Group::GroupEntity *> groups;
-		e->getGroups(groups);
+		Group::GroupManager& gm = e->getContext().getGroupManager();
+		std::vector<Group::GroupEntity *> groups = gm.getGroupsFor(e);
 		if (!groups.empty())
 		{
 			Utils::SerializedRepresentation groupeDescription("Relations vers des groupes", "");

@@ -154,11 +154,10 @@ void CommandSetGeomAssociation::validGroupsName(TopoEntity* te)
 	if (te == 0 || m_geom_entity == 0)
 		return;
 
-	std::vector<std::string> te_gn;
-	te->getGroupsName(te_gn, false, true);
-
-	std::vector<std::string> ge_gn;
-	m_geom_entity->getGroupsName(ge_gn);
+	Group::GroupManager& gm = getContext().getGroupManager();
+	Group::GroupHelperForCommand ghfc(getInfoCommand(), gm);
+	std::vector<std::string> te_gn = Utils::toNames(ghfc.getGroupsFor(te));
+	std::vector<std::string> ge_gn = Utils::toNames(gm.getGroupsFor(m_geom_entity));
 
 #ifdef _DEBUG2
 	std::cout<<"validGroupsName("<<te->getName()<<")"<<std::endl;

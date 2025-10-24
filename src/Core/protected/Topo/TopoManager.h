@@ -1890,7 +1890,7 @@ public:
 #endif
 
 #ifndef SWIG
-    /// Retourne les entités topologiques associées, léve une exception si aucune
+    /// Retourne les entités topologiques associées à une entité géométrique
     const std::vector<TopoEntity*>& getRefTopos(const Geom::GeomEntity* ge);
     /// Ajoute une association Geom-->Topo
     void addRefTopo(const Geom::GeomEntity* ge, TopoEntity* te);
@@ -1898,7 +1898,7 @@ public:
     void setRefTopos(const Geom::GeomEntity* ge, const std::vector<TopoEntity*>& tes);
     /// Enlève une association Geom-->Topo
     void removeRefTopo(const Geom::GeomEntity* ge, TopoEntity* te);
-    /// Retourne les entités topologiques filtrées, léve une exception si aucune
+    /// Retourne les entités topologiques filtrées
     template <typename T, typename = std::enable_if<std::is_base_of<Topo::TopoEntity, T>::value>>
     std::vector<T*> getFilteredRefTopos(const Geom::GeomEntity* ge)
     {

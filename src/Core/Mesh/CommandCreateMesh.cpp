@@ -13,6 +13,7 @@
 #include "Smoothing/VolumicSmoothing.h"
 #include "Utils/Command.h"
 #include "Group/GroupEntity.h"
+#include "Group/GroupManager.h"
 #include "Topo/TopoHelper.h"
 #include "Topo/CoEdge.h"
 #include "Topo/CoFace.h"
@@ -995,29 +996,26 @@ meshAndModify(std::list<Topo::CoFace*>& list_cofaces)
 	// 1 pour les anciens (ceux créés avant cette commande)
 	std::map<gmds::TCellID, uint> filtre_nodes_pert;
 
-	for (std::list<Topo::CoFace*>::iterator iter1 = list_cofaces.begin();
-			iter1 != list_cofaces.end(); ++iter1){
-		Topo::CoFace* coface = *iter1;
+	Group::GroupManager& gm = getContext().getGroupManager();
+	for (Topo::CoFace* coface : list_cofaces) {
 		filtre_cofaces[coface] = 1;
 
 		if (coface->getGeomAssociation() && coface->getGeomAssociation()->getDim() == 2){
 			Geom::Surface* surface = dynamic_cast<Geom::Surface*>(coface->getGeomAssociation());
 			CHECK_NULL_PTR_ERROR(surface);
-			const std::vector<Group::Group2D*>& grps = surface->getGroups();
-			for (Group::Group2D* grp : grps){
+			for (Group::Group2D* grp : gm.getFilteredGroupsFor<Group::Group2D>(surface)){
 				if (!grp->getMeshModifications().empty())
 					list_grp.push_back(grp);
 			}
 		} // end if getGeomAssociation
 
 		// les groupes depuis les faces
-		std::vector<Group::Group2D*> grps = coface->getGroups();
-		for (Group::Group2D* grp : grps){
+		for (Group::Group2D* grp : coface->getGroups()){
 			if (!grp->getMeshModifications().empty())
 				list_grp.push_back(grp);
 		}
 
-	} // end for iter1
+	}
 
 	list_grp.sort();
 	list_grp.unique();
@@ -1242,17 +1240,15 @@ modify(std::vector<Topo::Block*>& list_blocks)
 {
 	// recherche des groupes 3D, parmis les blocs en entrée, qui ont une modification
 	std::list<Group::Group3D*> list_grp;
+	Group::GroupManager& gm = getContext().getGroupManager();
 
 	for (Topo::Block* block : list_blocks){
 		if (block->getGeomAssociation() && block->getGeomAssociation()->getDim() == 3){
 			Geom::Volume* volume = dynamic_cast<Geom::Volume*>(block->getGeomAssociation());
 			CHECK_NULL_PTR_ERROR(volume);
-			const std::vector<Group::Group3D*>& grps = volume->getGroups();
-
-			for (Group::Group3D* grp : grps) {
+			for (Group::Group3D* grp : gm.getFilteredGroupsFor<Group::Group3D>(volume))
 				if (!grp->getMeshModifications().empty())
 					list_grp.push_back(grp);
-			} // end for iter2
 		} // end if getGeomAssociation
 		else {
 			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);

@@ -10,7 +10,6 @@
 #include "Services/MementoService.h"
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
-#include "Group/GroupEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Edge.hxx>
 /*----------------------------------------------------------------------------*/
@@ -230,29 +229,6 @@ public:
     static bool isA(const std::string& name);
 
     /*------------------------------------------------------------------------*/
-    /** Ajoute le groupe parmis ceux auxquels appartient la courbe */
-    void add(Group::Group1D* grp);
-
-    /** Retire le groupe parmis ceux auxquels appartient la courbe */
-    void remove(Group::Group1D* grp);
-
-    /** Recherche le groupe parmis ceux auxquels appartient la courbe
-     * return vrai si trouvé */
-    bool find(Group::Group1D* grp);
-
-    /// Retourne les noms des groupes auxquels appartient cette entité
-    virtual void getGroupsName (std::vector<std::string>& gn) const;
-
-    /// Retourne la liste des groupes auxquels appartient cette entité
-    virtual void getGroups(std::vector<Group::GroupEntity*>& grp) const;
-
-    /// Retourne la liste des groupes auxquels appartient cette entité
-    virtual const std::vector<Group::Group1D*>& getGroups() const {return m_groups;}
-
-    /// Retourne le nombre de groupes
-    virtual int getNbGroups() const;
-
-    /*------------------------------------------------------------------------*/
     /** \brief  Return the surfaces incident to this curve
      */
     const std::vector<Surface*>& getSurfaces() const { return m_surfaces; }
@@ -261,11 +237,6 @@ public:
     /** \brief  Return the vertices incident to this curve
      */
     const std::vector<Vertex*>& getVertices() const { return m_vertices; }
-    
-    /*------------------------------------------------------------------------*/
-    /** \brief   détruit l'objet
-     */
-    virtual void setDestroyed(bool b);
 
     /*------------------------------------------------------------------------*/
     /** \brief   indique si la courbe est un segment ou pas
@@ -290,8 +261,6 @@ public:
 private:
     std::vector<Surface*> m_surfaces;
     std::vector<Vertex*> m_vertices;
-    /// Listes des groupes 1D auxquels appartient cette courbe
-    std::vector<Group::Group1D*> m_groups;
     /// représentation open cascade
     std::vector<TopoDS_Edge> m_occ_edges;
 };

@@ -107,10 +107,9 @@ void CommandJoinSurfaces::internalSpecificExecute()
 	m_newEntities.push_back(newSurface);
 
 	// reprise des groupes de la première surface
-	std::vector<Group::GroupEntity*> grp;
-	m_entities[0]->getGroups(grp);
-	for (uint i=0; i<grp.size(); i++){
-		m_group_helper.addToGroup(grp[i]->getName(), newSurface);
+	Group::GroupManager& gm = getContext().getGroupManager();
+	for (Group::GroupEntity* grp : gm.getGroupsFor(m_entities[0])) {
+		m_group_helper.addToGroup(grp->getName(), newSurface);
 	}
 
 	// destruction des anciennes surfaces

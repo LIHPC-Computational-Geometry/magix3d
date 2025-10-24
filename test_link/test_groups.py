@@ -98,7 +98,7 @@ def test_section_by_plane():
     vol_info = ctx.getGeomManager().getInfos("Vol0000",3)
     assert "box" in vol_info.groups()
     # Section par un plan entre géométries avec topologies
-    ctx.getGeomManager ( ).sectionByPlane (["Vol0000"], Mgx3D.Plane(Mgx3D.Point(0, 0, .5), Mgx3D.Vector(0, 0, 1)), "aaa")
+    ctx.getGeomManager().sectionByPlane (["Vol0000"], Mgx3D.Plane(Mgx3D.Point(0, 0, .5), Mgx3D.Vector(0, 0, 1)), "aaa")
     # Les entités de dimension inférieure à 2 sont affectées au groupe aaa de manière explicite
     vol_info = ctx.getGeomManager().getInfos("Vol0001",3)
     assert "box" in vol_info.groups()
@@ -152,7 +152,7 @@ def test_new_planar_surface():
     # Création d'une boite avec une topologie
     ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10, "box")
     # Création de la surface Surf0006
-    ctx.getGeomManager ( ).newPlanarSurface (["Crb0002","Crb0006","Crb0010","Crb0011"], "aaa")
+    ctx.getGeomManager().newPlanarSurface (["Crb0002","Crb0006","Crb0010","Crb0011"], "aaa")
     # Les entités de dimension inférieure à 2 sont affectées au groupe aaa de manière implicite
     # Cette commande crée 1 surface à partir de 4 courbes existantes
     surf_info = ctx.getGeomManager().getInfos("Surf0006",2)
@@ -211,3 +211,14 @@ def test_changeGroupName():
     with pytest.raises(RuntimeError) as excinfo:
         ctx.getGroupManager().changeGroupName("Hors_Groupe_3D", "TOTO", 3)
     assert "Il n'est pas possible de changer le nom du groupe par défaut" in str(excinfo.value)
+
+def test_topo_group(capfd):
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    # Création d'une boite avec une topologie
+    ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
+    # Modifie le groupe aaa
+    ctx.getTopoManager().addToGroup (["Bl0000"], 3, "aaa")
+
+    assert ctx.getGroupManager().getTopoBlocks("aaa", 3) == ["Bl0000"]
+    assert ctx.getTopoManager().getInfos("Bl0000",3).groups() == ["aaa"]

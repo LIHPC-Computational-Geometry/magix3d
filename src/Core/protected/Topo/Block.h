@@ -1,4 +1,3 @@
-/*----------------------------------------------------------------------------*/
 #ifndef MGX3D_TOPO_BLOCK_H_
 #define MGX3D_TOPO_BLOCK_H_
 /*----------------------------------------------------------------------------*/
@@ -512,7 +511,7 @@ public:
     Face* getFace(Topo::Vertex* v0, Topo::Vertex* v1, Topo::Vertex* v2, Topo::Vertex* v3);
 
     /// Accesseur sur la liste de noms de groupes
-    virtual void getGroupsName (std::vector<std::string>& gn, bool byGeom=true, bool byTopo=true) const;
+    virtual void getGroupsName (std::vector<std::string>& gn) const;
 
     void add(Group::Group3D* grp);
     void remove(Group::Group3D* grp);

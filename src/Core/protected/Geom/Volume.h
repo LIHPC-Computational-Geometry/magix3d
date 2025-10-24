@@ -3,7 +3,6 @@
 /*----------------------------------------------------------------------------*/
 #include "Geom/GeomEntity.h"
 #include "Services/MementoService.h"
-#include "Group/GroupEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <list>
 /*----------------------------------------------------------------------------*/
@@ -132,39 +131,9 @@ public:
      */
     static bool isA(const std::string& name);
 
-    /*------------------------------------------------------------------------*/
-    /** Ajoute le groupe parmis ceux auxquels appartient le volume */
-    void add(Group::Group3D* grp);
-
-    /** Retire le groupe parmis ceux auxquels appartient le volume */
-    void remove(Group::Group3D* grp);
-
-    /** Recherche le groupe parmis ceux auxquels appartient le volume
-     * return vrai si trouvé */
-    bool find(Group::Group3D* grp);
-
-    /// Retourne les noms des groupes auxquels appartient cette entité
-    virtual void getGroupsName (std::vector<std::string>& gn) const;
-
-    /// Retourne la liste des groupes auxquels appartient cette entité
-    virtual void getGroups(std::vector<Group::GroupEntity*>& grp) const;
-
-    /// Retourne la liste des groupes 3D auxquels appartient cette entité
-    virtual const std::vector<Group::Group3D*>& getGroups() const {return m_groups;}
-
-    /// Retourne le nombre de groupes
-    virtual int getNbGroups() const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief   détruit l'objet
-     */
-    virtual void setDestroyed(bool b);
-
 private:
     /// surfaces incidentes au volume
     std::vector<Surface*> m_surfaces;
-    /// Listes des groupes 3D auxquels appartient ce volume
-    std::vector<Group::Group3D*> m_groups;
     /// représentation open cascade
     TopoDS_Shape m_occ_shape;
 };

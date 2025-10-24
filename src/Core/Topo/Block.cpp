@@ -1,4 +1,3 @@
-/*----------------------------------------------------------------------------*/
 #include <iostream>
 #include <vector>
 #include <list>
@@ -1457,12 +1456,12 @@ TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const Block & b)
         o << ", projetée sur " << b.getGeomAssociation()->getName()
         <<(b.getGeomAssociation()->isDestroyed()?" (DETRUIT)":"");
 
-        std::vector<std::string> gn;
-        b.getGeomAssociation()->getGroupsName(gn);
+        Group::GroupManager& gm = b.getContext().getGroupManager();
+        std::vector<Group::GroupEntity*> gn = gm.getGroupsFor(b.getGeomAssociation());
         if (!gn.empty()) {
             o << " (groupes:";
             for (size_t i=0; i<gn.size(); i++)
-                o << " "<<gn[i];
+                o << " "<<gn[i]->getName();
             o << ")";
         }
         else {
@@ -1501,25 +1500,23 @@ Topo::TopoInfo Block::getInfos() const
 	Topo::TopoInfo infos;
 	infos.name = getName();
 	infos.dimension = getDim();
+    infos._groups = Utils::toNames(getGroups());
 	if (getGeomAssociation() != 0)
 		infos.geom_entity = getGeomAssociation()->getName();
 
     std::vector<Vertex*> vertices;
     getVertices(vertices);
-    for (Vertex* v : vertices)
-        infos._vertices.push_back(v->getName());
+    infos._vertices = Utils::toNames(vertices);
 
     std::vector<CoEdge*> coedges;
     getCoEdges(coedges);
-    for (CoEdge* e : coedges)
-        infos._coedges.push_back(e->getName());
+    infos._coedges = Utils::toNames(coedges);
     
     std::vector<CoFace*> cofaces;
 	getCoFaces(cofaces);
-    for (CoFace* f : cofaces)
-        infos._cofaces.push_back(f->getName());
+    infos._cofaces = Utils::toNames(cofaces);
 
-	return infos;
+    return infos;
 }
 /*----------------------------------------------------------------------------*/
 //void Block::
@@ -3458,14 +3455,12 @@ Utils::Math::Point Block::getBarycentre() const
 	return barycentre;
 }
 /*----------------------------------------------------------------------------*/
-void Block::getGroupsName (std::vector<std::string>& gn, bool byGeom, bool byTopo) const
+void Block::getGroupsName (std::vector<std::string>& gn) const
 {
-	if (byGeom)
-		TopoEntity::getGroupsName(gn, byGeom, byTopo);
+    TopoEntity::getGroupsName(gn);
 
-	if (byTopo)
-		for (uint i = 0; i<getNbGroups(); ++i)
-		        gn.push_back(m_topo_property->getGroupsContainer().get(i)->getName());
+    for (uint i = 0; i<getNbGroups(); ++i)
+            gn.push_back(m_topo_property->getGroupsContainer().get(i)->getName());
 }
 /*----------------------------------------------------------------------------*/
 void Block::add(Group::Group3D* grp)
