@@ -44,8 +44,8 @@ protected:
 			   uint level);
 
 public:
-    virtual void accept(ConstGroupEntityVisitor& visitor) const = 0 ;
-    virtual void accept(GroupEntityVisitor& visitor) = 0 ;
+    virtual void accept(ConstGroupEntityVisitor& visitor) const = 0;
+    virtual void accept(GroupEntityVisitor& visitor) = 0;
 
     /*------------------------------------------------------------------------*/
     /** \brief   Destructeur
@@ -153,8 +153,7 @@ public:
 
     int getDim() const override { return TDIM; }
     Utils::Entity::objectType getType() const override { return TTYPE; }
-    std::string getTypeName() const override
-    { return Utils::Entity::objectTypeToObjectTypeName(TTYPE); }
+    std::string getTypeName() const override { return objectTypeToObjectTypeName(TTYPE); }
 };
 /*----------------------------------------------------------------------------*/
 using Group0D = GroupEntityT<0, Utils::Entity::Group0D>;

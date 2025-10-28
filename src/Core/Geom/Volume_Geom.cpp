@@ -20,8 +20,6 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 /*----------------------------------------------------------------------------*/
-const char* Volume::typeNameGeomVolume = "GeomVolume";
-/*----------------------------------------------------------------------------*/
 Volume::Volume(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
         GeomProperty* gprop, TopoDS_Shape& shape)
 : GeomEntity(ctx, prop, disp, gprop)
