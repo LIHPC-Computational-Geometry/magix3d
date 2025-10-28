@@ -6,7 +6,6 @@
 #include <sys/types.h>		// CP : uint sur Bull
 /*----------------------------------------------------------------------------*/
 #include "Geom/GeomEntity.h"
-#include "Geom/GeomProperty.h"
 #include "Services/MementoService.h"
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
@@ -16,8 +15,6 @@
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
-
-class GeomProperty;
 /*----------------------------------------------------------------------------*/
 /**
  * \class Curve
@@ -27,7 +24,6 @@ class GeomProperty;
 class Curve: public GeomEntity {
 
     friend class Services::MementoService;
-    static const char* typeNameGeomCurve;
 
 public:
 
@@ -57,34 +53,34 @@ public:
 
     const std::vector<TopoDS_Edge>& getOCCEdges() const { return m_occ_edges; }
 
-    virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const;
-    virtual void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda);
-    virtual void accept(ConstGeomEntityVisitor& v) const { v.visit(this); }
-    virtual void accept(GeomEntityVisitor& v) { v.visit(this); }
+    void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const override;
+    void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda) override;
+    void accept(ConstGeomEntityVisitor& v) const override{ v.visit(this); }
+    void accept(GeomEntityVisitor& v) override { v.visit(this); }
 
     /*------------------------------------------------------------------------*/
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
      *          courant.
      */
-    virtual GeomEntity* clone(Internal::Context&);
+    GeomEntity* clone(Internal::Context&) override;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur
      */
     virtual ~Curve() = default;
 
-    virtual bool isEqual(Geom::Curve* curve);
+    bool isEqual(Geom::Curve* curve);
 
     /*------------------------------------------------------------------------*/
     /** \brief  retourne la dimension de l'entité géométrique
      */
-    virtual int getDim() const {return 1;}
+    int getDim() const override { return 1; }
 
     /*------------------------------------------------------------------------*/
     /** \brief  Calcule l'aire d'une entité:  Pour une courbe, c'est la
      *          longueur, pour une surface, l'aire, pour un volume le volume.
      */
-    virtual double computeArea() const;
+    double computeArea() const override;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Calcul de la boite englobante orientée selon les axes Ox,Oy,Oz
@@ -92,7 +88,7 @@ public:
      *  \param pmin Les coordonnées min de la boite englobante
      *  \param pmax Les coordonnées max de la boite englobante
      */
-    virtual void computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const;
+    void computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const override;
 
     /*------------------------------------------------------------------------*/
     /** \brief Donne le point en fonction du paramètre sur la courbe
@@ -200,23 +196,18 @@ public:
      *
      *  \param liste d'entity
      */
-    virtual void addAllDownLevelEntity(std::list<GeomEntity*>& l_entity) const;
+    void addAllDownLevelEntity(std::list<GeomEntity*>& l_entity) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief   retourne un point sur l'objet au centre si possible
      * \author Eric Brière de l'Isle
      */
-    virtual Utils::Math::Point getCenteredPosition() const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Donne le nom du type d'objet (un nom distinct par type d'objet)
-     */
-    virtual std::string getTypeName() const {return typeNameGeomCurve;}
+    Utils::Math::Point getCenteredPosition() const override;
 
     /*------------------------------------------------------------------------*/
     /** \brief Donne le type de l'objet
      */
-    virtual Utils::Entity::objectType getType() const {return Utils::Entity::GeomCurve;}
+    Utils::Entity::objectType getType() const override { return Utils::Entity::GeomCurve; }
 
     /*------------------------------------------------------------------------*/
    /** \brief Donne le nom court du type d'objet (pour le nommage des entités)

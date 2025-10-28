@@ -28,16 +28,6 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 /*----------------------------------------------------------------------------*/
-const char* Surface::typeNameGeomSurface = "GeomSurface";
-
-/*----------------------------------------------------------------------------*/
-//void Surface::add(TopoDS_Edge e)
-//{m_occ_edges.push_back(e);}
-///*----------------------------------------------------------------------------*/
-//std::vector<TopoDS_Edge> Surface::getEdges()
-//{return m_occ_edges;}
-
-/*----------------------------------------------------------------------------*/
 Surface::Surface(Internal::Context& ctx, Utils::Property* prop,
         Utils::DisplayProperties* disp,
         GeomProperty* gprop, TopoDS_Face& shape)

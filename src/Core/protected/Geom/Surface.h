@@ -14,11 +14,8 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 /*----------------------------------------------------------------------------*/
-class Loop;
 class Curve;
 class Volume;
-class Vertex;
-class GeomProperty;
 /*----------------------------------------------------------------------------*/
 /**
  * \class Surface
@@ -28,7 +25,6 @@ class GeomProperty;
 class Surface: public GeomEntity {
 
     friend class Services::MementoService;
-    static const char* typeNameGeomSurface;
 
 public:
 
@@ -57,16 +53,16 @@ public:
 
     const std::vector<TopoDS_Face>& getOCCFaces() const { return m_occ_faces; }
 
-    virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const;
-    virtual void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda);
-    virtual void accept(ConstGeomEntityVisitor& v) const { v.visit(this); }
-    virtual void accept(GeomEntityVisitor& v) { v.visit(this); }
+    void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const override;
+    void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda) override;
+    void accept(ConstGeomEntityVisitor& v) const override { v.visit(this); }
+    void accept(GeomEntityVisitor& v) override { v.visit(this); }
 
     /*------------------------------------------------------------------------*/
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
      *          courant.
      */
-    virtual GeomEntity* clone(Internal::Context&);
+    GeomEntity* clone(Internal::Context&) override;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur
@@ -79,18 +75,18 @@ public:
      *  \param pmin Les coordonnées min de la boite englobante
      *  \param pmax Les coordonnées max de la boite englobante
      */
-    virtual void computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const;
+    void computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const override;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Calcule l'aire d'une entité:  Pour une courbe, c'est la
      *          longueur, pour une surface, l'aire, pour un volume le volume.
      */
-    virtual double computeArea() const;
+    double computeArea() const override;
 
     /*------------------------------------------------------------------------*/
     /** \brief  retourne la dimension de l'entité géométrique
      */
-    virtual int getDim() const {return 2;}
+    int getDim() const  override { return 2; }
 
     /*------------------------------------------------------------------------*/
     /** \brief Calcul la normale à une surface en un point
@@ -98,7 +94,7 @@ public:
      *  \param P1 le point à projeter
      *  \param V2 la normale recherchée suivant le projeté du point
      */
-    virtual void normal(const Utils::Math::Point& P1, Utils::Math::Vector& V2) const;
+    void normal(const Utils::Math::Point& P1, Utils::Math::Vector& V2) const;
 
      /*------------------------------------------------------------------------*/
      /** \brief Retourne le point de parametre (u,v) dans l'espace de parametre
@@ -106,21 +102,21 @@ public:
       *         [V1,V2] retournées par getParametricBounds, une exception est
       *         levée. La robustesse de cette méthode repose sur OCC
       */
-    virtual Utils::Math::Point getPoint(const double u, const double v) const;
+    Utils::Math::Point getPoint(const double u, const double v) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Ajoute v comme volume incident
      *
      *  \param v un pointeur sur un volume
      */
-    virtual void add(Volume* v);
+    void add(Volume* v);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Ajoute c comme courbe incidente
      *
      *  \param c un pointeur sur une courbe
      */
-    virtual void add(Curve* c);
+    void add(Curve* c);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Supprime v de la liste des volumes incidents. Si v n'apparait
@@ -128,7 +124,7 @@ public:
      *
      *  \param v un pointeur sur un volume
      */
-    virtual void remove(Volume* v);
+    void remove(Volume* v);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Supprime c de la liste des courbes incidentes. Si c n'apparait
@@ -136,7 +132,7 @@ public:
      *
      *  \param v un pointeur sur un volume
      */
-    virtual void remove(Curve* c);
+    void remove(Curve* c);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Ajoute à la liste les entités de niveaux inférieurs
@@ -144,23 +140,18 @@ public:
      *
      *  \param liste d'entity
      */
-    virtual void addAllDownLevelEntity(std::list<GeomEntity*>& l_entity) const;
+    void addAllDownLevelEntity(std::list<GeomEntity*>& l_entity) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief   retourne un point sur l'objet au centre si possible
      * \author Eric Brière de l'Isle
      */
-    virtual Utils::Math::Point getCenteredPosition() const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Donne le nom du type d'objet (un nom distinct par type d'objet)
-     */
-    virtual std::string getTypeName() const {return typeNameGeomSurface;}
+    Utils::Math::Point getCenteredPosition() const override;
 
     /*------------------------------------------------------------------------*/
     /** \brief Donne le type de l'objet
      */
-    virtual Utils::Entity::objectType getType() const {return Utils::Entity::GeomSurface;}
+    Utils::Entity::objectType getType() const override { return Utils::Entity::GeomSurface; }
 
     /*------------------------------------------------------------------------*/
    /** \brief Donne le nom court du type d'objet (pour le nommage des entités)
@@ -185,7 +176,7 @@ public:
     /*------------------------------------------------------------------------*/
     /** \brief   indique si la surface est un plan ou pas
      */
-    virtual bool isPlanar() const;
+    bool isPlanar() const;
 
 private:
     std::vector<Curve*> m_curves;

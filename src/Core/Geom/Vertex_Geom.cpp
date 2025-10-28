@@ -20,8 +20,6 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 /*----------------------------------------------------------------------------*/
-const char* Vertex::typeNameGeomVertex = "GeomVertex";
-/*----------------------------------------------------------------------------*/
 Vertex::Vertex(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
         GeomProperty* gprop, TopoDS_Vertex& shape)
 : GeomEntity(ctx, prop, disp, gprop)
