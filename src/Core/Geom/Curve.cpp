@@ -32,8 +32,6 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
 /*----------------------------------------------------------------------------*/
-const char* Curve::typeNameGeomCurve = "GeomCurve";
-/*----------------------------------------------------------------------------*/
 Curve::Curve(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
         GeomProperty* gprop, TopoDS_Edge& shape)
 :GeomEntity(ctx, prop, disp, gprop)

@@ -1,8 +1,8 @@
-/*----------------------------------------------------------------------------*/
 #include "Group/GroupEntity.h"
 #include "Group/GroupEntityVisitor.h"
 #include "Internal/Context.h"
 #include "Mesh/MeshModificationItf.h"
+#include "Services/DescriptionService.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
