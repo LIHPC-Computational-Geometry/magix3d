@@ -1,16 +1,9 @@
-/*----------------------------------------------------------------------------*/
-/** \file Entity.h
- *
- *  \author Franck Ledoux, Eric Brière de l'Isle
- *
- *  \date 30/11/2010
- */
-/*----------------------------------------------------------------------------*/
 #ifndef UTIL_ENTITY_H_
 #define UTIL_ENTITY_H_
 /*----------------------------------------------------------------------------*/
 #include "Utils/DisplayRepresentation.h"
 #include "Utils/SerializedRepresentation.h"
+#include <TkUtil/Exception.h>
 #include <vector>
 #include <map>
 #include <set>
@@ -381,14 +374,34 @@ private :
 
 Entity::objectType typesToType (FilterEntity::objectType types);
 FilterEntity::objectType typeToTypes (Entity::objectType type);
+
 #ifndef SWIG
 template<typename T> using EntitySet = std::set<T, decltype(&Utils::Entity::compareEntity)>;
-template<typename T> std::vector<std::string> toNames(const std::vector<T*>& entities) {
+
+template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
+std::vector<std::string> toNames(const std::vector<T*>& entities)
+{
     std::vector<std::string> result;
     result.reserve(entities.size());
     std::transform(entities.begin(), entities.end(), std::back_inserter(result),
                    [](T* e){ return e->getName(); });
     return result;
+}
+
+template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
+int getIndexOf(const std::vector<T*>& entities, T* e)
+{
+	int index = -1;
+	for (unsigned int i=0; i<entities.size(); i++) {
+		if(e->getUniqueId() == entities[i]->getUniqueId())
+			index = i;
+	}
+	if (index == -1) {
+		TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
+		message <<"getIndexOf impossible pour un volume";
+		throw TkUtil::Exception(message);
+	}
+	return index;
 }
 #endif
 /*----------------------------------------------------------------------------*/
