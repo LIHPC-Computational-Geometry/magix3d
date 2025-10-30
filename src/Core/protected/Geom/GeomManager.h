@@ -1439,15 +1439,6 @@ public:
     /** Retourne le nom du dernier Vertex */
     std::string getLastVertex() const;
 
-    /** Retourne l'indice du sommet v*/
-    int getIndexOf(Vertex* v) const;
-    /** Retourne l'indice de la courbe c*/
-    int getIndexOf(Curve* c) const;
-    /** Retourne l'indice de la surface s*/
-    int getIndexOf(Surface* s) const;
-    /** Retourne l'indice du volume v*/
-    int getIndexOf(Volume* v) const;
-
     /** Ajoute un groupe à un ensemble d'entités géométriques, suivant une dimension */
     Internal::M3DCommandResult* addToGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
     SET_SWIG_COMPLETABLE_METHOD(addToGroup)
