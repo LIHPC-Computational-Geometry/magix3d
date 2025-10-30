@@ -1,5 +1,6 @@
 #ifndef MGX3D_GEOM_VERTEX_H_
 #define MGX3D_GEOM_VERTEX_H_
+/*----------------------------------------------------------------------------*/
 #include "Geom/GeomEntity.h"
 #include "Services/MementoService.h"
 #include "Utils/Point.h"

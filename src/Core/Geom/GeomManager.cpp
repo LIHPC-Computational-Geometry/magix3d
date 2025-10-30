@@ -4842,69 +4842,6 @@ GeomEntity* GeomManager::getEntity(const std::string& name, const bool exception
     return ge;
 }
 /*----------------------------------------------------------------------------*/
-int GeomManager::getIndexOf(Vertex* v) const
-{
-	int index = -1;
-	for (unsigned int i=0; i<m_vertices.size(); i++){
-		if(v->getUniqueId()==m_vertices[i]->getUniqueId())
-			index = i;
-	}
-	if(index==-1){
-		TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-		message <<"getIndexOf impossible pour un sommet";
-		throw TkUtil::Exception(message);
-	}
-	return index;
-}
-/*----------------------------------------------------------------------------*/
-int GeomManager::getIndexOf(Curve* c) const
-{
-	int index = -1;
-	for (unsigned int i=0; i<m_curves.size(); i++){
-		if(c->getUniqueId()==m_curves[i]->getUniqueId())
-			index = i;
-	}
-	if(index==-1){
-		TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-		message <<"getIndexOf impossible pour une courbe";
-		throw TkUtil::Exception(message);
-	}
-	return index;
-}
-/*----------------------------------------------------------------------------*/
-int GeomManager::getIndexOf(Surface* s) const
-{
-	int index = -1;
-
-	for (unsigned int i=0; i<m_surfaces.size(); i++){
-		if(s->getUniqueId()==m_surfaces[i]->getUniqueId())
-			index = i;
-	}
-	if(index==-1){
-		TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-		message <<"getIndexOf impossible pour une surface";
-		throw TkUtil::Exception(message);
-	}
-	return index;
-}
-/*----------------------------------------------------------------------------*/
-int GeomManager::getIndexOf(Volume* v) const
-{
-	int index = -1;
-
-	for (unsigned int i=0; i<m_volumes.size(); i++){
-		if(v->getUniqueId()==m_volumes[i]->getUniqueId())
-			index = i;
-	}
-	if(index==-1){
-		TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-		message <<"getIndexOf impossible pour un volume";
-		throw TkUtil::Exception(message);
-	}
-	return index;
-}
-
-/*----------------------------------------------------------------------------*/
 void GeomManager::addEntity (GeomEntity* ge)
 {
     if(ge==0)
