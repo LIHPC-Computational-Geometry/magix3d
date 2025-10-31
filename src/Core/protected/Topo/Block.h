@@ -179,26 +179,10 @@ public:
     void degenerateFaceInEdge(uint id, Topo::Vertex* v1, Topo::Vertex* v2,
             Internal::InfoCommand* icmd);
 
-    /*------------------------------------------------------------------------*/
-    /** Fournit l'accès aux sommets topologiques incidents avec une copie
-     *
-     *  \param vertices les sommets incidents
-     */
-    void getVertices(std::vector<Topo::Vertex* >& vertices) const
-    {m_topo_property->getVertexContainer().get(vertices);}
-
     /** Fournit l'accès aux sommets topologiques incidents sans copie
      */
     const std::vector<Topo::Vertex* >& getVertices() const
-            {return m_topo_property->getVertexContainer().get();}
-
-    /// \return le nombre de Vertex
-    uint getNbVertices() const
-    {return m_topo_property->getVertexContainer().getNb();}
-
-    /// fournit l'accès à l'un des sommets
-    Topo::Vertex* getVertex(uint ind) const
-    {return m_topo_property->getVertexContainer().get(ind);}
+            {return m_topo_property->getVertexContainer();}
 
     /** Retourne le sommet suivant ses coordonnées logiques dans le bloc lorsqu'il est structuré
     @param cote_i faux pour i minimum
@@ -207,67 +191,37 @@ public:
      */
     Topo::Vertex* getVertex(bool cote_i, bool cote_j, bool cote_k);
 
-    /// retourne l'indice d'un sommet
-    uint getIndex(Topo::Vertex* v)
-    {return m_topo_property->getVertexContainer().getIndex(v);}
-
     /// retourne la liste des 8 sommets en duplicant les derniers en cas de dégénérescence
-    void getHexaVertices(std::vector<Topo::Vertex* >& vertices) const;
+    std::vector<Vertex*> getHexaVertices() const;
 
     /// accès à tous les sommets y compris ceux internes
-    void getAllVertices(std::vector<Topo::Vertex* >& vertices, bool unique = true) const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux faces topologiques incidentes avec copie
-     *
-     *  \param faces les faces incidentes
-     */
-    void getFaces(std::vector<Face* >& faces) const
-    {m_topo_property->getFaceContainer().get(faces);}
+    std::vector<Vertex*> getAllVertices() const;
 
     /** \brief  Fournit l'accès aux faces topologiques incidentes sans copie
      */
-    const std::vector<Face* > getFaces() const
-            {return m_topo_property->getFaceContainer().get();}
-
-    /// Accesseur pour l'une des faces
-    Face* getFace(uint id) const
-    {return m_topo_property->getFaceContainer().get(id);}
-
-    /// retourne le nombre de faces
-    uint getNbFaces() const
-    {return m_topo_property->getFaceContainer().getNb();}
-
-    /// retourne l'indice d'une face
-    uint getIndex(Face* f)
-    {return m_topo_property->getFaceContainer().getIndex(f);}
+    const std::vector<Face*>& getFaces() const
+            {return m_topo_property->getFaceContainer();}
 
     /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès aux faces communes topologiques incidentes
      *
      *  \param cofaces les faces communes incidentes en retour
      */
-    void getCoFaces(std::vector<CoFace* >& cofaces) const;
-
-    uint getNbCoFaces() const;
+    std::vector<CoFace*> getCoFaces() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès aux arêtes topologiques incidentes
      *
      *  \param edges les arêtes incidentes
      */
-    void getEdges(std::vector<Edge* >& edges) const;
-
-    uint getNbEdges() const;
+    std::vector<Edge*> getEdges() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès aux arêtes communes topologiques incidentes
      *
      *  \param coedges les arêtes communes incidentes
      */
-    void getCoEdges(std::vector<CoEdge* >& coedges, bool unique = true) const;
-
-    uint getNbCoEdges() const;
+    std::vector<CoEdge*> getCoEdges() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Fournit une représentation affichable de l'entité en se basant

@@ -442,7 +442,7 @@ void MeshImplementation::writeCGNS(std::string nom)
 		Topo::Block* bloc = blocks[i];
 		if (bloc->isMeshed() && bloc->isStructured()){
 
-			if (bloc->getNbVertices() != 8){
+			if (bloc->getVertices().size() != 8){
 				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
 				message << "Erreur dans MeshImplementation::writeCGNS, cas dégénéré non implémenté pour "
 						<<bloc->getName();
@@ -516,12 +516,10 @@ void MeshImplementation::writeCGNS(std::string nom)
 
 
 			// les relations avec les autres blocs
-			std::vector<Topo::CoFace*> cofaces;
-			bloc->getCoFaces(cofaces);
+			std::vector<Topo::CoFace*> cofaces = bloc->getCoFaces();
 			for (uint j=0; j<cofaces.size(); j++){
 				// on ne s'occupe que des cofaces entre 2 blocs
-				std::vector<Topo::Block*> coface_blocks;
-				cofaces[j]->getBlocks(coface_blocks);
+				std::vector<Topo::Block*> coface_blocks = cofaces[j]->getBlocks();
 				if (coface_blocks.size() == 2){
 					Topo::CoFace* coface = cofaces[j];
 					Topo::Block* bloc_vois = (coface_blocks[0] == bloc?coface_blocks[1]:coface_blocks[0]);
@@ -540,8 +538,7 @@ void MeshImplementation::writeCGNS(std::string nom)
 					}
 
 					// recherche des indices de noeuds dans les blocs pour les extrémités (les sommets) des faces communes
-					std::vector<Topo::Vertex*> coface_vertices;
-					coface->getVertices(coface_vertices);
+					const std::vector<Topo::Vertex*>& coface_vertices = coface->getVertices();
 
 					// stockage des indices par sommet
 					std::vector<std::vector<uint> > idxIJK_vertices;
@@ -1077,8 +1074,7 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::Block* bl)
         if (getContext().getMeshDim() == Internal::Context::MESH2D)
         	throw TkUtil::Exception (TkUtil::UTF8String ("Il n'est pas possible de mailler des blocs alors que le maillage n'est pas 3D en sortie", TkUtil::Charset::UTF_8));
 
-		std::vector<Topo::Face* > faces;
-		bl->getFaces(faces);
+		std::vector<Topo::Face*> faces = bl->getFaces();
 		for (uint i=0; i<faces.size(); i++) {
 			mesh(command, faces[i]);
 		}
@@ -1101,11 +1097,8 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::Block* bl)
 /*----------------------------------------------------------------------------*/
 void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::Face* fa)
 {
-    std::vector<Topo::CoFace* > cofaces;
-    fa->getCoFaces(cofaces);
-    for (uint i=0; i<cofaces.size(); i++) {
-        mesh(command, cofaces[i]);
-    }
+    for (Topo::CoFace* coface : fa->getCoFaces())
+        mesh(command, coface);
 }
 /*----------------------------------------------------------------------------*/
 /// Construction des points du maillage d'une face
@@ -1157,10 +1150,8 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::CoFace* fa
 /*----------------------------------------------------------------------------*/
 void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::Edge* ed)
 {
-    std::vector<Topo::CoEdge* > coedges;
-    ed->getCoEdges(coedges);
-    for (uint i=0; i<coedges.size(); i++)
-        mesh(command, coedges[i]);
+	for (Topo::CoEdge* ce : ed->getCoEdges())
+		mesh(command, ce);
 }
 /*----------------------------------------------------------------------------*/
 /// Construction des points du maillage d'une arête
@@ -1199,9 +1190,10 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::CoEdge* ed
         ed->saveCoEdgeMeshingData(&command->getInfoCommand());
 
         // on met toujours les noeuds aux extrémités
-        if (!ed->getVertex(0)->isMeshed())
-        	mesh(command, ed->getVertex(0));
-        ed->nodes().push_back(ed->getVertex(0)->getNode());
+		const std::vector<Topo::Vertex* >& ed_vertices = ed->getVertices();
+        if (!ed_vertices[0]->isMeshed())
+        	mesh(command, ed_vertices[0]);
+        ed->nodes().push_back(ed_vertices[0]->getNode());
 
         const uint nbBrasI = ed->getNbMeshingEdges();
         for (uint i=1; i<nbBrasI; i++){
@@ -1211,9 +1203,9 @@ void MeshImplementation::mesh(Mesh::CommandCreateMesh* command, Topo::CoEdge* ed
             command->addCreatedNode(nd.id());
         }
 
-        if (!ed->getVertex(1)->isMeshed())
-        	mesh(command, ed->getVertex(1));
-        ed->nodes().push_back(ed->getVertex(1)->getNode());
+        if (!ed_vertices[1]->isMeshed())
+        	mesh(command, ed_vertices[1]);
+        ed->nodes().push_back(ed_vertices[1]->getNode());
 
         // ajoute les noeuds aux groupes suivant ce qui a été demandé
         _addNodesInClouds(command, ed);

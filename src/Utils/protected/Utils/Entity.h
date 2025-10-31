@@ -5,6 +5,7 @@
 #include "Utils/SerializedRepresentation.h"
 #include <TkUtil/Exception.h>
 #include <vector>
+#include <list>
 #include <map>
 #include <set>
 /*----------------------------------------------------------------------------*/
@@ -389,7 +390,22 @@ std::vector<std::string> toNames(const std::vector<T*>& entities)
 }
 
 template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
-int getIndexOf(const std::vector<T*>& entities, T* e)
+std::vector<T*> toVect(const EntitySet<T*>& entities)
+{
+    std::vector<T*> ret(entities.begin(), entities.end());
+    return ret;
+}
+
+
+template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
+std::list<T*> toList(const std::vector<T*>& entities)
+{
+    std::list<T*> ret(entities.begin(), entities.end());
+    return ret;
+}
+
+template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
+int getIndexOf(T* e, const std::vector<T*>& entities)
 {
 	int index = -1;
 	for (unsigned int i=0; i<entities.size(); i++) {
@@ -398,10 +414,34 @@ int getIndexOf(const std::vector<T*>& entities, T* e)
 	}
 	if (index == -1) {
 		TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-		message <<"getIndexOf impossible pour un volume";
+		message << "getIndexOf impossible pour un " << e->getName();
 		throw TkUtil::Exception(message);
 	}
 	return index;
+}
+
+template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
+bool contains(const T* e, const std::vector<T*>& entities)
+{
+    return std::find(entities.begin(), entities.end(), e) != entities.end();
+}
+
+// en attendant C++ 23
+template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
+void append(std::vector<T*>& to, const std::vector<T*>& from)
+{
+    to.insert(to.end(), from.begin(), from.end());
+}
+
+template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
+bool remove(T* e, std::vector<T*>& entities)
+{
+    if (auto it = std::find(entities.begin(), entities.end(), e); it != entities.end()) {
+        entities.erase(it);
+        return true;
+    } else {
+        return false;
+    }
 }
 #endif
 /*----------------------------------------------------------------------------*/

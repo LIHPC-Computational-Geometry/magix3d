@@ -194,7 +194,7 @@ void QtMgx3DEdgePanel::getPoints (Math::Point& p1, Math::Point& p2) const
 	Topo::CoEdge*	coEdge	= dynamic_cast<Topo::CoEdge*>(&entity);
 	if (0 != curve)
 	{
-		auto vertices =	curve->getVertices();
+		auto vertices =	curve->getVertices ();
 		if (2 != vertices.size ( ))
 			throw Exception (UTF8String ("Arête géométrique non composée de 2 points.", Charset::UTF_8));
 		p1	= vertices [0]->getCoord ( );
@@ -202,8 +202,7 @@ void QtMgx3DEdgePanel::getPoints (Math::Point& p1, Math::Point& p2) const
 	}	// if (0 != curve)
 	else if (0 != edge)
 	{
-		vector<Topo::Vertex*>	vertices;
-		edge->getVertices (vertices);
+		auto vertices = edge->getVertices ();
 		if (2 != vertices.size ( ))
 			throw Exception (UTF8String ("Arête topologique non composée de 2 points.", Charset::UTF_8));
 		p1	= vertices [0]->getCoord ( );
@@ -211,8 +210,7 @@ void QtMgx3DEdgePanel::getPoints (Math::Point& p1, Math::Point& p2) const
 	}	// else if (0 != edge)
 	else if (0 != coEdge)
 	{
-		vector<Topo::Vertex*>	vertices;
-		coEdge->getVertices (vertices);
+		auto vertices = coEdge->getVertices ();
 		if (2 != vertices.size ( ))
 			throw Exception (UTF8String ("Arête topologique non composée de 2 points.", Charset::UTF_8));
 		p1	= vertices [0]->getCoord ( );

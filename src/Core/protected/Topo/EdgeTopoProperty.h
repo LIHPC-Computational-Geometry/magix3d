@@ -1,19 +1,7 @@
-/*----------------------------------------------------------------------------*/
-/** \file EdgeTopoProperty.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 23 nov. 2011
- */
-/*----------------------------------------------------------------------------*/
 #ifndef EDGE_TOPO_PROPERTY_H_
 #define EDGE_TOPO_PROPERTY_H_
 /*----------------------------------------------------------------------------*/
-#include "Utils/Container.h"
-#include <TkUtil/Exception.h>
 #include <vector>
-#include <sys/types.h>
-#include <algorithm>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -30,35 +18,31 @@ class CoEdge;
  
  class EdgeTopoProperty {
  public:
-     EdgeTopoProperty()
-     {
-     }
-
-     ~EdgeTopoProperty()
-     {}
+     EdgeTopoProperty() = default;
+     ~EdgeTopoProperty() = default;
 
      /*------------------------------------------------------------------------*/
      /** Création d'un clone, on copie toutes les informations */
-     EdgeTopoProperty* clone() {
-         EdgeTopoProperty* prop = new EdgeTopoProperty();
-         prop->m_vertices.clone(m_vertices);
-         prop->m_coedges.clone(m_coedges);
-         prop->m_cofaces.clone(m_cofaces);
-
-         return prop;
+     EdgeTopoProperty* clone()
+     {
+        EdgeTopoProperty* prop = new EdgeTopoProperty();
+        prop->m_vertices = m_vertices;
+        prop->m_coedges = m_coedges;
+        prop->m_cofaces = m_cofaces;
+        return prop;
      }
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des sommets
-     Utils::Container<Vertex>& getVertexContainer() {return m_vertices;}
+     std::vector<Vertex*>& getVertexContainer() {return m_vertices;}
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des faces communes
-     Utils::Container<CoFace>& getCoFaceContainer() {return m_cofaces;}
+     std::vector<CoFace*>& getCoFaceContainer() {return m_cofaces;}
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des arêtes communes
-     Utils::Container<CoEdge>& getCoEdgeContainer() {return m_coedges;}
+     std::vector<CoEdge*>& getCoEdgeContainer() {return m_coedges;}
 
      /*------------------------------------------------------------------------*/
      /** \brief   Suppression des dépendances (entités topologiques incidentes)
@@ -72,13 +56,13 @@ class CoEdge;
 
  private:
      /// Lien avec les faces incidentes communes
-     Utils::Container<CoFace> m_cofaces;
+     std::vector<CoFace*> m_cofaces;
 
      /// Lien avec les arêtes communes sur lesquelles se base cette arête
-     Utils::Container<CoEdge> m_coedges;
+     std::vector<CoEdge*> m_coedges;
 
      /// Lien avec les sommets extrémités
-     Utils::Container<Vertex> m_vertices;
+     std::vector<Vertex*> m_vertices;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo

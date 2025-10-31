@@ -160,11 +160,8 @@ void CommandDestroyTopo::destroy(CoFace* coface)
 	mark(coface);
 
 	// marque égallement les entités de niveau supérieur
-	std::vector<Block*> blocks;
-	coface->getBlocks(blocks);
-	for (std::vector<Block*>::iterator iter = blocks.begin();
-			iter != blocks.end(); ++iter)
-		mark(*iter);
+	for (Block* bl : coface->getBlocks())
+		mark(bl);
 
 	// parcours les entités pour déterminer si elles dépendent encore
 	// de quelque chose qui n'est pas marqué
@@ -180,18 +177,11 @@ void CommandDestroyTopo::destroy(CoEdge* coedge)
 	mark(coedge);
 
 	// marque égallement les entités de niveau supérieur
-	std::vector<CoFace*> cofaces;
-	coedge->getCoFaces(cofaces);
-	for (std::vector<CoFace*>::iterator iter1 = cofaces.begin();
-			iter1 != cofaces.end(); ++iter1){
-		CoFace* coface = *iter1;
+	for (CoFace* coface : coedge->getCoFaces()){
 		mark(coface);
 
-		std::vector<Block*> blocks;
-		coface->getBlocks(blocks);
-		for (std::vector<Block*>::iterator iter2 = blocks.begin();
-				iter2 != blocks.end(); ++iter2)
-			mark(*iter2);
+		for (Block* bl : coface->getBlocks())
+			mark(bl);
 	} // end for iter1
 
 	// parcours les entités pour déterminer si elles dépendent encore
@@ -208,27 +198,14 @@ void CommandDestroyTopo::destroy(Vertex* vertex)
 	mark(vertex);
 
 	// marque égallement les entités de niveau supérieur
-	std::vector<CoEdge*> coedges;
-	vertex->getCoEdges(coedges);
-	for (std::vector<CoEdge*>::iterator iter0 = coedges.begin();
-				iter0 != coedges.end(); ++iter0){
-		CoEdge* coedge = *iter0;
+	for (CoEdge* coedge : vertex->getCoEdges()){
 		mark(coedge);
-
-		std::vector<CoFace*> cofaces;
-		coedge->getCoFaces(cofaces);
-		for (std::vector<CoFace*>::iterator iter1 = cofaces.begin();
-				iter1 != cofaces.end(); ++iter1){
-			CoFace* coface = *iter1;
+		for (CoFace* coface : coedge->getCoFaces()){
 			mark(coface);
-
-			std::vector<Block*> blocks;
-			coface->getBlocks(blocks);
-			for (std::vector<Block*>::iterator iter2 = blocks.begin();
-					iter2 != blocks.end(); ++iter2)
-				mark(*iter2);
-		} // end for iter1
-	} // end for iter0
+			for (Block* bl : coface->getBlocks())
+				mark(bl);
+		}
+	}
 	// parcours les entités pour déterminer si elles dépendent encore
 	// de quelque chose qui n'est pas marqué
 	// si ce n'est pas le cas, alors elles sont à détruire
@@ -242,9 +219,7 @@ void CommandDestroyTopo::mark(Block* bloc)
 
 	m_filtre_blocks.insert(bloc);
 
-	std::vector<Face*> faces;
-	bloc->getFaces(faces);
-
+	std::vector<Face*> faces = bloc->getFaces();
 	for (std::vector<Face*>::iterator iter = faces.begin();
 			iter != faces.end(); ++iter)
 		mark(*iter);
@@ -255,12 +230,8 @@ void CommandDestroyTopo::mark(Face* face)
 	m_filtre_faces.insert(face);
 
 	if (m_propagate){
-		std::vector<CoFace*> cofaces;
-		face->getCoFaces(cofaces);
-
-		for (std::vector<CoFace*>::iterator iter = cofaces.begin();
-				iter != cofaces.end(); ++iter)
-			mark(*iter);
+		for (CoFace* coface : face->getCoFaces())
+			mark(coface);
 	}
 }
 /*----------------------------------------------------------------------------*/
@@ -271,39 +242,25 @@ void CommandDestroyTopo::mark(CoFace* coface)
 
 	m_filtre_cofaces.insert(coface);
 
-	std::vector<Edge*> edges;
-	coface->getEdges(edges);
-
-	for (std::vector<Edge*>::iterator iter = edges.begin();
-			iter != edges.end(); ++iter)
-		mark(*iter);
+	for (Edge* edge : coface->getEdges())
+		mark(edge);
 }
 /*----------------------------------------------------------------------------*/
 void CommandDestroyTopo::mark(Edge* edge)
 {
 	m_filtre_edges.insert(edge);
-
-	std::vector<CoEdge*> coedges;
-	edge->getCoEdges(coedges);
-
 	if (m_propagate){
-		for (std::vector<CoEdge*>::iterator iter = coedges.begin();
-				iter != coedges.end(); ++iter)
-			mark(*iter);
+		for (CoEdge* coedge : edge->getCoEdges())
+			mark(coedge);
 	}
 }
 /*----------------------------------------------------------------------------*/
 void CommandDestroyTopo::mark(CoEdge* coedge)
 {
 	m_filtre_coedges.insert(coedge);
-
-	std::vector<Vertex*> vertices;
-	coedge->getVertices(vertices);
-
 	if (m_propagate){
-		for (std::vector<Vertex*>::iterator iter = vertices.begin();
-				iter != vertices.end(); ++iter)
-			mark(*iter);
+		for (Vertex* v : coedge->getVertices())
+			mark(v);
 	}
 }
 /*----------------------------------------------------------------------------*/
@@ -314,11 +271,8 @@ void CommandDestroyTopo::mark(Vertex* vertex)
 /*----------------------------------------------------------------------------*/
 bool CommandDestroyTopo::dependUnmarqued(Face* face)
 {
-	std::vector<Block*> blocs;
-	face->getBlocks(blocs);
-	for (std::vector<Block*>::iterator iter = blocs.begin();
-			iter != blocs.end(); ++iter)
-		if (m_filtre_blocks.count(*iter) == 0)
+	for (Block* b : face->getBlocks())
+		if (m_filtre_blocks.count(b) == 0)
 			return true;
 
 	return false;
@@ -326,11 +280,8 @@ bool CommandDestroyTopo::dependUnmarqued(Face* face)
 /*----------------------------------------------------------------------------*/
 bool CommandDestroyTopo::dependUnmarqued(CoFace* coface)
 {
-	std::vector<Face*> faces;
-	coface->getFaces(faces);
-	for (std::vector<Face*>::iterator iter = faces.begin();
-			iter != faces.end(); ++iter)
-		if (m_filtre_faces.count(*iter) == 0)
+	for (Face* face : coface->getFaces())
+		if (m_filtre_faces.count(face) == 0)
 			return true;
 
 	return false;
@@ -338,14 +289,8 @@ bool CommandDestroyTopo::dependUnmarqued(CoFace* coface)
 /*----------------------------------------------------------------------------*/
 bool CommandDestroyTopo::dependUnmarqued(Edge* edge)
 {
-	std::vector<CoFace*> cofaces;
-	edge->getCoFaces(cofaces);
-//	if (cofaces.size()>1)
-//		std::cout<<"CommandDestroyTopo::dependUnmarqued, trouve que "<<edge->getName()<<" est relié à "<<cofaces.size()<<" cofaces"<<std::endl;
-
-	for (std::vector<CoFace*>::iterator iter = cofaces.begin();
-			iter != cofaces.end(); ++iter)
-		if (m_filtre_cofaces.count(*iter) == 0)
+	for (CoFace* coface : edge->getCoFaces())
+		if (m_filtre_cofaces.count(coface) == 0)
 			return true;
 
 	return false;
@@ -353,11 +298,8 @@ bool CommandDestroyTopo::dependUnmarqued(Edge* edge)
 /*----------------------------------------------------------------------------*/
 bool CommandDestroyTopo::dependUnmarqued(CoEdge* coedge)
 {
-	std::vector<Edge*> edges;
-	coedge->getEdges(edges);
-	for (std::vector<Edge*>::iterator iter = edges.begin();
-			iter != edges.end(); ++iter)
-		if (m_filtre_edges.count(*iter) == 0)
+	for (Edge* e : coedge->getEdges())
+		if (m_filtre_edges.count(e) == 0)
 			return true;
 
 	return false;
@@ -365,11 +307,8 @@ bool CommandDestroyTopo::dependUnmarqued(CoEdge* coedge)
 /*----------------------------------------------------------------------------*/
 bool CommandDestroyTopo::dependUnmarqued(Vertex* vertex)
 {
-	std::vector<CoEdge*> coedges;
-	vertex->getCoEdges(coedges);
-	for (std::vector<CoEdge*>::iterator iter = coedges.begin();
-			iter != coedges.end(); ++iter)
-		if (m_filtre_coedges.count(*iter) == 0)
+	for (CoEdge* coedge : vertex->getCoEdges())
+		if (m_filtre_coedges.count(coedge) == 0)
 			return true;
 
 	return false;

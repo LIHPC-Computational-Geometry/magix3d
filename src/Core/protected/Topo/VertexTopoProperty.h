@@ -1,19 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/** \file VertexTopoProperty.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 23 nov. 2011
- */
-/*----------------------------------------------------------------------------*/
 #ifndef VERTEX_TOPO_PROPERTY_H_
 #define VERTEX_TOPO_PROPERTY_H_
 /*----------------------------------------------------------------------------*/
-#include "Utils/Container.h"
-#include "Group/GroupEntity.h"
-#include <TkUtil/Exception.h>
 #include <vector>
-#include <algorithm>
+#include "Group/GroupEntity.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -28,30 +17,26 @@ class CoEdge;
  
  class VertexTopoProperty {
  public:
-     VertexTopoProperty()
-     {}
-
-     ~VertexTopoProperty()
-     {}
+     VertexTopoProperty() = default;
+     ~VertexTopoProperty() = default;
 
      /*------------------------------------------------------------------------*/
      /** Création d'un clone, on copie toutes les informations */
-     VertexTopoProperty* clone() {
-         VertexTopoProperty* prop = new VertexTopoProperty();
-
-         prop->m_coedges.clone(m_coedges);
-         prop->m_groups.clone(m_groups);
-
-         return prop;
+     VertexTopoProperty* clone()
+     {
+        VertexTopoProperty* prop = new VertexTopoProperty();
+        prop->m_coedges = m_coedges;
+        prop->m_groups = m_groups;
+        return prop;
      }
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des arêtes communes
-     Utils::Container<CoEdge>& getCoEdgeContainer() {return m_coedges;}
+     std::vector<CoEdge*>& getCoEdgeContainer() {return m_coedges;}
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des groupes
-     Utils::Container<Group::Group0D>& getGroupsContainer() {return m_groups;}
+     std::vector<Group::Group0D*>& getGroupsContainer() {return m_groups;}
 
      /*------------------------------------------------------------------------*/
      /** \brief   Suppression des dépendances (entités topologiques incidentes)
@@ -64,10 +49,10 @@ class CoEdge;
 
  private:
      /// accès aux arêtes incidentes communes
-     Utils::Container<CoEdge> m_coedges;
+     std::vector<CoEdge*> m_coedges;
 
      /// Listes des groupes 0D
-     Utils::Container<Group::Group0D> m_groups;
+     std::vector<Group::Group0D*> m_groups;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo

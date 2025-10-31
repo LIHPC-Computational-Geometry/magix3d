@@ -723,29 +723,12 @@ createMeshEntitySurfacicRepresentation3D(Mesh::MeshEntity* meshEntity, gmds::Mes
 	// la liste des faces externes au groupe de blocs
 	// on utilise une map et on marque les faces à chaque fois qu'elles sont vus
 	std::map<Topo::CoFace*, int> marque_faces;
-
-	std::vector<Topo::Face* > faces;
-	for (std::vector<Topo::Block* >::iterator iter1 =
-			blocs.begin(); iter1 != blocs.end(); ++iter1)
-	{
-		(*iter1)->getFaces(faces);
-
-		std::vector<Topo::CoFace* > cofaces;
-		for (std::vector<Topo::Face* >::iterator iter2 =
-				faces.begin(); iter2 != faces.end(); ++iter2)
-		{
-			(*iter2)->getCoFaces(cofaces);
-
-			for (std::vector<Topo::CoFace* >::iterator iter3 =
-					cofaces.begin(); iter3 != cofaces.end();
-					++iter3)
-				marque_faces[*iter3] += 1;
-		}
-	}
-
+	for (Topo::Block* bloc : blocs)
+		for (Topo::Face* face : bloc->getFaces())
+			for (Topo::CoFace* coface : face->getCoFaces())
+				marque_faces[coface] += 1;
 
 	std::vector<Topo::CoFace*> cofaces;
-
 	for (std::map<Topo::CoFace*, int>::iterator iter = marque_faces.begin();
 			iter != marque_faces.end();
 			++iter)
@@ -927,8 +910,8 @@ createCoFacesSurfacicRepresentationRatioN(std::vector<Topo::CoFace*> cofaces, gm
 	size_t pos = 0;
 	for (std::vector<Topo::CoFace* >::iterator iter = cofaces.begin(); iter != cofaces.end(); ++iter)
 	{
-		uint niMax = (*iter)->getEdge(Topo::CoFace::j_min)->getNbNodes();
-		uint njMax = (*iter)->getEdge(Topo::CoFace::i_min)->getNbNodes();
+		uint niMax = (*iter)->getEdges()[Topo::CoFace::j_min]->getNbNodes();
+		uint njMax = (*iter)->getEdges()[Topo::CoFace::i_min]->getNbNodes();
 
 #ifdef _DEBUG_VTKGMDSEntityRepresentation
 		std::cout<<" pour "<<(*iter)->getName()<<" niMax = "<<niMax<<", njMax = "<<njMax<<std::endl;

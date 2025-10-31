@@ -87,13 +87,10 @@ internalExecute()
 	setStepProgression (1.);
 	setStep (++step, "Recensement des faces", 0.);
 	std::list<Topo::CoFace*> list_cofaces;
-    std::vector<Topo::CoFace* > cofaces;
     for (uint i=0; i<m_blocks.size(); i++){
-        m_blocks[i]->getCoFaces(cofaces);
-
-        for (uint j=0; j<cofaces.size(); j++)
-            if (!cofaces[j]->isMeshed())
-                list_cofaces.push_back(cofaces[j]);
+        for (Topo::CoFace* coface : m_blocks[i]->getCoFaces())
+            if (!coface->isMeshed())
+                list_cofaces.push_back(coface);
     }
     list_cofaces.sort(Utils::Entity::compareEntity);
     list_cofaces.unique();
@@ -107,10 +104,7 @@ internalExecute()
     {
         std::set<Topo::CoEdge *> set_coedges;
         for (auto b: m_blocks) {
-            std::vector<Topo::CoEdge *> coedges;
-            b->getCoEdges(coedges);
-
-            for (auto ce: coedges) {
+            for (auto ce: b->getCoEdges()) {
                 set_coedges.insert(ce);
             }
         }

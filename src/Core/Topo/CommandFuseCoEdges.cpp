@@ -69,17 +69,15 @@ internalExecute()
 
     // Vérification qu'elles appartiennent aux mêmes arêtes
     std::map<uint, uint> filtre_edges;
-    std::vector<Edge* > edges;
-    m_coedges[0]->getEdges(edges);
+    std::vector<Edge* > edges = m_coedges[0]->getEdges();
     uint nb_edges = edges.size();
-    for (std::vector<Topo::Edge* >::iterator iter2 = edges.begin();
-            iter2 != edges.end(); ++iter2)
+    for (auto iter2 = edges.begin(); iter2 != edges.end(); ++iter2)
         filtre_edges[(*iter2)->getUniqueId()] = 1;
 
     for (std::vector<Topo::CoEdge* >::iterator iter1 = m_coedges.begin();
                 iter1 != m_coedges.end(); ++iter1){
 
-        (*iter1)->getEdges(edges);
+        edges = (*iter1)->getEdges();
         if (nb_edges != edges.size())
             throw TkUtil::Exception (TkUtil::UTF8String ("La fusion d'arêtes communes ne peut se faire car elles ne sont pas toutes utilisées par le même nombre arêtes", TkUtil::Charset::UTF_8));
 
@@ -109,14 +107,15 @@ internalExecute()
     Topo::Vertex* vtx2 = 0;
     TopoHelper::getVerticesTip(m_coedges, vtx1, vtx2, true);
 
-    if (vtx1 == edge_modif->getVertex(0))
-        edge_modif->replace(edge_modif->getVertex(1), vtx2, true, false, &getInfoCommand());
-    else if (vtx1 == edge_modif->getVertex(1))
-        edge_modif->replace(edge_modif->getVertex(0), vtx2, true, false, &getInfoCommand());
-    else if (vtx2 == edge_modif->getVertex(0))
-        edge_modif->replace(edge_modif->getVertex(1), vtx1, true, false, &getInfoCommand());
-    else if (vtx2 == edge_modif->getVertex(1))
-        edge_modif->replace(edge_modif->getVertex(0), vtx1, true, false, &getInfoCommand());
+    const std::vector<Topo::Vertex*> edge_modif_vertices = edge_modif->getVertices();
+    if (vtx1 == edge_modif_vertices[0])
+        edge_modif->replace(edge_modif_vertices[1], vtx2, true, false, &getInfoCommand());
+    else if (vtx1 == edge_modif_vertices[1])
+        edge_modif->replace(edge_modif_vertices[0], vtx2, true, false, &getInfoCommand());
+    else if (vtx2 == edge_modif_vertices[0])
+        edge_modif->replace(edge_modif_vertices[1], vtx1, true, false, &getInfoCommand());
+    else if (vtx2 == edge_modif_vertices[1])
+        edge_modif->replace(edge_modif_vertices[0], vtx1, true, false, &getInfoCommand());
     else
         throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, CommandFuseCoEdges ne trouve pas de sommet extrémité pour l'arête à conserver", TkUtil::Charset::UTF_8));
 
@@ -124,8 +123,7 @@ internalExecute()
     m_coedges.pop_back();
     for (std::vector<Topo::CoEdge* >::iterator iter1 = m_coedges.begin();
             iter1 != m_coedges.end(); ++iter1){
-    	std::vector<Topo::Vertex*> vertices;
-    	(*iter1)->getVertices(vertices);
+    	std::vector<Topo::Vertex*> vertices = (*iter1)->getVertices();
     	for (std::vector<Topo::Vertex*>::iterator iter2 = vertices.begin();
     			iter2 != vertices.end(); ++iter2)
     		if (*iter2 != vtx1 && *iter2 != vtx2)

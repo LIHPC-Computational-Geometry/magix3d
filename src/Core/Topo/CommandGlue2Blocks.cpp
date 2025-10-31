@@ -38,11 +38,8 @@ internalExecute()
     Face* faceA = getNearestFace(m_bl_A, m_bl_B->getBarycentre());
     Face* faceB = getNearestFace(m_bl_B, m_bl_A->getBarycentre());
 
-    std::vector<CoFace*> cofaces_A;
-    std::vector<CoFace*> cofaces_B;
-
-    faceA->getCoFaces(cofaces_A);
-    faceB->getCoFaces(cofaces_B);
+    std::vector<CoFace*> cofaces_A = faceA->getCoFaces();
+    std::vector<CoFace*> cofaces_B = faceB->getCoFaces();
 
     if (cofaces_A.size() > cofaces_B.size()){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -85,16 +82,16 @@ postExecute(bool hasError)
 Face* CommandGlue2Blocks::getNearestFace(Block* bl, Utils::Math::Point pt)
 {
 	uint id_best = 0;
-	double dist2 = bl->getFace(0)->getBarycentre().length2(pt);
-	uint nb_faces = bl->getNbFaces();
-	for (uint i=1; i<nb_faces; i++){
-		double d2 = bl->getFace(i)->getBarycentre().length2(pt);
+    const std::vector<Face*>& faces = bl->getFaces();
+	double dist2 = faces[0]->getBarycentre().length2(pt);
+	for (uint i=1; i<faces.size(); i++){
+		double d2 = faces[i]->getBarycentre().length2(pt);
 		if (d2<dist2){
 			dist2 = d2;
 			id_best = i;
 		}
 	}
-	return bl->getFace(id_best);
+	return faces[id_best];
 }
 /*----------------------------------------------------------------------------*/
 CoFace* CommandGlue2Blocks::getNearestCoFace(std::vector<CoFace*>& cofaces, Utils::Math::Point pt)
