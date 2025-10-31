@@ -177,8 +177,9 @@ duplicate(CoEdge* ce)
 {
     CoEdge* new_coedge = m_corr_coedge[ce];
     if (new_coedge == 0){
-        Vertex* new_vtx1 = duplicate(ce->getVertex(0));
-        Vertex* new_vtx2 = duplicate(ce->getVertex(1));
+        const std::vector<Topo::Vertex*> vertices = ce->getVertices();
+        Vertex* new_vtx1 = duplicate(vertices[0]);
+        Vertex* new_vtx2 = duplicate(vertices[1]);
 
         CoEdgeMeshingProperty* cemp = ce->getMeshingProperty()->clone();
         new_coedge = new CoEdge(getContext(), cemp, new_vtx1, new_vtx2);
@@ -197,8 +198,8 @@ duplicate(Edge* ed)
 {
     Edge* new_edge = m_corr_edge[ed];
     if (new_edge == 0){
-        Vertex* new_vtx1 = duplicate(ed->getVertex(0));
-        Vertex* new_vtx2 = duplicate(ed->getVertex(1));
+        Vertex* new_vtx1 = duplicate(ed->getVertices()[0]);
+        Vertex* new_vtx2 = duplicate(ed->getVertices()[1]);
 
         const std::vector<CoEdge*> & coedges = ed->getCoEdges();
         std::vector<CoEdge*> new_coedges;

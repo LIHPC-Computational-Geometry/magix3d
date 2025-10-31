@@ -239,17 +239,13 @@ void ImportBlocksImplementation::internalExecute() {
                 coedges_f.resize(coedges_in_face.size());
                 coedges_f[0] = coedges[coedges_in_face[0]];
                 bool v1changed = false;
-                std::string v1Edge = coedges[coedges_in_face[0]]->getVertex(
-                        0)->getName();
-                std::string v2Edge = coedges[coedges_in_face[0]]->getVertex(
-                        1)->getName();
+                std::string v1Edge = coedges[coedges_in_face[0]]->getVertices()[0]->getName();
+                std::string v2Edge = coedges[coedges_in_face[0]]->getVertices()[1]->getName();
 
                 for (int i_e = 1; i_e < coedges_in_face.size(); i_e++) {
                     coedges_f[i_e] = coedges[coedges_in_face[i_e]];
-                    std::string v1current = coedges[coedges_in_face[i_e]]->getVertex(
-                            0)->getName();
-                    std::string v2current = coedges[coedges_in_face[i_e]]->getVertex(
-                            1)->getName();
+                    std::string v1current = coedges[coedges_in_face[i_e]]->getVertices()[0]->getName();
+                    std::string v2current = coedges[coedges_in_face[i_e]]->getVertices()[1]->getName();
 
                     if (v1Edge == v1current) {
                         v1Edge = v2current;

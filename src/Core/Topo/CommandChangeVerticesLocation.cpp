@@ -116,12 +116,10 @@ internalExecute()
 
         vtx->setCoord(newPt);
 
-        std::vector<Block* > l_blocks;
-        vtx->getBlocks(l_blocks);
+        std::vector<Block* > l_blocks = vtx->getBlocks();
         blocks.insert(blocks.end(), l_blocks.begin(), l_blocks.end());
 
-        std::vector<CoFace* > l_cofaces;
-        vtx->getCoFaces(l_cofaces);
+        std::vector<CoFace* > l_cofaces = vtx->getCoFaces();
         cofaces.insert(cofaces.end(), l_cofaces.begin(), l_cofaces.end());
     }
 

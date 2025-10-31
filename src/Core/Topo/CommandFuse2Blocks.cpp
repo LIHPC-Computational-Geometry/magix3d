@@ -26,7 +26,7 @@ CommandFuse2Blocks(Internal::Context& c, Block* bl_A, Block* bl_B)
 	if (!bl_A->isStructured() || !bl_B->isStructured())
 		throw TkUtil::Exception (TkUtil::UTF8String ("Le collage n'est possible qu'avec des blocs structurés", TkUtil::Charset::UTF_8));
 
-	if (bl_A->getNbVertices()!=8 || bl_B->getNbVertices()!=8)
+	if (bl_A->getVertices().size()!=8 || bl_B->getVertices().size()!=8)
 		throw TkUtil::Exception (TkUtil::UTF8String ("Le collage n'est possible qu'avec des blocs non dégénérés", TkUtil::Charset::UTF_8));
 
 	if (bl_A->getGeomAssociation() != bl_B->getGeomAssociation())
@@ -49,16 +49,14 @@ internalExecute()
     Face* faceA = getNearestFace(m_bl_A, m_bl_B->getBarycentre());
     Face* faceB = getNearestFace(m_bl_B, m_bl_A->getBarycentre());
     // vérification : les 2 faces doivent avoir les même sommets
-    std::vector<Topo::Vertex*> verticesFA;
-    std::vector<Topo::Vertex*> verticesFB;
-    faceA->getVertices(verticesFA);
-    faceB->getVertices(verticesFB);
+    std::vector<Topo::Vertex*> verticesFA = faceA->getVertices();
+    std::vector<Topo::Vertex*> verticesFB = faceB->getVertices();
     if (!TopoHelper::haveSame(verticesFA, verticesFB))
     	throw TkUtil::Exception (TkUtil::UTF8String ("On ne trouve pas de face en commun (avec les même sommets) pour les 2 blocs", TkUtil::Charset::UTF_8));
 
     // recherche des 8 sommets pour le nouveau bloc
-    uint idA = m_bl_A->getIndex(faceA); // indice de la face dans le bloc A
-    uint idB = m_bl_B->getIndex(faceB); // indice de la face dans le bloc B
+    uint idA = Utils::getIndexOf(faceA, m_bl_A->getFaces()); // indice de la face dans le bloc A
+    uint idB = Utils::getIndexOf(faceB, m_bl_B->getFaces()); // indice de la face dans le bloc B
     uint idA_op = ((idA/2)*2+(idA%2+1)%2); // indice de la face opposée
     uint idB_op = ((idB/2)*2+(idB%2+1)%2); // indice de la face opposée
 
@@ -120,10 +118,10 @@ internalExecute()
     	loc_vtx.push_back(newVertices[id2]);
     	loc_vtx.push_back(newVertices[4+id2]);
     	loc_vtx.push_back(newVertices[4+id1]);
-    	for (uint j=0; j<faces1[i]->getNbCoFaces(); j++)
-    		loc_cofaces.push_back(faces1[i]->getCoFace(j));
-    	for (uint j=0; j<faces2[i]->getNbCoFaces(); j++)
-    		loc_cofaces.push_back(faces2[i]->getCoFace(j));
+    	for (CoFace* cf : faces1[i]->getCoFaces())
+    		loc_cofaces.push_back(cf);
+    	for (CoFace* cf : faces2[i]->getCoFaces())
+    		loc_cofaces.push_back(cf);
     	newFaces.push_back(new Face(getContext(), loc_cofaces, loc_vtx, true));
         getInfoCommand().addTopoInfoEntity(newFaces.back(), Internal::InfoCommand::CREATED);
     }
@@ -153,11 +151,10 @@ internalExecute()
     newBlock->setGeomAssociation(m_bl_A->getGeomAssociation());
 
     // destruction des faces et cofaces entre les 2
-    std::vector<CoFace*> loc_cofaces;
-    faceA->getCoFaces(loc_cofaces);
+    std::vector<CoFace*> loc_cofaces = faceA->getCoFaces();
     for (uint i=0; i<loc_cofaces.size(); i++)
     	loc_cofaces[i]->free(&getInfoCommand());
-    faceB->getCoFaces(loc_cofaces);
+    loc_cofaces = faceB->getCoFaces();
     for (uint i=0; i<loc_cofaces.size(); i++)
     	loc_cofaces[i]->free(&getInfoCommand());
 
@@ -199,16 +196,16 @@ postExecute(bool hasError)
 Face* CommandFuse2Blocks::getNearestFace(Block* bl, Utils::Math::Point pt)
 {
 	uint id_best = 0;
-	double dist2 = bl->getFace(0)->getBarycentre().length2(pt);
-	uint nb_faces = bl->getNbFaces();
-	for (uint i=1; i<nb_faces; i++){
-		double d2 = bl->getFace(i)->getBarycentre().length2(pt);
+    const std::vector<Face*>& faces = bl->getFaces();
+	double dist2 = faces[0]->getBarycentre().length2(pt);
+	for (uint i=1; i<faces.size(); i++){
+		double d2 = faces[i]->getBarycentre().length2(pt);
 		if (d2<dist2){
 			dist2 = d2;
 			id_best = i;
 		}
 	}
-	return bl->getFace(id_best);
+	return faces[id_best];
 }
 /*----------------------------------------------------------------------------*/
 void CommandFuse2Blocks::getPreviewRepresentation(Utils::DisplayRepresentation& dr)

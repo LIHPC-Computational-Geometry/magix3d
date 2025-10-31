@@ -129,8 +129,8 @@ Block(Internal::Context& ctx,
             throw TkUtil::Exception(messErr);
         }
 
-    m_topo_property->getFaceContainer().add(faces);
-    m_topo_property->getVertexContainer().add(vertices);
+    Utils::append(m_topo_property->getFaceContainer(), faces);
+    Utils::append(m_topo_property->getVertexContainer(), vertices);
 
     _init();
 }
@@ -154,15 +154,23 @@ Block(Internal::Context& ctx, int ni, int nj, int nk)
     m_mesh_property = new BlockMeshingPropertyTransfinite();
 
     // bloc avec les sommets équivalents à ceux d'une boite de taille 1
+    Vertex* v0 = new Topo::Vertex(ctx, Utils::Math::Point(0,0,0));
+    Vertex* v1 = new Topo::Vertex(ctx, Utils::Math::Point(1,0,0));
+    Vertex* v2 = new Topo::Vertex(ctx, Utils::Math::Point(0,1,0));
+    Vertex* v3 = new Topo::Vertex(ctx, Utils::Math::Point(1,1,0));
+    Vertex* v4 = new Topo::Vertex(ctx, Utils::Math::Point(0,0,1));
+    Vertex* v5 = new Topo::Vertex(ctx, Utils::Math::Point(1,0,1));
+    Vertex* v6 = new Topo::Vertex(ctx, Utils::Math::Point(0,1,1));
+    Vertex* v7 = new Topo::Vertex(ctx, Utils::Math::Point(1,1,1));
 
-    m_topo_property->getVertexContainer().add(new Topo::Vertex(ctx, Utils::Math::Point(0,0,0)));
-    m_topo_property->getVertexContainer().add(new Topo::Vertex(ctx, Utils::Math::Point(1,0,0)));
-    m_topo_property->getVertexContainer().add(new Topo::Vertex(ctx, Utils::Math::Point(0,1,0)));
-    m_topo_property->getVertexContainer().add(new Topo::Vertex(ctx, Utils::Math::Point(1,1,0)));
-    m_topo_property->getVertexContainer().add(new Topo::Vertex(ctx, Utils::Math::Point(0,0,1)));
-    m_topo_property->getVertexContainer().add(new Topo::Vertex(ctx, Utils::Math::Point(1,0,1)));
-    m_topo_property->getVertexContainer().add(new Topo::Vertex(ctx, Utils::Math::Point(0,1,1)));
-    m_topo_property->getVertexContainer().add(new Topo::Vertex(ctx, Utils::Math::Point(1,1,1)));
+    m_topo_property->getVertexContainer().push_back(v0);
+    m_topo_property->getVertexContainer().push_back(v1);
+    m_topo_property->getVertexContainer().push_back(v2);
+    m_topo_property->getVertexContainer().push_back(v3);
+    m_topo_property->getVertexContainer().push_back(v4);
+    m_topo_property->getVertexContainer().push_back(v5);
+    m_topo_property->getVertexContainer().push_back(v6);
+    m_topo_property->getVertexContainer().push_back(v7);
 
     // les arêtes (communes) dont on ne conserve pas de lien dans le bloc
     std::vector<CoEdge* > coedges;
@@ -173,18 +181,18 @@ Block(Internal::Context& ctx, int ni, int nj, int nk)
     EdgeMeshingPropertyUniform empJ(nj?nj:ctx.getTopoManager().getDefaultNbMeshingEdges());
     EdgeMeshingPropertyUniform empK(nk?nk:ctx.getTopoManager().getDefaultNbMeshingEdges());
 
-    coedges.push_back(new Topo::CoEdge(ctx, &empI, getVertex(0), getVertex(1)));
-    coedges.push_back(new Topo::CoEdge(ctx, &empI, getVertex(2), getVertex(3)));
-    coedges.push_back(new Topo::CoEdge(ctx, &empI, getVertex(4), getVertex(5)));
-    coedges.push_back(new Topo::CoEdge(ctx, &empI, getVertex(6), getVertex(7)));
-    coedges.push_back(new Topo::CoEdge(ctx, &empJ, getVertex(0), getVertex(2)));
-    coedges.push_back(new Topo::CoEdge(ctx, &empJ, getVertex(1), getVertex(3)));
-    coedges.push_back(new Topo::CoEdge(ctx, &empJ, getVertex(4), getVertex(6)));
-    coedges.push_back(new Topo::CoEdge(ctx, &empJ, getVertex(5), getVertex(7)));
-    coedges.push_back(new Topo::CoEdge(ctx, &empK, getVertex(0), getVertex(4)));
-    coedges.push_back(new Topo::CoEdge(ctx, &empK, getVertex(1), getVertex(5)));
-    coedges.push_back(new Topo::CoEdge(ctx, &empK, getVertex(2), getVertex(6)));
-    coedges.push_back(new Topo::CoEdge(ctx, &empK, getVertex(3), getVertex(7)));
+    coedges.push_back(new Topo::CoEdge(ctx, &empI, v0, v1));
+    coedges.push_back(new Topo::CoEdge(ctx, &empI, v2, v3));
+    coedges.push_back(new Topo::CoEdge(ctx, &empI, v4, v5));
+    coedges.push_back(new Topo::CoEdge(ctx, &empI, v6, v7));
+    coedges.push_back(new Topo::CoEdge(ctx, &empJ, v0, v2));
+    coedges.push_back(new Topo::CoEdge(ctx, &empJ, v1, v3));
+    coedges.push_back(new Topo::CoEdge(ctx, &empJ, v4, v6));
+    coedges.push_back(new Topo::CoEdge(ctx, &empJ, v5, v7));
+    coedges.push_back(new Topo::CoEdge(ctx, &empK, v0, v4));
+    coedges.push_back(new Topo::CoEdge(ctx, &empK, v1, v5));
+    coedges.push_back(new Topo::CoEdge(ctx, &empK, v2, v6));
+    coedges.push_back(new Topo::CoEdge(ctx, &empK, v3, v7));
 
     // création des Edges qui utilisent les CoEdges
     std::vector<Edge* > edges;
@@ -197,17 +205,17 @@ Block(Internal::Context& ctx, int ni, int nj, int nk)
     CoFace* coface;
 
     coface = new Topo::CoFace(ctx, edges[4], edges[8], edges[6], edges[10]);
-    m_topo_property->getFaceContainer().add(new Topo::Face(ctx, coface));
+    m_topo_property->getFaceContainer().push_back(new Topo::Face(ctx, coface));
     coface = new Topo::CoFace(ctx, edges[5], edges[9], edges[7], edges[11]);
-    m_topo_property->getFaceContainer().add(new Topo::Face(ctx, coface));
+    m_topo_property->getFaceContainer().push_back(new Topo::Face(ctx, coface));
     coface = new Topo::CoFace(ctx, edges[0], edges[8], edges[2], edges[9]);
-    m_topo_property->getFaceContainer().add(new Topo::Face(ctx, coface));
+    m_topo_property->getFaceContainer().push_back(new Topo::Face(ctx, coface));
     coface = new Topo::CoFace(ctx, edges[1], edges[10], edges[3], edges[11]);
-    m_topo_property->getFaceContainer().add(new Topo::Face(ctx, coface));
+    m_topo_property->getFaceContainer().push_back(new Topo::Face(ctx, coface));
     coface = new Topo::CoFace(ctx, edges[0], edges[4], edges[1], edges[5]);
-    m_topo_property->getFaceContainer().add(new Topo::Face(ctx, coface));
+    m_topo_property->getFaceContainer().push_back(new Topo::Face(ctx, coface));
     coface = new Topo::CoFace(ctx, edges[2], edges[6], edges[3], edges[7]);
-    m_topo_property->getFaceContainer().add(new Topo::Face(ctx, coface));
+    m_topo_property->getFaceContainer().push_back(new Topo::Face(ctx, coface));
 
     _init();
 
@@ -225,8 +233,9 @@ _init()
 #endif
 
     // association remontante
-    for (uint i=0; i<getNbFaces(); i++)
-        getFace(i)->addBlock(this);
+    std::vector<Face*> faces = getFaces();
+    for (uint i=0; i<faces.size(); i++)
+        faces[i]->addBlock(this);
 	getContext ( ).newGraphicalRepresentation (*this);
 }
 /*----------------------------------------------------------------------------*/
@@ -283,7 +292,7 @@ getVertex(bool cote_i, bool cote_j, bool cote_k)
         throw TkUtil::Exception (TkUtil::UTF8String ("Block::getVertex(bool,bool,bool) n'est pas possible avec un bloc non structuré", TkUtil::Charset::UTF_8));
 
     uint indice = (cote_i?1:0) + (cote_j?2:0) + (cote_k?4:0);
-    Topo::Vertex* vtx = getVertex(indice);
+    Topo::Vertex* vtx = getVertices()[indice];
 #ifdef _DEBUG2
     std::cout<<"Block::getVertex("<<(cote_i?"true":"false")<<", "<<(cote_j?"true":"false")<<", "<<(cote_k?"true":"false")<<") => "<<vtx->getName()<<std::endl;
 #endif
@@ -291,175 +300,86 @@ getVertex(bool cote_i, bool cote_j, bool cote_k)
 
 }
 /*----------------------------------------------------------------------------*/
-void Block::
-getCoFaces(std::vector<CoFace* >& cofaces) const
+std::vector<CoFace*> Block::
+getCoFaces() const
 {
-    cofaces.clear();
-    std::list<Topo::CoFace*> l_cf;
-    for(uint i=0; i <getNbFaces();i++) {
-        Face* face = getFace(i);
-        const std::vector<CoFace* > & local_cofaces =
-                face->getCoFaces();
-        l_cf.insert(l_cf.end(), local_cofaces.begin(), local_cofaces.end());
+    Utils::EntitySet<CoFace*> cofaces(Utils::Entity::compareEntity);
+    for(Face* face : getFaces()) {
+        const std::vector<CoFace* >& local_cofaces = face->getCoFaces();
+        cofaces.insert(local_cofaces.begin(), local_cofaces.end());
     }
-    l_cf.sort(Utils::Entity::compareEntity);
-    l_cf.unique();
-
-    cofaces.insert(cofaces.end(),l_cf.begin(),l_cf.end());
+    return Utils::toVect(cofaces);
 }
 /*----------------------------------------------------------------------------*/
-uint Block::
-getNbCoFaces() const
+std::vector<Edge*> Block::
+getEdges() const
 {
-    std::vector<CoFace* > cofaces;
-    getCoFaces(cofaces);
-    return cofaces.size();
-}
-/*----------------------------------------------------------------------------*/
-void Block::
-getEdges(std::vector<Edge* >& edges) const
-{
-    edges.clear();
-    std::list<Topo::Edge*> l_e;
-    for(uint i=0; i <getNbFaces();i++) {
-        Face* face = getFace(i);
-        for(uint j=0; j < face->getNbCoFaces();j++) {
-            const std::vector<Edge* > & local_edges =
-                    face->getCoFace(j)->getEdges();
-            l_e.insert(l_e.end(), local_edges.begin(), local_edges.end());
+    Utils::EntitySet<Topo::Edge*> edges(Utils::Entity::compareEntity);
+    for(Face* face : getFaces()) {
+        for(CoFace* coface : face->getCoFaces()) {
+            const std::vector<Edge* >& local_edges = coface->getEdges();
+            edges.insert(local_edges.begin(), local_edges.end());
         }
     }
-    l_e.sort(Utils::Entity::compareEntity);
-    l_e.unique();
-
-    edges.insert(edges.end(),l_e.begin(),l_e.end());
+    return Utils::toVect(edges);
 }
 /*----------------------------------------------------------------------------*/
-uint Block::
-getNbEdges() const
+std::vector<Vertex*> Block::
+getAllVertices() const
 {
-    std::vector<Edge* > edges;
-    getEdges(edges);
-    return edges.size();
-}
-/*----------------------------------------------------------------------------*/
-void Block::getAllVertices(std::vector<Vertex* >& vertices, bool unique) const
-{
-    vertices.clear();
-    if (unique){
-    	std::list<Topo::Vertex*> l_v;
-    	for(uint i=0; i <getNbFaces();i++) {
-    		Face* face = getFace(i);
-    		for(uint j=0; j < face->getNbCoFaces();j++) {
-    			CoFace* coface = face->getCoFace(j);
-    			for(uint k=0; k < coface->getNbEdges();k++) {
-    				Edge* edge = coface->getEdge(k);
-    				for(uint l=0; l < edge->getNbCoEdges(); l++){
-    					CoEdge* coedge = edge->getCoEdge(l);
-
-    					const std::vector<Vertex* > & local_vertices = coedge->getVertices();
-
-    					l_v.insert(l_v.end(), local_vertices.begin(), local_vertices.end());
-    				}
-    			}
-    		}
-    	}
-
-    	l_v.sort(Utils::Entity::compareEntity);
-    	l_v.unique();
-
-    	vertices.insert(vertices.end(),l_v.begin(),l_v.end());
+    Utils::EntitySet<Vertex*> vertices(Utils::Entity::compareEntity);
+    for(Face* face : getFaces()) {
+        for(CoFace* coface : face->getCoFaces()) {
+            for(Edge* edge : coface->getEdges()) {
+                for(CoEdge* coedge : edge->getCoEdges()){
+                    const std::vector<Vertex* >& local_vertices = coedge->getVertices();
+                    vertices.insert(local_vertices.begin(), local_vertices.end());
+                }
+            }
+        }
     }
-    else {
-    	for(uint i=0; i <getNbFaces();i++) {
-    		Face* face = getFace(i);
-    		for(uint j=0; j < face->getNbCoFaces();j++) {
-    			CoFace* coface = face->getCoFace(j);
-    			for(uint k=0; k < coface->getNbEdges();k++) {
-    				Edge* edge = coface->getEdge(k);
-    				for(uint l=0; l < edge->getNbCoEdges(); l++){
-    					CoEdge* coedge = edge->getCoEdge(l);
-
-    					const std::vector<Vertex* > & local_vertices = coedge->getVertices();
-
-    					vertices.insert(vertices.end(), local_vertices.begin(), local_vertices.end());
-    				}
-    			}
-    		}
-    	}
+    return Utils::toVect(vertices);
+}
+/*----------------------------------------------------------------------------*/
+std::vector<CoEdge*> Block::
+getCoEdges() const
+{
+    Utils::EntitySet<Topo::CoEdge*> coedges(Utils::Entity::compareEntity);
+    for(Face* face : getFaces()) {
+        for(CoFace* coface : face->getCoFaces()) {
+            for(Edge* edge : coface->getEdges()) {
+                const std::vector<CoEdge* >& local_coedges = edge->getCoEdges();
+                coedges.insert(local_coedges.begin(), local_coedges.end());
+            }
+        }
     }
-}
-/*----------------------------------------------------------------------------*/
-void Block::getCoEdges(std::vector<CoEdge* >& coedges, bool unique) const
-{
-	if (unique){
-		coedges.clear();
-		std::list<Topo::CoEdge*> l_e;
-		for(uint i=0; i <getNbFaces();i++) {
-			Face* face = getFace(i);
-			for(uint j=0; j < face->getNbCoFaces();j++) {
-				CoFace* coface = face->getCoFace(j);
-				for(uint k=0; k < coface->getNbEdges();k++) {
-					const std::vector<CoEdge* > & local_coedges =
-							coface->getEdge(k)->getCoEdges();
-					l_e.insert(l_e.end(), local_coedges.begin(), local_coedges.end());
-				}
-			}
-		}
-		l_e.sort(Utils::Entity::compareEntity);
-		l_e.unique();
-
-		coedges.insert(coedges.end(),l_e.begin(),l_e.end());
-	}
-	else {
-		coedges.clear();
-		for(uint i=0; i <getNbFaces();i++) {
-			Face* face = getFace(i);
-			for(uint j=0; j < face->getNbCoFaces();j++) {
-				CoFace* coface = face->getCoFace(j);
-				for(uint k=0; k < coface->getNbEdges();k++) {
-					const std::vector<CoEdge* > & local_coedges =
-							coface->getEdge(k)->getCoEdges();
-					coedges.insert(coedges.end(), local_coedges.begin(), local_coedges.end());
-				}
-			}
-		}
-	}
-
-}
-/*----------------------------------------------------------------------------*/
-uint Block::
-getNbCoEdges() const
-{
-    std::vector<CoEdge* > coedges;
-    getCoEdges(coedges);
-    return coedges.size();
+    return Utils::toVect(coedges);
 }
 /*----------------------------------------------------------------------------*/
 void Block::
 replace(Topo::Vertex* v1, Topo::Vertex* v2, bool propagate_up, bool propagate_down, Internal::InfoCommand* icmd)
 {
-    Topo::Vertex* v_tmp;
-
-    for (uint i=0; i<getNbVertices(); i++)
-        if (v1 == getVertex(i)){
-            v_tmp = getVertex(i);
+    std::vector<Vertex*> vertices = getVertices();
+    for (uint i=0; i<vertices.size(); i++)
+        if (v1 == vertices[i]) {
             saveBlockTopoProperty(icmd);
-            m_topo_property->getVertexContainer().set(i, v2);
+            m_topo_property->getVertexContainer()[i] = v2;
         }
-    if (propagate_down)
-    	for (uint j=0; j<getNbFaces(); j++)
-    		getFace(j)->replace(v1, v2, propagate_up, propagate_down, icmd);
-
+    if (propagate_down) {
+        std::vector<Face*> faces = getFaces();
+    	for (uint j=0; j<faces.size(); j++)
+    		faces[j]->replace(v1, v2, propagate_up, propagate_down, icmd);
+    }
 }
 /*----------------------------------------------------------------------------*/
 void Block::
 replace(Face* f1, Face* f2, Internal::InfoCommand* icmd)
 {
-    for (uint i=0; i<getNbFaces(); i++)
-        if (f1 == getFace(i)){
+    std::vector<Face*> faces = getFaces();
+    for (uint i=0; i<faces.size(); i++)
+        if (f1 == faces[i]){
             saveBlockTopoProperty(icmd);
-            m_topo_property->getFaceContainer().set(i, f2);
+            m_topo_property->getFaceContainer()[i] = f2;
 
             f1->saveFaceTopoProperty(icmd);
             f2->saveFaceTopoProperty(icmd);
@@ -471,8 +391,9 @@ replace(Face* f1, Face* f2, Internal::InfoCommand* icmd)
 void Block::
 replace(CoEdge* e1, CoEdge* e2, Internal::InfoCommand* icmd)
 {
-    for (uint i=0; i<getNbFaces(); i++)
-    	getFace(i)->replace(e1, e2, icmd);
+    std::vector<Face*> faces = getFaces();
+    for (uint i=0; i<faces.size(); i++)
+    	faces[i]->replace(e1, e2, icmd);
 }
 /*----------------------------------------------------------------------------*/
 //#define _DEBUG_REPRESENTATION
@@ -500,6 +421,8 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
     std::vector<Utils::Math::Point>& points = tdr->getPoints();
     std::vector<size_t>& indicesFilaire = tdr->getCurveDiscretization();
     std::vector<size_t>& indicesSurf = tdr->getSurfaceDiscretization();
+    std::vector<Vertex*> vertices = getVertices();
+    std::vector<Face*> faces = getFaces();
 
     // recherche du barycentre
     Utils::Math::Point barycentre = getBarycentre();
@@ -509,10 +432,10 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
     if (tdr->hasRepresentation(Utils::DisplayRepresentation::WIRE)){
         indicesFilaire.clear();
 
-        if (getNbVertices() == 8 && isStructured()){
+        if (vertices.size() == 8 && isStructured()){
 
-            for (uint i=0; i<getNbVertices(); i++)
-                points.push_back(barycentre + (getVertex(i)->getCoord() -  barycentre) * shrink);
+            for (uint i=0; i<vertices.size(); i++)
+                points.push_back(barycentre + (vertices[i]->getCoord() -  barycentre) * shrink);
 
             // construction des 12 arêtes en se servant du modèle de construction du bloc
             indicesFilaire.push_back(0);
@@ -553,16 +476,15 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
         }
         else {
             // utilisation de toutes les arêtes et construction de la représentation filaire
-            std::vector<Topo::Edge* > edges;
-            getEdges(edges);
+            std::vector<Topo::Edge* > edges = getEdges();
 
             for (std::vector<Topo::Edge* >::iterator iter = edges.begin();
                         iter != edges.end(); ++iter) {
-                Topo::Edge* edge = *iter;
-                if (edge->getNbVertices() == 2){
+                const std::vector<Vertex* >& edge_vertices = (*iter)->getVertices();
+                if (edge_vertices.size() == 2){
                     for (uint i=0; i<2; i++){
                         indicesFilaire.push_back(points.size());
-                        points.push_back(barycentre + (edge->getVertex(i)->getCoord() -  barycentre) * shrink);
+                        points.push_back(barycentre + (edge_vertices[i]->getCoord() -  barycentre) * shrink);
                     }
                 }
             } // end for iter = edges.begin()
@@ -571,9 +493,9 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
     else if (tdr->hasRepresentation(Utils::DisplayRepresentation::SOLID)) {
 
         // représentation à l'aide de 2 triangles par côté
-        if (getNbVertices() == 8 && isStructured()){
-            for (uint i=0; i<getNbVertices(); i++)
-                points.push_back(barycentre + (getVertex(i)->getCoord() -  barycentre) * shrink);
+        if (vertices.size() == 8 && isStructured()){
+            for (uint i=0; i<vertices.size(); i++)
+                points.push_back(barycentre + (vertices[i]->getCoord() -  barycentre) * shrink);
 
             indicesSurf.push_back(0);
             indicesSurf.push_back(1);
@@ -626,11 +548,11 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
         else {
             // utilisation d'une représentation de chacune des faces (sans shrink)
             // que l'on reporte dans celle du block.
-            for (uint i=0; i<getNbFaces(); i++){
+            for (uint i=0; i<faces.size(); i++){
 
                 TopoDisplayRepresentation   tr (Utils::DisplayRepresentation::SOLID);
                 tr.setShrink(1.0);
-                getFace(i)->getRepresentation (tr, checkDestroyed);
+                faces[i]->getRepresentation (tr, checkDestroyed);
 
                 std::vector<Utils::Math::Point>& face_points = tr.getPoints();
                 std::vector<size_t>& face_indicesSurf = tr.getSurfaceDiscretization();
@@ -654,7 +576,7 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
     	std::vector<size_t>& indices = tdr->getCurveDiscretization();
 
     	// un point de départ pour la représentation
-    	Utils::Math::Point orig = (barycentre + (getVertex(0)->getCoord() -  barycentre) * shrink);
+    	Utils::Math::Point orig = (barycentre + (vertices[0]->getCoord() -  barycentre) * shrink);
 
     	// trois vecteurs pour orienter et placer dans l'espace la représentation
     	Utils::Math::Vector vect1;
@@ -673,9 +595,9 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
     		std::vector<CoEdge* > coedges_dirI;
     		std::vector<CoEdge* > coedges_dirJ;
     		std::vector<CoEdge* > coedges_dirK;
-    		TopoHelper::getCoEdgesBetweenVertices(getVertex(0), getVertex(1), iCoedges, coedges_dirI);
-    		TopoHelper::getCoEdgesBetweenVertices(getVertex(0), getVertex(2), jCoedges, coedges_dirJ);
-    		TopoHelper::getCoEdgesBetweenVertices(getVertex(0), getVertex(4), kCoedges, coedges_dirK);
+    		TopoHelper::getCoEdgesBetweenVertices(vertices[0], vertices[1], iCoedges, coedges_dirI);
+    		TopoHelper::getCoEdgesBetweenVertices(vertices[0], vertices[2], jCoedges, coedges_dirJ);
+    		TopoHelper::getCoEdgesBetweenVertices(vertices[0], vertices[4], kCoedges, coedges_dirK);
 
     		// on va prendre la coedge1 et vect1 qui suivent le sens de la discrétisation (s'il y en a un)
     		CoEdge* coedge1 = coedges_dirI[0];
@@ -706,9 +628,10 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
              <<std::endl;
 #endif
 
-    		if (coedge1->getVertex(0) == getVertex(0))
+		    const std::vector<Topo::Vertex* >& coedge1_vertices = coedge1->getVertices();
+            if (coedge1_vertices[0] == vertices[0])
     			vect1 = Utils::Math::Vector(points_coedge1[0], points_coedge1[1]);
-    		else if (coedge1->getVertex(1) == getVertex(0))
+    		else if (coedge1_vertices[1] == vertices[0])
     			vect1 = Utils::Math::Vector(points_coedge1[points_coedge1.size()-1],
     					points_coedge1[points_coedge1.size()-2]);
     		else {
@@ -718,9 +641,10 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
     			throw TkUtil::Exception(messErr);
     		}
 
-    		if (coedge2->getVertex(0) == getVertex(0))
+		    const std::vector<Topo::Vertex* >& coedge2_vertices = coedge2->getVertices();
+    		if (coedge2_vertices[0] == vertices[0])
     			vect2 = Utils::Math::Vector(points_coedge2[0], points_coedge2[1]);
-    		else if (coedge2->getVertex(1) == getVertex(0))
+    		else if (coedge2_vertices[1] == vertices[0])
     			vect2 = Utils::Math::Vector(points_coedge2[points_coedge2.size()-1],
     					points_coedge2[points_coedge2.size()-2]);
     		else {
@@ -730,9 +654,10 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
     			throw TkUtil::Exception(messErr);
     		}
 
-    		if (coedge3->getVertex(0) == getVertex(0))
+		    const std::vector<Topo::Vertex* >& coedge3_vertices = coedge3->getVertices();
+    		if (coedge3_vertices[0] == vertices[0])
     			vect3 = Utils::Math::Vector(points_coedge3[0], points_coedge3[1]);
-    		else if (coedge3->getVertex(1) == getVertex(0))
+    		else if (coedge3_vertices[1] == vertices[0])
     			vect3 = Utils::Math::Vector(points_coedge3[points_coedge3.size()-1],
     					points_coedge3[points_coedge3.size()-2]);
     		else {
@@ -873,12 +798,11 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
     	else {
 
     		// recherche de 3 vecteurs
-    		std::vector<CoEdge* > coedges;
-    		getCoEdges(coedges);
+    		std::vector<CoEdge* > coedges = getCoEdges();
     		// on cherche les coedges reliées au sommet 0 du bloc
     		std::vector<CoEdge* > coedges_som0;
     		for (uint i=0; i<coedges.size(); i++)
-    			if (coedges[i]->find(getVertex(0)))
+    			if (Utils::contains(vertices[0], coedges[i]->getVertices()))
     				coedges_som0.push_back(coedges[i]);
 
     		if (coedges_som0.size() == 1){
@@ -902,9 +826,11 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
     			std::vector<Utils::Math::Point> points_coedge2;
     			coedge1->getPoints(coedge1->getMeshingProperty(), points_coedge1, true);
     			coedge2->getPoints(coedge2->getMeshingProperty(), points_coedge2, true);
-    			if (coedge1->getVertex(0) == getVertex(0))
+
+                const std::vector<Topo::Vertex* >& coedge1_vertices = coedge1->getVertices();
+    			if (coedge1_vertices[0] == vertices[0])
     				vect1 = Utils::Math::Vector(points_coedge1[0], points_coedge1[1]);
-    			else if (coedge1->getVertex(1) == getVertex(0))
+    			else if (coedge1_vertices[1] == vertices[0])
     				vect1 = Utils::Math::Vector(points_coedge1[points_coedge1.size()-1],
     						points_coedge1[points_coedge1.size()-2]);
     			else {
@@ -914,9 +840,10 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
     				throw TkUtil::Exception(messErr);
     			}
 
-        		if (coedge2->getVertex(0) == getVertex(0))
+    		    const std::vector<Topo::Vertex* >& coedge2_vertices = coedge2->getVertices();
+        		if (coedge2_vertices[0] == vertices[0])
         			vect2 = Utils::Math::Vector(points_coedge2[0], points_coedge2[1]);
-        		else if (coedge2->getVertex(1) == getVertex(0))
+        		else if (coedge2_vertices[1] == vertices[0])
         			vect2 = Utils::Math::Vector(points_coedge2[points_coedge2.size()-1],
         					points_coedge2[points_coedge2.size()-2]);
         		else {
@@ -927,10 +854,10 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
         		}
 
         		// cas cycliques
-        		if (coedge1->getVertex(0) == coedge1->getVertex(1)){
+        		if (coedge1_vertices[0] == coedge1_vertices[1]){
         			vect3 = Utils::Math::Vector(points_coedge1[points_coedge1.size()-1],
         			    						points_coedge1[points_coedge1.size()-2]);
-        		} else if (coedge1->getVertex(0) == coedge1->getVertex(1)){
+        		} else if (coedge1_vertices[0] == coedge1_vertices[1]){
         			vect3 = Utils::Math::Vector(points_coedge2[points_coedge2.size()-1],
         					points_coedge2[points_coedge2.size()-2]);
         		} else
@@ -959,9 +886,11 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
     			coedge1->getPoints(coedge1->getMeshingProperty(), points_coedge1, true);
     			coedge2->getPoints(coedge2->getMeshingProperty(), points_coedge2, true);
     			coedge3->getPoints(coedge3->getMeshingProperty(), points_coedge3, true);
-    			if (coedge1->getVertex(0) == getVertex(0))
+
+    		    const std::vector<Topo::Vertex* >& coedge1_vertices = coedge1->getVertices();
+    			if (coedge1_vertices[0] == vertices[0])
     				vect1 = Utils::Math::Vector(points_coedge1[0], points_coedge1[1]);
-    			else if (coedge1->getVertex(1) == getVertex(0))
+    			else if (coedge1_vertices[1] == vertices[0])
     				vect1 = Utils::Math::Vector(points_coedge1[points_coedge1.size()-1],
     						points_coedge1[points_coedge1.size()-2]);
     			else {
@@ -971,9 +900,10 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
     				throw TkUtil::Exception(messErr);
     			}
 
-        		if (coedge2->getVertex(0) == getVertex(0))
+		        const std::vector<Topo::Vertex* >& coedge2_vertices = coedge2->getVertices();
+        		if (coedge2_vertices[0] == vertices[0])
         			vect2 = Utils::Math::Vector(points_coedge2[0], points_coedge2[1]);
-        		else if (coedge2->getVertex(1) == getVertex(0))
+        		else if (coedge2_vertices[1] == vertices[0])
         			vect2 = Utils::Math::Vector(points_coedge2[points_coedge2.size()-1],
         					points_coedge2[points_coedge2.size()-2]);
         		else {
@@ -983,9 +913,10 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
         			throw TkUtil::Exception(messErr);
         		}
 
-        		if (coedge3->getVertex(0) == getVertex(0))
+    		    const std::vector<Topo::Vertex* >& coedge3_vertices = coedge3->getVertices();
+        		if (coedge3_vertices[0] == vertices[0])
         			vect3 = Utils::Math::Vector(points_coedge3[0], points_coedge3[1]);
-        		else if (coedge3->getVertex(1) == getVertex(0))
+        		else if (coedge3_vertices[1] == vertices[0])
         			vect3 = Utils::Math::Vector(points_coedge3[points_coedge3.size()-1],
         					points_coedge3[points_coedge3.size()-2]);
         		else {
@@ -1120,8 +1051,7 @@ getDescription (bool alsoComputed) const
 
     Utils::SerializedRepresentation  topoRelation ("Relations topologiques", "");
 
-    std::vector<Topo::Vertex* > vtx;
-    getVertices(vtx);
+    std::vector<Topo::Vertex* > vtx = getVertices();
 
     Utils::SerializedRepresentation  vertices ("Sommets topologiques",
             TkUtil::NumericConversions::toStr(vtx.size()));
@@ -1133,8 +1063,7 @@ getDescription (bool alsoComputed) const
 
 
     if (Internal::InternalPreferences::instance ( )._displayFace.getValue ( )){
-    	std::vector<Face* > fa;
-    	getFaces(fa);
+    	std::vector<Face* > fa = getFaces();
 
     	Utils::SerializedRepresentation  faces ("Faces topologiques",
     			TkUtil::NumericConversions::toStr(fa.size()));
@@ -1146,8 +1075,7 @@ getDescription (bool alsoComputed) const
     	topoRelation.addPropertiesSet (faces);
     }
     else {
-    	std::vector<CoFace* > fa;
-    	getCoFaces(fa);
+    	std::vector<CoFace* > fa = getCoFaces();
 
     	Utils::SerializedRepresentation  cofaces ("Faces topologiques",
     			TkUtil::NumericConversions::toStr(fa.size()));
@@ -1181,10 +1109,11 @@ bool Block::
 structurable()
 {
    if (!isStructured()) {
-       if (getNbFaces() == 6){
+       std::vector<Face*> faces = getFaces();
+       if (faces.size() == 6){
            // il faut de plus que les faces soient structurables
            for (uint i=0; i<6; i++)
-               if (!getFace(i)->structurable())
+               if (!faces[i]->structurable())
                    return false;
        }
        else
@@ -1203,9 +1132,10 @@ unstructure(Internal::InfoCommand* icmd)
 	throw TkUtil::Exception (TkUtil::UTF8String ("Non structuration d'un bloc non prévue", TkUtil::Charset::UTF_8));
 
     // propage la non-structuration aux faces autant que possible
+    std::vector<Face*> faces = getFaces();
     for (uint i=0; i<6; i++)
-        if (getFace(i)->unstructurable())
-            getFace(i)->unstructure(icmd);
+        if (faces[i]->unstructurable())
+            faces[i]->unstructure(icmd);
 }
 /*----------------------------------------------------------------------------*/
 void Block::setStructured(Internal::InfoCommand* icmd, bool str)
@@ -1233,16 +1163,16 @@ structure(Internal::InfoCommand* icmd)
 //    message1<<*this;
 //    log (TkUtil::TraceLog (message1, TkUtil::Log::TRACE_4));
 
+    std::vector<Face*> faces = getFaces();
     for (uint i=0; i<6; i++)
-        getFace(i)->structure(icmd);
+        faces[i]->structure(icmd);
 
     // Réordonne les Faces comme pour Bibop3D
     // cela suppose que les sommets soit ordonnés
     std::vector<Face* > sorted_faces;
 
     // On tient compte du cas avec bloc à 5 ou 6 sommets
-    std::vector<Topo::Vertex* > vertices;
-    getHexaVertices(vertices);
+    std::vector<Topo::Vertex* > vertices = getHexaVertices();
 
     for (uint i=0; i<6; i++){
         sorted_faces.push_back(getFace(
@@ -1254,7 +1184,7 @@ structure(Internal::InfoCommand* icmd)
     }
 
     m_topo_property->getFaceContainer().clear();
-    m_topo_property->getFaceContainer().add(sorted_faces);
+    Utils::append(m_topo_property->getFaceContainer(), sorted_faces);
 
     BlockMeshingProperty* prop = new BlockMeshingPropertyTransfinite();
     switchBlockMeshingProperty(icmd, prop);
@@ -1282,8 +1212,9 @@ check() const
     }
 
     // on lance la vérification des faces
-    for (uint i=0; i<getNbFaces(); i++)
-        getFace(i)->check();
+    std::vector<Face*> faces = getFaces();
+    for (uint i=0; i<faces.size(); i++)
+        faces[i]->check();
 
     if (getGeomAssociation() && getGeomAssociation()->isDestroyed()){
 		TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
@@ -1295,11 +1226,11 @@ check() const
 
     if (isStructured()){
         // les faces doivent être structurées
-        for (uint i=0; i<getNbFaces(); i++)
-            if (!getFace(i)->isStructured()) {
+        for (uint i=0; i<faces.size(); i++)
+            if (!faces[i]->isStructured()) {
 				TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
                 messErr << "Erreur avec le bloc structuré "<<getName()
-                        <<", sa face "<<getFace(i)->getName()
+                        <<", sa face "<<faces[i]->getName()
                         <<" n'est pas structurée";
                 throw TkUtil::Exception(messErr);
             }
@@ -1309,20 +1240,19 @@ check() const
         uint tabDirAretesFace[6][2] = {{2, 1}, {2, 1}, {2, 0}, {2, 0}, {1, 0}, {1, 0}};
 
         // construction d'un tableau avec les 8 sommets en duplicant les sommets en cas de dégénérescence
-        std::vector<Topo::Vertex* > sommets;
-        getHexaVertices(sommets);
+        std::vector<Topo::Vertex* > sommets = getHexaVertices();
 
         // calcul le nombre de bras pour chacune des directions
         uint nbBrasDir[3];
         getNbMeshingEdges(nbBrasDir[0], nbBrasDir[1], nbBrasDir[2]);
 
         // on vérifie que chacune des Face a le même nombre de bras que ce que l'on a trouvé pour le bloc
-        for (uint iFace=0; iFace<getNbFaces(); iFace++){
+        for (uint iFace=0; iFace<faces.size(); iFace++){
             Topo::Vertex* v0 = sommets[TopoHelper::tabIndVtxByFaceOnBlock[iFace][0]];
             Topo::Vertex* v1 = sommets[TopoHelper::tabIndVtxByFaceOnBlock[iFace][1]];
             uint nb1, nb2;
-            getFace(iFace)->getNbMeshingEdges(nb1, nb2);
-            Face::eDirOnFace dirFace = getFace(iFace)->getDir(v0, v1);
+            faces[iFace]->getNbMeshingEdges(nb1, nb2);
+            Face::eDirOnFace dirFace = faces[iFace]->getDir(v0, v1);
             // on permute si nécessaire pour que le premier (nb1) corresponde à la première direction tabDirAretesFace
             if (dirFace == Face::j_dir){
                 uint nb_tmp = nb1;
@@ -1332,7 +1262,7 @@ check() const
 
             if (nb1 != nbBrasDir[tabDirAretesFace[iFace][0]]){
 				TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-                messErr << "Erreur avec la face structurée "<<getFace(iFace)->getName()
+                messErr << "Erreur avec la face structurée "<<faces[iFace]->getName()
                         << " dans le bloc " <<getName()
                         <<", le premier côté n'a pas le même nombre de bras: "
                         << (short)nb1
@@ -1343,7 +1273,7 @@ check() const
 
             if (nb2 != nbBrasDir[tabDirAretesFace[iFace][1]]){
 				TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-                messErr << "Erreur avec la face structurée "<<getFace(iFace)->getName()
+                messErr << "Erreur avec la face structurée "<<faces[iFace]->getName()
                         << " dans le bloc " <<getName()
                         <<", le deuxième côté n'a pas le même nombre de bras: "
                         << (short)nb2
@@ -1359,39 +1289,42 @@ check() const
     return 0;
 }
 /*----------------------------------------------------------------------------*/
-void Block::
-getHexaVertices(std::vector<Topo::Vertex* >& sommets) const
+std::vector<Vertex*> Block::
+getHexaVertices() const
 {
-    sommets.resize(8);
-
-    if (getNbVertices() == 8){
+    std::vector<Vertex*> vertices = getVertices();
+    std::vector<Vertex*> sommets(8);
+    if (vertices.size() == 8){
         for (uint i=0; i<8; i++)
-            sommets[i] = getVertex(i);
-    } else if (getNbVertices() == 5){
+            sommets[i] = vertices[i];
+    } else if (vertices.size() == 5){
         for (uint i=0; i<5; i++)
-            sommets[i] = getVertex(i);
+            sommets[i] = vertices[i];
         sommets[5] = sommets[4];
         sommets[6] = sommets[4];
         sommets[7] = sommets[4];
-    } else if (getNbVertices() == 6){
+    } else if (vertices.size() == 6){
         for (uint i=0; i<4; i++)
-            sommets[i] = getVertex(i);
+            sommets[i] = vertices[i];
 
-        if (getFace(0)->getNbVertices() == 3 && getFace(1)->getNbVertices() == 3){
-            sommets[4] = getVertex(4);
-            sommets[5] = getVertex(5);
-            sommets[6] = getVertex(4);
-            sommets[7] = getVertex(5);
-        } else if (getFace(2)->getNbVertices() == 3 && getFace(3)->getNbVertices() == 3){
-            sommets[4] = getVertex(4);
-            sommets[5] = getVertex(4);
-            sommets[6] = getVertex(5);
-            sommets[7] = getVertex(5);
+        std::vector<Face*> faces = getFaces();
+        if (faces[0]->getVertices().size() == 3 && faces[1]->getVertices().size() == 3){
+            sommets[4] = vertices[4];
+            sommets[5] = vertices[5];
+            sommets[6] = vertices[4];
+            sommets[7] = vertices[5];
+        } else if (faces[2]->getVertices().size() == 3 && faces[3]->getVertices().size() == 3){
+            sommets[4] = vertices[4];
+            sommets[5] = vertices[4];
+            sommets[6] = vertices[5];
+            sommets[7] = vertices[5];
         } else
             throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne avec Block::getHexaVertices(), nb de sommets non prévus dans une des faces", TkUtil::Charset::UTF_8));
 
     } else
         throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne avec Block::getHexaVertices(), nb de sommets non prévus", TkUtil::Charset::UTF_8));
+
+    return sommets;
 }
 /*----------------------------------------------------------------------------*/
 Face* Block::
@@ -1417,16 +1350,17 @@ getFace(Topo::Vertex* v0, Topo::Vertex* v1, Topo::Vertex* v2, Topo::Vertex* v3)
 
     // recherche d'une face avec les nbVtx sommets de marqués
     Face* face_ok = 0;
-    for (uint i=0; i<getNbFaces(); i++) {
+    std::vector<Face*> faces = getFaces();
+    for (uint i=0; i<faces.size(); i++) {
         uint nb_marques = 0;
-        const std::vector<Topo::Vertex* > & local_vertices = getFace(i)->getVertices();
+        const std::vector<Topo::Vertex* > & local_vertices = faces[i]->getVertices();
         for (std::vector<Topo::Vertex* >::const_iterator iter2 = local_vertices.begin();
                 iter2 != local_vertices.end(); ++iter2) {
             if (filtre_sommets[*iter2] == 1)
                 nb_marques+=1;
         }
          if (nb_marques == nbVtx)
-             face_ok = getFace(i);
+             face_ok = faces[i];
     }
     if (!face_ok){
         std::cerr<<"Erreur avec Block::getFace("<<v0->getName()<<","
@@ -1471,15 +1405,15 @@ TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const Block & b)
     else
         o << ", sans projection";
 
-    o << " avec "<<(short)b.getNbFaces()<<" faces:\n";
-    const std::vector<Topo::Face* > & faces = b.getFaces();
+    const std::vector<Topo::Face*>& faces = b.getFaces();
+    o << " avec "<<(short)faces.size()<<" faces:\n";
     for (uint i=0; i<faces.size();i++)
         o << " "<<faces[i]->getName()<<"\n";
 //      o << *faces[i]<<"\n";
     o << "\n";
 
-    o << b.getName()<< " bloc avec "<<(short)b.getNbVertices()<<" sommets:\n";
-    const std::vector<Topo::Vertex* > & vertices = b.getVertices();
+    const std::vector<Topo::Vertex*> & vertices = b.getVertices();
+    o << b.getName()<< " bloc avec "<<(short)vertices.size()<<" sommets:\n";
     for (uint i=0; i<vertices.size();i++){
         o <<"   "<<*vertices[i]<<"\n";
     }
@@ -1504,109 +1438,17 @@ Topo::TopoInfo Block::getInfos() const
 	if (getGeomAssociation() != 0)
 		infos.geom_entity = getGeomAssociation()->getName();
 
-    std::vector<Vertex*> vertices;
-    getVertices(vertices);
+    const std::vector<Vertex*>& vertices = getVertices();
     infos._vertices = Utils::toNames(vertices);
 
-    std::vector<CoEdge*> coedges;
-    getCoEdges(coedges);
+    std::vector<CoEdge*> coedges = getCoEdges();
     infos._coedges = Utils::toNames(coedges);
     
-    std::vector<CoFace*> cofaces;
-	getCoFaces(cofaces);
+    std::vector<CoFace*> cofaces = getCoFaces();
     infos._cofaces = Utils::toNames(cofaces);
 
     return infos;
 }
-/*----------------------------------------------------------------------------*/
-//void Block::
-//getEdges(eDirOnBlock dir, std::vector<Edge* > & edges) const
-//{
-//
-//    if (!isStructured())
-//        throw TkUtil::Exception("Block::getEdges(dir) n'est pas possible avec un bloc non structuré");
-//
-//    std::list<Topo::Edge*> l_e;
-//
-//    // attention, un bloc structuré a 5, 6 ou 8 sommets suivant les dégénérescences
-//    if (dir == i_dir){
-//        l_e.push_back(getFace(2)->getEdge(getVertex(0),getVertex(1)));
-//        l_e.push_back(getFace(4)->getEdge(getVertex(0),getVertex(1)));
-//        l_e.push_back(getFace(4)->getEdge(getVertex(2),getVertex(3)));
-//        l_e.push_back(getFace(3)->getEdge(getVertex(2),getVertex(3)));
-//
-//        if (getNbFaces() == 6){
-//            l_e.push_back(getFace(2)->getEdge(getVertex(4),getVertex(5)));
-//            l_e.push_back(getFace(5)->getEdge(getVertex(4),getVertex(5)));
-//            l_e.push_back(getFace(5)->getEdge(getVertex(6),getVertex(7)));
-//            l_e.push_back(getFace(3)->getEdge(getVertex(6),getVertex(7)));
-//        }
-//        else if (getFace(2)->getNbVertices() == 4){
-//            l_e.push_back(getFace(2)->getEdge(getVertex(4),getVertex(5)));
-//            l_e.push_back(getFace(3)->getEdge(getVertex(4),getVertex(5)));
-//        }
-//
-//    }
-//    else if (dir == j_dir){
-//        l_e.push_back(getFace(0)->getEdge(getVertex(0),getVertex(2)));
-//        l_e.push_back(getFace(4)->getEdge(getVertex(0),getVertex(2)));
-//        l_e.push_back(getFace(4)->getEdge(getVertex(1),getVertex(3)));
-//        l_e.push_back(getFace(1)->getEdge(getVertex(1),getVertex(3)));
-//
-//        if (getNbFaces() == 6){
-//            l_e.push_back(getFace(0)->getEdge(getVertex(4),getVertex(6)));
-//            l_e.push_back(getFace(5)->getEdge(getVertex(4),getVertex(6)));
-//            l_e.push_back(getFace(5)->getEdge(getVertex(5),getVertex(7)));
-//            l_e.push_back(getFace(1)->getEdge(getVertex(5),getVertex(7)));
-//        }
-//        else if (getFace(0)->getNbVertices() == 4){
-//            l_e.push_back(getFace(0)->getEdge(getVertex(4),getVertex(5)));
-//            l_e.push_back(getFace(1)->getEdge(getVertex(4),getVertex(5)));
-//        }
-//
-//    }
-//    else if (dir == k_dir){
-//
-//        // construction d'un tableau avec les 8 sommets en duplicant les sommets en cas de dégénérescence
-//        std::vector<Topo::Vertex* > sommets;
-//        getHexaVertices(sommets);
-//
-//        if (getFace(0)->getNbVertices() == 3 && getFace(1)->getNbVertices() == 3) {
-//            l_e.push_back(getFace(0)->getEdge(0));
-//            l_e.push_back(getFace(0)->getEdge(2));
-//            l_e.push_back(getFace(1)->getEdge(0));
-//            l_e.push_back(getFace(1)->getEdge(2));
-//        }
-//        else {
-//            l_e.push_back(getFace(0)->getEdge(sommets[0],sommets[4]));
-//            l_e.push_back(getFace(0)->getEdge(sommets[2],sommets[6]));
-//            l_e.push_back(getFace(1)->getEdge(sommets[1],sommets[5]));
-//            l_e.push_back(getFace(1)->getEdge(sommets[3],sommets[7]));
-//        }
-//
-//        if (getFace(2)->getNbVertices() == 3 && getFace(3)->getNbVertices() == 3) {
-//            l_e.push_back(getFace(2)->getEdge(0));
-//            l_e.push_back(getFace(2)->getEdge(2));
-//            l_e.push_back(getFace(3)->getEdge(0));
-//            l_e.push_back(getFace(3)->getEdge(2));
-//        }
-//        else {
-//            l_e.push_back(getFace(2)->getEdge(sommets[0],sommets[4]));
-//            l_e.push_back(getFace(2)->getEdge(sommets[1],sommets[5]));
-//            l_e.push_back(getFace(3)->getEdge(sommets[2],sommets[6]));
-//            l_e.push_back(getFace(3)->getEdge(sommets[3],sommets[7]));
-//        }
-//
-//    }
-//    else
-//        throw TkUtil::Exception("Block::getEdges avec une direction non prévue");
-//
-//    l_e.sort(Utils::Entity::compareEntity);
-//    l_e.unique();
-//
-//    edges.clear();
-//    edges.insert(edges.end(),l_e.begin(),l_e.end());
-//}
 /*----------------------------------------------------------------------------*/
 void Block::
 getOrientedCoEdges(std::vector<CoEdge* > & iCoedges,
@@ -1627,23 +1469,12 @@ getOrientedCoEdges(std::vector<CoEdge* > & iCoedges,
 
     // on marque les CoEdges dans le bloc
     std::map<CoEdge*, uint> filtre_coedge;
-    for(uint f=0; f < getNbFaces(); f++){
-        Face* face = getFace(f);
-
-        for(uint i=0; i < face->getNbCoFaces(); i++){
-            CoFace* coface = face->getCoFace(i);
-
-            for(uint j=0; j < coface->getNbEdges(); j++){
-                Edge* edge = coface->getEdge(j);
-
-                for(uint k=0; k < edge->getNbCoEdges(); k++){
-                    CoEdge* coedge = edge->getCoEdge(k);
+    const std::vector<Topo::Face*>& faces = getFaces();
+    for(Face* face : faces)
+        for(CoFace* coface : face->getCoFaces())
+            for(Edge* edge : coface->getEdges())
+                for(CoEdge* coedge : edge->getCoEdges())
                     filtre_coedge[coedge] = 1;
-
-                } // for(uint k=0; k < edge->getNbCoEdges(); k++)
-            } // for(uint j=0; j < coface->getNbEdges(); j++)
-        } // for(uint i=0; i < getNbCoFaces(); i++)
-    } // for(uint f=0; f < getNbFaces(); f++)
 
     // tableau de 3 vecteurs de CoEdges pour le stockage temporaire
     std::vector<CoEdge* > tabCoedges[3];
@@ -1652,8 +1483,8 @@ getOrientedCoEdges(std::vector<CoEdge* > & iCoedges,
 
     // ordre des faces pour un parcours avec des faces ayant une coedge en commun
     const uint tabIndFace[6] = {4, 0, 2, 1, 3, 5};
-    for (uint i=0; i<getNbFaces(); i++){
-        Face* face = getFace(tabIndFace[i]);
+    for (uint i=0; i<faces.size(); i++){
+        Face* face = faces[tabIndFace[i]];
 
         std::vector<CoEdge* > iCoedges_face;
         std::vector<CoEdge* > jCoedges_face;
@@ -1732,17 +1563,18 @@ getOrientedCoEdges(std::vector<CoEdge* > & iCoedges,
     } // for (uint i=0; i<getNbFaces(); i++)
 
     // recherche de la correspondance entre direction dans bloc et les groupes de CoEdges
+    const std::vector<Vertex*>& vertices = getVertices();
     std::vector<CoEdge* > coedges_between; // inutilisé
     for (uint i=0; i<3 && iCoedges.empty(); i++)
-        if (TopoHelper::getCoEdgesBetweenVertices(getVertex(0), getVertex(1), tabCoedges[i], coedges_between))
+        if (TopoHelper::getCoEdgesBetweenVertices(vertices[0], vertices[1], tabCoedges[i], coedges_between))
             iCoedges = tabCoedges[i];
 
     for (uint i=0; i<3 && jCoedges.empty(); i++)
-        if (TopoHelper::getCoEdgesBetweenVertices(getVertex(0), getVertex(2), tabCoedges[i], coedges_between))
+        if (TopoHelper::getCoEdgesBetweenVertices(vertices[0], vertices[2], tabCoedges[i], coedges_between))
             jCoedges = tabCoedges[i];
 
     for (uint i=0; i<3 && kCoedges.empty(); i++)
-        if (TopoHelper::getCoEdgesBetweenVertices(getVertex(0), getVertex(4), tabCoedges[i], coedges_between))
+        if (TopoHelper::getCoEdgesBetweenVertices(vertices[0], vertices[4], tabCoedges[i], coedges_between))
             kCoedges = tabCoedges[i];
 
     if (iCoedges.empty() || jCoedges.empty() || kCoedges.empty()){
@@ -1779,11 +1611,13 @@ getNbMeshingEdges(uint& nbI, uint& nbJ, uint& nbK, bool accept_error) const
 
     // on utilise la recherche des discrétisations pour 2 faces orthogonales
     uint nbI_face0, nbJ_face0, nbI_face4, nbJ_face4;
-    getFace(0)->getNbMeshingEdges(nbI_face0, nbJ_face0, accept_error);
-    getFace(4)->getNbMeshingEdges(nbI_face4, nbJ_face4, accept_error);
+    const std::vector<Face*>& faces = getFaces();
+    faces[0]->getNbMeshingEdges(nbI_face0, nbJ_face0, accept_error);
+    faces[4]->getNbMeshingEdges(nbI_face4, nbJ_face4, accept_error);
 
-    Face::eDirOnFace dirI = getFace(4)->getDir(getVertex(0), getVertex(1));
-    Face::eDirOnFace dirK = getFace(0)->getDir(getVertex(0), getVertex(4));
+    const std::vector<Vertex*>& vertices = getVertices();
+    Face::eDirOnFace dirI = faces[4]->getDir(vertices[0], vertices[1]);
+    Face::eDirOnFace dirK = faces[0]->getDir(vertices[0], vertices[4]);
 
     if (dirI == Face::i_dir){
         nbI = nbI_face4;
@@ -1933,8 +1767,9 @@ fuse(Block* bloc_B,
     // recherche de la face dont tous les sommets ont un sommet en correspondance
     Face* face_A = 0;
     bool faceATrouvee = false;
-    for (uint i=0; i<getNbFaces() && !faceATrouvee; i++){
-        Face* face = getFace(i);
+    const std::vector<Face*>& faces = getFaces();
+    for (uint i=0; i<faces.size() && !faceATrouvee; i++){
+        Face* face = faces[i];
         const std::vector<Topo::Vertex* > & vertices = face->getVertices();
 
         bool tousMarques = true;
@@ -1959,8 +1794,9 @@ fuse(Block* bloc_B,
 
     Face* face_B = 0;
     bool faceBTrouvee = false;
-    for (uint i=0; i<bloc_B->getNbFaces() && !faceBTrouvee; i++){
-        Face* face = bloc_B->getFace(i);
+    const std::vector<Face*>& Bfaces = bloc_B->getFaces();
+    for (uint i=0; i<Bfaces.size() && !faceBTrouvee; i++){
+        Face* face = Bfaces[i];
         const std::vector<Topo::Vertex* > vertices = face->getVertices();
 
         bool tousMarques = true;
@@ -2038,13 +1874,12 @@ void Block::extendSplit(CoEdge* arete,
     // recherche dans une face du bloc et voisine de l'arête
     // une arête d'une direction différente
     std::map<CoFace*, uint> filtre_coface;
-    std::vector<CoFace* > cofaces;
-    getCoFaces(cofaces);
+    std::vector<CoFace* > cofaces = getCoFaces();
     for (std::vector<CoFace* >::iterator iter = cofaces.begin();
             iter != cofaces.end(); ++iter)
         filtre_coface[*iter] = 1;
 
-    arete->getCoFaces(cofaces);
+    cofaces = arete->getCoFaces();
     CoFace* coface = 0;
     for (std::vector<CoFace* >::iterator iter = cofaces.begin();
             iter != cofaces.end(); ++iter)
@@ -2057,11 +1892,9 @@ void Block::extendSplit(CoEdge* arete,
     CoEdge* coedge = 0;
     std::vector<CoEdge* > coedges;
     uint marque_arete = dir + 1;
-    coface->getCoEdges(coedges);
-    for (std::vector<Topo::CoEdge* >::iterator iter = coedges.begin();
-            iter != coedges.end(); ++iter)
-        if (filtre_coedge[*iter] != marque_arete)
-            coedge = *iter;
+    for (Topo::CoEdge* ce : coface->getCoEdges())
+        if (filtre_coedge[ce] != marque_arete)
+            coedge = ce;
 
     if (0 == coedge)
            throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, on ne trouve pas d'arête dans une autre direction et dans une même coface", TkUtil::Charset::UTF_8));
@@ -2070,11 +1903,13 @@ void Block::extendSplit(CoEdge* arete,
     timer.reset();
     timer.start();
 #endif
-    if (coedge->getVertex(0) == arete->getVertex(0)
-    		|| coedge->getVertex(0) == arete->getVertex(1))
+    const std::vector<Vertex*>& ce_vertices = coedge->getVertices();
+    const std::vector<Vertex*>& ar_vertices = arete->getVertices();
+    if (ce_vertices[0] == ar_vertices[0]
+    		|| ce_vertices[0] == ar_vertices[1])
     	split(coedge, 0.0, newBlocs, icmd);
-    else if (coedge->getVertex(1) == arete->getVertex(0)
-    		|| coedge->getVertex(1) == arete->getVertex(1))
+    else if (ce_vertices[1] == ar_vertices[0]
+    		|| ce_vertices[1] == ar_vertices[1])
     	split(coedge, 1.0, newBlocs, icmd);
     else
     	throw TkUtil::Exception (TkUtil::UTF8String ("On ne trouve pas de sommet commun entre l'arête sélectionnée et l'arête transverse", TkUtil::Charset::UTF_8));
@@ -2131,8 +1966,7 @@ split(CoEdge* arete, double ratio,
 #endif
 
     // les faces communes autorisées pour la coupe
-    std::vector<CoFace* > blk_cofaces;
-    getCoFaces(blk_cofaces);
+    std::vector<CoFace* > blk_cofaces = getCoFaces();
 
     // les Edges qui coupent le bloc en deux
     std::vector<Edge* > splitingEdges;
@@ -2150,15 +1984,17 @@ split(CoEdge* arete, double ratio,
 
     // les faces qui ne sont pas concernées par la coupe
     uint ind_face0 = dirSplit*2;
-    Face* face0 = getFace(ind_face0);
-    Face* face1 = (getNbVertices()!=8 && dirSplit==k_dir?0:getFace(dirSplit*2+1));
+    const std::vector<Face*>& faces = getFaces();
+    Face* face0 = faces[ind_face0];
+    const std::vector<Vertex*>& vertices = getVertices();
+    Face* face1 = (vertices.size()!=8 && dirSplit==k_dir?0:faces[dirSplit*2+1]);
     Face* faceI[4];
     Face* newFaceI[4][2];
 #ifdef _DEBUG_SPLIT
     std::cout<<"face0 : "<<face0->getName()<<std::endl;
 #endif
     // nombre de Faces impactées par la coupe
-    uint nbFacesCoupees = face0->getNbVertices();
+    uint nbFacesCoupees = face0->getVertices().size();
 
 #ifdef _DEBUG_TIMER
     timer.reset();
@@ -2166,10 +2002,10 @@ split(CoEdge* arete, double ratio,
 #endif
     for (uint i=0; i<nbFacesCoupees; i++){
 
-        if (tabIndFaceParDir[dirSplit][i]<getNbFaces()){
+        if (tabIndFaceParDir[dirSplit][i]<faces.size()){
 
             // la face que l'on coupe
-            faceI[i] = getFace(tabIndFaceParDir[dirSplit][i]);
+            faceI[i] = faces[tabIndFaceParDir[dirSplit][i]];
 
             // on découpe la face en deux
             faceI[i]->split(splitingEdges, newFaceI[i][0], newFaceI[i][1], icmd);
@@ -2201,19 +2037,19 @@ split(CoEdge* arete, double ratio,
             continue;
 
         Topo::Vertex* vtx;
-        if (i == 0 && getNbVertices() != 8)
+        if (i == 0 && vertices.size() != 8)
             // on évite le sommet du bloc s'il est dégénéré
-            vtx = getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][1]);
+            vtx = vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][1]];
         else
-            vtx = getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][i]);
+            vtx = vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][i]];
 #ifdef _DEBUG_SPLIT
         std::cout <<"sommet "<<vtx->getName()<<" pour ordonner les 2 faces : "
                 <<newFaceI[i][0]->getName()<<" et "<<newFaceI[i][1]->getName()<<std::endl;
 #endif
 
-        if (newFaceI[i][0]->find(vtx)){
+        if (Utils::contains(vtx, newFaceI[i][0]->getVertices())){
             // rien à faire
-        } else if (newFaceI[i][1]->find(vtx)) {
+        } else if (Utils::contains(vtx, newFaceI[i][1]->getVertices())) {
             // il faut permuter les 2 faces
             Face* face_tmp = newFaceI[i][1];
             newFaceI[i][1] = newFaceI[i][0];
@@ -2234,15 +2070,15 @@ split(CoEdge* arete, double ratio,
         // on se base sur les 2 sommets en contact avec la face inchangée
         Topo::Vertex* vtx1;
         Topo::Vertex* vtx2;
-        if (getNbVertices() == 6 && ind_face0 == 0 && i == 3)
-            vtx1 = getVertex(5);
+        if (vertices.size() == 6 && ind_face0 == 0 && i == 3)
+            vtx1 = vertices[5];
         else
-            vtx1 = getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][i]);
+            vtx1 = vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][i]];
 
-        if (getNbVertices() == 6 && nbFacesCoupees == 4 && ind_face0 == 0 && i == 2)
-            vtx2 = getVertex(5);
+        if (vertices.size() == 6 && nbFacesCoupees == 4 && ind_face0 == 0 && i == 2)
+            vtx2 = vertices[5];
         else
-            vtx2 = getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][(i+1)%nbFacesCoupees]);
+            vtx2 = vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][(i+1)%nbFacesCoupees]];
 
     	if (i>=4)
     		throw TkUtil::Exception (TkUtil::UTF8String ("Erreur Interne, Bloc::split echoue avec i trop grand", TkUtil::Charset::UTF_8));
@@ -2349,12 +2185,12 @@ split(CoEdge* arete, double ratio,
     std::vector<Topo::Vertex* > vertices_2;
 
     // les nouveaux blocs dépendent du type de bloc au départ
-    if (getNbVertices() == 8){
+    if (vertices.size() == 8){
         // cas du bloc hexaédrique
-        vertices_1.push_back(getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][0]));
-        vertices_1.push_back(getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][1]));
-        vertices_1.push_back(getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][3]));
-        vertices_1.push_back(getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][2]));
+        vertices_1.push_back(vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][0]]);
+        vertices_1.push_back(vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][1]]);
+        vertices_1.push_back(vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][3]]);
+        vertices_1.push_back(vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][2]]);
         vertices_1.push_back(splitingVertices[0]);
         vertices_1.push_back(splitingVertices[1]);
         vertices_1.push_back(splitingVertices[3]);
@@ -2390,16 +2226,16 @@ split(CoEdge* arete, double ratio,
         faces_2.push_back(face1);
 
 
-    } else if (getNbVertices() == 6){
+    } else if (vertices.size() == 6){
         // cas du bloc avec dégénérescence en prisme
 
         if (nbFacesCoupees == 3){
             // cas avec une coupe des 3 faces quadrangulaires
-            vertices_1.push_back(getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][1]));
+            vertices_1.push_back(vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][1]]);
             vertices_1.push_back(splitingVertices[1]);
-            vertices_1.push_back(getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][2]));
+            vertices_1.push_back(vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][2]]);
             vertices_1.push_back(splitingVertices[2]);
-            vertices_1.push_back(getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][0]));
+            vertices_1.push_back(vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][0]]);
             vertices_1.push_back(splitingVertices[0]);
 
             faces_1.push_back(face0);
@@ -2424,9 +2260,9 @@ split(CoEdge* arete, double ratio,
         }
         else if (0 == newFaceI[3][0]) {
             // cas de la coupe des 2 faces triangulaires, du quad à la base, et on suit l'arête somitale
-            vertices_1.push_back(getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][1]));
+            vertices_1.push_back(vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][1]]);
             vertices_1.push_back(splitingVertices[1]);
-            vertices_1.push_back(getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][2]));
+            vertices_1.push_back(vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][2]]);
             vertices_1.push_back(splitingVertices[2]);
             vertices_1.push_back(splitingVertices[0]);
             vertices_1.push_back(splitingVertices[3]);
@@ -2460,10 +2296,10 @@ split(CoEdge* arete, double ratio,
             faces_1.push_back(face0);
             faces_1.push_back(new_face_1);
 
-            vertices_1.push_back(getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][0]));
-            vertices_1.push_back(getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][1]));
-            vertices_1.push_back(getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][3]));
-            vertices_1.push_back(getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][2]));
+            vertices_1.push_back(vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][0]]);
+            vertices_1.push_back(vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][1]]);
+            vertices_1.push_back(vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][3]]);
+            vertices_1.push_back(vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][2]]);
             vertices_1.push_back(splitingVertices[0]);
             vertices_1.push_back(splitingVertices[1]);
             vertices_1.push_back(splitingVertices[3]);
@@ -2496,7 +2332,7 @@ split(CoEdge* arete, double ratio,
                 vertices_2.push_back(vtx);
         }
 
-    } else if (getNbVertices() == 5){
+    } else if (vertices.size() == 5){
         // cas du bloc avec dégénérescence en pyramide
 
         if (nbFacesCoupees == 4) {
@@ -2508,10 +2344,10 @@ split(CoEdge* arete, double ratio,
             faces_1.push_back(face0);
             faces_1.push_back(new_face_1);
 
-            vertices_1.push_back(getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][0]));
-            vertices_1.push_back(getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][1]));
-            vertices_1.push_back(getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][3]));
-            vertices_1.push_back(getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][2]));
+            vertices_1.push_back(vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][0]]);
+            vertices_1.push_back(vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][1]]);
+            vertices_1.push_back(vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][3]]);
+            vertices_1.push_back(vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][2]]);
             vertices_1.push_back(splitingVertices[0]);
             vertices_1.push_back(splitingVertices[1]);
             vertices_1.push_back(splitingVertices[3]);
@@ -2538,11 +2374,11 @@ split(CoEdge* arete, double ratio,
         }
         else {
             // cas avec la coupe de la base (quad) et de 2 tri
-            vertices_1.push_back(getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][1]));
+            vertices_1.push_back(vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][1]]);
             vertices_1.push_back(splitingVertices[1]);
-            vertices_1.push_back(getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][2]));
+            vertices_1.push_back(vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][2]]);
             vertices_1.push_back(splitingVertices[2]);
-            vertices_1.push_back(getVertex(TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][0]));
+            vertices_1.push_back(vertices[TopoHelper::tabIndVtxByFaceOnBlock[ind_face0][0]]);
 
             faces_1.push_back(face0);
             faces_1.push_back(new_face_1);
@@ -2585,9 +2421,7 @@ split(CoEdge* arete, double ratio,
     block_1->setGeomAssociation(getGeomAssociation());
     block_2->setGeomAssociation(getGeomAssociation());
 
-    Utils::Container<Group::Group3D>& groups = m_topo_property->getGroupsContainer();
-    for (uint i=0; i<groups.size(); i++){
-    	Group::Group3D* gr = groups.get(i);
+    for (Group::Group3D* gr : m_topo_property->getGroupsContainer()){
     	gr->add(block_1);
     	gr->add(block_2);
     	block_1->add(gr);
@@ -2652,14 +2486,12 @@ unrefine(eDirOnBlock dir,
     // on met à 2 la marque pour les CoFace et CoEdge reliés à 2 blocs
     std::map<CoEdge*, uint> filtre_coedges;
     std::map<CoFace*, uint> filtre_cofaces;
-    for(uint f=0; f < getNbFaces(); f++){
-        Face* face = getFace(f);
-
-        for(uint i=0; i < face->getNbCoFaces(); i++){
-            CoFace* coface = face->getCoFace(i);
+    const std::vector<Face*>& faces = getFaces();
+    for(Face* face : faces){
+        for(CoFace* coface : face->getCoFaces()){
             // la CoFace est-elle entre 2 blocs ?
             bool coFaceInterne = false;
-            if (coface->getNbFaces() == 2){
+            if (coface->getFaces().size() == 2){
                 filtre_cofaces[coface] = 2;
                 coFaceInterne = true;
             }
@@ -2668,20 +2500,12 @@ unrefine(eDirOnBlock dir,
                 coFaceInterne = false;
             }
 
-            for(uint j=0; j < coface->getNbEdges(); j++){
-                Edge* edge = coface->getEdge(j);
-
-                for(uint k=0; k < edge->getNbCoEdges(); k++){
-                    CoEdge* coedge = edge->getCoEdge(k);
-                    if (coFaceInterne) {
+            for(Edge* edge : coface->getEdges())
+                for(CoEdge* coedge : edge->getCoEdges())
+                    if (coFaceInterne)
                         filtre_coedges[coedge] = 2;
-                    }
-                    else {
-                        if (filtre_coedges[coedge] != 2)
-                            filtre_coedges[coedge] = 1;
-                    }
-                } // for(uint k=0; k < edge->getNbCoEdges(); k++)
-            } // for(uint j=0; j < coface->getNbEdges(); j++)
+                    else if (filtre_coedges[coedge] != 2)
+                        filtre_coedges[coedge] = 1;
         } // for(uint i=0; i < getNbCoFaces(); i++)
     } // for(uint f=0; f < getNbFaces(); f++)
 
@@ -2714,34 +2538,29 @@ unrefine(eDirOnBlock dir,
     // si elles sont marquées à 1, on traite les Edges:
     //    pour les CoEdges marquées à 2, on déraffine l'arête
     //    pour les CoEdges marquées à 1, on modifie la discrétisation
+    const std::vector<Vertex*>& vertices = getVertices();
     for (uint f=0; f<4; f++)
-        if (tabIndFaceParDir[dir][f]<getNbFaces()){
-            Face* face = getFace(tabIndFaceParDir[dir][f]);
+        if (tabIndFaceParDir[dir][f]<faces.size()){
+            Face* face = faces[tabIndFaceParDir[dir][f]];
 
             // on recherche la direction touchée par le déraffinement
             uint indFace = f;
             if (f == 2)
                 indFace = 1;
 
-            Face::eDirOnFace dirLoc = face->getDir(getVertex(TopoHelper::tabIndVtxByEdgeAndDirOnBlock[dir][indFace][0]),
-                    getVertex(TopoHelper::tabIndVtxByEdgeAndDirOnBlock[dir][indFace][1]));
+            Face::eDirOnFace dirLoc = face->getDir(vertices[TopoHelper::tabIndVtxByEdgeAndDirOnBlock[dir][indFace][0]],
+                    vertices[TopoHelper::tabIndVtxByEdgeAndDirOnBlock[dir][indFace][1]]);
 
-            for(uint i=0; i < face->getNbCoFaces(); i++){
-                CoFace* coface = face->getCoFace(i);
+            for(uint i=0; i < face->getCoFaces().size(); i++){
+                CoFace* coface = face->getCoFaces()[i];
                 if (filtre_cofaces[coface] == 2){
                     int old_ratio = face->getRatio(coface, dirLoc);
                     face->saveFaceMeshingProperty(icmd);
                     face->setRatio(coface, old_ratio*ratio, dirLoc);
                 }
                 else {
-                    std::vector<Edge* > edges;
-                    coface->getEdges(edges);
-
-                    for (std::vector<Edge* >::iterator iter1=edges.begin();
-                            iter1!=edges.end(); ++iter1){
-                        Edge* edge = *iter1;
-                        std::vector<CoEdge* > coedges;
-                        edge->getCoEdges(coedges);
+                    for (Edge* edge : coface->getEdges()){
+                        std::vector<CoEdge* > coedges = edge->getCoEdges();
                         for (std::vector<CoEdge* >::iterator iter2=coedges.begin();
                                                     iter2!=coedges.end(); ++iter2){
                             CoEdge* coedge = *iter2;
@@ -2756,7 +2575,7 @@ unrefine(eDirOnBlock dir,
 
                             } else if (filtre_coedges[coedge] == 2){
 
-                                if (edge->getNbCoFaces() != 1){
+                                if (edge->getCoFaces().size() != 1){
                                     // on duplique l'arête
                                     Edge* new_edge = edge->clone();
                                     if (icmd)
@@ -2812,9 +2631,10 @@ free(Internal::InfoCommand* icmd)
     setDestroyed(true);
 
     // suppression des relations remontantes des faces vers ce block
-    for (uint i=0; i<getNbFaces(); i++) {
-        getFace(i)->saveFaceTopoProperty(icmd);
-        getFace(i)->removeBlock(this, false);
+    const std::vector<Face*>& faces = getFaces();
+    for (uint i=0; i<faces.size(); i++) {
+        faces[i]->saveFaceTopoProperty(icmd);
+        faces[i]->removeBlock(this);
     }
 
     clearDependancy();
@@ -2824,15 +2644,15 @@ void Block::
 degenerateFaceInVertex(uint id, Internal::InfoCommand* icmd)
 {
     // la face qui disparait
-    Face* face = getFace(id);
+    Face* face = getFaces()[id];
 
-    if (face->getNbCoFaces() != 1)
+    if (face->getCoFaces().size() != 1)
         throw TkUtil::Exception (TkUtil::UTF8String ("Erreur Interne, il n'est pas prévu de faire appel à Block::degenerateFaceInEdge pour une face composée", TkUtil::Charset::UTF_8));
 
     // la coface qui disparait
-     CoFace* coface = face->getCoFace(0);
+     CoFace* coface = face->getCoFaces()[0];
 
-     if (coface->getNbVertices() != 4)
+     if (coface->getVertices().size() != 4)
          throw TkUtil::Exception (TkUtil::UTF8String ("Erreur Interne, il n'est pas prévu de faire appel à Block::degenerateFaceInVertex pour une face avec autre chose que 4 sommets", TkUtil::Charset::UTF_8));
 
     // sauvegarde pour undo ou retour en arrière en cas d'échec
@@ -2843,24 +2663,25 @@ degenerateFaceInVertex(uint id, Internal::InfoCommand* icmd)
 
     // les fusions de sommets des arêtes (qui disparaissent de la face)
 
-    Edge* a0 = coface->getEdge(0);
-    Edge* a2 = coface->getEdge(2);
+    const std::vector<Edge* >& edges = coface->getEdges();
+    Edge* a0 = edges[0];
+    Edge* a2 = edges[2];
     a0->collapse(icmd);
     a2->collapse(icmd);
-    Edge* a1 = coface->getEdge(0);
-    Edge* a3 = coface->getEdge(1);
+    Edge* a1 = edges[0];
+    Edge* a3 = edges[1];
     a1->merge(a3, icmd, false);
     a1->collapse(icmd);
 
     coface->free(icmd);
     face->free(icmd);
-    m_topo_property->getFaceContainer().remove(face, true);
+    Utils::remove(face, m_topo_property->getFaceContainer());
 
     // suppression des sommets de la liste
     m_topo_property->getVertexContainer().resize(5);
 
     // des fois que ...
-    if (getVertex(4)->isDestroyed())
+    if (getVertices()[4]->isDestroyed())
         throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne Block::degenerateFaceInVertex, le sommet conservé est détruit", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
@@ -2871,13 +2692,13 @@ degenerateFaceInEdge(uint id, Topo::Vertex* v1, Topo::Vertex* v2,
 	// comme pour degenerateFaceInVertex, mais sans le dernier collapse
 
 	// la face qui disparait
-	Face* face = getFace(id);
+    Face* face = getFaces()[id];
 
-	if (face->getNbCoFaces() != 1)
+	if (face->getCoFaces().size() != 1)
 		throw TkUtil::Exception (TkUtil::UTF8String ("Erreur Interne, il n'est pas prévu de faire appel à Block::degenerateFaceInEdge pour une face composée", TkUtil::Charset::UTF_8));
 
 	// la coface qui disparait
-	CoFace* coface = face->getCoFace(0);
+	CoFace* coface = face->getCoFaces()[0];
 
 	// sauvegarde pour undo ou retour en arrière en cas d'échec
 	saveBlockTopoProperty(icmd);
@@ -2891,22 +2712,24 @@ degenerateFaceInEdge(uint id, Topo::Vertex* v1, Topo::Vertex* v2,
 	a0->collapse(icmd);
 	a2->collapse(icmd);
 
-	Edge* a1 = coface->getEdge(0);
-	Edge* a3 = coface->getEdge(1);
+    const std::vector<Edge* > edges = coface->getEdges();
+	Edge* a1 = edges[0];
+	Edge* a3 = edges[1];
 	a1->merge(a3, icmd, false);
 
 	coface->free(icmd);
 	face->free(icmd);
-	m_topo_property->getFaceContainer().remove(face, true);
+	Utils::remove(face, m_topo_property->getFaceContainer());
 
 	// suppression des sommets de la liste
 	// tout d'abord, on évite de se retrouver avec 2 sommets identiques dans la liste restante
-	if (getVertex(4) == getVertex(5))
-		m_topo_property->getVertexContainer().set(5, getVertex(6));
+    const std::vector<Vertex*> vertices = getVertices();
+	if (vertices[4] == vertices[5])
+		m_topo_property->getVertexContainer()[5] = vertices[6];
 	m_topo_property->getVertexContainer().resize(6);
 
 	// des fois que ...
-	if (getVertex(4)->isDestroyed() || getVertex(5)->isDestroyed())
+	if (vertices[4]->isDestroyed() || vertices[5]->isDestroyed())
 		throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne Block::degenerateFaceInEdge, l'un des sommets conservés est détruit", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
@@ -2929,10 +2752,10 @@ permuteToKmaxFace(uint id, Internal::InfoCommand* icmd)
     if (!isStructured())
         throw TkUtil::Exception (TkUtil::UTF8String ("Block::permuteToKmaxFace n'est possible qu'avec un bloc structuré", TkUtil::Charset::UTF_8));
 
-    if (getNbVertices() != 8)
+    if (getVertices().size() != 8)
         throw TkUtil::Exception (TkUtil::UTF8String ("Block::permuteToKmaxFace n'est possible qu'avec un bloc structuré à 8 sommets", TkUtil::Charset::UTF_8));
 
-    if (getNbFaces() != 6)
+    if (getFaces().size() != 6)
         throw TkUtil::Exception (TkUtil::UTF8String ("Block::permuteToKmaxFace n'est possible qu'avec un bloc structuré à 6 faces", TkUtil::Charset::UTF_8));
 
     // un filtre sur les arêtes pour passer des sommets vers les aretes sans sortir du bloc ou de la face
@@ -2941,62 +2764,42 @@ permuteToKmaxFace(uint id, Internal::InfoCommand* icmd)
     std::map<Topo::Vertex*, uint> filtre_sommets;
 
     // les arêtes du bloc
-    std::vector<Edge* > edges;
-    getEdges(edges);
-    for (std::vector<Edge* >::iterator iter = edges.begin();
-            iter != edges.end(); ++iter){
-        filtre_aretes[*iter] = 1;
-    }
+    for (Edge* edge : getEdges())
+        filtre_aretes[edge] = 1;
 
     // les arêtes de la face à mettre en k_max,
     // en tenant compte des arêtes qui s'appuient sur les coedges, dans d'autres faces
     // donc on passe par toutes les coedges
-    std::vector<CoEdge* > coedges;
-    getFace(id)->getCoEdges(coedges);
-    for (std::vector<CoEdge* >::iterator iter1 = coedges.begin();
-                iter1 != coedges.end(); ++iter1){
-        (*iter1)->getEdges(edges);
-        for (std::vector<Edge* >::iterator iter = edges.begin();
-                iter != edges.end(); ++iter)
-            filtre_aretes[*iter] = 3;
-    }
+    Face* face_id = getFaces()[id];
+    for (CoEdge* coedge : face_id->getCoEdges())
+        for (Edge* e : coedge->getEdges())
+            filtre_aretes[e] = 3;
 
     // les arêtes de la face à mettre en k_max, strictement dans la face
-    getFace(id)->getEdges(edges);
-    for (std::vector<Edge* >::iterator iter = edges.begin();
-            iter != edges.end(); ++iter)
-        filtre_aretes[*iter] = 2;
+    for (Edge* edge : face_id->getEdges())
+        filtre_aretes[edge] = 2;
 
-
-    std::vector<Topo::Vertex* > sommets;
-    getFace(id)->getVertices(sommets);
-    for (std::vector<Topo::Vertex* >::iterator iter = sommets.begin();
-            iter != sommets.end(); ++iter)
-        filtre_sommets[*iter] = 2;
+    for (Topo::Vertex* v : face_id->getVertices())
+        filtre_sommets[v] = 2;
 
     // on se donne un sommet de départ (l'indice 7 car on veut mettre la face en k_max)
-    Topo::Vertex* p7 = getFace(id)->getVertex(0);
+    Topo::Vertex* p7 = face_id->getVertices()[0];
 
     // recherche de 2 arêtes marqués dans la face parmis les arêtes reliées au sommet de départ
     std::vector<Edge* > aretesTriedre;
-    p7->getEdges(edges);
-    for (std::vector<Edge* >::iterator iter = edges.begin();
-            iter != edges.end(); ++iter){
-        if (filtre_aretes[*iter] == 2){
-            aretesTriedre.push_back(*iter);
-        }
-    }
+    for (Edge* p7_edge : p7->getEdges())
+        if (filtre_aretes[p7_edge] == 2)
+            aretesTriedre.push_back(p7_edge);
 
     if (aretesTriedre.size() != 2)
         throw TkUtil::Exception (TkUtil::UTF8String ("Block::permuteToKmaxFace ne trouve pas 2 arêtes dans la face depuis un des points", TkUtil::Charset::UTF_8));
 
     // recherche d'1 arête marquée dans le bloc mais hors de la face
-    for (std::vector<Edge* >::iterator iter = edges.begin();
-            iter != edges.end(); ++iter)
-        if (filtre_aretes[*iter] == 1){
-            Topo::Vertex* som_op = (*iter)->getOppositeVertex(p7);
+    for (Edge* p7_edge : p7->getEdges())
+        if (filtre_aretes[p7_edge] == 1){
+            Topo::Vertex* som_op = p7_edge->getOppositeVertex(p7);
             if (filtre_sommets[som_op] != 2){
-                aretesTriedre.push_back(*iter);
+                aretesTriedre.push_back(p7_edge);
                 filtre_sommets[som_op] = 2; // pour ne pas prendre 2 fois cette arête
             }
         }
@@ -3027,7 +2830,7 @@ permuteToKmaxFace(uint id, Internal::InfoCommand* icmd)
 #endif
 
     // recherche de p4 (opposé à p7, dans la face)
-    Edge* arete7 = getFace(id)->getOppositeEdge(getFace(id)->getEdge(p7, p5));
+    Edge* arete7 = face_id->getOppositeEdge(face_id->getEdge(p7, p5));
     Topo::Vertex* p4 = arete7->getOppositeVertex(p6);
 #ifdef _DEBUG_PERM
     std::cout<<"p4 = "<<p4->getName()<<std::endl;
@@ -3040,24 +2843,21 @@ permuteToKmaxFace(uint id, Internal::InfoCommand* icmd)
     somDep.push_back(p5);
     somDep.push_back(p6);
 
-    for (std::vector<Topo::Vertex* >::iterator iterSom = somDep.begin();
-            iterSom != somDep.end(); ++iterSom) {
+    for (Topo::Vertex* vtx : somDep) {
         // recherche d'1 arête marqué dans le bloc mais hors de la face
         Edge* arete = 0;
-        (*iterSom)->getEdges(edges);
 
-        for (std::vector<Edge* >::iterator iter = edges.begin();
-                iter != edges.end(); ++iter)
-            if (filtre_aretes[*iter] == 1)
-                arete = *iter;
+        for (Edge* vtx_edge : vtx->getEdges())
+            if (filtre_aretes[vtx_edge] == 1)
+                arete = vtx_edge;
 
         if (!arete)
                throw TkUtil::Exception (TkUtil::UTF8String ("Block::permuteToKmaxFace ne trouve pas 1 arête dans le bloc, hors de la face, depuis un sommet donné", TkUtil::Charset::UTF_8));
 
-        somOpp.push_back(arete->getOppositeVertex(*iterSom));
+        somOpp.push_back(arete->getOppositeVertex(vtx));
 #ifdef _DEBUG_PERM
         std::cout<<" getOppositeVertex dans l'arete "<<arete->getName()
-                << " pour sommet "<<(*iterSom)->getName()
+                << " pour sommet "<<vtx->getName()
                 <<" donne sommet "<<somOpp.back()->getName()<<std::endl;
 #endif
     }
@@ -3068,28 +2868,29 @@ permuteToKmaxFace(uint id, Internal::InfoCommand* icmd)
     std::cout<<"p2 = "<<somOpp[2]->getName()<<std::endl;
 #endif
     // les sommets réordonnés
-    m_topo_property->getVertexContainer().set(0, somOpp[0]);
-    m_topo_property->getVertexContainer().set(1, somOpp[1]);
-    m_topo_property->getVertexContainer().set(2, somOpp[2]);
-    m_topo_property->getVertexContainer().set(3, p3);
-    m_topo_property->getVertexContainer().set(4, p4);
-    m_topo_property->getVertexContainer().set(5, p5);
-    m_topo_property->getVertexContainer().set(6, p6);
-    m_topo_property->getVertexContainer().set(7, p7);
+    m_topo_property->getVertexContainer()[0] = somOpp[0];
+    m_topo_property->getVertexContainer()[1] = somOpp[1];
+    m_topo_property->getVertexContainer()[2] = somOpp[2];
+    m_topo_property->getVertexContainer()[3] = p3;
+    m_topo_property->getVertexContainer()[4] = p4;
+    m_topo_property->getVertexContainer()[5] = p5;
+    m_topo_property->getVertexContainer()[6] = p6;
+    m_topo_property->getVertexContainer()[7] = p7;
 
     // Réordonne les Faces
     std::vector<Face* > sorted_faces;
+    const std::vector<Vertex*>& vertices = getVertices();
     for (uint i=0; i<6; i++){
         sorted_faces.push_back(getFace(
-                getVertex(TopoHelper::tabIndVtxByFaceOnBlock[i][0]),
-                getVertex(TopoHelper::tabIndVtxByFaceOnBlock[i][1]),
-                getVertex(TopoHelper::tabIndVtxByFaceOnBlock[i][2]),
-                getVertex(TopoHelper::tabIndVtxByFaceOnBlock[i][3])));
+                vertices[TopoHelper::tabIndVtxByFaceOnBlock[i][0]],
+                vertices[TopoHelper::tabIndVtxByFaceOnBlock[i][1]],
+                vertices[TopoHelper::tabIndVtxByFaceOnBlock[i][2]],
+                vertices[TopoHelper::tabIndVtxByFaceOnBlock[i][3]]));
 
     }
 
     m_topo_property->getFaceContainer().clear();
-    m_topo_property->getFaceContainer().add(sorted_faces);
+    Utils::append(m_topo_property->getFaceContainer(), sorted_faces);
 
 #ifdef _DEBUG_PERM
     std::cout<<" ==> Block : "<<*this<<std::endl;
@@ -3102,11 +2903,12 @@ void Block::reverseOrder7Vertices()
 #ifdef _DEBUG_REVERSE
 	std::cout<<"Block::reverseOrder7Vertices() pour bloc : "<<*this<<std::endl;
 #endif
-
-	if (7 != getNbVertices())
+    std::vector<Vertex*> vertices = getVertices();
+	if (7 != vertices.size())
 		throw TkUtil::Exception (TkUtil::UTF8String ("Block::reverseOrder7Vertices n'est pas possible avec autre chose qu'un bloc à 7 sommets", TkUtil::Charset::UTF_8));
 
-	if (6 != getNbFaces())
+    std::vector<Face*> faces = getFaces();
+	if (6 != faces.size())
 		throw TkUtil::Exception (TkUtil::UTF8String ("Block::reverseOrder7Vertices n'est pas possible avec autre chose qu'un bloc à 6 côtés", TkUtil::Charset::UTF_8));
 
 	// identification de l'indice du sommet à la dégénérescence
@@ -3114,9 +2916,9 @@ void Block::reverseOrder7Vertices()
 
 	// les faces triangulaires
 	std::vector<Face*> faces_tri;
-	for (uint i=0; i<getNbFaces(); i++)
-		if (3 == getFace(i)->getNbVertices())
-			faces_tri.push_back(getFace(i));
+	for (uint i=0; i<faces.size(); i++)
+		if (3 == faces[i]->getVertices().size())
+			faces_tri.push_back(faces[i]);
 
 	if (2 != faces_tri.size()){
 		TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
@@ -3126,19 +2928,19 @@ void Block::reverseOrder7Vertices()
 	}
 
 	Vertex* vtx_deg = TopoHelper::getCommonVertex(faces_tri[0], faces_tri[1]);
-	uint ind_deg = getIndex(vtx_deg);
+	uint ind_deg = Utils::getIndexOf(vtx_deg, vertices);
 
 	// identification des indices des 2 sommets opposés à ce sommet à la dégénérescence
 	// il s'agit des sommets opposés au sommet deg / face quadrangulaires
 
 	// les faces quad qui contiennent vtx_deg
 	std::vector<Face*> faces_quad;
-	for (uint i=0; i<getNbFaces(); i++)
-		if (4 == getFace(i)->getNbVertices()){
-			std::vector<Vertex*> vertices = getFace(i)->getVertices();
+	for (uint i=0; i<faces.size(); i++)
+		if (4 == faces[i]->getVertices().size()){
+			std::vector<Vertex*> vertices = faces[i]->getVertices();
 
 			if (std::find(vertices.begin(), vertices.end(), vtx_deg) != vertices.end())
-				faces_quad.push_back(getFace(i));
+				faces_quad.push_back(faces[i]);
 		}
 
 
@@ -3151,10 +2953,15 @@ void Block::reverseOrder7Vertices()
 		throw TkUtil::Exception(messErr);
 	}
 
-	Vertex* vtx_opp1 = faces_quad[0]->getVertex((faces_quad[0]->getIndex(vtx_deg)+2) %4);
-	Vertex* vtx_opp2 = faces_quad[1]->getVertex((faces_quad[1]->getIndex(vtx_deg)+2) %4);
-	uint ind_opp1 = getIndex(vtx_opp1);
-	uint ind_opp2 = getIndex(vtx_opp2);
+    auto fa1_vertices = faces_quad[0]->getVertices();
+    int if1 = Utils::getIndexOf(vtx_deg, fa1_vertices);
+	Vertex* vtx_opp1 = fa1_vertices[(if1+2)%4];
+	uint ind_opp1 = Utils::getIndexOf(vtx_opp1, vertices);
+
+    auto fa2_vertices = faces_quad[1]->getVertices();
+    int if2 = Utils::getIndexOf(vtx_deg, fa2_vertices);
+    Vertex* vtx_opp2 = fa2_vertices[(if2+2)%4];
+	uint ind_opp2 = Utils::getIndexOf(vtx_opp2, vertices);
 
 #ifdef _DEBUG_REVERSE
 	std::cout<<"vtx_deg: "<<vtx_deg->getName()<<std::endl;
@@ -3273,12 +3080,10 @@ void Block::reverseOrder7Vertices()
 	}
 
 	// met en place la nouvelle liste de sommets réordonnés
-	getBlockTopoProperty()->getVertexContainer().clear();
-	getBlockTopoProperty()->getVertexContainer().add(loc_vtx);
+	getBlockTopoProperty()->getVertexContainer() = loc_vtx;
 
 	// idem avec les faces
-	getBlockTopoProperty()->getFaceContainer().clear();
-	getBlockTopoProperty()->getFaceContainer().add(loc_faces);
+	getBlockTopoProperty()->getFaceContainer() = loc_faces;
 
 #ifdef _DEBUG_REVERSE
 	std::cout<<" bloc après reverseOrder7Vertices : "<<*this<<std::endl;
@@ -3291,16 +3096,15 @@ setMeshLaw(BlockMeshingProperty* new_ppty)
     BlockMeshingProperty* old_ppty = setProperty(new_ppty);
     delete old_ppty;
 
-    std::vector<Topo::Face* > faces;
-    getFaces(faces);
+    std::vector<Topo::Face* > faces = getFaces();
     for (std::vector<Topo::Face* >::iterator iter1 = faces.begin();
             iter1 != faces.end(); ++iter1){
         Topo::Face* face = *iter1;
 
         Topo::Block* bloc_opp = face->getOppositeBlock(this);
 
-        for (uint j=0; j<face->getNbCoFaces(); j++){
-            Topo::CoFace* coface = face->getCoFace(j);
+        for (uint j=0; j<face->getCoFaces().size(); j++){
+            Topo::CoFace* coface = face->getCoFaces()[j];
 
             // cas où on affecte une méthode structurée
             if (new_ppty->getMeshLaw() == BlockMeshingProperty::transfinite) {
@@ -3356,20 +3160,19 @@ isEdited() const
 void Block::
 getRatios(std::map<CoEdge*,uint> &ratios)
 {
-    for (uint i=0; i<getNbFaces(); i++){
-        Face* face = getFace(i);
+    std::vector<Face*> faces = getFaces();
+    for (uint i=0; i<faces.size(); i++){
+        Face* face = faces[i];
 
         // recherche de la présence de ratios sur les cofaces
         bool haveRatio = false;
-        for (uint j=0; j<face->getNbCoFaces(); j++){
-            CoFace* coface = face->getCoFace(j);
-
+        for (CoFace* coface : face->getCoFaces()){
             uint ratio_i = face->getRatio(coface, 0);
             uint ratio_j = face->getRatio(coface, 1);
 
             if (ratio_i > 1 || ratio_j > 1)
                 haveRatio = true;
-        } // end for j<face->getNbCofaces()
+        }
 
         if (haveRatio){
 #ifdef _DEBUG2
@@ -3380,13 +3183,10 @@ getRatios(std::map<CoEdge*,uint> &ratios)
             face->getOrientedCoEdges(dirCoedges[0], dirCoedges[1]);
             std::map<CoEdge*,short> coedge2dir;
             for (uint dir=0; dir<2; dir++)
-                for (std::vector<CoEdge* >::iterator iter = dirCoedges[dir].begin();
-                        iter != dirCoedges[dir].end(); ++iter)
-                    coedge2dir[*iter] = dir;
+                for (CoEdge* coedge : dirCoedges[dir])
+                    coedge2dir[coedge] = dir;
 
-            for (uint j=0; j<face->getNbCoFaces(); j++){
-                CoFace* coface = face->getCoFace(j);
-
+            for (CoFace* coface : face->getCoFaces()){
                 uint ratio_dir[2];
                 for (uint dir=0; dir<2; dir++)
                     ratio_dir[dir] = face->getRatio(coface, dir);
@@ -3395,11 +3195,11 @@ getRatios(std::map<CoEdge*,uint> &ratios)
                     for (uint cote=0; cote<2; cote++){
                         uint ind = cote*2 + dir;
                         // on évite la 4ème arête d'une coface dégénérée
-                        if (ind < coface->getNbEdges()){
-                            Edge* edge =  coface->getEdge(ind);
+                        const std::vector<Edge* > cf_edges = coface->getEdges();
+                        if (ind < cf_edges.size()){
+                            Edge* edge =  cf_edges[ind];
 
-                            for (uint l=0; l<edge->getNbCoEdges(); l++){
-                                CoEdge* coedge = edge->getCoEdge(l);
+                            for (CoEdge* coedge : edge->getCoEdges()){
                                 uint ratio = edge->getRatio(coedge);
                                 // cas d'une coedge non encore vue
                                 if (ratios[coedge] == 0){
@@ -3410,25 +3210,20 @@ getRatios(std::map<CoEdge*,uint> &ratios)
                                             <<"="<<ratio*ratio_dir[coedge2dir[coedge]]<<std::endl;
 #endif
                                 } // end if (ratios[coedge] == 0)
-                            } // end for l<edge->getNbCoEdges()
+                            } // end for coedge
                         } // end if (ind < coface->getNbEdges())
                     } // end for cote<2
                 } // end for dir<2
-
-            } // end for j<face->getNbCofaces()
+            } // end for coface
 
         } // end if (haveRatio)
         else {
             // on évite ici l'appel à getOrientedCoEdges qui coûte un peu
 
             // recherche des ratios sur les coedges
-            for (uint j=0; j<face->getNbCoFaces(); j++){
-                CoFace* coface = face->getCoFace(j);
-                for (uint k=0; k<coface->getNbEdges(); k++){
-                    Edge* edge =  coface->getEdge(k);
-                    for (uint l=0; l<edge->getNbCoEdges(); l++){
-                        CoEdge* coedge = edge->getCoEdge(l);
-
+            for (CoFace* coface : face->getCoFaces())
+                for (Edge* edge : coface->getEdges())
+                    for (CoEdge* coedge : edge->getCoEdges())
                         if (ratios[coedge] == 0){
                             uint ratio = edge->getRatio(coedge);
                             ratios[coedge] = ratio;
@@ -3436,9 +3231,6 @@ getRatios(std::map<CoEdge*,uint> &ratios)
                             std::cout<<coedge->getName()<<" a pour ratio "<<ratio<<std::endl;
 #endif
                         }
-                    } // end for l<edge->getNbCoEdges()
-                } /// end for k<coface->getNbEdges()
-            } // end for j<face->getNbCofaces()
         } // end else / if (haveRatio)
     } // end for i<getNbFaces()
 }
@@ -3447,8 +3239,7 @@ Utils::Math::Point Block::getBarycentre() const
 {
 	Utils::Math::Point barycentre;
 
-	std::vector<Topo::Vertex* > vertices;
-	getVertices(vertices);
+	std::vector<Topo::Vertex* > vertices = getVertices();
 	for (uint i=0; i<vertices.size(); i++)
 		barycentre += vertices[i]->getCoord();
 	barycentre /= (double)vertices.size();
@@ -3459,28 +3250,28 @@ void Block::getGroupsName (std::vector<std::string>& gn) const
 {
     TopoEntity::getGroupsName(gn);
 
-    for (uint i = 0; i<getNbGroups(); ++i)
-            gn.push_back(m_topo_property->getGroupsContainer().get(i)->getName());
+    for (auto gr : m_topo_property->getGroupsContainer())
+        gn.push_back(gr->getName());
 }
 /*----------------------------------------------------------------------------*/
 void Block::add(Group::Group3D* grp)
 {
-    m_topo_property->getGroupsContainer().add(grp);
+    m_topo_property->getGroupsContainer().push_back(grp);
 }
 /*----------------------------------------------------------------------------*/
 void Block::remove(Group::Group3D* grp)
 {
-    m_topo_property->getGroupsContainer().remove(grp);
+    Utils::remove(grp, m_topo_property->getGroupsContainer());
 }
 /*----------------------------------------------------------------------------*/
 int Block::getNbGroups() const
 {
-    return m_topo_property->getGroupsContainer().getNb();
+    return m_topo_property->getGroupsContainer().size();
 }
 /*----------------------------------------------------------------------------*/
 std::vector<Group::Group3D*> Block::getGroups() const
 {
-    return m_topo_property->getGroupsContainer().get();
+    return m_topo_property->getGroupsContainer();
 }
 /*----------------------------------------------------------------------------*/
 void Block::setDestroyed(bool b)
@@ -3493,7 +3284,7 @@ void Block::setDestroyed(bool b)
         return;
 
     // on retire la relation depuis les groupes
-     Utils::Container<Group::Group3D>& groups = m_topo_property->getGroupsContainer();
+    auto groups = m_topo_property->getGroupsContainer();
 #ifdef _DEBUG2
     std::cout<<"Les groupes:";
     for  (uint i=0; i<groups.size(); i++)
@@ -3504,12 +3295,12 @@ void Block::setDestroyed(bool b)
 
      if (b)
     	 for (uint i=0; i<groups.size(); i++){
-    		 Group::Group3D* gr = groups.get(i);
+    		 Group::Group3D* gr = groups[i];
     		 gr->remove(this);
     	 }
      else
     	 for (uint i=0; i<groups.size(); i++){
-    		 Group::Group3D* gr = groups.get(i);
+    		 Group::Group3D* gr = groups[i];
     		 gr->add(this);
     	 }
 
@@ -3528,16 +3319,16 @@ unsigned long Block::getNbInternalMeshingNodes()
 	}
 	else {
 		unsigned short res = m_mesh_data->nodes().size();
-		for (uint i=0;i<getNbVertices(); i++)
-			res -= getVertex(i)->getNbInternalMeshingNodes();
 
-		std::vector<CoEdge*> coedges;
-		getCoEdges(coedges);
+        std::vector<Vertex*> vertices = getVertices();
+		for (uint i=0;i<vertices.size(); i++)
+			res -= vertices[i]->getNbInternalMeshingNodes();
+
+		std::vector<CoEdge*> coedges = getCoEdges();
 		for (uint i=0;i<coedges.size(); i++)
 			res -= coedges[i]->getNbInternalMeshingNodes();
 
-		std::vector<CoFace*> cofaces;
-		getCoFaces(cofaces);
+		std::vector<CoFace*> cofaces = getCoFaces();
 		for (uint i=0;i<cofaces.size(); i++)
 			res -= cofaces[i]->getNbInternalMeshingNodes();
 

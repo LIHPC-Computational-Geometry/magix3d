@@ -217,29 +217,30 @@ internalExecute()
 //				 std::cout<<"pmax-pmin : "<<pmax-pmin<<std::endl;
 
 				 // on cherche si la boite est platte
+				 const std::vector<Vertex*>& cf_vertices = cf->getVertices();
 				 if (std::fabs(pmin.getZ()-pmax.getZ())<Mgx3D::Utils::Math::MgxNumeric::mgxTopoDoubleEpsilon){
-					 cf->getVertex(0)->setCoord(Utils::Math::Point(pmin.getX(), pmax.getY(), pmin.getZ()));
-					 cf->getVertex(1)->setCoord(Utils::Math::Point(pmin.getX(), pmin.getY(), pmin.getZ()));
-					 cf->getVertex(2)->setCoord(Utils::Math::Point(pmax.getX(), pmin.getY(), pmin.getZ()));
-					 cf->getVertex(3)->setCoord(Utils::Math::Point(pmax.getX(), pmax.getY(), pmin.getZ()));
+					 cf_vertices[0]->setCoord(Utils::Math::Point(pmin.getX(), pmax.getY(), pmin.getZ()));
+					 cf_vertices[1]->setCoord(Utils::Math::Point(pmin.getX(), pmin.getY(), pmin.getZ()));
+					 cf_vertices[2]->setCoord(Utils::Math::Point(pmax.getX(), pmin.getY(), pmin.getZ()));
+					 cf_vertices[3]->setCoord(Utils::Math::Point(pmax.getX(), pmax.getY(), pmin.getZ()));
 				 }
 				 else if (std::fabs(pmin.getY()-pmax.getY())<Mgx3D::Utils::Math::MgxNumeric::mgxTopoDoubleEpsilon){
-					 cf->getVertex(0)->setCoord(Utils::Math::Point(pmin.getX(), pmin.getY(), pmax.getZ()));
-					 cf->getVertex(1)->setCoord(Utils::Math::Point(pmin.getX(), pmin.getY(), pmin.getZ()));
-					 cf->getVertex(2)->setCoord(Utils::Math::Point(pmax.getX(), pmin.getY(), pmin.getZ()));
-					 cf->getVertex(3)->setCoord(Utils::Math::Point(pmax.getX(), pmin.getY(), pmax.getZ()));
+					 cf_vertices[0]->setCoord(Utils::Math::Point(pmin.getX(), pmin.getY(), pmax.getZ()));
+					 cf_vertices[1]->setCoord(Utils::Math::Point(pmin.getX(), pmin.getY(), pmin.getZ()));
+					 cf_vertices[2]->setCoord(Utils::Math::Point(pmax.getX(), pmin.getY(), pmin.getZ()));
+					 cf_vertices[3]->setCoord(Utils::Math::Point(pmax.getX(), pmin.getY(), pmax.getZ()));
 				 }
 				 else if (std::fabs(pmin.getX()-pmax.getX())<Mgx3D::Utils::Math::MgxNumeric::mgxTopoDoubleEpsilon){
-					 cf->getVertex(0)->setCoord(Utils::Math::Point(pmin.getX(), pmin.getY(), pmax.getZ()));
-					 cf->getVertex(1)->setCoord(Utils::Math::Point(pmin.getX(), pmin.getY(), pmin.getZ()));
-					 cf->getVertex(2)->setCoord(Utils::Math::Point(pmin.getX(), pmax.getY(), pmin.getZ()));
-					 cf->getVertex(3)->setCoord(Utils::Math::Point(pmin.getX(), pmax.getY(), pmax.getZ()));
+					 cf_vertices[0]->setCoord(Utils::Math::Point(pmin.getX(), pmin.getY(), pmax.getZ()));
+					 cf_vertices[1]->setCoord(Utils::Math::Point(pmin.getX(), pmin.getY(), pmin.getZ()));
+					 cf_vertices[2]->setCoord(Utils::Math::Point(pmin.getX(), pmax.getY(), pmin.getZ()));
+					 cf_vertices[3]->setCoord(Utils::Math::Point(pmin.getX(), pmax.getY(), pmax.getZ()));
 				 }
 				 else {
-					 cf->getVertex(0)->setCoord(Utils::Math::Point(pmin.getX(), pmin.getY(), pmax.getZ()));
-					 cf->getVertex(1)->setCoord(Utils::Math::Point(pmin.getX(), pmin.getY(), pmin.getZ()));
-					 cf->getVertex(2)->setCoord(Utils::Math::Point(pmax.getX(), pmax.getY(), pmin.getZ()));
-					 cf->getVertex(3)->setCoord(Utils::Math::Point(pmax.getX(), pmax.getY(), pmax.getZ()));
+					 cf_vertices[0]->setCoord(Utils::Math::Point(pmin.getX(), pmin.getY(), pmax.getZ()));
+					 cf_vertices[1]->setCoord(Utils::Math::Point(pmin.getX(), pmin.getY(), pmin.getZ()));
+					 cf_vertices[2]->setCoord(Utils::Math::Point(pmax.getX(), pmax.getY(), pmin.getZ()));
+					 cf_vertices[3]->setCoord(Utils::Math::Point(pmax.getX(), pmax.getY(), pmax.getZ()));
 				 }
 			 }
 		}
@@ -443,33 +444,35 @@ void CommandNewTopoOnGeometry::createSpherePartBlock()
     std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
     std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
 
+	const std::vector<Vertex*>& bloc_vertices = bloc->getVertices();
 	for (uint i=0; i<5; i++)
-		bloc->getVertex(i)->setCoord(vertices[i]->getCoord());
+		bloc_vertices[i]->setCoord(vertices[i]->getCoord());
 	for (uint i=5; i<8; i++)
-		bloc->getVertex(i)->setCoord(vertices[4]->getCoord());
+		bloc_vertices[i]->setCoord(vertices[4]->getCoord());
 
 	bloc->degenerateFaceInVertex(Block::k_max, &getInfoCommand());
 
 	// les associations
 	bloc->setGeomAssociation(getGeomEntity());
 
-	bloc->getFace(Block::k_min)->getEdge(bloc->getVertex(0), bloc->getVertex(1))->setGeomAssociation(curves[0]);
-	bloc->getFace(Block::k_min)->getEdge(bloc->getVertex(0), bloc->getVertex(2))->setGeomAssociation(curves[1]);
-	bloc->getFace(Block::k_min)->getEdge(bloc->getVertex(3), bloc->getVertex(2))->setGeomAssociation(curves[2]);
-	bloc->getFace(Block::k_min)->getEdge(bloc->getVertex(3), bloc->getVertex(1))->setGeomAssociation(curves[3]);
-	bloc->getFace(Block::i_min)->getEdge(bloc->getVertex(0), bloc->getVertex(4))->setGeomAssociation(curves[4]);
-	bloc->getFace(Block::i_min)->getEdge(bloc->getVertex(2), bloc->getVertex(4))->setGeomAssociation(curves[6]);
-	bloc->getFace(Block::i_max)->getEdge(bloc->getVertex(1), bloc->getVertex(4))->setGeomAssociation(curves[5]);
-	bloc->getFace(Block::i_max)->getEdge(bloc->getVertex(3), bloc->getVertex(4))->setGeomAssociation(curves[7]);
+    const std::vector<Face*>& bloc_faces = bloc->getFaces();
+	bloc_faces[Block::k_min]->getEdge(bloc_vertices[0], bloc_vertices[1])->setGeomAssociation(curves[0]);
+	bloc_faces[Block::k_min]->getEdge(bloc_vertices[0], bloc_vertices[2])->setGeomAssociation(curves[1]);
+	bloc_faces[Block::k_min]->getEdge(bloc_vertices[3], bloc_vertices[2])->setGeomAssociation(curves[2]);
+	bloc_faces[Block::k_min]->getEdge(bloc_vertices[3], bloc_vertices[1])->setGeomAssociation(curves[3]);
+	bloc_faces[Block::i_min]->getEdge(bloc_vertices[0], bloc_vertices[4])->setGeomAssociation(curves[4]);
+	bloc_faces[Block::i_min]->getEdge(bloc_vertices[2], bloc_vertices[4])->setGeomAssociation(curves[6]);
+	bloc_faces[Block::i_max]->getEdge(bloc_vertices[1], bloc_vertices[4])->setGeomAssociation(curves[5]);
+	bloc_faces[Block::i_max]->getEdge(bloc_vertices[3], bloc_vertices[4])->setGeomAssociation(curves[7]);
 
-	bloc->getFace(Block::k_min)->setGeomAssociation(surfaces[0]);
-	bloc->getFace(Block::i_min)->setGeomAssociation(surfaces[2]);
-	bloc->getFace(Block::i_max)->setGeomAssociation(surfaces[4]);
-	bloc->getFace(Block::j_min)->setGeomAssociation(surfaces[1]);
-	bloc->getFace(Block::j_max)->setGeomAssociation(surfaces[3]);
+	bloc_faces[Block::k_min]->setGeomAssociation(surfaces[0]);
+	bloc_faces[Block::i_min]->setGeomAssociation(surfaces[2]);
+	bloc_faces[Block::i_max]->setGeomAssociation(surfaces[4]);
+	bloc_faces[Block::j_min]->setGeomAssociation(surfaces[1]);
+	bloc_faces[Block::j_max]->setGeomAssociation(surfaces[3]);
 
 	for (uint i=0; i<5; i++)
-		bloc->getVertex(i)->setGeomAssociation(vertices[i]);
+		bloc_vertices[i]->setGeomAssociation(vertices[i]);
 }
 /*----------------------------------------------------------------------------*/
 void CommandNewTopoOnGeometry::createHollowSpherePartBlock()
@@ -486,34 +489,36 @@ void CommandNewTopoOnGeometry::createHollowSpherePartBlock()
     std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
     std::vector<Geom::Vertex*> vertices (v.getVertices().begin(), v.getVertices().end());
 
+	const std::vector<Vertex*>& bloc_vertices = bloc->getVertices();
 	for (uint i=0; i<8; i++)
-		bloc->getVertex(i)->setCoord(vertices[i]->getCoord());
+		bloc_vertices[i]->setCoord(vertices[i]->getCoord());
 
 	// les associations
 	bloc->setGeomAssociation(getGeomEntity());
 
-	bloc->getFace(Block::k_min)->getEdge(bloc->getVertex(0), bloc->getVertex(1))->setGeomAssociation(curves[0]);
-	bloc->getFace(Block::k_min)->getEdge(bloc->getVertex(0), bloc->getVertex(2))->setGeomAssociation(curves[1]);
-	bloc->getFace(Block::k_min)->getEdge(bloc->getVertex(3), bloc->getVertex(2))->setGeomAssociation(curves[2]);
-	bloc->getFace(Block::k_min)->getEdge(bloc->getVertex(3), bloc->getVertex(1))->setGeomAssociation(curves[3]);
-	bloc->getFace(Block::i_min)->getEdge(bloc->getVertex(0), bloc->getVertex(4))->setGeomAssociation(curves[4]);
-	bloc->getFace(Block::i_max)->getEdge(bloc->getVertex(5), bloc->getVertex(1))->setGeomAssociation(curves[6]);
-	bloc->getFace(Block::i_max)->getEdge(bloc->getVertex(3), bloc->getVertex(7))->setGeomAssociation(curves[10]);
-	bloc->getFace(Block::i_min)->getEdge(bloc->getVertex(2), bloc->getVertex(6))->setGeomAssociation(curves[8]);
-	bloc->getFace(Block::k_max)->getEdge(bloc->getVertex(4), bloc->getVertex(5))->setGeomAssociation(curves[5]);
-	bloc->getFace(Block::k_max)->getEdge(bloc->getVertex(6), bloc->getVertex(7))->setGeomAssociation(curves[9]);
-	bloc->getFace(Block::k_max)->getEdge(bloc->getVertex(4), bloc->getVertex(6))->setGeomAssociation(curves[7]);
-	bloc->getFace(Block::k_max)->getEdge(bloc->getVertex(5), bloc->getVertex(7))->setGeomAssociation(curves[11]);
+    const std::vector<Face*>& bloc_faces = bloc->getFaces();
+	bloc_faces[Block::k_min]->getEdge(bloc_vertices[0], bloc_vertices[1])->setGeomAssociation(curves[0]);
+	bloc_faces[Block::k_min]->getEdge(bloc_vertices[0], bloc_vertices[2])->setGeomAssociation(curves[1]);
+	bloc_faces[Block::k_min]->getEdge(bloc_vertices[3], bloc_vertices[2])->setGeomAssociation(curves[2]);
+	bloc_faces[Block::k_min]->getEdge(bloc_vertices[3], bloc_vertices[1])->setGeomAssociation(curves[3]);
+	bloc_faces[Block::i_min]->getEdge(bloc_vertices[0], bloc_vertices[4])->setGeomAssociation(curves[4]);
+	bloc_faces[Block::i_max]->getEdge(bloc_vertices[5], bloc_vertices[1])->setGeomAssociation(curves[6]);
+	bloc_faces[Block::i_max]->getEdge(bloc_vertices[3], bloc_vertices[7])->setGeomAssociation(curves[10]);
+	bloc_faces[Block::i_min]->getEdge(bloc_vertices[2], bloc_vertices[6])->setGeomAssociation(curves[8]);
+	bloc_faces[Block::k_max]->getEdge(bloc_vertices[4], bloc_vertices[5])->setGeomAssociation(curves[5]);
+	bloc_faces[Block::k_max]->getEdge(bloc_vertices[6], bloc_vertices[7])->setGeomAssociation(curves[9]);
+	bloc_faces[Block::k_max]->getEdge(bloc_vertices[4], bloc_vertices[6])->setGeomAssociation(curves[7]);
+	bloc_faces[Block::k_max]->getEdge(bloc_vertices[5], bloc_vertices[7])->setGeomAssociation(curves[11]);
 
-	bloc->getFace(Block::k_min)->setGeomAssociation(surfaces[0]);
-	bloc->getFace(Block::i_min)->setGeomAssociation(surfaces[2]);
-	bloc->getFace(Block::i_max)->setGeomAssociation(surfaces[4]);
-	bloc->getFace(Block::j_min)->setGeomAssociation(surfaces[1]);
-	bloc->getFace(Block::j_max)->setGeomAssociation(surfaces[3]);
-	bloc->getFace(Block::k_max)->setGeomAssociation(surfaces[5]);
+	bloc_faces[Block::k_min]->setGeomAssociation(surfaces[0]);
+	bloc_faces[Block::i_min]->setGeomAssociation(surfaces[2]);
+	bloc_faces[Block::i_max]->setGeomAssociation(surfaces[4]);
+	bloc_faces[Block::j_min]->setGeomAssociation(surfaces[1]);
+	bloc_faces[Block::j_max]->setGeomAssociation(surfaces[3]);
+	bloc_faces[Block::k_max]->setGeomAssociation(surfaces[5]);
 
 	for (uint i=0; i<8; i++)
-		bloc->getVertex(i)->setGeomAssociation(vertices[i]);
+		bloc_vertices[i]->setGeomAssociation(vertices[i]);
 
 }
 /*----------------------------------------------------------------------------*/

@@ -63,11 +63,8 @@ void CommandCreateTopo::split()
     for (std::vector<Block* >::const_iterator iter = m_blocks.begin();
             iter != m_blocks.end(); ++iter) {
         const std::vector<Topo::Vertex* > & vertices = (*iter)->getVertices();
-        std::vector<Topo::CoEdge* > coedges;
-        std::vector<Topo::CoFace* > cofaces;
-
-        (*iter)->getCoEdges(coedges);
-        (*iter)->getCoFaces(cofaces);
+        std::vector<Topo::CoEdge* > coedges = (*iter)->getCoEdges();
+        std::vector<Topo::CoFace* > cofaces = (*iter)->getCoFaces();
 
         l_v.insert(l_v.end(), vertices.begin(), vertices.end());
         l_ce.insert(l_ce.end(), coedges.begin(), coedges.end());
@@ -75,18 +72,16 @@ void CommandCreateTopo::split()
 
         // entités pour lesquelles il n'est pas prévu de les représenté ni de les utiliser
         // mais pour lesquelles il est utile de les marquer comme CREATED
-        std::vector<Topo::Edge* > edges;
+        std::vector<Topo::Edge* > edges = (*iter)->getEdges();
         const std::vector<Topo::Face* > & faces = (*iter)->getFaces();
-        (*iter)->getEdges(edges);
         l_e.insert(l_e.end(), edges.begin(), edges.end());
         l_f.insert(l_f.end(), faces.begin(), faces.end());
     }
 
     for (std::vector<CoFace* >::const_iterator iter = m_cofaces.begin();
             iter != m_cofaces.end(); ++iter) {
-        const std::vector<Topo::Vertex* > & vertices = (*iter)->getVertices();
-        std::vector<Topo::CoEdge* > coedges;
-        (*iter)->getCoEdges(coedges);
+        const std::vector<Topo::Vertex* >& vertices = (*iter)->getVertices();
+        std::vector<Topo::CoEdge* > coedges = (*iter)->getCoEdges();
 
         l_v.insert(l_v.end(), vertices.begin(), vertices.end());
         l_ce.insert(l_ce.end(), coedges.begin(), coedges.end());
@@ -94,8 +89,7 @@ void CommandCreateTopo::split()
 
         // entités pour lesquelles il n'est pas prévu de les représenté ni de les utiliser
         // mais pour lesquelles il est utile de les marquer comme CREATED
-        std::vector<Topo::Edge* > edges;
-        (*iter)->getEdges(edges);
+        const std::vector<Topo::Edge* >& edges = (*iter)->getEdges();
         l_e.insert(l_e.end(), edges.begin(), edges.end());
     }
 

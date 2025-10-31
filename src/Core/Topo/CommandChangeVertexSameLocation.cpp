@@ -38,16 +38,10 @@ internalExecute()
     message << "CommandChangeVertexSameLocation::execute pour la commande " << getName ( )
             << " de nom unique " << getUniqueName ( );
 
-    // liste des blocs modifiés
-    std::vector<Topo::Block*> blocks;
-    // liste des cofaces modifiées
-    std::vector<Topo::CoFace*> cofaces;
-
     m_vertex->saveVertexGeomProperty(&getInfoCommand(), true);
     m_vertex->setCoord(m_target->getCoord());
-    m_vertex->getBlocks(blocks);
-
-    m_vertex->getCoFaces(cofaces);
+    std::vector<Topo::Block*> blocks = m_vertex->getBlocks(); // liste des blocs modifiés
+    std::vector<Topo::CoFace*> cofaces = m_vertex->getCoFaces(); // liste des cofaces modifiées
 
     std::sort(blocks.begin(), blocks.end(), Utils::Entity::compareEntity);
     auto lastblocks = std::unique(blocks.begin(), blocks.end());

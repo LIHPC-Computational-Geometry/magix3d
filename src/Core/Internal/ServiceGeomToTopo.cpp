@@ -63,8 +63,7 @@ bool ServiceGeomToTopo::convertBlockStructured(const int ni, const int nj, const
 
         // cas où le nombre de bras est donné par l'utilisateur
         if (ni>0 && nj>0 && nk>0){
-        	std::vector<Topo::CoEdge*> coedges;
-        	bloc->getCoEdges(coedges);
+        	std::vector<Topo::CoEdge*> coedges = bloc->getCoEdges();
         	if (coedges.size() != 12){
         		throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, on impose une discrétisation à un bloc qui n'a pas que 12 arêtes", TkUtil::Charset::UTF_8));
         	}
@@ -372,14 +371,11 @@ std::vector<Topo::Edge*> ServiceGeomToTopo::getEdges(std::vector<Topo::CoEdge*>&
 		// accumulation des coedges pour une edge
 		do {
 //			std::cout<<"vtx_i = "<<vtx_i->getName()<<std::endl;
-			std::vector<Topo::CoEdge*> coedges_loc;
-			vtx_i->getCoEdges(coedges_loc);
-//			std::cout<<"coedges_loc.size() = "<<coedges_loc.size()<<std::endl;
 			// recherche d'une arête non marquée
 			Topo::CoEdge* coedge = 0;
-			for (uint i=0; i<coedges_loc.size(); i++)
-				if (filtre_coedges[coedges_loc[i]] == 1)
-					coedge = coedges_loc[i];
+			for (Topo::CoEdge* ce_loc : vtx_i->getCoEdges())
+				if (filtre_coedges[ce_loc] == 1)
+					coedge = ce_loc;
 			if (coedge == 0)
 				throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, plus d'arête lors du parcours de proche en proche", TkUtil::Charset::UTF_8));
 			filtre_coedges[coedge] = 2;

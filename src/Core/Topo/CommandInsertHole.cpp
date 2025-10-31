@@ -102,16 +102,11 @@ duplicate()
 	uint nb_blocs_touches = 0;
 
 	// filtre pour cofaces (à 4) et blocs (à 1)
-	for (std::vector<CoFace*>::iterator iter_cf=m_cofaces.begin();
-			iter_cf!=m_cofaces.end(); ++iter_cf){
-		CoFace* coface = *iter_cf;
-
+	for (CoFace* coface : m_cofaces){
 		// les cofaces sélectionnées sont à dupliquer
 		m_filtre_coface[coface] = 4;
 
-		std::vector<Block* > blocks;
-		coface->getBlocks(blocks);
-
+		std::vector<Block* > blocks = coface->getBlocks();
 		if (blocks.size() != 2){
 			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
             message <<"Insertion d'un trou impossible avec face "<<coface->getName()<<", elle n'est pas entre 2 blocs";
@@ -119,14 +114,13 @@ duplicate()
 		}
 
 		// on marque tous les blocs à 1 dans un premier temps
-		for (std::vector<Block*>::iterator iter_bl=blocks.begin();
-					iter_bl!=blocks.end(); ++iter_bl){
-			if (m_filtre_block[*iter_bl] == 0){
+		for (Block* bl : blocks){
+			if (m_filtre_block[bl] == 0){
 				nb_blocs_touches++;
-				m_filtre_block[*iter_bl] = 1;
+				m_filtre_block[bl] = 1;
 			}
 		}
-	} // end for iter_cf
+	}
 
 #ifdef _DEBUG_INSERTHOLE
     std::cout<<"nb_blocs_touches = "<<nb_blocs_touches<<std::endl;
@@ -138,20 +132,11 @@ duplicate()
     // sinon on ne la duplique que s'il n'y a pas de liaison topo entre les blocs
     // de part et d'autre en tournant autour de l'arête et sans passer par la coface traitée
 
-	for (std::vector<CoFace*>::iterator iter_cf=m_cofaces.begin();
-			iter_cf!=m_cofaces.end(); ++iter_cf){
-		CoFace* coface = *iter_cf;
-
-		std::vector<CoEdge* > coedges;
-		coface->getCoEdges(coedges, false);
-
-		for (std::vector<CoEdge*>::iterator iter_ce=coedges.begin();
-				iter_ce!=coedges.end(); ++iter_ce){
-			CoEdge* coedge = *iter_ce;
+	for (CoFace* coface : m_cofaces){
+		for (CoEdge* coedge : coface->getCoEdges()){
 			if (m_filtre_coedge[coedge] == 0){
 
-				std::vector<Topo::CoFace*> cofaces;
-				coedge->getCoFaces(cofaces);
+				std::vector<Topo::CoFace*> cofaces = coedge->getCoFaces();
 				// on compte le nb de cofaces marqués à dupliquer
 				uint nb_coface_marquees = 0;
 				for (std::vector<CoFace*>::iterator iter=cofaces.begin();
@@ -187,8 +172,7 @@ duplicate()
 
 				if (m_filtre_coedge[coedge] == 4){
 					// on marque tous les blocs en contact à 1
-					std::vector<Block* > blocks;
-					coedge->getBlocks(blocks);
+					std::vector<Block* > blocks = coedge->getBlocks();
 					for (std::vector<Block*>::iterator iter_bl=blocks.begin();
 							iter_bl!=blocks.end(); ++iter_bl){
 						if (m_filtre_block[*iter_bl] == 0){
@@ -200,34 +184,20 @@ duplicate()
 
 			} // end if (m_filtre_coedge[coedge] == 0)
 
-		} // end for iter_ce
+		} // end for coedge
 
-	} // end for iter_cf
+	} // end for coface
 
     // un sommet est dupliqué dès lors qu'il est relié à une arête à dupliquée et à aucune arête
     // commune non dupliquée
 	std::vector<Vertex*> duplicatedVertices;
-	for (std::vector<CoFace*>::iterator iter_cf=m_cofaces.begin();
-			iter_cf!=m_cofaces.end(); ++iter_cf){
-		CoFace* coface = *iter_cf;
-
-		std::vector<Vertex*> vertices;
-		coface->getVertices(vertices);
-
-		for (std::vector<Vertex*>::iterator iter_vt=vertices.begin();
-				iter_vt!=vertices.end(); ++iter_vt){
-			Vertex* vertex = *iter_vt;
+	for (CoFace* coface : m_cofaces){
+		for (Vertex* vertex : coface->getVertices()){
 			if (m_filtre_vertex[vertex] == 0){
-
-				std::vector<CoEdge* > coedges;
-				vertex->getCoEdges(coedges);
-
 				// a-t-on trouvé une arête marquée à 3 ?
 				bool haveCoEdgeConservated = false;
 
-				for (std::vector<CoEdge*>::iterator iter_ce=coedges.begin();
-						iter_ce!=coedges.end(); ++iter_ce){
-					CoEdge* coedge = *iter_ce;
+				for (CoEdge* coedge : vertex->getCoEdges()){
 					if (m_filtre_coedge[coedge] == 3)
 						haveCoEdgeConservated = true;
 				}
@@ -245,20 +215,17 @@ duplicate()
 					duplicatedVertices.push_back(vertex);
 
 					// on marque tous les blocs en contact à 1
-					std::vector<Block* > blocks;
-					vertex->getBlocks(blocks);
-					for (std::vector<Block*>::iterator iter_bl=blocks.begin();
-							iter_bl!=blocks.end(); ++iter_bl){
-						if (m_filtre_block[*iter_bl] == 0){
+					for (Block* bl : vertex->getBlocks()){
+						if (m_filtre_block[bl] == 0){
 							nb_blocs_touches++;
-							m_filtre_block[*iter_bl] = 1;
+							m_filtre_block[bl] = 1;
 						}
 					}
 				}
 
 			} // end if (m_filtre_vertex[vertex] == 0
-		} // end for iter_vt
-	} // end for iter_cf
+		} // end for vertex
+	} // end for coface
 
 	// création de 2 groupes de blocs de part et d'autre de l'interface constituée des cofaces
 	std::vector<Block*> blocs1 = getConnectedBlocks();
@@ -296,12 +263,10 @@ duplicate()
 	// va être dupliquée. Et cela sans dupliquer les sommets ni les arêtes,
 	for (std::vector<CoFace*>::iterator iter_cf=m_cofaces.begin();
 			iter_cf!=m_cofaces.end(); ++iter_cf){
-		std::vector<CoEdge*> coedges;
-		(*iter_cf)->getCoEdges(coedges);
+		std::vector<CoEdge*> coedges = (*iter_cf)->getCoEdges();
 		for (std::vector<CoEdge*>::iterator iter_ce=coedges.begin();
 				iter_ce!= coedges.end(); ++iter_ce){
-			std::vector<Edge*> edges;
-			(*iter_ce)->getEdges(edges);
+			std::vector<Edge*> edges = (*iter_ce)->getEdges();
 			for (std::vector<Edge*>::iterator iter_ed=edges.begin();
 					iter_ed!=edges.end(); ++iter_ed){
 				separate(*iter_ed);
@@ -326,16 +291,14 @@ duplicate()
 		CoFace* new_coface = duplicate(old_coface);
 
 		// mise à jour dans les faces des blocs du côté marqué à 2
-		std::vector<Face*> faces;
-		old_coface->getFaces(faces);
+		std::vector<Face*> faces = old_coface->getFaces();
 		if (faces.size()!=2)
 			throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne dans CommandInsertHole, face commune reliée à autre chose que 2 faces", TkUtil::Charset::UTF_8));
 
 		// recherche celle avec bloc dans groupe 2
 		Face* face = 0;
 		for (uint i=0; i<faces.size(); i++){
-			std::vector<Block*> blocs;
-			faces[i]->getBlocks(blocs);
+			std::vector<Block*> blocs = faces[i]->getBlocks();
 			if (blocs.size()!=1)
 				throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne dans CommandInsertHole, face reliée à autre chose qu'un unique bloc", TkUtil::Charset::UTF_8));
 			if (m_filtre_block[blocs[0]] == 2)
@@ -356,8 +319,7 @@ duplicate()
 	for (std::vector<Block*>::iterator iter_bl=blocs2.begin();
 			iter_bl!=blocs2.end(); ++iter_bl){
 		Block* bloc = *iter_bl;
-		std::vector<CoEdge*> coedges;
-		bloc->getCoEdges(coedges);
+		std::vector<CoEdge*> coedges = bloc->getCoEdges();
 
 		for (std::vector<CoEdge*>::iterator iter_ce=coedges.begin();
 				iter_ce!= coedges.end(); ++iter_ce){
@@ -377,12 +339,8 @@ duplicate()
 	for (std::vector<Block*>::iterator iter_bl=blocs2.begin();
 			iter_bl!=blocs2.end(); ++iter_bl){
 		Block* bloc = *iter_bl;
-		std::vector<Vertex*> vertices;
-		bloc->getVertices(vertices);
 
-		for (std::vector<Vertex*>::iterator iter_vtx=vertices.begin();
-				iter_vtx!= vertices.end(); ++iter_vtx){
-			Vertex* old_vtx = *iter_vtx;
+		for (Vertex* old_vtx : bloc->getVertices()){
 			Vertex* new_vtx = duplicate(old_vtx);
 			if (old_vtx != new_vtx){
 				bloc->saveBlockTopoProperty(&getInfoCommand());
@@ -416,11 +374,9 @@ void CommandInsertHole::translate(Vertex* vtx)
 #endif
 	// utilisation d'un vecteur entre le sommet et la moyenne des barycentres des blocs voisins du groupe 2
 	Utils::Math::Point bary_moy;
-	std::vector<Block* > blocks;
-	vtx->getBlocks(blocks);
-	for (std::vector<Block*>::iterator iter_bl=blocks.begin();
-			iter_bl!=blocks.end(); ++iter_bl){
-		bary_moy += (*iter_bl)->getBarycentre();
+	std::vector<Block* > blocks = vtx->getBlocks();
+	for (Block* bl : blocks){
+		bary_moy += bl->getBarycentre();
 	}
 	if (blocks.size()==0)
 		throw TkUtil::Exception (TkUtil::UTF8String ("Erreur avec commande de création d'un trou, on ne trouve pas de blocs reliés à un sommet donné à déplacer", TkUtil::Charset::UTF_8));
@@ -454,21 +410,12 @@ std::vector<Block*> CommandInsertHole::getConnectedBlocks()
 	while(bl_dep) {
 		m_filtre_block[bl_dep] = 3;
 		// récupération des blocs voisins suivant voisinage par coface
-
-		std::vector<Topo::CoFace*> cofaces;
-		bl_dep->getCoFaces(cofaces);
-
-		for (std::vector<Topo::CoFace*>::iterator iter_cf=cofaces.begin();
-				iter_cf!=cofaces.end();++iter_cf)
-			if (m_filtre_coface[*iter_cf] != 4){
-				std::vector<Block* > blocks_vois;
-				(*iter_cf)->getBlocks(blocks_vois);
-
-				for (std::vector<Block*>::iterator iter_bl=blocks_vois.begin();
-						iter_bl!=blocks_vois.end(); ++iter_bl)
-					if (m_filtre_block[*iter_bl] == 1){
-						blocs.push_back(*iter_bl);
-						m_filtre_block[*iter_bl] = 2;
+		for (CoFace* cf : bl_dep->getCoFaces())
+			if (m_filtre_coface[cf] != 4){
+				for (Block* bl : cf->getBlocks())
+					if (m_filtre_block[bl] == 1){
+						blocs.push_back(bl);
+						m_filtre_block[bl] = 2;
 					}
 			}
 
@@ -533,8 +480,9 @@ duplicate(CoEdge* ce)
 
     CoEdge* new_coedge = m_corr_coedge[ce];
     if (new_coedge == 0){
-        Vertex* new_vtx1 = duplicate(ce->getVertex(0));
-        Vertex* new_vtx2 = duplicate(ce->getVertex(1));
+		auto vertices = ce->getVertices();
+        Vertex* new_vtx1 = duplicate(vertices[0]);
+        Vertex* new_vtx2 = duplicate(vertices[1]);
 
         // pour le cas où le sommet n'est pas dupliqué, on va le modifier: lui ajouter une arête
         new_vtx1->saveVertexTopoProperty(&getInfoCommand());
@@ -557,14 +505,14 @@ duplicate(Edge* ed)
 
     if (new_edge == 0){
 
-    	if (ed->getNbCoFaces() > 1){
+    	if (ed->getCoFaces().size() > 1){
 			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
              message <<"Erreur interne, dans  CommandInsertHole::duplicate,"<<ed->getName()<<" appartient à plusieurs cofaces";
              throw TkUtil::Exception(message);
     	}
 
-    	Vertex* new_vtx1 = duplicate(ed->getVertex(0));
-    	Vertex* new_vtx2 = duplicate(ed->getVertex(1));
+    	Vertex* new_vtx1 = duplicate(ed->getVertices()[0]);
+    	Vertex* new_vtx2 = duplicate(ed->getVertices()[1]);
 
     	const std::vector<CoEdge*> & coedges = ed->getCoEdges();
     	std::vector<CoEdge*> new_coedges;
@@ -594,11 +542,10 @@ separate(Edge* ed)
 #ifdef _DEBUG_INSERTHOLE
     std::cout<<" separate pour "<<ed->getName()<<std::endl;
 #endif
-	std::vector<CoFace*> cofaces;
-	ed->getCoFaces(cofaces);
+	std::vector<CoFace*> cofaces = ed->getCoFaces();
 
-	for (uint i=0; i<ed->getNbCoEdges(); i++)
-		ed->getCoEdge(i)->saveCoEdgeTopoProperty(&getInfoCommand());
+	for (CoEdge* ce : ed->getCoEdges())
+		ce->saveCoEdgeTopoProperty(&getInfoCommand());
 
 	for (uint i=1; i<cofaces.size(); i++){
 		CoFace* coface = cofaces[i];
@@ -655,22 +602,16 @@ bool CommandInsertHole::findCoFace_Block_relation(CoEdge* coedge, CoFace* coface
     std::map<Block*, uint> filtre_block;
     std::map<CoFace*, uint> filtre_coface;
 
-    std::vector<Topo::CoFace*> cofaces;
-    std::vector<Block* > blocks;
-    coedge->getCoFaces(cofaces);
-    coedge->getBlocks(blocks);
+	for (CoFace* cf : coedge->getCoFaces())
+    	filtre_coface[cf] = 1;
 
-    for (std::vector<Topo::CoFace*>::iterator iter=cofaces.begin(); iter != cofaces.end(); ++iter)
-    	filtre_coface[*iter] = 1;
-
-    for (std::vector<Topo::Block*>::iterator iter=blocks.begin(); iter != blocks.end(); ++iter)
-    	filtre_block[*iter] = 1;
+    for (Block* bl : coedge->getBlocks())
+    	filtre_block[bl] = 1;
 
     // on s'interdit la coface
     filtre_coface[coface] = 2;
 
-    blocks.clear();
-    coface->getBlocks(blocks);
+    std::vector<Block* > blocks = coface->getBlocks();
 	if (blocks.size()!=2){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
 		message << "CommandInsertHole::findCoFace_Block_relation pour " << coedge->getName()
@@ -687,8 +628,7 @@ bool CommandInsertHole::findCoFace_Block_relation(CoEdge* coedge, CoFace* coface
 
 		// une (unique il me semble) coface dans bl_dep et marquée à 1
 		CoFace* coface_suiv = 0;
-		cofaces.clear();
-		bl_dep->getCoFaces(cofaces);
+		std::vector<Topo::CoFace*> cofaces = bl_dep->getCoFaces();
 		for (std::vector<Topo::CoFace*>::iterator iter=cofaces.begin();
 				iter != cofaces.end() && coface_suiv==0; ++iter)
 			if (filtre_coface[*iter] == 1)
@@ -702,7 +642,7 @@ bool CommandInsertHole::findCoFace_Block_relation(CoEdge* coedge, CoFace* coface
 
 		// recherche du bloc suivant
 		blocks.clear();
-		coface_suiv->getBlocks(blocks);
+		blocks = coface_suiv->getBlocks();
 
 		Block* bl_suiv = 0;
 		for (std::vector<Topo::Block*>::iterator iter=blocks.begin(); iter != blocks.end(); ++iter)
