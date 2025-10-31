@@ -143,9 +143,7 @@ void CommandSplitFaces::verif(Topo::CoFace* coface)
 	std::cout<<"CommandSplitFaces::verif pour "<<coface->getName()<<std::endl;
 #endif
 
-	std::vector<CoEdge*> coedges;
-	coface->getCoEdges(coedges, false);
-
+	std::vector<CoEdge*> coedges = coface->getCoEdges();
 
 	// recherche si une arête est projetée sur un demi cercle
 
@@ -177,15 +175,14 @@ void CommandSplitFaces::verif(Topo::CoFace* coface)
 
 
 	// recherche si 2 côtés de part et d'autre d'un sommet logique de la coface sont colinéaires
-	if (coface->isStructured() && coface->getNbVertices() == 4){
+	const std::vector<Vertex*>& vertices = coface->getVertices();
+	if (coface->isStructured() && vertices.size() == 4){
 
 		// on marque les arêtes de cette coface
 		std::map<CoEdge*, uint> filtre_ce;
 		for (uint i=0; i<coedges.size(); i++)
 			filtre_ce[coedges[i]] = 1;
 
-		std::vector<Vertex*> vertices;
-		coface->getVertices(vertices);
 
 		// pour tous les sommets de la coface
 		// recherche d'un couple d'arêtes de la face de part et d'autre d'un sommet
@@ -197,11 +194,10 @@ void CommandSplitFaces::verif(Topo::CoFace* coface)
 			std::vector<CoEdge*> aretes;
 
 			// on se limite aux arêtes reliés au sommet
-			vtx->getCoEdges(coedges);
-			for (uint j=0; j<coedges.size(); j++)
-				if (filtre_ce[coedges[j]] == 1){
-					filtre_ce[coedges[j]] = 2;
-					aretes.push_back(coedges[j]);
+			for (CoEdge* vtx_ce : vtx->getCoEdges())
+				if (filtre_ce[vtx_ce] == 1){
+					filtre_ce[vtx_ce] = 2;
+					aretes.push_back(vtx_ce);
 				}
 
 			if (aretes.size() == 2){
@@ -281,10 +277,8 @@ internalExecute()
     for (std::vector<CoFace* >::iterator iter1 = m_cofaces.begin();
     		iter1 != m_cofaces.end(); ++iter1){
     	CoFace* coface = *iter1;
-    	std::vector<Topo::CoEdge* > coedges;
-    	coface->getCoEdges(coedges);
-    	for (uint i=0; i<coedges.size(); i++)
-    		if (coedges[i] == m_arete)
+    	for (CoEdge* coedge : coface->getCoEdges())
+    		if (coedge == m_arete)
     			arete_vue = true;
     }
     if (!arete_vue)
@@ -315,31 +309,22 @@ internalExecute()
 				if(findFaceUnmarkedWithVertexMarked(filtre_faces, filtre_vertices, coface, sommet)) {
 					coface_vec = {coface};
 
-					std::vector<CoEdge *> coedges;
-					coface->getCoEdges(coedges);
-
 					CoEdge *coedge = 0;
-					for (std::vector<Topo::CoEdge *>::iterator iter = coedges.begin();
-						 iter != coedges.end(); ++iter)
-						if ((*iter)->find(sommet))
-							coedge = *iter;
+					for (CoEdge* cf_ce : coface->getCoEdges())
+						if (Utils::contains(sommet, cf_ce->getVertices()))
+							coedge = cf_ce;
 
-					if (coedge->getVertex(0) == sommet)
-						TopoHelper::splitFaces3D(coface_vec, coedge, 0, m_ratio_ogrid, false, false, current_splitingEdge,
-											   &getInfoCommand());
-					else if (coedge->getVertex(1) == sommet)
-						TopoHelper::splitFaces3D(coface_vec, coedge, 1, m_ratio_ogrid, false, false, current_splitingEdge,
-											   &getInfoCommand());
+					if (coedge->getVertices()[0] == sommet)
+						TopoHelper::splitFaces3D(coface_vec, coedge, 0, m_ratio_ogrid, false, false, current_splitingEdge, &getInfoCommand());
+					else if (coedge->getVertices()[1] == sommet)
+						TopoHelper::splitFaces3D(coface_vec, coedge, 1, m_ratio_ogrid, false, false, current_splitingEdge, &getInfoCommand());
 
 					filtre_faces.insert(coface);
 				}
 			}
 			else{
-				std::vector<CoFace*> arete_cofaces;
-				m_arete->getCoFaces(arete_cofaces);
-
-				for (std::vector<Topo::CoFace* >::iterator iter = arete_cofaces.begin();
-					 iter != arete_cofaces.end(); ++iter)
+				std::vector<CoFace*> arete_cofaces = m_arete->getCoFaces();
+				for (auto iter = arete_cofaces.begin(); iter != arete_cofaces.end(); ++iter)
 					if (std::find(m_cofaces.begin(), m_cofaces.end(),*iter) != m_cofaces.end())
 						coface = *iter;
 
@@ -354,8 +339,8 @@ internalExecute()
 
 			for(auto e : current_splitingEdge){
 				splitingEdges.push_back(e);
-				filtre_vertices.insert(e->getVertex(0));
-				filtre_vertices.insert(e->getVertex(1));
+				filtre_vertices.insert(e->getVertices()[0]);
+				filtre_vertices.insert(e->getVertices()[1]);
 			}
 
 		} while (nb_faces_dep != nb_faces_split);
@@ -368,11 +353,9 @@ internalExecute()
     		// recherche les cofaces de part et d'autre de cette edge
     		std::vector<CoFace*> cofaces;
 
-    		std::vector<CoFace*> edge_cofaces;
-    		edge->getCoFaces(edge_cofaces);
-    		for (uint j=0; j<edge_cofaces.size(); j++)
-    			if (getInfoCommand().getTopoInfoEntity()[edge_cofaces[j]] == Internal::InfoCommand::CREATED)
-    				cofaces.push_back(edge_cofaces[j]);
+    		for (CoFace* cf : edge->getCoFaces())
+    			if (getInfoCommand().getTopoInfoEntity()[cf] == Internal::InfoCommand::CREATED)
+    				cofaces.push_back(cf);
 
     		// cas avec découpage au bord (sans coupe en fait)
     		if (cofaces.size() == 0)
@@ -386,20 +369,18 @@ internalExecute()
 
     		// on utilise un filtre pour marquer les Edges que l'on accepte pour la suite
     		std::map<Edge*, uint> filtre_edge;
-    		for (uint j=0; j<cofaces.size(); j++)
-    			for (uint k=0; k<cofaces[j]->getNbEdges(); k++)
-    				filtre_edge[cofaces[j]->getEdge(k)] = 1;
+    		for (CoFace* cf : cofaces)
+    			for (Edge* cf_e : cf->getEdges())
+    				filtre_edge[cf_e] = 1;
     		filtre_edge[edge] = 0;
 
-    		for (uint j=0; j<edge->getNbVertices(); j++){
-    			Vertex* vtx_c = edge->getVertex(j);
+    		for (uint j=0; j<edge->getVertices().size(); j++){
+    			Vertex* vtx_c = edge->getVertices()[j];
     			// les 2 arêtes de part et d'autre d'un sommet
     			std::vector<Edge*> edges;
-    			std::vector<Edge*> vtx_edges;
-    			vtx_c->getEdges(vtx_edges);
-    			for (uint j=0; j<vtx_edges.size(); j++)
-    				if (filtre_edge[vtx_edges[j]] == 1)
-    					edges.push_back(vtx_edges[j]);
+				for (Edge* e : vtx_c->getEdges())
+    				if (filtre_edge[e] == 1)
+    					edges.push_back(e);
 
     			if (edges.size() != 2)
     				throw TkUtil::Exception (TkUtil::UTF8String ("On ne peut replacer le sommet suivant le ratio, on ne trouve pas exactement 2 edges autour d'un sommet", TkUtil::Charset::UTF_8));
@@ -453,16 +434,13 @@ findFaceUnmarkedWithVertexMarked(std::set<CoFace*>& filtre_faces,
 										  std::set<Vertex*>& filtre_vertices, CoFace* &face, Vertex* &noeud)
 {
 	//std::cout<<"findBlockUnmarkedWithCoEdgeMarked ..."<<std::endl;
-	for (std::vector<CoFace*>::iterator iter1 = m_cofaces.begin(); iter1 != m_cofaces.end(); ++iter1){
+	for (CoFace* cf : m_cofaces){
 		// le bloc est-il marqué ?
-		if (filtre_faces.find(*iter1) == filtre_faces.end()){
-			CoFace* cf = *iter1;
+		if (filtre_faces.find(cf) == filtre_faces.end()){
 			// possède-t-il une arête marquée ?
-			std::vector<Vertex* > vertices;
-			cf->getAllVertices(vertices);
-			for (std::vector<Vertex*>::iterator iter2 = vertices.begin(); iter2 != vertices.end(); ++iter2){
-				if (filtre_vertices.find(*iter2) != filtre_vertices.end()){
-					noeud = *iter2;
+			for (Vertex* vtx : cf->getAllVertices()){
+				if (filtre_vertices.find(vtx) != filtre_vertices.end()){
+					noeud = vtx;
 					face = cf;
 					return true;
 				}
@@ -476,13 +454,9 @@ void CommandSplitFaces::
 countNbCoEdgesByVertices(std::map<Topo::Vertex*, uint> &nb_coedges_by_vertex)
 {
 	// stocke pour chacun des sommets le nombre d'arêtes auxquelles il est relié
-	for (std::vector<CoFace* >::iterator iter1 = m_cofaces.begin();
-	            iter1 != m_cofaces.end(); ++iter1){
-		CoFace* coface = *iter1;
-		std::vector<Topo::Vertex* > all_vertices;
-		coface->getAllVertices(all_vertices);
-		for (uint i=0; i<all_vertices.size(); i++)
-			nb_coedges_by_vertex[all_vertices[i]] = all_vertices[i]->getNbCoEdges();
+	for (CoFace* coface : m_cofaces){
+		for (Vertex* vtx : coface->getAllVertices())
+			nb_coedges_by_vertex[vtx] = vtx->getCoEdges().size();
 	}
 }
 /*----------------------------------------------------------------------------*/

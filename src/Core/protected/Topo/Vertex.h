@@ -71,7 +71,7 @@ public:
 
     /*------------------------------------------------------------------------*/
     /// accès à tous les sommets (un seul pour un sommet)
-    void getAllVertices(std::vector<Topo::Vertex* >& vertices, const bool unique=true) const;
+    std::vector<Topo::Vertex* > getAllVertices() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief   Suppression des dépendances (entités topologiques incidentes)
@@ -109,9 +109,7 @@ public:
      * \see saveVertexTopoProperty
      */
 
-    void addCoEdge(CoEdge* e)
-    {m_topo_property->getCoEdgeContainer().add(e);}
-
+    void addCoEdge(CoEdge* e);
 
     /*------------------------------------------------------------------------*/
     /** \brief Enlève une relation vers une arête commune
@@ -120,31 +118,12 @@ public:
      * Attention à sauvegarder pour le undo
      * \see saveVertexTopoProperty
      */
-
-   void removeCoEdge(CoEdge* e, const bool exceptionIfNotFound=true)
-    {m_topo_property->getCoEdgeContainer().remove(e, exceptionIfNotFound);}
-
+   void removeCoEdge(CoEdge* e);
 
     /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux arêtes topologiques communes incidentes avec copie
-     *
-     *  \param edges les arêtes incidentes
-     */
-    void getCoEdges(std::vector<CoEdge* >& edges) const
-    {m_topo_property->getCoEdgeContainer().get(edges);}
-
     /// Fournit l'accès aux arêtes topologiques communes incidentes sans copie
     const std::vector<CoEdge* > & getCoEdges() const
-    {return m_topo_property->getCoEdgeContainer().get();}
-
-    /*------------------------------------------------------------------------*/
-    /// fournit l'accès à l'une des arêtes communes
-    CoEdge* getCoEdge(uint ind) const
-    {return m_topo_property->getCoEdgeContainer().get(ind);}
-
-    /// retourne le nombre d'arêtes communes
-    uint getNbCoEdges() const
-    {return m_topo_property->getCoEdgeContainer().getNb();}
+    {return m_topo_property->getCoEdgeContainer();}
 
     /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès aux arêtes topologiques incidentes
@@ -152,16 +131,16 @@ public:
      *  \param edges les arêtes incidentes
      */
 
-    void getEdges(std::vector<Edge* >& edges) const;
+    std::vector<Edge* > getEdges() const;
 
 
     /*------------------------------------------------------------------------*/
     /** Constitue la liste des CoFaces adjacentes */
-    void getCoFaces(std::vector<CoFace* >& cofaces) const;
+    std::vector<CoFace* > getCoFaces() const;
 
     /*------------------------------------------------------------------------*/
     /** Constitue la liste des Blocs adjacents */
-    void getBlocks(std::vector<Block* >& blocks) const;
+    std::vector<Block* > getBlocks() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief Fusionne 2 sommets ensembles

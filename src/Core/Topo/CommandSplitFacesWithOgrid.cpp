@@ -48,7 +48,7 @@ CommandSplitFacesWithOgrid(Internal::Context& c,
     for (std::vector<Topo::CoFace* >::iterator iter = cofaces.begin();
             iter != cofaces.end(); ++iter){
         Topo::CoFace* hf = *iter;
-        if (hf->isStructured() && hf->getNbVertices() == 4)
+        if (hf->isStructured() && hf->getVertices().size() == 4)
         	m_cofaces.push_back(hf);
         else{
 			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -172,16 +172,12 @@ computeFilters(std::map<Vertex*, uint> & filtre_vertex,
         filtre_coface[coface] = 2;
 
         // les sommets
-        std::vector<Vertex* > vertices;
-        coface->getAllVertices(vertices);
-        for (uint i=0; i<vertices.size(); i++)
-            filtre_vertex[vertices[i]] = 2;
+        for (Vertex* v : coface->getAllVertices())
+            filtre_vertex[v] = 2;
 
         // on incrémente à chaque fois que l'on voit l'arête commune
-        std::vector<CoEdge* > coedges;
-        coface->getCoEdges(coedges);
-        for (uint i=0; i<coedges.size(); i++)
-            filtre_coedge[coedges[i]] += 1;
+        for (CoEdge* ce : coface->getCoEdges())
+            filtre_coedge[ce] += 1;
 
     } // end for iter1
 
@@ -194,8 +190,7 @@ computeFilters(std::map<Vertex*, uint> & filtre_vertex,
         CoEdge* coedge = *iter3;
         bool erreur = false;
 
-        std::vector<CoFace* > cofaces;
-        coedge->getCoFaces(cofaces);
+        std::vector<CoFace* > cofaces = coedge->getCoFaces();
         if (cofaces.size() == 2){
             uint nb_facesAjoutes = 0;
             // dans se cas on ajoute simplement la face voisine
@@ -231,16 +226,12 @@ computeFilters(std::map<Vertex*, uint> & filtre_vertex,
         filtre_coface[coface] = 2;
 
         // les sommets
-        std::vector<Vertex* > vertices;
-        coface->getAllVertices(vertices);
-        for (uint i=0; i<vertices.size(); i++)
-            filtre_vertex[vertices[i]] = 2;
+        for (Vertex* v : coface->getAllVertices())
+            filtre_vertex[v] = 2;
 
         // on incrémente à chaque fois que l'on voit l'arête commune
-        std::vector<CoEdge* > coedges;
-        coface->getCoEdges(coedges);
-        for (uint i=0; i<coedges.size(); i++)
-            filtre_coedge[coedges[i]] += 1;
+        for (CoEdge* ce : coface->getCoEdges())
+            filtre_coedge[ce] += 1;
 
     } // end for iter1
 
@@ -251,11 +242,9 @@ computeFilters(std::map<Vertex*, uint> & filtre_vertex,
             iter1 != m_cofaces.end(); ++iter1){
 
     	CoFace* coface = *iter1;
-        std::vector<CoEdge* > coedges;
-        coface->getCoEdges(coedges);
-        for (uint i=0; i<coedges.size(); i++)
-            if (filtre_coedge[coedges[i]] == 1)
-                coedgesAuBord.push_back(coedges[i]);
+        for (CoEdge* ce : coface->getCoEdges())
+            if (filtre_coedge[ce] == 1)
+                coedgesAuBord.push_back(ce);
     } // end for iter1
 
     // pour les arêtes au bord, on marque les sommets et faces
@@ -274,8 +263,7 @@ computeFilters(std::map<Vertex*, uint> & filtre_vertex,
 //            filtre_coedge[coedges[i]] = 1;
 
         // les faces sélectionnées qui touchent le bord
-        std::vector<CoFace* > cofaces;
-        coedge->getCoFaces(cofaces);
+        std::vector<CoFace* > cofaces = coedge->getCoFaces();
         for (uint i=0; i<cofaces.size(); i++)
         	if (filtre_coface[cofaces[i]] == 2)
         		filtre_coface[cofaces[i]] = 1;
@@ -287,19 +275,14 @@ computeFilters(std::map<Vertex*, uint> & filtre_vertex,
 
     	CoFace* coface = *iter1;
 
-        std::vector<Edge* > edges;
-        coface->getEdges(edges);
-
-        for (std::vector<Edge* >::iterator iter2 = edges.begin();
-                iter2 != edges.end(); ++iter2){
+        const std::vector<Edge* >& edges = coface->getEdges();
+        for (auto iter2 = edges.begin(); iter2 != edges.end(); ++iter2){
 
             Edge* edge = *iter2;
             // recherche des nombres d'arêtes communes internes et externes dans cette arête
             uint nb_arete_int = 0;
             uint nb_arete_ext = 0;
-
-            std::vector<CoEdge* > coedges;
-            edge->getCoEdges(coedges);
+            std::vector<CoEdge* > coedges = edge->getCoEdges();
 
             for (std::vector<CoEdge* >::iterator iter3 = coedges.begin();
                     iter3 != coedges.end(); ++iter3)
@@ -313,25 +296,17 @@ computeFilters(std::map<Vertex*, uint> & filtre_vertex,
 
             if (nb_arete_int == 0){
                 filtre_edge[edge] = 1;
-                std::vector<Vertex* > vertices;
-                edge->getVertices(vertices);
-                for (uint i=0; i<vertices.size(); i++)
-                	filtre_vertex[vertices[i]] = 1;
+                for (Topo::Vertex* ve : edge->getVertices())
+                	filtre_vertex[ve] = 1;
             }
             else {
                 filtre_edge[edge] = 2;
 
                 // pour ces arete particulières, on marques tous les noeuds des aretes au bord
-                for (std::vector<CoEdge* >::iterator iter3 = coedges.begin();
-                        iter3 != coedges.end(); ++iter3){
-                    CoEdge* coedge = *iter3;
-                    if (filtre_coedge[coedge] == 1){
-                        std::vector<Vertex* > vertices;
-                        coedge->getVertices(vertices);
-                        for (uint i=0; i<vertices.size(); i++)
-                            filtre_vertex[vertices[i]] = 1;
-                    }
-                }
+                for (CoEdge* coedge : coedges)
+                    if (filtre_coedge[coedge] == 1)
+                        for (Topo::Vertex* ve : coedge->getVertices())
+                            filtre_vertex[ve] = 1;
             }
         }
     }
@@ -349,61 +324,44 @@ computeFilters(std::map<Vertex*, uint> & filtre_vertex,
 #endif
 
     		// les arêtes communes
-    		std::vector<CoEdge* > coedges;
-    		coface->getCoEdges(coedges);
-    		for (uint i=0; i<coedges.size(); i++)
-    			filtre_coedge[coedges[i]] = 3;
+    		for (CoEdge* ce : coface->getCoEdges())
+    			filtre_coedge[ce] = 3;
 
     	}
     }
 
     // constitution de la liste de arêtes au bord
     std::vector<Edge*> aretesAuBord;
-    for (std::vector<CoFace* >::iterator iter1 = m_cofaces.begin();
-    		iter1 != m_cofaces.end(); ++iter1){
-
-    	CoFace* coface = *iter1;
-    	std::vector<Edge* > edges;
-    	coface->getEdges(edges);
-    	for (uint i=0; i<edges.size(); i++)
-    		if (filtre_edge[edges[i]] == 1)
-    			aretesAuBord.push_back(edges[i]);
-    } // end for iter1
+    for (CoFace* coface : m_cofaces)
+    	for (Edge* e : coface->getEdges())
+    		if (filtre_edge[e] == 1)
+    			aretesAuBord.push_back(e);
 
     // pour les arêtes au bord, on marque les sommets,
     // à 1 (au bord)
-    for (std::vector<Edge*>::iterator iter3 = aretesAuBord.begin();
-    		iter3 != aretesAuBord.end(); ++iter3){
-    	Edge* edge = *iter3;
+    for (Edge* edge : aretesAuBord){
+    	for (Topo::Vertex* v : edge->getVertices())
+    		if (filtre_vertex[v] == 2)
+    			filtre_vertex[v] = 1;
 
-    	std::vector<Vertex* > vertices;
-    	edge->getVertices(vertices);
-    	for (uint i=0; i<vertices.size(); i++)
-    		if (filtre_vertex[vertices[i]] == 2)
-    			filtre_vertex[vertices[i]] = 1;
-
-    	edge->getAllVertices(vertices);
-    	for (uint i=0; i<vertices.size(); i++)
-    		if (filtre_vertex[vertices[i]] == 2){
+    	for (Topo::Vertex* v : edge->getAllVertices())
+    		if (filtre_vertex[v] == 2){
     			// par défaut ce sommet est à ignorer
-    			filtre_vertex[vertices[i]] = 5;
+    			filtre_vertex[v] = 5;
     			// recherche si ce sommet est relié à une arête interne (filtre à 2)
     			// si oui, alors on le considère au bord
-    			std::vector<CoEdge* > coedges;
-    			vertices[i]->getCoEdges(coedges);
-    			for (uint j=0; j<coedges.size(); j++)
-    				if (filtre_coedge[coedges[j]] == 2)
-    					filtre_vertex[vertices[i]] = 1;
+    			for (CoEdge* v_ce : v->getCoEdges())
+    				if (filtre_coedge[v_ce] == 2)
+    					filtre_vertex[v] = 1;
     		}
-
     }
 
     // on ne touchera pas aux arêtes entièrement à l'intérieur (celles avec les 2 sommets internes)
     for (std::map<CoEdge*, uint>::iterator iter_ce=filtre_coedge.begin();
     		iter_ce!=filtre_coedge.end(); ++iter_ce)
     	if (iter_ce->second == 2
-    			&& filtre_vertex[iter_ce->first->getVertex(0)] == 2
-				&& filtre_vertex[iter_ce->first->getVertex(1)] == 2)
+    			&& filtre_vertex[iter_ce->first->getVertices()[0]] == 2
+				&& filtre_vertex[iter_ce->first->getVertices()[1]] == 2)
     		iter_ce->second = 3;
 
 
@@ -436,42 +394,22 @@ void CommandSplitFacesWithOgrid::saveTopoProperty(std::map<Vertex*, uint> & filt
         std::map<CoEdge*, uint> & filtre_coedge,
         std::map<CoFace*, uint> & filtre_coface)
 {
-    for (std::vector<CoFace* >::iterator iter1 = m_cofaces.begin();
-             iter1 != m_cofaces.end(); ++iter1){
-
-    	CoFace* coface = *iter1;
-
+    for (CoFace* coface : m_cofaces){
     	// seules les faces communes internes ne sont pas touchées
          if (filtre_coface[coface] != 3){
              // les sommets
-              std::vector<Vertex* > vertices;
-              coface->getVertices(vertices);
-              for (uint i=0; i<vertices.size(); i++)
-                  vertices[i]->saveVertexTopoProperty(&getInfoCommand());
+              for (Vertex* v : coface->getVertices())
+                  v->saveVertexTopoProperty(&getInfoCommand());
 
-              std::vector<Edge* > edges;
-              coface->getEdges(edges);
-              for (std::vector<Edge* >::iterator iter4 = edges.begin();
-            		  iter4 != edges.end(); ++iter4){
-            	  Edge* edge = *iter4;
-
+              for (Edge* edge : coface->getEdges()){
             	  edge->saveEdgeTopoProperty(&getInfoCommand());
-
-            	  std::vector<CoEdge* > coedges;
-            	  edge->getCoEdges(coedges);
-            	  for (std::vector<CoEdge* >::iterator iter5 = coedges.begin();
-            			  iter5 != coedges.end(); ++iter5){
-            		  CoEdge* coedge = *iter5;
-
+            	  for (CoEdge* coedge : edge->getCoEdges())
             		  // seules les arêtes communes internes ne sont pas touchées
 					  if (filtre_coedge[coedge] != 3)
 						  coedge->saveCoEdgeTopoProperty(&getInfoCommand());
-					  //std::cout<<"saveCoEdgeTopoProperty pour "<<coedge->getName()<<std::endl;
-            	  } // end for iter5
-              } // end for iter4
+              } // end for edge
          } // end if filtre ...
-     } // end for iter1
-
+     } // end for coface
 }
 /*----------------------------------------------------------------------------*/
 void CommandSplitFacesWithOgrid::
@@ -487,8 +425,7 @@ createVertices(std::map<Vertex*, uint> & filtre_vertex,
         CoFace* coface = *iter1;
 
         // les sommets extrémités de la face
-        std::vector<Vertex* > vertices;
-        coface->getVertices(vertices);
+        std::vector<Vertex* > vertices = coface->getVertices();
 
         // recherche du barycentre de la face
         Utils::Math::Point barycentre_cf;
@@ -496,7 +433,7 @@ createVertices(std::map<Vertex*, uint> & filtre_vertex,
             barycentre_cf += vertices[i]->getCoord();
         barycentre_cf /= (double)vertices.size();
 
-        coface->getAllVertices(vertices);
+        vertices = coface->getAllVertices();
 
         // création des sommets pour la face centrale
         for (std::vector<Vertex* >::iterator iter6 = vertices.begin();
@@ -520,18 +457,14 @@ createVertices(std::map<Vertex*, uint> & filtre_vertex,
                 // on conserve les arêtes internes
                 std::vector<CoEdge* > coedges_int;
 
-                std::vector<CoEdge* > coedges;
-                sommet->getCoEdges(coedges);
-
-                for (std::vector<CoEdge* >::iterator iter3 = coedges.begin();
-                        iter3 != coedges.end(); ++iter3){
+                for (CoEdge* sommet_ce : sommet->getCoEdges()){
 #ifdef _DEBUG_SPLIT_OGRID
-                	std::cout<<"  coedge = "<<(*iter3)->getName()<<", filtre à "<<filtre_coedge[*iter3]<<std::endl;
+                	std::cout<<"  coedge = "<<sommet_ce->getName()<<", filtre à "<<filtre_coedge[sommet_ce]<<std::endl;
 #endif
-                    if (filtre_coedge[*iter3] == 1)
+                    if (filtre_coedge[sommet_ce] == 1)
                         nb_arete_ext += 1;
-                    else if (filtre_coedge[*iter3] == 2){
-                    	coedges_int.push_back(*iter3);
+                    else if (filtre_coedge[sommet_ce] == 2){
+                    	coedges_int.push_back(sommet_ce);
                         nb_arete_int += 1;
                     }
                 }
@@ -547,10 +480,8 @@ createVertices(std::map<Vertex*, uint> & filtre_vertex,
                     // ce cas n'est valide que si le sommet n'est relié qu'à une seule face sélectionnée
                     // pas valide en cas de sommet commun à 2 faces sans arête commune
                     // => récupération des faces du sommet pour compter le nombre de faces candidates à l'ogrid
-                    std::vector<CoFace* > cofaces;
-                    sommet->getCoFaces(cofaces);
                     int nb_selected = 0;
-                    for (auto f1 : cofaces) {
+                    for (auto f1 : sommet->getCoFaces()) {
                         for (auto f2 : m_cofaces) {
                             if (f1 == f2) nb_selected++;
                         }
@@ -639,8 +570,7 @@ createVertices(std::map<Vertex*, uint> & filtre_vertex,
                     CoEdge* coedge = coedges_int[0];
 
                     // calcul le barycentre de la CoEdge
-                    std::vector<Vertex* > vertices_ce;
-                    coedge->getVertices(vertices_ce);
+                    const std::vector<Vertex* >& vertices_ce = coedge->getVertices();
                     Utils::Math::Point barycentre_ce = (vertices_ce[0]->getCoord()+vertices_ce[1]->getCoord())/2;
 
                     Utils::Math::Point pt = (barycentre_ce + (sommet->getCoord() - barycentre_ce)*m_ratio_ogrid);
@@ -715,9 +645,7 @@ createCoEdges(std::map<Vertex*, uint> & filtre_vertex,
 
     	CoFace* coface = *iter1;
 
-        std::vector<Vertex* > vertices;
-        coface->getAllVertices(vertices);
-
+        std::vector<Vertex* > vertices = coface->getAllVertices();
         for (std::vector<Vertex* >::iterator iter6 = vertices.begin();
                 iter6 != vertices.end(); ++iter6){
             CoEdge* newCoEdge = corr_vtx_coedge[*iter6];
@@ -772,18 +700,16 @@ createCoEdgeAndFace(std::map<Vertex*, uint> & filtre_vertex,
         // on procède par Edge
         // et si cette Edge est composée de Edge commune interne et externe
         // alors on procède par arête commune
-        std::vector<Edge* > edges;
-        coface->getEdges(edges);
+        const std::vector<Edge* >& edges = coface->getEdges();
 
-        for (std::vector<Edge* >::iterator iter2 = edges.begin();
-                iter2 != edges.end(); ++iter2){
+        for (auto iter2 = edges.begin(); iter2 != edges.end(); ++iter2){
 
         	Edge* edge = *iter2;
 #ifdef _DEBUG_SPLIT_OGRID
         	std::cout<<"arête: "<<edge->getName()<<", filtre à "<<filtre_edge[edge]<<std::endl;
 #endif
-        	Vertex* vtx0 = edge->getVertex(0);
-        	Vertex* vtx1 = edge->getVertex(1);
+        	Vertex* vtx0 = edge->getVertices()[0];
+        	Vertex* vtx1 = edge->getVertices()[1];
 
         	std::vector<std::string> groupsName;
 
@@ -827,13 +753,11 @@ getSelectedVertices(Vertex* vtx0,
 
     do {
         // recherche de l'arête marquée à 1 parmis celles liées au sommet vtx_prec
-        std::vector<CoEdge* > coedge_vois;
-        vtx_prec->getCoEdges(coedge_vois);
         CoEdge* coedge = 0;
 
-        for (uint i=0; i<coedge_vois.size(); i++)
-            if (filtre_vu[coedge_vois[i]] == 1)
-                coedge = coedge_vois[i];
+        for (CoEdge* coedge_vois : vtx_prec->getCoEdges())
+            if (filtre_vu[coedge_vois] == 1)
+                coedge = coedge_vois;
 
         if (0 == coedge)
             throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne dans CommandSplitFacesWithOgrid::getSelectedVertices, aucune arête voisine de vtx_prec", TkUtil::Charset::UTF_8));
@@ -882,8 +806,7 @@ createCoEdgeAndFace(Vertex* vtx0,
     TopoHelper::sortVertices(som0, som1);
 
     // recherche des arêtes entre les 2 sommets
-    std::vector<CoEdge* > coedges_between;
-    edge->getCoEdges(coedges_between);
+    std::vector<CoEdge* > coedges_between = edge->getCoEdges();
 
     // si l'une des arêtes est interne (sans toucher le bord), on passe
     if (filtre_coedge[coedges_between[0]] == 3)
@@ -1049,12 +972,12 @@ createCoFace(std::map<Vertex*, uint> & filtre_vertex,
 			for (uint i=0; i<4; i++){
 
 				Edge* newEdge;
-				Vertex* som0 = coface->getVertex(i);
-				Vertex* som1 = coface->getVertex((i+1)%4);
+				Vertex* som0 = coface->getVertices()[i];
+				Vertex* som1 = coface->getVertices()[(i+1)%4];
 
 				if (filtre_vertex[som0] == 2 && filtre_vertex[som1] == 2)
 					// on conserve l'arête lorsqu'elle est interne
-					newEdge = coface->getEdge(i);
+					newEdge = coface->getEdges()[i];
 				else
 					newEdge = createEdge(
 							som0,
@@ -1108,44 +1031,45 @@ freeUnused(std::map<Vertex*, uint> & filtre_vertex,
                 newCoface->setGeomAssociation(ga);
 
                 // pour les arêtes et sommets au bord de cette coface centrale
-                std::vector<CoEdge* > coedges;
-                newCoface->getCoEdges(coedges);
-                for (std::vector<CoEdge* >::iterator iter5 = coedges.begin();
-                        iter5 != coedges.end(); ++iter5){
+                std::vector<CoEdge* > coedges = newCoface->getCoEdges();
+                for (auto iter5 = coedges.begin(); iter5 != coedges.end(); ++iter5){
+                    Topo::Vertex* vtx0 = (*iter5)->getVertices()[0];
+                    Topo::Vertex* vtx1 = (*iter5)->getVertices()[1];
 #ifdef _DEBUG_SPLIT_OGRID
                 	std::cout<<"coedge: "<<(*iter5)->getName()<<std::endl;
-                	std::cout<<"  vtx0: "<<(*iter5)->getVertex(0)->getName()<<", filtre à "<<filtre_vertex[(*iter5)->getVertex(0)]<<std::endl;
-                	std::cout<<"  vtx1: "<<(*iter5)->getVertex(1)->getName()<<", filtre à "<<filtre_vertex[(*iter5)->getVertex(1)]<<std::endl;
-                	if ((*iter5)->getVertex(0)->getGeomAssociation() == (*iter5)->getVertex(1)->getGeomAssociation())
+                	std::cout<<"  vtx0: "<<vtx0->getName()<<", filtre à "<<filtre_vertex[vtx0]<<std::endl;
+                	std::cout<<"  vtx1: "<<vtx1->getName()<<", filtre à "<<filtre_vertex[vtx1]<<std::endl;
+                	if (vtx0->getGeomAssociation() == vtx1->getGeomAssociation())
                 		std::cout<<"  associés à la même entité"<<std::endl;
                 	else
                 		std::cout<<"  associés à des entités différentes"<<std::endl;
 #endif
-                    if ((filtre_vertex[(*iter5)->getVertex(0)] == 4
-                            || filtre_vertex[(*iter5)->getVertex(1)] == 4)
-                            && (*iter5)->getVertex(0)->getGeomAssociation() == (*iter5)->getVertex(1)->getGeomAssociation())
-                        (*iter5)->setGeomAssociation((*iter5)->getVertex(0)->getGeomAssociation());
+                    if ((filtre_vertex[vtx0] == 4 || filtre_vertex[vtx1] == 4)
+                            && vtx0->getGeomAssociation() == vtx1->getGeomAssociation())
+                        (*iter5)->setGeomAssociation(vtx0->getGeomAssociation());
                     else
                         (*iter5)->setGeomAssociation(ga);
 
                     for (uint i=0; i<2; i++)
-                        if ((*iter5)->getVertex(i)->getGeomAssociation() == 0)
-                            (*iter5)->getVertex(i)->setGeomAssociation(ga);
+                        if ((*iter5)->getVertices()[i]->getGeomAssociation() == 0)
+                            (*iter5)->getVertices()[i]->setGeomAssociation(ga);
                 } // end for iter5
 
                 // pour les arêtes entre les sommets de la face initiale et celle créée au centre
                 for (uint i=0; i<4; i++){
-                    CoEdge* newCoedge = corr_vtx_coedge[coface->getVertex(i)];
+                    CoEdge* newCoedge = corr_vtx_coedge[coface->getVertices()[i]];
                     if (newCoedge){
+                        Topo::Vertex* vtx0 = newCoedge->getVertices()[0];
+                        Topo::Vertex* vtx1 = newCoedge->getVertices()[1];
 #ifdef _DEBUG_SPLIT_OGRID
                     	std::cout<<"newCoedge: "<<newCoedge->getName()<<std::endl;
-                    	std::cout<<"  vtx0: "<<newCoedge->getVertex(0)->getName()<<", filtre à "<<filtre_vertex[newCoedge->getVertex(0)]<<std::endl;
-                    	std::cout<<"  vtx1: "<<newCoedge->getVertex(1)->getName()<<", filtre à "<<filtre_vertex[newCoedge->getVertex(1)]<<std::endl;
+                    	std::cout<<"  vtx0: "<<vtx0->getName()<<", filtre à "<<filtre_vertex[vtx0]<<std::endl;
+                    	std::cout<<"  vtx1: "<<vtx1->getName()<<", filtre à "<<filtre_vertex[vtx1]<<std::endl;
 #endif
-                        if (filtre_vertex[newCoedge->getVertex(0)] == 4)
-                            newCoedge->setGeomAssociation(newCoedge->getVertex(0)->getGeomAssociation());
-                        else if (filtre_vertex[newCoedge->getVertex(1)] == 4)
-                            newCoedge->setGeomAssociation(newCoedge->getVertex(1)->getGeomAssociation());
+                        if (filtre_vertex[vtx0] == 4)
+                            newCoedge->setGeomAssociation(vtx0->getGeomAssociation());
+                        else if (filtre_vertex[vtx1] == 4)
+                            newCoedge->setGeomAssociation(vtx1->getGeomAssociation());
                         else
                             newCoedge->setGeomAssociation(ga);
                     }
@@ -1153,8 +1077,8 @@ freeUnused(std::map<Vertex*, uint> & filtre_vertex,
 
                 // pour les faces entre les bords de la face initiale et celle au centre
                 for (uint i=0; i<4; i++){
-                    Vertex* vtx0 = coface->getVertex(i);
-                    Vertex* vtx1 = coface->getVertex((i+1)%4);
+                    Vertex* vtx0 = coface->getVertices()[i];
+                    Vertex* vtx1 = coface->getVertices()[(i+1)%4];
 
                     // on ordonne les sommets suivant leur id
                     TopoHelper::sortVertices(vtx0, vtx1);
@@ -1181,8 +1105,8 @@ freeUnused(std::map<Vertex*, uint> & filtre_vertex,
 
             // pour les faces entre les bords de la face initiale et celle au centre
             for (uint i=0; i<4; i++){
-                Vertex* vtx0 = coface->getVertex(i);
-                Vertex* vtx1 = coface->getVertex((i+1)%4);
+                Vertex* vtx0 = coface->getVertices()[i];
+                Vertex* vtx1 = coface->getVertices()[(i+1)%4];
 
                 // on ordonne les sommets suivant leur id
                 TopoHelper::sortVertices(vtx0, vtx1);
@@ -1198,15 +1122,11 @@ freeUnused(std::map<Vertex*, uint> & filtre_vertex,
         } // end if (newCoface)
 
 
-
-        std::vector<Edge* > edges;
-        coface->getEdges(edges);
-        for (std::vector<Edge* >::iterator iter4 = edges.begin();
-        		iter4 != edges.end(); ++iter4){
+        // travaille sur une copie du vecteur
+        std::vector<Edge* > edges = coface->getEdges();
+        for (auto iter4 = edges.begin(); iter4 != edges.end(); ++iter4){
         	Edge* edge = *iter4;
-
-        	std::vector<CoEdge* > coedges;
-        	edge->getCoEdges(coedges);
+        	std::vector<CoEdge* > coedges = edge->getCoEdges();
 
         	// suppression des arêtes initiales entre le bord et le centre de la sélection
         	for (std::vector<CoEdge* >::iterator iter5 = coedges.begin();
@@ -1220,7 +1140,7 @@ freeUnused(std::map<Vertex*, uint> & filtre_vertex,
         		}
         	} // end for iter5
 
-        	if (edge->getNbCoFaces() == 1)
+        	if (edge->getCoFaces().size() == 1)
         		edge->free(&getInfoCommand());
         } // end for iter4
 
@@ -1235,9 +1155,9 @@ freeUnused(std::map<Vertex*, uint> & filtre_vertex,
     	CoEdge* coedge = iter->second;
     	Vertex* vtx = iter->first;
 
-    	if (coedge && !coedge->isDestroyed() && coedge->getNbEdges() == 0){
+    	if (coedge && !coedge->isDestroyed() && coedge->getEdges().size() == 0){
     		Vertex* newVtx = coedge->getOppositeVertex(vtx);
-    		if (newVtx->getNbCoEdges() == 1){
+    		if (newVtx->getCoEdges().size() == 1){
 #ifdef _DEBUG_SPLIT_OGRID
     			std::cout<<"  sommet à détruire : "<<newVtx->getName()<<std::endl;
 #endif
@@ -1258,13 +1178,9 @@ void CommandSplitFacesWithOgrid::
 countNbCoEdgesByVertices(std::map<Topo::Vertex*, uint> &nb_coedges_by_vertex)
 {
 	// stocke pour chacun des sommets le nombre d'arêtes auxquelles il est relié
-	for (std::vector<CoFace* >::iterator iter1 = m_cofaces.begin();
-	            iter1 != m_cofaces.end(); ++iter1){
-		CoFace* coface = *iter1;
-		std::vector<Topo::Vertex* > all_vertices;
-		coface->getAllVertices(all_vertices);
-		for (uint i=0; i<all_vertices.size(); i++)
-			nb_coedges_by_vertex[all_vertices[i]] = all_vertices[i]->getNbCoEdges();
+	for (CoFace* coface : m_cofaces){
+		for (Vertex* vtx : coface->getAllVertices())
+			nb_coedges_by_vertex[vtx] = vtx->getCoEdges().size();
 	}
 }
 /*----------------------------------------------------------------------------*/

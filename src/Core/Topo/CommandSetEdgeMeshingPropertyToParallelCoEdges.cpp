@@ -58,9 +58,7 @@ internalExecute()
     	 coedges_in.pop_back();
 
     	 // boucle sur les cofaces autour
-    	 std::vector<CoFace*> cofaces;
-    	 coedge_dep->getCoFaces(cofaces);
-
+    	 std::vector<CoFace*> cofaces = coedge_dep->getCoFaces();
     	 for (uint i=0; i<cofaces.size(); i++){
     		 CoFace* coface = cofaces[i];
 

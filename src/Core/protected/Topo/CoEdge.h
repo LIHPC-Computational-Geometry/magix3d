@@ -90,26 +90,14 @@ public:
 
     /*------------------------------------------------------------------------*/
     /// ajoute une relation vers une arête
-    void addEdge(Edge* e) {m_topo_property->getEdgeContainer().add(e);}
+    void addEdge(Edge* e);
 
     /// enlève une relation vers une arête
-    void removeEdge(Edge* e, const bool exceptionIfNotFound=true)
-    {m_topo_property->getEdgeContainer().remove(e, exceptionIfNotFound);}
-
-    /// Fournit l'accès aux arêtes topologiques qui utilisent cette CoEdge avec une copie
-    void getEdges(std::vector<Edge* >& edges) const
-    { m_topo_property->getEdgeContainer().get(edges); }
+    void removeEdge(Edge* e);
 
     /// Fournit l'accès aux arêtes topologiques qui utilisent cette CoEdge sans copie
     const std::vector<Edge* > & getEdges() const
-    {return m_topo_property->getEdgeContainer().get();}
-
-    /// fournit l'accès à l'une des arêtes
-    Edge* getEdge(uint ind) const
-    {return m_topo_property->getEdgeContainer().get(ind);}
-
-    uint getNbEdges() const
-    {return m_topo_property->getEdgeContainer().getNb();}
+    {return m_topo_property->getEdgeContainer();}
 
     /*------------------------------------------------------------------------*/
     /** \brief Remplace un sommet v1 par le sommet v2
@@ -176,32 +164,11 @@ public:
      */
     std::vector<CoEdge*> split(Topo::Vertex* vtx, uint nbMeshingEdges, Internal::InfoCommand* icmd, bool sortCoEdges);
 
-    /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux sommets topologiques incidents avec une copie
-     *
-     *  \param vertices les sommets incidents
-     */
-    void getVertices(std::vector<Topo::Vertex* >& vertices) const
-    {m_topo_property->getVertexContainer().get(vertices);}
-
-    /** Fournit l'accès aux sommets topologiques incidents sans copie
-     */
     const std::vector<Topo::Vertex* >& getVertices() const
-        {return m_topo_property->getVertexContainer().get();}
-
-    /// fournit l'accès à l'un des sommets
-    Topo::Vertex* getVertex(uint ind) const
-    {return m_topo_property->getVertexContainer().get(ind);}
-
-    /// \return le nombre de Vertex
-    uint getNbVertices() const;
-
-    /// vérifie si cette arête commune contient ou non ce sommet
-    bool find(Topo::Vertex* v) const
-    {return m_topo_property->getVertexContainer().find(v);}
+        {return m_topo_property->getVertexContainer();}
 
     /// accès à tous les sommets
-    void getAllVertices(std::vector<Topo::Vertex* >& vertices, const bool unique=true) const;
+    std::vector<Topo::Vertex* > getAllVertices() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès aux sommets topologiques opposé à un sommet
@@ -213,7 +180,7 @@ public:
 
     /*------------------------------------------------------------------------*/
     /** Constitue la liste des Blocs adjacents */
-    void getBlocks(std::vector<Block* >& blocks) const;
+    std::vector<Block* > getBlocks() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Fournit une représentation affichable de l'entité en se basant
@@ -391,10 +358,7 @@ public:
 
     /*------------------------------------------------------------------------*/
     /** Constitue la liste des CoFaces adjacentes */
-    void getCoFaces(std::vector<Topo::CoFace* >& cofaces) const;
-
-    /// le nombre de cofaces adjacentes
-    uint getNbCofaces() const;
+    std::vector<Topo::CoFace* > getCoFaces() const;
 
     /** Booléen qui signale que l'on est en cours d'édition de l'objet
      * (une des propriétées a sa copie non nulle) */

@@ -45,57 +45,31 @@ CommandSnapVertices(Internal::Context& c,
     uint marque = vertices1.size() + vertices2.size();
     std::map<Topo::Block*, uint> filtre_block;
 
-    for (std::vector<Topo::Vertex* >::iterator iter1 = vertices1.begin();
-            iter1 != vertices1.end(); ++iter1){
-        std::vector<Block* > blocks;
-        (*iter1)->getBlocks(blocks);
+    for (Topo::Vertex* vtx : vertices1)
+        for (Topo::Block* vtx_bl : vtx->getBlocks())
+            filtre_block[vtx_bl] += 1;
 
-        for (std::vector<Topo::Block* >::iterator iter5 = blocks.begin();
-                iter5 != blocks.end(); ++iter5){
-            filtre_block[*iter5] += 1;
+    for (Topo::Vertex* vtx : vertices2)
+        for (Topo::Block* vtx_bl : vtx->getBlocks()) {
+            filtre_block[vtx_bl] += 1;
+            if (filtre_block[vtx_bl] == marque)
+                m_common_block = vtx_bl;
         }
-    }
-
-    for (std::vector<Topo::Vertex* >::iterator iter1 = vertices2.begin();
-            iter1 != vertices2.end(); ++iter1){
-        std::vector<Block* > blocks;
-        (*iter1)->getBlocks(blocks);
-
-        for (std::vector<Topo::Block* >::iterator iter5 = blocks.begin();
-                iter5 != blocks.end(); ++iter5){
-            filtre_block[*iter5] += 1;
-            if (filtre_block[*iter5] == marque)
-                m_common_block = *iter5;
-        }
-    }
 
     if (m_common_block == 0){
     	// on cherche une coface
     	std::map<Topo::CoFace*, uint> filtre_coface;
 
-    	for (std::vector<Topo::Vertex* >::iterator iter1 = vertices1.begin();
-    			iter1 != vertices1.end(); ++iter1){
-    		std::vector<CoFace* > cofaces;
-    		(*iter1)->getCoFaces(cofaces);
+    	for (Topo::Vertex* vtx : vertices1)
+    		for (CoFace* vtx_cf : vtx->getCoFaces())
+    			filtre_coface[vtx_cf] += 1;
 
-    		for (std::vector<Topo::CoFace* >::iterator iter5 = cofaces.begin();
-    				iter5 != cofaces.end(); ++iter5){
-    			filtre_coface[*iter5] += 1;
+    	for (Topo::Vertex* vtx : vertices2)
+    		for (CoFace* vtx_cf : vtx->getCoFaces()) {
+    			filtre_coface[vtx_cf] += 1;
+                if (filtre_coface[vtx_cf] == marque)
+                    m_common_coface = vtx_cf;
     		}
-    	}
-
-    	for (std::vector<Topo::Vertex* >::iterator iter1 = vertices2.begin();
-    			iter1 != vertices2.end(); ++iter1){
-    		std::vector<CoFace* > cofaces;
-    		(*iter1)->getCoFaces(cofaces);
-
-    		for (std::vector<Topo::CoFace* >::iterator iter5 = cofaces.begin();
-    				iter5 != cofaces.end(); ++iter5){
-    			filtre_coface[*iter5] += 1;
-                if (filtre_coface[*iter5] == marque)
-                    m_common_coface = *iter5;
-    		}
-    	}
     }
 
     if (m_common_coface == 0 && m_common_block == 0)
@@ -124,8 +98,7 @@ CommandSnapVertices(Internal::Context& c,
         Block::eDirOnBlock dir_bl = Block::unknown;
 
         // les 8 sommets du bloc (en dupliquant si bloc dégénéré)
-    	std::vector<Vertex* > vertices;
-    	m_common_block->getHexaVertices(vertices);
+    	std::vector<Vertex* > vertices = m_common_block->getHexaVertices();
 
 #ifdef _DEBUG_SNAP
     	std::cout<<"getHexaVertices => ";
@@ -272,22 +245,19 @@ internalExecute()
         Vertex* som1 = *iter1;
         Vertex* som2 = *iter2;
 
-        std::vector<Block* > l_blocks;
-        std::vector<CoFace* > l_cofaces;
-
         // le som2 bouge, il est fusionné avec le som1
-        som2->getBlocks(l_blocks);
+        std::vector<Block* > l_blocks = som2->getBlocks();
         blocks.insert(blocks.end(), l_blocks.begin(), l_blocks.end());
 
-        som2->getCoFaces(l_cofaces);
+        std::vector<CoFace* > l_cofaces = som2->getCoFaces();
         cofaces.insert(cofaces.end(), l_cofaces.begin(), l_cofaces.end());
 
         // cas où le som1 bouge
         if (!m_project_on_first){
-            som1->getBlocks(l_blocks);
+            l_blocks = som1->getBlocks();
             blocks.insert(blocks.end(), l_blocks.begin(), l_blocks.end());
 
-            som1->getCoFaces(l_cofaces);
+            l_cofaces = som1->getCoFaces();
             cofaces.insert(cofaces.end(), l_cofaces.begin(), l_cofaces.end());
         }
     }
@@ -305,9 +275,9 @@ internalExecute()
 
     std::vector<CoEdge* > coedges;
     if (m_common_block)
-    	m_common_block->getCoEdges(coedges);
+    	coedges = m_common_block->getCoEdges();
     else if (m_common_coface)
-    	m_common_coface->getCoEdges(coedges);
+    	coedges = m_common_coface->getCoEdges();
 
     // on marque les arêtes dans le bloc
     std::map<CoEdge*, uint> filtre_coedge;
@@ -334,12 +304,9 @@ internalExecute()
 
         // recherche d'une arête entre 2 sommets fusionnés
         CoEdge* coedge_between = 0;
-        std::vector<CoEdge* > loc_coedges;
-        som1->getCoEdges(loc_coedges);
-        for (std::vector<CoEdge* >::iterator iter = loc_coedges.begin();
-                iter != loc_coedges.end(); ++iter)
-            if (filtre_coedge[*iter] == 1 && som2 == (*iter)->getOppositeVertex(som1))
-                coedge_between = *iter;
+        for (CoEdge* som1_ce : som1->getCoEdges())
+            if (filtre_coedge[som1_ce] == 1 && som2 == som1_ce->getOppositeVertex(som1))
+                coedge_between = som1_ce;
 
         // on ne trouve pas d'arête, peut-être parce qu'elle est composée
         if(0 == coedge_between)
@@ -350,13 +317,10 @@ internalExecute()
 
         // on met de côtés les faces communes touchées
         // ainsi que les blocs touchés
-        std::vector<CoFace* > loc_cofaces;
-        coedge_between->getCoFaces(loc_cofaces);
-        for (std::vector<CoFace* >::iterator iter2 = loc_cofaces.begin();
-                iter2 != loc_cofaces.end(); ++iter2){
+        std::vector<CoFace* > loc_cofaces = coedge_between->getCoFaces();
+        for (auto iter2 = loc_cofaces.begin(); iter2 != loc_cofaces.end(); ++iter2){
             cofaces_degenerated.push_back(*iter2);
-            std::vector<Block* > loc_blocs;
-            (*iter2)->getBlocks(loc_blocs);
+            std::vector<Block* > loc_blocs = (*iter2)->getBlocks();
             blocks_degenerated.insert(blocks_degenerated.end(), loc_blocs.begin(), loc_blocs.end());
         }
 
@@ -389,33 +353,29 @@ internalExecute()
         Block* bloc = *iter;
 
         // remplissage de filtre_block
-        for (uint i=0; i<bloc->getNbVertices(); i++)
-            if (filtre_vertex[bloc->getVertex(i)] == 1)
+        const std::vector<Vertex*>& vertices = bloc->getVertices();
+        for (uint i=0; i<vertices.size(); i++)
+            if (filtre_vertex[vertices[i]] == 1)
                 filtre_block[bloc] += 1;
 
         // remplissage de filtre_coface
-        std::vector<CoFace* > loc_cofaces;
-        bloc->getCoFaces(loc_cofaces);
-        for (std::vector<CoFace* >::iterator iter2 = loc_cofaces.begin();
-                        iter2 != loc_cofaces.end(); ++iter2){
-            CoFace* coface = *iter2;
-            for (uint i=0; i<coface->getNbVertices(); i++)
-                if (filtre_vertex[coface->getVertex(i)] == 1)
+        for (CoFace* coface : bloc->getCoFaces())
+            for (Vertex* vtx : coface->getVertices())
+                if (filtre_vertex[vtx] == 1)
                     filtre_coface[coface] += 1;
-        }
 
         // réorientation du bloc
-        if (bloc->isStructured() && bloc->getNbFaces() == 6){
+        const std::vector<Face*>& faces = bloc->getFaces();
+        if (bloc->isStructured() && faces.size() == 6){
 
             // recherche d'une Face
             Face* face = 0;
             uint nb_vtx_max = 0;
 
-            for (uint i=0; i<bloc->getNbFaces(); i++){
+            for (Face* loc_face : faces){
                 uint nb_vtx = 0;
-                Face* loc_face = bloc->getFace(i);
-                for (uint j=0; j<loc_face->getNbVertices(); j++)
-                    if (filtre_vertex[loc_face->getVertex(j)] != 0)
+                for (Vertex* vtx : loc_face->getVertices())
+                    if (filtre_vertex[vtx] != 0)
                         nb_vtx+=1;
                 if (nb_vtx>nb_vtx_max){
 #ifdef _DEBUG_SNAP
@@ -425,7 +385,7 @@ internalExecute()
                     nb_vtx_max = nb_vtx;
                 }
                 else if (nb_vtx>0 && nb_vtx==nb_vtx_max
-                        && face->getNbVertices()>loc_face->getNbVertices()){
+                        && face->getVertices().size()>loc_face->getVertices().size()){
                     // on privilégie la face la plus dégénérée
                     face = loc_face;
                 }
@@ -437,16 +397,16 @@ internalExecute()
                             <<" et pour Face "<<face->getName()<<std::endl;
 #endif
                 bloc->saveBlockTopoProperty(&getInfoCommand());
-                bloc->permuteToKmaxFace(bloc->getIndex(face), &getInfoCommand());
+                bloc->permuteToKmaxFace(Utils::getIndexOf(face, faces), &getInfoCommand());
             }
         } // end if bloc->isStructured() && getNbFaces() == 6
 
-        if (!bloc->isStructured() && bloc->getNbVertices() == 7 && filtre_block[bloc] == 1){
+        if (!bloc->isStructured() && vertices.size() == 7 && filtre_block[bloc] == 1){
         	// si c'est l'un des 4 premiers sommets qui est pris dans la fusion,
         	// alors on symétrise ce bloc / arête opposée au 7ème sommet
         	bool symNeeded = false;
         	for (uint i=0;i<4; i++)
-        		if (1 == filtre_vertex[bloc->getVertex(i)])
+        		if (1 == filtre_vertex[vertices[i]])
         			symNeeded = true;
         	if (symNeeded) {
 #ifdef _DEBUG_SNAP
@@ -473,15 +433,10 @@ internalExecute()
         CoEdge* coedge_between = *iter3;
 
         // marque les arêtes
-        std::vector<Topo::Edge* > edges;
-        som1->getEdges(edges);
-        for (std::vector<Topo::Edge* >::iterator iter4 = edges.begin();
-                    iter4 != edges.end(); ++iter4)
-            filtre_edge[*iter4] = 1;
-        som2->getEdges(edges);
-        for (std::vector<Topo::Edge* >::iterator iter4 = edges.begin();
-                    iter4 != edges.end(); ++iter4)
-            filtre_edge[*iter4] = 2;
+        for (Topo::Edge* som1_edge : som1->getEdges())
+            filtre_edge[som1_edge] = 1;
+        for (Topo::Edge* som2_edge : som2->getEdges())
+            filtre_edge[som2_edge] = 2;
 
 #ifdef _DEBUG_SNAP
         std::cout<<" merge de "<<som1->getName()<<" avec "<<som2->getName()
@@ -511,49 +466,48 @@ internalExecute()
     for (std::list<CoFace*>::iterator iter = cofaces_degenerated.begin();
             iter != cofaces_degenerated.end(); ++iter){
         CoFace* coface = *iter;
-        if (coface->getNbVertices() == 1){
+        if (coface->getVertices().size() == 1){
 #ifdef _DEBUG_SNAP
             std::cout<<" cofaces dégénérée avec 1 seul sommet "<<coface->getName()<<std::endl;
 #endif
             coface->free(&getInfoCommand());
             MGX_NOT_YET_IMPLEMENTED("CommandSnapVertices avec face commune dégénérée en 1 seul sommet")
 
-        } else if (coface->getNbVertices() == 2){
+        } else if (coface->getVertices().size() == 2){
 #ifdef _DEBUG_SNAP
             std::cout<<" cofaces dégénérée avec 2 sommets "<<coface->getName()<<std::endl;
 #endif
-            Edge* a1 = coface->getEdge(0);
-            Edge* a3 = coface->getEdge(1);
+            Edge* a1 = coface->getEdges()[0];
+            Edge* a3 = coface->getEdges()[1];
 #ifdef _DEBUG_SNAP
             std::cout<<" merge entre les arêtes "<<a1->getName()<<" et "
                     <<a3->getName()<<std::endl;
 #endif
-            if (a1->getNbCoEdges() > 1 || a3->getNbCoEdges() > 1)
+            if (a1->getCoEdges().size() > 1 || a3->getCoEdges().size() > 1)
                 throw TkUtil::Exception (TkUtil::UTF8String ("CommandSnapVertices, merge d'une arête composée non prévu", TkUtil::Charset::UTF_8));
 
             // la fusion se fait sur les arêtes internes
             if (filtre_edge[a1] == 1 && filtre_edge[a3] == 2)
-                a1->getCoEdge(0)->merge(a3->getCoEdge(0), &getInfoCommand());
+                a1->getCoEdges()[0]->merge(a3->getCoEdges()[0], &getInfoCommand());
             else if (filtre_edge[a1] == 2 && filtre_edge[a3] == 1)
-                a3->getCoEdge(0)->merge(a1->getCoEdge(0), &getInfoCommand());
+                a3->getCoEdges()[0]->merge(a1->getCoEdges()[0], &getInfoCommand());
             else
                 throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, CommandSnapVertices, le filtre_edge ne nous apprend rien", TkUtil::Charset::UTF_8));
 
             // il faut supprimer les Faces des blocs
-            std::vector<Face* > loc_faces;
-            coface->getFaces(loc_faces);
+            std::vector<Face* > loc_faces = coface->getFaces();
             for (std::vector<Face* >::iterator iter2 = loc_faces.begin();
                     iter2 != loc_faces.end(); ++iter2){
                 Face* face = *iter2;
 #ifdef _DEBUG_SNAP
                 std::cout<<"  face impactée "<<face->getName()<<std::endl;
 #endif
-                if (face->getNbBlocks()!=1)
+                if (face->getBlocks().size()!=1)
                     throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, CommandSnapVertices, une Face n'a pas un unique Block", TkUtil::Charset::UTF_8));
 
-                Block* bloc = face->getBlock(0);
+                Block* bloc = face->getBlocks()[0];
                 bloc->saveBlockTopoProperty(&getInfoCommand());
-                bloc->getBlockTopoProperty()->getFaceContainer().remove(face, true);
+                Utils::remove(face, bloc->getBlockTopoProperty()->getFaceContainer());
                 face->free(&getInfoCommand());
             }
 
@@ -565,17 +519,19 @@ internalExecute()
     for (std::list<Block*>::iterator iter = blocks_degenerated.begin();
             iter != blocks_degenerated.end(); ++iter){
         Block* bloc = *iter;
-        if (bloc->getNbFaces() == 2){
+        const std::vector<Vertex*>& loc_vertices = bloc->getVertices();
+        const std::vector<Face*>& loc_faces = bloc->getFaces();
+        if (loc_faces.size() == 2){
 #ifdef _DEBUG_SNAP
             std::cout<<"  bloc "<<bloc->getName()
                      <<" avec plus que 2 faces"<<std::endl;
 #endif
             // suppression des cofaces (fusion d'une avec l'autre)
-            if (bloc->getFace(0)->getNbCoFaces() != 1 || bloc->getFace(1)->getNbCoFaces() != 1)
+            if (loc_faces[0]->getCoFaces().size() != 1 || loc_faces[1]->getCoFaces().size() != 1)
                 throw TkUtil::Exception (TkUtil::UTF8String ("CommandSnapVertices, cas avec plusieurs faces communes non prévu pour le moment", TkUtil::Charset::UTF_8));
             else {
-                CoFace* cf1 = bloc->getFace(0)->getCoFace(0);
-                CoFace* cf2 = bloc->getFace(1)->getCoFace(0);
+                CoFace* cf1 = loc_faces[0]->getCoFaces()[0];
+                CoFace* cf2 = loc_faces[1]->getCoFaces()[0];
 
                 if (filtre_coface[cf1] > filtre_coface[cf2])
                     cf1->merge(cf2, &getInfoCommand());
@@ -584,23 +540,19 @@ internalExecute()
             }
 
             // suppression des faces
-            std::vector<Face* > loc_faces;
-            bloc->getFaces(loc_faces);
-            for (std::vector<Face* >::iterator iter2 = loc_faces.begin();
-                    iter2 != loc_faces.end(); ++iter2)
-                (*iter2)->free(&getInfoCommand());
+            for (Face* f : loc_faces) f->free(&getInfoCommand());
 
             // suppression du bloc
             bloc->free(&getInfoCommand());
         }
-        else if (bloc->isStructured() && bloc->getNbVertices() == 8 && filtre_block[bloc] == 2){
+        else if (bloc->isStructured() && loc_vertices.size() == 8 && filtre_block[bloc] == 2){
 #ifdef _DEBUG_SNAP
             std::cout<<"  bloc "<<bloc->getName()
                      <<" avec dégénérescence en prisme [cas structuré]"<<std::endl;
 #endif
             // cas similaire à Block::degenerateFaceInEdge
-            if (bloc->getVertex(4) == bloc->getVertex(5))
-                bloc->getBlockTopoProperty()->getVertexContainer().set(5, bloc->getVertex(6));
+            if (loc_vertices[4] == loc_vertices[5])
+                bloc->getBlockTopoProperty()->getVertexContainer()[5] = loc_vertices[6];
             bloc->getBlockTopoProperty()->getVertexContainer().resize(6);
         }
         else {
@@ -619,8 +571,9 @@ internalExecute()
             bloc->saveBlockTopoProperty(&getInfoCommand());
 
             std::vector<Vertex*> loc_vtx;
-            for (uint i=0;i<bloc->getNbVertices(); i++){
-            	Vertex* vtx = bloc->getVertex(i);
+            const std::vector<Vertex*>& vertices = bloc->getVertices();
+            for (uint i=0;i<vertices.size(); i++){
+            	Vertex* vtx = vertices[i];
 #ifdef _DEBUG_SNAP
             	std::cout<<"    "<<vtx->getName()<<" , filtre_vertex: "<<filtre_vertex[vtx]<<std::endl;
 #endif
@@ -631,9 +584,7 @@ internalExecute()
             		// pour ne prendre qu'une fois le sommet
             		filtre_vertex[vtx] = 4;
             }
-            bloc->getBlockTopoProperty()->getVertexContainer().clear();
-            bloc->getBlockTopoProperty()->getVertexContainer().add(loc_vtx);
-
+            bloc->getBlockTopoProperty()->getVertexContainer() = loc_vtx;
 
             // on remet le filtre à l'état d'avant pour le prochain bloc
             for (uint i=0;i<loc_vtx.size(); i++)

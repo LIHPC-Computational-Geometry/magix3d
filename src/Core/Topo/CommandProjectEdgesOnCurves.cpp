@@ -70,11 +70,11 @@ internalExecute()
 
 		// recherche des courbes associées au premier sommet topo
 		std::vector<Geom::Curve*> curves1;
-		Internal::EntitiesHelper::getAssociatedCurves(coedge->getVertex(0), curves1);
+		Internal::EntitiesHelper::getAssociatedCurves(coedge->getVertices()[0], curves1);
 
 		// idem avec le 2ème sommet
 		std::vector<Geom::Curve*> curves2;
-		Internal::EntitiesHelper::getAssociatedCurves(coedge->getVertex(1), curves2);
+		Internal::EntitiesHelper::getAssociatedCurves(coedge->getVertices()[1], curves2);
 
 		// recherche de la courbe commune entre les deux groupes
 		Geom::GeomEntity* ge = Geom::GeomHelper::getCommonCurve(curves1, curves2);
@@ -83,11 +83,11 @@ internalExecute()
 			// on tente avec une surface
 			// recherche des surfaces associées au premier sommet topo
 			std::vector<Geom::Surface*> surf1;
-			Internal::EntitiesHelper::getAssociatedSurfaces(coedge->getVertex(0), surf1);
+			Internal::EntitiesHelper::getAssociatedSurfaces(coedge->getVertices()[0], surf1);
 
 			// idem avec le 2ème sommet
 			std::vector<Geom::Surface*> surf2;
-			Internal::EntitiesHelper::getAssociatedSurfaces(coedge->getVertex(1), surf2);
+			Internal::EntitiesHelper::getAssociatedSurfaces(coedge->getVertices()[1], surf2);
 
 			// recherche de la surface commune entre les deux groupes
 			ge = Geom::GeomHelper::getCommonSurface(surf1, surf2);

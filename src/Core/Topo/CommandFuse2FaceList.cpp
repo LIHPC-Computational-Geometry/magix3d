@@ -45,28 +45,20 @@ internalExecute()
     // à 3 pour les sommets communs à cofaces1 et cofaces2
     std::map<Vertex*,uint> filtre_vtx;
 
-    for (std::vector<CoFace*>::iterator iter1 = m_cofaces1.begin();
-    		iter1 != m_cofaces1.end(); ++iter1){
-    	std::vector<Vertex*> vertices;
-    	(*iter1)->getAllVertices(vertices);
-    	for (std::vector<Vertex*>::iterator iter2 = vertices.begin();
-    			iter2 != vertices.end(); ++iter2){
-    		filtre_vtx[*iter2] = 1;
-    	} // end for iter2 = vertices.begin()
-    } // end for iter1 = cofaces1.begin()
+    for (CoFace* cf : m_cofaces1){
+    	for (Vertex* v : cf->getAllVertices()){
+    		filtre_vtx[v] = 1;
+    	}
+    }
 
-    for (std::vector<CoFace*>::iterator iter1 = m_cofaces2.begin();
-    		iter1 != m_cofaces2.end(); ++iter1){
-    	std::vector<Vertex*> vertices;
-    	(*iter1)->getAllVertices(vertices);
-    	for (std::vector<Vertex*>::iterator iter2 = vertices.begin();
-    			iter2 != vertices.end(); ++iter2){
-    		if (1 == filtre_vtx[*iter2])
-    			filtre_vtx[*iter2] = 3;
-    		else if (0 == filtre_vtx[*iter2])
-    			filtre_vtx[*iter2] = 2;
-    	} // end for iter2 = vertices.begin()
-    } // end for iter1 = cofaces1.begin()
+    for (CoFace* cf : m_cofaces2){
+    	for (Vertex* v : cf->getAllVertices()){
+    		if (1 == filtre_vtx[v])
+    			filtre_vtx[v] = 3;
+    		else if (0 == filtre_vtx[v])
+    			filtre_vtx[v] = 2;
+    	} 
+    }
 
     // constitution des 2 listes de sommets dont on cherche à trouver une relation de proximité
     std::vector<Vertex*> vertices1;
@@ -130,9 +122,9 @@ internalExecute()
     for (std::vector<CoFace*>::iterator iter1 = m_cofaces1.begin();
     		iter1 != m_cofaces1.end(); ++iter1){
     	CoFace* coface1 = *iter1;
-    	std::vector<Vertex*> verticesA;
+    	std::vector<Vertex*> verticesA = coface1->getAllVertices();
     	std::vector<Vertex*> verticesB;
-    	coface1->getAllVertices(verticesA);
+    	
 #ifdef _DEBUG_GLUE
     	std::cout<<"on observe la face commune "<<coface1->getName();
     	for (uint i=0; i<verticesA.size(); i++)

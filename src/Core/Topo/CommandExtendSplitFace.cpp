@@ -37,22 +37,16 @@ internalExecute()
             << " de nom unique " << getUniqueName ( );
 
     // vérification que le sommet n'est pas à une extrémité de la coface, sinon cela ne ferait rien
-    std::vector<Vertex* > vertices;
-    m_coface->getVertices(vertices);
-    for (std::vector<Vertex* >::iterator iter = vertices.begin(); iter != vertices.end(); ++iter)
-    	if (m_sommet == *iter)
+    for (Topo::Vertex* v : m_coface->getVertices())
+    	if (m_sommet == v)
     		throw TkUtil::Exception (TkUtil::UTF8String ("La face ne peut être découpée avec un sommet au sommet de la face (en prendre un sur un côté)", TkUtil::Charset::UTF_8));
 
 
     // recherche de l'arête de la face qui contient ce sommet
-    std::vector<CoEdge* > coedges;
-    m_coface->getCoEdges(coedges);
-
     CoEdge* coedge = 0;
-    for (std::vector<Topo::CoEdge* >::iterator iter = coedges.begin();
-            iter != coedges.end(); ++iter)
-    	if ((*iter)->find(m_sommet))
-    		coedge = *iter;
+    for (Topo::CoEdge* e : m_coface->getCoEdges())
+    	if (Utils::contains(m_sommet, e->getVertices()))
+    		coedge = e;
 
     if (coedge == 0)
     	throw TkUtil::Exception (TkUtil::UTF8String ("La face ne peut être découpée avec ce sommet, on ne trouve pas d'arête contenant ce sommet", TkUtil::Charset::UTF_8));
@@ -62,9 +56,9 @@ internalExecute()
     std::vector<CoFace* > cofaces;
     cofaces.push_back(m_coface);
 
-    if (coedge->getVertex(0) == m_sommet)
+    if (coedge->getVertices()[0] == m_sommet)
     	TopoHelper::splitFaces2D(cofaces, coedge, 0, 0, false, false, splitingEdges, &getInfoCommand());
-    else if (coedge->getVertex(1) == m_sommet)
+    else if (coedge->getVertices()[1] == m_sommet)
     	TopoHelper::splitFaces2D(cofaces, coedge, 1, 0, false, false, splitingEdges, &getInfoCommand());
     else
     	throw TkUtil::Exception (TkUtil::UTF8String ("La face ne peut être découpée avec ce sommet, on ne trouve retrouve pas ce sommet dans l'arête", TkUtil::Charset::UTF_8));
@@ -85,10 +79,8 @@ void CommandExtendSplitFace::
 countNbCoEdgesByVertices(std::map<Topo::Vertex*, uint> &nb_coedges_by_vertex)
 {
 	// stocke pour chacun des sommets le nombre d'arêtes auxquelles il est relié
-	std::vector<Topo::Vertex* > all_vertices;
-	m_coface->getAllVertices(all_vertices);
-	for (uint i=0; i<all_vertices.size(); i++)
-		nb_coedges_by_vertex[all_vertices[i]] = all_vertices[i]->getNbCoEdges();
+	for (Topo::Vertex * vtx : m_coface->getAllVertices())
+		nb_coedges_by_vertex[vtx] = vtx->getCoEdges().size();
 }
 /*----------------------------------------------------------------------------*/
 void CommandExtendSplitFace::getPreviewRepresentation(Utils::DisplayRepresentation& dr)

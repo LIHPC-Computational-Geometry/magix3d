@@ -787,7 +787,7 @@ std::string TopoManager::getEdgeAt(const Point& pt1, const Point& pt2) const
 	const std::vector<CoEdge* >& all = m_coedges.get();
 	for (std::vector<CoEdge*>::const_iterator iter = all.begin();
 			iter != all.end(); ++iter)
-		if ((*iter)->getVertex(0)->getCoord() == pt1 && (*iter)->getVertex(1)->getCoord() == pt2)
+		if ((*iter)->getVertices()[0]->getCoord() == pt1 && (*iter)->getVertices()[1]->getCoord() == pt2)
 			selected.push_back(*iter);
 
 	if (selected.size() == 1)
@@ -814,8 +814,7 @@ std::string TopoManager::getFaceAt(std::vector<Point>& pts) const
 	const std::vector<CoFace* >& all = m_cofaces.get();
 	for (std::vector<CoFace*>::const_iterator iter = all.begin();
 	            iter != all.end(); ++iter){
-		std::vector<Topo::Vertex*> vertices;
-		(*iter)->getAllVertices(vertices);
+		std::vector<Topo::Vertex*> vertices = (*iter)->getAllVertices();
 		uint i;
 		if (vertices.size() != pts.size())
 			continue;
@@ -848,8 +847,7 @@ std::string TopoManager::getBlockAt(std::vector<Point>& pts) const
 	const std::vector<Block* >& all = m_blocks.get();
 	for (std::vector<Block*>::const_iterator iter = all.begin();
 	            iter != all.end(); ++iter){
-		std::vector<Topo::Vertex*> vertices;
-		(*iter)->getAllVertices(vertices);
+		std::vector<Topo::Vertex*> vertices = (*iter)->getAllVertices();
 		uint i;
 		if (vertices.size() != pts.size())
 			continue;
@@ -2939,11 +2937,8 @@ Mgx3D::Internal::M3DCommandResult* TopoManager::snapVertices(Topo::CoEdge* ce1, 
 		bool project_on_first,
 		TkUtil::UTF8String& scriptCommand)
 {
-    std::vector<Topo::Vertex* > vertices1;
-    std::vector<Topo::Vertex* > vertices2;
-
-    ce1->getVertices(vertices1);
-    ce2->getVertices(vertices2);
+    const std::vector<Topo::Vertex*>& vertices1 = ce1->getVertices();
+    const std::vector<Topo::Vertex*>& vertices2 = ce2->getVertices();
 
     return snapVertices(vertices1, vertices2, project_on_first, scriptCommand);
 }
@@ -2952,11 +2947,8 @@ Mgx3D::Internal::M3DCommandResult* TopoManager::snapVertices(Topo::CoFace* cf1, 
 		bool project_on_first,
 		TkUtil::UTF8String& scriptCommand)
 {
-    std::vector<Topo::Vertex* > vertices1;
-    std::vector<Topo::Vertex* > vertices2;
-
-    cf1->getVertices(vertices1);
-    cf2->getVertices(vertices2);
+    const std::vector<Topo::Vertex*>& vertices1 = cf1->getVertices();
+    const std::vector<Topo::Vertex*>& vertices2 = cf2->getVertices();
 
     return snapVertices(vertices1, vertices2, project_on_first, scriptCommand);
 }
@@ -3036,10 +3028,8 @@ Mgx3D::Internal::M3DCommandResult* TopoManager::makeBlocksByRevol(std::vector<Co
     for (uint i=0; i<coedges.size(); i++){
     	CoEdge* coedge = coedges[i];
 
-        std::vector<CoFace* > cofaces_dep;
+        std::vector<CoFace* > cofaces_dep = coedge->getCoFaces();
         std::vector<CoFace* > cofaces_suiv;
-
-        coedge->getCoFaces(cofaces_dep);
 
         for (std::vector<CoFace* >::iterator iter = cofaces_dep.begin();
                 iter != cofaces_dep.end(); ++iter){
@@ -3616,7 +3606,7 @@ getFusableEdgesObj()
     std::vector<Topo::CoFace* > cofaces;
     for (std::vector<Topo::CoFace* >::iterator iter = all_cofaces.begin();
             iter != all_cofaces.end(); ++iter)
-        if ((*iter)->getNbFaces() == 0)
+        if ((*iter)->getFaces().size() == 0)
             cofaces.push_back(*iter);
 
     // On fait une recherche des groupes de CoEdges partagées par les même CoFaces
@@ -3626,17 +3616,9 @@ getFusableEdgesObj()
     std::map<uint, uint> coedge_color;
     uint color = 0; // la couleur pour les prochaines coedges vues
 
-    for (std::vector<Topo::CoFace* >::iterator iter1 = cofaces.begin();
-            iter1 != cofaces.end(); ++iter1){
-        Topo::CoFace* coface = *iter1;
-        std::vector<Edge* > edges;
-        coface->getEdges(edges);
-
-        for (std::vector<Topo::Edge* >::iterator iter2 = edges.begin();
-                iter2 != edges.end(); ++iter2){
-            Topo::Edge* edge = *iter2;
-            std::vector<CoEdge* > coedges;
-            edge->getCoEdges(coedges);
+    for (Topo::CoFace* coface : cofaces){
+        for (Topo::Edge* edge : coface->getEdges()){
+            std::vector<CoEdge* > coedges = edge->getCoEdges();
             // on change de couleur à chaque nouvelle arête
             color += 1;
 
@@ -3661,17 +3643,9 @@ getFusableEdgesObj()
 
     // après coloration, on recherche les groupes de même couleur
     // on remet à 0 les couleurs des groupes sélectionnés pour éviter de les prendre 2 fois
-    for (std::vector<Topo::CoFace* >::iterator iter1 = cofaces.begin();
-            iter1 != cofaces.end(); ++iter1){
-        Topo::CoFace* coface = *iter1;
-        std::vector<Edge* > edges;
-        coface->getEdges(edges);
-
-        for (std::vector<Topo::Edge* >::iterator iter2 = edges.begin();
-                iter2 != edges.end(); ++iter2){
-            Topo::Edge* edge = *iter2;
-            std::vector<CoEdge* > coedges;
-            edge->getCoEdges(coedges);
+    for (Topo::CoFace* coface : cofaces){
+        for (Topo::Edge* edge : coface->getEdges()){
+            std::vector<CoEdge* > coedges = edge->getCoEdges();
 
             uint prec_color = 0;
             std::vector<CoEdge*> fusesableCoedges;
@@ -5020,7 +4994,7 @@ std::vector<std::string> TopoManager::getBorderFaces() const
 
     for (std::vector<Topo::CoFace* >::iterator iter = cofaces.begin();
     		iter != cofaces.end(); ++iter)
-    	if ((*iter)->getNbBlocks() == 1)
+    	if ((*iter)->getBlocks().size() == 1)
     		borderFaces.push_back((*iter)->getName());
 
     return borderFaces;
@@ -5036,7 +5010,7 @@ std::vector<std::string> TopoManager::getFacesWithoutBlock() const
 
     for (std::vector<Topo::CoFace* >::iterator iter = cofaces.begin();
     		iter != cofaces.end(); ++iter)
-    	if ((*iter)->getNbBlocks() == 0)
+    	if ((*iter)->getBlocks().size() == 0)
     		facesWB.push_back((*iter)->getName());
 
     return facesWB;
@@ -5050,12 +5024,11 @@ std::vector<std::string> TopoManager::getSemiConformalFaces() const
 	// recherches parmis ces cofaces celles qui sont reliées à deux faces et pour lesquelles
 	// il y a une semi-conformité
 	std::vector<std::string> semiConf;
-	for (uint i=0; i<cofaces.size(); i++){
-		CoFace* coface = cofaces[i];
+	for (CoFace* coface : cofaces){
 		bool isSemiConf = false;
-		if (coface->getNbFaces() == 2 && coface->isStructured())
+		if (coface->getFaces().size() == 2 && coface->isStructured())
 			for (uint j=0; j<2; j++){
-				Face* face = coface->getFace(j);
+				Face* face = coface->getFaces()[j];
 				for (uint dir=0; dir<2; dir++)
 					if (face->getRatio(coface,dir) != 1)
 						isSemiConf = true;

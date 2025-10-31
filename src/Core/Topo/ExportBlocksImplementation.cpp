@@ -67,8 +67,8 @@ void ExportBlocksImplementation::writeEdges(std::ofstream &str, std::vector<Topo
 
         auto blk_edge_id = 0;
         for(auto e : edges){
-            int n0 = m_node_ids_mapping[e->getVertex(0)->getName()];
-            int n1 = m_node_ids_mapping[e->getVertex(1)->getName()];
+            int n0 = m_node_ids_mapping[e->getVertices()[0]->getName()];
+            int n1 = m_node_ids_mapping[e->getVertices()[1]->getName()];
             str << n0 <<  " " << n1 << "\n";
             m_edge_ids_mapping[e->getName()] = blk_edge_id++;
         }
@@ -129,46 +129,47 @@ void ExportBlocksImplementation::writeFaces(std::ofstream &str, std::vector<Topo
 
 
             m_face_ids_mapping[f->getName()] = blk_face_id++;
-            Edge* e0 = f->getEdge(0);
-            Edge* e1 = f->getEdge(1);
-            Edge* e2 = f->getEdge(2);
-            Edge* e3 = f->getEdge(3);
+            const std::vector<Edge*> f_edges = f->getEdges();
+            Edge* e0 = f_edges[0];
+            Edge* e1 = f_edges[1];
+            Edge* e2 = f_edges[2];
+            Edge* e3 = f_edges[3];
 
             str << "[ ";
 
-            if(f->getVertex(0)->getName() == e0->getVertex(0)->getName()) {
+            if(f->getVertices()[0]->getName() == e0->getVertices()[0]->getName()) {
                 for (int i = 0; i < e0->getCoEdges().size(); i++)
-                    str << m_edge_ids_mapping[e0->getCoEdge(i)->getName()]<<" ";
-            }else if(f->getVertex(0)->getName() == e0->getVertex(1)->getName()){
+                    str << m_edge_ids_mapping[e0->getCoEdges()[i]->getName()]<<" ";
+            }else if(f->getVertices()[0]->getName() == e0->getVertices()[1]->getName()){
                 for (int i = e0->getCoEdges().size()-1; i >= 0 ; i--)
-                    str << m_edge_ids_mapping[e0->getCoEdge(i)->getName()]<<" ";
+                    str << m_edge_ids_mapping[e0->getCoEdges()[i]->getName()]<<" ";
             }
             str << "] [ ";
 
-            if(f->getVertex(1)->getName() == e1->getVertex(0)->getName()) {
+            if(f->getVertices()[1]->getName() == e1->getVertices()[0]->getName()) {
                 for (int i = 0; i < e1->getCoEdges().size(); i++)
-                    str << m_edge_ids_mapping[e1->getCoEdge(i)->getName()]<<" ";
-            }else if(f->getVertex(1)->getName() == e1->getVertex(1)->getName()){
+                    str << m_edge_ids_mapping[e1->getCoEdges()[i]->getName()]<<" ";
+            }else if(f->getVertices()[1]->getName() == e1->getVertices()[1]->getName()){
                 for (int i = e1->getCoEdges().size()-1; i >= 0 ; i--)
-                    str << m_edge_ids_mapping[e1->getCoEdge(i)->getName()]<<" ";
+                    str << m_edge_ids_mapping[e1->getCoEdges()[i]->getName()]<<" ";
             }
             str << "] [ ";
 
-            if(f->getVertex(2)->getName() == e2->getVertex(0)->getName()) {
+            if(f->getVertices()[2]->getName() == e2->getVertices()[0]->getName()) {
                 for (int i = 0; i < e2->getCoEdges().size(); i++)
-                    str << m_edge_ids_mapping[e2->getCoEdge(i)->getName()]<<" ";
-            }else if(f->getVertex(2)->getName() == e2->getVertex(1)->getName()){
+                    str << m_edge_ids_mapping[e2->getCoEdges()[i]->getName()]<<" ";
+            }else if(f->getVertices()[2]->getName() == e2->getVertices()[1]->getName()){
                 for (int i = e2->getCoEdges().size()-1; i >= 0 ; i--)
-                    str << m_edge_ids_mapping[e2->getCoEdge(i)->getName()]<<" ";
+                    str << m_edge_ids_mapping[e2->getCoEdges()[i]->getName()]<<" ";
             }
             str << "] [ ";
 
-            if(f->getVertex(3)->getName() == e3->getVertex(0)->getName()) {
+            if(f->getVertices()[3]->getName() == e3->getVertices()[0]->getName()) {
                 for (int i = 0; i < e3->getCoEdges().size(); i++)
-                    str << m_edge_ids_mapping[e3->getCoEdge(i)->getName()]<<" ";
-            }else if(f->getVertex(3)->getName() == e3->getVertex(1)->getName()){
+                    str << m_edge_ids_mapping[e3->getCoEdges()[i]->getName()]<<" ";
+            }else if(f->getVertices()[3]->getName() == e3->getVertices()[1]->getName()){
                 for (int i = e3->getCoEdges().size()-1; i >= 0 ; i--)
-                    str << m_edge_ids_mapping[e3->getCoEdge(i)->getName()]<<" ";
+                    str << m_edge_ids_mapping[e3->getCoEdges()[i]->getName()]<<" ";
             }
             str << "]\n";
         }
@@ -178,42 +179,43 @@ void ExportBlocksImplementation::writeFaces(std::ofstream &str, std::vector<Topo
 void ExportBlocksImplementation::writeBlocks(std::ofstream &str, std::vector<Topo::Block*> blocks) {
         str  << "BLOCKS " << blocks.size() << "\n";
         for(auto b : blocks){
+            const std::vector<Vertex*>& vertices = b->getVertices();
+            int v0 = m_node_ids_mapping[vertices[0]->getName()];
+            int v1 = m_node_ids_mapping[vertices[1]->getName()];
+            int v2 = m_node_ids_mapping[vertices[2]->getName()];
+            int v3 = m_node_ids_mapping[vertices[3]->getName()];
+            int v4 = m_node_ids_mapping[vertices[4]->getName()];
+            int v5 = m_node_ids_mapping[vertices[5]->getName()];
+            int v6 = m_node_ids_mapping[vertices[6]->getName()];
+            int v7 = m_node_ids_mapping[vertices[7]->getName()];
 
-            int v0 = m_node_ids_mapping[b->getVertex(0)->getName()];
-            int v1 = m_node_ids_mapping[b->getVertex(1)->getName()];
-            int v2 = m_node_ids_mapping[b->getVertex(2)->getName()];
-            int v3 = m_node_ids_mapping[b->getVertex(3)->getName()];
-            int v4 = m_node_ids_mapping[b->getVertex(4)->getName()];
-            int v5 = m_node_ids_mapping[b->getVertex(5)->getName()];
-            int v6 = m_node_ids_mapping[b->getVertex(6)->getName()];
-            int v7 = m_node_ids_mapping[b->getVertex(7)->getName()];
-
-            Face* f0 = b->getFace(0);
-            Face* f1 = b->getFace(1);
-            Face* f2 = b->getFace(2);
-            Face* f3 = b->getFace(3);
-            Face* f4 = b->getFace(4);
-            Face* f5 = b->getFace(5);
+            const std::vector<Face*>& faces = b->getFaces();
+            Face* f0 = faces[0];
+            Face* f1 = faces[1];
+            Face* f2 = faces[2];
+            Face* f3 = faces[3];
+            Face* f4 = faces[4];
+            Face* f5 = faces[5];
 
             str << v0 << " " << v1 << " " << v2 << " " << v3 << " " << v4 << " ";
             str << v5 << " " << v6 << " " << v7 << " [ ";
             for (int i = 0; i < f0->getCoFaces().size(); i++)
-                str << m_face_ids_mapping[f0->getCoFace(i)->getName()]<<" ";
+                str << m_face_ids_mapping[f0->getCoFaces()[i]->getName()]<<" ";
             str << "] [ ";
             for (int i = 0; i < f1->getCoFaces().size(); i++)
-                str << m_face_ids_mapping[f1->getCoFace(i)->getName()]<<" ";
+                str << m_face_ids_mapping[f1->getCoFaces()[i]->getName()]<<" ";
             str << "] [ ";
             for (int i = 0; i < f2->getCoFaces().size(); i++)
-                str << m_face_ids_mapping[f2->getCoFace(i)->getName()]<<" ";
+                str << m_face_ids_mapping[f2->getCoFaces()[i]->getName()]<<" ";
             str << "] [ ";
             for (int i = 0; i < f3->getCoFaces().size(); i++)
-                str << m_face_ids_mapping[f3->getCoFace(i)->getName()]<<" ";
+                str << m_face_ids_mapping[f3->getCoFaces()[i]->getName()]<<" ";
             str << "] [ ";
             for (int i = 0; i < f4->getCoFaces().size(); i++)
-                str << m_face_ids_mapping[f4->getCoFace(i)->getName()]<<" ";
+                str << m_face_ids_mapping[f4->getCoFaces()[i]->getName()]<<" ";
             str << "] [ ";
             for (int i = 0; i < f5->getCoFaces().size(); i++)
-                str << m_face_ids_mapping[f5->getCoFace(i)->getName()]<<" ";
+                str << m_face_ids_mapping[f5->getCoFaces()[i]->getName()]<<" ";
             str << "]\n";
         }
 }

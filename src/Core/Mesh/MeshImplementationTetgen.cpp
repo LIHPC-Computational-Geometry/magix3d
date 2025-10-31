@@ -26,8 +26,7 @@ meshDelaunayTetgen(Mesh::CommandCreateMesh* command, Topo::Block* bl)
 #endif
 
     // TODO [FL] TEMPORAIRE POUR LES PYRAMIDES
-    std::vector<Topo::Vertex* > topo_vertices;
-    bl->getVertices(topo_vertices);
+    std::vector<Topo::Vertex* > topo_vertices = bl->getVertices();
     double x=0, y=0, z=0;
     for(unsigned int i=0;i<topo_vertices.size();i++){
         Topo::Vertex*  vi = topo_vertices[i];
@@ -40,8 +39,7 @@ meshDelaunayTetgen(Mesh::CommandCreateMesh* command, Topo::Block* bl)
     z/=topo_vertices.size();
     gmds::math::Point block_center(x,y,z);
     // on recupere les faces topologiques
-    std::vector<Topo::Face* >faces;
-    bl->getFaces(faces);
+    std::vector<Topo::Face* > faces = bl->getFaces();
     std::vector<std::vector<gmds::Face> > mesh_faces;
     std::vector<gmds::Face> mesh_faces_in1Surf;
     std::vector<gmds::Node> mesh_nodes;
@@ -56,8 +54,7 @@ meshDelaunayTetgen(Mesh::CommandCreateMesh* command, Topo::Block* bl)
     double ratio_hauteur_pyramides = meshingProp->getRatioPyramidSize();
 
    for(unsigned int i=0;i<faces.size();i++){
-        std::vector<Topo::CoFace* > cofaces;
-        faces[i]->getCoFaces(cofaces);
+        std::vector<Topo::CoFace* > cofaces = faces[i]->getCoFaces();
         for(unsigned int k=0;k<cofaces.size();k++){
 
             std::vector<gmds::Face> local_mesh_faces;

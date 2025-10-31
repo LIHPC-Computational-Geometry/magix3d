@@ -60,28 +60,16 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 	std::vector<Topo::Block*> topo_blocs;
 	m_context.getTopoManager().getBlocks(topo_blocs);
 
-	std::vector<Topo::CoFace*> topo_cofaces;
-	std::vector<Topo::CoEdge*> topo_coedges;
-	std::vector<Topo::Vertex*> topo_vertices;
-	topo_blocs[0]->getCoFaces(topo_cofaces);
-	topo_blocs[0]->getCoEdges(topo_coedges);
-	topo_blocs[0]->getVertices(topo_vertices);
-//
-//	std::vector<Mesh::Surface*> surfaces;
-//	std::vector<Mesh::Cloud*> clouds;
-//	m_context.getMeshManager().getSurfaces(surfaces);
-//	m_context.getMeshManager().getClouds(clouds);
-
 	gmds::Mesh& mesh = m_context.getMeshManager().getMesh()->getGMDSMesh();
 	{
 		// surfaces
-		for(unsigned int iCoFace=0; iCoFace<topo_cofaces.size(); iCoFace++) {
+		for(Topo::CoFace* coface : topo_blocs[0]->getCoFaces()) {
 
-			Geom::Surface* surf_tmp = dynamic_cast<Geom::Surface*> (topo_cofaces[iCoFace]->getGeomAssociation());
+			Geom::Surface* surf_tmp = dynamic_cast<Geom::Surface*> (coface->getGeomAssociation());
 			CHECK_NULL_PTR_ERROR(surf_tmp);
 			auto surf = mesh.newGroup<gmds::Face>(surf_tmp->getName());
 
-			std::vector<gmds::TCellID>& elems = topo_cofaces[iCoFace]->faces();
+			std::vector<gmds::TCellID>& elems = coface->faces();
 			std::vector<gmds::Face> face_elems;
 			face_elems.resize(elems.size());
 			for(unsigned int iGMDSFace=0; iGMDSFace<elems.size(); iGMDSFace++) {
@@ -93,13 +81,13 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 		}
 
 		// curves
-		for(unsigned int iCoEdge=0; iCoEdge<topo_coedges.size(); iCoEdge++) {
+		for(Topo::CoEdge* coedge : topo_blocs[0]->getCoEdges()) {
 
-		    Geom::Curve* curv_tmp = dynamic_cast<Geom::Curve*> (topo_coedges[iCoEdge]->getGeomAssociation());
+		    Geom::Curve* curv_tmp = dynamic_cast<Geom::Curve*> (coedge->getGeomAssociation());
 		    CHECK_NULL_PTR_ERROR(curv_tmp);
 		    auto cl = mesh.newGroup<gmds::Node>(curv_tmp->getName());
 
-		    std::vector<gmds::TCellID>& elems = topo_coedges[iCoEdge]->nodes();
+		    std::vector<gmds::TCellID>& elems = coedge->nodes();
 
 		    std::vector<gmds::Node> node_elems;
 		    node_elems.resize(elems.size());
@@ -112,13 +100,12 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 		}
 
 		// vertices
-		for(unsigned int iVertex=0; iVertex<topo_vertices.size(); iVertex++) {
+		for(Topo::Vertex* vertex : topo_blocs[0]->getVertices()) {
 
-			Geom::Vertex* vert_tmp = dynamic_cast<Geom::Vertex*> (topo_vertices[iVertex]->getGeomAssociation());
+			Geom::Vertex* vert_tmp = dynamic_cast<Geom::Vertex*> (vertex->getGeomAssociation());
 			CHECK_NULL_PTR_ERROR(vert_tmp);
 			auto cl = mesh.newGroup<gmds::Node>(vert_tmp->getName());
-			gmds::Node elem = mesh.get<gmds::Node>(topo_vertices[iVertex]->getNode());
-
+			gmds::Node elem = mesh.get<gmds::Node>(vertex->getNode());
 			cl->add(elem);
 		}
 	}

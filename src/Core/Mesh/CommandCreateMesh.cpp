@@ -1064,15 +1064,13 @@ meshAndModify(std::list<Topo::CoFace*>& list_cofaces)
 #ifdef _DEBUG2
 				std::cout<<"  on doit mailler "<<coface->getName()<<std::endl;
 #endif
-				std::vector<Topo::Vertex*> vertices;
-				coface->getVertices(vertices);
+				const std::vector<Topo::Vertex*>& vertices = coface->getVertices();
 				for (uint i=0; i<vertices.size(); i++){
 					if (!vertices[i]->isMeshed())
 						mesh (vertices[i]);
 				}
 
-				std::vector<Topo::CoEdge*> aretes;
-				coface->getCoEdges(aretes);
+				std::vector<Topo::CoEdge*> aretes = coface->getCoEdges();
 				for (uint i=0; i<aretes.size(); i++){
 					if (!aretes[i]->isPreMeshed() && !aretes[i]->isMeshed())
 						preMesh (aretes[i]);

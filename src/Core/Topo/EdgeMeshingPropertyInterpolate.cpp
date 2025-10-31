@@ -205,9 +205,9 @@ getPointsRef(std::vector<Utils::Math::Point> &points_ref, const Topo::CoEdge* co
 	}
 
 	// déterminer les indices sur l'edge
-	uint ind_edge = coface->getIndex(edge_dep);
+	uint ind_edge = Utils::getIndexOf(edge_dep, coface->getEdges());
 	//Vertex* v_dep = coface->getVertex(ind_edge);
-	Vertex* v_dep = edge_dep->getVertex(0);
+	Vertex* v_dep = edge_dep->getVertices()[0];
 	uint nb_bras1, nb_bras2;
 	bool sens_dep;
 	edge_dep->computeCorrespondingNbMeshingEdges(v_dep, coedge, 0, nb_bras1, sens_dep);
@@ -223,7 +223,7 @@ getPointsRef(std::vector<Utils::Math::Point> &points_ref, const Topo::CoEdge* co
 #endif
 
 	// récupérer les points de l'edge qui fait face
-	uint nbPts = coface->getNbVertices();
+	uint nbPts = coface->getVertices().size();
 	uint indP1 = (ind_edge+3) % nbPts;
 	uint indP2 = (ind_edge+2) % nbPts;
 	if (nbPts == 3 && ind_edge>1){
@@ -244,9 +244,9 @@ getPointsRef(std::vector<Utils::Math::Point> &points_ref, const Topo::CoEdge* co
 #endif
 
 	// sens de l'arête de départ / face
-	bool sens_edge_dep = (edge_dep->getVertex(0) == coface->getVertex(ind_edge));
+	bool sens_edge_dep = (edge_dep->getVertices()[0] == coface->getVertices()[ind_edge]);
 	// idem avec celle référencée
-	bool sens_edge_ref = (edge_ref->getVertex(0) == coface->getVertex(indP1));
+	bool sens_edge_ref = (edge_ref->getVertices()[0] == coface->getVertices()[indP1]);
 
 	uint nb_bras_edge = edge_ref->getNbMeshingEdges();
 	// si les arêtes sont de sens opposé, on prend du côté opposé
