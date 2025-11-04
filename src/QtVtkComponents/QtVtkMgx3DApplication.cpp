@@ -59,48 +59,13 @@ _offScreenWindowWidth ("offScreenWindowWidth", 1024, "Largeur de la fenêtre off
 _offScreenWindowHeight ("offScreenWindowHeight", 768, "Hauteur de la fenêtre offscreen utilisée pour supprimer les taches cachées"),
 _raysFileCharset ("raysFileCharset", "ISO8859", "Jeu de caractères utilisé par défaut lors de l'enregistrement des fichiers lasers/diagnostics (ISO8859, UTF8).")
 {
-#ifdef VTK_8
-    // Gestion des paramètres Open GL via Qt.
-	// En son absence, par défaut, les polygones sont transparents.
-	// Permet de choisir la version d'Open GL (et extensions, ...)
-//	QSurfaceFormat::setDefaultFormat (QVTKOpenGLWidget::defaultFormat ( ));
-	QSurfaceFormat fmt;
-	fmt.setRenderableType(QSurfaceFormat::OpenGL);
-	fmt.setVersion(3, 2);
-	fmt.setProfile(QSurfaceFormat::CoreProfile);
-	fmt.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-	fmt.setRedBufferSize(8);
-	fmt.setGreenBufferSize(8);
-	fmt.setBlueBufferSize(8);
-	fmt.setDepthBufferSize(24);
-	fmt.setStencilBufferSize(8);
-	fmt.setAlphaBufferSize(0);
-//fmt.setAlphaBufferSize(1);
-	fmt.setStereo(false);
-	fmt.setSamples(vtkOpenGLRenderWindow::GetGlobalMaximumNumberOfMultiSamples());
-//fmt.setSamples(0);
-	QSurfaceFormat::setDefaultFormat (fmt);
-
-#else	// VTK 8
-    // Code issu de QVTKOpenGLWindow::defaultFormat ( ) de VTK 8.2.0
-    // Paramètres à donner à Qt pour initialiser Open GL. Evite que les maillages ne soient transparents.
-    // OK avec VTK 7.1.1 QVTKWidget/backend OpenGL
-    QSurfaceFormat fmt;
-    fmt.setRenderableType(QSurfaceFormat::OpenGL);
-    fmt.setVersion(3, 2);
-//fmt.setVersion(2, 0);
-    fmt.setProfile(QSurfaceFormat::CoreProfile);
-    fmt.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-    fmt.setRedBufferSize(8);
-    fmt.setGreenBufferSize(8);
-    fmt.setBlueBufferSize(8);
-    fmt.setDepthBufferSize(24);
-    fmt.setStencilBufferSize(8);
-    fmt.setAlphaBufferSize(0);
-    fmt.setStereo(false);
-    fmt.setSamples(0);//vtkOpenGLRenderWindow::GetGlobalMaximumNumberOfMultiSamples());
+	QSurfaceFormat	fmt	= QSurfaceFormat::defaultFormat ( );
+//	fmt.setRenderableType(QSurfaceFormat::OpenGL);
+//	fmt.setVersion(3, 2);
+	fmt.setAlphaBufferSize (0);
+	fmt.setSamples (0);
+	fmt.setDepthBufferSize (24);
     QSurfaceFormat::setDefaultFormat (fmt);
-#endif	// VTK_8
 }	// QtVtkMgx3DApplication::QtVtkMgx3DApplication
 
 
