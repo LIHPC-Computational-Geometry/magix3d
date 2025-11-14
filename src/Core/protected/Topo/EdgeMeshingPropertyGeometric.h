@@ -31,11 +31,14 @@ public:
      *  Si la longueur du premier bras est non nulle, alors le ratio est calculé
      *  à l'aide de la longueur de l'arête (projetée s'il y a lieu)
      */
-    EdgeMeshingPropertyGeometric(int nb, double raison, bool isDirect=true, bool initWithFirstEdge=false, double meshingEdgeLength=0.0);
+    EdgeMeshingPropertyGeometric(int nb, double raison, bool isDirect=true, 
+        bool initWithFirstEdge=false, double meshingEdgeLength=0.0);
 
     /// idem avec un centre pour découpage polaire
     EdgeMeshingPropertyGeometric(int nb, double raison,
-        Utils::Math::Point polar_center, bool isDirect=true, bool initWithFirstEdge=false, double meshingEdgeLength=0.0);
+        Utils::Math::Point polar_center, bool isDirect=true, 
+        bool initWithFirstEdge=false, double meshingEdgeLength=0.0);
+
     /// Pour les pythoneries, cast par opérateur = :
     EdgeMeshingPropertyGeometric (const CoEdgeMeshingProperty&);	
     /*------------------------------------------------------------------------*/
@@ -51,14 +54,12 @@ public:
 
     /// le ratio entre deux bras successifs
     double getRatio() const {return m_raison;}
-
     void setRatio(const double & ratio) {m_raison = ratio;}
 
     bool initWithFirstEdge() const {return m_initWithArm1;}
 
     /// longueur de la première arête
     double getFirstEdgeLength() const {return m_arm1;}
-
     void setFirstEdgeLength(const double & arm1) {m_arm1 = arm1;}
 
 #ifndef SWIG

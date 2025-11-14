@@ -308,7 +308,7 @@ class QtGeometricProgressionPanel : public QtDiscretisationPanelIfc
 	QRadioButton*				_factorRadioButton;
 	QtDoubleTextField*			_factorTextField;
 
-	/** La saisie de la raison de la progression géométrique. */
+	/** La saisie de la longueur de la première arête. */
 	QRadioButton*				_firstEdgeLengthRadioButton;
 	QtDoubleTextField*			_firstEdgeLengthTextField;
 
@@ -319,8 +319,6 @@ class QtGeometricProgressionPanel : public QtDiscretisationPanelIfc
    	
 	void factorRadioButtonSelected() { _factorTextField->setEnabled(true); _firstEdgeLengthTextField->setEnabled(false); }
    	void firstEdgeLengthRadioButton() { _factorTextField->setEnabled(false); _firstEdgeLengthTextField->setEnabled(true); }
-
-
 
 };	// class QtGeometricProgressionPanel
 
@@ -748,7 +746,8 @@ class QtBetaDiscretisationPanel : public QtDiscretisationPanelIfc
 	 *				utilisée notamment pour récupérer le contexte.
 	 */
 	QtBetaDiscretisationPanel (
-							QWidget* parent, double beta,
+							QWidget* parent, 
+							double beta,
 							Mgx3D::QtComponents::QtMgx3DMainWindow& mw);
 
 	/**
@@ -773,6 +772,17 @@ class QtBetaDiscretisationPanel : public QtDiscretisationPanelIfc
 	virtual double getBeta ( ) const;
 
 	/**
+	 * \return		La longueur de la première arête.
+	 */
+	virtual double getFirstEdgeLength ( ) const;
+
+	/** 
+	* \ return		Si on initialise à partir de la longueur de la première arête
+	* Par défaut False -> on initialise à partir de la raison
+	 */
+	virtual double initWithFirstEdgeLength () const;
+
+	/**
 	 * \return		<I>true</I> s'il faut inverser l'orientation du découpage,
 	 * 				<I>false</I> dans le sens contraire.
 	 */
@@ -795,11 +805,24 @@ class QtBetaDiscretisationPanel : public QtDiscretisationPanelIfc
 	QtBetaDiscretisationPanel& operator = (
 										const QtBetaDiscretisationPanel&);
 
+	QButtonGroup*				_buttonGroup;
+	
 	/** La saisie du facteur beta de resserrement. */
+	QRadioButton*				_betaRadioButton;
 	QtDoubleTextField*			_betaTextField;
+
+	/** La saisie de la longueur de la première arête. */
+	QRadioButton*				_firstEdgeLengthRadioButton;
+	QtDoubleTextField*			_firstEdgeLengthTextField;
 
 	/** Faut il inverser le sens de discrétisation ? */
 	QCheckBox*					_orientationCheckBox;
+
+	private slots:
+
+	void betaRadioButtonSelected() { _betaTextField->setEnabled(true); _firstEdgeLengthTextField->setEnabled(false); }
+	void firstEdgeLengthRadioButton() { _betaTextField->setEnabled(false); _firstEdgeLengthTextField->setEnabled(true); }
+
 };	// class QtBetaDiscretisationPanel
 
 

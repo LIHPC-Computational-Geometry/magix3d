@@ -363,7 +363,9 @@ EdgeMeshingPropertyUniform*
 QtGeometricProgressionPanel::QtGeometricProgressionPanel (
 	QWidget* parent, double factor, QtMgx3DMainWindow& window)
 	: QtDiscretisationPanelIfc (parent, window),
-	  _buttonGroup (0), _factorRadioButton (0), _factorTextField (0), _firstEdgeLengthRadioButton (0), _firstEdgeLengthTextField(0), _orientationCheckBox (0)
+	  _buttonGroup (0), _factorRadioButton (0), _factorTextField (0), 
+	  _firstEdgeLengthRadioButton (0), _firstEdgeLengthTextField(0), 
+	  _orientationCheckBox (0)
 {
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	layout->setContentsMargins  (
@@ -392,10 +394,10 @@ QtGeometricProgressionPanel::QtGeometricProgressionPanel (
 	connect (_factorTextField, SIGNAL (editingFinished ( )), this,
 	         SLOT (discretisationModifiedCallback ( )));
 
-	// La longueur de la première arête :
+	// La longueur du premier segment :
 	QHBoxLayout* hlayout2	= new QHBoxLayout ( );
 	layout->addLayout (hlayout2);
-	_firstEdgeLengthRadioButton = new QRadioButton("Longueur de la première arête :", this);
+	_firstEdgeLengthRadioButton = new QRadioButton("Longueur du premier segment :", this);
 	hlayout2->addWidget (_firstEdgeLengthRadioButton);
 	_buttonGroup->addButton(_firstEdgeLengthRadioButton);
 	connect (_firstEdgeLengthRadioButton, SIGNAL(clicked()), this,
@@ -467,7 +469,6 @@ void QtGeometricProgressionPanel::reset ( )
 void QtGeometricProgressionPanel::setMeshingProperty (
 											const CoEdgeMeshingProperty& cemp)
 {
-	std::cout << "Dans  QtGeometricProgressionPanel::setMeshingProperty " << std::endl;
 	CHECK_NULL_PTR_ERROR (_factorTextField)
 	CHECK_NULL_PTR_ERROR (_firstEdgeLengthTextField)
 	CHECK_NULL_PTR_ERROR (_orientationCheckBox)
@@ -505,8 +506,8 @@ double QtGeometricProgressionPanel::getFirstEdgeLength ( ) const
 
 double QtGeometricProgressionPanel::initWithFirstEdgeLength () const
 {
-	CHECK_NULL_PTR_ERROR (_factorTextField)
-	return (_firstEdgeLengthRadioButton->isChecked());
+	CHECK_NULL_PTR_ERROR (_firstEdgeLengthRadioButton)
+	return _firstEdgeLengthRadioButton->isChecked();
 }
 
 bool QtGeometricProgressionPanel::invertOrientation ( ) const
@@ -1438,7 +1439,9 @@ EdgeMeshingPropertyHyperbolic*
 QtBetaDiscretisationPanel::QtBetaDiscretisationPanel (
 	QWidget* parent, double factor, QtMgx3DMainWindow& window)
 	: QtDiscretisationPanelIfc (parent, window),
-	  _betaTextField (0), _orientationCheckBox (0)
+	  _buttonGroup (0), _betaRadioButton (0), _betaTextField (0), 
+	  _firstEdgeLengthRadioButton (0), _firstEdgeLengthTextField(0), 
+	  _orientationCheckBox (0)
 {
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	setLayout (layout);
@@ -1449,15 +1452,37 @@ QtBetaDiscretisationPanel::QtBetaDiscretisationPanel (
 						Resources::instance ( )._margin.getValue ( ));
 	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
 
+	_buttonGroup = new QButtonGroup(this);
+	_buttonGroup->setExclusive(true);
+
 	// Le facteur de resserrement beta :
 	QHBoxLayout* hlayout	= new QHBoxLayout ( );
 	layout->addLayout (hlayout);
-	QLabel* label	= new QLabel (QString::fromUtf8("Bêta resserrement :"), this);
-	hlayout->addWidget (label);
+	_betaRadioButton = new QRadioButton("Bêta resserrement :", this);
+	hlayout->addWidget (_betaRadioButton);
+	_buttonGroup->addButton(_betaRadioButton);
+	_betaRadioButton->setChecked (true);
+	connect (_betaRadioButton, SIGNAL(clicked()), this,
+	         SLOT (betaRadioButtonSelected ()));
 	_betaTextField	= &QtNumericFieldsFactory::createRatioTextField (this);
-	_betaTextField->setValue (1.1);
+	_betaTextField->setValue (1.01);
 	hlayout->addWidget (_betaTextField);
 	connect (_betaTextField, SIGNAL (editingFinished ( )), this,
+	         SLOT (discretisationModifiedCallback ( )));
+
+	// La longueur de la première arête :
+	QHBoxLayout* hlayout2	= new QHBoxLayout ( );
+	layout->addLayout (hlayout2);
+	_firstEdgeLengthRadioButton = new QRadioButton("Longueur du premier segment :", this);
+	hlayout2->addWidget (_firstEdgeLengthRadioButton);
+	_buttonGroup->addButton(_firstEdgeLengthRadioButton);
+	connect (_firstEdgeLengthRadioButton, SIGNAL(clicked()), this,
+	         SLOT (firstEdgeLengthRadioButton ( )));
+	_firstEdgeLengthTextField	= &QtNumericFieldsFactory::createDistanceTextField (this);
+	_firstEdgeLengthTextField->setValue (1.0);
+	_firstEdgeLengthTextField->setEnabled(false);
+	hlayout2->addWidget (_firstEdgeLengthTextField);
+	connect (_firstEdgeLengthTextField, SIGNAL (editingFinished ( )), this,
 	         SLOT (discretisationModifiedCallback ( )));
 
 	// Le sens de la discrétisation :
@@ -1475,7 +1500,8 @@ QtBetaDiscretisationPanel::QtBetaDiscretisationPanel (
 										const QtBetaDiscretisationPanel& p)
 	: QtDiscretisationPanelIfc (
 		0, *new QtMgx3DMainWindow(0)),
-	  _betaTextField (0), _orientationCheckBox (0)
+	  _buttonGroup (0), _betaRadioButton (0), _firstEdgeLengthRadioButton (0),
+	  _betaTextField (0), _firstEdgeLengthTextField (0), _orientationCheckBox (0)
 {
 	MGX_FORBIDDEN ("QtBetaDiscretisationPanel copy constructor is not allowed.");
 }	// QtBetaDiscretisationPanel::QtBetaDiscretisationPanel
@@ -1498,8 +1524,13 @@ void QtBetaDiscretisationPanel::reset ( )
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
 
+	_betaRadioButton->setChecked(true);
+
 	CHECK_NULL_PTR_ERROR (_betaTextField)
-	_betaTextField->setValue (1.1);
+	_betaTextField->setValue (1.01);
+
+	CHECK_NULL_PTR_ERROR (_firstEdgeLengthTextField)
+	_firstEdgeLengthTextField->setValue (1.0);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
 
@@ -1511,6 +1542,7 @@ void QtBetaDiscretisationPanel::setMeshingProperty (
 											const CoEdgeMeshingProperty& cemp)
 {
 	CHECK_NULL_PTR_ERROR (_betaTextField)
+	CHECK_NULL_PTR_ERROR (_firstEdgeLengthTextField)
 	CHECK_NULL_PTR_ERROR (_orientationCheckBox)
 
 	const EdgeMeshingPropertyBeta*	properties	=
@@ -1523,6 +1555,9 @@ void QtBetaDiscretisationPanel::setMeshingProperty (
 	}	// if (0 == properties)
 
 	_betaTextField->setValue (properties->getBeta ( ));
+	_firstEdgeLengthTextField->setValue (properties->getFirstEdgeLength ( ));
+	_betaRadioButton->setChecked(!properties->initWithFirstEdge());
+	_firstEdgeLengthRadioButton->setChecked(properties->initWithFirstEdge());
 	_orientationCheckBox->setCheckState (
 			true == properties->getDirect ( ) ? Qt::Unchecked : Qt::Checked);
 	QtDiscretisationPanelIfc::setMeshingProperty(cemp);
@@ -1536,6 +1571,17 @@ double QtBetaDiscretisationPanel::getBeta ( ) const
 	return _betaTextField->getValue ( );
 }	// QtBetaDiscretisationPanel::getBeta
 
+double QtBetaDiscretisationPanel::getFirstEdgeLength ( ) const
+{
+	CHECK_NULL_PTR_ERROR (_firstEdgeLengthTextField)
+	return _firstEdgeLengthTextField->getValue ( );
+}	// QtBetaDiscretisationPanel::getFirstEdgeLength
+
+double QtBetaDiscretisationPanel::initWithFirstEdgeLength () const
+{
+	CHECK_NULL_PTR_ERROR (_firstEdgeLengthRadioButton)
+	return (_firstEdgeLengthRadioButton->isChecked());
+}
 
 bool QtBetaDiscretisationPanel::invertOrientation ( ) const
 {
@@ -1549,7 +1595,8 @@ EdgeMeshingPropertyBeta*
 {
 	EdgeMeshingPropertyBeta*	emp	=
 			 new EdgeMeshingPropertyBeta (
-					 edgeNum, getBeta ( ), !invertOrientation ( ));
+				edgeNum, getBeta ( ), !invertOrientation ( ), 
+				initWithFirstEdgeLength(), getFirstEdgeLength());
 	updateProperty (*emp);
 
 	return emp;
