@@ -17,30 +17,27 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Topo {
 /*----------------------------------------------------------------------------*/
-#define _DEBUG_beta
-/*----------------------------------------------------------------------------*/EdgeMeshingPropertyBeta::
-EdgeMeshingPropertyBeta(int nb, double beta, bool isDirect, bool initWithFirstEdge, double meshingEdgeLength)
-: CoEdgeMeshingProperty(nb, beta_resserrement, isDirect)
+//#define _DEBUG_beta
+/*----------------------------------------------------------------------------*/
+EdgeMeshingPropertyBeta::
+EdgeMeshingPropertyBeta(int nbBras, double beta, bool isDirect,
+	bool initWithFirstEdge, double meshingEdgeLength)
+: CoEdgeMeshingProperty(nbBras, beta_resserrement, isDirect)
 , m_beta(beta)
 , m_arm1(meshingEdgeLength)
 , m_initWithArm1(initWithFirstEdge)
 {
-    if (!m_initWithArm1 && m_beta<=1.0){
+    if (!m_initWithArm1 && (m_beta<1.00001 || m_beta>1.01)){
 		TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-        messErr << "EdgeMeshingPropertyBeta, la valeur de beta doit être légèrement supérieur à 1, actuellement : "<<m_beta;
+        messErr << "EdgeMeshingPropertyBeta, la valeur de beta doit être comprise entre 1 et 1.01, actuellement : "<<m_beta;
         throw TkUtil::Exception(messErr);
-    }
-    if (!m_initWithArm1 && m_beta>2.0){
-		TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-    	messErr << "EdgeMeshingPropertyBeta, la longueur de beta n'a pas été testé jusque là "<<m_beta;
-    	throw TkUtil::Exception(messErr);
     }
    if (m_initWithArm1 && m_arm1 < 0){
 		TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
     	messErr << "EdgeMeshingPropertyGeometric, la longueur du premier bras ne doit pas être négative : "<<m_arm1;
     	throw TkUtil::Exception(messErr);
     }
-    if (nb<1)
+    if (nbBras < 1)
         throw TkUtil::Exception (TkUtil::UTF8String ("EdgeMeshingPropertyBeta, le nombre de bras doit être au moins de 1", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
@@ -82,13 +79,32 @@ bool EdgeMeshingPropertyBeta::operator == (const CoEdgeMeshingProperty& cedp) co
 	return CoEdgeMeshingProperty::operator == (cedp);
 }
 /*----------------------------------------------------------------------------*/
-
+void EdgeMeshingPropertyBeta::setNbEdges(const int nb)
+{
+    CoEdgeMeshingProperty::setNbEdges(nb);
+}
+/*----------------------------------------------------------------------------*/
 void EdgeMeshingPropertyBeta::initCoeff(double length)
 {
-	//if (m_initWithArm1){
-		// c'est l'occasion de calculer la raison
-		computeBeta(0.0334298);
-	//}
+	if (m_initWithArm1){
+		// on calcule le coefficient de resserement
+		m_beta = computeBeta(m_arm1);
+	}
+	initCoeff();
+}
+
+void EdgeMeshingPropertyBeta::initCoeff()
+{
+#ifdef _DEBUG_beta
+	std::cout<<"EdgeMeshingPropertyBeta::initCoeff() "<<std::endl;
+#endif
+    if (m_beta==0.0){
+		TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
+        messErr << "Erreur interne: EdgeMeshingPropertyBeta, le coefficient de resserrement n'a pas été initialisé";
+        throw TkUtil::Exception(messErr);
+    }
+
+    m_dernierIndice = 0;
 }
 
 double EdgeMeshingPropertyBeta::
@@ -96,49 +112,28 @@ nextCoeff()
 {
     m_dernierIndice+=1;
 
-//#ifdef _DEBUG
-    if (m_dernierIndice>m_nb_edges){
-		TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-        messErr<<"EdgeMeshingPropertyBeta::nextCoeff est en dehors des limites: dernierIndice : "
-                <<(long)m_dernierIndice<<", nb de bras : "<<(long)m_nb_edges;
-        throw TkUtil::Exception(messErr);
-    }
-//#endif
-
     double feta = 0.0;
     double eta = 0.0;
     if (m_sens){
     	eta = ((double)m_dernierIndice)/((double)m_nb_edges);
-		std::cout << "eta = " << eta << std::endl;
     	feta=resserre(eta, m_beta);
-		std::cout << "feta = " << feta << std::endl;
     }
     else {
     	eta = ((double)m_nb_edges-m_dernierIndice)/((double)m_nb_edges);
     	feta = 1.0-resserre(eta, m_beta);
     }
 
-//#ifdef _DEBUG2
-	std::cout<<"EdgeMeshingPropertyBeta::nextCoeff (m_beta="<<m_beta<<") return "<<feta<<" pour eta = "<<eta<<std::endl;
-//#endif
+#ifdef _DEBUG_beta
+	std::cout<<"EdgeMeshingPropertyBeta::nextCoeff (m_beta="<<m_beta<<") return "<<feta<<std::endl;
+#endif
+
     return feta;
 }
 /*----------------------------------------------------------------------------*/
 double EdgeMeshingPropertyBeta::resserre(double eta, double beta)
 {
-	std::cout << "beta = " << beta << std::endl;
-	double ratio = (beta + 1.0) / (beta - 1.0);
-	std::cout << "ratio = " << ratio << std::endl;
-	double zlog = std::log(ratio);
-	std::cout << "zlog = " << zlog << std::endl;
-	double puiss  =  zlog * (1.0 - eta);
-	puiss  =  std::exp(puiss);
-	std::cout << "puiss = " << puiss << std::endl;
-	double rapp   =  (1.0 - puiss) / (1.0 + puiss);
-	std::cout << "rapp = " << rapp << std::endl;
-	double  feta   =  1.0 + beta * rapp;
-	std::cout << "feta = " << feta << std::endl;
-	return feta;
+	double p = std::log((beta + 1.0)/(beta - 1.0)) * (1.0 - eta);
+	return  1.0 + beta * (1.0 - std::exp(p)) / (1.0 + std::exp(p));
 }
 /*----------------------------------------------------------------------------*/
 TkUtil::UTF8String EdgeMeshingPropertyBeta::
@@ -187,18 +182,18 @@ computeBeta(const double lg)
 		std::cout << "eta = " << eta << std::endl;
     }
 
-
 	// on limite la recherche
-	double beta1 = 1.0000001;
-	double beta2 = 2.0;
+	double beta1 = 1.00001;
+	double beta2 = 1.01;
 	double lg1 = resserre(eta, beta1);
 	double lg2 = resserre(eta, beta2);
 
+	std::cout << "lg1 = " << lg1 << ", lg2 = " << lg2 << ", lg = " << lg << std::endl;
 	if ((lg1<lg && lg2<lg) || (lg1>lg && lg2>lg)){
 		TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
         messErr << "EdgeMeshingPropertyBeta, on ne peut pas trouver de beta pour lg "
         		<<lg<<" et nombre de bras de "<<(short)m_nb_edges;
-        throw TkUtil::Exception(messErr);
+	        throw TkUtil::Exception(messErr);
 	}
 	uint iter = 0;
 	bool sens = (lg1<lg2);
@@ -208,8 +203,8 @@ computeBeta(const double lg)
 
 		double lg_iter = resserre(eta, beta);
 #ifdef _DEBUG_beta
-		std::cout<<"iter "<<iter<<std::endl;
-		std::cout<<" beta "<<beta<<", lg_iter "<<lg_iter<<std::endl;
+		//std::cout<<"iter "<<iter<<std::endl;
+		//std::cout<<" beta "<<beta<<", lg_iter "<<lg_iter<<std::endl;
 #endif
 
 		if (sens){

@@ -20,7 +20,8 @@ namespace Topo {
 //#define _DEBUG_raison
 /*----------------------------------------------------------------------------*/
 EdgeMeshingPropertyGeometric::
-EdgeMeshingPropertyGeometric(int nbBras, double raison, bool isDirect, bool initWithFirstEdge, double meshingEdgeLength)
+EdgeMeshingPropertyGeometric(int nbBras, double raison, bool isDirect, 
+	bool initWithFirstEdge, double meshingEdgeLength)
 : CoEdgeMeshingProperty(nbBras, geometrique, isDirect)
 , m_raison(raison)
 , m_arm1(meshingEdgeLength)
@@ -39,7 +40,7 @@ EdgeMeshingPropertyGeometric(int nbBras, double raison, bool isDirect, bool init
     	messErr << "EdgeMeshingPropertyGeometric, la longueur du premier bras ne doit pas être négative : "<<m_arm1;
     	throw TkUtil::Exception(messErr);
     }
-    if (nbBras<1)
+    if (nbBras < 1)
         throw TkUtil::Exception (TkUtil::UTF8String ("EdgeMeshingPropertyGeometric, le nombre de bras doit être au moins de 1", TkUtil::Charset::UTF_8));
     // calcul de la somme à l'aide de la raison
     if (!m_initWithArm1)
@@ -138,7 +139,7 @@ void EdgeMeshingPropertyGeometric::initSomme()
 void EdgeMeshingPropertyGeometric::initCoeff(double length)
 {
 	if (m_initWithArm1){
-		// c'est l'occasion de calculer la raison
+		// on calcule la raison
 		m_raison = computeRaison(length/m_arm1);
 		initSomme();
 	}
@@ -181,14 +182,6 @@ nextCoeff()
 {
     m_dernierIndice+=1;
 
-#ifdef _DEBUG
-    if (m_dernierIndice>m_nb_edges){
-		TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-        messErr<<"EdgeMeshingPropertyGeometric::nextCoeff est en dehors des limites: dernierIndice : "
-                <<(long)m_dernierIndice<<", nb de bras : "<<(long)m_nb_edges;
-        throw TkUtil::Exception(messErr);
-    }
-#endif
     if (m_sens){
         m_dernierCoeff *= m_raison;
         m_dernierSommeCoeff += m_dernierCoeff;
@@ -280,8 +273,8 @@ computeRaison(const double lg)
 
 		double lg_iter = computePolynome(raison);
 #ifdef _DEBUG_raison
-		std::cout<<"iter "<<iter<<std::endl;
-		std::cout<<" raison "<<raison<<", lg_iter "<<lg_iter<<std::endl;
+		//std::cout<<"iter "<<iter<<std::endl;
+		//std::cout<<" raison "<<raison<<", lg_iter "<<lg_iter<<std::endl;
 #endif
 
 		if (sens){

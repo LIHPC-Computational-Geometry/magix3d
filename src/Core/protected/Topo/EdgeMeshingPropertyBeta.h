@@ -26,12 +26,15 @@ class EdgeMeshingPropertyBeta : public CoEdgeMeshingProperty {
 public:
 
     /*------------------------------------------------------------------------*/
-    /** Constructeur avec un nombre de bras spécifié et la valeur de beta
-     *
+    /** Constructeur avec un nombre de bras spécifié,
+     *  la valeur de beta
+     *  et la longueur du premier bras
      *  \param beta coeff de resserrement , beta=1+epsilon  ; epsilon>  0;
      *  en pratique beta peut varier de 1.01 (peu resséré) à 1.00001 (très resséré)
+     *  Si la longueur du premier bras est non nulle, alors beta est calculé
      */
     EdgeMeshingPropertyBeta(int nb, double beta, bool isDirect=true, bool initWithFirstEdge=false, double meshingEdgeLength=0.0);
+
     /// Pour les pythoneries, cast par opérateur = :
     EdgeMeshingPropertyBeta (const CoEdgeMeshingProperty&);
 
@@ -43,18 +46,30 @@ public:
     /// Accesseur sur le nom de la méthode de maillage
     virtual std::string getMeshLawName() const {return "Beta";}
 
+    /// change le nombre de bras demandé pour un côté
+    virtual void setNbEdges(const int nb);
+
     /// le ratio entre deux bras successifs
     double getBeta() const {return m_beta;}
 
-#ifndef SWIG
+    bool initWithFirstEdge() const {return m_initWithArm1;}
+
+    /// longueur de la première arête
+    double getFirstEdgeLength() const {return m_arm1;}
+    void setFirstEdgeLength(const double & arm1) {m_arm1 = arm1;}
+
+    #ifndef SWIG
     /** Création d'un clone, on copie toutes les informations */
     virtual CoEdgeMeshingProperty* clone() {return new  EdgeMeshingPropertyBeta(*this);}
 
-    /// retourne le coefficient suivant pour les noeuds internes
-    virtual double nextCoeff();
+    // initialisation avant appel à nextCoeff
+    virtual void initCoeff();
 
     /// initialisation avant appel à nextCoeff pour le cas où la longueur est utile
     virtual void initCoeff(double length);
+
+    /// retourne le coefficient suivant pour les noeuds internes
+    virtual double nextCoeff();
 
     /*------------------------------------------------------------------------*/
     /// Script pour la commande de création Python
@@ -72,9 +87,7 @@ private:
     /** f(eta) : est en sortie de resserre, ça peut être vu comme la
      position du point après resserrement (feta=0 -->  paroi,
      feta=1-->  frontière amont)
-
-             transformation de (0,1) sur (0,1) permettant de resserrer
-                        le maillage au voisinage du corps
+     transformation de (0,1) sur (0,1) permettant de resserrer le maillage au voisinage du corps
      */
     double resserre(double eta, double beta);
 
@@ -83,8 +96,8 @@ private:
 
     /// valeur de beta pour le resserrement (de la forme 1+epsilon)
     double m_beta;
-
     double m_arm1;
+
     /// vrai si c'est la longueur du premier bras qui permet de déterminer beta
     bool m_initWithArm1;
 };
