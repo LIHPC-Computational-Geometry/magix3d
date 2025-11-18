@@ -63,12 +63,12 @@ class VTKFILTERSGENERAL_EXPORT vtkECMExtractSelectedFrustum : public vtkExtractS
 public:
   static vtkECMExtractSelectedFrustum *New();
   vtkTypeMacro(vtkECMExtractSelectedFrustum, vtkExtractSelectionBase);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   /**
    * Return the MTime taking into account changes to the Frustum
    */
-  vtkMTimeType GetMTime() VTK_OVERRIDE;
+  vtkMTimeType GetMTime();
 
   //@{
   /**
@@ -151,16 +151,16 @@ public:
 
 protected:
   vtkECMExtractSelectedFrustum(vtkPlanes *f=NULL);
-  ~vtkECMExtractSelectedFrustum() VTK_OVERRIDE;
+  ~vtkECMExtractSelectedFrustum();
 
   // sets up output dataset
   int RequestDataObject(vtkInformation* request,
                         vtkInformationVector** inputVector,
-                        vtkInformationVector* outputVector) VTK_OVERRIDE;
+                        vtkInformationVector* outputVector);
 
   //execution
   int RequestData(vtkInformation *,
-                          vtkInformationVector **, vtkInformationVector *) VTK_OVERRIDE;
+                          vtkInformationVector **, vtkInformationVector *);
   int ABoxFrustumIsect(double bounds[], vtkCell *cell);
   int FrustumClipPolygon(int nverts,
                          double *ivlist, double *wvlist, double *ovlist);
@@ -193,8 +193,8 @@ protected:
   int ShowBounds;
 
 private:
-  vtkECMExtractSelectedFrustum(const vtkECMExtractSelectedFrustum&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkECMExtractSelectedFrustum&) VTK_DELETE_FUNCTION;
+  vtkECMExtractSelectedFrustum(const vtkECMExtractSelectedFrustum&);
+  void operator=(const vtkECMExtractSelectedFrustum&);
 
 };
 
