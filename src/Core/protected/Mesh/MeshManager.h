@@ -105,7 +105,7 @@ public:
 	 *
 	 *  \param n le nom du ficher dans lequel on exporte
 	 */
-	Mgx3D::Internal::M3DCommandResult* exportBlocksForCGNS(const std::string& n);
+	Mgx3D::Internal::M3DCommandResult* exportBlocksForCGNS(int dim,const std::string& n);
 	SET_SWIG_COMPLETABLE_METHOD(exportBlocksForCGNS)
 
 	/*------------------------------------------------------------------------*/

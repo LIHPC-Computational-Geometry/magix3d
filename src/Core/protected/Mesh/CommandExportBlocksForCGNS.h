@@ -37,7 +37,7 @@ public:
      *  \param context  le contexte
      *  \param fileName le nom du fichier de sortie
      */
-    CommandExportBlocksForCGNS(Internal::Context& context, const std::string &fileName);
+    CommandExportBlocksForCGNS(Internal::Context& context, int dim, const std::string &fileName);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur
