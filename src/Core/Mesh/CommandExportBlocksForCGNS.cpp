@@ -7,9 +7,9 @@ namespace Mgx3D {
     namespace Mesh {
 /*----------------------------------------------------------------------------*/
         CommandExportBlocksForCGNS::
-        CommandExportBlocksForCGNS(Internal::Context& context, const std::string& fileName)
+        CommandExportBlocksForCGNS(Internal::Context& context, int dim, const std::string& fileName)
                 : Internal::CommandInternal(context, "Export CGNS total")
-                , m_impl(context,fileName)
+                , m_impl(context,fileName, dim)
         {
         }
 

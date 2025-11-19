@@ -610,14 +610,14 @@ CommandMeshExplorer* MeshManager::endExplorer(CommandMeshExplorer* oldExplo, boo
     return command;
 }
 /*----------------------------------------------------------------------------*/
-    Internal::M3DCommandResult* MeshManager::exportBlocksForCGNS(const std::string& n)
+    Internal::M3DCommandResult* MeshManager::exportBlocksForCGNS(int dim, const std::string& n)
     {
 #ifdef _DEBUG2
         std::cout<<"exportBlocks"<<std::endl;
 #endif
 
         //creation de la commande d'exportation
-        CommandExportBlocksForCGNS *command = new CommandExportBlocksForCGNS(getContext(), n);
+        CommandExportBlocksForCGNS *command = new CommandExportBlocksForCGNS(getContext(), dim, n);
 
         // trace dans le script
         TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);

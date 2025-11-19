@@ -27,7 +27,7 @@ namespace Mgx3D {
              *  \param c le contexte
              *  \param n le nom du fichier dans lequel se fait l'exportation
              */
-            ExportBlocksCGNSImplementation(Internal::Context& c, const std::string& filename);
+            ExportBlocksCGNSImplementation(Internal::Context& c, const std::string& filename, int dim);
 
             /*------------------------------------------------------------------------*/
             /** \brief   Destructeur
@@ -40,7 +40,13 @@ namespace Mgx3D {
              */
             void perform(Internal::InfoCommand* icmd);
 
+
         private:
+            void perform2D();
+            void perform3D();
+
+        private:
+            int m_dim;
 
             /// contexte d'exécution
             Internal::Context& m_context;
