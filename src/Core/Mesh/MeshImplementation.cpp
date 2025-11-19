@@ -267,9 +267,6 @@ bool MeshImplementation::createGMDSGroups()
         auto su = getGMDSMesh().newGroup<gmds::Face>(current_surf->getName());
         createdGMDSSurfaces.push_back(su);
 
-        std::vector<Topo::CoFace* > coFaces;
-        current_surf->getCoFaces(coFaces);
-
         std::vector<gmds::Face> faces;
         current_surf->getGMDSFaces(faces);
 
@@ -282,9 +279,6 @@ bool MeshImplementation::createGMDSGroups()
         Mesh::Volume* current_vol = volumes[iVol];
         auto vo = getGMDSMesh().newGroup<gmds::Region>(current_vol->getName());
         createdGMDSVolumes.push_back(vo);
-
-        std::vector<Topo::Block* > blocks;
-        current_vol->getBlocks(blocks);
 
         std::vector<gmds::Region> regions;
         current_vol->getGMDSRegions(regions);

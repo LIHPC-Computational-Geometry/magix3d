@@ -1,19 +1,7 @@
-/*----------------------------------------------------------------------------*/
-/** \file MeshVolumeTopoProperty.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 15/11/13
- */
-/*----------------------------------------------------------------------------*/
 #ifndef MESH_VOLUME_TOPO_PROPERTY_H_
 #define MESH_VOLUME_TOPO_PROPERTY_H_
 /*----------------------------------------------------------------------------*/
-#include "Utils/Container.h"
-#include <TkUtil/Exception.h>
 #include <vector>
-#include <list>
-#include <algorithm>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -26,27 +14,24 @@ class Block;
  * Rassemble les propriétés topologiques communes aux Mesh::Volume.
  */
  
- class MeshVolumeTopoProperty {
+class MeshVolumeTopoProperty
+{
  public:
-     MeshVolumeTopoProperty()
-     {}
-
-     ~MeshVolumeTopoProperty()
-     {}
+     MeshVolumeTopoProperty() = default;
+     ~MeshVolumeTopoProperty() = default;
 
      /*------------------------------------------------------------------------*/
      /** Création d'un clone, on copie toutes les informations */
-     MeshVolumeTopoProperty* clone() {
-         MeshVolumeTopoProperty* prop = new MeshVolumeTopoProperty();
-
-         prop->m_blocks.clone(m_blocks);
-
-         return prop;
+     MeshVolumeTopoProperty* clone() 
+     {
+        MeshVolumeTopoProperty* prop = new MeshVolumeTopoProperty();
+        prop->m_blocks = m_blocks;
+        return prop;
      }
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des blocs
-     Utils::Container<Block>& getBlockContainer() {return m_blocks;}
+     std::vector<Block*>& getBlockContainer() {return m_blocks;}
 
      /*------------------------------------------------------------------------*/
      /** \brief   Suppression des relations
@@ -58,7 +43,7 @@ class Block;
 
  private:
      /// lien sur les Topo::Block qui ont participés à la constitution des mailles
-     Utils::Container<Block> m_blocks;
+     std::vector<Block*> m_blocks;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo

@@ -1,12 +1,3 @@
-/*----------------------------------------------------------------------------*/
-/*
- * \file Surface.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 25 nov. 2011
- */
-/*----------------------------------------------------------------------------*/
 #ifndef MGX3D_MESH_SURFACE_H_
 #define MGX3D_MESH_SURFACE_H_
 /*----------------------------------------------------------------------------*/
@@ -128,7 +119,7 @@ public:
 
     /*----------------------------------------------------------------------------*/
     ///  Fournit l'accès aux faces topologiques communes qui ont participées à la constitution de la surface
-    void getCoFaces(std::vector<Topo::CoFace* >& faces) const;
+    const std::vector<Topo::CoFace* >& getCoFaces() const;
 
     /** supprime les relations vers les cofaces */
     void clearCoFaces()
