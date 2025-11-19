@@ -1,12 +1,3 @@
-/*----------------------------------------------------------------------------*/
-/*
- * \file Volume.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 25 nov. 2011
- */
-/*----------------------------------------------------------------------------*/
 #ifndef MGX3D_MESH_VOLUME_H_
 #define MGX3D_MESH_VOLUME_H_
 /*----------------------------------------------------------------------------*/
@@ -128,7 +119,7 @@ public:
 
     /*----------------------------------------------------------------------------*/
     ///  Fournit l'accès aux blocs topologiques qui ont participées à la constitution du volume
-    void getBlocks(std::vector<Topo::Block* >& blocs) const;
+    const std::vector<Topo::Block* >& getBlocks() const;
 
     /** supprime les relations vers les blocs */
     void clearBlocks()
