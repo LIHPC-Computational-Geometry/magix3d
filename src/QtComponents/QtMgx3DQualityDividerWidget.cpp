@@ -160,7 +160,7 @@ void QtMgx3DQualityDividerWidget::displayExtraction (size_t i, bool display)
 			for (size_t i = 0; i < gmdsSurface->size ( ); i++)
 			{
 				gmds::Face	face	= gmdsMesh.get<gmds::Face>((*gmdsSurface)[i]);
-				surface->addFace (face);
+				surface->add (face);
 			}	// for (size_t i = 0; i < gmdsSurface->size ( ); i++)
 			meshManager->add (surface);
 			entity	= surface;

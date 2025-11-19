@@ -109,7 +109,7 @@ public:
      * \see saveVertexTopoProperty
      */
 
-    void addCoEdge(CoEdge* e);
+    void add(CoEdge* e);
 
     /*------------------------------------------------------------------------*/
     /** \brief Enlève une relation vers une arête commune
@@ -118,7 +118,7 @@ public:
      * Attention à sauvegarder pour le undo
      * \see saveVertexTopoProperty
      */
-   void removeCoEdge(CoEdge* e);
+   void remove(CoEdge* e);
 
     /*------------------------------------------------------------------------*/
     /// Fournit l'accès aux arêtes topologiques communes incidentes sans copie

@@ -31,20 +31,16 @@ void ExportBlocksImplementation::perform(Internal::InfoCommand* icmd)
     
     Mgx3D::Topo::TopoManager& tm = m_context.getTopoManager();
 
-    std::vector<Topo::Vertex*> vertices;
-    tm.getVertices(vertices);
+    std::vector<Topo::Vertex*> vertices = tm.getVerticesObj();
     writeNodes(str, vertices);
 
-    std::vector<CoEdge*> edges;
-    tm.getCoEdges(edges);
+    std::vector<CoEdge*> edges = tm.getCoEdgesObj();
     writeEdges(str, edges);
 
-    std::vector<CoFace*> faces;
-    tm.getCoFaces(faces);
+    std::vector<CoFace*> faces = tm.getCoFacesObj();
     writeFaces(str, faces);
 
-    std::vector<Block*> blocks;
-    tm.getBlocks(blocks);
+    std::vector<Block*> blocks = tm.getBlocksObj();
     writeBlocks(str, blocks);
 
     str.close();

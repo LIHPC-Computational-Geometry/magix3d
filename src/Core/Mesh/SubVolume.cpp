@@ -1,15 +1,7 @@
-/*----------------------------------------------------------------------------*/
-/*
- * \file SubVolume.cpp
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 6/12/12
- */
-/*----------------------------------------------------------------------------*/
 #include "Mesh/SubVolume.h"
 #include "Mesh/MeshDisplayRepresentation.h"
 #include "Mesh/MeshImplementation.h"
+#include "Mesh/MeshManager.h"
 #include "Utils/Common.h"
 #include "Utils/SerializedRepresentation.h"
 
@@ -251,13 +243,6 @@ Utils::SerializedRepresentation* SubVolume::getDescription (bool alsoComputed) c
 	description->addPropertiesSet(meshProprietes);
 
 	return description.release ( );
-}
-/*----------------------------------------------------------------------------*/
-bool SubVolume::isA(std::string& name)
-{
-    MGX_NOT_YET_IMPLEMENTED("Il n'est pas prévu de faire un tel test");
-//    return (name.compare(0,strlen(typeNameMeshSubVolume),typeNameMeshSubVolume) == 0);
-    return false;
 }
 /*----------------------------------------------------------------------------*/
 TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const SubVolume & cl)

@@ -461,10 +461,7 @@ computeFiltersWithAllFaces(std::map<Vertex*, uint>& filtre_vertex,
             std::map<CoEdge*, uint>& filtre_coedge,
             std::map<CoFace*, uint>& filtre_coface)
 {
-	std::vector<CoFace*> cofaces;
-	getContext().getTopoManager().getCoFaces(cofaces);
-
-	for (CoFace* coface : cofaces){
+	for (CoFace* coface : getContext().getTopoManager().getCoFacesObj()){
 		filtre_coface[coface] = 3;
 		for (CoEdge* coedge : coface->getCoEdges()){
 			filtre_coedge[coedge] = 3;

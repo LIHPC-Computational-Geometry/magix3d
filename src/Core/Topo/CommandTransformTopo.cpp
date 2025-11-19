@@ -41,11 +41,9 @@ CommandTransformTopo(Internal::Context& c, std::string name)
 , m_all_topo(true)
 {
 	// on prend tous les blocs et les faces
-	std::vector<Topo::Block* > blocs;
-	std::vector<Topo::CoFace* > cofaces;
-
-	getTopoManager().getBlocks(blocs);
-	getTopoManager().getCoFaces(cofaces);
+	std::vector<Topo::Block* > blocs = getTopoManager().getBlocksObj();
+	std::vector<Topo::CoFace* > cofaces = getTopoManager().getCoFacesObj();
+	
 	m_entities.insert(m_entities.end(), blocs.begin(), blocs.end());
 	m_entities.insert(m_entities.end(), cofaces.begin(), cofaces.end());
 }

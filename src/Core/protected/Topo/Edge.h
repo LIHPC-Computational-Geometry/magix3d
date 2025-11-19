@@ -118,10 +118,10 @@ public:
 
     /*------------------------------------------------------------------------*/
     /// ajoute une relation vers une face
-    void addCoFace(CoFace* f);
+    void add(CoFace* f);
 
     /// enlève une relation vers une face
-    void removeCoFace(CoFace* f);
+    void remove(CoFace* f);
 
     /** Fournit l'accès aux faces topologiques incidentes sans copie
      */
@@ -193,10 +193,10 @@ public:
 
     /*------------------------------------------------------------------------*/
     /// ajoute une relation vers une arête
-    void addCoEdge(CoEdge* e);
+    void add(CoEdge* e);
 
     /// enlève une relation vers une arête
-    void removeCoEdge(CoEdge* e);
+    void remove(CoEdge* e);
 
     /// Fournit l'accès aux arêtes topologiques qui utilisent cette CoEdge sans copie
     const std::vector<CoEdge* >& getCoEdges() const

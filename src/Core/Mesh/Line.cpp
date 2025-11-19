@@ -85,25 +85,18 @@ void Line::getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroy
     // cf VTKGMDSEntityRepresentation
 }
 /*----------------------------------------------------------------------------*/
-bool Line::isA(std::string& name)
-{
-    MGX_NOT_YET_IMPLEMENTED("Il n'est pas prévu de faire un tel test");
-//    return (name.compare(0,strlen(typeNameMeshLine),typeNameMeshLine) == 0);
-    return false;
-}
-/*----------------------------------------------------------------------------*/
 TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const Line & cl)
 {
     o << cl.getName() << " (uniqueId " << cl.getUniqueId() << ", Name "<<cl.getName()<<")";
     return o;
 }
 /*----------------------------------------------------------------------------*/
-void Line::addCoEdge(Topo::CoEdge* ed)
+void Line::add(Topo::CoEdge* ed)
 {
     m_topo_property->getCoEdgeContainer().push_back(ed);
 }
 /*----------------------------------------------------------------------------*/
-void Line::removeCoEdge(Topo::CoEdge* ed)
+void Line::remove(Topo::CoEdge* ed)
 {
     Utils::remove(ed, m_topo_property->getCoEdgeContainer());
 }

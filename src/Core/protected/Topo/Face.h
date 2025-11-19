@@ -87,10 +87,10 @@ public:
 
     /*------------------------------------------------------------------------*/
     /// ajoute une relation vers un bloc
-    void addBlock(Block* b);
+    void add(Block* b);
 
     /// enlève une relation vers un bloc
-    void removeBlock(Block* b);
+    void remove(Block* b);
 
     /// Fournit l'accès aux blocs topologiques incidents sans copie
     const std::vector<Block* >& getBlocks() const
@@ -107,10 +107,10 @@ public:
 
     /*------------------------------------------------------------------------*/
     /// ajoute une relation vers une coface
-    void addCoFace(CoFace* f);
+    void add(CoFace* f);
 
     /// enlève une relation vers une coface
-    void removeCoFace(CoFace* f);
+    void remove(CoFace* f);
 
     /** Fournit l'accès aux faces topologiques incidentes sans copie
      */

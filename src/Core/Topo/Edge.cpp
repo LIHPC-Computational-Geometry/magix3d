@@ -47,7 +47,7 @@ Edge(Internal::Context& ctx,
 , m_save_mesh_property (0)
 {
     // association remontante
-    ce->addEdge(this);
+    ce->add(this);
 
     m_topo_property->getVertexContainer() = ce->getVertices();
     m_topo_property->getCoEdgeContainer().push_back(ce);
@@ -73,7 +73,7 @@ Edge(Internal::Context& ctx,
 
     // association remontante
     for (CoEdge* ce : coedges)
-        ce->addEdge(this);
+        ce->add(this);
 	ctx.newGraphicalRepresentation (*this);
 }
 /*----------------------------------------------------------------------------*/
@@ -229,8 +229,8 @@ void Edge::replace(CoEdge* e1, CoEdge* e2, Internal::InfoCommand* icmd)
 
             e1->saveCoEdgeTopoProperty(icmd);
             e2->saveCoEdgeTopoProperty(icmd);
-            e1->removeEdge(this);
-            e2->addEdge(this);
+            e1->remove(this);
+            e2->add(this);
         }
 }
 /*----------------------------------------------------------------------------*/
@@ -275,10 +275,10 @@ void Edge::replace(CoEdge* e1, std::vector<CoEdge*>& coedges, Internal::InfoComm
     	++iter;
     }
 
-    e1->removeEdge(this);
+    e1->remove(this);
     for (uint i=0; i<coedges.size(); i++){
     	coedges[i]->saveCoEdgeTopoProperty(icmd);
-    	coedges[i]->addEdge(this);
+    	coedges[i]->add(this);
     }
     m_topo_property->getCoEdgeContainer() = new_edges;
 #ifdef _DEBUG2
@@ -384,15 +384,17 @@ free(Internal::InfoCommand* icmd)
     setDestroyed(true);
 
     // on supprime l'arête des relations des arêtes communes vers les arêtes
-    for (uint i=0; i<getCoEdges().size(); i++) {
-        getCoEdges()[i]->saveCoEdgeTopoProperty(icmd);
-        getCoEdges()[i]->removeEdge(this);
+    for (CoEdge* coedge : getCoEdges()) {
+        coedge->saveCoEdgeTopoProperty(icmd);
+        if (Utils::contains(this, coedge->getEdges()))
+            coedge->remove(this);
     }
 
     // idem entre faces communes et cette arête
-    for (uint i=0; i<getCoFaces().size(); i++) {
-        getCoFaces()[i]->saveCoFaceTopoProperty(icmd);
-        getCoFaces()[i]->removeEdge(this);
+    for (CoFace* coface : getCoFaces()) {
+        coface->saveCoFaceTopoProperty(icmd);
+        if (Utils::contains(this, coface->getEdges()))
+            coface->remove(this);
     }
 
     clearDependancy();
@@ -1179,22 +1181,22 @@ isEdited() const
     || m_save_mesh_property != 0;
 }
 /*----------------------------------------------------------------------------*/
-void Edge::addCoFace(CoFace* f)
+void Edge::add(CoFace* f)
 {
     m_topo_property->getCoFaceContainer().push_back(f);
 }
 /*----------------------------------------------------------------------------*/
-void Edge::removeCoFace(CoFace* f)
+void Edge::remove(CoFace* f)
 {
     Utils::remove(f, m_topo_property->getCoFaceContainer());
 }
 /*----------------------------------------------------------------------------*/
-void Edge::addCoEdge(CoEdge* e)
+void Edge::add(CoEdge* e)
 {
     m_topo_property->getCoEdgeContainer().push_back(e);
 }
 /*----------------------------------------------------------------------------*/
-void Edge::removeCoEdge(CoEdge* e)
+void Edge::remove(CoEdge* e)
 {
     Utils::remove(e, m_topo_property->getCoEdgeContainer());
 }

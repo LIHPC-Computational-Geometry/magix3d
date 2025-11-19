@@ -28,22 +28,15 @@ CommandDestroyMesh::~CommandDestroyMesh()
 void CommandDestroyMesh::internalExecute()
 {
 	std::vector<Mesh::MeshEntity*> me;
-	std::vector<Mesh::Volume*> mvol;
-	getContext().getMeshManager().getVolumes(mvol);
-	for (uint i=0; i<mvol.size(); i++)
-		me.push_back(mvol[i]);
-	std::vector<Mesh::Surface*> msurf;
-	getContext().getMeshManager().getSurfaces(msurf);
-	for (uint i=0; i<msurf.size(); i++)
-		me.push_back(msurf[i]);
-	std::vector<Mesh::Line*> mline;
-	getContext().getMeshManager().getLines(mline);
-	for (uint i=0; i<mline.size(); i++)
-		me.push_back(mline[i]);
-	std::vector<Mesh::Cloud*> mcloud;
-	getContext().getMeshManager().getClouds(mcloud);
-	for (uint i=0; i<mcloud.size(); i++)
-		me.push_back(mcloud[i]);
+	Mesh::MeshManager& mm = getContext().getMeshManager();
+	for (Mesh::Volume* v : mm.getVolumesObj())
+		me.push_back(v);
+	for (Mesh::Surface* s : mm.getSurfacesObj())
+		me.push_back(s);
+	for (Mesh::Line* l : mm.getLinesObj())
+		me.push_back(l);
+	for (Mesh::Cloud* c : mm.getCloudsObj())
+		me.push_back(c);
 
 	for (uint i=0; i<me.size(); i++)
 		getInfoCommand().addMeshInfoEntity(me[i], Internal::InfoCommand::DELETED);
@@ -52,22 +45,15 @@ void CommandDestroyMesh::internalExecute()
 	gmds_mesh.clear();
 
 	// commande de destruction de toutes les entités topologiques qui ont pu être construites
-	std::vector<Topo::Block*> blocks;
-	getContext().getTopoManager().getBlocks(blocks);
-	for (uint i=0; i<blocks.size(); i++)
-		blocks[i]->getMeshingData()->setMeshed(false);
-	std::vector<Topo::CoFace*> cofaces;
-	getContext().getTopoManager().getCoFaces(cofaces);
-	for (uint i=0; i<cofaces.size(); i++)
-		cofaces[i]->getMeshingData()->setMeshed(false);
-	std::vector<Topo::CoEdge*> coedges;
-	getContext().getTopoManager().getCoEdges(coedges);
-	for (uint i=0; i<coedges.size(); i++)
-		coedges[i]->getMeshingData()->setMeshed(false);
-	std::vector<Topo::Vertex*> vertices;
-	getContext().getTopoManager().getVertices(vertices);
-	for (uint i=0; i<vertices.size(); i++)
-		vertices[i]->getMeshingData()->setMeshed(false);
+	Topo::TopoManager& tm = getContext().getTopoManager();
+	for (Topo::Block* b : tm.getBlocksObj())
+		b->getMeshingData()->setMeshed(false);
+	for (Topo::CoFace* cf : tm.getCoFacesObj())
+		cf->getMeshingData()->setMeshed(false);
+	for (Topo::CoEdge* ce : tm.getCoEdgesObj())
+		ce->getMeshingData()->setMeshed(false);
+	for (Topo::Vertex* v : tm.getVerticesObj())
+		v->getMeshingData()->setMeshed(false);
 }
 /*----------------------------------------------------------------------------*/
 void CommandDestroyMesh::internalUndo()

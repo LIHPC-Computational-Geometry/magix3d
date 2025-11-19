@@ -3,7 +3,6 @@
 /*----------------------------------------------------------------------------*/
 #include "Mesh/MeshEntity.h"
 #include <TkUtil/UTF8String.h>
-#include "Utils/Container.h"
 #include "Topo/MeshLineTopoProperty.h"
 
 namespace gmds {
@@ -87,30 +86,20 @@ public:
     virtual Utils::Entity::objectType getType() const {return Utils::Entity::MeshLine;}
 
     /*------------------------------------------------------------------------*/
-   /** \brief Donne le nom court du type d'objet (pour le nommage des entités)
-    */
-    static std::string getTinyName() {return "Li";}
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Test si l'entité est un Line suivant son nom
-     */
-    static bool isA(std::string& name);
-
-    /*------------------------------------------------------------------------*/
     /// pour l'affichage d'informations
 #ifndef SWIG
-    friend TkUtil::UTF8String & operator << (TkUtil::UTF8String & , const Cloud &);
+    friend TkUtil::UTF8String & operator << (TkUtil::UTF8String & , const Line &);
 #endif
 
     /*------------------------------------------------------------------------*/
     /// \brief Ajoute une relation vers une arête commune
 #ifndef SWIG
-    void addCoEdge(Topo::CoEdge* e);
+    void add(Topo::CoEdge* e);
 #endif
 
     /// Retire une relation vers une Edge
 #ifndef SWIG
-    void removeCoEdge(Topo::CoEdge* e);
+    void remove(Topo::CoEdge* e);
 #endif
 
     ///  Fournit l'accès aux arêtes topologiques qui ont participées à la constitution de la ligne

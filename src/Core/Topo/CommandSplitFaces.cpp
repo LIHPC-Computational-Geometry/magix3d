@@ -81,9 +81,8 @@ CommandSplitFaces(Internal::Context& c, CoEdge* arete, double ratio_dec, double 
 #ifdef _DEBUG_SPLIT
 	std::cout<<"CommandSplitFaces::CommandSplitFaces("<<arete->getName()<<", "<<ratio_dec<<", "<<ratio_ogrid<<", "<<project_on_meshing_edges<<")"<<std::endl;
 #endif
-    std::vector<Topo::CoFace* > cofaces;
-    getContext().getTopoManager().getCoFaces(cofaces);
-   init(cofaces);
+	std::vector<Topo::CoFace* > cofaces = getContext().getTopoManager().getCoFacesObj();
+	init(cofaces);
 }
 /*----------------------------------------------------------------------------*/
 CommandSplitFaces::
@@ -98,8 +97,7 @@ CommandSplitFaces(Internal::Context& c, CoEdge* arete, const Point& pt, double r
 #ifdef _DEBUG_SPLIT
 	std::cout<<"CommandSplitFaces::CommandSplitFaces("<<arete->getName()<<", "<<m_ratio_dec<<", "<<ratio_ogrid<<", "<<project_on_meshing_edges<<")"<<std::endl;
 #endif
-    std::vector<Topo::CoFace* > cofaces;
-    getContext().getTopoManager().getCoFaces(cofaces);
+    std::vector<Topo::CoFace* > cofaces = getContext().getTopoManager().getCoFacesObj();
     init(cofaces);
 }
 /*----------------------------------------------------------------------------*/
@@ -109,9 +107,7 @@ void CommandSplitFaces::init(std::vector<Topo::CoFace* > &cofaces)
 	std::cout<<"init avec "<<cofaces.size() <<" cofaces"<<std::endl;
 #endif
     // on ne conserve que les faces  structurées
-    for (std::vector<Topo::CoFace* >::iterator iter = cofaces.begin();
-            iter != cofaces.end(); ++iter){
-        Topo::CoFace* hcf = *iter;
+    for (Topo::CoFace* hcf : cofaces){
 		
         if (hcf->isStructured()){
 			m_cofaces.push_back(hcf);

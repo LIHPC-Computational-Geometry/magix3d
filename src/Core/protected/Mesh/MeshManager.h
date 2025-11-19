@@ -2,7 +2,7 @@
 #define MGX3D_MESH_MESHMANAGER_H_
 /*----------------------------------------------------------------------------*/
 #include "Internal/CommandCreator.h"
-#include "Utils/Container.h"
+#include "Mesh/MeshEntity.h"
 #include "Utils/SwigCompletion.h"
 /*----------------------------------------------------------------------------*/
 #include <string>
@@ -195,11 +195,11 @@ public:
 #endif
 
     /*------------------------------------------------------------------------*/
-    int getNbClouds(bool onlyVisible = true) const;
+    int getNbClouds() const;
 	SET_SWIG_COMPLETABLE_METHOD(getNbClouds)
-    int getNbSurfaces(bool onlyVisible = true) const;
+    int getNbSurfaces() const;
 	SET_SWIG_COMPLETABLE_METHOD(getNbSurfaces)
-    int getNbVolumes(bool onlyVisible = true) const;
+    int getNbVolumes() const;
 	SET_SWIG_COMPLETABLE_METHOD(getNbVolumes)
     int getNbNodes();
     int getNbFaces();
@@ -225,7 +225,7 @@ public:
     Cloud* getCloud(const std::string& name, const bool exceptionIfNotFound=true) const;
 
     /** Retourne les Nuages */
-    void getClouds(std::vector<Cloud*>& AClouds) const;
+    std::vector<Cloud*> getCloudsObj() const;
 
     /*------------------------------------------------------------------------*/
     /** Ajoute une Ligne au manager */
@@ -238,7 +238,7 @@ public:
     Line* getLine(const std::string& name, const bool exceptionIfNotFound=true) const;
 
     /** Retourne les Lignes */
-    void getLines(std::vector<Line*>& ALines) const;
+    std::vector<Line*> getLinesObj() const;
 
     /*------------------------------------------------------------------------*/
     /** Ajoute une Surface au manager */
@@ -251,7 +251,7 @@ public:
     Surface* getSurface(const std::string& name, const bool exceptionIfNotFound=true) const;
 
     /** Retourne les Surfaces */
-    void getSurfaces(std::vector<Surface*>& ASurfaces) const;
+    std::vector<Surface*> getSurfacesObj() const;
 
     /*------------------------------------------------------------------------*/
     /** Ajoute un Volume au manager */
@@ -264,7 +264,7 @@ public:
     Volume* getVolume(const std::string& name, const bool exceptionIfNotFound=true) const;
 
     /** Retourne les Volumes */
-    void getVolumes(std::vector<Volume*>& AVolumes) const;
+    std::vector<Volume*> getVolumesObj() const;
 
     /** Création d'un sous-volume ou réutilisation d'un existant */
     SubVolume* getNewSubVolume(const std::string& gr_name, Internal::InfoCommand* icmd);
@@ -277,20 +277,24 @@ public:
 #endif
 
 private:
+    /// retourne l'entité à partir du nom, une exception si elle n'existe pas
+    template <typename T, typename = std::enable_if_t<std::is_base_of<MeshEntity, T>::value>>
+    T* findByName(const std::string& name, const std::vector<T*> entities, const bool exceptionIfNotFound) const;
+
     /// Lien sur la structure de maillage et ses algos
     MeshItf* m_mesh_itf;
 
     // stockage des groupes de noeuds
-    Utils::Container<Cloud> m_clouds;
+    std::vector<Cloud*> m_clouds;
 
     // stockage des groupes de lignes
-    Utils::Container<Line> m_lines;
+    std::vector<Line*> m_lines;
 
     // stockage des groupes de polygones
-    Utils::Container<Surface> m_surfaces;
+    std::vector<Surface*> m_surfaces;
 
     // stockage des groupes de polyèdres
-    Utils::Container<Volume> m_volumes;
+    std::vector<Volume*> m_volumes;
 
 
     /// Stategie pour la conservation des créations et modifications de maillage

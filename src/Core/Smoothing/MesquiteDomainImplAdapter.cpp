@@ -40,15 +40,10 @@ MesquiteDomainImplAdapter(
   m_mesquite2GMDSNodes(AMesquite2GMDSNodes),
   m_mesquite2GMDSCells2D(AMesquite2GMDSCells2D), m_mesquite2GMDSCells3D(AMesquite2GMDSCells3D)
 {
-	std::vector<Topo::Block*  > blocks;
-	std::vector<Topo::CoFace* > coFaces;
-	std::vector<Topo::CoEdge* > coEdges;
-	std::vector<Topo::Vertex* > vertices;
-
-	m_topoManager.getBlocks(blocks);
-	m_topoManager.getCoFaces(coFaces);
-	m_topoManager.getCoEdges(coEdges);
-	m_topoManager.getVertices(vertices);
+	auto blocks = m_topoManager.getBlocksObj();
+	auto coFaces = m_topoManager.getCoFacesObj();
+	auto coEdges = m_topoManager.getCoEdgesObj();
+	auto vertices = m_topoManager.getVerticesObj();
 
 //	for(unsigned int iBlock=0; iBlock<blocks.size(); iBlock++) {
 //		std::vector<gmds::Region*>& regions = blocks[iBlock]->regions();

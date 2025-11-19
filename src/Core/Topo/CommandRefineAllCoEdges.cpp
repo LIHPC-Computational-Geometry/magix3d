@@ -34,12 +34,7 @@ internalExecute()
     message << "CommandRefineAllCoEdges::execute pour la commande " << getName ( )
             << " de nom unique " << getUniqueName ( );
 
-    std::vector<CoEdge*> coedges;
-    getContext().getTopoManager().getCoEdges(coedges);
-
-    for (std::vector<CoEdge*>::iterator iter=coedges.begin();
-    		iter!=coedges.end(); ++iter){
-    	CoEdge* coedge = *iter;
+    for (CoEdge* coedge : getContext().getTopoManager().getCoEdgesObj()){
     	CoEdgeMeshingProperty* mp = coedge->getMeshingProperty();
     	CoEdgeMeshingProperty* new_mp = mp->clone();
     	// on adapte la raison pour que le bras du début reste de la même longueur

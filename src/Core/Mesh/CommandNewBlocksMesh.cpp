@@ -45,9 +45,7 @@ CommandNewBlocksMesh::
 CommandNewBlocksMesh(Internal::Context& c, size_t tasksNum)
 : CommandCreateMesh(c, "Création du maillage pour tous les blocs", tasksNum)
 {
-    std::vector<Topo::Block* > blocs;
-    getContext().getTopoManager().getBlocks(blocs, true);
-
+    std::vector<Topo::Block* > blocs = getContext().getTopoManager().getBlocksObj();
     validate(blocs);
 }
 /*----------------------------------------------------------------------------*/

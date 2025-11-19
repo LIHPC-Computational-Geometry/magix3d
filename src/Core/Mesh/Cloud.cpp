@@ -86,25 +86,18 @@ void Cloud::getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestro
     // cf VTKGMDSEntityRepresentation
 }
 /*----------------------------------------------------------------------------*/
-bool Cloud::isA(std::string& name)
-{
-    MGX_NOT_YET_IMPLEMENTED("Il n'est pas prévu de faire un tel test");
-//    return (name.compare(0,strlen(typeNameMeshCloud),typeNameMeshCloud) == 0);
-    return false;
-}
-/*----------------------------------------------------------------------------*/
 TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const Cloud & cl)
 {
     o << cl.getName() << " (uniqueId " << cl.getUniqueId() << ", Name "<<cl.getName()<<")";
     return o;
 }
 /*----------------------------------------------------------------------------*/
-void Cloud::addCoEdge(Topo::CoEdge* ed)
+void Cloud::add(Topo::CoEdge* ed)
 {
     m_topo_property->getCoEdgeContainer().push_back(ed);
 }
 /*----------------------------------------------------------------------------*/
-void Cloud::removeCoEdge(Topo::CoEdge* ed)
+void Cloud::remove(Topo::CoEdge* ed)
 {
     Utils::remove(ed, m_topo_property->getCoEdgeContainer());
 }
@@ -115,12 +108,12 @@ const std::vector<Topo::CoEdge* >& Cloud::getCoEdges() const
     return m_topo_property->getCoEdgeContainer();
 }
 /*----------------------------------------------------------------------------*/
-void Cloud::addVertex(Topo::Vertex* vtx)
+void Cloud::add(Topo::Vertex* vtx)
 {
     m_topo_property->getVertexContainer().push_back(vtx);
 }
 /*----------------------------------------------------------------------------*/
-void Cloud::removeVertex(Topo::Vertex* vtx)
+void Cloud::remove(Topo::Vertex* vtx)
 {
     Utils::remove(vtx, m_topo_property->getVertexContainer());
 }

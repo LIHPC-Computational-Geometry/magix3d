@@ -3,7 +3,6 @@
 /*----------------------------------------------------------------------------*/
 #include "Mesh/MeshEntity.h"
 #include <TkUtil/UTF8String.h>
-#include "Utils/Container.h"
 #include "Topo/MeshVolumeTopoProperty.h"
 /*----------------------------------------------------------------------------*/
 namespace gmds {
@@ -90,16 +89,6 @@ public:
     virtual Utils::Entity::objectType getType() const {return Utils::Entity::MeshVolume;}
 
     /*------------------------------------------------------------------------*/
-   /** \brief Donne le nom court du type d'objet (pour le nommage des entités)
-    */
-    static std::string getTinyName() {return "Vo";}
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Test si l'entité est un Volume suivant son nom
-     */
-    static bool isA(std::string& name);
-
-    /*------------------------------------------------------------------------*/
     /// pour l'affichage d'informations
 #ifndef SWIG
     friend TkUtil::UTF8String & operator << (TkUtil::UTF8String & , const Volume &);
@@ -108,13 +97,13 @@ public:
     /*------------------------------------------------------------------------*/
     /// \brief Ajoute une relation vers un bloc
 #ifndef SWIG
-    void addBlock(Topo::Block* b);
+    void add(Topo::Block* b);
 #endif
 
     /*----------------------------------------------------------------------------*/
     /// Retire une relation vers un bloc
 #ifndef SWIG
-    void removeBlock(Topo::Block* b);
+    void remove(Topo::Block* b);
 #endif
 
     /*----------------------------------------------------------------------------*/

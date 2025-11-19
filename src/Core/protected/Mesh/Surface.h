@@ -3,7 +3,6 @@
 /*----------------------------------------------------------------------------*/
 #include "Mesh/MeshEntity.h"
 #include <TkUtil/UTF8String.h>
-#include "Utils/Container.h"
 #include "Topo/MeshSurfaceTopoProperty.h"
 /*----------------------------------------------------------------------------*/
 namespace gmds {
@@ -90,16 +89,6 @@ public:
     virtual Utils::Entity::objectType getType() const {return Utils::Entity::MeshSurface;}
 
     /*------------------------------------------------------------------------*/
-   /** \brief Donne le nom court du type d'objet (pour le nommage des entités)
-    */
-    static std::string getTinyName() {return "Su";}
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Test si l'entité est une Surface suivant son nom
-     */
-    static bool isA(std::string& name);
-
-    /*------------------------------------------------------------------------*/
     /// pour l'affichage d'informations
 #ifndef SWIG
     friend TkUtil::UTF8String & operator << (TkUtil::UTF8String & , const Surface &);
@@ -108,13 +97,13 @@ public:
     /*------------------------------------------------------------------------*/
     /// \brief Ajoute une relation vers une face commune
 #ifndef SWIG
-    void addCoFace(Topo::CoFace* f);
+    void add(Topo::CoFace* f);
 #endif
 
     /*----------------------------------------------------------------------------*/
     /// Retire une relation vers une Face commune
 #ifndef SWIG
-    void removeCoFace(Topo::CoFace* f);
+    void remove(Topo::CoFace* f);
 #endif
 
     /*----------------------------------------------------------------------------*/
