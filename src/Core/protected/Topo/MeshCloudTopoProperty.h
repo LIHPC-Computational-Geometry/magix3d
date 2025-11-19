@@ -1,19 +1,7 @@
-/*----------------------------------------------------------------------------*/
-/** \file MeshCloudTopoProperty.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 15/11/13
- */
-/*----------------------------------------------------------------------------*/
 #ifndef MESH_CLOUD_TOPO_PROPERTY_H_
 #define MESH_CLOUD_TOPO_PROPERTY_H_
 /*----------------------------------------------------------------------------*/
-#include "Utils/Container.h"
-#include <TkUtil/Exception.h>
 #include <vector>
-#include <sys/types.h>
-#include <algorithm>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -27,31 +15,28 @@ class Vertex;
  * Rassemble les propriétés topologiques communes aux arêtes et sommets.
  */
  
- class MeshCloudTopoProperty {
+ class MeshCloudTopoProperty
+ {
  public:
-     MeshCloudTopoProperty()
-     {
-     }
-
-     ~MeshCloudTopoProperty()
-     {}
+     MeshCloudTopoProperty() = default;
+     ~MeshCloudTopoProperty() = default;
 
      /*------------------------------------------------------------------------*/
      /** Création d'un clone, on copie toutes les informations */
-     MeshCloudTopoProperty* clone() {
+     MeshCloudTopoProperty* clone()
+     {
          MeshCloudTopoProperty* prop = new MeshCloudTopoProperty();
-         prop->m_coedges.clone(m_coedges);
-         prop->m_vertices.clone(m_vertices);
-
+         prop->m_coedges = m_coedges;
+         prop->m_vertices = m_vertices;
          return prop;
      }
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des arêtes communes
-     Utils::Container<CoEdge>& getCoEdgeContainer() {return m_coedges;}
+     std::vector<CoEdge*>& getCoEdgeContainer() {return m_coedges;}
 
      /// accesseur sur le conteneur des sommets
-     Utils::Container<Vertex>& getVertexContainer() {return m_vertices;}
+     std::vector<Vertex*>& getVertexContainer() {return m_vertices;}
 
      /*------------------------------------------------------------------------*/
      /** \brief   Suppression des relations
@@ -64,10 +49,10 @@ class Vertex;
 
  private:
      /// Lien avec les arêtes communes sur lesquelles se base ce nuage
-     Utils::Container<CoEdge> m_coedges;
+     std::vector<CoEdge*> m_coedges;
 
      /// Lien avec les sommets sur lesquels se base ce nuage
-     Utils::Container<Vertex> m_vertices;
+     std::vector<Vertex*> m_vertices;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo

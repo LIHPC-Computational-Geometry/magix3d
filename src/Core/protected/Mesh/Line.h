@@ -1,12 +1,3 @@
-/*----------------------------------------------------------------------------*/
-/*
- * \file Line.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 24/08/16
- */
-/*----------------------------------------------------------------------------*/
 #ifndef MGX3D_MESH_LINE_H_
 #define MGX3D_MESH_LINE_H_
 /*----------------------------------------------------------------------------*/
@@ -123,7 +114,7 @@ public:
 #endif
 
     ///  Fournit l'accès aux arêtes topologiques qui ont participées à la constitution de la ligne
-    void getCoEdges(std::vector<Topo::CoEdge* >& edges) const;
+    const std::vector<Topo::CoEdge* >& getCoEdges() const;
 
     /** supprime les relations vers les arêtes */
     void clearCoEdges()

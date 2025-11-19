@@ -1,12 +1,3 @@
-/*----------------------------------------------------------------------------*/
-/*
- * \file Cloud.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 25 nov. 2011
- */
-/*----------------------------------------------------------------------------*/
 #ifndef MGX3D_MESH_CLOUD_H_
 #define MGX3D_MESH_CLOUD_H_
 /*----------------------------------------------------------------------------*/
@@ -122,7 +113,7 @@ public:
 #endif
 
     ///  Fournit l'accès aux arêtes topologiques qui ont participées à la constitution du nuage
-    void getCoEdges(std::vector<Topo::CoEdge* >& edges) const;
+    const std::vector<Topo::CoEdge* >& getCoEdges() const;
 
     /** supprime les relations vers les arêtes */
     void clearCoEdges()
@@ -140,7 +131,7 @@ public:
 #endif
 
     ///  Fournit l'accès aux sommets topologiques qui ont participées à la constitution du nuage
-    void getVertices(std::vector<Topo::Vertex* >& vertices) const;
+    const std::vector<Topo::Vertex* >& getVertices() const;
 
     /** supprime les relations vers les sommets */
     void clearVertices()

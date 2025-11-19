@@ -1,19 +1,7 @@
-/*----------------------------------------------------------------------------*/
-/** \file MeshLineTopoProperty.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 24/08/16
- */
-/*----------------------------------------------------------------------------*/
 #ifndef MESH_LINE_TOPO_PROPERTY_H_
 #define MESH_LINE_TOPO_PROPERTY_H_
 /*----------------------------------------------------------------------------*/
-#include "Utils/Container.h"
-#include <TkUtil/Exception.h>
 #include <vector>
-#include <sys/types.h>
-#include <algorithm>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -26,27 +14,24 @@ class CoEdge;
  * Rassemble les propriétés topologiques communes aux arêtes et sommets.
  */
  
- class MeshLineTopoProperty {
+ class MeshLineTopoProperty
+ {
  public:
-     MeshLineTopoProperty()
-     {
-     }
-
-     ~MeshLineTopoProperty()
-     {}
+     MeshLineTopoProperty() = default;
+     ~MeshLineTopoProperty() = default;
 
      /*------------------------------------------------------------------------*/
      /** Création d'un clone, on copie toutes les informations */
-     MeshLineTopoProperty* clone() {
+     MeshLineTopoProperty* clone()
+     {
          MeshLineTopoProperty* prop = new MeshLineTopoProperty();
-         prop->m_coedges.clone(m_coedges);
-
+         prop->m_coedges = m_coedges;
          return prop;
      }
 
      /*------------------------------------------------------------------------*/
      /// accesseur sur le conteneur des arêtes communes
-     Utils::Container<CoEdge>& getCoEdgeContainer() {return m_coedges;}
+     std::vector<CoEdge*>& getCoEdgeContainer() {return m_coedges;}
 
      /*------------------------------------------------------------------------*/
      /** \brief   Suppression des relations
@@ -58,8 +43,7 @@ class CoEdge;
 
  private:
      /// Lien avec les arêtes communes sur lesquelles se base ce nuage
-     Utils::Container<CoEdge> m_coedges;
-
+     std::vector<CoEdge*> m_coedges;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo

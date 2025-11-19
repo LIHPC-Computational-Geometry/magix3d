@@ -443,6 +443,17 @@ bool remove(T* e, std::vector<T*>& entities)
         return false;
     }
 }
+
+template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
+void checkIfDestroyed(const std::vector<T*>& entities)
+{
+    for (T* e : entities)
+        if (e->isDestroyed()) {
+            TkUtil::UTF8String   message;
+            message << e->getName() << " est marquée à détruire";
+            throw TkUtil::Exception (message);
+        }
+}
 #endif
 /*----------------------------------------------------------------------------*/
 } // end namespace Utils
