@@ -235,7 +235,7 @@ _init()
     // association remontante
     std::vector<Face*> faces = getFaces();
     for (uint i=0; i<faces.size(); i++)
-        faces[i]->addBlock(this);
+        faces[i]->add(this);
 	getContext ( ).newGraphicalRepresentation (*this);
 }
 /*----------------------------------------------------------------------------*/
@@ -383,8 +383,8 @@ replace(Face* f1, Face* f2, Internal::InfoCommand* icmd)
 
             f1->saveFaceTopoProperty(icmd);
             f2->saveFaceTopoProperty(icmd);
-            f1->removeBlock(this);
-            f2->addBlock(this);
+            f1->remove(this);
+            f2->add(this);
         }
 }
 /*----------------------------------------------------------------------------*/
@@ -2631,10 +2631,10 @@ free(Internal::InfoCommand* icmd)
     setDestroyed(true);
 
     // suppression des relations remontantes des faces vers ce block
-    const std::vector<Face*>& faces = getFaces();
-    for (uint i=0; i<faces.size(); i++) {
-        faces[i]->saveFaceTopoProperty(icmd);
-        faces[i]->removeBlock(this);
+    for (Face* face : getFaces()) {
+        face->saveFaceTopoProperty(icmd);
+        if (Utils::contains(this, face->getBlocks()))
+            face->remove(this);
     }
 
     clearDependancy();

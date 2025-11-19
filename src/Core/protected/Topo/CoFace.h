@@ -93,10 +93,10 @@ public:
 
     /*------------------------------------------------------------------------*/
     /// ajoute une relation vers une face
-    void addFace(Face* f);
+    void add(Face* f);
 
     /// enlève une relation vers une face
-    void removeFace(Face* f);
+    void remove(Face* f);
 
     /** \brief  Fournit l'accès aux faces topologiques incidentes sans copie
      */
@@ -201,10 +201,10 @@ public:
     {return m_topo_property->getEdgeContainer();}
 
     /// ajoute une relation vers une arête
-    void addEdge(Edge* e);
+    void add(Edge* e);
 
     /// enlève une relation vers une arête
-    void removeEdge(Edge* e);
+    void remove(Edge* e);
 
     /// accès à l'une des arêtes suivant 2 sommets
     Edge* getEdge(Topo::Vertex* v1, Topo::Vertex* v2) const;

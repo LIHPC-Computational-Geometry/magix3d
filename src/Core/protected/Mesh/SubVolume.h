@@ -73,16 +73,6 @@ public:
     virtual Utils::Entity::objectType getType() const {return Utils::Entity::MeshSubVolume;}
 
     /*------------------------------------------------------------------------*/
-   /** \brief Donne le nom court du type d'objet (pour le nommage des entités)
-    */
-    static std::string getTinyName() {return "SV";}
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Test si l'entité est un Volume suivant son nom
-     */
-    static bool isA(std::string& name);
-
-    /*------------------------------------------------------------------------*/
     /// ajoute un polyèdre à la liste
     void addRegion(gmds::Region& reg);
 

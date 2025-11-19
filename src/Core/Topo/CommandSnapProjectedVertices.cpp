@@ -42,10 +42,7 @@ CommandSnapProjectedVertices::
 CommandSnapProjectedVertices(Internal::Context& c)
 :CommandEditTopo(c, "Déplace tous les sommets topologiques suivant la projection sur la géométrie")
 {
-    std::vector<Topo::Vertex* > vertices;
-
-    c.getTopoManager().getVertices(vertices);
-
+    std::vector<Topo::Vertex* > vertices = c.getTopoManager().getVerticesObj();
     m_vertices.insert(m_vertices.end(), vertices.begin(), vertices.end());
 }
 /*----------------------------------------------------------------------------*/

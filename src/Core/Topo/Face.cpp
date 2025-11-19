@@ -53,7 +53,7 @@ Face(Internal::Context& ctx,
     m_topo_property->getCoFaceContainer().push_back(coface);
     m_topo_property->getVertexContainer() = coface->getVertices();
 
-    coface->addFace(this);
+    coface->add(this);
 	ctx.newGraphicalRepresentation (*this);
 
 #ifdef _DEBUG_MEMORY
@@ -81,7 +81,7 @@ Face(Internal::Context& ctx,
     m_topo_property->getCoFaceContainer() = cofaces;
     m_topo_property->getVertexContainer() = vertices;
     for (uint i=0; i<getCoFaces().size(); i++)
-        getCoFaces()[i]->addFace(this);
+        getCoFaces()[i]->add(this);
 	ctx.newGraphicalRepresentation (*this);
 #ifdef _DEBUG_MEMORY
 	std::cout << "Face::Face( avec "<<cofaces.size()<<" cofaces et "<<vertices.size()<<" vertices)"<<std::endl;
@@ -136,22 +136,22 @@ Face::
     }
 }
 /*----------------------------------------------------------------------------*/
-void Face::addBlock(Block* b)
+void Face::add(Block* b)
 {
     m_topo_property->getBlockContainer().push_back(b);
 }
 /*----------------------------------------------------------------------------*/
-void Face::removeBlock(Block* b)
+void Face::remove(Block* b)
 {
     Utils::remove(b, m_topo_property->getBlockContainer());
 }
 /*----------------------------------------------------------------------------*/
-void Face::addCoFace(CoFace* f)
+void Face::add(CoFace* f)
 {
     m_topo_property->getCoFaceContainer().push_back(f);
 }
 /*----------------------------------------------------------------------------*/
-void Face::removeCoFace(CoFace* f)
+void Face::remove(CoFace* f)
 {
     Utils::remove(f, m_topo_property->getCoFaceContainer());
 }
@@ -229,8 +229,8 @@ replace(CoFace* cf1, CoFace* cf2, Internal::InfoCommand* icmd)
 
             cf1->saveCoFaceTopoProperty(icmd);
             cf2->saveCoFaceTopoProperty(icmd);
-            cf1->removeFace(this);
-            cf2->addFace(this);
+            cf1->remove(this);
+            cf2->add(this);
         }
 }
 /*---------------------------------------------------------------------------*/
@@ -1093,9 +1093,10 @@ free(Internal::InfoCommand* icmd)
     // on laisse les relation du bloc vers cette face
 
     // suppression des relations remontantes des faces communes vers cette face
-    for (uint i=0; i<getCoFaces().size(); i++) {
-        getCoFaces()[i]->saveCoFaceTopoProperty(icmd);
-        getCoFaces()[i]->removeFace(this);
+    for (CoFace* coface : getCoFaces()) {
+        coface->saveCoFaceTopoProperty(icmd);
+        if (Utils::contains(this, coface->getFaces()))
+            coface->remove(this);
     }
 
     clearDependancy();

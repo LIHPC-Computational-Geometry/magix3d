@@ -138,7 +138,7 @@ void CommandReadMLI::internalExecute()
 		for (auto face_id : surf->cells())
 		{
 			auto face = gmdsMesh.get<gmds::Face>(face_id);
-			ss->addFace(face);
+			ss->add(face);
 		}
 
         getContext().newGraphicalRepresentation (*ss);

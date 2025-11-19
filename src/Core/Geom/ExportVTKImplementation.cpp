@@ -57,8 +57,7 @@ void ExportVTKImplementation::perform(Internal::InfoCommand* icmd)
 				"one and only one block", TkUtil::Charset::UTF_8));
 	}
 
-	std::vector<Topo::Block*> topo_blocs;
-	m_context.getTopoManager().getBlocks(topo_blocs);
+	std::vector<Topo::Block*> topo_blocs = m_context.getTopoManager().getBlocksObj();
 
 	gmds::Mesh& mesh = m_context.getMeshManager().getMesh()->getGMDSMesh();
 	{

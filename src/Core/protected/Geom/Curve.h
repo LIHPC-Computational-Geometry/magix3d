@@ -172,7 +172,7 @@ public:
      *
      *  \param v un pointeur sur un sommet
      */
-    void add (Vertex* v);
+    void add(Vertex* v);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Supprime s de la liste des surfaces incidentes. Si s n'apparait

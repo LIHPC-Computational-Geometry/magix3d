@@ -434,13 +434,14 @@ void append(std::vector<T*>& to, const std::vector<T*>& from)
 }
 
 template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
-bool remove(T* e, std::vector<T*>& entities)
+void remove(T* e, std::vector<T*>& entities)
 {
     if (auto it = std::find(entities.begin(), entities.end(), e); it != entities.end()) {
         entities.erase(it);
-        return true;
     } else {
-        return false;
+        TkUtil::UTF8String   message;
+        message << e->getName() << " n'existe pas dans la liste des entités";
+        throw TkUtil::Exception (message);
     }
 }
 
@@ -453,6 +454,24 @@ void checkIfDestroyed(const std::vector<T*>& entities)
             message << e->getName() << " est marquée à détruire";
             throw TkUtil::Exception (message);
         }
+}
+
+template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
+void deleteAndClear(std::vector<T*>& entities)
+{
+    for (uint i = 0; i<entities.size(); ++i)
+        delete entities[i];
+    entities.clear();
+}
+
+template <typename T, typename = std::enable_if<std::is_base_of<Entity, T>::value>>
+std::vector<T*> filterAndSort(const std::vector<T*>& entities)
+{
+    Utils::EntitySet<T*> result(Utils::Entity::compareEntity);
+    for (T* e : entities)
+        if (!e->isDestroyed())
+            result.insert(e);
+    return Utils::toVect(result);
 }
 #endif
 /*----------------------------------------------------------------------------*/

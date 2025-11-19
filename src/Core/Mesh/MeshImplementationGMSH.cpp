@@ -268,7 +268,7 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
         // la surface de maillage que l'on vient de créer/modifier
         Mesh::Surface* sf = getContext().getMeshManager().getSurface(nom);
         sf->saveMeshSurfaceTopoProperty(&command->getInfoCommand());
-        sf->addCoFace(fa);
+        sf->add(fa);
     } // end for i<group_names.size()
 
 #ifdef _DEBUG_MESH

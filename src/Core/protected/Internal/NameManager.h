@@ -1,21 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/*
- * \file NameManager.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 17 janv. 2011
- */
-/*----------------------------------------------------------------------------*/
-
-
 #ifndef NAMEMANAGER_H_
 #define NAMEMANAGER_H_
-
+/*----------------------------------------------------------------------------*/
 #include "Utils/Entity.h"
-
+#include "Internal/EntitiesHelper.h"
+#include "Utils/TypeDedicatedNameManager.h"
+#include "Utils/MgxException.h"
 #include <vector>
-
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 
@@ -68,6 +58,50 @@ public:
 
     /// retourne vrai si le décalage d'id (renommage) est actif
     bool isShiftingIdActivated() const {return m_is_name_shifting;}
+
+    /// recherche un objet par son nom (Geom, Topo et SysCoord. Mesh et Group gérés autrement)
+    template <typename T, typename = std::enable_if<std::is_base_of<InternalEntity, T>::value>>
+    T* findByName(const std::string& name, const std::vector<T*>& entities, const bool exceptionIfNotFound) const
+    {
+        T* entity = 0;
+
+        if (!T::isA(name)){
+            if (exceptionIfNotFound){
+                TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+                message << name << " n'est pas un nom correspondant à ce type d'entité";
+                throw TkUtil::Exception(message);
+            }
+            else
+                return entity;
+        }
+
+        std::string new_name;
+        if (isShiftingIdActivated()){
+            TkUtil::UTF8String tkutil_name(name);
+            Utils::Entity::objectType t = EntitiesHelper::getObjectType(tkutil_name);
+            new_name = getTypeDedicatedNameManager(t)->renameWithShiftingId(name);
+        } else {
+            new_name = name;
+        }
+
+        for (T* e : entities)
+            if (new_name == e->getName())
+                entity = e;
+
+        if (entity != 0 && entity->isDestroyed()){
+            TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+            message << new_name << " existe mais elle est détruite";
+            throw Utils::IsDestroyedException(message);
+        }
+
+        if (exceptionIfNotFound && entity == 0){
+            TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+            message << new_name << " n'a pas été trouvée";
+            throw TkUtil::Exception(message);
+        }
+
+        return entity;
+    }
 
 private:
     /// id global pour les entités

@@ -211,16 +211,7 @@ bool MeshImplementation::createGMDSGroups()
 {
     // création des clouds, lines, surfaces et volumes gmds correspondants aux
     // Mgx3D::Mesh::Cloud, Line, Surface et Volume
-
-    std::vector<Mesh::Cloud*> clouds;
-    getContext().getMeshManager().getClouds(clouds);
-    std::vector<Mesh::Line*> lines;
-    getContext().getMeshManager().getLines(lines);
-    std::vector<Mesh::Surface*> surfaces;
-    getContext().getMeshManager().getSurfaces(surfaces);
-    std::vector<Mesh::Volume*> volumes;
-    getContext().getMeshManager().getVolumes(volumes);
-
+	Mesh::MeshManager& mm = getContext().getMeshManager();
     std::vector<gmds::CellGroup<gmds::Node>*> createdGMDSClouds;
     std::vector<gmds::CellGroup<gmds::Edge>*> createdGMDSLines;
     std::vector<gmds::CellGroup<gmds::Face>*> createdGMDSSurfaces;
@@ -228,8 +219,7 @@ bool MeshImplementation::createGMDSGroups()
 
     try {
 
-    for(unsigned int iCloud=0; iCloud<clouds.size(); iCloud++) {
-        Mesh::Cloud* current_cloud = clouds[iCloud];
+    for(Mesh::Cloud* current_cloud : mm.getCloudsObj()) {
         // modification du nom du nuage pour éviter les conflits avec les noms de ligne
         std::string cloudName = current_cloud->getName() + std::string("ND");
         auto cl = getGMDSMesh().newGroup<gmds::Node>(cloudName);
@@ -244,9 +234,7 @@ bool MeshImplementation::createGMDSGroups()
     }
 
 //    std::string lineDefaultName = getContext().getGroupManager().getDefaultName(1);
-    for(unsigned int iLine=0; iLine<lines.size(); iLine++) {
-        Mesh::Line* current_line = lines[iLine];
-
+    for(Mesh::Line* current_line : mm.getLinesObj()) {
 //        // on évite les lignes hors groupe s'il y a des groupes pour d'autres lignes
 //        if (lines.size() > 1 && current_line->getName() == lineDefaultName)
 //            continue;
@@ -262,8 +250,7 @@ bool MeshImplementation::createGMDSGroups()
         }
     }
 
-    for(unsigned int iSurf=0; iSurf<surfaces.size(); iSurf++) {
-        Mesh::Surface* current_surf = surfaces[iSurf];
+    for(Mesh::Surface* current_surf : mm.getSurfacesObj()) {
         auto su = getGMDSMesh().newGroup<gmds::Face>(current_surf->getName());
         createdGMDSSurfaces.push_back(su);
 
@@ -275,8 +262,7 @@ bool MeshImplementation::createGMDSGroups()
         }
     }
 
-    for(unsigned int iVol=0; iVol<volumes.size(); iVol++) {
-        Mesh::Volume* current_vol = volumes[iVol];
+    for(Mesh::Volume* current_vol : mm.getVolumesObj()) {
         auto vo = getGMDSMesh().newGroup<gmds::Region>(current_vol->getName());
         createdGMDSVolumes.push_back(vo);
 
@@ -410,9 +396,6 @@ void MeshImplementation::writeCGNS(std::string nom)
 	//     les indices sont à choisir comme en fortran (à partir de 1)
 // REM CP : pour ne pas dépendre de l'option +scoping (sous spack) de CGNS on utilise
 // ici la macro CGNS_ENUMV.
-
-	std::vector<Topo::Block*> blocks;
-	getContext().getTopoManager().getBlocks(blocks, true);
 	gmds::Mesh& gmdsMesh = getGMDSMesh();
 
 	int index_file, icelldim, iphysdim, index_base;
@@ -432,8 +415,7 @@ void MeshImplementation::writeCGNS(std::string nom)
 		throw TkUtil::Exception (TkUtil::UTF8String ("Erreur dans cg_base_write", TkUtil::Charset::UTF_8));
 
 	// on ajoute un à un tous les blocks maillés et structurés
-	for (uint i=0; i<blocks.size(); i++){
-		Topo::Block* bloc = blocks[i];
+	for (Topo::Block* bloc : getContext().getTopoManager().getBlocksObj()){
 		if (bloc->isMeshed() && bloc->isStructured()){
 
 			if (bloc->getVertices().size() != 8){
@@ -925,41 +907,24 @@ void MeshImplementation::deleteGMDSGroups()
 {
     // destruction des clouds, surfaces et volumes gmds correspondants aux
     // Mgx3D::Mesh::Cloud, Surface et Volume
+	Mesh::MeshManager& mm = getContext().getMeshManager();
 
-    std::vector<Mesh::Cloud*> clouds;
-    getContext().getMeshManager().getClouds(clouds);
-    std::vector<Mesh::Line*> lines;
-    getContext().getMeshManager().getLines(lines);
-    std::vector<Mesh::Surface*> surfaces;
-    getContext().getMeshManager().getSurfaces(surfaces);
-    std::vector<Mesh::Volume*> volumes;
-    getContext().getMeshManager().getVolumes(volumes);
-
-
-    for(unsigned int iCloud=0; iCloud<clouds.size(); iCloud++) {
-        Mesh::Cloud* current_cloud = clouds[iCloud];
-
+    for(Mesh::Cloud* current_cloud : mm.getCloudsObj()) {
         // modification du nom du nuage pour éviter les conflits avec les noms de ligne
         std::string cloudName = current_cloud->getName() + std::string("ND");
 
         getGMDSMesh().deleteGroup<gmds::Node>(getGMDSMesh().getGroup<gmds::Node>(cloudName));
     }
 
-    for(unsigned int iLine=0; iLine<lines.size(); iLine++) {
-        Mesh::Line* current_line = lines[iLine];
-
+    for(Mesh::Line* current_line : mm.getLinesObj()) {
         getGMDSMesh().deleteGroup<gmds::Edge>(getGMDSMesh().getGroup<gmds::Edge>(current_line->getName()));
     }
 
-    for(unsigned int iSurf=0; iSurf<surfaces.size(); iSurf++) {
-        Mesh::Surface* current_surf = surfaces[iSurf];
-
+    for(Mesh::Surface* current_surf : mm.getSurfacesObj()) {
         getGMDSMesh().deleteGroup<gmds::Face>(getGMDSMesh().getGroup<gmds::Face>(current_surf->getName()));
     }
 
-    for(unsigned int iVol=0; iVol<volumes.size(); iVol++) {
-        Mesh::Volume* current_vol = volumes[iVol];
-
+    for(Mesh::Volume* current_vol : mm.getVolumesObj()) {
         getGMDSMesh().deleteGroup<gmds::Region>(getGMDSMesh().getGroup<gmds::Region>(current_vol->getName()));
     }
 }
@@ -1288,7 +1253,7 @@ void MeshImplementation::_addNodesInClouds(Mesh::CommandCreateMesh* command, Top
 
             Mesh::Cloud* cl = getContext().getMeshManager().getCloud(nom);
             cl->saveMeshCloudTopoProperty(&command->getInfoCommand());
-            cl->addCoEdge(ed);
+            cl->add(ed);
         } // end for i<groupsName.size()
 }
 /*----------------------------------------------------------------------------*/
@@ -1324,7 +1289,7 @@ void MeshImplementation::_addNodesInClouds(Mesh::CommandCreateMesh* command, Top
 
             Mesh::Cloud* cl = getContext().getMeshManager().getCloud(nom);
             cl->saveMeshCloudTopoProperty(&command->getInfoCommand());
-            cl->addVertex(ve);
+            cl->add(ve);
         } // end for i<groupsName.size()
 }
 /*----------------------------------------------------------------------------*/
@@ -1360,7 +1325,7 @@ void MeshImplementation::_addEdgesInLines(Mesh::CommandCreateMesh* command, Topo
 
             Mesh::Line* ln = getContext().getMeshManager().getLine(nom);
             ln->saveMeshLineTopoProperty(&command->getInfoCommand());
-            ln->addCoEdge(ed);
+            ln->add(ed);
         } // end for i<groupsName.size()
 }
 /*----------------------------------------------------------------------------*/

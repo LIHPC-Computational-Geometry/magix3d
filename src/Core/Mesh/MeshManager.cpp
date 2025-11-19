@@ -41,9 +41,9 @@ MeshManager::~MeshManager()
 {
     if (m_mesh_itf)
         delete m_mesh_itf;
-    m_clouds.deleteAndClear();
-    m_surfaces.deleteAndClear();
-    m_volumes.deleteAndClear();
+    Utils::deleteAndClear(m_clouds);
+    Utils::deleteAndClear(m_surfaces);
+    Utils::deleteAndClear(m_volumes);
 }
 /*----------------------------------------------------------------------------*/
 void MeshManager::clear()
@@ -52,143 +52,89 @@ void MeshManager::clear()
         delete m_mesh_itf;
         m_mesh_itf = new MeshImplementation(&getContext());
     }
-    m_clouds.deleteAndClear();
-    m_surfaces.deleteAndClear();
-    m_volumes.deleteAndClear();
+    Utils::deleteAndClear(m_clouds);
+    Utils::deleteAndClear(m_surfaces);
+    Utils::deleteAndClear(m_volumes);
 }
 /*----------------------------------------------------------------------------*/
 void MeshManager::add(Cloud* cl)
 {
-    m_clouds.add(cl);
+    m_clouds.push_back(cl);
 }
 /*----------------------------------------------------------------------------*/
 void MeshManager::remove(Cloud* cl)
 {
-    m_clouds.remove(cl, true);
+    Utils::remove(cl, m_clouds);
 }
 /*----------------------------------------------------------------------------*/
 Cloud* MeshManager::getCloud(const std::string& name, const bool exceptionIfNotFound) const
 {
-    Cloud* cloud = 0;
-    const std::vector<Cloud*>& clouds = m_clouds.get();
-    for (std::vector<Cloud*>::const_iterator iter = clouds.begin();
-            iter != clouds.end(); ++iter)
-        if (name == (*iter)->getName())
-            cloud = (*iter);
-
-    if (exceptionIfNotFound && cloud == 0){
-		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-        message <<"getCloud impossible, entité \""<<name
-                <<"\" n'a pas été trouvée dans le MeshManager";
-        throw TkUtil::Exception(message);
-    }
-
-    return cloud;
+    return findByName(name, m_clouds, exceptionIfNotFound);
 }
 /*----------------------------------------------------------------------------*/
-void MeshManager::getClouds(std::vector<Cloud*>& AClouds) const
+std::vector<Cloud*> MeshManager::getCloudsObj() const
 {
-    AClouds = m_clouds.get();
+    return Utils::filterAndSort(m_clouds);
 }
 /*----------------------------------------------------------------------------*/
 void MeshManager::add(Line* ln)
 {
-    m_lines.add(ln);
+    m_lines.push_back(ln);
 }
 /*----------------------------------------------------------------------------*/
 void MeshManager::remove(Line* ln)
 {
-	m_lines.remove(ln, true);
+	Utils::remove(ln, m_lines);
 }
 /*----------------------------------------------------------------------------*/
 Line* MeshManager::getLine(const std::string& name, const bool exceptionIfNotFound) const
 {
-	Line* line = 0;
-    const std::vector<Line*>& lines = m_lines.get();
-    for (std::vector<Line*>::const_iterator iter = lines.begin();
-            iter != lines.end(); ++iter)
-        if (name == (*iter)->getName())
-            line = (*iter);
-
-    if (exceptionIfNotFound && line == 0){
-		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-        message <<"getLine impossible, entité \""<<name
-                <<"\" n'a pas été trouvée dans le MeshManager";
-        throw TkUtil::Exception(message);
-    }
-
-    return line;
+    return findByName(name, m_lines, exceptionIfNotFound);
 }
 /*----------------------------------------------------------------------------*/
-void MeshManager::getLines(std::vector<Line*>& ALines) const
+std::vector<Line*> MeshManager::getLinesObj() const
 {
-	ALines = m_lines.get();
+    return Utils::filterAndSort(m_lines);
 }
 /*----------------------------------------------------------------------------*/
 void MeshManager::add(Surface* sf)
 {
-    m_surfaces.add(sf);
+    m_surfaces.push_back(sf);
 }
 /*----------------------------------------------------------------------------*/
 void MeshManager::remove(Surface* sf)
 {
-    m_surfaces.remove(sf, true);
+    Utils::remove(sf, m_surfaces);
 }
 /*----------------------------------------------------------------------------*/
 Surface* MeshManager::getSurface(const std::string& name, const bool exceptionIfNotFound) const
 {
-    Surface* surf = 0;
-
-    const std::vector<Surface*>& surfaces = m_surfaces.get();
-    for (std::vector<Surface* >::const_iterator iter = surfaces.begin();
-            iter != surfaces.end(); ++iter)
-        if (name == (*iter)->getName())
-            surf = (*iter);
-
-    if (exceptionIfNotFound && surf == 0){
-		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-        message <<"getSurface impossible, entité \""<<name
-                <<"\" n'a pas été trouvée dans le MeshManager";
-        throw TkUtil::Exception(message);
-    }
-
-    return surf;
+    return findByName(name, m_surfaces, exceptionIfNotFound);
 }
 /*----------------------------------------------------------------------------*/
-void MeshManager::getSurfaces(std::vector<Surface*>& ASurfaces) const
+std::vector<Surface*> MeshManager::getSurfacesObj() const
 {
-    ASurfaces = m_surfaces.get();
+    return Utils::filterAndSort(m_surfaces);
 }
 /*----------------------------------------------------------------------------*/
 void MeshManager::add(Volume* vo)
 {
-    m_volumes.add(vo);
+    m_volumes.push_back(vo);
 }
 /*----------------------------------------------------------------------------*/
 void MeshManager::remove(Volume* vo)
 {
-    //std::cout<<"MeshManager::remove("<<vo->getName()<<")"<<std::endl;
-    m_volumes.remove(vo, true);
+    Utils::remove(vo, m_volumes);
 }
 /*----------------------------------------------------------------------------*/
 Volume* MeshManager::getVolume(const std::string& name, const bool exceptionIfNotFound) const
 {
-    Volume* vol = 0;
-
-    const std::vector<Volume*>& volumes = m_volumes.get();
-    for (std::vector<Volume* >::const_iterator iter = volumes.begin();
-            iter != volumes.end(); ++iter)
-        if (name == (*iter)->getName())
-            vol = (*iter);
-
-    if (exceptionIfNotFound && vol == 0){
-		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-        message <<"getVolume impossible, entité \""<<name
-                <<"\" n'a pas été trouvée dans le MeshManager";
-        throw TkUtil::Exception(message);
-    }
-
-    return vol;
+    return findByName(name, m_volumes, exceptionIfNotFound);
+}
+/*----------------------------------------------------------------------------*/
+std::vector<Volume*> MeshManager::getVolumesObj() const
+{
+    return Utils::filterAndSort(m_volumes);
 }
 /*----------------------------------------------------------------------------*/
 SubVolume* MeshManager::getNewSubVolume(const std::string& gr_name, Internal::InfoCommand* icmd)
@@ -199,9 +145,8 @@ SubVolume* MeshManager::getNewSubVolume(const std::string& gr_name, Internal::In
 		throw TkUtil::Exception (TkUtil::UTF8String ("Création d'un sous-volume impossible sans un nom", TkUtil::Charset::UTF_8));
 
 	Volume* vol = 0;
-	const std::vector<Volume*>& volumes = m_volumes.get();
-	for (std::vector<Volume* >::const_iterator iter = volumes.begin();
-			iter != volumes.end(); ++iter)
+	for (std::vector<Volume* >::const_iterator iter = m_volumes.begin();
+			iter != m_volumes.end(); ++iter)
 		if (gr_name == (*iter)->getName())
 			vol = (*iter);
 
@@ -232,11 +177,6 @@ SubVolume* MeshManager::getNewSubVolume(const std::string& gr_name, Internal::In
 	}
 
 	return sv;
-}
-/*----------------------------------------------------------------------------*/
-void MeshManager::getVolumes(std::vector<Volume*>& AVolumes) const
-{
-    AVolumes = m_volumes.get();
 }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResult* MeshManager::newBlocksMesh(std::vector<std::string>& names)
@@ -529,28 +469,19 @@ std::string MeshManager::getInfos(const Volume* me) const
             return std::string("Volume non trouvé !");
 }
 /*----------------------------------------------------------------------------*/
-int MeshManager::getNbClouds(bool onlyVisible) const
+int MeshManager::getNbClouds() const
 {
-    if (onlyVisible)
-        return m_clouds.getVisibleNb();
-    else
-        return m_clouds.getNb();
+    return getCloudsObj().size();
 }
 /*----------------------------------------------------------------------------*/
-int MeshManager::getNbSurfaces(bool onlyVisible) const
+int MeshManager::getNbSurfaces() const
 {
-    if (onlyVisible)
-        return m_surfaces.getVisibleNb();
-    else
-        return m_surfaces.getNb();
+    return getSurfacesObj().size();
 }
 /*----------------------------------------------------------------------------*/
-int MeshManager::getNbVolumes(bool onlyVisible) const
+int MeshManager::getNbVolumes() const
 {
-    if (onlyVisible)
-        return m_volumes.getVisibleNb();
-    else
-        return m_volumes.getNb();
+    return getVolumesObj().size();
 }
 /*----------------------------------------------------------------------------*/
 int MeshManager::getNbNodes()
@@ -634,6 +565,22 @@ CommandMeshExplorer* MeshManager::endExplorer(CommandMeshExplorer* oldExplo, boo
         return cmdResult;
     }
 /*----------------------------------------------------------------------------*/
+template <typename T, typename = std::enable_if_t<std::is_base_of<MeshEntity, T>::value>>
+T* MeshManager::findByName(const std::string& name, const std::vector<T*> entities, const bool exceptionIfNotFound) const
+{
+    T* entity = 0;
+    for (T* e : entities)
+        if (name == e->getName())
+            entity = e;
+
+    if (exceptionIfNotFound && entity == 0) {
+        TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+        message << name << " n'a pas été trouvée dans le MeshManager";
+        throw TkUtil::Exception(message);
+    }
+
+    return entity;
+}
 /*----------------------------------------------------------------------------*/
 } // end namespace Mesh
 /*----------------------------------------------------------------------------*/

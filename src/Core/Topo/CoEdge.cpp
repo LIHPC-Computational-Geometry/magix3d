@@ -76,8 +76,8 @@ CoEdge(Internal::Context& ctx,
     m_topo_property->getVertexContainer().push_back(v2);
 
     // association remontante
-    v1->addCoEdge(this);
-    v2->addCoEdge(this);
+    v1->add(this);
+    v2->add(this);
 
     // om met une discrétisation par défaut
     if (m_mesh_property == 0){
@@ -142,12 +142,12 @@ CoEdge::
 	}
 }
 /*----------------------------------------------------------------------------*/
-void CoEdge::addEdge(Edge* e)
+void CoEdge::add(Edge* e)
 { 
 	m_topo_property->getEdgeContainer().push_back(e);
 }
 /*----------------------------------------------------------------------------*/
-void CoEdge::removeEdge(Edge* e)
+void CoEdge::remove(Edge* e)
 {
 	Utils::remove(e, m_topo_property->getEdgeContainer());
 }
@@ -187,8 +187,8 @@ replace(Topo::Vertex* v1, Topo::Vertex* v2, bool propagate_up, bool propagate_do
 
             saveCoEdgeTopoProperty(icmd);
             m_topo_property->getVertexContainer()[i] = v2;
-            v1->removeCoEdge(this);
-            v2->addCoEdge(this);
+            v1->remove(this);
+            v2->add(this);
         }
 
     if (propagate_up && !found)
@@ -293,13 +293,15 @@ free(Internal::InfoCommand* icmd)
     // on supprime l'arête des relations des sommets vers les arêtes communes
     for (Vertex* v : getVertices()) {
         v->saveVertexTopoProperty(icmd);
-        v->removeCoEdge(this);
+        if (Utils::contains(this, v->getCoEdges()))
+	        v->remove(this);
     }
 
     // idem entre arêtes et arêtes communes
     for (Edge* e : getEdges()) {
         e->saveEdgeTopoProperty(icmd);
-        e->removeCoEdge(this);
+		if (Utils::contains(this, e->getCoEdges()))
+	        e->remove(this);
     }
 
     clearDependancy();
@@ -432,11 +434,11 @@ std::vector<CoEdge*> CoEdge::split(Topo::Vertex* vtx, uint nbMeshingEdges, Inter
     		edges[i]->setRatio(coedge2, ratio);
     	}
         edges[i]->saveEdgeTopoProperty(icmd);
-        edges[i]->addCoEdge(coedge1);
-        edges[i]->addCoEdge(coedge2);
+        edges[i]->add(coedge1);
+        edges[i]->add(coedge2);
 
-		coedge1->addEdge(edges[i]);
-		coedge2->addEdge(edges[i]);
+		coedge1->add(edges[i]);
+		coedge2->add(edges[i]);
     }
 
     // on met de côté la liste des Edges touchées
@@ -622,13 +624,13 @@ std::vector<Topo::Vertex*> CoEdge::split(uint nbMeshingEdges1, uint nbMeshingEdg
     	}
 
         edges[i]->saveEdgeTopoProperty(icmd);
-        edges[i]->addCoEdge(coedge1);
-        edges[i]->addCoEdge(coedge2);
-        edges[i]->addCoEdge(coedge3);
+        edges[i]->add(coedge1);
+        edges[i]->add(coedge2);
+        edges[i]->add(coedge3);
 
-        coedge1->addEdge(edges[i]);
-        coedge2->addEdge(edges[i]);
-        coedge3->addEdge(edges[i]);
+        coedge1->add(edges[i]);
+        coedge2->add(edges[i]);
+        coedge3->add(edges[i]);
     }
 
     // on met de côté la liste des Edges touchées

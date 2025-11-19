@@ -1368,7 +1368,7 @@ void MeshImplementation::_addRegionsInVolumes(Mesh::CommandCreateMesh* command, 
         }
         // le volume de maillage que l'on vient de créer/modifier
         Mesh::Volume* vol = getContext().getMeshManager().getVolume(nom);
-        vol->addBlock(bl);
+        vol->add(bl);
         if (isNewVolume)
             getContext().newGraphicalRepresentation (*vol);
     } // end for i<groupsName.size()
@@ -1484,7 +1484,7 @@ void MeshImplementation::_addFacesInSurfaces(Mesh::CommandCreateMesh* command, T
         }
         // la surface de maillage que l'on vient de créer/modifier
         Mesh::Surface* sf = getContext().getMeshManager().getSurface(nom);
-        sf->addCoFace(fa);
+        sf->add(fa);
     } // end for i<groupsName.size()
 
     if (isOpposite){

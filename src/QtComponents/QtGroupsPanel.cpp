@@ -2045,33 +2045,27 @@ void QtGroupsPanel::selectAllCallback ( )
 		entities.insert(entities.end(), ge.begin(), ge.end());
 	}
 	if (types & FilterEntity::TopoBlock){
-		std::vector<Topo::Block*> te;
-		getContext ( ).getTopoManager().getBlocks(te);
+		std::vector<Topo::Block*> te = getContext ( ).getTopoManager().getBlocksObj();
 		entities.insert(entities.end(), te.begin(), te.end());
 	}
 	if (types & FilterEntity::TopoCoFace){
-		std::vector<Topo::CoFace*> te;
-		getContext ( ).getTopoManager().getCoFaces(te);
+		std::vector<Topo::CoFace*> te = getContext ( ).getTopoManager().getCoFacesObj();
 		entities.insert(entities.end(), te.begin(), te.end());
 	}
 	if (types & FilterEntity::TopoCoEdge){
-		std::vector<Topo::CoEdge*> te;
-		getContext ( ).getTopoManager().getCoEdges(te);
+		std::vector<Topo::CoEdge*> te = getContext ( ).getTopoManager().getCoEdgesObj();
 		entities.insert(entities.end(), te.begin(), te.end());
 	}
 	if (types & FilterEntity::TopoVertex){
-		std::vector<Topo::Vertex*> te;
-		getContext ( ).getTopoManager().getVertices(te);
+		std::vector<Topo::Vertex*> te = getContext ( ).getTopoManager().getVerticesObj();
 		entities.insert(entities.end(), te.begin(), te.end());
 	}
 	if (types & FilterEntity::MeshSurface){
-		std::vector<Mesh::Surface*> ms;
-		getContext ( ).getMeshManager().getSurfaces(ms);
+		std::vector<Mesh::Surface*> ms = getContext ( ).getMeshManager().getSurfacesObj();
 		entities.insert(entities.end(), ms.begin(), ms.end());
 	}
 	if (types & FilterEntity::MeshVolume){
-		std::vector<Mesh::Volume*> me;
-		getContext ( ).getMeshManager().getVolumes(me);
+		std::vector<Mesh::Volume*> me = getContext ( ).getMeshManager().getVolumesObj();
 		entities.insert(entities.end(), me.begin(), me.end());
 	}
 

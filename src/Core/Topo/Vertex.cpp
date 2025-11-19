@@ -148,12 +148,12 @@ setCoord(const Utils::Math::Point & pt, bool acceptMeshed)
     updateCoEdgeModificationTime();
 }
 /*----------------------------------------------------------------------------*/
-void Vertex::addCoEdge(CoEdge* e)
+void Vertex::add(CoEdge* e)
 {
     m_topo_property->getCoEdgeContainer().push_back(e);
 }
 /*----------------------------------------------------------------------------*/
-void Vertex::removeCoEdge(CoEdge* e)
+void Vertex::remove(CoEdge* e)
 {
     Utils::remove(e, m_topo_property->getCoEdgeContainer());
 }
@@ -291,9 +291,10 @@ free(Internal::InfoCommand* icmd)
     setDestroyed(true);
 
 //    // on supprime les relations des arêtes vers ce sommet
-//    for (uint i=0; i<getNbCoEdges(); i++) {
-//        getCoEdge(i)->saveCoEdgeTopoProperty(icmd);
-//        getCoEdge(i)->removeVertex(this, false);
+//    for (CpEdge* coedge : getCoEdges()) {
+//        coedge->saveCoEdgeTopoProperty(icmd);
+//        if (Utils::contains(this, coedge->getVertices()))
+//          coedge->remove(this, false);
 //    }
 
     clearDependancy();

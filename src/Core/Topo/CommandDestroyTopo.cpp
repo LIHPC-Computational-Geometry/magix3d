@@ -401,9 +401,7 @@ void CommandDestroyTopo::checkInterpolates()
 			deletedCoFaces[iter->first->getName()] = 1;
 	}
 	// parcours des arêtes existantes dans le manager
-	std::vector<Topo::CoEdge*> coedges;
-	getContext().getTopoManager().getCoEdges(coedges);
-
+	auto coedges = getContext().getTopoManager().getCoEdgesObj();
 	for (std::vector<Topo::CoEdge*>::iterator iter=coedges.begin();
 				iter!=coedges.end(); ++iter){
 		Topo::CoEdge* coedge = *iter;

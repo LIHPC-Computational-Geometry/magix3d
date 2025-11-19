@@ -234,8 +234,7 @@ void QtMeshInformationOperationPanel::autoUpdate ( )
 
 		QtMgx3DOperationPanel::autoUpdate ( );
 
-		std::vector<Topo::Block*> blocks;
-		manager->getBlocks(blocks);
+		std::vector<Topo::Block*> blocks = manager->getBlocksObj();
 
 		uint nb_blocs = blocks.size();
 		uint nb_bl_mailles = 0;
@@ -278,8 +277,7 @@ void QtMeshInformationOperationPanel::autoUpdate ( )
 			_nbProvideRegionLabel->setText (UTF8TOQSTRING (text));
 		}
 
-		std::vector<Topo::CoFace*> cofaces;
-		manager->getCoFaces(cofaces);
+		std::vector<Topo::CoFace*> cofaces = manager->getCoFacesObj();
 
 		uint nb_cofaces = cofaces.size();
 		uint nb_cf_mailles = 0;

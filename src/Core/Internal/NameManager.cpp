@@ -45,12 +45,8 @@ NameManager::NameManager()
     m_all_type_name_managers.push_back(new Utils::TypeDedicatedNameManager(Topo::Face::getTinyName()));
     m_all_type_name_managers.push_back(new Utils::TypeDedicatedNameManager(Topo::Block::getTinyName()));
     m_all_type_name_managers.push_back(new Utils::TypeDedicatedNameManager(CoordinateSystem::SysCoord::getTinyName()));
-    // a priori, les suivant ne servent pas
-    // [EB] sauf pour nommer les groupes de mailles pour les objets de base (cf CommandNewTopoOGridOnGeometry)
-//    m_all_type_name_managers.push_back(new Utils::TypeDedicatedNameManager(Mesh::Cloud::getTinyName()));
-//    m_all_type_name_managers.push_back(new Utils::TypeDedicatedNameManager(Mesh::Surface::getTinyName()));
-//    m_all_type_name_managers.push_back(new Utils::TypeDedicatedNameManager(Mesh::Volume::getTinyName()));
 
+    // Les noms des entités Mesh et Group sont gérés différemment (cf MeshManager & GroupManager)
 }
 /*----------------------------------------------------------------------------*/
 NameManager::~NameManager()

@@ -1968,14 +1968,14 @@ freeUnused(std::map<Vertex*, uint> & filtre_vertex,
 							TopoHelper::sortVertices(vtx0, vtx1);
 							CoFace* newCoface = corr_2vtx_coface[std::pair<Vertex*, Vertex*>(vtx0, vtx1)];
 							if (newCoface){
-								faceToUpdate->addCoFace(newCoface);
-								newCoface->addFace(faceToUpdate);
+								faceToUpdate->add(newCoface);
+								newCoface->add(faceToUpdate);
 							}
 						} // end for i
 						CoFace* newCoface = corr_coface[coface];
 						if (newCoface){
-							faceToUpdate->addCoFace(newCoface);
-							newCoface->addFace(faceToUpdate);
+							faceToUpdate->add(newCoface);
+							newCoface->add(faceToUpdate);
 						}
 
 					} // if (cofaceToBeReplaced)
