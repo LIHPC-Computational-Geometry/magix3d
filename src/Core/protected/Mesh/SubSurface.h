@@ -59,21 +59,11 @@ public:
     virtual Utils::Entity::objectType getType() const {return Utils::Entity::MeshSubSurface;}
 
     /*------------------------------------------------------------------------*/
-   /** \brief Donne le nom court du type d'objet (pour le nommage des entités)
-    */
-    static std::string getTinyName() {return "SS";}
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Test si l'entité est un Surface suivant son nom
-     */
-    static bool isA(std::string& name);
-
-    /*------------------------------------------------------------------------*/
     /// ajoute un polygone à la liste
-    void addFace(gmds::Face face);
+    void add(gmds::Face face);
 
     /// ajoute une liste de polygones à la liste
-    void addFace(std::vector<gmds::Face> face);
+    void add(std::vector<gmds::Face> face);
 
     ///  Fournit l'accès aux faces GMDS
     virtual void getGMDSFaces(std::vector<gmds::Face >& faces) const;

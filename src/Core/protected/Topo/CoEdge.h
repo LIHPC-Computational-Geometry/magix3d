@@ -90,10 +90,10 @@ public:
 
     /*------------------------------------------------------------------------*/
     /// ajoute une relation vers une arête
-    void addEdge(Edge* e);
+    void add(Edge* e);
 
     /// enlève une relation vers une arête
-    void removeEdge(Edge* e);
+    void remove(Edge* e);
 
     /// Fournit l'accès aux arêtes topologiques qui utilisent cette CoEdge sans copie
     const std::vector<Edge* > & getEdges() const

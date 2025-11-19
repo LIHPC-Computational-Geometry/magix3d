@@ -370,15 +370,15 @@ updateMesh(std::vector<Topo::Block*>& blocs, std::string grpName, bool add)
             if ((*iter)->isMeshed()){
                 if (add){
 #ifdef _DEBUG_UPDATE
-                    std::cout<<" "<<mvol->getName()<<" addBlock("<<(*iter)->getName()<<")"<<std::endl;
+                    std::cout<<" "<<mvol->getName()<<" add("<<(*iter)->getName()<<")"<<std::endl;
 #endif
-                    mvol->addBlock(*iter);
+                    mvol->add(*iter);
                 }
                 else {
 #ifdef _DEBUG_UPDATE
-                    std::cout<<" "<<mvol->getName()<<" removeBlock("<<(*iter)->getName()<<")"<<std::endl;
+                    std::cout<<" "<<mvol->getName()<<" remove("<<(*iter)->getName()<<")"<<std::endl;
 #endif
-                    mvol->removeBlock(*iter);
+                    mvol->remove(*iter);
                 }
             }
         if (isNewVolume)
@@ -437,15 +437,15 @@ updateMesh(std::vector<Topo::CoFace*>& cofaces, std::string grpName, bool add)
             if ((*iter)->isMeshed()){
                 if (add){
 #ifdef _DEBUG_UPDATE
-                   std::cout<<" "<<msurf->getName()<<" addCoFace("<<(*iter)->getName()<<")"<<std::endl;
+                   std::cout<<" "<<msurf->getName()<<" add("<<(*iter)->getName()<<")"<<std::endl;
 #endif
-                    msurf->addCoFace(*iter);
+                    msurf->add(*iter);
                 }
                 else {
 #ifdef _DEBUG_UPDATE
-                    std::cout<<" "<<msurf->getName()<<" removeCoFace("<<(*iter)->getName()<<")"<<std::endl;
+                    std::cout<<" "<<msurf->getName()<<" remove("<<(*iter)->getName()<<")"<<std::endl;
 #endif
-                    msurf->removeCoFace(*iter);
+                    msurf->remove(*iter);
                 }
             }
     } // end if (is_meshed)
@@ -502,15 +502,15 @@ updateMesh(std::vector<Topo::CoEdge*>& coedges, std::string grpName, bool add)
             if ((*iter)->isMeshed()){
                 if (add){
 #ifdef _DEBUG_UPDATE
-                   std::cout<<" "<<mcld->getName()<<" addCoEdge("<<(*iter)->getName()<<")"<<std::endl;
+                   std::cout<<" "<<mcld->getName()<<" add("<<(*iter)->getName()<<")"<<std::endl;
 #endif
-                   mcld->addCoEdge(*iter);
+                   mcld->add(*iter);
                 }
                 else {
 #ifdef _DEBUG_UPDATE
-                    std::cout<<" "<<mcld->getName()<<" removeCoEdge("<<(*iter)->getName()<<")"<<std::endl;
+                    std::cout<<" "<<mcld->getName()<<" remove("<<(*iter)->getName()<<")"<<std::endl;
 #endif
-                    mcld->removeCoEdge(*iter);
+                    mcld->remove(*iter);
                 }
             }
 
@@ -537,15 +537,15 @@ updateMesh(std::vector<Topo::CoEdge*>& coedges, std::string grpName, bool add)
             if ((*iter)->isMeshed()){
                 if (add){
 #ifdef _DEBUG_UPDATE
-                   std::cout<<" "<<mln->getName()<<" addCoEdge("<<(*iter)->getName()<<")"<<std::endl;
+                   std::cout<<" "<<mln->getName()<<" add("<<(*iter)->getName()<<")"<<std::endl;
 #endif
-                   mln->addCoEdge(*iter);
+                   mln->add(*iter);
                 }
                 else {
 #ifdef _DEBUG_UPDATE
-                    std::cout<<" "<<mcld->getName()<<" removeCoEdge("<<(*iter)->getName()<<")"<<std::endl;
+                    std::cout<<" "<<mcld->getName()<<" remove("<<(*iter)->getName()<<")"<<std::endl;
 #endif
-                    mln->removeCoEdge(*iter);
+                    mln->remove(*iter);
                 }
             }
 

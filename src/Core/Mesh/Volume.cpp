@@ -317,25 +317,18 @@ void Volume::getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestr
 	}	// if (true == solid)
 }
 /*----------------------------------------------------------------------------*/
-bool Volume::isA(std::string& name)
-{
-    MGX_NOT_YET_IMPLEMENTED("Il n'est pas prévu de faire un tel test");
-//    return (name.compare(0,strlen(typeNameMeshVolume),typeNameMeshVolume) == 0);
-    return false;
-}
-/*----------------------------------------------------------------------------*/
 TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const Volume & cl)
 {
     o << cl.getName() << " (uniqueId " << cl.getUniqueId() << ", Name "<<cl.getName()<<")";
     return o;
 }
 /*----------------------------------------------------------------------------*/
-void Volume::addBlock(Topo::Block* b)
+void Volume::add(Topo::Block* b)
 {
     m_topo_property->getBlockContainer().push_back(b);
 }
 /*----------------------------------------------------------------------------*/
-void Volume::removeBlock(Topo::Block* b)
+void Volume::remove(Topo::Block* b)
 {
     Utils::remove(b, m_topo_property->getBlockContainer());
 }

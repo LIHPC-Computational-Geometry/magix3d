@@ -301,11 +301,8 @@ vector<string> QtTopologySplitFacesPanel::getFacesNames ( ) const
 	CHECK_NULL_PTR_ERROR (_facesPanel)
 	if (true == allFaces ( ))
 	{
-		vector<CoFace*>	faces;
-		getContext ( ).getTopoManager ( ).getCoFaces (faces);
-		for (vector<CoFace*>::iterator it = faces.begin ( );
-		     faces.end ( ) != it; it++)
-			names.push_back ((*it)->getUniqueName ( ));
+		for (CoFace* cf : getContext ( ).getTopoManager ( ).getCoFacesObj ( ))
+			names.push_back (cf->getUniqueName ( ));
 	}
 	else
 		names	= _facesPanel->getUniqueNames ( );

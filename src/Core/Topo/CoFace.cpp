@@ -206,7 +206,7 @@ init(std::vector<Edge* > &edges,
    // association remontante
     for (std::vector<Edge* >::iterator iter = edges.begin();
             iter != edges.end(); ++iter)
-        (*iter)->addCoFace(this);
+        (*iter)->add(this);
 
     // on copie les arêtes
     m_topo_property->getEdgeContainer() = edges;
@@ -232,7 +232,7 @@ init(std::vector<Edge* > &edges)
     // association remontante
     for (std::vector<Edge* >::iterator iter = edges.begin();
             iter != edges.end(); ++iter)
-        (*iter)->addCoFace(this);
+        (*iter)->add(this);
 
     // on copie les arêtes
     m_topo_property->getEdgeContainer() = edges;
@@ -537,8 +537,8 @@ replace(Edge* e1, Edge* e2, Internal::InfoCommand* icmd)
 
             e1->saveEdgeTopoProperty(icmd);
             e2->saveEdgeTopoProperty(icmd);
-            e1->removeCoFace(this);
-            e2->addCoFace(this);
+            e1->remove(this);
+            e2->add(this);
         }
 
     // pas de transmition aux blocs, ils n'ont pas la connaissance des arêtes
@@ -574,7 +574,7 @@ merge(CoFace* coface, Internal::InfoCommand* icmd)
     for (std::vector<Edge* >::iterator iter = edges.begin();
             iter != edges.end(); ++iter){
         (*iter)->saveEdgeTopoProperty(icmd);
-        (*iter)->removeCoFace(coface);
+        (*iter)->remove(coface);
 
         if ((*iter)->getCoFaces().size() == 0){
             // cas où l'arête peut être supprimée
@@ -652,15 +652,17 @@ free(Internal::InfoCommand* icmd)
     setDestroyed(true);
 
     // on supprime la face commune des relations des faces vers les faces communes
-    for (uint i=0; i<getFaces().size(); i++) {
-        getFaces()[i]->saveFaceTopoProperty(icmd);
-        getFaces()[i]->removeCoFace(this);
+    for (Face* face : getFaces()) {
+        face->saveFaceTopoProperty(icmd);
+        if (Utils::contains(this, face->getCoFaces()))
+            face->remove(this);
     }
 
     // idem entre arêtes et cette face commune
-    for (uint i=0; i<getEdges().size(); i++) {
-        getEdges()[i]->saveEdgeTopoProperty(icmd);
-        getEdges()[i]->removeCoFace(this);
+    for (Edge* edge : getEdges()) {
+        edge->saveEdgeTopoProperty(icmd);
+        if (Utils::contains(this, edge->getCoFaces()))
+            edge->remove(this);
     }
 
     clearDependancy();
@@ -933,11 +935,11 @@ split2(eDirOnCoFace dir, std::vector<Edge*>& edges1, std::vector<Edge*>& edges3,
     // on ajoute les 2 CoFaces aux faces
     for (Face* f : getFaces()) {
         f->saveFaceTopoProperty(icmd);
-        f->addCoFace(coface1);
-        f->addCoFace(coface2);
+        f->add(coface1);
+        f->add(coface2);
 
-        coface1->addFace(f);
-        coface2->addFace(f);
+        coface1->add(f);
+        coface2->add(f);
     }
 
     // destruction de la face commune actuelle
@@ -1187,13 +1189,13 @@ split3(eDirOnCoFace dir, std::vector<Edge*>& edges1, std::vector<Edge*>& edges3,
     // on ajoute les 3 CoFaces aux faces
     for (Face* f : getFaces()) {
         f->saveFaceTopoProperty(icmd);
-        f->addCoFace(coface1);
-        f->addCoFace(coface2);
-        f->addCoFace(coface3);
+        f->add(coface1);
+        f->add(coface2);
+        f->add(coface3);
 
-        coface1->addFace(f);
-        coface2->addFace(f);
-        coface3->addFace(f);
+        coface1->add(f);
+        coface2->add(f);
+        coface3->add(f);
     }
 
     // destruction de la face commune actuelle
@@ -1693,12 +1695,12 @@ splitOgrid(eDirOnCoFace dir,
     return splitingEdges;
 }
 /*----------------------------------------------------------------------------*/
-void CoFace::addEdge(Edge* e)
+void CoFace::add(Edge* e)
 {
     m_topo_property->getEdgeContainer().push_back(e);
 }
 /*----------------------------------------------------------------------------*/
-void CoFace::removeEdge(Edge* e)
+void CoFace::remove(Edge* e)
 {
     Utils::remove(e, m_topo_property->getEdgeContainer());
 }
@@ -3575,12 +3577,12 @@ isEdited() const
     || m_save_mesh_data != 0;
 }
 /*----------------------------------------------------------------------------*/
-void CoFace::addFace(Face* f)
+void CoFace::add(Face* f)
 {
     m_topo_property->getFaceContainer().push_back(f);
 }
 /*----------------------------------------------------------------------------*/
-void CoFace::removeFace(Face* f)
+void CoFace::remove(Face* f)
 {
     Utils::remove(f, m_topo_property->getFaceContainer());
 }

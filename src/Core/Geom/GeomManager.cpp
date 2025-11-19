@@ -4555,138 +4555,22 @@ int GeomManager::getNbVolumes() const
 /*----------------------------------------------------------------------------*/
 Volume* GeomManager::getVolume(const std::string& name, const bool exceptionIfNotFound) const
 {
-    Volume* vol = 0;
-
-    std::string new_name;
-    if (getContext().getNameManager().isShiftingIdActivated()){
-    	if (Volume::isA(name))
-    		new_name = getContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::GeomVolume)->renameWithShiftingId(name);
-    	else
-    		return vol;
-    }
-    else
-        new_name = name;
-
-    for (std::vector<Volume*>::const_iterator iter = m_volumes.begin();
-            iter != m_volumes.end(); ++iter)
-        if (new_name == (*iter)->getName())
-            vol = (*iter);
-
-    if (exceptionIfNotFound && vol == 0){
-        TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-        message <<"getVolume impossible, entité \""<<new_name<<"\" n'a pas été trouvée dans le GeomManager";
-        throw TkUtil::Exception(message);
-    }
-
-    if (vol && vol->isDestroyed()){
-    	TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-    	message <<"getVolume impossible, entité \""<<new_name<<"\" est détruite";
-    	throw Utils::IsDestroyedException(message);
-    }
-
-    return vol;
+    return getContext().getNameManager().findByName(name, m_volumes, exceptionIfNotFound);
 }
 /*----------------------------------------------------------------------------*/
 Surface* GeomManager::getSurface(const std::string& name, const bool exceptionIfNotFound) const
 {
-    Surface* surf = 0;
-
-    std::string new_name;
-    if (getContext().getNameManager().isShiftingIdActivated()){
-    	if (Surface::isA(name))
-    		new_name = getContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::GeomSurface)->renameWithShiftingId(name);
-    	else
-    		return surf;
-    }
-    else
-        new_name = name;
-
-    for (std::vector<Surface*>::const_iterator iter = m_surfaces.begin();
-            iter != m_surfaces.end(); ++iter)
-        if (new_name == (*iter)->getName())
-            surf = (*iter);
-
-    if (exceptionIfNotFound && surf == 0){
-        TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-        message <<"getSurface impossible, entité \""<<new_name<<"\" n'a pas été trouvée dans le GeomManager";
-        throw TkUtil::Exception(message);
-    }
-
-    if (surf && surf->isDestroyed()){
-    	TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-    	message <<"getSurface impossible, entité \""<<new_name<<"\" est détruite";
-    	throw Utils::IsDestroyedException(message);
-    }
-
-    return surf;
+    return getContext().getNameManager().findByName(name, m_surfaces, exceptionIfNotFound);
 }
 /*----------------------------------------------------------------------------*/
 Curve* GeomManager::getCurve(const std::string& name, const bool exceptionIfNotFound) const
 {
-    Curve* curve = 0;
-
-    std::string new_name;
-    if (getContext().getNameManager().isShiftingIdActivated()){
-    	if (Curve::isA(name))
-    		new_name = getContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::GeomCurve)->renameWithShiftingId(name);
-    	else
-    		return curve;
-    }
-    else
-        new_name = name;
-
-    for (std::vector<Curve*>::const_iterator iter = m_curves.begin();
-            iter != m_curves.end(); ++iter)
-        if (new_name == (*iter)->getName())
-            curve = (*iter);
-
-    if (exceptionIfNotFound && curve == 0){
-        TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-        message <<"getCurve impossible, entité \""<<new_name<<"\" n'a pas été trouvée dans le GeomManager";
-        throw TkUtil::Exception(message);
-    }
-
-    if (curve && curve->isDestroyed()){
-    	TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-    	message <<"getCurve impossible, entité \""<<new_name<<"\" est détruite";
-    	throw Utils::IsDestroyedException(message);
-    }
-
-    return curve;
+    return getContext().getNameManager().findByName(name, m_curves, exceptionIfNotFound);
 }
 /*----------------------------------------------------------------------------*/
 Vertex* GeomManager::getVertex(const std::string& name, const bool exceptionIfNotFound) const
 {
-    Vertex* vertex = 0;
-
-    std::string new_name;
-    if (getContext().getNameManager().isShiftingIdActivated()){
-    	if (Vertex::isA(name))
-    		new_name = getContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::GeomVertex)->renameWithShiftingId(name);
-    	else
-    		return vertex;
-    }
-    else
-        new_name = name;
-
-    for (std::vector<Vertex*>::const_iterator iter = m_vertices.begin();
-            iter != m_vertices.end(); ++iter)
-        if (new_name == (*iter)->getName())
-            vertex = (*iter);
-
-    if (exceptionIfNotFound && vertex == 0){
-        TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-        message <<"getVertex impossible, entité \""<<new_name<<"\" n'a pas été trouvée dans le GeomManager";
-        throw TkUtil::Exception(message);
-    }
-
-    if (vertex && vertex->isDestroyed()){
-     	TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-     	message <<"getVertex impossible, entité \""<<new_name<<"\" est détruite";
-     	throw Utils::IsDestroyedException(message);
-     }
-
-    return vertex;
+    return getContext().getNameManager().findByName(name, m_vertices, exceptionIfNotFound);
 }
 /*----------------------------------------------------------------------------*/
 std::string GeomManager::getVertexAt(const Point& pt1) const
@@ -4874,42 +4758,22 @@ void GeomManager::removeEntity (GeomEntity* ge)
 /*----------------------------------------------------------------------------*/
 void GeomManager::remove (Volume* v)
 {
-    std::vector<Volume*>::iterator iter;
-    iter = find(m_volumes.begin(), m_volumes.end(), v);
-    if (iter != m_volumes.end())
-        m_volumes.erase(iter);
-    else
-        throw TkUtil::Exception("Erreur interne, volume absent du GeomManager pour removeVolume");
+    Utils::remove(v, m_volumes);
 }
 /*----------------------------------------------------------------------------*/
 void GeomManager::remove (Surface* s)
 {
-    std::vector<Surface*>::iterator iter;
-    iter = find(m_surfaces.begin(), m_surfaces.end(), s);
-    if (iter != m_surfaces.end())
-        m_surfaces.erase(iter);
-    else
-        throw TkUtil::Exception("Erreur interne, surface absente du GeomManager pour removeSurface");
+    Utils::remove(s, m_surfaces);
 }
 /*----------------------------------------------------------------------------*/
 void GeomManager::remove (Curve* c)
 {
-    std::vector<Curve*>::iterator iter;
-    iter = find(m_curves.begin(), m_curves.end(), c);
-    if (iter != m_curves.end())
-        m_curves.erase(iter);
-    else
-        throw TkUtil::Exception("Erreur interne, courbe absente du GeomManager pour removeCurve");
+    Utils::remove(c, m_curves);
 }
 /*----------------------------------------------------------------------------*/
 void GeomManager::remove (Vertex* v)
 {
-    std::vector<Vertex*>::iterator iter;
-    iter = find(m_vertices.begin(), m_vertices.end(), v);
-    if (iter != m_vertices.end())
-        m_vertices.erase(iter);
-    else
-        throw TkUtil::Exception("Erreur interne, sommet absent du GeomManager pour removeVertex");
+    Utils::remove(v, m_vertices);
 }
 /*----------------------------------------------------------------------------*/
 std::string GeomManager::getLastVolume() const

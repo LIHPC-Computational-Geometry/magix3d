@@ -636,8 +636,8 @@ void CommandModificationTopo::MAJCoFaces()
                     	coface2[0]->free(&getInfoCommand());
 
                         for (uint i=0; i<coface1.size(); i++) {
-                            face2->addCoFace(coface1[i]);
-                            coface1[i]->addFace(face2);
+                            face2->add(coface1[i]);
+                            coface1[i]->add(face2);
                         }
 
                     	updateGeomAssociation(coface1, 0, newEntities[0]);

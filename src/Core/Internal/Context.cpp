@@ -1727,22 +1727,15 @@ void Context::clearSession()
 
 	// commande de destruction de toutes les entités topologiques qui ont pu être construites
 	std::vector<Topo::TopoEntity*> ve;
-	std::vector<Topo::Block*> blocks;
-	getTopoManager().getBlocks(blocks);
-	for (uint i=0; i<blocks.size(); i++)
-		ve.push_back(blocks[i]);
-	std::vector<Topo::CoFace*> cofaces;
-	getTopoManager().getCoFaces(cofaces);
-	for (uint i=0; i<cofaces.size(); i++)
-		ve.push_back(cofaces[i]);
-	std::vector<Topo::CoEdge*> coedges;
-	getTopoManager().getCoEdges(coedges);
-	for (uint i=0; i<coedges.size(); i++)
-		ve.push_back(coedges[i]);
-	std::vector<Topo::Vertex*> vertices;
-	getTopoManager().getVertices(vertices);
-	for (uint i=0; i<vertices.size(); i++)
-		ve.push_back(vertices[i]);
+	Topo::TopoManager& tm = getTopoManager();
+	for (Topo::Block* b : tm.getBlocksObj())
+		ve.push_back(b);
+	for (Topo::CoFace* cf : tm.getCoFacesObj())
+		ve.push_back(cf);
+	for (Topo::CoEdge* ce : tm.getCoEdgesObj())
+		ve.push_back(ce);
+	for (Topo::Vertex* v : tm.getVerticesObj())
+		ve.push_back(v);
 
 	Topo::CommandDestroyTopo* commandTopo = new Topo::CommandDestroyTopo(*this, ve, true);
 
@@ -1750,18 +1743,15 @@ void Context::clearSession()
 
 	// commande de destruction de toutes les entités géométriques qui ont pu être construites
 	std::vector<Geom::GeomEntity*> entities;
-	std::vector<Geom::Volume*> volumes = getGeomManager().getVolumesObj();
-	for (uint i=0; i<volumes.size(); i++)
-		entities.push_back(volumes[i]);
-	std::vector<Geom::Surface*> surfaces = getGeomManager().getSurfacesObj();
-	for (uint i=0; i<surfaces.size(); i++)
-		entities.push_back(surfaces[i]);
-	std::vector<Geom::Curve*> curves = getGeomManager().getCurvesObj();
-	for (uint i=0; i<curves.size(); i++)
-		entities.push_back(curves[i]);
-	std::vector<Geom::Vertex*> vtx = getGeomManager().getVerticesObj();
-	for (uint i=0; i<vtx.size(); i++)
-		entities.push_back(vtx[i]);
+	Geom::GeomManager& gm = getGeomManager();
+	for (Geom::Volume* v : gm.getVolumesObj())
+		entities.push_back(v);
+	for (Geom::Surface* s : gm.getSurfacesObj())
+		entities.push_back(s);
+	for (Geom::Curve* c : gm.getCurvesObj())
+		entities.push_back(c);
+	for (Geom::Vertex* v : gm.getVerticesObj())
+		entities.push_back(v);
 
 	Geom::CommandRemove* commandGeom = new Geom::CommandRemove(*this, entities, true);
 

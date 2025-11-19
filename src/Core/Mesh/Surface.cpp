@@ -225,25 +225,18 @@ void Surface::getRepresentation(Utils::DisplayRepresentation& dr, bool checkDest
     // cf VTKGMDSEntityRepresentation
 }
 /*----------------------------------------------------------------------------*/
-bool Surface::isA(std::string& name)
-{
-    MGX_NOT_YET_IMPLEMENTED("Il n'est pas prévu de faire un tel test");
-    //return (name.compare(0,strlen(typeNameMeshSurface),typeNameMeshSurface) == 0);
-    return false;
-}
-/*----------------------------------------------------------------------------*/
 TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const Surface & cl)
 {
     o << cl.getName() << " (uniqueId " << cl.getUniqueId() << ", Name "<<cl.getName()<<")";
     return o;
 }
 /*----------------------------------------------------------------------------*/
-void Surface::addCoFace(Topo::CoFace* f)
+void Surface::add(Topo::CoFace* f)
 {
     m_topo_property->getCoFaceContainer().push_back(f);
 }
 /*----------------------------------------------------------------------------*/
-void Surface::removeCoFace(Topo::CoFace* f)
+void Surface::remove(Topo::CoFace* f)
 {
     Utils::remove(f, m_topo_property->getCoFaceContainer());
 }

@@ -316,12 +316,7 @@ void QtTopoInformationOperationPanel::autoUpdate ( )
 
 		QtMgx3DOperationPanel::autoUpdate ( );
 
-		std::vector<Topo::Block*> blocks;
-		std::vector<Topo::CoFace*> cofaces;
-		manager->getBlocks(blocks);
-		manager->getCoFaces(cofaces);
-
-		uint nb_blocs = blocks.size();
+		uint nb_blocs = 0;
 	    uint nb_dom_str_dir = 0;
 	    uint nb_dom_str_rot = 0;
 	    uint nb_dom_str_trans = 0;
@@ -345,9 +340,8 @@ void QtTopoInformationOperationPanel::autoUpdate ( )
 	    uint nb_faces_str_trans = 0;
 	    uint nb_faces_unstr = 0;
 
-	    for (std::vector<Topo::Block* >::iterator iter = blocks.begin();
-	    		iter != blocks.end(); ++iter){
-	    	Topo::Block* bloc = *iter;
+	    for (Topo::Block* bloc : manager->getBlocksObj()){
+			nb_blocs += 1;
 	    	size_t nb = bloc->getMeshingData()->regions().size();
 	    	nb_regions_tot += nb;
 	    	if (bloc->getMeshLaw() == Topo::BlockMeshingProperty::transfinite){
@@ -360,10 +354,8 @@ void QtTopoInformationOperationPanel::autoUpdate ( )
 	    	}
 	    }
 
-	    for (std::vector<Topo::CoFace*>::iterator iter = cofaces.begin();
-	    		iter != cofaces.end(); ++iter){
-	        Topo::CoFace* coface = *iter;
-	        nb_cofaces +=1;
+	    for (Topo::CoFace* coface : manager->getCoFacesObj()){
+	        nb_cofaces += 1;
 	        size_t nb = coface->getMeshingData()->faces().size();
 	        nb_faces_tot += nb;
 	        if (coface->getMeshLaw() == Topo::CoFaceMeshingProperty::transfinite){

@@ -55,11 +55,8 @@ namespace Mgx3D {
                 gmds::Node n = mesh.newNode(n_local.X(),n_local.Y(),n_local.Z());
             }
 
-            m_context.getTopoManager().getBlocks(topo_blocs);
-            m_context.getTopoManager().getCoFaces(topo_faces);
-
+            std::vector<Topo::CoFace*> topo_faces = m_context.getTopoManager().getCoFacesObj();
             std::map<std::string, int> topoF_2_gmdsF;
-
             for (auto cf : topo_faces) {
                 int n0 = cf->getVertex(0)->getNode();
                 int n1 = cf->getVertex(1)->getNode();
@@ -73,6 +70,7 @@ namespace Mgx3D {
 
             std::map<std::string, int> topoB_2_gmdsB;
 
+            std::vector<Topo::Block*> topo_blocs = m_context.getTopoManager().getBlocksObj();
             for(int iBlock = 0; iBlock < topo_blocs.size(); iBlock++){
                 Topo::Block* block = topo_blocs[iBlock];
                 std::vector<unsigned long> ids;
