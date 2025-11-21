@@ -23,110 +23,30 @@ namespace Mgx3D {
 namespace Mesh {
 /*----------------------------------------------------------------------------*/
 CommandAddRemoveGroupName::CommandAddRemoveGroupName(Internal::Context& c,
-        std::vector<Geom::Volume*>& volumes,
+        std::vector<Geom::GeomEntity*>& entities,
+        const int dim,
         const std::string& groupName,
         groupOperation ope)
 : CommandCreateMesh(c, (std::string("Modifie le groupe ")+groupName),0)
 , m_group_helper(getInfoCommand(), c.getGroupManager())
-, m_geom_entities(volumes.begin(), volumes.end())
+, m_geom_entities(entities.begin(), entities.end())
 , m_groupName(groupName)
-, m_dim(3)
+, m_dim(dim)
 , m_ope(ope)
 {
 }
 /*----------------------------------------------------------------------------*/
 CommandAddRemoveGroupName::CommandAddRemoveGroupName(Internal::Context& c,
-        std::vector<Geom::Surface*>& surfaces,
+		std::vector<Topo::TopoEntity*>& entities,
+        const int dim,
         const std::string& groupName,
         groupOperation ope)
 : CommandCreateMesh(c, (std::string("Modifie le groupe ")+groupName),0)
 , m_group_helper(getInfoCommand(), c.getGroupManager())
-, m_geom_entities(surfaces.begin(), surfaces.end())
+, m_topo_entities(entities.begin(), entities.end())
 , m_groupName(groupName)
-, m_dim(2)
+, m_dim(dim)
 , m_ope(ope)
-{
-}
-/*----------------------------------------------------------------------------*/
-CommandAddRemoveGroupName::CommandAddRemoveGroupName(Internal::Context& c,
-        std::vector<Geom::Curve*>& curves,
-        const std::string& groupName,
-        groupOperation ope)
-: CommandCreateMesh(c, (std::string("Modifie le groupe ")+groupName),0)
-, m_group_helper(getInfoCommand(), c.getGroupManager())
-, m_geom_entities(curves.begin(), curves.end())
-, m_groupName(groupName)
-, m_dim(1)
-, m_ope(ope)
-{
-}
-/*----------------------------------------------------------------------------*/
-CommandAddRemoveGroupName::CommandAddRemoveGroupName(Internal::Context& c,
-        std::vector<Geom::Vertex*>& vertices,
-        const std::string& groupName,
-        groupOperation ope)
-: CommandCreateMesh(c, (std::string("Modifie le groupe ")+groupName),0)
-, m_group_helper(getInfoCommand(), c.getGroupManager())
-, m_geom_entities(vertices.begin(), vertices.end())
-, m_groupName(groupName)
-, m_dim(0)
-, m_ope(ope)
-{
-}
-/*----------------------------------------------------------------------------*/
-CommandAddRemoveGroupName::CommandAddRemoveGroupName(Internal::Context& c,
-		std::vector<Topo::Block*>& blocks,
-        const std::string& groupName,
-        groupOperation ope)
-: CommandCreateMesh(c, (std::string("Modifie le groupe ")+groupName),0)
-, m_group_helper(getInfoCommand(), c.getGroupManager())
-, m_topo_entities(blocks.begin(), blocks.end())
-, m_groupName(groupName)
-, m_dim(3)
-, m_ope(ope)
-{
-}
-/*----------------------------------------------------------------------------*/
-CommandAddRemoveGroupName::CommandAddRemoveGroupName(Internal::Context& c,
-        std::vector<Topo::CoFace*>& cofaces,
-        const std::string& groupName,
-        groupOperation ope)
-: CommandCreateMesh(c, (std::string("Modifie le groupe ")+groupName),0)
-, m_group_helper(getInfoCommand(), c.getGroupManager())
-, m_topo_entities(cofaces.begin(), cofaces.end())
-, m_groupName(groupName)
-, m_dim(2)
-, m_ope(ope)
-{
-}
-/*----------------------------------------------------------------------------*/
-CommandAddRemoveGroupName::CommandAddRemoveGroupName(Internal::Context& c,
-        std::vector<Topo::CoEdge*>& coedges,
-        const std::string& groupName,
-        groupOperation ope)
-: CommandCreateMesh(c, (std::string("Modifie le groupe ")+groupName),0)
-, m_group_helper(getInfoCommand(), c.getGroupManager())
-, m_topo_entities(coedges.begin(), coedges.end())
-, m_groupName(groupName)
-, m_dim(1)
-, m_ope(ope)
-{
-}
-/*----------------------------------------------------------------------------*/
-CommandAddRemoveGroupName::CommandAddRemoveGroupName(Internal::Context& c,
-        std::vector<Topo::Vertex*>& vertices,
-        const std::string& groupName,
-        groupOperation ope)
-: CommandCreateMesh(c, (std::string("Modifie le groupe ")+groupName),0)
-, m_group_helper(getInfoCommand(), c.getGroupManager())
-, m_topo_entities(vertices.begin(), vertices.end())
-, m_groupName(groupName)
-, m_dim(0)
-, m_ope(ope)
-{
-}
-/*----------------------------------------------------------------------------*/
-CommandAddRemoveGroupName::~CommandAddRemoveGroupName()
 {
 }
 /*----------------------------------------------------------------------------*/
@@ -253,12 +173,25 @@ void CommandAddRemoveGroupName::internalRedo()
 void CommandAddRemoveGroupName::
 updateMesh(Geom::GeomEntity* e, std::string grpName, bool add)
 {
+    Topo::TopoManager& tm = getContext().getTopoManager();
     switch (e->getDim())
     {
-        case 1: return updateMesh(dynamic_cast<Geom::Curve*>(e), grpName, add);
-        case 2: return updateMesh(dynamic_cast<Geom::Surface*>(e), grpName, add);
-        case 3: return updateMesh(dynamic_cast<Geom::Volume*>(e), grpName, add);
-		default: return; // rien à faire en 0D
+        case 1: {
+            std::vector<Topo::CoEdge*> coedges = tm.getFilteredRefTopos<Topo::CoEdge>(e);
+            updateMesh(coedges, grpName, add);
+            break;
+        }
+        case 2: {
+            std::vector<Topo::CoFace*> cofaces = tm.getFilteredRefTopos<Topo::CoFace>(e);
+            updateMesh(cofaces, grpName, add);
+            break;
+        }
+        case 3: {
+            std::vector<Topo::Block*> blocs = tm.getFilteredRefTopos<Topo::Block>(e);
+            updateMesh(blocs, grpName, add);
+            break;
+        }
+		default: break; // rien à faire en 0D
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -269,27 +202,21 @@ updateMesh(Topo::TopoEntity* e, std::string grpName, bool add)
     {
         case 1: {
             std::vector<Topo::CoEdge*> v = { dynamic_cast<Topo::CoEdge*>(e) };
-            return updateMesh(v, grpName, add);
+            updateMesh(v, grpName, add);
+            break;
         }
         case 2: {
             std::vector<Topo::CoFace*> v = { dynamic_cast<Topo::CoFace*>(e) };
-            return updateMesh(v, grpName, add);
+            updateMesh(v, grpName, add);
+            break;
         }
         case 3: {
             std::vector<Topo::Block*> v = { dynamic_cast<Topo::Block*>(e) };
-            return updateMesh(v, grpName, add);
+            updateMesh(v, grpName, add);
+            break;
         }
-		default: return; // rien à faire en 0D
+		default: break; // rien à faire en 0D
     }
-}
-/*----------------------------------------------------------------------------*/
-void CommandAddRemoveGroupName::
-updateMesh(Geom::Volume* vol, std::string grpName, bool add)
-{
-    // récupération de la liste des blocs
-	Topo::TopoManager& tm = getContext().getTopoManager();
-	std::vector<Topo::Block*> blocs = tm.getFilteredRefTopos<Topo::Block>(vol);
-	updateMesh(blocs, grpName, add);
 }
 /*----------------------------------------------------------------------------*/
 void CommandAddRemoveGroupName::
@@ -351,15 +278,6 @@ updateMesh(std::vector<Topo::Block*>& blocs, std::string grpName, bool add)
 }
 /*----------------------------------------------------------------------------*/
 void CommandAddRemoveGroupName::
-updateMesh(Geom::Surface* surf, std::string grpName, bool add)
-{
-	// récupération de la liste des CoFaces
-	Topo::TopoManager& tm = getContext().getTopoManager();
-	std::vector<Topo::CoFace*> cofaces = tm.getFilteredRefTopos<Topo::CoFace>(surf);
-	updateMesh(cofaces, grpName, add);
-}
-/*----------------------------------------------------------------------------*/
-void CommandAddRemoveGroupName::
 updateMesh(std::vector<Topo::CoFace*>& cofaces, std::string grpName, bool add)
 {
 #ifdef _DEBUG_UPDATE
@@ -413,15 +331,6 @@ updateMesh(std::vector<Topo::CoFace*>& cofaces, std::string grpName, bool add)
 #ifdef _DEBUG_UPDATE
     std::cout<<"end updateMesh"<<std::endl;
 #endif
-}
-/*----------------------------------------------------------------------------*/
-void CommandAddRemoveGroupName::
-updateMesh(Geom::Curve* crv, std::string grpName, bool add)
-{
-    // récupération de la liste des CoEdges
-	Topo::TopoManager& tm = getContext().getTopoManager();
-	std::vector<Topo::CoEdge*> coedges = tm.getFilteredRefTopos<Topo::CoEdge>(crv);
-	updateMesh(coedges, grpName, add);
 }
 /*----------------------------------------------------------------------------*/
 void CommandAddRemoveGroupName::

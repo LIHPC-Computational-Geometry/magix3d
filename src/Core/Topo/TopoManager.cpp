@@ -4756,57 +4756,8 @@ Internal::M3DCommandResult* TopoManager::addToGroup(std::vector<std::string>& ve
     message << "], "<<(short)dim<<", "<<groupName<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
-
-    Mesh::CommandAddRemoveGroupName* command = 0;
-
-    switch(dim){
-    case(0):{
-        // reconstitue le vecteur de sommets
-        std::vector<Vertex*> vertices;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-            vertices.push_back(getVertex(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), vertices, groupName, Mesh::CommandAddRemoveGroupName::add);
-    }
-    break;
-    case(1):{
-        // reconstitue le vecteur de coedges
-        std::vector<CoEdge*> coedges;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-        	coedges.push_back(getCoEdge(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), coedges, groupName, Mesh::CommandAddRemoveGroupName::add);
-    }
-    break;
-    case(2):{
-        // reconstitue le vecteur de surfaces
-        std::vector<CoFace*> cofaces;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-        	cofaces.push_back(getCoFace(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), cofaces, groupName, Mesh::CommandAddRemoveGroupName::add);
-    }
-    break;
-    case(3):{
-        // reconstitue le vecteur de blocs
-        std::vector<Block*> blocks;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-        	blocks.push_back(getBlock(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), blocks, groupName, Mesh::CommandAddRemoveGroupName::add);
-    }
-    break;
-    default:{
-        TkUtil::Exception ("Dimension erronée");
-    }
-    break;
-    }
-
-    CHECK_NULL_PTR_ERROR(command);
+    std::vector<TopoEntity*> entities = getEntitiesFromNames(ve, dim);
+    Mesh::CommandAddRemoveGroupName* command = new Mesh::CommandAddRemoveGroupName(getContext(), entities, dim, groupName, Mesh::CommandAddRemoveGroupName::add);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -4841,57 +4792,8 @@ Internal::M3DCommandResult* TopoManager::removeFromGroup(std::vector<std::string
     message << "], "<<(short)dim<<", "<<groupName<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
-
-    Mesh::CommandAddRemoveGroupName* command = 0;
-
-    switch(dim){
-    case(0):{
-        // reconstitue le vecteur de sommets
-        std::vector<Vertex*> vertices;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-            vertices.push_back(getVertex(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), vertices, groupName, Mesh::CommandAddRemoveGroupName::remove);
-    }
-    break;
-    case(1):{
-        // reconstitue le vecteur de coedges
-        std::vector<CoEdge*> coedges;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-        	coedges.push_back(getCoEdge(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), coedges, groupName, Mesh::CommandAddRemoveGroupName::remove);
-    }
-    break;
-    case(2):{
-        // reconstitue le vecteur de cofaces
-        std::vector<CoFace*> cofaces;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-        	cofaces.push_back(getCoFace(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), cofaces, groupName, Mesh::CommandAddRemoveGroupName::remove);
-    }
-    break;
-    case(3):{
-        // reconstitue le vecteur de blocks
-        std::vector<Block*> blocks;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-        	blocks.push_back(getBlock(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), blocks, groupName, Mesh::CommandAddRemoveGroupName::remove);
-    }
-    break;
-    default:{
-        TkUtil::Exception ("Dimension erronée");
-    }
-    break;
-    }
-
-    CHECK_NULL_PTR_ERROR(command);
+    std::vector<TopoEntity*> entities = getEntitiesFromNames(ve, dim);
+    Mesh::CommandAddRemoveGroupName* command = new Mesh::CommandAddRemoveGroupName(getContext(), entities, dim, groupName, Mesh::CommandAddRemoveGroupName::remove);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -4926,57 +4828,8 @@ Internal::M3DCommandResult* TopoManager::setGroup(std::vector<std::string>& ve, 
     message << "], "<<(short)dim<<", "<<groupName<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
-
-    Mesh::CommandAddRemoveGroupName* command = 0;
-
-    switch(dim){
-    case(0):{
-        // reconstitue le vecteur de sommets
-        std::vector<Vertex*> vertices;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-            vertices.push_back(getVertex(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), vertices, groupName, Mesh::CommandAddRemoveGroupName::set);
-    }
-    break;
-    case(1):{
-        // reconstitue le vecteur de coedges
-        std::vector<CoEdge*> coedges;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-        	coedges.push_back(getCoEdge(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), coedges, groupName, Mesh::CommandAddRemoveGroupName::set);
-    }
-    break;
-    case(2):{
-        // reconstitue le vecteur de cofaces
-        std::vector<CoFace*> cofaces;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-        	cofaces.push_back(getCoFace(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), cofaces, groupName, Mesh::CommandAddRemoveGroupName::set);
-    }
-    break;
-    case(3):{
-        // reconstitue le vecteur de blocks
-        std::vector<Block*> blocks;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-        	blocks.push_back(getBlock(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), blocks, groupName, Mesh::CommandAddRemoveGroupName::set);
-    }
-    break;
-    default:{
-        TkUtil::Exception ("Dimension erronée");
-    }
-    break;
-    }
-
-    CHECK_NULL_PTR_ERROR(command);
+    std::vector<TopoEntity*> entities = getEntitiesFromNames(ve, dim);
+    Mesh::CommandAddRemoveGroupName* command = new Mesh::CommandAddRemoveGroupName(getContext(), entities, dim, groupName, Mesh::CommandAddRemoveGroupName::set);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -5124,6 +4977,30 @@ void TopoManager::removeRefTopo(const Geom::GeomEntity* ge, TopoEntity* te)
     // on supprime toutes les occurrences de te dans le vecteur
     // (même si en principe il ne devrait y en avoir qu'une seule)
     v.erase(std::remove(v.begin(), v.end(), te), v.end());
+}
+/*----------------------------------------------------------------------------*/
+std::vector<TopoEntity*> TopoManager::getEntitiesFromNames(const std::vector<std::string>& names, const int dim) const
+{
+    std::vector<TopoEntity*> entities;
+
+    switch(dim){
+    case(0):
+        for (std::string name : names) entities.push_back(getVertex(name));
+        break;
+    case(1):
+        for (std::string name : names) entities.push_back(getCoEdge(name));
+        break;
+    case(2):
+        for (std::string name : names) entities.push_back(getCoFace(name));
+        break;
+    case(3):
+        for (std::string name : names) entities.push_back(getBlock(name));
+        break;
+    default:
+        throw TkUtil::Exception ("Dimension erronée");
+    }
+
+    return entities;
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo
