@@ -214,7 +214,14 @@ void vtkUnifiedInteractorStyle::OnKeyRelease ( )
 		IncreaseEyeAngle (false);
 	else if (keycode == toggleStereoKey && 0 != renderWindow)
 	{
-		
+/* Note CP : par défaut VTK bascule en mode stéréo rouge/bleu lorsque l'utilisateur presse la touche F4. L'utilisateur non équipé
+ * des lunettes de vision stéréo adaptées s'en trouvera désorienté.
+ * On inactive ici cette bascule en mode stéréo, faute de demande en ce sens, et de support des différents modes de stéréo qui
+ * requièrent tous un équipement spécial : crystal eyes, red/blue, interlaced, toleft, toright, todresden, toanaglyph, tocheckerboard,
+ * tosplitviewporthorizontal.
+ */
+cout << "Affichage stéréo désactivé (touche F4) dans l'attente d'un support plus complet (type de stéréo attendu)." << endl;
+/*
 		if (renderWindow->GetStereoRender()) 
 		{
 			renderWindow->StereoRenderOff();
@@ -224,6 +231,7 @@ void vtkUnifiedInteractorStyle::OnKeyRelease ( )
 			renderWindow->StereoRenderOn();
 		}
 		renderWindow->Render();
+*/
 	}	// else if (keycode == toggleStereoKey)
 
 	switch (interactor->GetKeyCode ( ))
