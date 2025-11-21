@@ -1921,6 +1921,9 @@ private:
             std::vector<TopoEntity*> & topo_entities,
             const char* nom_fonction);
 
+    /// Retourne une liste d'entités en fonction du nom et de la dimension
+    std::vector<TopoEntity*> getEntitiesFromNames(const std::vector<std::string>& names, const int dim) const;
+
     /** blocs accessibles depuis le manager */
     std::vector<Block*> m_blocks;
 
