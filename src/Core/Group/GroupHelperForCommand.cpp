@@ -17,6 +17,7 @@ addToGroup(const std::string group_name, Geom::Volume* v)
 {
 	Group3D* grp = m_group_manager.getNewGroup3D(group_name, &m_info_command);
     addEntityToGroup(grp, v);
+    m_info_command.addGeomInfoEntity (v, Internal::InfoCommand::DISPMODIFIED);
     return grp;
 }
 /*----------------------------------------------------------------------------*/
@@ -25,6 +26,7 @@ addToGroup(const std::string group_name, Geom::Surface* s)
 {
 	Group2D* grp = m_group_manager.getNewGroup2D(group_name, &m_info_command);
     addEntityToGroup(grp, s);
+    m_info_command.addGeomInfoEntity (s, Internal::InfoCommand::DISPMODIFIED);
     return grp;
 }
 /*----------------------------------------------------------------------------*/
@@ -33,6 +35,7 @@ addToGroup(const std::string group_name, Geom::Curve* c)
 {
 	Group1D* grp = m_group_manager.getNewGroup1D(group_name, &m_info_command);
     addEntityToGroup(grp, c);
+    m_info_command.addGeomInfoEntity (c, Internal::InfoCommand::DISPMODIFIED);
     return grp;
 }
 /*----------------------------------------------------------------------------*/
@@ -41,6 +44,7 @@ addToGroup(const std::string group_name, Geom::Vertex* v)
 {
 	Group0D* grp = m_group_manager.getNewGroup0D(group_name, &m_info_command);
     addEntityToGroup(grp, v);
+    m_info_command.addGeomInfoEntity (v, Internal::InfoCommand::DISPMODIFIED);
     return grp;
 }
 /*----------------------------------------------------------------------------*/

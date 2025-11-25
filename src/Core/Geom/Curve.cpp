@@ -9,6 +9,7 @@
 #include "Geom/OCCHelper.h"
 #include "Geom/GeomProjectImplementation.h"
 #include "Group/Group1D.h"
+#include "Internal/EntitiesHelper.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
@@ -640,6 +641,16 @@ void Curve::add(Group::Group1D* grp)
 {
     //std::cout<<"Curve::add("<<grp->getName()<<") à "<<getName()<<std::endl;
     m_groups.push_back(grp);
+    
+    TkUtil::Color	color (0, 0, 0);
+    std::vector<Group::GroupEntity*>	groups	= Internal::groupsFromTypedGroups (m_groups);
+    if (true == getContext ( ).getGroupColor (groups, color))
+    {
+		getDisplayProperties ( ).setCloudColor (color);
+		getDisplayProperties ( ).setWireColor (color);
+		getDisplayProperties ( ).setSurfacicColor (color);
+		getDisplayProperties ( ).setFontColor (color);
+	}	// if (true == getContext ( ).getGroupColor (groups, color))
 }
 /*----------------------------------------------------------------------------*/
 void Curve::remove(Group::Group1D* grp)

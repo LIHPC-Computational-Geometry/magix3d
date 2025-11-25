@@ -442,6 +442,25 @@ public:
 	* (<I>true == getDisplayProperties ( ).isDisplayable</I>.
 	*/
 	void newGraphicalRepresentation(Utils::Entity& entity);
+
+	/**
+	 * Recherche une couleur en configuration pour une entité. Une entité pouvant appartenir à plusieurs
+	 * groupes c'est ici la liste des groupes qui est transmise en argument.
+	 * \param	Groupes dont on veut récupérer une éventuelle couleur définie en configuration. 
+	 *			La première couleur trouvée en configuration est retenue.
+	 * \param	En retour, la première couleur trouvée en configuration, s'il y en a une.
+	 * \return	true si une couleur est trouvée, false dans le cas contraire.
+	 * \see		loadGroupsColors
+	 */
+	 bool getGroupColor (const std::vector<Group::GroupEntity*>& groups, TkUtil::Color& color);
+
+	/**
+	 * Recherche une couleur en configuration pour une entité.
+	 * \param		Nom du groupe dont on recherche une couleur.
+	 * \return		La couleur associé au groupe dont le nom est transmis en argument.
+	 * \exception	Une exception est levée si la couleur n'est pas trouvée en configuration.
+	 */
+	 TkUtil::Color getGroupColor (const std::string& name);
 #endif
 
     /** Passage en mode apperçu ou non. En mode apperçu les couleurs fournies
@@ -603,6 +622,12 @@ public:
 	std::string createName (const std::string& base) const;
 
 private:
+  
+    /**
+     * Le chargement optionnel des fichiers table groupe -> couleur.
+     */
+    static void loadGroupsColors (const Preferences::Section& section);
+
 	/** Nom unique de l'instance. */
 	std::string m_name;
 
@@ -676,6 +701,9 @@ private:
 
     /** Le jeu de caractères utilisé par la sortie standard. */
     static TkUtil::Charset		m_outCharset;
+
+	/** La table groupe -> couleur.  */
+	static std::map<std::string, TkUtil::Color>	m_groups_colors;
 
 	/** booléen positionné à vrai seulement lorsque la sessione est terminée
 	 * (destruction du context)
