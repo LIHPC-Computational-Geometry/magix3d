@@ -61,7 +61,7 @@ def test_export_quad_2d(capfd):
     ctx.getTopoManager ( ).splitFacesWithOgrid (["Fa0000"], ["Ar0002","Ar0003"], .1, 10)
     ctx.getTopoManager ( ).setGeomAssociation (["Ar0009"], "Crb0002", True)
     ctx.getTopoManager ( ).setGeomAssociation (["Ar0010"], "Crb0003", True)
-    ctx.getTopoManager().addToGroup (["Ar0005", "Ar0008"], 1, "milieu_cgns")
+    ctx.getTopoManager().addToGroup (["Ar0005", "Ar0008", "Ar0007"], 1, "milieu_cgns")
     ctx.getMeshManager().newAllFacesMesh()
     ctx.getMeshManager().exportBlocksForCGNS(2,cgnsfilename)
 
