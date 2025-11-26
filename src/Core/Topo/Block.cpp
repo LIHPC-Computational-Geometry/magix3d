@@ -3320,17 +3320,14 @@ unsigned long Block::getNbInternalMeshingNodes()
 	else {
 		unsigned short res = m_mesh_data->nodes().size();
 
-        std::vector<Vertex*> vertices = getVertices();
-		for (uint i=0;i<vertices.size(); i++)
-			res -= vertices[i]->getNbInternalMeshingNodes();
+		for (Vertex* v : getVertices())
+			res -= v->getNbInternalMeshingNodes();
 
-		std::vector<CoEdge*> coedges = getCoEdges();
-		for (uint i=0;i<coedges.size(); i++)
-			res -= coedges[i]->getNbInternalMeshingNodes();
+		for (CoEdge* ce : getCoEdges())
+			res -= ce->getNbInternalMeshingNodes();
 
-		std::vector<CoFace*> cofaces = getCoFaces();
-		for (uint i=0;i<cofaces.size(); i++)
-			res -= cofaces[i]->getNbInternalMeshingNodes();
+		for (CoFace* cf : getCoFaces())
+			res -= cf->getNbInternalMeshingNodes();
 
 		return res;
 	}

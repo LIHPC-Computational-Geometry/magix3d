@@ -70,7 +70,6 @@ void CommandEditGeom::internalExecute()
     std::vector<GeomEntity*>  mod_entities  = getKeepedEntities();
     std::vector<GeomEntity*>  mov_entities  = getMovedEntities();
     std::vector<GeomEntity*>& rem_entities = getRemovedEntities();
-    std::map<GeomEntity*,std::vector<GeomEntity*> >& rep_entities = getReplacedEntities();
 
     for(int i=0;i<new_entities.size();i++){
         GeomEntity* ge = new_entities[i];
@@ -103,6 +102,7 @@ void CommandEditGeom::internalExecute()
     }
 
 #ifdef _DEBUG2
+    std::map<GeomEntity*,std::vector<GeomEntity*> >& rep_entities = getReplacedEntities();
     for (std::map<GeomEntity*,std::vector<GeomEntity*> >::iterator iter1 = rep_entities.begin();
     		iter1!=rep_entities.end(); ++iter1){
     	std::cerr<<"Remplace "<<iter1->first->getName()<<" par";
