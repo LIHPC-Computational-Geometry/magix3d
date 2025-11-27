@@ -63,13 +63,6 @@ public:
      /** \brief  initialisation de la commande
       */
      void internalSpecificPreExecute();
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Traitement spécifique délégué aux classes filles
-     */
-    void internalSpecificUndo();
-    void internalSpecificRedo();
-
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

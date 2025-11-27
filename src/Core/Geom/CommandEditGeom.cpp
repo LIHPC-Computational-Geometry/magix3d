@@ -163,8 +163,7 @@ void CommandEditGeom::internalUndo()
     // les entités détruites sont dites créées et inversement
     getInfoCommand().permCreatedDeleted();
 
-    // Annulation de la commande pour les entités dont l'état n'est pas mémorisé (cas des FcetedSurface)
-    internalSpecificUndo();
+    if (m_impl) m_impl->performUndo();
 
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_1));
 }
@@ -185,8 +184,7 @@ void CommandEditGeom::internalRedo()
     // les entités détruites sont dites créées et inversement
     getInfoCommand().permCreatedDeleted();
 
-    // Rejoue la commande pour les entités dont l'état n'est pas mémorisé (cas des FcetedSurface)
-    internalSpecificRedo();
+    if (m_impl) m_impl->performRedo();
 
     startingOrcompletionLog (false);
 
