@@ -9,6 +9,7 @@
 #include "Mesh/ExportBlocksCGNSImplementation.h"
 #include "Mesh/MeshItf.h"
 #include "Mesh/Surface.h"
+#include "Group/GroupManager.h"
 /*----------------------------------------------------------------------------*/
 #include <gmds/ig/Mesh.h>
 #include <gmds/io/IGMeshIOService.h>
@@ -39,11 +40,6 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
         void ExportBlocksCGNSImplementation::perform3D()
         {
-            std::vector<Topo::Vertex*> topo_vertices;
-            std::vector<Topo::Block*> topo_blocs;
-            std::vector<Topo::CoFace*> topo_faces;
-
-
             gmds::Mesh mesh(gmds::MeshModel(gmds::DIM3 | gmds::N | gmds::F | gmds::R |
                                             gmds::R2N | gmds::N2R | gmds::R2F |  gmds::F2R | gmds::F2N | gmds::N2F));
 
@@ -58,10 +54,10 @@ namespace Mgx3D {
             std::vector<Topo::CoFace*> topo_faces = m_context.getTopoManager().getCoFacesObj();
             std::map<std::string, int> topoF_2_gmdsF;
             for (auto cf : topo_faces) {
-                int n0 = cf->getVertex(0)->getNode();
-                int n1 = cf->getVertex(1)->getNode();
-                int n2 = cf->getVertex(2)->getNode();
-                int n3 = cf->getVertex(3)->getNode();
+                int n0 = cf->getVertices()[0]->getNode();
+                int n1 = cf->getVertices()[1]->getNode();
+                int n2 = cf->getVertices()[2]->getNode();
+                int n3 = cf->getVertices()[3]->getNode();
 
                 gmds::Face f = mesh.newQuad(n0,n1,n2,n3);
 
@@ -100,16 +96,16 @@ namespace Mgx3D {
                 gmds::Region r = mesh.newHex(ids[0],ids[1],ids[2],ids[3],
                                              ids[4],ids[5],ids[6],ids[7]);
 
-                if(topo_blocs[iBlock]->getNbCoFaces() != 6 ){
+                if(topo_blocs[iBlock]->getCoFaces().size() != 6 ){
                     throw TkUtil::Exception(TkUtil::UTF8String ("Le bloc "+topo_blocs[iBlock]->getName()+" n'est pas conforme.", TkUtil::Charset::UTF_8));
                 }
 
-                int iface0 = topoF_2_gmdsF[block->getFace(vertices[0],vertices[1],vertices[2],vertices[3])->getCoFace(0)->getName()];
-                int iface1 = topoF_2_gmdsF[block->getFace(vertices[0],vertices[1],vertices[5],vertices[4])->getCoFace(0)->getName()];
-                int iface2 = topoF_2_gmdsF[block->getFace(vertices[1],vertices[2],vertices[6],vertices[5])->getCoFace(0)->getName()];
-                int iface3 = topoF_2_gmdsF[block->getFace(vertices[2],vertices[3],vertices[7],vertices[6])->getCoFace(0)->getName()];
-                int iface4 = topoF_2_gmdsF[block->getFace(vertices[3],vertices[0],vertices[4],vertices[7])->getCoFace(0)->getName()];
-                int iface5 = topoF_2_gmdsF[block->getFace(vertices[4],vertices[5],vertices[6],vertices[7])->getCoFace(0)->getName()];
+                int iface0 = topoF_2_gmdsF[block->getFace(vertices[0],vertices[1],vertices[2],vertices[3])->getCoFaces()[0]->getName()];
+                int iface1 = topoF_2_gmdsF[block->getFace(vertices[0],vertices[1],vertices[5],vertices[4])->getCoFaces()[0]->getName()];
+                int iface2 = topoF_2_gmdsF[block->getFace(vertices[1],vertices[2],vertices[6],vertices[5])->getCoFaces()[0]->getName()];
+                int iface3 = topoF_2_gmdsF[block->getFace(vertices[2],vertices[3],vertices[7],vertices[6])->getCoFaces()[0]->getName()];
+                int iface4 = topoF_2_gmdsF[block->getFace(vertices[3],vertices[0],vertices[4],vertices[7])->getCoFaces()[0]->getName()];
+                int iface5 = topoF_2_gmdsF[block->getFace(vertices[4],vertices[5],vertices[6],vertices[7])->getCoFaces()[0]->getName()];
 
                 r.add<gmds::Face>(iface0);
                 r.add<gmds::Face>(iface1);
@@ -169,9 +165,7 @@ namespace Mgx3D {
             //gmds::Variable<int>* sym        = mesh.newVariable<int, gmds::GMDS_NODE>("Symetrie");
 
 
-            std::vector<Group::GroupEntity*> groups2D;
-            getStdContext()->getGroupManager().getGroups(groups2D, Internal::SelectionManager::DIM::D2);
-
+            std::vector<Group::GroupEntity*> groups2D = getStdContext()->getGroupManager().getGroups(Internal::SelectionManager::DIM::D2);
             std::vector<std::string> groupsname;
             for(auto g : groups2D){
                 std::string name = g->getName();
@@ -226,8 +220,7 @@ namespace Mgx3D {
             //gmds::Variable<int>* fluide = mesh.newVariable<int>(gmds::GMDS_NODE,"Fluide"); //Valeur par défaut
             //gmds::Variable<int>* solide = mesh.newVariable<int, gmds::GMDS_NODE>("Solide");
 
-            std::vector<Group::GroupEntity*> groups3D;
-            getStdContext()->getGroupManager().getGroups(groups3D, Internal::SelectionManager::DIM::D3);
+            std::vector<Group::GroupEntity*> groups3D = getStdContext()->getGroupManager().getGroups(Internal::SelectionManager::DIM::D3);
 
             groupsname.clear();
             for(auto g : groups3D){
@@ -263,11 +256,6 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
         void ExportBlocksCGNSImplementation::perform2D()
         {
-            std::vector<Topo::Vertex*> topo_vertices;
-            std::vector<Topo::CoFace*> topo_faces;
-            std::vector<Topo::CoEdge*> topo_edges;
-
-
             gmds::Mesh mesh(gmds::MeshModel(gmds::DIM2 | gmds::N | gmds::E | gmds::F |
                                             gmds::F2N | gmds::N2F | gmds::F2E |  gmds::E2F | gmds::E2N | gmds::N2E));
 
@@ -279,14 +267,11 @@ namespace Mgx3D {
                 gmds::Node n = mesh.newNode(n_local.X(),n_local.Y(),n_local.Z());
             }
 
-            m_context.getTopoManager().getCoFaces(topo_faces);
-            m_context.getTopoManager().getCoEdges(topo_edges);
-
             std::map<std::string, int> topoE_2_gmdsE;
-
+            const std::vector<Topo::CoEdge*>& topo_edges = m_context.getTopoManager().getCoEdgesObj();
             for (auto ce : topo_edges) {
-                int n0 = ce->getVertex(0)->getNode();
-                int n1 = ce->getVertex(1)->getNode();
+                int n0 = ce->getVertices()[0]->getNode();
+                int n1 = ce->getVertices()[1]->getNode();
 
                 gmds::Edge e = mesh.newEdge(n0,n1);
 
@@ -294,35 +279,35 @@ namespace Mgx3D {
             }
 
             std::map<std::string, int> topoF_2_gmdsF;
-
+            const std::vector<Topo::CoFace*>& topo_faces = m_context.getTopoManager().getCoFacesObj();
             for(int iFace = 0; iFace < topo_faces.size(); iFace++){
                 Topo::CoFace* face = topo_faces[iFace];
                 std::vector<unsigned long> ids;
                 std::vector<Topo::Vertex*> vertices;
                 vertices.resize(4);
 
-                vertices[0] = face->getVertex(0);
-                vertices[1] = face->getVertex(1);
-                vertices[2] = face->getVertex(2);
-                vertices[3] = face->getVertex(3);
+                vertices[0] = face->getVertices()[0];
+                vertices[1] = face->getVertices()[1];
+                vertices[2] = face->getVertices()[2];
+                vertices[3] = face->getVertices()[3];
 
 
-                ids.push_back(topo_faces[iFace]->getVertex(0)->getNode());
-                ids.push_back(topo_faces[iFace]->getVertex(1)->getNode());
-                ids.push_back(topo_faces[iFace]->getVertex(2)->getNode());
-                ids.push_back(topo_faces[iFace]->getVertex(3)->getNode());
+                ids.push_back(topo_faces[iFace]->getVertices()[0]->getNode());
+                ids.push_back(topo_faces[iFace]->getVertices()[1]->getNode());
+                ids.push_back(topo_faces[iFace]->getVertices()[2]->getNode());
+                ids.push_back(topo_faces[iFace]->getVertices()[3]->getNode());
 
 
                 gmds::Face f = mesh.newQuad(ids[0],ids[1],ids[2],ids[3]);
 
-                if(topo_faces[iFace]->getNbEdges()!= 4 ){
+                if(topo_faces[iFace]->getEdges().size()!= 4 ){
                     throw TkUtil::Exception(TkUtil::UTF8String ("La face "+topo_faces[iFace]->getName()+" n'est pas conforme.", TkUtil::Charset::UTF_8));
                 }
 
-                int iedge0 = topoE_2_gmdsE[face->getEdge(vertices[0],vertices[1])->getCoEdge(0)->getName()];
-                int iedge1 = topoE_2_gmdsE[face->getEdge(vertices[1],vertices[2])->getCoEdge(0)->getName()];
-                int iedge2 = topoE_2_gmdsE[face->getEdge(vertices[2],vertices[3])->getCoEdge(0)->getName()];
-                int iedge3 = topoE_2_gmdsE[face->getEdge(vertices[3],vertices[0])->getCoEdge(0)->getName()];
+                int iedge0 = topoE_2_gmdsE[face->getEdge(vertices[0],vertices[1])->getCoEdges()[0]->getName()];
+                int iedge1 = topoE_2_gmdsE[face->getEdge(vertices[1],vertices[2])->getCoEdges()[0]->getName()];
+                int iedge2 = topoE_2_gmdsE[face->getEdge(vertices[2],vertices[3])->getCoEdges()[0]->getName()];
+                int iedge3 = topoE_2_gmdsE[face->getEdge(vertices[3],vertices[0])->getCoEdges()[0]->getName()];
 
                 f.add<gmds::Edge>(iedge0);
                 f.add<gmds::Edge>(iedge1);
@@ -362,9 +347,7 @@ namespace Mgx3D {
                 }
             }
 
-            std::vector<Group::GroupEntity*> groups1D;
-            getStdContext()->getGroupManager().getGroups(groups1D, Internal::SelectionManager::DIM::D1);
-
+            std::vector<Group::GroupEntity*> groups1D = getStdContext()->getGroupManager().getGroups(Internal::SelectionManager::DIM::D1);
             std::vector<std::string> groupsname;
             for(auto g : groups1D){
                 std::string name = g->getName();
@@ -388,9 +371,7 @@ namespace Mgx3D {
                 }
             }
 
-            std::vector<Group::GroupEntity*> groups2D;
-            getStdContext()->getGroupManager().getGroups(groups2D, Internal::SelectionManager::DIM::D2);
-
+            std::vector<Group::GroupEntity*> groups2D = getStdContext()->getGroupManager().getGroups(Internal::SelectionManager::DIM::D2);
             groupsname.clear();
             for(auto g : groups2D){
                 std::string name = g->getName();
