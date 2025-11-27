@@ -51,16 +51,6 @@ void CommandMirroring::internalSpecificPreExecute() {
 	m_impl->prePerform();
 }
 /*----------------------------------------------------------------------------*/
-void CommandMirroring::internalSpecificUndo()
-{
-    m_impl->performUndo();
-}
-/*----------------------------------------------------------------------------*/
-void CommandMirroring::internalSpecificRedo()
-{
-    m_impl->performRedo();
-}
-/*----------------------------------------------------------------------------*/
 } // end namespace Geom
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D
