@@ -5,6 +5,7 @@
 #include "Geom/OCCHelper.h"
 #include "Group/Group0D.h"
 #include "Internal/Context.h"
+#include "Internal/EntitiesHelper.h"
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Vertex.hxx>
 #include <TopoDS_Shape.hxx>
@@ -139,6 +140,16 @@ TkUtil::UTF8String& operator<<(TkUtil::UTF8String& str, const Vertex& v)
 void Vertex::add(Group::Group0D* grp)
 {
     m_groups.push_back(grp);
+    
+    TkUtil::Color	color (0, 0, 0);
+    std::vector<Group::GroupEntity*>	groups	= Internal::groupsFromTypedGroups (m_groups);
+    if (true == getContext ( ).getGroupColor (groups, color))
+    {
+		getDisplayProperties ( ).setCloudColor (color);
+		getDisplayProperties ( ).setWireColor (color);
+		getDisplayProperties ( ).setSurfacicColor (color);
+		getDisplayProperties ( ).setFontColor (color);
+	}	// if (true == getContext ( ).getGroupColor (groups, color))
 }
 /*----------------------------------------------------------------------------*/
 void Vertex::remove(Group::Group0D* grp)

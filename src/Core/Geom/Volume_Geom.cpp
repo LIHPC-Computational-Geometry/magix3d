@@ -6,6 +6,7 @@
 #include "Geom/OCCHelper.h"
 #include "Group/Group3D.h"
 #include "Internal/Context.h"
+#include "Internal/EntitiesHelper.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/MemoryError.h>
@@ -115,6 +116,16 @@ bool Volume::isA(const std::string& name)
 void Volume::add(Group::Group3D* grp)
 {
     m_groups.push_back(grp);
+    
+    TkUtil::Color	color (0, 0, 0);
+    std::vector<Group::GroupEntity*>	groups	= Internal::groupsFromTypedGroups (m_groups);
+    if (true == getContext ( ).getGroupColor (groups, color))
+    {
+		getDisplayProperties ( ).setCloudColor (color);
+		getDisplayProperties ( ).setWireColor (color);
+		getDisplayProperties ( ).setSurfacicColor (color);
+		getDisplayProperties ( ).setFontColor (color);
+	}	// if (true == getContext ( ).getGroupColor (groups, color))
 }
 /*----------------------------------------------------------------------------*/
 void Volume::remove(Group::Group3D* grp)

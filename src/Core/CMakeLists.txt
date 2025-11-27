@@ -18,7 +18,7 @@ add_library (Core ${CPP_SOURCES} ${HEADERS})
 
 set (CORE_OPTIONAL_LIBRARIES_LIST)
 
-find_package (PrefsCore REQUIRED)
+find_package (PrefsXerces REQUIRED)
 find_package (PythonUtil REQUIRED)
 find_package (GQGMDS REQUIRED)
 #find_package (MachineTypes REQUIRED)
@@ -87,7 +87,7 @@ target_include_directories (Core PUBLIC ${GMDS_INCLUDE_DIR})
 target_include_directories (Core PUBLIC ${OpenCASCADE_INCLUDE_DIR})
 target_link_libraries (Core PUBLIC ${OpenCASCADE_FoundationClasses_LIBRARIES} ${OpenCASCADE_ModelingAlgorithms_LIBRARIES} ${OpenCASCADE_DataExchange_LIBRARIES})
 
-target_link_libraries (Core PUBLIC GQGMDS::GQGMDS Lima::Lima Utils PrefsCore::PrefsCore PythonUtil::PythonUtil)
+target_link_libraries (Core PUBLIC GQGMDS::GQGMDS Lima::Lima Utils PrefsXerces::PrefsXerces PythonUtil::PythonUtil)
 if (USE_TRITON)
 	target_link_libraries (Core PUBLIC Triton2)
 endif()

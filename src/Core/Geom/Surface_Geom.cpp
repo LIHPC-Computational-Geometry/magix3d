@@ -7,6 +7,7 @@
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomProjectImplementation.h"
 #include "Group/Group2D.h"
+#include "Internal/EntitiesHelper.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
@@ -226,6 +227,16 @@ bool Surface::isA(const std::string& name)
 void Surface::add(Group::Group2D* grp)
 {
     m_groups.push_back(grp);
+    
+    TkUtil::Color	color (0, 0, 0);
+    std::vector<Group::GroupEntity*>	groups	= Internal::groupsFromTypedGroups (m_groups);
+    if (true == getContext ( ).getGroupColor (groups, color))
+    {
+		getDisplayProperties ( ).setCloudColor (color);
+		getDisplayProperties ( ).setWireColor (color);
+		getDisplayProperties ( ).setSurfacicColor (color);
+		getDisplayProperties ( ).setFontColor (color);
+	}	// if (true == getContext ( ).getGroupColor (groups, color))
 }
 /*----------------------------------------------------------------------------*/
 void Surface::remove(Group::Group2D* grp)

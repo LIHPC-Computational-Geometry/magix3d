@@ -173,6 +173,32 @@ template < typename E > inline std::vector< Mgx3D::Utils::Entity* > entitiesFrom
 }	// entitiesFromTypedEntities
 
 /**
+ * \return		Une liste de groupes issue d'une liste de groupes typés.
+ */
+template < typename G > inline std::vector< Mgx3D::Group::GroupEntity* > groupsFromTypedGroups (
+								const std::vector< G* >& typedGroups, bool strict = true)
+{
+	std::vector< Mgx3D::Group::GroupEntity* >	groups;
+
+	for (typename std::vector< G* >::const_iterator	it	= typedGroups.begin ( );
+		 typedGroups.end ( ) != it; it++)
+	{
+		Mgx3D::Group::GroupEntity*	group	= dynamic_cast<Mgx3D::Group::GroupEntity*>(*it);
+		if ((0 == group) && (true == strict))
+		{
+			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+			message << "Erreur, le groupe " << (*it)->getName ( )
+			        << " n'est pas du bon type.";
+			INTERNAL_ERROR (exc, message, "groupsFromTypedGroups")
+			throw exc;
+		}	// if ((0 == group) && (true == strict))
+		groups.push_back (group);
+	}
+
+	return groups;
+}	// groupsFromTypedGroups
+
+/**
  * \return		La différence entre les 2 listes d'entités reçues en premiers arguments.
  * \param		before et after représentent la même liste d'entités avant et après un évènement, par exemple l'exécution d'une commande
  * \param		En sortie added recevra les entités présentes dans after mais pas dans before

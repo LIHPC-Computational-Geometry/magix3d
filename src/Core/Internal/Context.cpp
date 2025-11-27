@@ -50,6 +50,7 @@ extern TkUtil::PythonSession* createMgx3DPythonSession ( );
 #include <TkUtil/Process.h>
 #include <TkUtil/ThreadManager.h>
 #include <TkUtil/ThreadPool.h>
+#include <PrefsXerces/XMLLoader.h>
 
 #include <signal.h>
 #include <unistd.h>
@@ -231,6 +232,7 @@ static TkUtil::Color nextColor (
 TkUtil::Log::TYPE	Context::m_logMask	= TkUtil::Log::PRODUCTION;
 TkUtil::ArgumentsMap	Context::m_argumentsMap;
 TkUtil::Charset		Context::m_outCharset (TkUtil::Charset::UTF_8);
+std::map<std::string, TkUtil::Color>	Context::m_groups_colors;
 
 TkUtil::Color	Context::m_initial_geom_displayColor (255, 0, 127);
 TkUtil::Color	Context::m_initial_topo_displayColor (0, 1, 1);	// Initialisé dans initialize
@@ -705,6 +707,30 @@ void Context::initialize (int argc, char* argv [])
 		255*Internal::InternalPreferences::instance ( )._topoColorWithoutProj.getRed ( ),
 		255*Internal::InternalPreferences::instance ( )._topoColorWithoutProj.getGreen ( ),
 		255*Internal::InternalPreferences::instance ( )._topoColorWithoutProj.getBlue ( )); // bleu, pas de proj
+
+	// Chargement des éventuelles associations nom de groupes -> couleurs transmises à la ligne de commande via un fichier xml :
+	std::string	fileName;
+	try
+	{
+		if (true == m_argumentsMap.hasArg ("--groupsColors"))
+		{
+			fileName	= m_argumentsMap.getArgValue ("--groupsColors", std::string ( ), true);
+			std::cout << "Chargement des propriétés d'affichage des entités pour cette session depuis le fichier " << fileName << " ..." << std::endl;
+			std::unique_ptr<Preferences::Section>	mainSection	(Preferences::XMLLoader::load (fileName));
+			Preferences::Section&					groupsSection	= mainSection->getSection ("Groups");
+			loadGroupsColors (groupsSection);
+			std::cout << "Propriétés d'affichage des entités chargées." << std::endl;
+		}	// if (true == m_argumentsMap.hasArg ("--groupsColors"))
+	}
+	catch (const TkUtil::Exception& exc)
+	{
+		std::cerr << "Echec du chargement des propriétés d'affichage des entités depuis le fichier \"" << fileName << "\" :" << std::endl
+		          << exc.getFullMessage ( ) << std::endl;
+	}
+	catch (...)
+	{
+		std::cerr << "Echec du chargement des propriétés d'affichage des entités depuis le fichier \"" << fileName << "\" : erreur non documentée." << std::endl;
+	}
 }
 /*----------------------------------------------------------------------------*/
 void Context::finalize ( )
@@ -947,6 +973,27 @@ std::string Context::createName (const std::string& base) const
 
 	return name.iso ( );
 }	// Context::createName
+/*----------------------------------------------------------------------------*/
+void Context::loadGroupsColors (const Preferences::Section& section)
+{
+	const std::vector<Preferences::Section*>&	groups	= section.getSections ( );
+	for (std::vector<Preferences::Section*>::const_iterator itg = groups.begin ( ); groups.end ( ) != itg; itg++)
+	{
+		try
+		{
+			Preferences::NamedValue&		namedValue	= (*itg)->getNamedValue ("color");
+			Preferences::ColorNamedValue*	colorValue	= dynamic_cast<Preferences::ColorNamedValue*>(&namedValue);
+			if (0 != colorValue)
+			{
+				TkUtil::Color	color ((unsigned char)(255 * colorValue->getRed ( )), (unsigned char)(255 * colorValue->getGreen ( )), (unsigned char)(255 * colorValue->getBlue ( )));
+				m_groups_colors.insert_or_assign ((*itg)->getName ( ), color);
+			}	// if (0 != colorValue)
+		}
+		catch (...)
+		{
+		}
+	}	// for (std::vector<Preferences::Section*>::const_iterator itg = groups.begin ( ); groups.end ( ) != itg; itg++)
+}	// Context::loadGroupsColors
 /*----------------------------------------------------------------------------*/
 unsigned long Context::newUniqueId()
 {
@@ -1369,6 +1416,34 @@ void Context::newGraphicalRepresentation (Utils::Entity& entity)
 	if (0 != representation)
 		entity.getDisplayProperties ( ).setGraphicalRepresentation (representation);
 }	// Context::newGraphicalRepresentation
+/*----------------------------------------------------------------------------*/
+bool Context::getGroupColor (const std::vector<Group::GroupEntity*>& groups, TkUtil::Color& color)
+{
+	for (std::vector<Group::GroupEntity*>::const_iterator itg = groups.begin ( ); groups.end ( ) != itg; itg++)
+	{
+		try
+		{
+			color	= getGroupColor ((*itg)->getName ( ));
+			return true;
+		}
+		catch (...)
+		{
+		}
+	}	// for (std::vector<Group::GroupEntity*>::const_iterator itg = groups.begin ( ); groups.end ( ) != itg; itg++)
+	
+	return false;
+}	// Context::getGroupColor
+/*----------------------------------------------------------------------------*/
+TkUtil::Color Context::getGroupColor (const std::string& name)
+{
+	const std::map<std::string, TkUtil::Color>::iterator it	= m_groups_colors.find (name);
+	if (m_groups_colors.end ( ) != it)
+		return it->second;
+
+	TkUtil::UTF8String	message;
+	message << "Context::groupColor. Couleur pour le groupe de données \"" << name << "\" non recensée.";
+	throw TkUtil::Exception (message);
+}	// Context::getGroupColor
 /*----------------------------------------------------------------------------*/
 void Context::undo()
 {
