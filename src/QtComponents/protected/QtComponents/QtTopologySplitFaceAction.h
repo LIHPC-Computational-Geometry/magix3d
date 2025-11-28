@@ -1,10 +1,10 @@
 /**
- * \file		QtTopologySplitFacesAction.h
+ * \file		QtTopologySplitFaceAction.h
  * \author		Charles PIGNEROL
  * \date		17/03/2014
  */
-#ifndef QT_TOPOLOGY_SPLIT_FACES_ACTION_H
-#define QT_TOPOLOGY_SPLIT_FACES_ACTION_H
+#ifndef QT_TOPOLOGY_SPLIT_FACE_ACTION_H
+#define QT_TOPOLOGY_SPLIT_FACE_ACTION_H
 
 #include "Internal/Context.h"
 
@@ -25,9 +25,9 @@ namespace QtComponents
 {
 
 /**
- * Panneau d'édition des paramètres de découpe de faces topologiques.
+ * Panneau d'édition des paramètres de découpe d'une face topologique.
  */
-class QtTopologySplitFacesPanel : public QtMgx3DOperationPanel
+class QtTopologySplitFacePanel : public QtMgx3DOperationPanel
 {
 	Q_OBJECT
 
@@ -46,7 +46,7 @@ class QtTopologySplitFacesPanel : public QtMgx3DOperationPanel
 	 *			notamment pour récupérer le contexte.
 	 * \param	Eventuelle action associée à ce panneau.
 	 */
-	QtTopologySplitFacesPanel (
+	QtTopologySplitFacePanel (
 			QWidget* parent, const std::string& panelName,
 			Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
 			Mgx3D::QtComponents::QtMgx3DOperationAction* action);
@@ -54,7 +54,7 @@ class QtTopologySplitFacesPanel : public QtMgx3DOperationPanel
 	/**
 	 * Destructeur. RAS.
 	 */
-	virtual ~QtTopologySplitFacesPanel ( );
+	virtual ~QtTopologySplitFacePanel ( );
 
 	/**
 	 * Réinitialise le panneau.
@@ -77,22 +77,14 @@ class QtTopologySplitFacesPanel : public QtMgx3DOperationPanel
 	virtual void autoUpdate ( );
 
 	/**
-	 * \return		<I>true</I> si toutes les faces sont soumises à la découpe,
-	 * 				sinon <I>false</I>.
-	 * \see			getFacesNames
-	 */
-	virtual bool allFaces ( ) const;
-
-	/**
-	 * \return		Les noms des faces à découper.
-	 * \see			allFaces
+	 * \return		Les nom de la face à découper.
 	 * \see			getEdgeName
 	 */
-	virtual std::vector<std::string> getFacesNames ( ) const;
+	virtual std::string getFaceName ( ) const;
 
 	/**
 	 * \return		Le nom de l'arête orthogonale au plan de coupe.
-	 * \see			getFacesNames
+	 * \see			getFaceName
 	 */
 	virtual std::string getEdgeName ( ) const;
 
@@ -113,10 +105,10 @@ class QtTopologySplitFacesPanel : public QtMgx3DOperationPanel
 	virtual Mgx3D::Utils::Math::Point getCutPoint ( ) const;
 
 	/**
-	 * \return		Le ratio de découpage de l'o-grid en cas de découpage en
-	 * 				0-grid (ratio non nul).
+	 * \return		<I>true</I> s'il faut projeter les sommets créés sur la
+	 *				discrétisation initiale, <I>false</I> dans le cas contraire.
 	 */
-	virtual double getOGridRatio ( ) const;
+	virtual bool projectCreatedVertices ( ) const;
 
 	/**
 	 * \param		<I>true</I> pour prévisualiser les entités concernées par
@@ -149,24 +141,17 @@ class QtTopologySplitFacesPanel : public QtMgx3DOperationPanel
 	 */
 	virtual void cutDefinitionModifiedCallback ( );
 
-	/**
-	 * Appelé lorsque la case à cocher "Toutes les faces" est modifiée.
-	 * Actualise l'IHM et appelle <I>parametersModifiedCallback</I>.
-	 * \see		parametersModifiedCallback
-	 */
-	virtual void facesModifiedCallback ( );
-
 
 	private :
 
 	/**
 	 * Constructeur de copie et opérateur = opérations interdites.
 	 */
-	QtTopologySplitFacesPanel (const QtTopologySplitFacesPanel&);
-	QtTopologySplitFacesPanel& operator = (const QtTopologySplitFacesPanel&);
+	QtTopologySplitFacePanel (const QtTopologySplitFacePanel&);
+	QtTopologySplitFacePanel& operator = (const QtTopologySplitFacePanel&);
 
-	/** Les faces à découper. */
-	QtMgx3DEntityPanel*			_facesPanel;
+	/** La face à découper. */
+	QtMgx3DEntityPanel*			_facePanel;
 
 	/** La définition de la position de la découpe. */
 	QButtonGroup*				_cutDefinitionButtonGroup;
@@ -180,25 +165,22 @@ class QtTopologySplitFacesPanel : public QtMgx3DOperationPanel
 	/** L'entité de définition du positionnement de la coupe. */
 	QtMgx3DEntityPanel*			_cutPointEntityPanel;
 
-	/** Le ratio de découpage de l'o-grid. */
-	QtDoubleTextField*			_oGridRatioTextField;
-
-	/** La case à cocher "Toutes les faces ?". */
-	QCheckBox*					_allFacesCheckBox;
-};	// class QtTopologySplitFacesPanel
+	/** Faut-il projeter les sommets créés sur la discrétisation initiale ? */
+	QCheckBox*					_projectVerticesCheckBox;
+};	// class QtTopologySplitFacePanel
 
 
 /**
  * Classe d'action type <I>check box</I> associée à un panneau type
- * <I>QtTopologySplitFacesPanel</I> de découpe de faces topologiques.
+ * <I>QtTopologySplitFacePanel</I> de découpe d'une face topologique.
  */
-class QtTopologySplitFacesAction : public QtMgx3DTopoOperationAction
+class QtTopologySplitFaceAction : public QtMgx3DTopoOperationAction
 {
 	public :
 
 	/**
 	 * Créé et s'associe une instance de la classe
-	 * <I>QtTopologySplitFacesPanel</I>.
+	 * <I>QtTopologySplitFacePanel</I>.
 	 * \param		Icône représentant l'action.
 	 * \param		Texte représentant l'action.
 	 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée
@@ -206,7 +188,7 @@ class QtTopologySplitFacesAction : public QtMgx3DTopoOperationAction
 	 *				les icônes.
 	 * \param		Tooltip décrivant l'action.
 	 */
-	QtTopologySplitFacesAction (
+	QtTopologySplitFaceAction (
 		const QIcon& icon, const QString& text,
 		Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
 		const QString& tooltip);
@@ -214,15 +196,15 @@ class QtTopologySplitFacesAction : public QtMgx3DTopoOperationAction
 	/**
 	 * Destructeur. RAS.
 	 */
-	virtual ~QtTopologySplitFacesAction ( );
+	virtual ~QtTopologySplitFaceAction ( );
 
 	/**
 	 * \return		Le panneau de paramétrage de la découpe.
 	 */
-	virtual QtTopologySplitFacesPanel* getTopologySplitFacesPanel ( );
+	virtual QtTopologySplitFacePanel* getTopologySplitFacePanel ( );
 
 	/**
-	 * Découpe les faces topologiques conformément au paramétrage de
+	 * Découpe la face topologique conformément au paramétrage de
 	 * son panneau associé. Invoque préalablement
 	 * <I>QtMgx3DTopoOperationAction::executeOperation</I>.
 	 */
@@ -234,8 +216,8 @@ class QtTopologySplitFacesAction : public QtMgx3DTopoOperationAction
 	/**
 	 * Constructeur de copie et opérateur = : interdits.
 	 */
-	QtTopologySplitFacesAction (const QtTopologySplitFacesAction&);
-	QtTopologySplitFacesAction& operator = (const QtTopologySplitFacesAction&);
+	QtTopologySplitFaceAction (const QtTopologySplitFaceAction&);
+	QtTopologySplitFaceAction& operator = (const QtTopologySplitFaceAction&);
 };  // class QtTopologyCreationAction
 
 
@@ -244,4 +226,4 @@ class QtTopologySplitFacesAction : public QtMgx3DTopoOperationAction
 
 }	// namespace Mgx3D
 
-#endif	// QT_TOPOLOGY_SPLIT_FACES_ACTION_H
+#endif	// QT_TOPOLOGY_SPLIT_FACE_ACTION_H
