@@ -8,12 +8,12 @@
 
 #include "Utils/Common.h"
 #include "Internal/Resources.h"
+#include "Topo/CommandSplitBlocksWithOgrid.h"
+#include "Topo/TopoDisplayRepresentation.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtNumericFieldsFactory.h"
 #include "QtComponents/QtTopologySplitBlockWithOGridAction.h"
-#include "Topo/CommandSplitBlocksWithOgrid.h"
-#include "Topo/TopoDisplayRepresentation.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>

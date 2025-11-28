@@ -29,9 +29,7 @@ CommandNewFacesMesh::
 CommandNewFacesMesh(Internal::Context& c, size_t tasksNum)
 : CommandCreateMesh(c, "Création du maillage pour toutes les faces", tasksNum)
 {
-    std::vector<Topo::CoFace* > faces;
-    getContext().getTopoManager().getCoFaces(faces);
-
+    std::vector<Topo::CoFace* > faces = getContext().getTopoManager().getCoFacesObj();
     validate(faces);
 }
 /*----------------------------------------------------------------------------*/
@@ -95,15 +93,11 @@ internalExecute()
     // applied to adjacent surfaces
     {
         std::set<Topo::CoEdge *> set_coedges;
-        for (auto cf: list_cofaces) {
-            std::vector<Topo::CoEdge *> coedges;
-            cf->getCoEdges(coedges);
-
-            for (auto ce: coedges) {
+        for (Topo::CoFace* cf : list_cofaces)
+            for (Topo::CoEdge* ce : cf->getCoEdges())
                 set_coedges.insert(ce);
-            }
-        }
-        for (auto ce: set_coedges) {
+
+        for (Topo::CoEdge* ce: set_coedges) {
             ce->clearPoints();
             ce->getMeshingData()->setPreMeshed(false);
         }

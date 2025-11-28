@@ -47,6 +47,16 @@ void SysCoordManager::clear()
 	m_reperes.clear();
 }
 /*----------------------------------------------------------------------------*/
+void SysCoordManager::add(SysCoord* rep)
+{
+    m_reperes.push_back(rep);
+}
+/*----------------------------------------------------------------------------*/
+void SysCoordManager::remove(SysCoord* rep)
+{
+    Utils::remove(rep, m_reperes);
+}
+/*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResult*
 SysCoordManager::newSysCoord(std::string groupName)
 {
@@ -282,41 +292,7 @@ SysCoordManager::copy(SysCoord* syscoord, std::string groupName)
 /*----------------------------------------------------------------------------*/
 SysCoord* SysCoordManager::getSysCoord (const std::string& name, const bool exceptionIfNotFound) const
 {
-	SysCoord* rep = 0;
-
-    std::string new_name;
-    if (getContext().getNameManager().isShiftingIdActivated())
-        new_name = getContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::SysCoord)->renameWithShiftingId(name);
-    else
-        new_name = name;
-
-    if (SysCoord::isA(new_name)){
-        const std::vector<SysCoord* >& sysCoord = m_reperes.get();
-        for (std::vector<SysCoord* >::const_iterator iter2 = sysCoord.begin();
-                iter2 != sysCoord.end() && rep == 0; ++iter2){
-            if (new_name == (*iter2)->getName())
-                rep = (*iter2);
-        }
-    }
-    else if (exceptionIfNotFound){
-		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-        message <<"getSysCoord impossible, entité \""<<new_name<<"\" n'a pas un nom de repère";
-        throw TkUtil::Exception(message);
-    }
-
-    if (rep != 0 && rep->isDestroyed()){
-		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-        message <<"getSysCoord trouve l'entité \""<<new_name<<"\", mais il est détruit";
-        throw Utils::IsDestroyedException(message);
-        }
-
-    if (exceptionIfNotFound && rep == 0){
-		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-        message <<"getSysCoord impossible, entité \""<<new_name<<"\" n'a pas été trouvé dans le TopoManager";
-        throw TkUtil::Exception(message);
-    }
-
-    return rep;
+    return getContext().getNameManager().findByName(name, m_reperes, exceptionIfNotFound);
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace CoordinateSystem

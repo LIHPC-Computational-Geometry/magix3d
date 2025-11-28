@@ -85,33 +85,26 @@ void Line::getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroy
     // cf VTKGMDSEntityRepresentation
 }
 /*----------------------------------------------------------------------------*/
-bool Line::isA(std::string& name)
-{
-    MGX_NOT_YET_IMPLEMENTED("Il n'est pas prévu de faire un tel test");
-//    return (name.compare(0,strlen(typeNameMeshLine),typeNameMeshLine) == 0);
-    return false;
-}
-/*----------------------------------------------------------------------------*/
 TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const Line & cl)
 {
     o << cl.getName() << " (uniqueId " << cl.getUniqueId() << ", Name "<<cl.getName()<<")";
     return o;
 }
 /*----------------------------------------------------------------------------*/
-void Line::addCoEdge(Topo::CoEdge* ed)
+void Line::add(Topo::CoEdge* ed)
 {
-    m_topo_property->getCoEdgeContainer().add(ed);
+    m_topo_property->getCoEdgeContainer().push_back(ed);
 }
 /*----------------------------------------------------------------------------*/
-void Line::removeCoEdge(Topo::CoEdge* ed)
+void Line::remove(Topo::CoEdge* ed)
 {
-    m_topo_property->getCoEdgeContainer().remove(ed, true);
+    Utils::remove(ed, m_topo_property->getCoEdgeContainer());
 }
 /*----------------------------------------------------------------------------*/
-void Line::getCoEdges(std::vector<Topo::CoEdge* >& edges) const
+const std::vector<Topo::CoEdge* >& Line::getCoEdges() const
 {
-    m_topo_property->getCoEdgeContainer().checkIfDestroyed();
-    m_topo_property->getCoEdgeContainer().get(edges);
+    Utils::checkIfDestroyed(m_topo_property->getCoEdgeContainer());
+    return m_topo_property->getCoEdgeContainer();
 }
 /*----------------------------------------------------------------------------*/
 Utils::SerializedRepresentation* Line::
@@ -123,8 +116,7 @@ getDescription (bool alsoComputed) const
     // le maillage vu depuis les arêtes et celui stocké dans GMDS
     Utils::SerializedRepresentation  meshProprietes ("Propriétés du maillage", "");
 
-    std::vector<Topo::CoEdge* > coedges;
-    getCoEdges(coedges);
+    auto coedges = getCoEdges();
 
     uint nbEdges = 0;
     for (uint i=0; i<coedges.size(); i++){
@@ -158,17 +150,14 @@ void Line::getGMDSEdges(std::vector<gmds::Edge >& AEdges) const
 {
     AEdges.clear();
 
-    std::vector<Topo::CoEdge* > coEdges;
-    getCoEdges(coEdges);
-
     Mesh::MeshItf*              meshItf     = getMeshManager ( ).getMesh ( );
     Mesh::MeshImplementation*   meshImpl    =
                                 dynamic_cast<Mesh::MeshImplementation*> (meshItf);
     CHECK_NULL_PTR_ERROR(meshImpl);
     gmds::Mesh& gmdsMesh = meshImpl->getGMDSMesh();
 
-     for(unsigned int iCoEdge=0; iCoEdge<coEdges.size(); iCoEdge++) {
-        std::vector<gmds::TCellID> edges  = coEdges[iCoEdge]->edges();
+     for(Topo::CoEdge* coedge : getCoEdges()) {
+        std::vector<gmds::TCellID> edges  = coedge->edges();
 
         for(unsigned int iEdge=0; iEdge<edges.size(); iEdge++) {
         	AEdges.push_back(gmdsMesh.get<gmds::Edge>(edges[iEdge]));

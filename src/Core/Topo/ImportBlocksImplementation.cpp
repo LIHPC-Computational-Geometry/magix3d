@@ -6,13 +6,10 @@
 #include "Topo/ImportBlocksImplementation.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Topo/EdgeMeshingPropertyGeometric.h"
-#include "Internal/InfoCommand.h"
-
-#include "Group/Group0D.h"
-#include "Group/Group1D.h"
-#include "Group/Group2D.h"
-#include "Group/Group3D.h"
 #include "Topo/EdgeMeshingPropertyGlobalInterpolate.h"
+#include "Internal/InfoCommand.h"
+#include "Group/GroupManager.h"
+#include "Group/GroupEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <iostream>
 /*----------------------------------------------------------------------------*/
@@ -48,9 +45,9 @@ void ImportBlocksImplementation::internalExecute() {
         throw TkUtil::Exception(mess);
     }
 
-        Group::Group1D* group1 = getStdContext()->getGroupManager().getNewGroup1D("Hors_Groupe_1D", m_icmd);
-        Group::Group2D* group2 = getStdContext()->getGroupManager().getNewGroup2D("Hors_Groupe_2D", m_icmd);
-        Group::Group3D* group3 = getStdContext()->getGroupManager().getNewGroup3D("Hors_Groupe_3D", m_icmd);
+        Group::Group1D* group1 = getStdContext()->getGroupManager().getNewGroup<Group::Group1D>("Hors_Groupe_1D", m_icmd);
+        Group::Group2D* group2 = getStdContext()->getGroupManager().getNewGroup<Group::Group2D>("Hors_Groupe_2D", m_icmd);
+        Group::Group3D* group3 = getStdContext()->getGroupManager().getNewGroup<Group::Group3D>("Hors_Groupe_3D", m_icmd);
 
     /*----------------------------------------------------------------------------*/
     if (!moveStreamOntoFirst(s, "POINTS")) {
@@ -242,17 +239,13 @@ void ImportBlocksImplementation::internalExecute() {
                 coedges_f.resize(coedges_in_face.size());
                 coedges_f[0] = coedges[coedges_in_face[0]];
                 bool v1changed = false;
-                std::string v1Edge = coedges[coedges_in_face[0]]->getVertex(
-                        0)->getName();
-                std::string v2Edge = coedges[coedges_in_face[0]]->getVertex(
-                        1)->getName();
+                std::string v1Edge = coedges[coedges_in_face[0]]->getVertices()[0]->getName();
+                std::string v2Edge = coedges[coedges_in_face[0]]->getVertices()[1]->getName();
 
                 for (int i_e = 1; i_e < coedges_in_face.size(); i_e++) {
                     coedges_f[i_e] = coedges[coedges_in_face[i_e]];
-                    std::string v1current = coedges[coedges_in_face[i_e]]->getVertex(
-                            0)->getName();
-                    std::string v2current = coedges[coedges_in_face[i_e]]->getVertex(
-                            1)->getName();
+                    std::string v1current = coedges[coedges_in_face[i_e]]->getVertices()[0]->getName();
+                    std::string v2current = coedges[coedges_in_face[i_e]]->getVertices()[1]->getName();
 
                     if (v1Edge == v1current) {
                         v1Edge = v2current;

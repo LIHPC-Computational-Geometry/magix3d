@@ -428,9 +428,7 @@ Geom::Surface* EntitiesHelper::getCommonSurface(Topo::CoFace* coface)
 #endif
 	Geom::Surface* surface = 0;
 
-	std::vector<Topo::CoEdge* > coedges;
-	coface->getCoEdges(coedges, true);
-
+	std::vector<Topo::CoEdge* > coedges = coface->getCoEdges();
 	if (!coedges.empty()){
 		// recherche d'une surface commune à tous les groupes de surfaces
 		// associés aux différentes arêtes

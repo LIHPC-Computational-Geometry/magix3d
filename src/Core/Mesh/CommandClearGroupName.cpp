@@ -1,10 +1,7 @@
 /*----------------------------------------------------------------------------*/
 #include "Internal/Context.h"
-#include "Group/Group3D.h"
-#include "Group/Group2D.h"
-#include "Group/Group1D.h"
-#include "Group/Group0D.h"
 #include "Group/GroupManager.h"
+#include "Group/GroupEntity.h"
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
@@ -46,122 +43,74 @@ void CommandClearGroupName::internalExecute()
 
     switch(m_dim){
     case(0):{
-    	Group::Group0D* grp = getContext().getGroupManager().getNewGroup0D(m_groupName, &getInfoCommand());
+    	Group::Group0D* grp = getContext().getGroupManager().getNewGroup<Group::Group0D>(m_groupName, &getInfoCommand());
 
-    	std::vector<Geom::Vertex*> geoms = grp->getVertices();
-    	for (std::vector<Geom::Vertex*>::iterator iter = geoms.begin();
-    			iter != geoms.end(); ++iter){
-
-    		Geom::Vertex* vtx = *iter;
-    		m_geom_entities.push_back(vtx);
-
+    	for (Geom::Vertex* ge : grp->getFilteredEntities<Geom::Vertex>()) {
+    		m_geom_entities.push_back(ge);
     		// on retire le groupe
-			m_group_helper.removeFromGroup(m_groupName, vtx);
+			m_group_helper.removeFromGroup(m_groupName, ge);
     	} // end for iter
 
-    	std::vector<Topo::Vertex*> topos = grp->getTopoVertices();
-    	for (std::vector<Topo::Vertex*>::iterator iter = topos.begin();
-    			iter != topos.end(); ++iter){
-
-    		Topo::Vertex* topo = *iter;
-    		m_topo_entities.push_back(topo);
-
+    	for (Topo::Vertex* te : grp->getFilteredEntities<Topo::Vertex>()){
+    		m_topo_entities.push_back(te);
     		// on retire le groupe
-			m_group_helper.removeFromGroup(m_groupName, topo);
-
+			m_group_helper.removeFromGroup(m_groupName, te);
     		// le sommet n'est peut-être plus visible / groupe visibles
-    		getInfoCommand().addTopoInfoEntity(topo, Internal::InfoCommand::VISIBILYCHANGED);
-
+    		getInfoCommand().addTopoInfoEntity(te, Internal::InfoCommand::VISIBILYCHANGED);
     	} // end for iter
     }
     break;
     case(1):{
-    	Group::Group1D* grp = getContext().getGroupManager().getNewGroup1D(m_groupName, &getInfoCommand());
+    	Group::Group1D* grp = getContext().getGroupManager().getNewGroup<Group::Group1D>(m_groupName, &getInfoCommand());
 
-    	std::vector<Geom::Curve*> geoms = grp->getCurves();
-    	for (std::vector<Geom::Curve*>::iterator iter = geoms.begin();
-    			iter != geoms.end(); ++iter){
-
-    		Geom::Curve* geom = *iter;
-    		m_geom_entities.push_back(geom);
-
+    	for (Geom::Curve* ge : grp->getFilteredEntities<Geom::Curve>()) {
+    		m_geom_entities.push_back(ge);
     		// on retire le groupe
-			m_group_helper.removeFromGroup(m_groupName, geom);
+			m_group_helper.removeFromGroup(m_groupName, ge);
     	} // end for iter
 
-    	std::vector<Topo::CoEdge*> topos = grp->getCoEdges();
-    	for (std::vector<Topo::CoEdge*>::iterator iter = topos.begin();
-    			iter != topos.end(); ++iter){
-
-    		Topo::CoEdge* topo = *iter;
-    		m_topo_entities.push_back(topo);
-
+    	for (Topo::CoEdge* te : grp->getFilteredEntities<Topo::CoEdge>()){
+    		m_topo_entities.push_back(te);
     		// on retire le groupe
-			m_group_helper.removeFromGroup(m_groupName, topo);
-
+			m_group_helper.removeFromGroup(m_groupName, te);
     		// l'arête n'est peut-être plus visible / groupe visibles
-    		getInfoCommand().addTopoInfoEntity(topo, Internal::InfoCommand::VISIBILYCHANGED);
-
+    		getInfoCommand().addTopoInfoEntity(te, Internal::InfoCommand::VISIBILYCHANGED);
     	} // end for iter
     }
     break;
     case(2):{
-        Group::Group2D* grp = getContext().getGroupManager().getNewGroup2D(m_groupName, &getInfoCommand());
+        Group::Group2D* grp = getContext().getGroupManager().getNewGroup<Group::Group2D>(m_groupName, &getInfoCommand());
 
-        std::vector<Geom::Surface*> geoms = grp->getSurfaces();
-        for (std::vector<Geom::Surface*>::iterator iter = geoms.begin();
-                iter != geoms.end(); ++iter){
-
-        	Geom::Surface* geom = *iter;
-        	m_geom_entities.push_back(geom);
-
+        for (Geom::Surface* ge : grp->getFilteredEntities<Geom::Surface>()) {
+        	m_geom_entities.push_back(ge);
         	// on retire le groupe
-			m_group_helper.removeFromGroup(m_groupName, geom);
+			m_group_helper.removeFromGroup(m_groupName, ge);
         } // end for iter
 
-        std::vector<Topo::CoFace*> topos = grp->getCoFaces();
-        for (std::vector<Topo::CoFace*>::iterator iter = topos.begin();
-                        iter != topos.end(); ++iter){
-
-        	Topo::CoFace* topo = *iter;
-        	m_topo_entities.push_back(topo);
-
+        for (Topo::CoFace*te : grp->getFilteredEntities<Topo::CoFace>()) {
+        	m_topo_entities.push_back(te);
         	// on retire le groupe
-			m_group_helper.removeFromGroup(m_groupName, topo);
-
+			m_group_helper.removeFromGroup(m_groupName, te);
     		// la face n'est peut-être plus visible / groupe visibles
-			getInfoCommand().addTopoInfoEntity(topo, Internal::InfoCommand::VISIBILYCHANGED);
-
+			getInfoCommand().addTopoInfoEntity(te, Internal::InfoCommand::VISIBILYCHANGED);
         } // end for iter
     }
     break;
     case(3):{
-        Group::Group3D* grp = getContext().getGroupManager().getNewGroup3D(m_groupName, &getInfoCommand());
+        Group::Group3D* grp = getContext().getGroupManager().getNewGroup<Group::Group3D>(m_groupName, &getInfoCommand());
 
-        std::vector<Geom::Volume*> geoms = grp->getVolumes();
-        for (std::vector<Geom::Volume*>::iterator iter = geoms.begin();
-                iter != geoms.end(); ++iter){
-
-        	Geom::Volume* geom = *iter;
-        	m_geom_entities.push_back(geom);
-
+        for (Geom::Volume* ge : grp->getFilteredEntities<Geom::Volume>()) {
+        	m_geom_entities.push_back(ge);
         	// on retire le groupe
-			m_group_helper.removeFromGroup(m_groupName, geom);
+			m_group_helper.removeFromGroup(m_groupName, ge);
         } // end for iter
 
-        std::vector<Topo::Block*> topos = grp->getBlocks();
-        for (std::vector<Topo::Block*>::iterator iter = topos.begin();
-                        iter != topos.end(); ++iter){
-
-        	Topo::Block* topo = *iter;
-        	m_topo_entities.push_back(topo);
-
+        for (Topo::Block* te : grp->getFilteredEntities<Topo::Block>()) {
+        	m_topo_entities.push_back(te);
         	// on retire le groupe
-			m_group_helper.removeFromGroup(m_groupName, topo);
-
+			m_group_helper.removeFromGroup(m_groupName, te);
     		// le bloc n'est peut-être plus visible / groupe visibles
-			getInfoCommand().addTopoInfoEntity(topo, Internal::InfoCommand::VISIBILYCHANGED);
-
+			getInfoCommand().addTopoInfoEntity(te, Internal::InfoCommand::VISIBILYCHANGED);
         } // end for iter
     }
     break;
@@ -252,7 +201,7 @@ void CommandClearGroupName::internalUndo()
 	}
 	break;
 	case(3):{
-		Group::Group3D* grp = gm.getNewGroup3D(m_groupName, &getInfoCommand());
+		Group::Group3D* grp = gm.getNewGroup<Group::Group3D>(m_groupName, &getInfoCommand());
 
 		for (std::vector<Geom::GeomEntity*>::iterator iter = m_geom_entities.begin();
 				iter != m_geom_entities.end(); ++iter){
@@ -421,15 +370,15 @@ updateMesh(std::vector<Topo::Block*>& blocs, std::string grpName, bool add)
             if ((*iter)->isMeshed()){
                 if (add){
 #ifdef _DEBUG_UPDATE
-                    std::cout<<" "<<mvol->getName()<<" addBlock("<<(*iter)->getName()<<")"<<std::endl;
+                    std::cout<<" "<<mvol->getName()<<" add("<<(*iter)->getName()<<")"<<std::endl;
 #endif
-                    mvol->addBlock(*iter);
+                    mvol->add(*iter);
                 }
                 else {
 #ifdef _DEBUG_UPDATE
-                    std::cout<<" "<<mvol->getName()<<" removeBlock("<<(*iter)->getName()<<")"<<std::endl;
+                    std::cout<<" "<<mvol->getName()<<" remove("<<(*iter)->getName()<<")"<<std::endl;
 #endif
-                    mvol->removeBlock(*iter);
+                    mvol->remove(*iter);
                 }
             }
         if (isNewVolume)
@@ -488,15 +437,15 @@ updateMesh(std::vector<Topo::CoFace*>& cofaces, std::string grpName, bool add)
             if ((*iter)->isMeshed()){
                 if (add){
 #ifdef _DEBUG_UPDATE
-                   std::cout<<" "<<msurf->getName()<<" addCoFace("<<(*iter)->getName()<<")"<<std::endl;
+                   std::cout<<" "<<msurf->getName()<<" add("<<(*iter)->getName()<<")"<<std::endl;
 #endif
-                    msurf->addCoFace(*iter);
+                    msurf->add(*iter);
                 }
                 else {
 #ifdef _DEBUG_UPDATE
-                    std::cout<<" "<<msurf->getName()<<" removeCoFace("<<(*iter)->getName()<<")"<<std::endl;
+                    std::cout<<" "<<msurf->getName()<<" remove("<<(*iter)->getName()<<")"<<std::endl;
 #endif
-                    msurf->removeCoFace(*iter);
+                    msurf->remove(*iter);
                 }
             }
     } // end if (is_meshed)
@@ -553,15 +502,15 @@ updateMesh(std::vector<Topo::CoEdge*>& coedges, std::string grpName, bool add)
             if ((*iter)->isMeshed()){
                 if (add){
 #ifdef _DEBUG_UPDATE
-                   std::cout<<" "<<mcld->getName()<<" addCoEdge("<<(*iter)->getName()<<")"<<std::endl;
+                   std::cout<<" "<<mcld->getName()<<" add("<<(*iter)->getName()<<")"<<std::endl;
 #endif
-                   mcld->addCoEdge(*iter);
+                   mcld->add(*iter);
                 }
                 else {
 #ifdef _DEBUG_UPDATE
-                    std::cout<<" "<<mcld->getName()<<" removeCoEdge("<<(*iter)->getName()<<")"<<std::endl;
+                    std::cout<<" "<<mcld->getName()<<" remove("<<(*iter)->getName()<<")"<<std::endl;
 #endif
-                    mcld->removeCoEdge(*iter);
+                    mcld->remove(*iter);
                 }
             }
 
@@ -588,15 +537,15 @@ updateMesh(std::vector<Topo::CoEdge*>& coedges, std::string grpName, bool add)
             if ((*iter)->isMeshed()){
                 if (add){
 #ifdef _DEBUG_UPDATE
-                   std::cout<<" "<<mln->getName()<<" addCoEdge("<<(*iter)->getName()<<")"<<std::endl;
+                   std::cout<<" "<<mln->getName()<<" add("<<(*iter)->getName()<<")"<<std::endl;
 #endif
-                   mln->addCoEdge(*iter);
+                   mln->add(*iter);
                 }
                 else {
 #ifdef _DEBUG_UPDATE
-                    std::cout<<" "<<mcld->getName()<<" removeCoEdge("<<(*iter)->getName()<<")"<<std::endl;
+                    std::cout<<" "<<mcld->getName()<<" remove("<<(*iter)->getName()<<")"<<std::endl;
 #endif
-                    mln->removeCoEdge(*iter);
+                    mln->remove(*iter);
                 }
             }
 

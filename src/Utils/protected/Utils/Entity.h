@@ -1,17 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/** \file Entity.h
- *
- *  \author Franck Ledoux, Eric Brière de l'Isle
- *
- *  \date 30/11/2010
- */
-/*----------------------------------------------------------------------------*/
 #ifndef UTIL_ENTITY_H_
 #define UTIL_ENTITY_H_
 /*----------------------------------------------------------------------------*/
 #include "Utils/DisplayRepresentation.h"
 #include "Utils/SerializedRepresentation.h"
+#include <TkUtil/Exception.h>
 #include <vector>
+#include <list>
 #include <map>
 #include <set>
 /*----------------------------------------------------------------------------*/
@@ -381,8 +375,104 @@ private :
 
 Entity::objectType typesToType (FilterEntity::objectType types);
 FilterEntity::objectType typeToTypes (Entity::objectType type);
+
 #ifndef SWIG
 template<typename T> using EntitySet = std::set<T, decltype(&Utils::Entity::compareEntity)>;
+
+template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
+std::vector<std::string> toNames(const std::vector<T*>& entities)
+{
+    std::vector<std::string> result;
+    result.reserve(entities.size());
+    std::transform(entities.begin(), entities.end(), std::back_inserter(result),
+                   [](T* e){ return e->getName(); });
+    return result;
+}
+
+template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
+std::vector<T*> toVect(const EntitySet<T*>& entities)
+{
+    std::vector<T*> ret(entities.begin(), entities.end());
+    return ret;
+}
+
+
+template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
+std::list<T*> toList(const std::vector<T*>& entities)
+{
+    std::list<T*> ret(entities.begin(), entities.end());
+    return ret;
+}
+
+template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
+int getIndexOf(T* e, const std::vector<T*>& entities)
+{
+	int index = -1;
+	for (unsigned int i=0; i<entities.size(); i++) {
+		if(e->getUniqueId() == entities[i]->getUniqueId())
+			index = i;
+	}
+	if (index == -1) {
+		TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
+		message << "getIndexOf impossible pour un " << e->getName();
+		throw TkUtil::Exception(message);
+	}
+	return index;
+}
+
+template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
+bool contains(const T* e, const std::vector<T*>& entities)
+{
+    return std::find(entities.begin(), entities.end(), e) != entities.end();
+}
+
+// en attendant C++ 23
+template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
+void append(std::vector<T*>& to, const std::vector<T*>& from)
+{
+    to.insert(to.end(), from.begin(), from.end());
+}
+
+template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
+void remove(T* e, std::vector<T*>& entities)
+{
+    if (auto it = std::find(entities.begin(), entities.end(), e); it != entities.end()) {
+        entities.erase(it);
+    } else {
+        TkUtil::UTF8String   message;
+        message << e->getName() << " n'existe pas dans la liste des entités";
+        throw TkUtil::Exception (message);
+    }
+}
+
+template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
+void checkIfDestroyed(const std::vector<T*>& entities)
+{
+    for (T* e : entities)
+        if (e->isDestroyed()) {
+            TkUtil::UTF8String   message;
+            message << e->getName() << " est marquée à détruire";
+            throw TkUtil::Exception (message);
+        }
+}
+
+template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
+void deleteAndClear(std::vector<T*>& entities)
+{
+    for (uint i = 0; i<entities.size(); ++i)
+        delete entities[i];
+    entities.clear();
+}
+
+template <typename T, typename = std::enable_if<std::is_base_of<Entity, T>::value>>
+std::vector<T*> filterAndSort(const std::vector<T*>& entities)
+{
+    Utils::EntitySet<T*> result(Utils::Entity::compareEntity);
+    for (T* e : entities)
+        if (!e->isDestroyed())
+            result.insert(e);
+    return Utils::toVect(result);
+}
 #endif
 /*----------------------------------------------------------------------------*/
 } // end namespace Utils

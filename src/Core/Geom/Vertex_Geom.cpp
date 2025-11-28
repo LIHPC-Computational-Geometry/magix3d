@@ -3,9 +3,7 @@
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/OCCHelper.h"
-#include "Group/Group0D.h"
 #include "Internal/Context.h"
-#include "Internal/EntitiesHelper.h"
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Vertex.hxx>
 #include <TopoDS_Shape.hxx>
@@ -21,8 +19,6 @@
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
-/*----------------------------------------------------------------------------*/
-const char* Vertex::typeNameGeomVertex = "GeomVertex";
 /*----------------------------------------------------------------------------*/
 Vertex::Vertex(Internal::Context& ctx, Utils::Property* prop, Utils::DisplayProperties* disp,
         GeomProperty* gprop, TopoDS_Vertex& shape)
@@ -134,77 +130,6 @@ TkUtil::UTF8String& operator<<(TkUtil::UTF8String& str, const Vertex& v)
 {
   str<<"("<<v.getX()<<", "<<v.getY()<<", "<<v.getZ()<<")";
   return str;
-}
-
-/*----------------------------------------------------------------------------*/
-void Vertex::add(Group::Group0D* grp)
-{
-    m_groups.push_back(grp);
-    
-    TkUtil::Color	color (0, 0, 0);
-    std::vector<Group::GroupEntity*>	groups	= Internal::groupsFromTypedGroups (m_groups);
-    if (true == getContext ( ).getGroupColor (groups, color))
-    {
-		getDisplayProperties ( ).setCloudColor (color);
-		getDisplayProperties ( ).setWireColor (color);
-		getDisplayProperties ( ).setSurfacicColor (color);
-		getDisplayProperties ( ).setFontColor (color);
-	}	// if (true == getContext ( ).getGroupColor (groups, color))
-}
-/*----------------------------------------------------------------------------*/
-void Vertex::remove(Group::Group0D* grp)
-{
-    uint i = 0;
-    for (; i<m_groups.size() && grp != m_groups[i]; ++i)
-        ;
-
-    if (i!=m_groups.size())
-        m_groups.erase(m_groups.begin()+i);
-    else
-        throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne (pas de groupe), avec Vertex::remove", TkUtil::Charset::UTF_8));
-}
-/*----------------------------------------------------------------------------*/
-bool Vertex::find(Group::Group0D* grp)
-{
-    uint i = 0;
-    for (; i<m_groups.size() && grp != m_groups[i]; ++i)
-        ;
-
-    return (i!=m_groups.size());
-}
-/*----------------------------------------------------------------------------*/
-void Vertex::getGroupsName (std::vector<std::string>& gn) const
-{
-    gn.clear();
-    for (uint i = 0; i<m_groups.size(); ++i)
-        gn.push_back(m_groups[i]->getName());
-}
-/*----------------------------------------------------------------------------*/
-void Vertex::getGroups(std::vector<Group::GroupEntity*>& grp) const
-{
-    grp.insert(grp.end(), m_groups.begin(), m_groups.end());
-}
-/*----------------------------------------------------------------------------*/
-int Vertex::getNbGroups() const
-{
-    return m_groups.size();
-}
-/*----------------------------------------------------------------------------*/
-void Vertex::setDestroyed(bool b)
-{
-    if (isDestroyed() == b)
-        return;
-
-    // supprime la relation du groupe vers le sommet en cas de destruction
-    if (b)
-        for (uint i = 0; i<m_groups.size(); ++i)
-            m_groups[i]->remove(this);
-    else
-        // et inversement en cas de ressurection
-        for (uint i = 0; i<m_groups.size(); ++i)
-            m_groups[i]->add(this);
-
-    Entity::setDestroyed(b);
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

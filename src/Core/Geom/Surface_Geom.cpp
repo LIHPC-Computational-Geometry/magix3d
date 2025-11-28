@@ -6,8 +6,6 @@
 #include "Geom/OCCHelper.h"
 #include "Geom/EntityFactory.h"
 #include "Geom/GeomProjectImplementation.h"
-#include "Group/Group2D.h"
-#include "Internal/EntitiesHelper.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
@@ -29,16 +27,6 @@
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
-/*----------------------------------------------------------------------------*/
-const char* Surface::typeNameGeomSurface = "GeomSurface";
-
-/*----------------------------------------------------------------------------*/
-//void Surface::add(TopoDS_Edge e)
-//{m_occ_edges.push_back(e);}
-///*----------------------------------------------------------------------------*/
-//std::vector<TopoDS_Edge> Surface::getEdges()
-//{return m_occ_edges;}
-
 /*----------------------------------------------------------------------------*/
 Surface::Surface(Internal::Context& ctx, Utils::Property* prop,
         Utils::DisplayProperties* disp,
@@ -222,76 +210,6 @@ getCenteredPosition() const
 bool Surface::isA(const std::string& name)
 {
     return (name.compare(0,getTinyName().size(),getTinyName()) == 0);
-}
-/*----------------------------------------------------------------------------*/
-void Surface::add(Group::Group2D* grp)
-{
-    m_groups.push_back(grp);
-    
-    TkUtil::Color	color (0, 0, 0);
-    std::vector<Group::GroupEntity*>	groups	= Internal::groupsFromTypedGroups (m_groups);
-    if (true == getContext ( ).getGroupColor (groups, color))
-    {
-		getDisplayProperties ( ).setCloudColor (color);
-		getDisplayProperties ( ).setWireColor (color);
-		getDisplayProperties ( ).setSurfacicColor (color);
-		getDisplayProperties ( ).setFontColor (color);
-	}	// if (true == getContext ( ).getGroupColor (groups, color))
-}
-/*----------------------------------------------------------------------------*/
-void Surface::remove(Group::Group2D* grp)
-{
-    uint i = 0;
-    for (; i<m_groups.size() && grp != m_groups[i]; ++i)
-        ;
-
-    if (i!=m_groups.size())
-        m_groups.erase(m_groups.begin()+i);
-    else
-        throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne (pas de groupe), avec Surface::remove", TkUtil::Charset::UTF_8));
-}
-/*----------------------------------------------------------------------------*/
-bool Surface::find(Group::Group2D* grp)
-{
-    uint i = 0;
-    for (; i<m_groups.size() && grp != m_groups[i]; ++i)
-        ;
-
-    return (i!=m_groups.size());
-}
-/*----------------------------------------------------------------------------*/
-void Surface::getGroupsName (std::vector<std::string>& gn) const
-{
-    gn.clear();
-    for (uint i = 0; i<m_groups.size(); ++i)
-        gn.push_back(m_groups[i]->getName());
-}
-/*----------------------------------------------------------------------------*/
-void Surface::getGroups(std::vector<Group::GroupEntity*>& grp) const
-{
-    grp.insert(grp.end(), m_groups.begin(), m_groups.end());
-}
-/*----------------------------------------------------------------------------*/
-int Surface::getNbGroups() const
-{
-    return m_groups.size();
-}
-/*----------------------------------------------------------------------------*/
-void Surface::setDestroyed(bool b)
-{
-    if (isDestroyed() == b)
-        return;
-
-    // supprime la relation du groupe vers le Surface en cas de destruction
-    if (b)
-        for (uint i = 0; i<m_groups.size(); ++i)
-            m_groups[i]->remove(this);
-    else
-        // et inversement en cas de ressurection
-        for (uint i = 0; i<m_groups.size(); ++i)
-            m_groups[i]->add(this);
-
-    Entity::setDestroyed(b);
 }
 /*----------------------------------------------------------------------------*/
 bool Surface::isPlanar() const

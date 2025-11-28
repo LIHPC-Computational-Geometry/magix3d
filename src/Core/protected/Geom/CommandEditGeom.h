@@ -64,12 +64,6 @@ public:
     virtual void internalSpecificExecute()=0;
 
     /*------------------------------------------------------------------------*/
-    /** \brief  Traitement spécifique délégué aux classes filles
-     */
-    virtual void internalSpecificUndo(){}
-    virtual void internalSpecificRedo(){}
-
-    /*------------------------------------------------------------------------*/
     /** \brief  retourne une référence sur les entités supprimées. N'a de sens
      *          qu'une fois l'opération perform() appelée.
      */

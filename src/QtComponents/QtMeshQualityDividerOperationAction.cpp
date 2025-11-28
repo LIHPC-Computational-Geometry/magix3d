@@ -266,10 +266,10 @@ void QtMeshQualityDividerOperationPanel::autoUpdate ( )
 
 		// s'il n'y a rien de sélectionné, on prend tout [EB]
 		if (volumes.empty())
-			getContext ( ).getMeshManager().getVolumes(volumes);
+			volumes = getContext ( ).getMeshManager().getVolumesObj();
 
 		if (volumes.empty() && surfaces.empty())
-			getContext ( ).getMeshManager().getSurfaces(surfaces);
+			surfaces = getContext ( ).getMeshManager().getSurfacesObj();
 
 		for (std::vector<Mesh::Surface*> ::const_iterator iter = surfaces.begin ( ); surfaces.end() != iter; iter++)
 		{

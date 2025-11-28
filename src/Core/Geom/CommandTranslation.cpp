@@ -78,16 +78,6 @@ void CommandTranslation::internalSpecificPreExecute()
     m_impl->prePerform();
 }
 /*----------------------------------------------------------------------------*/
-void CommandTranslation::internalSpecificUndo()
-{
-    m_impl->performUndo();
-}
-/*----------------------------------------------------------------------------*/
-void CommandTranslation::internalSpecificRedo()
-{
-    m_impl->performRedo();
-}
-/*----------------------------------------------------------------------------*/
 } // end namespace Geom
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D

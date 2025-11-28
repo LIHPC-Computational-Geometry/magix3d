@@ -1,7 +1,9 @@
 /*----------------------------------------------------------------------------*/
 #include "Internal/Context.h"
 #include "Internal/InfoCommand.h"
-#include "Group/Group3D.h"
+#include "Group/GroupManager.h"
+#include "Group/GroupEntity.h"
+#include "SysCoord/SysCoord.h"
 #include "SysCoord/CommandNewSysCoord.h"
 #include "SysCoord/SysCoordManager.h"
 #include "SysCoord/SysCoordDisplayRepresentation.h"
@@ -110,7 +112,7 @@ void CommandNewSysCoord::internalRedo()
 /*----------------------------------------------------------------------------*/
 void CommandNewSysCoord::addToGroup(SysCoord* rep, bool use_default_name)
 {
-    Group::Group3D* group = getContext().getGroupManager().getNewGroup3D(use_default_name?"":m_group_name, &getInfoCommand());
+    Group::Group3D* group = getContext().getGroupManager().getNewGroup<Group::Group3D>(use_default_name?"":m_group_name, &getInfoCommand());
     //rep->add(group);
     group->add(rep);
     getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);

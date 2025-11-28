@@ -11,7 +11,7 @@
 #include "Topo/CoFace.h"
 #include "Topo/Face.h"
 #include "Topo/Block.h"
-#include "Group/Group3D.h"
+#include "Group/GroupManager.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/NumericConversions.h>
 #include <TkUtil/Exception.h>
@@ -233,32 +233,15 @@ void Volume::getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestr
 	        {	// On prend la peau du maillage
 	            // on passe par GMDS pour récupérer les noeuds et les mailles :
 	            gmds::Mesh&	gmdsMesh	= meshImpl->getGMDSMesh ( );
-	            // la liste des Topo::Block qui ont contribués :
-	            std::vector<Topo::Block* >	blocs;
-	            getBlocks (blocs);
 
 	            // la liste des faces externes au groupe de blocs
 	            // on utilise une map et on marque les faces à chaque fois
 	            // qu'elles sont vus
-	            std::map<Topo::CoFace*, int>			marque_faces;
-	            std::vector<Topo::Face* >	faces;
-	            for (std::vector<Topo::Block* >::iterator
-	                    iter1 = blocs.begin();  iter1 != blocs.end(); ++iter1)
-	            {
-	                (*iter1)->getFaces(faces);
-	                std::vector<Topo::CoFace* >	cofaces;
-	                for (std::vector<Topo::Face* >::iterator
-	                        iter2 = faces.begin(); iter2 != faces.end();++iter2)
-	                {
-	                    (*iter2)->getCoFaces(cofaces);
-	                    for (std::vector<Topo::CoFace* >::iterator
-	                            iter3 = cofaces.begin(); iter3 != cofaces.end();
-	                            ++iter3)
-	                    {
-	                        marque_faces[*iter3] += 1;
-	                    }	// for (std::vector<Topo::CoFace*> ...
-	                }	// for (std::vector<Topo::Face* > ...
-                }   // for (std::vector<Topo::Block* > ...
+	            std::map<Topo::CoFace*, int> marque_faces;
+	            for (Topo::Block* bloc : getBlocks())
+	                for (Topo::Face* face : bloc->getFaces())
+	                    for (Topo::CoFace* coface : face->getCoFaces())
+	                        marque_faces[coface] += 1;
 
 	            // on cumule les noeuds, en évitant les doublons
 	            std::vector<gmds::Node>	nodes;
@@ -334,49 +317,39 @@ void Volume::getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestr
 	}	// if (true == solid)
 }
 /*----------------------------------------------------------------------------*/
-bool Volume::isA(std::string& name)
-{
-    MGX_NOT_YET_IMPLEMENTED("Il n'est pas prévu de faire un tel test");
-//    return (name.compare(0,strlen(typeNameMeshVolume),typeNameMeshVolume) == 0);
-    return false;
-}
-/*----------------------------------------------------------------------------*/
 TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const Volume & cl)
 {
     o << cl.getName() << " (uniqueId " << cl.getUniqueId() << ", Name "<<cl.getName()<<")";
     return o;
 }
 /*----------------------------------------------------------------------------*/
-void Volume::addBlock(Topo::Block* b)
+void Volume::add(Topo::Block* b)
 {
-    m_topo_property->getBlockContainer().add(b);
+    m_topo_property->getBlockContainer().push_back(b);
 }
 /*----------------------------------------------------------------------------*/
-void Volume::removeBlock(Topo::Block* b)
+void Volume::remove(Topo::Block* b)
 {
-    m_topo_property->getBlockContainer().remove(b, true);
+    Utils::remove(b, m_topo_property->getBlockContainer());
 }
 /*----------------------------------------------------------------------------*/
-void Volume::getBlocks(std::vector<Topo::Block* >& blocks) const
+const std::vector<Topo::Block* >& Volume::getBlocks() const
 {
-    m_topo_property->getBlockContainer().checkIfDestroyed();
-    m_topo_property->getBlockContainer().get(blocks);
+    Utils::checkIfDestroyed(m_topo_property->getBlockContainer());
+    return m_topo_property->getBlockContainer();
 }
 /*----------------------------------------------------------------------------*/
 void Volume::getGMDSRegions(std::vector<gmds::Region >& ARegions) const
 {
     ARegions.clear();
 
-    std::vector<Topo::Block* > blocks;
-    getBlocks(blocks);
-
     Mesh::MeshItf*              meshItf     = getMeshManager ( ).getMesh ( );
     Mesh::MeshImplementation*   meshImpl    =
                                 dynamic_cast<Mesh::MeshImplementation*> (meshItf);
     CHECK_NULL_PTR_ERROR(meshImpl);
     gmds::Mesh&  gmdsMesh    = meshImpl->getGMDSMesh ( );
-    for(unsigned int iBlock=0; iBlock<blocks.size(); iBlock++) {
-        std::vector<gmds::TCellID> regions  = blocks[iBlock]->regions();
+    for(Topo::Block* block : getBlocks()) {
+        std::vector<gmds::TCellID> regions  = block->regions();
 
         for(unsigned int iRegion=0; iRegion<regions.size(); iRegion++) {
             ARegions.push_back(gmdsMesh.get<gmds::Region>(regions[iRegion]));
@@ -391,16 +364,13 @@ void Volume::getGMDSNodes(std::vector<gmds::Node>& ANodes) const
 	// utilisation d'un filtre pour ne pas référencer plusieurs fois un même noeud
 	std::map<gmds::TCellID, uint> filtre_nodes;
 
-    std::vector<Topo::Block* > blocks;
-    getBlocks(blocks);
-
     Mesh::MeshItf*              meshItf  = getMeshManager ( ).getMesh ( );
     Mesh::MeshImplementation*   meshImpl = dynamic_cast<Mesh::MeshImplementation*> (meshItf);
     CHECK_NULL_PTR_ERROR(meshImpl);
     gmds::Mesh&  gmdsMesh = meshImpl->getGMDSMesh();
 
-    for(unsigned int iBlock=0; iBlock<blocks.size(); iBlock++) {
-    	std::vector<gmds::TCellID> nodes  = blocks[iBlock]->nodes();
+    for(Topo::Block* block : getBlocks()) {
+    	std::vector<gmds::TCellID> nodes  = block->nodes();
 
     	for(unsigned int iNode=0; iNode<nodes.size(); iNode++) {
     		if (filtre_nodes[nodes[iNode]] == 0){
@@ -417,8 +387,7 @@ getDescription (bool alsoComputed) const
     std::unique_ptr<Utils::SerializedRepresentation>   description (
             MeshEntity::getDescription (alsoComputed));
 
-    std::vector<Topo::Block* > blocks;
-    getBlocks(blocks);
+    auto blocks = getBlocks();
 
     if (!blocks.empty()){
     	// le maillage vu depuis les blocs
@@ -453,7 +422,7 @@ getDescription (bool alsoComputed) const
     Group::Group3D* gr = 0;
     MeshManager* mm = dynamic_cast<MeshManager*>(&getMeshManager());
     if (mm)
-    	gr = mm->getContext().getGroupManager().getGroup3D(getName(),false);
+    	gr = mm->getContext().getGroupManager().getGroup<Group::Group3D>(getName(),false);
     if (gr){
         Utils::SerializedRepresentation  groupeDescription (
                         "Groupe 3D associé", "");
@@ -509,10 +478,8 @@ saveInternals(Mesh::CommandCreateMesh* ccm)
 bool Volume::
 isStructured()
 {
-    std::vector<Topo::Block* > blocs;
-    getBlocks(blocs);
-    for(unsigned int i=0; i<blocs.size(); i++)
-    	if (!blocs[i]->isStructured())
+    for(Topo::Block* block : getBlocks())
+    	if (!block->isStructured())
     		return false;
 
     return true;

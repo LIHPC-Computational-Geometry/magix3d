@@ -4,7 +4,7 @@
 #include "Geom/Curve.h"
 #include "Geom/Surface.h"
 #include "Geom/CommandJoinCurves.h"
-#include "Group/Group1D.h"
+#include "Group/GroupEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/UTF8String.h>
@@ -142,10 +142,9 @@ internalSpecificExecute()
 	m_newEntities.push_back(newCurve);
 
 	// reprise des groupes de la première courbe
-	std::vector<Group::GroupEntity*> grp;
-	m_entities[0]->getGroups(grp);
-	for (uint i=0; i<grp.size(); i++){
-		m_group_helper.addToGroup(grp[i]->getName(), newCurve);
+	Group::GroupManager& gm = getContext().getGroupManager();
+	for (Group::GroupEntity* grp : gm.getGroupsFor(m_entities[0])) {
+		m_group_helper.addToGroup(grp->getName(), newCurve);
 	}
 
 	// destruction des anciennes courbes

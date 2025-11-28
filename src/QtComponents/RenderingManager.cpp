@@ -6,6 +6,7 @@
 
 #include "Internal/Context.h"
 #include "Internal/Resources.h"
+#include "Group/GroupManager.h"
 #include "QtComponents/RenderingManager.h"
 #include "QtComponents/QtMgx3DApplication.h"
 #include "Geom/GeomDisplayRepresentation.h"

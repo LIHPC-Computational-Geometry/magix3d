@@ -66,12 +66,6 @@ public:
      */
     void internalSpecificPreExecute();
 
-    /*------------------------------------------------------------------------*/
-    /** \brief  Traitement spécifique délégué aux classes filles
-     */
-    void internalSpecificUndo();
-    void internalSpecificRedo();
-
 protected:
 
     /// valide les paramètres

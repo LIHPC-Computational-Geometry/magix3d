@@ -13,7 +13,6 @@
 #include "Internal/InternalEntity.h"
 #include "Utils/Property.h"
 #include "Utils/DisplayProperties.h"
-#include "Mesh/MeshManager.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -26,6 +25,7 @@ namespace Mgx3D {
  */
 namespace Mesh {
 
+class MeshManager;
 class CommandCreateMesh;
 
 /*----------------------------------------------------------------------------*/

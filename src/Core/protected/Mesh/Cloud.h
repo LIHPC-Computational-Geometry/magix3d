@@ -1,18 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/*
- * \file Cloud.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 25 nov. 2011
- */
-/*----------------------------------------------------------------------------*/
 #ifndef MGX3D_MESH_CLOUD_H_
 #define MGX3D_MESH_CLOUD_H_
 /*----------------------------------------------------------------------------*/
 #include "Mesh/MeshEntity.h"
 #include <TkUtil/UTF8String.h>
-#include "Utils/Container.h"
 #include "Topo/MeshCloudTopoProperty.h"
 
 namespace gmds {
@@ -95,16 +85,6 @@ public:
     virtual Utils::Entity::objectType getType() const {return Utils::Entity::MeshCloud;}
 
     /*------------------------------------------------------------------------*/
-   /** \brief Donne le nom court du type d'objet (pour le nommage des entités)
-    */
-    static std::string getTinyName() {return "Nu";}
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Test si l'entité est un Cloud suivant son nom
-     */
-    static bool isA(std::string& name);
-
-    /*------------------------------------------------------------------------*/
     /// pour l'affichage d'informations
 #ifndef SWIG
     friend TkUtil::UTF8String & operator << (TkUtil::UTF8String & , const Cloud &);
@@ -113,16 +93,16 @@ public:
     /*------------------------------------------------------------------------*/
     /// \brief Ajoute une relation vers une arête commune
 #ifndef SWIG
-    void addCoEdge(Topo::CoEdge* e);
+    void add(Topo::CoEdge* e);
 #endif
 
     /// Retire une relation vers une Edge
 #ifndef SWIG
-    void removeCoEdge(Topo::CoEdge* e);
+    void remove(Topo::CoEdge* e);
 #endif
 
     ///  Fournit l'accès aux arêtes topologiques qui ont participées à la constitution du nuage
-    void getCoEdges(std::vector<Topo::CoEdge* >& edges) const;
+    const std::vector<Topo::CoEdge* >& getCoEdges() const;
 
     /** supprime les relations vers les arêtes */
     void clearCoEdges()
@@ -131,16 +111,16 @@ public:
     /*------------------------------------------------------------------------*/
     /// \brief Ajoute une relation vers un sommet
 #ifndef SWIG
-    void addVertex(Topo::Vertex* v);
+    void add(Topo::Vertex* v);
 #endif
 
     /// Retire une relation vers un Vertex
 #ifndef SWIG
-    void removeVertex(Topo::Vertex* v);
+    void remove(Topo::Vertex* v);
 #endif
 
     ///  Fournit l'accès aux sommets topologiques qui ont participées à la constitution du nuage
-    void getVertices(std::vector<Topo::Vertex* >& vertices) const;
+    const std::vector<Topo::Vertex* >& getVertices() const;
 
     /** supprime les relations vers les sommets */
     void clearVertices()

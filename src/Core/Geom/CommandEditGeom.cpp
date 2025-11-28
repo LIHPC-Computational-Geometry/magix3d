@@ -10,10 +10,7 @@
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
 #include "Group/GroupManager.h"
-#include "Group/Group3D.h"
-#include "Group/Group2D.h"
-#include "Group/Group1D.h"
-#include "Group/Group0D.h"
+#include "Group/GroupEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
@@ -73,7 +70,6 @@ void CommandEditGeom::internalExecute()
     std::vector<GeomEntity*>  mod_entities  = getKeepedEntities();
     std::vector<GeomEntity*>  mov_entities  = getMovedEntities();
     std::vector<GeomEntity*>& rem_entities = getRemovedEntities();
-    std::map<GeomEntity*,std::vector<GeomEntity*> >& rep_entities = getReplacedEntities();
 
     for(int i=0;i<new_entities.size();i++){
         GeomEntity* ge = new_entities[i];
@@ -106,6 +102,7 @@ void CommandEditGeom::internalExecute()
     }
 
 #ifdef _DEBUG2
+    std::map<GeomEntity*,std::vector<GeomEntity*> >& rep_entities = getReplacedEntities();
     for (std::map<GeomEntity*,std::vector<GeomEntity*> >::iterator iter1 = rep_entities.begin();
     		iter1!=rep_entities.end(); ++iter1){
     	std::cerr<<"Remplace "<<iter1->first->getName()<<" par";
@@ -166,8 +163,7 @@ void CommandEditGeom::internalUndo()
     // les entités détruites sont dites créées et inversement
     getInfoCommand().permCreatedDeleted();
 
-    // Annulation de la commande pour les entités dont l'état n'est pas mémorisé (cas des FcetedSurface)
-    internalSpecificUndo();
+    if (m_impl) m_impl->performUndo();
 
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_1));
 }
@@ -188,8 +184,7 @@ void CommandEditGeom::internalRedo()
     // les entités détruites sont dites créées et inversement
     getInfoCommand().permCreatedDeleted();
 
-    // Rejoue la commande pour les entités dont l'état n'est pas mémorisé (cas des FcetedSurface)
-    internalSpecificRedo();
+    if (m_impl) m_impl->performRedo();
 
     startingOrcompletionLog (false);
 
@@ -211,52 +206,10 @@ saveMementos(std::map<GeomEntity*,Services::Memento> & candidates)
 /*----------------------------------------------------------------------------*/
 void CommandEditGeom::copyGroups(GeomEntity* ge1, GeomEntity* ge2)
 {
-    if (ge1->getDim() == 3 && ge2->getDim() == 3){
-    std::vector<Group::GroupEntity*> grp;
-        ge1->getGroups(grp);
-        Volume* res = dynamic_cast<Volume*>(ge2);
-        for (std::vector<Group::GroupEntity*>::iterator iter = grp.begin();
-                iter != grp.end(); ++iter){
-            Group::Group3D* grp = dynamic_cast<Group::Group3D*>(*iter);
-            if (res && grp && !res->find(grp)){
-                m_group_helper.addToGroup(grp->getName(), res);
-            }
-        }
-    }
-    else if (ge1->getDim() == 2 && ge2->getDim() == 2){
-    std::vector<Group::GroupEntity*> grp;
-        ge1->getGroups(grp);
-        Surface* res = dynamic_cast<Surface*>(ge2);
-        for (std::vector<Group::GroupEntity*>::iterator iter = grp.begin();
-                iter != grp.end(); ++iter){
-            Group::Group2D* grp = dynamic_cast<Group::Group2D*>(*iter);
-            if (res && grp && !res->find(grp)){
-                m_group_helper.addToGroup(grp->getName(), res);
-            }
-        }
-    }
-    else if (ge1->getDim() == 1 && ge2->getDim() == 1){
-    std::vector<Group::GroupEntity*> grp;
-        ge1->getGroups(grp);
-        Curve* res = dynamic_cast<Curve*>(ge2);
-        for (std::vector<Group::GroupEntity*>::iterator iter = grp.begin();
-                iter != grp.end(); ++iter){
-            Group::Group1D* grp = dynamic_cast<Group::Group1D*>(*iter);
-            if (res && grp && !res->find(grp)){
-                m_group_helper.addToGroup(grp->getName(), res);
-            }
-        }
-    }
-    else if (ge1->getDim() == 0 && ge2->getDim() == 0){
-        Vertex* res = dynamic_cast<Vertex*>(ge2);
-        for (Group::Group0D* grp : res->getGroups()) {
-            if (res && grp && !res->find(grp)){
-                m_group_helper.addToGroup(grp->getName(), res);
-            }
-        }
-    }
-    else {
-        throw TkUtil::Exception(TkUtil::UTF8String ("Copie des groupes pour une dimension non prévue", TkUtil::Charset::UTF_8));
+    Group::GroupManager& gm = getContext().getGroupManager();
+    for (Group::GroupEntity* grp : gm.getGroupsFor(ge1)) {
+        if (!gm.hasGroupFor(ge2, grp))
+            m_group_helper.addToGroup(grp->getName(), ge2);
     }
 }
 /*----------------------------------------------------------------------------*/

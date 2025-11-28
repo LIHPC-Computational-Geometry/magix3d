@@ -1,7 +1,8 @@
 /*----------------------------------------------------------------------------*/
 #include "Internal/Context.h"
-#include "Utils/Common.h"
 #include "Internal/CommandInternal.h"
+#include "Utils/Common.h"
+#include "Group/GroupManager.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/InformationLog.h>
 #include <TkUtil/TraceLog.h>

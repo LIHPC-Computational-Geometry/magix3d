@@ -21,6 +21,8 @@
 #include "Geom/Vertex.h"
 #include "Geom/Surface.h"
 #include "Geom/GeomProjectImplementation.h"
+
+#include "Group/GroupManager.h"
 /*----------------------------------------------------------------------------*/
 /// TkUtil
 #include <TkUtil/Exception.h>
@@ -111,6 +113,8 @@ void MeshImplementation::preMeshStructured(Topo::Block* bl)
 
     // on va mettre en premier dans le tableau des id, ceux du bord
     bl->nodes().resize(nbNoeudsI*nbNoeudsJ*nbNoeudsK);
+    std::vector<Topo::Face*> bl_faces = bl->getFaces();
+    std::vector<Topo::Vertex*> bl_vertices = bl->getVertices();
 
 #ifdef _DEBUG_MESH
     for (uint i=0; i<nbNoeudsI*nbNoeudsJ*nbNoeudsK; i++)
@@ -157,9 +161,8 @@ void MeshImplementation::preMeshStructured(Topo::Block* bl)
         }
 
         // cas pour les faces non-dégénérées (celles qui existent)
-        if (cote<bl->getNbFaces()){
-            Topo::Face* face = bl->getFace(cote);
-
+        if (cote<bl_faces.size()){
+            Topo::Face* face = bl_faces[cote];
 
             // nombre de points dans les 2 directions locales de la face
             uint nbPtI = 0;
@@ -168,11 +171,11 @@ void MeshImplementation::preMeshStructured(Topo::Block* bl)
             nbPtI += 1;
             nbPtJ += 1;
 
-            if (bl->getNbVertices() == 8){
-                Topo::Face::eDirOnFace iDir = face->getDir(bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnBlock[cote][1]),
-                        bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnBlock[cote][2]));
-                Topo::Face::eDirOnFace jDir = face->getDir(bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnBlock[cote][1]),
-                        bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnBlock[cote][0]));
+            if (bl_vertices.size() == 8){
+                Topo::Face::eDirOnFace iDir = face->getDir(bl_vertices[Topo::TopoHelper::tabIndVtxByFaceOnBlock[cote][1]],
+                        bl_vertices[Topo::TopoHelper::tabIndVtxByFaceOnBlock[cote][2]]);
+                Topo::Face::eDirOnFace jDir = face->getDir(bl_vertices[Topo::TopoHelper::tabIndVtxByFaceOnBlock[cote][1]],
+                        bl_vertices[Topo::TopoHelper::tabIndVtxByFaceOnBlock[cote][0]]);
                 if (iDir == Topo::Face::j_dir){
                     // on permute les nombres
                     int tmp = nbPtI;
@@ -180,12 +183,12 @@ void MeshImplementation::preMeshStructured(Topo::Block* bl)
                     nbPtJ = tmp;
                 }
             }
-            else if (face->getNbVertices() == 4) {
+            else if (face->getVertices().size() == 4) {
             	assert(cote<5);
-                Topo::Face::eDirOnFace iDir = face->getDir(bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][1]),
-                        bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][2]));
-                Topo::Face::eDirOnFace jDir = face->getDir(bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][1]),
-                        bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][0]));
+                Topo::Face::eDirOnFace iDir = face->getDir(bl_vertices[Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][1]],
+                        bl_vertices[Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][2]]);
+                Topo::Face::eDirOnFace jDir = face->getDir(bl_vertices[Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][1]],
+                        bl_vertices[Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][0]]);
                 if (iDir == Topo::Face::j_dir){
                     // on permute les nombres
                     int tmp = nbPtI;
@@ -193,7 +196,7 @@ void MeshImplementation::preMeshStructured(Topo::Block* bl)
                     nbPtJ = tmp;
                 }
             }
-            else if (face->getNbVertices() == 3) {
+            else if (face->getVertices().size() == 3) {
                 // l'ordre est bon ...
             }
             else
@@ -204,21 +207,21 @@ void MeshImplementation::preMeshStructured(Topo::Block* bl)
 
             // cas sans/avec dégénéréscence, on tient compte du fait que la face si elle est dégénérée
             // elle l'est sur sa dernière arête
-            if (face->getNbVertices() == 4)
+            if (face->getVertices().size() == 4)
                 // demander les points de la face avec respect de l'ordre des sommets internes du bloc
-                if (bl->getNbVertices() == 8)
-                    face->getNodes(bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnBlock[cote][0]),
-                            bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnBlock[cote][1]),
-                            bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnBlock[cote][2]),
-                            bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnBlock[cote][3]),
+                if (bl_vertices.size() == 8)
+                    face->getNodes(bl_vertices[Topo::TopoHelper::tabIndVtxByFaceOnBlock[cote][0]],
+                            bl_vertices[Topo::TopoHelper::tabIndVtxByFaceOnBlock[cote][1]],
+                            bl_vertices[Topo::TopoHelper::tabIndVtxByFaceOnBlock[cote][2]],
+                            bl_vertices[Topo::TopoHelper::tabIndVtxByFaceOnBlock[cote][3]],
                             nodes);
                 else {
                 	if (cote >= 5)
                 		throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, MeshImplementation::meshStructured, cote trop grand", TkUtil::Charset::UTF_8));
-                	face->getNodes(bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][0]),
-                            bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][1]),
-                            bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][2]),
-                            bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][3]),
+                	face->getNodes(bl_vertices[Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][0]],
+                            bl_vertices[Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][1]],
+                            bl_vertices[Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][2]],
+                            bl_vertices[Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][3]],
                             nodes);
                 }
             else {
@@ -226,11 +229,11 @@ void MeshImplementation::preMeshStructured(Topo::Block* bl)
             		throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne avec cote == 5 alors qu'il y a une face dégénérée", TkUtil::Charset::UTF_8));
 
                 // recherche du sens
-                if (bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][1]) == face->getVertex(1)
-                        && bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][2]) == face->getVertex(2))
+                if (bl_vertices[Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][1]] == face->getVertices()[1]
+                        && bl_vertices[Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][2]] == face->getVertices()[2])
                     face->getNodes(0, true, nodes);
-                else if (bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][1]) == face->getVertex(2)
-                        && bl->getVertex(Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][2]) == face->getVertex(1))
+                else if (bl_vertices[Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][1]] == face->getVertices()[2]
+                        && bl_vertices[Topo::TopoHelper::tabIndVtxByFaceOnDegBlock[cote][2]] == face->getVertices()[1])
                     face->getNodes(3, false, nodes);
                 else {
 					TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -268,10 +271,10 @@ void MeshImplementation::preMeshStructured(Topo::Block* bl)
         else {
             // cas de la dernière face dégénérées
             // 3 cas possibles: en un point ou suivant l'un des 2 côtés
-
-            if (bl->getNbVertices() == 5){
+            std::vector<Topo::Face*> bl_faces = bl->getFaces();
+            if (bl_vertices.size() == 5){
                 // copie le noeud au sommet
-                gmds::Node node = getGMDSMesh().get<gmds::Node>(bl->getVertex(4)->getNode());
+                gmds::Node node = getGMDSMesh().get<gmds::Node>(bl_vertices[4]->getNode());
                 Utils::Math::Point pt = getCoordNode(node);
                 for(uint jface=0, jbloc=jblocdep; jface<jfacesize; jface++, jbloc+=jblocpas)
                     for(uint iface=0, ibloc=iblocdep; iface<ifacesize; iface++, ibloc+=iblocpas){
@@ -279,10 +282,10 @@ void MeshImplementation::preMeshStructured(Topo::Block* bl)
                         l_points[ibloc+jbloc] = pt;
                     }
             }
-            else if (bl->getFace(0)->getNbVertices() == 3
-                    && bl->getFace(1)->getNbVertices() == 3
-                    && bl->getFace(2)->getNbVertices() == 4
-                    && bl->getFace(3)->getNbVertices() == 4) {
+            else if (bl_faces[0]->getVertices().size() == 3
+                    && bl_faces[1]->getVertices().size() == 3
+                    && bl_faces[2]->getVertices().size() == 4
+                    && bl_faces[3]->getVertices().size() == 4) {
 
                 // La face dégénérée étant la dernière, on utilise ce qui a été
                 // remplit par les autres faces (les arêtes de cette face) pour remplir l'intérieur
@@ -294,10 +297,10 @@ void MeshImplementation::preMeshStructured(Topo::Block* bl)
                     }
 
             }
-            else if (bl->getFace(0)->getNbVertices() == 4
-                    && bl->getFace(1)->getNbVertices() == 4
-                    && bl->getFace(2)->getNbVertices() == 3
-                    && bl->getFace(3)->getNbVertices() == 3) {
+            else if (bl_faces[0]->getVertices().size() == 4
+                    && bl_faces[1]->getVertices().size() == 4
+                    && bl_faces[2]->getVertices().size() == 3
+                    && bl_faces[3]->getVertices().size() == 3) {
 
                 for(uint jface=0, jbloc=jblocdep; jface<jfacesize; jface++, jbloc+=jblocpas)
                     for(uint iface=0, ibloc=iblocdep; iface<ifacesize; iface++, ibloc+=iblocpas){
@@ -311,7 +314,7 @@ void MeshImplementation::preMeshStructured(Topo::Block* bl)
                 message << "Erreur interne dans MeshImplementation::meshStructured pour le bloc"
                         << bl->getName() << ", les faces dégénérées ne rentre pas dans l'une des 3 possibilitées";
                 throw TkUtil::Exception (message);
-            } // else ... (bl->getNbVertices() == 5)
+            } // else ... (bl->getVertices().size() == 5)
 
         } // end else (cote<bl->getNbFaces())
     } // end for cote<6
@@ -460,19 +463,21 @@ void MeshImplementation::preMeshStructured(Topo::CoFace* coface)
         }
 
         // cas pour les arêtes non dégénérées
-        if (cote<coface->getNbEdges()){
-            Topo::Edge* arete = coface->getEdge(cote);
+        const std::vector<Topo::Edge* >& cf_edges = coface->getEdges();
+        const std::vector<Topo::Vertex* >& cf_vertices = coface->getVertices();
+        if (cote<cf_edges.size()){
+            Topo::Edge* arete = cf_edges[cote];
 
             // demander les points de l'arête avec respect de l'ordre des sommets internes de la face
             std::vector<gmds::Node> nodes;
-            if (coface->getNbVertices() == 4)
-                arete->getNodes(coface->getVertex(Topo::TopoHelper::tabIndVtxByEdgeOnFace[cote][0]),
-                		coface->getVertex(Topo::TopoHelper::tabIndVtxByEdgeOnFace[cote][1]),
+            if (cf_vertices.size() == 4)
+                arete->getNodes(cf_vertices[Topo::TopoHelper::tabIndVtxByEdgeOnFace[cote][0]],
+                		cf_vertices[Topo::TopoHelper::tabIndVtxByEdgeOnFace[cote][1]],
                         nodes);
             else {
             	assert(cote<5);
-                arete->getNodes(coface->getVertex(Topo::TopoHelper::tabIndVtxByEdgeOnDegFace[cote][0]),
-                		coface->getVertex(Topo::TopoHelper::tabIndVtxByEdgeOnDegFace[cote][1]),
+                arete->getNodes(cf_vertices[Topo::TopoHelper::tabIndVtxByEdgeOnDegFace[cote][0]],
+                		cf_vertices[Topo::TopoHelper::tabIndVtxByEdgeOnDegFace[cote][1]],
                         nodes);
             }
 
@@ -487,8 +492,8 @@ void MeshImplementation::preMeshStructured(Topo::CoFace* coface)
         else {
             // cas d'une arête dégénérées (la dernière)
             uint jface = 0;
-            uint nbPtI = coface->getEdge(cote-2)->getNbNodes();
-            gmds::Node node = getGMDSMesh().get<gmds::Node>(coface->getVertex(0)->getNode());
+            uint nbPtI = cf_edges[cote-2]->getNbNodes();
+            gmds::Node node = getGMDSMesh().get<gmds::Node>(cf_vertices[0]->getNode());
             for(uint iarete=0, jface=idep[cote]; iarete<nbPtI; iarete++, jface+=ipas[cote]){
                 coface->nodes()[jface] = node.id();
                 l_points[jface] = getCoordNode(node);
@@ -1005,7 +1010,9 @@ void MeshImplementation::_addRegionsInVolumes(Mesh::CommandCreateMesh* command, 
     uint jBegin = 0, jEnd = nbBrasJ;
     uint kBegin = 0, kEnd = nbBrasK;
 
-    if (bl->getNbVertices() != 8) // K MAX
+    std::vector<Topo::Face*> bl_faces = bl->getFaces();
+    std::vector<Topo::Vertex*> bl_vertices = bl->getVertices();
+    if (bl_vertices.size() != 8) // K MAX
         kEnd-=1;
 
     gmds::Mesh& gmds_mesh = getGMDSMesh();
@@ -1147,9 +1154,9 @@ void MeshImplementation::_addRegionsInVolumes(Mesh::CommandCreateMesh* command, 
     } // for (uint k=kBegin; k<kEnd; k++) {
 
     // s'il y a une dégénérescence, on traite ici la création d'une couche de mailles
-    if (bl->getNbVertices() != 8){  // K MAX
-        bool degI = (bl->getFace(2)->getNbVertices() == 3);
-        bool degJ = (bl->getFace(0)->getNbVertices() == 3);
+    if (bl_vertices.size() != 8){  // K MAX
+        bool degI = (bl_faces[2]->getVertices().size() == 3);
+        bool degJ = (bl_faces[0]->getVertices().size() == 3);
 
         if(!areRegionsTested) {
         	for (uint k=kEnd; k<kEnd+1; k++) {
@@ -1337,7 +1344,7 @@ void MeshImplementation::_addRegionsInVolumes(Mesh::CommandCreateMesh* command, 
         	} // for (uint j=jBegin; j<jEnd; j++) {
         } // for (uint k=kEnd; k<kEnd+1; k++) {
 
-	} // if (bl->getNbVertices() != 8){  // K MAX
+	} // if (bl->getVertices().size() != 8){  // K MAX
 
 #undef nodeIJ
 
@@ -1361,7 +1368,7 @@ void MeshImplementation::_addRegionsInVolumes(Mesh::CommandCreateMesh* command, 
         }
         // le volume de maillage que l'on vient de créer/modifier
         Mesh::Volume* vol = getContext().getMeshManager().getVolume(nom);
-        vol->addBlock(bl);
+        vol->add(bl);
         if (isNewVolume)
             getContext().newGraphicalRepresentation (*vol);
     } // end for i<groupsName.size()
@@ -1419,7 +1426,7 @@ void MeshImplementation::_addFacesInSurfaces(Mesh::CommandCreateMesh* command, T
     uint jBegin = 0, jEnd = nbBrasJ;
 
     // les triangles (juste à une extrémité: j_max)
-    if (fa->getNbVertices() == 3){
+    if (fa->getVertices().size() == 3){
         jEnd-=1;
         for (uint i=iBegin; i<iEnd; i++)
             for (uint j=jEnd; j<jEnd+1; j++){
@@ -1477,7 +1484,7 @@ void MeshImplementation::_addFacesInSurfaces(Mesh::CommandCreateMesh* command, T
         }
         // la surface de maillage que l'on vient de créer/modifier
         Mesh::Surface* sf = getContext().getMeshManager().getSurface(nom);
-        sf->addCoFace(fa);
+        sf->add(fa);
     } // end for i<groupsName.size()
 
     if (isOpposite){

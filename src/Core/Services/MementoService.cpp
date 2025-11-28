@@ -7,6 +7,7 @@
 #include "Geom/Volume.h"
 #include "Topo/TopoManager.h"
 #include "Internal/Context.h"
+#include "Group/GroupManager.h"
 #include <TopoDS.hxx>
 
 namespace Mgx3D::Services
@@ -20,7 +21,6 @@ namespace Mgx3D::Services
             {
                 fillCommonFields(v);
                 mem.curves = const_cast<std::vector<Geom::Curve *> &>(v->getCurves());
-                mem.groups0D = const_cast<std::vector<Group::Group0D *> &>(v->getGroups());
                 mem.occ_shapes = {v->getOCCVertex()};
             }
 
@@ -29,7 +29,6 @@ namespace Mgx3D::Services
                 fillCommonFields(c);
                 mem.surfaces = const_cast<std::vector<Geom::Surface *> &>(c->getSurfaces());
                 mem.vertices = const_cast<std::vector<Geom::Vertex *> &>(c->getVertices());
-                mem.groups1D = const_cast<std::vector<Group::Group1D *> &>(c->getGroups());
                 std::vector<TopoDS_Shape> shapes;
                 for (auto e : c->getOCCEdges())
                     shapes.push_back(e);
@@ -41,7 +40,6 @@ namespace Mgx3D::Services
                 fillCommonFields(s);
                 mem.curves = const_cast<std::vector<Geom::Curve *> &>(s->getCurves());
                 mem.volumes = const_cast<std::vector<Geom::Volume *> &>(s->getVolumes());
-                mem.groups2D = const_cast<std::vector<Group::Group2D *> &>(s->getGroups());
                 std::vector<TopoDS_Shape> shapes;
                 for (auto f : s->getOCCFaces())
                     shapes.push_back(f);
@@ -52,7 +50,6 @@ namespace Mgx3D::Services
             {
                 fillCommonFields(v);
                 mem.surfaces = const_cast<std::vector<Geom::Surface *> &>(v->m_surfaces);
-                mem.groups3D = const_cast<std::vector<Group::Group3D *> &>(v->m_groups);
                 mem.occ_shapes = {v->getOCCShape()};
             }
 
@@ -60,6 +57,8 @@ namespace Mgx3D::Services
             {
         		Topo::TopoManager& tm = e->getContext().getTopoManager();
                 mem.topo_entities = tm.getRefTopos(e);
+        		Group::GroupManager& gm = e->getContext().getGroupManager();
+                mem.groups = gm.getGroupsFor(e);
                 mem.property = e->getGeomProperty();
             }
 
@@ -93,7 +92,6 @@ namespace Mgx3D::Services
             void visit(Geom::Vertex *v) override
             {
                 v->m_curves = m_mem.curves;
-                v->m_groups = m_mem.groups0D;
                 v->m_occ_vertex = TopoDS::Vertex(m_mem.occ_shapes[0]);
                 setCommonFields(v);
             }
@@ -102,7 +100,6 @@ namespace Mgx3D::Services
             {
                 c->m_surfaces = m_mem.surfaces;
                 c->m_vertices = m_mem.vertices;
-                c->m_groups = m_mem.groups1D;
                 c->m_occ_edges.clear();
                 for (auto sh : m_mem.occ_shapes)
                     c->m_occ_edges.push_back(TopoDS::Edge(sh));
@@ -113,7 +110,6 @@ namespace Mgx3D::Services
             {
                 s->m_curves = m_mem.curves;
                 s->m_volumes = m_mem.volumes;
-                s->m_groups = m_mem.groups2D;
                 s->m_occ_faces.clear();
                 for (auto sh : m_mem.occ_shapes)
                     s->m_occ_faces.push_back(TopoDS::Face(sh));
@@ -123,7 +119,6 @@ namespace Mgx3D::Services
             void visit(Geom::Volume *v) override
             {
                 v->m_surfaces = m_mem.surfaces;
-                v->m_groups = m_mem.groups3D;
                 v->m_occ_shape = m_mem.occ_shapes[0];
                 setCommonFields(v);
             }
@@ -132,6 +127,8 @@ namespace Mgx3D::Services
             {
         		Topo::TopoManager& tm = e->getContext().getTopoManager();
                 tm.setRefTopos(e, m_mem.topo_entities);
+        		Group::GroupManager& gm = e->getContext().getGroupManager();
+                gm.setGroupsFor(e, m_mem.groups);
                 e->setGeomProperty(m_mem.property);
                 e->forceComputeArea();
             }

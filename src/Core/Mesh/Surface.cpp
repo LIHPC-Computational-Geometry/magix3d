@@ -225,49 +225,39 @@ void Surface::getRepresentation(Utils::DisplayRepresentation& dr, bool checkDest
     // cf VTKGMDSEntityRepresentation
 }
 /*----------------------------------------------------------------------------*/
-bool Surface::isA(std::string& name)
-{
-    MGX_NOT_YET_IMPLEMENTED("Il n'est pas prévu de faire un tel test");
-    //return (name.compare(0,strlen(typeNameMeshSurface),typeNameMeshSurface) == 0);
-    return false;
-}
-/*----------------------------------------------------------------------------*/
 TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const Surface & cl)
 {
     o << cl.getName() << " (uniqueId " << cl.getUniqueId() << ", Name "<<cl.getName()<<")";
     return o;
 }
 /*----------------------------------------------------------------------------*/
-void Surface::addCoFace(Topo::CoFace* f)
+void Surface::add(Topo::CoFace* f)
 {
-    m_topo_property->getCoFaceContainer().add(f);
+    m_topo_property->getCoFaceContainer().push_back(f);
 }
 /*----------------------------------------------------------------------------*/
-void Surface::removeCoFace(Topo::CoFace* f)
+void Surface::remove(Topo::CoFace* f)
 {
-    m_topo_property->getCoFaceContainer().remove(f, true);
+    Utils::remove(f, m_topo_property->getCoFaceContainer());
 }
 /*----------------------------------------------------------------------------*/
-void Surface::getCoFaces(std::vector<Topo::CoFace* >& faces) const
+const std::vector<Topo::CoFace* >& Surface::getCoFaces() const
 {
-    m_topo_property->getCoFaceContainer().checkIfDestroyed();
-    m_topo_property->getCoFaceContainer().get(faces);
+    Utils::checkIfDestroyed(m_topo_property->getCoFaceContainer());
+    return m_topo_property->getCoFaceContainer();
 }
 /*----------------------------------------------------------------------------*/
 void Surface::getGMDSFaces(std::vector<gmds::Face >& AFaces) const
 {
     AFaces.clear();
 
-    std::vector<Topo::CoFace* > coFaces;
-    getCoFaces(coFaces);
-
     Mesh::MeshItf*              meshItf  = getMeshManager ( ).getMesh ( );
     Mesh::MeshImplementation*   meshImpl = dynamic_cast<Mesh::MeshImplementation*> (meshItf);
     CHECK_NULL_PTR_ERROR(meshImpl);
     gmds::Mesh&  gmdsMesh = meshImpl->getGMDSMesh();
 
-    for(unsigned int iCoFace=0; iCoFace<coFaces.size(); iCoFace++) {
-        std::vector<gmds::TCellID> faces  = coFaces[iCoFace]->faces();
+    for(Topo::CoFace* coface : getCoFaces()) {
+        std::vector<gmds::TCellID> faces  = coface->faces();
 
         for(unsigned int iFace=0; iFace<faces.size(); iFace++) {
             AFaces.push_back(gmdsMesh.get<gmds::Face>(faces[iFace]));
@@ -282,16 +272,13 @@ void Surface::getGMDSNodes(std::vector<gmds::Node>& ANodes) const
 	// utilisation d'un filtre pour ne pas référencer plusieurs fois un même noeud
 	std::map<gmds::TCellID, uint> filtre_nodes;
 
-    std::vector<Topo::CoFace* > coFaces;
-    getCoFaces(coFaces);
-
     Mesh::MeshItf*              meshItf  = getMeshManager ( ).getMesh ( );
     Mesh::MeshImplementation*   meshImpl = dynamic_cast<Mesh::MeshImplementation*> (meshItf);
     CHECK_NULL_PTR_ERROR(meshImpl);
     gmds::Mesh&  gmdsMesh = meshImpl->getGMDSMesh();
 
-    for(unsigned int iCoFace=0; iCoFace<coFaces.size(); iCoFace++) {
-    	std::vector<gmds::TCellID> nodes  = coFaces[iCoFace]->nodes();
+    for(Topo::CoFace* coface : getCoFaces()) {
+    	std::vector<gmds::TCellID> nodes  = coface->nodes();
 
     	for(unsigned int iNode=0; iNode<nodes.size(); iNode++) {
     		if (filtre_nodes[nodes[iNode]] == 0){
@@ -308,8 +295,7 @@ getDescription (bool alsoComputed) const
     std::unique_ptr<Utils::SerializedRepresentation>   description (
             MeshEntity::getDescription (alsoComputed));
 
-    std::vector<Topo::CoFace* > faces;
-    getCoFaces(faces);
+    auto faces = getCoFaces();
 
     // le maillage vu depuis les cofaces
     Utils::SerializedRepresentation  meshProprietes ("Propriétés du maillage", "");
@@ -375,10 +361,8 @@ saveInternals(Mesh::CommandCreateMesh* ccm)
 bool Surface::
 isStructured()
 {
-    std::vector<Topo::CoFace* > coFaces;
-    getCoFaces(coFaces);
-    for(unsigned int iCoFace=0; iCoFace<coFaces.size(); iCoFace++)
-    	if (!coFaces[iCoFace]->isStructured())
+    for(Topo::CoFace* coface : getCoFaces())
+    	if (!coface->isStructured())
     		return false;
 
     return true;

@@ -2,7 +2,7 @@
 #include "Internal/InfoCommand.h"
 #include "Internal/Context.h"
 #include "Group/GroupManager.h"
-#include "Group/Group3D.h"
+#include "Group/GroupEntity.h"
 #include "Geom/Volume.h"
 #include "Topo/TopoEntity.h"
 #include "Topo/Block.h"
@@ -112,21 +112,12 @@ internalRedo()
 void CommandCreateSubVolumeBetweenSheets::
 selectCoFaces(std::map<Topo::CoFace*, uint>& filtre_coface)
 {
-	for (uint j=0; j<m_blocks.size(); j++){
-		Topo::Block* blk = m_blocks[j];
-
+	for (Topo::Block* blk : m_blocks) {
 		if (blk->isStructured() && blk->isMeshed()){
-
-			std::vector<Topo::CoFace* > cofaces;
-
-			blk->getCoFaces(cofaces);
-
-			for (std::vector<Topo::CoFace* >::iterator iter1 = cofaces.begin();
-					iter1 != cofaces.end(); ++iter1){
-				filtre_coface[*iter1] = 1;
+			for (Topo::CoFace* coface : blk->getCoFaces()) {
+				filtre_coface[coface] = 1;
 				//std::cout<<"filtre_coface à 1 pour "<<(*iter1)->getName()<<std::endl;
 			}
-
 		} // end if (blk->isStructured() && blk->isMeshed())
 		else if (!blk->isStructured()){
 			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -140,7 +131,7 @@ selectCoFaces(std::map<Topo::CoFace*, uint>& filtre_coface)
     			    <<" n'est pas maillé";
 			throw TkUtil::Exception(message);
 		}
-	} // end for j
+	} // end for blk
 }
 /*----------------------------------------------------------------------------*/
 void CommandCreateSubVolumeBetweenSheets::
@@ -167,8 +158,7 @@ computePosCoEdge(std::map<Topo::CoFace*, uint>& filtre_coface,
 #ifdef _DEBUG_SHEETS
         std::cout<<"### coedge : "<<coedge_dep->getName()<<", pos1 : "<<pos1<<", pos2 : "<<pos2<<std::endl;
 #endif
-        std::vector<Topo::CoFace* > cofaces;
-        coedge_dep->getCoFaces(cofaces);
+        std::vector<Topo::CoFace* > cofaces = coedge_dep->getCoFaces();
 
         for (std::vector<Topo::CoFace* >::iterator iter1 = cofaces.begin();
                 iter1 != cofaces.end(); ++iter1){
@@ -184,19 +174,20 @@ computePosCoEdge(std::map<Topo::CoFace*, uint>& filtre_coface,
                 // recherche du côté dans lequel est cette arête, et le nombre de bras de maillage jusqu'à la coupe
                 Topo::Edge* edge_dep = coface->getEdgeContaining(coedge_dep);
                 //std::cout<<"edge_dep : "<<*edge_dep;
-                uint ind_edge_dep = coface->getIndex(edge_dep);
+                uint ind_edge_dep = Utils::getIndexOf(edge_dep, coface->getEdges());
 
                 // direction de la face qui est coupée
                 Topo::CoFace::eDirOnCoFace dirCoFaceSplit = (ind_edge_dep%2?Topo::CoFace::i_dir:Topo::CoFace::j_dir);
 
                 Topo::Vertex* vertex1;
                 Topo::Vertex* vertex2;
+                const std::vector<Topo::Vertex* >& cf_vertices = coface->getVertices();
                 if (dirCoFaceSplit == Topo::CoFace::i_dir){
-                    vertex1 = coface->getVertex(1);
-                    vertex2 = coface->getVertex(0);
+                    vertex1 = cf_vertices[1];
+                    vertex2 = cf_vertices[0];
                 } else {
-                    vertex1 = coface->getVertex(1);
-                    vertex2 = coface->getVertex(2);
+                    vertex1 = cf_vertices[1];
+                    vertex2 = cf_vertices[2];
                 }
 
                 if (ind_edge_dep>1){
@@ -233,14 +224,15 @@ computePosCoEdge(std::map<Topo::CoFace*, uint>& filtre_coface,
 
                 Topo::Edge* edge_ar = 0;
                 // si on est sur le côté face à la dégénérescence, on met à 0 l'arête d'arrivée
-                if (coface->getNbEdges() == 4){
+                const std::vector<Topo::Edge* > & cf_edges = coface->getEdges();
+                if (cf_edges.size() == 4){
                     uint ind_edge_ar = (ind_edge_dep+2)%4;
-                    edge_ar = coface->getEdge(ind_edge_ar);
+                    edge_ar = cf_edges[ind_edge_ar];
                 } else {
                     if (ind_edge_dep == 0)
-                        edge_ar = coface->getEdge(2);
+                        edge_ar = cf_edges[2];
                     else if (ind_edge_dep == 2)
-                        edge_ar = coface->getEdge(0);
+                        edge_ar = cf_edges[0];
                     else
                         edge_ar = 0;
                 }
@@ -339,9 +331,10 @@ computePosBlock(std::map<Topo::CoEdge*, uint> &filtre1_coedge,
     		std::cout<<"getCoEdgesBetweenVertices entre "<<bloc->getVertex(0)->getName()
                         		<<" et "<<bloc->getVertex(ind_vtx)->getName()<<" d'indice "<<ind_vtx<<std::endl;
 #endif
-    		Topo::TopoHelper::getCoEdgesBetweenVertices(bloc->getVertex(0), bloc->getVertex(ind_vtx), iCoedges[i], coedges_between);
+            std::vector<Topo::Vertex*> vertices = bloc->getVertices();
+    		Topo::Vertex* vtx = vertices[0];
+    		Topo::TopoHelper::getCoEdgesBetweenVertices(vtx, vertices[ind_vtx], iCoedges[i], coedges_between);
 
-    		Topo::Vertex* vtx = bloc->getVertex(0);
     		for (std::vector<Topo::CoEdge* >::iterator iter3 = coedges_between.begin();
     				iter3 != coedges_between.end(); ++iter3){
     			Topo::CoEdge* coedge = *iter3;
@@ -353,7 +346,7 @@ computePosBlock(std::map<Topo::CoEdge*, uint> &filtre1_coedge,
     				dir = (Topo::Block::eDirOnBlock)i;
     				uint ratio = ratios[coedge];
     				uint dec = ratio-1;
-    				if (vtx == coedge->getVertex(0)){
+    				if (vtx == coedge->getVertices()[0]){
     					pos1_blk += (filtre1_coedge[coedge]+dec)/ratio;
     					pos2_blk += (filtre2_coedge[coedge]+dec)/ratio;
     				}
@@ -394,7 +387,7 @@ createSubVolume(std::vector<BlockDirPos>& bloc_dirPos)
     Mesh::SubVolume* sv = getContext().getMeshManager().getNewSubVolume(m_group_name, &getInfoCommand());
 
     // recherche le groupe 3D et le construit si nécessaire
-    Group::Group3D* gr = getContext().getGroupManager().getNewGroup3D(m_group_name, &getInfoCommand());
+    Group::Group3D* gr = getContext().getGroupManager().getNewGroup<Group::Group3D>(m_group_name, &getInfoCommand());
     gr->setLevel(0);
     sv->getDisplayProperties().setDisplayed(gr->isVisible());
     if (!gr->find(sv))

@@ -54,107 +54,39 @@ public:
 	} groupOperation;
 
     /*------------------------------------------------------------------------*/
-    /** \brief  Constructeur avec une liste de volumes
+    /** \brief Constructeur avec une liste d'entités géométriques de même dimension
      *
      *  \param c le contexte
-     *  \param volumes les volumes à ajouter au groupe
+     *  \param entities les entités géométriques à ajouter au groupe
+     *  \param dim la dimension des entités
      *  \param groupName le nom du groupe auquel on ajoute les entités
      *  \param ope le type d'opération
      */
     CommandAddRemoveGroupName(Internal::Context& c,
-            std::vector<Geom::Volume*>& volumes,
-            const std::string& groupName,
-            groupOperation ope);
-
-    /** \brief  Constructeur avec une liste de surfaces
-     *
-     *  \param c le contexte
-     *  \param surfaces les surfaces à ajouter au groupe
-     *  \param groupName le nom du groupe auquel on ajoute les entités
-     *  \param add si on est dans le cas d'un ajout
-     */
-    CommandAddRemoveGroupName(Internal::Context& c,
-            std::vector<Geom::Surface*>& surfaces,
-            const std::string& groupName,
-            groupOperation ope);
-
-    /** \brief  Constructeur avec une liste de courbes
-     *
-     *  \param c le contexte
-     *  \param curves les courbes à ajouter au groupe
-     *  \param groupName le nom du groupe auquel on ajoute les entités
-     *  \param add si on est dans le cas d'un ajout
-     */
-    CommandAddRemoveGroupName(Internal::Context& c,
-            std::vector<Geom::Curve*>& curves,
-            const std::string& groupName,
-            groupOperation ope);
-
-    /** \brief  Constructeur avec une liste de sommets géométriques
-     *
-     *  \param c le contexte
-     *  \param vertices les sommets à ajouter au groupe
-     *  \param groupName le nom du groupe auquel on ajoute les entités
-     *  \param add si on est dans le cas d'un ajout
-     */
-    CommandAddRemoveGroupName(Internal::Context& c,
-            std::vector<Geom::Vertex*>& vertices,
+            std::vector<Geom::GeomEntity*>& entities,
+            const int dim,
             const std::string& groupName,
             groupOperation ope);
 
     /*------------------------------------------------------------------------*/
-    /** \brief  Constructeur avec une liste de blocs
+    /** \brief Constructeur avec une liste d'entités topologiques de même dimension
      *
      *  \param c le contexte
-     *  \param blocks les blocs à ajouter au groupe
+     *  \param entities les entités topologiques à ajouter au groupe
+     *  \param dim la dimension des entités
      *  \param groupName le nom du groupe auquel on ajoute les entités
      *  \param ope le type d'opération
      */
     CommandAddRemoveGroupName(Internal::Context& c,
-            std::vector<Topo::Block*>& blocks,
-            const std::string& groupName,
-            groupOperation ope);
-
-    /** \brief  Constructeur avec une liste de cofaces
-     *
-     *  \param c le contexte
-     *  \param cofaces les cofaces à ajouter au groupe
-     *  \param groupName le nom du groupe auquel on ajoute les entités
-     *  \param ope le type d'opération
-     */
-    CommandAddRemoveGroupName(Internal::Context& c,
-            std::vector<Topo::CoFace*>& cofaces,
-            const std::string& groupName,
-            groupOperation ope);
-
-    /** \brief  Constructeur avec une liste de coedges
-     *
-     *  \param c le contexte
-     *  \param coedges les coedges à ajouter au groupe
-     *  \param groupName le nom du groupe auquel on ajoute les entités
-     *  \param ope le type d'opération
-     */
-    CommandAddRemoveGroupName(Internal::Context& c,
-            std::vector<Topo::CoEdge*>& coedges,
-            const std::string& groupName,
-            groupOperation ope);
-
-    /** \brief  Constructeur avec une liste de sommets topologiques
-     *
-     *  \param c le contexte
-     *  \param vertices les sommets à ajouter au groupe
-     *  \param groupName le nom du groupe auquel on ajoute les entités
-     *  \param ope le type d'opération
-     */
-    CommandAddRemoveGroupName(Internal::Context& c,
-            std::vector<Topo::Vertex*>& vertices,
+            std::vector<Topo::TopoEntity*>& entities,
+            const int dim,
             const std::string& groupName,
             groupOperation ope);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur
      */
-    virtual ~CommandAddRemoveGroupName();
+    ~CommandAddRemoveGroupName() = default;
 
     /*------------------------------------------------------------------------*/
     /** \brief  exécute la commande
@@ -170,20 +102,15 @@ public:
      */
     void internalRedo();
 
+private:
     /*------------------------------------------------------------------------*/
     ///  met à jour les relation entre volumes de maillage et la topologie
-    void updateMesh(Geom::Volume* vol, std::string grpName, bool add);
+    void updateMesh(Geom::GeomEntity* e, std::string grpName, bool add);
+    void updateMesh(Topo::TopoEntity* e, std::string grpName, bool add);
     void updateMesh(std::vector<Topo::Block*>& blocs, std::string grpName, bool add);
-
-    ///  met à jour les relation entre surface de maillage et la topologie
-    void updateMesh(Geom::Surface* surf, std::string grpName, bool add);
     void updateMesh(std::vector<Topo::CoFace*>& cofaces, std::string grpName, bool add);
-
-    ///  met à jour les relation entre nuages de maillage et la topologie
-    void updateMesh(Geom::Curve* crv, std::string grpName, bool add);
     void updateMesh(std::vector<Topo::CoEdge*>& coedges, std::string grpName, bool add);
 
-private:
     /// helper pour la gestion des groupes dans les commandes
     Group::GroupHelperForCommand m_group_helper;
 

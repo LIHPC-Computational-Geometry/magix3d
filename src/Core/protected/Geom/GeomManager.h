@@ -1439,15 +1439,6 @@ public:
     /** Retourne le nom du dernier Vertex */
     std::string getLastVertex() const;
 
-    /** Retourne l'indice du sommet v*/
-    int getIndexOf(Vertex* v) const;
-    /** Retourne l'indice de la courbe c*/
-    int getIndexOf(Curve* c) const;
-    /** Retourne l'indice de la surface s*/
-    int getIndexOf(Surface* s) const;
-    /** Retourne l'indice du volume v*/
-    int getIndexOf(Volume* v) const;
-
     /** Ajoute un groupe à un ensemble d'entités géométriques, suivant une dimension */
     Internal::M3DCommandResult* addToGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
     SET_SWIG_COMPLETABLE_METHOD(addToGroup)
@@ -1466,7 +1457,14 @@ public:
 #endif
 
 private:
-	/// Retourne vrai si l'une des entités géométriques a un lien sur une entité topologique
+    /// Retourne les entités topologiques filtrées
+    template <typename T, typename = std::enable_if<std::is_base_of<GeomEntity, T>::value>>
+    std::string getLastEntityName(const std::vector<T*>& entities) const;
+
+    /// Retourne une liste d'entités en fonction du nom et de la dimension
+    std::vector<GeomEntity*> getEntitiesFromNames(const std::vector<std::string>& names, const int dim) const;
+
+    /// Retourne vrai si l'une des entités géométriques a un lien sur une entité topologique
 	bool hasRefTopo(std::vector<Geom::GeomEntity*>& entities);
 
     /** volumes gérés par le manager */

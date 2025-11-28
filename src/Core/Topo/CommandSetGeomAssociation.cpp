@@ -154,11 +154,10 @@ void CommandSetGeomAssociation::validGroupsName(TopoEntity* te)
 	if (te == 0 || m_geom_entity == 0)
 		return;
 
-	std::vector<std::string> te_gn;
-	te->getGroupsName(te_gn, false, true);
-
-	std::vector<std::string> ge_gn;
-	m_geom_entity->getGroupsName(ge_gn);
+	Group::GroupManager& gm = getContext().getGroupManager();
+	Group::GroupHelperForCommand ghfc(getInfoCommand(), gm);
+	std::vector<std::string> te_gn = Utils::toNames(ghfc.getGroupsFor(te));
+	std::vector<std::string> ge_gn = Utils::toNames(gm.getGroupsFor(m_geom_entity));
 
 #ifdef _DEBUG2
 	std::cout<<"validGroupsName("<<te->getName()<<")"<<std::endl;
@@ -198,8 +197,7 @@ void CommandSetGeomAssociation::project(CoFace* coface)
 	coface->saveTopoProperty();
 	coface->setGeomAssociation(m_geom_entity);
 
-	std::vector<CoEdge*> coedges;
-	coface->getCoEdges(coedges);
+	std::vector<CoEdge*> coedges = coface->getCoEdges();
 
 	// on passe en mode transfini dès lors que l'on change l'association
 	if (coface->getMeshLaw() < Topo::CoFaceMeshingProperty::transfinite){
@@ -218,13 +216,14 @@ void CommandSetGeomAssociation::project(CoFace* coface)
 				project(coedge);
 
 			// on cherche à projeter les arêtes sur les courbes de la surface autant que possible
-			if (coedge->getNbVertices() == 2){
-				if (coedge->getVertex(0)->getGeomAssociation() && coedge->getVertex(0)->getGeomAssociation()->getDim()==0
-						&& coedge->getVertex(1)->getGeomAssociation() && coedge->getVertex(1)->getGeomAssociation()->getDim()==0){
+			const std::vector<Topo::Vertex*> coedge_vertices = coedge->getVertices();
+			if (coedge_vertices.size() == 2){
+				if (coedge_vertices[0]->getGeomAssociation() && coedge_vertices[0]->getGeomAssociation()->getDim()==0
+						&& coedge_vertices[1]->getGeomAssociation() && coedge_vertices[1]->getGeomAssociation()->getDim()==0){
 
 					// recherche s'il y a une courbe entre ces 2 sommets
-					Geom::Vertex* vtx1 = dynamic_cast<Geom::Vertex*>(coedge->getVertex(0)->getGeomAssociation());
-					Geom::Vertex* vtx2 = dynamic_cast<Geom::Vertex*>(coedge->getVertex(1)->getGeomAssociation());
+					Geom::Vertex* vtx1 = dynamic_cast<Geom::Vertex*>(coedge_vertices[0]->getGeomAssociation());
+					Geom::Vertex* vtx2 = dynamic_cast<Geom::Vertex*>(coedge_vertices[1]->getGeomAssociation());
 					CHECK_NULL_PTR_ERROR(vtx1);
 					CHECK_NULL_PTR_ERROR(vtx2);
 
@@ -254,11 +253,8 @@ void CommandSetGeomAssociation::project(CoEdge* coedge)
 	coedge->saveTopoProperty();
 	coedge->setGeomAssociation(m_geom_entity);
 
-	std::vector<Vertex*> vertices;
-	coedge->getVertices(vertices);
-
-	for (std::vector<Vertex*>::iterator iter = vertices.begin();
-			iter != vertices.end(); ++iter){
+	const std::vector<Vertex*>& vertices = coedge->getVertices();
+	for (auto iter = vertices.begin(); iter != vertices.end(); ++iter){
 		Vertex* vtx = *iter;
 
 		// on propage si on projète sur une entité de dimension inférieure à la projection précédente

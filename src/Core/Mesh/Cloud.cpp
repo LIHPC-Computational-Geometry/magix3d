@@ -86,49 +86,42 @@ void Cloud::getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestro
     // cf VTKGMDSEntityRepresentation
 }
 /*----------------------------------------------------------------------------*/
-bool Cloud::isA(std::string& name)
-{
-    MGX_NOT_YET_IMPLEMENTED("Il n'est pas prévu de faire un tel test");
-//    return (name.compare(0,strlen(typeNameMeshCloud),typeNameMeshCloud) == 0);
-    return false;
-}
-/*----------------------------------------------------------------------------*/
 TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const Cloud & cl)
 {
     o << cl.getName() << " (uniqueId " << cl.getUniqueId() << ", Name "<<cl.getName()<<")";
     return o;
 }
 /*----------------------------------------------------------------------------*/
-void Cloud::addCoEdge(Topo::CoEdge* ed)
+void Cloud::add(Topo::CoEdge* ed)
 {
-    m_topo_property->getCoEdgeContainer().add(ed);
+    m_topo_property->getCoEdgeContainer().push_back(ed);
 }
 /*----------------------------------------------------------------------------*/
-void Cloud::removeCoEdge(Topo::CoEdge* ed)
+void Cloud::remove(Topo::CoEdge* ed)
 {
-    m_topo_property->getCoEdgeContainer().remove(ed, true);
+    Utils::remove(ed, m_topo_property->getCoEdgeContainer());
 }
 /*----------------------------------------------------------------------------*/
-void Cloud::getCoEdges(std::vector<Topo::CoEdge* >& edges) const
+const std::vector<Topo::CoEdge* >& Cloud::getCoEdges() const
 {
-    m_topo_property->getCoEdgeContainer().checkIfDestroyed();
-    m_topo_property->getCoEdgeContainer().get(edges);
+    Utils::checkIfDestroyed(m_topo_property->getCoEdgeContainer());
+    return m_topo_property->getCoEdgeContainer();
 }
 /*----------------------------------------------------------------------------*/
-void Cloud::addVertex(Topo::Vertex* vtx)
+void Cloud::add(Topo::Vertex* vtx)
 {
-    m_topo_property->getVertexContainer().add(vtx);
+    m_topo_property->getVertexContainer().push_back(vtx);
 }
 /*----------------------------------------------------------------------------*/
-void Cloud::removeVertex(Topo::Vertex* vtx)
+void Cloud::remove(Topo::Vertex* vtx)
 {
-    m_topo_property->getVertexContainer().remove(vtx, true);
+    Utils::remove(vtx, m_topo_property->getVertexContainer());
 }
 /*----------------------------------------------------------------------------*/
-void Cloud::getVertices(std::vector<Topo::Vertex* >& vertices) const
+const std::vector<Topo::Vertex* >& Cloud::getVertices() const
 {
-    m_topo_property->getVertexContainer().checkIfDestroyed();
-    m_topo_property->getVertexContainer().get(vertices);
+    Utils::checkIfDestroyed(m_topo_property->getVertexContainer());
+    return m_topo_property->getVertexContainer();
 }
 /*----------------------------------------------------------------------------*/
 Utils::SerializedRepresentation* Cloud::
@@ -140,10 +133,8 @@ getDescription (bool alsoComputed) const
     // le maillage vu depuis les arêtes et celui stocké dans GMDS
     Utils::SerializedRepresentation  meshProprietes ("Propriétés du maillage", "");
 
-    std::vector<Topo::CoEdge* > coedges;
-    getCoEdges(coedges);
-    std::vector<Topo::Vertex* > vertices;
-    getVertices(vertices);
+    auto coedges = getCoEdges();
+    auto vertices = getVertices();
 
     uint nbNodes = 0;
     for (uint i=0; i<coedges.size(); i++){
@@ -194,11 +185,6 @@ void Cloud::getGMDSNodes(std::vector<gmds::Node >& ANodes) const
 {
     ANodes.clear();
 
-    std::vector<Topo::CoEdge* > coEdges;
-    getCoEdges(coEdges);
-    std::vector<Topo::Vertex* > vertices;
-    getVertices(vertices);
-
     Mesh::MeshItf*              meshItf     = getMeshManager ( ).getMesh ( );
     Mesh::MeshImplementation*   meshImpl    =
                                 dynamic_cast<Mesh::MeshImplementation*> (meshItf);
@@ -208,8 +194,8 @@ void Cloud::getGMDSNodes(std::vector<gmds::Node >& ANodes) const
     // ajout d'un filtre pour éviter de mettre 2 fois (ou plus) un même noeud
     std::map<gmds::TCellID, uint> filtre;
 
-    for(unsigned int iVertex=0; iVertex<vertices.size(); iVertex++) {
-        gmds::TCellID node  = vertices[iVertex]->getNode();
+    for(Topo::Vertex* vtx : getVertices()) {
+        gmds::TCellID node  = vtx->getNode();
 
         if (filtre[node] == 0){
         	ANodes.push_back(gmdsMesh.get<gmds::Node>(node));
@@ -217,8 +203,8 @@ void Cloud::getGMDSNodes(std::vector<gmds::Node >& ANodes) const
         }
     }
 
-    for(unsigned int iCoEdge=0; iCoEdge<coEdges.size(); iCoEdge++) {
-        std::vector<gmds::TCellID> nodes  = coEdges[iCoEdge]->nodes();
+    for(Topo::CoEdge* coedge : getCoEdges()) {
+        std::vector<gmds::TCellID> nodes  = coedge->nodes();
 
         for(unsigned int iNode=0; iNode<nodes.size(); iNode++) {
             if (filtre[nodes[iNode]] == 0){

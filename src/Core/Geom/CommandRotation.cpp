@@ -83,16 +83,6 @@ void CommandRotation::internalSpecificPreExecute()
     m_impl->prePerform();
 }
 /*----------------------------------------------------------------------------*/
-void CommandRotation::internalSpecificUndo()
-{
-    m_impl->performUndo();
-}
-/*----------------------------------------------------------------------------*/
-void CommandRotation::internalSpecificRedo()
-{
-    m_impl->performRedo();
-}
-/*----------------------------------------------------------------------------*/
 } // end namespace Geom
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D

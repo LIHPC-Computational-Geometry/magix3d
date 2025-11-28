@@ -81,8 +81,7 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
         std::cout <<"=== traitement des arêtes de la face "<<fa->getName()<<std::endl;
 #endif
         // on recupere le maillage des aretes
-        std::vector<Topo::Edge* > edges;
-        fa->getEdges(edges);
+        std::vector<Topo::Edge* > edges = fa->getEdges();
 
         // Set qui contient tous les noeuds gmds
         std::set<gmds::TCellID> gmds_node_ids;
@@ -269,7 +268,7 @@ void MeshImplementation::meshDelaunayGMSH(Mesh::CommandCreateMesh* command, Topo
         // la surface de maillage que l'on vient de créer/modifier
         Mesh::Surface* sf = getContext().getMeshManager().getSurface(nom);
         sf->saveMeshSurfaceTopoProperty(&command->getInfoCommand());
-        sf->addCoFace(fa);
+        sf->add(fa);
     } // end for i<group_names.size()
 
 #ifdef _DEBUG_MESH
