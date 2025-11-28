@@ -1920,18 +1920,27 @@ const std::vector<GroupEntity*>& GroupManager::getGroupsFor(const Geom::GeomEnti
     return m_entities_groups[e];
 }
 /*----------------------------------------------------------------------------*/
-void GroupManager::addGroupFor(const Geom::GeomEntity* e, GroupEntity* g)
+void GroupManager::addGroupFor(Geom::GeomEntity* e, GroupEntity* g)
 {
     if (e->getDim() != g->getDim()) {
         TkUtil::UTF8String messErr (TkUtil::Charset::UTF_8);
         messErr << e->getName() << " doit être de même dimension que " << g->getName();
         throw TkUtil::Exception(messErr);
     }
-    if (!hasGroupFor(e, g))
+    if (!hasGroupFor(e, g)) {
         m_entities_groups[e].push_back(g);
+
+        TkUtil::Color	color (0, 0, 0);
+        if (true == getContext().getGroupColor(m_entities_groups[e], color)) {
+    		e->getDisplayProperties().setCloudColor(color);
+            e->getDisplayProperties().setWireColor(color);
+    		e->getDisplayProperties().setSurfacicColor(color);
+        	e->getDisplayProperties().setFontColor(color);
+    	}	// if (true == getContext ( ).getGroupColor (groups, color))
+    }
 }
 /*----------------------------------------------------------------------------*/
-void GroupManager::setGroupsFor(const Geom::GeomEntity* e, const std::vector<GroupEntity*>& gs)
+void GroupManager::setGroupsFor(Geom::GeomEntity* e, const std::vector<GroupEntity*>& gs)
 {
     m_entities_groups[e].clear();
     for (GroupEntity* g : gs) addGroupFor(e, g);

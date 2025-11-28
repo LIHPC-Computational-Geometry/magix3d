@@ -114,7 +114,7 @@ void CommandSplitFaces::init(std::vector<Topo::CoFace* > &cofaces)
     for (Topo::CoFace* hcf : cofaces){
 		
         if (hcf->isStructured()){
-			if (hcf->getNbFaces()) {
+			if (hcf->getFaces().size() > 0) {
 				// si hcf est 2D, elle n'a pas de face
 				// et si au moins une coface est 3D, le cas est 3D
 				m_cas_2D = false;

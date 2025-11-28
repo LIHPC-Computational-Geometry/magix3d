@@ -635,7 +635,7 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
 
     // dans le cas dégénéré, il sera peut-être nécessaire de refaire un démarage de l'algo au point de départ,
     // car on ne peut pas forcément boucler (cas d'une face dégénérée à 3 côtés)
-    int nb_trials = arete->getNbCofaces(); // Pour traiter la cas du split de deux faces avec une arete commune
+    int nb_trials = arete->getCoFaces().size(); // Pour traiter la cas du split de deux faces avec une arete commune
     bool boucleRelancee = false;
     bool tenteRelance = false;
 
@@ -672,8 +672,7 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
         std::cout<<"coface_prec = "<<(coface_prec?coface_prec->getName():"0")<<std::endl;
 #endif
 
-        std::vector<CoFace* > loc_cofaces;
-        coedge_dep->getCoFaces(loc_cofaces);
+        std::vector<CoFace* > loc_cofaces = coedge_dep->getCoFaces();
 
         // on en recherche une parmi la sélection et qui ne soit pas encore vue
         // dans le cas d'une boucle (faces d'un bloc) on ne veut prendre les faces qu'une fois
@@ -691,10 +690,10 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
             // ce qui apparait dans le cas d'une face déjà coupée
             // mais qui n'a pas été détecté par coedge_dep == arete
             // ou une terminaison pour une coupe localisée
-            if (coedge_dep->getVertex(0) == arete->getVertex(0)
-                    || coedge_dep->getVertex(0) == arete->getVertex(1)
-                    || coedge_dep->getVertex(1) == arete->getVertex(0)
-                    || coedge_dep->getVertex(1) == arete->getVertex(1)
+            if (coedge_dep->getVertices()[0] == arete->getVertices()[0]
+                    || coedge_dep->getVertices()[0] == arete->getVertices()[1]
+                    || coedge_dep->getVertices()[1] == arete->getVertices()[0]
+                    || coedge_dep->getVertices()[1] == arete->getVertices()[1]
                     || !boucleDemandee){
                 if (nb_trials > 1){
                     nb_trials--;
@@ -723,7 +722,7 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
 
             // recherche du côté dans lequel est cette arête, et le nombre de bras de maillage jusqu'à la coupe
             Edge* edge_dep = coface->getEdgeContaining(coedge_dep);
-            uint ind_edge_dep = coface->getIndex(edge_dep);
+            uint ind_edge_dep = Utils::getIndexOf(edge_dep, coface->getEdges());
 #ifdef _DEBUG_SPLIT
             std::cout<<"edge_dep = "<<edge_dep->getName()<<std::endl;
 #endif
@@ -737,11 +736,11 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
             Vertex* vertex1;
             Vertex* vertex2;
             if (dirCoFaceSplit == CoFace::i_dir){
-                vertex1 = coface->getVertex(1);
-                vertex2 = coface->getVertex(0);
+                vertex1 = coface->getVertices()[1];
+                vertex2 = coface->getVertices()[0];
             } else {
-                vertex1 = coface->getVertex(1);
-                vertex2 = coface->getVertex(2);
+                vertex1 = coface->getVertices()[1];
+                vertex2 = coface->getVertices()[2];
             }
 
             if (ind_edge_dep>1){
@@ -782,16 +781,16 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
             Edge* edge_ar = 0;
             // si on est sur côté face à la dégénérescence, on met à 0 l'arête d'arrivée
             // ce qui permet de signaler un redémarage nécessaire
-            if (coface->getNbEdges() == 4){
+            if (coface->getEdges().size() == 4){
                 uint ind_edge_ar = (ind_edge_dep+2)%4;
-                edge_ar = coface->getEdge(ind_edge_ar);
+                edge_ar = coface->getEdges()[ind_edge_ar];
             } else {
                 if (boucleDemandee){
                     // cas 3D
                     if (ind_edge_dep == 0)
-                        edge_ar = coface->getEdge(2);
+                        edge_ar = coface->getEdges()[2];
                     else if (ind_edge_dep == 2)
-                        edge_ar = coface->getEdge(0);
+                        edge_ar = coface->getEdges()[0];
                     else
                         edge_ar = 0;
                 }
@@ -803,11 +802,11 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
 
                     // on test pour détecter le cas d'une zone avec 1 seul sommet sur l'axe
                     uint nb_sur_axe = 0;
-                    if (Utils::Math::MgxNumeric::isNearlyZero(coface->getVertex(0)->getY()))
+                    if (Utils::Math::MgxNumeric::isNearlyZero(coface->getVertices()[0]->getY()))
                         nb_sur_axe++;
-                    if (Utils::Math::MgxNumeric::isNearlyZero(coface->getVertex(1)->getY()))
+                    if (Utils::Math::MgxNumeric::isNearlyZero(coface->getVertices()[1]->getY()))
                         nb_sur_axe++;
-                    if (Utils::Math::MgxNumeric::isNearlyZero(coface->getVertex(2)->getY()))
+                    if (Utils::Math::MgxNumeric::isNearlyZero(coface->getVertices()[2]->getY()))
                         nb_sur_axe++;
                     if (nb_sur_axe == 1){
                         TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
@@ -850,7 +849,7 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
             // on recherche si cette face est déjà coupée
             InfoSplit* is = 0;
             if (cofaceInfoSplit.find(coface->getUniqueId()) == cofaceInfoSplit.end()){
-                if (coface->getNbEdges() == 3 && ind_edge_dep != 1 && !boucleDemandee){
+                if (coface->getEdges().size() == 3 && ind_edge_dep != 1 && !boucleDemandee){
                     // cas où on arrive sur face dégénérée par un côté autre que celui qui fait face à la dégénérescence
 #ifdef _DEBUG_SPLIT
                     std::cout<<"on ne fait rien sur cette face en arrivant par ce côté\n";
@@ -919,10 +918,10 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
 
             // cas d'un "rebond" au niveau du centre d'une "boule"
             // c'est à dire une topologie équivalente à un demi-cercle, sur l'axe de symétrie
-            if (0 == coedge_ar && rebondAutorise && coface->getNbEdges() == 3
-                    && Utils::Math::MgxNumeric::isNearlyZero(coface->getVertex(0)->getY())
-                    && Utils::Math::MgxNumeric::isNearlyZero(coface->getVertex(1)->getY())
-                    && Utils::Math::MgxNumeric::isNearlyZero(coface->getVertex(2)->getY()) ){
+            if (0 == coedge_ar && rebondAutorise && coface->getEdges().size() == 3
+                    && Utils::Math::MgxNumeric::isNearlyZero(coface->getVertices()[0]->getY())
+                    && Utils::Math::MgxNumeric::isNearlyZero(coface->getVertices()[1]->getY())
+                    && Utils::Math::MgxNumeric::isNearlyZero(coface->getVertices()[2]->getY()) ){
                 // on coupe une deuxième fois l'arête
 
                 // on prend le complément pour la coupe
@@ -951,10 +950,10 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
                 is->nbMeshingEdges_ar.push_back(nbMeshingEdges_ar);
 
             }
-            else if (0 == coedge_ar && rebondAutorise && coface->getNbEdges() == 3
-                    && Utils::Math::MgxNumeric::isNearlyZero(coface->getVertex(0)->getY())
-                    && (Utils::Math::MgxNumeric::isNearlyZero(coface->getVertex(1)->getY())
-                    || Utils::Math::MgxNumeric::isNearlyZero(coface->getVertex(2)->getY())) ){
+            else if (0 == coedge_ar && rebondAutorise && coface->getEdges().size() == 3
+                    && Utils::Math::MgxNumeric::isNearlyZero(coface->getVertices()[0]->getY())
+                    && (Utils::Math::MgxNumeric::isNearlyZero(coface->getVertices()[1]->getY())
+                    || Utils::Math::MgxNumeric::isNearlyZero(coface->getVertices()[2]->getY())) ){
                 // on est peut-être dans le cas d'un rebond avec 2 zones pour la "boule" centrale
 
 #ifdef _DEBUG_SPLIT
@@ -963,21 +962,20 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
                 //  on cherche l'arête qui couperait cette boule
                 Edge* edge_sym = 0;
                 for (uint i=0; i<3; i+=2){
-                    Edge* edge = coface->getEdge(i);
+                    Edge* edge = coface->getEdges()[i];
                     // le 2ème sommet de l'arête qui n'est pas à la dégénérescence
-                    Vertex* vtx2 = edge->getOppositeVertex(coface->getVertex(0));
+                    Vertex* vtx2 = edge->getOppositeVertex(coface->getVertices()[0]);
                     if (!Utils::Math::MgxNumeric::isNearlyZero(vtx2->getY()))
                         edge_sym =  edge;
                 }
 #ifdef _DEBUG_SPLIT
                 std::cout<<"edge_sym =  "<<(edge_sym?edge_sym->getName():"0")<<std::endl;
 #endif
-                if (0 != edge_sym && edge_sym->getNbCoEdges() == 1){
-                    CoEdge* coedge_sym = edge_sym->getCoEdge(0);
+                if (0 != edge_sym && edge_sym->getCoEdges().size() == 1){
+                    CoEdge* coedge_sym = edge_sym->getCoEdges()[0];
                     // recherche de la face de l'autre côté de cette arête si elle existe
                     CoFace* coface_sym = 0;
-                    std::vector<CoFace* > cofaces_vois;
-                    coedge_sym->getCoFaces(cofaces_vois);
+                    std::vector<CoFace* > cofaces_vois = coedge_sym->getCoFaces();
                     if (cofaces_vois.size() == 2){
                         if (coface == cofaces_vois[0])
                             coface_sym = cofaces_vois[1];
@@ -987,7 +985,7 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
                     if (reprendreCetteFace){
                         coface_sym = coface;
                         // dans ce cas il faut recalculer nbMeshingEdges_edge
-                        nbMeshingEdges_edge = coface_sym->getEdge(1)->getNbMeshingEdges() - nbMeshingEdges_edge;
+                        nbMeshingEdges_edge = coface_sym->getEdges()[1]->getNbMeshingEdges() - nbMeshingEdges_edge;
 #ifdef _DEBUG_SPLIT
                         std::cout<<" cas où il faut adapter nbMeshingEdges_edge ...\n";
                         std::cout<<"   => nbMeshingEdges_edge =  "<<nbMeshingEdges_edge<<std::endl;
@@ -1002,11 +1000,11 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
                     if (coface_sym){
                         // on test pour détecter le cas d'une zone avec 1 seul sommet sur l'axe
                         uint nb_sur_axe = 0;
-                        if (Utils::Math::MgxNumeric::isNearlyZero(coface_sym->getVertex(0)->getY()))
+                        if (Utils::Math::MgxNumeric::isNearlyZero(coface_sym->getVertices()[0]->getY()))
                             nb_sur_axe++;
-                        if (Utils::Math::MgxNumeric::isNearlyZero(coface_sym->getVertex(1)->getY()))
+                        if (Utils::Math::MgxNumeric::isNearlyZero(coface_sym->getVertices()[1]->getY()))
                             nb_sur_axe++;
-                        if (Utils::Math::MgxNumeric::isNearlyZero(coface_sym->getVertex(2)->getY()))
+                        if (Utils::Math::MgxNumeric::isNearlyZero(coface_sym->getVertices()[2]->getY()))
                             nb_sur_axe++;
                         if (nb_sur_axe == 1){
                             TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
@@ -1017,15 +1015,15 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
                     }
 
                     if (coface_sym && filtre_cofaces[coface_sym] == 1){
-                        if (coface_sym->getNbEdges() == 3){
+                        if (coface_sym->getEdges().size() == 3){
 
                             // on recherche dans cette face symétrique de la précédente
                             // la positition de la coupe
 
-                            edge_ar = coface_sym->getEdge(1);
+                            edge_ar = coface_sym->getEdges()[1];
 
                             // recherche du sommet symétrique à vertex1 / edge_sym
-                            if (edge_sym->find(vertex1))
+                            if (Utils::contains(vertex1, edge_sym->getVertices()))
                                 vertex2 = vertex1;
                             else {
                                 vertex2 = edge_dep->getOppositeVertex(vertex1);
@@ -1066,14 +1064,14 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
 
                             cofaceInfoSplit[coface->getUniqueId()] = is;
                             id2coface[coface->getUniqueId()] = coface;
-                        } // end if (coface_sym->getNbEdges() == 3)
+                        } // end if (coface_sym->getEdges().size() == 3)
                         else {
 
                             // recherche de l'arête hors de l'axe
-                            if (Utils::Math::MgxNumeric::isNearlyZero(coface->getVertex(1)->getY()))
-                                edge_ar = coface->getEdge(2);
-                            else if (Utils::Math::MgxNumeric::isNearlyZero(coface->getVertex(2)->getY()))
-                                edge_ar = coface->getEdge(0);
+                            if (Utils::Math::MgxNumeric::isNearlyZero(coface->getVertices()[1]->getY()))
+                                edge_ar = coface->getEdges()[2];
+                            else if (Utils::Math::MgxNumeric::isNearlyZero(coface->getVertices()[2]->getY()))
+                                edge_ar = coface->getEdges()[0];
 
                             // si le sommet 1 n'est pas sur l'axe on prend le complément pour nbMeshingEdges_edge
                             if (!Utils::Math::MgxNumeric::isNearlyZero(vertex1->getY()))
@@ -1101,9 +1099,9 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
                         // il faut arréter de ce côté ...
                         tenteRelance = true;
                     }
-                } // end if (0 != edge_sym && edge_sym->getNbCoEdges() == 1)
+                } // end if (0 != edge_sym && edge_sym->getCoEdges().size() == 1)
             }
-            else if (0 == coedge_ar || (!boucleDemandee && coedge_ar->getNbEdges() == 1 && coedge_ar->getNbCofaces() == 1)) { // terminaison ou relance ?
+            else if (0 == coedge_ar || (!boucleDemandee && coedge_ar->getEdges().size() == 1 && coedge_ar->getCoFaces().size() == 1)) { // terminaison ou relance ?
                 // redémarrage
                 tenteRelance = true;
             }
@@ -1142,7 +1140,7 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
 
         }
 
-        if (!boucleDemandee && coedge_dep->getNbEdges() == 1 && coedge_dep->getNbCofaces() == 1){
+        if (!boucleDemandee && coedge_dep->getEdges().size() == 1 && coedge_dep->getCoFaces().size() == 1){
 #ifdef _DEBUG_SPLIT
             std::cout<<" cela se termine vraiment ..."<<std::endl;
 #endif
@@ -1207,8 +1205,8 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
                 newVertices1 = is->coedge_dep[0]->split(is->nbMeshingEdges_dep, icmd);
                 oldCoEdge2newVertices[is->coedge_dep[0]] = newVertices1;
             }
-            CoEdge* coedge0 = newVertices1[0]->getCoEdge(0);
-            CoEdge* coedge1 = newVertices1[0]->getCoEdge(1);
+            CoEdge* coedge0 = newVertices1[0]->getCoEdges()[0];
+            CoEdge* coedge1 = newVertices1[0]->getCoEdges()[1];
             // recherche de l'arête qui touche l'axe
             if (Utils::Math::MgxNumeric::isNearlyZero(coedge0->getOppositeVertex(newVertices1[0])->getY()))
             	ni = coedge0->getNbMeshingEdges();
@@ -1242,13 +1240,13 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
                 newVertices1.push_back(vtx2[0]);
             }
         }
-        if (coface->getNbEdges() == 3 && ratio_ogrid>0){
+        if (coface->getEdges().size() == 3 && ratio_ogrid>0){
 #ifdef _DEBUG_SPLIT
             std::cout<<"split avec ogrid, on coupe les arêtes ..."<<std::endl;
 #endif
 
             // détection d'un cas pathologique possible: un seul bras sur bras reliés à la dégénérescence
-            if (coface->getEdge(0)->getNbMeshingEdges() == 1 || coface->getEdge(2)->getNbMeshingEdges() == 1){
+            if (coface->getEdges()[0]->getNbMeshingEdges() == 1 || coface->getEdges()[2]->getNbMeshingEdges() == 1){
 				TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
             	messErr << "Il n'est pas possible de découper en o-grid une face ("<<coface->getName()<<") avec un seul bras autour de la dégérescence";
             	throw TkUtil::Exception(messErr);
@@ -1256,17 +1254,17 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
 
             // on découpe les 2 autres arêtes
             // indice de l'arête / face (1 pour les face dégénérées)
-            uint ind_ar_dep = coface->getIndex(is->edge_dep);
+            uint ind_ar_dep = Utils::getIndexOf(is->edge_dep, coface->getEdges());
             if (ind_ar_dep!=1)
                 throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, Topo::splitFaces ne trouve pas l'arête de départ en position 1", TkUtil::Charset::UTF_8));
 
-            Edge* edge4 = coface->getEdge(0);
-            if (edge4->getNbCoEdges() == 1){
-                newVertices4 = oldCoEdge2newVertices[edge4->getCoEdge(0)];
+            Edge* edge4 = coface->getEdges()[0];
+            if (edge4->getCoEdges().size() == 1){
+                newVertices4 = oldCoEdge2newVertices[edge4->getCoEdges()[0]];
             }
-            else if (edge4->getNbCoEdges() == 2){
+            else if (edge4->getCoEdges().size() == 2){
                 // on considère que l'arête est déjà coupée en 2
-                newVertices4.push_back(TopoHelper::getCommonVertex(edge4->getCoEdge(0), edge4->getCoEdge(1)));
+                newVertices4.push_back(TopoHelper::getCommonVertex(edge4->getCoEdges()[0], edge4->getCoEdges()[1]));
             }
             else {
 				TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
@@ -1276,13 +1274,13 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
             }
 
 
-            Edge* edge2 = coface->getEdge(2);
-            if (edge2->getNbCoEdges() == 1){
-                newVertices2 = oldCoEdge2newVertices[edge2->getCoEdge(0)];
+            Edge* edge2 = coface->getEdges()[2];
+            if (edge2->getCoEdges().size() == 1){
+                newVertices2 = oldCoEdge2newVertices[edge2->getCoEdges()[0]];
             }
-            else if (edge2->getNbCoEdges() == 2){
+            else if (edge2->getCoEdges().size() == 2){
                 // on considère que l'arête est déjà coupée en 2
-                newVertices2.push_back(TopoHelper::getCommonVertex(edge2->getCoEdge(0), edge2->getCoEdge(1)));
+                newVertices2.push_back(TopoHelper::getCommonVertex(edge2->getCoEdges()[0], edge2->getCoEdges()[1]));
             }
             else{
 				TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
@@ -1293,7 +1291,7 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
 
 
             // le sommet à la dégénérescence
-            Vertex* vtx0 = coface->getVertex(0);
+            Vertex* vtx0 = coface->getVertices()[0];
 
 #ifdef _DEBUG_SPLIT
             std::cout<<" ni trouvé : "<<ni<<std::endl;
@@ -1319,13 +1317,13 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
             if (newVertices2.empty()){
                 // vérif du sens pour prendre ni ou le complément
                 uint ni_loc = ni;
-                if (vtx0 == edge2->getCoEdge(0)->getVertex(0))
+                if (vtx0 == edge2->getCoEdges()[0]->getVertices()[0])
                     ni_loc = edge2->getNbMeshingEdges() - ni;
 #ifdef _DEBUG_SPLIT
                 std::cout<<" ni_loc : "<<ni_loc<<std::endl;
 #endif
-                newVertices2.push_back(edge2->getCoEdge(0)->split(ni_loc, icmd));
-                oldCoEdge2newVertices[edge2->getCoEdge(0)] = newVertices2;
+                newVertices2.push_back(edge2->getCoEdges()[0]->split(ni_loc, icmd));
+                oldCoEdge2newVertices[edge2->getCoEdges()[0]] = newVertices2;
             }
 
             std::vector<Edge*> & newEdges2 = old2newEdges[edge2];
@@ -1336,13 +1334,13 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
             if (newVertices4.empty()){
                 // vérif du sens pour prendre ni ou le complément
                 uint ni_loc = ni;
-                if (vtx0 == edge4->getCoEdge(0)->getVertex(0))
+                if (vtx0 == edge4->getCoEdges()[0]->getVertices()[0])
                     ni_loc = edge4->getNbMeshingEdges() - ni;
 #ifdef _DEBUG_SPLIT
                 std::cout<<" ni_loc : "<<ni_loc<<std::endl;
 #endif
-                newVertices4.push_back(edge4->getCoEdge(0)->split(ni_loc, icmd));
-                oldCoEdge2newVertices[edge4->getCoEdge(0)] = newVertices4;
+                newVertices4.push_back(edge4->getCoEdges()[0]->split(ni_loc, icmd));
+                oldCoEdge2newVertices[edge4->getCoEdges()[0]] = newVertices4;
             }
 
             std::vector<Edge*> & newEdges4 = old2newEdges[edge4];
@@ -1359,7 +1357,7 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
             CoEdge* coedge2 = edge2->getCoEdge(newVertices2[0], vtx_opp);
             newVertices2[0]->setCoord(vtx0->getCoord() + (vtx_opp->getCoord() - vtx0->getCoord()) * ratio);
 
-        } // end if (coface->getNbEdges() == 3 && ratio_ogrid>0)
+        } // end if (coface->getEdges().size() == 3 && ratio_ogrid>0)
 
 
         std::vector<Edge*> & newEdges_dep = old2newEdges[is->edge_dep];
@@ -1384,7 +1382,7 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
                 }
             }
             else {
-                newVertices3.push_back(coface->getVertex(0)); // le sommet à la dégénérescence
+                newVertices3.push_back(coface->getVertices()[0]); // le sommet à la dégénérescence
             }
         } else if (is->coedge_ar.size() == 2){
             if (is->coedge_ar[0]){
@@ -1414,8 +1412,8 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
                 }
             }
             else {
-                newVertices3.push_back(coface->getVertex(0)); // le sommet à la dégénérescence
-                newVertices3.push_back(coface->getVertex(0));
+                newVertices3.push_back(coface->getVertices()[0]); // le sommet à la dégénérescence
+                newVertices3.push_back(coface->getVertices()[0]);
             }
         }
 
@@ -1431,13 +1429,13 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
             is->edge_ar->split(newVertices3, newEdges_ar, icmd);
         }
 
-        if (coface->getNbEdges() == 3 && ratio_ogrid>0){
+        if (coface->getEdges().size() == 3 && ratio_ogrid>0){
             // découpage en 3 ou 4 CoFace
 
             // NB on ne retourne pas les arêtes créées, cela n'a pas d'utilité
 
-            Edge* oldEdge0 = coface->getEdge(0);
-            Edge* oldEdge2 = coface->getEdge(2);
+            Edge* oldEdge0 = coface->getEdges()[0];
+            Edge* oldEdge2 = coface->getEdges()[2];
 
             coface->splitOgrid((CoFace::eDirOnCoFace)is->dirCoFaceSplit,
                     old2newEdges[oldEdge0],
@@ -1450,9 +1448,9 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
                     icmd);
 
             // Destruction des arêtes inutiles (celles sans relation vers une CoFace)
-            if (oldEdge0->getNbCoFaces() == 0)
+            if (oldEdge0->getCoFaces().size() == 0)
                 oldEdge0->free(icmd);
-            if (oldEdge2->getNbCoFaces() == 0)
+            if (oldEdge2->getCoFaces().size() == 0)
                 oldEdge2->free(icmd);
         }
         else {
@@ -1465,9 +1463,9 @@ void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
         }
 
         // Destruction des arêtes inutiles (celles sans relation vers une CoFace)
-        if (0 != is->edge_dep && is->edge_dep->getNbCoFaces() == 0)
+        if (0 != is->edge_dep && is->edge_dep->getCoFaces().size() == 0)
             is->edge_dep->free(icmd);
-        if (0 != is->edge_ar && is->edge_ar->getNbCoFaces() == 0)
+        if (0 != is->edge_ar && is->edge_ar->getCoFaces().size() == 0)
             is->edge_ar->free(icmd);
 
         // libération de la mémoire
@@ -1942,7 +1940,7 @@ void TopoHelper::splitFaces3D(std::vector<CoFace* > cofaces,
 
                 		cofaceInfoSplit[coface->getUniqueId()] = is;
                 		id2coface[coface->getUniqueId()] = coface;
-                	} // end if (coface_sym->getNbEdges() == 3)
+                	} // end if (coface_sym->getEdges().size() == 3)
                 	else {
 
                 		// recherche de l'arête hors de l'axe
@@ -1977,7 +1975,7 @@ void TopoHelper::splitFaces3D(std::vector<CoFace* > cofaces,
                 	// il faut arréter de ce côté ...
                 	tenteRelance = true;
                 }
-            } // end if (0 != edge_sym && edge_sym->getNbCoEdges() == 1)
+            } // end if (0 != edge_sym && edge_sym->getCoEdges().size() == 1)
         }
         else if (0 == coedge_ar || (!boucleDemandee && coedge_ar->getEdges().size() == 1 && coedge_ar->getCoFaces().size() == 1)) { // terminaison ou relance ?
             // redémarrage
@@ -2234,7 +2232,7 @@ void TopoHelper::splitFaces3D(std::vector<CoFace* > cofaces,
             CoEdge* coedge2 = edge2->getCoEdge(newVertices2[0], vtx_opp);
             newVertices2[0]->setCoord(vtx0->getCoord() + (vtx_opp->getCoord() - vtx0->getCoord()) * ratio);
 
-        } // end if (coface->getNbEdges() == 3 && ratio_ogrid>0)
+        } // end if (coface->getEdges().size() == 3 && ratio_ogrid>0)
 
 
         std::vector<Edge*> & newEdges_dep = old2newEdges[is->edge_dep];
