@@ -148,6 +148,7 @@ void TopoManager::clear()
     m_edges.deleteAndClear();
     m_coedges.deleteAndClear();
     m_vertices.deleteAndClear();
+    m_geom_associations.clear();
     m_defaultNbMeshingEdges = 10;
 }
 /*----------------------------------------------------------------------------*/
