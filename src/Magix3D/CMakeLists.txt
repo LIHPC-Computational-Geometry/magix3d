@@ -47,7 +47,9 @@ install (
 # Le script de lancement de Magix3D :
 find_package (QtPython3 REQUIRED)
 set (QtPython_RUNTIME_DIR "${QtPython3_RUNTIME_DIR}")
-#find_package (LimaScripting)	# Faut il ajouter le PATH à Lima si installé ailleurs ?
+# On ajoute Lima qui fait partie intégrante du package "maillage" :
+find_package (Lima REQUIRED COMPONENTS LimaScripting)
+set (LIMA_BINDING_DIR ${LimaScripting_RUNTIME_DIR})
 set (MAGIX3D_BINDING_INSTALL_DIR ${PYTHON_BINDING_DIR})
 find_package (VTK REQUIRED COMPONENTS vtksys )
 set (VTK_LIBRARY_PATH "${VTK_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")

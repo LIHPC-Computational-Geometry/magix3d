@@ -3573,6 +3573,17 @@ void QtMgx3DMainWindow::showReady ( )
 				      << "L'exécution de commandes Python pourrait ne pas fonctionner.";
 				log(WarningLog(error));
 			}    // else if (0 != env)
+			env	= getenv ("LIMA_PATH");
+			if (0 != env)
+			{
+				const string limaPath (env);
+				UTF8String   path (Charset::UTF_8);
+				path << "sys.path.append(\"" << limaPath << "\")";
+				_pythonPanel->executeCommand (path);
+				UTF8String importLine (Charset::UTF_8);
+				importLine << "from LimaScripting import *";
+				_pythonPanel->executeCommand (importLine);
+			}	// if (0 != env)
 		}    // QtMgx3DMainWindow::initPythonScripting
 
 
