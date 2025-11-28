@@ -12,10 +12,10 @@
 #include <TopoDS_Shell.hxx>
 #include <BRepCheck_Analyzer.hxx>
 #include <GProp_GProps.hxx>
+#include <GCPnts_AbscissaPoint.hxx>
 #include <BRepGProp.hxx>
 #include <BRep_Tool.hxx>
 #include <GeomAPI_ProjectPointOnSurf.hxx>
-#include <GeomAPI_ProjectPointOnCurve.hxx>
 #include <GeomAPI_ProjectPointOnCurve.hxx>
 #include <GeomConvert.hxx>
 #include <GeomConvert_CompCurveToBSplineCurve.hxx>
@@ -923,7 +923,6 @@ getParameter(const std::vector<TopoDS_Edge>& edges, const Utils::Math::Point& Pt
         gp_Pnt projected = proj.NearestPoint();
         p = proj.LowerDistanceParameter();
         distance = proj.LowerDistance();
-
 #ifdef _DEBUG_GETPARAMETER
         std::cout << "Projected point: " << projected.X() << ", "
                   << projected.Y() << ", " << projected.Z() << std::endl;
@@ -1382,6 +1381,169 @@ exploreCompound(const TopoDS_Compound& compound, const std::string& indent)
         TopoDS_Shape sub_shape = exp.Current();
         printInfos(sub_shape, new_indent);
     }
+}
+/*----------------------------------------------------------------------------*/
+// Fonction pour calculer la distance curviligne entre deux points sur une liste d'arêtes
+double OCCHelper::
+curvilinearDistance(
+        const std::vector<TopoDS_Edge>& edges,
+        const Utils::Math::Point& P1,
+        const Utils::Math::Point& P2)
+{
+
+    // Projeter les points sur la courbe pour obtenir leurs paramètres u
+    double u1, u2;
+    getParameter(edges, P1, u1);
+    getParameter(edges, P2, u2);
+
+    // S'assurer que u1 < u2 pour le calcul de longueur
+    if (u1 > u2) {
+        std::swap(u1, u2);
+    }
+
+    // Calculer la longueur de la courbe entre p1 et p2
+    Handle(Geom_BSplineCurve) bsplineCurve = makeBSplineCurve(edges);
+    GeomAdaptor_Curve adaptor(bsplineCurve);
+    double length = GCPnts_AbscissaPoint::Length(adaptor, u1, u2);
+
+    return length;
+}
+
+bool OCCHelper::isPlanarFace(const TopoDS_Face& face, Handle(Geom_Plane)& plane)
+{
+    Handle(Geom_Surface) surf = BRep_Tool::Surface(face);
+    if (surf.IsNull())
+        return false;
+
+    plane = Handle(Geom_Plane)::DownCast(surf);
+    return !plane.IsNull();
+}
+
+double OCCHelper::
+geodesicDistance(
+        const TopoDS_Face& face,
+        const Utils::Math::Point& P1,
+        const Utils::Math::Point& P2,
+        double meshDeflection)
+{
+    gp_Pnt p1(P1.getX(), P1.getY(), P1.getZ());
+    gp_Pnt p2(P2.getX(), P2.getY(), P2.getZ());
+
+    Handle(Geom_Plane) plane;
+    if (isPlanarFace(face, plane))
+    {
+       return p1.Distance(p2);
+    }
+
+    /* ==============================
+       1. Maillage de la face
+       ============================== */
+    BRepMesh_IncrementalMesh mesher(face, meshDeflection, true);
+    TopLoc_Location loc;
+    Handle(Poly_Triangulation) triangulation = BRep_Tool::Triangulation(face, loc);
+
+    if (triangulation.IsNull())
+        throw TkUtil::Exception("Triangulation inexistante");
+
+    const TColgp_Array1OfPnt& nodes = triangulation->Nodes();
+    int nbNodes = nodes.Size();
+    const Poly_Array1OfTriangle& triangles = triangulation->Triangles();
+
+    /* ==============================
+       2. Trouver les nœuds les plus proches
+       ============================== */
+    int startNode = nodes.Lower();
+    int endNode   = nodes.Lower();
+
+    double minDistStart = std::numeric_limits<double>::max();
+    double minDistEnd   = std::numeric_limits<double>::max();
+
+    for (int i = nodes.Lower(); i <= nodes.Upper(); ++i)
+    {
+        double d1 = nodes(i).Distance(p1);
+        double d2 = nodes(i).Distance(p2);
+
+        if (d1 < minDistStart)
+        {
+            minDistStart = d1;
+            startNode = i;
+        }
+
+        if (d2 < minDistEnd)
+        {
+            minDistEnd = d2;
+            endNode = i;
+        }
+    }
+
+    /* ==============================
+       3. Construction du graphe
+       ============================== */
+    using Edge = std::pair<int, double>; // (voisin, poids)
+    std::vector<std::vector<Edge>> graph(nodes.Size() + 1);
+
+    for (int i = triangles.Lower(); i <= triangles.Upper(); ++i)
+    {
+        int n1, n2, n3;
+        triangles(i).Get(n1, n2, n3);
+
+        auto addEdge = [&](int a, int b)
+        {
+            double w = nodes(a).Distance(nodes(b));
+            graph[a].emplace_back(b, w);
+            graph[b].emplace_back(a, w);
+        };
+
+        addEdge(n1, n2);
+        addEdge(n2, n3);
+        addEdge(n3, n1);
+    }
+
+    /* ==============================
+       4. Dijkstra
+       ============================== */
+    std::vector<double> dist(nbNodes + 1, std::numeric_limits<double>::max());
+    std::vector<bool> visited(nbNodes + 1, false);
+
+    dist[startNode] = 0.0;
+
+    for (int iter = 0; iter < nbNodes; ++iter)
+    {
+        // Trouver le sommet non visité de distance minimale
+        int u = -1;
+        double minDist = std::numeric_limits<double>::max();
+
+        for (int i = nodes.Lower(); i <= nodes.Upper(); ++i)
+        {
+            if (!visited[i] && dist[i] < minDist)
+            {
+                minDist = dist[i];
+                u = i;
+            }
+        }
+
+        if (u == -1)
+            break;
+
+        if (u == endNode)
+            break;
+
+        visited[u] = true;
+
+        // Relaxation des arêtes
+        for (const auto& edge : graph[u])
+        {
+            int v = edge.first;
+            double w = edge.second;
+
+            if (!visited[v] && dist[v] > dist[u] + w)
+            {
+                dist[v] = dist[u] + w;
+            }
+        }
+    }
+
+    return dist[endNode];
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom
