@@ -36,6 +36,7 @@ addToGroup(const std::string& group_name, Geom::GeomEntity* e)
     if (! (m_group_manager.getGroupsFor(e).size() > 0 && group->isDefaultGroup())) {
         group->add(e);
         m_group_manager.addGroupFor(e, group);
+        m_info_command.addGeomInfoEntity (e, Internal::InfoCommand::DISPMODIFIED);
         m_info_command.addGroupInfoEntity(group, Internal::InfoCommand::DISPMODIFIED);	
     }
 

@@ -501,9 +501,9 @@ public:
     /// Retourne les groupes associés à une entité
     const std::vector<GroupEntity*>& getGroupsFor(const Geom::GeomEntity* e);
     /// Ajoute une association Entité-->Group
-    void addGroupFor(const Geom::GeomEntity* e, GroupEntity* g);
+    void addGroupFor(Geom::GeomEntity* e, GroupEntity* g);
     /// Positionne les associations Entité-->Group
-    void setGroupsFor(const Geom::GeomEntity* e, const std::vector<GroupEntity*>& gs);
+    void setGroupsFor(Geom::GeomEntity* e, const std::vector<GroupEntity*>& gs);
     /// Enlève une association Entité-->Group
     void removeGroupFor(const Geom::GeomEntity* e, GroupEntity* g);
     /// Enlève toutes les associations Entité-->Group
