@@ -4,6 +4,7 @@
 #include "Utils/Vector.h"
 #include "Utils/Point.h"
 /*----------------------------------------------------------------------------*/
+#include <Geom_BSplineCurve.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Edge.hxx>
@@ -12,8 +13,8 @@
 #include <TopoDS_Solid.hxx>
 #include <TopoDS_Compound.hxx>
 #include <TopTools_IndexedMapOfShape.hxx>
-#include <Geom_BSplineCurve.hxx>
 #include <TopTools_ListOfShape.hxx>
+#include <Geom_Plane.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -129,6 +130,23 @@ public:
 
     /// Calcule la boite englobante
     static void computeBoundingBox(const TopoDS_Shape& shape, Utils::Math::Point& pmin, Utils::Math::Point& pmax, double tol=0.0);
+
+        /// Calcule la distance curviligne entre deux points sur une courbe
+    static double curvilinearDistance(const std::vector<TopoDS_Edge>& curve,
+                                   const Utils::Math::Point& P1,
+                                   const Utils::Math::Point& P2);
+
+    static bool isPlanarFace(const TopoDS_Face& face, Handle(Geom_Plane)& plane);
+
+    /// Calcule la distance géodésique entre deux points sur une surface
+    static double geodesicDistance(const TopoDS_Face& face,
+                                   const Utils::Math::Point& P1,
+                                   const Utils::Math::Point& P2,
+                                   double meshDeflection = 1e-3);
+
+    /// Renvoie la triangulationd d'une surface
+    static std::vector<Utils::Math::Point> getNodes(const TopoDS_Face& face,
+                                   double meshDeflection = 1e-3);
 
     /// Effectue le nettoyage topologique de la shape occ sh passée en paramètre
     static TopoDS_Shape cleanShape(TopoDS_Shape& sh);

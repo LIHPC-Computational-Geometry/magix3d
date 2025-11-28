@@ -88,6 +88,8 @@
 #include "Geom/CommandTranslation.h"
 #include "Geom/CommandScaling.h"
 #include "Geom/CommandMirroring.h"
+#include "Geom/GeomProjectImplementation.h"
+#include "Geom/OCCHelper.h"
 #include "Mesh/CommandAddRemoveGroupName.h"
 #include "SysCoord/SysCoord.h"
 #ifdef USE_MDLPARSER
@@ -3018,6 +3020,65 @@ TopoManager::getEdgeMeshingProperty(std::string ed)
     CoEdgeMeshingProperty* property = getCoEdge(ed, true)->getMeshingProperty ( );
     CHECK_NULL_PTR_ERROR (property)
     return *property;
+}
+/*----------------------------------------------------------------------------*/
+double TopoManager::getEdgeLength(const std::string& edge_name) const
+{
+    CoEdge* edge = getCoEdge(edge_name, true);
+    auto vertices = edge->getVertices();
+    if (vertices.size() != 2)
+        throw TkUtil::Exception (TkUtil::UTF8String ("L'arête doit avoir exactement deux sommets pour calculer sa longueur", TkUtil::Charset::UTF_8));
+
+    Utils::Math::Point P1 = vertices[0]->getCoord();
+    Utils::Math::Point P2 = vertices[1]->getCoord();
+    return P1.length(P2);
+}
+
+double TopoManager::getEdgeProjectedLength(const std::string& edge_name) const
+{
+    CoEdge* edge = getCoEdge(edge_name, true);
+    auto vertices = edge->getVertices();
+    if (vertices.size() != 2)
+        throw TkUtil::Exception (TkUtil::UTF8String ("L'arête doit avoir exactement deux sommets pour calculer sa longueur", TkUtil::Charset::UTF_8));
+    auto geom_entity = edge->getGeomAssociation();
+    if (!geom_entity)
+    {
+        // On renvoie la longueur topologique de l'arête
+        return getEdgeLength(edge_name);
+    }
+
+    Utils::Math::Point P1 = vertices[0]->getCoord();
+    Utils::Math::Point P2 = vertices[1]->getCoord();
+
+    Geom::GeomProjectImplementation gpi;
+    if (geom_entity->getDim() == 1)
+    {
+        // distance curviligne entre les deux points issus de la projection des sommets sur la courbe
+        Geom::Curve* curve = static_cast<Geom::Curve*>(geom_entity);
+        return Geom::OCCHelper::curvilinearDistance(curve->getOCCEdges(), P1, P2);
+    }
+    else if (geom_entity->getDim() == 2)
+    {
+       // distance geodesique entre les deux points issus de la projection des sommets sur la surface
+        Geom::Surface* surface = static_cast<Geom::Surface*>(geom_entity);
+
+        // Projeter P1 et P2 sur la surface
+        Utils::Math::Point ptProj1 = gpi.project(surface, P1).first;
+        Utils::Math::Point ptProj2 = gpi.project(surface, P2).first;
+        // Vérifier que les deux points projetés sont sur la même face
+        if (gpi.project(surface, P1).second == gpi.project(surface, P2).second)
+        {
+            TopoDS_Face topo_face = surface->getOCCFaces()[gpi.project(surface, P1).second];
+            // Calculer la distance géodésique
+            return Geom::OCCHelper::geodesicDistance(topo_face, ptProj1, ptProj2);
+        }
+        else
+        {
+            throw TkUtil::Exception (TkUtil::UTF8String ("Les projections des deux points ne sont pas sur la même face pour le calcul de la longueur projetée", TkUtil::Charset::UTF_8));
+        }
+    }
+    else
+        throw TkUtil::Exception (TkUtil::UTF8String ("Type d'entité géométrique associée à l'arête non géré pour le calcul de la longueur projetée", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResult* TopoManager::setEdgeMeshingProperty(CoEdgeMeshingProperty& emp, CoEdge* ed)

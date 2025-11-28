@@ -1566,6 +1566,12 @@ public:
         getEdgeMeshingProperty(std::string ed);
     SET_SWIG_COMPLETABLE_METHOD(getEdgeMeshingProperty)
 
+    double getEdgeLength(const std::string& edge_name) const;
+    SET_SWIG_COMPLETABLE_METHOD(getEdgeLength)
+   
+    double getEdgeProjectedLength(const std::string& edge_name) const;
+    SET_SWIG_COMPLETABLE_METHOD(getEdgeProjectedLength)
+    
     /*------------------------------------------------------------------------*/
     /** \brief Change la propriété de discrétisation pour une face commune
      *
