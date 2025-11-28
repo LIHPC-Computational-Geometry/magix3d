@@ -173,8 +173,8 @@ protected:
   double Y1;
 
 private:
-  vtkECMAreaPicker(const vtkECMAreaPicker&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkECMAreaPicker&) VTK_DELETE_FUNCTION;
+  vtkECMAreaPicker(const vtkECMAreaPicker&);
+  void operator=(const vtkECMAreaPicker&);
 };
 
 #endif

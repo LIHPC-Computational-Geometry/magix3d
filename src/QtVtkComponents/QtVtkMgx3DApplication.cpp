@@ -24,6 +24,7 @@
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkMapper.h>
 #include <vtkTextProperty.h>
+#include <vtkVersionMacros.h>
 
 #include <mgx_config.h>
 using namespace std;
