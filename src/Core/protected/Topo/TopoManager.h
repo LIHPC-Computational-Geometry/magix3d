@@ -810,21 +810,21 @@ public:
 #endif
 
     /*------------------------------------------------------------------------*/
-    /** \brief Découpe des faces structurées en deux
+    /** \brief Découpe des faces structurées 2D en deux
      *
      *  On utilise une arête et un ratio pour positionner un premier sommet
      *  qui va être inséré sur l'arête.
      *  Les autres arêtes parallèles sont aussi découpées avec le même ratio.
-     *  Si ratio_ogrid vaut 0, alors le tracé de l'ogrid peut passer par l'axe si une face n'a que 3 côtés,
+     *  Si ratio_ogrid vaut 0, alors le tracé de l'ogrid peut passer par l'axe si une face n'a que 3 côté,
      *  sinon on découpe la face en 3 (ogrid en 2D) avec un sommet placé avec ce ratio entre le sommet dans
      *  le prolongement sur l'axe et le sommet à l'entrée dans la face.
      */
     Mgx3D::Internal::M3DCommandResult*
-        splitFaces(std::vector<std::string> &cofaces_names, std::string narete, const double& ratio_dec, const double& ratio_ogrid,  bool project_on_meshing_edge = true);
+        splitFaces(std::vector<std::string> &cofaces_names, std::string narete, const double& ratio_dec, const double& ratio_ogrid);
 
 #ifndef SWIG
     Mgx3D::Internal::M3DCommandResult*
-        splitFaces(std::vector<Topo::CoFace* > &cofaces, CoEdge* arete, const double& ratio_dec, const double& ratio_ogrid, bool project_on_meshing_edge);
+        splitFaces(std::vector<Topo::CoFace* > &cofaces, CoEdge* arete, const double& ratio_dec, const double& ratio_ogrid);
 #endif
 
     /** \brief Découpe des faces structurées 2D en deux suivant un point à projeter
@@ -837,33 +837,33 @@ public:
      *  le prolongement sur l'axe et le sommet à l'entrée dans la face.
      */
     Mgx3D::Internal::M3DCommandResult*
-        splitFaces(std::vector<std::string> &cofaces_names, std::string narete, const Point& pt, const double& ratio_ogrid, bool project_on_meshing_edge = true);
+        splitFaces(std::vector<std::string> &cofaces_names, std::string narete, const Point& pt, const double& ratio_ogrid);
 
 #ifndef SWIG
     Mgx3D::Internal::M3DCommandResult*
-        splitFaces(std::vector<Topo::CoFace* > &cofaces, CoEdge* arete, const Point& pt, const double& ratio_ogrid, bool project_on_meshing_edge);
+        splitFaces(std::vector<Topo::CoFace* > &cofaces, CoEdge* arete, const Point& pt, const double& ratio_ogrid);
 #endif
 
     /** \brief Découpe toutes les faces structurées 2D en deux
      * \see splitFaces
      */
     Mgx3D::Internal::M3DCommandResult*
-        splitAllFaces(std::string narete, const double& ratio_dec, const double& ratio_ogrid, bool project_on_meshing_edge = true);
+        splitAllFaces(std::string narete, const double& ratio_dec, const double& ratio_ogrid);
 
 #ifndef SWIG
     Mgx3D::Internal::M3DCommandResult*
-        splitAllFaces(CoEdge* arete, const double& ratio_dec, const double& ratio_ogrid, bool project_on_meshing_edge);
+        splitAllFaces(CoEdge* arete, const double& ratio_dec, const double& ratio_ogrid);
 #endif
 
-    /** \brief Découpe toutes les faces structurées en deux suivant un point à projeter
+    /** \brief Découpe toutes les faces structurées 2D en deux suivant un point à projeter
      * \see splitFaces
      */
     Mgx3D::Internal::M3DCommandResult*
-        splitAllFaces(std::string narete, const Point& pt, const double& ratio_ogrid, bool project_on_meshing_edge = true);
+        splitAllFaces(std::string narete, const Point& pt, const double& ratio_ogrid);
 
 #ifndef SWIG
     Mgx3D::Internal::M3DCommandResult*
-        splitAllFaces(CoEdge* arete, const Point& pt, const double& ratio_ogrid, bool project_on_meshing_edge);
+        splitAllFaces(CoEdge* arete, const Point& pt, const double& ratio_ogrid);
 #endif
 
     /** \brief Découpage d'une face structurée 2D ou 3D en deux suivant un ratio
@@ -887,7 +887,7 @@ public:
      *  L'autre arête parallèle est aussi découpée avec le même ratio induit de la première coupe.
      */
     Mgx3D::Internal::M3DCommandResult*
-        splitFace(std::string coface_name, std::string narete, const Point& pt, bool project_on_meshing_edges);
+        splitFace(std::string coface_name, std::string narete, const Point& pt, bool project_on_meshing_edges = true);
 
 #ifndef SWIG
     Mgx3D::Internal::M3DCommandResult*
