@@ -868,8 +868,6 @@ public:
 
     /** \brief Découpage d'une face structurée 2D ou 3D en deux suivant un ratio
      *
-     *	OBSOLETE: Issue201 - Homogénéisation de l'API : utiliser splitFaces
-     *
      *  On utilise une arête et un ratio pour positionner un premier sommet
      *  qui va être inséré sur l'arête.
      *  L'autre arête parallèle est aussi découpée avec le même ratio.
@@ -883,8 +881,6 @@ public:
 #endif
 
     /** \brief Découpage d'une face structurée 2D ou 3D en deux suivant un point à projeter
-     *
-     *	OBSOLETE: Issue201 - Homogénéisation de l'API : utiliser splitFaces
      *
      *  On utilise une arête et un point que l'on projette sur cette arête pour positionner un premier sommet
      *  qui va être inséré sur l'arête.
