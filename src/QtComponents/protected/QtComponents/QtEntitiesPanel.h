@@ -55,6 +55,11 @@ class QtEntityTreeWidgetItem :
 	virtual ~QtEntityTreeWidgetItem ( );
 
 	/**
+	 * Oublie l'entité représentée.
+	 */
+	virtual void releaseEntity ( );
+
+	/**
 	 * \return		L'entité représentée.
 	 */
 	virtual Mgx3D::Utils::Entity* getEntity ( );
@@ -756,6 +761,11 @@ class QtEntitiesPanel :public QtEntitiesItemViewPanel, public Internal::Selectio
 	 * \param		Types d'entrées à actualiser
 	 */
 	virtual void updateEntryItems (Mgx3D::Utils::DisplayRepresentation::display_type type);
+
+	/**
+	 * A appeler lorsque la session est réinitialisée, doit réinitialiser le panneau. Ne fait rien par défaut, à surcharger.
+	 */
+	virtual void sessionCleared ( );
 
 	//@}
 

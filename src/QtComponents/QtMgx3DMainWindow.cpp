@@ -5395,7 +5395,7 @@ cout << __FILE__ << ' ' << __LINE__ << " QtMgx3DMainWindow::exitCallback" << end
 
 			BEGIN_QT_TRY_CATCH_BLOCK
 
-					DISABLE_COMMAND_ACTIONS
+			DISABLE_COMMAND_ACTIONS
 			DISABLE_GRAPHICAL_OPERATIONS
 			getContext().redo();
 
@@ -5429,7 +5429,11 @@ cout << __FILE__ << ' ' << __LINE__ << " QtMgx3DMainWindow::exitCallback" << end
 
 			BEGIN_QT_TRY_CATCH_BLOCK
 
-			getContext().clearSession();
+			DISABLE_GRAPHICAL_OPERATIONS
+
+			getContext ( ).clearSession ( );
+			getGroupsPanel ( ).sessionCleared ( );
+			getEntitiesPanel ( ).sessionCleared ( );
 
 			COMPLETE_QT_TRY_CATCH_BLOCK(true, this, getAppTitle())
 		}    // QtMgx3DMainWindow::reinitializeCallback
