@@ -23,6 +23,7 @@ CommandSplitFaces(Internal::Context& c, std::vector<Topo::CoFace* > &cofaces, Co
 , m_ratio_dec(ratio_dec)
 , m_ratio_ogrid(ratio_ogrid)
 , m_project_on_meshing_edges(project_on_meshing_edges)
+, m_cas_2D(true)
 {
 #ifdef _DEBUG_SPLIT
 	std::cout<<"CommandSplitFaces::CommandSplitFaces("<<cofaces.size()<<" cofaces, "<<arete->getName()<<", "<<ratio_dec<<", "<<ratio_ogrid<<", "<<project_on_meshing_edges<<")"<<std::endl;
@@ -49,6 +50,7 @@ CommandSplitFaces(Internal::Context& c, std::vector<Topo::CoFace* > &cofaces, Co
 , m_ratio_dec(0)
 , m_ratio_ogrid(ratio_ogrid)
 , m_project_on_meshing_edges(project_on_meshing_edges)
+, m_cas_2D(true)
 {
 	m_ratio_dec = arete->computeRatio(pt);
 
@@ -77,6 +79,7 @@ CommandSplitFaces(Internal::Context& c, CoEdge* arete, double ratio_dec, double 
 , m_ratio_dec(ratio_dec)
 , m_ratio_ogrid(ratio_ogrid)
 , m_project_on_meshing_edges(project_on_meshing_edges)
+, m_cas_2D(true)
 {
 #ifdef _DEBUG_SPLIT
 	std::cout<<"CommandSplitFaces::CommandSplitFaces("<<arete->getName()<<", "<<ratio_dec<<", "<<ratio_ogrid<<", "<<project_on_meshing_edges<<")"<<std::endl;
@@ -93,6 +96,7 @@ CommandSplitFaces(Internal::Context& c, CoEdge* arete, const Point& pt, double r
 , m_ratio_dec(0)
 , m_ratio_ogrid(ratio_ogrid)
 , m_project_on_meshing_edges(project_on_meshing_edges)
+, m_cas_2D(true)
 {
     m_ratio_dec = arete->computeRatio(pt);
 #ifdef _DEBUG_SPLIT
@@ -114,6 +118,11 @@ void CommandSplitFaces::init(std::vector<Topo::CoFace* > &cofaces)
         Topo::CoFace* hcf = *iter;
 		
         if (hcf->isStructured()){
+			if (hcf->getNbFaces()) {
+				// si hcf est 2D, elle n'a pas de face
+				// et si au moins une coface est 3D, le cas est 3D
+				m_cas_2D = false;
+			}
 			m_cofaces.push_back(hcf);
             verif(hcf);
 #ifdef _DEBUG_SPLIT
@@ -290,7 +299,9 @@ internalExecute()
 
 	std::vector<Edge*> splitingEdges;
 
-	try {
+	// if (m_cas_2D) {
+	// 	TopoHelper::splitFaces(m_cofaces, m_arete, m_ratio_dec, m_ratio_ogrid, false, true, splitingEdges, &getInfoCommand());
+	// } else {
 		do {
 			Vertex* sommet = 0;
 			CoFace* coface = 0;
@@ -348,10 +359,7 @@ internalExecute()
 			}
 
 		} while (nb_faces_dep != nb_faces_split);
-	}
-	catch (const TkUtil::Exception& exc){
-		throw TkUtil::Exception(exc);
-	}
+	//}
 
 	// on replace les sommets en fonction de m_ratio_dec
     if (!m_project_on_meshing_edges)

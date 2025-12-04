@@ -1818,7 +1818,7 @@ void Context::clearIdToEntity()
 	TkUtil::AutoMutex	autoMutex (&_entitiesMutex);
 #ifdef _DEBUG
 	if (0 != _entities.size ( ))
-		std::cerr << __FILE__ << ' ' << __LINE__ << " Context::clearIdToEntity : "
+		std::cout << __FILE__ << ' ' << __LINE__ << " Context::clearIdToEntity : "
 		<< "la liste contient " << _entities.size ( ) << " entités."
 		<< std::endl;
 	//showAllEntities(std::cout);

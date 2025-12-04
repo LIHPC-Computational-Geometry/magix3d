@@ -712,9 +712,9 @@ void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
                     || coedge_dep->getVertex(1) == arete->getVertex(0)
                     || coedge_dep->getVertex(1) == arete->getVertex(1)
                     || !boucleDemandee){
-                boucleTerminee = true;
-                continue;
-            }
+                    boucleTerminee = true;
+                    continue;
+                }
             else
                 throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, Topo::splitFaces ne retrouve pas de face commune pour avancer", TkUtil::Charset::UTF_8));
         }
@@ -723,7 +723,7 @@ void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
 #endif
         // pour ne pas réutiliser cette coface
         if (boucleDemandee)
-            filtre_cofaces[coface] = 2;
+        filtre_cofaces[coface] = 2;
         else if (0 == coface_begin)
             coface_begin = coface;
 
