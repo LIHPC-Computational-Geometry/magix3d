@@ -641,6 +641,18 @@ vector<Group::GroupEntity*> QtGroupsPanel::getSelectedGroups ( ) const
 }	// QtGroupsPanel::getSelectedGroups
 
 
+void QtGroupsPanel::sessionCleared ( )
+{
+	// Rem : ça détruit également la vue multi-niveaux
+	for (vector<QTreeWidgetItem*>::iterator itge = _groupsEntriesItems.begin ( ); itge != _groupsEntriesItems.end ( ); itge++)
+	{
+		QList<QTreeWidgetItem*>	items	= (*itge)->takeChildren ( );
+		for (int i = 0; i < items.size ( ); i++)
+			delete items.at (i);
+	}	// for (vector<QTreeWidgetItem*>::iterator itge = _groupsEntriesItems.begin ( ); itge != _groupsEntriesItems.end ( ); itge++)
+}	// QtGroupsPanel::sessionCleared
+
+
 void QtGroupsPanel::displaySelectedTypes (bool display)
 {
 	if (true == getGraphicalWidget ( )->getRenderingManager ( ).displayLocked ( ))

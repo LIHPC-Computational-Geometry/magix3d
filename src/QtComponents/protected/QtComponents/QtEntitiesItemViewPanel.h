@@ -25,14 +25,10 @@ class QtMgx3DMainWindow;
 
 
 /**
- * \brief		Panneau abstrait de l'IHM <I>Magix 3D</I> affichant des entités 
- *				d'une session <I>Magix 3D</I>.
- *				L'affichage est ici a priori textuel et couplé à un affichage
- *				dans une fenêtre graphique 3D.
+ * \brief		Panneau abstrait de l'IHM <I>Magix 3D</I> affichant des entités d'une session <I>Magix 3D</I>.
+ *				L'affichage est ici a priori textuel et couplé à un affichage dans une fenêtre graphique 3D.
  *
- *				<P>L'objectif de cette classe non instanciable est de factoriser
- *				certains services des vues textuelles type <I>QTreeWidget</I>
- *				d'entités.
+ *				<P>L'objectif de cette classe non instanciable est de factoriser certains services des vues textuelles type <I>QTreeWidget</I> d'entités.
  *				</P>
  */
 class QtEntitiesItemViewPanel : public QtGroupBox
@@ -45,9 +41,7 @@ class QtEntitiesItemViewPanel : public QtGroupBox
 	 * \param	Nom du panneau.
 	 * \param	Contexte Magix 3D du panneau
 	 */
-	QtEntitiesItemViewPanel (
-			QWidget* parent, QtMgx3DMainWindow* mainWindow,
-			const std::string& name, Internal::Context& context);
+	QtEntitiesItemViewPanel (QWidget* parent, QtMgx3DMainWindow* mainWindow, const std::string& name, Internal::Context& context);
 
 	/**
 	 * RAS.
@@ -72,6 +66,11 @@ class QtEntitiesItemViewPanel : public QtGroupBox
 	 * \param		La fenêtre principale à laquelle est rattaché le panneau.
 	 */
 	virtual void setMainWindow (QtMgx3DMainWindow*);
+
+	/**
+	 * A appeler lorsque la session est réinitialisée, doit réinitialiser le panneau. Ne fait rien par défaut, à surcharger.
+	 */
+	virtual void sessionCleared ( );
 
 	/**
 	 * La gestion de la sélection.
@@ -99,11 +98,8 @@ class QtEntitiesItemViewPanel : public QtGroupBox
 	//@{
 
 	/**
-	 * \param		La fenêtre graphique à utiliser pour les affichages 3D,
-	 *				ou 0.
-	 * \exception	Une exception est levée si la fenêtre transmise en
-	 *				argument est non nulle et qu'une autre fenêtre est déjà
-	 *				affectée.
+	 * \param		La fenêtre graphique à utiliser pour les affichages 3D, ou 0.
+	 * \exception	Une exception est levée si la fenêtre transmise en argument est non nulle et qu'une autre fenêtre est déjà affectée.
 	 * \see			getGraphicalWidget
 	 */
 	virtual void setGraphicalWidget (Qt3DGraphicalWidget* widget3D);
@@ -129,22 +125,18 @@ class QtEntitiesItemViewPanel : public QtGroupBox
 	virtual void setLogStream (TkUtil::LogOutputStream* stream);
 
 	/**
-	 * \param		Ecrit le log transmis en argument dans le flux
-	 *				d'informations associé.
+	 * \param		Ecrit le log transmis en argument dans le flux d'informations associé.
 	 */
 	virtual void log (const TkUtil::Log& log);
 
 	//@}	// La gestion des informations à remonter à l'utilisateur.
 
 	/**
-	 * Appelé pour modifier les paramètres d'affichage
-	 * (points/filaire/surfacique) des entités données en argument. Affiche une
-	 * boite de dialogue de choix des types de représentation à utiliser,
-	 * initialisé selon les entités transmises en argument, et effectue les
+	 * Appelé pour modifier les paramètres d'affichage (points/filaire/surfacique) des entités données en argument. Affiche une
+	 * boite de dialogue de choix des types de représentation à utiliser, initialisé selon les entités transmises en argument, et effectue les
 	 * modifications demandées.
 	 */
-	virtual void changeRepresentationTypes (
-						const std::vector<Mgx3D::Utils::Entity*>& entities);
+	virtual void changeRepresentationTypes (const std::vector<Mgx3D::Utils::Entity*>& entities);
 
 
 	protected :

@@ -222,8 +222,7 @@ void QtEntitiesGroupTreeWidgetItem::setRepresentationMask (unsigned long mask)
 }	// QtEntitiesGroupTreeWidgetItem::setRepresentationMask
 
 
-DisplayRepresentation::display_type
-					QtEntitiesGroupTreeWidgetItem::getEntitiesType ( ) const
+DisplayRepresentation::display_type QtEntitiesGroupTreeWidgetItem::getEntitiesType ( ) const
 {
 	return _entitiesType;
 }	// QtEntitiesGroupTreeWidgetItem::getEntitiesType
@@ -326,6 +325,12 @@ const Entity* QtEntityTreeWidgetItem::getEntity ( ) const
 {
 	return _entity;
 }	// QtEntityTreeWidgetItem::getEntity
+
+
+void QtEntityTreeWidgetItem::releaseEntity ( )
+{
+	_entity	= 0;
+}	// QtEntityTreeWidgetItem::releaseEntity
 
 
 unsigned long QtEntityTreeWidgetItem::getNativeRepresentationMask ( ) const
@@ -1508,6 +1513,53 @@ void QtEntitiesPanel::updateEntryItems (DisplayRepresentation::display_type type
 		break;
 	}	// switch (type)
 }	// QtEntitiesPanel::updateEntryItems
+
+
+static void clearEntityTreeWidgetItemList (QTreeWidgetItem& entry)
+{
+	QList<QTreeWidgetItem*>	items	= entry.takeChildren ( );
+	for (int i = 0; i < items.size ( ); i++)
+	{
+		QtEntityTreeWidgetItem*	entityItem	= dynamic_cast<QtEntityTreeWidgetItem*>(items.at (i));
+		if (0 != entityItem)
+			entityItem->releaseEntity ( );
+		delete items.at (i);
+	}	// for (int i = 0; i < items.size ( ); i++)
+	entry.setCheckState (0, Qt::Unchecked);
+}	// clearEntityTreeWidgetItemList
+
+
+void QtEntitiesPanel::sessionCleared ( )
+{
+	CHECK_NULL_PTR_ERROR (_cadVolumesItem)
+	CHECK_NULL_PTR_ERROR (_cadSurfacesItem)
+	CHECK_NULL_PTR_ERROR (_cadCurvesItem)
+	CHECK_NULL_PTR_ERROR (_cadCloudsItem)
+	CHECK_NULL_PTR_ERROR (_topoBlocksItem)
+	CHECK_NULL_PTR_ERROR (_topoFacesItem)
+	CHECK_NULL_PTR_ERROR (_topoEdgesItem)
+	CHECK_NULL_PTR_ERROR (_topoVerticesItem)
+	CHECK_NULL_PTR_ERROR (_meshVolumesItem)
+	CHECK_NULL_PTR_ERROR (_meshSurfacesItem)
+	CHECK_NULL_PTR_ERROR (_meshLinesItem)
+	CHECK_NULL_PTR_ERROR (_meshCloudsItem)
+	CHECK_NULL_PTR_ERROR (_sysCoordItem)
+	CHECK_NULL_PTR_ERROR (_structuredMeshVolumesItem)
+	clearEntityTreeWidgetItemList (*_cadVolumesItem);
+	clearEntityTreeWidgetItemList (*_cadSurfacesItem);
+	clearEntityTreeWidgetItemList (*_cadCurvesItem);
+	clearEntityTreeWidgetItemList (*_cadCloudsItem);
+	clearEntityTreeWidgetItemList (*_topoBlocksItem);
+	clearEntityTreeWidgetItemList (*_topoFacesItem);
+	clearEntityTreeWidgetItemList (*_topoEdgesItem);
+	clearEntityTreeWidgetItemList (*_topoVerticesItem);
+	clearEntityTreeWidgetItemList (*_meshVolumesItem);
+	clearEntityTreeWidgetItemList (*_meshSurfacesItem);
+	clearEntityTreeWidgetItemList (*_meshLinesItem);
+	clearEntityTreeWidgetItemList (*_meshCloudsItem);
+	clearEntityTreeWidgetItemList (*_sysCoordItem);
+	clearEntityTreeWidgetItemList (*_structuredMeshVolumesItem);
+}	// QtEntitiesPanel::sessionCleared
 
 
 void QtEntitiesPanel::entitiesAddedToSelection (const vector<Entity*>& entities)
