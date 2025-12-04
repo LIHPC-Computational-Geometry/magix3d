@@ -3,7 +3,7 @@
 
 import sys
 
-dependencies = "@ADDPYTHONPACKAGES@"
+dependencies = "@LIMA_BINDING_DIR@:@ADDPYTHONPACKAGES@"
 dependencies_tmp = dependencies.split(":")
 
 sys.path.insert(1,"@CMAKE_INSTALL_PREFIX@/@MAGIX3D_BINDING_INSTALL_DIR@")

@@ -13,6 +13,10 @@ add_executable (${MAGIX3D_BATCH_EXE} Magix3DBatch.cpp)
 target_link_libraries (${MAGIX3D_BATCH_EXE} PUBLIC pyMagix3D)
 target_link_libraries (${MAGIX3D_BATCH_EXE} PUBLIC z)	# Pour Qt sous Ubuntu installé via l'installeur Qt)
 
+# On ajoute Lima qui fait partie intégrante du package "maillage" :
+find_package (Lima REQUIRED COMPONENTS LimaScripting)
+set (LIMA_BINDING_DIR ${LimaScripting_RUNTIME_DIR})
+
 # INSTALL_RPATH modifie le rpath pour les libs internes au projet :
 set_target_properties (${MAGIX3D_BATCH_EXE} PROPERTIES INSTALL_RPATH_USE_LINK_PATH 1 INSTALL_RPATH ${CMAKE_PACKAGE_RPATH_DIR})
 

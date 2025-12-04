@@ -3521,7 +3521,8 @@ void QtMgx3DMainWindow::showReady ( )
 			CHECK_NULL_PTR_ERROR(_pythonPanel)
 			_pythonPanel->setInterpreterName("Magix3D interpreter");
 			// On facilite la tache de l'utilisateur : récupération du contexte de cette session :
-			char *env = getenv("MGX3D_PATH");
+			char*	env		= getenv ("MGX3D_PATH");
+			char*	limaEnv	= getenv ("LIMA_PATH");
 			if (0 != env)
 			{
 				_pythonPanel->executeCommand("import sys");
@@ -3532,6 +3533,20 @@ void QtMgx3DMainWindow::showReady ( )
 				UTF8String importLine(Charset::UTF_8);
 				importLine << "import pyMagix3D as " << getMgx3DAlias();
 				_pythonPanel->executeCommand(importLine);
+
+				if (0 != limaEnv)
+				{
+					const string	comment	= PythonLogOutputStream::toComment (UTF8String ("Pour une utilisation directe et scriptée de l'API Lima :", Charset::UTF_8));
+					_pythonPanel->executeCommand (comment);
+					const string limaPath (limaEnv);
+					UTF8String   limaPathCmd (Charset::UTF_8);
+					limaPathCmd << "sys.path.append(\"" << limaPath << "\")";
+					_pythonPanel->executeCommand (limaPathCmd);
+					UTF8String limaImportLine (Charset::UTF_8);
+					limaImportLine << "from LimaScripting import *";
+					_pythonPanel->executeCommand (limaImportLine);
+				}	// if (0 != limaEnv)
+
 				UTF8String contextLine(Charset::UTF_8);
 				contextLine << getContextAlias() << " = " << getMgx3DAlias()
 				            << ".getContext(\"" << getContext().getName() << "\")";
