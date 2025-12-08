@@ -618,14 +618,891 @@ void TopoHelper::getVerticesTip(const std::vector<CoEdge* > & coedges, Vertex* &
 }
 /*----------------------------------------------------------------------------*/
 //#define _DEBUG_SPLIT
-void TopoHelper::splitFaces(std::vector<CoFace* > cofaces,
+void TopoHelper::splitFaces2D(std::vector<CoFace* > cofaces,
         CoEdge* arete, double ratio_dec, double ratio_ogrid,
         bool boucleDemandee, bool rebondAutorise,
         std::vector<Edge* > &splitingEdges,
         Internal::InfoCommand* icmd)
 {
 #ifdef _DEBUG_SPLIT
-    std::cout<<"splitFaces(...) avec "<< cofaces.size()<<" cofaces, arete = "<<arete->getName()
+    std::cout<<"splitFaces2D(...) avec "<< cofaces.size()<<" cofaces, arete = "<<arete->getName()
+            <<", ratio_dec = "<< ratio_dec
+            <<", ratio_ogrid = "<< ratio_ogrid
+            <<", boucleDemandee = "<< boucleDemandee
+            << std::endl;
+#endif
+
+    // on marque les CoFaces autorisées à 1,
+    // et on incrémente à chaque fois que l'on sélectionne la face
+    std::map<CoFace*, uint> filtre_cofaces;
+    for (std::vector<CoFace* >::iterator iter = cofaces.begin();
+            iter != cofaces.end(); ++iter)
+        filtre_cofaces[*iter] = 1;
+
+
+    // on recherche le nombre de bras de maillage correspondant au ratio
+    // (on ne tient pas compte du type de discrétisation, seulement le nombre de bras)
+    uint nbMeshingEdges_dep = (uint)((double)arete->getNbMeshingEdges()*ratio_dec+0.5);
+    CoEdge* coedge_dep = arete;
+
+    // on part d'une CoEdge et d'un nombre de bras de maillage à mettre entre le premier sommet et la coupe,
+    // on sélectionne une CoFace adjacente parmi la sélection
+    // on recherche la CoEdge en face et le nombre de bras de maillage similaire au cas précédent
+    bool boucleTerminee = false;
+
+    // dans le cas dégénéré, il sera peut-être nécessaire de refaire un démarage de l'algo au point de départ,
+    // car on ne peut pas forcément boucler (cas d'une face dégénérée à 3 côtés)
+    int nb_trials = arete->getNbCofaces(); // Pour traiter la cas du split de deux faces avec une arete commune
+    bool boucleRelancee = false;
+    bool tenteRelance = false;
+
+    // on fait une première passe pour repérer les arêtes
+    // on stocke le résultat
+    std::map<uint, InfoSplit*> cofaceInfoSplit;
+    std::map<uint, CoFace*> id2coface;
+    CoFace* coface_prec = 0;
+    // on repère la première coface vue pour ne pas la reprendre en cas de reprise dans l'autre sens
+    CoFace* coface_begin = 0;
+
+    /* mémorise si l'arête de départ est après la coupe ou non
+     * nécessaire lorque l'on est à une extrémité d'une arête pour commencer
+     * ce qui est le cas si cette arête a déjà été coupée
+     */
+    bool need_find_coedge = (ratio_dec == 0.0 || ratio_dec == 1.0);
+    bool coedge_after_cut = false;
+    bool init_coedge_after_cut = true;
+    bool sens_coedge_dep = true;
+    bool sens_coedge_ar = true;
+
+    while (!boucleTerminee){
+        uint nbMeshingEdges_ar;
+        CoEdge* coedge_ar = 0;
+
+        // vrai si l'on souhaite reprendre cette face comme s'il y avait une symétrie
+        // utile pour le cas où l'on arrive sur une face dégénérée par un côté qui ne fait pas face a la dégénérescence
+        bool reprendreCetteFace = false;
+
+#ifdef _DEBUG_SPLIT
+        std::cout<<std::endl;
+        std::cout<<"nbMeshingEdges_dep = "<<nbMeshingEdges_dep<<std::endl;
+        std::cout<<"coedge_dep = "<<coedge_dep->getName()<<std::endl;
+        std::cout<<"coface_prec = "<<(coface_prec?coface_prec->getName():"0")<<std::endl;
+#endif
+
+        std::vector<CoFace* > loc_cofaces;
+        coedge_dep->getCoFaces(loc_cofaces);
+
+        // on en recherche une parmi la sélection et qui ne soit pas encore vue
+        // dans le cas d'une boucle (faces d'un bloc) on ne veut prendre les faces qu'une fois
+        // dans le cas sans boucle, on veut juste passer d'une face à la voisine avec un retour possible
+        // lors du passage par un point au centre d'une boule
+        CoFace* coface = 0;
+        for (std::vector<CoFace* >::iterator iter = loc_cofaces.begin();
+                iter != loc_cofaces.end() && 0 == coface; ++iter){
+            if (filtre_cofaces[*iter] == 1 && coface_prec != *iter)
+                coface = *iter;
+        }
+
+        if (0 == coface){
+            // détection du cas d'une arête dans le prolongement de l'arête de départ
+            // ce qui apparait dans le cas d'une face déjà coupée
+            // mais qui n'a pas été détecté par coedge_dep == arete
+            // ou une terminaison pour une coupe localisée
+            if (coedge_dep->getVertex(0) == arete->getVertex(0)
+                    || coedge_dep->getVertex(0) == arete->getVertex(1)
+                    || coedge_dep->getVertex(1) == arete->getVertex(0)
+                    || coedge_dep->getVertex(1) == arete->getVertex(1)
+                    || !boucleDemandee){
+                if (nb_trials > 1){
+                    nb_trials--;
+                    tenteRelance = true;
+                } else{
+                    boucleTerminee = true;
+#ifdef _DEBUG_SPLIT
+                    std::cout<<"Pas de coface trouvée, on va sortir"<<std::endl;
+#endif
+                    continue;
+                }
+            }
+            else
+                throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, Topo::splitFaces ne retrouve pas de face commune pour avancer", TkUtil::Charset::UTF_8));
+        }
+
+        if (0 != coface){
+#ifdef _DEBUG_SPLIT
+            std::cout<<"coface trouvée : "<<coface->getName()<<std::endl;
+#endif
+            // pour ne pas réutiliser cette coface
+            if (boucleDemandee)
+                filtre_cofaces[coface] = 2;
+            else if (0 == coface_begin)
+                coface_begin = coface;
+
+            // recherche du côté dans lequel est cette arête, et le nombre de bras de maillage jusqu'à la coupe
+            Edge* edge_dep = coface->getEdgeContaining(coedge_dep);
+            uint ind_edge_dep = coface->getIndex(edge_dep);
+#ifdef _DEBUG_SPLIT
+            std::cout<<"edge_dep = "<<edge_dep->getName()<<std::endl;
+#endif
+
+            // direction de la face qui est coupée
+            CoFace::eDirOnCoFace dirCoFaceSplit = (ind_edge_dep%2?CoFace::i_dir:CoFace::j_dir);
+#ifdef _DEBUG_SPLIT
+            std::cout<<"dirCoFaceSplit = "<<(dirCoFaceSplit==CoFace::i_dir?"i_dir":"j_dir")<<std::endl;
+#endif
+
+            Vertex* vertex1;
+            Vertex* vertex2;
+            if (dirCoFaceSplit == CoFace::i_dir){
+                vertex1 = coface->getVertex(1);
+                vertex2 = coface->getVertex(0);
+            } else {
+                vertex1 = coface->getVertex(1);
+                vertex2 = coface->getVertex(2);
+            }
+
+            if (ind_edge_dep>1){
+                Vertex* vertex_tmp = vertex1;
+                vertex1 = vertex2;
+                vertex2 = vertex_tmp;
+            }
+
+            // calcul le nombre de bras entre le sommet de départ et un noeud sur une CoEdge
+            uint nbMeshingEdges_edge;
+            edge_dep->computeCorrespondingNbMeshingEdges(vertex1, coedge_dep, nbMeshingEdges_dep,
+                    nbMeshingEdges_edge, sens_coedge_dep);
+
+            if (need_find_coedge){
+                if (init_coedge_after_cut){
+                    coedge_after_cut = (nbMeshingEdges_dep != coedge_dep->getNbMeshingEdges());
+                    if (!sens_coedge_dep)
+                        coedge_after_cut = !coedge_after_cut;
+                    // pour ne faire l'initialisation qu'une fois
+                    init_coedge_after_cut = false;
+                }
+                else {
+                    if (sens_coedge_dep != sens_coedge_ar)
+                        coedge_after_cut = !coedge_after_cut;
+                }
+            }
+
+#ifdef _DEBUG_SPLIT
+            std::cout<<"nbMeshingEdges_dep =  "<<nbMeshingEdges_dep<<std::endl;
+            std::cout<<"nbMeshingEdges_edge =  "<<nbMeshingEdges_edge<<std::endl;
+            std::cout<<"sens_coedge_dep = "<<(sens_coedge_dep?"vrai":"faux")<<std::endl;
+            std::cout<<"vertex1 = "<<vertex1->getName()<<std::endl;
+            std::cout<<"vertex2 = "<<vertex2->getName()<<std::endl;
+            if (need_find_coedge)
+                std::cout<<"coedge_after_cut = "<<(coedge_after_cut?"vrai":"faux")<<std::endl;
+#endif
+
+            Edge* edge_ar = 0;
+            // si on est sur côté face à la dégénérescence, on met à 0 l'arête d'arrivée
+            // ce qui permet de signaler un redémarage nécessaire
+            if (coface->getNbEdges() == 4){
+                uint ind_edge_ar = (ind_edge_dep+2)%4;
+                edge_ar = coface->getEdge(ind_edge_ar);
+            } else {
+                if (boucleDemandee){
+                    // cas 3D
+                    if (ind_edge_dep == 0)
+                        edge_ar = coface->getEdge(2);
+                    else if (ind_edge_dep == 2)
+                        edge_ar = coface->getEdge(0);
+                    else
+                        edge_ar = 0;
+                }
+                else {
+                    // cas 2D
+                    edge_ar = 0;
+                    if (ind_edge_dep != 1)
+                        reprendreCetteFace = true;
+
+                    // on test pour détecter le cas d'une zone avec 1 seul sommet sur l'axe
+                    uint nb_sur_axe = 0;
+                    if (Utils::Math::MgxNumeric::isNearlyZero(coface->getVertex(0)->getY()))
+                        nb_sur_axe++;
+                    if (Utils::Math::MgxNumeric::isNearlyZero(coface->getVertex(1)->getY()))
+                        nb_sur_axe++;
+                    if (Utils::Math::MgxNumeric::isNearlyZero(coface->getVertex(2)->getY()))
+                        nb_sur_axe++;
+                    if (nb_sur_axe == 1){
+                        TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
+                        messErr << "Echec lors du découpage de la face "<<coface->getName()
+                                <<", elle n'a qu'un unique sommet sur l'axe, ce qui n'est pas compatible avec le passage en blocs structurés en 3D";
+                        throw TkUtil::Exception(messErr);
+                    }
+                }
+            }
+
+            // réciproque: recherche la CoEdge touchée par le noeud
+            if (0 != edge_ar){
+                if (edge_dep->getNbMeshingEdges() != edge_ar->getNbMeshingEdges())
+                {
+                        TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
+                        messErr << "Echec lors du découpage de la face "<<coface->getName()
+                                <<", le nombre d'arêtes de maillage est différent de part et d'autre de la face (" << (short)edge_dep->getNbMeshingEdges()
+                                << " vs " << (short)edge_ar->getNbMeshingEdges() << ")";
+                        throw TkUtil::Exception(messErr);
+                }
+
+                edge_ar->computeCorrespondingCoEdgeAndNbMeshingEdges(vertex2, nbMeshingEdges_edge, coedge_after_cut,
+                        coedge_ar, nbMeshingEdges_ar, sens_coedge_ar);
+
+
+#ifdef _DEBUG_SPLIT
+                std::cout<<"nbMeshingEdges_ar =  "<<nbMeshingEdges_ar<<std::endl;
+                std::cout<<"coedge_ar =  "<<coedge_ar->getName()<<std::endl;
+                std::cout<<"edge_ar =  "<<edge_ar->getName()<<std::endl;
+                std::cout<<"sens_coedge_ar = "<<(sens_coedge_ar?"vrai":"faux")<<std::endl;
+#endif
+            }
+            else {
+                nbMeshingEdges_ar = 0;
+                coedge_ar = 0;
+#ifdef _DEBUG_SPLIT
+                std::cout<<"edge_ar et coedge_ar  == 0\n";
+#endif
+            }
+            // on recherche si cette face est déjà coupée
+            InfoSplit* is = 0;
+            if (cofaceInfoSplit.find(coface->getUniqueId()) == cofaceInfoSplit.end()){
+                if (coface->getNbEdges() == 3 && ind_edge_dep != 1 && !boucleDemandee){
+                    // cas où on arrive sur face dégénérée par un côté autre que celui qui fait face à la dégénérescence
+#ifdef _DEBUG_SPLIT
+                    std::cout<<"on ne fait rien sur cette face en arrivant par ce côté\n";
+                    std::cout<<"coedge_dep =  "<<(coedge_dep?coedge_dep->getName():"0")<<std::endl;
+                    std::cout<<" on en profite pour recalculer nbMeshingEdges_edge ...\n";
+                    std::cout<<"nbMeshingEdges_edge =  "<<nbMeshingEdges_edge<<std::endl;
+                    std::cout<<"vertex1 =  "<<(vertex1?vertex1->getName():"0")<<std::endl;
+                    std::cout<<"vertex2 =  "<<(vertex2?vertex2->getName():"0")<<std::endl;
+#endif
+                    // on va calculer nbMeshingEdges_edge pour la partie sous l'ogrid
+                    if (!Utils::Math::MgxNumeric::isNearlyZero(vertex1->getY()))
+                        nbMeshingEdges_edge = edge_dep->getNbMeshingEdges() - nbMeshingEdges_edge;
+#ifdef _DEBUG_SPLIT
+                    std::cout<<" => nbMeshingEdges_edge =  "<<nbMeshingEdges_edge<<std::endl;
+#endif
+                }
+                else {
+#ifdef _DEBUG_SPLIT
+                    std::cout<<"# nouveau InfoSplit\n";
+                    std::cout<<"coedge_dep =  "<<(coedge_dep?coedge_dep->getName():"0")<<std::endl;
+                    std::cout<<"coedge_ar =  "<<(coedge_ar?coedge_ar->getName():"0")<<std::endl;
+                    std::cout<<"nbMeshingEdges_dep =  "<<nbMeshingEdges_dep<<std::endl;
+                    std::cout<<"nbMeshingEdges_ar =  "<<nbMeshingEdges_ar<<std::endl;
+#endif
+                    is = new InfoSplit();
+                    is->dirCoFaceSplit = dirCoFaceSplit;
+                    is->coedge_dep.push_back(coedge_dep);
+                    is->edge_dep = edge_dep;
+                    is->coedge_ar.push_back(coedge_ar);
+                    is->edge_ar = edge_ar;
+                    is->nbMeshingEdges_dep.push_back(nbMeshingEdges_dep);
+                    is->nbMeshingEdges_ar.push_back(nbMeshingEdges_ar);
+
+                    cofaceInfoSplit[coface->getUniqueId()] = is;
+                    id2coface[coface->getUniqueId()] = coface;
+                }
+            }
+            else {
+                is = cofaceInfoSplit[coface->getUniqueId()];
+                // si la face a déjà été vu, c'est peut-être en parcourant dans l'autre sens, il faut peut-être inverser
+                uint ind_dep_0 = coface->getIndex(is->coedge_dep[0]);
+                uint ind_dep_1 = coface->getIndex(coedge_dep);
+                bool inverse = (ind_dep_0 != ind_dep_1);
+
+#ifdef _DEBUG_SPLIT
+                std::cout<<"InfoSplit complété "<<(inverse?"en inversant\n":"sans inverser\n");
+                std::cout<<"coedge_dep =  "<<(coedge_dep?coedge_dep->getName():"0")<<std::endl;
+                std::cout<<"coedge_ar =  "<<(coedge_ar?coedge_ar->getName():"0")<<std::endl;
+                std::cout<<"nbMeshingEdges_dep =  "<<nbMeshingEdges_dep<<std::endl;
+                std::cout<<"nbMeshingEdges_ar =  "<<nbMeshingEdges_ar<<std::endl;
+#endif
+
+                if (inverse){
+                    is->coedge_dep.push_back(coedge_ar);
+                    is->coedge_ar.push_back(coedge_dep);
+                    is->nbMeshingEdges_dep.push_back(nbMeshingEdges_ar);
+                    is->nbMeshingEdges_ar.push_back(nbMeshingEdges_dep);
+                }
+                else {
+                    is->coedge_dep.push_back(coedge_dep);
+                    is->coedge_ar.push_back(coedge_ar);
+                    is->nbMeshingEdges_dep.push_back(nbMeshingEdges_dep);
+                    is->nbMeshingEdges_ar.push_back(nbMeshingEdges_ar);
+                }
+            }
+
+            // cas d'un "rebond" au niveau du centre d'une "boule"
+            // c'est à dire une topologie équivalente à un demi-cercle, sur l'axe de symétrie
+            if (0 == coedge_ar && rebondAutorise && coface->getNbEdges() == 3
+                    && Utils::Math::MgxNumeric::isNearlyZero(coface->getVertex(0)->getY())
+                    && Utils::Math::MgxNumeric::isNearlyZero(coface->getVertex(1)->getY())
+                    && Utils::Math::MgxNumeric::isNearlyZero(coface->getVertex(2)->getY()) ){
+                // on coupe une deuxième fois l'arête
+
+                // on prend le complément pour la coupe
+                nbMeshingEdges_edge = edge_dep->getNbMeshingEdges() - nbMeshingEdges_edge;
+                edge_dep->computeCorrespondingCoEdgeAndNbMeshingEdges(vertex1, nbMeshingEdges_edge, false,
+                                    coedge_dep, nbMeshingEdges_dep, sens_coedge_ar);
+
+                if (is == 0){
+                    TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
+                    messErr << "Echec lors du découpage. Serait-ce une arête sur l'axe ? ";
+                    throw TkUtil::Exception(messErr);
+                }
+
+#ifdef _DEBUG_SPLIT
+                std::cout<<" détection d'un rebond ...\n";
+                std::cout<<"nbMeshingEdges_edge =  "<<nbMeshingEdges_edge<<std::endl;
+                std::cout<<"nbMeshingEdges_dep =  "<<nbMeshingEdges_dep<<std::endl;
+                std::cout<<"nbMeshingEdges_ar =  "<<nbMeshingEdges_ar<<std::endl;
+                std::cout<<"coedge_dep =  "<<(coedge_dep?coedge_dep->getName():"0")<<std::endl;
+                std::cout<<"coedge_ar =  "<<(coedge_ar?coedge_ar->getName():"0")<<std::endl;
+#endif
+
+                is->coedge_dep.push_back(coedge_dep);
+                is->coedge_ar.push_back(coedge_ar);
+                is->nbMeshingEdges_dep.push_back(nbMeshingEdges_dep);
+                is->nbMeshingEdges_ar.push_back(nbMeshingEdges_ar);
+
+            }
+            else if (0 == coedge_ar && rebondAutorise && coface->getNbEdges() == 3
+                    && Utils::Math::MgxNumeric::isNearlyZero(coface->getVertex(0)->getY())
+                    && (Utils::Math::MgxNumeric::isNearlyZero(coface->getVertex(1)->getY())
+                    || Utils::Math::MgxNumeric::isNearlyZero(coface->getVertex(2)->getY())) ){
+                // on est peut-être dans le cas d'un rebond avec 2 zones pour la "boule" centrale
+
+#ifdef _DEBUG_SPLIT
+                std::cout<<" cas avec symétrie possible ...\n";
+#endif
+                //  on cherche l'arête qui couperait cette boule
+                Edge* edge_sym = 0;
+                for (uint i=0; i<3; i+=2){
+                    Edge* edge = coface->getEdge(i);
+                    // le 2ème sommet de l'arête qui n'est pas à la dégénérescence
+                    Vertex* vtx2 = edge->getOppositeVertex(coface->getVertex(0));
+                    if (!Utils::Math::MgxNumeric::isNearlyZero(vtx2->getY()))
+                        edge_sym =  edge;
+                }
+#ifdef _DEBUG_SPLIT
+                std::cout<<"edge_sym =  "<<(edge_sym?edge_sym->getName():"0")<<std::endl;
+#endif
+                if (0 != edge_sym && edge_sym->getNbCoEdges() == 1){
+                    CoEdge* coedge_sym = edge_sym->getCoEdge(0);
+                    // recherche de la face de l'autre côté de cette arête si elle existe
+                    CoFace* coface_sym = 0;
+                    std::vector<CoFace* > cofaces_vois;
+                    coedge_sym->getCoFaces(cofaces_vois);
+                    if (cofaces_vois.size() == 2){
+                        if (coface == cofaces_vois[0])
+                            coface_sym = cofaces_vois[1];
+                        else
+                            coface_sym = cofaces_vois[0];
+                    }
+                    if (reprendreCetteFace){
+                        coface_sym = coface;
+                        // dans ce cas il faut recalculer nbMeshingEdges_edge
+                        nbMeshingEdges_edge = coface_sym->getEdge(1)->getNbMeshingEdges() - nbMeshingEdges_edge;
+#ifdef _DEBUG_SPLIT
+                        std::cout<<" cas où il faut adapter nbMeshingEdges_edge ...\n";
+                        std::cout<<"   => nbMeshingEdges_edge =  "<<nbMeshingEdges_edge<<std::endl;
+#endif
+
+
+                    } // end if reprendreCetteFace
+
+#ifdef _DEBUG_SPLIT
+                    std::cout<<"coface_sym =  "<<(coface_sym?coface_sym->getName():"0")<<std::endl;
+#endif
+                    if (coface_sym){
+                        // on test pour détecter le cas d'une zone avec 1 seul sommet sur l'axe
+                        uint nb_sur_axe = 0;
+                        if (Utils::Math::MgxNumeric::isNearlyZero(coface_sym->getVertex(0)->getY()))
+                            nb_sur_axe++;
+                        if (Utils::Math::MgxNumeric::isNearlyZero(coface_sym->getVertex(1)->getY()))
+                            nb_sur_axe++;
+                        if (Utils::Math::MgxNumeric::isNearlyZero(coface_sym->getVertex(2)->getY()))
+                            nb_sur_axe++;
+                        if (nb_sur_axe == 1){
+                            TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
+                            messErr << "Echec lors du découpage de la face "<<coface_sym->getName()
+                                        <<", elle n'a qu'un unique sommet sur l'axe, ce qui n'est pas compatible avec le passage en blocs structurés en 3D";
+                            throw TkUtil::Exception(messErr);
+                        }
+                    }
+
+                    if (coface_sym && filtre_cofaces[coface_sym] == 1){
+                        if (coface_sym->getNbEdges() == 3){
+
+                            // on recherche dans cette face symétrique de la précédente
+                            // la positition de la coupe
+
+                            edge_ar = coface_sym->getEdge(1);
+
+                            // recherche du sommet symétrique à vertex1 / edge_sym
+                            if (edge_sym->find(vertex1))
+                                vertex2 = vertex1;
+                            else {
+                                vertex2 = edge_dep->getOppositeVertex(vertex1);
+                                vertex2 = edge_ar->getOppositeVertex(vertex2);
+                            }
+
+                            edge_ar->computeCorrespondingCoEdgeAndNbMeshingEdges(vertex2, nbMeshingEdges_edge, false,
+                                    coedge_ar, nbMeshingEdges_ar, sens_coedge_ar);
+
+
+                            nbMeshingEdges_dep = nbMeshingEdges_ar;
+                            coedge_dep = coedge_ar;
+                            edge_dep = edge_ar;
+
+                            coedge_ar = 0;
+                            nbMeshingEdges_ar = 0;
+                            edge_ar = 0;
+
+                            coface = coface_sym;
+#ifdef _DEBUG_SPLIT
+                            std::cout<<" détection d'un rebond avec arête de symétrie ...\n";
+                            std::cout<<"vertex2 = "<<vertex2->getName()<<std::endl;
+                            std::cout<<"# nouveau InfoSplit (2ème)\n";
+                            std::cout<<"nbMeshingEdges_dep =  "<<nbMeshingEdges_dep<<std::endl;
+                            std::cout<<"nbMeshingEdges_ar =  "<<nbMeshingEdges_ar<<std::endl;
+                            std::cout<<"coedge_dep =  "<<(coedge_dep?coedge_dep->getName():"0")<<std::endl;
+                            std::cout<<"coedge_ar =  "<<(coedge_ar?coedge_ar->getName():"0")<<std::endl;
+#endif
+
+                            is = new InfoSplit();
+                            is->dirCoFaceSplit = dirCoFaceSplit;
+                            is->coedge_dep.push_back(coedge_dep);
+                            is->edge_dep = edge_dep;
+                            is->coedge_ar.push_back(coedge_ar);
+                            is->edge_ar = edge_ar;
+                            is->nbMeshingEdges_dep.push_back(nbMeshingEdges_dep);
+                            is->nbMeshingEdges_ar.push_back(nbMeshingEdges_ar);
+
+                            cofaceInfoSplit[coface->getUniqueId()] = is;
+                            id2coface[coface->getUniqueId()] = coface;
+                        } // end if (coface_sym->getNbEdges() == 3)
+                        else {
+
+                            // recherche de l'arête hors de l'axe
+                            if (Utils::Math::MgxNumeric::isNearlyZero(coface->getVertex(1)->getY()))
+                                edge_ar = coface->getEdge(2);
+                            else if (Utils::Math::MgxNumeric::isNearlyZero(coface->getVertex(2)->getY()))
+                                edge_ar = coface->getEdge(0);
+
+                            // si le sommet 1 n'est pas sur l'axe on prend le complément pour nbMeshingEdges_edge
+                            if (!Utils::Math::MgxNumeric::isNearlyZero(vertex1->getY()))
+                                nbMeshingEdges_edge = edge_dep->getNbMeshingEdges() - nbMeshingEdges_edge;
+
+                            edge_ar->computeCorrespondingCoEdgeAndNbMeshingEdges(vertex2, nbMeshingEdges_edge, false,
+                                    coedge_ar, nbMeshingEdges_ar, sens_coedge_ar);
+
+#ifdef _DEBUG_SPLIT
+                            std::cout<<" détection d'un passage par zone à 3 côtés et avec arête de symétrie ...\n";
+                            std::cout<<"nbMeshingEdges_edge =  "<<nbMeshingEdges_edge<<std::endl;
+                            std::cout<<"nbMeshingEdges_ar =  "<<nbMeshingEdges_ar<<std::endl;
+                            std::cout<<"coedge_ar =  "<<(coedge_ar?coedge_ar->getName():"0")<<std::endl;
+                            std::cout<<"vertex1 =  "<<(vertex1?vertex1->getName():"0")<<std::endl;
+                            std::cout<<"vertex2 =  "<<(vertex2?vertex2->getName():"0")<<std::endl;
+#endif
+                            nbMeshingEdges_dep = nbMeshingEdges_ar;
+                            coedge_dep = coedge_ar;
+
+                            if (coedge_dep == arete)
+                                boucleTerminee = true;
+                        }
+                    } // end if (filtre_cofaces[coface_sym] == 1)
+                    else {
+                        // il faut arréter de ce côté ...
+                        tenteRelance = true;
+                    }
+                } // end if (0 != edge_sym && edge_sym->getNbCoEdges() == 1)
+            }
+            else if (0 == coedge_ar || (!boucleDemandee && coedge_ar->getNbEdges() == 1 && coedge_ar->getNbCofaces() == 1)) { // terminaison ou relance ?
+                // redémarrage
+                tenteRelance = true;
+            }
+            else { // cas par défaut, on continue à partir de l'arête d'arrivée (face à celle de départ)
+#ifdef _DEBUG_SPLIT
+                std::cout<<" on continue ..."<<std::endl;
+#endif
+                nbMeshingEdges_dep = nbMeshingEdges_ar;
+                coedge_dep = coedge_ar;
+
+                if (coedge_dep == arete)
+                    boucleTerminee = true;
+            }
+        } // (0 != coface)
+
+        if (tenteRelance){
+        	tenteRelance = false;
+#ifdef _DEBUG_SPLIT
+            std::cout<<" on tente de relancer ..."<<std::endl;
+#endif
+            if (boucleRelancee){
+#ifdef _DEBUG_SPLIT
+                std::cout<<" cela se termine ..."<<std::endl;
+#endif
+                // on ne relance qu'une fois
+                boucleTerminee = true;
+            } else {
+#ifdef _DEBUG_SPLIT
+                std::cout<<" on relance ..."<<std::endl;
+#endif
+                boucleRelancee = true;
+                nbMeshingEdges_dep = (uint)((double)arete->getNbMeshingEdges()*ratio_dec+0.5);
+                coedge_dep = arete;
+                coface = coface_begin;
+            }
+
+        }
+
+        if (!boucleDemandee && coedge_dep->getNbEdges() == 1 && coedge_dep->getNbCofaces() == 1){
+#ifdef _DEBUG_SPLIT
+            std::cout<<" cela se termine vraiment ..."<<std::endl;
+#endif
+            boucleTerminee = true;
+        }
+
+        // pour éviter de revenir en arrière
+        coface_prec = coface;
+
+    } // while (!boucleTerminee)
+
+
+
+
+    // map de stockage des Edges initiales et des 2 ou 3 arêtes qui découlent de la coupe
+    std::map<Edge*, std::vector<Edge*> > old2newEdges;
+    // map de stockage des CoEdges initiales et des nouveaux sommets créés
+    std::map<CoEdge*, std::vector<Vertex*> > oldCoEdge2newVertices;
+
+    // on parcourt à nouveau les faces et arêtes à couper pour y faire le split
+    for (std::map<uint, InfoSplit*>::iterator iter = cofaceInfoSplit.begin();
+            iter != cofaceInfoSplit.end(); ++iter) {
+        uint id = (*iter).first;
+        CoFace* coface = id2coface[id];
+        InfoSplit* is = (*iter).second;
+
+        CHECK_NULL_PTR_ERROR(is)
+
+#ifdef _DEBUG_SPLIT
+        std::cout<<std::endl;
+        std::cout<<"coface découpée : "<<coface->getName()<<", unique id : "<<id<<std::endl;
+        std::cout<<*coface;
+        std::cout<<"coedge_dep :";
+        for (uint i=0; i<is->coedge_dep.size(); i++)
+            std::cout<<" "<<(is->coedge_dep[i]?is->coedge_dep[i]->getName():"undef");
+        std::cout<<"\nedge_dep :"<<(is->edge_dep?is->edge_dep->getName():"undef");
+        std::cout<<"\ncoedge_ar :";
+        for (uint i=0; i<is->coedge_ar.size(); i++)
+            std::cout<<" "<<(is->coedge_ar[i]?is->coedge_ar[i]->getName():"undef");
+        std::cout<<"\nedge_ar :"<<(is->edge_ar?is->edge_ar->getName():"undef");
+        std::cout<<std::endl;
+#endif
+
+        std::vector<Vertex*> newVertices1; // sommet inséré sur l'arête de départ
+        std::vector<Vertex*> newVertices2; // sommet inséré sur l'arête suivante / départ
+        std::vector<Vertex*> newVertices3; // sommet inséré sur l'arête opposée à celle de départ
+        std::vector<Vertex*> newVertices4; // sommet inséré sur l'arête prédente / départ
+
+        // choix de ni en fonction des autres coupes (nombre de bras entre axe et o-grid)
+        uint ni=0;
+
+        // 3 cas (dans l'ordre):
+        // 1 coedge à couper une fois
+        // 1 coedge à couper deux fois
+        // 2 coedges à couper chacune une fois
+        // optionnellement, si ratio_ogrid>0 et la face dégénérée, il faut couper les autres arêtes
+
+        if (is->coedge_dep.size() == 1){
+            // 1 coedge à couper une fois
+            newVertices1 = oldCoEdge2newVertices[is->coedge_dep[0]];
+            if (newVertices1.empty()){
+                newVertices1 = is->coedge_dep[0]->split(is->nbMeshingEdges_dep, icmd);
+                oldCoEdge2newVertices[is->coedge_dep[0]] = newVertices1;
+            }
+            CoEdge* coedge0 = newVertices1[0]->getCoEdge(0);
+            CoEdge* coedge1 = newVertices1[0]->getCoEdge(1);
+            // recherche de l'arête qui touche l'axe
+            if (Utils::Math::MgxNumeric::isNearlyZero(coedge0->getOppositeVertex(newVertices1[0])->getY()))
+            	ni = coedge0->getNbMeshingEdges();
+            else
+            	ni = coedge1->getNbMeshingEdges();
+
+        } else if (is->coedge_dep.size() == 2){
+            if (is->coedge_dep[0] == is->coedge_dep[1]){
+                // 1 coedge à couper deux fois
+                newVertices1 = oldCoEdge2newVertices[is->coedge_dep[0]];
+                if (newVertices1.empty()){
+                    newVertices1 = is->coedge_dep[0]->split(is->nbMeshingEdges_dep, icmd);
+                    oldCoEdge2newVertices[is->coedge_dep[0]] = newVertices1;
+                }
+            }
+            else {
+                // 2 coedges à couper chacune une fois
+                std::vector<Vertex*> vtx1 = oldCoEdge2newVertices[is->coedge_dep[0]];
+                if (vtx1.empty()){
+                    Vertex* vtx = is->coedge_dep[0]->split(is->nbMeshingEdges_dep[0], icmd);
+                    vtx1.push_back(vtx);
+                    oldCoEdge2newVertices[is->coedge_dep[0]] = vtx1;
+                }
+                std::vector<Vertex*> vtx2 = oldCoEdge2newVertices[is->coedge_dep[1]];
+                if (vtx2.empty()){
+                    Vertex* vtx = is->coedge_dep[1]->split(is->nbMeshingEdges_dep[1], icmd);
+                    vtx2.push_back(vtx);
+                    oldCoEdge2newVertices[is->coedge_dep[1]] = vtx2;
+                }
+                newVertices1.push_back(vtx1[0]);
+                newVertices1.push_back(vtx2[0]);
+            }
+        }
+        if (coface->getNbEdges() == 3 && ratio_ogrid>0){
+#ifdef _DEBUG_SPLIT
+            std::cout<<"split avec ogrid, on coupe les arêtes ..."<<std::endl;
+#endif
+
+            // détection d'un cas pathologique possible: un seul bras sur bras reliés à la dégénérescence
+            if (coface->getEdge(0)->getNbMeshingEdges() == 1 || coface->getEdge(2)->getNbMeshingEdges() == 1){
+				TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
+            	messErr << "Il n'est pas possible de découper en o-grid une face ("<<coface->getName()<<") avec un seul bras autour de la dégérescence";
+            	throw TkUtil::Exception(messErr);
+            }
+
+            // on découpe les 2 autres arêtes
+            // indice de l'arête / face (1 pour les face dégénérées)
+            uint ind_ar_dep = coface->getIndex(is->edge_dep);
+            if (ind_ar_dep!=1)
+                throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, Topo::splitFaces ne trouve pas l'arête de départ en position 1", TkUtil::Charset::UTF_8));
+
+            Edge* edge4 = coface->getEdge(0);
+            if (edge4->getNbCoEdges() == 1){
+                newVertices4 = oldCoEdge2newVertices[edge4->getCoEdge(0)];
+            }
+            else if (edge4->getNbCoEdges() == 2){
+                // on considère que l'arête est déjà coupée en 2
+                newVertices4.push_back(TopoHelper::getCommonVertex(edge4->getCoEdge(0), edge4->getCoEdge(1)));
+            }
+            else {
+				TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
+                messErr << "Il n'est pas prévu d'avoir une arête composée autour d'un point de dégénérescence, ce qui est le cas dans la face "
+                        <<coface->getName();
+                throw TkUtil::Exception(messErr);
+            }
+
+
+            Edge* edge2 = coface->getEdge(2);
+            if (edge2->getNbCoEdges() == 1){
+                newVertices2 = oldCoEdge2newVertices[edge2->getCoEdge(0)];
+            }
+            else if (edge2->getNbCoEdges() == 2){
+                // on considère que l'arête est déjà coupée en 2
+                newVertices2.push_back(TopoHelper::getCommonVertex(edge2->getCoEdge(0), edge2->getCoEdge(1)));
+            }
+            else{
+				TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
+                messErr << "Il n'est pas prévu d'avoir une arête composée autour d'un point de dégénérescence, ce qui est le cas dans la face "
+                        <<coface->getName();
+                throw TkUtil::Exception(messErr);
+            }
+
+
+            // le sommet à la dégénérescence
+            Vertex* vtx0 = coface->getVertex(0);
+
+#ifdef _DEBUG_SPLIT
+            std::cout<<" ni trouvé : "<<ni<<std::endl;
+#endif
+            // calcul du ni, nombre de bras entre le bloc central et le contour extérieur de la face
+            if (ni){
+            	if (edge2->getNbMeshingEdges()>ni)
+            		ni = edge2->getNbMeshingEdges()-ni;
+            	else
+            		ni = 1;
+            }
+            else
+            	// version inexacte ...
+            	ni = (uint)((double)edge2->getNbMeshingEdges() * (1.0-ratio_ogrid));
+
+            if (ni == 0)
+                ni = 1;
+#ifdef _DEBUG_SPLIT
+            std::cout<<" ni calculé : "<<ni<<std::endl;
+#endif
+
+            // découpe de l'arête 2
+            if (newVertices2.empty()){
+                // vérif du sens pour prendre ni ou le complément
+                uint ni_loc = ni;
+                if (vtx0 == edge2->getCoEdge(0)->getVertex(0))
+                    ni_loc = edge2->getNbMeshingEdges() - ni;
+#ifdef _DEBUG_SPLIT
+                std::cout<<" ni_loc : "<<ni_loc<<std::endl;
+#endif
+                newVertices2.push_back(edge2->getCoEdge(0)->split(ni_loc, icmd));
+                oldCoEdge2newVertices[edge2->getCoEdge(0)] = newVertices2;
+            }
+
+            std::vector<Edge*> & newEdges2 = old2newEdges[edge2];
+            if (newEdges2.empty())
+                edge2->split(newVertices2, newEdges2, icmd);
+
+            // découpe de l'arête 4 (ou 0 en base 4)
+            if (newVertices4.empty()){
+                // vérif du sens pour prendre ni ou le complément
+                uint ni_loc = ni;
+                if (vtx0 == edge4->getCoEdge(0)->getVertex(0))
+                    ni_loc = edge4->getNbMeshingEdges() - ni;
+#ifdef _DEBUG_SPLIT
+                std::cout<<" ni_loc : "<<ni_loc<<std::endl;
+#endif
+                newVertices4.push_back(edge4->getCoEdge(0)->split(ni_loc, icmd));
+                oldCoEdge2newVertices[edge4->getCoEdge(0)] = newVertices4;
+            }
+
+            std::vector<Edge*> & newEdges4 = old2newEdges[edge4];
+            if (newEdges4.empty())
+                edge4->split(newVertices4, newEdges4, icmd);
+
+            // on replace les sommets en fonction du ratio_ogrid
+            Vertex* vtx_opp;
+            double ratio = ratio_ogrid/std::sqrt(2.0);
+            vtx_opp = edge4->getOppositeVertex(vtx0);
+            CoEdge* coedge4 = edge4->getCoEdge(newVertices4[0], vtx_opp);
+            newVertices4[0]->setCoord(vtx0->getCoord() + (vtx_opp->getCoord() - vtx0->getCoord()) * ratio);
+            vtx_opp = edge2->getOppositeVertex(vtx0);
+            CoEdge* coedge2 = edge2->getCoEdge(newVertices2[0], vtx_opp);
+            newVertices2[0]->setCoord(vtx0->getCoord() + (vtx_opp->getCoord() - vtx0->getCoord()) * ratio);
+
+        } // end if (coface->getNbEdges() == 3 && ratio_ogrid>0)
+
+
+        std::vector<Edge*> & newEdges_dep = old2newEdges[is->edge_dep];
+        if (newEdges_dep.empty()){
+#ifdef _DEBUG_SPLIT
+            std::cout<<"edge_dep à découper "<<is->edge_dep->getName()<<"\n";
+            std::cout<<"newVertices1 : ";
+            for (uint i=0; i<newVertices1.size(); i++)
+                std::cout<<" "<<(newVertices1[i]?newVertices1[i]->getName():"undef");
+            std::cout<<std::endl;
+#endif
+            is->edge_dep->split(newVertices1, newEdges_dep, icmd);
+        }
+
+
+        if (is->coedge_ar.size() == 1){
+            if (is->coedge_ar[0]){
+                newVertices3 = oldCoEdge2newVertices[is->coedge_ar[0]];
+                if (newVertices3.empty()){
+                    newVertices3 = is->coedge_ar[0]->split(is->nbMeshingEdges_ar, icmd);
+                    oldCoEdge2newVertices[is->coedge_ar[0]] = newVertices3;
+                }
+            }
+            else {
+                newVertices3.push_back(coface->getVertex(0)); // le sommet à la dégénérescence
+            }
+        } else if (is->coedge_ar.size() == 2){
+            if (is->coedge_ar[0]){
+
+                if (is->coedge_ar[0] == is->coedge_ar[1]){
+                    newVertices3 = oldCoEdge2newVertices[is->coedge_ar[0]];
+                    if (newVertices3.empty()){
+                        newVertices3 = is->coedge_ar[0]->split(is->nbMeshingEdges_ar, icmd);
+                        oldCoEdge2newVertices[is->coedge_ar[0]] = newVertices3;
+                    }
+                }
+                else {
+                    std::vector<Vertex*> vtx1 = oldCoEdge2newVertices[is->coedge_ar[0]];
+                    if (vtx1.empty()){
+                        Vertex* vtx = is->coedge_ar[0]->split(is->nbMeshingEdges_ar[0], icmd);
+                        vtx1.push_back(vtx);
+                        oldCoEdge2newVertices[is->coedge_ar[0]] = vtx1;
+                    }
+                    std::vector<Vertex*> vtx2 = oldCoEdge2newVertices[is->coedge_ar[1]];
+                    if (vtx2.empty()){
+                        Vertex* vtx = is->coedge_ar[1]->split(is->nbMeshingEdges_ar[1], icmd);
+                        vtx2.push_back(vtx);
+                        oldCoEdge2newVertices[is->coedge_ar[1]] = vtx2;
+                    }
+                    newVertices3.push_back(vtx1[0]);
+                    newVertices3.push_back(vtx2[0]);
+                }
+            }
+            else {
+                newVertices3.push_back(coface->getVertex(0)); // le sommet à la dégénérescence
+                newVertices3.push_back(coface->getVertex(0));
+            }
+        }
+
+        std::vector<Edge*> & newEdges_ar = old2newEdges[is->edge_ar];
+        if (newEdges_ar.empty() && is->edge_ar){
+#ifdef _DEBUG_SPLIT
+            std::cout<<"edge_ar à découper "<<is->edge_ar->getName()<<"\n";
+            std::cout<<"newVertices3 : ";
+            for (uint i=0; i<newVertices3.size(); i++)
+                std::cout<<" "<<(newVertices3[i]?newVertices3[i]->getName():"undef");
+            std::cout<<std::endl;
+#endif
+            is->edge_ar->split(newVertices3, newEdges_ar, icmd);
+        }
+
+        if (coface->getNbEdges() == 3 && ratio_ogrid>0){
+            // découpage en 3 ou 4 CoFace
+
+            // NB on ne retourne pas les arêtes créées, cela n'a pas d'utilité
+
+            Edge* oldEdge0 = coface->getEdge(0);
+            Edge* oldEdge2 = coface->getEdge(2);
+
+            coface->splitOgrid((CoFace::eDirOnCoFace)is->dirCoFaceSplit,
+                    old2newEdges[oldEdge0],
+                    newEdges_dep,
+                    old2newEdges[oldEdge2],
+                    newVertices4,
+                    newVertices1,
+                    newVertices2,
+                    ratio_ogrid,
+                    icmd);
+
+            // Destruction des arêtes inutiles (celles sans relation vers une CoFace)
+            if (oldEdge0->getNbCoFaces() == 0)
+                oldEdge0->free(icmd);
+            if (oldEdge2->getNbCoFaces() == 0)
+                oldEdge2->free(icmd);
+        }
+        else {
+            // découpage de la CoFace en deux ou trois
+            std::vector<Edge*> newEdges = coface->split((CoFace::eDirOnCoFace)is->dirCoFaceSplit,
+                    newEdges_dep, newEdges_ar, newVertices1, newVertices3, icmd);
+
+            splitingEdges.insert(splitingEdges.begin(), newEdges.begin(), newEdges.end());
+
+        }
+
+        // Destruction des arêtes inutiles (celles sans relation vers une CoFace)
+        if (0 != is->edge_dep && is->edge_dep->getNbCoFaces() == 0)
+            is->edge_dep->free(icmd);
+        if (0 != is->edge_ar && is->edge_ar->getNbCoFaces() == 0)
+            is->edge_ar->free(icmd);
+
+        // libération de la mémoire
+        delete is;
+
+    } // for (std::map<CoFace*, InfoSplit*>::iterator iter = cofaceInfoSplit.begin() ...
+
+}
+/*----------------------------------------------------------------------------*/
+//#define _DEBUG_SPLIT
+void TopoHelper::splitFaces3D(std::vector<CoFace* > cofaces,
+        CoEdge* arete, double ratio_dec, double ratio_ogrid,
+        bool boucleDemandee, bool rebondAutorise,
+        std::vector<Edge* > &splitingEdges,
+        Internal::InfoCommand* icmd)
+{
+#ifdef _DEBUG_SPLIT
+    std::cout<<"splitFaces3D(...) avec "<< cofaces.size()<<" cofaces, arete = "<<arete->getName()
             <<", ratio_dec = "<< ratio_dec
             <<", ratio_ogrid = "<< ratio_ogrid
             <<", boucleDemandee = "<< boucleDemandee

@@ -187,7 +187,12 @@ public:
      *  \param splitingEdges les arêtes créées ou non sur la coupe
      *  \param icmd pour stocker les types de modifications par entités
      */
-    static void splitFaces(std::vector<CoFace* > cofaces,
+    static void splitFaces2D(std::vector<CoFace* > cofaces,
+            CoEdge* arete, double ratio_dec, double ratio_ogrid,
+            bool boucle, bool rebondAutorise,
+            std::vector<Edge* > &splitingEdges,
+            Internal::InfoCommand* icmd);
+    static void splitFaces3D(std::vector<CoFace* > cofaces,
             CoEdge* arete, double ratio_dec, double ratio_ogrid,
             bool boucle, bool rebondAutorise,
             std::vector<Edge* > &splitingEdges,

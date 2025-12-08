@@ -299,9 +299,9 @@ internalExecute()
 
 	std::vector<Edge*> splitingEdges;
 
-	// if (m_cas_2D) {
-	// 	TopoHelper::splitFaces(m_cofaces, m_arete, m_ratio_dec, m_ratio_ogrid, false, true, splitingEdges, &getInfoCommand());
-	// } else {
+	if (m_cas_2D) {
+		TopoHelper::splitFaces2D(m_cofaces, m_arete, m_ratio_dec, m_ratio_ogrid, false, true, splitingEdges, &getInfoCommand());
+	} else {
 		do {
 			Vertex* sommet = 0;
 			CoFace* coface = 0;
@@ -325,10 +325,10 @@ internalExecute()
 							coedge = *iter;
 
 					if (coedge->getVertex(0) == sommet)
-						TopoHelper::splitFaces(coface_vec, coedge, 0, m_ratio_ogrid, false, false, current_splitingEdge,
+						TopoHelper::splitFaces3D(coface_vec, coedge, 0, m_ratio_ogrid, false, false, current_splitingEdge,
 											   &getInfoCommand());
 					else if (coedge->getVertex(1) == sommet)
-						TopoHelper::splitFaces(coface_vec, coedge, 1, m_ratio_ogrid, false, false, current_splitingEdge,
+						TopoHelper::splitFaces3D(coface_vec, coedge, 1, m_ratio_ogrid, false, false, current_splitingEdge,
 											   &getInfoCommand());
 
 					filtre_faces.insert(coface);
@@ -345,7 +345,7 @@ internalExecute()
 
 				coface_vec = {coface};
 
-				TopoHelper::splitFaces(coface_vec, m_arete, m_ratio_dec, m_ratio_ogrid, false, true, current_splitingEdge, &getInfoCommand());
+				TopoHelper::splitFaces3D(coface_vec, m_arete, m_ratio_dec, m_ratio_ogrid, false, true, current_splitingEdge, &getInfoCommand());
 
 				filtre_faces.insert(coface);
 			}
@@ -359,7 +359,7 @@ internalExecute()
 			}
 
 		} while (nb_faces_dep != nb_faces_split);
-	//}
+	}
 
 	// on replace les sommets en fonction de m_ratio_dec
     if (!m_project_on_meshing_edges)

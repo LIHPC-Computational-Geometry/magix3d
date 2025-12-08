@@ -363,7 +363,7 @@ createCylinderTopo1BlockDemi(Geom::PropertyCylinder* propertyCyl)
     std::vector<Edge* > splitingEdges;
     std::vector<CoFace* > cofaces;
     cofaces.push_back(b1->getFace(Block::j_min)->getCoFace(0));
-    TopoHelper::splitFaces(cofaces,
+    TopoHelper::splitFaces2D(cofaces,
             b1->getFace(Block::k_min)->getEdge(b1->getVertex(0), b1->getVertex(1))->getCoEdge(0),
             0.5, 0.0, false, false,
             splitingEdges,
@@ -1411,7 +1411,7 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridDemiNonDeg(Geom::Prop
     std::vector<Edge* > splitingEdges;
     std::vector<CoFace* > cofaces;
     cofaces.push_back(b1->getFace(Block::j_min)->getCoFace(0));
-    TopoHelper::splitFaces(cofaces,
+    TopoHelper::splitFaces2D(cofaces,
             b1->getFace(Block::k_min)->getEdge(b1->getVertex(0), b1->getVertex(1))->getCoEdge(0),
             0.5, 0.0, false, false,
             splitingEdges,
@@ -1662,7 +1662,7 @@ createSphereTopo1BlockDemi(Geom::PropertySphere* propertySph)
     std::vector<Edge* > splitingEdges;
     std::vector<CoFace* > cofaces;
     cofaces.push_back(b1->getFace(Block::j_min)->getCoFace(0));
-    TopoHelper::splitFaces(cofaces,
+    TopoHelper::splitFaces2D(cofaces,
             b1->getFace(Block::j_min)->getEdge(b1->getVertex(0), b1->getVertex(1))->getCoEdge(0),
             0.5, 0.0, false, false,
             splitingEdges,
@@ -2237,7 +2237,7 @@ createSphereTopoOGridDemiDeg(Geom::PropertySphere* propertySph)
     std::vector<CoEdge* > coedges;
     std::vector<CoFace* > cofaces;
     cofaces.push_back(b4->getFace(Block::i_min)->getCoFace(0));
-    TopoHelper::splitFaces(cofaces,
+    TopoHelper::splitFaces2D(cofaces,
             b4->getFace(Block::i_min)->getEdge(b4->getVertex(0), b4->getVertex(2))->getCoEdge(0),
             0.5, 0.0, false, false,
             splitingEdges,
@@ -2246,7 +2246,7 @@ createSphereTopoOGridDemiDeg(Geom::PropertySphere* propertySph)
     coedges.push_back(splitingEdges[0]->getCoEdge(0));
     cofaces.clear();
     cofaces.push_back(b5->getFace(Block::i_min)->getCoFace(0));
-    TopoHelper::splitFaces(cofaces,
+    TopoHelper::splitFaces2D(cofaces,
             b5->getFace(Block::i_min)->getEdge(b5->getVertex(0), b5->getVertex(2))->getCoEdge(0),
             0.5, 0.0, false, false,
             splitingEdges,
@@ -2464,7 +2464,7 @@ createSphereTopoOGridDemiNonDeg(Geom::PropertySphere* propertySph)
     cofaces.push_back(b1->getFace(Block::k_max)->getCoFace(0));
     cofaces.push_back(b4->getFace(Block::i_min)->getCoFace(0));
     cofaces.push_back(b5->getFace(Block::i_min)->getCoFace(0));
-    TopoHelper::splitFaces(cofaces,
+    TopoHelper::splitFaces2D(cofaces,
             b4->getFace(Block::i_min)->getEdge(b4->getVertex(0), b4->getVertex(2))->getCoEdge(0),
             0.5, 0.0, false, false,
             splitingEdges,
@@ -3966,7 +3966,7 @@ createHollowSphereTopoDemi(Geom::PropertyHollowSphere* propertySph)
     std::vector<CoEdge* > coedges;
     std::vector<CoFace* > cofaces;
     cofaces.push_back(b4->getFace(Block::i_min)->getCoFace(0));
-    TopoHelper::splitFaces(cofaces,
+    TopoHelper::splitFaces2D(cofaces,
             b4->getFace(Block::i_min)->getEdge(b4->getVertex(0), b4->getVertex(2))->getCoEdge(0),
             0.5, 0.0, false, false,
             splitingEdges,
@@ -3975,7 +3975,7 @@ createHollowSphereTopoDemi(Geom::PropertyHollowSphere* propertySph)
     coedges.push_back(splitingEdges[0]->getCoEdge(0));
     cofaces.clear();
     cofaces.push_back(b5->getFace(Block::i_min)->getCoFace(0));
-    TopoHelper::splitFaces(cofaces,
+    TopoHelper::splitFaces2D(cofaces,
             b5->getFace(Block::i_min)->getEdge(b5->getVertex(0), b5->getVertex(2))->getCoEdge(0),
             0.5, 0.0, false, false,
             splitingEdges,
@@ -4574,7 +4574,7 @@ void CommandNewTopoOGridOnGeometry::createConeTopo1BlockDemiR0()
     std::vector<Edge* > splitingEdges;
     std::vector<CoFace* > cofaces;
     cofaces.push_back(b1->getFace(Block::j_max)->getCoFace(0));
-    TopoHelper::splitFaces(cofaces,
+    TopoHelper::splitFaces2D(cofaces,
     		cofaces[0]->getEdge(b1->getVertex(2), b1->getVertex(3))->getCoEdge(0),
 			0.5, 0.0, false, false,
 			splitingEdges,
@@ -4661,7 +4661,7 @@ void CommandNewTopoOGridOnGeometry::createConeTopo1BlockDemi()
     std::vector<Edge* > splitingEdges;
     std::vector<CoFace* > cofaces;
     cofaces.push_back(b1->getFace(Block::j_max)->getCoFace(0));
-    TopoHelper::splitFaces(cofaces,
+    TopoHelper::splitFaces2D(cofaces,
     		cofaces[0]->getEdge(b1->getVertex(2), b1->getVertex(3))->getCoEdge(0),
 			0.5, 0.0, false, false,
 			splitingEdges,
@@ -5284,7 +5284,7 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridDemiNonDegR0()
     std::vector<Edge* > splitingEdges;
     std::vector<CoFace* > cofaces;
     cofaces.push_back(b5->getFace(Block::i_max)->getCoFace(0));
-    TopoHelper::splitFaces(cofaces,
+    TopoHelper::splitFaces2D(cofaces,
     		cofaces[0]->getEdge(b5->getVertex(1), b5->getVertex(3))->getCoEdge(0),
 			0.5, 0.0, false, false,
 			splitingEdges,
@@ -5567,7 +5567,7 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridDemiNonDeg()
     std::vector<Edge* > splitingEdges;
     std::vector<CoFace* > cofaces;
     cofaces.push_back(b5->getFace(Block::i_max)->getCoFace(0));
-    TopoHelper::splitFaces(cofaces,
+    TopoHelper::splitFaces2D(cofaces,
     		cofaces[0]->getEdge(b5->getVertex(1), b5->getVertex(3))->getCoEdge(0),
 			0.5, 0.0, false, false,
 			splitingEdges,
