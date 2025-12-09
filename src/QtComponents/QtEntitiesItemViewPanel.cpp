@@ -110,6 +110,11 @@ void QtEntitiesItemViewPanel::setMainWindow (QtMgx3DMainWindow* mainWindow)
 }	// QtEntitiesItemViewPanel::setMainWindow
 
 
+void QtEntitiesItemViewPanel::sessionCleared ( )
+{
+}	// QtEntitiesItemViewPanel::sessionCleared
+
+
 Mgx3D::Internal::Context& QtEntitiesItemViewPanel::getContext ( )
 {
 	if (0 == _context)

@@ -1710,67 +1710,6 @@ void Context::clearSession()
 	// annulation de la sélection
 	m_selection_manager->clearSelection ( );
 
-    //creation de la commande de destruction
-	Internal::CommandComposite* command = new Internal::CommandComposite(*this, TkUtil::UTF8String ("Destruction de tout, les commandes précédentes n'ont plus lieu d'être ! ", TkUtil::Charset::UTF_8));
-
-	// trace dans le script
-	TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-	cmd << getContextAlias() << ".clearSession()";
-	command->setScriptCommand(cmd);
-
-	// commande de destruction de toutes les entités maillages qui ont pu être construites
-	Mesh::CommandDestroyMesh* commandMesh = new Mesh::CommandDestroyMesh(*this);
-
-	command->addCommand(commandMesh);
-
-	// commande de destruction de toutes les entités topologiques qui ont pu être construites
-	std::vector<Topo::TopoEntity*> ve;
-	std::vector<Topo::Block*> blocks;
-	getTopoManager().getBlocks(blocks);
-	for (uint i=0; i<blocks.size(); i++)
-		ve.push_back(blocks[i]);
-	std::vector<Topo::CoFace*> cofaces;
-	getTopoManager().getCoFaces(cofaces);
-	for (uint i=0; i<cofaces.size(); i++)
-		ve.push_back(cofaces[i]);
-	std::vector<Topo::CoEdge*> coedges;
-	getTopoManager().getCoEdges(coedges);
-	for (uint i=0; i<coedges.size(); i++)
-		ve.push_back(coedges[i]);
-	std::vector<Topo::Vertex*> vertices;
-	getTopoManager().getVertices(vertices);
-	for (uint i=0; i<vertices.size(); i++)
-		ve.push_back(vertices[i]);
-
-	Topo::CommandDestroyTopo* commandTopo = new Topo::CommandDestroyTopo(*this, ve, true);
-
-	command->addCommand(commandTopo);
-
-	// commande de destruction de toutes les entités géométriques qui ont pu être construites
-	std::vector<Geom::GeomEntity*> entities;
-	std::vector<Geom::Volume*> volumes = getGeomManager().getVolumesObj();
-	for (uint i=0; i<volumes.size(); i++)
-		entities.push_back(volumes[i]);
-	std::vector<Geom::Surface*> surfaces = getGeomManager().getSurfacesObj();
-	for (uint i=0; i<surfaces.size(); i++)
-		entities.push_back(surfaces[i]);
-	std::vector<Geom::Curve*> curves = getGeomManager().getCurvesObj();
-	for (uint i=0; i<curves.size(); i++)
-		entities.push_back(curves[i]);
-	std::vector<Geom::Vertex*> vtx = getGeomManager().getVerticesObj();
-	for (uint i=0; i<vtx.size(); i++)
-		entities.push_back(vtx[i]);
-
-	Geom::CommandRemove* commandGeom = new Geom::CommandRemove(*this, entities, true);
-
-	command->addCommand(commandGeom);
-
-	// TODO [EB] Destruction des SysCoord
-
-	// on passe au gestionnaire de commandes qui exécute la commande en // ou non
-    // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
-    getCommandManager().addCommand(command, Utils::Command::DO);
-
 	m_command_manager->clear();
 	m_name_manager->clear();
 	m_geom_manager->clear();

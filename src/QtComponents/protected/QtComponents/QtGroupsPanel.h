@@ -396,6 +396,11 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Internal::Selection
 	 */
 	virtual std::vector<Mgx3D::Group::GroupEntity*> getSelectedGroups ( ) const;
 
+	/**
+	 * A appeler lorsque la session est réinitialisée, doit réinitialiser le panneau. Ne fait rien par défaut, à surcharger.
+	 */
+	virtual void sessionCleared ( );
+
 	//@}	// Les groupes représentés.
 
 	/**
@@ -759,7 +764,6 @@ class QtGroupsPanel : public QtEntitiesItemViewPanel, public Internal::Selection
 	 * Destruction d'un groupe, on lui retire toute les entités qu'il contient
 	 */
 	virtual void clearGroupCallback ( );
-
 
 	/**
 	 * Appelé lorsque le menu popup est demandé au niveau de l'arborescence des types d'entités à afficher. Affiche ce menu popup à la position transmise en argument.
