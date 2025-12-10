@@ -891,7 +891,7 @@ public:
      *  L'autre arête parallèle est aussi découpée avec le même ratio induit de la première coupe.
      */
     Mgx3D::Internal::M3DCommandResult*
-        splitFace(std::string coface_name, std::string narete, const Point& pt, bool project_on_meshing_edges);
+        splitFace(std::string coface_name, std::string narete, const Point& pt, bool project_on_meshing_edges = true);
 
 #ifndef SWIG
     Mgx3D::Internal::M3DCommandResult*

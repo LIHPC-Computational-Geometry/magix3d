@@ -2146,7 +2146,7 @@ split(CoEdge* arete, double ratio,
     timer.start();
 #endif
    // le découpage des faces communes (qui doivent former une boucle)
-    TopoHelper::splitFaces(blk_cofaces, arete, ratio, 0, true, false, splitingEdges, icmd);
+    TopoHelper::splitFaces2D(blk_cofaces, arete, ratio, 0, true, false, splitingEdges, icmd);
 #ifdef _DEBUG_TIMER
     timer.stop();
     std::cout<<" TopoHelper::splitFaces en "<<timer.strDuration()<<std::endl;

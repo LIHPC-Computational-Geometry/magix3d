@@ -63,9 +63,9 @@ internalExecute()
     cofaces.push_back(m_coface);
 
     if (coedge->getVertex(0) == m_sommet)
-    	TopoHelper::splitFaces(cofaces, coedge, 0, 0, false, false, splitingEdges, &getInfoCommand());
+    	TopoHelper::splitFaces2D(cofaces, coedge, 0, 0, false, false, splitingEdges, &getInfoCommand());
     else if (coedge->getVertex(1) == m_sommet)
-    	TopoHelper::splitFaces(cofaces, coedge, 1, 0, false, false, splitingEdges, &getInfoCommand());
+    	TopoHelper::splitFaces2D(cofaces, coedge, 1, 0, false, false, splitingEdges, &getInfoCommand());
     else
     	throw TkUtil::Exception (TkUtil::UTF8String ("La face ne peut être découpée avec ce sommet, on ne trouve retrouve pas ce sommet dans l'arête", TkUtil::Charset::UTF_8));
 

@@ -1,5 +1,111 @@
 import pyMagix3D as Mgx3D
 import math
+import pytest
+
+def test_extend_split_face():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    tm = ctx.getTopoManager()
+    # Création d'une boite avec une topologie
+    tm.newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
+    # Découpage de la face Fa0003
+    tm.splitFace ("Fa0003", "Ar0002", .3, True)
+    assert tm.getNbFaces() == 7
+    with pytest.raises(RuntimeError) as excinfo:
+        # Découpage de la face Fa0001 par prolongation
+        tm.extendSplitFace ("Fa0001", "Som0007")
+    expected = "La face ne peut être découpée avec un sommet au sommet de la face (en prendre un sur un côté)"
+    assert expected in str(excinfo.value)
+    with pytest.raises(RuntimeError) as excinfo:
+        # Découpage de la face Fa0002 par prolongation
+        tm.extendSplitFace ("Fa0002", "Som0009")
+    expected = "La face ne peut être découpée avec ce sommet, on ne trouve pas d'arête contenant ce sommet"
+    assert expected in str(excinfo.value)
+    # Découpage de la face Fa0001 par prolongation
+    tm.extendSplitFace ("Fa0001", "Som0009")
+    assert tm.getNbFaces() == 8
+
+def test_extend_split_face_with_degenerated_face_2D():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    tm = ctx.getTopoManager()
+    # Création d'une boite avec une topologie
+    tm.newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
+    # Suppression d'entités géométriques et suppression des liens topologiques
+    ctx.getGeomManager().destroy(["Vol0000"], True)
+    # Destruction des entités topologiques Bl0000
+    tm.destroy(["Bl0000"], False)
+    # Découpage de la face Fa0000
+    tm.splitFace ("Fa0000", "Ar0000", .5, True)
+    assert tm.getNbFaces() == 7
+    # Fusion de sommets Som0007 avec Som0006
+    tm.snapVertices ("Som0007", "Som0006", True)
+    # Découpage de la face Fa0003 par prolongation
+    # On est en face de la dégénérescence
+    tm.extendSplitFace ("Fa0003", "Som0009")
+    assert tm.getNbFaces() == 8
+    # Découpage de la face Fa0009
+    # On n'est pas en face de la dégénérescence => pas de coupe
+    # TODO : mettre en conformité avec le 3D qui fait une coupe quand même
+    tm.splitFace ("Fa0009", "Ar0010", .5, True)
+    assert tm.getNbFaces() == 8
+
+def test_extend_split_face_with_degenerated_face_3D():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    tm = ctx.getTopoManager()
+    # Création d'une boite avec une topologie
+    tm.newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
+    # Découpage de la face Fa0000
+    tm.splitFace ("Fa0000", "Ar0000", .5, True)
+    assert tm.getNbFaces() == 7
+    # Fusion de sommets Som0007 avec Som0006
+    tm.snapVertices ("Som0007", "Som0006", True)
+    # Découpage de la face Fa0003 par prolongation
+    # On est en face de la dégénérescence
+    tm.extendSplitFace ("Fa0003", "Som0009")
+    assert tm.getNbFaces() == 8
+    # Découpage de la face Fa0009
+    # On n'est pas en face de la dégénérescence => coupe quand même
+    tm.splitFace ("Fa0009", "Ar0010", .5, True)
+    assert tm.getNbFaces() == 9
+
+def test_no_more_infinite_loop_2D():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    gm = ctx.getGeomManager()
+    tm = ctx.getTopoManager()
+    # Création d'une boite avec une topologie
+    tm.newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
+    # Suppression d'entités géométriques et suppression des liens topologiques
+    gm.destroy(["Vol0000"], True)
+    # Destruction des entités topologiques Bl0000
+    tm.destroy(["Bl0000"], False)
+    tm.splitFaces (["Fa0005", "Fa0001", "Fa0004", "Fa0000"], "Ar0005", .5, .5)
+    assert tm.getNbFaces() == 10
+
+def test_no_more_infinite_loop_3D():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    gm = ctx.getGeomManager()
+    tm = ctx.getTopoManager()
+    # Création d'une boite avec une topologie
+    tm.newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
+    tm.splitFaces (["Fa0005", "Fa0001", "Fa0004", "Fa0000"], "Ar0005", .5, .5)
+    assert tm.getNbFaces() == 10
+
+def test_split_adjacent_faces_with_common_edge():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    tm = ctx.getTopoManager()
+    # Création d'une boite avec une topologie
+    ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
+    # Suppression d'entités géométriques et suppression des entités topologiques dépendantes
+    ctx.getGeomManager().destroyWithTopo(["Vol0000"], False)
+    assert tm.getNbFaces() == 6
+    # Découpage des faces 2D structurées Fa0005 Fa0001 suivant l'arête Ar0005 avec comme ratio 5.000000e-01
+    ctx.getTopoManager().splitFaces (["Fa0005","Fa0001"], "Ar0005", .5, .5)
+    assert tm.getNbFaces() == 8
 
 def test_split_faces2D_1(capfd):
     ctx = Mgx3D.getStdContext()
@@ -77,7 +183,7 @@ def test_split_faces2D_4(capfd):
     # Suppression d'entités géométriques et suppression des liens topologiques
     gm.destroy(["Vol0000"], True)
     # Destruction des entités topologiques Bl0000
-    ctx.getTopoManager ( ).destroy (["Bl0000"], False)
+    tm.destroy(["Bl0000"], False)
     # Découpage de la face Fa0000
     tm.splitFaces (["Fa0000"], "Ar0000", .5, 0, True)
     assert tm.getNbFaces() == 7
@@ -86,7 +192,7 @@ def test_split_faces2D_4(capfd):
     tm.extendSplitFace ("Fa0003", "Som0009")
     assert tm.getNbFaces() == 8
 
-def test_split_faces2D_4(capfd):
+def test_split_faces2D_5(capfd):
     # Test de splitFaces avec o-grid
     ctx = Mgx3D.getStdContext()
     gm = ctx.getGeomManager()
@@ -136,6 +242,13 @@ def test_split_faces3D_2(capfd):
     ctx.undo()
     assert tm.getNbFaces() == 6
 
+    # Découpage de 2 faces par l'arete adjacente aux deux faces
+    # Découpage des faces 3D structurées Fa0005 Fa0001 suivant l'arête Ar0005 avec comme ratio 5.000000e-01
+    tm.splitFaces (["Fa0005","Fa0001"], "Ar0005", .5, .5)
+    assert tm.getNbFaces() == 8
+    ctx.undo()
+    assert tm.getNbFaces() == 6
+    
     # cas où l'arete n'est pas adjacente à une des faces et qu'on ne peut pas itérer
     # Une seule face découpée
     # Découpage des faces Fa0001 Fa0000 suivant l'arête Ar0005 avec comme ratio 3.000000e-01
@@ -153,7 +266,7 @@ def test_split_faces3D_3(capfd):
     tm.splitFaces (["Fa0001"], "Ar0007", .3, 0, True)
     assert tm.getNbFaces() == 7
 
-def test_projection_3d(capfd):
+def test_projection_3D(capfd):
     ctx = Mgx3D.getStdContext()
     tm = ctx.getTopoManager()
     ctx.clearSession() # Clean the session after the previous test
@@ -169,7 +282,7 @@ def test_projection_3d(capfd):
     tm.splitFaces (["Fa0001"], "Ar0007", .62, .5, True)
     assertVertex(tm, "Som0008", 1, 0.6, 0)
 
-def test_projection_2d(capfd):
+def test_projection_2D(capfd):
     ctx = Mgx3D.getStdContext()
     tm = ctx.getTopoManager()
     ctx.clearSession() # Clean the session after the previous test
@@ -203,7 +316,7 @@ def test_projection_2d(capfd):
     tm.splitFaces (["Fa0000"], "Ar0003", .5, 0, False)
     assertVertex(tm, "Som0005", 0, 0.5, 0)
 
-def test_projection_2d_2faces(capfd):
+def test_projection_2D_2faces(capfd):
     ctx = Mgx3D.getStdContext()
     tm = ctx.getTopoManager()
     ctx.clearSession() # Clean the session after the previous test

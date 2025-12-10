@@ -108,6 +108,9 @@ private:
     /// activation ou non de la projection des sommets créés sur la discrétisation initiale
     bool m_project_on_meshing_edges;
 
+    /// vrai si le cas ne contient que des cofaces 2D
+    bool m_cas_2D;
+
     bool
     findFaceUnmarkedWithVertexMarked(std::set<CoFace *> &filtre_faces, std::set<Vertex *> &filtre_vertices,
                                      CoFace *&face,
