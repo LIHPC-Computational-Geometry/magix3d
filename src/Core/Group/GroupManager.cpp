@@ -1615,6 +1615,7 @@ std::vector<std::string> GroupManager::getGeomVolumes(const std::string& g, cons
 	for (auto e : geom_entities)
 		result.push_back(e->getName());
 
+    std::sort(result.begin(), result.end());
 	return result;
 }
 /*----------------------------------------------------------------------------*/
@@ -1628,6 +1629,7 @@ std::vector<std::string> GroupManager::getGeomSurfaces(const std::string& g, con
 	for (auto e : geom_entities)
 		result.push_back(e->getName());
 
+    std::sort(result.begin(), result.end());
 	return result;
 }
 /*----------------------------------------------------------------------------*/
@@ -1641,6 +1643,7 @@ std::vector<std::string> GroupManager::getGeomCurves(const std::string& g, const
 	for (auto e : geom_entities)
 		result.push_back(e->getName());
 
+    std::sort(result.begin(), result.end());
 	return result;
 }
 /*----------------------------------------------------------------------------*/
@@ -1654,6 +1657,7 @@ std::vector<std::string> GroupManager::getGeomVertices(const std::string& g, con
 	for (auto e : geom_entities)
 		result.push_back(e->getName());
 
+    std::sort(result.begin(), result.end());
 	return result;
 }
 /*----------------------------------------------------------------------------*/
@@ -1667,6 +1671,7 @@ std::vector<std::string> GroupManager::getTopoBlocks(const std::string& g, const
 	for (auto e : topo_entities)
 		result.push_back(e->getName());
 
+    std::sort(result.begin(), result.end());
 	return result;
 }
 /*----------------------------------------------------------------------------*/
@@ -1680,6 +1685,7 @@ std::vector<std::string> GroupManager::getTopoFaces(const std::string& g, const 
 	for (auto e : topo_entities)
 		result.push_back(e->getName());
 
+    std::sort(result.begin(), result.end());
 	return result;
 }
 /*----------------------------------------------------------------------------*/
@@ -1693,6 +1699,7 @@ std::vector<std::string> GroupManager::getTopoEdges(const std::string& g, const 
 	for (auto e : topo_entities)
 		result.push_back(e->getName());
 
+    std::sort(result.begin(), result.end());
 	return result;
 }
 /*----------------------------------------------------------------------------*/
@@ -1706,6 +1713,7 @@ std::vector<std::string> GroupManager::getTopoVertices(const std::string& g, con
 	for (auto e : topo_entities)
 		result.push_back(e->getName());
 
+    std::sort(result.begin(), result.end());
 	return result;
 }
 /*----------------------------------------------------------------------------*/
