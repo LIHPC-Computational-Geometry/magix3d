@@ -1089,12 +1089,7 @@ dupVertexNonConformalRelation(std::vector<Topo::CoFace* >& cofaces)
         Topo::CoFace* coface = *iter1;
         num_groupe = filtre_coface[coface];
 
-        std::vector<Topo::CoEdge* > coedges;
-        coface->getCoEdges(coedges);
-
-        for (std::vector<Topo::CoEdge* >::iterator iter2 = coedges.begin();
-                iter2 != coedges.end(); ++iter2){
-            Topo::CoEdge* coedge = *iter2;
+        for (Topo::CoEdge* coedge : coface->getCoEdges()){
             filtre_coedge[coedge] = num_groupe;
 
             const std::vector<Topo::Vertex* > & vertices = coedge->getVertices();
@@ -1126,18 +1121,13 @@ dupVertexNonConformalRelation(std::vector<Topo::CoFace* >& cofaces)
             iter1 != verticesToDup.end(); ++iter1){
         Topo::Vertex* vertex = *iter1;
 
-        std::vector<Topo::CoEdge* > coedges;
-        vertex->getCoEdges(coedges);
-
         // correspondance entre le groupe et le sommet par lequel on remplace le sommet à dupliquer
         std::map<uint, Topo::Vertex*> cor_grp_vtx;
         // on garde le sommet originel pour l'un des groupes (celui du filtre par ex)
         cor_grp_vtx[filtre_vertex[vertex]] = vertex;
 
         // les groupes auquels appartient ce sommet
-        for (std::vector<Topo::CoEdge* >::iterator iter2 = coedges.begin();
-                iter2 != coedges.end(); ++iter2){
-            Topo::CoEdge* coedge = *iter2;
+        for (Topo::CoEdge* coedge : vertex->getCoEdges()){
             Topo::Vertex* newVtx = cor_grp_vtx[filtre_coedge[coedge]];
             if (newVtx == 0){
                 newVtx = vertex->clone();
