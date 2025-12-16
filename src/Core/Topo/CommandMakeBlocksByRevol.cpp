@@ -463,7 +463,7 @@ computeFiltersWithAllFaces(std::map<Vertex*, uint>& filtre_vertex,
 {
 	for (CoFace* coface : getContext().getTopoManager().getCoFacesObj()){
 		filtre_coface[coface] = 3;
-		for (CoEdge* coedge : coface->getCoEdges()){
+		for (CoEdge* coedge : coface->getCoEdges(false)){
 			filtre_coedge[coedge] = 3;
 			for (Vertex* vtx : coedge->getVertices())
 				filtre_vertex[vtx] = 3;
@@ -1056,8 +1056,8 @@ void CommandMakeBlocksByRevol::copyNi(std::map<Vertex*, uint>& ni_vtx,
     	std::cout<<"ni_coface pour "<<(*iter2)->getName()<<" = "<<ni_coface[*iter1]<<" par copie de "<<(*iter1)->getName()<<std::endl;
 #endif
 
-    	std::vector<CoEdge*> coedges1 = (*iter1)->getCoEdges();
-    	std::vector<CoEdge*> coedges2 = (*iter2)->getCoEdges();
+    	std::vector<CoEdge*> coedges1 = (*iter1)->getCoEdges(false);
+    	std::vector<CoEdge*> coedges2 = (*iter2)->getCoEdges(false);
     	auto iter3 = coedges1.begin();
     	auto iter4 = coedges2.begin();
     	for ( ; iter3 != coedges1.end(); ++iter3, ++iter4){
@@ -1401,7 +1401,7 @@ updateInterpolate(std::vector<CoFace*>& cofaces,
 			CoFace* coface = *iter1;
 
 			auto edges = coface->getEdges();
-			auto coface_coedges = coface->getCoEdges();
+			auto coface_coedges = coface->getCoEdges(false);
 
 			for (std::vector<Edge* >::iterator iter2 = edges.begin();
 					iter2 != edges.end(); ++iter2){

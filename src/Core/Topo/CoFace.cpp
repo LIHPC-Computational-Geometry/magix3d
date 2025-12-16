@@ -3435,14 +3435,23 @@ getNbMeshingEdges(uint& nbI, uint& nbJ) const
 }
 /*----------------------------------------------------------------------------*/
 std::vector<CoEdge* > CoFace::
-getCoEdges() const
+getCoEdges(bool unique) const
 {
-    Utils::EntitySet<Topo::CoEdge*> coedges(Utils::Entity::compareEntity);
-    for(Edge* e : getEdges()) {
-        const std::vector<CoEdge* > & local_coedges = e->getCoEdges();
-        coedges.insert(local_coedges.begin(), local_coedges.end());
+    if (unique) {
+        Utils::EntitySet<Topo::CoEdge*> coedges(Utils::Entity::compareEntity);
+        for(Edge* e : getEdges()) {
+            const std::vector<CoEdge* > & local_coedges = e->getCoEdges();
+            coedges.insert(local_coedges.begin(), local_coedges.end());
+        }
+        return Utils::toVect(coedges);
+    } else {
+        std::vector<CoEdge* > coedges;
+        for(Edge* e : getEdges()) {
+            const std::vector<CoEdge* > & local_coedges = e->getCoEdges();
+            coedges.insert(coedges.end(), local_coedges.begin(), local_coedges.end());
+        }
+        return coedges;
     }
-    return Utils::toVect(coedges);
 }
 /*----------------------------------------------------------------------------*/
 CoFace::eDirOnCoFace CoFace::getDir(Vertex* v1, Vertex* v2) const

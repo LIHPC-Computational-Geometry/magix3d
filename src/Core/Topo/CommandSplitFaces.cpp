@@ -139,7 +139,7 @@ void CommandSplitFaces::verif(Topo::CoFace* coface)
 	std::cout<<"CommandSplitFaces::verif pour "<<coface->getName()<<std::endl;
 #endif
 
-	std::vector<CoEdge*> coedges = coface->getCoEdges();
+	std::vector<CoEdge*> coedges = coface->getCoEdges(false);
 
 	// recherche si une arête est projetée sur un demi cercle
 

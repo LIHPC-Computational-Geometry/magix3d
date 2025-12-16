@@ -392,7 +392,7 @@ public:
 
 
     /// retourne l'ensemble des arêtes communes toute directions confondues
-    std::vector<CoEdge* > getCoEdges() const;
+    std::vector<CoEdge* > getCoEdges(bool unique=true) const;
 
     /*------------------------------------------------------------------------*/
     /** Retrouve la direction dans une coface structurée à partir de 2 sommets

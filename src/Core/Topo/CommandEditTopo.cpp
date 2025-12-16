@@ -808,7 +808,7 @@ duplicate(std::vector<CoFace*>& cofaces_dep,
             std::cout<<"corr_coface "<<(*iter1)->getName()<<" => "<<newCoface->getName()<<std::endl;
 #endif
             // mise à jour des arêtes interpolées
-            std::vector<CoEdge* > coedges = newCoface->getCoEdges();
+            std::vector<CoEdge* > coedges = newCoface->getCoEdges(false);
             for (uint i=0; i<coedges.size(); i++)
             	if (filtre_coedge[coedges[i]] < 20) // cas hors de l'axe
             		updateCoEdgesInterpolateNames(coedges[i], corr_coedge,
