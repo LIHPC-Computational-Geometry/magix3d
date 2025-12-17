@@ -34,6 +34,8 @@ class CoFace : public TopoEntity {
     static const char* typeNameTopoCoFace;
 
 public:
+    void accept(ConstTopoEntityVisitor& v) const override{ v.visit(this); }
+    void accept(TopoEntityVisitor& v) override { v.visit(this); }
 
     /// identification des arêtes pour le cas structuré
     enum eEdgeOnCoFace {i_min = 0, j_min, i_max, j_max};

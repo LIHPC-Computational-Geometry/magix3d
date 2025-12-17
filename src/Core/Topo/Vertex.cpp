@@ -707,14 +707,6 @@ isEdited() const
     || m_save_mesh_data != 0;
 }
 /*----------------------------------------------------------------------------*/
-std::vector<Vertex* > Vertex::getAllVertices() const
-{
-    std::vector<Vertex* > vertices;
-    Vertex* vtx = const_cast<Vertex*>(this);
-    vertices.push_back(vtx);
-    return vertices;
-}
-/*----------------------------------------------------------------------------*/
 void Vertex::getGroupsName (std::vector<std::string>& gn) const
 {
     TopoEntity::getGroupsName(gn);
