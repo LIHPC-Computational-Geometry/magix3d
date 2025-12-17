@@ -2683,7 +2683,7 @@ std::vector<CoEdge*> TopoHelper::getBorder(std::vector<CoFace*>& cofaces)
 	std::map<CoEdge*, uint> filtre_coedges;
 
 	for (CoFace* cf : cofaces)
-        for (CoEdge* ce : cf->getCoEdges(false))
+        for (CoEdge* ce : cf->getCoEdges())
 			filtre_coedges[ce] += 1;
 
 	std::vector<CoEdge*> coedges;

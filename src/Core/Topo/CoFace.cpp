@@ -3435,23 +3435,14 @@ getNbMeshingEdges(uint& nbI, uint& nbJ) const
 }
 /*----------------------------------------------------------------------------*/
 std::vector<CoEdge* > CoFace::
-getCoEdges(bool unique) const
+getCoEdges() const
 {
-    if (unique) {
-        Utils::EntitySet<Topo::CoEdge*> coedges(Utils::Entity::compareEntity);
-        for(Edge* e : getEdges()) {
-            const std::vector<CoEdge* > & local_coedges = e->getCoEdges();
-            coedges.insert(local_coedges.begin(), local_coedges.end());
-        }
-        return Utils::toVect(coedges);
-    } else {
-        std::vector<CoEdge* > coedges;
-        for(Edge* e : getEdges()) {
-            const std::vector<CoEdge* > & local_coedges = e->getCoEdges();
-            coedges.insert(coedges.end(), local_coedges.begin(), local_coedges.end());
-        }
-        return coedges;
+    std::vector<CoEdge* > coedges;
+    for(Edge* e : getEdges()) {
+        const std::vector<CoEdge* > & local_coedges = e->getCoEdges();
+        Utils::addUnique(local_coedges, coedges);
     }
+    return coedges;
 }
 /*----------------------------------------------------------------------------*/
 CoFace::eDirOnCoFace CoFace::getDir(Vertex* v1, Vertex* v2) const
@@ -3482,15 +3473,15 @@ CoFace::eDirOnCoFace CoFace::getDir(Vertex* v1, Vertex* v2) const
 /*----------------------------------------------------------------------------*/
 std::vector<Topo::Vertex* > CoFace::getAllVertices() const
 {
-    Utils::EntitySet<Topo::Vertex*> vertices(Utils::Entity::compareEntity);
+    std::vector<Topo::Vertex*> vertices;
     for(Edge* e : getEdges()) {
         const std::vector<CoEdge* > & local_coedges = e->getCoEdges();
         for (uint i=0; i<local_coedges.size(); i++) {
             const std::vector<Vertex* > & local_vertices = local_coedges[i]->getVertices();
-            vertices.insert(local_vertices.begin(), local_vertices.end());
+            Utils::addUnique(local_vertices, vertices);
         }
     }
-    return Utils::toVect(vertices);
+    return vertices;
 }
 /*----------------------------------------------------------------------------*/
 CoEdgeMeshingProperty* CoFace::
@@ -3599,12 +3590,12 @@ void CoFace::remove(Face* f)
 std::vector<Block* > CoFace::
 getBlocks() const
 {
-    Utils::EntitySet<Block* > blocks(Utils::Entity::compareEntity);
+    std::vector<Block* > blocks;
     for (Face* f : getFaces()) {
         std::vector<Block* > loc_bl = f->getBlocks();
-        blocks.insert(loc_bl.begin(), loc_bl.end());
+        Utils::addUnique(loc_bl, blocks);
     }
-    return Utils::toVect(blocks);
+    return blocks;
 }
 /*----------------------------------------------------------------------------*/
 Utils::Math::Point CoFace::getBarycentre() const

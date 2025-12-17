@@ -34,6 +34,8 @@ class Edge : public TopoEntity {
     static const char* typeNameTopoEdge;
 
 public:
+    void accept(ConstTopoEntityVisitor& v) const override{ v.visit(this); }
+    void accept(TopoEntityVisitor& v) override { v.visit(this); }
 
     /*------------------------------------------------------------------------*/
     /// Constructeur (avec une CoEdge)

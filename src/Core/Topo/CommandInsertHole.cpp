@@ -133,7 +133,7 @@ duplicate()
     // de part et d'autre en tournant autour de l'arête et sans passer par la coface traitée
 
 	for (CoFace* coface : m_cofaces){
-		for (CoEdge* coedge : coface->getCoEdges(false)){
+		for (CoEdge* coedge : coface->getCoEdges()){
 			if (m_filtre_coedge[coedge] == 0){
 
 				std::vector<Topo::CoFace*> cofaces = coedge->getCoFaces();

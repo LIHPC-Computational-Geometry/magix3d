@@ -655,23 +655,23 @@ void Vertex::findNearlyVertices(const std::vector<Vertex* >& vertices_A,
 std::vector<Edge* > Vertex::
 getEdges() const
 {
-    Utils::EntitySet<Topo::Edge*> edges(Utils::Entity::compareEntity);
+    std::vector<Topo::Edge*> edges;
     for(CoEdge* coedge : getCoEdges()) {
         const std::vector<Edge* >& local_edges = coedge->getEdges();
-        edges.insert(local_edges.begin(), local_edges.end());
+        Utils::addUnique(local_edges, edges);
     }
-    return Utils::toVect(edges);
+    return edges;
 }
 /*----------------------------------------------------------------------------*/
 std::vector<CoFace* > Vertex::
 getCoFaces() const
 {
-    Utils::EntitySet<Topo::CoFace*> cofaces(Utils::Entity::compareEntity);
+    std::vector<Topo::CoFace*> cofaces;
     for (Edge* edge : getEdges()){
         std::vector<CoFace* > loc_cofaces = edge->getCoFaces();
-        cofaces.insert(loc_cofaces.begin(), loc_cofaces.end());
+        Utils::addUnique(loc_cofaces, cofaces);
     }
-    return Utils::toVect(cofaces);
+    return cofaces;
 }
 /*----------------------------------------------------------------------------*/
 std::vector<Block* > Vertex::
@@ -680,14 +680,13 @@ getBlocks() const
 #ifdef _DEBUG2
 	std::cout<<"getBlocks() pour "<<getName();
 #endif
-    Utils::EntitySet<Topo::Block*> blocks(Utils::Entity::compareEntity);
-
+    std::vector<Topo::Block*> blocks;
     for(CoEdge* coedge : getCoEdges()) {
         for (Edge* e : coedge->getEdges()){
             for (CoFace* cf : e->getCoFaces()){
                 for (Face* f : cf->getFaces()){
                     std::vector<Block* > loc_bl = f->getBlocks();
-                    blocks.insert(loc_bl.begin(), loc_bl.end());
+                    Utils::addUnique(loc_bl, blocks);
                 }
             }
         }
@@ -695,7 +694,7 @@ getBlocks() const
 #ifdef _DEBUG2
 	std::cout<<"  => trouve "<<blocks.size()<<" blocs"<<std::endl;
 #endif
-    return Utils::toVect(blocks);
+    return blocks;
 }
 /*----------------------------------------------------------------------------*/
 bool Vertex::
@@ -705,14 +704,6 @@ isEdited() const
     || m_save_geom_property != 0
     || m_save_topo_property != 0
     || m_save_mesh_data != 0;
-}
-/*----------------------------------------------------------------------------*/
-std::vector<Vertex* > Vertex::getAllVertices() const
-{
-    std::vector<Vertex* > vertices;
-    Vertex* vtx = const_cast<Vertex*>(this);
-    vertices.push_back(vtx);
-    return vertices;
 }
 /*----------------------------------------------------------------------------*/
 void Vertex::getGroupsName (std::vector<std::string>& gn) const

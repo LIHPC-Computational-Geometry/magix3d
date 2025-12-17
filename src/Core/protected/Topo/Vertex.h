@@ -34,25 +34,23 @@ class Vertex : public TopoEntity {
     static const char* typeNameTopoVertex;
 
 public:
+    void accept(ConstTopoEntityVisitor& v) const override{ v.visit(this); }
+    void accept(TopoEntityVisitor& v) override { v.visit(this); }
 
     /// Constructeur par défaut (sommet en 0,0,0)
-
     Vertex(Internal::Context& ctx);
 
 
     /// Constructeur avec sommet en pt
-
     Vertex(Internal::Context& ctx,
            const Utils::Math::Point& pt);
 
 
     /// Constructeur par copie interdit
-
     Vertex(const Vertex& v);
 
 
     /// Constructeur par copie, sans relation topologique ni maillage
-
     Vertex* clone();
 
 
@@ -60,7 +58,6 @@ public:
     virtual ~Vertex();
 
     /// Opérateur de copie
-
     Vertex & operator = (const Vertex& v);
 
 
@@ -68,10 +65,6 @@ public:
     /** \brief  retourne la dimension de l'entité topologique
      */
     int getDim() const {return 0;}
-
-    /*------------------------------------------------------------------------*/
-    /// accès à tous les sommets (un seul pour un sommet)
-    std::vector<Topo::Vertex* > getAllVertices() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief   Suppression des dépendances (entités topologiques incidentes)

@@ -252,16 +252,16 @@ merge(Face* fa, Internal::InfoCommand* icmd)
 /*----------------------------------------------------------------------------*/
 std::vector<Vertex* > Face::getAllVertices() const
 {
-    Utils::EntitySet<Topo::Vertex*> vertices(Utils::Entity::compareEntity);
+    std::vector<Topo::Vertex*> vertices;
     for(CoFace* coface : getCoFaces()) {
         for(Edge* edge : coface->getEdges()) {
             for(CoEdge* coedge : edge->getCoEdges()){
                 const std::vector<Vertex* > & local_vertices = coedge->getVertices();
-                vertices.insert(local_vertices.begin(), local_vertices.end());
+                Utils::addUnique(local_vertices, vertices);
             }
         }
     }
-    return Utils::toVect(vertices);
+    return vertices;
 }
 /*----------------------------------------------------------------------------*/
 Block* Face::
@@ -1433,12 +1433,12 @@ saveInternals(CommandEditTopo* cet)
 std::vector<Edge* > Face::
 getEdges() const
 {
-    Utils::EntitySet<Topo::Edge*> edges(Utils::Entity::compareEntity);
+    std::vector<Topo::Edge*> edges;
     for(CoFace* coface : getCoFaces()) {
         const std::vector<Edge* >& local_edges = coface->getEdges();
-        edges.insert(local_edges.begin(), local_edges.end());
+        Utils::addUnique(local_edges, edges);
     }
-    return Utils::toVect(edges);
+    return edges;
 }
 /*----------------------------------------------------------------------------*/
 Edge* Face::
@@ -1466,14 +1466,14 @@ getEdge(Vertex* v1, Vertex* v2) const
 std::vector<CoEdge* > Face::
 getCoEdges() const
 {
-    Utils::EntitySet<Topo::CoEdge*> coedges(Utils::Entity::compareEntity);
+    std::vector<Topo::CoEdge*> coedges;
     for(CoFace* coface : getCoFaces()) {
         for(Edge* edge : coface->getEdges()) {
             const std::vector<CoEdge* >& local_coedges = edge->getCoEdges();
-            coedges.insert(local_coedges.begin(), local_coedges.end());
+            Utils::addUnique(local_coedges, coedges);
         }
     }
-    return Utils::toVect(coedges);
+    return coedges;
 }
 /*----------------------------------------------------------------------------*/
 void Face::

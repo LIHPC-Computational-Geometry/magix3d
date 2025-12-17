@@ -36,6 +36,8 @@ class Face : public TopoEntity {
     static const char* typeNameTopoFace;
 
 public:
+    void accept(ConstTopoEntityVisitor& v) const override{ v.visit(this); }
+    void accept(TopoEntityVisitor& v) override { v.visit(this); }
 
     /// identification des arêtes pour le cas structuré
     enum eEdgeOnFace {i_min = 0, j_min, i_max, j_max};
