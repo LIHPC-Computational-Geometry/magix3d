@@ -5,7 +5,6 @@
 #include "Internal/InternalEntity.h"
 #include "Topo/TopoProperty.h"
 #include "Topo/TopoInfo.h"
-#include "Topo/TopoEntityVisitor.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -45,9 +44,6 @@ protected:
             Utils::DisplayProperties* disp);
 
 public:
-    virtual void accept(ConstTopoEntityVisitor& visitor) const = 0 ;
-    virtual void accept(TopoEntityVisitor& visitor) = 0 ;
-
     /*------------------------------------------------------------------------*/
     /** \brief   Destructeur
      */
@@ -61,6 +57,12 @@ public:
 #ifndef SWIG
 	virtual void getBounds (double bounds[6]) const;
 #endif	// SWIG
+
+    /*------------------------------------------------------------------------*/
+	/// accès à tous les sommets y compris ceux internes
+#ifndef SWIG
+	virtual void getAllVertices(std::vector<Topo::Vertex* >& vertices, const bool unique=true) const;
+#endif  // SWIG
 
 	/*------------------------------------------------------------------------*/
     /** \brief   détruit l'objet (mais pas ses dépendances !)

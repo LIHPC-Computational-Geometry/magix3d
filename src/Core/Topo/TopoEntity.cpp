@@ -44,29 +44,26 @@ TopoEntity::~TopoEntity()
 /*----------------------------------------------------------------------------*/
 void TopoEntity::getBounds (double bounds[6]) const
 {
-    struct : ConstTopoEntityVisitor {
-        void visit(const Vertex* v) override { vertices.push_back(const_cast<Vertex*>(v)); }
-        void visit(const Edge* e) override { vertices = e->getAllVertices(); }
-        void visit(const CoEdge* e)override { vertices = e->getVertices(); }
-        void visit(const Face* f) override { vertices = f->getAllVertices(); }
-        void visit(const CoFace* f) override { vertices = f->getAllVertices(); }
-        void visit(const Block* b) override { vertices = b->getAllVertices(); }
-        std::vector<Topo::Vertex*> vertices;
-    } v;
+    // tous les sommets
+    std::vector<Vertex* > vertices;
+    getAllVertices(vertices);
 
-    this->accept(v);
-
-    if (v.vertices.empty()){
+    if (vertices.empty()){
         Entity::getBounds(bounds);
         return;
     }
 
-    Utils::Bounds bnds(v.vertices[0]->getCoord());
-    for (uint i=1; i<v.vertices.size(); i++){
-        bnds.add(v.vertices[i]->getCoord());
+    Utils::Bounds bnds(vertices[0]->getCoord());
+    for (uint i=1; i<vertices.size(); i++){
+        bnds.add(vertices[i]->getCoord());
     }
 
     bnds.get(bounds);
+}
+/*----------------------------------------------------------------------------*/
+void TopoEntity::getAllVertices(std::vector<Topo::Vertex* >& vertices, const bool unique) const
+{
+	throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, TopoEntity::getAllVertices doit être implémenté.", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
 void TopoEntity::setDestroyed(bool b)

@@ -920,12 +920,12 @@ void Edge::getPoints(std::vector<Utils::Math::Point> &points) const
 /*----------------------------------------------------------------------------*/
 std::vector<Vertex* > Edge::getAllVertices() const
 {
-    std::vector<Topo::Vertex*> vertices;
+    Utils::EntitySet<Topo::Vertex*> vertices(Utils::Entity::compareEntity);
     for(CoEdge* ce : getCoEdges()){
         const std::vector<Vertex* > & local_vertices = ce->getVertices();
-        Utils::addUnique(local_vertices, vertices);
+        vertices.insert(local_vertices.begin(), local_vertices.end());
     }
-    return vertices;
+    return Utils::toVect(vertices);
 }
 /*----------------------------------------------------------------------------*/
 uint Edge::

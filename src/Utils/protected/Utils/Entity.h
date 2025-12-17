@@ -421,20 +421,6 @@ int getIndexOf(T* e, const std::vector<T*>& entities)
 }
 
 template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
-void addUnique(T* e, std::vector<T*>& entities)
-{
-    if (std::find(entities.begin(), entities.end(), e) == entities.end())
-        entities.push_back(e);
-}
-
-template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
-void addUnique(const std::vector<T*>& entitiesToAdd, std::vector<T*>& entities)
-{
-    for (T* e : entitiesToAdd)
-        addUnique(e, entities);
-}
-
-template<typename T, typename = std::enable_if_t<std::is_base_of<Entity, T>::value>>
 bool contains(const T* e, const std::vector<T*>& entities)
 {
     return std::find(entities.begin(), entities.end(), e) != entities.end();

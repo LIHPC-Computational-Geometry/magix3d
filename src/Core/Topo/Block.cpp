@@ -25,7 +25,6 @@
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
 #include "Utils/Common.h"
-#include "Utils/Entity.h"
 #include "Utils/SerializedRepresentation.h"
 #include "Geom/GeomEntity.h"
 /*----------------------------------------------------------------------------*/
@@ -304,57 +303,57 @@ getVertex(bool cote_i, bool cote_j, bool cote_k)
 std::vector<CoFace*> Block::
 getCoFaces() const
 {
-    std::vector<CoFace*> cofaces;
+    Utils::EntitySet<CoFace*> cofaces(Utils::Entity::compareEntity);
     for(Face* face : getFaces()) {
         const std::vector<CoFace* >& local_cofaces = face->getCoFaces();
-        Utils::addUnique(local_cofaces, cofaces);
+        cofaces.insert(local_cofaces.begin(), local_cofaces.end());
     }
-    return cofaces;
+    return Utils::toVect(cofaces);
 }
 /*----------------------------------------------------------------------------*/
 std::vector<Edge*> Block::
 getEdges() const
 {
-    std::vector<Topo::Edge*> edges;
+    Utils::EntitySet<Topo::Edge*> edges(Utils::Entity::compareEntity);
     for(Face* face : getFaces()) {
         for(CoFace* coface : face->getCoFaces()) {
             const std::vector<Edge* >& local_edges = coface->getEdges();
-            Utils::addUnique(local_edges, edges);
+            edges.insert(local_edges.begin(), local_edges.end());
         }
     }
-    return edges;
+    return Utils::toVect(edges);
 }
 /*----------------------------------------------------------------------------*/
 std::vector<Vertex*> Block::
 getAllVertices() const
 {
-    std::vector<Vertex*> vertices;
+    Utils::EntitySet<Vertex*> vertices(Utils::Entity::compareEntity);
     for(Face* face : getFaces()) {
         for(CoFace* coface : face->getCoFaces()) {
             for(Edge* edge : coface->getEdges()) {
                 for(CoEdge* coedge : edge->getCoEdges()){
                     const std::vector<Vertex* >& local_vertices = coedge->getVertices();
-                    Utils::addUnique(local_vertices, vertices);
+                    vertices.insert(local_vertices.begin(), local_vertices.end());
                 }
             }
         }
     }
-    return vertices;
+    return Utils::toVect(vertices);
 }
 /*----------------------------------------------------------------------------*/
 std::vector<CoEdge*> Block::
 getCoEdges() const
 {
-    std::vector<Topo::CoEdge*> coedges;
+    Utils::EntitySet<Topo::CoEdge*> coedges(Utils::Entity::compareEntity);
     for(Face* face : getFaces()) {
         for(CoFace* coface : face->getCoFaces()) {
             for(Edge* edge : coface->getEdges()) {
                 const std::vector<CoEdge* >& local_coedges = edge->getCoEdges();
-                Utils::addUnique(local_coedges, coedges);
+                coedges.insert(local_coedges.begin(), local_coedges.end());
             }
         }
     }
-    return coedges;
+    return Utils::toVect(coedges);
 }
 /*----------------------------------------------------------------------------*/
 void Block::

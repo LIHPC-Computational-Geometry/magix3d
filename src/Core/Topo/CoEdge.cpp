@@ -739,16 +739,16 @@ Topo::Vertex* CoEdge::getOppositeVertex(Topo::Vertex* v) const
 std::vector<Block* > CoEdge::
 getBlocks() const
 {
-    std::vector<Block*> blocks;
+    Utils::EntitySet<Block*> blocks(Utils::Entity::compareEntity);
     for (Edge* edge : getEdges()){
     	for (CoFace* loc_coface : edge->getCoFaces()){
     		for (Face* face : loc_coface->getFaces()){
     			std::vector<Block* > loc_bl = face->getBlocks();
-				addUnique(loc_bl, blocks);
+    			blocks.insert(loc_bl.begin(), loc_bl.end());
     		}
     	}
     }
-    return blocks;
+    return Utils::toVect(blocks);
 }
 /*----------------------------------------------------------------------------*/
 //#define _DEBUG_REPRESENTATION
@@ -2565,17 +2565,33 @@ getNodes(Topo::Vertex* v1, Topo::Vertex* v2,
 			iter != vectNd.end(); ++iter)
 		std::cout<<"  Nd "<<(*iter).getID()<<" : ["<<(*iter).X()<<", "<<(*iter).Y()<<", "<<(*iter).Z()<<"]"<<std::endl;
 #endif
+
+//    TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
+//    message << "CoEdge::getNodes( \""
+//            << v1->getName() << "\", "
+//            << v2->getName() << "\") avec l'arête "
+//            << getName()<<" donne un vecteur de "<<vectNd.size()<<" noeuds";
+//    std::cout<<message<<std::endl;
+//    std::cout<<"m_mesh_data->nodes().size() = "<<m_mesh_data->nodes().size()<<std::endl;
+}
+/*----------------------------------------------------------------------------*/
+std::vector<Vertex* > CoEdge::getAllVertices() const
+{
+    Utils::EntitySet<Vertex*> vertices(Utils::Entity::compareEntity);
+    const std::vector<Vertex* > & local_vertices = getVertices();
+    vertices.insert(local_vertices.begin(), local_vertices.end());
+	return Utils::toVect(vertices);
 }
 /*----------------------------------------------------------------------------*/
 std::vector<CoFace* > CoEdge::
 getCoFaces() const
 {
-    std::vector<CoFace*> cofaces;
+    Utils::EntitySet<CoFace*> cofaces(Utils::Entity::compareEntity);
     for (Edge* e : getEdges()){
         const std::vector<CoFace* >& loc_cofaces = e->getCoFaces();
-		Utils::addUnique(loc_cofaces, cofaces);
+        cofaces.insert(loc_cofaces.begin(), loc_cofaces.end());
     }
-	return cofaces;
+	return Utils::toVect(cofaces);
 }
 /*----------------------------------------------------------------------------*/
 bool CoEdge::

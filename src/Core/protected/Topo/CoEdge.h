@@ -39,8 +39,6 @@ class CoEdge : public TopoEntity {
     static const char* typeNameTopoCoEdge;
 
 public:
-    void accept(ConstTopoEntityVisitor& v) const override{ v.visit(this); }
-    void accept(TopoEntityVisitor& v) override { v.visit(this); }
 
     /*------------------------------------------------------------------------*/
     /// Constructeur (avec 2 sommets)
@@ -168,6 +166,9 @@ public:
 
     const std::vector<Topo::Vertex* >& getVertices() const
         {return m_topo_property->getVertexContainer();}
+
+    /// accès à tous les sommets
+    std::vector<Topo::Vertex* > getAllVertices() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès aux sommets topologiques opposé à un sommet

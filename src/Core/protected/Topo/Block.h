@@ -38,8 +38,6 @@ class Block : public TopoEntity {
     static const char* typeNameTopoBlock;
 
 public:
-    void accept(ConstTopoEntityVisitor& v) const override{ v.visit(this); }
-    void accept(TopoEntityVisitor& v) override { v.visit(this); }
 
     /*------------------------------------------------------------------------*/
     /// énumération des côtés d'un bloc structuré
