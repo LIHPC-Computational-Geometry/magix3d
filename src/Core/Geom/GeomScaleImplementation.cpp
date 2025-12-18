@@ -234,34 +234,6 @@ scale(const TopoDS_Shape& shape, const double factorX, const double factorY, con
     return scaling.Shape();
 }
 /*----------------------------------------------------------------------------*/
-void GeomScaleImplementation::
-performUndo()
-{
-    for (uint i=0; i<m_undoableEntities.size(); i++) {
-        if (m_isHomogene) {
-            auto undo = [&](const TopoDS_Shape& sh) { return scale(sh, 1.0/m_factor, m_center); };
-            m_undoableEntities[i]->applyAndReturn(undo);
-        } else {
-            auto undo = [&](const TopoDS_Shape& sh) { return scale(sh, 1.0/m_factorX, 1.0/m_factorY, 1.0/m_factorZ, m_center); };
-            m_undoableEntities[i]->applyAndReturn(undo);
-        }
-    }
-}
-/*----------------------------------------------------------------------------*/
-void GeomScaleImplementation::
-performRedo()
-{
-    for (uint i=0; i<m_undoableEntities.size(); i++) {
-        if (m_isHomogene) {
-            auto redo = [&](const TopoDS_Shape& sh) { return scale(sh, m_factor, m_center); };
-            m_undoableEntities[i]->applyAndReturn(redo);
-        } else {
-            auto redo = [&](const TopoDS_Shape& sh) { return scale(sh,  m_factorX, m_factorY, m_factor, m_center); };
-            m_undoableEntities[i]->applyAndReturn(redo);
-        }
-    }
-}
-/*----------------------------------------------------------------------------*/
 } // end namespace Geom
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D

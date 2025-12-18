@@ -102,23 +102,6 @@ translate(const TopoDS_Shape& shape, const Utils::Math::Vector& V)
     return translat.Shape();
 }
 /*----------------------------------------------------------------------------*/
-void GeomTranslateImplementation::
-performUndo()
-{
-    Utils::Math::Vector dv_inv(-m_dv.getX(), -m_dv.getY(), -m_dv.getZ());
-    auto undo = [&](const TopoDS_Shape& sh) { return translate(sh, dv_inv); };
-    for (uint i=0; i<m_undoableEntities.size(); i++)
-        m_undoableEntities[i]->applyAndReturn(undo);
-}
-/*----------------------------------------------------------------------------*/
-void GeomTranslateImplementation::
-performRedo()
-{
-    auto redo = [&](const TopoDS_Shape& sh) { return translate(sh, m_dv); };
-    for (uint i=0; i<m_undoableEntities.size(); i++)
-        m_undoableEntities[i]->applyAndReturn(redo);
-}
-/*----------------------------------------------------------------------------*/
 } // end namespace Geom
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D

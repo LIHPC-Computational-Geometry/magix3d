@@ -65,12 +65,6 @@ public:
 
     void prePerform();
 
-    /*------------------------------------------------------------------------*/
-    /** \brief  réalisation du undo/redo pour les entités qui n'ont pas leur état stocké dans le Memento de la commande
-     */
-    void performUndo();
-    void performRedo();
-
 private:
     /*------------------------------------------------------------------------*/
     /** \brief  symétrie des entités

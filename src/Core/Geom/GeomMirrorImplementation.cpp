@@ -106,20 +106,6 @@ mirror(const TopoDS_Shape& shape, const Utils::Math::Plane& plane) const
     return trans.Shape();
 }
 /*----------------------------------------------------------------------------*/
-void GeomMirrorImplementation::
-performUndo()
-{
-    auto undo = [&](const TopoDS_Shape& sh) { return mirror(sh, m_plane); };
-    for (uint i=0; i<m_undoableEntities.size(); i++)
-        m_undoableEntities[i]->applyAndReturn(undo);
-}
-/*----------------------------------------------------------------------------*/
-void GeomMirrorImplementation::
-performRedo()
-{
-    performUndo();
-}
-/*----------------------------------------------------------------------------*/
 } // end namespace Geom
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D
