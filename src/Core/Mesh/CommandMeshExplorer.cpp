@@ -2,7 +2,7 @@
 #include "Internal/Context.h"
 #include "Internal/InfoCommand.h"
 #include "Group/GroupManager.h"
-#include "Group/Group3D.h"
+#include "Group/GroupEntity.h"
 #include "Geom/Volume.h"
 #include "Topo/TopoEntity.h"
 #include "Topo/Block.h"
@@ -149,16 +149,12 @@ void CommandMeshExplorer::
 selectCoFaceAndBlocks(std::map<Topo::CoFace*, uint>& filtre_coface,
         std::map<Topo::Block*, uint>& filtre_block)
 {
-    // tous les groupes 3D
-    std::vector<Group::Group3D*> grp;
-    getContext().getGroupManager().getGroup3D(grp);
-
     // le nombre de blocs maillés en structuré
     uint nb_blocks_marked = 0;
 
     Topo::TopoManager& tm = getContext().getTopoManager();
-    for (uint ig=0; ig<grp.size(); ig++){
-    	std::vector<Geom::Volume*>& volumes = grp[ig]->getVolumes();
+    for (Group::Group3D* grp : getContext().getGroupManager().getGroups<Group::Group3D>()){
+    	std::vector<Geom::Volume*> volumes = grp->getFilteredEntities<Geom::Volume>();
     	for (uint i=0; i<volumes.size(); i++){
             std::vector<Topo::Block*> topos = tm.getFilteredRefTopos<Topo::Block>(volumes[i]);
             for (Topo::Block* blk : topos) {
@@ -168,12 +164,7 @@ selectCoFaceAndBlocks(std::map<Topo::CoFace*, uint>& filtre_coface,
 #ifdef _DEBUG_EXPLORER
                     std::cout<<"  bloc pris en compte : "<<blk->getName()<<std::endl;
 #endif
-
-                    std::vector<Topo::CoFace* > cofaces;
-
-                    blk->getCoFaces(cofaces);
-
-                    for (Topo::CoFace* coface : cofaces){
+                    for (Topo::CoFace* coface : blk->getCoFaces()){
                         filtre_coface[coface] = 1;
                         //std::cout<<"filtre_coface à 1 pour "<<(coface)->getName()<<std::endl;
                     }
@@ -182,30 +173,21 @@ selectCoFaceAndBlocks(std::map<Topo::CoFace*, uint>& filtre_coface,
             } // end for blk : topos
     	} // end for i
 
-    	std::vector<Topo::Block*>& blocks = grp[ig]->getBlocks();
-    	for (uint j=0; j<blocks.size(); j++){
-    		Topo::Block* blk = blocks[j];
-
+    	for (Topo::Block* blk : grp->getFilteredEntities<Topo::Block>()) {
     		if (blk->isStructured()){ // && blk->isMeshed()
     			filtre_block[blk] = 1;
     			nb_blocks_marked += 1;
 #ifdef _DEBUG_EXPLORER
     			std::cout<<"  bloc pris en compte : "<<blk->getName()<<std::endl;
 #endif
-
-    			std::vector<Topo::CoFace* > cofaces;
-
-    			blk->getCoFaces(cofaces);
-
-    			for (std::vector<Topo::CoFace* >::iterator iter1 = cofaces.begin();
-    					iter1 != cofaces.end(); ++iter1){
-    				filtre_coface[*iter1] = 1;
-    				//std::cout<<"filtre_coface à 1 pour "<<(*iter1)->getName()<<std::endl;
+    			for (Topo::CoFace* coface : blk->getCoFaces()){
+    				filtre_coface[coface] = 1;
+    				//std::cout<<"filtre_coface à 1 pour "<<coface->getName()<<std::endl;
     			}
 
     		} // end if (blk->isStructured() && blk->isMeshed())
-    	} // end for j
-    } // end for ig
+    	} // end for blk
+    } // end for grp
 
     if (nb_blocks_marked == 0){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -235,8 +217,7 @@ computePosCoEdge(std::map<Topo::CoFace*, uint>& filtre_coface,
 #ifdef _DEBUG_EXPLORER
         std::cout<<"### coedge : "<<coedge_dep->getName()<<", pos : "<<pos<<std::endl;
 #endif
-        std::vector<Topo::CoFace* > cofaces;
-        coedge_dep->getCoFaces(cofaces);
+        std::vector<Topo::CoFace* > cofaces = coedge_dep->getCoFaces();
 
         for (std::vector<Topo::CoFace* >::iterator iter1 = cofaces.begin();
                 iter1 != cofaces.end(); ++iter1){
@@ -252,7 +233,7 @@ computePosCoEdge(std::map<Topo::CoFace*, uint>& filtre_coface,
                 // recherche du côté dans lequel est cette arête, et le nombre de bras de maillage jusqu'à la coupe
                 Topo::Edge* edge_dep = coface->getEdgeContaining(coedge_dep);
                 //std::cout<<"edge_dep : "<<*edge_dep;
-                uint ind_edge_dep = coface->getIndex(edge_dep);
+                uint ind_edge_dep = Utils::getIndexOf(edge_dep, coface->getEdges());
 
 
                 // direction de la face qui est coupée
@@ -260,12 +241,13 @@ computePosCoEdge(std::map<Topo::CoFace*, uint>& filtre_coface,
 
                 Topo::Vertex* vertex1;
                 Topo::Vertex* vertex2;
+                const std::vector<Topo::Vertex* >& cf_vertices = coface->getVertices();
                 if (dirCoFaceSplit == Topo::CoFace::i_dir){
-                    vertex1 = coface->getVertex(1);
-                    vertex2 = coface->getVertex(0);
+                    vertex1 = cf_vertices[1];
+                    vertex2 = cf_vertices[0];
                 } else {
-                    vertex1 = coface->getVertex(1);
-                    vertex2 = coface->getVertex(2);
+                    vertex1 = cf_vertices[1];
+                    vertex2 = cf_vertices[2];
                 }
 
                 if (ind_edge_dep>1){
@@ -297,14 +279,15 @@ computePosCoEdge(std::map<Topo::CoFace*, uint>& filtre_coface,
 
                 Topo::Edge* edge_ar = 0;
                 // si on est sur le côté face à la dégénérescence, on met à 0 l'arête d'arrivée
-                if (coface->getNbEdges() == 4){
+                const std::vector<Topo::Edge* > & cf_edges = coface->getEdges();
+                if (cf_edges.size() == 4){
                     uint ind_edge_ar = (ind_edge_dep+2)%4;
-                    edge_ar = coface->getEdge(ind_edge_ar);
+                    edge_ar = cf_edges[ind_edge_ar];
                 } else {
                     if (ind_edge_dep == 0)
-                        edge_ar = coface->getEdge(2);
+                        edge_ar = cf_edges[2];
                     else if (ind_edge_dep == 2)
-                        edge_ar = coface->getEdge(0);
+                        edge_ar = cf_edges[0];
                     else
                         edge_ar = 0;
                 }
@@ -386,9 +369,10 @@ computePosBlock(std::map<Topo::Block*, uint>& filtre_block,
                 std::cout<<"getCoEdgesBetweenVertices entre "<<bloc->getVertex(0)->getName()
                         <<" et "<<bloc->getVertex(ind_vtx)->getName()<<" d'indice "<<ind_vtx<<std::endl;
 #endif
-                Topo::TopoHelper::getCoEdgesBetweenVertices(bloc->getVertex(0), bloc->getVertex(ind_vtx), iCoedges[i], coedges_between);
+                std::vector<Topo::Vertex*> vertices = bloc->getVertices();
+                Topo::Vertex* vtx = vertices[0];;
+                Topo::TopoHelper::getCoEdgesBetweenVertices(vtx, vertices[ind_vtx], iCoedges[i], coedges_between);
 
-                Topo::Vertex* vtx = bloc->getVertex(0);
                 for (std::vector<Topo::CoEdge* >::iterator iter3 = coedges_between.begin();
                         iter3 != coedges_between.end(); ++iter3){
                     Topo::CoEdge* coedge = *iter3;
@@ -399,7 +383,7 @@ computePosBlock(std::map<Topo::Block*, uint>& filtre_block,
                         dir = (Topo::Block::eDirOnBlock)i;
                         uint ratio = ratios[coedge];
                         uint dec = ratio-1;
-                        if (vtx == coedge->getVertex(0))
+                        if (vtx == coedge->getVertices()[0])
                             pos_blk += (filtre_coedge[coedge]+dec)/ratio;
                         else
                             pos_blk += (coedge->getNbMeshingEdges() - filtre_coedge[coedge] + 1 + dec)/ratio;
@@ -459,7 +443,7 @@ createSubVolume(std::vector<BlockDirPos>& bloc_dirPos)
         	continue;
 
         std::vector<std::string> groupsName;
-        blk->getGroupsName(groupsName, true, true);
+        blk->getGroupsName(groupsName);
 
         for (std::vector<std::string>::iterator iter2 = groupsName.begin();
                 iter2 != groupsName.end(); ++iter2){
@@ -479,7 +463,7 @@ createSubVolume(std::vector<BlockDirPos>& bloc_dirPos)
                 getContext().newGraphicalRepresentation (*sv);
 
                 // recherche le groupe 3D de base pour connaitre sa visibilité
-                Group::Group3D* gr = getContext().getGroupManager().getGroup3D(*iter2, true);
+                Group::Group3D* gr = getContext().getGroupManager().getGroup<Group::Group3D>(*iter2, true);
                 sv->getDisplayProperties().setDisplayed(gr->isVisible());
 
                 corr_subVol[name] = sv;

@@ -403,22 +403,16 @@ void VTKGMDSEntityRepresentation::createMeshEntityCloudRepresentation( Mesh::Mes
                 throw exc;
             }
 
-            // la liste des Topo::CoFace qui ont contribuées
-            std::vector<Topo::CoFace* > faces;
-            surf->getCoFaces(faces);
-
             // calcul le nombre total de noeuds (il y a des doublons sur les arêtes, tant pis)
-            for (std::vector<Topo::CoFace* >::iterator iter =
-                    faces.begin(); iter != faces.end(); ++iter)
-                pointsNum += (*iter)->nodes().size();
+            for (Topo::CoFace* f : surf->getCoFaces())
+                pointsNum += f->nodes().size();
 
             points->SetNumberOfPoints(pointsNum);
             _cloudGrid->Allocate(pointsNum, 1000);
 
-            for (std::vector<Topo::CoFace* >::iterator iter =
-                    faces.begin(); iter != faces.end(); ++iter)
+            for (Topo::CoFace* f : surf->getCoFaces())
             {
-                std::vector<gmds::TCellID>& nodes = (*iter)->nodes();
+                std::vector<gmds::TCellID>& nodes = f->nodes();
                 for (std::vector<gmds::TCellID>::const_iterator itp =
                         nodes.begin(); nodes.end() != itp; itp++, id++)
                 {
@@ -440,22 +434,16 @@ void VTKGMDSEntityRepresentation::createMeshEntityCloudRepresentation( Mesh::Mes
                 throw exc;
             }
 
-            // la liste des Topo::Block qui ont contribués
-            std::vector<Topo::Block* > blocs;
-            vol->getBlocks(blocs);
-
             // calcul le nombre total de noeuds (il y a des doublons sur les faces, tant pis)
-            for (std::vector<Topo::Block* >::iterator iter =
-                    blocs.begin(); iter != blocs.end(); ++iter)
-                pointsNum += (*iter)->nodes().size();
+            for (Topo::Block* bl : vol->getBlocks())
+                pointsNum += bl->nodes().size();
 
             points->SetNumberOfPoints(pointsNum);
             _cloudGrid->Allocate(pointsNum, 1000);
 
-            for (std::vector<Topo::Block* >::iterator iter =
-                    blocs.begin(); iter != blocs.end(); ++iter)
+            for (Topo::Block* bl : vol->getBlocks())
             {
-                std::vector<gmds::TCellID>& nodes = (*iter)->nodes();
+                std::vector<gmds::TCellID>& nodes = bl->nodes();
                 for (std::vector<gmds::TCellID>::const_iterator itp =
                         nodes.begin(); nodes.end() != itp; itp++, id++)
                 {
@@ -689,11 +677,9 @@ createMeshEntitySurfacicRepresentation2D(Mesh::MeshEntity* meshEntity, gmds::Mes
 		throw exc;
 	}
 
-	std::vector<Topo::CoFace*> cofaces;
+	std::vector<Topo::CoFace*> cofaces =surf->getCoFaces();
 
-	surf->getCoFaces(cofaces);
-
-	if (meshEntity->getContext().getRatioDegrad() == 1 || !surf->isStructured())
+    if (meshEntity->getContext().getRatioDegrad() == 1 || !surf->isStructured())
 		createCoFacesSurfacicRepresentationRatio1(cofaces, gmdsMesh);
 	else
 		createCoFacesSurfacicRepresentationRatioN(cofaces, gmdsMesh, meshEntity->getContext().getRatioDegrad());
@@ -716,36 +702,16 @@ createMeshEntitySurfacicRepresentation3D(Mesh::MeshEntity* meshEntity, gmds::Mes
 				"VTKGMDSEntityRepresentation::createMeshEntityCloudRepresentation");
 		throw exc;
 	}
-	// la liste des Topo::Block qui ont contribués
-	std::vector<Topo::Block* > blocs;
-	vol->getBlocks(blocs);
 
 	// la liste des faces externes au groupe de blocs
 	// on utilise une map et on marque les faces à chaque fois qu'elles sont vus
 	std::map<Topo::CoFace*, int> marque_faces;
-
-	std::vector<Topo::Face* > faces;
-	for (std::vector<Topo::Block* >::iterator iter1 =
-			blocs.begin(); iter1 != blocs.end(); ++iter1)
-	{
-		(*iter1)->getFaces(faces);
-
-		std::vector<Topo::CoFace* > cofaces;
-		for (std::vector<Topo::Face* >::iterator iter2 =
-				faces.begin(); iter2 != faces.end(); ++iter2)
-		{
-			(*iter2)->getCoFaces(cofaces);
-
-			for (std::vector<Topo::CoFace* >::iterator iter3 =
-					cofaces.begin(); iter3 != cofaces.end();
-					++iter3)
-				marque_faces[*iter3] += 1;
-		}
-	}
-
+	for (Topo::Block* bloc : vol->getBlocks())
+		for (Topo::Face* face : bloc->getFaces())
+			for (Topo::CoFace* coface : face->getCoFaces())
+				marque_faces[coface] += 1;
 
 	std::vector<Topo::CoFace*> cofaces;
-
 	for (std::map<Topo::CoFace*, int>::iterator iter = marque_faces.begin();
 			iter != marque_faces.end();
 			++iter)
@@ -927,8 +893,8 @@ createCoFacesSurfacicRepresentationRatioN(std::vector<Topo::CoFace*> cofaces, gm
 	size_t pos = 0;
 	for (std::vector<Topo::CoFace* >::iterator iter = cofaces.begin(); iter != cofaces.end(); ++iter)
 	{
-		uint niMax = (*iter)->getEdge(Topo::CoFace::j_min)->getNbNodes();
-		uint njMax = (*iter)->getEdge(Topo::CoFace::i_min)->getNbNodes();
+		uint niMax = (*iter)->getEdges()[Topo::CoFace::j_min]->getNbNodes();
+		uint njMax = (*iter)->getEdges()[Topo::CoFace::i_min]->getNbNodes();
 
 #ifdef _DEBUG_VTKGMDSEntityRepresentation
 		std::cout<<" pour "<<(*iter)->getName()<<" niMax = "<<niMax<<", njMax = "<<njMax<<std::endl;

@@ -4555,138 +4555,22 @@ int GeomManager::getNbVolumes() const
 /*----------------------------------------------------------------------------*/
 Volume* GeomManager::getVolume(const std::string& name, const bool exceptionIfNotFound) const
 {
-    Volume* vol = 0;
-
-    std::string new_name;
-    if (getContext().getNameManager().isShiftingIdActivated()){
-    	if (Volume::isA(name))
-    		new_name = getContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::GeomVolume)->renameWithShiftingId(name);
-    	else
-    		return vol;
-    }
-    else
-        new_name = name;
-
-    for (std::vector<Volume*>::const_iterator iter = m_volumes.begin();
-            iter != m_volumes.end(); ++iter)
-        if (new_name == (*iter)->getName())
-            vol = (*iter);
-
-    if (exceptionIfNotFound && vol == 0){
-        TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-        message <<"getVolume impossible, entité \""<<new_name<<"\" n'a pas été trouvée dans le GeomManager";
-        throw TkUtil::Exception(message);
-    }
-
-    if (vol && vol->isDestroyed()){
-    	TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-    	message <<"getVolume impossible, entité \""<<new_name<<"\" est détruite";
-    	throw Utils::IsDestroyedException(message);
-    }
-
-    return vol;
+    return getContext().getNameManager().findByName(name, m_volumes, exceptionIfNotFound);
 }
 /*----------------------------------------------------------------------------*/
 Surface* GeomManager::getSurface(const std::string& name, const bool exceptionIfNotFound) const
 {
-    Surface* surf = 0;
-
-    std::string new_name;
-    if (getContext().getNameManager().isShiftingIdActivated()){
-    	if (Surface::isA(name))
-    		new_name = getContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::GeomSurface)->renameWithShiftingId(name);
-    	else
-    		return surf;
-    }
-    else
-        new_name = name;
-
-    for (std::vector<Surface*>::const_iterator iter = m_surfaces.begin();
-            iter != m_surfaces.end(); ++iter)
-        if (new_name == (*iter)->getName())
-            surf = (*iter);
-
-    if (exceptionIfNotFound && surf == 0){
-        TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-        message <<"getSurface impossible, entité \""<<new_name<<"\" n'a pas été trouvée dans le GeomManager";
-        throw TkUtil::Exception(message);
-    }
-
-    if (surf && surf->isDestroyed()){
-    	TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-    	message <<"getSurface impossible, entité \""<<new_name<<"\" est détruite";
-    	throw Utils::IsDestroyedException(message);
-    }
-
-    return surf;
+    return getContext().getNameManager().findByName(name, m_surfaces, exceptionIfNotFound);
 }
 /*----------------------------------------------------------------------------*/
 Curve* GeomManager::getCurve(const std::string& name, const bool exceptionIfNotFound) const
 {
-    Curve* curve = 0;
-
-    std::string new_name;
-    if (getContext().getNameManager().isShiftingIdActivated()){
-    	if (Curve::isA(name))
-    		new_name = getContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::GeomCurve)->renameWithShiftingId(name);
-    	else
-    		return curve;
-    }
-    else
-        new_name = name;
-
-    for (std::vector<Curve*>::const_iterator iter = m_curves.begin();
-            iter != m_curves.end(); ++iter)
-        if (new_name == (*iter)->getName())
-            curve = (*iter);
-
-    if (exceptionIfNotFound && curve == 0){
-        TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-        message <<"getCurve impossible, entité \""<<new_name<<"\" n'a pas été trouvée dans le GeomManager";
-        throw TkUtil::Exception(message);
-    }
-
-    if (curve && curve->isDestroyed()){
-    	TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-    	message <<"getCurve impossible, entité \""<<new_name<<"\" est détruite";
-    	throw Utils::IsDestroyedException(message);
-    }
-
-    return curve;
+    return getContext().getNameManager().findByName(name, m_curves, exceptionIfNotFound);
 }
 /*----------------------------------------------------------------------------*/
 Vertex* GeomManager::getVertex(const std::string& name, const bool exceptionIfNotFound) const
 {
-    Vertex* vertex = 0;
-
-    std::string new_name;
-    if (getContext().getNameManager().isShiftingIdActivated()){
-    	if (Vertex::isA(name))
-    		new_name = getContext().getNameManager().getTypeDedicatedNameManager(Utils::Entity::GeomVertex)->renameWithShiftingId(name);
-    	else
-    		return vertex;
-    }
-    else
-        new_name = name;
-
-    for (std::vector<Vertex*>::const_iterator iter = m_vertices.begin();
-            iter != m_vertices.end(); ++iter)
-        if (new_name == (*iter)->getName())
-            vertex = (*iter);
-
-    if (exceptionIfNotFound && vertex == 0){
-        TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-        message <<"getVertex impossible, entité \""<<new_name<<"\" n'a pas été trouvée dans le GeomManager";
-        throw TkUtil::Exception(message);
-    }
-
-    if (vertex && vertex->isDestroyed()){
-     	TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-     	message <<"getVertex impossible, entité \""<<new_name<<"\" est détruite";
-     	throw Utils::IsDestroyedException(message);
-     }
-
-    return vertex;
+    return getContext().getNameManager().findByName(name, m_vertices, exceptionIfNotFound);
 }
 /*----------------------------------------------------------------------------*/
 std::string GeomManager::getVertexAt(const Point& pt1) const
@@ -4842,69 +4726,6 @@ GeomEntity* GeomManager::getEntity(const std::string& name, const bool exception
     return ge;
 }
 /*----------------------------------------------------------------------------*/
-int GeomManager::getIndexOf(Vertex* v) const
-{
-	int index = -1;
-	for (unsigned int i=0; i<m_vertices.size(); i++){
-		if(v->getUniqueId()==m_vertices[i]->getUniqueId())
-			index = i;
-	}
-	if(index==-1){
-		TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-		message <<"getIndexOf impossible pour un sommet";
-		throw TkUtil::Exception(message);
-	}
-	return index;
-}
-/*----------------------------------------------------------------------------*/
-int GeomManager::getIndexOf(Curve* c) const
-{
-	int index = -1;
-	for (unsigned int i=0; i<m_curves.size(); i++){
-		if(c->getUniqueId()==m_curves[i]->getUniqueId())
-			index = i;
-	}
-	if(index==-1){
-		TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-		message <<"getIndexOf impossible pour une courbe";
-		throw TkUtil::Exception(message);
-	}
-	return index;
-}
-/*----------------------------------------------------------------------------*/
-int GeomManager::getIndexOf(Surface* s) const
-{
-	int index = -1;
-
-	for (unsigned int i=0; i<m_surfaces.size(); i++){
-		if(s->getUniqueId()==m_surfaces[i]->getUniqueId())
-			index = i;
-	}
-	if(index==-1){
-		TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-		message <<"getIndexOf impossible pour une surface";
-		throw TkUtil::Exception(message);
-	}
-	return index;
-}
-/*----------------------------------------------------------------------------*/
-int GeomManager::getIndexOf(Volume* v) const
-{
-	int index = -1;
-
-	for (unsigned int i=0; i<m_volumes.size(); i++){
-		if(v->getUniqueId()==m_volumes[i]->getUniqueId())
-			index = i;
-	}
-	if(index==-1){
-		TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-		message <<"getIndexOf impossible pour un volume";
-		throw TkUtil::Exception(message);
-	}
-	return index;
-}
-
-/*----------------------------------------------------------------------------*/
 void GeomManager::addEntity (GeomEntity* ge)
 {
     if(ge==0)
@@ -4937,98 +4758,42 @@ void GeomManager::removeEntity (GeomEntity* ge)
 /*----------------------------------------------------------------------------*/
 void GeomManager::remove (Volume* v)
 {
-    std::vector<Volume*>::iterator iter;
-    iter = find(m_volumes.begin(), m_volumes.end(), v);
-    if (iter != m_volumes.end())
-        m_volumes.erase(iter);
-    else
-        throw TkUtil::Exception("Erreur interne, volume absent du GeomManager pour removeVolume");
+    Utils::remove(v, m_volumes);
 }
 /*----------------------------------------------------------------------------*/
 void GeomManager::remove (Surface* s)
 {
-    std::vector<Surface*>::iterator iter;
-    iter = find(m_surfaces.begin(), m_surfaces.end(), s);
-    if (iter != m_surfaces.end())
-        m_surfaces.erase(iter);
-    else
-        throw TkUtil::Exception("Erreur interne, surface absente du GeomManager pour removeSurface");
+    Utils::remove(s, m_surfaces);
 }
 /*----------------------------------------------------------------------------*/
 void GeomManager::remove (Curve* c)
 {
-    std::vector<Curve*>::iterator iter;
-    iter = find(m_curves.begin(), m_curves.end(), c);
-    if (iter != m_curves.end())
-        m_curves.erase(iter);
-    else
-        throw TkUtil::Exception("Erreur interne, courbe absente du GeomManager pour removeCurve");
+    Utils::remove(c, m_curves);
 }
 /*----------------------------------------------------------------------------*/
 void GeomManager::remove (Vertex* v)
 {
-    std::vector<Vertex*>::iterator iter;
-    iter = find(m_vertices.begin(), m_vertices.end(), v);
-    if (iter != m_vertices.end())
-        m_vertices.erase(iter);
-    else
-        throw TkUtil::Exception("Erreur interne, sommet absent du GeomManager pour removeVertex");
+    Utils::remove(v, m_vertices);
 }
 /*----------------------------------------------------------------------------*/
 std::string GeomManager::getLastVolume() const
 {
-    std::string nom("");
-    if (m_volumes.empty())
-        return nom;
-    // recherche du dernier non détruit, en partant de la fin
-    int i;
-    for (i=m_volumes.size()-1; i>=0 && m_volumes[i]->isDestroyed(); i--)
-    {}
-    if (i>=0)
-        nom = m_volumes[i]->getName();
-    return nom;
+    return getLastEntityName(m_volumes);
 }
 /*----------------------------------------------------------------------------*/
 std::string GeomManager::getLastSurface() const
 {
-    std::string nom("");
-    if (m_surfaces.empty())
-        return nom;
-    // recherche du dernier non détruit, en partant de la fin
-    int i;
-    for (i=m_surfaces.size()-1; i>=0 && m_surfaces[i]->isDestroyed(); i--)
-    {}
-    if (i>=0)
-        nom = m_surfaces[i]->getName();
-    return nom;
+    return getLastEntityName(m_surfaces);
 }
 /*----------------------------------------------------------------------------*/
 std::string GeomManager::getLastCurve() const
 {
-    std::string nom("");
-    if (m_curves.empty())
-        return nom;
-    // recherche du dernier non détruit, en partant de la fin
-    int i;
-    for (i=m_curves.size()-1; i>=0 && m_curves[i]->isDestroyed(); i--)
-    {}
-    if (i>=0)
-        nom = m_curves[i]->getName();
-    return nom;
+    return getLastEntityName(m_curves);
 }
 /*----------------------------------------------------------------------------*/
 std::string GeomManager::getLastVertex() const
 {
-    std::string nom("");
-    if (m_vertices.empty())
-        return nom;
-    // recherche du dernier non détruit, en partant de la fin
-    int i;
-    for (i=m_vertices.size()-1; i>=0 && m_vertices[i]->isDestroyed(); i--)
-    {}
-    if (i>=0)
-        nom = m_vertices[i]->getName();
-    return nom;
+    return getLastEntityName(m_vertices);
 }
 /*----------------------------------------------------------------------------*/
 Internal::M3DCommandResult* GeomManager::addToGroup(std::vector<std::string>& ve, int dim, const std::string& groupName)
@@ -5044,57 +4809,8 @@ Internal::M3DCommandResult* GeomManager::addToGroup(std::vector<std::string>& ve
     message << "], "<<(short)dim<<", "<<groupName<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
-
-    Mesh::CommandAddRemoveGroupName* command = 0;
-
-    switch(dim){
-    case(0):{
-        // reconstitue le vecteur de sommets
-        std::vector<Vertex*> vertices;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-            vertices.push_back(getVertex(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), vertices, groupName, Mesh::CommandAddRemoveGroupName::add);
-    }
-    break;
-    case(1):{
-        // reconstitue le vecteur de courbes
-        std::vector<Curve*> curves;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-            curves.push_back(getCurve(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), curves, groupName, Mesh::CommandAddRemoveGroupName::add);
-    }
-    break;
-    case(2):{
-        // reconstitue le vecteur de surfaces
-        std::vector<Surface*> surfaces;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-            surfaces.push_back(getSurface(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), surfaces, groupName, Mesh::CommandAddRemoveGroupName::add);
-    }
-    break;
-    case(3):{
-        // reconstitue le vecteur de volumes
-        std::vector<Volume*> volumes;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-            volumes.push_back(getVolume(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), volumes, groupName, Mesh::CommandAddRemoveGroupName::add);
-    }
-    break;
-    default:{
-        TkUtil::Exception ("Dimension erronée");
-    }
-    break;
-    }
-
-    CHECK_NULL_PTR_ERROR(command);
+    std::vector<GeomEntity*> entities = getEntitiesFromNames(ve, dim);
+    Mesh::CommandAddRemoveGroupName* command = new Mesh::CommandAddRemoveGroupName(getContext(), entities, dim, groupName, Mesh::CommandAddRemoveGroupName::add);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -5129,57 +4845,8 @@ Internal::M3DCommandResult* GeomManager::removeFromGroup(std::vector<std::string
     message << "], "<<(short)dim<<", "<<groupName<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
-
-    Mesh::CommandAddRemoveGroupName* command = 0;
-
-    switch(dim){
-    case(0):{
-        // reconstitue le vecteur de sommets
-        std::vector<Vertex*> vertices;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-            vertices.push_back(getVertex(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), vertices, groupName, Mesh::CommandAddRemoveGroupName::remove);
-    }
-    break;
-    case(1):{
-        // reconstitue le vecteur de courbes
-        std::vector<Curve*> curves;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-            curves.push_back(getCurve(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), curves, groupName, Mesh::CommandAddRemoveGroupName::remove);
-    }
-    break;
-    case(2):{
-        // reconstitue le vecteur de surfaces
-        std::vector<Surface*> surfaces;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-            surfaces.push_back(getSurface(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), surfaces, groupName, Mesh::CommandAddRemoveGroupName::remove);
-    }
-    break;
-    case(3):{
-        // reconstitue le vecteur de volumes
-        std::vector<Volume*> volumes;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-            volumes.push_back(getVolume(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), volumes, groupName, Mesh::CommandAddRemoveGroupName::remove);
-    }
-    break;
-    default:{
-        TkUtil::Exception ("Dimension erronée");
-    }
-    break;
-    }
-
-    CHECK_NULL_PTR_ERROR(command);
+    std::vector<GeomEntity*> entities = getEntitiesFromNames(ve, dim);
+    Mesh::CommandAddRemoveGroupName* command = new Mesh::CommandAddRemoveGroupName(getContext(), entities, dim, groupName, Mesh::CommandAddRemoveGroupName::remove);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -5214,57 +4881,8 @@ Internal::M3DCommandResult* GeomManager::setGroup(std::vector<std::string>& ve, 
     message << "], "<<(short)dim<<", "<<groupName<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
-
-    Mesh::CommandAddRemoveGroupName* command = 0;
-
-    switch(dim){
-    case(0):{
-        // reconstitue le vecteur de sommets
-        std::vector<Vertex*> vertices;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-            vertices.push_back(getVertex(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), vertices, groupName, Mesh::CommandAddRemoveGroupName::set);
-    }
-    break;
-    case(1):{
-        // reconstitue le vecteur de courbes
-        std::vector<Curve*> curves;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-            curves.push_back(getCurve(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), curves, groupName, Mesh::CommandAddRemoveGroupName::set);
-    }
-    break;
-    case(2):{
-        // reconstitue le vecteur de surfaces
-        std::vector<Surface*> surfaces;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-            surfaces.push_back(getSurface(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), surfaces, groupName, Mesh::CommandAddRemoveGroupName::set);
-    }
-    break;
-    case(3):{
-        // reconstitue le vecteur de volumes
-        std::vector<Volume*> volumes;
-        for (std::vector<std::string>::const_iterator iter = ve.begin();
-                iter != ve.end(); ++iter)
-            volumes.push_back(getVolume(*iter, true));
-
-        command = new Mesh::CommandAddRemoveGroupName(getContext(), volumes, groupName, Mesh::CommandAddRemoveGroupName::set);
-    }
-    break;
-    default:{
-        TkUtil::Exception ("Dimension erronée");
-    }
-    break;
-    }
-
-    CHECK_NULL_PTR_ERROR(command);
+    std::vector<GeomEntity*> entities = getEntitiesFromNames(ve, dim);
+    Mesh::CommandAddRemoveGroupName* command = new Mesh::CommandAddRemoveGroupName(getContext(), entities, dim, groupName, Mesh::CommandAddRemoveGroupName::set);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
@@ -5311,6 +4929,45 @@ hasRefTopo(std::vector<Geom::GeomEntity*>& entities)
     } // end for i<entities.size()
 
     return false;
+}
+/*----------------------------------------------------------------------------*/
+template <typename T, typename = std::enable_if<std::is_base_of<GeomEntity, T>::value>>
+std::string GeomManager::getLastEntityName(const std::vector<T*>& entities) const
+{
+    std::string nom("");
+    if (entities.empty())
+        return nom;
+    // recherche du dernier non détruit, en partant de la fin
+    int i;
+    for (i=entities.size()-1; i>=0 && entities[i]->isDestroyed(); i--)
+    {}
+    if (i>=0)
+        nom = entities[i]->getName();
+    return nom;
+}
+/*----------------------------------------------------------------------------*/
+std::vector<GeomEntity*> GeomManager::getEntitiesFromNames(const std::vector<std::string>& names, const int dim) const
+{
+    std::vector<GeomEntity*> entities;
+
+    switch(dim){
+    case(0):
+        for (std::string name : names) entities.push_back(getVertex(name));
+        break;
+    case(1):
+        for (std::string name : names) entities.push_back(getCurve(name));
+        break;
+    case(2):
+        for (std::string name : names) entities.push_back(getSurface(name));
+        break;
+    case(3):
+        for (std::string name : names) entities.push_back(getVolume(name));
+        break;
+    default:
+        throw TkUtil::Exception ("Dimension erronée");
+    }
+
+    return entities;
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

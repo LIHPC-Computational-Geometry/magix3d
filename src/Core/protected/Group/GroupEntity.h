@@ -1,11 +1,3 @@
-/*----------------------------------------------------------------------------*/
-/** \file GroupEntity.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 18/10/2012
- */
-/*----------------------------------------------------------------------------*/
 #ifndef MGX3D_GROUP_GROUPENTITY_H_
 #define MGX3D_GROUP_GROUPENTITY_H_
 /*----------------------------------------------------------------------------*/
@@ -30,6 +22,9 @@ class Context;
  */
 namespace Group {
 /*----------------------------------------------------------------------------*/
+class GroupEntityVisitor;
+class ConstGroupEntityVisitor;
+/*----------------------------------------------------------------------------*/
 /**
  * \class GroupEntity
  * \brief Interface définissant les services que doit fournir toute entité
@@ -49,10 +44,13 @@ protected:
 			   uint level);
 
 public:
+    virtual void accept(ConstGroupEntityVisitor& visitor) const = 0;
+    virtual void accept(GroupEntityVisitor& visitor) = 0;
+
     /*------------------------------------------------------------------------*/
     /** \brief   Destructeur
      */
-    virtual ~GroupEntity();
+    virtual ~GroupEntity() = default;
 
     /*------------------------------------------------------------------------*/
     /** \brief   détruit l'objet (mais pas ses dépendances !)
@@ -60,25 +58,53 @@ public:
     virtual void setDestroyed(bool b);
 
     /*------------------------------------------------------------------------*/
-    /// retourne les infos sur l'entité
-     virtual std::string getInfos() =0;
+    virtual void getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const;
 
-     /*------------------------------------------------------------------------*/
-    virtual void getRepresentation(
-			Mgx3D::Utils::DisplayRepresentation& dr, bool checkDestroyed) const;
+    /*------------------------------------------------------------------------*/
+    /// Identification des groupes avec nom par défaut (type Hors_Groupe...)
+    bool isDefaultGroup() const {return m_isDefaultGroup;}
 
-     /*------------------------------------------------------------------------*/
-     /// Identification des groupes avec nom par défaut (type Hors_Groupe...)
-     bool isDefaultGroup() const {return m_isDefaultGroup;}
+    /*------------------------------------------------------------------------*/
+    /// changement de niveau d'un groupe
+    void setLevel (uint level) {m_level = level;}
 
-     /*------------------------------------------------------------------------*/
-     /// changement de niveau d'un groupe
-     void setLevel (uint level) {m_level = level;}
+    /// accès au niveau d'un groupe
+    uint getLevel () const {return m_level;}
 
-     /// accès au niveau d'un groupe
-     uint getLevel () const {return m_level;}
+    /*------------------------------------------------------------------------*/
+	/// retourne les entités du groupe.
+    const std::vector<Utils::Entity*>& getEntities() const {return m_entities;}
 
-     /*------------------------------------------------------------------------*/
+    /// accesseur sur la liste des Vertices référencées
+    template <typename T, typename = std::enable_if_t<std::is_base_of<Utils::Entity, T>::value>>
+    const std::vector<T*> getFilteredEntities() const
+    {
+        std::vector<T*> entities;
+        for (Utils::Entity* e : m_entities)
+            if (T* casted = dynamic_cast<T*>(e))
+                entities.push_back(casted);
+        return entities;
+    }
+
+    /// Retourne vrai si le groupe est vide
+    bool empty() const {return m_entities.empty();}
+
+    /// Enlève une entité du groupe
+    void remove(Utils::Entity* e, const bool exceptionIfNotFound=true);
+
+    /// Ajoute une entité au groupe
+    void add(Utils::Entity* e);
+
+    /// Recherche une entité dans le groupe
+    bool find(Utils::Entity* e);
+
+    /*------------------------------------------------------------------------*/
+    /// pour l'affichage d'informations
+    friend TkUtil::UTF8String & operator << (TkUtil::UTF8String & , const GroupEntity &);
+    friend std::ostream & operator << (std::ostream & , const GroupEntity &);
+    std::string getInfos();
+
+    /*------------------------------------------------------------------------*/
 #ifndef SWIG
     /** \brief  Fournit une représentation textuelle de l'entité.
 	 * \param	true si l'entité fourni la totalité de sa description, false si
@@ -86,27 +112,21 @@ public:
 	 * 			optimisation)
       * \return  Description, à détruire par l'appelant.
       */
-    virtual Mgx3D::Utils::SerializedRepresentation* getDescription (
-													bool alsoComputed) const;
+    virtual Utils::SerializedRepresentation* getDescription (bool alsoComputed) const;
 
      /*------------------------------------------------------------------------*/
-	/// retourne les entités du groupe. Méthode à surcharger.
-     virtual std::vector<Utils::Entity*> getEntities() const;
-
-     /*------------------------------------------------------------------------*/
-     /// Accesseur sur le id ème objet de modification du maillage pour un groupe
-     virtual Mesh::MeshModificationItf* getMeshModif(size_t id) {return m_meshModif[id];}
-
      /// Ajout d'un objet de modification du maillage pour un groupe
-     virtual void addMeshModif(Mesh::MeshModificationItf* modif) {m_meshModif.push_back(modif);}
+     void addMeshModif(Mesh::MeshModificationItf* modif) {m_meshModif.push_back(modif);}
 
      /// Suppression du dernier objet de modification
-     virtual void popBackMeshModif() {m_meshModif.pop_back();}
+     void popBackMeshModif() {m_meshModif.pop_back();}
 
-     /// Retourne le nombre de modifications pour ce groupe
-     virtual size_t getNbMeshModif() {return m_meshModif.size();}
+     /// Accesseurs sur les modifications pour ce groupe
+     const std::vector<Mesh::MeshModificationItf*>& getMeshModifications() const {return m_meshModif;}
 #endif
 
+protected:
+    std::vector<Utils::Entity*> m_entities;
 
 private:
     /// Les modifications du maillage associé au groupe
@@ -118,6 +138,28 @@ private:
     /// Distinction des groupes suivant un niveau (~ notion de matériau)
     uint m_level;
 };
+/*----------------------------------------------------------------------------*/
+template <uint TDIM, Utils::Entity::objectType TTYPE>
+class GroupEntityT : public GroupEntity 
+{
+public:
+    static const uint DIM = TDIM;
+
+    void accept(ConstGroupEntityVisitor& v) const override;
+    void accept(GroupEntityVisitor& v) override;
+
+    GroupEntityT(Internal::Context& ctx, const std::string& nom, bool isDefaultGroup, uint level=1);
+    virtual ~GroupEntityT() = default;
+
+    int getDim() const override { return TDIM; }
+    Utils::Entity::objectType getType() const override { return TTYPE; }
+    std::string getTypeName() const override { return objectTypeToObjectTypeName(TTYPE); }
+};
+/*----------------------------------------------------------------------------*/
+using Group0D = GroupEntityT<0, Utils::Entity::Group0D>;
+using Group1D = GroupEntityT<1, Utils::Entity::Group1D>;
+using Group2D = GroupEntityT<2, Utils::Entity::Group2D>;
+using Group3D = GroupEntityT<3, Utils::Entity::Group3D>;
 /*----------------------------------------------------------------------------*/
 } // end namespace Group
 /*----------------------------------------------------------------------------*/

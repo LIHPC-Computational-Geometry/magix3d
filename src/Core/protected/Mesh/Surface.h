@@ -1,18 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/*
- * \file Surface.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 25 nov. 2011
- */
-/*----------------------------------------------------------------------------*/
 #ifndef MGX3D_MESH_SURFACE_H_
 #define MGX3D_MESH_SURFACE_H_
 /*----------------------------------------------------------------------------*/
 #include "Mesh/MeshEntity.h"
 #include <TkUtil/UTF8String.h>
-#include "Utils/Container.h"
 #include "Topo/MeshSurfaceTopoProperty.h"
 /*----------------------------------------------------------------------------*/
 namespace gmds {
@@ -99,16 +89,6 @@ public:
     virtual Utils::Entity::objectType getType() const {return Utils::Entity::MeshSurface;}
 
     /*------------------------------------------------------------------------*/
-   /** \brief Donne le nom court du type d'objet (pour le nommage des entités)
-    */
-    static std::string getTinyName() {return "Su";}
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Test si l'entité est une Surface suivant son nom
-     */
-    static bool isA(std::string& name);
-
-    /*------------------------------------------------------------------------*/
     /// pour l'affichage d'informations
 #ifndef SWIG
     friend TkUtil::UTF8String & operator << (TkUtil::UTF8String & , const Surface &);
@@ -117,18 +97,18 @@ public:
     /*------------------------------------------------------------------------*/
     /// \brief Ajoute une relation vers une face commune
 #ifndef SWIG
-    void addCoFace(Topo::CoFace* f);
+    void add(Topo::CoFace* f);
 #endif
 
     /*----------------------------------------------------------------------------*/
     /// Retire une relation vers une Face commune
 #ifndef SWIG
-    void removeCoFace(Topo::CoFace* f);
+    void remove(Topo::CoFace* f);
 #endif
 
     /*----------------------------------------------------------------------------*/
     ///  Fournit l'accès aux faces topologiques communes qui ont participées à la constitution de la surface
-    void getCoFaces(std::vector<Topo::CoFace* >& faces) const;
+    const std::vector<Topo::CoFace* >& getCoFaces() const;
 
     /** supprime les relations vers les cofaces */
     void clearCoFaces()

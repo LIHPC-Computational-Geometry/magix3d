@@ -15,6 +15,7 @@
 #include "Topo/CoFace.h"
 #include "Utils/Point.h"
 #include "Utils/Unit.h"
+#include "Group/GroupManager.h"
 /*----------------------------------------------------------------------------*/
 #include <TopoDS.hxx>
 #include <BRep_Tool.hxx>
@@ -377,15 +378,15 @@ save(Geom::Surface* sf)
 //        std::cout<<"nb_cd = "<<nb_cd<<std::endl;
         cmd.u.area.algo_mesh = "Delaunay";
         cmd.u.area.algo_smooth = 0;
-        std::vector<std::string> grps;
-        sf->getGroupsName(grps);
+        Group::GroupManager& gm = m_context.getGroupManager();
+        std::vector<Group::GroupEntity*> grps = gm.getGroupsFor(sf);
         cmd.u.area.groups_name = 0;
         if (!grps.empty()){
             TkUtil::UTF8String grps_str (TkUtil::Charset::UTF_8);
             for (uint i=0; i<grps.size(); i++){
                 if (i)
                     grps_str << " ";
-                grps_str << grps[i];
+                grps_str << grps[i]->getName();
             }
             char* grps_ch = new char[grps_str.length()+1];
             cmd.u.area.groups_name = grps_ch;

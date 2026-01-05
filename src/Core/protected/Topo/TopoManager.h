@@ -13,7 +13,6 @@
 #include "Topo/Edge.h"
 #include "Topo/CoEdge.h"
 #include "Topo/Vertex.h"
-#include "Utils/Container.h"
 #include "Utils/Plane.h"
 #include "Utils/Constants.h"
 #include "Utils/SwigCompletion.h"
@@ -1739,7 +1738,7 @@ public:
     /** \brief retourne la liste des blocs gérées par le manager,
      * optionnellement triés par id
      * */
-    void getBlocks(std::vector<Topo::Block* >& blocks, bool sort=false) const;
+    std::vector<Topo::Block*> getBlocksObj() const;
 
     /*------------------------------------------------------------------------*/
     /** Retourne le Block suivant le nom en argument */
@@ -1765,7 +1764,7 @@ public:
     /** \brief retourne la liste des faces communes (non détruites) accessibles depuis le manager
      * Les faces sont ordonnés suivant l'id
      * */
-    void getCoFaces(std::vector<Topo::CoFace* >& faces) const;
+    std::vector<Topo::CoFace*> getCoFacesObj() const;
 
     /** Retourne la Face commune suivant le nom en argument */
     CoFace* getCoFace(const std::string& name, const bool exceptionIfNotFound=true) const;
@@ -1788,7 +1787,7 @@ public:
 
     /*------------------------------------------------------------------------*/
     /** \brief retourne la liste des arêtes communes (non détruites) accessibles depuis les blocs */
-    void getCoEdges(std::vector<Topo::CoEdge* >& edges) const;
+    std::vector<Topo::CoEdge*> getCoEdgesObj() const;
 
     /** Retourne l'arête suivant le nom en argument */
     CoEdge* getCoEdge(const std::string& name, const bool exceptionIfNotFound=true) const;
@@ -1801,7 +1800,7 @@ public:
 
     /*------------------------------------------------------------------------*/
     /** \brief retourne la liste des vertex (non détruits) accessibles depuis le manager */
-    void getVertices(std::vector<Topo::Vertex* >& vertices) const;
+    std::vector<Topo::Vertex* > getVerticesObj() const;
 
     /** Retourne le sommet suivant le nom en argument */
     Vertex* getVertex(const std::string& name, const bool exceptionIfNotFound=true) const;
@@ -1890,7 +1889,7 @@ public:
 #endif
 
 #ifndef SWIG
-    /// Retourne les entités topologiques associées, léve une exception si aucune
+    /// Retourne les entités topologiques associées à une entité géométrique
     const std::vector<TopoEntity*>& getRefTopos(const Geom::GeomEntity* ge);
     /// Ajoute une association Geom-->Topo
     void addRefTopo(const Geom::GeomEntity* ge, TopoEntity* te);
@@ -1898,11 +1897,10 @@ public:
     void setRefTopos(const Geom::GeomEntity* ge, const std::vector<TopoEntity*>& tes);
     /// Enlève une association Geom-->Topo
     void removeRefTopo(const Geom::GeomEntity* ge, TopoEntity* te);
-    /// Retourne les entités topologiques filtrées, léve une exception si aucune
-    template <class T>
+    /// Retourne les entités topologiques filtrées
+    template <typename T, typename = std::enable_if<std::is_base_of<Topo::TopoEntity, T>::value>>
     std::vector<T*> getFilteredRefTopos(const Geom::GeomEntity* ge)
     {
-        static_assert(std::is_base_of<Topo::TopoEntity, T>::value, "T doit hériter de TopoEntity");
         std::vector<T*> result;
         for (Topo::TopoEntity* te : getRefTopos(ge)) {
             if (T* casted = dynamic_cast<T*>(te)) {
@@ -1923,23 +1921,26 @@ private:
             std::vector<TopoEntity*> & topo_entities,
             const char* nom_fonction);
 
+    /// Retourne une liste d'entités en fonction du nom et de la dimension
+    std::vector<TopoEntity*> getEntitiesFromNames(const std::vector<std::string>& names, const int dim) const;
+
     /** blocs accessibles depuis le manager */
-    Utils::Container<Block> m_blocks;
+    std::vector<Block*> m_blocks;
 
     /** faces accessibles depuis le manager */
-    Utils::Container<Face> m_faces;
+    std::vector<Face*> m_faces;
 
     /** faces communes accessibles depuis le manager */
-    Utils::Container<CoFace> m_cofaces;
+    std::vector<CoFace*> m_cofaces;
 
     /** arêtes accessibles depuis le manager */
-    Utils::Container<Edge> m_edges;
+    std::vector<Edge*> m_edges;
 
     /** arêtes communes accessibles depuis le manager */
-    Utils::Container<CoEdge> m_coedges;
+    std::vector<CoEdge*> m_coedges;
 
     /** sommets accessibles depuis le manager */
-    Utils::Container<Vertex> m_vertices;
+    std::vector<Vertex*> m_vertices;
 
     /// Nombre de bras par défaut pour une arête
     int m_defaultNbMeshingEdges;

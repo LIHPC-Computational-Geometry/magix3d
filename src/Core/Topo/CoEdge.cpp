@@ -1,4 +1,3 @@
-/*----------------------------------------------------------------------------*/
 #include <iostream>
 #include <vector>
 #include <string>
@@ -32,7 +31,6 @@
 #include "Geom/EntityFactory.h"
 #include "Geom/Vertex.h"
 #include "Geom/GeomProjectImplementation.h"
-#include "Group/Group1D.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/UTF8String.h>
@@ -74,12 +72,12 @@ CoEdge(Internal::Context& ctx,
 , m_mesh_data(new CoEdgeMeshingData())
 , m_save_mesh_data(0)
 {
-    m_topo_property->getVertexContainer().add(v1);
-    m_topo_property->getVertexContainer().add(v2);
+    m_topo_property->getVertexContainer().push_back(v1);
+    m_topo_property->getVertexContainer().push_back(v2);
 
     // association remontante
-    v1->addCoEdge(this);
-    v2->addCoEdge(this);
+    v1->add(this);
+    v2->add(this);
 
     // om met une discrétisation par défaut
     if (m_mesh_property == 0){
@@ -144,6 +142,16 @@ CoEdge::
 	}
 }
 /*----------------------------------------------------------------------------*/
+void CoEdge::add(Edge* e)
+{ 
+	m_topo_property->getEdgeContainer().push_back(e);
+}
+/*----------------------------------------------------------------------------*/
+void CoEdge::remove(Edge* e)
+{
+	Utils::remove(e, m_topo_property->getEdgeContainer());
+}
+/*----------------------------------------------------------------------------*/
 void CoEdge::
 replace(Topo::Vertex* v1, Topo::Vertex* v2, bool propagate_up, bool propagate_down, Internal::InfoCommand* icmd)
 {
@@ -156,6 +164,7 @@ replace(Topo::Vertex* v1, Topo::Vertex* v2, bool propagate_up, bool propagate_do
 #endif
 
     // transmet aux Edges
+	const std::vector<Edge*>& edges = getEdges();
 	if (propagate_up)
 		/* 
 		 * 9/7/2025  ** ATTENTION **
@@ -163,12 +172,13 @@ replace(Topo::Vertex* v1, Topo::Vertex* v2, bool propagate_up, bool propagate_do
 		 * car Edge::replace appelle Edge::free qui modifie la liste
 		 * des edges de la coedge ce qui perturbe le parcours de la boucle.
 		*/
-		for (uint j=0; j<getNbEdges(); j++)
-			getEdge(j)->replace(v1, v2, propagate_up, propagate_down, icmd);
+		for (uint j=0; j<edges.size(); j++)
+			edges[j]->replace(v1, v2, propagate_up, propagate_down, icmd);
 
     bool found = false;
-    for (uint i=0; i<getNbVertices(); i++)
-        if (v1 == getVertex(i)){
+	const std::vector<Topo::Vertex* >& vertices = getVertices();
+    for (uint i=0; i<vertices.size(); i++)
+        if (v1 == vertices[i]){
             found = true;
 
             // sauvegarde pour permettre le undo
@@ -176,9 +186,9 @@ replace(Topo::Vertex* v1, Topo::Vertex* v2, bool propagate_up, bool propagate_do
             v2->saveVertexTopoProperty(icmd);
 
             saveCoEdgeTopoProperty(icmd);
-            m_topo_property->getVertexContainer().set(i,v2);
-            v1->removeCoEdge(this);
-            v2->addCoEdge(this);
+            m_topo_property->getVertexContainer()[i] = v2;
+            v1->remove(this);
+            v2->add(this);
         }
 
     if (propagate_up && !found)
@@ -197,11 +207,8 @@ merge(CoEdge* ed, Internal::InfoCommand* icmd)
 
     // on remplace ed dans les arêtes associées à ed
     // On travaille sur une copie car il y a une mise à jour en même temps des arêtes
-    std::vector<Edge* > edges;
-    ed->getEdges(edges);
-
-    for (std::vector<Edge* >::iterator iter=edges.begin();
-            iter != edges.end(); ++iter)
+    std::vector<Edge* > edges = ed->getEdges();
+    for (auto iter = edges.begin(); iter != edges.end(); ++iter)
         (*iter)->replace(ed, this, icmd);
 
     // récupère l'association côté ed si celle de this est dédtruite, ou si la dimension de la geom est inférieure
@@ -220,9 +227,10 @@ collapse(Internal::InfoCommand* icmd)
 {
     //std::cout<<"CoEdge::collapse pour : "<<*this<<std::endl;
 
-    if (getNbVertices() != 2)
+	const std::vector<Topo::Vertex*>& vertices = getVertices();
+    if (vertices.size() != 2)
         throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne CoEdge::collapse avec autre chose que 2 sommets", TkUtil::Charset::UTF_8));
-    if (getVertex(0) == getVertex(1))
+    if (vertices[0] == vertices[1])
         throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne CoEdge::collapse avec 2 sommets identiques", TkUtil::Charset::UTF_8));
 
     setDestroyed(true);
@@ -230,8 +238,8 @@ collapse(Internal::InfoCommand* icmd)
     if (icmd)
         icmd->addTopoInfoEntity(this,Internal::InfoCommand::DELETED);
 
-    // on supprime getVertex(1)
-    getVertex(0)->merge(getVertex(1), icmd);
+    // on supprime vertices[1]
+    vertices[0]->merge(vertices[1], icmd);
 
     free(icmd);
 }
@@ -249,15 +257,15 @@ setDestroyed(bool b)
 	if (isDestroyed() == b)
 		return;
 
-	Utils::Container<Group::Group1D>& groups = m_topo_property->getGroupsContainer();
+	auto groups = m_topo_property->getGroupsContainer();
 	if (b)
 		for (uint i=0; i<groups.size(); i++){
-			Group::Group1D* gr = groups.get(i);
+			Group::Group1D* gr = groups[i];
 			gr->remove(this);
 		}
 	else
 		for (uint i=0; i<groups.size(); i++){
-			Group::Group1D* gr = groups.get(i);
+			Group::Group1D* gr = groups[i];
 			gr->add(this);
 		}
 
@@ -283,15 +291,17 @@ free(Internal::InfoCommand* icmd)
     }
 
     // on supprime l'arête des relations des sommets vers les arêtes communes
-    for (uint i=0; i<getNbVertices(); i++) {
-        getVertex(i)->saveVertexTopoProperty(icmd);
-        getVertex(i)->removeCoEdge(this, false);
+    for (Vertex* v : getVertices()) {
+        v->saveVertexTopoProperty(icmd);
+        if (Utils::contains(this, v->getCoEdges()))
+	        v->remove(this);
     }
 
     // idem entre arêtes et arêtes communes
-    for (uint i=0; i<getNbEdges(); i++) {
-        getEdge(i)->saveEdgeTopoProperty(icmd);
-        getEdge(i)->removeCoEdge(this, false);
+    for (Edge* e : getEdges()) {
+        e->saveEdgeTopoProperty(icmd);
+		if (Utils::contains(this, e->getCoEdges()))
+	        e->remove(this);
     }
 
     clearDependancy();
@@ -306,13 +316,14 @@ split(uint nbMeshingEdges, Internal::InfoCommand* icmd)
     std::cout<<"CoEdge::split("<<nbMeshingEdges<<") avec comme arête commune : "<<*this<<std::endl;
 #endif
 
+	const std::vector<Topo::Vertex*>& vertices = getVertices();
     if (nbMeshingEdges == 0)
-        return getVertex(0);
+        return vertices[0];
     else if (nbMeshingEdges == getNbMeshingEdges())
-        return getVertex(1);
+        return vertices[1];
     else {
-        getVertex(0)->saveVertexTopoProperty(icmd);
-        getVertex(1)->saveVertexTopoProperty(icmd);
+        vertices[0]->saveVertexTopoProperty(icmd);
+        vertices[1]->saveVertexTopoProperty(icmd);
 
         // utilisation des points placés suivant la projection et la discrétisation
 		std::vector<Utils::Math::Point> points;
@@ -333,19 +344,19 @@ split(uint nbMeshingEdges, Internal::InfoCommand* icmd)
 				Geom::Curve* curve = dynamic_cast<Geom::Curve*> (getGeomAssociation());
 				if (curve){
 
-					curve->getParametricsPoints(getVertex(0)->getCoord(),
-							getVertex(1)->getCoord(),
+					curve->getParametricsPoints(vertices[0]->getCoord(),
+							vertices[1]->getCoord(),
 							1, &ratio, points);
 				}
 				else {
-					points.push_back(getVertex(0)->getCoord() + (getVertex(1)->getCoord() - getVertex(0)->getCoord()) * ratio);
+					points.push_back(vertices[0]->getCoord() + (vertices[1]->getCoord() - vertices[0]->getCoord()) * ratio);
 					Geom::GeomProjectVisitor gpv(points[0]);
 					getGeomAssociation()->accept(gpv);
 					points[0] = gpv.getProjectedPoint();
 				}
 			}
 			else {
-				points.push_back(getVertex(0)->getCoord() + (getVertex(1)->getCoord() - getVertex(0)->getCoord()) * ratio);
+				points.push_back(vertices[0]->getCoord() + (vertices[1]->getCoord() - vertices[0]->getCoord()) * ratio);
 			}
 
 			new_vertex = new Topo::Vertex(getContext(), points[0]);
@@ -386,8 +397,9 @@ std::vector<CoEdge*> CoEdge::split(Topo::Vertex* vtx, uint nbMeshingEdges, Inter
 
 
     // création de 2 nouvelles arêtes communes
-    Topo::CoEdge* coedge1 = new Topo::CoEdge(getContext(), cemp1, getVertex(0), vtx);
-    Topo::CoEdge* coedge2 = new Topo::CoEdge(getContext(), cemp2, vtx,   getVertex(1));
+	const std::vector<Topo::Vertex*>& vertices = getVertices();
+    Topo::CoEdge* coedge1 = new Topo::CoEdge(getContext(), cemp1, vertices[0], vtx);
+    Topo::CoEdge* coedge2 = new Topo::CoEdge(getContext(), cemp2, vtx,   vertices[1]);
     if (icmd){
         icmd->addTopoInfoEntity(coedge1, Internal::InfoCommand::CREATED);
         icmd->addTopoInfoEntity(coedge2, Internal::InfoCommand::CREATED);
@@ -399,9 +411,9 @@ std::vector<CoEdge*> CoEdge::split(Topo::Vertex* vtx, uint nbMeshingEdges, Inter
         coedge2->setGeomAssociation(getGeomAssociation());
     }
 
-    Utils::Container<Group::Group1D>& groups = m_topo_property->getGroupsContainer();
+    auto groups = m_topo_property->getGroupsContainer();
     for (uint i=0; i<groups.size(); i++){
-    	Group::Group1D* gr = groups.get(i);
+    	Group::Group1D* gr = groups[i];
     	gr->add(coedge1);
     	gr->add(coedge2);
     	coedge1->add(gr);
@@ -412,33 +424,32 @@ std::vector<CoEdge*> CoEdge::split(Topo::Vertex* vtx, uint nbMeshingEdges, Inter
     delete cemp2;
 
     // on ajoute les 2 arêtes
-    for (uint i=0; i<getNbEdges(); i++) {
-    	uint ratio = getEdge(i)->getRatio(this);
+	const std::vector<Topo::Edge*>& edges = getEdges();
+    for (uint i=0; i<edges.size(); i++) {
+    	uint ratio = edges[i]->getRatio(this);
     	// cas où il faut reporter la semi conformité sur les nouvelles arêtes communes
     	if (ratio != 1){
-    		getEdge(i)->saveEdgeMeshingProperty(icmd);
-    		getEdge(i)->setRatio(coedge1, ratio);
-    		getEdge(i)->setRatio(coedge2, ratio);
+    		edges[i]->saveEdgeMeshingProperty(icmd);
+    		edges[i]->setRatio(coedge1, ratio);
+    		edges[i]->setRatio(coedge2, ratio);
     	}
-        getEdge(i)->saveEdgeTopoProperty(icmd);
-        getEdge(i)->addCoEdge(coedge1);
-        getEdge(i)->addCoEdge(coedge2);
+        edges[i]->saveEdgeTopoProperty(icmd);
+        edges[i]->add(coedge1);
+        edges[i]->add(coedge2);
 
-        coedge1->addEdge(getEdge(i));
-        coedge2->addEdge(getEdge(i));
+		coedge1->add(edges[i]);
+		coedge2->add(edges[i]);
     }
 
     // on met de côté la liste des Edges touchées
-    std::vector<Edge* > edges;
-    getEdges(edges);
+    std::vector<Edge* > sauv_edges = getEdges();
 
     // on supprime cette arête (this)
     free(icmd);
 
     // remet les CoEdges dans l'ordre / arête
     if (sortCoEdges)
-        for (std::vector<Edge* >::iterator iter1 = edges.begin();
-                iter1 != edges.end(); ++iter1)
+        for (auto iter1 = sauv_edges.begin(); iter1 != sauv_edges.end(); ++iter1)
             (*iter1)->sortCoEdges();
 
 #ifdef _DEBUG_SPLIT
@@ -461,8 +472,9 @@ std::vector<Topo::Vertex*> CoEdge::split(uint nbMeshingEdges1, uint nbMeshingEdg
     std::cout<<"CoEdge::split("<<nbMeshingEdges1<<", "<<nbMeshingEdges2<<") avec comme arête commune : "<<*this<<std::endl;
 #endif
 
-    getVertex(0)->saveVertexTopoProperty(icmd);
-    getVertex(1)->saveVertexTopoProperty(icmd);
+	const std::vector<Topo::Vertex*>& vertices = getVertices();
+    vertices[0]->saveVertexTopoProperty(icmd);
+    vertices[1]->saveVertexTopoProperty(icmd);
 
     Topo::Vertex* new_vertex1 = 0;
     Topo::Vertex* new_vertex2 = 0;
@@ -488,15 +500,15 @@ std::vector<Topo::Vertex*> CoEdge::split(uint nbMeshingEdges1, uint nbMeshingEdg
 		if (getGeomAssociation()){
 			Geom::Curve* curve = dynamic_cast<Geom::Curve*> (getGeomAssociation());
 			if (curve){
-				curve->getParametricsPoints(getVertex(0)->getCoord(),
-						getVertex(1)->getCoord(),
+				curve->getParametricsPoints(vertices[0]->getCoord(),
+						vertices[1]->getCoord(),
 						2, l_ratios, points);
 			}
 			else{
-				points.push_back(getVertex(0)->getCoord()
-						+ (getVertex(1)->getCoord() - getVertex(0)->getCoord()) * l_ratios[0]);
-				points.push_back(getVertex(0)->getCoord()
-						+ (getVertex(1)->getCoord() - getVertex(0)->getCoord()) * l_ratios[1]);
+				points.push_back(vertices[0]->getCoord()
+						+ (vertices[1]->getCoord() - vertices[0]->getCoord()) * l_ratios[0]);
+				points.push_back(vertices[0]->getCoord()
+						+ (vertices[1]->getCoord() - vertices[0]->getCoord()) * l_ratios[1]);
 
 				Geom::GeomProjectVisitor gpv0(points[0]);
 				getGeomAssociation()->accept(gpv0);
@@ -508,10 +520,10 @@ std::vector<Topo::Vertex*> CoEdge::split(uint nbMeshingEdges1, uint nbMeshingEdg
 			}
 		}
 		else {
-			points.push_back(getVertex(0)->getCoord()
-					+ (getVertex(1)->getCoord() - getVertex(0)->getCoord()) * l_ratios[0]);
-			points.push_back(getVertex(0)->getCoord()
-					+ (getVertex(1)->getCoord() - getVertex(0)->getCoord()) * l_ratios[1]);
+			points.push_back(vertices[0]->getCoord()
+					+ (vertices[1]->getCoord() - vertices[0]->getCoord()) * l_ratios[0]);
+			points.push_back(vertices[0]->getCoord()
+					+ (vertices[1]->getCoord() - vertices[0]->getCoord()) * l_ratios[1]);
 		}
 
 		delete [] l_ratios;
@@ -559,14 +571,14 @@ std::vector<Topo::Vertex*> CoEdge::split(uint nbMeshingEdges1, uint nbMeshingEdg
     // création de 3 nouvelles arêtes communes
     Topo::CoEdge *coedge1, *coedge2, *coedge3;
     if (!permutation){
-        coedge1 = new Topo::CoEdge(getContext(), cemp1, getVertex(0), new_vertex1);
+        coedge1 = new Topo::CoEdge(getContext(), cemp1, vertices[0], new_vertex1);
         coedge2 = new Topo::CoEdge(getContext(), cemp2, new_vertex1,  new_vertex2);
-        coedge3 = new Topo::CoEdge(getContext(), cemp3, new_vertex2,  getVertex(1));
+        coedge3 = new Topo::CoEdge(getContext(), cemp3, new_vertex2,  vertices[1]);
     }
     else {
-        coedge1 = new Topo::CoEdge(getContext(), cemp1, getVertex(0), new_vertex2);
+        coedge1 = new Topo::CoEdge(getContext(), cemp1, vertices[0], new_vertex2);
         coedge2 = new Topo::CoEdge(getContext(), cemp2, new_vertex2,  new_vertex1);
-        coedge3 = new Topo::CoEdge(getContext(), cemp3, new_vertex1,  getVertex(1));
+        coedge3 = new Topo::CoEdge(getContext(), cemp3, new_vertex1,  vertices[1]);
     }
 
     if (icmd){
@@ -584,9 +596,9 @@ std::vector<Topo::Vertex*> CoEdge::split(uint nbMeshingEdges1, uint nbMeshingEdg
         new_vertex2->setGeomAssociation(getGeomAssociation());
     }
 
-    Utils::Container<Group::Group1D>& groups = m_topo_property->getGroupsContainer();
+    auto groups = m_topo_property->getGroupsContainer();
     for (uint i=0; i<groups.size(); i++){
-    	Group::Group1D* gr = groups.get(i);
+    	Group::Group1D* gr = groups[i];
     	gr->add(coedge1);
     	gr->add(coedge2);
     	gr->add(coedge3);
@@ -600,36 +612,35 @@ std::vector<Topo::Vertex*> CoEdge::split(uint nbMeshingEdges1, uint nbMeshingEdg
     delete cemp3;
 
     // on ajoute les 3 arêtes
-    for (uint i=0; i<getNbEdges(); i++) {
-    	uint ratio = getEdge(i)->getRatio(this);
+	const std::vector<Topo::Edge*>& edges = getEdges();
+    for (uint i=0; i<edges.size(); i++) {
+    	uint ratio = edges[i]->getRatio(this);
     	// cas où il faut reporter la semi conformité sur les nouvelles arêtes communes
     	if (ratio != 1){
-    		getEdge(i)->saveEdgeMeshingProperty(icmd);
-    		getEdge(i)->setRatio(coedge1, ratio);
-    		getEdge(i)->setRatio(coedge2, ratio);
-    		getEdge(i)->setRatio(coedge3, ratio);
+    		edges[i]->saveEdgeMeshingProperty(icmd);
+    		edges[i]->setRatio(coedge1, ratio);
+    		edges[i]->setRatio(coedge2, ratio);
+    		edges[i]->setRatio(coedge3, ratio);
     	}
 
-        getEdge(i)->saveEdgeTopoProperty(icmd);
-        getEdge(i)->addCoEdge(coedge1);
-        getEdge(i)->addCoEdge(coedge2);
-        getEdge(i)->addCoEdge(coedge3);
+        edges[i]->saveEdgeTopoProperty(icmd);
+        edges[i]->add(coedge1);
+        edges[i]->add(coedge2);
+        edges[i]->add(coedge3);
 
-        coedge1->addEdge(getEdge(i));
-        coedge2->addEdge(getEdge(i));
-        coedge3->addEdge(getEdge(i));
+        coedge1->add(edges[i]);
+        coedge2->add(edges[i]);
+        coedge3->add(edges[i]);
     }
 
     // on met de côté la liste des Edges touchées
-    std::vector<Edge* > edges;
-    getEdges(edges);
+    std::vector<Edge* > sauv_edges = getEdges();
 
     // on supprime celle-ci (this)
     free(icmd);
 
     // remet les CoEdges dans l'ordre / arête
-    for (std::vector<Edge* >::iterator iter1 = edges.begin();
-            iter1 != edges.end(); ++iter1)
+    for (auto iter1 = sauv_edges.begin(); iter1 != sauv_edges.end(); ++iter1)
         (*iter1)->sortCoEdges();
 
 #ifdef _DEBUG_SPLIT
@@ -667,14 +678,15 @@ split(std::vector<uint> nbMeshingEdges, Internal::InfoCommand* icmd)
     uint nbVerticesToCreate = nbMeshingEdges.size();
 
     // on fait un pré-traitement pour les cas extrémité
+	const std::vector<Topo::Vertex*>& vertices = getVertices();
     std::vector<Topo::Vertex*> newVertices;
     newVertices.resize(nbMeshingEdges.size());
     if (nbMeshingEdges[0] == 0){
-        newVertices[0] = getVertex(0);
+        newVertices[0] = vertices[0];
         nbVerticesToCreate--;
     }
     else if (nbMeshingEdges[0] == getNbMeshingEdges()){
-        newVertices[0] = getVertex(1);
+        newVertices[0] = vertices[1];
         nbVerticesToCreate--;
     }
     else
@@ -682,11 +694,11 @@ split(std::vector<uint> nbMeshingEdges, Internal::InfoCommand* icmd)
 
     if (nbMeshingEdges.size() == 2){
         if (nbMeshingEdges[1] == 0){
-            newVertices[1] = getVertex(0);
+            newVertices[1] = vertices[0];
             nbVerticesToCreate--;
         }
         else if (nbMeshingEdges[1] == getNbMeshingEdges()){
-            newVertices[1] = getVertex(1);
+            newVertices[1] = vertices[1];
             nbVerticesToCreate--;
         }
         else
@@ -710,11 +722,12 @@ split(std::vector<uint> nbMeshingEdges, Internal::InfoCommand* icmd)
 /*----------------------------------------------------------------------------*/
 Topo::Vertex* CoEdge::getOppositeVertex(Topo::Vertex* v) const
 {
-    if (v == getVertex(0)){
-        return getVertex(1);
+	const std::vector<Topo::Vertex*>& vertices = getVertices();
+    if (v == vertices[0]){
+        return vertices[1];
     }
-    else if (v == getVertex(1)){
-        return getVertex(0);
+    else if (v == vertices[1]){
+        return vertices[0];
     }
     else{
         std::cerr <<"CoEdge::getOppositeVertex("<<v->getName()<<") dans "<<*this;
@@ -723,38 +736,19 @@ Topo::Vertex* CoEdge::getOppositeVertex(Topo::Vertex* v) const
     return 0;
 }
 /*----------------------------------------------------------------------------*/
-void CoEdge::
-getBlocks(std::vector<Block* >& blocks) const
+std::vector<Block* > CoEdge::
+getBlocks() const
 {
-    std::list<Topo::Block*> l_b;
-
-    std::vector<Edge* > local_edges;
-    getEdges(local_edges);
-
-    for (std::vector<Edge* >::iterator iter1 = local_edges.begin();
-    		iter1 != local_edges.end(); ++iter1){
-    	std::vector<CoFace* > loc_cofaces;
-    	(*iter1)->getCoFaces(loc_cofaces);
-
-    	for (std::vector<CoFace* >::iterator iter2 = loc_cofaces.begin();
-    			iter2 != loc_cofaces.end(); ++iter2){
-    		std::vector<Face* > loc_faces;
-    		(*iter2)->getFaces(loc_faces);
-
-    		for (std::vector<Face* >::iterator iter3 = loc_faces.begin();
-    				iter3 != loc_faces.end(); ++iter3){
-    			std::vector<Block* > loc_bl;
-    			(*iter3)->getBlocks(loc_bl);
-
-    			l_b.insert(l_b.end(), loc_bl.begin(), loc_bl.end());
+    Utils::EntitySet<Block*> blocks(Utils::Entity::compareEntity);
+    for (Edge* edge : getEdges()){
+    	for (CoFace* loc_coface : edge->getCoFaces()){
+    		for (Face* face : loc_coface->getFaces()){
+    			std::vector<Block* > loc_bl = face->getBlocks();
+    			blocks.insert(loc_bl.begin(), loc_bl.end());
     		}
     	}
     }
-
-    l_b.sort(Utils::Entity::compareEntity);
-    l_b.unique();
-
-    blocks.insert(blocks.end(),l_b.begin(),l_b.end());
+    return Utils::toVect(blocks);
 }
 /*----------------------------------------------------------------------------*/
 //#define _DEBUG_REPRESENTATION
@@ -790,15 +784,16 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
     indices.clear();
 
     // NB: pas d'affichage dans le cas d'une arête avec un seul sommet
-    if (getNbVertices() < 2)
+	const std::vector<Topo::Vertex*>& vertices = getVertices();
+    if (vertices.size() < 2)
         return;
 
     if (tdr->hasRepresentation(Utils::DisplayRepresentation::WIRE)){
 
     	if (tdr->hasRepresentation(Utils::DisplayRepresentation::MINIMUMWIRE)
     			&& !tdr->hasRepresentation(Utils::DisplayRepresentation::SHOWMESHSHAPE)){
-    		points.push_back(getVertex(0)->getCoord());
-    		points.push_back(getVertex(1)->getCoord());
+    		points.push_back(vertices[0]->getCoord());
+    		points.push_back(vertices[1]->getCoord());
     		indices.push_back(0);
     		indices.push_back(1);
     	} else {
@@ -829,7 +824,7 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
 #ifdef _DEBUG_REPRESENTATION
         std::cout<<"  SHOWASSOCIATION -> vers "<<getGeomAssociation()->getName()<<std::endl;
 #endif
-        Utils::Math::Point pt1 = (getVertex(0)->getCoord() + getVertex(1)->getCoord() ) / 2;
+        Utils::Math::Point pt1 = (vertices[0]->getCoord() + vertices[1]->getCoord() ) / 2;
 #ifdef _DEBUG_REPRESENTATION
         std::cout<<"  pt1 "<<pt1<<std::endl;
 #endif
@@ -1297,21 +1292,22 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 #endif
 //	dni->initCoeff();
 
-	Utils::Math::Point pt0 = getVertex(0)->getCoord();
-	Utils::Math::Point pt1 = getVertex(1)->getCoord();
+	const std::vector<Topo::Vertex*>& vertices = getVertices();
+	Utils::Math::Point pt0 = vertices[0]->getCoord();
+	Utils::Math::Point pt1 = vertices[1]->getCoord();
 
 	bool pt0_projected = false;
 	bool pt1_projected = false;
 	if (project){
-		Geom::GeomEntity* ge0 = getVertex(0)->getGeomAssociation();
-		if (ge0 && !getVertex(0)->isMeshed()){
+		Geom::GeomEntity* ge0 = vertices[0]->getGeomAssociation();
+		if (ge0 && !vertices[0]->isMeshed()){
 			Geom::GeomProjectVisitor gpv(pt0);
 			ge0->accept(gpv);
 			pt0 = gpv.getProjectedPoint();
 			pt0_projected = true;
 		}
-		Geom::GeomEntity* ge1 = getVertex(1)->getGeomAssociation();
-		if (ge1 && !getVertex(1)->isMeshed()){
+		Geom::GeomEntity* ge1 = vertices[1]->getGeomAssociation();
+		if (ge1 && !vertices[1]->isMeshed()){
 			Geom::GeomProjectVisitor gpv(pt1);
 			ge1->accept(gpv);
 			pt1 = gpv.getProjectedPoint();
@@ -1321,8 +1317,8 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 
 	Utils::Math::Point vect = (pt1 - pt0);
 #ifdef _DEBUG_GETPOINTS
-	std::cout<<" pt0 "<<getVertex(0)->getName()<<": "<<pt0<<std::endl;
-	std::cout<<" pt1 "<<getVertex(1)->getName()<<": "<<pt1<<std::endl;
+	std::cout<<" pt0 "<<vertices[0]->getName()<<": "<<pt0<<std::endl;
+	std::cout<<" pt1 "<<vertices[1]->getName()<<": "<<pt1<<std::endl;
 	std::cout<<" vect = "<<vect<<" longueur "<<vect.norme()<<std::endl;
 	std::cout<<" getGeomAssociation() -> "<<(getGeomAssociation()?getGeomAssociation()->getName():"0")<<std::endl;
 	std::cout<<" dni->getMeshLaw() "<<dni->getMeshLawName()<<std::endl;
@@ -1377,9 +1373,9 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 						message << "Pb avec création d'une courbe par projection de " << getName() << " sur la surface " << ge->getName() << ".\n";
 
 						if (Utils::Math::MgxNumeric::isNearlyZero(vect.norme())) {
-							std::string n0 = getVertex(0)->getName();
-							std::string n1 = getVertex(1)->getName();
-							message << getVertex(0)->getName() << " et " << getVertex(1)->getName() << " sont confondus après projection.\n";
+							std::string n0 = vertices[0]->getName();
+							std::string n1 = vertices[1]->getName();
+							message << vertices[0]->getName() << " et " << vertices[1]->getName() << " sont confondus après projection.\n";
 						}
 						message << "Le pb est peut-être lié à une projection sur un demi cercle => couper l'arête en deux. ";
 
@@ -1445,9 +1441,10 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 
 					// regarde si l'on est dans le cas de l'arête projetée sur l'intégralité de la courbe
 					auto crv_vertices = curve->getVertices();
-					if (getNbVertices() == 2 && crv_vertices.size() == 2
-							&& ( (getVertex(0)->getCoord() == crv_vertices[0]->getCoord() && getVertex(1)->getCoord() == crv_vertices[1]->getCoord())
-									|| (getVertex(0)->getCoord() == crv_vertices[1]->getCoord() && getVertex(1)->getCoord() == crv_vertices[0]->getCoord()) )
+					auto vertices = getVertices();
+					if (vertices.size() == 2 && crv_vertices.size() == 2
+							&& ( (vertices[0]->getCoord() == crv_vertices[0]->getCoord() && vertices[1]->getCoord() == crv_vertices[1]->getCoord())
+									|| (vertices[0]->getCoord() == crv_vertices[1]->getCoord() && vertices[1]->getCoord() == crv_vertices[0]->getCoord()) )
 					){
 						dni->initCoeff(curve->getArea());
 #ifdef _DEBUG_GETPOINTS
@@ -1456,7 +1453,7 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 					}
 					else if (curve->isLinear()) {
 						// pas de pb pour le cas linéaire
-						double dist = getVertex(0)->getCoord().length(getVertex(1)->getCoord());
+						double dist = vertices[0]->getCoord().length(vertices[1]->getCoord());
 						dni->initCoeff(dist);
 #ifdef _DEBUG_GETPOINTS
 						std::cout<<"  initCoeff cas linéaire avec dist"<<dist<<std::endl;
@@ -1471,7 +1468,7 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 
 						}
 
-						double dist = getVertex(0)->getCoord().length(getVertex(1)->getCoord());
+						double dist = vertices[0]->getCoord().length(vertices[1]->getCoord());
 						dni->initCoeff(dist);
 						//dni->initCoeff();
 #ifdef _DEBUG_GETPOINTS
@@ -1843,8 +1840,8 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
     	// recherche de la normale
         Utils::Math::Vector normale;
 
-        Topo::Vertex* vtx0 = getVertex(dni->getSide());
-        Topo::Vertex* vtxN = getVertex(1-dni->getSide());
+        Topo::Vertex* vtx0 = vertices[dni->getSide()];
+        Topo::Vertex* vtxN = vertices[1-dni->getSide()];
 		Utils::Math::Point pt0 = vtx0->getCoord();
 		Utils::Math::Point ptN = vtxN->getCoord();
         Utils::Math::Point vect = (ptN - pt0);
@@ -1909,8 +1906,8 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
             		else if (curves2.size() == 1){
 
             			// l'arête doit être dans le plan Z=0
-            			if (!Utils::Math::MgxNumeric::isNearlyZero(getVertex(0)->getCoord().getZ())
-            			|| !Utils::Math::MgxNumeric::isNearlyZero(getVertex(1)->getCoord().getZ())){
+            			if (!Utils::Math::MgxNumeric::isNearlyZero(vertices[0]->getCoord().getZ())
+            			|| !Utils::Math::MgxNumeric::isNearlyZero(vertices[1]->getCoord().getZ())){
             				TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
             				message << "On ne sait pas définir la normale pour l'arête "
             						<<getName()<<", elle n'est pas dans le plan Z=0";
@@ -2116,55 +2113,40 @@ getDescription (bool alsoComputed) const
     // les relations vers les autres types d'entités topologiques
     // on cache l'existance des Edge et Face
 
-    std::vector<Topo::Vertex* > vtx;
-    getVertices(vtx);
-
-    Utils::SerializedRepresentation  topoRelation ("Relations topologiques", "");
-
-    Utils::SerializedRepresentation  vertices ("Sommets topologiques",
+    auto vtx = getVertices();
+    Utils::SerializedRepresentation topoRelation ("Relations topologiques", "");
+    Utils::SerializedRepresentation vertices ("Sommets topologiques",
             TkUtil::NumericConversions::toStr(vtx.size()));
-    for (std::vector<Topo::Vertex*>::iterator iter = vtx.begin( ); vtx.end( )!=iter; iter++)
-        vertices.addProperty (
-                Utils::SerializedRepresentation::Property (
-                        (*iter)->getName ( ),  *(*iter)));
+    for (auto iter = vtx.begin(); vtx.end()!=iter; iter++)
+        vertices.addProperty(Utils::SerializedRepresentation::Property((*iter)->getName(), *(*iter)));
     topoRelation.addPropertiesSet (vertices);
 
     if (Internal::InternalPreferences::instance ( )._displayEdge.getValue ( )){
-    	std::vector<Edge* > ed;
-    	getEdges(ed);
-
-    	Utils::SerializedRepresentation  edges ("Arêtes topologiques",
+    	auto ed = getEdges();
+    	Utils::SerializedRepresentation edges ("Arêtes topologiques",
     			TkUtil::NumericConversions::toStr(ed.size()));
-    	for (std::vector<Topo::Edge*>::iterator iter = ed.begin( ); ed.end( )!=iter; iter++)
-    		edges.addProperty (
-    				Utils::SerializedRepresentation::Property (
-    						(*iter)->getName ( ),  *(*iter)));
+    	for (auto iter = ed.begin(); ed.end()!=iter; iter++)
+    		edges.addProperty(Utils::SerializedRepresentation::Property((*iter)->getName(), *(*iter)));
     	topoRelation.addPropertiesSet (edges);
 
     }
     else {
-    	std::vector<CoFace* > fa;
-    	getCoFaces(fa);
-
-    	Utils::SerializedRepresentation  cofaces ("Faces topologiques",
+    	auto fa = getCoFaces();
+    	Utils::SerializedRepresentation cofaces ("Faces topologiques",
     			TkUtil::NumericConversions::toStr(fa.size()));
-    	for (std::vector<Topo::CoFace*>::iterator iter = fa.begin( ); fa.end( )!=iter; iter++)
-    		cofaces.addProperty (
-    				Utils::SerializedRepresentation::Property (
-    						(*iter)->getName ( ),  *(*iter)));
+    	for (auto iter = fa.begin(); fa.end()!=iter; iter++)
+    		cofaces.addProperty (Utils::SerializedRepresentation::Property((*iter)->getName(), *(*iter)));
     	topoRelation.addPropertiesSet (cofaces);
     }
 
     description->addPropertiesSet (topoRelation);
 
-    std::vector<Group::Group1D*> grp = getGroups();
+    auto grp = getGroups();
     if (!grp.empty()){
-    	Utils::SerializedRepresentation  groupe ("Relation vers les groupes",
+    	Utils::SerializedRepresentation groupe ("Relation vers les groupes",
     			TkUtil::NumericConversions::toStr(grp.size()));
-    	for (std::vector<Group::Group1D*>::iterator iter = grp.begin( ); iter!=grp.end( ); ++iter)
-    		groupe.addProperty (
-    				Utils::SerializedRepresentation::Property (
-    						(*iter)->getName ( ),  *(*iter)));
+    	for (auto iter = grp.begin(); iter!=grp.end(); ++iter)
+    		groupe.addProperty (Utils::SerializedRepresentation::Property((*iter)->getName ( ), *(*iter)));
 
     	description->addPropertiesSet (groupe);
 
@@ -2370,11 +2352,13 @@ check() const
     if (isMeshed())
     	return;
 
-    for (uint i=0; i<getNbVertices(); i++)
-       getVertex(i)->check();
+	const std::vector<Vertex* >& vertices = getVertices();
+    for (uint i=0; i<vertices.size(); i++)
+       vertices[i]->check();
 
-    for (uint i=0; i<getNbEdges(); i++)
-        if (getEdge(i)->isDestroyed()){
+	const std::vector<Edge* >& edges = getEdges();
+    for (uint i=0; i<edges.size(); i++)
+        if (edges[i]->isDestroyed()){
             std::cerr<<"CoEdge::check() pour l'arête commune "<<getName()<<std::endl;
             throw TkUtil::Exception (TkUtil::UTF8String ("Une arête commune pointe sur une arête détruite", TkUtil::Charset::UTF_8));
         }
@@ -2460,12 +2444,12 @@ TkUtil::UTF8String & operator << (TkUtil::UTF8String & o, const CoEdge & e)
         o << ", projetée sur " << e.getGeomAssociation()->getName()
         <<(e.getGeomAssociation()->isDestroyed()?" (DETRUITE)":"");
 
-        std::vector<std::string> gn;
-        e.getGeomAssociation()->getGroupsName(gn);
+        Group::GroupManager& gm = e.getContext().getGroupManager();
+        std::vector<Group::GroupEntity*> gn = gm.getGroupsFor(e.getGeomAssociation());
         if (!gn.empty()) {
             o << " (groupes:";
             for (size_t i=0; i<gn.size(); i++)
-                o << " "<<gn[i];
+                o << " "<<gn[i]->getName();
             o << ")";
         }
         else {
@@ -2510,28 +2494,13 @@ Topo::TopoInfo CoEdge::getInfos() const
 	Topo::TopoInfo infos;
 	infos.name = getName();
 	infos.dimension = getDim();
+    infos._groups = Utils::toNames(getGroups());
+	infos._vertices = Utils::toNames(getVertices());
+	infos._edges = Utils::toNames(getEdges());
+	infos._cofaces = Utils::toNames(getCoFaces());
+	infos._blocks = Utils::toNames(getBlocks());
 	if (getGeomAssociation() != 0)
 		infos.geom_entity = getGeomAssociation()->getName();
-
-    std::vector<Vertex*> vertices;
-    getVertices(vertices);
-    for (Vertex* v : vertices)
-        infos._vertices.push_back(v->getName());
-
-    std::vector<Edge*> edges;
-    getEdges(edges);
-    for (Edge* e : edges)
-    	infos._edges.push_back(e->getName());
-
-    std::vector<CoFace*> cofaces;
-	getCoFaces(cofaces);
-    for (CoFace* f : cofaces)
-        infos._cofaces.push_back(f->getName());
-
-    std::vector<Block*> blocks;
-	getBlocks(blocks);
-	for (Block* b : blocks)
-        infos._blocks.push_back(b->getName());
 
 	return infos;
 }
@@ -2557,7 +2526,8 @@ getNodes(Topo::Vertex* v1, Topo::Vertex* v2,
 
     gmds::Mesh& gmds_mesh = getContext().getMeshManager().getMesh()->getGMDSMesh();
 
-    if (v1 == getVertex(0) && v2 == getVertex(1)){
+	const std::vector<Topo::Vertex* >& vertices = getVertices();
+    if (v1 == vertices[0] && v2 == vertices[1]){
     	for (std::vector<gmds::TCellID>::iterator iter = m_mesh_data->nodes().begin();
     			iter != m_mesh_data->nodes().end(); ++iter)
     		vectNd.push_back(gmds_mesh.get<gmds::Node>(*iter));
@@ -2566,7 +2536,7 @@ getNodes(Topo::Vertex* v1, Topo::Vertex* v2,
 	std::cout<<" sens normal"<<std::endl;
 #endif
     }
-    else if (v2 == getVertex(0) && v1 == getVertex(1)) {
+    else if (v2 == vertices[0] && v1 == vertices[1]) {
     	for (std::vector<gmds::TCellID>::reverse_iterator iter = m_mesh_data->nodes().rbegin();
     	    			iter != m_mesh_data->nodes().rend(); ++iter)
     	    		vectNd.push_back(gmds_mesh.get<gmds::Node>(*iter));
@@ -2583,8 +2553,8 @@ getNodes(Topo::Vertex* v1, Topo::Vertex* v2,
                 << v1->getName() << "\", "
                 << v2->getName() << "\") avec l'arête "
                 << getName() << " qui a comme sommets:";
-        for (uint i=0; i<getNbVertices();i++)
-            message <<"  "<<*getVertex(i);
+        for (uint i=0; i<vertices.size();i++)
+            message <<"  "<<*vertices[i];
         message << ", a échoué";
         throw TkUtil::Exception (message);
     }
@@ -2595,71 +2565,17 @@ getNodes(Topo::Vertex* v1, Topo::Vertex* v2,
 			iter != vectNd.end(); ++iter)
 		std::cout<<"  Nd "<<(*iter).getID()<<" : ["<<(*iter).X()<<", "<<(*iter).Y()<<", "<<(*iter).Z()<<"]"<<std::endl;
 #endif
-
-//    TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-//    message << "CoEdge::getNodes( \""
-//            << v1->getName() << "\", "
-//            << v2->getName() << "\") avec l'arête "
-//            << getName()<<" donne un vecteur de "<<vectNd.size()<<" noeuds";
-//    std::cout<<message<<std::endl;
-//    std::cout<<"m_mesh_data->nodes().size() = "<<m_mesh_data->nodes().size()<<std::endl;
 }
 /*----------------------------------------------------------------------------*/
-uint CoEdge::
-getNbVertices() const
+std::vector<CoFace* > CoEdge::
+getCoFaces() const
 {
-#ifdef _DEBUG
-    if (isDestroyed()){
-        TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-        message << "CoEdge::getNbVertices() pour arête "<<getName()<<" détruite !";
-        log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
+    Utils::EntitySet<CoFace*> cofaces(Utils::Entity::compareEntity);
+    for (Edge* e : getEdges()){
+        const std::vector<CoFace* >& loc_cofaces = e->getCoFaces();
+        cofaces.insert(loc_cofaces.begin(), loc_cofaces.end());
     }
-#endif
-    return m_topo_property->getVertexContainer().getNb();
-}
-/*----------------------------------------------------------------------------*/
-void CoEdge::getAllVertices(std::vector<Vertex* >& vertices, const bool unique) const
-{
-    vertices.clear();
-    std::list<Topo::Vertex*> l_v;
-    const std::vector<Vertex* > & local_vertices = getVertices();
-
-    l_v.insert(l_v.end(), local_vertices.begin(), local_vertices.end());
-
-    l_v.sort(Utils::Entity::compareEntity);
-    l_v.unique();
-
-    vertices.insert(vertices.end(),l_v.begin(),l_v.end());
-}
-/*----------------------------------------------------------------------------*/
-void CoEdge::
-getCoFaces(std::vector<CoFace* >& cofaces) const
-{
-    std::list<Topo::CoFace*> l_f;
-
-    std::vector<Edge* > edges;
-    getEdges(edges);
-
-    for (std::vector<Edge* >::iterator iter1 = edges.begin();
-            iter1 != edges.end(); ++iter1){
-        std::vector<CoFace* > loc_cofaces;
-        (*iter1)->getCoFaces(loc_cofaces);
-
-        l_f.insert(l_f.end(), loc_cofaces.begin(), loc_cofaces.end());
-    }
-
-    l_f.sort(Utils::Entity::compareEntity);
-    l_f.unique();
-
-    cofaces.insert(cofaces.end(),l_f.begin(),l_f.end());
-}
-/*----------------------------------------------------------------------------*/
-uint CoEdge::
-getNbCofaces() const
-{
-	std::vector<CoFace* > cofaces;
-	getCoFaces(cofaces);
-	return cofaces.size();
+	return Utils::toVect(cofaces);
 }
 /*----------------------------------------------------------------------------*/
 bool CoEdge::
@@ -2689,11 +2605,12 @@ computeRatio(const Utils::Math::Point& pt)
 		// si la création des points ne peut se faire, on procède autrement
 		// cela peut apparaitre si l'arête n'est que partiellement sur une surface par ex
 
-		if (getNbVertices() != 2)
+		const std::vector<Topo::Vertex* >& vertices = getVertices();
+		if (vertices.size() != 2)
 			throw TkUtil::Exception (TkUtil::UTF8String ("Pas possible de projeter un point sur arête avec autre chose que 2 sommets", TkUtil::Charset::UTF_8));
 
-		Point pt0 =  getVertex(0)->getCoord();
-		Point pt1 =  getVertex(1)->getCoord();
+		Point pt0 =  vertices[0]->getCoord();
+		Point pt1 =  vertices[1]->getCoord();
 
 		double norme = (pt1-pt0).norme2();
 		double scale = (pt-pt0).dot(pt1-pt0);
@@ -2704,120 +2621,40 @@ computeRatio(const Utils::Math::Point& pt)
 
 		return scale/norme;
 	}
-
-//	if (getGeomAssociation()){
-//		Geom::Curve* curve = dynamic_cast<Geom::Curve*> (getGeomAssociation());
-//		if (curve){
-//			double param1 = 0;
-//			double param2 = 0;
-//			curve->getParameter(getVertex(0)->getCoord(), param1);
-//			curve->getParameter(getVertex(getNbVertices()==1?0:1)->getCoord(), param2);
-//
-//			Point ptProj;
-//			curve->project(pt, ptProj);
-//
-//			double paramPt = 0;
-//			curve->getParameter(ptProj, paramPt);
-//
-//#ifdef _DEBUG_SPLIT
-//			std::cout<<"computeRatio entre "<<curve->getName()<<" et "<<pt<<" => "<<(paramPt-param1)/(param2-param1)<<std::endl;
-//#endif
-//			return (paramPt-param1)/(param2-param1);
-//		}
-//		else {
-//			// projection certainement sur une surface
-//
-//			// on recherche le ratio à l'aide de la discrétisation projetée de l'arête
-//			std::vector<Utils::Math::Point> points;
-//			getPoints(getMeshingProperty(), points, true);
-//
-//			// vrai dès que l'on trouve le segment sur lequel est projeté le pt
-//			bool trouve = false;
-//			double long_tot = 0.0;
-//			double ratio_tot = 0.0;
-//			for (uint i=0; i<points.size()-1; i++){
-//
-//				Point& pt0 = points[i];
-//				Point& pt1 = points[i+1];
-//
-//				double norme2 = (pt1-pt0).norme2();
-//				double norme = std::sqrt(norme2);
-//				if (!trouve){
-//					double scale = (pt-pt0).dot(pt1-pt0);
-//					double ratio = scale/norme2;
-//					//std::cout<<"Pt["<<i<<"] "<<pt0<<", ratio = "<<ratio<<std::endl;
-//
-//					if (ratio >= 0 && ratio <= 1.0){
-//						trouve = true;
-//						ratio_tot = long_tot + ratio*norme;
-//						//std::cout<<"   ratio_tot = "<<ratio_tot<<std::endl;
-//					}
-//				} // end if (!trouve)
-//
-//				long_tot += norme;
-//				//std::cout<<"   long_tot = "<<long_tot<<", norme = "<<norme<<std::endl;
-//
-//			} // end for i<points.size()-1
-//
-//#ifdef _DEBUG_SPLIT
-//			std::cout<<"computeRatio entre "<<getGeomAssociation()->getName()<<" et "<<pt<<" => "<<ratio_tot/long_tot<<std::endl;
-//#endif
-//			return ratio_tot/long_tot;
-//
-//		} // end else / if (curve)
-//	}
-//
-//	// s'il n'y a pas de courbe, alors on projette sur la droite entre les sommets de la coedge
-//	// et on calcul le ratio à partir de ce point
-//	if (getNbVertices() != 2)
-//		throw TkUtil::Exception (TkUtil::UTF8String ("Pas possible de projeter un point sur arête avec autre chose que 2 sommets", TkUtil::Charset::UTF_8));
-//
-//	Point pt0 =  getVertex(0)->getCoord();
-//	Point pt1 =  getVertex(1)->getCoord();
-//
-//	double norme = (pt1-pt0).norme2();
-//	double scale = (pt-pt0).dot(pt1-pt0);
-//
-//#ifdef _DEBUG_SPLIT
-//	std::cout<<"computeRatio entre "<<getName()<<" et "<<pt<<" => "<<scale/norme<<std::endl;
-//#endif
-//
-//	return scale/norme;
 }
 /*----------------------------------------------------------------------------*/
-void CoEdge::getGroupsName (std::vector<std::string>& gn, bool byGeom, bool byTopo) const
+void CoEdge::getGroupsName (std::vector<std::string>& gn) const
 {
-	if (byGeom)
-		TopoEntity::getGroupsName(gn, byGeom, byTopo);
+	TopoEntity::getGroupsName(gn);
 
-	if (byTopo)
-		for (uint i = 0; i<m_topo_property->getGroupsContainer().size(); ++i)
-		        gn.push_back(m_topo_property->getGroupsContainer().get(i)->getName());
+	for (auto gr : m_topo_property->getGroupsContainer())
+		gn.push_back(gr->getName());
 }
 /*----------------------------------------------------------------------------*/
 void CoEdge::add(Group::Group1D* grp)
 {
-    m_topo_property->getGroupsContainer().add(grp);
+    m_topo_property->getGroupsContainer().push_back(grp);
 }
 /*----------------------------------------------------------------------------*/
 void CoEdge::remove(Group::Group1D* grp)
 {
-    m_topo_property->getGroupsContainer().remove(grp);
+    Utils::remove(grp, m_topo_property->getGroupsContainer());
 }
 /*----------------------------------------------------------------------------*/
 int CoEdge::getNbGroups() const
 {
-    return m_topo_property->getGroupsContainer().getNb();
+    return m_topo_property->getGroupsContainer().size();
 }
 /*----------------------------------------------------------------------------*/
 std::vector<Group::Group1D*> CoEdge::getGroups() const
 {
-    return m_topo_property->getGroupsContainer().get();
+    return m_topo_property->getGroupsContainer();
 }
 /*----------------------------------------------------------------------------*/
 unsigned long CoEdge::getNbInternalMeshingNodes()
 {
-	if (getNbVertices() == 1 || getVertex(0) == getVertex(1))
+	const std::vector<Topo::Vertex* >& vertices = getVertices();
+	if (vertices.size() == 1 || vertices[0] == vertices[1])
 		return getNbMeshingEdges();
 	else
 		return getNbMeshingEdges() - 1;
@@ -2951,8 +2788,7 @@ detectLoopReference(const Topo::CoEdge* coedge_dep, const Topo::CoEdge* coedge, 
 	}
 
 	// vérifie que les coedges ne dépendent pas de coedge_dep
-	std::vector<Topo::CoEdge*> coedges_ref;
-	edge_ref->getCoEdges(coedges_ref);
+	std::vector<Topo::CoEdge*> coedges_ref = edge_ref->getCoEdges();
 	detectLoopReference(coedge_dep, coedges_ref, filtre_coedges);
 	updateModificationTime(coedge, coedges_ref);
 }

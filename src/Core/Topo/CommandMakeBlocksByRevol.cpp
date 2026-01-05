@@ -53,8 +53,8 @@ CommandMakeBlocksByRevol(Internal::Context& c,
 , m_ratio_ogrid(ratio_ogrid)
 {
 	for (uint i=0; i<coedges.size(); i++){
-		CoEdge* coedge = coedges[i];
-		if (isOnAxis(coedge->getVertex(0)) && isOnAxis(coedge->getVertex(1))){
+        auto vertices = coedges[i]->getVertices();
+		if (isOnAxis(vertices[0]) && isOnAxis(vertices[1])){
 			TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
 	    	message<<"Il n'est pas permis de démarrer avec une arête ayant les 2 extrémités sur l'axe\n";
 	    	message<<"NB: penser à découper les faces pour placer le tracé de l'o-grid";
@@ -461,26 +461,12 @@ computeFiltersWithAllFaces(std::map<Vertex*, uint>& filtre_vertex,
             std::map<CoEdge*, uint>& filtre_coedge,
             std::map<CoFace*, uint>& filtre_coface)
 {
-	std::vector<CoFace*> cofaces;
-	getContext().getTopoManager().getCoFaces(cofaces);
-
-	for (uint i=0; i<cofaces.size(); i++){
-		CoFace* coface = cofaces[i];
+	for (CoFace* coface : getContext().getTopoManager().getCoFacesObj()){
 		filtre_coface[coface] = 3;
-
-		std::vector<CoEdge*> coedges;
-		coface->getCoEdges(coedges, false);
-
-		for (uint j=0; j<coedges.size(); j++){
-			CoEdge* coedge = coedges[j];
-
+		for (CoEdge* coedge : coface->getCoEdges(false)){
 			filtre_coedge[coedge] = 3;
-
-			std::vector<Vertex*> vertices;
-			coedge->getVertices(vertices);
-
-			for (uint k=0; k<vertices.size(); k++)
-				filtre_vertex[vertices[k]] = 3;
+			for (Vertex* vtx : coedge->getVertices())
+				filtre_vertex[vtx] = 3;
 		}
 	}
 }
@@ -507,7 +493,8 @@ computeOgridFilters(std::map<Vertex*, uint>& filtre_vertex,
     bool withOgrid = true;
     for (uint iar=0; iar<m_coedges.size(); ++iar) {
     	// si l'une des arêtes est sur l'axe, alors pas d'ogrid
-    	if (isOnAxis(m_coedges[iar]->getVertex(0)) && isOnAxis(m_coedges[iar]->getVertex(1)))
+        auto vertices = m_coedges[iar]->getVertices();
+    	if (isOnAxis(vertices[0]) && isOnAxis(vertices[1]))
     		withOgrid = false;
     }
 
@@ -535,8 +522,7 @@ computeOgridFilters(std::map<Vertex*, uint>& filtre_vertex,
     	// on marque les arêtes et les sommets des 2 faces
     	{
     		// les 2 Faces communes
-    		std::vector<CoFace* > cofaces;
-    		arete->getCoFaces(cofaces);
+    		std::vector<CoFace* > cofaces = arete->getCoFaces();
     		if (cofaces.size() != 2){
 				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     			message<<"Erreur, il faut sélectionner une arête entre 2 faces pour rechercher le tracé de l'ogrid.\n";
@@ -563,20 +549,15 @@ computeOgridFilters(std::map<Vertex*, uint>& filtre_vertex,
 
     			filtre_coface[coface] = marques[i];
 
-    			std::vector<CoEdge* > coedges;
-    			coface->getCoEdges(coedges);
-    			for (std::vector<CoEdge* >::iterator iter2 = coedges.begin();
-    					iter2 != coedges.end(); ++iter2){
-    				if (filtre_coedge[*iter2] == 0){
+    			for (CoEdge* coedge : coface->getCoEdges()){
+    				if (filtre_coedge[coedge] == 0){
     					//std::cout<<"arete "<<(*iter2)->getName()<<" marquée à "<<marques[i]<<std::endl;
-    					filtre_coedge[*iter2] = marques[i];
+    					filtre_coedge[coedge] = marques[i];
     				}
 
-    				const std::vector<Vertex* > & vertices = (*iter2)->getVertices();
-    				for (std::vector<Vertex* >::const_iterator iter1 = vertices.begin();
-    						iter1 != vertices.end(); ++iter1)
-    					if (filtre_vertex[*iter1] == 0)
-    						filtre_vertex[*iter1] = marques[i];
+    				for (Vertex* vtx : coedge->getVertices())
+    					if (filtre_vertex[vtx] == 0)
+    						filtre_vertex[vtx] = marques[i];
     			}
     		}
     	}
@@ -584,9 +565,10 @@ computeOgridFilters(std::map<Vertex*, uint>& filtre_vertex,
     	// on part d'un sommet de l'arête de départ (puis de l'autre)
     	// on va de proche en proche pour sélectionner toutes les arêtes
     	// qui vont constituer l'ogrid
-    	for (uint i=0; i<arete->getNbVertices(); i++){
+        auto ar_vertices = arete->getVertices();
+    	for (uint i=0; i<ar_vertices.size(); i++){
 
-    		Vertex* vtx_dep = arete->getVertex(i);
+    		Vertex* vtx_dep = ar_vertices[i];
 
     		do {
 #ifdef _DEBUG_REVOL
@@ -595,8 +577,7 @@ computeOgridFilters(std::map<Vertex*, uint>& filtre_vertex,
     			// recherche d'une arête suivante
     			CoEdge* coedge_suiv = 0;
 
-    			std::vector<CoEdge* > coedges;
-    			vtx_dep->getCoEdges(coedges);
+    			std::vector<CoEdge* > coedges = vtx_dep->getCoEdges();
 #ifdef _DEBUG_REVOL
     			std::cout<<" -> coedges :";
     			for (uint i2=0; i2<coedges.size(); i2++)
@@ -652,8 +633,7 @@ computeOgridFilters(std::map<Vertex*, uint>& filtre_vertex,
     				if (coedges.size() == 3){
     					// si le sommet est relié à 3 faces, on est certainement dans le cas d'un o-grid en 2D
     					// sinon c'est terminé
-    					std::vector<CoFace* > cofaces_vtx;
-    					vtx_dep->getCoFaces(cofaces_vtx);
+    					std::vector<CoFace* > cofaces_vtx = vtx_dep->getCoFaces();
 #ifdef _DEBUG_REVOL
     					std::cout<<"   -> cofaces_vtx :";
     					for (uint i2=0; i2<cofaces_vtx.size(); i2++)
@@ -689,8 +669,7 @@ computeOgridFilters(std::map<Vertex*, uint>& filtre_vertex,
     						for (std::vector<CoEdge* >::iterator iter2 = coedges.begin();
     								iter2 != coedges.end(); ++iter2)
     							if (filtre_coedge[*iter2] == 3){
-    								std::vector<CoFace* > cofaces_coedge;
-    								(*iter2)->getCoFaces(cofaces_coedge);
+    								std::vector<CoFace* > cofaces_coedge = (*iter2)->getCoFaces();
     								if (cofaces_coedge.size() == 2 &&
     										((filtre_coface[cofaces_coedge[0]] == 3 && filtre_coface[cofaces_coedge[1]] == 0)
     												||
@@ -795,11 +774,12 @@ computeOgridFilters(std::map<Vertex*, uint>& filtre_vertex,
 		TopoHelper::getMarqued(filtre_coedge, 3, coedges);
 		for (std::vector<CoEdge*>::iterator iter2 = coedges.begin();
 				iter2 != coedges.end(); ++iter2){
-			if (isOnAxis((*iter2)->getVertex(0)))
-				filtre_vertex[(*iter2)->getVertex(0)] = 1;
-			if (isOnAxis((*iter2)->getVertex(1)))
-				filtre_vertex[(*iter2)->getVertex(1)] = 1;
-			if (filtre_vertex[(*iter2)->getVertex(0)] == 1 && filtre_vertex[(*iter2)->getVertex(1)] == 1)
+            auto vertices = (*iter2)->getVertices();
+			if (isOnAxis(vertices[0]))
+				filtre_vertex[vertices[0]] = 1;
+			if (isOnAxis(vertices[1]))
+				filtre_vertex[vertices[1]] = 1;
+			if (filtre_vertex[vertices[0]] == 1 && filtre_vertex[vertices[1]] == 1)
 				filtre_coedge[(*iter2)] = 1;
 		}
 	}
@@ -821,11 +801,11 @@ computeAxisFilters(std::map<Vertex*, uint>& filtre_vertex,
     for (std::map<CoEdge*, uint>::iterator iter = filtre_coedge.begin();
             iter != filtre_coedge.end(); ++iter)
         if ((*iter).second) {
-            CoEdge* coedge = (*iter).first;
-            if (coedge->getNbVertices() != 2)
+            auto coedge_vertices = (*iter).first->getVertices();
+            if (coedge_vertices.size() != 2)
                 throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, CommandMakeBlocksByRevol::computeAxisFilters trouve une arête avec autre chose que 2 sommets", TkUtil::Charset::UTF_8));
-            Vertex* vtx1 = coedge->getVertex(0);
-            Vertex* vtx2 = coedge->getVertex(1);
+            Vertex* vtx1 = coedge_vertices[0];
+            Vertex* vtx2 = coedge_vertices[1];
 
             bool vtx1OnAxis = (filtre_vertex[vtx1]>=10);
             bool vtx2OnAxis = (filtre_vertex[vtx2]>=10);
@@ -841,12 +821,9 @@ computeAxisFilters(std::map<Vertex*, uint>& filtre_vertex,
             iter != filtre_coface.end(); ++iter)
         if ((*iter).second) {
             CoFace* coface = (*iter).first;
-            std::vector<CoEdge* > coedges;
-            coface->getCoEdges(coedges);
             bool cofaceOnAxis = false;
-            for (std::vector<CoEdge* >::iterator iter2 = coedges.begin();
-                    iter2 != coedges.end(); ++iter2)
-                if (filtre_coedge[*iter2] >= 10)
+            for (CoEdge* coedge : coface->getCoEdges())
+                if (filtre_coedge[coedge] >= 10)
                     cofaceOnAxis = true;
             if (cofaceOnAxis)
                 (*iter).second += 10;
@@ -861,20 +838,16 @@ detectVerticesUnderOgrid(std::map<Vertex*, uint>& filtre_vertex)
         if (filtre_vertex[(*iter).first] == 2){
             // on a trouvé un sommet entre l'axe et l'ogrid
             Vertex* vtx0 = (*iter).first;
-
-            std::vector<CoEdge* > edges;
-            vtx0->getCoEdges(edges);
             CoEdge* coedgeAxe = 0;
             CoEdge* coedgeOgrid = 0;
-            for (std::vector<CoEdge* >::iterator iter=edges.begin();
-                    iter != edges.end(); ++iter){
-                Vertex* vtxOpp = (*iter)->getOppositeVertex(vtx0);
+            for (CoEdge* vtx0_ce : vtx0->getCoEdges()){
+                Vertex* vtxOpp = vtx0_ce->getOppositeVertex(vtx0);
                 if (filtre_vertex[vtxOpp] == 1){
-                    coedgeOgrid = *iter;
+                    coedgeOgrid = vtx0_ce;
                     filtre_vertex[vtxOpp] = 6;
                 }
                 else if (filtre_vertex[vtxOpp] == 12)
-                    coedgeAxe = *iter;
+                    coedgeAxe = vtx0_ce;
             }
             if (0 == coedgeAxe){
 				TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
@@ -910,11 +883,12 @@ computeNi(std::map<Vertex*, uint>& filtre_vertex,
             iter != filtre_coedge.end(); ++iter)
         if ((*iter).second == 12) {
             CoEdge* coedge = (*iter).first;
+            auto coedge_vertices = coedge->getVertices();
             uint ni_loc = 0;
-            if (coedge->getNbVertices() != 2)
+            if (coedge_vertices.size() != 2)
                 throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, CommandMakeBlocksByRevol::computeNi trouve une arête avec autre chose que 2 sommets", TkUtil::Charset::UTF_8));
-            Vertex* vtx1 = coedge->getVertex(0);
-            Vertex* vtx2 = coedge->getVertex(1);
+            Vertex* vtx1 = coedge_vertices[0];
+            Vertex* vtx2 = coedge_vertices[1];
             // sommet sur l'ogrid
             Vertex* vtxo = 0;
             if (filtre_vertex[vtx1] == 1)
@@ -926,15 +900,11 @@ computeNi(std::map<Vertex*, uint>& filtre_vertex,
                 // on doit chercher l'arête reliée à l'ogrid
                 Vertex* vtx0 = (filtre_vertex[vtx1] == 2 ? vtx1 : vtx2);
                 vtxo = vtx0;
-
-                std::vector<CoEdge* > edges;
-                vtx0->getCoEdges(edges);
                 CoEdge* coedge2 = 0;
-                for (std::vector<CoEdge* >::iterator iter=edges.begin();
-                        iter != edges.end(); ++iter){
-                    Vertex* vtxOpp = (*iter)->getOppositeVertex(vtx0);
+                for (CoEdge* vtx0_ce : vtx0->getCoEdges()){
+                    Vertex* vtxOpp = vtx0_ce->getOppositeVertex(vtx0);
                     if (filtre_vertex[vtxOpp] == 6)
-                        coedge2 = *iter;
+                        coedge2 = vtx0_ce;
                 }
 
                 if (0 == coedge2)
@@ -997,8 +967,7 @@ computeNi(std::map<Vertex*, uint>& filtre_vertex,
             iter != filtre_coedge.end(); ++iter)
         if ((*iter).second == 1) {
             CoEdge* coedge = (*iter).first;
-            std::vector<CoFace*> cofaces;
-            coedge->getCoFaces(cofaces);
+            std::vector<CoFace*> cofaces = coedge->getCoFaces();
 
             if (cofaces.size() == 2){
             	uint ni_loc = 0;
@@ -1026,10 +995,8 @@ computeNi(std::map<Vertex*, uint>& filtre_vertex,
 
                // on prend le plus grand des ni des cofaces voisines
                uint ni_loc = 0;
-               std::vector<CoFace*> cofaces;
-               vtx->getCoFaces(cofaces);
-               for (uint j=0; j<cofaces.size(); j++){
-            	   uint ni = ni_coface[cofaces[j]];
+               for (CoFace* vtx_cf : vtx->getCoFaces()){
+            	   uint ni = ni_coface[vtx_cf];
             	   if (ni > ni_loc)
             		   ni_loc = ni;
                }
@@ -1050,8 +1017,7 @@ computeNi(std::map<Vertex*, uint>& filtre_vertex,
     	// on prend le ni le plus grand entre ceux des cofaces autours
     	uint ni = 0;
     	CoEdge* coedge = iter->first;
-    	std::vector<CoFace*> cofaces;
-    	coedge->getCoFaces(cofaces);
+    	std::vector<CoFace*> cofaces = coedge->getCoFaces();
 
     	for (uint i=0; i<cofaces.size(); i++){
     		CoFace* coface = cofaces[i];
@@ -1090,26 +1056,20 @@ void CommandMakeBlocksByRevol::copyNi(std::map<Vertex*, uint>& ni_vtx,
     	std::cout<<"ni_coface pour "<<(*iter2)->getName()<<" = "<<ni_coface[*iter1]<<" par copie de "<<(*iter1)->getName()<<std::endl;
 #endif
 
-    	std::vector<CoEdge*> coedges1;
-    	std::vector<CoEdge*> coedges2;
-    	(*iter1)->getCoEdges(coedges1, false);
-    	(*iter2)->getCoEdges(coedges2, false);
-
-    	std::vector<CoEdge*>::const_iterator iter3 = coedges1.begin();
-    	std::vector<CoEdge*>::const_iterator iter4 = coedges2.begin();
+    	std::vector<CoEdge*> coedges1 = (*iter1)->getCoEdges(false);
+    	std::vector<CoEdge*> coedges2 = (*iter2)->getCoEdges(false);
+    	auto iter3 = coedges1.begin();
+    	auto iter4 = coedges2.begin();
     	for ( ; iter3 != coedges1.end(); ++iter3, ++iter4){
     		ni_coedge[*iter4] = ni_coedge[*iter3];
 #ifdef _DEBUG_REVOL
     		std::cout<<"ni_coedge pour "<<(*iter4)->getName()<<" = "<<ni_coedge[*iter3]<<" par copie de "<<(*iter3)->getName()<<std::endl;
 #endif
 
-        	std::vector<Vertex*> vertices1;
-        	std::vector<Vertex*> vertices2;
-        	(*iter3)->getVertices(vertices1);
-        	(*iter4)->getVertices(vertices2);
-
-        	std::vector<Vertex*>::const_iterator iter5 = vertices1.begin();
-        	std::vector<Vertex*>::const_iterator iter6 = vertices2.begin();
+        	const std::vector<Vertex*>& vertices1 = (*iter3)->getVertices();
+        	const std::vector<Vertex*>& vertices2 = (*iter4)->getVertices();
+        	auto iter5 = vertices1.begin();
+        	auto iter6 = vertices2.begin();
         	for ( ; iter5 != vertices1.end(); ++iter5, ++iter6){
         		ni_vtx[*iter6] = ni_vtx[*iter5];
 #ifdef _DEBUG_REVOL
@@ -1128,30 +1088,19 @@ marqueCoFaceCoEdgeVertices(CoEdge* coedge, const uint marque,
         std::map<CoFace*, uint>& filtre_coface)
 {
 	//std::cout<<"marqueCoFaceCoEdgeVertices ..."<<std::endl;
-    std::vector<CoFace* > cofaces;
-    coedge->getCoFaces(cofaces);
+    for (CoFace* cf : coedge->getCoFaces())
+        if (filtre_coface[cf] == 0){
+            filtre_coface[cf] = marque;
+            //std::cout<<"coface "<<(cf)->getName()<<" marquée à "<<marque<<std::endl;
 
-    for (std::vector<CoFace* >::iterator iter3 = cofaces.begin();
-            iter3 != cofaces.end(); ++iter3)
-        if (filtre_coface[*iter3] == 0){
-            filtre_coface[*iter3] = marque;
-            //std::cout<<"coface "<<(*iter3)->getName()<<" marquée à "<<marque<<std::endl;
+            for (CoEdge* ce : cf->getCoEdges())
+                if (filtre_coedge[ce] == 0){
+                    filtre_coedge[ce] = marque;
+                    //std::cout<<"coedge "<<ce->getName()<<" marquée à "<<marque<<std::endl;
 
-            std::vector<CoEdge* > coedges;
-            (*iter3)->getCoEdges(coedges);
-
-            for (std::vector<CoEdge* >::iterator iter2 = coedges.begin();
-                    iter2 != coedges.end(); ++iter2)
-                if (filtre_coedge[*iter2] == 0){
-                    filtre_coedge[*iter2] = marque;
-                    //std::cout<<"coedge "<<(*iter2)->getName()<<" marquée à "<<marque<<std::endl;
-
-                    const std::vector<Vertex* > & vertices = (*iter2)->getVertices();
-
-                    for (std::vector<Vertex* >::const_iterator iter1 = vertices.begin();
-                            iter1 != vertices.end(); ++iter1)
-                        if (filtre_vertex[*iter1] == 0){
-                            filtre_vertex[*iter1] = marque;
+                    for (Vertex* vtx : ce->getVertices())
+                        if (filtre_vertex[vtx] == 0){
+                            filtre_vertex[vtx] = marque;
                         }
                 }
         }
@@ -1375,20 +1324,17 @@ freeUnused(std::vector<CoFace*>& cofaces,
         if (filtre_coface[*iter1]%10 == 2){
             CoFace* coface = *iter1;
 
-            std::vector<Edge* > edges;
-            (*iter1)->getEdges(edges);
-
+            std::vector<Edge* > edges = (*iter1)->getEdges();
             for (std::vector<Edge* >::iterator iter2 = edges.begin();
                     iter2 != edges.end(); ++iter2){
 
-                std::vector<CoEdge* > coedges;
-                (*iter2)->getCoEdges(coedges);
+                std::vector<CoEdge* > coedges = (*iter2)->getCoEdges();
 
                 for (std::vector<CoEdge* >::iterator iter3 = coedges.begin();
                         iter3 != coedges.end(); ++iter3)
                     if ((filtre_coedge[*iter3] == 2 || filtre_coedge[*iter3] == 12)
-                            && (filtre_vertex[(*iter3)->getVertex(0)] != 2
-                                    || filtre_vertex[(*iter3)->getVertex(1)] != 2)){
+                            && (filtre_vertex[(*iter3)->getVertices()[0]] != 2
+                                    || filtre_vertex[(*iter3)->getVertices()[1]] != 2)){
 
                         // supprime les arêtes sous l'ogrid sauf celles sur l'axe et celles // à l'axe
                         (*iter3)->setDestroyed(true);
@@ -1399,10 +1345,8 @@ freeUnused(std::vector<CoFace*>& cofaces,
                     else if (m_portion == Utils::Portion::ENTIER && filtre_coedge[*iter3] == 22) {
                         // cas d'une arête sur l'axe
                         // on supprime égallement ses sommets
-                        std::vector<Vertex* > vertices;
-                        (*iter3)->getVertices(vertices);
-                        for (std::vector<Vertex* >::iterator iter4 = vertices.begin();
-                        		iter4 != vertices.end(); ++iter4)
+                        const std::vector<Vertex* >& vertices = (*iter3)->getVertices();
+                        for (auto iter4 = vertices.begin(); iter4 != vertices.end(); ++iter4)
                         	// on ne détruit pas un sommet sur l'ogrid (cas de l'ogrid qui passe par l'axe)
                         	if (filtre_vertex[*iter4] == 12){
                         		(*iter4)->setDestroyed(true);
@@ -1433,7 +1377,7 @@ freeUnused(std::vector<CoFace*>& cofaces,
             // on fait le ménage parmi les Edge qui ne sont plus référencées par aucune CoFace
             for (std::vector<Edge* >::iterator iter2 = edges.begin();
                                 iter2 != edges.end(); ++iter2){
-            	if ((*iter2)->getNbCoFaces() == 0){
+            	if ((*iter2)->getCoFaces().size() == 0){
             		(*iter2)->setDestroyed(true);
             		getInfoCommand().addTopoInfoEntity(*iter2,Internal::InfoCommand::DELETED);
             		(*iter2)->free(&getInfoCommand());
@@ -1456,17 +1400,13 @@ updateInterpolate(std::vector<CoFace*>& cofaces,
 		if (filtre_coface[*iter1] == 3){
 			CoFace* coface = *iter1;
 
-			std::vector<Edge* > edges;
-			coface->getEdges(edges);
-
-			std::vector<CoEdge* > coface_coedges;
-			coface->getCoEdges(coface_coedges, false);
+			auto edges = coface->getEdges();
+			auto coface_coedges = coface->getCoEdges(false);
 
 			for (std::vector<Edge* >::iterator iter2 = edges.begin();
 					iter2 != edges.end(); ++iter2){
 
-				std::vector<CoEdge* > coedges;
-				(*iter2)->getCoEdges(coedges);
+				std::vector<CoEdge* > coedges = (*iter2)->getCoEdges();
 
 				for (std::vector<CoEdge* >::iterator iter3 = coedges.begin();
 						iter3 != coedges.end(); ++iter3)
@@ -1536,10 +1476,8 @@ constructRevolCoEdges(std::vector<CoFace*>& cofaces_0,
 
     for (; iter1_0 != cofaces_0.end(); ++iter1_0, ++iter1_1){
 
-        std::vector<Edge* > edges_0;
-        std::vector<Edge* > edges_1;
-        (*iter1_0)->getEdges(edges_0);
-        (*iter1_1)->getEdges(edges_1);
+        std::vector<Edge* > edges_0 = (*iter1_0)->getEdges();
+        std::vector<Edge* > edges_1 = (*iter1_1)->getEdges();
 
         if (edges_0.size() != edges_1.size())
             throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructRevolCoEdges avec des nombres de Edge différents", TkUtil::Charset::UTF_8));
@@ -1549,29 +1487,25 @@ constructRevolCoEdges(std::vector<CoFace*>& cofaces_0,
 
         for (; iter2_0 != edges_0.end(); ++iter2_0, ++iter2_1){
 
-            std::vector<CoEdge* > coedges_0;
-            std::vector<CoEdge* > coedges_1;
-            (*iter2_0)->getCoEdges(coedges_0);
-            (*iter2_1)->getCoEdges(coedges_1);
+            std::vector<CoEdge* > coedges_0 = (*iter2_0)->getCoEdges();
+            std::vector<CoEdge* > coedges_1 = (*iter2_1)->getCoEdges();
 
             if (coedges_0.size() != coedges_1.size())
                 throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructRevolCoEdges avec des nombres de CoEdge différents", TkUtil::Charset::UTF_8));
 
-            std::vector<CoEdge* >::iterator iter3_0 = coedges_0.begin();
-            std::vector<CoEdge* >::iterator iter3_1 = coedges_1.begin();
+            auto iter3_0 = coedges_0.begin();
+            auto iter3_1 = coedges_1.begin();
 
             for (; iter3_0 != coedges_0.end(); ++iter3_0, ++iter3_1){
 
-                std::vector<Vertex* > vertices_0;
-                std::vector<Vertex* > vertices_1;
-                (*iter3_0)->getVertices(vertices_0);
-                (*iter3_1)->getVertices(vertices_1);
+                const std::vector<Vertex* >& vertices_0 = (*iter3_0)->getVertices();
+                const std::vector<Vertex* >& vertices_1 = (*iter3_1)->getVertices();
 
                 if (vertices_0.size() != vertices_1.size())
                     throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructRevolCoEdges avec des nombres de Vertex différents", TkUtil::Charset::UTF_8));
 
-                std::vector<Vertex* >::iterator iter4_0 = vertices_0.begin();
-                std::vector<Vertex* >::iterator iter4_1 = vertices_1.begin();
+                auto iter4_0 = vertices_0.begin();
+                auto iter4_1 = vertices_1.begin();
 
                 for (; iter4_0 != vertices_0.end(); ++iter4_0, ++iter4_1){
                     Vertex* vtx0 = *iter4_0;
@@ -1592,14 +1526,11 @@ constructRevolCoEdges(std::vector<CoFace*>& cofaces_0,
                             uint nbBrasVersAxe = 0;
                             // pour cela on recherche les arêtes reliées à l'axe
                             {
-                                std::vector<CoEdge* > edges;
-                                vtx0->getCoEdges(edges);
                                 CoEdge* coedgeAxe = 0;
-                                for (std::vector<CoEdge* >::iterator iter=edges.begin();
-                                        iter != edges.end(); ++iter){
-                                    Vertex* vtxOpp = (*iter)->getOppositeVertex(vtx0);
+                                for (CoEdge* vtx0_ce : vtx0->getCoEdges()){
+                                    Vertex* vtxOpp = vtx0_ce->getOppositeVertex(vtx0);
                                     if (filtre_vertex[vtxOpp] == 12)
-                                        coedgeAxe = *iter;
+                                        coedgeAxe = vtx0_ce;
                                 }
                                 if (0 == coedgeAxe){
 									TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
@@ -1628,8 +1559,7 @@ constructRevolCoEdges(std::vector<CoFace*>& cofaces_0,
                             // recherche du nombre de bras entre ce sommet et le sommet vers l'axe
                             uint nbBrasVersOgrid = 0;
                             {
-                                std::vector<CoEdge* > edges;
-                                vtx0->getCoEdges(edges);
+                                std::vector<CoEdge* > edges = vtx0->getCoEdges();
                                 CoEdge* coedgeAxe = 0;
                                 for (std::vector<CoEdge* >::iterator iter=edges.begin();
                                         iter != edges.end(); ++iter){
@@ -1827,10 +1757,8 @@ constructRevolFaces(std::vector<CoFace*>& cofaces_0,
 
     for (; iter1_0 != cofaces_0.end(); ++iter1_0, ++iter1_1){
 
-        std::vector<Edge* > edges_0;
-        std::vector<Edge* > edges_1;
-        (*iter1_0)->getEdges(edges_0);
-        (*iter1_1)->getEdges(edges_1);
+        std::vector<Edge* > edges_0 = (*iter1_0)->getEdges();
+        std::vector<Edge* > edges_1 = (*iter1_1)->getEdges();
 
         if (edges_0.size() != edges_1.size())
             throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructRevolFaces avec des nombres de Edge différents", TkUtil::Charset::UTF_8));
@@ -1840,16 +1768,14 @@ constructRevolFaces(std::vector<CoFace*>& cofaces_0,
 
         for (; iter2_0 != edges_0.end(); ++iter2_0, ++iter2_1){
 
-            std::vector<CoEdge* > coedges_0;
-            std::vector<CoEdge* > coedges_1;
-            (*iter2_0)->getCoEdges(coedges_0);
-            (*iter2_1)->getCoEdges(coedges_1);
+            std::vector<CoEdge* > coedges_0 = (*iter2_0)->getCoEdges();
+            std::vector<CoEdge* > coedges_1 = (*iter2_1)->getCoEdges();
 
             if (coedges_0.size() != coedges_1.size())
                 throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructRevolFaces avec des nombres de CoEdge différents", TkUtil::Charset::UTF_8));
 
-            std::vector<CoEdge* >::iterator iter3_0 = coedges_0.begin();
-            std::vector<CoEdge* >::iterator iter3_1 = coedges_1.begin();
+            auto iter3_0 = coedges_0.begin();
+            auto iter3_1 = coedges_1.begin();
 
             for (; iter3_0 != coedges_0.end(); ++iter3_0, ++iter3_1){
                 CoEdge* coedge_0 = *iter3_0;
@@ -1862,10 +1788,8 @@ constructRevolFaces(std::vector<CoFace*>& cofaces_0,
                     if (ni_loc_coedge == 0)
                     	ni_loc_coedge = m_ni*facteur_ni;
 
-                    std::vector<Vertex* > vertices_0;
-                    std::vector<Vertex* > vertices_1;
-                    (*iter3_0)->getVertices(vertices_0);
-                    (*iter3_1)->getVertices(vertices_1);
+                    const std::vector<Vertex* >& vertices_0 = (*iter3_0)->getVertices();
+                    const std::vector<Vertex* >& vertices_1 = (*iter3_1)->getVertices();
 
                     if (vertices_0.size() != vertices_1.size())
                         throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructRevolFaces avec des nombres de Vertex différents", TkUtil::Charset::UTF_8));
@@ -2045,10 +1969,8 @@ constructRevolFacesInnerOgrid(std::vector<CoFace*>& cofaces_0,
 
     for (; iter1_0 != cofaces_0.end(); ++iter1_0, ++iter1_1){
 
-        std::vector<Edge* > edges_0;
-        std::vector<Edge* > edges_1;
-        (*iter1_0)->getEdges(edges_0);
-        (*iter1_1)->getEdges(edges_1);
+        std::vector<Edge* > edges_0 = (*iter1_0)->getEdges();
+        std::vector<Edge* > edges_1 = (*iter1_1)->getEdges();
 
         if (edges_0.size() != edges_1.size())
             throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructRevolFacesInnerOgrid avec des nombres de Edge différents", TkUtil::Charset::UTF_8));
@@ -2060,16 +1982,14 @@ constructRevolFacesInnerOgrid(std::vector<CoFace*>& cofaces_0,
 
         for (; iter2_0 != edges_0.end(); ++iter2_0, ++iter2_1){
 
-            std::vector<CoEdge* > coedges_0;
-            std::vector<CoEdge* > coedges_1;
-            (*iter2_0)->getCoEdges(coedges_0);
-            (*iter2_1)->getCoEdges(coedges_1);
+            std::vector<CoEdge* > coedges_0 = (*iter2_0)->getCoEdges();
+            std::vector<CoEdge* > coedges_1 = (*iter2_1)->getCoEdges();
 
             if (coedges_0.size() != coedges_1.size())
                 throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructRevolFacesInnerOgrid avec des nombres de CoEdge différents", TkUtil::Charset::UTF_8));
 
-            std::vector<CoEdge* >::iterator iter3_0 = coedges_0.begin();
-            std::vector<CoEdge* >::iterator iter3_1 = coedges_1.begin();
+            auto iter3_0 = coedges_0.begin();
+            auto iter3_1 = coedges_1.begin();
 
             for (; iter3_0 != coedges_0.end(); ++iter3_0, ++iter3_1){
                 CoEdge* coedge_0 = *iter3_0;
@@ -2078,10 +1998,8 @@ constructRevolFacesInnerOgrid(std::vector<CoFace*>& cofaces_0,
                 if (filtre_vu[coedge_0] == 0 && filtre_coedge[coedge_0] != 22){
                     filtre_vu[coedge_0] = 1;
 
-                    std::vector<Vertex* > vertices_0;
-                    std::vector<Vertex* > vertices_1;
-                    (*iter3_0)->getVertices(vertices_0);
-                    (*iter3_1)->getVertices(vertices_1);
+                    std::vector<Vertex* > vertices_0 = (*iter3_0)->getVertices();
+                    std::vector<Vertex* > vertices_1 = (*iter3_1)->getVertices();
 
                     if (vertices_0.size() != vertices_1.size())
                         throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructRevolFacesInnerOgrid avec des nombres de Vertex différents", TkUtil::Charset::UTF_8));
@@ -2640,11 +2558,11 @@ constructRevolBlocks(std::vector<CoFace*>& cofaces_0,
 #ifdef _DEBUG_REVOL
         //            std::cout<<" coface_0 : "<<*coface_0<<std::endl;
         //            std::cout<<" coface_1 : "<<*coface_1<<std::endl;
-        std::cout<<"coface_0->getNbEdges() = "<<coface_0->getNbEdges()<<std::endl;
-        std::cout<<"coface_1->getNbEdges() = "<<coface_1->getNbEdges()<<std::endl;
+        std::cout<<"coface_0->getEdges().size() = "<<coface_0->getEdges().size()<<std::endl;
+        std::cout<<"coface_1->getEdges().size() = "<<coface_1->getEdges().size()<<std::endl;
 #endif
-        if (!((coface_0->getNbEdges() == 4 && coface_1->getNbEdges() == 4)
-        		|| (coface_0->getNbEdges() == 3 && coface_1->getNbEdges() == 3)))
+        if (!((coface_0->getEdges().size() == 4 && coface_1->getEdges().size() == 4)
+        		|| (coface_0->getEdges().size() == 3 && coface_1->getEdges().size() == 3)))
         {
 			TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
         	messErr << "Erreur interne, la création d'un bloc ne peut se faire pour la face "<<coface_0->getName()
@@ -2655,9 +2573,10 @@ constructRevolBlocks(std::vector<CoFace*>& cofaces_0,
         // si l'une des arêtes est sur l'axe de symétrie,
         // alors il faudra adapter la création du bloc à la dégénérecence (la mettre en k_max)
         uint indDeg = 3; // cas dit normal, indice de l'arête qui porte la dég... s'il y a lieu
-        for (uint i=0; i<coface_0->getNbEdges(); i++){
-        	Edge* edge_0 = coface_0->getEdge(i);
-        	if (isOnAxis(edge_0->getVertex(0)) && isOnAxis(edge_0->getVertex(1)))
+        const std::vector<Edge*>& cf0_edges = coface_0->getEdges();
+        for (uint i=0; i<cf0_edges.size(); i++){
+        	Edge* edge_0 = cf0_edges[i];
+        	if (isOnAxis(edge_0->getVertices()[0]) && isOnAxis(edge_0->getVertices()[1]))
         		indDeg = i;
         }
         uint tabIndVtx[4] = {1, 2, 0, 3};
@@ -2699,21 +2618,21 @@ constructRevolBlocks(std::vector<CoFace*>& cofaces_0,
 #endif
 
         // on ordonne les sommets pour être compatible avec l'ordre pour le Block
-        vertices.push_back(coface_0->getVertex(tabIndVtx[0]));
-        vertices.push_back(coface_1->getVertex(tabIndVtx[0]));
-        vertices.push_back(coface_0->getVertex(tabIndVtx[1]));
-        vertices.push_back(coface_1->getVertex(tabIndVtx[1]));
-        vertices.push_back(coface_0->getVertex(tabIndVtx[2]));
-        if (coface_0->getNbEdges() == 4){
-        	if (vertices.back() != coface_1->getVertex(tabIndVtx[2]))
-        		vertices.push_back(coface_1->getVertex(tabIndVtx[2]));
-        	vertices.push_back(coface_0->getVertex(tabIndVtx[3]));
-        	if (vertices.back() != coface_1->getVertex(tabIndVtx[3]))
-        		vertices.push_back(coface_1->getVertex(tabIndVtx[3]));
+        vertices.push_back(coface_0->getVertices()[tabIndVtx[0]]);
+        vertices.push_back(coface_1->getVertices()[tabIndVtx[0]]);
+        vertices.push_back(coface_0->getVertices()[tabIndVtx[1]]);
+        vertices.push_back(coface_1->getVertices()[tabIndVtx[1]]);
+        vertices.push_back(coface_0->getVertices()[tabIndVtx[2]]);
+        if (coface_0->getEdges().size() == 4){
+        	if (vertices.back() != coface_1->getVertices()[tabIndVtx[2]])
+        		vertices.push_back(coface_1->getVertices()[tabIndVtx[2]]);
+        	vertices.push_back(coface_0->getVertices()[tabIndVtx[3]]);
+        	if (vertices.back() != coface_1->getVertices()[tabIndVtx[3]])
+        		vertices.push_back(coface_1->getVertices()[tabIndVtx[3]]);
         }
-        else if (filtre_vertex[coface_1->getVertex(tabIndVtx[2])] != 11)
+        else if (filtre_vertex[coface_1->getVertices()[tabIndVtx[2]]] != 11)
         	// cas d'un bloc dégénéré qui n'est pas sur l'axe
-        	vertices.push_back(coface_1->getVertex(tabIndVtx[2]));
+        	vertices.push_back(coface_1->getVertices()[tabIndVtx[2]]);
 
 #ifdef _DEBUG_REVOL
         std::cout<<" vertices pour bloc:";
@@ -2723,16 +2642,16 @@ constructRevolBlocks(std::vector<CoFace*>& cofaces_0,
 #endif
 
 
-        for (uint i=0; i<coface_0->getNbEdges(); i++){
+        for (uint i=0; i<coface_0->getEdges().size(); i++){
 
-        	Edge* edge_0 = coface_0->getEdge(tabIndFace[i]);
-        	Edge* edge_1 = coface_1->getEdge(tabIndFace[i]);
+        	Edge* edge_0 = coface_0->getEdges()[tabIndFace[i]];
+        	Edge* edge_1 = coface_1->getEdges()[tabIndFace[i]];
 
         	std::vector<Vertex* > face_vertices;
-        	Vertex* vtx0 = edge_0->getVertex(0);
-        	Vertex* vtx1 = edge_0->getVertex(1);
-        	Vertex* vtx2 = edge_1->getVertex(1);
-        	Vertex* vtx3 = edge_1->getVertex(0);
+        	Vertex* vtx0 = edge_0->getVertices()[0];
+        	Vertex* vtx1 = edge_0->getVertices()[1];
+        	Vertex* vtx2 = edge_1->getVertices()[1];
+        	Vertex* vtx3 = edge_1->getVertices()[0];
 
         	if (vtx1!=vtx2){
         		face_vertices.push_back(vtx0);
@@ -2749,9 +2668,7 @@ constructRevolBlocks(std::vector<CoFace*>& cofaces_0,
 
         	std::vector<CoFace* > face_cofaces;
 
-        	std::vector<CoEdge* > coedges_0;
-        	edge_0->getCoEdges(coedges_0);
-
+        	std::vector<CoEdge* > coedges_0 = edge_0->getCoEdges();
         	for (std::vector<CoEdge* >::iterator iter3 = coedges_0.begin();
         			iter3 != coedges_0.end(); ++iter3){
         		std::vector<CoFace* >& revol_cofaces = coedge2cofaces[*iter3];
@@ -2793,7 +2710,7 @@ constructRevolBlocks(std::vector<CoFace*>& cofaces_0,
 
         	} // end if (!face_cofaces.empty())
 
-        } // end for i<coface_0->getNbEdges()
+        } // end for i<coface_0->getEdges().size()
 
         Block* newBlock = new Topo::Block(getContext(), faces, vertices, true);
         getInfoCommand().addTopoInfoEntity(newBlock, Internal::InfoCommand::CREATED);
@@ -2872,15 +2789,15 @@ constructRevolBlocksInnerOgrid_4(std::vector<CoFace*>& cofaces_0,
 
             std::vector<Face* > faces;
             std::vector<Vertex* > vertices;
-            if (coface_0->getNbEdges() == 4)
+            if (coface_0->getEdges().size() == 4)
                 faces.resize(6);
             else
                 faces.resize(5);
 
             // recherche de l'indice de l'arête sur l'axe dans la coface,
             uint indEdgeNearAxe = 0;
-            for (uint i=0; i<coface_0->getNbEdges(); i++)
-                if (filtre_coedge[coface_0->getEdge(i)->getCoEdge(0)] >= 20)
+            for (uint i=0; i<coface_0->getEdges().size(); i++)
+                if (filtre_coedge[coface_0->getEdges()[i]->getCoEdges()[0]] >= 20)
                     indEdgeNearAxe = i;
 
             faces[0] = new Topo::Face(getContext(), coface_0);
@@ -2893,22 +2810,19 @@ constructRevolBlocksInnerOgrid_4(std::vector<CoFace*>& cofaces_0,
             getInfoCommand().addTopoInfoEntity(faces[0], Internal::InfoCommand::CREATED);
             getInfoCommand().addTopoInfoEntity(faces[2], Internal::InfoCommand::CREATED);
 
-            if (((coface_0->getNbEdges() == 4 && coface_45->getNbEdges() == 4 && coface_90->getNbEdges() == 4))
-                    || (coface_0->getNbEdges() == 3 && coface_45->getNbEdges() == 3 && coface_90->getNbEdges() == 3)) {
+            if (((coface_0->getEdges().size() == 4 && coface_45->getEdges().size() == 4 && coface_90->getEdges().size() == 4))
+                    || (coface_0->getEdges().size() == 3 && coface_45->getEdges().size() == 3 && coface_90->getEdges().size() == 3)) {
 
                 // on ordonne les Edges pour être compatible avec l'ordre des Face pour le Block
-                for (uint i=0; i<coface_0->getNbEdges(); i++){
+                for (uint i=0; i<coface_0->getEdges().size(); i++){
 
-                    Edge* edge_0 = coface_0->getEdge(tabIndArFace[indEdgeNearAxe][i]);
-                    Edge* edge_45 = coface_45->getEdge(tabIndArFace[indEdgeNearAxe][i]);
-                    Edge* edge_90 = coface_90->getEdge(tabIndArFace[indEdgeNearAxe][i]);
+                    Edge* edge_0 = coface_0->getEdges()[tabIndArFace[indEdgeNearAxe][i]];
+                    Edge* edge_45 = coface_45->getEdges()[tabIndArFace[indEdgeNearAxe][i]];
+                    Edge* edge_90 = coface_90->getEdges()[tabIndArFace[indEdgeNearAxe][i]];
 
-                    std::vector<CoEdge* > coedges_0;
-                    std::vector<CoEdge* > coedges_45;
-                    std::vector<CoEdge* > coedges_90;
-                    edge_0->getCoEdges(coedges_0);
-                    edge_45->getCoEdges(coedges_45);
-                    edge_90->getCoEdges(coedges_90);
+                    std::vector<CoEdge* > coedges_0 = edge_0->getCoEdges();
+                    std::vector<CoEdge* > coedges_45 = edge_45->getCoEdges();
+                    std::vector<CoEdge* > coedges_90 = edge_90->getCoEdges();
 
                     // pour la construction d'une face à partir d'une arête qui pointe sur plusieurs CoEdge
                     // cas de la face qui suit la révol, dans le cas d'un deto
@@ -2937,8 +2851,8 @@ constructRevolBlocksInnerOgrid_4(std::vector<CoFace*>& cofaces_0,
                         else if (filtre_coedge[*iter3_0] == 11)
                             nbFacesCreated = 2;
                         else if (filtre_coedge[*iter3_0] == 2){
-                            if (filtre_vertex[(*iter3_0)->getVertex(0)] == 6
-                                    || filtre_vertex[(*iter3_0)->getVertex(1)] == 6)
+                            if (filtre_vertex[(*iter3_0)->getVertices()[0]] == 6
+                                    || filtre_vertex[(*iter3_0)->getVertices()[1]] == 6)
                                 nbFacesCreated = 3;
                             else
                                 nbFacesCreated = 2;
@@ -2987,19 +2901,19 @@ constructRevolBlocksInnerOgrid_4(std::vector<CoFace*>& cofaces_0,
                             else {
                                 std::vector<Vertex* > face_vertices;
 
-                                face_vertices.push_back(edge_0->getVertex(0));
-                                face_vertices.push_back(edge_0->getVertex(1));
-                                face_vertices.push_back(edge_45->getVertex(1));
-                                face_vertices.push_back(edge_45->getVertex(0));
+                                face_vertices.push_back(edge_0->getVertices()[0]);
+                                face_vertices.push_back(edge_0->getVertices()[1]);
+                                face_vertices.push_back(edge_45->getVertices()[1]);
+                                face_vertices.push_back(edge_45->getVertices()[0]);
                                 faces[3] = new Topo::Face(getContext(), revol_cofaces_0, face_vertices, true);
 #ifdef _DEBUG_REVOL
                                 std::cout<<"Construction de la faces[3] "<<faces[3]->getName()<<std::endl;
 #endif
                                 face_vertices.clear();
-                                face_vertices.push_back(edge_45->getVertex(0));
-                                face_vertices.push_back(edge_45->getVertex(1));
-                                face_vertices.push_back(edge_90->getVertex(1));
-                                face_vertices.push_back(edge_90->getVertex(0));
+                                face_vertices.push_back(edge_45->getVertices()[0]);
+                                face_vertices.push_back(edge_45->getVertices()[1]);
+                                face_vertices.push_back(edge_90->getVertices()[1]);
+                                face_vertices.push_back(edge_90->getVertices()[0]);
 
                                 faces[1] = new Topo::Face(getContext(), revol_cofaces_45, face_vertices, true);
 #ifdef _DEBUG_REVOL
@@ -3035,19 +2949,19 @@ constructRevolBlocksInnerOgrid_4(std::vector<CoFace*>& cofaces_0,
 
                         // recherche de l'indice du sommet sur l'ogrid
                         uint indSomOnOgrid = 0;
-                        if (filtre_vertex[edge_0->getVertex(0)]%5 == 1)
+                        if (filtre_vertex[edge_0->getVertices()[0]]%5 == 1)
                             indSomOnOgrid = 0;
-                        else if (filtre_vertex[edge_0->getVertex(1)]%5 == 1) {
+                        else if (filtre_vertex[edge_0->getVertices()[1]]%5 == 1) {
                             indSomOnOgrid = 1;
                         } else {
                             std::cerr<<"Recherche sur le filtre pour l'arête "<<*edge_0<<std::endl;
                             throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructRevolBlocksInnerOgrid_4 ne trouve pas le sommet sur l'axe pour une Edge", TkUtil::Charset::UTF_8));
                         }
 
-                        face_vertices.push_back(edge_0->getVertex(indSomOnOgrid));
-                        face_vertices.push_back(edge_45->getVertex(indSomOnOgrid));
-                        face_vertices.push_back(edge_90->getVertex(indSomOnOgrid));
-                        face_vertices.push_back(edge_0->getVertex((indSomOnOgrid+1)%2));
+                        face_vertices.push_back(edge_0->getVertices()[indSomOnOgrid]);
+                        face_vertices.push_back(edge_45->getVertices()[indSomOnOgrid]);
+                        face_vertices.push_back(edge_90->getVertices()[indSomOnOgrid]);
+                        face_vertices.push_back(edge_0->getVertices()[(indSomOnOgrid+1)%2]);
 
                         faces[tabIndArToFace[i]] = new Topo::Face(getContext(), face_cofaces, face_vertices, true);
                         getInfoCommand().addTopoInfoEntity(faces[tabIndArToFace[i]], Internal::InfoCommand::CREATED);
@@ -3057,23 +2971,23 @@ constructRevolBlocksInnerOgrid_4(std::vector<CoFace*>& cofaces_0,
 
                     } // end else / if (coedges_0.size() == 1)
 
-                } // end for i<coface_0->getNbEdges()
+                } // end for i<coface_0->getEdges().size()
 
                 // on ordonne les sommets pour être compatible avec l'ordre pour le Block
-                vertices.push_back(coface_0->getVertex(tabIndSomFace[indEdgeNearAxe][0]));
-                vertices.push_back(coface_90->getVertex(tabIndSomFace[indEdgeNearAxe][1]));
-                vertices.push_back(coface_0->getVertex(tabIndSomFace[indEdgeNearAxe][1]));
-                vertices.push_back(coface_45->getVertex(tabIndSomFace[indEdgeNearAxe][1]));
+                vertices.push_back(coface_0->getVertices()[tabIndSomFace[indEdgeNearAxe][0]]);
+                vertices.push_back(coface_90->getVertices()[tabIndSomFace[indEdgeNearAxe][1]]);
+                vertices.push_back(coface_0->getVertices()[tabIndSomFace[indEdgeNearAxe][1]]);
+                vertices.push_back(coface_45->getVertices()[tabIndSomFace[indEdgeNearAxe][1]]);
 
-                if (coface_0->getNbEdges() == 3){
+                if (coface_0->getEdges().size() == 3){
                     // cas dégénéré (indEdgeNearAxe vaut 0 ou 2)
-                    vertices.push_back(coface_0->getVertex(tabIndSomFaceDeg[indEdgeNearAxe][2]));
+                    vertices.push_back(coface_0->getVertices()[tabIndSomFaceDeg[indEdgeNearAxe][2]]);
                 }
                 else {
-                    vertices.push_back(coface_0->getVertex(tabIndSomFace[indEdgeNearAxe][2]));
-                    vertices.push_back(coface_90->getVertex(tabIndSomFace[indEdgeNearAxe][3]));
-                    vertices.push_back(coface_0->getVertex(tabIndSomFace[indEdgeNearAxe][3]));
-                    vertices.push_back(coface_45->getVertex(tabIndSomFace[indEdgeNearAxe][3]));
+                    vertices.push_back(coface_0->getVertices()[tabIndSomFace[indEdgeNearAxe][2]]);
+                    vertices.push_back(coface_90->getVertices()[tabIndSomFace[indEdgeNearAxe][3]]);
+                    vertices.push_back(coface_0->getVertices()[tabIndSomFace[indEdgeNearAxe][3]]);
+                    vertices.push_back(coface_45->getVertices()[tabIndSomFace[indEdgeNearAxe][3]]);
                 }
 
                 Block* newBlock = new Topo::Block(getContext(), faces, vertices, true);
@@ -3095,20 +3009,22 @@ constructRevolBlocksInnerOgrid_4(std::vector<CoFace*>& cofaces_0,
 
             std::vector<Face* > faces;
             std::vector<Vertex* > vertices;
-            if (coface_0->getNbEdges() == 4)
+            if (coface_0->getEdges().size() == 4)
                 faces.resize(6);
             else
                 faces.resize(5);
 
             // recherche de l'indice de l'arête // et la plus proche dans le cas de la zone sous ogrid ne touchant pas l'axe (cas deto)
             uint indEdgeNearAxe = 0;
-            for (uint i=0; i<coface_0->getNbEdges(); i++)
-                if (filtre_vertex[coface_0->getEdge(i)->getCoEdge(0)->getVertex(0)] == 2
-                        && filtre_vertex[coface_0->getEdge(i)->getCoEdge(0)->getVertex(1)] == 2){
-                    //  if (coface_0->getNbEdges() == 3 && i == 2 && filtre_vertex[coface_0->getVertex(0)] == 11)
+            for (uint i=0; i<coface_0->getEdges().size(); i++) {
+                auto ce_vertices = coface_0->getEdges()[i]->getCoEdges()[0]->getVertices();
+                if (filtre_vertex[ce_vertices[0]] == 2
+                        && filtre_vertex[ce_vertices[1]] == 2){
+                    //  if (coface_0->getEdges().size() == 3 && i == 2 && filtre_vertex[coface_0->getVertices()[0]] == 11)
                     //     invVertexOrder = true;
                     indEdgeNearAxe = i;
                 }
+            }
 
 #ifdef _DEBUG_REVOL
             std::cout<<"indEdgeNearAxe = "<<indEdgeNearAxe<<std::endl;
@@ -3123,12 +3039,12 @@ constructRevolBlocksInnerOgrid_4(std::vector<CoFace*>& cofaces_0,
 
             // le 1er bloc
             {
-                vtx0 = coface_0->getVertex(tabIndSomFace[indEdgeNearAxe][0]);
-                vtx2 = coface_0->getVertex(tabIndSomFace[indEdgeNearAxe][1]);
-                vtx4 = coface_0->getVertex(tabIndSomFace[indEdgeNearAxe][2]);
-                vtx6 = coface_0->getVertex(tabIndSomFace[indEdgeNearAxe][3]);
-                vtx1 = coface_45->getVertex(tabIndSomFace[indEdgeNearAxe][0]);
-                vtx5 = coface_45->getVertex(tabIndSomFace[indEdgeNearAxe][2]);
+                vtx0 = coface_0->getVertices()[tabIndSomFace[indEdgeNearAxe][0]];
+                vtx2 = coface_0->getVertices()[tabIndSomFace[indEdgeNearAxe][1]];
+                vtx4 = coface_0->getVertices()[tabIndSomFace[indEdgeNearAxe][2]];
+                vtx6 = coface_0->getVertices()[tabIndSomFace[indEdgeNearAxe][3]];
+                vtx1 = coface_45->getVertices()[tabIndSomFace[indEdgeNearAxe][0]];
+                vtx5 = coface_45->getVertices()[tabIndSomFace[indEdgeNearAxe][2]];
 
 #ifdef _DEBUG_REVOL
                 std::cout<<"vtx0 = "<<vtx0->getName()<<std::endl;
@@ -3168,7 +3084,7 @@ constructRevolBlocksInnerOgrid_4(std::vector<CoFace*>& cofaces_0,
                 // récupération au passage des Edges pour la construction de la nouvelle face commune
                 std::vector<Edge*> edges_newcoface;
                 for (uint i=0; i<4; i++){
-                    CoEdge* coedge = coface_0->getEdge(tabIndArFace[indEdgeNearAxe][i])->getCoEdge(0);
+                    CoEdge* coedge = coface_0->getEdges()[tabIndArFace[indEdgeNearAxe][i]]->getCoEdges()[0];
                     CoFace* coface = coedge2cofaces[coedge][0];
                     faces[tabIndArToFace[i]] = new Topo::Face(getContext(), coface);
                     getInfoCommand().addTopoInfoEntity(faces[tabIndArToFace[i]], Internal::InfoCommand::CREATED);
@@ -3178,7 +3094,8 @@ constructRevolBlocksInnerOgrid_4(std::vector<CoFace*>& cofaces_0,
 #ifdef _DEBUG_REVOL
                     std::cout<<"Recherche de l'arête "<<edge->getName() << " dans la face "<<*coface<<std::endl;
 #endif
-                    edges_newcoface.push_back(coface->getEdge((coface->getIndex(edge)+2)%4));
+                    uint edge_index = Utils::getIndexOf(edge, coface->getEdges());
+                    edges_newcoface.push_back(coface->getEdges()[(edge_index+2)%4]);
                 }
 
                 newCoface = new Topo::CoFace(getContext(), edges_newcoface[0], edges_newcoface[2], edges_newcoface[1], edges_newcoface[3]);
@@ -3203,9 +3120,9 @@ constructRevolBlocksInnerOgrid_4(std::vector<CoFace*>& cofaces_0,
             // le deuxième bloc
             {
                 vtx6 = vtx7;
-                vtx7 = coface_45->getVertex(tabIndSomFace[indEdgeNearAxe][3]);
+                vtx7 = coface_45->getVertices()[tabIndSomFace[indEdgeNearAxe][3]];
                 vtx2 = vtx3;
-                vtx3 = coface_45->getVertex(tabIndSomFace[indEdgeNearAxe][1]);
+                vtx3 = coface_45->getVertices()[tabIndSomFace[indEdgeNearAxe][1]];
                 vtx4 = vtx5;
                 vtx0 = vtx1;
 
@@ -3251,7 +3168,7 @@ constructRevolBlocksInnerOgrid_4(std::vector<CoFace*>& cofaces_0,
 
                 // les faces 3 4 et 5
                 for (uint i=1; i<4; i++){
-                    CoEdge* coedge = coface_0->getEdge(tabIndArFace[indEdgeNearAxe][i])->getCoEdge(0);
+                    CoEdge* coedge = coface_0->getEdges()[tabIndArFace[indEdgeNearAxe][i]]->getCoEdges()[0];
                     CoFace* coface = coedge2cofaces[coedge][1];
                     faces[tabIndArToFace[i]] = new Topo::Face(getContext(), coface);
                     getInfoCommand().addTopoInfoEntity(faces[tabIndArToFace[i]], Internal::InfoCommand::CREATED);
@@ -3263,7 +3180,7 @@ constructRevolBlocksInnerOgrid_4(std::vector<CoFace*>& cofaces_0,
 
                 // la face 1
                 {
-                    CoEdge* coedge = coface_45->getEdge(tabIndArFace[indEdgeNearAxe][1])->getCoEdge(0);
+                    CoEdge* coedge = coface_45->getEdges()[tabIndArFace[indEdgeNearAxe][1]]->getCoEdges()[0];
                     CoFace* coface = coedge2cofaces[coedge][0];
                     faces[1] = new Topo::Face(getContext(), coface);
                     getInfoCommand().addTopoInfoEntity(faces[1], Internal::InfoCommand::CREATED);
@@ -3273,7 +3190,8 @@ constructRevolBlocksInnerOgrid_4(std::vector<CoFace*>& cofaces_0,
 #ifdef _DEBUG_REVOL
                     std::cout<<"Recherche de l'arête "<<edge->getName() << " dans la face "<<*coface<<std::endl;
 #endif
-                    edges_newcoface.push_back(coface->getEdge((coface->getIndex(edge)+2)%4));
+                    uint edge_index = Utils::getIndexOf(edge, coface->getEdges());
+                    edges_newcoface.push_back(coface->getEdges()[(edge_index+2)%4]);
                 }
 
                 // la face 2
@@ -3302,10 +3220,10 @@ constructRevolBlocksInnerOgrid_4(std::vector<CoFace*>& cofaces_0,
                 vtx3 = vtx1;
                 vtx2 = vtx0;
 
-                vtx0 = coface_90->getVertex(tabIndSomFace[indEdgeNearAxe][0]);
-                vtx1 = coface_90->getVertex(tabIndSomFace[indEdgeNearAxe][1]);
-                vtx4 = coface_90->getVertex(tabIndSomFace[indEdgeNearAxe][2]);
-                vtx5 = coface_90->getVertex(tabIndSomFace[indEdgeNearAxe][3]);
+                vtx0 = coface_90->getVertices()[tabIndSomFace[indEdgeNearAxe][0]];
+                vtx1 = coface_90->getVertices()[tabIndSomFace[indEdgeNearAxe][1]];
+                vtx4 = coface_90->getVertices()[tabIndSomFace[indEdgeNearAxe][2]];
+                vtx5 = coface_90->getVertices()[tabIndSomFace[indEdgeNearAxe][3]];
 
 #ifdef _DEBUG_REVOL
                 std::cout<<"vtx0 = "<<vtx0->getName()<<std::endl;
@@ -3329,14 +3247,14 @@ constructRevolBlocksInnerOgrid_4(std::vector<CoFace*>& cofaces_0,
 
                 // la face 0
                 {
-                    CoEdge* coedge = coface_45->getEdge(tabIndArFace[indEdgeNearAxe][0])->getCoEdge(0);
+                    CoEdge* coedge = coface_45->getEdges()[tabIndArFace[indEdgeNearAxe][0]]->getCoEdges()[0];
                     CoFace* coface = coedge2cofaces[coedge][0];
                     faces[0] = new Topo::Face(getContext(), coface);
                     getInfoCommand().addTopoInfoEntity(faces[0], Internal::InfoCommand::CREATED);
                 }
                 // la face 1
                 {
-                    CoEdge* coedge = coface_45->getEdge(tabIndArFace[indEdgeNearAxe][1])->getCoEdge(0);
+                    CoEdge* coedge = coface_45->getEdges()[tabIndArFace[indEdgeNearAxe][1]]->getCoEdges()[0];
                     CoFace* coface = coedge2cofaces[coedge][1];
                     faces[1] = new Topo::Face(getContext(), coface);
                     getInfoCommand().addTopoInfoEntity(faces[1], Internal::InfoCommand::CREATED);
@@ -3353,7 +3271,7 @@ constructRevolBlocksInnerOgrid_4(std::vector<CoFace*>& cofaces_0,
                 }
                 // les faces 4 et 5
                 for (uint i=2; i<4; i++){
-                    CoEdge* coedge = coface_0->getEdge(tabIndArFace[indEdgeNearAxe][i])->getCoEdge(0);
+                    CoEdge* coedge = coface_0->getEdges()[tabIndArFace[indEdgeNearAxe][i]]->getCoEdges()[0];
                     CoFace* coface = coedge2cofaces[coedge][2];
                     faces[tabIndArToFace[i]] = new Topo::Face(getContext(), coface);
                     getInfoCommand().addTopoInfoEntity(faces[tabIndArToFace[i]], Internal::InfoCommand::CREATED);
@@ -3441,15 +3359,15 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
 
             std::vector<Face* > faces;
             std::vector<Vertex* > vertices;
-            if (coface_0->getNbEdges() == 4)
+            if (coface_0->getEdges().size() == 4)
                 faces.resize(6);
             else
                 faces.resize(5);
 
             // recherche de l'indice de l'arête sur l'axe dans la coface,
             uint indEdgeNearAxe = 0;
-            for (uint i=0; i<coface_0->getNbEdges(); i++)
-                if (filtre_coedge[coface_0->getEdge(i)->getCoEdge(0)] >= 20)
+            for (uint i=0; i<coface_0->getEdges().size(); i++)
+                if (filtre_coedge[coface_0->getEdges()[i]->getCoEdges()[0]] >= 20)
                     indEdgeNearAxe = i;
 #ifdef _DEBUG_REVOL
             std::cout<<"indEdgeNearAxe = "<<indEdgeNearAxe<<std::endl;
@@ -3461,16 +3379,16 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
                 std::vector<CoFace* > face_cofaces;
                 face_cofaces.push_back(coface_0);
                 face_cofaces.push_back(coface_180);
-                if (coface_0->getNbEdges() == 4){
-                	face_vertices.push_back(coface_0->getVertex(tabIndSomFace[indEdgeNearAxe][1]));
-                	face_vertices.push_back(coface_0->getVertex(tabIndSomFace[indEdgeNearAxe][3]));
-                	face_vertices.push_back(coface_180->getVertex(tabIndSomFace[indEdgeNearAxe][3]));
-                	face_vertices.push_back(coface_180->getVertex(tabIndSomFace[indEdgeNearAxe][1]));
+                if (coface_0->getEdges().size() == 4){
+                	face_vertices.push_back(coface_0->getVertices()[tabIndSomFace[indEdgeNearAxe][1]]);
+                	face_vertices.push_back(coface_0->getVertices()[tabIndSomFace[indEdgeNearAxe][3]]);
+                	face_vertices.push_back(coface_180->getVertices()[tabIndSomFace[indEdgeNearAxe][3]]);
+                	face_vertices.push_back(coface_180->getVertices()[tabIndSomFace[indEdgeNearAxe][1]]);
                 }
                 else {
-                	face_vertices.push_back(coface_0->getVertex(tabIndSomFaceDeg[indEdgeNearAxe][2]));
-                	face_vertices.push_back(coface_0->getVertex(tabIndSomFaceDeg[indEdgeNearAxe][1]));
-                	face_vertices.push_back(coface_180->getVertex(tabIndSomFaceDeg[indEdgeNearAxe][1]));
+                	face_vertices.push_back(coface_0->getVertices()[tabIndSomFaceDeg[indEdgeNearAxe][2]]);
+                	face_vertices.push_back(coface_0->getVertices()[tabIndSomFaceDeg[indEdgeNearAxe][1]]);
+                	face_vertices.push_back(coface_180->getVertices()[tabIndSomFaceDeg[indEdgeNearAxe][1]]);
                 }
                 faces[0] = new Topo::Face(getContext(), face_cofaces, face_vertices, true);
 #ifdef _DEBUG_REVOL
@@ -3480,16 +3398,16 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
             }
 
             // Face 1 à 3
-            faces[1] = constructFaceWith1RevolCoFace(coface_45->getEdge(tabIndArFace[indEdgeNearAxe][1]),
+            faces[1] = constructFaceWith1RevolCoFace(coface_45->getEdges()[tabIndArFace[indEdgeNearAxe][1]],
                     coedge2cofaces);
-            faces[2] = constructFaceWith1RevolCoFace(coface_135->getEdge(tabIndArFace[indEdgeNearAxe][1]),
+            faces[2] = constructFaceWith1RevolCoFace(coface_135->getEdges()[tabIndArFace[indEdgeNearAxe][1]],
                     coedge2cofaces);
-            faces[3] = constructFaceWith1RevolCoFace(coface_0->getEdge(tabIndArFace[indEdgeNearAxe][1]),
+            faces[3] = constructFaceWith1RevolCoFace(coface_0->getEdges()[tabIndArFace[indEdgeNearAxe][1]],
                     coedge2cofaces);
             // Face 4
             {
-                Edge* edge = coface_0->getEdge(tabIndArFace[indEdgeNearAxe][2]);
-                if (edge->getNbCoEdges() == 1){
+                Edge* edge = coface_0->getEdges()[tabIndArFace[indEdgeNearAxe][2]];
+                if (edge->getCoEdges().size() == 1){
                     faces[4] = constructFaceWith1RevolCoFace(edge, coedge2cofaces);
                     // prise en compte de la semi-conformité
                     computeFaceRatio(faces[4] , 0, ni_loc_coface);
@@ -3497,16 +3415,16 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
                 }
                 else
                     faces[4] = constructFaceWithRevolCoFaces(edge, coedge2cofaces,
-                            coface_0->getVertex(tabIndSomFace[indEdgeNearAxe][1]),
-                            coface_45->getVertex(tabIndSomFace[indEdgeNearAxe][1]),
-                            coface_135->getVertex(tabIndSomFace[indEdgeNearAxe][1]),
-                            coface_180->getVertex(tabIndSomFace[indEdgeNearAxe][1]));
+                            coface_0->getVertices()[tabIndSomFace[indEdgeNearAxe][1]],
+                            coface_45->getVertices()[tabIndSomFace[indEdgeNearAxe][1]],
+                            coface_135->getVertices()[tabIndSomFace[indEdgeNearAxe][1]],
+                            coface_180->getVertices()[tabIndSomFace[indEdgeNearAxe][1]]);
             }
 
             // Face 5
-            if (coface_0->getNbEdges() == 4) {
-                Edge* edge = coface_0->getEdge(tabIndArFace[indEdgeNearAxe][3]);
-                if (edge->getNbCoEdges() == 1){
+            if (coface_0->getEdges().size() == 4) {
+                Edge* edge = coface_0->getEdges()[tabIndArFace[indEdgeNearAxe][3]];
+                if (edge->getCoEdges().size() == 1){
                     faces[5] = constructFaceWith1RevolCoFace(edge, coedge2cofaces);
                     // prise en compte de la semi-conformité
                     computeFaceRatio(faces[5] , 0, ni_loc_coface);
@@ -3514,27 +3432,27 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
                 }
                 else
                     faces[5] = constructFaceWithRevolCoFaces(edge, coedge2cofaces,
-                            coface_0->getVertex(tabIndSomFace[indEdgeNearAxe][3]),
-                            coface_45->getVertex(tabIndSomFace[indEdgeNearAxe][3]),
-                            coface_135->getVertex(tabIndSomFace[indEdgeNearAxe][3]),
-                            coface_180->getVertex(tabIndSomFace[indEdgeNearAxe][3]));
+                            coface_0->getVertices()[tabIndSomFace[indEdgeNearAxe][3]],
+                            coface_45->getVertices()[tabIndSomFace[indEdgeNearAxe][3]],
+                            coface_135->getVertices()[tabIndSomFace[indEdgeNearAxe][3]],
+                            coface_180->getVertices()[tabIndSomFace[indEdgeNearAxe][3]]);
             }
 
             // Sommets ordonnés pour être compatible avec l'ordre pour le Block
-            vertices.push_back(coface_180->getVertex(tabIndSomFace[indEdgeNearAxe][1]));
-            vertices.push_back(coface_135->getVertex(tabIndSomFace[indEdgeNearAxe][1]));
-            vertices.push_back(coface_0->getVertex(tabIndSomFace[indEdgeNearAxe][1]));
-            vertices.push_back(coface_45->getVertex(tabIndSomFace[indEdgeNearAxe][1]));
+            vertices.push_back(coface_180->getVertices()[tabIndSomFace[indEdgeNearAxe][1]]);
+            vertices.push_back(coface_135->getVertices()[tabIndSomFace[indEdgeNearAxe][1]]);
+            vertices.push_back(coface_0->getVertices()[tabIndSomFace[indEdgeNearAxe][1]]);
+            vertices.push_back(coface_45->getVertices()[tabIndSomFace[indEdgeNearAxe][1]]);
 
 
-            if (coface_0->getNbEdges() == 4){
-                vertices.push_back(coface_180->getVertex(tabIndSomFace[indEdgeNearAxe][3]));
-                vertices.push_back(coface_135->getVertex(tabIndSomFace[indEdgeNearAxe][3]));
-                vertices.push_back(coface_0->getVertex(tabIndSomFace[indEdgeNearAxe][3]));
-                vertices.push_back(coface_45->getVertex(tabIndSomFace[indEdgeNearAxe][3]));
+            if (coface_0->getEdges().size() == 4){
+                vertices.push_back(coface_180->getVertices()[tabIndSomFace[indEdgeNearAxe][3]]);
+                vertices.push_back(coface_135->getVertices()[tabIndSomFace[indEdgeNearAxe][3]]);
+                vertices.push_back(coface_0->getVertices()[tabIndSomFace[indEdgeNearAxe][3]]);
+                vertices.push_back(coface_45->getVertices()[tabIndSomFace[indEdgeNearAxe][3]]);
             }
             else{
-            	vertices.push_back(coface_0->getVertex(tabIndSomFaceDeg[indEdgeNearAxe][2]));
+            	vertices.push_back(coface_0->getVertices()[tabIndSomFaceDeg[indEdgeNearAxe][2]]);
             }
 
             // Block (unique)
@@ -3553,17 +3471,17 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
 
             std::vector<Face* > faces;
             std::vector<Vertex* > vertices;
-            if (coface_0->getNbEdges() == 4)
+            if (coface_0->getEdges().size() == 4)
                 faces.resize(6);
             else
                 faces.resize(5);
 
             // recherche de l'indice de l'arête // et la plus proche dans le cas de la zone sous ogrid ne touchant pas l'axe (cas deto)
             uint indEdgeNearAxe = 0;
-            for (uint i=0; i<coface_0->getNbEdges(); i++)
-                if (filtre_vertex[coface_0->getEdge(i)->getCoEdge(0)->getVertex(0)] == 2
-                        && filtre_vertex[coface_0->getEdge(i)->getCoEdge(0)->getVertex(1)] == 2){
-                    //  if (coface_0->getNbEdges() == 3 && i == 2 && filtre_vertex[coface_0->getVertex(0)] == 11)
+            for (uint i=0; i<coface_0->getEdges().size(); i++)
+                if (filtre_vertex[coface_0->getEdges()[i]->getCoEdges()[0]->getVertices()[0]] == 2
+                        && filtre_vertex[coface_0->getEdges()[i]->getCoEdges()[0]->getVertices()[1]] == 2){
+                    //  if (coface_0->getEdges().size() == 3 && i == 2 && filtre_vertex[coface_0->getVertices()[0]] == 11)
                     //     invVertexOrder = true;
                     indEdgeNearAxe = i;
                 }
@@ -3581,12 +3499,12 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
 
             // le 1er bloc
             {
-                vtx0 = coface_0->getVertex(tabIndSomFace[indEdgeNearAxe][0]);
-                vtx2 = coface_0->getVertex(tabIndSomFace[indEdgeNearAxe][1]);
-                vtx4 = coface_0->getVertex(tabIndSomFace[indEdgeNearAxe][2]);
-                vtx6 = coface_0->getVertex(tabIndSomFace[indEdgeNearAxe][3]);
-                vtx1 = coface_45->getVertex(tabIndSomFace[indEdgeNearAxe][0]);
-                vtx5 = coface_45->getVertex(tabIndSomFace[indEdgeNearAxe][2]);
+                vtx0 = coface_0->getVertices()[tabIndSomFace[indEdgeNearAxe][0]];
+                vtx2 = coface_0->getVertices()[tabIndSomFace[indEdgeNearAxe][1]];
+                vtx4 = coface_0->getVertices()[tabIndSomFace[indEdgeNearAxe][2]];
+                vtx6 = coface_0->getVertices()[tabIndSomFace[indEdgeNearAxe][3]];
+                vtx1 = coface_45->getVertices()[tabIndSomFace[indEdgeNearAxe][0]];
+                vtx5 = coface_45->getVertices()[tabIndSomFace[indEdgeNearAxe][2]];
 
 #ifdef _DEBUG_REVOL
                 std::cout<<"vtx0 = "<<vtx0->getName()<<std::endl;
@@ -3626,7 +3544,7 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
                 // récupération au passage des Edges pour la construction de la nouvelle face commune
                 std::vector<Edge*> edges_newcoface;
                 for (uint i=0; i<4; i++){
-                    CoEdge* coedge = coface_0->getEdge(tabIndArFace[indEdgeNearAxe][i])->getCoEdge(0);
+                    CoEdge* coedge = coface_0->getEdges()[tabIndArFace[indEdgeNearAxe][i]]->getCoEdges()[0];
                     CoFace* coface = coedge2cofaces[coedge][0];
                     faces[tabIndArToFace[i]] = new Topo::Face(getContext(), coface);
                     getInfoCommand().addTopoInfoEntity(faces[tabIndArToFace[i]], Internal::InfoCommand::CREATED);
@@ -3636,7 +3554,8 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
 #ifdef _DEBUG_REVOL
                     std::cout<<"Recherche de l'arête "<<edge->getName() << " dans la face "<<*coface<<std::endl;
 #endif
-                    edges_newcoface.push_back(coface->getEdge((coface->getIndex(edge)+2)%4));
+                    uint edge_index = Utils::getIndexOf(edge, coface->getEdges());
+                    edges_newcoface.push_back(coface->getEdges()[(edge_index+2)%4]);
                 }
 
                 newCoface = new Topo::CoFace(getContext(), edges_newcoface[0], edges_newcoface[2], edges_newcoface[1], edges_newcoface[3]);
@@ -3661,9 +3580,9 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
             // le deuxième bloc
             {
                 vtx6 = vtx7;
-                vtx7 = coface_45->getVertex(tabIndSomFace[indEdgeNearAxe][3]);
+                vtx7 = coface_45->getVertices()[tabIndSomFace[indEdgeNearAxe][3]];
                 vtx2 = vtx3;
-                vtx3 = coface_45->getVertex(tabIndSomFace[indEdgeNearAxe][1]);
+                vtx3 = coface_45->getVertices()[tabIndSomFace[indEdgeNearAxe][1]];
                 vtx4 = vtx5;
                 vtx0 = vtx1;
 
@@ -3712,7 +3631,7 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
 
                 // les faces 3 4 et 5
                 for (uint i=1; i<4; i++){
-                    CoEdge* coedge = coface_0->getEdge(tabIndArFace[indEdgeNearAxe][i])->getCoEdge(0);
+                    CoEdge* coedge = coface_0->getEdges()[tabIndArFace[indEdgeNearAxe][i]]->getCoEdges()[0];
                     CoFace* coface = coedge2cofaces[coedge][1];
                     faces[tabIndArToFace[i]] = new Topo::Face(getContext(), coface);
                     getInfoCommand().addTopoInfoEntity(faces[tabIndArToFace[i]], Internal::InfoCommand::CREATED);
@@ -3724,7 +3643,7 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
 
                 // la face 1
                 {
-                    CoEdge* coedge = coface_45->getEdge(tabIndArFace[indEdgeNearAxe][1])->getCoEdge(0);
+                    CoEdge* coedge = coface_45->getEdges()[tabIndArFace[indEdgeNearAxe][1]]->getCoEdges()[0];
                     CoFace* coface = coedge2cofaces[coedge][0];
                     faces[1] = new Topo::Face(getContext(), coface);
                     getInfoCommand().addTopoInfoEntity(faces[1], Internal::InfoCommand::CREATED);
@@ -3734,7 +3653,8 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
 #ifdef _DEBUG_REVOL
                     std::cout<<"Recherche de l'arête "<<edge->getName() << " dans la face "<<*coface<<std::endl;
 #endif
-                    edges_newcoface.push_back(coface->getEdge((coface->getIndex(edge)+2)%4));
+                    uint edge_index = Utils::getIndexOf(edge, coface->getEdges());
+                    edges_newcoface.push_back(coface->getEdges()[(edge_index+2)%4]);
                 }
 
                 // la face 2
@@ -3768,8 +3688,8 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
                 vtx3 = vtx1;
                 vtx2 = vtx0;
 
-                vtx0 = coface_135->getVertex(tabIndSomFace[indEdgeNearAxe][0]);
-                vtx4 = coface_135->getVertex(tabIndSomFace[indEdgeNearAxe][2]);
+                vtx0 = coface_135->getVertices()[tabIndSomFace[indEdgeNearAxe][0]];
+                vtx4 = coface_135->getVertices()[tabIndSomFace[indEdgeNearAxe][2]];
 
                 std::vector<CoEdge* > &coedges0 = vtx2coedges[vtx3B2];
                 if (coedges0.size() != 3)
@@ -3803,14 +3723,14 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
 
                 // la face 0
                 {
-                    CoEdge* coedge = coface_45->getEdge(tabIndArFace[indEdgeNearAxe][0])->getCoEdge(0);
+                    CoEdge* coedge = coface_45->getEdges()[tabIndArFace[indEdgeNearAxe][0]]->getCoEdges()[0];
                     CoFace* coface = coedge2cofaces[coedge][0];
                     faces[0] = new Topo::Face(getContext(), coface);
                     getInfoCommand().addTopoInfoEntity(faces[0], Internal::InfoCommand::CREATED);
                 }
                 // la face 1
                 {
-                    CoEdge* coedge = coface_45->getEdge(tabIndArFace[indEdgeNearAxe][1])->getCoEdge(0);
+                    CoEdge* coedge = coface_45->getEdges()[tabIndArFace[indEdgeNearAxe][1]]->getCoEdges()[0];
                     CoFace* coface = coedge2cofaces[coedge][1];
                     faces[1] = new Topo::Face(getContext(), coface);
                     getInfoCommand().addTopoInfoEntity(faces[1], Internal::InfoCommand::CREATED);
@@ -3822,7 +3742,7 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
                 }
                 // les faces 4 et 5
                 for (uint i=2; i<4; i++){
-                    CoEdge* coedge = coface_0->getEdge(tabIndArFace[indEdgeNearAxe][i])->getCoEdge(0);
+                    CoEdge* coedge = coface_0->getEdges()[tabIndArFace[indEdgeNearAxe][i]]->getCoEdges()[0];
                     CoFace* coface = coedge2cofaces[coedge][2];
                     faces[tabIndArToFace[i]] = new Topo::Face(getContext(), coface);
                     getInfoCommand().addTopoInfoEntity(faces[tabIndArToFace[i]], Internal::InfoCommand::CREATED);
@@ -3860,8 +3780,8 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
                 vtx3 = vtx1;
                 vtx2 = vtx0;
 
-                vtx1 = coface_135->getVertex(tabIndSomFace[indEdgeNearAxe][1]);
-                vtx5 = coface_135->getVertex(tabIndSomFace[indEdgeNearAxe][3]);
+                vtx1 = coface_135->getVertices()[tabIndSomFace[indEdgeNearAxe][1]];
+                vtx5 = coface_135->getVertices()[tabIndSomFace[indEdgeNearAxe][3]];
 
                 std::vector<CoEdge* > &coedges0 = vtx2coedges[vtx1];
                 if (coedges0.size() != 2)
@@ -3899,14 +3819,14 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
 
                 // la face 1
                 {
-                    CoEdge* coedge = coface_45->getEdge(tabIndArFace[indEdgeNearAxe][1])->getCoEdge(0);
+                    CoEdge* coedge = coface_45->getEdges()[tabIndArFace[indEdgeNearAxe][1]]->getCoEdges()[0];
                     CoFace* coface = coedge2cofaces[coedge][2];
                     faces[1] = new Topo::Face(getContext(), coface);
                     getInfoCommand().addTopoInfoEntity(faces[1], Internal::InfoCommand::CREATED);
                 }
                 // la face 2
                 {
-                    CoEdge* coedge = coface_135->getEdge(tabIndArFace[indEdgeNearAxe][1])->getCoEdge(0);
+                    CoEdge* coedge = coface_135->getEdges()[tabIndArFace[indEdgeNearAxe][1]]->getCoEdges()[0];
                     CoFace* coface = coedge2cofaces[coedge][0];
                     faces[2] = new Topo::Face(getContext(), coface);
                     getInfoCommand().addTopoInfoEntity(faces[2], Internal::InfoCommand::CREATED);
@@ -3918,7 +3838,7 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
                 }
                 // les faces 4 et 5
                 for (uint i=2; i<4; i++){
-                    CoEdge* coedge = coface_0->getEdge(tabIndArFace[indEdgeNearAxe][i])->getCoEdge(0);
+                    CoEdge* coedge = coface_0->getEdges()[tabIndArFace[indEdgeNearAxe][i]]->getCoEdges()[0];
                     CoFace* coface = coedge2cofaces[coedge][3];
                     faces[tabIndArToFace[i]] = new Topo::Face(getContext(), coface);
                     getInfoCommand().addTopoInfoEntity(faces[tabIndArToFace[i]], Internal::InfoCommand::CREATED);
@@ -3956,10 +3876,10 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
                 vtx1 = vtx0;
                 vtx5 = vtx4;
 
-                vtx0 = coface_180->getVertex(tabIndSomFace[indEdgeNearAxe][1]);
-                vtx2 = coface_180->getVertex(tabIndSomFace[indEdgeNearAxe][0]);
-                vtx4 = coface_180->getVertex(tabIndSomFace[indEdgeNearAxe][3]);
-                vtx6 = coface_180->getVertex(tabIndSomFace[indEdgeNearAxe][2]);
+                vtx0 = coface_180->getVertices()[tabIndSomFace[indEdgeNearAxe][1]];
+                vtx2 = coface_180->getVertices()[tabIndSomFace[indEdgeNearAxe][0]];
+                vtx4 = coface_180->getVertices()[tabIndSomFace[indEdgeNearAxe][3]];
+                vtx6 = coface_180->getVertices()[tabIndSomFace[indEdgeNearAxe][2]];
 
 #ifdef _DEBUG_REVOL
                 std::cout<<"vtx0 = "<<vtx0->getName()<<std::endl;
@@ -3995,14 +3915,14 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
                 }
                 // la face 2
                 {
-                    CoEdge* coedge = coface_135->getEdge(tabIndArFace[indEdgeNearAxe][1])->getCoEdge(0);
+                    CoEdge* coedge = coface_135->getEdges()[tabIndArFace[indEdgeNearAxe][1]]->getCoEdges()[0];
                     CoFace* coface = coedge2cofaces[coedge][1];
                     faces[2] = new Topo::Face(getContext(), coface);
                     getInfoCommand().addTopoInfoEntity(faces[2], Internal::InfoCommand::CREATED);
                 }
                 // la face 3
                 {
-                    CoEdge* coedge = coface_135->getEdge(tabIndArFace[indEdgeNearAxe][0])->getCoEdge(0);
+                    CoEdge* coedge = coface_135->getEdges()[tabIndArFace[indEdgeNearAxe][0]]->getCoEdges()[0];
                     CoFace* coface = coedge2cofaces[coedge][0];
                     faces[3] = new Topo::Face(getContext(), coface);
                     getInfoCommand().addTopoInfoEntity(faces[3], Internal::InfoCommand::CREATED);
@@ -4010,7 +3930,7 @@ constructRevolBlocksInnerOgrid_2(std::vector<CoFace*>& cofaces_0,
 
                 // les faces 4 et 5
                 for (uint i=2; i<4; i++){
-                    CoEdge* coedge = coface_0->getEdge(tabIndArFace[indEdgeNearAxe][i])->getCoEdge(0);
+                    CoEdge* coedge = coface_0->getEdges()[tabIndArFace[indEdgeNearAxe][i]]->getCoEdges()[0];
                     CoFace* coface = coedge2cofaces[coedge][4];
                     faces[tabIndArToFace[i]] = new Topo::Face(getContext(), coface);
                     getInfoCommand().addTopoInfoEntity(faces[tabIndArToFace[i]], Internal::InfoCommand::CREATED);
@@ -4099,74 +4019,74 @@ constructRevolBlocksInnerOgrid_1(std::vector<CoFace*>& cofaces_45,
 
             std::vector<Face* > faces;
             std::vector<Vertex* > vertices;
-            if (coface_45->getNbEdges() == 4)
+            if (coface_45->getEdges().size() == 4)
                 faces.resize(6);
             else
                 faces.resize(5);
 
             // recherche de l'indice de l'arête sur l'axe dans la coface,
             uint indEdgeNearAxe = 0;
-            for (uint i=0; i<coface_45->getNbEdges(); i++)
-                if (filtre_coedge[coface_45->getEdge(i)->getCoEdge(0)] >= 20)
+            for (uint i=0; i<coface_45->getEdges().size(); i++)
+                if (filtre_coedge[coface_45->getEdges()[i]->getCoEdges()[0]] >= 20)
                     indEdgeNearAxe = i;
 #ifdef _DEBUG_REVOL
             std::cout<<"indEdgeNearAxe = "<<indEdgeNearAxe<<std::endl;
 #endif
 
             // Face 0 1 2 et 3
-            faces[0] = constructFaceWith1RevolCoFace(coface_45->getEdge(tabIndArFace[indEdgeNearAxe][1]),
+            faces[0] = constructFaceWith1RevolCoFace(coface_45->getEdges()[tabIndArFace[indEdgeNearAxe][1]],
                     coedge2cofaces);
-            faces[3] = constructFaceWith1RevolCoFace(coface_135->getEdge(tabIndArFace[indEdgeNearAxe][1]),
+            faces[3] = constructFaceWith1RevolCoFace(coface_135->getEdges()[tabIndArFace[indEdgeNearAxe][1]],
                     coedge2cofaces);
-            faces[1] = constructFaceWith1RevolCoFace(coface_225->getEdge(tabIndArFace[indEdgeNearAxe][1]),
+            faces[1] = constructFaceWith1RevolCoFace(coface_225->getEdges()[tabIndArFace[indEdgeNearAxe][1]],
                     coedge2cofaces);
-            faces[2] = constructFaceWith1RevolCoFace(coface_315->getEdge(tabIndArFace[indEdgeNearAxe][1]),
+            faces[2] = constructFaceWith1RevolCoFace(coface_315->getEdges()[tabIndArFace[indEdgeNearAxe][1]],
                     coedge2cofaces);
             // Face 4
             {
-            	Edge* edge = coface_45->getEdge(tabIndArFace[indEdgeNearAxe][2]);
-            	if (edge->getNbCoEdges() == 1){
+            	Edge* edge = coface_45->getEdges()[tabIndArFace[indEdgeNearAxe][2]];
+            	if (edge->getCoEdges().size() == 1){
             		faces[4] = constructFaceWith1RevolCoFace(edge, coedge2cofaces);
             		// prise en compte de la semi-conformité
             		computeFaceRatio(faces[4] , 2, ni_loc_coface*2);
             	}
             	else
             		faces[4] = constructFaceWithRevolCoFaces(edge, coedge2cofaces,
-            				coface_45->getVertex(tabIndSomFace[indEdgeNearAxe][1]),
-            				coface_135->getVertex(tabIndSomFace[indEdgeNearAxe][1]),
-            				coface_225->getVertex(tabIndSomFace[indEdgeNearAxe][1]),
-            				coface_315->getVertex(tabIndSomFace[indEdgeNearAxe][1]));
+            				coface_45->getVertices()[tabIndSomFace[indEdgeNearAxe][1]],
+            				coface_135->getVertices()[tabIndSomFace[indEdgeNearAxe][1]],
+            				coface_225->getVertices()[tabIndSomFace[indEdgeNearAxe][1]],
+            				coface_315->getVertices()[tabIndSomFace[indEdgeNearAxe][1]]);
             }
 
             // Face 5
-            if (coface_45->getNbEdges() == 4) {
-            	Edge* edge = coface_45->getEdge(tabIndArFace[indEdgeNearAxe][3]);
-            	if (edge->getNbCoEdges() == 1){
+            if (coface_45->getEdges().size() == 4) {
+            	Edge* edge = coface_45->getEdges()[tabIndArFace[indEdgeNearAxe][3]];
+            	if (edge->getCoEdges().size() == 1){
             		faces[5] = constructFaceWith1RevolCoFace(edge, coedge2cofaces);
             		// prise en compte de la semi-conformité
             		computeFaceRatio(faces[5] , 2, ni_loc_coface*2);
             	}
             	else
                     faces[5] = constructFaceWithRevolCoFaces(edge, coedge2cofaces,
-                            coface_45->getVertex(tabIndSomFace[indEdgeNearAxe][3]),
-                            coface_135->getVertex(tabIndSomFace[indEdgeNearAxe][3]),
-                            coface_225->getVertex(tabIndSomFace[indEdgeNearAxe][3]),
-                            coface_315->getVertex(tabIndSomFace[indEdgeNearAxe][3]));
+                            coface_45->getVertices()[tabIndSomFace[indEdgeNearAxe][3]],
+                            coface_135->getVertices()[tabIndSomFace[indEdgeNearAxe][3]],
+                            coface_225->getVertices()[tabIndSomFace[indEdgeNearAxe][3]],
+                            coface_315->getVertices()[tabIndSomFace[indEdgeNearAxe][3]]);
             }
 
             // Sommets ordonnés pour être compatible avec l'ordre pour le Block
-            vertices.push_back(coface_45->getVertex(tabIndSomFace[indEdgeNearAxe][1]));
-            vertices.push_back(coface_315->getVertex(tabIndSomFace[indEdgeNearAxe][1]));
-            vertices.push_back(coface_135->getVertex(tabIndSomFace[indEdgeNearAxe][1]));
-            vertices.push_back(coface_225->getVertex(tabIndSomFace[indEdgeNearAxe][1]));
-            if (coface_45->getNbEdges() == 4){
-                vertices.push_back(coface_45->getVertex(tabIndSomFace[indEdgeNearAxe][3]));
-                vertices.push_back(coface_315->getVertex(tabIndSomFace[indEdgeNearAxe][3]));
-                vertices.push_back(coface_135->getVertex(tabIndSomFace[indEdgeNearAxe][3]));
-                vertices.push_back(coface_225->getVertex(tabIndSomFace[indEdgeNearAxe][3]));
+            vertices.push_back(coface_45->getVertices()[tabIndSomFace[indEdgeNearAxe][1]]);
+            vertices.push_back(coface_315->getVertices()[tabIndSomFace[indEdgeNearAxe][1]]);
+            vertices.push_back(coface_135->getVertices()[tabIndSomFace[indEdgeNearAxe][1]]);
+            vertices.push_back(coface_225->getVertices()[tabIndSomFace[indEdgeNearAxe][1]]);
+            if (coface_45->getEdges().size() == 4){
+                vertices.push_back(coface_45->getVertices()[tabIndSomFace[indEdgeNearAxe][3]]);
+                vertices.push_back(coface_315->getVertices()[tabIndSomFace[indEdgeNearAxe][3]]);
+                vertices.push_back(coface_135->getVertices()[tabIndSomFace[indEdgeNearAxe][3]]);
+                vertices.push_back(coface_225->getVertices()[tabIndSomFace[indEdgeNearAxe][3]]);
             }
             else
-                vertices.push_back(coface_45->getVertex(tabIndSomFaceDeg[indEdgeNearAxe][2]));
+                vertices.push_back(coface_45->getVertices()[tabIndSomFaceDeg[indEdgeNearAxe][2]]);
 
             // Block (unique)
             Block* newBlock = new Topo::Block(getContext(), faces, vertices, true);
@@ -4184,18 +4104,20 @@ constructRevolBlocksInnerOgrid_1(std::vector<CoFace*>& cofaces_45,
 
             std::vector<Face* > faces;
             std::vector<Vertex* > vertices;
-            if (coface_45->getNbEdges() == 4)
+            if (coface_45->getEdges().size() == 4)
                 faces.resize(6);
             else
                 faces.resize(5);
 
             // recherche de l'indice de l'arête // et la plus proche dans le cas de la zone sous ogrid ne touchant pas l'axe (cas deto)
             uint indEdgeNearAxe = 0;
-            for (uint i=0; i<coface_45->getNbEdges(); i++)
-                if (filtre_vertex[coface_45->getEdge(i)->getCoEdge(0)->getVertex(0)] == 2
-                        && filtre_vertex[coface_45->getEdge(i)->getCoEdge(0)->getVertex(1)] == 2){
+            for (uint i=0; i<coface_45->getEdges().size(); i++) {
+                auto vertices = coface_45->getEdges()[i]->getCoEdges()[0]->getVertices();
+                if (filtre_vertex[vertices[0]] == 2
+                        && filtre_vertex[vertices[1]] == 2){
                     indEdgeNearAxe = i;
                 }
+            }
 
 #ifdef _DEBUG_REVOL
             std::cout<<"indEdgeNearAxe = "<<indEdgeNearAxe<<std::endl;
@@ -4211,10 +4133,10 @@ constructRevolBlocksInnerOgrid_1(std::vector<CoFace*>& cofaces_45,
             // inuitialisation de vtx 1 4 5 3 et 7
             // création d'une première newCoface (à mettre de côté)
             {
-                vtx7 = coface_45->getVertex(tabIndSomFace[indEdgeNearAxe][3]);
-                vtx3 = coface_45->getVertex(tabIndSomFace[indEdgeNearAxe][1]);
-                vtx4 = coface_45->getVertex(tabIndSomFace[indEdgeNearAxe][2]);
-                vtx0 = coface_45->getVertex(tabIndSomFace[indEdgeNearAxe][0]);
+                vtx7 = coface_45->getVertices()[tabIndSomFace[indEdgeNearAxe][3]];
+                vtx3 = coface_45->getVertices()[tabIndSomFace[indEdgeNearAxe][1]];
+                vtx4 = coface_45->getVertices()[tabIndSomFace[indEdgeNearAxe][2]];
+                vtx0 = coface_45->getVertices()[tabIndSomFace[indEdgeNearAxe][0]];
 
                 vtx6 = 0;
                 vtx2 = 0;
@@ -4232,20 +4154,20 @@ constructRevolBlocksInnerOgrid_1(std::vector<CoFace*>& cofaces_45,
                 // récupération des Edges pour la construction de la nouvelle face commune
                 std::vector<Edge*> edges_newcoface;
 
-                edges_newcoface.push_back(coface_45->getEdge(tabIndArFace[indEdgeNearAxe][0]));
+                edges_newcoface.push_back(coface_45->getEdges()[tabIndArFace[indEdgeNearAxe][0]]);
 
                 {
-                    CoEdge* coedge = coface_45->getEdge(tabIndArFace[indEdgeNearAxe][1])->getCoEdge(0);
+                    CoEdge* coedge = coface_45->getEdges()[tabIndArFace[indEdgeNearAxe][1]]->getCoEdges()[0];
                     CoFace* coface = coedge2cofaces[coedge][0];
                     edges_newcoface.push_back(coface->getEdge(vtx1, vtx5));
                 }
                 {
-                    CoEdge* coedge = coface_45->getEdge(tabIndArFace[indEdgeNearAxe][2])->getCoEdge(0);
+                    CoEdge* coedge = coface_45->getEdges()[tabIndArFace[indEdgeNearAxe][2]]->getCoEdges()[0];
                     CoFace* coface = coedge2cofaces[coedge][0];
                     edges_newcoface.push_back(coface->getEdge(vtx0, vtx1));
                 }
                 {
-                    CoEdge* coedge = coface_45->getEdge(tabIndArFace[indEdgeNearAxe][3])->getCoEdge(0);
+                    CoEdge* coedge = coface_45->getEdges()[tabIndArFace[indEdgeNearAxe][3]]->getCoEdges()[0];
                     CoFace* coface = coedge2cofaces[coedge][0];
                     edges_newcoface.push_back(coface->getEdge(vtx4, vtx5));
                 }
@@ -4293,8 +4215,8 @@ constructRevolBlocksInnerOgrid_1(std::vector<CoFace*>& cofaces_45,
                         throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructRevolBlocksInnerOgrid_1 avec autre chose que 3 arêtes pour vtx7B0 ", TkUtil::Charset::UTF_8));
                     vtx7 = coedges1[1]->getOppositeVertex(vtx6);
 
-                    vtx1 = coface_1->getVertex(tabIndSomFace[indEdgeNearAxe][0]);
-                    vtx5 = coface_1->getVertex(tabIndSomFace[indEdgeNearAxe][2]);
+                    vtx1 = coface_1->getVertices()[tabIndSomFace[indEdgeNearAxe][0]];
+                    vtx5 = coface_1->getVertices()[tabIndSomFace[indEdgeNearAxe][2]];
 
 #ifdef _DEBUG_REVOL
                     std::cout<<"vtx0 = "<<vtx0->getName()<<std::endl;
@@ -4324,21 +4246,21 @@ constructRevolBlocksInnerOgrid_1(std::vector<CoFace*>& cofaces_45,
                     }
                     // la face 2
                     {
-                        CoEdge* coedge = coface_0->getEdge(tabIndArFace[indEdgeNearAxe][0])->getCoEdge(0);
+                        CoEdge* coedge = coface_0->getEdges()[tabIndArFace[indEdgeNearAxe][0]]->getCoEdges()[0];
                         CoFace* coface = coedge2cofaces[coedge][0];
                         faces[2] = new Topo::Face(getContext(), coface);
                         getInfoCommand().addTopoInfoEntity(faces[2], Internal::InfoCommand::CREATED);
                     }
                     // la face 3
                     {
-                         CoEdge* coedge = coface_0->getEdge(tabIndArFace[indEdgeNearAxe][1])->getCoEdge(0);
+                         CoEdge* coedge = coface_0->getEdges()[tabIndArFace[indEdgeNearAxe][1]]->getCoEdges()[0];
                          CoFace* coface = coedge2cofaces[coedge][1];
                          faces[3] = new Topo::Face(getContext(), coface);
                          getInfoCommand().addTopoInfoEntity(faces[3], Internal::InfoCommand::CREATED);
                      }
                     // les faces 4 et 5
                     for (uint i=2; i<4; i++){
-                        CoEdge* coedge = coface_45->getEdge(tabIndArFace[indEdgeNearAxe][i])->getCoEdge(0);
+                        CoEdge* coedge = coface_45->getEdges()[tabIndArFace[indEdgeNearAxe][i]]->getCoEdges()[0];
                         CoFace* coface = coedge2cofaces[coedge][j*2];
                         faces[tabIndArToFace[i]] = new Topo::Face(getContext(), coface);
                         getInfoCommand().addTopoInfoEntity(faces[tabIndArToFace[i]], Internal::InfoCommand::CREATED);
@@ -4371,9 +4293,9 @@ constructRevolBlocksInnerOgrid_1(std::vector<CoFace*>& cofaces_45,
                 // Création du deuxième bloc
                 {
                     vtx6 = vtx7;
-                    vtx7 = coface_1->getVertex(tabIndSomFace[indEdgeNearAxe][3]);
+                    vtx7 = coface_1->getVertices()[tabIndSomFace[indEdgeNearAxe][3]];
                     vtx2 = vtx3;
-                    vtx3 = coface_1->getVertex(tabIndSomFace[indEdgeNearAxe][1]);
+                    vtx3 = coface_1->getVertices()[tabIndSomFace[indEdgeNearAxe][1]];
                     vtx4 = vtx5;
                     vtx0 = vtx1;
 
@@ -4414,21 +4336,21 @@ constructRevolBlocksInnerOgrid_1(std::vector<CoFace*>& cofaces_45,
                     }
                     // la face 1
                     {
-                         CoEdge* coedge = coface_1->getEdge(tabIndArFace[indEdgeNearAxe][1])->getCoEdge(0);
+                         CoEdge* coedge = coface_1->getEdges()[tabIndArFace[indEdgeNearAxe][1]]->getCoEdges()[0];
                          CoFace* coface = coedge2cofaces[coedge][0];
                          faces[1] = new Topo::Face(getContext(), coface);
                          getInfoCommand().addTopoInfoEntity(faces[1], Internal::InfoCommand::CREATED);
                      }
                     // la face 3
                     {
-                         CoEdge* coedge = coface_0->getEdge(tabIndArFace[indEdgeNearAxe][1])->getCoEdge(0);
+                         CoEdge* coedge = coface_0->getEdges()[tabIndArFace[indEdgeNearAxe][1]]->getCoEdges()[0];
                          CoFace* coface = coedge2cofaces[coedge][2];
                          faces[3] = new Topo::Face(getContext(), coface);
                          getInfoCommand().addTopoInfoEntity(faces[3], Internal::InfoCommand::CREATED);
                      }
                     // les faces 4 et 5
                     for (uint i=2; i<4; i++){
-                        CoEdge* coedge = coface_45->getEdge(tabIndArFace[indEdgeNearAxe][i])->getCoEdge(0);
+                        CoEdge* coedge = coface_45->getEdges()[tabIndArFace[indEdgeNearAxe][i]]->getCoEdges()[0];
                         CoFace* coface = coedge2cofaces[coedge][j*2+1];
                         faces[tabIndArToFace[i]] = new Topo::Face(getContext(), coface);
                         getInfoCommand().addTopoInfoEntity(faces[tabIndArToFace[i]], Internal::InfoCommand::CREATED);
@@ -4548,8 +4470,7 @@ updateGeomAssociationOGrid(std::vector<Vertex*>& vertices,
 
         if (filtre_vertex[vtx] != 11){
 
-            std::vector<CoEdge* > coedges;
-            vtx->getCoEdges(coedges);
+            std::vector<CoEdge* > coedges = vtx->getCoEdges();
 
             Geom::Curve* crv_ogrid = 0;
             for (std::vector<CoEdge* >::iterator iter3 = coedges.begin();
@@ -4594,9 +4515,9 @@ Face* CommandMakeBlocksByRevol::
 constructFaceWith1RevolCoFace(Edge* edge,
         std::map<CoEdge*, std::vector<CoFace* > >& coedge2cofaces)
 {
-    if (edge->getNbCoEdges() != 1)
+    if (edge->getCoEdges().size() != 1)
         throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, constructFaceWith1RevolCoFace avec une arête composée", TkUtil::Charset::UTF_8));
-    CoEdge* coedge = edge->getCoEdge(0);
+    CoEdge* coedge = edge->getCoEdges()[0];
     std::vector<CoFace* >& revol_cofaces = coedge2cofaces[coedge];
     if (revol_cofaces.size() != 1){
     	std::cerr<<"coedge : "<<coedge->getName()<<std::endl;
@@ -4619,8 +4540,7 @@ constructFaceWithRevolCoFaces(Edge* edge,
         Vertex* vtx0, Vertex* vtx1, Vertex* vtx2, Vertex* vtx3)
 {
     // cas d'une Edge pointant sur plusieurs CoEdges
-    std::vector<CoEdge* > coedges;
-    edge->getCoEdges(coedges);
+    std::vector<CoEdge* > coedges = edge->getCoEdges();
     std::vector<Vertex* > face_vertices;
     std::vector<CoFace* > face_cofaces;
     for (std::vector<CoEdge* >::iterator iter3 = coedges.begin();
@@ -4661,8 +4581,8 @@ computeFaceRatio(Face* face, uint dir, uint ni_loc_coface)
     if (dir == 2 || dir == 0){
     	uint ratio = nbI/ni_loc_coface;
     	if (ratio != 1)
-    		for (uint i=0; i<face->getNbCoFaces(); i++){
-    			face->setRatio(face->getCoFace(i), ratio, 0);
+    		for (CoFace* cf : face->getCoFaces()){
+    			face->setRatio(cf, ratio, 0);
 #ifdef _DEBUG_REVOL
     			std::cout<<"   ratio pour "<<face->getCoFace(i)->getName()
     					<<" => "<<face->getRatio(face->getCoFace(i), 0)
@@ -4673,8 +4593,8 @@ computeFaceRatio(Face* face, uint dir, uint ni_loc_coface)
     if (dir == 2 || dir == 1){
     	uint ratio = nbJ/ni_loc_coface;
     	if (ratio != 1)
-    		for (uint i=0; i<face->getNbCoFaces(); i++){
-    			face->setRatio(face->getCoFace(i), ratio, 1);
+    		for (CoFace* cf : face->getCoFaces()){
+    			face->setRatio(cf, ratio, 1);
 #ifdef _DEBUG_REVOL
     			std::cout<<"   ratio pour "<<face->getCoFace(i)->getName()
     					<<" => "<<face->getRatio(face->getCoFace(i), 1)

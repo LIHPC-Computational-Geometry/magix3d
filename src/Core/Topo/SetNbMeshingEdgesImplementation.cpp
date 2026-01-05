@@ -170,21 +170,21 @@ addParalelCoEdges(CoEdge* coedge_dep, std::vector<CoEdge*>& whole_coedges)
     	uint cote_dep = coface->getIndex(coedge_dep);
     	uint cote_opp = (cote_dep+2)%4;
     	// cas d'une face dégénérée en triangle
-    	if (cote_opp == 3 && coface->getNbEdges() == 3)
+    	if (cote_opp == 3 && coface->getEdges().size() == 3)
     		continue;
 
     	// déséquilibre dans cette face
 		int delta = computeDelta(coface, cote_dep);
 
-		Edge* edge_opp = coface->getEdge(cote_opp);
-    	if (edge_opp->getNbCoEdges() == 1){
-    		CoEdge* coedge_opp = edge_opp->getCoEdge(0);
+		Edge* edge_opp = coface->getEdges()[cote_opp];
+    	if (edge_opp->getCoEdges().size() == 1){
+    		CoEdge* coedge_opp = edge_opp->getCoEdges()[0];
 
     		if (m_coedges_vue[coedge_opp]){
     			// reste à vérifier que la coface est équilibrée
     			if (delta){
-    				Edge* edge_dep = coface->getEdge(cote_dep);
-    				if (edge_dep->getNbCoEdges() == 1){
+    				Edge* edge_dep = coface->getEdges()[cote_dep];
+    				if (edge_dep->getCoEdges().size() == 1){
 						TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     					message << "La modification a échouée, elle est bloquée sur la face commune "<< coface->getName();
     					message<<"\n avec une première arête "<<coedge_dep->getName()<<" et delta de "<<(short)m_coedge_delta[coedge_dep];
@@ -222,7 +222,7 @@ addParalelCoEdges(CoEdge* coedge_dep, std::vector<CoEdge*>& whole_coedges)
     			m_cofaces_vue[coface] = true;
     		} // else / if m_coedges_vue
 
-    	} // if edge_opp->getNbCoEdges() == 1
+    	} // if edge_opp->getCoEdges().size() == 1
     	else {
     		// cas avec un choix à faire sur l'arête qui devra être déséquilibrée
     		// on reporte cela à plus tard
@@ -233,7 +233,7 @@ addParalelCoEdges(CoEdge* coedge_dep, std::vector<CoEdge*>& whole_coedges)
 					 <<", cote_dep "<<cote_dep<<", delta = "<<delta
 					 <<", coedge_dep "<<coedge_dep->getName()<<std::endl;
 #endif
-    	} // else / if edge_opp->getNbCoEdges() == 1
+    	} // else / if edge_opp->getCoEdges().size() == 1
     } // end for iter
 }
 /*----------------------------------------------------------------------------*/
@@ -243,10 +243,10 @@ findOppositeCoEdge(CoEdge* coedge_dep, uint cote_dep, CoFace* coface)
 	CoEdge* coedge_opp = 0;
 
 	uint cote_opp = (cote_dep+2)%4;
-	Edge* edge_dep = coface->getEdge(cote_dep);
-	Edge* edge_opp = coface->getEdge(cote_opp);
+	Edge* edge_dep = coface->getEdges()[cote_dep];
+	Edge* edge_opp = coface->getEdges()[cote_opp];
 
-	if (coface->getNbVertices() != 4){
+	if (coface->getVertices().size() != 4){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
 		message << "Erreur interne, cas avec face "<< coface->getName()
 				<<" avec autre chose que 4 côtés pas encore pris en compte.";
@@ -254,18 +254,16 @@ findOppositeCoEdge(CoEdge* coedge_dep, uint cote_dep, CoFace* coface)
 	}
 
 	// recherche des arêtes triées côté départ
-	Vertex* vtx1_dep = coface->getVertex(cote_dep);
-	Vertex* vtx2_dep = coface->getVertex((cote_dep+1)%4);
-	std::vector<CoEdge*> coedges_dep;
-	edge_dep->getCoEdges(coedges_dep);
+	Vertex* vtx1_dep = coface->getVertices()[cote_dep];
+	Vertex* vtx2_dep = coface->getVertices()[(cote_dep+1)%4];
+	std::vector<CoEdge*> coedges_dep = edge_dep->getCoEdges();
 	std::vector<CoEdge*> coedges_dep_sort;
 	TopoHelper::getCoEdgesBetweenVertices(vtx1_dep, vtx2_dep, coedges_dep, coedges_dep_sort);
 
 	// idem côté opposé
-	Vertex* vtx1_opp = coface->getVertex((cote_dep+3)%4);
-	Vertex* vtx2_opp = coface->getVertex((cote_dep+2)%4);
-	std::vector<CoEdge*> coedges_opp;
-	edge_opp->getCoEdges(coedges_opp);
+	Vertex* vtx1_opp = coface->getVertices()[(cote_dep+3)%4];
+	Vertex* vtx2_opp = coface->getVertices()[(cote_dep+2)%4];
+	std::vector<CoEdge*> coedges_opp = edge_opp->getCoEdges();
 	std::vector<CoEdge*> coedges_opp_sort;
 	TopoHelper::getCoEdgesBetweenVertices(vtx1_opp, vtx2_opp, coedges_opp, coedges_opp_sort);
 
@@ -318,25 +316,20 @@ computeDelta(CoFace* coface, uint cote)
 
     uint cote_opp = (cote+2)%4;
 
-    if (cote_opp == 3 && coface->getNbEdges() == 3)
+    if (cote_opp == 3 && coface->getEdges().size() == 3)
         return 0;
     else {
-        std::vector<CoEdge* > coedges;
-
         int nb_init = 0;
-        coface->getEdge(cote)->getCoEdges(coedges);
-        for (std::vector<CoEdge* >::iterator iter = coedges.begin();
-                iter != coedges.end(); ++iter){
-            nb_init += (*iter)->getNbMeshingEdges() + m_coedge_delta[*iter];
-            //std::cout<<"nb_init += "<<(*iter)->getNbMeshingEdges()<<" + "<<m_coedge_delta[*iter]<<std::endl;
+        for (CoEdge* ce : coface->getEdges()[cote]->getCoEdges()){
+            nb_init += ce->getNbMeshingEdges() + m_coedge_delta[ce];
+            //std::cout<<"nb_init += "<<ce->getNbMeshingEdges()<<" + "<<m_coedge_delta[ce]<<std::endl;
         }
 
         int nb_opp = 0;
-        coface->getEdge(cote_opp)->getCoEdges(coedges);
-        for (std::vector<CoEdge* >::iterator iter = coedges.begin();
-                iter != coedges.end(); ++iter){
-            nb_opp += (*iter)->getNbMeshingEdges() + m_coedge_delta[*iter];
-            //std::cout<<"nb_opp += "<<(*iter)->getNbMeshingEdges()<<" + "<<m_coedge_delta[*iter]<<std::endl;
+        
+        for (CoEdge* ce : coface->getEdges()[cote_opp]->getCoEdges()){
+            nb_opp += ce->getNbMeshingEdges() + m_coedge_delta[ce];
+            //std::cout<<"nb_opp += "<<ce->getNbMeshingEdges()<<" + "<<m_coedge_delta[ce]<<std::endl;
         }
 
 #ifdef _DEBUG_SETNBMESHINGEDGES
@@ -349,13 +342,9 @@ computeDelta(CoFace* coface, uint cote)
 void SetNbMeshingEdgesImplementation::
 getStructuredCoFaces(CoEdge* coedge, std::vector<CoFace* >& cofaces)
 {
-    std::vector<CoFace* > all_cofaces;
-    coedge->getCoFaces(all_cofaces);
-
-    for (std::vector<CoFace* >::iterator iter = all_cofaces.begin();
-            iter != all_cofaces.end(); ++iter)
-        if ((*iter)->isStructured())
-            cofaces.push_back(*iter);
+    for (CoFace* cf : coedge->getCoFaces())
+        if (cf->isStructured())
+            cofaces.push_back(cf);
 }
 /*----------------------------------------------------------------------------*/
 void SetNbMeshingEdgesImplementation::

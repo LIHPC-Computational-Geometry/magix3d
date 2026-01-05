@@ -145,6 +145,16 @@ internalExecute()
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_1));
 }
 /*----------------------------------------------------------------------------*/
+Edge* CommandNewTopoOGridOnGeometry::getEdge(const Face* f, uint ind) const
+{
+    if (!f->isStructured())
+        throw TkUtil::Exception (TkUtil::UTF8String ("getEdge(ind) n'est pas possible avec une surface non structurée", TkUtil::Charset::UTF_8));
+    if (f->getCoFaces().size() != 1)
+        throw TkUtil::Exception (TkUtil::UTF8String ("Erreur Interne, il n'est pas prévu de faire appel à getEdge(ind) pour une face composée", TkUtil::Charset::UTF_8));
+
+    return f->getCoFaces()[0]->getEdges()[ind];
+}
+/*----------------------------------------------------------------------------*/
 void CommandNewTopoOGridOnGeometry::validGeomEntity()
 {
 	CommandCreateTopo::validGeomEntity();
@@ -247,21 +257,24 @@ createCylinderTopo1BlockPlein(Geom::PropertyCylinder* propertyCyl)
     }
 
     // on considère que la première surface est celle qui enveloppe
-    b1->getFace(Block::i_min)->setGeomAssociation(surfaces[0]);
-    b1->getFace(Block::i_max)->setGeomAssociation(surfaces[0]);
-    b1->getFace(Block::j_min)->setGeomAssociation(surfaces[0]);
-    b1->getFace(Block::j_max)->setGeomAssociation(surfaces[0]);
 
-    b1->getFace(Block::i_min)->getEdge(Face::j_min)->setGeomAssociation(surfaces[0]);
-    b1->getFace(Block::i_min)->getEdge(Face::j_max)->setGeomAssociation(surfaces[0]);
-    b1->getFace(Block::i_max)->getEdge(Face::j_min)->setGeomAssociation(surfaces[0]);
-    b1->getFace(Block::i_max)->getEdge(Face::j_max)->setGeomAssociation(surfaces[0]);
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+
+    b1_faces[Block::i_min]->setGeomAssociation(surfaces[0]);
+    b1_faces[Block::i_max]->setGeomAssociation(surfaces[0]);
+    b1_faces[Block::j_min]->setGeomAssociation(surfaces[0]);
+    b1_faces[Block::j_max]->setGeomAssociation(surfaces[0]);
+
+    getEdge(b1_faces[Block::i_min], Face::j_min)->setGeomAssociation(surfaces[0]);
+    getEdge(b1_faces[Block::i_min], Face::j_max)->setGeomAssociation(surfaces[0]);
+    getEdge(b1_faces[Block::i_max], Face::j_min)->setGeomAssociation(surfaces[0]);
+    getEdge(b1_faces[Block::i_max], Face::j_max)->setGeomAssociation(surfaces[0]);
 
     // la deuxième est au sommet du cylindre
-    b1->getFace(Block::k_max)->setGeomAssociation(surfaces[1]);
+    b1_faces[Block::k_max]->setGeomAssociation(surfaces[1]);
 
     // la dernière surface est à la base du cylindre
-    b1->getFace(Block::k_min)->setGeomAssociation(surfaces[2]);
+    b1_faces[Block::k_min]->setGeomAssociation(surfaces[2]);
 
     std::vector<Geom::Curve*> curves (v.getCurves().begin(), v.getCurves().end());
     if (curves.size() != 3){
@@ -272,26 +285,26 @@ createCylinderTopo1BlockPlein(Geom::PropertyCylinder* propertyCyl)
     }
 
     // on considère que la 3ème courbe est celle qui est à la base du cylindre
-    b1->getFace(Block::k_min)->getEdge(Face::i_min)->setGeomAssociation(curves[2]);
-    b1->getFace(Block::k_min)->getEdge(Face::i_max)->setGeomAssociation(curves[2]);
-    b1->getFace(Block::k_min)->getEdge(Face::j_min)->setGeomAssociation(curves[2]);
-    b1->getFace(Block::k_min)->getEdge(Face::j_max)->setGeomAssociation(curves[2]);
+    getEdge(b1_faces[Block::k_min], Face::i_min)->setGeomAssociation(curves[2]);
+    getEdge(b1_faces[Block::k_min], Face::i_max)->setGeomAssociation(curves[2]);
+    getEdge(b1_faces[Block::k_min], Face::j_min)->setGeomAssociation(curves[2]);
+    getEdge(b1_faces[Block::k_min], Face::j_max)->setGeomAssociation(curves[2]);
 
-    b1->getFace(Block::k_min)->getVertex(0)->setGeomAssociation(curves[2]);
-    b1->getFace(Block::k_min)->getVertex(1)->setGeomAssociation(curves[2]);
-    b1->getFace(Block::k_min)->getVertex(2)->setGeomAssociation(curves[2]);
-    b1->getFace(Block::k_min)->getVertex(3)->setGeomAssociation(curves[2]);
+    b1_faces[Block::k_min]->getVertices()[0]->setGeomAssociation(curves[2]);
+    b1_faces[Block::k_min]->getVertices()[1]->setGeomAssociation(curves[2]);
+    b1_faces[Block::k_min]->getVertices()[2]->setGeomAssociation(curves[2]);
+    b1_faces[Block::k_min]->getVertices()[3]->setGeomAssociation(curves[2]);
 
     // on considère que la première courbe est celle qui est en z max
-    b1->getFace(Block::k_max)->getEdge(Face::i_min)->setGeomAssociation(curves[0]);
-    b1->getFace(Block::k_max)->getEdge(Face::i_max)->setGeomAssociation(curves[0]);
-    b1->getFace(Block::k_max)->getEdge(Face::j_min)->setGeomAssociation(curves[0]);
-    b1->getFace(Block::k_max)->getEdge(Face::j_max)->setGeomAssociation(curves[0]);
+    getEdge(b1_faces[Block::k_max], Face::i_min)->setGeomAssociation(curves[0]);
+    getEdge(b1_faces[Block::k_max], Face::i_max)->setGeomAssociation(curves[0]);
+    getEdge(b1_faces[Block::k_max], Face::j_min)->setGeomAssociation(curves[0]);
+    getEdge(b1_faces[Block::k_max], Face::j_max)->setGeomAssociation(curves[0]);
 
-    b1->getFace(Block::k_max)->getVertex(0)->setGeomAssociation(curves[0]);
-    b1->getFace(Block::k_max)->getVertex(1)->setGeomAssociation(curves[0]);
-    b1->getFace(Block::k_max)->getVertex(2)->setGeomAssociation(curves[0]);
-    b1->getFace(Block::k_max)->getVertex(3)->setGeomAssociation(curves[0]);
+    b1_faces[Block::k_max]->getVertices()[0]->setGeomAssociation(curves[0]);
+    b1_faces[Block::k_max]->getVertices()[1]->setGeomAssociation(curves[0]);
+    b1_faces[Block::k_max]->getVertices()[2]->setGeomAssociation(curves[0]);
+    b1_faces[Block::k_max]->getVertices()[3]->setGeomAssociation(curves[0]);
 }
 /*----------------------------------------------------------------------------*/
 void CommandNewTopoOGridOnGeometry::
@@ -349,85 +362,87 @@ createCylinderTopo1BlockDemi(Geom::PropertyCylinder* propertyCyl)
     curves[2]->getPoint(param1+(param2-param1)/4, p2);
     curves[2]->getPoint(param1+(param2-param1)*3/4, p3);
 
-    b1->getVertex(0)->setCoord(vertices[1]->getCoord());
-    b1->getVertex(1)->setCoord(vertices[0]->getCoord());
-    b1->getVertex(2)->setCoord(p1);
-    b1->getVertex(3)->setCoord(p0);
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    b1_vertices[0]->setCoord(vertices[1]->getCoord());
+    b1_vertices[1]->setCoord(vertices[0]->getCoord());
+    b1_vertices[2]->setCoord(p1);
+    b1_vertices[3]->setCoord(p0);
 
-    b1->getVertex(4)->setCoord(vertices[3]->getCoord());
-    b1->getVertex(5)->setCoord(vertices[2]->getCoord());
-    b1->getVertex(6)->setCoord(p3);
-    b1->getVertex(7)->setCoord(p2);
+    b1_vertices[4]->setCoord(vertices[3]->getCoord());
+    b1_vertices[5]->setCoord(vertices[2]->getCoord());
+    b1_vertices[6]->setCoord(p3);
+    b1_vertices[7]->setCoord(p2);
 
     // on coupe la face du bloc b1 pour qu'une arête soit sur la courbe 8
     std::vector<Edge* > splitingEdges;
     std::vector<CoFace* > cofaces;
-    cofaces.push_back(b1->getFace(Block::j_min)->getCoFace(0));
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+    cofaces.push_back(b1_faces[Block::j_min]->getCoFaces()[0]);
     TopoHelper::splitFaces2D(cofaces,
-            b1->getFace(Block::k_min)->getEdge(b1->getVertex(0), b1->getVertex(1))->getCoEdge(0),
+            b1_faces[Block::k_min]->getEdge(b1_vertices[0], b1_vertices[1])->getCoEdges()[0],
             0.5, 0.0, false, false,
             splitingEdges,
             &getInfoCommand());
 
-    Vertex* v0 = TopoHelper::getCommonVertex(splitingEdges[0]->getCoEdge(0),
-            b1->getFace(Block::k_min)->getEdge(b1->getVertex(0), b1->getVertex(1))->getCoEdge(0));
-    Vertex* v1 = TopoHelper::getCommonVertex(splitingEdges[0]->getCoEdge(0),
-            b1->getFace(Block::k_max)->getEdge(b1->getVertex(4), b1->getVertex(5))->getCoEdge(0));
+    Vertex* v0 = TopoHelper::getCommonVertex(splitingEdges[0]->getCoEdges()[0],
+            b1_faces[Block::k_min]->getEdge(b1_vertices[0], b1_vertices[1])->getCoEdges()[0]);
+    Vertex* v1 = TopoHelper::getCommonVertex(splitingEdges[0]->getCoEdges()[0],
+            b1_faces[Block::k_max]->getEdge(b1_vertices[4], b1_vertices[5])->getCoEdges()[0]);
 
     v0->setCoord(vertices[4]->getCoord());
     v1->setCoord(vertices[5]->getCoord());
 
-    splitingEdges[0]->getCoEdge(0)->setGeomAssociation(curves[8]);
+    splitingEdges[0]->getCoEdges()[0]->setGeomAssociation(curves[8]);
 
     // on considère que la première surface est celle qui enveloppe
-    b1->getFace(Block::i_max)->setGeomAssociation(surfaces[0]);
-    b1->getFace(Block::j_max)->setGeomAssociation(surfaces[0]);
-    b1->getFace(Block::i_min)->setGeomAssociation(surfaces[0]);
+    b1_faces[Block::i_max]->setGeomAssociation(surfaces[0]);
+    b1_faces[Block::j_max]->setGeomAssociation(surfaces[0]);
+    b1_faces[Block::i_min]->setGeomAssociation(surfaces[0]);
 
 
     // la deuxième est au sommet du cylindre
-    b1->getFace(Block::k_min)->setGeomAssociation(surfaces[1]);
+    b1_faces[Block::k_min]->setGeomAssociation(surfaces[1]);
 
     // la troisième est à la base du cylindre
-    b1->getFace(Block::k_max)->setGeomAssociation(surfaces[2]);
+    b1_faces[Block::k_max]->setGeomAssociation(surfaces[2]);
 
-    CoFace* coface0 = b1->getFace(Block::j_min)->getCoFace(0);
-    if (coface0->find(b1->getVertex(1))){
-        b1->getFace(Block::j_min)->getCoFace(0)->setGeomAssociation(surfaces[4]);
-        b1->getFace(Block::j_min)->getCoFace(1)->setGeomAssociation(surfaces[3]);
+    CoFace* coface0 = b1_faces[Block::j_min]->getCoFaces()[0];
+    if (Utils::contains(b1_vertices[1], coface0->getVertices())){
+        b1_faces[Block::j_min]->getCoFaces()[0]->setGeomAssociation(surfaces[4]);
+        b1_faces[Block::j_min]->getCoFaces()[1]->setGeomAssociation(surfaces[3]);
     } else {
-        b1->getFace(Block::j_min)->getCoFace(1)->setGeomAssociation(surfaces[4]);
-        b1->getFace(Block::j_min)->getCoFace(0)->setGeomAssociation(surfaces[3]);
+        b1_faces[Block::j_min]->getCoFaces()[1]->setGeomAssociation(surfaces[4]);
+        b1_faces[Block::j_min]->getCoFaces()[0]->setGeomAssociation(surfaces[3]);
     }
 
     // on considère que la courbe 0 est celle qui est à au sommet du cylindre
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(1), b1->getVertex(3))->setGeomAssociation(curves[0]);
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(2), b1->getVertex(3))->setGeomAssociation(curves[0]);
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(2), b1->getVertex(0))->setGeomAssociation(curves[0]);
-    b1->getVertex(3)->setGeomAssociation(curves[0]);
-    b1->getVertex(2)->setGeomAssociation(curves[0]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[1], b1_vertices[3])->setGeomAssociation(curves[0]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[2], b1_vertices[3])->setGeomAssociation(curves[0]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[2], b1_vertices[0])->setGeomAssociation(curves[0]);
+    b1_vertices[3]->setGeomAssociation(curves[0]);
+    b1_vertices[2]->setGeomAssociation(curves[0]);
 
     // on considère que la courbe 2 est celle qui est à la base du cylindre
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(5), b1->getVertex(7))->setGeomAssociation(curves[2]);
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(6), b1->getVertex(7))->setGeomAssociation(curves[2]);
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(6), b1->getVertex(4))->setGeomAssociation(curves[2]);
-    b1->getVertex(7)->setGeomAssociation(curves[2]);
-    b1->getVertex(6)->setGeomAssociation(curves[2]);
+    b1_faces[Block::k_max]->getEdge(b1_vertices[5], b1_vertices[7])->setGeomAssociation(curves[2]);
+    b1_faces[Block::k_max]->getEdge(b1_vertices[6], b1_vertices[7])->setGeomAssociation(curves[2]);
+    b1_faces[Block::k_max]->getEdge(b1_vertices[6], b1_vertices[4])->setGeomAssociation(curves[2]);
+    b1_vertices[7]->setGeomAssociation(curves[2]);
+    b1_vertices[6]->setGeomAssociation(curves[2]);
 
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(0), b1->getVertex(1))->getCoEdge(v0, b1->getVertex(1))->setGeomAssociation(curves[5]);
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(0), b1->getVertex(1))->getCoEdge(b1->getVertex(0), v0)->setGeomAssociation(curves[4]);
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(4), b1->getVertex(5))->getCoEdge(v1, b1->getVertex(5))->setGeomAssociation(curves[6]);
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(4), b1->getVertex(5))->getCoEdge(b1->getVertex(4), v1)->setGeomAssociation(curves[7]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[0], b1_vertices[1])->getCoEdge(v0, b1_vertices[1])->setGeomAssociation(curves[5]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[0], b1_vertices[1])->getCoEdge(b1_vertices[0], v0)->setGeomAssociation(curves[4]);
+    b1_faces[Block::k_max]->getEdge(b1_vertices[4], b1_vertices[5])->getCoEdge(v1, b1_vertices[5])->setGeomAssociation(curves[6]);
+    b1_faces[Block::k_max]->getEdge(b1_vertices[4], b1_vertices[5])->getCoEdge(b1_vertices[4], v1)->setGeomAssociation(curves[7]);
 
-    b1->getFace(Block::i_max)->getEdge(b1->getVertex(1), b1->getVertex(5))->setGeomAssociation(curves[1]);
-    b1->getFace(Block::i_min)->getEdge(b1->getVertex(0), b1->getVertex(4))->setGeomAssociation(curves[3]);
-    b1->getFace(Block::j_max)->getEdge(b1->getVertex(3), b1->getVertex(7))->setGeomAssociation(surfaces[0]);
-    b1->getFace(Block::j_max)->getEdge(b1->getVertex(2), b1->getVertex(6))->setGeomAssociation(surfaces[0]);
+    b1_faces[Block::i_max]->getEdge(b1_vertices[1], b1_vertices[5])->setGeomAssociation(curves[1]);
+    b1_faces[Block::i_min]->getEdge(b1_vertices[0], b1_vertices[4])->setGeomAssociation(curves[3]);
+    b1_faces[Block::j_max]->getEdge(b1_vertices[3], b1_vertices[7])->setGeomAssociation(surfaces[0]);
+    b1_faces[Block::j_max]->getEdge(b1_vertices[2], b1_vertices[6])->setGeomAssociation(surfaces[0]);
 
-    b1->getVertex(0)->setGeomAssociation(vertices[1]);
-    b1->getVertex(1)->setGeomAssociation(vertices[0]);
-    b1->getVertex(4)->setGeomAssociation(vertices[3]);
-    b1->getVertex(5)->setGeomAssociation(vertices[2]);
+    b1_vertices[0]->setGeomAssociation(vertices[1]);
+    b1_vertices[1]->setGeomAssociation(vertices[0]);
+    b1_vertices[4]->setGeomAssociation(vertices[3]);
+    b1_vertices[5]->setGeomAssociation(vertices[2]);
     v0->setGeomAssociation(vertices[4]);
     v1->setGeomAssociation(vertices[5]);
 
@@ -486,57 +501,59 @@ createCylinderTopo1BlockQuart(Geom::PropertyCylinder* propertyCyl)
     curves[2]->getPoint((param1+param2)/2, p2);
 
 
-    b1->getVertex(0)->setCoord(vertices[4]->getCoord());
-    b1->getVertex(1)->setCoord(vertices[0]->getCoord());
-    b1->getVertex(2)->setCoord(vertices[1]->getCoord());
-    b1->getVertex(3)->setCoord(p0);
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    b1_vertices[0]->setCoord(vertices[4]->getCoord());
+    b1_vertices[1]->setCoord(vertices[0]->getCoord());
+    b1_vertices[2]->setCoord(vertices[1]->getCoord());
+    b1_vertices[3]->setCoord(p0);
 
-    b1->getVertex(4)->setCoord(vertices[5]->getCoord());
-    b1->getVertex(5)->setCoord(vertices[2]->getCoord());
-    b1->getVertex(6)->setCoord(vertices[3]->getCoord());
-    b1->getVertex(7)->setCoord(p2);
+    b1_vertices[4]->setCoord(vertices[5]->getCoord());
+    b1_vertices[5]->setCoord(vertices[2]->getCoord());
+    b1_vertices[6]->setCoord(vertices[3]->getCoord());
+    b1_vertices[7]->setCoord(p2);
 
     // on considère que la première surface est celle qui enveloppe
-    b1->getFace(Block::i_max)->setGeomAssociation(surfaces[0]);
-    b1->getFace(Block::j_max)->setGeomAssociation(surfaces[0]);
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+    b1_faces[Block::i_max]->setGeomAssociation(surfaces[0]);
+    b1_faces[Block::j_max]->setGeomAssociation(surfaces[0]);
 
     // la deuxième est au sommet du cylindre
-    b1->getFace(Block::k_min)->setGeomAssociation(surfaces[1]);
+    b1_faces[Block::k_min]->setGeomAssociation(surfaces[1]);
 
     // la troisième est à la base du cylindre
-    b1->getFace(Block::k_max)->setGeomAssociation(surfaces[2]);
+    b1_faces[Block::k_max]->setGeomAssociation(surfaces[2]);
 
-    b1->getFace(Block::j_min)->getCoFace(0)->setGeomAssociation(surfaces[4]);
-    b1->getFace(Block::i_min)->getCoFace(0)->setGeomAssociation(surfaces[3]);
+    b1_faces[Block::j_min]->getCoFaces()[0]->setGeomAssociation(surfaces[4]);
+    b1_faces[Block::i_min]->getCoFaces()[0]->setGeomAssociation(surfaces[3]);
 
 
     // on considère que la courbe 0 est celle qui est à au sommet du cylindre
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(1), b1->getVertex(3))->setGeomAssociation(curves[0]);
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(2), b1->getVertex(3))->setGeomAssociation(curves[0]);
-    b1->getVertex(3)->setGeomAssociation(curves[0]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[1], b1_vertices[3])->setGeomAssociation(curves[0]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[2], b1_vertices[3])->setGeomAssociation(curves[0]);
+    b1_vertices[3]->setGeomAssociation(curves[0]);
 
     // on considère que la courbe 2 est celle qui est à la base du cylindre
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(5), b1->getVertex(7))->setGeomAssociation(curves[2]);
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(6), b1->getVertex(7))->setGeomAssociation(curves[2]);
-    b1->getVertex(7)->setGeomAssociation(curves[2]);
+    b1_faces[Block::k_max]->getEdge(b1_vertices[5], b1_vertices[7])->setGeomAssociation(curves[2]);
+    b1_faces[Block::k_max]->getEdge(b1_vertices[6], b1_vertices[7])->setGeomAssociation(curves[2]);
+    b1_vertices[7]->setGeomAssociation(curves[2]);
 
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(0), b1->getVertex(1))->setGeomAssociation(curves[5]);
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(0), b1->getVertex(2))->setGeomAssociation(curves[4]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[0], b1_vertices[1])->setGeomAssociation(curves[5]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[0], b1_vertices[2])->setGeomAssociation(curves[4]);
 
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(4), b1->getVertex(5))->setGeomAssociation(curves[6]);
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(4), b1->getVertex(6))->setGeomAssociation(curves[7]);
+    b1_faces[Block::k_max]->getEdge(b1_vertices[4], b1_vertices[5])->setGeomAssociation(curves[6]);
+    b1_faces[Block::k_max]->getEdge(b1_vertices[4], b1_vertices[6])->setGeomAssociation(curves[7]);
 
-    b1->getFace(Block::i_max)->getEdge(b1->getVertex(1), b1->getVertex(5))->setGeomAssociation(curves[1]);
-    b1->getFace(Block::i_min)->getEdge(b1->getVertex(0), b1->getVertex(4))->setGeomAssociation(curves[8]);
-    b1->getFace(Block::i_min)->getEdge(b1->getVertex(2), b1->getVertex(6))->setGeomAssociation(curves[3]);
-    b1->getFace(Block::i_max)->getEdge(b1->getVertex(3), b1->getVertex(7))->setGeomAssociation(surfaces[0]);
+    b1_faces[Block::i_max]->getEdge(b1_vertices[1], b1_vertices[5])->setGeomAssociation(curves[1]);
+    b1_faces[Block::i_min]->getEdge(b1_vertices[0], b1_vertices[4])->setGeomAssociation(curves[8]);
+    b1_faces[Block::i_min]->getEdge(b1_vertices[2], b1_vertices[6])->setGeomAssociation(curves[3]);
+    b1_faces[Block::i_max]->getEdge(b1_vertices[3], b1_vertices[7])->setGeomAssociation(surfaces[0]);
 
-    b1->getVertex(0)->setGeomAssociation(vertices[4]);
-    b1->getVertex(1)->setGeomAssociation(vertices[0]);
-    b1->getVertex(2)->setGeomAssociation(vertices[1]);
-    b1->getVertex(4)->setGeomAssociation(vertices[5]);
-    b1->getVertex(5)->setGeomAssociation(vertices[2]);
-    b1->getVertex(6)->setGeomAssociation(vertices[3]);
+    b1_vertices[0]->setGeomAssociation(vertices[4]);
+    b1_vertices[1]->setGeomAssociation(vertices[0]);
+    b1_vertices[2]->setGeomAssociation(vertices[1]);
+    b1_vertices[4]->setGeomAssociation(vertices[5]);
+    b1_vertices[5]->setGeomAssociation(vertices[2]);
+    b1_vertices[6]->setGeomAssociation(vertices[3]);
 }
 /*----------------------------------------------------------------------------*/
 void CommandNewTopoOGridOnGeometry::
@@ -700,16 +717,21 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridPleinNonDeg(Geom::Pro
     } // end for niv
 
     // fusion des faces avec l'ogrid
-    b1->getFace(Block::i_max)->fuse(b5->getFace(Block::i_min), &getInfoCommand());
-    b2->getFace(Block::j_min)->fuse(b5->getFace(Block::j_max), &getInfoCommand());
-    b3->getFace(Block::i_min)->fuse(b5->getFace(Block::i_max), &getInfoCommand());
-    b4->getFace(Block::j_max)->fuse(b5->getFace(Block::j_min), &getInfoCommand());
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+    const std::vector<Face*>& b2_faces = b2->getFaces();
+    const std::vector<Face*>& b3_faces = b3->getFaces();
+    const std::vector<Face*>& b4_faces = b4->getFaces();
+    const std::vector<Face*>& b5_faces = b5->getFaces();
+    b1_faces[Block::i_max]->fuse(b5_faces[Block::i_min], &getInfoCommand());
+    b2_faces[Block::j_min]->fuse(b5_faces[Block::j_max], &getInfoCommand());
+    b3_faces[Block::i_min]->fuse(b5_faces[Block::i_max], &getInfoCommand());
+    b4_faces[Block::j_max]->fuse(b5_faces[Block::j_min], &getInfoCommand());
 
     // fusion des faces autour de l'ogrid
-    b1->getFace(Block::j_max)->fuse(b2->getFace(Block::i_min), &getInfoCommand());
-    b2->getFace(Block::i_max)->fuse(b3->getFace(Block::j_max), &getInfoCommand());
-    b3->getFace(Block::j_min)->fuse(b4->getFace(Block::i_max), &getInfoCommand());
-    b4->getFace(Block::i_min)->fuse(b1->getFace(Block::j_min), &getInfoCommand());
+    b1_faces[Block::j_max]->fuse(b2_faces[Block::i_min], &getInfoCommand());
+    b2_faces[Block::i_max]->fuse(b3_faces[Block::j_max], &getInfoCommand());
+    b3_faces[Block::j_min]->fuse(b4_faces[Block::i_max], &getInfoCommand());
+    b4_faces[Block::i_min]->fuse(b1_faces[Block::j_min], &getInfoCommand());
 
     // les projections sur la géométrie
     Geom::GetDownIncidentGeomEntitiesVisitor v;
@@ -725,42 +747,42 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridPleinNonDeg(Geom::Pro
     }
 
     // on considère que la première surface est celle qui enveloppe
-    b1->getFace(Block::i_min)->setGeomAssociation(surfaces[0]);
-    b2->getFace(Block::j_max)->setGeomAssociation(surfaces[0]);
-    b3->getFace(Block::i_max)->setGeomAssociation(surfaces[0]);
-    b4->getFace(Block::j_min)->setGeomAssociation(surfaces[0]);
+    b1_faces[Block::i_min]->setGeomAssociation(surfaces[0]);
+    b2_faces[Block::j_max]->setGeomAssociation(surfaces[0]);
+    b3_faces[Block::i_max]->setGeomAssociation(surfaces[0]);
+    b4_faces[Block::j_min]->setGeomAssociation(surfaces[0]);
 
-    b1->getFace(Block::i_min)->getEdge(Face::j_min)->setGeomAssociation(surfaces[0]);
-    b1->getFace(Block::i_min)->getEdge(Face::j_max)->setGeomAssociation(surfaces[0]);
-    b3->getFace(Block::i_max)->getEdge(Face::j_min)->setGeomAssociation(surfaces[0]);
-    b3->getFace(Block::i_max)->getEdge(Face::j_max)->setGeomAssociation(surfaces[0]);
+    getEdge(b1_faces[Block::i_min], Face::j_min)->setGeomAssociation(surfaces[0]);
+    getEdge(b1_faces[Block::i_min], Face::j_max)->setGeomAssociation(surfaces[0]);
+    getEdge(b3_faces[Block::i_max], Face::j_min)->setGeomAssociation(surfaces[0]);
+    getEdge(b3_faces[Block::i_max], Face::j_max)->setGeomAssociation(surfaces[0]);
 
     // la deuxième est au sommet du cylindre
-    b1->getFace(Block::k_max)->setGeomAssociation(surfaces[1]);
-    b2->getFace(Block::k_max)->setGeomAssociation(surfaces[1]);
-    b3->getFace(Block::k_max)->setGeomAssociation(surfaces[1]);
-    b4->getFace(Block::k_max)->setGeomAssociation(surfaces[1]);
-    b5->getFace(Block::k_max)->setGeomAssociation(surfaces[1]);
+    b1_faces[Block::k_max]->setGeomAssociation(surfaces[1]);
+    b2_faces[Block::k_max]->setGeomAssociation(surfaces[1]);
+    b3_faces[Block::k_max]->setGeomAssociation(surfaces[1]);
+    b4_faces[Block::k_max]->setGeomAssociation(surfaces[1]);
+    b5_faces[Block::k_max]->setGeomAssociation(surfaces[1]);
 
     for (uint i=0; i<4; i++){
-        b1->getFace(Block::k_max)->getEdge(i)->setGeomAssociation(surfaces[1]);
-        b3->getFace(Block::k_max)->getEdge(i)->setGeomAssociation(surfaces[1]);
-        b5->getFace(Block::k_max)->getEdge(i)->setGeomAssociation(surfaces[1]);
-        b5->getFace(Block::k_max)->getVertex(i)->setGeomAssociation(surfaces[1]);
+        getEdge(b1_faces[Block::k_max], i)->setGeomAssociation(surfaces[1]);
+        getEdge(b3_faces[Block::k_max], i)->setGeomAssociation(surfaces[1]);
+        getEdge(b5_faces[Block::k_max], i)->setGeomAssociation(surfaces[1]);
+        b5_faces[Block::k_max]->getVertices()[i]->setGeomAssociation(surfaces[1]);
     }
 
     // la dernière surface est à la base du cylindre
-    b1->getFace(Block::k_min)->setGeomAssociation(surfaces[2]);
-    b2->getFace(Block::k_min)->setGeomAssociation(surfaces[2]);
-    b3->getFace(Block::k_min)->setGeomAssociation(surfaces[2]);
-    b4->getFace(Block::k_min)->setGeomAssociation(surfaces[2]);
-    b5->getFace(Block::k_min)->setGeomAssociation(surfaces[2]);
+    b1_faces[Block::k_min]->setGeomAssociation(surfaces[2]);
+    b2_faces[Block::k_min]->setGeomAssociation(surfaces[2]);
+    b3_faces[Block::k_min]->setGeomAssociation(surfaces[2]);
+    b4_faces[Block::k_min]->setGeomAssociation(surfaces[2]);
+    b5_faces[Block::k_min]->setGeomAssociation(surfaces[2]);
 
     for (uint i=0; i<4; i++){
-        b1->getFace(Block::k_min)->getEdge(i)->setGeomAssociation(surfaces[2]);
-        b3->getFace(Block::k_min)->getEdge(i)->setGeomAssociation(surfaces[2]);
-        b5->getFace(Block::k_min)->getEdge(i)->setGeomAssociation(surfaces[2]);
-        b5->getFace(Block::k_min)->getVertex(i)->setGeomAssociation(surfaces[2]);
+        getEdge(b1_faces[Block::k_min], i)->setGeomAssociation(surfaces[2]);
+        getEdge(b3_faces[Block::k_min], i)->setGeomAssociation(surfaces[2]);
+        getEdge(b5_faces[Block::k_min], i)->setGeomAssociation(surfaces[2]);
+        b5_faces[Block::k_min]->getVertices()[i]->setGeomAssociation(surfaces[2]);
     }
 
     if (curves.size() != 3){
@@ -771,26 +793,26 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridPleinNonDeg(Geom::Pro
     }
 
     // on considère que la 3ème courbe est celle qui est à la base du cylindre
-    b1->getFace(Block::i_min)->getEdge(Face::i_min)->setGeomAssociation(curves[2]);
-    b2->getFace(Block::j_max)->getEdge(Face::i_min)->setGeomAssociation(curves[2]);
-    b3->getFace(Block::i_max)->getEdge(Face::i_min)->setGeomAssociation(curves[2]);
-    b4->getFace(Block::j_min)->getEdge(Face::i_min)->setGeomAssociation(curves[2]);
+    getEdge(b1_faces[Block::i_min], Face::i_min)->setGeomAssociation(curves[2]);
+    getEdge(b2_faces[Block::j_max], Face::i_min)->setGeomAssociation(curves[2]);
+    getEdge(b3_faces[Block::i_max], Face::i_min)->setGeomAssociation(curves[2]);
+    getEdge(b4_faces[Block::j_min], Face::i_min)->setGeomAssociation(curves[2]);
 
-    b1->getFace(Block::i_min)->getEdge(Face::i_min)->getVertex(0)->setGeomAssociation(curves[2]);
-    b1->getFace(Block::i_min)->getEdge(Face::i_min)->getVertex(1)->setGeomAssociation(curves[2]);
-    b3->getFace(Block::i_max)->getEdge(Face::i_min)->getVertex(0)->setGeomAssociation(curves[2]);
-    b3->getFace(Block::i_max)->getEdge(Face::i_min)->getVertex(1)->setGeomAssociation(curves[2]);
+    getEdge(b1_faces[Block::i_min], Face::i_min)->getVertices()[0]->setGeomAssociation(curves[2]);
+    getEdge(b1_faces[Block::i_min], Face::i_min)->getVertices()[1]->setGeomAssociation(curves[2]);
+    getEdge(b3_faces[Block::i_max], Face::i_min)->getVertices()[0]->setGeomAssociation(curves[2]);
+    getEdge(b3_faces[Block::i_max], Face::i_min)->getVertices()[1]->setGeomAssociation(curves[2]);
 
     // on considère que la première courbe est celle qui est en z max
-    b1->getFace(Block::i_min)->getEdge(Face::i_max)->setGeomAssociation(curves[0]);
-    b2->getFace(Block::j_max)->getEdge(Face::i_max)->setGeomAssociation(curves[0]);
-    b3->getFace(Block::i_max)->getEdge(Face::i_max)->setGeomAssociation(curves[0]);
-    b4->getFace(Block::j_min)->getEdge(Face::i_max)->setGeomAssociation(curves[0]);
+    getEdge(b1_faces[Block::i_min], Face::i_max)->setGeomAssociation(curves[0]);
+    getEdge(b2_faces[Block::j_max], Face::i_max)->setGeomAssociation(curves[0]);
+    getEdge(b3_faces[Block::i_max], Face::i_max)->setGeomAssociation(curves[0]);
+    getEdge(b4_faces[Block::j_min], Face::i_max)->setGeomAssociation(curves[0]);
 
-    b1->getFace(Block::i_min)->getEdge(Face::i_max)->getVertex(0)->setGeomAssociation(curves[0]);
-    b1->getFace(Block::i_min)->getEdge(Face::i_max)->getVertex(1)->setGeomAssociation(curves[0]);
-    b3->getFace(Block::i_max)->getEdge(Face::i_max)->getVertex(0)->setGeomAssociation(curves[0]);
-    b3->getFace(Block::i_max)->getEdge(Face::i_max)->getVertex(1)->setGeomAssociation(curves[0]);
+    getEdge(b1_faces[Block::i_min], Face::i_max)->getVertices()[0]->setGeomAssociation(curves[0]);
+    getEdge(b1_faces[Block::i_min], Face::i_max)->getVertices()[1]->setGeomAssociation(curves[0]);
+    getEdge(b3_faces[Block::i_max], Face::i_max)->getVertices()[0]->setGeomAssociation(curves[0]);
+    getEdge(b3_faces[Block::i_max], Face::i_max)->getVertices()[1]->setGeomAssociation(curves[0]);
 
 
 } // createCylinderTopoOGridPleinNonDeg
@@ -893,16 +915,24 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridPleinDeg(Geom::Proper
     } // end for niv
 
     // dégénéréscence des blocs
-    b1->degenerateFaceInEdge(Block::k_max, b1->getVertex(4), b1->getVertex(5), &getInfoCommand());
-    b2->degenerateFaceInEdge(Block::k_max, b2->getVertex(4), b2->getVertex(5), &getInfoCommand());
-    b3->degenerateFaceInEdge(Block::k_max, b3->getVertex(4), b3->getVertex(5), &getInfoCommand());
-    b4->degenerateFaceInEdge(Block::k_max, b4->getVertex(4), b4->getVertex(5), &getInfoCommand());
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    const std::vector<Vertex*>& b2_vertices = b2->getVertices();
+    const std::vector<Vertex*>& b3_vertices = b3->getVertices();
+    const std::vector<Vertex*>& b4_vertices = b4->getVertices();
+    b1->degenerateFaceInEdge(Block::k_max, b1_vertices[4], b1_vertices[5], &getInfoCommand());
+    b2->degenerateFaceInEdge(Block::k_max, b2_vertices[4], b2_vertices[5], &getInfoCommand());
+    b3->degenerateFaceInEdge(Block::k_max, b3_vertices[4], b3_vertices[5], &getInfoCommand());
+    b4->degenerateFaceInEdge(Block::k_max, b4_vertices[4], b4_vertices[5], &getInfoCommand());
 
     // fusion des faces autour de l'ogrid
-    b1->getFace(Block::i_max)->fuse(b2->getFace(Block::i_min), &getInfoCommand());
-    b2->getFace(Block::i_max)->fuse(b3->getFace(Block::i_min), &getInfoCommand());
-    b3->getFace(Block::i_max)->fuse(b4->getFace(Block::i_min), &getInfoCommand());
-    b4->getFace(Block::i_max)->fuse(b1->getFace(Block::i_min), &getInfoCommand());
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+    const std::vector<Face*>& b2_faces = b2->getFaces();
+    const std::vector<Face*>& b3_faces = b3->getFaces();
+    const std::vector<Face*>& b4_faces = b4->getFaces();
+    b1_faces[Block::i_max]->fuse(b2_faces[Block::i_min], &getInfoCommand());
+    b2_faces[Block::i_max]->fuse(b3_faces[Block::i_min], &getInfoCommand());
+    b3_faces[Block::i_max]->fuse(b4_faces[Block::i_min], &getInfoCommand());
+    b4_faces[Block::i_max]->fuse(b1_faces[Block::i_min], &getInfoCommand());
 
 
     // les projections sur la géométrie
@@ -919,39 +949,39 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridPleinDeg(Geom::Proper
     }
 
     // on considère que la première surface est celle qui enveloppe
-    b1->getFace(Block::k_min)->setGeomAssociation(surfaces[0]);
-    b2->getFace(Block::k_min)->setGeomAssociation(surfaces[0]);
-    b3->getFace(Block::k_min)->setGeomAssociation(surfaces[0]);
-    b4->getFace(Block::k_min)->setGeomAssociation(surfaces[0]);
+    b1_faces[Block::k_min]->setGeomAssociation(surfaces[0]);
+    b2_faces[Block::k_min]->setGeomAssociation(surfaces[0]);
+    b3_faces[Block::k_min]->setGeomAssociation(surfaces[0]);
+    b4_faces[Block::k_min]->setGeomAssociation(surfaces[0]);
 
     for (uint i=0; i<4; i++){
-        b1->getFace(Block::k_min)->getEdge(i)->setGeomAssociation(surfaces[0]);
-        b3->getFace(Block::k_min)->getEdge(i)->setGeomAssociation(surfaces[0]);
+        getEdge(b1_faces[Block::k_min], i)->setGeomAssociation(surfaces[0]);
+        getEdge(b3_faces[Block::k_min], i)->setGeomAssociation(surfaces[0]);
     }
 
     // la deuxième est au sommet du cylindre
-    b1->getFace(Block::j_max)->setGeomAssociation(surfaces[1]);
-    b2->getFace(Block::j_max)->setGeomAssociation(surfaces[1]);
-    b3->getFace(Block::j_max)->setGeomAssociation(surfaces[1]);
-    b4->getFace(Block::j_max)->setGeomAssociation(surfaces[1]);
+    b1_faces[Block::j_max]->setGeomAssociation(surfaces[1]);
+    b2_faces[Block::j_max]->setGeomAssociation(surfaces[1]);
+    b3_faces[Block::j_max]->setGeomAssociation(surfaces[1]);
+    b4_faces[Block::j_max]->setGeomAssociation(surfaces[1]);
 
     for (uint i=0; i<3; i++){
-        b1->getFace(Block::j_max)->getEdge(i)->setGeomAssociation(surfaces[1]);
-        b3->getFace(Block::j_max)->getEdge(i)->setGeomAssociation(surfaces[1]);
+        getEdge(b1_faces[Block::j_max], i)->setGeomAssociation(surfaces[1]);
+        getEdge(b3_faces[Block::j_max], i)->setGeomAssociation(surfaces[1]);
     }
-    b1->getVertex(5)->setGeomAssociation(surfaces[1]);
+    b1_vertices[5]->setGeomAssociation(surfaces[1]);
 
     // la dernière surface est à la base du cylindre
-    b1->getFace(Block::j_min)->setGeomAssociation(surfaces[2]);
-    b2->getFace(Block::j_min)->setGeomAssociation(surfaces[2]);
-    b3->getFace(Block::j_min)->setGeomAssociation(surfaces[2]);
-    b4->getFace(Block::j_min)->setGeomAssociation(surfaces[2]);
+    b1_faces[Block::j_min]->setGeomAssociation(surfaces[2]);
+    b2_faces[Block::j_min]->setGeomAssociation(surfaces[2]);
+    b3_faces[Block::j_min]->setGeomAssociation(surfaces[2]);
+    b4_faces[Block::j_min]->setGeomAssociation(surfaces[2]);
 
     for (uint i=0; i<3; i++){
-        b1->getFace(Block::j_min)->getEdge(i)->setGeomAssociation(surfaces[2]);
-        b3->getFace(Block::j_min)->getEdge(i)->setGeomAssociation(surfaces[2]);
+        getEdge(b1_faces[Block::j_min], i)->setGeomAssociation(surfaces[2]);
+        getEdge(b3_faces[Block::j_min], i)->setGeomAssociation(surfaces[2]);
     }
-    b1->getVertex(4)->setGeomAssociation(surfaces[2]);
+    b1_vertices[4]->setGeomAssociation(surfaces[2]);
 
     if (curves.size() != 3){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -961,26 +991,26 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridPleinDeg(Geom::Proper
     }
 
     // on considère que la première courbe est celle qui est en j max
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(2), b1->getVertex(3))->setGeomAssociation(curves[0]);
-    b2->getFace(Block::k_min)->getEdge(b2->getVertex(2), b2->getVertex(3))->setGeomAssociation(curves[0]);
-    b3->getFace(Block::k_min)->getEdge(b3->getVertex(2), b3->getVertex(3))->setGeomAssociation(curves[0]);
-    b4->getFace(Block::k_min)->getEdge(b4->getVertex(2), b4->getVertex(3))->setGeomAssociation(curves[0]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[2], b1_vertices[3])->setGeomAssociation(curves[0]);
+    b2_faces[Block::k_min]->getEdge(b2_vertices[2], b2_vertices[3])->setGeomAssociation(curves[0]);
+    b3_faces[Block::k_min]->getEdge(b3_vertices[2], b3_vertices[3])->setGeomAssociation(curves[0]);
+    b4_faces[Block::k_min]->getEdge(b4_vertices[2], b4_vertices[3])->setGeomAssociation(curves[0]);
 
-    b1->getVertex(2)->setGeomAssociation(curves[0]);
-    b1->getVertex(3)->setGeomAssociation(curves[0]);
-    b3->getVertex(2)->setGeomAssociation(curves[0]);
-    b3->getVertex(3)->setGeomAssociation(curves[0]);
+    b1_vertices[2]->setGeomAssociation(curves[0]);
+    b1_vertices[3]->setGeomAssociation(curves[0]);
+    b3_vertices[2]->setGeomAssociation(curves[0]);
+    b3_vertices[3]->setGeomAssociation(curves[0]);
 
     // on considère que la 3ème courbe est celle qui est à la base du cylindre
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(0), b1->getVertex(1))->setGeomAssociation(curves[2]);
-    b2->getFace(Block::k_min)->getEdge(b2->getVertex(0), b2->getVertex(1))->setGeomAssociation(curves[2]);
-    b3->getFace(Block::k_min)->getEdge(b3->getVertex(0), b3->getVertex(1))->setGeomAssociation(curves[2]);
-    b4->getFace(Block::k_min)->getEdge(b4->getVertex(0), b4->getVertex(1))->setGeomAssociation(curves[2]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[0], b1_vertices[1])->setGeomAssociation(curves[2]);
+    b2_faces[Block::k_min]->getEdge(b2_vertices[0], b2_vertices[1])->setGeomAssociation(curves[2]);
+    b3_faces[Block::k_min]->getEdge(b3_vertices[0], b3_vertices[1])->setGeomAssociation(curves[2]);
+    b4_faces[Block::k_min]->getEdge(b4_vertices[0], b4_vertices[1])->setGeomAssociation(curves[2]);
 
-    b1->getVertex(0)->setGeomAssociation(curves[2]);
-    b1->getVertex(1)->setGeomAssociation(curves[2]);
-    b3->getVertex(0)->setGeomAssociation(curves[2]);
-    b3->getVertex(1)->setGeomAssociation(curves[2]);
+    b1_vertices[0]->setGeomAssociation(curves[2]);
+    b1_vertices[1]->setGeomAssociation(curves[2]);
+    b3_vertices[0]->setGeomAssociation(curves[2]);
+    b3_vertices[1]->setGeomAssociation(curves[2]);
 
 } // createCylinderTopoOGridPleinDeg
 /*----------------------------------------------------------------------------*/
@@ -1027,7 +1057,8 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridQuartDeg(Geom::Proper
     b1->getVertex(true ,true ,true )->setCoord(vertices[4]->getCoord());
 
     // dégénéréscence des blocs
-    b1->degenerateFaceInEdge(Block::k_max, b1->getVertex(4), b1->getVertex(5), &getInfoCommand());
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    b1->degenerateFaceInEdge(Block::k_max, b1_vertices[4], b1_vertices[5], &getInfoCommand());
 
     // les projections sur la géométrie
     if (surfaces.size() != 5){
@@ -1037,17 +1068,19 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridQuartDeg(Geom::Proper
         throw TkUtil::Exception(message);
     }
 
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+
     // on considère que la première surface est celle qui enveloppe
-    b1->getFace(Block::k_min)->setGeomAssociation(surfaces[0]);
+    b1_faces[Block::k_min]->setGeomAssociation(surfaces[0]);
 
     // la deuxième est au sommet du cylindre
-    b1->getFace(Block::j_max)->setGeomAssociation(surfaces[1]);
+    b1_faces[Block::j_max]->setGeomAssociation(surfaces[1]);
 
     // la troisième surface est à la base du cylindre
-    b1->getFace(Block::j_min)->setGeomAssociation(surfaces[2]);
+    b1_faces[Block::j_min]->setGeomAssociation(surfaces[2]);
 
-    b1->getFace(Block::i_min)->setGeomAssociation(surfaces[3]);
-    b1->getFace(Block::i_max)->setGeomAssociation(surfaces[4]);
+    b1_faces[Block::i_min]->setGeomAssociation(surfaces[3]);
+    b1_faces[Block::i_max]->setGeomAssociation(surfaces[4]);
 
     if (curves.size() != 9){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -1057,31 +1090,31 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridQuartDeg(Geom::Proper
     }
 
     // on considère que la première courbe est celle qui est en j max
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(2), b1->getVertex(3))->setGeomAssociation(curves[0]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[2], b1_vertices[3])->setGeomAssociation(curves[0]);
 
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(2), b1->getVertex(0))->setGeomAssociation(curves[3]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[2], b1_vertices[0])->setGeomAssociation(curves[3]);
 
     // on considère que la 3ème courbe est celle qui est à la base du cylindre
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(0), b1->getVertex(1))->setGeomAssociation(curves[2]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[0], b1_vertices[1])->setGeomAssociation(curves[2]);
 
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(3), b1->getVertex(1))->setGeomAssociation(curves[1]);
-
-
-    b1->getFace(Block::j_min)->getEdge(b1->getVertex(0), b1->getVertex(4))->setGeomAssociation(curves[7]);
-    b1->getFace(Block::j_min)->getEdge(b1->getVertex(1), b1->getVertex(4))->setGeomAssociation(curves[6]);
-
-    b1->getFace(Block::j_max)->getEdge(b1->getVertex(2), b1->getVertex(5))->setGeomAssociation(curves[4]);
-    b1->getFace(Block::j_max)->getEdge(b1->getVertex(3), b1->getVertex(5))->setGeomAssociation(curves[5]);
-
-    b1->getFace(Block::i_min)->getEdge(b1->getVertex(4), b1->getVertex(5))->setGeomAssociation(curves[8]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[3], b1_vertices[1])->setGeomAssociation(curves[1]);
 
 
-    b1->getVertex(0)->setGeomAssociation(vertices[3]);
-    b1->getVertex(1)->setGeomAssociation(vertices[2]);
-    b1->getVertex(2)->setGeomAssociation(vertices[1]);
-    b1->getVertex(3)->setGeomAssociation(vertices[0]);
-    b1->getVertex(4)->setGeomAssociation(vertices[5]);
-    b1->getVertex(5)->setGeomAssociation(vertices[4]);
+    b1_faces[Block::j_min]->getEdge(b1_vertices[0], b1_vertices[4])->setGeomAssociation(curves[7]);
+    b1_faces[Block::j_min]->getEdge(b1_vertices[1], b1_vertices[4])->setGeomAssociation(curves[6]);
+
+    b1_faces[Block::j_max]->getEdge(b1_vertices[2], b1_vertices[5])->setGeomAssociation(curves[4]);
+    b1_faces[Block::j_max]->getEdge(b1_vertices[3], b1_vertices[5])->setGeomAssociation(curves[5]);
+
+    b1_faces[Block::i_min]->getEdge(b1_vertices[4], b1_vertices[5])->setGeomAssociation(curves[8]);
+
+
+    b1_vertices[0]->setGeomAssociation(vertices[3]);
+    b1_vertices[1]->setGeomAssociation(vertices[2]);
+    b1_vertices[2]->setGeomAssociation(vertices[1]);
+    b1_vertices[3]->setGeomAssociation(vertices[0]);
+    b1_vertices[4]->setGeomAssociation(vertices[5]);
+    b1_vertices[5]->setGeomAssociation(vertices[4]);
 
 } // createCylinderTopoOGridQuartDeg
 /*----------------------------------------------------------------------------*/
@@ -1161,117 +1194,123 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridQuartNonDeg(Geom::Pro
     p1 = p5+p4-vertices[4]->getCoord();
     p3 = p6+p7-vertices[5]->getCoord();
 
-    b1->getVertex(0)->setCoord(vertices[4]->getCoord());
-    b1->getVertex(1)->setCoord(p5);
-    b1->getVertex(2)->setCoord(p4);
-    b1->getVertex(3)->setCoord(p1);
-    b1->getVertex(4)->setCoord(vertices[5]->getCoord());
-    b1->getVertex(5)->setCoord(p6);
-    b1->getVertex(6)->setCoord(p7);
-    b1->getVertex(7)->setCoord(p3);
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    const std::vector<Vertex*>& b2_vertices = b2->getVertices();
+    const std::vector<Vertex*>& b3_vertices = b3->getVertices();
+    b1_vertices[0]->setCoord(vertices[4]->getCoord());
+    b1_vertices[1]->setCoord(p5);
+    b1_vertices[2]->setCoord(p4);
+    b1_vertices[3]->setCoord(p1);
+    b1_vertices[4]->setCoord(vertices[5]->getCoord());
+    b1_vertices[5]->setCoord(p6);
+    b1_vertices[6]->setCoord(p7);
+    b1_vertices[7]->setCoord(p3);
 
-    b2->getVertex(0)->setCoord(p5);
-    b2->getVertex(1)->setCoord(vertices[0]->getCoord());
-    b2->getVertex(2)->setCoord(p1);
-    b2->getVertex(3)->setCoord(p0);
-    b2->getVertex(4)->setCoord(p6);
-    b2->getVertex(5)->setCoord(vertices[2]->getCoord());
-    b2->getVertex(6)->setCoord(p3);
-    b2->getVertex(7)->setCoord(p2);
+    b2_vertices[0]->setCoord(p5);
+    b2_vertices[1]->setCoord(vertices[0]->getCoord());
+    b2_vertices[2]->setCoord(p1);
+    b2_vertices[3]->setCoord(p0);
+    b2_vertices[4]->setCoord(p6);
+    b2_vertices[5]->setCoord(vertices[2]->getCoord());
+    b2_vertices[6]->setCoord(p3);
+    b2_vertices[7]->setCoord(p2);
 
-    b3->getVertex(0)->setCoord(p4);
-    b3->getVertex(1)->setCoord(p1);
-    b3->getVertex(2)->setCoord(vertices[1]->getCoord());
-    b3->getVertex(3)->setCoord(p0);
-    b3->getVertex(4)->setCoord(p7);
-    b3->getVertex(5)->setCoord(p3);
-    b3->getVertex(6)->setCoord(vertices[3]->getCoord());
-    b3->getVertex(7)->setCoord(p2);
+    b3_vertices[0]->setCoord(p4);
+    b3_vertices[1]->setCoord(p1);
+    b3_vertices[2]->setCoord(vertices[1]->getCoord());
+    b3_vertices[3]->setCoord(p0);
+    b3_vertices[4]->setCoord(p7);
+    b3_vertices[5]->setCoord(p3);
+    b3_vertices[6]->setCoord(vertices[3]->getCoord());
+    b3_vertices[7]->setCoord(p2);
 
 
     // fusion des faces
-    b1->getFace(Block::i_max)->fuse(b2->getFace(Block::i_min), &getInfoCommand());
-    b1->getFace(Block::j_max)->fuse(b3->getFace(Block::j_min), &getInfoCommand());
-    b2->getFace(Block::j_max)->fuse(b3->getFace(Block::i_max), &getInfoCommand());
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+    const std::vector<Face*>& b2_faces = b2->getFaces();
+    const std::vector<Face*>& b3_faces = b3->getFaces();
 
+    b1_faces[Block::i_max]->fuse(b2_faces[Block::i_min], &getInfoCommand());
+    b1_faces[Block::j_max]->fuse(b3_faces[Block::j_min], &getInfoCommand());
+    b2_faces[Block::j_max]->fuse(b3_faces[Block::i_max], &getInfoCommand());
 
     // on considère que la première surface est celle qui enveloppe
-    b2->getFace(Block::i_max)->setGeomAssociation(surfaces[0]);
-    b3->getFace(Block::j_max)->setGeomAssociation(surfaces[0]);
+    b2_faces[Block::i_max]->setGeomAssociation(surfaces[0]);
+    b3_faces[Block::j_max]->setGeomAssociation(surfaces[0]);
 
     // la deuxième est au sommet du cylindre
-    b1->getFace(Block::k_min)->setGeomAssociation(surfaces[1]);
-    b2->getFace(Block::k_min)->setGeomAssociation(surfaces[1]);
-    b3->getFace(Block::k_min)->setGeomAssociation(surfaces[1]);
+    b1_faces[Block::k_min]->setGeomAssociation(surfaces[1]);
+    b2_faces[Block::k_min]->setGeomAssociation(surfaces[1]);
+    b3_faces[Block::k_min]->setGeomAssociation(surfaces[1]);
 
     // la troisième est à la base du cylindre
-    b1->getFace(Block::k_max)->setGeomAssociation(surfaces[2]);
-    b2->getFace(Block::k_max)->setGeomAssociation(surfaces[2]);
-    b3->getFace(Block::k_max)->setGeomAssociation(surfaces[2]);
+    b1_faces[Block::k_max]->setGeomAssociation(surfaces[2]);
+    b2_faces[Block::k_max]->setGeomAssociation(surfaces[2]);
+    b3_faces[Block::k_max]->setGeomAssociation(surfaces[2]);
 
 
-    b1->getFace(Block::j_min)->setGeomAssociation(surfaces[4]);
-    b2->getFace(Block::j_min)->setGeomAssociation(surfaces[4]);
+    b1_faces[Block::j_min]->setGeomAssociation(surfaces[4]);
+    b2_faces[Block::j_min]->setGeomAssociation(surfaces[4]);
 
-    b1->getFace(Block::i_min)->setGeomAssociation(surfaces[3]);
-    b3->getFace(Block::i_min)->setGeomAssociation(surfaces[3]);
+    b1_faces[Block::i_min]->setGeomAssociation(surfaces[3]);
+    b3_faces[Block::i_min]->setGeomAssociation(surfaces[3]);
 
 
     // on considère que la courbe 0 est celle qui est à au sommet du cylindre
-    b2->getFace(Block::k_min)->getEdge(b2->getVertex(1), b2->getVertex(3))->setGeomAssociation(curves[0]);
-    b3->getFace(Block::k_min)->getEdge(b3->getVertex(2), b3->getVertex(3))->setGeomAssociation(curves[0]);
-    b2->getVertex(3)->setGeomAssociation(curves[0]);
+    b2_faces[Block::k_min]->getEdge(b2_vertices[1], b2_vertices[3])->setGeomAssociation(curves[0]);
+    b3_faces[Block::k_min]->getEdge(b3_vertices[2], b3_vertices[3])->setGeomAssociation(curves[0]);
+    b2_vertices[3]->setGeomAssociation(curves[0]);
 
     // on considère que la courbe 2 est celle qui est à la base du cylindre
-    b2->getFace(Block::k_max)->getEdge(b2->getVertex(5), b2->getVertex(7))->setGeomAssociation(curves[2]);
-    b3->getFace(Block::k_max)->getEdge(b3->getVertex(6), b3->getVertex(7))->setGeomAssociation(curves[2]);
-    b2->getVertex(7)->setGeomAssociation(curves[2]);
+    b2_faces[Block::k_max]->getEdge(b2_vertices[5], b2_vertices[7])->setGeomAssociation(curves[2]);
+    b3_faces[Block::k_max]->getEdge(b3_vertices[6], b3_vertices[7])->setGeomAssociation(curves[2]);
+    b2_vertices[7]->setGeomAssociation(curves[2]);
 
-    b2->getFace(Block::k_min)->getEdge(b2->getVertex(0), b2->getVertex(1))->setGeomAssociation(curves[5]);
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(0), b1->getVertex(1))->setGeomAssociation(curves[5]);
-    b1->getVertex(1)->setGeomAssociation(curves[5]);
+    b2_faces[Block::k_min]->getEdge(b2_vertices[0], b2_vertices[1])->setGeomAssociation(curves[5]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[0], b1_vertices[1])->setGeomAssociation(curves[5]);
+    b1_vertices[1]->setGeomAssociation(curves[5]);
 
-    b3->getFace(Block::k_min)->getEdge(b3->getVertex(0), b3->getVertex(2))->setGeomAssociation(curves[4]);
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(0), b1->getVertex(2))->setGeomAssociation(curves[4]);
-    b1->getVertex(2)->setGeomAssociation(curves[4]);
+    b3_faces[Block::k_min]->getEdge(b3_vertices[0], b3_vertices[2])->setGeomAssociation(curves[4]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[0], b1_vertices[2])->setGeomAssociation(curves[4]);
+    b1_vertices[2]->setGeomAssociation(curves[4]);
 
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(1), b1->getVertex(3))->setGeomAssociation(surfaces[1]);
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(2), b1->getVertex(3))->setGeomAssociation(surfaces[1]);
-    b2->getFace(Block::k_min)->getEdge(b2->getVertex(2), b2->getVertex(3))->setGeomAssociation(surfaces[1]);
-    b1->getVertex(3)->setGeomAssociation(surfaces[1]);
-
-
-    b2->getFace(Block::k_max)->getEdge(b2->getVertex(4), b2->getVertex(5))->setGeomAssociation(curves[6]);
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(4), b1->getVertex(5))->setGeomAssociation(curves[6]);
-    b1->getVertex(5)->setGeomAssociation(curves[6]);
-
-    b3->getFace(Block::k_max)->getEdge(b3->getVertex(4), b3->getVertex(6))->setGeomAssociation(curves[7]);
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(4), b1->getVertex(6))->setGeomAssociation(curves[7]);
-    b1->getVertex(6)->setGeomAssociation(curves[7]);
-
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(5), b1->getVertex(7))->setGeomAssociation(surfaces[2]);
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(6), b1->getVertex(7))->setGeomAssociation(surfaces[2]);
-    b2->getFace(Block::k_max)->getEdge(b2->getVertex(6), b2->getVertex(7))->setGeomAssociation(surfaces[2]);
-    b1->getVertex(7)->setGeomAssociation(surfaces[2]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[1], b1_vertices[3])->setGeomAssociation(surfaces[1]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[2], b1_vertices[3])->setGeomAssociation(surfaces[1]);
+    b2_faces[Block::k_min]->getEdge(b2_vertices[2], b2_vertices[3])->setGeomAssociation(surfaces[1]);
+    b1_vertices[3]->setGeomAssociation(surfaces[1]);
 
 
-    b1->getFace(Block::j_min)->getEdge(b1->getVertex(0), b1->getVertex(4))->setGeomAssociation(curves[8]);
-    b1->getFace(Block::j_min)->getEdge(b1->getVertex(1), b1->getVertex(5))->setGeomAssociation(surfaces[4]);
-    b2->getFace(Block::j_min)->getEdge(b2->getVertex(1), b2->getVertex(5))->setGeomAssociation(curves[1]);
+    b2_faces[Block::k_max]->getEdge(b2_vertices[4], b2_vertices[5])->setGeomAssociation(curves[6]);
+    b1_faces[Block::k_max]->getEdge(b1_vertices[4], b1_vertices[5])->setGeomAssociation(curves[6]);
+    b1_vertices[5]->setGeomAssociation(curves[6]);
+
+    b3_faces[Block::k_max]->getEdge(b3_vertices[4], b3_vertices[6])->setGeomAssociation(curves[7]);
+    b1_faces[Block::k_max]->getEdge(b1_vertices[4], b1_vertices[6])->setGeomAssociation(curves[7]);
+    b1_vertices[6]->setGeomAssociation(curves[7]);
+
+    b1_faces[Block::k_max]->getEdge(b1_vertices[5], b1_vertices[7])->setGeomAssociation(surfaces[2]);
+    b1_faces[Block::k_max]->getEdge(b1_vertices[6], b1_vertices[7])->setGeomAssociation(surfaces[2]);
+    b2_faces[Block::k_max]->getEdge(b2_vertices[6], b2_vertices[7])->setGeomAssociation(surfaces[2]);
+    b1_vertices[7]->setGeomAssociation(surfaces[2]);
 
 
-    b3->getFace(Block::i_min)->getEdge(b3->getVertex(0), b3->getVertex(4))->setGeomAssociation(surfaces[3]);
-    b3->getFace(Block::i_min)->getEdge(b3->getVertex(2), b3->getVertex(6))->setGeomAssociation(curves[3]);
+    b1_faces[Block::j_min]->getEdge(b1_vertices[0], b1_vertices[4])->setGeomAssociation(curves[8]);
+    b1_faces[Block::j_min]->getEdge(b1_vertices[1], b1_vertices[5])->setGeomAssociation(surfaces[4]);
+    b2_faces[Block::j_min]->getEdge(b2_vertices[1], b2_vertices[5])->setGeomAssociation(curves[1]);
 
-    b3->getFace(Block::i_max)->getEdge(b3->getVertex(3), b3->getVertex(7))->setGeomAssociation(surfaces[0]);
+
+    b3_faces[Block::i_min]->getEdge(b3_vertices[0], b3_vertices[4])->setGeomAssociation(surfaces[3]);
+    b3_faces[Block::i_min]->getEdge(b3_vertices[2], b3_vertices[6])->setGeomAssociation(curves[3]);
+
+    b3_faces[Block::i_max]->getEdge(b3_vertices[3], b3_vertices[7])->setGeomAssociation(surfaces[0]);
 
 
-    b1->getVertex(0)->setGeomAssociation(vertices[4]);
-    b1->getVertex(4)->setGeomAssociation(vertices[5]);
-    b2->getVertex(1)->setGeomAssociation(vertices[0]);
-    b2->getVertex(5)->setGeomAssociation(vertices[2]);
-    b3->getVertex(2)->setGeomAssociation(vertices[1]);
-    b3->getVertex(6)->setGeomAssociation(vertices[3]);
+    b1_vertices[0]->setGeomAssociation(vertices[4]);
+    b1_vertices[4]->setGeomAssociation(vertices[5]);
+    b2_vertices[1]->setGeomAssociation(vertices[0]);
+    b2_vertices[5]->setGeomAssociation(vertices[2]);
+    b3_vertices[2]->setGeomAssociation(vertices[1]);
+    b3_vertices[6]->setGeomAssociation(vertices[3]);
 
 } // createCylinderTopoOGridQuartNonDeg
 /*----------------------------------------------------------------------------*/
@@ -1349,6 +1388,10 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridDemiNonDeg(Geom::Prop
     curves[2]->getPoint(param1+(param2-param1)*3/4, p3);
 
     double ratio = m_ratio/std::sqrt(2);
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    const std::vector<Vertex*>& b2_vertices = b2->getVertices();
+    const std::vector<Vertex*>& b3_vertices = b3->getVertices();
+    const std::vector<Vertex*>& b4_vertices = b4->getVertices();
 
     p5 = vertices[4]->getCoord()+(vertices[0]->getCoord()-vertices[4]->getCoord())*ratio;
     p4 = vertices[4]->getCoord()+(vertices[1]->getCoord()-vertices[4]->getCoord())*ratio;
@@ -1363,162 +1406,166 @@ void CommandNewTopoOGridOnGeometry::createCylinderTopoOGridDemiNonDeg(Geom::Prop
     p11 = vertices[5]->getCoord()+(p3-vertices[5]->getCoord())*m_ratio;
 
 
-    b1->getVertex(0)->setCoord(p4);
-    b1->getVertex(1)->setCoord(p5);
-    b1->getVertex(2)->setCoord(p9);
-    b1->getVertex(3)->setCoord(p8);
-    b1->getVertex(4)->setCoord(p7);
-    b1->getVertex(5)->setCoord(p6);
-    b1->getVertex(6)->setCoord(p11);
-    b1->getVertex(7)->setCoord(p10);
+    b1_vertices[0]->setCoord(p4);
+    b1_vertices[1]->setCoord(p5);
+    b1_vertices[2]->setCoord(p9);
+    b1_vertices[3]->setCoord(p8);
+    b1_vertices[4]->setCoord(p7);
+    b1_vertices[5]->setCoord(p6);
+    b1_vertices[6]->setCoord(p11);
+    b1_vertices[7]->setCoord(p10);
 
-    b2->getVertex(0)->setCoord(p5);
-    b2->getVertex(1)->setCoord(vertices[0]->getCoord());
-    b2->getVertex(2)->setCoord(p8);
-    b2->getVertex(3)->setCoord(p0);
-    b2->getVertex(4)->setCoord(p6);
-    b2->getVertex(5)->setCoord(vertices[2]->getCoord());
-    b2->getVertex(6)->setCoord(p10);
-    b2->getVertex(7)->setCoord(p2);
+    b2_vertices[0]->setCoord(p5);
+    b2_vertices[1]->setCoord(vertices[0]->getCoord());
+    b2_vertices[2]->setCoord(p8);
+    b2_vertices[3]->setCoord(p0);
+    b2_vertices[4]->setCoord(p6);
+    b2_vertices[5]->setCoord(vertices[2]->getCoord());
+    b2_vertices[6]->setCoord(p10);
+    b2_vertices[7]->setCoord(p2);
 
-    b3->getVertex(0)->setCoord(p9);
-    b3->getVertex(1)->setCoord(p8);
-    b3->getVertex(2)->setCoord(p1);
-    b3->getVertex(3)->setCoord(p0);
-    b3->getVertex(4)->setCoord(p11);
-    b3->getVertex(5)->setCoord(p10);
-    b3->getVertex(6)->setCoord(p3);
-    b3->getVertex(7)->setCoord(p2);
+    b3_vertices[0]->setCoord(p9);
+    b3_vertices[1]->setCoord(p8);
+    b3_vertices[2]->setCoord(p1);
+    b3_vertices[3]->setCoord(p0);
+    b3_vertices[4]->setCoord(p11);
+    b3_vertices[5]->setCoord(p10);
+    b3_vertices[6]->setCoord(p3);
+    b3_vertices[7]->setCoord(p2);
 
-    b4->getVertex(0)->setCoord(vertices[1]->getCoord());
-    b4->getVertex(1)->setCoord(p4);
-    b4->getVertex(2)->setCoord(p1);
-    b4->getVertex(3)->setCoord(p9);
-    b4->getVertex(4)->setCoord(vertices[3]->getCoord());
-    b4->getVertex(5)->setCoord(p7);
-    b4->getVertex(6)->setCoord(p3);
-    b4->getVertex(7)->setCoord(p11);
+    b4_vertices[0]->setCoord(vertices[1]->getCoord());
+    b4_vertices[1]->setCoord(p4);
+    b4_vertices[2]->setCoord(p1);
+    b4_vertices[3]->setCoord(p9);
+    b4_vertices[4]->setCoord(vertices[3]->getCoord());
+    b4_vertices[5]->setCoord(p7);
+    b4_vertices[6]->setCoord(p3);
+    b4_vertices[7]->setCoord(p11);
 
 
     // fusion des faces
-    b1->getFace(Block::i_max)->fuse(b2->getFace(Block::i_min), &getInfoCommand());
-    b1->getFace(Block::j_max)->fuse(b3->getFace(Block::j_min), &getInfoCommand());
-    b1->getFace(Block::i_min)->fuse(b4->getFace(Block::i_max), &getInfoCommand());
-    b2->getFace(Block::j_max)->fuse(b3->getFace(Block::i_max), &getInfoCommand());
-    b3->getFace(Block::i_min)->fuse(b4->getFace(Block::j_max), &getInfoCommand());
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+    const std::vector<Face*>& b2_faces = b2->getFaces();
+    const std::vector<Face*>& b3_faces = b3->getFaces();
+    const std::vector<Face*>& b4_faces = b4->getFaces();
+    b1_faces[Block::i_max]->fuse(b2_faces[Block::i_min], &getInfoCommand());
+    b1_faces[Block::j_max]->fuse(b3_faces[Block::j_min], &getInfoCommand());
+    b1_faces[Block::i_min]->fuse(b4_faces[Block::i_max], &getInfoCommand());
+    b2_faces[Block::j_max]->fuse(b3_faces[Block::i_max], &getInfoCommand());
+    b3_faces[Block::i_min]->fuse(b4_faces[Block::j_max], &getInfoCommand());
 
     // on coupe la face du bloc b1 pour qu'une arête soit sur la courbe 8
     std::vector<Edge* > splitingEdges;
     std::vector<CoFace* > cofaces;
-    cofaces.push_back(b1->getFace(Block::j_min)->getCoFace(0));
+    cofaces.push_back(b1_faces[Block::j_min]->getCoFaces()[0]);
     TopoHelper::splitFaces2D(cofaces,
-            b1->getFace(Block::k_min)->getEdge(b1->getVertex(0), b1->getVertex(1))->getCoEdge(0),
+            b1_faces[Block::k_min]->getEdge(b1_vertices[0], b1_vertices[1])->getCoEdges()[0],
             0.5, 0.0, false, false,
             splitingEdges,
             &getInfoCommand());
 
-    Vertex* v0 = TopoHelper::getCommonVertex(splitingEdges[0]->getCoEdge(0),
-            b1->getFace(Block::k_min)->getEdge(b1->getVertex(0), b1->getVertex(1))->getCoEdge(0));
-    Vertex* v1 = TopoHelper::getCommonVertex(splitingEdges[0]->getCoEdge(0),
-            b1->getFace(Block::k_max)->getEdge(b1->getVertex(4), b1->getVertex(5))->getCoEdge(0));
+    Vertex* v0 = TopoHelper::getCommonVertex(splitingEdges[0]->getCoEdges()[0],
+            b1_faces[Block::k_min]->getEdge(b1_vertices[0], b1_vertices[1])->getCoEdges()[0]);
+    Vertex* v1 = TopoHelper::getCommonVertex(splitingEdges[0]->getCoEdges()[0],
+            b1_faces[Block::k_max]->getEdge(b1_vertices[4], b1_vertices[5])->getCoEdges()[0]);
 
     v0->setCoord(vertices[4]->getCoord());
     v1->setCoord(vertices[5]->getCoord());
 
-    splitingEdges[0]->getCoEdge(0)->setGeomAssociation(curves[8]);
+    splitingEdges[0]->getCoEdges()[0]->setGeomAssociation(curves[8]);
 
     // on considère que la première surface est celle qui enveloppe
-    b2->getFace(Block::i_max)->setGeomAssociation(surfaces[0]);
-    b3->getFace(Block::j_max)->setGeomAssociation(surfaces[0]);
-    b4->getFace(Block::i_min)->setGeomAssociation(surfaces[0]);
+    b2_faces[Block::i_max]->setGeomAssociation(surfaces[0]);
+    b3_faces[Block::j_max]->setGeomAssociation(surfaces[0]);
+    b4_faces[Block::i_min]->setGeomAssociation(surfaces[0]);
 
     // la deuxième est au sommet du cylindre
-    b1->getFace(Block::k_min)->setGeomAssociation(surfaces[1]);
-    b2->getFace(Block::k_min)->setGeomAssociation(surfaces[1]);
-    b3->getFace(Block::k_min)->setGeomAssociation(surfaces[1]);
-    b4->getFace(Block::k_min)->setGeomAssociation(surfaces[1]);
+    b1_faces[Block::k_min]->setGeomAssociation(surfaces[1]);
+    b2_faces[Block::k_min]->setGeomAssociation(surfaces[1]);
+    b3_faces[Block::k_min]->setGeomAssociation(surfaces[1]);
+    b4_faces[Block::k_min]->setGeomAssociation(surfaces[1]);
 
     // la troisième est à la base du cylindre
-    b1->getFace(Block::k_max)->setGeomAssociation(surfaces[2]);
-    b2->getFace(Block::k_max)->setGeomAssociation(surfaces[2]);
-    b3->getFace(Block::k_max)->setGeomAssociation(surfaces[2]);
-    b4->getFace(Block::k_max)->setGeomAssociation(surfaces[2]);
+    b1_faces[Block::k_max]->setGeomAssociation(surfaces[2]);
+    b2_faces[Block::k_max]->setGeomAssociation(surfaces[2]);
+    b3_faces[Block::k_max]->setGeomAssociation(surfaces[2]);
+    b4_faces[Block::k_max]->setGeomAssociation(surfaces[2]);
 
-    b2->getFace(Block::j_min)->setGeomAssociation(surfaces[4]);
+    b2_faces[Block::j_min]->setGeomAssociation(surfaces[4]);
 
-    b4->getFace(Block::j_min)->setGeomAssociation(surfaces[3]);
+    b4_faces[Block::j_min]->setGeomAssociation(surfaces[3]);
 
-    CoFace* coface0 = b1->getFace(Block::j_min)->getCoFace(0);
-    if (coface0->find(b1->getVertex(1))){
-        b1->getFace(Block::j_min)->getCoFace(0)->setGeomAssociation(surfaces[4]);
-        b1->getFace(Block::j_min)->getCoFace(1)->setGeomAssociation(surfaces[3]);
+    CoFace* coface0 = b1_faces[Block::j_min]->getCoFaces()[0];
+    if (Utils::contains(b1_vertices[1], coface0->getVertices())){
+        b1_faces[Block::j_min]->getCoFaces()[0]->setGeomAssociation(surfaces[4]);
+        b1_faces[Block::j_min]->getCoFaces()[1]->setGeomAssociation(surfaces[3]);
     } else {
-        b1->getFace(Block::j_min)->getCoFace(1)->setGeomAssociation(surfaces[4]);
-        b1->getFace(Block::j_min)->getCoFace(0)->setGeomAssociation(surfaces[3]);
+        b1_faces[Block::j_min]->getCoFaces()[1]->setGeomAssociation(surfaces[4]);
+        b1_faces[Block::j_min]->getCoFaces()[0]->setGeomAssociation(surfaces[3]);
     }
 
     // on considère que la courbe 0 est celle qui est à au sommet du cylindre
-    b2->getFace(Block::k_min)->getEdge(b2->getVertex(1), b2->getVertex(3))->setGeomAssociation(curves[0]);
-    b3->getFace(Block::k_min)->getEdge(b3->getVertex(2), b3->getVertex(3))->setGeomAssociation(curves[0]);
-    b4->getFace(Block::k_min)->getEdge(b4->getVertex(2), b4->getVertex(0))->setGeomAssociation(curves[0]);
-    b2->getVertex(3)->setGeomAssociation(curves[0]);
-    b3->getVertex(2)->setGeomAssociation(curves[0]);
+    b2_faces[Block::k_min]->getEdge(b2_vertices[1], b2_vertices[3])->setGeomAssociation(curves[0]);
+    b3_faces[Block::k_min]->getEdge(b3_vertices[2], b3_vertices[3])->setGeomAssociation(curves[0]);
+    b4_faces[Block::k_min]->getEdge(b4_vertices[2], b4_vertices[0])->setGeomAssociation(curves[0]);
+    b2_vertices[3]->setGeomAssociation(curves[0]);
+    b3_vertices[2]->setGeomAssociation(curves[0]);
 
     // on considère que la courbe 2 est celle qui est à la base du cylindre
-    b2->getFace(Block::k_max)->getEdge(b2->getVertex(5), b2->getVertex(7))->setGeomAssociation(curves[2]);
-    b3->getFace(Block::k_max)->getEdge(b3->getVertex(6), b3->getVertex(7))->setGeomAssociation(curves[2]);
-    b4->getFace(Block::k_max)->getEdge(b4->getVertex(6), b4->getVertex(4))->setGeomAssociation(curves[2]);
-    b2->getVertex(7)->setGeomAssociation(curves[2]);
-    b3->getVertex(6)->setGeomAssociation(curves[2]);
+    b2_faces[Block::k_max]->getEdge(b2_vertices[5], b2_vertices[7])->setGeomAssociation(curves[2]);
+    b3_faces[Block::k_max]->getEdge(b3_vertices[6], b3_vertices[7])->setGeomAssociation(curves[2]);
+    b4_faces[Block::k_max]->getEdge(b4_vertices[6], b4_vertices[4])->setGeomAssociation(curves[2]);
+    b2_vertices[7]->setGeomAssociation(curves[2]);
+    b3_vertices[6]->setGeomAssociation(curves[2]);
 
-    b2->getFace(Block::k_min)->getEdge(b2->getVertex(0), b2->getVertex(1))->setGeomAssociation(curves[5]);
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(0), b1->getVertex(1))->getCoEdge(v0, b1->getVertex(1))->setGeomAssociation(curves[5]);
-    b1->getVertex(1)->setGeomAssociation(curves[5]);
+    b2_faces[Block::k_min]->getEdge(b2_vertices[0], b2_vertices[1])->setGeomAssociation(curves[5]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[0], b1_vertices[1])->getCoEdge(v0, b1_vertices[1])->setGeomAssociation(curves[5]);
+    b1_vertices[1]->setGeomAssociation(curves[5]);
 
-    b4->getFace(Block::k_min)->getEdge(b4->getVertex(0), b4->getVertex(1))->setGeomAssociation(curves[4]);
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(0), b1->getVertex(1))->getCoEdge(b1->getVertex(0), v0)->setGeomAssociation(curves[4]);
-    b1->getVertex(0)->setGeomAssociation(curves[4]);
+    b4_faces[Block::k_min]->getEdge(b4_vertices[0], b4_vertices[1])->setGeomAssociation(curves[4]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[0], b1_vertices[1])->getCoEdge(b1_vertices[0], v0)->setGeomAssociation(curves[4]);
+    b1_vertices[0]->setGeomAssociation(curves[4]);
 
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(1), b1->getVertex(3))->setGeomAssociation(surfaces[1]);
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(2), b1->getVertex(3))->setGeomAssociation(surfaces[1]);
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(2), b1->getVertex(0))->setGeomAssociation(surfaces[1]);
-    b2->getFace(Block::k_min)->getEdge(b2->getVertex(2), b2->getVertex(3))->setGeomAssociation(surfaces[1]);
-    b4->getFace(Block::k_min)->getEdge(b4->getVertex(2), b4->getVertex(3))->setGeomAssociation(surfaces[1]);
-    b1->getVertex(3)->setGeomAssociation(surfaces[1]);
-    b1->getVertex(2)->setGeomAssociation(surfaces[1]);
-
-
-    b2->getFace(Block::k_max)->getEdge(b2->getVertex(4), b2->getVertex(5))->setGeomAssociation(curves[6]);
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(4), b1->getVertex(5))->getCoEdge(v1, b1->getVertex(5))->setGeomAssociation(curves[6]);
-    b1->getVertex(5)->setGeomAssociation(curves[6]);
-
-    b4->getFace(Block::k_max)->getEdge(b4->getVertex(4), b4->getVertex(5))->setGeomAssociation(curves[7]);
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(4), b1->getVertex(5))->getCoEdge(b1->getVertex(4), v1)->setGeomAssociation(curves[7]);
-    b1->getVertex(4)->setGeomAssociation(curves[7]);
-
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(5), b1->getVertex(7))->setGeomAssociation(surfaces[2]);
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(6), b1->getVertex(7))->setGeomAssociation(surfaces[2]);
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(6), b1->getVertex(4))->setGeomAssociation(surfaces[2]);
-    b2->getFace(Block::k_max)->getEdge(b2->getVertex(6), b2->getVertex(7))->setGeomAssociation(surfaces[2]);
-    b4->getFace(Block::k_max)->getEdge(b4->getVertex(6), b4->getVertex(7))->setGeomAssociation(surfaces[2]);
-    b1->getVertex(7)->setGeomAssociation(surfaces[2]);
-    b1->getVertex(6)->setGeomAssociation(surfaces[2]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[1], b1_vertices[3])->setGeomAssociation(surfaces[1]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[2], b1_vertices[3])->setGeomAssociation(surfaces[1]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[2], b1_vertices[0])->setGeomAssociation(surfaces[1]);
+    b2_faces[Block::k_min]->getEdge(b2_vertices[2], b2_vertices[3])->setGeomAssociation(surfaces[1]);
+    b4_faces[Block::k_min]->getEdge(b4_vertices[2], b4_vertices[3])->setGeomAssociation(surfaces[1]);
+    b1_vertices[3]->setGeomAssociation(surfaces[1]);
+    b1_vertices[2]->setGeomAssociation(surfaces[1]);
 
 
-    b1->getFace(Block::j_min)->getEdge(b1->getVertex(1), b1->getVertex(5))->setGeomAssociation(surfaces[4]);
-    b2->getFace(Block::j_min)->getEdge(b2->getVertex(1), b2->getVertex(5))->setGeomAssociation(curves[1]);
+    b2_faces[Block::k_max]->getEdge(b2_vertices[4], b2_vertices[5])->setGeomAssociation(curves[6]);
+    b1_faces[Block::k_max]->getEdge(b1_vertices[4], b1_vertices[5])->getCoEdge(v1, b1_vertices[5])->setGeomAssociation(curves[6]);
+    b1_vertices[5]->setGeomAssociation(curves[6]);
+
+    b4_faces[Block::k_max]->getEdge(b4_vertices[4], b4_vertices[5])->setGeomAssociation(curves[7]);
+    b1_faces[Block::k_max]->getEdge(b1_vertices[4], b1_vertices[5])->getCoEdge(b1_vertices[4], v1)->setGeomAssociation(curves[7]);
+    b1_vertices[4]->setGeomAssociation(curves[7]);
+
+    b1_faces[Block::k_max]->getEdge(b1_vertices[5], b1_vertices[7])->setGeomAssociation(surfaces[2]);
+    b1_faces[Block::k_max]->getEdge(b1_vertices[6], b1_vertices[7])->setGeomAssociation(surfaces[2]);
+    b1_faces[Block::k_max]->getEdge(b1_vertices[6], b1_vertices[4])->setGeomAssociation(surfaces[2]);
+    b2_faces[Block::k_max]->getEdge(b2_vertices[6], b2_vertices[7])->setGeomAssociation(surfaces[2]);
+    b4_faces[Block::k_max]->getEdge(b4_vertices[6], b4_vertices[7])->setGeomAssociation(surfaces[2]);
+    b1_vertices[7]->setGeomAssociation(surfaces[2]);
+    b1_vertices[6]->setGeomAssociation(surfaces[2]);
 
 
-    b1->getFace(Block::j_min)->getEdge(b1->getVertex(0), b1->getVertex(4))->setGeomAssociation(surfaces[3]);
-    b4->getFace(Block::i_min)->getEdge(b4->getVertex(0), b4->getVertex(4))->setGeomAssociation(curves[3]);
+    b1_faces[Block::j_min]->getEdge(b1_vertices[1], b1_vertices[5])->setGeomAssociation(surfaces[4]);
+    b2_faces[Block::j_min]->getEdge(b2_vertices[1], b2_vertices[5])->setGeomAssociation(curves[1]);
 
-    b3->getFace(Block::j_max)->getEdge(b3->getVertex(3), b3->getVertex(7))->setGeomAssociation(surfaces[0]);
-    b3->getFace(Block::j_max)->getEdge(b3->getVertex(2), b3->getVertex(6))->setGeomAssociation(surfaces[0]);
 
-    b2->getVertex(1)->setGeomAssociation(vertices[0]);
-    b2->getVertex(5)->setGeomAssociation(vertices[2]);
-    b4->getVertex(0)->setGeomAssociation(vertices[1]);
-    b4->getVertex(4)->setGeomAssociation(vertices[3]);
+    b1_faces[Block::j_min]->getEdge(b1_vertices[0], b1_vertices[4])->setGeomAssociation(surfaces[3]);
+    b4_faces[Block::i_min]->getEdge(b4_vertices[0], b4_vertices[4])->setGeomAssociation(curves[3]);
+
+    b3_faces[Block::j_max]->getEdge(b3_vertices[3], b3_vertices[7])->setGeomAssociation(surfaces[0]);
+    b3_faces[Block::j_max]->getEdge(b3_vertices[2], b3_vertices[6])->setGeomAssociation(surfaces[0]);
+
+    b2_vertices[1]->setGeomAssociation(vertices[0]);
+    b2_vertices[5]->setGeomAssociation(vertices[2]);
+    b4_vertices[0]->setGeomAssociation(vertices[1]);
+    b4_vertices[4]->setGeomAssociation(vertices[3]);
     v0->setGeomAssociation(vertices[4]);
     v1->setGeomAssociation(vertices[5]);
 
@@ -1618,15 +1665,17 @@ createSphereTopo1BlockPlein(Geom::PropertySphere* propertySph)
         throw TkUtil::Exception(message);
     }
 
+    const std::vector<Face*>& b1_faces = b1->getFaces();
     for (uint i=0; i<6; i++){
-        Topo::Face* face = b1->getFace(i);
+        Topo::Face* face = b1_faces[i];
         face->setGeomAssociation(surfaces[0]);
         for (uint j=0; j<4; j++)
-            face->getEdge(j)->setGeomAssociation(surfaces[0]);
+            getEdge(face, j)->setGeomAssociation(surfaces[0]);
     }
 
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
     for (uint i=0; i<8; i++)
-        b1->getVertex(i)->setGeomAssociation(surfaces[0]);
+        b1_vertices[i]->setGeomAssociation(surfaces[0]);
 }
 /*----------------------------------------------------------------------------*/
 void CommandNewTopoOGridOnGeometry::
@@ -1661,9 +1710,11 @@ createSphereTopo1BlockDemi(Geom::PropertySphere* propertySph)
     // on coupe la face du bloc b1 pour qu'une arête soit sur la courbe 2
     std::vector<Edge* > splitingEdges;
     std::vector<CoFace* > cofaces;
-    cofaces.push_back(b1->getFace(Block::j_min)->getCoFace(0));
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+    cofaces.push_back(b1_faces[Block::j_min]->getCoFaces()[0]);
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
     TopoHelper::splitFaces2D(cofaces,
-            b1->getFace(Block::j_min)->getEdge(b1->getVertex(0), b1->getVertex(1))->getCoEdge(0),
+            b1_faces[Block::j_min]->getEdge(b1_vertices[0], b1_vertices[1])->getCoEdges()[0],
             0.5, 0.0, false, false,
             splitingEdges,
             &getInfoCommand());
@@ -1685,20 +1736,20 @@ createSphereTopo1BlockDemi(Geom::PropertySphere* propertySph)
     for (uint i=0; i<6; i++){
         if (i==2)
             continue;
-        Topo::Face* face = b1->getFace(i);
+        Topo::Face* face = b1_faces[i];
         face->setGeomAssociation(surfaces[0]);
         for (uint j=0; j<4; j++)
-            face->getEdge(j)->setGeomAssociation(surfaces[0]);
+            getEdge(face, j)->setGeomAssociation(surfaces[0]);
     }
 
     for (uint i=0; i<8; i++)
-        b1->getVertex(i)->setGeomAssociation(surfaces[0]);
+        b1_vertices[i]->setGeomAssociation(surfaces[0]);
 
-    b1->getFace(Block::j_min)->getCoFaces(cofaces);
-    if (cofaces[0]->find(b1->getVertex(0))){
+    cofaces = b1_faces[Block::j_min]->getCoFaces();
+    if (Utils::contains(b1_vertices[0], cofaces[0]->getVertices())){
         cofaces[0]->setGeomAssociation(surfaces[2]);
         cofaces[1]->setGeomAssociation(surfaces[1]);
-    } else if (cofaces[0]->find(b1->getVertex(1))){
+    } else if (Utils::contains(b1_vertices[1], cofaces[0]->getVertices())){
         cofaces[0]->setGeomAssociation(surfaces[1]);
         cofaces[1]->setGeomAssociation(surfaces[2]);
     } else
@@ -1716,7 +1767,7 @@ createSphereTopo1BlockDemi(Geom::PropertySphere* propertySph)
     Vertex* v1 = 0;
     std::vector<CoEdge* > coedges;
     for (uint i=0; i<splitingEdges.size(); i++)
-        coedges.push_back(splitingEdges[i]->getCoEdge(0));
+        coedges.push_back(splitingEdges[i]->getCoEdges()[0]);
     TopoHelper::getVerticesTip(coedges, v0, v1, false);
 
     // on met v0 en z max sur la sphère
@@ -1738,25 +1789,23 @@ createSphereTopo1BlockDemi(Geom::PropertySphere* propertySph)
     }
 
 
-    for (uint i=0; i<b1->getFace(Block::j_min)->getNbCoFaces(); i++){
-        CoFace* coface = b1->getFace(Block::j_min)->getCoFace(i);
-        for (uint j=0; j<coface->getNbEdges(); j++)
-            coface->getEdge(j)->setGeomAssociation(coface->getGeomAssociation());
-    }
+    for (CoFace* cf : b1_faces[Block::j_min]->getCoFaces())
+        for (Edge* e : cf->getEdges())
+            e->setGeomAssociation(cf->getGeomAssociation());
 
-    b1->getFace(Block::j_min)->getEdge(v1, b1->getVertex(1))->setGeomAssociation(curves[1]);
-    b1->getFace(Block::j_min)->getEdge(b1->getVertex(1), b1->getVertex(5))->setGeomAssociation(curves[1]);
-    b1->getFace(Block::j_min)->getEdge(v0, b1->getVertex(5))->setGeomAssociation(curves[1]);
+    b1_faces[Block::j_min]->getEdge(v1, b1_vertices[1])->setGeomAssociation(curves[1]);
+    b1_faces[Block::j_min]->getEdge(b1_vertices[1], b1_vertices[5])->setGeomAssociation(curves[1]);
+    b1_faces[Block::j_min]->getEdge(v0, b1_vertices[5])->setGeomAssociation(curves[1]);
 
-    b1->getFace(Block::j_min)->getEdge(v1, b1->getVertex(0))->setGeomAssociation(curves[0]);
-    b1->getFace(Block::j_min)->getEdge(b1->getVertex(0), b1->getVertex(4))->setGeomAssociation(curves[0]);
-    b1->getFace(Block::j_min)->getEdge(v0, b1->getVertex(4))->setGeomAssociation(curves[0]);
+    b1_faces[Block::j_min]->getEdge(v1, b1_vertices[0])->setGeomAssociation(curves[0]);
+    b1_faces[Block::j_min]->getEdge(b1_vertices[0], b1_vertices[4])->setGeomAssociation(curves[0]);
+    b1_faces[Block::j_min]->getEdge(v0, b1_vertices[4])->setGeomAssociation(curves[0]);
 
-    b1->getVertex(1)->setGeomAssociation(curves[1]);
-    b1->getVertex(5)->setGeomAssociation(curves[1]);
+    b1_vertices[1]->setGeomAssociation(curves[1]);
+    b1_vertices[5]->setGeomAssociation(curves[1]);
 
-    b1->getVertex(0)->setGeomAssociation(curves[0]);
-    b1->getVertex(4)->setGeomAssociation(curves[0]);
+    b1_vertices[0]->setGeomAssociation(curves[0]);
+    b1_vertices[4]->setGeomAssociation(curves[0]);
 
 
     // sur l'axe des Z
@@ -1807,20 +1856,22 @@ createSphereTopo1BlockQuart(Geom::PropertySphere* propertySph)
         throw TkUtil::Exception(message);
     }
 
+    const std::vector<Face*>& b1_faces = b1->getFaces();
     for (uint i=0; i<6; i++){
         if (i==2 || i==0)
             continue;
-        Topo::Face* face = b1->getFace(i);
+        Topo::Face* face = b1_faces[i];
         face->setGeomAssociation(surfaces[0]);
         for (uint j=0; j<4; j++)
-            face->getEdge(j)->setGeomAssociation(surfaces[0]);
+            getEdge(face, j)->setGeomAssociation(surfaces[0]);
     }
 
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
     for (uint i=0; i<8; i++)
-        b1->getVertex(i)->setGeomAssociation(surfaces[0]);
+        b1_vertices[i]->setGeomAssociation(surfaces[0]);
 
-    b1->getFace(Block::i_min)->setGeomAssociation(surfaces[2]);
-    b1->getFace(Block::j_min)->setGeomAssociation(surfaces[1]);
+    b1_faces[Block::i_min]->setGeomAssociation(surfaces[2]);
+    b1_faces[Block::j_min]->setGeomAssociation(surfaces[1]);
 
     // les sommets géométriques
     if (vertices.size() != 2){
@@ -1830,8 +1881,8 @@ createSphereTopo1BlockQuart(Geom::PropertySphere* propertySph)
         throw TkUtil::Exception(message);
     }
 
-    Vertex* v0 = b1->getVertex(4);
-    Vertex* v1 = b1->getVertex(0);
+    Vertex* v0 = b1_vertices[4];
+    Vertex* v1 = b1_vertices[0];
     v0->setGeomAssociation(vertices[0]);
     v1->setGeomAssociation(vertices[1]);
     v0->setCoord(vertices[0]->getCoord());
@@ -1844,21 +1895,21 @@ createSphereTopo1BlockQuart(Geom::PropertySphere* propertySph)
         throw TkUtil::Exception(message);
     }
 
-    b1->getFace(Block::i_min)->getEdge(b1->getVertex(0), b1->getVertex(2))->setGeomAssociation(curves[0]);
-    b1->getFace(Block::i_min)->getEdge(b1->getVertex(2), b1->getVertex(6))->setGeomAssociation(curves[0]);
-    b1->getFace(Block::i_min)->getEdge(b1->getVertex(6), b1->getVertex(4))->setGeomAssociation(curves[0]);
+    b1_faces[Block::i_min]->getEdge(b1_vertices[0], b1_vertices[2])->setGeomAssociation(curves[0]);
+    b1_faces[Block::i_min]->getEdge(b1_vertices[2], b1_vertices[6])->setGeomAssociation(curves[0]);
+    b1_faces[Block::i_min]->getEdge(b1_vertices[6], b1_vertices[4])->setGeomAssociation(curves[0]);
 
-    b1->getFace(Block::j_min)->getEdge(b1->getVertex(0), b1->getVertex(1))->setGeomAssociation(curves[1]);
-    b1->getFace(Block::j_min)->getEdge(b1->getVertex(1), b1->getVertex(5))->setGeomAssociation(curves[1]);
-    b1->getFace(Block::j_min)->getEdge(b1->getVertex(5), b1->getVertex(4))->setGeomAssociation(curves[1]);
+    b1_faces[Block::j_min]->getEdge(b1_vertices[0], b1_vertices[1])->setGeomAssociation(curves[1]);
+    b1_faces[Block::j_min]->getEdge(b1_vertices[1], b1_vertices[5])->setGeomAssociation(curves[1]);
+    b1_faces[Block::j_min]->getEdge(b1_vertices[5], b1_vertices[4])->setGeomAssociation(curves[1]);
 
-    b1->getFace(Block::i_min)->getEdge(b1->getVertex(0), b1->getVertex(4))->setGeomAssociation(curves[2]);
+    b1_faces[Block::i_min]->getEdge(b1_vertices[0], b1_vertices[4])->setGeomAssociation(curves[2]);
 
-    b1->getVertex(2)->setGeomAssociation(curves[0]);
-    b1->getVertex(6)->setGeomAssociation(curves[0]);
+    b1_vertices[2]->setGeomAssociation(curves[0]);
+    b1_vertices[6]->setGeomAssociation(curves[0]);
 
-    b1->getVertex(1)->setGeomAssociation(curves[1]);
-    b1->getVertex(5)->setGeomAssociation(curves[1]);
+    b1_vertices[1]->setGeomAssociation(curves[1]);
+    b1_vertices[5]->setGeomAssociation(curves[1]);
 
 }
 /*----------------------------------------------------------------------------*/
@@ -1917,20 +1968,22 @@ createSphereTopo1BlockHuitieme(Geom::PropertySphere* propertySph)
         throw TkUtil::Exception(message);
     }
 
+    const std::vector<Face*>& b1_faces = b1->getFaces();
     for (uint i=0; i<6; i++){
         if (i==0 || i==2 || i==4)
             continue;
-        Topo::Face* face = b1->getFace(i);
+        Topo::Face* face = b1_faces[i];
         face->setGeomAssociation(surfaces[0]);
         for (uint j=0; j<4; j++)
-            face->getEdge(j)->setGeomAssociation(surfaces[0]);
+            getEdge(face, j)->setGeomAssociation(surfaces[0]);
     }
 
-    b1->getVertex(7)->setGeomAssociation(surfaces[0]);
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    b1_vertices[7]->setGeomAssociation(surfaces[0]);
 
-    b1->getFace(Block::i_min)->setGeomAssociation(surfaces[3]);
-    b1->getFace(Block::j_min)->setGeomAssociation(surfaces[2]);
-    b1->getFace(Block::k_min)->setGeomAssociation(surfaces[1]);
+    b1_faces[Block::i_min]->setGeomAssociation(surfaces[3]);
+    b1_faces[Block::j_min]->setGeomAssociation(surfaces[2]);
+    b1_faces[Block::k_min]->setGeomAssociation(surfaces[1]);
 
     if (curves.size() != 6){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -1939,19 +1992,19 @@ createSphereTopo1BlockHuitieme(Geom::PropertySphere* propertySph)
         throw TkUtil::Exception(message);
     }
 
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(0), b1->getVertex(1))->setGeomAssociation(curves[4]);
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(2), b1->getVertex(3))->setGeomAssociation(curves[1]);
-    b1->getFace(Block::k_min)->getEdge(b1->getVertex(1), b1->getVertex(3))->setGeomAssociation(curves[1]);
-    b1->getFace(Block::j_min)->getEdge(b1->getVertex(1), b1->getVertex(5))->setGeomAssociation(curves[2]);
-    b1->getFace(Block::j_min)->getEdge(b1->getVertex(4), b1->getVertex(5))->setGeomAssociation(curves[2]);
-    b1->getFace(Block::j_min)->getEdge(b1->getVertex(4), b1->getVertex(0))->setGeomAssociation(curves[5]);
-    b1->getFace(Block::i_min)->getEdge(b1->getVertex(2), b1->getVertex(6))->setGeomAssociation(curves[0]);
-    b1->getFace(Block::i_min)->getEdge(b1->getVertex(4), b1->getVertex(6))->setGeomAssociation(curves[0]);
-    b1->getFace(Block::i_min)->getEdge(b1->getVertex(2), b1->getVertex(0))->setGeomAssociation(curves[3]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[0], b1_vertices[1])->setGeomAssociation(curves[4]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[2], b1_vertices[3])->setGeomAssociation(curves[1]);
+    b1_faces[Block::k_min]->getEdge(b1_vertices[1], b1_vertices[3])->setGeomAssociation(curves[1]);
+    b1_faces[Block::j_min]->getEdge(b1_vertices[1], b1_vertices[5])->setGeomAssociation(curves[2]);
+    b1_faces[Block::j_min]->getEdge(b1_vertices[4], b1_vertices[5])->setGeomAssociation(curves[2]);
+    b1_faces[Block::j_min]->getEdge(b1_vertices[4], b1_vertices[0])->setGeomAssociation(curves[5]);
+    b1_faces[Block::i_min]->getEdge(b1_vertices[2], b1_vertices[6])->setGeomAssociation(curves[0]);
+    b1_faces[Block::i_min]->getEdge(b1_vertices[4], b1_vertices[6])->setGeomAssociation(curves[0]);
+    b1_faces[Block::i_min]->getEdge(b1_vertices[2], b1_vertices[0])->setGeomAssociation(curves[3]);
 
-    b1->getVertex(3)->setGeomAssociation(curves[1]);
-    b1->getVertex(6)->setGeomAssociation(curves[0]);
-    b1->getVertex(5)->setGeomAssociation(curves[2]);
+    b1_vertices[3]->setGeomAssociation(curves[1]);
+    b1_vertices[6]->setGeomAssociation(curves[0]);
+    b1_vertices[5]->setGeomAssociation(curves[2]);
 }
 /*----------------------------------------------------------------------------*/
 void CommandNewTopoOGridOnGeometry::
@@ -2003,8 +2056,8 @@ createSphereTopoOGridPleinDeg(Geom::PropertySphere* propertySph)
     // on place les sommets
     for (uint j=0; j<6; j++)
         for (uint i=0; i<4; i++){
-                blocs[j]->getVertex(i)->setCoord(pts_ext[TopoHelper::tab2IndVtxByFaceOnBlock[j][i]]);
-                blocs[j]->getVertex(i+4)->setCoord(centre);
+                blocs[j]->getVertices()[i]->setCoord(pts_ext[TopoHelper::tab2IndVtxByFaceOnBlock[j][i]]);
+                blocs[j]->getVertices()[i+4]->setCoord(centre);
             }
 
     // dégénéréscence des blocs
@@ -2012,18 +2065,24 @@ createSphereTopoOGridPleinDeg(Geom::PropertySphere* propertySph)
         blocs[j]->degenerateFaceInVertex(Block::k_max, &getInfoCommand());
 
     // on fusionne les blocs
-    b2->getFace(Block::j_min)->fuse(b4->getFace(Block::j_max), &getInfoCommand());
-    b2->getFace(Block::i_min)->fuse(b7->getFace(Block::j_max), &getInfoCommand());
-    b2->getFace(Block::i_max)->fuse(b6->getFace(Block::j_min), &getInfoCommand());
-    b4->getFace(Block::i_min)->fuse(b7->getFace(Block::i_max), &getInfoCommand());
-    b4->getFace(Block::i_max)->fuse(b6->getFace(Block::i_max), &getInfoCommand());
-    b3->getFace(Block::j_max)->fuse(b4->getFace(Block::j_min), &getInfoCommand());
-    b3->getFace(Block::i_min)->fuse(b7->getFace(Block::j_min), &getInfoCommand());
-    b3->getFace(Block::i_max)->fuse(b6->getFace(Block::j_max), &getInfoCommand());
-    b5->getFace(Block::i_min)->fuse(b7->getFace(Block::i_min), &getInfoCommand());
-    b3->getFace(Block::j_min)->fuse(b5->getFace(Block::j_max), &getInfoCommand());
-    b5->getFace(Block::i_max)->fuse(b6->getFace(Block::i_min), &getInfoCommand());
-    b2->getFace(Block::j_max)->fuse(b5->getFace(Block::j_min), &getInfoCommand());
+    const std::vector<Face*>& b2_faces = b2->getFaces();
+    const std::vector<Face*>& b3_faces = b3->getFaces();
+    const std::vector<Face*>& b4_faces = b4->getFaces();
+    const std::vector<Face*>& b5_faces = b5->getFaces();
+    const std::vector<Face*>& b6_faces = b6->getFaces();
+    const std::vector<Face*>& b7_faces = b7->getFaces();
+    b2_faces[Block::j_min]->fuse(b4_faces[Block::j_max], &getInfoCommand());
+    b2_faces[Block::i_min]->fuse(b7_faces[Block::j_max], &getInfoCommand());
+    b2_faces[Block::i_max]->fuse(b6_faces[Block::j_min], &getInfoCommand());
+    b4_faces[Block::i_min]->fuse(b7_faces[Block::i_max], &getInfoCommand());
+    b4_faces[Block::i_max]->fuse(b6_faces[Block::i_max], &getInfoCommand());
+    b3_faces[Block::j_max]->fuse(b4_faces[Block::j_min], &getInfoCommand());
+    b3_faces[Block::i_min]->fuse(b7_faces[Block::j_min], &getInfoCommand());
+    b3_faces[Block::i_max]->fuse(b6_faces[Block::j_max], &getInfoCommand());
+    b5_faces[Block::i_min]->fuse(b7_faces[Block::i_min], &getInfoCommand());
+    b3_faces[Block::j_min]->fuse(b5_faces[Block::j_max], &getInfoCommand());
+    b5_faces[Block::i_max]->fuse(b6_faces[Block::i_min], &getInfoCommand());
+    b2_faces[Block::j_max]->fuse(b5_faces[Block::j_min], &getInfoCommand());
 
     // les projections sur la géométrie
     auto surfaces = dynamic_cast<Geom::Volume*>(getGeomEntity())->getSurfaces();
@@ -2036,12 +2095,12 @@ createSphereTopoOGridPleinDeg(Geom::PropertySphere* propertySph)
 
     // les projections
     for (uint j=0; j<6; j++){
-        Face* face = blocs[j]->getFace(Block::k_min);
+        Face* face = blocs[j]->getFaces()[Block::k_min];
         face->setGeomAssociation(surfaces[0]);
 
         for (uint i=0; i<4; i++){
-            face->getEdge(i)->setGeomAssociation(surfaces[0]);
-            face->getVertex(i)->setGeomAssociation(surfaces[0]);
+            getEdge(face, i)->setGeomAssociation(surfaces[0]);
+            face->getVertices()[i]->setGeomAssociation(surfaces[0]);
         }
     }
 }
@@ -2111,31 +2170,40 @@ createSphereTopoOGridPleinNonDeg(Geom::PropertySphere* propertySph)
     // on place les sommets
 
     // le bloc au centre (b1)
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
     for (uint i=0; i<8; i++)
-        b1->getVertex(i)->setCoord(pts_int[i]);
+        b1_vertices[i]->setCoord(pts_int[i]);
 
     for (uint j=0; j<6; j++)
         for (uint i=0; i<4; i++){
-                blocs[j]->getVertex(i)->setCoord(pts_ext[TopoHelper::tab2IndVtxByFaceOnBlock[j][i]]);
-                blocs[j]->getVertex(i+4)->setCoord(pts_int[TopoHelper::tab2IndVtxByFaceOnBlock[j][i]]);
+                blocs[j]->getVertices()[i]->setCoord(pts_ext[TopoHelper::tab2IndVtxByFaceOnBlock[j][i]]);
+                blocs[j]->getVertices()[i+4]->setCoord(pts_int[TopoHelper::tab2IndVtxByFaceOnBlock[j][i]]);
             }
 
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+    const std::vector<Face*>& b2_faces = b2->getFaces();
+    const std::vector<Face*>& b3_faces = b3->getFaces();
+    const std::vector<Face*>& b4_faces = b4->getFaces();
+    const std::vector<Face*>& b5_faces = b5->getFaces();
+    const std::vector<Face*>& b6_faces = b6->getFaces();
+    const std::vector<Face*>& b7_faces = b7->getFaces();
+    
     // on fusionne les blocs
     for (uint j=0; j<6; j++)
-        b1->getFace(j)->fuse(blocs[j]->getFace(Block::k_max), &getInfoCommand());
+        b1_faces[j]->fuse(blocs[j]->getFaces()[Block::k_max], &getInfoCommand());
 
-    b2->getFace(Block::j_min)->fuse(b4->getFace(Block::j_max), &getInfoCommand());
-    b2->getFace(Block::i_min)->fuse(b7->getFace(Block::j_max), &getInfoCommand());
-    b2->getFace(Block::i_max)->fuse(b6->getFace(Block::j_min), &getInfoCommand());
-    b4->getFace(Block::i_min)->fuse(b7->getFace(Block::i_max), &getInfoCommand());
-    b4->getFace(Block::i_max)->fuse(b6->getFace(Block::i_max), &getInfoCommand());
-    b3->getFace(Block::j_max)->fuse(b4->getFace(Block::j_min), &getInfoCommand());
-    b3->getFace(Block::i_min)->fuse(b7->getFace(Block::j_min), &getInfoCommand());
-    b3->getFace(Block::i_max)->fuse(b6->getFace(Block::j_max), &getInfoCommand());
-    b5->getFace(Block::i_min)->fuse(b7->getFace(Block::i_min), &getInfoCommand());
-    b3->getFace(Block::j_min)->fuse(b5->getFace(Block::j_max), &getInfoCommand());
-    b5->getFace(Block::i_max)->fuse(b6->getFace(Block::i_min), &getInfoCommand());
-    b2->getFace(Block::j_max)->fuse(b5->getFace(Block::j_min), &getInfoCommand());
+    b2_faces[Block::j_min]->fuse(b4_faces[Block::j_max], &getInfoCommand());
+    b2_faces[Block::i_min]->fuse(b7_faces[Block::j_max], &getInfoCommand());
+    b2_faces[Block::i_max]->fuse(b6_faces[Block::j_min], &getInfoCommand());
+    b4_faces[Block::i_min]->fuse(b7_faces[Block::i_max], &getInfoCommand());
+    b4_faces[Block::i_max]->fuse(b6_faces[Block::i_max], &getInfoCommand());
+    b3_faces[Block::j_max]->fuse(b4_faces[Block::j_min], &getInfoCommand());
+    b3_faces[Block::i_min]->fuse(b7_faces[Block::j_min], &getInfoCommand());
+    b3_faces[Block::i_max]->fuse(b6_faces[Block::j_max], &getInfoCommand());
+    b5_faces[Block::i_min]->fuse(b7_faces[Block::i_min], &getInfoCommand());
+    b3_faces[Block::j_min]->fuse(b5_faces[Block::j_max], &getInfoCommand());
+    b5_faces[Block::i_max]->fuse(b6_faces[Block::i_min], &getInfoCommand());
+    b2_faces[Block::j_max]->fuse(b5_faces[Block::j_min], &getInfoCommand());
 
 //    std::cout<<getTopoManager().getCoFace("Fa0009")->getInfoBlock()
 //             <<" fuse avec "<<getTopoManager().getCoFace("Fa0026")->getInfoBlock()<<std::endl;
@@ -2152,12 +2220,12 @@ createSphereTopoOGridPleinNonDeg(Geom::PropertySphere* propertySph)
 
     // les projections
     for (uint j=0; j<6; j++){
-        Face* face = blocs[j]->getFace(Block::k_min);
+        Face* face = blocs[j]->getFaces()[Block::k_min];
         face->setGeomAssociation(surfaces[0]);
 
         for (uint i=0; i<4; i++){
-            face->getEdge(i)->setGeomAssociation(surfaces[0]);
-            face->getVertex(i)->setGeomAssociation(surfaces[0]);
+            getEdge(face, i)->setGeomAssociation(surfaces[0]);
+            face->getVertices()[i]->setGeomAssociation(surfaces[0]);
         }
     }
 
@@ -2214,8 +2282,8 @@ createSphereTopoOGridDemiDeg(Geom::PropertySphere* propertySph)
     // on place les sommets
     for (uint j=0; j<5; j++)
         for (uint i=0; i<4; i++){
-                blocs[j]->getVertex(i)->setCoord(pts_ext[TopoHelper::tab2IndVtxByFaceOnBlock[j][i]]);
-                blocs[j]->getVertex(i+4)->setCoord(centre);
+                blocs[j]->getVertices()[i]->setCoord(pts_ext[TopoHelper::tab2IndVtxByFaceOnBlock[j][i]]);
+                blocs[j]->getVertices()[i+4]->setCoord(centre);
             }
 
     // dégénéréscence des blocs
@@ -2223,35 +2291,46 @@ createSphereTopoOGridDemiDeg(Geom::PropertySphere* propertySph)
         blocs[j]->degenerateFaceInVertex(Block::k_max, &getInfoCommand());
 
     // on fusionne les blocs
-    b2->getFace(Block::j_min)->fuse(b4->getFace(Block::j_max), &getInfoCommand());
-    b2->getFace(Block::i_max)->fuse(b6->getFace(Block::j_min), &getInfoCommand());
-    b4->getFace(Block::i_max)->fuse(b6->getFace(Block::i_max), &getInfoCommand());
-    b3->getFace(Block::j_max)->fuse(b4->getFace(Block::j_min), &getInfoCommand());
-    b3->getFace(Block::i_max)->fuse(b6->getFace(Block::j_max), &getInfoCommand());
-    b3->getFace(Block::j_min)->fuse(b5->getFace(Block::j_max), &getInfoCommand());
-    b5->getFace(Block::i_max)->fuse(b6->getFace(Block::i_min), &getInfoCommand());
-    b2->getFace(Block::j_max)->fuse(b5->getFace(Block::j_min), &getInfoCommand());
+    const std::vector<Face*>& b2_faces = b2->getFaces();
+    const std::vector<Face*>& b3_faces = b3->getFaces();
+    const std::vector<Face*>& b4_faces = b4->getFaces();
+    const std::vector<Face*>& b5_faces = b5->getFaces();
+    const std::vector<Face*>& b6_faces = b6->getFaces();
+    b2_faces[Block::j_min]->fuse(b4_faces[Block::j_max], &getInfoCommand());
+    b2_faces[Block::i_max]->fuse(b6_faces[Block::j_min], &getInfoCommand());
+    b4_faces[Block::i_max]->fuse(b6_faces[Block::i_max], &getInfoCommand());
+    b3_faces[Block::j_max]->fuse(b4_faces[Block::j_min], &getInfoCommand());
+    b3_faces[Block::i_max]->fuse(b6_faces[Block::j_max], &getInfoCommand());
+    b3_faces[Block::j_min]->fuse(b5_faces[Block::j_max], &getInfoCommand());
+    b5_faces[Block::i_max]->fuse(b6_faces[Block::i_min], &getInfoCommand());
+    b2_faces[Block::j_max]->fuse(b5_faces[Block::j_min], &getInfoCommand());
 
     // on coupe les faces des blocs b4 et b5 pour qu'une arête soit sur la courbe 2
     std::vector<Edge* > splitingEdges;
     std::vector<CoEdge* > coedges;
     std::vector<CoFace* > cofaces;
-    cofaces.push_back(b4->getFace(Block::i_min)->getCoFace(0));
+    const std::vector<Vertex*>& b2_vertices = b2->getVertices();
+    const std::vector<Vertex*>& b3_vertices = b3->getVertices();
+    const std::vector<Vertex*>& b4_vertices = b4->getVertices();
+    const std::vector<Vertex*>& b5_vertices = b5->getVertices();
+    const std::vector<Vertex*>& b6_vertices = b6->getVertices();
+
+    cofaces.push_back(b4_faces[Block::i_min]->getCoFaces()[0]);
     TopoHelper::splitFaces2D(cofaces,
-            b4->getFace(Block::i_min)->getEdge(b4->getVertex(0), b4->getVertex(2))->getCoEdge(0),
+            b4_faces[Block::i_min]->getEdge(b4_vertices[0], b4_vertices[2])->getCoEdges()[0],
             0.5, 0.0, false, false,
             splitingEdges,
             &getInfoCommand());
 
-    coedges.push_back(splitingEdges[0]->getCoEdge(0));
+    coedges.push_back(splitingEdges[0]->getCoEdges()[0]);
     cofaces.clear();
-    cofaces.push_back(b5->getFace(Block::i_min)->getCoFace(0));
+    cofaces.push_back(b5_faces[Block::i_min]->getCoFaces()[0]);
     TopoHelper::splitFaces2D(cofaces,
-            b5->getFace(Block::i_min)->getEdge(b5->getVertex(0), b5->getVertex(2))->getCoEdge(0),
+            b5_faces[Block::i_min]->getEdge(b5_vertices[0], b5_vertices[2])->getCoEdges()[0],
             0.5, 0.0, false, false,
             splitingEdges,
             &getInfoCommand());
-    coedges.push_back(splitingEdges[0]->getCoEdge(0));
+    coedges.push_back(splitingEdges[0]->getCoEdges()[0]);
 
     // les projections sur la géométrie
 
@@ -2270,38 +2349,39 @@ createSphereTopoOGridDemiDeg(Geom::PropertySphere* propertySph)
 
     // les projections
     for (uint j=0; j<5; j++){
-        Face* face = blocs[j]->getFace(Block::k_min);
+        Face* face = blocs[j]->getFaces()[Block::k_min];
         face->setGeomAssociation(surfaces[0]);
 
         for (uint i=0; i<4; i++){
-            face->getEdge(i)->setGeomAssociation(surfaces[0]);
-            face->getVertex(i)->setGeomAssociation(surfaces[0]);
+            getEdge(face, i)->setGeomAssociation(surfaces[0]);
+            face->getVertices()[i]->setGeomAssociation(surfaces[0]);
         }
     }
 
-    b3->getFace(Block::i_min)->setGeomAssociation(surfaces[1]);
-    b2->getFace(Block::i_min)->setGeomAssociation(surfaces[2]);
+    b3_faces[Block::i_min]->setGeomAssociation(surfaces[1]);
+    b2_faces[Block::i_min]->setGeomAssociation(surfaces[2]);
 
-    Vertex* v0 = b4->getVertex(2);
-    Vertex* v1 = b4->getVertex(0);
-    Vertex* v2 = b5->getVertex(0);
-    Vertex* v3 = b5->getVertex(2);
+    Vertex* v0 = b4_vertices[2];
+    Vertex* v1 = b4_vertices[0];
+    Vertex* v2 = b5_vertices[0];
+    Vertex* v3 = b5_vertices[2];
 
-    b4->getFace(Block::i_min)->getCoFaces(cofaces);
-    if (cofaces[0]->find(v0)){
+    cofaces = b4_faces[Block::i_min]->getCoFaces();
+    const std::vector<Vertex*>& cf0_vertices = cofaces[0]->getVertices();
+    if (Utils::contains(v0, cf0_vertices)){
         cofaces[0]->setGeomAssociation(surfaces[2]);
         cofaces[1]->setGeomAssociation(surfaces[1]);
-    } else if (cofaces[0]->find(v1)){
+    } else if (Utils::contains(v1, cf0_vertices)){
         cofaces[0]->setGeomAssociation(surfaces[1]);
         cofaces[1]->setGeomAssociation(surfaces[2]);
     } else
         throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b4", TkUtil::Charset::UTF_8));
 
-    b5->getFace(Block::i_min)->getCoFaces(cofaces);
-    if (cofaces[0]->find(v2)){
+    cofaces = b5_faces[Block::i_min]->getCoFaces();
+    if (Utils::contains(v2, cf0_vertices)){
         cofaces[0]->setGeomAssociation(surfaces[2]);
         cofaces[1]->setGeomAssociation(surfaces[1]);
-    } else if (cofaces[0]->find(v3)){
+    } else if (Utils::contains(v3, cf0_vertices)){
         cofaces[0]->setGeomAssociation(surfaces[1]);
         cofaces[1]->setGeomAssociation(surfaces[2]);
     } else
@@ -2336,32 +2416,32 @@ createSphereTopoOGridDemiDeg(Geom::PropertySphere* propertySph)
     }
 
 
-    b3->getFace(Block::k_min)->getEdge(b3->getVertex(0), b3->getVertex(2))->setGeomAssociation(curves[1]);
-    b3->getVertex(0)->setGeomAssociation(curves[1]);
-    b3->getVertex(2)->setGeomAssociation(curves[1]);
+    b3_faces[Block::k_min]->getEdge(b3_vertices[0], b3_vertices[2])->setGeomAssociation(curves[1]);
+    b3_vertices[0]->setGeomAssociation(curves[1]);
+    b3_vertices[2]->setGeomAssociation(curves[1]);
 
-    b5->getFace(Block::k_min)->getEdge(b5->getVertex(0), b5->getVertex(2))->getCoEdge(v0, b5->getVertex(2))->setGeomAssociation(curves[1]);
-    b5->getFace(Block::k_min)->getEdge(b5->getVertex(0), b5->getVertex(2))->getCoEdge(b5->getVertex(0), v0)->setGeomAssociation(curves[0]);
+    b5_faces[Block::k_min]->getEdge(b5_vertices[0], b5_vertices[2])->getCoEdge(v0, b5_vertices[2])->setGeomAssociation(curves[1]);
+    b5_faces[Block::k_min]->getEdge(b5_vertices[0], b5_vertices[2])->getCoEdge(b5_vertices[0], v0)->setGeomAssociation(curves[0]);
 
-    b4->getFace(Block::k_min)->getEdge(b4->getVertex(0), b4->getVertex(2))->getCoEdge(b4->getVertex(0), v1)->setGeomAssociation(curves[1]);
-    b4->getFace(Block::k_min)->getEdge(b4->getVertex(0), b4->getVertex(2))->getCoEdge(b4->getVertex(2), v1)->setGeomAssociation(curves[0]);
+    b4_faces[Block::k_min]->getEdge(b4_vertices[0], b4_vertices[2])->getCoEdge(b4_vertices[0], v1)->setGeomAssociation(curves[1]);
+    b4_faces[Block::k_min]->getEdge(b4_vertices[0], b4_vertices[2])->getCoEdge(b4_vertices[2], v1)->setGeomAssociation(curves[0]);
 
-    b2->getFace(Block::k_min)->getEdge(b2->getVertex(0), b2->getVertex(2))->setGeomAssociation(curves[0]);
-    b2->getVertex(0)->setGeomAssociation(curves[0]);
-    b2->getVertex(2)->setGeomAssociation(curves[0]);
+    b2_faces[Block::k_min]->getEdge(b2_vertices[0], b2_vertices[2])->setGeomAssociation(curves[0]);
+    b2_vertices[0]->setGeomAssociation(curves[0]);
+    b2_vertices[2]->setGeomAssociation(curves[0]);
 
 
-    b3->getFace(Block::i_min)->getEdge(b3->getVertex(0), b3->getVertex(4))->setGeomAssociation(surfaces[1]);
-    b3->getFace(Block::i_min)->getEdge(b3->getVertex(2), b3->getVertex(4))->setGeomAssociation(surfaces[1]);
+    b3_faces[Block::i_min]->getEdge(b3_vertices[0], b3_vertices[4])->setGeomAssociation(surfaces[1]);
+    b3_faces[Block::i_min]->getEdge(b3_vertices[2], b3_vertices[4])->setGeomAssociation(surfaces[1]);
 
-    b2->getFace(Block::i_min)->getEdge(b2->getVertex(0), b2->getVertex(4))->setGeomAssociation(surfaces[2]);
-    b2->getFace(Block::i_min)->getEdge(b2->getVertex(2), b2->getVertex(4))->setGeomAssociation(surfaces[2]);
+    b2_faces[Block::i_min]->getEdge(b2_vertices[0], b2_vertices[4])->setGeomAssociation(surfaces[2]);
+    b2_faces[Block::i_min]->getEdge(b2_vertices[2], b2_vertices[4])->setGeomAssociation(surfaces[2]);
 
     // sur l'axe des Z
-    for (uint i=0; i<splitingEdges.size(); i++){
-        splitingEdges[i]->setGeomAssociation(curves[2]);
-        for (uint j=0; j<splitingEdges[i]->getNbVertices(); j++)
-            splitingEdges[i]->getVertex(j)->setGeomAssociation(curves[2]);
+    for (Edge* e : splitingEdges){
+        e->setGeomAssociation(curves[2]);
+        for (Topo::Vertex* ve : e->getVertices())
+            ve->setGeomAssociation(curves[2]);
     }
     v0->setGeomAssociation(vertices[0]);
     v1->setGeomAssociation(vertices[1]);
@@ -2435,37 +2515,50 @@ createSphereTopoOGridDemiNonDeg(Geom::PropertySphere* propertySph)
     // on place les sommets
 
     // le bloc au centre (b1)
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    const std::vector<Vertex*>& b2_vertices = b2->getVertices();
+    const std::vector<Vertex*>& b3_vertices = b3->getVertices();
+    const std::vector<Vertex*>& b4_vertices = b4->getVertices();
+    const std::vector<Vertex*>& b5_vertices = b5->getVertices();
+    const std::vector<Vertex*>& b6_vertices = b6->getVertices();
     for (uint i=0; i<8; i++)
-        b1->getVertex(i)->setCoord(pts_int[i]);
+        b1_vertices[i]->setCoord(pts_int[i]);
 
     for (uint j=0; j<5; j++)
         for (uint i=0; i<4; i++){
-                blocs[j]->getVertex(i)->setCoord(pts_ext[TopoHelper::tab2IndVtxByFaceOnBlock[j][i]]);
-                blocs[j]->getVertex(i+4)->setCoord(pts_int[TopoHelper::tab2IndVtxByFaceOnBlock[j][i]]);
+                blocs[j]->getVertices()[i]->setCoord(pts_ext[TopoHelper::tab2IndVtxByFaceOnBlock[j][i]]);
+                blocs[j]->getVertices()[i+4]->setCoord(pts_int[TopoHelper::tab2IndVtxByFaceOnBlock[j][i]]);
             }
+
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+    const std::vector<Face*>& b2_faces = b2->getFaces();
+    const std::vector<Face*>& b3_faces = b3->getFaces();
+    const std::vector<Face*>& b4_faces = b4->getFaces();
+    const std::vector<Face*>& b5_faces = b5->getFaces();
+    const std::vector<Face*>& b6_faces = b6->getFaces();
 
     // on fusionne les blocs
     for (uint j=0; j<5; j++)
-        b1->getFace(j)->fuse(blocs[j]->getFace(Block::k_max), &getInfoCommand());
+        b1_faces[j]->fuse(blocs[j]->getFaces()[Block::k_max], &getInfoCommand());
 
-    b2->getFace(Block::j_min)->fuse(b4->getFace(Block::j_max), &getInfoCommand());
-    b2->getFace(Block::i_max)->fuse(b6->getFace(Block::j_min), &getInfoCommand());
-    b4->getFace(Block::i_max)->fuse(b6->getFace(Block::i_max), &getInfoCommand());
-    b3->getFace(Block::j_max)->fuse(b4->getFace(Block::j_min), &getInfoCommand());
-    b3->getFace(Block::i_max)->fuse(b6->getFace(Block::j_max), &getInfoCommand());
-    b3->getFace(Block::j_min)->fuse(b5->getFace(Block::j_max), &getInfoCommand());
-    b5->getFace(Block::i_max)->fuse(b6->getFace(Block::i_min), &getInfoCommand());
-    b2->getFace(Block::j_max)->fuse(b5->getFace(Block::j_min), &getInfoCommand());
+    b2_faces[Block::j_min]->fuse(b4_faces[Block::j_max], &getInfoCommand());
+    b2_faces[Block::i_max]->fuse(b6_faces[Block::j_min], &getInfoCommand());
+    b4_faces[Block::i_max]->fuse(b6_faces[Block::i_max], &getInfoCommand());
+    b3_faces[Block::j_max]->fuse(b4_faces[Block::j_min], &getInfoCommand());
+    b3_faces[Block::i_max]->fuse(b6_faces[Block::j_max], &getInfoCommand());
+    b3_faces[Block::j_min]->fuse(b5_faces[Block::j_max], &getInfoCommand());
+    b5_faces[Block::i_max]->fuse(b6_faces[Block::i_min], &getInfoCommand());
+    b2_faces[Block::j_max]->fuse(b5_faces[Block::j_min], &getInfoCommand());
 
     // on coupe la face du bloc b1 pour qu'une arête soit sur la courbe 2
     // et les faces des blocs b4 et b5
     std::vector<Edge* > splitingEdges;
     std::vector<CoFace* > cofaces;
-    cofaces.push_back(b1->getFace(Block::k_max)->getCoFace(0));
-    cofaces.push_back(b4->getFace(Block::i_min)->getCoFace(0));
-    cofaces.push_back(b5->getFace(Block::i_min)->getCoFace(0));
+    cofaces.push_back(b1_faces[Block::k_max]->getCoFaces()[0]);
+    cofaces.push_back(b4_faces[Block::i_min]->getCoFaces()[0]);
+    cofaces.push_back(b5_faces[Block::i_min]->getCoFaces()[0]);
     TopoHelper::splitFaces2D(cofaces,
-            b4->getFace(Block::i_min)->getEdge(b4->getVertex(0), b4->getVertex(2))->getCoEdge(0),
+            b4_faces[Block::i_min]->getEdge(b4_vertices[0], b4_vertices[2])->getCoEdges()[0],
             0.5, 0.0, false, false,
             splitingEdges,
             &getInfoCommand());
@@ -2488,48 +2581,49 @@ createSphereTopoOGridDemiNonDeg(Geom::PropertySphere* propertySph)
 
     // les projections
     for (uint j=0; j<5; j++){
-        Face* face = blocs[j]->getFace(Block::k_min);
+        Face* face = blocs[j]->getFaces()[Block::k_min];
         face->setGeomAssociation(surfaces[0]);
 
         for (uint i=0; i<4; i++){
-            face->getEdge(i)->setGeomAssociation(surfaces[0]);
-            face->getVertex(i)->setGeomAssociation(surfaces[0]);
+            getEdge(face, i)->setGeomAssociation(surfaces[0]);
+            face->getVertices()[i]->setGeomAssociation(surfaces[0]);
         }
     }
 
-    b3->getFace(Block::i_min)->setGeomAssociation(surfaces[1]);
-    b2->getFace(Block::i_min)->setGeomAssociation(surfaces[2]);
+    b3_faces[Block::i_min]->setGeomAssociation(surfaces[1]);
+    b2_faces[Block::i_min]->setGeomAssociation(surfaces[2]);
 
-    Vertex* v4 = b1->getVertex(4);
-    Vertex* v5 = b1->getVertex(5);
-    Vertex* v6 = b1->getVertex(6);
-    Vertex* v7 = b1->getVertex(7);
+    Vertex* v4 = b1_vertices[4];
+    Vertex* v5 = b1_vertices[5];
+    Vertex* v6 = b1_vertices[6];
+    Vertex* v7 = b1_vertices[7];
 
-    b1->getFace(Block::k_max)->getCoFaces(cofaces);
-    if (cofaces[0]->find(v4) || cofaces[0]->find(v6)){
+    cofaces = b1_faces[Block::k_max]->getCoFaces();
+    const std::vector<Vertex*>& cf0_vertices = cofaces[0]->getVertices();
+    if (Utils::contains(v4, cf0_vertices) || Utils::contains(v6, cf0_vertices)){
         cofaces[0]->setGeomAssociation(surfaces[2]);
         cofaces[1]->setGeomAssociation(surfaces[1]);
-    } else if (cofaces[0]->find(v5) || cofaces[0]->find(v7)){
+    } else if (Utils::contains(v5, cf0_vertices) || Utils::contains(v7, cf0_vertices)){
         cofaces[0]->setGeomAssociation(surfaces[1]);
         cofaces[1]->setGeomAssociation(surfaces[2]);
     } else
         throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b1", TkUtil::Charset::UTF_8));
 
-    b4->getFace(Block::i_min)->getCoFaces(cofaces);
-    if (cofaces[0]->find(v4) || cofaces[0]->find(v6)){
+    cofaces = b4_faces[Block::i_min]->getCoFaces();
+    if (Utils::contains(v4, cf0_vertices) || Utils::contains(v6, cf0_vertices)){
         cofaces[0]->setGeomAssociation(surfaces[2]);
         cofaces[1]->setGeomAssociation(surfaces[1]);
-    } else if (cofaces[0]->find(v5) || cofaces[0]->find(v7)){
+    } else if (Utils::contains(v5, cf0_vertices) || Utils::contains(v7, cf0_vertices)){
         cofaces[0]->setGeomAssociation(surfaces[1]);
         cofaces[1]->setGeomAssociation(surfaces[2]);
     } else
         throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b4", TkUtil::Charset::UTF_8));
 
-    b5->getFace(Block::i_min)->getCoFaces(cofaces);
-    if (cofaces[0]->find(v4) || cofaces[0]->find(v6)){
+    cofaces = b5_faces[Block::i_min]->getCoFaces();
+    if (Utils::contains(v4, cf0_vertices) || Utils::contains(v6, cf0_vertices)){
         cofaces[0]->setGeomAssociation(surfaces[2]);
         cofaces[1]->setGeomAssociation(surfaces[1]);
-    } else if (cofaces[0]->find(v5) || cofaces[0]->find(v7)){
+    } else if (Utils::contains(v5, cf0_vertices) || Utils::contains(v7, cf0_vertices)){
         cofaces[0]->setGeomAssociation(surfaces[1]);
         cofaces[1]->setGeomAssociation(surfaces[2]);
     } else
@@ -2547,7 +2641,7 @@ createSphereTopoOGridDemiNonDeg(Geom::PropertySphere* propertySph)
     Vertex* v1 = 0;
     std::vector<CoEdge* > coedges;
     for (uint i=0; i<splitingEdges.size(); i++)
-        coedges.push_back(splitingEdges[i]->getCoEdge(0));
+        coedges.push_back(splitingEdges[i]->getCoEdges()[0]);
     TopoHelper::getVerticesTip(coedges, v0, v1, false);
 
     // on met v0 en z max sur la sphère
@@ -2567,43 +2661,41 @@ createSphereTopoOGridDemiNonDeg(Geom::PropertySphere* propertySph)
     }
 
 
-    b3->getFace(Block::k_min)->getEdge(b3->getVertex(0), b3->getVertex(2))->setGeomAssociation(curves[1]);
-    b3->getVertex(0)->setGeomAssociation(curves[1]);
-    b3->getVertex(2)->setGeomAssociation(curves[1]);
+    b3_faces[Block::k_min]->getEdge(b3_vertices[0], b3_vertices[2])->setGeomAssociation(curves[1]);
+    b3_vertices[0]->setGeomAssociation(curves[1]);
+    b3_vertices[2]->setGeomAssociation(curves[1]);
 
-    b5->getFace(Block::k_min)->getEdge(b5->getVertex(0), b5->getVertex(2))->getCoEdge(v0, b5->getVertex(2))->setGeomAssociation(curves[1]);
-    b5->getFace(Block::k_min)->getEdge(b5->getVertex(0), b5->getVertex(2))->getCoEdge(b5->getVertex(0), v0)->setGeomAssociation(curves[0]);
+    b5_faces[Block::k_min]->getEdge(b5_vertices[0], b5_vertices[2])->getCoEdge(v0, b5_vertices[2])->setGeomAssociation(curves[1]);
+    b5_faces[Block::k_min]->getEdge(b5_vertices[0], b5_vertices[2])->getCoEdge(b5_vertices[0], v0)->setGeomAssociation(curves[0]);
 
-    b4->getFace(Block::k_min)->getEdge(b4->getVertex(0), b4->getVertex(2))->getCoEdge(b4->getVertex(0), v1)->setGeomAssociation(curves[1]);
-    b4->getFace(Block::k_min)->getEdge(b4->getVertex(0), b4->getVertex(2))->getCoEdge(b4->getVertex(2), v1)->setGeomAssociation(curves[0]);
+    b4_faces[Block::k_min]->getEdge(b4_vertices[0], b4_vertices[2])->getCoEdge(b4_vertices[0], v1)->setGeomAssociation(curves[1]);
+    b4_faces[Block::k_min]->getEdge(b4_vertices[0], b4_vertices[2])->getCoEdge(b4_vertices[2], v1)->setGeomAssociation(curves[0]);
 
-    b2->getFace(Block::k_min)->getEdge(b2->getVertex(0), b2->getVertex(2))->setGeomAssociation(curves[0]);
-    b2->getVertex(0)->setGeomAssociation(curves[0]);
-    b2->getVertex(2)->setGeomAssociation(curves[0]);
+    b2_faces[Block::k_min]->getEdge(b2_vertices[0], b2_vertices[2])->setGeomAssociation(curves[0]);
+    b2_vertices[0]->setGeomAssociation(curves[0]);
+    b2_vertices[2]->setGeomAssociation(curves[0]);
 
 
-    b3->getFace(Block::i_min)->getEdge(b3->getVertex(0), b3->getVertex(4))->setGeomAssociation(surfaces[1]);
-    b3->getFace(Block::i_min)->getEdge(b3->getVertex(2), b3->getVertex(6))->setGeomAssociation(surfaces[1]);
+    b3_faces[Block::i_min]->getEdge(b3_vertices[0], b3_vertices[4])->setGeomAssociation(surfaces[1]);
+    b3_faces[Block::i_min]->getEdge(b3_vertices[2], b3_vertices[6])->setGeomAssociation(surfaces[1]);
 
-    b2->getFace(Block::i_min)->getEdge(b2->getVertex(0), b2->getVertex(4))->setGeomAssociation(surfaces[2]);
-    b2->getFace(Block::i_min)->getEdge(b2->getVertex(2), b2->getVertex(6))->setGeomAssociation(surfaces[2]);
+    b2_faces[Block::i_min]->getEdge(b2_vertices[0], b2_vertices[4])->setGeomAssociation(surfaces[2]);
+    b2_faces[Block::i_min]->getEdge(b2_vertices[2], b2_vertices[6])->setGeomAssociation(surfaces[2]);
 
-    b1->getVertex(5)->setGeomAssociation(surfaces[1]);
-    b1->getVertex(7)->setGeomAssociation(surfaces[1]);
-    b1->getVertex(4)->setGeomAssociation(surfaces[2]);
-    b1->getVertex(6)->setGeomAssociation(surfaces[2]);
+    b1_vertices[5]->setGeomAssociation(surfaces[1]);
+    b1_vertices[7]->setGeomAssociation(surfaces[1]);
+    b1_vertices[4]->setGeomAssociation(surfaces[2]);
+    b1_vertices[6]->setGeomAssociation(surfaces[2]);
 
-    for (uint i=0; i<b1->getFace(Block::k_max)->getNbCoFaces(); i++){
-        CoFace* coface = b1->getFace(Block::k_max)->getCoFace(i);
-        for (uint j=0; j<coface->getNbEdges(); j++)
-            coface->getEdge(j)->setGeomAssociation(coface->getGeomAssociation());
-    }
+    for (CoFace* cf : b1_faces[Block::k_max]->getCoFaces())
+        for (Edge* e : cf->getEdges())
+            e->setGeomAssociation(cf->getGeomAssociation());
 
     // sur l'axe des Z
-    for (uint i=0; i<splitingEdges.size(); i++){
-        splitingEdges[i]->setGeomAssociation(curves[2]);
-        for (uint j=0; j<splitingEdges[i]->getNbVertices(); j++)
-            splitingEdges[i]->getVertex(j)->setGeomAssociation(curves[2]);
+    for (Edge* e : splitingEdges){
+        e->setGeomAssociation(curves[2]);
+        for (Topo::Vertex* ve : e->getVertices())
+            ve->setGeomAssociation(curves[2]);
     }
     v0->setGeomAssociation(vertices[0]);
     v1->setGeomAssociation(vertices[1]);
@@ -2656,8 +2748,8 @@ createSphereTopoOGridQuartDeg(Geom::PropertySphere* propertySph)
     // on place les sommets
     for (uint j=0; j<4; j++)
         for (uint i=0; i<4; i++){
-                blocs[j]->getVertex(i)->setCoord(pts_ext[TopoHelper::tab2IndVtxByFaceOnBlock[j+1][i]]);
-                blocs[j]->getVertex(i+4)->setCoord(centre);
+                blocs[j]->getVertices()[i]->setCoord(pts_ext[TopoHelper::tab2IndVtxByFaceOnBlock[j+1][i]]);
+                blocs[j]->getVertices()[i+4]->setCoord(centre);
             }
 
     // dégénéréscence des blocs
@@ -2665,11 +2757,15 @@ createSphereTopoOGridQuartDeg(Geom::PropertySphere* propertySph)
         blocs[j]->degenerateFaceInVertex(Block::k_max, &getInfoCommand());
 
     // on fusionne les blocs
-    b4->getFace(Block::i_max)->fuse(b6->getFace(Block::i_max), &getInfoCommand());
-    b3->getFace(Block::j_max)->fuse(b4->getFace(Block::j_min), &getInfoCommand());
-    b3->getFace(Block::i_max)->fuse(b6->getFace(Block::j_max), &getInfoCommand());
-    b3->getFace(Block::j_min)->fuse(b5->getFace(Block::j_max), &getInfoCommand());
-    b5->getFace(Block::i_max)->fuse(b6->getFace(Block::i_min), &getInfoCommand());
+    const std::vector<Face*>& b3_faces = b3->getFaces();
+    const std::vector<Face*>& b4_faces = b4->getFaces();
+    const std::vector<Face*>& b5_faces = b5->getFaces();
+    const std::vector<Face*>& b6_faces = b6->getFaces();
+    b4_faces[Block::i_max]->fuse(b6_faces[Block::i_max], &getInfoCommand());
+    b3_faces[Block::j_max]->fuse(b4_faces[Block::j_min], &getInfoCommand());
+    b3_faces[Block::i_max]->fuse(b6_faces[Block::j_max], &getInfoCommand());
+    b3_faces[Block::j_min]->fuse(b5_faces[Block::j_max], &getInfoCommand());
+    b5_faces[Block::i_max]->fuse(b6_faces[Block::i_min], &getInfoCommand());
 
     // les projections sur la géométrie
     Geom::GetDownIncidentGeomEntitiesVisitor v;
@@ -2687,22 +2783,22 @@ createSphereTopoOGridQuartDeg(Geom::PropertySphere* propertySph)
 
     // les projections
     for (uint j=0; j<4; j++){
-        Face* face = blocs[j]->getFace(Block::k_min);
+        Face* face = blocs[j]->getFaces()[Block::k_min];
         face->setGeomAssociation(surfaces[0]);
 
         for (uint i=0; i<4; i++){
-            face->getEdge(i)->setGeomAssociation(surfaces[0]);
-            face->getVertex(i)->setGeomAssociation(surfaces[0]);
+            getEdge(face, i)->setGeomAssociation(surfaces[0]);
+            face->getVertices()[i]->setGeomAssociation(surfaces[0]);
         }
     }
 
-    b3->getFace(Block::i_min)->setGeomAssociation(surfaces[1]);
-    b4->getFace(Block::i_min)->setGeomAssociation(surfaces[1]);
-    b5->getFace(Block::i_min)->setGeomAssociation(surfaces[1]);
+    b3_faces[Block::i_min]->setGeomAssociation(surfaces[1]);
+    b4_faces[Block::i_min]->setGeomAssociation(surfaces[1]);
+    b5_faces[Block::i_min]->setGeomAssociation(surfaces[1]);
 
-    b4->getFace(Block::j_max)->setGeomAssociation(surfaces[2]);
-    b5->getFace(Block::j_min)->setGeomAssociation(surfaces[2]);
-    b6->getFace(Block::j_min)->setGeomAssociation(surfaces[2]);
+    b4_faces[Block::j_max]->setGeomAssociation(surfaces[2]);
+    b5_faces[Block::j_min]->setGeomAssociation(surfaces[2]);
+    b6_faces[Block::j_min]->setGeomAssociation(surfaces[2]);
 
 
     // les sommets géométriques
@@ -2713,8 +2809,12 @@ createSphereTopoOGridQuartDeg(Geom::PropertySphere* propertySph)
         throw TkUtil::Exception(message);
     }
 
-    Vertex* v0 = b5->getVertex(0);
-    Vertex* v1 = b4->getVertex(2);
+    const std::vector<Vertex*>& b3_vertices = b3->getVertices();
+    const std::vector<Vertex*>& b4_vertices = b4->getVertices();
+    const std::vector<Vertex*>& b5_vertices = b5->getVertices();
+    const std::vector<Vertex*>& b6_vertices = b6->getVertices();
+    Vertex* v0 = b5_vertices[0];
+    Vertex* v1 = b4_vertices[2];
     v0->setGeomAssociation(vertices[0]);
     v1->setGeomAssociation(vertices[1]);
     v0->setCoord(vertices[0]->getCoord());
@@ -2728,32 +2828,32 @@ createSphereTopoOGridQuartDeg(Geom::PropertySphere* propertySph)
     }
 
 
-    b3->getFace(Block::k_min)->getEdge(b3->getVertex(0), b3->getVertex(2))->setGeomAssociation(curves[1]);
+    b3_faces[Block::k_min]->getEdge(b3_vertices[0], b3_vertices[2])->setGeomAssociation(curves[1]);
 
-    b5->getFace(Block::k_min)->getEdge(b5->getVertex(0), b5->getVertex(2))->setGeomAssociation(curves[1]);
-    b5->getFace(Block::k_min)->getEdge(b5->getVertex(0), b5->getVertex(1))->setGeomAssociation(curves[0]);
+    b5_faces[Block::k_min]->getEdge(b5_vertices[0], b5_vertices[2])->setGeomAssociation(curves[1]);
+    b5_faces[Block::k_min]->getEdge(b5_vertices[0], b5_vertices[1])->setGeomAssociation(curves[0]);
 
-    b6->getFace(Block::k_min)->getEdge(b6->getVertex(0), b6->getVertex(1))->setGeomAssociation(curves[0]);
+    b6_faces[Block::k_min]->getEdge(b6_vertices[0], b6_vertices[1])->setGeomAssociation(curves[0]);
 
-    b4->getFace(Block::k_min)->getEdge(b4->getVertex(0), b4->getVertex(2))->setGeomAssociation(curves[1]);
-    b4->getFace(Block::k_min)->getEdge(b4->getVertex(2), b4->getVertex(3))->setGeomAssociation(curves[0]);
+    b4_faces[Block::k_min]->getEdge(b4_vertices[0], b4_vertices[2])->setGeomAssociation(curves[1]);
+    b4_faces[Block::k_min]->getEdge(b4_vertices[2], b4_vertices[3])->setGeomAssociation(curves[0]);
 
-    b5->getVertex(2)->setGeomAssociation(curves[1]);
-    b5->getVertex(1)->setGeomAssociation(curves[0]);
-    b4->getVertex(0)->setGeomAssociation(curves[1]);
-    b4->getVertex(3)->setGeomAssociation(curves[0]);
+    b5_vertices[2]->setGeomAssociation(curves[1]);
+    b5_vertices[1]->setGeomAssociation(curves[0]);
+    b4_vertices[0]->setGeomAssociation(curves[1]);
+    b4_vertices[3]->setGeomAssociation(curves[0]);
 
 
-    b3->getFace(Block::i_min)->getEdge(b3->getVertex(0), b3->getVertex(4))->setGeomAssociation(surfaces[1]);
-    b3->getFace(Block::i_min)->getEdge(b3->getVertex(2), b3->getVertex(4))->setGeomAssociation(surfaces[1]);
+    b3_faces[Block::i_min]->getEdge(b3_vertices[0], b3_vertices[4])->setGeomAssociation(surfaces[1]);
+    b3_faces[Block::i_min]->getEdge(b3_vertices[2], b3_vertices[4])->setGeomAssociation(surfaces[1]);
 
-    b6->getFace(Block::j_min)->getEdge(b6->getVertex(0), b6->getVertex(4))->setGeomAssociation(surfaces[2]);
-    b6->getFace(Block::j_min)->getEdge(b6->getVertex(1), b6->getVertex(4))->setGeomAssociation(surfaces[2]);
+    b6_faces[Block::j_min]->getEdge(b6_vertices[0], b6_vertices[4])->setGeomAssociation(surfaces[2]);
+    b6_faces[Block::j_min]->getEdge(b6_vertices[1], b6_vertices[4])->setGeomAssociation(surfaces[2]);
 
     // sur l'axe des Z
-    b4->getFace(Block::j_max)->getEdge(b4->getVertex(2), b4->getVertex(4))->setGeomAssociation(curves[2]);
-    b5->getFace(Block::j_min)->getEdge(b5->getVertex(0), b5->getVertex(4))->setGeomAssociation(curves[2]);
-    b5->getVertex(4)->setGeomAssociation(curves[2]);
+    b4_faces[Block::j_max]->getEdge(b4_vertices[2], b4_vertices[4])->setGeomAssociation(curves[2]);
+    b5_faces[Block::j_min]->getEdge(b5_vertices[0], b5_vertices[4])->setGeomAssociation(curves[2]);
+    b5_vertices[4]->setGeomAssociation(curves[2]);
 }
 /*----------------------------------------------------------------------------*/
 void CommandNewTopoOGridOnGeometry::
@@ -2818,24 +2918,35 @@ createSphereTopoOGridQuartNonDeg(Geom::PropertySphere* propertySph)
     split(); // split à faire avant les modifications
 
     // le bloc au centre (b1)
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    const std::vector<Vertex*>& b3_vertices = b3->getVertices();
+    const std::vector<Vertex*>& b4_vertices = b4->getVertices();
+    const std::vector<Vertex*>& b5_vertices = b5->getVertices();
+    const std::vector<Vertex*>& b6_vertices = b6->getVertices();
     for (uint i=0; i<8; i++)
-        b1->getVertex(i)->setCoord(pts_int[i]);
+        b1_vertices[i]->setCoord(pts_int[i]);
 
     for (uint j=0; j<4; j++)
         for (uint i=0; i<4; i++){
-            blocs[j]->getVertex(i)->setCoord(pts_ext[TopoHelper::tab2IndVtxByFaceOnBlock[j+1][i]]);
-            blocs[j]->getVertex(i+4)->setCoord(pts_int[TopoHelper::tab2IndVtxByFaceOnBlock[j+1][i]]);
+            blocs[j]->getVertices()[i]->setCoord(pts_ext[TopoHelper::tab2IndVtxByFaceOnBlock[j+1][i]]);
+            blocs[j]->getVertices()[i+4]->setCoord(pts_int[TopoHelper::tab2IndVtxByFaceOnBlock[j+1][i]]);
         }
+
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+    const std::vector<Face*>& b3_faces = b3->getFaces();
+    const std::vector<Face*>& b4_faces = b4->getFaces();
+    const std::vector<Face*>& b5_faces = b5->getFaces();
+    const std::vector<Face*>& b6_faces = b6->getFaces();
 
     // on fusionne les blocs
     for (uint j=0; j<4; j++)
-        b1->getFace(j+1)->fuse(blocs[j]->getFace(Block::k_max), &getInfoCommand());
+        b1_faces[j+1]->fuse(blocs[j]->getFaces()[Block::k_max], &getInfoCommand());
 
-    b4->getFace(Block::i_max)->fuse(b6->getFace(Block::i_max), &getInfoCommand());
-    b3->getFace(Block::j_max)->fuse(b4->getFace(Block::j_min), &getInfoCommand());
-    b3->getFace(Block::i_max)->fuse(b6->getFace(Block::j_max), &getInfoCommand());
-    b3->getFace(Block::j_min)->fuse(b5->getFace(Block::j_max), &getInfoCommand());
-    b5->getFace(Block::i_max)->fuse(b6->getFace(Block::i_min), &getInfoCommand());
+    b4_faces[Block::i_max]->fuse(b6_faces[Block::i_max], &getInfoCommand());
+    b3_faces[Block::j_max]->fuse(b4_faces[Block::j_min], &getInfoCommand());
+    b3_faces[Block::i_max]->fuse(b6_faces[Block::j_max], &getInfoCommand());
+    b3_faces[Block::j_min]->fuse(b5_faces[Block::j_max], &getInfoCommand());
+    b5_faces[Block::i_max]->fuse(b6_faces[Block::i_min], &getInfoCommand());
 
     // les projections sur la géométrie
     Geom::GetDownIncidentGeomEntitiesVisitor v;
@@ -2853,24 +2964,24 @@ createSphereTopoOGridQuartNonDeg(Geom::PropertySphere* propertySph)
 
     // les projections
     for (uint j=0; j<4; j++){
-        Face* face = blocs[j]->getFace(Block::k_min);
+        Face* face = blocs[j]->getFaces()[Block::k_min];
         face->setGeomAssociation(surfaces[0]);
 
         for (uint i=0; i<4; i++){
-            face->getEdge(i)->setGeomAssociation(surfaces[0]);
-            face->getVertex(i)->setGeomAssociation(surfaces[0]);
+            getEdge(face, i)->setGeomAssociation(surfaces[0]);
+            face->getVertices()[i]->setGeomAssociation(surfaces[0]);
         }
     }
 
-    b1->getFace(Block::k_max)->setGeomAssociation(surfaces[1]);
-    b3->getFace(Block::i_min)->setGeomAssociation(surfaces[1]);
-    b4->getFace(Block::i_min)->setGeomAssociation(surfaces[1]);
-    b5->getFace(Block::i_min)->setGeomAssociation(surfaces[1]);
+    b1_faces[Block::k_max]->setGeomAssociation(surfaces[1]);
+    b3_faces[Block::i_min]->setGeomAssociation(surfaces[1]);
+    b4_faces[Block::i_min]->setGeomAssociation(surfaces[1]);
+    b5_faces[Block::i_min]->setGeomAssociation(surfaces[1]);
 
-    b1->getFace(Block::i_min)->setGeomAssociation(surfaces[2]);
-    b4->getFace(Block::j_max)->setGeomAssociation(surfaces[2]);
-    b5->getFace(Block::j_min)->setGeomAssociation(surfaces[2]);
-    b6->getFace(Block::j_min)->setGeomAssociation(surfaces[2]);
+    b1_faces[Block::i_min]->setGeomAssociation(surfaces[2]);
+    b4_faces[Block::j_max]->setGeomAssociation(surfaces[2]);
+    b5_faces[Block::j_min]->setGeomAssociation(surfaces[2]);
+    b6_faces[Block::j_min]->setGeomAssociation(surfaces[2]);
 
 
     // les sommets géométriques
@@ -2881,8 +2992,8 @@ createSphereTopoOGridQuartNonDeg(Geom::PropertySphere* propertySph)
         throw TkUtil::Exception(message);
     }
 
-    Vertex* v0 = b5->getVertex(0);
-    Vertex* v1 = b4->getVertex(2);
+    Vertex* v0 = b5_vertices[0];
+    Vertex* v1 = b4_vertices[2];
     v0->setGeomAssociation(vertices[0]);
     v1->setGeomAssociation(vertices[1]);
     v0->setCoord(vertices[0]->getCoord());
@@ -2895,48 +3006,48 @@ createSphereTopoOGridQuartNonDeg(Geom::PropertySphere* propertySph)
         throw TkUtil::Exception(message);
     }
 
-    b3->getFace(Block::k_min)->getEdge(b3->getVertex(0), b3->getVertex(2))->setGeomAssociation(curves[1]);
+    b3_faces[Block::k_min]->getEdge(b3_vertices[0], b3_vertices[2])->setGeomAssociation(curves[1]);
 
-    b5->getFace(Block::k_min)->getEdge(b5->getVertex(0), b5->getVertex(2))->setGeomAssociation(curves[1]);
-    b5->getFace(Block::k_min)->getEdge(b5->getVertex(0), b5->getVertex(1))->setGeomAssociation(curves[0]);
+    b5_faces[Block::k_min]->getEdge(b5_vertices[0], b5_vertices[2])->setGeomAssociation(curves[1]);
+    b5_faces[Block::k_min]->getEdge(b5_vertices[0], b5_vertices[1])->setGeomAssociation(curves[0]);
 
-    b6->getFace(Block::k_min)->getEdge(b6->getVertex(0), b6->getVertex(1))->setGeomAssociation(curves[0]);
+    b6_faces[Block::k_min]->getEdge(b6_vertices[0], b6_vertices[1])->setGeomAssociation(curves[0]);
 
-    b4->getFace(Block::k_min)->getEdge(b4->getVertex(0), b4->getVertex(2))->setGeomAssociation(curves[1]);
-    b4->getFace(Block::k_min)->getEdge(b4->getVertex(2), b4->getVertex(3))->setGeomAssociation(curves[0]);
+    b4_faces[Block::k_min]->getEdge(b4_vertices[0], b4_vertices[2])->setGeomAssociation(curves[1]);
+    b4_faces[Block::k_min]->getEdge(b4_vertices[2], b4_vertices[3])->setGeomAssociation(curves[0]);
 
-    b5->getVertex(2)->setGeomAssociation(curves[1]);
-    b5->getVertex(1)->setGeomAssociation(curves[0]);
-    b4->getVertex(0)->setGeomAssociation(curves[1]);
-    b4->getVertex(3)->setGeomAssociation(curves[0]);
+    b5_vertices[2]->setGeomAssociation(curves[1]);
+    b5_vertices[1]->setGeomAssociation(curves[0]);
+    b4_vertices[0]->setGeomAssociation(curves[1]);
+    b4_vertices[3]->setGeomAssociation(curves[0]);
 
 
-    b1->getFace(Block::i_min)->getEdge(b1->getVertex(0), b1->getVertex(2))->setGeomAssociation(surfaces[2]);
-    b1->getFace(Block::i_min)->getEdge(b1->getVertex(6), b1->getVertex(2))->setGeomAssociation(surfaces[2]);
-    b1->getFace(Block::i_min)->getEdge(b1->getVertex(0), b1->getVertex(4))->setGeomAssociation(surfaces[2]);
+    b1_faces[Block::i_min]->getEdge(b1_vertices[0], b1_vertices[2])->setGeomAssociation(surfaces[2]);
+    b1_faces[Block::i_min]->getEdge(b1_vertices[6], b1_vertices[2])->setGeomAssociation(surfaces[2]);
+    b1_faces[Block::i_min]->getEdge(b1_vertices[0], b1_vertices[4])->setGeomAssociation(surfaces[2]);
 
-    b1->getVertex(0)->setGeomAssociation(surfaces[2]);
-    b1->getVertex(2)->setGeomAssociation(surfaces[2]);
+    b1_vertices[0]->setGeomAssociation(surfaces[2]);
+    b1_vertices[2]->setGeomAssociation(surfaces[2]);
 
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(4), b1->getVertex(5))->setGeomAssociation(surfaces[1]);
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(5), b1->getVertex(7))->setGeomAssociation(surfaces[1]);
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(7), b1->getVertex(6))->setGeomAssociation(surfaces[1]);
+    b1_faces[Block::k_max]->getEdge(b1_vertices[4], b1_vertices[5])->setGeomAssociation(surfaces[1]);
+    b1_faces[Block::k_max]->getEdge(b1_vertices[5], b1_vertices[7])->setGeomAssociation(surfaces[1]);
+    b1_faces[Block::k_max]->getEdge(b1_vertices[7], b1_vertices[6])->setGeomAssociation(surfaces[1]);
 
-    b1->getVertex(5)->setGeomAssociation(surfaces[1]);
-    b1->getVertex(7)->setGeomAssociation(surfaces[1]);
+    b1_vertices[5]->setGeomAssociation(surfaces[1]);
+    b1_vertices[7]->setGeomAssociation(surfaces[1]);
 
-    b3->getFace(Block::i_min)->getEdge(b3->getVertex(0), b3->getVertex(4))->setGeomAssociation(surfaces[1]);
-    b3->getFace(Block::i_min)->getEdge(b3->getVertex(2), b3->getVertex(6))->setGeomAssociation(surfaces[1]);
+    b3_faces[Block::i_min]->getEdge(b3_vertices[0], b3_vertices[4])->setGeomAssociation(surfaces[1]);
+    b3_faces[Block::i_min]->getEdge(b3_vertices[2], b3_vertices[6])->setGeomAssociation(surfaces[1]);
 
-    b6->getFace(Block::j_min)->getEdge(b6->getVertex(0), b6->getVertex(4))->setGeomAssociation(surfaces[2]);
-    b6->getFace(Block::j_min)->getEdge(b6->getVertex(1), b6->getVertex(5))->setGeomAssociation(surfaces[2]);
+    b6_faces[Block::j_min]->getEdge(b6_vertices[0], b6_vertices[4])->setGeomAssociation(surfaces[2]);
+    b6_faces[Block::j_min]->getEdge(b6_vertices[1], b6_vertices[5])->setGeomAssociation(surfaces[2]);
 
     // sur l'axe des Z
-    b1->getFace(Block::i_min)->getEdge(b1->getVertex(4), b1->getVertex(6))->setGeomAssociation(curves[2]);
-    b4->getFace(Block::j_max)->getEdge(b4->getVertex(2), b4->getVertex(6))->setGeomAssociation(curves[2]);
-    b5->getFace(Block::j_min)->getEdge(b5->getVertex(0), b5->getVertex(4))->setGeomAssociation(curves[2]);
-    b1->getVertex(4)->setGeomAssociation(curves[2]);
-    b1->getVertex(6)->setGeomAssociation(curves[2]);
+    b1_faces[Block::i_min]->getEdge(b1_vertices[4], b1_vertices[6])->setGeomAssociation(curves[2]);
+    b4_faces[Block::j_max]->getEdge(b4_vertices[2], b4_vertices[6])->setGeomAssociation(curves[2]);
+    b5_faces[Block::j_min]->getEdge(b5_vertices[0], b5_vertices[4])->setGeomAssociation(curves[2]);
+    b1_vertices[4]->setGeomAssociation(curves[2]);
+    b1_vertices[6]->setGeomAssociation(curves[2]);
 
 }
 /*----------------------------------------------------------------------------*/
@@ -2991,8 +3102,8 @@ createSphereTopoOGridHuitiemeDeg(Geom::PropertySphere* propertySph)
                 k=3;
             else if (j==2)
                 k=4;
-            blocs[j]->getVertex(i)->setCoord(pts_ext[TopoHelper::tab2IndVtxByFaceOnBlock[k][i]]);
-            blocs[j]->getVertex(i+4)->setCoord(centre);
+            blocs[j]->getVertices()[i]->setCoord(pts_ext[TopoHelper::tab2IndVtxByFaceOnBlock[k][i]]);
+            blocs[j]->getVertices()[i+4]->setCoord(centre);
         }
 
     // dégénéréscence des blocs
@@ -3000,9 +3111,12 @@ createSphereTopoOGridHuitiemeDeg(Geom::PropertySphere* propertySph)
         blocs[j]->degenerateFaceInVertex(Block::k_max, &getInfoCommand());
 
     // on fusionne les blocs
-    b3->getFace(Block::i_max)->fuse(b6->getFace(Block::j_max), &getInfoCommand());
-    b3->getFace(Block::j_min)->fuse(b5->getFace(Block::j_max), &getInfoCommand());
-    b5->getFace(Block::i_max)->fuse(b6->getFace(Block::i_min), &getInfoCommand());
+    const std::vector<Face*>& b3_faces = b3->getFaces();
+    const std::vector<Face*>& b5_faces = b5->getFaces();
+    const std::vector<Face*>& b6_faces = b6->getFaces();
+    b3_faces[Block::i_max]->fuse(b6_faces[Block::j_max], &getInfoCommand());
+    b3_faces[Block::j_min]->fuse(b5_faces[Block::j_max], &getInfoCommand());
+    b5_faces[Block::i_max]->fuse(b6_faces[Block::i_min], &getInfoCommand());
 
     // les projections sur la géométrie
     Geom::GetDownIncidentGeomEntitiesVisitor v;
@@ -3020,23 +3134,27 @@ createSphereTopoOGridHuitiemeDeg(Geom::PropertySphere* propertySph)
 
     // les projections
     for (uint j=0; j<3; j++){
-        Face* face = blocs[j]->getFace(Block::k_min);
+        Face* face = blocs[j]->getFaces()[Block::k_min];
         face->setGeomAssociation(surfaces[0]);
 
         for (uint i=0; i<4; i++){
-            face->getEdge(i)->setGeomAssociation(surfaces[0]);
-            face->getVertex(i)->setGeomAssociation(surfaces[0]);
+            getEdge(face, i)->setGeomAssociation(surfaces[0]);
+            face->getVertices()[i]->setGeomAssociation(surfaces[0]);
         }
     }
 
-    b3->getFace(Block::j_max)->setGeomAssociation(surfaces[1]);
-    b6->getFace(Block::i_max)->setGeomAssociation(surfaces[1]);
+    const std::vector<Vertex*>& b3_vertices = b3->getVertices();
+    const std::vector<Vertex*>& b5_vertices = b5->getVertices();
+    const std::vector<Vertex*>& b6_vertices = b6->getVertices();
 
-    b3->getFace(Block::i_min)->setGeomAssociation(surfaces[2]);
-    b5->getFace(Block::i_min)->setGeomAssociation(surfaces[2]);
+    b3_faces[Block::j_max]->setGeomAssociation(surfaces[1]);
+    b6_faces[Block::i_max]->setGeomAssociation(surfaces[1]);
 
-    b5->getFace(Block::j_min)->setGeomAssociation(surfaces[3]);
-    b6->getFace(Block::j_min)->setGeomAssociation(surfaces[3]);
+    b3_faces[Block::i_min]->setGeomAssociation(surfaces[2]);
+    b5_faces[Block::i_min]->setGeomAssociation(surfaces[2]);
+
+    b5_faces[Block::j_min]->setGeomAssociation(surfaces[3]);
+    b6_faces[Block::j_min]->setGeomAssociation(surfaces[3]);
 
 
     // les sommets géométriques
@@ -3047,10 +3165,10 @@ createSphereTopoOGridHuitiemeDeg(Geom::PropertySphere* propertySph)
         throw TkUtil::Exception(message);
     }
 
-    Vertex* v0 = b5->getVertex(0);
-    Vertex* v1 = b6->getVertex(1);
-    Vertex* v2 = b3->getVertex(2);
-    Vertex* v3 = b3->getVertex(4);
+    Vertex* v0 = b5_vertices[0];
+    Vertex* v1 = b6_vertices[1];
+    Vertex* v2 = b3_vertices[2];
+    Vertex* v3 = b3_vertices[4];
 
     v0->setGeomAssociation(vertices[0]);
     v1->setGeomAssociation(vertices[1]);
@@ -3069,26 +3187,26 @@ createSphereTopoOGridHuitiemeDeg(Geom::PropertySphere* propertySph)
     }
 
 
-    b3->getFace(Block::k_min)->getEdge(b3->getVertex(2), b3->getVertex(3))->setGeomAssociation(curves[1]);
-    b3->getFace(Block::k_min)->getEdge(b3->getVertex(0), b3->getVertex(2))->setGeomAssociation(curves[2]);
+    b3_faces[Block::k_min]->getEdge(b3_vertices[2], b3_vertices[3])->setGeomAssociation(curves[1]);
+    b3_faces[Block::k_min]->getEdge(b3_vertices[0], b3_vertices[2])->setGeomAssociation(curves[2]);
 
-    b5->getFace(Block::k_min)->getEdge(b5->getVertex(0), b5->getVertex(2))->setGeomAssociation(curves[2]);
-    b5->getFace(Block::k_min)->getEdge(b5->getVertex(0), b5->getVertex(1))->setGeomAssociation(curves[0]);
+    b5_faces[Block::k_min]->getEdge(b5_vertices[0], b5_vertices[2])->setGeomAssociation(curves[2]);
+    b5_faces[Block::k_min]->getEdge(b5_vertices[0], b5_vertices[1])->setGeomAssociation(curves[0]);
 
-    b6->getFace(Block::k_min)->getEdge(b6->getVertex(1), b6->getVertex(3))->setGeomAssociation(curves[1]);
-    b6->getFace(Block::k_min)->getEdge(b6->getVertex(0), b6->getVertex(1))->setGeomAssociation(curves[0]);
+    b6_faces[Block::k_min]->getEdge(b6_vertices[1], b6_vertices[3])->setGeomAssociation(curves[1]);
+    b6_faces[Block::k_min]->getEdge(b6_vertices[0], b6_vertices[1])->setGeomAssociation(curves[0]);
 
-    b3->getVertex(3)->setGeomAssociation(curves[1]);
-    b5->getVertex(2)->setGeomAssociation(curves[2]);
-    b6->getVertex(0)->setGeomAssociation(curves[0]);
+    b3_vertices[3]->setGeomAssociation(curves[1]);
+    b5_vertices[2]->setGeomAssociation(curves[2]);
+    b6_vertices[0]->setGeomAssociation(curves[0]);
 
-    b3->getFace(Block::j_max)->getEdge(b3->getVertex(4), b3->getVertex(3))->setGeomAssociation(surfaces[1]);
-    b3->getFace(Block::i_min)->getEdge(b3->getVertex(0), b3->getVertex(4))->setGeomAssociation(surfaces[2]);
-    b5->getFace(Block::j_min)->getEdge(b5->getVertex(1), b5->getVertex(4))->setGeomAssociation(surfaces[3]);
+    b3_faces[Block::j_max]->getEdge(b3_vertices[4], b3_vertices[3])->setGeomAssociation(surfaces[1]);
+    b3_faces[Block::i_min]->getEdge(b3_vertices[0], b3_vertices[4])->setGeomAssociation(surfaces[2]);
+    b5_faces[Block::j_min]->getEdge(b5_vertices[1], b5_vertices[4])->setGeomAssociation(surfaces[3]);
 
-    b3->getFace(Block::j_max)->getEdge(b3->getVertex(2), b3->getVertex(4))->setGeomAssociation(curves[4]);
-    b5->getFace(Block::j_min)->getEdge(b5->getVertex(0), b5->getVertex(4))->setGeomAssociation(curves[5]);
-    b6->getFace(Block::i_max)->getEdge(b6->getVertex(1), b6->getVertex(4))->setGeomAssociation(curves[3]);
+    b3_faces[Block::j_max]->getEdge(b3_vertices[2], b3_vertices[4])->setGeomAssociation(curves[4]);
+    b5_faces[Block::j_min]->getEdge(b5_vertices[0], b5_vertices[4])->setGeomAssociation(curves[5]);
+    b6_faces[Block::i_max]->getEdge(b6_vertices[1], b6_vertices[4])->setGeomAssociation(curves[3]);
 
 }
 /*----------------------------------------------------------------------------*/
@@ -3152,8 +3270,12 @@ createSphereTopoOGridHuitiemeNonDeg(Geom::PropertySphere* propertySph)
 
 
     // le bloc au centre (b1)
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    const std::vector<Vertex*>& b3_vertices = b3->getVertices();
+    const std::vector<Vertex*>& b5_vertices = b5->getVertices();
+    const std::vector<Vertex*>& b6_vertices = b6->getVertices();
     for (uint i=0; i<8; i++)
-        b1->getVertex(i)->setCoord(pts_int[i]);
+        b1_vertices[i]->setCoord(pts_int[i]);
 
     for (uint j=0; j<3; j++)
         for (uint i=0; i<4; i++){
@@ -3164,12 +3286,16 @@ createSphereTopoOGridHuitiemeNonDeg(Geom::PropertySphere* propertySph)
                 k=3;
             else if (j==2)
                 k=4;
-            blocs[j]->getVertex(i)->setCoord(pts_ext[TopoHelper::tab2IndVtxByFaceOnBlock[k][i]]);
-            blocs[j]->getVertex(i+4)->setCoord(pts_int[TopoHelper::tab2IndVtxByFaceOnBlock[k][i]]);
+            blocs[j]->getVertices()[i]->setCoord(pts_ext[TopoHelper::tab2IndVtxByFaceOnBlock[k][i]]);
+            blocs[j]->getVertices()[i+4]->setCoord(pts_int[TopoHelper::tab2IndVtxByFaceOnBlock[k][i]]);
         }
 
 
     // on fusionne les blocs
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+    const std::vector<Face*>& b3_faces = b3->getFaces();
+    const std::vector<Face*>& b5_faces = b5->getFaces();
+    const std::vector<Face*>& b6_faces = b6->getFaces();
     for (uint j=0; j<3; j++){
         uint k = 0;
         if (j==0)
@@ -3178,13 +3304,12 @@ createSphereTopoOGridHuitiemeNonDeg(Geom::PropertySphere* propertySph)
             k=3;
         else if (j==2)
             k=4;
-        b1->getFace(k)->fuse(blocs[j]->getFace(Block::k_max), &getInfoCommand());
+        b1_faces[k]->fuse(blocs[j]->getFaces()[Block::k_max], &getInfoCommand());
     }
 
-    b3->getFace(Block::i_max)->fuse(b6->getFace(Block::j_max), &getInfoCommand());
-    b3->getFace(Block::j_min)->fuse(b5->getFace(Block::j_max), &getInfoCommand());
-    b5->getFace(Block::i_max)->fuse(b6->getFace(Block::i_min), &getInfoCommand());
-
+    b3_faces[Block::i_max]->fuse(b6_faces[Block::j_max], &getInfoCommand());
+    b3_faces[Block::j_min]->fuse(b5_faces[Block::j_max], &getInfoCommand());
+    b5_faces[Block::i_max]->fuse(b6_faces[Block::i_min], &getInfoCommand());
 
     // les projections sur la géométrie
     Geom::GetDownIncidentGeomEntitiesVisitor v;
@@ -3202,26 +3327,26 @@ createSphereTopoOGridHuitiemeNonDeg(Geom::PropertySphere* propertySph)
 
     // les projections
     for (uint j=0; j<3; j++){
-        Face* face = blocs[j]->getFace(Block::k_min);
+        Face* face = blocs[j]->getFaces()[Block::k_min];
         face->setGeomAssociation(surfaces[0]);
 
         for (uint i=0; i<4; i++){
-            face->getEdge(i)->setGeomAssociation(surfaces[0]);
-            face->getVertex(i)->setGeomAssociation(surfaces[0]);
+            getEdge(face, i)->setGeomAssociation(surfaces[0]);
+            face->getVertices()[i]->setGeomAssociation(surfaces[0]);
         }
     }
 
-    b1->getFace(Block::j_min)->setGeomAssociation(surfaces[1]);
-    b3->getFace(Block::j_max)->setGeomAssociation(surfaces[1]);
-    b6->getFace(Block::i_max)->setGeomAssociation(surfaces[1]);
+    b1_faces[Block::j_min]->setGeomAssociation(surfaces[1]);
+    b3_faces[Block::j_max]->setGeomAssociation(surfaces[1]);
+    b6_faces[Block::i_max]->setGeomAssociation(surfaces[1]);
 
-    b1->getFace(Block::k_max)->setGeomAssociation(surfaces[2]);
-    b3->getFace(Block::i_min)->setGeomAssociation(surfaces[2]);
-    b5->getFace(Block::i_min)->setGeomAssociation(surfaces[2]);
+    b1_faces[Block::k_max]->setGeomAssociation(surfaces[2]);
+    b3_faces[Block::i_min]->setGeomAssociation(surfaces[2]);
+    b5_faces[Block::i_min]->setGeomAssociation(surfaces[2]);
 
-    b1->getFace(Block::i_min)->setGeomAssociation(surfaces[3]);
-    b5->getFace(Block::j_min)->setGeomAssociation(surfaces[3]);
-    b6->getFace(Block::j_min)->setGeomAssociation(surfaces[3]);
+    b1_faces[Block::i_min]->setGeomAssociation(surfaces[3]);
+    b5_faces[Block::j_min]->setGeomAssociation(surfaces[3]);
+    b6_faces[Block::j_min]->setGeomAssociation(surfaces[3]);
 
 
     // les sommets géométriques
@@ -3232,11 +3357,10 @@ createSphereTopoOGridHuitiemeNonDeg(Geom::PropertySphere* propertySph)
         throw TkUtil::Exception(message);
     }
 
-    Vertex* v0 = b5->getVertex(0);
-    Vertex* v1 = b6->getVertex(1);
-    Vertex* v2 = b3->getVertex(2);
-    Vertex* v3 = b1->getVertex(4);
-
+    Vertex* v0 = b5_vertices[0];
+    Vertex* v1 = b6_vertices[1];
+    Vertex* v2 = b3_vertices[2];
+    Vertex* v3 = b1_vertices[4];
     v0->setGeomAssociation(vertices[0]);
     v1->setGeomAssociation(vertices[1]);
     v2->setGeomAssociation(vertices[2]);
@@ -3259,47 +3383,47 @@ createSphereTopoOGridHuitiemeNonDeg(Geom::PropertySphere* propertySph)
 //    for (uint i=0; i<curves.size(); i++)
 //        std::cout<<"curves["<<i<<"] = "<<(curves[i]?curves[i]->getName():0)<<std::endl;
 
-    b3->getFace(Block::k_min)->getEdge(b3->getVertex(2), b3->getVertex(3))->setGeomAssociation(curves[1]);
-    b3->getFace(Block::k_min)->getEdge(b3->getVertex(0), b3->getVertex(2))->setGeomAssociation(curves[2]);
+    b3_faces[Block::k_min]->getEdge(b3_vertices[2], b3_vertices[3])->setGeomAssociation(curves[1]);
+    b3_faces[Block::k_min]->getEdge(b3_vertices[0], b3_vertices[2])->setGeomAssociation(curves[2]);
 
-    b5->getFace(Block::k_min)->getEdge(b5->getVertex(0), b5->getVertex(2))->setGeomAssociation(curves[2]);
-    b5->getFace(Block::k_min)->getEdge(b5->getVertex(0), b5->getVertex(1))->setGeomAssociation(curves[0]);
+    b5_faces[Block::k_min]->getEdge(b5_vertices[0], b5_vertices[2])->setGeomAssociation(curves[2]);
+    b5_faces[Block::k_min]->getEdge(b5_vertices[0], b5_vertices[1])->setGeomAssociation(curves[0]);
 
-    b6->getFace(Block::k_min)->getEdge(b6->getVertex(1), b6->getVertex(3))->setGeomAssociation(curves[1]);
-    b6->getFace(Block::k_min)->getEdge(b6->getVertex(0), b6->getVertex(1))->setGeomAssociation(curves[0]);
+    b6_faces[Block::k_min]->getEdge(b6_vertices[1], b6_vertices[3])->setGeomAssociation(curves[1]);
+    b6_faces[Block::k_min]->getEdge(b6_vertices[0], b6_vertices[1])->setGeomAssociation(curves[0]);
 
-    b3->getVertex(3)->setGeomAssociation(curves[1]);
-    b5->getVertex(2)->setGeomAssociation(curves[2]);
-    b6->getVertex(0)->setGeomAssociation(curves[0]);
+    b3_vertices[3]->setGeomAssociation(curves[1]);
+    b5_vertices[2]->setGeomAssociation(curves[2]);
+    b6_vertices[0]->setGeomAssociation(curves[0]);
 
-    b1->getFace(Block::i_min)->getEdge(b1->getVertex(0), b1->getVertex(2))->setGeomAssociation(surfaces[3]);
-    b1->getFace(Block::i_min)->getEdge(b1->getVertex(2), b1->getVertex(6))->setGeomAssociation(surfaces[3]);
+    b1_faces[Block::i_min]->getEdge(b1_vertices[0], b1_vertices[2])->setGeomAssociation(surfaces[3]);
+    b1_faces[Block::i_min]->getEdge(b1_vertices[2], b1_vertices[6])->setGeomAssociation(surfaces[3]);
 
-    b1->getFace(Block::j_min)->getEdge(b1->getVertex(0), b1->getVertex(1))->setGeomAssociation(surfaces[1]);
-    b1->getFace(Block::j_min)->getEdge(b1->getVertex(1), b1->getVertex(5))->setGeomAssociation(surfaces[1]);
+    b1_faces[Block::j_min]->getEdge(b1_vertices[0], b1_vertices[1])->setGeomAssociation(surfaces[1]);
+    b1_faces[Block::j_min]->getEdge(b1_vertices[1], b1_vertices[5])->setGeomAssociation(surfaces[1]);
 
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(5), b1->getVertex(7))->setGeomAssociation(surfaces[2]);
-    b1->getFace(Block::k_max)->getEdge(b1->getVertex(6), b1->getVertex(7))->setGeomAssociation(surfaces[2]);
+    b1_faces[Block::k_max]->getEdge(b1_vertices[5], b1_vertices[7])->setGeomAssociation(surfaces[2]);
+    b1_faces[Block::k_max]->getEdge(b1_vertices[6], b1_vertices[7])->setGeomAssociation(surfaces[2]);
 
-    b3->getFace(Block::j_max)->getEdge(b3->getVertex(7), b3->getVertex(3))->setGeomAssociation(surfaces[1]);
-    b3->getFace(Block::i_min)->getEdge(b3->getVertex(0), b3->getVertex(4))->setGeomAssociation(surfaces[2]);
-    b5->getFace(Block::j_min)->getEdge(b5->getVertex(1), b5->getVertex(5))->setGeomAssociation(surfaces[3]);
+    b3_faces[Block::j_max]->getEdge(b3_vertices[7], b3_vertices[3])->setGeomAssociation(surfaces[1]);
+    b3_faces[Block::i_min]->getEdge(b3_vertices[0], b3_vertices[4])->setGeomAssociation(surfaces[2]);
+    b5_faces[Block::j_min]->getEdge(b5_vertices[1], b5_vertices[5])->setGeomAssociation(surfaces[3]);
 
-    b1->getFace(Block::i_min)->getEdge(b1->getVertex(4), b1->getVertex(0))->setGeomAssociation(curves[3]);
-    b1->getFace(Block::i_min)->getEdge(b1->getVertex(4), b1->getVertex(6))->setGeomAssociation(curves[5]);
-    b1->getFace(Block::j_min)->getEdge(b1->getVertex(4), b1->getVertex(5))->setGeomAssociation(curves[4]);
+    b1_faces[Block::i_min]->getEdge(b1_vertices[4], b1_vertices[0])->setGeomAssociation(curves[3]);
+    b1_faces[Block::i_min]->getEdge(b1_vertices[4], b1_vertices[6])->setGeomAssociation(curves[5]);
+    b1_faces[Block::j_min]->getEdge(b1_vertices[4], b1_vertices[5])->setGeomAssociation(curves[4]);
 
-    b3->getFace(Block::j_max)->getEdge(b3->getVertex(2), b3->getVertex(6))->setGeomAssociation(curves[4]);
-    b5->getFace(Block::j_min)->getEdge(b5->getVertex(0), b5->getVertex(4))->setGeomAssociation(curves[5]);
-    b6->getFace(Block::i_max)->getEdge(b6->getVertex(1), b6->getVertex(5))->setGeomAssociation(curves[3]);
+    b3_faces[Block::j_max]->getEdge(b3_vertices[2], b3_vertices[6])->setGeomAssociation(curves[4]);
+    b5_faces[Block::j_min]->getEdge(b5_vertices[0], b5_vertices[4])->setGeomAssociation(curves[5]);
+    b6_faces[Block::i_max]->getEdge(b6_vertices[1], b6_vertices[5])->setGeomAssociation(curves[3]);
 
-    b1->getVertex(0)->setGeomAssociation(curves[3]);
-    b1->getVertex(6)->setGeomAssociation(curves[5]);
-    b1->getVertex(5)->setGeomAssociation(curves[4]);
+    b1_vertices[0]->setGeomAssociation(curves[3]);
+    b1_vertices[6]->setGeomAssociation(curves[5]);
+    b1_vertices[5]->setGeomAssociation(curves[4]);
 
-    b1->getVertex(2)->setGeomAssociation(surfaces[3]);
-    b1->getVertex(1)->setGeomAssociation(surfaces[1]);
-    b1->getVertex(7)->setGeomAssociation(surfaces[2]);
+    b1_vertices[2]->setGeomAssociation(surfaces[3]);
+    b1_vertices[1]->setGeomAssociation(surfaces[1]);
+    b1_vertices[7]->setGeomAssociation(surfaces[2]);
 
 }
 /*----------------------------------------------------------------------------*/
@@ -3468,106 +3592,114 @@ createHollowCylinderTopoEntier(Geom::PropertyHollowCylinder* propertyCyl)
         throw TkUtil::Exception(message);
     }
 
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    const std::vector<Vertex*>& b2_vertices = b2->getVertices();
+    const std::vector<Vertex*>& b3_vertices = b3->getVertices();
+    const std::vector<Vertex*>& b4_vertices = b4->getVertices();
     Utils::Math::Point pt;
     Geom::Curve* crv;
 
     // pour la première courbe interne (j min, x min si c'est l'axe)
     crv = curves[4];
     crv->getPoint(0.125, pt, true);
-    b4->getVertex(1)->setCoord(pt);
-    b1->getVertex(0)->setCoord(pt);
+    b4_vertices[1]->setCoord(pt);
+    b1_vertices[0]->setCoord(pt);
 
     crv->getPoint(0.375, pt, true);
-    b3->getVertex(1)->setCoord(pt);
-    b4->getVertex(0)->setCoord(pt);
+    b3_vertices[1]->setCoord(pt);
+    b4_vertices[0]->setCoord(pt);
 
     crv->getPoint(0.625, pt, true);
-    b2->getVertex(1)->setCoord(pt);
-    b3->getVertex(0)->setCoord(pt);
+    b2_vertices[1]->setCoord(pt);
+    b3_vertices[0]->setCoord(pt);
 
     crv->getPoint(0.875, pt, true);
-    b1->getVertex(1)->setCoord(pt);
-    b2->getVertex(0)->setCoord(pt);
+    b1_vertices[1]->setCoord(pt);
+    b2_vertices[0]->setCoord(pt);
 
-    b1->getVertex(1)->setGeomAssociation(crv);
-    b2->getVertex(1)->setGeomAssociation(crv);
-    b3->getVertex(1)->setGeomAssociation(crv);
-    b4->getVertex(1)->setGeomAssociation(crv);
+    b1_vertices[1]->setGeomAssociation(crv);
+    b2_vertices[1]->setGeomAssociation(crv);
+    b3_vertices[1]->setGeomAssociation(crv);
+    b4_vertices[1]->setGeomAssociation(crv);
 
     // pour la première courbe externe
     crv = curves[2];
     crv->getPoint(0.125, pt, true);
-    b4->getVertex(5)->setCoord(pt);
-    b1->getVertex(4)->setCoord(pt);
+    b4_vertices[5]->setCoord(pt);
+    b1_vertices[4]->setCoord(pt);
 
     crv->getPoint(0.375, pt, true);
-    b3->getVertex(5)->setCoord(pt);
-    b4->getVertex(4)->setCoord(pt);
+    b3_vertices[5]->setCoord(pt);
+    b4_vertices[4]->setCoord(pt);
 
     crv->getPoint(0.625, pt, true);
-    b2->getVertex(5)->setCoord(pt);
-    b3->getVertex(4)->setCoord(pt);
+    b2_vertices[5]->setCoord(pt);
+    b3_vertices[4]->setCoord(pt);
 
     crv->getPoint(0.875, pt, true);
-    b1->getVertex(5)->setCoord(pt);
-    b2->getVertex(4)->setCoord(pt);
+    b1_vertices[5]->setCoord(pt);
+    b2_vertices[4]->setCoord(pt);
 
-    b1->getVertex(5)->setGeomAssociation(crv);
-    b2->getVertex(5)->setGeomAssociation(crv);
-    b3->getVertex(5)->setGeomAssociation(crv);
-    b4->getVertex(5)->setGeomAssociation(crv);
+    b1_vertices[5]->setGeomAssociation(crv);
+    b2_vertices[5]->setGeomAssociation(crv);
+    b3_vertices[5]->setGeomAssociation(crv);
+    b4_vertices[5]->setGeomAssociation(crv);
 
     // pour la deuxième courbe interne (j max, x max si c'est l'axe)
     crv = curves[3];
     crv->getPoint(0.125, pt, true);
-    b4->getVertex(3)->setCoord(pt);
-    b1->getVertex(2)->setCoord(pt);
+    b4_vertices[3]->setCoord(pt);
+    b1_vertices[2]->setCoord(pt);
 
     crv->getPoint(0.375, pt, true);
-    b3->getVertex(3)->setCoord(pt);
-    b4->getVertex(2)->setCoord(pt);
+    b3_vertices[3]->setCoord(pt);
+    b4_vertices[2]->setCoord(pt);
 
     crv->getPoint(0.625, pt, true);
-    b2->getVertex(3)->setCoord(pt);
-    b3->getVertex(2)->setCoord(pt);
+    b2_vertices[3]->setCoord(pt);
+    b3_vertices[2]->setCoord(pt);
 
     crv->getPoint(0.875, pt, true);
-    b1->getVertex(3)->setCoord(pt);
-    b2->getVertex(2)->setCoord(pt);
+    b1_vertices[3]->setCoord(pt);
+    b2_vertices[2]->setCoord(pt);
 
-    b1->getVertex(3)->setGeomAssociation(crv);
-    b2->getVertex(3)->setGeomAssociation(crv);
-    b3->getVertex(3)->setGeomAssociation(crv);
-    b4->getVertex(3)->setGeomAssociation(crv);
+    b1_vertices[3]->setGeomAssociation(crv);
+    b2_vertices[3]->setGeomAssociation(crv);
+    b3_vertices[3]->setGeomAssociation(crv);
+    b4_vertices[3]->setGeomAssociation(crv);
 
     // pour la deuxième courbe externe
     crv = curves[0];
     crv->getPoint(0.125, pt, true);
-    b4->getVertex(7)->setCoord(pt);
-    b1->getVertex(6)->setCoord(pt);
+    b4_vertices[7]->setCoord(pt);
+    b1_vertices[6]->setCoord(pt);
 
     crv->getPoint(0.375, pt, true);
-    b3->getVertex(7)->setCoord(pt);
-    b4->getVertex(6)->setCoord(pt);
+    b3_vertices[7]->setCoord(pt);
+    b4_vertices[6]->setCoord(pt);
 
     crv->getPoint(0.625, pt, true);
-    b2->getVertex(7)->setCoord(pt);
-    b3->getVertex(6)->setCoord(pt);
+    b2_vertices[7]->setCoord(pt);
+    b3_vertices[6]->setCoord(pt);
 
     crv->getPoint(0.875, pt, true);
-    b1->getVertex(7)->setCoord(pt);
-    b2->getVertex(6)->setCoord(pt);
+    b1_vertices[7]->setCoord(pt);
+    b2_vertices[6]->setCoord(pt);
 
-    b1->getVertex(7)->setGeomAssociation(crv);
-    b2->getVertex(7)->setGeomAssociation(crv);
-    b3->getVertex(7)->setGeomAssociation(crv);
-    b4->getVertex(7)->setGeomAssociation(crv);
+    b1_vertices[7]->setGeomAssociation(crv);
+    b2_vertices[7]->setGeomAssociation(crv);
+    b3_vertices[7]->setGeomAssociation(crv);
+    b4_vertices[7]->setGeomAssociation(crv);
 
     // fusion des faces
-    b1->getFace(Block::i_max)->fuse(b2->getFace(Block::i_min), &getInfoCommand());
-    b2->getFace(Block::i_max)->fuse(b3->getFace(Block::i_min), &getInfoCommand());
-    b3->getFace(Block::i_max)->fuse(b4->getFace(Block::i_min), &getInfoCommand());
-    b4->getFace(Block::i_max)->fuse(b1->getFace(Block::i_min), &getInfoCommand());
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+    const std::vector<Face*>& b2_faces = b2->getFaces();
+    const std::vector<Face*>& b3_faces = b3->getFaces();
+    const std::vector<Face*>& b4_faces = b4->getFaces();
+    b1_faces[Block::i_max]->fuse(b2_faces[Block::i_min], &getInfoCommand());
+    b2_faces[Block::i_max]->fuse(b3_faces[Block::i_min], &getInfoCommand());
+    b3_faces[Block::i_max]->fuse(b4_faces[Block::i_min], &getInfoCommand());
+    b4_faces[Block::i_max]->fuse(b1_faces[Block::i_min], &getInfoCommand());
 
     projectEdgesOnCurves();
 
@@ -3652,7 +3784,7 @@ createHollowSphereTopoHuitieme(Geom::PropertyHollowSphere* propertySph)
                 k=3;
             else if (j==2)
                 k=4;
-            blocs[j]->getVertex(i)->setCoord(pts[TopoHelper::tab2IndVtxByFaceOnBlock[k][i]]);
+            blocs[j]->getVertices()[i]->setCoord(pts[TopoHelper::tab2IndVtxByFaceOnBlock[k][i]]);
         }
 
 
@@ -3682,13 +3814,16 @@ createHollowSphereTopoHuitieme(Geom::PropertyHollowSphere* propertySph)
                 k=3;
             else if (j==2)
                 k=4;
-            blocs[j]->getVertex(i+4)->setCoord(pts[TopoHelper::tab2IndVtxByFaceOnBlock[k][i]]);
+            blocs[j]->getVertices()[i+4]->setCoord(pts[TopoHelper::tab2IndVtxByFaceOnBlock[k][i]]);
         }
 
     // on fusionne les blocs
-    b3->getFace(Block::i_max)->fuse(b6->getFace(Block::j_max), &getInfoCommand());
-    b3->getFace(Block::j_min)->fuse(b5->getFace(Block::j_max), &getInfoCommand());
-    b5->getFace(Block::i_max)->fuse(b6->getFace(Block::i_min), &getInfoCommand());
+    const std::vector<Face*>& b3_faces = b3->getFaces();
+    const std::vector<Face*>& b5_faces = b5->getFaces();
+    const std::vector<Face*>& b6_faces = b6->getFaces();
+    b3_faces[Block::i_max]->fuse(b6_faces[Block::j_max], &getInfoCommand());
+    b3_faces[Block::j_min]->fuse(b5_faces[Block::j_max], &getInfoCommand());
+    b5_faces[Block::i_max]->fuse(b6_faces[Block::i_min], &getInfoCommand());
 
     Geom::GetDownIncidentGeomEntitiesVisitor v;
     getGeomEntity()->accept(v);
@@ -3704,12 +3839,15 @@ createHollowSphereTopoHuitieme(Geom::PropertyHollowSphere* propertySph)
         throw TkUtil::Exception(message);
     }
 
-    b5->getVertex(0)->setGeomAssociation(vertices[0]);
-    b6->getVertex(1)->setGeomAssociation(vertices[1]);
-    b3->getVertex(2)->setGeomAssociation(vertices[2]);
-    b5->getVertex(4)->setGeomAssociation(vertices[3]);
-    b6->getVertex(5)->setGeomAssociation(vertices[4]);
-    b3->getVertex(6)->setGeomAssociation(vertices[5]);
+    const std::vector<Vertex*>& b3_vertices = b3->getVertices();
+    const std::vector<Vertex*>& b5_vertices = b5->getVertices();
+    const std::vector<Vertex*>& b6_vertices = b6->getVertices();
+    b5_vertices[0]->setGeomAssociation(vertices[0]);
+    b6_vertices[1]->setGeomAssociation(vertices[1]);
+    b3_vertices[2]->setGeomAssociation(vertices[2]);
+    b5_vertices[4]->setGeomAssociation(vertices[3]);
+    b6_vertices[5]->setGeomAssociation(vertices[4]);
+    b3_vertices[6]->setGeomAssociation(vertices[5]);
 
     if (curves.size() != 9){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -3718,12 +3856,12 @@ createHollowSphereTopoHuitieme(Geom::PropertyHollowSphere* propertySph)
         throw TkUtil::Exception(message);
     }
 
-    b6->getVertex(0)->setGeomAssociation(curves[0]);
-    b3->getVertex(3)->setGeomAssociation(curves[1]);
-    b5->getVertex(2)->setGeomAssociation(curves[2]);
-    b6->getVertex(4)->setGeomAssociation(curves[5]);
-    b3->getVertex(7)->setGeomAssociation(curves[7]);
-    b5->getVertex(6)->setGeomAssociation(curves[8]);
+    b6_vertices[0]->setGeomAssociation(curves[0]);
+    b3_vertices[3]->setGeomAssociation(curves[1]);
+    b5_vertices[2]->setGeomAssociation(curves[2]);
+    b6_vertices[4]->setGeomAssociation(curves[5]);
+    b3_vertices[7]->setGeomAssociation(curves[7]);
+    b5_vertices[6]->setGeomAssociation(curves[8]);
 
     if (surfaces.size() != 5){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -3732,8 +3870,8 @@ createHollowSphereTopoHuitieme(Geom::PropertyHollowSphere* propertySph)
         throw TkUtil::Exception(message);
     }
 
-    b6->getVertex(2)->setGeomAssociation(surfaces[0]);
-    b6->getVertex(6)->setGeomAssociation(surfaces[4]);
+    b6_vertices[2]->setGeomAssociation(surfaces[0]);
+    b6_vertices[6]->setGeomAssociation(surfaces[4]);
 
 
     projectEdgesOnCurves();
@@ -3789,7 +3927,7 @@ createHollowSphereTopoQuart(Geom::PropertyHollowSphere* propertySph)
     // on place les sommets
     for (uint j=0; j<4; j++)
         for (uint i=0; i<4; i++){
-                blocs[j]->getVertex(i)->setCoord(pts[TopoHelper::tab2IndVtxByFaceOnBlock[j+1][i]]);
+                blocs[j]->getVertices()[i]->setCoord(pts[TopoHelper::tab2IndVtxByFaceOnBlock[j+1][i]]);
             }
 
 
@@ -3812,15 +3950,19 @@ createHollowSphereTopoQuart(Geom::PropertyHollowSphere* propertySph)
     // on place les sommets
     for (uint j=0; j<4; j++)
         for (uint i=0; i<4; i++){
-                blocs[j]->getVertex(i+4)->setCoord(pts[TopoHelper::tab2IndVtxByFaceOnBlock[j+1][i]]);
+                blocs[j]->getVertices()[i+4]->setCoord(pts[TopoHelper::tab2IndVtxByFaceOnBlock[j+1][i]]);
             }
 
     // on fusionne les blocs
-    b4->getFace(Block::i_max)->fuse(b6->getFace(Block::i_max), &getInfoCommand());
-    b3->getFace(Block::j_max)->fuse(b4->getFace(Block::j_min), &getInfoCommand());
-    b3->getFace(Block::i_max)->fuse(b6->getFace(Block::j_max), &getInfoCommand());
-    b3->getFace(Block::j_min)->fuse(b5->getFace(Block::j_max), &getInfoCommand());
-    b5->getFace(Block::i_max)->fuse(b6->getFace(Block::i_min), &getInfoCommand());
+    const std::vector<Face*>& b3_faces = b3->getFaces();
+    const std::vector<Face*>& b4_faces = b4->getFaces();
+    const std::vector<Face*>& b5_faces = b5->getFaces();
+    const std::vector<Face*>& b6_faces = b6->getFaces();
+    b4_faces[Block::i_max]->fuse(b6_faces[Block::i_max], &getInfoCommand());
+    b3_faces[Block::j_max]->fuse(b4_faces[Block::j_min], &getInfoCommand());
+    b3_faces[Block::i_max]->fuse(b6_faces[Block::j_max], &getInfoCommand());
+    b3_faces[Block::j_min]->fuse(b5_faces[Block::j_max], &getInfoCommand());
+    b5_faces[Block::i_max]->fuse(b6_faces[Block::i_min], &getInfoCommand());
 
     Geom::GetDownIncidentGeomEntitiesVisitor v;
     getGeomEntity()->accept(v);
@@ -3835,10 +3977,14 @@ createHollowSphereTopoQuart(Geom::PropertyHollowSphere* propertySph)
         throw TkUtil::Exception(message);
     }
 
-    b5->getVertex(0)->setGeomAssociation(vertices[0]);
-    b4->getVertex(2)->setGeomAssociation(vertices[1]);
-    b5->getVertex(4)->setGeomAssociation(vertices[3]);
-    b4->getVertex(6)->setGeomAssociation(vertices[2]);
+    const std::vector<Vertex*>& b3_vertices = b3->getVertices();
+    const std::vector<Vertex*>& b4_vertices = b4->getVertices();
+    const std::vector<Vertex*>& b5_vertices = b5->getVertices();
+    const std::vector<Vertex*>& b6_vertices = b6->getVertices();
+    b5_vertices[0]->setGeomAssociation(vertices[0]);
+    b4_vertices[2]->setGeomAssociation(vertices[1]);
+    b5_vertices[4]->setGeomAssociation(vertices[3]);
+    b4_vertices[6]->setGeomAssociation(vertices[2]);
 
     if (curves.size() != 6){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -3847,15 +3993,15 @@ createHollowSphereTopoQuart(Geom::PropertyHollowSphere* propertySph)
         throw TkUtil::Exception(message);
     }
 
-    b3->getVertex(0)->setGeomAssociation(curves[1]);
-    b3->getVertex(2)->setGeomAssociation(curves[1]);
-    b3->getVertex(4)->setGeomAssociation(curves[5]);
-    b3->getVertex(6)->setGeomAssociation(curves[5]);
+    b3_vertices[0]->setGeomAssociation(curves[1]);
+    b3_vertices[2]->setGeomAssociation(curves[1]);
+    b3_vertices[4]->setGeomAssociation(curves[5]);
+    b3_vertices[6]->setGeomAssociation(curves[5]);
 
-    b6->getVertex(0)->setGeomAssociation(curves[0]);
-    b6->getVertex(1)->setGeomAssociation(curves[0]);
-    b6->getVertex(4)->setGeomAssociation(curves[3]);
-    b6->getVertex(5)->setGeomAssociation(curves[3]);
+    b6_vertices[0]->setGeomAssociation(curves[0]);
+    b6_vertices[1]->setGeomAssociation(curves[0]);
+    b6_vertices[4]->setGeomAssociation(curves[3]);
+    b6_vertices[5]->setGeomAssociation(curves[3]);
 
     if (surfaces.size() != 4){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -3864,10 +4010,10 @@ createHollowSphereTopoQuart(Geom::PropertyHollowSphere* propertySph)
         throw TkUtil::Exception(message);
     }
 
-    b3->getVertex(1)->setGeomAssociation(surfaces[0]);
-    b3->getVertex(3)->setGeomAssociation(surfaces[0]);
-    b3->getVertex(5)->setGeomAssociation(surfaces[3]);
-    b3->getVertex(7)->setGeomAssociation(surfaces[3]);
+    b3_vertices[1]->setGeomAssociation(surfaces[0]);
+    b3_vertices[3]->setGeomAssociation(surfaces[0]);
+    b3_vertices[5]->setGeomAssociation(surfaces[3]);
+    b3_vertices[7]->setGeomAssociation(surfaces[3]);
 
     projectEdgesOnCurves();
 
@@ -3926,7 +4072,7 @@ createHollowSphereTopoDemi(Geom::PropertyHollowSphere* propertySph)
     // on place les sommets
     for (uint j=0; j<5; j++)
         for (uint i=0; i<4; i++){
-                blocs[j]->getVertex(i)->setCoord(pts[TopoHelper::tab2IndVtxByFaceOnBlock[j][i]]);
+                blocs[j]->getVertices()[i]->setCoord(pts[TopoHelper::tab2IndVtxByFaceOnBlock[j][i]]);
             }
 
     // on traite les points à l'intérieur
@@ -3948,39 +4094,46 @@ createHollowSphereTopoDemi(Geom::PropertyHollowSphere* propertySph)
     // on place les sommets
     for (uint j=0; j<5; j++)
         for (uint i=0; i<4; i++){
-                blocs[j]->getVertex(i+4)->setCoord(pts[TopoHelper::tab2IndVtxByFaceOnBlock[j][i]]);
+                blocs[j]->getVertices()[i+4]->setCoord(pts[TopoHelper::tab2IndVtxByFaceOnBlock[j][i]]);
             }
 
     // on fusionne les blocs
-    b2->getFace(Block::j_min)->fuse(b4->getFace(Block::j_max), &getInfoCommand());
-    b2->getFace(Block::i_max)->fuse(b6->getFace(Block::j_min), &getInfoCommand());
-    b4->getFace(Block::i_max)->fuse(b6->getFace(Block::i_max), &getInfoCommand());
-    b3->getFace(Block::j_max)->fuse(b4->getFace(Block::j_min), &getInfoCommand());
-    b3->getFace(Block::i_max)->fuse(b6->getFace(Block::j_max), &getInfoCommand());
-    b3->getFace(Block::j_min)->fuse(b5->getFace(Block::j_max), &getInfoCommand());
-    b5->getFace(Block::i_max)->fuse(b6->getFace(Block::i_min), &getInfoCommand());
-    b2->getFace(Block::j_max)->fuse(b5->getFace(Block::j_min), &getInfoCommand());
+    const std::vector<Face*>& b2_faces = b2->getFaces();
+    const std::vector<Face*>& b3_faces = b3->getFaces();
+    const std::vector<Face*>& b4_faces = b4->getFaces();
+    const std::vector<Face*>& b5_faces = b5->getFaces();
+    const std::vector<Face*>& b6_faces = b6->getFaces();
+    b2_faces[Block::j_min]->fuse(b4_faces[Block::j_max], &getInfoCommand());
+    b2_faces[Block::i_max]->fuse(b6_faces[Block::j_min], &getInfoCommand());
+    b4_faces[Block::i_max]->fuse(b6_faces[Block::i_max], &getInfoCommand());
+    b3_faces[Block::j_max]->fuse(b4_faces[Block::j_min], &getInfoCommand());
+    b3_faces[Block::i_max]->fuse(b6_faces[Block::j_max], &getInfoCommand());
+    b3_faces[Block::j_min]->fuse(b5_faces[Block::j_max], &getInfoCommand());
+    b5_faces[Block::i_max]->fuse(b6_faces[Block::i_min], &getInfoCommand());
+    b2_faces[Block::j_max]->fuse(b5_faces[Block::j_min], &getInfoCommand());
 
     // on coupe les faces des blocs b4 et b5 pour qu'une arête soit sur la courbe 2
-    std::vector<Edge* > splitingEdges;
+    const std::vector<Vertex*>& b4_vertices = b4->getVertices();
+    const std::vector<Vertex*>& b5_vertices = b5->getVertices();
+     std::vector<Edge* > splitingEdges;
     std::vector<CoEdge* > coedges;
     std::vector<CoFace* > cofaces;
-    cofaces.push_back(b4->getFace(Block::i_min)->getCoFace(0));
+    cofaces.push_back(b4_faces[Block::i_min]->getCoFaces()[0]);
     TopoHelper::splitFaces2D(cofaces,
-            b4->getFace(Block::i_min)->getEdge(b4->getVertex(0), b4->getVertex(2))->getCoEdge(0),
+            b4_faces[Block::i_min]->getEdge(b4_vertices[0], b4_vertices[2])->getCoEdges()[0],
             0.5, 0.0, false, false,
             splitingEdges,
             &getInfoCommand());
 
-    coedges.push_back(splitingEdges[0]->getCoEdge(0));
+    coedges.push_back(splitingEdges[0]->getCoEdges()[0]);
     cofaces.clear();
-    cofaces.push_back(b5->getFace(Block::i_min)->getCoFace(0));
+    cofaces.push_back(b5_faces[Block::i_min]->getCoFaces()[0]);
     TopoHelper::splitFaces2D(cofaces,
-            b5->getFace(Block::i_min)->getEdge(b5->getVertex(0), b5->getVertex(2))->getCoEdge(0),
+            b5_faces[Block::i_min]->getEdge(b5_vertices[0], b5_vertices[2])->getCoEdges()[0],
             0.5, 0.0, false, false,
             splitingEdges,
             &getInfoCommand());
-    coedges.push_back(splitingEdges[0]->getCoEdge(0));
+    coedges.push_back(splitingEdges[0]->getCoEdges()[0]);
 
 
     // les sommets géométriques
@@ -3997,15 +4150,15 @@ createHollowSphereTopoDemi(Geom::PropertyHollowSphere* propertySph)
         throw TkUtil::Exception(message);
     }
 
-    coedges[0]->getVertex(0)->setGeomAssociation(vertices[1]);
-    coedges[0]->getVertex(1)->setGeomAssociation(vertices[2]);
-    coedges[1]->getVertex(0)->setGeomAssociation(vertices[0]);
-    coedges[1]->getVertex(1)->setGeomAssociation(vertices[3]);
+    coedges[0]->getVertices()[0]->setGeomAssociation(vertices[1]);
+    coedges[0]->getVertices()[1]->setGeomAssociation(vertices[2]);
+    coedges[1]->getVertices()[0]->setGeomAssociation(vertices[0]);
+    coedges[1]->getVertices()[1]->setGeomAssociation(vertices[3]);
 
-    coedges[0]->getVertex(0)->setCoord(vertices[1]->getCoord());
-    coedges[0]->getVertex(1)->setCoord(vertices[2]->getCoord());
-    coedges[1]->getVertex(0)->setCoord(vertices[0]->getCoord());
-    coedges[1]->getVertex(1)->setCoord(vertices[3]->getCoord());
+    coedges[0]->getVertices()[0]->setCoord(vertices[1]->getCoord());
+    coedges[0]->getVertices()[1]->setCoord(vertices[2]->getCoord());
+    coedges[1]->getVertices()[0]->setCoord(vertices[0]->getCoord());
+    coedges[1]->getVertices()[1]->setCoord(vertices[3]->getCoord());
 
     if (curves.size() != 6){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -4014,15 +4167,17 @@ createHollowSphereTopoDemi(Geom::PropertyHollowSphere* propertySph)
         throw TkUtil::Exception(message);
     }
 
-    b2->getVertex(0)->setGeomAssociation(curves[0]);
-    b2->getVertex(2)->setGeomAssociation(curves[0]);
-    b2->getVertex(4)->setGeomAssociation(curves[3]);
-    b2->getVertex(6)->setGeomAssociation(curves[3]);
+    const std::vector<Vertex*>& b2_vertices = b2->getVertices();
+    const std::vector<Vertex*>& b3_vertices = b3->getVertices();
+    b2_vertices[0]->setGeomAssociation(curves[0]);
+    b2_vertices[2]->setGeomAssociation(curves[0]);
+    b2_vertices[4]->setGeomAssociation(curves[3]);
+    b2_vertices[6]->setGeomAssociation(curves[3]);
 
-    b3->getVertex(0)->setGeomAssociation(curves[1]);
-    b3->getVertex(2)->setGeomAssociation(curves[1]);
-    b3->getVertex(4)->setGeomAssociation(curves[5]);
-    b3->getVertex(6)->setGeomAssociation(curves[5]);
+    b3_vertices[0]->setGeomAssociation(curves[1]);
+    b3_vertices[2]->setGeomAssociation(curves[1]);
+    b3_vertices[4]->setGeomAssociation(curves[5]);
+    b3_vertices[6]->setGeomAssociation(curves[5]);
 
     if (surfaces.size() != 4){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -4031,15 +4186,15 @@ createHollowSphereTopoDemi(Geom::PropertyHollowSphere* propertySph)
         throw TkUtil::Exception(message);
     }
 
-    b2->getVertex(1)->setGeomAssociation(surfaces[0]);
-    b2->getVertex(3)->setGeomAssociation(surfaces[0]);
-    b2->getVertex(5)->setGeomAssociation(surfaces[3]);
-    b2->getVertex(7)->setGeomAssociation(surfaces[3]);
+    b2_vertices[1]->setGeomAssociation(surfaces[0]);
+    b2_vertices[3]->setGeomAssociation(surfaces[0]);
+    b2_vertices[5]->setGeomAssociation(surfaces[3]);
+    b2_vertices[7]->setGeomAssociation(surfaces[3]);
 
-    b3->getVertex(1)->setGeomAssociation(surfaces[0]);
-    b3->getVertex(3)->setGeomAssociation(surfaces[0]);
-    b3->getVertex(5)->setGeomAssociation(surfaces[3]);
-    b3->getVertex(7)->setGeomAssociation(surfaces[3]);
+    b3_vertices[1]->setGeomAssociation(surfaces[0]);
+    b3_vertices[3]->setGeomAssociation(surfaces[0]);
+    b3_vertices[5]->setGeomAssociation(surfaces[3]);
+    b3_vertices[7]->setGeomAssociation(surfaces[3]);
 
     projectEdgesOnCurves();
 
@@ -4100,7 +4255,7 @@ createHollowSphereTopoEntier(Geom::PropertyHollowSphere* propertySph)
     // on place les sommets
     for (uint j=0; j<6; j++)
         for (uint i=0; i<4; i++){
-                blocs[j]->getVertex(i)->setCoord(pts[TopoHelper::tab2IndVtxByFaceOnBlock[j][i]]);
+                blocs[j]->getVertices()[i]->setCoord(pts[TopoHelper::tab2IndVtxByFaceOnBlock[j][i]]);
             }
 
     // on traite les points à l'intérieur
@@ -4122,23 +4277,29 @@ createHollowSphereTopoEntier(Geom::PropertyHollowSphere* propertySph)
     // on place les sommets
     for (uint j=0; j<6; j++)
         for (uint i=0; i<4; i++){
-                blocs[j]->getVertex(i+4)->setCoord(pts[TopoHelper::tab2IndVtxByFaceOnBlock[j][i]]);
+                blocs[j]->getVertices()[i+4]->setCoord(pts[TopoHelper::tab2IndVtxByFaceOnBlock[j][i]]);
             }
 
 
     // on fusionne les blocs
-    b2->getFace(Block::j_min)->fuse(b4->getFace(Block::j_max), &getInfoCommand());
-    b2->getFace(Block::i_min)->fuse(b7->getFace(Block::j_max), &getInfoCommand());
-    b2->getFace(Block::i_max)->fuse(b6->getFace(Block::j_min), &getInfoCommand());
-    b4->getFace(Block::i_min)->fuse(b7->getFace(Block::i_max), &getInfoCommand());
-    b4->getFace(Block::i_max)->fuse(b6->getFace(Block::i_max), &getInfoCommand());
-    b3->getFace(Block::j_max)->fuse(b4->getFace(Block::j_min), &getInfoCommand());
-    b3->getFace(Block::i_min)->fuse(b7->getFace(Block::j_min), &getInfoCommand());
-    b3->getFace(Block::i_max)->fuse(b6->getFace(Block::j_max), &getInfoCommand());
-    b5->getFace(Block::i_min)->fuse(b7->getFace(Block::i_min), &getInfoCommand());
-    b3->getFace(Block::j_min)->fuse(b5->getFace(Block::j_max), &getInfoCommand());
-    b5->getFace(Block::i_max)->fuse(b6->getFace(Block::i_min), &getInfoCommand());
-    b2->getFace(Block::j_max)->fuse(b5->getFace(Block::j_min), &getInfoCommand());
+    const std::vector<Face*>& b2_faces = b2->getFaces();
+    const std::vector<Face*>& b3_faces = b3->getFaces();
+    const std::vector<Face*>& b4_faces = b4->getFaces();
+    const std::vector<Face*>& b5_faces = b5->getFaces();
+    const std::vector<Face*>& b6_faces = b6->getFaces();
+    const std::vector<Face*>& b7_faces = b7->getFaces();
+    b2_faces[Block::j_min]->fuse(b4_faces[Block::j_max], &getInfoCommand());
+    b2_faces[Block::i_min]->fuse(b7_faces[Block::j_max], &getInfoCommand());
+    b2_faces[Block::i_max]->fuse(b6_faces[Block::j_min], &getInfoCommand());
+    b4_faces[Block::i_min]->fuse(b7_faces[Block::i_max], &getInfoCommand());
+    b4_faces[Block::i_max]->fuse(b6_faces[Block::i_max], &getInfoCommand());
+    b3_faces[Block::j_max]->fuse(b4_faces[Block::j_min], &getInfoCommand());
+    b3_faces[Block::i_min]->fuse(b7_faces[Block::j_min], &getInfoCommand());
+    b3_faces[Block::i_max]->fuse(b6_faces[Block::j_max], &getInfoCommand());
+    b5_faces[Block::i_min]->fuse(b7_faces[Block::i_min], &getInfoCommand());
+    b3_faces[Block::j_min]->fuse(b5_faces[Block::j_max], &getInfoCommand());
+    b5_faces[Block::i_max]->fuse(b6_faces[Block::i_min], &getInfoCommand());
+    b2_faces[Block::j_max]->fuse(b5_faces[Block::j_min], &getInfoCommand());
 
 
     // les projections sur la géométrie
@@ -4153,21 +4314,21 @@ createHollowSphereTopoEntier(Geom::PropertyHollowSphere* propertySph)
 
     // les projections
     for (uint j=0; j<6; j++){
-        Face* face = blocs[j]->getFace(Block::k_min);
+        Face* face = blocs[j]->getFaces()[Block::k_min];
         face->setGeomAssociation(surfaces[0]);
 
         for (uint i=0; i<4; i++){
-            face->getEdge(i)->setGeomAssociation(surfaces[0]);
-            face->getVertex(i)->setGeomAssociation(surfaces[0]);
+            getEdge(face, i)->setGeomAssociation(surfaces[0]);
+            face->getVertices()[i]->setGeomAssociation(surfaces[0]);
         }
     }
     for (uint j=0; j<6; j++){
-        Face* face = blocs[j]->getFace(Block::k_max);
+        Face* face = blocs[j]->getFaces()[Block::k_max];
         face->setGeomAssociation(surfaces[1]);
 
         for (uint i=0; i<4; i++){
-            face->getEdge(i)->setGeomAssociation(surfaces[1]);
-            face->getVertex(i)->setGeomAssociation(surfaces[1]);
+            getEdge(face, i)->setGeomAssociation(surfaces[1]);
+            face->getVertices()[i]->setGeomAssociation(surfaces[1]);
         }
     }
 
@@ -4181,8 +4342,7 @@ snapVertices()
 	getBlocks(blocks);
 
 	for (uint i=0; i<blocks.size(); i++){
-		std::vector<Vertex*> vertices;
-		blocks[i]->getVertices(vertices);
+		const std::vector<Vertex*>& vertices = blocks[i]->getVertices();
 		for (uint j=0; j<vertices.size(); j++){
 			Vertex* vtx = vertices[j];
 			if (vtx->getGeomAssociation()){
@@ -4206,8 +4366,7 @@ projectEdgesOnCurves()
 	getBlocks(blocks);
 
 	for (uint i=0; i<blocks.size(); i++){
-		std::vector<CoEdge*> coedges;
-		blocks[i]->getCoEdges(coedges);
+		std::vector<CoEdge*> coedges = blocks[i]->getCoEdges();
 		for (uint j=0; j<coedges.size(); j++){
 			CoEdge* coedge = coedges[j];
 
@@ -4217,11 +4376,11 @@ projectEdgesOnCurves()
 
 			// recherche des courbes associées au premier sommet topo
 			std::vector<Geom::Curve*> curves1;
-			Internal::EntitiesHelper::getAssociatedCurves(coedge->getVertex(0), curves1);
+			Internal::EntitiesHelper::getAssociatedCurves(coedge->getVertices()[0], curves1);
 
 			// idem avec le 2ème sommet
 			std::vector<Geom::Curve*> curves2;
-			Internal::EntitiesHelper::getAssociatedCurves(coedge->getVertex(1), curves2);
+			Internal::EntitiesHelper::getAssociatedCurves(coedge->getVertices()[1], curves2);
 
 			// recherche de la courbe commune entre les deux groupes
 			Geom::GeomEntity* ge = Geom::GeomHelper::getCommonCurve(curves1, curves2);
@@ -4230,11 +4389,11 @@ projectEdgesOnCurves()
 				// on tente avec une surface
 				// recherche des surfaces associées au premier sommet topo
 				std::vector<Geom::Surface*> surf1;
-				Internal::EntitiesHelper::getAssociatedSurfaces(coedge->getVertex(0), surf1);
+				Internal::EntitiesHelper::getAssociatedSurfaces(coedge->getVertices()[0], surf1);
 
 				// idem avec le 2ème sommet
 				std::vector<Geom::Surface*> surf2;
-				Internal::EntitiesHelper::getAssociatedSurfaces(coedge->getVertex(1), surf2);
+				Internal::EntitiesHelper::getAssociatedSurfaces(coedge->getVertices()[1], surf2);
 
 				// recherche de la surface commune entre les deux groupes
 				ge = Geom::GeomHelper::getCommonSurface(surf1, surf2);
@@ -4254,8 +4413,7 @@ projectFacesOnSurfaces()
 	getBlocks(blocks);
 
 	for (uint i=0; i<blocks.size(); i++){
-		std::vector<CoFace*> cofaces;
-		blocks[i]->getCoFaces(cofaces);
+		std::vector<CoFace*> cofaces = blocks[i]->getCoFaces();
 		for (uint j=0; j<cofaces.size(); j++){
 			CoFace* coface = cofaces[j];
 
@@ -4409,31 +4567,33 @@ void CommandNewTopoOGridOnGeometry::createConeTopo1BlockQuartR0()
         throw TkUtil::Exception(message);
     }
 
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    const std::vector<Face*>& b1_faces = b1->getFaces();
     Utils::Math::Point pt;
     Geom::Curve* crv;
 
     // x min, k max
     pt = vertices[2]->getCoord();
-    b1->getVertex(4)->setCoord(pt);
-    b1->getVertex(4)->setGeomAssociation(vertices[2]);
+    b1_vertices[4]->setCoord(pt);
+    b1_vertices[4]->setGeomAssociation(vertices[2]);
 
     // x max, k min
     crv = curves[0];
     crv->getPoint(0.5, pt, true);
-    b1->getVertex(1)->setCoord(pt);
-    b1->getVertex(1)->setGeomAssociation(crv);
+    b1_vertices[1]->setCoord(pt);
+    b1_vertices[1]->setGeomAssociation(crv);
 
     pt = vertices[0]->getCoord();
-    b1->getVertex(0)->setCoord(pt);
-    b1->getVertex(0)->setGeomAssociation(vertices[0]);
+    b1_vertices[0]->setCoord(pt);
+    b1_vertices[0]->setGeomAssociation(vertices[0]);
 
     pt = vertices[3]->getCoord();
-    b1->getVertex(2)->setCoord(pt);
-    b1->getVertex(2)->setGeomAssociation(vertices[3]);
+    b1_vertices[2]->setCoord(pt);
+    b1_vertices[2]->setGeomAssociation(vertices[3]);
 
     pt = vertices[1]->getCoord();
-    b1->getVertex(3)->setCoord(pt);
-    b1->getVertex(3)->setGeomAssociation(vertices[1]);
+    b1_vertices[3]->setCoord(pt);
+    b1_vertices[3]->setGeomAssociation(vertices[1]);
 
     projectEdgesOnCurves();
 
@@ -4469,44 +4629,46 @@ void CommandNewTopoOGridOnGeometry::createConeTopo1BlockQuart()
         throw TkUtil::Exception(message);
     }
 
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    const std::vector<Face*>& b1_faces = b1->getFaces();
     Utils::Math::Point pt;
     Geom::Curve* crv;
 
     // x min, k max
     crv = curves[2];
     crv->getPoint(0.5, pt, true);
-    b1->getVertex(5)->setCoord(pt);
-    b1->getVertex(5)->setGeomAssociation(crv);
+    b1_vertices[5]->setCoord(pt);
+    b1_vertices[5]->setGeomAssociation(crv);
 
     pt = vertices[2]->getCoord();
-    b1->getVertex(4)->setCoord(pt);
-    b1->getVertex(4)->setGeomAssociation(vertices[2]);
+    b1_vertices[4]->setCoord(pt);
+    b1_vertices[4]->setGeomAssociation(vertices[2]);
 
     pt = vertices[5]->getCoord();
-    b1->getVertex(6)->setCoord(pt);
-    b1->getVertex(6)->setGeomAssociation(vertices[5]);
+    b1_vertices[6]->setCoord(pt);
+    b1_vertices[6]->setGeomAssociation(vertices[5]);
 
     pt = vertices[3]->getCoord();
-    b1->getVertex(7)->setCoord(pt);
-    b1->getVertex(7)->setGeomAssociation(vertices[3]);
+    b1_vertices[7]->setCoord(pt);
+    b1_vertices[7]->setGeomAssociation(vertices[3]);
 
     // x max, k min
     crv = curves[0];
     crv->getPoint(0.5, pt, true);
-    b1->getVertex(1)->setCoord(pt);
-    b1->getVertex(1)->setGeomAssociation(crv);
+    b1_vertices[1]->setCoord(pt);
+    b1_vertices[1]->setGeomAssociation(crv);
 
     pt = vertices[0]->getCoord();
-    b1->getVertex(0)->setCoord(pt);
-    b1->getVertex(0)->setGeomAssociation(vertices[0]);
+    b1_vertices[0]->setCoord(pt);
+    b1_vertices[0]->setGeomAssociation(vertices[0]);
 
     pt = vertices[4]->getCoord();
-    b1->getVertex(2)->setCoord(pt);
-    b1->getVertex(2)->setGeomAssociation(vertices[4]);
+    b1_vertices[2]->setCoord(pt);
+    b1_vertices[2]->setGeomAssociation(vertices[4]);
 
     pt = vertices[1]->getCoord();
-    b1->getVertex(3)->setCoord(pt);
-    b1->getVertex(3)->setGeomAssociation(vertices[1]);
+    b1_vertices[3]->setCoord(pt);
+    b1_vertices[3]->setGeomAssociation(vertices[1]);
 
     projectEdgesOnCurves();
 
@@ -4544,45 +4706,47 @@ void CommandNewTopoOGridOnGeometry::createConeTopo1BlockDemiR0()
         throw TkUtil::Exception(message);
     }
 
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    const std::vector<Face*>& b1_faces = b1->getFaces();
     Utils::Math::Point pt;
     Geom::Curve* crv;
 
     // x min, k max
     pt = vertices[2]->getCoord();
-    b1->getVertex(4)->setCoord(pt);
-    b1->getVertex(4)->setGeomAssociation(vertices[2]);
+    b1_vertices[4]->setCoord(pt);
+    b1_vertices[4]->setGeomAssociation(vertices[2]);
 
     // x max, k min
     crv = curves[0];
     crv->getPoint(0.75, pt, true);
-    b1->getVertex(0)->setCoord(pt);
-    b1->getVertex(0)->setGeomAssociation(crv);
+    b1_vertices[0]->setCoord(pt);
+    b1_vertices[0]->setGeomAssociation(crv);
 
     crv->getPoint(0.25, pt, true);
-    b1->getVertex(1)->setCoord(pt);
-    b1->getVertex(1)->setGeomAssociation(crv);
+    b1_vertices[1]->setCoord(pt);
+    b1_vertices[1]->setGeomAssociation(crv);
 
     pt = vertices[0]->getCoord();
-    b1->getVertex(2)->setCoord(pt);
-    b1->getVertex(2)->setGeomAssociation(vertices[0]);
+    b1_vertices[2]->setCoord(pt);
+    b1_vertices[2]->setGeomAssociation(vertices[0]);
 
     pt = vertices[1]->getCoord();
-    b1->getVertex(3)->setCoord(pt);
-    b1->getVertex(3)->setGeomAssociation(vertices[1]);
+    b1_vertices[3]->setCoord(pt);
+    b1_vertices[3]->setGeomAssociation(vertices[1]);
 
     // découpage de la face
     std::vector<Edge* > splitingEdges;
     std::vector<CoFace* > cofaces;
-    cofaces.push_back(b1->getFace(Block::j_max)->getCoFace(0));
+    cofaces.push_back(b1_faces[Block::j_max]->getCoFaces()[0]);
     TopoHelper::splitFaces2D(cofaces,
-    		cofaces[0]->getEdge(b1->getVertex(2), b1->getVertex(3))->getCoEdge(0),
+    		cofaces[0]->getEdge(b1_vertices[2], b1_vertices[3])->getCoEdges()[0],
 			0.5, 0.0, false, false,
 			splitingEdges,
 			&getInfoCommand());
 
     pt = vertices[3]->getCoord();
-    splitingEdges[0]->getVertex(0)->setCoord(pt);
-    splitingEdges[0]->getVertex(0)->setGeomAssociation(vertices[3]);
+    splitingEdges[0]->getVertices()[0]->setCoord(pt);
+    splitingEdges[0]->getVertices()[0]->setGeomAssociation(vertices[3]);
 
     projectEdgesOnCurves();
 
@@ -4618,62 +4782,64 @@ void CommandNewTopoOGridOnGeometry::createConeTopo1BlockDemi()
         throw TkUtil::Exception(message);
     }
 
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    const std::vector<Face*>& b1_faces = b1->getFaces();
     Utils::Math::Point pt;
     Geom::Curve* crv;
 
     // x min, k max
     crv = curves[2];
     crv->getPoint(0.75, pt, true);
-    b1->getVertex(4)->setCoord(pt);
-    b1->getVertex(4)->setGeomAssociation(crv);
+    b1_vertices[4]->setCoord(pt);
+    b1_vertices[4]->setGeomAssociation(crv);
 
     crv->getPoint(0.25, pt, true);
-    b1->getVertex(5)->setCoord(pt);
-    b1->getVertex(5)->setGeomAssociation(crv);
+    b1_vertices[5]->setCoord(pt);
+    b1_vertices[5]->setGeomAssociation(crv);
 
     pt = vertices[2]->getCoord();
-    b1->getVertex(6)->setCoord(pt);
-    b1->getVertex(6)->setGeomAssociation(vertices[2]);
+    b1_vertices[6]->setCoord(pt);
+    b1_vertices[6]->setGeomAssociation(vertices[2]);
 
     pt = vertices[3]->getCoord();
-    b1->getVertex(7)->setCoord(pt);
-    b1->getVertex(7)->setGeomAssociation(vertices[3]);
+    b1_vertices[7]->setCoord(pt);
+    b1_vertices[7]->setGeomAssociation(vertices[3]);
 
     // x max, k min
     crv = curves[0];
     crv->getPoint(0.75, pt, true);
-    b1->getVertex(0)->setCoord(pt);
-    b1->getVertex(0)->setGeomAssociation(crv);
+    b1_vertices[0]->setCoord(pt);
+    b1_vertices[0]->setGeomAssociation(crv);
 
     crv->getPoint(0.25, pt, true);
-    b1->getVertex(1)->setCoord(pt);
-    b1->getVertex(1)->setGeomAssociation(crv);
+    b1_vertices[1]->setCoord(pt);
+    b1_vertices[1]->setGeomAssociation(crv);
 
     pt = vertices[0]->getCoord();
-    b1->getVertex(2)->setCoord(pt);
-    b1->getVertex(2)->setGeomAssociation(vertices[0]);
+    b1_vertices[2]->setCoord(pt);
+    b1_vertices[2]->setGeomAssociation(vertices[0]);
 
     pt = vertices[1]->getCoord();
-    b1->getVertex(3)->setCoord(pt);
-    b1->getVertex(3)->setGeomAssociation(vertices[1]);
+    b1_vertices[3]->setCoord(pt);
+    b1_vertices[3]->setGeomAssociation(vertices[1]);
 
     // découpage de la face
     std::vector<Edge* > splitingEdges;
     std::vector<CoFace* > cofaces;
-    cofaces.push_back(b1->getFace(Block::j_max)->getCoFace(0));
+    cofaces.push_back(b1_faces[Block::j_max]->getCoFaces()[0]);
     TopoHelper::splitFaces2D(cofaces,
-    		cofaces[0]->getEdge(b1->getVertex(2), b1->getVertex(3))->getCoEdge(0),
+    		cofaces[0]->getEdge(b1_vertices[2], b1_vertices[3])->getCoEdges()[0],
 			0.5, 0.0, false, false,
 			splitingEdges,
 			&getInfoCommand());
 
     pt = vertices[4]->getCoord();
-    splitingEdges[0]->getVertex(0)->setCoord(pt);
-    splitingEdges[0]->getVertex(0)->setGeomAssociation(vertices[4]);
+    splitingEdges[0]->getVertices()[0]->setCoord(pt);
+    splitingEdges[0]->getVertices()[0]->setGeomAssociation(vertices[4]);
 
     pt = vertices[5]->getCoord();
-    splitingEdges[0]->getVertex(1)->setCoord(pt);
-    splitingEdges[0]->getVertex(1)->setGeomAssociation(vertices[5]);
+    splitingEdges[0]->getVertices()[1]->setCoord(pt);
+    splitingEdges[0]->getVertices()[1]->setGeomAssociation(vertices[5]);
 
     projectEdgesOnCurves();
 
@@ -4711,31 +4877,33 @@ void CommandNewTopoOGridOnGeometry::createConeTopo1BlockPleinR0()
         throw TkUtil::Exception(message);
     }
 
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    const std::vector<Face*>& b1_faces = b1->getFaces();
     Utils::Math::Point pt;
     Geom::Curve* crv;
 
     // x min, k max
     pt = vertices[1]->getCoord();
-    b1->getVertex(4)->setCoord(pt);
-    b1->getVertex(4)->setGeomAssociation(vertices[1]);
+    b1_vertices[4]->setCoord(pt);
+    b1_vertices[4]->setGeomAssociation(vertices[1]);
 
     // x max, k min
     crv = curves[0];
     crv->getPoint(0.125, pt, true);
-    b1->getVertex(0)->setCoord(pt);
-    b1->getVertex(0)->setGeomAssociation(crv);
+    b1_vertices[0]->setCoord(pt);
+    b1_vertices[0]->setGeomAssociation(crv);
 
     crv->getPoint(0.375, pt, true);
-    b1->getVertex(1)->setCoord(pt);
-    b1->getVertex(1)->setGeomAssociation(crv);
+    b1_vertices[1]->setCoord(pt);
+    b1_vertices[1]->setGeomAssociation(crv);
 
     crv->getPoint(0.625, pt, true);
-    b1->getVertex(3)->setCoord(pt);
-    b1->getVertex(3)->setGeomAssociation(crv);
+    b1_vertices[3]->setCoord(pt);
+    b1_vertices[3]->setGeomAssociation(crv);
 
     crv->getPoint(0.875, pt, true);
-    b1->getVertex(2)->setCoord(pt);
-    b1->getVertex(2)->setGeomAssociation(crv);
+    b1_vertices[2]->setCoord(pt);
+    b1_vertices[2]->setGeomAssociation(crv);
 
     projectEdgesOnCurves();
 
@@ -4764,44 +4932,46 @@ void CommandNewTopoOGridOnGeometry::createConeTopo1BlockPlein()
         throw TkUtil::Exception(message);
     }
 
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    const std::vector<Face*>& b1_faces = b1->getFaces();
     Utils::Math::Point pt;
     Geom::Curve* crv;
 
     // x min, k max
     crv = curves[2];
     crv->getPoint(0.125, pt, true);
-    b1->getVertex(4)->setCoord(pt);
-    b1->getVertex(4)->setGeomAssociation(crv);
+    b1_vertices[4]->setCoord(pt);
+    b1_vertices[4]->setGeomAssociation(crv);
 
     crv->getPoint(0.375, pt, true);
-    b1->getVertex(5)->setCoord(pt);
-    b1->getVertex(5)->setGeomAssociation(crv);
+    b1_vertices[5]->setCoord(pt);
+    b1_vertices[5]->setGeomAssociation(crv);
 
     crv->getPoint(0.625, pt, true);
-    b1->getVertex(7)->setCoord(pt);
-    b1->getVertex(7)->setGeomAssociation(crv);
+    b1_vertices[7]->setCoord(pt);
+    b1_vertices[7]->setGeomAssociation(crv);
 
     crv->getPoint(0.875, pt, true);
-    b1->getVertex(6)->setCoord(pt);
-    b1->getVertex(6)->setGeomAssociation(crv);
+    b1_vertices[6]->setCoord(pt);
+    b1_vertices[6]->setGeomAssociation(crv);
 
     // x max, k min
     crv = curves[0];
     crv->getPoint(0.125, pt, true);
-    b1->getVertex(0)->setCoord(pt);
-    b1->getVertex(0)->setGeomAssociation(crv);
+    b1_vertices[0]->setCoord(pt);
+    b1_vertices[0]->setGeomAssociation(crv);
 
     crv->getPoint(0.375, pt, true);
-    b1->getVertex(1)->setCoord(pt);
-    b1->getVertex(1)->setGeomAssociation(crv);
+    b1_vertices[1]->setCoord(pt);
+    b1_vertices[1]->setGeomAssociation(crv);
 
     crv->getPoint(0.625, pt, true);
-    b1->getVertex(3)->setCoord(pt);
-    b1->getVertex(3)->setGeomAssociation(crv);
+    b1_vertices[3]->setCoord(pt);
+    b1_vertices[3]->setGeomAssociation(crv);
 
     crv->getPoint(0.875, pt, true);
-    b1->getVertex(2)->setCoord(pt);
-    b1->getVertex(2)->setGeomAssociation(crv);
+    b1_vertices[2]->setCoord(pt);
+    b1_vertices[2]->setGeomAssociation(crv);
 
     projectEdgesOnCurves();
 
@@ -4861,70 +5031,75 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridQuartNonDegR0()
         throw TkUtil::Exception(message);
     }
 
-
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    const std::vector<Vertex*>& b2_vertices = b2->getVertices();
+    const std::vector<Vertex*>& b5_vertices = b5->getVertices();
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+    const std::vector<Face*>& b2_faces = b2->getFaces();
+    const std::vector<Face*>& b5_faces = b5->getFaces();
     Utils::Math::Point pt;
     Geom::Curve* crv;
     // x min, k max
-    b1->getVertex(4)->setCoord(pt);
-    b2->getVertex(4)->setCoord(pt);
-    b5->getVertex(4)->setCoord(pt);
+    b1_vertices[4]->setCoord(pt);
+    b2_vertices[4]->setCoord(pt);
+    b5_vertices[4]->setCoord(pt);
 
     // x max, k min
     crv = curves[0];
     crv->getPoint(0.5, pt, true);
-    b1->getVertex(0)->setCoord(pt);
-    b2->getVertex(0)->setCoord(pt);
+    b1_vertices[0]->setCoord(pt);
+    b2_vertices[0]->setCoord(pt);
 
     pt = vertices[0]->getCoord();
-    b1->getVertex(1)->setCoord(pt);
-    b1->getVertex(1)->setGeomAssociation(vertices[0]);
+    b1_vertices[1]->setCoord(pt);
+    b1_vertices[1]->setGeomAssociation(vertices[0]);
 
     pt = vertices[1]->getCoord();
-    b2->getVertex(2)->setCoord(pt);
-    b2->getVertex(2)->setGeomAssociation(vertices[1]);
+    b2_vertices[2]->setCoord(pt);
+    b2_vertices[2]->setGeomAssociation(vertices[1]);
 
     // les sommets au centre de l'ogrid
     double unSurRac2 = 1/sqrt(2);
     Utils::Math::Point pt_centre;
     pt_centre = vertices[3]->getCoord();
-    pt = pt_centre+(b1->getVertex(0)->getCoord()-pt_centre)*m_ratio;
-    b1->getVertex(2)->setCoord(pt);
-    b2->getVertex(1)->setCoord(pt);
-    b5->getVertex(0)->setCoord(pt);
+    pt = pt_centre+(b1_vertices[0]->getCoord()-pt_centre)*m_ratio;
+    b1_vertices[2]->setCoord(pt);
+    b2_vertices[1]->setCoord(pt);
+    b5_vertices[0]->setCoord(pt);
 
-    pt = pt_centre+(b1->getVertex(1)->getCoord()-pt_centre)*m_ratio*unSurRac2;
-    b1->getVertex(3)->setCoord(pt);
-    b5->getVertex(1)->setCoord(pt);
+    pt = pt_centre+(b1_vertices[1]->getCoord()-pt_centre)*m_ratio*unSurRac2;
+    b1_vertices[3]->setCoord(pt);
+    b5_vertices[1]->setCoord(pt);
 
     pt = vertices[3]->getCoord();
-    b5->getVertex(3)->setCoord(pt);
+    b5_vertices[3]->setCoord(pt);
 
-    pt = pt_centre+(b2->getVertex(2)->getCoord()-pt_centre)*m_ratio*unSurRac2;
-    b2->getVertex(3)->setCoord(pt);
-    b5->getVertex(2)->setCoord(pt);
+    pt = pt_centre+(b2_vertices[2]->getCoord()-pt_centre)*m_ratio*unSurRac2;
+    b2_vertices[3]->setCoord(pt);
+    b5_vertices[2]->setCoord(pt);
 
     // fusion des faces avec l'ogrid
-    b1->getFace(Block::j_max)->fuse(b5->getFace(Block::j_min), &getInfoCommand());
-    b2->getFace(Block::i_max)->fuse(b5->getFace(Block::i_min), &getInfoCommand());
+    b1_faces[Block::j_max]->fuse(b5_faces[Block::j_min], &getInfoCommand());
+    b2_faces[Block::i_max]->fuse(b5_faces[Block::i_min], &getInfoCommand());
 
     // fusion des faces autour de l'ogrid
-    b1->getFace(Block::i_min)->fuse(b2->getFace(Block::j_min), &getInfoCommand());
+    b1_faces[Block::i_min]->fuse(b2_faces[Block::j_min], &getInfoCommand());
 
     // les associations
     crv = curves[0];
-    b1->getVertex(0)->setGeomAssociation(crv);
+    b1_vertices[0]->setGeomAssociation(crv);
 
     crv = curves[4];
-    b1->getVertex(3)->setGeomAssociation(crv);
+    b1_vertices[3]->setGeomAssociation(crv);
     crv = curves[3];
-    b2->getVertex(3)->setGeomAssociation(crv);
+    b2_vertices[3]->setGeomAssociation(crv);
 
     Geom::Surface* surf;
     surf = surfaces[1];
-    b1->getVertex(2)->setGeomAssociation(surf);
+    b1_vertices[2]->setGeomAssociation(surf);
 
-    b5->getVertex(4)->setGeomAssociation(vertices[2]);
-    b5->getVertex(3)->setGeomAssociation(vertices[3]);
+    b5_vertices[4]->setGeomAssociation(vertices[2]);
+    b5_vertices[3]->setGeomAssociation(vertices[3]);
 
 
     projectEdgesOnCurves();
@@ -4964,61 +5139,65 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridQuartDeg()
         throw TkUtil::Exception(message);
     }
 
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    const std::vector<Vertex*>& b2_vertices = b2->getVertices();
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+    const std::vector<Face*>& b2_faces = b2->getFaces();
     Utils::Math::Point pt;
     Geom::Curve* crv;
    // x min, k max
     crv = curves[2];
     crv->getPoint(0.5, pt, true);
-    b1->getVertex(0)->setCoord(pt);
-    b2->getVertex(1)->setCoord(pt);
+    b1_vertices[0]->setCoord(pt);
+    b2_vertices[1]->setCoord(pt);
 
     pt = vertices[2]->getCoord();
-    b1->getVertex(1)->setCoord(pt);
-    b1->getVertex(1)->setGeomAssociation(vertices[2]);
+    b1_vertices[1]->setCoord(pt);
+    b1_vertices[1]->setGeomAssociation(vertices[2]);
 
     pt = vertices[3]->getCoord();
-    b2->getVertex(0)->setCoord(pt);
-    b2->getVertex(0)->setGeomAssociation(vertices[3]);
+    b2_vertices[0]->setCoord(pt);
+    b2_vertices[0]->setGeomAssociation(vertices[3]);
 
     // x max, k min
     crv = curves[0];
     crv->getPoint(0.5, pt, true);
-    b1->getVertex(2)->setCoord(pt);
-    b2->getVertex(3)->setCoord(pt);
+    b1_vertices[2]->setCoord(pt);
+    b2_vertices[3]->setCoord(pt);
 
     pt = vertices[0]->getCoord();
-    b1->getVertex(3)->setCoord(pt);
-    b1->getVertex(3)->setGeomAssociation(vertices[0]);
+    b1_vertices[3]->setCoord(pt);
+    b1_vertices[3]->setGeomAssociation(vertices[0]);
 
     pt = vertices[1]->getCoord();
-    b2->getVertex(2)->setCoord(pt);
-    b2->getVertex(2)->setGeomAssociation(vertices[1]);
+    b2_vertices[2]->setCoord(pt);
+    b2_vertices[2]->setGeomAssociation(vertices[1]);
 
     // dégénéréscence des blocs
-    b1->degenerateFaceInEdge(Block::k_max, b1->getVertex(4), b1->getVertex(5), &getInfoCommand());
-    b2->degenerateFaceInEdge(Block::k_max, b2->getVertex(4), b2->getVertex(5), &getInfoCommand());
+    b1->degenerateFaceInEdge(Block::k_max, b1_vertices[4], b1_vertices[5], &getInfoCommand());
+    b2->degenerateFaceInEdge(Block::k_max, b2_vertices[4], b2_vertices[5], &getInfoCommand());
 
     // les sommets au centre de l'ogrid
     pt = vertices[5]->getCoord();
-    b1->getVertex(4)->setCoord(pt);
-    b2->getVertex(4)->setCoord(pt);
+    b1_vertices[4]->setCoord(pt);
+    b2_vertices[4]->setCoord(pt);
 
     pt = vertices[4]->getCoord();
-    b1->getVertex(5)->setCoord(pt);
-    b2->getVertex(5)->setCoord(pt);
+    b1_vertices[5]->setCoord(pt);
+    b2_vertices[5]->setCoord(pt);
 
 
     // fusion des faces autour de l'ogrid
-    b1->getFace(Block::i_min)->fuse(b2->getFace(Block::i_max), &getInfoCommand());
+    b1_faces[Block::i_min]->fuse(b2_faces[Block::i_max], &getInfoCommand());
 
     // les associations
-    b1->getVertex(4)->setGeomAssociation(vertices[5]);
-    b1->getVertex(5)->setGeomAssociation(vertices[4]);
+    b1_vertices[4]->setGeomAssociation(vertices[5]);
+    b1_vertices[5]->setGeomAssociation(vertices[4]);
 
     crv = curves[2];
-    b1->getVertex(0)->setGeomAssociation(crv);
+    b1_vertices[0]->setGeomAssociation(crv);
     crv = curves[0];
-    b1->getVertex(2)->setGeomAssociation(crv);
+    b1_vertices[2]->setGeomAssociation(crv);
 
 
     projectEdgesOnCurves();
@@ -5069,102 +5248,108 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridQuartNonDeg()
     }
 
 
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    const std::vector<Vertex*>& b2_vertices = b2->getVertices();
+    const std::vector<Vertex*>& b5_vertices = b5->getVertices();
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+    const std::vector<Face*>& b2_faces = b2->getFaces();
+    const std::vector<Face*>& b5_faces = b5->getFaces();
     Utils::Math::Point pt;
     Geom::Curve* crv;
    // x min, k max
     crv = curves[2];
     crv->getPoint(0.5, pt, true);
-    b1->getVertex(4)->setCoord(pt);
-    b2->getVertex(4)->setCoord(pt);
+    b1_vertices[4]->setCoord(pt);
+    b2_vertices[4]->setCoord(pt);
 
     pt = vertices[2]->getCoord();
-    b1->getVertex(5)->setCoord(pt);
-    b1->getVertex(5)->setGeomAssociation(vertices[2]);
+    b1_vertices[5]->setCoord(pt);
+    b1_vertices[5]->setGeomAssociation(vertices[2]);
 
     pt = vertices[3]->getCoord();
-    b2->getVertex(6)->setCoord(pt);
-    b2->getVertex(6)->setGeomAssociation(vertices[3]);
+    b2_vertices[6]->setCoord(pt);
+    b2_vertices[6]->setGeomAssociation(vertices[3]);
 
     // x max, k min
     crv = curves[0];
     crv->getPoint(0.5, pt, true);
-    b1->getVertex(0)->setCoord(pt);
-    b2->getVertex(0)->setCoord(pt);
+    b1_vertices[0]->setCoord(pt);
+    b2_vertices[0]->setCoord(pt);
 
     pt = vertices[0]->getCoord();
-    b1->getVertex(1)->setCoord(pt);
-    b1->getVertex(1)->setGeomAssociation(vertices[0]);
+    b1_vertices[1]->setCoord(pt);
+    b1_vertices[1]->setGeomAssociation(vertices[0]);
 
     pt = vertices[1]->getCoord();
-    b2->getVertex(2)->setCoord(pt);
-    b2->getVertex(2)->setGeomAssociation(vertices[1]);
+    b2_vertices[2]->setCoord(pt);
+    b2_vertices[2]->setGeomAssociation(vertices[1]);
 
     // les sommets au centre de l'ogrid
     double unSurRac2 = 1/sqrt(2);
     Utils::Math::Point pt_centre = vertices[5]->getCoord();
-    pt = pt_centre+(b1->getVertex(4)->getCoord()-pt_centre)*m_ratio;
-    b1->getVertex(6)->setCoord(pt);
-    b2->getVertex(5)->setCoord(pt);
-    b5->getVertex(4)->setCoord(pt);
+    pt = pt_centre+(b1_vertices[4]->getCoord()-pt_centre)*m_ratio;
+    b1_vertices[6]->setCoord(pt);
+    b2_vertices[5]->setCoord(pt);
+    b5_vertices[4]->setCoord(pt);
 
-    pt = pt_centre+(b1->getVertex(5)->getCoord()-pt_centre)*m_ratio*unSurRac2;
-    b1->getVertex(7)->setCoord(pt);
-    b5->getVertex(5)->setCoord(pt);
+    pt = pt_centre+(b1_vertices[5]->getCoord()-pt_centre)*m_ratio*unSurRac2;
+    b1_vertices[7]->setCoord(pt);
+    b5_vertices[5]->setCoord(pt);
 
     pt = vertices[5]->getCoord();
-    b5->getVertex(7)->setCoord(pt);
+    b5_vertices[7]->setCoord(pt);
 
-    pt = pt_centre+(b2->getVertex(6)->getCoord()-pt_centre)*m_ratio*unSurRac2;
-    b2->getVertex(7)->setCoord(pt);
-    b5->getVertex(6)->setCoord(pt);
+    pt = pt_centre+(b2_vertices[6]->getCoord()-pt_centre)*m_ratio*unSurRac2;
+    b2_vertices[7]->setCoord(pt);
+    b5_vertices[6]->setCoord(pt);
 
     pt_centre = vertices[4]->getCoord();
-    pt = pt_centre+(b1->getVertex(0)->getCoord()-pt_centre)*m_ratio;
-    b1->getVertex(2)->setCoord(pt);
-    b2->getVertex(1)->setCoord(pt);
-    b5->getVertex(0)->setCoord(pt);
+    pt = pt_centre+(b1_vertices[0]->getCoord()-pt_centre)*m_ratio;
+    b1_vertices[2]->setCoord(pt);
+    b2_vertices[1]->setCoord(pt);
+    b5_vertices[0]->setCoord(pt);
 
-    pt = pt_centre+(b1->getVertex(1)->getCoord()-pt_centre)*m_ratio*unSurRac2;
-    b1->getVertex(3)->setCoord(pt);
-    b5->getVertex(1)->setCoord(pt);
+    pt = pt_centre+(b1_vertices[1]->getCoord()-pt_centre)*m_ratio*unSurRac2;
+    b1_vertices[3]->setCoord(pt);
+    b5_vertices[1]->setCoord(pt);
 
     pt = vertices[4]->getCoord();
-    b5->getVertex(3)->setCoord(pt);
+    b5_vertices[3]->setCoord(pt);
 
-    pt = pt_centre+(b2->getVertex(2)->getCoord()-pt_centre)*m_ratio*unSurRac2;
-    b2->getVertex(3)->setCoord(pt);
-    b5->getVertex(2)->setCoord(pt);
+    pt = pt_centre+(b2_vertices[2]->getCoord()-pt_centre)*m_ratio*unSurRac2;
+    b2_vertices[3]->setCoord(pt);
+    b5_vertices[2]->setCoord(pt);
 
     // fusion des faces avec l'ogrid
-    b1->getFace(Block::j_max)->fuse(b5->getFace(Block::j_min), &getInfoCommand());
-    b2->getFace(Block::i_max)->fuse(b5->getFace(Block::i_min), &getInfoCommand());
+    b1_faces[Block::j_max]->fuse(b5_faces[Block::j_min], &getInfoCommand());
+    b2_faces[Block::i_max]->fuse(b5_faces[Block::i_min], &getInfoCommand());
 
     // fusion des faces autour de l'ogrid
-    b1->getFace(Block::i_min)->fuse(b2->getFace(Block::j_min), &getInfoCommand());
+    b1_faces[Block::i_min]->fuse(b2_faces[Block::j_min], &getInfoCommand());
 
     // les associations
     crv = curves[2];
-    b1->getVertex(4)->setGeomAssociation(crv);
+    b1_vertices[4]->setGeomAssociation(crv);
     crv = curves[0];
-    b1->getVertex(0)->setGeomAssociation(crv);
+    b1_vertices[0]->setGeomAssociation(crv);
 
     crv = curves[6];
-    b1->getVertex(7)->setGeomAssociation(crv);
+    b1_vertices[7]->setGeomAssociation(crv);
     crv = curves[7];
-    b2->getVertex(7)->setGeomAssociation(crv);
+    b2_vertices[7]->setGeomAssociation(crv);
     crv = curves[5];
-    b1->getVertex(3)->setGeomAssociation(crv);
+    b1_vertices[3]->setGeomAssociation(crv);
     crv = curves[4];
-    b2->getVertex(3)->setGeomAssociation(crv);
+    b2_vertices[3]->setGeomAssociation(crv);
 
     Geom::Surface* surf;
     surf = surfaces[2];
-    b1->getVertex(6)->setGeomAssociation(surf);
+    b1_vertices[6]->setGeomAssociation(surf);
     surf = surfaces[1];
-    b1->getVertex(2)->setGeomAssociation(surf);
+    b1_vertices[2]->setGeomAssociation(surf);
 
-    b5->getVertex(7)->setGeomAssociation(vertices[5]);
-    b5->getVertex(3)->setGeomAssociation(vertices[4]);
+    b5_vertices[7]->setGeomAssociation(vertices[5]);
+    b5_vertices[3]->setGeomAssociation(vertices[4]);
 
 
     projectEdgesOnCurves();
@@ -5230,97 +5415,105 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridDemiNonDegR0()
     }
 
 
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    const std::vector<Vertex*>& b2_vertices = b2->getVertices();
+    const std::vector<Vertex*>& b3_vertices = b3->getVertices();
+    const std::vector<Vertex*>& b5_vertices = b5->getVertices();
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+    const std::vector<Face*>& b2_faces = b2->getFaces();
+    const std::vector<Face*>& b3_faces = b3->getFaces();
+    const std::vector<Face*>& b5_faces = b5->getFaces();
     Utils::Math::Point pt;
     Geom::Curve* crv;
     // x min, k max
     pt = vertices[2]->getCoord();
 
-    b1->getVertex(4)->setCoord(pt);
-    b2->getVertex(4)->setCoord(pt);
-    b3->getVertex(4)->setCoord(pt);
-    b5->getVertex(4)->setCoord(pt);
+    b1_vertices[4]->setCoord(pt);
+    b2_vertices[4]->setCoord(pt);
+    b3_vertices[4]->setCoord(pt);
+    b5_vertices[4]->setCoord(pt);
 
     // x max, k min
     crv = curves[0];
     crv->getPoint(0.75, pt, true);
-    b1->getVertex(0)->setCoord(pt);
-    b2->getVertex(0)->setCoord(pt);
+    b1_vertices[0]->setCoord(pt);
+    b2_vertices[0]->setCoord(pt);
 
     crv->getPoint(0.25, pt, true);
-    b2->getVertex(2)->setCoord(pt);
-    b3->getVertex(2)->setCoord(pt);
+    b2_vertices[2]->setCoord(pt);
+    b3_vertices[2]->setCoord(pt);
 
     pt = vertices[0]->getCoord();
-    b1->getVertex(1)->setCoord(pt);
-    b1->getVertex(1)->setGeomAssociation(vertices[0]);
+    b1_vertices[1]->setCoord(pt);
+    b1_vertices[1]->setGeomAssociation(vertices[0]);
 
     pt = vertices[1]->getCoord();
-    b3->getVertex(3)->setCoord(pt);
-    b3->getVertex(3)->setGeomAssociation(vertices[1]);
+    b3_vertices[3]->setCoord(pt);
+    b3_vertices[3]->setGeomAssociation(vertices[1]);
 
     // les sommets au centre de l'ogrid
     double unSurRac2 = 1/sqrt(2);
     Utils::Math::Point pt_centre;
     pt_centre = vertices[3]->getCoord();
-    pt = pt_centre+(b1->getVertex(0)->getCoord()-pt_centre)*m_ratio;
-    b1->getVertex(2)->setCoord(pt);
-    b2->getVertex(1)->setCoord(pt);
-    b5->getVertex(0)->setCoord(pt);
+    pt = pt_centre+(b1_vertices[0]->getCoord()-pt_centre)*m_ratio;
+    b1_vertices[2]->setCoord(pt);
+    b2_vertices[1]->setCoord(pt);
+    b5_vertices[0]->setCoord(pt);
 
-    pt = pt_centre+(b1->getVertex(1)->getCoord()-pt_centre)*m_ratio*unSurRac2;
-    b1->getVertex(3)->setCoord(pt);
-    b5->getVertex(1)->setCoord(pt);
+    pt = pt_centre+(b1_vertices[1]->getCoord()-pt_centre)*m_ratio*unSurRac2;
+    b1_vertices[3]->setCoord(pt);
+    b5_vertices[1]->setCoord(pt);
 
-    pt = pt_centre+(b3->getVertex(3)->getCoord()-pt_centre)*m_ratio*unSurRac2;
-    b3->getVertex(1)->setCoord(pt);
-    b5->getVertex(3)->setCoord(pt);
+    pt = pt_centre+(b3_vertices[3]->getCoord()-pt_centre)*m_ratio*unSurRac2;
+    b3_vertices[1]->setCoord(pt);
+    b5_vertices[3]->setCoord(pt);
 
-    pt = pt_centre+(b3->getVertex(2)->getCoord()-pt_centre)*m_ratio;
-    b3->getVertex(0)->setCoord(pt);
-    b2->getVertex(3)->setCoord(pt);
-    b5->getVertex(2)->setCoord(pt);
+    pt = pt_centre+(b3_vertices[2]->getCoord()-pt_centre)*m_ratio;
+    b3_vertices[0]->setCoord(pt);
+    b2_vertices[3]->setCoord(pt);
+    b5_vertices[2]->setCoord(pt);
 
     // découpage de la face
     std::vector<Edge* > splitingEdges;
     std::vector<CoFace* > cofaces;
-    cofaces.push_back(b5->getFace(Block::i_max)->getCoFace(0));
+    cofaces.push_back(b5_faces[Block::i_max]->getCoFaces()[0]);
     TopoHelper::splitFaces2D(cofaces,
-    		cofaces[0]->getEdge(b5->getVertex(1), b5->getVertex(3))->getCoEdge(0),
+    		cofaces[0]->getEdge(b5_vertices[1], b5_vertices[3])->getCoEdges()[0],
 			0.5, 0.0, false, false,
 			splitingEdges,
 			&getInfoCommand());
 
     // fusion des faces avec l'ogrid
-    b1->getFace(Block::j_max)->fuse(b5->getFace(Block::j_min), &getInfoCommand());
-    b2->getFace(Block::i_max)->fuse(b5->getFace(Block::i_min), &getInfoCommand());
-    b3->getFace(Block::j_min)->fuse(b5->getFace(Block::j_max), &getInfoCommand());
+    b1_faces[Block::j_max]->fuse(b5_faces[Block::j_min], &getInfoCommand());
+    b2_faces[Block::i_max]->fuse(b5_faces[Block::i_min], &getInfoCommand());
+    b3_faces[Block::j_min]->fuse(b5_faces[Block::j_max], &getInfoCommand());
 
     // fusion des faces autour de l'ogrid
-    b1->getFace(Block::i_min)->fuse(b2->getFace(Block::j_min), &getInfoCommand());
-    b2->getFace(Block::j_max)->fuse(b3->getFace(Block::i_min), &getInfoCommand());
+    b1_faces[Block::i_min]->fuse(b2_faces[Block::j_min], &getInfoCommand());
+    b2_faces[Block::j_max]->fuse(b3_faces[Block::i_min], &getInfoCommand());
 
     // les associations
     crv = curves[0];
-    b1->getVertex(0)->setGeomAssociation(crv);
-    b3->getVertex(2)->setGeomAssociation(crv);
+    b1_vertices[0]->setGeomAssociation(crv);
+    b3_vertices[2]->setGeomAssociation(crv);
 
     crv = curves[4];
-    b1->getVertex(3)->setGeomAssociation(crv);
+    b1_vertices[3]->setGeomAssociation(crv);
     crv = curves[3];
-    b3->getVertex(1)->setGeomAssociation(crv);
+    b3_vertices[1]->setGeomAssociation(crv);
 
     Geom::Surface* surf;
     surf = surfaces[1];
-    b1->getVertex(2)->setGeomAssociation(surf);
-    b3->getVertex(0)->setGeomAssociation(surf);
+    b1_vertices[2]->setGeomAssociation(surf);
+    b3_vertices[0]->setGeomAssociation(surf);
 
     pt = vertices[3]->getCoord();
-    splitingEdges[0]->getVertex(0)->setCoord(pt);
-    splitingEdges[0]->getVertex(0)->setGeomAssociation(vertices[3]);
+    splitingEdges[0]->getVertices()[0]->setCoord(pt);
+    splitingEdges[0]->getVertices()[0]->setGeomAssociation(vertices[3]);
 
     pt = vertices[2]->getCoord();
-    splitingEdges[0]->getVertex(1)->setCoord(pt);
-    splitingEdges[0]->getVertex(1)->setGeomAssociation(vertices[2]);
+    splitingEdges[0]->getVertices()[1]->setCoord(pt);
+    splitingEdges[0]->getVertices()[1]->setGeomAssociation(vertices[2]);
 
 
     projectEdgesOnCurves();
@@ -5363,75 +5556,81 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridDemiDeg()
         throw TkUtil::Exception(message);
     }
 
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    const std::vector<Vertex*>& b2_vertices = b2->getVertices();
+    const std::vector<Vertex*>& b3_vertices = b3->getVertices();
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+    const std::vector<Face*>& b2_faces = b2->getFaces();
+    const std::vector<Face*>& b3_faces = b3->getFaces();
     Utils::Math::Point pt;
     Geom::Curve* crv;
    // x min, k max
     crv = curves[2];
     crv->getPoint(0.75, pt, true);
-    b1->getVertex(0)->setCoord(pt);
-    b2->getVertex(1)->setCoord(pt);
+    b1_vertices[0]->setCoord(pt);
+    b2_vertices[1]->setCoord(pt);
 
     crv->getPoint(0.25, pt, true);
-    b2->getVertex(0)->setCoord(pt);
-    b3->getVertex(1)->setCoord(pt);
+    b2_vertices[0]->setCoord(pt);
+    b3_vertices[1]->setCoord(pt);
 
     pt = vertices[2]->getCoord();
-    b1->getVertex(1)->setCoord(pt);
-    b1->getVertex(1)->setGeomAssociation(vertices[2]);
+    b1_vertices[1]->setCoord(pt);
+    b1_vertices[1]->setGeomAssociation(vertices[2]);
 
     pt = vertices[3]->getCoord();
-    b3->getVertex(0)->setCoord(pt);
-    b3->getVertex(0)->setGeomAssociation(vertices[3]);
+    b3_vertices[0]->setCoord(pt);
+    b3_vertices[0]->setGeomAssociation(vertices[3]);
 
     // x max, k min
     crv = curves[0];
     crv->getPoint(0.75, pt, true);
-    b1->getVertex(2)->setCoord(pt);
-    b2->getVertex(3)->setCoord(pt);
+    b1_vertices[2]->setCoord(pt);
+    b2_vertices[3]->setCoord(pt);
 
     crv->getPoint(0.25, pt, true);
-    b2->getVertex(2)->setCoord(pt);
-    b3->getVertex(3)->setCoord(pt);
+    b2_vertices[2]->setCoord(pt);
+    b3_vertices[3]->setCoord(pt);
 
     pt = vertices[0]->getCoord();
-    b1->getVertex(3)->setCoord(pt);
-    b1->getVertex(3)->setGeomAssociation(vertices[0]);
+    b1_vertices[3]->setCoord(pt);
+    b1_vertices[3]->setGeomAssociation(vertices[0]);
 
     pt = vertices[1]->getCoord();
-    b3->getVertex(2)->setCoord(pt);
-    b3->getVertex(2)->setGeomAssociation(vertices[1]);
+    b3_vertices[2]->setCoord(pt);
+    b3_vertices[2]->setGeomAssociation(vertices[1]);
 
     // dégénéréscence des blocs
-    b1->degenerateFaceInEdge(Block::k_max, b1->getVertex(4), b1->getVertex(5), &getInfoCommand());
-    b2->degenerateFaceInEdge(Block::k_max, b2->getVertex(4), b2->getVertex(5), &getInfoCommand());
-    b3->degenerateFaceInEdge(Block::k_max, b3->getVertex(4), b3->getVertex(5), &getInfoCommand());
+    b1->degenerateFaceInEdge(Block::k_max, b1_vertices[4], b1_vertices[5], &getInfoCommand());
+    b2->degenerateFaceInEdge(Block::k_max, b2_vertices[4], b2_vertices[5], &getInfoCommand());
+    b3->degenerateFaceInEdge(Block::k_max, b3_vertices[4], b3_vertices[5], &getInfoCommand());
 
     // les sommets au centre de l'ogrid
     pt = vertices[5]->getCoord();
-    b1->getVertex(4)->setCoord(pt);
-    b2->getVertex(4)->setCoord(pt);
-    b3->getVertex(4)->setCoord(pt);
+    b1_vertices[4]->setCoord(pt);
+    b2_vertices[4]->setCoord(pt);
+    b3_vertices[4]->setCoord(pt);
 
     pt = vertices[4]->getCoord();
-    b1->getVertex(5)->setCoord(pt);
-    b2->getVertex(5)->setCoord(pt);
-    b3->getVertex(5)->setCoord(pt);
+    b1_vertices[5]->setCoord(pt);
+    b2_vertices[5]->setCoord(pt);
+    b3_vertices[5]->setCoord(pt);
 
 
     // fusion des faces autour de l'ogrid
-    b1->getFace(Block::i_min)->fuse(b2->getFace(Block::i_max), &getInfoCommand());
-    b2->getFace(Block::i_min)->fuse(b3->getFace(Block::i_max), &getInfoCommand());
+    b1_faces[Block::i_min]->fuse(b2_faces[Block::i_max], &getInfoCommand());
+    b2_faces[Block::i_min]->fuse(b3_faces[Block::i_max], &getInfoCommand());
 
     // les associations
-    b1->getVertex(4)->setGeomAssociation(vertices[5]);
-    b1->getVertex(5)->setGeomAssociation(vertices[4]);
+    b1_vertices[4]->setGeomAssociation(vertices[5]);
+    b1_vertices[5]->setGeomAssociation(vertices[4]);
 
     crv = curves[2];
-    b1->getVertex(0)->setGeomAssociation(crv);
-    b2->getVertex(0)->setGeomAssociation(crv);
+    b1_vertices[0]->setGeomAssociation(crv);
+    b2_vertices[0]->setGeomAssociation(crv);
     crv = curves[0];
-    b1->getVertex(2)->setGeomAssociation(crv);
-    b2->getVertex(2)->setGeomAssociation(crv);
+    b1_vertices[2]->setGeomAssociation(crv);
+    b2_vertices[2]->setGeomAssociation(crv);
 
 
     projectEdgesOnCurves();
@@ -5485,135 +5684,143 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridDemiNonDeg()
     }
 
 
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    const std::vector<Vertex*>& b2_vertices = b2->getVertices();
+    const std::vector<Vertex*>& b3_vertices = b3->getVertices();
+    const std::vector<Vertex*>& b5_vertices = b5->getVertices();
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+    const std::vector<Face*>& b2_faces = b2->getFaces();
+    const std::vector<Face*>& b3_faces = b3->getFaces();
+    const std::vector<Face*>& b5_faces = b5->getFaces();
     Utils::Math::Point pt;
     Geom::Curve* crv;
    // x min, k max
     crv = curves[2];
     crv->getPoint(0.75, pt, true);
-    b1->getVertex(4)->setCoord(pt);
-    b2->getVertex(4)->setCoord(pt);
+    b1_vertices[4]->setCoord(pt);
+    b2_vertices[4]->setCoord(pt);
 
     crv->getPoint(0.25, pt, true);
-    b2->getVertex(6)->setCoord(pt);
-    b3->getVertex(6)->setCoord(pt);
+    b2_vertices[6]->setCoord(pt);
+    b3_vertices[6]->setCoord(pt);
 
     pt = vertices[2]->getCoord();
-    b1->getVertex(5)->setCoord(pt);
-    b1->getVertex(5)->setGeomAssociation(vertices[2]);
+    b1_vertices[5]->setCoord(pt);
+    b1_vertices[5]->setGeomAssociation(vertices[2]);
 
     pt = vertices[3]->getCoord();
-    b3->getVertex(7)->setCoord(pt);
-    b3->getVertex(7)->setGeomAssociation(vertices[3]);
+    b3_vertices[7]->setCoord(pt);
+    b3_vertices[7]->setGeomAssociation(vertices[3]);
 
     // x max, k min
     crv = curves[0];
     crv->getPoint(0.75, pt, true);
-    b1->getVertex(0)->setCoord(pt);
-    b2->getVertex(0)->setCoord(pt);
+    b1_vertices[0]->setCoord(pt);
+    b2_vertices[0]->setCoord(pt);
 
     crv->getPoint(0.25, pt, true);
-    b2->getVertex(2)->setCoord(pt);
-    b3->getVertex(2)->setCoord(pt);
+    b2_vertices[2]->setCoord(pt);
+    b3_vertices[2]->setCoord(pt);
 
     pt = vertices[0]->getCoord();
-    b1->getVertex(1)->setCoord(pt);
-    b1->getVertex(1)->setGeomAssociation(vertices[0]);
+    b1_vertices[1]->setCoord(pt);
+    b1_vertices[1]->setGeomAssociation(vertices[0]);
 
     pt = vertices[1]->getCoord();
-    b3->getVertex(3)->setCoord(pt);
-    b3->getVertex(3)->setGeomAssociation(vertices[1]);
+    b3_vertices[3]->setCoord(pt);
+    b3_vertices[3]->setGeomAssociation(vertices[1]);
 
     // les sommets au centre de l'ogrid
     double unSurRac2 = 1/sqrt(2);
     Utils::Math::Point pt_centre = vertices[5]->getCoord();
-    pt = pt_centre+(b1->getVertex(4)->getCoord()-pt_centre)*m_ratio;
-    b1->getVertex(6)->setCoord(pt);
-    b2->getVertex(5)->setCoord(pt);
-    b5->getVertex(4)->setCoord(pt);
+    pt = pt_centre+(b1_vertices[4]->getCoord()-pt_centre)*m_ratio;
+    b1_vertices[6]->setCoord(pt);
+    b2_vertices[5]->setCoord(pt);
+    b5_vertices[4]->setCoord(pt);
 
-    pt = pt_centre+(b1->getVertex(5)->getCoord()-pt_centre)*m_ratio*unSurRac2;
-    b1->getVertex(7)->setCoord(pt);
-    b5->getVertex(5)->setCoord(pt);
+    pt = pt_centre+(b1_vertices[5]->getCoord()-pt_centre)*m_ratio*unSurRac2;
+    b1_vertices[7]->setCoord(pt);
+    b5_vertices[5]->setCoord(pt);
 
-    pt = pt_centre+(b3->getVertex(7)->getCoord()-pt_centre)*m_ratio*unSurRac2;
-    b3->getVertex(5)->setCoord(pt);
-    b5->getVertex(7)->setCoord(pt);
+    pt = pt_centre+(b3_vertices[7]->getCoord()-pt_centre)*m_ratio*unSurRac2;
+    b3_vertices[5]->setCoord(pt);
+    b5_vertices[7]->setCoord(pt);
 
-    pt = pt_centre+(b3->getVertex(6)->getCoord()-pt_centre)*m_ratio;
-    b3->getVertex(4)->setCoord(pt);
-    b2->getVertex(7)->setCoord(pt);
-    b5->getVertex(6)->setCoord(pt);
+    pt = pt_centre+(b3_vertices[6]->getCoord()-pt_centre)*m_ratio;
+    b3_vertices[4]->setCoord(pt);
+    b2_vertices[7]->setCoord(pt);
+    b5_vertices[6]->setCoord(pt);
 
     pt_centre = vertices[4]->getCoord();
-    pt = pt_centre+(b1->getVertex(0)->getCoord()-pt_centre)*m_ratio;
-    b1->getVertex(2)->setCoord(pt);
-    b2->getVertex(1)->setCoord(pt);
-    b5->getVertex(0)->setCoord(pt);
+    pt = pt_centre+(b1_vertices[0]->getCoord()-pt_centre)*m_ratio;
+    b1_vertices[2]->setCoord(pt);
+    b2_vertices[1]->setCoord(pt);
+    b5_vertices[0]->setCoord(pt);
 
-    pt = pt_centre+(b1->getVertex(1)->getCoord()-pt_centre)*m_ratio*unSurRac2;
-    b1->getVertex(3)->setCoord(pt);
-    b5->getVertex(1)->setCoord(pt);
+    pt = pt_centre+(b1_vertices[1]->getCoord()-pt_centre)*m_ratio*unSurRac2;
+    b1_vertices[3]->setCoord(pt);
+    b5_vertices[1]->setCoord(pt);
 
-    pt = pt_centre+(b3->getVertex(3)->getCoord()-pt_centre)*m_ratio*unSurRac2;
-    b3->getVertex(1)->setCoord(pt);
-    b5->getVertex(3)->setCoord(pt);
+    pt = pt_centre+(b3_vertices[3]->getCoord()-pt_centre)*m_ratio*unSurRac2;
+    b3_vertices[1]->setCoord(pt);
+    b5_vertices[3]->setCoord(pt);
 
-    pt = pt_centre+(b3->getVertex(2)->getCoord()-pt_centre)*m_ratio;
-    b3->getVertex(0)->setCoord(pt);
-    b2->getVertex(3)->setCoord(pt);
-    b5->getVertex(2)->setCoord(pt);
+    pt = pt_centre+(b3_vertices[2]->getCoord()-pt_centre)*m_ratio;
+    b3_vertices[0]->setCoord(pt);
+    b2_vertices[3]->setCoord(pt);
+    b5_vertices[2]->setCoord(pt);
 
     // découpage de la face
     std::vector<Edge* > splitingEdges;
     std::vector<CoFace* > cofaces;
-    cofaces.push_back(b5->getFace(Block::i_max)->getCoFace(0));
+    cofaces.push_back(b5_faces[Block::i_max]->getCoFaces()[0]);
     TopoHelper::splitFaces2D(cofaces,
-    		cofaces[0]->getEdge(b5->getVertex(1), b5->getVertex(3))->getCoEdge(0),
+    		cofaces[0]->getEdge(b5_vertices[1], b5_vertices[3])->getCoEdges()[0],
 			0.5, 0.0, false, false,
 			splitingEdges,
 			&getInfoCommand());
 
     // fusion des faces avec l'ogrid
-    b1->getFace(Block::j_max)->fuse(b5->getFace(Block::j_min), &getInfoCommand());
-    b2->getFace(Block::i_max)->fuse(b5->getFace(Block::i_min), &getInfoCommand());
-    b3->getFace(Block::j_min)->fuse(b5->getFace(Block::j_max), &getInfoCommand());
+    b1_faces[Block::j_max]->fuse(b5_faces[Block::j_min], &getInfoCommand());
+    b2_faces[Block::i_max]->fuse(b5_faces[Block::i_min], &getInfoCommand());
+    b3_faces[Block::j_min]->fuse(b5_faces[Block::j_max], &getInfoCommand());
 
     // fusion des faces autour de l'ogrid
-    b1->getFace(Block::i_min)->fuse(b2->getFace(Block::j_min), &getInfoCommand());
-    b2->getFace(Block::j_max)->fuse(b3->getFace(Block::i_min), &getInfoCommand());
+    b1_faces[Block::i_min]->fuse(b2_faces[Block::j_min], &getInfoCommand());
+    b2_faces[Block::j_max]->fuse(b3_faces[Block::i_min], &getInfoCommand());
 
     // les associations
     crv = curves[2];
-    b1->getVertex(4)->setGeomAssociation(crv);
-    b3->getVertex(6)->setGeomAssociation(crv);
+    b1_vertices[4]->setGeomAssociation(crv);
+    b3_vertices[6]->setGeomAssociation(crv);
     crv = curves[0];
-    b1->getVertex(0)->setGeomAssociation(crv);
-    b3->getVertex(2)->setGeomAssociation(crv);
+    b1_vertices[0]->setGeomAssociation(crv);
+    b3_vertices[2]->setGeomAssociation(crv);
 
     crv = curves[6];
-    b1->getVertex(7)->setGeomAssociation(crv);
+    b1_vertices[7]->setGeomAssociation(crv);
     crv = curves[7];
-    b3->getVertex(5)->setGeomAssociation(crv);
+    b3_vertices[5]->setGeomAssociation(crv);
     crv = curves[5];
-    b1->getVertex(3)->setGeomAssociation(crv);
+    b1_vertices[3]->setGeomAssociation(crv);
     crv = curves[4];
-    b3->getVertex(1)->setGeomAssociation(crv);
+    b3_vertices[1]->setGeomAssociation(crv);
 
     Geom::Surface* surf;
     surf = surfaces[2];
-    b1->getVertex(6)->setGeomAssociation(surf);
-    b3->getVertex(4)->setGeomAssociation(surf);
+    b1_vertices[6]->setGeomAssociation(surf);
+    b3_vertices[4]->setGeomAssociation(surf);
     surf = surfaces[1];
-    b1->getVertex(2)->setGeomAssociation(surf);
-    b3->getVertex(0)->setGeomAssociation(surf);
+    b1_vertices[2]->setGeomAssociation(surf);
+    b3_vertices[0]->setGeomAssociation(surf);
 
     pt = vertices[4]->getCoord();
-    splitingEdges[0]->getVertex(0)->setCoord(pt);
-    splitingEdges[0]->getVertex(0)->setGeomAssociation(vertices[4]);
+    splitingEdges[0]->getVertices()[0]->setCoord(pt);
+    splitingEdges[0]->getVertices()[0]->setGeomAssociation(vertices[4]);
 
     pt = vertices[5]->getCoord();
-    splitingEdges[0]->getVertex(1)->setCoord(pt);
-    splitingEdges[0]->getVertex(1)->setGeomAssociation(vertices[5]);
+    splitingEdges[0]->getVertices()[1]->setCoord(pt);
+    splitingEdges[0]->getVertices()[1]->setGeomAssociation(vertices[5]);
 
 
     projectEdgesOnCurves();
@@ -5683,86 +5890,96 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridPleinNonDegR0()
     }
 
 
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    const std::vector<Vertex*>& b2_vertices = b2->getVertices();
+    const std::vector<Vertex*>& b3_vertices = b3->getVertices();
+    const std::vector<Vertex*>& b4_vertices = b4->getVertices();
+    const std::vector<Vertex*>& b5_vertices = b5->getVertices();
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+    const std::vector<Face*>& b2_faces = b2->getFaces();
+    const std::vector<Face*>& b3_faces = b3->getFaces();
+    const std::vector<Face*>& b4_faces = b4->getFaces();
+    const std::vector<Face*>& b5_faces = b5->getFaces();
     Utils::Math::Point pt;
     Geom::Curve* crv;
     // x min, k max
     pt = vertices[1]->getCoord();
-    b1->getVertex(4)->setCoord(pt);
-    b2->getVertex(4)->setCoord(pt);
-    b3->getVertex(4)->setCoord(pt);
-    b4->getVertex(4)->setCoord(pt);
-    b5->getVertex(4)->setCoord(pt);
+    b1_vertices[4]->setCoord(pt);
+    b2_vertices[4]->setCoord(pt);
+    b3_vertices[4]->setCoord(pt);
+    b4_vertices[4]->setCoord(pt);
+    b5_vertices[4]->setCoord(pt);
 
     // x max, k min
     crv = curves[0];
     crv->getPoint(0.125, pt, true);
-    b1->getVertex(0)->setCoord(pt);
-    b2->getVertex(0)->setCoord(pt);
+    b1_vertices[0]->setCoord(pt);
+    b2_vertices[0]->setCoord(pt);
 
     crv->getPoint(0.375, pt, true);
-    b1->getVertex(1)->setCoord(pt);
-    b4->getVertex(1)->setCoord(pt);
+    b1_vertices[1]->setCoord(pt);
+    b4_vertices[1]->setCoord(pt);
 
     crv->getPoint(0.625, pt, true);
-    b3->getVertex(3)->setCoord(pt);
-    b4->getVertex(3)->setCoord(pt);
+    b3_vertices[3]->setCoord(pt);
+    b4_vertices[3]->setCoord(pt);
 
     crv->getPoint(0.875, pt, true);
-    b3->getVertex(2)->setCoord(pt);
-    b2->getVertex(2)->setCoord(pt);
+    b3_vertices[2]->setCoord(pt);
+    b2_vertices[2]->setCoord(pt);
 
 
     // les sommets au centre de l'ogrid
     Utils::Math::Point pt_centre;
 
-    pt_centre = (b1->getVertex(1)->getCoord()+b3->getVertex(2)->getCoord())/2;
-    pt = pt_centre+(b1->getVertex(0)->getCoord()-pt_centre)*m_ratio;
-    b1->getVertex(2)->setCoord(pt);
-    b2->getVertex(1)->setCoord(pt);
-    b5->getVertex(0)->setCoord(pt);
+    pt_centre = (b1_vertices[1]->getCoord()+b3_vertices[2]->getCoord())/2;
+    pt = pt_centre+(b1_vertices[0]->getCoord()-pt_centre)*m_ratio;
+    b1_vertices[2]->setCoord(pt);
+    b2_vertices[1]->setCoord(pt);
+    b5_vertices[0]->setCoord(pt);
 
-    pt = pt_centre+(b1->getVertex(1)->getCoord()-pt_centre)*m_ratio;
-    b1->getVertex(3)->setCoord(pt);
-    b4->getVertex(0)->setCoord(pt);
-    b5->getVertex(1)->setCoord(pt);
+    pt = pt_centre+(b1_vertices[1]->getCoord()-pt_centre)*m_ratio;
+    b1_vertices[3]->setCoord(pt);
+    b4_vertices[0]->setCoord(pt);
+    b5_vertices[1]->setCoord(pt);
 
-    pt = pt_centre+(b3->getVertex(3)->getCoord()-pt_centre)*m_ratio;
-    b3->getVertex(1)->setCoord(pt);
-    b4->getVertex(2)->setCoord(pt);
-    b5->getVertex(3)->setCoord(pt);
+    pt = pt_centre+(b3_vertices[3]->getCoord()-pt_centre)*m_ratio;
+    b3_vertices[1]->setCoord(pt);
+    b4_vertices[2]->setCoord(pt);
+    b5_vertices[3]->setCoord(pt);
 
-    pt = pt_centre+(b3->getVertex(2)->getCoord()-pt_centre)*m_ratio;
-    b3->getVertex(0)->setCoord(pt);
-    b2->getVertex(3)->setCoord(pt);
-    b5->getVertex(2)->setCoord(pt);
+    pt = pt_centre+(b3_vertices[2]->getCoord()-pt_centre)*m_ratio;
+    b3_vertices[0]->setCoord(pt);
+    b2_vertices[3]->setCoord(pt);
+    b5_vertices[2]->setCoord(pt);
 
 
     // fusion des faces avec l'ogrid
-    b1->getFace(Block::j_max)->fuse(b5->getFace(Block::j_min), &getInfoCommand());
-    b2->getFace(Block::i_max)->fuse(b5->getFace(Block::i_min), &getInfoCommand());
-    b3->getFace(Block::j_min)->fuse(b5->getFace(Block::j_max), &getInfoCommand());
-    b4->getFace(Block::i_min)->fuse(b5->getFace(Block::i_max), &getInfoCommand());
+    b1_faces[Block::j_max]->fuse(b5_faces[Block::j_min], &getInfoCommand());
+    b2_faces[Block::i_max]->fuse(b5_faces[Block::i_min], &getInfoCommand());
+    b3_faces[Block::j_min]->fuse(b5_faces[Block::j_max], &getInfoCommand());
+    b4_faces[Block::i_min]->fuse(b5_faces[Block::i_max], &getInfoCommand());
 
     // fusion des faces autour de l'ogrid
-    b1->getFace(Block::i_min)->fuse(b2->getFace(Block::j_min), &getInfoCommand());
-    b2->getFace(Block::j_max)->fuse(b3->getFace(Block::i_min), &getInfoCommand());
-    b3->getFace(Block::i_max)->fuse(b4->getFace(Block::j_max), &getInfoCommand());
-    b4->getFace(Block::j_min)->fuse(b1->getFace(Block::i_max), &getInfoCommand());
+    b1_faces[Block::i_min]->fuse(b2_faces[Block::j_min], &getInfoCommand());
+    b2_faces[Block::j_max]->fuse(b3_faces[Block::i_min], &getInfoCommand());
+    b3_faces[Block::i_max]->fuse(b4_faces[Block::j_max], &getInfoCommand());
+    b4_faces[Block::j_min]->fuse(b1_faces[Block::i_max], &getInfoCommand());
 
     // les associations
-    b1->getVertex(4)->setGeomAssociation(vertices[1]);
+    b1_vertices[4]->setGeomAssociation(vertices[1]);
     crv = curves[0];
-    b1->getVertex(0)->setGeomAssociation(crv);
-    b1->getVertex(1)->setGeomAssociation(crv);
-    b3->getVertex(3)->setGeomAssociation(crv);
-    b3->getVertex(2)->setGeomAssociation(crv);
+    b1_vertices[0]->setGeomAssociation(crv);
+    b1_vertices[1]->setGeomAssociation(crv);
+    b3_vertices[3]->setGeomAssociation(crv);
+    b3_vertices[2]->setGeomAssociation(crv);
 
     Geom::Surface* surf;
     surf = surfaces[1];
-    b1->getVertex(2)->setGeomAssociation(surf);
-    b1->getVertex(3)->setGeomAssociation(surf);
-    b3->getVertex(1)->setGeomAssociation(surf);
-    b3->getVertex(0)->setGeomAssociation(surf);
+    b1_vertices[2]->setGeomAssociation(surf);
+    b1_vertices[3]->setGeomAssociation(surf);
+    b3_vertices[1]->setGeomAssociation(surf);
+    b3_vertices[0]->setGeomAssociation(surf);
 
 
     projectEdgesOnCurves();
@@ -5808,86 +6025,94 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridPleinDeg()
         throw TkUtil::Exception(message);
     }
 
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    const std::vector<Vertex*>& b2_vertices = b2->getVertices();
+    const std::vector<Vertex*>& b3_vertices = b3->getVertices();
+    const std::vector<Vertex*>& b4_vertices = b4->getVertices();
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+    const std::vector<Face*>& b2_faces = b2->getFaces();
+    const std::vector<Face*>& b3_faces = b3->getFaces();
+    const std::vector<Face*>& b4_faces = b4->getFaces();
     Utils::Math::Point pt;
     Geom::Curve* crv;
     // x min, k max
     crv = curves[2];
     crv->getPoint(0.125, pt, true);
-    b1->getVertex(0)->setCoord(pt);
-    b2->getVertex(1)->setCoord(pt);
+    b1_vertices[0]->setCoord(pt);
+    b2_vertices[1]->setCoord(pt);
 
     crv->getPoint(0.375, pt, true);
-    b2->getVertex(0)->setCoord(pt);
-    b3->getVertex(1)->setCoord(pt);
+    b2_vertices[0]->setCoord(pt);
+    b3_vertices[1]->setCoord(pt);
 
     crv->getPoint(0.625, pt, true);
-    b3->getVertex(0)->setCoord(pt);
-    b4->getVertex(1)->setCoord(pt);
+    b3_vertices[0]->setCoord(pt);
+    b4_vertices[1]->setCoord(pt);
 
     crv->getPoint(0.875, pt, true);
-    b4->getVertex(0)->setCoord(pt);
-    b1->getVertex(1)->setCoord(pt);
+    b4_vertices[0]->setCoord(pt);
+    b1_vertices[1]->setCoord(pt);
 
     // x max, k min
     crv = curves[0];
     crv->getPoint(0.125, pt, true);
-    b1->getVertex(2)->setCoord(pt);
-    b2->getVertex(3)->setCoord(pt);
+    b1_vertices[2]->setCoord(pt);
+    b2_vertices[3]->setCoord(pt);
 
     crv->getPoint(0.375, pt, true);
-    b2->getVertex(2)->setCoord(pt);
-    b3->getVertex(3)->setCoord(pt);
+    b2_vertices[2]->setCoord(pt);
+    b3_vertices[3]->setCoord(pt);
 
     crv->getPoint(0.625, pt, true);
-    b3->getVertex(2)->setCoord(pt);
-    b4->getVertex(3)->setCoord(pt);
+    b3_vertices[2]->setCoord(pt);
+    b4_vertices[3]->setCoord(pt);
 
     crv->getPoint(0.875, pt, true);
-    b4->getVertex(2)->setCoord(pt);
-    b1->getVertex(3)->setCoord(pt);
+    b4_vertices[2]->setCoord(pt);
+    b1_vertices[3]->setCoord(pt);
 
     // dégénéréscence des blocs
-    b1->degenerateFaceInEdge(Block::k_max, b1->getVertex(4), b1->getVertex(5), &getInfoCommand());
-    b2->degenerateFaceInEdge(Block::k_max, b2->getVertex(4), b2->getVertex(5), &getInfoCommand());
-    b3->degenerateFaceInEdge(Block::k_max, b3->getVertex(4), b3->getVertex(5), &getInfoCommand());
-    b4->degenerateFaceInEdge(Block::k_max, b4->getVertex(4), b4->getVertex(5), &getInfoCommand());
+    b1->degenerateFaceInEdge(Block::k_max, b1_vertices[4], b1_vertices[5], &getInfoCommand());
+    b2->degenerateFaceInEdge(Block::k_max, b2_vertices[4], b2_vertices[5], &getInfoCommand());
+    b3->degenerateFaceInEdge(Block::k_max, b3_vertices[4], b3_vertices[5], &getInfoCommand());
+    b4->degenerateFaceInEdge(Block::k_max, b4_vertices[4], b4_vertices[5], &getInfoCommand());
 
     // les sommets au centre de l'ogrid
-    pt = (b1->getVertex(0)->getCoord()+b3->getVertex(0)->getCoord())/2;
-    b1->getVertex(4)->setCoord(pt);
-    b2->getVertex(4)->setCoord(pt);
-    b3->getVertex(4)->setCoord(pt);
-    b4->getVertex(4)->setCoord(pt);
+    pt = (b1_vertices[0]->getCoord()+b3_vertices[0]->getCoord())/2;
+    b1_vertices[4]->setCoord(pt);
+    b2_vertices[4]->setCoord(pt);
+    b3_vertices[4]->setCoord(pt);
+    b4_vertices[4]->setCoord(pt);
 
-    pt = (b1->getVertex(2)->getCoord()+b3->getVertex(2)->getCoord())/2;
-    b1->getVertex(5)->setCoord(pt);
-    b2->getVertex(5)->setCoord(pt);
-    b3->getVertex(5)->setCoord(pt);
-    b4->getVertex(5)->setCoord(pt);
+    pt = (b1_vertices[2]->getCoord()+b3_vertices[2]->getCoord())/2;
+    b1_vertices[5]->setCoord(pt);
+    b2_vertices[5]->setCoord(pt);
+    b3_vertices[5]->setCoord(pt);
+    b4_vertices[5]->setCoord(pt);
 
     // fusion des faces autour de l'ogrid
-    b1->getFace(Block::i_min)->fuse(b2->getFace(Block::i_max), &getInfoCommand());
-    b2->getFace(Block::i_min)->fuse(b3->getFace(Block::i_max), &getInfoCommand());
-    b3->getFace(Block::i_min)->fuse(b4->getFace(Block::i_max), &getInfoCommand());
-    b4->getFace(Block::i_min)->fuse(b1->getFace(Block::i_max), &getInfoCommand());
+    b1_faces[Block::i_min]->fuse(b2_faces[Block::i_max], &getInfoCommand());
+    b2_faces[Block::i_min]->fuse(b3_faces[Block::i_max], &getInfoCommand());
+    b3_faces[Block::i_min]->fuse(b4_faces[Block::i_max], &getInfoCommand());
+    b4_faces[Block::i_min]->fuse(b1_faces[Block::i_max], &getInfoCommand());
 
     // les associations
     crv = curves[2];
-    b1->getVertex(0)->setGeomAssociation(crv);
-    b2->getVertex(0)->setGeomAssociation(crv);
-    b3->getVertex(0)->setGeomAssociation(crv);
-    b4->getVertex(0)->setGeomAssociation(crv);
+    b1_vertices[0]->setGeomAssociation(crv);
+    b2_vertices[0]->setGeomAssociation(crv);
+    b3_vertices[0]->setGeomAssociation(crv);
+    b4_vertices[0]->setGeomAssociation(crv);
     crv = curves[0];
-    b1->getVertex(2)->setGeomAssociation(crv);
-    b2->getVertex(2)->setGeomAssociation(crv);
-    b3->getVertex(2)->setGeomAssociation(crv);
-    b4->getVertex(2)->setGeomAssociation(crv);
+    b1_vertices[2]->setGeomAssociation(crv);
+    b2_vertices[2]->setGeomAssociation(crv);
+    b3_vertices[2]->setGeomAssociation(crv);
+    b4_vertices[2]->setGeomAssociation(crv);
 
     Geom::Surface* surf;
     surf = surfaces[2];
-    b1->getVertex(4)->setGeomAssociation(surf);
+    b1_vertices[4]->setGeomAssociation(surf);
     surf = surfaces[1];
-    b1->getVertex(5)->setGeomAssociation(surf);
+    b1_vertices[5]->setGeomAssociation(surf);
 
 
     projectEdgesOnCurves();
@@ -5936,125 +6161,135 @@ void CommandNewTopoOGridOnGeometry::createConeTopoOGridPleinNonDeg()
         throw TkUtil::Exception(message);
     }
 
+    const std::vector<Vertex*>& b1_vertices = b1->getVertices();
+    const std::vector<Vertex*>& b2_vertices = b2->getVertices();
+    const std::vector<Vertex*>& b3_vertices = b3->getVertices();
+    const std::vector<Vertex*>& b4_vertices = b4->getVertices();
+    const std::vector<Vertex*>& b5_vertices = b5->getVertices();
+    const std::vector<Face*>& b1_faces = b1->getFaces();
+    const std::vector<Face*>& b2_faces = b2->getFaces();
+    const std::vector<Face*>& b3_faces = b3->getFaces();
+    const std::vector<Face*>& b4_faces = b4->getFaces();
+    const std::vector<Face*>& b5_faces = b5->getFaces();
     Utils::Math::Point pt;
     Geom::Curve* crv;
     // x min, k max
     crv = curves[2];
     crv->getPoint(0.125, pt, true);
-    b1->getVertex(4)->setCoord(pt);
-    b2->getVertex(4)->setCoord(pt);
+    b1_vertices[4]->setCoord(pt);
+    b2_vertices[4]->setCoord(pt);
 
     crv->getPoint(0.375, pt, true);
-    b1->getVertex(5)->setCoord(pt);
-    b4->getVertex(5)->setCoord(pt);
+    b1_vertices[5]->setCoord(pt);
+    b4_vertices[5]->setCoord(pt);
 
     crv->getPoint(0.625, pt, true);
-    b3->getVertex(7)->setCoord(pt);
-    b4->getVertex(7)->setCoord(pt);
+    b3_vertices[7]->setCoord(pt);
+    b4_vertices[7]->setCoord(pt);
 
     crv->getPoint(0.875, pt, true);
-    b3->getVertex(6)->setCoord(pt);
-    b2->getVertex(6)->setCoord(pt);
+    b3_vertices[6]->setCoord(pt);
+    b2_vertices[6]->setCoord(pt);
 
     // x max, k min
     crv = curves[0];
     crv->getPoint(0.125, pt, true);
-    b1->getVertex(0)->setCoord(pt);
-    b2->getVertex(0)->setCoord(pt);
+    b1_vertices[0]->setCoord(pt);
+    b2_vertices[0]->setCoord(pt);
 
     crv->getPoint(0.375, pt, true);
-    b1->getVertex(1)->setCoord(pt);
-    b4->getVertex(1)->setCoord(pt);
+    b1_vertices[1]->setCoord(pt);
+    b4_vertices[1]->setCoord(pt);
 
     crv->getPoint(0.625, pt, true);
-    b3->getVertex(3)->setCoord(pt);
-    b4->getVertex(3)->setCoord(pt);
+    b3_vertices[3]->setCoord(pt);
+    b4_vertices[3]->setCoord(pt);
 
     crv->getPoint(0.875, pt, true);
-    b3->getVertex(2)->setCoord(pt);
-    b2->getVertex(2)->setCoord(pt);
+    b3_vertices[2]->setCoord(pt);
+    b2_vertices[2]->setCoord(pt);
 
 
     // les sommets au centre de l'ogrid
-    Utils::Math::Point pt_centre = (b1->getVertex(5)->getCoord()+b3->getVertex(6)->getCoord())/2;
-    pt = pt_centre+(b1->getVertex(4)->getCoord()-pt_centre)*m_ratio;
-    b1->getVertex(6)->setCoord(pt);
-    b2->getVertex(5)->setCoord(pt);
-    b5->getVertex(4)->setCoord(pt);
+    Utils::Math::Point pt_centre = (b1_vertices[5]->getCoord()+b3_vertices[6]->getCoord())/2;
+    pt = pt_centre+(b1_vertices[4]->getCoord()-pt_centre)*m_ratio;
+    b1_vertices[6]->setCoord(pt);
+    b2_vertices[5]->setCoord(pt);
+    b5_vertices[4]->setCoord(pt);
 
-    pt = pt_centre+(b1->getVertex(5)->getCoord()-pt_centre)*m_ratio;
-    b1->getVertex(7)->setCoord(pt);
-    b4->getVertex(4)->setCoord(pt);
-    b5->getVertex(5)->setCoord(pt);
+    pt = pt_centre+(b1_vertices[5]->getCoord()-pt_centre)*m_ratio;
+    b1_vertices[7]->setCoord(pt);
+    b4_vertices[4]->setCoord(pt);
+    b5_vertices[5]->setCoord(pt);
 
-    pt = pt_centre+(b3->getVertex(7)->getCoord()-pt_centre)*m_ratio;
-    b3->getVertex(5)->setCoord(pt);
-    b4->getVertex(6)->setCoord(pt);
-    b5->getVertex(7)->setCoord(pt);
+    pt = pt_centre+(b3_vertices[7]->getCoord()-pt_centre)*m_ratio;
+    b3_vertices[5]->setCoord(pt);
+    b4_vertices[6]->setCoord(pt);
+    b5_vertices[7]->setCoord(pt);
 
-    pt = pt_centre+(b3->getVertex(6)->getCoord()-pt_centre)*m_ratio;
-    b3->getVertex(4)->setCoord(pt);
-    b2->getVertex(7)->setCoord(pt);
-    b5->getVertex(6)->setCoord(pt);
+    pt = pt_centre+(b3_vertices[6]->getCoord()-pt_centre)*m_ratio;
+    b3_vertices[4]->setCoord(pt);
+    b2_vertices[7]->setCoord(pt);
+    b5_vertices[6]->setCoord(pt);
 
 
-    pt_centre = (b1->getVertex(1)->getCoord()+b3->getVertex(2)->getCoord())/2;
-    pt = pt_centre+(b1->getVertex(0)->getCoord()-pt_centre)*m_ratio;
-    b1->getVertex(2)->setCoord(pt);
-    b2->getVertex(1)->setCoord(pt);
-    b5->getVertex(0)->setCoord(pt);
+    pt_centre = (b1_vertices[1]->getCoord()+b3_vertices[2]->getCoord())/2;
+    pt = pt_centre+(b1_vertices[0]->getCoord()-pt_centre)*m_ratio;
+    b1_vertices[2]->setCoord(pt);
+    b2_vertices[1]->setCoord(pt);
+    b5_vertices[0]->setCoord(pt);
 
-    pt = pt_centre+(b1->getVertex(1)->getCoord()-pt_centre)*m_ratio;
-    b1->getVertex(3)->setCoord(pt);
-    b4->getVertex(0)->setCoord(pt);
-    b5->getVertex(1)->setCoord(pt);
+    pt = pt_centre+(b1_vertices[1]->getCoord()-pt_centre)*m_ratio;
+    b1_vertices[3]->setCoord(pt);
+    b4_vertices[0]->setCoord(pt);
+    b5_vertices[1]->setCoord(pt);
 
-    pt = pt_centre+(b3->getVertex(3)->getCoord()-pt_centre)*m_ratio;
-    b3->getVertex(1)->setCoord(pt);
-    b4->getVertex(2)->setCoord(pt);
-    b5->getVertex(3)->setCoord(pt);
+    pt = pt_centre+(b3_vertices[3]->getCoord()-pt_centre)*m_ratio;
+    b3_vertices[1]->setCoord(pt);
+    b4_vertices[2]->setCoord(pt);
+    b5_vertices[3]->setCoord(pt);
 
-    pt = pt_centre+(b3->getVertex(2)->getCoord()-pt_centre)*m_ratio;
-    b3->getVertex(0)->setCoord(pt);
-    b2->getVertex(3)->setCoord(pt);
-    b5->getVertex(2)->setCoord(pt);
+    pt = pt_centre+(b3_vertices[2]->getCoord()-pt_centre)*m_ratio;
+    b3_vertices[0]->setCoord(pt);
+    b2_vertices[3]->setCoord(pt);
+    b5_vertices[2]->setCoord(pt);
 
 
     // fusion des faces avec l'ogrid
-    b1->getFace(Block::j_max)->fuse(b5->getFace(Block::j_min), &getInfoCommand());
-    b2->getFace(Block::i_max)->fuse(b5->getFace(Block::i_min), &getInfoCommand());
-    b3->getFace(Block::j_min)->fuse(b5->getFace(Block::j_max), &getInfoCommand());
-    b4->getFace(Block::i_min)->fuse(b5->getFace(Block::i_max), &getInfoCommand());
+    b1_faces[Block::j_max]->fuse(b5_faces[Block::j_min], &getInfoCommand());
+    b2_faces[Block::i_max]->fuse(b5_faces[Block::i_min], &getInfoCommand());
+    b3_faces[Block::j_min]->fuse(b5_faces[Block::j_max], &getInfoCommand());
+    b4_faces[Block::i_min]->fuse(b5_faces[Block::i_max], &getInfoCommand());
 
     // fusion des faces autour de l'ogrid
-    b1->getFace(Block::i_min)->fuse(b2->getFace(Block::j_min), &getInfoCommand());
-    b2->getFace(Block::j_max)->fuse(b3->getFace(Block::i_min), &getInfoCommand());
-    b3->getFace(Block::i_max)->fuse(b4->getFace(Block::j_max), &getInfoCommand());
-    b4->getFace(Block::j_min)->fuse(b1->getFace(Block::i_max), &getInfoCommand());
+    b1_faces[Block::i_min]->fuse(b2_faces[Block::j_min], &getInfoCommand());
+    b2_faces[Block::j_max]->fuse(b3_faces[Block::i_min], &getInfoCommand());
+    b3_faces[Block::i_max]->fuse(b4_faces[Block::j_max], &getInfoCommand());
+    b4_faces[Block::j_min]->fuse(b1_faces[Block::i_max], &getInfoCommand());
 
     // les associations
     crv = curves[2];
-    b1->getVertex(4)->setGeomAssociation(crv);
-    b1->getVertex(5)->setGeomAssociation(crv);
-    b3->getVertex(7)->setGeomAssociation(crv);
-    b3->getVertex(6)->setGeomAssociation(crv);
+    b1_vertices[4]->setGeomAssociation(crv);
+    b1_vertices[5]->setGeomAssociation(crv);
+    b3_vertices[7]->setGeomAssociation(crv);
+    b3_vertices[6]->setGeomAssociation(crv);
     crv = curves[0];
-    b1->getVertex(0)->setGeomAssociation(crv);
-    b1->getVertex(1)->setGeomAssociation(crv);
-    b3->getVertex(3)->setGeomAssociation(crv);
-    b3->getVertex(2)->setGeomAssociation(crv);
+    b1_vertices[0]->setGeomAssociation(crv);
+    b1_vertices[1]->setGeomAssociation(crv);
+    b3_vertices[3]->setGeomAssociation(crv);
+    b3_vertices[2]->setGeomAssociation(crv);
 
     Geom::Surface* surf;
     surf = surfaces[2];
-    b1->getVertex(6)->setGeomAssociation(surf);
-    b1->getVertex(7)->setGeomAssociation(surf);
-    b3->getVertex(5)->setGeomAssociation(surf);
-    b3->getVertex(4)->setGeomAssociation(surf);
+    b1_vertices[6]->setGeomAssociation(surf);
+    b1_vertices[7]->setGeomAssociation(surf);
+    b3_vertices[5]->setGeomAssociation(surf);
+    b3_vertices[4]->setGeomAssociation(surf);
     surf = surfaces[1];
-    b1->getVertex(2)->setGeomAssociation(surf);
-    b1->getVertex(3)->setGeomAssociation(surf);
-    b3->getVertex(1)->setGeomAssociation(surf);
-    b3->getVertex(0)->setGeomAssociation(surf);
+    b1_vertices[2]->setGeomAssociation(surf);
+    b1_vertices[3]->setGeomAssociation(surf);
+    b3_vertices[1]->setGeomAssociation(surf);
+    b3_vertices[0]->setGeomAssociation(surf);
 
 
     projectEdgesOnCurves();

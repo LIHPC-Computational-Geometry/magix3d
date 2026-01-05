@@ -72,8 +72,10 @@ public:
     virtual void getPreviewRepresentation(Utils::DisplayRepresentation& dr);
 
 private:
+    /// retourne l'une des arêtes d'un côté pour le cas avec une seule face commune
+    Edge* getEdge(const Face* f, uint ind) const;
 
-    /** Méthode de vérification et validation de l'entité présente */
+    /// Méthode de vérification et validation de l'entité présente
     virtual void validGeomEntity();
 
     /// Création de la topologie avec un unique bloc pour le cylindre

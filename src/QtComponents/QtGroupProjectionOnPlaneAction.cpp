@@ -8,7 +8,8 @@
 
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Group/Group2D.h"
+#include "Group/GroupManager.h"
+#include "Group/GroupEntity.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtGroupProjectionOnPlaneAction.h"
 #include "QtComponents/QtMgx3DApplication.h"
@@ -180,7 +181,7 @@ vector<Entity*> QtGroupProjectionOnPlanePanel::getInvolvedEntities ( )
 	const string		groupName	= getGroupName ( );
 	if (false == groupName.empty ( ))
 	{
-		Group2D*	group	= getContext ( ).getGroupManager ( ).getGroup2D (groupName, false);
+		Group2D*	group	= getContext ( ).getGroupManager ( ).getGroup<Group::Group2D> (groupName, false);
 		if (0 != group)
 			entities.push_back (group);
 	}	// if (false == groupName.empty ( ))

@@ -1,4 +1,3 @@
-/*----------------------------------------------------------------------------*/
 #ifndef TOPO_COFACE_H_
 #define TOPO_COFACE_H_
 /*----------------------------------------------------------------------------*/
@@ -35,6 +34,8 @@ class CoFace : public TopoEntity {
     static const char* typeNameTopoCoFace;
 
 public:
+    void accept(ConstTopoEntityVisitor& v) const override{ v.visit(this); }
+    void accept(TopoEntityVisitor& v) override { v.visit(this); }
 
     /// identification des arêtes pour le cas structuré
     enum eEdgeOnCoFace {i_min = 0, j_min, i_max, j_max};
@@ -94,43 +95,19 @@ public:
 
     /*------------------------------------------------------------------------*/
     /// ajoute une relation vers une face
-
-    virtual void addFace(Face* f) {m_topo_property->getFaceContainer().add(f);}
-
+    void add(Face* f);
 
     /// enlève une relation vers une face
-
-    virtual void removeFace(Face* f, const bool exceptionIfNotFound=true)
-    {m_topo_property->getFaceContainer().remove(f, exceptionIfNotFound);}
-
-
-    /** \brief  Fournit l'accès aux faces topologiques qui référencent cette face commune
-     *
-     *  \param faces les faces incidentes
-     */
-
-    void getFaces(std::vector<Face* >& faces) const
-    {m_topo_property->getFaceContainer().get(faces);}
-
+    void remove(Face* f);
 
     /** \brief  Fournit l'accès aux faces topologiques incidentes sans copie
      */
-   const std::vector<Face* > getFaces() const
-    {return m_topo_property->getFaceContainer().get();}
-
-    uint getNbFaces() const
-    { return m_topo_property->getFaceContainer().getNb(); }
-
-    Face* getFace(uint ind) const
-    { return m_topo_property->getFaceContainer().get(ind); }
-
+    const std::vector<Face* > getFaces() const
+    {return m_topo_property->getFaceContainer();}
 
     /*------------------------------------------------------------------------*/
     /** Constitue la liste des Blocs adjacents */
-    void getBlocks(std::vector<Block* >& blocks) const;
-
-    /** Retourne la taille de la liste des Blocs adjacents (en général soit 0 pour le 2D, soit 1, soit 2 pour les cofaces entres 2 blocs) */
-    uint getNbBlocks() const;
+    std::vector<Block* > getBlocks() const;
 
     /** Renseigne sur le bloc adjacent à la face et la position de cette face par rapport au bloc (structuré) */
     TkUtil::UTF8String getInfoBlock() const;
@@ -213,84 +190,28 @@ public:
             double& ratio,
             Internal::InfoCommand* icmd);
 
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux sommets topologiques incidents
-     *
-     *  \param vertices les sommets incidents
-     */
-    void getVertices(std::vector<Topo::Vertex* >& vertices) const
-    {m_topo_property->getVertexContainer().get(vertices);}
-
     /** Fournit l'accès aux sommets topologiques incidents sans copie
      */
     const std::vector<Topo::Vertex* >& getVertices() const
-    {return m_topo_property->getVertexContainer().get();}
-
-    /// fournit l'accès à l'un des sommets
-    Topo::Vertex* getVertex(uint ind) const
-    {return m_topo_property->getVertexContainer().get(ind);}
-
-    /// retourne le nombre de sommets
-    uint getNbVertices() const;
-
-    /// retourne l'indice d'un sommet
-    uint getIndex(Topo::Vertex* v)
-    {return m_topo_property->getVertexContainer().getIndex(v);}
-
-    /// vérifie si cette face commune contient ou non ce sommet
-     bool find(Topo::Vertex* v) const
-     {return m_topo_property->getVertexContainer().find(v);}
+    {return m_topo_property->getVertexContainer();}
 
      /// accès à tous les sommets y compris ceux internes aux Edges
-     void getAllVertices(std::vector<Topo::Vertex* >& vertices, const bool unique=true) const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux arêtes topologiques incidentes avec copie
-     *
-     *  \param edges les arêtes incidentes
-     */
-
-    void getEdges(std::vector<Edge* >& edges) const
-       {m_topo_property->getEdgeContainer().get(edges);}
-
+     std::vector<Topo::Vertex* > getAllVertices() const;
 
     /// Fournit l'accès aux arêtes topologiques qui utilisent cette CoEdge sans copie
-
     const std::vector<Edge* > & getEdges() const
-    {return m_topo_property->getEdgeContainer().get();}
+    {return m_topo_property->getEdgeContainer();}
 
-
-    /// fournit l'accès à l'une des arêtes
-
-    Edge* getEdge(uint ind) const
-       {return m_topo_property->getEdgeContainer().get(ind);}
-
-
-    /// retourne le nombre d'arêtes
-
-    uint getNbEdges() const {return m_topo_property->getEdgeContainer().getNb();}
-
-
-    /// retourne l'indice d'une arête
-
-    uint getIndex(Edge* e) const
-    {return m_topo_property->getEdgeContainer().getIndex(e);}
-
+    /// ajoute une relation vers une arête
+    void add(Edge* e);
 
     /// enlève une relation vers une arête
-
-    void removeEdge(Edge* e, const bool exceptionIfNotFound=true)
-    {m_topo_property->getEdgeContainer().remove(e, exceptionIfNotFound);}
-
+    void remove(Edge* e);
 
     /// accès à l'une des arêtes suivant 2 sommets
-
     Edge* getEdge(Topo::Vertex* v1, Topo::Vertex* v2) const;
 
-
     /// retourne l'arête contenant une arête commune, lève une exception en cas d'erreur
-
     Edge* getEdgeContaining(const CoEdge* coedge) const;
 
 
@@ -298,8 +219,7 @@ public:
     bool hasHole() { return m_topo_property->hasHole();}
 
     /// retourne l'indice du côté contenant une arête commune
-    uint getIndex(CoEdge* coedge) const
-    { return getIndex(getEdgeContaining(coedge)); }
+    uint getIndex(CoEdge* coedge) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès à l'arête topologiques opposé à une arête
@@ -309,8 +229,6 @@ public:
      */
 
     Edge* getOppositeEdge(Edge* e) const;
-
-
 
     /*------------------------------------------------------------------------*/
     /** \brief  Retourne l'arête commune qui fait face à une arête donnée.
@@ -476,7 +394,7 @@ public:
 
 
     /// retourne l'ensemble des arêtes communes toute directions confondues
-    void getCoEdges(std::vector<CoEdge* >& coedges, bool unique = true) const;
+    std::vector<CoEdge* > getCoEdges(bool unique=true) const;
 
     /*------------------------------------------------------------------------*/
     /** Retrouve la direction dans une coface structurée à partir de 2 sommets
@@ -633,7 +551,7 @@ public:
 
 
     /// Accesseur sur la liste de noms de groupes
-    virtual void getGroupsName (std::vector<std::string>& gn, bool byGeom=true, bool byTopo=true) const;
+    virtual void getGroupsName (std::vector<std::string>& gn) const;
     void add(Group::Group2D* grp);
     void remove(Group::Group2D* grp);
     int getNbGroups() const;

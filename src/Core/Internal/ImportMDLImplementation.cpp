@@ -16,9 +16,7 @@
 #include "Topo/CoFace.h"
 #include "Topo/TopoHelper.h"
 #include "Group/GroupManager.h"
-#include "Group/Group2D.h"
-#include "Group/Group1D.h"
-#include "Group/Group0D.h"
+#include "Group/GroupEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/TraceLog.h>
@@ -115,6 +113,7 @@ void ImportMDLImplementation::performGeom(Internal::InfoCommand* icmd)
     bool isFiltered = getFilter(filter);
 
     // les surfaces
+    Group::GroupManager& gm = m_context.getGroupManager();
     for (std::vector<const T_MdlCommand*>::const_iterator iter = m_vCmdArea.begin(); iter!=m_vCmdArea.end(); ++iter){
         const T_MdlCommand& current_command = **iter;
 
@@ -139,25 +138,24 @@ void ImportMDLImplementation::performGeom(Internal::InfoCommand* icmd)
                     	id_grp++;
                     	if (!m_prefixName.empty())
                     		name = m_prefixName + name;
-                        Group::Group1D* group = m_context.getGroupManager().getNewGroup1D(name, icmd);
+                        Group::Group1D* group = gm.getNewGroup<Group::Group1D>(name, icmd);
                         if (id_grp == 1)
                         	group->setLevel(2);
                         else
                         	group->setLevel(3);
                         if (!group->find(crv)){
                 			// il faut peut-être enlever le groupe par défaut
-                			if (crv->getNbGroups() == 1){
-                				std::vector<std::string> gn;
-                				crv->getGroupsName(gn);
-                				if (gn[0] == m_context.getGroupManager().getDefaultName(1)){
-                					Group::Group1D* grp = m_context.getGroupManager().getGroup1D(gn[0], icmd);
+                            std::vector<Group::GroupEntity*> crv_groups = gm.getGroupsFor(crv);
+                			if (crv_groups.size() == 1){
+                                Group::GroupEntity* grp = crv_groups[0];
+                				if (grp->getName() == gm.getDefaultName(1)){
+                                    gm.removeGroupFor(crv, grp);
                 					grp->remove(crv);
-                					crv->remove(grp);
-                					icmd->addGroupInfoEntity(grp,Internal::InfoCommand::DISPMODIFIED);
+                					icmd->addGroupInfoEntity(grp, Internal::InfoCommand::DISPMODIFIED);
                 				}
                 			}
 
-                            crv->add(group);
+                            gm.addGroupFor(crv, group);
                             group->add(crv);
                        }
                     }
@@ -199,12 +197,12 @@ void ImportMDLImplementation::performGeom(Internal::InfoCommand* icmd)
                     id_grp++;
                 	if (!m_prefixName.empty())
                 		name = m_prefixName + name;
-                    Group::Group2D* group = m_context.getGroupManager().getNewGroup2D(name, icmd);
+                    Group::Group2D* group = gm.getNewGroup<Group::Group2D>(name, icmd);
                     if (id_grp == 1)
                     	group->setLevel(2);
                     else
                     	group->setLevel(3);
-                    surf->add(group);
+                    gm.addGroupFor(surf, group);
                     group->add(surf);
                 }
             }
@@ -217,9 +215,9 @@ void ImportMDLImplementation::performGeom(Internal::InfoCommand* icmd)
             std::string nomDef = current_command.name.str();
         	if (!m_prefixName.empty())
         		nomDef = m_prefixName + nomDef;
-            Group::Group2D* group = m_context.getGroupManager().getNewGroup2D(nomDef, icmd);
+            Group::Group2D* group = gm.getNewGroup<Group::Group2D>(nomDef, icmd);
             group->setLevel(1);
-            surf->add(group);
+            gm.addGroupFor(surf, group);
             group->add(surf);
         }
 
@@ -248,12 +246,12 @@ void ImportMDLImplementation::performGeom(Internal::InfoCommand* icmd)
                                 id_grp++;
                                 if (!m_prefixName.empty())
                                     name = m_prefixName + name;
-                                Group::Group0D* group = m_context.getGroupManager().getNewGroup0D(name, icmd);
+                                Group::Group0D* group = gm.getNewGroup<Group::Group0D>(name, icmd);
                                 if (id_grp == 1)
                                     group->setLevel(2);
                                 else
                                     group->setLevel(3);
-                                v->add(group);
+                                gm.addGroupFor(v, group);
                                 group->add(v);
                             }
                         }
@@ -594,14 +592,15 @@ MAJInterpolated(std::vector<Topo::CoEdge*>& coedges, Topo::CoFace* coface)
 Geom::Vertex* ImportMDLImplementation::getVertex(uint ptId)
 {
     Geom::Vertex* vtx = m_cor_ptId_vertex[ptId];
+    Group::GroupManager& gm = m_context.getGroupManager();
 
     if (!vtx){
         const T_MdlCommand& command_pt = *m_vCmdPt[ptId];
         vtx = Geom::EntityFactory(m_context).newVertex(Utils::Math::Point(command_pt.u.point.cd.x1,command_pt.u.point.cd.x2, 0.0)*m_scale_factor);
         m_newGeomEntities.push_back(vtx);
         m_cor_ptId_vertex[ptId] = vtx;
-        Group::Group0D* group = m_context.getGroupManager().getNewGroup0D("", m_icmd);
-        vtx->add(group);
+        Group::Group0D* group = gm.getNewGroup<Group::Group0D>("", m_icmd);
+        gm.addGroupFor(vtx, group);
         group->add(vtx);
     }
 
@@ -621,6 +620,7 @@ Geom::Vertex* ImportMDLImplementation::getVertex(uint ptId)
 Geom::Curve* ImportMDLImplementation::getCurve(const std::string name)
 {
     Geom::Curve* crv = m_cor_name_curve[name];
+    Group::GroupManager& gm = m_context.getGroupManager();
 
     if (!crv){
         T_MdlCommand* ptr_current_command = m_cor_name_mdlCmd[name];
@@ -755,9 +755,9 @@ Geom::Curve* ImportMDLImplementation::getCurve(const std::string name)
                 m_newGeomEntities.push_back(vtx1);
                 m_newGeomEntities.push_back(vtx2);
 
-                Group::Group0D* group = m_context.getGroupManager().getNewGroup0D("", m_icmd);
-                vtx1->add(group);
-                vtx2->add(group);
+                Group::Group0D* group = gm.getNewGroup<Group::Group0D>("", m_icmd);
+                gm.addGroupFor(vtx1, group);
+                gm.addGroupFor(vtx2, group);
                 group->add(vtx1);
                 group->add(vtx2);
 
@@ -775,8 +775,8 @@ Geom::Curve* ImportMDLImplementation::getCurve(const std::string name)
             	m_newGeomEntities.push_back(crv);
             	m_cor_name_curve[name] = crv;
 
-            	Group::Group1D* group = m_context.getGroupManager().getNewGroup1D("", m_icmd);
-            	crv->add(group);
+            	Group::Group1D* group = gm.getNewGroup<Group::Group1D>("", m_icmd);
+                gm.addGroupFor(crv, group);
             	group->add(crv);
             }
         }
@@ -1089,12 +1089,7 @@ dupVertexNonConformalRelation(std::vector<Topo::CoFace* >& cofaces)
         Topo::CoFace* coface = *iter1;
         num_groupe = filtre_coface[coface];
 
-        std::vector<Topo::CoEdge* > coedges;
-        coface->getCoEdges(coedges);
-
-        for (std::vector<Topo::CoEdge* >::iterator iter2 = coedges.begin();
-                iter2 != coedges.end(); ++iter2){
-            Topo::CoEdge* coedge = *iter2;
+        for (Topo::CoEdge* coedge : coface->getCoEdges()){
             filtre_coedge[coedge] = num_groupe;
 
             const std::vector<Topo::Vertex* > & vertices = coedge->getVertices();
@@ -1126,18 +1121,13 @@ dupVertexNonConformalRelation(std::vector<Topo::CoFace* >& cofaces)
             iter1 != verticesToDup.end(); ++iter1){
         Topo::Vertex* vertex = *iter1;
 
-        std::vector<Topo::CoEdge* > coedges;
-        vertex->getCoEdges(coedges);
-
         // correspondance entre le groupe et le sommet par lequel on remplace le sommet à dupliquer
         std::map<uint, Topo::Vertex*> cor_grp_vtx;
         // on garde le sommet originel pour l'un des groupes (celui du filtre par ex)
         cor_grp_vtx[filtre_vertex[vertex]] = vertex;
 
         // les groupes auquels appartient ce sommet
-        for (std::vector<Topo::CoEdge* >::iterator iter2 = coedges.begin();
-                iter2 != coedges.end(); ++iter2){
-            Topo::CoEdge* coedge = *iter2;
+        for (Topo::CoEdge* coedge : vertex->getCoEdges()){
             Topo::Vertex* newVtx = cor_grp_vtx[filtre_coedge[coedge]];
             if (newVtx == 0){
                 newVtx = vertex->clone();

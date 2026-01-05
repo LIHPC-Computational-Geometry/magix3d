@@ -173,16 +173,6 @@ void CommandScaling::internalSpecificPreExecute() {
 	m_impl->prePerform();
 }
 /*----------------------------------------------------------------------------*/
-void CommandScaling::internalSpecificUndo()
-{
-    m_impl->performUndo();
-}
-/*----------------------------------------------------------------------------*/
-void CommandScaling::internalSpecificRedo()
-{
-    m_impl->performRedo();
-}
-/*----------------------------------------------------------------------------*/
 } // end namespace Geom
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D

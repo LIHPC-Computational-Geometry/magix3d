@@ -1,17 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/** \file TopoEntity.h
- *
- *  \author Eric Brière de l'Isle
- *
- *  \date 18 nov. 2010
- */
-/*----------------------------------------------------------------------------*/
 #ifndef MGX3D_GEOM_TOPOENTITY_H_
 #define MGX3D_GEOM_TOPOENTITY_H_
 /*----------------------------------------------------------------------------*/
 #include "Internal/InternalEntity.h"
 #include "Topo/TopoProperty.h"
 #include "Topo/TopoInfo.h"
+#include "Topo/TopoEntityVisitor.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -51,6 +45,9 @@ protected:
             Utils::DisplayProperties* disp);
 
 public:
+    virtual void accept(ConstTopoEntityVisitor& visitor) const = 0 ;
+    virtual void accept(TopoEntityVisitor& visitor) = 0 ;
+
     /*------------------------------------------------------------------------*/
     /** \brief   Destructeur
      */
@@ -64,12 +61,6 @@ public:
 #ifndef SWIG
 	virtual void getBounds (double bounds[6]) const;
 #endif	// SWIG
-
-    /*------------------------------------------------------------------------*/
-	/// accès à tous les sommets y compris ceux internes
-#ifndef SWIG
-	virtual void getAllVertices(std::vector<Topo::Vertex* >& vertices, const bool unique=true) const;
-#endif  // SWIG
 
 	/*------------------------------------------------------------------------*/
     /** \brief   détruit l'objet (mais pas ses dépendances !)
@@ -108,7 +99,7 @@ public:
 
       /*------------------------------------------------------------------------*/
     /// Accesseur sur la liste de noms de groupes
-    virtual void getGroupsName (std::vector<std::string>& gn, bool byGeom, bool byTopo) const;
+    virtual void getGroupsName (std::vector<std::string>& gn) const;
 
     /*------------------------------------------------------------------------*/
     /** Duplique le TopoProperty pour en conserver une copie

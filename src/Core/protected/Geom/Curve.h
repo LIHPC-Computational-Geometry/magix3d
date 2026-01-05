@@ -6,7 +6,6 @@
 #include <sys/types.h>		// CP : uint sur Bull
 /*----------------------------------------------------------------------------*/
 #include "Geom/GeomEntity.h"
-#include "Geom/GeomProperty.h"
 #include "Services/MementoService.h"
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
@@ -15,13 +14,7 @@
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
-namespace Group {
-class Group1D;
-}
-/*----------------------------------------------------------------------------*/
 namespace Geom {
-
-class GeomProperty;
 /*----------------------------------------------------------------------------*/
 /**
  * \class Curve
@@ -31,7 +24,6 @@ class GeomProperty;
 class Curve: public GeomEntity {
 
     friend class Services::MementoService;
-    static const char* typeNameGeomCurve;
 
 public:
 
@@ -61,34 +53,34 @@ public:
 
     const std::vector<TopoDS_Edge>& getOCCEdges() const { return m_occ_edges; }
 
-    virtual void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const;
-    virtual void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda);
-    virtual void accept(ConstGeomEntityVisitor& v) const { v.visit(this); }
-    virtual void accept(GeomEntityVisitor& v) { v.visit(this); }
+    void apply(std::function<void(const TopoDS_Shape&)> const& lambda) const override;
+    void applyAndReturn(std::function<TopoDS_Shape(const TopoDS_Shape&)> const& lambda) override;
+    void accept(ConstGeomEntityVisitor& v) const override{ v.visit(this); }
+    void accept(GeomEntityVisitor& v) override { v.visit(this); }
 
     /*------------------------------------------------------------------------*/
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
      *          courant.
      */
-    virtual GeomEntity* clone(Internal::Context&);
+    GeomEntity* clone(Internal::Context&) override;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur
      */
     virtual ~Curve() = default;
 
-    virtual bool isEqual(Geom::Curve* curve);
+    bool isEqual(Geom::Curve* curve);
 
     /*------------------------------------------------------------------------*/
     /** \brief  retourne la dimension de l'entité géométrique
      */
-    virtual int getDim() const {return 1;}
+    int getDim() const override { return 1; }
 
     /*------------------------------------------------------------------------*/
     /** \brief  Calcule l'aire d'une entité:  Pour une courbe, c'est la
      *          longueur, pour une surface, l'aire, pour un volume le volume.
      */
-    virtual double computeArea() const;
+    double computeArea() const override;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Calcul de la boite englobante orientée selon les axes Ox,Oy,Oz
@@ -96,7 +88,7 @@ public:
      *  \param pmin Les coordonnées min de la boite englobante
      *  \param pmax Les coordonnées max de la boite englobante
      */
-    virtual void computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const;
+    void computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& pmax) const override;
 
     /*------------------------------------------------------------------------*/
     /** \brief Donne le point en fonction du paramètre sur la courbe
@@ -180,7 +172,7 @@ public:
      *
      *  \param v un pointeur sur un sommet
      */
-    void add (Vertex* v);
+    void add(Vertex* v);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Supprime s de la liste des surfaces incidentes. Si s n'apparait
@@ -204,23 +196,18 @@ public:
      *
      *  \param liste d'entity
      */
-    virtual void addAllDownLevelEntity(std::list<GeomEntity*>& l_entity) const;
+    void addAllDownLevelEntity(std::list<GeomEntity*>& l_entity) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief   retourne un point sur l'objet au centre si possible
      * \author Eric Brière de l'Isle
      */
-    virtual Utils::Math::Point getCenteredPosition() const;
-
-    /*------------------------------------------------------------------------*/
-    /** \brief Donne le nom du type d'objet (un nom distinct par type d'objet)
-     */
-    virtual std::string getTypeName() const {return typeNameGeomCurve;}
+    Utils::Math::Point getCenteredPosition() const override;
 
     /*------------------------------------------------------------------------*/
     /** \brief Donne le type de l'objet
      */
-    virtual Utils::Entity::objectType getType() const {return Utils::Entity::GeomCurve;}
+    Utils::Entity::objectType getType() const override { return Utils::Entity::GeomCurve; }
 
     /*------------------------------------------------------------------------*/
    /** \brief Donne le nom court du type d'objet (pour le nommage des entités)
@@ -233,29 +220,6 @@ public:
     static bool isA(const std::string& name);
 
     /*------------------------------------------------------------------------*/
-    /** Ajoute le groupe parmis ceux auxquels appartient la courbe */
-    void add(Group::Group1D* grp);
-
-    /** Retire le groupe parmis ceux auxquels appartient la courbe */
-    void remove(Group::Group1D* grp);
-
-    /** Recherche le groupe parmis ceux auxquels appartient la courbe
-     * return vrai si trouvé */
-    bool find(Group::Group1D* grp);
-
-    /// Retourne les noms des groupes auxquels appartient cette entité
-    virtual void getGroupsName (std::vector<std::string>& gn) const;
-
-    /// Retourne la liste des groupes auxquels appartient cette entité
-    virtual void getGroups(std::vector<Group::GroupEntity*>& grp) const;
-
-    /// Retourne la liste des groupes auxquels appartient cette entité
-    virtual const std::vector<Group::Group1D*>& getGroups() const {return m_groups;}
-
-    /// Retourne le nombre de groupes
-    virtual int getNbGroups() const;
-
-    /*------------------------------------------------------------------------*/
     /** \brief  Return the surfaces incident to this curve
      */
     const std::vector<Surface*>& getSurfaces() const { return m_surfaces; }
@@ -264,11 +228,6 @@ public:
     /** \brief  Return the vertices incident to this curve
      */
     const std::vector<Vertex*>& getVertices() const { return m_vertices; }
-    
-    /*------------------------------------------------------------------------*/
-    /** \brief   détruit l'objet
-     */
-    virtual void setDestroyed(bool b);
 
     /*------------------------------------------------------------------------*/
     /** \brief   indique si la courbe est un segment ou pas
@@ -293,8 +252,6 @@ public:
 private:
     std::vector<Surface*> m_surfaces;
     std::vector<Vertex*> m_vertices;
-    /// Listes des groupes 1D auxquels appartient cette courbe
-    std::vector<Group::Group1D*> m_groups;
     /// représentation open cascade
     std::vector<TopoDS_Edge> m_occ_edges;
 };

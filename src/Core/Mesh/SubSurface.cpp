@@ -73,19 +73,12 @@ Utils::SerializedRepresentation* SubSurface::getDescription (bool alsoComputed) 
 	return description.release ( );
 }
 /*----------------------------------------------------------------------------*/
-bool SubSurface::isA(std::string& name)
-{
-    MGX_NOT_YET_IMPLEMENTED("Il n'est pas prévu de faire un tel test");
-//    return (name.compare(0,strlen(typeNameMeshSubSurface),typeNameMeshSubSurface) == 0);
-    return false;
-}
-/*----------------------------------------------------------------------------*/
-void SubSurface::addFace(gmds::Face face)
+void SubSurface::add(gmds::Face face)
 {
 	m_poly.push_back(face);
 }
 /*----------------------------------------------------------------------------*/
-void SubSurface::addFace(std::vector<gmds::Face> faces)
+void SubSurface::add(std::vector<gmds::Face> faces)
 {
 	m_poly.insert(m_poly.end(), faces.begin(), faces.end());
 }

@@ -5,7 +5,7 @@
  */
 
 #include "Internal/Context.h"
-
+#include "Group/GroupManager.h"
 #include "Utils/Command.h"
 #include "Utils/Magix3DEvents.h"
 #include "Utils/Point.h"
@@ -5274,31 +5274,23 @@ log (t5);
 
 	if (update0D)
 	{
-		std::vector<Topo::Vertex* >	vertices;
-		getContext ( ).getTopoManager ( ).getVertices (vertices);
-		for (std::vector<Topo::Vertex*>::iterator itv = vertices.begin ( ); vertices.end ( ) != itv; itv++)
-			(*itv)->updateDisplayPropertiesColor ( );
+		for (Topo::Vertex* v : getContext ( ).getTopoManager ( ).getVerticesObj ( ))
+			v->updateDisplayPropertiesColor ( );
 	}	// if (true == update0D)
 	if (update1D)
 	{
-		std::vector<Topo::CoEdge*>	edges;
-		getContext ( ).getTopoManager ( ).getCoEdges (edges);
-		for (std::vector<Topo::CoEdge*>::iterator ite = edges.begin ( ); edges.end ( ) != ite; ite++)
-			(*ite)->updateDisplayPropertiesColor ( );
+		for (Topo::CoEdge* ce : getContext ( ).getTopoManager ( ).getCoEdgesObj ( ))
+			ce->updateDisplayPropertiesColor ( );
 	}	// if (true == update1D)
 	if (update2D)
 	{
-		std::vector<Topo::CoFace*>	faces;
-		getContext ( ).getTopoManager ( ).getCoFaces (faces);
-		for (std::vector<Topo::CoFace*>::iterator itf = faces.begin ( ); faces.end ( ) != itf; itf++)
-			(*itf)->updateDisplayPropertiesColor ( );
+		for (Topo::CoFace* cf : getContext ( ).getTopoManager ( ).getCoFacesObj ( ))
+			cf->updateDisplayPropertiesColor ( );
 	}	// if (true == update2D)
 	if (update3D)
 	{
-		std::vector<Topo::Block* >	blocks;
-		getContext ( ).getTopoManager ( ).getBlocks (blocks);
-		for (std::vector<Topo::Block*>::iterator itb = blocks.begin ( ); blocks.end ( ) != itb; itb++)
-			(*itb)->updateDisplayPropertiesColor ( );
+		for (Topo::Block* b : getContext ( ).getTopoManager ( ).getBlocksObj ( ))
+			b->updateDisplayPropertiesColor ( );
 	}	// if (true == update3D)
 	if (updateAll || update0D || update1D || update2D || update3D)
 		getGraphicalWidget ( ).getRenderingManager ( ).updateRepresentations ( );

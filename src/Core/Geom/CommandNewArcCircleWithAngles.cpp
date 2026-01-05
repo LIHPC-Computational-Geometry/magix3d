@@ -1,6 +1,7 @@
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandNewArcCircleWithAngles.h"
 #include "Geom/EntityFactory.h"
+#include "SysCoord/SysCoord.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>

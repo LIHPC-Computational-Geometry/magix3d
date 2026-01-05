@@ -5,15 +5,10 @@
  */
 
 #include "Internal/Context.h"
-
 #include "Utils/Common.h"
-#include "QtComponents/QtMgx3DGroupNamePanel.h"
-
-#include "Group/Group0D.h"
-#include "Group/Group1D.h"
-#include "Group/Group2D.h"
-#include "Group/Group3D.h"
 #include "Group/GroupManager.h"
+#include "Group/GroupEntity.h"
+#include "QtComponents/QtMgx3DGroupNamePanel.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/UTF8String.h>
@@ -227,48 +222,9 @@ void QtMgx3DGroupNamePanel::getGroupNames (vector< string >& names)
 	names.clear ( );
 
 	GroupManager&	groupManager	= _mainWindow->getContext ( ).getGroupManager ( );
-
-	switch (getDimension ( ))
-	{
-		case 0	:
-		{
-			vector<Group0D*>	groups;
-			groupManager.getGroup0D (groups, true);
-			for (vector<Group0D*>::const_iterator it = groups.begin ( ); groups.end ( ) != it; it++)
-				names.push_back ((*it)->getName ( ));
-		}
-		break;
-		case 1	:
-		{
-			vector<Group1D*>	groups;
-			groupManager.getGroup1D (groups, true);
-			for (vector<Group1D*>::const_iterator it = groups.begin ( ); groups.end ( ) != it; it++)
-				names.push_back ((*it)->getName ( ));
-		}
-		break;
-		case 2	:
-		{
-			vector<Group2D*>	groups;
-			groupManager.getGroup2D (groups, true);
-			for (vector<Group2D*>::const_iterator it = groups.begin ( ); groups.end ( ) != it; it++)
-				names.push_back ((*it)->getName ( ));
-		}
-		break;
-		case 3	:
-		{
-			vector<Group3D*>	groups;
-			groupManager.getGroup3D (groups, true);
-			for (vector<Group3D*>::const_iterator it = groups.begin ( ); groups.end ( ) != it; it++)
-				names.push_back ((*it)->getName ( ));
-		}
-		break;
-		default	:
-		{
-			UTF8String	error (Charset::UTF_8);
-			error << "QtMgx3DGroupNamePanel::getGroupNames : " << "dimension invalide (" << (long)getDimension ( ) << ").";
-			throw Exception (error);
-		}
-	}	// switch (getDimension ( ))
+	const Internal::SelectionManager::DIM dim = Internal::SelectionManager::dimensionToDimensions(getDimension ( ));
+	for (GroupEntity* g : groupManager.getGroups (dim, true))
+		names.push_back (g->getName ( ));
 }	// QtMgx3DGroupNamePanel::getGroupNames
 
 

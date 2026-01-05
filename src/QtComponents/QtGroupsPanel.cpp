@@ -8,6 +8,8 @@
 
 #include "Utils/Common.h"
 #include "Internal/SelectionManagerDimFilter.h"
+#include "Group/GroupManager.h"
+#include "Group/GroupEntity.h"
 #include "Geom/Volume.h"
 #include "Geom/Surface.h"
 #include "Geom/Curve.h"
@@ -26,11 +28,6 @@
 #include "QtComponents/QtMgx3DApplication.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtExpansionTreeRestorer.h"
-#include "Group/GroupManager.h"
-#include "Group/Group0D.h"
-#include "Group/Group1D.h"
-#include "Group/Group2D.h"
-#include "Group/Group3D.h"
 
 #include <TkUtil/ErrorLog.h>
 #include <TkUtil/InternalError.h>
@@ -743,19 +740,19 @@ void QtGroupsPanel::displaySelectedGroupsNames (bool display)
 
 			std::string nom = (*it)->getGroup ( )->getName();
 
-			GroupEntity* gr0 = getStdContext()->getGroupManager().getGroup0D(nom, false);
+			GroupEntity* gr0 = getStdContext()->getGroupManager().getGroup<Group::Group0D>(nom, false);
 			if (gr0)
 				groups.push_back (gr0);
 
-			GroupEntity* gr1 = getStdContext()->getGroupManager().getGroup1D(nom, false);
+			GroupEntity* gr1 = getStdContext()->getGroupManager().getGroup<Group::Group1D>(nom, false);
 			if (gr1)
 				groups.push_back (gr1);
 
-			GroupEntity* gr2 = getStdContext()->getGroupManager().getGroup2D(nom, false);
+			GroupEntity* gr2 = getStdContext()->getGroupManager().getGroup<Group::Group2D>(nom, false);
 			if (gr2)
 				groups.push_back (gr2);
 
-			GroupEntity* gr3 = getStdContext()->getGroupManager().getGroup3D(nom, false);
+			GroupEntity* gr3 = getStdContext()->getGroupManager().getGroup<Group::Group3D>(nom, false);
 			if (gr3)
 				groups.push_back (gr3);
 
@@ -1916,11 +1913,10 @@ void QtGroupsPanel::levelSelectionCallback ( )
 		_entitiesGroupsWidget->clearSelection ( );
 //		getContext ( ).getSelectionManager ( ).clearSelection();
 
-	const SelectionManager::DIM	dimensions	= dialog.dimensions ( );
-	const set<unsigned long>		levels		= dialog.levels ( );
-	vector<GroupEntity*>			groups;
+	const SelectionManager::DIM	dimensions = dialog.dimensions ( );
+	const set<unsigned long>		levels = dialog.levels ( );
+	vector<GroupEntity*>			groups = getContext ( ).getGroupManager( ).getGroups (dimensions, true);
 //	vector<Entity*>					selection;
-	getContext ( ).getGroupManager( ).getGroups (groups, dimensions, true);
 	for (vector<GroupEntity*>::iterator itg = groups.begin ( ); groups.end ( ) != itg; itg++)
 	{
 		for (set<unsigned long>::const_iterator itl = levels.begin ( ); levels.end ( ) != itl; itl++)
@@ -2049,33 +2045,27 @@ void QtGroupsPanel::selectAllCallback ( )
 		entities.insert(entities.end(), ge.begin(), ge.end());
 	}
 	if (types & FilterEntity::TopoBlock){
-		std::vector<Topo::Block*> te;
-		getContext ( ).getTopoManager().getBlocks(te);
+		std::vector<Topo::Block*> te = getContext ( ).getTopoManager().getBlocksObj();
 		entities.insert(entities.end(), te.begin(), te.end());
 	}
 	if (types & FilterEntity::TopoCoFace){
-		std::vector<Topo::CoFace*> te;
-		getContext ( ).getTopoManager().getCoFaces(te);
+		std::vector<Topo::CoFace*> te = getContext ( ).getTopoManager().getCoFacesObj();
 		entities.insert(entities.end(), te.begin(), te.end());
 	}
 	if (types & FilterEntity::TopoCoEdge){
-		std::vector<Topo::CoEdge*> te;
-		getContext ( ).getTopoManager().getCoEdges(te);
+		std::vector<Topo::CoEdge*> te = getContext ( ).getTopoManager().getCoEdgesObj();
 		entities.insert(entities.end(), te.begin(), te.end());
 	}
 	if (types & FilterEntity::TopoVertex){
-		std::vector<Topo::Vertex*> te;
-		getContext ( ).getTopoManager().getVertices(te);
+		std::vector<Topo::Vertex*> te = getContext ( ).getTopoManager().getVerticesObj();
 		entities.insert(entities.end(), te.begin(), te.end());
 	}
 	if (types & FilterEntity::MeshSurface){
-		std::vector<Mesh::Surface*> ms;
-		getContext ( ).getMeshManager().getSurfaces(ms);
+		std::vector<Mesh::Surface*> ms = getContext ( ).getMeshManager().getSurfacesObj();
 		entities.insert(entities.end(), ms.begin(), ms.end());
 	}
 	if (types & FilterEntity::MeshVolume){
-		std::vector<Mesh::Volume*> me;
-		getContext ( ).getMeshManager().getVolumes(me);
+		std::vector<Mesh::Volume*> me = getContext ( ).getMeshManager().getVolumesObj();
 		entities.insert(entities.end(), me.begin(), me.end());
 	}
 

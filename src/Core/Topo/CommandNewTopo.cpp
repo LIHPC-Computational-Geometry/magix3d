@@ -15,10 +15,8 @@
 #include "Utils/Common.h"
 #include "Internal/ServiceGeomToTopo.h"
 #include "Internal/Context.h"
-#include "Group/Group3D.h"
-#include "Group/Group2D.h"
-#include "Group/Group1D.h"
-#include "Group/Group0D.h"
+#include "Group/GroupManager.h"
+#include "Group/GroupEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
@@ -178,8 +176,7 @@ CommandNewTopo::
             CoEdge* coedge = new CoEdge(getContext(), &emp, v0, v1);
 
 
-            Group::Group1D *group = getContext().getGroupManager().getNewGroup1D(groupName,
-                                                                                      &getInfoCommand());
+            Group::Group1D *group = getContext().getGroupManager().getNewGroup<Group::Group1D>(groupName, &getInfoCommand());
             group->add(coedge);
             coedge->add(group);
             getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
@@ -339,8 +336,7 @@ CommandNewTopo::
 
             Topo::CoFace* face = new CoFace(getContext(), edges, true);
 
-            Group::Group2D *group = getContext().getGroupManager().getNewGroup2D(groupName,
-                                                                                      &getInfoCommand());
+            Group::Group2D *group = getContext().getGroupManager().getNewGroup<Group::Group2D>(groupName, &getInfoCommand());
             group->add(face);
             face->add(group);
             getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
@@ -379,15 +375,10 @@ Topo::CoEdge* CommandNewTopo::getCommonEdge(const Vertex* v1, const Vertex* v2) 
 /*----------------------------------------------------------------------------*/
 Topo::CoFace* CommandNewTopo::getCommonFace(const Vertex* v1, const Vertex* v2, const Vertex* v3, const Vertex* v4) {
 
-    std::vector<CoFace*> v1_cf;
-    std::vector<CoFace*> v2_cf;
-    std::vector<CoFace*> v3_cf;
-    std::vector<CoFace*> v4_cf;
-
-    v1->getCoFaces(v1_cf);
-    v2->getCoFaces(v2_cf);
-    v3->getCoFaces(v3_cf);
-    v4->getCoFaces(v4_cf);
+    std::vector<CoFace*> v1_cf = v1->getCoFaces();
+    std::vector<CoFace*> v2_cf = v2->getCoFaces();
+    std::vector<CoFace*> v3_cf = v3->getCoFaces();
+    std::vector<CoFace*> v4_cf = v4->getCoFaces();
 
     for(auto v1_f : v1_cf){
         for(auto v2_f : v2_cf){

@@ -17,12 +17,12 @@ CommandFuse2Faces(Internal::Context& c, CoFace* face_A, CoFace* face_B)
 , m_face_A(face_A)
 , m_face_B(face_B)
 {
-	if (face_A->getNbBlocks() == 2){
+	if (face_A->getBlocks().size() == 2){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"Fusion de 2 faces impossible avec "<<face_A->getName()<<", cette face est déjà entre 2 blocs";
         throw TkUtil::Exception(message);
 	}
-	if (face_B->getNbBlocks() == 2){
+	if (face_B->getBlocks().size() == 2){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
         message <<"Fusion de 2 faces impossible avec "<<face_B->getName()<<", cette face est déjà entre 2 blocs";
         throw TkUtil::Exception(message);

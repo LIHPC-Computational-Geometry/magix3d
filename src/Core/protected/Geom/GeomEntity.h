@@ -2,7 +2,6 @@
 #define MGX3D_GEOM_GEOMENTITY_H_
 /*----------------------------------------------------------------------------*/
 #include <set>
-#include <vector>
 #include <functional>
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
@@ -13,31 +12,15 @@
 #include "Utils/Point.h"
 #include "Geom/GeomProperty.h"
 #include "Geom/GeomEntityVisitor.h"
-#include "Services/DescriptionService.h"
 /*----------------------------------------------------------------------------*/
 #include <gmds/math/Triangle.h>
-/*----------------------------------------------------------------------------*/
-namespace Mgx3D {
-/*----------------------------------------------------------------------------*/
-namespace Group {
-class GroupEntity;
-}
 /*----------------------------------------------------------------------------*/
 /*!
  * \namespace Mgx3D::Geom
  *
  * \brief Espace de nom des classes associées à la géométrie
- *
- *
  */
-namespace Geom {
-/*----------------------------------------------------------------------------*/
-class Volume;
-class Surface;
-class Curve;
-class Vertex;
-class GeomProperty;
-class MementoEntity;
+namespace Mgx3D::Geom {
 /*----------------------------------------------------------------------------*/
    /** \enum Orientation gives a list of orientation option for geometric
     *        entities.
@@ -56,7 +39,7 @@ class MementoEntity;
  *        sommets, courbes, surfaces et volumes géométriques.
  *
  */
-class GeomEntity : public Internal::InternalEntity{
+class GeomEntity : public Internal::InternalEntity {
 protected:
     /*------------------------------------------------------------------------*/
     /** \brief  Constructeur. Une entité délègue un certain nombre de calculs
@@ -78,9 +61,7 @@ public:
     /** \brief  Crée une copie (avec allocation mémoire, appel à new) de l'objet
      *          courant.
      */
-    virtual GeomEntity* clone(Internal::Context&){
-        throw TkUtil::Exception (TkUtil::UTF8String ("GeomEntity::clone pas implementee.", TkUtil::Charset::UTF_8));
-    };
+    virtual GeomEntity* clone(Internal::Context&) = 0;
 
     /*------------------------------------------------------------------------*/
     /** \brief   Destructeur
@@ -104,7 +85,7 @@ public:
     /** \brief  Calcule l'aire d'une entité:  Pour une courbe, c'est la
      *          longueur, pour une surface, l'aire, pour un volume le volume.
      */
-    virtual double computeArea() const =0;
+    virtual double computeArea() const = 0;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Retourne l'aire d'une entité:  Pour une courbe, c'est la
@@ -115,9 +96,7 @@ public:
     /** \brief  Stocke l'aire d'une entité:  Pour une courbe, c'est la
      *          longueur, pour une surface, l'aire, pour un volume le volume.
      */
-    virtual void setArea(double area)
-    {m_computedArea = area;}
-
+    void setArea(double area) { m_computedArea = area; }
     void forceComputeArea() { m_computedAreaIsUpToDate = false; }
 
     /*------------------------------------------------------------------------*/
@@ -132,7 +111,7 @@ public:
     /** \brief   retourne un point sur l'objet au centre si possible
      * \author Eric Brière de l'Isle
      */
-    virtual Utils::Math::Point getCenteredPosition() const =0;
+    virtual Utils::Math::Point getCenteredPosition() const = 0;
 
     /*------------------------------------------------------------------------*/
     /** \brief  Fournit l'accès à la propriété de l'entité géométrique
@@ -152,8 +131,7 @@ public:
      *  \param  dr la représentation que l'on demande à afficher
      *  \param	Lève une exception si checkDestroyed vaut true
      */
-    virtual void getRepresentation(
-			Mgx3D::Utils::DisplayRepresentation& dr, bool checkDestroyed) const;
+    virtual void getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const;
 
    	/*------------------------------------------------------------------------*/
 	/** \brief	Fournit une représentation textuelle de l'entité.
@@ -162,17 +140,18 @@ public:
 	 * 			optimisation)
 	 * \return	Description, à détruire par l'appelant.
 	 */
-    virtual Mgx3D::Utils::SerializedRepresentation* getDescription (bool alsoComputed) const;
+    virtual Utils::SerializedRepresentation* getDescription (bool alsoComputed) const;
 
     /*------------------------------------------------------------------------*/
-    /// Retourne les noms des groupes auxquels appartient cette entité
-    virtual void getGroupsName (std::vector<std::string>& gn) const;
+    /** \brief   détruit l'objet
+     */
+    virtual void setDestroyed(bool b);
 
-    /// Retourne la liste des groupes auxquels appartient cette entité
-    virtual void getGroups(std::vector<Group::GroupEntity*>& grp) const;
-
-    /// Retourne le nombre de groupes
-    virtual int getNbGroups() const;
+    /*------------------------------------------------------------------------*/
+    /** \brief Donne le nom du type d'objet (un nom distinct par type d'objet)
+     *
+     */
+    std::string getTypeName() const override { return objectTypeToObjectTypeName(getType()); }
 
 private:
     /// Propriétés géométriques (qui peut être spécifique, PropertyBox par exemple)
@@ -183,12 +162,8 @@ private:
 
     /// résultat de la commande computeArea, qui peut être longue
     mutable double m_computedArea;
-
 };
 /*----------------------------------------------------------------------------*/
-} // end namespace Geom
-/*----------------------------------------------------------------------------*/
-} // end namespace Mgx3D
+} // end namespace Mgx3D::Geom
 /*----------------------------------------------------------------------------*/
 #endif /* MGX3D_GEOM_GEOMENTITY_H_ */
-/*----------------------------------------------------------------------------*/

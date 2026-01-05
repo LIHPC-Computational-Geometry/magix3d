@@ -11,11 +11,11 @@
 #define COMMANDCREATEMESH_H_
 /*----------------------------------------------------------------------------*/
 #include "Internal/MultiTaskedCommand.h"
-#include "Utils/Container.h"
 #include "Mesh/Cloud.h"
 #include "Mesh/Line.h"
 #include "Mesh/Surface.h"
 #include "Mesh/Volume.h"
+#include "Mesh/MeshManager.h"
 /*----------------------------------------------------------------------------*/
 #include <gmds/ig/Mesh.h>
 /*----------------------------------------------------------------------------*/
@@ -81,13 +81,13 @@ public:
 
     /*------------------------------------------------------------------------*/
     /// Accesseur sur les noms des nuages créés par la commande
-    const std::vector<Cloud*>& createdClouds () const {return m_created_clouds.get();}
+    const std::vector<Cloud*>& createdClouds () const {return m_created_clouds;}
 
     /// Accesseur sur les noms des surfaces de maillage créés par la commande
-    const std::vector<Surface*>& createdSurfaces () const {return  m_created_surfaces.get();}
+    const std::vector<Surface*>& createdSurfaces () const {return  m_created_surfaces;}
 
     /// Accesseur sur les noms des volumes de maillage créés par la commande
-    const std::vector<Volume*>& createdVolumes () const {return  m_created_volumes.get();}
+    const std::vector<Volume*>& createdVolumes () const {return  m_created_volumes;}
 
     /*------------------------------------------------------------------------*/
     /// Ajoute au vecteur le noeud créé par la commande, suivant la strategie
@@ -311,16 +311,16 @@ protected:
 
 
     /// stockage des nuages créés par la commande
-    Utils::Container<Cloud> m_created_clouds;
+    std::vector<Cloud*> m_created_clouds;
 
     /// stockage des lignes créées par la commande
-    Utils::Container<Line> m_created_lines;
+    std::vector<Line*> m_created_lines;
 
     /// stockage des surfaces de maillage créés par la commande
-    Utils::Container<Surface> m_created_surfaces;
+    std::vector<Surface*> m_created_surfaces;
 
     /// stockage des volumes de maillage créés par la commande
-    Utils::Container<Volume> m_created_volumes;
+    std::vector<Volume*> m_created_volumes;
 
 
     /// Strategie de stockage pour cette commande

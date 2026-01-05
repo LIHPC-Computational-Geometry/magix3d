@@ -7,12 +7,12 @@
 #include "Internal/Context.h"
 
 #include "Utils/Common.h"
+#include "Topo/CommandSplitBlocks.h"
+#include "Topo/TopoDisplayRepresentation.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtNumericFieldsFactory.h"
 #include "QtComponents/QtTopologySplitBlockAction.h"
-#include "Topo/CommandSplitBlocks.h"
-#include "Topo/TopoDisplayRepresentation.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>
@@ -274,11 +274,8 @@ vector<string> QtTopologySplitBlockPanel::getBlocksNames ( ) const
 	CHECK_NULL_PTR_ERROR (_blocksPanel)
 	if (true == allBlocks ( ))
 	{
-		vector<Block*>	blocks;
-		getContext ( ).getTopoManager ( ).getBlocks (blocks);
-		for (vector<Block*>::iterator	it	= blocks.begin ( );
-		     blocks.end ( ) != it; it++)
-			names.push_back ((*it)->getUniqueName ( ));
+		for (Block* b : getContext ( ).getTopoManager ( ).getBlocksObj ())
+			names.push_back (b->getUniqueName ( ));
 	}	// if (true == allBlocks ( ))
 	else
 		names	= _blocksPanel->getUniqueNames ( );
@@ -429,20 +426,15 @@ vector<Entity*> QtTopologySplitBlockPanel::getInvolvedEntities ( )
 
 	if (true == allBlocks ( ))
 	{
-		vector<Block*>	blocks;
-		getContext ( ).getTopoManager ( ).getBlocks (blocks);
-		for (vector<Block*>::iterator	it	= blocks.begin ( );
-		     blocks.end ( ) != it; it++)
-			entities.push_back (*it);
+		for (Block* b : getContext ( ).getTopoManager ( ).getBlocksObj ( ))
+			entities.push_back (b);
 	}	// if (true == allBlocks ( ))
 	else
 	{
-		const vector<string>	blocksNames	= getBlocksNames ( );
-		for (vector<string>::const_iterator it = blocksNames.begin ( );
-		     blocksNames.end ( ) != it; it++)
+		for (string name : getBlocksNames ( ))
 		{
 			TopoEntity*	te	=
-				getContext( ).getTopoManager( ).getBlock(*it, false);
+				getContext( ).getTopoManager( ).getBlock(name, false);
 			if (0 != te)
 				entities.push_back (te);
 		}	// for (vector<string>::const_iterator it = ...

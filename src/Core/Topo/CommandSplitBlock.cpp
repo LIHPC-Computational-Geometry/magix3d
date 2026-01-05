@@ -95,10 +95,8 @@ void CommandSplitBlock::
 countNbCoEdgesByVertices(std::map<Topo::Vertex*, uint> &nb_coedges_by_vertex)
 {
 	// stocke pour chacun des sommets le nombre d'arêtes auxquelles il est relié
-	std::vector<Topo::Vertex* > all_vertices;
-	m_bloc->getAllVertices(all_vertices);
-	for (uint i=0; i<all_vertices.size(); i++)
-		nb_coedges_by_vertex[all_vertices[i]] = all_vertices[i]->getNbCoEdges();
+	for (Topo::Vertex* vtx : m_bloc->getAllVertices())
+		nb_coedges_by_vertex[vtx] = vtx->getCoEdges().size();
 }
 /*----------------------------------------------------------------------------*/
 void CommandSplitBlock::getPreviewRepresentation(Utils::DisplayRepresentation& dr)

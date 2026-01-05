@@ -7,13 +7,9 @@
 #include "Internal/Context.h"
 
 #include "Utils/Common.h"
-#include "QtComponents/QtMgx3DEntityNamePanel.h"
-
-#include "Group/Group0D.h"
-#include "Group/Group1D.h"
-#include "Group/Group2D.h"
-#include "Group/Group3D.h"
 #include "Group/GroupManager.h"
+#include "Group/GroupEntity.h"
+#include "QtComponents/QtMgx3DEntityNamePanel.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/UTF8String.h>

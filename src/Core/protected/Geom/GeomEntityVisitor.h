@@ -1,9 +1,8 @@
 #ifndef GEOMENTITYVISITOR_H_
 #define GEOMENTITYVISITOR_H_
 /*----------------------------------------------------------------------------*/
-namespace Mgx3D {
-/*----------------------------------------------------------------------------*/
-namespace Geom {
+namespace Mgx3D::Geom
+{
 /*----------------------------------------------------------------------------*/
 class Vertex;
 class Curve;
@@ -18,6 +17,7 @@ struct ConstGeomEntityVisitor
     virtual void visit(const Volume*) = 0;
     virtual ~ConstGeomEntityVisitor() = default;
 };
+/*----------------------------------------------------------------------------*/
 struct GeomEntityVisitor
 {
     virtual void visit(Vertex*) = 0;
@@ -27,9 +27,7 @@ struct GeomEntityVisitor
     virtual ~GeomEntityVisitor() = default;
 };
 /*----------------------------------------------------------------------------*/
-} // end namespace Geom
-/*----------------------------------------------------------------------------*/
-} // end namespace Mgx3D
+} // end namespace Mgx3D::Geom
 /*----------------------------------------------------------------------------*/
 #endif /* GEOMENTITYVISITOR_H_ */
 /*----------------------------------------------------------------------------*/

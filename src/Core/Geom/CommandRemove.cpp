@@ -33,12 +33,12 @@ CommandRemove::~CommandRemove()
     if(m_impl)
         delete m_impl;
 }
-
 /*----------------------------------------------------------------------------*/
 void CommandRemove::internalSpecificPreExecute()
 {
     m_impl->prePerform();
-}/*----------------------------------------------------------------------------*/
+}
+/*----------------------------------------------------------------------------*/
 void CommandRemove::
 internalSpecificExecute()
 {

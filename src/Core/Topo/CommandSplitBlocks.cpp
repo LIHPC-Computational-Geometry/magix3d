@@ -55,8 +55,7 @@ CommandSplitBlocks(Internal::Context& c, CoEdge* arete, double ratio)
 , m_ratio(ratio)
 , m_allBlocksMustBeCut(false)
 {
-	std::vector<Topo::Block* > blocs;
-	c.getTopoManager().getBlocks(blocs, true);
+	std::vector<Topo::Block* > blocs = c.getTopoManager().getBlocksObj();
 	validateRatio();
 	initBlocks(blocs, false);
 	initCommentsAllBlocks(arete);
@@ -70,9 +69,7 @@ CommandSplitBlocks(Internal::Context& c, CoEdge* arete, const Utils::Math::Point
 , m_allBlocksMustBeCut(false)
 {
 	m_ratio = arete->computeRatio(pt);
-	std::vector<Topo::Block* > blocs;
-	c.getTopoManager().getBlocks(blocs, true);
-
+	std::vector<Topo::Block* > blocs =  c.getTopoManager().getBlocksObj();
 	validateRatio();
 	initBlocks(blocs, false);
 	initCommentsAllBlocks(arete);
@@ -218,8 +215,7 @@ findBlockUnmarkedWithCoEdgeMarked(std::set<Block*>& filtre_blocs,
 			Block* bl = *iter1;
 			//std::cout<<"   pas encore vu, on recherche une arête ..."<<std::endl;
 			// possède-t-il une arête marquée ?
-			std::vector<CoEdge* > coedges;
-			bl->getCoEdges(coedges);
+			std::vector<CoEdge* > coedges = bl->getCoEdges();
 			for (std::vector<CoEdge*>::iterator iter2 = coedges.begin(); iter2 != coedges.end(); ++iter2){
 				if (filtre_coedges.find(*iter2) != filtre_coedges.end()){
 					arete = *iter2;
@@ -236,14 +232,9 @@ void CommandSplitBlocks::
 countNbCoEdgesByVertices(std::map<Topo::Vertex*, uint> &nb_coedges_by_vertex)
 {
 	// stocke pour chacun des sommets le nombre d'arêtes auxquelles il est relié
-	for (std::vector<Block* >::iterator iter1 = m_blocs.begin();
-	            iter1 != m_blocs.end(); ++iter1){
-		Block* bloc = *iter1;
-		std::vector<Topo::Vertex* > all_vertices;
-		bloc->getAllVertices(all_vertices);
-		for (uint i=0; i<all_vertices.size(); i++)
-			nb_coedges_by_vertex[all_vertices[i]] = all_vertices[i]->getNbCoEdges();
-	}
+	for (Block* b : m_blocs)
+		for (Vertex* vtx : b->getAllVertices())
+			nb_coedges_by_vertex[vtx] = vtx->getCoEdges().size();
 }
 /*----------------------------------------------------------------------------*/
 void CommandSplitBlocks::getPreviewRepresentation(Utils::DisplayRepresentation& dr)

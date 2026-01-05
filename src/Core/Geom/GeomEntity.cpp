@@ -1,4 +1,5 @@
 /*----------------------------------------------------------------------------*/
+#include "Internal/Context.h"
 #include "Geom/GeomEntity.h"
 #include "Geom/Volume.h"
 #include "Geom/Curve.h"
@@ -9,13 +10,9 @@
 #include "Geom/OCCDisplayRepresentationBuilder.h"
 #include "Geom/OCCFacetedRepresentationBuilder.h"
 #include "Geom/IncidentGeomEntitiesVisitor.h"
+#include "Group/GroupManager.h"
 /*----------------------------------------------------------------------------*/
 #include "Services/DescriptionService.h"
-/*----------------------------------------------------------------------------*/
-#include "Group/Group0D.h"
-#include "Group/Group1D.h"
-#include "Group/Group2D.h"
-#include "Group/Group3D.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/InternalError.h>
@@ -36,6 +33,9 @@ GeomEntity::GeomEntity(Internal::Context& ctx, Utils::Property* prop, Utils::Dis
 /*----------------------------------------------------------------------------*/
 GeomEntity::~GeomEntity()
 {
+	Group::GroupManager& gm = getContext().getGroupManager();
+	gm.removeAllGroupsFor(this);
+
     if(m_geomProp!=0)
         delete m_geomProp;
 }
@@ -92,7 +92,7 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
 			pts[i] = (barycentre + (pts[i] - barycentre) * shrink);
 }
 /*----------------------------------------------------------------------------*/
-Mgx3D::Utils::SerializedRepresentation* GeomEntity::getDescription (bool alsoComputed) const
+Utils::SerializedRepresentation* GeomEntity::getDescription (bool alsoComputed) const
 {
     return Services::DescriptionService::getDescription(this, alsoComputed);
 }
@@ -102,22 +102,6 @@ GeomProperty::type GeomEntity::getGeomType ( ) const
 	CHECK_NULL_PTR_ERROR (getGeomProperty ( ))
 	return getGeomProperty ( )->getType ( );
 }	// GeomEntity::getGeomType
-/*----------------------------------------------------------------------------*/
-void GeomEntity::getGroupsName (std::vector<std::string>& gn) const
-{
-    MGX_FORBIDDEN("getGroupsName est à redéfinir dans les classes dérivées");
-}
-/*----------------------------------------------------------------------------*/
-void GeomEntity::getGroups(std::vector<Group::GroupEntity*>& grp) const
-{
-    MGX_FORBIDDEN("getGroups est à redéfinir dans les classes dérivées");
-}
-/*----------------------------------------------------------------------------*/
-int GeomEntity::getNbGroups() const
-{
-    MGX_FORBIDDEN("getNbGroups est à redéfinir dans les classes dérivées");
-    return 0;
-}
 /*----------------------------------------------------------------------------*/
 double GeomEntity::getArea() const
 {
@@ -129,6 +113,24 @@ double GeomEntity::getArea() const
 	}
 	//std::cout<<"return m_computedArea = "<< m_computedArea<<std::endl;
 	return m_computedArea;
+}
+/*----------------------------------------------------------------------------*/
+void GeomEntity::setDestroyed(bool b)
+{
+    if (isDestroyed() == b)
+        return;
+
+    // supprime la relation du groupe vers le sommet en cas de destruction
+	Group::GroupManager& gm = getContext().getGroupManager();
+    if (b)
+        for (Group::GroupEntity* g : gm.getGroupsFor(this))
+            g->remove(this);
+    else
+        // et inversement en cas de ressurection
+        for (Group::GroupEntity* g : gm.getGroupsFor(this))
+            g->add(this);
+
+    Entity::setDestroyed(b);
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

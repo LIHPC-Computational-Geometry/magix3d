@@ -1,6 +1,3 @@
-/*----------------------------------------------------------------------------*/
-/** \file Edge.h
-/*----------------------------------------------------------------------------*/
 #ifndef TOPO_EDGE_H_
 #define TOPO_EDGE_H_
 /*----------------------------------------------------------------------------*/
@@ -37,6 +34,8 @@ class Edge : public TopoEntity {
     static const char* typeNameTopoEdge;
 
 public:
+    void accept(ConstTopoEntityVisitor& v) const override{ v.visit(this); }
+    void accept(TopoEntityVisitor& v) override { v.visit(this); }
 
     /*------------------------------------------------------------------------*/
     /// Constructeur (avec une CoEdge)
@@ -121,33 +120,15 @@ public:
 
     /*------------------------------------------------------------------------*/
     /// ajoute une relation vers une face
-    void addCoFace(CoFace* f)
-    {m_topo_property->getCoFaceContainer().add(f);}
+    void add(CoFace* f);
 
     /// enlève une relation vers une face
-    void removeCoFace(CoFace* f, const bool exceptionIfNotFound=true)
-    {m_topo_property->getCoFaceContainer().remove(f, exceptionIfNotFound);}
-
-    /*------------------------------------------------------------------------*/
-    /** Fournit l'accès aux faces topologiques incidentes avec une copie
-     *
-     *  \param faces les faces incidentes
-     */
-    void getCoFaces(std::vector<CoFace* >& faces) const
-    {m_topo_property->getCoFaceContainer().get(faces);}
+    void remove(CoFace* f);
 
     /** Fournit l'accès aux faces topologiques incidentes sans copie
      */
     const std::vector<CoFace* > & getCoFaces() const
-    {return m_topo_property->getCoFaceContainer().get();}
-
-    /// fournit l'accès à l'une des faces communes
-    CoFace* getCoFace(uint ind) const
-    {return m_topo_property->getCoFaceContainer().get(ind);}
-
-    /// \return le nombre de faces
-    uint getNbCoFaces() const
-    {return m_topo_property->getCoFaceContainer().getNb();}
+    {return m_topo_property->getCoFaceContainer();}
 
     /*------------------------------------------------------------------------*/
     /** \brief Remplace un sommet v1 par le sommet v2
@@ -204,61 +185,24 @@ public:
      */
     void split(std::vector<Vertex*> new_vtx, std::vector<Edge*>& new_edges, Internal::InfoCommand* icmd);
 
-    /*------------------------------------------------------------------------*/
-    /** \brief  Fournit l'accès aux sommets topologiques incidents avec une copie
-     *
-     *  \param vertices les sommets incidents
-     */
-    void getVertices(std::vector<Vertex* >& vertices) const
-    {m_topo_property->getVertexContainer().get(vertices);}
-
     /** Fournit l'accès aux sommets topologiques incidents sans copie
      */
     const std::vector<Vertex* >& getVertices() const
-        {return m_topo_property->getVertexContainer().get();}
-
-    /// fournit l'accès à l'un des sommets
-    Vertex* getVertex(uint ind) const
-    {return m_topo_property->getVertexContainer().get(ind);}
-
-    /// \return le nombre de Vertex
-    uint getNbVertices() const;
-
-    /// vérifie si cette arête contient ou non ce sommet
-    bool find(Vertex* v) const
-    {return m_topo_property->getVertexContainer().find(v);}
+        {return m_topo_property->getVertexContainer();}
 
     /// accès à tous les sommets y compris ceux internes
-     void getAllVertices(std::vector<Topo::Vertex* >& vertices, const bool unique=true) const;
+    std::vector<Topo::Vertex* > getAllVertices() const;
 
     /*------------------------------------------------------------------------*/
     /// ajoute une relation vers une arête
-    void addCoEdge(CoEdge* e)
-    {m_topo_property->getCoEdgeContainer().add(e);}
+    void add(CoEdge* e);
 
     /// enlève une relation vers une arête
-    void removeCoEdge(CoEdge* e, const bool exceptionIfNotFound=true)
-    {m_topo_property->getCoEdgeContainer().remove(e, exceptionIfNotFound);}
-
-    /// Fournit l'accès aux arêtes topologiques qui utilisent cette CoEdge avec une copie
-    void getCoEdges(std::vector<CoEdge* >& edges) const
-    {m_topo_property->getCoEdgeContainer().get(edges);}
+    void remove(CoEdge* e);
 
     /// Fournit l'accès aux arêtes topologiques qui utilisent cette CoEdge sans copie
-    const std::vector<CoEdge* > & getCoEdges() const
-    {return m_topo_property->getCoEdgeContainer().get();}
-
-    /// le nombre d'arêtes communes utilisées par cette arête
-    uint getNbCoEdges() const
-    {return m_topo_property->getCoEdgeContainer().getNb();}
-
-    /// fournit l'accès à l'une des arêtes communes
-    CoEdge* getCoEdge(uint ind) const
-    {return m_topo_property->getCoEdgeContainer().get(ind);}
-
-    /// vérifie si cette arête contient ou non cette arête commune
-    bool find(const CoEdge* e) const
-    {return m_topo_property->getCoEdgeContainer().find(e);}
+    const std::vector<CoEdge* >& getCoEdges() const
+    {return m_topo_property->getCoEdgeContainer();}
 
     /// retourne une arête à partir des 2 sommets qui la compose, exception sinon
     CoEdge* getCoEdge(Vertex* vtx1, Vertex* vtx2);

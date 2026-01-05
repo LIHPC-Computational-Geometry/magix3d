@@ -1,5 +1,6 @@
 /*----------------------------------------------------------------------------*/
 #include "Internal/Context.h"
+#include "SysCoord/SysCoord.h"
 #include "SysCoord/CommandEditSysCoord.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>

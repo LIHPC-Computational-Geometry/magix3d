@@ -7,8 +7,8 @@
 #include "Mesh/MeshImplementation.h"
 #include "Mesh/SubVolume.h"
 #include "Mesh/SubSurface.h"
-#include "Group/Group3D.h"
-#include "Group/Group2D.h"
+#include "Group/GroupManager.h"
+#include "Group/GroupEntity.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
@@ -41,14 +41,14 @@ CommandReadMLI::~CommandReadMLI()
         Mesh::SubVolume* sv = dynamic_cast<Mesh::SubVolume*>(me);
         Mesh::SubSurface* ss = dynamic_cast<Mesh::SubSurface*>(me);
         if (sv){
-        	Group::Group3D* gr = getContext().getGroupManager().getGroup3D(sv->getName(), true);
+        	Group::Group3D* gr = getContext().getGroupManager().getGroup<Group::Group3D>(sv->getName(), true);
         	gr->remove(sv);
         	getContext().getMeshManager().remove(sv);
         	sv->clear();
         	delete sv;
         }
         else if (ss){
-        	Group::Group2D* gr = getContext().getGroupManager().getGroup2D(ss->getName(), true);
+        	Group::Group2D* gr = getContext().getGroupManager().getGroup<Group::Group2D>(ss->getName(), true);
         	gr->remove(ss);
         	getContext().getMeshManager().remove(ss);
         	ss->clear();
@@ -102,7 +102,7 @@ void CommandReadMLI::internalExecute()
 
         getContext().newGraphicalRepresentation (*sv);
 
-        Group::Group3D* gr = getContext().getGroupManager().getNewGroup3D(nomGr, &getInfoCommand());
+        Group::Group3D* gr = getContext().getGroupManager().getNewGroup<Group::Group3D>(nomGr, &getInfoCommand());
 
         if (!gr->empty()){
 			TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
@@ -138,12 +138,12 @@ void CommandReadMLI::internalExecute()
 		for (auto face_id : surf->cells())
 		{
 			auto face = gmdsMesh.get<gmds::Face>(face_id);
-			ss->addFace(face);
+			ss->add(face);
 		}
 
         getContext().newGraphicalRepresentation (*ss);
 
-        Group::Group2D* gr = getContext().getGroupManager().getNewGroup2D(nomGr, &getInfoCommand());
+        Group::Group2D* gr = getContext().getGroupManager().getNewGroup<Group::Group2D>(nomGr, &getInfoCommand());
 
         if (!gr->empty()){
 			TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);

@@ -47,8 +47,7 @@ internalExecute()
 
     for (std::vector<CoEdge*>::iterator iter1 = m_coedges1.begin();
     		iter1 != m_coedges1.end(); ++iter1){
-    	std::vector<Vertex*> vertices;
-    	(*iter1)->getAllVertices(vertices);
+    	std::vector<Vertex*> vertices = (*iter1)->getVertices();
     	for (std::vector<Vertex*>::iterator iter2 = vertices.begin();
     			iter2 != vertices.end(); ++iter2){
     		filtre_vtx[*iter2] = 1;
@@ -57,8 +56,7 @@ internalExecute()
 
     for (std::vector<CoEdge*>::iterator iter1 = m_coedges2.begin();
     		iter1 != m_coedges2.end(); ++iter1){
-    	std::vector<Vertex*> vertices;
-    	(*iter1)->getAllVertices(vertices);
+    	std::vector<Vertex*> vertices = (*iter1)->getVertices();
     	for (std::vector<Vertex*>::iterator iter2 = vertices.begin();
     			iter2 != vertices.end(); ++iter2){
     		if (1 == filtre_vtx[*iter2])
@@ -130,9 +128,8 @@ internalExecute()
     for (std::vector<CoEdge*>::iterator iter1 = m_coedges1.begin();
     		iter1 != m_coedges1.end(); ++iter1){
     	CoEdge* coedge1 = *iter1;
-    	std::vector<Vertex*> verticesA;
+    	std::vector<Vertex*> verticesA = coedge1->getVertices();
     	std::vector<Vertex*> verticesB;
-    	coedge1->getAllVertices(verticesA);
 #ifdef _DEBUG_GLUE
     	std::cout<<"on observe l'arête commune "<<coedge1->getName();
     	for (uint i=0; i<verticesA.size(); i++)

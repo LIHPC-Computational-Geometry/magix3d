@@ -4,8 +4,6 @@
 #include "Geom/GeomRevolImplementation.h"
 #include "Geom/Curve.h"
 #include "Geom/Vertex.h"
-#include "Group/Group3D.h"
-#include "Group/Group1D.h"
 #include "Group/GroupManager.h"
 #include "Utils/Rotation.h"
 /*----------------------------------------------------------------------------*/

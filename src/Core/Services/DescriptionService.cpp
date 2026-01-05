@@ -7,10 +7,10 @@
 #include "Topo/CoEdge.h"
 #include "Topo/CoFace.h"
 #include "Topo/Block.h"
-#include "Group/Group0D.h"
-#include "Group/Group1D.h"
-#include "Group/Group2D.h"
-#include "Group/Group3D.h"
+#include "Group/GroupEntity.h"
+#include "Group/GroupManager.h"
+#include "SysCoord/SysCoord.h"
+#include "Mesh/MeshModificationItf.h"
 #include <TkUtil/NumericServices.h>
 #include <BRep_Tool.hxx>
 #include <Geom_BSplineCurve.hxx>
@@ -19,13 +19,6 @@ using Property = Mgx3D::Utils::SerializedRepresentation::Property;
 
 namespace Mgx3D::Services
 {
-	Utils::SerializedRepresentation *DescriptionService::getDescription(const Geom::GeomEntity *e, const bool alsoComputed)
-	{
-		DescriptionService ds(alsoComputed);
-		e->accept(ds);
-		return ds.m_representation;
-	}
-
 	DescriptionService::DescriptionService(const bool alsoComputed)
 		: m_also_computed(alsoComputed), m_representation(nullptr)
 	{
@@ -190,6 +183,73 @@ namespace Mgx3D::Services
 		m_representation->addPropertiesSet(propertyGeomDescription);
 	}
 
+	void DescriptionService::visit(const Group::Group0D *e)
+	{
+		visitGroupEntity(e);
+
+		auto vertices = e->getFilteredEntities<Geom::Vertex>();
+		buildSerializedRepresentation(*m_representation, "Sommets géométriques", vertices);
+
+		auto topo_vertices = e->getFilteredEntities<Topo::Vertex>();
+		buildSerializedRepresentation(*m_representation, "Sommets topologiques", topo_vertices);
+	}
+
+	void DescriptionService::visit(const Group::Group1D *e)
+	{
+		visitGroupEntity(e);
+
+		auto curves = e->getFilteredEntities<Geom::Curve>();
+		buildSerializedRepresentation(*m_representation, "Courbes géométriques", curves);
+
+		auto coedges = e->getFilteredEntities<Topo::CoEdge>();
+		buildSerializedRepresentation(*m_representation, "Arêtes topologiques", coedges);
+	}
+
+	void DescriptionService::visit(const Group::Group2D *e)
+	{
+		visitGroupEntity(e);
+
+	    auto surfaces = e->getFilteredEntities<Geom::Surface>();
+		buildSerializedRepresentation(*m_representation, "Surfaces géométriques", surfaces);
+
+    	auto cofaces = e->getFilteredEntities<Topo::CoFace>();
+		buildSerializedRepresentation(*m_representation, "Faces topologiques", cofaces);
+
+	    Mesh::Surface* msurf = e->getContext().getMeshManager().getSurface(e->getName(), false);
+		if (msurf){
+			Utils::SerializedRepresentation sr ("Surface maillage", std::string("1"));
+			sr.addProperty(Utils::SerializedRepresentation::Property (msurf->getName(), *msurf));
+			m_representation->addPropertiesSet(sr);
+		} else {
+			m_representation->addProperty (Utils::SerializedRepresentation::Property(
+							"Surface maillage", std::string("Aucune")));
+		}
+	}
+
+	void DescriptionService::visit(const Group::Group3D *e)
+	{
+		visitGroupEntity(e);
+
+		auto volumes = e->getFilteredEntities<Geom::Volume>();
+		buildSerializedRepresentation(*m_representation, "Volumes géométriques", volumes);
+
+	    auto blocks = e->getFilteredEntities<Topo::Block>();
+		buildSerializedRepresentation(*m_representation, "Blocs topologiques", blocks);
+
+		Mesh::Volume* mvol = e->getContext().getMeshManager().getVolume(e->getName(), false);
+		if (mvol){
+			Utils::SerializedRepresentation sr ("Volume maillage", std::string("1"));
+			sr.addProperty(Utils::SerializedRepresentation::Property (mvol->getName(), *mvol));
+			m_representation->addPropertiesSet(sr);
+		} else {
+			m_representation->addProperty(Utils::SerializedRepresentation::Property(
+							"Volume maillage", std::string("Aucun")));
+		}
+
+		auto scs = e->getFilteredEntities<CoordinateSystem::SysCoord>();
+		buildSerializedRepresentation(*m_representation, "Repères", scs);
+	}
+
 	void DescriptionService::visitEntity(const Utils::Entity *e)
 	{
 		m_representation = e->Utils::Entity::getDescription(m_also_computed);
@@ -268,8 +328,8 @@ namespace Mgx3D::Services
 		}
 
 		// Les groupes s'il y en a
-		std::vector<Group::GroupEntity *> groups;
-		e->getGroups(groups);
+		Group::GroupManager& gm = e->getContext().getGroupManager();
+		std::vector<Group::GroupEntity *> groups = gm.getGroupsFor(e);
 		if (!groups.empty())
 		{
 			Utils::SerializedRepresentation groupeDescription("Relations vers des groupes", "");
@@ -315,6 +375,21 @@ namespace Mgx3D::Services
 		e->apply(add_description);
 		m_representation->addPropertiesSet(occGeomDescription);
 #endif
+	}
+
+	void DescriptionService::visitGroupEntity(const Group::GroupEntity *e)
+	{
+		visitEntity(e);
+		m_representation->addProperty(Utils::SerializedRepresentation::Property ("Niveau", (long)e->getLevel()));
+
+		auto mesh_modifs = e->getMeshModifications();
+		if (!mesh_modifs.empty()) {
+			Utils::SerializedRepresentation modification("Modification du maillage", "");
+			for (Mesh::MeshModificationItf* mesh_modif : mesh_modifs)
+				mesh_modif->addToDescription(&modification);
+
+			m_representation->addPropertiesSet(modification);
+		}
 	}
 
 	template <typename T>

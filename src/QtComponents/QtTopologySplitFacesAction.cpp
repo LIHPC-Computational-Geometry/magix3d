@@ -7,13 +7,13 @@
 #include "Internal/Context.h"
 
 #include "Utils/Common.h"
+#include "Topo/CommandSplitFaces.h"
+#include "Topo/TopoDisplayRepresentation.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtNumericFieldsFactory.h"
 #include "QtComponents/QtTopologySplitFacesAction.h"
 #include "Geom/GeomEntity.h"
-#include "Topo/CommandSplitFaces.h"
-#include "Topo/TopoDisplayRepresentation.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>
@@ -301,11 +301,8 @@ vector<string> QtTopologySplitFacesPanel::getFacesNames ( ) const
 	CHECK_NULL_PTR_ERROR (_facesPanel)
 	if (true == allFaces ( ))
 	{
-		vector<CoFace*>	faces;
-		getContext ( ).getTopoManager ( ).getCoFaces (faces);
-		for (vector<CoFace*>::iterator it = faces.begin ( );
-		     faces.end ( ) != it; it++)
-			names.push_back ((*it)->getUniqueName ( ));
+		for (CoFace* cf : getContext ( ).getTopoManager ( ).getCoFacesObj ( ))
+			names.push_back (cf->getUniqueName ( ));
 	}
 	else
 		names	= _facesPanel->getUniqueNames ( );
