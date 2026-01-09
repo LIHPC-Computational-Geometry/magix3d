@@ -15,10 +15,6 @@
 #include "Topo/EdgeMeshingPropertyGlobalInterpolate.h"
 #include "Internal/InfoCommand.h"
 
-#include "Group/Group0D.h"
-#include "Group/Group1D.h"
-#include "Group/Group2D.h"
-#include "Group/Group3D.h"
 /*----------------------------------------------------------------------------*/
 #include <iostream>
 /*----------------------------------------------------------------------------*/
@@ -29,8 +25,14 @@ namespace Topo {
 /*----------------------------------------------------------------------------*/
 
 ImportBlocksImplementation::ImportBlocksImplementation(Internal::Context &c, Internal::InfoCommand *icmd,
-                            const std::string &n, bool withGeom) : m_c(c), m_icmd(icmd), m_filename(n), m_geom(withGeom) {
-}
+                            const std::string &n, bool withGeom) :
+    m_group_helper(*icmd, c.getGroupManager()),
+    m_c(c),
+    m_icmd(icmd),
+    m_filename(n),
+    m_geom(withGeom)
+    {}
+
 /*----------------------------------------------------------------------------*/
 //ImportBlocksImplementation::~ImportBlocksImplementation() {}
 /*----------------------------------------------------------------------------*/
@@ -49,7 +51,7 @@ void ImportBlocksImplementation::internalExecute() {
         std::string mess = "Impossible to read file " + m_filename;
         throw TkUtil::Exception(mess);
     }
-
+        Group::Group0D* group0 = getStdContext()->getGroupManager().getNewGroup<Group::Group0D>("Hors_Groupe_0D", m_icmd);
         Group::Group1D* group1 = getStdContext()->getGroupManager().getNewGroup<Group::Group1D>("Hors_Groupe_1D", m_icmd);
         Group::Group2D* group2 = getStdContext()->getGroupManager().getNewGroup<Group::Group2D>("Hors_Groupe_2D", m_icmd);
         Group::Group3D* group3 = getStdContext()->getGroupManager().getNewGroup<Group::Group3D>("Hors_Groupe_3D", m_icmd);
@@ -94,8 +96,7 @@ void ImportBlocksImplementation::readNodes(std::ifstream &str, Group::Group0D* g
         m_vertices[i] = vtx;
         m_vnames[i] = vtx->getName();
         m_icmd->addTopoInfoEntity(vtx, Internal::InfoCommand::CREATED);
-        group->add(vtx);
-        vtx->getGroupsContainer().add(group);
+        m_group_helper.addToGroup("Hors_Groupe_0D", vtx);
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -125,8 +126,7 @@ int ImportBlocksImplementation::readEdges(std::ifstream &str, Group::Group1D* gr
                 m_coedges[i] = edge;
                 m_enames[i] = edge->getName();
                 m_icmd->addTopoInfoEntity(edge, Internal::InfoCommand::CREATED);
-                group->add(edge);
-                edge->getGroupsContainer().add(group);
+                m_group_helper.addToGroup("Hors_Groupe_1D", edge);
             }
             return nb_edges;
         }
@@ -180,17 +180,13 @@ void ImportBlocksImplementation::readFaces(std::ifstream &str, Group::Group2D* g
                     coedges_f.resize(coedges_in_face.size());
                     coedges_f[0] = m_coedges[coedges_in_face[0]];
                     bool v1changed = false;
-                    std::string v1Edge = m_coedges[coedges_in_face[0]]->getVertex(
-                            0)->getName();
-                    std::string v2Edge = m_coedges[coedges_in_face[0]]->getVertex(
-                            1)->getName();
+                    std::string v1Edge = m_coedges[coedges_in_face[0]]->getVertices()[0]->getName();
+                    std::string v2Edge = m_coedges[coedges_in_face[0]]->getVertices()[1]->getName();
 
                     for (int i_e = 1; i_e < coedges_in_face.size(); i_e++) {
                         coedges_f[i_e] = m_coedges[coedges_in_face[i_e]];
-                        std::string v1current = m_coedges[coedges_in_face[i_e]]->getVertex(
-                                0)->getName();
-                        std::string v2current = m_coedges[coedges_in_face[i_e]]->getVertex(
-                                1)->getName();
+                        std::string v1current = m_coedges[coedges_in_face[i_e]]->getVertices()[0]->getName();
+                        std::string v2current = m_coedges[coedges_in_face[i_e]]->getVertices()[1]->getName();
 
                         if (v1Edge == v1current) {
                             v1Edge = v2current;
@@ -230,8 +226,7 @@ void ImportBlocksImplementation::readFaces(std::ifstream &str, Group::Group2D* g
                 m_cofaces[i] = face;
                 m_fnames[i] = face->getName();
                 m_icmd->addTopoInfoEntity(face, Internal::InfoCommand::CREATED);
-                group->add(face);
-                face->getGroupsContainer().add(group);
+                m_group_helper.addToGroup("Hors_Groupe_2D", face);
             }
 }
 /*----------------------------------------------------------------------------*/
@@ -342,8 +337,7 @@ void ImportBlocksImplementation::readBlocks(std::ifstream &str, Group::Group3D* 
 
                 Block* block = new Block(m_c, faces, vs, true);
                 m_icmd->addTopoInfoEntity(block, Internal::InfoCommand::CREATED);
-                group->add(block);
-                block->getGroupsContainer().add(group);
+                m_group_helper.addToGroup("Hors_Groupe_3D", block);
                 m_bnames[i] = block->getName();
                 m_blocks[i] = block;
             }
