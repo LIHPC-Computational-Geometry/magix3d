@@ -1815,10 +1815,10 @@ freeUnused(std::map<Vertex*, uint> & filtre_vertex,
 
 							// pour les arêtes entre les sommets de la face initiale et celle créée au centre
 							for (uint i=0; i<4; i++){
-								CoEdge* newCoedge = corr_vtx_coedge[coface->getVertices()[i]];
-                                Topo::Vertex* vtx0 = newCoedge->getVertices()[0];
-                                Topo::Vertex* vtx1 = newCoedge->getVertices()[1];
+                                CoEdge* newCoedge = corr_vtx_coedge[coface->getVertices()[i]];
 								if (newCoedge){
+                                    Topo::Vertex* vtx0 = newCoedge->getVertices()[0];
+                                    Topo::Vertex* vtx1 = newCoedge->getVertices()[1];
 #ifdef _DEBUG_SPLIT_OGRID
 									std::cout<<"newCoedge: "<<newCoedge->getName()<<std::endl;
 									std::cout<<"  vtx0: "<<vtx0->getName()<<", filtre à "<<filtre_vertex[vtx0]<<std::endl;
