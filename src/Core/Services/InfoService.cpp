@@ -47,7 +47,7 @@ namespace Mgx3D::Services
 
 		Topo::TopoManager& tm = e->getContext().getTopoManager();
         for (Topo::TopoEntity* te : tm.getRefTopos(e))
-            info._topo_entities.push_back(e->getName());
+            info._topo_entities.push_back(te->getName());
 
 		Group::GroupManager& gm = e->getContext().getGroupManager();
 		info._groups = Utils::toNames(gm.getGroupsFor(e));

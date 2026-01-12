@@ -17,7 +17,7 @@ namespace Mgx3D::Geom
         std::vector<std::string> curves() const { return _curves; }
         std::vector<std::string> surfaces() const { return _surfaces; }
         std::vector<std::string> volumes() const { return _volumes; }
-        std::vector<std::string> topo_entities() const { return _topo_entities; }
+        std::vector<std::string> topoEntities() const { return _topo_entities; }
         std::vector<std::string> groups() const { return _groups; }
 
 #ifndef SWIG
