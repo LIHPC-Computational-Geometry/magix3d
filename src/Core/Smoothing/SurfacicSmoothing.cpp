@@ -23,6 +23,7 @@
 #include <TkUtil/UTF8String.h>
 /*----------------------------------------------------------------------------*/
 #include <gmds/ig/Node.h>
+#include <gmds/ig/Face.h>
 /*----------------------------------------------------------------------------*/
 //Mesquite
 #include "InstructionQueue.hpp"
@@ -33,6 +34,7 @@
 
 #include "QualityAssessor.hpp"
 #include "TerminationCriterion.hpp"
+#include "Geom/Surface.h"
 
 
 /*----------------------------------------------------------------------------*/
@@ -147,6 +149,10 @@ applyModification(std::vector<gmds::Node >& gmdsNodes,
 
 		if (m_methodeLissage == surfacicOrthogonalSmoothingElliptic){
 
+			std::cout << "ELLIPTIC ORTHOGONAL SMOOTHING SURFACE: " << surface->getName() << std::endl;
+			std::cout << "Nbr of Nodes: " << gmdsNodes.size() << std::endl;
+			std::cout << "Nbr of Faces: " << gmdsPolygones.size() << std::endl;
+
 			MESQUITE_NS::OrthogonalSmoothing algo(m_nbIterations);
 
 			const Mesquite2::Settings dummySettings;
@@ -156,13 +162,29 @@ applyModification(std::vector<gmds::Node >& gmdsNodes,
 			MSQ_CHKERR(err);
 
 			mesh->updateNodesPositions();
-
-		} else {
+		}
+		else if (m_methodeLissage == surfacicYaoSmoothing)
+		{
+			std::cout << "YAO SMOOTHING SURFACE: " << surface->getName() << std::endl;
+			std::cout << "Nbr of Nodes: " << gmdsNodes.size() << std::endl;
+			std::cout << "Nbr of Faces: " << gmdsPolygones.size() << std::endl;
+		}
+		else {
 
 			MESQUITE_NS::QualityMetric* qual =0;
 			switch (m_methodeLissage){
-			case surfacicNormalSmoothing:    qual = new MESQUITE_NS::NormaleQualityMetric(mdl_geom); break;
-			case surfacicOrthogonalSmoothing: qual = new MESQUITE_NS::OrthogonalQualityMetric; break;
+			case surfacicNormalSmoothing:
+					std::cout << "NORMAL SMOOTHING SURFACE: " << surface->getName() << std::endl;
+					std::cout << "Nbr of Nodes: " << gmdsNodes.size() << std::endl;
+					std::cout << "Nbr of Faces: " << gmdsPolygones.size() << std::endl;
+					qual = new MESQUITE_NS::NormaleQualityMetric(mdl_geom);
+					break;
+			case surfacicOrthogonalSmoothing:
+					std::cout << "ORTHOGONAL SMOOTHING SURFACE: " << surface->getName() << std::endl;
+					std::cout << "Nbr of Nodes: " << gmdsNodes.size() << std::endl;
+					std::cout << "Nbr of Faces: " << gmdsPolygones.size() << std::endl;
+					qual = new MESQUITE_NS::OrthogonalQualityMetric;
+					break;
 			}
 
 			if (qual == 0){
@@ -289,6 +311,8 @@ std::string SurfacicSmoothing::toString(eSurfacicMethod method)
 		return "surfacicOrthogonalSmoothing";
 	else if (method == surfacicOrthogonalSmoothingElliptic)
 		return "surfacicOrthogonalSmoothingElliptic";
+	else if (method == surfacicYaoSmoothing)
+		return "surfacicYaoSmoothing";
 	else
 		throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, une méthode de lissage surfacique n'est pas encore prévue pour toString", TkUtil::Charset::UTF_8));
 }
