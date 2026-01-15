@@ -39,8 +39,9 @@ public:
 
 	/// énuméré sur les différentes méthodes de lissage surfacique
 	enum eSurfacicMethod { surfacicNormalSmoothing = 0, // optimisation suivant la normale
-					 surfacicOrthogonalSmoothing, // optimisation suivant l'orthogonalité des bras des mailles
-					 surfacicOrthogonalSmoothingElliptic};
+							surfacicOrthogonalSmoothing, // optimisation suivant l'orthogonalité des bras des mailles
+							surfacicOrthogonalSmoothingElliptic,
+							surfacicYaoSmoothing};
 
 	/// énuméré sur les différents solvers
 	enum eSolver {gradientConjugue = 0, newton};
