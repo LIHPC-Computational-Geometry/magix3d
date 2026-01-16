@@ -1026,7 +1026,13 @@ computeBoundingBox(const TopoDS_Shape& shape, Utils::Math::Point& pmin, Utils::M
 {
     Bnd_Box box;
     box.SetGap(tol);
-    BRepBndLib::Add(shape, box);
+
+    BRepCheck_Analyzer analyzer(shape);
+    if (analyzer.IsValid()) {
+        BRepBndLib::AddClose(shape, box);
+    } else {
+        BRepBndLib::AddOptimal(shape, box);
+    }
 
     double xmin, ymin, zmin, xmax, ymax, zmax;
     box.Get(xmin, ymin, zmin, xmax, ymax, zmax);
