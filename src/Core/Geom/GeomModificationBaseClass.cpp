@@ -65,7 +65,7 @@ void GeomModificationBaseClass::init(Geom::CommandGeomCopy* cmd)
 	m_buildEntitiesCmd = cmd;
 }
 /*----------------------------------------------------------------------------*/
-void GeomModificationBaseClass::init(std::vector<GeomEntity*>& es)
+void GeomModificationBaseClass::init(const std::vector<GeomEntity*>& es)
 {
     // pour chacune des entités passées en argument, on ajoute les entités de
     // dimension inférieure et supérieure ou égale en référence.
@@ -188,26 +188,45 @@ addAdjacencyReference(GeomEntity* e)
     }
 }
 /*----------------------------------------------------------------------------*/
-std::vector<GeomEntity*>& GeomModificationBaseClass::
-getNewEntities()
+const std::vector<GeomEntity*>& GeomModificationBaseClass::
+getRemovedEntities() const
+{
+    return m_removedEntities;
+}
+/*----------------------------------------------------------------------------*/
+const std::vector<GeomEntity*>& GeomModificationBaseClass::
+getNewEntities() const
 {
     return m_newEntities;
 }
 /*----------------------------------------------------------------------------*/
-std::list<GeomEntity*>& GeomModificationBaseClass::
-getRefEntities(const int dim)
+const std::list<GeomEntity*>& GeomModificationBaseClass::
+getRefEntities(const int dim) const
 {
     return m_ref_entities[dim];
 }
 /*----------------------------------------------------------------------------*/
-std::list<GeomEntity*>& GeomModificationBaseClass::
-getAdjEntities(const int dim)
+const std::list<GeomEntity*>& GeomModificationBaseClass::
+getAdjEntities(const int dim) const
 {
     return m_adj_entities[dim];
 }
 /*----------------------------------------------------------------------------*/
-std::vector<GeomEntity*> GeomModificationBaseClass::
-getKeepedEntities(){
+const std::vector<GeomEntity*>& GeomModificationBaseClass::
+getMovedEntities() const
+{
+    return m_movedEntities;
+}
+/*----------------------------------------------------------------------------*/
+const std::map<GeomEntity*,std::vector<GeomEntity*> >&  GeomModificationBaseClass::
+getReplacedEntities() const
+{
+    return m_replacedEntities;
+}
+/*----------------------------------------------------------------------------*/
+const std::vector<GeomEntity*> GeomModificationBaseClass::
+getKeepedEntities() const
+{
 
     std::vector<GeomEntity*> e;
 
@@ -217,24 +236,6 @@ getKeepedEntities(){
     e.insert(e.end(),m_toKeepVertices.begin(),m_toKeepVertices.end());
 
     return e;
-}
-/*----------------------------------------------------------------------------*/
-std::vector<GeomEntity*>& GeomModificationBaseClass::
-getRemovedEntities()
-{
-    return m_removedEntities;
-}
-/*----------------------------------------------------------------------------*/
-std::vector<GeomEntity*>& GeomModificationBaseClass::
-getMovedEntities()
-{
-    return m_movedEntities;
-}
-/*----------------------------------------------------------------------------*/
-std::map<GeomEntity*,std::vector<GeomEntity*> >&  GeomModificationBaseClass::
-getReplacedEntities()
-{
-    return m_replacedEntities;
 }
 /*----------------------------------------------------------------------------*/
 void GeomModificationBaseClass::clean(const bool deleteAloneVertices)

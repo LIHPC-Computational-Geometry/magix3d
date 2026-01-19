@@ -28,7 +28,6 @@ class CommandGeomCopy;
 class GeomModificationBaseClass{
 
 public:
-
     /*------------------------------------------------------------------------*/
     /** \brief  intialisation de données avant le perform pour les mementos des
      *          commandes appelantes
@@ -51,43 +50,43 @@ public:
     /** \brief  retourne une référence sur les entités supprimées. N'a de sens
      *          qu'une fois l'opération perform() appelée.
      */
-    std::vector<GeomEntity*>& getRemovedEntities();
+    const std::vector<GeomEntity*>& getRemovedEntities() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  retourne une référence sur les nouvelles entités. N'a de sens
      *          qu'une fois l'opération perform() appelée.
      */
-    std::vector<GeomEntity*>& getNewEntities();
+    const std::vector<GeomEntity*>& getNewEntities() const;
+
+    /*------------------------------------------------------------------------*/
+    /** \brief  retourne une référence sur toutes les entités  sur lesquelles
+     *          l'algorithme travaille
+     */
+    const std::list<GeomEntity*>& getRefEntities(const int dim) const;
+
+    /*------------------------------------------------------------------------*/
+    /** \brief  retourne une référence sur toutes les entités  adjacentes
+     */
+    const std::list<GeomEntity*>& getAdjEntities(const int dim) const;
+
+    /*------------------------------------------------------------------------*/
+    /** \brief  retourne une référence sur les entités conservées et déplacées
+     *          qu'une fois l'opération perform() appelée.
+     */
+    const std::vector<GeomEntity*>& getMovedEntities() const;
+
+    /*------------------------------------------------------------------------*/
+    /** \brief  retourne une référence sur une map indiquant par quelles
+     *          entités une entité supprimée a été remplacée
+     */
+    const std::map<GeomEntity*,std::vector<GeomEntity*> >& getReplacedEntities() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  retourne une référence sur les entités conservées et
      *          potentiellement modifées. N'a de sens qu'une fois l'opération
      *          perform() appelée.
      */
-    std::vector<GeomEntity*> getKeepedEntities();
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  retourne une référence sur les entités conservées et déplacées
-     *          qu'une fois l'opération perform() appelée.
-     */
-    std::vector<GeomEntity*>& getMovedEntities();
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  retourne une référence sur toutes les entités  sur lesquelles
-     *          l'algorithme travaille
-     */
-    std::list<GeomEntity*>& getRefEntities(const int dim);
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  retourne une référence sur toutes les entités  adjacentes
-     */
-    std::list<GeomEntity*>& getAdjEntities(const int dim);
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  retourne une référence sur une map indiquant par quelles
-     *          entités une entité supprimée a été remplacée
-     */
-    std::map<GeomEntity*,std::vector<GeomEntity*> >& getReplacedEntities();
+    const std::vector<GeomEntity*> getKeepedEntities() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief   Destructeur
@@ -111,7 +110,7 @@ protected:
     /** \brief  Initialise les attributs de cette classe dans les constructeurs
      *          des classes filles.
      */
-    virtual void init(std::vector<GeomEntity*>& es);
+    virtual void init(const std::vector<GeomEntity*>& es);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Initialise les attributs de cette classe dans les constructeurs
