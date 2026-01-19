@@ -350,13 +350,14 @@ MAJRelation(Geom::GeomEntity* ge, TopoEntity* te)
 {
 	if (m_geomCmd){
 		if (ge){
-			Geom::GeomEntity* ge_cpy = m_geomCmd->getRef2NewEntities()[ge];
+            auto ref2new = m_geomCmd->getRef2NewEntities();
+			Geom::GeomEntity* ge_cpy = ref2new[ge];
 #ifdef _DEBUG_DUPTOPO
-			std::cout << "MAJRelation("<<ge->getName()<<", "<<te->getName()<<") donne "
-					<<(ge_cpy?ge_cpy->getName():"rien")<<std::endl;
+            std::cout << "MAJRelation("<<ge->getName()<<", "<<te->getName()<<") donne "
+                    <<(ge_cpy?ge_cpy->getName():"rien")<<std::endl;
 #endif
-			te->setGeomAssociation(ge_cpy);
-		}
+            te->setGeomAssociation(ge_cpy);
+        }
 	}
 	else if (m_volume) {
 		if (te->getDim() == 3){

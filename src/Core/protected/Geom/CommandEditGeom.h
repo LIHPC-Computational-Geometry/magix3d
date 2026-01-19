@@ -67,43 +67,43 @@ public:
     /** \brief  retourne une référence sur les entités supprimées. N'a de sens
      *          qu'une fois l'opération perform() appelée.
      */
-    virtual std::vector<GeomEntity*>& getRemovedEntities();
+    virtual const std::vector<GeomEntity*>& getRemovedEntities() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  retourne une référence sur les nouvelles entités. N'a de sens
      *          qu'une fois l'opération perform() appelée.
      */
-    virtual std::vector<GeomEntity*>& getNewEntities();
+    virtual const std::vector<GeomEntity*>& getNewEntities() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  retourne une référence sur les entités conservées et
      *          potentiellement modifées. N'a de sens qu'une fois l'opération
      *          perform() appelée.
      */
-    virtual std::vector<GeomEntity*> getKeepedEntities();
+    virtual const std::vector<GeomEntity*> getKeepedEntities() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  retourne une référence sur les entités conservées et déplacées
      *          qu'une fois l'opération perform() appelée.
      */
-    virtual std::vector<GeomEntity*>& getMovedEntities();
+    virtual const std::vector<GeomEntity*>& getMovedEntities() const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  retourne une référence sur toutes les entités  sur lesquelles
      *          l'algorithme travaille
      */
-    virtual std::list<GeomEntity*>& getRefEntities(const int dim);
+    virtual const std::list<GeomEntity*>& getRefEntities(const int dim) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  retourne une référence sur toutes les entités  adjacentes
      */
-    virtual std::list<GeomEntity*>& getAdjEntities(const int dim);
+    virtual const std::list<GeomEntity*>& getAdjEntities(const int dim) const;
 
     /*------------------------------------------------------------------------*/
     /** \brief  retourne une référence sur une map indiquant par quelles
      *          entités une entité supprimée a été remplacée
      */
-    virtual std::map<GeomEntity*,std::vector<GeomEntity*> >& getReplacedEntities();
+    virtual const std::map<GeomEntity*,std::vector<GeomEntity*> >& getReplacedEntities() const;
 
 
 protected:

@@ -133,7 +133,7 @@ GeomScaleImplementation::~GeomScaleImplementation()
 void GeomScaleImplementation::prePerform()
 {
 	if (m_buildEntitiesCmd){
-		std::vector<GeomEntity*>& es = m_buildEntitiesCmd->getNewEntities();
+		auto es = m_buildEntitiesCmd->getNewEntities();
 		m_modifiedEntities.insert(m_modifiedEntities.end(),es.begin(),es.end());
 		init(m_modifiedEntities);
 	}
