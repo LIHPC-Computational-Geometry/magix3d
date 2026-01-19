@@ -16,12 +16,12 @@ Properties sets                  :
 	SerializedRepresentation Boite englobante
 Path                             : Description.Propriétés génériques.Boite englobante
 Properties                       : 
-	X min			: -1e-7
-	X max			: 1e-7
-	Y min			: -1e-7
-	Y max			: 1.0000001
-	Z min			: -1e-7
-	Z max			: 1.0000001
+	X min			: 0
+	X max			: 0
+	Y min			: 0
+	Y max			: 1
+	Z min			: 0
+	Z max			: 1
 Properties sets                  : 
 	SerializedRepresentation Relations géométriques
 Path                             : Description.Relations géométriques
