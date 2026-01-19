@@ -20,8 +20,8 @@ def test_order_join_curves():
 	# Fusion Booléenne de  Vol0009 Vol0006 Vol0005 Vol0010 Vol0008 ... 
 	gm.fuse (["Vol0005","Vol0006","Vol0007","Vol0008","Vol0009","Vol0010"])
 	gm.joinSurfaces (["Surf0020","Surf0021","Surf0022","Surf0023","Surf0024","Surf0025"])
-	gm.joinSurfaces (["Surf0026","Surf0029","Surf0034","Surf0035","Surf0037","Surf0038"])
-	gm.joinSurfaces (["Surf0016","Surf0017","Surf0019","Surf0030","Surf0040","Surf0041","Surf0042"])
+	gm.joinSurfaces (["Surf0026","Surf0031","Surf0033","Surf0034","Surf0036","Surf0037"])
+	gm.joinSurfaces (["Surf0016","Surf0018","Surf0019","Surf0039","Surf0040","Surf0041","Surf0042"])
 	gm.joinCurves (["Crb0020","Crb0021","Crb0024","Crb0040","Crb0043","Crb0045","Crb0050"])
 	gm.joinCurves (["Crb0013","Crb0014","Crb0018","Crb0026","Crb0028","Crb0030","Crb0038"])
 

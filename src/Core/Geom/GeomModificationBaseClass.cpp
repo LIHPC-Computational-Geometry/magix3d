@@ -1397,7 +1397,7 @@ static int diffGpPnt(const gp_Pnt& pnt1, const gp_Pnt& pnt2, double dimX, double
 	}
 #endif
 	// nouvel algo
-	double tol = Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon*100.0;
+	double tol = Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon*10.0;
 	int res2 = 0;
 
 	if (pnt1.X()<pnt2.X()-tol*dimX){
