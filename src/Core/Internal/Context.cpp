@@ -1422,36 +1422,14 @@ void Context::newGraphicalRepresentation (Utils::Entity& entity)
 bool Context::getGroupColor (const std::vector<Group::GroupEntity*>& groups, TkUtil::Color& color)
 {
 	for (std::vector<Group::GroupEntity*>::const_iterator itg = groups.begin ( ); groups.end ( ) != itg; itg++)
-	{
-		try
+	{	
+		const std::map<std::string, TkUtil::Color>::iterator it	= m_groups_colors.find ((*itg)->getName ( ));
+		if (m_groups_colors.end ( ) != it)
 		{
-			if (true == getGroupColor ((*itg)->getName ( ), color, false))
-				return true;
+			color	= it->second;
+			return true;
 		}
-		catch (...)
-		{
-		}
-	}	// for (std::vector<Group::GroupEntity*>::const_iterator itg = groups.begin ( ); groups.end ( ) != itg; itg++)
-	
-	return false;
-}	// Context::getGroupColor
-/*----------------------------------------------------------------------------*/
-bool Context::getGroupColor (const std::string& name, TkUtil::Color& color, bool raise)
-{
-	const std::map<std::string, TkUtil::Color>::iterator it	= m_groups_colors.find (name);
-	if (m_groups_colors.end ( ) != it)
-	{
-		color	= it->second;
-		return true;
-	}
-
-	if (true == raise)
-	{
-		TkUtil::UTF8String	message;
-		message << "Context::groupColor. Couleur pour le groupe de données \"" << name << "\" non recensée.";
-		throw TkUtil::Exception (message);
-	}
-	
+	}	
 	return false;
 }	// Context::getGroupColor
 /*----------------------------------------------------------------------------*/
