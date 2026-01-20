@@ -299,6 +299,12 @@ bool MeshImplementation::createGMDSGroups()
 /*----------------------------------------------------------------------------*/
 void MeshImplementation::writeMli(std::string nom)
 {
+	std::string extension = nom.substr(nom.size()-4);
+	if (extension != "mli2") {
+		throw TkUtil::Exception (TkUtil::UTF8String ("MeshImplementation::writeMli : le format .mli est obsolète. "
+													 "Veuillez enregistrer au format .mli2 .",
+													 TkUtil::Charset::UTF_8));
+	}
     // on ajoute les groupes de mailles de gmds
     bool isCreateGMDSGroupsOK = createGMDSGroups();
     if(!isCreateGMDSGroupsOK) {
@@ -306,12 +312,6 @@ void MeshImplementation::writeMli(std::string nom)
                                                      "Veuillez fermer les panneaux qualité ou désafficher les classes de mailles de ces panneaux.",
                                                      TkUtil::Charset::UTF_8));
     }
-	std::string extension = nom.substr(nom.size()-4);
-	if (extension != "mli2") {
-		throw TkUtil::Exception (TkUtil::UTF8String ("MeshImplementation::writeMli : le format .mli est obsolète."
-													 "Veuillez enregistrer au format .mli2 .",
-													 TkUtil::Charset::UTF_8));
-	}
 
     try {
 		bool	implemented	= false;
