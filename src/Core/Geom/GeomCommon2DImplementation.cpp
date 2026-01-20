@@ -39,7 +39,6 @@ void GeomCommon2DImplementation::prePerform()
     // Mise à jour des connectivés de références
     //========================================================================
 	if (m_geomCmd){
-		std::vector<GeomEntity*>& newEntities = m_geomCmd->getNewEntities();
 		uint dim = 0;
 		if (m_geomCmd->getRefEntities(2).size())
 			dim = 2; // cas de l'intersection de surfaces
@@ -49,9 +48,9 @@ void GeomCommon2DImplementation::prePerform()
 			throw TkUtil::Exception("Erreur interne, la copie n'a pas d'entités d'une dimension attendue");
 
 		std::vector<GeomEntity*>entities;
-		for (uint i=0; i<newEntities.size(); i++)
-			if (newEntities[i]->getDim() == dim)
-				entities.push_back(newEntities[i]);
+		for (GeomEntity* ge : m_geomCmd->getNewEntities())
+			if (ge->getDim() == dim)
+				entities.push_back(ge);
 
 		if (entities.size() != 2)
 			throw TkUtil::Exception("Erreur interne, la copie n'a pas donné 2 entités");

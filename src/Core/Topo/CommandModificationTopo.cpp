@@ -94,7 +94,7 @@ void CommandModificationTopo::MAJVertices()
 	std::cout<<"CommandModificationTopo::MAJVertices()"<<std::endl;
 #endif
     // récupération de tous les sommets géométriques
-    std::list<Geom::GeomEntity*>& geom_vtx = m_command_edit_geom->getRefEntities(0);
+    auto geom_vtx = m_command_edit_geom->getRefEntities(0);
 
 #ifdef _DEBUG_MAJTOPO_2
     // on afiche la liste des sommets détruits et leurs coordonnées
@@ -122,7 +122,8 @@ void CommandModificationTopo::MAJVertices()
 #endif
         if ((*iter)->isDestroyed()){
             // recherche du sommet par lequel il est remplacé
-            std::vector<Geom::GeomEntity*> newEntities = m_command_edit_geom->getReplacedEntities()[*iter];
+            auto repl = m_command_edit_geom->getReplacedEntities();
+            std::vector<Geom::GeomEntity*> newEntities = repl[*iter];
 #ifdef _DEBUG_MAJTOPO
             std::cout<<"   "<<(*iter)->getName()<<" est remplacée par "<<newEntities.size()<<" sommet[s]:";
             for (uint i=0; i<newEntities.size(); i++)
@@ -185,7 +186,8 @@ void CommandModificationTopo::MAJCoEdges()
 #endif
         if ((*iter)->isDestroyed()){
             // recherche de[s] la[es] courbe[s] par laquelle elle est remplacée
-            std::vector<Geom::GeomEntity*> newEntities = m_command_edit_geom->getReplacedEntities()[*iter];
+            auto repl = m_command_edit_geom->getReplacedEntities();
+            std::vector<Geom::GeomEntity*> newEntities = repl[*iter];
 
 #ifdef _DEBUG_MAJTOPO
             std::cout<<"   "<<(*iter)->getName()<<" est remplacée par "<<newEntities.size()<<" courbe[s]:";
@@ -554,7 +556,8 @@ void CommandModificationTopo::MAJCoFaces()
 #endif
         if ((*iter)->isDestroyed()){
             // recherche de[s] la[es] surface[s] par laquelle elle est remplacée
-            std::vector<Geom::GeomEntity*> newEntities = m_command_edit_geom->getReplacedEntities()[*iter];
+            auto repl = m_command_edit_geom->getReplacedEntities();
+            std::vector<Geom::GeomEntity*> newEntities = repl[*iter];
 
 #ifdef _DEBUG_MAJTOPO
             std::cout<<"   "<<(*iter)->getName()<<" est remplacée par "<<newEntities.size()<<" surface[s]:";
@@ -737,7 +740,8 @@ void CommandModificationTopo::MAJBlocks()
 #endif
         if ((*iter)->isDestroyed()){
         	// recherche le volume par lequel il est remplacé
-        	std::vector<Geom::GeomEntity*> newEntities = m_command_edit_geom->getReplacedEntities()[*iter];
+            auto repl = m_command_edit_geom->getReplacedEntities();
+        	std::vector<Geom::GeomEntity*> newEntities = repl[*iter];
 
 #ifdef _DEBUG_MAJTOPO
         	std::cout<<"   "<<(*iter)->getName()<<" est remplacée par "<<newEntities.size()<<" volume[s]:";

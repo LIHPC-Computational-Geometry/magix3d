@@ -55,21 +55,17 @@ CommandGeomCopy(Internal::Context& c,
 {
 	Geom::GeomManager& gm = getContext().getGeomManager();
 
-	std::vector<Volume*> volumes = gm.getVolumesObj();
-	for (uint i=0; i<volumes.size(); i++)
-		m_entities.push_back(volumes[i]);
+	for (Volume* v : gm.getVolumesObj())
+		m_entities.push_back(v);
 
-	std::vector<Surface*> surfaces = gm.getSurfacesObj();
-	for (uint i=0; i<surfaces.size(); i++)
-		m_entities.push_back(surfaces[i]);
+	for (Surface* s : gm.getSurfacesObj())
+		m_entities.push_back(s);
 
-	std::vector<Curve*> curves = gm.getCurvesObj();
-	for (uint i=0; i<curves.size(); i++)
-		m_entities.push_back(curves[i]);
+	for (Curve* c : gm.getCurvesObj())
+		m_entities.push_back(c);
 
-	std::vector<Vertex*> vertices = gm.getVerticesObj();
-	for (uint i=0; i<vertices.size(); i++)
-		m_entities.push_back(vertices[i]);
+	for (Vertex* v : gm.getVerticesObj())
+		m_entities.push_back(v);
 
     m_adj_entities.clear();
     m_moved_entities.clear();
@@ -88,17 +84,17 @@ CommandGeomCopy::~CommandGeomCopy()
 void CommandGeomCopy::validate()
 {}
 /*----------------------------------------------------------------------------*/
-std::vector<GeomEntity*>& CommandGeomCopy::getRemovedEntities()
+const std::vector<GeomEntity*>& CommandGeomCopy::getRemovedEntities() const
 {
     return m_removed_entities;
 }
 /*----------------------------------------------------------------------------*/
-std::vector<GeomEntity*>& CommandGeomCopy::getNewEntities()
+const std::vector<GeomEntity*>& CommandGeomCopy::getNewEntities() const
 {
     return m_new_entities;
 }
 /*----------------------------------------------------------------------------*/
-std::vector<GeomEntity*> CommandGeomCopy::getKeepedEntities()
+const std::vector<GeomEntity*> CommandGeomCopy::getKeepedEntities() const
 {
     std::vector<GeomEntity*> vec;
     for(int i=0;i<4;i++)
@@ -107,29 +103,27 @@ std::vector<GeomEntity*> CommandGeomCopy::getKeepedEntities()
     return vec;
 }
 /*----------------------------------------------------------------------------*/
-std::vector<GeomEntity*>& CommandGeomCopy::getMovedEntities()
+const std::vector<GeomEntity*>& CommandGeomCopy::getMovedEntities() const
 {
    return m_moved_entities;
 }
 /*----------------------------------------------------------------------------*/
-std::list<GeomEntity*>& CommandGeomCopy::getRefEntities(const int dim)
+const std::list<GeomEntity*>& CommandGeomCopy::getRefEntities(const int dim) const
 {
     return m_ref_entities[dim];
 }
 /*----------------------------------------------------------------------------*/
-std::list<GeomEntity*>& CommandGeomCopy::getAdjEntities(const int dim)
+const std::list<GeomEntity*>& CommandGeomCopy::getAdjEntities(const int dim) const
 {
     return m_adj_entities;
 }
 /*----------------------------------------------------------------------------*/
-std::map<GeomEntity*,std::vector<GeomEntity*> >& CommandGeomCopy::
-getReplacedEntities()
+const std::map<GeomEntity*,std::vector<GeomEntity*> >& CommandGeomCopy::getReplacedEntities() const
 {
    return m_replaced_entities;
 }
 /*----------------------------------------------------------------------------*/
-std::map<GeomEntity*, GeomEntity* >& CommandGeomCopy::
-getRef2NewEntities()
+const std::map<GeomEntity*, GeomEntity*>& CommandGeomCopy::getRef2NewEntities() const
 {
     return m_ref_to_new_entities;
 }

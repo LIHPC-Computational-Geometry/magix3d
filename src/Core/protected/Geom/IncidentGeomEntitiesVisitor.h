@@ -61,10 +61,10 @@ public:
     const Utils::EntitySet<Vertex*>& getVertices() {return m_down_incident_vertices;}
 
     GetDownIncidentGeomEntitiesVisitor()
-    : m_down_incident_entities(&Utils::Entity::compareEntity)
-    , m_down_incident_surfaces(&Utils::Entity::compareEntity)
-    , m_down_incident_curves(&Utils::Entity::compareEntity)
-    , m_down_incident_vertices(&Utils::Entity::compareEntity)
+    : m_down_incident_entities(Utils::Entity::compareEntity)
+    , m_down_incident_surfaces(Utils::Entity::compareEntity)
+    , m_down_incident_curves(Utils::Entity::compareEntity)
+    , m_down_incident_vertices(Utils::Entity::compareEntity)
     {}
     virtual ~GetDownIncidentGeomEntitiesVisitor() = default;
 
@@ -122,10 +122,10 @@ public:
     const Utils::EntitySet<Curve*>& getCurves() {return m_up_incident_curves;}
 
     GetUpIncidentGeomEntitiesVisitor()
-    : m_up_incident_entities(&Utils::Entity::compareEntity)
-    , m_up_incident_volumes(&Utils::Entity::compareEntity)
-    , m_up_incident_surfaces(&Utils::Entity::compareEntity)
-    , m_up_incident_curves(&Utils::Entity::compareEntity)
+    : m_up_incident_entities(Utils::Entity::compareEntity)
+    , m_up_incident_volumes(Utils::Entity::compareEntity)
+    , m_up_incident_surfaces(Utils::Entity::compareEntity)
+    , m_up_incident_curves(Utils::Entity::compareEntity)
     {}
     virtual ~GetUpIncidentGeomEntitiesVisitor() = default;
 
@@ -183,11 +183,11 @@ public:
     const Utils::EntitySet<Vertex*>& getVertices() {return m_adjacent_vertices;}
     
     GetAdjacentGeomEntitiesVisitor()
-    : m_adjacent_entities(&Utils::Entity::compareEntity)
-    , m_adjacent_volumes(&Utils::Entity::compareEntity)
-    , m_adjacent_surfaces(&Utils::Entity::compareEntity)
-    , m_adjacent_curves(&Utils::Entity::compareEntity)
-    , m_adjacent_vertices(&Utils::Entity::compareEntity)
+    : m_adjacent_entities(Utils::Entity::compareEntity)
+    , m_adjacent_volumes(Utils::Entity::compareEntity)
+    , m_adjacent_surfaces(Utils::Entity::compareEntity)
+    , m_adjacent_curves(Utils::Entity::compareEntity)
+    , m_adjacent_vertices(Utils::Entity::compareEntity)
     {}
     virtual ~GetAdjacentGeomEntitiesVisitor() = default;
 
