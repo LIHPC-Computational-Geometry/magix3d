@@ -458,10 +458,13 @@ public:
 	/**
 	 * Recherche une couleur en configuration pour une entité.
 	 * \param		Nom du groupe dont on recherche une couleur.
-	 * \return		La couleur associé au groupe dont le nom est transmis en argument.
-	 * \exception	Une exception est levée si la couleur n'est pas trouvée en configuration.
+	 * \param		En retour, la couleur associé au groupe.
+	 * \param		true s'il faut lever une exception si la couleur n'est pas trouvée
+	 * \return		true si la couleur est trouvée, false dansle cas contraire
+	 * \exception	Une exception est levée si la couleur n'est pas trouvée en configuration et
+	 * 				si raise vaut true.
 	 */
-	 TkUtil::Color getGroupColor (const std::string& name);
+	 bool getGroupColor (const std::string& name, TkUtil::Color& color, bool raise = true);
 #endif
 
     /** Passage en mode apperçu ou non. En mode apperçu les couleurs fournies

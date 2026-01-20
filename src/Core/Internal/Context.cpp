@@ -1425,8 +1425,8 @@ bool Context::getGroupColor (const std::vector<Group::GroupEntity*>& groups, TkU
 	{
 		try
 		{
-			color	= getGroupColor ((*itg)->getName ( ));
-			return true;
+			if (true == getGroupColor ((*itg)->getName ( ), color, false))
+				return true;
 		}
 		catch (...)
 		{
@@ -1436,15 +1436,23 @@ bool Context::getGroupColor (const std::vector<Group::GroupEntity*>& groups, TkU
 	return false;
 }	// Context::getGroupColor
 /*----------------------------------------------------------------------------*/
-TkUtil::Color Context::getGroupColor (const std::string& name)
+bool Context::getGroupColor (const std::string& name, TkUtil::Color& color, bool raise)
 {
 	const std::map<std::string, TkUtil::Color>::iterator it	= m_groups_colors.find (name);
 	if (m_groups_colors.end ( ) != it)
-		return it->second;
+	{
+		color	= it->second;
+		return true;
+	}
 
-	TkUtil::UTF8String	message;
-	message << "Context::groupColor. Couleur pour le groupe de données \"" << name << "\" non recensée.";
-	throw TkUtil::Exception (message);
+	if (true == raise)
+	{
+		TkUtil::UTF8String	message;
+		message << "Context::groupColor. Couleur pour le groupe de données \"" << name << "\" non recensée.";
+		throw TkUtil::Exception (message);
+	}
+	
+	return false;
 }	// Context::getGroupColor
 /*----------------------------------------------------------------------------*/
 void Context::undo()
