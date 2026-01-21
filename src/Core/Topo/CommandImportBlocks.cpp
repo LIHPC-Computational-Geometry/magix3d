@@ -45,7 +45,7 @@ namespace Mgx3D {
                     getTopoManager().add((CoFace *) te.first);
                 }else if (te.first->getType() == Utils::Entity::TopoFace) {
                     getTopoManager().add((Face *) te.first);
-                } else if (te.first->getType() == Utils::Entity::TopoEdge) {
+                } else if (te.first->getType() == Utils::Entity::TopoBlock) {
                     getTopoManager().add((Block *) te.first);
                 }
             }
