@@ -751,7 +751,7 @@ getIntersection(const TopoDS_Edge& edge, gp_Pln& plan_cut, Utils::Math::Point& P
 		 else if (Intersector.NbPoints() > 1){
 			 for (uint i=1; i<=Intersector.NbPoints(); i++){
 				 gp_Pnt pt = Intersector.Point (i);
-				 Quantity_Parameter U, V, W;
+				 Standard_Real U, V, W;
 				 Intersector.Parameters(i, U, V, W);
 #ifdef _DEBUG_INTERSECTION
 				 std::cout<<" i = "<<i<<" W = "<<W<<" dans ["<<first<<" "<<last<<"] ?"<<std::endl;
@@ -1064,36 +1064,35 @@ cleanShape(TopoDS_Shape& shape){
 #endif
 
         Handle(ShapeFix_Wire) sfw;
-        Handle_ShapeBuild_ReShape rebuild = new ShapeBuild_ReShape;
-        rebuild->Apply(shape);
-
+        ShapeBuild_ReShape rebuild;
+        rebuild.Apply(shape);
         for(int i = 1; i <= fmap.Extent(); i++){
             TopExp_Explorer exp1;
             for(exp1.Init(fmap(i), TopAbs_WIRE); exp1.More(); exp1.Next()){
                 TopoDS_Wire oldwire = TopoDS::Wire(exp1.Current());
-                sfw = new ShapeFix_Wire(oldwire, TopoDS::Face(fmap(i)), tolerance);
-                sfw->ModifyTopologyMode() = Standard_True;
+                ShapeFix_Wire sfw(oldwire, TopoDS::Face(fmap(i)), tolerance);
+                sfw.ModifyTopologyMode() = Standard_True;
 
-                if(sfw->FixSmall(false, tolerance)){
+                if(sfw.FixSmall(false, tolerance)){
 
                     std::cout<<"suppression dans un \"wire\" "<< wmap.FindIndex(oldwire)<<std::endl;
 
-                    TopoDS_Wire newwire = sfw->Wire();
-                    rebuild->Replace(oldwire, newwire, Standard_False);
+                    TopoDS_Wire newwire = sfw.Wire();
+                    rebuild.Replace(oldwire, newwire);
                 }
 #ifdef _DEBUG
-                if((sfw->StatusSmall(ShapeExtend_FAIL1)) ||
-                        (sfw->StatusSmall(ShapeExtend_FAIL2)) ||
-                        (sfw->StatusSmall(ShapeExtend_FAIL3)))
+                if((sfw.StatusSmall(ShapeExtend_FAIL1)) ||
+                        (sfw.StatusSmall(ShapeExtend_FAIL2)) ||
+                        (sfw.StatusSmall(ShapeExtend_FAIL3)))
                     std::cout<<"Echec de la correction d'une petite arête dans un wire"<<wmap.FindIndex(oldwire)<<std::endl;
 #endif
             }
         }
-        shape = rebuild->Apply(shape);
+        shape = rebuild.Apply(shape);
 
         {
-            Handle_ShapeBuild_ReShape rebuild = new ShapeBuild_ReShape;
-            rebuild->Apply(shape);
+            ShapeBuild_ReShape rebuild;
+            rebuild.Apply(shape);
             TopExp_Explorer exp1;
             for(exp1.Init(shape, TopAbs_EDGE); exp1.More(); exp1.Next()){
                 TopoDS_Edge edge = TopoDS::Edge(exp1.Current());
@@ -1105,28 +1104,28 @@ cleanShape(TopoDS_Shape& shape){
 #ifdef _DEBUG
                         std::cout <<"removing degenerated edge "<<emap.FindIndex(edge)<<std::endl;
 #endif
-                        rebuild->Remove(edge, false);
+                        rebuild.Remove(edge);
                     }
                 }
             }
-            shape = rebuild->Apply(shape);
+            shape = rebuild.Apply(shape);
         }
 
-        Handle(ShapeFix_Wireframe) sfwf = new ShapeFix_Wireframe;
-        sfwf->SetPrecision(tolerance);
-        sfwf->Load(shape);
-        shape = sfwf->Shape();
+        ShapeFix_Wireframe sfwf;
+        sfwf.SetPrecision(tolerance);
+        sfwf.Load(shape);
+        shape = sfwf.Shape();
     }
 
     if(fixspotstripfaces){
 #ifdef _DEBUG
        std::cout<<"- fixing spot faces"<<std::endl;
 #endif
-        Handle(ShapeFix_FixSmallFace) sffsm = new ShapeFix_FixSmallFace;
-        sffsm->Init(shape);
-        sffsm->SetPrecision(tolerance);
-       sffsm->FixSpotFace();
-        shape = sffsm->FixShape();
+        ShapeFix_FixSmallFace sffsm;
+        sffsm.Init(shape);
+        sffsm.SetPrecision(tolerance);
+        sffsm.FixSpotFace();
+        shape = sffsm.FixShape();
     }
     return shape;
 }
@@ -1434,23 +1433,22 @@ geodesicDistance(
     if (triangulation.IsNull())
         throw TkUtil::Exception("Triangulation inexistante");
 
-    const TColgp_Array1OfPnt& nodes = triangulation->Nodes();
-    int nbNodes = nodes.Size();
+    int nbNodes = triangulation->NbNodes();
     const Poly_Array1OfTriangle& triangles = triangulation->Triangles();
 
     /* ==============================
        2. Trouver les nœuds les plus proches
        ============================== */
-    int startNode = nodes.Lower();
-    int endNode   = nodes.Lower();
+    int startNode = 0;
+    int endNode   = 0;
 
     double minDistStart = std::numeric_limits<double>::max();
     double minDistEnd   = std::numeric_limits<double>::max();
 
-    for (int i = nodes.Lower(); i <= nodes.Upper(); ++i)
+    for (int i = 1; i <= nbNodes; ++i)
     {
-        double d1 = nodes(i).Distance(p1);
-        double d2 = nodes(i).Distance(p2);
+        double d1 = triangulation->Node(i).Distance(p1);
+        double d2 = triangulation->Node(i).Distance(p2);
 
         if (d1 < minDistStart)
         {
@@ -1469,7 +1467,7 @@ geodesicDistance(
        3. Construction du graphe
        ============================== */
     using Edge = std::pair<int, double>; // (voisin, poids)
-    std::vector<std::vector<Edge>> graph(nodes.Size() + 1);
+    std::vector<std::vector<Edge>> graph(nbNodes + 1);
 
     for (int i = triangles.Lower(); i <= triangles.Upper(); ++i)
     {
@@ -1478,7 +1476,7 @@ geodesicDistance(
 
         auto addEdge = [&](int a, int b)
         {
-            double w = nodes(a).Distance(nodes(b));
+            double w = triangulation->Node(a).Distance(triangulation->Node(b));
             graph[a].emplace_back(b, w);
             graph[b].emplace_back(a, w);
         };
@@ -1502,7 +1500,7 @@ geodesicDistance(
         int u = -1;
         double minDist = std::numeric_limits<double>::max();
 
-        for (int i = nodes.Lower(); i <= nodes.Upper(); ++i)
+        for (int i = 0; i < nbNodes; ++i)
         {
             if (!visited[i] && dist[i] < minDist)
             {

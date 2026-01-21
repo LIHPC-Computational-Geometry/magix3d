@@ -71,7 +71,7 @@ endif (NOT TARGET Mesquite::Mesquite)
 
 pkg_check_modules (GTS REQUIRED IMPORTED_TARGET gts)  # GTS (GNU Triangulated Surface Library)
 
-find_package (OpenCASCADE 7.1.0 REQUIRED)
+find_package (OpenCASCADE 7.8.1 REQUIRED)
 
 set (ALL_TARGETS Core)
 set_property (TARGET Core PROPERTY VERSION ${CORE_VERSION})

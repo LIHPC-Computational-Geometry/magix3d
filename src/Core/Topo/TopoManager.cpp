@@ -3078,7 +3078,9 @@ double TopoManager::getEdgeProjectedLength(const std::string& edge_name) const
         }
     }
     else
+    {
         throw TkUtil::Exception (TkUtil::UTF8String ("Type d'entité géométrique associée à l'arête non géré pour le calcul de la longueur projetée", TkUtil::Charset::UTF_8));
+    }
 }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResult* TopoManager::setEdgeMeshingProperty(CoEdgeMeshingProperty& emp, CoEdge* ed)
