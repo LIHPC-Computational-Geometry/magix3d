@@ -88,13 +88,10 @@ translateSingle(GeomEntity* e)
 TopoDS_Shape GeomTranslateImplementation::
 translate(const TopoDS_Shape& shape, const Utils::Math::Vector& V)
 {
-    gp_Trsf T;
     gp_Vec v(V.getX(),V.getY(),V.getZ());
+    gp_Trsf T;
     T.SetTranslation(v);
-    BRepBuilderAPI_Transform translat(T);
-    //on effectue la translation
-    translat.Perform(shape);
-
+    BRepBuilderAPI_Transform translat(shape, T, Standard_True);
     if(!translat.IsDone())
         throw TkUtil::Exception("Echec d'une translation!!");
 

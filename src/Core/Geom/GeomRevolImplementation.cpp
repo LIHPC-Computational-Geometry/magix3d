@@ -20,7 +20,7 @@
 #include <TopExp.hxx>
 #include <TopTools_IndexedMapOfShape.hxx>
 #include <BRepTools.hxx>
-#include <BRepAdaptor_HCurve.hxx>
+#include <BRepAdaptor_Curve.hxx>
 #include <BRepCheck_Analyzer.hxx>
 #include <GProp_GProps.hxx>
 #include <BRepGProp.hxx>

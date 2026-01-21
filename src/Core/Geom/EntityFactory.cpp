@@ -125,9 +125,8 @@ Surface* EntityFactory::newSurfaceByCopyWithOffset(Surface* E, const double& off
 
 		auto init_reps = E->getOCCFaces();
         for (auto sh : init_reps) {
-			BRepOffsetAPI_MakeOffsetShape MF(sh, offset,
-					Utils::Math::MgxNumeric::mgxDoubleEpsilon);
-
+			BRepOffsetAPI_MakeOffsetShape MF;
+            MF.PerformByJoin(sh, offset, Utils::Math::MgxNumeric::mgxDoubleEpsilon);
 			if(MF.IsDone()){
 				TopoDS_Shape aShape = MF.Shape();
 				if (!aShape.IsNull()){

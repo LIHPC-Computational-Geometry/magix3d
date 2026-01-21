@@ -10,7 +10,6 @@
 #include <Poly_Polygon3D.hxx>
 #include <Poly_PolygonOnTriangulation.hxx>
 #include <BRepBndLib.hxx>
-#include <BRepMesh.hxx>
 #include <BRepTools.hxx>
 #include <BRep_Tool.hxx>
 #include <TopExp.hxx>
@@ -39,7 +38,6 @@
 #include <BRepAdaptor_Surface.hxx>
 #include <GeomAbs_SurfaceType.hxx>
 #include <GeomAbs_CurveType.hxx>
-#include <Adaptor3d_HCurve.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -285,10 +283,9 @@ void OCCDisplayRepresentationBuilder::computeEdges()
                 nbNodesInEdge= aEdgePoly->NbNodes();
 
                 const TColStd_Array1OfInteger& NodeIDs = aEdgePoly->Nodes();
-                const TColgp_Array1OfPnt& Nodes = T->Nodes();
                 gp_Pnt V;
                 for (Standard_Integer i=0;i < nbNodesInEdge;i++) {
-                    V = Nodes(NodeIDs(i+1));
+                    V = T->Node(NodeIDs(i+1));
                     if(!identity)
                         V.Transform(myTransf);
 
@@ -401,10 +398,9 @@ void OCCDisplayRepresentationBuilder::computeEdges()
            int nbNodesInEdge= aEdgePoly->NbNodes();
 
             const TColStd_Array1OfInteger& NodeIDs = aEdgePoly->Nodes();
-            const TColgp_Array1OfPnt& Nodes = T->Nodes();
             gp_Pnt V;
             for (Standard_Integer i=0;i < nbNodesInEdge;i++) {
-                V = Nodes(NodeIDs(i+1));
+                V = T->Node(NodeIDs(i+1));
                 if(!identity)
                     V.Transform(myTransf);
 
@@ -1157,7 +1153,6 @@ void OCCDisplayRepresentationBuilder::fillRepresentation(
 
     // on parcourt la triangulation pour remplir notre représentation
     const Poly_Array1OfTriangle& Triangles = aPoly->Triangles();
-    const TColgp_Array1OfPnt& Nodes = aPoly->Nodes();
     for (i=1;i<=nbTriInFace;i++) {
         // Get the triangle
         Standard_Integer N1,N2,N3;
@@ -1170,9 +1165,9 @@ void OCCDisplayRepresentationBuilder::fillRepresentation(
             N2 = tmp;
         }
 
-        gp_Pnt V1 = Nodes(N1);
-        gp_Pnt V2 = Nodes(N2);
-        gp_Pnt V3 = Nodes(N3);
+        gp_Pnt V1 = aPoly->Node(N1);
+        gp_Pnt V2 = aPoly->Node(N2);
+        gp_Pnt V3 = aPoly->Node(N3);
 
         // on positionne correctement les sommets
         if (!identity) {

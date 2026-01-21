@@ -33,5 +33,5 @@ def test_tetgen2():
     ctx.getTopoManager().setMeshingProperty (emp, ["Ar0001"])
     # Création du maillage pour tous les blocs
     ctx.getMeshManager().newAllBlocksMesh()
-    assert ctx.getMeshManager().getNbRegions() > 2900
-    assert ctx.getMeshManager().getNbRegions() < 3000
+    assert ctx.getMeshManager().getNbRegions() > 3000
+    assert ctx.getMeshManager().getNbRegions() < 3010

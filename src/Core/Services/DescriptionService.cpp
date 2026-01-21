@@ -14,6 +14,7 @@
 #include <TkUtil/NumericServices.h>
 #include <BRep_Tool.hxx>
 #include <Geom_BSplineCurve.hxx>
+#include <NCollection_DefaultHasher.hxx>
 
 using Property = Mgx3D::Utils::SerializedRepresentation::Property;
 
@@ -369,7 +370,8 @@ namespace Mgx3D::Services
 
 		auto add_description = [&](const TopoDS_Shape &sh)
 		{
-			int hc = sh.HashCode(INT_MAX);
+			NCollection_DefaultHasher<TopoDS_Shape> hasher;
+			int hc = hasher(sh);
 			occGeomDescription.addProperty(Property("HashCode", (long int)hc));
 		};
 		e->apply(add_description);

@@ -10,6 +10,7 @@
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
 /*----------------------------------------------------------------------------*/
+#include <gp_Pln.hxx>
 #include <TopoDS_Edge.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {

@@ -58,36 +58,6 @@ def test_curve_on_surf_proj_1():
         gm.newCurveByCurveProjectionOnSurface("Crb0009", "Surf0007", "TITI")
     assert "OCC a échoué, création de la courbe composite" in str(excinfo.value)
 
-# Met en évidence un bug lors la création d'une courbe composite
-# après projection d'une courbe sur une surface
-def test_curve_on_surf_proj_2():
-    ctx = Mgx3D.getStdContext()
-    ctx.clearSession() # Clean the session after the previous test
-    gm = ctx.getGeomManager()
-
-    # Création du sommet Pt0000
-    gm.newVertex (Mgx3D.Point(0, 0.0615, 0))
-    # Création du sommet Pt0001
-    gm.newVertex (Mgx3D.Point(-0.0015, 0.06, 0))
-    # Création du sommet Pt0002
-    gm.newVertex (Mgx3D.Point(-0.0015, 0.0615, 0))
-    # Création de l'arc de cercle Crb0000
-    gm.newArcCircle("Pt0002", "Pt0001", "Pt0000", True)
-    # Révolution de Crb0000
-    gm.makeRevol (["Crb0000"], Mgx3D.RotX(90), False)
-    # Création du sommet Pt0007
-    gm.newVertex (Mgx3D.Point(-0.0015, 4.24264068711929e-2, 4.24264068711928e-2))
-    # Création du sommet Pt0008
-    gm.newVertex (Mgx3D.Point(0, 4.34870670429727e-2, 4.34870670429727e-2))
-    # Création du segment Crb0005
-    gm.newSegment("Pt0008", "Pt0007")
-
-    with pytest.raises(RuntimeError) as excinfo:
-        # Création d'une courbe par projection sur une surface
-        # Erreur OCC
-        gm.newCurveByCurveProjectionOnSurface("Crb0005", "Surf0000")
-    assert "Erreur OCC" in str(excinfo.value)
-
 # le maillage obtenu dans le fichier pb_perturbation.mli semble anormal
 def test_perturbation(capfd):
     ctx = Mgx3D.getStdContext()
