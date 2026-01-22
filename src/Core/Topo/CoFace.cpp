@@ -2883,6 +2883,15 @@ getNodes(uint decalage,
 #endif
 }
 /*----------------------------------------------------------------------------*/
+gmds::TCellID CoFace::
+getNode(uint i, uint j)
+{
+    uint nbI;
+    uint nbJ;
+    getNbMeshingNodes(nbI, nbJ);
+    return nodes()[i + j*nbI];
+}
+/*----------------------------------------------------------------------------*/
 void CoFace::
 fuse(CoFace* face_B,
         Internal::InfoCommand* icmd)
@@ -3432,6 +3441,14 @@ getNbMeshingEdges(uint& nbI, uint& nbJ) const
         nbI = 0;
         nbJ = 0;
     }
+}
+/*----------------------------------------------------------------------------*/
+void CoFace::
+getNbMeshingNodes(uint& nbI, uint& nbJ) const
+{
+    getNbMeshingEdges(nbI, nbJ);
+    nbI++;
+    nbJ++;
 }
 /*----------------------------------------------------------------------------*/
 std::vector<CoEdge* > CoFace::
