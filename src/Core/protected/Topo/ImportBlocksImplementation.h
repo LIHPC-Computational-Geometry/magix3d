@@ -20,9 +20,10 @@ public:
      *
      *  \param c le contexte
      *  \param n le nom du fichier à importer
+     *  \param withGeom <I>True</I> si on importe l'association
      */
     ImportBlocksImplementation(Internal::Context& c, Internal::InfoCommand* icmd,
-                               const std::string& n);
+                               const std::string& n, bool withGeom);
 
     /*------------------------------------------------------------------------*/
     /** \brief   Destructeur
@@ -31,8 +32,21 @@ public:
 
     void internalExecute();
 
+    std::string getWarning();
+
+
 private:
+    void readNodes(ifstream &str, Group::Group0D* group);
+    int readEdges(ifstream &str, Group::Group1D* group);
+    void readFaces(ifstream &str, Group::Group2D* group);
+    void readBlocks(ifstream &str, Group::Group3D* group);
+
+    void readDiscr(ifstream &str, const int &nbEdges);
+
+    void readAssociation(std::ifstream &str);
+
     bool moveStreamOntoFirst(std::ifstream& s,const std::string &AString);
+    static std::string findGeom(int dim, int id);
 
 private:
     /// helper pour la gestion des groupes dans les commandes
@@ -45,6 +59,22 @@ private:
 
     /// le nom du fichier en entier
     std::string m_filename;
+    bool m_geom;
+
+    std::string m_warning;
+
+    std::vector<Vertex*> m_vertices;
+    std::vector<std::string> m_vnames;
+
+    std::vector<CoEdge*> m_coedges;
+    std::vector<std::string> m_enames;
+
+    std::vector<CoFace*> m_cofaces;
+    std::vector<std::string > m_fnames;
+
+    std::vector<std::string > m_bnames;
+    std::vector<Block*> m_blocks;
+
 };
 }
 }

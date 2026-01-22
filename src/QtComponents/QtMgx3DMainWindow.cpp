@@ -26,10 +26,12 @@
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtLandmarkDialog.h"
 #include "QtComponents/QtMdlOptionsDialog.h"
+#include "QtComponents/QtBlocksOptionsDialog.h"
 #include "QtComponents/QtMgx3DScriptFileDialog.h"
 #include "QtComponents/QtGuiStateDialog.h"
 #include "QtComponents/RenderedEntityRepresentation.h"
 #include "QtComponents/QtColorTablesEditorDialog.h"
+
 
 // Les opérations géométriques :
 #include "QtComponents/QtArcCircleOperationAction.h"
@@ -5515,6 +5517,7 @@ cout << __FILE__ << ' ' << __LINE__ << " QtMgx3DMainWindow::exitCallback" << end
 			filters << "BREP (*.brep)";
 			filters << "STEP (*.stp *.step)";
 			filters << "IGES (*.igs *.iges)";
+            filters << "BLOCKS (*.blk)";
 			UTF8String limaFilter(Charset::UTF_8);
 			limaFilter << "Lima++ (";
 			const char **limaExt = Lima::liste_format_lecture();
@@ -5656,6 +5659,22 @@ cout << __FILE__ << ' ' << __LINE__ << " QtMgx3DMainWindow::exitCallback" << end
 										log(InformationLog(msg));
 										getContext().getMeshManager().readMli(fileName, pre);
 									}    // Lima
+                                    else
+                                    if (true == compareExtensions(file.getExtension(), "blk"))
+                                    {
+                                        QtBlocksOptionsDialog blocksDialog(this, getAppTitle(), fileName);
+                                        if (QDialog::Rejected == blocksDialog.exec())
+                                        {
+                                            msg << " Opération annulée par l'utilisateur.";
+                                            log(InformationLog(msg));
+                                            return;
+                                        }    // if (QDialog::Rejected == mdlDialog.exec ( ))
+
+                                        QtAutoWaitingCursor cursor(true);
+                                        const bool          geomAssoc    = blocksDialog.geometricAssociation();
+
+                                        getContext().getTopoManager().importBlocks(fileName, geomAssoc);
+                                    }    // BREP
 									else
 									{
 										UTF8String error(Charset::UTF_8);
@@ -5737,6 +5756,7 @@ void QtMgx3DMainWindow::exportAllCallback ( )
 	filters << "STEP (*.stp *.step)";
 	filters << "IGES (*.igs *.iges)";
 	filters << "CGNS (*.cgns)";
+    filters << "BLOCKS (*.blk)";
 	dialog.setNameFilters (filters);
 
 	while (0 == fileName.length ( ))
@@ -5857,6 +5877,25 @@ void QtMgx3DMainWindow::exportAllCallback ( )
 		log (InformationLog (msg));
 		getContext ( ).getMeshManager ( ).writeCGNS (fileName);
 	}	// cgns
+    else if (true == compareExtensions (file.getExtension ( ), "blk"))
+    {
+        SelectionManager&	selectionManager	=
+                getContext ( ).getSelectionManager ( );
+
+        QtBlocksOptionsDialog blocksDialog(this, getAppTitle(), fileName);
+        if (QDialog::Rejected == blocksDialog.exec())
+        {
+            msg << " Opération annulée par l'utilisateur.";
+            log(InformationLog(msg));
+            return;
+        }    // if (QDialog::Rejected == mdlDialog.exec ( ))
+
+        QtAutoWaitingCursor cursor(true);
+        const bool          geomAssoc    = blocksDialog.geometricAssociation();
+
+        log (InformationLog (msg));
+        getContext ( ).getTopoManager ( ).exportBlocks(fileName, geomAssoc);
+    }	// blk
 	else
 	{
 		UTF8String	error (Charset::UTF_8);

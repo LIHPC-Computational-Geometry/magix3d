@@ -1838,14 +1838,16 @@ public:
     /** \brief Export dans un fichier au format BLK de toute la topologie
      *
      *  \param n le nom du ficher dans lequel on exporte
+     *  \param withGeom si on exporte l'association géométrique
      */
-    virtual Mgx3D::Internal::M3DCommandResult* exportBlocks(const std::string& n);
+    virtual Mgx3D::Internal::M3DCommandResult* exportBlocks(const std::string& n, bool withGeom);
 
     /** \brief Import de la topologie à partir d'un fichier au format BLK
      *
      *  \param n le nom du ficher à partir duquel on importe
+     *  \param withGeom si on importe l'association géométrique
      */
-    virtual Mgx3D::Internal::M3DCommandResult* importBlocks(const std::string& n);
+    virtual Mgx3D::Internal::M3DCommandResult* importBlocks(const std::string& n, bool withGeom);
 
     /*------------------------------------------------------------------------*/
     /// retourne le nombre de blocs non détruits référencés par le TopoManager
