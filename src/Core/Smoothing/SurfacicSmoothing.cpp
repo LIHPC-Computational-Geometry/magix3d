@@ -26,6 +26,9 @@
 #include <gmds/ig/Face.h>
 /*----------------------------------------------------------------------------*/
 //Mesquite
+#include <gmds/io/IGMeshIOService.h>
+#include <gmds/io/VTKWriter.h>
+
 #include "InstructionQueue.hpp"
 #include "LPtoPTemplate.hpp"
 #include "ConjugateGradient.hpp"
@@ -35,6 +38,9 @@
 #include "QualityAssessor.hpp"
 #include "TerminationCriterion.hpp"
 #include "Geom/Surface.h"
+#include "Internal/Context.h"
+#include "Mesh/MeshItf.h"
+#include "Topo/CoFace.h"
 
 
 /*----------------------------------------------------------------------------*/
@@ -128,7 +134,8 @@ addToDescription (Mgx3D::Utils::SerializedRepresentation* description) const
 }
 /*----------------------------------------------------------------------------*/
 void SurfacicSmoothing::
-applyModification(std::vector<gmds::Node >& gmdsNodes,
+applyModification(std::vector<Topo::CoFace*>& cofaces,
+			std::vector<gmds::Node >& gmdsNodes,
 			std::vector<gmds::Face>& gmdsPolygones,
 			std::map<gmds::TCellID, uint>& filtre_nodes,
 			std::map<gmds::TCellID, bool>& isPolyInverted,
@@ -168,6 +175,58 @@ applyModification(std::vector<gmds::Node >& gmdsNodes,
 			std::cout << "YAO SMOOTHING SURFACE: " << surface->getName() << std::endl;
 			std::cout << "Nbr of Nodes: " << gmdsNodes.size() << std::endl;
 			std::cout << "Nbr of Faces: " << gmdsPolygones.size() << std::endl;
+
+			for (Topo::CoFace* cf:cofaces)
+			{
+				gmds::Mesh& gmds_mesh = cf->getContext().getMeshManager().getMesh()->getGMDSMesh();
+				uint nbI;
+				uint nbJ;
+				cf->getNbMeshingNodes(nbI, nbJ);
+				std::vector<gmds::TCellID> cfNodes = cf->nodes();
+				// save old positions
+				std::map<gmds::TCellID, Utils::Math::Point> oldPositions;
+
+				// loop over iterations
+				for (int iter=0; iter<m_nbIterations; iter++)
+				{
+					// save old positions
+					for (auto nId:cfNodes)
+					{
+						gmds::Node n = gmds_mesh.get<gmds::Node>(nId);
+						Utils::Math::Point p = {n.X(), n.Y(), n.Z()};
+						oldPositions[nId] = p;
+					}
+
+					// update node positions
+					for (uint j=1; j<nbJ-1; j++)
+					{
+						for (uint i=1; i<nbI-1; i++)
+						{
+							gmds_mesh.get<gmds::Node>(cf->getNode(i,j)).setPoint({0,0,0});
+						}
+					}
+				}
+
+				for (auto n:gmdsNodes)
+				{
+					n.setPoint(gmds_mesh.get<gmds::Node>(n.id()).point());
+					n.setX(gmds_mesh.get<gmds::Node>(n.id()).X());
+				}
+
+				gmds::IGMeshIOService ioService(&gmds_mesh);
+				gmds::VTKWriter vtkWriter(&ioService);
+				vtkWriter.setCellOptions(gmds::F|gmds::N);
+				vtkWriter.setDataOptions(gmds::F|gmds::N);
+				vtkWriter.write("test.vtk");
+
+				for (uint j=0; j<nbJ; j++)
+				{
+					for (uint i=0; i<nbI; i++)
+					{
+						std::cout << gmds_mesh.get<gmds::Node>(cf->getNode(i,j)) << std::endl;
+					}
+				}
+			}
 		}
 		else {
 

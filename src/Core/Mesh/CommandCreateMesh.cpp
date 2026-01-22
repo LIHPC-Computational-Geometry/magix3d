@@ -1214,12 +1214,12 @@ meshAndModify(std::list<Topo::CoFace*>& list_cofaces)
                                 filtre_nodes_lisse[node] = 2;
                             }
                         }
+					}
+#endif
+					// applique le lissage uniquement aux noeuds internes à la surface (non marqués à 2)
+					lissageSurf->applyModification(cofaces, nodes, polygones, filtre_nodes_lisse, isPolyInverted, 2, surface);
 
-                        // applique le lissage uniquement aux noeuds internes à la surface (non marqués à 2)
-                        lissageSurf->applyModification(nodes, polygones, filtre_nodes_lisse, isPolyInverted, 2,
-                                                       surface);
-                    }
-                } // end for surface
+				} // end for surface
 
 
 			}

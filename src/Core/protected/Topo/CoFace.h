@@ -360,6 +360,12 @@ public:
             bool sensDirecte,
             std::vector<gmds::Node> &nodes);
 
+    /** Return the ID of node (i,j) in the co-face
+     * \param[in] i is the index in the first direction
+     * \param[in] j is the index in the second direction
+     */
+    gmds::TCellID getNode(uint i, uint j);
+
 
     /*------------------------------------------------------------------------*/
     /** Accesseur sur la liste des points */
@@ -391,6 +397,10 @@ public:
     /// retourne les nombres de bras suivant les 2 directions pour une face commune structurée
 
     void getNbMeshingEdges(uint& nbI, uint& nbJ) const;
+
+    /// retourne les nombres de noeuds suivant les 2 directions pour une face commune structurée
+
+    void getNbMeshingNodes(uint& nbI, uint& nbJ) const;
 
 
     /// retourne l'ensemble des arêtes communes toute directions confondues

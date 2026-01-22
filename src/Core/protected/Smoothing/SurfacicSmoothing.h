@@ -26,6 +26,10 @@ namespace Geom {
 class Surface;
 }
 /*----------------------------------------------------------------------------*/
+namespace Topo {
+class CoFace;
+}
+/*----------------------------------------------------------------------------*/
 namespace Mesh {
 /*----------------------------------------------------------------------------*/
 /**
@@ -87,7 +91,8 @@ public:
 	/** Fonction d'appel pour modifier un ensemble de noeuds du maillage
 	 *  Ne sont modifiés que ceux dont la valeur est différente de la marque dans le filtre
 	 */
-	virtual void applyModification(std::vector<gmds::Node >& gmdsNodes,
+	virtual void applyModification(std::vector<Topo::CoFace*>& cofaces,
+			std::vector<gmds::Node >& gmdsNodes,
 			std::vector<gmds::Face>& gmdsPolygones,
 			std::map<gmds::TCellID, uint>& filtre_nodes,
 			std::map<gmds::TCellID, bool>& isPolyInverted,
