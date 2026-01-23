@@ -1,7 +1,3 @@
-//
-// Created by calderans on 3/17/25.
-//
-
 /*----------------------------------------------------------------------------*/
 #ifndef EXPORTBLOCKSIMPLEMENTATION_H
 #define EXPORTBLOCKSIMPLEMENTATION_H
@@ -9,6 +5,7 @@
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 #include <string>
+#include <fstream>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -43,10 +40,10 @@ private:
     void writeFaces(std::ofstream& str, std::vector<Topo::CoFace*> faces);
     void writeBlocks(std::ofstream& str, std::vector<Topo::Block*> blocks);
 
-    void writeAssociationNodes(ofstream &str, const std::vector<Topo::Vertex*>& vs);
-    void writeAssociationEdges(ofstream &str, const std::vector<Topo::CoEdge*>& es);
-    void writeAssociationFaces(ofstream &str, const std::vector<Topo::CoFace*>& fs);
-    void writeAssociationBlocks(ofstream &str, const std::vector<Topo::Block*>& bs);
+    void writeAssociationNodes(std::ofstream &str, const std::vector<Topo::Vertex*>& vs);
+    void writeAssociationEdges(std::ofstream &str, const std::vector<Topo::CoEdge*>& es);
+    void writeAssociationFaces(std::ofstream &str, const std::vector<Topo::CoFace*>& fs);
+    void writeAssociationBlocks(std::ofstream &str, const std::vector<Topo::Block*>& bs);
 
 
     /// contexte d'exécution
