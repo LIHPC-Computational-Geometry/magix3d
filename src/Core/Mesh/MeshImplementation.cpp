@@ -299,6 +299,13 @@ bool MeshImplementation::createGMDSGroups()
 /*----------------------------------------------------------------------------*/
 void MeshImplementation::writeMli(std::string nom)
 {
+	int pos = nom.find_last_of('.');
+	std::string extension = nom.substr(pos+1);
+	if (extension == "mli") {
+		throw TkUtil::Exception (TkUtil::UTF8String ("MeshImplementation::writeMli : le format .mli est obsolète. "
+													 "Veuillez enregistrer au format .mli2 .",
+													 TkUtil::Charset::UTF_8));
+	}
     // on ajoute les groupes de mailles de gmds
     bool isCreateGMDSGroupsOK = createGMDSGroups();
     if(!isCreateGMDSGroupsOK) {
