@@ -176,9 +176,10 @@ applyModification(std::vector<Topo::CoFace*>& cofaces,
 			std::cout << "Nbr of Nodes: " << gmdsNodes.size() << std::endl;
 			std::cout << "Nbr of Faces: " << gmdsPolygones.size() << std::endl;
 
+			gmds::Mesh& gmds_mesh = getStdContext()->getMeshManager().getMesh()->getGMDSMesh();
+
 			for (Topo::CoFace* cf:cofaces)
 			{
-				gmds::Mesh& gmds_mesh = cf->getContext().getMeshManager().getMesh()->getGMDSMesh();
 				uint nbI;
 				uint nbJ;
 				cf->getNbMeshingNodes(nbI, nbJ);
