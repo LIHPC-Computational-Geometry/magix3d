@@ -49,17 +49,12 @@ areSame(const TopoDS_Shape& sh1, const TopoDS_Shape& sh2)
     //---------------------------------------------------------------------
     //test sur les boites englobantes des 2 objets
     //---------------------------------------------------------------------
-    double gap = 0;
-    Bnd_Box box1, box2;
-    box1.SetGap(gap);
-    box2.SetGap(gap);
-    BRepBndLib::Add(sh1,box1);
-    BRepBndLib::Add(sh2,box2);
+    Utils::Math::Point pmin, pmax;
+    computeBoundingBox(sh1, pmin, pmax);
+    double xmin1{pmin.getX()},ymin1{pmin.getY()},zmin1{pmin.getZ()},xmax1{pmax.getX()},ymax1{pmax.getY()},zmax1{pmax.getZ()};
 
-    double xmin1,ymin1,zmin1,xmax1,ymax1,zmax1;
-    double xmin2,ymin2,zmin2,xmax2,ymax2,zmax2;
-    box1.Get(xmin1,ymin1,zmin1,xmax1,ymax1,zmax1);
-    box2.Get(xmin2,ymin2,zmin2,xmax2,ymax2,zmax2);
+    computeBoundingBox(sh2, pmin, pmax);
+    double xmin2{pmin.getX()},ymin2{pmin.getY()},zmin2{pmin.getZ()},xmax2{pmax.getX()},ymax2{pmax.getY()},zmax2{pmax.getZ()};
 
     //pour chaque boite, on considere 1/10 de sa diagonale
     double diag1 = 0.1*sqrt((xmax1-xmin1)*(xmax1-xmin1) +
@@ -646,26 +641,6 @@ buildIncrementalBRepMesh(const TopoDS_Shape& shape, const double& deflection)
         return 0;
 
     // on crée la représentation de la shape
-#ifdef _DEBUG2
-    Bnd_Box bounds;
-    BRepBndLib::Add(shape, bounds);
-    bounds.SetGap(0.0);
-    Standard_Real xMin, yMin, zMin, xMax, yMax, zMax;
-    bounds.Get(xMin, yMin, zMin, xMax, yMax, zMax);
-
-    Standard_Real dX = xMax - xMin;
-    Standard_Real dY = yMax - yMin;
-    Standard_Real dZ = zMax - zMin;
-
-    Standard_Real deviation = 0.05;
-    Standard_Real deflection_calc = (dX+dY+dZ)/300.0*deviation;
-    //Standard_Real deflection = 0.01;
-
-    /* utilisation du incrementalMesh plutot que du fastDiscret car ce dernier avait
-     * des problèmes sur la discrétisation de courbes isolées */
-    std::cout<<"buildIncrementalBRepMesh deflection_calc = "<<deflection_calc<<std::endl;
-    std::cout<<"buildIncrementalBRepMesh deflection = "<<deflection<<std::endl;
-#endif
     BRepMesh_IncrementalMesh mesher(shape, deflection, Standard_True); //,Standard_False, 0.01);
 
 //    BRepMesh_FastDiscret::Parameters params;
@@ -1022,22 +997,28 @@ computeArea(const TopoDS_Shape& volume)
 }
 /*----------------------------------------------------------------------------*/
 void OCCHelper::
-computeBoundingBox(const TopoDS_Shape& shape, Utils::Math::Point& pmin, Utils::Math::Point& pmax, double tol)
+computeBoundingBox(const TopoDS_Shape& shape, gp_Pnt& pmin, gp_Pnt& pmax)
 {
     Bnd_Box box;
-    box.SetGap(tol);
-
     BRepCheck_Analyzer analyzer(shape);
     if (analyzer.IsValid()) {
         BRepBndLib::AddClose(shape, box);
     } else {
         BRepBndLib::AddOptimal(shape, box);
     }
-
     double xmin, ymin, zmin, xmax, ymax, zmax;
     box.Get(xmin, ymin, zmin, xmax, ymax, zmax);
-    pmin.setXYZ(xmin, ymin, zmin);
-    pmax.setXYZ(xmax, ymax, zmax);
+    pmin.SetCoord(xmin, ymin, zmin);
+    pmax.SetCoord(xmax, ymax, zmax);
+}
+/*----------------------------------------------------------------------------*/
+void OCCHelper::
+computeBoundingBox(const TopoDS_Shape& shape, Utils::Math::Point& pmin, Utils::Math::Point& pmax)
+{
+    gp_Pnt gp_pmin, gp_pmax;
+    computeBoundingBox(shape, gp_pmin, gp_pmax);
+    pmin.setXYZ(gp_pmin.X(), gp_pmin.Y(), gp_pmin.Z());
+    pmax.setXYZ(gp_pmax.X(), gp_pmax.Y(), gp_pmax.Z());
 }
 /*----------------------------------------------------------------------------*/
 TopoDS_Shape OCCHelper::
