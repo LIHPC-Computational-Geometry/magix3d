@@ -66,39 +66,35 @@ void CommandEditGeom::internalExecute()
     //MISE A JOUR DES DONNES A TRANSMETTRE AU CONTEXTE:
     //nouvelles entités, entités conservées, entités supprimées,
     //entités déplacées
-    std::vector<GeomEntity*>& new_entities = getNewEntities();
-    std::vector<GeomEntity*>  mod_entities  = getKeepedEntities();
-    std::vector<GeomEntity*>  mov_entities  = getMovedEntities();
-    std::vector<GeomEntity*>& rem_entities = getRemovedEntities();
+    auto new_entities = getNewEntities();
+    auto mod_entities  = getKeepedEntities();
+    auto mov_entities  = getMovedEntities();
+    auto rem_entities = getRemovedEntities();
 
-    for(int i=0;i<new_entities.size();i++){
-        GeomEntity* ge = new_entities[i];
+    for(GeomEntity* ge : new_entities){
 #ifdef _DEBUG2
         std::cerr<<"Ajoute --> "<<ge->getUniqueName()<<std::endl;
 #endif
         getInfoCommand ( ).addGeomInfoEntity (ge, Internal::InfoCommand::CREATED);
         getContext().getGeomManager().addEntity(ge);
     }
-    for(int i=0;i<mod_entities.size();i++){
-        GeomEntity* ge = mod_entities[i];
+    for(GeomEntity* ge : mod_entities){
 #ifdef _DEBUG2
         std::cerr<<"Modifie --> "<<ge->getUniqueName()<<std::endl;
 #endif
-        getInfoCommand ( ).addGeomInfoEntity (mod_entities[i], Internal::InfoCommand::OTHERMODIFIED);
+        getInfoCommand ( ).addGeomInfoEntity (ge, Internal::InfoCommand::OTHERMODIFIED);
     }
-    for(int i=0;i<mov_entities.size();i++){
-        GeomEntity* ge = mov_entities[i];
+    for(GeomEntity* ge : mov_entities){
 #ifdef _DEBUG2
         std::cerr<<"Deplace --> "<<ge->getUniqueName()<<std::endl;
 #endif
-        getInfoCommand ( ).addGeomInfoEntity (mov_entities[i], Internal::InfoCommand::DISPMODIFIED);
+        getInfoCommand ( ).addGeomInfoEntity (ge, Internal::InfoCommand::DISPMODIFIED);
     }
-    for(int i=0;i<rem_entities.size();i++){
-        GeomEntity* ge = rem_entities[i];
+    for(GeomEntity* ge : rem_entities){
 #ifdef _DEBUG2
         std::cerr<<"Supprime --> "<<ge->getUniqueName()<<std::endl;
 #endif
-        getInfoCommand ( ).addGeomInfoEntity (rem_entities[i], Internal::InfoCommand::DELETED);
+        getInfoCommand ( ).addGeomInfoEntity (ge, Internal::InfoCommand::DELETED);
     }
 
 #ifdef _DEBUG2
@@ -117,23 +113,20 @@ void CommandEditGeom::internalExecute()
     // Utiliser at en lecture pour avoir une exception si
     // la clef est absente (ne pas utiliser l'opérateur [])
     std::map<GeomEntity*,Services::Memento> keeped_ref;
-    for(unsigned int i=0;i<mod_entities.size();i++){
-        GeomEntity* e = mod_entities[i];
-        if (mementos_by_entity.find(e) == mementos_by_entity.end())
-            std::cout << "*** MOD les mementos ne contiennent pas " << e->getName() << std::endl;
-        keeped_ref[e] = mementos_by_entity.at(e);
+    for(GeomEntity* ge : mod_entities){
+        if (mementos_by_entity.find(ge) == mementos_by_entity.end())
+            std::cout << "*** MOD les mementos ne contiennent pas " << ge->getName() << std::endl;
+        keeped_ref[ge] = mementos_by_entity.at(ge);
     }
-    for(unsigned int i=0;i<mov_entities.size();i++){
-        GeomEntity* e = mov_entities[i];
-        if (mementos_by_entity.find(e) == mementos_by_entity.end())
-            std::cout << "*** MOV les mementos ne contiennent pas " << e->getName() << std::endl;
-        keeped_ref[e] = mementos_by_entity.at(e);
+    for(GeomEntity* ge : mov_entities){
+        if (mementos_by_entity.find(ge) == mementos_by_entity.end())
+            std::cout << "*** MOV les mementos ne contiennent pas " << ge->getName() << std::endl;
+        keeped_ref[ge] = mementos_by_entity.at(ge);
     }
-    for(unsigned int i=0;i<rem_entities.size();i++){
-        GeomEntity* e = rem_entities[i];
-        if (mementos_by_entity.find(e) == mementos_by_entity.end())
-            std::cout << "*** REM les mementos ne contiennent pas " << e->getName() << std::endl;
-        keeped_ref[e] = mementos_by_entity.at(e);
+    for(GeomEntity* ge : rem_entities){
+        if (mementos_by_entity.find(ge) == mementos_by_entity.end())
+            std::cout << "*** REM les mementos ne contiennent pas " << ge->getName() << std::endl;
+        keeped_ref[ge] = mementos_by_entity.at(ge);
     }
     saveMementos(keeped_ref);
     getInfoCommand().setDestroyAndUpdateConnectivity(rem_entities);
@@ -218,7 +211,7 @@ void CommandEditGeom::updateGroups()
 #ifdef _DEBUG2
     std::cout<<"CommandEditGeom::updateGroups() m_dim_new_group = "<<m_dim_new_group<<std::endl;
 #endif
-    std::map<GeomEntity*,std::vector<GeomEntity*> >& replacedEntities = getReplacedEntities();
+    auto replacedEntities = getReplacedEntities();
 
     // filtre pour identifier les entités nouvelles qui ne sont pas référencées dans replacedEntities
     std::map<GeomEntity*, uint > filtre_ge;
@@ -239,10 +232,7 @@ void CommandEditGeom::updateGroups()
     }
 
     // on utilise le groupe m_group_name (suivant la dimension)
-    std::vector<GeomEntity*>& newEntities = getNewEntities();
-    for (std::vector<GeomEntity*>::iterator iter = newEntities.begin();
-            iter != newEntities.end(); ++iter){
-        GeomEntity* ge = *iter;
+    for (GeomEntity* ge : getNewEntities()){
         if (filtre_ge[ge] == 0){
             std::string group_name = (ge->getDim() == m_dim_new_group ? m_group_name : ""); // && (filtre_ge[ge] == 0)
             m_group_helper.addToGroup(group_name, ge);
@@ -255,50 +245,49 @@ void CommandEditGeom::updateGroups()
 
 }
 /*----------------------------------------------------------------------------*/
-std::vector<GeomEntity*>& CommandEditGeom::getRemovedEntities()
+const std::vector<GeomEntity*>& CommandEditGeom::getRemovedEntities() const
 {
 	if (m_impl == 0)
 		throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, getRemovedEntities avec m_impl vide", TkUtil::Charset::UTF_8));
     return m_impl->getRemovedEntities();
 }
 /*----------------------------------------------------------------------------*/
-std::vector<GeomEntity*>& CommandEditGeom::getNewEntities()
+const std::vector<GeomEntity*>& CommandEditGeom::getNewEntities() const
 {
 	if (m_impl == 0)
 		throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, getNewEntities avec m_impl vide", TkUtil::Charset::UTF_8));
     return m_impl->getNewEntities();
 }
 /*----------------------------------------------------------------------------*/
-std::vector<GeomEntity*> CommandEditGeom::getKeepedEntities()
+const std::vector<GeomEntity*> CommandEditGeom::getKeepedEntities() const
 {
 	if (m_impl == 0)
 		throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, getKeepedEntities avec m_impl vide", TkUtil::Charset::UTF_8));
     return m_impl->getKeepedEntities();
 }
 /*----------------------------------------------------------------------------*/
-std::vector<GeomEntity*>& CommandEditGeom::getMovedEntities()
+const std::vector<GeomEntity*>& CommandEditGeom::getMovedEntities() const
 {
 	if (m_impl == 0)
 		throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, getMovedEntities avec m_impl vide", TkUtil::Charset::UTF_8));
     return m_impl->getMovedEntities();
 }
 /*----------------------------------------------------------------------------*/
-std::list<GeomEntity*>& CommandEditGeom::getRefEntities(const int dim)
+const std::list<GeomEntity*>& CommandEditGeom::getRefEntities(const int dim) const
 {
 	if (m_impl == 0)
 		throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, getRefEntities avec m_impl vide", TkUtil::Charset::UTF_8));
     return m_impl->getRefEntities(dim);
 }
 /*----------------------------------------------------------------------------*/
-std::list<GeomEntity*>& CommandEditGeom::getAdjEntities(const int dim)
+const std::list<GeomEntity*>& CommandEditGeom::getAdjEntities(const int dim) const
 {
 	if (m_impl == 0)
 		throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, getAdjEntities avec m_impl vide", TkUtil::Charset::UTF_8));
     return m_impl->getAdjEntities(dim);
 }
 /*----------------------------------------------------------------------------*/
-std::map<GeomEntity*,std::vector<GeomEntity*> >& CommandEditGeom::
-getReplacedEntities()
+const std::map<GeomEntity*,std::vector<GeomEntity*> >& CommandEditGeom::getReplacedEntities() const
 {
 	if (m_impl == 0)
 		throw TkUtil::Exception(TkUtil::UTF8String ("Erreur interne, getReplacedEntities avec m_impl vide", TkUtil::Charset::UTF_8));

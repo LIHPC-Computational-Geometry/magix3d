@@ -1422,29 +1422,15 @@ void Context::newGraphicalRepresentation (Utils::Entity& entity)
 bool Context::getGroupColor (const std::vector<Group::GroupEntity*>& groups, TkUtil::Color& color)
 {
 	for (std::vector<Group::GroupEntity*>::const_iterator itg = groups.begin ( ); groups.end ( ) != itg; itg++)
-	{
-		try
+	{	
+		const std::map<std::string, TkUtil::Color>::iterator it	= m_groups_colors.find ((*itg)->getName ( ));
+		if (m_groups_colors.end ( ) != it)
 		{
-			color	= getGroupColor ((*itg)->getName ( ));
+			color	= it->second;
 			return true;
 		}
-		catch (...)
-		{
-		}
-	}	// for (std::vector<Group::GroupEntity*>::const_iterator itg = groups.begin ( ); groups.end ( ) != itg; itg++)
-	
+	}	
 	return false;
-}	// Context::getGroupColor
-/*----------------------------------------------------------------------------*/
-TkUtil::Color Context::getGroupColor (const std::string& name)
-{
-	const std::map<std::string, TkUtil::Color>::iterator it	= m_groups_colors.find (name);
-	if (m_groups_colors.end ( ) != it)
-		return it->second;
-
-	TkUtil::UTF8String	message;
-	message << "Context::groupColor. Couleur pour le groupe de données \"" << name << "\" non recensée.";
-	throw TkUtil::Exception (message);
 }	// Context::getGroupColor
 /*----------------------------------------------------------------------------*/
 void Context::undo()

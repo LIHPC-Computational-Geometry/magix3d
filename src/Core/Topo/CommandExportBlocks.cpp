@@ -9,8 +9,8 @@ namespace Mgx3D {
 namespace Topo {
 /*----------------------------------------------------------------------------*/
 CommandExportBlocks::
-CommandExportBlocks(Internal::Context &context, const std::string &fileName)
-: Internal::CommandInternal(context, "Export des Blocs"),m_filename(fileName), m_impl(context, fileName)
+CommandExportBlocks(Internal::Context &context, const std::string &fileName, const bool& with_geom)
+: Internal::CommandInternal(context, "Export des Blocs"),m_filename(fileName), m_impl(context, fileName, with_geom)
 {}
 /*----------------------------------------------------------------------------*/
 CommandExportBlocks::~CommandExportBlocks()

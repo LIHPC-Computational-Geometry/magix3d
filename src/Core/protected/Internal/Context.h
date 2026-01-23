@@ -454,14 +454,6 @@ public:
 	 * \see		loadGroupsColors
 	 */
 	 bool getGroupColor (const std::vector<Group::GroupEntity*>& groups, TkUtil::Color& color);
-
-	/**
-	 * Recherche une couleur en configuration pour une entité.
-	 * \param		Nom du groupe dont on recherche une couleur.
-	 * \return		La couleur associé au groupe dont le nom est transmis en argument.
-	 * \exception	Une exception est levée si la couleur n'est pas trouvée en configuration.
-	 */
-	 TkUtil::Color getGroupColor (const std::string& name);
 #endif
 
     /** Passage en mode apperçu ou non. En mode apperçu les couleurs fournies

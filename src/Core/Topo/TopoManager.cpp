@@ -4977,15 +4977,16 @@ Mgx3D::Internal::M3DCommandResult* TopoManager::alignVerticesOnSurface(Geom::Geo
 
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResult* TopoManager::exportBlocks(const std::string& n)
+Internal::M3DCommandResult* TopoManager::exportBlocks(const std::string& n, bool withGeom)
 {
     //creation de la commande d'exportation
-    CommandExportBlocks *command = new CommandExportBlocks(getContext(), n);
+    CommandExportBlocks *command = new CommandExportBlocks(getContext(), n, withGeom);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().exportBlocks(";
-    cmd <<"\""<<n<<"\")";
+    cmd <<"\""<<n<<"\", ";
+    cmd << (withGeom ? "True" : "False") << " )";
     command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
@@ -4997,16 +4998,17 @@ Internal::M3DCommandResult* TopoManager::exportBlocks(const std::string& n)
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResult* TopoManager::importBlocks(const std::string& n)
-{
-    //creation de la commande d'exportation
-    CommandImportBlocks *command = new CommandImportBlocks(getContext(), n);
+    Internal::M3DCommandResult* TopoManager::importBlocks(const std::string& n,bool withGeom)
+    {
+        //creation de la commande d'exportation
+        CommandImportBlocks *command = new CommandImportBlocks(getContext(), n, withGeom);
 
-    // trace dans le script
-    TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getTopoManager().importBlocks(";
-    cmd <<"\""<<n<<"\")";
-    command->setScriptCommand(cmd);
+        // trace dans le script
+        TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
+        cmd << getContextAlias() << "." << "getTopoManager().importBlocks(";
+        cmd <<"\""<<n<<"\", ";
+        cmd << (withGeom ? "True" : "False") << " )";
+        command->setScriptCommand(cmd);
 
     // on passe au gestionnaire de commandes qui exécute la commande en // ou non
     // et la stocke dans le gestionnaire de undo-redo si c'est une réussite

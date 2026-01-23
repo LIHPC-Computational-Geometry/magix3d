@@ -59,17 +59,17 @@ void CommandJoinEntities::internalSpecificPreExecute()
     init(m_entities);
 }
 /*----------------------------------------------------------------------------*/
-std::vector<GeomEntity*>& CommandJoinEntities::getRemovedEntities()
+const std::vector<GeomEntity*>& CommandJoinEntities::getRemovedEntities() const
 {
 	return m_removedEntities;
 }
 /*----------------------------------------------------------------------------*/
-std::vector<GeomEntity*>& CommandJoinEntities::getNewEntities()
+const std::vector<GeomEntity*>& CommandJoinEntities::getNewEntities() const
 {
 	return m_newEntities;
 }
 /*----------------------------------------------------------------------------*/
-std::vector<GeomEntity*> CommandJoinEntities::getKeepedEntities()
+const std::vector<GeomEntity*> CommandJoinEntities::getKeepedEntities() const
 {
 	std::vector<GeomEntity*> e;
     e.insert(e.end(),m_toKeepVolumes.begin(),m_toKeepVolumes.end());
@@ -80,22 +80,22 @@ std::vector<GeomEntity*> CommandJoinEntities::getKeepedEntities()
 	return e;
 }
 /*----------------------------------------------------------------------------*/
-std::vector<GeomEntity*>& CommandJoinEntities::getMovedEntities()
+const std::vector<GeomEntity*>& CommandJoinEntities::getMovedEntities() const
 {
 	return m_movedEntities;
 }
 /*----------------------------------------------------------------------------*/
-std::list<GeomEntity*>& CommandJoinEntities::getRefEntities(const int dim)
+const std::list<GeomEntity*>& CommandJoinEntities::getRefEntities(const int dim) const
 {
     return m_ref_entities[dim];
 }
 /*----------------------------------------------------------------------------*/
-std::list<GeomEntity*>& CommandJoinEntities::getAdjEntities(const int dim)
+const std::list<GeomEntity*>& CommandJoinEntities::getAdjEntities(const int dim) const
 {
     return m_adj_entities[dim];
 }
 /*----------------------------------------------------------------------------*/
-std::map<GeomEntity*,std::vector<GeomEntity*> >& CommandJoinEntities::getReplacedEntities()
+const std::map<GeomEntity*,std::vector<GeomEntity*> >& CommandJoinEntities::getReplacedEntities() const
 {
     return m_replacedEntities;
 }
