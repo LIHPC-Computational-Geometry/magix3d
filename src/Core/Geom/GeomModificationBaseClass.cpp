@@ -35,8 +35,6 @@
 #include <BRepTools_ReShape.hxx>
 #include <BRepAdaptor_Curve.hxx>
 #include <ShapeFix_Shape.hxx>
-#include <BRepBndLib.hxx>
-#include <Bnd_Box.hxx>
 #include <GeomAdaptor_Curve.hxx>
 #include <Extrema_ExtPC.hxx>
 #include <BRepGProp.hxx>
@@ -1397,7 +1395,7 @@ static int diffGpPnt(const gp_Pnt& pnt1, const gp_Pnt& pnt2, double dimX, double
 	}
 #endif
 	// nouvel algo
-	double tol = Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon*100.0;
+	double tol = Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon*10.0;
 	int res2 = 0;
 
 	if (pnt1.X()<pnt2.X()-tol*dimX){
@@ -1607,18 +1605,9 @@ static bool compareOCCFace(const TopoDS_Face f1, const TopoDS_Face f2)
 #endif
 
 	// comparaison dans un premier temps des bounding box
-	//double gap = Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon;
-	double gap = 0;
-    Bnd_Box box1, box2;
-    box1.SetGap(gap);
-    box2.SetGap(gap);
-    BRepBndLib::Add(f1,box1);
-    BRepBndLib::Add(f2,box2);
-
-    gp_Pnt minPnt1 = box1.CornerMin();
-    gp_Pnt maxPnt1 = box1.CornerMax();
-    gp_Pnt minPnt2 = box2.CornerMin();
-    gp_Pnt maxPnt2 = box2.CornerMax();
+    gp_Pnt minPnt1, maxPnt1, minPnt2, maxPnt2;
+    OCCHelper::computeBoundingBox(f1, minPnt1, maxPnt1);
+    OCCHelper::computeBoundingBox(f2, minPnt2, maxPnt2);
 
 	int res = diffGpPnt(minPnt1, minPnt2, maxPnt1.X()-minPnt1.X(), maxPnt1.Y()-minPnt1.Y(), maxPnt1.Z()-minPnt1.Z());
 #ifdef _DEBUG_DIFF
@@ -1679,17 +1668,9 @@ static bool compareOCCFace(const TopoDS_Face f1, const TopoDS_Face f2)
 static bool compareOCCSolid(const TopoDS_Solid s1, const TopoDS_Solid s2)
 {
 	// comparaison dans un premier temps des bounding box
-	double gap = 0;
-    Bnd_Box box1, box2;
-    box1.SetGap(gap);
-    box2.SetGap(gap);
-    BRepBndLib::Add(s1,box1);
-    BRepBndLib::Add(s2,box2);
-
-    gp_Pnt minPnt1 = box1.CornerMin();
-    gp_Pnt maxPnt1 = box1.CornerMax();
-    gp_Pnt minPnt2 = box2.CornerMin();
-    gp_Pnt maxPnt2 = box2.CornerMax();
+    gp_Pnt minPnt1, maxPnt1, minPnt2, maxPnt2;
+    OCCHelper::computeBoundingBox(s1, minPnt1, maxPnt1);
+    OCCHelper::computeBoundingBox(s2, minPnt2, maxPnt2);
 
 	int res = diffGpPnt(minPnt1, minPnt2, maxPnt1.X()-minPnt1.X(), maxPnt1.Y()-minPnt1.Y(), maxPnt1.Z()-minPnt1.Z());
 	if (res == -1)

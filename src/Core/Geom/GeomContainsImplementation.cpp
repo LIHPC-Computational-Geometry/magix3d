@@ -452,39 +452,27 @@ contains(const TopoDS_Shape& sh,const TopoDS_Shape& shOther) const
 #ifdef _DEBUG2
     	std::cout<<" OCCHelper::contains(...,...)"<<std::endl;
 #endif
-   double tol = Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon;
-    double my_bounds[6];
-    double bounds[6];
+    Utils::Math::Point min_bound, max_bound;
+    OCCHelper::computeBoundingBox(sh, min_bound, max_bound);
 
-    Bnd_Box my_box;
-    my_box.SetGap(tol);
-    BRepBndLib::Add(sh,my_box);
+    Utils::Math::Point min_other_bound, max_other_bound;
+    OCCHelper::computeBoundingBox(shOther, min_other_bound, max_other_bound);
 
-    my_box.Get(my_bounds[0],my_bounds[2], my_bounds[4],my_bounds[1], my_bounds[3],my_bounds[5]);
-
-    Bnd_Box box;
-    box.SetGap(tol);
-    BRepBndLib::Add(shOther,box);
-    box.Get(bounds[0],bounds[2],bounds[4],bounds[1],bounds[3],bounds[5]);
-
-
-    double local_tolX = 0.5*(bounds[1]-bounds[0]);
-    double local_tolY = 0.5*(bounds[3]-bounds[2]);
-    double local_tolZ = 0.5*(bounds[5]-bounds[4]);
-    if(    ( bounds[0] < my_bounds[0] - local_tolX)||//minX
-            ( bounds[1] > my_bounds[1] + local_tolX)||//maxX
-            ( bounds[2] < my_bounds[2] - local_tolY)||//minY
-            ( bounds[3] > my_bounds[3] + local_tolY)||//maxY
-            ( bounds[4] < my_bounds[4] - local_tolZ)||//minZ
-            ( bounds[5] > my_bounds[5] + local_tolZ) )//maxZ
+    double local_tolX = 0.5*(max_bound.getX()-min_bound.getX());
+    double local_tolY = 0.5*(max_bound.getY()-min_bound.getY());
+    double local_tolZ = 0.5*(max_bound.getZ()-min_bound.getZ());
+    if(    ( min_other_bound.getX() < min_bound.getX() - local_tolX)||//minX
+            ( max_other_bound.getX() > max_bound.getX() + local_tolX)||//maxX
+            ( min_other_bound.getY() < min_bound.getY() - local_tolY)||//minY
+            ( max_other_bound.getY() > max_bound.getY() + local_tolY)||//maxY
+            ( min_other_bound.getZ() < min_bound.getZ() - local_tolZ)||//minZ
+            ( max_other_bound.getZ() > max_bound.getZ() + local_tolZ) )//maxZ
     {
 #ifdef _DEBUG2
     	std::cout<<"  (boites englobantes différentes) return faux"<<std::endl;
 #endif
     	return false;
     }
-
-
 
     Standard_Boolean onlyClosed = Standard_True;
     Standard_Boolean isUseSpan = Standard_True;
