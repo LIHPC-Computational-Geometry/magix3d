@@ -168,6 +168,8 @@ applyModification(std::vector<Topo::CoFace*>& cofaces,
 			algo.loop_over_mesh (&myAssoc, &dummySettings, err);
 			MSQ_CHKERR(err);
 
+			mesh->updateNodePositions();
+
 		}
 		else if (m_methodeLissage == surfacicYaoSmoothing)
 		{
@@ -175,9 +177,10 @@ applyModification(std::vector<Topo::CoFace*>& cofaces,
 			std::cout << "Nbr of Nodes: " << gmdsNodes.size() << std::endl;
 			std::cout << "Nbr of Faces: " << gmdsPolygones.size() << std::endl;
 
+			gmds::Mesh& gmds_mesh = getStdContext()->getMeshManager().getMesh()->getGMDSMesh();
+
 			for (Topo::CoFace* cf:cofaces)
 			{
-				gmds::Mesh& gmds_mesh = cf->getContext().getMeshManager().getMesh()->getGMDSMesh();
 				uint nbI;
 				uint nbJ;
 				cf->getNbMeshingNodes(nbI, nbJ);
@@ -315,6 +318,8 @@ applyModification(std::vector<Topo::CoFace*>& cofaces,
 
 			delete pass1;
 			delete qual;
+
+			mesh->updateNodePositions();
 		} // end else if (m_methodeLissage == surfacicOrthogonalSmoothingElliptic)
 	} // end if (m_nbIterations)
 
@@ -335,6 +340,8 @@ applyModification(std::vector<Topo::CoFace*>& cofaces,
 			mesh->vertex_set_coordinates (handles[i], coords[i], err);
 		}
 		MSQ_CHKERR (err);
+
+		mesh->updateNodePositions();
 
 	}
 
