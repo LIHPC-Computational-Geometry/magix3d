@@ -39,8 +39,15 @@ public:
 			std::map<gmds::TCellID, bool>& isPolyInverted,
 			uint maskFixed);
 
-	/// retour de Mesquite vers Gmds (modif des positions des noeuds)
+	/*------------------------------------------------------------------------*/
+	/** \brief   Destructor
+	 */
 	virtual ~MesquiteMeshAdapter();
+
+	/*------------------------------------------------------------------------*/
+	/** \brief  Update node positions after smoothing
+	 */
+	void updateNodePositions();
 
 private:
 	/// copie de la liste des noeuds concernés pour les modifier
