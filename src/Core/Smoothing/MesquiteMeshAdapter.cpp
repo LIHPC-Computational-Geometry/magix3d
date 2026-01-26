@@ -96,7 +96,7 @@ MesquiteMeshAdapter::~MesquiteMeshAdapter()
 {
 }
 /*----------------------------------------------------------------------------*/
-void MesquiteMeshAdapter::updateNodePositions()
+void MesquiteMeshAdapter::updateNodesPositions()
 {
 	MESQUITE_NS::MsqError err;
 

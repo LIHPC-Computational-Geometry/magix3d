@@ -47,7 +47,7 @@ public:
 	/*------------------------------------------------------------------------*/
 	/** \brief  Update node positions after smoothing
 	 */
-	void updateNodePositions();
+	void updateNodesPositions();
 
 private:
 	/// copie de la liste des noeuds concernés pour les modifier
