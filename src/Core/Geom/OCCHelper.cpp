@@ -997,9 +997,10 @@ computeArea(const TopoDS_Shape& volume)
 }
 /*----------------------------------------------------------------------------*/
 void OCCHelper::
-computeBoundingBox(const TopoDS_Shape& shape, gp_Pnt& pmin, gp_Pnt& pmax)
+computeBoundingBox(const TopoDS_Shape& shape, gp_Pnt& pmin, gp_Pnt& pmax, double gap)
 {
     Bnd_Box box;
+    box.SetGap(gap);
     BRepCheck_Analyzer analyzer(shape);
     if (analyzer.IsValid()) {
         BRepBndLib::AddClose(shape, box);
@@ -1013,10 +1014,10 @@ computeBoundingBox(const TopoDS_Shape& shape, gp_Pnt& pmin, gp_Pnt& pmax)
 }
 /*----------------------------------------------------------------------------*/
 void OCCHelper::
-computeBoundingBox(const TopoDS_Shape& shape, Utils::Math::Point& pmin, Utils::Math::Point& pmax)
+computeBoundingBox(const TopoDS_Shape& shape, Utils::Math::Point& pmin, Utils::Math::Point& pmax, double gap)
 {
     gp_Pnt gp_pmin, gp_pmax;
-    computeBoundingBox(shape, gp_pmin, gp_pmax);
+    computeBoundingBox(shape, gp_pmin, gp_pmax, gap);
     pmin.setXYZ(gp_pmin.X(), gp_pmin.Y(), gp_pmin.Z());
     pmax.setXYZ(gp_pmax.X(), gp_pmax.Y(), gp_pmax.Z());
 }
