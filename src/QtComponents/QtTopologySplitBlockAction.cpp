@@ -274,8 +274,10 @@ vector<string> QtTopologySplitBlockPanel::getBlocksNames ( ) const
 	CHECK_NULL_PTR_ERROR (_blocksPanel)
 	if (true == allBlocks ( ))
 	{
-		for (Block* b : getContext ( ).getTopoManager ( ).getBlocksObj ())
-			names.push_back (b->getUniqueName ( ));
+		names	= getContext ( ).getTopoManager ( ).getBlocks ( );
+// CP : se sont les noms type Bl0000 qui sont attendus et non type TopoBlock0000
+//		for (Block* b : getContext ( ).getTopoManager ( ).getBlocksObj ())
+//			names.push_back (b->getUniqueName ( ));
 	}	// if (true == allBlocks ( ))
 	else
 		names	= _blocksPanel->getUniqueNames ( );
@@ -396,6 +398,21 @@ void QtTopologySplitBlockPanel::preview (bool show, bool destroyInteractor)
 
 		TopoDisplayRepresentation	dr (DisplayRepresentation::WIRE);
 		command->getPreviewRepresentation (dr);
+// Issue 222. A ce stade, de part sa construction, command->getPreviewRepresentation (dr) a détruit puis reconstruit certains blocs. Détruits car
+// coupés, reconstruits via undo car mode "preview". Mais le redo ne rétablit pas des caractéristiques t.q. "highlighting"".
+// Les lignes ci-dessous ont pour vocation de rétablir le comportement attendu pour ce panneau, dans l'attente de décisions architecturales
+// sur les évolutions de Magix3D.
+		vector<string>	blocksNames	= getBlocksNames ( );
+		for (vector<string>::const_iterator it = blocksNames.begin ( ); blocksNames.end ( ) != it; it++)
+		{
+			Block*	block	= getContext ( ).getTopoManager ( ).getBlock (*it, true);
+			registerHighlightedEntity (*block);
+			DisplayProperties::GraphicalRepresentation*	gr	= 0 == block ? 0 : block->getDisplayProperties ( ).getGraphicalRepresentation ( );
+			if (0 != gr)
+				gr->setHighlighted (true, false);
+		}	// for (vector<string>::const_iterator it = blocksNames.begin ( ); blocksNames.end ( ) != it; it++)
+
+		// Affichage de l'aperçu :
 		const vector<Math::Point>&	points	= dr.getPoints ( );
 		const vector<size_t>&		indices	= dr.getCurveDiscretization ( );
 
@@ -519,10 +536,13 @@ void QtTopologySplitBlockPanel::blocksModifiedCallback ( )
 	CHECK_NULL_PTR_ERROR (_allBlocksCheckBox)
 	CHECK_NULL_PTR_ERROR (_blocksPanel)
 
-	_blocksPanel->setEnabled (
-		Qt::Checked == _allBlocksCheckBox->checkState ( ) ? false : true);
+	_blocksPanel->setEnabled (Qt::Checked == _allBlocksCheckBox->checkState ( ) ? false : true);
 
 	parametersModifiedCallback ( );
+
+	// cf. preview, enlever les highlights "automatiques"
+	highlight (false);
+	highlight (true);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
 }	// QtTopologySplitBlockPanel::blocksModifiedCallback
