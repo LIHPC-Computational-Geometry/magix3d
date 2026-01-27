@@ -155,6 +155,8 @@ applyModification(std::vector<gmds::Node >& gmdsNodes,
 			algo.loop_over_mesh (&myAssoc, &dummySettings, err);
 			MSQ_CHKERR(err);
 
+			mesh->updateNodesPositions();
+
 		} else {
 
 			MESQUITE_NS::QualityMetric* qual =0;
@@ -233,6 +235,8 @@ applyModification(std::vector<gmds::Node >& gmdsNodes,
 
 			delete pass1;
 			delete qual;
+
+			mesh->updateNodesPositions();
 		} // end else if (m_methodeLissage == surfacicOrthogonalSmoothingElliptic)
 	} // end if (m_nbIterations)
 
@@ -254,6 +258,7 @@ applyModification(std::vector<gmds::Node >& gmdsNodes,
 		}
 		MSQ_CHKERR (err);
 
+		mesh->updateNodesPositions();
 	}
 
 	delete mesh;
