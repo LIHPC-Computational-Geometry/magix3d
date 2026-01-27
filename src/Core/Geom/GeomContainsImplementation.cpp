@@ -452,11 +452,13 @@ contains(const TopoDS_Shape& sh,const TopoDS_Shape& shOther) const
 #ifdef _DEBUG2
     	std::cout<<" OCCHelper::contains(...,...)"<<std::endl;
 #endif
+    double tol = Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon;
+
     Utils::Math::Point min_bound, max_bound;
-    OCCHelper::computeBoundingBox(sh, min_bound, max_bound);
+    OCCHelper::computeBoundingBox(sh, min_bound, max_bound, tol);
 
     Utils::Math::Point min_other_bound, max_other_bound;
-    OCCHelper::computeBoundingBox(shOther, min_other_bound, max_other_bound);
+    OCCHelper::computeBoundingBox(shOther, min_other_bound, max_other_bound, tol);
 
     double local_tolX = 0.5*(max_bound.getX()-min_bound.getX());
     double local_tolY = 0.5*(max_bound.getY()-min_bound.getY());
