@@ -45,8 +45,6 @@
 #include <GC_MakeCircle.hxx>
 #include <GC_MakeEllipse.hxx>
 #include <GC_MakeArcOfCircle.hxx>
-#include <GC_MakeArcOfEllipse.hxx>
-#include <gp_Elips.hxx>
 #include <Geom_BSplineCurve.hxx>
 #include <GeomAPI_PointsToBSpline.hxx>
 #include <TColgp_Array1OfPnt.hxx>
@@ -59,6 +57,7 @@
 #include <BRepAdaptor_Curve.hxx>
 #include <Geom_Circle.hxx>
 #include <Geom_Ellipse.hxx>
+#include <ElCLib.hxx>
 /*----------------------------------------------------------------------------*/
 #include <set>
 /*----------------------------------------------------------------------------*/
@@ -464,59 +463,75 @@ Curve* EntityFactory::newArcEllipse(const Geom::Vertex* center,
     std::cout<<"newArcEllipse center "<<center->getPoint()<<" , start "<<start->getPoint()
 			<<" , end "<<end->getPoint()<<" , direction "<<(direction?"true":"false")<<std::endl;
 #endif
-
     gp_Pnt p_center(center->getX(),center->getY(),center->getZ());
     gp_Pnt p_start(start->getX(),start->getY(),start->getZ());
     gp_Pnt p_end(end->getX(),end->getY(),end->getZ());
-    gp_Vec from_center_to_start(p_center, p_start);
 
-    /* calcul du grand axe et du petit axe a partir des coordonnées centrées
-     *
-     * (x1,y1) et (x2,y2) */
-    double x1 = p_start.X()-p_center.X();
-    double y1 = p_start.Y()-p_center.Y();
-    double x2 = p_end.X()-p_center.X();
-    double y2 = p_end.Y()-p_center.Y();
-    double det = x1*x1*y2*y2-x2*x2*y1*y1;
+    // Vecteurs depuis le centre
+    gp_Vec vStart(p_center, p_start);
+    gp_Vec vEnd(p_center, p_end);
 
-    if (det == 0)
-      throw Utils::BuildingException(TkUtil::UTF8String ("Les 3 points n'appartiennent pas a une ellipse non dégénérée dont les axes sont X et Y", TkUtil::Charset::UTF_8));
+    if (vStart.Magnitude() < Precision::Confusion())
+        throw Utils::BuildingException(TkUtil::UTF8String("Création de l'arc impossible car centre et point de départ sont confondus", TkUtil::Charset::UTF_8));
 
+    // Plan de l’ellipse
+    gp_Vec normal = vStart.Crossed(vEnd);
+    if (normal.Magnitude() < Precision::Confusion())
+        throw Utils::BuildingException(TkUtil::UTF8String("Création de l'arc impossible car les points sont colinéaires", TkUtil::Charset::UTF_8));
 
-    double b2 = det / (x1*x1-x2*x2);
-    double a2 = det / (y2*y2-y1*y1);
-    double b = sqrt(b2); // demi-axe selon y
-    double a = sqrt(a2); // demi-axe selon x
+    gp_Dir normalDir(normal);
+    gp_Dir xDir(vStart);                 // grand axe imposé
+    gp_Dir yDir(normalDir.Crossed(xDir));
 
-    /* dans le systeme de coordonnees locales de l'ellipse(Xe,Ye,Ze), l'axe des
-     * abcisses doit porter le grand axe de l'ellipse et le sens de l'ellipse
-     * est celui qui va de Xe vers Ye. Donc si a>b, Xe=X sinon Xe=Y et
-     * si dir=true, Ze=Z sinon Ze=-Z */
-    gp_Dir Ze = (direction)?gp_Dir(0,0,1):gp_Dir(0,0,-1);
-    gp_Dir Xe = (a>b)?gp_Dir(1,0,0):gp_Dir(0,1,0);
-#ifdef _DEBUG2
-    std::cout<<"locSysCoord center , Ze (0,0,"<<Ze.Z()
-			<<") , Xe ("<<Xe.X()<<","<<Xe.Y()<<",0)"<<std::endl;
-#endif
-    gp_Ax2 locSysCoord(p_center,Ze,Xe);
+    // Grand rayon
+    Standard_Real a = vStart.Magnitude();
 
-#ifdef _DEBUG2
-    std::cout<<"gp_Elips locSysCoord ,"<<std::max(a,b)<<","<<std::min(a,b)<<std::endl;
-#endif
-    gp_Elips ellipse=gp_Elips(locSysCoord,std::max(a,b),std::min(a,b));
+    // Coordonnées de vEnd dans le repère
+    Standard_Real x = vEnd.Dot(gp_Vec(xDir));
+    Standard_Real y = vEnd.Dot(gp_Vec(yDir));
 
-    try {
-    	Handle(Geom_TrimmedCurve) arc = GC_MakeArcOfEllipse(ellipse, p_start, p_end, true);
-        TopoDS_Edge e = BRepBuilderAPI_MakeEdge(arc);
-        Curve* curve = new Curve(m_context,
-                    m_context.newProperty(Utils::Entity::GeomCurve),
-                    m_context.newDisplayProperties(Utils::Entity::GeomCurve),
-                    new GeomProperty(), e);
-        m_context.newGraphicalRepresentation (*curve);
-        return curve;
-    } catch(StdFail_NotDone& e) {
-        throw Utils::BuildingException(TkUtil::UTF8String ("Erreur durant la creation d'un arc d'ellipse", TkUtil::Charset::UTF_8));
+    // Condition d’existence
+    if (Abs(x) >= a)
+        throw Utils::BuildingException(TkUtil::UTF8String("Impossible de faire passer l'arc par le point d'arrivée", TkUtil::Charset::UTF_8));
+
+    // Petit rayon (résolution analytique)
+    Standard_Real b = Sqrt( (y * y) / (1.0 - (x * x) / (a * a)) );
+
+    if (b < Precision::Confusion())
+        throw Utils::BuildingException(TkUtil::UTF8String("Création de l'arc impossible car le petit rayon est trop petit", TkUtil::Charset::UTF_8));
+
+    Standard_Real major = a;
+    Standard_Real minor = b;
+    gp_Dir majorDir = xDir;
+    gp_Dir minorDir = yDir;
+
+    if (b > a)
+    {
+        major = b;
+        minor = a;
+        majorDir = yDir;
+        minorDir = xDir;
     }
+
+    // Repère de l’ellipse
+    gp_Ax2 ellipseAxis(p_center, normalDir, majorDir);
+    // Construction de l’ellipse
+    Handle(Geom_Ellipse) ellipse = new Geom_Ellipse(ellipseAxis, major, minor);
+
+    // Paramètres angulaires EXACTS
+    Standard_Real u1 = ElCLib::EllipseParameter(ellipseAxis, major, minor, p_start);
+    Standard_Real u2 = ElCLib::EllipseParameter(ellipseAxis, major, minor, p_end);
+
+    // Arc d’ellipse
+    Handle(Geom_TrimmedCurve) arc = new Geom_TrimmedCurve(ellipse, u1, u2, Standard_True);
+
+    TopoDS_Edge e = BRepBuilderAPI_MakeEdge(arc);
+    Curve* curve = new Curve(m_context,
+                     m_context.newProperty(Utils::Entity::GeomCurve),
+                     m_context.newDisplayProperties(Utils::Entity::GeomCurve),
+                     new GeomProperty(), e);
+    m_context.newGraphicalRepresentation (*curve);
+    return curve;
 }
 /*----------------------------------------------------------------------------*/
 //#define _DEBUG_BSPLINE
