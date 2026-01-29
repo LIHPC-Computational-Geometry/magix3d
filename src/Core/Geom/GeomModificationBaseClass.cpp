@@ -40,6 +40,7 @@
 #include <BRepGProp.hxx>
 #include <GProp_GProps.hxx>
 #include <BRepCheck_Analyzer.hxx>
+#include <TopTools_ShapeMapHasher.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -920,7 +921,7 @@ void GeomModificationBaseClass::rebuildAdjacencyLinks()
     for(;it!=m_adj_entities[3].end();it++){
         Volume* vi = dynamic_cast<Volume*>(*it);
 #ifdef _DEBUG2
-        std::cout<<" ADJ VOLUME "<<ei->getName()<<std::endl;
+        std::cout<<" ADJ VOLUME "<<vi->getName()<<std::endl;
 #endif
         //on regarde si des surfaces du volumes ont été remplacées
         auto surfs = vi->getSurfaces();
@@ -1351,86 +1352,48 @@ void GeomModificationBaseClass::connect(
 }
 /*----------------------------------------------------------------------------*/
 /// comparaison géométrique de 2 points pour permettre un ordonnancement spacial
-static int diffGpPnt(const gp_Pnt& pnt1, const gp_Pnt& pnt2, double dimX, double dimY, double dimZ)
+static int diffGpPnt(const gp_Pnt& pnt1, const gp_Pnt& pnt2, double scale)
 {
 #ifdef _DEBUG_DIFF
-	std::cout<<setprecision(10)<<"diffGpPnt entre ["<<pnt1.X()<<","<<pnt1.Y()<<","<<pnt1.Z()<<"] et ["<<pnt2.X()<<","<<pnt2.Y()<<","<<pnt2.Z()<<"] avec dim : "<<dimX<<", "<<dimY<<", "<<dimZ<<", "<<std::endl;
+	std::cout<<setprecision(10)<<"diffGpPnt entre ["<<pnt1.X()<<","<<pnt1.Y()<<","<<pnt1.Z()<<"] et ["<<pnt2.X()<<","<<pnt2.Y()<<","<<pnt2.Z()<<"] avec scale : "<<scale<<std::endl;
 #endif
-#ifdef _DEBUG_DIFF_OTHER
-	std::cout<<setprecision(10)<<"diffGpPnt entre ["<<pnt1.X()<<","<<pnt1.Y()<<","<<pnt1.Z()<<"] et ["<<pnt2.X()<<","<<pnt2.Y()<<","<<pnt2.Z()<<"] avec dim : "<<dimX<<", "<<dimY<<", "<<dimZ<<", "<<std::endl;
-	int res1 = 0;
 
-	// algo historique
-	if (pnt1.X()<pnt2.X()-Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon){
-		std::cout<<"pnt1.X()<pnt2.X()-eps"<<std::endl;
-		res1 = -1;
-	}
-	else if (pnt1.X()>pnt2.X()+Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon){
-		std::cout<<"pnt1.X()>pnt2.X()+eps"<<std::endl;
-		res1 = 1;
-	}
-	else {
-		if (pnt1.Y()<pnt2.Y()-Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon){
-			std::cout<<"pnt1.Y()<pnt2.Y()-eps"<<std::endl;
-			res1 = -1;
-		}
-		else if (pnt1.Y()>pnt2.Y()+Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon){
-			std::cout<<"pnt1.Y()>pnt2.Y()+eps"<<std::endl;
-			res1 = 1;
-		}
-		else {
-			if (pnt1.Z()<pnt2.Z()-Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon){
-				std::cout<<"pnt1.Z()<pnt2.Z()-eps"<<std::endl;
-				res1 = -1;
-			}
-			else if (pnt1.Z()>pnt2.Z()+Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon){
-				std::cout<<"pnt1.Z()>pnt2.Z()+eps"<<std::endl;
-				res1 = 1;
-			}
-			else {
-				std::cout<<" c'est jugé équivalent ..."<<std::endl;
-				res1 = 0;
-			}
-		}
-	}
-#endif
-	// nouvel algo
-	double tol = Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon*10.0;
+	double tol = Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon;
 	int res2 = 0;
 
-	if (pnt1.X()<pnt2.X()-tol*dimX){
+	if (pnt1.X()<pnt2.X()-tol*scale){
 #ifdef _DEBUG_DIFF
 		std::cout<<"pnt1.X()<pnt2.X()-eps"<<std::endl;
 #endif
 		res2 = -1;
 	}
-	else if (pnt1.X()>pnt2.X()+tol*dimX){
+	else if (pnt1.X()>pnt2.X()+tol*scale){
 #ifdef _DEBUG_DIFF
 		std::cout<<"pnt1.X()>pnt2.X()+eps"<<std::endl;
 #endif
 		res2 = 1;
 	}
 	else {
-		if (pnt1.Y()<pnt2.Y()-tol*dimY){
+		if (pnt1.Y()<pnt2.Y()-tol*scale){
 #ifdef _DEBUG_DIFF
 			std::cout<<"pnt1.Y()<pnt2.Y()-eps"<<std::endl;
 #endif
 			res2 = -1;
 		}
-		else if (pnt1.Y()>pnt2.Y()+tol*dimY){
+		else if (pnt1.Y()>pnt2.Y()+tol*scale){
 #ifdef _DEBUG_DIFF
 			std::cout<<"pnt1.Y()>pnt2.Y()+eps"<<std::endl;
 #endif
 			res2 = 1;
 		}
 		else {
-			if (pnt1.Z()<pnt2.Z()-tol*dimZ){
+			if (pnt1.Z()<pnt2.Z()-tol*scale){
 #ifdef _DEBUG_DIFF
 				std::cout<<"pnt1.Z()<pnt2.Z()-eps"<<std::endl;
 #endif
 				res2 = -1;
 			}
-			else if (pnt1.Z()>pnt2.Z()+tol*dimZ){
+			else if (pnt1.Z()>pnt2.Z()+tol*scale){
 #ifdef _DEBUG_DIFF
 				std::cout<<"pnt1.Z()>pnt2.Z()+eps"<<std::endl;
 #endif
@@ -1445,13 +1408,7 @@ static int diffGpPnt(const gp_Pnt& pnt1, const gp_Pnt& pnt2, double dimX, double
 		}
 	}
 
-#ifdef _DEBUG_DIFF_OTHER
-	if (res1 != res2){
-		std::cout<<"CAS AVEC DIFFERENCE !!!"<<std::endl;
-	}
-#endif
-
-	return res2;
+    return res2;
 }
 /*----------------------------------------------------------------------------*/
 /// comparaison géométrique de 2 listes de points pour permettre un ordonnancement spacial
@@ -1464,7 +1421,7 @@ static int diffListeGpPnt(std::list<gp_Pnt>& lpnt1, std::list<gp_Pnt>& lpnt2)
 	else {
 		for (std::list<gp_Pnt>::iterator iter1 = lpnt1.begin(), iter2 = lpnt2.begin();
 				iter1 != lpnt1.end(); ++iter1, ++iter2){
-			int res = diffGpPnt(*iter1, *iter2, 1.0, 1.0, 1.0);
+			int res = diffGpPnt(*iter1, *iter2, 1.0);
 			if (res == -1)
 				return -1;
 			else if (res == 1)
@@ -1480,7 +1437,7 @@ static bool compareOCCVertex(const TopoDS_Vertex v1, const TopoDS_Vertex v2)
 	gp_Pnt pnt1 = BRep_Tool::Pnt(v1);
 	gp_Pnt pnt2 = BRep_Tool::Pnt(v2);
 
-	int res = diffGpPnt(pnt1, pnt2, 1.0, 1.0, 1.0);
+	int res = diffGpPnt(pnt1, pnt2, 1.0);
 	if (res == -1)
 		return false;
 	else if (res == 1)
@@ -1498,7 +1455,7 @@ static bool compareOCCVertex(const TopoDS_Vertex v1, const TopoDS_Vertex v2)
 /// comparaison géométrique de 2 gp_pnt pour permettre un ordonnancement spacial
 static bool comparePnt(const gp_Pnt& pnt1, const gp_Pnt& pnt2)
 {
-	int res = diffGpPnt(pnt1, pnt2, 1.0, 1.0, 1.0);
+	int res = diffGpPnt(pnt1, pnt2, 1.0);
 	if (res == -1)
 		return false;
 	else if (res == 1)
@@ -1595,32 +1552,38 @@ static bool compareOCCEdge(const TopoDS_Edge c1, const TopoDS_Edge c2)
 /// comparaison géométrique de 2 surfaces pour permettre un ordonnancement spacial
 static bool compareOCCFace(const TopoDS_Face f1, const TopoDS_Face f2)
 {
-#ifdef _DEBUG_DIFF
-	std::cout<<"compareOCCFace entre 2 surfaces : "<<std::endl;
-	GProp_GProps pb;
-	BRepGProp::SurfaceProperties(f1,pb);
-	std::cout<<"  F1 Mass "<<pb.Mass()<<std::endl;
-	BRepGProp::SurfaceProperties(f2,pb);
-	std::cout<<"  F2 Mass "<<pb.Mass()<<std::endl;
-#endif
-
 	// comparaison dans un premier temps des bounding box
     gp_Pnt minPnt1, maxPnt1, minPnt2, maxPnt2;
     OCCHelper::computeBoundingBox(f1, minPnt1, maxPnt1);
     OCCHelper::computeBoundingBox(f2, minPnt2, maxPnt2);
 
-	int res = diffGpPnt(minPnt1, minPnt2, maxPnt1.X()-minPnt1.X(), maxPnt1.Y()-minPnt1.Y(), maxPnt1.Z()-minPnt1.Z());
 #ifdef _DEBUG_DIFF
-	std::cout<<"diffGpPnt minPnt1 minPnt2 res = "<<res<<std::endl;
+	std::cout<<"compareOCCFace entre 2 surfaces : "<<std::endl;
+	GProp_GProps pb;
+	BRepGProp::SurfaceProperties(f1,pb);
+    double m1 = pb.Mass();
+    BRepGProp::SurfaceProperties(f2,pb);
+    double m2 = pb.Mass();
+    std::cout<<"    f1 Mass "<<m1<<" Boite englobante : ["<<minPnt1.X()<<","<<minPnt1.Y()<<","<<minPnt1.Z()<<"]-["<<maxPnt1.X()<<","<<maxPnt1.Y()<<","<<maxPnt1.Z()<<"]"<<std::endl;
+	BRepGProp::SurfaceProperties(f2,pb);
+	std::cout<<"    f2 Mass "<<m2<<" Boite englobante : ["<<minPnt2.X()<<","<<minPnt2.Y()<<","<<minPnt2.Z()<<"]-["<<maxPnt2.X()<<","<<maxPnt2.Y()<<","<<maxPnt2.Z()<<"]"<<std::endl;
+#endif
+
+    double scale = std::max(maxPnt1.X()-minPnt1.X(), std::max(maxPnt1.Y()-minPnt1.Y(), maxPnt1.Z()-minPnt1.Z()));
+    int res = diffGpPnt(minPnt1, minPnt2, scale);
+#ifdef _DEBUG_DIFF
+    if (res == -1 || res == 1)
+	    std::cout<<"    diffGpPnt minPnt1 minPnt2 res = "<<res<<std::endl;
 #endif
 	if (res == -1)
 		return false;
 	else if (res == 1)
 		return true;
 	else {
-		res = diffGpPnt(maxPnt1, maxPnt2, maxPnt1.X()-minPnt1.X(), maxPnt1.Y()-minPnt1.Y(), maxPnt1.Z()-minPnt1.Z());
+		res = diffGpPnt(maxPnt1, maxPnt2, scale);
 #ifdef _DEBUG_DIFF
-		std::cout<<"diffGpPnt maxPnt1 maxPnt2 res = "<<res<<std::endl;
+        if (res == -1 || res == 1)
+		std::cout<<"    diffGpPnt maxPnt1 maxPnt2 res = "<<res<<std::endl;
 #endif
 		if (res == -1)
 			return false;
@@ -1628,7 +1591,9 @@ static bool compareOCCFace(const TopoDS_Face f1, const TopoDS_Face f2)
 			return true;
 		else {
 			// donc les boites sont identiques à mgxGeomDoubleEpsilon près
-
+#ifdef _DEBUG_DIFF
+            std::cout << "    Boites englobantes identiques" << std::endl;
+#endif
 			// comparaison des sommets
 			std::list<gp_Pnt> lpnt1 = getOrderedGpPnt(f1);
 			std::list<gp_Pnt> lpnt2 = getOrderedGpPnt(f2);
@@ -1656,7 +1621,6 @@ static bool compareOCCFace(const TopoDS_Face f1, const TopoDS_Face f2)
 				std::cout <<" 2 TopoDS_Face avec coordonnées identiques à "
 						<<Utils::Math::MgxNumeric::mgxGeomDoubleEpsilon
 						<<" près !"<<std::endl;
-				//std::cerr<<"HashCode: "<<(long int)f1.HashCode(INT_MAX)<<" et "<<(long int)f2.HashCode(INT_MAX)<<std::endl;
 #endif
 				return true;
 			}
@@ -1672,13 +1636,15 @@ static bool compareOCCSolid(const TopoDS_Solid s1, const TopoDS_Solid s2)
     OCCHelper::computeBoundingBox(s1, minPnt1, maxPnt1);
     OCCHelper::computeBoundingBox(s2, minPnt2, maxPnt2);
 
-	int res = diffGpPnt(minPnt1, minPnt2, maxPnt1.X()-minPnt1.X(), maxPnt1.Y()-minPnt1.Y(), maxPnt1.Z()-minPnt1.Z());
+    double scale = std::max(maxPnt1.X()-minPnt1.X(), std::max(maxPnt1.Y()-minPnt1.Y(), maxPnt1.Z()-minPnt1.Z()));
+	int res = diffGpPnt(minPnt1, minPnt2, scale);
 	if (res == -1)
 		return false;
 	else if (res == 1)
 		return true;
 	else {
-		res = diffGpPnt(maxPnt1, maxPnt2, maxPnt1.X()-minPnt1.X(), maxPnt1.Y()-minPnt1.Y(), maxPnt1.Z()-minPnt1.Z());
+        scale = std::max(maxPnt1.X()-minPnt1.X(), std::max(maxPnt1.Y()-minPnt1.Y(), maxPnt1.Z()-minPnt1.Z()));
+		res = diffGpPnt(maxPnt1, maxPnt2, scale);
 		if (res == -1)
 			return false;
 		else if (res == 1)
@@ -1943,9 +1909,37 @@ void GeomModificationBaseClass::createNewSurfaces(
     	sorted_entities.push_back(F);
     	OCCHelper::buildIncrementalBRepMesh(F, 0.01); // calcul de la triangulation interne
     }
-    sorted_entities.sort(compareOCCFace);
 #ifdef _DEBUG2
-    std::cout<<" ==== end sorted_entities.sort ===="<<std::endl;
+    std::cout<<" Avant sort ===="<<std::endl;
+    std::cout << "entities : [";
+    bool premierElement = true;
+    for (const auto& element : sorted_entities) {
+        if (!premierElement) {
+            std::cout << ", ";
+        }
+        GProp_GProps pb;
+        BRepGProp::SurfaceProperties(element,pb);
+        std::cout << pb.Mass();
+        premierElement = false;
+    }
+    std::cout << "]" << std::endl;
+#endif
+    sorted_entities.sort(compareOCCFace);
+
+#ifdef _DEBUG2
+    std::cout<<" Apres sort ===="<<std::endl;
+    std::cout << "sorted_entities : [";
+    premierElement = true;
+    for (const auto& element : sorted_entities) {
+        if (!premierElement) {
+            std::cout << ", ";
+        }
+        GProp_GProps pb;
+        BRepGProp::SurfaceProperties(element,pb);
+        std::cout << pb.Mass();
+        premierElement = false;
+    }
+    std::cout << "]" << std::endl;
 #endif
 
     for (std::list<TopoDS_Face>::iterator iter=sorted_entities.begin();
@@ -1956,7 +1950,7 @@ void GeomModificationBaseClass::createNewSurfaces(
         GProp_GProps pb;
         BRepGProp::SurfaceProperties(F,pb);
 #ifdef _DEBUG2
-    	std::cout<<"  F Mass "<<pb.Mass()<<std::endl;
+    	//std::cout<<"  F Mass "<<pb.Mass()<<std::endl;
 #endif
     	// pour éviter de conserver le plan (de coupe) troué
     	if (pb.Mass() > 0.0) {
@@ -1976,7 +1970,7 @@ void GeomModificationBaseClass::createNewSurfaces(
 
                 for (auto rep_face : current->getOCCFaces()) {
 #ifdef _DEBUG2
-    				std::cout<<"  areEquals avec "<<current->getName()<<std::endl;
+    				//std::cout<<"  areEquals avec "<<current->getName()<<std::endl;
 #endif
     				if(OCCHelper::areEquals(F, rep_face)){
     					//std::cout<<"\t on garde"<<std::endl;
@@ -2006,7 +2000,7 @@ void GeomModificationBaseClass::createNewSurfaces(
         					newFace = current;
         					newOCCFace = F;
     #ifdef _DEBUG2
-        					std::cout<<"**** "<<current->getName()<<" deja cree"<<std::endl;
+        					//std::cout<<"**** "<<current->getName()<<" deja cree"<<std::endl;
     #endif
         				}
     				}
@@ -2042,8 +2036,8 @@ void GeomModificationBaseClass::createNewSurfaces(
     	}
 
     }
-
 }
+#undef _DEBUG2
 /*----------------------------------------------------------------------------*/
 void GeomModificationBaseClass::createNewVolumes(
 		const TopoDS_Shape&              entity,

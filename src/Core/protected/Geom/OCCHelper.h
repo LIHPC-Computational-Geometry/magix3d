@@ -129,10 +129,10 @@ public:
     static double computeArea(const TopoDS_Shape& volume);
 
     /// Calcule la boite englobante
-    static void computeBoundingBox(const TopoDS_Shape& shape, gp_Pnt& pmin, gp_Pnt& pmax, double gap=0.0);
+    static void computeBoundingBox(const TopoDS_Shape& shape, gp_Pnt& pmin, gp_Pnt& pmax);
 
     /// Calcule la boite englobante
-    static void computeBoundingBox(const TopoDS_Shape& shape, Utils::Math::Point& pmin, Utils::Math::Point& pmax, double gap=0.0);
+    static void computeBoundingBox(const TopoDS_Shape& shape, Utils::Math::Point& pmin, Utils::Math::Point& pmax);
 
         /// Calcule la distance curviligne entre deux points sur une courbe
     static double curvilinearDistance(const std::vector<TopoDS_Edge>& curve,
