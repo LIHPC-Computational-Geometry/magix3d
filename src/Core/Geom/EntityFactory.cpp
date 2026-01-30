@@ -521,7 +521,9 @@ Curve* EntityFactory::newArcEllipse(const Geom::Vertex* center,
     // Paramètres angulaires EXACTS
     Standard_Real u1 = ElCLib::EllipseParameter(ellipseAxis, major, minor, p_start);
     Standard_Real u2 = ElCLib::EllipseParameter(ellipseAxis, major, minor, p_end);
-
+    if(!direction) {
+        std::swap(u1,u2);
+    }
     // Arc d’ellipse
     Handle(Geom_TrimmedCurve) arc = new Geom_TrimmedCurve(ellipse, u1, u2, Standard_True);
 
