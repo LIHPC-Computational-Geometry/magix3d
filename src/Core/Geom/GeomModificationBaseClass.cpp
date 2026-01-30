@@ -40,7 +40,6 @@
 #include <BRepGProp.hxx>
 #include <GProp_GProps.hxx>
 #include <BRepCheck_Analyzer.hxx>
-#include <TopTools_ShapeMapHasher.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -1950,7 +1949,7 @@ void GeomModificationBaseClass::createNewSurfaces(
         GProp_GProps pb;
         BRepGProp::SurfaceProperties(F,pb);
 #ifdef _DEBUG2
-    	//std::cout<<"  F Mass "<<pb.Mass()<<std::endl;
+    	std::cout<<"  F Mass "<<pb.Mass()<<std::endl;
 #endif
     	// pour éviter de conserver le plan (de coupe) troué
     	if (pb.Mass() > 0.0) {
@@ -1970,7 +1969,7 @@ void GeomModificationBaseClass::createNewSurfaces(
 
                 for (auto rep_face : current->getOCCFaces()) {
 #ifdef _DEBUG2
-    				//std::cout<<"  areEquals avec "<<current->getName()<<std::endl;
+    				std::cout<<"  areEquals avec "<<current->getName()<<std::endl;
 #endif
     				if(OCCHelper::areEquals(F, rep_face)){
     					//std::cout<<"\t on garde"<<std::endl;
@@ -2036,8 +2035,8 @@ void GeomModificationBaseClass::createNewSurfaces(
     	}
 
     }
+
 }
-#undef _DEBUG2
 /*----------------------------------------------------------------------------*/
 void GeomModificationBaseClass::createNewVolumes(
 		const TopoDS_Shape&              entity,

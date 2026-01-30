@@ -26,7 +26,6 @@
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
 namespace Geom {
-#define _DEBUG2
 /*----------------------------------------------------------------------------*/
 bool GeomContainsImplementation::
 contains(Curve* c1, Curve* c2) const
