@@ -308,6 +308,17 @@ void QtTopologySplitBlockWithOGridPanel::preview (
 									*context, blocks, faces, ratio, edgesNum, false, propagate());
 		TopoDisplayRepresentation	dr (DisplayRepresentation::WIRE);
 		command.getPreviewRepresentation (dr);
+
+		// Issue 222 : cf. QtTopologySplitBlockPanel::preview
+		for (vector<string>::const_iterator it = blocksNames.begin ( ); blocksNames.end ( ) != it; it++)
+		{
+			Block*	block	= getContext ( ).getTopoManager ( ).getBlock (*it, true);
+			registerHighlightedEntity (*block);
+			DisplayProperties::GraphicalRepresentation*	gr	= 0 == block ? 0 : block->getDisplayProperties ( ).getGraphicalRepresentation ( );
+			if (0 != gr)
+				gr->setHighlighted (true, false);
+		}	// for (vector<string>::const_iterator it = blocksNames.begin ( ); blocksNames.end ( ) != it; it++)
+
 		const vector<Math::Point>&	points	= dr.getPoints ( );
 		const vector<size_t>&		indices	= dr.getCurveDiscretization ( );
 
