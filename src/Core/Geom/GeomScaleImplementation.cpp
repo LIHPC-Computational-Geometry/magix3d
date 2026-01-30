@@ -5,8 +5,6 @@
 #include "Geom/Volume.h"
 #include "Geom/CommandGeomCopy.h"
 /*----------------------------------------------------------------------------*/
-#include <Bnd_Box.hxx>
-#include <BRepBndLib.hxx>
 #include <BRepBuilderAPI_Transform.hxx>
 #include <BRepBuilderAPI_GTransform.hxx>
 /*----------------------------------------------------------------------------*/
@@ -183,13 +181,6 @@ void GeomScaleImplementation::scaleSingle(GeomEntity* e)
 TopoDS_Shape GeomScaleImplementation::
 scale(const TopoDS_Shape& shape, const double F, const Point& center) const
 {
-    Bnd_Box box;
-    box.SetGap(Utils::Math::MgxNumeric::mgxDoubleEpsilon);
-    BRepBndLib::Add(shape, box);
-
-    double xmin,ymin,zmin,xmax,ymax,zmax;
-    box.Get(xmin,ymin,zmin,xmax,ymax,zmax);
-
     gp_Trsf T;
     T.SetScale(gp_Pnt(center.getX(), center.getY(), center.getZ()),F);
     BRepBuilderAPI_Transform scaling(T);
@@ -207,13 +198,6 @@ scale(const TopoDS_Shape& shape, const double F, const Point& center) const
 TopoDS_Shape GeomScaleImplementation::
 scale(const TopoDS_Shape& shape, const double factorX, const double factorY, const double factorZ, const Point& center) const
 {
-    Bnd_Box box;
-    box.SetGap(Utils::Math::MgxNumeric::mgxDoubleEpsilon);
-    BRepBndLib::Add(shape, box);
-
-    double xmin,ymin,zmin,xmax,ymax,zmax;
-    box.Get(xmin,ymin,zmin,xmax,ymax,zmax);
-
     gp_GTrsf GT;
     GT.SetValue(1, 1, factorX);
     GT.SetValue(2, 2, factorY);
