@@ -658,43 +658,65 @@ createVertices(std::map<Vertex*, uint> & filtre_vertex,
                     	std::cout<<"vtx_prec : "<<vtx_prec->getName()<<std::endl;
 #endif
                         CoEdge* coedge = 0;
-                        for (CoEdge* vtx_prec_ce : vtx_prec->getCoEdges())
+                        for (CoEdge* vtx_prec_ce : vtx_prec->getCoEdges()) {
                             if (filtre_vu[vtx_prec_ce] == 0 && filtre_coedge[vtx_prec_ce] == 2)
                                 coedge = vtx_prec_ce;
+                        }
 
-                        if (0 == coedge)
-                            throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne dans CommandSplitBlocksWithOgrid::createVertices, on ne trouve pas de sommet opposé au sommet marqué à 4", TkUtil::Charset::UTF_8));
-
-                        // pour ne pas revenir en arrière
-                        filtre_vu[coedge] = 1;
-                        coedges_int.push_back(coedge);
+                        if (0 == coedge) {
+                            vtx_opp = 0;
+                        } else {
+                            // pour ne pas revenir en arrière
+                            filtre_vu[coedge] = 1;
+                            coedges_int.push_back(coedge);
 #ifdef _DEBUG_SPLIT_OGRID
-                        std::cout<<"coedge : "<<coedge->getName()
-                        		<<", filtre_vu = "<<filtre_vu[coedge]
-                        		<<", filtre_coedge = "<<filtre_coedge[coedge]
-                        		<<std::endl;
+                            std::cout<<"coedge : "<<coedge->getName()
+                                    <<", filtre_vu = "<<filtre_vu[coedge]
+                                    <<", filtre_coedge = "<<filtre_coedge[coedge]
+                                    <<std::endl;
 #endif
-                        vtx_opp = coedge->getOppositeVertex(vtx_prec);
+                            vtx_opp = coedge->getOppositeVertex(vtx_prec);
 
-                        vtx_prec = vtx_opp;
-                    } while (filtre_vertex[vtx_opp] == 0);
+                            vtx_prec = vtx_opp;
+                        }
+                    } while (vtx_opp !=0 && filtre_vertex[vtx_opp] == 0);
 
+                    if (vtx_opp == 0) {
+                        // Pas de edge interne
+                        // 4 blocs placés en forme de T. 
+                        // Pointe formée sur l'arête centrale en haut du T
+                        // cf. test_link/test_splitBlocksWithOgrid.py
+                        std::map<CoEdge*, int> cofaces_int_coedges;
+                        Utils::Math::Point cofaces_int_barycentre;
+                        int nb_vertices = 0;
+                        for (CoFace* cf : cofaces_int) {
+                            for (Vertex* cf_v : cf->getVertices()) {
+                                nb_vertices++;
+                                cofaces_int_barycentre += cf_v->getCoord();
+                            }
+                        }
+                        cofaces_int_barycentre /= (double)nb_vertices;
+                        Utils::Math::Point pt = (cofaces_int_barycentre + (sommet->getCoord() - cofaces_int_barycentre)*m_ratio_ogrid);
+                        newVtx = new Topo::Vertex(getContext(), pt);
+                        getInfoCommand().addTopoInfoEntity(newVtx, Internal::InfoCommand::CREATED);
+                        corr_vertex[sommet] = newVtx;
+                    } else {
 #ifdef _DEBUG_SPLIT_OGRID
-                    std::cout<<"vtx_opp : "<<vtx_opp->getName()<<std::endl;
+                        std::cout<<"vtx_opp : "<<vtx_opp->getName()<<std::endl;
 #endif
-                    Utils::Math::Point barycentre_edge = (sommet->getCoord() + vtx_opp->getCoord())/2;
+                        Utils::Math::Point barycentre_edge = (sommet->getCoord() + vtx_opp->getCoord())/2;
 
-                    Utils::Math::Point pt = (barycentre_edge + (sommet->getCoord() - barycentre_edge)*m_ratio_ogrid);
-                    newVtx = new Topo::Vertex(getContext(), pt);
-                    getInfoCommand().addTopoInfoEntity(newVtx, Internal::InfoCommand::CREATED);
-                    corr_vertex[sommet] = newVtx;
+                        Utils::Math::Point pt = (barycentre_edge + (sommet->getCoord() - barycentre_edge)*m_ratio_ogrid);
+                        newVtx = new Topo::Vertex(getContext(), pt);
+                        getInfoCommand().addTopoInfoEntity(newVtx, Internal::InfoCommand::CREATED);
+                        corr_vertex[sommet] = newVtx;
 
-                    // utilisation de la projection de[s] coedges vues si possible
-                    if (coedges_int.size() == 1 && coedges_int[0]->getGeomAssociation()){
-                        newVtx->setGeomAssociation(coedges_int[0]->getGeomAssociation());
-                        filtre_vertex[newVtx] = 4;
+                        // utilisation de la projection de[s] coedges vues si possible
+                        if (coedges_int.size() == 1 && coedges_int[0]->getGeomAssociation()){
+                            newVtx->setGeomAssociation(coedges_int[0]->getGeomAssociation());
+                            filtre_vertex[newVtx] = 4;
+                        }
                     }
-
                 }
                 else if ((nb_face_int == 1)
                         || (nb_face_int == 2 && m_blocs.size() == 2)) {
@@ -747,7 +769,6 @@ createVertices(std::map<Vertex*, uint> & filtre_vertex,
                 else {
                     // dans tous les autres cas, on ne fait rien pour le sommet
                 }
-
             } // end else if (0 == newVtx)
         } // end for iter6
     } // end for iter1
@@ -1249,7 +1270,7 @@ createCoFace(std::map<Vertex*, uint> & filtre_vertex,
                 else if (filtre_face[face] == 1) {
                     // cas ou c'est toute la face qui donne une unique coface
 #ifdef _DEBUG_SPLIT_OGRID
-                    std::cout<<"    face avec de multiples ("<<face->getNbCoFaces()
+                    std::cout<<"    face avec de multiples ("<<face->getCoFaces().size()
                                 <<") cofaces, mais pas décomposée."<<std::endl;
 #endif
 
@@ -1597,11 +1618,8 @@ createBlock(std::map<Vertex*, uint> & filtre_vertex,
         else {
 #ifdef _DEBUG_SPLIT_OGRID
             std::cout<<"  face qui ne donne pas de bloc, elle contient les cofaces: ";
-            std::vector<CoFace* > cofaces;
-            face->getCoFaces(cofaces);
-            for (std::vector<CoFace* >::iterator iter3 = cofaces.begin();
-                    iter3 != cofaces.end(); ++iter3)
-                std::cout<<(*iter3)->getName();
+            for (CoFace* cf : face->getCoFaces())
+                std::cout<<cf->getName();
 #endif
             }
         } // end iter2
