@@ -9,7 +9,6 @@
 /*----------------------------------------------------------------------------*/
 #include <Poly_Polygon3D.hxx>
 #include <Poly_PolygonOnTriangulation.hxx>
-#include <BRepMesh.hxx>
 #include <BRepBndLib.hxx>
 #include <BRepTools.hxx>
 #include <BRep_Tool.hxx>

@@ -7,7 +7,6 @@
 #include <TkUtil/Exception.h>
 /*----------------------------------------------------------------------------*/
 #include <Poly_PolygonOnTriangulation.hxx>
-#include <BRepMesh.hxx>
 #include <BRepBndLib.hxx>
 #include <BRepTools.hxx>
 #include <BRep_Tool.hxx>
