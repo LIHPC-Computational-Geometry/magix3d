@@ -167,7 +167,7 @@ void Surface::computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& p
     OCCHelper::computeBoundingBox(m_occ_faces[0], pmin, pmax);
 	for (uint i=1; i<m_occ_faces.size(); i++){
 		Utils::Math::Point p1,p2;
-        OCCHelper::computeBoundingBox(m_occ_faces[i], pmin, pmax);
+        OCCHelper::computeBoundingBox(m_occ_faces[i], p1, p2);
 		for (uint j=0; j<3; j++){
 			double c1 = pmin.getCoord(j);
 			double c2 = p1.getCoord(j);
@@ -178,7 +178,7 @@ void Surface::computeBoundingBox(Utils::Math::Point& pmin, Utils::Math::Point& p
 			double c1 = pmax.getCoord(j);
 			double c2 = p2.getCoord(j);
 			if (c2>c1)
-				pmin.setCoord(j,c2);
+				pmax.setCoord(j,c2);
 		}
 	}
 }

@@ -1,5 +1,6 @@
 import os
 import pyMagix3D as Mgx3D
+import math
 
 step_file_name = "cube_sphere.step"
 
@@ -29,3 +30,19 @@ def test_export_import_step():
     # Import STEP
     gm.importSTEP(step_file_name)
     assert gm.getNbVolumes()==1
+
+def test_import_iges():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    gm = ctx.getGeomManager ()
+    tm = ctx.getTopoManager ()
+
+    # Changement d'unité de longueur
+    ctx.setLengthUnit(Mgx3D.Unit.meter)
+    # Import IGES
+    gm.importIGES("ex1.iges")
+    # pb de conversion d'unité lors du passage OCC 7.8.1
+    c = gm.getCoord("Pt0000")
+    assert math.isclose(c.getX(), -5e-6, abs_tol=1e-7)
+    assert math.isclose(c.getY(), 2.5e-6, abs_tol=1e-7)
+    assert math.isclose(c.getZ(), 0, abs_tol=1e-7)

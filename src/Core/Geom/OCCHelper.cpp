@@ -1006,7 +1006,9 @@ computeBoundingBox(const TopoDS_Shape& shape, gp_Pnt& pmin, gp_Pnt& pmax)
     } else {
         BRepBndLib::AddOptimal(shape, box);
     }
-    //BRepBndLib::Add(shape, box);
+
+    if (box.IsVoid())
+        BRepBndLib::Add(shape, box);
 
     double xmin, ymin, zmin, xmax, ymax, zmax;
     box.Get(xmin, ymin, zmin, xmax, ymax, zmax);

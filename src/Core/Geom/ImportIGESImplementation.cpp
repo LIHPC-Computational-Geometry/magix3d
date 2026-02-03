@@ -9,6 +9,7 @@
 /*----------------------------------------------------------------------------*/
 #include <TopoDS_Shape.hxx>
 #include <IGESControl_Reader.hxx>
+#include <IGESControl_Controller.hxx>
 #include <Interface_Static.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
@@ -25,34 +26,14 @@ ImportIGESImplementation::~ImportIGESImplementation()
 /*----------------------------------------------------------------------------*/
 void ImportIGESImplementation::readFile()
 {
-        std::string suffix = m_filename;
-        int suffix_start = m_filename.find_last_of(".");
-        suffix.erase(0,suffix_start+1);
-        if (suffix != "igs" && suffix != "iges"  )
-            throw TkUtil::Exception (TkUtil::UTF8String ("Mauvaise extension de fichier IGES (.igs ou .iges)", TkUtil::Charset::UTF_8));
-
-        // récupération du nom du fichier sans chemin ni extension
-        int path_end = m_filename.find_last_of("/");
-
-        IGESControl_Reader aReader;
-
-        if (aReader.ReadFile((Standard_CString)m_filename.c_str()) != IFSelect_RetDone)
-            throw TkUtil::Exception (TkUtil::UTF8String ("Impossible d'ouvrir ce fichier IGES", TkUtil::Charset::UTF_8));
-
-//        // the precision wil be given by me
-//        Interface_Static::SetIVal("read.precision.mode",1);
-//
-//        Standard_Real precision_value = Interface_Static::RVal("read.precision.val");
-//        std::cerr<<"initial precision: "<<precision_value<<std::endl;
-//        Interface_Static::SetRVal("read.precision.val",1e-1);
-//        precision_value = Interface_Static::RVal("read.precision.val");
-//        std::cerr<<"new precision    : "<<precision_value<<std::endl;
-
         /* Valeur par défaut de 1 changée en 0 pour éviter la création
          * d'une multitude de courbes pour un modèle test
          * 0 -> continuité C0 entre les éléments de la courbe
          * 1 -> si la continuité n'est pas C1, alors la courbe est coupée
+         * 
+         * ATTENTION à partir de OCC 7.8.1, doit être fait avant instanciation du reader
          */
+        IGESControl_Controller::Init();
         Interface_Static::SetIVal("read.iges.bspline.continuity",0);
 
         switch (m_context.getLengthUnit ( ))
@@ -73,6 +54,21 @@ void ImportIGESImplementation::readFile()
                 // on n'accepte plus de ne pas avoir d'unité de spécifiée
                 throw Utils::UndefinedUnitException(TkUtil::UTF8String ("Il est nécessaire de spécifier une unité avant d'ouvrir un fichier IGES", TkUtil::Charset::UTF_8));
         }	// switch (getLengthUnit ( ))
+        Interface_Static::SetIVal("read.scale.unit", 1); // activer conversion
+
+        std::string suffix = m_filename;
+        int suffix_start = m_filename.find_last_of(".");
+        suffix.erase(0,suffix_start+1);
+        if (suffix != "igs" && suffix != "iges"  )
+            throw TkUtil::Exception (TkUtil::UTF8String ("Mauvaise extension de fichier IGES (.igs ou .iges)", TkUtil::Charset::UTF_8));
+
+        // récupération du nom du fichier sans chemin ni extension
+        int path_end = m_filename.find_last_of("/");
+
+        IGESControl_Reader aReader;
+
+        if (aReader.ReadFile((Standard_CString)m_filename.c_str()) != IFSelect_RetDone)
+            throw TkUtil::Exception (TkUtil::UTF8String ("Impossible d'ouvrir ce fichier IGES", TkUtil::Charset::UTF_8));
 
         // Root transfers
         Standard_Integer nbr = aReader.NbRootsForTransfer();
