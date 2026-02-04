@@ -1065,7 +1065,6 @@ cleanShape(TopoDS_Shape& shape){
         std::cout<<message<<std::endl;
 #endif
 
-        Handle(ShapeFix_Wire) sfw;
         ShapeBuild_ReShape rebuild;
         rebuild.Apply(shape);
         for(int i = 1; i <= fmap.Extent(); i++){
