@@ -1444,8 +1444,16 @@ Topo::TopoInfo Block::getInfos() const
     std::vector<CoEdge*> coedges = getCoEdges();
     infos._coedges = Utils::toNames(coedges);
     
+    std::vector<Edge*> edges = getEdges();
+    infos._edges = Utils::toNames(edges);
+
     std::vector<CoFace*> cofaces = getCoFaces();
     infos._cofaces = Utils::toNames(cofaces);
+
+    std::vector<Face*> faces = getFaces();
+    infos._faces = Utils::toNames(faces);
+
+    getGroupsName(infos._groups);
 
     return infos;
 }
