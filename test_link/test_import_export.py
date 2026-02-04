@@ -35,12 +35,13 @@ def test_import_iges():
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     gm = ctx.getGeomManager ()
-    tm = ctx.getTopoManager ()
 
     # Changement d'unité de longueur
     ctx.setLengthUnit(Mgx3D.Unit.meter)
     # Import IGES
-    gm.importIGES("ex1.iges")
+    test_folder = os.path.dirname(__file__)
+    iges_file_path = os.path.join(test_folder, 'ex1.iges')
+    gm.importIGES(iges_file_path)
     # pb de conversion d'unité lors du passage OCC 7.8.1
     c = gm.getCoord("Pt0000")
     assert math.isclose(c.getX(), -5e-6, abs_tol=1e-7)
