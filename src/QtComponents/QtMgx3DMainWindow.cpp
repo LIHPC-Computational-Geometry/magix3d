@@ -5623,20 +5623,6 @@ cout << __FILE__ << ' ' << __LINE__ << " QtMgx3DMainWindow::exitCallback" << end
 							if ((true == compareExtensions(file.getExtension(), "igs")) ||
 							    (true == compareExtensions(file.getExtension(), "iges")))
 							{
-								if (Utils::Unit::undefined == getContext().getLengthUnit())
-								{   // Suggérer l'unité de longueur du fichier IGES si elle est compatible
-									IGESHeader header;
-									UTF8String infos;
-									header.read(fileName, infos);
-									Unit::lengthUnit igesUnit = header.getMgxUnit(false);
-									if (false == requireUnitMeter(igesUnit))
-									{
-										msg << " Opération annulée par l'utilisateur.";
-										log(InformationLog(msg));
-										return;
-									}   // if (false == requireUnitMeter (igesUnit))
-								}   // if (Utils::Unit::undefined == getContext ( ).getLengthUnit ( ))
-
 								QtAutoWaitingCursor cursor(true);
 								getContext().getGeomManager().importIGES(fileName);
 							}    // IGES

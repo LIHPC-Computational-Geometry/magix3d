@@ -1,12 +1,9 @@
-//
-// Created by calderans on 4/3/25.
-//
-
 #ifndef MAGIX3D_IMPORTBLOCKSIMPLEMENTATION_H
 #define MAGIX3D_IMPORTBLOCKSIMPLEMENTATION_H
 /*----------------------------------------------------------------------------*/
 #include "Internal/Context.h"
 #include "Group/GroupHelperForCommand.h"
+#include <fstream>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -36,12 +33,12 @@ public:
 
 
 private:
-    void readNodes(ifstream &str, Group::Group0D* group);
-    int readEdges(ifstream &str, Group::Group1D* group);
-    void readFaces(ifstream &str, Group::Group2D* group);
-    void readBlocks(ifstream &str, Group::Group3D* group);
+    void readNodes(std::ifstream &str, Group::Group0D* group);
+    int readEdges(std::ifstream &str, Group::Group1D* group);
+    void readFaces(std::ifstream &str, Group::Group2D* group);
+    void readBlocks(std::ifstream &str, Group::Group3D* group);
 
-    void readDiscr(ifstream &str, const int &nbEdges);
+    void readDiscr(std::ifstream &str, const int &nbEdges);
 
     void readAssociation(std::ifstream &str);
 

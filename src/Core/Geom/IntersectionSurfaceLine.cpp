@@ -17,7 +17,7 @@ IntersectionSurfaceLine::IntersectionSurfaceLine(Surface *s, const Point pnt, co
 /*----------------------------------------------------------------------------*/
 IntersectionSurfaceLine::~IntersectionSurfaceLine()
 {
-    m_intersector->Destroy();
+    delete m_intersector;
 }
 /*----------------------------------------------------------------------------*/
 void IntersectionSurfaceLine::perform()

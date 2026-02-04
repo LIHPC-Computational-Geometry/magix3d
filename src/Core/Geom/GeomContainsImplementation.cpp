@@ -22,6 +22,7 @@
 #include <BRepCheck_Analyzer.hxx>
 #include <GProp_GProps.hxx>
 #include <BRepGProp.hxx>
+#include <BRepBndLib.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -257,13 +258,12 @@ contains(Surface* s1, Surface* s2) const
     		selectTriangleID= nbTriInFace/2;
 
     	const Poly_Array1OfTriangle& Triangles = aPoly->Triangles();
-    	const TColgp_Array1OfPnt& Nodes = aPoly->Nodes();
 
     	// Get the triangle
     	//   std::cout<<"Triangle choisi : "<<selectTriangleID<<std::endl;
     	Standard_Integer N1,N2,N3;
     	Triangles(selectTriangleID).Get(N1,N2,N3);
-    	gp_Pnt V1 = Nodes(N1), V2 = Nodes(N2), V3 = Nodes(N3);
+    	gp_Pnt V1 = aPoly->Node(N1), V2 = aPoly->Node(N2), V3 = aPoly->Node(N3);
     	// on positionne correctement les sommets
     	if (!identity) {
     		V1.Transform(myTransf);
@@ -408,13 +408,12 @@ contains(Volume* v1, Volume* v2) const
                 selectTriangleID= nbTriInFace/2;
 
             const Poly_Array1OfTriangle& Triangles = aPoly->Triangles();
-            const TColgp_Array1OfPnt& Nodes = aPoly->Nodes();
 
             // Get the triangle
             //   std::cout<<"Triangle choisi : "<<selectTriangleID<<std::endl;
             Standard_Integer N1,N2,N3;
             Triangles(selectTriangleID).Get(N1,N2,N3);
-            gp_Pnt V1 = Nodes(N1), V2 = Nodes(N2), V3 = Nodes(N3);
+            gp_Pnt V1 = aPoly->Node(N1), V2 = aPoly->Node(N2), V3 = aPoly->Node(N3);
             // on positionne correctement les sommets
             if (!identity) {
                 V1.Transform(myTransf);
@@ -600,13 +599,12 @@ contains(const TopoDS_Shape& sh,const TopoDS_Shape& shOther) const
                 selectTriangleID= nbTriInFace/2;
 
             const Poly_Array1OfTriangle& Triangles = aPoly->Triangles();
-            const TColgp_Array1OfPnt& Nodes = aPoly->Nodes();
 
             // Get the triangle
             //   std::cout<<"Triangle choisi : "<<selectTriangleID<<std::endl;
             Standard_Integer N1,N2,N3;
             Triangles(selectTriangleID).Get(N1,N2,N3);
-            gp_Pnt V1 = Nodes(N1), V2 = Nodes(N2), V3 = Nodes(N3);
+            gp_Pnt V1 = aPoly->Node(N1), V2 = aPoly->Node(N2), V3 = aPoly->Node(N3);
             // on positionne correctement les sommets
             if (!identity) {
                 V1.Transform(myTransf);
