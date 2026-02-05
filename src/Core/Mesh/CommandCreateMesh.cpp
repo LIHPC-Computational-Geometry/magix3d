@@ -1356,7 +1356,7 @@ modify(std::vector<Topo::Block*>& list_blocks)
 					}
 
 					// applique le lissage uniquement aux noeuds internes au volume (non marqués à 2)
-					lissageVol->applyModification(nodes, polygedres, filtre_nodes_lisse, 2, volume);
+					lissageVol->applyModification(blocks, nodes, polygedres, filtre_nodes_lisse, 2);
 				} // end for volume
 			}
 			else if (pert){
