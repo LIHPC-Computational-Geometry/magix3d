@@ -8,9 +8,9 @@
  */
 /*----------------------------------------------------------------------------*/
 #include "Smoothing/VolumicSmoothing.h"
+#include "Smoothing/YaoVolumicSmoothing.h"
 #include "Mesh/MeshManager.h"
 #include "Utils/Common.h"
-#include "Geom/Volume.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/UTF8String.h>
@@ -18,8 +18,12 @@
 #include <gmds/ig/Node.h>
 #include <gmds/ig/Region.h>
 /*----------------------------------------------------------------------------*/
-//#include <MachineTypes/machine_types.h>
 #include <cstdint>
+#include <gmds/io/IGMeshIOService.h>
+#include <gmds/io/VTKWriter.h>
+
+#include "Internal/Context.h"
+#include "Mesh/MeshItf.h"
 
 #ifdef USE_SMOOTH3D
 #include <smooth3D/smooth3d.h>
@@ -99,20 +103,15 @@ addToDescription (Mgx3D::Utils::SerializedRepresentation* description) const
 }
 /*----------------------------------------------------------------------------*/
 void VolumicSmoothing::
-applyModification(std::vector<gmds::Node>& gmdsNodes,
+applyModification(std::vector<Topo::Block*> &blocks,
+                  std::vector<gmds::Node>& gmdsNodes,
 			std::vector<gmds::Region>& gmdsPolyedres,
 			std::map<gmds::TCellID, uint>& filtre_nodes,
-			uint maskFixed,
-			Geom::Volume* volume)
+			uint maskFixed)
 {
 	uint nb_cells = gmdsPolyedres.size();
 	uint nb_vtx = gmdsNodes.size();
 
-#ifdef _DEBUG2
-	std::cout<<"VolumicSmoothing::applyModification pour "<<nb_vtx<<" noeuds "
-    		 << " et "<<nb_cells<<" polyèdres, dans le volume "
- 			 << volume->getName()<<std::endl;
-#endif
 
 	  double * weights = new double [nb_cells + nb_vtx];
 	  double * relax = new double [nb_vtx];
@@ -132,16 +131,13 @@ applyModification(std::vector<gmds::Node>& gmdsNodes,
 		  gmds2mesquite[gmdsNodes[i].id()] = i;
 
 	  // nombre de noeuds par maille
-	  //int_type *nb_node_cell = new int_type[nb_cells];
-          int64_t *nb_node_cell = new int64_t[nb_cells];
+      int64_t *nb_node_cell = new int64_t[nb_cells];
 	  uint nb_tt_node_cell = 0;
 	  for (uint i=0; i<nb_cells; i++){
 		  nb_node_cell[i] = gmdsPolyedres[i].nbNodes();
 		  nb_tt_node_cell += nb_node_cell[i];
 	  }
 
-	  //int_type * nodes_number = new int_type[nb_tt_node_cell];
-	  //int_type * f_nodes_number = nodes_number;
 	  int64_t * nodes_number = new int64_t[nb_tt_node_cell];
 	  int64_t * f_nodes_number = nodes_number;
 	  for (int cell = 0; cell < nb_cells; ++cell){
@@ -194,25 +190,32 @@ applyModification(std::vector<gmds::Node>& gmdsNodes,
 				  weights, relax, m_nbIterations);
 		  break;
 #endif	// USE_SMOOTH3D
-	  default:
-		  throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, VolumicSmoothing appelé avec une méthode non prévue", TkUtil::Charset::UTF_8));
+    case volumicYaoSmoothing:
+    {
+        std::cout << "Volumic Yao Smoothing" << std::endl;
+        YaoVolumicSmoothing smoother = YaoVolumicSmoothing(blocks, m_nbIterations);
+        smoother.execute();
+        break;
+    }
+    default:
+        throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, VolumicSmoothing appelé avec une méthode non prévue", TkUtil::Charset::UTF_8));
 	  }
 
 	  delete [] weights;
 	  delete [] nb_node_cell;
 	  delete [] nodes_number;
 
-#ifdef _DEBUG2
-	  std::cout<<" => err = "<<err<<std::endl;
-#endif
 
 	  // on ne fait pas confiance au lisseur, capable de déplacer n'importe où un noeud figé
-	  for (int vtx = 0; vtx < nb_vtx; ++ vtx)
-		  if (relax[vtx] == 1.0){
-			  gmdsNodes[vtx].setX(x[vtx]);
-			  gmdsNodes[vtx].setY(y[vtx]);
-			  gmdsNodes[vtx].setZ(z[vtx]);
-		  }
+    if (m_methodeLissage != volumicYaoSmoothing)
+    {
+        for (int vtx = 0; vtx < nb_vtx; ++ vtx)
+            if (relax[vtx] == 1.0){
+                gmdsNodes[vtx].setX(x[vtx]);
+                gmdsNodes[vtx].setY(y[vtx]);
+                gmdsNodes[vtx].setZ(z[vtx]);
+            }
+    }
 
 	  delete [] x;
 	  delete [] y;
@@ -248,6 +251,8 @@ std::string VolumicSmoothing::toString(eVolumicMethod method)
 		return "conditionNumber";
 	else if (method == inverseMeanRatio)
 		return "inverseMeanRatio";
+    else if (method == volumicYaoSmoothing)
+        return "volumicYaoSmoothing";
 	else
 		throw TkUtil::Exception (TkUtil::UTF8String ("Erreur interne, une méthode de lissage volumique n'est pas encore prévue pour toString", TkUtil::Charset::UTF_8));
 }

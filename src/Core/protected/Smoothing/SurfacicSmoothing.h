@@ -45,7 +45,8 @@ public:
 	enum eSurfacicMethod { surfacicNormalSmoothing = 0, // optimisation suivant la normale
 							surfacicOrthogonalSmoothing, // optimisation suivant l'orthogonalité des bras des mailles
 							surfacicOrthogonalSmoothingElliptic,
-							surfacicYaoSmoothing};
+							surfacicYaoSmoothing,
+	                        surfacicLaplacianSmoothing};
 
 	/// énuméré sur les différents solvers
 	enum eSolver {gradientConjugue = 0, newton};

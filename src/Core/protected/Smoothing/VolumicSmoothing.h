@@ -14,6 +14,9 @@
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/UTF8String.h>
 #include <gmds/utils/CommonTypes.h>
+
+#include "Topo/Block.h"
+
 /*----------------------------------------------------------------------------*/
 namespace gmds{
 class Node;
@@ -43,7 +46,8 @@ public:
 		tipton,
 		jun,
 		conditionNumber,
-		inverseMeanRatio};
+		inverseMeanRatio,
+	    volumicYaoSmoothing};
 
 	/// Constructeur pour fonction de lissage volumique avec les arguments par défaut
 	VolumicSmoothing();
@@ -77,11 +81,11 @@ public:
 	/** Fonction d'appel pour modifier un ensemble de noeuds du maillage
 	 *  Ne sont modifiés que ceux dont la valeur est différente de la marque dans le filtre
 	 */
-	virtual void applyModification(std::vector<gmds::Node >& gmdsNodes,
+	virtual void applyModification(std::vector<Topo::Block*> &blocks,
+                                   std::vector<gmds::Node >& gmdsNodes,
 			std::vector<gmds::Region>& gmdsPolyedres,
 			std::map<gmds::TCellID, uint>& filtre_nodes,
-			uint maskFixed,
-			Geom::Volume* volume);
+			uint maskFixed);
 
 	/** \brief  Fournit une représentation textuelle de l'entité.
 	 * \return	Description, à détruire par l'appelant.
