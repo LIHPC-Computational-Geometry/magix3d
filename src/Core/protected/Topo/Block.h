@@ -193,6 +193,13 @@ public:
      */
     Topo::Vertex* getVertex(bool cote_i, bool cote_j, bool cote_k);
 
+    /** Return the ID of node (i,j,k) in the co-face
+     * \param[in] i is the index in the first direction
+     * \param[in] j is the index in the second direction
+     * \param[in] k is the index in the third direction
+     */
+    gmds::TCellID getNode(uint i, uint j, uint k);
+
     /// retourne la liste des 8 sommets en duplicant les derniers en cas de dégénérescence
     std::vector<Vertex*> getHexaVertices() const;
 

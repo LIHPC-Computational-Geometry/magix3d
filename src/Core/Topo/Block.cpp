@@ -300,6 +300,19 @@ getVertex(bool cote_i, bool cote_j, bool cote_k)
 
 }
 /*----------------------------------------------------------------------------*/
+gmds::TCellID Block::
+getNode(uint const i, uint const j, uint const k)
+{
+    uint nbI;
+    uint nbJ;
+    uint nbK;
+    getNbMeshingEdges(nbI, nbJ, nbK);
+    nbI++;
+    nbJ++;
+    nbK++;
+    return nodes()[i + j*nbI + k*nbI*nbJ];
+}
+/*----------------------------------------------------------------------------*/
 std::vector<CoFace*> Block::
 getCoFaces() const
 {
