@@ -1457,9 +1457,11 @@ public:
 #endif
 
 private:
+#ifndef SWIG
     /// Retourne les entités topologiques filtrées
     template <typename T, typename = std::enable_if<std::is_base_of<GeomEntity, T>::value>>
     std::string getLastEntityName(const std::vector<T*>& entities) const;
+#endif
 
     /// Retourne une liste d'entités en fonction du nom et de la dimension
     std::vector<GeomEntity*> getEntitiesFromNames(const std::vector<std::string>& names, const int dim) const;
