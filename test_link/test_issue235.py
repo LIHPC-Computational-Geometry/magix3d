@@ -23,6 +23,16 @@ def test_issue235():
     ctx.getGeomManager().newVertex ("Crb0000", 1.000000e+00)
     coord_are_equals(gm, "Pt0002", "Pt0003")
 
+    # Annulation de : Création de l'arc d'ellipse Crb0000
+    ctx.undo()
+    # Création de l'arc d'ellipse Crb0000
+    gm.newArcEllipse("Pt0000", "Pt0001", "Pt0002", True)
+
+    # On vérifie que l'arc d'ellipse passe par Pt0002
+    # Création du sommet Pt0003 sur la courbe Crb0000
+    ctx.getGeomManager().newVertex ("Crb0000", 1.000000e+00)
+    coord_are_equals(gm, "Pt0002", "Pt0003")
+
 def coord_are_equals(gm, pt1, pt2):
     c1 = gm.getCoord(pt1)
     c2 = gm.getCoord(pt2)

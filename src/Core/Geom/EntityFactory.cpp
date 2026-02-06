@@ -524,9 +524,10 @@ Curve* EntityFactory::newArcEllipse(const Geom::Vertex* center,
     if(!direction) {
         std::swap(u1,u2);
     }
-    // Arc d’ellipse
-    Handle(Geom_TrimmedCurve) arc = new Geom_TrimmedCurve(ellipse, u1, u2, Standard_True);
 
+    // Arc d’ellipse
+    Standard_Boolean sense = direction;
+    Handle(Geom_TrimmedCurve) arc = new Geom_TrimmedCurve(ellipse, u1, u2, sense);
     TopoDS_Edge e = BRepBuilderAPI_MakeEdge(arc);
     Curve* curve = new Curve(m_context,
                      m_context.newProperty(Utils::Entity::GeomCurve),
