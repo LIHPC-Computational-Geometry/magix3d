@@ -4931,7 +4931,7 @@ hasRefTopo(std::vector<Geom::GeomEntity*>& entities)
     return false;
 }
 /*----------------------------------------------------------------------------*/
-template <typename T, typename = std::enable_if<std::is_base_of<GeomEntity, T>::value>>
+template <typename T, typename>
 std::string GeomManager::getLastEntityName(const std::vector<T*>& entities) const
 {
     std::string nom("");

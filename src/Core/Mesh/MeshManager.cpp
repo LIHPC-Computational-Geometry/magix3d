@@ -565,7 +565,7 @@ CommandMeshExplorer* MeshManager::endExplorer(CommandMeshExplorer* oldExplo, boo
         return cmdResult;
     }
 /*----------------------------------------------------------------------------*/
-template <typename T, typename = std::enable_if_t<std::is_base_of<MeshEntity, T>::value>>
+template <typename T, typename>
 T* MeshManager::findByName(const std::string& name, const std::vector<T*> entities, const bool exceptionIfNotFound) const
 {
     T* entity = 0;
