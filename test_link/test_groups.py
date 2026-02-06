@@ -212,7 +212,7 @@ def test_changeGroupName():
         ctx.getGroupManager().changeGroupName("Hors_Groupe_3D", "TOTO", 3)
     assert "Il n'est pas possible de changer le nom du groupe par défaut" in str(excinfo.value)
 
-def test_topo_group(capfd):
+def test_topo_group():
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     # Création d'une boite avec une topologie
@@ -222,3 +222,21 @@ def test_topo_group(capfd):
 
     assert ctx.getGroupManager().getTopoBlocks("aaa", 3) == ["Bl0000"]
     assert ctx.getTopoManager().getInfos("Bl0000",3).groups() == ["aaa"]
+
+# vérifie que 2 ajouts successifs ne produisent pas une erreur
+def test_two_adds(capfd):
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+
+    # Création de la boite Vol0000
+    ctx.getGeomManager().newBox (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1))
+    # Modifie le groupe A
+    ctx.getGeomManager().addToGroup (["Pt0000"], 0, "A")
+    assert ctx.getGroupManager().getGeomVertices("A", 0) == ['Pt0000']
+
+    # Modifie le groupe A (2e ajout)
+    ctx.getGeomManager().addToGroup (["Pt0000"], 0, "A")
+    assert ctx.getGroupManager().getGeomVertices("A", 0) == ['Pt0000']
+
+    out, err = capfd.readouterr()
+    assert "Le groupe A possède déjà Pt0000" in out
