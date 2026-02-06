@@ -150,7 +150,7 @@ GroupManager::changeGroupName(const std::string& oldName, const std::string& new
     return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-template <typename T, typename = std::enable_if_t<std::is_base_of<GroupEntity, T>::value>>
+template <typename T, typename>
 T* GroupManager::getGroup(const std::string& gr_name, const bool exceptionIfNotFound) const
 {
     std::string name(gr_name.empty()?getDefaultName(T::DIM):gr_name);
@@ -181,7 +181,7 @@ GroupEntity* GroupManager::getGroup(const std::string& name, const int dim, cons
     }
 }
 /*----------------------------------------------------------------------------*/
-template <typename T, typename = std::enable_if_t<std::is_base_of<GroupEntity, T>::value>>
+template <typename T, typename>
 T* GroupManager::getNewGroup(const std::string& gr_name, Internal::InfoCommand* icmd)
 {
     T* gr = getGroup<T>(gr_name, false);
@@ -213,7 +213,7 @@ GroupEntity* GroupManager::getNewGroup(const std::string& name, const int dim, I
     }
 }
 /*----------------------------------------------------------------------------*/
-template <typename T, typename = std::enable_if_t<std::is_base_of<GroupEntity, T>::value>>
+template <typename T, typename>
 std::vector<T*> GroupManager::getGroups(const bool onlyLive) const
 {
     std::vector<T*> groups;
