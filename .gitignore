@@ -1,10 +1,14 @@
 .vscode
 .idea
 cmake-build-*
-__pycache__
+
 build-linux-ubuntu*
 spack-build*
 spack-configure*
+
+CMakeUserPresets.json
+
+__pycache__
 .pytest_cache
 *.mli2
 *.pyc
