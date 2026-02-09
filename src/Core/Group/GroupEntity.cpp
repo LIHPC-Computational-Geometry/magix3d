@@ -97,9 +97,12 @@ void GroupEntity::add(Utils::Entity* e)
         if (topo && topo->getGeomAssociation()) {
             Geom::GeomEntity* ge = topo->getGeomAssociation();
             if (ge && find(ge)) {
-                TkUtil::UTF8String	messErr (TkUtil::Charset::UTF_8);
-                messErr << "Le groupe "<<getName()<<" possède déjà "<<ge->getName()<<" à laquelle est associée "<<e->getName();
-                throw TkUtil::Exception(messErr);
+                // Ne doit pas produire une erreur car l'entité e peut être
+                // ajouter au groupe de manière indirecte plusieurs fois.
+                TkUtil::UTF8String warning (TkUtil::Charset::UTF_8);
+                warning << "Le groupe " << getName() << " possède déjà " << ge->getName() << " à laquelle est associée " << e->getName();
+                getContext().getLogStream()->log(TkUtil::TraceLog(warning));
+                std::cout << warning << std::endl;
             }
         }
 

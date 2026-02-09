@@ -238,5 +238,49 @@ def test_two_adds(capfd):
     ctx.getGeomManager().addToGroup (["Pt0000"], 0, "A")
     assert ctx.getGroupManager().getGeomVertices("A", 0) == ['Pt0000']
 
+    ctx.getGeomManager().addToGroup (["Pt0001"], 0, "Hors_Groupe_0D")
     out, err = capfd.readouterr()
     assert "Le groupe A possède déjà Pt0000" in out
+
+# suppression de la vérification d'appartenance 
+# au même groupe dans l'association topo --> geom
+def test_geom_assoc1():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    tm = ctx.getTopoManager()
+
+    # Création de la boite Vol0000
+    ctx.getGeomManager().newBox (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1))
+    # Création d'un sommet géométrique par coordonnées
+    tm.newTopoVertex (Mgx3D.Point(0, 0, 0),"")
+
+    assert tm.getInfos("Som0000", 0).groups() == ['Hors_Groupe_0D']
+
+    # Affectation d'une projection vers Pt0001 pour les entités topologiques Som0000
+    # L'association ne peut se faire car le groupe Hors_Groupe_0D possède Pt0001 ainsi que Som0000
+    # Il est recommandé de supprimer la topologie du groupe
+    tm.setGeomAssociation (["Som0000"], "Pt0001", True)
+
+    assert tm.getInfos("Som0000", 0).groups() == ['Hors_Groupe_0D']
+
+def test_geom_assoc2():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    tm = ctx.getTopoManager()
+
+    # Création de la boite Vol0000
+    ctx.getGeomManager().newBox (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1))
+    # Modifie le groupe A
+    ctx.getGeomManager().addToGroup (["Pt0001"], 0, "A")
+
+    # Création d'un sommet géométrique par coordonnées
+    tm.newTopoVertex (Mgx3D.Point(0, 0, 0),"A")
+
+    assert tm.getInfos("Som0000", 0).groups() == ['A']
+
+    # Affectation d'une projection vers Pt0001 pour les entités topologiques Som0000
+    # L'association ne peut se faire car le groupe Hors_Groupe_0D possède Pt0001 ainsi que Som0000
+    # Il est recommandé de supprimer la topologie du groupe
+    tm.setGeomAssociation (["Som0000"], "Pt0001", True)
+
+    assert tm.getInfos("Som0000", 0).groups() == ['A']

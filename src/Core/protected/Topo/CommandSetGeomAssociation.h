@@ -102,9 +102,6 @@ private:
     /** Méthode de vérification et validation de l'entité présente */
     void validGeomEntity();
 
-    /// vérifie qu'un même groupe n'est pas référencé depuis la géométrie et depuis la topologie
-    void validGroupsName(TopoEntity* te);
-
     /*------------------------------------------------------------------------*/
 
     /** les entités à projeter */
