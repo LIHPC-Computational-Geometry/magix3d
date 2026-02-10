@@ -45,6 +45,8 @@
 #include <GC_MakeCircle.hxx>
 #include <GC_MakeEllipse.hxx>
 #include <GC_MakeArcOfCircle.hxx>
+#include <GC_MakeArcOfEllipse.hxx>
+#include <gp_Elips.hxx>
 #include <Geom_BSplineCurve.hxx>
 #include <GeomAPI_PointsToBSpline.hxx>
 #include <TColgp_Array1OfPnt.hxx>
@@ -452,6 +454,69 @@ Curve* EntityFactory::newArcCircle2D(
         return curve;
     } catch(StdFail_NotDone& e) {
         throw Utils::BuildingException(TkUtil::UTF8String ("Erreur durant la creation d'un arc de cercle", TkUtil::Charset::UTF_8));
+    }
+}
+/*----------------------------------------------------------------------------*/
+Curve* EntityFactory::newArcEllipse2D(const Geom::Vertex* center,
+    const Geom::Vertex* start, const Geom::Vertex* end,
+    const bool direction)
+{
+#ifdef _DEBUG2
+    std::cout<<"newArcEllipse2D center "<<center->getPoint()<<" , start "<<start->getPoint()
+			<<" , end "<<end->getPoint()<<" , direction "<<(direction?"true":"false")<<std::endl;
+#endif
+
+    gp_Pnt p_center(center->getX(),center->getY(),center->getZ());
+    gp_Pnt p_start(start->getX(),start->getY(),start->getZ());
+    gp_Pnt p_end(end->getX(),end->getY(),end->getZ());
+    gp_Vec from_center_to_start(p_center, p_start);
+
+    /* calcul du grand axe et du petit axe a partir des coordonnées centrées
+     *
+     * (x1,y1) et (x2,y2) */
+    double x1 = p_start.X()-p_center.X();
+    double y1 = p_start.Y()-p_center.Y();
+    double x2 = p_end.X()-p_center.X();
+    double y2 = p_end.Y()-p_center.Y();
+    double det = x1*x1*y2*y2-x2*x2*y1*y1;
+
+    if (det == 0)
+      throw Utils::BuildingException(TkUtil::UTF8String ("Les 3 points n'appartiennent pas a une ellipse non dégénérée dont les axes sont X et Y", TkUtil::Charset::UTF_8));
+
+
+    double b2 = det / (x1*x1-x2*x2);
+    double a2 = det / (y2*y2-y1*y1);
+    double b = sqrt(b2); // demi-axe selon y
+    double a = sqrt(a2); // demi-axe selon x
+
+    /* dans le systeme de coordonnees locales de l'ellipse(Xe,Ye,Ze), l'axe des
+     * abcisses doit porter le grand axe de l'ellipse et le sens de l'ellipse
+     * est celui qui va de Xe vers Ye. Donc si a>b, Xe=X sinon Xe=Y et
+     * si dir=true, Ze=Z sinon Ze=-Z */
+    gp_Dir Ze = (direction)?gp_Dir(0,0,1):gp_Dir(0,0,-1);
+    gp_Dir Xe = (a>b)?gp_Dir(1,0,0):gp_Dir(0,1,0);
+#ifdef _DEBUG2
+    std::cout<<"locSysCoord center , Ze (0,0,"<<Ze.Z()
+			<<") , Xe ("<<Xe.X()<<","<<Xe.Y()<<",0)"<<std::endl;
+#endif
+    gp_Ax2 locSysCoord(p_center,Ze,Xe);
+
+#ifdef _DEBUG2
+    std::cout<<"gp_Elips locSysCoord ,"<<std::max(a,b)<<","<<std::min(a,b)<<std::endl;
+#endif
+    gp_Elips ellipse=gp_Elips(locSysCoord,std::max(a,b),std::min(a,b));
+
+    try {
+    	Handle(Geom_TrimmedCurve) arc = GC_MakeArcOfEllipse(ellipse, p_start, p_end, true);
+        TopoDS_Edge e = BRepBuilderAPI_MakeEdge(arc);
+        Curve* curve = new Curve(m_context,
+                    m_context.newProperty(Utils::Entity::GeomCurve),
+                    m_context.newDisplayProperties(Utils::Entity::GeomCurve),
+                    new GeomProperty(), e);
+        m_context.newGraphicalRepresentation (*curve);
+        return curve;
+    } catch(StdFail_NotDone& e) {
+        throw Utils::BuildingException(TkUtil::UTF8String ("Erreur durant la creation d'un arc d'ellipse", TkUtil::Charset::UTF_8));
     }
 }
 /*----------------------------------------------------------------------------*/
