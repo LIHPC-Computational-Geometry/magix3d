@@ -284,3 +284,28 @@ def test_geom_assoc2():
     tm.setGeomAssociation (["Som0000"], "Pt0001", True)
 
     assert tm.getInfos("Som0000", 0).groups() == ['A']
+
+# issue#245: undo on addToGroup raises an error
+def test_topo_surface():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+
+    ctx.getGeomManager().newVertex (Mgx3D.Point(0, 0, 0))
+    ctx.getGeomManager().newVertex (Mgx3D.Point(1, 0, 0))
+    ctx.getGeomManager().newVertex (Mgx3D.Point(1, 1, 0))
+    ctx.getGeomManager().newVertex (Mgx3D.Point(0, 1, 0))
+    ctx.getGeomManager().newSegment("Pt0000", "Pt0001")
+    ctx.getGeomManager().newSegment("Pt0001", "Pt0002")
+    ctx.getGeomManager().newSegment("Pt0002", "Pt0003")
+    ctx.getGeomManager().newSegment("Pt0003", "Pt0000")
+    ctx.getGeomManager ( ).newPlanarSurface (["Crb0000","Crb0001","Crb0002","Crb0003"], "")
+    ctx.getGeomManager().addToGroup (["Surf0000"], 2, "face_cgns")
+    ctx.getGeomManager().addToGroup (["Crb0002"], 1, "haut_cgns")
+    ctx.getGeomManager().addToGroup (["Crb0000"], 1, "bad_cgns")
+    ctx.getGeomManager().addToGroup (["Crb0003"], 1, "gauche_cgns")
+    ctx.getGeomManager().addToGroup (["Crb0001"], 1, "droite_cgns")
+    ctx.getTopoManager().newStructuredTopoOnGeometry ("Surf0000")
+    ctx.getTopoManager().addToGroup(["Fa0000"], 2, "aaa")
+    assert ctx.getGroupManager().getTopoFaces("aaa", 2) == ["Fa0000"]
+    ctx.undo()
+    assert ctx.getGroupManager().getTopoFaces("aaa", 2) == []
