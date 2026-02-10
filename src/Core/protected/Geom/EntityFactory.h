@@ -120,14 +120,13 @@ public:
      *         grand axe défini par center/p1, 
      *         grand rayon défini par la distance center-p1, 
      *         petit rayon défini par la distance p2-axe principal.
-
      */
     Curve* newEllipse(
             const Geom::Vertex* p1,
             const Geom::Vertex* p2,
             const Geom::Vertex* center);
     /*------------------------------------------------------------------------*/
-    /** \brief Arc de cercle dans le plan XY avec normale fixée
+    /** \brief Arc de cercle dans le plan XY avec normale fixée (import MDL)
      */
     Curve* newArcCircle2D(const Geom::Vertex* center,
             const Geom::Vertex* start,
@@ -148,13 +147,22 @@ public:
                         const double& angleFin,
                         const double& rayon,
                         CoordinateSystem::SysCoord* rep);
+
     /*------------------------------------------------------------------------*/
-    /** \brief
+    /** \brief Arc d'ellipse dans le plan XY avec normale fixée (import MDL)
+     */
+    Curve* newArcEllipse2D(const Geom::Vertex* center,
+    		           const Geom::Vertex* start,
+                           const Geom::Vertex* end,
+                           const bool direction=true);
+    /*------------------------------------------------------------------------*/
+    /** \brief Arc d'ellipse dans le cas général 3D
      */
     Curve* newArcEllipse(const Geom::Vertex* center,
-    		const Geom::Vertex* start,
-            const Geom::Vertex* end,
-            const bool direction=true);
+    		         const Geom::Vertex* start,
+                         const Geom::Vertex* end,
+                         const bool direction=true);
+
     /*------------------------------------------------------------------------*/
     /** \brief
      */

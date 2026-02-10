@@ -661,7 +661,7 @@ Geom::Curve* ImportMDLImplementation::getCurve(const std::string name)
                     if(current_command.u.arc.is_circle)
                         crv = Geom::EntityFactory(m_context).newArcCircle2D(vtxcenter,vtx1,vtx2, dir);
                     else
-                        crv = Geom::EntityFactory(m_context).newArcEllipse(vtxcenter,vtx1,vtx2, dir);
+                        crv = Geom::EntityFactory(m_context).newArcEllipse2D(vtxcenter,vtx1,vtx2, dir);
 
                     //creation des connections topologiques
                     crv->add(vtx1);
