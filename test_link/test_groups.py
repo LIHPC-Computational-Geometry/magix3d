@@ -238,5 +238,74 @@ def test_two_adds(capfd):
     ctx.getGeomManager().addToGroup (["Pt0000"], 0, "A")
     assert ctx.getGroupManager().getGeomVertices("A", 0) == ['Pt0000']
 
+    ctx.getGeomManager().addToGroup (["Pt0001"], 0, "Hors_Groupe_0D")
     out, err = capfd.readouterr()
     assert "Le groupe A possède déjà Pt0000" in out
+
+# suppression de la vérification d'appartenance 
+# au même groupe dans l'association topo --> geom
+def test_geom_assoc1():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    tm = ctx.getTopoManager()
+
+    # Création de la boite Vol0000
+    ctx.getGeomManager().newBox (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1))
+    # Création d'un sommet géométrique par coordonnées
+    tm.newTopoVertex (Mgx3D.Point(0, 0, 0),"")
+
+    assert tm.getInfos("Som0000", 0).groups() == ['Hors_Groupe_0D']
+
+    # Affectation d'une projection vers Pt0001 pour les entités topologiques Som0000
+    # L'association ne peut se faire car le groupe Hors_Groupe_0D possède Pt0001 ainsi que Som0000
+    # Il est recommandé de supprimer la topologie du groupe
+    tm.setGeomAssociation (["Som0000"], "Pt0001", True)
+
+    assert tm.getInfos("Som0000", 0).groups() == ['Hors_Groupe_0D']
+
+def test_geom_assoc2():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    tm = ctx.getTopoManager()
+
+    # Création de la boite Vol0000
+    ctx.getGeomManager().newBox (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1))
+    # Modifie le groupe A
+    ctx.getGeomManager().addToGroup (["Pt0001"], 0, "A")
+
+    # Création d'un sommet géométrique par coordonnées
+    tm.newTopoVertex (Mgx3D.Point(0, 0, 0),"A")
+
+    assert tm.getInfos("Som0000", 0).groups() == ['A']
+
+    # Affectation d'une projection vers Pt0001 pour les entités topologiques Som0000
+    # L'association ne peut se faire car le groupe Hors_Groupe_0D possède Pt0001 ainsi que Som0000
+    # Il est recommandé de supprimer la topologie du groupe
+    tm.setGeomAssociation (["Som0000"], "Pt0001", True)
+
+    assert tm.getInfos("Som0000", 0).groups() == ['A']
+
+# issue#245: undo on addToGroup raises an error
+def test_topo_surface():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+
+    ctx.getGeomManager().newVertex (Mgx3D.Point(0, 0, 0))
+    ctx.getGeomManager().newVertex (Mgx3D.Point(1, 0, 0))
+    ctx.getGeomManager().newVertex (Mgx3D.Point(1, 1, 0))
+    ctx.getGeomManager().newVertex (Mgx3D.Point(0, 1, 0))
+    ctx.getGeomManager().newSegment("Pt0000", "Pt0001")
+    ctx.getGeomManager().newSegment("Pt0001", "Pt0002")
+    ctx.getGeomManager().newSegment("Pt0002", "Pt0003")
+    ctx.getGeomManager().newSegment("Pt0003", "Pt0000")
+    ctx.getGeomManager ( ).newPlanarSurface (["Crb0000","Crb0001","Crb0002","Crb0003"], "")
+    ctx.getGeomManager().addToGroup (["Surf0000"], 2, "face_cgns")
+    ctx.getGeomManager().addToGroup (["Crb0002"], 1, "haut_cgns")
+    ctx.getGeomManager().addToGroup (["Crb0000"], 1, "bad_cgns")
+    ctx.getGeomManager().addToGroup (["Crb0003"], 1, "gauche_cgns")
+    ctx.getGeomManager().addToGroup (["Crb0001"], 1, "droite_cgns")
+    ctx.getTopoManager().newStructuredTopoOnGeometry ("Surf0000")
+    ctx.getTopoManager().addToGroup(["Fa0000"], 2, "aaa")
+    assert ctx.getGroupManager().getTopoFaces("aaa", 2) == ["Fa0000"]
+    ctx.undo()
+    assert ctx.getGroupManager().getTopoFaces("aaa", 2) == []
