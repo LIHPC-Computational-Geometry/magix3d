@@ -2371,11 +2371,12 @@ newBSpline(Vertex* vtx1,
             new CommandNewBSpline(getContext(), vtx1, vp, vtx2, deg_min, deg_max, groupName);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias ( ) << ".getGeomManager ( ).newBSpline (" ;
-    cmd << "\"" << vtx1->getName() << "\"," ;
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).newBSpline (";
+    cmd << "\"" << vtx1->getName() << "\",";
     cmd << Internal::scriptablesToPythonList<Point> (vp) << ", ";
-    cmd << "\"" << vtx2->getName()<<"\","<<(short)deg_min<<", "<<(short)deg_max
-    		<<", \""<<groupName<<"\")";
+    cmd << "\"" << vtx2->getName() << "\",";
+    cmd << static_cast<short>(deg_min) << ", " << static_cast<short>(deg_max);
+    cmd << ", \"" << groupName << "\")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
