@@ -51,3 +51,26 @@ def test_rotate_pt():
     with pytest.raises(RuntimeError) as excinfo:
         gm.rotate (["Pt0002"], Mgx3D.RotX(120))
     assert "Opération impossible car Pt0002 est reliée à Vol0000" in str(excinfo.value)
+
+# Issue#248: révolution de courbes qui crée un volume
+def test_volume_not_created():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    gm = ctx.getGeomManager()
+
+    gm.newVertex(Mgx3D.Point(0,0,0))
+    gm.newVertex(Mgx3D.Point(0,2,0))
+    gm.newVertex(Mgx3D.Point(-3,0,0))
+    gm.newVertex(Mgx3D.Point(-2,0,0))
+    gm.newVertex(Mgx3D.Point(2,0,0))
+    gm.newVertex(Mgx3D.Point(3,0,0))
+    gm.newSegment("Pt0002", "Pt0003")
+    gm.newSegment("Pt0004", "Pt0005")
+    gm.newArcCircle("Pt0000", "Pt0004", "Pt0001", True)
+    gm.newArcCircle("Pt0000", "Pt0001", "Pt0003", True)
+    gm.newArcCircle("Pt0000", "Pt0005", "Pt0002", True)
+    gm.newPlanarSurface(["Crb0001", "Crb0004", "Crb0000", "Crb0003", "Crb0002"], "")
+
+    assert gm.getNbVolumes() == 0
+    gm.makeRevol(["Crb0002", "Crb0003"], Mgx3D.RotX(360), False)
+    assert gm.getNbVolumes() == 0
