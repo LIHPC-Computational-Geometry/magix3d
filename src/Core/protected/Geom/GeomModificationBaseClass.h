@@ -243,9 +243,9 @@ protected:
      *          pas connectées à des entités de dimension supérieure. Si oui,
      *          une exception est levée.
      */
-    void checkValidity(std::set<GeomEntity*>& entities);
+    void checkValidity(Utils::EntitySet<GeomEntity*>& entities);
 
-    void buildInitialSet(std::set<GeomEntity*>& init_entities);
+    void buildInitialSet(Utils::EntitySet<GeomEntity*>& init_entities);
 
 protected:
 

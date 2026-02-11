@@ -55,7 +55,7 @@ void GeomMirrorImplementation::perform(std::vector<GeomEntity*>& res)
 
     // on sépare les entités à symétriser, ainsi que les entités incidentes
     // de dimension inférieure en différents ensembles selon leur dimension.
-    std::set<GeomEntity*> init_entities;
+    Utils::EntitySet<GeomEntity*> init_entities(Utils::Entity::compareEntity);
     buildInitialSet(init_entities);
     //maintenant on met a jour les entites de references
     m_modifiedEntities.insert(m_modifiedEntities.end(),init_entities.begin(),init_entities.end());
