@@ -111,9 +111,6 @@ internalExecute()
 		std::cout<<"CommandSetGeomAssociation => project("<<(*iter)->getName()<<")"<<std::endl;
 #endif
 
-		// vérifie qu'un même groupe n'est pas référencé depuis la géométrie et depuis la topologie
-		validGroupsName(*iter);
-
 		if ((*iter)->getDim() == 3)
 			project(dynamic_cast<Block*>(*iter));
 		else if ((*iter)->getDim() == 2)
@@ -146,42 +143,6 @@ void CommandSetGeomAssociation::validGeomEntity()
 
     	m_topo_entities = Topo::TopoHelper::getTopoEntities(entities);
     }
-}
-/*----------------------------------------------------------------------------*/
-void CommandSetGeomAssociation::validGroupsName(TopoEntity* te)
-{
-
-	if (te == 0 || m_geom_entity == 0)
-		return;
-
-	Group::GroupManager& gm = getContext().getGroupManager();
-	Group::GroupHelperForCommand ghfc(getInfoCommand(), gm);
-	std::vector<std::string> te_gn = Utils::toNames(ghfc.getGroupsFor(te));
-	std::vector<std::string> ge_gn = Utils::toNames(gm.getGroupsFor(m_geom_entity));
-
-#ifdef _DEBUG2
-	std::cout<<"validGroupsName("<<te->getName()<<")"<<std::endl;
-	std::cout<<"te_gn :";
-	for (uint i=0; i<te_gn.size(); i++)
-		std::cout<<" "<<te_gn[i];
-	std::cout<<std::endl;
-	std::cout<<"ge_gn :";
-	for (uint i=0; i<ge_gn.size(); i++)
-		std::cout<<" "<<ge_gn[i];
-	std::cout<<std::endl;
-#endif
-
-	for (std::vector<std::string>::iterator iter_t = te_gn.begin();
-			iter_t != te_gn.end(); ++iter_t){
-		std::vector<std::string>::iterator iter_g = std::find(ge_gn.begin(), ge_gn.end(), *iter_t);
-		if (iter_g!=ge_gn.end()){
-	TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-	        message << "L'association ne peut se faire car le groupe "<<*iter_g
-	                <<" possède "<<m_geom_entity->getName()<<" ainsi que "<<te->getName();
-	        message << "\nIl est recommandé de supprimer la topologie du groupe";
-	        throw TkUtil::Exception (message);
-		}
-	}
 }
 /*----------------------------------------------------------------------------*/
 void CommandSetGeomAssociation::project(Block* bloc)
