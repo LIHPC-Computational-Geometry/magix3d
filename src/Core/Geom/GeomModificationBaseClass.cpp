@@ -71,7 +71,6 @@ void GeomModificationBaseClass::init(const std::vector<GeomEntity*>& es)
         m_init_entities.push_back(esi);
         addReference(esi);
         addDownIncidentReference(esi);
-        addUpIncidentReference(esi);
     }
 
     for(int i=0 ; i<4 ; i++)
@@ -2306,7 +2305,7 @@ getGeomEntity(TopoDS_Shape &loc_shape,
 	return 0;
 }
 /*----------------------------------------------------------------------------*/
-void GeomModificationBaseClass::checkValidity(std::set<GeomEntity*>& entities)
+void GeomModificationBaseClass::checkValidity(Utils::EntitySet<GeomEntity*>& entities)
 {
     for(auto ei : entities){
         GetUpIncidentGeomEntitiesVisitor v;
@@ -2314,7 +2313,7 @@ void GeomModificationBaseClass::checkValidity(std::set<GeomEntity*>& entities)
         for (auto vei : v.get()) {
             if(entities.find(vei)==entities.end()){
                 TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-                message << "L'entité " << ei->getName() << " est reliée à " << vei->getName() << " non modifiée";
+                message << "Opération impossible car " << ei->getName() << " est reliée à " << vei->getName();
                 throw TkUtil::Exception (message);
             }
         }
@@ -2322,7 +2321,7 @@ void GeomModificationBaseClass::checkValidity(std::set<GeomEntity*>& entities)
 }
 /*----------------------------------------------------------------------------*/
 void GeomModificationBaseClass::
-buildInitialSet(std::set<GeomEntity*>& init_entities)
+buildInitialSet(Utils::EntitySet<GeomEntity*>& init_entities)
 {
     // on utilise un set pour ne pas ajouter plusieurs fois la meme cellule
     // dans les entites de references (pb sinon à la destruction de la commande)

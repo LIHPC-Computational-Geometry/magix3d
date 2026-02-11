@@ -115,18 +115,21 @@ void CommandEditGeom::internalExecute()
     std::map<GeomEntity*,Services::Memento> keeped_ref;
     for(GeomEntity* ge : mod_entities){
         if (mementos_by_entity.find(ge) == mementos_by_entity.end())
-            std::cout << "*** MOD les mementos ne contiennent pas " << ge->getName() << std::endl;
-        keeped_ref[ge] = mementos_by_entity.at(ge);
+            std::cout << "* MOD les mementos ne contiennent pas " << ge->getName() << std::endl;
+        else
+            keeped_ref[ge] = mementos_by_entity.at(ge);
     }
     for(GeomEntity* ge : mov_entities){
         if (mementos_by_entity.find(ge) == mementos_by_entity.end())
-            std::cout << "*** MOV les mementos ne contiennent pas " << ge->getName() << std::endl;
-        keeped_ref[ge] = mementos_by_entity.at(ge);
+            std::cout << "* MOV les mementos ne contiennent pas " << ge->getName() << std::endl;
+        else
+            keeped_ref[ge] = mementos_by_entity.at(ge);
     }
     for(GeomEntity* ge : rem_entities){
         if (mementos_by_entity.find(ge) == mementos_by_entity.end())
-            std::cout << "*** REM les mementos ne contiennent pas " << ge->getName() << std::endl;
-        keeped_ref[ge] = mementos_by_entity.at(ge);
+            std::cout << "* REM les mementos ne contiennent pas " << ge->getName() << std::endl;
+        else
+            keeped_ref[ge] = mementos_by_entity.at(ge);
     }
     saveMementos(keeped_ref);
     getInfoCommand().setDestroyAndUpdateConnectivity(rem_entities);
