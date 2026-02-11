@@ -44,6 +44,8 @@ SysCoordManager::~SysCoordManager ( )
 /*----------------------------------------------------------------------------*/
 void SysCoordManager::clear()
 {
+	for (auto iter = m_reperes.begin(); iter != m_reperes.end(); ++iter)
+        delete *iter;
 	m_reperes.clear();
 }
 /*----------------------------------------------------------------------------*/
@@ -55,6 +57,11 @@ void SysCoordManager::add(SysCoord* rep)
 void SysCoordManager::remove(SysCoord* rep)
 {
     Utils::remove(rep, m_reperes);
+}
+/*----------------------------------------------------------------------------*/
+int SysCoordManager::getNbSysCoords() const
+{
+    return m_reperes.size();
 }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResult*

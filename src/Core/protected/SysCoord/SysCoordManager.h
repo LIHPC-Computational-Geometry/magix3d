@@ -66,7 +66,12 @@ public:
 	void clear();
 #endif
 
-	/*------------------------------------------------------------------------*/
+    /*------------------------------------------------------------------------*/
+    /** \brief retourne le nombre de repères gérées par le manager
+     */
+    int getNbSysCoords() const;
+
+    /*------------------------------------------------------------------------*/
 	/** \brief Création d'un repère centré
 	 */
 	Mgx3D::Internal::M3DCommandResult*
