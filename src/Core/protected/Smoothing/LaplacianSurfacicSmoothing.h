@@ -21,7 +21,7 @@ namespace Mgx3D {
              *
              *  \param
              */
-            LaplacianSurfacicSmoothing(std::vector<Topo::CoFace*>& cofaces, Geom::Surface* surface, int nbIterations);
+            LaplacianSurfacicSmoothing(std::vector<gmds::Node>& gmdsNodes, Geom::Surface* surface, int nbIterations);
 
             /*------------------------------------------------------------------------*/
             /** \brief   Destructeur
@@ -35,12 +35,17 @@ namespace Mgx3D {
             void execute();
 
 
+            /*------------------------------------------------------------------------*/
+            /** \brief
+             */
+            std::map<gmds::TCellID, std::vector<gmds::TCellID>> buildN2E() const;
+
 
         private:
             /** geometric surface to smooth */
             Geom::Surface* m_surface;
             /** co-faces classified on the geometric surface to smooth */
-            std::vector<Topo::CoFace*>& m_cofaces;
+            std::vector<gmds::Node>& m_gmdsNodes;
             /** smoothing number of iterations */
             int m_nbIterations;
 

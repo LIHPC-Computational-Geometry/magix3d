@@ -187,7 +187,7 @@ applyModification(std::vector<Topo::CoFace*>& cofaces,
 		    std::cout << "Nbr of Nodes: " << gmdsNodes.size() << std::endl;
 		    std::cout << "Nbr of Faces: " << gmdsPolygones.size() << std::endl;
 
-		    LaplacianSurfacicSmoothing smoother = LaplacianSurfacicSmoothing(cofaces, surface, m_nbIterations);
+		    LaplacianSurfacicSmoothing smoother = LaplacianSurfacicSmoothing(gmdsNodes, surface, m_nbIterations);
 		    smoother.execute();
 		}
 		else {
