@@ -1277,19 +1277,17 @@ Geom::Curve* CoEdge::createBSplineByProjWithOrthogonalIntersection(Utils::Math::
 }
 /*----------------------------------------------------------------------------*/
 void CoEdge::
-getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, bool project) const
+getPoints(CoEdgeMeshingProperty *prop, std::vector<Utils::Math::Point> &points, bool project) const
 {
     // protection pour éviter les appels concurrents pouvant modifier le preMesh
     TkUtil::AutoMutex autoMutex(&preMeshMutex);
 
-    const uint nbBrasI = dni->getNbEdges();
+    const uint nbBrasI = prop->getNbEdges();
 
     const std::vector<Topo::Vertex *> &vertices = getVertices();
     Utils::Math::Point pt0 = vertices[0]->getCoord();
     Utils::Math::Point pt1 = vertices[1]->getCoord();
 
-    bool pt0_projected = false;
-    bool pt1_projected = false;
     if (project)
     {
         Geom::GeomEntity *ge0 = vertices[0]->getGeomAssociation();
@@ -1298,7 +1296,6 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
             Geom::GeomProjectVisitor gpv(pt0);
             ge0->accept(gpv);
             pt0 = gpv.getProjectedPoint();
-            pt0_projected = true;
         }
         Geom::GeomEntity *ge1 = vertices[1]->getGeomAssociation();
         if (ge1 && !vertices[1]->isMeshed())
@@ -1306,15 +1303,14 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
             Geom::GeomProjectVisitor gpv(pt1);
             ge1->accept(gpv);
             pt1 = gpv.getProjectedPoint();
-            pt1_projected = true;
         }
     }
 
     Utils::Math::Point vect = (pt1 - pt0);
 
     if (project && getGeomAssociation()
-        && dni->getMeshLaw() != CoEdgeMeshingProperty::interpolate
-        && dni->getMeshLaw() != CoEdgeMeshingProperty::globalinterpolate)
+        && prop->getMeshLaw() != CoEdgeMeshingProperty::interpolate
+        && prop->getMeshLaw() != CoEdgeMeshingProperty::globalinterpolate)
     {
         // cas avec projection
         Geom::GeomEntity *ge = getGeomAssociation();
@@ -1329,7 +1325,7 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
             std::vector<unsigned long> name_manager_before;
 
             // courbe sur laquelle se fait la projection
-            Geom::Curve *curve = 0;
+            Geom::Curve *curve = nullptr;
             bool curveToBeDeleted = false;
             if (ge->getType() == Utils::Entity::GeomCurve)
             {
@@ -1402,7 +1398,7 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
                     throw TkUtil::Exception(message);
                 }
 
-                if (0 == curve)
+                if (!curve)
                 {
                     // remet les compteurs pour les ids
                     getContext().getNameManager().setInternalStats(name_manager_before);
@@ -1413,8 +1409,7 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
                             << ", cas en dehors de la surface par exemple";
                     throw TkUtil::Exception(message);
                 }
-                else
-                    curveToBeDeleted = true;
+                curveToBeDeleted = true;
             } // end else if (ge->getType() == Utils::Entity::GeomSurface)
             else
             {
@@ -1425,7 +1420,7 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
                 throw TkUtil::Exception(message);
             }
 
-            if (curve == 0)
+            if (!curve)
             {
                 TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
                 message << "Erreur interne pour l'arête \"" << getName() << "\", curve == 0\n";
@@ -1435,7 +1430,7 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
             try
             {
                 if (curveToBeDeleted)
-                    dni->initCoeff(curve->getArea());
+                    prop->initCoeff(curve->getArea());
                 else
                 {
                     // TODO [EB]: il faut calculer la longueur de l'arête projetée sur la courbe
@@ -1451,18 +1446,18 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
                                 crv_vertices[0]->getCoord()))
                     )
                     {
-                        dni->initCoeff(curve->getArea());
+                        prop->initCoeff(curve->getArea());
                     }
                     else if (curve->isLinear())
                     {
                         // pas de pb pour le cas linéaire
                         double dist = vertices[0]->getCoord().length(vertices[1]->getCoord());
-                        dni->initCoeff(dist);
+                        prop->initCoeff(dist);
                     }
                     else
                     {
                         // cas problématique (projection sur une portion de la courbe) ...
-                        if (dni->needLengthToInitialize())
+                        if (prop->needLengthToInitialize())
                         {
                             TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
                             message << " projection sur " << ge->getName() << " pour l'arête " << getName() <<
@@ -1471,7 +1466,7 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
                         }
 
                         double dist = vertices[0]->getCoord().length(vertices[1]->getCoord());
-                        dni->initCoeff(dist);
+                        prop->initCoeff(dist);
                     }
                 } // end else / if (curveToBeDeleted)
             }
@@ -1486,10 +1481,10 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
             double *l_ratios = new double[nbBrasI - 1];
             for (uint i = 0; i < nbBrasI - 1; i++)
             {
-                l_ratios[i] = dni->nextCoeff();
+                l_ratios[i] = prop->nextCoeff();
             }
 
-            if (curve == 0)
+            if (!curve)
             {
                 TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
                 message << "Erreur interne pour l'arête \""
@@ -1500,9 +1495,9 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
             try
             {
                 // calcul de la position des points sur la courbe
-                if (dni->isPolarCut())
+                if (prop->isPolarCut())
                     curve->getPolarParametricsPoints(pt0, pt1,
-                                                     nbBrasI - 1, l_ratios, points, dni->getPolarCenter());
+                                                     nbBrasI - 1, l_ratios, points, prop->getPolarCenter());
                 else
                     curve->getParametricsPoints(pt0, pt1,
                                                 nbBrasI - 1, l_ratios, points);
@@ -1569,12 +1564,12 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
         points.push_back(pt1);
     }
     else if (project
-               && dni->getMeshLaw() == CoEdgeMeshingProperty::interpolate)
+               && prop->getMeshLaw() == CoEdgeMeshingProperty::interpolate)
     {
         // cas avec interpolation
         // cela nécessite de laisser le calcul des positions des points à EdgeMeshingPropertyInterpolate
 
-        EdgeMeshingPropertyInterpolate *interpol = dynamic_cast<EdgeMeshingPropertyInterpolate *>(dni);
+        EdgeMeshingPropertyInterpolate *interpol = dynamic_cast<EdgeMeshingPropertyInterpolate *>(prop);
         CHECK_NULL_PTR_ERROR(interpol);
 
         if (interpol->getType() == EdgeMeshingPropertyInterpolate::with_coedge_list)
@@ -1593,8 +1588,8 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
             {
                 TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
                 message << "Erreur, l'arête " << getName()
-                        << " est discrétisée en " << (short) interpol->getNbEdges()
-                        << " alors que les arêtes de référence le sont en " << (short) nbMeshingEdges;
+                        << " est discrétisée en " << static_cast<short>(interpol->getNbEdges())
+                        << " alors que les arêtes de référence le sont en " << static_cast<short>(nbMeshingEdges);
                 throw TkUtil::Exception(message);
             }
 
@@ -1616,7 +1611,7 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
                 // Cas où le sens est inversé à la main par l'utilisateur
                 // L'algo actuel oriente l'arête par compraison géométrique ce qui n'est pas
                 // adapté à une face courbe ou avec un rebroussement par exemple
-                if ((0 != m_mesh_property) && (false == m_mesh_property->getDirect()))
+                if ((nullptr != m_mesh_property) && (false == m_mesh_property->getDirect()))
                     std::reverse(tabulation.begin(), tabulation.end());
 
                 Topo::CoEdgeMeshingProperty *empTab = new Topo::EdgeMeshingPropertyTabulated(tabulation);
@@ -1639,7 +1634,7 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
         {
             std::string coface_name = interpol->getCoFace();
 
-            CoFace *coface = 0;
+            CoFace *coface = nullptr;
             try
             {
                 coface = getContext().getTopoManager().getCoFace(coface_name, false);
@@ -1653,7 +1648,7 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
                 throw TkUtil::Exception(message);
             }
 
-            if (coface == 0)
+            if (!coface)
             {
                 TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
                 message << "Erreur, l'arête " << getName() <<
@@ -1690,12 +1685,12 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
         } // else if (interpol->getType() == EdgeMeshingPropertyInterpolate::with_coface)
     } // else if (project && dni->getMeshLaw() == CoEdgeMeshingProperty::interpolate)
     else if (project
-             && dni->getMeshLaw() == CoEdgeMeshingProperty::globalinterpolate)
+             && prop->getMeshLaw() == CoEdgeMeshingProperty::globalinterpolate)
     {
         // cas avec interpolation globale
         // cela nécessite de laisser le calcul des positions des points à EdgeMeshingPropertyGlobalInterpolate
 
-        EdgeMeshingPropertyGlobalInterpolate *interpol = dynamic_cast<EdgeMeshingPropertyGlobalInterpolate *>(dni);
+        EdgeMeshingPropertyGlobalInterpolate *interpol = dynamic_cast<EdgeMeshingPropertyGlobalInterpolate *>(prop);
         CHECK_NULL_PTR_ERROR(interpol);
 
         // recherche des arêtes par rapport aux quelles se fait l'interpolation
@@ -1709,7 +1704,7 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
         {
             CoEdge *coedge = getContext().getTopoManager().getCoEdge(first_coedges_names[i], false);
 
-            if (coedge == 0)
+            if (!coedge)
             {
                 TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
                 message << "Erreur, l'arête " << getName() << " a une discrétisation basée sur celle de " <<
@@ -1735,7 +1730,7 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
         {
             CoEdge *coedge = getContext().getTopoManager().getCoEdge(second_coedges_names[i], false);
 
-            if (coedge == 0)
+            if (!coedge)
             {
                 TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
                 message << "Erreur, l'arête " << getName() << " a une discrétisation basée sur celle de " <<
@@ -1762,9 +1757,9 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
         {
             TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
             message << "Erreur, l'arête " << getName()
-                    << " est discrétisée en " << (short) interpol->getNbEdges()
-                    << " alors que les arêtes de référence le sont en " << (short) nbMeshingEdges1
-                    << " et " << (short) nbMeshingEdges2;
+                    << " est discrétisée en " << static_cast<short>(interpol->getNbEdges())
+                    << " alors que les arêtes de référence le sont en " << static_cast<short>(nbMeshingEdges1)
+                    << " et " << static_cast<short>(nbMeshingEdges2);
             throw TkUtil::Exception(message);
         }
 
@@ -1781,7 +1776,7 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
         try
         {
             // cas sans projection
-            dni->initCoeff(vect.norme());
+            prop->initCoeff(vect.norme());
         }
         catch (TkUtil::Exception &exc)
         {
@@ -1794,7 +1789,7 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
         points.push_back(pt0);
         for (uint i = 0; i < nbBrasI - 1; i++)
         {
-            Utils::Math::Point pt = pt0 + vect * dni->nextCoeff();
+            Utils::Math::Point pt = pt0 + vect * prop->nextCoeff();
             points.push_back(pt);
         }
         points.push_back(pt1);
@@ -1805,17 +1800,17 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
     // on ne fait rien si l'arête est projetée sur une courbe
     bool projectOnCurve = false;
     // nombre de couches qui respectent l'orthogonalité
-    uint nbLayers = dni->getNbLayers();
+    uint nbLayers = prop->getNbLayers();
 
     if (getGeomAssociation() && getGeomAssociation()->getType() == Utils::Entity::GeomCurve)
         projectOnCurve = true;
-    if (project && dni->isOrthogonal() && (not projectOnCurve) && nbLayers)
+    if (project && prop->isOrthogonal() && (not projectOnCurve) && nbLayers)
     {
         // recherche de la normale
         Utils::Math::Vector normale;
 
-        Topo::Vertex *vtx0 = vertices[dni->getSide()];
-        Topo::Vertex *vtxN = vertices[1 - dni->getSide()];
+        Topo::Vertex *vtx0 = vertices[prop->getSide()];
+        Topo::Vertex *vtxN = vertices[1 - prop->getSide()];
         Utils::Math::Point pt0 = vtx0->getCoord();
         Utils::Math::Point ptN = vtxN->getCoord();
         Utils::Math::Point vect = (ptN - pt0);
@@ -1824,14 +1819,14 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
         Geom::GeomEntity *ge = vtx0->getGeomAssociation();
         try
         {
-            if (ge == 0)
-                {
+            if (!ge)
+            {
                 TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
                 message << "Problème: on ne sait pas définir la normale pour le sommet " << vtx0->getName()
                         << ", dans l'arête " << getName() << " car le sommet n'est pas associé à la géométrie";
                 throw TkUtil::Exception(message);
             }
-            else if (ge->getType() == Utils::Entity::GeomSurface)
+            if (ge->getType() == Utils::Entity::GeomSurface)
             {
                 // c'est le cas le plus simple
                 Geom::Surface *surface = dynamic_cast<Geom::Surface *>(ge);
@@ -1881,7 +1876,7 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
                                 << getName() << ", cas non implémenté, pour 2D sans courbe à la base";
                         throw TkUtil::Exception(message);
                     }
-                    else if (curves2.size() == 1)
+                    if (curves2.size() == 1)
                     {
                         // l'arête doit être dans le plan Z=0
                         if (!Utils::Math::MgxNumeric::isNearlyZero(vertices[0]->getCoord().getZ())
@@ -1942,7 +1937,7 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
 
             // nous avons donc une normale ...
             normale /= norme;
-            if (Utils::Math::scaMul(vect, normale) < 0.0)
+            if (Utils::Math::scaMul(vect, static_cast<Point>(normale)) < 0.0)
                 normale *= -1;
         }
         catch (Utils::BadNormalException &e)
@@ -1952,7 +1947,7 @@ getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, b
         }
 
         // Nous utilisons les distances pour replacer les points
-        if (dni->getSide() == 0)
+        if (prop->getSide() == 0)
         {
             std::vector<Utils::Math::Point> ptInternes;
             for (uint i = 1; i < points.size() - 1; i++)
