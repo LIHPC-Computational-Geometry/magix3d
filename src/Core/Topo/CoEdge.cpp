@@ -1438,11 +1438,11 @@ getPoints(CoEdgeMeshingProperty *prop, std::vector<Utils::Math::Point> &points, 
 
                     // regarde si l'on est dans le cas de l'arête projetée sur l'intégralité de la courbe
                     auto crv_vertices = curve->getVertices();
-                    auto vertices = getVertices();
-                    if (vertices.size() == 2 && crv_vertices.size() == 2
-                        && ((vertices[0]->getCoord() == crv_vertices[0]->getCoord() && vertices[1]->getCoord() ==
+                    auto vertices2 = getVertices();
+                    if (vertices2.size() == 2 && crv_vertices.size() == 2
+                        && ((vertices2[0]->getCoord() == crv_vertices[0]->getCoord() && vertices2[1]->getCoord() ==
                              crv_vertices[1]->getCoord())
-                            || (vertices[0]->getCoord() == crv_vertices[1]->getCoord() && vertices[1]->getCoord() ==
+                            || (vertices2[0]->getCoord() == crv_vertices[1]->getCoord() && vertices2[1]->getCoord() ==
                                 crv_vertices[0]->getCoord()))
                     )
                     {
@@ -1451,7 +1451,7 @@ getPoints(CoEdgeMeshingProperty *prop, std::vector<Utils::Math::Point> &points, 
                     else if (curve->isLinear())
                     {
                         // pas de pb pour le cas linéaire
-                        double dist = vertices[0]->getCoord().length(vertices[1]->getCoord());
+                        double dist = vertices2[0]->getCoord().length(vertices2[1]->getCoord());
                         prop->initCoeff(dist);
                     }
                     else
@@ -1465,7 +1465,7 @@ getPoints(CoEdgeMeshingProperty *prop, std::vector<Utils::Math::Point> &points, 
                             getContext().getLogStream()->log(TkUtil::TraceLog(message, TkUtil::Log::INFORMATION));
                         }
 
-                        double dist = vertices[0]->getCoord().length(vertices[1]->getCoord());
+                        double dist = vertices2[0]->getCoord().length(vertices2[1]->getCoord());
                         prop->initCoeff(dist);
                     }
                 } // end else / if (curveToBeDeleted)
@@ -1510,11 +1510,11 @@ getPoints(CoEdgeMeshingProperty *prop, std::vector<Utils::Math::Point> &points, 
                         << getName() << ", sur " << ge->getName();
                 message << ", pt0 : " << pt0;
                 message << ", pt1 : " << pt1;
-                auto vertices = curve->getVertices();
-                if (vertices.size() > 0)
-                    message << ", vertices[0] : " << vertices[0]->getCoord();
-                if (vertices.size() > 1)
-                    message << ", vertices[1] : " << vertices[1]->getCoord();
+                auto vertices3 = curve->getVertices();
+                if (vertices3.size() > 0)
+                    message << ", vertices[0] : " << vertices3[0]->getCoord();
+                if (vertices3.size() > 1)
+                    message << ", vertices[1] : " << vertices3[1]->getCoord();
                 message << "\nMessage remonté: " << exc.getMessage();
                 throw TkUtil::Exception(message);
             }
@@ -1811,9 +1811,9 @@ getPoints(CoEdgeMeshingProperty *prop, std::vector<Utils::Math::Point> &points, 
 
         Topo::Vertex *vtx0 = vertices[prop->getSide()];
         Topo::Vertex *vtxN = vertices[1 - prop->getSide()];
-        Utils::Math::Point pt0 = vtx0->getCoord();
+        Utils::Math::Point p0 = vtx0->getCoord();
         Utils::Math::Point ptN = vtxN->getCoord();
-        Utils::Math::Point vect = (ptN - pt0);
+        Utils::Math::Point vec = (ptN - p0);
 
         // recherche des surfaces / orthogonal
         Geom::GeomEntity *ge = vtx0->getGeomAssociation();
@@ -1831,8 +1831,8 @@ getPoints(CoEdgeMeshingProperty *prop, std::vector<Utils::Math::Point> &points, 
                 // c'est le cas le plus simple
                 Geom::Surface *surface = dynamic_cast<Geom::Surface *>(ge);
                 CHECK_NULL_PTR_ERROR(surface);
-                Utils::Math::Point pt0 = vtx0->getCoord();
-                surface->normal(pt0, normale);
+                Utils::Math::Point ppt0 = vtx0->getCoord();
+                surface->normal(ppt0, normale);
             }
             else if (ge->getType() == Utils::Entity::GeomCurve
                        || ge->getType() == Utils::Entity::GeomVertex)
@@ -1887,9 +1887,9 @@ getPoints(CoEdgeMeshingProperty *prop, std::vector<Utils::Math::Point> &points, 
                                     << getName() << ", elle n'est pas dans le plan Z=0";
                             throw TkUtil::Exception(message);
                         }
-                        Utils::Math::Point pt0 = vtx0->getCoord();
+                        Utils::Math::Point pppt0 = vtx0->getCoord();
                         Utils::Math::Vector tangente;
-                        curves2[0]->tangent(pt0, tangente);
+                        curves2[0]->tangent(pppt0, tangente);
 
                         normale = Utils::Math::Vector(tangente.getY(), -tangente.getX(), 0);
 
@@ -1913,7 +1913,7 @@ getPoints(CoEdgeMeshingProperty *prop, std::vector<Utils::Math::Point> &points, 
                     for (uint i = 0; i < surfaces2.size(); i++)
                     {
                         Utils::Math::Vector normaleLoc;
-                        surfaces2[i]->normal(pt0, normaleLoc);
+                        surfaces2[i]->normal(p0, normaleLoc);
                         normale += normaleLoc;
                     }
                 }
@@ -1937,7 +1937,7 @@ getPoints(CoEdgeMeshingProperty *prop, std::vector<Utils::Math::Point> &points, 
 
             // nous avons donc une normale ...
             normale /= norme;
-            if (Utils::Math::scaMul(vect, static_cast<Point>(normale)) < 0.0)
+            if (Utils::Math::scaMul(vec, static_cast<Point>(normale)) < 0.0)
                 normale *= -1;
         }
         catch (Utils::BadNormalException &e)
@@ -1952,10 +1952,10 @@ getPoints(CoEdgeMeshingProperty *prop, std::vector<Utils::Math::Point> &points, 
             std::vector<Utils::Math::Point> ptInternes;
             for (uint i = 1; i < points.size() - 1; i++)
             {
-                double ratio = (points[i] - pt0).norme();
-                ptInternes.push_back(pt0 + (normale * ratio));
+                double ratio = (points[i] - p0).norme();
+                ptInternes.push_back(p0 + (normale * ratio));
             }
-            ptInternes.push_back(pt0 + (normale * vect.norme()));
+            ptInternes.push_back(p0 + (normale * vec.norme()));
 
             // déplace les point pour se raccorder à ptN
             Mesh::MeshImplementation::courbeDiscretisation(ptN, ptInternes, nbLayers);
@@ -1969,10 +1969,10 @@ getPoints(CoEdgeMeshingProperty *prop, std::vector<Utils::Math::Point> &points, 
             std::vector<Utils::Math::Point> ptInternes;
             for (uint i = points.size() - 2; i >= 1; i--)
             {
-                double ratio = (points[i] - pt0).norme();
-                ptInternes.push_back(pt0 + (normale * ratio));
+                double ratio = (points[i] - p0).norme();
+                ptInternes.push_back(p0 + (normale * ratio));
             }
-            ptInternes.push_back(pt0 + (normale * vect.norme()));
+            ptInternes.push_back(p0 + (normale * vec.norme()));
 
             // déplace les point pour se raccorder à pt0
             Mesh::MeshImplementation::courbeDiscretisation(ptN, ptInternes, nbLayers);
@@ -1984,11 +1984,11 @@ getPoints(CoEdgeMeshingProperty *prop, std::vector<Utils::Math::Point> &points, 
         // reprojection sur la surface pour le cas où on l'aurait quitté
         if (getGeomAssociation() && getGeomAssociation()->getType() == Utils::Entity::GeomSurface)
         {
-            Geom::GeomEntity *ge = getGeomAssociation();
+            Geom::GeomEntity *geom_entity = getGeomAssociation();
             for (uint i = 1; i < points.size() - 1; i++)
             {
                 Geom::GeomProjectVisitor gpv(points[i]);
-                ge->accept(gpv);
+                geom_entity->accept(gpv);
                 points[i] = gpv.getProjectedPoint();
             }
         }
