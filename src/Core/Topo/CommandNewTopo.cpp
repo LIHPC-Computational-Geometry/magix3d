@@ -125,7 +125,7 @@ CommandNewTopo::
 
                 if(getCommonBlock(m_vertices[0], m_vertices[1], m_vertices[2], m_vertices[3],
                                   m_vertices[4], m_vertices[5], m_vertices[6], m_vertices[7]) != nullptr){
-                    throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo une face existe déjà entre "
+                    throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo un block existe déjà entre "
                                                                  + m_vertices[0]->getName() + ", " + m_vertices[1]->getName()
                                                                  + ", " + m_vertices[2]->getName()+ " et " + m_vertices[3]->getName(), TkUtil::Charset::UTF_8));
                 }else{
@@ -400,8 +400,7 @@ Topo::Block* CommandNewTopo::getCommonBlock(const Mgx3D::Topo::Vertex *v0, const
                                             const Mgx3D::Topo::Vertex *v2, const Mgx3D::Topo::Vertex *v3,
                                             const Mgx3D::Topo::Vertex *v4, const Mgx3D::Topo::Vertex *v5,
                                             const Mgx3D::Topo::Vertex *v6, const Mgx3D::Topo::Vertex *v7) {
-
-
+    throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo la construction des blocs n'est pas prise en compte", TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
     } // end namespace Topo
