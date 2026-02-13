@@ -31,6 +31,7 @@
 #include "QtComponents/QtGuiStateDialog.h"
 #include "QtComponents/RenderedEntityRepresentation.h"
 #include "QtComponents/QtColorTablesEditorDialog.h"
+#include "QtComponents/QtCGNSOptionsDialog.h"
 
 
 // Les opérations géométriques :
@@ -5858,10 +5859,19 @@ void QtMgx3DMainWindow::exportAllCallback ( )
 	}	// Lima++
 	else if (true == compareExtensions (file.getExtension ( ), "cgns"))
 	{
-		SelectionManager&	selectionManager	=
-									getContext ( ).getSelectionManager ( );
+		cursor.hide();
+		QtCGNSOptionsDialog cgnsDialog(this, getAppTitle(), fileName);
+		if (QDialog::Rejected == cgnsDialog.exec())
+		{
+			msg << " Opération annulée par l'utilisateur.";
+			log(InformationLog(msg));
+			return;
+		}    // if (QDialog::Rejected == mdlDialog.exec ( ))
+
+		const int          dim    = cgnsDialog.getDim();
 		log (InformationLog (msg));
-		getContext ( ).getMeshManager ( ).writeCGNS (fileName);
+		cursor.show();
+		getContext ( ).getMeshManager ( ).exportBlocksForCGNS (dim,fileName);
 	}	// cgns
     else if (true == compareExtensions (file.getExtension ( ), "blk"))
     {
