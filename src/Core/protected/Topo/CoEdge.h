@@ -329,9 +329,9 @@ public:
      *  pour la discrétisation passée en paramètre
      *  On tient compte de la projection si demandé
      */
-    void getPoints(CoEdgeMeshingProperty* prop,
-    		std::vector<Utils::Math::Point> &points,
-    		bool project) const;
+    void getPoints(CoEdgeMeshingProperty *prop,
+                   std::vector<Utils::Math::Point> &points,
+                   bool project) const;
 
     /** Retourne un vecteur avec les positions des noeuds qui sont ou seront créés
      *  Les points sont stockés dans le premesh s'il n'y sont pas déjà
