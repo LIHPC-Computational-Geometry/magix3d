@@ -1277,552 +1277,528 @@ Geom::Curve* CoEdge::createBSplineByProjWithOrthogonalIntersection(Utils::Math::
 }
 /*----------------------------------------------------------------------------*/
 void CoEdge::
-getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, bool project) const
+getPoints(CoEdgeMeshingProperty *dni, std::vector<Utils::Math::Point> &points, bool project) const
 {
-//	// pour protéger OCC et éviter 2 créations de courbes simultanément
-//	// mais aussi pour la cohérence sur les numéros d'entités créées (utilisation du getInternalStats)
-//	TkUtil::AutoMutex	autoMutex (&entityFactoryMutex);
-
-	// protection pour éviter les appels concurrents pouvant modifier le preMesh
-	TkUtil::AutoMutex autoMutex (&preMeshMutex);
-
-	const uint nbBrasI = dni->getNbEdges();
-#ifdef _DEBUG_GETPOINTS
-	std::cout<<"getPoints avec nbBrasI = "<<nbBrasI<<" pour "<<getName()<<(project?" avec projection":" sans projection")<<std::endl;
-#endif
-//	dni->initCoeff();
-
-	const std::vector<Topo::Vertex*>& vertices = getVertices();
-	Utils::Math::Point pt0 = vertices[0]->getCoord();
-	Utils::Math::Point pt1 = vertices[1]->getCoord();
-
-	bool pt0_projected = false;
-	bool pt1_projected = false;
-	if (project){
-		Geom::GeomEntity* ge0 = vertices[0]->getGeomAssociation();
-		if (ge0 && !vertices[0]->isMeshed()){
-			Geom::GeomProjectVisitor gpv(pt0);
-			ge0->accept(gpv);
-			pt0 = gpv.getProjectedPoint();
-			pt0_projected = true;
-		}
-		Geom::GeomEntity* ge1 = vertices[1]->getGeomAssociation();
-		if (ge1 && !vertices[1]->isMeshed()){
-			Geom::GeomProjectVisitor gpv(pt1);
-			ge1->accept(gpv);
-			pt1 = gpv.getProjectedPoint();
-			pt1_projected = true;
-		}
-	}
-
-	Utils::Math::Point vect = (pt1 - pt0);
-#ifdef _DEBUG_GETPOINTS
-	std::cout<<" pt0 "<<vertices[0]->getName()<<": "<<pt0<<std::endl;
-	std::cout<<" pt1 "<<vertices[1]->getName()<<": "<<pt1<<std::endl;
-	std::cout<<" vect = "<<vect<<" longueur "<<vect.norme()<<std::endl;
-	std::cout<<" getGeomAssociation() -> "<<(getGeomAssociation()?getGeomAssociation()->getName():"0")<<std::endl;
-	std::cout<<" dni->getMeshLaw() "<<dni->getMeshLawName()<<std::endl;
-#endif
-
-	if (project && getGeomAssociation()
-	&& dni->getMeshLaw() != CoEdgeMeshingProperty::interpolate
-	&& dni->getMeshLaw() != CoEdgeMeshingProperty::globalinterpolate){
-		// cas avec projection
-		Geom::GeomEntity* ge = getGeomAssociation();
-#ifdef _DEBUG_GETPOINTS
-		std::cout<<" projection sur "<<ge->getName()<<std::endl;
-#endif
-		points.push_back(pt0);
-
-		if (nbBrasI > 1){
-
-			// on fait la projection des points en tenant compte d'un paramètre curviligne
-			// pour les projections sur courbes
-
-			// mémorisation des ids, pour le cas de la création d'une courbe temporaire
-			std::vector<unsigned long> name_manager_before;
-
-			// courbe sur laquelle se fait la projection
-			Geom::Curve* curve = 0;
-			bool curveToBeDeleted = false;
-			if (ge->getType() == Utils::Entity::GeomCurve) {
-				curve = dynamic_cast<Geom::Curve*> (ge);
-			}
-			else if (ge->getType() == Utils::Entity::GeomSurface){
-				getContext().getNameManager().getInternalStats(name_manager_before);
-				Geom::Surface* surface = dynamic_cast<Geom::Surface*> (ge);
-				CHECK_NULL_PTR_ERROR(surface);
-
-				try {
-					curve = createBSplineByProj(pt0, pt1, surface);
-				}
-				catch (Utils::HalfCircleSurfaceException& exc){
-					try {
-						// 2ème essai avec autre méthode:
-						// on place le point central de l'arête directement sur la surface
-						// pour cela on constitue la courbe intersection entre plan orthogonal à l'arête et la surface
-						// puis on projette le centre de l'arête sur cette courbe
-						// on projette ensuite sur la surface les points entre les extrémités de l'arête et ce point projeté
-						curve = createBSplineByProjWithOrthogonalIntersection(pt0, pt1, surface);
-					}
-					catch (TkUtil::Exception& exc){
-						// remet les compteurs pour les ids
-						getContext().getNameManager().setInternalStats(name_manager_before);
-
-						TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-						message << "Pb avec création d'une courbe par projection de " << getName() << " sur la surface " << ge->getName() << ".\n";
-
-						if (Utils::Math::MgxNumeric::isNearlyZero(vect.norme())) {
-							std::string n0 = vertices[0]->getName();
-							std::string n1 = vertices[1]->getName();
-							message << vertices[0]->getName() << " et " << vertices[1]->getName() << " sont confondus après projection.\n";
-						}
-						message << "Le pb est peut-être lié à une projection sur un demi cercle => couper l'arête en deux. ";
-
-						// message plus important au niveau des logs
-						TkUtil::UTF8String	messageComplet (TkUtil::Charset::UTF_8);
-						messageComplet << message << ", message remonté : " << exc.getMessage();
-						getContext().getLogStream()->log(TkUtil::TraceLog (messageComplet, TkUtil::Log::TRACE_3));
-
-						throw TkUtil::Exception (message);
-					}
-				}
-				catch (TkUtil::Exception& exc){
-
-					// remet les compteurs pour les ids
-					getContext().getNameManager().setInternalStats(name_manager_before);
-
-					TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-					message << "Pb avec création d'une courbe par projection de l'arête "<<getName()<<" sur la surface "<<ge->getName();
-					message << "\nLe pb est peut-être lié à une projection en dehors de la surface => découper l'arête et revoir les associations";
-
-					// message plus important au niveau des logs
-					TkUtil::UTF8String	messageComplet (TkUtil::Charset::UTF_8);
-					messageComplet<<message<<", message remonté : "<<exc.getMessage();
-					getContext().getLogStream()->log(TkUtil::TraceLog (messageComplet, TkUtil::Log::TRACE_3));
-
-					throw TkUtil::Exception (message);
-				}
-
-				if (0 == curve){
-					// remet les compteurs pour les ids
-					getContext().getNameManager().setInternalStats(name_manager_before);
-
-					TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-					message << "OCC a échoué, création de la projection de l'arête "
-							<< getName() << " sur la surface  "<<ge->getName()
-							<<", cas en dehors de la surface par exemple";
-					throw TkUtil::Exception (message);
-				}
-				else
-					curveToBeDeleted = true;
-
-			} // end else if (ge->getType() == Utils::Entity::GeomSurface)
-			else {
-				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-				message << "Projection impossible pour l'arête \""
-						<< getName() << "\", sur "<<ge->getName()<<" de type "<<ge->getTypeName()<<"\n";
-				message << "elle est projetée sur autre chose qu'une courbe ou une surface";
-				throw TkUtil::Exception (message);
-			}
-
-			if (curve == 0){
-				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-				message << "Erreur interne pour l'arête \""<< getName() << "\", curve == 0\n";
-				throw TkUtil::Exception (message);
-			}
-
-			try {
-				if (curveToBeDeleted)
-					dni->initCoeff(curve->getArea());
-				else {
-					// TODO [EB]: il faut calculer la longueur de l'arête projetée sur la courbe
-
-
-					// regarde si l'on est dans le cas de l'arête projetée sur l'intégralité de la courbe
-					auto crv_vertices = curve->getVertices();
-					auto vertices = getVertices();
-					if (vertices.size() == 2 && crv_vertices.size() == 2
-							&& ( (vertices[0]->getCoord() == crv_vertices[0]->getCoord() && vertices[1]->getCoord() == crv_vertices[1]->getCoord())
-									|| (vertices[0]->getCoord() == crv_vertices[1]->getCoord() && vertices[1]->getCoord() == crv_vertices[0]->getCoord()) )
-					){
-						dni->initCoeff(curve->getArea());
-#ifdef _DEBUG_GETPOINTS
-						std::cout<<"  initCoeff avec "<<curve->computeArea()<<std::endl;
-#endif
-					}
-					else if (curve->isLinear()) {
-						// pas de pb pour le cas linéaire
-						double dist = vertices[0]->getCoord().length(vertices[1]->getCoord());
-						dni->initCoeff(dist);
-#ifdef _DEBUG_GETPOINTS
-						std::cout<<"  initCoeff cas linéaire avec dist"<<dist<<std::endl;
-#endif
-					}
-					else {
-						// cas problématique (projection sur une portion de la courbe) ...
-						if (dni->needLengthToInitialize()){
-							TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-			            	message<<" projection sur "<<ge->getName()<<" pour l'arête "<<getName()<<" problématique pour cas bigéométrique ou autre nécessitant la connaissance de la longueur de la portion du contour";
-			            	getContext().getLogStream()->log(TkUtil::TraceLog (message, TkUtil::Log::INFORMATION));
-
-						}
-
-						double dist = vertices[0]->getCoord().length(vertices[1]->getCoord());
-						dni->initCoeff(dist);
-						//dni->initCoeff();
-#ifdef _DEBUG_GETPOINTS
-						std::cout<<"  initCoeff cas autre avec dist"<<dist<<std::endl;
-#endif
-
-					}
-				} // end else / if (curveToBeDeleted)
-			}
-			catch (TkUtil::Exception& exc){
-				TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-				message << "Pb avec initialisation des paramètres de discrétisation de l'arête "
-						<< getName() << ", message remonté : "<<exc.getMessage();
-				throw TkUtil::Exception (message);
-			}
-
-			double* l_ratios = new double[nbBrasI-1];
-			for (uint i=0; i<nbBrasI-1; i++){
-				l_ratios[i] = dni->nextCoeff();
-#ifdef _DEBUG_GETPOINTS
-					std::cout<<"  l_ratios["<<i<<"] = "<<l_ratios[i]<<std::endl;
-#endif
-			}
-
-			if (curve == 0){
-				TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-				message << "Erreur interne pour l'arête \""
-						<< getName() << "\", sur "<<ge->getName()<<" de type "<<ge->getTypeName()
-						<<", pb de création de la courbe géométrique\n";
-				throw TkUtil::Exception (message);
-			}
-			try {
-				// calcul de la position des points sur la courbe
-				if (dni->isPolarCut())
-					curve->getPolarParametricsPoints(pt0, pt1,
-							nbBrasI-1, l_ratios, points, dni->getPolarCenter());
-				else
-					curve->getParametricsPoints(pt0, pt1,
-							nbBrasI-1, l_ratios, points);
-#ifdef _DEBUG_GETPOINTS
-				std::cout<<"pt0 : "<<pt0<<std::endl;
-				for (uint i=0; i<nbBrasI-1; i++){
-					std::cout<<" ratio : "<<l_ratios[i]<<", => point"<<points[i+1];
-					std::cout<<" dist au précédent : "<<points[i+1].length(points[i]);
-					std::cout<<std::endl;
-				}
-				std::cout<<"pt1 : "<<pt1<<" dist au précédent : "<<pt1.length(points.back())<<std::endl;
-#endif
-			}
-			catch (TkUtil::Exception& exc){
-				TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-				message << "Curve::getParametricsPoints a échoué, récupération des paramètres aux extrémités impossible pour l'arête "
-						<< getName() << ", sur "<<ge->getName();
-				message<<", pt0 : "<<pt0;
-				message<<", pt1 : "<<pt1;
-				auto vertices = curve->getVertices();
-				if (vertices.size()>0)
-					message<<", vertices[0] : "<<vertices[0]->getCoord();
-				if (vertices.size()>1)
-					message<<", vertices[1] : "<<vertices[1]->getCoord();
-				message<<"\nMessage remonté: "<<exc.getMessage();
-				throw TkUtil::Exception (message);
-			}
-			catch (const Standard_Failure& exc){
-				TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-				message << "OCC a échoué, récupération des paramètres aux extrémités impossible pour l'arête "
-						<< getName() << ", sur "<<ge->getName();
-				throw TkUtil::Exception (message);
-			}
-
-			delete [] l_ratios;
-
-			// on replace les noeuds de l'arête sur la surface
-			if (curveToBeDeleted){
-				Geom::Surface* surface = dynamic_cast<Geom::Surface*> (ge);
-				CHECK_NULL_PTR_ERROR(surface);
-				double lnVect = vect.norme();
-
-#ifdef _DEBUG_GETPOINTS
-				std::cout<<"reprojection de la bspline sur la surface..."<<std::endl;
-#endif
-
-				for (uint i=1; i<points.size()/2; i++){
-					Utils::Math::Point newPt = Geom::GeomProjectImplementation().project(surface, points[i]).first;
-#ifdef _DEBUG_GETPOINTS
-					std::cout<<"dist newPt à pt0 = "<<(newPt-pt0).norme()<<std::endl;
-#endif
-					double len0 = (newPt-pt0).norme();
-
-					if (!Utils::Math::MgxNumeric::isNearlyZero(len0/lnVect))
-						points[i] = newPt;
-				}
-				for (uint i=points.size()/2; i<points.size()-1; i++){
-					Utils::Math::Point newPt = Geom::GeomProjectImplementation().project(surface, points[i]).first;
-#ifdef _DEBUG_GETPOINTS
-					std::cout<<"dist newPt à pt1 = "<<(newPt-pt1).norme()<<std::endl;
-#endif
-					double len1 = (newPt-pt1).norme();
-
-					if (!Utils::Math::MgxNumeric::isNearlyZero(len1/lnVect))
-						points[i] = newPt;
-				}
-			}
-
-			if (curveToBeDeleted){
-				delete curve;
-				// remet les compteurs pour les ids
-				getContext().getNameManager().setInternalStats(name_manager_before);
-			}
-
-		} // end if (nbBrasI > 1)
-
-		points.push_back(pt1);
-
-	} else if (project
-			&& dni->getMeshLaw() == CoEdgeMeshingProperty::interpolate) {
-		// cas avec interpolation
-		// cela nécessite de laisser le calcul des positions des points à EdgeMeshingPropertyInterpolate
-
-		EdgeMeshingPropertyInterpolate* interpol = dynamic_cast<EdgeMeshingPropertyInterpolate*>(dni);
-		CHECK_NULL_PTR_ERROR(interpol);
-
-		if (interpol->getType() == EdgeMeshingPropertyInterpolate::with_coedge_list){
-			// recherche des arêtes par rapport aux quelles se fait l'interpolation
-			std::vector<std::string> coedges_names = interpol->getCoEdges();
-			std::vector<CoEdge*> coedges;
-			getCoEdges(coedges_names, coedges);
-
-			uint nbMeshingEdges = 0;
-			for (uint i=0; i<coedges.size(); i++)
-				nbMeshingEdges+=coedges[i]->getNbMeshingEdges();
-
-			// il faut avoir le même nombre de sommets sur les deux arêtes
-			if (interpol->getNbEdges() != nbMeshingEdges){
-				TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-				message << "Erreur, l'arête "<<getName()
-							<<" est discrétisée en "<<(short)interpol->getNbEdges()
-							<<" alors que les arêtes de référence le sont en "<<(short)nbMeshingEdges;
-				throw TkUtil::Exception (message);
-			}
-
-			// vérifie que les coedges_ref ne dépendent pas de la coedge de départ
-			std::set<const CoEdge*> filtre_coedges; // pour éviter d'y passer trop de temps
-			detectLoopReference(this, coedges, filtre_coedges);
-			updateModificationTime(this, coedges);
-
-			// cas d'une interpolation avec projection sur une courbe ou une surface
-			// on passe par une tabulation
-			if (getGeomAssociation()
-					&& (getGeomAssociation()->getType() == Utils::Entity::GeomCurve
-							|| getGeomAssociation()->getType() == Utils::Entity::GeomSurface)){
-
-#ifdef _DEBUG_GETPOINTS
-				std::cout<<"Cas interpolé avec utilisation EdgeMeshingPropertyTabulated via coedges"<<std::endl;
-#endif
-				// on traite le cas avec projection comme on le fait avec une tabulation
-				std::vector<double> tabulation;
-				interpol->getTabulations(tabulation, coedges, pt0, pt1);
-
-				// Cas où le sens est inversé à la main par l'utilisateur
-				// L'algo actuel oriente l'arête par compraison géométrique ce qui n'est pas
-				// adapté à une face courbe ou avec un rebroussement par exemple
-				if ((0 != m_mesh_property) && (false == m_mesh_property->getDirect ( )))
-					std::reverse (tabulation.begin ( ), tabulation.end ( ));
-
-				Topo::CoEdgeMeshingProperty * empTab = new Topo::EdgeMeshingPropertyTabulated(tabulation);
-				getPoints(empTab, points, true);
-
-				delete empTab;
-
-			} // if getType() == GeomCurve
-			else {
-#ifdef _DEBUG_GETPOINTS
-				std::cout<<"Cas interpolé (interpol::getPoints(coedges)) ..."<<std::endl;
-#endif
-				// on initialise le vecteur de points avec les extrémités
-				points.resize(nbMeshingEdges+1);
-				points[0] = pt0;
-				points[nbMeshingEdges] = pt1;
-
-				// l'interpolation n'accède pas au contexte, donc on lui passe l'arête
-				interpol->getPoints(points, coedges);
-				// [EB] code mort ...
-				//			// s'il y a une projection sur une surface on replace les points dessus
-				//			if (getGeomAssociation() && getGeomAssociation()->getType() == Utils::Entity::GeomSurface){
-				//				Geom::GeomEntity* ge = getGeomAssociation();
-				//				for (uint i=1; i<getNbMeshingEdges(); i++)
-				//					ge->project(points[i]);
-				//			} // end getGeomAssociation()
-
-			} // end else / if getType() == GeomCurve
-		} // if (interpol->getType() == EdgeMeshingPropertyInterpolate::with_coedge_list)
-		else if (interpol->getType() == EdgeMeshingPropertyInterpolate::with_coface) {
-
-			std::string coface_name = interpol->getCoFace();
-
-			CoFace* coface = 0;
-			try {
-				coface = getContext().getTopoManager().getCoFace(coface_name, false);
-			}
-			catch (Utils::IsDestroyedException &e){
-				TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-				message << "Erreur, l'arête "<<getName()<<" a une discrétisation basée sur l'interpolation en utilisant la face "
-						<< coface_name <<" qui est détruite";
-				throw TkUtil::Exception (message);
-			}
-
-			if (coface == 0){
-				TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-				message << "Erreur, l'arête "<<getName()<<" a une discrétisation basée sur l'interpolation en utilisant une face non renseignée (détruite)";
-				throw TkUtil::Exception (message);
-			}
-
-			// vérifie que les coedges_ref ne dépendent pas de la coedge de départ
-			std::set<const CoEdge*> filtre_coedges; // pour éviter d'y passer trop de temps
-			detectLoopReference(this, this, coface, filtre_coedges);
-
-			if (getGeomAssociation()
-					&& (getGeomAssociation()->getType() == Utils::Entity::GeomCurve
-							|| getGeomAssociation()->getType() == Utils::Entity::GeomSurface)){
-
-#ifdef _DEBUG_GETPOINTS
-				std::cout<<"Cas interpolé avec utilisation EdgeMeshingPropertyTabulated via coface"<<std::endl;
-#endif
-				// on traite le cas avec projection comme on le fait avec une tabulation
-				std::vector<double> tabulation;
-				interpol->getTabulations(tabulation, this, coface);
-
-				Topo::CoEdgeMeshingProperty * empTab = new Topo::EdgeMeshingPropertyTabulated(tabulation);
-				getPoints(empTab, points, true);
-
-				delete empTab;
-
-			} // if getType() == GeomCurve
-			else {
-#ifdef _DEBUG_GETPOINTS
-				std::cout<<"Cas interpolé (interpol::getPoints(coface)) ..."<<std::endl;
-#endif
-				points.resize(interpol->getNbEdges()+1);
-				points[0] = pt0;
-				points[interpol->getNbEdges()] = pt1;
-
-				// l'interpolation n'accède pas au contexte, donc on lui passe la face
-				interpol->getPoints(points, this, coface);
-
-			} // end else / if getType() == GeomCurve
-
-		} // else if (interpol->getType() == EdgeMeshingPropertyInterpolate::with_coface)
-
-
-	} // else if (project && dni->getMeshLaw() == CoEdgeMeshingProperty::interpolate)
-	else if (project
-			&& dni->getMeshLaw() == CoEdgeMeshingProperty::globalinterpolate) {
-		// cas avec interpolation globale
-		// cela nécessite de laisser le calcul des positions des points à EdgeMeshingPropertyGlobalInterpolate
-
-		EdgeMeshingPropertyGlobalInterpolate* interpol = dynamic_cast<EdgeMeshingPropertyGlobalInterpolate*>(dni);
-		CHECK_NULL_PTR_ERROR(interpol);
-
-		// recherche des arêtes par rapport aux quelles se fait l'interpolation
-		std::vector<CoEdge*> first_coedges;
-		std::vector<CoEdge*> second_coedges;
-		std::vector<std::string> first_coedges_names = interpol->getFirstCoEdges();
-		std::vector<std::string> second_coedges_names = interpol->getSecondCoEdges();
-		uint nbMeshingEdges1 = 0;
-		uint nbMeshingEdges2 = 0;
-		for (uint i=0; i<first_coedges_names.size(); i++){
-			CoEdge* coedge = getContext().getTopoManager().getCoEdge(first_coedges_names[i], false);
-
-			if (coedge == 0){
-				TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-				message << "Erreur, l'arête "<<getName()<<" a une discrétisation basée sur celle de "<<first_coedges_names[i]
-						<<" qui n'existe pas (ou n'existe plus)";
-				throw TkUtil::Exception (message);
-			}
-			// cas où on dépend de soit même
-			if (coedge == this){
-				TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-				message << "Erreur, l'arête "<<getName()<<" a une discrétisation basée sur elle même \n";
-				message << "(peut-être avez-vous utilisé setParallelMeshingProperty au lieu de setMeshingProperty)";
-				throw TkUtil::Exception (message);
-			}
-
-			first_coedges.push_back(coedge);
-
-			nbMeshingEdges1+=coedge->getNbMeshingEdges();
-
-		} // end for i<first_coedges_names.size()
-
-		for (uint i=0; i<second_coedges_names.size(); i++){
-			CoEdge* coedge = getContext().getTopoManager().getCoEdge(second_coedges_names[i], false);
-
-			if (coedge == 0){
-				TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-				message << "Erreur, l'arête "<<getName()<<" a une discrétisation basée sur celle de "<<second_coedges_names[i]
-						<<" qui n'existe pas (ou n'existe plus)";
-				throw TkUtil::Exception (message);
-			}
-			// cas où on dépend de soit même
-			if (coedge == this){
-				TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-				message << "Erreur, l'arête "<<getName()<<" a une discrétisation basée sur elle même \n";
-				message << "(peut-être avez-vous utilisé setParallelMeshingProperty au lieu de setMeshingProperty)";
-				throw TkUtil::Exception (message);
-			}
-
-			second_coedges.push_back(coedge);
-
-			nbMeshingEdges2+=coedge->getNbMeshingEdges();
-
-		} // end for i<second_coedges_names.size()
-
-		// il faut avoir le même nombre de sommets sur les deux arêtes
-		if (interpol->getNbEdges() != nbMeshingEdges1 || interpol->getNbEdges() != nbMeshingEdges2){
-			TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-			message << "Erreur, l'arête "<<getName()
-					<<" est discrétisée en "<<(short)interpol->getNbEdges()
-					<<" alors que les arêtes de référence le sont en "<<(short)nbMeshingEdges1
-					<<" et "<<(short)nbMeshingEdges2;
-			throw TkUtil::Exception (message);
-		}
-
-		// on initialise le vecteur de points avec les extrémités
-		points.resize(nbMeshingEdges1+1);
-		points[0] = pt0;
-		points[nbMeshingEdges1] = pt1;
-
-		// l'interpolation n'accède pas au contexte, donc on lui passe les listes d'arêtes
-		interpol->getPoints(points, first_coedges, second_coedges);
-
-	} // else if (project && dni->getMeshLaw() == CoEdgeMeshingProperty::globalinterpolate)
-	else {
-#ifdef _DEBUG_GETPOINTS
-		std::cout<<"Cas sans projection ..."<<std::endl;
-#endif
-		try {
-			// cas sans projection
-			dni->initCoeff(vect.norme());
-		}
-		catch (TkUtil::Exception& exc){
-			TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-			message << "Pb avec initialisation des paramètres de discrétisation de l'arête "
-					<< getName() << ", message remonté : "<<exc.getMessage();
-			throw TkUtil::Exception (message);
-		}
-
-		points.push_back(pt0);
-		for (uint i=0; i<nbBrasI-1; i++){
-			Utils::Math::Point pt = pt0 + vect * dni->nextCoeff();
-			points.push_back(pt);
-		}
-		points.push_back(pt1);
-	}
-
+    // protection pour éviter les appels concurrents pouvant modifier le preMesh
+    TkUtil::AutoMutex autoMutex(&preMeshMutex);
+
+    const uint nbBrasI = dni->getNbEdges();
+
+    const std::vector<Topo::Vertex *> &vertices = getVertices();
+    Utils::Math::Point pt0 = vertices[0]->getCoord();
+    Utils::Math::Point pt1 = vertices[1]->getCoord();
+
+    bool pt0_projected = false;
+    bool pt1_projected = false;
+    if (project)
+    {
+        Geom::GeomEntity *ge0 = vertices[0]->getGeomAssociation();
+        if (ge0 && !vertices[0]->isMeshed())
+        {
+            Geom::GeomProjectVisitor gpv(pt0);
+            ge0->accept(gpv);
+            pt0 = gpv.getProjectedPoint();
+            pt0_projected = true;
+        }
+        Geom::GeomEntity *ge1 = vertices[1]->getGeomAssociation();
+        if (ge1 && !vertices[1]->isMeshed())
+        {
+            Geom::GeomProjectVisitor gpv(pt1);
+            ge1->accept(gpv);
+            pt1 = gpv.getProjectedPoint();
+            pt1_projected = true;
+        }
+    }
+
+    Utils::Math::Point vect = (pt1 - pt0);
+
+    if (project && getGeomAssociation()
+        && dni->getMeshLaw() != CoEdgeMeshingProperty::interpolate
+        && dni->getMeshLaw() != CoEdgeMeshingProperty::globalinterpolate)
+    {
+        // cas avec projection
+        Geom::GeomEntity *ge = getGeomAssociation();
+        points.push_back(pt0);
+
+        if (nbBrasI > 1)
+        {
+            // on fait la projection des points en tenant compte d'un paramètre curviligne
+            // pour les projections sur courbes
+
+            // mémorisation des ids, pour le cas de la création d'une courbe temporaire
+            std::vector<unsigned long> name_manager_before;
+
+            // courbe sur laquelle se fait la projection
+            Geom::Curve *curve = 0;
+            bool curveToBeDeleted = false;
+            if (ge->getType() == Utils::Entity::GeomCurve)
+            {
+                curve = dynamic_cast<Geom::Curve *>(ge);
+            }
+            else if (ge->getType() == Utils::Entity::GeomSurface)
+            {
+                getContext().getNameManager().getInternalStats(name_manager_before);
+                Geom::Surface *surface = dynamic_cast<Geom::Surface *>(ge);
+                CHECK_NULL_PTR_ERROR(surface);
+
+                try
+                {
+                    curve = createBSplineByProj(pt0, pt1, surface);
+                }
+                catch (Utils::HalfCircleSurfaceException &exc)
+                {
+                    try
+                    {
+                        // 2ème essai avec autre méthode:
+                        // on place le point central de l'arête directement sur la surface
+                        // pour cela on constitue la courbe intersection entre plan orthogonal à l'arête et la surface
+                        // puis on projette le centre de l'arête sur cette courbe
+                        // on projette ensuite sur la surface les points entre les extrémités de l'arête et ce point projeté
+                        curve = createBSplineByProjWithOrthogonalIntersection(pt0, pt1, surface);
+                    }
+                    catch (TkUtil::Exception &exc)
+                    {
+                        // remet les compteurs pour les ids
+                        getContext().getNameManager().setInternalStats(name_manager_before);
+
+                        TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                        message << "Pb avec création d'une courbe par projection de " << getName() << " sur la surface "
+                                << ge->getName() << ".\n";
+
+                        if (Utils::Math::MgxNumeric::isNearlyZero(vect.norme()))
+                        {
+                            std::string n0 = vertices[0]->getName();
+                            std::string n1 = vertices[1]->getName();
+                            message << vertices[0]->getName() << " et " << vertices[1]->getName() <<
+                                    " sont confondus après projection.\n";
+                        }
+                        message <<
+                                "Le pb est peut-être lié à une projection sur un demi cercle => couper l'arête en deux. ";
+
+                        // message plus important au niveau des logs
+                        TkUtil::UTF8String messageComplet(TkUtil::Charset::UTF_8);
+                        messageComplet << message << ", message remonté : " << exc.getMessage();
+                        getContext().getLogStream()->log(TkUtil::TraceLog(messageComplet, TkUtil::Log::TRACE_3));
+
+                        throw TkUtil::Exception(message);
+                    }
+                }
+                catch (TkUtil::Exception &exc)
+                {
+                    // remet les compteurs pour les ids
+                    getContext().getNameManager().setInternalStats(name_manager_before);
+
+                    TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                    message << "Pb avec création d'une courbe par projection de l'arête " << getName() <<
+                            " sur la surface " << ge->getName();
+                    message <<
+                            "\nLe pb est peut-être lié à une projection en dehors de la surface => découper l'arête et revoir les associations";
+
+                    // message plus important au niveau des logs
+                    TkUtil::UTF8String messageComplet(TkUtil::Charset::UTF_8);
+                    messageComplet << message << ", message remonté : " << exc.getMessage();
+                    getContext().getLogStream()->log(TkUtil::TraceLog(messageComplet, TkUtil::Log::TRACE_3));
+
+                    throw TkUtil::Exception(message);
+                }
+
+                if (0 == curve)
+                {
+                    // remet les compteurs pour les ids
+                    getContext().getNameManager().setInternalStats(name_manager_before);
+
+                    TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                    message << "OCC a échoué, création de la projection de l'arête "
+                            << getName() << " sur la surface  " << ge->getName()
+                            << ", cas en dehors de la surface par exemple";
+                    throw TkUtil::Exception(message);
+                }
+                else
+                    curveToBeDeleted = true;
+            } // end else if (ge->getType() == Utils::Entity::GeomSurface)
+            else
+            {
+                TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                message << "Projection impossible pour l'arête \""
+                        << getName() << "\", sur " << ge->getName() << " de type " << ge->getTypeName() << "\n";
+                message << "elle est projetée sur autre chose qu'une courbe ou une surface";
+                throw TkUtil::Exception(message);
+            }
+
+            if (curve == 0)
+            {
+                TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                message << "Erreur interne pour l'arête \"" << getName() << "\", curve == 0\n";
+                throw TkUtil::Exception(message);
+            }
+
+            try
+            {
+                if (curveToBeDeleted)
+                    dni->initCoeff(curve->getArea());
+                else
+                {
+                    // TODO [EB]: il faut calculer la longueur de l'arête projetée sur la courbe
+
+
+                    // regarde si l'on est dans le cas de l'arête projetée sur l'intégralité de la courbe
+                    auto crv_vertices = curve->getVertices();
+                    auto vertices = getVertices();
+                    if (vertices.size() == 2 && crv_vertices.size() == 2
+                        && ((vertices[0]->getCoord() == crv_vertices[0]->getCoord() && vertices[1]->getCoord() ==
+                             crv_vertices[1]->getCoord())
+                            || (vertices[0]->getCoord() == crv_vertices[1]->getCoord() && vertices[1]->getCoord() ==
+                                crv_vertices[0]->getCoord()))
+                    )
+                    {
+                        dni->initCoeff(curve->getArea());
+                    }
+                    else if (curve->isLinear())
+                    {
+                        // pas de pb pour le cas linéaire
+                        double dist = vertices[0]->getCoord().length(vertices[1]->getCoord());
+                        dni->initCoeff(dist);
+                    }
+                    else
+                    {
+                        // cas problématique (projection sur une portion de la courbe) ...
+                        if (dni->needLengthToInitialize())
+                        {
+                            TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                            message << " projection sur " << ge->getName() << " pour l'arête " << getName() <<
+                                    " problématique pour cas bigéométrique ou autre nécessitant la connaissance de la longueur de la portion du contour";
+                            getContext().getLogStream()->log(TkUtil::TraceLog(message, TkUtil::Log::INFORMATION));
+                        }
+
+                        double dist = vertices[0]->getCoord().length(vertices[1]->getCoord());
+                        dni->initCoeff(dist);
+                    }
+                } // end else / if (curveToBeDeleted)
+            }
+            catch (TkUtil::Exception &exc)
+            {
+                TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                message << "Pb avec initialisation des paramètres de discrétisation de l'arête "
+                        << getName() << ", message remonté : " << exc.getMessage();
+                throw TkUtil::Exception(message);
+            }
+
+            double *l_ratios = new double[nbBrasI - 1];
+            for (uint i = 0; i < nbBrasI - 1; i++)
+            {
+                l_ratios[i] = dni->nextCoeff();
+            }
+
+            if (curve == 0)
+            {
+                TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                message << "Erreur interne pour l'arête \""
+                        << getName() << "\", sur " << ge->getName() << " de type " << ge->getTypeName()
+                        << ", pb de création de la courbe géométrique\n";
+                throw TkUtil::Exception(message);
+            }
+            try
+            {
+                // calcul de la position des points sur la courbe
+                if (dni->isPolarCut())
+                    curve->getPolarParametricsPoints(pt0, pt1,
+                                                     nbBrasI - 1, l_ratios, points, dni->getPolarCenter());
+                else
+                    curve->getParametricsPoints(pt0, pt1,
+                                                nbBrasI - 1, l_ratios, points);
+            }
+            catch (TkUtil::Exception &exc)
+            {
+                TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                message <<
+                        "Curve::getParametricsPoints a échoué, récupération des paramètres aux extrémités impossible pour l'arête "
+                        << getName() << ", sur " << ge->getName();
+                message << ", pt0 : " << pt0;
+                message << ", pt1 : " << pt1;
+                auto vertices = curve->getVertices();
+                if (vertices.size() > 0)
+                    message << ", vertices[0] : " << vertices[0]->getCoord();
+                if (vertices.size() > 1)
+                    message << ", vertices[1] : " << vertices[1]->getCoord();
+                message << "\nMessage remonté: " << exc.getMessage();
+                throw TkUtil::Exception(message);
+            }
+            catch (const Standard_Failure &exc)
+            {
+                TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                message << "OCC a échoué, récupération des paramètres aux extrémités impossible pour l'arête "
+                        << getName() << ", sur " << ge->getName();
+                throw TkUtil::Exception(message);
+            }
+
+            delete [] l_ratios;
+
+            // on replace les noeuds de l'arête sur la surface
+            if (curveToBeDeleted)
+            {
+                Geom::Surface *surface = dynamic_cast<Geom::Surface *>(ge);
+                CHECK_NULL_PTR_ERROR(surface);
+                double lnVect = vect.norme();
+
+                for (uint i = 1; i < points.size() / 2; i++)
+                {
+                    Utils::Math::Point newPt = Geom::GeomProjectImplementation().project(surface, points[i]).first;
+                    double len0 = (newPt - pt0).norme();
+
+                    if (!Utils::Math::MgxNumeric::isNearlyZero(len0 / lnVect))
+                        points[i] = newPt;
+                }
+                for (uint i = points.size() / 2; i < points.size() - 1; i++)
+                {
+                    Utils::Math::Point newPt = Geom::GeomProjectImplementation().project(surface, points[i]).first;
+                    double len1 = (newPt - pt1).norme();
+
+                    if (!Utils::Math::MgxNumeric::isNearlyZero(len1 / lnVect))
+                        points[i] = newPt;
+                }
+            }
+
+            if (curveToBeDeleted)
+            {
+                delete curve;
+                // remet les compteurs pour les ids
+                getContext().getNameManager().setInternalStats(name_manager_before);
+            }
+        } // end if (nbBrasI > 1)
+
+        points.push_back(pt1);
+    }
+    else if (project
+               && dni->getMeshLaw() == CoEdgeMeshingProperty::interpolate)
+    {
+        // cas avec interpolation
+        // cela nécessite de laisser le calcul des positions des points à EdgeMeshingPropertyInterpolate
+
+        EdgeMeshingPropertyInterpolate *interpol = dynamic_cast<EdgeMeshingPropertyInterpolate *>(dni);
+        CHECK_NULL_PTR_ERROR(interpol);
+
+        if (interpol->getType() == EdgeMeshingPropertyInterpolate::with_coedge_list)
+        {
+            // recherche des arêtes par rapport aux quelles se fait l'interpolation
+            std::vector<std::string> coedges_names = interpol->getCoEdges();
+            std::vector<CoEdge *> coedges;
+            getCoEdges(coedges_names, coedges);
+
+            uint nbMeshingEdges = 0;
+            for (uint i = 0; i < coedges.size(); i++)
+                nbMeshingEdges += coedges[i]->getNbMeshingEdges();
+
+            // il faut avoir le même nombre de sommets sur les deux arêtes
+            if (interpol->getNbEdges() != nbMeshingEdges)
+            {
+                TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                message << "Erreur, l'arête " << getName()
+                        << " est discrétisée en " << (short) interpol->getNbEdges()
+                        << " alors que les arêtes de référence le sont en " << (short) nbMeshingEdges;
+                throw TkUtil::Exception(message);
+            }
+
+            // vérifie que les coedges_ref ne dépendent pas de la coedge de départ
+            std::set<const CoEdge *> filtre_coedges; // pour éviter d'y passer trop de temps
+            detectLoopReference(this, coedges, filtre_coedges);
+            updateModificationTime(this, coedges);
+
+            // cas d'une interpolation avec projection sur une courbe ou une surface
+            // on passe par une tabulation
+            if (getGeomAssociation()
+                && (getGeomAssociation()->getType() == Utils::Entity::GeomCurve
+                    || getGeomAssociation()->getType() == Utils::Entity::GeomSurface))
+            {
+                // on traite le cas avec projection comme on le fait avec une tabulation
+                std::vector<double> tabulation;
+                interpol->getTabulations(tabulation, coedges, pt0, pt1);
+
+                // Cas où le sens est inversé à la main par l'utilisateur
+                // L'algo actuel oriente l'arête par compraison géométrique ce qui n'est pas
+                // adapté à une face courbe ou avec un rebroussement par exemple
+                if ((0 != m_mesh_property) && (false == m_mesh_property->getDirect()))
+                    std::reverse(tabulation.begin(), tabulation.end());
+
+                Topo::CoEdgeMeshingProperty *empTab = new Topo::EdgeMeshingPropertyTabulated(tabulation);
+                getPoints(empTab, points, true);
+
+                delete empTab;
+            } // if getType() == GeomCurve
+            else
+            {
+                // on initialise le vecteur de points avec les extrémités
+                points.resize(nbMeshingEdges + 1);
+                points[0] = pt0;
+                points[nbMeshingEdges] = pt1;
+
+                // l'interpolation n'accède pas au contexte, donc on lui passe l'arête
+                interpol->getPoints(points, coedges);
+            } // end else / if getType() == GeomCurve
+        } // if (interpol->getType() == EdgeMeshingPropertyInterpolate::with_coedge_list)
+        else if (interpol->getType() == EdgeMeshingPropertyInterpolate::with_coface)
+        {
+            std::string coface_name = interpol->getCoFace();
+
+            CoFace *coface = 0;
+            try
+            {
+                coface = getContext().getTopoManager().getCoFace(coface_name, false);
+            }
+            catch (Utils::IsDestroyedException &e)
+            {
+                TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                message << "Erreur, l'arête " << getName() <<
+                        " a une discrétisation basée sur l'interpolation en utilisant la face "
+                        << coface_name << " qui est détruite";
+                throw TkUtil::Exception(message);
+            }
+
+            if (coface == 0)
+            {
+                TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                message << "Erreur, l'arête " << getName() <<
+                        " a une discrétisation basée sur l'interpolation en utilisant une face non renseignée (détruite)";
+                throw TkUtil::Exception(message);
+            }
+
+            // vérifie que les coedges_ref ne dépendent pas de la coedge de départ
+            std::set<const CoEdge *> filtre_coedges; // pour éviter d'y passer trop de temps
+            detectLoopReference(this, this, coface, filtre_coedges);
+
+            if (getGeomAssociation()
+                && (getGeomAssociation()->getType() == Utils::Entity::GeomCurve
+                    || getGeomAssociation()->getType() == Utils::Entity::GeomSurface))
+            {
+                // on traite le cas avec projection comme on le fait avec une tabulation
+                std::vector<double> tabulation;
+                interpol->getTabulations(tabulation, this, coface);
+
+                Topo::CoEdgeMeshingProperty *empTab = new Topo::EdgeMeshingPropertyTabulated(tabulation);
+                getPoints(empTab, points, true);
+
+                delete empTab;
+            } // if getType() == GeomCurve
+            else
+            {
+                points.resize(interpol->getNbEdges() + 1);
+                points[0] = pt0;
+                points[interpol->getNbEdges()] = pt1;
+
+                // l'interpolation n'accède pas au contexte, donc on lui passe la face
+                interpol->getPoints(points, this, coface);
+            } // end else / if getType() == GeomCurve
+        } // else if (interpol->getType() == EdgeMeshingPropertyInterpolate::with_coface)
+    } // else if (project && dni->getMeshLaw() == CoEdgeMeshingProperty::interpolate)
+    else if (project
+             && dni->getMeshLaw() == CoEdgeMeshingProperty::globalinterpolate)
+    {
+        // cas avec interpolation globale
+        // cela nécessite de laisser le calcul des positions des points à EdgeMeshingPropertyGlobalInterpolate
+
+        EdgeMeshingPropertyGlobalInterpolate *interpol = dynamic_cast<EdgeMeshingPropertyGlobalInterpolate *>(dni);
+        CHECK_NULL_PTR_ERROR(interpol);
+
+        // recherche des arêtes par rapport aux quelles se fait l'interpolation
+        std::vector<CoEdge *> first_coedges;
+        std::vector<CoEdge *> second_coedges;
+        std::vector<std::string> first_coedges_names = interpol->getFirstCoEdges();
+        std::vector<std::string> second_coedges_names = interpol->getSecondCoEdges();
+        uint nbMeshingEdges1 = 0;
+        uint nbMeshingEdges2 = 0;
+        for (uint i = 0; i < first_coedges_names.size(); i++)
+        {
+            CoEdge *coedge = getContext().getTopoManager().getCoEdge(first_coedges_names[i], false);
+
+            if (coedge == 0)
+            {
+                TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                message << "Erreur, l'arête " << getName() << " a une discrétisation basée sur celle de " <<
+                        first_coedges_names[i]
+                        << " qui n'existe pas (ou n'existe plus)";
+                throw TkUtil::Exception(message);
+            }
+            // cas où on dépend de soit même
+            if (coedge == this)
+            {
+                TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                message << "Erreur, l'arête " << getName() << " a une discrétisation basée sur elle même \n";
+                message << "(peut-être avez-vous utilisé setParallelMeshingProperty au lieu de setMeshingProperty)";
+                throw TkUtil::Exception(message);
+            }
+
+            first_coedges.push_back(coedge);
+
+            nbMeshingEdges1 += coedge->getNbMeshingEdges();
+        } // end for i<first_coedges_names.size()
+
+        for (uint i = 0; i < second_coedges_names.size(); i++)
+        {
+            CoEdge *coedge = getContext().getTopoManager().getCoEdge(second_coedges_names[i], false);
+
+            if (coedge == 0)
+            {
+                TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                message << "Erreur, l'arête " << getName() << " a une discrétisation basée sur celle de " <<
+                        second_coedges_names[i]
+                        << " qui n'existe pas (ou n'existe plus)";
+                throw TkUtil::Exception(message);
+            }
+            // cas où on dépend de soit même
+            if (coedge == this)
+            {
+                TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                message << "Erreur, l'arête " << getName() << " a une discrétisation basée sur elle même \n";
+                message << "(peut-être avez-vous utilisé setParallelMeshingProperty au lieu de setMeshingProperty)";
+                throw TkUtil::Exception(message);
+            }
+
+            second_coedges.push_back(coedge);
+
+            nbMeshingEdges2 += coedge->getNbMeshingEdges();
+        } // end for i<second_coedges_names.size()
+
+        // il faut avoir le même nombre de sommets sur les deux arêtes
+        if (interpol->getNbEdges() != nbMeshingEdges1 || interpol->getNbEdges() != nbMeshingEdges2)
+        {
+            TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+            message << "Erreur, l'arête " << getName()
+                    << " est discrétisée en " << (short) interpol->getNbEdges()
+                    << " alors que les arêtes de référence le sont en " << (short) nbMeshingEdges1
+                    << " et " << (short) nbMeshingEdges2;
+            throw TkUtil::Exception(message);
+        }
+
+        // on initialise le vecteur de points avec les extrémités
+        points.resize(nbMeshingEdges1 + 1);
+        points[0] = pt0;
+        points[nbMeshingEdges1] = pt1;
+
+        // l'interpolation n'accède pas au contexte, donc on lui passe les listes d'arêtes
+        interpol->getPoints(points, first_coedges, second_coedges);
+    } // else if (project && dni->getMeshLaw() == CoEdgeMeshingProperty::globalinterpolate)
+    else
+    {
+        try
+        {
+            // cas sans projection
+            dni->initCoeff(vect.norme());
+        }
+        catch (TkUtil::Exception &exc)
+        {
+            TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+            message << "Pb avec initialisation des paramètres de discrétisation de l'arête "
+                    << getName() << ", message remonté : " << exc.getMessage();
+            throw TkUtil::Exception(message);
+        }
+
+        points.push_back(pt0);
+        for (uint i = 0; i < nbBrasI - 1; i++)
+        {
+            Utils::Math::Point pt = pt0 + vect * dni->nextCoeff();
+            points.push_back(pt);
+        }
+        points.push_back(pt1);
+    }
 
 
     // cas où il faut rendre la discrétisation orthogonale
@@ -1832,218 +1808,206 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
     uint nbLayers = dni->getNbLayers();
 
     if (getGeomAssociation() && getGeomAssociation()->getType() == Utils::Entity::GeomCurve)
-    	projectOnCurve = true;
-    if (project && dni->isOrthogonal() && (not projectOnCurve) && nbLayers){
-#ifdef _DEBUG_GETPOINTS
-    	std::cout<<"Déplacement des points pour être orthogonal sur "<<dni->getNbLayers()<<" couches"<<std::endl;
-#endif
-    	// recherche de la normale
+        projectOnCurve = true;
+    if (project && dni->isOrthogonal() && (not projectOnCurve) && nbLayers)
+    {
+        // recherche de la normale
         Utils::Math::Vector normale;
 
-        Topo::Vertex* vtx0 = vertices[dni->getSide()];
-        Topo::Vertex* vtxN = vertices[1-dni->getSide()];
-		Utils::Math::Point pt0 = vtx0->getCoord();
-		Utils::Math::Point ptN = vtxN->getCoord();
+        Topo::Vertex *vtx0 = vertices[dni->getSide()];
+        Topo::Vertex *vtxN = vertices[1 - dni->getSide()];
+        Utils::Math::Point pt0 = vtx0->getCoord();
+        Utils::Math::Point ptN = vtxN->getCoord();
         Utils::Math::Point vect = (ptN - pt0);
 
-    	// recherche des surfaces / orthogonal
-        Geom::GeomEntity* ge = vtx0->getGeomAssociation();
-        try {
-        	if (ge == 0){
-        		TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-        		message << "Problème: on ne sait pas définir la normale pour le sommet "<<vtx0->getName()
-                    		<< ", dans l'arête "<<getName()<<" car le sommet n'est pas associé à la géométrie";
-        		throw TkUtil::Exception (message);
-        	}
-        	else if (ge->getType() == Utils::Entity::GeomSurface){
-        		// c'est le cas le plus simple
-        		Geom::Surface* surface = dynamic_cast<Geom::Surface*>(ge);
-        		CHECK_NULL_PTR_ERROR(surface);
-        		Utils::Math::Point pt0 = vtx0->getCoord();
-        		surface->normal(pt0, normale);
-#ifdef _DEBUG_GETPOINTS
-        		std::cout<<"  calcul normale à "<<surface->getName()<<" en "<<pt0<<std::endl;
-#endif
-        	}
-        	else if (ge->getType() == Utils::Entity::GeomCurve
-        			|| ge->getType() == Utils::Entity::GeomVertex) {
+        // recherche des surfaces / orthogonal
+        Geom::GeomEntity *ge = vtx0->getGeomAssociation();
+        try
+        {
+            if (ge == 0)
+                {
+                TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                message << "Problème: on ne sait pas définir la normale pour le sommet " << vtx0->getName()
+                        << ", dans l'arête " << getName() << " car le sommet n'est pas associé à la géométrie";
+                throw TkUtil::Exception(message);
+            }
+            else if (ge->getType() == Utils::Entity::GeomSurface)
+            {
+                // c'est le cas le plus simple
+                Geom::Surface *surface = dynamic_cast<Geom::Surface *>(ge);
+                CHECK_NULL_PTR_ERROR(surface);
+                Utils::Math::Point pt0 = vtx0->getCoord();
+                surface->normal(pt0, normale);
+            }
+            else if (ge->getType() == Utils::Entity::GeomCurve
+                       || ge->getType() == Utils::Entity::GeomVertex)
+            {
+                // recherche des courbes qui en dépendent, en évitant la courbe sur laquelle ed pourrait être projetée
+                // recherche des surfaces qui en dépendent, en évitant la surface sur laquelle ed pourrait être projetée
+                std::vector<Geom::Curve *> curves1;
+                std::vector<Geom::Surface *> surfaces1;
+                if (ge->getType() == Utils::Entity::GeomCurve)
+                {
+                    Geom::Curve *c = dynamic_cast<Geom::Curve *>(ge);
+                    curves1.push_back(c);
+                    surfaces1 = c->getSurfaces();
+                }
+                else
+                {
+                    Geom::Vertex *v = dynamic_cast<Geom::Vertex *>(ge);
+                    curves1 = v->getCurves();
+                    for (auto c: curves1)
+                        for (auto s: c->getSurfaces())
+                            surfaces1.push_back(s);
+                }
 
-				// recherche des courbes qui en dépendent, en évitant la courbe sur laquelle ed pourrait être projetée
-        		// recherche des surfaces qui en dépendent, en évitant la surface sur laquelle ed pourrait être projetée
-				std::vector<Geom::Curve*> curves1;
-        		std::vector<Geom::Surface*> surfaces1;
-				if (ge->getType() == Utils::Entity::GeomCurve){
-					Geom::Curve* c = dynamic_cast<Geom::Curve*>(ge);
-					curves1.push_back(c);
-            		surfaces1 = c->getSurfaces();
-				}
-				else{
-					Geom::Vertex* v = dynamic_cast<Geom::Vertex*>(ge);
-					curves1 = v->getCurves();
-					for (auto c : curves1)
-						for (auto s : c->getSurfaces())
-		            		surfaces1.push_back(s);
-				}
+                std::vector<Geom::Surface *> surfaces2;
+                for (uint i = 0; i < surfaces1.size(); i++)
+                    if (surfaces1[i] != getGeomAssociation())
+                        surfaces2.push_back(surfaces1[i]);
 
-        		std::vector<Geom::Surface*> surfaces2;
-        		for (uint i=0; i<surfaces1.size(); i++)
-        			if (surfaces1[i] != getGeomAssociation())
-        				surfaces2.push_back(surfaces1[i]);
+                if (surfaces2.empty())
+                {
+                    // c'est le cas en 2D
+                    std::vector<Geom::Curve *> curves2;
+                    for (uint i = 0; i < curves1.size(); i++)
+                        if (curves1[i] != getGeomAssociation())
+                            curves2.push_back(curves1[i]);
 
-        		if (surfaces2.empty()){
-        			// c'est le cas en 2D
-            		std::vector<Geom::Curve*> curves2;
-            		for (uint i=0; i<curves1.size(); i++)
-            			if (curves1[i] != getGeomAssociation())
-            				curves2.push_back(curves1[i]);
+                    if (curves2.empty())
+                    {
+                        TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                        message << "Erreur interne: on ne sait pas définir la normale pour l'arête "
+                                << getName() << ", cas non implémenté, pour 2D sans courbe à la base";
+                        throw TkUtil::Exception(message);
+                    }
+                    else if (curves2.size() == 1)
+                    {
+                        // l'arête doit être dans le plan Z=0
+                        if (!Utils::Math::MgxNumeric::isNearlyZero(vertices[0]->getCoord().getZ())
+                            || !Utils::Math::MgxNumeric::isNearlyZero(vertices[1]->getCoord().getZ()))
+                        {
+                            TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                            message << "On ne sait pas définir la normale pour l'arête "
+                                    << getName() << ", elle n'est pas dans le plan Z=0";
+                            throw TkUtil::Exception(message);
+                        }
+                        Utils::Math::Point pt0 = vtx0->getCoord();
+                        Utils::Math::Vector tangente;
+                        curves2[0]->tangent(pt0, tangente);
 
-            		if (curves2.empty()){
-            			TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-            			message << "Erreur interne: on ne sait pas définir la normale pour l'arête "
-            					<<getName()<<", cas non implémenté, pour 2D sans courbe à la base";
-            			throw TkUtil::Exception (message);
-            		}
-            		else if (curves2.size() == 1){
+                        normale = Utils::Math::Vector(tangente.getY(), -tangente.getX(), 0);
 
-            			// l'arête doit être dans le plan Z=0
-            			if (!Utils::Math::MgxNumeric::isNearlyZero(vertices[0]->getCoord().getZ())
-            			|| !Utils::Math::MgxNumeric::isNearlyZero(vertices[1]->getCoord().getZ())){
-            				TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-            				message << "On ne sait pas définir la normale pour l'arête "
-            						<<getName()<<", elle n'est pas dans le plan Z=0";
-            				throw TkUtil::Exception (message);
-            			}
-            			Utils::Math::Point pt0 = vtx0->getCoord();
-            			Utils::Math::Vector tangente;
-            			curves2[0]->tangent(pt0, tangente);
+                        if (normale.dot(tangente) < 0)
+                            normale = Utils::Math::Vector(-tangente.getY(), tangente.getX(), 0);
+                    }
+                    else
+                    {
+                        TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                        message << "Erreur interne: extrémité de l'arête "
+                                << getName() << " reliée à plus d'une courbe !!! (";
+                        for (uint i = 0; i < curves2.size(); i++)
+                            message << " " << curves2[i]->getName();
+                        message << " )";
+                        throw TkUtil::Exception(message);
+                    }
+                }
+                else
+                {
+                    // on prend la normale moyenne entre les différentes surfaces
+                    for (uint i = 0; i < surfaces2.size(); i++)
+                    {
+                        Utils::Math::Vector normaleLoc;
+                        surfaces2[i]->normal(pt0, normaleLoc);
+                        normale += normaleLoc;
+                    }
+                }
+            }
+            else
+            {
+                TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                message << "Erreur interne: on ne sait pas définir la normale pour l'arête "
+                        << getName() << ", cas non prévu";
+                throw TkUtil::Exception(message);
+            }
 
-            			normale = Utils::Math::Vector(tangente.getY(), -tangente.getX(), 0);
-
-            			if (normale.dot(tangente) < 0)
-            				normale = Utils::Math::Vector(-tangente.getY(), tangente.getX(), 0);
-
-            		}
-            		else {
-            			TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-            			message << "Erreur interne: extrémité de l'arête "
-            					<<getName()<<" reliée à plus d'une courbe !!! (";
-            			for (uint i=0; i<curves2.size(); i++)
-            				message <<" "<<curves2[i]->getName();
-            			message << " )";
-            			throw TkUtil::Exception (message);
-            		}
-        		}
-        		else {
-        			// on prend la normale moyenne entre les différentes surfaces
-        			for (uint i=0; i<surfaces2.size(); i++){
-        				Utils::Math::Vector normaleLoc;
-#ifdef _DEBUG_GETPOINTS
-        				std::cout<<"  calcul normale à "<<surfaces2[i]->getName()<<" en "<<pt0<<std::endl;
-#endif
-        				surfaces2[i]->normal(pt0, normaleLoc);
-        				normale+=normaleLoc;
-        			}
-        		}
-
-        	}
-        	else {
-        		TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-        		message << "Erreur interne: on ne sait pas définir la normale pour l'arête "
-        				<<getName()<<", cas non prévu";
-        		throw TkUtil::Exception (message);
-        	}
-
-        	double norme = normale.norme();
-        	if (Utils::Math::MgxNumeric::isNearlyZero(norme)){
-        		TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-        		message << "Erreur interne: on ne sait pas définir la normale pour l'arête "
-        				<<getName()<<", normale indéfinie";
-        		throw TkUtil::Exception (message);
-        	}
+            double norme = normale.norme();
+            if (Utils::Math::MgxNumeric::isNearlyZero(norme))
+            {
+                TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+                message << "Erreur interne: on ne sait pas définir la normale pour l'arête "
+                        << getName() << ", normale indéfinie";
+                throw TkUtil::Exception(message);
+            }
 
             // nous avons donc une normale ...
-            normale/=norme;
-            if (Utils::Math::scaMul(vect, normale)<0.0)
-            	normale *= -1;
-#ifdef _DEBUG_GETPOINTS
-        std::cout <<"  orthogonal avec comme normale "<<normale<<std::endl;
-        std::cout <<"  vect : "<<vect<<std::endl;
-#endif
-
+            normale /= norme;
+            if (Utils::Math::scaMul(vect, normale) < 0.0)
+                normale *= -1;
         }
-        catch(Utils::BadNormalException &e) {
-        	// cas où on ne peut pas compter sur OCC pour obtenir la normale
-        	normale = Topo::TopoHelper::computeNormale(vtx0, this);
-#ifdef _DEBUG_GETPOINTS
-        	std::cout <<"  computeNormale retourne comme normale "<<normale<<std::endl;
-#endif
+        catch (Utils::BadNormalException &e)
+        {
+            // cas où on ne peut pas compter sur OCC pour obtenir la normale
+            normale = Topo::TopoHelper::computeNormale(vtx0, this);
         }
 
-#ifdef _DEBUG_GETPOINTS
-        std::cout<<"dni->getSide() = "<<dni->getSide()<<std::endl;
-#endif
         // Nous utilisons les distances pour replacer les points
-        if (dni->getSide() == 0){
-        	std::vector<Utils::Math::Point> ptInternes;
-        	for (uint i=1; i<points.size()-1; i++){
-        		double ratio = (points[i] - pt0).norme();
-#ifdef _DEBUG_GETPOINTS
-        		std::cout<<"ratio = "<<ratio<<" pour point "<<points[i]<<std::endl;
-#endif
-        		ptInternes.push_back(pt0 + (normale * ratio));
-        	}
-        	ptInternes.push_back(pt0 + (normale * vect.norme()));
+        if (dni->getSide() == 0)
+        {
+            std::vector<Utils::Math::Point> ptInternes;
+            for (uint i = 1; i < points.size() - 1; i++)
+            {
+                double ratio = (points[i] - pt0).norme();
+                ptInternes.push_back(pt0 + (normale * ratio));
+            }
+            ptInternes.push_back(pt0 + (normale * vect.norme()));
 
-        	// déplace les point pour se raccorder à ptN
-        	Mesh::MeshImplementation::courbeDiscretisation(ptN, ptInternes, nbLayers);
+            // déplace les point pour se raccorder à ptN
+            Mesh::MeshImplementation::courbeDiscretisation(ptN, ptInternes, nbLayers);
 
-        	for (uint i=1; i<points.size()-1; i++)
-        		points[i] = ptInternes[i-1];
+            for (uint i = 1; i < points.size() - 1; i++)
+                points[i] = ptInternes[i - 1];
         }
-        else {
-        	// cas avec sens inversé
-        	std::vector<Utils::Math::Point> ptInternes;
-        	for (uint i=points.size()-2; i>=1; i--){
-        		double ratio = (points[i] - pt0).norme();
-#ifdef _DEBUG_GETPOINTS
-        		std::cout<<"ratio = "<<ratio<<" pour point "<<points[i]<<std::endl;
-#endif
-        		ptInternes.push_back(pt0 + (normale * ratio));
-        	}
-        	ptInternes.push_back(pt0 + (normale * vect.norme()));
+        else
+        {
+            // cas avec sens inversé
+            std::vector<Utils::Math::Point> ptInternes;
+            for (uint i = points.size() - 2; i >= 1; i--)
+            {
+                double ratio = (points[i] - pt0).norme();
+                ptInternes.push_back(pt0 + (normale * ratio));
+            }
+            ptInternes.push_back(pt0 + (normale * vect.norme()));
 
-        	// déplace les point pour se raccorder à pt0
-        	Mesh::MeshImplementation::courbeDiscretisation(ptN, ptInternes, nbLayers);
+            // déplace les point pour se raccorder à pt0
+            Mesh::MeshImplementation::courbeDiscretisation(ptN, ptInternes, nbLayers);
 
-        	for (uint i=1; i<points.size()-1; i++)
-        		points[i] = ptInternes[ptInternes.size()-1-i];
+            for (uint i = 1; i < points.size() - 1; i++)
+                points[i] = ptInternes[ptInternes.size() - 1 - i];
         }
 
         // reprojection sur la surface pour le cas où on l'aurait quitté
-        if (getGeomAssociation() && getGeomAssociation()->getType() == Utils::Entity::GeomSurface){
-        	Geom::GeomEntity* ge = getGeomAssociation();
-        	for (uint i=1; i<points.size()-1; i++) {
-				Geom::GeomProjectVisitor gpv(points[i]);
-				ge->accept(gpv);
-				points[i] = gpv.getProjectedPoint();
-			}
+        if (getGeomAssociation() && getGeomAssociation()->getType() == Utils::Entity::GeomSurface)
+        {
+            Geom::GeomEntity *ge = getGeomAssociation();
+            for (uint i = 1; i < points.size() - 1; i++)
+            {
+                Geom::GeomProjectVisitor gpv(points[i]);
+                ge->accept(gpv);
+                points[i] = gpv.getProjectedPoint();
+            }
         }
-
     } // end if (dni->isOrthogonal())
 
 
 #ifdef _DEBUG
-	if (nbBrasI+1 != points.size()){
-		TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-		message << "Erreur interne, CoEdge::getPoints ne retourne pas le nombre de points attendu pour "<<getName()<<", "
-				<<(long)points.size()<<" au lieu des "<<(long)(nbBrasI+1)<<" prévus";
-		throw TkUtil::Exception (message);
-	}
-#endif
-#ifdef _DEBUG_GETPOINTS
-	std::cout<<"points retournés : "<<std::endl;
-	for (uint i=0; i<points.size(); i++)
-		std::cout<<"   "<<points[i]<<std::endl;
+    if (nbBrasI + 1 != points.size()) {
+        TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+        message << "Erreur interne, CoEdge::getPoints ne retourne pas le nombre de points attendu pour " << getName() <<
+                ", "
+                << (long) points.size() << " au lieu des " << (long) (nbBrasI + 1) << " prévus";
+        throw TkUtil::Exception(message);
+    }
 #endif
 }
 /*----------------------------------------------------------------------------*/
