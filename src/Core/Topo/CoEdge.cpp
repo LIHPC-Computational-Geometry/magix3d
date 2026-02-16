@@ -47,6 +47,8 @@
 #include <BRepBuilderAPI_MakeVertex.hxx>
 #include <BRepExtrema_DistShapeShape.hxx>
 #include <BRepAlgoAPI_Section.hxx>
+
+#include "Geom/OCCHelper.h"
 /*----------------------------------------------------------------------------*/
 // protection pour les appels OCC et pour la création des points
 static TkUtil::Mutex					entityFactoryMutex;
@@ -1424,8 +1426,11 @@ getPoints(CoEdgeMeshingProperty *prop, std::vector<Utils::Math::Point> &points, 
                 else
                 {
                     // TODO [EB]: il faut calculer la longueur de l'arête projetée sur la courbe
+                    double l = Geom::OCCHelper::curvilinearDistance(curve->getOCCEdges(), getVertices()[0]->getCoord(), getVertices()[1]->getCoord());
+                    prop->initCoeff(l);
+                    std::cout << "len: " << l << std::endl;
 
-
+                    /*
                     // regarde si l'on est dans le cas de l'arête projetée sur l'intégralité de la courbe
                     auto crv_vertices = curve->getVertices();
                     auto vertices2 = getVertices();
@@ -1458,6 +1463,7 @@ getPoints(CoEdgeMeshingProperty *prop, std::vector<Utils::Math::Point> &points, 
                         double dist = vertices2[0]->getCoord().length(vertices2[1]->getCoord());
                         prop->initCoeff(dist);
                     }
+                    */
                 } // end else / if (curveToBeDeleted)
             }
             catch (TkUtil::Exception &exc)
