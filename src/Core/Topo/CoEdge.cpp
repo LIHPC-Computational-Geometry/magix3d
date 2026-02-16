@@ -1034,10 +1034,9 @@ void CoEdge::getPoints(std::vector<Utils::Math::Point> &points) const
     if (isMeshed())
     {
         gmds::Mesh &gmds_mesh = getContext().getMeshManager().getMesh()->getGMDSMesh();
-
-        for (std::vector<gmds::TCellID>::iterator iter = m_mesh_data->nodes().begin();
-             iter != m_mesh_data->nodes().end(); ++iter) {
-            const gmds::Node &nd = gmds_mesh.get<gmds::Node>(*iter);
+        for (const auto nId:m_mesh_data->nodes())
+        {
+            const gmds::Node &nd = gmds_mesh.get<gmds::Node>(nId);
             points.push_back(Utils::Math::Point(nd.X(), nd.Y(), nd.Z()));
         }
     }
@@ -1045,8 +1044,8 @@ void CoEdge::getPoints(std::vector<Utils::Math::Point> &points) const
     {
         std::vector<Utils::Math::Point> &ref_points = m_mesh_data->points();
         if (ref_points.begin() != points.begin())
-            for (uint i = 0; i < ref_points.size(); i++)
-                points.push_back(ref_points[i]);
+            for (const auto &point : ref_points)
+                points.push_back(point);
     }
     else
     {
