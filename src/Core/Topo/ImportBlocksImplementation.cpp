@@ -42,9 +42,9 @@ void ImportBlocksImplementation::internalExecute() {
     std::string suffix = m_filename;
     int suffix_start = m_filename.find_last_of('.');
     suffix.erase(0, suffix_start + 1);
-    if (suffix != "blk")
+    if (suffix != "mgx")
         throw TkUtil::Exception(
-                TkUtil::UTF8String("Mauvaise extension de fichier (.blk)", TkUtil::Charset::UTF_8));
+                TkUtil::UTF8String("Mauvaise extension de fichier (.mgxt)", TkUtil::Charset::UTF_8));
 
     std::ifstream s(m_filename.c_str(), std::ios::in);
     if (!s) {

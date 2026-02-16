@@ -26,9 +26,9 @@ internalExecute()
         ext = m_filename.substr(i+1, m_filename.length() - i);
     }
 
-    if(ext != "blk"){
+    if(ext != "mgx"){
         TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-        message<<"Erreur dans l'extension du fichier, merci d'utiliser \".blk\"";
+        message<<"Erreur dans l'extension du fichier, merci d'utiliser \".mgxt\"";
         throw TkUtil::Exception (message);
 
     }
