@@ -40,8 +40,8 @@ def test_export_no_assoc():
     ctx.getTopoManager().newSphereWithTopo (Mgx3D.Point(0, 0, 0), 1, Mgx3D.Portion.DEMI, True, .5, 10, 10)
     mgxt_filename = os.path.join(test_folder, "data/half_sphere_export.mgxt")
     tm.exportBlocks(mgxt_filename, False)
-    assert os.path.exists(blk_filename)
-    assert os.path.getsize(blk_filename) > 0
+    assert os.path.exists(mgxt_filename)
+    assert os.path.getsize(mgxt_filename) > 0
 
     ctx.clearSession()
     tm.importBlocks(mgxt_filename, False)
