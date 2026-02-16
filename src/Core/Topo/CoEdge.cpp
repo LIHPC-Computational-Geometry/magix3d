@@ -1007,62 +1007,53 @@ bool CoEdge::isPreMeshed() const
 	return m_mesh_data->isPreMeshed() && pointsUpToDate;
 }
 /*----------------------------------------------------------------------------*/
-//#define _DEBUG_GETPOINTS
 void CoEdge::getPoints(std::vector<Utils::Math::Point> &points) const
 {
-#ifdef _DEBUG_GETPOINTS
-	std::cout<<"getPoints pour "<<getName()<<(isPreMeshed()?" est prémaillée":" non prémaillée")<<std::endl;
-#endif
+    // protection pour éviter les appels concurrents pouvant modifier le preMesh
+    TkUtil::AutoMutex autoMutex(&preMeshMutex);
 
-//	// pour éviter l'appel concurrent à la création des points (cas de l'interpolation qui déclanche cette création pour d'autres arêtes)
-//	TkUtil::AutoMutex	autoMutex (&entityFactoryMutex);
+    // s'il existe des noeuds ou des points, est-ce que la date de création est compatible ?
+    bool pointsUpToDate = (m_mesh_property->getModificationTime() < m_mesh_data->getPointsTime());
 
-	// protection pour éviter les appels concurrents pouvant modifier le preMesh
-	TkUtil::AutoMutex autoMutex (&preMeshMutex);
+    if (isMeshed() && !pointsUpToDate)
+    {
+        TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+        message << "Erreur interne, L'arête " << getName() << " a été modifiée après qu'elle soit maillée";
+        throw TkUtil::Exception(message);
+    }
 
-	// s'il existe des noeuds ou des points, est-ce que la date de création est compatible ?
-	bool pointsUpToDate = (m_mesh_property->getModificationTime() < m_mesh_data->getPointsTime());
+    if (!isPreMeshed())
+    {
+        m_mesh_data->points().clear();
+        getPoints(m_mesh_property, m_mesh_data->points(), true);
+        getMeshingData()->setPreMeshed(true);
 
-	if (isMeshed() && !pointsUpToDate){
-		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-		message<<"Erreur interne, L'arête "<<getName()<<" a été modifiée après qu'elle soit maillée";
-		throw TkUtil::Exception (message);
-	}
+        getMeshingData()->updatePointsTime();
+    }
 
-	if (!isPreMeshed()){
-		m_mesh_data->points().clear();
-		getPoints(m_mesh_property, m_mesh_data->points(), true);
-		getMeshingData()->setPreMeshed(true);
-#ifdef _DEBUG_GETPOINTS
-		std::cout<<getName()<<" => est prémaillée"<<(pointsUpToDate?"":" (actualisation)")<<std::endl;
-#endif
+    if (isMeshed())
+    {
+        gmds::Mesh &gmds_mesh = getContext().getMeshManager().getMesh()->getGMDSMesh();
 
-		getMeshingData()->updatePointsTime();
-	}
-
-	if (isMeshed()){
-
-	    gmds::Mesh& gmds_mesh = getContext().getMeshManager().getMesh()->getGMDSMesh();
-
-		for (std::vector<gmds::TCellID>::iterator iter = m_mesh_data->nodes().begin();
-		    			iter != m_mesh_data->nodes().end(); ++iter){
-			const gmds::Node& nd = gmds_mesh.get<gmds::Node>(*iter);
-			points.push_back(Utils::Math::Point(nd.X(), nd.Y(), nd.Z()));
-		}
-	}
-	else if (isPreMeshed()){
-
-		std::vector<Utils::Math::Point>& ref_points = m_mesh_data->points();
-		if (ref_points.begin() != points.begin())
-			for (uint i=0; i<ref_points.size(); i++)
-				points.push_back(ref_points[i]);
-
-	}
-	else {
-		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
-		message<<"Erreur interne, L'arête "<<getName()<<" n'a toujours pas de points !!!";
-		throw TkUtil::Exception (message);
-	}
+        for (std::vector<gmds::TCellID>::iterator iter = m_mesh_data->nodes().begin();
+             iter != m_mesh_data->nodes().end(); ++iter) {
+            const gmds::Node &nd = gmds_mesh.get<gmds::Node>(*iter);
+            points.push_back(Utils::Math::Point(nd.X(), nd.Y(), nd.Z()));
+        }
+    }
+    else if (isPreMeshed())
+    {
+        std::vector<Utils::Math::Point> &ref_points = m_mesh_data->points();
+        if (ref_points.begin() != points.begin())
+            for (uint i = 0; i < ref_points.size(); i++)
+                points.push_back(ref_points[i]);
+    }
+    else
+    {
+        TkUtil::UTF8String message(TkUtil::Charset::UTF_8);
+        message << "Erreur interne, L'arête " << getName() << " n'a toujours pas de points !!!";
+        throw TkUtil::Exception(message);
+    }
 }
 /*----------------------------------------------------------------------------*/
 void CoEdge::clearPoints()
