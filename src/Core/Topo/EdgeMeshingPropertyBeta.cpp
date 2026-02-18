@@ -141,10 +141,18 @@ getScriptCommand() const
 {
     TkUtil::UTF8String o (TkUtil::Charset::UTF_8);
     o << getMgx3DAlias() << ".EdgeMeshingPropertyBeta("
-      << (long)m_nb_edges <<","
+      << static_cast<long>(m_nb_edges) << ","
       << Utils::Math::MgxNumeric::userRepresentation(m_beta);
-    if (!getDirect())
-    	o << ", False";
+    if (m_initWithArm1)
+    {
+        o << (getDirect() ? std::string(", True") : std::string(", False"));
+        o << ", True"; // this is for m_initWithArm1
+        o << ", " << Utils::Math::MgxNumeric::userRepresentation(m_arm1);
+    }
+    else if (!getDirect())
+    {
+        o << ", False";
+    }
     o << ")";
     return o;
 }
