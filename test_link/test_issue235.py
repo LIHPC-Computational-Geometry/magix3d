@@ -25,7 +25,7 @@ def test_issue235():
 
     # Annulation de : Création de l'arc d'ellipse Crb0000
     ctx.undo()
-    # Création de l'arc d'ellipse Crb0000
+    # Création de l'arc d'ellipse Crb0000 (autre sens)
     gm.newArcEllipse("Pt0000", "Pt0001", "Pt0002", True)
 
     # On vérifie que l'arc d'ellipse passe par Pt0002
