@@ -12,4 +12,5 @@ jobs:
     uses: LIHPC-Computational-Geometry/spack_recipes/.github/workflows/spack-reusable.yml@main
     secrets: inherit
     with:
-      coverage: ${{ github.event_name == 'pull_request' }}
+      # coverage on pull-request and when merging on main branch
+      coverage: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main') }}
