@@ -324,7 +324,7 @@ Math::Point QtMgx3DPointPanel::getPoint ( ) const
 		point = Math::Point(Math::Cylindrical(x, y, z));
 	}
 	else
-		throw Exception ("Erreur interne, coordinateType de getPoint en dehors des clous");
+		throw Exception ("Erreur interne, coordinateType de getPoint ne peut etre que cartesian, spherical ou cylindrical");
 		
 	CoordinateSystem::SysCoord* rep = getSysCoord();
 
