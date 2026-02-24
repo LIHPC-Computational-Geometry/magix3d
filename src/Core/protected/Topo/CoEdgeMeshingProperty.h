@@ -56,6 +56,8 @@ public:
         tabulated,
         /// decoupage d'une arete en N segments selon une loi beta de resserrement
         beta_resserrement,
+        /// decoupage d'une arete en N segments selon une loi exponentielle
+        exponential,
     } meshLaw;
 
     /** Côté de départ pour les discrétisations orientés avec orthogonalité
