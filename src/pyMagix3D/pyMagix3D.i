@@ -47,6 +47,7 @@ using std::ptrdiff_t;
 #include "Topo/EdgeMeshingPropertyTabulated.h"
 #include "Topo/EdgeMeshingPropertyBeta.h"
 #include "Topo/EdgeMeshingPropertyExponential.h"
+#include "Topo/EdgeMeshingPropertyDoubleExponential.h"
 #include "Topo/FaceMeshingPropertyTransfinite.h"
 #include "Topo/FaceMeshingPropertyDelaunayGMSH.h"
 #include "Topo/FaceMeshingPropertyQuadPairing.h"
@@ -323,6 +324,7 @@ using std::ptrdiff_t;
 %include Topo/EdgeMeshingPropertyTabulated.h
 %include Topo/EdgeMeshingPropertyBeta.h
 %include Topo/EdgeMeshingPropertyExponential.h
+%include Topo/EdgeMeshingPropertyDoubleExponential.h
 %include Topo/CoFaceMeshingProperty.h
 %include Topo/FaceMeshingPropertyTransfinite.h
 %include Topo/FaceMeshingPropertyDelaunayGMSH.h

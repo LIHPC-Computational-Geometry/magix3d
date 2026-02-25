@@ -58,6 +58,8 @@ public:
         beta_resserrement,
         /// decoupage d'une arete en N segments selon une loi exponentielle
         exponential,
+        /// decoupage d'une arete en N segments selon une loi double exponentielle
+        double_exponential
     } meshLaw;
 
     /** Côté de départ pour les discrétisations orientés avec orthogonalité
