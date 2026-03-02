@@ -332,10 +332,11 @@ computeDelta(CoFace* coface, uint cote)
             //std::cout<<"nb_opp += "<<ce->getNbMeshingEdges()<<" + "<<m_coedge_delta[ce]<<std::endl;
         }
 
+		int delta = (nb_init - nb_opp < 0 ? 0 : nb_init - nb_opp);
 #ifdef _DEBUG_SETNBMESHINGEDGES
-        std::cout<<"  computeDelta pour coface "<<coface->getName()<<" => "<<nb_init - nb_opp<<std::endl;
+        std::cout<<"  computeDelta pour coface "<<coface->getName()<<" => "<<delta<<std::endl;
 #endif
-        return (nb_init - nb_opp);
+        return delta;
     }
 }
 /*----------------------------------------------------------------------------*/
