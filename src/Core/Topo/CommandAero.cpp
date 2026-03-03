@@ -32,7 +32,6 @@ void CommandAero::internalExecute() {
     pipeline->execute();
     gmds::Blocking3D *blocking = pipeline->getBlocking();
 
-    std::cout<<"nb nodes "<<blocking->getNbNodes()<<std::endl;
     for (auto n : blocking->nodes()) {
         gmds::Node node = blocking->get<gmds::Node>(n);
 
@@ -46,7 +45,6 @@ void CommandAero::internalExecute() {
             m_group_helper.addToGroup("Aero_0D", vtx);
         }
     }
-    std::cout<<"nb edges "<<blocking->getNbEdges()<<std::endl;
     for (auto e : blocking->edges()) {
         gmds::Edge edge = blocking->get<gmds::Edge>(e);
 
@@ -61,7 +59,6 @@ void CommandAero::internalExecute() {
         getInfoCommand().addTopoInfoEntity(coedge, Internal::InfoCommand::CREATED);
         m_group_helper.addToGroup("Aero_1D", coedge);
     }
-    std::cout<<"nb faces "<<blocking->getNbFaces()<<std::endl;
     for (auto f : blocking->faces()) {
         gmds::Face face = blocking->get<gmds::Face>(f);
 
@@ -90,7 +87,6 @@ void CommandAero::internalExecute() {
         m_group_helper.addToGroup("Aero_2D", coface);
         m_gmdsFace2TopoFace[f] = coface;
     }
-    std::cout<<"nb blocks "<<blocking->getNbRegions()<<std::endl;
     for (auto r : blocking->regions()) {
         gmds::Region region = blocking->get<gmds::Region>(r);
         std::vector<gmds::TCellID> gnodesID = region.getIDs<gmds::Node>();
