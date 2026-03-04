@@ -121,6 +121,39 @@ public:
     newTopoEntity(std::vector<Topo::Vertex*>& ve, int dim, std::string groupName);
 #endif
 
+    /*------------------------------------------------------------------------*/
+    /**  \brief Création d'un block à partir de ses faces et de ses sommets
+    *
+    *  \param groupName le nom du groupe dans lequel sera mis le bloc
+    *  \param faces la liste des noms de faces constituant le bloc
+    *  \param vertices la liste des noms de sommets constituant le bloc
+    */
+
+    Mgx3D::Internal::M3DCommandResult*
+         newBlock(const std::vector<std::string>& faces, const std::vector<std::string>& vertices, bool isStructured, std::string groupName);
+     SET_SWIG_COMPLETABLE_METHOD(newBlock)
+
+#ifndef SWIG
+    Mgx3D::Internal::M3DCommandResult*
+        newBlock(const std::vector<Topo::Face* > &faces, const std::vector<Topo::Vertex* > &vertices, bool isStructured, std::string groupName);
+#endif
+
+    /*------------------------------------------------------------------------*/
+    /**  \brief Création d'une face à partir de ses cofaces et de ses sommets
+    *
+    *  \param groupName le nom du groupe dans lequel sera mise la face
+    *  \param cofaces la liste des noms de cofaces constituant la face
+    *  \param vertices la liste des noms de sommets constituant le bloc
+    */
+
+    Mgx3D::Internal::M3DCommandResult*
+         newFace(const std::vector<std::string>& cofaces, const std::vector<std::string>& vertices, bool isStructured);
+     SET_SWIG_COMPLETABLE_METHOD(newFace)
+
+#ifndef SWIG
+    Mgx3D::Internal::M3DCommandResult*
+        newFace(const std::vector<Topo::CoFace* > &cofaces, const std::vector<Topo::Vertex* > &vertices, bool isStructured);
+#endif
 	/*------------------------------------------------------------------------*/
     /** \brief Création d'une topologie s'appuyant sur une géométrie
      *
@@ -189,13 +222,14 @@ public:
      	 newFreeTopoOnGeometry(Geom::GeomEntity* ge);
 #endif
 
+     /*------------------------------------------------------------------------*/
      /** \brief Création d'un block topologique structuré sans association
-        *
-        *  L'entité topologique est mise dans un groupe
-        *
-       *  \param ng le nom du groupe dans lequel sera mis le bloc ou la face
-       *  \param dim la dimension (2 ou 3) de ce que l'on veut créer
-       */
+      *
+      *  L'entité topologique est mise dans un groupe
+      *
+      *  \param ng le nom du groupe dans lequel sera mis le bloc ou la face
+      *  \param dim la dimension (2 ou 3) de ce que l'on veut créer
+      */
       Mgx3D::Internal::M3DCommandResult*
           newFreeTopoInGroup(std::string ng,  int dim);
       SET_SWIG_COMPLETABLE_METHOD(newFreeTopoInGroup)
