@@ -11,9 +11,9 @@
 #include "Topo/CoFace.h"
 #include "Topo/CoEdge.h"
 #include "Topo/Edge.h"
-
-#include "Utils/Common.h"
 #include "Topo/TopoHelper.h"
+#include "Internal/Context.h"
+#include "Utils/Common.h"
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/TraceLog.h>
 #include <TkUtil/UTF8String.h>
@@ -362,12 +362,19 @@ applyDeltas()
         if (delta != 0){
             CoEdgeMeshingProperty* mp = coedge->getMeshingProperty();
             CoEdgeMeshingProperty* new_mp = mp->clone();
+			int new_nb_edges = new_mp->getNbEdges()+delta;
+			if (new_nb_edges < 0) {
+				TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+				message << "New computed number of edges < 0 for " <<coedge->getName()<<" => set to 0";
+				coedge->getContext().getLogStream()->log (TkUtil::TraceLog (message, TkUtil::Log::WARNING));
+				new_nb_edges = 0;
+			}
 
 #ifdef _DEBUG_SETNBMESHINGEDGES
-            std::cout<<"setNbEdges("<<new_mp->getNbEdges()<<" -> "<<new_mp->getNbEdges()+delta<<") pour "<<coedge->getName()<<std::endl;
+            std::cout<<"setNbEdges("<<new_mp->getNbEdges()<<" -> "<<new_nb_edges<<") pour "<<coedge->getName()<<std::endl;
 #endif
 
-            new_mp->setNbEdges(new_mp->getNbEdges()+delta);
+            new_mp->setNbEdges(new_nb_edges);
 
             coedge->switchCoEdgeMeshingProperty(m_icmd, new_mp);
             delete new_mp;
