@@ -3312,19 +3312,21 @@ common2DOnCopy(Geom::GeomEntity* entity1, Geom::GeomEntity* entity2, std::string
 	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
-Internal::M3DCommandResult* GeomManager::importBREP(std::string n, const bool testVolumicProperties)
+Internal::M3DCommandResult* GeomManager::importBREP(std::string n, const bool testVolumicProperties, const bool createGroups)
 {
     TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
     message << "GeomManager::importBREP ("<<n<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
     //creation de la commande de création
-    CommandImportBREP *command = new CommandImportBREP(getContext(), n, testVolumicProperties);
+    CommandImportBREP *command = new CommandImportBREP(getContext(), n, testVolumicProperties, createGroups);
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().importBREP(\""<<n<<"\"";
     if (!testVolumicProperties)
         cmd << (testVolumicProperties?", True":", False");
+    if (!createGroups)
+        cmd << (createGroups?", True":", False");
     cmd << ")";
     command->setScriptCommand(cmd);
 

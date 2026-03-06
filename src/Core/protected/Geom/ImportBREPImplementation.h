@@ -28,7 +28,7 @@ public:
      *  \param n le nom du fichier à importer
      */
     ImportBREPImplementation(Internal::Context& c, Internal::InfoCommand* icmd,
-    		const std::string& n);
+            const std::string& n, const bool createGroups = true);
 
     /*------------------------------------------------------------------------*/
     /** \brief   Destructeur

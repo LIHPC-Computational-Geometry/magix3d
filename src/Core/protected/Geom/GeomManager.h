@@ -998,7 +998,7 @@ public:
      *  \param testVolumicProperties test que les volumes sont fermés
      */
     Mgx3D::Internal::M3DCommandResult* importBREP(std::string n,
-        const bool testVolumicProperties=true);
+        const bool testVolumicProperties=true, const bool createGroups=true);
     SET_SWIG_COMPLETABLE_METHOD(importBREP)
 
     /*------------------------------------------------------------------------*/

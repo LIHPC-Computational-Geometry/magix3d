@@ -36,12 +36,13 @@ public:
      *
      *  \param c le contexte
      *  \param n le nom du fichier à importer
-     *  \param onlySolidsAndFaces indique que l'on n'importe pas les sommets et
-     *                            courbes libres.
+     *  \param onlySolidsAndFaces indique que l'on n'importe pas les sommets et courbes libres.
+     *  \param createGroups indique s'il faut créer des groupes pour les entités importées
      */
     GeomImport(Internal::Context& c, Internal::InfoCommand* icmd,
             const std::string& n,
-            const bool onlySolidAndFaces = false);
+            const bool onlySolidAndFaces = false,
+            const bool createGroups = true);
     /*------------------------------------------------------------------------*/
     /** \brief   Destructeur
      */
@@ -119,6 +120,9 @@ protected:
 
     /// flag suivant qu'il est nécessaire ou non de tester que les volumes sont fermés
     bool m_testVolumicProperties;
+
+    /// flag suivant qu'il faut ou non créer des groupes pour les entités importées
+    bool m_createGroups;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

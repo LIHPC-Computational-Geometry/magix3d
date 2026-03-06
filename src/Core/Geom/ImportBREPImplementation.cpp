@@ -13,8 +13,8 @@ namespace Geom {
 /*----------------------------------------------------------------------------*/
 ImportBREPImplementation::
 ImportBREPImplementation(Internal::Context& c, Internal::InfoCommand* icmd,
-		const std::string& n)
-: GeomImport(c,icmd,n)
+		const std::string& n, const bool createGroups)
+: GeomImport(c,icmd,n, false, createGroups)
 {
 }
 /*----------------------------------------------------------------------------*/

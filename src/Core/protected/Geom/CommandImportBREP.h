@@ -28,8 +28,11 @@ public:
      *  \param c le contexte
      *  \param n le nom du fichier à importer
      *  \param testVolumicProperties s'il est nécessaire que les volumes sont fermés
+     *  \param createGroups indique s'il faut créer des groupes pour les entités importées
      */
-    CommandImportBREP(Internal::Context& c, const std::string& n, const bool testVolumicProperties);
+    CommandImportBREP(Internal::Context& c, const std::string& n,
+        const bool testVolumicProperties,
+        const bool createGroups = true);
 
     /*------------------------------------------------------------------------*/
     /** \brief  Destructeur
