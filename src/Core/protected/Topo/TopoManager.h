@@ -122,11 +122,27 @@ public:
 #endif
 
     /*------------------------------------------------------------------------*/
+    /** \brief Création d'une CoFace à partir de edges existants
+     *
+     *  \param edges le nom des edges topologiques qui permettent de créer la CoFace
+     *  \param isStructured indique si la CoFace doit être structurée ou non
+     */
+    Mgx3D::Internal::M3DCommandResult*
+    newCoFace(const std::vector<std::string>& edges, bool isStructured);
+    SET_SWIG_COMPLETABLE_METHOD(newCoFace)
+
+#ifndef SWIG
+    Mgx3D::Internal::M3DCommandResult*
+    newCoFace(const std::vector<Topo::Edge*>& edges, bool isStructured);
+#endif
+
+    /*------------------------------------------------------------------------*/
     /**  \brief Création d'un block à partir de ses faces et de ses sommets
     *
     *  \param groupName le nom du groupe dans lequel sera mis le bloc
     *  \param faces la liste des noms de faces constituant le bloc
     *  \param vertices la liste des noms de sommets constituant le bloc
+    *  \param isStructured indique si le bloc doit être structuré ou non
     */
 
     Mgx3D::Internal::M3DCommandResult*
@@ -141,9 +157,9 @@ public:
     /*------------------------------------------------------------------------*/
     /**  \brief Création d'une face à partir de ses cofaces et de ses sommets
     *
-    *  \param groupName le nom du groupe dans lequel sera mise la face
     *  \param cofaces la liste des noms de cofaces constituant la face
     *  \param vertices la liste des noms de sommets constituant le bloc
+    *  \param isStructured indique si la face doit être structurée ou non
     */
 
     Mgx3D::Internal::M3DCommandResult*
@@ -153,6 +169,21 @@ public:
 #ifndef SWIG
     Mgx3D::Internal::M3DCommandResult*
         newFace(const std::vector<Topo::CoFace* > &cofaces, const std::vector<Topo::Vertex* > &vertices, bool isStructured);
+#endif
+    /*------------------------------------------------------------------------*/
+    /**  \brief Création d'une edge àpartir de ses coedges et de ses sommets
+    *
+    *  \param coedges la liste des noms de coedges constituant l'edge
+    *  \param vertices la liste des noms de sommets constituant l'edge
+    */
+
+    Mgx3D::Internal::M3DCommandResult*
+         newEdge(const std::string v1, const std::string v2, const std::vector<std::string>& coedges);
+     SET_SWIG_COMPLETABLE_METHOD(newEdge)
+
+#ifndef SWIG
+    Mgx3D::Internal::M3DCommandResult*
+        newEdge(Topo::Vertex* v1, Topo::Vertex* v2, const std::vector<Topo::CoEdge* > &coedges);
 #endif
 	/*------------------------------------------------------------------------*/
     /** \brief Création d'une topologie s'appuyant sur une géométrie

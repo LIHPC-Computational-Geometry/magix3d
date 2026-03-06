@@ -489,23 +489,23 @@ std::string TopoManager::getBlockAt(std::vector<Point>& pts) const
 	}
 }
 /*----------------------------------------------------------------------------*/
-    Mgx3D::Internal::M3DCommandResult*
-    TopoManager::newTopoVertex(Utils::Math::Point pt, std::string groupName)
-    {
-        Topo::CommandNewTopo* command = new Topo::CommandNewTopo(getContext(), pt, groupName);
+Mgx3D::Internal::M3DCommandResult*
+TopoManager::newTopoVertex(Utils::Math::Point pt, std::string groupName)
+{
+    Topo::CommandNewTopo* command = new Topo::CommandNewTopo(getContext(), pt, groupName);
 
-        TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
-        cmd << getContextAlias() << "." << "getTopoManager().newTopoVertex (";
-        cmd<<pt.getScriptCommand()<<",\""<<groupName<<"\")";
-        command->setScriptCommand(cmd);
+    TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
+    cmd << getContextAlias() << "." << "getTopoManager().newTopoVertex (";
+    cmd<<pt.getScriptCommand()<<",\""<<groupName<<"\")";
+    command->setScriptCommand(cmd);
 
-        getCommandManager().addCommand(command, Utils::Command::DO);
+    getCommandManager().addCommand(command, Utils::Command::DO);
 
-        Internal::M3DCommandResult*  cmdResult   =
-                new Internal::M3DCommandResult (*command);
+    Internal::M3DCommandResult*  cmdResult   =
+            new Internal::M3DCommandResult (*command);
 
-        return cmdResult;
-    }
+    return cmdResult;
+}
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResult*
 TopoManager::newTopoEntity(std::vector<std::string>& ve, int dim, std::string groupName)
@@ -529,7 +529,7 @@ TopoManager::newTopoEntity(std::vector<Topo::Vertex*>& vertices, int dim, std::s
                                                              CommandNewTopo::STRUCTURED_BLOCK, dim, groupName);
 
     TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
-cmd << getContextAlias() << "." << "getTopoManager().newTopoEntity ([";
+    cmd << getContextAlias() << "." << "getTopoManager().newTopoEntity ([";
     for(unsigned int i=0;i<vertices.size();i++){
         if(i!=0)
             cmd << ", ";
@@ -538,6 +538,45 @@ cmd << getContextAlias() << "." << "getTopoManager().newTopoEntity ([";
     cmd << "], ";
     cmd << (short)dim <<", ";
     cmd<<"\""<<groupName<<"\")";
+    command->setScriptCommand(cmd);
+
+    getCommandManager().addCommand(command, Utils::Command::DO);
+
+    Internal::M3DCommandResult*  cmdResult   =
+            new Internal::M3DCommandResult (*command);
+
+    return cmdResult;
+}
+/*----------------------------------------------------------------------------*/
+Mgx3D::Internal::M3DCommandResult*
+TopoManager::newCoFace(const std::vector<std::string>& edges, bool isStructured)
+{
+    std::vector<Topo::Edge*> e;
+    for(auto v_name : edges){
+        e.push_back(getEdge(v_name));
+    }
+
+    return newCoFace(e, isStructured);
+}
+/*----------------------------------------------------------------------------*/
+Mgx3D::Internal::M3DCommandResult*
+TopoManager::newCoFace(const std::vector<Topo::Edge*>& edges, bool isStructured)
+{
+    TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+    message <<"TopoManager::newTopoEntity("<<")";
+    log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
+
+    Topo::CommandNewTopo* command = new Topo::CommandNewTopo(getContext(), edges, isStructured);
+
+    TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
+    cmd << getContextAlias() << "." << "getTopoManager().newTopoEntity ([";
+    for(unsigned int i=0;i<edges.size();i++){
+        if(i!=0)
+            cmd << ", ";
+        cmd << "\""<< edges[i]->getName()<<"\"";
+    }
+    cmd << "]";
+    cmd << (short)isStructured <<")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
@@ -639,6 +678,50 @@ cmd << getContextAlias() << "." << "getTopoManager().newFace ([";
     }
     cmd << "], ";
     cmd << (short)isStructured <<"\")";
+    command->setScriptCommand(cmd);
+
+    getCommandManager().addCommand(command, Utils::Command::DO);
+
+    Internal::M3DCommandResult*  cmdResult   =
+            new Internal::M3DCommandResult (*command);
+
+    return cmdResult;
+}
+/*----------------------------------------------------------------------------*/
+Mgx3D::Internal::M3DCommandResult*
+TopoManager::newEdge(const std::string v1, const std::string v2, const std::vector<std::string>& coedges)
+{
+
+    std::vector<Topo::CoEdge*> e;
+    for(auto e_name : coedges){
+        e.push_back(getCoEdge(e_name));
+    }
+
+    Topo::Vertex* vertex1 = getVertex(v1);
+    Topo::Vertex* vertex2 = getVertex(v2);
+
+    return newEdge(vertex1, vertex2, e);
+}
+/*----------------------------------------------------------------------------*/
+Mgx3D::Internal::M3DCommandResult*
+TopoManager::newEdge(Topo::Vertex* v1, Topo::Vertex* v2, const std::vector<Topo::CoEdge* > &coedges)
+{
+    TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+    message <<"TopoManager::newEdge("<<")";
+    log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
+
+    const std::vector<Topo::Vertex* > &vertices = {v1, v2};
+
+    Topo::CommandNewTopo* command = new Topo::CommandNewTopo(getContext(), coedges, vertices);
+    TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
+    cmd << getContextAlias() << "." << "getTopoManager().newEdge (\""<<v1->getName()<<"\", \""<<v2->getName()<<"\", [";
+    for(unsigned int i=0;i<coedges.size();i++){
+        if(i!=0)
+            cmd << ", ";
+        cmd << "\""<< coedges[i]->getName()<<"\"";
+    }
+
+    cmd << "]";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);
