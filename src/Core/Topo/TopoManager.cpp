@@ -92,6 +92,7 @@
 #include "Geom/OCCHelper.h"
 #include "Mesh/CommandAddRemoveGroupName.h"
 #include "SysCoord/SysCoord.h"
+#include "Topo/CommandAero.h"
 #ifdef USE_MDLPARSER
 #include "Internal/CommandChangeLengthUnit.h"
 #include "Topo/CommandImportBlocks.h"
@@ -5066,6 +5067,25 @@ std::vector<TopoEntity*> TopoManager::getEntitiesFromNames(const std::vector<std
     }
 
     return entities;
+}
+/*----------------------------------------------------------------------------*/
+Internal::M3DCommandResult* TopoManager::computeAero(std::string filename) {
+    //creation de la commande d'exportation
+    CommandAero *command = new CommandAero(getContext(), filename);
+
+    // trace dans le script
+    TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
+    cmd << getContextAlias() << "." << "getTopoManager().importBlocks(";
+    cmd <<"\""<<filename<<"\") ";
+    command->setScriptCommand(cmd);
+
+    // on passe au gestionnaire de commandes qui exécute la commande en // ou non
+    // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
+    getCommandManager().addCommand(command, Utils::Command::DO);
+
+    Internal::M3DCommandResult*  cmdResult   =
+            new Internal::M3DCommandResult (*command);
+    return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo
