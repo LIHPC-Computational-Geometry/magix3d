@@ -18,7 +18,8 @@ def generer_script(ctx):
     script += "ctx = Mgx3D.getStdContext()\n"
     script += "ctx.clearSession()\n"
     script += "gm = ctx.getGeomManager()\n"
-    script += "tm = ctx.getTopoManager()\n"    
+    script += "tm = ctx.getTopoManager()\n"
+    script += "gpm = ctx.getGroupManager()\n"
     script += "\n"
 
     script += f"# Anciens points ({len(gm.getVertices())} points) : \n"
@@ -56,8 +57,8 @@ def generer_script(ctx):
     for volume in gm.getVolumes():
         surfaces = gm.getInfos(volume, 3).surfaces()
         groups = gm.getInfos(volume, 3).groups()
-        if 'Hors_Groupe_3D' in groups:
-            groups.remove('Hors_Groupe_3D')
+        #if 'Hors_Groupe_3D' in groups:
+        #    groups.remove('Hors_Groupe_3D')
         script += f"volumes['{volume}'] = ({surfaces}, {groups})\n"
     script += "\n" 
 
@@ -72,7 +73,7 @@ def generer_script(ctx):
     script += "# Changement d'unité de longueur\n"
     script += "ctx.setLengthUnit(Mgx3D.Unit.centimeter)\n"
     script += "# Import BREP\n"
-    script += f"gm.importBREP(\"{brep_file_name}\")\n\n"
+    script += f"gm.importBREP(\"{brep_file_name}\", True, False)\n\n"
     
     script += "points_mapping = defaultdict(list)\n"
     script += "for old_point, (old_coord, old_groups) in points.items():\n"
@@ -174,7 +175,7 @@ def generer_script(ctx):
     script += "\n"
 
     script += "# Création des arêtes\n"
-    script += "edges_mapping = {}\n"
+    script += "coedges_mapping = {}\n"
     for edge in tm.getCoEdges():
         script += f'# Création de l\'arête {edge}\n'
         start_vertex = tm.getInfos(edge, 1).vertices()[0]
@@ -191,17 +192,28 @@ def generer_script(ctx):
         if geom_entity:
             script += f"# L'arête {edge} est associée à l'entité géométrique {geom_entity}\n"
             script += f"tm.setGeomAssociation([e], find_in_dicts('{geom_entity}'), False)\n"
-        script += f'edges_mapping["{edge}"] = e\n'
+        script += f'coedges_mapping["{edge}"] = e\n'
     script += "print(\"Correspondance des arêtes:\")\n"
-    script += "print(edges_mapping, '\\n')\n\n"
+    script += "print(coedges_mapping, '\\n')\n\n"
     script += "\n"
 
     script += "# Création des cofaces\n"
     script += "cofaces_mapping = {}\n"
+    edge_id = 0
     for coface in tm.getCoFaces():
         script += f'# Création de la coface {coface}\n'
-        vertices_list = [f'vertices_mapping["{vertex}"]' for vertex in tm.getInfos(coface, 2).vertices()]
-        script += f'cmd = tm.newTopoEntity([{", ".join(vertices_list)}], 2, "")\n'
+        edges_list = tm.getInfos(coface, 2).edges()
+        script += "coface_edges = []\n"
+        for edge in edges_list:
+            v1 = tm.getInfos(edge, 1).vertices()[0]
+            v2 = tm.getInfos(edge, 1).vertices()[1]
+            coedges = []
+            for coedge in tm.getInfos(edge, 1).coedges():
+                coedges.append(f'coedges_mapping["{coedge}"]')
+            script += f"cmd = tm.newEdge(vertices_mapping['{v1}'], vertices_mapping['{v2}'], [{', '.join(coedges)}])\n"
+            script += f"coface_edges.append('Edge{edge_id:04d}')\n"
+            edge_id += 1
+        script += 'cmd = tm.newCoFace(coface_edges, True)\n'
         script += 'f = cmd.getFaces()[0]\n'
         groups = tm.getInfos(coface, 2).groups()
         if 'Hors_Groupe_2D' in groups:
@@ -226,6 +238,9 @@ def generer_script(ctx):
         for face in tm.getInfos(coface, 2).faces():
             faces.add(face)
             faces_vertices_map['-'.join(sorted(tm.getInfos(face, 2).vertices()))] = face
+    print("Tableau de faces avec leurs sommets")
+    for(v, f) in faces_vertices_map.items():
+        print(f"Face {f} has vertices {v}")
     face_id = 0
     for face in faces:
             face_cofaces = []
@@ -252,19 +267,26 @@ def generer_script(ctx):
     (6, 4, 5, 7)
     )
     for block in tm.getBlocks():
+        print(f"Block {block} has vertices {tm.getInfos(block, 3).vertices()}")
         block_vertices = tm.getInfos(block, 3).vertices()
-        for idxs in tabIndVtxByFaceOnBlock:
-            face_vertices_key = '-'.join(sorted([block_vertices[i] for i in idxs]))
-            if face_vertices_key in faces_vertices_map:
-                blocks_faces[block].append(faces_vertices_map[face_vertices_key])
-
+        if (len(block_vertices) == 8):
+            for idxs in tabIndVtxByFaceOnBlock:
+                face_vertices_key = '-'.join(sorted([block_vertices[i] for i in idxs]))
+                print("On cherche la face ayant pour sommets ", face_vertices_key, " -> ", faces_vertices_map[face_vertices_key])
+                if face_vertices_key in faces_vertices_map:
+                    blocks_faces[block].append(faces_vertices_map[face_vertices_key])
+ 
     script += "# Création des blocs\n"
     script += "blocks_mapping = {}\n"
     for block in tm.getBlocks():
-        script += f'# Création du bloc {block} ayant pour faces {blocks_faces[block]} et pour sommets {tm.getInfos(block, 3).vertices()}\n'
         block_vertices = [f'vertices_mapping["{vertex}"]' for vertex in tm.getInfos(block, 3).vertices()]
-        block_faces = [f'faces_mapping["{face}"]' for face in blocks_faces[block]]
-        script += f'cmd = ctx.getTopoManager().newBlock ([{", ".join(block_faces)}], [{", ".join(block_vertices)}], True, "")\n'
+        if blocks_faces[block]:
+            script += f'# Création du bloc {block} ayant pour faces {blocks_faces[block]} et pour sommets {tm.getInfos(block, 3).vertices()}\n'
+            block_faces = [f'faces_mapping["{face}"]' for face in blocks_faces[block]]
+            script += f'cmd = ctx.getTopoManager().newBlock ([{", ".join(block_faces)}], [{", ".join(block_vertices)}], True, "")\n'
+        else:
+            script += f'# Création du bloc {block} ayant pour sommets {tm.getInfos(block, 3).vertices()}\n'
+            script += f'cmd = ctx.getTopoManager().newTopoEntity ([{", ".join(block_vertices)}], 3, "")\n'
         script += 'b = cmd.getBlocks()[0]\n'
         geom_entity = tm.getInfos(block, 3).geom_entity
         if geom_entity:
@@ -274,28 +296,10 @@ def generer_script(ctx):
     script += "print(\"Correspondance des blocs:\")\n"
     script += "print(blocks_mapping, '\\n')\n\n"
 
-    '''
-    script += "coedges_mapping = {}\n"
-    script += "for old_coedge, (old_vertices, nb_meshing_edges) in coedges.items():\n"
-    script += "    new_vertices = []\n"
-    script += "    for vertex in old_vertices:\n"
-    script += "        if vertex in vertices_mapping:\n"
-    script += "            new_vertices.append(vertices_mapping[vertex])\n"
-    script += "        else:\n"
-    script += "            raise ValueError(f\"Le sommet {vertex} n'a pas de correspondance dans vertices_mapping.\")\n"
-    script += "    for coedge in tm.getCoEdges():\n"
-    script += "        vertices = tm.getInfos(coedge, 1).vertices()\n"
-    script += "        if set(vertices) == set(new_vertices):\n"
-    script += "            coedges_mapping[old_coedge] = coedge\n"
-    script += "            break\n"
-    script += "print(\"Correspondance des coedges:\")\n"
-    script += "print(coedges_mapping, '\\n')\n\n"
-'''
-
     script += "# Definition de la discrétisation des aretes\n"
     script += 'for old_coedge, (old_vertices, nb_meshing_edges) in coedges.items():\n'
     script += f'    emp = Mgx3D.EdgeMeshingPropertyUniform(nb_meshing_edges)\n'
-    script += f"    tm.setMeshingProperty (emp, [edges_mapping[old_coedge]])\n"
+    script += f"    tm.setMeshingProperty (emp, [coedges_mapping[old_coedge]])\n"
 
     script += "\n# Création du maillage pour tous les blocs\n"
     script += "mm = ctx.getMeshManager()\n"
