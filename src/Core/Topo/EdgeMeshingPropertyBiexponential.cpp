@@ -167,8 +167,9 @@ nextCoeff()
     }
     else
     {
-        intermediateParameter = m_coeff[m_nb_edges-m_dernierIndice];
+        intermediateParameter = 1.0-m_coeff[m_nb_edges-m_dernierIndice];
     }
+    std::cout << "coeff: " << intermediateParameter << std::endl;
     return intermediateParameter;
 }
 /*----------------------------------------------------------------------------*/
