@@ -524,22 +524,17 @@ void CommandSplitBlocksWithOgrid::saveTopoProperty(std::map<Vertex*, uint> & fil
                           std::vector<CoEdge* > coedges = edge->getCoEdges();
                           for (std::vector<CoEdge* >::iterator iter5 = coedges.begin();
                                   iter5 != coedges.end(); ++iter5){
-                              CoEdge* coedge = *iter5;
+                                CoEdge* coedge = *iter5;
 
-                              // seules les arêtes communes internes ne sont pas touchées
-                              if (filtre_coedge[coedge] != 3){
-                                  coedge->saveCoEdgeTopoProperty(&getInfoCommand());
-                                  //std::cout<<"saveCoEdgeTopoProperty pour "<<coedge->getName()<<std::endl;
+                                coedge->saveCoEdgeTopoProperty(&getInfoCommand());
 
-                                  if (!m_propagate_neighbor_block){
-                                	  // propage aux arêtes reliées
-                                	  const std::vector<Edge* >& otherEdges = coedge->getEdges();
-                                	  for (auto iter6 = otherEdges.begin(); iter6 != otherEdges.end(); ++iter6)
-                                		  (*iter6)->saveEdgeTopoProperty(&getInfoCommand());
+                                if (!m_propagate_neighbor_block){
+                                    // propage aux arêtes reliées
+                                    const std::vector<Edge* >& otherEdges = coedge->getEdges();
+                                    for (auto iter6 = otherEdges.begin(); iter6 != otherEdges.end(); ++iter6)
+                                        (*iter6)->saveEdgeTopoProperty(&getInfoCommand());
+                                }
 
-                                  }
-
-                              }
                           } // end for iter5
                       } // end for iter4
                   } // end for iter3
