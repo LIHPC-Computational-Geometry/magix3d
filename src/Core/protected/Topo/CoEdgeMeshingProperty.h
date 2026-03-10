@@ -58,6 +58,7 @@ public:
         beta_resserrement,
         /// decoupage d'une arete en N segments selon une loi exponentielle
         exponential,
+        biexponential,
         /// decoupage d'une arete en N segments selon une loi double exponentielle
         double_exponential
     } meshLaw;
