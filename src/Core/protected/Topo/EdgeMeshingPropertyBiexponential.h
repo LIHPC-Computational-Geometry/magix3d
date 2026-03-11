@@ -98,7 +98,6 @@ private:
     double m_r2;
     /// longueur du dernier bras
     double m_sp2;
-    double m_A4;
 
     /// liste des coefficients
     std::vector<double> m_coeff;

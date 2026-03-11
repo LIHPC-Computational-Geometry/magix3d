@@ -7,10 +7,7 @@ def l2_norme(n0, n1):
     return math.sqrt( pow(n1.x()-n0.x(),2) + pow(n1.y()-n0.y(),2) + pow(n1.z()-n0.z(),2) )
 
 
-# The bigeometric progression law with target mesh edge size on both sides
-# seems to work only if the two sizes are bigger than what would be the
-# uniform mesh edge size on the topological edge.
-def test_law_bigeometric_Linear(capfd):
+def test_law_biexponential_Linear(capfd):
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     mm = ctx.getMeshManager()
@@ -43,34 +40,22 @@ def test_law_bigeometric_Linear(capfd):
     # we choose a tolerance for tests on sizes
     eps = 10e-9
 
-    # test of first mesh edge size of topo edge Ar0000
-    # here, we show that the requested size is not
-    # obtained
+    # test first mesh edge size of topo edge Ar0000
     n0 = mesh_lima.noeud(0)
     n8 = mesh_lima.noeud(8)
-    assert( abs(l2_norme(n0, n8) - s1_ar0000) > eps )
-    assert( abs(l2_norme(n0, n8) - 0.35) < eps )
+    assert( abs(l2_norme(n0, n8) - s1_ar0000) < eps )
 
-    # test of last mesh edge size of topo edge Ar0000
-    # here, we show that the requested size is not
-    # obtained
+    # test last mesh edge size of topo edge Ar0000
     n1  = mesh_lima.noeud(1)
     n16 = mesh_lima.noeud(16)
-    assert( abs(l2_norme(n1, n16) - s2_ar0000) > eps )
-    assert( abs(l2_norme(n1, n16) - 0.25) < eps )
+    assert( abs(l2_norme(n1, n16) - s2_ar0000) < eps )
 
-    # test of first mesh edge size of topo edge Ar0011
-    # here, we show that the requested size is not
-    # obtained
+    # test first mesh edge size of topo edge Ar0011
     n6 = mesh_lima.noeud(6)
     n115 = mesh_lima.noeud(115)
-    assert( abs(l2_norme(n6, n115) - s1_ar0011) > eps )
-    assert( abs(l2_norme(n6, n115) - 0.35) < eps )
+    assert( abs(l2_norme(n6, n115) - s1_ar0011) < eps )
 
-    # test of last mesh edge size of topo edge Ar0011
-    # here, we show that the requested size is not
-    # obtained
+    # test last mesh edge size of topo edge Ar0011
     n2  = mesh_lima.noeud(2)
     n107 = mesh_lima.noeud(107)
-    assert( abs(l2_norme(n2, n107) - s2_ar0000) > eps )
-    assert( abs(l2_norme(n2, n107) - 0.25) < eps )
+    assert( abs(l2_norme(n2, n107) - s2_ar0011) < eps )

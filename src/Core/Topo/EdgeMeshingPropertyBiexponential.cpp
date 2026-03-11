@@ -14,14 +14,13 @@ namespace Topo {
 /*----------------------------------------------------------------------------*/
 EdgeMeshingPropertyBiexponential::
 EdgeMeshingPropertyBiexponential(int nb, double r1, double sp1, double r2, double sp2, bool isDirect)
-    : CoEdgeMeshingProperty(nb, bigeometrique, isDirect)
+    : CoEdgeMeshingProperty(nb, biexponential, isDirect)
       , m_r1(r1)
       , m_sp1(sp1)
       , m_r2(r2)
       , m_sp2(sp2)
       , m_length(0.0)
 {
-    m_A4 = 0.0;
     if (m_r1 <= 0.0)
     {
         TkUtil::UTF8String messErr(TkUtil::Charset::UTF_8);
@@ -36,7 +35,7 @@ EdgeMeshingPropertyBiexponential(int nb, double r1, double sp1, double r2, doubl
                 m_r2;
         throw TkUtil::Exception(messErr);
     }
-    if (m_sp1 < 0.0)
+    if (m_sp1 <= 0.0)
     {
         TkUtil::UTF8String messErr(TkUtil::Charset::UTF_8);
         messErr <<
@@ -44,7 +43,7 @@ EdgeMeshingPropertyBiexponential(int nb, double r1, double sp1, double r2, doubl
                 << m_sp1;
         throw TkUtil::Exception(messErr);
     }
-    if (m_sp2 < 0.0)
+    if (m_sp2 <= 0.0)
     {
         TkUtil::UTF8String messErr(TkUtil::Charset::UTF_8);
         messErr <<
@@ -52,23 +51,16 @@ EdgeMeshingPropertyBiexponential(int nb, double r1, double sp1, double r2, doubl
                 << m_sp2;
         throw TkUtil::Exception(messErr);
     }
-    if (m_sp1 == 0 && m_sp2 == 0)
-    {
-        TkUtil::UTF8String messErr(TkUtil::Charset::UTF_8);
-        messErr <<
-                "EdgeMeshingPropertyBiexponential, une seule des extrémités peut avoir une taille nulle de spécifiée";
-        throw TkUtil::Exception(messErr);
-    }
 
-    if (nb < 1)
+    if (nb < 2)
         throw TkUtil::Exception(TkUtil::UTF8String(
-            "EdgeMeshingPropertyBiexponential, le nombre de bras doit être au moins de 1",
+            "EdgeMeshingPropertyBiexponential, le nombre de bras doit être au moins de 2",
             TkUtil::Charset::UTF_8));
 }
 /*----------------------------------------------------------------------------*/
 EdgeMeshingPropertyBiexponential::
 EdgeMeshingPropertyBiexponential(const EdgeMeshingPropertyBiexponential &prop)
-    : CoEdgeMeshingProperty(prop.getNbEdges(), bigeometrique, prop.getDirect())
+    : CoEdgeMeshingProperty(prop.getNbEdges(), biexponential, prop.getDirect())
       , m_r1(prop.m_r1)
       , m_sp1(prop.m_sp1)
       , m_r2(prop.m_r2)
@@ -82,7 +74,7 @@ EdgeMeshingPropertyBiexponential(const EdgeMeshingPropertyBiexponential &prop)
 
 /*----------------------------------------------------------------------------*/
 EdgeMeshingPropertyBiexponential::EdgeMeshingPropertyBiexponential(const CoEdgeMeshingProperty &prop)
-    : CoEdgeMeshingProperty(prop.getNbEdges(), bigeometrique, prop.getDirect())
+    : CoEdgeMeshingProperty(prop.getNbEdges(), biexponential, prop.getDirect())
       , m_r1(0.)
       , m_sp1(0.)
       , m_r2(0.)
@@ -143,6 +135,9 @@ void EdgeMeshingPropertyBiexponential::initCoeff(const double length)
     {
         m_coeff.push_back(0.5 + (1.0-coeffs2[i])/2.0);
     }
+
+    // smooth the mid coeff, at the interface between the two laws
+    m_coeff[coeffs1.size()-1] = (m_coeff[coeffs1.size()-2]+m_coeff[coeffs1.size()])/2.0;
 
     m_dernierIndice = 0;
 }
