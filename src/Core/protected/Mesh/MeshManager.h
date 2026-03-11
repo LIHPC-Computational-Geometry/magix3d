@@ -277,9 +277,11 @@ public:
 #endif
 
 private:
+#ifndef SWIG
     /// retourne l'entité à partir du nom, une exception si elle n'existe pas
     template <typename T, typename = std::enable_if_t<std::is_base_of<MeshEntity, T>::value>>
     T* findByName(const std::string& name, const std::vector<T*> entities, const bool exceptionIfNotFound) const;
+#endif
 
     /// Lien sur la structure de maillage et ses algos
     MeshItf* m_mesh_itf;
