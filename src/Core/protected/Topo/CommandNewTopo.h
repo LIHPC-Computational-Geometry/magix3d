@@ -74,14 +74,17 @@ namespace Mgx3D {
             CommandNewTopo(Internal::Context& c, const std::vector<Topo::CoFace*>& cofaces,
                         const std::vector<Topo::Vertex*>& vertices, bool isStructured);
             /*------------------------------------------------------------------------*/
-            /** \brief  Constructeur pour une coface à partir d'une liste de edges
+            /** \brief  Constructeur pour une coface à partir d'une liste de edges et de vertices
              *
              *  \param c le contexte
              *  \param edges les edges topologiques
+             *  \param vertices les sommets topologiques
              *  \param isStructured indique si la topologie créée doit être structurée ou non
+             *  \param hasHole indique si la coface créée doit comporter un trou ou non
              */
             CommandNewTopo(Internal::Context& c, const std::vector<Topo::Edge*>& edges,
-                        bool isStructured);
+                std::vector<Topo::Vertex* > &vertices,
+                bool isStructured, bool hasHole);
             /*------------------------------------------------------------------------*/
             /** \brief  Constructeur pour une edge à partir d'une liste de coedges et de 2 vertices
              *
@@ -180,6 +183,7 @@ namespace Mgx3D {
             uint m_nk;
 
             bool m_isStructured;
+            bool m_hasHole;
         };
 /*----------------------------------------------------------------------------*/
     } // end namespace Topo

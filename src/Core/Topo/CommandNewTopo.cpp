@@ -42,6 +42,7 @@ namespace Mgx3D {
                 , m_coedges({})
                 , m_dim(dim)
                 , m_isStructured(topoType == STRUCTURED_BLOCK)
+                , m_hasHole()
         {
             TkUtil::UTF8String	comments (TkUtil::Charset::UTF_8);
 
@@ -87,6 +88,7 @@ namespace Mgx3D {
                 , m_cofaces({})
                 , m_edges({})
                 , m_coedges({})
+                , m_hasHole()
         {
             TkUtil::UTF8String	comments (TkUtil::Charset::UTF_8);
             comments << "Création d'un sommet géométrique par coordonnées";
@@ -114,6 +116,7 @@ namespace Mgx3D {
                 , m_edges({})
                 , m_coedges({})
                 , m_isStructured(isStructured)
+                , m_hasHole()
         {
             TkUtil::UTF8String	comments (TkUtil::Charset::UTF_8);
             if(isStructured)
@@ -141,6 +144,7 @@ namespace Mgx3D {
                 , m_edges({})
                 , m_coedges({})
                 , m_isStructured(isStructured)
+                , m_hasHole()
         {
             TkUtil::UTF8String	comments (TkUtil::Charset::UTF_8);
             if(isStructured)
@@ -154,7 +158,8 @@ namespace Mgx3D {
         /*------------------------------------------------------------------------*/
         CommandNewTopo::
         CommandNewTopo(Internal::Context& c, const std::vector<Topo::Edge*>& edges,
-                bool isStructured)
+                std::vector<Topo::Vertex* > &vertices,
+                bool isStructured, bool hasHole)
               : CommandEditTopo(c, "Nom de commande à définir")
                 , m_dim(2)
                 , m_point()
@@ -162,15 +167,16 @@ namespace Mgx3D {
                 , m_ni(0)
                 , m_nj(0)
                 , m_nk(0)
-                , m_vertices({})
+                , m_vertices({vertices})
                 , m_faces({})
                 , m_cofaces({})
                 , m_edges(edges)
                 , m_coedges({})
                 , m_isStructured(isStructured)
+                , m_hasHole(hasHole)
             {
             TkUtil::UTF8String	comments (TkUtil::Charset::UTF_8);
-            comments << "Création d'une coface topologique à partir de edges";
+            comments << "Création d'une coface topologique à partir de edges et de vertices";
             setScriptComments(comments);
             setName(comments);
         }
@@ -191,6 +197,7 @@ namespace Mgx3D {
                 , m_cofaces({})
                 , m_coedges(coedges)
                 , m_isStructured()
+                , m_hasHole()
             {
             TkUtil::UTF8String	comments (TkUtil::Charset::UTF_8);
             comments << "Création d'une edge topologique à partir de coedges et de 2 sommets";
@@ -209,7 +216,7 @@ CommandNewTopo::
                 throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo nombre de sommets invalide pour créer une arete " + std::to_string(m_vertices.size()) + " au lieu de 2", TkUtil::Charset::UTF_8));
             if(m_dim == 2 && m_vertices.size() != 4 && m_cofaces.size() == 0 && m_edges.size() == 0)
                 throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo nombre de sommets invalide pour créer une face " + std::to_string(m_vertices.size()) + " au lieu de 4", TkUtil::Charset::UTF_8));
-            if(m_dim == 3 && m_vertices.size() != 8)
+            if(m_dim == 3 && m_vertices.size() != 8 && m_faces.size() == 0)
                 throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo nombre de sommets invalide pour créer un bloc " + std::to_string(m_vertices.size()) + " au lieu de 8", TkUtil::Charset::UTF_8));
 
             TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
@@ -229,8 +236,9 @@ CommandNewTopo::
                    createEdge(m_vertices[0], m_vertices[1], m_coedges);
                 }
                 else{
-                    if (getCommonCoEdge(m_vertices[0], m_vertices[1]) != nullptr){
-                        throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo une arete existe déjà entre " + m_vertices[0]->getName() + " et " + m_vertices[1]->getName(), TkUtil::Charset::UTF_8));
+                    auto e = getCommonCoEdge(m_vertices[0], m_vertices[1]);
+                    if (e != nullptr){
+                        throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo une arete ("+ e->getName() + ") existe déjà entre " + m_vertices[0]->getName() + " et " + m_vertices[1]->getName(), TkUtil::Charset::UTF_8));
                     }
                     else{
                         createCoEdge(m_vertices[0], m_vertices[1], m_groupName);
@@ -262,7 +270,7 @@ CommandNewTopo::
             else if (m_dim == 2){
                 if (m_edges.size() > 0)
                 {
-                    CoFace* face = new CoFace(getContext(), m_edges, m_isStructured);
+                    CoFace* face = new CoFace(getContext(), m_edges, m_vertices, m_isStructured, m_hasHole);
                     getInfoCommand().addTopoInfoEntity(face, Internal::InfoCommand::CREATED);
                 }
                 else
@@ -513,16 +521,20 @@ void CommandNewTopo::getPreviewRepresentation(Utils::DisplayRepresentation& dr)
 /*----------------------------------------------------------------------------*/
 Topo::CoEdge* CommandNewTopo::getCommonCoEdge(const Vertex* v1, const Vertex* v2) {
 
-    std::vector<CoEdge*> test1 = v1->getCoEdges();
-            std::vector<CoEdge*> test2 = v2->getCoEdges();
-
-    for(auto v1_e : v1->getCoEdges()){
-        for(auto v2_e : v2->getCoEdges()){
-            if(v1_e->getName() == v2_e->getName())
-                return v1_e;
+    if (v1==v2){
+        for (auto edge : v1->getCoEdges()){
+            if (std::count(edge->getVertices().begin(), edge->getVertices().end(), v1) >= 2)
+                return edge;
         }
     }
-
+    else{
+        for(auto v1_e : v1->getCoEdges()){
+            for(auto v2_e : v2->getCoEdges()){
+                if(v1_e->getName() == v2_e->getName())
+                    return v1_e;
+            }
+        }
+    }
     return nullptr;
 }
 /*----------------------------------------------------------------------------*/

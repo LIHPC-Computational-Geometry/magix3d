@@ -202,18 +202,24 @@ def generer_script(ctx):
     edge_id = 0
     for coface in tm.getCoFaces():
         script += f'# Création de la coface {coface}\n'
+        script += f'print("Création de la coface {coface}")\n'
         edges_list = tm.getInfos(coface, 2).edges()
         script += "coface_edges = []\n"
+        hasHole = False
         for edge in edges_list:
             v1 = tm.getInfos(edge, 1).vertices()[0]
             v2 = tm.getInfos(edge, 1).vertices()[1]
+            if (v1 == v2):
+                hasHole = True
             coedges = []
             for coedge in tm.getInfos(edge, 1).coedges():
                 coedges.append(f'coedges_mapping["{coedge}"]')
             script += f"cmd = tm.newEdge(vertices_mapping['{v1}'], vertices_mapping['{v2}'], [{', '.join(coedges)}])\n"
             script += f"coface_edges.append('Edge{edge_id:04d}')\n"
             edge_id += 1
-        script += 'cmd = tm.newCoFace(coface_edges, True)\n'
+        coface_vertices = [f'vertices_mapping["{vertex}"]' for vertex in tm.getInfos(coface, 2).vertices()]
+        isStructured = "True" if len(coface_vertices) == 4 else "False"
+        script += f'cmd = tm.newCoFace(coface_edges, [{", ".join(coface_vertices)}],{isStructured}, {hasHole})\n'
         script += 'f = cmd.getFaces()[0]\n'
         groups = tm.getInfos(coface, 2).groups()
         if 'Hors_Groupe_2D' in groups:
@@ -238,20 +244,23 @@ def generer_script(ctx):
         for face in tm.getInfos(coface, 2).faces():
             faces.add(face)
             faces_vertices_map['-'.join(sorted(tm.getInfos(face, 2).vertices()))] = face
+    sorted_faces = sorted(faces)
     print("Tableau de faces avec leurs sommets")
     for(v, f) in faces_vertices_map.items():
         print(f"Face {f} has vertices {v}")
     face_id = 0
-    for face in faces:
+    blocks_faces_0 = defaultdict(list)
+    for face in sorted_faces:
             face_cofaces = []
             for coface in tm.getCoFaces():
                 if face in tm.getInfos(coface, 2).faces():
                     face_cofaces.append(f'cofaces_mapping["{coface}"]')
             script += f'# Création de la face {face}\n'
             face_vertices = [f'vertices_mapping["{vertex}"]' for vertex in tm.getInfos(face, 2).vertices()]
-            script += f'cmd = tm.newFace([{", ".join(face_cofaces)}], [{", ".join(face_vertices)}], True)\n'
+            script += f'cmd = tm.newFace([{", ".join(face_cofaces)}], [{", ".join(face_vertices)}], {"True" if len(face_vertices)==4 else "False"})\n'
             script += f'faces_mapping["{face}"] = "Face{face_id:04d}"\n'
             face_id += 1
+            blocks_faces_0[tm.getInfos(face, 2).blocks()[0]].append(face)
     script += "print(\"Correspondance des faces:\")\n"
     script += "print(faces_mapping, '\\n')\n\n"
     script += "\n"
@@ -275,7 +284,12 @@ def generer_script(ctx):
                 print("On cherche la face ayant pour sommets ", face_vertices_key, " -> ", faces_vertices_map[face_vertices_key])
                 if face_vertices_key in faces_vertices_map:
                     blocks_faces[block].append(faces_vertices_map[face_vertices_key])
- 
+        if blocks_faces[block]:
+            print(f"Le bloc {block} a pour faces {blocks_faces[block]} et pour sommets {tm.getInfos(block, 3).vertices()}")
+        else:
+            print(f"Le bloc {block} a pour faces {blocks_faces_0[block]} et pour sommets {tm.getInfos(block, 3).vertices()}")
+    # Si le bloc est dégéné
+    
     script += "# Création des blocs\n"
     script += "blocks_mapping = {}\n"
     for block in tm.getBlocks():
@@ -283,10 +297,11 @@ def generer_script(ctx):
         if blocks_faces[block]:
             script += f'# Création du bloc {block} ayant pour faces {blocks_faces[block]} et pour sommets {tm.getInfos(block, 3).vertices()}\n'
             block_faces = [f'faces_mapping["{face}"]' for face in blocks_faces[block]]
-            script += f'cmd = ctx.getTopoManager().newBlock ([{", ".join(block_faces)}], [{", ".join(block_vertices)}], True, "")\n'
+            script += f'cmd = ctx.getTopoManager().newBlock([{", ".join(block_faces)}], [{", ".join(block_vertices)}], {"True" if len(block_vertices)==4 else "False"}, "")\n'
         else:
-            script += f'# Création du bloc {block} ayant pour sommets {tm.getInfos(block, 3).vertices()}\n'
-            script += f'cmd = ctx.getTopoManager().newTopoEntity ([{", ".join(block_vertices)}], 3, "")\n'
+            script += f'# Création du bloc {block} ayant pour faces {blocks_faces_0[block]} et pour sommets {tm.getInfos(block, 3).vertices()}\n'
+            block_faces = [f'faces_mapping["{face}"]' for face in blocks_faces_0[block]]
+            script += f'cmd = ctx.getTopoManager().newBlock([{", ".join(block_faces)}], [{", ".join(block_vertices)}], {"True" if len(block_vertices)==4 else "False"}, "")\n'
         script += 'b = cmd.getBlocks()[0]\n'
         geom_entity = tm.getInfos(block, 3).geom_entity
         if geom_entity:

@@ -42,7 +42,7 @@
 /*----------------------------------------------------------------------------*/
 // #pragma "GCC" optimize "00" // désactivation du inline (avec gcc)
 /*----------------------------------------------------------------------------*/
-//#define _DEBUG2
+#define _DEBUG2
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -610,7 +610,7 @@ setDestroyed(bool b)
 #ifdef _DEBUG2
     std::cout<<"Les groupes:";
     for  (uint i=0; i<groups.size(); i++)
-		 std::cout<<" "<<groups.get(i)->getName();
+		 std::cout<<" "<<groups[i]->getName();
     std::cout<<std::endl;
 #endif
 

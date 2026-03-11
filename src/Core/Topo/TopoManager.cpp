@@ -549,24 +549,31 @@ TopoManager::newTopoEntity(std::vector<Topo::Vertex*>& vertices, int dim, std::s
 }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResult*
-TopoManager::newCoFace(const std::vector<std::string>& edges, bool isStructured)
+TopoManager::newCoFace(const std::vector<std::string>& edges, const std::vector<std::string>& vertices,
+        bool isStructured, bool hasHole)
 {
     std::vector<Topo::Edge*> e;
     for(auto v_name : edges){
         e.push_back(getEdge(v_name));
     }
 
-    return newCoFace(e, isStructured);
+    std::vector<Topo::Vertex*> v;
+    for(auto v_name : vertices){
+        v.push_back(getVertex(v_name));
+    }
+
+    return newCoFace(e, v, isStructured, hasHole);
 }
 /*----------------------------------------------------------------------------*/
 Mgx3D::Internal::M3DCommandResult*
-TopoManager::newCoFace(const std::vector<Topo::Edge*>& edges, bool isStructured)
+TopoManager::newCoFace(const std::vector<Topo::Edge*>& edges, std::vector<Topo::Vertex* > &vertices,
+        bool isStructured, bool hasHole)
 {
     TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
     message <<"TopoManager::newTopoEntity("<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
-    Topo::CommandNewTopo* command = new Topo::CommandNewTopo(getContext(), edges, isStructured);
+    Topo::CommandNewTopo* command = new Topo::CommandNewTopo(getContext(), edges, vertices, isStructured, hasHole);
 
     TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getTopoManager().newTopoEntity ([";

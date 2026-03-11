@@ -128,12 +128,14 @@ public:
      *  \param isStructured indique si la CoFace doit être structurée ou non
      */
     Mgx3D::Internal::M3DCommandResult*
-    newCoFace(const std::vector<std::string>& edges, bool isStructured);
+    newCoFace(const std::vector<std::string>& edges, const std::vector<std::string>& vertices,
+        bool isStructured, bool hasHole);
     SET_SWIG_COMPLETABLE_METHOD(newCoFace)
 
 #ifndef SWIG
     Mgx3D::Internal::M3DCommandResult*
-    newCoFace(const std::vector<Topo::Edge*>& edges, bool isStructured);
+    newCoFace(const std::vector<Topo::Edge*>& edges, std::vector<Topo::Vertex* > &vertices,
+        bool isStructured, bool hasHole);
 #endif
 
     /*------------------------------------------------------------------------*/
