@@ -219,6 +219,7 @@ def generer_script(ctx):
             edge_id += 1
         coface_vertices = [f'vertices_mapping["{vertex}"]' for vertex in tm.getInfos(coface, 2).vertices()]
         isStructured = "True" if len(coface_vertices) == 4 else "False"
+        # Utiliser tm.getUnstructuredFaces(coface) pour vérifier si la coface est structurée ou non
         script += f'cmd = tm.newCoFace(coface_edges, [{", ".join(coface_vertices)}],{isStructured}, {hasHole})\n'
         script += 'f = cmd.getFaces()[0]\n'
         groups = tm.getInfos(coface, 2).groups()
@@ -297,6 +298,7 @@ def generer_script(ctx):
         if blocks_faces[block]:
             script += f'# Création du bloc {block} ayant pour faces {blocks_faces[block]} et pour sommets {tm.getInfos(block, 3).vertices()}\n'
             block_faces = [f'faces_mapping["{face}"]' for face in blocks_faces[block]]
+            # Utiliser tm.getUnstructuredBlocks() pour vérifier si le block est structuré ou non
             script += f'cmd = ctx.getTopoManager().newBlock([{", ".join(block_faces)}], [{", ".join(block_vertices)}], {"True" if len(block_vertices)==4 else "False"}, "")\n'
         else:
             script += f'# Création du bloc {block} ayant pour faces {blocks_faces_0[block]} et pour sommets {tm.getInfos(block, 3).vertices()}\n'
