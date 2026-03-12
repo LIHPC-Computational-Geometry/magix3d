@@ -1001,6 +1001,7 @@ computeBoundingBox(const TopoDS_Shape& shape, gp_Pnt& pmin, gp_Pnt& pmax)
 {
     Bnd_Box box;
     BRepCheck_Analyzer analyzer(shape);
+
     if (analyzer.IsValid()) {
         BRepBndLib::AddClose(shape, box);
     } else {
@@ -1008,8 +1009,29 @@ computeBoundingBox(const TopoDS_Shape& shape, gp_Pnt& pmin, gp_Pnt& pmax)
     }
 
     if (box.IsVoid())
+    {
         BRepBndLib::Add(shape, box);
+    }
 
+    TopAbs_ShapeEnum type = shape.ShapeType();
+    if (type != TopAbs_FACE && type != TopAbs_EDGE && type != TopAbs_VERTEX)
+    {
+        // On teste si la box est plane
+        // Récupérer les coins min et max
+        gp_Pnt minCorner = box.CornerMin();
+        gp_Pnt maxCorner = box.CornerMax();
+
+        // Calculer les dimensions
+        double width  = maxCorner.X() - minCorner.X();
+        double height = maxCorner.Y() - minCorner.Y();
+        double depth  = maxCorner.Z() - minCorner.Z();
+
+        // Vérifier si l'une des dimensions est nulle ou quasi-nulle
+        double tolerance =  1e-7;
+        if (width < tolerance || height < tolerance || depth < tolerance) {
+            BRepBndLib::Add(shape, box);
+        }
+    }
     double xmin, ymin, zmin, xmax, ymax, zmax;
     box.Get(xmin, ymin, zmin, xmax, ymax, zmax);
     pmin.SetCoord(xmin, ymin, zmin);
