@@ -11,6 +11,7 @@
 #include <TopoDS_Wire.hxx>
 #include <TopoDS_Vertex.hxx>
 #include <TopoDS_Solid.hxx>
+#include <TopoDS_Shell.hxx>
 #include <TopoDS_Compound.hxx>
 #include <TopTools_IndexedMapOfShape.hxx>
 #include <TopTools_ListOfShape.hxx>
@@ -158,6 +159,22 @@ public:
     static void printInfos(const TopTools_ListOfShape& shapes);
     static void printInfos(const TopoDS_Shape& shape, const std::string& indent="");
     static void exploreCompound(const TopoDS_Compound& compound, const std::string& indent);
+    static void displayShapeInfo(const TopoDS_Shape& shape);
+
+    /// Lit un fichier brep et renvoit un TopoDS_Shape
+    static TopoDS_Shape readBrepFile(const std::string& brepFileName);
+
+    // Récupére les TopoDS_Vertex d'une shape
+    static std::vector<TopoDS_Vertex> getOCCVertices(const TopoDS_Shape& shape);
+    // Récupére les TopoDS_Edge d'une shape
+    static std::vector<TopoDS_Edge> getOCCEdges(const TopoDS_Shape& shape);
+    // Récupére les TopoDS_Face d'une shape
+    static std::vector<TopoDS_Face> getOCCFaces(const TopoDS_Shape& shape);
+    // Récupére les TopoDS_Solid d'une shape
+    static std::vector<TopoDS_Solid> getOCCSolids(const TopoDS_Shape& shape);
+    // Récupére les TopoDS_Shell d'une shape
+    static std::vector<TopoDS_Shell> getOCCShells(const TopoDS_Shape& shape);
+
 
 private:
     /// Construit une courbe BSpline à partir d'une collection de Edge

@@ -10,6 +10,10 @@
 #include "Geom/CommandNewHollowCylinder.h"
 #include "Geom/CommandNewHollowSphere.h"
 #include "Geom/CommandNewVertex.h"
+#include "Geom/CommandNewVertexByBREPImport.h"
+#include "Geom/CommandNewCurveByBREPImport.h"
+#include "Geom/CommandNewSurfaceByBREPImport.h"
+#include "Geom/CommandNewVolumeByBREPImport.h"
 #include "Geom/CommandNewSegment.h"
 #include "Geom/CommandNewSurface.h"
 #include "Geom/CommandNewSurfaceByOffset.h"
@@ -58,6 +62,7 @@
 #include "Geom/CommandJoinCurves.h"
 #include "Geom/CommandJoinSurfaces.h"
 #include "Geom/IncidentGeomEntitiesVisitor.h"
+#include "Geom/OCCHelper.h"
 #include "Internal/ImportMDLImplementation.h"
 #include "Internal/ImportMDL2Commandes.h"
 #include "Internal/ExportMDLImplementation.h"
@@ -94,6 +99,7 @@
 #ifdef USE_MDLPARSER
 #include "Internal/CommandChangeLengthUnit.h"
 #endif
+#include <TopoDS.hxx>
 /*----------------------------------------------------------------------------*/
 #include <TkUtil/Exception.h>
 #include <TkUtil/TraceLog.h>
@@ -4971,6 +4977,143 @@ std::vector<GeomEntity*> GeomManager::getEntitiesFromNames(const std::vector<std
     }
 
     return entities;
+}
+/*----------------------------------------------------------------------------*/
+Mgx3D::Internal::M3DCommandResult* GeomManager::
+newVertexFromBrep(std::string brepFileName)
+{
+    TopoDS_Shape shape = OCCHelper::readBrepFile(brepFileName);
+
+    std::vector<TopoDS_Vertex> vertices = OCCHelper::getOCCVertices(shape);
+    if (vertices.size() != 1){
+        TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+        message << "Erreur lors de la lecture du fichier BREP : le shape doit contenir exactement un sommet. Nombre de sommets trouvés : " << vertices.size();
+        throw TkUtil::Exception(message);
+    }
+    TopoDS_Vertex vertex = vertices[0];
+
+    TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+    message << "GeomManager::newVertexFromBrep ("<<brepFileName<<")";
+    log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
+
+    //creation de la commande de création
+    CommandNewVertexByBREPImport *command = new CommandNewVertexByBREPImport(getContext(), vertex);
+
+    // trace dans le script
+	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
+    cmd << getContextAlias() << "." << "getGeomManager().newVertexFromBrep(\"" << brepFileName << "\")";
+    command->setScriptCommand(cmd);
+
+    // on passe au gestionnaire de commandes qui exécute la commande en // ou non
+    // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
+    getCommandManager().addCommand(command, Utils::Command::DO);
+
+	Internal::M3DCommandResult*	cmdResult = new Internal::M3DCommandResult (*command);
+	return cmdResult;
+}
+/*----------------------------------------------------------------------------*/
+Mgx3D::Internal::M3DCommandResult* GeomManager::
+newCurveFromBrep(std::string brepFileName, std::string extremaFirstPoint, std::string extremaLastPoint)
+{
+    TopoDS_Shape shape = OCCHelper::readBrepFile(brepFileName);
+
+    std::vector<TopoDS_Edge> edges = OCCHelper::getOCCEdges(shape);
+    if (edges.size() < 1){
+        TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+        message << "Erreur lors de la lecture du fichier BREP : le shape doit contenir au moins une courbe. Nombre de courbes trouvées : " << edges.size();
+        throw TkUtil::Exception(message);
+    }
+
+    Vertex* firstVertex = GeomManager::getVertex (extremaFirstPoint);
+    Vertex* lastVertex = GeomManager::getVertex (extremaLastPoint);
+
+    TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+    message << "GeomManager::newCurveFromBrep ("<<brepFileName<<", "<<extremaFirstPoint<<", "<<extremaLastPoint<<")";
+    log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
+
+    //creation de la commande de création
+    CommandNewCurveByBREPImport *command = new CommandNewCurveByBREPImport(getContext(), edges,
+        firstVertex->getPoint(), lastVertex->getPoint());
+    // trace dans le script
+	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
+    cmd << getContextAlias() << "." << "getGeomManager().newCurveFromBrep(\"" << brepFileName << "\", \"" << extremaFirstPoint << "\", \"" << extremaLastPoint << "\")";
+    command->setScriptCommand(cmd);
+
+    // on passe au gestionnaire de commandes qui exécute la commande en // ou non
+    // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
+    getCommandManager().addCommand(command, Utils::Command::DO);
+
+	Internal::M3DCommandResult*	cmdResult = new Internal::M3DCommandResult (*command);
+	return cmdResult;
+}
+/*----------------------------------------------------------------------------*/
+Mgx3D::Internal::M3DCommandResult* GeomManager::
+newSurfaceFromBrep(std::string brepFileName)
+{
+    TopoDS_Shape shape = OCCHelper::readBrepFile(brepFileName);
+
+    std::vector<TopoDS_Face> faces = OCCHelper::getOCCFaces(shape);
+    if (faces.size() < 1){
+        TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+        message << "Erreur lors de la lecture du fichier BREP : le shape doit contenir au moins une face. Nombre de faces trouvées : " << faces.size();
+        throw TkUtil::Exception(message);
+    }
+
+    TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+    message << "GeomManager::newSurfaceFromBrep ("<<brepFileName<<")";
+    log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
+
+    //creation de la commande de création
+    CommandNewSurfaceByBREPImport *command = new CommandNewSurfaceByBREPImport(getContext(), faces);
+    // trace dans le script
+	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
+    cmd << getContextAlias() << "." << "getGeomManager().newSurfaceFromBrep(\"" << brepFileName << "\")";
+    command->setScriptCommand(cmd);
+
+    // on passe au gestionnaire de commandes qui exécute la commande en // ou non
+    // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
+    getCommandManager().addCommand(command, Utils::Command::DO);
+
+	Internal::M3DCommandResult*	cmdResult = new Internal::M3DCommandResult (*command);
+	return cmdResult;
+}
+/*----------------------------------------------------------------------------*/
+Mgx3D::Internal::M3DCommandResult* GeomManager::
+newVolumeFromBrep(std::string brepFileName)
+{
+    TopoDS_Shape shape = OCCHelper::readBrepFile(brepFileName);
+
+    std::vector<TopoDS_Shell> shells = OCCHelper::getOCCShells(shape);
+    std::vector<TopoDS_Solid> solids = OCCHelper::getOCCSolids(shape);
+
+    if (solids.size() != 1 && shells.size() != 1){
+        TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+        message << "Erreur lors de la lecture du fichier BREP : le shape doit contenir exactement un solid ou un shell. Nombre de solids trouvés : " << solids.size() << ", Nombre de shells trouvés : " << shells.size();
+        throw TkUtil::Exception(message);
+    }
+
+    TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
+    message << "GeomManager::newVolume  FromBrep ("<<brepFileName<<")";
+    log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
+
+    CommandNewVolumeByBREPImport *command;
+    //creation de la commande de création
+    if (solids.size() == 1)
+        command = new CommandNewVolumeByBREPImport(getContext(), solids[0]);
+    else
+        command = new CommandNewVolumeByBREPImport(getContext(), shells[0]);
+
+    // trace dans le script
+	TkUtil::UTF8String	cmd (TkUtil::Charset::UTF_8);
+    cmd << getContextAlias() << "." << "getGeomManager().newVolumeFromBrep(\"" << brepFileName << "\")";
+    command->setScriptCommand(cmd);
+
+    // on passe au gestionnaire de commandes qui exécute la commande en // ou non
+    // et la stocke dans le gestionnaire de undo-redo si c'est une réussite
+    getCommandManager().addCommand(command, Utils::Command::DO);
+
+	Internal::M3DCommandResult*	cmdResult = new Internal::M3DCommandResult (*command);
+	return cmdResult;
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom
