@@ -26,7 +26,7 @@ namespace QtVtkComponents {
  *				d'<I>API 3D</I> tels que l'utilisation de <I>display list</I> ou
  *				autres.
  *
- * @author		Charles PIGNEROL, CEA/DAM/DSSI
+ * @author		Charles PIGNEROL
  * @date		18/10/2012
  */
 class VTKConfiguration

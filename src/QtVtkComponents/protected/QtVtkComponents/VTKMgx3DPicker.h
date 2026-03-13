@@ -24,7 +24,7 @@ namespace QtVtkComponents
 /**
  * Classe de picker <I>VTK</I> spécialisé pour le logiciel <I>Magix 3D</I>.
  *
- * @author		Charles PIGNEROL, CEA/DAM/DSSI
+ * @author		Charles PIGNEROL
  */
 class VTKMgx3DPicker : public VTKECMPicker
 {
