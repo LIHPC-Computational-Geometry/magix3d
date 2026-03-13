@@ -43,7 +43,7 @@ namespace QtComponents
  *
  *				<P>Cette classe dérive de SelectionManagerObserver afin d'être en mesure d'actualiser les représentations graphiques en
  *				fonction du caractère sélectionné ou non des entités.</P>
- * \author		Charles PIGNEROL, CEA/DAM/DSSI
+ * \author		Charles PIGNEROL
  */
 class RenderingManager : public Internal::SelectionManagerObserver
 {

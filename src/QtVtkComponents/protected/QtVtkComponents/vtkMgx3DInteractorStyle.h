@@ -1,5 +1,5 @@
 /**
- * Interacteur DSSI spécialisé pour le logiciel <I>Magix 3D</I>. Il
+ * Interacteur spécialisé pour le logiciel <I>Magix 3D</I>. Il
  * hérite de la classe <I>vtkUnifiedInteractorStyle</I> afin d'offrir le
  * même comportement de base que les autres logiciels graphiques du service.
  * 
@@ -30,7 +30,7 @@
  * </OL>
  * </P>
  *
- * @author		Charles PIGNEROL			CEA/DAM/DSSI
+ * @author		Charles PIGNEROL
  */
 class vtkMgx3DInteractorStyle : public vtkUnifiedInteractorStyle
 {
