@@ -111,7 +111,7 @@ namespace Mgx3D {
             /// les coordonnées pour créer un sommet libre
             Utils::Math::Point m_point;
 
-            /// les sommets topologiques qui servants à créer l'entité
+            /// les sommets topologiques qui servent à créer l'entité
             std::vector<Topo::Vertex*> m_vertices;
 
             /// nombre de bras pour la première direction dans le cas structuré
