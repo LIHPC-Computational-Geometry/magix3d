@@ -22,10 +22,10 @@ def test_law_biexponential_Linear(capfd):
     ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
 
     # Changement de discrétisation pour les arêtes Ar0000
-    emp = Mgx3D.EdgeMeshingPropertyBiexponential(10,1,s1_ar0000,1,s2_ar0000)
+    emp = Mgx3D.EdgeMeshingPropertyBiexponential(10,s1_ar0000,s2_ar0000)
     ctx.getTopoManager().setMeshingProperty (emp, ["Ar0000"])
     # Changement de discrétisation pour les arêtes Ar0011
-    emp = Mgx3D.EdgeMeshingPropertyBiexponential(10,1,s1_ar0011,1,s2_ar0011, False)
+    emp = Mgx3D.EdgeMeshingPropertyBiexponential(10,s1_ar0011,s2_ar0011, False)
     ctx.getTopoManager().setMeshingProperty (emp, ["Ar0011"])
 
     # Création du maillage pour tous les blocs

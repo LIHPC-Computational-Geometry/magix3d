@@ -1,6 +1,3 @@
-//
-// Created by rochec on 27/02/2026.
-//
 #include "Topo/EdgeMeshingPropertyBiexponential.h"
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
@@ -13,28 +10,12 @@ namespace Mgx3D {
 namespace Topo {
 /*----------------------------------------------------------------------------*/
 EdgeMeshingPropertyBiexponential::
-EdgeMeshingPropertyBiexponential(int nb, double r1, double sp1, double r2, double sp2, bool isDirect)
-    : CoEdgeMeshingProperty(nb, biexponential, isDirect)
-      , m_r1(r1)
-      , m_sp1(sp1)
-      , m_r2(r2)
-      , m_sp2(sp2)
-      , m_length(0.0)
+EdgeMeshingPropertyBiexponential(const int nb, const double sp1, const double sp2, const bool isDirect)
+    : CoEdgeMeshingProperty(nb, biexponential, isDirect),
+      m_length(0.0),
+      m_sp1(sp1),
+      m_sp2(sp2)
 {
-    if (m_r1 <= 0.0)
-    {
-        TkUtil::UTF8String messErr(TkUtil::Charset::UTF_8);
-        messErr << "EdgeMeshingPropertyBiexponential, la première raison doit être positive et non : " <<
-                m_r1;
-        throw TkUtil::Exception(messErr);
-    }
-    if (m_r2 <= 0.0)
-    {
-        TkUtil::UTF8String messErr(TkUtil::Charset::UTF_8);
-        messErr << "EdgeMeshingPropertyBiexponential, la deuxième raison doit être positive et non : " <<
-                m_r2;
-        throw TkUtil::Exception(messErr);
-    }
     if (m_sp1 <= 0.0)
     {
         TkUtil::UTF8String messErr(TkUtil::Charset::UTF_8);
@@ -60,12 +41,10 @@ EdgeMeshingPropertyBiexponential(int nb, double r1, double sp1, double r2, doubl
 /*----------------------------------------------------------------------------*/
 EdgeMeshingPropertyBiexponential::
 EdgeMeshingPropertyBiexponential(const EdgeMeshingPropertyBiexponential &prop)
-    : CoEdgeMeshingProperty(prop.getNbEdges(), biexponential, prop.getDirect())
-      , m_r1(prop.m_r1)
-      , m_sp1(prop.m_sp1)
-      , m_r2(prop.m_r2)
-      , m_sp2(prop.m_sp2)
-      , m_length(prop.m_length)
+    : CoEdgeMeshingProperty(prop.getNbEdges(), biexponential, prop.getDirect()),
+      m_length(prop.m_length),
+      m_sp1(prop.m_sp1),
+      m_sp2(prop.m_sp2)
 {
     m_coeff.insert(m_coeff.end(), prop.m_coeff.begin(), prop.m_coeff.end());
     m_is_polar = prop.m_is_polar;
@@ -74,12 +53,10 @@ EdgeMeshingPropertyBiexponential(const EdgeMeshingPropertyBiexponential &prop)
 
 /*----------------------------------------------------------------------------*/
 EdgeMeshingPropertyBiexponential::EdgeMeshingPropertyBiexponential(const CoEdgeMeshingProperty &prop)
-    : CoEdgeMeshingProperty(prop.getNbEdges(), biexponential, prop.getDirect())
-      , m_r1(0.)
-      , m_sp1(0.)
-      , m_r2(0.)
-      , m_sp2(0.)
-      , m_length(0.)
+    : CoEdgeMeshingProperty(prop.getNbEdges(), biexponential, prop.getDirect()),
+      m_length(0.),
+      m_sp1(0.),
+      m_sp2(0.)
 {
     const auto *bg = reinterpret_cast<const EdgeMeshingPropertyBiexponential *>(&prop);
     if (!bg)
@@ -90,9 +67,7 @@ EdgeMeshingPropertyBiexponential::EdgeMeshingPropertyBiexponential(const CoEdgeM
         throw TkUtil::Exception(messErr);
     }
 
-    m_r1 = bg->m_r1;
     m_sp1 = bg->m_sp1;
-    m_r2 = bg->m_r2;
     m_sp2 = bg->m_sp2;
     m_length = bg->m_length;
 }
@@ -102,11 +77,14 @@ bool EdgeMeshingPropertyBiexponential::operator ==(const CoEdgeMeshingProperty &
 {
     const auto *props = dynamic_cast<const EdgeMeshingPropertyBiexponential *>(&cedp);
     if (!props)
+    {
         return false;
+    }
 
-    if ((m_r1 != props->m_r1) || (m_r2 != props->m_r2) ||
-        (m_sp1 != props->m_sp1) || (m_sp2 != props->m_sp2))
+    if ((m_sp1 != props->m_sp1) || (m_sp2 != props->m_sp2))
+    {
         return false;
+    }
 
     return CoEdgeMeshingProperty::operator ==(cedp);
 }
@@ -117,9 +95,6 @@ void EdgeMeshingPropertyBiexponential::initCoeff(const double length)
     uint n1;
     uint n2;
     findNbrEdgesBalance(n1, n2);
-    std::cout << "TARGET SIZES: " << m_sp1 << ", " << m_sp2 << std::endl;
-    std::cout << "FINAL BALANCE: " << n1 << ", " << n2 << std::endl;
-    std::cout << m_sp1 << std::endl;
     const double paramExpo1 = computeParamExpo(m_sp1, m_length/2.0, n1);
     const double paramExpo2 = computeParamExpo(m_sp2, m_length/2.0, n2);
 
@@ -141,15 +116,6 @@ void EdgeMeshingPropertyBiexponential::initCoeff(const double length)
 
     m_dernierIndice = 0;
 }
-
-/*----------------------------------------------------------------------------*/
-void EdgeMeshingPropertyBiexponential::initCoeff()
-{
-    TkUtil::UTF8String messErr(TkUtil::Charset::UTF_8);
-    messErr <<
-            "Erreur interne: EdgeMeshingPropertyBiexponential, initCoeff ne peut se faire sans une longueur";
-    throw TkUtil::Exception(messErr);
-}
 /*----------------------------------------------------------------------------*/
 double EdgeMeshingPropertyBiexponential::
 nextCoeff()
@@ -164,7 +130,6 @@ nextCoeff()
     {
         intermediateParameter = 1.0-m_coeff[m_nb_edges-m_dernierIndice];
     }
-    std::cout << "coeff: " << intermediateParameter << std::endl;
     return intermediateParameter;
 }
 /*----------------------------------------------------------------------------*/
@@ -173,15 +138,17 @@ getScriptCommand() const
 {
     TkUtil::UTF8String o(TkUtil::Charset::UTF_8);
     o << getMgx3DAlias() << ".EdgeMeshingPropertyBiexponential("
-            << static_cast<long>(m_nb_edges) << ","
-            << Utils::Math::MgxNumeric::userRepresentation(m_r1) << ","
-            << Utils::Math::MgxNumeric::userRepresentation(m_sp1) << ","
-            << Utils::Math::MgxNumeric::userRepresentation(m_r2) << ","
-            << Utils::Math::MgxNumeric::userRepresentation(m_sp2);
-    if (isPolarCut())
-        o << ", " << getPolarCenter().getScriptCommand();
-    if (!getDirect())
-        o << ", False";
+        << static_cast<long>(m_nb_edges) << ",";
+    if (getDirect())
+    {
+        o << Utils::Math::MgxNumeric::userRepresentation(m_sp1) << ",";
+        o << Utils::Math::MgxNumeric::userRepresentation(m_sp2);
+    }
+    else
+    {
+        o << Utils::Math::MgxNumeric::userRepresentation(m_sp2) << ",";
+        o << Utils::Math::MgxNumeric::userRepresentation(m_sp1);
+    }
     o << ")";
     return o;
 }
@@ -193,25 +160,25 @@ addDescription(Utils::SerializedRepresentation &topoProprietes) const
     topoProprietes.addProperty(
         Utils::SerializedRepresentation::Property("Longueur premier bras", m_sp1));
     topoProprietes.addProperty(
-        Utils::SerializedRepresentation::Property("Raison 1", m_r1));
-    topoProprietes.addProperty(
         Utils::SerializedRepresentation::Property("Longueur dernier bras", m_sp2));
-    topoProprietes.addProperty(
-        Utils::SerializedRepresentation::Property("Raison 2", m_r2));
 
     if (getDirect())
+    {
         topoProprietes.addProperty(
             Utils::SerializedRepresentation::Property("Sens", std::string("direct")));
+    }
     else
+    {
         topoProprietes.addProperty(
             Utils::SerializedRepresentation::Property("Sens", std::string("inverse")));
+    }
 }
 /*----------------------------------------------------------------------------*/
 double EdgeMeshingPropertyBiexponential::
-computeParamExpo(const double size, const double length, const uint nbrEdges) const
+computeParamExpo(const double size, const double length, const uint nbrEdges)
 {
     double paramExpo = 0.1;
-    // we normalize the tolerence by a characteristic length
+    // we normalize the tolerance by a characteristic length
     const double eps = length*1e-9;
     constexpr int maxIter = 100;
     int iter = 0;
@@ -238,7 +205,7 @@ computeParamExpo(const double size, const double length, const uint nbrEdges) co
 }
 /*----------------------------------------------------------------------------*/
 double
-EdgeMeshingPropertyBiexponential::computeIntermediateParameter(const double paramExpo, const double refParameter) const
+EdgeMeshingPropertyBiexponential::computeIntermediateParameter(const double paramExpo, const double refParameter)
 {
     return (std::exp(refParameter*paramExpo)-1.0)/(std::exp(paramExpo)-1.0);
 }
@@ -248,6 +215,7 @@ EdgeMeshingPropertyBiexponential::computeCoeffs(const double paramExpo, const do
 {
     std::vector<double> coeffs;
     const double step = 1.0/nbrEdges;
+    coeffs.reserve(nbrEdges+1);
     for (uint i=0; i<nbrEdges+1; i++)
     {
         coeffs.push_back(computeIntermediateParameter(paramExpo, i*step));
@@ -256,7 +224,7 @@ EdgeMeshingPropertyBiexponential::computeCoeffs(const double paramExpo, const do
 }
 /*----------------------------------------------------------------------------*/
 void
-EdgeMeshingPropertyBiexponential::findNbrEdgesBalance(uint &n1_min, uint &n2_min)
+EdgeMeshingPropertyBiexponential::findNbrEdgesBalance(uint &n1_min, uint &n2_min) const
 {
     uint n1 = static_cast<uint>(m_nb_edges/2);
     uint n2 = m_nb_edges-n1;
