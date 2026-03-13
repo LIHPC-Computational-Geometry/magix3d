@@ -12,3 +12,6 @@ __pycache__
 .pytest_cache
 *.mli2
 *.pyc
+
+testExportData/*_export/*.brep
+testExportData/*_generated.py
