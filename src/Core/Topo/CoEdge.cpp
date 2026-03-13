@@ -885,7 +885,9 @@ getRepresentation(Utils::DisplayRepresentation& dr, bool checkDestroyed) const
         } else if (m_mesh_property->getMeshLaw() == CoEdgeMeshingProperty::geometrique
         		|| m_mesh_property->getMeshLaw() == CoEdgeMeshingProperty::bigeometrique
         		|| m_mesh_property->getMeshLaw() == CoEdgeMeshingProperty::hyperbolique
-        		|| m_mesh_property->getMeshLaw() == CoEdgeMeshingProperty::beta_resserrement){
+        		|| m_mesh_property->getMeshLaw() == CoEdgeMeshingProperty::beta_resserrement
+                || m_mesh_property->getMeshLaw() == CoEdgeMeshingProperty::biexponential)
+        {
         	pos_carres.push_back(0.1);
         	pos_carres.push_back(0.2);
         	pos_carres.push_back(0.4);

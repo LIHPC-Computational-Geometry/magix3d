@@ -57,9 +57,13 @@ public:
     /*------------------------------------------------------------------------*/
     /// Compare two meshing properties.
     bool operator == (const CoEdgeMeshingProperty&) const override;
+
 #endif
 
-
+    /*------------------------------------------------------------------------*/
+    /// Retournent les longueurs des premiers et derniers bras.
+    virtual double getLength1 ( ) const { return m_sp1; }
+    virtual double getLength2 ( ) const { return m_sp2; }
 
 private:
 
