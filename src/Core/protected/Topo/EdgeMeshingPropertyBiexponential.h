@@ -11,6 +11,22 @@ namespace Topo {
  * @brief Topological edge discretization property with two exponential
  * progression law on the two different sides of the edge, with target
  * sizes of the first and the last meshing edges.
+ *
+ *  0                              l/2                              l
+ *  o-------------------------------x-------------------------------o
+ *
+ * Considering the topological edge above, we split it at l/2, where l
+ * is the projected topological edge length. We distribute equally the
+ * number of mesh edges on both side, and compute on each side, an
+ * exponential law [1] to get the requested target first mesh size, on
+ * each side of the edge. Then, we compare the size of the meshing edges
+ * on both side of l/2 (where a meshing node is placed). If the size
+ * difference is too important, then we re-distribute the number of
+ * meshing edges from one side to another, until the difference is as
+ * small as possible.
+ *
+ * [1] THOMPSON, Joe F., SONI, Bharat K., et WEATHERILL, Nigel P. (ed.).
+ *     Handbook of grid generation. CRC press, 1998.
  */
 class EdgeMeshingPropertyBiexponential : public CoEdgeMeshingProperty
 {
@@ -28,29 +44,28 @@ public:
     EdgeMeshingPropertyBiexponential (const CoEdgeMeshingProperty&);
 
     /*------------------------------------------------------------------------*/
-    /// Get name of meshing method
+    /// Get name of meshing method.
     std::string getMeshLawName() const override {return "Bi-Exponential";}
 
 #ifndef SWIG
     /** Création d'un clone, on copie toutes les informations */
     CoEdgeMeshingProperty* clone() override {return new  EdgeMeshingPropertyBiexponential(*this);}
 
-    /// initialisation avant appel à nextCoeff pour le cas où la longueur est utile
+    /// Initialization before call to nextCoeff function.
     void initCoeff(double length) override;
 
-    /// retourne le coefficient suivant pour les noeuds internes
+    /// Return the next coefficient.
     double nextCoeff() override;
 
-    /// retourne vrai pour les méthodes qui nécessitent d'avoir la longueur du contour pour l'initialisation
+    /// Return true if the discretization needs the topological edge length information.
     bool needLengthToInitialize() override {return true;}
 
     /*------------------------------------------------------------------------*/
-    /// Script pour la commande de création Python
+    /// Python command script.
     TkUtil::UTF8String getScriptCommand() const override;
 
     /*------------------------------------------------------------------------*/
-    /** Ajoute les informations spécifiques de cette discrétisation à
-     *  la représentation textuelle
+    /** Add discretization specific information to textual representation.
      */
     void addDescription(Utils::SerializedRepresentation& topoProprietes) const override;
 
@@ -61,9 +76,9 @@ public:
 #endif
 
     /*------------------------------------------------------------------------*/
-    /// Retournent les longueurs des premiers et derniers bras.
-    virtual double getLength1 ( ) const { return m_sp1; }
-    virtual double getLength2 ( ) const { return m_sp2; }
+    /// Return target sizes of first and last meshing edges.
+    virtual double getLength1() const { return m_sp1; }
+    virtual double getLength2() const { return m_sp2; }
 
 private:
 
@@ -110,12 +125,11 @@ private:
      * distribution of points.
      *
      * @param[in] paramExpo is the exponential parameter
-     * @param[in] length is the physical topological edge length
      * @param[in] nbrEdges is the number of meshing edges
      *
      * @return The exponential distribution of points over [0,1]
      */
-    static std::vector<double> computeCoeffs(double paramExpo, double length, uint nbrEdges);
+    static std::vector<double> computeCoeffs(double paramExpo, uint nbrEdges);
 
 private:
     /// Projected/Physical topological edge length
