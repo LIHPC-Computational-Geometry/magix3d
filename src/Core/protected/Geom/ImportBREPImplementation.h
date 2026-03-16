@@ -42,6 +42,10 @@ protected:
      */
     virtual void readFile();
 
+    static void displayShapeInfo(const TopoDS_Shape& shape);
+    static TopoDS_Shape mergeVerticesSafe(const TopoDS_Shape& shape, double tol);
+    static TopoDS_Shape removeDegeneratedEdges(const TopoDS_Shape& shape);
+    static TopoDS_Shape fixShape(const TopoDS_Shape& shape);
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

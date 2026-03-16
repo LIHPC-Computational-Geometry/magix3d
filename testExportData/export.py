@@ -76,10 +76,11 @@ def generer_script(ctx):
     script += f"gm.importBREP(\"{brep_file_name}\", True, False)\n\n"
     
     script += "points_mapping = defaultdict(list)\n"
+    script += "seuil = 1e-6\n"
     script += "for old_point, (old_coord, old_groups) in points.items():\n"
     script += "    for point in gm.getVertices():\n"
     script += "        coord = gm.getCoord(point)\n"
-    script += "        if coord.getX() == old_coord[0] and coord.getY() == old_coord[1] and coord.getZ() == old_coord[2]:\n"
+    script += "        if abs(coord.getX() - old_coord[0]) < seuil and abs(coord.getY() - old_coord[1]) < seuil and abs(coord.getZ() - old_coord[2]) < seuil:\n"
     script += "            points_mapping[old_point].append(point)\n"
     script += "            if old_groups != []:\n"
     script += "                for group in old_groups:\n"
@@ -202,7 +203,7 @@ def generer_script(ctx):
     edge_id = 0
     for coface in tm.getCoFaces():
         script += f'# Création de la coface {coface}\n'
-        script += f'print("Création de la coface {coface}")\n'
+        script += f'#print("Création de la coface {coface}")\n'
         edges_list = tm.getInfos(coface, 2).edges()
         script += "coface_edges = []\n"
         hasHole = False
@@ -246,9 +247,9 @@ def generer_script(ctx):
             faces.add(face)
             faces_vertices_map['-'.join(sorted(tm.getInfos(face, 2).vertices()))] = face
     sorted_faces = sorted(faces)
-    print("Tableau de faces avec leurs sommets")
-    for(v, f) in faces_vertices_map.items():
-        print(f"Face {f} has vertices {v}")
+    #print("Tableau de faces avec leurs sommets")
+    #for(v, f) in faces_vertices_map.items():
+        #print(f"Face {f} has vertices {v}")
     face_id = 0
     blocks_faces_0 = defaultdict(list)
     for face in sorted_faces:
@@ -277,18 +278,18 @@ def generer_script(ctx):
     (6, 4, 5, 7)
     )
     for block in tm.getBlocks():
-        print(f"Block {block} has vertices {tm.getInfos(block, 3).vertices()}")
+        #print(f"Block {block} has vertices {tm.getInfos(block, 3).vertices()}")
         block_vertices = tm.getInfos(block, 3).vertices()
         if (len(block_vertices) == 8):
             for idxs in tabIndVtxByFaceOnBlock:
                 face_vertices_key = '-'.join(sorted([block_vertices[i] for i in idxs]))
-                print("On cherche la face ayant pour sommets ", face_vertices_key, " -> ", faces_vertices_map[face_vertices_key])
+                #print("On cherche la face ayant pour sommets ", face_vertices_key, " -> ", faces_vertices_map[face_vertices_key])
                 if face_vertices_key in faces_vertices_map:
                     blocks_faces[block].append(faces_vertices_map[face_vertices_key])
-        if blocks_faces[block]:
-            print(f"Le bloc {block} a pour faces {blocks_faces[block]} et pour sommets {tm.getInfos(block, 3).vertices()}")
-        else:
-            print(f"Le bloc {block} a pour faces {blocks_faces_0[block]} et pour sommets {tm.getInfos(block, 3).vertices()}")
+        #if blocks_faces[block]:
+        #    print(f"Le bloc {block} a pour faces {blocks_faces[block]} et pour sommets {tm.getInfos(block, 3).vertices()}")
+        #else:
+        #    print(f"Le bloc {block} a pour faces {blocks_faces_0[block]} et pour sommets {tm.getInfos(block, 3).vertices()}")
     # Si le bloc est dégéné
     
     script += "# Création des blocs\n"

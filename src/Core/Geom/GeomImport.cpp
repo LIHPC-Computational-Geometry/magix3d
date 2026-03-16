@@ -25,6 +25,8 @@
 #include <BRepGProp.hxx>
 #include <GProp_GProps.hxx>
 #include <BRepAdaptor_Curve.hxx>
+#include <TopExp.hxx>
+#include <TopAbs_ShapeEnum.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -72,6 +74,16 @@ void GeomImport::perform(std::vector<GeomEntity*>& res)
     for(unsigned int i=0; i<m_importedShapes.size();i++)
     {
         TopoDS_Shape current_shape = m_importedShapes[i];
+
+        TopTools_IndexedMapOfShape edgeMap;
+        TopTools_IndexedMapOfShape faceMap;
+        TopTools_IndexedMapOfShape vertexMap;
+        TopExp::MapShapes(current_shape, TopAbs_EDGE, edgeMap);
+        TopExp::MapShapes(current_shape, TopAbs_FACE, faceMap);
+        TopExp::MapShapes(current_shape, TopAbs_VERTEX, vertexMap);
+        std::cout << "Vertices : " << vertexMap.Extent() << std::endl;
+        std::cout << "Edges    : " << edgeMap.Extent() << std::endl;
+        std::cout << "Faces    : " << faceMap.Extent() << std::endl;
 
         TopExp_Explorer ex;
         ex.Init(current_shape, TopAbs_SOLID);
@@ -288,6 +300,10 @@ void GeomImport::add(TopoDS_Shape& AShape, const std::string& AName)
     case TopAbs_VERTEX:
     {
         Vertex* vertex=EntityFactory(m_context).newOCCVertex(TopoDS::Vertex(AShape));
+        std::cout << "Création du vertex "<<vertex->getName()<<std::endl;
+        for (auto v : m_newVertices)
+            if (OCCHelper::areEquals(vertex->getOCCVertex(), v->getOCCVertex()))
+                std::cout << "Le vertex "<<vertex->getName()<<" est égal au vertex "<<v->getName()<<std::endl;       
         if (m_createGroups)
             m_group_helper.addToGroup(AName, vertex);
         store(vertex);
