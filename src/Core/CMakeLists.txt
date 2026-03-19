@@ -14,9 +14,7 @@ set (HEADERS_DIRECTORIES protected/Geom protected/Group protected/Internal prote
 
 # On ajoute les en-têtes aux sources. C'est utile pour cmake dans certains cas,
 # par exemple lorsqu'ils doivent être pré-processés (moc, ...).
-add_library (Core ${CPP_SOURCES} ${HEADERS}
-        protected/Topo/EdgeMeshingPropertyBiexponential.h
-        Topo/EdgeMeshingPropertyBiexponential.cpp)
+add_library (Core ${CPP_SOURCES} ${HEADERS})
 
 set (CORE_OPTIONAL_LIBRARIES_LIST)
 
