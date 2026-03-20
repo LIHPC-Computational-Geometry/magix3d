@@ -5350,7 +5350,6 @@ void QtMgx3DMainWindow::exitCallback()
 {
 
 #ifndef _DEBUG
-cout << __FILE__ << ' ' << __LINE__ << " QtMgx3DMainWindow::exitCallback" << endl;
 	if (true == Resources::instance ( )._confirmQuitAction.getValue ( ))
 	{
 		if (0 != QtMessageBox::displayWarningMessage(this, getAppTitle ( ), "Souhaitez-vous réellement quitter cette application ?", 100, "Oui", "Non", 0, 0))
