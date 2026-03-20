@@ -13,9 +13,9 @@
 
 /** Filtre permettant de raffiner les mailles d'un polydata.
  * 
- * @warning		Ne gère que les triangles dans la version actuelle.
+ * @warning		Ne gï¿½re que les triangles dans la version actuelle.
  *
- * @author		Charles PIGNEROL, CEA/DAM/DSSI
+ * @author		Charles PIGNEROL
  */
 class vtkPolyDataRefinementFilter : public vtkPolyDataAlgorithm
 {
@@ -32,13 +32,13 @@ class vtkPolyDataRefinementFilter : public vtkPolyDataAlgorithm
 	vtkTypeMacro(vtkPolyDataRefinementFilter,vtkPolyDataAlgorithm);
 
 	/**
-	 * @param	Facteur de raffinement. Il est appliqué selon chaque dimension.
-	 * Exemple : si 2 les arêtes des mailles seront coupées en 2.
+	 * @param	Facteur de raffinement. Il est appliquï¿½ selon chaque dimension.
+	 * Exemple : si 2 les arï¿½tes des mailles seront coupï¿½es en 2.
 	 */
 	virtual void SetRefinementFactor (unsigned int factor);
 
 	/**
-	 * @return	Le facteur de raffinement appliqué selon chaque dimension.
+	 * @return	Le facteur de raffinement appliquï¿½ selon chaque dimension.
 	 */
 	virtual unsigned int GetRefinementFactor ( ) const
 	{ return _refinementFactor; }
@@ -46,7 +46,7 @@ class vtkPolyDataRefinementFilter : public vtkPolyDataAlgorithm
 	/**
 	 * Affiche quelques infos sur l'instance.
 	 * @param		flux d'impression
-	 * @param		indentation utilisée
+	 * @param		indentation utilisï¿½e
 	 */
 	virtual void PrintSelf (ostream& os, vtkIndent indent);
 
@@ -54,7 +54,7 @@ class vtkPolyDataRefinementFilter : public vtkPolyDataAlgorithm
 	protected :
 
 	/**
-	 * Constructeur. Id par défaut : 0. Méthode par défaut : noeud commun.
+	 * Constructeur. Id par dï¿½faut : 0. Mï¿½thode par dï¿½faut : noeud commun.
 	 */
 	vtkPolyDataRefinementFilter ( );
 
@@ -82,13 +82,13 @@ class vtkPolyDataRefinementFilter : public vtkPolyDataAlgorithm
 	/** Constructeur de copie : interdit. */
 	vtkPolyDataRefinementFilter (const vtkPolyDataRefinementFilter&);
 
-	/** Opérateur = : interdit. */
+	/** Opï¿½rateur = : interdit. */
 	vtkPolyDataRefinementFilter& operator = (const vtkPolyDataRefinementFilter&);
 
 	/** Le facteur de raffinement. */
 	unsigned int			_refinementFactor;
 
-	/** Tampon pour stocker les ids des noeuds utilisés lors du raffinement des triangles. Ce buffer est de dimension
+	/** Tampon pour stocker les ids des noeuds utilisï¿½s lors du raffinement des triangles. Ce buffer est de dimension
 	 * (_refinementFactor+1) x (_refinementFactor+1).
 	 * @see		AllocateTriangleBuffer
 	 * @see		DesallocateTriangleBuffer
