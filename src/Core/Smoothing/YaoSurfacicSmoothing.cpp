@@ -35,11 +35,30 @@ namespace Mgx3D {
 
             gmds::Mesh& gmds_mesh = getStdContext()->getMeshManager().getMesh()->getGMDSMesh();
 
+            /*
+            for (Topo::CoFace* cf:m_cofaces)
+            {
+                uint nbI;
+                uint nbJ;
+                cf->getNbMeshingNodes(nbI, nbJ);
+                // update mesh with new positions
+                for (uint j=1; j<nbJ-1; j++)
+                {
+                    for (uint i=1; i<nbI-1; i++)
+                    {
+                        gmds::Node nIJ = gmds_mesh.get<gmds::Node>(cf->getNode(i,j));
+                        nIJ.setXYZ(0.0,0.0,0.0);
+                    }
+                }
+            }
+            */
+
             gmds::IGMeshIOService ioService(&gmds_mesh);
             gmds::VTKWriter vtkWriter(&ioService);
             vtkWriter.setCellOptions(gmds::F|gmds::N);
             vtkWriter.setDataOptions(gmds::F|gmds::N);
             vtkWriter.write("YaoSurfacicSmoothing_"+std::to_string(0)+".vtk");
+            std::cout << "Nbr cofaces: " << m_cofaces.size() << std::endl;
 
             for (Topo::CoFace* cf:m_cofaces)
             {
