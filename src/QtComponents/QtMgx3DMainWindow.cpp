@@ -190,6 +190,7 @@
 
 // NECESSAIRE POUR LES IMAGES AU FORMAT XPM
 #include "images/union.xpm"
+#include "QtComponents/QtGeometryMoveToAction.h"
 
 #undef LOCK_INSTANCE
 #define LOCK_INSTANCE AutoReferencedMutex autoReferencedMutex (TkUtil::ObjectBase::getMutex ( ));
@@ -2919,6 +2920,21 @@ void QtMgx3DMainWindow::showReady ( )
 						SelectionManager::dimensionToDimensions(dim));
 				registerOperationAction(
 						*translateAction, (QtMgx3DOperationsPanel::OPERATION_TYPES) ot);
+			}    // for (int ot = (int)QtMgx3DOperationsPanel::GEOM_POINT_OPERATION; ...
+			dim = 0;
+			for (int ot = (int) QtMgx3DOperationsPanel::GEOM_POINT_OPERATION;
+				 ot <= (int) QtMgx3DOperationsPanel::GEOM_VOLUME_OPERATION; ot++, dim++)
+			{
+				QtGeometryMoveToAction *moveToAction =
+													new QtGeometryMoveToAction(
+															QIcon(":/images/geom_moveto.png"),
+															QString::fromUtf8("Déplacement d'entités géométriques"),
+															*this, QString::fromUtf8("Déplacement d'entités géométriques"));
+				CHECK_NULL_PTR_ERROR(moveToAction->getMoveToPanel())
+				moveToAction->getMoveToPanel()->setDimension(
+						SelectionManager::dimensionToDimensions(dim));
+				registerOperationAction(
+						*moveToAction, (QtMgx3DOperationsPanel::OPERATION_TYPES) ot);
 			}    // for (int ot = (int)QtMgx3DOperationsPanel::GEOM_POINT_OPERATION; ...
 			// Rotation d'entités géométriques :
 			dim = 0;

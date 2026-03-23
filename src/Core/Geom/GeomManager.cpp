@@ -57,6 +57,7 @@
 #include "Geom/CommandNewVertexByCurveParameterization.h"
 #include "Geom/CommandJoinCurves.h"
 #include "Geom/CommandJoinSurfaces.h"
+#include "Geom/CommandMoveTo.h"
 #include "Geom/IncidentGeomEntitiesVisitor.h"
 #include "Internal/ImportMDLImplementation.h"
 #include "Internal/ImportMDL2Commandes.h"
@@ -2377,6 +2378,114 @@ newBSpline(Vertex* vtx1,
     cmd << "\"" << vtx2->getName() << "\",";
     cmd << static_cast<short>(deg_min) << ", " << static_cast<short>(deg_max);
     cmd << ", \"" << groupName << "\")";
+    command->setScriptCommand(cmd);
+
+    getCommandManager().addCommand(command, Utils::Command::DO);
+
+	Internal::M3DCommandResult*	cmdResult	=
+			new Internal::M3DCommandResult (*command);
+	return cmdResult;
+}
+/*----------------------------------------------------------------------------*/
+Internal::M3DCommandResult* GeomManager::
+moveTo(std::vector<std::string>& entities, const Utils::Math::Point& dp){
+
+    std::vector<GeomEntity*> vge;
+    convert(entities, vge);
+
+    return moveTo(vge, dp);
+}
+/*----------------------------------------------------------------------------*/
+Internal::M3DCommandResult* GeomManager::
+moveTo(std::vector<GeomEntity*>& entities, const Point& dp)
+{
+    if (entities.empty()){
+    	throw TkUtil::Exception(TkUtil::UTF8String ("Aucune entité sélectionnée pour la translation", TkUtil::Charset::UTF_8));
+    }
+
+    TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
+    message <<"GeomManager::moveTo(";
+    for (uint i=0; i<entities.size(); i++)
+        message <<entities[i]->getName()<<",";
+    message <<dp<<")";
+    log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
+
+    Internal::CommandInternal* command = 0;
+    Geom::CommandEditGeom *commandGeom = 0;
+    // est-ce qu'il y a une topologie parmis les entités géométriques sélectionnées ?
+    if (hasRefTopo(entities)){
+
+        /*Internal::CommandComposite* commandCompo =
+             new Internal::CommandComposite(getContext(), "Translation d'une géométrie avec sa topologie");
+
+        commandGeom = new CommandTranslation(getContext(), entities, dp);
+        commandCompo->addCommand(commandGeom);
+
+        // recherche des entités topologiques parmis les entités géométriques sélectionnées
+        std::vector<Topo::TopoEntity*> topoEntities = Topo::TopoHelper::getTopoEntities(entities);
+
+        Topo::CommandTranslateTopo* commandTopo = new Topo::CommandTranslateTopo(getContext(), topoEntities, dp);
+        commandCompo->addCommand(commandTopo);
+
+        command = commandCompo;*/
+    }
+    else {
+    	commandGeom = new CommandMoveTo(getContext(), entities, dp);
+    	command = commandGeom;
+    }
+
+    // trace dans le script
+    TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).moveTo (" << Internal::entitiesToPythonList<GeomEntity> (entities) << ", " << dp.getScriptCommand ( ) << ")";
+    command->setScriptCommand(cmd);
+
+    getCommandManager().addCommand(command, Utils::Command::DO);
+
+	Internal::M3DCommandResult*	cmdResult	=
+			new Internal::M3DCommandResult (*command,  commandGeom);
+	return cmdResult;
+}
+/*----------------------------------------------------------------------------*/
+Internal::M3DCommandResult* GeomManager::
+copyAndMove(std::vector<std::string>& entities, const Utils::Math::Point& dp, std::string groupName){
+
+    std::vector<GeomEntity*> vge;
+    convert(entities, vge);
+
+    return copyAndMove(vge, dp, groupName);
+}
+/*----------------------------------------------------------------------------*/
+Internal::M3DCommandResult* GeomManager::
+copyAndMove(std::vector<GeomEntity*>& entities, const Point& dp, std::string groupName)
+{
+    if (entities.empty()){
+    	throw TkUtil::Exception(TkUtil::UTF8String ("Aucune entité sélectionnée pour la translation avec copie", TkUtil::Charset::UTF_8));
+    }
+
+    TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
+    message <<"GeomManager::copyAndMove(";
+    for (uint i=0; i<entities.size(); i++)
+        message <<entities[i]->getName()<<",";
+    message <<dp<<", \""<<groupName<<"\")";
+    log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
+
+    Internal::CommandComposite* command = 0;
+
+
+    	command =
+             new Internal::CommandComposite(getContext(), "Translation d'une copie d'une géométrie");
+
+    	CommandGeomCopy *commandCopy =
+    	                new CommandGeomCopy(getContext(), entities, groupName);
+    	command->addCommand(commandCopy);
+
+    	CommandTranslation* commandGeom = new CommandTranslation(getContext(), commandCopy, dp);
+    	command->addCommand(commandGeom);
+
+
+    // trace dans le script
+    TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
+    cmd << getContextAlias ( ) << ".getGeomManager ( ).copyAndMove (" << Internal::entitiesToPythonList<GeomEntity> (entities) << ", " << dp.getScriptCommand ( )<<"\""<<groupName<<"\")";
     command->setScriptCommand(cmd);
 
     getCommandManager().addCommand(command, Utils::Command::DO);

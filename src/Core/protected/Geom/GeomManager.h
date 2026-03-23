@@ -751,6 +751,39 @@ public:
 					const Vector& dp, const bool keep);
 #endif
 
+	/*------------------------------------------------------------------------*/
+	/** \brief translation des entités (identifiée par un nom unique pour python)
+	 *  suivant le vecteur de translation défini par dp
+	 *
+	 *  \param ve nom des entités géométrique à déplacer
+	 *  \param dp le vecteur de translation
+	 */
+	Mgx3D::Internal::M3DCommandResult*
+		moveTo(std::vector<std::string>& ve, const Point& dp);
+
+#ifndef SWIG
+	Mgx3D::Internal::M3DCommandResult*
+		moveTo(std::vector<GeomEntity*>& ve, const Point& dp);
+#endif
+
+	/*------------------------------------------------------------------------*/
+	/** \brief translation d'une copie des entités (identifiée par un nom unique pour python)
+	 *  suivant le vecteur de translation défini par dp
+	 *
+	 *  \param ve nom des entités géométrique à copier et translater
+	 *  \param dp le vecteur de translation
+	 *  \param groupName groupe dans lequel sont mise les nouvelles entités
+	 */
+	Mgx3D::Internal::M3DCommandResult*
+		copyAndMove(std::vector<std::string>& ve, const Point& dp, std::string groupName);
+	SET_SWIG_COMPLETABLE_METHOD(copyAndMove)
+
+#ifndef SWIG
+	Mgx3D::Internal::M3DCommandResult*
+		copyAndMove(std::vector<GeomEntity*>& ve, const Point& dp, std::string groupName);
+#endif
+
+
     /*------------------------------------------------------------------------*/
     /** \brief translation des entités (identifiée par un nom unique pour python)
      *  suivant le vecteur de translation défini par dp
