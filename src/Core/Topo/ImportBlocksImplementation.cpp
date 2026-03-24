@@ -6,6 +6,7 @@
 #include "Topo/ImportBlocksImplementation.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Topo/EdgeMeshingPropertyGeometric.h"
+#include "Topo/EdgeMeshingPropertyBiexponential.h"
 #include "Topo/EdgeMeshingPropertyBigeometric.h"
 #include "Topo/EdgeMeshingPropertyBeta.h"
 #include "Topo/EdgeMeshingPropertyHyperbolic.h"
@@ -472,6 +473,12 @@ void ImportBlocksImplementation::readDiscr(std::ifstream &str,const int &nbEdges
                     double beta;
                     str >> nb >> beta;
                     emps[i] = new EdgeMeshingPropertyBeta(nb, beta);
+                }
+                else if (disc_type == 9)
+                {
+                    double sp1, sp2;
+                    str >> nb >> sp1 >> sp2;
+                    emps[i] = new EdgeMeshingPropertyBiexponential(nb, sp1, sp2);
                 }
                 else {
                     std::string mess = "BLK read error: type of discretization not supported";
