@@ -10,6 +10,8 @@
 #include "Topo/EdgeMeshingPropertySpecificSize.h"
 #include "Topo/EdgeMeshingPropertyInterpolate.h"
 #include "Topo/EdgeMeshingPropertyBeta.h"
+#include "Topo/EdgeMeshingPropertyBiexponential.h"
+
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -140,6 +142,19 @@ void ExportBlocksImplementation::writeEdges(std::ofstream &str, std::vector<Topo
                 case CoEdgeMeshingProperty::beta_resserrement:
                     str << 8 <<  " " << prop->getNbEdges() << " ";
                     str << dynamic_cast<EdgeMeshingPropertyBeta*>(prop)->getBeta() << "\n";
+                    break;
+                case CoEdgeMeshingProperty::biexponential:
+                    str << 9 <<  " " << prop->getNbEdges() << " ";
+                    if (dynamic_cast<EdgeMeshingPropertyBiexponential*>(prop)->getDirect())
+                    {
+                        str << dynamic_cast<EdgeMeshingPropertyBiexponential*>(prop)->getLength1() << " ";
+                        str << dynamic_cast<EdgeMeshingPropertyBiexponential*>(prop)->getLength2() << "\n";
+                    }
+                    else
+                    {
+                        str << dynamic_cast<EdgeMeshingPropertyBiexponential*>(prop)->getLength2() << " ";
+                        str << dynamic_cast<EdgeMeshingPropertyBiexponential*>(prop)->getLength1() << "\n";
+                    }
                     break;
                 default:
                     std::string s ="Arete avec une méthode de discrétisation inconnue";
