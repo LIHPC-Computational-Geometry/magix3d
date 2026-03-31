@@ -73,17 +73,9 @@ void GeomImport::perform(std::vector<GeomEntity*>& res)
     unsigned long id_vertex=0;
     for(unsigned int i=0; i<m_importedShapes.size();i++)
     {
+        std::cout << "dans GeomImport " << std::endl;
         TopoDS_Shape current_shape = m_importedShapes[i];
-
-        TopTools_IndexedMapOfShape edgeMap;
-        TopTools_IndexedMapOfShape faceMap;
-        TopTools_IndexedMapOfShape vertexMap;
-        TopExp::MapShapes(current_shape, TopAbs_EDGE, edgeMap);
-        TopExp::MapShapes(current_shape, TopAbs_FACE, faceMap);
-        TopExp::MapShapes(current_shape, TopAbs_VERTEX, vertexMap);
-        std::cout << "Vertices : " << vertexMap.Extent() << std::endl;
-        std::cout << "Edges    : " << edgeMap.Extent() << std::endl;
-        std::cout << "Faces    : " << faceMap.Extent() << std::endl;
+        OCCHelper::displayShapeInfo(current_shape);
 
         TopExp_Explorer ex;
         ex.Init(current_shape, TopAbs_SOLID);

@@ -1,5 +1,6 @@
 /*----------------------------------------------------------------------------*/
 #include "Geom/ExportBREPImplementation.h"
+#include "Geom/OCCHelper.h"
 /*----------------------------------------------------------------------------*/
 #include <ios>
 #include <TkUtil/MemoryError.h>
@@ -39,6 +40,9 @@ addGeomEntityToExport(GeomEntity* geomEntity)
 /*----------------------------------------------------------------------------*/
 void ExportBREPImplementation::write()
 {
+    std::cout << "Au moment de l'export : " << std::endl;
+    OCCHelper::displayShapeInfo(m_compound);
+
     std::ofstream file(m_filename, std::ios::out);
     if (file.bad()) {
         throw TkUtil::Exception (TkUtil::UTF8String ("Impossible d'écrire ce fichier BREP", TkUtil::Charset::UTF_8));

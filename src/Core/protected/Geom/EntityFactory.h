@@ -88,6 +88,7 @@ class EntityFactory
     friend class Volume;
     friend class CommandNewSurfaceByOffset;
     friend class GeomSplitImplementation;
+    friend class ImportBREPImplementationForPairing;
 
 public:
     /*------------------------------------------------------------------------*/

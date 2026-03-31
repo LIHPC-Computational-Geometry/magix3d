@@ -1372,6 +1372,27 @@ exploreCompound(const TopoDS_Compound& compound, const std::string& indent)
     }
 }
 /*----------------------------------------------------------------------------*/
+// Fonction pour afficher les informations de base sur une forme TopoDS_Shape
+void OCCHelper::
+displayShapeInfo(const TopoDS_Shape& shape)
+{
+        TopTools_IndexedMapOfShape vertexMap;
+        TopTools_IndexedMapOfShape edgeMap;
+        TopTools_IndexedMapOfShape wireMap;
+        TopTools_IndexedMapOfShape faceMap;
+        TopTools_IndexedMapOfShape solidMap;
+        TopExp::MapShapes(shape, TopAbs_VERTEX, vertexMap);
+        TopExp::MapShapes(shape, TopAbs_EDGE, edgeMap);
+        TopExp::MapShapes(shape, TopAbs_WIRE, wireMap);
+        TopExp::MapShapes(shape, TopAbs_FACE, faceMap);
+        TopExp::MapShapes(shape, TopAbs_SOLID, solidMap);
+        std::cout << "Vertices : " << vertexMap.Extent() << std::endl;
+        std::cout << "Edges    : " << edgeMap.Extent() << std::endl;
+        std::cout << "Wires    : " << wireMap.Extent() << std::endl;
+        std::cout << "Faces    : " << faceMap.Extent() << std::endl;
+        std::cout << "Solids    : " << solidMap.Extent() << std::endl;
+}
+/*----------------------------------------------------------------------------*/
 // Fonction pour calculer la distance curviligne entre deux points sur une liste d'arêtes
 double OCCHelper::
 curvilinearDistance(

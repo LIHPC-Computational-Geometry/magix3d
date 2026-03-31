@@ -2,6 +2,7 @@
 #define COMMANDIMPORTBREP_H_
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandCreateGeom.h"
+#include "Geom/ImportBREPImplementationForPairing.h"
 #include "Internal/Context.h"
 /*----------------------------------------------------------------------------*/
 #include <string>
@@ -51,7 +52,7 @@ protected:
     std::string  m_filename;
 
     /* objet gérant l'opération de fusion */
-    ImportBREPImplementation* m_impl;
+    ImportBREPImplementationForPairing* m_impl;
 };
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

@@ -1,6 +1,6 @@
 /*----------------------------------------------------------------------------*/
 #include "Geom/CommandImportBREP.h"
-#include "Geom/ImportBREPImplementation.h"
+#include "Geom/ImportBREPImplementationForPairing.h"
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -11,8 +11,7 @@ CommandImportBREP(Internal::Context& c, const std::string& n,
     const bool testVolumicProperties, const bool createGroups)
 : CommandCreateGeom(c, "Import BREP"), m_filename(n)
 {
-    m_impl = new ImportBREPImplementation(c, &getInfoCommand(), m_filename, createGroups);
-    m_impl->setTestVolumicProperties(testVolumicProperties);
+    m_impl = new ImportBREPImplementationForPairing(c, &getInfoCommand(), m_filename);
 }
 /*----------------------------------------------------------------------------*/
 CommandImportBREP::~CommandImportBREP()

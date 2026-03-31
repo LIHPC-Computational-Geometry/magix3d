@@ -29,7 +29,7 @@ def generer_script(ctx):
         groups = gm.getInfos(vertex, 0).groups()
         if 'Hors_Groupe_0D' in groups:
             groups.remove('Hors_Groupe_0D')
-        script += f"points['{vertex}'] = ({coord}, {groups})\n"
+        script += f"points['{vertex}'] = ({coord.getX(), coord.getY(), coord.getZ()}, {groups})\n"
     script += "\n" 
 
     script += f"# Anciennes courbes ({len(gm.getCurves())} courbes) : \n"
@@ -148,6 +148,8 @@ def generer_script(ctx):
     script += "def find_in_dicts(key):\n"
     script += "    for d in points_mapping, curves_mapping, surfaces_mapping, volumes_mapping:\n"
     script += "            if key in d:\n"
+    script += "                if len(d[key]) > 1:\n"
+    script += "                    print('Attention correspondance non déterministe pour ' + key)\n"
     script += "                # Renvoyer la première valeur trouvée (suppose que la valeur est une liste)\n"
     script += "                return d[key][0]\n"
     script += "    # Si la clé n'est pas trouvée dans aucun dictionnaire\n"
@@ -203,7 +205,6 @@ def generer_script(ctx):
     edge_id = 0
     for coface in tm.getCoFaces():
         script += f'# Création de la coface {coface}\n'
-        script += f'#print("Création de la coface {coface}")\n'
         edges_list = tm.getInfos(coface, 2).edges()
         script += "coface_edges = []\n"
         hasHole = False
@@ -219,8 +220,7 @@ def generer_script(ctx):
             script += f"coface_edges.append('Edge{edge_id:04d}')\n"
             edge_id += 1
         coface_vertices = [f'vertices_mapping["{vertex}"]' for vertex in tm.getInfos(coface, 2).vertices()]
-        isStructured = "True" if len(coface_vertices) == 4 else "False"
-        # Utiliser tm.getUnstructuredFaces(coface) pour vérifier si la coface est structurée ou non
+        isStructured = "False" if coface in tm.getUnstructuredFaces() else "True"
         script += f'cmd = tm.newCoFace(coface_edges, [{", ".join(coface_vertices)}],{isStructured}, {hasHole})\n'
         script += 'f = cmd.getFaces()[0]\n'
         groups = tm.getInfos(coface, 2).groups()
@@ -234,6 +234,12 @@ def generer_script(ctx):
             script += f"# La coface {coface} est associée à l'entité géométrique {geom_entity}\n"
             script += f"tm.setGeomAssociation([f], find_in_dicts('{geom_entity}'), False)\n"
         script += f'cofaces_mapping["{coface}"] = f\n'
+    script += "\n"
+
+    if tm.getTransfiniteMeshLawFaces():
+        script += "emp = Mgx3D.FaceMeshingPropertyTransfinite()\n"
+        script += f"tm.setMeshingProperty(emp, [cofaces_mapping[coface] for coface in {tm.getTransfiniteMeshLawFaces()}])\n"
+
     script += "print(\"Correspondance des cofaces:\")\n"
     script += "print(cofaces_mapping, '\\n')\n\n"
     script += "\n"
@@ -259,7 +265,7 @@ def generer_script(ctx):
                     face_cofaces.append(f'cofaces_mapping["{coface}"]')
             script += f'# Création de la face {face}\n'
             face_vertices = [f'vertices_mapping["{vertex}"]' for vertex in tm.getInfos(face, 2).vertices()]
-            script += f'cmd = tm.newFace([{", ".join(face_cofaces)}], [{", ".join(face_vertices)}], {"True" if len(face_vertices)==4 else "False"})\n'
+            script += f'cmd = tm.newFace([{", ".join(face_cofaces)}], [{", ".join(face_vertices)}], {"False" if face in tm.getUnstructuredFaces() else "True"})\n'
             script += f'faces_mapping["{face}"] = "Face{face_id:04d}"\n'
             face_id += 1
             blocks_faces_0[tm.getInfos(face, 2).blocks()[0]].append(face)
@@ -300,17 +306,23 @@ def generer_script(ctx):
             script += f'# Création du bloc {block} ayant pour faces {blocks_faces[block]} et pour sommets {tm.getInfos(block, 3).vertices()}\n'
             block_faces = [f'faces_mapping["{face}"]' for face in blocks_faces[block]]
             # Utiliser tm.getUnstructuredBlocks() pour vérifier si le block est structuré ou non
-            script += f'cmd = ctx.getTopoManager().newBlock([{", ".join(block_faces)}], [{", ".join(block_vertices)}], {"True" if len(block_vertices)==4 else "False"}, "")\n'
+            script += f'cmd = ctx.getTopoManager().newBlock([{", ".join(block_faces)}], [{", ".join(block_vertices)}], {"False" if block in tm.getUnstructuredBlocks() else "True"}, "")\n'
         else:
             script += f'# Création du bloc {block} ayant pour faces {blocks_faces_0[block]} et pour sommets {tm.getInfos(block, 3).vertices()}\n'
             block_faces = [f'faces_mapping["{face}"]' for face in blocks_faces_0[block]]
-            script += f'cmd = ctx.getTopoManager().newBlock([{", ".join(block_faces)}], [{", ".join(block_vertices)}], {"True" if len(block_vertices)==4 else "False"}, "")\n'
+            script += f'cmd = ctx.getTopoManager().newBlock([{", ".join(block_faces)}], [{", ".join(block_vertices)}], {"False" if block in tm.getUnstructuredBlocks() else "True"}, "")\n'
         script += 'b = cmd.getBlocks()[0]\n'
         geom_entity = tm.getInfos(block, 3).geom_entity
         if geom_entity:
             script += f"# Le bloc {block} est associé à l'entité géométrique {geom_entity}\n"
             script += f"tm.setGeomAssociation([b], find_in_dicts('{geom_entity}'), False)\n"
         script += f'blocks_mapping["{block}"] = b\n'
+
+    if tm.getTransfiniteMeshLawBlocks():
+        script += "emp = Mgx3D.BlockMeshingPropertyTransfinite()\n"
+        script += f"tm.setMeshingProperty(emp, [blocks_mapping[block] for block in {tm.getTransfiniteMeshLawBlocks()}])\n"
+
+
     script += "print(\"Correspondance des blocs:\")\n"
     script += "print(blocks_mapping, '\\n')\n\n"
 

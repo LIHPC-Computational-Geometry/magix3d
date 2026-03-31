@@ -158,6 +158,7 @@ public:
     static void printInfos(const TopTools_ListOfShape& shapes);
     static void printInfos(const TopoDS_Shape& shape, const std::string& indent="");
     static void exploreCompound(const TopoDS_Compound& compound, const std::string& indent);
+    static void displayShapeInfo(const TopoDS_Shape& shape);
 
 private:
     /// Construit une courbe BSpline à partir d'une collection de Edge
