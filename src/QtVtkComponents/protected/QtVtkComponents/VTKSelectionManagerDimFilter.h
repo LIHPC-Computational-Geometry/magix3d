@@ -30,7 +30,7 @@ namespace QtVtkComponents {
  * et/ou le type d'entités) via leur méthode <I>selectionPolicyModified</I>.
  * </P>
  *
- * @author		Charles PIGNEROL, CEA/DAM/DSSI
+ * @author		Charles PIGNEROL
  * @date		18/10/2012
  */
 class VTKSelectionManagerDimFilter :

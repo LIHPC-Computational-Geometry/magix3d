@@ -26,7 +26,7 @@ namespace QtVtkComponents
  * la souris, au théatre, et spécialisée pour l'application <I>Magix 3D</I>.
  * Attention : cette classe est faite pour fonctionner avec une instance de la
  * classe VTKMgx3DPicker.
- * \author		Charles PIGNEROL, CEA/DAM/DSSI
+ * \author		Charles PIGNEROL
  */
 class VTKMgx3DPickerCommand : public VTKECMPickerCommand
 {
