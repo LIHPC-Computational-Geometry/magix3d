@@ -70,12 +70,18 @@ void CommandAddRemoveGroupName::internalExecute()
 			updateMesh(ge, grp->getName(), false);
 		} else if (m_ope == set){
 			// on retire tous les groupes
+            bool ge_already_in_group = false;
 			for (Group::GroupEntity* grp : groups)
-				m_group_helper.removeFromGroup(grp->getName(), ge);
+                if (grp->getName() == m_groupName)
+                    ge_already_in_group = true;
+                else
+    				m_group_helper.removeFromGroup(grp->getName(), ge);
 
-			// on ajoute le groupe
-			Group::GroupEntity* grp = m_group_helper.addToGroup(m_groupName, ge);
-			updateMesh(ge, grp->getName(), true);
+			// on ajoute le groupe s'il n'était pas déjà présent
+            if (!ge_already_in_group) {
+                Group::GroupEntity* grp = m_group_helper.addToGroup(m_groupName, ge);
+                updateMesh(ge, grp->getName(), true);
+            }
 		} else {
 			TkUtil::Exception ("[Erreur interne] Opération non prévue");
 		}
@@ -97,12 +103,18 @@ void CommandAddRemoveGroupName::internalExecute()
 			updateMesh(te, grp->getName(), false);
 		} else if (m_ope == set){
 			// on retire tous les groupes
+            bool te_already_in_group = false;
 			for (Group::GroupEntity* grp : groups)
-				m_group_helper.removeFromGroup(grp->getName(), te);
+                if (grp->getName() == m_groupName)
+                    te_already_in_group = true;
+                else
+    				m_group_helper.removeFromGroup(grp->getName(), te);
 
-			// on ajoute le groupe
-			Group::GroupEntity* grp = m_group_helper.addToGroup(m_groupName, te);
-			updateMesh(te, grp->getName(), true);
+			// on ajoute le groupe s'il n'était pas déjà présent
+            if (!te_already_in_group) {
+                Group::GroupEntity* grp = m_group_helper.addToGroup(m_groupName, te);
+                updateMesh(te, grp->getName(), true);
+            }
 		} else {
 			TkUtil::Exception ("[Erreur interne] Opération non prévue");
 		}
