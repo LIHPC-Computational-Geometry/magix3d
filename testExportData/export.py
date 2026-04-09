@@ -131,8 +131,6 @@ def generer_script(ctx, export_folder):
         end_vertex = tm.getInfos(coedge, 1).vertices()[1]
         script += f'cmd = tm.newTopoEntity([vertices_mapping["{start_vertex}"], vertices_mapping["{end_vertex}"]], 1, "", True)\n'
         script += 'e = cmd.getEdges()[0]\n'
-        script += f'emp = Mgx3D.EdgeMeshingPropertyUniform({tm.getNbMeshingEdges(coedge)})\n'
-        script += f"tm.setMeshingProperty (emp, [e])\n"
         groups = tm.getInfos(coedge, 1).groups()
         if 'Hors_Groupe_1D' in groups:
             groups.remove('Hors_Groupe_1D')
@@ -150,7 +148,22 @@ def generer_script(ctx, export_folder):
     script += "print(\"Correspondance des arêtes:\")\n"
     script += "print(coedges_mapping, '\\n')\n\n"
     script += "\n"
-    
+
+    script += "# Application des propriétés de maillage sur les arêtes\n"
+    for coedge in tm.getCoEdges():
+        script += f'# Discrétisation de l\'arête {coedge}\n'
+        emp = tm.getEdgeMeshingProperty(coedge)
+        law = emp.getMeshLaw()
+        if (law == Mgx3D.CoEdgeMeshingProperty.uniforme):
+            uemp = Mgx3D.EdgeMeshingPropertyUniform(emp)
+            script += f'emp = Mgx3D.EdgeMeshingPropertyUniform({uemp.getNbEdges()})\n'
+        elif (law == Mgx3D.CoEdgeMeshingProperty.globalinterpolate):
+            giemp = Mgx3D.EdgeMeshingPropertyGlobalInterpolate(emp)
+            script += f'emp = Mgx3D.EdgeMeshingPropertyGlobalInterpolate({giemp.getNbEdges()}, [", ".join([coedges_mapping[coedge] for coedge in {giemp.getFirstCoEdges()}])], [", ".join([coedges_mapping[coedge] for coedge in {giemp.getSecondCoEdges()}])])\n'
+        else:
+            raise ValueError(f"Loi de maillage pour les arêtes non traitée: {law}")
+        script += f"tm.setMeshingProperty (emp, [coedges_mapping['{coedge}']])\n"
+
     script += "# Création des cofaces\n"
     script += "cofaces_mapping = dict()\n"
     edge_id = 0
