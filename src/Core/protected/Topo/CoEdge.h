@@ -390,18 +390,18 @@ private:
     std::vector<Topo::Vertex*> split(uint nbMeshingEdges1, uint nbMeshingEdges2, Internal::InfoCommand* icmd);
 
     /*------------------------------------------------------------------------*/
-    /// Lève une exception si les coedges_ref dépendent de coedge
-    void detectLoopReference(const Topo::CoEdge* coedge, std::vector<Topo::CoEdge*>& coedges_ref, std::set<const CoEdge*>& filtre_coedges) const;
-    /// Lève une exception si les coedges_ref (en face de coedge via la coface) dépendent de coedge
-    void detectLoopReference(const Topo::CoEdge* coedge_dep, const Topo::CoEdge* coedge, Topo::CoFace* coface, std::set<const CoEdge*>& filtre_coedges) const;
+    /// Lève une exception si une boucle est détectée dans l'interpolation
+    void checkNoInterpolationLoop(const Topo::CoEdge* coedge_dep, const std::vector<Topo::CoEdge*> interpolated_coedges, std::set<const Topo::CoEdge*> traversed_coedges=std::set<const Topo::CoEdge*>{}) const;
+
+    //  Retourne la liste des arêtes interpolées depuis coedge
+    const std::vector<Topo::CoEdge*> findInterpolatedCoEdges(const Topo::CoEdge* coedge) const;
 
     /// reporte la date la plus récente des coedges sur l'arête de référence
-    void updateModificationTime(const Topo::CoEdge* coedge_ref, std::vector<Topo::CoEdge*>& coedges) const;
+    void updateModificationTime(const Topo::CoEdge* coedge_ref, const std::vector<Topo::CoEdge*>& coedges) const;
 
     /*------------------------------------------------------------------------*/
     /// recherche un ensemble de coedges à partir des noms
-    void getCoEdges(std::vector<std::string>& coedges_names,
-    		std::vector<Topo::CoEdge*>& coedges) const;
+    void getCoEdges(std::vector<std::string>& coedges_names, std::vector<Topo::CoEdge*>& coedges) const;
 
     /*------------------------------------------------------------------------*/
     /// Création d'une courbe b-spline par projection de points de l'arête sur la surface
