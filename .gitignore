@@ -13,5 +13,4 @@ __pycache__
 *.mli2
 *.pyc
 
-testExportData/*_export/*.brep
-testExportData/*_generated.py
+testExportData/*_generate_import
