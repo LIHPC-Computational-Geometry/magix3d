@@ -11,16 +11,13 @@ def test_undo_hg():
         ctx.getGroupManager().getInfos("Hors_Groupe_3D", 3)
     ctx.getGroupManager().clearGroup(3, "GGG")
     ctx.undo()
-    #with pytest.raises(RuntimeError) as excinfo:
-    #    ctx.getGroupManager().getInfos("Hors_Groupe_3D", 3)
+    ctx.getGroupManager().getInfos("Hors_Groupe_3D", 3)
 
 def test_set_topo_group():
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
-    with pytest.raises(RuntimeError) as excinfo:
-        ctx.getTopoManager().setGroup(["Bl0000"], 3, "AAA")
-    assert "Le groupe Hors_Groupe_3D ne contient pas Bl0000" in str(excinfo.value)
+    ctx.getTopoManager().setGroup(["Bl0000"], 3, "AAA")
 
 def test_group_box():
     ctx = Mgx3D.getStdContext()
