@@ -391,9 +391,9 @@ private:
 
     /*------------------------------------------------------------------------*/
     /// Lève une exception si les coedges_ref dépendent de coedge
-    void detectLoopReference(const Topo::CoEdge* coedge, std::vector<Topo::CoEdge*>& coedges_ref, std::set<const CoEdge*>& filtre_coedges, const Topo::CoFace* coface_dep=0) const;
+    void detectLoopReference(const Topo::CoEdge* coedge, std::vector<Topo::CoEdge*>& coedges_ref, std::set<const CoEdge*>& filtre_coedges) const;
     /// Lève une exception si les coedges_ref (en face de coedge via la coface) dépendent de coedge
-    void detectLoopReference(const Topo::CoEdge* coedge_dep, const Topo::CoEdge* coedge, const Topo::CoFace* coface, std::set<const CoEdge*>& filtre_coedges) const;
+    void detectLoopReference(const Topo::CoEdge* coedge_dep, const Topo::CoEdge* coedge, Topo::CoFace* coface, std::set<const CoEdge*>& filtre_coedges) const;
 
     /// reporte la date la plus récente des coedges sur l'arête de référence
     void updateModificationTime(const Topo::CoEdge* coedge_ref, std::vector<Topo::CoEdge*>& coedges) const;

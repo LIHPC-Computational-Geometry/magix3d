@@ -2663,7 +2663,7 @@ unsigned long CoEdge::getNbInternalMeshingNodes()
 }
 /*----------------------------------------------------------------------------*/
 void CoEdge::
-detectLoopReference(const Topo::CoEdge* coedge_dep, std::vector<Topo::CoEdge*>& coedges_ref, std::set<const CoEdge*>& filtre_coedges, const Topo::CoFace* coface_dep) const
+detectLoopReference(const Topo::CoEdge* coedge_dep, std::vector<Topo::CoEdge*>& coedges_ref, std::set<const CoEdge*>& filtre_coedges) const
 {
 #ifdef _DEBUG2
 	std::cout<<"detectLoopReference("<<coedge_dep->getName()<<", [";
@@ -2743,8 +2743,7 @@ detectLoopReference(const Topo::CoEdge* coedge_dep, std::vector<Topo::CoEdge*>& 
 					throw TkUtil::Exception (message);
 				}
 
-				const CoEdge* ce = (coface != coface_dep ? coedges_ref[i] : coedge_dep);
-				detectLoopReference(ce, coedges_ref[i], coface, filtre_coedges);
+				detectLoopReference(coedge_dep, coedges_ref[i], coface, filtre_coedges);
 
 			} // else if (interpol->getType() == EdgeMeshingPropertyInterpolate::with_coface)
 		} // if (dni->getMeshLaw() == CoEdgeMeshingProperty::interpolate)
@@ -2753,7 +2752,7 @@ detectLoopReference(const Topo::CoEdge* coedge_dep, std::vector<Topo::CoEdge*>& 
 }
 /*----------------------------------------------------------------------------*/
 void CoEdge::
-detectLoopReference(const Topo::CoEdge* coedge_dep, const Topo::CoEdge* coedge, const Topo::CoFace* coface, std::set<const CoEdge*>& filtre_coedges) const
+detectLoopReference(const Topo::CoEdge* coedge_dep, const Topo::CoEdge* coedge, Topo::CoFace* coface, std::set<const CoEdge*>& filtre_coedges) const
 {
 #ifdef _DEBUG2
 	std::cout<<"detectLoopReference("<<coedge_dep->getName()<<", "<<coedge->getName()<<", "<<coface->getName()<<")"<<std::endl;
@@ -2792,7 +2791,7 @@ detectLoopReference(const Topo::CoEdge* coedge_dep, const Topo::CoEdge* coedge, 
 
 	// vérifie que les coedges ne dépendent pas de coedge_dep
 	std::vector<Topo::CoEdge*> coedges_ref = edge_ref->getCoEdges();
-	detectLoopReference(coedge_dep, coedges_ref, filtre_coedges, coface);
+	detectLoopReference(coedge_dep, coedges_ref, filtre_coedges);
 	updateModificationTime(coedge, coedges_ref);
 }
 /*----------------------------------------------------------------------------*/
