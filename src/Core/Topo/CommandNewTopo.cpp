@@ -400,7 +400,43 @@ Topo::Block* CommandNewTopo::getCommonBlock(const Mgx3D::Topo::Vertex *v0, const
                                             const Mgx3D::Topo::Vertex *v2, const Mgx3D::Topo::Vertex *v3,
                                             const Mgx3D::Topo::Vertex *v4, const Mgx3D::Topo::Vertex *v5,
                                             const Mgx3D::Topo::Vertex *v6, const Mgx3D::Topo::Vertex *v7) {
-    throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo la construction des blocs n'est pas prise en compte", TkUtil::Charset::UTF_8));
+
+    std::vector<Block*> v0_blks = v0->getBlocks();
+    std::vector<Block*> v1_blks = v1->getBlocks();
+    std::vector<Block*> v2_blks = v2->getBlocks();
+    std::vector<Block*> v3_blks = v3->getBlocks();
+    std::vector<Block*> v4_blks = v4->getBlocks();
+    std::vector<Block*> v5_blks = v5->getBlocks();
+    std::vector<Block*> v6_blks = v6->getBlocks();
+    std::vector<Block*> v7_blks = v7->getBlocks();
+
+    for(auto v0_b : v0_blks){
+        for(auto v1_b : v1_blks){
+            for(auto v2_b : v2_blks){
+                for(auto v3_b : v3_blks){
+                    for(auto v4_b : v4_blks){
+                        for(auto v5_b : v5_blks){
+                            for(auto v6_b : v6_blks){
+                                for(auto v7_b : v7_blks){
+                                    if (v0_b->getName() == v1_b->getName() &&
+                                        v0_b->getName() == v2_b->getName() &&
+                                        v0_b->getName() == v3_b->getName() &&
+                                        v0_b->getName() == v4_b->getName() &&
+                                        v0_b->getName() == v5_b->getName() &&
+                                        v0_b->getName() == v6_b->getName() &&
+                                        v0_b->getName() == v7_b->getName()) {
+                                        return v0_b;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return nullptr;
 }
 /*----------------------------------------------------------------------------*/
     } // end namespace Topo
