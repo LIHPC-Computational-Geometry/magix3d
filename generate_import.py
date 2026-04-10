@@ -31,7 +31,7 @@ def generer_script(ctx, export_folder):
         groups = gm.getInfos(vertex, 0).groups()
         if 'Hors_Groupe_0D' in groups:
             groups.remove('Hors_Groupe_0D')
-        point_file_name = f"{export_folder}/{vertex + '.brep'}"
+        point_file_name = f"{brep_folder}/{vertex + '.brep'}"
         script += f'cmd = gm.newVertexFromBrep("{point_file_name}")\n'
         script += 'point = cmd.getVertices()[0]\n'
         for group in groups:
@@ -48,7 +48,7 @@ def generer_script(ctx, export_folder):
         groups = gm.getInfos(curve, 1).groups()
         if 'Hors_Groupe_1D' in groups:
             groups.remove('Hors_Groupe_1D')
-        curve_file_name = f"{export_folder}/{curve + '.brep'}"
+        curve_file_name = f"{brep_folder}/{curve + '.brep'}"
         extrema_first_point = gm.getInfos(curve, 1).vertices()[0]
         extrema_last_point = gm.getInfos(curve, 1).vertices()[-1]
         script += f'cmd = gm.newCurveFromBrep("{curve_file_name}", points_mapping["{extrema_first_point}"], points_mapping["{extrema_last_point}"])\n'
@@ -67,7 +67,7 @@ def generer_script(ctx, export_folder):
         groups = gm.getInfos(surface, 2).groups()
         if 'Hors_Groupe_2D' in groups:
             groups.remove('Hors_Groupe_2D')
-        surface_file_name = f"{export_folder}/{surface + '.brep'}"
+        surface_file_name = f"{brep_folder}/{surface + '.brep'}"
         script += f'cmd = gm.newSurfaceFromBrep("{surface_file_name}")\n'
         script += 'surface = cmd.getSurfaces()[0]\n'
         for group in groups:
@@ -84,7 +84,7 @@ def generer_script(ctx, export_folder):
         groups = gm.getInfos(volume, 3).groups()
         if 'Hors_Groupe_3D' in groups:
             groups.remove('Hors_Groupe_3D')
-        volume_file_name = f"{export_folder}/{volume + '.brep'}"
+        volume_file_name = f"{brep_folder}/{volume + '.brep'}"
         script += f'cmd = gm.newVolumeFromBrep("{volume_file_name}")\n'
         script += 'volume = cmd.getVolumes()[0]\n'
         for group in groups:
@@ -312,31 +312,33 @@ if __name__ == "__main__":
             exec(code)
 
             # création du répertoire de sortie s'il n'existe pas
-            export_folder = os.path.join(path, script_name + "_export")
+            export_folder = os.path.join(path, script_name + "_generate_import")
+            brep_folder = os.path.join(export_folder, "brep")
             os.makedirs(export_folder, exist_ok=True)
+            os.makedirs(brep_folder, exist_ok=True) 
             
             for vertex in gm.getVertices():
-                brep_file_name = f"{export_folder}/{vertex + '.brep'}"
+                brep_file_name = f"{brep_folder}/{vertex + '.brep'}"
                 print(brep_file_name)
                 gm.exportBREP ([vertex], brep_file_name)
 
             for curve in gm.getCurves():
-                brep_file_name = f"{export_folder}/{curve + '.brep'}"
+                brep_file_name = f"{brep_folder}/{curve + '.brep'}"
                 print(brep_file_name)
                 gm.exportBREP ([curve], brep_file_name)
 
             for surface in gm.getSurfaces():
-                brep_file_name = f"{export_folder}/{surface + '.brep'}"
+                brep_file_name = f"{brep_folder}/{surface + '.brep'}"
                 print(brep_file_name)
                 gm.exportBREP ([surface], brep_file_name)
 
             for volume in gm.getVolumes():
-                brep_file_name = f"{export_folder}/{volume + '.brep'}"
+                brep_file_name = f"{brep_folder}/{volume + '.brep'}"
                 print(brep_file_name)
                 gm.exportBREP ([volume], brep_file_name)
             
             generated_script = generer_script(ctx, export_folder)
-            generated_script_file_name = f"{path}/{file.replace('.py', '_generated.py')}"
+            generated_script_file_name = f"{export_folder}/{file.replace('.py', '_generated.py')}"
             # Sauvegarde du script généré
             with open(generated_script_file_name, "w") as f:
                 f.write(generated_script)
