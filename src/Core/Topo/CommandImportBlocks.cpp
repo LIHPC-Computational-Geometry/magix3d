@@ -15,7 +15,7 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
         CommandImportBlocks::
         CommandImportBlocks(Internal::Context& c, const std::string& n, bool withGeom)
-                : CommandCreateTopo(c, "Import (Topo) blk"), m_filename(n)
+                : CommandCreateTopo(c, "Import (Topo) mgxt"), m_filename(n)
         {
             m_impl = new ImportBlocksImplementation(c, &getInfoCommand(), m_filename, withGeom);
         }

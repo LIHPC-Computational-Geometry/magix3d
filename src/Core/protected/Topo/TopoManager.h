@@ -1919,6 +1919,8 @@ public:
     }
 #endif
 
+    Internal::M3DCommandResult* computeAero(std::string filename);
+
 private:
     /** Recherche un vecteur d'entités topologiques suivant leur nom,
      *  lève une exception en cas d'erreur.
@@ -1931,6 +1933,7 @@ private:
 
     /// Retourne une liste d'entités en fonction du nom et de la dimension
     std::vector<TopoEntity*> getEntitiesFromNames(const std::vector<std::string>& names, const int dim) const;
+
 
     /** blocs accessibles depuis le manager */
     std::vector<Block*> m_blocks;

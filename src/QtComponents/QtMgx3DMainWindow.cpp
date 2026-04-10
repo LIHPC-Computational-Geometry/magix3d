@@ -47,7 +47,7 @@
 #include "QtComponents/QtAngleMeasurementOperationAction.h"
 #include "QtComponents/QtExtremaMeshingEdgeLengthOnEdgeAction.h"
 #include "QtComponents/QtBooleanOpOperationAction.h"
-#include "QtComponents/QtPrismCreationAction.h"
+#include "QtComponents/QtExtrusionAction.h"
 #include "QtComponents/QtGeomEntityByRevolutionCreationAction.h"
 #include "QtComponents/QtGeomEntityCommon2DOperationAction.h"
 #include "QtComponents/QtSegmentOperationAction.h"
@@ -2694,14 +2694,20 @@ void QtMgx3DMainWindow::showReady ( )
 			// Surface :
 			QtGeomSurfaceCreationAction *surfaceAction =
 					                            new QtGeomSurfaceCreationAction(
-							                            QIcon(
-									                            ":/images/create_surface_with_contour.png"),
+							                            QIcon(":/images/create_surface_with_contour.png"),
 							                            QString::fromUtf8("Création de surface"), *this, QString::fromUtf8("Création de surface.")
 					                            );
 			CHECK_NULL_PTR_ERROR(surfaceAction->getSurfaceCreationPanel())
 			surfaceAction->getSurfaceCreationPanel()->setDimension(1);
-			registerOperationAction(
-					*surfaceAction, QtMgx3DOperationsPanel::GEOM_SURFACE_OPERATION);
+			registerOperationAction(*surfaceAction, QtMgx3DOperationsPanel::GEOM_SURFACE_OPERATION);
+            // Création d'entité par extrusion :
+			QtMgx3DOperationAction *surfaceByExtrusionAction =
+					                       new QtExtrusionAction(
+							                       QIcon(":/images/create_quad_by_extrusion.png"), QString::fromUtf8("Création de surface par extrusion"), *this,
+							                       SelectionManager::D1, QString::fromUtf8("Création de surface géométrique par extrusion linéaire de courbe."),
+							                       QtMgx3DGroupNamePanel::CREATION
+					                       );
+			registerOperationAction(*surfaceByExtrusionAction, QtMgx3DOperationsPanel::GEOM_SURFACE_OPERATION);
 			// Boite :
 			QtMgx3DOperationAction *boxAction =
 					                       new QtBoxOperationAction(
@@ -2749,14 +2755,12 @@ void QtMgx3DMainWindow::showReady ( )
 					*spherepartAction, QtMgx3DOperationsPanel::GEOM_VOLUME_OPERATION);
             // Création d'entité par extrusion :
 			QtMgx3DOperationAction *entityByExtrusionAction =
-					                       new QtPrismCreationAction(
-							                       QIcon(
-									                       ":/images/create_prism_by_extrusion.png"), QString::fromUtf8("Création d'entité géométrique par extrusion"), *this,
-							                       QString::fromUtf8("Création d'entité géométrique par extrusion."),
+					                       new QtExtrusionAction(
+							                       QIcon(":/images/create_prism_by_extrusion.png"), QString::fromUtf8("Création de volume par extrusion"), *this,
+							                       SelectionManager::D2, QString::fromUtf8("Création de volume géométrique par extrusion de surface."),
 							                       QtMgx3DGroupNamePanel::CREATION
 					                       );
-			registerOperationAction(
-					*entityByExtrusionAction, QtMgx3DOperationsPanel::GEOM_VOLUME_OPERATION);
+			registerOperationAction(*entityByExtrusionAction, QtMgx3DOperationsPanel::GEOM_VOLUME_OPERATION);
 			// Création d'entité par révolution :
 			dim = 0;
 			for (int ot = (int) QtMgx3DOperationsPanel::GEOM_CURVE_OPERATION;
@@ -5518,7 +5522,7 @@ cout << __FILE__ << ' ' << __LINE__ << " QtMgx3DMainWindow::exitCallback" << end
 			filters << "BREP (*.brep)";
 			filters << "STEP (*.stp *.step)";
 			filters << "IGES (*.igs *.iges)";
-            filters << "BLOCKS (*.blk)";
+            filters << "Magix Topo (*.mgxt)";
 			UTF8String limaFilter(Charset::UTF_8);
 			limaFilter << "Lima++ (";
 			const char **limaExt = Lima::liste_format_lecture();
@@ -5647,7 +5651,7 @@ cout << __FILE__ << ' ' << __LINE__ << " QtMgx3DMainWindow::exitCallback" << end
 										getContext().getMeshManager().readMli(fileName, pre);
 									}    // Lima
                                     else
-                                    if (true == compareExtensions(file.getExtension(), "blk"))
+                                    if (true == compareExtensions(file.getExtension(), "mgxt"))
                                     {
                                         QtBlocksOptionsDialog blocksDialog(this, getAppTitle(), fileName);
                                         if (QDialog::Rejected == blocksDialog.exec())
@@ -5743,7 +5747,7 @@ void QtMgx3DMainWindow::exportAllCallback ( )
 	filters << "STEP (*.stp *.step)";
 	filters << "IGES (*.igs *.iges)";
 	filters << "CGNS (*.cgns)";
-    filters << "BLOCKS (*.blk)";
+    filters << "Magix Topo (*.mgxt)";
 	dialog.setNameFilters (filters);
 
 	while (0 == fileName.length ( ))
@@ -5873,7 +5877,7 @@ void QtMgx3DMainWindow::exportAllCallback ( )
 		cursor.show();
 		getContext ( ).getMeshManager ( ).exportBlocksForCGNS (dim,fileName);
 	}	// cgns
-    else if (true == compareExtensions (file.getExtension ( ), "blk"))
+    else if (true == compareExtensions (file.getExtension ( ), "mgxt"))
     {
         SelectionManager&	selectionManager	=
                 getContext ( ).getSelectionManager ( );

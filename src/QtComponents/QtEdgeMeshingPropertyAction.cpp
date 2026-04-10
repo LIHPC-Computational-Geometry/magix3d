@@ -1604,6 +1604,164 @@ EdgeMeshingPropertyBeta*
 
 
 // ===========================================================================
+//                 LA CLASSE QtBiExponentialDiscretisationPanel
+// ===========================================================================
+
+QtBiExponentialDiscretisationPanel::QtBiExponentialDiscretisationPanel(
+    QWidget *parent,
+    const double length1,
+    const double length2,
+    QtMgx3DMainWindow &mw)
+    : QtDiscretisationPanelIfc(parent, mw),
+      _length1TextField(nullptr),
+      _length2TextField(nullptr),
+      _orientationCheckBox(nullptr)
+{
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    setLayout(layout);
+    layout->setContentsMargins(
+        Resources::instance()._margin.getValue(),
+        Resources::instance()._margin.getValue(),
+        Resources::instance()._margin.getValue(),
+        Resources::instance()._margin.getValue());
+    layout->setSpacing(Resources::instance()._spacing.getValue());
+
+    // Le premier bras côté 1 :
+    QHBoxLayout *hlayout = new QHBoxLayout();
+    layout->addLayout(hlayout);
+    QLabel *label = new QLabel(QString::fromUtf8("Longueur premier bras côté 1 :"), this);
+    hlayout->addWidget(label);
+    _length1TextField = &QtNumericFieldsFactory::createDistanceTextField(this);
+    _length1TextField->setValue(length1);
+    hlayout->addWidget(_length1TextField);
+    connect(_length1TextField, SIGNAL(editingFinished ( )), this,
+            SLOT(discretisationModifiedCallback ( )));
+
+    // Le premier bras côté 2 :
+    hlayout = new QHBoxLayout();
+    layout->addLayout(hlayout);
+    label = new QLabel(QString::fromUtf8("Longueur premier bras côté 2 :"), this);
+    hlayout->addWidget(label);
+    _length2TextField = &QtNumericFieldsFactory::createDistanceTextField(this);
+    _length2TextField->setValue(length2);
+    hlayout->addWidget(_length2TextField);
+    connect(_length2TextField, SIGNAL(editingFinished ( )), this,
+            SLOT(discretisationModifiedCallback ( )));
+
+    // Le sens de la discrétisation :
+    _orientationCheckBox = new QCheckBox("Inverser le sens", this);
+    layout->addWidget(_orientationCheckBox);
+    connect(_orientationCheckBox, SIGNAL(stateChanged (int)), this,
+            SLOT(discretisationModifiedCallback ( )));
+
+    // L'orthogonalité à la paroi :
+    createOrthogonalityArea(*layout);
+}
+
+
+QtBiExponentialDiscretisationPanel::QtBiExponentialDiscretisationPanel(
+    const QtBiExponentialDiscretisationPanel &p)
+    : QtDiscretisationPanelIfc(
+          nullptr,
+          *new QtMgx3DMainWindow(nullptr)),
+      _length1TextField(nullptr),
+      _length2TextField(nullptr),
+      _orientationCheckBox(nullptr)
+{
+    MGX_FORBIDDEN("QtBiExponentialDiscretisationPanel copy constructor is not allowed.");
+}
+
+
+QtBiExponentialDiscretisationPanel &
+QtBiExponentialDiscretisationPanel::operator =(
+    const QtBiExponentialDiscretisationPanel &)
+{
+    MGX_FORBIDDEN("QtBiExponentialDiscretisationPanel assignment operator is not allowed.");
+    return *this;
+}
+
+
+QtBiExponentialDiscretisationPanel::~QtBiExponentialDiscretisationPanel()
+{
+}
+
+
+void
+QtBiExponentialDiscretisationPanel::reset() {
+    BEGIN_QT_TRY_CATCH_BLOCK
+        CHECK_NULL_PTR_ERROR(_length1TextField)
+        CHECK_NULL_PTR_ERROR(_length2TextField)
+        _length1TextField->setValue(1.);
+        _length2TextField->setValue(1.);
+
+    COMPLETE_QT_TRY_CATCH_BLOCK(true, this, "Magix 3D")
+
+    QtDiscretisationPanelIfc::reset();
+}
+
+
+void
+QtBiExponentialDiscretisationPanel::setMeshingProperty(
+    const CoEdgeMeshingProperty &cemp)
+{
+    CHECK_NULL_PTR_ERROR(_length1TextField)
+    CHECK_NULL_PTR_ERROR(_length2TextField)
+    CHECK_NULL_PTR_ERROR(_orientationCheckBox)
+
+    const auto *properties = dynamic_cast<const EdgeMeshingPropertyBiexponential *>(&cemp);
+    if (!properties)
+    {
+        INTERNAL_ERROR(exc, "Les propriétés de maillage ne sont pas du type EdgeMeshingPropertyBiExponential.",
+                       "QtBiExponentialDiscretisationPanel::setMeshingProperty")
+        throw exc;
+    }
+
+    _length1TextField->setValue(properties->getLength1());
+    _length2TextField->setValue(properties->getLength2());
+    _orientationCheckBox->setCheckState(true == properties->getDirect() ? Qt::Unchecked : Qt::Checked);
+    QtDiscretisationPanelIfc::setMeshingProperty(cemp);
+}
+
+
+double
+QtBiExponentialDiscretisationPanel::getLength1() const
+{
+    CHECK_NULL_PTR_ERROR(_length1TextField)
+    return _length1TextField->getValue();
+}
+
+
+double
+QtBiExponentialDiscretisationPanel::getLength2() const
+{
+    CHECK_NULL_PTR_ERROR(_length2TextField)
+    return _length2TextField->getValue();
+}
+
+
+bool
+QtBiExponentialDiscretisationPanel::invertOrientation() const
+{
+    CHECK_NULL_PTR_ERROR(_orientationCheckBox)
+    return Qt::Checked == _orientationCheckBox->checkState() ? true : false;
+}
+
+
+EdgeMeshingPropertyBiexponential *
+QtBiExponentialDiscretisationPanel::getMeshingProperty(const size_t edgeNum) const
+{
+    auto *emp = new EdgeMeshingPropertyBiexponential(edgeNum,
+                                                     getLength1(),
+                                                     getLength2(),
+                                                     !invertOrientation());
+    updateProperty(*emp);
+
+    return emp;
+}
+
+
+
+// ===========================================================================
 //                   LA CLASSE QtEdgeMeshingPropertyPanelIfc
 // ===========================================================================
 
@@ -1690,7 +1848,9 @@ QtEdgeListMeshingPropertyPanel::QtEdgeListMeshingPropertyPanel (
 	  _uniformDiscretisationPanel (0), _geometricProgressionPanel (0),
 	  _specificSizePanel (0), _interpolatedPanel (0), _globalInterpolatedPanel(0),
 	  _bigeometricProgressionPanel (0), _hyperbolicPanel (0),
-	  _betaPanel (0), _edgesNumTextField (edgesNumTextField)
+	  _betaPanel (0),
+    _biexponentialPanel(nullptr),
+    _edgesNumTextField (edgesNumTextField)
 {
 //	SET_WIDGET_BACKGROUND (this, Qt::yellow)
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
@@ -1716,6 +1876,7 @@ QtEdgeListMeshingPropertyPanel::QtEdgeListMeshingPropertyPanel (
 	_algorithmComboBox->addItem (QString::fromUtf8("Progression bi-géométrique"));
 	_algorithmComboBox->addItem (QString::fromUtf8("Progression hyperbolique"));
 	_algorithmComboBox->addItem (QString::fromUtf8("Loi beta de resserrement à la paroi"));
+    _algorithmComboBox->addItem (QString::fromUtf8("Progression bi-exponentielle"));
 	connect (_algorithmComboBox, SIGNAL (currentIndexChanged (int)),
 	         this, SLOT (algorithmCallback ( )));
 	hlayout->addWidget (_algorithmComboBox);
@@ -1836,6 +1997,22 @@ QtEdgeListMeshingPropertyPanel::QtEdgeListMeshingPropertyPanel (
 	         SIGNAL (discretisationModified ( )),
 	         this, SLOT (discretisationModifiedCallback ( )));
 
+    _biexponentialPanel	=
+            new QtBiExponentialDiscretisationPanel (nullptr, 1., 1., mainWindow);
+    _biexponentialPanel->hide();
+    connect(_biexponentialPanel,
+            SIGNAL(entitiesAddedToSelection(QString)),
+            this,
+            SLOT(entitiesAddedToSelectionCallback(QString)));
+    connect(_biexponentialPanel,
+            SIGNAL(entitiesRemovedFromSelection(QString)),
+            this,
+            SLOT(entitiesRemovedFromSelectionCallback(QString)));
+    connect(_biexponentialPanel,
+            SIGNAL(discretisationModified()),
+            this,
+            SLOT(discretisationModifiedCallback()));
+
 	vlayout->addStretch (2);
 
 	algorithmCallback ( );
@@ -1851,7 +2028,9 @@ QtEdgeListMeshingPropertyPanel::QtEdgeListMeshingPropertyPanel (
 	  _uniformDiscretisationPanel (0), _geometricProgressionPanel (0),
 	  _specificSizePanel (0), _interpolatedPanel (0), _globalInterpolatedPanel(0),
 	  _bigeometricProgressionPanel (0), _hyperbolicPanel (0),
-	  _betaPanel(0), _edgesNumTextField (0)
+	  _betaPanel(0),
+    _biexponentialPanel(nullptr),
+    _edgesNumTextField (0)
 {
 	MGX_FORBIDDEN ("QtEdgeListMeshingPropertyPanel copy constructor is not allowed.");
 }	// QtEdgeListMeshingPropertyPanel::QtEdgeListMeshingPropertyPanel (
@@ -1889,6 +2068,7 @@ CoEdgeMeshingProperty*
 	CHECK_NULL_PTR_ERROR (_bigeometricProgressionPanel)
 	CHECK_NULL_PTR_ERROR (_hyperbolicPanel)
 	CHECK_NULL_PTR_ERROR (_betaPanel)
+    CHECK_NULL_PTR_ERROR (_biexponentialPanel)
 
 
 	CHECK_NULL_PTR_ERROR (_edgesNumTextField)
@@ -1912,6 +2092,8 @@ CoEdgeMeshingProperty*
 			return _hyperbolicPanel->getMeshingProperty ( edgesNum );
 		case QtEdgeListMeshingPropertyPanel::BETA	:
 			return _betaPanel->getMeshingProperty ( edgesNum );
+        case QtEdgeListMeshingPropertyPanel::BI_EXPONENTIAL:
+            return _biexponentialPanel->getMeshingProperty ( edgesNum );
 	}	// switch (getAlgorithm ( ))
 
 	INTERNAL_ERROR (exc, "Méthode de discrétisation d'arête non supportée", "QtEdgeListMeshingPropertyPanel::getMeshingProperty")
@@ -1971,6 +2153,10 @@ void QtEdgeListMeshingPropertyPanel::setMeshingProperty (
 			newAlgo	= QtEdgeListMeshingPropertyPanel::BETA;
 			_edgesNumTextField->setValue (properties.getNbEdges ( ));
 			break;
+        case CoEdgeMeshingProperty::biexponential:
+            newAlgo	= QtEdgeListMeshingPropertyPanel::BI_EXPONENTIAL;
+            _edgesNumTextField->setValue (properties.getNbEdges());
+            break;
 		default	:
 			throw Exception (UTF8String ("Réinitialisation du panneau impossible : alorithme non supporté.", Charset::UTF_8));
 	}	// switch (properties.getMeshLaw ( ))
@@ -1998,6 +2184,7 @@ void QtEdgeListMeshingPropertyPanel::reset ( )
 	CHECK_NULL_PTR_ERROR (_bigeometricProgressionPanel)
 	CHECK_NULL_PTR_ERROR (_hyperbolicPanel)
 	CHECK_NULL_PTR_ERROR (_betaPanel)
+    CHECK_NULL_PTR_ERROR (_biexponentialPanel)
 	CHECK_NULL_PTR_ERROR (_edgesNumTextField)
 	_uniformDiscretisationPanel->reset ( );
 	_geometricProgressionPanel->reset ( );
@@ -2007,6 +2194,7 @@ void QtEdgeListMeshingPropertyPanel::reset ( )
 	_bigeometricProgressionPanel->reset ( );
 	_hyperbolicPanel->reset ( );
 	_betaPanel->reset ( );
+    _biexponentialPanel->reset();
 	_edgesNumTextField->setValue (10);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
@@ -2048,6 +2236,7 @@ void QtEdgeListMeshingPropertyPanel::validate ( )
 		case QtEdgeListMeshingPropertyPanel::BI_GEOMETRIC			:
 		case QtEdgeListMeshingPropertyPanel::HYPERBOLIC				:
 		case QtEdgeListMeshingPropertyPanel::BETA		    		:
+	    case QtEdgeListMeshingPropertyPanel::BI_EXPONENTIAL:
 			break;
 		case -1	:
 			if (0 != error.length ( ))
@@ -2153,6 +2342,7 @@ void QtEdgeListMeshingPropertyPanel::algorithmCallback ( )
 	CHECK_NULL_PTR_ERROR (_bigeometricProgressionPanel)
 	CHECK_NULL_PTR_ERROR (_hyperbolicPanel)
 	CHECK_NULL_PTR_ERROR (_betaPanel)
+    CHECK_NULL_PTR_ERROR (_biexponentialPanel)
 	if (0 != _currentPanel)
 	{
 		_currentParentWidget->layout ( )->removeWidget (_currentPanel);
@@ -2195,6 +2385,10 @@ void QtEdgeListMeshingPropertyPanel::algorithmCallback ( )
 			_currentPanel	= _betaPanel;
 			_edgesNumTextField->setVisible(true);
 			break;
+        case QtEdgeListMeshingPropertyPanel::BI_EXPONENTIAL:
+            _currentPanel = _biexponentialPanel;
+            _edgesNumTextField->setVisible(true);
+            break;
 		default	:
 		{
 			UTF8String	message (Charset::UTF_8);

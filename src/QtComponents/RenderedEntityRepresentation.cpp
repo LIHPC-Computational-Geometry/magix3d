@@ -235,11 +235,11 @@ float RenderedEntityRepresentation::getPointSize (
 float RenderedEntityRepresentation::getLineWidth (
 									const Entity& entity, unsigned long mask)
 {
-	float lineWidth	= 1;
 	//const DisplayProperties&	properties	= entity.getDisplayProperties ( );
 	const DisplayProperties	properties	= getDisplayPropertiesAttributes ( );
 	const DisplayProperties::GraphicalRepresentation*	rep	=
 		entity.getDisplayProperties ( ).getGraphicalRepresentation ( );
+    float lineWidth	= properties.getLineWidth ( );
 
 	if ((0 != rep) && (true == rep->isSelected ( )))
 	{

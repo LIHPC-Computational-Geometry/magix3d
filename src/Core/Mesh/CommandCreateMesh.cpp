@@ -1146,82 +1146,80 @@ meshAndModify(std::list<Topo::CoFace*>& list_cofaces)
 			}
 			else if (lissageSurf){
 
-				// le lissage dépend de la surface sur laquelle se fait la projection
-				for (Geom::Surface* surface : surfaces){
-					std::vector<Topo::CoFace*> cofaces = tm.getFilteredRefTopos<Topo::CoFace>(surface);
+                // le lissage dépend de la surface sur laquelle se fait la projection
+                for (Geom::Surface* surface : surfaces)
+                {
+                    std::vector<Topo::CoFace *> surf_cofaces = tm.getFilteredRefTopos<Topo::CoFace>(surface);
 
-					// marque par coface pour savoir si elle est dans le même sens (normale) que les autres
-					std::map<Topo::CoFace*, bool> isCoFaceInverted;
-					Topo::TopoHelper::computeInvertedDir(cofaces, isCoFaceInverted);
-					std::map<gmds::TCellID, bool> isPolyInverted;
+                    // marque par coface pour savoir si elle est dans le même sens (normale) que les autres
+                    if (!surf_cofaces.empty())
+                    {
+                        std::map<Topo::CoFace *, bool> isCoFaceInverted;
+                        Topo::TopoHelper::computeInvertedDir(surf_cofaces, isCoFaceInverted);
+                        std::map<gmds::TCellID, bool> isPolyInverted;
 
-					// ensemble des cofaces d'une surface du groupe qui sont maillées à la fin
-					std::vector<Topo::CoFace*> meshed_cofaces;
+                        // ensemble des cofaces d'une surface du groupe qui sont maillées à la fin
+                        std::vector<Topo::CoFace *> meshed_cofaces;
 
-					for (Topo::CoFace* coface : cofaces) {
-						if (coface->isMeshed())
-							meshed_cofaces.push_back(coface);
-					} // end for iter3
-
-					// la liste des polygones dans ces cofaces
-					std::vector<gmds::Face> polygones;
-					// la liste des noeuds dans ces cofaces
-					std::vector<gmds::Node> nodes;
-
-					// filtre sur les noeuds gmds pour les lissages:
-					// 1 pour les nouveaux,
-					// 2 pour les noeuds au bord d'une surface de maillage
-					std::map<gmds::TCellID, uint> filtre_nodes_lisse;
-
-					for (Topo::CoFace* coface : meshed_cofaces){
-						bool isInverted = isCoFaceInverted[coface];
-						std::vector<gmds::TCellID>& l_nds = coface->nodes();
-						std::vector<gmds::TCellID>& l_poly = coface->faces();
-
-                        for(unsigned int i_poly=0;i_poly<l_poly.size();i_poly++){
-                            polygones.push_back(gmds_mesh.get<gmds::Face>(l_poly[i_poly]));
-                            isPolyInverted[l_poly[i_poly]] = isInverted;
+                        for (Topo::CoFace *coface: surf_cofaces)
+                        {
+                            if (coface->isMeshed())
+                            {
+                                meshed_cofaces.push_back(coface);
+                            }
                         }
 
-						for (std::vector<gmds::TCellID>::iterator iter4 = l_nds.begin();
-								iter4 != l_nds.end(); ++iter4)
-							if (filtre_nodes_lisse[*iter4] == 0){
-								filtre_nodes_lisse[*iter4] = 1;
-								nodes.push_back(gmds_mesh.get<gmds::Node>(*iter4));
-						}
-					}
+                        // la liste des polygones dans ces cofaces
+                        std::vector<gmds::Face> polygones;
+                        // la liste des noeuds dans ces cofaces
+                        std::vector<gmds::Node> nodes;
+
+                        // filtre sur les noeuds gmds pour les lissages:
+                        // 1 pour les nouveaux,
+                        // 2 pour les noeuds au bord d'une surface de maillage
+                        std::map<gmds::TCellID, uint> filtre_nodes_lisse;
+
+                        for (Topo::CoFace *coface: meshed_cofaces)
+                        {
+                            bool isInverted = isCoFaceInverted[coface];
+                            std::vector<gmds::TCellID> &l_nds = coface->nodes();
+                            std::vector<gmds::TCellID> &l_poly = coface->faces();
+
+                            for (unsigned int poly : l_poly)
+                            {
+                                polygones.push_back(gmds_mesh.get<gmds::Face>(poly));
+                                isPolyInverted[poly] = isInverted;
+                            }
+
+                            for (unsigned int & l_nd : l_nds)
+                            {
+                                if (filtre_nodes_lisse[l_nd] == 0)
+                                {
+                                    filtre_nodes_lisse[l_nd] = 1;
+                                    nodes.push_back(gmds_mesh.get<gmds::Node>(l_nd));
+                                }
+                            }
+                        }
 
 
-					std::vector<Topo::CoEdge*> border_meshed_coedges;
-					border_meshed_coedges = Topo::TopoHelper::getBorder(meshed_cofaces);
+                        std::vector<Topo::CoEdge *> border_meshed_coedges;
+                        border_meshed_coedges = Topo::TopoHelper::getBorder(meshed_cofaces);
 
-					// on marque les noeuds des arêtes au bord à 2 pour ne pas les déplacer
-					for (std::vector<Topo::CoEdge*>::iterator iter3 = border_meshed_coedges.begin();
-							iter3 != border_meshed_coedges.end(); ++iter3){
-						std::vector<gmds::TCellID>& nodes = (*iter3)->nodes();
-						for (std::vector<gmds::TCellID>::iterator iter4 = nodes.begin();
-								iter4 != nodes.end(); ++iter4)
-							filtre_nodes_lisse[*iter4] = 2;
-					} // end for iter3
-#ifdef _DEBUG2
-					{
-						// stats sur le nombre de noeuds à 1 et ceux à 2
-						uint mq1 = 0;
-						uint mq2 = 0;
-						for (std::map<gmds::TCellID, uint>::iterator iter=filtre_nodes_lisse.begin();
-								iter!=filtre_nodes_lisse.end(); ++iter)
-							if (iter->second == 1)
-								mq1++;
-							else if (iter->second == 2)
-								mq2++;
-						std::cout<<"CommandCreateMesh::meshAndModify, filtre_nodes_lisse avec "<<mq1<<" noeuds à bouger et "<<mq2<<" figés"<<std::endl;
+                        // on marque les noeuds des arêtes au bord à 2 pour ne pas les déplacer
+                        for (auto & border_meshed_coedge : border_meshed_coedges)
+                        {
+                            std::vector<gmds::TCellID> &bme_nodes = border_meshed_coedge->nodes();
+                            for (unsigned int & node : bme_nodes)
+                            {
+                                filtre_nodes_lisse[node] = 2;
+                            }
+                        }
 
-					}
-#endif
-					// applique le lissage uniquement aux noeuds internes à la surface (non marqués à 2)
-					lissageSurf->applyModification(nodes, polygones, filtre_nodes_lisse, isPolyInverted, 2, surface);
-
-				} // end for surface
+                        // applique le lissage uniquement aux noeuds internes à la surface (non marqués à 2)
+                        lissageSurf->applyModification(nodes, polygones, filtre_nodes_lisse, isPolyInverted, 2,
+                                                       surface);
+                    }
+                } // end for surface
 
 
 			}

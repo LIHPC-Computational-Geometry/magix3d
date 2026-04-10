@@ -19,6 +19,7 @@
 #include "Topo/EdgeMeshingPropertySpecificSize.h"
 #include "Topo/EdgeMeshingPropertyInterpolate.h"
 #include "Topo/EdgeMeshingPropertyGlobalInterpolate.h"
+#include "Topo/EdgeMeshingPropertyBiexponential.h"
 #include "Topo/EdgeMeshingPropertyBigeometric.h"
 #include "Topo/EdgeMeshingPropertyHyperbolic.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
@@ -827,6 +828,83 @@ class QtBetaDiscretisationPanel : public QtDiscretisationPanelIfc
 
 
 /**
+ * Le paramétrage d'un découpage bi-exponentiel.
+ */
+class QtBiExponentialDiscretisationPanel : public QtDiscretisationPanelIfc
+{
+    Q_OBJECT
+
+    public :
+
+    /**
+     * \param   Widget parent
+     * \param   Longueur des premiers bras aux extrémités.
+     * \param   Fenêtre principale <I>Magix 3D</I> de rattachement,
+     *          utilisée notamment pour récupérer le contexte.
+     */
+    QtBiExponentialDiscretisationPanel (QWidget* parent,
+                                       double length1,
+                                       double length2,
+                                       Mgx3D::QtComponents::QtMgx3DMainWindow& mw);
+
+    /**
+     * Destructeur. RAS.
+     */
+    ~QtBiExponentialDiscretisationPanel() override;
+
+    /**
+     * Réinitialise le panneau.
+     */
+    void reset() override;
+
+    /**
+     * Réinitialise le panneau à l'aide des propriétés de discrétisation
+     * transmises en  argument.
+     */
+    void setMeshingProperty(const Mgx3D::Topo::CoEdgeMeshingProperty&) override;
+
+    /**
+     * \return La longueur du bras à l'extrémité du côté 1.
+     */
+    virtual double getLength1() const;
+
+    /**
+     * \return La longueur du bras à l'extrémité du côté 2.
+     */
+    virtual double getLength2() const;
+
+    /**
+     * \return <I>true</I> s'il faut inverser l'orientation du découpage,
+     *         <I>false</I> dans le sens contraire.
+     */
+    virtual bool invertOrientation() const;
+
+    /**
+     * \param edgeNum le nombre de bras
+     * \return La propriété de maillage de l'arête conforme au panneau.
+     */
+    virtual Mgx3D::Topo::EdgeMeshingPropertyBiexponential*
+                                            getMeshingProperty( size_t edgeNum ) const;
+
+private :
+
+/**
+ * Constructeur de copie et opérateur = : interdits.
+ */
+QtBiExponentialDiscretisationPanel (const QtBiExponentialDiscretisationPanel&);
+    QtBiExponentialDiscretisationPanel& operator = (
+                                        const QtBiExponentialDiscretisationPanel&);
+
+    /** La saisie des longueurs des 2 bras aux extrémités. */
+    QtDoubleTextField *_length1TextField;
+    QtDoubleTextField *_length2TextField;
+
+    /** Faut il inverser le sens de discrétisation ? */
+    QCheckBox* _orientationCheckBox;
+};	// class QtBiExponentielDiscretisationPanel
+
+
+/**
  * Panneau générique d'édition des paramètres de maillage d'une liste d'arêtes
  * topologiques.
  */
@@ -933,11 +1011,12 @@ class QtEdgeListMeshingPropertyPanel : public QtEdgeMeshingPropertyPanelIfc
 	 * <LI>Interpolation avec une progression à chaque extrémité.
 	 * <LI>Interpolation avec une progression dite hyperbolique.
 	 * <LI>Interpolation avec loi de resserrement beta.
+	 * <LI>Discrétisation avec progressions bi-exponentielles.
 	 * </OL>
 	 */
 	enum ALGORITHM { UNIFORM, GEOMETRIC_PROGRESSION, SPECIFIC_SIZE,
 	                 INTERPOLATION, GLOBAL_INTERPOLATION, BI_GEOMETRIC,
-					 HYPERBOLIC, BETA };
+					 HYPERBOLIC, BETA, BI_EXPONENTIAL };
 
 	/**
 	 * Créé l'ihm.
@@ -1080,6 +1159,9 @@ class QtEdgeListMeshingPropertyPanel : public QtEdgeMeshingPropertyPanelIfc
 
 	/** Discrétisation avec beta resserrement. */
 	QtBetaDiscretisationPanel*              _betaPanel;
+
+    /** Discrétisation bi-exponentielle. */
+    QtBiExponentialDiscretisationPanel* _biexponentialPanel;
 
 	/** Lien sur le widget de sélection du nombre de bras */
 	QtIntTextField* _edgesNumTextField;
