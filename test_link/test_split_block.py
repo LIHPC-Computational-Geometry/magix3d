@@ -12,7 +12,7 @@ def test_split_block_1():
 
     with pytest.raises(RuntimeError) as excinfo:
         tm.splitBlock("Bl0004", "Ar1016", True)
-    assert "getCoEdge impossible" in str(excinfo.value)
+    assert "Ar1016 n'a pas été trouvée" in str(excinfo.value)
 
     with pytest.raises(RuntimeError) as excinfo:
         tm.splitBlock("Bl0004", "Ar0018", True)
