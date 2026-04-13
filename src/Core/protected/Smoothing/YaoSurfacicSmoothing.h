@@ -27,57 +27,62 @@
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
-    namespace Mesh {
+namespace Mesh {
 /*----------------------------------------------------------------------------*/
-        class YaoSurfacicSmoothing
-        {
-        public:
+class YaoSurfacicSmoothing
+{
+public:
 
-            /*------------------------------------------------------------------------*/
-            /** \brief  Constructeur
-             *
-             *  \param
-             */
-            YaoSurfacicSmoothing(std::vector<Topo::CoFace*>& cofaces, Geom::Surface* surface, int nbIterations);
+    /*------------------------------------------------------------------------*/
+    /** \brief  Constructeur
+     *
+     *  \param
+     */
+    YaoSurfacicSmoothing(std::vector<Topo::CoFace*>& cofaces, Geom::Surface* surface, int nbIterations);
 
-            /*------------------------------------------------------------------------*/
-            /** \brief   Destructeur
-             */
-            virtual ~YaoSurfacicSmoothing();
-
-
-            /*------------------------------------------------------------------------*/
-            /** \brief
-             */
-            void execute();
-
-        private:
-            /*------------------------------------------------------------------------*/
-            /** \brief
-             */
-            Utils::Math::Point computeNextNodePosition(Topo::CoFace* coface, int i, int j);
+    /*------------------------------------------------------------------------*/
+    /** \brief   Destructeur
+     */
+    virtual ~YaoSurfacicSmoothing();
 
 
-            /*------------------------------------------------------------------------*/
-            /** \brief
-             */
-            gmds::math::Point computePointOnBranch(gmds::math::Point const &p0,
-                                                    gmds::math::Point const &p1,
-                                                    gmds::math::Point const &p2);
+    /*------------------------------------------------------------------------*/
+    /** \brief
+     */
+    void execute();
+
+private:
+
+    /*------------------------------------------------------------------------*/
+    /** \brief
+     */
+    void computeRatios(Topo::CoFace* coface,
+                        std::vector<double>& r_imin,
+                        std::vector<double>& r_imax,
+                        std::vector<double>& r_jmin,
+                        std::vector<double>& r_jmax);
+
+    /*------------------------------------------------------------------------*/
+    /** \brief
+     */
+    static gmds::math::Point computePointOnBranch(gmds::math::Point const &p0,
+                                            gmds::math::Point const &p1,
+                                            gmds::math::Point const &p2,
+                                            double r);
 
 
-        private:
-            /** geometric surface to smooth */
-            Geom::Surface* m_surface;
-            /** co-faces classified on the geometric surface to smooth */
-            std::vector<Topo::CoFace*>& m_cofaces;
-            /** smoothing number of iterations */
-            int m_nbIterations;
+private:
+    /** geometric surface to smooth */
+    Geom::Surface* m_surface;
+    /** co-faces classified on the geometric surface to smooth */
+    std::vector<Topo::CoFace*>& m_cofaces;
+    /** smoothing number of iterations */
+    int m_nbIterations;
 
-        };
+};
 
 /*----------------------------------------------------------------------------*/
-    } // end namespace Mesh
+} // end namespace Mesh
 /*----------------------------------------------------------------------------*/
 } // end namespace Mgx3D
 /*----------------------------------------------------------------------------*/
