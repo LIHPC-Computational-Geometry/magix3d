@@ -223,7 +223,11 @@ def generer_script(ctx, export_folder):
         script += f'# Création de la face {face}\n'
         face_cofaces = [f'cofaces_mapping["{coface}"]' for coface in cofaces]
         face_vertices = [f'vertices_mapping["{vertex}"]' for vertex in tm.getInfos(face, 2).vertices()]
-        script += f'cmd = tm.newFace([{", ".join(face_cofaces)}], [{", ".join(face_vertices)}], {"False" if face in tm.getUnstructuredFaces() else "True"})\n'
+        isStructured = "True"
+        for coface in cofaces:
+            if coface in tm.getUnstructuredFaces():
+                isStructured = "False"
+        script += f'cmd = tm.newFace([{", ".join(face_cofaces)}], [{", ".join(face_vertices)}], {isStructured})\n'
         script += f'faces_mapping["{face}"] = "Face{face_id:04d}"\n'
         face_id += 1
         for block in tm.getInfos(face, 2).blocks():
@@ -262,11 +266,11 @@ def generer_script(ctx, export_folder):
         if blocks_faces[block]:
             script += f'# Création du bloc {block} ayant pour faces {blocks_faces[block]} et pour sommets {tm.getInfos(block, 3).vertices()}\n'
             block_faces = [f'faces_mapping["{face}"]' for face in blocks_faces[block]]
-            script += f'cmd = ctx.getTopoManager().newBlock([{", ".join(block_faces)}], [{", ".join(block_vertices)}], {"False" if block in tm.getUnstructuredBlocks() else "True"}, "")\n'
+            script += f'cmd = tm.newBlock([{", ".join(block_faces)}], [{", ".join(block_vertices)}], {"False" if block in tm.getUnstructuredBlocks() else "True"}, "")\n'
         else:
             script += f'# Création du bloc {block} ayant pour faces {blocks_faces_0[block]} et pour sommets {tm.getInfos(block, 3).vertices()}\n'
             block_faces = [f'faces_mapping["{face}"]' for face in blocks_faces_0[block]]
-            script += f'cmd = ctx.getTopoManager().newBlock([{", ".join(block_faces)}], [{", ".join(block_vertices)}], {"False" if block in tm.getUnstructuredBlocks() else "True"}, "")\n'
+            script += f'cmd = tm.newBlock([{", ".join(block_faces)}], [{", ".join(block_vertices)}], {"False" if block in tm.getUnstructuredBlocks() else "True"}, "")\n'
         script += 'b = cmd.getBlocks()[0]\n'
         geom_entity = tm.getInfos(block, 3).geom_entity
         if geom_entity:
