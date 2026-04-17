@@ -35,6 +35,9 @@
 #include <ShapeFix_FixSmallFace.hxx>
 #include <ShapeBuild_ReShape.hxx>
 #include <ShapeAnalysis_ShapeContents.hxx>
+#include <TopoDS_Shape.hxx>
+#include <BRep_Builder.hxx>
+#include <BRepTools.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -1532,6 +1535,102 @@ geodesicDistance(
     }
 
     return dist[endNode];
+}
+// Fonction pour afficher les informations de base sur une forme TopoDS_Shape
+void OCCHelper::
+displayShapeInfo(const TopoDS_Shape& shape)
+{
+        TopTools_IndexedMapOfShape vertexMap;
+        TopTools_IndexedMapOfShape edgeMap;
+        TopTools_IndexedMapOfShape wireMap;
+        TopTools_IndexedMapOfShape faceMap;
+        TopTools_IndexedMapOfShape solidMap;
+        TopExp::MapShapes(shape, TopAbs_VERTEX, vertexMap);
+        TopExp::MapShapes(shape, TopAbs_EDGE, edgeMap);
+        TopExp::MapShapes(shape, TopAbs_WIRE, wireMap);
+        TopExp::MapShapes(shape, TopAbs_FACE, faceMap);
+        TopExp::MapShapes(shape, TopAbs_SOLID, solidMap);
+        std::cout << "Vertices : " << vertexMap.Extent() << std::endl;
+        std::cout << "Edges    : " << edgeMap.Extent() << std::endl;
+        std::cout << "Wires    : " << wireMap.Extent() << std::endl;
+        std::cout << "Faces    : " << faceMap.Extent() << std::endl;
+        std::cout << "Solids    : " << solidMap.Extent() << std::endl;
+}
+
+TopoDS_Shape OCCHelper::readBrepFile(const std::string& filename)
+{
+    // check file extension
+    std::string suffix = filename;
+    int suffix_start = filename.find_last_of(".");
+    suffix.erase(0,suffix_start+1);
+    if (suffix != "brep")
+        throw TkUtil::Exception (TkUtil::UTF8String ("Mauvaise extension de fichier BREP (.brep)", TkUtil::Charset::UTF_8));
+
+    // read file
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        throw TkUtil::Exception (TkUtil::UTF8String ("Impossible d'ouvrir ce fichier BREP", TkUtil::Charset::UTF_8));
+    }
+
+    BRep_Builder builder;
+    TopoDS_Shape shape;
+    BRepTools::Read(shape, file, builder);
+    return shape;
+}
+
+std::vector<TopoDS_Vertex> OCCHelper::getOCCVertices(const TopoDS_Shape& shape)
+{
+    std::vector<TopoDS_Vertex> vertices;
+    TopTools_IndexedMapOfShape vertexMap;
+    TopExp::MapShapes(shape, TopAbs_VERTEX, vertexMap);
+    for (int i = 1; i <= vertexMap.Extent(); ++i) {
+        vertices.push_back(TopoDS::Vertex(vertexMap(i)));
+    }
+    return vertices;
+}
+
+std::vector<TopoDS_Edge> OCCHelper::getOCCEdges(const TopoDS_Shape& shape)
+{
+    std::vector<TopoDS_Edge> edges;
+    TopTools_IndexedMapOfShape edgeMap;
+    TopExp::MapShapes(shape, TopAbs_EDGE, edgeMap);
+    for (int i = 1; i <= edgeMap.Extent(); ++i) {
+        edges.push_back(TopoDS::Edge(edgeMap(i)));
+    }
+    return edges;
+}
+
+std::vector<TopoDS_Face> OCCHelper::getOCCFaces(const TopoDS_Shape& shape)
+{
+    std::vector<TopoDS_Face> faces;
+    TopTools_IndexedMapOfShape faceMap;
+    TopExp::MapShapes(shape, TopAbs_FACE, faceMap);
+    for (int i = 1; i <= faceMap.Extent(); ++i) {
+        faces.push_back(TopoDS::Face(faceMap(i)));
+    }
+    return faces;
+}
+
+std::vector<TopoDS_Solid> OCCHelper::getOCCSolids(const TopoDS_Shape& shape)
+{
+    std::vector<TopoDS_Solid> solids;
+    TopTools_IndexedMapOfShape solidMap;
+    TopExp::MapShapes(shape, TopAbs_SOLID, solidMap);
+    for (int i = 1; i <= solidMap.Extent(); ++i) {
+        solids.push_back(TopoDS::Solid(solidMap(i)));
+    }
+    return solids;
+}
+
+std::vector<TopoDS_Shell> OCCHelper::getOCCShells(const TopoDS_Shape& shape)
+{
+    std::vector<TopoDS_Shell> shells;
+    TopTools_IndexedMapOfShape shellMap;
+    TopExp::MapShapes(shape, TopAbs_SHELL, shellMap);
+    for (int i = 1; i <= shellMap.Extent(); ++i) {
+        shells.push_back(TopoDS::Shell(shellMap(i)));
+    }
+    return shells;
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom

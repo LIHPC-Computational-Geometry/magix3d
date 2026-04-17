@@ -39,8 +39,8 @@ namespace Mgx3D {
              *  \param dim la dimension de l'entité topologique créée
              *  \param groupName le nom du groupe à associer l'entité, peut etre vide
              */
-            CommandNewTopo(Internal::Context& c, std::vector<Topo::Vertex*> sommets, eTopoType topoType, int dim,
-                           std::string groupName);
+            CommandNewTopo(Internal::Context& c, std::vector<Topo::Vertex*> sommets, eTopoType topoType,
+                        int dim, std::string groupName, bool enableDuplicateCoEdges = false);
             /*------------------------------------------------------------------------*/
             /** \brief  Constructeur pour un sommet topologique uniquement par coordonées géométriques
              *
@@ -49,8 +49,52 @@ namespace Mgx3D {
              *  \param groupName le nom du groupe à associer l'entité, peut etre vide
              */
             CommandNewTopo(Internal::Context& c, const Utils::Math::Point point,
-                           std::string groupName);
+                        std::string groupName);
 
+            /*------------------------------------------------------------------------*/
+            /** \brief  Constructeur pour un block à partir d'une liste de faces et de vertices
+             *
+             *  \param c le contexte
+             *  \param faces les faces topologiques
+             *  \param vertices les sommets topologiques
+             *  \param isStructured indique si la topologie créée doit être structurée ou non
+             *  \param groupName le nom du groupe à associer l'entité, peut etre vide
+             */
+            CommandNewTopo(Internal::Context& c, const std::vector<Topo::Face*>& faces,
+                        const std::vector<Topo::Vertex*>& vertices, bool isStructured,
+                        std::string groupName);
+            /*------------------------------------------------------------------------*/
+            /** \brief  Constructeur pour une face à partir d'une liste de cofaces et de vertices
+             *
+             *  \param c le contexte
+             *  \param cofaces les cofaces topologiques
+             *  \param vertices les sommets topologiques
+             *  \param isStructured indique si la topologie créée doit être structurée ou non
+             */
+            CommandNewTopo(Internal::Context& c, const std::vector<Topo::CoFace*>& cofaces,
+                        const std::vector<Topo::Vertex*>& vertices, bool isStructured);
+            /*------------------------------------------------------------------------*/
+            /** \brief  Constructeur pour une coface à partir d'une liste de edges et de vertices
+             *
+             *  \param c le contexte
+             *  \param edges les edges topologiques
+             *  \param vertices les sommets topologiques
+             *  \param isStructured indique si la topologie créée doit être structurée ou non
+             *  \param hasHole indique si la coface créée doit comporter un trou ou non
+             */
+            CommandNewTopo(Internal::Context& c, const std::vector<Topo::Edge*>& edges,
+                std::vector<Topo::Vertex* > &vertices,
+                bool isStructured, bool hasHole);
+            /*------------------------------------------------------------------------*/
+            /** \brief  Constructeur pour une edge à partir d'une liste de coedges et de 2 vertices
+             *
+             *  \param c le contexte
+             *  \param coedges les coedges topologiques
+             *  \param vertices les sommets topologiques
+             *  \param isStrucutred indique si la topologie créée doit être structurée ou non
+             */
+            CommandNewTopo(Internal::Context& c, const std::vector<Topo::CoEdge*>& coedges,
+                        const std::vector<Topo::Vertex*>& vertices);
             /*------------------------------------------------------------------------*/
             /** \brief  Destructeur
              */
@@ -72,13 +116,19 @@ namespace Mgx3D {
         private:
 
             /** Création d'un sommet topologique */
-            virtual void createVertex();
+            virtual Vertex* createVertex(Utils::Math::Point point, std::string groupName);
 
             /** Création d'une arête topologique */
             virtual CoEdge* createCoEdge(Vertex* v0,Vertex* v1, std::string groupName);
 
+            /** Création d'une arête topologique */
+            virtual Edge* createEdge(Vertex* v0,Vertex* v1, std::vector<CoEdge*>& coedges);
+
             /** Création d'une face topologique structurée */
-            virtual CoFace* createFace(Vertex* v0, Vertex* v1, Vertex* v2, Vertex* v3, std::string groupName);
+            virtual CoFace* createCoFace(Vertex* v0, Vertex* v1, Vertex* v2, Vertex* v3, std::string groupName);
+
+            /** Création d'une face topologique structurée */
+            virtual CoFace* createCoFace(std::vector<Edge*>& edges, std::string groupName);
 
             /** Création d'un bloc topologique structuré */
             virtual void createBlock(Vertex* v0, Vertex* v1, Vertex* v2, Vertex* v3, Vertex* v4, Vertex* v5,
@@ -87,12 +137,12 @@ namespace Mgx3D {
             /** Récupère l'arete topologique commune aux deux sommets si elle existe
              * @return l'arete topologique si elle existe ou nullptr sinon
              * */
-            virtual Topo::CoEdge* getCommonEdge(const Vertex* v0, const Vertex* v1);
+            virtual Topo::CoEdge* getCommonCoEdge(const Vertex* v0, const Vertex* v1);
 
-            /** Récupère la face topologique commune aux quatres sommets si elle existe
-             * @return la face topologique si elle existe ou nullptr sinon
+            /** Récupère la coface topologique commune aux quatres sommets si elle existe
+             * @return la coface topologique si elle existe ou nullptr sinon
              * */
-            virtual Topo::CoFace* getCommonFace(const Vertex* v0, const Vertex* v1, const Vertex* v2, const Vertex* v3);
+            virtual Topo::CoFace* getCommonCoFace(const Vertex* v0, const Vertex* v1, const Vertex* v2, const Vertex* v3);
 
             /** Récupère le bloc topologique commun aux huit sommets si il existe
              * @return le bloc topologique si il existe ou nullptr sinon
@@ -101,7 +151,6 @@ namespace Mgx3D {
                                                 const Vertex* v4, const Vertex* v5, const Vertex* v6, const Vertex* v7);
 
         private:
-
             /// dimension de l'entité topo libre
             short m_dim;
 
@@ -111,8 +160,20 @@ namespace Mgx3D {
             /// les coordonnées pour créer un sommet libre
             Utils::Math::Point m_point;
 
-            /// les sommets topologiques qui servants à créer l'entité
+            /// les sommets topologiques servant à créer l'entité
             std::vector<Topo::Vertex*> m_vertices;
+
+            /// les cofaces topologiques servant à créer l'entité
+            std::vector<Topo::CoFace*> m_cofaces;
+
+            /// les arêtes topologiques servant à créer l'entité
+            std::vector<Topo::CoEdge*> m_coedges;
+
+            /// les coedges topologiques servant à créer l'entité
+            std::vector<Topo::Edge*> m_edges;
+
+            /// les faces topologiques servant à créer l'entité
+            std::vector<Topo::Face*> m_faces;
 
             /// nombre de bras pour la première direction dans le cas structuré
             uint m_ni;
@@ -121,6 +182,9 @@ namespace Mgx3D {
             /// nombre de bras pour la troisième direction dans le cas structuré
             uint m_nk;
 
+            bool m_isStructured;
+            bool m_hasHole;
+            bool m_enableDuplicateCoEdges;
         };
 /*----------------------------------------------------------------------------*/
     } // end namespace Topo

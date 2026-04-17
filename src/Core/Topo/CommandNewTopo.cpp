@@ -29,14 +29,21 @@ namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
         CommandNewTopo::
         CommandNewTopo(Internal::Context& c, std::vector<Topo::Vertex*> sommets, eTopoType topoType, int dim,
-                       std::string groupName)
+                std::string groupName, bool enableDuplicateCoEdges)
                 : CommandEditTopo(c, "Nom de commande à définir")
                 , m_groupName(groupName)
                 , m_ni(0)
                 , m_nj(0)
                 , m_nk(0)
-                ,m_vertices(sommets)
-                ,m_dim(dim)
+                , m_vertices(sommets)
+                , m_faces({})
+                , m_cofaces({})
+                , m_edges({})
+                , m_coedges({})
+                , m_dim(dim)
+                , m_isStructured(topoType == STRUCTURED_BLOCK)
+                , m_hasHole()
+                , m_enableDuplicateCoEdges(enableDuplicateCoEdges)
         {
             TkUtil::UTF8String	comments (TkUtil::Charset::UTF_8);
 
@@ -68,7 +75,7 @@ namespace Mgx3D {
         /*----------------------------------------------------------------------------*/
         CommandNewTopo::
         CommandNewTopo(Internal::Context& c, const Utils::Math::Point point,
-                       std::string groupName)
+                std::string groupName)
                 : CommandEditTopo(c, "Nom de commande à définir")
                 , m_dim(0)
                 , m_point(point)
@@ -76,11 +83,125 @@ namespace Mgx3D {
                 , m_ni(0)
                 , m_nj(0)
                 , m_nk(0)
+                , m_isStructured(false)
+                , m_vertices({})
+                , m_faces({})
+                , m_cofaces({})
+                , m_edges({})
+                , m_coedges({})
+                , m_hasHole()
         {
             TkUtil::UTF8String	comments (TkUtil::Charset::UTF_8);
             comments << "Création d'un sommet géométrique par coordonnées";
 
 
+            setScriptComments(comments);
+            setName(comments);
+        }
+
+        /*------------------------------------------------------------------------*/
+        CommandNewTopo::
+        CommandNewTopo(Internal::Context& c, const std::vector<Topo::Face*>& faces,
+                const std::vector<Topo::Vertex*>& vertices, bool isStructured,
+                std::string groupName)
+              : CommandEditTopo(c, "Nom de commande à définir")
+                , m_dim(3)
+                , m_point()
+                , m_groupName(groupName)
+                , m_ni(0)
+                , m_nj(0)
+                , m_nk(0)
+                , m_vertices(vertices)
+                , m_faces(faces)
+                , m_cofaces({})
+                , m_edges({})
+                , m_coedges({})
+                , m_isStructured(isStructured)
+                , m_hasHole()
+        {
+            TkUtil::UTF8String	comments (TkUtil::Charset::UTF_8);
+            if(isStructured)
+                comments << "Création d'un bloc topologique structuré à partir de faces et de sommets";
+            else
+                comments << "Création d'un bloc topologique non structuré à partir de faces et de sommets";
+
+            setScriptComments(comments);
+            setName(comments);
+        }
+        /*------------------------------------------------------------------------*/
+        CommandNewTopo::
+        CommandNewTopo(Internal::Context& c, const std::vector<Topo::CoFace*>& cofaces,
+                const std::vector<Topo::Vertex*>& vertices, bool isStructured)
+              : CommandEditTopo(c, "Nom de commande à définir")
+                , m_dim(2)
+                , m_point()
+                , m_groupName("")
+                , m_ni(0)
+                , m_nj(0)
+                , m_nk(0)
+                , m_vertices(vertices)
+                , m_faces({})
+                , m_cofaces(cofaces)
+                , m_edges({})
+                , m_coedges({})
+                , m_isStructured(isStructured)
+                , m_hasHole()
+        {
+            TkUtil::UTF8String	comments (TkUtil::Charset::UTF_8);
+            if(isStructured)
+                comments << "Création d'une face topologique structurée à partir de cofaces et de sommets";
+            else
+                comments << "Création d'une face topologique non structurée à partir de cofaces et de sommets";
+
+            setScriptComments(comments);
+            setName(comments);
+        }
+        /*------------------------------------------------------------------------*/
+        CommandNewTopo::
+        CommandNewTopo(Internal::Context& c, const std::vector<Topo::Edge*>& edges,
+                std::vector<Topo::Vertex* > &vertices,
+                bool isStructured, bool hasHole)
+              : CommandEditTopo(c, "Nom de commande à définir")
+                , m_dim(2)
+                , m_point()
+                , m_groupName("")
+                , m_ni(0)
+                , m_nj(0)
+                , m_nk(0)
+                , m_vertices({vertices})
+                , m_faces({})
+                , m_cofaces({})
+                , m_edges(edges)
+                , m_coedges({})
+                , m_isStructured(isStructured)
+                , m_hasHole(hasHole)
+            {
+            TkUtil::UTF8String	comments (TkUtil::Charset::UTF_8);
+            comments << "Création d'une coface topologique à partir de edges et de vertices";
+            setScriptComments(comments);
+            setName(comments);
+        }
+/*-------------------------
+        /*------------------------------------------------------------------------*/
+        CommandNewTopo::
+        CommandNewTopo(Internal::Context& c, const std::vector<Topo::CoEdge*>& coedges,
+                const std::vector<Topo::Vertex*>& vertices)
+              : CommandEditTopo(c, "Nom de commande à définir")
+                , m_dim(1)
+                , m_point()
+                , m_groupName("")
+                , m_ni(0)
+                , m_nj(0)
+                , m_nk(0)
+                , m_vertices(vertices)
+                , m_faces({})
+                , m_cofaces({})
+                , m_coedges(coedges)
+                , m_isStructured()
+                , m_hasHole()
+            {
+            TkUtil::UTF8String	comments (TkUtil::Charset::UTF_8);
+            comments << "Création d'une edge topologique à partir de coedges et de 2 sommets";
             setScriptComments(comments);
             setName(comments);
         }
@@ -92,14 +213,12 @@ CommandNewTopo::
         void CommandNewTopo::
         internalExecute()
         {
-
             if(m_dim == 1 && m_vertices.size() != 2)
-                throw TkUtil::Exception(TkUtil::UTF8String("CommandNewTopo nombre de sommets invalide pour créer une arete " + std::to_string(m_vertices.size()) + " au lieu de 2", TkUtil::Charset::UTF_8));
-            if(m_dim == 2 && m_vertices.size() != 4)
+                throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo nombre de sommets invalide pour créer une arete " + std::to_string(m_vertices.size()) + " au lieu de 2", TkUtil::Charset::UTF_8));
+            if(m_dim == 2 && m_vertices.size() != 4 && m_cofaces.size() == 0 && m_edges.size() == 0)
                 throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo nombre de sommets invalide pour créer une face " + std::to_string(m_vertices.size()) + " au lieu de 4", TkUtil::Charset::UTF_8));
-            if(m_dim == 3 && m_vertices.size() != 8)
+            if(m_dim == 3 && m_vertices.size() != 8 && m_faces.size() == 0)
                 throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo nombre de sommets invalide pour créer un bloc " + std::to_string(m_vertices.size()) + " au lieu de 8", TkUtil::Charset::UTF_8));
-
 
             TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
             message << "CommandNewTopo::execute pour la commande " << getName ( )
@@ -110,39 +229,67 @@ CommandNewTopo::
             }
 
             if (m_dim == 0){
-                createVertex();
+                createVertex(m_point, m_groupName);
             }
             else if (m_dim == 1){
 
-                if(getCommonEdge(m_vertices[0], m_vertices[1]) != nullptr){
-                    throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo une arete existe déjà entre " + m_vertices[0]->getName() + " et " + m_vertices[1]->getName(), TkUtil::Charset::UTF_8));
+                if (m_coedges.size() > 0){
+                   createEdge(m_vertices[0], m_vertices[1], m_coedges);
                 }
                 else{
-                    createCoEdge(m_vertices[0], m_vertices[1], m_groupName);
+                    auto e = getCommonCoEdge(m_vertices[0], m_vertices[1]);
+                    if (e != nullptr && !m_enableDuplicateCoEdges){
+                        throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo une arete ("+ e->getName() + ") existe déjà entre " + m_vertices[0]->getName() + " et " + m_vertices[1]->getName(), TkUtil::Charset::UTF_8));
+                    }
+                    else{
+                        createCoEdge(m_vertices[0], m_vertices[1], m_groupName);
+                    }
                 }
             }
             else if (m_dim == 3){
 
-                if(getCommonBlock(m_vertices[0], m_vertices[1], m_vertices[2], m_vertices[3],
-                                  m_vertices[4], m_vertices[5], m_vertices[6], m_vertices[7]) != nullptr){
-                    throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo une face existe déjà entre "
-                                                                 + m_vertices[0]->getName() + ", " + m_vertices[1]->getName()
-                                                                 + ", " + m_vertices[2]->getName()+ " et " + m_vertices[3]->getName(), TkUtil::Charset::UTF_8));
-                }else{
-                    createBlock(m_vertices[0], m_vertices[1], m_vertices[2], m_vertices[3],
-                                m_vertices[4], m_vertices[5], m_vertices[6], m_vertices[7],m_groupName);
+                if (m_faces.size() > 0)
+                {
+                    Block* block = new Block(getContext(), m_faces, m_vertices, m_isStructured);
+                    getInfoCommand().addTopoInfoEntity(block, Internal::InfoCommand::CREATED);
+                    m_group_helper.addToGroup(m_groupName, block);
                 }
-
+                else
+                {
+                    // On essaie de construire le bloc à partir des sommets uniquement
+                    if(getCommonBlock(m_vertices[0], m_vertices[1], m_vertices[2], m_vertices[3],
+                                    m_vertices[4], m_vertices[5], m_vertices[6], m_vertices[7]) != nullptr){
+                        throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo un bloc existe déjà entre "
+                                                                    + m_vertices[0]->getName() + ", " + m_vertices[1]->getName()
+                                                                    + ", " + m_vertices[2]->getName()+ " et " + m_vertices[3]->getName(), TkUtil::Charset::UTF_8));
+                    }else{
+                        createBlock(m_vertices[0], m_vertices[1], m_vertices[2], m_vertices[3],
+                                    m_vertices[4], m_vertices[5], m_vertices[6], m_vertices[7],m_groupName);
+                    }
+                }
             }
             else if (m_dim == 2){
-
-                if(getCommonFace(m_vertices[0], m_vertices[1], m_vertices[2], m_vertices[3]) != nullptr){
-                    throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo une face existe déjà entre "
-                    + m_vertices[0]->getName() + ", " + m_vertices[1]->getName()
-                    + ", " + m_vertices[2]->getName()+ " et " + m_vertices[3]->getName(), TkUtil::Charset::UTF_8));
-                }else{
-                    createFace(m_vertices[0], m_vertices[1], m_vertices[2], m_vertices[3], m_groupName);
+                if (m_edges.size() > 0)
+                {
+                    CoFace* face = new CoFace(getContext(), m_edges, m_vertices, m_isStructured, m_hasHole);
+                    getInfoCommand().addTopoInfoEntity(face, Internal::InfoCommand::CREATED);
                 }
+                else
+                    if (m_cofaces.size()>0)
+                    {
+                        Face* face = new Face(getContext(), m_cofaces, m_vertices, m_isStructured);
+                        getInfoCommand().addTopoInfoEntity(face, Internal::InfoCommand::CREATED);
+                    }
+                    else
+                    {
+                        if(getCommonCoFace(m_vertices[0], m_vertices[1], m_vertices[2], m_vertices[3]) != nullptr){
+                            throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopo une face existe déjà entre "
+                            + m_vertices[0]->getName() + ", " + m_vertices[1]->getName()
+                            + ", " + m_vertices[2]->getName()+ " et " + m_vertices[3]->getName(), TkUtil::Charset::UTF_8));
+                        }else{
+                            createCoFace(m_vertices[0], m_vertices[1], m_vertices[2], m_vertices[3], m_groupName);
+                        }
+                    }
             }
             else {
                 throw TkUtil::Exception (TkUtil::UTF8String ("CommandNewTopoOnGeometry imposible avec une géométrie autre qu'un Volume ou une Surface", TkUtil::Charset::UTF_8));
@@ -162,32 +309,34 @@ CommandNewTopo::
             log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_1));
         }
 /*----------------------------------------------------------------------------*/
-        void CommandNewTopo::createVertex()
+        Vertex* CommandNewTopo::createVertex(Utils::Math::Point point, std::string groupName)
         {
-            Vertex* vtx = new Vertex(getContext(), m_point);
-            m_group_helper.addToGroup(m_groupName, vtx);
+            Vertex* vtx = new Vertex(getContext(), point);
+            m_group_helper.addToGroup(groupName, vtx);
             getInfoCommand().addTopoInfoEntity(vtx, Internal::InfoCommand::CREATED);
+            return vtx;
+        }
+/*----------------------------------------------------------------------------*/
+        Edge* CommandNewTopo::createEdge(Vertex* v0,Vertex* v1, std::vector<CoEdge*>& coedges)
+        {
+            Edge* edge = new Edge(getContext(), v0, v1, coedges);
+            getInfoCommand().addTopoInfoEntity(edge, Internal::InfoCommand::CREATED);
+            return edge;
         }
 /*----------------------------------------------------------------------------*/
         CoEdge* CommandNewTopo::createCoEdge(Vertex* v0,Vertex* v1, std::string groupName)
         {
-
             EdgeMeshingPropertyUniform emp(getContext().getTopoManager().getDefaultNbMeshingEdges());
             CoEdge* coedge = new CoEdge(getContext(), &emp, v0, v1);
-
-
             Group::Group1D *group = getContext().getGroupManager().getNewGroup<Group::Group1D>(groupName, &getInfoCommand());
             group->add(coedge);
             coedge->add(group);
             getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
-
             getInfoCommand().addTopoInfoEntity(coedge, Internal::InfoCommand::CREATED);
-
-
             return coedge;
         }
 /*----------------------------------------------------------------------------*/
-        Topo::CoFace* CommandNewTopo::createFace(Vertex* v0, Vertex* v1, Vertex* v2, Vertex* v3, std::string groupName)
+        Topo::CoFace* CommandNewTopo::createCoFace(Vertex* v0, Vertex* v1, Vertex* v2, Vertex* v3, std::string groupName)
         {
 
             gmds::math::Triangle t012(gmds::math::Point(v0->getX(),v0->getY(),v0->getZ()),
@@ -244,25 +393,25 @@ CommandNewTopo::
 
             switch (orientation) {
                 case 0:
-                    e0 = getCommonEdge(v0,v1);
+                    e0 = getCommonCoEdge(v0,v1);
                     if(e0 == nullptr)
                         e0 = createCoEdge(v0,v1,"");
                     else
                         e0->saveCoEdgeTopoProperty(&getInfoCommand());
 
-                    e1 = getCommonEdge(v1,v2);
+                    e1 = getCommonCoEdge(v1,v2);
                     if(e1 == nullptr)
                         e1 = createCoEdge(v1,v2,"");
                     else
                         e1->saveCoEdgeTopoProperty(&getInfoCommand());
 
-                    e2 = getCommonEdge(v2,v3);
+                    e2 = getCommonCoEdge(v2,v3);
                     if(e2 == nullptr)
                         e2 = createCoEdge(v2,v3,"");
                     else
                         e2->saveCoEdgeTopoProperty(&getInfoCommand());
 
-                    e3 = getCommonEdge(v3,v0);
+                    e3 = getCommonCoEdge(v3,v0);
                     if(e3 == nullptr)
                         e3 = createCoEdge(v3,v0,"");
                     else
@@ -270,25 +419,25 @@ CommandNewTopo::
 
                     break;
                 case 1:
-                    e0 = getCommonEdge(v0,v1);
+                    e0 = getCommonCoEdge(v0,v1);
                     if(e0 == nullptr)
                         e0 = createCoEdge(v0,v1,"");
                     else
                         e0->saveCoEdgeTopoProperty(&getInfoCommand());
 
-                    e1 = getCommonEdge(v1,v3);
+                    e1 = getCommonCoEdge(v1,v3);
                     if(e1 == nullptr)
                         e1 = createCoEdge(v1,v3,"");
                     else
                         e1->saveCoEdgeTopoProperty(&getInfoCommand());
 
-                    e2 = getCommonEdge(v3,v2);
+                    e2 = getCommonCoEdge(v3,v2);
                     if(e2 == nullptr)
                         e2 = createCoEdge(v3,v2,"");
                     else
                         e2->saveCoEdgeTopoProperty(&getInfoCommand());
 
-                    e3 = getCommonEdge(v2,v0);
+                    e3 = getCommonCoEdge(v2,v0);
                     if(e3 == nullptr)
                         e3 = createCoEdge(v2,v0,"");
                     else
@@ -296,25 +445,25 @@ CommandNewTopo::
 
                     break;
                 case 2:
-                    e0 = getCommonEdge(v0,v2);
+                    e0 = getCommonCoEdge(v0,v2);
                     if(e0 == nullptr)
                         e0 = createCoEdge(v0,v2,"");
                     else
                         e0->saveCoEdgeTopoProperty(&getInfoCommand());
 
-                    e1 = getCommonEdge(v2,v1);
+                    e1 = getCommonCoEdge(v2,v1);
                     if(e1 == nullptr)
                         e1 = createCoEdge(v2,v1,"");
                     else
                         e1->saveCoEdgeTopoProperty(&getInfoCommand());
 
-                    e2 = getCommonEdge(v1,v3);
+                    e2 = getCommonCoEdge(v1,v3);
                     if(e2 == nullptr)
                         e2 = createCoEdge(v1,v3,"");
                     else
                         e2->saveCoEdgeTopoProperty(&getInfoCommand());
 
-                    e3 = getCommonEdge(v3,v0);
+                    e3 = getCommonCoEdge(v3,v0);
                     if(e3 == nullptr)
                         e3 = createCoEdge(v3,v0,"");
                     else
@@ -334,17 +483,30 @@ CommandNewTopo::
 
             std::vector<Edge*> edges = {edge0,edge1,edge2,edge3};
 
-            Topo::CoFace* face = new CoFace(getContext(), edges, true);
+            Topo::CoFace* coface = new CoFace(getContext(), edges, true);
 
             Group::Group2D *group = getContext().getGroupManager().getNewGroup<Group::Group2D>(groupName, &getInfoCommand());
-            group->add(face);
-            face->add(group);
+            group->add(coface);
+            coface->add(group);
             getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
+            getInfoCommand().addTopoInfoEntity(coface, Internal::InfoCommand::CREATED);
 
-            getInfoCommand().addTopoInfoEntity(face, Internal::InfoCommand::CREATED);
-
-            return face;
+            return coface;
         }
+
+Topo::CoFace* CommandNewTopo::createCoFace(std::vector<Edge*>& edges, std::string groupName)
+{
+    Topo::CoFace* coface = new CoFace(getContext(), edges, true);
+
+    Group::Group2D *group = getContext().getGroupManager().getNewGroup<Group::Group2D>(groupName, &getInfoCommand());
+    group->add(coface);
+    coface->add(group);
+    getInfoCommand().addGroupInfoEntity(group,Internal::InfoCommand::DISPMODIFIED);
+    getInfoCommand().addTopoInfoEntity(coface, Internal::InfoCommand::CREATED);
+
+    return coface;
+}
+
 /*----------------------------------------------------------------------------*/
 void CommandNewTopo::createBlock(Mgx3D::Topo::Vertex *v0, Mgx3D::Topo::Vertex *v1, Mgx3D::Topo::Vertex *v2,
                                  Mgx3D::Topo::Vertex *v3, Mgx3D::Topo::Vertex *v4, Mgx3D::Topo::Vertex *v5,
@@ -358,22 +520,26 @@ void CommandNewTopo::getPreviewRepresentation(Utils::DisplayRepresentation& dr)
     return getPreviewRepresentationNewCoedges(dr);
 }
 /*----------------------------------------------------------------------------*/
-Topo::CoEdge* CommandNewTopo::getCommonEdge(const Vertex* v1, const Vertex* v2) {
+Topo::CoEdge* CommandNewTopo::getCommonCoEdge(const Vertex* v1, const Vertex* v2) {
 
-    std::vector<CoEdge*> test1 = v1->getCoEdges();
-            std::vector<CoEdge*> test2 = v2->getCoEdges();
-
-    for(auto v1_e : v1->getCoEdges()){
-        for(auto v2_e : v2->getCoEdges()){
-            if(v1_e->getName() == v2_e->getName())
-                return v1_e;
+    if (v1==v2){
+        for (auto edge : v1->getCoEdges()){
+            if (std::count(edge->getVertices().begin(), edge->getVertices().end(), v1) >= 2)
+                return edge;
         }
     }
-
+    else{
+        for(auto v1_e : v1->getCoEdges()){
+            for(auto v2_e : v2->getCoEdges()){
+                if(v1_e->getName() == v2_e->getName())
+                    return v1_e;
+            }
+        }
+    }
     return nullptr;
 }
 /*----------------------------------------------------------------------------*/
-Topo::CoFace* CommandNewTopo::getCommonFace(const Vertex* v1, const Vertex* v2, const Vertex* v3, const Vertex* v4) {
+Topo::CoFace* CommandNewTopo::getCommonCoFace(const Vertex* v1, const Vertex* v2, const Vertex* v3, const Vertex* v4) {
 
     std::vector<CoFace*> v1_cf = v1->getCoFaces();
     std::vector<CoFace*> v2_cf = v2->getCoFaces();
@@ -401,7 +567,7 @@ Topo::Block* CommandNewTopo::getCommonBlock(const Mgx3D::Topo::Vertex *v0, const
                                             const Mgx3D::Topo::Vertex *v4, const Mgx3D::Topo::Vertex *v5,
                                             const Mgx3D::Topo::Vertex *v6, const Mgx3D::Topo::Vertex *v7) {
 
-
+    MGX_NOT_YET_IMPLEMENTED("getCommonBlock is not yet implemented");
 }
 /*----------------------------------------------------------------------------*/
     } // end namespace Topo
