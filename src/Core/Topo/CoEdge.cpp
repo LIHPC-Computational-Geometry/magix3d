@@ -1612,10 +1612,8 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 				throw TkUtil::Exception (message);
 			}
 
-			// vérifie que les coedges_ref ne dépendent pas de la coedge de départ
-			std::set<const CoEdge*> filtre_coedges; // pour éviter d'y passer trop de temps
-			detectLoopReference(this, coedges, filtre_coedges);
-			updateModificationTime(this, coedges);
+			// vérifie que les coedges interpolées ne dépendent pas de la coedge de départ
+			checkNoInterpolationLoop(this, coedges);
 
 			// cas d'une interpolation avec projection sur une courbe ou une surface
 			// on passe par une tabulation
@@ -1653,17 +1651,13 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 
 				// l'interpolation n'accède pas au contexte, donc on lui passe l'arête
 				interpol->getPoints(points, coedges);
-				// [EB] code mort ...
-				//			// s'il y a une projection sur une surface on replace les points dessus
-				//			if (getGeomAssociation() && getGeomAssociation()->getType() == Utils::Entity::GeomSurface){
-				//				Geom::GeomEntity* ge = getGeomAssociation();
-				//				for (uint i=1; i<getNbMeshingEdges(); i++)
-				//					ge->project(points[i]);
-				//			} // end getGeomAssociation()
 
 			} // end else / if getType() == GeomCurve
 		} // if (interpol->getType() == EdgeMeshingPropertyInterpolate::with_coedge_list)
 		else if (interpol->getType() == EdgeMeshingPropertyInterpolate::with_coface) {
+
+			// vérifie que les coedges interpolées ne dépendent pas de la coedge de départ
+			checkNoInterpolationLoop(this, findInterpolatedCoEdges(this));
 
 			std::string coface_name = interpol->getCoFace();
 
@@ -1683,10 +1677,6 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 				message << "Erreur, l'arête "<<getName()<<" a une discrétisation basée sur l'interpolation en utilisant une face non renseignée (détruite)";
 				throw TkUtil::Exception (message);
 			}
-
-			// vérifie que les coedges_ref ne dépendent pas de la coedge de départ
-			std::set<const CoEdge*> filtre_coedges; // pour éviter d'y passer trop de temps
-			detectLoopReference(this, this, coface, filtre_coedges);
 
 			if (getGeomAssociation()
 					&& (getGeomAssociation()->getType() == Utils::Entity::GeomCurve
@@ -1757,7 +1747,6 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 			first_coedges.push_back(coedge);
 
 			nbMeshingEdges1+=coedge->getNbMeshingEdges();
-
 		} // end for i<first_coedges_names.size()
 
 		for (uint i=0; i<second_coedges_names.size(); i++){
@@ -1780,7 +1769,6 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 			second_coedges.push_back(coedge);
 
 			nbMeshingEdges2+=coedge->getNbMeshingEdges();
-
 		} // end for i<second_coedges_names.size()
 
 		// il faut avoir le même nombre de sommets sur les deux arêtes
@@ -1792,6 +1780,9 @@ getPoints(CoEdgeMeshingProperty* dni, std::vector<Utils::Math::Point> &points, b
 					<<" et "<<(short)nbMeshingEdges2;
 			throw TkUtil::Exception (message);
 		}
+
+		// vérifie que les coedges interpolées ne dépendent pas de la coedge de départ
+		checkNoInterpolationLoop(this, findInterpolatedCoEdges(this));
 
 		// on initialise le vecteur de points avec les extrémités
 		points.resize(nbMeshingEdges1+1);
@@ -2662,140 +2653,135 @@ unsigned long CoEdge::getNbInternalMeshingNodes()
 		return getNbMeshingEdges() - 1;
 }
 /*----------------------------------------------------------------------------*/
-void CoEdge::
-detectLoopReference(const Topo::CoEdge* coedge_dep, std::vector<Topo::CoEdge*>& coedges_ref, std::set<const CoEdge*>& filtre_coedges) const
+void CoEdge::checkNoInterpolationLoop(const Topo::CoEdge* coedge_dep, const std::vector<Topo::CoEdge*> interpolated_coedges, std::set<const Topo::CoEdge*> traversed_coedges) const
 {
 #ifdef _DEBUG2
-	std::cout<<"detectLoopReference("<<coedge_dep->getName()<<", [";
-	for (uint i=0; i<coedges_ref.size(); i++)
-		std::cout<<coedges_ref[i]->getName()<<" ";
+	std::cout << "checkNoInterpolationLoop(" << coedge_dep->getName() << ", [";
+	for (const Topo::CoEdge* ce : interpolated_coedges) std::cout << ce->getName() << " ";
+	std::cout<<"], [";
+	for (const Topo::CoEdge* ce : traversed_coedges) std::cout << ce->getName() << " ";
 	std::cout<<"])"<<std::endl;
 #endif
 
-
-	for (uint i=0; i<coedges_ref.size(); i++){
-
-		if (filtre_coedges.find(coedges_ref[i]) != filtre_coedges.end()){
-#ifdef _DEBUG2
-			std::cout<<" "<<coedges_ref[i]->getName()<<" déjà validée"<<std::endl;
-#endif
-			continue;
-		}
-		if (coedge_dep == coedges_ref[i]){
+	traversed_coedges.insert(coedge_dep);
+	updateModificationTime(coedge_dep, interpolated_coedges);
+	for (const Topo::CoEdge* ice : interpolated_coedges)
+	{
+		if (traversed_coedges.find(ice) != traversed_coedges.end())
+		{
 			TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-			message << "Erreur dans l'utilisation de l'interpolation, l'arête "
-					<<coedge_dep->getName()
-					<<" se référence elle même indirectement";
+			message << "Erreur d'interpolation : "
+					<< coedge_dep->getName()
+					<< " --> "
+					<< ice->getName()
+					<< " qui a déjà été parcourue"
+					<< " (boucle dans l'interpolation).";
 			throw TkUtil::Exception (message);
 		}
 
-		CoEdgeMeshingProperty* dni = coedges_ref[i]->getMeshingProperty();
-
-		if (dni->getMeshLaw() == CoEdgeMeshingProperty::interpolate){
-			EdgeMeshingPropertyInterpolate* interpol = dynamic_cast<EdgeMeshingPropertyInterpolate*>(dni);
-			CHECK_NULL_PTR_ERROR(interpol);
-			if (interpol->getType() == EdgeMeshingPropertyInterpolate::with_coedge_list){
-				// recherche des arêtes par rapport aux quelles se fait l'interpolation
-				std::vector<std::string> coedges_names = interpol->getCoEdges();
-
-				for (uint j=0; j<coedges_names.size(); j++)
-					if (coedges_names[j] == coedge_dep->getName()){
-						TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-						message << "Erreur dans l'utilisation de l'interpolation, les arêtes "
-								<<coedges_names[j]<<" et "<<coedges_ref[i]->getName()
-								<<" se référencent mutuellement";
-						throw TkUtil::Exception (message);
-					} // if (coedges_names[j] == coedge->getName())
-					else if (coedges_names[j] == coedges_ref[i]->getName()) {
-						TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-						message << "Erreur dans l'utilisation de l'interpolation, l'arête "
-								<<coedges_names[j]
-								<<" se référence elle même";
-						throw TkUtil::Exception (message);
-					}
-					else {
-						std::vector<Topo::CoEdge*> coedges;
-						getCoEdges(coedges_names, coedges);
-						std::set<const CoEdge*> filtre_coedges; // pour éviter d'y passer trop de temps
-						detectLoopReference(coedge_dep, coedges, filtre_coedges);
-						updateModificationTime(coedges_ref[i], coedges);
-					}
-			} // if (interpol->getType() == EdgeMeshingPropertyInterpolate::with_coedge_list)
-			else if (interpol->getType() == EdgeMeshingPropertyInterpolate::with_coface) {
-
-				std::string coface_name = interpol->getCoFace();
-
-				CoFace* coface = 0;
-				try {
-					coface = getContext().getTopoManager().getCoFace(coface_name, false);
-				}
-				catch (Utils::IsDestroyedException &e){
-					TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-					message << "Erreur, l'arête "<<getName()<<" a une discrétisation basée sur l'interpolation en utilisant la face "
-							<< coface_name <<" qui est détruite";
-					throw TkUtil::Exception (message);
-				}
-
-				if (coface == 0){
-					TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-					message << "Erreur, l'arête "<<getName()<<" a une discrétisation basée sur l'interpolation en utilisant la face "
-							<< coface_name <<" qui n'existe pas (ou n'existe plus)";
-					throw TkUtil::Exception (message);
-				}
-
-				detectLoopReference(coedge_dep, coedges_ref[i], coface, filtre_coedges);
-
-			} // else if (interpol->getType() == EdgeMeshingPropertyInterpolate::with_coface)
-		} // if (dni->getMeshLaw() == CoEdgeMeshingProperty::interpolate)
-		filtre_coedges.insert(coedges_ref[i]);
-	} // for (uint i=0; i<coedges_ref.size(); i++)
+		checkNoInterpolationLoop(ice, findInterpolatedCoEdges(ice), traversed_coedges);
+	}
+	traversed_coedges.erase(coedge_dep);
 }
 /*----------------------------------------------------------------------------*/
-void CoEdge::
-detectLoopReference(const Topo::CoEdge* coedge_dep, const Topo::CoEdge* coedge, Topo::CoFace* coface, std::set<const CoEdge*>& filtre_coedges) const
+const std::vector<Topo::CoEdge*> CoEdge::
+findInterpolatedCoEdges(const Topo::CoEdge* coedge) const
 {
-#ifdef _DEBUG2
-	std::cout<<"detectLoopReference("<<coedge_dep->getName()<<", "<<coedge->getName()<<", "<<coface->getName()<<")"<<std::endl;
-#endif
-	// si cette arête a déjà été validée, on passe
-	if (filtre_coedges.find(coedge) != filtre_coedges.end()){
-#ifdef _DEBUG2
-		std::cout<<" déjà validée"<<std::endl;
-#endif
-		return;
-	}
+	std::vector<Topo::CoEdge*> interpolated_coedges;
+	const CoEdgeMeshingProperty* dni = coedge->getMeshingProperty();
+	switch (dni->getMeshLaw())
+	{
+		case CoEdgeMeshingProperty::interpolate:
+		{
+			auto interpol = dynamic_cast<const EdgeMeshingPropertyInterpolate*>(dni);
+			switch (interpol->getType())
+			{
+				case EdgeMeshingPropertyInterpolate::with_coedge_list:
+				{
+					std::vector<std::string> names = interpol->getCoEdges();
+					getCoEdges(names, interpolated_coedges);
+					break;
+				}
+				case EdgeMeshingPropertyInterpolate::with_coface:
+				{
+					std::string coface_name = interpol->getCoFace();
+					CoFace* coface = 0;
+					try {
+						coface = getContext().getTopoManager().getCoFace(interpol->getCoFace(), false);
+					}
+					catch (Utils::IsDestroyedException &e){
+						TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
+						message << "Erreur, l'arête "
+							    << coedge->getName()
+								<< " a une discrétisation basée sur l'interpolation en utilisant la face "
+								<< coface_name 
+								<< " qui est détruite";
+						throw TkUtil::Exception (message);
+					}
+					if (coface == 0){
+						TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
+						message << "Erreur, l'arête "
+						        << coedge->getName() 
+								<< " a une discrétisation basée sur l'interpolation en utilisant une face non renseignée (détruite)";
+						throw TkUtil::Exception (message);
+					}
 
-	// rechercher l'edge dans laquelle est cette coedge, à partir de la coface.
-	Edge* edge_dep = 0;
-	try {
-		edge_dep = coface->getEdgeContaining(coedge);
-	}
-	catch (TkUtil::Exception &e){
-		TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-		message << "Erreur avec l'interpolation de l'arête "
-				<< coedge->getName()
-				<<", elle référence la face "<<coface->getName()
-				<<" alors qu'elles ne sont pas en relation.";
-		throw TkUtil::Exception (message);
-	}
+					Topo::Edge* edge_dep = 0;
+					try
+					{
+						edge_dep = coface->getEdgeContaining(coedge);
+					}
+					catch (TkUtil::Exception &e)
+					{
+						TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
+						message << "Erreur avec l'interpolation de l'arête "
+								<< coedge->getName()
+								<< ", elle référence la face " 
+								<< coface->getName()
+								<< " alors qu'elles ne sont pas en relation.";
+						throw TkUtil::Exception (message);
+					}
 
-	Edge* edge_ref = coface->getOppositeEdge(edge_dep);
-	if (edge_ref == 0){
-		TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-		message << "Erreur avec l'interpolation de l'arête "
-				<< coedge->getName()
-				<<", elle référence la face "<<coface->getName()
-				<<" mais on ne trouve pas d'arête en face.";
-		throw TkUtil::Exception (message);
-	}
+					Topo::Edge* edge_ref = coface->getOppositeEdge(edge_dep);
+					if (edge_ref == 0){
+						TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
+						message << "Erreur avec l'interpolation de l'arête "
+								<< coedge->getName()
+								<< ", elle référence la face "
+								<< coface->getName()
+								<< " mais on ne trouve pas d'arête en face.";
+						throw TkUtil::Exception (message);
+					}
 
-	// vérifie que les coedges ne dépendent pas de coedge_dep
-	std::vector<Topo::CoEdge*> coedges_ref = edge_ref->getCoEdges();
-	detectLoopReference(coedge_dep, coedges_ref, filtre_coedges);
-	updateModificationTime(coedge, coedges_ref);
+					// vérifie que les coedges ne dépendent pas de coedge_dep
+					interpolated_coedges = edge_ref->getCoEdges();
+					break;
+				}
+				default:
+				{
+					break;
+				}
+			}
+			break;
+		};
+		case CoEdgeMeshingProperty::globalinterpolate:
+		{
+			auto interpol = dynamic_cast<const EdgeMeshingPropertyGlobalInterpolate*>(dni);
+			std::vector<std::string> names = interpol->getFirstCoEdges();
+			getCoEdges(names, interpolated_coedges);
+			names = interpol->getSecondCoEdges();
+			getCoEdges(names, interpolated_coedges);
+			break;
+		};
+		default:
+		{
+			break;
+		}
+	}
+	return interpolated_coedges;
 }
 /*----------------------------------------------------------------------------*/
-void CoEdge::updateModificationTime(const Topo::CoEdge* coedge_ref, std::vector<Topo::CoEdge*>& coedges) const
+void CoEdge::updateModificationTime(const Topo::CoEdge* coedge_ref, const std::vector<Topo::CoEdge*>& coedges) const
 {
 	for (uint i=0; i<coedges.size(); i++){
 		Topo::CoEdge* coedge = coedges[i];
@@ -2810,20 +2796,13 @@ void CoEdge::getCoEdges(std::vector<std::string>& coedges_names, std::vector<Top
 		CoEdge* coedge = getContext().getTopoManager().getCoEdge(coedges_names[i], false);
 
 		if (coedge == 0){
-			TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
+			TkUtil::UTF8String message (TkUtil::Charset::UTF_8);
 			message << "Erreur, l'arête "<<getName()
 					<<" a une discrétisation basée sur celle de "<<coedges_names[i]
 					<<" qui n'existe pas (ou n'existe plus)";
 			throw TkUtil::Exception (message);
 		}
 
-		// cas où on dépend de soit même
-		if (coedge == this){
-			TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-			message << "Erreur, l'arête "<<getName()<<" a une discrétisation basée sur elle même \n";
-			message << "(peut-être avez-vous utilisé setParallelMeshingProperty au lieu de setMeshingProperty)";
-			throw TkUtil::Exception (message);
-		}
 		coedges.push_back(coedge);
 	}
 }

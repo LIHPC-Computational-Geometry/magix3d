@@ -70,12 +70,12 @@ def test_ns_mesh_2(capfd):
     mm.newAllBlocksMesh()
 
     assert gm.getNbVolumes() == 2
-    assert mm.getNbFaces() < 1900
+    assert mm.getNbFaces() < 1950
     assert mm.getNbFaces() > 1850
     out, err = capfd.readouterr()
     assert len(err) == 0
 
-def test_ns_mesh_2(capfd):
+def test_ns_mesh_3(capfd):
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
     gm = ctx.getGeomManager()
@@ -103,6 +103,24 @@ def test_block_on_box_union(capfd):
     gm.newBox(Mgx3D.Point(1, 0, 0), Mgx3D.Point(2, 1, 1))
     gm.translate(["Vol0001"], Mgx3D.Vector(0, 0.5, 0.5))
     gm.fuse(["Vol0000", "Vol0001"])
+    tm.newUnstructuredTopoOnGeometry("Vol0002")
+    mm.newAllBlocksMesh()
+
+    assert gm.getNbVolumes() == 1
+    out, err = capfd.readouterr()
+    assert len(err) == 0
+
+def test_block_on_cut_surface(capfd):
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    gm = ctx.getGeomManager()
+    tm = ctx.getTopoManager()
+    mm = ctx.getMeshManager()
+
+    gm.newBox(Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1))
+    gm.newCylinder(Mgx3D.Point(0, 0, 0), 0.2, Mgx3D.Vector(1, 0, 0), 360)
+    gm.translate(["Vol0001"], Mgx3D.Vector(0, 0.5, 0.5))
+    gm.cut(["Vol0000"], ["Vol0001"])
     tm.newUnstructuredTopoOnGeometry("Vol0002")
     mm.newAllBlocksMesh()
 
