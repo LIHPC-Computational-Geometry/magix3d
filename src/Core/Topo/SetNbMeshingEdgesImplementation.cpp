@@ -105,7 +105,8 @@ execute()
 
     		CoEdge* coedge_opp = findOppositeCoEdge(coedge_dep, cote_dep, coface);
 
-        	if (coedge_opp){
+//        	if (coedge_opp){	// CP, issue 106 : risque de mener à coedge_opp->setNbMeshingEdges (nb <= 0)
+			if ((coedge_opp) && (coedge_opp->getNbMeshingEdges ( ) > delta)){
         		m_coedge_delta[coedge_opp] = delta;
         		propagateWholeCoedges(coedge_opp);
         	}
@@ -177,7 +178,8 @@ addParalelCoEdges(CoEdge* coedge_dep, std::vector<CoEdge*>& whole_coedges)
 		int delta = computeDelta(coface, cote_dep);
 
 		Edge* edge_opp = coface->getEdges()[cote_opp];
-    	if (edge_opp->getCoEdges().size() == 1){
+//    	if (edge_opp->getCoEdges().size() == 1){	// CP, issue 106 : risque de mener à edge_opp->setNbMeshingEdges (nb <= 0)
+		if ((edge_opp->getCoEdges().size() == 1) && (edge_opp->getNbMeshingEdges ( ) > delta)){
     		CoEdge* coedge_opp = edge_opp->getCoEdges()[0];
 
     		if (m_coedges_vue[coedge_opp]){
