@@ -334,3 +334,21 @@ def test_topo_surface():
     assert ctx.getGroupManager().getTopoFaces("aaa", 2) == ["Fa0000"]
     ctx.undo()
     assert ctx.getGroupManager().getTopoFaces("aaa", 2) == []
+
+# issue#265: crash after two identical setGroup commands
+def test_issue265():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    gm = ctx.getGeomManager()
+
+    gm.newBox (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1))
+    gm.setGroup(["Vol0000"], 3, "bbb")
+    assert gm.getInfos("Vol0000", 3).groups() == ["bbb"]
+    gm.setGroup(["Vol0000"], 3, "aaa")
+    assert gm.getInfos("Vol0000", 3).groups() == ["aaa"]
+    gm.setGroup(["Vol0000"], 3, "aaa")
+    assert gm.getInfos("Vol0000", 3).groups() == ["aaa"]
+    gm.newBox (Mgx3D.Point(1, 0, 0), Mgx3D.Point(2, 1, 1))
+    gm.setGroup(["Vol0001"], 3, "aaa")
+    assert gm.getInfos("Vol0000", 3).groups() == ["aaa"]
+    assert gm.getInfos("Vol0001", 3).groups() == ["aaa"]
