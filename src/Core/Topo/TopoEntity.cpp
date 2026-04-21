@@ -116,13 +116,14 @@ setGeomAssociation(Geom::GeomEntity* ge)
 
     // on met à jour la relation réciproque (de Geom vers Topo)
     Topo::TopoManager& tm = getContext().getTopoManager();
-    if (m_topo_property->getGeomAssociation())
-        tm.removeRefTopo(m_topo_property->getGeomAssociation(), this);
+    Geom::GeomEntity* oldGe = m_topo_property->getGeomAssociation();
+    if (oldGe)
+        tm.removeRefTopo(oldGe, this);
+
     if (ge)
         tm.addRefTopo(ge, this);
 
     // mise à jour de la couleur si changement de dimension pour la projection
-    Geom::GeomEntity* oldGe = m_topo_property->getGeomAssociation();
     bool need_update_color = (0==ge || 0==oldGe || ge->getDim() != oldGe->getDim());
 
     // la relation Topo vers Geom

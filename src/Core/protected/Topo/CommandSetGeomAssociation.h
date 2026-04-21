@@ -79,6 +79,7 @@ public:
     virtual void getPreviewRepresentation(Utils::DisplayRepresentation& dr);
 
 private:
+    void setGeomAssociation(TopoEntity* e, std::function<void(Internal::InfoCommand* icmd)> saveGroups);
 
     /*------------------------------------------------------------------------*/
     /** Met à jour l'association et c'est tout */

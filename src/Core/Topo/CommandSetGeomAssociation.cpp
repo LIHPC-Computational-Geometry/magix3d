@@ -147,16 +147,12 @@ void CommandSetGeomAssociation::validGeomEntity()
 /*----------------------------------------------------------------------------*/
 void CommandSetGeomAssociation::project(Block* bloc)
 {
-	getInfoCommand().addTopoInfoEntity(bloc, Internal::InfoCommand::DISPMODIFIED);
-	bloc->saveTopoProperty();
-	bloc->setGeomAssociation(m_geom_entity);
+	setGeomAssociation(bloc, [bloc](Internal::InfoCommand* icmd) { bloc->saveBlockTopoProperty(icmd); });
 }
 /*----------------------------------------------------------------------------*/
 void CommandSetGeomAssociation::project(CoFace* coface)
 {
-	getInfoCommand().addTopoInfoEntity(coface, Internal::InfoCommand::DISPMODIFIED);
-	coface->saveTopoProperty();
-	coface->setGeomAssociation(m_geom_entity);
+	setGeomAssociation(coface, [coface](Internal::InfoCommand* icmd) { coface->saveCoFaceTopoProperty(icmd); });
 
 	std::vector<CoEdge*> coedges = coface->getCoEdges();
 
@@ -210,9 +206,7 @@ void CommandSetGeomAssociation::project(CoFace* coface)
 /*----------------------------------------------------------------------------*/
 void CommandSetGeomAssociation::project(CoEdge* coedge)
 {
-	getInfoCommand().addTopoInfoEntity(coedge, Internal::InfoCommand::DISPMODIFIED);
-	coedge->saveTopoProperty();
-	coedge->setGeomAssociation(m_geom_entity);
+	setGeomAssociation(coedge, [coedge](Internal::InfoCommand* icmd) { coedge->saveCoEdgeTopoProperty(icmd); });
 
 	const std::vector<Vertex*>& vertices = coedge->getVertices();
 	for (auto iter = vertices.begin(); iter != vertices.end(); ++iter){
@@ -229,8 +223,7 @@ void CommandSetGeomAssociation::project(CoEdge* coedge)
 /*----------------------------------------------------------------------------*/
 void CommandSetGeomAssociation::project(Vertex* vtx)
 {
-	vtx->saveTopoProperty();
-	vtx->setGeomAssociation(m_geom_entity);
+	setGeomAssociation(vtx, [vtx](Internal::InfoCommand* icmd) { vtx->saveVertexTopoProperty(icmd); });
 
 	// déplace le sommet topologique si la projection implique un déplacement
 	if (m_geom_entity && m_move_vertices){
@@ -258,12 +251,42 @@ void CommandSetGeomAssociation::project(Vertex* vtx)
 			}
 		}
 	}
-	getInfoCommand().addTopoInfoEntity(vtx, Internal::InfoCommand::DISPMODIFIED);
 }
 /*----------------------------------------------------------------------------*/
 void CommandSetGeomAssociation::getPreviewRepresentation(Utils::DisplayRepresentation& dr)
 {
 	return getPreviewRepresentationCoedgeDisplayModified(dr);
+}
+/*----------------------------------------------------------------------------*/
+void CommandSetGeomAssociation::setGeomAssociation(TopoEntity* e, std::function<void(Internal::InfoCommand* icmd)> saveGroups)
+{
+	getInfoCommand().addTopoInfoEntity(e, Internal::InfoCommand::DISPMODIFIED);
+	e->saveTopoProperty();
+	e->setGeomAssociation(m_geom_entity);
+
+	// si m_geom_entity est dans le même groupe que e => e sort du groupe
+	// 1. les groupes géométriques
+	Group::GroupManager& gm = e->getContext().getGroupManager();
+	std::vector<std::string> geom_groups = Utils::toNames(gm.getGroupsFor(m_geom_entity));
+	std::sort(geom_groups.begin(), geom_groups.end());
+	// 2. les groupes topologiques
+	Group::GroupHelperForCommand helper(getInfoCommand(), gm);
+	std::vector<std::string> topo_groups = Utils::toNames(helper.getGroupsFor(e));
+	std::sort(topo_groups.begin(), topo_groups.end());
+	// 3. l'intersection
+	std::vector<std::string> common_groups;
+	std::set_intersection(
+        geom_groups.begin(), geom_groups.end(),
+        topo_groups.begin(), topo_groups.end(),
+        std::back_inserter(common_groups)
+    );
+	// 4. suppression des groupes
+	if (common_groups.size() > 0) {
+		// au moins un groupe à supprimer, il faut sauvegarder les listes de groupes
+		saveGroups(&getInfoCommand());
+		for (std::string gn : common_groups)
+			helper.removeFromGroup(gn, e);
+	}
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Topo
