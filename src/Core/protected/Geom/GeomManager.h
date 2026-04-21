@@ -1330,6 +1330,40 @@ public:
 #endif
 
     /*------------------------------------------------------------------------*/
+    /** \brief création d'un sommet géométrique à partir de sa représentation opencascade
+     *
+	 *  \param brepName	    fichier brep contenant la représentation OCC du sommet
+     */
+    Mgx3D::Internal::M3DCommandResult*
+		newVertexFromBrep(std::string brepFileName);
+
+    /*------------------------------------------------------------------------*/
+    /** \brief création d'une courbe géométrique à partir de sa représentation opencascade
+     *
+	 *  \param brepName	    fichier brep contenant la représentation OCC de la courbe
+     *  \param extremaFirstPoint  point de la courbe à utiliser pour identifier la courbe
+     *  \param extremaLastPoint   point de la courbe à utiliser pour identifier la courbe
+     */
+    Mgx3D::Internal::M3DCommandResult*
+		newCurveFromBrep(std::string brepFileName, std::string extremaFirstPoint, std::string extremaLastPoint);
+
+    /*------------------------------------------------------------------------*/
+    /** \brief création d'une surface géométrique à partir de sa représentation opencascade
+     *
+	 *  \param brepName	    fichier brep contenant la représentation OCC de la surface
+     */
+    Mgx3D::Internal::M3DCommandResult*
+		newSurfaceFromBrep(std::string brepFileName);
+
+    /*------------------------------------------------------------------------*/
+    /** \brief création d'un volume géométrique à partir de sa représentation opencascade
+     *
+	 *  \param brepName	    fichier brep contenant la représentation OCC du volume
+     */
+    Mgx3D::Internal::M3DCommandResult*
+		newVolumeFromBrep(std::string brepFileName);
+
+    /*------------------------------------------------------------------------*/
     /** \brief retourne la liste des volumes (non détruits) gérées par le manager
      */
     std::vector<std::string> getVolumes() const;
@@ -1455,6 +1489,7 @@ public:
     /// recherche les entitées à partir des noms
     void convert(std::vector<std::string>& names, std::vector<GeomEntity*>& entities);
 #endif
+
 
 private:
 #ifndef SWIG
