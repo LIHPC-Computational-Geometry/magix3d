@@ -2,9 +2,11 @@ import pyMagix3D as Mgx3D
 import pytest
 import math
 import LimaScripting as lima
+import os
 
 def l2_norme(n0, n1):
     return math.sqrt( pow(n1.x()-n0.x(),2) + pow(n1.y()-n0.y(),2) + pow(n1.z()-n0.z(),2) )
+
 
 
 def test_law_beta(capfd):
@@ -28,7 +30,7 @@ def test_law_beta(capfd):
     ctx.getMeshManager().newAllBlocksMesh()
 
     # Sauvegarde du maillage (mli)
-    filename = "meshing_law_beta.mli2"
+    filename = "/dev/shm/meshing_law_beta.mli2"
     mm.writeMli(filename)
     mesh_lima = lima.Maillage()
     mesh_lima.lire(filename)
@@ -45,6 +47,8 @@ def test_law_beta(capfd):
     n2 = mesh_lima.noeud(2)
     n25 = mesh_lima.noeud(25)
     assert( abs(l2_norme(n2, n25) - s1_ar0000) < eps )
+
+    os.remove(filename)
 
 
 
@@ -73,7 +77,7 @@ def test_law_beta_onCurve_1(capfd):
     ctx.getMeshManager().newAllBlocksMesh()
 
     # Sauvegarde du maillage (mli)
-    filename = "meshing_law_beta_2.mli2"
+    filename = "/dev/shm/meshing_law_beta_2.mli2"
     mm.writeMli(filename)
     mesh_lima = lima.Maillage()
     mesh_lima.lire(filename)
@@ -88,6 +92,8 @@ def test_law_beta_onCurve_1(capfd):
     assert( abs(l2_norme(n0, n8) - s1_ar0000) > eps )
     # real meshing edge size
     assert( abs(l2_norme(n0, n8) - 0.000123750926732273) < eps )
+
+    os.remove(filename)
 
 
 
@@ -131,7 +137,7 @@ def test_law_beta_onCurve_2(capfd):
     ctx.getMeshManager().newAllBlocksMesh()
 
     # Sauvegarde du maillage (mli)
-    filename = "meshing_law_beta_3.mli2"
+    filename = "/dev/shm/meshing_law_beta_3.mli2"
     mm.writeMli(filename)
     mesh_lima = lima.Maillage()
     mesh_lima.lire(filename)
@@ -146,3 +152,30 @@ def test_law_beta_onCurve_2(capfd):
     assert( abs(l2_norme(n2, n17) - s1_ar0001) > eps )
     # real meshing edge size
     assert( abs(l2_norme(n2, n17) - 0.0000594519721850694) < eps )
+
+    os.remove(filename)
+
+
+
+# This test case shows that the "Inverser le sens" option doesn't work when the
+# beta law is used with a target first mesh edge size. To show this, we use the
+# same test as "test_law_beta", which is successful, and the only
+# difference is we turn false the direction option.
+def test_law_beta_fail(capfd):
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+
+    # chosen first mesh edge size
+    s1_ar0000 = 0.005
+
+    # Création d'une boite avec une topologie
+    ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
+
+    # Changement de discrétisation pour les arêtes Ar0000
+    emp = Mgx3D.EdgeMeshingPropertyBeta(10, 1.1, False, True, s1_ar0000)
+    ctx.getTopoManager().setMeshingProperty (emp, ["Ar0000"])
+    with pytest.raises(RuntimeError) as excinfo:
+        # Création du maillage pour tous les blocs
+        ctx.getMeshManager().newAllBlocksMesh()
+    expected = "EdgeMeshingPropertyBeta, on ne peut pas trouver de beta"
+    assert expected in str(excinfo.value)

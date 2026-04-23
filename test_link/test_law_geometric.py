@@ -2,6 +2,7 @@ import pyMagix3D as Mgx3D
 import pytest
 import math
 import LimaScripting as lima
+import os
 
 def l2_norme(n0, n1):
     return math.sqrt( pow(n1.x()-n0.x(),2) + pow(n1.y()-n0.y(),2) + pow(n1.z()-n0.z(),2) )
@@ -30,7 +31,7 @@ def test_law_geometric_Linear(capfd):
     ctx.getMeshManager().newAllBlocksMesh()
 
     # Sauvegarde du maillage (mli)
-    filename = "meshing_law_geometric_1.mli2"
+    filename = "/dev/shm/meshing_law_geometric_1.mli2"
     mm.writeMli(filename)
     mesh_lima = lima.Maillage()
     mesh_lima.lire(filename)
@@ -48,6 +49,7 @@ def test_law_geometric_Linear(capfd):
     n52 = mesh_lima.noeud(52)
     assert( abs(l2_norme(n5, n52) - s1_ar0004) < eps )
 
+    os.remove(filename)
 
 
 # Geometric law with target first mesh edge size seems to work only if this
@@ -80,7 +82,7 @@ def test_law_geometric_onCurve_1(capfd):
     ctx.getMeshManager().newAllBlocksMesh()
 
     # Sauvegarde du maillage (mli)
-    filename = "meshing_law_geometric_2.mli2"
+    filename = "/dev/shm/meshing_law_geometric_2.mli2"
     mm.writeMli(filename)
     mesh_lima = lima.Maillage()
     mesh_lima.lire(filename)
@@ -104,6 +106,7 @@ def test_law_geometric_onCurve_1(capfd):
     # real meshing edge size
     assert( abs(l2_norme(n7, n43) - 0.0666309120859813) < eps )
 
+    os.remove(filename)
 
 
 # Geometric law with target first mesh edge size for a topological
@@ -149,7 +152,7 @@ def test_law_geometric_onCurve_2(capfd):
     ctx.getMeshManager().newAllBlocksMesh()
 
     # Sauvegarde du maillage (mli)
-    filename = "meshing_law_geometric_3.mli2"
+    filename = "/dev/shm/meshing_law_geometric_3.mli2"
     mm.writeMli(filename)
     mesh_lima = lima.Maillage()
     mesh_lima.lire(filename)
@@ -173,6 +176,7 @@ def test_law_geometric_onCurve_2(capfd):
     # real meshing edge size
     assert( abs(l2_norme(n7, n43) - 0.00473345420702485) < eps )
 
+    os.remove(filename)
 
 
 # Geometric law with target first mesh edge size for a topological
@@ -226,7 +230,7 @@ def test_law_geometric_onSurface(capfd):
     ctx.getMeshManager().newAllBlocksMesh()
 
     # Sauvegarde du maillage (mli)
-    filename = "meshing_law_geometric_3.mli2"
+    filename = "/dev/shm/meshing_law_geometric_3.mli2"
     mm.writeMli(filename)
     mesh_lima = lima.Maillage()
     mesh_lima.lire(filename)
@@ -250,6 +254,7 @@ def test_law_geometric_onSurface(capfd):
     # real meshing edge size
     assert( abs(l2_norme(n8, n142) - 2.12853778510894) < eps )
 
+    os.remove(filename)
 
 
 # This test shows an example of "Découpage polaire" option, with geometric law.
@@ -324,7 +329,7 @@ def test_law_geometric_polar(capfd):
     ctx.getMeshManager().newAllBlocksMesh()
 
     # Sauvegarde du maillage (mli)
-    filename = "meshing_law_geometric_polar.mli2"
+    filename = "/dev/shm/meshing_law_geometric_polar.mli2"
     mm.writeMli(filename)
     mesh_lima = lima.Maillage()
     mesh_lima.lire(filename)
@@ -347,3 +352,5 @@ def test_law_geometric_polar(capfd):
     assert( abs(l2_norme(n2, n17) - s1_ar0001) > eps )
     # real meshing edge size
     assert( abs(l2_norme(n2, n17) - 5.09996486467734e-1) < eps )
+
+    os.remove(filename)

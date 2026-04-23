@@ -55,13 +55,15 @@ def test_perturbation3(capfd):
     # Création du maillage pour des faces
     ctx.getMeshManager().newFacesMesh ( ["Fa0005"] )
     # Sauvegarde du maillage (mli)
-    mli_file_name = "perturbation3.mli2"
-    ctx.getMeshManager().writeMli(mli_file_name)
-    assert os.path.exists(mli_file_name)
-    assert os.path.getsize(mli_file_name) > 0
+    mli_filename = "/dev/shm/perturbation3.mli2"
+    ctx.getMeshManager().writeMli(mli_filename)
+    assert os.path.exists(mli_filename)
+    assert os.path.getsize(mli_filename) > 0
 
     out, err = capfd.readouterr()
     assert len(err) == 0
+
+    os.remove(mli_filename)
 
 def test_perturbation4(capfd):
     ctx = Mgx3D.getStdContext()
@@ -91,11 +93,13 @@ def test_perturbation5(capfd):
     ctx.getGeomManager().addToGroup(["Surf0000"], 2, "EXT")
     ctx.getGroupManager().addPolarPerturbation("EXT", pert)
     ctx.getMeshManager().newFacesMesh(["Fa0010", "Fa0016", "Fa0022", "Fa0028"])
-    mli_file_name = "perturbation4.mli2"
-    ctx.getMeshManager().writeMli(mli_file_name)
-    assert os.path.exists(mli_file_name)
-    assert os.path.getsize(mli_file_name) > 0
+
+    mli_filename = "/dev/shm/perturbation5.mli2"
+    ctx.getMeshManager().writeMli(mli_filename)
+    assert os.path.exists(mli_filename)
+    assert os.path.getsize(mli_filename) > 0
 
     out, err = capfd.readouterr()
     assert len(err) == 0
 
+    os.remove(mli_filename)

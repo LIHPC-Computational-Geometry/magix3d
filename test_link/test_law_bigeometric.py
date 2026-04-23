@@ -2,6 +2,7 @@ import pyMagix3D as Mgx3D
 import pytest
 import math
 import LimaScripting as lima
+import os
 
 def l2_norme(n0, n1):
     return math.sqrt( pow(n1.x()-n0.x(),2) + pow(n1.y()-n0.y(),2) + pow(n1.z()-n0.z(),2) )
@@ -35,7 +36,7 @@ def test_law_bigeometric_Linear(capfd):
     ctx.getMeshManager().newAllBlocksMesh()
 
     # Sauvegarde du maillage (mli)
-    filename = "meshing_law_bigeometric.mli2"
+    filename = "/dev/shm/meshing_law_bigeometric.mli2"
     mm.writeMli(filename)
     mesh_lima = lima.Maillage()
     mesh_lima.lire(filename)
@@ -75,6 +76,7 @@ def test_law_bigeometric_Linear(capfd):
     assert( abs(l2_norme(n2, n107) - s2_ar0000) > eps )
     assert( abs(l2_norme(n2, n107) - 0.25) < eps )
 
+    os.remove(filename)
 
 # This test shows an example of "Découpage polaire" option, with geometric law.
 # In 3D, it's difficult to get a suitable situation to use this option.
@@ -144,7 +146,7 @@ def test_law_bigeometric_polar(capfd):
     ctx.getMeshManager().newAllBlocksMesh()
 
     # Sauvegarde du maillage (mli)
-    filename = "meshing_law_bigeometric_polar.mli2"
+    filename = "/dev/shm/meshing_law_bigeometric_polar.mli2"
     mm.writeMli(filename)
     mesh_lima = lima.Maillage()
     mesh_lima.lire(filename)
@@ -167,3 +169,5 @@ def test_law_bigeometric_polar(capfd):
     assert( abs(l2_norme(n1, n16) - s_ar0000) > eps )
     # real meshing edge size
     assert( abs(l2_norme(n1, n16) - 3.13783707036233e-1) < eps )
+
+    os.remove(filename)

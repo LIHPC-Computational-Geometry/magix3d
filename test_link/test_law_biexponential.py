@@ -2,6 +2,7 @@ import pyMagix3D as Mgx3D
 import pytest
 import math
 import LimaScripting as lima
+import os
 
 def l2_norme(n0, n1):
     return math.sqrt( pow(n1.x()-n0.x(),2) + pow(n1.y()-n0.y(),2) + pow(n1.z()-n0.z(),2) )
@@ -32,7 +33,7 @@ def test_law_biexponential_Linear(capfd):
     ctx.getMeshManager().newAllBlocksMesh()
 
     # Sauvegarde du maillage (mli)
-    filename = "meshing_law_biexponential.mli2"
+    filename = "/dev/shm/meshing_law_biexponential.mli2"
     mm.writeMli(filename)
     mesh_lima = lima.Maillage()
     mesh_lima.lire(filename)
@@ -60,6 +61,8 @@ def test_law_biexponential_Linear(capfd):
     n107 = mesh_lima.noeud(107)
     assert( abs(l2_norme(n2, n107) - s2_ar0011) < eps )
 
+    os.remove(filename)
+
 # Target sizes are not respected here. It is due to how
 # the projected topological edge length is computed in
 # the code. This also affects the other laws.
@@ -86,7 +89,7 @@ def test_law_biexponential_onCurve_1(capfd):
     ctx.getMeshManager().newAllBlocksMesh()
 
     # Sauvegarde du maillage (mli)
-    filename = "meshing_law_biexponential.mli2"
+    filename = "/dev/shm/meshing_law_biexponential.mli2"
     mm.writeMli(filename)
     mesh_lima = lima.Maillage()
     mesh_lima.lire(filename)
@@ -126,6 +129,7 @@ def test_law_biexponential_onCurve_1(capfd):
     # because the topological edge is straight)
     assert( abs(l2_norme(n7, n203) - s2_ar0000) < eps )
 
+    os.remove
 
 # Bi-exponential law with target first and last mesh edge size for a topological
 # edge associated to a geometric curve with the two topological
@@ -174,7 +178,7 @@ def test_law_biexponential_onCurve_2(capfd):
     ctx.getMeshManager().newAllBlocksMesh()
 
     # Sauvegarde du maillage (mli)
-    filename = "meshing_law_biexponential_3.mli2"
+    filename = "/dev/shm/meshing_law_biexponential_3.mli2"
     mm.writeMli(filename)
     mesh_lima = lima.Maillage()
     mesh_lima.lire(filename)
@@ -215,6 +219,7 @@ def test_law_biexponential_onCurve_2(capfd):
     # real meshing edge size
     assert( abs(l2_norme(n7, n123) - 3.97338661590123e-1) < eps )
 
+    os.remove(filename)
 
 # Bi-exponential law with target first and last mesh edge size for a topological
 # edge associated to a geometric surface.
@@ -268,7 +273,7 @@ def test_law_biexponential_onSurface(capfd):
     ctx.getMeshManager().newAllBlocksMesh()
 
     # Sauvegarde du maillage (mli)
-    filename = "meshing_law_geometric_3.mli2"
+    filename = "/dev/shm/meshing_law_geometric_3.mli2"
     mm.writeMli(filename)
     mesh_lima = lima.Maillage()
     mesh_lima.lire(filename)
@@ -308,3 +313,5 @@ def test_law_biexponential_onSurface(capfd):
     assert( abs(l2_norme(n8, n192) - s2_ar0022) > eps )
     # real meshing edge size
     assert( abs(l2_norme(n8, n192) - 4.9378232958398e-1) < eps )
+
+    os.remove(filename)
