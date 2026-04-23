@@ -5,7 +5,7 @@ def test_export_demicyl_3d(capfd):
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
 
-    cgnsfilename = "demiCylinder.cgns"
+    cgnsfilename = "/dev/shm/demiCylinder.cgns"
     ctx.getTopoManager().newCylinderWithTopo (Mgx3D.Point(0, 0, 0), 1, Mgx3D.Vector(10, 0, 0), 360, True, .5, 10, 10, 10)
     ctx.getTopoManager().splitAllBlocks ("Ar0013",.5)
     ctx.getTopoManager().splitAllBlocks ("Ar0004",.5)
@@ -34,13 +34,13 @@ def test_export_demicyl_3d(capfd):
     out, err = capfd.readouterr()
     assert len(err) == 0
 
-
+    os.remove(cgnsfilename)
 
 def test_export_quad_2d(capfd):
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
 
-    cgnsfilename = "quadOGrid.cgns"
+    cgnsfilename = "/dev/shm/quadOGrid.cgns"
     ctx.getGeomManager().newVertex (Mgx3D.Point(0, 0, 0))
     ctx.getGeomManager().newVertex (Mgx3D.Point(1, 0, 0))
     ctx.getGeomManager().newVertex (Mgx3D.Point(1, 1, 0))
@@ -69,3 +69,5 @@ def test_export_quad_2d(capfd):
     assert os.path.getsize(cgnsfilename) > 0
     out, err = capfd.readouterr()
     assert len(err) == 0
+
+    os.remove(cgnsfilename)

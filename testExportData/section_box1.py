@@ -1,4 +1,5 @@
 import pyMagix3D as Mgx3D
+import os
 
 ctx = Mgx3D.getStdContext()
 gm = ctx.getGeomManager()
@@ -44,5 +45,10 @@ gm.section (["Vol0000"], "Surf0012")
 # Création du maillage pour tous les blocs
 mm.newAllBlocksMesh()
 # Sauvegarde du maillage (mli)
-filename = "section.mli2"
+filename = "/dev/shm/section.mli2"
 mm.writeMli(filename)
+
+assert os.path.exists(filename)
+assert os.path.getsize(filename) > 0
+
+os.remove(filename)

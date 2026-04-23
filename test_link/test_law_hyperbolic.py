@@ -2,6 +2,7 @@ import pyMagix3D as Mgx3D
 import pytest
 import math
 import LimaScripting as lima
+import os
 
 def l2_norme(n0, n1):
     return math.sqrt( pow(n1.x()-n0.x(),2) + pow(n1.y()-n0.y(),2) + pow(n1.z()-n0.z(),2) )
@@ -26,7 +27,7 @@ def test_law_hyperbolic_Linear(capfd):
     ctx.getMeshManager().newAllBlocksMesh()
 
     # Sauvegarde du maillage (mli)
-    filename = "meshing_law_hyperbolic.mli2"
+    filename = "/dev/shm/meshing_law_hyperbolic.mli2"
     mm.writeMli(filename)
     mesh_lima = lima.Maillage()
     mesh_lima.lire(filename)
@@ -50,6 +51,7 @@ def test_law_hyperbolic_Linear(capfd):
     assert( abs(l2_norme(n1, n16) - s2_ar0000) > eps )
     assert( abs(l2_norme(n1, n16) - 0.0796198050777711) < eps )
 
+    os.remove(filename)
 
 
 # Hyperbolic law with target first mesh edge size for a topological
@@ -101,7 +103,7 @@ def test_law_hyperbolic_onSurface(capfd):
     ctx.getMeshManager().newAllBlocksMesh()
 
     # Sauvegarde du maillage (mli)
-    filename = "meshing_law_hyperbolic_surface.mli2"
+    filename = "/dev/shm/meshing_law_hyperbolic_surface.mli2"
     mm.writeMli(filename)
     mesh_lima = lima.Maillage()
     mesh_lima.lire(filename)
@@ -124,3 +126,5 @@ def test_law_hyperbolic_onSurface(capfd):
     assert( abs(l2_norme(n10, n151) - s1_ar0023) > eps )
     # real meshing edge size
     assert( abs(l2_norme(n10, n151) - 0.0119670075859925) < eps )
+
+    os.remove(filename)
