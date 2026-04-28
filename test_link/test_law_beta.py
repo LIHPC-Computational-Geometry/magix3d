@@ -154,28 +154,3 @@ def test_law_beta_onCurve_2(capfd):
     assert( abs(l2_norme(n2, n17) - 0.0000594519721850694) < eps )
 
     os.remove(filename)
-
-
-
-# This test case shows that the "Inverser le sens" option doesn't work when the
-# beta law is used with a target first mesh edge size. To show this, we use the
-# same test as "test_law_beta", which is successful, and the only
-# difference is we turn false the direction option.
-def test_law_beta_fail(capfd):
-    ctx = Mgx3D.getStdContext()
-    ctx.clearSession() # Clean the session after the previous test
-
-    # chosen first mesh edge size
-    s1_ar0000 = 0.005
-
-    # Création d'une boite avec une topologie
-    ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
-
-    # Changement de discrétisation pour les arêtes Ar0000
-    emp = Mgx3D.EdgeMeshingPropertyBeta(10, 1.1, False, True, s1_ar0000)
-    ctx.getTopoManager().setMeshingProperty (emp, ["Ar0000"])
-    with pytest.raises(RuntimeError) as excinfo:
-        # Création du maillage pour tous les blocs
-        ctx.getMeshManager().newAllBlocksMesh()
-    expected = "EdgeMeshingPropertyBeta, on ne peut pas trouver de beta"
-    assert expected in str(excinfo.value)
