@@ -36,6 +36,7 @@
 #include <Geom2dAdaptor_Curve.hxx>
 #include <Geom2d_Line.hxx>
 #include <BRepAdaptor_Surface.hxx>
+#include <BRepBuilderAPI_Copy.hxx>
 #include <GeomAbs_SurfaceType.hxx>
 #include <GeomAbs_CurveType.hxx>
 /*----------------------------------------------------------------------------*/
@@ -232,19 +233,23 @@ void OCCDisplayRepresentationBuilder::computeEdges()
 #ifdef _DEBUG_EDGES
 	std::cout<<"OCCDisplayRepresentationBuilder::computeEdges() pour "<<m_entity->getName()<<std::endl;
 #endif
+	// Proposition : pour la visu on travaille sur une copie de m_shape non triangularisée.
+	// NB : il y a peut être du coup du code à nettoyer ou à revoir, notamment si la shape parente (surface) est
+	// triangularisée à des fins de visu : la jonction courbe/surface peut ne pas "être raccord".
+	TopoDS_Shape	shape	= BRepBuilderAPI_Copy (m_shape, Standard_False, Standard_False).Shape ( );
 
     std::vector<Utils::Math::Point>& rep_points = m_rep->getPoints();
 
     std::vector<size_t>& rep_edges= m_rep->getCurveDiscretization();
 
-    if(m_shape.ShapeType()<TopAbs_EDGE){ // toutes les entités de dimension supérieure
+    if(shape.ShapeType()<TopAbs_EDGE){ // toutes les entités de dimension supérieure
         // on récupère une liste indexée des arêtes composant l'objet
         TopTools_IndexedMapOfShape M;
-        TopExp::MapShapes(m_shape, TopAbs_EDGE, M);
+        TopExp::MapShapes(shape, TopAbs_EDGE, M);
 
         // On construit la map inverse edge->face
         TopTools_IndexedDataMapOfShapeListOfShape edge2Face;
-        TopExp::MapShapesAndAncestors(m_shape, TopAbs_EDGE, TopAbs_FACE, edge2Face);
+        TopExp::MapShapesAndAncestors(shape, TopAbs_EDGE, TopAbs_FACE, edge2Face);
 
         for (int ie=0; ie<M.Extent(); ie++)
         {
@@ -362,10 +367,10 @@ void OCCDisplayRepresentationBuilder::computeEdges()
             }
         }
 
-    }//(m_shape.ShapeType()==TopAbs_FACE)
-    else if(m_shape.ShapeType()==TopAbs_EDGE)
+    }//(shape.ShapeType()==TopAbs_FACE)
+    else if(shape.ShapeType()==TopAbs_EDGE)
     {
-        const TopoDS_Edge& aEdge = TopoDS::Edge(m_shape);
+        const TopoDS_Edge& aEdge = TopoDS::Edge(shape);
 
         // On récupère la transformation de la shape/face
         gp_Trsf myTransf;
@@ -1084,6 +1089,21 @@ void OCCDisplayRepresentationBuilder::computeFaces()
 #endif
     TopExp_Explorer ex;
     int i = 1;
+	// Proposition n° 1 : on évite de triangulariser  m_shape car cela pourrait avoir des effets de bord
+	// indésirables => pour la visu on travaille sur une copie.
+	TopoDS_Shape	shape	= BRepBuilderAPI_Copy (m_shape, Standard_False, Standard_False).Shape ( );
+    if(shape.ShapeType()==TopAbs_FACE){
+        fillRepresentation(TopoDS::Face(shape));
+    }
+    else{
+        for (ex.Init(shape, TopAbs_FACE); ex.More(); ex.Next(),i++) {
+            // on récupère la face et on la maille
+            fillRepresentation(TopoDS::Face(ex.Current()));
+
+        } // for (ex.Init(m_shape, TopAbs_FACE); ex.More(); ex.Next(),i++)
+    }
+
+/* Code initial
     if(m_shape.ShapeType()==TopAbs_FACE){
         fillRepresentation(TopoDS::Face(m_shape));
     }
@@ -1094,6 +1114,7 @@ void OCCDisplayRepresentationBuilder::computeFaces()
 
         } // for (ex.Init(m_shape, TopAbs_FACE); ex.More(); ex.Next(),i++)
     }
+*/
 }
 
 /*----------------------------------------------------------------------------*/
