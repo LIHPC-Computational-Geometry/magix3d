@@ -27,7 +27,7 @@
  * </P>
  * <P>Ces classes sont à spécialiser au sein de chaque application.</P>
  *
- * @author		Charles PIGNEROL, CEA/DAM/DSSI
+ * @author		Charles PIGNEROL
  */
 class VTKECMPicker : public vtkAbstractPropPicker
 {

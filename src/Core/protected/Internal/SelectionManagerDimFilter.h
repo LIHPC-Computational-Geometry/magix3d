@@ -29,7 +29,7 @@ namespace Internal {
  * et/ou le type d'entités) via leur méthode <I>selectionPolicyModified</I>.
  * </P>
  *
- * @author		Charles PIGNEROL, CEA/DAM/DSSI
+ * @author		Charles PIGNEROL
  * @date		14/10/2013
  */
 class SelectionManagerDimFilter : public virtual Mgx3D::Internal::SelectionManager

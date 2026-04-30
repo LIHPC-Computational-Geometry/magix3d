@@ -9,7 +9,7 @@
 
 /** 
  * Structure décrivant les paramètres d'un axe. 
- * @author		Charles PIGNEROL, CEA/DAM/DSSI
+ * @author		Charles PIGNEROL
  */
 struct AxisAttributes
 {

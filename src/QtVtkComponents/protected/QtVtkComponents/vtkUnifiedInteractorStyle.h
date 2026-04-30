@@ -1,5 +1,5 @@
 /**
- * Interacteur unifié DSSI de base utilisé dans les projets LEM et LOVE.
+ * Interacteur unifié de base utilisé dans les projets LEM et LOVE.
  * Spécialisé par LEM dans <I>vtkCustomizableInteractorStyleTrackball</I>.
  * 
  * \see		vtkCustomizableInteractorStyleTrackball
@@ -25,7 +25,7 @@
  * </P>
  * <P>Les raccourcis clavier sont personnalisables de même que plusieurs services de cette classe.</P>
  *
- * @author		Charles PIGNEROL, Daniel AGUILERA	CEA/DAM/DSSI
+ * @author		Charles PIGNEROL, Daniel AGUILERA
  * @date		16/10/2012
  */
 class vtkUnifiedInteractorStyle : public vtkInteractorStyleTrackballCamera
