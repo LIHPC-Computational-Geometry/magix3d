@@ -1,5 +1,6 @@
 import pyMagix3D as Mgx3D
 import pytest
+import os
 
 # Met en évidence que les propriétés géométriques d'une entité géométrique sont perdues
 #  lors d'opérations de base comme la translation, l'hométhétie, la rotation.
@@ -86,10 +87,13 @@ def test_perturbation(capfd):
     # Création du maillage pour des faces
     mm.newFacesMesh ( ["Fa0011"] )
     # Sauvegarde du maillage (mli)
-    mm.writeMli("pb_perturbation.mli2")
+    mli_filename = "/dev/shm/pb_perturbation.mli2"
+    mm.writeMli(mli_filename)
 
     out, err = capfd.readouterr()
     assert len(err) == 0
+
+    os.remove(mli_filename)
 
 def test_circle_revol_180(capfd):
     ctx = Mgx3D.getStdContext()

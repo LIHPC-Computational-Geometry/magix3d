@@ -376,6 +376,13 @@ La création d’une surface à partir de courbes se fait en sélectionnant
 un ensemble fermé de courbes coplanaires. La difficulté réside dans le
 fait qu’il faut des courbes jointives (à une tolérance près).
 
+Créer une surface par extrusion |
+'''''''''''''''''''''''''''''''''''
+
+La création de surface peut également être faite en sélectionnant une 
+courbe et en procédant à son extrusion linéaire définie par un vecteur
+ou un segment.
+
 .. _copie-surface-distance:
 
 Créer une surface à une distance |image94|

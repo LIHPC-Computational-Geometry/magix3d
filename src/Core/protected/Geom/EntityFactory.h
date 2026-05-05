@@ -88,6 +88,10 @@ class EntityFactory
     friend class Volume;
     friend class CommandNewSurfaceByOffset;
     friend class GeomSplitImplementation;
+    friend class CommandNewVertexByBREPImport;
+    friend class CommandNewCurveByBREPImport;
+    friend class CommandNewSurfaceByBREPImport;
+    friend class CommandNewVolumeByBREPImport;
 
 public:
     /*------------------------------------------------------------------------*/

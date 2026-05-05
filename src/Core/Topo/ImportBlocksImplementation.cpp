@@ -6,6 +6,7 @@
 #include "Topo/ImportBlocksImplementation.h"
 #include "Topo/EdgeMeshingPropertyUniform.h"
 #include "Topo/EdgeMeshingPropertyGeometric.h"
+#include "Topo/EdgeMeshingPropertyBiexponential.h"
 #include "Topo/EdgeMeshingPropertyBigeometric.h"
 #include "Topo/EdgeMeshingPropertyBeta.h"
 #include "Topo/EdgeMeshingPropertyHyperbolic.h"
@@ -42,9 +43,9 @@ void ImportBlocksImplementation::internalExecute() {
     std::string suffix = m_filename;
     int suffix_start = m_filename.find_last_of('.');
     suffix.erase(0, suffix_start + 1);
-    if (suffix != "blk")
+    if (suffix != "mgxt")
         throw TkUtil::Exception(
-                TkUtil::UTF8String("Mauvaise extension de fichier (.blk)", TkUtil::Charset::UTF_8));
+                TkUtil::UTF8String("Mauvaise extension de fichier (.mgxt)", TkUtil::Charset::UTF_8));
 
     std::ifstream s(m_filename.c_str(), std::ios::in);
     if (!s) {
@@ -472,6 +473,12 @@ void ImportBlocksImplementation::readDiscr(std::ifstream &str,const int &nbEdges
                     double beta;
                     str >> nb >> beta;
                     emps[i] = new EdgeMeshingPropertyBeta(nb, beta);
+                }
+                else if (disc_type == 9)
+                {
+                    double sp1, sp2;
+                    str >> nb >> sp1 >> sp2;
+                    emps[i] = new EdgeMeshingPropertyBiexponential(nb, sp1, sp2);
                 }
                 else {
                     std::string mess = "BLK read error: type of discretization not supported";

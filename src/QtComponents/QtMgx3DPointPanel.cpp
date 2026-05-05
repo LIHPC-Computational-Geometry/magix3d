@@ -312,8 +312,20 @@ Math::Point QtMgx3DPointPanel::getPoint ( ) const
 	}	// if (false == ok)
 
 
-	Math::Point	point (x, y, z);
-
+	Math::Point	point;
+	coordinateType ct = getTypeCoordinate();
+	if (ct == cartesian){
+		point = Math::Point(x, y, z);
+	}
+	else if (ct == spherical){
+		point = Math::Point(Math::Spherical(x, y, z));
+	}
+	else if (ct == cylindrical){
+		point = Math::Point(Math::Cylindrical(x, y, z));
+	}
+	else
+		throw Exception ("Erreur interne, coordinateType de getPoint ne peut etre que cartesian, spherical ou cylindrical");
+		
 	CoordinateSystem::SysCoord* rep = getSysCoord();
 
 	if (rep) {
@@ -583,7 +595,7 @@ void QtMgx3DPointPanel::coordTypeChangedCallback (int index)
 } // QtTopologyProjectVerticesPanel::coordTypeChangedCallback
 
 
-QtMgx3DPointPanel::coordinateType QtMgx3DPointPanel::getTypeCoordinate()
+QtMgx3DPointPanel::coordinateType QtMgx3DPointPanel::getTypeCoordinate() const
 {
 	CHECK_NULL_PTR_ERROR(_coordTypeComboBox);
 	if (_coordTypeComboBox->currentIndex() == 0)

@@ -198,7 +198,7 @@ class QtMgx3DPointPanel : public QWidget
 	/**
 	 * Retourne le type de coordonnées utilisées
 	 */
-	virtual coordinateType getTypeCoordinate ();
+	virtual coordinateType getTypeCoordinate () const;
 
 	/** Nombre de caractères par défaut des champs numériques. Cette
 	 * valeur est initialement de 12. */

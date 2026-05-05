@@ -1,5 +1,5 @@
 /**
- * \file        QtPrismCreationAction.cpp
+ * \file        QtExtrusionAction.cpp
  * \author      Charles PIGNEROL
  * \date        14/11/2014
  *
@@ -17,7 +17,7 @@
 #include "Utils/ValidatedField.h"
 #include "Geom/GeomManager.h"
 #include "Geom/Surface.h"
-#include "QtComponents/QtPrismCreationAction.h"
+#include "QtComponents/QtExtrusionAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
 
@@ -48,18 +48,19 @@ namespace QtComponents
 
 
 // ===========================================================================
-//                        LA CLASSE QtPrismCreationPanel
+//                        LA CLASSE QtExtrusionPanel
 // ===========================================================================
 
-QtPrismCreationPanel::QtPrismCreationPanel (
+QtExtrusionPanel::QtExtrusionPanel (
 			QWidget* parent, const string& panelName, 
 			QtMgx3DMainWindow& mainWindow,
+			Internal::SelectionManager::DIM dimension,
 			QtMgx3DGroupNamePanel::POLICY creationPolicy,
 			QtMgx3DOperationAction* action)
 	: QtMgx3DOperationPanel (parent, mainWindow, action,
 			QtMgx3DApplication::HelpSystem::instance ( ).prismOperationURL,
 			QtMgx3DApplication::HelpSystem::instance ( ).prismOperationTag),
-	  _surfacesPanel (0), _vectorPanel (0),
+	  _entitiesPanel (0), _vectorPanel (0),
 	  _withTopologyCheckBox (0), _keepEntitiesCheckBox (0)
 {
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
@@ -73,16 +74,30 @@ QtPrismCreationPanel::QtPrismCreationPanel (
 	label->setFont (font);
 	layout->addWidget (label);
 
-	// Surfaces de base :
-	_surfacesPanel	= new QtMgx3DEntityPanel (
-						this, "", true, "Surfaces à extruder :", "",
-						&mainWindow, SelectionManager::D2,
-						FilterEntity::GeomSurface);
-	_surfacesPanel->setMultiSelectMode (true);
-	layout->addWidget (_surfacesPanel);
-	connect (_surfacesPanel, SIGNAL (entitiesAddedToSelection(QString)),
+	// Entitiés à extruder :
+	FilterEntity::objectType	filter	= FilterEntity::NoneEntity;
+	UTF8String					extrudedEntitiesLabel (Charset::UTF_8);
+	switch (dimension)
+	{
+		case SelectionManager::D1	:
+			filter	= FilterEntity::GeomCurve;
+			extrudedEntitiesLabel << "Courbes à extruder :";
+			break;
+		case SelectionManager::D2	:
+			filter	= FilterEntity::GeomSurface;
+			extrudedEntitiesLabel << "Surfaces à extruder :";
+			break;
+		default						:
+			extrudedEntitiesLabel << "Erreur interne !";
+	}	// switch (dimension)
+	_entitiesPanel	= new QtMgx3DEntityPanel (
+						this, "", true, extrudedEntitiesLabel, "",
+						&mainWindow, dimension, filter);
+	_entitiesPanel->setMultiSelectMode (true);
+	layout->addWidget (_entitiesPanel);
+	connect (_entitiesPanel, SIGNAL (entitiesAddedToSelection(QString)),
 	         this, SLOT (entitiesAddedToSelectionCallback (QString)));
-	connect (_surfacesPanel, SIGNAL (entitiesRemovedFromSelection(QString)),
+	connect (_entitiesPanel, SIGNAL (entitiesRemovedFromSelection(QString)),
 	         this, SLOT (entitiesRemovedFromSelectionCallback (QString)));
 	
 	// Définition du vecteur d'extrusion :
@@ -98,10 +113,12 @@ QtPrismCreationPanel::QtPrismCreationPanel (
 	layout->addWidget (_vectorPanel);
 
 	// Faut il propager la copie aux entités topologiques associées ?
-	_withTopologyCheckBox	=
-			new QCheckBox ("Extrusion de la topologie", this);
-	_withTopologyCheckBox->setChecked (true);
-	layout->addWidget (_withTopologyCheckBox);
+	if (SelectionManager::D2 == dimension)
+	{
+		_withTopologyCheckBox	= new QCheckBox ("Extrusion de la topologie", this);
+		_withTopologyCheckBox->setChecked (true);
+		layout->addWidget (_withTopologyCheckBox);
+	}	// if (SelectionManager::D2 == dimension)
 
     // Conserver les entités initiales ?
     _keepEntitiesCheckBox	=
@@ -110,71 +127,70 @@ QtPrismCreationPanel::QtPrismCreationPanel (
     layout->addWidget (_keepEntitiesCheckBox);
 
 	layout->addStretch (2);
-}	// QtPrismCreationPanel::QtPrismCreationPanel
+}	// QtExtrusionPanel::QtExtrusionPanel
 
 
-QtPrismCreationPanel::QtPrismCreationPanel (const QtPrismCreationPanel& cao)
+QtExtrusionPanel::QtExtrusionPanel (const QtExtrusionPanel& cao)
 	: QtMgx3DOperationPanel (
 			0, *new QtMgx3DMainWindow(0), 0, "", ""),
-	  _surfacesPanel (0), _vectorPanel(0), _withTopologyCheckBox (0), _keepEntitiesCheckBox (0)
+	  _entitiesPanel (0), _vectorPanel(0), _withTopologyCheckBox (0), _keepEntitiesCheckBox (0)
 {
-	MGX_FORBIDDEN ("QtPrismCreationPanel copy constructor is not allowed.");
-}	// QtPrismCreationPanel::QtPrismCreationPanel (const QtPrismCreationPanel&)
+	MGX_FORBIDDEN ("QtExtrusionPanel copy constructor is not allowed.");
+}	// QtExtrusionPanel::QtExtrusionPanel (const QtExtrusionPanel&)
 
 
-QtPrismCreationPanel&
-			QtPrismCreationPanel::operator = (const QtPrismCreationPanel&)
+QtExtrusionPanel& QtExtrusionPanel::operator = (const QtExtrusionPanel&)
 {
-	MGX_FORBIDDEN ("QtPrismCreationPanel assignment operator is not allowed.");
+	MGX_FORBIDDEN ("QtExtrusionPanel assignment operator is not allowed.");
 	return *this;
-}	// QtPrismCreationPanel::QtPrismCreationPanel (const QtPrismCreationPanel&)
+}	// QtExtrusionPanel::QtExtrusionPanel (const QtExtrusionPanel&)
 
 
-QtPrismCreationPanel::~QtPrismCreationPanel ( )
+QtExtrusionPanel::~QtExtrusionPanel ( )
 {
-}	// QtPrismCreationPanel::~QtPrismCreationPanel
+}	// QtExtrusionPanel::~QtExtrusionPanel
 
 
-vector<string> QtPrismCreationPanel::getSurfaceNames ( ) const
+vector<string> QtExtrusionPanel::getEntitiesNames ( ) const
 {
-	CHECK_NULL_PTR_ERROR (_surfacesPanel)
-	return _surfacesPanel->getUniqueNames ( );
-}	// QtPrismCreationPanel::getSurfaceNames
+	CHECK_NULL_PTR_ERROR (_entitiesPanel)
+	return _entitiesPanel->getUniqueNames ( );
+}	// QtExtrusionPanel::getEntitiesNames
 
 
-Vector QtPrismCreationPanel::getVector ( ) const
+Vector QtExtrusionPanel::getVector ( ) const
 {
 	 CHECK_NULL_PTR_ERROR (_vectorPanel)
 
-	return Vector (_vectorPanel->getDx ( ),
-	               _vectorPanel->getDy ( ),
-	               _vectorPanel->getDz ( ));
-}	// QtPrismCreationPanel::getVector
+	return Vector (_vectorPanel->getDx ( ), _vectorPanel->getDy ( ), _vectorPanel->getDz ( ));
+}	// QtExtrusionPanel::getVector
 
 
-bool QtPrismCreationPanel::withTopology ( ) const
+bool QtExtrusionPanel::withTopology ( ) const
 {
-	CHECK_NULL_PTR_ERROR (_withTopologyCheckBox)
+	if (0 == _withTopologyCheckBox)
+		return false;
+
 	return Qt::Checked == _withTopologyCheckBox->checkState ( ) ? true : false;
-}	// QtPrismCreationPanel::withTopology
+}	// QtExtrusionPanel::withTopology
 
 
-void QtPrismCreationPanel::reset ( )
+void QtExtrusionPanel::reset ( )
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
 
-	CHECK_NULL_PTR_ERROR (_surfacesPanel)
+	CHECK_NULL_PTR_ERROR (_entitiesPanel)
 	CHECK_NULL_PTR_ERROR (_vectorPanel)
-	_surfacesPanel->reset ( );
+	_entitiesPanel->reset ( );
 	_vectorPanel->reset ( );
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
 
 	QtMgx3DOperationPanel::reset ( );
-}	// QtPrismCreationPanel::reset
+}	// QtExtrusionPanel::reset
 
 
-void QtPrismCreationPanel::validate ( )
+void QtExtrusionPanel::validate ( )
 {
 // CP : suite discussion EBL/FL, il est convenu que la validation des
 // paramètres de l'opération est effectuée par le "noyau" et qu'un mauvais
@@ -193,168 +209,165 @@ void QtPrismCreationPanel::validate ( )
 	}
 	catch (...)
 	{
-		error << "QtPrismCreationPanel::validate : erreur non documentée.";
+		error << "QtExtrusionPanel::validate : erreur non documentée.";
 	}
 
 	if (0 != error.length ( ))
 		throw Exception (error);
-}	// QtPrismCreationPanel::validate
+}	// QtExtrusionPanel::validate
 
 
-void QtPrismCreationPanel::cancel ( )
+void QtExtrusionPanel::cancel ( )
 {
 	QtMgx3DOperationPanel::cancel ( );
 
-	CHECK_NULL_PTR_ERROR (_surfacesPanel)
-	_surfacesPanel->stopSelection ( );
+	CHECK_NULL_PTR_ERROR (_entitiesPanel)
+	_entitiesPanel->stopSelection ( );
 
 	if (true == cancelClearEntities ( ))
 	{
 		BEGIN_QT_TRY_CATCH_BLOCK
 
-		_surfacesPanel->setUniqueName ("");
+		_entitiesPanel->setUniqueName ("");
 
 		COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
 	}	// if (true == cancelClearEntities ( ))
-}	// QtPrismCreationPanel::cancel
+}	// QtExtrusionPanel::cancel
 
 
-void QtPrismCreationPanel::autoUpdate ( )
+void QtExtrusionPanel::autoUpdate ( )
 {
-	CHECK_NULL_PTR_ERROR (_surfacesPanel)
+	CHECK_NULL_PTR_ERROR (_entitiesPanel)
 	CHECK_NULL_PTR_ERROR (_vectorPanel)
 
 #ifdef AUTO_UPDATE_OLD_SCHEME
 	if (true == autoUpdateUsesSelection ( ))
 	{
 		BEGIN_QT_TRY_CATCH_BLOCK
-
+/* Actuellement inutilisé
 		vector<string>	selectedSurfaces	=
 			getSelectionManager ( ).getEntitiesNames(FilterEntity::GeomSurface);
 		if (1 == selectedSurfaces.size ( ))
-			_surfacesPanel->setUniqueName (selectedSurfaces [0]);
+			_entitiesPanel->setUniqueName (selectedSurfaces [0]);
 		vector<string>	selectedEdges	=
 			getSelectionManager ( ).getEntitiesNames (FilterEntity::AllEdges);
 		if (1 == selectedEdges.size ( ))
 			_vectorPanel->setSegment (selectedEdges [0]);
-
+*/
 		COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
 	}	// if (true == autoUpdateUsesSelection ( ))
 #else	// AUTO_UPDATE_OLD_SCHEME
-	_surfacesPanel->clearSelection ( );
+	_entitiesPanel->clearSelection ( );
 	_vectorPanel->setSegment ("");
 #endif	// AUTO_UPDATE_OLD_SCHEME
 
 	QtMgx3DOperationPanel::autoUpdate ( );
 
-	_surfacesPanel->actualizeGui (true);
+	_entitiesPanel->actualizeGui (true);
 	_vectorPanel->actualizeGui (true);
-}	// QtPrismCreationPanel::autoUpdate
+}	// QtExtrusionPanel::autoUpdate
 
 
-vector<Entity*> QtPrismCreationPanel::getInvolvedEntities ( )
+vector<Entity*> QtExtrusionPanel::getInvolvedEntities ( )
 {
 	vector<Entity*>	entities;
-	const vector<string>	names	= getSurfaceNames ( );
+	const vector<string>	names	= getEntitiesNames ( );
 
-	for (vector<string>::const_iterator it = names.begin ( );
-	     names.end ( ) != it; it++)
+	for (vector<string>::const_iterator it = names.begin ( ); names.end ( ) != it; it++)
 	{
-		GeomEntity*		surface	=
-			getContext ( ).getGeomManager ( ).getSurface (*it, false);
-		if (0 != surface)
-			entities.push_back (surface);
+		GeomEntity*		entity	=
+			getContext ( ).getGeomManager ( ).getEntity (*it, false);
+		if (0 != entity)
+			entities.push_back (entity);
 	}	// for (vector<string>::const_iterator it = names.begin ( ); ...
 
 	return entities;
-}	// QtPrismCreationPanel::getInvolvedEntities
+}	// QtExtrusionPanel::getInvolvedEntities
 
 
-void QtPrismCreationPanel::operationCompleted ( )
+void QtExtrusionPanel::operationCompleted ( )
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
 
-	CHECK_NULL_PTR_ERROR (_surfacesPanel)
-	_surfacesPanel->stopSelection ( );
+	CHECK_NULL_PTR_ERROR (_entitiesPanel)
+	_entitiesPanel->stopSelection ( );
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
 
 	QtMgx3DOperationPanel::operationCompleted ( );
-}	// QtPrismCreationPanel::operationCompleted
+}	// QtExtrusionPanel::operationCompleted
 
 
-bool QtPrismCreationPanel::keepEntities ( ) const
+bool QtExtrusionPanel::keepEntities ( ) const
 {
     CHECK_NULL_PTR_ERROR (_keepEntitiesCheckBox)
     return Qt::Checked == _keepEntitiesCheckBox->checkState ( ) ? true : false;
 }	// QtGeomEntityByRevolutionCreationPanel::keepEntities
 
 // ===========================================================================
-//                  LA CLASSE QtPrismCreationAction
+//                  LA CLASSE QtExtrusionAction
 // ===========================================================================
 
-QtPrismCreationAction::QtPrismCreationAction (
+QtExtrusionAction::QtExtrusionAction (
 	const QIcon& icon, const QString& text, QtMgx3DMainWindow& mainWindow,
+	Internal::SelectionManager::DIM dimension,
 	const QString& tooltip, QtMgx3DGroupNamePanel::POLICY creationPolicy)
 	: QtMgx3DGeomOperationAction (icon, text, mainWindow, tooltip)
 {
-	QtPrismCreationPanel*	operationPanel	=
-		new QtPrismCreationPanel (
+	QtExtrusionPanel*	operationPanel	=
+		new QtExtrusionPanel (
 			&getOperationPanelParent ( ), text.toStdString ( ), 
-			mainWindow, creationPolicy, this);
+			mainWindow, dimension, creationPolicy, this);
 	setOperationPanel (operationPanel);
-}	// QtPrismCreationAction::QtPrismCreationAction
+}	// QtExtrusionAction::QtExtrusionAction
 
 
-QtPrismCreationAction::QtPrismCreationAction (
-										const QtPrismCreationAction&)
+QtExtrusionAction::QtExtrusionAction (const QtExtrusionAction&)
 	: QtMgx3DGeomOperationAction (
 						QIcon (""), "", *new QtMgx3DMainWindow (0, ""), "")
 {
-	MGX_FORBIDDEN ("QtPrismCreationAction copy constructor is not allowed.")
-}	// QtPrismCreationAction::QtPrismCreationAction
+	MGX_FORBIDDEN ("QtExtrusionAction copy constructor is not allowed.")
+}	// QtExtrusionAction::QtExtrusionAction
 
 
-QtPrismCreationAction&
-					 QtPrismCreationAction::operator = (
-									const QtPrismCreationAction&)
+QtExtrusionAction& QtExtrusionAction::operator = (const QtExtrusionAction&)
 {
-	MGX_FORBIDDEN ("QtPrismCreationAction assignment operator is not allowed.")
+	MGX_FORBIDDEN ("QtExtrusionAction assignment operator is not allowed.")
 	return *this;
-}	// QtPrismCreationAction::operator =
+}	// QtExtrusionAction::operator =
 
 
-QtPrismCreationAction::~QtPrismCreationAction ( )
+QtExtrusionAction::~QtExtrusionAction ( )
 {
-}	// QtPrismCreationAction::~QtPrismCreationAction
+}	// QtExtrusionAction::~QtExtrusionAction
 
 
-QtPrismCreationPanel* QtPrismCreationAction::getPrismPanel ( )
+QtExtrusionPanel* QtExtrusionAction::getExtrusionPanel ( )
 {
-	return dynamic_cast<QtPrismCreationPanel*>(getOperationPanel ( ));
-}	// QtPrismCreationAction::getPrismPanel
+	return dynamic_cast<QtExtrusionPanel*>(getOperationPanel ( ));
+}	// QtExtrusionAction::getExtrusionPanel
 
 
-void QtPrismCreationAction::executeOperation ( )
+void QtExtrusionAction::executeOperation ( )
 {
 	// Validation paramétrage :
 	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DGeomOperationAction::executeOperation ( );
 
-	// Récupération des paramètres de création des prismes :
-	QtPrismCreationPanel*	panel	= getPrismPanel ( );
+	// Récupération des paramètres de l'extrusion :
+	QtExtrusionPanel*	panel	= getExtrusionPanel ( );
 	CHECK_NULL_PTR_ERROR (panel)
-	std::vector<std::string>	surfaces	= panel->getSurfaceNames ( );
-	const Vector	v		= panel->getVector ( );
-	const bool		withTopo	= panel->withTopology ( );
-    const bool		keepEntities	= panel->keepEntities ( );
+	std::vector<std::string>	entities	= panel->getEntitiesNames ( );
+	const Vector				v			= panel->getVector ( );
+	const bool					withTopo	= panel->withTopology ( );
+    const bool					keepEntities= panel->keepEntities ( );
 	if (withTopo)
-		cmdResult	= getContext ( ).getGeomManager ( ).makeBlocksByExtrude(surfaces, v, keepEntities);
+		cmdResult	= getContext ( ).getGeomManager ( ).makeBlocksByExtrude(entities, v, keepEntities);
 	else
-		cmdResult	= getContext ( ).getGeomManager ( ).makeExtrude (surfaces, v, keepEntities);
+		cmdResult	= getContext ( ).getGeomManager ( ).makeExtrude (entities, v, keepEntities);
 
 	setCommandResult (cmdResult);
-}	// QtPrismCreationAction::executeOperation
+}	// QtExtrusionAction::executeOperation
 
 
 // ============================================================================

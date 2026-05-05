@@ -46,7 +46,7 @@ def test_section_box1(capfd):
     # Création du maillage pour tous les blocs
     mm.newAllBlocksMesh()
     # Sauvegarde du maillage (mli)
-    filename = "section.mli2"
+    filename = "/dev/shm/section.mli2"
     mm.writeMli(filename)
 
     assert os.path.exists(filename)
@@ -59,6 +59,8 @@ def test_section_box1(capfd):
 
     out, err = capfd.readouterr()
     assert len(err) == 0
+
+    os.remove(filename)
 
 
 def test_section_box2(capfd):

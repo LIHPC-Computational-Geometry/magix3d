@@ -1214,7 +1214,7 @@ fuseInternalCoEdgesAndVertices(Geom::GeomEntity* ge, std::vector<Geom::GeomEntit
     // si la fusion se fait avec une autre surface sans topo, alors on ne fait rien
     // (on ne supprime pas les associations)
     if (newEntities.size() == 1){
-    	if (tm.getRefTopos(newEntities[0]).empty());
+    	if (tm.getRefTopos(newEntities[0]).empty())
     		return;
     }
 

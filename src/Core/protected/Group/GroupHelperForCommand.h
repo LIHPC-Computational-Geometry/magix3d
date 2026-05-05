@@ -79,8 +79,7 @@ private:
         group->remove(e);
         e->remove(group);
 
-        // il faut peut-être ajouter le groupe par défaut
-        if (e->getNbGroups() == 0) {
+        if (e->getNbGroups() == 0 && e->getGeomAssociation() == 0) {
             addToGroup("", e);
         }
 

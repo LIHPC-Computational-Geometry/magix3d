@@ -1,16 +1,17 @@
 /**
- * \file		QtPrismCreationAction.h
+ * \file		QtExtrusionAction.h
  * \author		Charles PIGNEROL
  * \date		14/11/2014
  *
- *
+ * Anciennement QtPrismCreationAction.h, renommé le 11/03/26 en QtExtrusionAction.h suite à 
+ * une généralisation du panneau.
  *
  * Modified on: 21/02/2022
  *      Author: Simon C
  *      ajout de la possibilité de conserver les entités géométriques
  */
-#ifndef QT_PRISM_CREATION_ACTION_H
-#define QT_PRISM_CREATION_ACTION_H
+#ifndef QT_EXTRUSION_ACTION_H
+#define QT_EXTRUSION_ACTION_H
 
 
 #include "QtComponents/QtMgx3DGeomOperationAction.h"
@@ -27,9 +28,11 @@ namespace QtComponents
 
 
 /**
- * Panneau de création d'un volume de type prisme à partir d'une surface.
+ * Panneau de création d'entités géométriques par extrusion linéaire.
+ * Dans la version actuelle, extrusion d'une surface à partir d'un segment
+ * ou d'un prisme à partir d'une surface.
  */
-class QtPrismCreationPanel : public QtMgx3DOperationPanel
+class QtExtrusionPanel : public QtMgx3DOperationPanel
 {
 	public :
 
@@ -39,23 +42,25 @@ class QtPrismCreationPanel : public QtMgx3DOperationPanel
 	 * \param	Nom du panneau.
 	 * \param	Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée
 	 *			notamment pour récupérer le contexte.
+	 * \param	Dimension des données extrudées
 	 * \param	Eventuelle action associée à ce panneau.
 	 */
-	QtPrismCreationPanel (
+	QtExtrusionPanel (
 			QWidget* parent, const std::string& panelName,
 			Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
+			Mgx3D::Internal::SelectionManager::DIM dimension,
 			QtMgx3DGroupNamePanel::POLICY creationPolicy,
 			Mgx3D::QtComponents::QtMgx3DOperationAction* action);
 
 	/**
 	 * RAS.
 	 */
-	virtual ~QtPrismCreationPanel ( );
+	virtual ~QtExtrusionPanel ( );
 
 	/**
-	 * \return		Les noms des surfaces à extruder.
+	 * \return		Les noms des entités à extruder.
 	 */
-	virtual std::vector<std::string> getSurfaceNames ( ) const;
+	virtual std::vector<std::string> getEntitiesNames ( ) const;
 
 	/**
 	 * \return		Le vecteur définissant l'extrusion efectuée.
@@ -121,15 +126,13 @@ class QtPrismCreationPanel : public QtMgx3DOperationPanel
 	/**
 	 * Constructeur de copie et opérateur = opérations interdites.
 	 */
-	QtPrismCreationPanel (
-									const QtPrismCreationPanel&);
-	QtPrismCreationPanel& operator = (
-									const QtPrismCreationPanel&);
+	QtExtrusionPanel (const QtExtrusionPanel&);
+	QtExtrusionPanel& operator = (const QtExtrusionPanel&);
 
-	/** Les surfaces à partir desquelles sont créées les volumes (et les blocs si demandé). */
-	QtMgx3DEntityPanel*				_surfacesPanel;
+	/** Les entités à extruder. */
+	QtMgx3DEntityPanel*				_entitiesPanel;
 
-	/** Le vecteur appliqué à la surface pour extruder le prisme. */
+	/** Le vecteur appliqué à l'entité à extruder. */
 	QtMgx3DVectorPanel*				_vectorPanel;
 
 	/** Case à cocher <I>avec la topologie</I>. */
@@ -138,43 +141,45 @@ class QtPrismCreationPanel : public QtMgx3DOperationPanel
     /** Conserver les entités initiales ? */
     QCheckBox*						_keepEntitiesCheckBox;
 
-};	// class QtPrismCreationPanel
+};	// class QtExtrusionPanel
 
 
 /**
  * Classe d'action type <I>check box</I> associée à un panneau type
- * <I>QtPrismCreationPanel</I> de création d'un bloc par rotation
+ * <I>QtExtrusionPanel</I> de création d'un bloc par rotation
  * d'arêtes.
  */
-class QtPrismCreationAction : public QtMgx3DGeomOperationAction
+class QtExtrusionAction : public QtMgx3DGeomOperationAction
 {
 	public :
 
 	/**
 	 * Créé et s'associe une instance de la classe
-	 * <I>QtPrismCreationPanel</I>.
-	 * \param		Icône représentant l'action.
-	 * \param		Texte représentant l'action.
-	 * \param		Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée
-	 *				notamment pour récupérer le contexte et le panneau contenant
-	 *				les icônes.
-	 * \param		Tooltip décrivant l'action.
-	 * \param		Politique de création/modification du groupe
+	 * <I>QtExtrusionPanel</I>.
+	 * \param	Icône représentant l'action.
+	 * \param	Texte représentant l'action.
+	 * \param	Fenêtre principale <I>Magix 3D</I> de rattachement, utilisée
+	 *			notamment pour récupérer le contexte et le panneau contenant
+	 *			les icônes.
+	 * \param	Dimension des données extrudées
+	 * \param	Tooltip décrivant l'action.
+	 * \param	Politique de création/modification du groupe
 	 */
-	QtPrismCreationAction (
+	QtExtrusionAction (
 		const QIcon& icon, const QString& text,
 		Mgx3D::QtComponents::QtMgx3DMainWindow& mainWindow,
+		Mgx3D::Internal::SelectionManager::DIM dimension,
 		const QString& tooltip, QtMgx3DGroupNamePanel::POLICY creationPolicy);
 
 	/**
 	 * Destructeur. RAS.
 	 */
-	virtual ~QtPrismCreationAction ( );
+	virtual ~QtExtrusionAction ( );
 
 	/**
 	 * \return		Le panneau d'édition du bloc associé.
 	 */
-	virtual QtPrismCreationPanel* getPrismPanel ( );
+	virtual QtExtrusionPanel* getExtrusionPanel ( );
 
 	/**
 	 * Créé/modifie le bloc avec le paramétrage de son panneau associé.
@@ -189,11 +194,11 @@ class QtPrismCreationAction : public QtMgx3DGeomOperationAction
 	/**
 	 * Constructeur de copie et opérateur = : interdits.
 	 */
-	QtPrismCreationAction (
-								const QtPrismCreationAction&);
-	QtPrismCreationAction& operator = (
-								const QtPrismCreationAction&);
-};  // class QtPrismCreationAction
+	QtExtrusionAction (
+								const QtExtrusionAction&);
+	QtExtrusionAction& operator = (
+								const QtExtrusionAction&);
+};  // class QtExtrusionAction
 
 
 
@@ -201,4 +206,4 @@ class QtPrismCreationAction : public QtMgx3DGeomOperationAction
 
 }	// namespace Mgx3D
 
-#endif	// QT_PRISM_CREATION_ACTION_H
+#endif	// QT_EXTRUSION_ACTION_H

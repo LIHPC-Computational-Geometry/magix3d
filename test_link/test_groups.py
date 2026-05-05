@@ -2,6 +2,23 @@
 import pyMagix3D as Mgx3D
 import pytest
 
+def test_undo_hg():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+
+    ctx.getGeomManager().newBox (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), "GGG")
+    with pytest.raises(RuntimeError) as excinfo:
+        ctx.getGroupManager().getInfos("Hors_Groupe_3D", 3)
+    ctx.getGroupManager().clearGroup(3, "GGG")
+    ctx.undo()
+    ctx.getGroupManager().getInfos("Hors_Groupe_3D", 3)
+
+def test_set_topo_group():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
+    ctx.getTopoManager().setGroup(["Bl0000"], 3, "AAA")
+
 def test_group_box():
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
@@ -13,9 +30,13 @@ def test_group_box():
     coque = "Coque"
     ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10, acier)
     assert_all(ctx, "Bl0000", [acier])
-    
+
+    # Création d'une box avec topo sans groupe
     ctx.getTopoManager().newBoxWithTopo (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), 10, 10, 10)
     assert_all(ctx, "Bl0001", [hors_group])
+
+    # On ajoute le volume geom dans le groupe plastique 
+    # => le bloc topo est aussi dans le groupe plastique
     ctx.getGeomManager().addToGroup(["Vol0001"], 3, plastique)
     assert_all(ctx, "Bl0001", [plastique])
     ctx.undo()
@@ -23,27 +44,31 @@ def test_group_box():
     ctx.redo()
     assert_all(ctx, "Bl0001", [plastique])
 
+    # On affecte le volume geom dans le groupe coque 
+    # => le bloc topo est aussi et seulement dans le groupe coque
     ctx.getGeomManager().setGroup(["Vol0001"], 3, coque)
     assert_all(ctx, "Bl0001", [coque])
     ctx.undo()
     assert_all(ctx, "Bl0001", [plastique])
     ctx.redo()
     assert_all(ctx, "Bl0001", [coque])
-    
+
+    # On retire le volume geom du groupe coque 
+    # => le bloc topo est dans le groupe Hors_Groupe_3D
     ctx.getGeomManager().removeFromGroup(["Vol0001"], 3, coque)
     assert_all(ctx, "Bl0001", [hors_group])
     ctx.undo()
     assert_all(ctx, "Bl0001", [coque])
-    
+
+    # On détruit le groupe coque
+    # => le bloc topo est dans le groupe Hors_Groupe_3D
     ctx.getGroupManager().clearGroup(3, coque)
     assert_all(ctx, "Bl0001", [hors_group])
     ctx.undo()
-    #TODO Créer une issue
-    #assert_all(ctx, "Bl0001", [coque])
+    assert_all(ctx, "Bl0001", [coque])
 
     ctx.getGeomManager().addToGroup(["Vol0001"], 3, plastique) 
-    #TODO Cf issue précédente
-    #assert_all(ctx, "Bl0001", [plastique, coque])
+    assert_all(ctx, "Bl0001", [plastique, coque])
 
 
 def assert_all(ctx, block, group_names):
@@ -247,43 +272,54 @@ def test_two_adds(capfd):
 def test_geom_assoc1():
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
+    gm = ctx.getGeomManager()
     tm = ctx.getTopoManager()
 
     # Création de la boite Vol0000
-    ctx.getGeomManager().newBox (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1))
-    # Création d'un sommet géométrique par coordonnées
-    tm.newTopoVertex (Mgx3D.Point(0, 0, 0),"")
+    gm.newBox (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1))
+    assert gm.getInfos("Pt0001", 0).groups() == ['Hors_Groupe_0D']
 
+    # Création d'un sommet géométrique par coordonnées
+    tm.newTopoVertex (Mgx3D.Point(0, 0, 0), "")
     assert tm.getInfos("Som0000", 0).groups() == ['Hors_Groupe_0D']
 
     # Affectation d'une projection vers Pt0001 pour les entités topologiques Som0000
-    # L'association ne peut se faire car le groupe Hors_Groupe_0D possède Pt0001 ainsi que Som0000
-    # Il est recommandé de supprimer la topologie du groupe
+    # Som0000 va être sorti du groupe Hors_Groupe_0D car Pt0001 appartient à Hors_Groupe_0D
+    # Som0000 va donc hériter de ce groupe par associativité
     tm.setGeomAssociation (["Som0000"], "Pt0001", True)
+    assert gm.getInfos("Pt0001", 0).groups() == ['Hors_Groupe_0D']
+    assert tm.getInfos("Som0000", 0).groups() == []
 
+    ctx.undo()
+    assert gm.getInfos("Pt0001", 0).groups() == ['Hors_Groupe_0D']
     assert tm.getInfos("Som0000", 0).groups() == ['Hors_Groupe_0D']
 
 def test_geom_assoc2():
     ctx = Mgx3D.getStdContext()
     ctx.clearSession() # Clean the session after the previous test
+    gm = ctx.getGeomManager()
     tm = ctx.getTopoManager()
 
     # Création de la boite Vol0000
     ctx.getGeomManager().newBox (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1))
     # Modifie le groupe A
     ctx.getGeomManager().addToGroup (["Pt0001"], 0, "A")
+    assert gm.getInfos("Pt0001", 0).groups() == ['A']
 
     # Création d'un sommet géométrique par coordonnées
     tm.newTopoVertex (Mgx3D.Point(0, 0, 0),"A")
-
     assert tm.getInfos("Som0000", 0).groups() == ['A']
 
     # Affectation d'une projection vers Pt0001 pour les entités topologiques Som0000
-    # L'association ne peut se faire car le groupe Hors_Groupe_0D possède Pt0001 ainsi que Som0000
-    # Il est recommandé de supprimer la topologie du groupe
+    # Som0000 va être sorti du groupe A car Pt0001 appartient à A
+    # Som0000 va donc hériter de ce groupe par associativité
     tm.setGeomAssociation (["Som0000"], "Pt0001", True)
+    assert tm.getInfos("Som0000", 0).groups() == []
+    assert gm.getInfos("Pt0001", 0).groups() == ['A']
 
+    ctx.undo()
     assert tm.getInfos("Som0000", 0).groups() == ['A']
+    assert gm.getInfos("Pt0001", 0).groups() == ['A']
 
 # issue#245: undo on addToGroup raises an error
 def test_topo_surface():
@@ -309,3 +345,74 @@ def test_topo_surface():
     assert ctx.getGroupManager().getTopoFaces("aaa", 2) == ["Fa0000"]
     ctx.undo()
     assert ctx.getGroupManager().getTopoFaces("aaa", 2) == []
+
+# issue#265: crash after two identical setGroup commands
+def test_issue265():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    gm = ctx.getGeomManager()
+
+    gm.newBox (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1))
+    gm.setGroup(["Vol0000"], 3, "bbb")
+    assert gm.getInfos("Vol0000", 3).groups() == ["bbb"]
+    gm.setGroup(["Vol0000"], 3, "aaa")
+    assert gm.getInfos("Vol0000", 3).groups() == ["aaa"]
+    gm.setGroup(["Vol0000"], 3, "aaa")
+    assert gm.getInfos("Vol0000", 3).groups() == ["aaa"]
+    gm.newBox (Mgx3D.Point(1, 0, 0), Mgx3D.Point(2, 1, 1))
+    gm.setGroup(["Vol0001"], 3, "aaa")
+    assert gm.getInfos("Vol0000", 3).groups() == ["aaa"]
+    assert gm.getInfos("Vol0001", 3).groups() == ["aaa"]
+
+# mesh becomes invisible during geom association
+def test_issue261_1():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    gm = ctx.getGeomManager()
+    tm = ctx.getTopoManager()
+
+    gn = "test"
+    # Création de la boite Vol0000
+    gm.newBox (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1), gn)
+    assert gm.getInfos("Vol0000", 3).groups() == [gn]
+
+    # Création d'un bloc unitaire mis dans le groupe test
+    tm.newFreeTopoInGroup (gn, 3)
+    assert tm.getInfos("Bl0000", 3).groups() == [gn]
+
+    # Affectation d'une projection vers Vol0000 pour les entités topologiques Bl0000
+    tm.setGeomAssociation (["Bl0000"], "Vol0000", False)
+    # lors de l'association, Bl0000 doit être retiré de gn car il en "hérite" par la géométrie
+    assert tm.getInfos("Bl0000", 3).groups() == []
+    assert gm.getInfos("Vol0000", 3).groups() == [gn]
+
+    # test du undo
+    ctx.undo()
+    assert tm.getInfos("Bl0000", 3).groups() == [gn]
+    assert gm.getInfos("Vol0000", 3).groups() == [gn]
+
+def test_issue261_2():
+    ctx = Mgx3D.getStdContext()
+    ctx.clearSession() # Clean the session after the previous test
+    gm = ctx.getGeomManager()
+    tm = ctx.getTopoManager()
+
+    gn = "Hors_Groupe_3D"
+    # Création de la boite Vol0000
+    gm.newBox (Mgx3D.Point(0, 0, 0), Mgx3D.Point(1, 1, 1))
+    assert gm.getInfos("Vol0000", 3).groups() == [gn]
+
+    # Création d'un bloc unitaire mis dans le groupe test
+    tm.newFreeTopoInGroup (gn, 3)
+    assert tm.getInfos("Bl0000", 3).groups() == [gn]
+
+    # Affectation d'une projection vers Vol0000 pour les entités topologiques Bl0000
+    tm.setGeomAssociation (["Bl0000"], "Vol0000", False)
+    # lors de l'association, Bl0000 doit être retiré de gn car il en "hérite" par la géométrie
+    assert tm.getInfos("Bl0000", 3).groups() == []
+    assert gm.getInfos("Vol0000", 3).groups() == [gn]
+
+    # test du undo
+    ctx.undo()
+    assert tm.getInfos("Bl0000", 3).groups() == [gn]
+    assert gm.getInfos("Vol0000", 3).groups() == [gn]
