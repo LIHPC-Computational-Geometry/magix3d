@@ -286,6 +286,7 @@ namespace Mgx3D {
                 std::vector<Topo::Vertex*> vertices;
                 vertices.resize(4);
 
+
                 vertices[0] = face->getVertices()[0];
                 vertices[1] = face->getVertices()[1];
                 vertices[2] = face->getVertices()[2];
@@ -298,7 +299,7 @@ namespace Mgx3D {
                 ids.push_back(topo_faces[iFace]->getVertices()[3]->getNode());
 
 
-                gmds::Face f = mesh.newQuad(ids[0],ids[1],ids[2],ids[3]);
+                gmds::Face f = mesh.newQuad(ids[1],ids[2],ids[3],ids[0]);
 
                 if(topo_faces[iFace]->getEdges().size()!= 4 ){
                     throw TkUtil::Exception(TkUtil::UTF8String ("La face "+topo_faces[iFace]->getName()+" n'est pas conforme.", TkUtil::Charset::UTF_8));
@@ -309,10 +310,10 @@ namespace Mgx3D {
                 int iedge2 = topoE_2_gmdsE[face->getEdge(vertices[2],vertices[3])->getCoEdges()[0]->getName()];
                 int iedge3 = topoE_2_gmdsE[face->getEdge(vertices[3],vertices[0])->getCoEdges()[0]->getName()];
 
-                f.add<gmds::Edge>(iedge0);
                 f.add<gmds::Edge>(iedge1);
                 f.add<gmds::Edge>(iedge2);
                 f.add<gmds::Edge>(iedge3);
+                f.add<gmds::Edge>(iedge0);
 
                 gmds::Edge e0 = mesh.get<gmds::Edge>(iedge0);
                 e0.add<gmds::Face>(iFace);
@@ -336,7 +337,7 @@ namespace Mgx3D {
 
 
                 uint b_discrI,b_discrJ;
-                topo_faces[iFace]->getNbMeshingEdges(b_discrJ,b_discrI);
+                topo_faces[iFace]->getNbMeshingEdges(b_discrI,b_discrJ);
                 discrI->set(iFace, b_discrI+1);
                 discrJ->set(iFace, b_discrJ+1);
 
