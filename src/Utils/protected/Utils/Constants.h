@@ -80,7 +80,7 @@ public:
                 angle = M_PI;
                 break;
             case Portion::TIERS:
-                angle = M_PI/3;
+                angle = 2*M_PI/3;
                 break;
             case Portion::QUART:
                 angle = M_PI/2;
@@ -130,6 +130,40 @@ public:
                 break;
         }
         return angle;
+    }
+
+    static Type getTypeFromAngle(double angle) {
+        Type type;
+        switch((int)angle){
+            case 360:
+                type = ENTIER;
+                break;
+            case 72:
+                type = CINQUIEME;
+                break;
+            case 60:
+                type = SIXIEME;
+                break;
+            case 180:
+                type = DEMI;
+                break;
+            case 120:
+                type = TIERS;
+                break;
+            case 90:
+                type = QUART;
+                break;
+            case 270:
+                type = TROIS_QUARTS;
+                break;
+            case 45:
+                type = HUITIEME;
+                break;
+            default:
+                type = ANGLE_DEF;
+                break;
+        }
+        return type;
     }
 };/*----------------------------------------------------------------------------*/
 } // end namespace Utils

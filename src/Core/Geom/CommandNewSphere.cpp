@@ -18,22 +18,8 @@ CommandNewSphere::CommandNewSphere(Internal::Context& c,
         const double& angle,
         const std::string& groupName)
 :CommandCreateGeom(c, "Création d'une sphère", groupName), m_center(pcentre), m_dr(dr),
-m_angle(angle),m_type(Utils::Portion::ANGLE_DEF)
+m_angle(angle),m_type(Utils::Portion::getTypeFromAngle(angle))
 {
-	validate();
-}
-/*----------------------------------------------------------------------------*/
-CommandNewSphere::CommandNewSphere(Internal::Context& c,
-        const Utils::Math::Point& pcentre,
-        const double& dr,
-        const Utils::Portion::Type& dp,
-        const std::string& groupName)
-:CommandCreateGeom(c, "Création d'une sphère", groupName), m_center(pcentre), m_dr(dr),
- m_angle(0), m_type(dp)
-{
-	if (dp == 0){
-		MGX_FORBIDDEN("Sphère pleine avec portion indéfinie")
-	}
 	validate();
 }
 /*----------------------------------------------------------------------------*/
@@ -53,7 +39,7 @@ internalExecute()
             <<" Type "<<Utils::Portion::getName(m_type)
 	        <<", angle "<<Utils::Math::MgxNumeric::userRepresentation (m_angle);
     Volume* vol = EntityFactory(getContext()).newSphere(
-                   new PropertySphere(m_center, m_dr,m_type,m_angle));
+                   new PropertySphere(m_center, m_dr, m_type,m_angle));
 
     m_createdEntities.push_back(vol);
 

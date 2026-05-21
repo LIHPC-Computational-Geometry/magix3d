@@ -990,40 +990,28 @@ Volume* EntityFactory::newSphere(PropertySphere* prop)
 
     TopoDS_Solid s;
     switch(type){
-    case (Utils::Portion::ENTIER):{
-        BRepPrimAPI_MakeSphere mkSphere(center,radius);
-        s = mkSphere.Solid();
+        case (Utils::Portion::ENTIER):{
+            BRepPrimAPI_MakeSphere mkSphere(center,radius);
+            s = mkSphere.Solid();
+        }
+        break;
+        case (Utils::Portion::HUITIEME):{
+            BRepPrimAPI_MakeSphere mkSphere(center,radius,0,M_PI/2,M_PI/2);
+            s = mkSphere.Solid();
+        }
+        break;
+        case (Utils::Portion::ANGLE_DEF):{
+            // l'angle est supposé en degré et non pas en radians
+            BRepPrimAPI_MakeSphere mkSphere(center,radius,(angle*M_PI)/180.0);
+            s = mkSphere.Solid();
+        }
+        break;
+        default:{
+            BRepPrimAPI_MakeSphere mkSphere(center,radius,Utils::Portion::getAngleInRadian(type));
+            s = mkSphere.Solid();
+        }
+        break;
     }
-    break;
-    case (Utils::Portion::TROIS_QUARTS):{
-        BRepPrimAPI_MakeSphere mkSphere(center,radius,3*M_PI/4);
-        s = mkSphere.Solid();
-    }
-    break;
-    case (Utils::Portion::DEMI):{
-        BRepPrimAPI_MakeSphere mkSphere(center,radius,M_PI);
-        s = mkSphere.Solid();
-    }
-    break;
-    case (Utils::Portion::QUART):{
-        BRepPrimAPI_MakeSphere mkSphere(center,radius,M_PI/2);
-        s = mkSphere.Solid();
-    }
-    break;
-    case (Utils::Portion::HUITIEME):{
-        BRepPrimAPI_MakeSphere mkSphere(center,radius,0,M_PI/2,M_PI/2);
-        s = mkSphere.Solid();
-    }
-    break;
-    case (Utils::Portion::ANGLE_DEF):{
-        // l'angle est supposé en degré et non pas en radians
-        BRepPrimAPI_MakeSphere mkSphere(center,radius,(angle*M_PI)/180.0);
-        s = mkSphere.Solid();
-    }
-    break;
-    }
-
-
     try{
         Volume* volume  = new Volume(m_context,
                 m_context.newProperty(Utils::Entity::GeomVolume),

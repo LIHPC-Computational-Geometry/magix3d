@@ -546,20 +546,6 @@ public:
     Mgx3D::Internal::M3DCommandResult*
 		newSphere(const Point& pcentre,  const double& radius,
                   const double& angle, std::string groupName="");
-
-    /*------------------------------------------------------------------------*/
-    /** \brief  Création d'une sphère.
-     *
-     *  \param  pcentre Le centre de la sphère
-     *  \param  radius  Le rayon de la sphère
-     *  \param  dt      portion de sphere à créer
-     *  \param groupName optionnellement un nom de groupe
-     */
-    /*------------------------------------------------------------------------*/
-    Mgx3D::Internal::M3DCommandResult*
-		newSphere(const Point& pcentre,  const double& radius,
-                  const  Utils::Portion::Type& dt, std::string groupName="");
-
     /*------------------------------------------------------------------------*/
     /** \brief  Création d'une aiguille du type partie de sphère.
      *

@@ -566,7 +566,7 @@ void QtSphereOperationPanel::preview (bool show, bool destroyInteractor)
 		else
 		{	// Portion prédéfinie
 			if (false == hollowed)
-				command = new CommandNewSphere(*context, center, externalRadius, portion, "");
+				command = new CommandNewSphere(*context, center, externalRadius, angle, "");
 			else
 				command = new CommandNewHollowSphere(*context, center, internalRadius, externalRadius, portion, "");
 		}	// else if ((Portion::Type)0 == portion)
