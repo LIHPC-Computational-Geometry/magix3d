@@ -26,9 +26,10 @@ def generer_script(ctx, export_folder):
 
     script += "# Création des points\n"
     script += "points_mapping = dict()\n"
+
     for vertex in gm.getVertices():
         script += f'# Création du sommet {vertex}\n'
-        groups = gm.getInfos(vertex, 0).groups()
+        groups = gm.getInfos(vertex, 0).groupsName()
         if 'Hors_Groupe_0D' in groups:
             groups.remove('Hors_Groupe_0D')
         point_file_name = f"{brep_folder}/{vertex + '.brep'}"
@@ -45,7 +46,7 @@ def generer_script(ctx, export_folder):
     script += "curves_mapping = dict()\n"
     for curve in gm.getCurves():
         script += f'# Création de la courbe {curve}\n'
-        groups = gm.getInfos(curve, 1).groups()
+        groups = gm.getInfos(curve, 1).groupsName()
         if 'Hors_Groupe_1D' in groups:
             groups.remove('Hors_Groupe_1D')
         curve_file_name = f"{brep_folder}/{curve + '.brep'}"
@@ -64,7 +65,7 @@ def generer_script(ctx, export_folder):
     script += "surfaces_mapping = dict()\n"
     for surface in gm.getSurfaces():
         script += f'# Création de la surface {surface}\n'
-        groups = gm.getInfos(surface, 2).groups()
+        groups = gm.getInfos(surface, 2).groupsName()
         if 'Hors_Groupe_2D' in groups:
             groups.remove('Hors_Groupe_2D')
         surface_file_name = f"{brep_folder}/{surface + '.brep'}"
@@ -81,7 +82,7 @@ def generer_script(ctx, export_folder):
     script += "volumes_mapping = dict()\n"
     for volume in gm.getVolumes():
         script += f'# Création du volume {volume}\n'
-        groups = gm.getInfos(volume, 3).groups()
+        groups = gm.getInfos(volume, 3).groupsName()
         if 'Hors_Groupe_3D' in groups:
             groups.remove('Hors_Groupe_3D')
         volume_file_name = f"{brep_folder}/{volume + '.brep'}"
@@ -108,13 +109,13 @@ def generer_script(ctx, export_folder):
         coord = tm.getCoord(vertex)
         script += f'cmd = tm.newTopoVertex(Mgx3D.Point({coord.getX()}, {coord.getY()}, {coord.getZ()}), "")\n'
         script += 'v = cmd.getTopoVertices()[0]\n'
-        groups = tm.getInfos(vertex, 0).groups()
+        groups = tm.getInfos(vertex, 0).groupsName()
         if 'Hors_Groupe_0D' in groups:
             groups.remove('Hors_Groupe_0D')
         if groups != []:
             for group in groups:
                 script += f"tm.addToGroup ([v], 0, \"{group}\")\n"
-        geom_entity = tm.getInfos(vertex, 0).geom_entity
+        geom_entity = tm.getInfos(vertex, 0).geomEntity()
         if geom_entity:
             script += f"# Le sommet {vertex} est associé à l'entité géométrique {geom_entity}\n"
             script += f"tm.setGeomAssociation([v], find_in_dicts('{geom_entity}'), False)\n"
@@ -131,13 +132,13 @@ def generer_script(ctx, export_folder):
         end_vertex = tm.getInfos(coedge, 1).vertices()[1]
         script += f'cmd = tm.newTopoEntity([vertices_mapping["{start_vertex}"], vertices_mapping["{end_vertex}"]], 1, "", True)\n'
         script += 'e = cmd.getEdges()[0]\n'
-        groups = tm.getInfos(coedge, 1).groups()
+        groups = tm.getInfos(coedge, 1).groupsName()
         if 'Hors_Groupe_1D' in groups:
             groups.remove('Hors_Groupe_1D')
         if groups != []:
             for group in groups:
                 script += f"tm.addToGroup ([e], 1, \"{group}\")\n"
-        geom_entity = tm.getInfos(coedge, 1).geom_entity
+        geom_entity = tm.getInfos(coedge, 1).geomEntity()
         if geom_entity:
             script += "try:\n"
             script += f"    # L'arête {coedge} est associée à l'entité géométrique {geom_entity}\n"
@@ -193,13 +194,13 @@ def generer_script(ctx, export_folder):
         is_structured = "False" if coface in tm.getUnstructuredFaces() else "True"
         script += f'cmd = tm.newCoFace(coface_edges, [{", ".join(coface_vertices)}],{is_structured}, {has_hole})\n'
         script += 'f = cmd.getFaces()[0]\n'
-        groups = tm.getInfos(coface, 2).groups()
+        groups = tm.getInfos(coface, 2).groupsName()
         if 'Hors_Groupe_2D' in groups:
             groups.remove('Hors_Groupe_2D')
         if groups != []:
             for group in groups:
                 script += f"tm.addToGroup ([f], 2, \"{group}\")\n"
-        geom_entity = tm.getInfos(coface, 2).geom_entity
+        geom_entity = tm.getInfos(coface, 2).geomEntity()
         if geom_entity:
             script += f"# La coface {coface} est associée à l'entité géométrique {geom_entity}\n"
             script += f"tm.setGeomAssociation([f], find_in_dicts('{geom_entity}'), False)\n"
@@ -276,7 +277,7 @@ def generer_script(ctx, export_folder):
             block_faces = [f'faces_mapping["{face}"]' for face in blocks_faces_0[block]]
             script += f'cmd = tm.newBlock([{", ".join(block_faces)}], [{", ".join(block_vertices)}], {"False" if block in tm.getUnstructuredBlocks() else "True"}, "")\n'
         script += 'b = cmd.getBlocks()[0]\n'
-        geom_entity = tm.getInfos(block, 3).geom_entity
+        geom_entity = tm.getInfos(block, 3).geomEntity()
         if geom_entity:
             script += f"# Le bloc {block} est associé à l'entité géométrique {geom_entity}\n"
             script += f"tm.setGeomAssociation([b], find_in_dicts('{geom_entity}'), False)\n"
