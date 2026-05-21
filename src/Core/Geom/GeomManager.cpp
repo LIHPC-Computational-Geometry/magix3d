@@ -1831,42 +1831,14 @@ newSphere(const Utils::Math::Point& pcentre, const double& dr,
     message<<")";
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
 
-    CommandNewSphere *command = new CommandNewSphere(getContext(), pcentre, dr,da, groupName);
+    Utils::Portion::Type dt(Utils::Portion::ANGLE_DEF);
+    CommandNewSphere *command = new CommandNewSphere(getContext(), pcentre, dr, da, groupName);
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
     cmd << getContextAlias() << "." << "getGeomManager().newSphere ("
                              <<pcentre.getScriptCommand()<<", "<< Utils::Math::MgxNumeric::userRepresentation (dr) <<", "
                              <<Utils::Math::MgxNumeric::userRepresentation (da);
-    if (!groupName.empty())
-        cmd<<", \""<<groupName<<"\"";
-    cmd<<")";
-    command->setScriptCommand(cmd);
-
-    getCommandManager().addCommand(command, Utils::Command::DO);
-
-	Internal::M3DCommandResult*	cmdResult	=
-									new Internal::M3DCommandResult (*command);
-	return cmdResult;
-}
-/*----------------------------------------------------------------------------*/
-Internal::M3DCommandResult* GeomManager::
-newSphere(const Utils::Math::Point& pcentre, const double& dr,
-          const Utils::Portion::Type& dt, std::string groupName)
-{
-    TkUtil::UTF8String   message (TkUtil::Charset::UTF_8);
-    message << "GeomManager::newSphere("<<pcentre<<", "<<dr<<", "<<Utils::Portion::getName(dt);
-    if (!groupName.empty())
-        message<<", "<<groupName;
-    message<<")";
-    log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_3));
-
-    CommandNewSphere *command = new CommandNewSphere(getContext(), pcentre, dr,dt, groupName);
-    // trace dans le script
-    TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().newSphere ("
-                             <<pcentre.getScriptCommand()<<", "<< Utils::Math::MgxNumeric::userRepresentation (dr) <<", "
-                             <<Utils::Portion::getName(dt);
     if (!groupName.empty())
         cmd<<", \""<<groupName<<"\"";
     cmd<<")";

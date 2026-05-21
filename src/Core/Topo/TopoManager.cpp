@@ -1267,7 +1267,8 @@ newSphereWithTopo(const Point& pcentre,  const double& dr,
     log (TkUtil::TraceLog (message, TkUtil::Log::TRACE_4));
 
     // creation de la commande de création de la géométrie
-    Geom::CommandNewSphere *commandGeom = new Geom::CommandNewSphere(getContext(),pcentre, dr, dt, groupName);
+    double da =  Utils::Portion::getAngleInDegree(dt);
+    Geom::CommandNewSphere *commandGeom = new Geom::CommandNewSphere(getContext(),pcentre, dr, da, groupName);
 
     // creation de la commande de création de la topologie
     // avec un volume à récupérer dans la commande

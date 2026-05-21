@@ -34,21 +34,6 @@ public:
                        const double& angle,
                        const std::string& groupName);
     /*------------------------------------------------------------------------*/
-    /** \brief  Constructeur
-     *
-     *  \param c le contexte
-     *  \param pcentre le centre de la sphère
-     *  \param dr le rayon de la sphère
-     *  \param dp type de portion de sphere
-     *  \param groupName un nom de groupe (qui peut être vide)
-     */
-    CommandNewSphere(Internal::Context& c,
-                       const Utils::Math::Point& pcentre,
-                       const double& dr,
-                       const Utils::Portion::Type& dp,
-                       const std::string& groupName);
-
-    /*------------------------------------------------------------------------*/
     /** \brief  Destructeur
      */
     virtual ~CommandNewSphere();
