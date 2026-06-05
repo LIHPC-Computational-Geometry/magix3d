@@ -23,7 +23,7 @@ public:
      *
      *  \param c le contexte
      *  \param geom_cmd la commande de copie géométrique avec les modifications
-     *  \param groupName groupe dans lequel sont mise les nouvelles entités
+     *  \param groupName groupe dans lequel sont mises les nouvelles entités
      */
     CommandCommon2D(Internal::Context& c, GeomEntity* e1, GeomEntity* e2, std::string groupName);
 
@@ -33,7 +33,7 @@ public:
      *  \param c le contexte
      *  \param e1 une première entité
      *  \param e12 une deuxième entité
-     *  \param groupName groupe dans lequel sont mise les nouvelles entités
+     *  \param groupName groupe dans lequel sont mises les nouvelles entités
      */
     CommandCommon2D(Internal::Context& c, Geom::CommandGeomCopy* geom_cmd, std::string groupName);
 

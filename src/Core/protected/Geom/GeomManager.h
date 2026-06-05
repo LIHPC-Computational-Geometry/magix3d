@@ -101,10 +101,9 @@ public:
 
     /*------------------------------------------------------------------------*/
     /** \brief création d'entités géométrique par copie
-     *
      *  \param e les entités géométriques que l'on veut copier
      *  \param withTopo a vrai si l'on doit copier la topologie avec la géométrie
-     *  \param groupName groupe dans lequel sont mise les nouvelles entités
+     *  \param groupName groupe dans lequel sont mises les nouvelles entités
      */
     Mgx3D::Internal::M3DCommandResult*
         copy(std::vector<std::string>& e, bool withTopo, std::string groupName);
@@ -223,15 +222,16 @@ public:
                    std::string groupName="");
 #endif
 
-    /*------------------------------------------------------------------------*/
-    /** \brief création d'une ellipse centrée sur le point center, plan défini
-     *         par center/p1/p2, grand axe défini par center/p1,
-     *         grand rayon défini par la distance center-p1,
-     *         petit rayon défini par la distance p2-axe principal.
+    /**
+     * \brief Création d'une ellipse centrée sur le point center.
+     *        Le plan est défini par center/p1/p2, le grand axe par center/p1,
+     *        le grand rayon par la distance center-p1,
+     *        et le petit rayon par la distance p2-axe principal.
      *
-     *  \param p1 premier point
-     *  \param p2 second point
-     *  \param center centre
+     * \param p1 Premier point.
+     * \param p2 Second point.
+     * \param center Centre de l'ellipse.
+     * \param groupName Nom du groupe (optionnel, défaut: "").
      */
     Mgx3D::Internal::M3DCommandResult*
 		newEllipse( std::string p1, std::string p2, std::string center,
@@ -409,14 +409,12 @@ public:
     newCurveByCurveProjectionOnSurface(Geom::Curve* curve, Geom::Surface* surface, std::string groupName="");
 #endif
 
-    /*------------------------------------------------------------------------*/
     /** \brief suppression d'entités géométriques. Si on supprime une entité
      *         géométrique incidente à des entités géométriques de dimension
      *         supérieure, ces dernières sont aussi supprimées. Pour les
      *         entités géométriques incidentes de dimension inférieure, elles
      *         sont supprimés si propagateDown vaut true, sinon elles sont
      *         conservées.
-     *
      *  \param es les entités géométriques à supprimer
      *  \param propagateDown indique si l'on supprime les entités incidentes de
      *                       dimension inférieure
@@ -488,11 +486,9 @@ public:
      *         points pmin et pmax où pmin est le point de plus petites
      *         coordonnées (x,y,z) et pmax le point de plus grandes coordonnées
      *         (x,y,z)
-     *
      *  \param pmin le point min de la boite
      *  \param pmax le point max de la boite
      *  \param groupName optionnellement un nom de groupe
-     *
      *  \see getLastVolume pour obtenir le volume résultant
      */
     Mgx3D::Internal::M3DCommandResult*
@@ -769,14 +765,11 @@ public:
     Mgx3D::Internal::M3DCommandResult*
         translateAll(const Vector& dp);
 
-    /*------------------------------------------------------------------------*/
-    /** \brief translation d'une copie des entités (identifiée par un nom unique pour python)
-     *  suivant le vecteur de translation défini par dp
-     *
+    /** \brief translation d'une copie des entités suivant le vecteur de translation défini par dp
      *  \param ve nom des entités géométrique à copier et translater
      *  \param dp le vecteur de translation
      *  \param withTopo a vrai si l'on doit copier la topologie avec la géométrie
-     *  \param groupName groupe dans lequel sont mise les nouvelles entités
+     *  \param groupName groupe dans lequel sont mises les nouvelles entités
      */
     Mgx3D::Internal::M3DCommandResult*
         copyAndTranslate(std::vector<std::string>& ve, const Vector& dp, bool withTopo, std::string groupName);
@@ -787,6 +780,10 @@ public:
 	    copyAndTranslate(std::vector<GeomEntity*>& ve, const Vector& dp, bool withTopo, std::string groupName);
 #endif
 
+    /** \brief translation d'une copie de toutes les entités suivant le vecteur de translation défini par dp
+     *  \param dp le vecteur de translation
+     *  \param groupName groupe dans lequel sont mises les nouvelles entités
+     */
     Mgx3D::Internal::M3DCommandResult*
 	    copyAndTranslateAll(const Vector& dp, std::string groupName);
 	SET_SWIG_COMPLETABLE_METHOD(copyAndTranslateAll)
@@ -813,12 +810,11 @@ public:
     SET_SWIG_COMPLETABLE_METHOD(rotateAll)
 
     /*------------------------------------------------------------------------*/
-    /** \brief rotation d'une ou plusieurs copie d'entités géométrique
-     *
+    /** \brief rotation d'une ou plusieurs copie d'entités géométriques
      *  \param entities les entities dont on fait une copie et la rotation
      *  \param rot la rotation
      *  \param withTopo a vrai si l'on doit copier la topologie avec la géométrie
-     *  \param groupName groupe dans lequel sont mise les nouvelles entités
+     *  \param groupName groupe dans lequel sont mises les nouvelles entités
      */
     Mgx3D::Internal::M3DCommandResult*
 	copyAndRotate( std::vector<std::string>& entities,
@@ -831,13 +827,17 @@ public:
         		const Utils::Math::Rotation& rot, bool withTopo, std::string groupName);
 #endif
 
+    /*------------------------------------------------------------------------*/
+    /** \brief rotation de toutes les entités géométriques
+     *  \param rot la rotation
+     *  \param groupName groupe dans lequel sont mises les nouvelles entités
+     */
     Mgx3D::Internal::M3DCommandResult*
 		copyAndRotateAll( const Utils::Math::Rotation& rot, std::string groupName);
 	SET_SWIG_COMPLETABLE_METHOD(copyAndRotateAll)
 
     /*------------------------------------------------------------------------*/
     /** \brief homothétie d'objets géométriques
-     *
      *  \param geo      les objets d'origine
      *  \param factor   le facteur d'homothétie
      *  \param center   le centre (optionnel)
@@ -892,18 +892,22 @@ public:
 			const double factorZ,
 			const Point& pcentre = Point(0,0,0));
 
-	/*------------------------------------------------------------------------*/
     /** \brief homothétie d'une copie d'objets géométriques
-     *
      *  \param geo       les objets d'origine
      *  \param factor    le facteur d'homothétie
-     *  \param pcenter    le centre (optionnel)
-     *  \param withTopo  a vrai si l'on doit copier la topologie avec la géométrie
+     *  \param pcenter   le centre
+     *  \param withTopo  à vrai si l'on doit copier la topologie avec la géométrie
      *  \param groupName groupe dans lequel sont mises les nouvelles entités
      */
     Mgx3D::Internal::M3DCommandResult*
 	copyAndScale(std::vector<std::string>& geo, const double factor, const Point& pcenter, bool withTopo, std::string groupName);
 
+    /** \brief homothétie d'une copie d'objets géométriques
+     *  \param geo       les objets d'origine
+     *  \param factor    le facteur d'homothétie
+     *  \param withTopo  à vrai si l'on doit copier la topologie avec la géométrie
+     *  \param groupName groupe dans lequel sont mises les nouvelles entités
+     */
 	Mgx3D::Internal::M3DCommandResult*
 	copyAndScale(std::vector<std::string>& geo, const double factor, bool withTopo, std::string groupName);
 
@@ -913,17 +917,21 @@ public:
 	copyAndScale(std::vector<Geom::GeomEntity*>& geo, const double factor, const Point& pcenter, bool withTopo, std::string groupName);
 #endif
 
+    /** \brief homothétie d'une copie de tous les objets géométriques
+     *  \param factor    le facteur d'homothétie
+     *  \param pcenter   le centre
+     *  \param groupName groupe dans lequel sont mises les nouvelles entités
+     */
     Mgx3D::Internal::M3DCommandResult*
 	copyAndScaleAll(const double factor, const Point& pcenter, std::string groupName);
 
     /** \brief homothétie d'une copie d'un objet géométrique
-     *
      *  \param geo       les objets d'origine
      *  \param factorX   le facteur d'homothétie suivant l'axe des x
      *  \param factorY   le facteur d'homothétie suivant l'axe des y
      *  \param factorZ   le facteur d'homothétie suivant l'axe des z
-     *  \param pcenter    le centre (optionnel)
-     *  \param withTopo  a vrai si l'on doit copier la topologie avec la géométrie
+     *  \param pcenter   le centre
+     *  \param withTopo  à vrai si l'on doit copier la topologie avec la géométrie
      *  \param groupName groupe dans lequel sont mises les nouvelles entités
      */
     Mgx3D::Internal::M3DCommandResult*
@@ -935,6 +943,14 @@ public:
 				bool withTopo,
 				std::string groupName);
 
+    /** \brief homothétie d'une copie d'un objet géométrique
+     *  \param geo       les objets d'origine
+     *  \param factorX   le facteur d'homothétie suivant l'axe des x
+     *  \param factorY   le facteur d'homothétie suivant l'axe des y
+     *  \param factorZ   le facteur d'homothétie suivant l'axe des z
+     *  \param withTopo  à vrai si l'on doit copier la topologie avec la géométrie
+     *  \param groupName groupe dans lequel sont mises les nouvelles entités
+     */
 	Mgx3D::Internal::M3DCommandResult*
 	copyAndScale(std::vector<std::string>& geo,
         		const double factorX,
@@ -954,6 +970,13 @@ public:
 				std::string groupName);
 #endif
 
+    /** \brief homothétie d'une copie de toutes les entités géométriques
+     *  \param factorX   le facteur d'homothétie suivant l'axe des x
+     *  \param factorY   le facteur d'homothétie suivant l'axe des y
+     *  \param factorZ   le facteur d'homothétie suivant l'axe des z
+     *  \param pcenter   le centre
+     *  \param groupName groupe dans lequel sont mises les nouvelles entités
+     */
     Mgx3D::Internal::M3DCommandResult*
 	copyAndScaleAll(const double factorX,
 			const double factorY,
@@ -961,7 +984,6 @@ public:
 			const Point& pcenter,
 			std::string groupName);
 
-    /*------------------------------------------------------------------------*/
     /** \brief symétrie d'objets géométriques par rapport à un plan
      *  \param geo      les objets d'origine
      *  \param plane    le plan de symétrie
@@ -980,7 +1002,7 @@ public:
      *  \param geo      les objets d'origine à copier et symétriser
      *  \param plane    le plan de symétrie
      *  \param withTopo a vrai si l'on doit copier la topologie avec la géométrie
-     *  \param groupName groupe dans lequel sont mise les nouvelles entités
+     *  \param groupName groupe dans lequel sont mises les nouvelles entités
      */
     Mgx3D::Internal::M3DCommandResult*
 	copyAndMirror(std::vector<std::string>& geo, Utils::Math::Plane* plane, bool withTopo, std::string groupName);
@@ -993,7 +1015,6 @@ public:
 
     /*------------------------------------------------------------------------*/
     /** \brief Import d'un fichier au format BREP
-     *
      *  \param n le nom du ficher dont le contenu doit etre importe
      *  \param testVolumicProperties test que les volumes sont fermés
      */
@@ -1222,7 +1243,6 @@ public:
 
     /*------------------------------------------------------------------------*/
     /** \brief Intersection Booléenne de n entités géométriques
-     *
      *  \param entities les entités sur lesquelles on travaille
      */
     Mgx3D::Internal::M3DCommandResult* common(
@@ -1236,10 +1256,9 @@ public:
 
     /*------------------------------------------------------------------------*/
     /** \brief Intersection Booléenne de 2 entités géométriques 1D ou 2D, détruit les entités de base
-     *
      *  \param entity1 (courbe ou surface)
      *  \param entity2 (comme la précédente)
-     *  \param groupName groupe dans lequel sont mise les nouvelles entités
+     *  \param groupName groupe dans lequel sont mises les nouvelles entités
      */
     Mgx3D::Internal::M3DCommandResult*
 	     common2D(std::string entity1, std::string entity2, std::string groupName);
@@ -1252,10 +1271,9 @@ public:
 
     /*------------------------------------------------------------------------*/
     /** \brief Intersection Booléenne de 2 entités géométriques 1D ou 2D, ne détruit pas les entités de base
-     *
      *  \param entity1 (courbe ou surface)
      *  \param entity2 (comme la précédente)
-     *  \param groupName groupe dans lequel sont mise les nouvelles entités
+     *  \param groupName groupe dans lequel sont mises les nouvelles entités
      */
     Mgx3D::Internal::M3DCommandResult*
 	     common2DOnCopy(std::string entity1, std::string entity2, std::string groupName);
@@ -1266,11 +1284,8 @@ public:
 	     common2DOnCopy(Geom::GeomEntity* entity1, Geom::GeomEntity* entity2, std::string groupName);
 #endif
 
-    /*------------------------------------------------------------------------*/
-    /** \brief Différence Booléenne de n entités géométriques avec la première
-     *         entité qui est conservée
-     *
-     *  \param tokeep l(es) entité(s) que l'on conserve
+    /** \brief Différence Booléenne de n entités géométriques avec la première entité qui est conservée
+     *  \param tokeep l'entité que l'on conserve
      *  \param tocut  les entités que l'on retire de tokeep
      */
     Mgx3D::Internal::M3DCommandResult* cut(
@@ -1281,6 +1296,10 @@ public:
             Geom::GeomEntity* tokeep, std::vector<Geom::GeomEntity*>& tocut);
 #endif
 
+    /** \brief Différence Booléenne de n entités géométriques avec n entités
+     *  \param tokeep les entités que l'on conserve
+     *  \param tocut  les entités que l'on retire de tokeep
+     */
     Mgx3D::Internal::M3DCommandResult* cut(
             std::vector<std::string>& tokeep,std::vector<std::string>& tocut);
 
@@ -1403,6 +1422,7 @@ public:
      */
     int getNbVertices() const;
 
+#ifndef SWIG
     /** Ajoute un volume au gestionnaire */
     void add (Volume* v) {m_volumes.push_back(v);}
     /** Ajoute une surface au gestionnaire */
@@ -1411,6 +1431,7 @@ public:
     void add (Curve* c) {m_curves.push_back(c);}
     /** Ajoute un sommet au gestionnaire */
     void add (Vertex* v) {m_vertices.push_back(v);}
+
     /** Ajoute une entité au gestionnaire */
     void addEntity (GeomEntity* ge);
 
@@ -1425,8 +1446,7 @@ public:
     /** Enlève une entité au gestionnaire */
     void removeEntity (GeomEntity* ge);
 
-#ifndef SWIG
-	/** Retourne le Volume suivant le nom en argument */
+    /** Retourne le Volume suivant le nom en argument */
 	Volume* getVolume(const std::string& name, const bool exceptionIfNotFound=true) const;
 	/** Retourne la Surface suivant le nom en argument */
 	Surface* getSurface(const std::string& name, const bool exceptionIfNotFound=true) const;
@@ -1437,18 +1457,13 @@ public:
 	/** Retourne la GeomEntity suivant le nom en argument */
 	GeomEntity* getEntity(const std::string& name, const bool exceptionIfNotFound=true) const;
 
-	/*------------------------------------------------------------------------*/
-	/** \brief retourne la liste des volumes gérées par le manager
-	 */
+	/* Retourne la liste des volumes gérées par le manager */
 	std::vector<Volume*> getVolumesObj() const;
-	/** \brief retourne la liste des surfaces gérées par le manager
-	 */
+	/* Retourne la liste des surfaces gérées par le manager */
 	std::vector<Surface*> getSurfacesObj() const;
-	/** \brief retourne la liste des courbes gérées par le manager
-	 */
+	/* Retourne la liste des courbes gérées par le manager */
 	std::vector<Curve*> getCurvesObj() const;
-	/** \brief retourne la liste des sommets gérées par le manager
-	 */
+	/* Retourne la liste des sommets gérées par le manager */
 	std::vector<Vertex*> getVerticesObj() const;
 #endif
 
@@ -1473,7 +1488,11 @@ public:
     /** Retourne le nom du dernier Vertex */
     std::string getLastVertex() const;
 
-    /** Ajoute un groupe à un ensemble d'entités géométriques, suivant une dimension */
+    /** \brief Ajoute un groupe à un ensemble d'entités géométriques, suivant une dimension
+     *  \param ve liste d'entités géométriques
+     *  \param dim dimension des entités géométriques (0 pour les sommets, 1 pour les courbes, 2 pour les surfaces, 3 pour les volumes)
+     *  \param groupName nom du groupe à ajouter
+     */ 
     Internal::M3DCommandResult* addToGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
     SET_SWIG_COMPLETABLE_METHOD(addToGroup)
 

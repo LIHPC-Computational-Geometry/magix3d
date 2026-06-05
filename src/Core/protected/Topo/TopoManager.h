@@ -1722,15 +1722,19 @@ public:
 #endif
 
     /*------------------------------------------------------------------------*/
-    /** Ajoute un groupe à un ensemble d'entités topologiques, suivant une dimension */
+    /** \brief Ajoute un groupe à un ensemble d'entités topologiques, suivant une dimension 
+     *  \param ve liste des noms des entités topologiques
+     *  \param dim la dimension des entités topologiques (0 pour les sommets, 1 pour les arêtes, 2 pour les faces et 3 pour les blocs)
+     *  \param groupName le nom du groupe à ajouter
+     */
     Internal::M3DCommandResult* addToGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
     SET_SWIG_COMPLETABLE_METHOD(addToGroup)
 
-    /** Enlève un groupe à un ensemble d'entités topologiques, suivant une dimension */
+    /** \brief Enlève un groupe à un ensemble d'entités topologiques, suivant une dimension */
     Internal::M3DCommandResult* removeFromGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
     SET_SWIG_COMPLETABLE_METHOD(removeFromGroup)
 
-    /** Défini le groupe pour un ensemble d'entités topologiques, suivant une dimension */
+    /** \brief Défini le groupe pour un ensemble d'entités topologiques, suivant une dimension */
     Internal::M3DCommandResult* setGroup(std::vector<std::string>& ve, int dim, const std::string& groupName);
     SET_SWIG_COMPLETABLE_METHOD(setGroup)
 

@@ -4,6 +4,7 @@
 using std::ptrdiff_t;
 %}
 
+#undef SET_SWIG_COMPLETABLE_METHOD
 
 %include "std_string.i"
 %include "std_list.i"
@@ -275,14 +276,6 @@ using std::ptrdiff_t;
 }
 %}
 
-
-
-// ----------------------------------------------------------
-// interprété par swig : documentation des fonctions membres
-// fichier actuellement généré avec xsltproc
-// et modifié manuellement, cf swig.xsl
-// ----------------------------------------------------------
-%include "swig_doc.i"
 
 // ---------------------------------------------------------
 // interprété par swig : déclaration des fonction pour swig

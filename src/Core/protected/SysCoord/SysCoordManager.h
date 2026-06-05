@@ -114,7 +114,7 @@ public:
      *
      *  \param name nom de l'entité repère à copier et translater
      *  \param dp le vecteur de translation
-     *  \param groupName groupe dans lequel sont mise les nouvelles entités
+     *  \param groupName groupe dans lequel sont mises les nouvelles entités
      */
     Mgx3D::Internal::M3DCommandResult*
         copyAndTranslate(std::string name, const Vector& dp, std::string groupName);
@@ -147,7 +147,7 @@ public:
      *
      *  \param name nom de l'entité repère
      *  \param rot la rotation
-     *  \param groupName groupe dans lequel sont mise les nouvelles entités
+     *  \param groupName groupe dans lequel sont mises les nouvelles entités
      */
     Mgx3D::Internal::M3DCommandResult*
 		copyAndRotate(std::string name,
@@ -164,7 +164,7 @@ public:
     /** \brief création d'entités repère par copie
      *
      *  \param name nom de l'entité repère
-     *  \param groupName groupe dans lequel sont mise les nouvelles entités
+     *  \param groupName groupe dans lequel sont mises les nouvelles entités
      */
     Mgx3D::Internal::M3DCommandResult*
         copy(std::string name, std::string groupName);

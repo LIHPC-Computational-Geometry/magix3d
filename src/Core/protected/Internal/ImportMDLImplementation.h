@@ -139,7 +139,7 @@ protected:
     void dupVertexNonConformalRelation(std::vector<Topo::CoFace* >& cofaces);
 
     /** Mise en place d'un filtre sur les zones
-     * Les zones acceptées sont mise dans le set
+     * Les zones acceptées sont mises dans le set
      */
     bool getFilter(std::set<std::string>& filter);
 

@@ -29,9 +29,9 @@ set_source_files_properties (pyMagix3D.i PROPERTIES SWIG_MODULE_NAME pyMagix3D)
 add_custom_command (TARGET pyMagix3D POST_BUILD COMMAND mv ${CMAKE_CURRENT_BINARY_DIR}/pyMagix3D.py ${CMAKE_CURRENT_BINARY_DIR}/binding.py COMMAND cat ${GUIToolkitsVariables_CMAKE_DIR}/utf8-header.py ${CMAKE_CURRENT_BINARY_DIR}/binding.py >> ${CMAKE_CURRENT_BINARY_DIR}/pyMagix3D.py)
 
 # Objectif avoir les flags de compilation SWIG suivants :
-# -globals pyMagix3D -shadow -DIN_STD="std::" -DSWIG_FORBIDS_FINALIZATION -DIN_UTIL="TkUtil::" -DIN_STD="std::"
+# -globals pyMagix3D -python -doxygen -shadow -DIN_STD="std::" -DSWIG_FORBIDS_FINALIZATION -DIN_UTIL="TkUtil::" -DIN_STD="std::"
 # Ne marche pas sans le -c++ malgré les CPLUSPLUS ON avant le swig_add_library.
-set (MAGIX3D_SWIG_COMPILE_OPTIONS "-c++;-module;pyMagix3D;-globals;pyMagix3D;-shadow;-DIN_STD=\"std::\";-DSWIG_FORBIDS_FINALIZATION;-DIN_UTIL=\"TkUtil::\";-DIN_STD=\"std::\"")
+set (MAGIX3D_SWIG_COMPILE_OPTIONS "-c++;-module;pyMagix3D;-globals;pyMagix3D;-python;-doxygen;-shadow;-DIN_STD=\"std::\";-DSWIG_FORBIDS_FINALIZATION;-DIN_UTIL=\"TkUtil::\";-DIN_STD=\"std::\"")
 list (APPEND MAGIX3D_SWIG_COMPILE_OPTIONS ${MAGIX3D_OPTIONS})
 # Avec cmake_policy (SET CMP0086 NEW) -module ${SWIG_MODULE_NAME} devrait être automatiquement passé, SWIG_MODULE_NAME étant défini comme propriété du fichier swig. Mais ...
 #set (MT_SWIG_COMPILE_OPTIONS "-c++;-globals;pyMagix3D;-shadow;-DIN_STD=\"std::\";-DSWIG_FORBIDS_FINALIZATION;-DIN_UTIL=\"TkUtil::\";-DIN_STD=\"std::\"")
@@ -188,6 +188,7 @@ if (Doxygen_FOUND)
 	set (DOXYGEN_DOT_FONTNAME FreeSans)
 	set (DOXYGEN_COLLABORATION_GRAPH NO)
 	set (DOXYGEN_GENERATE_LEGEND NO)
+
 	doxygen_add_docs (pydoc ${DOXYGEN_SOURCES} ALL)
 
 	install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/pyMagix3D
@@ -197,8 +198,7 @@ if (Doxygen_FOUND)
 		)
 
 else (Doxygen_FOUND)
-	message (WARNING "Documentation de l'API python non générée : doxygen non trouvé.")
-#	message (FATAL_ERROR "Doxygen not found")
+	message (FATAL_ERROR "Documentation de l'API python non générée : doxygen non trouvé.")
 endif (Doxygen_FOUND)
 ]===]
 
