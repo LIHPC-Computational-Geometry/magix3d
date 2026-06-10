@@ -2598,45 +2598,43 @@ createSphereTopoOGridDemiNonDeg(Geom::PropertySphere* propertySph)
     Vertex* v6 = b1_vertices[6];
     Vertex* v7 = b1_vertices[7];
 
-    std::string v4_name = v4->getName();
-    std::string v5_name = v5->getName();
-    std::string v6_name = v6->getName();
-    std::string v7_name = v7->getName();
 
-
-    cofaces = b1_faces[Block::k_max]->getCoFaces();
-    const std::vector<Vertex*>& cf0_vertices = cofaces[0]->getVertices();
-    if (Utils::contains(v4, cf0_vertices) || Utils::contains(v6, cf0_vertices)){
-        cofaces[0]->setGeomAssociation(surfaces[2]);
-        cofaces[1]->setGeomAssociation(surfaces[1]);
-    } else if (Utils::contains(v5, cf0_vertices) || Utils::contains(v7, cf0_vertices)){
-        cofaces[0]->setGeomAssociation(surfaces[1]);
-        cofaces[1]->setGeomAssociation(surfaces[2]);
-    } else
-        throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b1", TkUtil::Charset::UTF_8));
-
-    cofaces = b4_faces[Block::i_min]->getCoFaces();
-    const std::vector<Vertex*>& cf0_vertices_b4 = cofaces[0]->getVertices();
-    if (Utils::contains(v4, cf0_vertices_b4) || Utils::contains(v6, cf0_vertices_b4)){
-        cofaces[0]->setGeomAssociation(surfaces[2]);
-        cofaces[1]->setGeomAssociation(surfaces[1]);
-    } else if (Utils::contains(v5, cf0_vertices_b4) || Utils::contains(v7, cf0_vertices_b4)){
-        cofaces[0]->setGeomAssociation(surfaces[1]);
-        cofaces[1]->setGeomAssociation(surfaces[2]);
-    } else
-        throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b4", TkUtil::Charset::UTF_8));
-
-    cofaces = b5_faces[Block::i_min]->getCoFaces();
-    const std::vector<Vertex*>& cf0_vertices_b5 = cofaces[0]->getVertices();
-    if (Utils::contains(v4, cf0_vertices_b5) || Utils::contains(v6, cf0_vertices_b5)){
-        cofaces[0]->setGeomAssociation(surfaces[2]);
-        cofaces[1]->setGeomAssociation(surfaces[1]);
-    } else if (Utils::contains(v5, cf0_vertices_b5) || Utils::contains(v7, cf0_vertices_b5)){
-        cofaces[0]->setGeomAssociation(surfaces[1]);
-        cofaces[1]->setGeomAssociation(surfaces[2]);
-    } else
-        throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b5", TkUtil::Charset::UTF_8));
-
+    {
+        cofaces = b1_faces[Block::k_max]->getCoFaces();
+        const std::vector<Vertex*>& cf0_vertices = cofaces[0]->getVertices();
+        if (Utils::contains(v4, cf0_vertices) || Utils::contains(v6, cf0_vertices)){
+            cofaces[0]->setGeomAssociation(surfaces[2]);
+            cofaces[1]->setGeomAssociation(surfaces[1]);
+        } else if (Utils::contains(v5, cf0_vertices) || Utils::contains(v7, cf0_vertices)){
+            cofaces[0]->setGeomAssociation(surfaces[1]);
+            cofaces[1]->setGeomAssociation(surfaces[2]);
+        } else
+            throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b1", TkUtil::Charset::UTF_8));
+    }
+    {
+        cofaces = b4_faces[Block::i_min]->getCoFaces();
+        const std::vector<Vertex*>& cf0_vertices = cofaces[0]->getVertices();
+        if (Utils::contains(v4, cf0_vertices) || Utils::contains(v6, cf0_vertices)){
+            cofaces[0]->setGeomAssociation(surfaces[2]);
+            cofaces[1]->setGeomAssociation(surfaces[1]);
+        } else if (Utils::contains(v5, cf0_vertices) || Utils::contains(v7, cf0_vertices)){
+            cofaces[0]->setGeomAssociation(surfaces[1]);
+            cofaces[1]->setGeomAssociation(surfaces[2]);
+        } else
+            throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b4", TkUtil::Charset::UTF_8));
+    }
+    {
+        cofaces = b5_faces[Block::i_min]->getCoFaces();
+        const std::vector<Vertex*>& cf0_vertices = cofaces[0]->getVertices();
+        if (Utils::contains(v4, cf0_vertices) || Utils::contains(v6, cf0_vertices)){
+            cofaces[0]->setGeomAssociation(surfaces[2]);
+            cofaces[1]->setGeomAssociation(surfaces[1]);
+        } else if (Utils::contains(v5, cf0_vertices) || Utils::contains(v7, cf0_vertices)){
+            cofaces[0]->setGeomAssociation(surfaces[1]);
+            cofaces[1]->setGeomAssociation(surfaces[2]);
+        } else
+            throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b5", TkUtil::Charset::UTF_8));
+    }
     // les sommets géométriques
     if (vertices.size() != 2){
 		TkUtil::UTF8String	message (TkUtil::Charset::UTF_8);
