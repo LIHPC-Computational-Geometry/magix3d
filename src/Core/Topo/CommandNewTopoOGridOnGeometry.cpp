@@ -2365,28 +2365,30 @@ createSphereTopoOGridDemiDeg(Geom::PropertySphere* propertySph)
     Vertex* v1 = b4_vertices[0];
     Vertex* v2 = b5_vertices[0];
     Vertex* v3 = b5_vertices[2];
-
-    cofaces = b4_faces[Block::i_min]->getCoFaces();
-    const std::vector<Vertex*>& cf0_vertices = cofaces[0]->getVertices();
-    if (Utils::contains(v0, cf0_vertices)){
-        cofaces[0]->setGeomAssociation(surfaces[2]);
-        cofaces[1]->setGeomAssociation(surfaces[1]);
-    } else if (Utils::contains(v1, cf0_vertices)){
-        cofaces[0]->setGeomAssociation(surfaces[1]);
-        cofaces[1]->setGeomAssociation(surfaces[2]);
-    } else
-        throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b4", TkUtil::Charset::UTF_8));
-
-    cofaces = b5_faces[Block::i_min]->getCoFaces();
-    if (Utils::contains(v2, cf0_vertices)){
-        cofaces[0]->setGeomAssociation(surfaces[2]);
-        cofaces[1]->setGeomAssociation(surfaces[1]);
-    } else if (Utils::contains(v3, cf0_vertices)){
-        cofaces[0]->setGeomAssociation(surfaces[1]);
-        cofaces[1]->setGeomAssociation(surfaces[2]);
-    } else
-        throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b5", TkUtil::Charset::UTF_8));
-
+    {
+        cofaces = b4_faces[Block::i_min]->getCoFaces();
+        const std::vector<Vertex*>& cf0_vertices = cofaces[0]->getVertices();
+        if (Utils::contains(v0, cf0_vertices)){
+            cofaces[0]->setGeomAssociation(surfaces[2]);
+            cofaces[1]->setGeomAssociation(surfaces[1]);
+        } else if (Utils::contains(v1, cf0_vertices)){
+            cofaces[0]->setGeomAssociation(surfaces[1]);
+            cofaces[1]->setGeomAssociation(surfaces[2]);
+        } else
+            throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b4", TkUtil::Charset::UTF_8));
+    }
+    {
+        cofaces = b5_faces[Block::i_min]->getCoFaces();
+        const std::vector<Vertex*>& cf0_vertices = cofaces[0]->getVertices();
+        if (Utils::contains(v2, cf0_vertices)){
+            cofaces[0]->setGeomAssociation(surfaces[2]);
+            cofaces[1]->setGeomAssociation(surfaces[1]);
+        } else if (Utils::contains(v3, cf0_vertices)){
+            cofaces[0]->setGeomAssociation(surfaces[1]);
+            cofaces[1]->setGeomAssociation(surfaces[2]);
+        } else
+            throw TkUtil::Exception (TkUtil::UTF8String ("Echec pour projeter les CoFaces issues de la coupe de b5", TkUtil::Charset::UTF_8));
+    }
 
 
     // les sommets géométriques
