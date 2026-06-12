@@ -239,28 +239,25 @@ def test_law_biexponential_onSurface(capfd):
     ctx.getGeomManager().newCylinder (Mgx3D.Point(1.5, 0, 0), 1, Mgx3D.Vector(0, 0, 4), 3.600000e+02)
     # Fusion Booléenne de  Vol0001 Vol0000
     ctx.getGeomManager ( ).fuse (["Vol0001","Vol0000"])
-    # Fusion de surfaces Surf0007 Surf0010 Surf0012
-    ctx.getGeomManager ( ).joinSurfaces (["Surf0007","Surf0010","Surf0012"])
-    # Fusion de surfaces Surf0008 Surf0011 Surf0014
-    ctx.getGeomManager ( ).joinSurfaces (["Surf0008","Surf0011","Surf0014"])
-    # Fusion de surfaces Surf0006 Surf0013
-    ctx.getGeomManager ( ).joinSurfaces (["Surf0006","Surf0013"])
-    # Fusion de surfaces Surf0017 Surf0009
-    ctx.getGeomManager ( ).joinSurfaces (["Surf0017","Surf0009"])
-    # Fusion de courbes Crb0006 Crb0016
-    ctx.getGeomManager ( ).joinCurves (["Crb0006","Crb0016"])
+    # Fusion de surfaces Surf0006 Surf0010 Surf0012
+    ctx.getGeomManager ( ).joinSurfaces (["Surf0006","Surf0010","Surf0012"])
+    # Fusion de surfaces Surf0007 Surf0011 Surf0013
+    ctx.getGeomManager ( ).joinSurfaces (["Surf0007","Surf0011","Surf0013"])
+    # Fusion de surfaces Surf0008 Surf0009 Surf0014
+    ctx.getGeomManager ( ).joinSurfaces (["Surf0008","Surf0009", "Surf0014"])
+    # Fusion de courbes Crb0006 Crb0007 Crb0016
+    ctx.getGeomManager ( ).joinCurves (["Crb0006", "Crb0007","Crb0016"])
     # Fusion de courbes Crb0018 Crb0009 Crb0008
     ctx.getGeomManager ( ).joinCurves (["Crb0018","Crb0009","Crb0008"])
-    # Fusion de courbes Crb0020 Crb0007
-    ctx.getGeomManager ( ).joinCurves (["Crb0020","Crb0007"])
+
     # Création d'un bloc topologique structuré sans projection (Vol0002)
     ctx.getTopoManager().newFreeTopoOnGeometry ("Vol0002")
     # Découpage suivant Ar0011 des blocs Bl0000
     ctx.getTopoManager().splitBlocks (["Bl0000"],"Ar0011", .5)
     # Affectation d'une projection vers Surf0018 pour les entités topologiques Ar0023
-    ctx.getTopoManager ( ).setGeomAssociation (["Ar0023"], "Surf0018", True)
+    ctx.getTopoManager ( ).setGeomAssociation (["Ar0023"], "Surf0017", True)
     # Affectation d'une projection vers Surf0018 pour les entités topologiques Ar0022
-    ctx.getTopoManager ( ).setGeomAssociation (["Ar0022"], "Surf0018", True)
+    ctx.getTopoManager ( ).setGeomAssociation (["Ar0022"], "Surf0017", True)
 
     # Changement de discrétisation pour les arêtes Ar0023
     emp = Mgx3D.EdgeMeshingPropertyBiexponential(20, s1_ar0023, s1_ar0023)
@@ -269,7 +266,7 @@ def test_law_biexponential_onSurface(capfd):
     emp = Mgx3D.EdgeMeshingPropertyBiexponential(20, s1_ar0022, s2_ar0022)
     ctx.getTopoManager().setMeshingProperty (emp, ["Ar0022"])
 
-    # Création du maillage pour tous les blocs
+        # Création du maillage pour tous les blocs
     ctx.getMeshManager().newAllBlocksMesh()
 
     # Sauvegarde du maillage (mli)
@@ -287,7 +284,7 @@ def test_law_biexponential_onSurface(capfd):
     # target meshing edge size (not respected)
     assert( abs(l2_norme(n9, n193) - s1_ar0023) > eps )
     # real meshing edge size
-    assert( abs(l2_norme(n9, n193) - 4.14588643711679e-3) < eps )
+    assert( abs(l2_norme(n9, n193) - 4.14578719225745e-3) < eps )
 
     # test of last mesh edge size of topo edge Ar0023
     n10  = mesh_lima.noeud(10)
@@ -295,7 +292,7 @@ def test_law_biexponential_onSurface(capfd):
     # target meshing edge size (not respected)
     assert( abs(l2_norme(n10, n211) - s1_ar0023) > eps )
     # real meshing edge size
-    assert( abs(l2_norme(n10, n211) - 4.15171460239938e-3) < eps )
+    assert( abs(l2_norme(n10, n211) - 4.15160096753457e-3) < eps )
 
 
     # test of first mesh edge size of topo edge Ar0022
@@ -304,7 +301,7 @@ def test_law_biexponential_onSurface(capfd):
     # target meshing edge size (not respected)
     assert( abs(l2_norme(n11, n174) - s1_ar0022) > eps )
     # real meshing edge size
-    assert( abs(l2_norme(n11, n174) - 7.89083037828939e-1) < eps )
+    assert( abs(l2_norme(n11, n174) - 7.89003595950745e-1) < eps )
 
     # test of last mesh edge size of topo edge Ar0022
     n8   = mesh_lima.noeud(8)
@@ -312,6 +309,6 @@ def test_law_biexponential_onSurface(capfd):
     # target meshing edge size (not respected)
     assert( abs(l2_norme(n8, n192) - s2_ar0022) > eps )
     # real meshing edge size
-    assert( abs(l2_norme(n8, n192) - 4.9378232958398e-1) < eps )
+    assert( abs(l2_norme(n8, n192) - 4.93740651566053e-1) < eps )
 
     os.remove(filename)
