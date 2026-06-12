@@ -1,9 +1,32 @@
 import os
 import sys
-import pyMagix3D as Mgx3D
 from collections import defaultdict
 
-def generer_script(ctx, export_folder):
+magix3d_250_path = "/chemin/vers/le/dossier/contenant/pyMagix3D"
+magix3d_260_path = "/chemin/vers/le/dossier/contenant/pyMagix3D"
+magix3d_263_path = "/home/oudotmp/wksMagix3D/spack/opt/spack/linux-ubuntu22.04-skylake/gcc-11.4.0/magix3d-2.6.3-dmawlilkl4e4fi6mduz6o75xa65nurmw/lib/python3.11/site-packages"  # Remplace par le chemin absolu
+current_version = "2.6.3"
+
+# pour gérer les différences d'API entre les différentes versions de Magix3D
+def getGeomGroups(entity, dimension):
+    if (magix3d_version <= "2.5.0"):
+        return gm.getInfos(entity, dimension).groupsName()
+    else:
+        return gm.getInfos(entity, dimension).groups()
+
+def getTopoGroups(entity, dimension):
+    if (magix3d_version <= "2.5.0"):
+        return tm.getInfos(entity, dimension).groupsName()
+    else:
+        return tm.getInfos(entity, dimension).groups()
+
+def getGeomEntity(entity, dimension):
+    if (magix3d_version <= "2.5.0"):
+        return tm.getInfos(entity, dimension).geomEntity()
+    else:
+        return tm.getInfos(entity, dimension).geom_entity
+
+def generer_script(ctx):
     script = """# Script généré automatiquement pour recréer les entités Magix3D
 # Ne pas modifier manuellement
 
@@ -11,6 +34,21 @@ def generer_script(ctx, export_folder):
     gm = ctx.getGeomManager()
     tm = ctx.getTopoManager()
     mm = ctx.getMeshManager()
+
+    script += "import os\n"
+    script += "import sys\n"
+
+    magix3d_path_variable = f"magix3d_{current_version.replace('.', '')}_path"
+    module_path = globals()[magix3d_path_variable]
+
+    script += f"module_path = \"{module_path}\"  # Remplace par le chemin absolu\n"
+    script += "if os.path.exists(module_path):\n"
+    script += "    if module_path not in sys.path:\n"
+    script += "        sys.path.append(module_path)\n"
+    script += "else:\n"
+    script += "    print(f\"Erreur : le chemin du module python Magix3D est introuvable ({module_path}).\")\n"
+    script += "    sys.exit(1)\n\n"
+
 
     script += "import pyMagix3D as Mgx3D\n"
     script += "import itertools\n"
@@ -26,9 +64,10 @@ def generer_script(ctx, export_folder):
 
     script += "# Création des points\n"
     script += "points_mapping = dict()\n"
+
     for vertex in gm.getVertices():
         script += f'# Création du sommet {vertex}\n'
-        groups = gm.getInfos(vertex, 0).groups()
+        groups = getGeomGroups(vertex, 0)
         if 'Hors_Groupe_0D' in groups:
             groups.remove('Hors_Groupe_0D')
         point_file_name = f"{brep_folder}/{vertex + '.brep'}"
@@ -44,18 +83,21 @@ def generer_script(ctx, export_folder):
     script += "# Création des courbes\n"
     script += "curves_mapping = dict()\n"
     for curve in gm.getCurves():
-        script += f'# Création de la courbe {curve}\n'
-        groups = gm.getInfos(curve, 1).groups()
+        groups = getGeomGroups(curve, 1)
         if 'Hors_Groupe_1D' in groups:
             groups.remove('Hors_Groupe_1D')
         curve_file_name = f"{brep_folder}/{curve + '.brep'}"
-        extrema_first_point = gm.getInfos(curve, 1).vertices()[0]
-        extrema_last_point = gm.getInfos(curve, 1).vertices()[-1]
-        script += f'cmd = gm.newCurveFromBrep("{curve_file_name}", points_mapping["{extrema_first_point}"], points_mapping["{extrema_last_point}"])\n'
-        script += 'curve = cmd.getCurves()[0]\n'
-        for group in groups:
-            script += f"gm.addToGroup ([curve], 1, '{group}')\n"
-        script += f'curves_mapping["{curve}"] = curve\n'
+        if (len(gm.getInfos(curve, 1).vertices()) > 0):
+            extrema_first_point = gm.getInfos(curve, 1).vertices()[0]
+            extrema_last_point = gm.getInfos(curve, 1).vertices()[-1]
+            script += f'# Création de la courbe {curve}\n'
+            script += f'cmd = gm.newCurveFromBrep("{curve_file_name}", points_mapping["{extrema_first_point}"], points_mapping["{extrema_last_point}"])\n'
+            script += 'curve = cmd.getCurves()[0]\n'
+            for group in groups:
+                script += f"gm.addToGroup ([curve], 1, '{group}')\n"
+            script += f'curves_mapping["{curve}"] = curve\n'
+        else:
+            print(f"Attention : la courbe {curve} n'a pas été créée car elle n'a pas 1 ou 2 extrémités (nombre d'extrémités trouvées : {len(gm.getInfos(curve, 1).vertices())}).\n")    
     script += "\n"
     script += "print(\"Correspondance des courbes:\")\n"
     script += "print(curves_mapping, '\\n')\n\n"
@@ -64,7 +106,7 @@ def generer_script(ctx, export_folder):
     script += "surfaces_mapping = dict()\n"
     for surface in gm.getSurfaces():
         script += f'# Création de la surface {surface}\n'
-        groups = gm.getInfos(surface, 2).groups()
+        groups = getGeomGroups(surface, 2)
         if 'Hors_Groupe_2D' in groups:
             groups.remove('Hors_Groupe_2D')
         surface_file_name = f"{brep_folder}/{surface + '.brep'}"
@@ -81,7 +123,7 @@ def generer_script(ctx, export_folder):
     script += "volumes_mapping = dict()\n"
     for volume in gm.getVolumes():
         script += f'# Création du volume {volume}\n'
-        groups = gm.getInfos(volume, 3).groups()
+        groups = getGeomGroups(volume, 3)
         if 'Hors_Groupe_3D' in groups:
             groups.remove('Hors_Groupe_3D')
         volume_file_name = f"{brep_folder}/{volume + '.brep'}"
@@ -108,13 +150,13 @@ def generer_script(ctx, export_folder):
         coord = tm.getCoord(vertex)
         script += f'cmd = tm.newTopoVertex(Mgx3D.Point({coord.getX()}, {coord.getY()}, {coord.getZ()}), "")\n'
         script += 'v = cmd.getTopoVertices()[0]\n'
-        groups = tm.getInfos(vertex, 0).groups()
+        groups = getTopoGroups(vertex, 0)
         if 'Hors_Groupe_0D' in groups:
             groups.remove('Hors_Groupe_0D')
         if groups != []:
             for group in groups:
                 script += f"tm.addToGroup ([v], 0, \"{group}\")\n"
-        geom_entity = tm.getInfos(vertex, 0).geom_entity
+        geom_entity = getGeomEntity(vertex, 0)
         if geom_entity:
             script += f"# Le sommet {vertex} est associé à l'entité géométrique {geom_entity}\n"
             script += f"tm.setGeomAssociation([v], find_in_dicts('{geom_entity}'), False)\n"
@@ -131,13 +173,13 @@ def generer_script(ctx, export_folder):
         end_vertex = tm.getInfos(coedge, 1).vertices()[1]
         script += f'cmd = tm.newTopoEntity([vertices_mapping["{start_vertex}"], vertices_mapping["{end_vertex}"]], 1, "", True)\n'
         script += 'e = cmd.getEdges()[0]\n'
-        groups = tm.getInfos(coedge, 1).groups()
+        groups = getTopoGroups(coedge, 1)
         if 'Hors_Groupe_1D' in groups:
             groups.remove('Hors_Groupe_1D')
         if groups != []:
             for group in groups:
                 script += f"tm.addToGroup ([e], 1, \"{group}\")\n"
-        geom_entity = tm.getInfos(coedge, 1).geom_entity
+        geom_entity = getGeomEntity(coedge, 1)
         if geom_entity:
             script += "try:\n"
             script += f"    # L'arête {coedge} est associée à l'entité géométrique {geom_entity}\n"
@@ -148,25 +190,6 @@ def generer_script(ctx, export_folder):
     script += "print(\"Correspondance des arêtes:\")\n"
     script += "print(coedges_mapping, '\\n')\n\n"
     script += "\n"
-
-    script += "# Application des propriétés de maillage sur les arêtes\n"
-    for coedge in tm.getCoEdges():
-        script += f'# Discrétisation de l\'arête {coedge}\n'
-        emp = tm.getEdgeMeshingProperty(coedge)
-        law = emp.getMeshLaw()
-        if (law == Mgx3D.CoEdgeMeshingProperty.uniforme):
-            uemp = Mgx3D.EdgeMeshingPropertyUniform(emp)
-            script += f'emp = Mgx3D.EdgeMeshingPropertyUniform({uemp.getNbEdges()})\n'
-        elif (law == Mgx3D.CoEdgeMeshingProperty.globalinterpolate):
-            giemp = Mgx3D.EdgeMeshingPropertyGlobalInterpolate(emp)
-            script += f'emp = Mgx3D.EdgeMeshingPropertyGlobalInterpolate({giemp.getNbEdges()}, [", ".join([coedges_mapping[coedge] for coedge in {giemp.getFirstCoEdges()}])], [", ".join([coedges_mapping[coedge] for coedge in {giemp.getSecondCoEdges()}])])\n'
-        elif (law == Mgx3D.CoEdgeMeshingProperty.geometrique):
-            gemp = Mgx3D.EdgeMeshingPropertyGeometric(emp)
-            center = gemp.getPolarCenter()
-            script += f'emp = Mgx3D.EdgeMeshingPropertyGeometric({gemp.getNbEdges()}, {gemp.getRatio()}, Mgx3D.Point({center.getX()}, {center.getY()}, {center.getZ()}), {gemp.getDirect()}, {gemp.initWithFirstEdge()}, {gemp.getFirstEdgeLength()})\n'
-        else:
-            raise ValueError(f"Loi de maillage pour les arêtes non traitée: {law}")
-        script += f"tm.setMeshingProperty (emp, [coedges_mapping['{coedge}']])\n"
 
     script += "# Création des cofaces\n"
     script += "cofaces_mapping = dict()\n"
@@ -193,13 +216,13 @@ def generer_script(ctx, export_folder):
         is_structured = "False" if coface in tm.getUnstructuredFaces() else "True"
         script += f'cmd = tm.newCoFace(coface_edges, [{", ".join(coface_vertices)}],{is_structured}, {has_hole})\n'
         script += 'f = cmd.getFaces()[0]\n'
-        groups = tm.getInfos(coface, 2).groups()
+        groups = getTopoGroups(coface, 2)
         if 'Hors_Groupe_2D' in groups:
             groups.remove('Hors_Groupe_2D')
         if groups != []:
             for group in groups:
                 script += f"tm.addToGroup ([f], 2, \"{group}\")\n"
-        geom_entity = tm.getInfos(coface, 2).geom_entity
+        geom_entity = getGeomEntity(coface, 2)
         if geom_entity:
             script += f"# La coface {coface} est associée à l'entité géométrique {geom_entity}\n"
             script += f"tm.setGeomAssociation([f], find_in_dicts('{geom_entity}'), False)\n"
@@ -218,6 +241,31 @@ def generer_script(ctx, export_folder):
     script += "print(cofaces_mapping, '\\n')\n\n"
     script += "\n"
     
+    script += "# Application des propriétés de maillage sur les arêtes\n"
+    for coedge in tm.getCoEdges():
+        script += f'# Discrétisation de l\'arête {coedge}\n'
+        emp = tm.getEdgeMeshingProperty(coedge)
+        law = emp.getMeshLaw()
+        if (law == Mgx3D.CoEdgeMeshingProperty.uniforme):
+            uemp = Mgx3D.EdgeMeshingPropertyUniform(emp)
+            script += f'emp = Mgx3D.EdgeMeshingPropertyUniform({uemp.getNbEdges()})\n'
+        elif (law == Mgx3D.CoEdgeMeshingProperty.geometrique):
+            gemp = Mgx3D.EdgeMeshingPropertyGeometric(emp)
+            center = gemp.getPolarCenter()
+            script += f'emp = Mgx3D.EdgeMeshingPropertyGeometric({gemp.getNbEdges()}, {gemp.getRatio()}, Mgx3D.Point({center.getX()}, {center.getY()}, {center.getZ()}), {gemp.getDirect()}, {gemp.initWithFirstEdge()}, {gemp.getFirstEdgeLength()})\n'
+        elif (law == Mgx3D.CoEdgeMeshingProperty.interpolate):
+            iemp = Mgx3D.EdgeMeshingPropertyInterpolate(emp)
+            if (len(iemp.getCoEdges()) > 0):
+                script += f'emp = Mgx3D.EdgeMeshingPropertyInterpolate({giemp.getNbEdges()}, [", ".join([coedges_mapping[coedge] for coedge in {iemp.getCoEdges()}])])\n'
+            else:
+                script += f'emp = Mgx3D.EdgeMeshingPropertyInterpolate({giemp.getNbEdges()}, cofaces_mapping["{iemp.getCoface()}"])\n'  
+        elif (law == Mgx3D.CoEdgeMeshingProperty.globalinterpolate):
+            giemp = Mgx3D.EdgeMeshingPropertyGlobalInterpolate(emp)
+            script += f'emp = Mgx3D.EdgeMeshingPropertyGlobalInterpolate({giemp.getNbEdges()}, [", ".join([coedges_mapping[coedge] for coedge in {giemp.getFirstCoEdges()}])], [", ".join([coedges_mapping[coedge] for coedge in {giemp.getSecondCoEdges()}])])\n'
+        else:
+            raise ValueError(f"Loi de maillage pour les arêtes non traitée: {law}")
+        script += f"tm.setMeshingProperty (emp, [coedges_mapping['{coedge}']])\n"
+
     script += "# Création des faces\n"
     script += "faces_mapping = dict()\n"
 
@@ -276,7 +324,7 @@ def generer_script(ctx, export_folder):
             block_faces = [f'faces_mapping["{face}"]' for face in blocks_faces_0[block]]
             script += f'cmd = tm.newBlock([{", ".join(block_faces)}], [{", ".join(block_vertices)}], {"False" if block in tm.getUnstructuredBlocks() else "True"}, "")\n'
         script += 'b = cmd.getBlocks()[0]\n'
-        geom_entity = tm.getInfos(block, 3).geom_entity
+        geom_entity = getGeomEntity(block, 3)
         if geom_entity:
             script += f"# Le bloc {block} est associé à l'entité géométrique {geom_entity}\n"
             script += f"tm.setGeomAssociation([b], find_in_dicts('{geom_entity}'), False)\n"
@@ -300,14 +348,34 @@ def generer_script(ctx, export_folder):
     return script
 
 if __name__ == "__main__":
-    ctx = Mgx3D.getStdContext()
-    gm = ctx.getGeomManager()
-    
-    if len(sys.argv) < 2:
-        print("Usage: python export.py <nom_du_script>")
+    if len(sys.argv) < 3:
+        print("Usage: python export.py <nom_du_script> <version_de_Magix3D>")
         sys.exit(1)
 
     script = sys.argv[1]  # Récupère le nom du script à exécuter
+    magix3d_version = sys.argv[2]  # Récupère la version de Magix3D (ex: "2.5.0")
+    print(f"Exécution du script {script} avec Magix3D version {magix3d_version}...")
+
+    magix3d_path_variable = f"magix3d_{magix3d_version.replace('.', '')}_path"
+
+    if magix3d_path_variable in globals():
+        module_path = globals()[magix3d_path_variable]
+    else:
+        print(f"Erreur : la variable de chemin pour Magix3D version {magix3d_version} n'est pas définie dans le script.")
+        sys.exit(1)
+
+    if os.path.exists(module_path):
+        if module_path not in sys.path:
+            sys.path.append(module_path)
+    else:
+        print(f"Erreur : le chemin du module python Magix3D {magix3d_version} est introuvable ({module_path}).")
+        sys.exit(1)
+
+    import pyMagix3D as Mgx3D
+
+    ctx = Mgx3D.getStdContext()
+    gm = ctx.getGeomManager()
+
     script_file = os.path.abspath(script)
     path = os.path.dirname(script_file)
     file = os.path.basename(script_file)
@@ -345,7 +413,7 @@ if __name__ == "__main__":
                 print(brep_file_name)
                 gm.exportBREP ([volume], brep_file_name)
             
-            generated_script = generer_script(ctx, export_folder)
+            generated_script = generer_script(ctx)
             generated_script_file_name = f"{export_folder}/{file.replace('.py', '_generated.py')}"
             # Sauvegarde du script généré
             with open(generated_script_file_name, "w") as f:
