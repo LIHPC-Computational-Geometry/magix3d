@@ -1004,7 +1004,7 @@ computeBoundingBox(const TopoDS_Shape& shape, gp_Pnt& pmin, gp_Pnt& pmax)
 {
     Bnd_Box box;
 
-    BRepBndLib::AddOptimal(shape, box);
+    BRepBndLib::AddOptimal(shape, box, false);
     double xmin, ymin, zmin, xmax, ymax, zmax;
     box.Get(xmin, ymin, zmin, xmax, ymax, zmax);
     pmin.SetCoord(xmin, ymin, zmin);

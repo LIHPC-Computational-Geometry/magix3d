@@ -1,8 +1,5 @@
 import pyMagix3D as Mgx3D
 
-# Issue 228 : L'ordre des entités créées par la commande sectionByPlane peut varier d'une exécution à l'autre
-# Corrigé par le nouveau calcul de boite englobante
-# NB : les ids des surfaces sont impactés
 def test_order_join_curves():
 	ctx = Mgx3D.getStdContext()
 	ctx.clearSession() # Clean the session after the previous test
@@ -20,12 +17,11 @@ def test_order_join_curves():
 	gm.translateAll(Mgx3D.Vector(1, 0, 0))
 	# Homothétie de tout
 	gm.scaleAll(1.000000e+00, 2.000000e+00, 3.000000e+00)
-
 	# Fusion Booléenne de  Vol0009 Vol0006 Vol0005 Vol0010 Vol0008 ... 
 	gm.fuse (["Vol0005","Vol0006","Vol0007","Vol0008","Vol0009","Vol0010"])
 	gm.joinSurfaces (["Surf0020","Surf0021","Surf0022","Surf0023","Surf0024","Surf0025"])
-	gm.joinSurfaces (["Surf0026","Surf0031","Surf0033","Surf0034","Surf0036","Surf0038"])
-	gm.joinSurfaces (["Surf0017","Surf0018","Surf0019","Surf0039","Surf0040","Surf0041","Surf0042"])
+	gm.joinSurfaces (["Surf0027","Surf0032","Surf0035","Surf0036","Surf0039","Surf0042"])
+	gm.joinSurfaces (["Surf0013","Surf0014","Surf0018","Surf0026","Surf0034","Surf0038","Surf0040"])
 	gm.joinCurves (["Crb0020","Crb0021","Crb0024","Crb0040","Crb0043","Crb0045","Crb0050"])
 	gm.joinCurves (["Crb0013","Crb0014","Crb0018","Crb0026","Crb0028","Crb0030","Crb0038"])
 

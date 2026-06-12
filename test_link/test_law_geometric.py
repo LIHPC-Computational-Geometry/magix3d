@@ -196,25 +196,28 @@ def test_law_geometric_onSurface(capfd):
     ctx.getGeomManager().newCylinder (Mgx3D.Point(1.5, 0, 0), 1, Mgx3D.Vector(0, 0, 4), 3.600000e+02)
     # Fusion Booléenne de  Vol0001 Vol0000
     ctx.getGeomManager ( ).fuse (["Vol0001","Vol0000"])
-    # Fusion de surfaces Surf0006 Surf0010 Surf0012
-    ctx.getGeomManager ( ).joinSurfaces (["Surf0006","Surf0010","Surf0012"])
-    # Fusion de surfaces Surf0007 Surf0011 Surf0013
-    ctx.getGeomManager ( ).joinSurfaces (["Surf0007","Surf0011","Surf0013"])
-    # Fusion de surfaces Surf0008 Surf0009 Surf0014
-    ctx.getGeomManager ( ).joinSurfaces (["Surf0008","Surf0009", "Surf0014"])
-    # Fusion de courbes Crb0006 Crb0007 Crb0016
-    ctx.getGeomManager ( ).joinCurves (["Crb0006", "Crb0007","Crb0016"])
+    # Fusion de surfaces Surf0007 Surf0010 Surf0012
+    ctx.getGeomManager ( ).joinSurfaces (["Surf0007","Surf0010","Surf0012"])
+    # Fusion de surfaces Surf0008 Surf0011 Surf0014
+    ctx.getGeomManager ( ).joinSurfaces (["Surf0008","Surf0011","Surf0014"])
+    # Fusion de surfaces Surf0006 Surf0013
+    ctx.getGeomManager ( ).joinSurfaces (["Surf0006","Surf0013"])
+    # Fusion de surfaces Surf0017 Surf0009
+    ctx.getGeomManager ( ).joinSurfaces (["Surf0017","Surf0009"])
+    # Fusion de courbes Crb0006 Crb0016
+    ctx.getGeomManager ( ).joinCurves (["Crb0006","Crb0016"])
     # Fusion de courbes Crb0018 Crb0009 Crb0008
     ctx.getGeomManager ( ).joinCurves (["Crb0018","Crb0009","Crb0008"])
-
-        # Création d'un bloc topologique structuré sans projection (Vol0002)
+    # Fusion de courbes Crb0020 Crb0007
+    ctx.getGeomManager ( ).joinCurves (["Crb0020","Crb0007"])
+    # Création d'un bloc topologique structuré sans projection (Vol0002)
     ctx.getTopoManager().newFreeTopoOnGeometry ("Vol0002")
     # Découpage suivant Ar0011 des blocs Bl0000
     ctx.getTopoManager().splitBlocks (["Bl0000"],"Ar0011", .5)
     # Affectation d'une projection vers Surf0018 pour les entités topologiques Ar0023
-    ctx.getTopoManager ( ).setGeomAssociation (["Ar0023"], "Surf0017", True)
+    ctx.getTopoManager ( ).setGeomAssociation (["Ar0023"], "Surf0018", True)
     # Affectation d'une projection vers Surf0018 pour les entités topologiques Ar0022
-    ctx.getTopoManager ( ).setGeomAssociation (["Ar0022"], "Surf0017", True)
+    ctx.getTopoManager ( ).setGeomAssociation (["Ar0022"], "Surf0018", True)
 
     # Changement de discrétisation pour les arêtes Ar0023
     emp = Mgx3D.EdgeMeshingPropertyGeometric(10, 1.1, True, True, s1_ar0023)
@@ -241,7 +244,7 @@ def test_law_geometric_onSurface(capfd):
     # target meshing edge size (not respected)
     assert( abs(l2_norme(n9, n143) - s1_ar0023) > eps )
     # real meshing edge size
-    assert( abs(l2_norme(n9, n143) - 3.94428397846855e-3) < eps )
+    assert( abs(l2_norme(n9, n143) - 3.94206709724702e-3) < eps )
 
     # test of first mesh edge size of topo edge Ar0022
     n8   = mesh_lima.noeud(8)
@@ -249,7 +252,7 @@ def test_law_geometric_onSurface(capfd):
     # target meshing edge size (not respected)
     assert( abs(l2_norme(n8, n142) - s1_ar0022) > eps )
     # real meshing edge size
-    assert( abs(l2_norme(n8, n142) - 2.12743146085374) < eps )
+    assert( abs(l2_norme(n8, n142) - 2.12853778510894) < eps )
 
     os.remove(filename)
 
