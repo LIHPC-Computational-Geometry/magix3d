@@ -40,11 +40,8 @@ private:
     void writeFaces(std::ofstream& str, std::vector<Topo::CoFace*> faces);
     void writeBlocks(std::ofstream& str, std::vector<Topo::Block*> blocks);
 
-    void writeAssociationNodes(std::ofstream &str, const std::vector<Topo::Vertex*>& vs);
-    void writeAssociationEdges(std::ofstream &str, const std::vector<Topo::CoEdge*>& es);
-    void writeAssociationFaces(std::ofstream &str, const std::vector<Topo::CoFace*>& fs);
-    void writeAssociationBlocks(std::ofstream &str, const std::vector<Topo::Block*>& bs);
-
+    template <typename T, typename = std::enable_if_t<std::is_base_of<TopoEntity, T>::value>>
+    void writeAssociations(std::ofstream &str, const std::string title, const std::vector<T*>& v, const std::map<std::string, std::vector<int>> geom_id_2_brep_indices);
 
     /// contexte d'exécution
     Internal::Context& m_context;
@@ -53,14 +50,10 @@ private:
     std::string m_filename;
 
     /// si oui ou non l'association géometrique est activée
-    bool with_geom;
+    bool m_with_geom;
 
     /// stockage des noms des entités topo vers un id local à écrire
-    std::map<std::string, int> m_node_ids_mapping;
-    std::map<std::string, int> m_edge_ids_mapping;
-    std::map<std::string, int> m_face_ids_mapping;
-    std::map<std::string, int> m_block_ids_mapping;
-
+    std::map<std::string, int> m_ids_mapping;
 };
 }
 }
