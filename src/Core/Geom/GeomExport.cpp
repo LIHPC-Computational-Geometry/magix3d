@@ -47,6 +47,7 @@ void GeomExport::perform(Internal::InfoCommand* icmd)
     	for(unsigned int i=0;i<vols.size();i++)
     	{
     		Volume* ge = vols[i];
+			m_geomEntities.push_back(ge);
     		addGeomEntityToExport(ge);
     	}
 
@@ -59,6 +60,7 @@ void GeomExport::perform(Internal::InfoCommand* icmd)
     		Surface* ge = surfs[i];
     		auto adj_vol = ge->getVolumes();
     		if(adj_vol.empty()){
+				m_geomEntities.push_back(ge);
     			addGeomEntityToExport(ge);
     		}
     	}
@@ -72,6 +74,7 @@ void GeomExport::perform(Internal::InfoCommand* icmd)
     		Curve* ge = curvs[i];
     		auto adj_surf = ge->getSurfaces();
     		if(adj_surf.empty()){
+				m_geomEntities.push_back(ge);
     			addGeomEntityToExport(ge);
     		}
     	}
@@ -85,6 +88,7 @@ void GeomExport::perform(Internal::InfoCommand* icmd)
     		Vertex* ge = verts[i];
     		auto adj_curves = ge->getCurves();
     		if(adj_curves.empty()){
+				m_geomEntities.push_back(ge);
     			addGeomEntityToExport(ge);
     		}
     	}
