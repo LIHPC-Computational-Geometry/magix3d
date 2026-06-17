@@ -371,7 +371,7 @@ Les algorithmes pour les discrétisations :
    listes de nœuds des 2 listes. La forme de l’arête est alors une
    interpolation entre les formes des autres arêtes.
 
--  *Avec progressions géométriques*, comme pour celle *avec progression
+-  *Avec progressions bi-géométriques*, comme pour celle *avec progression
    géométrique*, mais dans ce cas avec une progression à chaque
    extrémité. Il est possible de demander une longueur nulle à l’une des
    extrémités, dans ce cas la discrétisation sera uniforme à cette
@@ -389,6 +389,13 @@ Les algorithmes pour les discrétisations :
    d’obtenir une progression à une extrémité et est uniforme à l’autre.
    Elle est comparable à celle dite *avec progressions géométriques*
    dans le cas uniforme à une extrémité.
+
+-  *Avec progression bi-exponentielle*, Cette loi permet de définir,
+   pour une arête topologique, la taille de la première et de la dernière arête du maillage.
+   Deux lois permettent déjà d'y parvenir : la loi *bi-géométrique* et la loi *hyperbolique*.
+   Cependant, pour certaines plages de valeurs, elles ne fonctionnent pas correctement.
+   Elles peuvent également générer un maillage qui ne respecte pas les tailles demandées.
+
 
 Il est possible d’imposer un certain nombre de couches (donc de nœuds)
 orthogonales à la surface à l’une des extrémités.
