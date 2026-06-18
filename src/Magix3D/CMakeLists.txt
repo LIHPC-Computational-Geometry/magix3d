@@ -80,3 +80,12 @@ install (
     TYPE BIN
    )
 
+# Remplace les points par rien pour obtenir "263" à partir de "2.6.3"
+string(REPLACE "." "" MAGIX3D_VERSION_NO_DOTS "${MAGIX3D_VERSION}")
+
+configure_file(cmake/generate_import.py.in ${CMAKE_CURRENT_BINARY_DIR}/${CURRENT_PACKAGE_NAME}/generate_import.py @ONLY)
+install (
+    PROGRAMS
+    ${CMAKE_CURRENT_BINARY_DIR}/${CURRENT_PACKAGE_NAME}/generate_import.py
+    TYPE BIN
+   )

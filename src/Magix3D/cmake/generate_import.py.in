@@ -2,10 +2,8 @@ import os
 import sys
 from collections import defaultdict
 
-magix3d_250_path = "/chemin/vers/le/dossier/contenant/pyMagix3D"
-magix3d_260_path = "/chemin/vers/le/dossier/contenant/pyMagix3D"
-magix3d_263_path = "/home/oudotmp/wksMagix3D/spack/opt/spack/linux-ubuntu22.04-skylake/gcc-11.4.0/magix3d-2.6.3-dmawlilkl4e4fi6mduz6o75xa65nurmw/lib/python3.11/site-packages"  # Remplace par le chemin absolu
-current_version = "2.6.3"
+magix3d_@MAGIX3D_VERSION_NO_DOTS@_path = "@CMAKE_INSTALL_PREFIX@/@MAGIX3D_BINDING_INSTALL_DIR@"
+current_version = "@MAGIX3D_VERSION@"
 
 # pour gérer les différences d'API entre les différentes versions de Magix3D
 def getGeomGroups(entity, dimension):
@@ -41,7 +39,7 @@ def generer_script(ctx):
     magix3d_path_variable = f"magix3d_{current_version.replace('.', '')}_path"
     module_path = globals()[magix3d_path_variable]
 
-    script += f"module_path = \"{module_path}\"  # Remplace par le chemin absolu\n"
+    script += f"module_path = \"{module_path}\"\n"
     script += "if os.path.exists(module_path):\n"
     script += "    if module_path not in sys.path:\n"
     script += "        sys.path.append(module_path)\n"
@@ -73,10 +71,9 @@ def generer_script(ctx):
             groups.remove('Hors_Groupe_0D')
         point_file_name = f"{brep_folder}/{vertex + '.brep'}"
         script += f'cmd = gm.newVertexFromBrep("{point_file_name}")\n'
-        script += 'point = cmd.getVertices()[0]\n'
         for group in groups:
             point_groups[group].append(vertex)
-        script += f'points_mapping["{vertex}"] = point\n'
+        script += f'points_mapping["{vertex}"] = cmd.getVertices()[0]\n'
 
     if len(point_groups) > 0:
         script += "\n# Définition des groupes de points\n"
@@ -100,12 +97,11 @@ def generer_script(ctx):
             extrema_last_point = gm.getInfos(curve, 1).vertices()[-1]
             script += f'# Création de la courbe {curve}\n'
             script += f'cmd = gm.newCurveFromBrep("{curve_file_name}", points_mapping["{extrema_first_point}"], points_mapping["{extrema_last_point}"])\n'
-            script += 'curve = cmd.getCurves()[0]\n'
             for group in groups:
                 curve_groups[group].append(curve)
-            script += f'curves_mapping["{curve}"] = curve\n'
+            script += f'curves_mapping["{curve}"] = cmd.getCurves()[0]\n'
         else:
-            print(f"Attention : la courbe {curve} n'a pas été créée car elle n'a pas 1 ou 2 extrémités (nombre d'extrémités trouvées : {len(gm.getInfos(curve, 1).vertices())}).\n")    
+            script += f'print(f"Attention : la courbe {curve} n\'a pas été créée car elle n\'a pas 1 ou 2 extrémités (nombre d\'extrémités trouvées : {len(gm.getInfos(curve, 1).vertices())}).")\n'
 
     if len(curve_groups) > 0:
         script += "\n# Définition des groupes de courbes\n"
@@ -126,10 +122,9 @@ def generer_script(ctx):
             groups.remove('Hors_Groupe_2D')
         surface_file_name = f"{brep_folder}/{surface + '.brep'}"
         script += f'cmd = gm.newSurfaceFromBrep("{surface_file_name}")\n'
-        script += 'surface = cmd.getSurfaces()[0]\n'
         for group in groups:
             surface_groups[group].append(surface)
-        script += f'surfaces_mapping["{surface}"] = surface\n'
+        script += f'surfaces_mapping["{surface}"] = cmd.getSurfaces()[0]\n'
 
     if len(surface_groups) > 0:
         script += "\n# Définition des groupes de surfaces\n"
@@ -150,10 +145,9 @@ def generer_script(ctx):
             groups.remove('Hors_Groupe_3D')
         volume_file_name = f"{brep_folder}/{volume + '.brep'}"
         script += f'cmd = gm.newVolumeFromBrep("{volume_file_name}")\n'
-        script += 'volume = cmd.getVolumes()[0]\n'
         for group in groups:
             volume_groups[group].append(volume)
-        script += f'volumes_mapping["{volume}"] = volume\n'
+        script += f'volumes_mapping["{volume}"] = cmd.getVolumes()[0]\n'
 
     if len(volume_groups) > 0:
         script += "\n# Définition des groupes de volumes\n"
@@ -307,13 +301,13 @@ def generer_script(ctx):
         elif (law == Mgx3D.CoEdgeMeshingProperty.interpolate):
             iemp = Mgx3D.EdgeMeshingPropertyInterpolate(emp)
             if (len(iemp.getCoEdges()) > 0):
-                edge_emps[("interpolate", giemp.getNbEdges(), iemp.getCoEdges())].append(coedge)
-                edge_emps_value[("interpolate", giemp.getNbEdges(), iemp.getCoEdges())] = f'emp = Mgx3D.EdgeMeshingPropertyInterpolate({giemp.getNbEdges()}, [", ".join([coedges_mapping[coedge] for coedge in {iemp.getCoEdges()}])])\n'
-                #script += f'emp = Mgx3D.EdgeMeshingPropertyInterpolate({giemp.getNbEdges()}, [", ".join([coedges_mapping[coedge] for coedge in {iemp.getCoEdges()}])])\n'
+                edge_emps[("interpolate", iemp.getNbEdges(), iemp.getCoEdges())].append(coedge)
+                edge_emps_value[("interpolate", iemp.getNbEdges(), iemp.getCoEdges())] = f'emp = Mgx3D.EdgeMeshingPropertyInterpolate({iemp.getNbEdges()}, [", ".join([coedges_mapping[coedge] for coedge in {iemp.getCoEdges()}])])\n'
+                #script += f'emp = Mgx3D.EdgeMeshingPropertyInterpolate({iemp.getNbEdges()}, [", ".join([coedges_mapping[coedge] for coedge in {iemp.getCoEdges()}])])\n'
             else:
-                edge_emps[("interpolate", giemp.getNbEdges(), iemp.getCoface())].append(coedge)
-                edge_emps_value[("interpolate", giemp.getNbEdges(), iemp.getCoface())] = f'emp = Mgx3D.EdgeMeshingPropertyInterpolate({giemp.getNbEdges()}, cofaces_mapping["{iemp.getCoface()}"])\n'
-                #script += f'emp = Mgx3D.EdgeMeshingPropertyInterpolate({giemp.getNbEdges()}, cofaces_mapping["{iemp.getCoface()}"])\n'  
+                edge_emps[("interpolate", iemp.getNbEdges(), iemp.getCoFace())].append(coedge)
+                edge_emps_value[("interpolate", iemp.getNbEdges(), iemp.getCoFace())] = f'emp = Mgx3D.EdgeMeshingPropertyInterpolate({iemp.getNbEdges()}, cofaces_mapping["{iemp.getCoface()}"])\n'
+                #script += f'emp = Mgx3D.EdgeMeshingPropertyInterpolate({iemp.getNbEdges()}, cofaces_mapping["{iemp.getCoface()}"])\n'  
         elif (law == Mgx3D.CoEdgeMeshingProperty.globalinterpolate):
             giemp = Mgx3D.EdgeMeshingPropertyGlobalInterpolate(emp)
             edge_emps[("globalinterpolate", giemp.getNbEdges(), giemp.getFirstCoEdges(), giemp.getSecondCoEdges())].append(coedge)
@@ -408,13 +402,14 @@ def generer_script(ctx):
     script += "print(\"Correspondance des blocs:\")\n"
     script += "print(blocks_mapping, '\\n')\n\n"
 
-    script += "\n# Création du maillage pour tous les blocs\n"
-    script += "mm.newAllBlocksMesh()\n"
-    script += "nbRegions = mm.getNbRegions()\n"
-    script += f"if nbRegions == {mm.getNbRegions()}:\n"
-    script += "    print('Nombre de mailles identique.')\n"
-    script += "else:\n"
-    script += f"    print('Différence du nombre de mailles : ' + str(nbRegions) + ' vs {mm.getNbRegions()}.')\n"
+    if mm.getNbRegions() > 0:
+        script += "\n# Création du maillage pour tous les blocs\n"
+        script += "mm.newAllBlocksMesh()\n"
+        script += "nbRegions = mm.getNbRegions()\n"
+        script += f"if nbRegions == {mm.getNbRegions()}:\n"
+        script += "    print('Nombre de mailles identique.')\n"
+        script += "else:\n"
+        script += f"    print('Différence du nombre de mailles : ' + str(nbRegions) + ' vs {mm.getNbRegions()}.')\n"
 
     return script
 
@@ -457,6 +452,7 @@ if __name__ == "__main__":
         with open(script_file, "r") as script_file:
             code = script_file.read()
             # Exécuter le script dans le contexte global actuel
+
             exec(code)
 
             # création du répertoire de sortie s'il n'existe pas
