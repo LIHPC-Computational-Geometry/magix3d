@@ -297,17 +297,14 @@ def generer_script(ctx):
             center = gemp.getPolarCenter()
             edge_emps[("geometrique", gemp.getNbEdges(), gemp.getRatio(), center.getX(), center.getY(), center.getZ(), gemp.getDirect(), gemp.initWithFirstEdge(), gemp.getFirstEdgeLength())].append(coedge)
             edge_emps_value[("geometrique", gemp.getNbEdges(), gemp.getRatio(), center.getX(), center.getY(), center.getZ(), gemp.getDirect(), gemp.initWithFirstEdge(), gemp.getFirstEdgeLength())] = f'emp = Mgx3D.EdgeMeshingPropertyGeometric({gemp.getNbEdges()}, {gemp.getRatio()}, Mgx3D.Point({center.getX()}, {center.getY()}, {center.getZ()}), {gemp.getDirect()}, {gemp.initWithFirstEdge()}, {gemp.getFirstEdgeLength()})\n'
-            #script += f'emp = Mgx3D.EdgeMeshingPropertyGeometric({gemp.getNbEdges()}, {gemp.getRatio()}, Mgx3D.Point({center.getX()}, {center.getY()}, {center.getZ()}), {gemp.getDirect()}, {gemp.initWithFirstEdge()}, {gemp.getFirstEdgeLength()})\n'
         elif (law == Mgx3D.CoEdgeMeshingProperty.interpolate):
             iemp = Mgx3D.EdgeMeshingPropertyInterpolate(emp)
             if (len(iemp.getCoEdges()) > 0):
                 edge_emps[("interpolate", iemp.getNbEdges(), iemp.getCoEdges())].append(coedge)
                 edge_emps_value[("interpolate", iemp.getNbEdges(), iemp.getCoEdges())] = f'emp = Mgx3D.EdgeMeshingPropertyInterpolate({iemp.getNbEdges()}, [", ".join([coedges_mapping[coedge] for coedge in {iemp.getCoEdges()}])])\n'
-                #script += f'emp = Mgx3D.EdgeMeshingPropertyInterpolate({iemp.getNbEdges()}, [", ".join([coedges_mapping[coedge] for coedge in {iemp.getCoEdges()}])])\n'
             else:
                 edge_emps[("interpolate", iemp.getNbEdges(), iemp.getCoFace())].append(coedge)
-                edge_emps_value[("interpolate", iemp.getNbEdges(), iemp.getCoFace())] = f'emp = Mgx3D.EdgeMeshingPropertyInterpolate({iemp.getNbEdges()}, cofaces_mapping["{iemp.getCoface()}"])\n'
-                #script += f'emp = Mgx3D.EdgeMeshingPropertyInterpolate({iemp.getNbEdges()}, cofaces_mapping["{iemp.getCoface()}"])\n'  
+                edge_emps_value[("interpolate", iemp.getNbEdges(), iemp.getCoFace())] = f'emp = Mgx3D.EdgeMeshingPropertyInterpolate({iemp.getNbEdges()}, cofaces_mapping["{iemp.getCoFace()}"])\n'
         elif (law == Mgx3D.CoEdgeMeshingProperty.globalinterpolate):
             giemp = Mgx3D.EdgeMeshingPropertyGlobalInterpolate(emp)
             edge_emps[("globalinterpolate", giemp.getNbEdges(), giemp.getFirstCoEdges(), giemp.getSecondCoEdges())].append(coedge)
