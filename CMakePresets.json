@@ -35,6 +35,7 @@
         },
         {
             "name": "spack-env",
+            "generator": "Ninja",
             "binaryDir": "${sourceDir}/build",
             "installDir": "${sourceDir}/install",
             "cacheVariables": {
