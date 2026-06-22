@@ -1,52 +1,55 @@
 {
     "version": 3,
     "configurePresets": [
-      {
-        "name": "ci",
-        "cacheVariables": {
-          "TRITON": "ON",
-          "T_INTERNAL_EXTENSION": "not_defined",
-          "ERD_INTERNAL_EXTENSION": "not_defined",
-          "USER_TEAM": "undef_user_team",
-          "DOXYGEN_PATH": "not_defined",
-          "DKOC_LICENCE": "unavailable",
-          "GUIToolkitsVariables_ROOT": "$env{INSTALL_DIR}/guitoolkitsvariables",
-          "VtkContrib_ROOT": "$env{INSTALL_DIR}/vtkcontrib",
-          "VTK_ROOT": "$env{INSTALL_DIR}/VTK-7.1.1",
-          "TkUtil_ROOT": "$env{INSTALL_DIR}/tkutil",
-          "TkUtilScripting_ROOT": "$env{INSTALL_DIR}/tkutil",
-          "PrefsXerces_ROOT": "$env{INSTALL_DIR}/preferences",
-          "PrefsQt_ROOT": "$env{INSTALL_DIR}/preferences",
-          "PythonUtil_ROOT": "$env{INSTALL_DIR}/pythonutil",
-          "gmds_ROOT": "$env{INSTALL_DIR}/gmds",
-          "qualifinternal_ROOT": "$env{INSTALL_DIR}/qualif",
-          "GQGMDS_ROOT": "$env{INSTALL_DIR}/qqualif",
-          "QtQualif_ROOT": "$env{INSTALL_DIR}/qqualif",
-          "Lima_ROOT": "$env{INSTALL_DIR}/lima",
-          "QtUtil_ROOT": "$env{INSTALL_DIR}/qtutil",
-          "QwtCharts_ROOT": "$env{INSTALL_DIR}/qwtcharts",
-          "QtPython3_ROOT": "$env{INSTALL_DIR}/qtpython",
-          "QtVtk_ROOT": "$env{INSTALL_DIR}/qtvtk",
-          "OpenCASCADE_ROOT": "$env{INSTALL_DIR}/OCCT-7_8_1/",
-          "Cgns_ROOT": "$env{INSTALL_DIR}/CGNS-4.4.0",
-          "Mesquite_ROOT": "$env{INSTALL_DIR}/mesquite-2.99",
-          "CMAKE_PREFIX_PATH": "$env{INSTALL_DIR}/tetgen1.6.0;$env{INSTALL_DIR}/gmsh-4.13.1-Linux64-sdk"
+        {
+            "name": "ci",
+            "cacheVariables": {
+                "TRITON": "ON",
+                "T_INTERNAL_EXTENSION": "not_defined",
+                "ERD_INTERNAL_EXTENSION": "not_defined",
+                "USER_TEAM": "undef_user_team",
+                "DOXYGEN_PATH": "not_defined",
+                "DKOC_LICENCE": "unavailable",
+                "GUIToolkitsVariables_ROOT": "$env{INSTALL_DIR}/guitoolkitsvariables",
+                "VtkContrib_ROOT": "$env{INSTALL_DIR}/vtkcontrib",
+                "VTK_ROOT": "$env{INSTALL_DIR}/VTK-7.1.1",
+                "TkUtil_ROOT": "$env{INSTALL_DIR}/tkutil",
+                "TkUtilScripting_ROOT": "$env{INSTALL_DIR}/tkutil",
+                "PrefsXerces_ROOT": "$env{INSTALL_DIR}/preferences",
+                "PrefsQt_ROOT": "$env{INSTALL_DIR}/preferences",
+                "PythonUtil_ROOT": "$env{INSTALL_DIR}/pythonutil",
+                "gmds_ROOT": "$env{INSTALL_DIR}/gmds",
+                "qualifinternal_ROOT": "$env{INSTALL_DIR}/qualif",
+                "GQGMDS_ROOT": "$env{INSTALL_DIR}/qqualif",
+                "QtQualif_ROOT": "$env{INSTALL_DIR}/qqualif",
+                "Lima_ROOT": "$env{INSTALL_DIR}/lima",
+                "QtUtil_ROOT": "$env{INSTALL_DIR}/qtutil",
+                "QwtCharts_ROOT": "$env{INSTALL_DIR}/qwtcharts",
+                "QtPython3_ROOT": "$env{INSTALL_DIR}/qtpython",
+                "QtVtk_ROOT": "$env{INSTALL_DIR}/qtvtk",
+                "OpenCASCADE_ROOT": "$env{INSTALL_DIR}/OCCT-7_8_1/",
+                "Cgns_ROOT": "$env{INSTALL_DIR}/CGNS-4.4.0",
+                "Mesquite_ROOT": "$env{INSTALL_DIR}/mesquite-2.99",
+                "CMAKE_PREFIX_PATH": "$env{INSTALL_DIR}/tetgen1.6.0;$env{INSTALL_DIR}/gmsh-4.13.1-Linux64-sdk"
+            }
+        },
+        {
+            "name": "spack-env",
+            "binaryDir": "${sourceDir}/build",
+            "installDir": "${sourceDir}/install",
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "USE_TRITON": "ON",
+                "SMOOTH3D": "ON",
+                "USE_SMOOTH3D": "ON",
+                "WITH_DOC": "OFF",
+                "T_INTERNAL_EXTENSION": "not_defined",
+                "ERD_INTERNAL_EXTENSION": "not_defined",
+                "USER_TEAM": "undef_user_team",
+                "DOXYGEN_PATH": "not_defined",
+                "DKOC_LICENCE": "unavailable",
+                "CMAKE_PREFIX_PATH": "$env{HOME}/magix3d-spack-env"
+            }
         }
-      },
-      {
-        "name": "spack-env",
-        "cacheVariables": {
-          "USE_TRITON": "ON",
-          "SMOOTH3D": "ON",
-          "USE_SMOOTH3D": "ON",
-          "WITH_DOC": "OFF",
-          "T_INTERNAL_EXTENSION": "not_defined",
-          "ERD_INTERNAL_EXTENSION": "not_defined",
-          "USER_TEAM": "undef_user_team",
-          "DOXYGEN_PATH": "not_defined",
-          "DKOC_LICENCE": "unavailable",
-          "CMAKE_PREFIX_PATH": "$env{HOME}/magix3d-spack-env"
-        }
-      }
     ]
 }

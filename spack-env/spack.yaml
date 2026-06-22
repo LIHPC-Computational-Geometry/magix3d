@@ -13,7 +13,7 @@
 # You can then configure and compile Magix3D using CMake and the 
 # dedicated "spack-env" preset. Go into your Magix3D source directory
 # and enter the following commands:
-#   - cmake -S . -B build -DCMAKE_INSTALL_PREFIX=install --preset spack-env
+#   - cmake --preset spack-env
 #   - cmake --build build -j8 --target install
 #
 # Then Magix3D executable is available in the install/bin directory.
