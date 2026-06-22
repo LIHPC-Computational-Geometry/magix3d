@@ -5,6 +5,11 @@
         "name": "ci",
         "cacheVariables": {
           "TRITON": "ON",
+          "T_INTERNAL_EXTENSION": "not_defined",
+          "ERD_INTERNAL_EXTENSION": "not_defined",
+          "USER_TEAM": "undef_user_team",
+          "DOXYGEN_PATH": "not_defined",
+          "DKOC_LICENCE": "unavailable",
           "GUIToolkitsVariables_ROOT": "$env{INSTALL_DIR}/guitoolkitsvariables",
           "VtkContrib_ROOT": "$env{INSTALL_DIR}/vtkcontrib",
           "VTK_ROOT": "$env{INSTALL_DIR}/VTK-7.1.1",
@@ -25,12 +30,22 @@
           "OpenCASCADE_ROOT": "$env{INSTALL_DIR}/OCCT-7_8_1/",
           "Cgns_ROOT": "$env{INSTALL_DIR}/CGNS-4.4.0",
           "Mesquite_ROOT": "$env{INSTALL_DIR}/mesquite-2.99",
-          "CMAKE_PREFIX_PATH": "$env{INSTALL_DIR}/tetgen1.6.0;$env{INSTALL_DIR}/gmsh-4.13.1-Linux64-sdk",
+          "CMAKE_PREFIX_PATH": "$env{INSTALL_DIR}/tetgen1.6.0;$env{INSTALL_DIR}/gmsh-4.13.1-Linux64-sdk"
+        }
+      },
+      {
+        "name": "spack-env",
+        "cacheVariables": {
+          "USE_TRITON": "ON",
+          "SMOOTH3D": "ON",
+          "USE_SMOOTH3D": "ON",
+          "WITH_DOC": "OFF",
           "T_INTERNAL_EXTENSION": "not_defined",
           "ERD_INTERNAL_EXTENSION": "not_defined",
           "USER_TEAM": "undef_user_team",
           "DOXYGEN_PATH": "not_defined",
-          "DKOC_LICENCE": "unavailable" 
+          "DKOC_LICENCE": "unavailable",
+          "CMAKE_PREFIX_PATH": "$env{HOME}/magix3d-spack-env"
         }
       }
     ]

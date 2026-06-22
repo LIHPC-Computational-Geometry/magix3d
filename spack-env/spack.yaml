@@ -1,0 +1,67 @@
+#
+# This file contains the specification for a Spack environment 
+# that includes the dependencies required to compile Magix3D. 
+# It is useful for compiling with CMake during the development phase.
+#
+# To use it, do not forget to activate your Spack (setup-env) and then 
+# go to the directory containing this file (spack-env directory) and enter
+# the folowing commands:
+#   - spack env activate .
+#   - spack concretize -f
+#   - spack install
+#
+# You can then configure and compile Magix3D using CMake and the 
+# dedicated "spack-env" preset. Go into your Magix3D source directory
+# and enter the following commands:
+#   - cmake -S . -B build -DCMAKE_INSTALL_PREFIX=install --preset spack-env
+#   - cmake --build build -j8 --target install
+#
+# Then Magix3D executable is available in the install/bin directory.
+#
+# Of course, only the final compilation step needs to be repeated 
+# during your development process.
+#
+# Good luck !
+#
+
+spack:
+  definitions:
+  - packages:
+    - hdf5~mpi
+    - cgns~mpi
+    - mesquite~mpi
+    - vtk-maillage~opengl2+qt~mpi
+    - guitoolkitsvariables
+    - vtkcontrib
+    - tkutil
+    - preferences
+    - pythonutil
+    - gmds
+    - qualif
+    - qqualif
+    - lima
+    - qtutil
+    - qwtcharts
+    - qtpython
+    - qtvtk
+    - opencascade@7.8.1
+    - cgns
+    - mesquite
+    - tetgen
+    - smooth3d
+    - gmsh
+    - xerces-c
+    - libxt
+    - swig
+    
+  view:
+    vx1:
+      root: ${HOME}/magix3d-spack-env
+      link_type: symlink
+
+  specs:
+    - $packages
+    
+  concretizer:
+    unify: true
+
