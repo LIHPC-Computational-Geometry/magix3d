@@ -53,6 +53,11 @@ spack:
     - xerces-c
     - libxt
     - swig
+    - py-sphinx             # for doc
+    - py-sphinx-rtd-theme   # for doc
+    - py-breathe            # for doc
+    - py-sphinx-copybutton  # for doc
+    - py-rst2pdf            # for doc
     
   view:
     vx1:
