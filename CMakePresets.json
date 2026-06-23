@@ -49,7 +49,7 @@
                 "USER_TEAM": "undef_user_team",
                 "DOXYGEN_PATH": "not_defined",
                 "DKOC_LICENCE": "unavailable",
-                "CMAKE_PREFIX_PATH": "$env{HOME}/magix3d-spack-env"
+                "CMAKE_PREFIX_PATH": "$env{HOME}/magix3d-spack-view"
             }
         }
     ]
