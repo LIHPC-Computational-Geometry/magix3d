@@ -61,7 +61,7 @@ spack:
     
   view:
     vx1:
-      root: ${HOME}/magix3d-spack-env
+      root: ${HOME}/magix3d-spack-view
       link_type: symlink
 
   specs:
