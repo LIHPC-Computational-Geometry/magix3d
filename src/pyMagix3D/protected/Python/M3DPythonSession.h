@@ -37,7 +37,7 @@ namespace Python {
  * les instances de cette classe sont détruites.
  * </P>
  *
- * @author		Charles PIGNEROL, CEA/DAM/DSSI
+ * @author		Charles PIGNEROL
  */
 class M3DPythonSession : public IN_UTIL PythonSession
 {

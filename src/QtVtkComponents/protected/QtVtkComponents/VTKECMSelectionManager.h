@@ -19,7 +19,7 @@
  * <P>Cette classe repose uniquement sur des classes
  * <I>VTK</I> afin de pouvoir être utilisé dans n'importe quelle application.
  * </P>
- * @author		Charles PIGNEROL, CEA/DAM/DSSI
+ * @author		Charles PIGNEROL
  */
 class VTKECMSelectionManager
 {

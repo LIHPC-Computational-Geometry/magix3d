@@ -23,7 +23,7 @@ namespace Utils
 /** Classe d'acteur VTK assurant la jonction avec les entités Magix 3D
  * représentées (optimisation visant à limiter les temps de recherches
  * acteur -> entité, par exemple lors d'opérations de <I>picking</I>).
- * @author		Charles PIGNEROL, CEA/DAM/DSSI
+ * @author		Charles PIGNEROL
  */
 class VTKMgx3DActor : public vtkLODActor
 {

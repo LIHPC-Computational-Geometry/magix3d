@@ -31,7 +31,7 @@ class SelectionManagerObserver;
  * contexte.
  * </P>
  *
- * @author		Charles PIGNEROL, CEA/DAM/DSSI
+ * @author		Charles PIGNEROL
  */
 class SelectionManagerObserver
 {
@@ -170,7 +170,7 @@ class SelectionManagerObserver
  * <P>Cette classe n'offre pas de service de politique évènementielle de
  * gestion des évènements.
  * </P>
- * @author		Charles PIGNEROL, CEA/DAM/DSSI
+ * @author		Charles PIGNEROL
  */
 class SelectionManager
 {
