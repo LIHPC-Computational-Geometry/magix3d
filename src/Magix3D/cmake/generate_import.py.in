@@ -158,7 +158,7 @@ def generer_script(ctx):
     script += "print(\"Correspondance des volumes:\")\n"
     script += "print(volumes_mapping, '\\n')\n\n"
 
-    script += "def find_in_dicts(key):\n"
+    script += "def find_in_geom_dicts(key):\n"
     script += "    for d in points_mapping, curves_mapping, surfaces_mapping, volumes_mapping:\n"
     script += "            if key in d:\n"
     script += "                return d[key]\n"
@@ -168,11 +168,11 @@ def generer_script(ctx):
     script += "# Création des sommets\n"
     script += "vertices_mapping = dict()\n"
     vertex_groups = defaultdict(list)
+    associations = defaultdict(list)
     for vertex in tm.getVertices():
         script += f'# Création du sommet {vertex}\n'
         coord = tm.getCoord(vertex)
         script += f'cmd = tm.newTopoVertex(Mgx3D.Point({coord.getX()}, {coord.getY()}, {coord.getZ()}), "")\n'
-        script += 'v = cmd.getTopoVertices()[0]\n'
         groups = getTopoGroups(vertex, 0)
         if 'Hors_Groupe_0D' in groups:
             groups.remove('Hors_Groupe_0D')
@@ -180,9 +180,8 @@ def generer_script(ctx):
             vertex_groups[group].append(vertex)
         geom_entity = getGeomEntity(vertex, 0)
         if geom_entity:
-            script += f"# Le sommet {vertex} est associé à l'entité géométrique {geom_entity}\n"
-            script += f"tm.setGeomAssociation([v], find_in_dicts('{geom_entity}'), False)\n"
-        script += f'vertices_mapping["{vertex}"] = v\n'
+            associations[geom_entity].append(vertex)
+        script += f'vertices_mapping["{vertex}"] = cmd.getTopoVertices()[0]\n'
 
     if len(vertex_groups) > 0:
         script += "\n# Définition des groupes de sommets\n"
@@ -201,7 +200,6 @@ def generer_script(ctx):
         start_vertex = tm.getInfos(coedge, 1).vertices()[0]
         end_vertex = tm.getInfos(coedge, 1).vertices()[1]
         script += f'cmd = tm.newTopoEntity([vertices_mapping["{start_vertex}"], vertices_mapping["{end_vertex}"]], 1, "", True)\n'
-        script += 'e = cmd.getEdges()[0]\n'
         groups = getTopoGroups(coedge, 1)
         if 'Hors_Groupe_1D' in groups:
             groups.remove('Hors_Groupe_1D')
@@ -209,12 +207,8 @@ def generer_script(ctx):
             edge_groups[group].append(coedge)
         geom_entity = getGeomEntity(coedge, 1)
         if geom_entity:
-            script += "try:\n"
-            script += f"    # L'arête {coedge} est associée à l'entité géométrique {geom_entity}\n"
-            script += f"    tm.setGeomAssociation([e], find_in_dicts('{geom_entity}'), True)\n"
-            script += "except:\n"
-            script += "    pass\n"
-        script += f'coedges_mapping["{coedge}"] = e\n'
+            associations[geom_entity].append(coedge)
+        script += f'coedges_mapping["{coedge}"] = cmd.getEdges()[0]\n'
 
     if len(edge_groups) > 0:
         script += "\n# Définition des groupes d'arêtes\n"
@@ -250,7 +244,6 @@ def generer_script(ctx):
         coface_vertices = [f'vertices_mapping["{vertex}"]' for vertex in tm.getInfos(coface, 2).vertices()]
         is_structured = "False" if coface in tm.getUnstructuredFaces() else "True"
         script += f'cmd = tm.newCoFace({coface_edges}, [{", ".join(coface_vertices)}],{is_structured}, {has_hole})\n'
-        script += 'f = cmd.getFaces()[0]\n'
         groups = getTopoGroups(coface, 2)
         if 'Hors_Groupe_2D' in groups:
             groups.remove('Hors_Groupe_2D')
@@ -258,9 +251,8 @@ def generer_script(ctx):
             face_groups[group].append(coface)
         geom_entity = getGeomEntity(coface, 2)
         if geom_entity:
-            script += f"# La coface {coface} est associée à l'entité géométrique {geom_entity}\n"
-            script += f"tm.setGeomAssociation([f], find_in_dicts('{geom_entity}'), False)\n"
-        script += f'cofaces_mapping["{coface}"] = f\n'
+            associations[geom_entity].append(coface)
+        script += f'cofaces_mapping["{coface}"] = cmd.getFaces()[0]\n'
         # On remplit la liste des faces
         for face in tm.getInfos(coface, 2).faces():
             faces_cofaces_map[face].append(coface)
@@ -379,12 +371,10 @@ def generer_script(ctx):
             script += f'# Création du bloc {block} ayant pour faces {blocks_faces_0[block]} et pour sommets {tm.getInfos(block, 3).vertices()}\n'
             block_faces = [f'faces_mapping["{face}"]' for face in blocks_faces_0[block]]
             script += f'cmd = tm.newBlock([{", ".join(block_faces)}], [{", ".join(block_vertices)}], {"False" if block in tm.getUnstructuredBlocks() else "True"}, "")\n'
-        script += 'b = cmd.getBlocks()[0]\n'
         geom_entity = getGeomEntity(block, 3)
         if geom_entity:
-            script += f"# Le bloc {block} est associé à l'entité géométrique {geom_entity}\n"
-            script += f"tm.setGeomAssociation([b], find_in_dicts('{geom_entity}'), False)\n"
-        script += f'blocks_mapping["{block}"] = b\n'
+            associations[geom_entity].append(block)
+        script += f'blocks_mapping["{block}"] = cmd.getBlocks()[0]\n'
 
     if tm.getTransfiniteMeshLawBlocks():
         script += "emp = Mgx3D.BlockMeshingPropertyTransfinite()\n"
@@ -398,6 +388,18 @@ def generer_script(ctx):
     script += "\n"
     script += "print(\"Correspondance des blocs:\")\n"
     script += "print(blocks_mapping, '\\n')\n\n"
+
+    script += "def find_in_topo_dicts(key):\n"
+    script += "    for d in vertices_mapping, coedges_mapping, cofaces_mapping, blocks_mapping:\n"
+    script += "            if key in d:\n"
+    script += "                return d[key]\n"
+    script += "    # Si la clé n'est pas trouvée dans aucun dictionnaire\n"
+    script += "    return None\n\n"
+
+    script += "# Création des associations géométriques\n"
+    for geom_entity, topo_entities in associations.items():
+        script += f"# L'entité géométrique {geom_entity} est associée aux entités topologiques {topo_entities}\n"
+        script += f'tm.setGeomAssociation([{", ".join([f"find_in_topo_dicts({repr(entity)})" for entity in topo_entities])}], find_in_geom_dicts({repr(geom_entity)}), True)\n'
 
     if mm.getNbRegions() > 0:
         script += "\n# Création du maillage pour tous les blocs\n"
