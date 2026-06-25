@@ -234,7 +234,7 @@ def generer_script(ctx):
     for coface in tm.getCoFaces():
         script += f'# Création de la coface {coface}\n'
         edges_list = tm.getInfos(coface, 2).edges()
-        script += "coface_edges = []\n"
+        coface_edges = []
         has_hole = False
         for edge in edges_list:
             v1 = tm.getInfos(edge, 1).vertices()[0]
@@ -244,12 +244,12 @@ def generer_script(ctx):
             coedges = []
             for coedge in tm.getInfos(edge, 1).coedges():
                 coedges.append(f'coedges_mapping["{coedge}"]')
-            script += f"cmd = tm.newEdge(vertices_mapping['{v1}'], vertices_mapping['{v2}'], [{', '.join(coedges)}])\n"
-            script += f"coface_edges.append('Edge{edge_id:04d}')\n"
+            script += f"tm.newEdge(vertices_mapping['{v1}'], vertices_mapping['{v2}'], [{', '.join(coedges)}])\n"
+            coface_edges.append(f'Edge{edge_id:04d}')
             edge_id += 1
         coface_vertices = [f'vertices_mapping["{vertex}"]' for vertex in tm.getInfos(coface, 2).vertices()]
         is_structured = "False" if coface in tm.getUnstructuredFaces() else "True"
-        script += f'cmd = tm.newCoFace(coface_edges, [{", ".join(coface_vertices)}],{is_structured}, {has_hole})\n'
+        script += f'cmd = tm.newCoFace({coface_edges}, [{", ".join(coface_vertices)}],{is_structured}, {has_hole})\n'
         script += 'f = cmd.getFaces()[0]\n'
         groups = getTopoGroups(coface, 2)
         if 'Hors_Groupe_2D' in groups:
