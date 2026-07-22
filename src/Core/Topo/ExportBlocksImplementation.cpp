@@ -11,6 +11,7 @@
 #include "Topo/EdgeMeshingPropertyInterpolate.h"
 #include "Topo/EdgeMeshingPropertyBeta.h"
 #include "Topo/EdgeMeshingPropertyBiexponential.h"
+#include "Geom/ExportBREPImplementation.h"
 
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
@@ -19,9 +20,8 @@ namespace Topo {
 /*----------------------------------------------------------------------------*/
 ExportBlocksImplementation::
 ExportBlocksImplementation(Internal::Context& c, const std::string& n, const bool& with_geom)
-: m_context(c), m_filename(n), with_geom(with_geom)
+: m_context(c), m_filename(n), m_with_geom(with_geom)
 {}
-/*----------------------------------------------------------------------------*/
 /*----------------------------------------------------------------------------*/
 void ExportBlocksImplementation::perform(Internal::InfoCommand* icmd)
 {
@@ -51,12 +51,18 @@ void ExportBlocksImplementation::perform(Internal::InfoCommand* icmd)
     writeBlocks(str, blocks);
 
 
-    if(with_geom){
-        writeAssociationNodes(str, vertices);
-        writeAssociationEdges(str, edges);
-        writeAssociationFaces(str, faces);
-        writeAssociationBlocks(str, blocks);
-
+    if(m_with_geom){
+        // écriture du fichier BREP avec la géométrie et récupération des positions 
+        // des entités géométriques dans le compound du brep
+        size_t pos = m_filename.find_last_of('.');
+        std::string brep_filename = (pos != std::string::npos) ? m_filename.substr(0, pos) + ".brep" : m_filename + ".brep";
+        Geom::ExportBREPImplementation export_brep(m_context, brep_filename);
+        export_brep.perform(icmd);
+        const auto& geom_id_2_brep_indices = export_brep.getGeomId2BrepIndices();
+        writeAssociations(str, "Nodes", vertices, geom_id_2_brep_indices);
+        writeAssociations(str, "Edges", edges, geom_id_2_brep_indices);
+        writeAssociations(str, "Faces", faces, geom_id_2_brep_indices);
+        writeAssociations(str, "Blocks", blocks, geom_id_2_brep_indices);
     }
 
     str.close();
@@ -69,7 +75,7 @@ void ExportBlocksImplementation::writeNodes(std::ofstream &str, std::vector<Topo
         for(auto v : vertices){
             Utils::Math::Point p = v->getCoord();
             str << p.getX() <<  " " << p.getY() << " " << p.getZ() << "\n";
-            m_node_ids_mapping[v->getName()] = blk_node_id++;
+            m_ids_mapping[v->getName()] = blk_node_id++;
         }
         str  <<"\n\n";
 }
@@ -79,10 +85,10 @@ void ExportBlocksImplementation::writeEdges(std::ofstream &str, std::vector<Topo
 
         auto blk_edge_id = 0;
         for(auto e : edges){
-            int n0 = m_node_ids_mapping[e->getVertices()[0]->getName()];
-            int n1 = m_node_ids_mapping[e->getVertices()[1]->getName()];
+            int n0 = m_ids_mapping[e->getVertices()[0]->getName()];
+            int n1 = m_ids_mapping[e->getVertices()[1]->getName()];
             str << n0 <<  " " << n1 << "\n";
-            m_edge_ids_mapping[e->getName()] = blk_edge_id++;
+            m_ids_mapping[e->getName()] = blk_edge_id++;
         }
         str  << "Discr " << edges.size() << "\n";
         for(auto e : edges){
@@ -117,10 +123,10 @@ void ExportBlocksImplementation::writeEdges(std::ofstream &str, std::vector<Topo
                     if(!dynamic_cast<EdgeMeshingPropertyInterpolate*>(prop)->getCoEdges().empty()){
                         str << " 0 [ ";
                         for(auto e_name : dynamic_cast<EdgeMeshingPropertyInterpolate*>(prop)->getCoEdges()){
-                            str << m_edge_ids_mapping[e_name] << " ";
+                            str << m_ids_mapping[e_name] << " ";
                         }
                     }else{
-                        str << " 1 [ " << m_face_ids_mapping[dynamic_cast<EdgeMeshingPropertyInterpolate*>(prop)->getCoFace()] << " ";
+                        str << " 1 [ " << m_ids_mapping[dynamic_cast<EdgeMeshingPropertyInterpolate*>(prop)->getCoFace()] << " ";
                     }
                     str << "] " << "\n";
                     break;
@@ -128,11 +134,11 @@ void ExportBlocksImplementation::writeEdges(std::ofstream &str, std::vector<Topo
 
                     str << 6 <<  " " << prop->getNbEdges() << " [ ";
                     for(auto e_name : dynamic_cast<EdgeMeshingPropertyGlobalInterpolate*>(prop)->getFirstCoEdges()){
-                        str << m_edge_ids_mapping[e_name] << " ";
+                        str << m_ids_mapping[e_name] << " ";
                     }
                     str << "] [ ";
                     for(auto e_name : dynamic_cast<EdgeMeshingPropertyGlobalInterpolate*>(prop)->getSecondCoEdges()){
-                        str << m_edge_ids_mapping[e_name] << " ";
+                        str << m_ids_mapping[e_name] << " ";
                     }
                     str << "] " << "\n";
                     break;
@@ -168,9 +174,7 @@ void ExportBlocksImplementation::writeFaces(std::ofstream &str, std::vector<Topo
         str  << "FACES " << faces.size() << "\n";
         auto blk_face_id = 0;
         for(auto f : faces){
-
-
-            m_face_ids_mapping[f->getName()] = blk_face_id++;
+            m_ids_mapping[f->getName()] = blk_face_id++;
             const std::vector<Edge*> f_edges = f->getEdges();
             Edge* e0 = f_edges[0];
             Edge* e1 = f_edges[1];
@@ -181,37 +185,37 @@ void ExportBlocksImplementation::writeFaces(std::ofstream &str, std::vector<Topo
 
             if(f->getVertices()[0]->getName() == e0->getVertices()[0]->getName()) {
                 for (int i = 0; i < e0->getCoEdges().size(); i++)
-                    str << m_edge_ids_mapping[e0->getCoEdges()[i]->getName()]<<" ";
+                    str << m_ids_mapping[e0->getCoEdges()[i]->getName()]<<" ";
             }else if(f->getVertices()[0]->getName() == e0->getVertices()[1]->getName()){
                 for (int i = e0->getCoEdges().size()-1; i >= 0 ; i--)
-                    str << m_edge_ids_mapping[e0->getCoEdges()[i]->getName()]<<" ";
+                    str << m_ids_mapping[e0->getCoEdges()[i]->getName()]<<" ";
             }
             str << "] [ ";
 
             if(f->getVertices()[1]->getName() == e1->getVertices()[0]->getName()) {
                 for (int i = 0; i < e1->getCoEdges().size(); i++)
-                    str << m_edge_ids_mapping[e1->getCoEdges()[i]->getName()]<<" ";
+                    str << m_ids_mapping[e1->getCoEdges()[i]->getName()]<<" ";
             }else if(f->getVertices()[1]->getName() == e1->getVertices()[1]->getName()){
                 for (int i = e1->getCoEdges().size()-1; i >= 0 ; i--)
-                    str << m_edge_ids_mapping[e1->getCoEdges()[i]->getName()]<<" ";
+                    str << m_ids_mapping[e1->getCoEdges()[i]->getName()]<<" ";
             }
             str << "] [ ";
 
             if(f->getVertices()[2]->getName() == e2->getVertices()[0]->getName()) {
                 for (int i = 0; i < e2->getCoEdges().size(); i++)
-                    str << m_edge_ids_mapping[e2->getCoEdges()[i]->getName()]<<" ";
+                    str << m_ids_mapping[e2->getCoEdges()[i]->getName()]<<" ";
             }else if(f->getVertices()[2]->getName() == e2->getVertices()[1]->getName()){
                 for (int i = e2->getCoEdges().size()-1; i >= 0 ; i--)
-                    str << m_edge_ids_mapping[e2->getCoEdges()[i]->getName()]<<" ";
+                    str << m_ids_mapping[e2->getCoEdges()[i]->getName()]<<" ";
             }
             str << "] [ ";
 
             if(f->getVertices()[3]->getName() == e3->getVertices()[0]->getName()) {
                 for (int i = 0; i < e3->getCoEdges().size(); i++)
-                    str << m_edge_ids_mapping[e3->getCoEdges()[i]->getName()]<<" ";
+                    str << m_ids_mapping[e3->getCoEdges()[i]->getName()]<<" ";
             }else if(f->getVertices()[3]->getName() == e3->getVertices()[1]->getName()){
                 for (int i = e3->getCoEdges().size()-1; i >= 0 ; i--)
-                    str << m_edge_ids_mapping[e3->getCoEdges()[i]->getName()]<<" ";
+                    str << m_ids_mapping[e3->getCoEdges()[i]->getName()]<<" ";
             }
             str << "]\n";
         }
@@ -223,14 +227,14 @@ void ExportBlocksImplementation::writeBlocks(std::ofstream &str, std::vector<Top
         auto blk_block_id = 0;
         for(auto b : blocks){
             const std::vector<Vertex*>& vertices = b->getVertices();
-            int v0 = m_node_ids_mapping[vertices[0]->getName()];
-            int v1 = m_node_ids_mapping[vertices[1]->getName()];
-            int v2 = m_node_ids_mapping[vertices[2]->getName()];
-            int v3 = m_node_ids_mapping[vertices[3]->getName()];
-            int v4 = m_node_ids_mapping[vertices[4]->getName()];
-            int v5 = m_node_ids_mapping[vertices[5]->getName()];
-            int v6 = m_node_ids_mapping[vertices[6]->getName()];
-            int v7 = m_node_ids_mapping[vertices[7]->getName()];
+            int v0 = m_ids_mapping[vertices[0]->getName()];
+            int v1 = m_ids_mapping[vertices[1]->getName()];
+            int v2 = m_ids_mapping[vertices[2]->getName()];
+            int v3 = m_ids_mapping[vertices[3]->getName()];
+            int v4 = m_ids_mapping[vertices[4]->getName()];
+            int v5 = m_ids_mapping[vertices[5]->getName()];
+            int v6 = m_ids_mapping[vertices[6]->getName()];
+            int v7 = m_ids_mapping[vertices[7]->getName()];
 
             const std::vector<Face*>& faces = b->getFaces();
             Face* f0 = faces[0];
@@ -243,160 +247,58 @@ void ExportBlocksImplementation::writeBlocks(std::ofstream &str, std::vector<Top
             str << v0 << " " << v1 << " " << v2 << " " << v3 << " " << v4 << " ";
             str << v5 << " " << v6 << " " << v7 << " [ ";
             for (int i = 0; i < f0->getCoFaces().size(); i++)
-                str << m_face_ids_mapping[f0->getCoFaces()[i]->getName()]<<" ";
+                str << m_ids_mapping[f0->getCoFaces()[i]->getName()]<<" ";
             str << "] [ ";
             for (int i = 0; i < f1->getCoFaces().size(); i++)
-                str << m_face_ids_mapping[f1->getCoFaces()[i]->getName()]<<" ";
+                str << m_ids_mapping[f1->getCoFaces()[i]->getName()]<<" ";
             str << "] [ ";
             for (int i = 0; i < f2->getCoFaces().size(); i++)
-                str << m_face_ids_mapping[f2->getCoFaces()[i]->getName()]<<" ";
+                str << m_ids_mapping[f2->getCoFaces()[i]->getName()]<<" ";
             str << "] [ ";
             for (int i = 0; i < f3->getCoFaces().size(); i++)
-                str << m_face_ids_mapping[f3->getCoFaces()[i]->getName()]<<" ";
+                str << m_ids_mapping[f3->getCoFaces()[i]->getName()]<<" ";
             str << "] [ ";
             for (int i = 0; i < f4->getCoFaces().size(); i++)
-                str << m_face_ids_mapping[f4->getCoFaces()[i]->getName()]<<" ";
+                str << m_ids_mapping[f4->getCoFaces()[i]->getName()]<<" ";
             str << "] [ ";
             for (int i = 0; i < f5->getCoFaces().size(); i++)
-                str << m_face_ids_mapping[f5->getCoFaces()[i]->getName()]<<" ";
+                str << m_ids_mapping[f5->getCoFaces()[i]->getName()]<<" ";
             str << "]\n";
 
-            m_block_ids_mapping[b->getName()] = blk_block_id++;
+            m_ids_mapping[b->getName()] = blk_block_id++;
         }
         str  << "\n";
 }
 /*----------------------------------------------------------------------------*/
-void ExportBlocksImplementation::writeAssociationNodes(std::ofstream &str,const std::vector<Topo::Vertex*>& vs){
-
-    int nb_infos = 0;
+template <typename T, typename>
+void ExportBlocksImplementation::writeAssociations(std::ofstream &str, const std::string title, const std::vector<T*>& v, const std::map<std::string, std::vector<int>> geom_id_2_brep_indices){
     std::vector<std::string> infos;
-
-    for (auto te : vs) {
+    for (auto te : v) {
         Geom::GeomEntity* ge = te->getGeomAssociation();
         if(ge != nullptr){
-            std::string id = ge->getName();
-            int dim = ge->getDim();
-            if(dim == 2){
-                id.erase(0, 4);
-            }else if(dim == 0) {
-                id.erase(0, 2);
-            }else{
-                id.erase(0, 3);
+            const std::string id = ge->getName();
+            if (geom_id_2_brep_indices.find(id) != geom_id_2_brep_indices.end()){
+                std::vector<int> brep_indices = geom_id_2_brep_indices.at(id);
+                if (brep_indices.size() == 1 && brep_indices[0] >0) {
+                    infos.push_back(std::to_string(m_ids_mapping[te->getName()]) +" "+std::to_string(ge->getDim())+" "+std::to_string(brep_indices[0]) +"\n");
+                }
             }
-
-            while(id[0] == '0')
-                id.erase(0,1);
-
-            if(id.empty()){
-                id = "0";
-            }
-
-            nb_infos++;
-            infos.push_back(std::to_string(m_node_ids_mapping[te->getName()]) +" "+std::to_string(dim)+" "+id +"\n");
         }
     }
-    str  << "GEOM_Nodes "<< nb_infos<<"\n";
+    str  << "GEOM_" << title << " "<< infos.size() <<"\n";
     for (const auto& info : infos) {
         str << info;
     }
     str  << "\n";
 }
 /*----------------------------------------------------------------------------*/
-void ExportBlocksImplementation::writeAssociationEdges(std::ofstream &str,const std::vector<Topo::CoEdge*>& es){
+template void ExportBlocksImplementation::writeAssociations<Topo::Vertex>(std::ofstream &str, const std::string title, const std::vector<Topo::Vertex*>& v, const std::map<std::string, std::vector<int>> geom_id_2_brep_indices);
 
-    int nb_infos = 0;
-    std::vector<std::string> infos;
+template void ExportBlocksImplementation::writeAssociations<Topo::CoEdge>(std::ofstream &str, const std::string title, const std::vector<Topo::CoEdge*>& v, const std::map<std::string, std::vector<int>> geom_id_2_brep_indices);
 
-    for (auto te : es) {
-        Geom::GeomEntity* ge = te->getGeomAssociation();
-        if(ge != nullptr){
-            std::string id = ge->getName();
-            int dim = ge->getDim();
-            if(dim == 2){
-                id.erase(0, 4);
-            }else{
-                id.erase(0, 3);
-            }
+template void ExportBlocksImplementation::writeAssociations<Topo::CoFace>(std::ofstream &str, const std::string title, const std::vector<Topo::CoFace*>& v, const std::map<std::string, std::vector<int>> geom_id_2_brep_indices);
 
-            while(id[0] == '0')
-                id.erase(0,1);
-
-            if(id.empty()){
-                id = "0";
-            }
-
-            nb_infos++;
-            infos.push_back(std::to_string(m_edge_ids_mapping[te->getName()]) +" "+std::to_string(dim)+" "+id +"\n");
-        }
-    }
-    str  << "GEOM_Edges "<< nb_infos<<"\n";
-    for (const auto& info : infos) {
-        str << info;
-    }
-    str  << "\n";
-}
-/*----------------------------------------------------------------------------*/
-void ExportBlocksImplementation::writeAssociationFaces(std::ofstream &str,const std::vector<Topo::CoFace*>& fs){
-
-    int nb_infos = 0;
-    std::vector<std::string> infos;
-
-    for (auto te : fs) {
-        Geom::GeomEntity* ge = te->getGeomAssociation();
-        if(ge != nullptr){
-            std::string id = ge->getName();
-            int dim = ge->getDim();
-            if(dim == 2){
-                id.erase(0, 4);
-            }else{
-                id.erase(0, 3);
-            }
-
-            while(id[0] == '0')
-                id.erase(0,1);
-
-            if(id.empty()){
-                id = "0";
-            }
-
-            nb_infos++;
-            infos.push_back(std::to_string(m_face_ids_mapping[te->getName()]) +" "+std::to_string(dim)+" "+id +"\n");
-        }
-    }
-    str  << "GEOM_Faces "<< nb_infos<<"\n";
-    for (const auto& info : infos) {
-        str << info;
-    }
-    str  << "\n";
-}
-/*----------------------------------------------------------------------------*/
-void ExportBlocksImplementation::writeAssociationBlocks(std::ofstream &str,const std::vector<Topo::Block*>& bs){
-
-    int nb_infos = 0;
-    std::vector<std::string> infos;
-
-    for (auto te : bs) {
-        Geom::GeomEntity* ge = te->getGeomAssociation();
-        if(ge != nullptr){
-            std::string id = ge->getName();
-            id.erase(0, 3);
-
-            while(id[0] == '0')
-                id.erase(0,1);
-
-            if(id.empty()){
-                id = "0";
-            }
-
-            nb_infos++;
-            infos.push_back(std::to_string(m_block_ids_mapping[te->getName()]) +" 3 "+id +"\n");
-        }
-    }
-    str  << "GEOM_Blocks "<< nb_infos<<"\n";
-    for (const auto& info : infos) {
-        str << info;
-    }
-}
+template void ExportBlocksImplementation::writeAssociations<Topo::Block>(std::ofstream &str, const std::string title, const std::vector<Topo::Block*>& v, const std::map<std::string, std::vector<int>> geom_id_2_brep_indices);
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom
 /*----------------------------------------------------------------------------*/
