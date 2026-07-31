@@ -37,7 +37,7 @@ class VTKRenderingManager;
  * </OL>
  * </P>
  *
- * @author		Charles PIGNEROL, CEA/DAM/DSSI
+ * @author		Charles PIGNEROL
  * @date		23/04/2013
  */
 class VTKMgx3DSelectionManager :

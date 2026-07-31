@@ -22,7 +22,7 @@ namespace QtComponents
 
 /**
  * Widget type "File dialog" permettant de sélectionner un fichier script Magix 3D.
- * @author		Charles PIGNEROL, CEA/DAM/DSSI
+ * @author		Charles PIGNEROL
  */
 class QtMgx3DScriptFileDialog : public QFileDialog 
 {

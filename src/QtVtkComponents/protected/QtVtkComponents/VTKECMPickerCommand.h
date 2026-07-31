@@ -19,7 +19,7 @@
  * (ex : une touche est-elle pressée).
  * Attention : cette classe est faite pour fonctionner avec une instance de la
  * classe VTKECMPicker.
- * \author		Charles PIGNEROL, CEA/DAM/DSSI
+ * \author		Charles PIGNEROL
  */
 class VTKECMPickerCommand : public vtkCommand
 {
