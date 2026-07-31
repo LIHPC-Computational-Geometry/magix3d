@@ -5,7 +5,7 @@
  */
 
 #include "Internal/Context.h"
-#include "Internal/Resources.h"
+#include "QtComponents/GUIResources.h"
 
 #include "QtVtkComponents/VTKMgx3DMeshEntityRepresentation.h"
 #include "QtComponents/QtMgx3DApplication.h"
@@ -158,7 +158,7 @@ void VTKMgx3DMeshEntityRepresentation::createVolumicRepresentation (const vector
 	_volumicMapper->SetInputData (_volumicGrid);
 	_volumicMapper->ScalarVisibilityOff ( );
 #if	VTK_MAJOR_VERSION < 8
-	_volumicMapper->SetImmediateModeRendering (!Internal::Resources::instance ( )._useDisplayList);
+	_volumicMapper->SetImmediateModeRendering (!QtComponents::GUIResources::instance ( )._useDisplayList);
 #endif	// VTK_MAJOR_VERSION < 8
 	_volumicActor	  = VTKMgx3DActor::New ( );
 	_volumicActor->SetEntity (getEntity ( ));
@@ -279,7 +279,7 @@ void VTKMgx3DMeshEntityRepresentation::createWireRepresentation ( )
 	_wireMapper->SetInputConnection (edgesExtractor->GetOutputPort ( ));
 	_wireMapper->ScalarVisibilityOff ( );
 #if	VTK_MAJOR_VERSION < 8
-	_wireMapper->SetImmediateModeRendering (!Internal::Resources::instance ( )._useDisplayList);
+	_wireMapper->SetImmediateModeRendering (!QtComponents::GUIResources::instance ( )._useDisplayList);
 #endif	// VTK_MAJOR_VERSION < 8
 	_wireActor	= VTKMgx3DActor::New ( );
 	_wireActor->SetEntity (getEntity ( ));

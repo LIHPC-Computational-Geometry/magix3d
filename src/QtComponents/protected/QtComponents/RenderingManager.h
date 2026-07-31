@@ -6,12 +6,7 @@
 #ifndef RENDERING_MANAGER_H
 #define RENDERING_MANAGER_H
 
-
-#include "Group/GroupEntity.h"
-#include "Internal/Context.h"
-#include "Internal/SelectionManager.h"
 #include "Utils/GraphicalEntityRepresentation.h"
-#include "Internal/CommandInternal.h"
 #include "QtComponents/LandmarkAttributes.h"
 
 

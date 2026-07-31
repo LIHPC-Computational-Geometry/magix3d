@@ -4,8 +4,6 @@
  * \date		23/02/2022
  */
 
-#include "Internal/Context.h"
-#include "Internal/Resources.h"
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/ValidatedField.h"
@@ -13,6 +11,8 @@
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
 #include "QtComponents/QtNumericFieldsFactory.h"
+
+#include "QtComponents/GUIResources.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/UTF8String.h>
@@ -26,11 +26,8 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Group;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Internal;
 
 namespace Mgx3D {
 
@@ -50,11 +47,11 @@ namespace Mgx3D {
             QVBoxLayout *layout = new QVBoxLayout(this);
             setLayout(layout);
             layout->setContentsMargins(
-                    Resources::instance()._margin.getValue(),
-                    Resources::instance()._margin.getValue(),
-                    Resources::instance()._margin.getValue(),
-                    Resources::instance()._margin.getValue());
-            layout->setSpacing(Resources::instance()._spacing.getValue());
+                    GUIResources::instance()._margin.getValue(),
+                    GUIResources::instance()._margin.getValue(),
+                    GUIResources::instance()._margin.getValue(),
+                    GUIResources::instance()._margin.getValue());
+            layout->setSpacing(GUIResources::instance()._spacing.getValue());
 
             // Nom opération :
             QLabel *label = new QLabel(panelName.c_str(), this);
@@ -69,11 +66,11 @@ namespace Mgx3D {
             layout->addWidget(groupBox);
             QVBoxLayout *vlayout = new QVBoxLayout(groupBox);
             vlayout->setContentsMargins(
-                    Resources::instance()._margin.getValue(),
-                    Resources::instance()._margin.getValue(),
-                    Resources::instance()._margin.getValue(),
-                    Resources::instance()._margin.getValue());
-            vlayout->setSpacing(Resources::instance()._spacing.getValue());
+                    GUIResources::instance()._margin.getValue(),
+                    GUIResources::instance()._margin.getValue(),
+                    GUIResources::instance()._margin.getValue(),
+                    GUIResources::instance()._margin.getValue());
+            vlayout->setSpacing(GUIResources::instance()._spacing.getValue());
             groupBox->setLayout(vlayout);
             const string suggestedID;
 
@@ -151,8 +148,8 @@ namespace Mgx3D {
             for (vector<string>::const_iterator it = facesNames.begin ( );
                  facesNames.end ( ) != it; it++)
             {
-                TopoEntity*		edge		=
-                        getContext ( ).getTopoManager ( ).getCoEdge (*it, false);
+                Entity*		edge		=
+                        getController( ).getCoEdge (*it, false);
 
                 if (0 != edge)
                     entities.push_back (edge);
@@ -313,8 +310,6 @@ namespace Mgx3D {
 
         void QtBlocksByExtrusionCreationAction::executeOperation ( )
         {
-            // Validation paramétrage :
-            M3DCommandResult*	cmdResult	= 0;
             QtMgx3DTopoOperationAction::executeOperation ( );
 
             // Récupération des paramètres de création du cylindre :
@@ -322,7 +317,7 @@ namespace Mgx3D {
             CHECK_NULL_PTR_ERROR (panel)
             Vector direction = panel->getDirection();
             vector<string> cofaceNames	= panel->getFaces( );
-            cmdResult	= getContext ( ).getTopoManager ( ).makeBlocksByExtrude(cofaceNames, direction);
+            getController( ).makeBlocksByExtrude(cofaceNames, direction);
 
             setCommandResult (cmdResult);
         }	// QtBlocksByRevolutionCreationAction::executeOperation

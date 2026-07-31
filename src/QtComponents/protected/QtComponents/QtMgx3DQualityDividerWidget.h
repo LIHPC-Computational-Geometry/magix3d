@@ -7,14 +7,8 @@
 #ifndef QT_MGX3D_QUALITY_DIVIDER_WIDGET_H
 #define QT_MGX3D_QUALITY_DIVIDER_WIDGET_H
 
-#include "Internal/Context.h"
-
 #include <QtQualif/QtQualityDividerWidget.h>
 
-#include "Mesh/MeshItf.h"
-#include "Internal/Context.h"
-
-#include <gmds/utils/CommonTypes.h>
 #include <map>
 
 

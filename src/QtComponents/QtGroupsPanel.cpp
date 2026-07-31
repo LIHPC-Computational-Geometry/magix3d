@@ -4,30 +4,14 @@
  * \date        12/11/2012
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
-#include "Internal/SelectionManagerDimFilter.h"
-#include "Group/GroupManager.h"
-#include "Group/GroupEntity.h"
-#include "Geom/Volume.h"
-#include "Geom/Surface.h"
-#include "Geom/Curve.h"
-#include "Geom/Vertex.h"
-#include "Mesh/Surface.h"
-#include "Mesh/Volume.h"
-#include "Mesh/Line.h"
-#include "Mesh/Cloud.h"
-#include "Topo/Block.h"
-#include "Topo/CoFace.h"
-#include "Topo/CoEdge.h"
-#include "Topo/Vertex.h"
-#include "Mesh/MeshEntity.h"
 #include "QtComponents/QtGroupsPanel.h"
 #include "QtComponents/QtGroupsSelectorDialog.h"
 #include "QtComponents/QtMgx3DApplication.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtExpansionTreeRestorer.h"
+
+#include "QtComponents/GUIResources.h"
 
 #include <TkUtil/ErrorLog.h>
 #include <TkUtil/InternalError.h>
@@ -51,9 +35,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Group;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -432,9 +414,9 @@ QIcon*	QtGroupsPanel::_curvedEdgeIcon	= 0;
 QIcon*	QtGroupsPanel::_surfacicIcon	= 0;
 	
 	
-QtGroupsPanel::QtGroupsPanel (QWidget* parent, QtMgx3DMainWindow* mainWindow, const string& name, Context& context)
-	: QtEntitiesItemViewPanel (parent, mainWindow, name, context),
-	  SelectionManagerObserver (&context.getSelectionManager ( )),
+QtGroupsPanel::QtGroupsPanel (QWidget* parent, QtMgx3DMainWindow* mainWindow, const string& name, Controller& controller)
+	: QtEntitiesItemViewPanel (parent, mainWindow, name, controller),
+	  SelectionManagerObserver (&controller.getSelectionManager ( )),
 	  _entitiesTypesWidget (0), _entitiesGroupsWidget (0),
 	  _typesItems ( ), _groupsEntriesItems ( ), _levelsEntriesItems ( ),
 	  //_groupsPropagationCheckBox (0),
@@ -449,7 +431,7 @@ QtGroupsPanel::QtGroupsPanel (QWidget* parent, QtMgx3DMainWindow* mainWindow, co
 	// Par défaut le fait de démarrer une sélection interactive provoque l'affichage des entités des types sélectionnables des groupes affichés.
 	enableSelectionPolicyAdaptation (true);
 
-	context.getSelectionManager ( ).addSelectionObserver (*this);
+	controller.getSelectionManager ( ).addSelectionObserver (*this);
 }	// QtGroupsPanel::QtGroupsPanel
 
 
@@ -740,19 +722,19 @@ void QtGroupsPanel::displaySelectedGroupsNames (bool display)
 
 			std::string nom = (*it)->getGroup ( )->getName();
 
-			GroupEntity* gr0 = getStdContext()->getGroupManager().getGroup<Group::Group0D>(nom, false);
+			GroupEntity* gr0 = getController().getGroup<Group::Group0D>(nom, false);
 			if (gr0)
 				groups.push_back (gr0);
 
-			GroupEntity* gr1 = getStdContext()->getGroupManager().getGroup<Group::Group1D>(nom, false);
+			GroupEntity* gr1 = getController().getGroup<Group::Group1D>(nom, false);
 			if (gr1)
 				groups.push_back (gr1);
 
-			GroupEntity* gr2 = getStdContext()->getGroupManager().getGroup<Group::Group2D>(nom, false);
+			GroupEntity* gr2 = getController().getGroup<Group::Group2D>(nom, false);
 			if (gr2)
 				groups.push_back (gr2);
 
-			GroupEntity* gr3 = getStdContext()->getGroupManager().getGroup<Group::Group3D>(nom, false);
+			GroupEntity* gr3 = getController().getGroup<Group::Group3D>(nom, false);
 			if (gr3)
 				groups.push_back (gr3);
 
@@ -791,8 +773,8 @@ static unsigned long menuToRepresentations (QMenu& menu, unsigned long oldrep)
 
 void QtGroupsPanel::updateQuickButtons ( )
 {
-	Context*	context		= dynamic_cast<Context*>(&getContext ( ));		// Context* :(
-	CHECK_NULL_PTR_ERROR (context)
+	Controller*	controller		= &getController ( );		// Context* :(
+	CHECK_NULL_PTR_ERROR (controller)
 
 	if ((0 == _wireGeomVolumeButton) || (0 == _solidGeomVolumeButton) || (0 == _wireGeomSurfaceButton) || (0 == _solidGeomVolumeButton) ||
 	    (0 == _wireTopoBlockButton) || (0 == _solidTopoBlockButton) || (0 == _wireTopoCoFaceButton) || (0 == _solidTopoCoFaceButton) || (0 == _wireTopoCoEdgeButton))
@@ -836,31 +818,31 @@ void QtGroupsPanel::updateQuickButtons ( )
 		}	// if (0 < height)
 	}	// if (0 < height)
 	// GeomVolume / Wire :
-	unsigned long	rep	= context->globalMask (Entity::GeomVolume) & ((unsigned long)GraphicalEntityRepresentation::ISOCURVES | (unsigned long)GraphicalEntityRepresentation::CURVES);
+	unsigned long	rep	= controller->globalMask (Entity::GeomVolume) & ((unsigned long)GraphicalEntityRepresentation::ISOCURVES | (unsigned long)GraphicalEntityRepresentation::CURVES);
 	_wireGeomVolumeButton->setChecked (0 == rep ? false : true);
 	// GeomVolume / Solid :
-	rep	= context->globalMask (Entity::GeomVolume) & (unsigned long)GraphicalEntityRepresentation::SURFACES;
+	rep	= controller->globalMask (Entity::GeomVolume) & (unsigned long)GraphicalEntityRepresentation::SURFACES;
 	_solidGeomVolumeButton->setChecked (0 == rep ? false : true);
 	// GeomSurface / Wire :
-	rep	= context->globalMask (Entity::GeomSurface) & ((unsigned long)GraphicalEntityRepresentation::ISOCURVES | (unsigned long)GraphicalEntityRepresentation::CURVES);
+	rep	= controller->globalMask (Entity::GeomSurface) & ((unsigned long)GraphicalEntityRepresentation::ISOCURVES | (unsigned long)GraphicalEntityRepresentation::CURVES);
 	_wireGeomSurfaceButton->setChecked (0 == rep ? false : true);
 	// GeomSurface / Solid :
-	rep	= context->globalMask (Entity::GeomSurface) & (unsigned long)GraphicalEntityRepresentation::SURFACES;
+	rep	= controller->globalMask (Entity::GeomSurface) & (unsigned long)GraphicalEntityRepresentation::SURFACES;
 	_solidGeomSurfaceButton->setChecked (0 == rep ? false : true);
 	// TopoBlock / Wire :
-	rep	= context->globalMask (Entity::TopoBlock) & (unsigned long)GraphicalEntityRepresentation::CURVES;
+	rep	= controller->globalMask (Entity::TopoBlock) & (unsigned long)GraphicalEntityRepresentation::CURVES;
 	_wireTopoBlockButton->setChecked (0 == rep ? false : true);
 	// TopoBlock / Solid :
-	rep	= context->globalMask (Entity::TopoBlock) & (unsigned long)GraphicalEntityRepresentation::SURFACES;
+	rep	= controller->globalMask (Entity::TopoBlock) & (unsigned long)GraphicalEntityRepresentation::SURFACES;
 	_solidTopoBlockButton->setChecked (0 == rep ? false : true);
 	// TopoCoFace / Wire :
-	rep	= context->globalMask (Entity::TopoCoFace) & (unsigned long)GraphicalEntityRepresentation::CURVES;
+	rep	= controller->globalMask (Entity::TopoCoFace) & (unsigned long)GraphicalEntityRepresentation::CURVES;
 	_wireTopoCoFaceButton->setChecked (0 == rep ? false : true);
 	// TopoCoFace / Solid :
-	rep	= context->globalMask (Entity::TopoCoFace) & (unsigned long)GraphicalEntityRepresentation::SURFACES;
+	rep	= controller->globalMask (Entity::TopoCoFace) & (unsigned long)GraphicalEntityRepresentation::SURFACES;
 	_solidTopoCoFaceButton->setChecked (0 == rep ? false : true);
 	// TopoCoEdge / Wire :
-	rep	= context->globalMask (Entity::TopoCoEdge) & (unsigned long)GraphicalEntityRepresentation::MESH_SHAPE;
+	rep	= controller->globalMask (Entity::TopoCoEdge) & (unsigned long)GraphicalEntityRepresentation::MESH_SHAPE;
 	_wireTopoCoEdgeButton->setChecked (0 == rep ? false : true);
 }	// QtGroupsPanel::updateQuickButtons
 
@@ -878,7 +860,7 @@ void QtGroupsPanel::updateGroupCallback ( )
 			std::string str_newName = newName.toStdString();
 
 			GroupEntity* gr = (*it)->getGroup ( );
-			getContext().getGroupManager().changeGroupName(gr->getName(), str_newName, gr->getDim());
+			getController().changeGroupName(gr->getName(), str_newName, gr->getDim());
 
 			updateGroup(*gr);
 		}
@@ -893,7 +875,7 @@ void QtGroupsPanel::clearGroupCallback ( )
 		if (true == (*it)->isSelected ( ))
 		{
 			GroupEntity* gr = (*it)->getGroup ( );
-			getContext().getGroupManager().clearGroup(gr->getDim(), gr->getName());
+			getController().clearGroup(gr->getDim(), gr->getName());
 		}
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 }	// QtGroupsPanel::displaySelectedGroups
@@ -962,7 +944,7 @@ void QtGroupsPanel::updateEntityItemState (FilterEntity::objectType type, Filter
 
 void QtGroupsPanel::sort ( )
 {
-	if (false == Resources::instance ( )._automaticSort.getValue ( ))
+	if (false == GUIResources::instance ( )._automaticSort.getValue ( ))
 		return;
 
 	typeNameSort ( );
@@ -978,7 +960,7 @@ void QtGroupsPanel::typeNameSort ( )
 	for (vector<QTreeWidgetItem*>::iterator itgi = _groupsEntriesItems.begin( ); _groupsEntriesItems.end ( ) != itgi; itgi++)
 		typeNameSort (**itgi);
 
-	if (true == Resources::instance ( )._multiLevelGroupsView.getValue ( ))
+	if (true == GUIResources::instance ( )._multiLevelGroupsView.getValue ( ))
 	{
 		for (int i = 0; i < 4; i++)
 		{
@@ -986,7 +968,7 @@ void QtGroupsPanel::typeNameSort ( )
 			for (map <unsigned long, QTreeWidgetItem*>::iterator ite	= entries.begin ( ); entries.end ( ) != ite; ite++)
 				typeNameSort (*(*ite).second);
 		}	// for (int i = 0; i < 4; i++)
-	}	// if (true == Resources::instance ( )._multiLevelGroupsView ...
+	}	// if (true == GUIResources::instance ( )._multiLevelGroupsView ...
 
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (false, this, getAppTitle ( ))
@@ -1004,7 +986,7 @@ void QtGroupsPanel::typeNameSort (QTreeWidgetItem& parent)
 		item	= parent.takeChild (0);
 		items.push_back (item);
 	}	// while (0 != parent.childCount ( ))
-	if (0 != Resources::instance ( )._sortType.getValue ( ).ascii ( ).compare ("typeAscendingName"))
+	if (0 != GUIResources::instance ( )._sortType.getValue ( ).ascii ( ).compare ("typeAscendingName"))
 		std::sort (&items.front ( ), &(items [items.size ( )]), TypeNameSortGreater<QTreeWidgetItem*> ( ));
 	else
 		std::sort (&items.front ( ), &(items [items.size ( )]), TypeNameSortLesser<QTreeWidgetItem*> ( ));
@@ -1020,8 +1002,8 @@ void QtGroupsPanel::createGui ( )
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
 
-	Context*	context		= dynamic_cast<Context*>(&getContext ( ));
-	CHECK_NULL_PTR_ERROR (context)
+	Controller*	controller		= &getController ( );
+	CHECK_NULL_PTR_ERROR (controller)
 	
 	// Les menus contextuels :
 	if (0 == _wireIcon)
@@ -1074,7 +1056,7 @@ void QtGroupsPanel::createGui ( )
 	typeItem->setCheckState (0, Qt::Unchecked);
 	_typesItems.push_back (typeItem);
 	item->addChild (typeItem);
-	unsigned long	gmask	= context->globalMask (Entity::GeomVolume);
+	unsigned long	gmask	= controller->globalMask (Entity::GeomVolume);
 	_wireGeomVolumeButton	= new QtQuickRepToolButton (_entitiesTypesWidget, *_wireIcon, Entity::GeomVolume, true);
 	_wireGeomVolumeButton->setChecked ((gmask & GraphicalEntityRepresentation::CURVES) || (gmask & GraphicalEntityRepresentation::ISOCURVES));
 	connect (_wireGeomVolumeButton, SIGNAL (toggled (bool)), this, SLOT (quickDisplayRepresentationsCallback (bool)));
@@ -1090,7 +1072,7 @@ void QtGroupsPanel::createGui ( )
 	typeItem->setCheckState (0, Qt::Unchecked);
 	_typesItems.push_back (typeItem);
 	item->addChild (typeItem);
-	gmask	= context->globalMask (Entity::GeomSurface);
+	gmask	= controller->globalMask (Entity::GeomSurface);
 	_wireGeomSurfaceButton	= new QtQuickRepToolButton (_entitiesTypesWidget, *_wireIcon, Entity::GeomSurface, true);
 	_wireGeomSurfaceButton->setChecked ((gmask & GraphicalEntityRepresentation::CURVES) || (gmask & GraphicalEntityRepresentation::ISOCURVES));
 	connect (_wireGeomSurfaceButton, SIGNAL (toggled (bool)), this, SLOT (quickDisplayRepresentationsCallback (bool)));
@@ -1120,7 +1102,7 @@ void QtGroupsPanel::createGui ( )
 	typeItem->setCheckState (0, Qt::Unchecked);
 	_typesItems.push_back (typeItem);
 	item->addChild (typeItem);
-	gmask	= context->globalMask (Entity::TopoBlock);
+	gmask	= controller->globalMask (Entity::TopoBlock);
 	_wireTopoBlockButton	= new QtQuickRepToolButton (_entitiesTypesWidget, *_wireIcon, Entity::TopoBlock, true);
 	_wireTopoBlockButton->setChecked (gmask & GraphicalEntityRepresentation::CURVES);
 	connect (_wireTopoBlockButton, SIGNAL (toggled (bool)), this, SLOT (quickDisplayRepresentationsCallback (bool)));
@@ -1136,7 +1118,7 @@ void QtGroupsPanel::createGui ( )
 	typeItem->setCheckState (0, Qt::Unchecked);
 	_typesItems.push_back (typeItem);
 	item->addChild (typeItem);
-	gmask	= context->globalMask (Entity::TopoCoFace);
+	gmask	= controller->globalMask (Entity::TopoCoFace);
 	_wireTopoCoFaceButton	= new QtQuickRepToolButton (_entitiesTypesWidget, *_wireIcon, Entity::TopoCoFace, true);
 	_wireTopoCoFaceButton->setChecked (gmask & GraphicalEntityRepresentation::CURVES);
 	connect (_wireTopoCoFaceButton, SIGNAL (toggled (bool)), this, SLOT (quickDisplayRepresentationsCallback (bool)));
@@ -1152,7 +1134,7 @@ void QtGroupsPanel::createGui ( )
 	typeItem->setCheckState (0, Qt::Unchecked);
 	_typesItems.push_back (typeItem);
 	item->addChild (typeItem);
-	gmask	= context->globalMask (Entity::TopoCoEdge);
+	gmask	= controller->globalMask (Entity::TopoCoEdge);
 	_wireTopoCoEdgeButton	= new QtQuickRepToolButton (_entitiesTypesWidget, *_curvedEdgeIcon, Entity::TopoCoEdge, true);
 	_wireTopoCoEdgeButton->setChecked (gmask & GraphicalEntityRepresentation::MESH_SHAPE);
 	connect (_wireTopoCoEdgeButton, SIGNAL (toggled (bool)), this, SLOT (quickDisplayRepresentationsCallback (bool)));
@@ -1308,12 +1290,12 @@ void QtGroupsPanel::createPopupMenus ( )
 	_groupsPopupMenu->addSeparator ( );
 	QMenu*	entry	= new QMenu ("Tri ...", _groupsPopupMenu);
 	_groupsPopupMenu->addMenu (entry);
-	action	= createCheckableAction (*entry, "Automatique", "Tri automatiquement les groupes", SLOT (automaticSortCallback (bool)), this, Resources::instance ( )._automaticSort.getValue ( ), OFF);
-	const bool ascending	= 0 == Resources::instance ( )._sortType.getValue ( ).ascii ( ).compare ("typeAscendingName") ? true : false;
+	action	= createCheckableAction (*entry, "Automatique", "Tri automatiquement les groupes", SLOT (automaticSortCallback (bool)), this, GUIResources::instance ( )._automaticSort.getValue ( ), OFF);
+	const bool ascending	= 0 == GUIResources::instance ( )._sortType.getValue ( ).ascii ( ).compare ("typeAscendingName") ? true : false;
 	action	= createCheckableAction (*entry, "Ordre ascendant", "Tri les groupes par ordre alphabétique ascendant", SLOT (ascendingSortCallback (bool)), this, ascending, OFF);
 
 	_groupsPopupMenu->addSeparator ( );
-	action	= createCheckableAction (*_groupsPopupMenu, "Vue multi-niveaux", "(Dé)classer les groupes par niveaux.", SLOT (multiLevelViewCallback (bool)), this, Resources::instance ( )._multiLevelGroupsView.getValue( ), OFF);
+	action	= createCheckableAction (*_groupsPopupMenu, "Vue multi-niveaux", "(Dé)classer les groupes par niveaux.", SLOT (multiLevelViewCallback (bool)), this, GUIResources::instance ( )._multiLevelGroupsView.getValue( ), OFF);
 	_groupsPopupMenu->addAction (action);
 	action	= createAction (*_groupsPopupMenu, "Changer de niveau ...", QString::fromUtf8("Change de niveau les groupes sélectionnés"), SLOT (changeGroupLevelCallback( )), this, false, OFF);
 	action	= createAction (*_groupsPopupMenu, QString::fromUtf8("Sélectionner les groupes d'un niveau"), QString::fromUtf8("Sélectionner des groupes selon leurs dimensions et niveaux"),
@@ -1454,7 +1436,7 @@ QtGroupTreeWidgetItem* QtGroupsPanel::getGroupItem (const Mgx3D::Group::GroupEnt
 		throw Exception (message);
 	}	// if ((0 > group.getDim ( )) || (4 <= group.getDim ( )))
 
-	if (false == Resources::instance ( )._multiLevelGroupsView.getValue ( ))
+	if (false == GUIResources::instance ( )._multiLevelGroupsView.getValue ( ))
 	{
 		QTreeWidgetItem* parent		= _groupsEntriesItems [group.getDim ( )];
 		for (size_t i = 0; i < parent->childCount ( ); i++)
@@ -1463,7 +1445,7 @@ QtGroupTreeWidgetItem* QtGroupsPanel::getGroupItem (const Mgx3D::Group::GroupEnt
 			if ((0 != groupItem) && (&group == groupItem->getGroup ( )))
 				return groupItem;
 		}	// for (size_t i = 0; i < parent->childCount ( ); i++)
-	}	// if (false == Resources::instance ( )._multiLevelGroupsView.getValue ( ))
+	}	// if (false == GUIResources::instance ( )._multiLevelGroupsView.getValue ( ))
 	else
 	{
 		const map<unsigned long, QTreeWidgetItem*>&	entries	= _levelsEntriesItems [group.getDim ( )];
@@ -1519,7 +1501,7 @@ QTreeWidgetItem* QtGroupsPanel::getGroupEntryItem (unsigned char dim, unsigned l
 		throw Exception (message);
 	}	// if (4 <= dim)
 
-	if (true != Resources::instance ( )._multiLevelGroupsView.getValue ( ))
+	if (true != GUIResources::instance ( )._multiLevelGroupsView.getValue ( ))
 		return _groupsEntriesItems [dim];
 
 	map<unsigned long, QTreeWidgetItem*>&	entries	= _levelsEntriesItems [dim];
@@ -1578,21 +1560,21 @@ void QtGroupsPanel::quickDisplayRepresentationsCallback (bool display)
 
 	QtQuickRepToolButton*	button	= dynamic_cast<QtQuickRepToolButton*>(sender ( ));
 	CHECK_NULL_PTR_ERROR (button)
-	Context*		context	= dynamic_cast<Context*>(&getContext ( ));		// Context* :(
+	Controller*		controller	= &getController ( );		// Context* :(
 	unsigned long	gmask	= 0;
 	CHECK_NULL_PTR_ERROR (context)
 	
 	if (true == display)
 	{
 		if (true == button->isWireRepresentation ( ))
-			context->restoreGlobalMaskWireProperties (button->entityType ( ));
+			controller->restoreGlobalMaskWireProperties (button->entityType ( ));
 		else
-			context->restoreGlobalMaskSolidProperties (button->entityType ( ));
-		gmask	= context->globalMask (button->entityType ( ));
+			controller->restoreGlobalMaskSolidProperties (button->entityType ( ));
+		gmask	= controller->globalMask (button->entityType ( ));
 	}
 	else
 	{
-		gmask	= context->globalMask (button->entityType ( ));
+		gmask	= controller->globalMask (button->entityType ( ));
 		if (true == button->isWireRepresentation ( ))
 		{
 			if (Entity::TopoCoEdge != button->entityType ( ))
@@ -1613,14 +1595,14 @@ void QtGroupsPanel::quickDisplayRepresentationsCallback (bool display)
 			if (0 != (gmask & GraphicalEntityRepresentation::SURFACES))
 				gmask ^= GraphicalEntityRepresentation::SURFACES;
 		}	// else // if (true == button->isWireRepresentation ( ))
-		context->globalMask (button->entityType ( ))	= gmask;
+		controller->globalMask (button->entityType ( ))	= gmask;
 	}	// else if (true == display)
 
 	if (0 != getGraphicalWidget ( ))
 	{
 		bool	doRender	= false;
 		vector<Entity*>		entities;
-		context->getGroupManager ( ).getShownEntities (typeToTypes (button->entityType ( )), entities);
+		controller->getShownEntities (typeToTypes (button->entityType ( )), entities);
 		RenderingManager::DisplayLocker displayLocker (getGraphicalWidget ( )->getRenderingManager ( ));
 		for (vector<Entity*>::iterator ite = entities.begin ( ); entities.end ( ) != ite; ite++)
 		{
@@ -1747,7 +1729,7 @@ void QtGroupsPanel::automaticSortCallback (bool automatic)
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
 
-	Resources::instance ( )._automaticSort.setValue (automatic);
+	GUIResources::instance ( )._automaticSort.setValue (automatic);
 	if (true == automatic)
 		sort ( );
 
@@ -1760,9 +1742,9 @@ void QtGroupsPanel::ascendingSortCallback (bool ascending)
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	if (true == ascending)
-		Resources::instance ( )._sortType.setValue ("typeAscendingName");
+		GUIResources::instance ( )._sortType.setValue ("typeAscendingName");
 	else
-		Resources::instance ( )._sortType.setValue ("typeDescendingName");
+		GUIResources::instance ( )._sortType.setValue ("typeDescendingName");
 	typeNameSort ( );
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
@@ -1773,7 +1755,7 @@ void QtGroupsPanel::multiLevelViewCallback (bool enabled)
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
 
-	Resources::instance ( )._multiLevelGroupsView.setValue (enabled);
+	GUIResources::instance ( )._multiLevelGroupsView.setValue (enabled);
 
 	if (true == enabled)	// Vue multi-niveaux
 	{
@@ -1870,7 +1852,7 @@ void QtGroupsPanel::changeGroupLevelCallback ( )
 		{
 			(*itg)->getGroup ( )->setLevel (level);
 			doSort	= true;
-			if (true == Resources::instance ( )._multiLevelGroupsView.getValue ( ))
+			if (true == GUIResources::instance ( )._multiLevelGroupsView.getValue ( ))
 			{
 				QtExpansionTreeRestorer	restorer (**itg);
 				QTreeWidgetItem*	parent	= (*itg)->parent ( );
@@ -1915,7 +1897,7 @@ void QtGroupsPanel::levelSelectionCallback ( )
 
 	const SelectionManager::DIM	dimensions = dialog.dimensions ( );
 	const set<unsigned long>		levels = dialog.levels ( );
-	vector<GroupEntity*>			groups = getContext ( ).getGroupManager( ).getGroups (dimensions, true);
+	vector<GroupEntity*>			groups = getController( ).getGroups (dimensions, true);
 //	vector<Entity*>					selection;
 	for (vector<GroupEntity*>::iterator itg = groups.begin ( ); groups.end ( ) != itg; itg++)
 	{
@@ -1944,7 +1926,7 @@ void QtGroupsPanel::typesRepresentationTypesCallback ( )
 	// On s'intéresse aux types sélectionnés :
 	FilterEntity::objectType    types   = getSelectedEntitiesTypes ( );
 	vector<Entity*>             entities;
-	getContext ( ).getGroupManager ( ).getShownEntities (types, entities);
+	getController( ).getShownEntities (types, entities);
 	changeRepresentationTypes (entities);
     
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
@@ -1991,7 +1973,7 @@ void QtGroupsPanel::unselectCallback ( )
 	// Verrouiller les opérations d'affichage (optimisation) :
 	RenderingManager::DisplayLocker	displayLocker(getGraphicalWidget ( )->getRenderingManager ( ));
 
-	getContext ( ).getSelectionManager ( ).clearSelection();
+	getController( ).clearSelection();
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2008,9 +1990,9 @@ void QtGroupsPanel::selectVisibleCallback ( )
 	// On s'intéresse aux types sélectionnés :
 	FilterEntity::objectType	types	= getSelectedEntitiesTypes ( );
 	vector<Entity*>				entities;
-	getContext ( ).getGroupManager ( ).getShownEntities (types, entities);
+	getController( ).getShownEntities (types, entities);
 
-	getContext ( ).getSelectionManager ( ).addToSelection (entities);
+	getController( ).addToSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2029,47 +2011,47 @@ void QtGroupsPanel::selectAllCallback ( )
 	vector<Entity*>				entities;
 
 	if (types & FilterEntity::GeomVolume){
-		std::vector<Geom::Volume*> ge = getContext ( ).getGeomManager().getVolumesObj();
+		std::vector<Geom::Volume*> ge = getController().getVolumesObj();
 		entities.insert(entities.end(), ge.begin(), ge.end());
 	}
 	if (types & FilterEntity::GeomSurface){
-		std::vector<Geom::Surface*> ge = getContext ( ).getGeomManager().getSurfacesObj();
+		std::vector<Geom::Surface*> ge = getController().getSurfacesObj();
 		entities.insert(entities.end(), ge.begin(), ge.end());
 	}
 	if (types & FilterEntity::GeomCurve){
-		std::vector<Geom::Curve*> ge = getContext ( ).getGeomManager().getCurvesObj();
+		std::vector<Geom::Curve*> ge = getController().getCurvesObj();
 		entities.insert(entities.end(), ge.begin(), ge.end());
 	}
 	if (types & FilterEntity::GeomVertex){
-		std::vector<Geom::Vertex*> ge = getContext ( ).getGeomManager().getVerticesObj();
+		std::vector<Geom::Vertex*> ge = getController().getVerticesObj();
 		entities.insert(entities.end(), ge.begin(), ge.end());
 	}
 	if (types & FilterEntity::TopoBlock){
-		std::vector<Topo::Block*> te = getContext ( ).getTopoManager().getBlocksObj();
+		std::vector<Topo::Block*> te = getController().getBlocksObj();
 		entities.insert(entities.end(), te.begin(), te.end());
 	}
 	if (types & FilterEntity::TopoCoFace){
-		std::vector<Topo::CoFace*> te = getContext ( ).getTopoManager().getCoFacesObj();
+		std::vector<Topo::CoFace*> te = getController().getCoFacesObj();
 		entities.insert(entities.end(), te.begin(), te.end());
 	}
 	if (types & FilterEntity::TopoCoEdge){
-		std::vector<Topo::CoEdge*> te = getContext ( ).getTopoManager().getCoEdgesObj();
+		std::vector<Topo::CoEdge*> te = getController().getCoEdgesObj();
 		entities.insert(entities.end(), te.begin(), te.end());
 	}
 	if (types & FilterEntity::TopoVertex){
-		std::vector<Topo::Vertex*> te = getContext ( ).getTopoManager().getVerticesObj();
+		std::vector<Topo::Vertex*> te = getController().getVerticesObj();
 		entities.insert(entities.end(), te.begin(), te.end());
 	}
 	if (types & FilterEntity::MeshSurface){
-		std::vector<Mesh::Surface*> ms = getContext ( ).getMeshManager().getSurfacesObj();
+		std::vector<Mesh::Surface*> ms = getController().getSurfacesObj();
 		entities.insert(entities.end(), ms.begin(), ms.end());
 	}
 	if (types & FilterEntity::MeshVolume){
-		std::vector<Mesh::Volume*> me = getContext ( ).getMeshManager().getVolumesObj();
+		std::vector<Mesh::Volume*> me = getController().getVolumesObj();
 		entities.insert(entities.end(), me.begin(), me.end());
 	}
 
-	getContext ( ).getSelectionManager ( ).addToSelection (entities);
+	getController( ).addToSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2097,11 +2079,11 @@ void QtGroupsPanel::selectGeomVolumesCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Geom::Volume*> volumes;
-	getContext ( ).getGroupManager ( ).get(groups, volumes);
+	getController( ).get(groups, volumes);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), volumes.begin(), volumes.end());
-	getContext ( ).getSelectionManager ( ).addToSelection (entities);
+	getController( ).addToSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2129,11 +2111,11 @@ void QtGroupsPanel::selectGeomSurfacesCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Geom::Surface*> ge;
-	getContext ( ).getGroupManager ( ).get(groups, ge);
+	getController( ).get(groups, ge);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), ge.begin(), ge.end());
-	getContext ( ).getSelectionManager ( ).addToSelection (entities);
+	getController( ).addToSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2161,11 +2143,11 @@ void QtGroupsPanel::selectGeomCurvesCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Geom::Curve*> ge;
-	getContext ( ).getGroupManager ( ).get(groups, ge);
+	getController( ).get(groups, ge);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), ge.begin(), ge.end());
-	getContext ( ).getSelectionManager ( ).addToSelection (entities);
+	getController( ).addToSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2193,11 +2175,11 @@ void QtGroupsPanel::selectGeomVerticesCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Geom::Vertex*> ge;
-	getContext ( ).getGroupManager ( ).get(groups, ge);
+	getController( ).get(groups, ge);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), ge.begin(), ge.end());
-	getContext ( ).getSelectionManager ( ).addToSelection (entities);
+	getController( ).addToSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2225,11 +2207,11 @@ void QtGroupsPanel::selectTopoBlocksCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Topo::Block*> te;
-	getContext ( ).getGroupManager ( ).get(groups, te);
+	getController( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
-	getContext ( ).getSelectionManager ( ).addToSelection (entities);
+	getController( ).addToSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2257,11 +2239,11 @@ void QtGroupsPanel::selectTopoCoFacesCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Topo::CoFace*> te;
-	getContext ( ).getGroupManager ( ).get(groups, te);
+	getController( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
-	getContext ( ).getSelectionManager ( ).addToSelection (entities);
+	getController( ).addToSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2289,11 +2271,11 @@ void QtGroupsPanel::selectTopoCoEdgesCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Topo::CoEdge*> te;
-	getContext ( ).getGroupManager ( ).get(groups, te);
+	getController( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
-	getContext ( ).getSelectionManager ( ).addToSelection (entities);
+	getController( ).addToSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2321,11 +2303,11 @@ void QtGroupsPanel::selectTopoVerticesCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Topo::Vertex*> te;
-	getContext ( ).getGroupManager ( ).get(groups, te);
+	getController( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
-	getContext ( ).getSelectionManager ( ).addToSelection (entities);
+	getController( ).addToSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2353,11 +2335,11 @@ void QtGroupsPanel::selectMeshVolumesCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Mesh::Volume*> te;
-	getContext ( ).getGroupManager ( ).get(groups, te);
+	getController( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
-	getContext ( ).getSelectionManager ( ).addToSelection (entities);
+	getController( ).addToSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2385,11 +2367,11 @@ void QtGroupsPanel::selectMeshSurfacesCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Mesh::Surface*> te;
-	getContext ( ).getGroupManager ( ).get(groups, te);
+	getController( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
-	getContext ( ).getSelectionManager ( ).addToSelection (entities);
+	getController( ).addToSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2417,11 +2399,11 @@ void QtGroupsPanel::selectMeshLinesCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Mesh::Line*> te;
-	getContext ( ).getGroupManager ( ).get(groups, te);
+	getController( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
-	getContext ( ).getSelectionManager ( ).addToSelection (entities);
+	getController( ).addToSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2449,11 +2431,11 @@ void QtGroupsPanel::selectMeshCloudsCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Mesh::Cloud*> te;
-	getContext ( ).getGroupManager ( ).get(groups, te);
+	getController( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
-	getContext ( ).getSelectionManager ( ).addToSelection (entities);
+	getController( ).addToSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2481,11 +2463,11 @@ void QtGroupsPanel::unselectGeomVolumesCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Geom::Volume*> volumes;
-	getContext ( ).getGroupManager ( ).get(groups, volumes);
+	getController( ).get(groups, volumes);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), volumes.begin(), volumes.end());
-	getContext ( ).getSelectionManager ( ).removeFromSelection (entities);
+	getController( ).removeFromSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2513,11 +2495,11 @@ void QtGroupsPanel::unselectGeomSurfacesCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Geom::Surface*> ge;
-	getContext ( ).getGroupManager ( ).get(groups, ge);
+	getController( ).get(groups, ge);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), ge.begin(), ge.end());
-	getContext ( ).getSelectionManager ( ).removeFromSelection (entities);
+	getController( ).removeFromSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2545,11 +2527,11 @@ void QtGroupsPanel::unselectGeomCurvesCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Geom::Curve*> ge;
-	getContext ( ).getGroupManager ( ).get(groups, ge);
+	getController( ).get(groups, ge);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), ge.begin(), ge.end());
-	getContext ( ).getSelectionManager ( ).removeFromSelection (entities);
+	getController( ).removeFromSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2577,11 +2559,11 @@ void QtGroupsPanel::unselectGeomVerticesCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Geom::Vertex*> ge;
-	getContext ( ).getGroupManager ( ).get(groups, ge);
+	getController( ).get(groups, ge);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), ge.begin(), ge.end());
-	getContext ( ).getSelectionManager ( ).removeFromSelection (entities);
+	getController( ).removeFromSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2609,11 +2591,11 @@ void QtGroupsPanel::unselectTopoBlocksCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Topo::Block*> te;
-	getContext ( ).getGroupManager ( ).get(groups, te);
+	getController( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
-	getContext ( ).getSelectionManager ( ).removeFromSelection (entities);
+	getController( ).removeFromSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2641,11 +2623,11 @@ void QtGroupsPanel::unselectTopoCoFacesCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Topo::CoFace*> te;
-	getContext ( ).getGroupManager ( ).get(groups, te);
+	getController( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
-	getContext ( ).getSelectionManager ( ).removeFromSelection (entities);
+	getController( ).removeFromSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2673,11 +2655,11 @@ void QtGroupsPanel::unselectTopoCoEdgesCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Topo::CoEdge*> te;
-	getContext ( ).getGroupManager ( ).get(groups, te);
+	getController( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
-	getContext ( ).getSelectionManager ( ).removeFromSelection (entities);
+	getController( ).removeFromSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2705,11 +2687,11 @@ void QtGroupsPanel::unselectTopoVerticesCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Topo::Vertex*> te;
-	getContext ( ).getGroupManager ( ).get(groups, te);
+	getController( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
-	getContext ( ).getSelectionManager ( ).removeFromSelection (entities);
+	getController( ).removeFromSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2737,11 +2719,11 @@ void QtGroupsPanel::unselectMeshVolumesCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Mesh::Volume*> te;
-	getContext ( ).getGroupManager ( ).get(groups, te);
+	getController( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
-	getContext ( ).getSelectionManager ( ).removeFromSelection (entities);
+	getController( ).removeFromSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2769,11 +2751,11 @@ void QtGroupsPanel::unselectMeshSurfacesCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Mesh::Surface*> te;
-	getContext ( ).getGroupManager ( ).get(groups, te);
+	getController( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
-	getContext ( ).getSelectionManager ( ).removeFromSelection (entities);
+	getController( ).removeFromSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2801,11 +2783,11 @@ void QtGroupsPanel::unselectMeshLinesCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Mesh::Line*> te;
-	getContext ( ).getGroupManager ( ).get(groups, te);
+	getController( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
-	getContext ( ).getSelectionManager ( ).removeFromSelection (entities);
+	getController( ).removeFromSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 
@@ -2833,11 +2815,11 @@ void QtGroupsPanel::unselectMeshCloudsCallback ( )
 	}	// for (vector<QtGroupTreeWidgetItem*>::iterator it = ...
 
 	std::vector<Mesh::Cloud*> te;
-	getContext ( ).getGroupManager ( ).get(groups, te);
+	getController( ).get(groups, te);
 
 	vector<Entity*>	entities;
 	entities.insert(entities.end(), te.begin(), te.end());
-	getContext ( ).getSelectionManager ( ).removeFromSelection (entities);
+	getController( ).removeFromSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (QtMgx3DApplication::displayUpdatesErrors ( ), this, getAppTitle ( ))
 

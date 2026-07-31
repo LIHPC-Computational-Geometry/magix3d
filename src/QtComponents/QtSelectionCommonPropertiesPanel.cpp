@@ -3,16 +3,14 @@
  * \author      Charles PIGNEROL
  * \date        07/10/2013
  */
-
-#include "Internal/Context.h"
-#include "Internal/Resources.h"
-
 #include "Utils/Common.h"
 #include "Utils/DisplayProperties.h"
 #include "Utils/MgxNumeric.h"
 #include "QtComponents/QtSelectionCommonPropertiesPanel.h"
 #include "QtComponents/QtMgx3DApplication.h"
 #include <QtUtil/QtErrorManagement.h>
+
+#include "QtComponents/GUIResources.h"
 
 #include <TkUtil/ErrorLog.h>
 #include <TkUtil/InternalError.h>
@@ -34,7 +32,6 @@ using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -414,7 +411,7 @@ void QtSelectionCommonPropertiesPanel::selectionModified ( )
 	const vector<Entity*>	entities = getSelectionManager ( )->getEntities ( );
 	if (0 == entities.size ( ))
 		return;
-	if (Resources::instance ( )._maxCommonProperties.getValue( ) < entities.size( ))
+	if (GUIResources::instance ( )._maxCommonProperties.getValue( ) < entities.size( ))
 	{
 		UTF8String	message (Charset::UTF_8);
 		message << "Sélection courante : " << entities.size ( ) << " entités.";
@@ -422,7 +419,7 @@ void QtSelectionCommonPropertiesPanel::selectionModified ( )
 		item->setText (0, UTF8TOQSTRING (message));
 		_entitiesWidget->addTopLevelItem (item);
 		return;
-	}	// if (Resources::instance ( )._maxCommonProperties.getValue ( ) < ...
+	}	// if (GUIResources::instance ( )._maxCommonProperties.getValue ( ) < ...
 
 	QtCommonPropertiesItem*	item	=
 		new QtCommonPropertiesItem (

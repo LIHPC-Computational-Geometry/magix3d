@@ -10,7 +10,6 @@
 #include <TkUtil/util_config.h>
 
 #include "QtComponents/QtMgx3DEntityPanel.h"
-#include "Internal/Context.h"
 
 #include <QtUtil/QtDoubleTextField.h>
 

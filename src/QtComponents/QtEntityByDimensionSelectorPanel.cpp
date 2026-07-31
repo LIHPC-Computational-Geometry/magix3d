@@ -4,8 +4,6 @@
  * \date		05/12/2013
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "QtComponents/QtEntityByDimensionSelectorPanel.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -20,7 +18,6 @@ using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 using namespace Mgx3D::QtComponents;
 
 

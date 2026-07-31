@@ -4,8 +4,6 @@
  * \date        14/11/2013
  */
 
-#include "Internal/Context.h"
-#include "Internal/Resources.h"
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/MgxText.h"
@@ -15,6 +13,8 @@
 #include "QtComponents/QtMgx3DApplication.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtNumericFieldsFactory.h"
+
+#include "QtComponents/GUIResources.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>
@@ -31,10 +31,8 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -258,11 +256,11 @@ QtBlockMeshingPropertyPanel::QtBlockMeshingPropertyPanel (
 	groupBox->setLayout (vlayout);
 //	groupBox->setContentsMargins (0, 10, 0, 0);
 	groupBox->layout ( )->setContentsMargins (
-				Resources::instance ( )._margin.getValue ( ),
-				Resources::instance ( )._margin.getValue ( ),
-				Resources::instance ( )._margin.getValue ( ),
-				Resources::instance ( )._margin.getValue ( ));
-	groupBox->layout ( )->setSpacing (Resources::instance ( )._spacing.getValue( ));
+				GUIResources::instance ( )._margin.getValue ( ),
+				GUIResources::instance ( )._margin.getValue ( ),
+				GUIResources::instance ( )._margin.getValue ( ),
+				GUIResources::instance ( )._margin.getValue ( ));
+	groupBox->layout ( )->setSpacing (GUIResources::instance ( )._spacing.getValue( ));
 	layout->addWidget (groupBox);
 	// Le panneau "méthode" : plusieurs panneaux possibles.
 	// On garde un parent unique dans la layout :
@@ -501,7 +499,7 @@ vector<Entity*> QtBlockMeshingPropertyPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		TopoEntity*	entity	= getContext ( ).getTopoManager ( ).getEntity (*it);
+		Entity*	entity	= getController( ).getEntity (*it);
 		CHECK_NULL_PTR_ERROR (entity)
 		entities.push_back (entity);
 	}
@@ -630,8 +628,7 @@ QtBlockMeshingPropertyPanel*
 
 void QtBlockMeshingPropertyAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
+
 	QtMgx3DTopoOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de maillage des blocs :
@@ -639,7 +636,7 @@ void QtBlockMeshingPropertyAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (panel)
 	vector<string>					blocks		= panel->getBlocksNames ( );
 	unique_ptr<BlockMeshingProperty>	properties (panel->getMeshingProperty ( ));
-	cmdResult	= getContext ( ).getTopoManager ( ).setMeshingProperty (*properties.get ( ), blocks);
+	getController( ).setMeshingProperty (*properties.get ( ), blocks);
 
 	setCommandResult (cmdResult);
 }	// QtBlockMeshingPropertyAction::executeOperation

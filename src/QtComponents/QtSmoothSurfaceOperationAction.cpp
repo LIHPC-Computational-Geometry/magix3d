@@ -3,17 +3,13 @@
  * \author      Eric Brière de l'Isle
  * \date        4/4/2016
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Internal/Resources.h"
-#include "Smoothing/SurfacicSmoothing.h"
-#include "Group/GroupManager.h"
 #include "QtComponents/QtSmoothSurfaceOperationAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
+
+#include "QtComponents/GUIResources.h"
 
 #include <TkUtil/MemoryError.h>
 #include <QtUtil/QtConfiguration.h>
@@ -24,9 +20,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Mesh;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -50,11 +44,11 @@ QtSmoothSurfaceOperationPanel::QtSmoothSurfaceOperationPanel (
 {
 	QVBoxLayout* layout	= new QVBoxLayout (this);
 	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
 	// Nom opération :
@@ -84,11 +78,11 @@ QtSmoothSurfaceOperationPanel::QtSmoothSurfaceOperationPanel (
 	{
 		QHBoxLayout*	hlayout	= new QHBoxLayout ( );
 		hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-		hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+		hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 		layout->addLayout (hlayout);
 		QLabel*	label	= new QLabel (QString::fromUtf8("Nombre d'itérations :"), this);
 		hlayout->addWidget (label);
@@ -100,11 +94,11 @@ QtSmoothSurfaceOperationPanel::QtSmoothSurfaceOperationPanel (
 	{
 		QHBoxLayout*	hlayout	= new QHBoxLayout ( );
 		hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-		hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+		hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 		layout->addLayout (hlayout);
 		QLabel*	label	= new QLabel (QString::fromUtf8("Méthode de lissage :"), this);
 		hlayout->addWidget (label);
@@ -120,11 +114,11 @@ QtSmoothSurfaceOperationPanel::QtSmoothSurfaceOperationPanel (
 	{
 		QHBoxLayout*	hlayout	= new QHBoxLayout ( );
 		hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-		hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+		hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 		layout->addLayout (hlayout);
 		QLabel*	label	= new QLabel ("Solveur :", this);
 		hlayout->addWidget (label);
@@ -305,14 +299,14 @@ void QtSmoothSurfaceOperationAction::executeOperation ( )
 
 	if (true == getSmoothPanel ( )->smoothDefault ( )){
 		Mesh::SurfacicSmoothing lissage;
-		getContext ( ).getGroupManager().addSmoothing(groupName, lissage);
+		getController( ).getGroupManager().addSmoothing(groupName, lissage);
 	}
 	else
 	{
 		Mesh::SurfacicSmoothing lissage(panel->getNbIterations(),
 				panel->getMethod(),
 				panel->getSolver());
-		getContext ( ).getGroupManager().addSmoothing(groupName, lissage);
+		getController( ).getGroupManager().addSmoothing(groupName, lissage);
 	}
 }	// QtSmoothSurfaceOperationAction::executeOperation
 

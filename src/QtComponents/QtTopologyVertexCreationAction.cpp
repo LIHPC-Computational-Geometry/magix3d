@@ -3,9 +3,6 @@
  * \author		Eric B
  * \date		15/3/2019
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -16,17 +13,16 @@
 #include <TkUtil/InternalError.h>
 #include <QtUtil/QtConfiguration.h>
 #include <QtUtil/QtUnicodeHelper.h>
-#include "Geom/Vertex.h"
 
 #include <climits>
+
+#include "QtComponents/GUIResources.h"
 
 
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -277,12 +273,7 @@ void QtTopologyVertexCreationPanel::updateCoordinates (const string& name)
 
     CHECK_NULL_PTR_ERROR (_vertexPanel)
 
-    Utils::Math::Point pt;
-
-
-    Geom::Vertex*	vertex	= getContext ().getGeomManager ( ).getVertex (name, true);
-    CHECK_NULL_PTR_ERROR (vertex);
-    pt = vertex->getPoint();
+    Utils::Math::Point pt	= getController ().getPoint (name, true); //TODO
 
     CHECK_NULL_PTR_ERROR (_xTextField)
     CHECK_NULL_PTR_ERROR (_yTextField)
@@ -294,27 +285,27 @@ void QtTopologyVertexCreationPanel::updateCoordinates (const string& name)
 
 }	// QtTopologyVertexCreationPanel::updateCoordinates
 
-        bool QtTopologyVertexCreationPanel::isModified ( ) const
-        {
-            Math::Point pt;
-            double x,y,z;
-            try
-            {
-                pt = getPoint();
-                x	= pt.getX ( );
-                y	= pt.getY ( );
-                z	= pt.getZ ( );
-            }
-            catch (...)
-            {
-                return true;
-            }
+bool QtTopologyVertexCreationPanel::isModified ( ) const
+{
+	Math::Point pt;
+	double x,y,z;
+	try
+	{
+		pt = getPoint();
+		x	= pt.getX ( );
+		y	= pt.getY ( );
+		z	= pt.getZ ( );
+	}
+	catch (...)
+	{
+		return true;
+	}
 
-            if ((x != _initialX) || (y != _initialY) || (z != _initialZ))
-                return true;
+	if ((x != _initialX) || (y != _initialY) || (z != _initialZ))
+		return true;
 
-            return false;
-        }	// QtTopologyVertexCreationPanel::isModified
+	return false;
+}	// QtTopologyVertexCreationPanel::isModified
 
 
 void QtTopologyVertexCreationPanel::preview(bool show, bool destroyInteractor)
@@ -337,13 +328,13 @@ void QtTopologyVertexCreationPanel::preview(bool show, bool destroyInteractor)
 
         try
         {
-            Context*		context		= dynamic_cast<Context*>(&getContext ( ));
-            CHECK_NULL_PTR_ERROR (context)
+            Controller*		controller		= &getController ( );
+            CHECK_NULL_PTR_ERROR (controller)
 
             DisplayProperties	graphicalProps;
             graphicalProps.setCloudColor (Color (
-                    255 * Resources::instance ( )._previewColor.getRed ( ), 255 * Resources::instance ( )._previewColor.getGreen ( ), 255 * Resources::instance ( )._previewColor.getBlue ( )));
-            graphicalProps.setPointSize (Resources::instance ( )._previewPointSize.getValue ( ));
+                    255 * GUIResources::instance ( )._previewColor.getRed ( ), 255 * GUIResources::instance ( )._previewColor.getGreen ( ), 255 * GUIResources::instance ( )._previewColor.getBlue ( )));
+            graphicalProps.setPointSize (GUIResources::instance ( )._previewPointSize.getValue ( ));
 
 
             const vector<Math::Point>&	points = {getPoint()};
@@ -460,8 +451,6 @@ void QtTopologyVertexCreationAction::executeOperation ( )
 	QtTopologyVertexCreationPanel*	panel	= dynamic_cast<QtTopologyVertexCreationPanel*>(getOperationPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)
 
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtTopologyCreationAction::executeOperation ( );
 
 	// Récupération des paramètres d'association des entités topologiques :
@@ -470,9 +459,9 @@ void QtTopologyVertexCreationAction::executeOperation ( )
 
     if(vertex.empty()){
        Utils::Math::Point pt = panel->getPoint();
-       cmdResult    = getContext ( ).getTopoManager( ).newTopoVertex(pt,group);
+       getController ( ).getTopoManager( ).newTopoVertex(pt,group);
     }else{
-        cmdResult	= getContext ( ).getTopoManager( ).newTopoOnGeometry (vertex);
+        getController ( ).getTopoManager( ).newTopoOnGeometry (vertex);
     }
 
 	setCommandResult (cmdResult);

@@ -6,7 +6,6 @@
 #ifndef QT_MGX3D_APPLICATION_H
 #define QT_MGX3D_APPLICATION_H
 
-#include "Internal/Resources.h"
 #include <QApplication>
 
 #include <TkUtil/Version.h>

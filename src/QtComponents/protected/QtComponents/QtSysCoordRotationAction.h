@@ -10,7 +10,6 @@
 #include "QtComponents/QtMgx3DRotationPanel.h"
 #include "QtComponents/QtMgx3DOperationsPanel.h"
 
-#include "Internal/SelectionManager.h"
 
 #include <QCheckBox>
 

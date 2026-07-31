@@ -3,9 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        22/05/2014
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -27,9 +24,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -273,8 +268,8 @@ vector<Entity*> QtTopologyTranslationPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		TopoEntity*	entity	=
-					getContext ( ).getTopoManager ( ).getEntity (*it, false);
+		Entity*	entity	=
+					getController ( ).getTopoManager ( ).getEntity (*it, false);
 		if (0 != entity)
 			entities.push_back (entity);
 	}
@@ -344,8 +339,6 @@ QtTopologyTranslationPanel*
 
 void QtTopologyTranslationAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DTopoOperationAction::executeOperation ( );
 
 	// Récupération des paramètres d'association des entités topologiques :
@@ -355,7 +348,7 @@ void QtTopologyTranslationAction::executeOperation ( )
 	Math::Vector			translation	(panel->getTranslation ( ));
 	bool					propagate	= panel->doPropagate ( );
 
-	cmdResult	= getContext ( ).getTopoManager ( ).translate (entities, translation, propagate);
+	getController ( ).getTopoManager ( ).translate (entities, translation, propagate);
 
 	setCommandResult (cmdResult);
 }	// QtTopologyTranslationAction::executeOperation

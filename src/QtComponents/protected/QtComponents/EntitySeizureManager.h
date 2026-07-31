@@ -7,11 +7,9 @@
 #ifndef ENTITY_SEIZURE_MANAGER_H
 #define ENTITY_SEIZURE_MANAGER_H
 
-
-#include "Internal/SelectionManager.h"
-#include "Internal/Context.h"
-
 #include <QColor>
+
+#include "Controller/Controller.h"
 
 
 namespace Mgx3D
@@ -146,8 +144,8 @@ class EntitySeizureManager
 	/**
 	 * \return		Une référence sur le contexte associé.
 	 */
-	virtual const Mgx3D::Internal::Context& getContext ( ) const;
-	virtual Mgx3D::Internal::Context& getContext ( );
+	virtual const Mgx3D::Controller& getController ( ) const;
+	virtual Mgx3D::Controller& getController ( );
 
 	/**
 	 * \return		Une référence sur la fenêtre principale associée.

@@ -3,12 +3,7 @@
  * \author		Charles PIGNEROL - Eric BRIERE DE L'ISLE
  * \date		23/11/2017
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
-#include "Topo/CommandSplitFacesWithOgrid.h"
-#include "Topo/TopoDisplayRepresentation.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtNumericFieldsFactory.h"
@@ -21,9 +16,6 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
 
 
@@ -249,6 +241,10 @@ size_t QtTopologySplitFaceWithOGridPanel::getCentralEdgesNumber ( ) const
 void QtTopologySplitFaceWithOGridPanel::preview (
 											bool show, bool destroyInteractor)
 {
+
+	std::cout<<"Print disabled for the moment: refactoring in progress"<<std::endl;
+
+	/*
 	// Lors de la construction getGraphicalWidget peut être nul ...
 	try
 	{
@@ -296,11 +292,11 @@ void QtTopologySplitFaceWithOGridPanel::preview (
 
 		DisplayProperties	graphicalProps;
 		graphicalProps.setWireColor (Color (
-						255 * Resources::instance ( )._previewColor.getRed ( ),
-						255 * Resources::instance ( )._previewColor.getGreen ( ),
-						255 * Resources::instance ( )._previewColor.getBlue ( )));
+						255 * GUIResources::instance ( )._previewColor.getRed ( ),
+						255 * GUIResources::instance ( )._previewColor.getGreen ( ),
+						255 * GUIResources::instance ( )._previewColor.getBlue ( )));
 		graphicalProps.setLineWidth (
-						Resources::instance ( )._previewWidth.getValue ( ));
+						GUIResources::instance ( )._previewWidth.getValue ( ));
 		RenderingManager::RepresentationID	repID	=
 				getRenderingManager ( ).createSegmentsWireRepresentation (
 									points, indices, graphicalProps, true);
@@ -312,6 +308,7 @@ void QtTopologySplitFaceWithOGridPanel::preview (
 	catch (...)
 	{
 	}
+	*/
 }	// QtTopologySplitFaceWithOGridPanel::preview
 
 
@@ -323,14 +320,14 @@ vector<Entity*> QtTopologySplitFaceWithOGridPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = edgesNames.begin ( );
 			edgesNames.end ( ) != it; it++)
 	{
-		TopoEntity*	te	= getContext( ).getTopoManager( ).getCoEdge(*it, false);
+		Entity*	te	= getController( ).getTopoManager( ).getCoEdge(*it, false);
 		if (0 != te)
 			entities.push_back (te);
 	}	// for (vector<string>::const_iterator it = edgesNames.begin ( ); ...
 	for (vector<string>::const_iterator it = facesNames.begin ( );
 	     facesNames.end ( ) != it; it++)
 	{
-		TopoEntity*	te	= getContext( ).getTopoManager( ).getCoFace(*it, false);
+		Entity*	te	= getController( ).getTopoManager( ).getCoFace(*it, false);
 		if (0 != te)
 			entities.push_back (te);
 	}	// for (vector<string>::const_iterator it = facesNames.begin ( ); ...
@@ -413,8 +410,6 @@ void QtTopologySplitFaceWithOGridAction::executeOperation ( )
 	QtTopologySplitFaceWithOGridPanel*	panel	= dynamic_cast<QtTopologySplitFaceWithOGridPanel*>(getTopologySplitFaceWithOGridPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)
 
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de découpage en o-grid des faces
@@ -424,7 +419,7 @@ void QtTopologySplitFaceWithOGridAction::executeOperation ( )
 	double			ratio			= panel->getRatio ( );
 	size_t			centralEdgesNum	= panel->getCentralEdgesNumber ( );
 
-	cmdResult	= getContext ( ).getTopoManager ( ).splitFacesWithOgrid (facesNames, edgesNames, ratio, centralEdgesNum);
+	getController ( ).getTopoManager ( ).splitFacesWithOgrid (facesNames, edgesNames, ratio, centralEdgesNum);
 
 	setCommandResult (cmdResult);
 }	// QtTopologySplitFaceWithOGridAction::executeOperation

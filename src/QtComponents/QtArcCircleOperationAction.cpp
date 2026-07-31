@@ -3,18 +3,8 @@
  * \author      Charles PIGNEROL
  * \date        08/09/2014
  */
-
-#include "Internal/Context.h"
-#include "Internal/Context.h"
-#include "Internal/Resources.h"
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManager.h"
-#include "Geom/Vertex.h"
-#include "Geom/CommandNewArcCircle.h"
-#include "Geom/CommandNewArcCircleWithAngles.h"
-#include "Geom/CommandNewArcEllipse.h"
-#include "Geom/GeomDisplayRepresentation.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtArcCircleOperationAction.h"
 #include "QtComponents/QtMgx3DApplication.h"
@@ -25,21 +15,21 @@
 #include <TkUtil/UTF8String.h>
 #include <QtUtil/QtConfiguration.h>
 
+#include "QtComponents/GUIResources.h"
+
 #include <QLabel>
 #include <QBoxLayout>
 
 #include <values.h>	// DBL_MAX
+
+#include "Controller/Controller.h"
 
 
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Group;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
-using namespace Mgx3D::CoordinateSystem;
 
 namespace Mgx3D
 {
@@ -473,9 +463,9 @@ QtArcCircleOperationPanel::QtArcCircleOperationPanel (
 //	SET_WIDGET_BACKGROUND (this, Qt::yellow)
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
 	// Nom opération :
@@ -508,9 +498,9 @@ QtArcCircleOperationPanel::QtArcCircleOperationPanel (
 	QtGroupBox*		groupBox	= new QtGroupBox(QString::fromUtf8("Paramètres de l'arc"), this);
 	QVBoxLayout*	vlayout	= new QVBoxLayout (groupBox);
 	vlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
-	vlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ));
+	vlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	groupBox->setLayout (vlayout);
 	layout->addWidget (groupBox);
 	// Le panneau "méthode" : plusieurs panneaux possibles.
@@ -813,7 +803,10 @@ void QtArcCircleOperationPanel::autoUpdate ( )
 
 void QtArcCircleOperationPanel::preview (bool on, bool destroyInteractor)
 {
-	try
+
+	std::cout<<"Print disabled for the moment: refactoring in progress"<<std::endl;
+
+	/*try
 	{
 		// Quoi qu'il arrive on détruit l'éventuel aperçu existant :
 		removePreviewedObjects ( );
@@ -908,7 +901,7 @@ void QtArcCircleOperationPanel::preview (bool on, bool destroyInteractor)
 	}
 	catch (...)
 	{
-	}
+	}*/
 }	// QtArcCircleOperationPanel::preview
 
 
@@ -1024,8 +1017,6 @@ QtArcCircleOperationPanel* QtArcCircleOperationAction::getArcCirclePanel ( )
 
 void QtArcCircleOperationAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 
 //	QtMgx3DGeomOperationAction::executeOperation ( );
 
@@ -1044,9 +1035,9 @@ void QtArcCircleOperationAction::executeOperation ( )
 			const Utils::Math::Vector   normal	        = getArcCirclePanel ( )->getNormal ( );
 			const bool		            defineNormal	= getArcCirclePanel ( )->defineNormal ( );
 			if (true == defineNormal)
-				cmdResult	= getContext ( ).getGeomManager ( ).newArcCircle (vertex1, vertex2, vertex3, direct, normal, name);
+				getController( ).newArcCircle (vertex1, vertex2, vertex3, direct, normal, name);
 			else
-				cmdResult	= getContext ( ).getGeomManager ( ).newArcCircle (vertex1, vertex2, vertex3, direct, name);
+				getController( ).newArcCircle (vertex1, vertex2, vertex3, direct, name);
 		}
 		break;
 		case QtArcCircleOperationPanel::SYSCOORD_2_ANGLES				:
@@ -1055,7 +1046,7 @@ void QtArcCircleOperationAction::executeOperation ( )
 			const double    end         = getArcCirclePanel ( )->getEndAngle ( );
 			const double    rayLength   = getArcCirclePanel ( )->getRayLength ( );
 			const string    sysCoordName= getArcCirclePanel ( )->getSysCoordName ( );
-			cmdResult   = getContext ( ).getGeomManager ( ).newArcCircle (start, end, rayLength, sysCoordName, name);
+			getController( ).newArcCircle (start, end, rayLength, sysCoordName, name);
 		}   // case QtArcCircleOperationPanel::SYSCOORD_2_ANGLES
 		break;
         case QtArcCircleOperationPanel::CIRCUMCIRCLE_PTS				:
@@ -1063,7 +1054,7 @@ void QtArcCircleOperationAction::executeOperation ( )
             const string	            vertex1	        = getArcCirclePanel ( )->getVertex1UniqueName ( );
             const string	            vertex2	        = getArcCirclePanel ( )->getVertex2UniqueName ( );
             const string	            vertex3	        = getArcCirclePanel ( )->getVertex3UniqueName ( );
-            cmdResult	= getContext ( ).getGeomManager ( ).newArcCircle (vertex1, vertex2, vertex3, name);
+            getController( ).newArcCircle (vertex1, vertex2, vertex3, name);
         }
 		break;
 		case QtArcCircleOperationPanel::ELLIPSE_EXTREMITIES_CENTER		:
@@ -1072,7 +1063,7 @@ void QtArcCircleOperationAction::executeOperation ( )
 			const string	            vertex2	        = getArcCirclePanel ( )->getVertex2UniqueName ( );
 			const string	            vertex3	        = getArcCirclePanel ( )->getVertex3UniqueName ( );
 			const bool		            direct	        = getArcCirclePanel ( )->directOrientation ( );
-			cmdResult	= getContext ( ).getGeomManager ( ).newArcEllipse (vertex1, vertex2, vertex3, direct, name);
+			getController( ).newArcEllipse (vertex1, vertex2, vertex3, direct, name);
 		}
 		break;
 		default	:

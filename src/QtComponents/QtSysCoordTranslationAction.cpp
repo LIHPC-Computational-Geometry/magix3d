@@ -3,10 +3,6 @@
  * \author		Eric Brière de l'Isle
  * \date		8/6/2018
  */
-
-#include "Internal/Context.h"
-#include "Internal/SelectionManager.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -31,10 +27,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
-using namespace Mgx3D::CoordinateSystem;
 
 namespace Mgx3D
 {
@@ -244,8 +237,8 @@ vector<Entity*> QtSysCoordTranslationPanel::getInvolvedEntities ( )
 	vector<Entity*>	entities;
 
 	const string	name	= getSysCoordName ( );
-	CoordinateSystem::SysCoord*	entity	=
-			getContext ( ).getSysCoordManager ( ).getSysCoord (name, false);
+	Entity*	entity	=
+			getController( ).getSysCoordManager ( ).getSysCoord (name, false);
 	if (0 != entity)
 		entities.push_back (entity);
 
@@ -326,8 +319,6 @@ QtSysCoordTranslationPanel*
 
 void QtSysCoordTranslationAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	QtSysCoordTranslationPanel*	panel	= getTranslationPanel ( );
@@ -338,9 +329,9 @@ void QtSysCoordTranslationAction::executeOperation ( )
 	const string	      	groupName	= panel->getGroupName ( );
 
 	if (copy)
-		cmdResult	= getContext ( ).getSysCoordManager ( ).copyAndTranslate (entitiy, translation, groupName);
+		getController( ).getSysCoordManager ( ).copyAndTranslate (entitiy, translation, groupName);
 	else
-		cmdResult	= getContext ( ).getSysCoordManager ( ).translate (entitiy, translation);
+		getController( ).getSysCoordManager ( ).translate (entitiy, translation);
 
 	setCommandResult (cmdResult);
 }	// QtSysCoordTranslationAction::executeOperation

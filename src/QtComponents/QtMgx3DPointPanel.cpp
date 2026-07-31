@@ -3,10 +3,6 @@
  * \author		Charles PIGNEROL
  * \date		19/12/2012
  */
-
-#include "Internal/Context.h"
-#include "Internal/Resources.h"
-
 #include "QtComponents/QtMgx3DPointPanel.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -15,10 +11,6 @@
 #include "Utils/Common.h"
 #include "Utils/Spherical.h"
 #include "Utils/Cylindrical.h"
-#include "Geom/Vertex.h"
-#include "Topo/TopoManager.h"
-#include "Topo/Vertex.h"
-#include "SysCoord/SysCoord.h"
 #include <QtUtil/QtConfiguration.h>
 #include <QtUtil/QtObjectSignalBlocker.h>
 #include <TkUtil/Exception.h>
@@ -30,12 +22,12 @@
 
 #include <iostream>
 
+#include "QtComponents/GUIResources.h"
+
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Topo;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -79,7 +71,7 @@ QtMgx3DPointPanel::QtMgx3DPointPanel (QWidget* parent, const string& title,
 	_coordTypeComboBox->addItem(QString::fromUtf8("Cartésiennes"));
 	_coordTypeComboBox->addItem(QString::fromUtf8("Sphériques"));
 	_coordTypeComboBox->addItem(QString::fromUtf8("Cylindriques"));
-	hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+	hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 
 	if (true == verticalLayout)
 	{
@@ -479,7 +471,7 @@ void QtMgx3DPointPanel::updateCoordinates (const string& name)
 			case Entity::GeomVertex	:
 			{
 				const Geom::Vertex*	vertex	=
-					getContext ().getGeomManager ( ).getVertex (name, true);
+					getController().getGeomManager ( ).getVertex (name, true);
 				CHECK_NULL_PTR_ERROR (vertex);
 				pt = vertex->getCoord();
 			}	// case Entity::GeomVertex
@@ -487,7 +479,7 @@ void QtMgx3DPointPanel::updateCoordinates (const string& name)
 			case Entity::TopoVertex	:
 			{
 				const Topo::Vertex*	vertex	=
-					getContext ().getTopoManager ( ).getVertex (name, true);
+					getController().getTopoManager ( ).getVertex (name, true);
 				CHECK_NULL_PTR_ERROR (vertex);
 				pt = vertex->getCoord();
 			}	// case Entity::TopoVertex
@@ -547,20 +539,19 @@ CoordinateSystem::SysCoord* QtMgx3DPointPanel::getSysCoord() const
 	string repName = _sysCoordPanel->getUniqueName();
 
 	if (!repName.empty()){
-		return getContext().getSysCoordManager().getSysCoord(repName, true);
+		return getController().getSysCoordManager().getSysCoord(repName, true);
 	}
 	else
 		return 0;
 }
 
-Internal::Context& QtMgx3DPointPanel::getContext() const
+Controller& QtMgx3DPointPanel::getController() const
 {
 	// TODO peu mieux faire ...
 	CHECK_NULL_PTR_ERROR(_vertexIDTextField);
-	Internal::Context* ctxifc = &_vertexIDTextField->getMainWindow ( ).getContext();
-	Internal::Context* ctx = dynamic_cast<Internal::Context*>(ctxifc);
-	CHECK_NULL_PTR_ERROR(ctx);
-	return *ctx;
+	Controller* ctr = &_vertexIDTextField->getMainWindow ( ).getController();
+	CHECK_NULL_PTR_ERROR(ctr);
+	return *ctr;
 }
 
 

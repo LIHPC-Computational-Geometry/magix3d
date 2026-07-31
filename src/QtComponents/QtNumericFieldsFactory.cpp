@@ -3,9 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        09/01/2015
  */
-
-#include "Internal/Context.h"
-
 #include "QtComponents/QtNumericFieldsFactory.h"
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"

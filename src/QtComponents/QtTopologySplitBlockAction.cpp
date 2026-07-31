@@ -3,12 +3,7 @@
  * \author      Charles PIGNEROL
  * \date        10/03/2014
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
-#include "Topo/CommandSplitBlocks.h"
-#include "Topo/TopoDisplayRepresentation.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtNumericFieldsFactory.h"
@@ -26,11 +21,6 @@ using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
-using namespace Mgx3D::Geom;
-using namespace Mgx3D::Topo;
-using namespace Mgx3D::Utils;
-
 
 namespace Mgx3D
 {
@@ -274,7 +264,7 @@ vector<string> QtTopologySplitBlockPanel::getBlocksNames ( ) const
 	CHECK_NULL_PTR_ERROR (_blocksPanel)
 	if (true == allBlocks ( ))
 	{
-		names	= getContext ( ).getTopoManager ( ).getBlocks ( );
+		names	= getController ( ).getTopoManager ( ).getBlocks ( );
 // CP : se sont les noms type Bl0000 qui sont attendus et non type TopoBlock0000
 //		for (Block* b : getContext ( ).getTopoManager ( ).getBlocksObj ())
 //			names.push_back (b->getUniqueName ( ));
@@ -315,7 +305,7 @@ Math::Point QtTopologySplitBlockPanel::getCutPoint ( ) const
 	if (0 == name.length ( ))
 		return Math::Point ( );
 
-	Entity*			entity	= &getContext().nameToEntity (name);
+	Entity*			entity	= &getController().nameToEntity (name);
 	GeomEntity*		ge		= dynamic_cast<GeomEntity*>(entity);
 	Topo::Vertex*	v		= dynamic_cast<Topo::Vertex*>(entity);
 
@@ -330,6 +320,10 @@ Math::Point QtTopologySplitBlockPanel::getCutPoint ( ) const
 
 void QtTopologySplitBlockPanel::preview (bool show, bool destroyInteractor)
 {
+
+	std::cout<<"Print disabled for the moment: refactoring in progress"<<std::endl;
+
+	/*
 	// Lors de la construction getGraphicalWidget peut être nul ...
 	try
 	{
@@ -418,11 +412,11 @@ void QtTopologySplitBlockPanel::preview (bool show, bool destroyInteractor)
 
 		DisplayProperties	graphicalProps;
 		graphicalProps.setWireColor (Color (
-						255 * Resources::instance ( )._previewColor.getRed ( ),
-						255 * Resources::instance ( )._previewColor.getGreen ( ),
-						255 * Resources::instance ( )._previewColor.getBlue ( )));
+						255 * GUIResources::instance ( )._previewColor.getRed ( ),
+						255 * GUIResources::instance ( )._previewColor.getGreen ( ),
+						255 * GUIResources::instance ( )._previewColor.getBlue ( )));
 		graphicalProps.setLineWidth (
-						Resources::instance ( )._previewWidth.getValue ( ));
+						GUIResources::instance ( )._previewWidth.getValue ( ));
 		RenderingManager::RepresentationID	repID	=
 				getRenderingManager ( ).createSegmentsWireRepresentation (
 									points, indices, graphicalProps, true);
@@ -434,6 +428,7 @@ void QtTopologySplitBlockPanel::preview (bool show, bool destroyInteractor)
 	catch (...)
 	{
 	}
+	*/
 }	// QtTopologySplitBlockPanel::preview
 
 
@@ -443,23 +438,23 @@ vector<Entity*> QtTopologySplitBlockPanel::getInvolvedEntities ( )
 
 	if (true == allBlocks ( ))
 	{
-		for (Block* b : getContext ( ).getTopoManager ( ).getBlocksObj ( ))
-			entities.push_back (b);
+		for (std::string b_name : getController().getTopoManager().getBlocks())
+			Entity*	entity	= getController( ).getTopoManager( ).getBlock(b_name, false);
 	}	// if (true == allBlocks ( ))
 	else
 	{
 		for (string name : getBlocksNames ( ))
 		{
-			TopoEntity*	te	=
-				getContext( ).getTopoManager( ).getBlock(name, false);
+			Entity*	te	=
+				getController( ).getTopoManager( ).getBlock(name, false);
 			if (0 != te)
 				entities.push_back (te);
 		}	// for (vector<string>::const_iterator it = ...
 	}	// else if (true == allBlocks ( ))
 
 	const string	edgeName	= getEdgeName ( );
-	TopoEntity*		edge		=
-			getContext ( ).getTopoManager ( ).getCoEdge (edgeName, false);
+	Entity*		edge		=
+			getController ( ).getTopoManager ( ).getCoEdge (edgeName, false);
 	if (0 != edge)
 		entities.push_back (edge);
 	switch (getCutDefinitionMethod ( ))
@@ -469,7 +464,7 @@ vector<Entity*> QtTopologySplitBlockPanel::getInvolvedEntities ( )
 			CHECK_NULL_PTR_ERROR (_cutPointEntityPanel)
 			const string	point	= _cutPointEntityPanel->getUniqueName ( );
 			if (0 != point.length ( ))
-				entities.push_back (&getContext().nameToEntity (point));
+				entities.push_back (&getController().nameToEntity (point));
 		}
 		break;
 	}	// switch (getCutDefinitionMethod ( ))
@@ -605,17 +600,16 @@ void QtTopologySplitBlockAction::executeOperation ( )
 	vector<string>	blocksNames	= panel->getBlocksNames ( );
 	const string	edgeName	= panel->getEdgeName ( );
 
-	Mgx3D::Internal::M3DCommandResult*	result	= 0;
 	if (true == panel->allBlocks ( ))
 	{
 		switch (panel->getCutDefinitionMethod ( ))
 		{
 			case QtTopologySplitBlockPanel::CDM_RATIO	:
-				result	= getContext( ).getTopoManager( ).splitAllBlocks(
+				getController( ).getTopoManager( ).splitAllBlocks(
 											edgeName, panel->getRatio ( ));
 			break;
 			case QtTopologySplitBlockPanel::CDM_POINT	:
-					result	= getContext( ).getTopoManager( ).splitAllBlocks(
+					getController( ).getTopoManager( ).splitAllBlocks(
 											edgeName, panel->getCutPoint ( ));
 			break;
 			default	:
@@ -634,11 +628,11 @@ void QtTopologySplitBlockAction::executeOperation ( )
 		switch (panel->getCutDefinitionMethod ( ))
 		{
 			case QtTopologySplitBlockPanel::CDM_RATIO	:
-				result	= getContext( ).getTopoManager( ).splitBlocks(
+				getController( ).getTopoManager( ).splitBlocks(
 								blocksNames, edgeName, panel->getRatio ( ));
 			break;
 			case QtTopologySplitBlockPanel::CDM_POINT	:
-					result	= getContext( ).getTopoManager( ).splitBlocks(
+					getController( ).getTopoManager( ).splitBlocks(
 								blocksNames, edgeName, panel->getCutPoint ( ));
 			break;
 			default	:
@@ -652,7 +646,6 @@ void QtTopologySplitBlockAction::executeOperation ( )
 			}
 		}	// switch (panel->getCutDefinitionMethod ( ))
 	}	// if (true == panel->allBlocks ( ))
-	CHECK_NULL_PTR_ERROR (result)
 	setCommandResult (result);
 	if (Command::FAIL == result->getStatus ( ))
 		throw Exception (result->getErrorMessage ( ));

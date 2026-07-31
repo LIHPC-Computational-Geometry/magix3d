@@ -3,13 +3,8 @@
  * \author		Eric Brière de l'Isle
  * \date		4/3/2016
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
-#include "Internal/EntitiesHelper.h"
-#include "Internal/InfoCommand.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMeshInformationOperationAction.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -33,7 +28,6 @@ using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -250,7 +244,7 @@ void QtMeshInformationOperationPanel::autoUpdate ( )
 			if (bl->isMeshed() || bl->isStructured())
 				nb_provide_regions += bl->getNbRegions();
 		}
-		nb_created_regions = getContext().getMeshManager().getNbRegions();
+		nb_created_regions = getController().getNbRegions();
 
 		{
 			UTF8String	text ("Nombre de blocs : ", Charset::UTF_8);
@@ -293,7 +287,7 @@ void QtMeshInformationOperationPanel::autoUpdate ( )
 			if (cf->isMeshed() || cf->isStructured())
 				nb_provide_faces += cf->getNbMeshingFaces();
 		}
-		nb_created_faces = getContext().getMeshManager().getNbFaces();
+		nb_created_faces = getController().getNbFaces();
 
 		{
 			UTF8String	text ("Nombre de faces : ", Charset::UTF_8);

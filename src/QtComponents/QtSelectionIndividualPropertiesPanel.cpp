@@ -3,10 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        12/09/2013
  */
-
-#include "Internal/Context.h"
-#include "Internal/Resources.h"
-
 #include "Utils/Common.h"
 #include "Utils/DisplayProperties.h"
 #include "QtComponents/QtMgx3DApplication.h"
@@ -14,6 +10,8 @@
 #include "QtComponents/RenderedEntityRepresentation.h"
 #include "QtComponents/QtMgx3DApplication.h"
 #include <QtUtil/QtErrorManagement.h>
+
+#include "QtComponents/GUIResources.h"
 
 #include <TkUtil/ErrorLog.h>
 #include <TkUtil/InternalError.h>
@@ -33,7 +31,6 @@ using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Internal;
 /*static bool isInfinite (double value)
 {
 	if ((DBL_MAX == value) || (-DBL_MAX == value))
@@ -500,7 +497,7 @@ void QtSelectionIndividualPropertiesPanel::entitiesAddedToSelection (
 		return;
 
 	CHECK_NULL_PTR_ERROR (_entitiesWidget)
-	if (Resources::instance ( )._maxIndividualProperties.getValue ( ) < entities.size ( ))
+	if (GUIResources::instance ( )._maxIndividualProperties.getValue ( ) < entities.size ( ))
 	{
 		UTF8String	message (Charset::UTF_8);
 		message << "Sélection courante : " << entities.size ( ) << " entités.";
@@ -508,7 +505,7 @@ void QtSelectionIndividualPropertiesPanel::entitiesAddedToSelection (
 		item->setText (0, UTF8TOQSTRING (message));
 		_entitiesWidget->addTopLevelItem (item);
 		return;
-	}	// if (Resources::instance ( )._maxIndividualProperties.getValue ( ) < ...
+	}	// if (GUIResources::instance ( )._maxIndividualProperties.getValue ( ) < ...
 
 	QtSelectionPropertiesTreeItem*	item	= 0;
 	RenderingManager*		rm	= 0 == getGraphicalWidget ( ) ?

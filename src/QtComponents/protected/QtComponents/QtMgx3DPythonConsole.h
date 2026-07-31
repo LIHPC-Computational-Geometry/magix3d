@@ -2,7 +2,6 @@
 #define QT_MGX3D_PYTHON_CONSOLE_H
 
 
-#include "Internal/ScriptingManager.h"
 #include "Utils/CommandManager.h"
 #include <QtPython3/QtPythonConsole.h>
 

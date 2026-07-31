@@ -3,15 +3,9 @@
  * \author		Charles PIGNEROL
  * \date		02/08/2013
  */
-
-#include "Internal/Context.h"
-
 #include "QtComponents/QtMgx3DQualifWidget.h"
 
 #include "Utils/Common.h"
-#include "Mesh/Mgx3DQualifSerie.h"
-#include "Mesh/Surface.h"
-#include "Mesh/Volume.h"
 
 #include <TkUtil/Exception.h>
 #include <TkUtil/InternalError.h>
@@ -20,9 +14,7 @@
 
 
 using namespace GQualif;
-using namespace gmds;
 using namespace Mgx3D;
-using namespace Mgx3D::Internal;
 using namespace Mgx3D::Utils;
 using namespace TkUtil;
 using namespace std;
@@ -40,8 +32,8 @@ namespace QtComponents
 // ===========================================================================
 
 
-QtMgx3DQualifWidget::QtMgx3DQualifWidget (QWidget* parent, Context* context)
-	: QtQualifWidget (parent, "Magix 3D"), _context (context),
+QtMgx3DQualifWidget::QtMgx3DQualifWidget (QWidget* parent, Controller* controller)
+	: QtQualifWidget (parent, "Magix 3D"), _controller (controller),
 	  _popupMenu (0)
 {
 	_popupMenu	= new QMenu (this);
@@ -166,14 +158,14 @@ vector<gmds::CellGroup<gmds::Region>*>
 }	// QtMgx3DQualifWidget::getSelectedClassesVolumes
 
 
-Context& QtMgx3DQualifWidget::getContext ( )
+Controller& QtMgx3DQualifWidget::getController ( )
 {
 	CHECK_NULL_PTR_ERROR (_context)
 	return *_context;
 }	// QtMgx3DQualifWidget::getContext
 
 
-const Context& QtMgx3DQualifWidget::getContext ( ) const
+const Controller& QtMgx3DQualifWidget::getController ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_context)
 	return *_context;

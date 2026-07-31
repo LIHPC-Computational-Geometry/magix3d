@@ -1,5 +1,3 @@
-#include "Internal/Context.h"
-
 #include "QtComponents/QtLandmarkDialog.h"
 #include <QtUtil/QtGroupBox.h>
 #include <QtUtil/QtConfiguration.h>

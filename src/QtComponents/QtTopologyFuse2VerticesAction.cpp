@@ -3,8 +3,6 @@
  * \author      Eric Brière de l'Isle
  * \date        28/11/2017
  */
-
-#include "Internal/Context.h"
 #include "QtComponents/QtTopologyFuse2VerticesAction.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "Utils/Common.h"
@@ -18,9 +16,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -203,16 +199,16 @@ vector<Entity*> QtTopologyFuse2VerticesPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it1 = names1.begin ( );
 	     names1.end ( ) != it1; it1++)
 	{
-		TopoEntity*		vertex1	=
-			getContext ( ).getTopoManager ( ).getVertex (*it1, false);
+		Entity*		vertex1	=
+			getController ( ).getTopoManager ( ).getVertex (*it1, false);
 		if (0 != vertex1)
 			entities.push_back (vertex1);
 	}	// for (vector<string>::const_iterator it1 = names1.begin ( ); ...
 	for (vector<string>::const_iterator it2 = names2.begin ( );
 	     names2.end ( ) != it2; it2++)
 	{
-		TopoEntity*		vertex2	=
-			getContext ( ).getTopoManager ( ).getVertex (*it2, false);
+		Entity*		vertex2	=
+			getController ( ).getTopoManager ( ).getVertex (*it2, false);
 		if (0 != vertex2)
 			entities.push_back (vertex2);
 	}	// for (vector<string>::const_iterator it2 = names1.begin ( ); ...
@@ -294,8 +290,6 @@ void QtTopologyFuse2VerticesAction::executeOperation ( )
 	QtTopologyFuse2VerticesPanel*	panel	= dynamic_cast<QtTopologyFuse2VerticesPanel*>(getTopologyFuse2VerticesPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)
 
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de collage des sommets topologiques :
@@ -309,7 +303,7 @@ void QtTopologyFuse2VerticesAction::executeOperation ( )
 	if (names2.size ( ) == 1)
 		name2	= names2 [0];
 
-	cmdResult	= getContext ( ).getTopoManager ( ).fuse2Vertices (name1, name2);
+	etController ( ).getTopoManager ( ).fuse2Vertices (name1, name2);
 
 	setCommandResult (cmdResult);
 }	// QtTopologyFuse2VerticesAction::executeOperation

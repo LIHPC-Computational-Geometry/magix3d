@@ -36,7 +36,7 @@ target_compile_options (QtComponents PRIVATE -DMAGIX3D_VERSION="${MAGIX3D_VERSIO
 target_compile_options (QtComponents PRIVATE -DSWIG_VERSION="${SWIG_VERSION}")
 target_compile_options (QtComponents PRIVATE -DREPRESENTATION_TYPE_BY_POPUP)
 target_compile_options (QtComponents PRIVATE ${SHARED_CFLAGS})	# Requested by Qt ...
-target_link_libraries (QtComponents PUBLIC Core pyMagix3D PrefsQt::PrefsQt QtPython3::QtPython3 QtQualif::QtQualif GQGMDS::GQGMDS)
+target_link_libraries (QtComponents PUBLIC Controller pyMagix3D PrefsQt::PrefsQt QtPython3::QtPython3 QtQualif::QtQualif GQGMDS::GQGMDS)
 # Etre capable une fois installée de retrouver TkUtil, Qt5*, ... :
 set_target_properties (QtComponents PROPERTIES INSTALL_RPATH_USE_LINK_PATH 1 INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
 

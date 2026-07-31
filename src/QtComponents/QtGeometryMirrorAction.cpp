@@ -4,8 +4,6 @@
  * \date		12/4/2016
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/Plane.h"
 #include "Utils/ValidatedField.h"
@@ -14,6 +12,8 @@
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/RenderedEntityRepresentation.h"
 #include "QtComponents/QtMgx3DGroupNamePanel.h"
+
+#include "QtComponents/GUIResources.h"
 
 #include <QtUtil/QtErrorManagement.h>
 #include <QtUtil/QtConfiguration.h>
@@ -30,9 +30,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -336,8 +334,8 @@ vector<Entity*> QtGeometryMirrorPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		GeomEntity*	entity	=
-					getContext ( ).getGeomManager ( ).getEntity (*it, false);
+		Entity*	entity	=
+					getController( ).getEntity (*it, false);
 		if (0 != entity)
 			entities.push_back (entity);
 	}
@@ -366,7 +364,7 @@ void QtGeometryMirrorPanel::cutModifiedCallback ( )
 	preview (false, false);
 
 	RenderingManager::PlaneInteractor*	interactor	= getInteractor ( );
-	if ((0 != interactor) && (true == Resources::instance ( )._prevalidateSeizure))
+	if ((0 != interactor) && (true == GUIResources::instance ( )._prevalidateSeizure))
 	{
 		Math::Point		point	= getPoint ( );
 		Math::Vector	normal	= getNormal ( );
@@ -552,8 +550,6 @@ QtGeometryMirrorPanel*
 
 void QtGeometryMirrorAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres d'association des entités géométriques :
@@ -569,9 +565,9 @@ void QtGeometryMirrorAction::executeOperation ( )
 
 	vector<string>			entities	= panel->getGeomEntitiesNames ( );
 	if (copy)
-		cmdResult	= getContext ( ).getGeomManager ( ).copyAndMirror (entities, &plane, withTopo, groupName);
+		getController( ).copyAndMirror (entities, &plane, withTopo, groupName);
 	else
-		cmdResult	= getContext ( ).getGeomManager ( ).mirror (entities, &plane);
+		getController( ).mirror (entities, &plane);
 
 	setCommandResult (cmdResult);
 }	// QtGeometryMirrorAction::executeOperation

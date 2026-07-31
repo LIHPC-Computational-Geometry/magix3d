@@ -3,9 +3,6 @@
  * \author		Charles PIGNEROL
  * \date		22/05/2014
  */
-
-#include "Internal/Context.h"
-
 #include "QtComponents/QtMgx3DRotationPanel.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DEdgePanel.h"

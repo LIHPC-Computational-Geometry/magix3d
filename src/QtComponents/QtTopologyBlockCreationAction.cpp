@@ -3,9 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        20/12/2013
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -22,9 +19,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -122,8 +117,6 @@ void QtTopologyBlockCreationAction::executeOperation ( )
 	QtTopologyBlockCreationPanel*	panel	= dynamic_cast<QtTopologyBlockCreationPanel*>(getTopologyCreationPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)
 
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtTopologyCreationAction::executeOperation ( );
 
 	// Récupération des paramètres d'association des entités topologiques :
@@ -135,16 +128,16 @@ void QtTopologyBlockCreationAction::executeOperation ( )
 	switch (type)
 	{
 		case QtTopologyPanel::UNSTRUCTURED_TOPOLOGY	:
-			cmdResult	- getContext ( ).getTopoManager ( ).newUnstructuredTopoOnGeometry (name);
+			getController ( ).getTopoManager ( ).newUnstructuredTopoOnGeometry (name);
 			break;
 		case QtTopologyPanel::STRUCTURED_TOPOLOGY	:
-			cmdResult	= getContext ( ).getTopoManager ( ).newStructuredTopoOnGeometry (name);
+			getController ( ).getTopoManager ( ).newStructuredTopoOnGeometry (name);
 			break;
 		case QtTopologyPanel::STRUCTURED_FREE_TOPOLOGY	:
 			if ((0 != name.length ( )) && (0 != groupName.length ( )))
 				throw Exception (UTF8String ("Choisir un nom d'entité géométrique ou un nom de groupe.", Charset::UTF_8));
 			if (0 != name.length ( ))
-				cmdResult	= getContext ( ).getTopoManager( ).newFreeTopoOnGeometry (name);
+				getController ( ).getTopoManager( ).newFreeTopoOnGeometry (name);
 			else
 			{
 				if (0 == groupName.length ( ))
@@ -155,16 +148,16 @@ void QtTopologyBlockCreationAction::executeOperation ( )
 						return;
 				}	// if (0 == groupName.length ( ))
 				if (false == verticesOnSelection)
-					cmdResult	= getContext ( ).getTopoManager( ).newFreeTopoInGroup (groupName, 3);
+					getController ( ).getTopoManager( ).newFreeTopoInGroup (groupName, 3);
 				else
 				{
 					vector<string>	names	= panel->getBoundingEntities ( );
-					cmdResult	= getContext ( ).getTopoManager( ).newFreeBoundedTopoInGroup (groupName, 3, names);
+					getController ( ).getTopoManager( ).newFreeBoundedTopoInGroup (groupName, 3, names);
 				}	// else if (false == verticesOnSelection)
 			}
 			break;
 		case QtTopologyPanel::OGRID_BLOCKS				:
-			cmdResult	= getContext ( ).getTopoManager ( ).newTopoOGridOnGeometry (name, panel->getOGridRatio ( ));
+			getController ( ).getTopoManager ( ).newTopoOGridOnGeometry (name, panel->getOGridRatio ( ));
 			break;
 		default											:
 		{

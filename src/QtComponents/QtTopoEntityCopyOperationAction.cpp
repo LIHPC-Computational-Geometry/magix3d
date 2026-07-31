@@ -3,9 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        25/06/2014
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -27,10 +24,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -247,14 +241,14 @@ vector<Entity*> QtTopoEntityCopyOperationPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		TopoEntity*	entity	= getContext ( ).getTopoManager ( ).getEntity (*it);
+		Entity*	entity	= getController ( ).getTopoManager ( ).getEntity (*it);
 		CHECK_NULL_PTR_ERROR (entity)
 		entities.push_back (entity);
 	}
 	const string	name	= getGeomEntityName ( );
 	if (false == name.empty ( ))
 	{
-		GeomEntity*	entity	= getContext ( ).getGeomManager ( ).getEntity(name);
+		Entity*	entity	= getController ( ).getGeomManager ( ).getEntity(name);
 		CHECK_NULL_PTR_ERROR (entity)
 		entities.push_back (entity);
 	}
@@ -326,8 +320,6 @@ QtTopoEntityCopyOperationPanel*
 
 void QtTopoEntityCopyOperationAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DTopoOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de copie des entités topologiques :
@@ -336,7 +328,7 @@ void QtTopoEntityCopyOperationAction::executeOperation ( )
 	vector<string>		entities	= panel->getTopoEntitiesNames ( );
 	string				geomName	= panel->getGeomEntityName ( );
 
-	cmdResult	= getContext ( ).getTopoManager ( ).copy (entities, geomName);
+	getController ( ).getTopoManager ( ).copy (entities, geomName);
 	
 	setCommandResult (cmdResult);
 }	// QtTopoEntityCopyOperationAction::executeOperation

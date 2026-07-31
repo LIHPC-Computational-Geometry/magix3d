@@ -4,9 +4,6 @@
  * \date		11/09/2013
  */
 
-#include "Internal/Context.h"
-#include "Internal/EntitiesHelper.h"
-
 #include "QtComponents/QtEntityIDTextField.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 
@@ -24,7 +21,6 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -722,17 +718,17 @@ void QtEntityIDTextField::textModifiedCallback ( )
 }	// QtEntityIDTextField::textModifiedCallback
 
 
-const Context& QtEntityIDTextField::getContext ( ) const
+const Controller& QtEntityIDTextField::getController ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
-	return _mainWindow->getContext ( );
+	return _mainWindow->getController ( );
 }	// QtEntityIDTextField::getContext
 
 
-Context& QtEntityIDTextField::getContext ( )
+Controller& QtEntityIDTextField::getController ( )
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
-	return _mainWindow->getContext ( );
+	return _mainWindow->getController ( );
 }	// QtEntityIDTextField::getContext
 
 }	// namespace QtComponents

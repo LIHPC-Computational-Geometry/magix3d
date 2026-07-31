@@ -69,7 +69,7 @@ class QtMgx3DGroupNamePanel :
 	/**
 	 * \return		Contexte <I>Magix 3D</I> courant.
 	 */
-	 virtual Mgx3D::Internal::Context& getContext ( );
+	 virtual Mgx3D::Controller& getController ( );
 
 	/**
 	 * \param		La politique de saisie du nom.

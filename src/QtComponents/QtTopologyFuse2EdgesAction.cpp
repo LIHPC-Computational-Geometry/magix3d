@@ -3,9 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        28/06/2016
  */
-
-#include "Internal/Context.h"
-
 #include "QtComponents/QtTopologyFuse2EdgesAction.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "Utils/Common.h"
@@ -19,9 +16,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -204,16 +199,16 @@ vector<Entity*> QtTopologyFuse2EdgesPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it1 = names1.begin ( );
 	     names1.end ( ) != it1; it1++)
 	{
-		TopoEntity*		edge1	=
-			getContext ( ).getTopoManager ( ).getCoEdge (*it1, false);
+		Entity*		edge1	=
+			getController ( ).getTopoManager ( ).getCoEdge (*it1, false);
 		if (0 != edge1)
 			entities.push_back (edge1);
 	}	// for (vector<string>::const_iterator it1 = names1.begin ( ); ...
 	for (vector<string>::const_iterator it2 = names2.begin ( );
 	     names2.end ( ) != it2; it2++)
 	{
-		TopoEntity*		edge2	=
-			getContext ( ).getTopoManager ( ).getCoEdge (*it2, false);
+		Entity*		edge2	=
+			getController ( ).getTopoManager ( ).getCoEdge (*it2, false);
 		if (0 != edge2)
 			entities.push_back (edge2);
 	}	// for (vector<string>::const_iterator it2 = names1.begin ( ); ...
@@ -302,12 +297,10 @@ void QtTopologyFuse2EdgesAction::executeOperation ( )
 	vector<string>	names1	= panel->getEdges1Names ( );
 	vector<string>	names2	= panel->getEdges2Names ( );
 
-	Mgx3D::Internal::M3DCommandResult*	result	= 0;
 	if ((names1.size ( ) == 1) && (names2.size ( ) == 1))
-		result	= getContext ( ).getTopoManager ( ).fuse2Edges (names1[0], names2[0]);
+		getController ( ).getTopoManager ( ).fuse2Edges (names1[0], names2[0]);
 	else
-		result	= getContext ( ).getTopoManager ( ).fuse2EdgeList (names1, names2);
-	CHECK_NULL_PTR_ERROR (result)
+		getController ( ).getTopoManager ( ).fuse2EdgeList (names1, names2);
 	setCommandResult (result);
 	if (Command::FAIL == result->getStatus ( ))
 		throw Exception (result->getErrorMessage ( ));

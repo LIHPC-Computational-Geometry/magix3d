@@ -13,7 +13,6 @@
 #include "QtComponents/QtMgx3DVectorPanel.h"
 #include "QtComponents/QtCurvilinearAbscissaPanel.h"
 #include "QtComponents/Qt3VerticiesPanel.h"
-#include "SysCoord/SysCoord.h"
 
 #include <QtUtil/Qt3DDataPanel.h>
 #include <QtUtil/QtDoubleTextField.h>

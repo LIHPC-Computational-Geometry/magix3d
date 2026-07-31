@@ -1,5 +1,5 @@
 #include "Internal/Context.h"
-#include "Internal/Resources.h"
+#include "QtComponents/GUIResources.h"
 #include "Utils/MgxNumeric.h"
 
 #include "QtVtkComponents/vtkMgx3DInteractorStyle.h"
@@ -102,13 +102,13 @@ vtkMgx3DInteractorStyle::~vtkMgx3DInteractorStyle ( )
 void vtkMgx3DInteractorStyle::PrintSelf (ostream& os, vtkIndent indent)
 {
 	vtkUnifiedInteractorStyle::PrintSelf (os, indent);
-	os << "xyzCancelRoll : " << (true == Resources::instance ( )._xyzCancelRoll.getValue ( ) ? "True" : "False") << endl
+	os << "xyzCancelRoll : " << (true == GUIResources::instance ( )._xyzCancelRoll.getValue ( ) ? "True" : "False") << endl
 	   << "InteractiveSelectionActivated : " << (true == InteractiveSelectionActivated ? "True" : "False") << endl
 	   << "RubberBand : " << (true == RubberBand ? "True" : "False") << endl
 	   << "CompletelyInsideSelection : " << (true == CompletelyInsideSelection ? "True" : "False") << endl
 	   << "ForegroundSelection : " << (true == ForegroundSelection ? "True" : "False") << endl
-	   << "PickOnLeftButtonDown : " << (true == Resources::instance ( )._pickOnLeftButtonDown.getValue( ) ? "True" : "False") << endl
-	   << "PickOnRightButtonDown : " << (true == Resources::instance ( )._pickOnRightButtonDown.getValue( ) ? "True" : "False") << endl;
+	   << "PickOnLeftButtonDown : " << (true == GUIResources::instance ( )._pickOnLeftButtonDown.getValue( ) ? "True" : "False") << endl
+	   << "PickOnRightButtonDown : " << (true == GUIResources::instance ( )._pickOnRightButtonDown.getValue( ) ? "True" : "False") << endl;
 }	// vtkMgx3DInteractorStyle::PrintSelf
 
 
@@ -167,16 +167,16 @@ void vtkMgx3DInteractorStyle::OnChar ( )
 void vtkMgx3DInteractorStyle::OnKeyRelease ( )
 {
 	// OnChar n'est pas appelé pour SHIFT + TAB => OnKeyRelease
-	if (0 != Resources::instance ( )._nextSelectionKey.getValue ( ).length ( ))
+	if (0 != GUIResources::instance ( )._nextSelectionKey.getValue ( ).length ( ))
 	{
 		vtkRenderWindowInteractor*	interactor	= this->Interactor;
 		assert ((0 != interactor) && "vtkMgx3DInteractorStyle::OnKeyRelease : null interactor.");
-		const string	key	= Resources::instance ( )._nextSelectionKey.getValue( );
+		const string	key	= GUIResources::instance ( )._nextSelectionKey.getValue( );
 		if (0 == strcasecmp (interactor->GetKeySym ( ), (char*)key.c_str ( )))
 			NextSelection ( );
 		else
 			vtkUnifiedInteractorStyle::OnKeyRelease ( );
-	}	// if (0 != Resources::instance ( )._nextSelectionKey.getValue ( )...
+	}	// if (0 != GUIResources::instance ( )._nextSelectionKey.getValue ( )...
 	else
 		vtkUnifiedInteractorStyle::OnKeyRelease ( );
 }	// vtkMgx3DInteractorStyle::OnChar
@@ -209,7 +209,7 @@ void vtkMgx3DInteractorStyle::DisplayxOyViewPlane ( )
 	position [2]	= focal [2] + (position[2] < focal [2] ? -distance : distance);
 	camera->SetPosition (position);
 	camera->ComputeViewPlaneNormal ( );
-    if (true == Resources::instance ( )._xyzCancelRoll.getValue ( ))
+    if (true == GUIResources::instance ( )._xyzCancelRoll.getValue ( ))
         camera->SetRoll (0.);
 	if (0 != CurrentRenderer->GetRenderWindow ( ))
 		CurrentRenderer->GetRenderWindow ( )->Render ( );
@@ -234,7 +234,7 @@ void vtkMgx3DInteractorStyle::DisplayxOzViewPlane ( )
 	position [2]    = focal [2];
 	camera->SetPosition (position);
 	camera->ComputeViewPlaneNormal ( );
-    if (true == Resources::instance ( )._xyzCancelRoll.getValue ( ))
+    if (true == GUIResources::instance ( )._xyzCancelRoll.getValue ( ))
         camera->SetRoll (0.);
 	if (0 != CurrentRenderer->GetRenderWindow ( ))
 		CurrentRenderer->GetRenderWindow ( )->Render ( );
@@ -259,7 +259,7 @@ void vtkMgx3DInteractorStyle::DisplayyOzViewPlane ( )
 	position [2]	= focal [2];
 	camera->SetPosition (position);
 	camera->ComputeViewPlaneNormal ( );
-    if (true == Resources::instance ( )._xyzCancelRoll.getValue ( ))
+    if (true == GUIResources::instance ( )._xyzCancelRoll.getValue ( ))
         camera->SetRoll (0.);
 	if (0 != CurrentRenderer->GetRenderWindow ( ))
 		CurrentRenderer->GetRenderWindow ( )->Render ( );
@@ -423,7 +423,7 @@ void vtkMgx3DInteractorStyle::OnLeftButtonDown ( )
 	{
 		if ((false == RubberBand) || (true == isAltKeyPressed ( )))
 		{
-			if (true == Resources::instance ( )._pickOnLeftButtonDown.getValue ( ))
+			if (true == GUIResources::instance ( )._pickOnLeftButtonDown.getValue ( ))
 				Pick ( );
 			else
 				vtkUnifiedInteractorStyle::OnLeftButtonDown ( );
@@ -502,7 +502,7 @@ void vtkMgx3DInteractorStyle::OnRightButtonDown ( )
 	if (0 != rwi)
 		rwi->GetEventPosition (ButtonPressPosition);
 
-	if ((true == GetInteractiveSelectionActivated ( )) && (true == Resources::instance ( )._pickOnRightButtonDown.getValue ( )))
+	if ((true == GetInteractiveSelectionActivated ( )) && (true == GUIResources::instance ( )._pickOnRightButtonDown.getValue ( )))
 		Pick ( );
 	else
 		vtkUnifiedInteractorStyle::OnRightButtonDown ( );
@@ -521,7 +521,7 @@ void vtkMgx3DInteractorStyle::OnLeftButtonUp ( )
 		if (VTKIS_RUBBER_BAND != GetState ( ))
 		{
 			// Si le curseur n'a pas bougé depuis la pression sur le bouton, et que c'est paramétré tel que, on fait un picking :
-			if ((0 == rwi) || (true == Resources::instance ( )._pickOnLeftButtonUp.getValue ( )))
+			if ((0 == rwi) || (true == GUIResources::instance ( )._pickOnLeftButtonUp.getValue ( )))
 			{
 				int		EventPosition [2]	= {0, 0};
 				if (0 != rwi)
@@ -531,7 +531,7 @@ void vtkMgx3DInteractorStyle::OnLeftButtonUp ( )
 					if ((EventPosition [0] == ButtonPressPosition [0]) && (EventPosition [1] == ButtonPressPosition [1]))
 						Pick ( );
 				}	// if (0 != rwi)
-			}	// if ((0 == rwi) || (true == Resources::instance ( )._pickOnLeftButtonUp.getValue ( )))
+			}	// if ((0 == rwi) || (true == GUIResources::instance ( )._pickOnLeftButtonUp.getValue ( )))
 		}	// if (false == RubberBand)
 		else
 		{	// => VTKIS_RUBBER_BAND == GetState ( )
@@ -641,7 +641,7 @@ void vtkMgx3DInteractorStyle::OnRightButtonUp ( )
 
 	// Si le curseur n'a pas bougé depuis la pression sur le bouton, et que
 	// c'est paramétré tel que, on fait un picking :
-	if ((true == GetInteractiveSelectionActivated ( )) && (true == Resources::instance ( )._pickOnRightButtonUp.getValue ( )))
+	if ((true == GetInteractiveSelectionActivated ( )) && (true == GUIResources::instance ( )._pickOnRightButtonUp.getValue ( )))
 	{
 		int							EventPosition [2]	= {0, 0};
 		vtkRenderWindowInteractor*	rwi	= this->Interactor;

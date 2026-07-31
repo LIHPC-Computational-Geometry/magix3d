@@ -4,10 +4,7 @@
  * \date        07/02/2013
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
-#include "Internal/EntitiesHelper.h"
 #include "QtComponents/QtEntitiesItemViewPanel.h"
 #include "QtComponents/QtMgx3DApplication.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -33,9 +30,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Group;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 using namespace Mgx3D::QtComponents;
 
 
@@ -56,9 +51,9 @@ namespace QtComponents
 
 QtEntitiesItemViewPanel::QtEntitiesItemViewPanel (
 	QWidget* parent, QtMgx3DMainWindow* mainWindow, const string& name,
-	Context& context)
+	Controller& controller)
 	: QtGroupBox (name.c_str ( ), parent),
-	  _mainWindow (mainWindow), _context (&context), _graphicalWidget (0),
+	  _mainWindow (mainWindow), _controller (&controller), _graphicalWidget (0),
 	  _logStream (0)
 {
 }	// QtEntitiesItemViewPanel::QtEntitiesItemViewPanel
@@ -66,7 +61,7 @@ QtEntitiesItemViewPanel::QtEntitiesItemViewPanel (
 
 QtEntitiesItemViewPanel::QtEntitiesItemViewPanel (const QtEntitiesItemViewPanel&)
 	: QtGroupBox (0),
-	  _context(0), _mainWindow (0), _graphicalWidget (0), _logStream (0)
+	  _controller(0), _mainWindow (0), _graphicalWidget (0), _logStream (0)
 {
 	MGX_FORBIDDEN ("QtEntitiesItemViewPanel copy constructor is not allowed.");
 }	// QtEntitiesItemViewPanel::QtEntitiesItemViewPanel (const QtEntitiesItemViewPanel&)
@@ -115,20 +110,20 @@ void QtEntitiesItemViewPanel::sessionCleared ( )
 }	// QtEntitiesItemViewPanel::sessionCleared
 
 
-Mgx3D::Internal::Context& QtEntitiesItemViewPanel::getContext ( )
+Mgx3D::Controller& QtEntitiesItemViewPanel::getController ( )
 {
-	if (0 == _context)
+	if (0 == _controller)
 		throw Exception (UTF8String ("QtEntitiesItemViewPanel::getContext : absence de contexte.", Charset::UTF_8));
 
-	return *_context;
+	return *_controller;
 }	// QtEntitiesItemViewPanel::getContext
 
 
-void QtEntitiesItemViewPanel::setContext (Mgx3D::Internal::Context* context)
+void QtEntitiesItemViewPanel::setController (Mgx3D::Controller* controller)
 {
-	if (_context != context)
+	if (_controller != controller)
 	{
-		_context	= context;
+		_controller	= controller;
 	}	// if (_context != context)
 }	// QtEntitiesItemViewPanel::setContext
 

@@ -4,21 +4,16 @@
  * \date        11/12/2012
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManager.h"
-#include "Geom/Vertex.h"
-#include "Geom/GeomDisplayRepresentation.h"
-#include "Geom/CommandNewCylinder.h"
-#include "Geom/CommandNewHollowCylinder.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/Vector.h"
 #include "QtComponents/QtCylinderOperationAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
 #include "QtComponents/QtNumericFieldsFactory.h"
+
+#include "QtComponents/GUIResources.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/UTF8String.h>
@@ -34,11 +29,8 @@ using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Group;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -101,11 +93,11 @@ QtCylinderOperationPanel::QtCylinderOperationPanel (
 	layout->addWidget (groupBox);
 	QVBoxLayout*	vlayout	= new QVBoxLayout (groupBox);
 	vlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	vlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	vlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	groupBox->setLayout (vlayout);
 	_coordinatesPanel	= new QtMgx3DPointPanel (
 		groupBox, "Centre de la base", true, "x :", "y :", "z :",
@@ -123,11 +115,11 @@ QtCylinderOperationPanel::QtCylinderOperationPanel (
 
 	hlayout	= new QHBoxLayout (0);
 	hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	vlayout->addLayout (hlayout);
 	_internalRadiusLabel	= new QLabel ("Rayon interne :", groupBox);
 	hlayout->addWidget (_internalRadiusLabel, 1);
@@ -143,11 +135,11 @@ QtCylinderOperationPanel::QtCylinderOperationPanel (
 
 	hlayout	= new QHBoxLayout (0);
 	hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	vlayout->addLayout (hlayout);
 	label	= new QLabel ("Rayon externe :", groupBox);
 	hlayout->addWidget (label, 1);
@@ -172,11 +164,11 @@ QtCylinderOperationPanel::QtCylinderOperationPanel (
 	QtGroupBox*	angleGroupBox	= new QtGroupBox ("Portion du cylindre", this);
 	hlayout	= new QHBoxLayout (angleGroupBox);
 	hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	angleGroupBox->setLayout (hlayout);
 	vlayout->addWidget (angleGroupBox);
 	_anglePanel	= new QtAnglePanel (
@@ -200,14 +192,14 @@ QtCylinderOperationPanel::QtCylinderOperationPanel (
 	layout->addWidget (groupBox);
 	vlayout	= new QVBoxLayout (groupBox);
 	vlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	vlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	vlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	groupBox->setLayout (vlayout);
 	const int	defaultEdgesNum	=
-		mainWindow.getContext( ).getTopoManager( ).getDefaultNbMeshingEdges( );
+		mainWindow.getController( ).getDefaultNbMeshingEdges( );
 	_topologyPanel	= new QtTopologyPanel (
 			groupBox, mainWindow, false, false, 3,
 			QtTopologyPanel::OGRID_BLOCKS, QtTopologyPanel::OGRID,
@@ -260,7 +252,7 @@ vector<Entity*> QtCylinderOperationPanel::getInvolvedEntities ( )
 	if (0 != _coordinatesPanel->getUniqueName ( ).length ( ))
 	{
 		Geom::Vertex*	vertex	=
-			getContext ( ).getGeomManager ( ).getVertex (
+			getController( ).getVertex (
 								_coordinatesPanel->getUniqueName ( ), false);
 		if (0 != vertex)
 			entities.push_back (vertex);
@@ -386,7 +378,7 @@ void QtCylinderOperationPanel::reset ( )
 	_internalRadiusTextField->setValue(0.5);
 	_externalRadiusTextField->setValue(1.0);
 	const int	defaultEdgesNum	=
-		getMainWindow ( )->getContext( ).getTopoManager( ).getDefaultNbMeshingEdges( );
+		getMainWindow ( )->getController( ).getDefaultNbMeshingEdges( );
 	_topologyPanel->setTopologyType (QtTopologyPanel::OGRID_BLOCKS);
 	_topologyPanel->setAxe1EdgesNum (defaultEdgesNum);
 	_topologyPanel->setAxe2EdgesNum (defaultEdgesNum);
@@ -537,6 +529,10 @@ void QtCylinderOperationPanel::hollowedModifiedCallback ( )
 
 void QtCylinderOperationPanel::preview (bool show, bool destroyInteractor)
 {
+
+	std::cout<<"Print disabled for the moment: refactoring in progress"<<std::endl;
+
+	/*
 	// Lors de la construction getGraphicalWidget peut être nul ...
 	try
 	{
@@ -559,11 +555,11 @@ void QtCylinderOperationPanel::preview (bool show, bool destroyInteractor)
 
 		DisplayProperties	graphicalProps;
 		graphicalProps.setWireColor (Color (
-				255 * Resources::instance ( )._previewColor.getRed ( ),
-				255 * Resources::instance ( )._previewColor.getGreen ( ),
-				255 * Resources::instance ( )._previewColor.getBlue ( )));
+				255 * GUIResources::instance ( )._previewColor.getRed ( ),
+				255 * GUIResources::instance ( )._previewColor.getGreen ( ),
+				255 * GUIResources::instance ( )._previewColor.getBlue ( )));
 		graphicalProps.setLineWidth (
-						Resources::instance ( )._previewWidth.getValue ( ));
+						GUIResources::instance ( )._previewWidth.getValue ( ));
 
 		const bool			hollowed	= isHollowed ( );
 		const Point			center (getCenter());
@@ -595,6 +591,7 @@ void QtCylinderOperationPanel::preview (bool show, bool destroyInteractor)
 		if (command)
 			delete command;
 	}
+	*/
 }	// QtCylinderOperationPanel::preview
 
 
@@ -645,9 +642,6 @@ QtCylinderOperationPanel* QtCylinderOperationAction::getCylinderPanel ( )
 
 void QtCylinderOperationAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
-//	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de création du cylindre :
 	QtCylinderOperationPanel*	panel	= getCylinderPanel ( );
@@ -662,9 +656,9 @@ void QtCylinderOperationAction::executeOperation ( )
 	if (false == panel->createTopology ( ))
 	{
 		if (false == hollowed)
-			cmdResult	= getContext ( ).getGeomManager ( ).newCylinder (center, externalRadius, v, angle, name);
+			getController().newCylinder (center, externalRadius, v, angle, name);
 		else
-			cmdResult	= getContext ( ).getGeomManager ( ).newHollowCylinder (center, internalRadius, externalRadius, v, angle, name);
+			getController( ).newHollowCylinder (center, internalRadius, externalRadius, v, angle, name);
 	}	// if (false == panel->createTopology ( ))
 	else
 	{
@@ -689,10 +683,10 @@ void QtCylinderOperationAction::executeOperation ( )
 		const int	ni		= panel->getiEdgesNum ( );
 		const int	nr		= panel->getrLayersNum ( );
 		if (false == hollowed)
-			cmdResult	= getContext ( ).getTopoManager ( ).newCylinderWithTopo (
+			getController( ).newCylinderWithTopo (
 								center, externalRadius, v, angle, structured, ratio, naxe, ni, nr, name);
 		else
-			getContext ( ).getTopoManager ( ).newHollowCylinderWithTopo (
+			getController( ).newHollowCylinderWithTopo (
 								center, internalRadius, externalRadius, v, angle, structured, naxe, ni, nr, name);
 	}	// else if (false == panel->createTopology ( ))
 

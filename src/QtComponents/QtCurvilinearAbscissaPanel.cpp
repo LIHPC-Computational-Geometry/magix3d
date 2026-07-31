@@ -4,8 +4,6 @@
  * \date		09/09/2013
  */
 
-#include "Internal/Context.h"
-
 #include "QtComponents/QtCurvilinearAbscissaPanel.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtNumericFieldsFactory.h"
@@ -28,7 +26,6 @@ using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D

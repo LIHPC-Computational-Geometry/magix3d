@@ -6,23 +6,11 @@
 #ifndef QT_EDGE_MESHING_PROPERTY_ACTION_H
 #define QT_EDGE_MESHING_PROPERTY_ACTION_H
 
-#include "Internal/Context.h"
-
 #include "QtComponents/QtMgx3DEntityPanel.h"
 #include "QtComponents/QtMgx3DEdgePanel.h"
 #include "QtComponents/QtMgx3DTopoOperationAction.h"
 #include "QtComponents/RenderingManager.h"
 #include "QtComponents/QtMgx3DPointPanel.h"
-
-#include "Topo/EdgeMeshingPropertyBeta.h"
-#include "Topo/EdgeMeshingPropertyGeometric.h"
-#include "Topo/EdgeMeshingPropertySpecificSize.h"
-#include "Topo/EdgeMeshingPropertyInterpolate.h"
-#include "Topo/EdgeMeshingPropertyGlobalInterpolate.h"
-#include "Topo/EdgeMeshingPropertyBiexponential.h"
-#include "Topo/EdgeMeshingPropertyBigeometric.h"
-#include "Topo/EdgeMeshingPropertyHyperbolic.h"
-#include "Topo/EdgeMeshingPropertyUniform.h"
 
 #include <QtUtil/QtDoubleTextField.h>
 #include <QtUtil/QtIntTextField.h>

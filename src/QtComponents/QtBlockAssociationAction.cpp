@@ -4,8 +4,6 @@
  * \date        15/11/2013
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -14,8 +12,6 @@
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/RenderedEntityRepresentation.h"
 
-#include "Topo/Block.h"
-#include "Geom/Volume.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>
@@ -31,10 +27,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -258,8 +251,8 @@ vector<Entity*> QtBlockAssociationPanel::getInvolvedEntities ( )
 	const string	volName	= getVolumeName ( );
 	if (0 != volName.length ( ))
 	{
-		GeomEntity*	volume	=
-					getContext ( ).getGeomManager ( ).getVolume (volName);	
+		Entity*	volume	=
+					getController().getVolume (volName);
 		CHECK_NULL_PTR_ERROR (volume)
 		entities.push_back (volume);
 	}
@@ -268,7 +261,7 @@ vector<Entity*> QtBlockAssociationPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = blocks.begin ( );
 	     blocks.end ( ) != it; it++)
 	{
-		TopoEntity*	block	= getContext ( ).getTopoManager ( ).getBlock (*it);
+		Entity*	block	= getController().getBlock (*it);
 		CHECK_NULL_PTR_ERROR (block)
 		entities.push_back (block);
 	}
@@ -347,7 +340,6 @@ QtBlockAssociationPanel*
 void QtBlockAssociationAction::executeOperation ( )
 {
 	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DTopoOperationAction::executeOperation ( );
 
 	// Récupération des paramètres d'association des blocs :
@@ -356,7 +348,7 @@ void QtBlockAssociationAction::executeOperation ( )
 	vector<string>				blocks	= panel->getBlocksNames ( );
 	string						volume	= panel->getVolumeName ( );
 
-	cmdResult	= getContext ( ).getTopoManager ( ).setGeomAssociation (blocks, volume, false);
+	getController( ).setGeomAssociation (blocks, volume, false);
 	setCommandResult (cmdResult);
 }	// QtBlockAssociationAction::executeOperation
 

@@ -4,17 +4,14 @@
  * \date        09/09/2014
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManager.h"
-#include "Geom/GeomDisplayRepresentation.h"
-#include "Geom/CommandNewCone.h"
 #include "QtComponents/QtConeOperationAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
 #include "QtComponents/QtNumericFieldsFactory.h"
+
+#include "QtComponents/GUIResources.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>
@@ -31,10 +28,7 @@ using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Group;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -60,11 +54,11 @@ QtConeOperationPanel::QtConeOperationPanel (
 {
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
 	// Nom opération :
@@ -83,11 +77,11 @@ QtConeOperationPanel::QtConeOperationPanel (
 	// Méthode de création/modification du cône :
 	QHBoxLayout*	hlayout	= new QHBoxLayout (0);
 	hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	layout->addLayout (hlayout);
 	label	= new QLabel (QString::fromUtf8("Méthode"), this);
 	hlayout->addWidget (label);
@@ -102,19 +96,19 @@ QtConeOperationPanel::QtConeOperationPanel (
 	layout->addWidget (groupCone);
 	QVBoxLayout*	vlayout	= new QVBoxLayout (groupCone);
 	vlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	vlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	vlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	groupCone->setLayout (vlayout);
 	hlayout	= new QHBoxLayout (0);
 	hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	vlayout->addLayout (hlayout);
 	label	= new QLabel (QString::fromUtf8("Rayon du cône à l'origine :"), groupCone);
 	hlayout->addWidget (label, 1);
@@ -124,11 +118,11 @@ QtConeOperationPanel::QtConeOperationPanel (
 	hlayout->addStretch (10);
 	hlayout	= new QHBoxLayout (0);
 	hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	vlayout->addLayout (hlayout);
 	label	= new QLabel (QString::fromUtf8("Rayon du cône à l'extrémité :"), groupCone);
 	hlayout->addWidget (label, 1);
@@ -158,11 +152,11 @@ QtConeOperationPanel::QtConeOperationPanel (
 	angleGroupBox->setContentsMargins (0, 10, 0, 0);
 	hlayout	= new QHBoxLayout (angleGroupBox);
 	hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	angleGroupBox->setLayout (hlayout);
 	vlayout->addWidget (angleGroupBox);
 	_anglePanel	= new QtAnglePanel (
@@ -185,14 +179,14 @@ QtConeOperationPanel::QtConeOperationPanel (
 	layout->addWidget (groupCone);
 	vlayout	= new QVBoxLayout (groupCone);
 	vlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	vlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	vlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	groupCone->setLayout (vlayout);
 	const int	defaultEdgesNum	=
-		mainWindow.getContext( ).getTopoManager( ).getDefaultNbMeshingEdges( );
+		mainWindow.getController( ).getDefaultNbMeshingEdges( );
 	_topologyPanel	= new QtTopologyPanel (
 			groupCone, mainWindow, false, false, 3,
 			QtTopologyPanel::OGRID_BLOCKS, QtTopologyPanel::OGRID,
@@ -461,6 +455,10 @@ void QtConeOperationPanel::operationCompleted ( )
 
 void QtConeOperationPanel::preview (bool show, bool destroyInteractor)
 {
+
+	std::cout<<"Print disabled for the moment: refactoring in progress"<<std::endl;
+
+	/*
 	// Lors de la construction getGraphicalWidget peut être nul ...
 	try
 	{
@@ -482,11 +480,11 @@ void QtConeOperationPanel::preview (bool show, bool destroyInteractor)
 
 		DisplayProperties	graphicalProps;
 		graphicalProps.setWireColor (Color (
-				255 * Resources::instance ( )._previewColor.getRed ( ),
-				255 * Resources::instance ( )._previewColor.getGreen ( ),
-				255 * Resources::instance ( )._previewColor.getBlue ( )));
+				255 * GUIResources::instance ( )._previewColor.getRed ( ),
+				255 * GUIResources::instance ( )._previewColor.getGreen ( ),
+				255 * GUIResources::instance ( )._previewColor.getBlue ( )));
 		graphicalProps.setLineWidth (
-						Resources::instance ( )._previewWidth.getValue ( ));
+						GUIResources::instance ( )._previewWidth.getValue ( ));
 
 		const double		ray1	= getRay1 ( );
 		const double		ray2	= getRay2 ( );
@@ -510,6 +508,7 @@ void QtConeOperationPanel::preview (bool show, bool destroyInteractor)
 	catch (...)
 	{
 	}
+	*/
 }	// QtConeOperationPanel::preview
 
 // ===========================================================================
@@ -559,10 +558,6 @@ QtConeOperationPanel* QtConeOperationAction::getConePanel ( )
 
 void QtConeOperationAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
-//	QtMgx3DGeomOperationAction::executeOperation ( );
-
 	// Récupération des paramètres de création du cône :
 	QtConeOperationPanel*	panel	= getConePanel ( );
 	CHECK_NULL_PTR_ERROR (panel)
@@ -574,7 +569,7 @@ void QtConeOperationAction::executeOperation ( )
 
 	if (false == panel->createTopology ( ))
 	{
-		cmdResult	= getContext ( ).getGeomManager ( ).newCone (ray1, ray2, axis, angle, name);
+		getController( ).newCone (ray1, ray2, axis, angle, name);
 	}
 	else
 	{
@@ -597,7 +592,7 @@ void QtConeOperationAction::executeOperation ( )
 		const int	naxe	= panel->getAxeEdgesNum ( );
 		const int	ni		= panel->getiEdgesNum ( );
 		const int	nr		= panel->getrLayersNum ( );
-		cmdResult	= getContext ( ).getTopoManager ( ).newConeWithTopo (ray1, ray2, axis, angle, structured, ratio, naxe, ni, nr, name);
+		getController( ).newConeWithTopo (ray1, ray2, axis, angle, structured, ratio, naxe, ni, nr, name);
 	}
 
 	setCommandResult (cmdResult);

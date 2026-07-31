@@ -3,9 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        30/01/2013
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include "QtComponents/QtMeshSheetOperationAction.h"
@@ -22,9 +19,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Mesh;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -211,7 +206,7 @@ vector<Entity*> QtMeshSheetOperationPanel::getInvolvedEntities ( )
 
 	const string	edgeName	= getEdgeUniqueName ( );
 	Entity*			edge		=
-				getContext ( ).getTopoManager ( ).getCoEdge (edgeName, false);
+				getController( ).getTopoManager ( ).getCoEdge (edgeName, false);
 	if (0 != edge)
 		entities.push_back (edge);
 
@@ -314,7 +309,7 @@ void QtMeshSheetOperationAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (panel)
 	const string	edgeName	= panel->getEdgeUniqueName ( );
 
-	setMeshExplorer (getContext ( ).getMeshManager ( ).newExplorer (0, 1, edgeName, isCommand ( )));
+	setMeshExplorer (getController( ).getMeshManager ( ).newExplorer (0, 1, edgeName, isCommand ( )));
 
 	// Si c'est une commande Magix 3D elle est prise en charge par le
 	// gestionnaire de undo/redo, et on la libère donc de ce contexte.

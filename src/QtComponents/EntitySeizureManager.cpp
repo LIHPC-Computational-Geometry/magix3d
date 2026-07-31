@@ -4,10 +4,8 @@
  * \date		01/03/2013
  */
 
-#include "Internal/Context.h"
 #include "QtComponents/EntitySeizureManager.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
-#include "Internal/EntitiesHelper.h"
 
 #include <Utils/Common.h>
 
@@ -18,7 +16,6 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -296,15 +293,15 @@ bool EntitySeizureManager::criteriaMatch (int dimension, FilterEntity::objectTyp
 }	// EntitySeizureManager::criteriaMatch
 
 
-const Context& EntitySeizureManager::getContext ( ) const
+const Controller& EntitySeizureManager::getController ( ) const
 {
-	return getMainWindow ( ).getContext ( );
+	return getMainWindow ( ).getController ( );
 }	// EntitySeizureManager::getContext
 
 
-Context& EntitySeizureManager::getContext ( )
+Controller& EntitySeizureManager::getController ( )
 {
-	return getMainWindow ( ).getContext ( );
+	return getMainWindow ( ).getController ( );
 }	// EntitySeizureManager::getContext
 
 

@@ -3,11 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        25/03/2014
  */
-
-#include "Internal/Context.h"
-#include "Internal/Context.h"
-#include "Internal/Resources.h"
-
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/Entity.h"
@@ -17,21 +12,19 @@
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtNumericFieldsFactory.h"
 #include "QtComponents/QtTopologyProjectVerticesAction.h"
-#include "Geom/Vertex.h"
-#include "Topo/Vertex.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>
 #include <QtUtil/QtConfiguration.h>
 
+#include "QtComponents/GUIResources.h"
+
 
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -60,11 +53,11 @@ QtTopologyProjectVerticesPanel::QtTopologyProjectVerticesPanel (
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	setLayout (layout);
 	layout->setContentsMargins  (
-			Resources::instance ( )._margin.getValue ( ),
-			Resources::instance ( )._margin.getValue ( ),
-			Resources::instance ( )._margin.getValue ( ),
-			Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+			GUIResources::instance ( )._margin.getValue ( ),
+			GUIResources::instance ( )._margin.getValue ( ),
+			GUIResources::instance ( )._margin.getValue ( ),
+			GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 
 	// Le nom du panneau :
 	QLabel*	label	= new QLabel (panelName.c_str ( ), this);
@@ -94,7 +87,7 @@ QtTopologyProjectVerticesPanel::QtTopologyProjectVerticesPanel (
 	_coordTypeComboBox->addItem(QString::fromUtf8("Cartésiennes"));
 	_coordTypeComboBox->addItem(QString::fromUtf8("Sphériques"));
 	_coordTypeComboBox->addItem(QString::fromUtf8("Cylindriques"));
-	hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+	hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 
 	// Les composantes :
 	hlayout	= new QHBoxLayout ( );
@@ -385,8 +378,8 @@ vector<Entity*> QtTopologyProjectVerticesPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		TopoEntity*		vertex	=
-			getContext ( ).getTopoManager ( ).getVertex (*it, false);
+		Entity*		vertex	=
+			getController ( ).getTopoManager ( ).getVertex (*it, false);
 		if (0 != vertex)
 			entities.push_back (vertex);
 	}	// for (vector<string>::const_iterator it = names.begin ( ); ...
@@ -438,7 +431,7 @@ void QtTopologyProjectVerticesPanel::updateCoordinates (const string& name)
 			case Entity::GeomVertex	:
 			{
 				const Geom::Vertex*	vertex	=
-					getContext ().getGeomManager ( ).getVertex (name, true);
+					getController ().getGeomManager ( ).getVertex (name, true);
 				CHECK_NULL_PTR_ERROR (vertex);
 				pt = vertex->getCoord();
 			}	// case Entity::GeomVertex
@@ -446,7 +439,7 @@ void QtTopologyProjectVerticesPanel::updateCoordinates (const string& name)
 			case Entity::TopoVertex	:
 			{
 				const Topo::Vertex*	vertex	=
-					getContext ().getTopoManager ( ).getVertex (name, true);
+					getController ().getTopoManager ( ).getVertex (name, true);
 				CHECK_NULL_PTR_ERROR (vertex);
 				pt = vertex->getCoord();
 			}	// case Entity::TopoVertex
@@ -470,10 +463,8 @@ void QtTopologyProjectVerticesPanel::updateCoordinates (const string& name)
 	// on met les coordonnées dans le repère sélectionné si c'est le cas
 	string repName = getSysCoordName();
 	if (!repName.empty()){
-		Internal::Context* ctxifc = &getContext();
-		Internal::Context* ctx = dynamic_cast<Internal::Context*>(ctxifc);
-		CHECK_NULL_PTR_ERROR(ctx);
-		CoordinateSystem::SysCoord* rep = ctx->getSysCoordManager().getSysCoord(repName, true);
+		Controller* ctr = &getController();
+		CoordinateSystem::SysCoord* rep = ctr->getSysCoordManager().getSysCoord(repName, true);
 		pt = rep->toLocal(pt);
 	}
 
@@ -596,8 +587,6 @@ void QtTopologyProjectVerticesAction::executeOperation ( )
 	QtTopologyProjectVerticesPanel*	panel	= dynamic_cast<QtTopologyProjectVerticesPanel*>(getTopologyProjectVerticesPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)
 
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de projection des sommets topologiques :
@@ -614,13 +603,13 @@ void QtTopologyProjectVerticesAction::executeOperation ( )
 	string sysCoordName = panel->getSysCoordName();
 
 	if (ct == QtTopologyProjectVerticesPanel::cartesian){
-		cmdResult	= getContext ( ).getTopoManager ( ).setVertexLocation (vertices, changeX, x, changeY, y, changeZ, z, sysCoordName);
+		getController ( ).getTopoManager ( ).setVertexLocation (vertices, changeX, x, changeY, y, changeZ, z, sysCoordName);
 	}
 	else if (ct == QtTopologyProjectVerticesPanel::spherical){
-		cmdResult	= getContext ( ).getTopoManager ( ).setVertexSphericalLocation (vertices, changeX, x, changeY, y, changeZ, z, sysCoordName);
+		getController ( ).getTopoManager ( ).setVertexSphericalLocation (vertices, changeX, x, changeY, y, changeZ, z, sysCoordName);
 	}
 	else if (ct == QtTopologyProjectVerticesPanel::cylindrical){
-		cmdResult	= getContext ( ).getTopoManager ( ).setVertexCylindricalLocation (vertices, changeX, x, changeY, y, changeZ, z, sysCoordName);
+		getController ( ).getTopoManager ( ).setVertexCylindricalLocation (vertices, changeX, x, changeY, y, changeZ, z, sysCoordName);
 	}
 	else
 		throw Exception ("Erreur interne, coordinateType de executeOperation en dehors des clous");

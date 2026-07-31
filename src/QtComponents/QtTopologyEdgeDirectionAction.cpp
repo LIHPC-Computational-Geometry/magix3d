@@ -3,9 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        18/12/2014
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -19,9 +16,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -169,8 +164,8 @@ vector<Entity*> QtTopologyEdgeDirectionPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		TopoEntity*		edge	=
-			getContext ( ).getTopoManager ( ).getCoEdge (*it, false);
+		Entity*		edge	=
+			getController ( ).getTopoManager ( ).getCoEdge (*it, false);
 		if (0 != edge)
 			entities.push_back (edge);
 	}	// for (vector<string>::const_iterator it = names.begin ( ); ...
@@ -247,14 +242,12 @@ void QtTopologyEdgeDirectionAction::executeOperation ( )
 	QtTopologyEdgeDirectionPanel*	panel	= dynamic_cast<QtTopologyEdgeDirectionPanel*>(getTopologyEdgeDirectionPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)
 
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de modification des arêtes topologiques :
 	vector<string>	edges	= panel->getEdgesNames ( );
 
-	cmdResult	= getContext ( ).getTopoManager ( ).reverseDirection (edges);
+	getController ( ).getTopoManager ( ).reverseDirection (edges);
 
 	setCommandResult (cmdResult);
 }	// QtTopologyEdgeDirectionAction::executeOperation

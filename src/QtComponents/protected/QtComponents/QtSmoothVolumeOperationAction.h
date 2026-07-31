@@ -6,10 +6,6 @@
 #ifndef QT_SMOOTH_VOLUME_OPERATION_ACTION_H
 #define QT_SMOOTH_VOLUME_OPERATION_ACTION_H
 
-#include "Internal/Context.h"
-
-#include "Smoothing/VolumicSmoothing.h"
-
 #include "QtComponents/QtMgx3DMeshOperationAction.h"
 #include "QtComponents/QtMgx3DGroupNamePanel.h"
 #include "QtComponents/QtMgx3DEntityPanel.h"

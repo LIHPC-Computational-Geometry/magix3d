@@ -4,17 +4,16 @@
  * \date        05/11/2013
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/ValidatedField.h"
-#include "Internal/Resources.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtFaceMeshingPropertyAction.h"
 #include "QtComponents/QtMgx3DApplication.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtNumericFieldsFactory.h"
+
+#include "QtComponents/GUIResources.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>
@@ -31,10 +30,8 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -102,11 +99,11 @@ QtFaceDelaunayGMSHPanel::QtFaceDelaunayGMSHPanel (
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	setLayout (layout);
 	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 
 	FaceMeshingPropertyDelaunayGMSH	props;	// Pour récupérer les valeurs par défaut
 
@@ -199,10 +196,10 @@ QtFaceQuadPairingPanel::QtFaceQuadPairingPanel (
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	setLayout (layout);
 	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
 
 	FaceMeshingPropertyQuadPairing props;	// Pour récupérer les valeurs par défaut
 
@@ -300,10 +297,10 @@ QtFaceMeshingPropertyPanel::QtFaceMeshingPropertyPanel (
 //	SET_WIDGET_BACKGROUND (this, Qt::yellow)
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
 
 	// Nom opération :
 	QLabel*	label	= new QLabel (panelName.c_str ( ), this);
@@ -343,11 +340,11 @@ QtFaceMeshingPropertyPanel::QtFaceMeshingPropertyPanel (
 //	SET_WIDGET_BACKGROUND (groupBox, Qt::green)
 	QVBoxLayout*	vlayout	= new QVBoxLayout (groupBox);
 	vlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	vlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	vlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	groupBox->setLayout (vlayout);
 	layout->addWidget (groupBox);
 	// Le panneau "méthode" : plusieurs panneaux possibles.
@@ -572,7 +569,7 @@ vector<Entity*> QtFaceMeshingPropertyPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		TopoEntity*	entity	= getContext ( ).getTopoManager ( ).getEntity (*it);
+		Entity*	entity	= getController( ).getEntity (*it);
 		CHECK_NULL_PTR_ERROR (entity)
 		entities.push_back (entity);
 	}	// for (vector<string>::const_iterator it = names.begin ( ); ...
@@ -706,8 +703,6 @@ QtFaceMeshingPropertyPanel*
 
 void QtFaceMeshingPropertyAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DTopoOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de maillage des faces :
@@ -715,7 +710,7 @@ void QtFaceMeshingPropertyAction::executeOperation ( )
 	CHECK_NULL_PTR_ERROR (panel)
 	vector<string>					faces		= panel->getFacesNames ( );
 	unique_ptr<CoFaceMeshingProperty>	properties (panel->getMeshingProperty ( ));
-	cmdResult	= getContext ( ).getTopoManager ( ).setMeshingProperty (*properties.get ( ), faces);
+	getController( ).setMeshingProperty (*properties.get ( ), faces);
 
 	setCommandResult (cmdResult);
 }	// QtFaceMeshingPropertyAction::executeOperation

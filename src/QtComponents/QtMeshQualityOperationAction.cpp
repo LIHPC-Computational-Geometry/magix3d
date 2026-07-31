@@ -3,17 +3,8 @@
  * \author      Charles PIGNEROL
  * \date        18/07/2013
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Internal/EntitiesHelper.h"
-#include "Internal/InfoCommand.h"
-#include "Mesh/SubSurface.h"
-#include "Mesh/Surface.h"
-#include "Mesh/SubVolume.h"
-#include "Mesh/Volume.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMeshQualityOperationAction.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -28,20 +19,11 @@
 #include <QVBoxLayout>
 #include <QScrollArea>
 
-#include "Mesh/MeshManager.h"
-#include "Mesh/MeshItf.h"
-#include "Mesh/Mgx3DQualifSerie.h"
-
-#include <gmds/ig/Mesh.h>
-
 using namespace std;
 using namespace TkUtil;
 using namespace GQualif;
 using namespace Mgx3D;
-using namespace Mgx3D::Group;
-using namespace Mgx3D::Mesh;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 namespace Mgx3D
 {
@@ -79,10 +61,9 @@ QtMeshQualityOperationPanel::QtMeshQualityOperationPanel (
 	const QSizePolicy::Policy	grow	=
 									(QSizePolicy::Policy)QSizePolicy::GrowFlag;
 	scrollArea->setSizePolicy (grow, grow);
-	Internal::Context*	context	=
-					dynamic_cast<Internal::Context*>(&getContext ( ));
-	CHECK_NULL_PTR_ERROR (context)
-	_qualifWidget	= new QtMgx3DQualifWidget (this, context);
+	Controller*	controller	= &getController ( );
+	CHECK_NULL_PTR_ERROR (controller)
+	_qualifWidget	= new QtMgx3DQualifWidget (this, controller);
 	scrollArea->setWidget (_qualifWidget);
 
 	// Les boutons : ATTENTION, dans le QtQualifWidget.
@@ -260,15 +241,15 @@ void QtMeshQualityOperationPanel::autoUpdate ( )
 	try
 	{
 
-		Internal::Context*	context	=
-				dynamic_cast<Internal::Context*>(&getContext ( ));
-		CHECK_NULL_PTR_ERROR (context)
+		Controller*	controller	=
+				dynamic_cast<Internal::Context*>(&getController ( ));
+		CHECK_NULL_PTR_ERROR (controller)
 		Mesh::MeshManager*	manager	=
-				dynamic_cast<Mesh::MeshManager*>(&getContext ( ).getMeshManager( ));
+				dynamic_cast<Mesh::MeshManager*>(&getController ( ).getMeshManager( ));
 		CHECK_NULL_PTR_ERROR (manager)
-		CHECK_NULL_PTR_ERROR (getContext ( ).getMeshManager ( ).getMesh ( ))
+		CHECK_NULL_PTR_ERROR (getController ( ).getMeshManager ( ).getMesh ( ))
 		gmds::Mesh&	mesh	=
-				getContext ( ).getMeshManager ( ).getMesh ( )->getGMDSMesh ( );
+				getController ( ).getMeshManager ( ).getMesh ( )->getGMDSMesh ( );
 
 		clearSeries ( );
 
@@ -279,10 +260,10 @@ void QtMeshQualityOperationPanel::autoUpdate ( )
 
 		// Récupération des éléments de maillage sélectionnés :
 		vector<string>	selectedSurfacesNames	=
-				getContext ( ).getSelectionManager ( ).getEntitiesNames (
+				getController ( ).getSelectionManager ( ).getEntitiesNames (
 						Entity::MeshSurface);
 		vector<string>	selectedVolumesNames	=
-				getContext ( ).getSelectionManager ( ).getEntitiesNames (
+				getController ( ).getSelectionManager ( ).getEntitiesNames (
 						Entity::MeshVolume);
 		//		gmds::Mesh<MeshItf::TMask>&	gmdsMesh	=
 		//						(gmds::Mesh<MeshItf::TMask>&)mesh.getGMDSMesh ( );
@@ -295,7 +276,7 @@ void QtMeshQualityOperationPanel::autoUpdate ( )
 				selectedSurfacesNames.end ( ) != its; its++)
 		{
 			Mesh::Surface*	surface	=
-					getContext ( ).getMeshManager ( ).getSurface (*its, true);
+					getController ( ).getMeshManager ( ).getSurface (*its, true);
 			CHECK_NULL_PTR_ERROR (surface)
 			surfaces.push_back(surface);
 		}
@@ -303,17 +284,17 @@ void QtMeshQualityOperationPanel::autoUpdate ( )
 				selectedVolumesNames.end ( ) != itv; itv++)
 		{
 			Mesh::Volume*	volume	=
-					getContext ( ).getMeshManager ( ).getVolume (*itv, true);
+					getController ( ).getMeshManager ( ).getVolume (*itv, true);
 			CHECK_NULL_PTR_ERROR (volume)
 			volumes.push_back(volume);
 		}
 
 		// s'il n'y a rien de sélectionné, on prend tout [EB]
 		if (volumes.empty())
-			volumes = getContext ( ).getMeshManager().getVolumesObj();
+			volumes = getController ( ).getMeshManager().getVolumesObj();
 
 		if (volumes.empty() && surfaces.empty())
-			surfaces = getContext ( ).getMeshManager().getSurfacesObj();
+			surfaces = getController ( ).getMeshManager().getSurfacesObj();
 
 		for (std::vector<Mesh::Surface*> ::const_iterator iter = surfaces.begin ( );
 				surfaces.end() != iter; iter++)
@@ -367,15 +348,14 @@ QtMgx3DQualifWidget& QtMeshQualityOperationPanel::getQualityWidget ( )
 
 void QtMeshQualityOperationPanel::clear ( )
 {
-	Internal::Context*	context	=
-					dynamic_cast<Internal::Context*>(&getContext ( ));
-	CHECK_NULL_PTR_ERROR (context)
+	Controller*	controller	= &getController ( );
+	CHECK_NULL_PTR_ERROR (controller)
 	Mesh::MeshManager*	manager	=
-			dynamic_cast<Mesh::MeshManager*>(&getContext ( ).getMeshManager( ));
+			dynamic_cast<Mesh::MeshManager*>(&getController ( ).getMeshManager( ));
 	CHECK_NULL_PTR_ERROR (manager)
-	CHECK_NULL_PTR_ERROR (getContext ( ).getMeshManager ( ).getMesh ( ))
+	CHECK_NULL_PTR_ERROR (getController ( ).getMeshManager ( ).getMesh ( ))
 	gmds::Mesh&	mesh	=
-				getContext ( ).getMeshManager ( ).getMesh ( )->getGMDSMesh ( );
+				getController ( ).getMeshManager ( ).getMesh ( )->getGMDSMesh ( );
 
 	// On masque les entités :
 	CHECK_NULL_PTR_ERROR (getMainWindow ( ))
@@ -515,15 +495,15 @@ void QtMeshQualityOperationPanel::clear ( )
 void QtMeshQualityOperationPanel::clearSeries ( )
 {
 
-	Internal::Context*	context	=
+	Controller*	context	=
 					dynamic_cast<Internal::Context*>(&getContext ( ));
 	CHECK_NULL_PTR_ERROR (context)
 	Mesh::MeshManager*	manager	=
-			dynamic_cast<Mesh::MeshManager*>(&getContext ( ).getMeshManager( ));
+			dynamic_cast<Mesh::MeshManager*>(&getController ( ).getMeshManager( ));
 	CHECK_NULL_PTR_ERROR (manager)
-	CHECK_NULL_PTR_ERROR (getContext ( ).getMeshManager ( ).getMesh ( ))
+	CHECK_NULL_PTR_ERROR (getController ( ).getMeshManager ( ).getMesh ( ))
 	gmds::Mesh&	gmdsMesh	=
-				getContext ( ).getMeshManager ( ).getMesh ( )->getGMDSMesh ( );
+				getController ( ).getMeshManager ( ).getMesh ( )->getGMDSMesh ( );
 
 	_analysedMeshEntities.clear ( );
 }	// QtMeshQualityOperationPanel::clearSeries
@@ -535,14 +515,14 @@ void QtMeshQualityOperationPanel::displayCellsCallback ( )
 
 	clear ( );
 
-	Internal::Context*	context	=
-					dynamic_cast<Internal::Context*>(&getContext ( ));
-	CHECK_NULL_PTR_ERROR (context)
+	Controller*	controller	=
+					dynamic_cast<Internal::Context*>(&getController ( ));
+	CHECK_NULL_PTR_ERROR (controller)
 	Mesh::MeshManager*	manager	=
-			dynamic_cast<Mesh::MeshManager*>(&getContext ( ).getMeshManager( ));
+			dynamic_cast<Mesh::MeshManager*>(&getController ( ).getMeshManager( ));
 	CHECK_NULL_PTR_ERROR (manager)
 	gmds::Mesh&	gmdsMesh	=
-				getContext ( ).getMeshManager ( ).getMesh ( )->getGMDSMesh ( );
+				getController( ).getMeshManager ( ).getMesh ( )->getGMDSMesh ( );
 
 	vector<gmds::CellGroup<gmds::Face>*>	surfaces =
 							getQualityWidget ( ).getSelectedClassesSurfaces ( );
@@ -564,7 +544,7 @@ void QtMeshQualityOperationPanel::displayCellsCallback ( )
 			gmds::Face face	= gmdsMesh.get<gmds::Face>(gmdsSurface [i]);
 			surface->add (face);
 		}	// for (size_t i = 0; i < (*its)->size ( ); i++)
-		context->newGraphicalRepresentation (*surface);
+		controller->newGraphicalRepresentation (*surface);
 		_meshEntities.push_back (surface);
 		manager->add (surface);
 		surface->getDisplayProperties ( ).setDisplayed (true);
@@ -585,7 +565,7 @@ void QtMeshQualityOperationPanel::displayCellsCallback ( )
 			gmds::Region	region	= gmdsMesh.get<gmds::Region>(gmdsVolume [i]);
 			volume->addRegion (region);
 		}
-		context->newGraphicalRepresentation (*volume);
+		controller->newGraphicalRepresentation (*volume);
 		DisplayProperties::GraphicalRepresentation*	rep	=
 				volume->getDisplayProperties ( ).getGraphicalRepresentation ( );
 		CHECK_NULL_PTR_ERROR (rep)

@@ -3,9 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        20/11/2013
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -27,10 +24,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -296,7 +290,7 @@ vector<Entity*> QtTopologyCreationPanel::getInvolvedEntities ( )
 	const string	geomName	= getGeomEntityName ( );
 
 	if (0 != geomName.length ( ))
-		entities.push_back (getContext ( ).getGeomManager ( ).getEntity (geomName, true));
+		entities.push_back (getController ( ).getGeomManager ( ).getEntity (geomName, true));
 
 	return entities;
 }	// QtTopologyCreationPanel::getInvolvedEntities

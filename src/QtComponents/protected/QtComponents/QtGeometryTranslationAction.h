@@ -6,8 +6,6 @@
 #ifndef QT_GEOMETRY_TRANSLATION_ACTION_H
 #define QT_GEOMETRY_TRANSLATION_ACTION_H
 
-#include "Internal/Context.h"
-
 #include "QtComponents/QtMgx3DVectorPanel.h"
 #include "QtComponents/QtEntityByDimensionSelectorPanel.h"
 #include "QtComponents/QtMgx3DGeomOperationAction.h"

@@ -3,12 +3,8 @@
  * \author		Eric B
  * \date		13/4/2016
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Internal/Resources.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtTopologyMirrorAction.h"
 #include "QtComponents/QtMgx3DApplication.h"
@@ -25,13 +21,13 @@
 
 #include <values.h>	// DBL_MAX
 
+#include "QtComponents/GUIResources.h"
+
 
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -268,8 +264,8 @@ vector<Entity*> QtTopologyMirrorPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		TopoEntity*	entity	=
-					getContext ( ).getTopoManager ( ).getEntity (*it, false);
+		Entity*	entity	=
+					getController ( ).getTopoManager ( ).getEntity (*it, false);
 		if (0 != entity)
 			entities.push_back (entity);
 	}
@@ -298,7 +294,7 @@ void QtTopologyMirrorPanel::cutModifiedCallback ( )
 	preview (false, false);
 
 	RenderingManager::PlaneInteractor*	interactor	= getInteractor ( );
-	if ((0 != interactor) && (true == Resources::instance ( )._prevalidateSeizure))
+	if ((0 != interactor) && (true == GUIResources::instance ( )._prevalidateSeizure))
 	{
 		Math::Point		point	= getPoint ( );
 		Math::Vector	normal	= getNormal ( );
@@ -455,8 +451,6 @@ QtTopologyMirrorPanel*
 
 void QtTopologyMirrorAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DTopoOperationAction::executeOperation ( );
 
 	// Récupération des paramètres d'association des entités topologiques :
@@ -468,7 +462,7 @@ void QtTopologyMirrorAction::executeOperation ( )
 	bool			propagate	= panel->doPropagate ( );
 
 	vector<string>			entities	= panel->getTopoEntitiesNames ( );
-	cmdResult	= getContext ( ).getTopoManager ( ).mirror (entities, &plane, propagate);
+	getController ( ).getTopoManager ( ).mirror (entities, &plane, propagate);
 
 	setCommandResult (cmdResult);
 }	// QtTopologyMirrorAction::executeOperation

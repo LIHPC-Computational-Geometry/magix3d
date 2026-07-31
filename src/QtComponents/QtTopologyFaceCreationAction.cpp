@@ -3,9 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        20/12/2013
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -20,9 +17,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -124,8 +119,6 @@ void QtTopologyFaceCreationAction::executeOperation ( )
 	QtTopologyFaceCreationPanel*	panel	= dynamic_cast<QtTopologyFaceCreationPanel*>(getTopologyCreationPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)
 
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtTopologyCreationAction::executeOperation ( );
 
 	// Récupération des paramètres d'association des entités topologiques :
@@ -137,17 +130,17 @@ void QtTopologyFaceCreationAction::executeOperation ( )
 	switch (type)
 	{
 		case QtTopologyPanel::UNSTRUCTURED_TOPOLOGY	:
-			cmdResult	= getContext ( ).getTopoManager ( ).newUnstructuredTopoOnGeometry (name);
+			getController ( ).getTopoManager ( ).newUnstructuredTopoOnGeometry (name);
 			break;
 		case QtTopologyPanel::STRUCTURED_TOPOLOGY	:
-			cmdResult	= getContext ( ).getTopoManager ( ).newStructuredTopoOnGeometry (name);
+			getController ( ).getTopoManager ( ).newStructuredTopoOnGeometry (name);
 			break;
 		case QtTopologyPanel::STRUCTURED_FREE_TOPOLOGY	:
             if(!vnames.empty()){
-                cmdResult	= getContext ( ).getTopoManager ( ).newTopoEntity(vnames,2,groupName);
+                getController ( ).getTopoManager ( ).newTopoEntity(vnames,2,groupName);
             }
 			else if (0 != name.length ( ))
-				cmdResult	= getContext ( ).getTopoManager ( ).newFreeTopoOnGeometry (name);
+				getController ( ).getTopoManager ( ).newFreeTopoOnGeometry (name);
 			else
 			{
 				if (0 == groupName.length ( ))
@@ -157,7 +150,7 @@ void QtTopologyFaceCreationAction::executeOperation ( )
 					if (0 != QMessageBox::warning (0, "Magix 3D", UTF8TOQSTRING (warning), "Oui", "Non", "", 0, 2))
 						return;
 				}	// if (0 == groupName.length ( ))
-				cmdResult	= getContext ( ).getTopoManager( ).newFreeTopoInGroup (groupName, 2);
+				getController ( ).getTopoManager( ).newFreeTopoInGroup (groupName, 2);
 			}
 			break;
 		default											:

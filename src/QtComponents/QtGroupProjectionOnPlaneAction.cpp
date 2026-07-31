@@ -3,13 +3,8 @@
  * \author      Charles PIGNEROL
  * \date        09/04/2018
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Group/GroupManager.h"
-#include "Group/GroupEntity.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtGroupProjectionOnPlaneAction.h"
 #include "QtComponents/QtMgx3DApplication.h"
@@ -28,9 +23,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Group;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -181,7 +174,7 @@ vector<Entity*> QtGroupProjectionOnPlanePanel::getInvolvedEntities ( )
 	const string		groupName	= getGroupName ( );
 	if (false == groupName.empty ( ))
 	{
-		Group2D*	group	= getContext ( ).getGroupManager ( ).getGroup<Group::Group2D> (groupName, false);
+		Entity*	group	= getController( ).getGroup<Group::Group2D> (groupName, false);
 		if (0 != group)
 			entities.push_back (group);
 	}	// if (false == groupName.empty ( ))
@@ -257,13 +250,13 @@ void QtGroupProjectionOnPlaneAction::executeOperation ( )
 	switch (plane)
 	{
 		case Math::Plane::XY	:
-			getContext ( ).getGroupManager ( ).addProjectionOnPZ0 (groupName);
+			getController( ).addProjectionOnPZ0 (groupName);
 			break;
 		case Math::Plane::YZ	:
-			getContext ( ).getGroupManager ( ).addProjectionOnPX0 (groupName);
+			getController( ).addProjectionOnPX0 (groupName);
 			break;
 		case Math::Plane::XZ	:
-			getContext ( ).getGroupManager ( ).addProjectionOnPY0 (groupName);
+			getController( ).addProjectionOnPY0 (groupName);
 			break;
 		default			:
 			throw Exception ("Erreur interne en QtGroupProjectionOnPlaneAction::executeOperation : plan inconnu.");

@@ -6,7 +6,6 @@
 #ifndef QT_SYSCOORD_TRANSLATION_ACTION_H
 #define QT_SYSCOORD_TRANSLATION_ACTION_H
 
-#include "Internal/Context.h"
 #include "QtComponents/QtMgx3DOperationsPanel.h"
 
 #include "Utils/Vector.h"

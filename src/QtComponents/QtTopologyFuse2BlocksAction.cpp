@@ -4,10 +4,7 @@
  * \date        22/06/2015
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
-#include "Geom/Volume.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtTopologyFuse2BlocksAction.h"
@@ -20,10 +17,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -201,10 +195,10 @@ vector<Entity*> QtTopologyFuse2BlocksPanel::getInvolvedEntities ( )
 	vector<Entity*>	entities;
 	const string	name1	= getBlock1Name ( );
 	const string	name2	= getBlock2Name ( );
-	TopoEntity*		block1	=
-				getContext ( ).getTopoManager ( ).getBlock (name1, false);
-	TopoEntity*		block2	=
-				getContext ( ).getTopoManager ( ).getBlock (name2, false);
+	Entity*		block1	=
+				getController ( ).getTopoManager ( ).getBlock (name1, false);
+	Entity*		block2	=
+				getController ( ).getTopoManager ( ).getBlock (name2, false);
 	if (0 != block1)
 		entities.push_back (block1);
 	if (0 != block2)
@@ -294,8 +288,7 @@ void QtTopologyFuse2BlocksAction::executeOperation ( )
 	const string	name1	= panel->getBlock1Name ( );
 	const string	name2	= panel->getBlock2Name ( );
 
-	Mgx3D::Internal::M3DCommandResult*	result	= getContext ( ).getTopoManager ( ).fuse2Blocks (name1, name2);
-	CHECK_NULL_PTR_ERROR (result)
+	getController ( ).getTopoManager ( ).fuse2Blocks (name1, name2);
 	setCommandResult (result);
 	if (Command::FAIL == result->getStatus ( ))
 		throw Exception (result->getErrorMessage ( ));

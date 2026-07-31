@@ -4,8 +4,6 @@
  * \date		17/12/2012
  */
 
-#include "Internal/Context.h"
-#include "Internal/Resources.h"
 #include "QtComponents/QtAnglePanel.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
@@ -21,6 +19,8 @@
 #include <TkUtil/NumericConversions.h>
 #include <TkUtil/NumericServices.h>
 
+#include "QtComponents/GUIResources.h"
+
 #include <assert.h>
 #include <cmath>
 #include <memory>
@@ -31,7 +31,6 @@
 
 using namespace std;
 using namespace TkUtil;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -57,11 +56,11 @@ QtAnglePanel::QtAnglePanel (
 	QGridLayout*	layout	= new QGridLayout (this);
 	setLayout (layout);
 	layout->setContentsMargins (
-				Resources::instance ( )._margin.getValue ( ),
-				Resources::instance ( )._margin.getValue ( ),
-				Resources::instance ( )._margin.getValue ( ),
-				Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+				GUIResources::instance ( )._margin.getValue ( ),
+				GUIResources::instance ( )._margin.getValue ( ),
+				GUIResources::instance ( )._margin.getValue ( ),
+				GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 
 	// Les valeurs prédéfinies :
 	_partLabel	= new QLabel ("Portion", this);

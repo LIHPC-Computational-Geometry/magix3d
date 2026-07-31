@@ -4,16 +4,8 @@
  * \date        04/06/2012
  */
 
-#include "Internal/Context.h"
-#include "Internal/Resources.h"
-#include "Group/GroupManager.h"
 #include "QtComponents/RenderingManager.h"
 #include "QtComponents/QtMgx3DApplication.h"
-#include "Geom/GeomDisplayRepresentation.h"
-#include "Geom/GeomEntity.h"
-#include "Topo/TopoDisplayRepresentation.h"
-#include "Topo/TopoEntity.h"
-#include "Topo/CommandEditTopo.h"
 #include "Utils/Common.h"
 #include "Utils/DisplayProperties.h"
 #include "Utils/Vector.h"
@@ -26,14 +18,11 @@
 #include <iostream>
 #include <memory>
 
+#include "QtComponents/GUIResources.h"
+
 
 using namespace std;
 using namespace TkUtil;
-using namespace Mgx3D::Internal;
-using namespace Mgx3D::Group;
-using namespace Mgx3D::Geom;
-using namespace Mgx3D::Mesh;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
 
 
@@ -330,7 +319,7 @@ RenderingManager::DisplayLocker::~DisplayLocker ( )
 // Si directement reset (new DisplayLocker (...))  on a new DisplayLocker (...) puis delete de l'ancien DisplayLocker => unlock en dernier ...
 #define EVALUATE_DISPLAY_LOCKER                                                            \
 	displayLockerLoop++;                                                                   \
-	if (0 == displayLockerLoop % Resources::instance ( )._updateRefreshRate.getValue ( ))  \
+	if (0 == displayLockerLoop % GUIResources::instance ( )._updateRefreshRate.getValue ( ))  \
 	{                                                                                      \
 		displayLocker.reset (0);                                                           \
 		displayLocker.reset (new DisplayLocker (*this));                                   \
@@ -716,39 +705,39 @@ RenderingManager& RenderingManager::operator = (const RenderingManager&)
 
 RenderingManager::~RenderingManager ( )
 {
-	_context	= 0;
+	_controller	= 0;
 }	// RenderingManager::~RenderingManager
 
 
-Context& RenderingManager::getContext ( )
+Controller& RenderingManager::getController ( )
 {
-	if (0 == _context)
+	if (0 == _controller)
 		throw Exception (UTF8String ("RenderingManager::getContext : absence de contexte Magix 3D.", Charset::UTF_8));
 
-	return *_context;
+	return *_controller;
 }	// RenderingManager::getContext
 
 
-const Context& RenderingManager::getContext ( ) const
+const Controller& RenderingManager::getController ( ) const
 {
-	if (0 == _context)
+	if (0 == _controller)
 		throw Exception (UTF8String ("RenderingManager::getContext : absence de contexte Magix 3D.", Charset::UTF_8));
 
-	return *_context;
+	return *_controller;
 }	// RenderingManager::getContext
 
 
-void RenderingManager::setContext (Context* context)
+void RenderingManager::setController (Controller* controller)
 {
-	if (_context != context)
+	if (_controller != controller)
 	{
-		_context	= context;
+		_controller	= controller;
 		try
 		{
 			// Rem CP : getBackground ( ) sous try/catch car en mode batch
 			// il n'y a pas de gestionnaire de rendu => exception.
-			if (0 != _context)
-				_context->setBackground (getBackground ( ));
+			if (0 != _controller)
+				_controller->setBackground (getBackground ( ));
 		}
 		catch (const Exception& exc)
 		{
@@ -841,7 +830,7 @@ void RenderingManager::displayRepresentations (const vector<Entity*>& entities, 
 	{
 		// CP : Nouveau code : on utilise le masque pré-existant s'il y en a un
 		unsigned long	currentMask	= 0 == (*it)->getDisplayProperties( ).getGraphicalRepresentation( ) ? mask : (*it)->getDisplayProperties ( ).getGraphicalRepresentation ( )->getRepresentationMask ( );
-		const bool		forceRender	= ++count % Resources::instance ( )._updateRefreshRate.getValue ( );
+		const bool		forceRender	= ++count % GUIResources::instance ( )._updateRefreshRate.getValue ( );
 		displayRepresentation (**it, show, currentMask, forceRender);
 
 		EVALUATE_DISPLAY_LOCKER
@@ -860,7 +849,7 @@ void RenderingManager::displayRepresentationsSelectedEntities (bool show)
 	{
 		// CP : Nouveau code : on utilise le masque pré-existant s'il y en a un
 		unsigned long	currentMask	= 0 == (*it)->getDisplayProperties( ).getGraphicalRepresentation( ) ? 0 : (*it)->getDisplayProperties ( ).getGraphicalRepresentation ( )->getRepresentationMask ( );
-		const bool		forceRender	= ++count % Resources::instance ( )._updateRefreshRate.getValue ( );
+		const bool		forceRender	= ++count % GUIResources::instance ( )._updateRefreshRate.getValue ( );
 		displayRepresentation (**it, show, currentMask, forceRender);
 
 		EVALUATE_DISPLAY_LOCKER
@@ -967,7 +956,7 @@ void RenderingManager::updateRepresentations ( )
 			unsigned long	mask	= rep->getRepresentationMask ( );
 			rep->updateRepresentation (mask, true);
 		}
-		if (0 == count % Resources::instance ( )._updateRefreshRate.getValue ( ))
+		if (0 == count % GUIResources::instance ( )._updateRefreshRate.getValue ( ))
 			forceRender ( );
 	}	// for (vector<Entity*>::iterator it = entities.begin ( ); ...
 }	// RenderingManager::updateRepresentations
@@ -1262,9 +1251,9 @@ void RenderingManager::getBoundingBoxMargins (double& xmargin, double& ymargin, 
 	double	xmin = 0., xmax = 0., ymin = 0., ymax = 0., zmin = 0., zmax = 0.;
 	getBoundingBox (xmin, xmax, ymin, ymax, zmin, zmax);
 	double	dx	= xmax - xmin, dy = ymax - ymin, dz = zmax - zmin;
-	xmargin	= sizeScale (dx) * Resources::instance ( )._marginBoundingBoxPercentage.getValue ( );
-	ymargin	= sizeScale (dy) * Resources::instance ( )._marginBoundingBoxPercentage.getValue ( );
-	zmargin	= sizeScale (dz) * Resources::instance ( )._marginBoundingBoxPercentage.getValue ( );
+	xmargin	= sizeScale (dx) * GUIResources::instance ( )._marginBoundingBoxPercentage.getValue ( );
+	ymargin	= sizeScale (dy) * GUIResources::instance ( )._marginBoundingBoxPercentage.getValue ( );
+	zmargin	= sizeScale (dz) * GUIResources::instance ( )._marginBoundingBoxPercentage.getValue ( );
 }	// RenderingManager::getBoundingBoxMargins
 
 

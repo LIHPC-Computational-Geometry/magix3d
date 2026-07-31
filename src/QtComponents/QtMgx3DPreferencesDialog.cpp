@@ -1,5 +1,3 @@
-#include "Internal/Context.h"
-
 #include "QtComponents/QtMgx3DPreferencesDialog.h"
 #include "QtComponents/QtMgx3DApplication.h"
 #include <QtUtil/QtHelpWindow.h>

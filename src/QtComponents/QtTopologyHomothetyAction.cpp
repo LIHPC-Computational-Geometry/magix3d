@@ -3,9 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        26/05/2014
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -27,9 +24,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -310,8 +305,8 @@ vector<Entity*> QtTopologyHomothetyPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		TopoEntity*	entity	=
-					getContext ( ).getTopoManager ( ).getEntity (*it, false);
+		Entity*	entity	=
+					getController ( ).getTopoManager ( ).getEntity (*it, false);
 		if (0 != entity)
 			entities.push_back (entity);
 	}
@@ -426,8 +421,6 @@ QtTopologyHomothetyPanel*
 
 void QtTopologyHomothetyAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DTopoOperationAction::executeOperation ( );
 
 	// Récupération des paramètres d'association des entités topologiques :
@@ -441,7 +434,7 @@ void QtTopologyHomothetyAction::executeOperation ( )
 		{
 			const double	factor	= panel->getHomogeneousPanel ( ).getHomothetyFactor ( );
 			const Point	center	= panel->getHomogeneousPanel ( ).getCenter ( );
-			cmdResult	= getContext ( ).getTopoManager ( ).scale (entities, factor, center, propagate);
+			getController ( ).getTopoManager ( ).scale (entities, factor, center, propagate);
 		}	// QtTopologyHomothetyPanel::HOMOGENEOUS
 		break;
 		case QtTopologyHomothetyPanel::HETEROGENEOUS	:
@@ -449,7 +442,7 @@ void QtTopologyHomothetyAction::executeOperation ( )
 			const double	xFactor	= panel->getHeterogeneousPanel ( ).getHomothetyXFactor ( );
 			const double	yFactor	= panel->getHeterogeneousPanel ( ).getHomothetyYFactor ( );
 			const double	zFactor	= panel->getHeterogeneousPanel ( ).getHomothetyZFactor ( );
-			cmdResult	= getContext ( ).getTopoManager ( ).scale (entities, xFactor, yFactor, zFactor, propagate);
+			getController ( ).getTopoManager ( ).scale (entities, xFactor, yFactor, zFactor, propagate);
 		}	// QtTopologyHomothetyPanel::HETEROGENEOUS
 		break;
 		default											:

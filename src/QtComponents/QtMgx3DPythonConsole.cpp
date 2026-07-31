@@ -1,6 +1,3 @@
-#include "Internal/Context.h"
-#include "Internal/PythonWriter.h"
-
 #include "QtComponents/QtMgx3DPythonConsole.h"
 #include "QtComponents/Qt3DGraphicalWidget.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -38,7 +35,6 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 
@@ -179,7 +175,7 @@ void QtMgx3DPythonConsole::run ( )
 #endif	// MULTITHREADED_APPLICATION
 	storePolicy ( );
 	
-	ActionCompletionNotifier actionCompletionNotifier (getAppName ( ), QtMgx3DApplication::getAppIcon ( ), UTF8String ("Instructions python exécutées", Charset::UTF_8), QtMessageBox::URGENCY_NORMAL, Resources::instance ( )._commandNotificationDuration, Resources::instance ( )._commandNotificationDelay);
+	ActionCompletionNotifier actionCompletionNotifier (getAppName ( ), QtMgx3DApplication::getAppIcon ( ), UTF8String ("Instructions python exécutées", Charset::UTF_8), QtMessageBox::URGENCY_NORMAL, GUIResources::instance ( )._commandNotificationDuration, GUIResources::instance ( )._commandNotificationDelay);
 	AutoDisableCommandsErrorsNotifications	autoDisableCommandsErrorsNotifications (getMainWindow ( ));
 	
 	try
@@ -219,7 +215,7 @@ void QtMgx3DPythonConsole::cont ( )
 	AutoMutex	mutex (&getMutex ( ));
 #endif	// MULTITHREADED_APPLICATION
 
-	ActionCompletionNotifier actionCompletionNotifier (getAppName ( ), QtMgx3DApplication::getAppIcon ( ), UTF8String ("Instructions python exécutées", Charset::UTF_8), QtMessageBox::URGENCY_NORMAL, Resources::instance ( )._commandNotificationDuration, Resources::instance ( )._commandNotificationDelay);
+	ActionCompletionNotifier actionCompletionNotifier (getAppName ( ), QtMgx3DApplication::getAppIcon ( ), UTF8String ("Instructions python exécutées", Charset::UTF_8), QtMessageBox::URGENCY_NORMAL, GUIResources::instance ( )._commandNotificationDuration, GUIResources::instance ( )._commandNotificationDelay);
 
 	QtPythonConsole::cont ( );
 }	// QtMgx3DPythonConsole::cont
@@ -274,7 +270,7 @@ void QtMgx3DPythonConsole::executeFile (const std::string& fileName)
 
 	storePolicy ( );
 
-	ActionCompletionNotifier actionCompletionNotifier (getAppName ( ), QtMgx3DApplication::getAppIcon ( ), UTF8String ("Script exécuté", Charset::UTF_8), QtMessageBox::URGENCY_NORMAL, Resources::instance ( )._commandNotificationDuration, Resources::instance ( )._commandNotificationDelay);
+	ActionCompletionNotifier actionCompletionNotifier (getAppName ( ), QtMgx3DApplication::getAppIcon ( ), UTF8String ("Script exécuté", Charset::UTF_8), QtMessageBox::URGENCY_NORMAL, GUIResources::instance ( )._commandNotificationDuration, GUIResources::instance ( )._commandNotificationDelay);
 	
 	unique_ptr<RenderingManager::DisplayLocker>	displayLocker (0 == _graphicalWidget ? 0 : new RenderingManager::DisplayLocker (_graphicalWidget->getRenderingManager ( )));
 
@@ -566,7 +562,7 @@ QAction& QtMgx3DPythonConsole::insertSelectedCloudsAction ( )
 void QtMgx3DPythonConsole::storePolicy ( )
 {
 	if ((0 != getMainWindow ( )) && ((CommandManager::POLICY)-1 == _cmdMgrPolicy))
-		_cmdMgrPolicy	= getMainWindow ( )->getContext ( ).getCommandManager( ).setPolicy(CommandManager::SEQUENTIAL);
+		_cmdMgrPolicy	= getMainWindow ( )->getController ( ).getCommandManager( ).setPolicy(CommandManager::SEQUENTIAL);
 }	// QtMgx3DPythonConsole::storePolicy
 
 
@@ -577,7 +573,7 @@ void QtMgx3DPythonConsole::restorePolicy ( )
 		try
 		{
 			if ((CommandManager::POLICY)-1 != _cmdMgrPolicy)
-				getMainWindow ( )->getContext ( ).getCommandManager( ).setPolicy(_cmdMgrPolicy);
+				getMainWindow ( )->getController ( ).getCommandManager( ).setPolicy(_cmdMgrPolicy);
 			_cmdMgrPolicy	= (CommandManager::POLICY)-1;
 		}
 		catch (...)

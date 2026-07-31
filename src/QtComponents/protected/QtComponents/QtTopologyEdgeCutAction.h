@@ -6,8 +6,6 @@
 #ifndef QT_TOPOLOGY_EDGE_CUT_ACTION_H
 #define QT_TOPOLOGY_EDGE_CUT_ACTION_H
 
-#include "Internal/Context.h"
-
 #include "QtComponents/QtMgx3DEdgePanel.h"
 #include "QtComponents/QtMgx3DTopoOperationAction.h"
 

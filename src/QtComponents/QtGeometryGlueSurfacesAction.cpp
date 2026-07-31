@@ -4,10 +4,7 @@
  * \date        01/12/2014
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
-#include "Geom/Surface.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtGeometryGlueSurfacesAction.h"
@@ -20,9 +17,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -170,8 +165,8 @@ vector<Entity*> QtGeometryGlueSurfacesPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		GeomEntity*		surface	= 
-			getContext ( ).getGeomManager ( ).getSurface (*it, false);
+		Entity*		surface	=
+			getController( ).getSurface (*it, false);
 		if (0 != surface)
 			entities.push_back (surface);
 	}	// for (vector<string>::const_iterator it = names.begin ( ); ...
@@ -245,7 +240,6 @@ QtGeometryGlueSurfacesPanel*
 
 void QtGeometryGlueSurfacesAction::executeOperation ( )
 {
-	M3DCommandResult*			cmdResult	= 0;
 	QtGeometryGlueSurfacesPanel*	panel		= dynamic_cast<QtGeometryGlueSurfacesPanel*>(getGeometryGlueSurfacesPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)
 
@@ -255,7 +249,7 @@ void QtGeometryGlueSurfacesAction::executeOperation ( )
 	// Récupération des paramètres de collage des surfaces géométriques :
 	vector<string>	surfaces	= panel->getSurfacesNames ( );
 
-	cmdResult	= getContext ( ).getGeomManager ( ).joinSurfaces (surfaces);
+	getController( ).joinSurfaces (surfaces);
 	setCommandResult (cmdResult);
 }	// QtGeometryGlueSurfacesAction::executeOperation
 

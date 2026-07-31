@@ -3,9 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        06/03/2014
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -19,9 +16,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -164,8 +159,8 @@ vector<Entity*> QtTopologyInsertHolePanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		TopoEntity*		face	=
-			getContext ( ).getTopoManager ( ).getCoFace (*it, false);
+		Entity*		face	=
+			getController ( ).getTopoManager ( ).getCoFace (*it, false);
 		if (0 != face)
 			entities.push_back (face);
 	}	// for (vector<string>::const_iterator it = names.begin ( ); ...
@@ -249,8 +244,7 @@ void QtTopologyInsertHoleAction::executeOperation ( )
 	// Récupération des paramètres d'insertion de trou dans la topologie :
 	vector<string>	names	= panel->getFacesNames ( );
 
-	Mgx3D::Internal::M3DCommandResult*	result	= getContext ( ).getTopoManager ( ).insertHole (names);
-	CHECK_NULL_PTR_ERROR (result)
+	getController ( ).getTopoManager ( ).insertHole (names);
 	setCommandResult (result);
 	if (Command::FAIL == result->getStatus ( ))
 		throw Exception (result->getErrorMessage ( ));

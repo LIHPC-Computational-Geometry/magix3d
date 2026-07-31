@@ -10,7 +10,6 @@
 #include "QtComponents/QtMgx3DMeshOperationAction.h"
 #include "QtComponents/QtMgx3DEdgePanel.h"
 #include "QtComponents/QtMgx3DGroupNamePanel.h"
-#include "Mesh/CommandMeshExplorer.h"
 
 #include <QtUtil/QtTextField.h>
 

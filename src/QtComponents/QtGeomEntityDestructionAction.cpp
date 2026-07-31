@@ -4,8 +4,6 @@
  * \date        22/01/2014
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -28,9 +26,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -251,7 +247,7 @@ vector<Entity*> QtGeomEntityDestructionPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		GeomEntity*	entity	= getContext ( ).getGeomManager ( ).getEntity (*it);
+		Entity*	entity	= getController( ).getEntity (*it);
 		CHECK_NULL_PTR_ERROR (entity)
 		entities.push_back (entity);
 	}
@@ -327,8 +323,6 @@ QtGeomEntityDestructionPanel*
 
 void QtGeomEntityDestructionAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres d'association des entités géométriques :
@@ -338,9 +332,9 @@ void QtGeomEntityDestructionAction::executeOperation ( )
 	bool						propagate	= panel->doPropagate ( );
 
 	if (panel->withTopo ( ))
-		cmdResult	= getContext ( ).getGeomManager ( ).destroyWithTopo (entities, propagate);
+		cmdResult	= getController( ).destroyWithTopo (entities, propagate);
 	else
-		cmdResult	= getContext ( ).getGeomManager ( ).destroy (entities, propagate);
+		cmdResult	= getController( ).destroy (entities, propagate);
 
 	setCommandResult (cmdResult);
 }	// QtGeomEntityDestructionAction::executeOperation

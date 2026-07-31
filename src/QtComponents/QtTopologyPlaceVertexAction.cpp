@@ -3,9 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        01/02/2017
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -21,10 +18,8 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -273,7 +268,7 @@ void QtTopologyPlaceVertexPanel::constraintSelectedCallback (QString name)
 
 	CHECK_NULL_PTR_ERROR (_refinementFactorTextField)
 	const size_t					factor		= _refinementFactorTextField->getValue ( );
-	Entity*							entity		= &getContext().nameToEntity (name.toStdString ( ));
+	Entity*							entity		= &getController().nameToEntity (name.toStdString ( ));
 	RenderingManager::ConstrainedPointInteractor*	interactor	= getConstrainedInteractor ( );
 	if (0 != interactor)
 		interactor->setConstraint (entity, factor);
@@ -286,7 +281,7 @@ void QtTopologyPlaceVertexPanel::constraintUnselectedCallback (QString name)
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
 
-	Entity*	entity	= false == name.isEmpty ( ) ? &getContext().nameToEntity (name.toStdString ( )) : 0;
+	Entity*	entity	= false == name.isEmpty ( ) ? &getController().nameToEntity (name.toStdString ( )) : 0;
 	if (0 != entity)
 	{
 		GraphicalEntityRepresentation*	rep	= getRenderingManager ( ).getRepresentation (*entity);
@@ -369,7 +364,7 @@ void QtTopologyPlaceVertexPanel::preview (bool show, bool destroyInteractor)
 		if (0 == interactor)
 		{
 			const string	constraintName	= _entityConstraintPanel->getEntitiesPanel ( )->getUniqueName ( );
-			Entity*		constraint	= false == constraintName.empty ( ) ? &getContext().nameToEntity (constraintName) : 0;
+			Entity*		constraint	= false == constraintName.empty ( ) ? &getController().nameToEntity (constraintName) : 0;
 			// Cas tordu : constraint est une entité détruite (ex : undo) ;
 			constraint	= 0 == constraint ? 0 : (true == constraint->isDestroyed ( ) ? 0 : constraint);
 			interactor	= getRenderingManager ( ).createConstrainedPointInteractor (p, constraint, factor, this);
@@ -431,7 +426,7 @@ vector<Entity*> QtTopologyPlaceVertexPanel::getInvolvedEntities ( )
 {
 	vector<Entity*>	entities;
 
-	TopoEntity*		vertex	= getVertex ( );
+	Entity*		vertex	= getVertex ( );
 	if (0 != vertex)
 			entities.push_back (vertex);
 
@@ -442,7 +437,7 @@ vector<Entity*> QtTopologyPlaceVertexPanel::getInvolvedEntities ( )
 Vertex* QtTopologyPlaceVertexPanel::getVertex ( ) const
 {
 	const string	name	= getVertexName ( );
-	return getContext ( ).getTopoManager ( ).getVertex (name, false);
+	return getController ( ).getTopoManager ( ).getVertex (name, false);
 }	// QtTopologyPlaceVertexPanel::getVertex
 
 
@@ -744,8 +739,6 @@ void QtTopologyPlaceVertexAction::executeOperation ( )
 	QtTopologyPlaceVertexPanel*	panel	= dynamic_cast<QtTopologyPlaceVertexPanel*>(getTopologyProjectVerticesPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)
 
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de projection des sommets topologiques :
@@ -756,7 +749,7 @@ void QtTopologyPlaceVertexAction::executeOperation ( )
 	const double	y		= panel->getY ( );
 	const double	z		= panel->getZ ( );
 
-	cmdResult	= getContext ( ).getTopoManager ( ).setVertexLocation (vertices, true, x, true, y, true, z);
+	getController ( ).getTopoManager ( ).setVertexLocation (vertices, true, x, true, y, true, z);
 
 	setCommandResult (cmdResult);
 }	// QtTopologyPlaceVertexAction::executeOperation

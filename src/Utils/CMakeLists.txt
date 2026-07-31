@@ -58,8 +58,8 @@ write_basic_package_version_file(${CMAKE_PACKAGE_VERSION_FILE} VERSION ${MAGIX3D
 export (EXPORT ${CMAKE_PACKAGE_TARGETS_NAME} FILE ${CMAKE_PACKAGE_TARGETS_FILE} NAMESPACE ${CMAKE_MODULE_NAMESPACE})
 
 # Utilisation par d'autres modules de Utils :
-set (INCLUDE_INSTALL_DIR include/)		# Utils_INCLUDE_DIR avec UtilsConfig.cmake.in
-set (LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR})	# Utils_LIB_DIR avec UtilsConfig.cmake.in
+set (INCLUDE_INSTALL_DIR include/)		# Utils_INCLUDE_DIR avec ControllerConfig.cmake.in
+set (LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR})	# Utils_LIB_DIR avec ControllerConfig.cmake.in
 # Création du fichier UtilsConfig.cmake qui définira Utils_INCLUDE_DIR, Utils_LIB_DIR et Utils_BIN_DIR :
 configure_package_config_file (cmake/${CMAKE_PACKAGE_CONFIG_NAME}.cmake.in ${CMAKE_PACKAGE_CONFIG_FILE}
 	INSTALL_DESTINATION ${CMAKE_CMAKE_DIR} PATH_VARS INCLUDE_INSTALL_DIR LIB_INSTALL_DIR)

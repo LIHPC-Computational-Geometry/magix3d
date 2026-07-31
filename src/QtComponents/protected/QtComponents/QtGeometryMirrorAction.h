@@ -6,8 +6,6 @@
 #ifndef QT_GEOMETRY_MIRROR_ACTION_H
 #define QT_GEOMETRY_MIRROR_ACTION_H
 
-#include "Internal/Context.h"
-
 #include "QtComponents/QtEntityByDimensionSelectorPanel.h"
 #include "QtComponents/QtMgx3DGeomOperationAction.h"
 #include "QtComponents/QtMgx3DPointPanel.h"
@@ -15,7 +13,6 @@
 #include "QtComponents/RenderingManager.h"
 
 #include "Utils/Vector.h"
-#include "Internal/SelectionManager.h"
 
 #include <QCheckBox>
 

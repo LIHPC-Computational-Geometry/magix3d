@@ -5,7 +5,7 @@
  */
 
 #include "Internal/Context.h"
-#include "Internal/Resources.h"
+#include "QtComponents/GUIResources.h"
 
 #include "QtVtkComponents/VTKMgx3DEntityRepresentation.h"
 #include "QtComponents/QtMgx3DApplication.h"
@@ -119,7 +119,7 @@ void VTKMgx3DEntityRepresentation::createPointsCloudRepresentation (
 	mapper->SetInputData (grid);	
 	mapper->ScalarVisibilityOff ( );
 #if	VTK_MAJOR_VERSION < 8
-	mapper->SetImmediateModeRendering (!Internal::Resources::instance ( )._useDisplayList);
+	mapper->SetImmediateModeRendering (!QtComponents::GUIResources::instance ( )._useDisplayList);
 #endif	// VTK_MAJOR_VERSION < 8
 	actor		= VTKMgx3DActor::New ( );
 	actor->SetEntity (entity);
@@ -236,7 +236,7 @@ void VTKMgx3DEntityRepresentation::createTrianglesSurfacicRepresentation (
 	mapper->SetInputData (polydata);
 	mapper->ScalarVisibilityOff ( );
 #if	VTK_MAJOR_VERSION < 8
-	mapper->SetImmediateModeRendering (!Internal::Resources::instance ( )._useDisplayList);
+	mapper->SetImmediateModeRendering (!QtComponents::GUIResources::instance ( )._useDisplayList);
 #endif	// VTK_MAJOR_VERSION < 8
 	actor		= VTKMgx3DActor::New ( );
 	actor->SetEntity (entity);
@@ -327,7 +327,7 @@ void VTKMgx3DEntityRepresentation::createPolygonsSurfacicRepresentation (const v
 	_surfacicMapper->SetInputData (_surfacicPolyData);
 	_surfacicMapper->ScalarVisibilityOff ( );
 #if	VTK_MAJOR_VERSION < 8
-	_surfacicMapper->SetImmediateModeRendering (!Internal::Resources::instance ( )._useDisplayList);
+	_surfacicMapper->SetImmediateModeRendering (!QtComponents::GUIResources::instance ( )._useDisplayList);
 #endif	// VTK_MAJOR_VERSION < 8	
 	_surfacicActor		= VTKMgx3DActor::New ( );
 	_surfacicActor->SetEntity (getEntity ( ));
@@ -397,7 +397,7 @@ void VTKMgx3DEntityRepresentation::createSegmentsWireRepresentation (
 	mapper->SetInputData (grid);
 	mapper->ScalarVisibilityOff ( );
 #if	VTK_MAJOR_VERSION < 8
-	mapper->SetImmediateModeRendering (!Internal::Resources::instance ( )._useDisplayList);
+	mapper->SetImmediateModeRendering (!QtComponents::GUIResources::instance ( )._useDisplayList);
 #endif	// VTK_MAJOR_VERSION < 8
 	actor		= VTKMgx3DActor::New ( );
 	actor->SetEntity (entity);

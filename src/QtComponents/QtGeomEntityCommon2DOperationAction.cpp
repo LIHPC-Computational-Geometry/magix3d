@@ -4,8 +4,6 @@
  * \date        11/09/2018
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -28,9 +26,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -255,9 +251,9 @@ vector<Entity*> QtGeomEntityCommon2DOperationPanel::getInvolvedEntities ( )
 	vector<Entity*>	entities;
 
 	if (1 == _firstEntityPanel->getNameTextField ( )->getObjectsCount ( ))
-		entities.push_back (getContext ( ).getGeomManager ( ).getEntity (_firstEntityPanel->getUniqueName ( ), false));
+		entities.push_back (getController( ).getEntity (_firstEntityPanel->getUniqueName ( ), false));
 	if (1 == _secondEntityPanel->getNameTextField ( )->getObjectsCount ( ))
-		entities.push_back (getContext ( ).getGeomManager ( ).getEntity (_secondEntityPanel->getUniqueName ( ), false));
+		entities.push_back (getController( ).getEntity (_secondEntityPanel->getUniqueName ( ), false));
 
 	return entities;
 }	// QtGeomEntityCommon2DOperationPanel::getInvolvedEntities
@@ -343,11 +339,10 @@ void QtGeomEntityCommon2DOperationAction::executeOperation ( )
 	const string	secondName	= panel->getSecondGeomEntityName ( );
 	const bool			copy        = panel->copyEntities();
 
-	M3DCommandResult*	cmdResult	= 0;
 	if (copy)
-		cmdResult = getContext ( ).getGeomManager ( ).common2DOnCopy (firstName, secondName, groupName);
+		getController( ).common2DOnCopy (firstName, secondName, groupName);
 	else
-		cmdResult = getContext ( ).getGeomManager ( ).common2D (firstName, secondName, groupName);
+		getController( ).common2D (firstName, secondName, groupName);
 	setCommandResult (cmdResult);
 }	// QtGeomEntityCommon2DOperationAction::executeOperation
 

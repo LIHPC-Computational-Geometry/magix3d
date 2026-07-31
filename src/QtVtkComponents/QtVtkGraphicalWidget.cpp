@@ -5,7 +5,7 @@
  */
 
 #include "Internal/Context.h"
-#include "Internal/Resources.h"
+#include "QtComponents/GUIResources.h"
 
 #include "QtVtkComponents/QtVtkGraphicalWidget.h"
 #include "QtVtkComponents/vtkCustomizableInteractorStyleTrackball.h"
@@ -129,23 +129,23 @@ void QtVtkGraphicalWidget::updateConfiguration ( )
 			try
 			{
 				getRenderingManager ( ).setFrameRates (
-					Resources::instance ( )._stillFrameRate.getValue ( ),
-					Resources::instance ( )._desiredFrameRate.getValue ( ));
+					GUIResources::instance ( )._stillFrameRate.getValue ( ),
+					GUIResources::instance ( )._desiredFrameRate.getValue ( ));
 			}
 			catch (...)
 			{
 			}
-/*			window->SetDesiredUpdateRate (Resources::instance ( )._desiredFrameRate.getValue ( ));
-			interactor->SetStillUpdateRate (Resources::instance ( )._stillFrameRate.getValue ( ));
-			interactor->SetDesiredUpdateRate (Resources::instance ( )._desiredFrameRate.getValue ( ));
+/*			window->SetDesiredUpdateRate (GUIResources::instance ( )._desiredFrameRate.getValue ( ));
+			interactor->SetStillUpdateRate (GUIResources::instance ( )._stillFrameRate.getValue ( ));
+			interactor->SetDesiredUpdateRate (GUIResources::instance ( )._desiredFrameRate.getValue ( ));
 */
 			vtkRenderWindowInteractor*	interactor	= getVTKWidget ( ).getInteractor ( );
 			CHECK_NULL_PTR_ERROR (interactor)
 			vtkCustomizableInteractorStyleTrackball*	interactorStyle	= dynamic_cast<vtkCustomizableInteractorStyleTrackball*>(interactor->GetInteractorStyle ( ));
 			if (0 != interactorStyle)
 			{
-				vtkUnifiedInteractorStyle::upZoom	= Resources::instance ( )._mouseUpZoom;
-				interactorStyle->EnableZoomOnWheelEvent (Resources::instance ( )._zoomOnWheel);
+				vtkUnifiedInteractorStyle::upZoom	= GUIResources::instance ( )._mouseUpZoom;
+				interactorStyle->EnableZoomOnWheelEvent (GUIResources::instance ( )._zoomOnWheel);
 			}	// if (0 != interactorStyle)
 		}	// if (0 != getVTKWidget ( ).getRenderWindow ( ))
 	}	// try

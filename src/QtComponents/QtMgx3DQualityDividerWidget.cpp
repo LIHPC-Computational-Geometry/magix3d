@@ -3,19 +3,11 @@
  * \author		Charles PIGNEROL
  * \date		07/01/2025
  */
-
-#include "Internal/Context.h"
-
 #include "QtComponents/QtMgx3DQualityDividerWidget.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/RenderedEntityRepresentation.h"
 #include "Utils/GraphicalEntityRepresentation.h"
 #include "Utils/Common.h"
-#include "Mesh/Mgx3DQualifSerie.h"
-#include "Mesh/Surface.h"
-#include "Mesh/SubSurface.h"
-#include "Mesh/Volume.h"
-#include "Mesh/SubVolume.h"
 
 #include <TkUtil/ErrorLog.h>
 #include <TkUtil/Exception.h>
@@ -25,10 +17,7 @@
 
 
 using namespace GQualif;
-using namespace gmds;
 using namespace Mgx3D;
-using namespace Mgx3D::Mesh;
-using namespace Mgx3D::Internal;
 using namespace Mgx3D::Utils;
 using namespace TkUtil;
 using namespace std;
@@ -46,8 +35,8 @@ namespace QtComponents
 // ===========================================================================
 
 
-QtMgx3DQualityDividerWidget::QtMgx3DQualityDividerWidget (QWidget* parent, Context* context, QtMgx3DMainWindow* mainWindow)
-	: QtQualityDividerWidget (parent, "Magix 3D"), _mainWindow (mainWindow), _displayButton (0), _initializeButton (0), _wireCheckBox (0), _context (context), _extractions ( ),
+QtMgx3DQualityDividerWidget::QtMgx3DQualityDividerWidget (QWidget* parent, Controller* controller, QtMgx3DMainWindow* mainWindow)
+	: QtQualityDividerWidget (parent, "Magix 3D"), _mainWindow (mainWindow), _displayButton (0), _initializeButton (0), _wireCheckBox (0), _controller (controller), _extractions ( ),
 	  _parentsDisplayMask ( ), _useGlobalDisplayProperties (true), _criterionName ( )
 {
 	_displayButton		= new QPushButton ("Afficher", this);
@@ -65,7 +54,7 @@ QtMgx3DQualityDividerWidget::QtMgx3DQualityDividerWidget (QWidget* parent, Conte
 
 
 QtMgx3DQualityDividerWidget::QtMgx3DQualityDividerWidget (const QtMgx3DQualityDividerWidget&)
-	: QtQualityDividerWidget (0, "Magix 3D"), _mainWindow (0), _displayButton (0), _initializeButton (0), _wireCheckBox (0), _context (0), _extractions ( ), _parentsDisplayMask ( ), _criterionName ( )
+	: QtQualityDividerWidget (0, "Magix 3D"), _mainWindow (0), _displayButton (0), _initializeButton (0), _wireCheckBox (0), _controller (0), _extractions ( ), _parentsDisplayMask ( ), _criterionName ( )
 {
 	MGX_FORBIDDEN ("QtMgx3DQualityDividerWidget copy constructor is not allowed.")
 }	// QtMgx3DQualityDividerWidget::QtMgx3DQualityDividerWidget
@@ -222,23 +211,23 @@ void QtMgx3DQualityDividerWidget::displayExtraction (size_t i, bool display)
 }	// QtMgx3DQualityDividerWidget::displayExtraction
 
 
-Context& QtMgx3DQualityDividerWidget::getContext ( )
+Controller& QtMgx3DQualityDividerWidget::getController ( )
 {
-	CHECK_NULL_PTR_ERROR (_context)
-	return *_context;
+	CHECK_NULL_PTR_ERROR (_controller)
+	return *_controller;
 }	// QtMgx3DQualityDividerWidget::getContext
 
 
-const Context& QtMgx3DQualityDividerWidget::getContext ( ) const
+const Controller& QtMgx3DQualityDividerWidget::getController ( ) const
 {
-	CHECK_NULL_PTR_ERROR (_context)
-	return *_context;
+	CHECK_NULL_PTR_ERROR (_controller)
+	return *_controller;
 }	// QtMgx3DQualityDividerWidget::getContext
 
 
 void QtMgx3DQualityDividerWidget::removeDataGroupSubsets ( )
 {
-	MeshManager*	manager	= dynamic_cast<Mesh::MeshManager*>(&getContext ( ).getMeshManager ( ));
+	MeshManager*	manager	= dynamic_cast<Mesh::MeshManager*>(&getController ( ).getMeshManager ( ));
 	CHECK_NULL_PTR_ERROR (manager)
 	gmds::Mesh&		mesh	= manager->getMesh ( )->getGMDSMesh ( );
 

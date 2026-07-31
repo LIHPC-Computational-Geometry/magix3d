@@ -6,13 +6,9 @@
 #ifndef QT_GEOMETRY_ROTATION_ACTION_H
 #define QT_GEOMETRY_ROTATION_ACTION_H
 
-#include "Internal/Context.h"
-
 #include "QtComponents/QtMgx3DRotationPanel.h"
 #include "QtComponents/QtEntityByDimensionSelectorPanel.h"
 #include "QtComponents/QtMgx3DGeomOperationAction.h"
-
-#include "Internal/SelectionManager.h"
 
 #include <QCheckBox>
 

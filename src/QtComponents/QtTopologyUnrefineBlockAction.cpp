@@ -3,12 +3,7 @@
  * \author      Charles PIGNEROL
  * \date        11/12/2014
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
-#include "Topo/CommandUnrefineBlock.h"
-#include "Topo/TopoDisplayRepresentation.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtTopologyUnrefineBlockAction.h"
@@ -22,9 +17,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -255,11 +248,11 @@ void QtTopologyUnrefineBlockPanel::preview (bool show, bool destroyInteractor)
 
 		DisplayProperties	graphicalProps;
 		graphicalProps.setWireColor (Color (
-						255 * Resources::instance ( )._previewColor.getRed ( ),
-						255 * Resources::instance ( )._previewColor.getGreen ( ),
-						255 * Resources::instance ( )._previewColor.getBlue ( )));
+						255 * GUIResources::instance ( )._previewColor.getRed ( ),
+						255 * GUIResources::instance ( )._previewColor.getGreen ( ),
+						255 * GUIResources::instance ( )._previewColor.getBlue ( )));
 		graphicalProps.setLineWidth (
-						Resources::instance ( )._previewWidth.getValue ( ));
+						GUIResources::instance ( )._previewWidth.getValue ( ));
 		RenderingManager::RepresentationID	repID	=
 				getRenderingManager ( ).createSegmentsWireRepresentation (
 									*points, *indices, graphicalProps, true);
@@ -279,10 +272,10 @@ vector<Entity*> QtTopologyUnrefineBlockPanel::getInvolvedEntities ( )
 	vector<Entity*>	entities;
 	const string	blockName	= getBlockName ( );
 	const string	edgeName	= getEdgeName ( );
-	TopoEntity*		block	=
-			getContext ( ).getTopoManager ( ).getBlock (blockName, false);
-	TopoEntity*		edge	=
-			getContext ( ).getTopoManager ( ).getCoEdge (edgeName, false);
+	Entity*		block	=
+			getController ( ).getTopoManager ( ).getBlock (blockName, false);
+	Entity*		edge	=
+			getController ( ).getTopoManager ( ).getCoEdge (edgeName, false);
 	if (0 != block)
 		entities.push_back (block);
 	if (0 != edge)
@@ -365,8 +358,6 @@ void QtTopologyUnrefineBlockAction::executeOperation ( )
 	QtTopologyUnrefineBlockPanel*	panel	= dynamic_cast<QtTopologyUnrefineBlockPanel*>(getTopologyUnrefineBlockPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)
 
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de déraffinement du bloc topologique :
@@ -374,7 +365,7 @@ void QtTopologyUnrefineBlockAction::executeOperation ( )
 	const string	edgeName	= panel->getEdgeName ( );
 	const int		ratio		= panel->getRatio ( );
 
-	cmdResult	= getContext ( ).getTopoManager ( ).unrefine (blockName, edgeName, ratio);
+	getController ( ).getTopoManager ( ).unrefine (blockName, edgeName, ratio);
 
 	setCommandResult (cmdResult);
 }	// QtTopologyUnrefineBlockAction::executeOperation

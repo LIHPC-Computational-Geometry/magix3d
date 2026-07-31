@@ -5,7 +5,7 @@
  */
 
 #include "Internal/Context.h"
-#include "Internal/Resources.h"
+#include "QtComponents/GUIResources.h"
 
 #include "QtVtkComponents/VTKRenderingManager.h"
 #include "QtVtkComponents/vtkCustomizableInteractorStyleTrackball.h"
@@ -819,9 +819,9 @@ _renderWindow->PrintSelf (cout, *vtkIndent::New ( ));
 	_renderer	= vtkRenderer::New ( );
 	_renderer->SetUseDepthPeeling (true);	// Bonne gestion de la transparence
 	_renderer->SetLayer (_theaterLayer);
-	_renderer->SetBackground (Resources::instance ( )._background.getRed ( ), Resources::instance ( )._background.getGreen ( ), Resources::instance ( )._background.getBlue ( ));
+	_renderer->SetBackground (GUIResources::instance ( )._background.getRed ( ), GUIResources::instance ( )._background.getGreen ( ), GUIResources::instance ( )._background.getBlue ( ));
 #ifndef USE_OPENGL2_BACKEND						
-	enableMultipleLighting (Resources::instance ( )._multipleLighting.getValue ( ));
+	enableMultipleLighting (GUIResources::instance ( )._multipleLighting.getValue ( ));
 #endif	// USE_OPENGL2_BACKEND
 	_renderWindow->AddRenderer (_renderer);
 

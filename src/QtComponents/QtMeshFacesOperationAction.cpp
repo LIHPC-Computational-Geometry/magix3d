@@ -3,15 +3,13 @@
  * \author      Charles PIGNEROL
  * \date        09/09/2013
  */
-
-#include "Internal/Context.h"
-#include "Internal/Resources.h"
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Mesh/MeshManager.h"
 #include "QtComponents/QtMeshFacesOperationAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
+
+#include "QtComponents/GUIResources.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/UTF8String.h>
@@ -23,9 +21,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Mesh;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -48,11 +44,11 @@ QtMeshFacesOperationPanel::QtMeshFacesOperationPanel (
 {
 	_verticalLayout	= new QVBoxLayout (this);
 	_verticalLayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	_verticalLayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	_verticalLayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	setLayout (_verticalLayout);
 
 	// Nom opération :
@@ -242,7 +238,7 @@ vector<Entity*> QtMeshFacesOperationPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = faces.begin ( );
 	     faces.end ( ) != it; it++)
 	{
-		Entity*	entity	= getContext( ).getTopoManager( ).getCoFace(*it, false);
+		Entity*	entity	= getController( ).getCoFace(*it, false);
 		if (0 != entity)
 			entities.push_back (entity);
 	}	// for (vector<string>::const_iterator it = faces.begin ( );
@@ -318,17 +314,15 @@ void QtMeshFacesOperationAction::executeOperation ( )
 {
 	CHECK_NULL_PTR_ERROR (getMeshPanel ( ))
 
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DMeshOperationAction::executeOperation ( );
 
 	if (true == getMeshPanel ( )->meshAll ( ))
-		cmdResult	= getContext ( ).getMeshManager ( ).newAllFacesMesh ( );
+		getController( ).newAllFacesMesh ( );
 	else
 	{
 		vector<string>	faces	= getMeshPanel ( )->getFaces ( );
 		getMeshPanel ( )->stopInteractiveMode ( );
-		cmdResult	= getContext ( ).getMeshManager ( ).newFacesMesh (faces);
+		getController( ).newFacesMesh (faces);
 	}
 
 	setCommandResult (cmdResult);

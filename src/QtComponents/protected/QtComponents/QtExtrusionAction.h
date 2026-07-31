@@ -5,10 +5,6 @@
  *
  * Anciennement QtPrismCreationAction.h, renommé le 11/03/26 en QtExtrusionAction.h suite à 
  * une généralisation du panneau.
- *
- * Modified on: 21/02/2022
- *      Author: Simon C
- *      ajout de la possibilité de conserver les entités géométriques
  */
 #ifndef QT_EXTRUSION_ACTION_H
 #define QT_EXTRUSION_ACTION_H

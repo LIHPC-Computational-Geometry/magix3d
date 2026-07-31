@@ -4,19 +4,14 @@
  * \date        06/09/2013
  */
 
-#include "Internal/Context.h"
-#include "Internal/Resources.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/CommandNewBox.h"
-#include "Geom/GeomDisplayRepresentation.h"
-#include "Geom/GeomManager.h"
-#include "Geom/Vertex.h"
 #include "Utils/Vector.h"
 #include "QtComponents/QtBoxOperationAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
+
+#include "QtComponents/GUIResources.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>
@@ -33,10 +28,7 @@ using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Group;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -61,8 +53,8 @@ QtBoxOperationPanel::QtBoxOperationPanel (
 	  _point1Panel (0), _point2Panel (0), _topologyPanel (0)
 {
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
-	layout->setContentsMargins  (Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+	layout->setContentsMargins  (GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
 	// Nom opération :
@@ -79,8 +71,8 @@ QtBoxOperationPanel::QtBoxOperationPanel (
 
 	// Méthode de création/modification de la boite :
 	QHBoxLayout*	hlayout	= new QHBoxLayout (0);
-	hlayout->setContentsMargins  (Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
-	hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+	hlayout->setContentsMargins  (GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ));
+	hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	layout->addLayout (hlayout);
 	label	= new QLabel (QString::fromUtf8("Méthode"), this);
 	hlayout->addWidget (label);
@@ -93,8 +85,8 @@ QtBoxOperationPanel::QtBoxOperationPanel (
 	QtGroupBox*	groupBox	= new QtGroupBox (this, "Paramètres de la boite");
 	layout->addWidget (groupBox);
 	QVBoxLayout*	vlayout	= new QVBoxLayout (groupBox);
-	vlayout->setContentsMargins  (Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
-	vlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+	vlayout->setContentsMargins  (GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ));
+	vlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	groupBox->setLayout (vlayout);
 	_point1Panel	= new QtMgx3DPointPanel (groupBox, "Point 1", true, "x :", "y :", "z :", 0., -DBL_MAX, DBL_MAX, 0., -DBL_MAX, DBL_MAX, 0., -DBL_MAX, DBL_MAX, &mainWindow, FilterEntity::GeomVertex, true);
 	vlayout->addWidget (_point1Panel);
@@ -111,10 +103,10 @@ QtBoxOperationPanel::QtBoxOperationPanel (
 	groupBox	= new QtGroupBox (this, "Topologie :");
 	layout->addWidget (groupBox);
 	vlayout	= new QVBoxLayout (groupBox);
-	vlayout->setContentsMargins  (Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
-	vlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+	vlayout->setContentsMargins  (GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ));
+	vlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	groupBox->setLayout (vlayout);
-	const int	defaultEdgesNum	= mainWindow.getContext( ).getTopoManager( ).getDefaultNbMeshingEdges( );
+	const int	defaultEdgesNum	= mainWindow.getController( ).getDefaultNbMeshingEdges( );
 	_topologyPanel	= new QtTopologyPanel (
 		groupBox, mainWindow, false, false, 3, QtTopologyPanel::STRUCTURED_TOPOLOGY, QtTopologyPanel::CARTESIAN, defaultEdgesNum, defaultEdgesNum, defaultEdgesNum, true, true);
 	_topologyPanel->enableTopologyType (QtTopologyPanel::OGRID_BLOCKS, false);
@@ -159,14 +151,14 @@ vector<Entity*> QtBoxOperationPanel::getInvolvedEntities ( )
 
 	if (0 != _point1Panel->getUniqueName ( ).length ( ))
 	{
-		Geom::Vertex*	vertex	= 
-			getContext ( ).getGeomManager ( ).getVertex (_point1Panel->getUniqueName ( ), false);
+		Entity*	vertex	=
+			getController( ).getVertex (_point1Panel->getUniqueName ( ), false);
 		if (0 != vertex)
 			entities.push_back (vertex);
 	}	// if (0 != _point1Panel->getUniqueName ( ).length ( ))
 	if (0 != _point2Panel->getUniqueName ( ).length ( ))
 	{
-		Geom::Vertex*	vertex	= getContext ( ).getGeomManager ( ).getVertex (_point2Panel->getUniqueName ( ), false);
+		Entity*	vertex	= getController( ).getVertex (_point2Panel->getUniqueName ( ), false);
 		if (0 != vertex)
 			entities.push_back (vertex);
 	}	// if (0 != _point2Panel->getUniqueName ( ).length ( ))
@@ -387,6 +379,10 @@ void QtBoxOperationPanel::operationCompleted ( )
 
 void QtBoxOperationPanel::preview (bool show, bool destroyInteractor)
 {
+
+	std::cout<<"Print disabled for the moment: refactoring in progress"<<std::endl;
+
+	/*
 	// Lors de la construction getGraphicalWidget peut être nul ...
 	try
 	{
@@ -428,6 +424,7 @@ void QtBoxOperationPanel::preview (bool show, bool destroyInteractor)
 	catch (...)
 	{
 	}
+	*/
 }	// QtBoxOperationPanel::preview
 
 
@@ -470,10 +467,6 @@ QtBoxOperationPanel* QtBoxOperationAction::getBoxPanel ( )
 
 void QtBoxOperationAction::executeOperation ( )
 {
-	// Validation paramétrage :
-//	QtMgx3DGeomOperationAction::executeOperation ( );
-	M3DCommandResult*	cmdResult	= 0;
-
 	// Récupération des paramètres de création de la boite :
 	QtBoxOperationPanel*	panel	= getBoxPanel ( );
 	CHECK_NULL_PTR_ERROR (panel)
@@ -481,7 +474,7 @@ void QtBoxOperationAction::executeOperation ( )
 	Point	p2 = panel->getPoint2();
 	string	name	= panel->getGroupName ( );
 	if (false == panel->createTopology ( ))
-		cmdResult	= getContext ( ).getGeomManager ( ).newBox (p1, p2, name);
+		getController ).newBox (p1, p2, name);
 	else
 	{
 		bool	structured	= false;
@@ -490,7 +483,7 @@ void QtBoxOperationAction::executeOperation ( )
 		{
 			case QtTopologyPanel::UNSTRUCTURED_TOPOLOGY	:
 			    structured  = false;
-			    cmdResult	= getContext ( ).getTopoManager ( ).newBoxWithTopo (p1, p2, false, name);
+			    getController( ).newBoxWithTopo (p1, p2, false, name);
 			break;
 			case QtTopologyPanel::STRUCTURED_TOPOLOGY	:
 			{
@@ -498,7 +491,7 @@ void QtBoxOperationAction::executeOperation ( )
 				const int	ni	= panel->getNi ( );
 				const int	nj	= panel->getNj ( );
 				const int	nk	= panel->getNk ( );
-				cmdResult	= getContext ( ).getTopoManager ( ).newBoxWithTopo (p1, p2, ni, nj, nk, name);
+				getController( ).newBoxWithTopo (p1, p2, ni, nj, nk, name);
 			}
             break;
 			case QtTopologyPanel::OGRID_BLOCKS	:

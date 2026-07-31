@@ -10,7 +10,6 @@
 #include "QtComponents/QtMgx3DEntityPanel.h"
 #include "QtComponents/QtMgx3DTopoOperationAction.h"
 
-#include "Internal/SelectionManager.h"
 
 
 

@@ -4,8 +4,6 @@
  * \date		15/3/2019
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -20,9 +18,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -220,20 +216,20 @@ void QtTopologyEdgeCreationPanel::preview (bool show, bool destroyInteractor){
         return;
 
     try {
-        Context *context = dynamic_cast<Context *>(&getContext());
-        CHECK_NULL_PTR_ERROR (context)
+        Controller *controller = &getController();
+        CHECK_NULL_PTR_ERROR (controller)
 
         DisplayProperties graphicalProps;
         graphicalProps.setWireColor(Color(
-                255 * Resources::instance()._previewColor.getRed(),
-                255 * Resources::instance()._previewColor.getGreen(),
-                255 * Resources::instance()._previewColor.getBlue()));
-        graphicalProps.setLineWidth(Resources::instance()._previewWidth.getValue());
+                255 * GUIResources::instance()._previewColor.getRed(),
+                255 * GUIResources::instance()._previewColor.getGreen(),
+                255 * GUIResources::instance()._previewColor.getBlue()));
+        graphicalProps.setLineWidth(GUIResources::instance()._previewWidth.getValue());
 
         if(_verticesPanel->getUniqueNames().size() == 2){
 
-            Math::Point point0 = context->getTopoManager().getCoord(_verticesPanel->getUniqueNames()[0]);
-            Math::Point point1 = context->getTopoManager().getCoord(_verticesPanel->getUniqueNames()[1]);
+            Math::Point point0 = controller->getTopoManager().getCoord(_verticesPanel->getUniqueNames()[0]);
+            Math::Point point1 = controller->getTopoManager().getCoord(_verticesPanel->getUniqueNames()[1]);
             vector<size_t>		indices;
 
             RenderingManager::RepresentationID	repID	=
@@ -310,20 +306,18 @@ void QtTopologyEdgeCreationAction::executeOperation ( )
 	QtTopologyEdgeCreationPanel*	panel	= dynamic_cast<QtTopologyEdgeCreationPanel*>(getOperationPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)
 
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtTopologyCreationAction::executeOperation ( );
 
 
     if (panel->curveMethod()){
         // Récupération des paramètres d'association des entités topologiques :
         const string	curve	= panel->getCurveName ( );
-        cmdResult	= getContext ( ).getTopoManager( ).newTopoOnGeometry (curve);
+        getController ( ).getTopoManager( ).newTopoOnGeometry (curve);
     }
     else{
         std::vector<string> vnames = panel->getVerticesNames();
         const string group = panel->getGroupName();
-        cmdResult	= getContext ( ).getTopoManager( ).newTopoEntity (vnames,1,group);
+        getController ( ).getTopoManager( ).newTopoEntity (vnames,1,group);
     }
 
 	setCommandResult (cmdResult);

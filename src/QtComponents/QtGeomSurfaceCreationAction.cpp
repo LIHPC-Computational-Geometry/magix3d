@@ -3,11 +3,7 @@
  * \author      Charles PIGNEROL
  * \date        20/11/2014
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
-#include "Geom/Vertex.h"
 #include "Utils/ValidatedField.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtGeomSurfaceCreationAction.h"
@@ -30,9 +26,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -267,7 +261,7 @@ vector<Entity*> QtGeomSurfaceCreationPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		GeomEntity*	entity	= getContext ( ).getGeomManager ( ).getEntity (*it);
+		Entity*	entity	= getController( ).getEntity (*it);
 		CHECK_NULL_PTR_ERROR (entity)
 		entities.push_back (entity);
 	}
@@ -357,8 +351,6 @@ QtGeomSurfaceCreationPanel*
 
 void QtGeomSurfaceCreationAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres d'addition des entités géométriques :
@@ -377,16 +369,14 @@ void QtGeomSurfaceCreationAction::executeOperation ( )
 			for (vector<string>::const_iterator itn = entities.begin ( );
 			     itn != entities.end ( ); itn++)
 			{
-				Entity&	entity	= getContext().nameToEntity (*itn);
-				Vertex*	vertex	= dynamic_cast<Vertex*>(&entity);
-				CHECK_NULL_PTR_ERROR (vertex)
-				points.push_back (vertex->getPoint ( ));
+				Point point	= getController().getPoint(*itn);
+				points.push_back (point);
 			}	// for (vector<string>::const_iterator itn = ...
-			cmdResult	= getContext ( ).getGeomManager ( ).newVerticesCurvesAndPlanarSurface (points, groupName);
+			getController( ).newVerticesCurvesAndPlanarSurface (points, groupName);
 		}	// case 0	
 		break;
 		case 1	:
-			cmdResult	= getContext ( ).getGeomManager ( ).newPlanarSurface (entities, groupName);
+			getController( ).newPlanarSurface (entities, groupName);
 			break;
 		default	:
 			UTF8String	message (Charset::UTF_8);

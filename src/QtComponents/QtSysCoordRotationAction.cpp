@@ -3,9 +3,6 @@
  * \author		Eric Brière de l'Isle
  * \date		7/6/2018
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -29,10 +26,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
-using namespace Mgx3D::CoordinateSystem;
 
 namespace Mgx3D
 {
@@ -234,8 +228,8 @@ vector<Entity*> QtSysCoordRotationPanel::getInvolvedEntities ( )
 	vector<Entity*>	entities;
 
 	const string	name	= getSysCoordName ( );
-	CoordinateSystem::SysCoord*	entity	=
-			getContext ( ).getSysCoordManager ( ).getSysCoord (name, false);
+	Entity*	entity	=
+			getController( ).getSysCoordManager ( ).getSysCoord (name, false);
 	if (0 != entity)
 		entities.push_back (entity);
 
@@ -317,8 +311,6 @@ QtSysCoordRotationPanel*
 
 void QtSysCoordRotationAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	QtSysCoordRotationPanel*	panel	= getRotationPanel ( );
@@ -329,9 +321,9 @@ void QtSysCoordRotationAction::executeOperation ( )
 	const string	      	groupName	= panel->getGroupName ( );
 
 	if (copy)
-		cmdResult	= getContext ( ).getSysCoordManager ( ).copyAndRotate (entitiy, rotation, groupName);
+		getController( ).getSysCoordManager ( ).copyAndRotate (entitiy, rotation, groupName);
 	else
-		cmdResult	= getContext ( ).getSysCoordManager ( ).rotate (entitiy, rotation);
+		getController( ).getSysCoordManager ( ).rotate (entitiy, rotation);
 
 	setCommandResult (cmdResult);
 }	// QtSysCoordRotationAction::executeOperation

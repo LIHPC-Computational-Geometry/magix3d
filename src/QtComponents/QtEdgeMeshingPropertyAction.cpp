@@ -4,8 +4,6 @@
  * \date        04/11/2013
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -13,6 +11,8 @@
 #include "QtComponents/QtMgx3DApplication.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtNumericFieldsFactory.h"
+
+#include "QtComponents/GUIResources.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>
@@ -31,9 +31,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -185,11 +183,11 @@ void QtDiscretisationPanelIfc::createOrthogonalityArea (QLayout& layout)
 	layout.addWidget (_orthogonalOptionsPanel);
 	QHBoxLayout*	hlayout	= new QHBoxLayout ( );
 	hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	_orthogonalOptionsPanel->setLayout (hlayout);
 	QLabel*	label	=
 				new QLabel ("Nombre de couches :", _orthogonalOptionsPanel);
@@ -227,11 +225,11 @@ void QtDiscretisationPanelIfc::createPolarArea (QLayout& layout)
 	layout.addWidget (_polarOptionsPanel);
 	QHBoxLayout*	hlayout	= new QHBoxLayout ( );
 	hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	_polarOptionsPanel->setLayout (hlayout);
 
 	_polarCenterPanel = new QtMgx3DPointPanel (
@@ -295,11 +293,11 @@ QtUniformDiscretisationPanel::QtUniformDiscretisationPanel (
 {
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
 	// L'orthogonalité à la paroi :
@@ -369,11 +367,11 @@ QtGeometricProgressionPanel::QtGeometricProgressionPanel (
 {
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
 	_buttonGroup = new QButtonGroup(this);
@@ -546,11 +544,11 @@ QtSpecificSizePanel::QtSpecificSizePanel (
 {
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
 	// Le facteur de la progression géométrique :
@@ -639,22 +637,22 @@ QtInterpolatedEdgeDiscretisationPanel::QtInterpolatedEdgeDiscretisationPanel (
 {
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
 	// L'arête de référence :
 	QHBoxLayout*	hlayout	= new QHBoxLayout ( );
 	layout->addLayout (hlayout);
 	hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	_referenceComboBox	= new QComboBox (this);
 	_referenceComboBox->addItem (QString::fromUtf8("Arêtes de références"));
 	_referenceComboBox->addItem (QString::fromUtf8("Face de référence"));
@@ -831,7 +829,7 @@ vector<Entity*> QtInterpolatedEdgeDiscretisationPanel::getPanelEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 		if (0 != (*it).length ( ))
-			entities.push_back (getContext ( ).getTopoManager ( ).getEntity (
+			entities.push_back (getController( ).getEntity (
 																*it, true));
 
 	return entities;
@@ -888,11 +886,11 @@ QtGlobalInterpolatedEdgeDiscretisationPanel::QtGlobalInterpolatedEdgeDiscretisat
 {
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
 	// L'arête de référence :
@@ -1052,14 +1050,14 @@ vector<Entity*> QtGlobalInterpolatedEdgeDiscretisationPanel::getPanelEntities ( 
 	for (vector<string>::const_iterator it = names1.begin ( );
 	     names1.end ( ) != it; it++)
 		if (0 != (*it).length ( ))
-			entities.push_back (getContext ( ).getTopoManager ( ).getEntity (
+			entities.push_back (getController( ).getEntity (
 																*it, true));
 	const vector<string>	names2	= getSecondEdgeNames ( );
 
 	for (vector<string>::const_iterator it = names2.begin ( );
 	     names2.end ( ) != it; it++)
 		if (0 != (*it).length ( ))
-			entities.push_back (getContext ( ).getTopoManager ( ).getEntity (
+			entities.push_back (getController( ).getEntity (
 																*it, true));
 
 
@@ -1081,11 +1079,11 @@ QtBiGeometricProgressionPanel::QtBiGeometricProgressionPanel (
 {
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
 	// La progression géométrique côté 1 :
@@ -1293,11 +1291,11 @@ QtHyperbolicDiscretisationPanel::QtHyperbolicDiscretisationPanel (
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	setLayout (layout);
 	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 
 	// Le premier bras côté 1 :
 	QHBoxLayout* hlayout	= new QHBoxLayout ( );
@@ -1446,11 +1444,11 @@ QtBetaDiscretisationPanel::QtBetaDiscretisationPanel (
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	setLayout (layout);
 	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 
 	_buttonGroup = new QButtonGroup(this);
 	_buttonGroup->setExclusive(true);
@@ -1620,11 +1618,11 @@ QtBiExponentialDiscretisationPanel::QtBiExponentialDiscretisationPanel(
     QVBoxLayout *layout = new QVBoxLayout(this);
     setLayout(layout);
     layout->setContentsMargins(
-        Resources::instance()._margin.getValue(),
-        Resources::instance()._margin.getValue(),
-        Resources::instance()._margin.getValue(),
-        Resources::instance()._margin.getValue());
-    layout->setSpacing(Resources::instance()._spacing.getValue());
+        GUIResources::instance()._margin.getValue(),
+        GUIResources::instance()._margin.getValue(),
+        GUIResources::instance()._margin.getValue(),
+        GUIResources::instance()._margin.getValue());
+    layout->setSpacing(GUIResources::instance()._spacing.getValue());
 
     // Le premier bras côté 1 :
     QHBoxLayout *hlayout = new QHBoxLayout();
@@ -1855,11 +1853,11 @@ QtEdgeListMeshingPropertyPanel::QtEdgeListMeshingPropertyPanel (
 //	SET_WIDGET_BACKGROUND (this, Qt::yellow)
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
 	// Méthode de discrétisation des arêtes :
@@ -1887,11 +1885,11 @@ QtEdgeListMeshingPropertyPanel::QtEdgeListMeshingPropertyPanel (
 						new QtGroupBox (this, "Autres paramètres de discrétisation");
 	QVBoxLayout*	vlayout	= new QVBoxLayout (groupBox);
 	vlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	vlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	vlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	groupBox->setLayout (vlayout);
 	layout->addWidget (groupBox);
 	// Le panneau "méthode" : plusieurs panneaux possibles.
@@ -1900,11 +1898,11 @@ QtEdgeListMeshingPropertyPanel::QtEdgeListMeshingPropertyPanel (
 	vlayout->addWidget (_currentParentWidget);
 	QHBoxLayout*	currentLayout = new QHBoxLayout (_currentParentWidget);
 	currentLayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	currentLayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	currentLayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	_currentParentWidget->setLayout (currentLayout);
 	_uniformDiscretisationPanel	=
 					new QtUniformDiscretisationPanel (0, mainWindow);
@@ -2443,11 +2441,11 @@ QtTopologyEdgesRefinementPanel::QtTopologyEdgesRefinementPanel (
 {
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
 	// Nom opération :
@@ -2606,7 +2604,7 @@ vector<Entity*> QtTopologyEdgesRefinementPanel::getPanelEntities ( )
 	const string	name	= getRefinedReferenceEdgeName ( );
 	if (0 != name.length ( ))
 	{
-		TopoEntity*	entity	= getContext ( ).getTopoManager ( ).getCoEdge(name);
+		Entity*	entity	= getController( ).getCoEdge(name);
 		CHECK_NULL_PTR_ERROR (entity)
 		entities.push_back (entity);
 	}	// if (0 != name.length ( ))
@@ -2616,8 +2614,8 @@ vector<Entity*> QtTopologyEdgesRefinementPanel::getPanelEntities ( )
 	{
 		if (0 != (*it).length ( ))
 		{
-			TopoEntity*	entity	=
-							getContext ( ).getTopoManager ( ).getCoEdge (*it);
+			Entity*	entity	=
+							getController( ).getCoEdge (*it);
 			CHECK_NULL_PTR_ERROR (entity)
 			entities.push_back (entity);
 		}	// if (0 != (*it).length ( ))
@@ -2676,11 +2674,11 @@ QtEdgeMeshingPropertyPanel::QtEdgeMeshingPropertyPanel (
 //	SET_WIDGET_BACKGROUND (this, Qt::yellow)
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
 	// Nom opération :
@@ -2710,11 +2708,11 @@ QtEdgeMeshingPropertyPanel::QtEdgeMeshingPropertyPanel (
 						new QtGroupBox (this, "Paramètres de discrétisation");
 	QVBoxLayout*	vlayout	= new QVBoxLayout (groupBox);
 	vlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	vlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	vlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	groupBox->setLayout (vlayout);
 	layout->addWidget (groupBox);
 
@@ -2992,7 +2990,7 @@ vector<Entity*> QtEdgeMeshingPropertyPanel::getInvolvedEntities ( )
 
 		for (vector<string>::const_iterator it = names.begin ( );
 		     names.end ( ) != it; it++)
-			entities.push_back (getContext ( ).getTopoManager ( ).getEntity (
+			entities.push_back (getController( ).getEntity (
 																	*it, true));
 	}	// if (CONSTRAINED_EDGES != getOperationMethod ( ))
 
@@ -3155,14 +3153,14 @@ void QtEdgeMeshingPropertyPanel::reinitializeCallback ( )
 
 	vector<string>::const_iterator itn	= names.begin ( );
 	const CoEdge*	ref	=	
-					getContext ( ).getTopoManager ( ).getCoEdge (*itn, true);
+					getController( ).getCoEdge (*itn, true);
 	CHECK_NULL_PTR_ERROR (ref)
 	const CoEdgeMeshingProperty*	properties	= ref->getMeshingProperty ( );
 	itn++;
 	for ( ; itn != names.end ( ); itn++)
 	{
 		const CoEdge*	edge	=
-					getContext ( ).getTopoManager ( ).getCoEdge (*itn, true);
+					getController( ).getCoEdge (*itn, true);
 		CHECK_NULL_PTR_ERROR (edge)
 		const CoEdgeMeshingProperty*	props	= edge->getMeshingProperty ( );
 
@@ -3205,15 +3203,15 @@ void QtEdgeMeshingPropertyPanel::preview (bool show, bool destroyInteractor)
 	unique_ptr<CoEdgeMeshingProperty>	properties (getMeshingProperty ( ));
 	DisplayProperties	graphicalProps;
 	graphicalProps.setCloudColor (Color (
-					255 * Resources::instance ( )._previewColor.getRed ( ),
-					255 * Resources::instance ( )._previewColor.getGreen ( ),
-					255 * Resources::instance ( )._previewColor.getBlue ( )));
+					255 * GUIResources::instance ( )._previewColor.getRed ( ),
+					255 * GUIResources::instance ( )._previewColor.getGreen ( ),
+					255 * GUIResources::instance ( )._previewColor.getBlue ( )));
 	graphicalProps.setPointSize (
-						Resources::instance ( )._previewPointSize.getValue ( ));
+						GUIResources::instance ( )._previewPointSize.getValue ( ));
 	for (vector<string>::const_iterator ite = edges.begin ( );
 	     ite != edges.end ( ); ite++)
 	{
-		CoEdge*	coEdge	= getContext ( ).getTopoManager ( ).getCoEdge (*ite);
+		CoEdge*	coEdge	= getController( ).getCoEdge (*ite);
 		CHECK_NULL_PTR_ERROR (coEdge)
 		vector<Math::Point>	points;
 		coEdge->getPoints (properties.get( ), points, Qt::Checked == _previewProjectedCheckBox->checkState());
@@ -3228,9 +3226,9 @@ void QtEdgeMeshingPropertyPanel::preview (bool show, bool destroyInteractor)
 	COMPLETE_QT_TRY_CATCH_BLOCK (false, this, "Magix 3D")
 
 	if (hasError)
-		getContext ( ).getLogStream()->log(TraceLog (errorString, Log::WARNING));
+		getController( ).getLogStream()->log(TraceLog (errorString, Log::WARNING));
 	else if (edge_preview_activated)
-		getContext ( ).getLogStream()->log(TraceLog (UTF8String ("Prévisualisation de la discrétisation ...", Charset::UTF_8), Log::TRACE_1));
+		getController( ).getLogStream()->log(TraceLog (UTF8String ("Prévisualisation de la discrétisation ...", Charset::UTF_8), Log::TRACE_1));
 }	// QtEdgeMeshingPropertyPanel::preview
 
 
@@ -3318,7 +3316,7 @@ void QtEdgeMeshingPropertyAction::executeOperation ( )
 		case QtEdgeMeshingPropertyPanel::EDGE_LIST			:
 		{
 			unique_ptr<CoEdgeMeshingProperty>	properties (panel->getMeshingProperty ( ));
-			cmdResult	= getContext ( ).getTopoManager ( ).setMeshingProperty (*properties.get ( ), edges);
+			cmdResult	= getController( ).setMeshingProperty (*properties.get ( ), edges);
 		}
 		break;
 		case QtEdgeMeshingPropertyPanel::PARALLEL_EDGES		:
@@ -3331,7 +3329,7 @@ void QtEdgeMeshingPropertyAction::executeOperation ( )
 				throw Exception (error);
 			}	// if (1 != edges.size ( ))
 			unique_ptr<CoEdgeMeshingProperty>	properties (panel->getMeshingProperty ( ));
-			cmdResult	= getContext ( ).getTopoManager ( ).setParallelMeshingProperty (*properties.get ( ), edges [0]);
+			cmdResult	= getController( ).setParallelMeshingProperty (*properties.get ( ), edges [0]);
 		}
 		break;
 		case QtEdgeMeshingPropertyPanel::CONSTRAINED_EDGES	:
@@ -3342,7 +3340,7 @@ void QtEdgeMeshingPropertyAction::executeOperation ( )
 			string			name	= erp->getRefinedReferenceEdgeName ( );
 			vector<string>	names	= erp->getFixedEdgeNames ( );
 			int				number	= panel->getEdgesNum ( );
-			cmdResult	= getContext ( ).getTopoManager ( ).setNbMeshingEdges (name, number, names);
+			cmdResult	= getController( ).setNbMeshingEdges (name, number, names);
 		}
 		break;
 		default												:

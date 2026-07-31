@@ -11,8 +11,6 @@
 #include "QtComponents/QtEntityByDimensionSelectorPanel.h"
 #include "QtComponents/QtMgx3DTopoOperationAction.h"
 
-#include "Internal/SelectionManager.h"
-
 #include <QCheckBox>
 
 

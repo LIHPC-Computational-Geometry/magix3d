@@ -3,9 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        07/12/2016
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include "QtComponents/QtMeshSubVolumeBetweenSheetsAction.h"
@@ -22,9 +19,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Mesh;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -330,13 +325,13 @@ vector<Entity*> QtMeshSubVolumeBetweenSheetsPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = blocks.begin ( );
 	     blocks.end ( ) != it; it++)
 	{
-		Entity*	entity	= getContext( ).getTopoManager( ).getBlock(*it, false);
+		Entity*	entity	= getController( ).getTopoManager( ).getBlock(*it, false);
 		if (0 != entity)
 			entities.push_back (entity);
 	}	// for (vector<string>::const_iterator it = blocks.begin ( ); ...
 	if (false == edge.empty ( ))
 	{
-		Entity*	coEdge	= getContext( ).getTopoManager( ).getCoEdge(edge,false);
+		Entity*	coEdge	= getController( ).getTopoManager( ).getCoEdge(edge,false);
 		if (0 != coEdge)
 			entities.push_back (coEdge);
 	}	// if (false == edge.empty ( ))
@@ -408,8 +403,6 @@ void QtMeshSubVolumeBetweenSheetsAction::executeOperation ( )
 {
 	CHECK_NULL_PTR_ERROR (getMeshPanel ( ))
 
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DMeshOperationAction::executeOperation ( );
 
 	getMeshPanel ( )->stopInteractiveMode ( );
@@ -418,7 +411,7 @@ void QtMeshSubVolumeBetweenSheetsAction::executeOperation ( )
 	string			edge	= getMeshPanel ( )->getEdge ( );
 	const int				from	= getMeshPanel ( )->from ( );
 	const int				to		= getMeshPanel ( )->to ( );
-	cmdResult	= getContext ( ).getMeshManager ( ).newSubVolumeBetweenSheets (blocks, edge, from, to, name);
+	getController( ).getMeshManager ( ).newSubVolumeBetweenSheets (blocks, edge, from, to, name);
 
 	setCommandResult (cmdResult);
 }	// QtMeshSubVolumeBetweenSheetsAction::executeOperation

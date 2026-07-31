@@ -3,9 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        31/03/2014
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -20,10 +17,8 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -188,8 +183,8 @@ vector<Entity*> QtTopologySnapVerticesPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		TopoEntity*		vertex	=
-			getContext ( ).getTopoManager ( ).getVertex (*it, false);
+		Entity*		vertex	=
+			getController ( ).getTopoManager ( ).getVertex (*it, false);
 		if (0 != vertex)
 			entities.push_back (vertex);
 	}	// for (vector<string>::const_iterator it = names.begin ( ); ...
@@ -263,8 +258,6 @@ void QtTopologySnapVerticesAction::executeOperation ( )
 	QtTopologySnapVerticesPanel*	panel	= dynamic_cast<QtTopologySnapVerticesPanel*>(getTopologySnapVerticesPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)
 
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de projection des sommets topologiques :
@@ -272,9 +265,9 @@ void QtTopologySnapVerticesAction::executeOperation ( )
 	bool			allVertices	= panel->snapAllVertices ( );
 
 	if (true == allVertices)
-		cmdResult	= getContext ( ).getTopoManager ( ).snapAllProjectedVertices ( );
+		getController ( ).getTopoManager ( ).snapAllProjectedVertices ( );
 	else
-		cmdResult	= getContext ( ).getTopoManager ( ).snapProjectedVertices (vertices);
+		getController ( ).getTopoManager ( ).snapProjectedVertices (vertices);
 
 	setCommandResult (cmdResult);
 }	// QtTopologySnapVerticesAction::executeOperation

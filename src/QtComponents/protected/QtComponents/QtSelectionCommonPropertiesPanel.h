@@ -6,10 +6,7 @@
 #ifndef QT_SELECTION_COMMON_PROPERTIES_PANEL_H
 #define QT_SELECTION_COMMON_PROPERTIES_PANEL_H
 
-#include "Internal/Context.h"
-
 #include "QtComponents/QtSelectionPropertiesTreeItem.h"
-#include "Internal/SelectionManager.h"
 
 #include <QtUtil/QtGroupBox.h>
 

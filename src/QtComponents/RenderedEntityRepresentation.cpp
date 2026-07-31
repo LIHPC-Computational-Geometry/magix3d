@@ -3,10 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        09/10/2013
  */
-
-#include "Internal/Context.h"
-#include "Internal/Resources.h"
-
 #include "QtComponents/RenderedEntityRepresentation.h"
 #include "QtComponents/RenderingManager.h"
 #include "QtComponents/QtMgx3DApplication.h"
@@ -16,10 +12,11 @@
 
 #include <iostream>
 
+#include "QtComponents/GUIResources.h"
+
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 using namespace Mgx3D::QtComponents;
 
 
@@ -167,21 +164,21 @@ Color RenderedEntityRepresentation::getColor (unsigned long mask) const
 		// maillages
 		if (false == getEntity ( )->isMeshEntity ( ))
 			color	= Color (
-						255 * Resources::instance ( )._selectionColor.getRed ( ),
-						255 * Resources::instance ( )._selectionColor.getGreen ( ),
-						255 * Resources::instance ( )._selectionColor.getBlue ( ));
+						255 * GUIResources::instance ( )._selectionColor.getRed ( ),
+						255 * GUIResources::instance ( )._selectionColor.getGreen ( ),
+						255 * GUIResources::instance ( )._selectionColor.getBlue ( ));
 	}	// if ((0 != rep) && (true == rep->isSelected ( )))
 
 	if ((0 != rep) && (true == rep->isHighlighted ( )) &&
-	    (true == Resources::instance ( )._useHighLightColor.getValue ( )))
+	    (true == GUIResources::instance ( )._useHighLightColor.getValue ( )))
 	{
 		// [EB] on ne change la couleur que des parties filaires pour les
 		// maillages
 		if (false == getEntity ( )->isMeshEntity ( ))
 			color	= Color (
-						255 * Resources::instance ( )._highlightColor.getRed ( ),
-						255 * Resources::instance ( )._highlightColor.getGreen ( ),
-						255 * Resources::instance ( )._highlightColor.getBlue ( ));
+						255 * GUIResources::instance ( )._highlightColor.getRed ( ),
+						255 * GUIResources::instance ( )._highlightColor.getGreen ( ),
+						255 * GUIResources::instance ( )._highlightColor.getBlue ( ));
 	}
 
 	return color;
@@ -225,7 +222,7 @@ float RenderedEntityRepresentation::getPointSize (
 		// [EB] on ne change la couleur que des parties filaires pour les
 		// maillages
 		if (false == entity.isMeshEntity ( ))
-			pointSize	= Resources::instance ( )._selectionPointSize.getValue ( );
+			pointSize	= GUIResources::instance ( )._selectionPointSize.getValue ( );
 	}	// if ((0 != rep) && (true == rep->isSelected ( )))
 
 	return pointSize;
@@ -246,16 +243,16 @@ float RenderedEntityRepresentation::getLineWidth (
 		// [EB] on ne change la couleur que des parties filaires pour les
 		// maillages
 		if (false == entity.isMeshEntity ( ))
-			lineWidth	= Resources::instance ( )._selectionLineWidth.getValue ( );
+			lineWidth	= GUIResources::instance ( )._selectionLineWidth.getValue ( );
 	}	// if ((0 != rep) && (true == rep->isSelected ( )))
 
 	if ((0 != rep) && (true == rep->isHighlighted ( )) &&
-	    (true == Resources::instance ( )._useHighLightColor.getValue ( )))
+	    (true == GUIResources::instance ( )._useHighLightColor.getValue ( )))
 	{
 		// [EB] on ne change la couleur que des parties filaires pour les
 		// maillages
 		if (false == entity.isMeshEntity ( ))
-			lineWidth	= Resources::instance ( )._highLightWidth.getValue ( );
+			lineWidth	= GUIResources::instance ( )._highLightWidth.getValue ( );
 	}
 
 	return lineWidth;
@@ -282,11 +279,11 @@ bool RenderedEntityRepresentation::destroyDataOnHide ( ) const
 		return true;
 
 	if (true == entity->isGeomEntity ( ))
-		return Resources::instance ( )._geomDestroyOnHide.getValue ( );
+		return GUIResources::instance ( )._geomDestroyOnHide.getValue ( );
 	if (true == entity->isTopoEntity ( ))
-		return Resources::instance ( )._topoDestroyOnHide.getValue ( );
+		return GUIResources::instance ( )._topoDestroyOnHide.getValue ( );
 	if (true == entity->isMeshEntity ( ))
-		return Resources::instance ( )._meshDestroyOnHide.getValue ( );
+		return GUIResources::instance ( )._meshDestroyOnHide.getValue ( );
 
 	return true;
 }	// RenderedEntityRepresentation::destroyDataOnHide

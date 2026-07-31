@@ -3,12 +3,8 @@
  * \author      Charles PIGNEROL
  * \date        16/12/2014
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
-#include "Geom/Vertex.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtTopologyVerticesAlignmentAction.h"
@@ -21,14 +17,13 @@
 
 #include <values.h>	// DBL_MAX
 
+#include "QtComponents/GUIResources.h"
+
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -121,7 +116,7 @@ QtBetween2PntsPanel::~QtBetween2PntsPanel ( )
 {
 }    // QtCenterExtremitiesArcPanel::~QtCenterExtremitiesArcPanel
 
-Math::Point QtBetween2PntsPanel::getPoint1 ( ) const
+Math::Point QtBetween2PntsPanel::getPoint1 ( ) const // TODO
         {
             CHECK_NULL_PTR_ERROR (getMainWindow ( ))
             CHECK_NULL_PTR_ERROR (_point1TextField)
@@ -139,7 +134,7 @@ Math::Point QtBetween2PntsPanel::getPoint1 ( ) const
                     {
 
                         const Geom::Vertex*	vertex	=
-                                getMainWindow ( )->getContext ( ).getGeomManager (
+                                getMainWindow ( )->getController ( ).getGeomManager (
                                 ).getVertex (name, true);
                         CHECK_NULL_PTR_ERROR (vertex)
                         point	= vertex->getPoint ( );
@@ -148,7 +143,7 @@ Math::Point QtBetween2PntsPanel::getPoint1 ( ) const
                     case Entity::TopoVertex	:
                     {
                         const Topo::Vertex*	vertex	=
-                                getMainWindow ( )->getContext ( ).getTopoManager (
+                                getMainWindow ( )->getController ( ).getTopoManager (
                                 ).getVertex (name, true);
                         CHECK_NULL_PTR_ERROR (vertex)
                         point	= vertex->getCoord ( );
@@ -172,7 +167,7 @@ Math::Point QtBetween2PntsPanel::getPoint1 ( ) const
         }	// QtTopologyVerticesAlignmentPanel::getPoint1
 
 
-Math::Point QtBetween2PntsPanel::getPoint2 ( ) const
+Math::Point QtBetween2PntsPanel::getPoint2 ( ) const // TODO
         {
             CHECK_NULL_PTR_ERROR (getMainWindow ( ))
             CHECK_NULL_PTR_ERROR (_point2TextField)
@@ -188,7 +183,7 @@ Math::Point QtBetween2PntsPanel::getPoint2 ( ) const
                     {
 
                         const Geom::Vertex*	vertex	=
-                                getMainWindow ( )->getContext ( ).getGeomManager (
+                                getMainWindow ( )->getController ( ).getGeomManager (
                                 ).getVertex (name, true);
                         CHECK_NULL_PTR_ERROR (vertex)
                         point	= vertex->getPoint ( );
@@ -197,7 +192,7 @@ Math::Point QtBetween2PntsPanel::getPoint2 ( ) const
                     case Entity::TopoVertex	:
                     {
                         const Topo::Vertex*	vertex	=
-                                getMainWindow ( )->getContext ( ).getTopoManager (
+                                getMainWindow ( )->getController ( ).getTopoManager (
                                 ).getVertex (name, true);
                         CHECK_NULL_PTR_ERROR (vertex)
                         point	= vertex->getCoord ( );
@@ -417,7 +412,7 @@ void QtBetween2PntsPanel::autoUpdate ( )
         }	// QtTopologyVerticesAlignmentPanel::getPoint1
 
 
-        Math::Point QtSurfaceConstraintPanel::getPoint1 ( ) const
+        Math::Point QtSurfaceConstraintPanel::getPoint1 ( ) const // TODO
         {
             CHECK_NULL_PTR_ERROR (getMainWindow ( ))
             CHECK_NULL_PTR_ERROR (_point1TextField)
@@ -435,7 +430,7 @@ void QtBetween2PntsPanel::autoUpdate ( )
                     {
 
                         const Geom::Vertex*	vertex	=
-                                getMainWindow ( )->getContext ( ).getGeomManager (
+                                getMainWindow ( )->getController ( ).getGeomManager (
                                 ).getVertex (name, true);
                         CHECK_NULL_PTR_ERROR (vertex)
                         point	= vertex->getPoint ( );
@@ -444,7 +439,7 @@ void QtBetween2PntsPanel::autoUpdate ( )
                     case Entity::TopoVertex	:
                     {
                         const Topo::Vertex*	vertex	=
-                                getMainWindow ( )->getContext ( ).getTopoManager (
+                                getMainWindow ( )->getController ( ).getTopoManager (
                                 ).getVertex (name, true);
                         CHECK_NULL_PTR_ERROR (vertex)
                         point	= vertex->getCoord ( );
@@ -468,7 +463,7 @@ void QtBetween2PntsPanel::autoUpdate ( )
         }	// QtTopologyVerticesAlignmentPanel::getPoint1
 
 
-        Math::Point QtSurfaceConstraintPanel::getPoint2 ( ) const
+        Math::Point QtSurfaceConstraintPanel::getPoint2 ( ) const // TODO
         {
             CHECK_NULL_PTR_ERROR (getMainWindow ( ))
             CHECK_NULL_PTR_ERROR (_point2TextField)
@@ -484,7 +479,7 @@ void QtBetween2PntsPanel::autoUpdate ( )
                     {
 
                         const Geom::Vertex*	vertex	=
-                                getMainWindow ( )->getContext ( ).getGeomManager (
+                                getMainWindow ( )->getController ( ).getGeomManager (
                                 ).getVertex (name, true);
                         CHECK_NULL_PTR_ERROR (vertex)
                         point	= vertex->getPoint ( );
@@ -493,7 +488,7 @@ void QtBetween2PntsPanel::autoUpdate ( )
                     case Entity::TopoVertex	:
                     {
                         const Topo::Vertex*	vertex	=
-                                getMainWindow ( )->getContext ( ).getTopoManager (
+                                getMainWindow ( )->getController ( ).getTopoManager (
                                 ).getVertex (name, true);
                         CHECK_NULL_PTR_ERROR (vertex)
                         point	= vertex->getCoord ( );
@@ -649,9 +644,9 @@ QtTopologyVerticesAlignmentPanel::QtTopologyVerticesAlignmentPanel (
 	QtGroupBox*		groupBox	= new QtGroupBox(QString::fromUtf8("Paramètres de l'alignement"), this);
 	QVBoxLayout*	vlayout	= new QVBoxLayout (groupBox);
 	vlayout->setContentsMargins  (
-            Internal::Resources::instance ( )._margin.getValue ( ), Internal::Resources::instance ( )._margin.getValue ( ),
-            Internal::Resources::instance ( )._margin.getValue ( ), Internal::Resources::instance ( )._margin.getValue ( ));
-	vlayout->setSpacing (Internal::Resources::instance ( )._spacing.getValue ( ));
+            GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ),
+            GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ));
+	vlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	groupBox->setLayout (vlayout);
 	layout->addWidget (groupBox);
 	// Le panneau "méthode" : plusieurs panneaux possibles.
@@ -930,7 +925,6 @@ QtTopologyVerticesAlignmentPanel*
 
 void QtTopologyVerticesAlignmentAction::executeOperation ( )
 {
-    Mgx3D::Internal::M3DCommandResult*	cmdResult	= 0;
 
 	QtTopologyVerticesAlignmentPanel*	panel	= dynamic_cast<QtTopologyVerticesAlignmentPanel*>(getTopologyVerticesAlignmentPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)
@@ -943,7 +937,7 @@ void QtTopologyVerticesAlignmentAction::executeOperation ( )
             Math::Point		p1			= panel->getPoint1 ( );
             Math::Point		p2			= panel->getPoint2 ( );
 
-            cmdResult =    getContext ( ).getTopoManager ( ).alignVertices (p1, p2, vertices);
+            getController ( ).getTopoManager ( ).alignVertices (p1, p2, vertices);
         }
         break;
         case QtTopologyVerticesAlignmentPanel::SURFACE_CONSTRAINED:
@@ -953,14 +947,13 @@ void QtTopologyVerticesAlignmentAction::executeOperation ( )
             Math::Point		p1			= panel->getPoint1 ( );
             Math::Point		p2			= panel->getPoint2 ( );
 
-            cmdResult =    getContext ( ).getTopoManager ( ).alignVerticesOnSurface(surface, vertices[0],p1, p2);
+            getController ( ).getTopoManager ( ).alignVerticesOnSurface(surface, vertices[0],p1, p2);
         }
         break;
     }
 	// Validation paramétrage :
 	QtMgx3DOperationAction::executeOperation ( );
 
-	CHECK_NULL_PTR_ERROR (cmdResult)
 	setCommandResult (cmdResult);
 	if (Command::FAIL == cmdResult->getStatus ( ))
 		throw Exception (cmdResult->getErrorMessage ( ));

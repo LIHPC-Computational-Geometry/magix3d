@@ -6,8 +6,6 @@
 #ifndef QT_GEOM_SURFACE_CREATION_ACTION_H
 #define QT_GEOM_SURFACE_CREATION_ACTION_H
 
-#include "Internal/Context.h"
-
 #include "QtComponents/QtEntityByDimensionSelectorPanel.h"
 #include "QtComponents/QtMgx3DGeomOperationAction.h"
 #include "QtComponents/QtMgx3DGroupNamePanel.h"

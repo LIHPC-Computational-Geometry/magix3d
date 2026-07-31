@@ -6,15 +6,11 @@
 #ifndef QT_BLOCK_MESHING_PROPERTY_ACTION_H
 #define QT_BLOCK_MESHING_PROPERTY_ACTION_H
 
-#include "Internal/Context.h"
-
 #include "QtComponents/QtMgx3DEntityPanel.h"
 #include "QtComponents/QtMgx3DEdgePanel.h"
 #include "QtComponents/QtMgx3DPointPanel.h"
 #include "QtComponents/QtMgx3DTopoOperationAction.h"
 #include "QtComponents/RenderingManager.h"
-#include "Topo/BlockMeshingPropertyTransfinite.h"
-#include "Topo/BlockMeshingPropertyDelaunayTetgen.h"
 
 #include <QtUtil/QtIntTextField.h>
 

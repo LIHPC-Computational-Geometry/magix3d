@@ -3,9 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        17/01/2011
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "QtComponents/QtRepresentationTypesPanel.h"
 #include <QtUtil/QtErrorManagement.h>

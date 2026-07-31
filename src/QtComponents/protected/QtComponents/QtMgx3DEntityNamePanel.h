@@ -8,8 +8,6 @@
 #ifndef QTMGX3DENTITYNAMEPANEL_H_
 #define QTMGX3DENTITYNAMEPANEL_H_
 
-#include "Internal/Context.h"
-
 #include "Utils/ValidatedField.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 

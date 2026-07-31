@@ -1,5 +1,3 @@
-#include "Internal/Context.h"
-
 #include "QtComponents/QtExpansionTreeRestorer.h"
 
 #include <assert.h>

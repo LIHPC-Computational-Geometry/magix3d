@@ -3,15 +3,8 @@
  * \author		Eric Brière de l'Isle
  * \date		7/6/2018
  */
-
-#include "Internal/Context.h"
-#include "Internal/Resources.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "SysCoord/CommandNewSysCoord.h"
-#include "SysCoord/SysCoordManager.h"
-#include "SysCoord/SysCoordDisplayRepresentation.h"
 #include "QtComponents/QtSysCoordOperationAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
@@ -26,13 +19,14 @@
 
 #include <values.h>	// DBL_MAX
 
+#include "QtComponents/GUIResources.h"
+
 
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils::Math;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -58,11 +52,11 @@ QtSysCoordOperationPanel::QtSysCoordOperationPanel (
 {
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
 	// Nom opération :
@@ -81,11 +75,11 @@ QtSysCoordOperationPanel::QtSysCoordOperationPanel (
 	// Méthode de création/modification du repère :
 	QHBoxLayout*	hlayout	= new QHBoxLayout (0);
 	hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	layout->addLayout (hlayout);
 	label	= new QLabel (QString::fromUtf8("Méthode"), this);
 	hlayout->addWidget (label);
@@ -101,11 +95,11 @@ QtSysCoordOperationPanel::QtSysCoordOperationPanel (
 	layout->addWidget (groupBox);
 	QVBoxLayout*	vlayout	= new QVBoxLayout (groupBox);
 	vlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	vlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	vlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	groupBox->setLayout (vlayout);
 	_centerPanel	= new QtMgx3DPointPanel (
 		groupBox, "Centre", true, "x :", "y :", "z :",
@@ -182,11 +176,11 @@ vector<Entity*> QtSysCoordOperationPanel::getInvolvedEntities ( )
 	vector<Entity*>	entities;
 
 	if (0 != _centerPanel->getUniqueName ( ).length ( ))
-		entities.push_back (&getContext().nameToEntity (_centerPanel->getUniqueName ( )));
+		entities.push_back (&getController().nameToEntity (_centerPanel->getUniqueName ( )));
 	if (0 != _point1Panel->getUniqueName ( ).length ( ))
-		entities.push_back (&getContext().nameToEntity (_point1Panel->getUniqueName ( )));
+		entities.push_back (&getController().nameToEntity (_point1Panel->getUniqueName ( )));
 	if (0 != _point2Panel->getUniqueName ( ).length ( ))
-		entities.push_back (&getContext().nameToEntity (_point2Panel->getUniqueName ( )));
+		entities.push_back (&getController().nameToEntity (_point2Panel->getUniqueName ( )));
 
 	return entities;
 }	// QtSysCoordOperationPanel::getInvolvedEntities
@@ -400,6 +394,10 @@ void QtSysCoordOperationPanel::operationMethodCallback ( )
 
 void QtSysCoordOperationPanel::preview (bool show, bool destroyInteractor)
 {
+
+	std::cout<<"Print disabled for the moment: refactoring in progress"<<std::endl;
+
+	/*
 	// Lors de la construction getGraphicalWidget peut être nul ...
 	try
 	{
@@ -421,11 +419,11 @@ void QtSysCoordOperationPanel::preview (bool show, bool destroyInteractor)
 
 		DisplayProperties	graphicalProps;
 		graphicalProps.setWireColor (Color (
-				255 * Resources::instance ( )._previewColor.getRed ( ),
-				255 * Resources::instance ( )._previewColor.getGreen ( ),
-				255 * Resources::instance ( )._previewColor.getBlue ( )));
+				255 * GUIResources::instance ( )._previewColor.getRed ( ),
+				255 * GUIResources::instance ( )._previewColor.getGreen ( ),
+				255 * GUIResources::instance ( )._previewColor.getBlue ( )));
 		graphicalProps.setLineWidth (
-						Resources::instance ( )._previewWidth.getValue ( ));
+						GUIResources::instance ( )._previewWidth.getValue ( ));
 
 		CoordinateSystem::SysCoordDisplayRepresentation	dr (DisplayRepresentation::SHOWTRIHEDRON);
 
@@ -467,6 +465,7 @@ void QtSysCoordOperationPanel::preview (bool show, bool destroyInteractor)
 	catch (...)
 	{
 	}
+	*/
 }	// QtSysCoordOperationPanel::preview
 
 
@@ -518,8 +517,6 @@ QtSysCoordOperationPanel* QtSysCoordOperationAction::getSysCoordPanel ( )
 
 void QtSysCoordOperationAction::executeOperation ( )
 {
-	M3DCommandResult*	cmdResult	= 0;
-	
 	// Récupération des paramètres de création du repère :
 	QtSysCoordOperationPanel*	panel	= getSysCoordPanel ( );
 	CHECK_NULL_PTR_ERROR (panel)
@@ -530,13 +527,13 @@ void QtSysCoordOperationAction::executeOperation ( )
 
 	switch (panel->getOperationMethod ( )){
 	case QtSysCoordOperationPanel::DEFAUT	:
-		cmdResult	= getContext ( ).getSysCoordManager().newSysCoord(name);
+		getController( ).getSysCoordManager().newSysCoord(name);
 		break;
 	case QtSysCoordOperationPanel::CENTRE	:
-		cmdResult	= getContext ( ).getSysCoordManager().newSysCoord(centre, name);
+		getController( ).getSysCoordManager().newSysCoord(centre, name);
 		break;
 	case QtSysCoordOperationPanel::TROIS_POINTS	:
-		cmdResult	= getContext ( ).getSysCoordManager().newSysCoord(centre, p1, p2, name);
+		getController( ).getSysCoordManager().newSysCoord(centre, p1, p2, name);
 		break;
 	default		:
 		INTERNAL_ERROR (exc, "QtSysCoordOperationAction::executeOperation",

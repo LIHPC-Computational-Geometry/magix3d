@@ -3,9 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        26/05/2014
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -29,9 +26,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -341,8 +336,8 @@ vector<Entity*> QtGeometryTranslationPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		GeomEntity*	entity	=
-					getContext ( ).getGeomManager ( ).getEntity (*it, false);
+		Entity*	entity	=
+					getController( ).getEntity (*it, false);
 		if (0 != entity)
 			entities.push_back (entity);
 	}
@@ -438,8 +433,6 @@ QtGeometryTranslationPanel*
 
 void QtGeometryTranslationAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres d'association des entités géométriques :
@@ -453,17 +446,17 @@ void QtGeometryTranslationAction::executeOperation ( )
 
 	if (true == panel->processAllGeomEntities ( )){
 		if (copy)
-			cmdResult	= getContext ( ).getGeomManager ( ).copyAndTranslateAll (translation, groupName);
+			getController( ).copyAndTranslateAll (translation, groupName);
 		else
-			cmdResult	= getContext ( ).getGeomManager ( ).translateAll (translation);
+			getController( ).translateAll (translation);
 	}
 	else
 	{
 		vector<string>			entities	= panel->getGeomEntitiesNames ( );
 		if (copy)
-			cmdResult	= getContext ( ).getGeomManager ( ).copyAndTranslate (entities, translation, withTopo, groupName);
+			getController( ).copyAndTranslate (entities, translation, withTopo, groupName);
 		else
-			cmdResult	= getContext ( ).getGeomManager ( ).translate (entities, translation);
+			getController( ).translate (entities, translation);
 	}	// else if (true == panel->processAllGeomEntities ( ))
 
 	setCommandResult (cmdResult);

@@ -6,8 +6,6 @@
 #ifndef QT_COLOR_TABLES_EDITOR_DIALOG_H
 #define QT_COLOR_TABLES_EDITOR_DIALOG_H
 
-#include "Internal/Context.h"
-
 #include "QtComponents/RenderingManager.h"
 
 #include <QtUtil/QtDlgClosurePanel.h>

@@ -6,16 +6,11 @@
 #ifndef QT_FACE_MESHING_PROPERTY_ACTION_H
 #define QT_FACE_MESHING_PROPERTY_ACTION_H
 
-#include "Internal/Context.h"
-
 #include "QtComponents/QtMgx3DEntityPanel.h"
 #include "QtComponents/QtMgx3DEdgePanel.h"
 #include "QtComponents/QtMgx3DPointPanel.h"
 #include "QtComponents/QtMgx3DTopoOperationAction.h"
 #include "QtComponents/RenderingManager.h"
-#include "Topo/FaceMeshingPropertyTransfinite.h"
-#include "Topo/FaceMeshingPropertyDelaunayGMSH.h"
-#include "Topo/FaceMeshingPropertyQuadPairing.h"
 
 #include <QtUtil/QtIntTextField.h>
 

@@ -5,7 +5,7 @@
  */
 
 #include "Internal/Context.h"
-#include "Internal/Resources.h"
+#include "QtComponents/GUIResources.h"
 
 #include "QtVtkComponents/VTKEntityRepresentation.h"
 #include "QtComponents/QtMgx3DApplication.h"
@@ -208,7 +208,7 @@ void VTKEntityRepresentation::setSelected (bool selected)
 	{
 		updateRepresentationProperties ( );
 		if ((true == selected) &&
-		    (true == Resources::instance ( )._selectionOnTop.getValue ( )))
+		    (true == GUIResources::instance ( )._selectionOnTop.getValue ( )))
 			bringToTop ( );
 	}
 }	// VTKEntityRepresentation::setSelected
@@ -241,7 +241,7 @@ void VTKEntityRepresentation::setHighlighted (bool highlighted, bool refreshGui)
 	if ((true == update) && (0 != getEntity ( )))
 	{
 		updateHighlightRepresentation (highlighted, refreshGui);
-		if ((true == highlighted) && (true == Resources::instance ( )._selectionOnTop.getValue ( )))
+		if ((true == highlighted) && (true == GUIResources::instance ( )._selectionOnTop.getValue ( )))
 			bringToTop ( );
 	}	// if ((true == update) && (0 != getEntity ( )))
 }	// VTKEntityRepresentation::setHighlighted
@@ -760,10 +760,10 @@ void VTKEntityRepresentation::updateHighlightRepresentation (bool highlight, boo
 	if ((0 != getEntity ( )) && (false == getEntity ( )->getDisplayProperties ( ).isDisplayed ( )))
 			updateRepresentation (getRepresentationMask ( ), true);
 
-	if (true == Resources::instance ( )._useHighLightColor.getValue ( ))
+	if (true == GUIResources::instance ( )._useHighLightColor.getValue ( ))
 		updateRepresentationProperties ( );
 
-	if ((true == highlight) && (true == Resources::instance ( )._highLightBoundinBox.getValue ( )))
+	if ((true == highlight) && (true == GUIResources::instance ( )._highLightBoundinBox.getValue ( )))
 	{
 		if (0 == _highlightActor)
 		{
@@ -772,11 +772,11 @@ void VTKEntityRepresentation::updateHighlightRepresentation (bool highlight, boo
 			_highlightActor->DragableOff ( );
 			CHECK_NULL_PTR_ERROR (_highlightActor->GetProperty ( ))
 			_highlightActor->GetProperty ( )->SetColor (
-					255 * Resources::instance ( )._highlightColor.getRed( ),
-					255 * Resources::instance ( )._highlightColor.getGreen( ),
-					255 * Resources::instance ( )._highlightColor.getBlue( ));
+					255 * GUIResources::instance ( )._highlightColor.getRed( ),
+					255 * GUIResources::instance ( )._highlightColor.getGreen( ),
+					255 * GUIResources::instance ( )._highlightColor.getBlue( ));
 			_highlightActor->GetProperty ( )->SetLineWidth (
-							Resources::instance ( )._highLightWidth.getValue ( ));
+							GUIResources::instance ( )._highLightWidth.getValue ( ));
 			_highlightActor->GetProperty ( )->SetAmbient (1.0);
 			_highlightActor->GetProperty ( )->SetDiffuse (0.0);
 		}	// if (0 == _highlightActor)

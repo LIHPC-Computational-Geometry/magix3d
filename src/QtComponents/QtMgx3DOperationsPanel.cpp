@@ -3,9 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        05/12/2012
  */
-
-#include "Internal/Context.h"
-
 #include "QtComponents/QtMgx3DOperationsPanel.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtMgx3DApplication.h"
@@ -13,8 +10,6 @@
 #include <QtUtil/QtWidgetAutoLock.h>
 #include "QtComponents/RenderedEntityRepresentation.h"
 #include "QtComponents/QtMgx3DScrollArea.h"
-#include "Topo/CoEdge.h"
-#include "Topo/TopoDisplayRepresentation.h"
 #include "Utils/Common.h"
 
 #include <TkUtil/InternalError.h>
@@ -29,12 +24,12 @@
 #include <iostream>
 #include <memory>
 
+#include "QtComponents/GUIResources.h"
+
 
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
-using namespace Mgx3D::Topo;
 
 
 
@@ -219,13 +214,13 @@ bool QtMgx3DOperationPanel::previewResult ( ) const
 
 bool QtMgx3DOperationPanel::cancelClearEntities ( ) const
 {
-	return Resources::instance ( )._cancelClearEntities.getValue ( );
+	return GUIResources::instance ( )._cancelClearEntities.getValue ( );
 }	// QtMgx3DOperationPanel::cancelClearEntities
 
 
 bool QtMgx3DOperationPanel::autoUpdateUsesSelection ( ) const
 {
-	return Resources::instance ( )._autoUpdateUsesSelection.getValue ( );
+	return GUIResources::instance ( )._autoUpdateUsesSelection.getValue ( );
 }	// QtMgx3DOperationPanel::autoUpdateUsesSelection
 
 
@@ -271,7 +266,11 @@ void QtMgx3DOperationPanel::commandModifiedCallback (InfoCommand&)
 
 
 void QtMgx3DOperationPanel::preview (bool show, bool destroyInteractor)
-{	// Lors de la construction getGraphicalWidget peut être nul ...
+{
+
+	std::cout<<"Print disabled for the moment: refactoring in progress"<<std::endl;
+
+	/*	// Lors de la construction getGraphicalWidget peut être nul ...
 	try
 	{
 		getRenderingManager ( );
@@ -311,6 +310,7 @@ void QtMgx3DOperationPanel::preview (bool show, bool destroyInteractor)
 	renderingManager.forceRender ( );
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D : Affichage d'un aperçu des entités associées à l'opération en cours.")
+	*/
 }	// QtMgx3DOperationPanel::preview
 
 
@@ -342,7 +342,7 @@ void QtMgx3DOperationPanel::highlight (bool show)
 		{
 			DisplayProperties::GraphicalRepresentation*	gr	= (*it)->getDisplayProperties ( ).getGraphicalRepresentation ( );
 			CHECK_NULL_PTR_ERROR (gr)			
-			const bool	refreshGui	= 0 == (i % Resources::instance ( )._updateRefreshRate.getValue ( )) ? true : false;
+			const bool	refreshGui	= 0 == (i % GUIResources::instance ( )._updateRefreshRate.getValue ( )) ? true : false;
 			gr->setHighlighted (false, refreshGui);
 		}	// for (vector<Entity*>::iterator it = ...
 	}	// if (false == show)
@@ -357,7 +357,7 @@ void QtMgx3DOperationPanel::highlight (bool show)
 			if (0 != rep)
 				rep->setRenderingManager (&renderingManager);
 			registerHighlightedEntity (**it);
-			const bool	refreshGui	= 0 == (i % Resources::instance ( )._updateRefreshRate.getValue ( )) ? true : false;
+			const bool	refreshGui	= 0 == (i % GUIResources::instance ( )._updateRefreshRate.getValue ( )) ? true : false;
 			gr->setHighlighted (true, refreshGui);
 		}	// for (vector<Entity*>::const_iterator it = entities.begin ( );
 	}	// else if (false == show)
@@ -376,29 +376,29 @@ void QtMgx3DOperationPanel::addValidatedField (ValidatedField& field)
 }	// QtMgx3DOperationPanel::addValidatedField
 
 
-const Context& QtMgx3DOperationPanel::getContext ( ) const
+const Controller& QtMgx3DOperationPanel::getController ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
-	return _mainWindow->getContext ( );
+	return _mainWindow->getController ( );
 }	// QtMgx3DOperationPanel::getContext
 
 
-Context& QtMgx3DOperationPanel::getContext ( )
+Controller& QtMgx3DOperationPanel::getController ( )
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
-	return _mainWindow->getContext ( );
+	return _mainWindow->getController ( );
 }	// QtMgx3DOperationPanel::getContext
 
 
 SelectionManager& QtMgx3DOperationPanel::getSelectionManager ( )
 {
-	return getContext ( ).getSelectionManager ( );
+	return getController().getSelectionManager ( );
 }	// QtMgx3DOperationPanel::getSelectionManager
 
 
 const SelectionManager& QtMgx3DOperationPanel::getSelectionManager ( ) const
 {
-	return getContext ( ).getSelectionManager ( );
+	return getController.getSelectionManager ( );
 }	// QtMgx3DOperationPanel::getSelectionManager
 
 
@@ -513,23 +513,27 @@ void QtMgx3DOperationPanel::previewEdges (
 		InfoCommand::type status, const DisplayProperties& props,
 		unsigned long mask)
 {
+
+	std::cout<<"Print disabled for the moment: refactoring in progress"<<std::endl;
+
+	/*
 	InfoCommand&		infos	= command.getInfoCommand ( );
 
 	DisplayProperties	dp (props);
 	dp.setWireColor (Color (
-						255 * Resources::instance ( )._previewColor.getRed ( ),
-						255 * Resources::instance ( )._previewColor.getGreen ( ),
-						255 * Resources::instance ( )._previewColor.getBlue ( )));
-	dp.setLineWidth (Resources::instance ( )._previewWidth.getValue ( ));
+						255 * GUIResources::instance ( )._previewColor.getRed ( ),
+						255 * GUIResources::instance ( )._previewColor.getGreen ( ),
+						255 * GUIResources::instance ( )._previewColor.getBlue ( )));
+	dp.setLineWidth (GUIResources::instance ( )._previewWidth.getValue ( ));
 	dp.setCloudColor (Color (
-						255 * Resources::instance ( )._previewColor.getRed ( ),
-						255 * Resources::instance ( )._previewColor.getGreen ( ),
-						255 * Resources::instance ( )._previewColor.getBlue ( )));
-	dp.setPointSize (Resources::instance ( )._previewPointSize.getValue ( ));
+						255 * GUIResources::instance ( )._previewColor.getRed ( ),
+						255 * GUIResources::instance ( )._previewColor.getGreen ( ),
+						255 * GUIResources::instance ( )._previewColor.getBlue ( )));
+	dp.setPointSize (GUIResources::instance ( )._previewPointSize.getValue ( ));
 	const Color	fontColor (
-						255 * Resources::instance ( )._previewColor.getRed ( ),
-						255 * Resources::instance ( )._previewColor.getGreen ( ),
-						255 * Resources::instance ( )._previewColor.getBlue ( ));
+						255 * GUIResources::instance ( )._previewColor.getRed ( ),
+						255 * GUIResources::instance ( )._previewColor.getGreen ( ),
+						255 * GUIResources::instance ( )._previewColor.getBlue ( ));
 	const int		fontFamily  = 0, fontSize   = 12;
 	const bool		bold    = false,    italic  = false;
 	dp.setFontProperties (fontFamily, fontSize, bold, italic, fontColor);
@@ -614,6 +618,7 @@ void QtMgx3DOperationPanel::previewEdges (
 			}	// if (0 != (mask & ...
 		}	// if ((Entity::TopoCoEdge==te->getType( )) ...
 	}	// for (vector<InfoCommand::TopoEntityInfo>::iterator itei = tei.begin ( );
+	*/
 }	// QtMgx3DOperationPanel::previewEdges
 
 
@@ -648,7 +653,7 @@ void QtMgx3DOperationPanel::operationCompleted ( )
 void QtMgx3DOperationPanel::log (const TkUtil::Log& log)
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
-	getContext ( ).getLogDispatcher ( ).log (log);
+	getController( ).getLogDispatcher ( ).log (log);
 }	// QtMgx3DOperationPanel::log
 
 
@@ -730,7 +735,7 @@ void QtMgx3DOperationPanel::applyCallback ( )
 // On force à true car lors de pré-traitements (ex : liste d'entités vide, entité détruite) il n'y a pas création de commande donc
 // QtMgx3DMainWindow::commandModified n'est pas appelée donc pas de message d'erreur.
 // Le risque, avec true à la place de !QtMgx3DApplication::_showDialogOnCommandError.getValue( ), est que le message d'erreur soit affiché à 2 reprises.
-		(!userNotified && Resources::instance ( )._showDialogOnCommandError.getValue( )) && ((0 != getMgx3DOperationAction ( )) && ((0 == getMgx3DOperationAction ( )->getCommandResult ( )) || (0 != getMgx3DOperationAction ( )->getCommandResult ( )) && (false == getMgx3DOperationAction ( )->getCommandResult ( )->isUserNotified ( )))),			// CP 08/04/25
+		(!userNotified && GUIResources::instance ( )._showDialogOnCommandError.getValue( )) && ((0 != getMgx3DOperationAction ( )) && ((0 == getMgx3DOperationAction ( )->getCommandResult ( )) || (0 != getMgx3DOperationAction ( )->getCommandResult ( )) && (false == getMgx3DOperationAction ( )->getCommandResult ( )->isUserNotified ( )))),			// CP 08/04/25
 		this, "Magix 3D : exécution d'une opération")
 
 
@@ -785,7 +790,7 @@ void QtMgx3DOperationPanel::entitiesAddedToSelectionCallback (QString entitiesNa
 		{
 			try
 			{
-				Entity*	entity	= &getContext().nameToEntity (name);
+				Entity*	entity	= &getController().nameToEntity (name);
 				registerHighlightedEntity (*entity);
 				DisplayProperties::GraphicalRepresentation*	gr	= entity->getDisplayProperties ( ).getGraphicalRepresentation ( );
 				CHECK_NULL_PTR_ERROR (gr)
@@ -842,7 +847,7 @@ void QtMgx3DOperationPanel::entitiesRemovedFromSelectionCallback (QString entiti
 		{
 			try
 			{
-				Entity*	entity	= &getContext().nameToEntity (name);
+				Entity*	entity	= &getController().nameToEntity (name);
 				unregisterHighlightedEntity (*entity);
 				DisplayProperties::GraphicalRepresentation*	gr	= entity->getDisplayProperties ( ).getGraphicalRepresentation ( );
 				CHECK_NULL_PTR_ERROR (gr)
@@ -1146,15 +1151,15 @@ QWidget& QtMgx3DWidgetedCheckedAction::getOperationPanelParent ( )
 }	// QtMgx3DWidgetedCheckedAction::getOperationPanelParent
 
 
-const Context& QtMgx3DWidgetedCheckedAction::getContext ( ) const
+const Controller& QtMgx3DWidgetedCheckedAction::getController ( ) const
 {
-	return getMainWindow ( ).getContext ( );
+	return getMainWindow ( ).getController( );
 }	// QtMgx3DWidgetedCheckedAction::getContext
 
 
-Context& QtMgx3DWidgetedCheckedAction::getContext ( )
+Controller& QtMgx3DWidgetedCheckedAction::getController ( )
 {
-	return getMainWindow ( ).getContext ( );
+	return getMainWindow ( ).getController( );
 }	// QtMgx3DWidgetedCheckedAction::getContext
 
 
@@ -1454,18 +1459,18 @@ QtMgx3DMainWindow& QtMgx3DOperationsPanel::getMainWindow ( )
 }	// QtMgx3DOperationsPanel::getMainWindow
 
 
-const Context& QtMgx3DOperationsPanel::getContext ( ) const
+const Controller& QtMgx3DOperationsPanel::getController ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
-	return _mainWindow->getContext ( );
-}	// QtMgx3DOperationsPanel::getContext
+	return _mainWindow->getController ( );
+}	// QtMgx3DOperationsPanel::getController
 
 
-Context& QtMgx3DOperationsPanel::getContext ( )
+Controller& QtMgx3DOperationsPanel::getController ( )
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
-	return _mainWindow->getContext ( );
-}	// QtMgx3DOperationsPanel::getContext
+	return _mainWindow->getController ( );
+}	// QtMgx3DOperationsPanel::getController
 
 
 void QtMgx3DOperationsPanel::sessionCleared ( )

@@ -4,11 +4,7 @@
  * \date        03/02/2014
  */
 
-#include "Internal/Context.h"
 #include "Utils/Common.h"
-#include "Geom/GeomEntity.h"
-#include "Topo/CommandSplitEdge.h"
-#include "Topo/TopoDisplayRepresentation.h"
 #include "QtComponents/QtMgx3DApplication.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -25,10 +21,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -247,7 +240,7 @@ Math::Point QtTopologyEdgeCutPanel::getCutPoint ( ) const
 	if (0 == name.length ( ))
 		return Math::Point ( );
 
-	Entity*			entity	= &getContext().nameToEntity (name);
+	Entity*			entity	= &getController().nameToEntity (name);
 	GeomEntity*		ge		= dynamic_cast<GeomEntity*>(entity);
 	Topo::Vertex*	v		= dynamic_cast<Topo::Vertex*>(entity);
 
@@ -266,7 +259,7 @@ vector<Entity*> QtTopologyEdgeCutPanel::getInvolvedEntities ( )
 	const string	name	= getEdgeName ( );
 	if (0 != name.length ( ))
 	{
-		TopoEntity*	entity	= getContext ( ).getTopoManager ( ).getCoEdge(name);
+		Entity*	entity	= getController ( ).getTopoManager ( ).getCoEdge(name);
 		CHECK_NULL_PTR_ERROR (entity)
 		entities.push_back (entity);
 	}	// if (0 != name.length ( ))
@@ -278,7 +271,7 @@ vector<Entity*> QtTopologyEdgeCutPanel::getInvolvedEntities ( )
 			CHECK_NULL_PTR_ERROR (_cutPointEntityPanel)
 			const string	point	= _cutPointEntityPanel->getUniqueName ( );
 			if (0 != point.length ( ))
-				entities.push_back (&getContext().nameToEntity (point));
+				entities.push_back (&getController().nameToEntity (point));
 		}
 		break;
 	}	// switch (getCutDefinitionMethod ( ))
@@ -327,6 +320,10 @@ void QtTopologyEdgeCutPanel::cutDefinitionModifiedCallback ( )
 
 void QtTopologyEdgeCutPanel::preview (bool show, bool destroyInteractor)
 {
+
+	std::cout<<"Print disabled for the moment: refactoring in progress"<<std::endl;
+
+	/*
 	// Lors de la construction getGraphicalWidget peut être nul ...
 	try
 	{
@@ -395,6 +392,7 @@ cerr << __FILE__ << ' ' << __LINE__ << " Exception caught : " << exc.getFullMess
 	catch (...)
 	{
 	}
+	*/
 }	// QtTopologyEdgeCutPanel::preview
 
 
@@ -448,8 +446,6 @@ void QtTopologyEdgeCutAction::executeOperation ( )
 	QtTopologyEdgeCutPanel*	panel	= getEdgeCutPanel ( );
 	CHECK_NULL_PTR_ERROR (panel)
 
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DTopoOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de découpage de l'arête topologique :
@@ -459,10 +455,10 @@ void QtTopologyEdgeCutAction::executeOperation ( )
 	switch (panel->getCutDefinitionMethod ( ))
 	{
 		case QtTopologyEdgeCutPanel::CDM_RATIO	:
-			cmdResult	= getContext ( ).getTopoManager ( ).splitEdge (name, panel->getRatio ( ));
+			getController ( ).getTopoManager ( ).splitEdge (name, panel->getRatio ( ));
 			break;
 		case QtTopologyEdgeCutPanel::CDM_POINT	:
-			cmdResult	= getContext ( ).getTopoManager ( ).splitEdge (name, panel->getCutPoint ( ));
+			getController ( ).getTopoManager ( ).splitEdge (name, panel->getCutPoint ( ));
 			break;
 		default	:
 		{

@@ -4,11 +4,8 @@
  * \date        08/09/2014
  */
 
-#include "Internal/Context.h"
 
 #include "Utils/Common.h"
-#include "Geom/Vertex.h"
-#include "Topo/Vertex.h"
 #include <QtUtil/QtErrorManagement.h>
 #include <QtUtil/QtUnicodeHelper.h>
 #include "QtComponents/Qt3VerticiesPanel.h"
@@ -28,7 +25,6 @@ using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -306,23 +302,18 @@ void Qt3VerticiesPanel::pointsRemovedFromSelectionCallback (QString pointName)
 
 Utils::Math::Point Qt3VerticiesPanel::getPoint (const string& name) const
 {
-	Entity&			entity	= getContext().nameToEntity (name);
-	Geom::Vertex*	gvertex	= dynamic_cast<Geom::Vertex*>(&entity);
-	Topo::Vertex*	tvertex	= dynamic_cast<Topo::Vertex*>(&entity);
+	Point point = getController().nameToEntity (name);
 
-    if (0 != gvertex)
-		return gvertex->getCoord ( );
-	else if (0 != tvertex)
-		return tvertex->getCoord ( );
+	return point;
 
 	throw Exception (UTF8String ("Absence de point de ce nom.", Charset::UTF_8));
 }   // getPoint
 
 
-const Context& Qt3VerticiesPanel::getContext ( ) const
+const Controller& Qt3VerticiesPanel::getController ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
-	return _mainWindow->getContext ( );
+	return _mainWindow->getController ( );
 }	// Qt3VerticiesPanel::getContext
 
 

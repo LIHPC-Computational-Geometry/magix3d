@@ -9,7 +9,6 @@
 
 #include "QtComponents/QtMgx3DOperationsPanel.h"
 #include "QtComponents/QtMgx3DEntityPanel.h"
-#include "Internal/Context.h"
 
 #include <QtUtil/Qt3DDataPanel.h>
 #include <QtUtil/QtDoubleTextField.h>
@@ -118,7 +117,7 @@ class Qt3VerticiesPanel : public QtMgx3DOperationsSubPanel
 	/**
 	 * \return	Une référence sur le contexte <I>Magix 3D</I> associé à l'opération.
 	 */
-	virtual const Mgx3D::Internal::Context& getContext ( ) const;
+	virtual const Mgx3D::Controller& getController ( ) const;
 
 	/** \return le point pour un sommet topo ou géom */
 	Utils::Math::Point getPoint (const std::string& name) const;

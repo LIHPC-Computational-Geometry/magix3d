@@ -3,17 +3,13 @@
  * \author      Charles PIGNEROL
  * \date        10/09/2013
  */
-
-#include "Internal/Context.h"
-#include "Internal/Resources.h"
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/CommandNewSegment.h"
-#include "Geom/GeomDisplayRepresentation.h"
-#include "Geom/Vertex.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtSegmentOperationAction.h"
 #include "QtComponents/QtMgx3DApplication.h"
+
+#include "QtComponents/GUIResources.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>
@@ -29,10 +25,7 @@ using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Group;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -52,8 +45,8 @@ QtSegmentOperationPanel::QtSegmentOperationPanel (
 {
 //	SET_WIDGET_BACKGROUND (this, Qt::yellow)
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
-	layout->setContentsMargins  (Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+	layout->setContentsMargins  (GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
 	// Nom opération :
@@ -82,8 +75,8 @@ QtSegmentOperationPanel::QtSegmentOperationPanel (
 	// Définition du segment :
 	QtGroupBox*		groupBox	= new QtGroupBox(QString::fromUtf8("Paramètres du segment"), this);
 	QVBoxLayout*	vlayout	= new QVBoxLayout (groupBox);
-	vlayout->setContentsMargins  (Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
-	vlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+	vlayout->setContentsMargins  (GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ));
+	vlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	groupBox->setLayout (vlayout);
 	layout->addWidget (groupBox);
 	// Le panneau "méthode" : plusieurs panneaux possibles.
@@ -234,6 +227,10 @@ void QtSegmentOperationPanel::autoUpdate ( )
 
 void QtSegmentOperationPanel::preview (bool show, bool destroyInteractor)
 {
+
+	std::cout<<"Print disabled for the moment: refactoring in progress"<<std::endl;
+
+	/*
 	// Lors de la construction getGraphicalWidget peut être nul ...
 	try
 	{
@@ -288,6 +285,7 @@ void QtSegmentOperationPanel::preview (bool show, bool destroyInteractor)
 	catch (...)
 	{
 	}
+	*/
 }	// QtSegmentOperationPanel::preview
 
 
@@ -381,8 +379,6 @@ QtSegmentOperationPanel* QtSegmentOperationAction::getSegmentPanel ( )
 
 void QtSegmentOperationAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 //	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de création du segment :
@@ -395,7 +391,7 @@ void QtSegmentOperationAction::executeOperation ( )
 		{
 			const string	vertex1	= getSegmentPanel ( )->getVertex1Name ( );
 			const string	vertex2	= getSegmentPanel ( )->getVertex2Name ( );
-			cmdResult	= getContext ( ).getGeomManager ( ).newSegment (vertex1, vertex2, name);
+			getController( ).getGeomManager ( ).newSegment (vertex1, vertex2, name);
 		}
 		break;
 		default	:

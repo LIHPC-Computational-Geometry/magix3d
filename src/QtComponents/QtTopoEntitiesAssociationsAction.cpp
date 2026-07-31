@@ -3,16 +3,8 @@
  * \author      Charles PIGNEROL
  * \date        20/11/2013
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Topo/CommandSetGeomAssociation.h"
-#include "Topo/CommandProjectVerticesOnNearestGeomEntities.h"
-#include "Topo/CommandProjectEdgesOnCurves.h"
-#include "Topo/CommandProjectFacesOnSurfaces.h"
-#include "Topo/TopoDisplayRepresentation.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtTopoEntitiesAssociationsAction.h"
 #include "QtComponents/QtMgx3DApplication.h"
@@ -31,10 +23,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -345,14 +334,14 @@ vector<Entity*> QtTopoToGeomAssociationPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator itt = topoNames.begin ( );
 		 topoNames.end ( ) != itt; itt++)
 	{
-		TopoEntity*	entity	= getContext ( ).getTopoManager ( ).getEntity(*itt);
+		Entity*	entity	= getController( ).getTopoManager ( ).getEntity(*itt);
 		CHECK_NULL_PTR_ERROR (entity)
 		entities.push_back (entity);
 	}	// for (vector<string>::const_iterator itt = topoNames.begin ( ); ...
 	for (vector<string>::const_iterator itg = geomNames.begin ( );
 		 geomNames.end ( ) != itg; itg++)
 	{
-		GeomEntity*	entity	= getContext ( ).getGeomManager ( ).getEntity(*itg);
+		Entity*	entity	= getController ( ).getGeomManager ( ).getEntity(*itg);
 		CHECK_NULL_PTR_ERROR (entity)
 		entities.push_back (entity);
 	}	// for (vector<string>::const_iterator itg = geomNames.begin ( ); ...
@@ -591,7 +580,7 @@ vector<TopoEntity*> QtTopoEntitiesAssociationsPanel::getTopoEntities ( ) const
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		TopoEntity*	te	= getContext( ).getTopoManager( ).getEntity (*it, true);
+		TopoEntity*	te	= getController( ).getTopoManager( ).getEntity (*it, true);
 		CHECK_NULL_PTR_ERROR (te)
 		entities.push_back (te);
 	}	// for (vector<string>::const_iterator it = names.begin ( ); ...
@@ -608,7 +597,7 @@ vector<Topo::Vertex*> QtTopoEntitiesAssociationsPanel::getVertices ( ) const
 	     names.end ( ) != it; it++)
 	{
 		Topo::Vertex*	te	=
-				getContext( ).getTopoManager( ).getVertex (*it, true);
+				getController( ).getTopoManager( ).getVertex (*it, true);
 		CHECK_NULL_PTR_ERROR (te)
 		entities.push_back (te);
 	}	// for (vector<string>::const_iterator it = names.begin ( ); ...
@@ -624,7 +613,7 @@ vector<CoEdge*> QtTopoEntitiesAssociationsPanel::getCoEdges ( ) const
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		CoEdge*	te	= getContext( ).getTopoManager( ).getCoEdge (*it, true);
+		CoEdge*	te	= getController( ).getTopoManager( ).getCoEdge (*it, true);
 		CHECK_NULL_PTR_ERROR (te)
 		entities.push_back (te);
 	}	// for (vector<string>::const_iterator it = names.begin ( ); ...
@@ -640,7 +629,7 @@ vector<CoFace*> QtTopoEntitiesAssociationsPanel::getCoFaces ( ) const
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		CoFace*	te	= getContext( ).getTopoManager( ).getCoFace (*it, true);
+		CoFace*	te	= getController( ).getTopoManager( ).getCoFace (*it, true);
 		CHECK_NULL_PTR_ERROR (te)
 		entities.push_back (te);
 	}	// for (vector<string>::const_iterator it = names.begin ( ); ...
@@ -663,7 +652,7 @@ vector<GeomEntity*> QtTopoEntitiesAssociationsPanel::getGeomEntities ( ) const
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		GeomEntity*	te	= getContext( ).getGeomManager( ).getEntity (*it, true);
+		GeomEntity*	te	= getController( ).getGeomManager( ).getEntity (*it, true);
 		CHECK_NULL_PTR_ERROR (te)
 		entities.push_back (te);
 	}	// for (vector<string>::const_iterator it = names.begin ( ); ...
@@ -762,6 +751,10 @@ vector<Entity*> QtTopoEntitiesAssociationsPanel::getInvolvedEntities ( )
 void QtTopoEntitiesAssociationsPanel::preview (
 											bool show, bool destroyInteractor)
 {
+
+	std::cout<<"Print disabled for the moment: refactoring in progress"<<std::endl;
+
+	/*
 	QtMgx3DOperationPanel::preview (show, destroyInteractor);
 
 	if ((false == show) || (false == previewResult ( )))
@@ -851,10 +844,10 @@ void QtTopoEntitiesAssociationsPanel::preview (
 
 		DisplayProperties	graphicalProps;
 		graphicalProps.setWireColor (Color (
-						255 * Resources::instance ( )._previewColor.getRed ( ),
-						255 * Resources::instance ( )._previewColor.getGreen ( ),
-						255 * Resources::instance ( )._previewColor.getBlue ( )));
-		graphicalProps.setLineWidth (Resources::instance ( )._previewWidth.getValue ( ));
+						255 * GUIResources::instance ( )._previewColor.getRed ( ),
+						255 * GUIResources::instance ( )._previewColor.getGreen ( ),
+						255 * GUIResources::instance ( )._previewColor.getBlue ( )));
+		graphicalProps.setLineWidth (GUIResources::instance ( )._previewWidth.getValue ( ));
 		RenderingManager::RepresentationID	repID	=
 			getRenderingManager ( ).createSegmentsWireRepresentation (
 									points, indices, graphicalProps, true);
@@ -888,6 +881,7 @@ void QtTopoEntitiesAssociationsPanel::preview (
 	catch (...)
 	{
 	}
+	*/
 }	// QtTopoEntitiesAssociationsPanel::preview
 
 
@@ -1022,8 +1016,6 @@ QtTopoEntitiesAssociationsPanel*
 
 void QtTopoEntitiesAssociationsAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DTopoOperationAction::executeOperation ( );
 
 	// Récupération des paramètres d'association des entités topologiques :
@@ -1039,23 +1031,23 @@ void QtTopoEntitiesAssociationsAction::executeOperation ( )
 		case QtTopoToGeomAssociationPanel::TOPO_ENTITIES_GEOM_ENTITY	:
 		{
 			const string	name (0 == geomEntities.size ( ) ? string ( ) : geomEntities [0]);
-			cmdResult	= getContext ( ).getTopoManager ( ).setGeomAssociation (topoEntities, name, move);
+			getController ( ).getTopoManager ( ).setGeomAssociation (topoEntities, name, move);
 		}
 		break;
 		case QtTopoToGeomAssociationPanel::VERTICES_GEOM_ENTITIES		:
-			cmdResult	= getContext ( ).getTopoManager ().projectVerticesOnNearestGeomEntities (topoEntities, geomEntities, move);
+			getController ( ).getTopoManager ().projectVerticesOnNearestGeomEntities (topoEntities, geomEntities, move);
 		break;
 		case QtTopoToGeomAssociationPanel::EDGES_CURVES					:
 			if (false == projectAll)
-				cmdResult	= getContext ( ).getTopoManager ( ).projectEdgesOnCurves (topoEntities);
+				getController ( ).getTopoManager ( ).projectEdgesOnCurves (topoEntities);
 			else
-				cmdResult	= getContext ( ).getTopoManager ( ).projectAllEdgesOnCurves ( );
+				getController ( ).getTopoManager ( ).projectAllEdgesOnCurves ( );
 		break;
 		case QtTopoToGeomAssociationPanel::FACES_SURFACES				:
 			if (false == projectAll)
-				cmdResult	= getContext ( ).getTopoManager ( ).projectFacesOnSurfaces (topoEntities);
+				getController ( ).getTopoManager ( ).projectFacesOnSurfaces (topoEntities);
 			else
-				cmdResult	= getContext ( ).getTopoManager ( ).projectAllFacesOnSurfaces ( );
+				getController ( ).getTopoManager ( ).projectAllFacesOnSurfaces ( );
 		break;
 		default															:
 		{

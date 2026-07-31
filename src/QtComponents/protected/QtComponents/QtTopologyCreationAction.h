@@ -6,13 +6,9 @@
 #ifndef QT_TOPOLOGY_CREATION_ACTION_H
 #define QT_TOPOLOGY_CREATION_ACTION_H
 
-#include "Internal/Context.h"
-
 #include "QtComponents/QtMgx3DEntityPanel.h"
 #include "QtComponents/QtMgx3DTopoOperationAction.h"
 #include "QtComponents/QtTopologyPanel.h"
-
-#include "Internal/SelectionManager.h"
 
 #include <QCheckBox>
 

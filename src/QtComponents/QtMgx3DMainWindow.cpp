@@ -4,22 +4,11 @@
  * \date        29/11/2010
  */
 
-#include "Internal/Context.h"
-#include "Group/GroupManager.h"
 #include "Utils/Command.h"
 #include "Utils/Magix3DEvents.h"
 #include "Utils/Point.h"
 #include "Utils/Vector.h"
 #include "Utils/Common.h"
-#include "Geom/GeomEntity.h"
-#include "Geom/Volume.h"
-#include "Geom/GeomProperty.h"
-#include "Internal/Context.h"
-#include "Internal/Resources.h"
-#include "Internal/CommandInternal.h"
-#include "Internal/EntitiesHelper.h"
-#include "Internal/InternalPreferences.h"
-#include "Internal/PythonWriter.h"
 #include "QtComponents/QtMgx3DApplication.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtMgx3DSelectionDialog.h"
@@ -190,6 +179,7 @@
 
 // NECESSAIRE POUR LES IMAGES AU FORMAT XPM
 #include "images/union.xpm"
+#include "QtComponents/GUIResources.h"
 
 #undef LOCK_INSTANCE
 #define LOCK_INSTANCE AutoReferencedMutex autoReferencedMutex (TkUtil::ObjectBase::getMutex ( ));
@@ -200,11 +190,6 @@ using namespace TkUtil;
 using namespace Preferences;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Geom;
-using namespace Mgx3D::Topo;
-using namespace Mgx3D::Mesh;
-using namespace Mgx3D::Structured;
-using namespace Mgx3D::Internal;
 //using namespace Mgx3D::Commands;
 
 
@@ -255,7 +240,7 @@ namespace QtComponents
 #ifdef USE_EXPERIMENTAL_ROOM
                   _loadRaysAction(0), _importRaysAction(0),
                   _saveRaysAction(0), _saveAsRaysAction(0),
-                  _setRaysContextAction(0), _setRaysTargetSurfacesAction(0),
+                  _setRaysControllerAction(0), _setRaysTargetSurfacesAction(0),
                   _loadDiagsAction(0), _importDiagsAction(0),
                   _saveDiagsAction(0), _saveAsDiagsAction(0),
 #endif	// USE_EXPERIMENTAL_ROOM
@@ -305,12 +290,12 @@ namespace QtComponents
                   _pickingSelectionAction (0), _rubberBandSelectionAction (0), _rubberBandInsideSelectionAction (0),
                   _selectVisibleAction (0),
                   _showCommandMonitorDialogAction(0),
-                  _displayUsersGuideAction(0), _displayUsersGuideContextAction(0),
+                  _displayUsersGuideAction(0), _displayUsersGuideControllerAction(0),
                   _displayWikiAction(0), _displayTutorialAction(0), _displayPythonAPIUsersGuideAction(0),
                   _displayQualifAction(0), _displayShortKeyAction(0), _displaySelectAction(0),
                   _displayHistoriqueAction(0), _aboutDialogAction(0),
                   _mgx3DScriptsMenu(0),
-                  _recentFilesCapacity(Resources::instance()._recentScriptCapacity.getValue()),
+                  _recentFilesCapacity(GUIResources::instance()._recentScriptCapacity.getValue()),
                   _mgx3DScriptsActions(0), _undoManager(0)
 		{
 			_mgx3DScriptsActions = new QAction *[_recentFilesCapacity];
@@ -338,7 +323,7 @@ namespace QtComponents
                   _importRaysAction(wa._importRaysAction),
                   _saveRaysAction(wa._saveRaysAction),
                   _saveAsRaysAction(wa._saveAsRaysAction),
-                  _setRaysContextAction(wa._setRaysContextAction),
+                  _setRaysControllerAction(wa._setRaysControllerAction),
                   _setRaysTargetSurfacesAction(wa._setRaysTargetSurfacesAction),
                   _loadDiagsAction(wa._loadDiagsAction),
                   _importDiagsAction(wa._importDiagsAction),
@@ -437,7 +422,7 @@ namespace QtComponents
                   _selectVisibleAction (wa._selectVisibleAction),
                   _showCommandMonitorDialogAction(wa._showCommandMonitorDialogAction),
                   _displayUsersGuideAction(wa._displayUsersGuideAction),
-                  _displayUsersGuideContextAction(wa._displayUsersGuideContextAction),
+                  _displayUsersGuideControllerAction(wa._displayUsersGuideControllerAction),
                   _displayWikiAction(wa._displayWikiAction),
                   _displayTutorialAction(wa._displayTutorialAction),
                   _displayPythonAPIUsersGuideAction(wa._displayPythonAPIUsersGuideAction),
@@ -474,7 +459,7 @@ namespace QtComponents
 				_importRaysAction                     = wa._importRaysAction;
 				_saveRaysAction                       = wa._saveRaysAction;
 				_saveAsRaysAction                     = wa._saveAsRaysAction;
-				_setRaysContextAction                 = wa._setRaysContextAction;
+				_setRaysControllerAction                 = wa._setRaysControllerAction;
 				_setRaysTargetSurfacesAction          = wa._setRaysTargetSurfacesAction;
 				_loadDiagsAction                      = wa._loadDiagsAction;
 				_importDiagsAction                    = wa._importDiagsAction;
@@ -573,7 +558,7 @@ namespace QtComponents
 				_selectVisibleAction			= wa._selectVisibleAction;
 				_showCommandMonitorDialogAction = wa._showCommandMonitorDialogAction;
 				_displayUsersGuideAction        = wa._displayUsersGuideAction;
-				_displayUsersGuideContextAction = wa._displayUsersGuideContextAction;
+				_displayUsersGuideControllerAction = wa._displayUsersGuideControllerAction;
 				_displayWikiAction              = wa._displayWikiAction;
 				_displayTutorialAction          = wa._displayTutorialAction;
 				_displayPythonAPIUsersGuideAction = wa._displayPythonAPIUsersGuideAction;
@@ -681,8 +666,8 @@ namespace QtComponents
 				_saveRaysAction->setEnabled(enable);
 			if (0 != _saveAsRaysAction)
 				_saveAsRaysAction->setEnabled(enable);
-			if (0 != _setRaysContextAction)
-				_setRaysContextAction->setEnabled(enable);
+			if (0 != _setRaysControllerAction)
+				_setRaysControllerAction->setEnabled(enable);
 			if (0 != _setRaysTargetSurfacesAction)
 				_setRaysTargetSurfacesAction->setEnabled(enable);
 			if (0 != _loadDiagsAction)
@@ -946,7 +931,7 @@ Qt::AutoCompatConnection	3	The default type when Qt 3 support is enabled.
 		QtMgx3DMainWindow::QtMgx3DMainWindow(QWidget *parent, char *name, Qt::WindowFlags flags)
 				: QMainWindow(parent, flags), ObjectBase(true),
 				  SelectionManagerObserver(0),
-				  _maxSizeSet(false), _context(0),
+				  _maxSizeSet(false), _controller(0),
 				  _groupsPanel(0), _entitiesPanel(0),
 				  _graphicalWidget(0), _operationsPanel(0),
 				  _additionalPanels(),
@@ -972,7 +957,7 @@ Qt::AutoCompatConnection	3	The default type when Qt 3 support is enabled.
 #endif	// USE_EXPERIMENTAL_ROOM
                   _repTypesDialog(0),
                   _pythonMinScript(), _pytMinScriptCharset(Charset::ASCII),
-                  _encodageScripts((Context::encodageScripts) - 1)
+                  _encodageScripts((Controller::encodageScripts) - 1)
 		{
 			setObjectName(0 == name ? "QtMgx3DMainWindow" : name);
 		}    // QtMgx3DMainWindow::QtMgx3DMainWindow
@@ -981,7 +966,7 @@ Qt::AutoCompatConnection	3	The default type when Qt 3 support is enabled.
 		QtMgx3DMainWindow::QtMgx3DMainWindow(const QtMgx3DMainWindow &)
 				: QMainWindow(0), ObjectBase(true),
 				  SelectionManagerObserver(0),
-				  _maxSizeSet(false), _context(0),
+				  _maxSizeSet(false), _controller(0),
 				  _groupsPanel(0), _entitiesPanel(0),
 				  _graphicalWidget(0), _operationsPanel(0),
 				  _additionalPanels(),
@@ -1007,7 +992,7 @@ Qt::AutoCompatConnection	3	The default type when Qt 3 support is enabled.
 #endif	// USE_EXPERIMENTAL_ROOM
                   _repTypesDialog(0),
                   _pythonMinScript(), _pytMinScriptCharset(Charset::UNKNOWN),
-                  _encodageScripts((Context::encodageScripts) - 1)
+                  _encodageScripts((Controller::encodageScripts) - 1)
 		{
 			MGX_FORBIDDEN("QtMgx3DMainWindow copy constructor is not allowed.");
 		}    // QtMgx3DMainWindow::QtMgx3DMainWindow (const QtMgx3DMainWindow&)
@@ -1029,7 +1014,7 @@ Qt::AutoCompatConnection	3	The default type when Qt 3 support is enabled.
 			getActions()._undoManager = 0;
 			getActions().setEnabled(false);
 
-			getContext().getSelectionManager().clearSelection();
+			getController().getSelectionManager().clearSelection();
 			if (0 != _seizureManager)
 				_seizureManager->setInteractiveMode(false);
 			_seizureManager = 0;
@@ -1082,8 +1067,8 @@ Qt::AutoCompatConnection	3	The default type when Qt 3 support is enabled.
 		_operationsPanel->setParent (0);
 	}	// if (0 != _operationsPanel)
 
-	// Destruction du contexte actuel :
-	setContext (0);
+	// Destruction du Controllere actuel :
+	setController (0);
 
 #endif    //#ifdef _DEBUG
 
@@ -1098,12 +1083,12 @@ void QtMgx3DMainWindow::showReady ( )
 {
 	show( );	// => Initialise si nécessaire Open GL
 	
-	getGraphicalWidget ( ).getRenderingManager ( ).setDisplayTrihedron (Resources::instance ( )._displayTrihedron.getValue ( ));
-	getGraphicalWidget ( ).getRenderingManager ( ).setDisplayFocalPoint (Resources::instance ( )._displayFocalPoint.getValue ( ));
+	getGraphicalWidget ( ).getRenderingManager ( ).setDisplayTrihedron (GUIResources::instance ( )._displayTrihedron.getValue ( ));
+	getGraphicalWidget ( ).getRenderingManager ( ).setDisplayFocalPoint (GUIResources::instance ( )._displayFocalPoint.getValue ( ));
 }	// QtMgx3DMainWindow::showReady
 
 
-		void QtMgx3DMainWindow::init(const std::string &name, Context *context, QtGroupsPanel *groupsPanel, QtEntitiesPanel *entitiesPanel)
+		void QtMgx3DMainWindow::init(const std::string &name, Controller *controller, QtGroupsPanel *groupsPanel, QtEntitiesPanel *entitiesPanel)
 		{
 			if ((0 != _groupsPanel) || (0 != _entitiesPanel))
 				throw Exception("QtMgx3DMainWindow::init : fenêtre déjà initialisée.");
@@ -1121,9 +1106,9 @@ void QtMgx3DMainWindow::showReady ( )
 
 #endif    // #ifdef _DEBUG
 
-			if (0 == context)
-				context = new Internal::Context(name, true);
-			setContext(context);
+			if (0 == controller)
+				controller = new Internal::Controller(name, true);
+			setController(controller);
 
 			createGui();
 
@@ -1131,8 +1116,8 @@ void QtMgx3DMainWindow::showReady ( )
 			try
 			{
 				_pytMinScriptCharset = getDefaultScriptsCharset().charset();
-				getContext().getScriptingManager().setCharset(_pytMinScriptCharset);
-				getContext().getScriptingManager().initPython(getContext().newScriptingFileName());
+				getController().getScriptingManager().setCharset(_pytMinScriptCharset);
+				getController().getScriptingManager().initPython(getController().newScriptingFileName());
 
 				assert(0 != _pythonPanel);
 			}
@@ -1146,8 +1131,8 @@ void QtMgx3DMainWindow::showReady ( )
 			try
 			{
 				CHECK_NULL_PTR_ERROR(_pythonPanel)
-				CHECK_NULL_PTR_ERROR(getContext().getScriptingManager().getPythonWriter())
-				PythonWriter*	refWriter	= getContext ( ).getScriptingManager ( ).getPythonWriter ( );
+				CHECK_NULL_PTR_ERROR(getController().getScriptingManager().getPythonWriter())
+				PythonWriter*	refWriter	= getController( ).getScriptingManager ( ).getPythonWriter ( );
 				PythonWriter*	writer	= new Internal::PythonWriter (scriptToUserScript (refWriter->getFileName ( )), refWriter->getCharset ( ));
 				writer->writeHeader();
 				_pythonPanel->getLogDispatcher ( ).addStream (writer);
@@ -1158,7 +1143,7 @@ void QtMgx3DMainWindow::showReady ( )
 
 			// titre de la fenêtre principale
 			UTF8String titre(Charset::UTF_8);
-			titre << Resources::instance()._softwareName << " (" << MAGIX3D_VERSION /*GSCC_PROJECT_VERSION*/<< ")";
+			titre << GUIResources::instance()._softwareName << " (" << MAGIX3D_VERSION /*GSCC_PROJECT_VERSION*/<< ")";
 			setWindowTitle(UTF8TOQSTRING(titre));
 
 			initPythonScripting();
@@ -1174,8 +1159,8 @@ void QtMgx3DMainWindow::showReady ( )
 
 		void QtMgx3DMainWindow::writeSettings()
 		{
-			QSettings settings(Resources::instance()._organisation.c_str(),
-			                   Resources::instance()._softwareName.c_str());
+			QSettings settings(GUIResources::instance()._organisation.c_str(),
+			                   GUIResources::instance()._softwareName.c_str());
 			File      file(settings.fileName().toStdString());
 			File      dir(file.getPath());
 			if (false == dir.exists())
@@ -1212,11 +1197,11 @@ void QtMgx3DMainWindow::showReady ( )
 
 		void QtMgx3DMainWindow::readSettings()
 		{
-			if (false == Resources::instance()._loadGuiState.getValue())
+			if (false == GUIResources::instance()._loadGuiState.getValue())
 				return;
 
-			QSettings settings(Resources::instance()._organisation.c_str(),
-			                   Resources::instance()._softwareName.c_str());
+			QSettings settings(GUIResources::instance()._organisation.c_str(),
+			                   GUIResources::instance()._softwareName.c_str());
 
 			settings.beginGroup("MainWindow");
 
@@ -1267,8 +1252,8 @@ void QtMgx3DMainWindow::showReady ( )
 			_graphicalWidget = &widget;
 			if (0 != _graphicalWidget->getRenderingWidget())
 			{
-				QSize size(Resources::instance()._graphicalWindowWidth, Resources::instance()._graphicalWindowHeight);
-				if (false == Resources::instance()._graphicalWindowFixedSize.getValue())
+				QSize size(GUIResources::instance()._graphicalWindowWidth, GUIResources::instance()._graphicalWindowHeight);
+				if (false == GUIResources::instance()._graphicalWindowFixedSize.getValue())
 				{
 					_graphicalWidget->getRenderingWidget()->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 // Commit 1963 : on n'impose plus de taille minimum, pose des problèmes avec
@@ -1287,10 +1272,10 @@ void QtMgx3DMainWindow::showReady ( )
 			_selectionIndividualPropertiesPanel->setGraphicalWidget(_graphicalWidget);
 			if (0 != _pythonPanel)
 				_pythonPanel->setGraphicalWidget(&widget);
-			Context *context = dynamic_cast<Context *>(&getContext());
-			if (0 != context)
-				_graphicalWidget->getRenderingManager().setContext(context);
-			// Pour _groupsPanel->setGraphicalWidget (...) il faut que le contexte soit affecté au rendering manager :
+			Controller *controller = &getController();
+			if (0 != controller)
+				_graphicalWidget->getRenderingManager().setController(controller);
+			// Pour _groupsPanel->setGraphicalWidget (...) il faut que le Controllere soit affecté au rendering manager :
 			CHECK_NULL_PTR_ERROR(_groupsPanel)
 			_groupsPanel->setGraphicalWidget(_graphicalWidget);
 		}    // QtMgx3DMainWindow::setGraphicalWidget
@@ -1487,15 +1472,15 @@ void QtMgx3DMainWindow::showReady ( )
 			_entitiesTabWidget = new QTabWidget(this);
 			if (0 == _groupsPanel)
 				_groupsPanel   = new QtGroupsPanel(
-						_entitiesTabWidget, this, "", getContext());
+						_entitiesTabWidget, this, "", getController());
 			else
 				_groupsPanel->setMainWindow(this);
 			_entitiesTabWidget->addTab(_groupsPanel, "Groupes");
-//	getContext ( ).getGroupManager ( ).setPropagate (
+//	getController ( ).getGroupManager ( ).setPropagate (
 //						_groupsPanel->groupsRepresentationPropagation ( ));
 			if (0 == _entitiesPanel)
 				_entitiesPanel = new QtEntitiesPanel(
-						_entitiesTabWidget, this, "", getContext());
+						_entitiesTabWidget, this, "", getController());
 			else
 				_entitiesPanel->setMainWindow(this);
 			_entitiesTabWidget->addTab(_entitiesPanel, "Entités");
@@ -1525,10 +1510,10 @@ void QtMgx3DMainWindow::showReady ( )
 			// Le déroulement de la session :
 			_historyDockWidget = new QDockWidget("Historique", this);
 			_historyDockWidget->setObjectName("Historic panel");
-			_logView = new QtMgx3DLogsView(this, Context::getLogsMask());
+			_logView = new QtMgx3DLogsView(this, Controller::getLogsMask());
 			_logView->enableDate(
-					Resources::instance()._logDate, Resources::instance()._logTime);
-			_logView->enableThreadID(Resources::instance()._logThreadID);
+					GUIResources::instance()._logDate, GUIResources::instance()._logTime);
+			_logView->enableThreadID(GUIResources::instance()._logThreadID);
 			_historyDockWidget->setWidget(_logView);
 			getLogDispatcher().addStream(_logView);
 			_logView->setMinimumSize(QSize(300, 100));
@@ -1536,10 +1521,10 @@ void QtMgx3DMainWindow::showReady ( )
 			_historyDockWidget->setSizePolicy(
 					QSizePolicy::Preferred, QSizePolicy::Preferred);
 			_statusView =
-					new QtStatusLogOutputStream(statusBar(), Context::getLogsMask());
+					new QtStatusLogOutputStream(statusBar(), Controller::getLogsMask());
 			_statusView->enableDate(
-					Resources::instance()._logDate, Resources::instance()._logTime);
-			_statusView->enableThreadID(Resources::instance()._logThreadID);
+					GUIResources::instance()._logDate, GUIResources::instance()._logTime);
+			_statusView->enableThreadID(GUIResources::instance()._logThreadID);
 			QLabel *label = new QLabel("", this);
 			statusBar()->addPermanentWidget(label);
 			_stateView = new QtMgx3DStateView("Etat de l'IHM", this);
@@ -1553,7 +1538,7 @@ void QtMgx3DMainWindow::showReady ( )
 			_selectionCPDockWidget->setObjectName("Common properties panel");
 			_selectionCommonPropertiesPanel =
 					new QtSelectionCommonPropertiesPanel(
-							this, "", &getContext().getSelectionManager());
+							this, "", &getController().getSelectionManager());
 			_selectionCPDockWidget->setSizePolicy(
 					QSizePolicy::Preferred, QSizePolicy::Preferred);
 			_selectionCPDockWidget->setWidget(_selectionCommonPropertiesPanel);
@@ -1565,7 +1550,7 @@ void QtMgx3DMainWindow::showReady ( )
 			_selectionIPDockWidget->setObjectName("Individual properties panel");
 			_selectionIndividualPropertiesPanel =
 					new QtSelectionIndividualPropertiesPanel(
-							this, "", &getContext().getSelectionManager());
+							this, "", &getController().getSelectionManager());
 			_selectionIPDockWidget->setSizePolicy(
 					QSizePolicy::Preferred, QSizePolicy::Preferred);
 			_selectionIPDockWidget->setWidget(_selectionIndividualPropertiesPanel);
@@ -1666,7 +1651,7 @@ void QtMgx3DMainWindow::showReady ( )
 			QSize          size           = _entitiesDockWidget->sizeHint();
 			_entitiesDockWidget->setMinimumWidth(size.width());
 
-//	_logView->setLogMask (Context::getLogsMask ( ));
+//	_logView->setLogMask (Controller::getLogsMask ( ));
 //	_logView->setLogMask (Log::PRODUCTION | Log::TRACE_1);
 //	getLogDispatcher( ).setMask (Log::ALL_KINDS);
 
@@ -1986,8 +1971,8 @@ void QtMgx3DMainWindow::showReady ( )
 #ifndef QT_4
 			_roomMenu->setToolTipsVisible(true);
 #endif    // 	QT_4
-			if (0 != getActions()._setRaysContextAction)
-				_roomMenu->addAction(getActions()._setRaysContextAction);
+			if (0 != getActions()._setRaysControllerAction)
+				_roomMenu->addAction(getActions()._setRaysControllerAction);
 			_roomMenu->addSeparator();
 			if (0 != getActions()._setRaysTargetSurfacesAction)
 				_roomMenu->addAction(getActions()._setRaysTargetSurfacesAction);
@@ -2030,7 +2015,7 @@ void QtMgx3DMainWindow::showReady ( )
 			_helpMenu->setToolTipsVisible(true);
 #endif    // 	QT_4
 			_helpMenu->addAction(getActions()._displayUsersGuideAction);
-			_helpMenu->addAction(getActions()._displayUsersGuideContextAction);
+			_helpMenu->addAction(getActions()._displayUsersGuideControllerAction);
 			_helpMenu->addAction(getActions()._displayWikiAction);
 			_helpMenu->addAction(getActions()._displayTutorialAction);
 			_helpMenu->addAction(getActions()._displayPythonAPIUsersGuideAction);
@@ -2145,17 +2130,17 @@ void QtMgx3DMainWindow::showReady ( )
 			_actions._quitAction = new QAction("Quitter ...", this);
 			connect(_actions._quitAction, SIGNAL(triggered()), this, SLOT(exitCallback()));
 			_actions._quitAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q));
-			_actions._quitAction->setShortcutContext(Qt::ApplicationShortcut);
+			_actions._quitAction->setShortcutController(Qt::ApplicationShortcut);
 
 			// La session :
 			_actions._undoAction = new QtAutoDisablabledAction(QIcon(":/images/undo.png"), "Annuler", this);
 			connect(_actions._undoAction, SIGNAL(triggered()), this, SLOT(undoCallback()), defaultConnectionType);
 			_actions._undoAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Z));
-			_actions._undoAction->setShortcutContext(Qt::ApplicationShortcut);
+			_actions._undoAction->setShortcutController(Qt::ApplicationShortcut);
 			_actions._redoAction = new QtAutoDisablabledAction(QIcon(":/images/redo.png"), "Refaire", this);
 			connect(_actions._redoAction, SIGNAL(triggered()), this, SLOT(redoCallback()), defaultConnectionType);
 			_actions._redoAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Y));
-			_actions._redoAction->setShortcutContext(Qt::ApplicationShortcut);
+			_actions._redoAction->setShortcutController(Qt::ApplicationShortcut);
 			_actions._clearAction = new QAction(QString::fromUtf8("Réinitialiser"), this);
 			connect(_actions._clearAction, SIGNAL(triggered()), this, SLOT(reinitializeCallback()), defaultConnectionType);
 			QActionGroup *unitGroup = new QActionGroup(this);
@@ -2185,7 +2170,7 @@ void QtMgx3DMainWindow::showReady ( )
 			unitGroup->addAction(_actions._undefinedUnitAction);
 			try
 			{
-				switch (getContext().getLengthUnit())
+				switch (getController().getLengthUnit())
 				{
 					case Unit::meter        :
 						_actions._meterAction->setChecked(true);
@@ -2201,7 +2186,7 @@ void QtMgx3DMainWindow::showReady ( )
 						break;
 					default                    :
 						_actions._undefinedUnitAction->setChecked(true);
-				}    // switch (getContext ( ).getLengthUnit ( ))
+				}    // switch (getController ( ).getLengthUnit ( ))
 			}
 			catch (...)
 			{
@@ -2224,7 +2209,7 @@ void QtMgx3DMainWindow::showReady ( )
 			landmarkGroup->addAction(_actions._undefinedLandmarkAction);
 			try
 			{
-				switch (getContext().getLandmark())
+				switch (getController().getLandmark())
 				{
 					case Landmark::maillage        :
 						_actions._meshLandmarkAction->setChecked(true);
@@ -2234,7 +2219,7 @@ void QtMgx3DMainWindow::showReady ( )
 						break;
 					default                    :
 						_actions._undefinedLandmarkAction->setChecked(true);
-				}    // switch (getContext ( ).getandmark ( ))
+				}    // switch (getController ( ).getandmark ( ))
 			}
 			catch (...)
 			{
@@ -2274,7 +2259,7 @@ void QtMgx3DMainWindow::showReady ( )
 			_actions._print3DViewAction = new QAction(QIcon(":/images/print.png"), "Imprimer ...", this);
 			connect(_actions._print3DViewAction, SIGNAL(triggered()), this, SLOT(print3DViewCallback()), defaultConnectionType);
 			_actions._print3DViewAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
-			_actions._print3DViewAction->setShortcutContext(Qt::ApplicationShortcut);
+			_actions._print3DViewAction->setShortcutController(Qt::ApplicationShortcut);
 			_actions._print3DViewToFileAction = new QAction("Imprimer dans un fichier ...", this);
 			connect(_actions._print3DViewToFileAction, SIGNAL(triggered()), this, SLOT(print3DViewToFileCallback()), defaultConnectionType);
 			_actions._useGlobalDisplayPropertiesAction = new QAction(QString::fromUtf8("Utilisation des propriétés d'affichage globales"), this);
@@ -2283,11 +2268,11 @@ void QtMgx3DMainWindow::showReady ( )
 			connect(_actions._useGlobalDisplayPropertiesAction, SIGNAL(toggled(bool)), this, SLOT(useGlobalDisplayPropertiesCallback(bool)), defaultConnectionType);
 			_actions._displayTrihedronAction = new QAction(QIcon(":/images/trihedron.png"), QString::fromUtf8("Afficher le trièdre"), this);
 			_actions._displayTrihedronAction->setCheckable(true);
-			_actions._displayTrihedronAction->setChecked(Resources::instance()._displayTrihedron.getValue());
+			_actions._displayTrihedronAction->setChecked(GUIResources::instance()._displayTrihedron.getValue());
 			connect(_actions._displayTrihedronAction, SIGNAL(toggled(bool)), this, SLOT(displayTrihedronCallback(bool)), defaultConnectionType);
 			_actions._displayViewCubeAction		= new QAction(QIcon(":/images/viewcube.png"), QString::fromUtf8("Afficher cube d'orientation"), this);
 			_actions._displayViewCubeAction->setCheckable(true);
-			_actions._displayViewCubeAction->setChecked(Resources::instance()._displayTrihedron.getValue());
+			_actions._displayViewCubeAction->setChecked(GUIResources::instance()._displayTrihedron.getValue());
 			connect(_actions._displayViewCubeAction, SIGNAL(toggled(bool)), this, SLOT(displayViewCubeCallback(bool)), defaultConnectionType);
 			_actions._displayLandmarkAction = new QAction(QIcon(":/images/landmark.png"), QString::fromUtf8("Afficher le repère"), this);
 			_actions._displayLandmarkAction->setCheckable(true);
@@ -2297,7 +2282,7 @@ void QtMgx3DMainWindow::showReady ( )
 			connect(_actions._parametrizeLandmarkAction, SIGNAL(triggered()), this, SLOT(parametrizeLandmarkCallback()), defaultConnectionType);
 			_actions._displayFocalPointAction = new QAction(QIcon(":/images/focal_cross.png"), "Afficher le point focal", this);
 			_actions._displayFocalPointAction->setCheckable(true);
-			_actions._displayFocalPointAction->setChecked(Resources::instance()._displayFocalPoint.getValue());
+			_actions._displayFocalPointAction->setChecked(GUIResources::instance()._displayFocalPoint.getValue());
 			connect(_actions._displayFocalPointAction, SIGNAL(toggled(bool)), this, SLOT(displayFocalPointCrossCallback(bool)), defaultConnectionType);
 			_actions._xOyViewAction = new QAction(QIcon(":/images/trihedron_xOy.png"), "Afficher la vue du plan xOy", this);
 			connect(_actions._xOyViewAction, SIGNAL(triggered()), this, SLOT(xOyViewPlaneCallback()), defaultConnectionType);
@@ -2365,7 +2350,7 @@ void QtMgx3DMainWindow::showReady ( )
 			_actions._undoSelectionAction	= new QAction("Annuler la dernière sélection", this);
 			connect(_actions._undoSelectionAction, SIGNAL(triggered ( )), this, SLOT(undoSelectionCallback ( )));
 			_actions._undoSelectionAction->setShortcut (QKeySequence (Qt::SHIFT + Qt::Key_Z));
-			_actions._undoSelectionAction->setShortcutContext (Qt::ApplicationShortcut);
+			_actions._undoSelectionAction->setShortcutController (Qt::ApplicationShortcut);
 			_actions._redoSelectionAction	= new QAction("Refaire la sélection annulée", this);
 			connect(_actions._redoSelectionAction, SIGNAL(triggered ( )), this, SLOT(redoSelectionCallback ( )));
 			_actions._redoSelectionAction->setShortcut (QKeySequence (Qt::ALT + Qt::Key_Z));
@@ -2397,7 +2382,7 @@ void QtMgx3DMainWindow::showReady ( )
 			_actions._selectEntitiesAction = new QAction(QString::fromUtf8("Sélectionner des entités ..."), this);
 			connect(_actions._selectEntitiesAction, SIGNAL(triggered()), this, SLOT(selectEntitiesCallback()));
 			_actions._selectEntitiesAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
-			_actions._selectEntitiesAction->setShortcutContext(Qt::ApplicationShortcut);
+			_actions._selectEntitiesAction->setShortcutController(Qt::ApplicationShortcut);
 			_actions._selectVisibleEntitiesAction = new QAction(QString::fromUtf8("Sélectionner les entités visibles"), this);
 			connect(_actions._selectVisibleEntitiesAction, SIGNAL(triggered()), this, SLOT(selectVisibleEntitiesCallback()));
 			_actions._unselectVisibleEntitiesAction = new QAction(QString::fromUtf8("Désélectionner les entités visibles"), this);
@@ -2512,11 +2497,11 @@ void QtMgx3DMainWindow::showReady ( )
 			connect (_actions._selectVisibleAction, SIGNAL(toggled(bool)), this, SLOT(visibleSelectionCallback(bool)), defaultConnectionType);
 #ifdef USE_EXPERIMENTAL_ROOM
 			// La chambre expérimentale :
-			_actions._setRaysContextAction =
-					new QAction("Utiliser ce contexte", this);
-			_actions._setRaysContextAction->setToolTip(QString::fromUtf8("Utilise le contexte courant (surface et volumes sélectionné,\nunité de longueur) lors de la projection des pointages laser."));
-			connect(_actions._setRaysContextAction, SIGNAL(triggered()),
-			        this, SLOT(setRaysContextCallback()));
+			_actions._setRaysControllerAction =
+					new QAction("Utiliser ce Controllere", this);
+			_actions._setRaysControllerAction->setToolTip(QString::fromUtf8("Utilise le Controllere courant (surface et volumes sélectionné,\nunité de longueur) lors de la projection des pointages laser."));
+			connect(_actions._setRaysControllerAction, SIGNAL(triggered()),
+			        this, SLOT(setRaysControllerCallback()));
 			_actions._setRaysTargetSurfacesAction =
 					new QAction(QString::fromUtf8("Projeter sur les surfaces ou volumes sélectionnés"), this);
 			_actions._setRaysTargetSurfacesAction->setToolTip(QString::fromUtf8("Projette les pointages laser sur les surfaces et volumes sélectionnés."));
@@ -2596,14 +2581,14 @@ void QtMgx3DMainWindow::showReady ( )
 					new QAction("Manuel utilisateur (pdf)", this);
 			connect(_actions._displayUsersGuideAction, SIGNAL(triggered()), this,
 			        SLOT(usersGuideCallback()), defaultConnectionType);
-			_actions._displayUsersGuideContextAction =
-					new QAction("Aide contextuelle (html)", this);
-			_actions._displayUsersGuideContextAction->setShortcut(
+			_actions._displayUsersGuideControllerAction =
+					new QAction("Aide Controlleruelle (html)", this);
+			_actions._displayUsersGuideControllerAction->setShortcut(
 					QKeySequence(Qt::Key_F1));
-			_actions._displayUsersGuideContextAction->setShortcutContext(
+			_actions._displayUsersGuideControllerAction->setShortcutController(
 					Qt::ApplicationShortcut);
-			connect(_actions._displayUsersGuideContextAction, SIGNAL(triggered()),
-			        this, SLOT(usersGuideContextCallback()), defaultConnectionType);
+			connect(_actions._displayUsersGuideControllerAction, SIGNAL(triggered()),
+			        this, SLOT(usersGuideControllerCallback()), defaultConnectionType);
 			_actions._displayWikiAction = new QAction("Prise en main (Wiki Magix 3D)", this);
 			connect(_actions._displayWikiAction, SIGNAL(triggered()),
 			        this, SLOT(wikiCallback()), defaultConnectionType);
@@ -3527,7 +3512,7 @@ void QtMgx3DMainWindow::showReady ( )
 		{
 			CHECK_NULL_PTR_ERROR(_pythonPanel)
 			_pythonPanel->setInterpreterName("Magix3D interpreter");
-			// On facilite la tache de l'utilisateur : récupération du contexte de cette session :
+			// On facilite la tache de l'utilisateur : récupération du Controllere de cette session :
 			char*	env		= getenv ("MGX3D_PATH");
 			char*	limaEnv	= getenv ("LIMA_PATH");
 			if (0 != env)
@@ -3554,30 +3539,30 @@ void QtMgx3DMainWindow::showReady ( )
 					_pythonPanel->executeCommand (limaImportLine);
 				}	// if (0 != limaEnv)
 
-				UTF8String contextLine(Charset::UTF_8);
-				contextLine << getContextAlias() << " = " << getMgx3DAlias()
-				            << ".getContext(\"" << getContext().getName() << "\")";
-				_pythonPanel->executeCommand(contextLine);
+				UTF8String ControllerLine(Charset::UTF_8);
+				ControllerLine << getControllerAlias() << " = " << getMgx3DAlias()
+				            << ".getController(\"" << getController().getName() << "\")";
+				_pythonPanel->executeCommand(ControllerLine);
 
 				// quelques raccourcis
 				UTF8String raccourci(Charset::UTF_8);
 
-				raccourci << "gm = " << getContextAlias() << ".getGeomManager()";
+				raccourci << "gm = " << getControllerAlias() << ".getGeomManager()";
 				_pythonPanel->executeCommand(raccourci);
 				raccourci.clear();
-				raccourci << "tm = " << getContextAlias() << ".getTopoManager()";
+				raccourci << "tm = " << getControllerAlias() << ".getTopoManager()";
 				_pythonPanel->executeCommand(raccourci);
 				raccourci.clear();
-				raccourci << "mm = " << getContextAlias() << ".getMeshManager()";
+				raccourci << "mm = " << getControllerAlias() << ".getMeshManager()";
 				_pythonPanel->executeCommand(raccourci);
 				raccourci.clear();
 
-				PythonWriter*	writer	=		getContext ( ).getScriptingManager ( ).getPythonWriter ( );
+				PythonWriter*	writer	=		getController( ).getScriptingManager ( ).getPythonWriter ( );
 				if (0 != writer)
 				{
 					// Ca vient quelque part du noyau, mais ça n'est pas exécuté
 					// => le QtMgx3DPythonPanel ne l'écrira pas dans le flux.
-					ScriptingLog ins(getContextAlias(), "getGeomManager", "gm");
+					ScriptingLog ins(getControllerAlias(), "getGeomManager", "gm");
 					writer->log(ins);
 					ins.setResult("tm");
 					ins.setMethodName("getTopoManager");
@@ -3625,7 +3610,7 @@ cout << ctime (&t);
 		{
 /*
  * NOTE CP sur l'(in)activation des actions :
- * Objectif de cette fonction : activer les actions si le contexte s'y prête :
+ * Objectif de cette fonction : activer les actions si le Controllere s'y prête :
  * - Absence de commande en cours d'exécution
  * - Absence d'évènements Qt en attente. En effet, un évènement en attente
  * peut provoquer l'exécution d'un slot, et être incompatible avec une
@@ -3707,36 +3692,36 @@ cout << ctime (&t);
 		}    // QtMgx3DMainWindow::updateActions
 
 
-		void QtMgx3DMainWindow::setContext(Context *context)
+		void QtMgx3DMainWindow::setController(Controller *controller)
 		{
-			if (context == _context)
+			if (controller == _controller)
 				return;
 
 			QtAutoWaitingCursor cursor(true);
 
 			BEGIN_QT_TRY_CATCH_BLOCK
 
-			// Le contexte peut changer. C'est par ailleurs l'IHM qui gère les préférences utilisateurs. C'est donc ici un
+			// Le Controllere peut changer. C'est par ailleurs l'IHM qui gère les préférences utilisateurs. C'est donc ici un
 			// bon endroit pour gérer le type de log à afficher/enregistrer :
-			if (0 != context)
+			if (0 != controller)
 			{
-				context->getLogDispatcher().setMask(QtMgx3DApplication::getLogsMask());
-//		Context*	ctx	= dynamic_cast<Context*>(context);
+				controller->getLogDispatcher().setMask(QtMgx3DApplication::getLogsMask());
+//		Controller*	ctx	= dynamic_cast<Controller*>(Controller);
 //		if (0 != ctx)
 //		{
 //			ctx->getStdLogStream ( ).setMask (QtMgx3DApplication::getLogsMask ( ));
 //			ctx->getErrLogStream ( ).setMask (QtMgx3DApplication::getLogsMask ( ));
 //		}	// if (0 != ctx)
-			}    // if (0 != context)
+			}    // if (0 != Controller)
 
 			if (0 != _groupsPanel)
-				_groupsPanel->setContext(context);
+				_groupsPanel->setController(controller);
 
-			Context *ctx = dynamic_cast<Context *>(context);
+			Controller *ctx = controller;
 			if ((0 != _graphicalWidget) && (0 != ctx))
-				_graphicalWidget->getRenderingManager().setContext(ctx);
+				_graphicalWidget->getRenderingManager().setController(ctx);
 
-			// Destruction du contexte => récupérer les flux confiés car sinon ils vont être détruits :
+			// Destruction du Controllere => récupérer les flux confiés car sinon ils vont être détruits :
 			if (0 != _logView)
 				getLogDispatcher().releaseStream(_logView);
 			if (0 != _statusView)
@@ -3744,52 +3729,52 @@ cout << ctime (&t);
 
 			// ATTENTION :
 			// Etape très délicate et très peu testée. Qu'en sera t-il lors d'un
-			// changement de contexte en cours de session ? Le contexte est connu par de
+			// changement de Controllere en cours de session ? Le Controllere est connu par de
 			// très nombreux objets de très nombreuses classes, et ici on ne met pas tout à
 			// jour ...
 			setSelectionManager(0);
-			delete _context;
-			_context = context;
+			delete _controller;
+			_controller = controller;
 
-			if ((0 != _pythonPanel) && (0 != _context))
+			if ((0 != _pythonPanel) && (0 != _controller))
 			{
-				_pythonPanel->setLogStream(&(getContext().getLogDispatcher()));
+				_pythonPanel->setLogStream(&(getController().getLogDispatcher()));
 
 				// On fait un fichier script utilisateur, qui contient les commandes saisies
 				// par l'utilisateur et non celles générés par le noyau à partir des
 				// commandes utilisateur :
 				try
 				{
-					CHECK_NULL_PTR_ERROR(getContext().getScriptingManager().getPythonWriter())
-					ScriptingManager* userScriptingMgr = new ScriptingManager(dynamic_cast<Internal::Context *>(&getContext()));
-					userScriptingMgr->initPython(scriptToUserScript(getContext().getScriptingManager().getPythonWriter( )->getFileName()));
+					CHECK_NULL_PTR_ERROR(getController().getScriptingManager().getPythonWriter())
+					ScriptingManager* userScriptingMgr = new ScriptingManager(dynamic_cast<Internal::Controller *>(&getController()));
+					userScriptingMgr->initPython(scriptToUserScript(getController().getScriptingManager().getPythonWriter( )->getFileName()));
 					_pythonPanel->setMgxUserScriptingManager(userScriptingMgr);
 				}
 				catch (...)
 				{
 				}
-			}    // if ((0 != _pythonPanel) && (0 != _context))
+			}    // if ((0 != _pythonPanel) && (0 != _Controller))
 
 			// S'enregistrer auprès des gestionnaires d'objets (commande, undo, ...) :
 			registerToManagers();
 
-			// Changement de contexte => changement de gestionnaire de logs :
+			// Changement de Controllere => changement de gestionnaire de logs :
 			try
-			{    // Le contexte est peut être nul.
+			{    // Le Controllere est peut être nul.
 				if (0 != _logView)
 					getLogDispatcher().addStream(_logView);
 				if (0 != _statusView)
 					getLogDispatcher().addStream(_statusView);
 				getLogDispatcher().enableDate(
-						Resources::instance()._logDate, Resources::instance()._logTime);
-				getLogDispatcher().enableThreadID(Resources::instance()._logThreadID);
+						GUIResources::instance()._logDate, GUIResources::instance()._logTime);
+				getLogDispatcher().enableThreadID(GUIResources::instance()._logThreadID);
 			}
 			catch (...)
 			{
 			}
 
 			// Mise à jour de l'IHM :
-			if (0 != _context)
+			if (0 != _controller)
 				updateActions();
 
 			COMPLETE_QT_TRY_CATCH_BLOCK(true, this, getAppTitle())
@@ -3797,28 +3782,28 @@ cout << ctime (&t);
 			if (true == hasError)
 			{
 				UTF8String message(Charset::UTF_8);
-				message << "Echec lors du changement de contexte : " << errorString;
+				message << "Echec lors du changement de Controllere : " << errorString;
 				log(ErrorLog(message));
 			}    // if (true == hasError)
-		}    // QtMgx3DMainWindow::setContext
+		}    // QtMgx3DMainWindow::setController
 
 
-		Context &QtMgx3DMainWindow::getContext()
+		Controller &QtMgx3DMainWindow::getController()
 		{
-			if (0 == _context)
-				throw Exception(UTF8String("QtMgx3DMainWindow::getContext : absence de contexte.", Charset::UTF_8));
+			if (0 == _controller)
+				throw Exception(UTF8String("QtMgx3DMainWindow::getController : absence de Controllere.", Charset::UTF_8));
 
-			return *_context;
-		}    // QtMgx3DMainWindow::getContext
+			return *_controller;
+		}    // QtMgx3DMainWindow::getController
 
 
-		const Context &QtMgx3DMainWindow::getContext() const
+		const Controller &QtMgx3DMainWindow::getController() const
 		{
-			if (0 == _context)
-				throw Exception(UTF8String("QtMgx3DMainWindow::getContext : absence de contexte.", Charset::UTF_8));
+			if (0 == _controller)
+				throw Exception(UTF8String("QtMgx3DMainWindow::getController : absence de Controllere.", Charset::UTF_8));
 
-			return *_context;
-		}    // QtMgx3DMainWindow::getContext
+			return *_controller;
+		}    // QtMgx3DMainWindow::getController
 
 
 void QtMgx3DMainWindow::executePythonScript (const string &f)
@@ -3830,23 +3815,23 @@ void QtMgx3DMainWindow::executePythonScript (const string &f)
 
 	log(InformationLog(message));
 
-	getContext().beginImportScript();
+	getController().beginImportScript();
 	timer.start();
 	try
 	{
 		_pythonPanel->executeFile(f);
 		timer.stop();
-		getContext().endImportScript();
+		getController().endImportScript();
 	}
 	catch (...)
 	{
 		timer.stop();
-		getContext().endImportScript();
+		getController().endImportScript();
 		throw;
 	}
 	// titre de la fenêtre principale
 	UTF8String titre(Charset::UTF_8);
-	titre << Resources::instance()._softwareName << " (" << MAGIX3D_VERSION << ") " << file.getFileName();
+	titre << GUIResources::instance()._softwareName << " (" << MAGIX3D_VERSION << ") " << file.getFileName();
 	setWindowTitle(UTF8TOQSTRING(titre));
 
 	message.clear();
@@ -3857,19 +3842,19 @@ void QtMgx3DMainWindow::executePythonScript (const string &f)
 
 		CommandManager &QtMgx3DMainWindow::getCommandManager()
 		{
-			return getContext().getCommandManager();
+			return getController().getCommandManager();
 		}    // QtMgx3DMainWindow::getCommandManager
 
 
 /*SelectionManager& QtMgx3DMainWindow::getSelectionManager ( )
 {
-	return getContext ( ).getSelectionManager ( );
+	return getController ( ).getSelectionManager ( );
 }	// QtMgx3DMainWindow::getSelectionManager
 
 
 const SelectionManager& QtMgx3DMainWindow::getSelectionManager ( ) const
 {
-	return getContext ( ).getSelectionManager ( );
+	return getController ( ).getSelectionManager ( );
 }	// QtMgx3DMainWindow::getSelectionManager*/
 
 
@@ -3936,31 +3921,31 @@ const SelectionManager& QtMgx3DMainWindow::getSelectionManager ( ) const
 
 		Geom::GeomManager &QtMgx3DMainWindow::getGeomManager()
 		{
-			return getContext().getGeomManager();
+			return getController().getGeomManager();
 		}    // QtMgx3DMainWindow::getGeomManager
 
 
 		Topo::TopoManager &QtMgx3DMainWindow::getTopoManager()
 		{
-			return getContext().getTopoManager();
+			return getController().getTopoManager();
 		}   // QtMgx3DMainWindow::getTopoManager
 
 
 		Mesh::MeshManager &QtMgx3DMainWindow::getMeshManager()
 		{
-			return getContext().getMeshManager();
+			return getController().getMeshManager();
 		}   // QtMgx3DMainWindow::getMeshManager
 
 
 		Group::GroupManager &QtMgx3DMainWindow::getGroupManager()
 		{
-			return getContext().getGroupManager();
+			return getController().getGroupManager();
 		}   // QtMgx3DMainWindow::getGroupManager
 
 
 		Internal::M3DCommandManager &QtMgx3DMainWindow::getM3DCommandManager()
 		{
-			return getContext().getM3DCommandManager();
+			return getController().getM3DCommandManager();
 		}
 
 		UndoRedoManager &QtMgx3DMainWindow::getUndoManager()
@@ -3971,14 +3956,14 @@ const SelectionManager& QtMgx3DMainWindow::getSelectionManager ( ) const
 
 		void QtMgx3DMainWindow::closeEvent(QCloseEvent *event)
 		{
-			if (true == Resources::instance ( )._confirmQuitAction.getValue ( ))
+			if (true == GUIResources::instance ( )._confirmQuitAction.getValue ( ))
 			{
 				if (1 == QMessageBox::warning(this, getAppTitle().c_str ( ), "Souhaitez-vous réellement quitter cette application ?", "Oui", "Non", QString::null, 0, -1))
 				{
 					event->ignore();
 					return;
 				}
-			}	// if (true == Resources::instance ( )._confirmQuitAction.getValue ( ))
+			}	// if (true == GUIResources::instance ( )._confirmQuitAction.getValue ( ))
 			
 			// On a tendance à quitter Magix 3D via QApplication::exit. S'il y a du python en route ça ne pardonne pas ...
 			if (0 != _pythonPanel)
@@ -3986,7 +3971,7 @@ const SelectionManager& QtMgx3DMainWindow::getSelectionManager ( ) const
 
 			QMainWindow::closeEvent(event);
 
-			if (true == Resources::instance()._saveGuiState.getValue())
+			if (true == GUIResources::instance()._saveGuiState.getValue())
 				writeSettings();
 
 			// [EB] pour entrainer la fermeture de la fenêtre d'aide par exemple
@@ -4120,7 +4105,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 {
 	if (false == commandsErrorsNotificationsDisabled ( ))
 	{
-		if (false == Resources::instance ( )._showAmodalDialogOnCommandError.getValue ( ))
+		if (false == GUIResources::instance ( )._showAmodalDialogOnCommandError.getValue ( ))
 			QtMessageBox::displayErrorMessage (this, getAppTitle ( ), message);
 		else
 			QtMessageBox::displayErrorMessageInAppWorkspace (this, getAppTitle ( ), message);	// Experimental, Issue#112
@@ -4143,12 +4128,12 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 
 		void QtMgx3DMainWindow::registerToManagers()
 		{
-			CommandManager *cmdMgr = 0;    // 0 si pas de contexte
-			UndoRedoManager   *urm    = 0;    // 0 si pas de contexte
-			SelectionManager  *sm     = 0;    // 0 si pas de contexte
+			CommandManager *cmdMgr = 0;    // 0 si pas de Controllere
+			UndoRedoManager   *urm    = 0;    // 0 si pas de Controllere
+			SelectionManager  *sm     = 0;    // 0 si pas de Controllere
 			// ATTENTION :
 			// Etape très délicate et très peu testée. Qu'en sera t-il lors d'un
-			// changement de contexte en cours de session ? Le contexte est connu par de
+			// changement de Controllere en cours de session ? Le Controllere est connu par de
 			// très nombreux objets de très nombreuses classes, et ici on ne met pas tout à
 			// jour ...
 			try
@@ -4176,8 +4161,8 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 			// affecter, de même que plein d'autres trucs.
 			try
 			{
-				if (0 != _context)
-					setSelectionManager(&_context->getSelectionManager());
+				if (0 != _controller)
+					setSelectionManager(&_controller->getSelectionManager());
 				sm = dynamic_cast<SelectionManager *>(getSelectionManager());
 //		if (0 != sm)
 //			sm->addSelectionObserver ((SelectionManagerObserver&)*this);
@@ -4216,22 +4201,22 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 
 					InfoCommand &icmd = commandInternal->getInfoCommand();
 					InfoCommand::type t = InfoCommand::UNITIALIZED;
-					icmd.getContextInfo(t);
+					icmd.getControllerInfo(t);
 
-					// Modification du context ?
-					bool contextModification = false;
+					// Modification du Controller ?
+					bool ControllerModification = false;
 					switch (t)
 					{
 						case InfoCommand::LENGTHUNITMODIFIED    :
-							contextModification = true;
+							ControllerModification = true;
 							lengthUnitModifiedEvent();
 							break;
 						case InfoCommand::LANDMARKMODIFIED      :
-							contextModification = true;
+							ControllerModification = true;
 							landmarkModifiedEvent();
 							break;
 					}    // switch (t)
-//			if (true == contextModification)
+//			if (true == ControllerModification)
 //				return;
 
 					// recherche des différentes entités créées/supprimées :
@@ -4273,7 +4258,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 									doRender = true;
 								}
 
-						if (0 == (i % Resources::instance()._updateRefreshRate.getValue()))
+						if (0 == (i % GUIResources::instance()._updateRefreshRate.getValue()))
 							refreshGui();
 					}    // for (uint i=0; i<icmd.getNbGeomInfoEntity(); i++)
 					if (0 != geomAddedShown.size())
@@ -4334,7 +4319,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 											getGraphicalWidget().getRenderingManager( ).displayRepresentation(*te, displayed, rer->getRepresentationMask(), true);
 									}
 
-						if (0 == (i % Resources::instance()._updateRefreshRate.getValue()))
+						if (0 == (i % GUIResources::instance()._updateRefreshRate.getValue()))
 							refreshGui();
 					}    // for (uint i=0; i<icmd.getNbTopoInfoEntity(); i++)
 					if (0 != topoAddedShown.size())
@@ -4375,7 +4360,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 										getGraphicalWidget().getRenderingManager( ).updateRepresentation(*me);
 									doRender = true;
 								}
-						if (0 == (i % Resources::instance()._updateRefreshRate.getValue()))
+						if (0 == (i % GUIResources::instance()._updateRefreshRate.getValue()))
 							refreshGui();
 					}
 					if (0 != meshAddedShown.size())
@@ -4443,7 +4428,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 									doRender = true;
 								}
 
-						if (0 == (i % Resources::instance()._updateRefreshRate.getValue()))
+						if (0 == (i % GUIResources::instance()._updateRefreshRate.getValue()))
 							refreshGui();
 					}    // for (uint i=0; i<icmd.getNbSysCoordInfoEntity(); i++)
 
@@ -4485,7 +4470,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 									doRender = true;
 								}
 
-						if (0 == (i % Resources::instance()._updateRefreshRate.getValue()))
+						if (0 == (i % GUIResources::instance()._updateRefreshRate.getValue()))
 							refreshGui();
 					}    // for (uint i=0; i<icmd.getNbStructuredMeshInfoEntity(); i++)
 					if (0 != smeshAddedShown.size())
@@ -4505,8 +4490,8 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 					{
 						const UTF8String	comments	= commandInternal->getScriptComments ( );
 						if (false == comments.empty ( ))
-							getContext ( ).getScriptingManager ( ).addComment(comments);
-						getContext ( ).getScriptingManager ( ).addCommand (commandInternal->getScriptCommand ( ));
+							getController( ).getScriptingManager ( ).addComment(comments);
+						getController( ).getScriptingManager ( ).addCommand (commandInternal->getScriptCommand ( ));
 						_pythonPanel->addToHistoric(commandInternal->getScriptCommand(), commandInternal->getScriptComments(), output, false, true);
 					}    // if (0 != _pythonPanel && commandInternal->isScriptable())
 
@@ -4520,8 +4505,8 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 						const UTF8String warn(commandInternal->getWarningToPopup(), Charset::UTF_8);
 						if (false == warn.empty())
 						{
-							QtMessageBox::systemNotification ("Magix3D", QtMgx3DApplication::getAppIcon ( ), "Commandes terminées avec avertissement.", QtMessageBox::URGENCY_NORMAL, Resources::instance ( )._commandNotificationDuration);
-							if (false == Resources::instance ( )._showAmodalDialogOnCommandError.getValue ( ))
+							QtMessageBox::systemNotification ("Magix3D", QtMgx3DApplication::getAppIcon ( ), "Commandes terminées avec avertissement.", QtMessageBox::URGENCY_NORMAL, GUIResources::instance ( )._commandNotificationDuration);
+							if (false == GUIResources::instance ( )._showAmodalDialogOnCommandError.getValue ( ))
 								QtMessageBox::displayWarningMessage (this, getAppTitle().c_str ( ), warn);	// Défaut
 							else
 								QtMessageBox::displayWarningMessageInAppWorkspace (this, getAppTitle ( ), warn);	// Expérimental, Issue#112
@@ -4535,10 +4520,10 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 				else
 					if ((COMMAND_STATE == event) && (Command::FAIL == command.getStatus()))
 					{
-						if ((true == Resources::instance()._showDialogOnCommandError.getValue()) && (false == command.isUserNotified()))
+						if ((true == GUIResources::instance()._showDialogOnCommandError.getValue()) && (false == command.isUserNotified()))
 						{
 							command.setUserNotified (true);
-							QtMessageBox::systemNotification ("Magix3D", QtMgx3DApplication::getAppIcon ( ), "Commandes terminées en erreur.", QtMessageBox::URGENCY_NORMAL, Resources::instance ( )._commandNotificationDuration);
+							QtMessageBox::systemNotification ("Magix3D", QtMgx3DApplication::getAppIcon ( ), "Commandes terminées en erreur.", QtMessageBox::URGENCY_NORMAL, GUIResources::instance ( )._commandNotificationDuration);
 							displayCommandError (command.getErrorMessage ( ));
 						}
 
@@ -4549,15 +4534,15 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 							cmd << " Commande en Erreur: " << commandInternal->getScriptCommand ( ) << "\n" << " Message : " << commandInternal->getErrorMessage ( );
 							const UTF8String	comments (commandInternal->getScriptComments ( ));
 							if (false == comments.empty ( ))
-								getContext ( ).getScriptingManager ( ).addComment(comments);
+								getController( ).getScriptingManager ( ).addComment(comments);
 
 							// [EB] on ajoute un "#" au début de chacune des lignes
 							UTF8String	cmd2 = addCharAtBeginLines('#', cmd);
-							getContext ( ).getScriptingManager ( ).addCommand (cmd2);
+							getController( ).getScriptingManager ( ).addCommand (cmd2);
 							_pythonPanel->addToHistoric(commandInternal->getScriptCommand(), commandInternal->getScriptComments(), commandInternal->getErrorMessage(), true, true);
 						}    // if (0 != _pythonPanel && commandInternal->isScriptable())
 
-						// On est en erreur => réactualiser les menus de l'IHM selon ce nouveau context.
+						// On est en erreur => réactualiser les menus de l'IHM selon ce nouveau Controller.
 						updateActions();
 					}
 			}    // if (0 != commandInternal)
@@ -4601,7 +4586,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 		void QtMgx3DMainWindow::lengthUnitModifiedEvent()
 		{
 			QAction *action = 0;
-			switch (getContext().getLengthUnit())
+			switch (getController().getLengthUnit())
 			{
 				case Unit::undefined    :
 					action = getActions()._undefinedUnitAction;
@@ -4618,12 +4603,12 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 				case Unit::meter    :
 					action = getActions()._meterAction;
 					break;
-			}    // switch (getContext ( ).getLengthUnit ( ))
+			}    // switch (getController ( ).getLengthUnit ( ))
 
 			if (0 == action)
 			{
 				UTF8String message(Charset::UTF_8);
-				message << "Unité non référencée : " << (unsigned long) getContext().getLengthUnit() << ".";
+				message << "Unité non référencée : " << (unsigned long) getController().getLengthUnit() << ".";
 				INTERNAL_ERROR(exc, message, "QtMgx3DMainWindow::lengthUnitModifiedEvent")
 				throw exc;
 			}    // if (0 == action)
@@ -4636,7 +4621,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 		{
 			QAction *action = 0;
 
-			switch (getContext().getLandmark())
+			switch (getController().getLandmark())
 			{
 				case Landmark::maillage    :
 					action = getActions()._meshLandmarkAction;
@@ -4647,12 +4632,12 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 				case Landmark::undefined    :
 					action = getActions()._undefinedLandmarkAction;
 					break;
-			}    // switch (getContext ( ).getLandmark ( ))
+			}    // switch (getController ( ).getLandmark ( ))
 
 			if (0 == action)
 			{
 				UTF8String message(Charset::UTF_8);
-				message << "Repère non référencé : " << (unsigned long) getContext().getLandmark() << ".";
+				message << "Repère non référencé : " << (unsigned long) getController().getLandmark() << ".";
 				INTERNAL_ERROR(exc, message, "QtMgx3DMainWindow::landmarkModifiedEvent")
 				throw exc;
 			}    // if (0 == action)
@@ -4682,13 +4667,13 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 
 		LogDispatcher &QtMgx3DMainWindow::getLogDispatcher()
 		{
-			return getContext().getLogDispatcher();
+			return getController().getLogDispatcher();
 		}    // QtMgx3DMainWindow::getLogDispatcher
 
 
 		const LogDispatcher &QtMgx3DMainWindow::getLogDispatcher() const
 		{
-			return getContext().getLogDispatcher();
+			return getController().getLogDispatcher();
 		}    // QtMgx3DMainWindow::getLogDispatcher
 
 
@@ -4968,7 +4953,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 
 					DISABLE_COMMAND_ACTIONS
 			DISABLE_GRAPHICAL_OPERATIONS
-			getContext().setLandmark(landmark);
+			getController().setLandmark(landmark);
 
 			COMPLETE_QT_TRY_CATCH_BLOCK(true, this, getAppTitle())
 
@@ -5003,7 +4988,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 
 					DISABLE_COMMAND_ACTIONS
 			DISABLE_GRAPHICAL_OPERATIONS
-			getContext().setLengthUnit(unit);
+			getController().setLengthUnit(unit);
 
 			COMPLETE_QT_TRY_CATCH_BLOCK(true, this, getAppTitle())
 
@@ -5026,7 +5011,7 @@ void QtMgx3DMainWindow::displayCommandError (const TkUtil::UTF8String& message)
 
 					DISABLE_COMMAND_ACTIONS
 			DISABLE_GRAPHICAL_OPERATIONS
-			getContext().setMesh2D();
+			getController().setMesh2D();
 
 			COMPLETE_QT_TRY_CATCH_BLOCK(true, this, getAppTitle())
 
@@ -5069,7 +5054,7 @@ vector<File> QtMgx3DMainWindow::selectFileNames (
 		{
 			try
 			{
-				const Charset::CHARSET cs = Charset::str2charset(Resources::instance()._scriptsCharset.getValue().ascii().c_str());
+				const Charset::CHARSET cs = Charset::str2charset(GUIResources::instance()._scriptsCharset.getValue().ascii().c_str());
 
 				return Charset::UNKNOWN == cs ? Charset::UTF_8 : Charset(cs);
 			}
@@ -5093,7 +5078,7 @@ void QtMgx3DMainWindow::savePythonConsole (bool withEnv)
 	static bool		saveWithEnv	= true;
 	static QString	lastDir (Process::getCurrentDirectory ( ).c_str ( ));
 	File			file (consoleFilePath.toStdString ( ));
-	static	Charset::CHARSET	charset	= Charset::str2charset (Resources::instance ( )._scriptsCharset.getValue ( ).ascii ( ).c_str ( ));
+	static	Charset::CHARSET	charset	= Charset::str2charset (GUIResources::instance ( )._scriptsCharset.getValue ( ).ascii ( ).c_str ( ));
 	QtMgx3DScriptFileDialog	dialog (this, "Magix 3D - Enregistrement console Python", false, false, true, charset, true);
 	if ((false == _pythonMinScript.empty ( )) && (true == file.exists ( )))
 		lastDir	= file.getPath ( ).getFullFileName ( ).c_str ( );
@@ -5224,26 +5209,26 @@ void QtMgx3DMainWindow::preferencesCallback()
 		_graphicalWidget->updateConfiguration();
 
 	// Vue 3D :
-	_actions._displayTrihedronAction->setChecked(Resources::instance()._displayTrihedron.getValue());
+	_actions._displayTrihedronAction->setChecked(GUIResources::instance()._displayTrihedron.getValue());
 //	_actions._displayLandmarkAction->setChecked (Resources::instance ( )._displayLandmark.getValue ( ));
-	_actions._displayFocalPointAction->setChecked(Resources::instance()._displayFocalPoint.getValue());
+	_actions._displayFocalPointAction->setChecked(GUIResources::instance()._displayFocalPoint.getValue());
 
 	// Logs :
 	Log::TYPE mask = QtMgx3DApplication::getLogsMask();
 	getLogDispatcher().setMask(mask);
-//	Context*	context	= dynamic_cast<Context*>(&getContext ( ));
-//	if (0 != context)
+//	Controller*	Controller	= dynamic_cast<Controller*>(&getController ( ));
+//	if (0 != Controller)
 //	{
-//		context->getStdLogStream ( ).setMask (QtMgx3DApplication::getLogsMask ( ));
-//		context->getErrLogStream ( ).setMask (QtMgx3DApplication::getLogsMask ( ));
+//		Controller->getStdLogStream ( ).setMask (QtMgx3DApplication::getLogsMask ( ));
+//		Controller->getErrLogStream ( ).setMask (QtMgx3DApplication::getLogsMask ( ));
 //	}
-			getLogDispatcher().enableDate(Resources::instance()._logDate, Resources::instance()._logTime);
-			getLogDispatcher().enableThreadID(Resources::instance()._logThreadID);
+			getLogDispatcher().enableDate(GUIResources::instance()._logDate, GUIResources::instance()._logTime);
+			getLogDispatcher().enableThreadID(GUIResources::instance()._logThreadID);
 			getLogView().setLogMask(mask);
 			if (0 != _statusView)
 				_statusView->setMask(mask);
-			if (getActions()._recentFilesCapacity != Resources::instance ( )._recentScriptCapacity.getValue ( ))
-				updateRecentScriptsURLFifoCapacity (Resources::instance ( )._recentScriptCapacity.getValue ( ));
+			if (getActions()._recentFilesCapacity != GUIResources::instance ( )._recentScriptCapacity.getValue ( ))
+				updateRecentScriptsURLFifoCapacity (GUIResources::instance ( )._recentScriptCapacity.getValue ( ));
 // Tester les logs :
 /*
 InformationLog  i ("Information");
@@ -5281,22 +5266,22 @@ log (t5);
 
 	if (update0D)
 	{
-		for (Topo::Vertex* v : getContext ( ).getTopoManager ( ).getVerticesObj ( ))
+		for (Topo::Vertex* v : getController( ).getTopoManager ( ).getVerticesObj ( ))
 			v->updateDisplayPropertiesColor ( );
 	}	// if (true == update0D)
 	if (update1D)
 	{
-		for (Topo::CoEdge* ce : getContext ( ).getTopoManager ( ).getCoEdgesObj ( ))
+		for (Topo::CoEdge* ce : getController( ).getTopoManager ( ).getCoEdgesObj ( ))
 			ce->updateDisplayPropertiesColor ( );
 	}	// if (true == update1D)
 	if (update2D)
 	{
-		for (Topo::CoFace* cf : getContext ( ).getTopoManager ( ).getCoFacesObj ( ))
+		for (Topo::CoFace* cf : getController( ).getTopoManager ( ).getCoFacesObj ( ))
 			cf->updateDisplayPropertiesColor ( );
 	}	// if (true == update2D)
 	if (update3D)
 	{
-		for (Topo::Block* b : getContext ( ).getTopoManager ( ).getBlocksObj ( ))
+		for (Topo::Block* b : getController( ).getTopoManager ( ).getBlocksObj ( ))
 			b->updateDisplayPropertiesColor ( );
 	}	// if (true == update3D)
 	if (updateAll || update0D || update1D || update2D || update3D)
@@ -5310,31 +5295,31 @@ log (t5);
 		{
 			BEGIN_QT_TRY_CATCH_BLOCK
 
-			const bool oldLoad = Resources::instance()._loadGuiState.getValue();
-			const bool oldSave = Resources::instance()._saveGuiState.getValue();
-			QSettings  settings(Resources::instance()._organisation.c_str(),
-			                    Resources::instance()._softwareName.c_str());
+			const bool oldLoad = GUIResources::instance()._loadGuiState.getValue();
+			const bool oldSave = GUIResources::instance()._saveGuiState.getValue();
+			QSettings  settings(GUIResources::instance()._organisation.c_str(),
+			                    GUIResources::instance()._softwareName.c_str());
 
 			QtGuiStateDialog dialog(
 					this, "Magix 3D - Sauvegarde/Restauration de l'tat de l'IHM",
-					&Resources::instance()._loadGuiState,
-					&Resources::instance()._saveGuiState,
+					&GUIResources::instance()._loadGuiState,
+					&GUIResources::instance()._saveGuiState,
 					settings.fileName().toStdString());
 			if (1 == dialog.exec())
 			{    // MAJ éventuelle des opérations automatiques effectuées en début et
 				// fin de session :
-				if ((oldLoad != Resources::instance()._loadGuiState.getValue()) ||
-				    (oldSave != Resources::instance()._saveGuiState.getValue()))
+				if ((oldLoad != GUIResources::instance()._loadGuiState.getValue()) ||
+				    (oldSave != GUIResources::instance()._saveGuiState.getValue()))
 				{
 					unique_ptr <Section> section(
 							QtMgx3DApplication::getPersistantConfiguration());
 					CHECK_NULL_PTR_ERROR(section.get())
 					QtMgx3DApplication::updateConfiguration(
-							*(section.get()), Resources::instance()._loadGuiState);
+							*(section.get()), GUIResources::instance()._loadGuiState);
 					QtMgx3DApplication::updateConfiguration(
-							*(section.get()), Resources::instance()._saveGuiState);
+							*(section.get()), GUIResources::instance()._saveGuiState);
 					QtMgx3DApplication::setPersistantConfiguration(*(section.get()));
-				}    // if ((oldLoad != Resources::instance ( )._loadGuiState.getValue (...
+				}    // if ((oldLoad != GUIResources::instance ( )._loadGuiState.getValue (...
 
 				// Tout est fait automatiquement par la boite de dialogue sauf
 				// une sauvegarde immédiate de l'état de l'IHM :
@@ -5350,11 +5335,11 @@ void QtMgx3DMainWindow::exitCallback()
 {
 
 #ifndef _DEBUG
-	if (true == Resources::instance ( )._confirmQuitAction.getValue ( ))
+	if (true == GUIResources::instance ( )._confirmQuitAction.getValue ( ))
 	{
 		if (0 != QtMessageBox::displayWarningMessage(this, getAppTitle ( ), "Souhaitez-vous réellement quitter cette application ?", 100, "Oui", "Non", 0, 0))
 			return;
-	}	// if (true == Resources::instance ( )._confirmQuitAction.getValue ( ))
+	}	// if (true == GUIResources::instance ( )._confirmQuitAction.getValue ( ))
 			QApplication::exit();
 
 #else	// #ifndef _DEBUG
@@ -5387,7 +5372,7 @@ void QtMgx3DMainWindow::exitCallback()
 
 					DISABLE_COMMAND_ACTIONS
 			DISABLE_GRAPHICAL_OPERATIONS
-			getContext().undo();
+			getController().undo();
 
 			COMPLETE_QT_TRY_CATCH_BLOCK(true, this, getAppTitle())
 
@@ -5410,7 +5395,7 @@ void QtMgx3DMainWindow::exitCallback()
 
 			DISABLE_COMMAND_ACTIONS
 			DISABLE_GRAPHICAL_OPERATIONS
-			getContext().redo();
+			getController().redo();
 
 			COMPLETE_QT_TRY_CATCH_BLOCK(true, this, getAppTitle())
 
@@ -5444,7 +5429,7 @@ void QtMgx3DMainWindow::exitCallback()
 
 			DISABLE_GRAPHICAL_OPERATIONS
 
-			getContext ( ).clearSession ( );
+			getController( ).clearSession ( );
 			getGroupsPanel ( ).sessionCleared ( );
 			getEntitiesPanel ( ).sessionCleared ( );
 
@@ -5598,13 +5583,13 @@ void QtMgx3DMainWindow::exitCallback()
 					if (false == mdlDialog.splitMgx3DCommands())    // Défaut
 					{
 						if (true == mdlDialog.importTopology())
-							getContext().getTopoManager().importMDL(fileName, importAll, useAreaNames, prefixName, degMin, degMax);
+							getController().getTopoManager().importMDL(fileName, importAll, useAreaNames, prefixName, degMin, degMax);
 						else
-							getContext().getGeomManager().importMDL(fileName, importAll, useAreaNames, prefixName, degMin, degMax);
+							getController().getGeomManager().importMDL(fileName, importAll, useAreaNames, prefixName, degMin, degMax);
 					}    // if (false == mdlDialog.splitMgx3DCommands ( ))
 					else
 					{
-						getContext().getGeomManager().mdl2CommandesMagix3D(fileName, mdlDialog.importTopology());
+						getController().getGeomManager().mdl2CommandesMagix3D(fileName, mdlDialog.importTopology());
 					}    // else if (false == mdlDialog.splitMgx3DCommands ( ))
 				}    // Magix 2D
 				else
@@ -5613,7 +5598,7 @@ void QtMgx3DMainWindow::exitCallback()
 					{
 						log(InformationLog(msg));
 						QtAutoWaitingCursor cursor(true);
-						getContext().getGeomManager().importCATIA(fileName, true);
+						getController().getGeomManager().importCATIA(fileName, true);
 					}    // Catia
 					else
 						if ((true == compareExtensions(file.getExtension(), "stp")) ||
@@ -5621,20 +5606,20 @@ void QtMgx3DMainWindow::exitCallback()
 						{
 							log(InformationLog(msg));
 							QtAutoWaitingCursor cursor(true);
-							getContext().getGeomManager().importSTEP(fileName, true);
+							getController().getGeomManager().importSTEP(fileName, true);
 						}    // STEP
 						else
 							if ((true == compareExtensions(file.getExtension(), "igs")) ||
 							    (true == compareExtensions(file.getExtension(), "iges")))
 							{
 								QtAutoWaitingCursor cursor(true);
-								getContext().getGeomManager().importIGES(fileName);
+								getController().getGeomManager().importIGES(fileName);
 							}    // IGES
 							else
 								if (true == compareExtensions(file.getExtension(), "brep"))
 								{
 									QtAutoWaitingCursor cursor(true);
-									getContext().getGeomManager().importBREP(fileName, true);
+									getController().getGeomManager().importBREP(fileName, true);
 								}    // BREP
 								else
 									if (Lima::SUFFIXE != Lima::_Reader::detectFormat(file.getFileName()))
@@ -5647,7 +5632,7 @@ void QtMgx3DMainWindow::exitCallback()
 										msg << " Avec comme préfixe pour les noms de groupes : " << pre;
 										QtAutoWaitingCursor cursor(true);
 										log(InformationLog(msg));
-										getContext().getMeshManager().readMli(fileName, pre);
+										getController().getMeshManager().readMli(fileName, pre);
 									}    // Lima
                                     else
                                     if (true == compareExtensions(file.getExtension(), "mgxt"))
@@ -5663,7 +5648,7 @@ void QtMgx3DMainWindow::exitCallback()
                                         QtAutoWaitingCursor cursor(true);
                                         const bool          geomAssoc    = blocksDialog.geometricAssociation();
 
-                                        getContext().getTopoManager().importBlocks(fileName, geomAssoc);
+                                        getController().getTopoManager().importBlocks(fileName, geomAssoc);
                                     }    // BREP
 									else
 									{
@@ -5833,32 +5818,32 @@ void QtMgx3DMainWindow::exportAllCallback ( )
 
 	if (true == compareExtensions (file.getExtension ( ), "mdl"))
 	{
-		vector<string>	geomEntities	= getContext ( ).getGeomManager ( ).getSurfaces ( );
+		vector<string>	geomEntities	= getController ( ).getGeomManager ( ).getSurfaces ( );
 		log (InformationLog (msg));
-		getContext ( ).getGeomManager ( ).exportMDL (geomEntities, fileName);
+		getController ( ).getGeomManager ( ).exportMDL (geomEntities, fileName);
 	}	// Magix 2D
 	else if (true == compareExtensions (file.getExtension ( ), "brep"))
 	{
 		log (InformationLog (msg));
-		getContext ( ).getGeomManager ( ).exportBREP (fileName);
+		getController ( ).getGeomManager ( ).exportBREP (fileName);
 	}	// BREP
 	else if ((true == compareExtensions (file.getExtension ( ), "stp")) ||
 	         (true == compareExtensions (file.getExtension ( ), "step")))
 	{
 		log (InformationLog (msg));
-		getContext ( ).getGeomManager ( ).exportSTEP (fileName);
+		getController ( ).getGeomManager ( ).exportSTEP (fileName);
 	}	// STEP
 	else if ((true == compareExtensions (file.getExtension ( ), "igs")) ||
             (true == compareExtensions (file.getExtension ( ), "iges")))
 	{
 		log (InformationLog (msg));
-		getContext ( ).getGeomManager ( ).exportIGES (fileName);
+		getController ( ).getGeomManager ( ).exportIGES (fileName);
 	}	// IGES
 	else if (true == isLimaWExtension (file.getExtension ( )))
 	{
-		SelectionManager&	selectionManager	= getContext ( ).getSelectionManager ( );
+		SelectionManager&	selectionManager	= getController ( ).getSelectionManager ( );
 		log (InformationLog (msg));
-		getContext ( ).getMeshManager ( ).writeMli (fileName);
+		getController ( ).getMeshManager ( ).writeMli (fileName);
 	}	// Lima++
 	else if (true == compareExtensions (file.getExtension ( ), "cgns"))
 	{
@@ -5874,12 +5859,12 @@ void QtMgx3DMainWindow::exportAllCallback ( )
 		const int          dim    = cgnsDialog.getDim();
 		log (InformationLog (msg));
 		cursor.show();
-		getContext ( ).getMeshManager ( ).exportBlocksForCGNS (dim,fileName);
+		getController ( ).getMeshManager ( ).exportBlocksForCGNS (dim,fileName);
 	}	// cgns
     else if (true == compareExtensions (file.getExtension ( ), "mgxt"))
     {
         SelectionManager&	selectionManager	=
-                getContext ( ).getSelectionManager ( );
+                getController ( ).getSelectionManager ( );
 
         QtBlocksOptionsDialog blocksDialog(this, getAppTitle(), fileName);
         if (QDialog::Rejected == blocksDialog.exec())
@@ -5893,7 +5878,7 @@ void QtMgx3DMainWindow::exportAllCallback ( )
         const bool          geomAssoc    = blocksDialog.geometricAssociation();
 
         log (InformationLog (msg));
-        getContext ( ).getTopoManager ( ).exportBlocks(fileName, geomAssoc);
+        getController ( ).getTopoManager ( ).exportBlocks(fileName, geomAssoc);
     }	// blk
 	else
 	{
@@ -6006,7 +5991,7 @@ void QtMgx3DMainWindow::exportSelectionCallback ( )
 	DISABLE_GRAPHICAL_OPERATIONS
 
 	QtAutoWaitingCursor	cursor (true);
-	SelectionManager&	selectionManager	= getContext ( ).getSelectionManager ( );
+	SelectionManager&	selectionManager	= getController ( ).getSelectionManager ( );
 	vector<string>			selection;
 
 	UTF8String	msg (Charset::UTF_8);
@@ -6015,34 +6000,34 @@ void QtMgx3DMainWindow::exportSelectionCallback ( )
 
 	if (true == compareExtensions (file.getExtension ( ), "mdl"))
 	{
-		selection	= getContext ( ).getSelectionManager ( ).getEntitiesNames (
+		selection	= getController ( ).getSelectionManager ( ).getEntitiesNames (
 				(FilterEntity::objectType)
 				(FilterEntity::GeomSurface|FilterEntity::GeomCurve));
 		log (InformationLog (msg));
-		getContext ( ).getGeomManager ( ).exportMDL (selection, fileName);
+		getController ( ).getGeomManager ( ).exportMDL (selection, fileName);
 	}	// Magix 2D
 	else if (true == compareExtensions (file.getExtension ( ), "brep"))
 	{
-		selection	= getContext ( ).getSelectionManager ( ).getEntitiesNames (
+		selection	= getController ( ).getSelectionManager ( ).getEntitiesNames (
 													FilterEntity::AllGeom);
 		log (InformationLog (msg));
-		getContext ( ).getGeomManager ( ).exportBREP (selection, fileName);
+		getController ( ).getGeomManager ( ).exportBREP (selection, fileName);
 	}	// BREP
 	else if ((true == compareExtensions (file.getExtension ( ), "stp")) ||
 	         (true == compareExtensions (file.getExtension ( ), "step")))
 	{
-		selection	= getContext ( ).getSelectionManager ( ).getEntitiesNames (
+		selection	= getController ( ).getSelectionManager ( ).getEntitiesNames (
 													FilterEntity::AllGeom);
 		log (InformationLog (msg));
-		getContext ( ).getGeomManager ( ).exportSTEP (selection, fileName);
+		getController ( ).getGeomManager ( ).exportSTEP (selection, fileName);
 	}	// STEP
 	else if ((true == compareExtensions (file.getExtension ( ), "igs")) ||
 	        (true == compareExtensions (file.getExtension ( ), "iges")))
 	{
-		selection	= getContext ( ).getSelectionManager ( ).getEntitiesNames (
+		selection	= getController ( ).getSelectionManager ( ).getEntitiesNames (
 													FilterEntity::AllGeom);
 		log (InformationLog (msg));
-		getContext ( ).getGeomManager ( ).exportIGES (selection, fileName);
+		getController ( ).getGeomManager ( ).exportIGES (selection, fileName);
 	}	// IGES
 	else
 	{
@@ -6077,7 +6062,7 @@ void QtMgx3DMainWindow::saveMagix3DScriptCallback ( )
 
 	QtAutoWaitingCursor	cursor (true);
 
-	getContext ( ).savePythonScript (_pythonMinScript.c_str ( ), _encodageScripts, _pytMinScriptCharset);
+	getController ( ).savePythonScript (_pythonMinScript.c_str ( ), _encodageScripts, _pytMinScriptCharset);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 
@@ -6090,7 +6075,7 @@ void QtMgx3DMainWindow::saveMagix3DScriptCallback ( )
 	else {
 		// titre de la fenêtre principale
 		UTF8String	titre (Charset::UTF_8);
-		titre << Resources::instance ( )._softwareName<<" ("<<MAGIX3D_VERSION/*GSCC_PROJECT_VERSION*/<< ") " << _pythonMinScript;
+		titre << GUIResources::instance ( )._softwareName<<" ("<<MAGIX3D_VERSION/*GSCC_PROJECT_VERSION*/<< ") " << _pythonMinScript;
 		setWindowTitle(UTF8TOQSTRING (titre));
 	}
 }	// QtMgx3DMainWindow::saveMagix3DScriptCallback
@@ -6100,7 +6085,7 @@ void QtMgx3DMainWindow::saveAsMagix3DScriptCallback ( )
 {
 	static QString	lastDir (Process::getCurrentDirectory ( ).c_str ( ));
 	File			file (_pythonMinScript);
-	Charset::CHARSET	charset	= Charset::str2charset (Resources::instance ( )._scriptsCharset.getValue ( ).ascii ( ).c_str ( ));
+	Charset::CHARSET	charset	= Charset::str2charset (GUIResources::instance ( )._scriptsCharset.getValue ( ).ascii ( ).c_str ( ));
 	QtMgx3DScriptFileDialog	dialog (this, "Magix 3D - Enregistrement commandes Python", false, true, false, charset, true);
 	if ((false == _pythonMinScript.empty ( )) && (true == file.exists ( )))
 		lastDir	= file.getPath ( ).getFullFileName ( ).c_str ( );
@@ -6192,10 +6177,10 @@ void QtMgx3DMainWindow::saveAsMagix3DScriptCallback ( )
 
 	QtAutoWaitingCursor	cursor (true);
 
-	getContext ( ).savePythonScript (fileName.c_str ( ), (Context::encodageScripts) dialog.getEncodageScript(), dialog.getCharset ( ));
+	getController ( ).savePythonScript (fileName.c_str ( ), (Controller::encodageScripts) dialog.getEncodageScript(), dialog.getCharset ( ));
 
 	_pythonMinScript	= fileName;
-	_encodageScripts	= (Context::encodageScripts)dialog.getEncodageScript ( );
+	_encodageScripts	= (Controller::encodageScripts)dialog.getEncodageScript ( );
 	_pytMinScriptCharset	= dialog.getCharset ( );
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
@@ -6208,7 +6193,7 @@ void QtMgx3DMainWindow::saveAsMagix3DScriptCallback ( )
 	else {
 		// titre de la fenêtre principale
 		UTF8String	titre (Charset::UTF_8);
-		titre << Resources::instance ( )._softwareName<<" ("<<MAGIX3D_VERSION/*GSCC_PROJECT_VERSION*/<< ") " << file.getFileName();
+		titre << GUIResources::instance ( )._softwareName<<" ("<<MAGIX3D_VERSION/*GSCC_PROJECT_VERSION*/<< ") " << file.getFileName();
 		setWindowTitle(UTF8TOQSTRING (titre));
 	}
 }	// QtMgx3DMainWindow::saveAsMagix3DScriptCallback
@@ -6430,7 +6415,7 @@ void QtMgx3DMainWindow::displayTrihedronCallback (bool display)
 	}
 		
 	getGraphicalWidget ( ).getRenderingManager ( ).setDisplayTrihedron(display);
-	Resources::instance ( )._displayTrihedron.setValue (display);
+	GUIResources::instance ( )._displayTrihedron.setValue (display);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::displayTrihedronCallback
@@ -6447,7 +6432,7 @@ void QtMgx3DMainWindow::displayViewCubeCallback (bool display)
 	{
 		_actions._displayTrihedronAction->setChecked (false);
 		getGraphicalWidget ( ).getRenderingManager ( ).setDisplayTrihedron (false);
-		Resources::instance ( )._displayTrihedron.setValue (false);
+		GUIResources::instance ( )._displayTrihedron.setValue (false);
 	}	// if (true == display)
 	getGraphicalWidget ( ).getRenderingManager ( ).setDisplayViewCube (display);
 
@@ -6498,7 +6483,7 @@ void QtMgx3DMainWindow::displayFocalPointCrossCallback (bool display)
     BEGIN_QT_TRY_CATCH_BLOCK
 
 	getGraphicalWidget ( ).getRenderingManager ().setDisplayFocalPoint (display);
-	Resources::instance ( )._displayFocalPoint.setValue (display);
+	GUIResources::instance ( )._displayFocalPoint.setValue (display);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::displayFocalPointCrossCallback
@@ -6563,7 +6548,7 @@ void QtMgx3DMainWindow::clearViewCallback ( )
 
     BEGIN_QT_TRY_CATCH_BLOCK
 
-	const vector<Entity*> entities = getContext().getAllVisibleEntities();
+	const vector<Entity*> entities = getController().getAllVisibleEntities();
     getGraphicalWidget ( ).getRenderingManager ( ).removeEntities (entities, DisplayRepresentation::DISPLAY_GEOM);
     //getGraphicalWidget ( ).getRenderingManager ( ).displayRepresentations(entities, false, 0, DisplayRepresentation::DISPLAY_GEOM);
 
@@ -6828,8 +6813,8 @@ void QtMgx3DMainWindow::meshSelectionCallback ( )
 	DISABLE_GRAPHICAL_OPERATIONS
 
 	// on récupère les noms des entités sélectionnées
-	vector<string>	blocs = getContext ( ).getSelectionManager ( ).getEntitiesNames (Entity::TopoBlock);
-    vector<string>	faces = getContext ( ).getSelectionManager ( ).getEntitiesNames (Entity::TopoCoFace);
+	vector<string>	blocs = getController ( ).getSelectionManager ( ).getEntitiesNames (Entity::TopoBlock);
+    vector<string>	faces = getController ( ).getSelectionManager ( ).getEntitiesNames (Entity::TopoCoFace);
 	const size_t	count	= blocs.size ( ) + faces.size ( );
 
 	// Si absence de sélection adéquate on maille tout :
@@ -6932,16 +6917,16 @@ void QtMgx3DMainWindow::meshAllCallback ( )
 	DISABLE_GRAPHICAL_OPERATIONS
 
 	// On maille tous les blocs s'il y en a :
-	if (0 != getContext ( ).getTopoManager ( ).getNbBlocks ( ))
+	if (0 != getController ( ).getTopoManager ( ).getNbBlocks ( ))
 	{
 		message << "Création du maillage pour tous les blocs du maillage. ";
-		getContext ( ).getMeshManager ( ).newAllBlocksMesh ( );
-	}	// if (0 != getContext ( ).getTopoManager ( ).getNbBlocks ( ))
-	else if (0 != getContext ( ).getTopoManager ( ).getNbFaces ( ))
+		getController ( ).getMeshManager ( ).newAllBlocksMesh ( );
+	}	// if (0 != getController ( ).getTopoManager ( ).getNbBlocks ( ))
+	else if (0 != getController ( ).getTopoManager ( ).getNbFaces ( ))
 	{	// => On maille les faces
 		message << "Création du maillage pour toutes les faces du maillage. ";
-		getContext ( ).getMeshManager ( ).newAllFacesMesh ( );
-	}	// else if (0 != getContext ( ).getTopoManager ( ).getNbFaces ( ))
+		getController ( ).getMeshManager ( ).newAllFacesMesh ( );
+	}	// else if (0 != getController ( ).getTopoManager ( ).getNbFaces ( ))
 	else
 	{
 		throw Exception (UTF8String ("Il n'y a pas de topologie à mailler (ni face, ni bloc). ", Charset::UTF_8));
@@ -6961,7 +6946,7 @@ void QtMgx3DMainWindow::unrefineMeshRepresentationCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	bool		ok		= false;
-	const int	current	= getContext ( ).getRatioDegrad ( );
+	const int	current	= getController ( ).getRatioDegrad ( );
 
 	int factor	= QInputDialog::getInt ( this, "Déraffinement de la représentation du maillage.", "Facteur :", current, 1, 1000000, 1, &ok);
 
@@ -6973,7 +6958,7 @@ void QtMgx3DMainWindow::unrefineMeshRepresentationCallback ( )
 
 	QtAutoWaitingCursor cursor (true);
 
-	getContext ( ).setRatioDegrad (factor);
+	getController ( ).setRatioDegrad (factor);
 
 	// Réafficher les entités maillages avec le nouveau facteur de déraffinement
 	const vector<Entity*>	entities	= getGraphicalWidget ( ).getRenderingManager ( ).getDisplayedEntities ( );
@@ -7008,7 +6993,7 @@ void QtMgx3DMainWindow::addMeshExplorerCallback ( )
     BEGIN_QT_TRY_CATCH_BLOCK
 
     // récupération de l'éventuelle arête sélectionnée :
-    vector<string>	selectedEdges	= getContext ( ).getSelectionManager (
+    vector<string>	selectedEdges	= getController ( ).getSelectionManager (
 												).getEntitiesNames (Entity::TopoCoEdge);
 	const string	selectedEdge (
 					0 == selectedEdges.size ( ) ? string ( ) : selectedEdges [0]);
@@ -7189,7 +7174,7 @@ void QtMgx3DMainWindow::undoSelectionCallback ( )
 		
 	BEGIN_QT_TRY_CATCH_BLOCK
 
-	getContext ( ).getSelectionManager ( ).undo ( );
+	getController ( ).getSelectionManager ( ).undo ( );
 	
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 	
@@ -7207,7 +7192,7 @@ void QtMgx3DMainWindow::redoSelectionCallback ( )
 		
 	BEGIN_QT_TRY_CATCH_BLOCK
 
-	getContext ( ).getSelectionManager ( ).redo ( );
+	getController ( ).getSelectionManager ( ).redo ( );
 	
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 	
@@ -7223,7 +7208,7 @@ void QtMgx3DMainWindow::showRepresentationTypesCallback ( )
 
 	disableActions (true);
 
-	const vector<Entity*>	entities	= getContext ( ).getSelectionManager ( ).getEntities ( );
+	const vector<Entity*>	entities	= getController ( ).getSelectionManager ( ).getEntities ( );
 	vector<Entity*>			displayedEntities;
 	for (vector<Entity*>::const_iterator it = entities.begin ( ); entities.end ( ) != it; it++)
 		if (true == (*it)->getDisplayProperties ( ).isDisplayed ( ))
@@ -7258,12 +7243,12 @@ void QtMgx3DMainWindow::selectEntitiesCallback ( )
 		return;
 
 	if (true == dialog.replaceSelection ( ))
-		getContext ( ).getSelectionManager ( ).clearSelection ( );
+		getController ( ).getSelectionManager ( ).clearSelection ( );
 
 	vector<string>	entities	= dialog.getUniqueNames ( );
 	try
 	{
-		getContext ( ).addToSelection (entities);
+		getController ( ).addToSelection (entities);
 	}
 	catch (...)
 	{
@@ -7294,7 +7279,7 @@ void QtMgx3DMainWindow::selectVisibleEntitiesCallback ( )
 
 	vector<Entity*>	entities	= _graphicalWidget->getRenderingManager ( ).getDisplayedEntities ( );
 	if (0 != entities.size ( ))
-		getContext ( ).getSelectionManager ( ).addToSelection (entities);
+		getController ( ).getSelectionManager ( ).addToSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::selectVisibleEntitiesCallback
@@ -7308,7 +7293,7 @@ void QtMgx3DMainWindow::unselectVisibleEntitiesCallback ( )
 
 	vector<Entity*>	entities	= _graphicalWidget->getRenderingManager ( ).getDisplayedEntities ( );
 	if (0 != entities.size ( ))
-		getContext ( ).getSelectionManager ( ).removeFromSelection (entities);
+		getController ( ).getSelectionManager ( ).removeFromSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::unselectVisibleEntitiesCallback
@@ -7318,7 +7303,7 @@ void QtMgx3DMainWindow::selectFusableEdgesCallback ( )
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
 
-	const vector < vector<string> >	names	= getContext ( ).getTopoManager ( ).getFusableEdges ( );
+	const vector < vector<string> >	names	= getController ( ).getTopoManager ( ).getFusableEdges ( );
 	vector<Entity*>			entities;
 	for (vector < vector<string> >::const_iterator itg = names.begin ( );
 	     names.end ( ) != itg; itg++)
@@ -7327,14 +7312,14 @@ void QtMgx3DMainWindow::selectFusableEdgesCallback ( )
 		     (*itg).end ( ) != it; it++)
 		{
 			Topo::CoEdge*	coedge	=
-				getContext ( ).getTopoManager ( ).getCoEdge (*it, false);
+				getController ( ).getTopoManager ( ).getCoEdge (*it, false);
 			if (0 != coedge)
 				entities.push_back (coedge);
 		}	// for (vector<string>::const_iterator it = names.begin ( );
 	}	// for (vector < vector<string> >::const_iterator ...
 
 	if (0 != entities.size ( ))
-		getContext ( ).getSelectionManager ( ).addToSelection (entities);
+		getController ( ).getSelectionManager ( ).addToSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::selectFusableEdgesCallback
@@ -7345,7 +7330,7 @@ void QtMgx3DMainWindow::unselectFusableEdgesCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	const vector < vector<string> >	names	=
-					getContext ( ).getTopoManager ( ).getFusableEdges ( );
+					getController ( ).getTopoManager ( ).getFusableEdges ( );
 	vector<Entity*>			entities;
 	for (vector < vector<string> >::const_iterator itg = names.begin ( );
 	     names.end ( ) != itg; itg++)
@@ -7354,14 +7339,14 @@ void QtMgx3DMainWindow::unselectFusableEdgesCallback ( )
 		     (*itg).end ( ) != it; it++)
 		{
 			Topo::CoEdge*	coedge	=
-				getContext ( ).getTopoManager ( ).getCoEdge (*it, false);
+				getController ( ).getTopoManager ( ).getCoEdge (*it, false);
 			if (0 != coedge)
 				entities.push_back (coedge);
 		}	// for (vector<string>::const_iterator it = names.begin ( );
 	}	// for (vector < vector<string> >::const_iterator ...
 
 	if (0 != entities.size ( ))
-		getContext ( ).getSelectionManager ( ).removeFromSelection (entities);
+		getController ( ).getSelectionManager ( ).removeFromSelection (entities);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::unselectFusableEdgesCallback
@@ -7372,19 +7357,19 @@ void QtMgx3DMainWindow::selectInvalidEdgesCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	const vector<string>	names	=
-					getContext ( ).getTopoManager ( ).getInvalidEdges();
+					getController ( ).getTopoManager ( ).getInvalidEdges();
 	vector<Entity*>			edges;
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
 		Topo::CoEdge*	edge	=
-				getContext ( ).getTopoManager ( ).getCoEdge (*it, false);
+				getController ( ).getTopoManager ( ).getCoEdge (*it, false);
 		if (0 != edge)
 			edges.push_back (edge);
 	}	// for (vector<string>::const_iterator it = names.begin ( );
 
 	if (0 != edges.size ( ))
-		getContext ( ).getSelectionManager ( ).addToSelection (edges);
+		getController ( ).getSelectionManager ( ).addToSelection (edges);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 } // QtMgx3DMainWindow::selectInvalidEdgesCallback
@@ -7395,19 +7380,19 @@ void QtMgx3DMainWindow::unselectInvalidEdgesCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	const vector<string>	names	=
-					getContext ( ).getTopoManager ( ).getInvalidEdges();
+					getController ( ).getTopoManager ( ).getInvalidEdges();
 	vector<Entity*>			edges;
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
 		Topo::CoEdge*	edge	=
-				getContext ( ).getTopoManager ( ).getCoEdge (*it, false);
+				getController ( ).getTopoManager ( ).getCoEdge (*it, false);
 		if (0 != edge)
 			edges.push_back (edge);
 	}	// for (vector<string>::const_iterator it = names.begin ( );
 
 	if (0 != edges.size ( ))
-		getContext ( ).getSelectionManager ( ).removeFromSelection (edges);
+		getController ( ).getSelectionManager ( ).removeFromSelection (edges);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 } // QtMgx3DMainWindow::unselectInvalidEdgesCallback
@@ -7418,19 +7403,19 @@ void QtMgx3DMainWindow::selectBorderFacesCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	const vector<string>	names	=
-					getContext ( ).getTopoManager ( ).getBorderFaces ( );
+					getController ( ).getTopoManager ( ).getBorderFaces ( );
 	vector<Entity*>			faces;
 	for (vector<string>::const_iterator it = names.begin ( ); 
 	     names.end ( ) != it; it++)
 	{
 		Topo::CoFace*	face	=
-				getContext ( ).getTopoManager ( ).getCoFace (*it, false);
+				getController ( ).getTopoManager ( ).getCoFace (*it, false);
 		if (0 != face)
 			faces.push_back (face);
 	}	// for (vector<string>::const_iterator it = names.begin ( );
 
 	if (0 != faces.size ( ))
-		getContext ( ).getSelectionManager ( ).addToSelection (faces);
+		getController ( ).getSelectionManager ( ).addToSelection (faces);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::selectBorderFacesCallback
@@ -7441,19 +7426,19 @@ void QtMgx3DMainWindow::unselectBorderFacesCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	const vector<string>	names	=
-					getContext ( ).getTopoManager ( ).getBorderFaces ( );
+					getController ( ).getTopoManager ( ).getBorderFaces ( );
 	vector<Entity*>			faces;
 	for (vector<string>::const_iterator it = names.begin ( ); 
 	     names.end ( ) != it; it++)
 	{
 		Topo::CoFace*	face	=
-				getContext ( ).getTopoManager ( ).getCoFace (*it, false);
+				getController ( ).getTopoManager ( ).getCoFace (*it, false);
 		if (0 != face)
 			faces.push_back (face);
 	}	// for (vector<string>::const_iterator it = names.begin ( );
 
 	if (0 != faces.size ( ))
-		getContext ( ).getSelectionManager ( ).removeFromSelection (faces);
+		getController ( ).getSelectionManager ( ).removeFromSelection (faces);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::unselectBorderFacesCallback
@@ -7464,19 +7449,19 @@ void QtMgx3DMainWindow::selectFacesWithoutBlockCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	const vector<string>	names	=
-					getContext ( ).getTopoManager ( ).getFacesWithoutBlock ( );
+					getController ( ).getTopoManager ( ).getFacesWithoutBlock ( );
 	vector<Entity*>			faces;
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
 		Topo::CoFace*	face	=
-				getContext ( ).getTopoManager ( ).getCoFace (*it, false);
+				getController ( ).getTopoManager ( ).getCoFace (*it, false);
 		if (0 != face)
 			faces.push_back (face);
 	}	// for (vector<string>::const_iterator it = names.begin ( );
 
 	if (0 != faces.size ( ))
-		getContext ( ).getSelectionManager ( ).addToSelection (faces);
+		getController ( ).getSelectionManager ( ).addToSelection (faces);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::selectFacesWithoutBlockCallback
@@ -7487,19 +7472,19 @@ void QtMgx3DMainWindow::unselectFacesWithoutBlockCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	const vector<string>	names	=
-					getContext ( ).getTopoManager ( ).getFacesWithoutBlock ( );
+					getController ( ).getTopoManager ( ).getFacesWithoutBlock ( );
 	vector<Entity*>			faces;
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
 		Topo::CoFace*	face	=
-				getContext ( ).getTopoManager ( ).getCoFace (*it, false);
+				getController ( ).getTopoManager ( ).getCoFace (*it, false);
 		if (0 != face)
 			faces.push_back (face);
 	}	// for (vector<string>::const_iterator it = names.begin ( );
 
 	if (0 != faces.size ( ))
-		getContext ( ).getSelectionManager ( ).removeFromSelection (faces);
+		getController ( ).getSelectionManager ( ).removeFromSelection (faces);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::unselectFacesWithoutBlockCallback
@@ -7510,19 +7495,19 @@ void QtMgx3DMainWindow::selectSemiConformFacesCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	const vector<string>	names	=
-					getContext ( ).getTopoManager ( ).getSemiConformalFaces ( );
+					getController ( ).getTopoManager ( ).getSemiConformalFaces ( );
 	vector<Entity*>			faces;
 	for (vector<string>::const_iterator it = names.begin ( ); 
 	     names.end ( ) != it; it++)
 	{
 		Topo::CoFace*	face	=
-				getContext ( ).getTopoManager ( ).getCoFace (*it, false);
+				getController ( ).getTopoManager ( ).getCoFace (*it, false);
 		if (0 != face)
 			faces.push_back (face);
 	}	// for (vector<string>::const_iterator it = names.begin ( );
 
 	if (0 != faces.size ( ))
-		getContext ( ).getSelectionManager ( ).addToSelection (faces);
+		getController ( ).getSelectionManager ( ).addToSelection (faces);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::selectSemiConformFacesCallback
@@ -7533,19 +7518,19 @@ void QtMgx3DMainWindow::unselectSemiConformFacesCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	const vector<string>	names	=
-					getContext ( ).getTopoManager ( ).getSemiConformalFaces ( );
+					getController ( ).getTopoManager ( ).getSemiConformalFaces ( );
 	vector<Entity*>			faces;
 	for (vector<string>::const_iterator it = names.begin ( ); 
 	     names.end ( ) != it; it++)
 	{
 		Topo::CoFace*	face	=
-				getContext ( ).getTopoManager ( ).getCoFace (*it, false);
+				getController ( ).getTopoManager ( ).getCoFace (*it, false);
 		if (0 != face)
 			faces.push_back (face);
 	}	// for (vector<string>::const_iterator it = names.begin ( );
 
 	if (0 != faces.size ( ))
-		getContext ( ).getSelectionManager ( ).removeFromSelection (faces);
+		getController ( ).getSelectionManager ( ).removeFromSelection (faces);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::unselectSemiConformFacesCallback
@@ -7556,19 +7541,19 @@ void QtMgx3DMainWindow::selectInvalidFacesCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	const vector<string>	names	=
-					getContext ( ).getTopoManager ( ).getInvalidFaces();
+					getController ( ).getTopoManager ( ).getInvalidFaces();
 	vector<Entity*>			faces;
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
 		Topo::CoFace*	face	=
-				getContext ( ).getTopoManager ( ).getCoFace (*it, false);
+				getController ( ).getTopoManager ( ).getCoFace (*it, false);
 		if (0 != face)
 			faces.push_back (face);
 	}	// for (vector<string>::const_iterator it = names.begin ( );
 
 	if (0 != faces.size ( ))
-		getContext ( ).getSelectionManager ( ).addToSelection (faces);
+		getController ( ).getSelectionManager ( ).addToSelection (faces);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::selectInvalidFacesCallback
@@ -7579,19 +7564,19 @@ void QtMgx3DMainWindow::unselectInvalidFacesCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	const vector<string>	names	=
-					getContext ( ).getTopoManager ( ).getInvalidFaces();
+					getController ( ).getTopoManager ( ).getInvalidFaces();
 	vector<Entity*>			faces;
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
 		Topo::CoFace*	face	=
-				getContext ( ).getTopoManager ( ).getCoFace (*it, false);
+				getController ( ).getTopoManager ( ).getCoFace (*it, false);
 		if (0 != face)
 			faces.push_back (face);
 	}	// for (vector<string>::const_iterator it = names.begin ( );
 
 	if (0 != faces.size ( ))
-		getContext ( ).getSelectionManager ( ).removeFromSelection (faces);
+		getController ( ).getSelectionManager ( ).removeFromSelection (faces);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::unselectInvalidFacesCallback
@@ -7602,19 +7587,19 @@ void QtMgx3DMainWindow::selectUnstructuredFacesCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	const vector<string>	names	=
-					getContext ( ).getTopoManager ( ).getUnstructuredFaces();
+					getController ( ).getTopoManager ( ).getUnstructuredFaces();
 	vector<Entity*>			faces;
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
 		Topo::CoFace*	face	=
-				getContext ( ).getTopoManager ( ).getCoFace (*it, false);
+				getController ( ).getTopoManager ( ).getCoFace (*it, false);
 		if (0 != face)
 			faces.push_back (face);
 	}	// for (vector<string>::const_iterator it = names.begin ( );
 
 	if (0 != faces.size ( ))
-		getContext ( ).getSelectionManager ( ).addToSelection (faces);
+		getController ( ).getSelectionManager ( ).addToSelection (faces);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::selectUnstructuredFacesCallback
@@ -7624,19 +7609,19 @@ void QtMgx3DMainWindow::unselectUnstructuredFacesCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	const vector<string>	names	=
-					getContext ( ).getTopoManager ( ).getUnstructuredFaces();
+					getController ( ).getTopoManager ( ).getUnstructuredFaces();
 	vector<Entity*>			faces;
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
 		Topo::CoFace*	face	=
-				getContext ( ).getTopoManager ( ).getCoFace (*it, false);
+				getController ( ).getTopoManager ( ).getCoFace (*it, false);
 		if (0 != face)
 			faces.push_back (face);
 	}	// for (vector<string>::const_iterator it = names.begin ( );
 
 	if (0 != faces.size ( ))
-		getContext ( ).getSelectionManager ( ).removeFromSelection (faces);
+		getController ( ).getSelectionManager ( ).removeFromSelection (faces);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::unselectUnstructuredFacesCallback
@@ -7646,19 +7631,19 @@ void QtMgx3DMainWindow::selectTransfiniteFacesCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	const vector<string>	names	=
-					getContext ( ).getTopoManager ( ).getTransfiniteMeshLawFaces();
+					getController ( ).getTopoManager ( ).getTransfiniteMeshLawFaces();
 	vector<Entity*>			faces;
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
 		Topo::CoFace*	face	=
-				getContext ( ).getTopoManager ( ).getCoFace (*it, false);
+				getController ( ).getTopoManager ( ).getCoFace (*it, false);
 		if (0 != face)
 			faces.push_back (face);
 	}	// for (vector<string>::const_iterator it = names.begin ( );
 
 	if (0 != faces.size ( ))
-		getContext ( ).getSelectionManager ( ).addToSelection (faces);
+		getController ( ).getSelectionManager ( ).addToSelection (faces);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::selectTransfiniteFacesCallback
@@ -7668,19 +7653,19 @@ void QtMgx3DMainWindow::unselectTransfiniteFacesCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	const vector<string>	names	=
-					getContext ( ).getTopoManager ( ).getTransfiniteMeshLawFaces();
+					getController ( ).getTopoManager ( ).getTransfiniteMeshLawFaces();
 	vector<Entity*>			faces;
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
 		Topo::CoFace*	face	=
-				getContext ( ).getTopoManager ( ).getCoFace (*it, false);
+				getController ( ).getTopoManager ( ).getCoFace (*it, false);
 		if (0 != face)
 			faces.push_back (face);
 	}	// for (vector<string>::const_iterator it = names.begin ( );
 
 	if (0 != faces.size ( ))
-		getContext ( ).getSelectionManager ( ).removeFromSelection (faces);
+		getController ( ).getSelectionManager ( ).removeFromSelection (faces);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::unselectTransfiniteFacesCallback
@@ -7690,19 +7675,19 @@ void QtMgx3DMainWindow::selectInvalidBlocksCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	const vector<string>	names	=
-					getContext ( ).getTopoManager ( ).getInvalidBlocks();
+					getController ( ).getTopoManager ( ).getInvalidBlocks();
 	vector<Entity*>			blocks;
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
 		Topo::Block*	block	=
-				getContext ( ).getTopoManager ( ).getBlock (*it, false);
+				getController ( ).getTopoManager ( ).getBlock (*it, false);
 		if (0 != block)
 			blocks.push_back (block);
 	}	// for (vector<string>::const_iterator it = names.begin ( );
 
 	if (0 != blocks.size ( ))
-		getContext ( ).getSelectionManager ( ).addToSelection (blocks);
+		getController ( ).getSelectionManager ( ).addToSelection (blocks);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::selectInvalidBlocksCallback
@@ -7713,19 +7698,19 @@ void QtMgx3DMainWindow::unselectInvalidBlocksCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	const vector<string>	names	=
-					getContext ( ).getTopoManager ( ).getInvalidBlocks();
+					getController ( ).getTopoManager ( ).getInvalidBlocks();
 	vector<Entity*>			blocks;
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
 		Topo::Block*	block	=
-				getContext ( ).getTopoManager ( ).getBlock (*it, false);
+				getController ( ).getTopoManager ( ).getBlock (*it, false);
 		if (0 != block)
 			blocks.push_back (block);
 	}	// for (vector<string>::const_iterator it = names.begin ( );
 
 	if (0 != blocks.size ( ))
-		getContext ( ).getSelectionManager ( ).removeFromSelection (blocks);
+		getController ( ).getSelectionManager ( ).removeFromSelection (blocks);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::unselectInvalidBlocksCallback
@@ -7735,19 +7720,19 @@ void QtMgx3DMainWindow::selectUnstructuredBlocksCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	const vector<string>	names	=
-					getContext ( ).getTopoManager ( ).getUnstructuredBlocks();
+					getController ( ).getTopoManager ( ).getUnstructuredBlocks();
 	vector<Entity*>			blocks;
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
 		Topo::Block*	block	=
-				getContext ( ).getTopoManager ( ).getBlock (*it, false);
+				getController ( ).getTopoManager ( ).getBlock (*it, false);
 		if (0 != block)
 			blocks.push_back (block);
 	}	// for (vector<string>::const_iterator it = names.begin ( );
 
 	if (0 != blocks.size ( ))
-		getContext ( ).getSelectionManager ( ).addToSelection (blocks);
+		getController ( ).getSelectionManager ( ).addToSelection (blocks);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::selectUnstructuredBlocksCallback
@@ -7757,19 +7742,19 @@ void QtMgx3DMainWindow::unselectUnstructuredBlocksCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	const vector<string>	names	=
-					getContext ( ).getTopoManager ( ).getUnstructuredBlocks();
+					getController ( ).getTopoManager ( ).getUnstructuredBlocks();
 	vector<Entity*>			blocks;
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
 		Topo::Block*	block	=
-				getContext ( ).getTopoManager ( ).getBlock (*it, false);
+				getController ( ).getTopoManager ( ).getBlock (*it, false);
 		if (0 != block)
 			blocks.push_back (block);
 	}	// for (vector<string>::const_iterator it = names.begin ( );
 
 	if (0 != blocks.size ( ))
-		getContext ( ).getSelectionManager ( ).removeFromSelection (blocks);
+		getController ( ).getSelectionManager ( ).removeFromSelection (blocks);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::unselectUnstructuredBlocksCallback
@@ -7779,19 +7764,19 @@ void QtMgx3DMainWindow::selectTransfiniteBlocksCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	const vector<string>	names	=
-					getContext ( ).getTopoManager ( ).getTransfiniteMeshLawBlocks();
+					getController ( ).getTopoManager ( ).getTransfiniteMeshLawBlocks();
 	vector<Entity*>			blocks;
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
 		Topo::Block*	block	=
-				getContext ( ).getTopoManager ( ).getBlock (*it, false);
+				getController ( ).getTopoManager ( ).getBlock (*it, false);
 		if (0 != block)
 			blocks.push_back (block);
 	}	// for (vector<string>::const_iterator it = names.begin ( );
 
 	if (0 != blocks.size ( ))
-		getContext ( ).getSelectionManager ( ).addToSelection (blocks);
+		getController ( ).getSelectionManager ( ).addToSelection (blocks);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::selectTransfiniteBlocksCallback
@@ -7801,19 +7786,19 @@ void QtMgx3DMainWindow::unselectTransfiniteBlocksCallback ( )
 	BEGIN_QT_TRY_CATCH_BLOCK
 
 	const vector<string>	names	=
-					getContext ( ).getTopoManager ( ).getTransfiniteMeshLawBlocks();
+					getController ( ).getTopoManager ( ).getTransfiniteMeshLawBlocks();
 	vector<Entity*>			blocks;
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
 		Topo::Block*	block	=
-				getContext ( ).getTopoManager ( ).getBlock (*it, false);
+				getController ( ).getTopoManager ( ).getBlock (*it, false);
 		if (0 != block)
 			blocks.push_back (block);
 	}	// for (vector<string>::const_iterator it = names.begin ( );
 
 	if (0 != blocks.size ( ))
-		getContext ( ).getSelectionManager ( ).removeFromSelection (blocks);
+		getController ( ).getSelectionManager ( ).removeFromSelection (blocks);
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::unselectTransfiniteBlocksCallback
@@ -7822,7 +7807,7 @@ void QtMgx3DMainWindow::selectNodesCallback (bool enabled)
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
 
-	getContext ( ).getSelectionManager ( ).activateSelection (
+	getController ( ).getSelectionManager ( ).activateSelection (
 		true==enabled ? SelectionManager::D0 : SelectionManager::NO_DIM);
 	CHECK_NULL_PTR_ERROR (getActions ( )._selectEdgesAction)
 	CHECK_NULL_PTR_ERROR (getActions ( )._selectSurfacesAction)
@@ -7831,11 +7816,11 @@ void QtMgx3DMainWindow::selectNodesCallback (bool enabled)
 	QtActionAutoLock	surfacesLock (getActions ( )._selectSurfacesAction);
 	QtActionAutoLock	volumesLock (getActions ( )._selectVolumesAction);
 	getActions ( )._selectEdgesAction->setChecked (
-			getContext ( ).getSelectionManager ( ).is1DSelectionActivated ( ));
+			getController ( ).getSelectionManager ( ).is1DSelectionActivated ( ));
 	getActions ( )._selectSurfacesAction->setChecked (
-			getContext ( ).getSelectionManager ( ).is2DSelectionActivated ( ));
+			getController ( ).getSelectionManager ( ).is2DSelectionActivated ( ));
 	getActions ( )._selectVolumesAction->setChecked (
-			getContext ( ).getSelectionManager ( ).is3DSelectionActivated ( ));
+			getController ( ).getSelectionManager ( ).is3DSelectionActivated ( ));
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::selectNodesCallback
@@ -7845,7 +7830,7 @@ void QtMgx3DMainWindow::selectEdgesCallback (bool enabled)
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
 
-	getContext ( ).getSelectionManager ( ).activateSelection (
+	getController ( ).getSelectionManager ( ).activateSelection (
 		true==enabled ? SelectionManager::D1 : SelectionManager::NO_DIM);
 	CHECK_NULL_PTR_ERROR ( getActions ( )._selectNodesAction)
 	CHECK_NULL_PTR_ERROR ( getActions ( )._selectSurfacesAction)
@@ -7854,11 +7839,11 @@ void QtMgx3DMainWindow::selectEdgesCallback (bool enabled)
 	QtActionAutoLock	surfacesLock (getActions ( )._selectSurfacesAction);
 	QtActionAutoLock	volumesLock (getActions ( )._selectVolumesAction);
 	getActions ( )._selectNodesAction->setChecked (
-			getContext ( ).getSelectionManager ( ).is0DSelectionActivated ( ));
+			getController ( ).getSelectionManager ( ).is0DSelectionActivated ( ));
 	getActions ( )._selectSurfacesAction->setChecked (
-			getContext ( ).getSelectionManager ( ).is2DSelectionActivated ( ));
+			getController ( ).getSelectionManager ( ).is2DSelectionActivated ( ));
 	getActions ( )._selectVolumesAction->setChecked (
-			getContext ( ).getSelectionManager ( ).is3DSelectionActivated ( ));
+			getController ( ).getSelectionManager ( ).is3DSelectionActivated ( ));
 
 	 COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::selectEdgesCallback
@@ -7868,7 +7853,7 @@ void QtMgx3DMainWindow::selectSurfacesCallback (bool enabled)
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
 
-	getContext ( ).getSelectionManager ( ).activateSelection (
+	getController ( ).getSelectionManager ( ).activateSelection (
 		true==enabled ? SelectionManager::D2 : SelectionManager::NO_DIM);
 	CHECK_NULL_PTR_ERROR ( getActions ( )._selectNodesAction)
 	CHECK_NULL_PTR_ERROR ( getActions ( )._selectEdgesAction)
@@ -7877,11 +7862,11 @@ void QtMgx3DMainWindow::selectSurfacesCallback (bool enabled)
 	QtActionAutoLock	edgesLock (getActions ( )._selectEdgesAction);
 	QtActionAutoLock	volumesLock (getActions ( )._selectVolumesAction);
 	getActions ( )._selectNodesAction->setChecked (
-			getContext ( ).getSelectionManager ( ).is0DSelectionActivated ( ));
+			getController ( ).getSelectionManager ( ).is0DSelectionActivated ( ));
 	getActions ( )._selectEdgesAction->setChecked (
-			getContext ( ).getSelectionManager ( ).is1DSelectionActivated ( ));
+			getController ( ).getSelectionManager ( ).is1DSelectionActivated ( ));
 	getActions ( )._selectVolumesAction->setChecked (
-			getContext ( ).getSelectionManager ( ).is3DSelectionActivated ( ));
+			getController ( ).getSelectionManager ( ).is3DSelectionActivated ( ));
 
 	 COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::selectSurfacesCallback
@@ -7891,7 +7876,7 @@ void QtMgx3DMainWindow::selectVolumesCallback (bool enabled)
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
 
-	getContext ( ).getSelectionManager ( ).activateSelection (
+	getController ( ).getSelectionManager ( ).activateSelection (
 		true==enabled ? SelectionManager::D3 : SelectionManager::NO_DIM);
 	CHECK_NULL_PTR_ERROR ( getActions ( )._selectNodesAction)
 	CHECK_NULL_PTR_ERROR ( getActions ( )._selectEdgesAction)
@@ -7900,11 +7885,11 @@ void QtMgx3DMainWindow::selectVolumesCallback (bool enabled)
 	QtActionAutoLock	edgesLock (getActions ( )._selectEdgesAction);
 	QtActionAutoLock	surfacesLock (getActions ( )._selectSurfacesAction);
 	getActions ( )._selectNodesAction->setChecked (
-			getContext ( ).getSelectionManager ( ).is0DSelectionActivated ( ));
+			getController ( ).getSelectionManager ( ).is0DSelectionActivated ( ));
 	getActions ( )._selectEdgesAction->setChecked (
-			getContext ( ).getSelectionManager ( ).is1DSelectionActivated ( ));
+			getController ( ).getSelectionManager ( ).is1DSelectionActivated ( ));
 	getActions ( )._selectSurfacesAction->setChecked (
-			getContext ( ).getSelectionManager ( ).is2DSelectionActivated ( ));
+			getController ( ).getSelectionManager ( ).is2DSelectionActivated ( ));
 
 	 COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::selectVolumesCallback
@@ -8003,12 +7988,12 @@ void QtMgx3DMainWindow::saveAsRaysCallback ( )
 }	// QtMgx3DMainWindow::saveAsRaysCallback
 
 
-void QtMgx3DMainWindow::setRaysContextCallback ( )
+void QtMgx3DMainWindow::setRaysControllerCallback ( )
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
-	throw Exception (UTF8String ("QtMgx3DMainWindow::setRaysContextCallback : méthode à surcharger.", Charset::UTF_8));
+	throw Exception (UTF8String ("QtMgx3DMainWindow::setRaysControllerCallback : méthode à surcharger.", Charset::UTF_8));
 	 COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
-}	// QtMgx3DMainWindow::setRaysContextCallback
+}	// QtMgx3DMainWindow::setRaysControllerCallback
 
 
 void QtMgx3DMainWindow::setRaysTargetSurfacesCallback ( )
@@ -8087,12 +8072,12 @@ void QtMgx3DMainWindow::usersGuideCallback ( )
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtMgx3DMainWindow::usersGuideCallback
 
-void QtMgx3DMainWindow::usersGuideContextCallback ( )
+void QtMgx3DMainWindow::usersGuideControllerCallback ( )
 {
 	BEGIN_QT_TRY_CATCH_BLOCK
 	QtMgx3DApplication::HelpSystem::instance ( ).showUrl(QtMgx3DApplication::HelpSystem::instance ( ).indexURL);
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
-}	// QtMgx3DMainWindow::usersGuideContextCallback
+}	// QtMgx3DMainWindow::usersGuideControllerCallback
 
 
 void QtMgx3DMainWindow::wikiCallback ( )

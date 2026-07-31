@@ -3,9 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        25/06/2014
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -28,9 +25,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -274,7 +269,7 @@ vector<Entity*> QtGeomEntityCopyOperationPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		GeomEntity*	entity	= getContext ( ).getGeomManager ( ).getEntity (*it);
+		Entity*	entity	= getController( ).getEntity (*it);
 		CHECK_NULL_PTR_ERROR (entity)
 		entities.push_back (entity);
 	}
@@ -348,8 +343,6 @@ QtGeomEntityCopyOperationPanel*
 
 void QtGeomEntityCopyOperationAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de copie des entités géométriques :
@@ -359,7 +352,7 @@ void QtGeomEntityCopyOperationAction::executeOperation ( )
 	vector<string>		entities	= panel->getGeomEntitiesNames ( );
 	const bool			withTopo	= panel->withTopology ( );
 
-	cmdResult	= getContext ( ).getGeomManager ( ).copy (entities, withTopo, groupName);
+	getController( ).copy (entities, withTopo, groupName);
 
 	setCommandResult (cmdResult);
 }	// QtGeomEntityCopyOperationAction::executeOperation

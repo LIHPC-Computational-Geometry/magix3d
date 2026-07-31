@@ -6,9 +6,6 @@
 #ifndef QT_MESH_QUALITY_DIVIDER_OPERATION_ACTION_H
 #define QT_MESH_QUALITY_DIVIDER_OPERATION_ACTION_H
 
-
-#include "Internal/Context.h"
-
 #include "QtComponents/QtMgx3DMeshOperationAction.h"
 #include "QtComponents/QtMgx3DQualityDividerWidget.h"
 

@@ -3,19 +3,8 @@
  * \author      Charles PIGNEROL
  * \date        09/09/2013
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManager.h"
-#include "Geom/Surface.h"
-#include "Geom/Curve.h"
-#include "Geom/Vertex.h"
-#include "Geom/CommandNewVertexByCurveParameterization.h"
-#include "Geom/CommandNewVertexByProjection.h"
-#include "Geom/CommandNewVertex.h"
-#include "Geom/GeomDisplayRepresentation.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtVertexOperationAction.h"
 #include "QtComponents/QtMgx3DApplication.h"
@@ -30,15 +19,14 @@
 
 #include <values.h>	// DBL_MAX
 
+#include "QtComponents/GUIResources.h"
+
 
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Group;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -60,11 +48,11 @@ QtVertexOperationPanel::QtVertexCurveProjectionPanel::QtVertexCurveProjectionPan
 {
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
 	// Le point projeté :
@@ -204,11 +192,11 @@ vector<Entity*>
 	vector<Entity*>	entities;
 
 	const string	vertexName	= getVertexUniqueName ( );
-	GeomEntity*		entity		= getContext ( ).getGeomManager ( ).getVertex (vertexName, false);
+	Entity*		entity		= getController ( ).getGeomManager ( ).getVertex (vertexName, false);
 	if (0 != entity)
 		entities.push_back (entity);
 	const string	curveName	= getCurveUniqueName ( );
-	entity		= getContext ( ).getGeomManager ( ).getCurve (curveName, false);
+	entity		= getController ( ).getGeomManager ( ).getCurve (curveName, false);
 	if (0 != entity)
 		entities.push_back (entity);
 
@@ -242,11 +230,11 @@ QtVertexOperationPanel::QtVertexSurfaceProjectionPanel::QtVertexSurfaceProjectio
 {
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	layout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
 	// Le point projeté :
@@ -398,12 +386,12 @@ vector<Entity*> QtVertexOperationPanel::QtVertexSurfaceProjectionPanel::getInvol
 	vector<Entity*>	entities;
 
 	const string	vertexName	= getVertexUniqueName ( );
-	GeomEntity*		entity		=
-			 getContext ( ).getGeomManager ( ).getVertex (vertexName, false);
+	Entity*		entity		=
+			 getController ( ).getGeomManager ( ).getVertex (vertexName, false);
 	if (0 != entity)
 		entities.push_back (entity);
 	const string	surfaceName	= getSurfaceUniqueName ( );
-	entity		= getContext ( ).getGeomManager ( ).getCurve (surfaceName, false);
+	entity		= getController ( ).getGeomManager ( ).getCurve (surfaceName, false);
 	if (0 != entity)
 		entities.push_back (entity);
 
@@ -437,11 +425,11 @@ QtVertexOperationPanel::QtVerticesRatioPanel::QtVerticesRatioPanel (
 {
     QVBoxLayout*	layout	= new QVBoxLayout (this);
     layout->setContentsMargins  (
-            Resources::instance ( )._margin.getValue ( ),
-            Resources::instance ( )._margin.getValue ( ),
-            Resources::instance ( )._margin.getValue ( ),
-            Resources::instance ( )._margin.getValue ( ));
-    layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+            GUIResources::instance ( )._margin.getValue ( ),
+            GUIResources::instance ( )._margin.getValue ( ),
+            GUIResources::instance ( )._margin.getValue ( ),
+            GUIResources::instance ( )._margin.getValue ( ));
+    layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
     setLayout (layout);
 
     // Le premier point :
@@ -588,12 +576,12 @@ vector<Entity*> QtVertexOperationPanel::QtVerticesRatioPanel::getInvolvedEntitie
     vector<Entity*>	entities;
 
     const string	vertexName	= getFirstVertexUniqueName ( );
-    GeomEntity*		entity		=
-            getContext ( ).getGeomManager ( ).getVertex (vertexName, false);
+    Entity*		entity		=
+            getController ( ).getGeomManager ( ).getVertex (vertexName, false);
     if (0 != entity)
         entities.push_back (entity);
     const string	curveName	= getSecondVertexUniqueName ( );
-    entity		= getContext ( ).getGeomManager ( ).getCurve (curveName, false);
+    entity		= getController ( ).getGeomManager ( ).getCurve (curveName, false);
     if (0 != entity)
         entities.push_back (entity);
 
@@ -631,9 +619,9 @@ QtVertexOperationPanel::QtVertexFromTopologicVertexPanel::QtVertexFromTopologicV
 	  _topologicVertexPanel (0), _associationCheckBox (0)
 {
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
-	layout->setContentsMargins  (Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ),
-								 Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+	layout->setContentsMargins  (GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ),
+								 GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
 	// Le point projeté :
@@ -756,7 +744,7 @@ vector<Entity*> QtVertexOperationPanel::QtVertexFromTopologicVertexPanel::getInv
 	vector<Entity*>	entities;
 
 	const string		vertexName	= getVertexUniqueName ( );
-	Topo::TopoEntity*	entity		= getContext ( ).getTopoManager ( ).getVertex (vertexName, false);
+	Entity*	entity		= getController ( ).getTopoManager ( ).getVertex (vertexName, false);
 	if (0 != entity)
 		entities.push_back (entity);
 
@@ -790,9 +778,9 @@ QtVertexOperationPanel::QtVertexOperationPanel (
 //	SET_WIDGET_BACKGROUND (this, Qt::yellow)
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	layout->setContentsMargins  (
-			Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), 
-			Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+			GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ),
+			GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
 	// Nom opération :
@@ -827,9 +815,9 @@ QtVertexOperationPanel::QtVertexOperationPanel (
 	QtGroupBox*		groupBox	= new QtGroupBox (this, "Paramètres du point");
 	QVBoxLayout*	vlayout	= new QVBoxLayout (groupBox);
 	vlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
-	vlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ));
+	vlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	groupBox->setLayout (vlayout);
 	layout->addWidget (groupBox);
 	// Le panneau "méthode" : plusieurs panneaux possibles.
@@ -845,10 +833,10 @@ QtVertexOperationPanel::QtVertexOperationPanel (
 		(FilterEntity::objectType)(FilterEntity::GeomVertex|FilterEntity::TopoVertex),
 		true);
 	connect (_pointPanel, SIGNAL (pointModified ( )), this, SLOT (parametersModifiedCallback ( )));
-	_pointPanel->layout ( )->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+	_pointPanel->layout ( )->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	_pointPanel->layout ( )->setContentsMargins (
-						Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ));
 	_pointPanel->hide ( );
 	_vertexCurveProjectionPanel	= new QtVertexCurveProjectionPanel (0, "Projection d'un vertex sur une courbe", mainWindow);
 	_vertexCurveProjectionPanel->hide ( );
@@ -1248,26 +1236,26 @@ vector<Entity*> QtVertexOperationPanel::getInvolvedEntities ( )
 
 	if (0 != pointName.length ( ))
 	{
-		Entity*	entity	= getContext ( ).getGeomManager ( ).getVertex (pointName, false);
+		Entity*	entity	= getController ( ).getGeomManager ( ).getVertex (pointName, false);
 		if (0 != entity)
 			entities.push_back (entity);
 	}	// if (0 != pointName.length ( ))
 	if (0 != curveName.length ( ))
 	{
-		Entity*	entity	= getContext ( ).getGeomManager ( ).getCurve (curveName, false);
+		Entity*	entity	= getController ( ).getGeomManager ( ).getCurve (curveName, false);
 		if (0 != entity)
 			entities.push_back (entity);
 	}	// if (0 != curveName.length ( ))
 
 	if (0 != surfaceName.length ( ))
 	{
-		Entity*	entity	= getContext ( ).getGeomManager ( ).getSurface (surfaceName, false);
+		Entity*	entity	= getController ( ).getGeomManager ( ).getSurface (surfaceName, false);
 		if (0 != entity)
 			entities.push_back (entity);
 	}	// if (0 != surfaceName.length ( ))
 	if (0 != topoVertexName.length ( ))
 	{
-		Entity*	entity	= getContext ( ).getTopoManager ( ).getVertex (topoVertexName, false);
+		Entity*	entity	= getController ( ).getTopoManager ( ).getVertex (topoVertexName, false);
 		if (0 != entity)
 			entities.push_back (entity);
 	}	// if (0 != topoVertexName.length ( ))
@@ -1360,6 +1348,10 @@ void QtVertexOperationPanel::operationMethodCallback ( )
 
 void QtVertexOperationPanel::preview (bool show, bool destroyInteractor)
 {
+
+	std::cout<<"Print disabled for the moment: refactoring in progress"<<std::endl;
+
+	/*
 	// Lors de la construction getGraphicalWidget peut être nul ...
 	try
 	{
@@ -1381,8 +1373,8 @@ void QtVertexOperationPanel::preview (bool show, bool destroyInteractor)
 
 		DisplayProperties	graphicalProps;
 		graphicalProps.setCloudColor (Color (
-				255 * Resources::instance ( )._previewColor.getRed ( ), 255 * Resources::instance ( )._previewColor.getGreen ( ), 255 * Resources::instance ( )._previewColor.getBlue ( )));
-		graphicalProps.setPointSize (Resources::instance ( )._previewPointSize.getValue ( ));
+				255 * GUIResources::instance ( )._previewColor.getRed ( ), 255 * GUIResources::instance ( )._previewColor.getGreen ( ), 255 * GUIResources::instance ( )._previewColor.getBlue ( )));
+		graphicalProps.setPointSize (GUIResources::instance ( )._previewPointSize.getValue ( ));
 
 		switch (getOperationMethod ( )) {
 		case QtVertexOperationPanel::COORDINATES	:
@@ -1490,6 +1482,7 @@ void QtVertexOperationPanel::preview (bool show, bool destroyInteractor)
 	catch (...)
 	{
 	}
+	*/
 }	// QtVertexOperationPanel::preview
 
 
@@ -1535,8 +1528,6 @@ QtVertexOperationPanel* QtVertexOperationAction::getVertexPanel ( )
 
 void QtVertexOperationAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	CommandResult*	cmdResult	= 0;
 //	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de création du vertex :
@@ -1548,28 +1539,28 @@ void QtVertexOperationAction::executeOperation ( )
 		case QtVertexOperationPanel::COORDINATES	:
 		{
 			const Point	p (panel->getPoint ( ));
-			cmdResult	= getContext ( ).getGeomManager ( ).newVertex (p, name);
+			getController ( ).getGeomManager ( ).newVertex (p, name);
 		}
 		break;
 		case QtVertexOperationPanel::VERTEX_PROJECTED_ON_CURVE	:
 		{
 			const string	vertex	= panel->getProjectedVertexName ( );
 			const string	curve	= panel->getCurveName ( );
-			cmdResult	= getContext ( ).getGeomManager ( ).newVertex (vertex, curve, name);
+			getController ( ).getGeomManager ( ).newVertex (vertex, curve, name);
 		}
 		break;
 		case QtVertexOperationPanel::VERTEX_PROJECTED_ON_SURFACE	:
 		{
 			const string	vertex	= panel->getProjectedVertexName ( );
 			const string	surface	= panel->getSurfaceName ( );
-			cmdResult	= getContext ( ).getGeomManager ( ).newVertex (vertex, surface, name);
+			getController ( ).getGeomManager ( ).newVertex (vertex, surface, name);
 		}
 		break;
 		case QtVertexOperationPanel::CURVILINEAR_ABSCISSA	:
 		{
 			const string	curve	= panel->getCurveName ( );
 			const double	t		= panel->getCurvilinearAbscissa ( );
-			cmdResult	= getContext ( ).getGeomManager ( ).newVertex (curve, t, name);
+			getController ( ).getGeomManager ( ).newVertex (curve, t, name);
 		}
 		break;
 	    case QtVertexOperationPanel::RATE_WITH_2_POINTS  :
@@ -1577,14 +1568,14 @@ void QtVertexOperationAction::executeOperation ( )
 			const string	firstPoint	= panel->getFirstPointName ( );
 			const string	secondPoint	= panel->getSecondPointName ( );
 			const double	t		= panel->getCurvilinearAbscissa ( );
-			cmdResult	= getContext ( ).getGeomManager ( ).newVertex (firstPoint, secondPoint, t, name);
+			getController ( ).getGeomManager ( ).newVertex (firstPoint, secondPoint, t, name);
 		}
 		break;
 	    case QtVertexOperationPanel::VERTEX_FROM_TOPOLOGIC_VERTEX  :
 	    {
 			const string	vertexName	= panel->getTopologicVertexName ( );
 			const bool		asso		= panel->associatesVerticies ( );
-			cmdResult	= getContext ( ).getGeomManager ( ).newVertexFromTopo (vertexName, asso, name);
+			getController ( ).getGeomManager ( ).newVertexFromTopo (vertexName, asso, name);
 		}
 		break;
 		default	:

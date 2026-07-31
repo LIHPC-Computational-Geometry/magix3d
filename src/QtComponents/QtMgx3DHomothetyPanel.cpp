@@ -3,9 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        05/05/2017
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -26,7 +23,6 @@ using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -186,10 +182,10 @@ vector<Entity*> QtMgx3DHomogeneousHomothetyPanel::getInvolvedEntities ( )
 }	// QtMgx3DHomogeneousHomothetyPanel::getInvolvedEntities
 
 
-const Context& QtMgx3DHomogeneousHomothetyPanel::getContext ( ) const
+const Controller& QtMgx3DHomogeneousHomothetyPanel::getController ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
-	return _mainWindow->getContext ( );
+	return _mainWindow->getController ( );
 }	// QtMgx3DHomogeneousHomothetyPanel::getContext
 
 
@@ -392,10 +388,10 @@ vector<Entity*> QtMgx3DHeterogeneousHomothetyPanel::getInvolvedEntities ( )
 }	// QtMgx3DHeterogeneousHomothetyPanel::getInvolvedEntities
 
 
-const Context& QtMgx3DHeterogeneousHomothetyPanel::getContext ( ) const
+const Controller& QtMgx3DHeterogeneousHomothetyPanel::getController ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
-	return _mainWindow->getContext ( );
+	return _mainWindow->getController ( );
 }	// QtMgx3DHeterogeneousHomothetyPanel::getContext
 
 

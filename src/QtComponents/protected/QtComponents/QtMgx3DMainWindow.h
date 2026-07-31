@@ -17,13 +17,6 @@ namespace QtComponents
 }	// namespace QtComponents
 
 }	// namespace Mgx3D
-
-#include "Internal/Context.h"
-#include "Geom/GeomManager.h"
-#include "Topo/TopoManager.h"
-#include "Mesh/MeshManager.h"
-#include "Utils/CommandManager.h"
-#include "Internal/M3DCommandManager.h"
 #include "Utils/UndoRedoManager.h"
 #include "QtComponents/EntitySeizureManager.h"
 #include "QtComponents/Qt3DGraphicalWidget.h"
@@ -128,7 +121,7 @@ class QtMgx3DMainWindow :
 	 * \param	Eventuel widget"arbre" contenant les entités de la session.
 	 * \see		createGui
 	 */
-	virtual void init (const std::string& name, Mgx3D::Internal::Context* context,
+	virtual void init (const std::string& name, Mgx3D::Controller* Controller,
 				QtComponents::QtGroupsPanel* groupsPanel = 0, QtComponents::QtEntitiesPanel* entitiesPanel = 0);
 
 	/**
@@ -554,13 +547,13 @@ class QtMgx3DMainWindow :
 	 *			qui se chargera de ce fait de sa destruction.
 	 * \see			registerToManagers
 	 */
-	virtual void setContext (Mgx3D::Internal::Context* context);
+	virtual void setController (Mgx3D::Controller* controller);
 
 	/**
 	 * \return		Le contexte de la session de travail.
 	 */
-	virtual Mgx3D::Internal::Context& getContext ( );
-	virtual const Mgx3D::Internal::Context& getContext ( ) const;
+	virtual Mgx3D::Controller& getController ( );
+	virtual const Mgx3D::Controller& getController ( ) const;
 
 	/**
 	 * \return		La console python.
@@ -1526,7 +1519,7 @@ class QtMgx3DMainWindow :
 	bool							_maxSizeSet;
 
 	/** Le contexte de la session de travail. */
-	Mgx3D::Internal::Context*				_context;
+	Mgx3D::Controller*				_controller;
 
 	/** Le panneau de gestion des groupes d'entités. */
 	QtGroupsPanel*						_groupsPanel;

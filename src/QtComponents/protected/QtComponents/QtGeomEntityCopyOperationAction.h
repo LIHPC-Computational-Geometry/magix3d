@@ -12,8 +12,6 @@
 #include "QtComponents/QtEntityByDimensionSelectorPanel.h"
 #include "QtComponents/QtMgx3DGroupNamePanel.h"
 
-#include "Internal/SelectionManager.h"
-
 #include <QCheckBox>
 
 

@@ -4,11 +4,7 @@
  * \date        23/05/2014
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
-#include "Geom/Vertex.h"
-#include "Topo/Vertex.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/Qt2VerticiesPanel.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -27,7 +23,6 @@ using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -216,7 +211,7 @@ vector<Entity*> Qt2VerticiesPanel::getInvolvedEntities ( )
 	{
 		try
 		{
-			Entity&	vertex	= getContext().nameToEntity (name1);
+			Entity&	vertex	= getController().nameToEntity (name1);
 			entities.push_back (&vertex);
 		}
 		catch (...)
@@ -227,7 +222,7 @@ vector<Entity*> Qt2VerticiesPanel::getInvolvedEntities ( )
 	{
 		try
 		{
-			Entity&	vertex	= getContext().nameToEntity (name2);
+			Entity&	vertex	= getController().nameToEntity (name2);
 			entities.push_back (&vertex);
 		}
 		catch (...)
@@ -267,23 +262,18 @@ void Qt2VerticiesPanel::pointsRemovedFromSelectionCallback (QString point)
 
 Utils::Math::Point Qt2VerticiesPanel::getPoint (const string& name) const
 {
-	Entity&			entity	= getContext().nameToEntity (name);
-	Geom::Vertex*	gvertex	= dynamic_cast<Geom::Vertex*>(&entity);
-	Topo::Vertex*	tvertex	= dynamic_cast<Topo::Vertex*>(&entity);
+	Point point	= getController().getPoint (name);
 
-    if (0 != gvertex)
-		return gvertex->getCoord ( );
-	else if (0 != tvertex)
-		return tvertex->getCoord ( );
+	return point;
 
 	throw Exception (UTF8String ("Absence de point de ce nom.", Charset::UTF_8));
 }   // getPoint
 
 
-const Context& Qt2VerticiesPanel::getContext ( ) const
+const Controller& Qt2VerticiesPanel::getController ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
-	return _mainWindow->getContext ( );
+	return _mainWindow->getController ( );
 }	// Qt2VerticiesPanel::getContext
 
 

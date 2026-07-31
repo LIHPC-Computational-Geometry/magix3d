@@ -3,17 +3,11 @@
  * \author      Charles PIGNEROL
  * \date        17/03/2014
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
-#include "Topo/CommandSplitFaces.h"
-#include "Topo/TopoDisplayRepresentation.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtNumericFieldsFactory.h"
 #include "QtComponents/QtTopologySplitFacesAction.h"
-#include "Geom/GeomEntity.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>
@@ -25,10 +19,6 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
-using namespace Mgx3D::Geom;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
 
 
@@ -301,8 +291,8 @@ vector<string> QtTopologySplitFacesPanel::getFacesNames ( ) const
 	CHECK_NULL_PTR_ERROR (_facesPanel)
 	if (true == allFaces ( ))
 	{
-		for (CoFace* cf : getContext ( ).getTopoManager ( ).getCoFacesObj ( ))
-			names.push_back (cf->getUniqueName ( ));
+		for (std::string cf_name : getController ( ).getTopoManager ( ).getCoFaces ( ))
+			names.push_back (cf_name);
 	}
 	else
 		names	= _facesPanel->getUniqueNames ( );
@@ -333,7 +323,7 @@ Math::Point QtTopologySplitFacesPanel::getCutPoint ( ) const
 	if (0 == name.length ( ))
 		return Math::Point ( );
 
-	Entity*			entity	= &getContext().nameToEntity (name);
+	Entity*			entity	= &getController().nameToEntity (name);
 	GeomEntity*		ge		= dynamic_cast<GeomEntity*>(entity);
 	Topo::Vertex*	v		= dynamic_cast<Topo::Vertex*>(entity);
 
@@ -368,6 +358,10 @@ bool QtTopologySplitFacesPanel::projectCreatedVertices ( ) const
 
 void QtTopologySplitFacesPanel::preview (bool show, bool destroyInteractor)
 {
+
+	std::cout<<"Print disabled for the moment: refactoring in progress"<<std::endl;
+
+	/*
 	// Lors de la construction getGraphicalWidget peut être nul ...
 	try
 	{
@@ -462,6 +456,7 @@ void QtTopologySplitFacesPanel::preview (bool show, bool destroyInteractor)
 	catch (...)
 	{
 	}
+	*/
 }	// QtTopologySplitFacesPanel::preview
 
 
@@ -484,14 +479,12 @@ vector<Entity*> QtTopologySplitFacesPanel::getInvolvedEntities ( )
 		for (vector<string>::const_iterator it = facesNames.begin ( );
 		     facesNames.end ( ) != it; it++)
 		{
-			CoFace*			face		=
-				getContext ( ).getTopoManager ( ).getCoFace (*it, false);
+			Entity*	face = getController ( ).getTopoManager ( ).getCoFace (*it, false);
 			entities.push_back (face);
 		}	// for (vector<string>::const_iterator it = ...
 	}	// else if (true == allFaces ( ))
-	const string			edgeName	= getEdgeName ( );
-	TopoEntity*		edge	=
-			getContext ( ).getTopoManager ( ).getCoEdge (edgeName, false);
+	const string edgeName = getEdgeName ( );
+	Entity*	edge = getController ( ).getTopoManager ( ).getCoEdge (edgeName, false);
 	if (0 != edge)
 		entities.push_back (edge);
 	switch (getCutDefinitionMethod ( ))
@@ -501,7 +494,7 @@ vector<Entity*> QtTopologySplitFacesPanel::getInvolvedEntities ( )
 			CHECK_NULL_PTR_ERROR (_cutPointEntityPanel)
 			const string	point	= _cutPointEntityPanel->getUniqueName ( );
 			if (0 != point.length ( ))
-				entities.push_back (&getContext().nameToEntity (point));
+				entities.push_back (&getController().nameToEntity (point));
 		}
 		break;
 	}	// switch (getCutDefinitionMethod ( ))
@@ -627,8 +620,6 @@ void QtTopologySplitFacesAction::executeOperation ( )
 	QtTopologySplitFacesPanel*	panel	= dynamic_cast<QtTopologySplitFacesPanel*>(getTopologySplitFacesPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)
 
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de découpage des faces topologiques :
@@ -641,11 +632,11 @@ void QtTopologySplitFacesAction::executeOperation ( )
 		switch (panel->getCutDefinitionMethod ( ))
 		{
 			case QtTopologySplitFacesPanel::CDM_RATIO	:
-				cmdResult	= getContext ( ).getTopoManager ( ).splitAllFaces (
+				getController ( ).getTopoManager ( ).splitAllFaces (
 					edgeName, panel->getRatio ( ), oGridRatio, projectVertices);
 				break;
 			case QtTopologySplitFacesPanel::CDM_POINT	:
-				cmdResult	= getContext ( ).getTopoManager ( ).splitAllFaces (
+				getController ( ).getTopoManager ( ).splitAllFaces (
 					edgeName, panel->getCutPoint ( ), oGridRatio, projectVertices);
 				break;
 			default	:
@@ -665,10 +656,10 @@ void QtTopologySplitFacesAction::executeOperation ( )
 		switch (panel->getCutDefinitionMethod ( ))
 		{
 			case QtTopologySplitFacesPanel::CDM_RATIO	:
-				cmdResult	= getContext ( ).getTopoManager ( ).splitFaces (facesNames, edgeName, panel->getRatio ( ), oGridRatio, projectVertices);
+				getController ( ).getTopoManager ( ).splitFaces (facesNames, edgeName, panel->getRatio ( ), oGridRatio, projectVertices);
 				break;
 			case QtTopologySplitFacesPanel::CDM_POINT	:
-				cmdResult	= getContext ( ).getTopoManager ( ).splitFaces (facesNames, edgeName, panel->getCutPoint ( ), oGridRatio, projectVertices);
+				getController ( ).getTopoManager ( ).splitFaces (facesNames, edgeName, panel->getCutPoint ( ), oGridRatio, projectVertices);
 				break;
 			default	:
 			{

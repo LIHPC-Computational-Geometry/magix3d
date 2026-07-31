@@ -3,11 +3,7 @@
  * \author      Charles PIGNEROL
  * \date        17/01/2011
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
-#include "Internal/Context.h"
 #include "QtComponents/QtRepresentationTypesDialog.h"
 #include "QtComponents/RenderedEntityRepresentation.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -28,7 +24,6 @@ using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -969,16 +964,16 @@ void QtRepresentationTypesDialog::applyCallback ( )
 		
 	if (true == globalMode)
 	{
-		Context&	context	= getRenderingManager ( ).getContext ( );
+		Controller&	controller	= getRenderingManager ( ).getController ( );
 		for (Entity::objectType ot = Entity::GeomVertex; ot < Entity::undefined;  ot = (Entity::objectType)(ot + 1))
 		{
 			if (_globalMasks.end ( ) == _globalMasks.find (ot))
 				continue;
 
-			DisplayProperties&	globalProps	= context.globalDisplayProperties (ot);
+			DisplayProperties&	globalProps	= controller.globalDisplayProperties (ot);
 			QtRepresentationTypesPanel::ExtendedDisplayProperties::updateDisplayProperties (newProperties, ot, globalMode, globalProps);
 			unsigned long	newMask	= 0;
-			unsigned long	mask	= context.globalMask (ot);
+			unsigned long	mask	= controller.globalMask (ot);
 			updateMask (newMask, mask, GraphicalEntityRepresentation::CLOUDS, useCloudRepresentation ( ));
 			updateMask (newMask, mask, GraphicalEntityRepresentation::CURVES, useCurvesRepresentation ( ));
 			updateMask (newMask, mask, GraphicalEntityRepresentation::ISOCURVES, useIsoCurvesRepresentation ( ));
@@ -990,18 +985,18 @@ void QtRepresentationTypesDialog::applyCallback ( )
 			updateMask (newMask, mask, GraphicalEntityRepresentation::DISCRETISATIONTYPE, useDiscretisationRepresentation ( ));
 			updateMask (newMask, mask,  GraphicalEntityRepresentation::NBMESHINGEDGE, useNbMeshRepresentation ( ));
 			updateMask (newMask, getDisplayedValueType ( ));
-			context.globalMask (ot)			= newMask;
+			controller.globalMask (ot)			= newMask;
 			try
 			{
 				// Le masque sauvegardé : il doit lui rester au moins un attribut filaire et un attribut solide pour qu'en cas de clic sur un bouton d'accès rapide d'affichage
 				// on soit en mesure de concrétiser la demande :
-				const unsigned long		oldWireMask		= context.savedGlobalMask (ot) & (GraphicalEntityRepresentation::CURVES | GraphicalEntityRepresentation::ISOCURVES);
-				const unsigned long		oldSolidMask	= context.savedGlobalMask (ot) & (GraphicalEntityRepresentation::SURFACES);
+				const unsigned long		oldWireMask		= controller.savedGlobalMask (ot) & (GraphicalEntityRepresentation::CURVES | GraphicalEntityRepresentation::ISOCURVES);
+				const unsigned long		oldSolidMask	= controller.savedGlobalMask (ot) & (GraphicalEntityRepresentation::SURFACES);
 				if (0 == (newMask & (GraphicalEntityRepresentation::CURVES | GraphicalEntityRepresentation::ISOCURVES)))	// Plus de caractère filaire (:
 					newMask |= oldWireMask;
 				if (0 == (newMask & GraphicalEntityRepresentation::SURFACES))	// Plus de caractère solide (:
 					newMask |= oldSolidMask;
-				context.savedGlobalMask (ot)	= newMask;
+				controller.savedGlobalMask (ot)	= newMask;
 			}
 			catch (...)
 			{	// Pas de sauvegarde pour ot == Entity::CoEdge et autres

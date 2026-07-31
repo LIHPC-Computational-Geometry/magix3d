@@ -4,11 +4,8 @@
  * \date        25/09/2019
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/Surface.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtGeomEntityCopyByOffsetAction.h"
 #include "QtComponents/QtMgx3DApplication.h"
@@ -29,9 +26,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -230,7 +225,7 @@ vector<Entity*> QtGeomEntityCopyByOffsetPanel::getInvolvedEntities ( )
 	const string	name	= getGeomEntityName ( );
 	if (false == name.empty ( ))
 	{
-		Geom::Surface*	surface	= getContext ( ).getGeomManager ( ).getSurface (name);
+		Entity*	surface	= getController( ).getSurface (name);
 		if (0 != surface)
 			entities.push_back (dynamic_cast<Entity*>(surface));
 	}
@@ -297,8 +292,6 @@ QtGeomEntityCopyByOffsetPanel* QtGeomEntityCopyByOffsetAction::getCopyPanel ( )
 
 void QtGeomEntityCopyByOffsetAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de copie des entités géométriques :
@@ -308,7 +301,7 @@ void QtGeomEntityCopyByOffsetAction::executeOperation ( )
 	const string		entityName	= panel->getGeomEntityName ( );
 	const double		offset		= panel->getOffset ( );
 
-	cmdResult	= getContext ( ).getGeomManager ( ).newSurfaceByOffset (entityName, offset, groupName);
+	getController( ).newSurfaceByOffset (entityName, offset, groupName);
 
 	setCommandResult (cmdResult);
 }	// QtGeomEntityCopyByOffsetAction::executeOperation

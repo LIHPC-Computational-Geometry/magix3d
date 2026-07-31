@@ -4,8 +4,6 @@
  * \date        28/10/1312
  */
 
-#include "Internal/Context.h"
-#include "Internal/Resources.h"
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/ValidatedField.h"
@@ -13,6 +11,8 @@
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
 #include "QtComponents/QtNumericFieldsFactory.h"
+
+#include "QtComponents/GUIResources.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/UTF8String.h>
@@ -25,11 +25,8 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Group;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -54,11 +51,11 @@ QtBlocksByRevolutionCreationPanel::QtBlocksByRevolutionCreationPanel (
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
 	setLayout (layout);
 	layout->setContentsMargins (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( )); 
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 
 	// Nom opération :
 	QLabel*	label	= new QLabel (panelName.c_str ( ), this);
@@ -73,11 +70,11 @@ QtBlocksByRevolutionCreationPanel::QtBlocksByRevolutionCreationPanel (
 	layout->addWidget (groupBox);
 	QVBoxLayout*	vlayout	= new QVBoxLayout (groupBox);
 	vlayout->setContentsMargins (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	vlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	vlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	groupBox->setLayout (vlayout);
 	const string	suggestedID;
 	_edgePanel	= new QtMgx3DEdgePanel (
@@ -95,11 +92,11 @@ QtBlocksByRevolutionCreationPanel::QtBlocksByRevolutionCreationPanel (
 	QtGroupBox*	angleGroupBox	= new QtGroupBox (QString::fromUtf8("Portion de la révolution"), this);
 	QHBoxLayout*	hlayout	= new QHBoxLayout (angleGroupBox);
 	hlayout->setContentsMargins (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( )); 
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	angleGroupBox->setLayout (hlayout);
 	vlayout->addWidget (angleGroupBox);
 	_anglePanel	= new QtAnglePanel (
@@ -122,11 +119,11 @@ QtBlocksByRevolutionCreationPanel::QtBlocksByRevolutionCreationPanel (
 	QHBoxLayout*	hlayout2	= new QHBoxLayout ( );
 	layout->addLayout (hlayout2);
 	hlayout2->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	hlayout2->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	hlayout2->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	label	= new QLabel ("Ratio pour sommets de l'o-grid :", this);
 	hlayout2->addWidget (label);
 	_oGridRatioTextField	= &QtNumericFieldsFactory::createRatioTextField (this);
@@ -189,8 +186,8 @@ vector<Entity*> QtBlocksByRevolutionCreationPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = edgesNames.begin ( );
 	     edgesNames.end ( ) != it; it++)
 	{
-		TopoEntity*		edge		=
-			getContext ( ).getTopoManager ( ).getCoEdge (*it, false);
+		Entity*		edge		=
+			getController( ).getCoEdge (*it, false);
 	
 		if (0 != edge)
 			entities.push_back (edge);
@@ -370,8 +367,6 @@ QtBlocksByRevolutionCreationPanel*
 
 void QtBlocksByRevolutionCreationAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DTopoOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de création du cylindre :
@@ -380,9 +375,9 @@ void QtBlocksByRevolutionCreationAction::executeOperation ( )
 	double ratio = panel->getOGridRatio();
 	vector<string> coedgeNames	= panel->getEdges ( );
 	if (ratio == 1.0)
-		cmdResult	= getContext ( ).getTopoManager ( ).makeBlocksByRevol (coedgeNames, panel->getPortion ( ));
+		getContext ( ).makeBlocksByRevol (coedgeNames, panel->getPortion ( ));
 	else
-		cmdResult	= getContext ( ).getTopoManager ( ).makeBlocksByRevolWithRatioOgrid(coedgeNames, panel->getPortion ( ), ratio);
+		getContext ( ).makeBlocksByRevolWithRatioOgrid(coedgeNames, panel->getPortion ( ), ratio);
 
 	setCommandResult (cmdResult);
 }	// QtBlocksByRevolutionCreationAction::executeOperation

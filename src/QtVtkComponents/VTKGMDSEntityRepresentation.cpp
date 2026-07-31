@@ -5,7 +5,7 @@
  */
 
 #include "Internal/Context.h"
-#include "Internal/Resources.h"
+#include "QtComponents/GUIResources.h"
 
 #include "QtVtkComponents/VTKGMDSEntityRepresentation.h"
 #include "QtVtkComponents/VTKMgx3DEntityRepresentation.h"
@@ -133,7 +133,7 @@ void VTKGMDSEntityRepresentation::createSurfacicRepresentation()
     _surfacicMapper->SetInputData(_surfacicPolyData);
     _surfacicMapper->ScalarVisibilityOff();
 #if	VTK_MAJOR_VERSION < 8
-    _surfacicMapper->SetImmediateModeRendering(!Internal::Resources::instance ( )._useDisplayList.getValue ( ));
+    _surfacicMapper->SetImmediateModeRendering(!QtComponents::GUIResources::instance ( )._useDisplayList.getValue ( ));
 #endif	// VTK_MAJOR_VERSION < 8
     _surfacicActor = VTKMgx3DActor::New();
     _surfacicActor->SetEntity(getEntity());
@@ -183,7 +183,7 @@ void VTKGMDSEntityRepresentation::createVolumicRepresentation()
         _volumicMapper->SetInputData(_volumicGrid);
         _volumicMapper->ScalarVisibilityOff();
 #if	VTK_MAJOR_VERSION < 8        
-        _volumicMapper->SetImmediateModeRendering(!Internal::Resources::instance ( )._useDisplayList);
+        _volumicMapper->SetImmediateModeRendering(!QtComponents::GUIResources::instance ( )._useDisplayList);
 #endif	// VTK_MAJOR_VERSION < 8
         _volumicActor = VTKMgx3DActor::New();
         _volumicActor->SetEntity(getEntity());
@@ -269,7 +269,7 @@ void VTKGMDSEntityRepresentation::createWireRepresentation()
     _wireMapper->SetInputConnection (edgesExtractor->GetOutputPort ( ));
     _wireMapper->ScalarVisibilityOff();
 #if	VTK_MAJOR_VERSION < 8
-    _wireMapper->SetImmediateModeRendering(!Internal::Resources::instance ( )._useDisplayList);
+    _wireMapper->SetImmediateModeRendering(!QtComponents::GUIResources::instance ( )._useDisplayList);
 #endif	// VTK_MAJOR_VERSION < 8
 
     _wireActor = VTKMgx3DActor::New();
@@ -345,7 +345,7 @@ void VTKGMDSEntityRepresentation::createMeshEntityCloudRepresentation( Mesh::Mes
         _cloudMapper->SetInputData(_cloudGrid);
         _cloudMapper->ScalarVisibilityOff();
 #if	VTK_MAJOR_VERSION < 8
-        _cloudMapper->SetImmediateModeRendering(!Internal::Resources::instance ( )._useDisplayList);
+        _cloudMapper->SetImmediateModeRendering(!QtComponents::GUIResources::instance ( )._useDisplayList);
 #endif	// VTK_MAJOR_VERSION < 8
         _cloudActor = VTKMgx3DActor::New();
         _cloudActor->SetEntity(getEntity());

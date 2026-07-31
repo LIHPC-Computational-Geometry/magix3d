@@ -6,7 +6,6 @@
 #ifndef QT_SPHERE_OPERATION_ACTION_H
 #define QT_SPHERE_OPERATION_ACTION_H
 
-
 #include "QtComponents/QtMgx3DGeomOperationAction.h"
 #include "QtComponents/QtMgx3DGroupNamePanel.h"
 #include "QtComponents/QtAnglePanel.h"

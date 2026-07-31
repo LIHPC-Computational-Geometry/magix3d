@@ -3,20 +3,14 @@
  * \author		Charles PIGNEROL
  * \date		25/11/2013
  */
-
-#include "Internal/Context.h"
-
 #include "QtComponents/QtMgx3DVectorPanel.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtNumericFieldsFactory.h"
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
-#include "Internal/Resources.h"
-#include "Geom/Curve.h"
-#include "Geom/Vertex.h"
-#include "Topo/TopoManager.h"
-#include "Topo/CoEdge.h"
+
+#include "QtComponents/GUIResources.h"
 
 #include <QtUtil/QtConfiguration.h>
 #include <TkUtil/Exception.h>
@@ -32,8 +26,6 @@ using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Topo;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -68,11 +60,11 @@ QtMgx3DVectorPanel::QtMgx3DVectorPanel (QWidget* parent, const string& title,
 
 	QHBoxLayout*	hlayout	= new QHBoxLayout (0);
 	hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	layout->addLayout (hlayout);
 	label	= new QLabel (xTitle.c_str ( ), this);
 	label->setMinimumSize (label->sizeHint ( ));
@@ -84,11 +76,11 @@ QtMgx3DVectorPanel::QtMgx3DVectorPanel (QWidget* parent, const string& title,
 		hlayout->addStretch (2.);
 		hlayout	= new QHBoxLayout (0);
 		hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-		hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+		hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 		layout->addLayout (hlayout);
 	}	// if (true == verticalLayout)
 	label					= new QLabel (yTitle.c_str ( ), this);
@@ -101,11 +93,11 @@ QtMgx3DVectorPanel::QtMgx3DVectorPanel (QWidget* parent, const string& title,
 		hlayout->addStretch (2.);
 		hlayout	= new QHBoxLayout (0);
 		hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-		hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+		hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 		layout->addLayout (hlayout);
 	}	// if (true == verticalLayout)
 	label					= new QLabel (zTitle.c_str ( ), this);
@@ -140,11 +132,11 @@ QtMgx3DVectorPanel::QtMgx3DVectorPanel (QWidget* parent, const string& title,
 	// L'ID de l'éventuel segment dont on récupère les coordonnées :
 	hlayout	= new QHBoxLayout (0);
 	hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	layout->addLayout (hlayout);
 	label	= new QLabel ("Segment :", this);
 	label->setToolTip (QString::fromUtf8("Segment/Arête représentant le vecteur."));
@@ -165,11 +157,11 @@ QtMgx3DVectorPanel::QtMgx3DVectorPanel (QWidget* parent, const string& title,
 	// Les IDs des éventuels points définissant le vecteur :
 	hlayout	= new QHBoxLayout (0);
 	hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	layout->addLayout (hlayout);
 	QLabel*	label1	= new QLabel ("Point 1 :", this);
 	label1->setToolTip (QString::fromUtf8("Origine du vecteur."));
@@ -444,7 +436,7 @@ Math::Point QtMgx3DVectorPanel::getPoint (const string& name) const
 	try
 	{
 		const Geom::Vertex*	vertex	=
-			_point1IDTextField->getMainWindow ( ).getContext ( 
+			_point1IDTextField->getMainWindow ( ).getController (
 									).getGeomManager ( ).getVertex (name, true);
 		CHECK_NULL_PTR_ERROR (vertex)
 		return vertex->getCoord ( );
@@ -455,7 +447,7 @@ Math::Point QtMgx3DVectorPanel::getPoint (const string& name) const
 	try
 	{
 		const Topo::Vertex*	vertex	=
-			_point1IDTextField->getMainWindow ( ).getContext ( 
+			_point1IDTextField->getMainWindow ( ).getController (
 									).getTopoManager ( ).getVertex (name, true);
 		CHECK_NULL_PTR_ERROR (vertex)
 		return vertex->getCoord ( );
@@ -494,7 +486,7 @@ void QtMgx3DVectorPanel::selectedSegmentCallback (const QString name)
 			case Entity::GeomCurve	:
 			{
 				const Geom::Curve*	segment	=
-					_segmentIDTextField->getMainWindow ( ).getContext (
+					_segmentIDTextField->getMainWindow ( ).getController (
 						).getGeomManager ( ).getCurve (
 													name.toStdString ( ), true);
 				CHECK_NULL_PTR_ERROR (segment);
@@ -510,7 +502,7 @@ void QtMgx3DVectorPanel::selectedSegmentCallback (const QString name)
 			case Entity::TopoCoEdge	:
 			{
 				const Topo::CoEdge*	segment	=
-					_segmentIDTextField->getMainWindow ( ).getContext (
+					_segmentIDTextField->getMainWindow ( ).getController (
 						).getTopoManager ( ).getCoEdge (
 													name.toStdString ( ), true);
 				CHECK_NULL_PTR_ERROR (segment);

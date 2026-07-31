@@ -14,7 +14,6 @@
 #include "QtComponents/RenderingManager.h"
 
 #include "Utils/Vector.h"
-#include "Internal/SelectionManager.h"
 
 #include <QCheckBox>
 

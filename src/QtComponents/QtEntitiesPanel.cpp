@@ -4,10 +4,7 @@
  * \date        29/11/2010
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
-#include "Internal/EntitiesHelper.h"
 #include "Internal/InternalPreferences.h"
 #include "QtComponents/QtEntitiesPanel.h"
 #include "QtComponents/QtMgx3DApplication.h"
@@ -31,9 +28,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Internal;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Group;
 
 
 
@@ -2285,7 +2280,7 @@ void QtEntitiesPanel::itemsStateChange (const vector<QTreeWidgetItem*>& list , b
 
 		const bool	checked	= Qt::Checked == (*it)->checkState (0) ? true:false;
 		getGraphicalWidget ( )->getRenderingManager ( ).displayRepresentation (*(entityItem->getEntity ( )), checked, entityItem->getRepresentationMask ( ), true);
-		if (0 == i % Resources::instance ( )._updateRefreshRate.getValue ( ))
+		if (0 == i % GUIResources::instance ( )._updateRefreshRate.getValue ( ))
 		{	// On fait un render tous les x entités.
 
 			// On veut unlock avant lock => en 2 temps (reset (0) puis reset (new DisplayLocker (...)).

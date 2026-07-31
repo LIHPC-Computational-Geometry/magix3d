@@ -3,9 +3,6 @@
  * \author		Charles PIGNEROL 
  * \date		15/01/2013 
  */ 
-
-#include "Internal/Context.h"
-
 #include "QtComponents/QtMgx3DMeshOperationAction.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "Utils/Common.h"

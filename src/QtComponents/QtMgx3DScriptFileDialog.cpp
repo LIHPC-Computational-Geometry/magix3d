@@ -1,12 +1,9 @@
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "QtComponents/QtMgx3DScriptFileDialog.h"
 
 #include <QtUtil/QtUnicodeHelper.h>
 #include <TkUtil/InternalError.h>
 #include <TkUtil/MemoryError.h>
-#include "Internal/Context.h"
 
 #include <QLabel>
 #include <QHBoxLayout>
@@ -82,15 +79,15 @@ unsigned int QtMgx3DScriptFileDialog::getEncodageScript ( ) const
 	CHECK_NULL_PTR_ERROR(_saveEntitiesCoordCheckBox);
 
 	if (Qt::Checked == _saveEntitiesNamesCheckBox->checkState ( ))
-		return Internal::Context::WITHNAMES;
+		return Controller::WITHNAMES;
 	else if (Qt::Checked == _saveEntitiesIdRefCheckBox->checkState ( ))
-		return Internal::Context::WITHIDREF;
+		return Controller::WITHIDREF;
 	else if (Qt::Checked == _saveEntitiesCoordCheckBox->checkState ( ))
-		return Internal::Context::WITHCOORD;
+		return Controller::WITHCOORD;
 	else {
 		MGX_FORBIDDEN ("QtMgx3DScriptFileDialog::getEncodageScrip, cas non prévu");
 	}
-	return Internal::Context::WITHNAMES;
+	return Controller::WITHNAMES;
 }
 
 
@@ -140,17 +137,17 @@ void QtMgx3DScriptFileDialog::createGui (bool open, bool withScriptEncodage, boo
 	buttonGroup->setExclusive (true);
 	_saveEntitiesNamesCheckBox	= new QCheckBox (QString::fromUtf8("Enregistrer avec des noms pour les entités"));
 	buttonGroup->addButton (_saveEntitiesNamesCheckBox);
-	if (encodageScript == Internal::Context::WITHNAMES)
+	if (encodageScript == Controller::WITHNAMES)
 		_saveEntitiesNamesCheckBox->setCheckState (Qt::Checked);
 
 	_saveEntitiesIdRefCheckBox = new QCheckBox (QString::fromUtf8("Enregistrer avec des références sur les commandes précédentes pour les entités"));
 	buttonGroup->addButton (_saveEntitiesIdRefCheckBox);
-	if (encodageScript == Internal::Context::WITHIDREF)
+	if (encodageScript == Controller::WITHIDREF)
 		_saveEntitiesIdRefCheckBox->setCheckState (Qt::Checked);
 
 	_saveEntitiesCoordCheckBox = new QCheckBox (QString::fromUtf8("Enregistrer avec des coordonnées pour retrouver les entités"));
 	buttonGroup->addButton (_saveEntitiesCoordCheckBox);
-	if (encodageScript == Internal::Context::WITHCOORD)
+	if (encodageScript == Controller::WITHCOORD)
 		_saveEntitiesCoordCheckBox->setCheckState (Qt::Checked);
 
 	_saveEnvironmentCheckBox = new QCheckBox (QString::fromUtf8("Enregistrer des informations complémentaires liées à l'environnement python"));

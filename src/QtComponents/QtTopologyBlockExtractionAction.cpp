@@ -3,9 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        11/05/2015
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -27,10 +24,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -228,7 +222,7 @@ vector<Entity*> QtTopologyBlockExtractionOperationPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		TopoEntity*	entity	= getContext ( ).getTopoManager ( ).getEntity (*it);
+		Entity*	entity	= getController ( ).getTopoManager ( ).getEntity (*it);
 		CHECK_NULL_PTR_ERROR (entity)
 		entities.push_back (entity);
 	}
@@ -298,8 +292,6 @@ QtTopologyBlockExtractionOperationPanel*
 
 void QtTopologyBlockExtractionOperationAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DTopoOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de copie des entités topologiques :
@@ -308,7 +300,7 @@ void QtTopologyBlockExtractionOperationAction::executeOperation ( )
 	const string		name		= panel->getGroupName ( );
 	vector<string>		entities	= panel->getBlockNames ( );
 
-	cmdResult	= getContext ( ).getTopoManager ( ).extract (entities, name);
+	getController ( ).getTopoManager ( ).extract (entities, name);
 
 	setCommandResult (cmdResult);
 }	// QtTopologyBlockExtractionOperationAction::executeOperation

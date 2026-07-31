@@ -4,8 +4,6 @@
  * \date        12/05/2015
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "QtComponents/QtMgx3DSelectionDialog.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -24,7 +22,6 @@ using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Utils;
-using namespace Internal;
 
 
 namespace Mgx3D

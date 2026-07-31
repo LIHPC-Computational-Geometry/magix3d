@@ -4,8 +4,6 @@
  * \date        09/09/2014
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -29,9 +27,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -306,7 +302,7 @@ vector<Entity*> QtGeomAddToGroupOperationPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		GeomEntity*	entity	= getContext ( ).getGeomManager ( ).getEntity (*it);
+		Entity*	entity	= getController( ).getEntity (*it);
 		CHECK_NULL_PTR_ERROR (entity)
 		entities.push_back (entity);
 	}
@@ -396,8 +392,6 @@ QtGeomAddToGroupOperationPanel*
 
 void QtGeomAddToGroupOperationAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres d'addition des entités géométriques :
@@ -411,13 +405,13 @@ void QtGeomAddToGroupOperationAction::executeOperation ( )
 	switch (operation)
 	{
 		case QtGeomAddToGroupOperationPanel::ADD	:
-			cmdResult	= getContext ( ).getGeomManager ( ).addToGroup (entities, dim, groupName);
+			getController( ).addToGroup (entities, dim, groupName);
 			break;
 		case QtGeomAddToGroupOperationPanel::REMOVE	:
-			cmdResult	= getContext ( ).getGeomManager ( ).removeFromGroup (entities, dim, groupName);
+			getController( ).removeFromGroup (entities, dim, groupName);
 			break;
 		case QtGeomAddToGroupOperationPanel::SET	:
-			cmdResult	= getContext ( ).getGeomManager ( ).setGroup (entities, dim, groupName);
+			getController( ).setGroup (entities, dim, groupName);
 			break;
 		default										:
 		{

@@ -12,7 +12,6 @@
 #include "QtComponents/QtMgx3DTopoOperationAction.h"
 
 #include "Utils/Vector.h"
-#include "Internal/SelectionManager.h"
 
 #include <QCheckBox>
 

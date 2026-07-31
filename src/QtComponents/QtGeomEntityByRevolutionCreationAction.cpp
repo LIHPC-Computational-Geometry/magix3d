@@ -4,12 +4,9 @@
  * \date        18/11/2014
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManager.h"
 #include "QtComponents/QtGeomEntityByRevolutionCreationAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
@@ -25,10 +22,8 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -131,8 +126,8 @@ vector<Entity*> QtGeomEntityByRevolutionCreationPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		GeomEntity*		entity		=
-			getContext ( ).getGeomManager ( ).getEntity (*it, false);
+		Entity*		entity		=
+			getController( ).getEntity (*it, false);
 	
 		if (0 != entity)
 			entities.push_back (entity);
@@ -324,8 +319,6 @@ QtGeomEntityByRevolutionCreationPanel*
 
 void QtGeomEntityByRevolutionCreationAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de création du cylindre :
@@ -335,7 +328,7 @@ void QtGeomEntityByRevolutionCreationAction::executeOperation ( )
 	vector<string>	entitiesNames	= panel->getEntities ( );
 	const Rotation	rotation		= panel->getRotation ( );
 	const bool		keepEntities	= panel->keepEntities ( );
-	cmdResult	= getContext ( ).getGeomManager ( ).makeRevol (entitiesNames, rotation, keepEntities);
+	getController( ).makeRevol (entitiesNames, rotation, keepEntities);
 
 	setCommandResult (cmdResult);
 }	// QtGeomEntityByRevolutionCreationAction::executeOperation

@@ -8,11 +8,12 @@
 
 #include "Utils/SerializedRepresentation.h"
 #include "QtComponents/RenderingManager.h"
-#include "Internal/Context.h"
 
 #include <QTreeWidget>
 
 #include <memory>
+
+#include "Controller/Controller.h"
 
 
 namespace Mgx3D 
@@ -82,7 +83,7 @@ class QtSelectionPropertiesTreeItem : public QTreeWidgetItem
 	 * \return	Une référence sur le contexte <I>Magix 3D</I> associé à
 	 *			l'opération.
 	 */
-	virtual const Mgx3D::Internal::Context& getContext ( ) const;
+	virtual const Mgx3D::Controller& getController ( ) const;
 
 
 	protected :

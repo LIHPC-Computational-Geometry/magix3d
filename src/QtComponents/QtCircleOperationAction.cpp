@@ -4,18 +4,13 @@
  * \date        09/09/2014
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/CommandNewCircle.h"
-#include "Geom/CommandNewEllipse.h"
-#include "Geom/GeomDisplayRepresentation.h"
-#include "Geom/GeomManager.h"
-#include "Geom/Vertex.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtCircleOperationAction.h"
 #include "QtComponents/QtMgx3DApplication.h"
+
+#include "QtComponents/GUIResources.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>
@@ -32,10 +27,7 @@ using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Group;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -55,8 +47,8 @@ QtCircleOperationPanel::QtCircleOperationPanel (
 {
 //	SET_WIDGET_BACKGROUND (this, Qt::yellow)
 	QVBoxLayout*	layout	= new QVBoxLayout (this);
-	layout->setContentsMargins  (Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
-	layout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+	layout->setContentsMargins  (GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ));
+	layout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	setLayout (layout);
 
 	// Nom opération :
@@ -86,8 +78,8 @@ QtCircleOperationPanel::QtCircleOperationPanel (
 	// Définition du cercle :
 	QtGroupBox*		groupBox	= new QtGroupBox (QString::fromUtf8 ("Paramètres du cercle"), this);
 	QVBoxLayout*	vlayout	= new QVBoxLayout (groupBox);
-	vlayout->setContentsMargins  (Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ), Resources::instance ( )._margin.getValue ( ));
-	vlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+	vlayout->setContentsMargins  (GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ), GUIResources::instance ( )._margin.getValue ( ));
+	vlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	groupBox->setLayout (vlayout);
 	layout->addWidget (groupBox);
 	// Le panneau "méthode" : plusieurs panneaux possibles.
@@ -249,6 +241,10 @@ void QtCircleOperationPanel::autoUpdate ( )
 
 void QtCircleOperationPanel::preview (bool show, bool destroyInteractor)
 {
+
+	std::cout<<"Print disabled for the moment: refactoring in progress"<<std::endl;
+
+	/*
 	// Lors de la construction getGraphicalWidget peut être nul ...
 	try
 	{
@@ -270,10 +266,10 @@ void QtCircleOperationPanel::preview (bool show, bool destroyInteractor)
 
 		DisplayProperties	graphicalProps;
 		graphicalProps.setWireColor (Color (
-				255 * Resources::instance ( )._previewColor.getRed ( ),
-				255 * Resources::instance ( )._previewColor.getGreen ( ),
-				255 * Resources::instance ( )._previewColor.getBlue ( )));
-		graphicalProps.setLineWidth (Resources::instance ( )._previewWidth.getValue ( ));
+				255 * GUIResources::instance ( )._previewColor.getRed ( ),
+				255 * GUIResources::instance ( )._previewColor.getGreen ( ),
+				255 * GUIResources::instance ( )._previewColor.getBlue ( )));
+		graphicalProps.setLineWidth (GUIResources::instance ( )._previewWidth.getValue ( ));
 
 		CHECK_NULL_PTR_ERROR (_verticesPanel)
 		Geom::Vertex	*v1 = 0, *v2 = 0, *v3 = 0;
@@ -316,6 +312,7 @@ void QtCircleOperationPanel::preview (bool show, bool destroyInteractor)
 	catch (...)
 	{
 	}
+	*/
 }	// QtCircleOperationPanel::preview
 
 
@@ -431,9 +428,6 @@ QtCircleOperationPanel* QtCircleOperationAction::getCirclePanel ( )
 
 void QtCircleOperationAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
-//	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de création du cercle :
 	QtCircleOperationPanel*	panel	= getCirclePanel ( );
@@ -447,7 +441,7 @@ void QtCircleOperationAction::executeOperation ( )
 			const string	vertex1	= getCirclePanel ( )->getVertex1UniqueName ( );
 			const string	vertex2	= getCirclePanel ( )->getVertex2UniqueName ( );
 			const string	vertex3	= getCirclePanel ( )->getVertex3UniqueName ( );
-			cmdResult	= getContext ( ).getGeomManager ( ).newCircle (vertex1, vertex2, vertex3, name);
+			getController( ).newCircle (vertex1, vertex2, vertex3, name);
 		}
 		break;
 		case QtCircleOperationPanel::ELLIPSE_THREE_POINTS		:
@@ -455,7 +449,7 @@ void QtCircleOperationAction::executeOperation ( )
 			const string	vertex1	= getCirclePanel ( )->getVertex1UniqueName ( );
 			const string	vertex2	= getCirclePanel ( )->getVertex2UniqueName ( );
 			const string	vertex3	= getCirclePanel ( )->getVertex3UniqueName ( );
-			cmdResult	= getContext ( ).getGeomManager ( ).newEllipse (vertex1, vertex2, vertex3, name);
+			getController( ).newEllipse (vertex1, vertex2, vertex3, name);
 		}
 		break;
 		default	:

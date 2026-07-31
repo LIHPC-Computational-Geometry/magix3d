@@ -9,10 +9,11 @@
 
 #include <QtUtil/QtGroupBox.h>
 
+#include "Controller/Controller.h"
+
 #include "Utils/Entity.h"
 #include "QtComponents/Qt3DGraphicalWidget.h"
 #include "QtComponents/QtRepresentationTypesPanel.h"
-#include "Internal/Context.h"
 
 
 namespace Mgx3D 
@@ -41,7 +42,7 @@ class QtEntitiesItemViewPanel : public QtGroupBox
 	 * \param	Nom du panneau.
 	 * \param	Contexte Magix 3D du panneau
 	 */
-	QtEntitiesItemViewPanel (QWidget* parent, QtMgx3DMainWindow* mainWindow, const std::string& name, Internal::Context& context);
+	QtEntitiesItemViewPanel (QWidget* parent, QtMgx3DMainWindow* mainWindow, const std::string& name, Controller& controller);
 
 	/**
 	 * RAS.
@@ -81,13 +82,13 @@ class QtEntitiesItemViewPanel : public QtGroupBox
 	 * \return		Contexte <I>Magix 3D</I> courant.
 	 * \see			setContext
 	 */
-	virtual Mgx3D::Internal::Context& getContext ( );
+	virtual Mgx3D::Controller& getController ( );
 
 	/**
 	 * \param		Nouveau contexte <I>Magix 3D</I>.
 	 * \see			getContext
 	 */
-	virtual void setContext (Mgx3D::Internal::Context*);
+	virtual void setController (Mgx3D::Controller*);
 
 	//@}	// La gestion de la sélection.
 
@@ -150,7 +151,7 @@ class QtEntitiesItemViewPanel : public QtGroupBox
 	QtEntitiesItemViewPanel& operator = (const QtEntitiesItemViewPanel&);
 
 	/** Le context Magix 3D. */
-	Mgx3D::Internal::Context*	_context;
+	Mgx3D::Controller*	_controller;
 
 	/** La fenêtre principale à laquelle ce panneau est rattaché. */
 	QtMgx3DMainWindow*				_mainWindow;

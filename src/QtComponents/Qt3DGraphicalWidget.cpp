@@ -4,16 +4,15 @@
  * \date        30/11/2010
  */
 
-#include "Internal/Context.h"
-
 #include "QtComponents/Qt3DGraphicalWidget.h"
 #include "QtComponents/QtMgx3DApplication.h"
 #include "Utils/Common.h"
 #include "Utils/DisplayProperties.h"
-#include "Internal/Resources.h"
 
 #include <TkUtil/InternalError.h>
 #include <TkUtil/MemoryError.h>
+
+#include "QtComponents/GUIResources.h"
 
 #include <iostream>
 #include <memory>
@@ -22,7 +21,6 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -116,9 +114,9 @@ void Qt3DGraphicalWidget::updateConfiguration ( )
 	if (0 != _renderingManager)	
 	{
 		_renderingManager->setBackground (
-					Resources::instance ( )._background.getRed ( ),
-					Resources::instance ( )._background.getGreen ( ),
-					Resources::instance ( )._background.getBlue ( ));
+					GUIResources::instance ( )._background.getRed ( ),
+					GUIResources::instance ( )._background.getGreen ( ),
+					GUIResources::instance ( )._background.getBlue ( ));
 	}
 }	// Qt3DGraphicalWidget::updateConfiguration
 

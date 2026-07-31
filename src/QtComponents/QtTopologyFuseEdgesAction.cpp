@@ -3,8 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        25/03/2014
  */
-
-#include "Internal/Context.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtTopologyFuseEdgesAction.h"
 #include "Utils/Common.h"
@@ -18,9 +16,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -168,8 +164,8 @@ vector<Entity*> QtTopologyFuseEdgesPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		TopoEntity*		edge	=
-			getContext ( ).getTopoManager ( ).getCoEdge (*it, false);
+		Entity*		edge	=
+			getController ( ).getTopoManager ( ).getCoEdge (*it, false);
 		if (0 != edge)
 			entities.push_back (edge);
 	}	// for (vector<string>::const_iterator it = names.begin ( ); ...
@@ -252,8 +248,7 @@ void QtTopologyFuseEdgesAction::executeOperation ( )
 	// Récupération des paramètres de collage des arêtes topologiques :
 	vector<string>	edges	= panel->getEdgesNames ( );
 
-	Mgx3D::Internal::M3DCommandResult*	result	= getContext ( ).getTopoManager ( ).fuseEdges (edges);
-	CHECK_NULL_PTR_ERROR (result)
+	getController ( ).getTopoManager ( ).fuseEdges (edges);
 	setCommandResult (result);
 	if (Command::FAIL == result->getStatus ( ))
 		throw Exception (result->getErrorMessage ( ));

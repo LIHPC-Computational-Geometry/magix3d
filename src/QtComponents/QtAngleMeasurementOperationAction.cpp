@@ -4,16 +4,8 @@
  * \date		10/03/2017
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
-#include "Internal/EntitiesHelper.h"
-#include "Internal/InfoCommand.h"
-#include "Geom/Vertex.h"
-#include "Geom/Curve.h"
-#include "Geom/Surface.h"
-#include "Topo/Vertex.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtAngleMeasurementOperationAction.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -35,10 +27,8 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -342,7 +332,7 @@ const Entity* QtAngleMeasurementOperationPanel::getEntityCenter ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_entityCenterPanel)
 	string	entity	= _entityCenterPanel->getUniqueName ( );
-	return &getContext().nameToEntity (entity);
+	return &getController().nameToEntity (entity);
 }	// QtAngleMeasurementOperationPanel::getEntityCenter
 
 
@@ -350,7 +340,7 @@ const Entity* QtAngleMeasurementOperationPanel::getEntity1 ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_entity1Panel)
 	string	entity	= _entity1Panel->getUniqueName ( );
-	return &getContext().nameToEntity (entity);
+	return &getController().nameToEntity (entity);
 }	// QtAngleMeasurementOperationPanel::getEntity1
 
 
@@ -358,7 +348,7 @@ const Entity* QtAngleMeasurementOperationPanel::getEntity2 ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_entity2Panel)
 	string	entity	= _entity2Panel->getUniqueName ( );
-	return &getContext().nameToEntity (entity);
+	return &getController().nameToEntity (entity);
 }	// QtAngleMeasurementOperationPanel::getEntity2
 
 

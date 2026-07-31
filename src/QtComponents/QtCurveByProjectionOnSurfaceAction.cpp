@@ -4,11 +4,8 @@
  * \date        19/05/2015
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManager.h"
 #include "QtComponents/QtCurveByProjectionOnSurfaceAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
@@ -27,9 +24,6 @@ using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Group;
-using namespace Mgx3D::Geom;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -248,15 +242,15 @@ vector<Entity*> QtCurveByProjectionOnSurfacePanel::getInvolvedEntities ( )
 	const string	surfaceName	= getSurfaceName ( );
 	if (0 != curveName.length ( ))
 	{
-		Geom::Curve*	curve	=
-			getContext ( ).getGeomManager ( ).getCurve (curveName, false);
+		Entity*	curve	=
+			getController( ).getCurve (curveName, false);
 		if (0 !=curve)
 			entities.push_back ((Entity*)curve);
 	}	// if (0 != curveName.length ( ))
 	if (0 != surfaceName.length ( ))
 	{
-		Geom::Surface*	surface	=
-			getContext ( ).getGeomManager ( ).getSurface (surfaceName, false);
+		Entity*	surface	=
+			getController( ).getSurface (surfaceName, false);
 		if (0 !=surface)
 			entities.push_back ((Entity*)surface);
 	}	// if (0 != surfaceName.length ( ))
@@ -330,8 +324,6 @@ QtCurveByProjectionOnSurfacePanel*
 
 void QtCurveByProjectionOnSurfaceAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de création de la courbe :
@@ -340,7 +332,7 @@ void QtCurveByProjectionOnSurfaceAction::executeOperation ( )
 	const string	name	= panel->getGroupName ( );
 	const string	curve	= panel->getCurveName ( );
 	const string	surface	= panel->getSurfaceName ( );
-	cmdResult	= getContext ( ).getGeomManager ( ).newCurveByCurveProjectionOnSurface (curve, surface, name);
+	getController( ).newCurveByCurveProjectionOnSurface (curve, surface, name);
 
 	setCommandResult (cmdResult);
 }	// QtCurveByProjectionOnSurfaceAction::executeOperation

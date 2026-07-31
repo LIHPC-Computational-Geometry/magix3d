@@ -3,13 +3,7 @@
  * \author      Charles PIGNEROL
  * \date        10/03/2014
  */
-
-#include "Internal/Context.h"
-#include "Internal/Resources.h"
-
 #include "Utils/Common.h"
-#include "Topo/CommandExtendSplitBlock.h"
-#include "Topo/TopoDisplayRepresentation.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtTopologyExtendSplitBlockAction.h"
@@ -22,9 +16,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -200,6 +192,10 @@ string QtTopologyExtendSplitBlockPanel::getEdgeName ( ) const
 void QtTopologyExtendSplitBlockPanel::preview (
 											bool show, bool destroyInteractor)
 {
+
+	std::cout<<"Print disabled for the moment: refactoring in progress"<<std::endl;
+
+	/*
 	// Lors de la construction getGraphicalWidget peut être nul ...
 	try
 	{
@@ -248,6 +244,7 @@ void QtTopologyExtendSplitBlockPanel::preview (
 	catch (...)
 	{
 	}
+	*/
 }	// QtTopologyExtendSplitBlockPanel::preview
 
 
@@ -256,10 +253,10 @@ vector<Entity*> QtTopologyExtendSplitBlockPanel::getInvolvedEntities ( )
 	vector<Entity*>	entities;
 	const string	blockName	= getBlockName ( );
 	const string	edgeName	= getEdgeName ( );
-	TopoEntity*		block	=
-			getContext ( ).getTopoManager ( ).getBlock (blockName, false);
-	TopoEntity*		edge	=
-			getContext ( ).getTopoManager ( ).getCoEdge (edgeName, false);
+	Entity*		block	=
+			getController ( ).getTopoManager ( ).getBlock (blockName, false);
+	Entity*		edge	=
+			getController ( ).getTopoManager ( ).getCoEdge (edgeName, false);
 	if (0 != block)
 		entities.push_back (block);
 	if (0 != edge)
@@ -348,8 +345,7 @@ void QtTopologyExtendSplitBlockAction::executeOperation ( )
 	const string	blockName	= panel->getBlockName ( );
 	const string	edgeName	= panel->getEdgeName ( );
 
-	Mgx3D::Internal::M3DCommandResult*	result	= getContext ( ).getTopoManager ( ).extendSplitBlock (blockName, edgeName);
-	CHECK_NULL_PTR_ERROR (result)
+	getController ( ).getTopoManager ( ).extendSplitBlock (blockName, edgeName);
 	setCommandResult (result);
 	if (Command::FAIL == result->getStatus ( ))
 		throw Exception (result->getErrorMessage ( ));

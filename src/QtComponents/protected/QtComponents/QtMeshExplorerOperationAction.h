@@ -6,8 +6,6 @@
 #ifndef QT_MESH_EXPLORER_OPERATION_ACTION_H
 #define QT_MESH_EXPLORER_OPERATION_ACTION_H
 
-#include "Internal/Context.h"
-
 #include "QtComponents/QtMeshSheetOperationAction.h"
 
 #include <QtUtil/QtIntTextField.h>

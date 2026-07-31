@@ -11,8 +11,6 @@
 #include "QtComponents/QtMgx3DTopoOperationAction.h"
 #include "QtComponents/QtEntityByDimensionSelectorPanel.h"
 
-#include "Internal/SelectionManager.h"
-
 #include <QCheckBox>
 #include <QComboBox>
 

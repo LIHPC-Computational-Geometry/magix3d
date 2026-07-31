@@ -7,7 +7,7 @@
 #include <mgx_config.h>
 
 #include "Internal/Context.h"
-#include "Internal/Resources.h"
+#include "QtComponents/GUIResources.h"
 
 #include "QtVtkComponents/QtVtkMgx3DMainWindow.h"
 #include "QtVtkComponents/QtVtkMgx3DApplication.h"
@@ -369,7 +369,7 @@ void QtVtkMgx3DMainWindow::preferencesCallback ( )
 	CHECK_NULL_PTR_ERROR (vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).GetMgx3DPicker ( ))
 	vgw->getVTKRenderingManager ( ).getMgx3DInteractorStyle ( ).GetMgx3DPicker ( )->SetCellTolerance (
 						VTKConfiguration::instance ( )._cellPickerTolerance.getValue ( ));
-	vgw->getVTKRenderingManager ( ).enableMultipleLighting (Resources::instance ( )._multipleLighting.getValue ( ));
+	vgw->getVTKRenderingManager ( ).enableMultipleLighting (GUIResources::instance ( )._multipleLighting.getValue ( ));
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, getAppTitle ( ))
 }	// QtVtkMgx3DMainWindow::preferencesCallback

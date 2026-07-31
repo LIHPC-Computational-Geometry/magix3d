@@ -7,8 +7,6 @@
 #ifndef QT_MGX3D_VECTOR_PANEL_H
 #define QT_MGX3D_VECTOR_PANEL_H
 
-#include "Internal/Context.h"
-
 #include <TkUtil/util_config.h>
 
 #include "QtComponents/QtEntityIDTextField.h"

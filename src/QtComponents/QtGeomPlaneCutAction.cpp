@@ -3,18 +3,16 @@
  * \author      Charles PIGNEROL
  * \date        22/11/2013
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/Plane.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManager.h"
 #include "Utils/Vector.h"
 #include "QtComponents/QtMgx3DApplication.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtGeomPlaneCutAction.h"
 #include "QtComponents/RenderedEntityRepresentation.h"
+
+#include "QtComponents/GUIResources.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>
@@ -32,10 +30,7 @@ using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Group;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -376,7 +371,7 @@ vector<Entity*> QtGeomPlaneCutPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 		     names.end ( ) != it; it++)
 	{
-		GeomEntity*	entity	= getContext ( ).getGeomManager ( ).getEntity (*it);
+		Entity*	entity	= getController( ).getEntity (*it);
 		CHECK_NULL_PTR_ERROR (entity)
 		entities.push_back (entity);
 	}	// for (vector<string>::const_iterator it = names.begin ( );
@@ -415,6 +410,10 @@ void QtGeomPlaneCutPanel::operationCompleted ( )
 
 void QtGeomPlaneCutPanel::preview (bool show, bool destroyInteractor)
 {
+
+	std::cout<<"Print disabled for the moment: refactoring in progress"<<std::endl;
+
+	/*
 	// Lors de la construction getGraphicalWidget peut être nul ...
 	try
 	{
@@ -436,15 +435,15 @@ void QtGeomPlaneCutPanel::preview (bool show, bool destroyInteractor)
 
 	DisplayProperties	graphicalProps;
 	graphicalProps.setCloudColor (Color (
-						255 * Resources::instance ( )._previewColor.getRed ( ),
-						255 * Resources::instance ( )._previewColor.getGreen ( ),
-						255 * Resources::instance ( )._previewColor.getBlue ( )));
-	graphicalProps.setPointSize (Resources::instance ( )._previewPointSize.getValue ( ));
+						255 * GUIResources::instance ( )._previewColor.getRed ( ),
+						255 * GUIResources::instance ( )._previewColor.getGreen ( ),
+						255 * GUIResources::instance ( )._previewColor.getBlue ( )));
+	graphicalProps.setPointSize (GUIResources::instance ( )._previewPointSize.getValue ( ));
 	graphicalProps.setWireColor (Color (
-						255 * Resources::instance ( )._previewColor.getRed ( ),
-						255 * Resources::instance ( )._previewColor.getGreen ( ),
-						255 * Resources::instance ( )._previewColor.getBlue ( )));
-	graphicalProps.setLineWidth (Resources::instance ( )._previewWidth.getValue ( ));
+						255 * GUIResources::instance ( )._previewColor.getRed ( ),
+						255 * GUIResources::instance ( )._previewColor.getGreen ( ),
+						255 * GUIResources::instance ( )._previewColor.getBlue ( )));
+	graphicalProps.setLineWidth (GUIResources::instance ( )._previewWidth.getValue ( ));
 
 	// Les entités soumises à la coupe :
 	const vector<string>	entities	= getCutEntities ( );
@@ -508,6 +507,7 @@ void QtGeomPlaneCutPanel::preview (bool show, bool destroyInteractor)
 	getRenderingManager ( ).forceRender ( );
 
 	COMPLETE_QT_TRY_CATCH_BLOCK (true, this, "Magix 3D")
+	*/
 }	// QtGeomPlaneCutPanel::preview
 
 
@@ -518,7 +518,7 @@ void QtGeomPlaneCutPanel::cutModifiedCallback ( )
 	preview (false, false);
 
 	RenderingManager::PlaneInteractor*	interactor	= getInteractor ( );
-	if ((0 != interactor) && (true == Resources::instance ( )._prevalidateSeizure))
+	if ((0 != interactor) && (true == GUIResources::instance ( )._prevalidateSeizure))
 	{
 		Math::Point		point	= getPoint ( );
 		Math::Vector	normal	= getNormal ( );
@@ -594,8 +594,6 @@ QtGeomPlaneCutPanel* QtGeomPlaneCutAction::getPlaneCutPanel ( )
 
 void QtGeomPlaneCutAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de la coupe :
@@ -607,7 +605,7 @@ void QtGeomPlaneCutAction::executeOperation ( )
 	vector<string>	entities	= panel->getCutEntities ( );
 	string			name		= panel->getGroupName ( );
 	panel->clearEntitiesField ( );	// Coupe : les entités sont détruites ...
-	cmdResult	= getContext ( ).getGeomManager ( ).sectionByPlane (entities, &plane, name);
+	getController( ).sectionByPlane (entities, &plane, name);
 
 	setCommandResult (cmdResult);
 }	// QtGeomPlaneCutAction::executeOperation

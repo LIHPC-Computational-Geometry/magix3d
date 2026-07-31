@@ -3,13 +3,7 @@
  * \author      Charles PIGNEROL
  * \date        14/03/2014
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
-#include "Internal/Resources.h"
-#include "Topo/CommandSplitBlocksWithOgrid.h"
-#include "Topo/TopoDisplayRepresentation.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtNumericFieldsFactory.h"
@@ -22,9 +16,6 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
 
 
@@ -266,6 +257,10 @@ size_t QtTopologySplitBlockWithOGridPanel::getCentralEdgesNumber ( ) const
 void QtTopologySplitBlockWithOGridPanel::preview (
 											bool show, bool destroyInteractor)
 {
+
+	std::cout<<"Print disabled for the moment: refactoring in progress"<<std::endl;
+
+	/*
 	// Lors de la construction getGraphicalWidget peut être nul ...
 	try
 	{
@@ -340,6 +335,7 @@ void QtTopologySplitBlockWithOGridPanel::preview (
 	catch (...)
 	{
 	}
+	*/
 }	// QtTopologySplitBlockWithOGridPanel::preview
 
 
@@ -351,14 +347,14 @@ vector<Entity*> QtTopologySplitBlockWithOGridPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = blocksNames.begin ( );
 	     blocksNames.end ( ) != it; it++)
 	{
-		TopoEntity*	te	= getContext( ).getTopoManager( ).getBlock(*it, false);
+		Entity*	te	= getController( ).getTopoManager( ).getBlock(*it, false);
 		if (0 != te)
 			entities.push_back (te);
 	}	// for (vector<string>::const_iterator it = blocksNames.begin ( ); ...
 	for (vector<string>::const_iterator it = facesNames.begin ( );
 	     facesNames.end ( ) != it; it++)
 	{
-		TopoEntity*	te	= getContext( ).getTopoManager( ).getCoFace(*it, false);
+		Entity*	te	= getController( ).getTopoManager( ).getCoFace(*it, false);
 		if (0 != te)
 			entities.push_back (te);
 	}	// for (vector<string>::const_iterator it = facesNames.begin ( ); ...
@@ -441,8 +437,6 @@ void QtTopologySplitBlockWithOGridAction::executeOperation ( )
 	QtTopologySplitBlockWithOGridPanel*	panel	= dynamic_cast<QtTopologySplitBlockWithOGridPanel*>(getTopologySplitBlockWithOGridPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)
 
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de découpage en o-grid des blocs
@@ -452,9 +446,9 @@ void QtTopologySplitBlockWithOGridAction::executeOperation ( )
 	double			ratio			= panel->getRatio ( );
 	size_t			centralEdgesNum	= panel->getCentralEdgesNumber ( );
 	if (panel->propagate())
-		cmdResult	= getContext ( ).getTopoManager ( ).splitBlocksWithOgrid (blocksNames, facesNames, ratio, centralEdgesNum);
+		getController ( ).getTopoManager ( ).splitBlocksWithOgrid (blocksNames, facesNames, ratio, centralEdgesNum);
 	else
-		cmdResult	= getContext ( ).getTopoManager ( ).splitBlocksWithOgridV2 (blocksNames, facesNames, ratio, centralEdgesNum);
+		getController ( ).getTopoManager ( ).splitBlocksWithOgridV2 (blocksNames, facesNames, ratio, centralEdgesNum);
 
 	setCommandResult (cmdResult);
 }	// QtTopologySplitBlockWithOGridAction::executeOperation

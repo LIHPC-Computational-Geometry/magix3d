@@ -4,16 +4,8 @@
  * \date        27/01/2015
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
-#include "Internal/EntitiesHelper.h"
-#include "Internal/InfoCommand.h"
-#include "Geom/Vertex.h"
-#include "Geom/Curve.h"
-#include "Geom/Surface.h"
-#include "Topo/Vertex.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtDistanceMeasurementOperationAction.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -34,10 +26,8 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -387,7 +377,7 @@ const Entity* QtDistanceMeasurementOperationPanel::getEntity1 ( ) const
 	}	// if (1 < entities.size ( ))
 
 	if (1 == entities.size ( ))
-		return &getContext().nameToEntity (entities[0]);
+		return &getController().nameToEntity (entities[0]);
 
 	return 0;
 }	// QtDistanceMeasurementOperationPanel::getEntity1
@@ -404,7 +394,7 @@ const Entity* QtDistanceMeasurementOperationPanel::getEntity2 ( ) const
 	}	// if (1 < entities.size ( ))
 
 	if (1 == entities.size ( ))
-		return &getContext().nameToEntity (entities[0]);
+		return &getController().nameToEntity (entities[0]);
 
 	return 0;
 }	// QtDistanceMeasurementOperationPanel::getEntity2
@@ -430,11 +420,10 @@ void QtDistanceMeasurementOperationPanel::updateDistance (double d)
 		wholeText << " : " << MgxNumeric::userRepresentation (d);
 	}	// if (valid == NumericServices::isValid (d))
 
-	Context&	context	= getContext ( );
-	if (Unit::undefined != context.getLengthUnit ( ))
+	if (Unit::undefined != getController().getLengthUnit ( ))
 	{
-		text << Unit::toShortString (context.getLengthUnit ( ));
-		wholeText << Unit::toShortString (context.getLengthUnit ( ));
+		text << Unit::toShortString (getController().getLengthUnit ( ));
+		wholeText << Unit::toShortString (getController().getLengthUnit ( ));
 	}	// if (Unit::undefined != context.getLengthUnit ( ))
 
 	_distanceLabel->setText (text.iso ( ).c_str ( ));

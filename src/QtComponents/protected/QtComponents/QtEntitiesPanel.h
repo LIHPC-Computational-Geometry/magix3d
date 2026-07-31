@@ -6,20 +6,12 @@
 #ifndef QT_ENTITIES_PANEL_H
 #define QT_ENTITIES_PANEL_H
 
-#include "Internal/Context.h"
-
 #include <QSettings>
 #include <QItemDelegate>
 #include <QMenu>
 #include <QTreeWidget>
 
 #include "QtComponents/QtEntitiesItemViewPanel.h"
-#include "Internal/SelectionManager.h"
-#include "Geom/GeomEntity.h"
-#include "Topo/TopoEntity.h"
-#include "Mesh/MeshEntity.h"
-#include "SysCoord/SysCoord.h"
-#include "Structured/StructuredMeshEntity.h"
 
 #include <vector>
 

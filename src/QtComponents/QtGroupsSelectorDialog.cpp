@@ -3,15 +3,14 @@
  * \author		Charles PIGNEROL
  * \date		31/01/2017
  */
-
-#include "Internal/Context.h"
-
 #include "QtComponents/QtGroupsSelectorDialog.h"
 #include "QtComponents/QtMgx3DApplication.h"
 #include <QtUtil/QtErrorManagement.h>
 #include <QtUtil/QtConfiguration.h>
 #include <QtUtil/QtMessageBox.h>
 #include <QtUtil/QtUnicodeHelper.h>
+
+#include "Utils/Common.h"
 
 #include <TkUtil/Exception.h>
 #include <TkUtil/MemoryError.h>
@@ -29,7 +28,6 @@ using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D

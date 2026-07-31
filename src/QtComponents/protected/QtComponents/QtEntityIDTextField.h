@@ -7,7 +7,6 @@
 #ifndef QT_ENTITY_ID_TEXTFIELD_H
 #define QT_ENTITY_ID_TEXTFIELD_H
 
-#include "Internal/Context.h"
 #include "QtComponents/EntitySeizureManager.h"
 
 #include <QtUtil/QtTextField.h>
@@ -233,8 +232,8 @@ class QtEntityIDTextField : public QtTextField, public Mgx3D::QtComponents::Enti
 	 * \return	Une référence sur le contexte <I>Magix 3D</I> associé à
 	 *			l'opération.
 	 */
-	virtual const Mgx3D::Internal::Context& getContext ( ) const;
-	virtual Mgx3D::Internal::Context& getContext ( );
+	virtual const Mgx3D::Controller& getController ( ) const;
+	virtual Mgx3D::Controller& getController ( );
 
 
 	protected slots :

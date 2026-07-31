@@ -6,13 +6,9 @@
 #ifndef QT_GEOMETRY_HOMOTHETY_ACTION_H
 #define QT_GEOMETRY_HOMOTHETY_ACTION_H
 
-#include "Internal/Context.h"
-
 #include "QtComponents/QtEntityByDimensionSelectorPanel.h"
 #include "QtComponents/QtMgx3DHomothetyPanel.h"
 #include "QtComponents/QtMgx3DGeomOperationAction.h"
-
-#include "Internal/SelectionManager.h"
 
 #include <QCheckBox>
 #include <QComboBox>

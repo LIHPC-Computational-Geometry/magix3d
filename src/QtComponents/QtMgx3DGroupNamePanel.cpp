@@ -3,11 +3,7 @@
  * \author      Charles PIGNEROL
  * \date        11/12/2012
  */
-
-#include "Internal/Context.h"
 #include "Utils/Common.h"
-#include "Group/GroupManager.h"
-#include "Group/GroupEntity.h"
 #include "QtComponents/QtMgx3DGroupNamePanel.h"
 
 #include <TkUtil/MemoryError.h>
@@ -22,9 +18,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Group;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 using namespace Mgx3D::QtComponents;
 
 
@@ -76,10 +70,10 @@ QtMgx3DGroupNamePanel::~QtMgx3DGroupNamePanel ( )
 }	// QtMgx3DGroupNamePanel::~QtMgx3DGroupNamePanel
 
 
-Context& QtMgx3DGroupNamePanel::getContext ( )
+Controller& QtMgx3DGroupNamePanel::getController ( )
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
-	return _mainWindow->getContext ( );
+	return _mainWindow->getController ( );
 }	// QtMgx3DGroupNamePanel::getContext
 
 

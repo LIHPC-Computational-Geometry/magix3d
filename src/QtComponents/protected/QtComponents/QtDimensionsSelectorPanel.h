@@ -6,9 +6,6 @@
 #ifndef QT_DIMENSIONS_SELECTOR_PANEL_H
 #define QT_DIMENSIONS_SELECTOR_PANEL_H
 
-
-#include "Internal/SelectionManager.h"
-
 #include <QButtonGroup>
 #include <QCheckBox>
 

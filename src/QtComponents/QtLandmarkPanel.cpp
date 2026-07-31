@@ -1,5 +1,3 @@
-#include "Internal/Context.h"
-
 #include "QtComponents/QtLandmarkPanel.h"
 
 #include <QtUtil/QtConfiguration.h>

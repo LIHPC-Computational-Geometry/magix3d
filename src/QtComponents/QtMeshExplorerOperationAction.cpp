@@ -3,12 +3,8 @@
  * \author      Charles PIGNEROL
  * \date        29/01/2013
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Mesh/MeshManager.h"
 #include "QtComponents/QtMeshExplorerOperationAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
@@ -24,9 +20,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Mesh;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -352,7 +346,7 @@ QtMeshExplorerOperationAction::~QtMeshExplorerOperationAction ( )
 	if (0 != oldExplorer.get ( ))
 	{
 		CommandMeshExplorer*	explorer	=
-					getContext ( ).getMeshManager ( ).endExplorer (
+					getController( ).endExplorer (
 													oldExplorer.get ( ), false);
 		if (explorer){
 			for (vector<ObjectBase*>::iterator it = _observers.begin ( );
@@ -443,7 +437,7 @@ void QtMeshExplorerOperationAction::update (bool withStep)
         unique_ptr<CommandMeshExplorer>   oldExplorer (releaseMeshExplorer ( ));
 
         CommandMeshExplorer*    explorer    =
-                getContext ( ).getMeshManager ( ).newExplorer (
+                getController( ).newExplorer (
                         oldExplorer.get ( ),
                         (withStep?steps:0),
                         edgeName,

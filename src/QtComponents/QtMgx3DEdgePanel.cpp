@@ -4,18 +4,11 @@
  * \date		30/01/2013
  */
 
-#include "Internal/Context.h"
-
 #include "QtComponents/QtMgx3DEdgePanel.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
 
 #include "Utils/Common.h"
-#include "Geom/Curve.h"
-#include "Geom/Vertex.h"
-#include "Topo/Vertex.h"
-#include "Topo/Edge.h"
-#include "Topo/CoEdge.h"
 
 #include <QtUtil/QtConfiguration.h>
 #include <TkUtil/Exception.h>
@@ -32,7 +25,6 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -280,10 +272,10 @@ void QtMgx3DEdgePanel::edgesRemovedFromSelectionCallback (QString edgesNames)
 	emit edgesRemovedFromSelection (edgesNames);
 }	// QtMgx3DEdgePanel::edgesRemovedFromSelectionCallback
 
-const Context& QtMgx3DEdgePanel::getContext ( ) const
+const Controller& QtMgx3DEdgePanel::getController ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_mainWindow)
-	return _mainWindow->getContext ( );
+	return _mainWindow->getController ( );
 }	// QtMgx3DEdgePanel::getContext
 
 

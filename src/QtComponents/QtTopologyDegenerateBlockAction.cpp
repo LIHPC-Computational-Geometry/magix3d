@@ -3,9 +3,6 @@
  * \author      Charles PIGNEROL
  * \date        07/03/2014
  */
-
-#include "Internal/Context.h"
-
 #include "QtComponents/QtTopologyDegenerateBlockAction.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "Utils/Common.h"
@@ -18,9 +15,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -269,10 +264,10 @@ vector<Entity*> QtTopologyDegenerateBlockPanel::getInvolvedEntities ( )
 	vector<Entity*>	entities;
 	const string	vertice1Name	= getVertice1Name ( );
 	const string	vertice2Name	= getVertice2Name ( );
-	TopoEntity*		vertice1	=
-			getContext ( ).getTopoManager ( ).getEntity (vertice1Name, false);
-	TopoEntity*		vertice2	=
-			getContext ( ).getTopoManager ( ).getEntity (vertice2Name, false);
+	Entity*		vertice1	=
+			getController ( ).getTopoManager ( ).getEntity (vertice1Name, false);
+	Entity*		vertice2	=
+			getController ( ).getTopoManager ( ).getEntity (vertice2Name, false);
 	if (0 != vertice1)
 		entities.push_back (vertice1);
 	if (0 != vertice2)
@@ -372,15 +367,13 @@ void QtTopologyDegenerateBlockAction::executeOperation ( )
 	QtTopologyDegenerateBlockPanel*	panel	= dynamic_cast<QtTopologyDegenerateBlockPanel*>(getTopologyDegenerateBlockPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)
 
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de collage des vertices topologiques :
 	const string	vertice1Name	= panel->getVertice1Name ( );
 	const string	vertice2Name	= panel->getVertice2Name ( );
 
-	cmdResult	= getContext ( ).getTopoManager ( ).snapVertices (vertice1Name, vertice2Name, panel->projectOnFirst ( ));
+	getController ( ).getTopoManager ( ).snapVertices (vertice1Name, vertice2Name, panel->projectOnFirst ( ));
 	
 	setCommandResult (cmdResult);
 }	// QtTopologyDegenerateBlockAction::executeOperation

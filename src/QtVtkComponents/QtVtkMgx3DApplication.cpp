@@ -5,7 +5,7 @@
  */
 
 #include "Internal/Context.h"
-#include "Internal/Resources.h"
+#include "QtComponents/GUIResources.h"
 
 #include "QtVtkComponents/QtVtkMgx3DApplication.h"
 #include "QtVtkComponents/VTKConfiguration.h"
@@ -170,7 +170,7 @@ void QtVtkMgx3DApplication::init (int argc, char* argv[], char* envp[])
 
 	// Pas de display lists :
 #if	VTK_MAJOR_VERSION < 8
-	vtkMapper::SetGlobalImmediateModeRendering (!Resources::instance ( )._useDisplayList);
+	vtkMapper::SetGlobalImmediateModeRendering (!QtComponents::GUIResources::instance ( )._useDisplayList);
 #endif	// VTK_MAJOR_VERSION < 8
 
 	// ATTENTION : appel vital pour un bon affichage des bras.

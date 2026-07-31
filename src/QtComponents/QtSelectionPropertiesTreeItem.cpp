@@ -4,10 +4,6 @@
  * \date		07/10/2013
  */
 
-
-#include "Internal/Context.h"
-#include "Internal/Resources.h"
-
 #include "QtComponents/QtSelectionIndividualPropertiesPanel.h"
 
 #include "Utils/Common.h"
@@ -19,7 +15,6 @@ using namespace Mgx3D;
 using namespace Mgx3D::Utils;
 using namespace TkUtil;
 using namespace std;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -166,10 +161,10 @@ RenderingManager* QtSelectionPropertiesTreeItem::getRenderingManager ( )
 }	// QtSelectionPropertiesTreeItem::getRenderingManager
 
 
-const Context& QtSelectionPropertiesTreeItem::getContext ( ) const
+const Controller& QtSelectionPropertiesTreeItem::getController ( ) const
 {
 	CHECK_NULL_PTR_ERROR (_renderingManager)
-	return _renderingManager->getContext ( );
+	return _renderingManager->getController ( );
 }	// QtSelectionPropertiesTreeItem::getContext
 
 

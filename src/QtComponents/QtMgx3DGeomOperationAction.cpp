@@ -2,10 +2,7 @@
  * \file		QtMgx3DGeomOperationAction.hcpp
  * \author		Charles PIGNEROL 
  * \date		11/12/2012 
- */ 
-
-#include "Internal/Context.h"
-
+ */
 #include "QtComponents/QtMgx3DGeomOperationAction.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "Utils/Common.h"

@@ -1,4 +1,3 @@
-#include "Internal/Context.h"
 
 #include "QtComponents/QtAxisPanel.h"
 #include "QtComponents/QtNumericFieldsFactory.h"

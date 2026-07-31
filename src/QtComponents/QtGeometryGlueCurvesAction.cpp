@@ -4,10 +4,7 @@
  * \date        20/11/2014
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
-#include "Geom/Curve.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtGeometryGlueCurvesAction.h"
@@ -20,9 +17,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -170,8 +165,8 @@ vector<Entity*> QtGeometryGlueCurvesPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		GeomEntity*		curve	= 
-			getContext ( ).getGeomManager ( ).getCurve (*it, false);
+		Entity*		curve	=
+			getController( ).getCurve (*it, false);
 		if (0 != curve)
 			entities.push_back (curve);
 	}	// for (vector<string>::const_iterator it = names.begin ( ); ...
@@ -245,7 +240,6 @@ QtGeometryGlueCurvesPanel*
 
 void QtGeometryGlueCurvesAction::executeOperation ( )
 {
-	M3DCommandResult*		cmdResult	= 0;
 	QtGeometryGlueCurvesPanel*	panel	=
 			dynamic_cast<QtGeometryGlueCurvesPanel*>(getGeometryGlueCurvesPanel ( ));
 	CHECK_NULL_PTR_ERROR (panel)
@@ -256,7 +250,7 @@ void QtGeometryGlueCurvesAction::executeOperation ( )
 	// Récupération des paramètres de collage des courbes géométriques :
 	vector<string>	curves	= panel->getCurvesNames ( );
 
-	cmdResult	= getContext ( ).getGeomManager ( ).joinCurves (curves);
+	getController( ).joinCurves (curves);
 
 	setCommandResult (cmdResult);
 }	// QtGeometryGlueCurvesAction::executeOperation

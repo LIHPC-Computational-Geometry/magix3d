@@ -4,8 +4,6 @@
  * \date		18/01/2011
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ErrorManagement.h"
 #include "Utils/Magix3DEvents.h"

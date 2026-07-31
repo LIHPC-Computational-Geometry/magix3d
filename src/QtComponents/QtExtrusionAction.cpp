@@ -9,14 +9,9 @@
  *      Author: Simon C
  *      ajout de la possibilité de conserver les entités géométriques
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManager.h"
-#include "Geom/Surface.h"
 #include "QtComponents/QtExtrusionAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
@@ -33,11 +28,8 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Group;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -275,8 +267,8 @@ vector<Entity*> QtExtrusionPanel::getInvolvedEntities ( )
 
 	for (vector<string>::const_iterator it = names.begin ( ); names.end ( ) != it; it++)
 	{
-		GeomEntity*		entity	=
-			getContext ( ).getGeomManager ( ).getEntity (*it, false);
+		Entity*		entity	=
+			getController( ).getEntity (*it, false);
 		if (0 != entity)
 			entities.push_back (entity);
 	}	// for (vector<string>::const_iterator it = names.begin ( ); ...
@@ -350,8 +342,6 @@ QtExtrusionPanel* QtExtrusionAction::getExtrusionPanel ( )
 
 void QtExtrusionAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de l'extrusion :
@@ -362,9 +352,9 @@ void QtExtrusionAction::executeOperation ( )
 	const bool					withTopo	= panel->withTopology ( );
     const bool					keepEntities= panel->keepEntities ( );
 	if (withTopo)
-		cmdResult	= getContext ( ).getGeomManager ( ).makeBlocksByExtrude(entities, v, keepEntities);
+		getController( ).makeBlocksByExtrude(entities, v, keepEntities);
 	else
-		cmdResult	= getContext ( ).getGeomManager ( ).makeExtrude (entities, v, keepEntities);
+		getController( ).makeExtrude (entities, v, keepEntities);
 
 	setCommandResult (cmdResult);
 }	// QtExtrusionAction::executeOperation

@@ -4,20 +4,16 @@
  * \date		05/12/2016
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
-#include "Internal/EntitiesHelper.h"
-#include "Internal/InfoCommand.h"
-#include "Topo/CoEdge.h"
-#include "Topo/TopoDisplayRepresentation.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtExtremaMeshingEdgeLengthOnEdgeAction.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtMgx3DApplication.h"
 #include <QtUtil/QtHelpWindow.h>
 #include <QtUtil/QtUnicodeHelper.h>
+
+#include "QtComponents/GUIResources.h"
 
 #include <TkUtil/ErrorLog.h>
 #include <TkUtil/InformationLog.h>
@@ -36,7 +32,6 @@ using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -292,7 +287,7 @@ const Topo::CoEdge* QtExtremaMeshingEdgeLengthOnEdgePanel::getCoEdge ( ) const
 	CHECK_NULL_PTR_ERROR (_coedgePanel)
 	string	entitie	= _coedgePanel->getUniqueName ( );
 
-	return (Topo::CoEdge*)&getContext().nameToEntity (entitie);
+	return (Topo::CoEdge*)&getController().nameToEntity (entitie);
 
 }	// QtExtremaMeshingEdgeLengthOnEdgePanel::getCoEdge
 
@@ -313,10 +308,9 @@ void QtExtremaMeshingEdgeLengthOnEdgePanel::updateLengths (double d1, double d2)
 		text2 << MgxNumeric::userRepresentation (d2);
 	}	// if (valid)
 
-	Context&	context	= getContext ( );
-	if (Unit::undefined != context.getLengthUnit ( )) {
-		text1 << Unit::toShortString (context.getLengthUnit ( ));
-		text2 << Unit::toShortString (context.getLengthUnit ( ));
+	if (Unit::undefined != getController().getLengthUnit ( )) {
+		text1 << Unit::toShortString (getController().getLengthUnit ( ));
+		text2 << Unit::toShortString (getController().getLengthUnit ( ));
 	}	// if (Unit::undefined != context.getLengthUnit ( ))
 
 	_startLengthLabel->setText (UTF8TOQSTRING (text1));
@@ -419,11 +413,11 @@ void QtExtremaMeshingEdgeLengthOnEdgePanel::viewDirection (bool show, bool destr
 
 		DisplayProperties	graphicalProps;
 		graphicalProps.setWireColor (Color (
-				255 * Resources::instance ( )._previewColor.getRed ( ),
-				255 * Resources::instance ( )._previewColor.getGreen ( ),
-				255 * Resources::instance ( )._previewColor.getBlue ( )));
+				255 * GUIResources::instance ( )._previewColor.getRed ( ),
+				255 * GUIResources::instance ( )._previewColor.getGreen ( ),
+				255 * GUIResources::instance ( )._previewColor.getBlue ( )));
 		graphicalProps.setLineWidth (
-				Resources::instance ( )._previewWidth.getValue ( ));
+				GUIResources::instance ( )._previewWidth.getValue ( ));
 
 
 		RenderingManager::RepresentationID	edgeID	=
@@ -437,9 +431,9 @@ void QtExtremaMeshingEdgeLengthOnEdgePanel::viewDirection (bool show, bool destr
 	COMPLETE_QT_TRY_CATCH_BLOCK (false, this, "Magix 3D")
 
 	if (hasError)
-		getContext ( ).getLogStream()->log(TkUtil::TraceLog (errorString, TkUtil::Log::WARNING));
+		getController( ).getLogStream()->log(TkUtil::TraceLog (errorString, TkUtil::Log::WARNING));
 	else if (edge_direction_activated)
-		getContext ( ).getLogStream()->log(TkUtil::TraceLog (UTF8String ("Prévisualisation du sens de la discrétisation ...", Charset::UTF_8), TkUtil::Log::TRACE_1));
+		getController( ).getLogStream()->log(TkUtil::TraceLog (UTF8String ("Prévisualisation du sens de la discrétisation ...", Charset::UTF_8), TkUtil::Log::TRACE_1));
 }	// QtExtremaMeshingEdgeLengthOnEdgePanel::viewDirection
 
 

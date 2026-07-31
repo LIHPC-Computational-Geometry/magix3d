@@ -7,15 +7,8 @@
 #ifndef QT_MGX3D_QUALIF_WIDGET_H
 #define QT_MGX3D_QUALIF_WIDGET_H
 
-#include "Internal/Context.h"
-
 #include <QtQualif/QtQualifWidget.h>
 #include <QMenu>
-
-#include "Mesh/MeshItf.h"
-#include "Internal/Context.h"
-
-#include <gmds/utils/CommonTypes.h>
 
 
 namespace Mgx3D
@@ -48,7 +41,7 @@ class QtMgx3DQualifWidget : public GQualif::QtQualifWidget
 	 * \param		Widget parent.
 	 * \param		Context d'utilisation du widget
 	 */
-	QtMgx3DQualifWidget (QWidget* parent, Mgx3D::Internal::Context* context);
+	QtMgx3DQualifWidget (QWidget* parent, Mgx3D::Controller* controller);
 
 	/**
 	 * Destructeur. RAS.
@@ -81,8 +74,8 @@ class QtMgx3DQualifWidget : public GQualif::QtQualifWidget
 	/**
 	 * \return		Le context d'utilisation du widget.
 	 */
-	virtual Mgx3D::Internal::Context& getContext ( );
-	virtual const Mgx3D::Internal::Context& getContext ( ) const;
+	virtual Mgx3D::Controller& getController ( );
+	virtual const Mgx3D::Controller& getController ( ) const;
 
 	virtual void 	focusInEvent (QFocusEvent*);
 
@@ -109,7 +102,7 @@ class QtMgx3DQualifWidget : public GQualif::QtQualifWidget
 	QtMgx3DQualifWidget& operator = (const QtMgx3DQualifWidget&);
 
 	/** Le context Magix 3D d'utilisation du panneau. */
-	Mgx3D::Internal::Context*									_context;
+	Mgx3D::Controller*									_context;
 
 	/** Le menu contextuel. */
 	QMenu*				_popupMenu;

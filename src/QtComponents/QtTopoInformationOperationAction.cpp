@@ -3,13 +3,8 @@
  * \author		Eric Brière de l'Isle
  * \date		25/5/2016
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/MgxNumeric.h"
-#include "Internal/EntitiesHelper.h"
-#include "Internal/InfoCommand.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtTopoInformationOperationAction.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -32,7 +27,6 @@ using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -307,11 +301,10 @@ void QtTopoInformationOperationPanel::autoUpdate ( )
 	try
 	{
 
-		Internal::Context*	context	=
-				dynamic_cast<Internal::Context*>(&getContext ( ));
-		CHECK_NULL_PTR_ERROR (context)
+		Controller*	controller	= &getController ( );
+		CHECK_NULL_PTR_ERROR (controller)
 		Topo::TopoManager*	manager	=
-				dynamic_cast<Topo::TopoManager*>(&getContext ( ).getTopoManager( ));
+				dynamic_cast<Topo::TopoManager*>(&getController ( ).getTopoManager( ));
 		CHECK_NULL_PTR_ERROR (manager)
 
 		QtMgx3DOperationPanel::autoUpdate ( );

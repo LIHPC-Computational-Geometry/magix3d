@@ -172,7 +172,7 @@ void VTKMgx3DStructuredMeshEntityRepresentation::createVolumicRepresentation (co
 	_volumicMapper->SetInputData (_volumicGrid);
 //	_volumicMapper->ScalarVisibilityOff ( );
 #if	VTK_MAJOR_VERSION < 8
-	_volumicMapper->SetImmediateModeRendering (!Internal::Resources::instance ( )._useDisplayList);
+	_volumicMapper->SetImmediateModeRendering (!QtComponents::GUIResources::instance ( )._useDisplayList);
 #endif	// VTK_MAJOR_VERSION < 8
 	_volumicActor	  = VTKMgx3DActor::New ( );
 	_volumicActor->SetEntity (getEntity ( ));

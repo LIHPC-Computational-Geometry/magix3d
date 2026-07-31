@@ -6,7 +6,6 @@
 #ifndef QT_TOPOLOGY_SPLIT_BLOCK_WITH_OGRID_ACTION_H
 #define QT_TOPOLOGY_SPLIT_BLOCK_WITH_OGRID_ACTION_H
 
-
 #include "QtComponents/QtMgx3DEntityPanel.h"
 #include "QtComponents/QtMgx3DOperationsPanel.h"
 #include "QtComponents/QtMgx3DTopoOperationAction.h"

@@ -4,8 +4,6 @@
  * \date        26/05/2014
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
 #include <QtUtil/QtErrorManagement.h>
@@ -30,9 +28,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -402,8 +398,8 @@ vector<Entity*> QtGeometryHomothetyPanel::getInvolvedEntities ( )
 	for (vector<string>::const_iterator it = names.begin ( );
 	     names.end ( ) != it; it++)
 	{
-		GeomEntity*	entity	=
-					getContext ( ).getGeomManager ( ).getEntity (*it, false);
+		Entity*	entity	=
+					getController( ).getEntity (*it, false);
 		if (0 != entity)
 			entities.push_back (entity);
 	}
@@ -514,8 +510,6 @@ QtGeometryHomothetyPanel*
 
 void QtGeometryHomothetyAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres d'association des entités géométriques :
@@ -527,7 +521,6 @@ void QtGeometryHomothetyAction::executeOperation ( )
 	const bool		    processAll	= panel->processAllGeomEntities ( );
 	const QtGeometryHomothetyPanel::HOMOTHETY_TYPE	type	=
 											panel->getHomothetyType ( );
-	GeomManager&			geomManager	= getContext ( ).getGeomManager ( );
 	if (true == processAll)
 	{
 		if (copy)
@@ -538,7 +531,7 @@ void QtGeometryHomothetyAction::executeOperation ( )
 				{
 					const double		factor	(panel->getHomogeneousPanel ( ).getHomothetyFactor ( ));
 					const Math::Point	center (panel->getHomogeneousPanel ( ).getCenter ( ));
-					cmdResult	= geomManager.copyAndScaleAll (factor, center, groupName);
+					getController( ).copyAndScaleAll (factor, center, groupName);
 				}	// case QtGeometryHomothetyPanel::HOMOGENEOUS
 				break;
 				case QtGeometryHomothetyPanel::HETEROGENEOUS	:
@@ -547,7 +540,7 @@ void QtGeometryHomothetyAction::executeOperation ( )
 					const double		yFactor	(panel->getHeterogeneousPanel( ).getHomothetyYFactor( ));
 					const double		zFactor	(panel->getHeterogeneousPanel( ).getHomothetyZFactor( ));
 					const Math::Point	center (panel->getHeterogeneousPanel ( ).getCenter ( ));
-					cmdResult	= geomManager.copyAndScaleAll (xFactor, yFactor, zFactor, center, groupName);
+					getController( ).copyAndScaleAll (xFactor, yFactor, zFactor, center, groupName);
 				}	// QtGeometryHomothetyPanel::HETEROGENEOUS
 				break;
 			}	// switch (type)
@@ -560,7 +553,7 @@ void QtGeometryHomothetyAction::executeOperation ( )
 				{
 					const double		factor	(panel->getHomogeneousPanel ( ).getHomothetyFactor ( ));
 					const Math::Point	center (panel->getHomogeneousPanel ( ).getCenter ( ));
-					cmdResult	= geomManager.scaleAll (factor, center);
+					getController( ).scaleAll (factor, center);
 				}
 				break;
 				case QtGeometryHomothetyPanel::HETEROGENEOUS	:
@@ -569,7 +562,7 @@ void QtGeometryHomothetyAction::executeOperation ( )
 					const double		yFactor	(panel->getHeterogeneousPanel( ).getHomothetyYFactor( ));
 					const double		zFactor	(panel->getHeterogeneousPanel( ).getHomothetyZFactor( ));
 					const Math::Point	center (panel->getHeterogeneousPanel ( ).getCenter ( ));
-					cmdResult	= geomManager.scaleAll (xFactor, yFactor, zFactor, center);
+					getController( ).scaleAll (xFactor, yFactor, zFactor, center);
 				}
 				break;
 			}	// switch (type)
@@ -590,7 +583,7 @@ void QtGeometryHomothetyAction::executeOperation ( )
 				{
 					const double		factor	(panel->getHomogeneousPanel ( ).getHomothetyFactor ( ));
 					const Math::Point	center (panel->getHomogeneousPanel ( ).getCenter ( ));
-					cmdResult	= geomManager.copyAndScale (entities, factor, center, withTopo, groupName);
+					getController( ).copyAndScale (entities, factor, center, withTopo, groupName);
 				}	// case QtGeometryHomothetyPanel::HOMOGENEOUS
 				break;
 				case QtGeometryHomothetyPanel::HETEROGENEOUS	:
@@ -599,7 +592,7 @@ void QtGeometryHomothetyAction::executeOperation ( )
 					const double		yFactor	(panel->getHeterogeneousPanel( ).getHomothetyYFactor( ));
 					const double		zFactor	(panel->getHeterogeneousPanel( ).getHomothetyZFactor( ));
 					const Math::Point	center (panel->getHeterogeneousPanel ( ).getCenter ( ));
-					cmdResult	= geomManager.copyAndScale (entities, xFactor, yFactor, zFactor, center, withTopo, groupName);
+					getController( ).copyAndScale (entities, xFactor, yFactor, zFactor, center, withTopo, groupName);
 				}	// QtGeometryHomothetyPanel::HETEROGENEOUS
 				break;
 			}	// switch (type)
@@ -612,7 +605,7 @@ void QtGeometryHomothetyAction::executeOperation ( )
 				{
 					const double		factor	(panel->getHomogeneousPanel ( ).getHomothetyFactor ( ));
 					const Math::Point	center (panel->getHomogeneousPanel ( ).getCenter ( ));
-					cmdResult	= geomManager.scale (entities, factor, center);
+					getController( ).scale (entities, factor, center);
 				}	// case QtGeometryHomothetyPanel::HOMOGENEOUS
 				break;
 				case QtGeometryHomothetyPanel::HETEROGENEOUS	:
@@ -621,7 +614,7 @@ void QtGeometryHomothetyAction::executeOperation ( )
 					const double		yFactor	(panel->getHeterogeneousPanel( ).getHomothetyYFactor( ));
 					const double		zFactor	(panel->getHeterogeneousPanel( ).getHomothetyZFactor( ));
 					const Math::Point	center (panel->getHeterogeneousPanel ( ).getCenter ( ));
-					cmdResult	= geomManager.scale (entities, xFactor, yFactor, zFactor, center);
+					getController( ).scale (entities, xFactor, yFactor, zFactor, center);
 				}	// QtGeometryHomothetyPanel::HETEROGENEOUS
 				break;
 			}	// switch (type)

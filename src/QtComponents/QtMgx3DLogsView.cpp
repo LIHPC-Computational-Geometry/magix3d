@@ -1,5 +1,3 @@
-#include "Internal/Context.h"
-
 #include "QtComponents/QtMgx3DLogsView.h"
 
 #include <QtUtil/QtUnicodeHelper.h>

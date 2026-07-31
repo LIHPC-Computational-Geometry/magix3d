@@ -6,8 +6,6 @@
 #ifndef QT_SEGMENT_OPERATION_ACTION_H
 #define QT_SEGMENT_OPERATION_ACTION_H
 
-#include "Internal/Context.h"
-
 #include "QtComponents/QtMgx3DGeomOperationAction.h"
 #include "QtComponents/QtMgx3DGroupNamePanel.h"
 #include "QtComponents/QtCurvilinearAbscissaPanel.h"

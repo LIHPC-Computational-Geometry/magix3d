@@ -3,20 +3,15 @@
  * \author      Charles PIGNEROL
  * \date        27/05/2014
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/Vertex.h"
-#include "Geom/GeomDisplayRepresentation.h"
-#include "Geom/CommandNewSphere.h"
-#include "Geom/CommandNewHollowSphere.h"
 #include "Utils/Vector.h"
 #include "QtComponents/QtSphereOperationAction.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DApplication.h"
 #include "QtComponents/QtNumericFieldsFactory.h"
+
+#include "QtComponents/GUIResources.h"
 
 #include <TkUtil/MemoryError.h>
 #include <TkUtil/InternalError.h>
@@ -32,10 +27,7 @@ using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Group;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -98,11 +90,11 @@ QtSphereOperationPanel::QtSphereOperationPanel (
 	layout->addWidget (groupBox);
 	QVBoxLayout*	vlayout	= new QVBoxLayout (groupBox);
 	vlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	vlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	vlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	groupBox->setLayout (vlayout);
 	_centerPanel	= new QtMgx3DPointPanel (
 		groupBox, "Centre", true, "x :", "y :", "z :",
@@ -120,11 +112,11 @@ QtSphereOperationPanel::QtSphereOperationPanel (
 
 	hlayout	= new QHBoxLayout ( );
 	hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	vlayout->addLayout (hlayout);
 	_internalRadiusLabel	= new QLabel ("Rayon interne :", this);
 	hlayout->addWidget (_internalRadiusLabel);
@@ -139,11 +131,11 @@ QtSphereOperationPanel::QtSphereOperationPanel (
 
 	hlayout	= new QHBoxLayout ( );
 	hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	vlayout->addLayout (hlayout);
 	label	= new QLabel ("Rayon externe :", this);
 	hlayout->addWidget (label);
@@ -160,11 +152,11 @@ QtSphereOperationPanel::QtSphereOperationPanel (
 	groupBox	= new QtGroupBox (this, "Portion de la sphère");
 	hlayout	= new QHBoxLayout (groupBox);
 	hlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	hlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	hlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	groupBox->setLayout (hlayout);
 	layout->addWidget (groupBox);
 	_anglePanel	= new QtAnglePanel (
@@ -185,14 +177,14 @@ QtSphereOperationPanel::QtSphereOperationPanel (
 	layout->addWidget (groupBox);
 	vlayout	= new QVBoxLayout (groupBox);
 	vlayout->setContentsMargins  (
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ),
-						Resources::instance ( )._margin.getValue ( ));
-	vlayout->setSpacing (Resources::instance ( )._spacing.getValue ( ));
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ),
+						GUIResources::instance ( )._margin.getValue ( ));
+	vlayout->setSpacing (GUIResources::instance ( )._spacing.getValue ( ));
 	groupBox->setLayout (vlayout);
 	const int	defaultEdgesNum	=
-		mainWindow.getContext( ).getTopoManager( ).getDefaultNbMeshingEdges( );
+		mainWindow.getController( ).getTopoManager( ).getDefaultNbMeshingEdges( );
 	_topologyPanel	= new QtTopologyPanel (
 			groupBox, mainWindow, false, false, 3, QtTopologyPanel::OGRID_BLOCKS,
 			QtTopologyPanel::OGRID,
@@ -245,8 +237,8 @@ vector<Entity*> QtSphereOperationPanel::getInvolvedEntities ( )
 
 	if (0 != _centerPanel->getUniqueName ( ).length ( ))
 	{
-		Geom::Vertex*	vertex	= 
-			getContext ( ).getGeomManager ( ).getVertex (
+		Entity*	vertex	=
+			getController( ).getGeomManager ( ).getVertex (
 									_centerPanel->getUniqueName ( ), false);
 		if (0 != vertex)
 			entities.push_back (vertex);
@@ -368,7 +360,7 @@ void QtSphereOperationPanel::reset ( )
 	_externalRadiusTextField->setValue (1.);
 	_externalRadiusTextField->setValue (0.5);
 	const int	defaultEdgesNum	=
-		getMainWindow ( )->getContext( ).getTopoManager( ).getDefaultNbMeshingEdges( );
+		getMainWindow ( )->getController( ).getTopoManager( ).getDefaultNbMeshingEdges( );
 	_topologyPanel->setTopologyType (QtTopologyPanel::OGRID_BLOCKS);
 //	_topologyPanel->setAxe1EdgesNum (-1);	// Non instancié
 	_topologyPanel->setAxe2EdgesNum (defaultEdgesNum);
@@ -521,6 +513,10 @@ void QtSphereOperationPanel::hollowedModifiedCallback ( )
 
 void QtSphereOperationPanel::preview (bool show, bool destroyInteractor)
 {
+
+	std::cout<<"Print disabled for the moment: refactoring in progress"<<std::endl;
+
+	/*
 	// Lors de la construction getGraphicalWidget peut être nul ...
 	try
 	{
@@ -543,11 +539,11 @@ void QtSphereOperationPanel::preview (bool show, bool destroyInteractor)
 
 		DisplayProperties	graphicalProps;
 		graphicalProps.setWireColor (Color (
-				255 * Resources::instance ( )._previewColor.getRed ( ),
-				255 * Resources::instance ( )._previewColor.getGreen ( ),
-				255 * Resources::instance ( )._previewColor.getBlue ( )));
+				255 * GUIResources::instance ( )._previewColor.getRed ( ),
+				255 * GUIResources::instance ( )._previewColor.getGreen ( ),
+				255 * GUIResources::instance ( )._previewColor.getBlue ( )));
 		graphicalProps.setLineWidth (
-						Resources::instance ( )._previewWidth.getValue ( ));
+						GUIResources::instance ( )._previewWidth.getValue ( ));
 
 		const bool			hollowed	= isHollowed ( );
 		const Point			center (getCenter());
@@ -589,6 +585,7 @@ void QtSphereOperationPanel::preview (bool show, bool destroyInteractor)
 		if (command)
 			delete command;
 	}
+	*/
 }	// QtSphereOperationPanel::preview
 
 
@@ -639,8 +636,6 @@ QtSphereOperationPanel* QtSphereOperationAction::getSpherePanel ( )
 
 void QtSphereOperationAction::executeOperation ( )
 {
-	// Validation paramétrage :
-	M3DCommandResult*	cmdResult	= 0;
 //	QtMgx3DGeomOperationAction::executeOperation ( );
 
 	// Récupération des paramètres de création de la sphère :
@@ -658,16 +653,16 @@ void QtSphereOperationAction::executeOperation ( )
 		if ((Portion::Type)0 == portion)
 		{	// Angle personnalisé
 			if (false == hollowed)
-				cmdResult	= getContext ( ).getGeomManager ( ).newSphere (center, externalRadius, angle, name);
+				getController( ).getGeomManager ( ).newSphere (center, externalRadius, angle, name);
 			else
-				cmdResult	= getContext ( ).getGeomManager ( ).newHollowSphere (center, internalRadius, externalRadius, angle, name);
+				getController( ).getGeomManager ( ).newHollowSphere (center, internalRadius, externalRadius, angle, name);
 		}	// if ((Portion::Type)0 == portion)
 		else
 		{	// Portion prédéfinie
 			if (false == hollowed)
-				cmdResult	= getContext ( ).getGeomManager ( ).newSphere (center, externalRadius, portion, name);
+				getController( ).getGeomManager ( ).newSphere (center, externalRadius, portion, name);
 			else
-				cmdResult	= getContext ( ).getGeomManager ( ).newHollowSphere (center, internalRadius, externalRadius, portion, name);
+				getController( ).getGeomManager ( ).newHollowSphere (center, internalRadius, externalRadius, portion, name);
 		}	// else if ((Portion::Type)0 == portion)
 	}
 	else
@@ -697,9 +692,9 @@ void QtSphereOperationAction::executeOperation ( )
 		const int		nr		= panel->getNk ( );
 		const double	ratio	= panel->getOGridRatio ( );
 		if (false == hollowed)
-			cmdResult	= getContext ( ).getTopoManager ( ).newSphereWithTopo (center, externalRadius, portion, structured, ratio, ni, nr,name);
+			getController( ).getTopoManager ( ).newSphereWithTopo (center, externalRadius, portion, structured, ratio, ni, nr,name);
 		else
-			cmdResult	= getContext ( ).getTopoManager ( ).newHollowSphereWithTopo (center, internalRadius, externalRadius, portion, structured, ni, nr, name);
+			getController( ).getTopoManager ( ).newHollowSphereWithTopo (center, internalRadius, externalRadius, portion, structured, ni, nr, name);
 	}	// else if (false == panel->createTopology ( ))
 
 	setCommandResult (cmdResult);

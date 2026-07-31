@@ -18,10 +18,7 @@ namespace QtComponents
 
 }	// namespace Mgx3D
 
-
-#include "Internal/Context.h"
-#include "Internal/CommandInternal.h"
-#include "Internal/Resources.h"
+#include "Controller/Controller.h"
 
 #include <TkUtil/LogOutputStream.h>
 #include <QtUtil/QtGroupBox.h>
@@ -37,7 +34,6 @@ namespace QtComponents
 #include <QWidgetAction>
 
 #include "Utils/ValidatedField.h"
-#include "Internal/Context.h"
 #include "QtComponents/QtMgx3DApplication.h"
 #include "QtComponents/RenderingManager.h"
 #include <QtUtil/QtIntTextField.h>
@@ -59,7 +55,7 @@ namespace QtComponents
 	}                                                                      \
 	catch (...)                                                            \
 	{                                                                      \
-		if (false == Mgx3D::Internal::Resources::instance ( )._prevalidateSeizure) \
+		if (false == Mgx3D::QtComponents::GUIResources::instance ( )._prevalidateSeizure) \
 			preview (false, false);                                        \
 		else                                                               \
 			throw;                                                         \
@@ -300,8 +296,8 @@ class QtMgx3DOperationPanel : public QWidget
 	 * \return	Une référence sur le contexte <I>Magix 3D</I> associé à
 	 *			l'opération.
 	 */
-	virtual const Mgx3D::Internal::Context& getContext ( ) const;
-	virtual Mgx3D::Internal::Context& getContext ( );
+	virtual const Mgx3D::Controller& getController ( ) const;
+	virtual Mgx3D::Internal::Context& getController ( );
 
 	/**
 	 * \return	Une référence sur le gestionnaire de sélection.
@@ -770,8 +766,8 @@ class QtMgx3DWidgetedCheckedAction : public QtWidgetAction
 	 * \return		Une référence sur le contexte <I>Magix 3D</I> associé
 	 *				à cette opération.
 	 */
-	virtual const Mgx3D::Internal::Context& getContext ( ) const;
-	virtual Mgx3D::Internal::Context& getContext ( );
+	virtual const Mgx3D::Controller& getController ( ) const;
+	virtual Mgx3D::Controller& getController ( );
 
 	/**
 	 * \param		Le widget associé.
@@ -1135,8 +1131,8 @@ class QtMgx3DOperationsPanel : public QtGroupBox
 	/**
 	 * \return		Une référence sur le contexte <I>Magix 3D</I>.
 	 */
-	virtual const Mgx3D::Internal::Context& getContext ( ) const;
-	virtual Mgx3D::Internal::Context& getContext ( );
+	virtual const Mgx3D::Controller& getController ( ) const;
+	virtual Mgx3D::Controller& getController ( );
 
 	/**
 	 * Appellé lorsque la session va être réinitialisée. Purge les éventuels

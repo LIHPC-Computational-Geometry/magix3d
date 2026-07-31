@@ -3,17 +3,8 @@
  * \author      Charles PIGNEROL
  * \date        07/01/2025
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Internal/EntitiesHelper.h"
-#include "Internal/InfoCommand.h"
-#include "Mesh/SubSurface.h"
-#include "Mesh/Surface.h"
-#include "Mesh/SubVolume.h"
-#include "Mesh/Volume.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMeshQualityDividerOperationAction.h"
 #include "QtComponents/QtMgx3DMainWindow.h"
@@ -28,20 +19,11 @@
 #include <QVBoxLayout>
 #include <QScrollArea>
 
-#include "Mesh/MeshManager.h"
-#include "Mesh/MeshItf.h"
-#include "Mesh/Mgx3DQualifSerie.h"
-
-#include <gmds/ig/Mesh.h>
-
 using namespace std;
 using namespace TkUtil;
 using namespace GQualif;
 using namespace Mgx3D;
-using namespace Mgx3D::Group;
-using namespace Mgx3D::Mesh;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 namespace Mgx3D
 {
@@ -233,8 +215,8 @@ void QtMeshQualityDividerOperationPanel::autoUpdate ( )
 		CHECK_NULL_PTR_ERROR (context)
 		Mesh::MeshManager*	manager	= dynamic_cast<Mesh::MeshManager*>(&getContext ( ).getMeshManager( ));
 		CHECK_NULL_PTR_ERROR (manager)
-		CHECK_NULL_PTR_ERROR (getContext ( ).getMeshManager ( ).getMesh ( ))
-		gmds::Mesh&	mesh	= getContext ( ).getMeshManager ( ).getMesh ( )->getGMDSMesh ( );
+		CHECK_NULL_PTR_ERROR (getController( ).getMesh ( ))
+		gmds::Mesh&	mesh	= getController( ).getMesh ( )->getGMDSMesh ( );
 
 		clearSeries ( );
 
@@ -244,8 +226,8 @@ void QtMeshQualityDividerOperationPanel::autoUpdate ( )
 		clear ( );
 
 		// Récupération des éléments de maillage sélectionnés :
-		vector<string>	selectedSurfacesNames	= getContext ( ).getSelectionManager ( ).getEntitiesNames (Entity::MeshSurface);
-		vector<string>	selectedVolumesNames	= getContext ( ).getSelectionManager ( ).getEntitiesNames (Entity::MeshVolume);
+		vector<string>	selectedSurfacesNames	= getController( ).getEntitiesNames (Entity::MeshSurface);
+		vector<string>	selectedVolumesNames	= getController( ).getEntitiesNames (Entity::MeshVolume);
 
 		// les groupes de mailles qui seront évalués par Qualif
 		std::vector<Mesh::Volume*> volumes;
@@ -253,23 +235,23 @@ void QtMeshQualityDividerOperationPanel::autoUpdate ( )
 
 		for (vector<string>::const_iterator its = selectedSurfacesNames.begin ( ); selectedSurfacesNames.end ( ) != its; its++)
 		{
-			Mesh::Surface*	surface	= getContext ( ).getMeshManager ( ).getSurface (*its, true);
+			Mesh::Surface*	surface	= getController( ).getSurface (*its, true);
 			CHECK_NULL_PTR_ERROR (surface)
 			surfaces.push_back(surface);
 		}
 		for (vector<string>::const_iterator itv = selectedVolumesNames.begin ( ); selectedVolumesNames.end ( ) != itv; itv++)
 		{
-			Mesh::Volume*	volume	= getContext ( ).getMeshManager ( ).getVolume (*itv, true);
+			Mesh::Volume*	volume	= getController( ).getVolume (*itv, true);
 			CHECK_NULL_PTR_ERROR (volume)
 			volumes.push_back(volume);
 		}
 
 		// s'il n'y a rien de sélectionné, on prend tout [EB]
 		if (volumes.empty())
-			volumes = getContext ( ).getMeshManager().getVolumesObj();
+			volumes = getController().getVolumesObj();
 
 		if (volumes.empty() && surfaces.empty())
-			surfaces = getContext ( ).getMeshManager().getSurfacesObj();
+			surfaces = getController().getSurfacesObj();
 
 		for (std::vector<Mesh::Surface*> ::const_iterator iter = surfaces.begin ( ); surfaces.end() != iter; iter++)
 		{
@@ -322,8 +304,8 @@ void QtMeshQualityDividerOperationPanel::clear ( )
 	CHECK_NULL_PTR_ERROR (context)
 	Mesh::MeshManager*	manager	= dynamic_cast<Mesh::MeshManager*>(&getContext ( ).getMeshManager( ));
 	CHECK_NULL_PTR_ERROR (manager)
-	CHECK_NULL_PTR_ERROR (getContext ( ).getMeshManager ( ).getMesh ( ))
-	gmds::Mesh&	mesh	= getContext ( ).getMeshManager ( ).getMesh ( )->getGMDSMesh ( );
+	CHECK_NULL_PTR_ERROR (getController( ).getMesh ( ))
+	gmds::Mesh&	mesh	= getController( ).getMesh ( )->getGMDSMesh ( );
 
 	// On masque les entités :
 	CHECK_NULL_PTR_ERROR (getMainWindow ( ))
@@ -449,8 +431,8 @@ void QtMeshQualityDividerOperationPanel::clearSeries ( )
 	CHECK_NULL_PTR_ERROR (context)
 	Mesh::MeshManager*	manager	= dynamic_cast<Mesh::MeshManager*>(&getContext ( ).getMeshManager( ));
 	CHECK_NULL_PTR_ERROR (manager)
-	CHECK_NULL_PTR_ERROR (getContext ( ).getMeshManager ( ).getMesh ( ))
-	gmds::Mesh&	gmdsMesh	= getContext ( ).getMeshManager ( ).getMesh ( )->getGMDSMesh ( );
+	CHECK_NULL_PTR_ERROR (getController( ).getMesh ( ))
+	gmds::Mesh&	gmdsMesh	= getController( ).getMesh ( )->getGMDSMesh ( );
 
 	_analysedMeshEntities.clear ( );
 }	// QtMeshQualityDividerOperationPanel::clearSeries

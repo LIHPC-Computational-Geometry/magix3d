@@ -3,13 +3,7 @@
  * \author      Charles PIGNEROL
  * \date        22/05/2014
  */
-
-#include "Internal/Context.h"
-#include "Internal/Resources.h"
-
 #include "Utils/Common.h"
-#include "Topo/CommandExtendSplitFace.h"
-#include "Topo/TopoDisplayRepresentation.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtTopologyExtendSplitFaceAction.h"
@@ -22,9 +16,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -201,6 +193,10 @@ string QtTopologyExtendSplitFacePanel::getVertexName ( ) const
 void QtTopologyExtendSplitFacePanel::preview (
 											bool show, bool destroyInteractor)
 {
+
+	std::cout<<"Print disabled for the moment: refactoring in progress"<<std::endl;
+
+	/*
 	// Lors de la construction getGraphicalWidget peut être nul ...
 	try
 	{
@@ -249,6 +245,7 @@ void QtTopologyExtendSplitFacePanel::preview (
 	catch (...)
 	{
 	}
+	*/
 }	// QtTopologyExtendSplitFacePanel::preview
 
 
@@ -257,10 +254,10 @@ vector<Entity*> QtTopologyExtendSplitFacePanel::getInvolvedEntities ( )
 	vector<Entity*>	entities;
 	const string	faceName	= getFaceName ( );
 	const string	vertexName	= getVertexName ( );
-	TopoEntity*		face	=
-			getContext ( ).getTopoManager ( ).getCoFace (faceName, false);
-	TopoEntity*		vertex	=
-			getContext ( ).getTopoManager ( ).getVertex (vertexName, false);
+	Entity*		face	=
+			getController ( ).getTopoManager ( ).getCoFace (faceName, false);
+	Entity*		vertex	=
+			getController ( ).getTopoManager ( ).getVertex (vertexName, false);
 	if (0 != face)
 		entities.push_back (face);
 	if (0 != vertex)
@@ -350,8 +347,7 @@ void QtTopologyExtendSplitFaceAction::executeOperation ( )
 	const string	faceName	= panel->getFaceName ( );
 	const string	vertexName	= panel->getVertexName ( );
 
-	Mgx3D::Internal::M3DCommandResult*	result	= getContext ( ).getTopoManager ( ).extendSplitFace (faceName, vertexName);
-	CHECK_NULL_PTR_ERROR (result)
+	getController ( ).getTopoManager ( ).extendSplitFace (faceName, vertexName);
 	setCommandResult (result);
 	if (Command::FAIL == result->getStatus ( ))
 		throw Exception (result->getErrorMessage ( ));

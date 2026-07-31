@@ -3,11 +3,7 @@
  * \author      Charles PIGNEROL
  * \date        09/12/2014
  */
-
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
-#include "Geom/Volume.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "QtComponents/QtMgx3DMainWindow.h"
 #include "QtComponents/QtTopologyGlue2BlocksAction.h"
@@ -20,10 +16,7 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
-using namespace Mgx3D::Geom;
-using namespace Mgx3D::Topo;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -271,10 +264,10 @@ vector<Entity*> QtTopologyGlue2BlocksPanel::getInvolvedEntities ( )
 	{
 		case QtTopologyGlue2BlocksPanel::VOLUMES	:	
 		{
-			GeomEntity*		volume1	=
-				getContext ( ).getGeomManager ( ).getVolume (name1, false);
-			GeomEntity*		volume2	=
-				getContext ( ).getGeomManager ( ).getVolume (name2, false);
+			Entity*		volume1	=
+				getController ( ).getGeomManager ( ).getVolume (name1, false);
+			Entity*		volume2	=
+				getController ( ).getGeomManager ( ).getVolume (name2, false);
 			if (0 != volume1)
 				entities.push_back (volume1);
 			if (0 != volume2)
@@ -283,10 +276,10 @@ vector<Entity*> QtTopologyGlue2BlocksPanel::getInvolvedEntities ( )
 		break;
 		default										:
 		{
-			TopoEntity*		block1	=
-				getContext ( ).getTopoManager ( ).getBlock (name1, false);
-			TopoEntity*		block2	=
-				getContext ( ).getTopoManager ( ).getBlock (name2, false);
+			Entity*		block1	=
+				getController ( ).getTopoManager ( ).getBlock (name1, false);
+			Entity*		block2	=
+				getController ( ).getTopoManager ( ).getBlock (name2, false);
 			if (0 != block1)
 				entities.push_back (block1);
 			if (0 != block2)
@@ -378,17 +371,15 @@ void QtTopologyGlue2BlocksAction::executeOperation ( )
 	const string	name1	= panel->getBlock1Name ( );
 	const string	name2	= panel->getBlock2Name ( );
 
-	Mgx3D::Internal::M3DCommandResult*	result	= 0;
 	switch (panel->getGlueMethod ( ))
 	{
 		case QtTopologyGlue2BlocksPanel::VOLUMES	:
-			result	= getContext ( ).getTopoManager ( ).glue2Topo (name1, name2);
+			getController ( ).getTopoManager ( ).glue2Topo (name1, name2);
 			break;
 		default										:
-			result	= getContext ( ).getTopoManager ( ).glue2Blocks (name1, name2);
+			getController ( ).getTopoManager ( ).glue2Blocks (name1, name2);
 			break;
 	}	// switch (panel->getGlueMethod ( ))
-	CHECK_NULL_PTR_ERROR (result)
 	setCommandResult (result);
 	if (Command::FAIL == result->getStatus ( ))
 		throw Exception (result->getErrorMessage ( ));

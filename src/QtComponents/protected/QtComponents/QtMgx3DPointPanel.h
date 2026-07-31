@@ -7,8 +7,6 @@
 #ifndef QT_MGX3D_POINT_PANEL_H
 #define QT_MGX3D_POINT_PANEL_H
 
-#include "Internal/Context.h"
-
 #include <TkUtil/util_config.h>
 #include "QtComponents/QtEntityIDTextField.h"
 
@@ -296,7 +294,7 @@ class QtMgx3DPointPanel : public QWidget
 
 
 	/// accès au context
-	Internal::Context& getContext() const;
+	Controller& getController() const;
 
 	private :
 

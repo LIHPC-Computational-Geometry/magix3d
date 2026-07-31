@@ -14,11 +14,8 @@
  * \date        11/12/2012
  */
 
-#include "Internal/Context.h"
-
 #include "Utils/Common.h"
 #include "Utils/ValidatedField.h"
-#include "Geom/GeomManager.h"
 #include "Utils/Vector.h"
 #include "QtComponents/QtBooleanOpOperationAction.h"
 #include "QtComponents/QtMgx3DApplication.h"
@@ -37,10 +34,7 @@ using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D;
 using namespace Mgx3D::Utils::Math;
-using namespace Mgx3D::Group;
-using namespace Mgx3D::Geom;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D
@@ -313,12 +307,12 @@ vector<Entity*> QtBooleanOpOperationPanel::getInvolvedEntities ( )
 
 	for (vector<string>::const_iterator it = names.begin ( );
 	     it != names.end ( ); it++)
-		entities.push_back (getContext ( ).getGeomManager ( ).getEntity (*it, true));
+		entities.push_back (getController( ).getEntity (*it, true));
 
 	names	= getCuttingNames ( );
 	for (vector<string>::const_iterator it = names.begin ( );
 	     it != names.end ( ); it++)
-		entities.push_back (getContext ( ).getGeomManager ( ).getEntity (*it, true));
+		entities.push_back (getController( ).getEntity (*it, true));
 
 	return entities;
 }	// QtBooleanOpOperationPanel::getInvolvedEntities
@@ -371,8 +365,6 @@ QtBooleanOpOperationPanel* QtBooleanOpOperationAction::getBooleanPanel ( )
 
 void QtBooleanOpOperationAction::executeOperation ( )
 {
-    // Validation paramétrage :
-    M3DCommandResult*	cmdResult	= 0;
 //  QtMgx3DGeomOperationAction::executeOperation ( );
 
     // Récupération des paramètres de création du cylindre :
@@ -383,21 +375,21 @@ void QtBooleanOpOperationAction::executeOperation ( )
     vector<string> entities = panel->getEntityNames();
     QtBooleanOpOperationPanel::OPERATION_TYPE type = panel->getOperationType();
     if(type==QtBooleanOpOperationPanel::FUSE)
-        cmdResult	= getContext ( ).getGeomManager ( ).fuse(entities);
+        getController( ).fuse(entities);
     else if(type==QtBooleanOpOperationPanel::COMMON)
-        cmdResult	= getContext ( ).getGeomManager ( ).common(entities);
+        getController( ).common(entities);
     else if(type==QtBooleanOpOperationPanel::CUT)
     {
         vector<string> cuttingEntities = panel->getCuttingNames();
-        cmdResult	= getContext ( ).getGeomManager ( ).cut(entities, cuttingEntities);
+        getController( ).cut(entities, cuttingEntities);
     }
     else if(type==QtBooleanOpOperationPanel::SECTION)
     {
         string  cutting = panel->getCuttingNames()[0];
-        cmdResult	= getContext ( ).getGeomManager ( ).section(entities, cutting);
+        getController( ).section(entities, cutting);
     }
     else if(type==QtBooleanOpOperationPanel::GLUE)
-        cmdResult	= getContext ( ).getGeomManager ( ).glue(entities);
+        getController( ).glue(entities);
 
 	setCommandResult (cmdResult);
 }   // QtBooleanOpOperationAction::executeOperation

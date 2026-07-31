@@ -3,9 +3,6 @@
  * \author		Charles PIGNEROL
  * \date		09/09/2013
  */
-
-#include "Internal/Context.h"
-
 #include "QtComponents/QtMgx3DEntityPanel.h"
 #include <QtUtil/QtErrorManagement.h>
 #include "Utils/Common.h"
@@ -23,7 +20,6 @@
 using namespace std;
 using namespace TkUtil;
 using namespace Mgx3D::Utils;
-using namespace Mgx3D::Internal;
 
 
 namespace Mgx3D

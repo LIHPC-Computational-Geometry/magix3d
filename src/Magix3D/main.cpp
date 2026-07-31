@@ -14,6 +14,8 @@
 #include <TkUtil/MemoryError.h>
 #include <QTextCodec>
 #include <QtPython3/QtPython.h>
+
+#include "Internal/Resources.h"
 /*----------------------------------------------------------------------------*/
 #ifdef QT_4
 #include <QX11Info>
