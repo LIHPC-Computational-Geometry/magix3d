@@ -286,7 +286,7 @@ RenderingManager& RenderingManager::ColorTable::getRenderingManager ( )
 RenderingManager::DisplayLocker::DisplayLocker (RenderingManager& w, bool forceRenderAtEnd)
 	: _3dwidget (&w), _forceRenderAtEnd (forceRenderAtEnd)
 {
-	w.lockDisplay (true);
+	w.lockDisplay ( );
 }	// RenderingManager::DisplayLocker
 
 
@@ -306,7 +306,7 @@ RenderingManager::DisplayLocker::~DisplayLocker ( )
 {
 	if (0 != _3dwidget)
 	{
-		_3dwidget->lockDisplay (false);
+		_3dwidget->unlockDisplay ( );
 		if (true == _forceRenderAtEnd)
 			_3dwidget->forceRender ( );
 	}	// if (0 != _3dwidget)
@@ -692,7 +692,7 @@ vector<RenderingManager::RepresentationID>
 
 RenderingManager::RenderingManager ( )
 	: SelectionManagerObserver (0),
-	  _context (0), _displayLocked (false), _useGlobalDisplayProperties (true), _displayedTypes (FilterEntity::NoneEntity), _topoUseGeomColor (false),
+	  _context (0), _displayLocksCount (0), _useGlobalDisplayProperties (true), _displayedTypes (FilterEntity::NoneEntity), _topoUseGeomColor (false),
 	  _structuredDataThreshold (-NumericServices::doubleMachInfinity ( ))
 {
 }	// RenderingManager::RenderingManager
@@ -700,7 +700,7 @@ RenderingManager::RenderingManager ( )
 
 RenderingManager::RenderingManager (const RenderingManager&)
 	: SelectionManagerObserver (0),
-	  _context (0), _displayLocked (false), _useGlobalDisplayProperties (true), _displayedTypes (FilterEntity::NoneEntity), _topoUseGeomColor (false),
+	  _context (0), _displayLocksCount (0), _useGlobalDisplayProperties (true), _displayedTypes (FilterEntity::NoneEntity), _topoUseGeomColor (false),
 	  _structuredDataThreshold (-NumericServices::doubleMachInfinity ( ))
 {
 	MGX_FORBIDDEN ("RenderingManager copy constructor is not allowed.");
@@ -1218,16 +1218,14 @@ void RenderingManager::selectionCleared ( )
 		return;
 
 	const bool	locked	= displayLocked ( );
-	lockDisplay (true);
+	lockDisplay ( );
 
 	const vector<Entity*>	entities	= getSelectionManager ( )->getEntities ( );
 	entitiesRemovedFromSelection (entities, true);
 
+	unlockDisplay ( );
 	if (false == locked)
-	{
-		lockDisplay (false);
 		forceRender ( );
-	}	// if (false == locked)
 }	// RenderingManager::selectionCleared
 
 
@@ -1561,14 +1559,20 @@ const unsigned long	typesMask	= GraphicalEntityRepresentation::getDefaultReprese
 
 bool RenderingManager::displayLocked ( ) const
 {
-	return _displayLocked;
+	return 0 != _displayLocksCount ? true : false;
 }	// RenderingManager::displayLocked
 
 
-void RenderingManager::lockDisplay (bool lock)
+void RenderingManager::lockDisplay ( )
 {
-	_displayLocked	= lock;
+	++_displayLocksCount;
 }	// RenderingManager::lockDisplay
+
+
+void RenderingManager::unlockDisplay ( )
+{
+	--_displayLocksCount;
+}	// RenderingManager::unlockDisplay
 
 
 // ============================================================================

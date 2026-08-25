@@ -16,6 +16,9 @@
 
 
 #include <TkUtil/Timer.h>
+
+#include <atomic>
+
 /**
  * Macro-commandes pour faire du profiling sur le rendu graphique.
  */
@@ -1253,10 +1256,18 @@ class RenderingManager : public Internal::SelectionManagerObserver
 				);
 
 	/**
-	 * \param		<I>true</I> si les opérations d'affichage sont à inhiber, <I>false</I> dans le cas contraire.
+	 * \param		Incrémente le compteur d'inhibitions des opérations d'affichage.
 	 * \see			displayLocked
+	 * \see			unlockDisplay
 	 */
-	virtual void lockDisplay (bool lock);
+	virtual void lockDisplay ( );
+
+	/**
+	 * \param		Décrémente le compteur d'inhibitions des opérations d'affichage.
+	 * \see			displayLocked
+	 * \see			unlockDisplay
+	 */
+	virtual void unlockDisplay ( );
 
 
 
@@ -1265,6 +1276,7 @@ class RenderingManager : public Internal::SelectionManagerObserver
 	/**
 	 * \return		<I>true</I> si les opérations d'affichage sont inhibées (optimisation).
 	 * \see			lockDisplay
+	 * \see			unlockDisplay
 	 */
 	virtual bool displayLocked ( ) const;
 
@@ -1278,9 +1290,9 @@ class RenderingManager : public Internal::SelectionManagerObserver
 	/** Le contexte de session associé. */
 	Mgx3D::Internal::Context*						_context;
 
-	/** Si <I>true</I> ne pas effectuer d'opération d'affichage (optimisation).
+	/** Si <I>non nul</I> ne pas effectuer d'opération d'affichage (optimisation).
 	 */
-	bool											_displayLocked;
+	std::atomic<unsigned long>						_displayLocksCount;
 
 	/** Si <I>true</I> l'affichage des entités utilise des propriétés d'affichage communes. Si <I>false</I> se sont des propriétés
 	 * individuelles qui sont utilisées.
