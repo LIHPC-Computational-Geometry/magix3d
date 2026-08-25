@@ -950,11 +950,7 @@ void QtMgx3DApplication::setPersistantConfiguration (const Section& mainSection)
 {
 	if (0 != Resources::instance ( )._userConfigURL.length ( ))
 	{
-		XMLLoader::ENCODING	encoding	= XMLLoader::UTF_16;
-		if (true == mainSection.isIso ( ))
-			encoding	= XMLLoader::ISO_8859 ;
-		else if (true == mainSection.isAscii ( ))
-			encoding	= XMLLoader::UTF_8;
+		XMLLoader::ENCODING	encoding	= XMLLoader::UTF_8;
 	    XMLLoader::save (mainSection, Resources::instance ( )._userConfigURL, encoding);
 	}	// if (0 != _userConfigURL.length ( ))
 }	// QtMgx3DApplication::setPersistantConfiguration

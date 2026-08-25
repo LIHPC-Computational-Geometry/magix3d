@@ -1003,16 +1003,8 @@ void OCCHelper::
 computeBoundingBox(const TopoDS_Shape& shape, gp_Pnt& pmin, gp_Pnt& pmax)
 {
     Bnd_Box box;
-    BRepCheck_Analyzer analyzer(shape);
-    if (analyzer.IsValid()) {
-        BRepBndLib::AddClose(shape, box);
-    } else {
-        BRepBndLib::AddOptimal(shape, box);
-    }
 
-    if (box.IsVoid())
-        BRepBndLib::Add(shape, box);
-
+    BRepBndLib::AddOptimal(shape, box, false);
     double xmin, ymin, zmin, xmax, ymax, zmax;
     box.Get(xmin, ymin, zmin, xmax, ymax, zmax);
     pmin.SetCoord(xmin, ymin, zmin);

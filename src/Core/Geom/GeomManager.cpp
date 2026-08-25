@@ -2184,10 +2184,10 @@ newArcCircle(const double& angleDep,
 
     // trace dans le script
     TkUtil::UTF8String cmd (TkUtil::Charset::UTF_8);
-    cmd << getContextAlias() << "." << "getGeomManager().newArcCircle(\""
-            <<angleDep<<"\", \""
-            <<angleFin<<"\", \""
-            <<rayon<<"\", ";
+    cmd << getContextAlias() << "." << "getGeomManager().newArcCircle("
+            <<angleDep<<", "
+            <<angleFin<<", "
+            <<rayon<<", ";
     if (sysCoord)
         cmd << "\"" <<sysCoord->getName()<< "\"";
     else

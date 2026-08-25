@@ -6,6 +6,11 @@ build-linux-ubuntu*
 spack-build*
 spack-configure*
 
+spack-env/.spack-env
+spack-env/spack.lock
+build
+install
+
 CMakeUserPresets.json
 
 __pycache__

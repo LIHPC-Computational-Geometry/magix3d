@@ -485,11 +485,18 @@ void Entity::setDestroyed(bool b)
     m_destroyed = b;
     // En cas de redo ...
     // [EB] seulement pour b==false pour éviter updateRepresentation sur une entité marquée comme détruite
+/*
+ CP 17/07/26 : issue #279 et peut être #222
+ Désactivation de cette optimisation qui a des effets de bord délétères. En cas d'affichage d'un apperçu,
+ une entité peut être mise en surbrillance. Le do/undo de la commande, si il marque l'entité détruite, va la
+ restaurer dans un état autre que celui avant création de l'apperçu (ex : highlighted=true selected=true devient
+ highlighted=false selected=false après undo, le gestionnaire de sélection l'ayant conservé comme sélectionné).
 	if (0 != getDisplayProperties ( ).getGraphicalRepresentation ( ) && !b)
 	{
 		getDisplayProperties ( ).getGraphicalRepresentation ( )->setHighlighted (false);
 		getDisplayProperties ( ).getGraphicalRepresentation ( )->setSelected (false);
 	}	// if (0 != getDisplayProperties ( ).getGraphicalRepresentation ( ) && !b)
+*/
 #ifdef _DEBUG2
     std::cout<<"Entity::setDestroyed("<<(b?"vrai":"faux")<<") pour "<<getName()<<std::endl;
 #endif
