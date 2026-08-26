@@ -409,6 +409,10 @@ def generer_script(ctx):
         script += "    print('Nombre de mailles identique.')\n"
         script += "else:\n"
         script += f"    print('Différence du nombre de mailles : ' + str(nbRegions) + ' vs {mm.getNbRegions()}.')\n"
+        script += f"if mm.compareWithMesh('{os.path.join(path, script_name + '_generate_import', script_name + '.mli2')}'):\n"
+        script += "    print('Maillage identique.')\n"
+        script += "else:\n"
+        script += f"    print('Maillage différent')\n"
 
     return script
 
