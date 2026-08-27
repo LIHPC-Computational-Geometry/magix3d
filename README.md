@@ -1,6 +1,7 @@
 # magix3d
 
 ![spack-ci](https://github.com/LIHPC-Computational-Geometry/magix3d/actions/workflows/spack-ci.yml/badge.svg)
+![codecov](https://codecov.io/gh/LIHPC-Computational-Geometry/magix3d/graph/badge.svg?token=2OO9SA8EML)](https://codecov.io/gh/LIHPC-Computational-Geometry/magix3d)
 
 <p align="center"><img src="./Docs/images/magix3D.jpg" width="30%" height="30%"/></p>
 
