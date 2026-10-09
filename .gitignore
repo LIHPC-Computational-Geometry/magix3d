@@ -8,6 +8,8 @@ spack-configure*
 
 spack-env/.spack-env
 spack-env/spack.lock
+spack-env/spack_recipes
+
 build
 install
 

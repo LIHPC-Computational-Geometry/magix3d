@@ -27,7 +27,7 @@
 spack:
   definitions:
   - packages:
-    - hdf5~mpi
+    - hdf5@1.14.4-3~mpi
     - cgns~mpi
     - mesquite~mpi
     - vtk-maillage~opengl2+qt~mpi
@@ -36,20 +36,20 @@ spack:
     - tkutil
     - preferences
     - pythonutil
-    - gmds
+    - gmds+lima+cgns
     - qualif
     - qqualif
-    - lima
+    - lima+scripting
     - qtutil
     - qwtcharts
     - qtpython
     - qtvtk
-    - opencascade@7.8.1
+    - opencascade@7.8.1+data_exchange
     - cgns
     - mesquite
     - tetgen
     - smooth3d
-    - gmsh
+    - gmsh~fltk
     - xerces-c
     - libxt
     - swig
@@ -58,15 +58,28 @@ spack:
     - py-breathe            # for doc
     - py-sphinx-copybutton  # for doc
     - py-rst2pdf            # for doc
-    
   view:
     vx1:
       root: ${HOME}/magix3d-spack-view
       link_type: symlink
 
   specs:
-    - $packages
-    
+  - $packages
+
   concretizer:
     unify: true
 
+  compilers:
+  - compiler:
+      spec: gcc@=14.3.1
+      paths:
+        cc: /usr/bin/gcc
+        cxx: /usr/bin/g++
+        f77: /usr/bin/gfortran
+        fc: /usr/bin/gfortran
+      flags: {}
+      operating_system: almalinux10
+      target: x86_64
+      modules: []
+      environment: {}
+      extra_rpaths: []
