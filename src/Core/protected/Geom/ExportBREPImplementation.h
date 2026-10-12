@@ -7,6 +7,7 @@
 #include <TopoDS_Compound.hxx>
 /*----------------------------------------------------------------------------*/
 #include <string>
+#include <map>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
 /*----------------------------------------------------------------------------*/
@@ -49,6 +50,9 @@ public:
      */
     virtual ~ExportBREPImplementation();
 
+    const std::map<std::string, std::vector<int>>& getGeomId2BrepIndices() const 
+    { return m_geom_id_2_brep_indices; }
+
 protected:
 
     /*------------------------------------------------------------------------*/
@@ -65,7 +69,8 @@ protected:
 
 private:
     BRep_Builder m_builder;
-    TopoDS_Compound m_compound;    
+    TopoDS_Compound m_compound;
+    std::map<std::string, std::vector<int>> m_geom_id_2_brep_indices;
 };
 
 /*----------------------------------------------------------------------------*/

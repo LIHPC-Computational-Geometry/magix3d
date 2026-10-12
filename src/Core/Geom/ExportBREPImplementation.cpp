@@ -1,10 +1,12 @@
 /*----------------------------------------------------------------------------*/
 #include "Geom/ExportBREPImplementation.h"
+#include "Geom/IncidentGeomEntitiesVisitor.h"
 /*----------------------------------------------------------------------------*/
 #include <ios>
 #include <TkUtil/MemoryError.h>
 /*----------------------------------------------------------------------------*/
 #include <BRepTools.hxx>
+#include <TopExp.hxx>
 #include <Interface_Static.hxx>
 /*----------------------------------------------------------------------------*/
 namespace Mgx3D {
@@ -44,6 +46,21 @@ void ExportBREPImplementation::write()
         throw TkUtil::Exception (TkUtil::UTF8String ("Impossible d'écrire ce fichier BREP", TkUtil::Charset::UTF_8));
     }
     BRepTools::Write(m_compound, file);
+
+
+    GetDownIncidentGeomEntitiesVisitor v;
+    for (GeomEntity* ge : m_geomEntities)
+        ge->accept(v);
+
+    TopTools_IndexedMapOfShape map;
+    TopExp::MapShapes(m_compound, map);
+    for (GeomEntity* ge : v.get())
+    {
+        std::vector<int> brep_indices;
+        auto add = [&](const TopoDS_Shape& sh) { brep_indices.push_back(map.FindIndex(sh)); };
+        ge->apply(add);
+        m_geom_id_2_brep_indices[ge->getName()] = brep_indices;
+    }
 }
 /*----------------------------------------------------------------------------*/
 } // end namespace Geom
