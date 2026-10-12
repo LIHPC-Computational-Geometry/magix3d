@@ -9,7 +9,6 @@
                 "ERD_INTERNAL_EXTENSION": "not_defined",
                 "USER_TEAM": "undef_user_team",
                 "DOXYGEN_PATH": "not_defined",
-                "DKOC_LICENCE": "unavailable",
                 "GUIToolkitsVariables_ROOT": "$env{INSTALL_DIR}/guitoolkitsvariables",
                 "VtkContrib_ROOT": "$env{INSTALL_DIR}/vtkcontrib",
                 "VTK_ROOT": "$env{INSTALL_DIR}/VTK-7.1.1",
@@ -48,7 +47,6 @@
                 "ERD_INTERNAL_EXTENSION": "not_defined",
                 "USER_TEAM": "undef_user_team",
                 "DOXYGEN_PATH": "not_defined",
-                "DKOC_LICENCE": "unavailable",
                 "CMAKE_PREFIX_PATH": "$env{HOME}/magix3d-spack-view"
             }
         }

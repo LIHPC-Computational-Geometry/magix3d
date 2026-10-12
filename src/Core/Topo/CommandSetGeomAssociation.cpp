@@ -147,11 +147,13 @@ void CommandSetGeomAssociation::validGeomEntity()
 /*----------------------------------------------------------------------------*/
 void CommandSetGeomAssociation::project(Block* bloc)
 {
+	getInfoCommand().addTopoInfoEntity(bloc, Internal::InfoCommand::DISPMODIFIED);
 	setGeomAssociation(bloc, [bloc](Internal::InfoCommand* icmd) { bloc->saveBlockTopoProperty(icmd); });
 }
 /*----------------------------------------------------------------------------*/
 void CommandSetGeomAssociation::project(CoFace* coface)
 {
+	getInfoCommand().addTopoInfoEntity(coface, Internal::InfoCommand::DISPMODIFIED);
 	setGeomAssociation(coface, [coface](Internal::InfoCommand* icmd) { coface->saveCoFaceTopoProperty(icmd); });
 
 	std::vector<CoEdge*> coedges = coface->getCoEdges();
@@ -206,6 +208,7 @@ void CommandSetGeomAssociation::project(CoFace* coface)
 /*----------------------------------------------------------------------------*/
 void CommandSetGeomAssociation::project(CoEdge* coedge)
 {
+	getInfoCommand().addTopoInfoEntity(coedge, Internal::InfoCommand::DISPMODIFIED);
 	setGeomAssociation(coedge, [coedge](Internal::InfoCommand* icmd) { coedge->saveCoEdgeTopoProperty(icmd); });
 
 	const std::vector<Vertex*>& vertices = coedge->getVertices();
@@ -218,7 +221,6 @@ void CommandSetGeomAssociation::project(CoEdge* coedge)
 						|| (vtx->getGeomAssociation()->getDim() == 2 && m_geom_entity->getDim() == 1)))
 			project(vtx);
 	}
-
 }
 /*----------------------------------------------------------------------------*/
 void CommandSetGeomAssociation::project(Vertex* vtx)
@@ -251,6 +253,8 @@ void CommandSetGeomAssociation::project(Vertex* vtx)
 			}
 		}
 	}
+	// must be set after saveVertexGeomProperty that checks whether there is a status change
+	getInfoCommand().addTopoInfoEntity(vtx, Internal::InfoCommand::DISPMODIFIED);
 }
 /*----------------------------------------------------------------------------*/
 void CommandSetGeomAssociation::getPreviewRepresentation(Utils::DisplayRepresentation& dr)
@@ -260,7 +264,6 @@ void CommandSetGeomAssociation::getPreviewRepresentation(Utils::DisplayRepresent
 /*----------------------------------------------------------------------------*/
 void CommandSetGeomAssociation::setGeomAssociation(TopoEntity* e, std::function<void(Internal::InfoCommand* icmd)> saveGroups)
 {
-	getInfoCommand().addTopoInfoEntity(e, Internal::InfoCommand::DISPMODIFIED);
 	e->saveTopoProperty();
 	e->setGeomAssociation(m_geom_entity);
 
